@@ -1,7 +1,7 @@
 //
 // HTTPBasicCredentials.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPBasicCredentials.cpp#2 $
+// $Id: //poco/1.4/Net/src/HTTPBasicCredentials.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -103,7 +103,7 @@ void HTTPBasicCredentials::setPassword(const std::string& password)
 }
 	
 	
-void HTTPBasicCredentials::authenticate(HTTPRequest& request)
+void HTTPBasicCredentials::authenticate(HTTPRequest& request) const
 {
 	std::ostringstream ostr;
 	Base64Encoder encoder(ostr);
@@ -111,6 +111,17 @@ void HTTPBasicCredentials::authenticate(HTTPRequest& request)
 	encoder << _username << ":" << _password;
 	encoder.close();
 	request.setCredentials(SCHEME, ostr.str());
+}
+
+
+void HTTPBasicCredentials::proxyAuthenticate(HTTPRequest& request) const
+{
+	std::ostringstream ostr;
+	Base64Encoder encoder(ostr);
+	encoder.rdbuf()->setLineLength(0);
+	encoder << _username << ":" << _password;
+	encoder.close();
+	request.setProxyCredentials(SCHEME, ostr.str());
 }
 
 

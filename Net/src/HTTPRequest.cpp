@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#2 $
+// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -49,17 +49,18 @@ namespace Poco {
 namespace Net {
 
 
-const std::string HTTPRequest::HTTP_GET      = "GET";
-const std::string HTTPRequest::HTTP_HEAD     = "HEAD";
-const std::string HTTPRequest::HTTP_PUT      = "PUT";
-const std::string HTTPRequest::HTTP_POST     = "POST";
-const std::string HTTPRequest::HTTP_OPTIONS  = "OPTIONS";
-const std::string HTTPRequest::HTTP_DELETE   = "DELETE";
-const std::string HTTPRequest::HTTP_TRACE    = "TRACE";
-const std::string HTTPRequest::HTTP_CONNECT  = "CONNECT";
-const std::string HTTPRequest::HOST          = "Host";
-const std::string HTTPRequest::COOKIE        = "Cookie";
-const std::string HTTPRequest::AUTHORIZATION = "Authorization";
+const std::string HTTPRequest::HTTP_GET            = "GET";
+const std::string HTTPRequest::HTTP_HEAD           = "HEAD";
+const std::string HTTPRequest::HTTP_PUT            = "PUT";
+const std::string HTTPRequest::HTTP_POST           = "POST";
+const std::string HTTPRequest::HTTP_OPTIONS        = "OPTIONS";
+const std::string HTTPRequest::HTTP_DELETE         = "DELETE";
+const std::string HTTPRequest::HTTP_TRACE          = "TRACE";
+const std::string HTTPRequest::HTTP_CONNECT        = "CONNECT";
+const std::string HTTPRequest::HOST                = "Host";
+const std::string HTTPRequest::COOKIE              = "Cookie";
+const std::string HTTPRequest::AUTHORIZATION       = "Authorization";
+const std::string HTTPRequest::PROXY_AUTHORIZATION = "Proxy-Authorization";
 
 
 HTTPRequest::HTTPRequest():
@@ -168,28 +169,31 @@ bool HTTPRequest::hasCredentials() const
 	
 void HTTPRequest::getCredentials(std::string& scheme, std::string& authInfo) const
 {
-	scheme.clear();
-	authInfo.clear();
-	if (has(AUTHORIZATION))
-	{
-		const std::string& auth = get(AUTHORIZATION);
-		std::string::const_iterator it  = auth.begin();
-		std::string::const_iterator end = auth.end();
-		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
-		while (it != end && !Poco::Ascii::isSpace(*it)) scheme += *it++;
-		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
-		while (it != end) authInfo += *it++;
-	}
-	else throw NotAuthenticatedException();
+	getCredentials(AUTHORIZATION, scheme, authInfo);
 }
 
 	
 void HTTPRequest::setCredentials(const std::string& scheme, const std::string& authInfo)
 {
-	std::string auth(scheme);
-	auth.append(" ");
-	auth.append(authInfo);
-	set(AUTHORIZATION, auth);
+	setCredentials(AUTHORIZATION, scheme, authInfo);
+}
+
+
+bool HTTPRequest::hasProxyCredentials() const
+{
+	return has(PROXY_AUTHORIZATION);
+}
+
+	
+void HTTPRequest::getProxyCredentials(std::string& scheme, std::string& authInfo) const
+{
+	getCredentials(PROXY_AUTHORIZATION, scheme, authInfo);
+}
+
+	
+void HTTPRequest::setProxyCredentials(const std::string& scheme, const std::string& authInfo)
+{
+	setCredentials(PROXY_AUTHORIZATION, scheme, authInfo);
 }
 
 
@@ -231,6 +235,34 @@ void HTTPRequest::read(std::istream& istr)
 	setURI(uri);
 	setVersion(version);
 }
+
+
+void HTTPRequest::getCredentials(const std::string& header, std::string& scheme, std::string& authInfo) const
+{
+	scheme.clear();
+	authInfo.clear();
+	if (has(header))
+	{
+		const std::string& auth = get(header);
+		std::string::const_iterator it  = auth.begin();
+		std::string::const_iterator end = auth.end();
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
+		while (it != end && !Poco::Ascii::isSpace(*it)) scheme += *it++;
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
+		while (it != end) authInfo += *it++;
+	}
+	else throw NotAuthenticatedException();
+}
+
+	
+void HTTPRequest::setCredentials(const std::string& header, const std::string& scheme, const std::string& authInfo)
+{
+	std::string auth(scheme);
+	auth.append(" ");
+	auth.append(authInfo);
+	set(header, auth);
+}
+
 
 
 } } // namespace Poco::Net

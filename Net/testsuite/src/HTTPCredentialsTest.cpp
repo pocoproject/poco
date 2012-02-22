@@ -1,7 +1,7 @@
 //
 // HTTPCredentialsTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPCredentialsTest.cpp#2 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPCredentialsTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -79,6 +79,22 @@ void HTTPCredentialsTest::testBasicCredentials()
 	HTTPBasicCredentials cred2(request);
 	assert (cred2.getUsername() == "user");
 	assert (cred2.getPassword() == "secret");
+}
+
+
+void HTTPCredentialsTest::testProxyBasicCredentials()
+{
+	HTTPRequest request;
+	assert (!request.hasProxyCredentials());
+	
+	HTTPBasicCredentials cred("user", "secret");
+	cred.proxyAuthenticate(request);
+	assert (request.hasProxyCredentials());
+	std::string scheme;
+	std::string info;
+	request.getProxyCredentials(scheme, info);
+	assert (scheme == "Basic");
+	assert (info == "dXNlcjpzZWNyZXQ=");
 }
 
 
@@ -211,6 +227,17 @@ void HTTPCredentialsTest::testCredentialsBasic()
 }
 
 
+void HTTPCredentialsTest::testProxyCredentialsBasic()
+{
+	HTTPCredentials creds("user", "s3cr3t");
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/basic/");
+	HTTPResponse response;
+	response.set("Proxy-Authenticate", "Basic realm=\"TestBasic\"");	
+	creds.proxyAuthenticate(request, response);	
+	assert (request.get("Proxy-Authorization") == "Basic dXNlcjpzM2NyM3Q=");
+}
+
+
 void HTTPCredentialsTest::testCredentialsDigest()
 {
 	HTTPCredentials creds("user", "s3cr3t");
@@ -219,6 +246,17 @@ void HTTPCredentialsTest::testCredentialsDigest()
 	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
 	creds.authenticate(request, response);	
 	assert (request.get("Authorization") == "Digest nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", response=\"40e4889cfbd0e561f71e3107a2863bc4\", uri=\"/digest/\", username=\"user\"");
+}
+
+
+void HTTPCredentialsTest::testProxyCredentialsDigest()
+{
+	HTTPCredentials creds("user", "s3cr3t");
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
+	HTTPResponse response;
+	response.set("Proxy-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
+	creds.proxyAuthenticate(request, response);	
+	assert (request.get("Proxy-Authorization") == "Digest nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", response=\"40e4889cfbd0e561f71e3107a2863bc4\", uri=\"/digest/\", username=\"user\"");
 }
 
 
@@ -276,12 +314,15 @@ CppUnit::Test* HTTPCredentialsTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPCredentialsTest");
 
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testBasicCredentials);
+	CppUnit_addTest(pSuite, HTTPCredentialsTest, testProxyBasicCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testBadCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testAuthenticationParams);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testDigestCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testDigestCredentialsQoP);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testCredentialsBasic);
+	CppUnit_addTest(pSuite, HTTPCredentialsTest, testProxyCredentialsBasic);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testCredentialsDigest);
+	CppUnit_addTest(pSuite, HTTPCredentialsTest, testProxyCredentialsDigest);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testExtractCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testVerifyAuthInfo);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testVerifyAuthInfoQoP);

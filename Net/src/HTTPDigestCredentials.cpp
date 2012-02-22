@@ -1,7 +1,7 @@
 //
 // HTTPDigestCredentials.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPDigestCredentials.cpp#4 $
+// $Id: //poco/1.4/Net/src/HTTPDigestCredentials.cpp#5 $
 //
 // Library: Net
 // Package: HTTP
@@ -153,6 +153,26 @@ void HTTPDigestCredentials::updateAuthInfo(HTTPRequest& request)
 {
 	updateAuthParams(request);
 	request.setCredentials(SCHEME, _requestAuthParams.toString());
+}
+
+
+void HTTPDigestCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPResponse& response)
+{
+	proxyAuthenticate(request, HTTPAuthenticationParams(response));
+}
+
+
+void HTTPDigestCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPAuthenticationParams& responseAuthParams)
+{
+	createAuthParams(request, responseAuthParams);
+	request.setProxyCredentials(SCHEME, _requestAuthParams.toString());
+}
+
+
+void HTTPDigestCredentials::updateProxyAuthInfo(HTTPRequest& request)
+{
+	updateAuthParams(request);
+	request.setProxyCredentials(SCHEME, _requestAuthParams.toString());
 }
 
 

@@ -1,7 +1,7 @@
 //
 // HTTPCredentials.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPCredentials.cpp#2 $
+// $Id: //poco/1.4/Net/src/HTTPCredentials.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -129,6 +129,42 @@ void HTTPCredentials::updateAuthInfo(HTTPRequest& request)
 }
 
 
+void HTTPCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPResponse& response)
+{
+	for (HTTPResponse::ConstIterator iter = response.find("Proxy-Authenticate"); iter != response.end(); ++iter)
+	{
+		if (isBasicCredentials(iter->second)) 
+		{
+			HTTPBasicCredentials(_digest.getUsername(), _digest.getPassword()).proxyAuthenticate(request);
+			return;
+		} 
+		else if (isDigestCredentials(iter->second)) 
+		{
+			_digest.proxyAuthenticate(request, HTTPAuthenticationParams(iter->second.substr(7)));
+			return;
+		}
+	}
+}
+
+
+void HTTPCredentials::updateProxyAuthInfo(HTTPRequest& request)
+{
+	if (request.has(HTTPRequest::PROXY_AUTHORIZATION)) 
+	{
+		const std::string& authorization = request.get(HTTPRequest::PROXY_AUTHORIZATION);
+
+		if (isBasicCredentials(authorization)) 
+		{
+			HTTPBasicCredentials(_digest.getUsername(), _digest.getPassword()).proxyAuthenticate(request);
+		} 
+		else if (isDigestCredentials(authorization)) 
+		{
+			_digest.updateProxyAuthInfo(request);
+		}
+	}
+}
+
+
 bool HTTPCredentials::isBasicCredentials(const std::string& header)
 {
 	return icompare(header, 0, 5, "Basic") == 0 && (header.size() > 5 ? Poco::Ascii::isSpace(header[5]) : true);
@@ -150,6 +186,18 @@ bool HTTPCredentials::hasBasicCredentials(const HTTPRequest& request)
 bool HTTPCredentials::hasDigestCredentials(const HTTPRequest& request)
 {
 	return request.has(HTTPRequest::AUTHORIZATION) && isDigestCredentials(request.get(HTTPRequest::AUTHORIZATION));
+}
+
+
+bool HTTPCredentials::hasProxyBasicCredentials(const HTTPRequest& request)
+{
+	return request.has(HTTPRequest::PROXY_AUTHORIZATION) && isBasicCredentials(request.get(HTTPRequest::PROXY_AUTHORIZATION));
+}
+
+
+bool HTTPCredentials::hasProxyDigestCredentials(const HTTPRequest& request)
+{
+	return request.has(HTTPRequest::PROXY_AUTHORIZATION) && isDigestCredentials(request.get(HTTPRequest::PROXY_AUTHORIZATION));
 }
 
 

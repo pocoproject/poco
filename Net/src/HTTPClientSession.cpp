@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#5 $
+// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#6 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -41,6 +41,7 @@
 #include "Poco/Net/HTTPStream.h"
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPChunkedStream.h"
+#include "Poco/Net/HTTPBasicCredentials.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/CountingStream.h"
@@ -405,12 +406,8 @@ void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request)
 {
 	if (!_proxyUsername.empty())
 	{
-		std::ostringstream ostr;
-		ostr << "Basic ";
-		Base64Encoder encoder(ostr);
-		encoder << _proxyUsername << ":" << _proxyPassword;
-		encoder.close();
-		request.set("Proxy-Authorization", ostr.str());
+		HTTPBasicCredentials creds(_proxyUsername, _proxyPassword);
+		creds.proxyAuthenticate(request);
 	}
 }
 

@@ -1,7 +1,7 @@
 //
 // HTTPCredentialsTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPCredentialsTest.h#2 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPCredentialsTest.h#3 $
 //
 // Definition of the HTTPCredentialsTest class.
 //
@@ -47,12 +47,15 @@ public:
 	~HTTPCredentialsTest();
 
 	void testBasicCredentials();
+	void testProxyBasicCredentials();
 	void testBadCredentials();
 	void testAuthenticationParams();
 	void testDigestCredentials();
 	void testDigestCredentialsQoP();
 	void testCredentialsBasic();
+	void testProxyCredentialsBasic();
 	void testCredentialsDigest();
+	void testProxyCredentialsDigest();
 	void testExtractCredentials();
 	void testVerifyAuthInfo();
 	void testVerifyAuthInfoQoP();
