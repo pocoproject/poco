@@ -1,7 +1,7 @@
 //
 // ZipStream.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipStream.cpp#2 $
+// $Id: //poco/1.4/Zip/src/ZipStream.cpp#3 $
 //
 // Library: Zip
 // Package: Zip
@@ -35,7 +35,6 @@
 
 
 #include "Poco/Zip/ZipStream.h"
-#include "Poco/zlib.h"
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/Zip/AutoDetectStream.h"
 #include "Poco/Zip/PartialStream.h"
@@ -44,6 +43,11 @@
 #include "Poco/Exception.h"
 #include "Poco/InflatingStream.h"
 #include "Poco/DeflatingStream.h"
+#if defined(POCO_UNBUNDLED)
+#include <zlib.h>
+#else
+#include "Poco/zlib.h"
+#endif
 
 
 namespace Poco {

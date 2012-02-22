@@ -1,7 +1,7 @@
 //
 // SocketDefs.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketDefs.h#5 $
+// $Id: //poco/1.4/Net/include/Poco/Net/SocketDefs.h#6 $
 //
 // Library: Net
 // Package: NetCore
@@ -236,7 +236,7 @@
 #endif
 
 
-#if POCO_OS != POCO_OS_VXWORKS
+#if POCO_OS != POCO_OS_VXWORKS && !defined(POCO_NET_NO_ADDRINFO)
 #define POCO_HAVE_ADDRINFO   1
 #endif
 

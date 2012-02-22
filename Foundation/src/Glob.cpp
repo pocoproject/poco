@@ -1,7 +1,7 @@
 //
 // Glob.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Glob.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Glob.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -92,7 +92,11 @@ void Glob::glob(const Path& pathPattern, std::set<std::string>& files, int optio
 	Path base(pattern);
 	Path absBase(base);
 	absBase.makeAbsolute();
-	while (base.depth() > 0 && base[base.depth() - 1] != "..") 
+	// In case of UNC paths we must not pop the topmost directory
+	// (which must not contain wildcards), otherwise collect() will fail
+	// as one cannot create a DirectoryIterator with only a node name ("\\srv\").
+	int minDepth = base.getNode().empty() ? 0 : 1;
+	while (base.depth() > minDepth && base[base.depth() - 1] != "..") 
 	{
 		base.popDirectory();
 		absBase.popDirectory();
