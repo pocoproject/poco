@@ -55,7 +55,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32mdd.lib ssleay32mdd.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoCryptod.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -134,7 +134,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32md.lib ssleay32md.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoCrypto.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"

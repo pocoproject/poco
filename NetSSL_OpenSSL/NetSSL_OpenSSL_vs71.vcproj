@@ -42,7 +42,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libeay32mdd.lib ssleay32mdd.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="libeay32.lib ssleay32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin\PocoNetSSLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -107,7 +107,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libeay32md.lib ssleay32md.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="libeay32.lib ssleay32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin\PocoNetSSL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"

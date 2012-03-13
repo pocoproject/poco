@@ -56,7 +56,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="libeay32mdd.lib ssleay32mdd.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="libeay32.lib ssleay32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\shared\genrsakeyd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
@@ -128,7 +128,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="libeay32md.lib ssleay32md.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="libeay32.lib ssleay32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\shared\genrsakey.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
@@ -201,7 +201,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="iphlpapi.lib libeay32mtd.lib ssleay32mtd.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib libeay32mtd.lib ssleay32mtd.lib Crypt32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\genrsakeyd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
@@ -276,7 +276,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="iphlpapi.lib libeay32mt.lib ssleay32mt.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib libeay32mt.lib ssleay32mt.lib Crypt32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\genrsakey.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
@@ -349,7 +349,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="iphlpapi.lib libeay32mdd.lib ssleay32mdd.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib libeay32.lib ssleay32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\genrsakeyd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
@@ -424,7 +424,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="iphlpapi.lib libeay32md.lib ssleay32md.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib libeay32.lib ssleay32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\genrsakey.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"

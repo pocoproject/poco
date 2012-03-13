@@ -55,7 +55,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32mdd.lib ssleay32mdd.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
 				OutputFile="..\bin\PocoCryptod.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -125,7 +125,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32md.lib ssleay32md.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
 				OutputFile="..\bin\PocoCrypto.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

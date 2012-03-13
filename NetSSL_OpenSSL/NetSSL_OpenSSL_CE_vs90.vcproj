@@ -55,7 +55,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="libeay32mdd.lib ssleay32mdd.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="libeay32.lib ssleay32.lib ws2.lib iphlpapi.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoNetSSLd.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -134,7 +134,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="libeay32md.lib ssleay32md.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="libeay32.lib ssleay32.lib ws2.lib iphlpapi.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoNetSSL.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"

@@ -56,7 +56,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitd.lib WinTestRunnerd.lib ws2_32.lib iphlpapi.lib libeay32mdd.lib ssleay32mdd.lib"
+				AdditionalDependencies="CppUnitd.lib WinTestRunnerd.lib ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
 				OutputFile="bin\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -126,7 +126,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnit.lib WinTestRunner.lib ws2_32.lib iphlpapi.lib libeay32md.lib ssleay32md.lib"
+				AdditionalDependencies="CppUnit.lib WinTestRunner.lib ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
 				OutputFile="bin\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -194,7 +194,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib iphlpapi.lib winmm.lib nafxcwd.lib libcmtd.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32mtd.lib ssleay32mtd.lib"
+				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib iphlpapi.lib winmm.lib nafxcwd.lib libcmtd.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32mtd.lib ssleay32mtd.lib Crypt32.lib"
 				OutputFile="bin\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -265,7 +265,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib iphlpapi.lib winmm.lib nafxcw.lib libcmt.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32mt.lib ssleay32mt.lib"
+				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib iphlpapi.lib winmm.lib nafxcw.lib libcmt.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32mt.lib ssleay32mt.lib Crypt32.lib"
 				OutputFile="bin\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -334,7 +334,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmdd.lib WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32mdd.lib ssleay32mdd.lib"
+				AdditionalDependencies="CppUnitmdd.lib WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
 				OutputFile="bin\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -404,7 +404,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32md.lib ssleay32md.lib"
+				AdditionalDependencies="CppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
 				OutputFile="bin\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"

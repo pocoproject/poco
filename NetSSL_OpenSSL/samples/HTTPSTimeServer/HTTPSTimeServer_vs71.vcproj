@@ -41,7 +41,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libeay32mdd.lib ssleay32mdd.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="libeay32.lib ssleay32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\HTTPSTimeServerd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -103,7 +103,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libeay32md.lib ssleay32md.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="libeay32.lib ssleay32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\HTTPSTimeServer.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -164,7 +164,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32mtd.lib ssleay32mtd.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32mtd.lib ssleay32mtd.lib Crypt32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_mt\HTTPSTimeServerd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -226,7 +226,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32mt.lib ssleay32mt.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32mt.lib ssleay32mt.lib Crypt32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_mt\HTTPSTimeServer.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -287,7 +287,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32mdd.lib ssleay32mdd.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32.lib ssleay32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_md\HTTPSTimeServerd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -349,7 +349,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32md.lib ssleay32md.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32.lib ssleay32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_md\HTTPSTimeServer.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
