@@ -1,5 +1,19 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.4.4 (2012-04-??)
+==========================
+
+- ZipStream now builds correctly in unbundled build.
+- added proxy digest authentication support to Net library
+- integrated MySQL BLOB fixes from Franky Braem.
+- use standard OpenSSL import libraries (libeay32.lib, ssleay32.lib) for Crypto and 
+  NetSSL_OpenSSL Visual Studio project files.
+- fixed a potential buffer corruption issue in Poco::Net::SecureStreamSocket if lazy 
+  handshake is enabled and the first attempt to complete the handshake fails
+- Poco::DateTimeParser::tryParse() without format specifier now correctly parses ISO8601 
+  date/times with fractional seconds.
+
+
 Release 1.4.3p1 (2012-01-23)
 ============================
 
@@ -1678,4 +1692,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#58 $
+$Id: //poco/1.4/dist/CHANGELOG#59 $

@@ -1,7 +1,7 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DateTimeParser.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/DateTimeParser.cpp#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -148,7 +148,7 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 				case 's':
 					SKIP_JUNK();
 					PARSE_NUMBER_N(second, 2);
-					if (it != end && *it == '.')
+					if (it != end && (*it == '.' || *it == ','))
 					{
 						++it;
 						PARSE_FRACTIONAL_N(millis, 3);
@@ -236,12 +236,14 @@ bool DateTimeParser::tryParse(const std::string& str, DateTime& dateTime, int& t
 		return tryParse("%w, %e %b %r %H:%M:%S %Z", str, dateTime, timeZoneDifferential);
 	else if (str[3] == ' ')
 		return tryParse(DateTimeFormat::ASCTIME_FORMAT, str, dateTime, timeZoneDifferential);
-	else if (str.find(',') != std::string::npos)
+	else if (str.find(',') < 10)
 		return tryParse("%W, %e %b %r %H:%M:%S %Z", str, dateTime, timeZoneDifferential);
 	else if (Ascii::isDigit(str[0]))
 	{
 		if (str.find(' ') != std::string::npos || str.length() == 10)
 			return tryParse(DateTimeFormat::SORTABLE_FORMAT, str, dateTime, timeZoneDifferential);
+		else if (str.find('.') != std::string::npos || str.find(',') != std::string::npos)
+			return tryParse(DateTimeFormat::ISO8601_FRAC_FORMAT, str, dateTime, timeZoneDifferential);
 		else
 			return tryParse(DateTimeFormat::ISO8601_FORMAT, str, dateTime, timeZoneDifferential);
 	}
