@@ -67,6 +67,7 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 {
 	open();
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
+	setProperty("handle", _pDB);
 }
 
 

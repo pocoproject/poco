@@ -112,6 +112,10 @@ public:
 			&AbstractSessionImpl<C>::setStorage, 
 			&AbstractSessionImpl<C>::getStorage);
 
+		addProperty("handle", 
+			&AbstractSessionImpl<C>::setHandle,
+			&AbstractSessionImpl<C>::getHandle);
+
 		addFeature("bulk", 
 			&AbstractSessionImpl<C>::setBulk, 
 			&AbstractSessionImpl<C>::getBulk);
@@ -206,6 +210,18 @@ public:
 		/// Returns the storage type
 	{
 		return _storage;
+	}
+
+	void setHandle(const std::string& name, const Poco::Any& handle)
+		/// Sets the native session handle. 
+	{
+		_handle = handle;
+	}
+		
+	Poco::Any getHandle(const std::string& name="")
+		/// Returns the native session handle. 
+	{
+		return _handle;
 	}
 
 	void setBulk(const std::string& name, bool bulk)
@@ -308,6 +324,7 @@ private:
 	bool        _bulk;
 	bool        _emptyStringIsNull;
 	bool        _forceEmptyString;
+	Poco::Any   _handle;
 };
 
 

@@ -66,9 +66,6 @@
     <ClInclude Include="include\Poco\Data\MetaColumn.h">
       <Filter>DataCore\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\Data\Prepare.h">
-      <Filter>DataCore\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Poco\Data\Range.h">
       <Filter>DataCore\Header Files</Filter>
     </ClInclude>

@@ -209,4 +209,50 @@ void Utility::throwException(int rc, const std::string& addErrMsg)
 }
 
 
+bool Utility::fileToMemory(sqlite3* pInMemory, const std::string& fileName)
+{
+	int rc;
+	sqlite3* pFile;
+	sqlite3_backup* pBackup;
+
+	rc = sqlite3_open(fileName.c_str(), &pFile);
+	if(rc == SQLITE_OK )
+	{
+		pBackup = sqlite3_backup_init(pInMemory, "main", pFile, "main");
+		if( pBackup )
+		{
+			sqlite3_backup_step(pBackup, -1);
+			sqlite3_backup_finish(pBackup);
+		}
+		rc = sqlite3_errcode(pFile);
+	}
+
+	sqlite3_close(pFile);
+	return SQLITE_OK == rc;
+}
+
+
+bool Utility::memoryToFile(const std::string& fileName, sqlite3* pInMemory)
+{
+	int rc;
+	sqlite3* pFile;
+	sqlite3_backup* pBackup;
+
+	rc = sqlite3_open(fileName.c_str(), &pFile);
+	if(rc == SQLITE_OK )
+	{
+		pBackup = sqlite3_backup_init(pFile, "main", pInMemory, "main");
+		if( pBackup )
+		{
+			sqlite3_backup_step(pBackup, -1);
+			sqlite3_backup_finish(pBackup);
+		}
+		rc = sqlite3_errcode(pFile);
+	}
+
+	sqlite3_close(pFile);
+	return SQLITE_OK == rc;
+}
+
+
 } } } // namespace Poco::Data::SQLite

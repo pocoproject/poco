@@ -48,6 +48,7 @@ public:
 
 	void testBinding();
 	void testSimpleAccess();
+	void testInMemory();
 	void testNullCharPointer();
 	void testInsertCharPointer();
 	void testInsertCharPointer2();

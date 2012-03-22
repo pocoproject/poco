@@ -553,7 +553,6 @@
     <ClInclude Include="include\Poco\Data\Nullable.h" />
     <ClInclude Include="include\Poco\Data\Position.h" />
     <ClInclude Include="include\Poco\Data\Preparation.h" />
-    <ClInclude Include="include\Poco\Data\Prepare.h" />
     <ClInclude Include="include\Poco\Data\Range.h" />
     <ClInclude Include="include\Poco\Data\RecordSet.h" />
     <ClInclude Include="include\Poco\Data\Row.h" />

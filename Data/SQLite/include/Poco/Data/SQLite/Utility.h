@@ -80,6 +80,18 @@ public:
 	static MetaColumn::ColumnDataType getColumnType(sqlite3_stmt* pStmt, std::size_t pos);
 		/// Returns column data type.
 
+	static bool fileToMemory(sqlite3* pInMemory, const std::string& fileName);
+		/// Loads the contents of a database file on disk into an opened
+		/// database in memory.
+		/// 
+		/// Returns true if succesful
+
+	static bool memoryToFile(const std::string& fileName, sqlite3* pInMemory);
+		/// Saves the contents of an opened database in memory to the
+		/// database on disk.
+		/// 
+		/// Returns true if succesful
+
 private:
 	static TypeMap _types;
 	Poco::FastMutex _mutex;

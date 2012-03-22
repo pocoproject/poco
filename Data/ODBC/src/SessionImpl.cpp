@@ -64,6 +64,7 @@ SessionImpl::SessionImpl(const std::string& connect,
 {
 	setFeature("bulk", true);
 	open();
+	setProperty("handle", _db.handle());
 }
 
 
@@ -81,6 +82,7 @@ SessionImpl::SessionImpl(const std::string& connect,
 {
 	setFeature("bulk", true);
 	open();
+	setProperty("handle", _db.handle());
 }
 
 

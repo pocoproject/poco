@@ -41,6 +41,7 @@
 #include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/SQLite/Connector.h"
+#include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Data/DataException.h"
@@ -331,6 +332,63 @@ void SQLiteTest::testSimpleAccess()
 	assert (-1 == age);
 	tmp.close();
 	assert (!tmp.isConnected());
+}
+
+
+void SQLiteTest::testInMemory()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (tmp.isConnected());
+	std::string tableName("Person");
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	int age = 133132;
+	int count = 0;
+	std::string result;
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "SELECT name FROM sqlite_master WHERE tbl_name=?", use(tableName), into(result), now;
+	assert (result == tableName);
+
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
+
+	// load db from file to memory
+	Session mem (Poco::Data::SQLite::Connector::KEY, ":memory:");
+	sqlite3* pMemHandle = AnyCast<sqlite3*>(mem.getProperty("handle"));
+	assert (Poco::Data::SQLite::Utility::fileToMemory(pMemHandle, "dummy.db"));
+
+	mem << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 1);
+	mem << "SELECT LastName FROM PERSON", into(result), now;
+	assert (lastName == result);
+	mem << "SELECT Age FROM PERSON", into(count), now;
+	assert (count == age);
+	mem << "UPDATE PERSON SET Age = -1", now;
+	mem << "SELECT Age FROM PERSON", into(age), now;
+	assert (-1 == age);
+	
+	// save db from memory to file on the disk
+	Session dsk (Poco::Data::SQLite::Connector::KEY, "dsk.db");
+	assert (Poco::Data::SQLite::Utility::memoryToFile("dsk.db", pMemHandle));
+
+	dsk << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 1);
+	dsk << "SELECT LastName FROM PERSON", into(result), now;
+	assert (lastName == result);
+	dsk << "SELECT Age FROM PERSON", into(count), now;
+	assert (count == age);
+	dsk << "UPDATE PERSON SET Age = -1", now;
+	dsk << "SELECT Age FROM PERSON", into(age), now;
+	assert (-1 == age);
+
+	tmp.close();
+	mem.close();
+	dsk.close();
+
+	assert (!tmp.isConnected());
+	assert (!mem.isConnected());
+	assert (!dsk.isConnected());
 }
 
 
@@ -2445,6 +2503,7 @@ CppUnit::Test* SQLiteTest::suite()
 
 	CppUnit_addTest(pSuite, SQLiteTest, testBinding);
 	CppUnit_addTest(pSuite, SQLiteTest, testSimpleAccess);
+	CppUnit_addTest(pSuite, SQLiteTest, testInMemory);
 	CppUnit_addTest(pSuite, SQLiteTest, testNullCharPointer);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertCharPointer);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertCharPointer2);
