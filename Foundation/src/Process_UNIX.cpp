@@ -1,7 +1,7 @@
 //
 // Process_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_UNIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Process_UNIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Processes
@@ -109,27 +109,51 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
 #if defined(__QNX__)
-	/// use QNX's spawn system call which is more efficient than fork/exec.
-	char** argv = new char*[args.size() + 2];
-	int i = 0;
-	argv[i++] = const_cast<char*>(command.c_str());
-	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
-		argv[i++] = const_cast<char*>(it->c_str());
-	argv[i] = NULL;
-	struct inheritance inherit;
-	std::memset(&inherit, 0, sizeof(inherit));
-	inherit.flags = SPAWN_ALIGN_DEFAULT | SPAWN_CHECK_SCRIPT | SPAWN_SEARCH_PATH;
-	int fdmap[3];
-	fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;
-	fdmap[1] = outPipe ? outPipe->writeHandle() : 1;
-	fdmap[2] = errPipe ? errPipe->writeHandle() : 2;
-	int pid = spawn(command.c_str(), 3, fdmap, &inherit, argv, NULL);
-	delete [] argv;
-	if (pid == -1) throw SystemException("cannot spawn", command);
+	if (initialDirectory.empty())
+	{
+		/// use QNX's spawn system call which is more efficient than fork/exec.
+		char** argv = new char*[args.size() + 2];
+		int i = 0;
+		argv[i++] = const_cast<char*>(command.c_str());
+		for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
+			argv[i++] = const_cast<char*>(it->c_str());
+		argv[i] = NULL;
+		struct inheritance inherit;
+		std::memset(&inherit, 0, sizeof(inherit));
+		inherit.flags = SPAWN_ALIGN_DEFAULT | SPAWN_CHECK_SCRIPT | SPAWN_SEARCH_PATH;
+		int fdmap[3];
+		fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;
+		fdmap[1] = outPipe ? outPipe->writeHandle() : 1;
+		fdmap[2] = errPipe ? errPipe->writeHandle() : 2;
+	
+		char* envPtr = 0;
+		std::vector<char> envChars;
+		if (!env.empty())
+		{
+			envChars = getEnvironmentVariablesBuffer(env);
+			envPtr = &environmentChars[0];
+		}
+	
+		int pid = spawn(command.c_str(), 3, fdmap, &inherit, argv, envPtr);
+		delete [] argv;
+		if (pid == -1) 
+			throw SystemException("cannot spawn", command);
+	}
+	else
+	{
+		return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env);
+	}
 #else
+	return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env);
+#endif
+}
+
+
+ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
+{
 	int pid = fork();
 	if (pid < 0)
 	{
@@ -137,6 +161,16 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	}
 	else if (pid == 0)
 	{
+		if (!initialDirectory.empty())
+		{
+			if (chdir(initialDirectory.c_str()) != 0)
+			{
+				_exit(72);
+			}
+		}
+
+		setEnvironmentVariables(env);
+
 		// setup redirection
 		if (inPipe)
 		{
@@ -151,7 +185,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		// close all open file descriptors other than stdin, stdout, stderr
 		for (int i = 3; i < getdtablesize(); ++i)
 			close(i);
-			
+
 		char** argv = new char*[args.size() + 2];
 		int i = 0;
 		argv[i++] = const_cast<char*>(command.c_str());
@@ -161,7 +195,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		execvp(command.c_str(), argv);
 		_exit(72);
 	}
-#endif
+
 	if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
 	if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
 	if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);

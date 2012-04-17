@@ -1,7 +1,7 @@
 //
 // ProcessTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ProcessTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ProcessTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -144,6 +144,39 @@ void ProcessTest::testLaunchRedirectOut()
 }
 
 
+void ProcessTest::testLaunchEnv()
+{
+#if !defined(_WIN32_WCE)
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd = "./";
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	std::vector<std::string> args;
+	args.push_back("-env");
+	Pipe outPipe;
+	Process::Env env;
+	env["TESTENV"] = "test";
+	ProcessHandle ph = Process::launch(cmd, args, 0, &outPipe, 0, env);
+	PipeInputStream istr(outPipe);
+	std::string s;
+	int c = istr.get();
+	while (c != -1) { s += (char) c; c = istr.get(); }
+	assert (s == "test");
+	int rc = ph.wait();
+	assert (rc == 0);
+#endif // !defined(_WIN32_WCE)
+}
+
+
 void ProcessTest::setUp()
 {
 }
@@ -161,6 +194,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testLaunch);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectIn);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectOut);
+	CppUnit_addTest(pSuite, ProcessTest, testLaunchEnv);
 
 	return pSuite;
 }

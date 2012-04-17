@@ -1,7 +1,7 @@
 //
 // Process_VMS.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_VMS.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Process_VMS.cpp#3 $
 //
 // Library: Foundation
 // Package: Processes
@@ -37,6 +37,7 @@
 #include "Poco/Process_VMS.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NamedEvent.h"
+#include <sstream>
 #include <times.h>
 #include <time.h>
 
@@ -91,7 +92,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
 	char** argv = new char*[args.size() + 2];
 	int i = 0;
@@ -108,6 +109,17 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		}
 		else if (pid == 0)
 		{
+			if (!initialDirectory.empty())
+			{
+				if (chdir(initialDirectory.c_str()) != 0)
+				{
+					std::stringstream str;
+					str << "Cannot set initial directory to '" << initialDirectory << "' when forking process for";
+					throw SystemException(str.str(), command);		
+				}
+			}
+			setEnvironmentVariables(environment_variables);
+
 			if (execvp(command.c_str(), argv) == -1)
 				throw SystemException("Cannot execute command", command);
 		}

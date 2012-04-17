@@ -1,7 +1,7 @@
 //
 // Process.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/Process.cpp#4 $
 //
 // Library: Foundation
 // Package: Processes
@@ -35,6 +35,46 @@
 
 
 #include "Poco/Process.h"
+#include "Poco/Environment.h"
+
+
+namespace 
+{
+	std::vector<char> getEnvironmentVariablesBuffer(const Poco::Process::Env& env)
+	{   
+		std::vector<char> envbuf;
+		std::size_t pos = 0; 
+		
+		for (Poco::Process::Env::const_iterator it = env.begin(); it != env.end(); ++it)
+		{
+			std::size_t envlen = it->first.length() + it->second.length() + 1;
+	
+			envbuf.resize(pos + envlen + 1);
+			std::copy(it->first.begin(), it->first.end(), &envbuf[pos]);
+			pos += it->first.length();
+			envbuf[pos] = '=';
+			++pos;
+			std::copy(it->second.begin(), it->second.end(), &envbuf[pos]);
+			pos += it->second.length();
+		
+			envbuf[pos] = '\0';
+			++pos;
+		}
+	 
+		envbuf.resize(pos + 1);
+		envbuf[pos] = '\0';
+	
+		return envbuf;
+	}
+	
+	void setEnvironmentVariables(const Poco::Process::Env& env)
+	{
+		for (Poco::Process::Env::const_iterator it = env.begin(); it != env.end(); ++it)
+		{
+			Poco::Environment::set(it->first, it->second);
+		}
+	}
+}
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
@@ -109,17 +149,50 @@ int ProcessHandle::wait() const
 //
 ProcessHandle Process::launch(const std::string& command, const Args& args)
 {
-	return ProcessHandle(launchImpl(command, args, 0, 0, 0));
+	std::string initialDirectory;
+	Env env;
+	return ProcessHandle(launchImpl(command, args, initialDirectory, 0, 0, 0, env));
+}
+
+
+ProcessHandle Process::launch(const std::string& command, const Args& args, const std::string& initialDirectory)
+{
+	Env env;
+	return ProcessHandle(launchImpl(command, args, initialDirectory, 0, 0, 0, env));
 }
 
 
 ProcessHandle Process::launch(const std::string& command, const Args& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
 {
 	poco_assert (inPipe == 0 || (inPipe != outPipe && inPipe != errPipe));
-
-	return ProcessHandle(launchImpl(command, args, inPipe, outPipe, errPipe));
+	std::string initialDirectory;
+	Env env;
+	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env));
 }
 
+
+ProcessHandle Process::launch(const std::string& command, const Args& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
+{
+	poco_assert (inPipe == 0 || (inPipe != outPipe && inPipe != errPipe));
+	Env env;
+	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env));
+}
+
+
+ProcessHandle Process::launch(const std::string& command, const Args& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const Env& env)
+{
+	poco_assert (inPipe == 0 || (inPipe != outPipe && inPipe != errPipe));
+	std::string initialDirectory;
+	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env));
+}
+
+
+ProcessHandle Process::launch(const std::string& command, const Args& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const Env& env)
+{
+	poco_assert (inPipe == 0 || (inPipe != outPipe && inPipe != errPipe));
+	return ProcessHandle(launchImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env));
+}
+	
 	
 int Process::wait(const ProcessHandle& handle)
 {

@@ -1,7 +1,7 @@
 //
 // Process_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_VX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Process_VX.cpp#3 $
 //
 // Library: Foundation
 // Package: Processes
@@ -83,7 +83,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory,Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
 	throw Poco::NotImplementedException("Process::launch()");
 }

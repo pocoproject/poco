@@ -1,7 +1,7 @@
 //
 // ProcessTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ProcessTest.h#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ProcessTest.h#2 $
 //
 // Definition of the ProcessTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testLaunch();
 	void testLaunchRedirectIn();
 	void testLaunchRedirectOut();
+	void testLaunchEnv();
 
 	void setUp();
 	void tearDown();

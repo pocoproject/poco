@@ -1,7 +1,7 @@
 //
 // Process_WINCE.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_WINCE.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Process_WINCE.cpp#4 $
 //
 // Library: Foundation
 // Package: Processes
@@ -120,7 +120,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
 	std::wstring ucommand;
 	UnicodeConverter::toUTF16(command, ucommand);
