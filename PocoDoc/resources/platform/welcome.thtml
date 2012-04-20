@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Welcome</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<meta name="author" content="Applied Informatics Software Engineering GmbH and Contributors"/>
+<meta name="publisher" content="Applied Informatics Software Engineering GmbH and Contributors"/>
+<meta name="copyright" content="Copyright (c) 2009, Applied Informatics Software Engineering GmbH and Contributors"/>
+<meta name="language" content="en"/>
+<meta name="date" content="2009-11-07"/>
+<meta name="generator" content="PocoDoc"/>
+<link rel="stylesheet" href="css/styles.css" type="text/css"/>
+</head>
+<body bgcolor="#ffffff" leftmargin="0" topmargin="0">
+<div class="header">
+<img src="images/headerlogo.png" alt="Logo" align="right" border="0" style="padding-right: 20px;">
+<h1 class="category">Applied Informatics</h1>
+<h1 class="title">C++ Libraries and Tools Reference Library</h1>
+</div>
+<div class="body">
+<h2>User Guides And Tutorials</h2>
+${PocoDoc.pageIndex}
+
+<h2>API Reference by Namespace</h2>
+${PocoDoc.nameSpaceIndex}
+
+<p class="footer">${PocoDoc.software} ${PocoDoc.version}<br />
+Copyright &copy; ${PocoDoc.year}, <a href="${PocoDoc.companyURI}" target="_top">${PocoDoc.company}</a></p>
+</div>
+${PocoDoc.googleAnalyticsCode}
+</body>
+</html>
