@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/ActiveMethod/ActiveMethod.vmsbuild#1 $
+#
+EXE=ActiveMethod
+ActiveMethod
+<SourceFilesHere>

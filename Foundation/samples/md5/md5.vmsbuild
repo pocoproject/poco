@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/md5/md5.vmsbuild#1 $
+#
+EXE=md5
+md5
+<SourceFilesHere>

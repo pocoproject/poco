@@ -1,0 +1,14 @@
+#
+# buildfiles.vms
+#
+# $Id: //poco/CppUnit/cppunit.vmsbuild#1 $
+#
+LIB=CppUnit
+CppUnitException
+TestCase
+TestDecorator
+TestFailure
+TestResult
+TestRunner
+TestSuite
+TextTestResult

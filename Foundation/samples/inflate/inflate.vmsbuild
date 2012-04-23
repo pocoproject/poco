@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/inflate/inflate.vmsbuild#1 $
+#
+EXE=inflate
+inflate
+<SourceFilesHere>

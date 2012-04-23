@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Text", "Text\Text_vs80.vcproj", "{F2972327-DCA7-49BB-B55D-66C554CF1205}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Image", "Image\Image_vs80.vcproj", "{0A1723FB-44AF-429A-86AE-4C33A604C840}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|Win32 = debug_shared|Win32
+		release_shared|Win32 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2972327-DCA7-49BB-B55D-66C554CF1205}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{F2972327-DCA7-49BB-B55D-66C554CF1205}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{F2972327-DCA7-49BB-B55D-66C554CF1205}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{F2972327-DCA7-49BB-B55D-66C554CF1205}.release_shared|Win32.Build.0 = release_shared|Win32
+		{0A1723FB-44AF-429A-86AE-4C33A604C840}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{0A1723FB-44AF-429A-86AE-4C33A604C840}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{0A1723FB-44AF-429A-86AE-4C33A604C840}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{0A1723FB-44AF-429A-86AE-4C33A604C840}.release_shared|Win32.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

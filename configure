@@ -1,0 +1,299 @@
+#! /bin/sh
+#
+# configure
+#
+# $Id: //poco/1.4/dist/configure#2 $
+#
+# Configuration script for POCO.
+#
+# Invoke configure --help for help.
+#
+
+showhelp()
+{
+cat << ENDHELP 
+usage: configure {options}
+Configure the POCO C++ Libraries.
+
+Options:
+  --help
+    Display this help screen.
+
+  --config=<config_name>   
+    Use the given build configuration.
+    Available configurations are:
+
+`ls -C $base/build/config/`
+
+  --prefix=<install_prefix>
+    Use the given install directory for make install.
+    Default is /usr/local.
+
+  --stdcxx-base=<apache_stdcxx_install_prefix>
+    If (and only if) the $base/build/config selected with --config
+    uses the Apache stdcxx library, then apache_stdcxx_install_prefix
+    specifies the base directory where stdcxx is installed.
+
+  --no-tests
+    Do not build testsuites.
+
+  --no-samples
+    Do not build samples.
+
+  --no-wstring
+    Compile with -DPOCO_NO_WSTRING.
+    Useful if your C++ compiler does not support std::wstring
+    (such as uClibc-based systems).
+
+  --no-fpenvironment
+    Compile with -DPOCO_NO_FPENVIRONMENT.
+    Useful if your C++ compiler has incomplete floating-point support
+    (such as uClibc-based systems).
+
+  --no-sharedmemory
+    Compile with -DPOCO_NO_SHAREDMEMORY.
+    For systems that don't support shared memory API's,
+    like uClibc-based Linux systems.
+
+  --no-sharedlibs
+    Compile with -DPOCO_NO_SHAREDLIBS.
+    For systems that don't support shared library loading.
+
+  --omit=<component>{,<component>}
+    Do not build the specified component(s).
+    Example: --omit=Data/MySQL,Data/ODBC,Zip
+    
+  --include-path=<path>
+    Add search path for header files.
+    
+  --library-path=<path>
+    Add search path for library files.
+
+  --cflags=<flags>
+    Pass additional flags to compiler.
+    Example: --cflags=-wall
+
+  --poquito
+    Omit a few features for smaller codesize when linking
+    statically for embedded targets.
+
+  --unbundled
+    Use system-provided zlib, pcre, expat and sqlite instead of 
+    bundled ones.
+    
+  --static
+    Build static libraries. Overrides default mode, which
+    depends upon target. Can be specified together
+    with --shared to build both.
+    
+  --shared
+    Build shared libraries. Overrides default mode, which
+    depends upon target. Can be specified together
+    with --static to build both.
+
+ENDHELP
+}
+
+# save cwd
+build=`pwd`
+# get directory where we are located
+cd `dirname $0`
+base=`pwd`
+cd $build
+if [ `uname` = "QNX" ] ; then
+	EXPR=expr
+	NOTFOUND=0
+else
+	EXPR="expr --"
+	NOTFOUND=""
+fi
+
+tests="tests"
+samples="samples"
+flags=""
+omit=""
+includepath=""
+librarypath=""
+unbundled=""
+static=""
+shared=""
+# parse arguments
+while [ "$1" != "" ] ; do
+	val=`$EXPR "$1" : '--config=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
+		config=$val
+	fi
+	
+	val=`$EXPR "$1" : '--prefix=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
+		prefix=$val
+	fi
+
+	val=`$EXPR $1 : '--stdcxx-base=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
+		stdcxx_base=$val
+	fi
+
+	val=`$EXPR "$1" : '--omit=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
+		omit="$omit `echo $val | tr ',;' '  '`"
+	fi
+
+	val=`$EXPR "$1" : '--include-path=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
+		includepath="$includepath `echo $val | tr ',;' '  '`"
+	fi
+
+	val=`$EXPR "$1" : '--library-path=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
+		librarypath="$librarypath `echo $val | tr ',;' '  '`"
+	fi
+
+	val=`$EXPR "$1" : '--cflags=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
+		flags="$flags $val"
+	fi
+	
+	if [ "$1" = "--no-samples" ] ; then
+		samples=""
+	fi
+	
+	if [ "$1" = "--no-tests" ] ; then
+		tests=""
+	fi
+	
+	if [ "$1" = "--no-wstring" ] ; then
+		flags="$flags -DPOCO_NO_WSTRING"
+	fi
+
+	if [ "$1" = "--no-fpenvironment" ] ; then
+		flags="$flags -DPOCO_NO_FPENVIRONMENT"
+	fi
+
+	if [ "$1" = "--no-sharedmemory" ] ; then
+		flags="$flags -DPOCO_NO_SHAREDMEMORY"
+	fi
+
+	if [ "$1" = "--no-sharedlibs" ] ; then
+		flags="$flags -DPOCO_NO_SHAREDLIBS"
+	fi
+
+	if [ "$1" = "--poquito" ] ; then
+		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION"
+	fi
+
+	if [ "$1" = "--unbundled" ] ; then
+		flags="$flags -DPOCO_UNBUNDLED"
+		unbundled=1
+	fi
+
+	if [ "$1" = "--static" ] ; then
+		static=1
+	fi
+	
+	if [ "$1" = "--shared" ] ; then
+		shared=1
+	fi
+	
+	if [ "$1" = "--help" ] ; then
+		showhelp
+		exit 0
+	fi
+
+	shift
+done
+
+# autodetect build environment
+# ...special cases for CYGWIN or MinGW
+if [ "$config" = "" ] ; then
+	config=`uname`
+	cyg=`$EXPR $config : '\(CYGWIN\).*'`
+	if [ "$cyg" = "CYGWIN" ] ; then
+		config=CYGWIN
+    else
+        ming=`$EXPR $config : '\(MINGW\).*'`
+        if [ "$ming" = "MINGW" ] ; then
+            config=MinGW
+        fi
+    fi
+fi
+
+if [ ! -f "$base/build/config/$config" ] ; then
+	echo "Unknown configuration: $config"
+	echo "Please use the --config option to specify another build configuration"
+	echo "The following configurations are available:"
+	ls $base/build/config
+	exit 1
+fi
+
+if [ "$prefix" = "" ] ; then
+	prefix=/usr/local
+fi
+
+# check for patches
+if [ -d $base/patches/$config ] ; then
+	echo "NOTE: There are patches for your configuration available. Please apply them before compiling."
+fi
+
+# copy Makefile to build dir
+if [ "$base" != "$build" ] ; then
+	cp $base/Makefile $build
+fi
+
+if [ "$static" != "" -a "$shared" != "" ] ; then
+	linkmode=BOTH
+elif [ "$static" != "" ] ; then
+	linkmode=STATIC
+elif [ "$shared" != "" ] ; then
+	linkmode=SHARED
+else
+	linkmode=""
+fi
+
+# create config.make
+echo '# config.make generated by configure script' >$build/config.make
+echo "POCO_CONFIG = $config" >>$build/config.make
+echo "POCO_BASE = $base" >>$build/config.make
+echo "POCO_BUILD = $build" >>$build/config.make
+echo "POCO_PREFIX = $prefix" >>$build/config.make
+echo "POCO_FLAGS = $flags" >>$build/config.make
+echo "OMIT = $omit" >>$build/config.make
+if [ "$stdcxx_base" != "" ] ; then
+	echo "STDCXX_BASE = $stdcxx_base" >>$build/config.make
+fi
+if [ "$includepath" != "" ] ; then
+	echo "POCO_ADD_INCLUDE = $includepath" >>$build/config.make
+fi
+if [ "$librarypath" != "" ] ; then
+	echo "POCO_ADD_LIBRARY = $librarypath" >>$build/config.make
+fi
+if [ "$unbundled" != "" ] ; then
+	echo "POCO_UNBUNDLED = 1" >>$build/config.make
+fi
+if [ "$linkmode" != "" ] ; then
+	echo "LINKMODE = $linkmode" >>$build/config.make
+fi
+echo "export POCO_CONFIG" >>$build/config.make
+echo "export POCO_BASE" >>$build/config.make
+echo "export POCO_BUILD" >>$build/config.make
+echo "export POCO_PREFIX" >>$build/config.make
+echo "export POCO_FLAGS" >>$build/config.make
+if [ "$stdcxx_base" != "" ] ; then
+	echo "export STDCXX_BASE" >>$build/config.make
+fi
+if [ "$includepath" != "" ] ; then
+	echo "export POCO_ADD_INCLUDE" >>$build/config.make
+fi
+if [ "$librarypath" != "" ] ; then
+	echo "export POCO_ADD_LIBRARY" >>$build/config.make
+fi
+if [ "$unbundled" != "" ] ; then
+	echo "export POCO_UNBUNDLED" >>$build/config.make
+fi
+if [ "$linkmode" != "" ] ; then
+	echo "export LINKMODE" >>$build/config.make
+fi
+echo ".PHONY: poco" >>$build/config.make
+echo "poco: libexecs $tests $samples" >>$build/config.make
+
+echo "Configured for $config"

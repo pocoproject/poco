@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/Logger/Logger.vmsbuild#1 $
+#
+EXE=Logger
+Logger
+<SourceFilesHere>

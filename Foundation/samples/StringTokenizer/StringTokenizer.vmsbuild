@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/StringTokenizer/StringTokenizer.vmsbuild#1 $
+#
+EXE=StringTokenizer
+StringTokenizer
+<SourceFilesHere>

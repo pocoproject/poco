@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/Timer/Timer.vmsbuild#1 $
+#
+EXE=Timer
+Timer
+<SourceFilesHere>

@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/BinaryReaderWriter/BinaryReaderWriter.vmsbuild#1 $
+#
+EXE=BinaryReaderWriter
+BinaryReaderWriter
+<SourceFilesHere>

@@ -1,0 +1,529 @@
+POCO Data User Guide
+Data
+
+!!!First Steps
+POCO Data is POCO's database abstraction layer which allows users to easily
+send/retrieve data to/from various different SQL databases.
+The following complete example shows how to use it:
+
+    
+    #include "Poco/Data/Common.h"
+    #include "Poco/Data/SQLite/Connector.h"
+    #include <iostream>
+    
+    using namespace Poco::Data;
+    
+    
+    void init()
+    {
+        SQLite::Connector::registerConnector();
+    }
+    
+    
+    void shutdown()
+    {
+        SQLite::Connector::unregisterConnector();
+    }
+    
+    
+    int main(int argc, char* argv[])
+    {
+        init();
+        Session ses("SQLite", "sample.db");
+        int count = 0;
+        ses << "SELECT COUNT(*) FROM PERSON", into(count), now;
+        std::cout << "People in DB " << count;
+        shutdown();
+    }
+----
+
+The above example is pretty much self explanatory. The <[Poco/Data/Common.h]> file pulls in some common includes,
+the SQLite::Connector is used to register the SQLite connector so that we can later create an SQLite session
+via the SessionFactory. The two-argument constructor
+
+    Sesssion ses("SQLite", "sample.db");
+----
+
+is actually equivalent to:
+    Session ses(SessionFactory::instance()::create("SQLite", "sample.db"));
+----
+
+The << operator is used to send SQL statements to the Session, the <*into(count)*> simply informs the session where to store the result of the query.
+Take note of the <!now!> at the end of the SQL statement. It is required, otherwise the statement would not be executed. 
+The <* <[ using namespace Poco::Data ]> *> is for convenience only but highly recommended for good readable code 
+(while <* <[ ses << "SELECT COUNT(*) FROM PERSON", Poco::Data::into(count), Poco::Data::now; ]> *> is valid, it simply looks... strange).
+
+The remainder of this tutorial is split up into the following parts:
+  * Creating Sessions
+  * Inserting and Retrieving Data: the magic of <* into *> and <*use*>
+  * Working with Statements
+  * Working with Collections: vector, set, multiset, map and multimap
+  * Working with Limits
+  * Working with complex data types: how to map C++ objects to a database table
+
+!!!Creating Sessions
+Sessions are always created via the SessionFactory create method, or implicitly
+via the two-argument Session constructor.
+
+Session create(const std::string& connectorKey, const std::string& connectionString);
+----
+The first parameter contains the type of the Session one wants to create. For the moment "SQLite" is supported 
+directly, and via the ODBC driver support for Oracle, SQLite, DB2, SQLServer and PostgreSQL is available. 
+The second parameter contains the (connector-specific) connection string.
+In the case of SQLite, the location of the database file is sufficient.
+
+!!!Inserting and Retrieving Data
+Inserting data works by <* using *> the content of other variables. Assume we have a table that stores only forenames:
+
+    ForeName (Name VARCHAR(30))
+----
+If we want to insert one single forename we could simply write:
+    
+    std::string aName("Peter");
+    ses << "INSERT INTO FORENAME VALUES(" << aName << ")", now;
+----
+
+Well, we could do that, but we won't. A much better solution is to use <!placeholders!> and connect each placeholder via a <!use!> 
+expression with a variable that will provide the value during execution. 
+Placeholders are recognized by having a <!:!> in front of their name. Rewriting the above code now simply gives
+
+    std::string aName("Peter");
+    ses << "INSERT INTO FORENAME VALUES(:name)", use(aName), now;
+----
+
+In this example the <!use!> expression matches the <* :name *> with the <*Peter*> value. 
+Note that apart from the nicer syntax, the real benefit of placeholders - which is performance - doesn't show here. 
+Check the <*Working with Statements*> section to find out more.
+
+Retrieving data from the Database works similar. The <!into!> expression matches the returned database values to 
+C++ objects, it also allows to provide a default value in case null data is returned from the database:
+
+    std::string aName;
+    ses << "SELECT NAME FROM FORENAME", into(aName), now; // the default is the empty string
+    ses << "SELECT NAME FROM FORENAME", into(aName, "default"), now;
+----
+
+It is also possible to combine into and use expressions:
+
+    std::string aName;
+    std::string match("Peter")
+    ses << "SELECT NAME FROM FORENAME WHERE NAME=:name", into(aName), use(match), now;
+    poco_assert (aName == match);
+----
+
+Typically, tables will not be so trivial, ie. they will have more than one column which allows for more than one into/use.
+Lets assume we have a Person table that contains an age, a first and a last name:
+
+    std::string firstName("Peter";
+    std::string lastName("Junior");
+    int age = 0;
+    ses << INSERT INTO PERSON VALUES (:fn, :ln, :age)", use(firstName), use(lastName), use(age), now;
+    ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age), now;
+----
+
+Most important here is the <!order!> of the into and use expressions. The first placeholder is matched by the first <*use*>, 
+the 2nd by the 2nd <*use*> etc.
+The same is true for the <*into*> statement. We select <*firstname*> as the first column of the result set, 
+thus <*into(firstName)*> must be the first into clause.
+
+!! Handling NULL entries
+A common case with databases are optional data fields that can contain NULL. To accomodate for NULL, the <*into*> expression allows 
+you to define default values.
+For example, assume that age is such an optional field and we want to provide as default value <!-1!> 
+which is done by writing <!into(age, -1)!>:
+
+    std::string firstName("Peter";
+    std::string lastName("Junior");
+    int age = 0;
+    ses << INSERT INTO PERSON VALUES (:fn, :ln, :age)", use(firstName), use(lastName), use(age), now;
+    ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age, -1), now;
+----
+
+While you can achieve the same effect by initializing age previously to -1 (<*int age = -1*>), 
+this won't work with collection types. Here you must provide the second parameter
+to init. Otherwise, values will be initialized to compiler specific values.
+
+!!!Working with Statements
+We often mentioned the term <*Statement*> in the previous section, yet we only worked with database session objects so far, 
+or at least, that's what you have been made believe ;-).
+In reality, you have already worked with Statements. Lets take a look at the method signature of the << operator at Session:
+
+    template <typename T>
+    Statement Session::operator << (const T& t)
+----
+
+Simply ignore the template stuff in front, you won't need it. The only thing that counts here is that the operator <[ << ]> creates a 
+<*Statement*> internally and returns it.
+What happened in the previous examples is that the returned Statement was never assigned to a variable but simply passed on to the <*now*> 
+part which executed the statement. Afterwards the statement was destroyed.
+Let's take one of the previous examples and change it so that we assign the statement:
+    
+    std::string aName("Peter");
+    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(:name)", use(aName) );
+----
+Note that we must put brackets around the right part of the assignment, otherwise the compiler will complain.
+If you don't like the above syntax, the following alternative is equivalent:
+
+    Statement stmt(ses);
+    stmt << "INSERT INTO FORENAME VALUES(:name)", use(aName);
+----
+
+What did we achieve by assigning the statement to a variable? Well, currently nothing, apart that we can control when to <*execute*>:
+
+    std::string aName("Peter");
+    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(:name)", use(aName) );
+    stmt.execute();
+    poco_assert (stmt.done());
+----
+
+By calling <*execute*> we asserted that our query was executed and that the value was inserted. The check to <[stmt.done()]>
+simply guarantees that the statement was fully completed. 
+
+!!Prepared Statements
+A prepared statement is created by omitting the <*now*> clause.
+
+    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(:name)", use(aName) );
+----
+
+The advantage of a prepared statement is performance. Assume the following loop:
+
+    std::string aName();
+    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(:name)", use(aName) );
+    for (int i = 0; i < 100; ++i)
+    {
+        aName.append("x");
+        stmt.execute();
+    }
+----
+
+Instead of creating and parsing the Statement 100 times, we only do this once and then use the placeholder in combination with the <*use*> clause
+to insert 100 different values into the database.
+Still, this isn't the best way to insert a collection of values into a database.
+
+!!Things NOT To Do
+<!use!> expects as input a <!reference!> parameter, which is bound later during execution. 
+Thus, one can only use variables, but never constants.
+The following code will very likely fail (but this is platform/compiler dependent and also depends if your 
+building in release or debug mode, it will work from Monday to Thursday but will always fail on Friday, so shortly spoken: the kind of bugs
+software developers <*really*> love):
+    
+    Statement stmt = (ses << INSERT INTO PERSON VALUES (:fn, :ln, :age)", use("Peter"), use("Junior"), use(4)); //ERR!
+    stmt.execute();
+----
+The constant values <*Junior*>, <*Peter*> and <*4*> must be assigned to variables prior, otherwise their values will be invalid when execute is called.
+
+!!!Collection Support
+If one needs to handle many values at once, one ought to use a collection class.
+Per default, the following collection types are supported:
+  * vector: no requirements
+  * set: the < operator must be supported by the datatype. Note that duplicate key/value pairs are ignored.
+  * multiset: the < operator must be supported by the datatype
+  * map: the () operator must be supported by the datatype and return the key of the object. Note that duplicate key/value pairs are ignored.
+  * multimap: the () operator must be supported by the datatype and return the key of the object
+
+A bulk insert example via vector would be:
+    
+    std::string aName("");
+    std::vector<std::string> data;
+    for (int i = 0; i < 100; ++i)
+    {
+        aName.append("x");
+        data.push_back(aName);
+    }
+    ses << "INSERT INTO FORENAME VALUES(:name)", use(data), now;
+----
+
+The same example would work with set or multiset but not with map and multimap (std::string has no () operator).
+Note that <!use!> requires <*non-empty*> collections!
+
+Now reconsider the following example:
+
+    std::string aName;
+    ses << "SELECT NAME FROM FORENAME", into(aName), now;
+----
+
+Previously, it worked because the table contained only one single entry but now the database table contains at least 100 strings, 
+yet we only offer storage space for one single result.
+Thus, the above code will fail and throw an exception.
+One possible way to handle this is:
+
+    std::vector<std::string> names;
+    ses << "SELECT NAME FROM FORENAME", into(names), now;
+----
+
+And again, instead of vector, one could use set or multiset.
+
+!!!The limit clause
+Working with collections might be convenient to bulk process data but there is also the risk that large operations will 
+block your application for a very long time. In addition, you might want to have better fine-grained control over your 
+query, e.g. you only want to extract a subset of data until a condition is met.
+To elevate that problem, one can use the <!limit!> keyword.
+
+Let's assume we are retrieving thousands of rows from a database to render the data to a GUI. 
+To allow the user to stop fetching data any time (and to avoid having the user franatically click inside the GUI because 
+it doesn't show anything for seconds), we have to partition this process:
+
+    std::vector<std::string> names;
+    ses << "SELECT NAME FROM FORENAME", into(names), limit(50), now;
+----
+
+The above example will retrieve up to 50 rows from the database (note that returning nothing is valid!) and <*append*> 
+it to the names collection, i.e. the collection is not cleared!
+If one wants to make sure that <!exactly!> 50 rows are returned one must set the 2nd limit parameter 
+(which per default is set to  <*false*>) to <*true*>:
+
+    std::vector<std::string> names;
+    ses << "SELECT NAME FROM FORENAME", into(names), limit(50, true), now;
+----
+
+Iterating over a complete result collection is done via the Statement object until statement.done() returns true.
+For the next example, we assume that our system knows about 101 forenames:
+
+    std::vector<std::string> names;
+    Statement stmt = (ses << "SELECT NAME FROM FORENAME", into(names), limit(50)); 
+    stmt.execute(); //names.size() == 50
+    poco_assert (!stmt.done());
+    stmt.execute(); //names.size() == 100
+    poco_assert (!stmt.done());
+    stmt.execute(); //names.size() == 101
+    poco_assert (stmt.done()); 
+----
+
+We previously stated that if no data is returned this is valid too. Thus, executing the following statement on an
+empty database table will work:
+
+    std::string aName;
+    ses << "SELECT NAME FROM FORENAME", into(aName), now;
+----
+
+To guarantee that at least one valid result row is returned use the <!lowerLimit!> clause:
+
+    std::string aName;
+    ses << "SELECT NAME FROM FORENAME", into(aName), lowerLimit(1), now;
+----
+If the table is now empty, an exception will be thrown. If the query succeeds, aName is guaranteed to be initialized.
+Note that <!limit!> is only the short name for <!upperLimit!>. To iterate over a result set step-by-step, e.g. one wants to avoid 
+using a collection class, one would write:
+
+    std::string aName;
+    Statement stmt = (ses << "SELECT NAME FROM FORENAME", into(aName), lowerLimit(1), upperLimit(1));
+    while (!stmt.done())
+        stmt.execute();
+----
+
+And for the lazy ones, there is the <!range!> command:
+
+    std::string aName;
+    Statement stmt = (ses << "SELECT NAME FROM FORENAME", into(aName), range(1,1));
+    while (!stmt.done())
+        stmt.execute();
+----
+The third parameter to range is an optional boolean value which specifies if the upper limit is a hard limit, ie. 
+if the amount of rows returned by the query must match exactly. Per default exact matching is off.
+
+!!!Complex Data Type Mapping
+All the previous examples were contented to work with only the most basic data types: integer, string, ...
+a situation, unlikely to occur in real-world scenarios.
+Assume you have a class Person:
+
+    class Person
+    {
+    public:
+        // default constructor+destr.
+        // getter and setter methods for all members
+        [...] 
+        
+        bool operator <(const Person& p) const
+            /// we need this for set and multiset support
+        {
+            return _socialSecNr < p._socialSecNr;
+        }
+        
+        Poco::UInt64 operator()() const
+            /// we need this operator to return the key for the map and multimap
+        {
+            return _socialSecNr;
+        }
+        
+    private:
+        std::string _firstName;
+        std::string _lastName;
+        Poco::UInt64 _socialSecNr;
+    }
+----
+
+Ideally, one would like to use a Person as simple as one used a string. All that is needed is a template specialization of the <*TypeHandler*> 
+template. Note that template specializations must be declared in the <!same namespace!> as the original template, i.e. <*Poco::Data*>. 
+The template specialization must implement the following methods:
+
+    namespace Poco {
+    namespace Data {
+    
+    template <>
+    class TypeHandler<class Person>
+    {
+    public:
+        static std::size_t size()
+        {
+            return 3; // we handle three columns of the Table!
+        }
+    
+       static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder)
+        {
+            poco_assert_dbg (pBinder != 0);
+            // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
+            // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
+            TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder);
+            TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder);
+            TypeHandler<Poco::UInt64>::bind(pos++, obj.getSocialSecNr(), pBinder);
+        }
+    
+        static void prepare(std::size_t pos, const Person& obj, AbstractPreparation* pPrepare)
+        {
+            poco_assert_dbg (pBinder != 0);
+            // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
+            // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
+            TypeHandler<std::string>::prepare(pos++, obj.getFirstName(), pPrepare);
+            TypeHandler<std::string>::prepare(pos++, obj.getLastName(), pPrepare);
+            TypeHandler<Poco::UInt64>::prepare(pos++, obj.getSocialSecNr(), pPrepare);
+        }
+    
+        static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor* pExt)
+            /// obj will contain the result, defVal contains values we should use when one column is NULL
+        {
+            poco_assert_dbg (pExt != 0);
+            std::string firstName;
+            std::string lastName;
+            Poco::UInt64 socialSecNr = 0;
+            TypeHandler<std::string>::extract(pos++, firstName, defVal.getFirstName(), pExt);
+            TypeHandler<std::string>::extract(pos++, lastName, defVal.getLastName(), pExt);
+            TypeHandler<Poco::UInt64>::extract(pos++, socialSecNr, defVal.getSocialSecNr(), pExt);
+            obj.setFirstName(firstName);
+            obj.setLastName(lastName);
+            obj.setSocialSecNr(socialSecNr);
+        }
+    };
+    
+    } } // namespace Poco::Data
+----
+
+And that's all you have to do. Working with Person is now as simple as working with a string:
+
+    std::map<Poco::UInt64, Person> people;
+    ses << "SELECT * FROM Person", into(people), now;
+----
+
+!!!RecordSet
+The Poco::Data::RecordSet class provides a generic way to work with database tables.
+Using a <[RecordSet]>, one can:
+   - iterate over all columns and rows in a table
+   - obtain meta information about columns (such as name, type, length, etc.)
+   
+To work with a RecordSet, first create a Statement, execute it, and
+create the RecordSet from the Statement, as follows:
+
+    Statement select(session);
+    select << "SELECT * FROM Person";
+    select.execute();
+    RecordSet rs(select);
+----
+   
+The number of rows in the RecordSet can be limited by specifying
+a limit for the Statement.
+
+Following example demonstrates how to iterate over all rows and columns
+in a RecordSet:
+
+    bool more = rs.moveFirst();
+    while (more)
+    {
+        for (std::size_t col = 0; col < cols; ++col)
+        {
+            std::cout << rs[col].convert<std::string>() << " ";
+        }
+        std::cout << std::endl;
+        more = rs.moveNext();
+    }
+----
+
+As mentioned above, the number of rows retrieved into a RecordSet at a
+time can be limited using the <[limit]> or <[range]> clause. Iterating
+over all rows in a table a bunch of rows at a time can thus be done as
+follows:
+
+    Statement select(session);
+    select << "SELECT * FROM Person", range(0, 10);
+    RecordSet rs(select);
+    while (!select.done())
+    {
+        select.execute();
+        bool more = rs.moveFirst();
+        while (more)
+        {
+            for (std::size_t col = 0; col < cols; ++col)
+            {
+                std::cout << rs[col].convert<std::string>() << " ";
+            }
+            std::cout << std::endl;
+            more = rs.moveNext();
+        }
+    }
+----
+
+
+!!!Tuples
+Poco::Tuple and vectors of Poco::Tuple provide a convenient way to work with rows when
+column types are known, because TypeHandlers for them are readily available.
+
+Consider the following example:
+
+    typedef Poco::Tuple<std::string, std::string, int> Person;
+    typedef std::vector<Person> People;
+
+    People people;
+    people.push_back(Person("Bart Simpson", "Springfield", 12));
+    people.push_back(Person("Lisa Simpson", "Springfield", 10));
+    
+    Statement insert(session);
+    insert << "INSERT INTO Person VALUES(:name, :address, :age)",
+        use(people), now;
+----
+    
+Of course, tuples can also be used in queries:
+
+    Statement select(session);
+    select << "SELECT Name, Address, Age FROM Person",
+        into(people),
+        now;
+    
+    for (People::const_iterator it = people.begin(); it != people.end(); ++it)
+    {
+        std::cout << "Name: " << it->get<0>() << 
+            ", Address: " << it->get<1>() << 
+            ", Age: " << it->get<2>() <<std::endl;
+    }
+----
+
+!!!Session Pooling
+Creating a connection to a database is often a time consuming
+operation. Therefore it makes sense to save a session object for 
+later reuse once it is no longer needed.
+
+A Poco::Data::SessionPool manages a collection of sessions.
+When a session is requested, the SessionPool first
+looks in its set of already initialized sessions for an
+available object. If one is found, it is returned to the
+client and marked as "in-use". If no session is available,
+the SessionPool attempts to create a new one for the client.
+To avoid excessive creation of sessions, a limit
+can be set on the maximum number of objects.
+
+The following code fragment shows how to use the SessionPool:
+
+    SessionPool pool("ODBC", "...");
+    // ...
+    Session sess(pool.get());
+----
+
+Pooled sessions are automatically returned to the pool when the
+Session variable holding them is destroyed.

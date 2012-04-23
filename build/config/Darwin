@@ -1,0 +1,77 @@
+#
+# $Id: //poco/1.4/build/config/Darwin#5 $
+#
+# Darwin
+#
+# Build settings for Mac OS X 10.6 (GCC 4.2)
+# The build settings defined in this file are compatible
+# with XCode 3.2.5 C++ projects.
+#
+# NOTE: This build configuration will build 64-bit binaries.
+# Use the Darwin32 build configuration to build 32-bit binaries.
+# 
+
+#
+# General Settings
+#
+LINKMODE ?= SHARED
+
+POCO_TARGET_OSARCH ?= x86_64
+POCO_HOST_OSARCH   := $(POCO_TARGET_OSARCH)
+ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH)
+
+
+#
+# Tools
+#
+CC      = gcc
+CXX     = g++
+LINK    = $(CXX) -bind_at_load
+LIB     = libtool -static -o
+RANLIB  = ranlib
+SHLIB   = $(CXX) -dynamiclib -o $@
+DYLIB   = $(CXX) -dynamic -bundle -bind_at_load -o $@ 
+SHLIBLN = $(POCO_BASE)/build/script/shlibln
+STRIP   = 
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
+SHELL   = sh
+RM      = rm -rf
+CP      = cp
+MKDIR   = mkdir -p
+
+#
+# Extension for Shared Libraries
+#
+SHAREDLIBEXT     = .$(target_version).dylib
+SHAREDLIBLINKEXT = .dylib
+
+#
+# Compiler and Linker Flags
+#
+CFLAGS          = $(ARCHFLAGS)
+CXXFLAGS        = $(ARCHFLAGS) -Wall -Wno-sign-compare
+LINKFLAGS       = $(ARCHFLAGS)
+SHLIBFLAGS      = $(ARCHFLAGS)
+DYLIBFLAGS      = $(ARCHFLAGS)
+STATICOPT_CC    =
+STATICOPT_CXX   =
+STATICOPT_LINK  =
+SHAREDOPT_CC    = -fPIC 
+SHAREDOPT_CXX   = -fPIC
+SHAREDOPT_LINK  = 
+DEBUGOPT_CC     = -O0 -g -gdwarf-2 -D_DEBUG=$(DEBUGLEVEL)
+DEBUGOPT_CXX    = -O0 -g -gdwarf-2 -D_DEBUG=$(DEBUGLEVEL) -mfix-and-continue -fvisibility-inlines-hidden -fasm-blocks
+DEBUGOPT_LINK   =
+RELEASEOPT_CC   = -DNDEBUG -Os
+RELEASEOPT_CXX  = -DNDEBUG -Os -fvisibility-inlines-hidden -fasm-blocks
+RELEASEOPT_LINK =
+
+#
+# System Specific Flags
+#
+SYSFLAGS = -DPOCO_HAVE_IPv6
+
+#
+# System Specific Libraries
+#
+SYSLIBS  = -ldl

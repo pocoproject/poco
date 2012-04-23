@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/grep/grep.vmsbuild#1 $
+#
+EXE=grep
+grep
+<SourceFilesHere>

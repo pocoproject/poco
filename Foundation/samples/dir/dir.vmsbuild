@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/dir/dir.vmsbuild#1 $
+#
+EXE=dir
+dir
+<SourceFilesHere>

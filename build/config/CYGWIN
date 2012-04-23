@@ -1,0 +1,72 @@
+#
+# $Id$
+#
+# CYGWIN
+#
+# Make settings for Cygwin on WinXP/gcc 3.4
+#
+#
+
+#
+# General Settings, note that strip doesn't do anything on Cygwin, thus empty
+#
+LINKMODE ?= SHARED
+
+#
+# Define Tools
+#
+CC      = gcc
+CXX     = g++
+LINK    = $(CXX)
+LIB     = ar -cr
+RANLIB  = ranlib
+SHLIB   = $(CXX) -shared -o $@ -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
+SHLIBLN = $(POCO_BASE)/build/script/shlibln
+STRIP   =
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+SHELL   = sh
+RM      = rm -rf
+CP      = cp
+MKDIR   = mkdir -p
+
+#
+# Extension for Shared Libraries
+#
+LIBPREFIX        = cyg
+SHAREDLIBEXT     = .$(target_version).dll
+SHAREDLIBLINKEXT = .dll
+
+#
+# Compiler and Linker Flags
+#
+CFLAGS          = 
+CFLAGS32        =
+CFLAGS64        =
+CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SHAREDMEMORY
+CXXFLAGS32      =
+CXXFLAGS64      =
+LINKFLAGS       =
+LINKFLAGS32     =
+LINKFLAGS64     =
+STATICOPT_CC    =
+STATICOPT_CXX   =
+STATICOPT_LINK  = -static
+SHAREDOPT_CC    = 
+SHAREDOPT_CXX   = 
+SHAREDOPT_LINK  = 
+DEBUGOPT_CC     = -g -D_DEBUG
+DEBUGOPT_CXX    = -g -D_DEBUG
+DEBUGOPT_LINK   = -g
+RELEASEOPT_CC   = -DNDEBUG
+RELEASEOPT_CXX  = -DNDEBUG
+RELEASEOPT_LINK = 
+
+#
+# System Specific Flags
+#
+SYSFLAGS = -D_XOPEN_SOURCE=500
+
+#
+# System Specific Libraries
+#
+SYSLIBS  = 

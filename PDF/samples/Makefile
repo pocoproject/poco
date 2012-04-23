@@ -1,0 +1,13 @@
+#
+# Makefile
+#
+# $Id: //poco/Main/PDF/samples/Makefile#1 $
+#
+# Makefile for Poco PDF Samples
+#
+
+.PHONY: projects
+clean all: projects
+projects:
+	$(MAKE) -C Text $(MAKECMDGOALS)
+	$(MAKE) -C Image $(MAKECMDGOALS)

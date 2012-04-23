@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/hmacmd5/hmacmd5.vmsbuild#1 $
+#
+EXE=hmacmd5
+hmacmd5
+<SourceFilesHere>

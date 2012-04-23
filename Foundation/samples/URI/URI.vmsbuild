@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.4/Foundation/samples/URI/URI.vmsbuild#1 $
+#
+EXE=URI
+URI
+<SourceFilesHere>

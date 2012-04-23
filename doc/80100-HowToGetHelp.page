@@ -1,0 +1,21 @@
+How To Get Help
+AAAIntroduction
+
+If you got stuck with a problem when developing with the POCO C++ Libraries,
+here's some information how to get help and support.
+
+First, and most important, <!DON'T PANIC!>!
+
+There is help and support available.
+First, try the [[http://pocoproject.org POCO C++ Libraries Community]] resources on the Web, 
+where you can find:
+  - Applied Informatics' general [[http://www.appinf.com/en/services/index.html Support Services]] page,
+  - [[http://pocoproject.org/documentation/ introductory slides and articles]], and
+  - [[http://pocoproject.org/forum/ discussion forums]] on various topics.
+  
+If these resources still not answer your question, there is also a <!mailing list!> named 
+[[https://lists.sourceforge.net/lists/listinfo/poco-develop poco-develop]], read by the
+maintainers of POCO. In order to defend against spam, you are required to
+[[https://lists.sourceforge.net/lists/listinfo/poco-develop subscribe]] 
+to the list before you can send a message to it.
+

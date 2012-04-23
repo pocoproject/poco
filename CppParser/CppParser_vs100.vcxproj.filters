@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="CppParser">
+      <UniqueIdentifier>{fe377055-0525-44e6-acc7-8d7b1f6c3eab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CppParser\Header Files">
+      <UniqueIdentifier>{217c0ad9-ad83-4781-9937-3cd83b413b56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CppParser\Source Files">
+      <UniqueIdentifier>{3952c193-998f-4899-bbd1-3fdd17661c10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Symbol Table">
+      <UniqueIdentifier>{b956ea7f-4ced-4a5f-9e27-ed5236d5aad4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Symbol Table\Header Files">
+      <UniqueIdentifier>{c2c26550-40a8-4cee-9f8f-d9e18530d4ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Symbol Table\Source Files">
+      <UniqueIdentifier>{2422599c-57fd-475a-9fda-4a981d3645f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Attributes">
+      <UniqueIdentifier>{aa2c1c4c-dbf1-4818-aeeb-d5d8b82d7f77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Attributes\Header Files">
+      <UniqueIdentifier>{4ec2c692-a128-4bae-8906-3b341dfc867e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Attributes\Source Files">
+      <UniqueIdentifier>{778a11b1-307d-4120-af80-2af792b2699a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\CppParser\CppParser.h">
+      <Filter>CppParser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\CppToken.h">
+      <Filter>CppParser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Parser.h">
+      <Filter>CppParser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Tokenizer.h">
+      <Filter>CppParser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Utility.h">
+      <Filter>CppParser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Decl.h">
+      <Filter>Symbol Table\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Enum.h">
+      <Filter>Symbol Table\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\EnumValue.h">
+      <Filter>Symbol Table\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Function.h">
+      <Filter>Symbol Table\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\NameSpace.h">
+      <Filter>Symbol Table\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Parameter.h">
+      <Filter>Symbol Table\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Struct.h">
+      <Filter>Symbol Table\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Symbol.h">
+      <Filter>Symbol Table\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\TypeDef.h">
+      <Filter>Symbol Table\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Variable.h">
+      <Filter>Symbol Table\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\Attributes.h">
+      <Filter>Attributes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\AttributesParser.h">
+      <Filter>Attributes\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CppToken.cpp">
+      <Filter>CppParser\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Parser.cpp">
+      <Filter>CppParser\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tokenizer.cpp">
+      <Filter>CppParser\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utility.cpp">
+      <Filter>CppParser\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Decl.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Enum.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EnumValue.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NameSpace.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Parameter.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Struct.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Symbol.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TypeDef.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Variable.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Attributes.cpp">
+      <Filter>Attributes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AttributesParser.cpp">
+      <Filter>Attributes\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
