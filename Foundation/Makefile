@@ -29,9 +29,10 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel Base64Decoder Base64E
 	TemporaryFile TextConverter TextEncoding TextIterator TextBufferIterator Thread ThreadLocal \
 	ThreadPool ThreadTarget ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1252Encoding \
-	UTF8Encoding UnicodeConverter UUID UUIDGenerator Void Format \
-	Pipe PipeImpl PipeStream DynamicAny DynamicAnyHolder SharedMemory \
-	MemoryStream FileStream Unicode UTF8String AtomicCounter
+	UTF8Encoding UnicodeConverter UUID UUIDGenerator Void Var VarHolder Format \
+	Pipe PipeImpl PipeStream SharedMemory \
+	MemoryStream FileStream Unicode UTF8String AtomicCounter \
+	Windows1250Encoding Windows1251Encoding Latin2Encoding
 
 zlib_objects = adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil

@@ -27,10 +27,10 @@ COMMONFLAGS += -DPOCO_UNIXODBC
 else
 ifeq (0, $(shell test -e /usr/lib/libiodbc$(SHAREDLIBLINKEXT); echo $$?))
 SYSLIBS += -liodbc -liodbcinst
-COMMONFLAGS += -DPOCO_IODBC
+COMMONFLAGS += -DPOCO_IODBC -I/usr/include/iodbc
 else
 ifeq (0, $(shell test -h /usr/lib/libiodbc$(SHAREDLIBLINKEXT); echo $$?))
-SYSLIBS += -liodbc -liodbcinst
+SYSLIBS += -liodbc -liodbcinst -I/usr/include/iodbc
 COMMONFLAGS += -DPOCO_IODBC
 else
 $(error No ODBC library found. Please install unixODBC or iODBC and try again)

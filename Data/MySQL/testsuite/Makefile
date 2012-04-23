@@ -15,6 +15,6 @@ objects = MySQLTestSuite Driver MySQLTest SQLExecutor
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoMySQL PocoData PocoFoundation CppUnit
+target_libs    = PocoDataMySQL PocoData PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec
