@@ -1,8 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/svn/Foundation/samples/grep/grep.vmsbuild#1 $
-#
-EXE=grep
-grep
-<SourceFilesHere>

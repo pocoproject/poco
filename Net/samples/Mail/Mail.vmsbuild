@@ -1,8 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/svn/Net/samples/Mail/Mail.vmsbuild#1 $
-#
-EXE=Mail
-Mail
-<SourceFilesHere>

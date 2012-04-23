@@ -1,8 +1,0 @@
-#
-# buildfiles.vms
-#
-# $Id: //poco/svn/Foundation/testsuite/testlibrary.vmsbuild#1 $
-#
-SHR=TestLibrary
-TestPlugin
-TestLibrary

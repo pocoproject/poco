@@ -1,7 +1,0 @@
-#
-# HTTPLoadTest.vmsbuild
-#
-# $Id: //poco/svn/Net/samples/HTTPLoadTest/HTTPLoadTest.vmsbuild#1 $
-#
-EXE=HTTPLoadTest
-HTTPLoadTest

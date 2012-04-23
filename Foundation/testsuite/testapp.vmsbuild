@@ -1,7 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/svn/Foundation/testsuite/testapp.vmsbuild#1 $
-#
-EXE=TestApp
-TestApp

@@ -1,9 +1,0 @@
-#
-# TestSuite.vmsbuild
-#
-# $Id: //poco/svn/Net/testsuite/TestSuite.vmsbuild#1 $
-#
-EXE=TestRunner
-NetTestSuite
-Driver
-<SourceFilesHere>
