@@ -24,7 +24,7 @@ endif
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation XML Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Zip PageCompiler PageCompiler/File2Page
+COMPONENTS = Foundation XML Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Zip PageCompiler PageCompiler/File2Page PDF CppParser
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
@@ -44,8 +44,8 @@ install: libexecs
 	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
 	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
-libexecs =  Foundation-libexec XML-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec PDF-libexec
-tests    =  Foundation-tests XML-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Zip-tests PDF-tests
+libexecs =  Foundation-libexec XML-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec PDF-libexec CppParser-libexec
+tests    =  Foundation-tests XML-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Zip-tests PDF-tests CppParser-tests
 samples  =  Foundation-samples XML-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples Zip-samples PageCompiler-samples PDF-samples
 
 .PHONY: $(libexecs)
@@ -164,6 +164,12 @@ PDF-tests: PDF-libexec cppunit
 PDF-samples: PDF-libexec 
 	$(MAKE) -C $(POCO_BASE)/PDF/samples
 
+CppParser-libexec: Foundation-libexec
+	$(MAKE) -C $(POCO_BASE)/CppParser
+
+CppParser-tests: CppParser-libexec 
+	$(MAKE) -C $(POCO_BASE)/CppParser/testsuite
+
 
 clean:
 	$(MAKE) -C $(POCO_BASE)/Foundation clean
@@ -202,6 +208,8 @@ clean:
 	$(MAKE) -C $(POCO_BASE)/PDF clean
 	$(MAKE) -C $(POCO_BASE)/PDF/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/PDF/samples clean
+	$(MAKE) -C $(POCO_BASE)/CppParser clean
+	$(MAKE) -C $(POCO_BASE)/CppParser/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/CppUnit clean
 
 distclean:
