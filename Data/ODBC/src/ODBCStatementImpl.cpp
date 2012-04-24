@@ -129,7 +129,7 @@ void ODBCStatementImpl::makeInternalExtractors()
 			if (isStoredProcedure()) return;
 			throw;
 		}
-		
+
 		makeExtractors(columnsReturned());
 		fixupExtraction();
 	}
@@ -146,7 +146,7 @@ void ODBCStatementImpl::addPreparator()
 
 		Preparator::DataExtraction ext = session().getFeature("autoExtract") ? 
 			Preparator::DE_BOUND : Preparator::DE_MANUAL;
-		
+
 		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 
 		_preparations.push_back(new Preparator(_stmt, statement, maxFieldSize, ext));
@@ -245,7 +245,7 @@ void ODBCStatementImpl::putData()
 		if (pParam)
 		{
 			dataSize = (SQLINTEGER) _pBinder->parameterSize(pParam);
-		
+
 			if (Utility::isError(SQLPutData(_stmt, pParam, dataSize))) 
 				throw StatementException(_stmt, "SQLPutData()");
 		}
@@ -273,17 +273,17 @@ void ODBCStatementImpl::clear()
 		bool ignoreError = false;
 
 		const StatementDiagnostics& diagnostics = err.diagnostics();
-		//ignore "Invalid cursor state" error 
+		//ignore "Invalid cursor state" error
 		//(returned by 3.x drivers when cursor is not opened)
 		for (int i = 0; i < diagnostics.count(); ++i)
 		{
-			if (ignoreError = 
+			if (ignoreError =
 				(INVALID_CURSOR_STATE == std::string(diagnostics.sqlState(i))))
 			{
 				break;
 			}
 		}
-		
+
 		if (!ignoreError)
 			throw StatementException(_stmt, "SQLCloseCursor()");
 	}
@@ -294,12 +294,12 @@ bool ODBCStatementImpl::hasNext()
 {
 	if (hasData())
 	{
-		if (!extractions().size()) 
+		if (!extractions().size())
 			makeInternalExtractors();
 
 		if (!_prepared) doPrepare();
 
-		if (_stepCalled) 
+		if (_stepCalled)
 			return _stepCalled = nextRowReady();
 
 		makeStep();
@@ -307,9 +307,9 @@ bool ODBCStatementImpl::hasNext()
 		if (!nextRowReady())
 		{
 			if (hasMoreDataSets()) activateNextDataSet();
-			else return false;	
+			else return false;
 
-			if (SQL_NO_DATA == SQLMoreResults(_stmt)) 
+			if (SQL_NO_DATA == SQLMoreResults(_stmt))
 				return false;
 
 			addPreparator();

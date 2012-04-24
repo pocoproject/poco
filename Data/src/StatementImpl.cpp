@@ -280,8 +280,6 @@ void StatementImpl::fixupBinding()
 	AbstractBindingVec::iterator it    = bindings().begin();
 	AbstractBindingVec::iterator itEnd = bindings().end();
 	AbstractBinder& bin = binder();
-	std::size_t numRows = 0;
-	if (it != itEnd) numRows = (*it)->numOfRowsHandled();
 	for (; it != itEnd; ++it) (*it)->setBinder(&bin);
 }
 
