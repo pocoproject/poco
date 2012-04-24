@@ -14,8 +14,8 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel Base64Decoder Base64E
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator \
 	Environment Event EventArgs ErrorHandler Exception FPEnvironment File Glob \
 	FileChannel Formatter FormattingChannel HexBinaryDecoder LineEndingConverter \
-	HexBinaryEncoder InflatingStream Latin1Encoding Latin9Encoding LogFile Logger \
-	LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
+	HexBinaryEncoder InflatingStream Latin1Encoding Latin2Encoding Latin9Encoding LogFile \
+	Logger LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
 	MemoryPool MD4Engine MD5Engine Manifest Message Mutex \
 	NestedDiagnosticContext Notification NotificationCenter \
 	NotificationQueue PriorityNotificationQueue TimedNotificationQueue \
@@ -28,11 +28,10 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel Base64Decoder Base64E
 	Task TaskManager TaskNotification TeeStream Hash HashStatistic \
 	TemporaryFile TextConverter TextEncoding TextIterator TextBufferIterator Thread ThreadLocal \
 	ThreadPool ThreadTarget ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
-	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1252Encoding \
-	UTF8Encoding UnicodeConverter UUID UUIDGenerator Void Var VarHolder Format \
-	Pipe PipeImpl PipeStream SharedMemory \
-	MemoryStream FileStream Unicode UTF8String AtomicCounter \
-	Windows1250Encoding Windows1251Encoding Latin2Encoding
+	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding UTF8Encoding UTF8String \
+	Unicode UnicodeConverter Windows1250Encoding Windows1251Encoding Windows1252Encoding \
+	UUID UUIDGenerator Void Var VarHolder Format Pipe PipeImpl PipeStream SharedMemory \
+	MemoryStream FileStream AtomicCounter 
 
 zlib_objects = adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil
