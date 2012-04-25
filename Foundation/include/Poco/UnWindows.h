@@ -88,7 +88,7 @@
 #undef UpdateResource
 #undef FindAtom
 #undef AddAtom
-#undef GetSystemDirector
+#undef GetSystemDirectory
 #undef GetTempPath
 #undef GetTempFileName
 #undef SetCurrentDirectory
