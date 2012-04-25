@@ -52,6 +52,8 @@ public:
 	void testFPE();
 	void testEnvironment();
 	void testBuffer();
+	void testFIFOBufferChar();
+	void testFIFOBufferInt();
 	void testAtomicCounter();
 	void testNullable();
 	void testAscii();

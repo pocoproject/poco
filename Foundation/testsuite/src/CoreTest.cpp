@@ -39,9 +39,11 @@
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #include "Poco/Buffer.h"
+#include "Poco/FIFOBuffer.h"
 #include "Poco/AtomicCounter.h"
 #include "Poco/Nullable.h"
 #include "Poco/Ascii.h"
+#include "Poco/Exception.h"
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -53,9 +55,11 @@ using Poco::Environment;
 using Poco::Thread;
 using Poco::Runnable;
 using Poco::Buffer;
+using Poco::FIFOBuffer;
 using Poco::AtomicCounter;
 using Poco::Nullable;
 using Poco::Ascii;
+using Poco::InvalidAccessException;
 
 
 namespace
@@ -203,6 +207,188 @@ void CoreTest::testBuffer()
 	try { int i = b[s]; fail ("must fail"); }
 	catch (Exception&) { }
 #endif
+}
+
+
+void CoreTest::testFIFOBufferChar()
+{
+	typedef char T;
+
+	FIFOBuffer<T> f(20);
+	Buffer<T> b(10);
+	std::vector<T> v;
+
+	for (T c = '0'; c < '0' +  10; ++c)
+		v.push_back(c);
+
+	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	f.write(b);
+	assert (20 == f.size());
+	assert (10 == f.used());
+	assert (!f.isEmpty());
+	assert ('0' == f[0]);
+	assert ('1' == f[1]);
+	assert ('2' == f[2]);
+	assert ('3' == f[3]);
+	assert ('4' == f[4]);
+	assert ('5' == f[5]);
+	assert ('6' == f[6]);
+	assert ('7' == f[7]);
+	assert ('8' == f[8]);
+	assert ('9' == f[9]);
+
+	b.resize(5);
+	f.read(b, b.size());
+	assert (20 == f.size());
+	assert (5 == f.used());
+	assert (!f.isEmpty());
+	assert ('5' == f[0]);
+	assert ('6' == f[1]);
+	assert ('7' == f[2]);
+	assert ('8' == f[3]);
+	assert ('9' == f[4]);
+	try { T i = f[10]; fail ("must fail"); }
+	catch (InvalidAccessException&) { }
+
+	v.clear();
+	for (T c = 'a'; c < 'a' + 10; ++c)
+		v.push_back(c);
+
+	b.resize(10);
+	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	f.write(b);
+	assert (20 == f.size());
+	assert (15 == f.used());
+	assert (!f.isEmpty());
+	assert ('5' == f[0]);
+	assert ('6' == f[1]);
+	assert ('7' == f[2]);
+	assert ('8' == f[3]);
+	assert ('9' == f[4]);
+	assert ('a' == f[5]);
+	assert ('b' == f[6]);
+	assert ('c' == f[7]);
+	assert ('d' == f[8]);
+	assert ('e' == f[9]);
+	assert ('f' == f[10]);
+	assert ('g' == f[11]);
+	assert ('h' == f[12]);
+	assert ('i' == f[13]);
+	assert ('j' == f[14]);
+	try { T i = f[15]; fail ("must fail"); }
+	catch (InvalidAccessException&) { }
+
+	f.read(b, 10);
+	assert (20 == f.size());
+	assert (5 == f.used());
+	assert (!f.isEmpty());
+	assert ('f' == f[0]);
+	assert ('g' == f[1]);
+	assert ('h' == f[2]);
+	assert ('i' == f[3]);
+	assert ('j' == f[4]);
+	try { T i = f[5]; fail ("must fail"); }
+	catch (InvalidAccessException&) { }
+
+	f.read(b, 6);
+	assert (5 == b.size());
+	assert (20 == f.size());
+	assert (0 == f.used());
+	try { T i = f[0]; fail ("must fail"); }
+	catch (InvalidAccessException&) { }
+
+	assert (f.isEmpty());
+}
+
+
+void CoreTest::testFIFOBufferInt()
+{
+	typedef char T;
+
+	FIFOBuffer<T> f(20);
+	Buffer<T> b(10);
+	std::vector<T> v;
+
+	for (T c = 0; c < 10; ++c)
+		v.push_back(c);
+
+	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	f.write(b);
+	assert (20 == f.size());
+	assert (10 == f.used());
+	assert (!f.isEmpty());
+	assert (0 == f[0]);
+	assert (1 == f[1]);
+	assert (2 == f[2]);
+	assert (3 == f[3]);
+	assert (4 == f[4]);
+	assert (5 == f[5]);
+	assert (6 == f[6]);
+	assert (7 == f[7]);
+	assert (8 == f[8]);
+	assert (9 == f[9]);
+
+	b.resize(5);
+	f.read(b, b.size());
+	assert (20 == f.size());
+	assert (5 == f.used());
+	assert (!f.isEmpty());
+	assert (5 == f[0]);
+	assert (6 == f[1]);
+	assert (7 == f[2]);
+	assert (8 == f[3]);
+	assert (9 == f[4]);
+	try { T i = f[10]; fail ("must fail"); }
+	catch (InvalidAccessException&) { }
+
+	v.clear();
+	for (T c = 10; c < 20; ++c)
+		v.push_back(c);
+
+	b.resize(10);
+	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	f.write(b);
+	assert (20 == f.size());
+	assert (15 == f.used());
+	assert (!f.isEmpty());
+	assert (5 == f[0]);
+	assert (6 == f[1]);
+	assert (7 == f[2]);
+	assert (8 == f[3]);
+	assert (9 == f[4]);
+	assert (10 == f[5]);
+	assert (11 == f[6]);
+	assert (12 == f[7]);
+	assert (13 == f[8]);
+	assert (14 == f[9]);
+	assert (15 == f[10]);
+	assert (16 == f[11]);
+	assert (17 == f[12]);
+	assert (18 == f[13]);
+	assert (19 == f[14]);
+	try { T i = f[15]; fail ("must fail"); }
+	catch (InvalidAccessException&) { }
+
+	f.read(b, 10);
+	assert (20 == f.size());
+	assert (5 == f.used());
+	assert (!f.isEmpty());
+	assert (15 == f[0]);
+	assert (16 == f[1]);
+	assert (17 == f[2]);
+	assert (18 == f[3]);
+	assert (19 == f[4]);
+	try { T i = f[5]; fail ("must fail"); }
+	catch (InvalidAccessException&) { }
+
+	f.read(b, 6);
+	assert (5 == b.size());
+	assert (20 == f.size());
+	assert (0 == f.used());
+	try { T i = f[0]; fail ("must fail"); }
+	catch (InvalidAccessException&) { }
+
+	assert (f.isEmpty());
 }
 
 
@@ -376,6 +562,8 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testBugcheck);
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
+	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferChar);
+	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferInt);
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);

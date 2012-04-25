@@ -842,6 +842,9 @@
 					RelativePath=".\include\Poco\Exception.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\FIFOBuffer.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Format.h">
 				</File>
 				<File

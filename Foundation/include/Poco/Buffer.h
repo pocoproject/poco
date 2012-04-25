@@ -77,6 +77,8 @@ public:
 		/// new buffer. NewSize can be larger or smaller than
 		/// the current size, but it must not be 0.
 	{
+		poco_assert(newSize);
+
 		T* ptr = new T[newSize];
 		if (preserveContent)
 		{
@@ -87,7 +89,7 @@ public:
 		_ptr  = ptr;
 		_size = newSize;
 	}
-	
+
 	std::size_t size() const
 		/// Returns the size of the buffer.
 	{
