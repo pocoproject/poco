@@ -352,8 +352,6 @@ public:
 
 	virtual bool getBlocking() const;
 		/// Returns the blocking mode of the socket.
-		/// This method will only work if the blocking modes of 
-		/// the socket are changed via the setBlocking method!
 		
 	virtual bool secure() const;
 		/// Returns true iff the socket's connection is secure
@@ -372,6 +370,14 @@ public:
 	void ioctl(poco_ioctl_request_t request, void* arg);
 		/// A wrapper for the ioctl system call.
 	
+#if defined(POCO_OS_FAMILY_UNIX)
+    int fcntl(poco_fcntl_request_t request);
+        /// A wrapper for the fcntl system call.
+
+    int fcntl(poco_fcntl_request_t request, long arg);
+        /// A wrapper for the fcntl system call.
+#endif
+    
 	bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
 	

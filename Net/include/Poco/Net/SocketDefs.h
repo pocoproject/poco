@@ -148,6 +148,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <fcntl.h>
 #if POCO_OS != POCO_OS_HPUX
 #include <sys/select.h>
 #endif
@@ -170,6 +171,7 @@
 #define POCO_INVALID_SOCKET  -1
 #define poco_socket_t        int
 #define poco_socklen_t       socklen_t
+#define poco_fcntl_request_t int
 #if defined(POCO_OS_FAMILY_BSD)
 #define poco_ioctl_request_t unsigned long
 #else

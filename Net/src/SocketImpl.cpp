@@ -293,7 +293,7 @@ int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 		rc = ::send(_sockfd, reinterpret_cast<const char*>(buffer), length, flags);
 	}
-	while (rc < 0 && lastError() == POCO_EINTR);
+	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) error();
 	return rc;
 }
@@ -315,11 +315,13 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 		rc = ::recv(_sockfd, reinterpret_cast<char*>(buffer), length, flags);
 	}
-	while (rc < 0 && lastError() == POCO_EINTR);
+	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) 
 	{
 		int err = lastError();
-		if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
+		if (err == POCO_EAGAIN && !_blocking)
+			;
+		else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
 			throw TimeoutException();
 		else
 			error(err);
@@ -340,7 +342,7 @@ int SocketImpl::sendTo(const void* buffer, int length, const SocketAddress& addr
 		rc = ::sendto(_sockfd, reinterpret_cast<const char*>(buffer), length, flags, address.addr(), address.length());
 #endif
 	}
-	while (rc < 0 && lastError() == POCO_EINTR);
+	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) error();
 	return rc;
 }
@@ -365,7 +367,7 @@ int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, in
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 		rc = ::recvfrom(_sockfd, reinterpret_cast<char*>(buffer), length, flags, pSA, &saLen);
 	}
-	while (rc < 0 && lastError() == POCO_EINTR);
+	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
 	if (rc >= 0)
 	{
 		address = SocketAddress(pSA, saLen);
@@ -373,7 +375,9 @@ int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, in
 	else
 	{
 		int err = lastError();
-		if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
+		if (err == POCO_EAGAIN && !_blocking)
+			;
+		else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
 			throw TimeoutException();
 		else
 			error(err);
@@ -851,9 +855,17 @@ bool SocketImpl::getBroadcast()
 
 void SocketImpl::setBlocking(bool flag)
 {
+#if !defined(POCO_OS_FAMILY_UNIX)
 	int arg = flag ? 0 : 1;
 	ioctl(FIONBIO, arg);
-	_blocking = flag;
+#else
+    int arg = fcntl(F_GETFL);
+    long flags = arg & ~O_NONBLOCK;
+    if (!flag)
+        flags |= O_NONBLOCK;
+    (void) fcntl(F_SETFL, flags);
+#endif
+    _blocking = flag;
 }
 
 
@@ -906,6 +918,24 @@ void SocketImpl::ioctl(poco_ioctl_request_t request, void* arg)
 	if (rc != 0) error();
 }
 
+
+#if defined(POCO_OS_FAMILY_UNIX)
+int SocketImpl::fcntl(poco_fcntl_request_t request)
+{
+	int rc = ::fcntl(_sockfd, request);
+	if (rc == -1) error();
+	return rc;
+}
+
+
+int SocketImpl::fcntl(poco_fcntl_request_t request, long arg)
+{
+	int rc = ::fcntl(_sockfd, request, arg);
+	if (rc == -1) error();
+	return rc;
+}
+#endif
+ 
 
 void SocketImpl::reset(poco_socket_t aSocket)
 {
