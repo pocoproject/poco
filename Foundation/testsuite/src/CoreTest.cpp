@@ -296,7 +296,31 @@ void CoreTest::testFIFOBufferChar()
 	assert (0 == f.used());
 	try { T i = f[0]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
+	assert (f.isEmpty());
 
+	assert (5 == f.write(b));
+	assert (20 == f.size());
+	assert (5 == f.used());
+	assert (!f.isEmpty());
+	assert ('f' == f[0]);
+	assert ('g' == f[1]);
+	assert ('h' == f[2]);
+	assert ('i' == f[3]);
+	assert ('j' == f[4]);
+
+	f.resize(10);
+	assert (10 == f.size());
+	assert (5 == f.used());
+	assert (!f.isEmpty());
+	assert ('f' == f[0]);
+	assert ('g' == f[1]);
+	assert ('h' == f[2]);
+	assert ('i' == f[3]);
+	assert ('j' == f[4]);
+
+	f.resize(3, false);
+	assert (3 == f.size());
+	assert (0 == f.used());
 	assert (f.isEmpty());
 }
 
@@ -388,6 +412,31 @@ void CoreTest::testFIFOBufferInt()
 	try { T i = f[0]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
+	assert (f.isEmpty());
+
+	assert (5 == f.write(b));
+	assert (20 == f.size());
+	assert (5 == f.used());
+	assert (!f.isEmpty());
+	assert (15 == f[0]);
+	assert (16 == f[1]);
+	assert (17 == f[2]);
+	assert (18 == f[3]);
+	assert (19 == f[4]);
+
+	f.resize(10);
+	assert (10 == f.size());
+	assert (5 == f.used());
+	assert (!f.isEmpty());
+	assert (15 == f[0]);
+	assert (16 == f[1]);
+	assert (17 == f[2]);
+	assert (18 == f[3]);
+	assert (19 == f[4]);
+
+	f.resize(3, false);
+	assert (3 == f.size());
+	assert (0 == f.used());
 	assert (f.isEmpty());
 }
 

@@ -88,8 +88,7 @@ public:
 			throw InvalidAccessException("Can not resize FIFO without data loss.");
 		
 		_buffer.resize(newSize, preserveContent);
-		if (_used > _buffer.size())
-			_used = _buffer.size();
+		if (!preserveContent) _used = 0;
 	}
 	
 	Buffer<T>& peek(Poco::Buffer<T>& buffer, std::size_t length = 0) const
@@ -108,6 +107,7 @@ public:
 		poco_assert (length <= _buffer.size());
 		buffer.resize(length);
 		std::memcpy(buffer.begin(), _buffer.begin(), length * sizeof(T));
+
 		return buffer;
 	}
 	
@@ -139,12 +139,14 @@ public:
 		/// Returns the length of data written.
 	{
 		Mutex::ScopedLock lock(_mutex);
+
 		poco_assert (_used <= _buffer.size());
 		std::size_t available =  _buffer.size() - _used;
 		std::size_t len = buffer.size() > available ? available : buffer.size();
 		std::memcpy(_buffer.begin() + _used, buffer.begin(), len * sizeof(T));
 		_used += len;
 		poco_assert (_used <= _buffer.size());
+
 		return len;
 	}
 
