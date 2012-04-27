@@ -43,6 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include "Poco/Buffer.h"
+#include "Poco/BasicEvent.h"
 #include "Poco/Mutex.h"
 #include "Poco/Format.h"
 
@@ -53,17 +54,43 @@ namespace Poco {
 template <class T>
 class FIFOBuffer
 	/// A simple buffer class with support for re-entrant,
-	/// FIFO-style read/write operations as well as 
-	/// introspection into the size of buffer, amount of unread data
-	/// and available space.
+	/// FIFO-style read/write operations. as well as 
+	/// empty/full transition notifications. Buffer size
+	/// introspection as well as amount of unread data and 
+	/// available space are supported as well.
 	///
-	/// This class is useful everywhere where a FIFO functionality
+	/// This class is useful anywhere where a FIFO functionality
 	/// is needed.
 {
 public:
-	FIFOBuffer(std::size_t size):
+	mutable Poco::BasicEvent<bool> Writeable;
+		/// Event indicating "writeability" of the buffer,
+		/// triggerred as follows:
+		///
+		///	* when buffer transitions from non-full to full, 
+		///	  Writeable event observers are notified, with 
+		///	  false value as the argument
+		///
+		///	* when buffer transitions from full to non-full,
+		///	  Writeable event observers are notified, with 
+		///	  true value as the argument
+
+	mutable Poco::BasicEvent<bool> Readable;
+		/// Event indicating "readability" of the buffer,
+		/// triggerred as follows:
+		///
+		///	* when buffer transitions from non-empty to empty,
+		///	  Readable event observers are notified, with false  
+		///	  value as the argument
+		///
+		///	* when FIFOBuffer transitions from empty to non-empty,
+		///	  Readable event observers are notified, with true value
+		///	  as the argument
+
+	FIFOBuffer(std::size_t size, bool notify = false):
 		_buffer(size),
-		_used(0)
+		_used(0),
+		_notify(notify)
 		/// Creates and allocates the FIFOBuffer.
 	{
 	}
@@ -87,11 +114,13 @@ public:
 		if (preserveContent && (newSize < _used))
 			throw InvalidAccessException("Can not resize FIFO without data loss.");
 		
+		std::size_t usedBefore = _used;
 		_buffer.resize(newSize, preserveContent);
 		if (!preserveContent) _used = 0;
+		if (_notify) notify(usedBefore);
 	}
 	
-	Buffer<T>& peek(Poco::Buffer<T>& buffer, std::size_t length = 0) const
+	std::size_t peek(Poco::Buffer<T>& buffer, std::size_t length = 0) const
 		/// Peeks into the data currently in the FIFO
 		/// without actually extracting it.
 		/// Resizes the supplied buffer to the size of
@@ -108,10 +137,10 @@ public:
 		buffer.resize(length);
 		std::memcpy(buffer.begin(), _buffer.begin(), length * sizeof(T));
 
-		return buffer;
+		return length;
 	}
 	
-	Buffer<T>& read(Poco::Buffer<T>& buffer, std::size_t length = 0)
+	std::size_t read(Poco::Buffer<T>& buffer, std::size_t length = 0)
 		/// Copies the data currently in the FIFO
 		/// into the supplied buffer.
 		/// Resizes the supplied buffer to the size of
@@ -121,13 +150,18 @@ public:
 	{
 		Mutex::ScopedLock lock(_mutex);
 
-		std::size_t usedBefore = _used;
-		peek(buffer, length);
-		_used -= buffer.size();
-		if (_used)
-			std::memmove(_buffer.begin(), _buffer.begin() + usedBefore - _used, _used);
+		if (0 == _used) return 0;
 
-		return buffer;
+		std::size_t usedBefore = _used;
+		std::size_t readLen = peek(buffer, length);
+		poco_assert (_used >= readLen);
+		_used -= readLen;
+		if (_used > 0)
+			std::memmove(_buffer.begin(), _buffer.begin() + usedBefore - _used, _used);
+		
+		if (_notify) notify(usedBefore);
+
+		return readLen;
 	}
 
 	std::size_t write(const Buffer<T>& buffer)
@@ -141,11 +175,13 @@ public:
 		Mutex::ScopedLock lock(_mutex);
 
 		poco_assert (_used <= _buffer.size());
+		std::size_t usedBefore = _used;
 		std::size_t available =  _buffer.size() - _used;
 		std::size_t len = buffer.size() > available ? available : buffer.size();
 		std::memcpy(_buffer.begin() + _used, buffer.begin(), len * sizeof(T));
 		_used += len;
 		poco_assert (_used <= _buffer.size());
+		if (_notify) notify(usedBefore);
 
 		return len;
 	}
@@ -197,12 +233,26 @@ public:
 	}
 
 private:
+	void notify(std::size_t usedBefore)
+	{
+		bool t = true, f = false;
+		if (usedBefore == 0 && _used > 0)
+			Readable.notify(this, t);
+		else if (usedBefore > 0 && 0 == _used)
+			Readable.notify(this, f);
+		else if (usedBefore == _buffer.size() && _used < _buffer.size())
+			Writeable.notify(this, t);
+		else if (usedBefore < _buffer.size() && _used == _buffer.size())
+			Writeable.notify(this, f);
+	}
+
 	FIFOBuffer();
 	FIFOBuffer(const FIFOBuffer&);
 	FIFOBuffer& operator = (const FIFOBuffer&);
 
 	Buffer<T>     _buffer;
 	std::size_t   _used;
+	bool          _notify;
 	mutable Mutex _mutex;
 };
 

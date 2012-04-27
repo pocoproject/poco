@@ -63,7 +63,15 @@ public:
 
 	static CppUnit::Test* suite();
 
+protected:
+	void onReadable(bool& b);
+	void onWriteable(bool& b);
+
 private:
+	int _readableToNot;
+	int _notToReadable;
+	int _writeableToNot;
+	int _notToWriteable;
 };
 
 

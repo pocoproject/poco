@@ -43,6 +43,8 @@
 #include "Poco/AtomicCounter.h"
 #include "Poco/Nullable.h"
 #include "Poco/Ascii.h"
+#include "Poco/BasicEvent.h"
+#include "Poco/Delegate.h"
 #include "Poco/Exception.h"
 #include <iostream>
 #include <vector>
@@ -59,6 +61,8 @@ using Poco::FIFOBuffer;
 using Poco::AtomicCounter;
 using Poco::Nullable;
 using Poco::Ascii;
+using Poco::BasicEvent;
+using Poco::delegate;
 using Poco::InvalidAccessException;
 
 
@@ -214,15 +218,22 @@ void CoreTest::testFIFOBufferChar()
 {
 	typedef char T;
 
-	FIFOBuffer<T> f(20);
+	FIFOBuffer<T> f(20, true);
 	Buffer<T> b(10);
 	std::vector<T> v;
+
+	f.Readable += delegate(this, &CoreTest::onReadable);
+	f.Writeable += delegate(this, &CoreTest::onReadable);
 
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
 
 	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	assert(0 == _notToReadable);
+	assert(0 == _readableToNot);
 	f.write(b);
+	assert(1 == _notToReadable);
+	assert(0 == _readableToNot);
 	assert (20 == f.size());
 	assert (10 == f.used());
 	assert (!f.isEmpty());
@@ -290,7 +301,12 @@ void CoreTest::testFIFOBufferChar()
 	try { T i = f[5]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
+	assert(1 == _notToReadable);
+	assert(0 == _readableToNot);
 	f.read(b, 6);
+	assert(1 == _notToReadable);
+	assert(1 == _readableToNot);
+
 	assert (5 == b.size());
 	assert (20 == f.size());
 	assert (0 == f.used());
@@ -298,7 +314,12 @@ void CoreTest::testFIFOBufferChar()
 	catch (InvalidAccessException&) { }
 	assert (f.isEmpty());
 
+	assert(1 == _notToReadable);
+	assert(1 == _readableToNot);
 	assert (5 == f.write(b));
+	assert(2 == _notToReadable);
+	assert(1 == _readableToNot);
+
 	assert (20 == f.size());
 	assert (5 == f.used());
 	assert (!f.isEmpty());
@@ -318,10 +339,28 @@ void CoreTest::testFIFOBufferChar()
 	assert ('i' == f[3]);
 	assert ('j' == f[4]);
 
+	assert(2 == _notToReadable);
+	assert(1 == _readableToNot);
 	f.resize(3, false);
+	assert(2 == _notToReadable);
+	assert(2 == _readableToNot);
 	assert (3 == f.size());
 	assert (0 == f.used());
 	assert (f.isEmpty());
+
+	b.resize(3);
+	b[0] = 'x';
+	b[1] = 'y';
+	b[2] = 'z';
+	
+	assert(2 == _notToReadable);
+	assert(2 == _readableToNot);
+	f.write(b);
+	assert(3 == _notToReadable);
+	assert(2 == _readableToNot);
+
+	f.Readable -= delegate(this, &CoreTest::onReadable);
+	f.Writeable -= delegate(this, &CoreTest::onReadable);
 }
 
 
@@ -592,8 +631,26 @@ void CoreTest::testAscii()
 }
 
 
+void CoreTest::onReadable(bool& b)
+{
+	if (b) ++_notToReadable;
+	else ++_readableToNot;
+};
+
+
+void CoreTest::onWriteable(bool& b)
+{
+	if (b) ++_notToWriteable;
+	else ++_writeableToNot;
+}
+
+
 void CoreTest::setUp()
 {
+	_readableToNot = 0;
+	_notToReadable = 0;
+	_writeableToNot = 0;
+	_notToWriteable = 0;
 }
 
 
