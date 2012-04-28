@@ -47,6 +47,7 @@ public:
 	~StringTokenizerTest();
 
 	void testStringTokenizer();
+	void testFind();
 
 	void setUp();
 	void tearDown();

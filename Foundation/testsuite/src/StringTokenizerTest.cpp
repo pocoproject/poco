@@ -28,7 +28,7 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-
+#include <iostream>
 
 #include "StringTokenizerTest.h"
 #include "CppUnit/TestCaller.h"
@@ -411,6 +411,7 @@ void StringTokenizerTest::testFind()
         assert (2 == st.count("5"));
 
         st.replace("3", "6", 4);
+
         assert (1 == st.count("3"));
         assert (1 == st.count("6"));
 }
