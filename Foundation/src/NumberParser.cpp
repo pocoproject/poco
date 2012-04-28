@@ -37,18 +37,20 @@
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
 #include "Poco/MemoryStream.h"
+#include "Poco/String.h"
 #if !defined(POCO_NO_LOCALE)
 #include <locale>
 #endif
 #include <cstdio>
+#include <cctype>
 
 
 #if defined(POCO_LONG_IS_64_BIT)
-	#define I64_FMT "l"
+        #define I64_FMT "l"
 #elif defined(_MSC_VER)
-	#define I64_FMT "I64"
+        #define I64_FMT "I64"
 #elif defined(__APPLE__) 
-	#define I64_FMT "q"
+        #define I64_FMT "q"
 #else
 	#define I64_FMT "ll"
 #endif
@@ -174,15 +176,70 @@ double NumberParser::parseFloat(const std::string& s)
 		throw SyntaxException("Not a valid floating-point number", s);
 }
 
-	
+        
 bool NumberParser::tryParseFloat(const std::string& s, double& value)
 {
-	Poco::MemoryInputStream istr(s.data(), s.size());
+        Poco::MemoryInputStream istr(s.data(), s.size());
 #if !defined(POCO_NO_LOCALE)
-	istr.imbue(std::locale::classic());
+        istr.imbue(std::locale::classic());
 #endif
-	istr >> value;
-	return istr.eof() && !istr.fail();
+        istr >> value;
+        return istr.eof() && !istr.fail();
+}
+
+
+bool NumberParser::parseBool(const std::string& s)
+{
+        bool result;
+        if (tryParseBool(s, result))
+                return result;
+        else
+                throw SyntaxException("Not a valid bool number", s);
+}
+
+        
+bool NumberParser::tryParseBool(const std::string& s, bool& value)
+{
+        int n;
+        if (NumberParser::tryParse(s, n))
+        {
+                value = (n != 0);
+                return true;
+        }
+
+        if (icompare(s, "true") == 0)
+        {
+                value = true;
+                return true;
+        }
+        else if (icompare(s, "yes") == 0)
+        {
+                value = true;
+                return true;
+        }
+        else if (icompare(s, "on") == 0)
+        {
+                value = true;
+                return true;
+        }
+        
+        if (icompare(s, "false") == 0)
+        {
+                value = false;
+                return true;
+        }
+        else if (icompare(s, "no") == 0)
+        {
+                value = false;
+                return true;
+        }
+        else if (icompare(s, "off") == 0)
+        {
+                value = false;
+                return true;
+        }
+        
+        return false;
 }
 
 
