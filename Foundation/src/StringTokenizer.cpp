@@ -5,7 +5,7 @@
 //
 // Library: Foundation
 // Package: Core
-// Module:  StringTokenizer
+// Module:	StringTokenizer
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -80,44 +80,44 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 
 std::size_t StringTokenizer::count(const std::string& token) const
 {
-  std::size_t result = 0;
-  TokenVec::const_iterator it = std::find(_tokens.begin(), _tokens.end(), token);
-  while(it != _tokens.end())
-  {
-    result++;
-    it = std::find(++it, _tokens.end(), token);
-  }
-  return result;
+	std::size_t result = 0;
+	TokenVec::const_iterator it = std::find(_tokens.begin(), _tokens.end(), token);
+	while(it != _tokens.end())
+	{
+		result++;
+		it = std::find(++it, _tokens.end(), token);
+	}
+	return result;
 }
 
 
 std::size_t StringTokenizer::find(const std::string& token, std::size_t pos) const
-{  
-  TokenVec::const_iterator it = std::find(_tokens.begin() + pos, _tokens.end(), token);
-  if ( it != _tokens.end() )
-  {
-    return it - _tokens.begin();
-  }
-  throw NotFoundException(token);
+{	
+	TokenVec::const_iterator it = std::find(_tokens.begin() + pos, _tokens.end(), token);
+	if ( it != _tokens.end() )
+	{
+		return it - _tokens.begin();
+	}
+	throw NotFoundException(token);
 }
 
 bool StringTokenizer::has(const std::string& token) const
 {
-  TokenVec::const_iterator it = std::find(_tokens.begin(), _tokens.end(), token);
-  return it != _tokens.end();
+	TokenVec::const_iterator it = std::find(_tokens.begin(), _tokens.end(), token);
+	return it != _tokens.end();
 }
 
 std::size_t StringTokenizer::replace(const std::string& oldToken, const std::string& newToken, std::size_t pos)
 {
-  std::size_t result = 0;
-  TokenVec::iterator it = std::find(_tokens.begin() + pos, _tokens.end(), oldToken);
-  while(it != _tokens.end())
-  {
-    result++;
-    *it = newToken;
-    it = std::find(++it, _tokens.end(), oldToken);
-  }
-  return result;
+	std::size_t result = 0;
+	TokenVec::iterator it = std::find(_tokens.begin() + pos, _tokens.end(), oldToken);
+	while(it != _tokens.end())
+	{
+		result++;
+		*it = newToken;
+		it = std::find(++it, _tokens.end(), oldToken);
+	}
+	return result;
 }
 
 StringTokenizer::~StringTokenizer()
