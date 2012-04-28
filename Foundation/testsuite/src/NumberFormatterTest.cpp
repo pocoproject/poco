@@ -86,9 +86,16 @@ void NumberFormatterTest::testFormat()
 		assert (NumberFormatter::format((void*) 0x12345678) == "0000000012345678");
 	}
 	
-	assert (NumberFormatter::format(12.25) == "12.25");
-	assert (NumberFormatter::format(12.25, 4) == "12.2500");
-	assert (NumberFormatter::format(12.25, 8, 4) == " 12.2500");
+        assert (NumberFormatter::format(12.25) == "12.25");
+        assert (NumberFormatter::format(12.25, 4) == "12.2500");
+        assert (NumberFormatter::format(12.25, 8, 4) == " 12.2500");
+
+        assert (NumberFormatter::format(true, NumberFormatter::FMT_TRUE_FALSE) == "true");
+        assert (NumberFormatter::format(false, NumberFormatter::FMT_TRUE_FALSE) == "false");
+        assert (NumberFormatter::format(true, NumberFormatter::FMT_YES_NO) == "yes");
+        assert (NumberFormatter::format(false, NumberFormatter::FMT_YES_NO) == "no");
+        assert (NumberFormatter::format(true, NumberFormatter::FMT_ON_OFF) == "on");
+        assert (NumberFormatter::format(false, NumberFormatter::FMT_ON_OFF) == "off");
 }
 
 
@@ -146,15 +153,15 @@ void NumberFormatterTest::testFormatHex()
 
 void NumberFormatterTest::testFormatFloat()
 {
-	std::string s(NumberFormatter::format(1.0f));
-	assert (s == "1");
-	s = NumberFormatter::format(0.1f);
-	assert (s == "0.1");
-	
-	s = NumberFormatter::format(1.0);
-	assert (s == "1");
-	s = NumberFormatter::format(0.1);
-	assert (s == "0.1");	
+        std::string s(NumberFormatter::format(1.0f));
+        assert (s == "1");
+        s = NumberFormatter::format(0.1f);
+        assert (s == "0.1");
+        
+        s = NumberFormatter::format(1.0);
+        assert (s == "1");
+        s = NumberFormatter::format(0.1);
+        assert (s == "0.1");    
 }
 
 
@@ -172,10 +179,10 @@ CppUnit::Test* NumberFormatterTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NumberFormatterTest");
 
-	CppUnit_addTest(pSuite, NumberFormatterTest, testFormat);
-	CppUnit_addTest(pSuite, NumberFormatterTest, testFormat0);
-	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatHex);
-	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatFloat);
+        CppUnit_addTest(pSuite, NumberFormatterTest, testFormat);
+        CppUnit_addTest(pSuite, NumberFormatterTest, testFormat0);
+        CppUnit_addTest(pSuite, NumberFormatterTest, testFormatHex);
+        CppUnit_addTest(pSuite, NumberFormatterTest, testFormatFloat);
 
-	return pSuite;
+        return pSuite;
 }

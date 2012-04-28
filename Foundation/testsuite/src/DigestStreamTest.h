@@ -46,12 +46,13 @@ public:
 	DigestStreamTest(const std::string& name);
 	~DigestStreamTest();
 
-	void testInputStream();
-	void testOutputStream1();
-	void testOutputStream2();
+        void testInputStream();
+        void testOutputStream1();
+        void testOutputStream2();
+        void testToFromHex();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

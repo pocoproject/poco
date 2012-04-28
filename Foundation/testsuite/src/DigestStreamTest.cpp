@@ -93,6 +93,15 @@ void DigestStreamTest::testOutputStream2()
 }
 
 
+void DigestStreamTest::testToFromHex()
+{
+        std::string digest("c3fcd3d76192e4007dfb496cca67e13b");
+        Poco::DigestEngine::Digest dig = DigestEngine::digestFromHex(digest);
+        std::string digest2 = DigestEngine::digestToHex(dig);
+        assert (digest == digest2);
+}
+
+
 void DigestStreamTest::setUp()
 {
 }
@@ -107,9 +116,10 @@ CppUnit::Test* DigestStreamTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DigestStreamTest");
 
-	CppUnit_addTest(pSuite, DigestStreamTest, testInputStream);
-	CppUnit_addTest(pSuite, DigestStreamTest, testOutputStream1);
-	CppUnit_addTest(pSuite, DigestStreamTest, testOutputStream2);
+        CppUnit_addTest(pSuite, DigestStreamTest, testInputStream);
+        CppUnit_addTest(pSuite, DigestStreamTest, testOutputStream1);
+        CppUnit_addTest(pSuite, DigestStreamTest, testOutputStream2);
+        CppUnit_addTest(pSuite, DigestStreamTest, testToFromHex);
 
-	return pSuite;
+        return pSuite;
 }

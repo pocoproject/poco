@@ -55,12 +55,19 @@ void NumberParserTest::testParse()
 {
 	assert (NumberParser::parse("123") == 123);
 	assert (NumberParser::parse("-123") == -123);
-	assert (NumberParser::parseUnsigned("123") == 123);
-	assert (NumberParser::parseHex("12AB") == 0x12ab);
+        assert (NumberParser::parseUnsigned("123") == 123);
+        assert (NumberParser::parseHex("12AB") == 0x12ab);
+
+        assert (NumberParser::parseBool("0") == false);
+        assert (NumberParser::parseBool("FALSE") == false);
+        assert (NumberParser::parseBool("no") == false);
+        assert (NumberParser::parseBool("1") == true);
+        assert (NumberParser::parseBool("True") == true);
+        assert (NumberParser::parseBool("YeS") == true);
 
 #if defined(POCO_HAVE_INT64)
-	assert (NumberParser::parse64("123") == 123);
-	assert (NumberParser::parse64("-123") == -123);
+        assert (NumberParser::parse64("123") == 123);
+        assert (NumberParser::parse64("-123") == -123);
 	assert (NumberParser::parseUnsigned64("123") == 123);
 	assert (NumberParser::parseHex64("12AB") == 0x12ab);
 #endif
@@ -70,21 +77,23 @@ void NumberParserTest::testParse()
 
 void NumberParserTest::testParseError()
 {
-	try
-	{
-		NumberParser::parse("");
-		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
+        try
+        {
+                NumberParser::parse("");
+                NumberParser::parseBool("");
+                failmsg("must throw SyntaxException");
+        }
+        catch (SyntaxException&)
 	{
 	}
 
-	try
-	{
-		NumberParser::parse("asd");
-		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
+        try
+        {
+                NumberParser::parse("asd");
+                NumberParser::parseBool("asd");
+                failmsg("must throw SyntaxException");
+        }
+        catch (SyntaxException&)
 	{
 	}
 
