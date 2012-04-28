@@ -142,7 +142,7 @@ public:
 
 	bool poll(const Poco::Timespan& timeout, int mode) const;
 		/// Determines the status of the socket, using a 
-		/// call to select().
+		/// call to poll() or select().
 		/// 
 		/// The mode argument is constructed by combining the values
 		/// of the SelectMode enumeration.
@@ -315,6 +315,23 @@ protected:
 		/// Returns the socket descriptor for this socket.
 
 private:
+
+#if defined(POCO_HAVE_FD_POLL)
+class FDCompare
+	/// Utility functor used to compare socket file descriptors.
+	/// Used in poll() member function.
+{
+public:
+	FDCompare(int fd): _fd(fd) { }
+	inline bool operator()(const Socket& socket) const
+	{ return socket.sockfd() == _fd; }
+
+private:
+	FDCompare();
+	int _fd;
+};
+#endif
+
 	SocketImpl* _pImpl;
 };
 
@@ -603,6 +620,15 @@ inline bool Socket::supportsIPv4()
 	return true;
 }
 
+
+inline bool Socket::supportsIPv6()
+{
+#if defined(POCO_HAVE_IPv6)
+	return true;
+#else
+	return false;
+#endif
+}
 
 } } // namespace Poco::Net
 

@@ -41,6 +41,12 @@
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 #if defined(POCO_HAVE_FD_EPOLL)
 #include <sys/epoll.h>
+#elif defined(POCO_HAVE_FD_POLL)
+#include "Poco/SharedPtr.h"
+#include <poll.h>
+typedef Poco::SharedPtr<pollfd, 
+	Poco::ReferenceCounter, 
+	Poco::ReleaseArrayPolicy<pollfd> > SharedPollArray;
 #endif
 
 
@@ -226,6 +232,88 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	std::swap(exceptList, readyExceptList);
 	return readList.size() + writeList.size() + exceptList.size();
 
+#elif defined(POCO_HAVE_FD_POLL)
+
+	nfds_t nfd = readList.size() + writeList.size() + exceptList.size();
+	if (0 == nfd) return 0;
+
+	SharedPollArray pPollArr = new pollfd[nfd];
+
+	int idx = 0;
+	for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
+	{
+		pPollArr[idx].fd = int(it->sockfd());
+		pPollArr[idx++].events |= POLLIN;
+	}
+
+	SocketList::iterator begR = readList.begin();
+	SocketList::iterator endR = readList.end();
+	for (SocketList::iterator it = writeList.begin(); it != writeList.end(); ++it)
+	{
+		SocketList::iterator pos = std::find(begR, endR, *it);
+		if (pos != endR) 
+		{
+			pPollArr[pos-begR].events |= POLLOUT;
+			--nfd;
+		}
+		else
+		{
+			pPollArr[idx].fd = int(it->sockfd());
+			pPollArr[idx++].events |= POLLOUT;
+		}
+	}
+
+	SocketList::iterator begW = writeList.begin();
+	SocketList::iterator endW = writeList.end();
+	for (SocketList::iterator it = exceptList.begin(); it != exceptList.end(); ++it)
+	{
+		SocketList::iterator pos = std::find(begR, endR, *it);
+		if (pos != endR) --nfd;
+		else
+		{
+			SocketList::iterator pos = std::find(begW, endW, *it);
+			if (pos != endW) --nfd;
+			else pPollArr[idx++].fd = int(it->sockfd());
+		}
+	}
+
+	Poco::Timespan remainingTime(timeout);
+	int rc;
+	do
+	{
+		Poco::Timestamp start;
+		rc = ::poll(pPollArr, nfd, timeout.totalMilliseconds());
+		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = end - start;
+			if (waited < remainingTime) remainingTime -= waited;
+			else remainingTime = 0;
+		}
+	}
+	while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
+	if (rc < 0) SocketImpl::error();
+
+	SocketList readyReadList;
+	SocketList readyWriteList;
+	SocketList readyExceptList;
+
+	SocketList::iterator begE = exceptList.begin();
+	SocketList::iterator endE = exceptList.end();
+	for (int idx = 0; idx < nfd; ++idx)
+	{
+		SocketList::iterator slIt = std::find_if(begR, endR, Socket::FDCompare(pPollArr[idx].fd));
+		if (POLLIN & pPollArr[idx].revents && slIt != endR) readyReadList.push_back(*slIt);
+		slIt = std::find_if(begW, endW, Socket::FDCompare(pPollArr[idx].fd));
+		if (POLLOUT & pPollArr[idx].revents && slIt != endW) readyWriteList.push_back(*slIt);
+		slIt = std::find_if(begE, endE, Socket::FDCompare(pPollArr[idx].fd));
+		if (POLLERR & pPollArr[idx].revents && slIt != endE) readyExceptList.push_back(*slIt);
+	}
+	std::swap(readList, readyReadList);
+	std::swap(writeList, readyWriteList);
+	std::swap(exceptList, readyExceptList);
+	return readList.size() + writeList.size() + exceptList.size();
+
 #else
 
 	fd_set fdRead;
@@ -324,16 +412,6 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	return rc; 
 
 #endif // POCO_HAVE_FD_EPOLL
-}
-
-
-bool Socket::supportsIPv6()
-{
-#if defined(POCO_HAVE_IPv6)
-	return true;
-#else
-	return false;
-#endif
 }
 
 
