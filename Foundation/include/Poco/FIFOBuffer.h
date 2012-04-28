@@ -89,6 +89,7 @@ public:
 
 	FIFOBuffer(std::size_t size, bool notify = false):
 		_buffer(size),
+		_begin(0),
 		_used(0),
 		_notify(notify)
 		/// Creates and allocates the FIFOBuffer.
@@ -124,7 +125,7 @@ public:
 		/// Peeks into the data currently in the FIFO
 		/// without actually extracting it.
 		/// Resizes the supplied buffer to the size of
-		///.data written to it. If length is not
+		/// data written to it. If length is not
 		/// supplied by the caller, the current FIFO used length
 		/// is substituted for it.
 		/// 
@@ -135,7 +136,7 @@ public:
 		if (0 == length || length > _used) length = _used;
 		poco_assert (length <= _buffer.size());
 		buffer.resize(length);
-		std::memcpy(buffer.begin(), _buffer.begin(), length * sizeof(T));
+		std::memcpy(buffer.begin(), _buffer.begin() + _begin, length * sizeof(T));
 
 		return length;
 	}
@@ -144,7 +145,7 @@ public:
 		/// Copies the data currently in the FIFO
 		/// into the supplied buffer.
 		/// Resizes the supplied buffer to the size of
-		///.data written to it.
+		/// data written to it.
 		/// 
 		/// Returns the reference to the buffer.
 	{
@@ -156,9 +157,9 @@ public:
 		std::size_t readLen = peek(buffer, length);
 		poco_assert (_used >= readLen);
 		_used -= readLen;
-		if (_used > 0)
-			std::memmove(_buffer.begin(), _buffer.begin() + usedBefore - _used, _used);
-		
+		if (0 == _used) _begin = 0;
+		else _begin += length;
+
 		if (_notify) notify(usedBefore);
 
 		return readLen;
@@ -174,11 +175,16 @@ public:
 	{
 		Mutex::ScopedLock lock(_mutex);
 
-		poco_assert (_used <= _buffer.size());
+		if (_buffer.size() - (_begin + _used) < buffer.size())
+		{
+			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used);
+			_begin = 0;
+		}
+
 		std::size_t usedBefore = _used;
-		std::size_t available =  _buffer.size() - _used;
+		std::size_t available =  _buffer.size() - _used - _begin;
 		std::size_t len = buffer.size() > available ? available : buffer.size();
-		std::memcpy(_buffer.begin() + _used, buffer.begin(), len * sizeof(T));
+		std::memcpy(_buffer.begin() + _begin + _used, buffer.begin(), len * sizeof(T));
 		_used += len;
 		poco_assert (_used <= _buffer.size());
 		if (_notify) notify(usedBefore);
@@ -212,7 +218,7 @@ public:
 		if (index >= _used)
 			throw InvalidAccessException(format("Index out of bounds: %z (max index allowed: %z)", index, _used - 1));
 
-		return _buffer[index];
+		return _buffer[_begin + index];
 	}
 
 	const T& operator [] (std::size_t index) const
@@ -223,7 +229,7 @@ public:
 		if (index >= _used)
 			throw InvalidAccessException(format("Index out of bounds: %z (max index allowed: %z)", index, _used - 1));
 
-		return _buffer[index];
+		return _buffer[_begin + index];
 	}
 
 	bool isEmpty() const
@@ -251,6 +257,7 @@ private:
 	FIFOBuffer& operator = (const FIFOBuffer&);
 
 	Buffer<T>     _buffer;
+	std::size_t   _begin;
 	std::size_t   _used;
 	bool          _notify;
 	mutable Mutex _mutex;

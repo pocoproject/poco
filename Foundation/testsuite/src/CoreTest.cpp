@@ -197,6 +197,8 @@ void CoreTest::testBuffer()
 {
 	std::size_t s = 10;
 	Buffer<int> b(s);
+	assert (b.size() == s);
+	assert (b.allocated() == s);
 	std::vector<int> v;
 	for (int i = 0; i < s; ++i)
 		v.push_back(i);
@@ -206,6 +208,26 @@ void CoreTest::testBuffer()
 	assert (s == b.size());
 	for (int i = 0; i < s; ++i)
 		assert (b[i] == i);
+
+	b.resize(s/2);
+	for (int i = 0; i < s/2; ++i)
+		assert (b[i] == i);
+
+	assert (b.size() == s/2);
+	assert (b.allocated() == s);
+
+	b.resize(s*2);
+	v.clear();
+	for (int i = 0; i < s*2; ++i)
+		v.push_back(i);
+
+	std::memcpy(b.begin(), &v[0], sizeof(int) * v.size());
+
+	for (int i = 0; i < s*2; ++i)
+		assert (b[i] == i);
+
+	assert (b.size() == s*2);
+	assert (b.allocated() == s*2);
 
 #if ENABLE_BUGCHECK_TEST
 	try { int i = b[s]; fail ("must fail"); }

@@ -60,6 +60,7 @@ class Buffer
 public:
 	Buffer(std::size_t size):
 		_size(size),
+		_used(size),
 		_ptr(new T[size])
 		/// Creates and allocates the Buffer.
 	{
@@ -79,21 +80,30 @@ public:
 	{
 		poco_assert(newSize);
 
-		T* ptr = new T[newSize];
-		if (preserveContent)
+		if (newSize > _size)
 		{
-			std::size_t n = newSize > _size ? _size : newSize;
-			std::memcpy(ptr, _ptr, n);
+			T* ptr = new T[newSize];
+			if (preserveContent)
+				std::memcpy(ptr, _ptr, newSize);
+
+			delete [] _ptr;
+			_ptr  = ptr;
+			_size = newSize;
 		}
-		delete [] _ptr;
-		_ptr  = ptr;
-		_size = newSize;
+		
+		_used = newSize;
+	}
+
+	std::size_t allocated() const
+		/// Returns the allocated memory size.
+	{
+		return _size;
 	}
 
 	std::size_t size() const
-		/// Returns the size of the buffer.
+		/// Returns the used size of the buffer.
 	{
-		return _size;
+		return _used;
 	}
 	
 	T* begin()
@@ -111,25 +121,25 @@ public:
 	T* end()
 		/// Returns a pointer to end of the buffer.
 	{
-		return _ptr + _size;
+		return _ptr + _used;
 	}
 	
 	const T* end() const
 		/// Returns a pointer to the end of the buffer.
 	{
-		return _ptr + _size;
+		return _ptr + _used;
 	}
 	
 	T& operator [] (std::size_t index)
 	{
-		poco_assert (index < _size);
+		poco_assert (index < _used);
 		
 		return _ptr[index];
 	}
 
 	const T& operator [] (std::size_t index) const
 	{
-		poco_assert (index < _size);
+		poco_assert (index < _used);
 		
 		return _ptr[index];
 	}
@@ -140,6 +150,7 @@ private:
 	Buffer& operator = (const Buffer&);
 
 	std::size_t _size;
+	std::size_t _used;
 	T* _ptr;
 };
 
