@@ -173,10 +173,11 @@ private:
 
 
 class Foundation_API NullMutex
-	/// A NullMutex is an simple mutex implementation
+	/// A NullMutex is an empty mutex implementation
 	/// which performs no locking at all. Useful in policy driven design
-	/// where the type of mutex used can be now a template parameter allowing 
-	/// to switch between thread-safe and not thread-safe implementations.
+	/// where the type of mutex used can be now a template parameter allowing the user to switch
+	/// between thread-safe and not thread-safe depending on his need
+	/// Works with the ScopedLock class
 {
 public:
 	typedef Poco::ScopedLock<NullMutex> ScopedLock;
