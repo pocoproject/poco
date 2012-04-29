@@ -245,7 +245,7 @@ void CoreTest::testFIFOBufferChar()
 	std::vector<T> v;
 
 	f.Readable += delegate(this, &CoreTest::onReadable);
-	f.Writeable += delegate(this, &CoreTest::onWriteable);
+	f.Writable += delegate(this, &CoreTest::onWritable);
 
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
@@ -325,13 +325,13 @@ void CoreTest::testFIFOBufferChar()
 
 	assert(1 == _notToReadable);
 	assert(0 == _readableToNot);
-	assert(0 == _notToWriteable);
-	assert(0 == _writeableToNot);
+	assert(0 == _notToWritable);
+	assert(0 == _writableToNot);
 	f.read(b, 6);
 	assert(1 == _notToReadable);
 	assert(1 == _readableToNot);
-	assert(0 == _notToWriteable);
-	assert(0 == _writeableToNot);
+	assert(0 == _notToWritable);
+	assert(0 == _writableToNot);
 
 	assert (5 == b.size());
 	assert (20 == f.size());
@@ -342,13 +342,13 @@ void CoreTest::testFIFOBufferChar()
 
 	assert(1 == _notToReadable);
 	assert(1 == _readableToNot);
-	assert(0 == _notToWriteable);
-	assert(0 == _writeableToNot);
+	assert(0 == _notToWritable);
+	assert(0 == _writableToNot);
 	assert (5 == f.write(b));
 	assert(2 == _notToReadable);
 	assert(1 == _readableToNot);
-	assert(0 == _notToWriteable);
-	assert(0 == _writeableToNot);
+	assert(0 == _notToWritable);
+	assert(0 == _writableToNot);
 
 	assert (20 == f.size());
 	assert (5 == f.used());
@@ -371,13 +371,13 @@ void CoreTest::testFIFOBufferChar()
 
 	assert(2 == _notToReadable);
 	assert(1 == _readableToNot);
-	assert(0 == _notToWriteable);
-	assert(0 == _writeableToNot);
+	assert(0 == _notToWritable);
+	assert(0 == _writableToNot);
 	f.resize(3, false);
 	assert(2 == _notToReadable);
 	assert(2 == _readableToNot);
-	assert(0 == _notToWriteable);
-	assert(0 == _writeableToNot);
+	assert(0 == _notToWritable);
+	assert(0 == _writableToNot);
 	assert (3 == f.size());
 	assert (0 == f.used());
 	assert (f.isEmpty());
@@ -390,23 +390,23 @@ void CoreTest::testFIFOBufferChar()
 
 	assert(2 == _notToReadable);
 	assert(2 == _readableToNot);
-	assert(0 == _notToWriteable);
-	assert(0 == _writeableToNot);
+	assert(0 == _notToWritable);
+	assert(0 == _writableToNot);
 	f.write(b);
 	assert(3 == _notToReadable);
 	assert(2 == _readableToNot);
-	assert(0 == _notToWriteable);
-	assert(1 == _writeableToNot);
+	assert(0 == _notToWritable);
+	assert(1 == _writableToNot);
 
 	f.read(b);
 	assert(3 == _notToReadable);
 	assert(3 == _readableToNot);
-	assert(1 == _notToWriteable);
-	assert(1 == _writeableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
 	assert (f.isEmpty());
 
 	f.Readable -= delegate(this, &CoreTest::onReadable);
-	f.Writeable -= delegate(this, &CoreTest::onReadable);
+	f.Writable -= delegate(this, &CoreTest::onReadable);
 }
 
 
@@ -684,10 +684,10 @@ void CoreTest::onReadable(bool& b)
 };
 
 
-void CoreTest::onWriteable(bool& b)
+void CoreTest::onWritable(bool& b)
 {
-	if (b) ++_notToWriteable;
-	else ++_writeableToNot;
+	if (b) ++_notToWritable;
+	else ++_writableToNot;
 }
 
 
@@ -695,8 +695,8 @@ void CoreTest::setUp()
 {
 	_readableToNot = 0;
 	_notToReadable = 0;
-	_writeableToNot = 0;
-	_notToWriteable = 0;
+	_writableToNot = 0;
+	_notToWritable = 0;
 }
 
 

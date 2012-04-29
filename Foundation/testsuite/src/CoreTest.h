@@ -65,13 +65,13 @@ public:
 
 protected:
 	void onReadable(bool& b);
-	void onWriteable(bool& b);
+	void onWritable(bool& b);
 
 private:
 	int _readableToNot;
 	int _notToReadable;
-	int _writeableToNot;
-	int _notToWriteable;
+	int _writableToNot;
+	int _notToWritable;
 };
 
 

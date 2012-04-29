@@ -63,16 +63,16 @@ class FIFOBuffer
 	/// is needed.
 {
 public:
-	mutable Poco::BasicEvent<bool> Writeable;
+	mutable Poco::BasicEvent<bool> Writable;
 		/// Event indicating "writeability" of the buffer,
 		/// triggerred as follows:
 		///
 		///	* when buffer transitions from non-full to full, 
-		///	  Writeable event observers are notified, with 
+		///	  Writable event observers are notified, with 
 		///	  false value as the argument
 		///
 		///	* when buffer transitions from full to non-full,
-		///	  Writeable event observers are notified, with 
+		///	  Writable event observers are notified, with 
 		///	  true value as the argument
 
 	mutable Poco::BasicEvent<bool> Readable;
@@ -248,9 +248,9 @@ private:
 			Readable.notify(this, f);
 		
 		if (usedBefore == _buffer.size() && _used < _buffer.size())
-			Writeable.notify(this, t);
+			Writable.notify(this, t);
 		else if (usedBefore < _buffer.size() && _used == _buffer.size())
-			Writeable.notify(this, f);
+			Writable.notify(this, f);
 	}
 
 	FIFOBuffer();
