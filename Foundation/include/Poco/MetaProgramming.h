@@ -50,7 +50,7 @@ template <typename T>
 struct IsReference
 	/// Use this struct to determine if a template type is a reference.
 {
-	enum 
+	enum
 	{
 		VALUE = 0
 	};
@@ -81,7 +81,7 @@ template <typename T>
 struct IsConst
 	/// Use this struct to determine if a template type is a const type.
 {
-	enum 
+	enum
 	{
 		VALUE = 0
 	};
@@ -102,6 +102,17 @@ template <typename T>
 struct IsConst<const T>
 {
 	enum 
+	{
+		VALUE = 1
+	};
+};
+
+
+template <typename T, int i>
+struct IsConst<const T[i]>
+	/// Specialization for const char arrays
+{
+	enum
 	{
 		VALUE = 1
 	};
