@@ -62,7 +62,8 @@ public:
 			try
 			{
 				File f(*it);
-				f.remove(true);
+				if (f.exists())
+					f.remove(true);
 			}
 			catch (Exception&)
 			{
@@ -80,7 +81,7 @@ public:
 
 private:
 	std::set<std::string> _files;
-	FastMutex             _mutex;
+	FastMutex _mutex;
 };
 
 
