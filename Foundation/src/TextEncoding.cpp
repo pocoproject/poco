@@ -39,9 +39,12 @@
 #include "Poco/String.h"
 #include "Poco/ASCIIEncoding.h"
 #include "Poco/Latin1Encoding.h"
+#include "Poco/Latin2Encoding.h"
 #include "Poco/Latin9Encoding.h"
 #include "Poco/UTF16Encoding.h"
 #include "Poco/UTF8Encoding.h"
+#include "Poco/Windows1250Encoding.h"
+#include "Poco/Windows1251Encoding.h"
 #include "Poco/Windows1252Encoding.h"
 #include "Poco/RWLock.h"
 #include "Poco/SingletonHolder.h"
@@ -62,32 +65,35 @@ public:
 	TextEncodingManager()
 	{
 		TextEncoding::Ptr pUtf8Encoding(new UTF8Encoding);
-		add(pUtf8Encoding, TextEncoding::GLOBAL); 
+		add(pUtf8Encoding, TextEncoding::GLOBAL);
 
 		add(new ASCIIEncoding);
 		add(new Latin1Encoding);
+		add(new Latin2Encoding);
 		add(new Latin9Encoding);
 		add(pUtf8Encoding);
 		add(new UTF16Encoding);
+		add(new Windows1250Encoding);
+		add(new Windows1251Encoding);
 		add(new Windows1252Encoding);
 	}
-	
+
 	~TextEncodingManager()
 	{
 	}
-	
+
 	void add(TextEncoding::Ptr pEncoding)
 	{
 		add(pEncoding, pEncoding->canonicalName());
 	}
-	
+
 	void add(TextEncoding::Ptr pEncoding, const std::string& name)
 	{
 		RWLock::ScopedLock lock(_lock, true);
 	
 		_encodings[name] = pEncoding;
 	}
-	
+
 	void remove(const std::string& name)
 	{
 		RWLock::ScopedLock lock(_lock, true);
