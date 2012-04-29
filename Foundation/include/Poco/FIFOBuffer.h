@@ -52,7 +52,7 @@ namespace Poco {
 
 
 template <class T>
-class FIFOBuffer
+class BasicFIFOBuffer
 	/// A simple buffer class with support for re-entrant,
 	/// FIFO-style read/write operations. as well as 
 	/// empty/full transition notifications. Buffer size
@@ -63,6 +63,8 @@ class FIFOBuffer
 	/// is needed.
 {
 public:
+	typedef T Type;
+
 	mutable Poco::BasicEvent<bool> Writable;
 		/// Event indicating "writeability" of the buffer,
 		/// triggerred as follows:
@@ -87,7 +89,7 @@ public:
 		///	  Readable event observers are notified, with true value
 		///	  as the argument
 
-	FIFOBuffer(std::size_t size, bool notify = false):
+	BasicFIFOBuffer(std::size_t size, bool notify = false):
 		_buffer(size),
 		_begin(0),
 		_used(0),
@@ -96,7 +98,7 @@ public:
 	{
 	}
 	
-	~FIFOBuffer()
+	~BasicFIFOBuffer()
 		/// Destroys the FIFOBuffer.
 	{
 	}
@@ -253,9 +255,9 @@ private:
 			Writable.notify(this, f);
 	}
 
-	FIFOBuffer();
-	FIFOBuffer(const FIFOBuffer&);
-	FIFOBuffer& operator = (const FIFOBuffer&);
+	BasicFIFOBuffer();
+	BasicFIFOBuffer(const BasicFIFOBuffer&);
+	BasicFIFOBuffer& operator = (const BasicFIFOBuffer&);
 
 	Buffer<T>     _buffer;
 	std::size_t   _begin;
@@ -263,6 +265,12 @@ private:
 	bool          _notify;
 	mutable Mutex _mutex;
 };
+
+
+//
+// We provide an instantiation for char
+//
+typedef BasicFIFOBuffer<char> FIFOBuffer;
 
 
 } // namespace Poco

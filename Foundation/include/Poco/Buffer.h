@@ -59,7 +59,7 @@ class Buffer
 {
 public:
 	Buffer(std::size_t size):
-		_size(size),
+		_capacity(size),
 		_used(size),
 		_ptr(new T[size])
 		/// Creates and allocates the Buffer.
@@ -72,32 +72,32 @@ public:
 		delete [] _ptr;
 	}
 	
-	void resize(std::size_t newSize, bool preserveContent = true)
+	void resize(std::size_t newCapacity, bool preserveContent = true)
 		/// Resizes the buffer. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
 		/// new buffer. NewSize can be larger or smaller than
 		/// the current size, but it must not be 0.
 	{
-		poco_assert(newSize);
+		poco_assert(newCapacity);
 
-		if (newSize > _size)
+		if (newCapacity > _capacity)
 		{
-			T* ptr = new T[newSize];
+			T* ptr = new T[newCapacity];
 			if (preserveContent)
-				std::memcpy(ptr, _ptr, newSize);
+				std::memcpy(ptr, _ptr, newCapacity);
 
 			delete [] _ptr;
 			_ptr  = ptr;
-			_size = newSize;
+			_capacity = newCapacity;
 		}
 		
-		_used = newSize;
+		_used = newCapacity;
 	}
 
-	std::size_t allocated() const
+	std::size_t capacity() const
 		/// Returns the allocated memory size.
 	{
-		return _size;
+		return _capacity;
 	}
 
 	std::size_t size() const
@@ -149,9 +149,9 @@ private:
 	Buffer(const Buffer&);
 	Buffer& operator = (const Buffer&);
 
-	std::size_t _size;
+	std::size_t _capacity;
 	std::size_t _used;
-	T* _ptr;
+	T*          _ptr;
 };
 
 

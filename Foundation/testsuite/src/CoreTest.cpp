@@ -57,6 +57,7 @@ using Poco::Environment;
 using Poco::Thread;
 using Poco::Runnable;
 using Poco::Buffer;
+using Poco::BasicFIFOBuffer;
 using Poco::FIFOBuffer;
 using Poco::AtomicCounter;
 using Poco::Nullable;
@@ -198,7 +199,7 @@ void CoreTest::testBuffer()
 	std::size_t s = 10;
 	Buffer<int> b(s);
 	assert (b.size() == s);
-	assert (b.allocated() == s);
+	assert (b.capacity() == s);
 	std::vector<int> v;
 	for (int i = 0; i < s; ++i)
 		v.push_back(i);
@@ -214,7 +215,7 @@ void CoreTest::testBuffer()
 		assert (b[i] == i);
 
 	assert (b.size() == s/2);
-	assert (b.allocated() == s);
+	assert (b.capacity() == s);
 
 	b.resize(s*2);
 	v.clear();
@@ -227,7 +228,7 @@ void CoreTest::testBuffer()
 		assert (b[i] == i);
 
 	assert (b.size() == s*2);
-	assert (b.allocated() == s*2);
+	assert (b.capacity() == s*2);
 
 #if ENABLE_BUGCHECK_TEST
 	try { int i = b[s]; fail ("must fail"); }
@@ -238,9 +239,9 @@ void CoreTest::testBuffer()
 
 void CoreTest::testFIFOBufferChar()
 {
-	typedef char T;
+	typedef FIFOBuffer::Type T;
 
-	FIFOBuffer<T> f(20, true);
+	FIFOBuffer f(20, true);
 	Buffer<T> b(10);
 	std::vector<T> v;
 
@@ -414,7 +415,7 @@ void CoreTest::testFIFOBufferInt()
 {
 	typedef char T;
 
-	FIFOBuffer<T> f(20);
+	BasicFIFOBuffer<T> f(20);
 	Buffer<T> b(10);
 	std::vector<T> v;
 
