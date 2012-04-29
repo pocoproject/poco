@@ -31,32 +31,27 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-
 #ifndef StringTokenizerTest_INCLUDED
 #define StringTokenizerTest_INCLUDED
 
-
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-
 
 class StringTokenizerTest: public CppUnit::TestCase
 {
 public:
 	StringTokenizerTest(const std::string& name);
-        ~StringTokenizerTest();
+	~StringTokenizerTest();
 
-        void testStringTokenizer();
-        void testFind();
+	void testStringTokenizer();
 	void testFind();
 
-        void setUp();
-        void tearDown();
+	void setUp();
+	void tearDown();
 
 	static CppUnit::Test* suite();
 
 private:
 };
-
 
 #endif // StringTokenizerTest_INCLUDED

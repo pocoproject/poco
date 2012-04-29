@@ -49,24 +49,24 @@ public:
 	void testClear();
 	void testCacheSize0();
 	void testCacheSize1();
-        void testCacheSize2();
-        void testCacheSizeN();
-        void testDuplicateAdd();
-        void testUpdate();
-        
-        void setUp();
-        void tearDown();
-        static CppUnit::Test* suite();
+	void testCacheSize2();
+	void testCacheSizeN();
+	void testDuplicateAdd();
+	void testUpdate();
+
+	void setUp();
+	void tearDown();
+	static CppUnit::Test* suite();
 
 private:
-        void onUpdate(const void* pSender, const Poco::KeyValueArgs<int, int>& args);
-        void onAdd(const void* pSender, const Poco::KeyValueArgs<int, int>& args);
-        void onRemove(const void* pSender, const int& args);
+	void onUpdate(const void* pSender, const Poco::KeyValueArgs<int, int>& args);
+	void onAdd(const void* pSender, const Poco::KeyValueArgs<int, int>& args);
+	void onRemove(const void* pSender, const int& args);
 
 private:
-        int addCnt;
-        int updateCnt;
-        int removeCnt;
+	int addCnt;
+	int updateCnt;
+	int removeCnt;
 };
 
 
