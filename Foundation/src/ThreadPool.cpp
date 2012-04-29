@@ -191,8 +191,12 @@ void PooledThread::release()
 	_mutex.lock();
 	_pTarget = 0;
 	_mutex.unlock();
+	// In case of a statically allocated thread pool (such
+	// as the default thread pool), Windows may have already
+	// terminated the thread before we got here.
+	if (_thread.isRunning())
+		_targetReady.set();
 
-	_targetReady.set();
 	if (_thread.tryJoin(JOIN_TIMEOUT))
 	{
 		delete this;
@@ -457,25 +461,26 @@ PooledThread* ThreadPool::getThread()
 	PooledThread* pThread = 0;
 	for (ThreadVec::iterator it = _threads.begin(); !pThread && it != _threads.end(); ++it)
 	{
-		if ((*it)->idle()) pThread = *it;
+		if ((*it)->idle())
+			pThread = *it;
 	}
 	if (!pThread)
 	{
 		if (_threads.size() < _maxCapacity)
 		{
-            pThread = createThread();
-            try
-            {
-                pThread->start();
-                _threads.push_back(pThread);
-            }
-            catch (...)
-            {
-                delete pThread;
-                throw;
-            }
+			pThread = createThread();
+			try
+			{
+				pThread->start();
+				_threads.push_back(pThread);
+			} catch (...)
+			{
+				delete pThread;
+				throw;
+			}
 		}
-		else throw NoThreadAvailableException();
+		else
+			throw NoThreadAvailableException();
 	}
 	pThread->activate();
 	return pThread;
