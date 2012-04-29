@@ -57,18 +57,18 @@ class Foundation_API NumberFormatter
 	///      an existing string.
 	///
 	/// Internally, std::sprintf() is used to do the actual
-        /// formatting.
+	/// formatting.
 {
 public:
-        enum BoolFormat
-        {
-            FMT_TRUE_FALSE,
-            FMT_YES_NO,
-            FMT_ON_OFF
-        };
+	enum BoolFormat
+	{
+		FMT_TRUE_FALSE,
+		FMT_YES_NO,
+		FMT_ON_OFF
+	};
 
-        static std::string format(int value);
-                /// Formats an integer value in decimal notation.
+	static std::string format(int value);
+		/// Formats an integer value in decimal notation.
 
 	static std::string format(int value, int width);
 		/// Formats an integer value in decimal notation,
@@ -220,15 +220,15 @@ public:
 
 	static std::string format(const void* ptr);
 		/// Formats a pointer in an eight (32-bit architectures) or
-                /// sixteen (64-bit architectures) characters wide
-                /// field in hexadecimal notation.
+		/// sixteen (64-bit architectures) characters wide
+		/// field in hexadecimal notation.
 
-        static std::string format(bool value, BoolFormat format = FMT_TRUE_FALSE);
-                /// Formats a bool value in decimal/text notation,
-                /// according to format parameter.
+	static std::string format(bool value, BoolFormat format = FMT_TRUE_FALSE);
+		/// Formats a bool value in decimal/text notation,
+		/// according to format parameter.
 
-        static void append(std::string& str, int value);
-                /// Formats an integer value in decimal notation.
+	static void append(std::string& str, int value);
+		/// Formats an integer value in decimal notation.
 
 	static void append(std::string& str, int value, int width);
 		/// Formats an integer value in decimal notation,

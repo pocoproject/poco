@@ -45,8 +45,13 @@ using Poco::DateTimeFormat;
 using Poco::DateTimeFormatter;
 
 
-DateTimeFormatterTest::DateTimeFormatterTest(const std::string& name): CppUnit::TestCase(name)
+DateTimeFormatterTest::DateTimeFormatterTest(const std::string& name)
+	: CppUnit::TestCase(name)
 {
+	// Linker regresion SF #3288584
+	std::string message;
+	Poco::LocalDateTime now;
+	Poco::DateTimeFormatter::append(message, now, "%H:%M:%S.%i");
 }
 
 
@@ -75,13 +80,13 @@ void DateTimeFormatterTest::testISO8601Frac()
 	DateTime dt(2005, 1, 8, 12, 30, 00, 12, 34);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT);
-	assert (str == "2005-01-08T12:30:00.012034Z");
+	assert(str == "2005-01-08T12:30:00.012034Z");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT, 3600);
-	assert (str == "2005-01-08T12:30:00.012034+01:00");
+	assert(str == "2005-01-08T12:30:00.012034+01:00");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT, -3600);
-	assert (str == "2005-01-08T12:30:00.012034-01:00");
+	assert(str == "2005-01-08T12:30:00.012034-01:00");
 }
 
 

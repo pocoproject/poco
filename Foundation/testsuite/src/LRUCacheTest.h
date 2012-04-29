@@ -1,7 +1,7 @@
 //
 // LRUCacheTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/LRUCacheTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/LRUCacheTest.h#6 $
 //
 // Tests for LRUCache
 //
@@ -36,6 +36,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/KeyValueArgs.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -48,13 +49,24 @@ public:
 	void testClear();
 	void testCacheSize0();
 	void testCacheSize1();
-	void testCacheSize2();
-	void testCacheSizeN();
-	void testDuplicateAdd();
-	
-	void setUp();
-	void tearDown();
-	static CppUnit::Test* suite();
+        void testCacheSize2();
+        void testCacheSizeN();
+        void testDuplicateAdd();
+        void testUpdate();
+        
+        void setUp();
+        void tearDown();
+        static CppUnit::Test* suite();
+
+private:
+        void onUpdate(const void* pSender, const Poco::KeyValueArgs<int, int>& args);
+        void onAdd(const void* pSender, const Poco::KeyValueArgs<int, int>& args);
+        void onRemove(const void* pSender, const int& args);
+
+private:
+        int addCnt;
+        int updateCnt;
+        int removeCnt;
 };
 
 

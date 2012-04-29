@@ -36,6 +36,7 @@
 #include "Poco/Exception.h"
 #include "Poco/LRUCache.h"
 #include "Poco/Bugcheck.h"
+#include "Poco/Delegate.h"
 
 
 using namespace Poco;
@@ -217,6 +218,49 @@ void LRUCacheTest::testDuplicateAdd()
 }
 
 
+void LRUCacheTest::testUpdate()
+{
+	addCnt = 0;
+	updateCnt = 0;
+	removeCnt = 0;
+	LRUCache<int, int> aCache(3);
+	aCache.Add += delegate(this, &LRUCacheTest::onAdd);
+	aCache.Remove += delegate(this, &LRUCacheTest::onRemove);
+	aCache.Update += delegate(this, &LRUCacheTest::onUpdate);
+	aCache.add(1, 2); // 1 ,one add event
+	assert(addCnt == 1);
+	assert(updateCnt == 0);
+	assert(removeCnt == 0);
+
+	assert(aCache.has(1));
+	assert(*aCache.get(1) == 2);
+	aCache.update(1, 3); // one update event only!
+	assert(addCnt == 1);
+	assert(updateCnt == 1);
+	assert(removeCnt == 0);
+	assert(aCache.has(1));
+	assert(*aCache.get(1) == 3);
+}
+
+
+void LRUCacheTest::onUpdate(const void* pSender, const Poco::KeyValueArgs<int, int>& args)
+{
+	++updateCnt;
+}
+
+
+void LRUCacheTest::onAdd(const void* pSender, const Poco::KeyValueArgs<int, int>& args)
+{
+	++addCnt;
+}
+
+
+void LRUCacheTest::onRemove(const void* pSender, const int& args)
+{
+	++removeCnt;
+}
+
+
 void LRUCacheTest::setUp()
 {
 }
@@ -237,6 +281,7 @@ CppUnit::Test* LRUCacheTest::suite()
 	CppUnit_addTest(pSuite, LRUCacheTest, testCacheSize2);
 	CppUnit_addTest(pSuite, LRUCacheTest, testCacheSizeN);
 	CppUnit_addTest(pSuite, LRUCacheTest, testDuplicateAdd);
+	CppUnit_addTest(pSuite, LRUCacheTest, testUpdate);
 
 	return pSuite;
 }

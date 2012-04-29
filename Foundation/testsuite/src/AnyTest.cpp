@@ -38,6 +38,9 @@
 #include "Poco/Bugcheck.h"
 #include <vector>
 
+#if defined(_MSC_VER) && _MSC_VER < 1400
+	#pragma warning(disable:4800)//forcing value to bool 'true' or 'false'
+#endif
 
 using namespace Poco;
 
@@ -112,9 +115,9 @@ void AnyTest::testVector()
 	tmp.push_back(3);
 	Any a = tmp;
 	assert (a.type() == typeid(std::vector<int>));
-	std::vector<int>tmp2 = AnyCast<std::vector<int> >(a);
-	const std::vector<int >& vecCRef = RefAnyCast<std::vector<int> >(a);
-	std::vector<int >& vecRef = RefAnyCast<std::vector<int> >(a);
+	std::vector<int> tmp2 = AnyCast<std::vector<int> >(a);
+	const std::vector<int>& vecCRef = RefAnyCast<std::vector<int> >(a);
+	std::vector<int>& vecRef = RefAnyCast<std::vector<int> >(a);
 	vecRef[0] = 0;
 	assert (vecRef[0] == vecCRef[0]);
 }

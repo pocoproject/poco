@@ -1,7 +1,7 @@
 //
 // StringTokenizerTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/StringTokenizerTest.h#1 $
+// $Id: //poco/svn/Foundation/testsuite/src/StringTokenizerTest.h#2 $
 //
 // Definition of the StringTokenizerTest class.
 //
@@ -44,13 +44,14 @@ class StringTokenizerTest: public CppUnit::TestCase
 {
 public:
 	StringTokenizerTest(const std::string& name);
-	~StringTokenizerTest();
+        ~StringTokenizerTest();
 
-	void testStringTokenizer();
+        void testStringTokenizer();
+        void testFind();
 	void testFind();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

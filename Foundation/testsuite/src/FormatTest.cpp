@@ -58,14 +58,14 @@ void FormatTest::testChar()
 {
 	char c = 'a';
 	std::string s(format("%c", c));
-	assert (s == "a");
+	assert(s == "a");
 	s = format("%2c", c);
-	assert (s == " a");
+	assert(s == " a");
 	s = format("%-2c", c);
-	assert (s == "a ");
-	
+	assert(s == "a ");
+
 	s = format("%c", std::string("foo"));
-	assert (s == "[ERRFMT]");
+	assert(s == "[ERRFMT]");
 }
 
 
@@ -181,7 +181,7 @@ void FormatTest::testInt()
 	x = 0x42;
 	s = format("%#x", x);
 	assert (s == "0x42");
-	
+
 	s = format("%d", l);
 	assert (s == "[ERRFMT]");
 }
@@ -292,6 +292,9 @@ void FormatTest::testFloatFix()
 	float f = 1.5;
 	s = format("%hf", f);
 	assert (s.find("1.50") == 0);
+
+	s = format("%.0f", 1.0);
+	assert (s == "1");
 }
 
 
@@ -357,13 +360,13 @@ void FormatTest::testMultiple()
 void FormatTest::testIndex()
 {
 	std::string s(format("%[1]d%[0]d", 1, 2));
-	assert (s == "21");
+	assert(s == "21");
 
 	s = format("%[5]d%[4]d%[3]d%[2]d%[1]d%[0]d", 1, 2, 3, 4, 5, 6);
-	assert (s == "654321");
+	assert(s == "654321");
 
 	s = format("%%%[1]d%%%[2]d%%%d", 1, 2, 3);
-	assert (s == "%2%3%1");
+	assert(s == "%2%3%1");
 }
 
 
