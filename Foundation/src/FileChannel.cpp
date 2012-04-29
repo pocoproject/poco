@@ -302,14 +302,28 @@ void FileChannel::setCompress(const std::string& compress)
 
 void FileChannel::setPurgeAge(const std::string& age)
 {
-	std::string::const_iterator it  = age.begin();
+	delete _pPurgeStrategy;
+	_pPurgeStrategy = 0;
+	_purgeAge = "none";
+	if (age.empty() || 0 == icompare(age, "none"))
+		return;
+
+	std::string::const_iterator it = age.begin();
 	std::string::const_iterator end = age.end();
+
 	int n = 0;
-	while (it != end && Ascii::isSpace(*it)) ++it;
-	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
-	while (it != end && Ascii::isSpace(*it)) ++it;
+	while (it != end && Ascii::isSpace(*it))
+		++it;
+	while (it != end && Ascii::isDigit(*it))
+	{
+		n *= 10;
+		n += *it++ - '0';
+	}
+	while (it != end && Ascii::isSpace(*it))
+		++it;
 	std::string unit;
-	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
+	while (it != end && Ascii::isAlpha(*it))
+		unit += *it++;
 	
 	Timespan::TimeDiff factor = Timespan::SECONDS;
 	if (unit == "minutes")
@@ -321,26 +335,43 @@ void FileChannel::setPurgeAge(const std::string& age)
 	else if (unit == "weeks")
 		factor = 7*Timespan::DAYS;
 	else if (unit == "months")
-		factor = 30*Timespan::DAYS;
+		factor = 30 * Timespan::DAYS;
 	else if (unit != "seconds")
 		throw InvalidArgumentException("purgeAge", age);
-		
-	delete _pPurgeStrategy;
-	_pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor*n));
+
+	if (0 == n)
+		throw InvalidArgumentException("Zero is not valid purge age.");
+
+	_pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor * n));
 	_purgeAge = age;
 }
 
 
 void FileChannel::setPurgeCount(const std::string& count)
 {
-	std::string::const_iterator it  = count.begin();
-	std::string::const_iterator end = count.end();
-	int n = 0;
-	while (it != end && Ascii::isSpace(*it)) ++it;
-	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
-	while (it != end && Ascii::isSpace(*it)) ++it;
-
 	delete _pPurgeStrategy;
+	_pPurgeStrategy = 0;
+	_purgeAge = "none";
+	if (count.empty() || 0 == icompare(count, "none"))
+		return;
+
+	int n = 0;
+	std::string::const_iterator it = count.begin();
+	std::string::const_iterator end = count.end();
+
+	while (it != end && Ascii::isSpace(*it))
+		++it;
+	while (it != end && Ascii::isDigit(*it))
+	{
+		n *= 10;
+		n += *it++ - '0';
+	}
+	while (it != end && Ascii::isSpace(*it))
+		++it;
+
+	if (0 == n)
+		throw InvalidArgumentException("Zero is not valid purge count.");
+
 	_pPurgeStrategy = new PurgeByCountStrategy(n);
 	_purgeCount = count;
 }
