@@ -245,7 +245,7 @@ void CoreTest::testFIFOBufferChar()
 	std::vector<T> v;
 
 	f.Readable += delegate(this, &CoreTest::onReadable);
-	f.Writeable += delegate(this, &CoreTest::onReadable);
+	f.Writeable += delegate(this, &CoreTest::onWriteable);
 
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
@@ -325,9 +325,13 @@ void CoreTest::testFIFOBufferChar()
 
 	assert(1 == _notToReadable);
 	assert(0 == _readableToNot);
+	assert(0 == _notToWriteable);
+	assert(0 == _writeableToNot);
 	f.read(b, 6);
 	assert(1 == _notToReadable);
 	assert(1 == _readableToNot);
+	assert(0 == _notToWriteable);
+	assert(0 == _writeableToNot);
 
 	assert (5 == b.size());
 	assert (20 == f.size());
@@ -338,9 +342,13 @@ void CoreTest::testFIFOBufferChar()
 
 	assert(1 == _notToReadable);
 	assert(1 == _readableToNot);
+	assert(0 == _notToWriteable);
+	assert(0 == _writeableToNot);
 	assert (5 == f.write(b));
 	assert(2 == _notToReadable);
 	assert(1 == _readableToNot);
+	assert(0 == _notToWriteable);
+	assert(0 == _writeableToNot);
 
 	assert (20 == f.size());
 	assert (5 == f.used());
@@ -363,9 +371,13 @@ void CoreTest::testFIFOBufferChar()
 
 	assert(2 == _notToReadable);
 	assert(1 == _readableToNot);
+	assert(0 == _notToWriteable);
+	assert(0 == _writeableToNot);
 	f.resize(3, false);
 	assert(2 == _notToReadable);
 	assert(2 == _readableToNot);
+	assert(0 == _notToWriteable);
+	assert(0 == _writeableToNot);
 	assert (3 == f.size());
 	assert (0 == f.used());
 	assert (f.isEmpty());
@@ -374,12 +386,24 @@ void CoreTest::testFIFOBufferChar()
 	b[0] = 'x';
 	b[1] = 'y';
 	b[2] = 'z';
-	
+	f.resize(3);
+
 	assert(2 == _notToReadable);
 	assert(2 == _readableToNot);
+	assert(0 == _notToWriteable);
+	assert(0 == _writeableToNot);
 	f.write(b);
 	assert(3 == _notToReadable);
 	assert(2 == _readableToNot);
+	assert(0 == _notToWriteable);
+	assert(1 == _writeableToNot);
+
+	f.read(b);
+	assert(3 == _notToReadable);
+	assert(3 == _readableToNot);
+	assert(1 == _notToWriteable);
+	assert(1 == _writeableToNot);
+	assert (f.isEmpty());
 
 	f.Readable -= delegate(this, &CoreTest::onReadable);
 	f.Writeable -= delegate(this, &CoreTest::onReadable);

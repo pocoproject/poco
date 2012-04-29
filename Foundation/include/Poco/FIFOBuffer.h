@@ -246,7 +246,8 @@ private:
 			Readable.notify(this, t);
 		else if (usedBefore > 0 && 0 == _used)
 			Readable.notify(this, f);
-		else if (usedBefore == _buffer.size() && _used < _buffer.size())
+		
+		if (usedBefore == _buffer.size() && _used < _buffer.size())
 			Writeable.notify(this, t);
 		else if (usedBefore < _buffer.size() && _used == _buffer.size())
 			Writeable.notify(this, f);
