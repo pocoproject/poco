@@ -406,6 +406,83 @@ void CoreTest::testFIFOBufferChar()
 	assert(1 == _writableToNot);
 	assert (f.isEmpty());
 
+	f.resize(10);
+	assert (10 == f.size());
+	assert (0 == f.used());
+	assert (10 == f.available());
+	assert (f.isEmpty());
+
+	assert(3 == _notToReadable);
+	assert(3 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+	f.write(b);
+	assert(4 == _notToReadable);
+	assert(3 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+
+	assert (10 == f.size());
+	assert (3 == f.used());
+	assert (7 == f.available());
+	assert (!f.isEmpty());
+
+	f.drain(1);
+	assert(4 == _notToReadable);
+	assert(3 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+
+	assert (10 == f.size());
+	assert (2 == f.used());
+	assert (8 == f.available());
+	assert (!f.isEmpty());
+
+	f.drain(2);
+	assert(4 == _notToReadable);
+	assert(4 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+
+	assert (10 == f.size());
+	assert (0 == f.used());
+	assert (10 == f.available());
+	assert (f.isEmpty());
+
+	f.write(b);
+	assert(5 == _notToReadable);
+	assert(4 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+
+	assert (10 == f.size());
+	assert (3 == f.used());
+	assert (7 == f.available());
+	assert (!f.isEmpty());
+
+	f.drain();
+	assert(5 == _notToReadable);
+	assert(5 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+	assert (10 == f.size());
+	assert (0 == f.used());
+	assert (10 == f.available());
+	assert (f.isEmpty());
+
+	f.write(b, 2);
+	assert (10 == f.size());
+	assert (2 == f.used());
+	assert (8 == f.available());
+	assert (!f.isEmpty());
+
+	f.drain();
+	assert (3 == f.write(b, 10));
+	assert (10 == f.size());
+	assert (3 == f.used());
+	assert (7 == f.available());
+	assert (!f.isEmpty());
+
 	f.Readable -= delegate(this, &CoreTest::onReadable);
 	f.Writable -= delegate(this, &CoreTest::onReadable);
 }

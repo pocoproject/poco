@@ -58,10 +58,10 @@ class Buffer
 	/// is needed.
 {
 public:
-	Buffer(std::size_t size):
-		_capacity(size),
-		_used(size),
-		_ptr(new T[size])
+	Buffer(std::size_t capacity):
+		_capacity(capacity),
+		_used(capacity),
+		_ptr(new T[capacity])
 		/// Creates and allocates the Buffer.
 	{
 	}
@@ -75,8 +75,8 @@ public:
 	void resize(std::size_t newCapacity, bool preserveContent = true)
 		/// Resizes the buffer. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
-		/// new buffer. NewSize can be larger or smaller than
-		/// the current size, but it must not be 0.
+		/// new buffer. The new capacity can be larger or smaller than
+		/// the current one, but it must not be 0.
 	{
 		poco_assert(newCapacity);
 

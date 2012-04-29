@@ -54,10 +54,10 @@ namespace Poco {
 template <class T>
 class BasicFIFOBuffer
 	/// A simple buffer class with support for re-entrant,
-	/// FIFO-style read/write operations. as well as 
-	/// empty/full transition notifications. Buffer size
-	/// introspection as well as amount of unread data and 
-	/// available space are supported as well.
+	/// FIFO-style read/write operations, as well as (optional)
+	/// empty/non-empty/full (i.e. writable/readable) transition
+	/// notifications. Buffer size, as well as amount of unread data
+	/// and available space introspections are supported as well.
 	///
 	/// This class is useful anywhere where a FIFO functionality
 	/// is needed.
@@ -97,7 +97,7 @@ public:
 		/// Creates and allocates the FIFOBuffer.
 	{
 	}
-	
+
 	~BasicFIFOBuffer()
 		/// Destroys the FIFOBuffer.
 	{
@@ -167,17 +167,22 @@ public:
 		return readLen;
 	}
 
-	std::size_t write(const Buffer<T>& buffer)
-		/// Writes data.size() to the FIFO buffer.
+	std::size_t write(const Buffer<T>& buffer, std::size_t length = 0)
+		/// Writes data from supplied buffer to the FIFO buffer.
 		/// If there is no sufficient space for the whole
 		/// buffer to be written, data up to available 
 		/// length is written.
+		/// The length of data to be written is determined from the
+		/// length argument or buffer size (when length argument is
+		/// default zero or greater than buffer size).
 		/// 
 		/// Returns the length of data written.
 	{
 		Mutex::ScopedLock lock(_mutex);
 
-		if (_buffer.size() - (_begin + _used) < buffer.size())
+		if (0 == length || length > buffer.size()) length = buffer.size();
+
+		if (_buffer.size() - (_begin + _used) < length)
 		{
 			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used);
 			_begin = 0;
@@ -185,7 +190,7 @@ public:
 
 		std::size_t usedBefore = _used;
 		std::size_t available =  _buffer.size() - _used - _begin;
-		std::size_t len = buffer.size() > available ? available : buffer.size();
+		std::size_t len = length > available ? available : length;
 		std::memcpy(_buffer.begin() + _begin + _used, buffer.begin(), len * sizeof(T));
 		_used += len;
 		poco_assert (_used <= _buffer.size());
@@ -212,6 +217,24 @@ public:
 		return _buffer.size() - _used;
 	}
 
+	void drain(std::size_t length = 0)
+		/// Drains length number of elements from the buffer.
+		/// If length is zero or greater than buffer current
+		/// content length, buffer is emptied.
+	{
+		std::size_t usedBefore = _used;
+
+		if (0 == length || length >= _used)
+		{
+			_begin = 0;
+			_used = 0;
+		}
+		else
+			_used -= length;
+
+		if (_notify) notify(usedBefore);
+	}
+
 	T& operator [] (std::size_t index)
 		/// Returns value at index position.
 		/// Throws InvalidAccessException if index is larger than 
@@ -232,6 +255,12 @@ public:
 			throw InvalidAccessException(format("Index out of bounds: %z (max index allowed: %z)", index, _used - 1));
 
 		return _buffer[_begin + index];
+	}
+
+	const Buffer<T>& buffer() const
+		/// Returns const reference to the underlying buffer.
+	{
+		return _buffer;
 	}
 
 	bool isEmpty() const
