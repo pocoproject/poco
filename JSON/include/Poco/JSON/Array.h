@@ -44,7 +44,7 @@
 
 #include "Poco/JSON/JSON.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 
 namespace Poco
 {
@@ -214,15 +214,18 @@ inline void Array::remove(unsigned int index)
 namespace Poco
 {
 
+namespace Dynamic
+{
+
 template <>
-class DynamicAnyHolderImpl<JSON::Array::Ptr>: public DynamicAnyHolder
+class VarHolderImpl<JSON::Array::Ptr>: public VarHolder
 {
 public:
-	DynamicAnyHolderImpl(const JSON::Array::Ptr& val): _val(val)
+	VarHolderImpl(const JSON::Array::Ptr& val): _val(val)
 	{
 	}
 
-	~DynamicAnyHolderImpl()
+	~VarHolderImpl()
 	{
 	}
 
@@ -313,9 +316,9 @@ public:
 		throw BadCastException();
 	}
 
-	DynamicAnyHolder* clone() const
+	VarHolder* clone() const
 	{
-		return new DynamicAnyHolderImpl(_val);
+		return new VarHolderImpl(_val);
 	}
 
 	const JSON::Array::Ptr& value() const
@@ -352,6 +355,7 @@ private:
 	JSON::Array::Ptr _val;
 };
 
+} // Namespace Dynamic
 } // Namespace Poco
 
 

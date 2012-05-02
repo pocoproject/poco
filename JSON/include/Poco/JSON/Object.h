@@ -45,7 +45,7 @@
 #include <sstream>
 
 #include "Poco/SharedPtr.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Array.h"
@@ -216,15 +216,18 @@ inline void Object::remove(const std::string& key)
 namespace Poco
 {
 
+namespace Dynamic
+{
+
 template <>
-class DynamicAnyHolderImpl<JSON::Object::Ptr>: public DynamicAnyHolder
+class VarHolderImpl<JSON::Object::Ptr>: public VarHolder
 {
 public:
-	DynamicAnyHolderImpl(const JSON::Object::Ptr& val): _val(val)
+	VarHolderImpl(const JSON::Object::Ptr& val): _val(val)
 	{
 	}
 
-	~DynamicAnyHolderImpl()
+	~VarHolderImpl()
 	{
 	}
 
@@ -315,9 +318,9 @@ public:
 		//TODO: ts = _val.timestamp();
 	}
 
-	DynamicAnyHolder* clone() const
+	VarHolderImpl* clone() const
 	{
-		return new DynamicAnyHolderImpl(_val);
+		return new VarHolderImpl(_val);
 	}
 
 	const JSON::Object::Ptr& value() const
@@ -354,6 +357,7 @@ private:
 	JSON::Object::Ptr _val;
 };
 
+}
 }
 
 #endif // JSON_Object_INCLUDED
