@@ -15,7 +15,7 @@ objects = AbstractConfiguration Application ConfigurationMapper \
 	PropertyFileConfiguration Subsystem SystemConfiguration \
 	XMLConfiguration FilesystemConfiguration ServerApplication \
 	Validator IntValidator RegExpValidator OptionCallback \
-	Timer TimerTask
+	Timer TimerTask JSONConfiguration
 
 ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
 	objects += WinService WinRegistryKey WinRegistryConfiguration
@@ -23,6 +23,6 @@ endif
 
 target         = PocoUtil
 target_version = $(LIBVERSION)
-target_libs    = PocoFoundation PocoXML
+target_libs    = PocoFoundation PocoXML PocoJSON
 
 include $(POCO_BASE)/build/rules/lib
