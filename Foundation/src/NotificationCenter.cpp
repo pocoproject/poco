@@ -76,6 +76,16 @@ void NotificationCenter::removeObserver(const AbstractObserver& observer)
 }
 
 
+bool NotificationCenter::hasObserver(const AbstractObserver& observer) const
+{
+	Mutex::ScopedLock lock(_mutex);
+	for (ObserverList::const_iterator it = _observers.begin(); it != _observers.end(); ++it)
+		if (observer.equals(**it)) return true;
+
+	return false;
+}
+
+
 void NotificationCenter::postNotification(Notification::Ptr pNotification)
 {
 	poco_check_ptr (pNotification);

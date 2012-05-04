@@ -108,7 +108,7 @@ void HTTPTestServer::run()
 					ss.shutdown();
 					Poco::Thread::sleep(1000);
 				}
-				catch (Poco::Exception& exc)
+				catch (Poco::Exception&)
 				{
 				}
 			}

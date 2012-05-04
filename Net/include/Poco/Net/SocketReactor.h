@@ -169,6 +169,9 @@ public:
 		///     Poco::Observer<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
 		///     reactor.addEventHandler(obs);
 
+	bool hasEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
+		/// Returns true if the observer is reistered with SocketReactor for the given socket.
+
 	void removeEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
 		/// Unregisters an event handler with the SocketReactor.
 		///

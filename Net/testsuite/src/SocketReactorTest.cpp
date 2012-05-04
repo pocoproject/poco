@@ -41,6 +41,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Observer.h"
+#include "Poco/Exception.h"
 #include <sstream>
 
 
@@ -56,6 +57,7 @@ using Poco::Net::WritableNotification;
 using Poco::Net::TimeoutNotification;
 using Poco::Net::ShutdownNotification;
 using Poco::Observer;
+using Poco::IllegalStateException;
 
 
 namespace
@@ -101,18 +103,31 @@ namespace
 	public:
 		ClientServiceHandler(StreamSocket& socket, SocketReactor& reactor):
 			_socket(socket),
-			_reactor(reactor)
+			_reactor(reactor),
+			_or(*this, &ClientServiceHandler::onReadable),
+			_ow(*this, &ClientServiceHandler::onWritable),
+			_ot(*this, &ClientServiceHandler::onTimeout)
 		{
 			_timeout = false;
-			_reactor.addEventHandler(_socket, Observer<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
-			_reactor.addEventHandler(_socket, Observer<ClientServiceHandler, WritableNotification>(*this, &ClientServiceHandler::onWritable));
-			_reactor.addEventHandler(_socket, Observer<ClientServiceHandler, TimeoutNotification>(*this, &ClientServiceHandler::onTimeout));
+			_readableError = false;
+			_writableError = false;
+			_timeoutError = false;
+			checkReadableObserverCount(0);
+			_reactor.addEventHandler(_socket, _or);
+			checkReadableObserverCount(1);
+			checkWritableObserverCount(0);
+			_reactor.addEventHandler(_socket, _ow);
+			checkWritableObserverCount(1);
+			checkTimeoutObserverCount(0);
+			_reactor.addEventHandler(_socket, _ot);
+			checkTimeoutObserverCount(1);
+
 		}
 		
 		~ClientServiceHandler()
 		{
 		}
-		
+
 		void onReadable(ReadableNotification* pNf)
 		{
 			pNf->release();
@@ -124,7 +139,9 @@ namespace
 			}
 			else
 			{
+				checkReadableObserverCount(1);
 				_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
+				checkReadableObserverCount(0);
 				_reactor.stop();
 				_data = _str.str();
 				delete this;
@@ -134,7 +151,9 @@ namespace
 		void onWritable(WritableNotification* pNf)
 		{
 			pNf->release();
+			checkWritableObserverCount(1);
 			_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, WritableNotification>(*this, &ClientServiceHandler::onWritable));
+			checkWritableObserverCount(0);
 			std::string data(1024, 'x');
 			_socket.sendBytes(data.data(), (int) data.length());
 			_socket.shutdownSend();
@@ -171,17 +190,68 @@ namespace
 			_closeOnTimeout = flag;
 		}
 		
+		static bool readableError()
+		{
+			return _readableError;
+		}
+		
+		static bool writableError()
+		{
+			return _writableError;
+		}
+		
+		static bool timeoutError()
+		{
+			return _timeoutError;
+		}
+
 	private:
-		StreamSocket       _socket;
-		SocketReactor&     _reactor;
-		std::stringstream  _str;
-		static std::string _data;
-		static bool        _timeout;
-		static bool        _closeOnTimeout;
+		void checkReadableObserverCount(std::size_t oro)
+		{
+			if (((oro == 0) && _reactor.hasEventHandler(_socket, _or)) ||
+				((oro > 0) && !_reactor.hasEventHandler(_socket, _or)))
+			{
+				_readableError = true;
+			}
+		}
+
+		void checkWritableObserverCount(std::size_t ow)
+		{
+			if (((ow == 0) && _reactor.hasEventHandler(_socket, _ow)) ||
+				((ow > 0) && !_reactor.hasEventHandler(_socket, _ow)))
+			{
+				_writableError = true;
+			}
+		}
+
+		void checkTimeoutObserverCount(std::size_t ot)
+		{
+			if (((ot == 0) && _reactor.hasEventHandler(_socket, _ot)) ||
+				((ot > 0) && !_reactor.hasEventHandler(_socket, _ot)))
+			{
+				_timeoutError = true;
+			}
+		}
+
+		StreamSocket                                         _socket;
+		SocketReactor&                                       _reactor;
+		Observer<ClientServiceHandler, ReadableNotification> _or;
+		Observer<ClientServiceHandler, WritableNotification> _ow;
+		Observer<ClientServiceHandler, TimeoutNotification>  _ot;
+		std::stringstream                                    _str;
+		static std::string                                   _data;
+		static bool                                          _readableError;
+		static bool                                          _writableError;
+		static bool                                          _timeoutError;
+		static bool                                          _timeout;
+		static bool                                          _closeOnTimeout;
 	};
 	
 	
 	std::string ClientServiceHandler::_data;
+	bool ClientServiceHandler::_readableError = false;
+	bool ClientServiceHandler::_writableError = false;
+	bool ClientServiceHandler::_timeoutError = false;
 	bool ClientServiceHandler::_timeout = false;
 	bool ClientServiceHandler::_closeOnTimeout = false;
 	
@@ -247,6 +317,9 @@ void SocketReactorTest::testSocketReactor()
 	reactor.run();
 	std::string data(ClientServiceHandler::data());
 	assert (data.size() == 1024);
+	assert (!ClientServiceHandler::readableError());
+	assert (!ClientServiceHandler::writableError());
+	assert (!ClientServiceHandler::timeoutError());
 }
 
 

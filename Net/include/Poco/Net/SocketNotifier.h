@@ -69,7 +69,10 @@ public:
 		/// Adds the given observer. 
 		
 	void removeObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer);
-		/// Removes the given observer.
+		/// Removes the given observer. 
+		
+	bool hasObserver(const Poco::AbstractObserver& observer) const;
+		/// Returns true if the given observer is registered.
 		
 	bool accepts(SocketNotification* pNotification);
 		/// Returns true if there is at least one observer for the given notification.
@@ -102,6 +105,12 @@ private:
 inline bool SocketNotifier::accepts(SocketNotification* pNotification)
 {
 	return _events.find(pNotification) != _events.end();
+}
+
+
+inline bool SocketNotifier::hasObserver(const Poco::AbstractObserver& observer) const
+{
+	return _nc.hasObserver(observer);
 }
 
 

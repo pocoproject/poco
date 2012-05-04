@@ -1,5 +1,16 @@
 This is the changelog file for the POCO C++ Libraries.
 
+
+Release 1.5.0 (2012-07-04)
+==========================
+
+- added JSON
+- added Util::JSONConfiguration
+- added PDF
+- added PRoGen
+- added FIFOBuffer
+- fixed SF# 3522906: Unregistering handlers from SocketReactor
+ 
 Release 1.4.4 (2012-04-??)
 ==========================
 
