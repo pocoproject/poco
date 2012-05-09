@@ -173,8 +173,8 @@ CppParser-tests: CppParser-libexec
 JSON-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/JSON
 
-#JSON-tests: JSON-libexec cppunit
-#	$(MAKE) -C $(POCO_BASE)/JSON/testsuite
+JSON-tests: JSON-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/JSON/testsuite
 	
 #JSON-samples: JSON-libexec 
 #	$(MAKE) -C $(POCO_BASE)/JSON/samples
