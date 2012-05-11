@@ -44,9 +44,9 @@ install: libexecs
 	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
 	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
-libexecs =  Foundation-libexec XML-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec PDF-libexec CppParser-libexec JSON-libexec
-tests    =  Foundation-tests XML-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Zip-tests PDF-tests CppParser-tests JSON-tests
-samples  =  Foundation-samples XML-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples Zip-samples PageCompiler-samples PDF-samples JSON-samples
+libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec PDF-libexec CppParser-libexec
+tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Zip-tests PDF-tests CppParser-tests
+samples  =  Foundation-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples Zip-samples PageCompiler-samples PDF-samples
 
 .PHONY: $(libexecs)
 .PHONY: $(tests)
@@ -73,6 +73,15 @@ XML-tests: XML-libexec cppunit
 	
 XML-samples: XML-libexec 
 	$(MAKE) -C $(POCO_BASE)/XML/samples
+
+JSON-libexec:  Foundation-libexec
+	$(MAKE) -C $(POCO_BASE)/JSON
+
+JSON-tests: JSON-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/JSON/testsuite
+	
+#JSON-samples: JSON-libexec 
+#	$(MAKE) -C $(POCO_BASE)/JSON/samples
 
 Util-libexec:  Foundation-libexec XML-libexec
 	$(MAKE) -C $(POCO_BASE)/Util
@@ -169,15 +178,6 @@ CppParser-libexec: Foundation-libexec
 
 CppParser-tests: CppParser-libexec 
 	$(MAKE) -C $(POCO_BASE)/CppParser/testsuite
-
-JSON-libexec:  Foundation-libexec
-	$(MAKE) -C $(POCO_BASE)/JSON
-
-JSON-tests: JSON-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/JSON/testsuite
-	
-#JSON-samples: JSON-libexec 
-#	$(MAKE) -C $(POCO_BASE)/JSON/samples
 
 
 clean:

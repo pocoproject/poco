@@ -1,6 +1,7 @@
 CppUnit
 Foundation
 XML
+JSON
 Util
 Net
 Crypto
@@ -17,4 +18,3 @@ PDF
 CppParser
 PocoDoc
 ProGen
-JSON
