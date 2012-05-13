@@ -116,6 +116,22 @@ public:
 		_used = newCapacity;
 	}
 
+	void append(const T* buf, std::size_t sz)
+		/// Resizes this buffer and appends the argument buffer.
+	{
+		if (0 == sz)
+			return;
+		std::size_t oldSize = _used;
+		resize(_used + sz, true);
+		std::memcpy(_ptr + oldSize, buf, sz);
+	}
+
+	void append(const Buffer& buf)
+		/// Resizes this buffer and appends the argument buffer.
+	{
+		append(buf.begin(), buf.size());
+	}
+
 	std::size_t capacity() const
 		/// Returns the allocated memory size.
 	{
