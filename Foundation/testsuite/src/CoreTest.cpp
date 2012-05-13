@@ -234,6 +234,23 @@ void CoreTest::testBuffer()
 	try { int i = b[s]; fail ("must fail"); }
 	catch (Exception&) { }
 #endif
+
+	Buffer<int> c(s);
+	Buffer<int> d(c);
+	assert (c == d);
+
+	c[1] = -1;
+	assert (c[1] == -1);
+	c.clear();
+	assert (c[1] == 0);
+
+	Buffer<int> e(0);
+	assert (e.empty());
+
+	assert (c != e);
+
+	Buffer<int> f = e;
+	assert (f == e);
 }
 
 

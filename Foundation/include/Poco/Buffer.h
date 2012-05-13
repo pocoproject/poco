@@ -9,7 +9,7 @@
 //
 // Definition of the Buffer class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -65,7 +65,29 @@ public:
 		/// Creates and allocates the Buffer.
 	{
 	}
-	
+
+	Buffer(const Buffer& other):
+		/// Copy constructor.
+		_capacity(other._used),
+		_used(other._used),
+		_ptr(new T[other._used])
+	{
+		if (_used)
+			std::memcpy(_ptr, other._ptr, _used * sizeof(T));
+	}
+
+	Buffer& operator =(const Buffer& other)
+		/// Assignment operator.
+	{
+		if (this != &other)
+		{
+			Buffer tmp(other);
+			swap(tmp);
+		}
+
+		return *this;
+	}
+
 	~Buffer()
 		/// Destroys the Buffer.
 	{
@@ -100,6 +122,46 @@ public:
 		return _capacity;
 	}
 
+	void swap(Buffer& other)
+	/// Swaps the buffer with another one.
+	{
+		using std::swap;
+
+		swap(_ptr, other._ptr);
+		swap(_capacity, other._capacity);
+		swap(_used, other._used);
+	}
+
+	bool operator ==(const Buffer& other) const
+		/// Compare operator.
+	{
+		if (this != &other)
+		{
+			if (_used == other._used)
+			{
+				if (std::memcmp(_ptr, other._ptr, _used) == 0)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		return true;
+	}
+
+	bool operator !=(const Buffer& other) const
+		/// Compare operator.
+	{
+		return !(*this == other);
+	}
+
+	void clear()
+		/// Sets the contents of the bufer to zero.
+	{
+		std::memset(_ptr, 0, _used * sizeof(T));
+	}
+
 	std::size_t size() const
 		/// Returns the used size of the buffer.
 	{
@@ -130,6 +192,12 @@ public:
 		return _ptr + _used;
 	}
 	
+	bool empty() const
+		/// Return true if buffer is empty.
+	{
+		return 0 == _used;
+	}
+
 	T& operator [] (std::size_t index)
 	{
 		poco_assert (index < _used);
@@ -146,8 +214,6 @@ public:
 
 private:
 	Buffer();
-	Buffer(const Buffer&);
-	Buffer& operator = (const Buffer&);
 
 	std::size_t _capacity;
 	std::size_t _used;
