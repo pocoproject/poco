@@ -50,6 +50,11 @@ public:
 	void testIdentityUTF8();
 	void testUTF8toASCII();
 	void testLatin1toUTF8();
+	void testLatin2toUTF8();
+	void testLatin9toUTF8();
+	void testCP1250toUTF8();
+	void testCP1251toUTF8();
+	void testCP1252toUTF8();
 	void testErrors();
 
 	void setUp();

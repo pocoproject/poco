@@ -252,11 +252,11 @@ void CoreTest::testBuffer()
 	Buffer<int> f = e;
 	assert (f == e);
 
-	buffer<char> g;
+	Buffer<char> g(0);
 	g.append("hello", 5);
 	assert (g.size() == 5);
 
-	g.append(g);
+	g.append("hello", 5);
 	assert (g.size() == 10);
 	assert ( !memcmp(g.begin(), "hellohello", 10) );
 }
