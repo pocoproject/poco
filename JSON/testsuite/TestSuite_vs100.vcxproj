@@ -28,7 +28,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>TestSuite</ProjectName>
-    <ProjectGuid>{C9ACF028-17A1-44C2-8C09-DFD3BD9E7D45}</ProjectGuid>
+    <ProjectGuid>{8DDEF92F-2475-410B-8292-1D67B4C6E4A6}</ProjectGuid>
     <RootNamespace>TestSuite</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
