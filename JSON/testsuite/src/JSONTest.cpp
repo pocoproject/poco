@@ -822,14 +822,15 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 	std::string validDir(ostr.str());
 	Poco::Path pathPattern(validDir);
 	if (Poco::File(pathPattern).exists())
-		validDir += '*';
-	else
 	{
-		ostr.str("");
-		ostr << "/JSON/testsuite/testfiles/" << type << '/';
-		validDir = Poco::Environment::get("POCO_BASE") + ostr.str();
-		pathPattern = validDir;
+		validDir += '*';
+		return validDir;
 	}
+
+	ostr.str("");
+	ostr << "/JSON/testsuite/testfiles/" << type << '/';
+	validDir = Poco::Environment::get("POCO_BASE") + ostr.str();
+	pathPattern = validDir;
 
 	if (Poco::File(pathPattern).exists())
 		validDir += '*';
