@@ -749,57 +749,6 @@ void JSONTest::testInvalidJanssonFiles()
 	}
 }
 
-/*
-void testConfiguration()
-{
-	Poco::JSON::Configuration config;
-
-	std::string json = "{ \"config\" : "
-							" { \"prop1\" : \"value1\", "
-							" \"prop2\" : 10, "
-							" \"prop3\" : [ \"element1\", \"element2\" ], "
-							" \"prop4\" : { \"prop5\" : false, "
-											" \"prop6\" : null } "
-							" }"
-						"}";
-
-	std::istringstream iss(json);
-	try
-	{
-		config.load(iss);
-	}
-	catch(Poco::JSON::JSONException jsone)
-	{
-		std::cout << jsone.message() << std::endl;
-		assert(false);
-	}
-
-	std::string property1 = config.getString("config.prop1");
-	assert(property1.compare("value1") == 0);
-
-	int property2 = config.getInt("config.prop2");
-	assert(property2 == 10);
-
-	int nonExistingProperty = config.getInt("config.prop7", 5);
-	assert(nonExistingProperty == 5);
-
-	std::string arrProperty = config.getString("config.prop3[1]");
-	assert(arrProperty.compare("element2") == 0);
-
-	bool property35 = config.getBool("config.prop4.prop5");
-	assert(! property35);
-
-	try
-	{
-		config.getString("propertyUnknown");
-		assert(true);
-	}
-	catch(Poco::NotFoundException nfe)
-	{
-	}
-
-}
-*/
 
 void JSONTest::testTemplate()
 {
@@ -841,23 +790,6 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 }
 
 
-void JSONTest::testItunes()
-{
-	Poco::FileInputStream fis("/home/bronx/Development/search.json");
-	Poco::JSON::Parser parser;
-	try
-	{
-		Poco::JSON::DefaultHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(fis);
-	}
-	catch(Poco::JSON::JSONException jsone)
-	{
-		std::cout << jsone.message();
-	}
-}
-
-
 CppUnit::Test* JSONTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("JSONTest");
@@ -885,10 +817,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testQuery);
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidJanssonFiles);
-
-	//CppUnit_addTest(pSuite, JSONTest, testConfiguration);
 	CppUnit_addTest(pSuite, JSONTest, testTemplate);
-	CppUnit_addTest(pSuite, JSONTest, testItunes);
 
 	return pSuite;
 }
