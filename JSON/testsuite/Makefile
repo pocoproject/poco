@@ -8,7 +8,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = JSONTest
+objects = Driver JSONTest JSONTestSuite
 
 target         = testrunner
 target_version = 1
