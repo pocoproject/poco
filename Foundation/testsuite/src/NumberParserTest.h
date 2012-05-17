@@ -62,7 +62,10 @@ private:
 	{
 		T n = std::numeric_limits<T>::max();
 		std::string s = Poco::NumberFormatter::format(n);
-		return Poco::NumberParser::parse(s) == n;
+		if (std::numeric_limits<T>::is_signed)
+			return Poco::NumberParser::parse(s) == n;
+		else
+			return Poco::NumberParser::parseUnsigned(s) == n;
 	}
 
 	template <class T> bool testLowerLimit()
@@ -77,7 +80,10 @@ private:
 	{
 		T n = std::numeric_limits<T>::max();
 		std::string s = Poco::NumberFormatter::format(n);
-		return Poco::NumberParser::parse64(s) == n;
+		if (std::numeric_limits<T>::is_signed)
+			return Poco::NumberParser::parse64(s) == n;
+		else
+			return Poco::NumberParser::parseUnsigned64(s) == n;
 	}
 
 	template <class T> bool testLowerLimit64()
