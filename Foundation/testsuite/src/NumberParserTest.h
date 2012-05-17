@@ -38,7 +38,9 @@
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-
+#include "Poco/NumberParser.h"
+#include "Poco/NumberFormatter.h"
+#include <limits>
 
 class NumberParserTest: public CppUnit::TestCase
 {
@@ -47,6 +49,7 @@ public:
 	~NumberParserTest();
 
 	void testParse();
+	void testLimits();
 	void testParseError();
 
 	void setUp();
@@ -55,6 +58,35 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	template <class T> bool testUpperLimit()
+	{
+		T n = std::numeric_limits<T>::max();
+		std::string s = Poco::NumberFormatter::format(n);
+		return Poco::NumberParser::parse(s) == n;
+	}
+
+	template <class T> bool testLowerLimit()
+	{
+		T n = std::numeric_limits<T>::min();
+		std::string s = Poco::NumberFormatter::format(n);
+		return Poco::NumberParser::parse(s) == n;
+	}
+
+#if defined(POCO_HAVE_INT64)
+	template <class T> bool testUpperLimit64()
+	{
+		T n = std::numeric_limits<T>::max();
+		std::string s = Poco::NumberFormatter::format(n);
+		return Poco::NumberParser::parse64(s) == n;
+	}
+
+	template <class T> bool testLowerLimit64()
+	{
+		T n = std::numeric_limits<T>::min();
+		std::string s = Poco::NumberFormatter::format(n);
+		return Poco::NumberParser::parse64(s) == n;
+	}
+#endif
 };
 
 
