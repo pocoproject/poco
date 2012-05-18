@@ -88,6 +88,9 @@ public:
 		/// duration of the session) and locally (for a single statement execution only). 
 		/// See StatementImpl for details on how this property is used at runtime.
 		/// 
+		/// Adds "handle" property which, if set by the back end, returns native handle
+		/// for the back end DB.
+		/// 
 		/// Adds "bulk" feature and sets it to false.
 		/// Bulk feature determines whether the session is capable of bulk operations.
 		/// Connectors that are capable of it must set this feature prior to attempting 
