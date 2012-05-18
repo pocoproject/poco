@@ -65,7 +65,7 @@ WinRegistryConfiguration::~WinRegistryConfiguration()
 bool WinRegistryConfiguration::getRaw(const std::string& key, std::string& value) const
 {
 	std::string keyName;
-	std::string fullPath = _rootPath + ConvertToRegFormat(key, keyName);
+	std::string fullPath = _rootPath + convertToRegFormat(key, keyName);
 	WinRegistryKey aKey(fullPath, true, _extraSam);
 	bool exists = aKey.exists(keyName);
 	if (exists)
@@ -94,7 +94,7 @@ bool WinRegistryConfiguration::getRaw(const std::string& key, std::string& value
 void WinRegistryConfiguration::setRaw(const std::string& key, const std::string& value)
 {
 	std::string keyName;
-	std::string fullPath = _rootPath+ConvertToRegFormat(key, keyName);
+	std::string fullPath = _rootPath + convertToRegFormat(key, keyName);
 	WinRegistryKey aKey(fullPath, false, _extraSam);
 	aKey.setString(keyName, value);
 }
@@ -115,7 +115,7 @@ void WinRegistryConfiguration::enumerate(const std::string& key, Keys& range) co
 	else
 	{
 		std::string keyName;
-		std::string fullPath = _rootPath+ConvertToRegFormat(key, keyName);
+		std::string fullPath = _rootPath + convertToRegFormat(key, keyName);
 		WinRegistryKey aKey(fullPath, true, _extraSam);
 		aKey.values(range);
 		aKey.subKeys(range);
@@ -129,7 +129,7 @@ void WinRegistryConfiguration::removeRaw(const std::string& key)
 }
 
 
-std::string WinRegistryConfiguration::ConvertToRegFormat(const std::string& key, std::string& value) const
+std::string WinRegistryConfiguration::convertToRegFormat(const std::string& key, std::string& value) const
 {
 	std::size_t pos = key.rfind('.');
 	if (pos == std::string::npos)

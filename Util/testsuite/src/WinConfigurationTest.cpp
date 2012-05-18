@@ -74,6 +74,10 @@ void WinConfigurationTest::testConfiguration()
 	
 	pView->setString("sub.foo", "bar");
 	assert (pView->getString("sub.foo", "default") == "bar");
+
+	std::string value;
+	assert (pReg->convertToRegFormat("A.B.C", value) == "A\\B");
+	assert (value == "C");
 }
 
 
