@@ -1193,6 +1193,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\ObjectPool.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Platform.h"
 					>
 				</File>

@@ -1,7 +1,7 @@
 //
 // Thread_WINCE.h
 //
-// $Id: //poco/1.4/Foundation/src/Thread_WINCE.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Thread_WINCE.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -75,7 +75,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
-void ThreadImpl::setOSPriorityImpl(int prio)
+void ThreadImpl::setOSPriorityImpl(int prio, int /* policy */)
 {
 	setPriorityImpl(prio);
 }

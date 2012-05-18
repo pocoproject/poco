@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#5 $
+// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#7 $
 //
 // Library: Foundation
 // Package: Threading
@@ -103,7 +103,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 		if (isRunningImpl())
 		{
 			struct sched_param par;
-			par.sched_priority = mapPrio(_pData->prio);
+			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
 			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
 				throw SystemException("cannot set thread priority");
 		}
@@ -111,43 +111,44 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
-void ThreadImpl::setOSPriorityImpl(int prio)
+void ThreadImpl::setOSPriorityImpl(int prio, int policy )
 {
-	if (prio != _pData->osPrio)
+	if (prio != _pData->osPrio || policy != _pData->policy)
 	{
 		if (_pData->pRunnableTarget || _pData->pCallbackTarget)
 		{
 			struct sched_param par;
 			par.sched_priority = prio;
-			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
+			if (pthread_setschedparam(_pData->thread, policy, &par))
 				throw SystemException("cannot set thread priority");
 		}
-		_pData->prio   = reverseMapPrio(prio);
+		_pData->prio   = reverseMapPrio(prio, policy);
 		_pData->osPrio = prio;
+		_pData->policy = policy;
 	}
 }
 
 
-int ThreadImpl::getMinOSPriorityImpl()
+int ThreadImpl::getMinOSPriorityImpl(int policy)
 {
 #if defined(POCO_THREAD_PRIORITY_MIN)
 	return POCO_THREAD_PRIORITY_MIN;
 #elif defined(__VMS) || defined(__digital__)
 	return PRI_OTHER_MIN;
 #else
-	return sched_get_priority_min(SCHED_OTHER);
+	return sched_get_priority_min(policy);
 #endif
 }
 
 
-int ThreadImpl::getMaxOSPriorityImpl()
+int ThreadImpl::getMaxOSPriorityImpl(int policy)
 {
 #if defined(POCO_THREAD_PRIORITY_MAX)
 	return POCO_THREAD_PRIORITY_MAX;
 #elif defined(__VMS) || defined(__digital__)
 	return PRI_OTHER_MAX;
 #else
-	return sched_get_priority_max(SCHED_OTHER);
+	return sched_get_priority_max(policy);
 #endif
 }
 
@@ -195,11 +196,21 @@ void ThreadImpl::startImpl(Runnable& target)
 		throw SystemException("cannot start thread");
 	}
 
-	if (_pData->prio != PRIO_NORMAL_IMPL)
+    if (_pData->policy == SCHED_OTHER)
+	{
+		if (_pData->prio != PRIO_NORMAL_IMPL)
+		{
+			struct sched_param par;
+			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
+			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
+				throw SystemException("cannot set thread priority");
+		}
+	}
+	else
 	{
 		struct sched_param par;
-		par.sched_priority = mapPrio(_pData->prio);
-		if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
+		par.sched_priority = mapPrio(_pData->prio, _pData->policy);
+		if (pthread_setschedparam(_pData->thread, _pData->policy, &par))
 			throw SystemException("cannot set thread priority");
 	}
 }
@@ -232,11 +243,21 @@ void ThreadImpl::startImpl(Callable target, void* pData)
 		throw SystemException("cannot start thread");
 	}
 
-	if (_pData->prio != PRIO_NORMAL_IMPL)
+	if (_pData->policy == SCHED_OTHER)
+	{
+		if (_pData->prio != PRIO_NORMAL_IMPL)
+		{
+			struct sched_param par;
+			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
+			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
+				throw SystemException("cannot set thread priority");
+		}
+	}
+	else
 	{
 		struct sched_param par;
-		par.sched_priority = mapPrio(_pData->prio);
-		if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
+		par.sched_priority = _pData->osPrio;
+		if (pthread_setschedparam(_pData->thread, _pData->policy, &par))
 			throw SystemException("cannot set thread priority");
 	}
 }
@@ -410,10 +431,10 @@ void* ThreadImpl::callableEntry(void* pThread)
 }
 
 
-int ThreadImpl::mapPrio(int prio)
+int ThreadImpl::mapPrio(int prio, int policy)
 {
-	int pmin = getMinOSPriorityImpl();
-	int pmax = getMaxOSPriorityImpl();
+	int pmin = getMinOSPriorityImpl(policy);
+	int pmax = getMaxOSPriorityImpl(policy);
 
 	switch (prio)
 	{
@@ -434,21 +455,25 @@ int ThreadImpl::mapPrio(int prio)
 }
 
 
-int ThreadImpl::reverseMapPrio(int prio)
+int ThreadImpl::reverseMapPrio(int prio, int policy)
 {
-	int pmin = getMinOSPriorityImpl();
-	int pmax = getMaxOSPriorityImpl();
-	int normal = pmin + (pmax - pmin)/2;
-	if (prio == pmax)
-		return PRIO_HIGHEST_IMPL;
-	if (prio > normal)
-		return PRIO_HIGH_IMPL;
-	else if (prio == normal)
-		return PRIO_NORMAL_IMPL;
-	else if (prio > pmin)
-		return PRIO_LOW_IMPL;
-	else
-		return PRIO_LOWEST_IMPL;
+	if (policy == SCHED_OTHER)
+	{
+		int pmin = getMinOSPriorityImpl(policy);
+		int pmax = getMaxOSPriorityImpl(policy);
+		int normal = pmin + (pmax - pmin)/2;
+		if (prio == pmax)
+			return PRIO_HIGHEST_IMPL;
+		if (prio > normal)
+			return PRIO_HIGH_IMPL;
+		else if (prio == normal)
+			return PRIO_NORMAL_IMPL;
+		else if (prio > pmin)
+			return PRIO_LOW_IMPL;
+		else
+			return PRIO_LOWEST_IMPL;
+	}
+	else return PRIO_HIGHEST_IMPL;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#5 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#6 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -417,7 +417,7 @@ int SecureSocketImpl::handleError(int rc)
 			long lastError = ERR_get_error();
 			if (lastError == 0)
 			{
-				if (rc == 0)
+				if (rc == 0 || rc == -1)
 				{
 					throw SSLConnectionUnexpectedlyClosedException();
 				}

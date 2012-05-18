@@ -1,7 +1,7 @@
 //
 // DatagramSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/DatagramSocket.cpp#1 $
+// $Id: //poco/1.4/Net/src/DatagramSocket.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -56,7 +56,7 @@ DatagramSocket::DatagramSocket(IPAddress::Family family): Socket(new DatagramSoc
 }
 
 
-DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress): Socket(new DatagramSocketImpl)
+DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress): Socket(new DatagramSocketImpl(address.family()))
 {
 	bind(address, reuseAddress);
 }

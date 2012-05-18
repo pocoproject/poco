@@ -398,6 +398,10 @@
 				<File
 					RelativePath=".\src\CryptoTest.h"/>
 				<File
+					RelativePath=".\src\DigestEngineTest.cpp"/>
+				<File
+					RelativePath=".\src\DigestEngineTest.h"/>
+				<File
 					RelativePath=".\src\RSATest.h"/>
 			</Filter>
 			<Filter

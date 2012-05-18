@@ -1,7 +1,7 @@
 //
 // Thread_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread_VX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Thread_VX.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -74,7 +74,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
-void ThreadImpl::setOSPriorityImpl(int prio)
+void ThreadImpl::setOSPriorityImpl(int prio, int /* policy */)
 {
 	if (prio != _pData->osPrio)
 	{
@@ -89,13 +89,13 @@ void ThreadImpl::setOSPriorityImpl(int prio)
 }
 
 
-int ThreadImpl::getMinOSPriorityImpl()
+int ThreadImpl::getMinOSPriorityImpl(int /* policy */)
 {
 	return 255;
 }
 
 
-int ThreadImpl::getMaxOSPriorityImpl()
+int ThreadImpl::getMaxOSPriorityImpl(int /* policy */)
 {
 	return 0;
 }

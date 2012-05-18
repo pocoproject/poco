@@ -1,7 +1,7 @@
 //
 // TestApp.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TestApp.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/TestApp.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -28,6 +28,11 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+
+
+#if defined(_WIN32)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 
 
 #include <string>

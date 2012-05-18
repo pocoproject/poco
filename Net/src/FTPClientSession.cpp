@@ -1,7 +1,7 @@
 //
 // FTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/FTPClientSession.cpp#1 $
+// $Id: //poco/1.4/Net/src/FTPClientSession.cpp#2 $
 //
 // Library: Net
 // Package: FTP
@@ -329,10 +329,13 @@ std::string FTPClientSession::extractPath(const std::string& response)
 
 StreamSocket FTPClientSession::establishDataConnection(const std::string& command, const std::string& arg)
 {
+	StreamSocket ss;
 	if (_passiveMode)
-		return passiveDataConnection(command, arg);
+		ss = passiveDataConnection(command, arg);
 	else
-		return activeDataConnection(command, arg);
+		ss = activeDataConnection(command, arg);
+	ss.setReceiveTimeout(_timeout);
+	return ss;
 }
 
 

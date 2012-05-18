@@ -1,13 +1,15 @@
 //
-// CryptoTransform.cpp
+// DigestEngine.h
 //
-// $Id: //poco/1.4/Crypto/src/CryptoTransform.cpp#2 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/DigestEngine.h#1 $
 //
 // Library: Crypto
-// Package: Cipher
-// Module:  CryptoTransform
+// Package: Digest
+// Module:  DigestEngine
 //
-// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
+// Definition of the DigestEngine class.
+//
+// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -34,27 +36,62 @@
 //
 
 
-#include "Poco/Crypto/CryptoTransform.h"
+#ifndef Crypto_DigestEngine_INCLUDED
+#define Crypto_DigestEngine_INCLUDED
+
+
+#include "Poco/Crypto/Crypto.h"
+#include "Poco/DigestEngine.h"
+#include <openssl/evp.h>
 
 
 namespace Poco {
 namespace Crypto {
 
 
-CryptoTransform::CryptoTransform()
+class Crypto_API DigestEngine: public Poco::DigestEngine
+	/// This class implements a Poco::DigestEngine for all
+	/// digest algorithms supported by OpenSSL.
 {
-}
+public:
+	DigestEngine(const std::string& name);
+		/// Creates a DigestEngine using the digest with the given name
+		/// (e.g., "MD5", "SHA1", "SHA256", "SHA512", etc.).
+		/// See the OpenSSL documentation for a list of supported digest algorithms.
+		///
+		/// Throws a Poco::NotFoundException if no algorithm with the given name exists.
+		
+	~DigestEngine();
+		/// Destroys the DigestEngine.
+	
+	const std::string& algorithm() const;
+		/// Returns the name of the digest algorithm.
+	
+	// DigestEngine
+	unsigned digestLength() const;
+	void reset();
+	const Poco::DigestEngine::Digest& digest();
+
+protected:
+	void updateImpl(const void* data, unsigned length);
+	
+private:
+	std::string _name;
+	EVP_MD_CTX* _ctx;
+	Poco::DigestEngine::Digest _digest;
+};
 
 
-CryptoTransform::~CryptoTransform()
+//
+// inlines
+//
+inline const std::string& DigestEngine::algorithm() const
 {
-}
-
-  
-int CryptoTransform::setPadding(int padding)
-{
-	return 1;
+	return _name;
 }
 
 
 } } // namespace Poco::Crypto
+
+
+#endif // Crypto_DigestEngine_INCLUDED

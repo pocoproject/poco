@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/src/Thread_WIN32.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/Thread_WIN32.cpp#5 $
 //
 // Library: Foundation
 // Package: Threading
@@ -122,7 +122,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
-void ThreadImpl::setOSPriorityImpl(int prio)
+void ThreadImpl::setOSPriorityImpl(int prio, int /* policy */)
 {
 	setPriorityImpl(prio);
 }

@@ -1,13 +1,13 @@
 //
-// HTTPServer.cpp
+// DigestEngine.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServer.cpp#2 $
+// $Id: //poco/1.4/Crypto/src/DigestEngine.cpp#1 $
 //
-// Library: Net
-// Package: HTTPServer
-// Module:  HTTPServer
+// Library: Crypto
+// Package: Digest
+// Module:  DigestEngine
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -34,38 +34,60 @@
 //
 
 
-#include "Poco/Net/HTTPServer.h"
-#include "Poco/Net/HTTPServerConnectionFactory.h"
+#include "Poco/Crypto/DigestEngine.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
-namespace Net {
+namespace Crypto {
 
 
-HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), socket, pParams),
-	_pFactory(pFactory)
+DigestEngine::DigestEngine(const std::string& name):
+	_name(name)
 {
+	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
+	if (!md) throw Poco::NotFoundException(_name);
+	_ctx = EVP_MD_CTX_create();
+	EVP_DigestInit_ex(_ctx, md, NULL);	
+}
+
+	
+DigestEngine::~DigestEngine()
+{
+	EVP_MD_CTX_destroy(_ctx);
 }
 
 
-HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), threadPool, socket, pParams),
-	_pFactory(pFactory)
+unsigned DigestEngine::digestLength() const
 {
+	return EVP_MD_CTX_size(_ctx);
 }
 
 
-HTTPServer::~HTTPServer()
+void DigestEngine::reset()
 {
+	EVP_MD_CTX_cleanup(_ctx);
+	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
+	if (!md) throw Poco::NotFoundException(_name);
+	EVP_DigestInit_ex(_ctx, md, NULL);
 }
 
 
-void HTTPServer::stopAll(bool abortCurrent)
+const Poco::DigestEngine::Digest& DigestEngine::digest()
 {
-	_pFactory->serverStopped(this, abortCurrent);
-	stop();
+	_digest.clear();
+	unsigned len = EVP_MD_CTX_size(_ctx);
+	_digest.resize(len);
+	EVP_DigestFinal_ex(_ctx, &_digest[0], &len);
+	reset();
+	return _digest;
 }
 
 
-} } // namespace Poco::Net
+void DigestEngine::updateImpl(const void* data, unsigned length)
+{
+	EVP_DigestUpdate(_ctx, data, length);
+}
+
+
+} } // namespace Poco::Crypto

@@ -1,7 +1,7 @@
 //
 // CoreTestSuite.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/CoreTestSuite.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/CoreTestSuite.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -55,6 +55,7 @@
 #include "NamedTuplesTest.h"
 #endif
 #include "TypeListTest.h"
+#include "ObjectPoolTest.h"
 
 
 CppUnit::Test* CoreTestSuite::suite()
@@ -85,6 +86,7 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(NamedTuplesTest::suite());
 #endif
 	pSuite->addTest(TypeListTest::suite());
+	pSuite->addTest(ObjectPoolTest::suite());
 
 	return pSuite;
 }

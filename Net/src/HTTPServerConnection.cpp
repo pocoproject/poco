@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerConnection.cpp#1 $
+// $Id: //poco/1.4/Net/src/HTTPServerConnection.cpp#2 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -43,6 +43,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Delegate.h"
 #include <memory>
 
 
@@ -53,14 +54,18 @@ namespace Net {
 HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
 	TCPServerConnection(socket),
 	_pParams(pParams),
-	_pFactory(pFactory)
+	_pFactory(pFactory),
+	_stopped(false)
 {
 	poco_check_ptr (pFactory);
+	
+	_pFactory->serverStopped += Poco::delegate(this, &HTTPServerConnection::onServerStopped);
 }
 
 
 HTTPServerConnection::~HTTPServerConnection()
 {
+	_pFactory->serverStopped -= Poco::delegate(this, &HTTPServerConnection::onServerStopped);
 }
 
 
@@ -68,10 +73,12 @@ void HTTPServerConnection::run()
 {
 	std::string server = _pParams->getSoftwareVersion();
 	HTTPServerSession session(socket(), _pParams);
-	while (session.hasMoreRequests())
+	while (!_stopped && session.hasMoreRequests())
 	{
 		try
 		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+
 			HTTPServerResponseImpl response(session);
 			HTTPServerRequestImpl request(response, session, _pParams);
 			
@@ -121,6 +128,34 @@ void HTTPServerConnection::sendErrorResponse(HTTPServerSession& session, HTTPRes
 	response.setKeepAlive(false);
 	response.send();
 	session.setKeepAlive(false);
+}
+
+
+void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
+{
+	_stopped = true;
+	if (abortCurrent)
+	{
+		try
+		{
+			socket().shutdown();
+		}
+		catch (...)
+		{
+		}
+	}
+	else
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		try
+		{
+			socket().shutdown();
+		}
+		catch (...)
+		{
+		}
+	}
 }
 
 

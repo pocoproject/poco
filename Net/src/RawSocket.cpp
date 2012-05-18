@@ -1,7 +1,7 @@
 //
 // RawSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/RawSocket.cpp#1 $
+// $Id: //poco/1.4/Net/src/RawSocket.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -59,7 +59,7 @@ RawSocket::RawSocket(IPAddress::Family family, int proto):
 
 
 RawSocket::RawSocket(const SocketAddress& address, bool reuseAddress): 
-	Socket(new RawSocketImpl)
+	Socket(new RawSocketImpl(address.family()))
 {
 	bind(address, reuseAddress);
 }

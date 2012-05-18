@@ -279,6 +279,7 @@
     <ClInclude Include="include\Poco\Crypto\X509Certificate.h"/>
     <ClInclude Include="include\Poco\Crypto\Crypto.h"/>
     <ClInclude Include="include\Poco\Crypto\OpenSSLInitializer.h"/>
+    <ClInclude Include="include\Poco\Crypto\DigestEngine.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Cipher.cpp"/>
@@ -294,6 +295,7 @@
     <ClCompile Include="src\RSAKeyImpl.cpp"/>
     <ClCompile Include="src\X509Certificate.cpp"/>
     <ClCompile Include="src\OpenSSLInitializer.cpp"/>
+    <ClCompile Include="src\DigestEngine.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">

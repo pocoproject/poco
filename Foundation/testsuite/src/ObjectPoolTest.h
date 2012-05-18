@@ -1,13 +1,11 @@
 //
-// HTTPServer.cpp
+// ObjectPoolTest.h
 //
-// $Id: //poco/1.4/Net/src/HTTPServer.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ObjectPoolTest.h#1 $
 //
-// Library: Net
-// Package: HTTPServer
-// Module:  HTTPServer
+// Definition of the ObjectPoolTest class.
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2010-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -34,38 +32,29 @@
 //
 
 
-#include "Poco/Net/HTTPServer.h"
-#include "Poco/Net/HTTPServerConnectionFactory.h"
+#ifndef ObjectPoolTest_INCLUDED
+#define ObjectPoolTest_INCLUDED
 
 
-namespace Poco {
-namespace Net {
+#include "Poco/Foundation.h"
+#include "CppUnit/TestCase.h"
 
 
-HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), socket, pParams),
-	_pFactory(pFactory)
+class ObjectPoolTest: public CppUnit::TestCase
 {
-}
+public:
+	ObjectPoolTest(const std::string& name);
+	~ObjectPoolTest();
+
+	void testObjectPool();
+
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
+private:
+};
 
 
-HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), threadPool, socket, pParams),
-	_pFactory(pFactory)
-{
-}
-
-
-HTTPServer::~HTTPServer()
-{
-}
-
-
-void HTTPServer::stopAll(bool abortCurrent)
-{
-	_pFactory->serverStopped(this, abortCurrent);
-	stop();
-}
-
-
-} } // namespace Poco::Net
+#endif // ObjectPoolTest_INCLUDED
