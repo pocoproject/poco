@@ -36,6 +36,7 @@
 
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/StreamSocketImpl.h"
+#include "Poco/FIFOBuffer.h"
 #include "Poco/Exception.h"
 
 
@@ -133,9 +134,25 @@ int StreamSocket::sendBytes(const void* buffer, int length, int flags)
 }
 
 
+int StreamSocket::sendBytes(FIFOBuffer& fifoBuf)
+{
+	int ret = impl()->sendBytes(&fifoBuf.buffer()[0], fifoBuf.used());
+	if (ret > 0) fifoBuf.drain(ret);
+	return ret;
+}
+
+
 int StreamSocket::receiveBytes(void* buffer, int length, int flags)
 {
 	return impl()->receiveBytes(buffer, length, flags);
+}
+
+
+int StreamSocket::receiveBytes(FIFOBuffer& fifoBuf)
+{
+	int ret = impl()->receiveBytes(fifoBuf.next(), fifoBuf.available());
+	if (ret > 0) fifoBuf.advance(ret);
+	return ret;
 }
 
 

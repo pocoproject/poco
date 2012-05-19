@@ -49,6 +49,7 @@ public:
 	void testEcho();
 	void testPoll();
 	void testAvailable();
+	void testFIFOBuffer();
 	void testConnect();
 	void testConnectRefused();
 	void testConnectRefusedNB();
@@ -68,6 +69,13 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void onReadable(bool& b);
+	void onWritable(bool& b);
+
+	int _readableToNot;
+	int _notToReadable;
+	int _writableToNot;
+	int _notToWritable;
 };
 
 

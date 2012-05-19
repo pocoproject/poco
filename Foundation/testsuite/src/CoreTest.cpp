@@ -270,8 +270,8 @@ void CoreTest::testFIFOBufferChar()
 	Buffer<T> b(10);
 	std::vector<T> v;
 
-	f.Readable += delegate(this, &CoreTest::onReadable);
-	f.Writable += delegate(this, &CoreTest::onWritable);
+	f.readable += delegate(this, &CoreTest::onReadable);
+	f.writable += delegate(this, &CoreTest::onWritable);
 
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
@@ -501,15 +501,68 @@ void CoreTest::testFIFOBufferChar()
 	assert (8 == f.available());
 	assert (!f.isEmpty());
 
+	assert(6 == _notToReadable);
+	assert(5 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+
 	f.drain();
+	assert(6 == _notToReadable);
+	assert(6 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+
 	assert (3 == f.write(b, 10));
 	assert (10 == f.size());
 	assert (3 == f.used());
 	assert (7 == f.available());
 	assert (!f.isEmpty());
 
-	f.Readable -= delegate(this, &CoreTest::onReadable);
-	f.Writable -= delegate(this, &CoreTest::onReadable);
+	assert(7 == _notToReadable);
+	assert(6 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+
+	const char c[3] = {'4', '5', '6' };
+	try
+	{
+		f.copy(&c[0], 8);
+	} catch (InvalidAccessException&) { }
+
+	f.copy(&c[0], 3);
+	assert(7 == _notToReadable);
+	assert(6 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+
+	assert (10 == f.size());
+	assert (6 == f.used());
+	assert (4 == f.available());
+
+	const char d[4] = {'7', '8', '9', '0' };
+	f.copy(&c[0], 4);
+	assert(7 == _notToReadable);
+	assert(6 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(2 == _writableToNot);
+
+	assert (10 == f.size());
+	assert (10 == f.used());
+	assert (0 == f.available());
+
+	try
+	{
+		f.copy(&c[0], 1);
+	} catch (InvalidAccessException&) { }
+
+	f.drain(1);
+	assert(7 == _notToReadable);
+	assert(6 == _readableToNot);
+	assert(2 == _notToWritable);
+	assert(2 == _writableToNot);
+
+	f.readable -= delegate(this, &CoreTest::onReadable);
+	f.writable -= delegate(this, &CoreTest::onReadable);
 }
 
 

@@ -65,8 +65,8 @@ class BasicFIFOBuffer
 public:
 	typedef T Type;
 
-	mutable Poco::BasicEvent<bool> Writable;
-		/// Event indicating "writeability" of the buffer,
+	mutable Poco::BasicEvent<bool> writable;
+		/// Event indicating "writability" of the buffer,
 		/// triggerred as follows:
 		///
 		///	* when buffer transitions from non-full to full, 
@@ -77,7 +77,7 @@ public:
 		///	  Writable event observers are notified, with 
 		///	  true value as the argument
 
-	mutable Poco::BasicEvent<bool> Readable;
+	mutable Poco::BasicEvent<bool> readable;
 		/// Event indicating "readability" of the buffer,
 		/// triggerred as follows:
 		///
@@ -235,6 +235,47 @@ public:
 		if (_notify) notify(usedBefore);
 	}
 
+	void copy(const T* ptr, std::size_t length)
+		/// Copies the supplied data to the buffer and adjusts
+		/// the used buffer size.
+	{
+		poco_check_ptr(ptr);
+		if (0 == length) return;
+		if (length > available())
+			throw Poco::InvalidAccessException("Cannot extend buffer.");
+
+		std::memcpy(&_buffer[_used], ptr, length);
+		advance(length);
+	}
+
+	void advance(std::size_t length)
+		/// Advances buffer by length elements.
+		/// Should be called AFTER the data 
+		/// was copied into the buffer.
+	{
+		if (length > available())
+			throw Poco::InvalidAccessException("Cannot extend buffer.");
+
+		std::size_t usedBefore = _used;
+		_used += length;
+		if (_notify) notify(usedBefore);
+	}
+
+	T* begin()
+		/// Returns the pointer to the beginning of the buffer.
+	{
+		return _buffer.begin();
+	}
+
+	T* next()
+		/// Returns the pointer to the next available position in the buffer.
+	{
+		if (available() == 0)
+			throw InvalidAccessException("Buffer is full.");
+
+		return _buffer.begin() + _used;
+	}
+
 	T& operator [] (std::size_t index)
 		/// Returns value at index position.
 		/// Throws InvalidAccessException if index is larger than 
@@ -274,14 +315,14 @@ private:
 	{
 		bool t = true, f = false;
 		if (usedBefore == 0 && _used > 0)
-			Readable.notify(this, t);
+			readable.notify(this, t);
 		else if (usedBefore > 0 && 0 == _used)
-			Readable.notify(this, f);
+			readable.notify(this, f);
 		
 		if (usedBefore == _buffer.size() && _used < _buffer.size())
-			Writable.notify(this, t);
+			writable.notify(this, t);
 		else if (usedBefore < _buffer.size() && _used == _buffer.size())
-			Writable.notify(this, f);
+			writable.notify(this, f);
 	}
 
 	BasicFIFOBuffer();

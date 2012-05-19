@@ -40,6 +40,9 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Timespan.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Buffer.h"
+#include "Poco/FIFOBuffer.h"
+#include "Poco/Delegate.h"
 #include <iostream>
 
 
@@ -52,6 +55,9 @@ using Poco::Timespan;
 using Poco::Stopwatch;
 using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
+using Poco::Buffer;
+using Poco::FIFOBuffer;
+using Poco::delegate;
 
 
 SocketTest::SocketTest(const std::string& name): CppUnit::TestCase(name)
@@ -118,6 +124,62 @@ void SocketTest::testAvailable()
 	int n = ss.receiveBytes(buffer, sizeof(buffer));
 	assert (n == 5);
 	assert (std::string(buffer, n) == "hello");
+	ss.close();
+}
+
+
+void SocketTest::testFIFOBuffer()
+{
+	Buffer<char> b(5);
+	b[0] = 'h';
+	b[1] = 'e';
+	b[2] = 'l';
+	b[3] = 'l';
+	b[4] = 'o';
+
+	FIFOBuffer f(5, true);
+
+	f.readable += delegate(this, &SocketTest::onReadable);
+	f.writable += delegate(this, &SocketTest::onWritable);
+
+	assert(0 == _notToReadable);
+	assert(0 == _readableToNot);
+	assert(0 == _notToWritable);
+	assert(0 == _writableToNot);
+	f.write(b);
+	assert(1 == _notToReadable);
+	assert(0 == _readableToNot);
+	assert(0 == _notToWritable);
+	assert(1 == _writableToNot);
+
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("localhost", echoServer.port()));
+	int n = ss.sendBytes(f);
+	assert (n == 5);
+	assert(1 == _notToReadable);
+	assert(1 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+	assert (f.isEmpty());
+
+	n = ss.receiveBytes(f);
+	assert (n == 5);
+	
+	assert(2 == _notToReadable);
+	assert(1 == _readableToNot);
+	assert(1 == _notToWritable);
+	assert(2 == _writableToNot);
+
+	assert (f[0] == 'h');
+	assert (f[1] == 'e');
+	assert (f[2] == 'l');
+	assert (f[3] == 'l');
+	assert (f[4] == 'o');
+
+	f.readable -= delegate(this, &SocketTest::onReadable);
+	f.writable -= delegate(this, &SocketTest::onWritable);
+
 	ss.close();
 }
 
@@ -459,8 +521,26 @@ void SocketTest::testSelect3()
 }
 
 
+void SocketTest::onReadable(bool& b)
+{
+	if (b) ++_notToReadable;
+	else ++_readableToNot;
+};
+
+
+void SocketTest::onWritable(bool& b)
+{
+	if (b) ++_notToWritable;
+	else ++_writableToNot;
+}
+
+
 void SocketTest::setUp()
 {
+	_readableToNot = 0;
+	_notToReadable = 0;
+	_writableToNot = 0;
+	_notToWritable = 0;
 }
 
 
@@ -476,6 +556,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testEcho);
 	CppUnit_addTest(pSuite, SocketTest, testPoll);
 	CppUnit_addTest(pSuite, SocketTest, testAvailable);
+	CppUnit_addTest(pSuite, SocketTest, testFIFOBuffer);
 	CppUnit_addTest(pSuite, SocketTest, testConnect);
 	CppUnit_addTest(pSuite, SocketTest, testConnectRefused);
 	CppUnit_addTest(pSuite, SocketTest, testConnectRefusedNB);

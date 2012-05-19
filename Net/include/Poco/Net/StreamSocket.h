@@ -42,6 +42,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/Socket.h"
+#include "Poco/FIFOBuffer.h"
 
 
 namespace Poco {
@@ -128,9 +129,37 @@ public:
 		/// Certain socket implementations may also return a negative
 		/// value denoting a certain condition.
 
+	int sendBytes(Poco::FIFOBuffer& buffer);
+		/// Sends the contents of the given buffer through
+		/// the socket. FIFOBuffer has writable/readable transiton
+		/// notifications which may be enabled to notify the caller when
+		/// the buffer transitions between empty, partially full and
+		/// full states.
+		///
+		/// Returns the number of bytes sent, which may be
+		/// less than the number of bytes specified.
+		///
+		/// Certain socket implementations may also return a negative
+		/// value denoting a certain condition.
+
 	int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
+		///
+		/// Returns the number of bytes received. 
+		/// A return value of 0 means a graceful shutdown 
+		/// of the connection from the peer.
+		///
+		/// Throws a TimeoutException if a receive timeout has
+		/// been set and nothing is received within that interval.
+		/// Throws a NetException (or a subclass) in case of other errors.
+
+	int receiveBytes(Poco::FIFOBuffer& buffer);
+		/// Receives data from the socket and stores it
+		/// in buffer. Up to length bytes are received. FIFOBuffer has 
+		/// writable/readable transiton notifications which may be enabled 
+		/// to notify the caller when the buffer transitions between empty, 
+		/// partially full and full states.
 		///
 		/// Returns the number of bytes received. 
 		/// A return value of 0 means a graceful shutdown 
@@ -149,13 +178,18 @@ public:
 		/// The preferred way for a socket to receive urgent data
 		/// is by enabling the SO_OOBINLINE option.
 
-public:
 	StreamSocket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.
 		/// The socket takes owership of the SocketImpl.
 		///
 		/// The SocketImpl must be a StreamSocketImpl, otherwise
 		/// an InvalidArgumentException will be thrown.
+
+private:
+	enum
+	{
+		BUFFER_SIZE = 1024
+	};
 
 	friend class ServerSocket;
 	friend class SocketIOS;
