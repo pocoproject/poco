@@ -301,10 +301,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\CryptoTest.h" />
+    <ClInclude Include="src\DigestEngineTest.h" />
     <ClInclude Include="src\RSATest.h" />
     <ClInclude Include="src\CryptoTestSuite.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DigestEngineTest.cpp" />
     <ClCompile Include="src\CryptoTest.cpp" />
     <ClCompile Include="src\RSATest.cpp" />
     <ClCompile Include="src\CryptoTestSuite.cpp" />

@@ -1,9 +1,11 @@
 //
-// TestApp.cpp
+// ObjectPoolTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TestApp.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ObjectPoolTest.h#1 $
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Definition of the ObjectPoolTest class.
+//
+// Copyright (c) 2010-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,42 +32,29 @@
 //
 
 
-#if defined(_WIN32)
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+#ifndef ObjectPoolTest_INCLUDED
+#define ObjectPoolTest_INCLUDED
 
 
-#include <string>
-#include <iostream>
-#include <cstdlib>
+#include "Poco/Foundation.h"
+#include "CppUnit/TestCase.h"
 
 
-int main(int argc, char** argv)
+class ObjectPoolTest: public CppUnit::TestCase
 {
-	if (argc > 1)
-	{
-		std::string arg(argv[1]);
-		if (arg == "-hello")
-		{
-			std::cout << "Hello, world!";
-		}
-		else if (arg == "-count")
-		{
-			int n = 0;
-			int c = std::cin.get();
-			while (c != -1) { ++n; c = std::cin.get(); }
-			return n;
-		}
-		else if (arg == "-env")
-		{
-			const char* s = std::getenv("TESTENV");
-			if (s)
-			{
-				std::cout << s;
-				return 0;
-			}
-			else return 1;
-		}
-	}
-	return argc - 1;
-}
+public:
+	ObjectPoolTest(const std::string& name);
+	~ObjectPoolTest();
+
+	void testObjectPool();
+
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
+private:
+};
+
+
+#endif // ObjectPoolTest_INCLUDED

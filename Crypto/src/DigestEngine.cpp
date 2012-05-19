@@ -1,9 +1,13 @@
 //
-// TestApp.cpp
+// DigestEngine.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TestApp.cpp#2 $
+// $Id: //poco/1.4/Crypto/src/DigestEngine.cpp#1 $
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Library: Crypto
+// Package: Digest
+// Module:  DigestEngine
+//
+// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,42 +34,60 @@
 //
 
 
-#if defined(_WIN32)
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+#include "Poco/Crypto/DigestEngine.h"
+#include "Poco/Exception.h"
 
 
-#include <string>
-#include <iostream>
-#include <cstdlib>
+namespace Poco {
+namespace Crypto {
 
 
-int main(int argc, char** argv)
+DigestEngine::DigestEngine(const std::string& name):
+	_name(name)
 {
-	if (argc > 1)
-	{
-		std::string arg(argv[1]);
-		if (arg == "-hello")
-		{
-			std::cout << "Hello, world!";
-		}
-		else if (arg == "-count")
-		{
-			int n = 0;
-			int c = std::cin.get();
-			while (c != -1) { ++n; c = std::cin.get(); }
-			return n;
-		}
-		else if (arg == "-env")
-		{
-			const char* s = std::getenv("TESTENV");
-			if (s)
-			{
-				std::cout << s;
-				return 0;
-			}
-			else return 1;
-		}
-	}
-	return argc - 1;
+	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
+	if (!md) throw Poco::NotFoundException(_name);
+	_ctx = EVP_MD_CTX_create();
+	EVP_DigestInit_ex(_ctx, md, NULL);	
 }
+
+	
+DigestEngine::~DigestEngine()
+{
+	EVP_MD_CTX_destroy(_ctx);
+}
+
+
+unsigned DigestEngine::digestLength() const
+{
+	return EVP_MD_CTX_size(_ctx);
+}
+
+
+void DigestEngine::reset()
+{
+	EVP_MD_CTX_cleanup(_ctx);
+	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
+	if (!md) throw Poco::NotFoundException(_name);
+	EVP_DigestInit_ex(_ctx, md, NULL);
+}
+
+
+const Poco::DigestEngine::Digest& DigestEngine::digest()
+{
+	_digest.clear();
+	unsigned len = EVP_MD_CTX_size(_ctx);
+	_digest.resize(len);
+	EVP_DigestFinal_ex(_ctx, &_digest[0], &len);
+	reset();
+	return _digest;
+}
+
+
+void DigestEngine::updateImpl(const void* data, unsigned length)
+{
+	EVP_DigestUpdate(_ctx, data, length);
+}
+
+
+} } // namespace Poco::Crypto

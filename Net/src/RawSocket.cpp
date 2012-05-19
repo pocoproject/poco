@@ -59,7 +59,7 @@ RawSocket::RawSocket(IPAddress::Family family, int proto):
 
 
 RawSocket::RawSocket(const SocketAddress& address, bool reuseAddress): 
-	Socket(new RawSocketImpl)
+	Socket(new RawSocketImpl(address.family()))
 {
 	bind(address, reuseAddress);
 }

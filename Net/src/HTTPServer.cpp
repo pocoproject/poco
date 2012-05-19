@@ -43,19 +43,28 @@ namespace Net {
 
 
 HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), socket, pParams)
+	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), socket, pParams),
+	_pFactory(pFactory)
 {
 }
 
 
 HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), threadPool, socket, pParams)
+	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), threadPool, socket, pParams),
+	_pFactory(pFactory)
 {
 }
 
 
 HTTPServer::~HTTPServer()
 {
+}
+
+
+void HTTPServer::stopAll(bool abortCurrent)
+{
+	_pFactory->serverStopped(this, abortCurrent);
+	stop();
 }
 
 

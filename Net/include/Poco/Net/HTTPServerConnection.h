@@ -45,6 +45,7 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco {
@@ -70,10 +71,13 @@ public:
 
 protected:
 	void sendErrorResponse(HTTPServerSession& session, HTTPResponse::HTTPStatus status);
+	void onServerStopped(const bool& abortCurrent);
 
 private:
 	HTTPServerParams::Ptr          _pParams;
 	HTTPRequestHandlerFactory::Ptr _pFactory;
+	bool _stopped;
+	Poco::FastMutex _mutex;
 };
 
 

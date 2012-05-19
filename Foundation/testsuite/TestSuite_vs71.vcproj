@@ -443,6 +443,9 @@
 					RelativePath=".\src\NumberParserTest.cpp">
 				</File>
 				<File
+					RelativePath=".\src\ObjectPoolTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\RegularExpressionTest.cpp">
 				</File>
 				<File
@@ -508,6 +511,9 @@
 				</File>
 				<File
 					RelativePath=".\src\NumberParserTest.h">
+				</File>
+				<File
+					RelativePath=".\src\ObjectPoolTest.h">
 				</File>
 				<File
 					RelativePath=".\src\RegularExpressionTest.h">

@@ -471,6 +471,19 @@
 					RelativePath=".\src\OpenSSLInitializer.cpp"/>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="Digest">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\include\Poco\Crypto\DigestEngine.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\DigestEngine.cpp"/>
+			</Filter>
+		</Filter>
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration

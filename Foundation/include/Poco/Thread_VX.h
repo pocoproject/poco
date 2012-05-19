@@ -1,7 +1,7 @@
 //
 // Thread_VX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread_VX.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Thread_VX.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -67,7 +67,12 @@ public:
 		PRIO_HIGH_IMPL,
 		PRIO_HIGHEST_IMPL
 	};
-	
+
+	enum Policy
+	{
+		POLICY_DEFAULT_IMPL = 0
+	};
+
 	enum
 	{
 		DEFAULT_THREAD_STACK_SIZE = 65536
@@ -89,10 +94,10 @@ public:
 	TIDImpl tidImpl() const;
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
-	void setOSPriorityImpl(int prio);
+	void setOSPriorityImpl(int prio, int policy = 0);
 	int getOSPriorityImpl() const;
-	static int getMinOSPriorityImpl();
-	static int getMaxOSPriorityImpl();
+	static int getMinOSPriorityImpl(int policy);
+	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
 	void startImpl(Runnable& target);

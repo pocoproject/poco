@@ -23,7 +23,24 @@ Release 1.4.4 (2012-04-??)
   handshake is enabled and the first attempt to complete the handshake fails
 - Poco::DateTimeParser::tryParse() without format specifier now correctly parses ISO8601 
   date/times with fractional seconds.
-
+- Poco::Process::launch() now has additional overloads allowing to specify an initial
+  directory and/or environment.
+- Poco::Net::FTPClientSession: timeout was not applied to data connection, only to
+  control connection.
+- Fixed potential IPv6 issue with socket constructors if IPv6 SocketAddress is given
+  (contributed by ??????? ????????? <milovidov@yandex-team.ru>).
+- Added an additional (optional) parameter to Poco::Thread::setOSPriority() allowing to
+  specify a scheduling policy. Currently this is only used on POSIX platforms and allows
+  specifying SCHED_OTHER (default), SCHED_FIFO or SCHED_RR, as well as other
+  platform-specific policy values.
+- Added Poco::Crypto::DigestEngine class providing a Poco::DigestEngine interface to
+  the digest algorithms provided by OpenSSL.
+- Fixed some potential compiler warnings in Crypto library
+- In some cases, when an SSL exception was unexpectedly closed, a generic Poco::IOException
+  was thrown. This was fixed to throw a SSLConnectionUnexpectedlyClosedException instead.
+- Added Poco::ObjectPool class template.
+- Poco::Net::HTTPServer has a new stopAll() method allowing stopping/aborting of all
+  currently active client connections.
 
 Release 1.4.3p1 (2012-01-23)
 ============================

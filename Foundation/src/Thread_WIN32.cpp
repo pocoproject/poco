@@ -122,7 +122,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
-void ThreadImpl::setOSPriorityImpl(int prio)
+void ThreadImpl::setOSPriorityImpl(int prio, int /* policy */)
 {
 	setPriorityImpl(prio);
 }

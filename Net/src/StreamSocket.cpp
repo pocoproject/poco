@@ -51,7 +51,7 @@ StreamSocket::StreamSocket(): Socket(new StreamSocketImpl)
 }
 
 
-StreamSocket::StreamSocket(const SocketAddress& address): Socket(new StreamSocketImpl)
+StreamSocket::StreamSocket(const SocketAddress& address): Socket(new StreamSocketImpl(address.family()))
 {
 	connect(address);
 }

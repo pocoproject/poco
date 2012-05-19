@@ -329,10 +329,13 @@ std::string FTPClientSession::extractPath(const std::string& response)
 
 StreamSocket FTPClientSession::establishDataConnection(const std::string& command, const std::string& arg)
 {
+	StreamSocket ss;
 	if (_passiveMode)
-		return passiveDataConnection(command, arg);
+		ss = passiveDataConnection(command, arg);
 	else
-		return activeDataConnection(command, arg);
+		ss = activeDataConnection(command, arg);
+	ss.setReceiveTimeout(_timeout);
+	return ss;
 }
 
 
