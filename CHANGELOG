@@ -10,7 +10,8 @@ Release 1.5.0 (2012-07-04)
 - added PRoGen
 - added FIFOBuffer
 - fixed SF# 3522906: Unregistering handlers from SocketReactor
- 
+- fixed SF# 3522084: AbstractConfiguration does not support 64-bit integers
+
 Release 1.4.4 (2012-04-??)
 ==========================
 

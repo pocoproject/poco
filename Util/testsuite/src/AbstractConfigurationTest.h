@@ -51,11 +51,13 @@ public:
 	void testHasProperty();
 	void testGetString();
 	void testGetInt();
+	void testGetInt64();
 	void testGetDouble();
 	void testGetBool();
 	void testExpand();
 	void testSetString();
 	void testSetInt();
+	void testSetInt64();
 	void testSetDouble();
 	void testSetBool();
 	void testKeys();

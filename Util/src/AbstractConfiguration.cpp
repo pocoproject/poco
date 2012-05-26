@@ -160,6 +160,32 @@ int AbstractConfiguration::getInt(const std::string& key, int defaultValue) cons
 }
 
 
+#if defined(POCO_HAVE_INT64)
+
+Int64 AbstractConfiguration::getInt64(const std::string& key) const
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return NumberParser::parse64(internalExpand(value));
+	else
+		throw NotFoundException(key);
+}
+
+
+Int64 AbstractConfiguration::getInt64(const std::string& key, Int64 defaultValue) const
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return NumberParser::tryParse64(internalExpand(value), defaultValue);
+}
+
+#endif // defined(POCO_HAVE_INT64)
+
+
 double AbstractConfiguration::getDouble(const std::string& key) const
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -219,6 +245,17 @@ void AbstractConfiguration::setInt(const std::string& key, int value)
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
+
+#if defined(POCO_HAVE_INT64)
+
+void AbstractConfiguration::setInt64(const std::string& key, Int64 value)
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	setRaw(key, NumberFormatter::format(value));
+}
+
+#endif // defined(POCO_HAVE_INT64)
 
 void AbstractConfiguration::setDouble(const std::string& key, double value)
 {

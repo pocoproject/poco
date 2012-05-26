@@ -182,6 +182,28 @@ public:
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
 
+#if defined(POCO_HAVE_INT64)
+
+	Int64 getInt64(const std::string& key) const;
+		/// Returns the Int64 value of the property with the given name.
+		/// Throws a NotFoundException if the key does not exist.
+		/// Throws a SyntaxException if the property can not be converted
+		/// to an Int64.
+		/// Numbers starting with 0x are treated as hexadecimal.
+		/// If the value contains references to other properties (${<property>}), these
+		/// are expanded.
+
+	Int64 getInt64(const std::string& key, Int64 defaultValue) const;
+		/// If a property with the given key exists, returns the property's Int64 value,
+		/// otherwise returns the given default value.
+		/// Throws a SyntaxException if the property can not be converted
+		/// to an Int64.
+		/// Numbers starting with 0x are treated as hexadecimal.
+		/// If the value contains references to other properties (${<property>}), these
+		/// are expanded.
+
+#endif // defined(POCO_HAVE_INT64)
+
 	double getDouble(const std::string& key) const;
 		/// Returns the double value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
@@ -225,6 +247,14 @@ public:
 	void setInt(const std::string& key, int value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
+
+#if defined(POCO_HAVE_INT64)
+
+	void setInt64(const std::string& key, Int64 value);
+		/// Sets the property with the given key to the given value.
+		/// An already existing value for the key is overwritten.
+
+#endif // defined(POCO_HAVE_INT64)
 
 	void setDouble(const std::string& key, double value);
 		/// Sets the property with the given key to the given value.

@@ -118,6 +118,31 @@ void AbstractConfigurationTest::testGetInt()
 }
 
 
+void AbstractConfigurationTest::testGetInt64()
+{
+#if defined(POCO_HAVE_INT64)
+	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
+
+	assert (pConf->getInt64("prop4.bigint1") == 420000000000L);
+	assert (pConf->getInt64("prop4.bigint2") == -420000000000L);
+	assert (pConf->getInt64("ref2") == 42);
+
+	try
+	{
+		int x = pConf->getInt64("prop1");
+		x=x;
+		fail("not a number - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	assert (pConf->getInt64("prop4.bigint1", 100) == 420000000000L);
+	assert (pConf->getInt64("prop4.bigint2", 100) == -420000000000L);
+#endif //defined(POCO_HAVE_INT64)
+}
+
+
 void AbstractConfigurationTest::testGetDouble()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
@@ -217,6 +242,19 @@ void AbstractConfigurationTest::testSetInt()
 	pConf->setInt("set.int2", -100);
 	assert (pConf->getInt("set.int1") == 42);
 	assert (pConf->getInt("set.int2") == -100);
+}
+
+
+void AbstractConfigurationTest::testSetInt64()
+{
+#if defined(POCO_HAVE_INT64)
+	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
+
+	pConf->setInt64("set.bigint1", 440000000000L);
+	pConf->setInt64("set.bigint2", -440000000000L);
+	assert (pConf->getInt64("set.int1") == 440000000000L);
+	assert (pConf->getInt64("set.int2") == -440000000000L);
+#endif //defined(POCO_HAVE_INT64)
 }
 
 
@@ -371,6 +409,8 @@ Poco::AutoPtr<AbstractConfiguration> AbstractConfigurationTest::createConfigurat
 	pConfig->setString("prop3.string2", "bar");
 	pConfig->setString("prop4.int1", "42");
 	pConfig->setString("prop4.int2", "-42");
+	pConfig->setString("prop4.bigint1", "420000000000");
+	pConfig->setString("prop4.bigint2", "-420000000000");
 	pConfig->setString("prop4.hex", "0x1f");
 	pConfig->setString("prop4.double1", "1");
 	pConfig->setString("prop4.double2", "-1.5");
