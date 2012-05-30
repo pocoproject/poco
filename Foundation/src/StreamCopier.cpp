@@ -139,32 +139,32 @@ Poco::UInt64 StreamCopier::copyToString64(std::istream& istr, std::string& str, 
 
 std::streamsize StreamCopier::copyStreamUnbuffered(std::istream& istr, std::ostream& ostr)
 {
-    char c;
-    std::streamsize len = 0;
-    istr.get(c);
-    while (istr && ostr)
-    {
-        ++len;
-        ostr.put(c);
-        istr.get(c);
-    }
-    return len;
+	char c;
+	std::streamsize len = 0;
+	istr.get(c);
+	while (istr && ostr)
+	{
+		++len;
+		ostr.put(c);
+		istr.get(c);
+	}
+	return len;
 }
 
 
 #if defined(POCO_HAVE_INT64)
 Poco::UInt64 StreamCopier::copyStreamUnbuffered64(std::istream& istr, std::ostream& ostr)
 {
-    char c;
-    Poco::UInt64 len = 0;
-    istr.get(c);
-    while (istr && ostr)
-    {
-        ++len;
-        ostr.put(c);
-        istr.get(c);
-    }
-    return len;
+	char c;
+	Poco::UInt64 len = 0;
+	istr.get(c);
+	while (istr && ostr)
+	{
+		++len;
+		ostr.put(c);
+		istr.get(c);
+	}
+	return len;
 }
 #endif
 
