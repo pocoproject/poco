@@ -41,7 +41,7 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#if defined(POCO_OS_FAMILY_WINDOWS) || defined(__CYGWIN__)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include <windows.h>
 #endif
 #include <sqltypes.h>
