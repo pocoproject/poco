@@ -258,7 +258,25 @@ void CoreTest::testBuffer()
 
 	g.append("hello", 5);
 	assert (g.size() == 10);
-	assert ( !memcmp(g.begin(), "hellohello", 10) );
+	assert ( !std::memcmp(g.begin(), "hellohello", 10) );
+
+	char h[10];
+	Buffer<char> i(h, 10);
+	try
+	{
+		i.append("hello", 5);
+		fail ("must fail");
+	}
+	catch (InvalidAccessException&) { }
+
+	i.assign("hello", 5);
+	assert ( !std::memcmp(&h[0], "hello", 5) );
+
+	const char j[10] = "hello";
+	Buffer<char> k(j, 5);
+	k.append("hello", 5);
+	assert ( !std::memcmp(&j[0], "hello", 5) );
+	assert ( !std::memcmp(k.begin(), "hellohello", 10) );
 }
 
 
@@ -267,6 +285,10 @@ void CoreTest::testFIFOBufferChar()
 	typedef FIFOBuffer::Type T;
 
 	FIFOBuffer f(20, true);
+	
+	assert (f.isEmpty());
+	assert (!f.isFull());
+
 	Buffer<T> b(10);
 	std::vector<T> v;
 
@@ -423,6 +445,7 @@ void CoreTest::testFIFOBufferChar()
 	assert(2 == _readableToNot);
 	assert(0 == _notToWritable);
 	assert(1 == _writableToNot);
+	assert (f.isFull());
 
 	f.read(b);
 	assert(3 == _notToReadable);
@@ -545,6 +568,7 @@ void CoreTest::testFIFOBufferChar()
 	assert(6 == _readableToNot);
 	assert(1 == _notToWritable);
 	assert(2 == _writableToNot);
+	assert (f.isFull());
 
 	assert (10 == f.size());
 	assert (10 == f.used());

@@ -308,6 +308,7 @@
     <ClCompile Include="src\CoreTest.cpp" />
     <ClCompile Include="src\CoreTestSuite.cpp" />
     <ClCompile Include="src\DynamicFactoryTest.cpp" />
+    <ClCompile Include="src\FIFOBufferStreamTest.cpp" />
     <ClCompile Include="src\FormatTest.cpp" />
     <ClCompile Include="src\FPETest.cpp" />
     <ClCompile Include="src\MemoryPoolTest.cpp" />
@@ -439,6 +440,7 @@
     <ClInclude Include="src\CoreTest.h" />
     <ClInclude Include="src\CoreTestSuite.h" />
     <ClInclude Include="src\DynamicFactoryTest.h" />
+    <ClInclude Include="src\FIFOBufferStreamTest.h" />
     <ClInclude Include="src\FormatTest.h" />
     <ClInclude Include="src\FPETest.h" />
     <ClInclude Include="src\MemoryPoolTest.h" />

@@ -567,6 +567,9 @@
     <ClCompile Include="src\ArrayTest.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\FIFOBufferStreamTest.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AnyTest.h">
@@ -952,6 +955,9 @@
     </ClInclude>
     <ClInclude Include="src\ArrayTest.h">
       <Filter>Core\Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FIFOBufferStreamTest.h">
+      <Filter>Streams\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

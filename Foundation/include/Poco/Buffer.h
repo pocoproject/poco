@@ -61,16 +61,46 @@ public:
 	Buffer(std::size_t capacity):
 		_capacity(capacity),
 		_used(capacity),
-		_ptr(new T[capacity])
+		_ptr(new T[capacity]),
+		_ownMem(true)
 		/// Creates and allocates the Buffer.
 	{
+	}
+
+	explicit Buffer(T* pMem, std::size_t length):
+		_capacity(length),
+		_used(length),
+		_ptr(pMem),
+		_ownMem(false)
+		/// Creates the Buffer. Length argument specifies the length
+		/// of the supplied memory pointed to by pMem in the number
+		/// of elements of type T. Supplied pointer is considered
+		/// blank and not owned by Buffer, so in this case Buffer 
+		/// only acts as a wrapper around externally supplied 
+		/// (and lifetime-managed) memory.
+	{
+	}
+
+	explicit Buffer(const T* pMem, std::size_t length):
+		_capacity(length),
+		_used(length),
+		_ptr(new T[length]),
+		_ownMem(true)
+		/// Creates and allocates the Buffer; copies the contents of
+		/// the supplied memory into the buffer. Length argument specifies
+		/// the length of the supplied memory pointed to by pMem in the
+		/// number of elements of type T.
+	{
+		if (_used)
+			std::memcpy(_ptr, pMem, _used * sizeof(T));
 	}
 
 	Buffer(const Buffer& other):
 		/// Copy constructor.
 		_capacity(other._used),
 		_used(other._used),
-		_ptr(new T[other._used])
+		_ptr(new T[other._used]),
+		_ownMem(true)
 	{
 		if (_used)
 			std::memcpy(_ptr, other._ptr, _used * sizeof(T));
@@ -91,15 +121,21 @@ public:
 	~Buffer()
 		/// Destroys the Buffer.
 	{
-		delete [] _ptr;
+		if (_ownMem) delete [] _ptr;
 	}
 	
 	void resize(std::size_t newCapacity, bool preserveContent = true)
 		/// Resizes the buffer. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
 		/// new buffer. The new capacity can be larger or smaller than
-		/// the current one, but it must not be 0.
+		/// the current one, but it must not be 0. 
+		/// Buffers only wrapping externally owned storage can not be 
+		/// resized. If resize is attempted on those, IllegalAccessException
+		/// is thrown.
 	{
+		if (!_ownMem)
+			throw InvalidAccessException("Cannot resize buffer which does not own its storage.");
+
 		poco_assert(newCapacity);
 
 		if (newCapacity > _capacity)
@@ -116,11 +152,20 @@ public:
 		_used = newCapacity;
 	}
 
+	void assign(const T* buf, std::size_t sz)
+		/// Assigns the argument buffer to this buffer.
+		/// If necessary, resizes the buffer.
+	{
+		if (0 == sz) return;
+		if (sz > _capacity) resize(sz, false);
+		std::memcpy(_ptr, buf, sz);
+		_used = sz;
+	}
+
 	void append(const T* buf, std::size_t sz)
 		/// Resizes this buffer and appends the argument buffer.
 	{
-		if (0 == sz)
-			return;
+		if (0 == sz) return;
 		std::size_t oldSize = _used;
 		resize(_used + sz, true);
 		std::memcpy(_ptr + oldSize, buf, sz);
@@ -234,6 +279,7 @@ private:
 	std::size_t _capacity;
 	std::size_t _used;
 	T*          _ptr;
+	bool        _ownMem;
 };
 
 

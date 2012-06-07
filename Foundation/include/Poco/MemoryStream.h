@@ -58,7 +58,7 @@ class BasicMemoryStreamBuf: public std::basic_streambuf<ch, tr>
 	/// stream buffer for reading and writing from a memory area.
 	///
 	/// This streambuf only supports unidirectional streams.
-	/// In other words, the BasicBufferedStreamBuf can be
+	/// In other words, the BasicMemoryStreamBuf can be
 	/// used for the implementation of an istream or an
 	/// ostream, but not for an iostream.
 {

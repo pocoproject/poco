@@ -93,17 +93,17 @@ public:
 	{
 		if (_ispb)
 		{
-    		return _pb;
+			return _pb;
 		}
 		else
 		{
-    		int_type c = readFromDevice();
-    		if (c != char_traits::eof())
-    		{
-    			_ispb = true;
-    			_pb   = c;
-    		}
-    		return c;
+			int_type c = readFromDevice();
+			if (c != char_traits::eof())
+			{
+				_ispb = true;
+				_pb   = c;
+			}
+			return c;
 		}
 	}
 
@@ -116,12 +116,12 @@ public:
 		}
 		else
 		{
-    		int_type c = readFromDevice();
-    		if (c != char_traits::eof())
-    		{
-    			_pb = c;
-    		}
-    		return c;
+			int_type c = readFromDevice();
+			if (c != char_traits::eof())
+			{
+				_pb = c;
+			}
+			return c;
 		}
 	}
 
@@ -129,13 +129,13 @@ public:
 	{
 		if (_ispb)
 		{
-    		return char_traits::eof();
+			return char_traits::eof();
 		}
 		else
 		{
-    		_ispb = true;
-    		_pb   = c;
-    		return c;
+			_ispb = true;
+			_pb   = c;
+			return c;
 		}
 	}
 	

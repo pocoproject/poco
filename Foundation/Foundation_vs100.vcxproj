@@ -324,6 +324,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Exception.cpp" />
+    <ClCompile Include="src\FIFOBufferStream.cpp" />
     <ClCompile Include="src\Format.cpp" />
     <ClCompile Include="src\FPEnvironment.cpp" />
     <ClCompile Include="src\FPEnvironment_C99.cpp">
@@ -989,6 +990,7 @@
     <ClInclude Include="include\Poco\Environment_WIN32U.h" />
     <ClInclude Include="include\Poco\Exception.h" />
     <ClInclude Include="include\Poco\FIFOBuffer.h" />
+    <ClInclude Include="include\Poco\FIFOBufferStream.h" />
     <ClInclude Include="include\Poco\Format.h" />
     <ClInclude Include="include\Poco\Foundation.h" />
     <ClInclude Include="include\Poco\FPEnvironment.h" />

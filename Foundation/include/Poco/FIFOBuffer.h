@@ -67,7 +67,7 @@ public:
 
 	mutable Poco::BasicEvent<bool> writable;
 		/// Event indicating "writability" of the buffer,
-		/// triggerred as follows:
+		/// triggered as follows:
 		///
 		///	* when buffer transitions from non-full to full, 
 		///	  Writable event observers are notified, with 
@@ -79,7 +79,7 @@ public:
 
 	mutable Poco::BasicEvent<bool> readable;
 		/// Event indicating "readability" of the buffer,
-		/// triggerred as follows:
+		/// triggered as follows:
 		///
 		///	* when buffer transitions from non-empty to empty,
 		///	  Readable event observers are notified, with false  
@@ -94,7 +94,25 @@ public:
 		_begin(0),
 		_used(0),
 		_notify(notify)
-		/// Creates and allocates the FIFOBuffer.
+		/// Creates the FIFOBuffer.
+	{
+	}
+
+	explicit BasicFIFOBuffer(T* pBuffer, std::size_t size, bool notify = false):
+		_buffer(pBuffer, size),
+		_begin(0),
+		_used(0),
+		_notify(notify)
+		/// Creates the FIFOBuffer.
+	{
+	}
+
+	explicit BasicFIFOBuffer(const T* pBuffer, std::size_t size, bool notify = false):
+		_buffer(pBuffer, size),
+		_begin(0),
+		_used(size),
+		_notify(notify)
+		/// Creates the FIFOBuffer.
 	{
 	}
 
@@ -123,24 +141,64 @@ public:
 		if (_notify) notify(usedBefore);
 	}
 	
+	std::size_t peek(T* pBuffer, std::size_t length) const
+		/// Peeks into the data currently in the FIFO
+		/// without actually extracting it.
+		/// If length is zero, the return is immediate.
+		/// If length is greater than used length,
+		/// it is substituted with the the current FIFO 
+		/// used length.
+		/// 
+		/// Returns the number of elements copied in the 
+		/// supplied buffer.
+	{
+		if (0 == length) return 0;
+		Mutex::ScopedLock lock(_mutex);
+		if (length > _used) length = _used;
+		std::memcpy(pBuffer, _buffer.begin() + _begin, length * sizeof(T));
+		return length;
+	}
+	
 	std::size_t peek(Poco::Buffer<T>& buffer, std::size_t length = 0) const
 		/// Peeks into the data currently in the FIFO
 		/// without actually extracting it.
 		/// Resizes the supplied buffer to the size of
 		/// data written to it. If length is not
-		/// supplied by the caller, the current FIFO used length
-		/// is substituted for it.
+		/// supplied by the caller or is greater than length 
+		/// of currently used data, the current FIFO used 
+		/// data length is substituted for it.
+		/// 
+		/// Returns the number of elements copied in the 
+		/// supplied buffer.
+	{
+		Mutex::ScopedLock lock(_mutex);
+		if (0 == length || length > _used) length = _used;
+		buffer.resize(length);
+		return peek(buffer.begin(), length);
+	}
+	
+	std::size_t read(T* pBuffer, std::size_t length)
+		/// Copies the data currently in the FIFO
+		/// into the supplied buffer.
+		/// Resizes the supplied buffer to the size of
+		/// data written to it.
 		/// 
 		/// Returns the reference to the buffer.
 	{
 		Mutex::ScopedLock lock(_mutex);
 
-		if (0 == length || length > _used) length = _used;
-		poco_assert (length <= _buffer.size());
-		buffer.resize(length);
-		std::memcpy(buffer.begin(), _buffer.begin() + _begin, length * sizeof(T));
+		if (0 == _used) return 0;
 
-		return length;
+		std::size_t usedBefore = _used;
+		std::size_t readLen = peek(pBuffer, length);
+		poco_assert (_used >= readLen);
+		_used -= readLen;
+		if (0 == _used) _begin = 0;
+		else _begin += length;
+
+		if (_notify) notify(usedBefore);
+
+		return readLen;
 	}
 	
 	std::size_t read(Poco::Buffer<T>& buffer, std::size_t length = 0)
@@ -167,6 +225,38 @@ public:
 		return readLen;
 	}
 
+	std::size_t write(const T* pBuffer, std::size_t length)
+		/// Writes data from supplied buffer to the FIFO buffer.
+		/// If there is no sufficient space for the whole
+		/// buffer to be written, data up to available 
+		/// length is written.
+		/// The length of data to be written is determined from the
+		/// length argument. Function does nothing and returns zero
+		/// if length argument is equal to zero.
+		/// 
+		/// Returns the length of data written.
+	{
+		if (0 == length || isFull()) return 0;
+
+		Mutex::ScopedLock lock(_mutex);
+
+		if (_buffer.size() - (_begin + _used) < length)
+		{
+			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used);
+			_begin = 0;
+		}
+
+		std::size_t usedBefore = _used;
+		std::size_t available =  _buffer.size() - _used - _begin;
+		std::size_t len = length > available ? available : length;
+		std::memcpy(_buffer.begin() + _begin + _used, pBuffer, len * sizeof(T));
+		_used += len;
+		poco_assert (_used <= _buffer.size());
+		if (_notify) notify(usedBefore);
+
+		return len;
+	}
+
 	std::size_t write(const Buffer<T>& buffer, std::size_t length = 0)
 		/// Writes data from supplied buffer to the FIFO buffer.
 		/// If there is no sufficient space for the whole
@@ -178,25 +268,11 @@ public:
 		/// 
 		/// Returns the length of data written.
 	{
-		Mutex::ScopedLock lock(_mutex);
+		if (isFull()) return 0;
 
 		if (0 == length || length > buffer.size()) length = buffer.size();
 
-		if (_buffer.size() - (_begin + _used) < length)
-		{
-			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used);
-			_begin = 0;
-		}
-
-		std::size_t usedBefore = _used;
-		std::size_t available =  _buffer.size() - _used - _begin;
-		std::size_t len = length > available ? available : length;
-		std::memcpy(_buffer.begin() + _begin + _used, buffer.begin(), len * sizeof(T));
-		_used += len;
-		poco_assert (_used <= _buffer.size());
-		if (_notify) notify(usedBefore);
-
-		return len;
+		return write(buffer.begin(), length);
 	}
 
 	std::size_t size() const
@@ -308,6 +384,24 @@ public:
 		/// Returns true is buffer is empty, flase otherwise.
 	{
 		return 0 == _used;
+	}
+
+	bool isFull() const
+		/// Returns true is buffer is full, false otherwise.
+	{
+		return size() == _used;
+	}
+
+	void setNotify(bool notify = true)
+		/// Enables/disables notifications.
+	{
+		_notify = notify;
+	}
+
+	bool getNotify() const
+		/// Returns true if notifications are enabled, false otherwise.
+	{
+		return _notify;
 	}
 
 private:
