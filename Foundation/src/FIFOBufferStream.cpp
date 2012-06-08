@@ -166,36 +166,36 @@ void FIFOIOS::close()
 
 FIFOBufferStream::FIFOBufferStream(FIFOBuffer& fifoBuffer):
 	FIFOIOS(fifoBuffer),
+    std::iostream(&_buf),
 	readable(_buf.fifoBuffer().readable),
-	writable(_buf.fifoBuffer().writable),
-	std::iostream(&_buf)
+	writable(_buf.fifoBuffer().writable)
 {
 }
 
 
 FIFOBufferStream::FIFOBufferStream(char* pBuffer, std::size_t length):
 	FIFOIOS(pBuffer, length),
+    std::iostream(&_buf),
 	readable(_buf.fifoBuffer().readable),
-	writable(_buf.fifoBuffer().writable),
-	std::iostream(&_buf)
+	writable(_buf.fifoBuffer().writable)
 {
 }
 
 
 FIFOBufferStream::FIFOBufferStream(const char* pBuffer, std::size_t length):
 	FIFOIOS(pBuffer, length),
+    std::iostream(&_buf),
 	readable(_buf.fifoBuffer().readable),
-	writable(_buf.fifoBuffer().writable),
-	std::iostream(&_buf)
+	writable(_buf.fifoBuffer().writable)
 {
 }
 
 
 FIFOBufferStream::FIFOBufferStream(std::size_t length):
 	FIFOIOS(length),
+    std::iostream(&_buf),
 	readable(_buf.fifoBuffer().readable),
-	writable(_buf.fifoBuffer().writable),
-	std::iostream(&_buf)
+	writable(_buf.fifoBuffer().writable)
 {
 }
 

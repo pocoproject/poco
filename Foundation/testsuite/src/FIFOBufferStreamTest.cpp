@@ -168,7 +168,9 @@ void FIFOBufferStreamTest::testNotify()
 	assert (1 == _notToReadable);
 	assert (1 == _writableToNot);
 	assert (1 == _notToWritable);
-
+    
+    iostr.clear();
+    assert (iostr.good());
 	iostr << "This is a test " << 42 << std::ends << std::flush;
 	assert (iostr.rdbuf()->fifoBuffer().isFull());
 

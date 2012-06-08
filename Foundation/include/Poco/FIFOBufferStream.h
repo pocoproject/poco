@@ -132,8 +132,8 @@ class Foundation_API FIFOBufferStream: public FIFOIOS, public std::iostream
 	/// An output stream for writing to a FIFO.
 {
 public:
+    Poco::BasicEvent<bool>& readable;
 	Poco::BasicEvent<bool>& writable;
-	Poco::BasicEvent<bool>& readable;
 
 	explicit FIFOBufferStream(FIFOBuffer& buffer);
 		/// Creates the FIFOBufferStream with supplied buffer as initial value.

@@ -12,8 +12,8 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel Base64Decoder Base64E
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Configurable ConsoleChannel \
 	CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator \
-	Environment Event EventArgs ErrorHandler Exception FPEnvironment File Glob \
-	FileChannel Formatter FormattingChannel HexBinaryDecoder LineEndingConverter \
+	Environment Event EventArgs ErrorHandler Exception FIFOBufferStream FPEnvironment File \
+	FileChannel Formatter FormattingChannel Glob HexBinaryDecoder LineEndingConverter \
 	HexBinaryEncoder InflatingStream Latin1Encoding Latin2Encoding Latin9Encoding LogFile \
 	Logger LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
 	MemoryPool MD4Engine MD5Engine Manifest Message Mutex \

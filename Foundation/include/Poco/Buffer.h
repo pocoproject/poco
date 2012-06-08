@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Exception.h"
 #include <cstring>
 #include <cstddef>
 
@@ -134,7 +135,7 @@ public:
 		/// is thrown.
 	{
 		if (!_ownMem)
-			throw InvalidAccessException("Cannot resize buffer which does not own its storage.");
+			throw Poco::InvalidAccessException("Cannot resize buffer which does not own its storage.");
 
 		poco_assert(newCapacity);
 
