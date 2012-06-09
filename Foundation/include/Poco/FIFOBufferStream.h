@@ -164,7 +164,7 @@ private:
 ///
 
 
-FIFOBuffer& FIFOBufferStreamBuf::fifoBuffer()
+inline FIFOBuffer& FIFOBufferStreamBuf::fifoBuffer()
 {
 	return _fifoBuffer;
 }
