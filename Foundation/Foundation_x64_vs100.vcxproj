@@ -300,8 +300,6 @@
     <ClCompile Include="src\ByteOrder.cpp" />
     <ClCompile Include="src\Checksum.cpp" />
     <ClCompile Include="src\Debugger.cpp" />
-    <ClCompile Include="src\DynamicAny.cpp" />
-    <ClCompile Include="src\DynamicAnyHolder.cpp" />
     <ClCompile Include="src\Environment.cpp" />
     <ClCompile Include="src\Environment_UNIX.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>
@@ -336,6 +334,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Exception.cpp" />
+    <ClCompile Include="src\FIFOBufferStream.cpp" />
     <ClCompile Include="src\Format.cpp" />
     <ClCompile Include="src\FPEnvironment.cpp" />
     <ClCompile Include="src\FPEnvironment_C99.cpp">
@@ -378,6 +377,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\Latin2Encoding.cpp" />
     <ClCompile Include="src\MemoryPool.cpp" />
     <ClCompile Include="src\NestedDiagnosticContext.cpp" />
     <ClCompile Include="src\NumberFormatter.cpp" />
@@ -385,6 +385,8 @@
     <ClCompile Include="src\RefCountedObject.cpp" />
     <ClCompile Include="src\String.cpp" />
     <ClCompile Include="src\StringTokenizer.cpp" />
+    <ClCompile Include="src\Var.cpp" />
+    <ClCompile Include="src\VarHolder.cpp" />
     <ClCompile Include="src\Void.cpp" />
     <ClCompile Include="src\Base64Decoder.cpp" />
     <ClCompile Include="src\Base64Encoder.cpp" />
@@ -428,6 +430,8 @@
     <ClCompile Include="src\inflate.c" />
     <ClCompile Include="src\inftrees.c" />
     <ClCompile Include="src\trees.c" />
+    <ClCompile Include="src\Windows1250Encoding.cpp" />
+    <ClCompile Include="src\Windows1251Encoding.cpp" />
     <ClCompile Include="src\zutil.c" />
     <ClCompile Include="src\ActiveDispatcher.cpp" />
     <ClCompile Include="src\Condition.cpp" />
@@ -984,12 +988,17 @@
     <ClInclude Include="include\Poco\DynamicAny.h" />
     <ClInclude Include="include\Poco\DynamicAnyHolder.h" />
     <ClInclude Include="include\Poco\DynamicFactory.h" />
+    <ClInclude Include="include\Poco\Dynamic\Pair.h" />
+    <ClInclude Include="include\Poco\Dynamic\Struct.h" />
+    <ClInclude Include="include\Poco\Dynamic\Var.h" />
+    <ClInclude Include="include\Poco\Dynamic\VarHolder.h" />
     <ClInclude Include="include\Poco\Environment.h" />
     <ClInclude Include="include\Poco\Environment_UNIX.h" />
     <ClInclude Include="include\Poco\Environment_VMS.h" />
     <ClInclude Include="include\Poco\Environment_WIN32.h" />
     <ClInclude Include="include\Poco\Environment_WIN32U.h" />
     <ClInclude Include="include\Poco\Exception.h" />
+    <ClInclude Include="include\Poco\FIFOBufferStream.h" />
     <ClInclude Include="include\Poco\Format.h" />
     <ClInclude Include="include\Poco\Foundation.h" />
     <ClInclude Include="include\Poco\FPEnvironment.h" />
@@ -999,6 +1008,7 @@
     <ClInclude Include="include\Poco\FPEnvironment_SUN.h" />
     <ClInclude Include="include\Poco\FPEnvironment_WIN32.h" />
     <ClInclude Include="include\Poco\Instantiator.h" />
+    <ClInclude Include="include\Poco\Latin2Encoding.h" />
     <ClInclude Include="include\Poco\MemoryPool.h" />
     <ClInclude Include="include\Poco\MetaProgramming.h" />
     <ClInclude Include="include\Poco\NamedTuple.h" />
@@ -1047,6 +1057,8 @@
     <ClInclude Include="include\Poco\TeeStream.h" />
     <ClInclude Include="include\Poco\Token.h" />
     <ClInclude Include="include\Poco\UnbufferedStreamBuf.h" />
+    <ClInclude Include="include\Poco\Windows1250Encoding.h" />
+    <ClInclude Include="include\Poco\Windows1251Encoding.h" />
     <ClInclude Include="src\crc32.h" />
     <ClInclude Include="src\deflate.h" />
     <ClInclude Include="src\inffast.h" />

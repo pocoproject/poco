@@ -301,13 +301,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\AnyTest.cpp" />
+    <ClCompile Include="src\ArrayTest.cpp" />
     <ClCompile Include="src\AutoPtrTest.cpp" />
     <ClCompile Include="src\AutoReleasePoolTest.cpp" />
     <ClCompile Include="src\ByteOrderTest.cpp" />
     <ClCompile Include="src\CoreTest.cpp" />
     <ClCompile Include="src\CoreTestSuite.cpp" />
-    <ClCompile Include="src\DynamicAnyTest.cpp" />
     <ClCompile Include="src\DynamicFactoryTest.cpp" />
+    <ClCompile Include="src\FIFOBufferStreamTest.cpp" />
     <ClCompile Include="src\FormatTest.cpp" />
     <ClCompile Include="src\FPETest.cpp" />
     <ClCompile Include="src\MemoryPoolTest.cpp" />
@@ -334,6 +335,7 @@
     <ClCompile Include="src\StreamsTestSuite.cpp" />
     <ClCompile Include="src\StreamTokenizerTest.cpp" />
     <ClCompile Include="src\TeeStreamTest.cpp" />
+    <ClCompile Include="src\VarTest.cpp" />
     <ClCompile Include="src\ZLibTest.cpp" />
     <ClCompile Include="src\CryptTestSuite.cpp" />
     <ClCompile Include="src\DigestStreamTest.cpp" />
@@ -431,6 +433,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AnyTest.h" />
+    <ClInclude Include="src\ArrayTest.h" />
     <ClInclude Include="src\AutoPtrTest.h" />
     <ClInclude Include="src\AutoReleasePoolTest.h" />
     <ClInclude Include="src\ByteOrderTest.h" />
@@ -438,6 +441,7 @@
     <ClInclude Include="src\CoreTestSuite.h" />
     <ClInclude Include="src\DynamicAnyTest.h" />
     <ClInclude Include="src\DynamicFactoryTest.h" />
+    <ClInclude Include="src\FIFOBufferStreamTest.h" />
     <ClInclude Include="src\FormatTest.h" />
     <ClInclude Include="src\FPETest.h" />
     <ClInclude Include="src\MemoryPoolTest.h" />
@@ -464,6 +468,7 @@
     <ClInclude Include="src\StreamsTestSuite.h" />
     <ClInclude Include="src\StreamTokenizerTest.h" />
     <ClInclude Include="src\TeeStreamTest.h" />
+    <ClInclude Include="src\VarTest.h" />
     <ClInclude Include="src\ZLibTest.h" />
     <ClInclude Include="src\CryptTestSuite.h" />
     <ClInclude Include="src\DigestStreamTest.h" />
