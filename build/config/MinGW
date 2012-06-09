@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE ?= STATIC
+LINKMODE = STATIC
 POCO_TARGET_OSNAME = MinGW
 POCO_TARGET_OSARCH = ia32
 
@@ -21,7 +21,7 @@ CXX     = g++
 LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = $(CXX) -shared -mno-cygwin -o $@ -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(basename $(notdir $@))).a
+SHLIB   = $(CXX) -shared -o $@ -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(basename $(notdir $@))).a
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = strip
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
@@ -66,7 +66,7 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED -I/usr/local/include -I/usr/include
+SYSFLAGS = -D_WIN32 -DMINGW32 -DWINVER=0x500 -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED -I/usr/local/include -I/usr/include
 
 #
 # System Specific Libraries
