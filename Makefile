@@ -80,8 +80,8 @@ JSON-libexec:  Foundation-libexec
 JSON-tests: JSON-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/JSON/testsuite
 	
-#JSON-samples: JSON-libexec 
-#	$(MAKE) -C $(POCO_BASE)/JSON/samples
+JSON-samples: JSON-libexec 
+	$(MAKE) -C $(POCO_BASE)/JSON/samples
 
 Util-libexec:  Foundation-libexec XML-libexec
 	$(MAKE) -C $(POCO_BASE)/Util
