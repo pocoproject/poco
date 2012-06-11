@@ -740,11 +740,13 @@ void JSONTest::testInvalidJanssonFiles()
 					parser.parse(fis);
 					result = handler.result();
 					// We shouldn't get here.
+					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl; 
 					assert(false);
 				}
 				catch(Poco::JSON::JSONException jsone)
 				{
 					std::cout << "Ok! We got an exception " << jsone.message() << std::endl;
+					continue;
 				}
 				catch(Poco::SyntaxException se)
 				{
