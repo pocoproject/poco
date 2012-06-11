@@ -566,7 +566,20 @@ void Parser::readValue(const Token* token)
 	case Token::INTEGER_LITERAL_TOKEN:
 		if ( _handler != NULL )
 		{
-			_handler->value(token->asInteger());
+			int value = token->asInteger();
+#if defined(POCO_HAVE_INT64)
+			if (    value == std::numeric_limits<int>::max() 
+			     || value == std::numeric_limits<int>::min() )
+			{
+				_handler->value(NumberParser::parse64(token->asString()));
+			}
+			else
+			{
+				_handler->value(token->asInteger());
+			}
+#else
+			_handle->value(value);
+#endif
 		}
 		break;
 	case Token::KEYWORD_TOKEN:

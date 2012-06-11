@@ -92,6 +92,12 @@ public:
 		/// An integer value is read
 
 
+#if defined(POCO_HAVE_INT64)
+	virtual void value(Int64 v);
+		/// A 64-bit integer value is read
+#endif
+
+
 	virtual void value(const std::string& s);
 		/// A string value is read.
 
@@ -134,6 +140,13 @@ inline void DefaultHandler::value(int v)
 {
 	setValue(v);
 }
+
+#if defined(POCO_HAVE_INT64)
+inline void DefaultHandler::value(Int64 v)
+{
+	setValue(v);
+}
+#endif
 
 
 inline void DefaultHandler::value(const std::string& s)
