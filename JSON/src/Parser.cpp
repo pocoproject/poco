@@ -35,9 +35,12 @@
 
 #include "Poco/Ascii.h"
 #include "Poco/Token.h"
-
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/JSONException.h"
+#undef min
+#undef max
+#include <limits>
+
 
 namespace Poco
 {
