@@ -116,6 +116,18 @@ public:
 		/// may be specified. The scope ID will be ignored if an IPv4
 		/// address is specified.
 
+	IPAddress(unsigned prefix, Family family);
+			/// Creates an IPAddress mask with the given length of prefix.
+
+#if defined(_WIN32)
+	IPAddress(const SOCKET_ADDRESS& socket_address);
+			/// Creates an IPAddress from a SOCKET_ADDRESS wrapper for Windows.
+#endif
+
+	IPAddress(const struct sockaddr& sockaddr);
+		/// Same for struct sock_addr on POSIX.
+
+
 	~IPAddress();
 		/// Destroys the IPAddress.
 

@@ -119,6 +119,12 @@ public:
 		std::memcpy(&_addr, addr, sizeof(_addr));
 	}
 	
+	IPv4AddressImpl(unsigned prefix)
+	{
+		UInt32 addr = ~(0xffffffff >> prefix);
+		_addr.s_addr = htonl(addr);
+	}
+
 	std::string toString() const
 	{
 		const UInt8* bytes = reinterpret_cast<const UInt8*>(&_addr);
@@ -187,9 +193,9 @@ public:
 	bool isSiteLocal() const
 	{
 		UInt32 addr = ntohl(_addr.s_addr);
-		return (addr & 0xFF000000) == 0x0A000000 ||        // 10.0.0.0/24
-		       (addr & 0xFFFF0000) == 0xC0A80000 ||        // 192.68.0.0/16
-		       (addr >= 0xAC100000 && addr <= 0xAC1FFFFF); // 172.16.0.0 to 172.31.255.255
+		return (addr & 0xFF000000) == 0x0A000000 ||     // 10.0.0.0/24
+			(addr & 0xFFFF0000) == 0xC0A80000 ||        // 192.68.0.0/16
+			(addr >= 0xAC100000 && addr <= 0xAC1FFFFF); // 172.16.0.0 to 172.31.255.255
 	}
 	
 	bool isIPv4Compatible() const
@@ -275,7 +281,7 @@ public:
 	}
 		
 private:
-	struct in_addr _addr;	
+	struct in_addr _addr;
 };
 
 
@@ -301,6 +307,28 @@ public:
 		_scope(scope)
 	{
 		std::memcpy(&_addr, addr, sizeof(_addr));
+	}
+
+#if !defined(s6_addr16)
+#if defined(_WIN32)
+#define s6_addr16	u.Word
+#else
+#define s6_addr16	__u6_addr.__u6_addr16
+#endif
+#endif
+
+	IPv6AddressImpl(unsigned prefix):
+		_scope(0)
+	{
+		unsigned i = 0;
+		for (; prefix > 0; ++i, prefix -= 16) {
+			if (prefix >= 16)
+				_addr.s6_addr16[i] = 0xffff;
+			else
+				_addr.s6_addr16[i] = htons(~(0xffff >> prefix));
+		}
+		while (i < 8)
+			_addr.s6_addr16[i++] = 0;
 	}
 
 	std::string toString() const
@@ -396,7 +424,7 @@ public:
 	{
 		const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 		return words[0] == 0 && words[1] == 0 && words[2] == 0 && words[3] == 0 && 
-		       words[4] == 0 && words[5] == 0 && words[6] == 0 && words[7] == 0;
+			words[4] == 0 && words[5] == 0 && words[6] == 0 && words[7] == 0;
 	}
 	
 	bool isBroadcast() const
@@ -408,7 +436,7 @@ public:
 	{
 		const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 		return words[0] == 0 && words[1] == 0 && words[2] == 0 && words[3] == 0 && 
-		       words[4] == 0 && words[5] == 0 && words[6] == 0 && ntohs(words[7]) == 0x0001;
+			words[4] == 0 && words[5] == 0 && words[6] == 0 && ntohs(words[7]) == 0x0001;
 	}
 	
 	bool isMulticast() const
@@ -530,7 +558,7 @@ public:
 	}
 
 private:
-	struct in6_addr _addr;	
+	struct in6_addr _addr;
 	Poco::UInt32    _scope;
 };
 
@@ -612,6 +640,56 @@ IPAddress::IPAddress(const void* addr, poco_socklen_t length, Poco::UInt32 scope
 		_pImpl = new IPv6AddressImpl(addr, scope);
 #endif
 	else throw Poco::InvalidArgumentException("Invalid address length passed to IPAddress()");
+}
+
+
+IPAddress::IPAddress(unsigned prefix, Family family): _pImpl(0)
+{
+	if (family == IPv4)
+	{
+		if (prefix <= 32) {
+			_pImpl = new IPv4AddressImpl(prefix);
+		}
+	}
+#if defined(POCO_HAVE_IPv6)
+	else if (family == IPv6)
+	{
+		if (prefix <= 128)
+		{
+			_pImpl = new IPv6AddressImpl(prefix);
+		}
+	}
+#endif
+	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	if (!_pImpl) throw Poco::InvalidArgumentException("Invalid prefix length passed to IPAddress()");
+}
+
+
+#if defined(_WIN32)
+IPAddress::IPAddress(const SOCKET_ADDRESS& socket_address)
+{
+	ADDRESS_FAMILY family = socket_address.lpSockaddr->sa_family;
+	if (family == AF_INET)
+		_pImpl = new IPv4AddressImpl(&reinterpret_cast<const struct sockaddr_in*>(socket_address.lpSockaddr)->sin_addr);
+#if defined(POCO_HAVE_IPv6)
+	else if (family == AF_INET6)
+		_pImpl = new IPv6AddressImpl(&reinterpret_cast<const struct sockaddr_in6*>(socket_address.lpSockaddr)->sin6_addr, reinterpret_cast<const struct sockaddr_in6*>(socket_address.lpSockaddr)->sin6_scope_id);
+#endif
+	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+}
+#endif
+
+
+IPAddress::IPAddress(const struct sockaddr& sockaddr)
+{
+	unsigned short family = sockaddr.sa_family;
+	if (family == AF_INET)
+		_pImpl = new IPv4AddressImpl(&reinterpret_cast<const struct sockaddr_in*>(&sockaddr)->sin_addr);
+#if defined(POCO_HAVE_IPv6)
+	else if (family == AF_INET6)
+		_pImpl = new IPv6AddressImpl(&reinterpret_cast<const struct sockaddr_in6*>(&sockaddr)->sin6_addr, reinterpret_cast<const struct sockaddr_in6*>(&sockaddr)->sin6_scope_id);
+#endif
+	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 
 

@@ -68,6 +68,10 @@ void IPAddressTest::testStringConv()
 	IPAddress ia4("0.0.0.0");
 	assert (ia4.family() == IPAddress::IPv4);
 	assert (ia4.toString() == "0.0.0.0");
+
+	IPAddress ia5(24,  IPAddress::IPv4);
+	assert (ia5.family() == IPAddress::IPv4);
+	assert (ia5.toString() == "255.255.255.0");
 }
 
 
@@ -89,6 +93,10 @@ void IPAddressTest::testStringConv6()
 	IPAddress ia4("::FFFF:192.168.1.120");
 	assert (ia4.family() == IPAddress::IPv6);
 	assert (ia4.toString() == "::FFFF:192.168.1.120");
+
+	IPAddress ia5(64, IPAddress::IPv6);
+	assert (ia5.family() == IPAddress::IPv6);
+	assert (ia5.toString() == "FFFF:FFFF:FFFF:FFFF::");
 #endif
 }
 
