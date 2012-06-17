@@ -180,7 +180,9 @@ Int64 AbstractConfiguration::getInt64(const std::string& key, Int64 defaultValue
 
 	std::string value;
 	if (getRaw(key, value))
-		return NumberParser::tryParse64(internalExpand(value), defaultValue);
+		return NumberParser::parse64(internalExpand(value));
+	else
+		return defaultValue;
 }
 
 #endif // defined(POCO_HAVE_INT64)

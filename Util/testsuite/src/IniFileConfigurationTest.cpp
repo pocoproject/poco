@@ -124,7 +124,7 @@ void IniFileConfigurationTest::testCaseInsensitiveRemove()
 	pConf->keys(keys);
 	assert (keys.size() == 13);
 	pConf->keys("prop4", keys);
-	assert (keys.size() == 13);
+	assert (keys.size() == 15);
 
 	pConf->remove("PROP4.Bool1");
 	assert (pConf->hasProperty("Prop1"));
@@ -134,7 +134,7 @@ void IniFileConfigurationTest::testCaseInsensitiveRemove()
 	pConf->keys(keys);
 	assert (keys.size() == 13);
 	pConf->keys("PROP4", keys);
-	assert (keys.size() == 12);
+	assert (keys.size() == 14);
 
 	pConf->remove("Prop4");
 	assert (pConf->hasProperty("Prop1"));

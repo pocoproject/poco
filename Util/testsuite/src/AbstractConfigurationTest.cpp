@@ -36,12 +36,14 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include "Poco/Delegate.h"
+#include "Poco/Types.h"
 #include <algorithm>
 
 
 using Poco::Util::AbstractConfiguration;
 using Poco::Util::MapConfiguration;
 using Poco::AutoPtr;
+using Poco::Int64;
 
 
 AbstractConfigurationTest::AbstractConfigurationTest(const std::string& name): CppUnit::TestCase(name)
@@ -129,7 +131,7 @@ void AbstractConfigurationTest::testGetInt64()
 
 	try
 	{
-		int x = pConf->getInt64("prop1");
+		Int64 x = pConf->getInt64("prop1");
 		x=x;
 		fail("not a number - must throw");
 	}
@@ -372,7 +374,7 @@ void AbstractConfigurationTest::testRemove()
 	pConf->keys(keys);
 	assert (keys.size() == 13);
 	pConf->keys("prop4", keys);
-	assert (keys.size() == 13);
+	assert (keys.size() == 15);
 
 	pConf->remove("prop4.bool1");
 	assert (!pConf->hasProperty("prop4.bool1"));
@@ -381,7 +383,7 @@ void AbstractConfigurationTest::testRemove()
 	pConf->keys(keys);
 	assert (keys.size() == 13);
 	pConf->keys("prop4", keys);
-	assert (keys.size() == 12);
+	assert (keys.size() == 14);
 
 	pConf->remove("prop4");
 	assert (!pConf->hasProperty("prop4.bool1"));
