@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerConnection.cpp#2 $
+// $Id: //poco/1.4/Net/src/HTTPServerConnection.cpp#4 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -45,7 +45,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Delegate.h"
 #include <memory>
-
+#include <iostream>
 
 namespace Poco {
 namespace Net {
@@ -79,33 +79,40 @@ void HTTPServerConnection::run()
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
 
-			HTTPServerResponseImpl response(session);
-			HTTPServerRequestImpl request(response, session, _pParams);
-			
-			Poco::Timestamp now;
-			response.setDate(now);
-			response.setVersion(request.getVersion());
-			response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && session.canKeepAlive());
-			if (!server.empty())
-				response.set("Server", server);
-			try
+			if (!_stopped)
 			{
-				std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
-				if (pHandler.get())
+				HTTPServerResponseImpl response(session);
+				HTTPServerRequestImpl request(response, session, _pParams);
+				
+				Poco::Timestamp now;
+				response.setDate(now);
+				response.setVersion(request.getVersion());
+				response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && session.canKeepAlive());
+				if (!server.empty())
+					response.set("Server", server);
+				try
 				{
-					if (request.expectContinue())
-						response.sendContinue();
-					
-					pHandler->handleRequest(request, response);
-					session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive());
+					std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
+					if (pHandler.get())
+					{
+						if (request.expectContinue())
+							response.sendContinue();
+						
+						pHandler->handleRequest(request, response);
+						session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive());
+					}
+					else sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
 				}
-				else sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
-			}
-			catch (Poco::Exception&)
-			{
-				if (!response.sent())
-					sendErrorResponse(session, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-				throw;
+				catch (Poco::Exception&)
+				{
+					if (!response.sent())
+					{
+					std::cerr << "sendErrorResponse()" << std::endl;
+						sendErrorResponse(session, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+					std::cerr << "sendErrorResponse() done" << std::endl;
+					}
+					throw;
+				}
 			}
 		}
 		catch (NoMessageException&)
@@ -138,7 +145,7 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 	{
 		try
 		{
-			socket().shutdown();
+			socket().close();
 		}
 		catch (...)
 		{
@@ -150,7 +157,7 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 
 		try
 		{
-			socket().shutdown();
+			socket().close();
 		}
 		catch (...)
 		{
