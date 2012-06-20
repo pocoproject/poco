@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerConnection.cpp#4 $
+// $Id: //poco/1.4/Net/src/HTTPServerConnection.cpp#5 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -45,7 +45,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Delegate.h"
 #include <memory>
-#include <iostream>
+
 
 namespace Poco {
 namespace Net {
@@ -107,9 +107,13 @@ void HTTPServerConnection::run()
 				{
 					if (!response.sent())
 					{
-					std::cerr << "sendErrorResponse()" << std::endl;
-						sendErrorResponse(session, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-					std::cerr << "sendErrorResponse() done" << std::endl;
+						try
+						{
+							sendErrorResponse(session, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+						}
+						catch (...)
+						{
+						}
 					}
 					throw;
 				}
