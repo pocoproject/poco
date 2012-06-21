@@ -78,34 +78,36 @@ void HTTPServerConnection::run()
 		try
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
-
-			HTTPServerResponseImpl response(session);
-			HTTPServerRequestImpl request(response, session, _pParams);
+			if (!_stopped)
+			{
+				HTTPServerResponseImpl response(session);
+				HTTPServerRequestImpl request(response, session, _pParams);
 			
-			Poco::Timestamp now;
-			response.setDate(now);
-			response.setVersion(request.getVersion());
-			response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && session.canKeepAlive());
-			if (!server.empty())
-				response.set("Server", server);
-			try
-			{
-				std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
-				if (pHandler.get())
+				Poco::Timestamp now;
+				response.setDate(now);
+				response.setVersion(request.getVersion());
+				response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && session.canKeepAlive());
+				if (!server.empty())
+					response.set("Server", server);
+				try
 				{
-					if (request.expectContinue())
-						response.sendContinue();
+					std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
+					if (pHandler.get())
+					{
+						if (request.expectContinue())
+							response.sendContinue();
 					
-					pHandler->handleRequest(request, response);
-					session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive());
+						pHandler->handleRequest(request, response);
+						session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive());
+					}
+					else sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
 				}
-				else sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
-			}
-			catch (Poco::Exception&)
-			{
-				if (!response.sent())
-					sendErrorResponse(session, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-				throw;
+				catch (Poco::Exception&)
+				{
+					if (!response.sent())
+						sendErrorResponse(session, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+					throw;
+				}
 			}
 		}
 		catch (NoMessageException&)
@@ -138,7 +140,7 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 	{
 		try
 		{
-			socket().shutdown();
+			socket().close();
 		}
 		catch (...)
 		{
@@ -150,7 +152,7 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 
 		try
 		{
-			socket().shutdown();
+			socket().close();
 		}
 		catch (...)
 		{
