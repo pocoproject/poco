@@ -48,14 +48,11 @@ namespace Poco {
 
 
 class Foundation_API UTF32Encoding: public TextEncoding
-	/// UTF-16 text encoding, as defined in RFC 2781.
+	/// UTF-32 text encoding, as defined in RFC 2781.
 	///
-	/// When converting from UTF-16 to Unicode, surrogates are
+	/// When converting from UTF-32 to Unicode, surrogates are
 	/// reported as they are - in other words, surrogate pairs
 	/// are not combined into one Unicode character. 
-	/// When converting from Unicode to UTF-16, however, characters
-	/// outside the 16-bit range are converted into a low and
-	/// high surrogate.
 {
 public:
 	enum ByteOrderType
