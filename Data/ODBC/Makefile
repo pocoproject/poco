@@ -15,7 +15,9 @@ INCLUDE += -I/usr/local/include -I/usr/include -I/usr/include/odbc -I/usr/local/
 SYSLIBS += -L/usr/local/lib/odbc -L/usr/lib/odbc -L/usr/lib -L/usr/local/lib
 
 ifeq ($(POCO_CONFIG),MinGW)
-# Lack of unixODBC or iODBC is not an error for MinGW platform since it uses Windows odbc32.lib
+# -DODBCVER=0x0300: SQLHandle declaration issue
+# -DNOMINMAX      : MIN/MAX macros defined in windows conflict with libstdc++
+CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
 else
 ifeq ($(POCO_CONFIG),CYGWIN)
 # -DODBCVER=0x0300: SQLHandle declaration issue
