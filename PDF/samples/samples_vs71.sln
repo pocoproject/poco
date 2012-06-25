@@ -1,0 +1,49 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Image", "Image\Image_vs71.vcproj", "{DA74060D-73AF-3E8F-A804-FBC960DAC393}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Text", "Text\Text_vs71.vcproj", "{0DE18C25-1694-3598-831D-4FA48D113606}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug_shared = debug_shared
+		release_shared = release_shared
+		debug_static_mt = debug_static_mt
+		release_static_mt = release_static_mt
+		debug_static_md = debug_static_md
+		release_static_md = release_static_md
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.debug_shared.ActiveCfg = debug_shared|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.debug_shared.Build.0 = debug_shared|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.release_shared.ActiveCfg = release_shared|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.release_shared.Build.0 = release_shared|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.debug_static_mt.ActiveCfg = debug_static_mt|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.debug_static_mt.Build.0 = debug_static_mt|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.release_static_mt.ActiveCfg = release_static_mt|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.release_static_mt.Build.0 = release_static_mt|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.debug_static_md.ActiveCfg = debug_static_md|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.debug_static_md.Build.0 = debug_static_md|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.release_static_md.ActiveCfg = release_static_md|Win32
+		{DA74060D-73AF-3E8F-A804-FBC960DAC393}.release_static_md.Build.0 = release_static_md|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.debug_shared.ActiveCfg = debug_shared|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.debug_shared.Build.0 = debug_shared|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.release_shared.ActiveCfg = release_shared|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.release_shared.Build.0 = release_shared|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.debug_static_mt.ActiveCfg = debug_static_mt|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.debug_static_mt.Build.0 = debug_static_mt|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.release_static_mt.ActiveCfg = release_static_mt|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.release_static_mt.Build.0 = release_static_mt|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.debug_static_md.ActiveCfg = debug_static_md|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.debug_static_md.Build.0 = debug_static_md|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.release_static_md.ActiveCfg = release_static_md|Win32
+		{0DE18C25-1694-3598-831D-4FA48D113606}.release_static_md.Build.0 = release_static_md|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

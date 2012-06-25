@@ -375,6 +375,7 @@
     <ClCompile Include="src\RefCountedObject.cpp" />
     <ClCompile Include="src\String.cpp" />
     <ClCompile Include="src\StringTokenizer.cpp" />
+    <ClCompile Include="src\UTF32Encoding.cpp" />
     <ClCompile Include="src\Var.cpp" />
     <ClCompile Include="src\VarHolder.cpp" />
     <ClCompile Include="src\Void.cpp" />
@@ -1022,6 +1023,7 @@
     <ClInclude Include="include\Poco\TypeList.h" />
     <ClInclude Include="include\Poco\Types.h" />
     <ClInclude Include="include\Poco\UnWindows.h" />
+    <ClInclude Include="include\Poco\UTF32Encoding.h" />
     <ClInclude Include="include\Poco\Version.h" />
     <ClInclude Include="include\Poco\Void.h" />
     <ClInclude Include="include\Poco\Base64Decoder.h" />
