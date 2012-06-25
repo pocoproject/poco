@@ -4,5 +4,6 @@ vc.solution.create = true
 vc.solution.include = \
 	Binding\\Binding;\
 	RecordSet\\RecordSet;\
+	RowFormatter\\RowFormatter;\
 	Tuple\\Tuple;\
 	TypeHandler\\TypeHandler
