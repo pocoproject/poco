@@ -5583,6 +5583,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\UTF32Encoding.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\UTF8Encoding.cpp"
 					>
 				</File>
@@ -5652,6 +5656,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\UTF16Encoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\UTF32Encoding.h"
 					>
 				</File>
 				<File
