@@ -11,6 +11,8 @@ Release 1.5.0 (2012-07-30)
 - fixed SF# 3522906: Unregistering handlers from SocketReactor
 - fixed SF# 3522084: AbstractConfiguration does not support 64-bit integers
 - HTTPServer::stopAll(): close the socket instead of just shutting it down, as the latter won't wake up a select() on Windows
+- added SMTPLogger
+- added cmake support
 
 Release 1.4.4 (2012-07-??)
 ==========================
