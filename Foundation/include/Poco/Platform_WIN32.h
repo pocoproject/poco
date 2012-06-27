@@ -56,11 +56,40 @@
 
 // Reduce bloat imported by "Poco/UnWindows.h"
 #if defined(_WIN32)
-	#if !defined(_WIN32_WINNT)
-		#define _WIN32_WINNT 0x0501
-	#endif
+//	#if !defined(_WIN32_WINNT)
+//		#define _WIN32_WINNT 0x0501
+//	#endif
 	#if !defined(WIN32_LEAN_AND_MEAN) && !defined(POCO_BLOATED_WIN32)
 		#define WIN32_LEAN_AND_MEAN
+	#endif
+#endif
+
+
+#include "Poco/UnWindows.h"
+
+
+#if !defined(_WIN32_WINNT)
+	#if defined(_WIN32_WINNT_WIN7)
+		//Windows 7	_WIN32_WINNT_WIN7 (0x0601)
+		#define _WIN32_WINNT _WIN32_WINNT_WIN7
+	#elif defined (_WIN32_WINNT_WS08)
+		//Windows Server 2008 _WIN32_WINNT_WS08 (0x0600)
+		#define _WIN32_WINNT _WIN32_WINNT_WS08
+	#elif defined (_WIN32_WINNT_VISTA) || defined (_WIN32_WINNT_LONGHORN)
+		//Windows Vista	_WIN32_WINNT_VISTA (0x0600)
+		#define _WIN32_WINNT _WIN32_WINNT_VISTA
+	#elif defined (_WIN32_WINNT_WS03)
+		//Windows Server 2003 with SP1,
+		//Windows XP with SP2 _WIN32_WINNT_WS03 (0x0502)
+		#define _WIN32_WINNT _WIN32_WINNT_WS03
+	#elif defined (_WIN32_WINNT_WINXP)
+		//Windows Server 2003, Windows XP _WIN32_WINNT_WINXP (0x0501)
+		#define _WIN32_WINNT _WIN32_WINNT_WINXP
+	#elif defined (_WIN32_WINNT_WIN2K)
+		//Windows 2000 _WIN32_WINNT_WIN2K (0x0500)
+		#define _WIN32_WINNT _WIN32_WINNT_WIN2K
+	#else
+		#define _WIN32_WINNT 0x0500
 	#endif
 #endif
 
@@ -80,6 +109,12 @@
 	#pragma warning(disable:4351) // new behavior: elements of array '...' will be default initialized
 	#pragma warning(disable:4675) // resolved overload was found by argument-dependent lookup
 	#pragma warning(disable:4275) // non dll-interface class 'std::exception' used as base for dll-interface class 'Poco::Exception'
+#endif
+
+
+// Enable C++11 support for VS 2010 and newer
+#if defined(_MSC_VER) && (_MSC_VER >= 1600) && !defined(POCO_ENABLE_CPP11)
+	#define POCO_ENABLE_CPP11
 #endif
 
 

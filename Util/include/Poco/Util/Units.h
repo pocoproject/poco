@@ -328,9 +328,11 @@ Value<V, Power<U, Num, Den> > raise(const Value<V, U>& a)
 
 namespace Internal
 {
+#ifndef POCO_ENABLE_CPP11
 	template <bool> struct static_assert;
 	template <> struct static_assert<true> { };
 		/// Ensures (at compile-time) that the template argument is true.
+#endif
 
 	template <typename T1, typename T2>
 	struct Convertible;
@@ -374,7 +376,11 @@ namespace Internal
 		/// specialize this template.
 		/// The default implementation falls through to Convert2.
 	{
+#ifdef POCO_ENABLE_CPP11
+		static_assert(Convertible<T1,T2>::Value, "Error: Value not convertible.");
+#else
 		static_assert<Convertible<T1,T2>::Value> checkConvertible;
+#endif
 			/// If this fails, then T1 is not Convertible to T2:
 
 		template <typename V>
