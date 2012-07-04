@@ -240,27 +240,27 @@ public:
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
 		
-	void setString(const std::string& key, const std::string& value);
+	virtual void setString(const std::string& key, const std::string& value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
 		
-	void setInt(const std::string& key, int value);
+	virtual void setInt(const std::string& key, int value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
 
 #if defined(POCO_HAVE_INT64)
 
-	void setInt64(const std::string& key, Int64 value);
+	virtual void setInt64(const std::string& key, Int64 value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
 
 #endif // defined(POCO_HAVE_INT64)
 
-	void setDouble(const std::string& key, double value);
+	virtual void setDouble(const std::string& key, double value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
 
-	void setBool(const std::string& key, bool value);
+	virtual void setBool(const std::string& key, bool value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
 		
