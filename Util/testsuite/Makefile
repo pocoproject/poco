@@ -16,10 +16,11 @@ objects = AbstractConfigurationTest ConfigurationTestSuite \
 	OptionsTestSuite PropertyFileConfigurationTest \
 	SystemConfigurationTest UtilTestSuite XMLConfigurationTest \
 	FilesystemConfigurationTest ValidatorTest \
-	TimerTestSuite TimerTest
+	TimerTestSuite TimerTest \
+	JSONConfigurationTest
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoUtil PocoXML PocoFoundation CppUnit
+target_libs    = PocoJSON PocoUtil PocoXML PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec
