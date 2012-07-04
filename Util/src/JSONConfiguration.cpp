@@ -46,7 +46,7 @@ namespace Poco
 namespace Util
 {
 
-JSONConfiguration::JSONConfiguration()
+JSONConfiguration::JSONConfiguration() : _object(new JSON::Object())
 {
 }
 
@@ -205,7 +205,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 				}
 				else
 				{
-					// TODO: throw an error
+					throw SyntaxException("Expected a JSON object");
 				}
 			}
 			else
@@ -240,13 +240,13 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 						}
 						else
 						{
-							// TODO: throw an error
+							throw SyntaxException("Expected a JSON object");
 						}
 					}
 				}
 				else
 				{
-					// TODO: throw an error
+					throw SyntaxException("Expected a JSON array");
 				}
 			}
 		}
@@ -256,6 +256,14 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 
 void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny& value)
 {
+	std::string sValue;
+	value.convert<std::string>(sValue);
+	KeyValue kv(key, sValue);
+	if (eventsEnabled())
+	{
+		propertyChanging(this, kv);
+	}
+
 	std::string lastPart;
 	JSON::Object::Ptr parentObject = findStart(key, lastPart);
 
@@ -276,7 +284,7 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 		}
 		else if ( result.type() != typeid(JSON::Array::Ptr) )
 		{
-			//TODO: throw error
+			throw SyntaxException("Expected a JSON array");
 		}
 
 		JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
@@ -297,6 +305,15 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 		}
 		arr->add(value);
 	}
+	if (eventsEnabled())
+	{
+		propertyChanged(this, kv);
+	}
+}
+
+void JSONConfiguration::setString(const std::string& key, const std::string& value)
+{
+	setValue(key, value);
 }
 
 
@@ -335,6 +352,33 @@ void JSONConfiguration::enumerate(const std::string& key, Keys& range) const
 void JSONConfiguration::save(std::ostream& ostr, unsigned int indent) const
 {
 	_object->stringify(ostr, indent);
+}
+
+void JSONConfiguration::removeRaw(const std::string& key)
+{
+	std::string lastPart;
+	JSON::Object::Ptr parentObject = findStart(key, lastPart);
+	
+	std::vector<int> indexes;
+	getIndexes(lastPart, indexes);
+
+	if ( indexes.empty() ) // No Array
+	{
+		parentObject->remove(lastPart);
+	}
+	else
+	{
+		DynamicAny result = parentObject->get(lastPart);
+		if ( !result.isEmpty() && result.type() == typeid(JSON::Array::Ptr) )
+		{
+			JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
+			for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
+			{
+				arr = arr->getArray(*it);
+			}
+			arr->remove(indexes.back());
+		}
+	}
 }
 
 }} // Namespace Poco::Util

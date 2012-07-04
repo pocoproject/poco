@@ -113,15 +113,20 @@ public:
 		/// Saves the configuration to the given stream
 
 
-	void setInt(const std::string& key, int value);
+	virtual void setInt(const std::string& key, int value);
 
 
-	void setBool(const std::string& key, bool value);
+	virtual void setBool(const std::string& key, bool value);
 
 
-	void setDouble(const std::string& key, double value);
+	virtual void setDouble(const std::string& key, double value);
 
 
+	virtual void setString(const std::string& key, const std::string& value);
+	
+
+	virtual void removeRaw(const std::string& key);	
+	
 
 protected:
 
