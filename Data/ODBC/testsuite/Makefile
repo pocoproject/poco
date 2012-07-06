@@ -9,10 +9,10 @@
 include $(POCO_BASE)/build/rules/global
 
 # adjust for the target system (usually '/usr/lib' or '/usr/local/lib')
-ODBCLIBDIR = /usr/lib
+ODBCLIBDIR = /usr/lib$(LIB64SUFFIX)
 
 INCLUDE += -I/usr/local/include -I/usr/include -I/usr/include/odbc -I/usr/local/include/odbc
-SYSLIBS += -L/usr/local/lib/odbc -L/usr/lib/odbc -L/usr/lib -L/usr/local/lib
+SYSLIBS += -L/usr/local/lib$(LIB64SUFFIX)/odbc -L/usr/lib$(LIB64SUFFIX)/odbc -L/usr/lib$(LIB64SUFFIX) -L/usr/local/lib$(LIB64SUFFIX) 
 
 ifeq ($(POCO_CONFIG),MinGW)
 # Lack of unixODBC or iODBC is not an error for MinGW platform since it uses Windows odbc32.lib
@@ -47,6 +47,9 @@ endif
 endif
 endif
 endif
+
+# !!! do not move up, this has to be the last !!!
+SYSLIBS += -lltdl -ldl
 
 objects = ODBCTestSuite Driver \
 	ODBCDB2Test ODBCMySQLTest ODBCOracleTest \

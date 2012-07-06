@@ -117,19 +117,6 @@ endif
 include $(POCO_BASE)/build/config/$(POCO_CONFIG)
 
 #
-# Check if a 64bit build is requested
-#
-ifndef OSARCH_64BITS
-OSARCH_64BITS = 0
-endif
-
-ifeq ($(OSARCH_64BITS),1)
-OSARCH_POSTFIX = 64
-else
-OSARCH_POSTFIX =
-endif
-
-#
 # Determine operating system
 #
 ifndef POCO_TARGET_OSNAME
@@ -143,6 +130,37 @@ else
 OSARCH   := $(POCO_TARGET_OSARCH)
 endif
 HOSTNAME := $(shell hostname)
+
+#
+# Check if a 64bit build is requested
+#
+ifndef OSARCH_64BITS
+OSARCH_64BITS = 0
+endif
+
+ifeq ($(OSARCH_64BITS),1)
+OSARCH_POSTFIX = 64
+else
+OSARCH_POSTFIX =
+endif
+
+#
+# Detect distro
+#
+
+# Fedora, Redhat, Centos.
+REDHATISH = $(if $(wildcard /etc/redhat-release /etc/centos-release /etc/fedora-release),1)
+# Debian, Ubuntu
+DEBIANISH = $(if $(wildcard /etc/debian_version),1)
+
+#
+# Adjust suffix for 64-bit lib directory
+#
+ifneq ($(REDHATISH),)
+LIB64SUFFIX = $(if $(filter $(OSARCH),x86_64 sparc64 ppc64),64,)
+else ifneq ($(DEBIANISH),)
+LIB64SUFFIX = $(if $(filter $(OSARCH),x86_64 sparc64 ppc64),/x86_64-linux-gnu,)
+endif
 
 #
 # Find out current component

@@ -8,6 +8,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
+SYSLIBS += -lssl -lcrypto -lz -ldl
+
 objects = Mail
 
 target         = Mail

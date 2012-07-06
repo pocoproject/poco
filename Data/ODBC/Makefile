@@ -9,10 +9,10 @@
 include $(POCO_BASE)/build/rules/global
 
 # adjust for the target system (usually '/usr/lib' or '/usr/local/lib')
-ODBCLIBDIR = /usr/lib
+ODBCLIBDIR = /usr/lib$(LIB64SUFFIX)
 
 INCLUDE += -I/usr/local/include -I/usr/include -I/usr/include/odbc -I/usr/local/include/odbc
-SYSLIBS += -L/usr/local/lib/odbc -L/usr/lib/odbc -L/usr/lib -L/usr/local/lib
+SYSLIBS += -L/usr/lib$(LIB64SUFFIX) -L/usr/local/lib$(LIB64SUFFIX) -L/usr/lib$(LIB64SUFFIX)/odbc -L/usr/local/lib$(LIB64SUFFIX)/odbc
 
 ifeq ($(POCO_CONFIG),MinGW)
 # -DODBCVER=0x0300: SQLHandle declaration issue
@@ -42,7 +42,7 @@ ifeq (0, $(shell test -h $(ODBCLIBDIR)/libiodbc$(SHAREDLIBLINKEXT); echo $$?))
 SYSLIBS += -liodbc -liodbcinst
 COMMONFLAGS += -DPOCO_IODBC
 else
-$(error No ODBC library found. Please install unixODBC or iODBC and try again)
+$(error No ODBC library found in \n $(SYSLIBS) \n Please install unixODBC or iODBC and try again)
 endif
 endif
 endif

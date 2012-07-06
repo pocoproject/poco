@@ -8,7 +8,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-SYSLIBS += -lssl -lcrypto
+SYSLIBS += -lssl -lcrypto -lz -ldl
 
 objects = NetSSLTestSuite Driver \
 	HTTPSClientSessionTest HTTPSClientTestSuite HTTPSServerTest HTTPSServerTestSuite \

@@ -9,7 +9,7 @@
 include $(POCO_BASE)/build/rules/global
 
 INCLUDE += -I./../include -I/usr/local/include/mysql -I/usr/include/mysql -I/usr/mysql/include/mysql -I/usr/local/mysql/include
-SYSLIBS += -L/usr/local/lib/mysql -L/usr/lib/mysql -L/usr/mysql/lib/mysql -L/usr/local/mysql/lib -lmysqlclient -lz
+SYSLIBS += -L/usr/local/lib$(LIB64SUFFIX)/mysql -L/usr/lib$(LIB64SUFFIX)/mysql -L/usr/mysql/lib$(LIB64SUFFIX)/mysql -L/usr/local/mysql/lib$(LIB64SUFFIX) -lmysqlclient -lz -lpthread -ldl
 
 objects = MySQLTestSuite Driver \
 	MySQLTest SQLExecutor
