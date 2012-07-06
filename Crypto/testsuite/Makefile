@@ -8,11 +8,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-SYSLIBS += -lssl -lcrypto -lz -ldl
-
-ifeq ($(LINKMODE),STATIC)
-SYSLIBS += -lz -ldl
-endif
+SYSLIBS += -lssl -lcrypto -lz -ldl -lz -ldl
 
 objects = CryptoTestSuite Driver \
 	CryptoTest RSATest DigestEngineTest
