@@ -12,6 +12,6 @@ objects = Text
 
 target         = Text
 target_version = 1
-target_libs    = PocoFoundation PocoPDF
+target_libs    = PocoPDF PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

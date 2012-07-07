@@ -8,6 +8,9 @@
 
 include $(POCO_BASE)/build/rules/global
 
+# Note: linking order is important, do not change it.
+SYSLIBS += -lssl -lcrypto -lz -ldl
+
 objects = Mail
 
 target         = Mail

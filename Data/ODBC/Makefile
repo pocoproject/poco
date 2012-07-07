@@ -15,10 +15,10 @@
 include $(POCO_BASE)/build/rules/global
 
 # adjust for the target system (usually '/usr/lib' or '/usr/local/lib')
-ODBCLIBDIR = /usr/lib
+ODBCLIBDIR = /usr/lib$(LIB64SUFFIX)
 
 INCLUDE += -I/usr/local/include -I/usr/include -I/usr/include/odbc -I/usr/local/include/odbc
-SYSLIBS += -L/usr/local/lib/odbc -L/usr/lib/odbc -L/usr/lib -L/usr/local/lib
+SYSLIBS += -L/usr/lib$(LIB64SUFFIX) -L/usr/local/lib$(LIB64SUFFIX) -L/usr/lib$(LIB64SUFFIX)/odbc -L/usr/local/lib$(LIB64SUFFIX)/odbc
 
 ifeq ($(POCO_CONFIG),MinGW)
 # -DODBCVER=0x0300: SQLHandle declaration issue

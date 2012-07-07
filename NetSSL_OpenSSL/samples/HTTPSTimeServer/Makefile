@@ -8,7 +8,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
-SYSLIBS += -lssl -lcrypto
+# Note: linking order is important, do not change it.
+SYSLIBS += -lssl -lcrypto -lz -ldl
 
 objects = HTTPSTimeServer
 
