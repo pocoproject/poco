@@ -143,8 +143,8 @@ while [ $# -ge 1 ]; do
 	--no-wstring)
 		flags="$flags -DPOCO_NO_WSTRING" ;;
 
-	--no-fpevnironment)
-		flags="$flags -DPOCO_NO_PFENVIRONMENT" ;;
+	--no-fpenvironment)
+		flags="$flags -DPOCO_NO_FPENVIRONMENT" ;;
 
 	--no-sharedmemory)
 		flags="$flags -DPOCO_NO_SHAREDMEMORY" ;;
