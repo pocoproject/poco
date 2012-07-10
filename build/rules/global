@@ -162,6 +162,9 @@ else ifneq ($(DEBIANISH),)
 LIB64SUFFIX = $(if $(filter $(OSARCH),x86_64 sparc64 ppc64),/x86_64-linux-gnu,)
 endif
 
+# Default static lib extension
+STATICLIBLINKEXT = .a
+
 #
 # Find out current component
 #
