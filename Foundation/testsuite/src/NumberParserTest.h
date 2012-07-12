@@ -40,6 +40,8 @@
 #include "CppUnit/TestCase.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
+#undef max
+#undef min
 #include <limits>
 
 class NumberParserTest: public CppUnit::TestCase

@@ -301,9 +301,9 @@ SocketAddress::~SocketAddress()
 
 bool SocketAddress::operator < (const SocketAddress& addr) const
 {
-        if (family() < addr.family()) return true;
-        if (host() < addr.host()) return true;
-        return (port() < addr.port());
+	if (family() < addr.family()) return true;
+	if (host() < addr.host()) return true;
+	return (port() < addr.port());
 }
 
 

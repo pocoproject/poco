@@ -36,6 +36,8 @@
 
 #include "Poco/PDF/Page.h"
 #include "Poco/PDF/PDFException.h"
+#undef min
+#undef max
 #include <limits>
 
 
