@@ -13,6 +13,11 @@ Release 1.5.0 (2012-07-30)
 - HTTPServer::stopAll(): close the socket instead of just shutting it down, as the latter won't wake up a select() on Windows
 - added SMTPLogger
 - added cmake support
+- fixed SF#3538778: NetworkInterface enumeration uses deprecated API
+- fixed SF#3538779: IPAddress lacks useful constructors: from prefix mask, native SOCKADDR
+- fixed SF#3538780: SocketAddress needs operator < function
+- fixed SF#3538775: Issues building on Fedora/Centos, etc. for AMD64
+- fixed SF#3538786: Use size_t for describing data-blocks in DigestEngine
 
 Release 1.4.4 (2012-07-??)
 ==========================
