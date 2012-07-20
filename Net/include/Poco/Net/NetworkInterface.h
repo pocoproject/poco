@@ -109,7 +109,7 @@ public:
 		/// connection in a future version, however. 
 		///
 		/// On other platforms this is the same as name().
-		
+
 	const IPAddress& address() const;
 		/// Returns the IP address bound to the interface.
 		
@@ -118,13 +118,40 @@ public:
 		
 	const IPAddress& broadcastAddress() const;
 		/// Returns the IPv4 broadcast address for this network interface.
-		
+
+	const IPAddress& destAddress() const;
+		/// Returns the IPv4 point-to-point destiation address for this network interface.
+
+	int mtu() const;
+		/// Returns the MTU for this interface.
+ 		
+	int ifindex() const;
+		/// Returns the OS's index for this interface.
+
 	bool supportsIPv4() const;
 		/// Returns true if the interface supports IPv4.
-		
+
 	bool supportsIPv6() const;
 		/// Returns true if the interface supports IPv6.	
-		
+
+	bool supportsBroadcast() const;
+		/// Returns true if the interface supports broadcast.
+
+	bool supportsMulticast() const;
+		/// Returns true if the interface supports multicast.
+
+	bool isLoopback() const;
+		/// Returns true if the interface is loopback.
+
+	bool isPointToPoint() const;
+		/// Returns true if the interface is point-to-point.
+
+	bool isRunning() const;
+		/// Returns true if the interface is running.
+
+	bool isUp() const;
+		/// Returns true if the interface is up.
+
 	static NetworkInterface forName(const std::string& name, bool requireIPv6 = false);
 		/// Returns the NetworkInterface for the given name.
 		/// 
