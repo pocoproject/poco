@@ -77,7 +77,7 @@ inline void SHA1Engine::byteReverse(UInt32* buffer, int byteCount)
 }
 
 	
-void SHA1Engine::updateImpl(const void* buffer_, unsigned count)
+void SHA1Engine::updateImpl(const void* buffer_, std::size_t count)
 {
 	const BYTE* buffer = (const BYTE*) buffer_;
 	BYTE* db = (BYTE*) &_context.data[0];
@@ -103,7 +103,7 @@ void SHA1Engine::updateImpl(const void* buffer_, unsigned count)
 }
 
 
-unsigned SHA1Engine::digestLength() const
+std::size_t SHA1Engine::digestLength() const
 {
 	return DIGEST_SIZE;
 }

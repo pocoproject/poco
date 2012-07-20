@@ -84,17 +84,17 @@ public:
 	MD4Engine();
 	~MD4Engine();
 		
-	unsigned digestLength() const;
+	std::size_t digestLength() const;
 	void reset();
 	const DigestEngine::Digest& digest();
 
 protected:
-	void updateImpl(const void* data, unsigned length);
+	void updateImpl(const void* data, std::size_t length);
 
 private:
 	static void transform(UInt32 state[4], const unsigned char block[64]);
-	static void encode(unsigned char* output, const UInt32* input, unsigned int len);
-	static void decode(UInt32* output, const unsigned char* input, unsigned int len);
+	static void encode(unsigned char* output, const UInt32* input, std::size_t len);
+	static void decode(UInt32* output, const unsigned char* input, std::size_t len);
 
 	struct Context
 	{

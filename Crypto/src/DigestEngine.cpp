@@ -58,7 +58,7 @@ DigestEngine::~DigestEngine()
 }
 
 
-unsigned DigestEngine::digestLength() const
+std::size_t DigestEngine::digestLength() const
 {
 	return EVP_MD_CTX_size(_ctx);
 }

@@ -68,10 +68,10 @@ public:
 	
 	HMACEngine(const std::string& passphrase)
 	{
-		init(passphrase.data(), (unsigned) passphrase.length());
+		init(passphrase.data(), passphrase.length());
 	}
 	
-	HMACEngine(const char* passphrase, unsigned length)
+	HMACEngine(const char* passphrase, std::size_t length)
 	{
 		poco_check_ptr (passphrase);
 
@@ -86,7 +86,7 @@ public:
 		delete [] _opad;
 	}
 		
-	unsigned digestLength() const
+	std::size_t digestLength() const
 	{
 		return DIGEST_SIZE;
 	}
@@ -113,7 +113,7 @@ public:
 	}
 
 protected:
-	void init(const char* passphrase, unsigned length)
+	void init(const char* passphrase, std::size_t length)
 	{
 		_ipad = new char[BLOCK_SIZE];
 		_opad = new char[BLOCK_SIZE];
@@ -146,7 +146,7 @@ protected:
 		reset();
 	}
 	
-	void updateImpl(const void* data, unsigned length)
+	void updateImpl(const void* data, std::size_t length)
 	{
 		_engine.update(data, length);
 	}

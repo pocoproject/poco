@@ -63,12 +63,12 @@ public:
 	DigestEngine();
 	virtual ~DigestEngine();
 		
-	void update(const void* data, unsigned length);
+	void update(const void* data, std::size_t length);
 	void update(char data);
 	void update(const std::string& data);
 		/// Updates the digest with the given data.
 		
-	virtual unsigned digestLength() const = 0;
+	virtual std::size_t digestLength() const = 0;
 		/// Returns the length of the digest in bytes.
 
 	virtual void reset() = 0;
@@ -89,7 +89,7 @@ public:
                 /// Converts a string created by digestToHex back to its Digest presentation
 
 protected:
-        virtual void updateImpl(const void* data, unsigned length) = 0;
+        virtual void updateImpl(const void* data, std::size_t length) = 0;
                 /// Updates the digest with the given data. Must be implemented
 		/// by subclasses.
 		
@@ -104,7 +104,7 @@ private:
 //
 
 
-inline void DigestEngine::update(const void* data, unsigned length)
+inline void DigestEngine::update(const void* data, std::size_t length)
 {
 	updateImpl(data, length);
 }
@@ -118,7 +118,7 @@ inline void DigestEngine::update(char data)
 
 inline void DigestEngine::update(const std::string& data)
 {
-	updateImpl(data.data(), (unsigned) data.size());	
+	updateImpl(data.data(), data.size());	
 }
 
 

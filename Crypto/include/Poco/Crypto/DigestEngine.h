@@ -68,7 +68,7 @@ public:
 		/// Returns the name of the digest algorithm.
 	
 	// DigestEngine
-	unsigned digestLength() const;
+	std::size_t digestLength() const;
 	void reset();
 	const Poco::DigestEngine::Digest& digest();
 

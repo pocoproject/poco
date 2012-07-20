@@ -55,7 +55,7 @@ RSADigestEngine::~RSADigestEngine()
 }
 
 
-unsigned RSADigestEngine::digestLength() const
+std::size_t RSADigestEngine::digestLength() const
 {
 	return _engine.digestLength();
 }
@@ -104,7 +104,7 @@ bool RSADigestEngine::verify(const DigestEngine::Digest& sig)
 }
 
 
-void RSADigestEngine::updateImpl(const void* data, unsigned length)
+void RSADigestEngine::updateImpl(const void* data, std::size_t length)
 {
 	_engine.update(data, length);
 }

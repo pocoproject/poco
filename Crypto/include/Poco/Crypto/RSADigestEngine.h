@@ -82,7 +82,7 @@ public:
 	~RSADigestEngine();
 		/// Destroys the RSADigestEngine.
 
-	unsigned digestLength() const;
+	std::size_t digestLength() const;
 		/// Returns the length of the digest in bytes.
 
 	void reset();
@@ -109,7 +109,7 @@ public:
 		/// Returns true if the signature can be verified, false otherwise.
 
 protected:
-	void updateImpl(const void* data, unsigned length);
+	void updateImpl(const void* data, std::size_t length);
 
 private:
 	RSAKey _key;

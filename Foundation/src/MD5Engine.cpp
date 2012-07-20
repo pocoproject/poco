@@ -77,7 +77,7 @@ MD5Engine::~MD5Engine()
 }
 
 	
-void MD5Engine::updateImpl(const void* input_, unsigned inputLen)
+void MD5Engine::updateImpl(const void* input_, std::size_t inputLen)
 {
 	const unsigned char* input = (const unsigned char*) input_;
 	unsigned int i, index, partLen;
@@ -110,7 +110,7 @@ void MD5Engine::updateImpl(const void* input_, unsigned inputLen)
 }
 
 
-unsigned MD5Engine::digestLength() const
+std::size_t MD5Engine::digestLength() const
 {
 	return DIGEST_SIZE;
 }
@@ -304,7 +304,7 @@ void MD5Engine::transform (UInt32 state[4], const unsigned char block[64])
 }
 
 
-void MD5Engine::encode(unsigned char* output, const UInt32* input, unsigned int len)
+void MD5Engine::encode(unsigned char* output, const UInt32* input, std::size_t len)
 {
 	unsigned int i, j;
 
@@ -318,7 +318,7 @@ void MD5Engine::encode(unsigned char* output, const UInt32* input, unsigned int 
 }
 
 
-void MD5Engine::decode(UInt32* output, const unsigned char* input, unsigned int len)
+void MD5Engine::decode(UInt32* output, const unsigned char* input, std::size_t len)
 {
 	unsigned int i, j;
 

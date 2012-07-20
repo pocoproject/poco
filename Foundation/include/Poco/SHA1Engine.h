@@ -67,12 +67,12 @@ public:
 	SHA1Engine();
 	~SHA1Engine();
 		
-	unsigned digestLength() const;
+	std::size_t digestLength() const;
 	void reset();
 	const DigestEngine::Digest& digest();
 
 protected:
-	void updateImpl(const void* data, unsigned length);
+	void updateImpl(const void* data, std::size_t length);
 
 private:
 	void transform();
