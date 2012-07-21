@@ -38,13 +38,17 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
+#include "Poco/String.h"
 #include "Poco/Types.h"
-#include <algorithm>
-#include <cstring>
 
 
 using Poco::RefCountedObject;
 using Poco::NumberFormatter;
+using Poco::BinaryReader;
+using Poco::BinaryWriter;
+using Poco::toLower;
 using Poco::UInt8;
 using Poco::UInt16;
 using Poco::UInt32;
@@ -279,8 +283,43 @@ public:
 	{
 		return new IPv4AddressImpl(&_addr);
 	}
-		
-private:
+
+	IPv4AddressImpl operator & (const IPv4AddressImpl& addr) const
+	{
+		IPv4AddressImpl result(&_addr);
+		result._addr.s_addr &= addr._addr.s_addr;
+		return result;
+	}
+
+	IPv4AddressImpl operator | (const IPv4AddressImpl& addr) const
+	{
+		IPv4AddressImpl result(&_addr);
+		result._addr.s_addr |= addr._addr.s_addr;
+		return result;
+	}
+
+	IPv4AddressImpl operator ^ (const IPv4AddressImpl& addr) const
+	{
+		IPv4AddressImpl result(&_addr);
+		result._addr.s_addr ^= addr._addr.s_addr;
+		return result;
+	}
+
+	IPv4AddressImpl operator ~ () const
+	{
+		IPv4AddressImpl result(&_addr);
+		result._addr.s_addr ^= 0xffffffff;
+		return result;
+	}
+
+private:	
+	IPv4AddressImpl(const IPv4AddressImpl& addr)
+	{
+		std::memcpy(&_addr, &addr._addr, sizeof(_addr));
+	}
+
+	IPv4AddressImpl& operator = (const IPv4AddressImpl&);
+
 	struct in_addr _addr;
 };
 
@@ -341,7 +380,7 @@ public:
 			if (words[5] == 0)
 				result.append("::");
 			else
-				result.append("::FFFF:");
+				result.append("::ffff:");
 			const UInt8* bytes = reinterpret_cast<const UInt8*>(&_addr);
 			NumberFormatter::append(result, bytes[12]);
 			result.append(".");
@@ -391,7 +430,7 @@ public:
 				}
 #endif
 			}
-			return result;
+			return toLower(result);
 		}
 	}
 	
@@ -557,8 +596,131 @@ public:
 		return new IPv6AddressImpl(&_addr, _scope);
 	}
 
+	IPv6AddressImpl operator & (const IPv6AddressImpl& addr) const
+	{
+		IPv6AddressImpl result(&_addr);
+#ifdef POCO_OS_FAMILY_WINDOWS
+		result._addr.s6_addr[0] &= addr._addr.s6_addr[0];
+		result._addr.s6_addr[1] &= addr._addr.s6_addr[1];
+		result._addr.s6_addr[2] &= addr._addr.s6_addr[2];
+		result._addr.s6_addr[3] &= addr._addr.s6_addr[3];
+		result._addr.s6_addr[4] &= addr._addr.s6_addr[4];
+		result._addr.s6_addr[5] &= addr._addr.s6_addr[5];
+		result._addr.s6_addr[6] &= addr._addr.s6_addr[6];
+		result._addr.s6_addr[7] &= addr._addr.s6_addr[7];
+		result._addr.s6_addr[8] &= addr._addr.s6_addr[8];
+		result._addr.s6_addr[9] &= addr._addr.s6_addr[9];
+		result._addr.s6_addr[10] &= addr._addr.s6_addr[10];
+		result._addr.s6_addr[11] &= addr._addr.s6_addr[11];
+		result._addr.s6_addr[12] &= addr._addr.s6_addr[12];
+		result._addr.s6_addr[13] &= addr._addr.s6_addr[13];
+		result._addr.s6_addr[14] &= addr._addr.s6_addr[14];
+		result._addr.s6_addr[15] &= addr._addr.s6_addr[15];
+#else
+		result._addr.s6_addr32[0] &= addr._addr.s6_addr32[0];
+		result._addr.s6_addr32[1] &= addr._addr.s6_addr32[1];
+		result._addr.s6_addr32[2] &= addr._addr.s6_addr32[2];
+		result._addr.s6_addr32[3] &= addr._addr.s6_addr32[3];
+#endif
+		return result;
+	}
+
+	IPv6AddressImpl operator | (const IPv6AddressImpl& addr) const
+	{
+		IPv6AddressImpl result(&_addr);
+#ifdef POCO_OS_FAMILY_WINDOWS
+		result._addr.s6_addr[0] |= addr._addr.s6_addr[0];
+		result._addr.s6_addr[1] |= addr._addr.s6_addr[1];
+		result._addr.s6_addr[2] |= addr._addr.s6_addr[2];
+		result._addr.s6_addr[3] |= addr._addr.s6_addr[3];
+		result._addr.s6_addr[4] |= addr._addr.s6_addr[4];
+		result._addr.s6_addr[5] |= addr._addr.s6_addr[5];
+		result._addr.s6_addr[6] |= addr._addr.s6_addr[6];
+		result._addr.s6_addr[7] |= addr._addr.s6_addr[7];
+		result._addr.s6_addr[8] |= addr._addr.s6_addr[8];
+		result._addr.s6_addr[9] |= addr._addr.s6_addr[9];
+		result._addr.s6_addr[10] |= addr._addr.s6_addr[10];
+		result._addr.s6_addr[11] |= addr._addr.s6_addr[11];
+		result._addr.s6_addr[12] |= addr._addr.s6_addr[12];
+		result._addr.s6_addr[13] |= addr._addr.s6_addr[13];
+		result._addr.s6_addr[14] |= addr._addr.s6_addr[14];
+		result._addr.s6_addr[15] |= addr._addr.s6_addr[15];
+#else
+		result._addr.s6_addr32[0] |= addr._addr.s6_addr32[0];
+		result._addr.s6_addr32[1] |= addr._addr.s6_addr32[1];
+		result._addr.s6_addr32[2] |= addr._addr.s6_addr32[2];
+		result._addr.s6_addr32[3] |= addr._addr.s6_addr32[3];
+#endif
+		return result;
+	}
+
+	IPv6AddressImpl operator ^ (const IPv6AddressImpl& addr) const
+	{
+		IPv6AddressImpl result(&_addr);
+#ifdef POCO_OS_FAMILY_WINDOWS
+		result._addr.s6_addr[0] ^= addr._addr.s6_addr[0];
+		result._addr.s6_addr[1] ^= addr._addr.s6_addr[1];
+		result._addr.s6_addr[2] ^= addr._addr.s6_addr[2];
+		result._addr.s6_addr[3] ^= addr._addr.s6_addr[3];
+		result._addr.s6_addr[4] ^= addr._addr.s6_addr[4];
+		result._addr.s6_addr[5] ^= addr._addr.s6_addr[5];
+		result._addr.s6_addr[6] ^= addr._addr.s6_addr[6];
+		result._addr.s6_addr[7] ^= addr._addr.s6_addr[7];
+		result._addr.s6_addr[8] ^= addr._addr.s6_addr[8];
+		result._addr.s6_addr[9] ^= addr._addr.s6_addr[9];
+		result._addr.s6_addr[10] ^= addr._addr.s6_addr[10];
+		result._addr.s6_addr[11] ^= addr._addr.s6_addr[11];
+		result._addr.s6_addr[12] ^= addr._addr.s6_addr[12];
+		result._addr.s6_addr[13] ^= addr._addr.s6_addr[13];
+		result._addr.s6_addr[14] ^= addr._addr.s6_addr[14];
+		result._addr.s6_addr[15] ^= addr._addr.s6_addr[15];
+#else
+		result._addr.s6_addr32[0] ^= addr._addr.s6_addr32[0];
+		result._addr.s6_addr32[1] ^= addr._addr.s6_addr32[1];
+		result._addr.s6_addr32[2] ^= addr._addr.s6_addr32[2];
+		result._addr.s6_addr32[3] ^= addr._addr.s6_addr32[3];
+#endif
+		return result;
+	}
+
+	IPv6AddressImpl operator ~ () const
+	{
+		IPv6AddressImpl result(&_addr);
+#ifdef POCO_OS_FAMILY_WINDOWS
+		result._addr.s6_addr[0] ^= 0xff;
+		result._addr.s6_addr[1] ^= 0xff;
+		result._addr.s6_addr[2] ^= 0xff;
+		result._addr.s6_addr[3] ^= 0xff;
+		result._addr.s6_addr[4] ^= 0xff;
+		result._addr.s6_addr[5] ^= 0xff;
+		result._addr.s6_addr[6] ^= 0xff;
+		result._addr.s6_addr[7] ^= 0xff;
+		result._addr.s6_addr[8] ^= 0xff;
+		result._addr.s6_addr[9] ^= 0xff;
+		result._addr.s6_addr[10] ^= 0xff;
+		result._addr.s6_addr[11] ^= 0xff;
+		result._addr.s6_addr[12] ^= 0xff;
+		result._addr.s6_addr[13] ^= 0xff;
+		result._addr.s6_addr[14] ^= 0xff;
+		result._addr.s6_addr[15] ^= 0xff;
+#else
+		result._addr.s6_addr32[0] ^= 0xffffffff;
+		result._addr.s6_addr32[1] ^= 0xffffffff;
+		result._addr.s6_addr32[2] ^= 0xffffffff;
+		result._addr.s6_addr32[3] ^= 0xffffffff;
+#endif
+		return result;
+	}
+
 private:
-	struct in6_addr _addr;
+	IPv6AddressImpl(const IPv6AddressImpl& addr): _scope(0)
+	{
+		std::memcpy((void*) &_addr, (void*) &addr._addr, sizeof(_addr));
+	}
+
+	IPv6AddressImpl& operator = (const IPv6AddressImpl&);
+
+	struct in6_addr _addr;	
 	Poco::UInt32    _scope;
 };
 
@@ -890,6 +1052,103 @@ bool IPAddress::operator >= (const IPAddress& a) const
 }
 
 
+IPAddress IPAddress::operator & (const IPAddress& other) const
+{
+	if (family() == other.family())
+	{
+		if (family() == IPv4)
+		{
+			IPv4AddressImpl self(_pImpl->addr());
+			IPv4AddressImpl other(other._pImpl->addr());
+			return IPAddress((self & other).addr(), sizeof(struct in_addr));
+		}
+#if defined(POCO_HAVE_IPv6)
+		else if (family() == IPv6)
+		{
+			IPv6AddressImpl self(_pImpl->addr());
+			IPv6AddressImpl other(other._pImpl->addr());
+			return IPAddress((self & other).addr(), sizeof(struct in6_addr));
+		}
+#endif
+		else
+			throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	}
+	else
+		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+}
+
+
+IPAddress IPAddress::operator | (const IPAddress& other) const
+{
+	if (family() == other.family())
+	{
+		if (family() == IPv4)
+		{
+			IPv4AddressImpl self(_pImpl->addr());
+			IPv4AddressImpl other(other._pImpl->addr());
+			return IPAddress((self | other).addr(), sizeof(struct in_addr));
+		}
+#if defined(POCO_HAVE_IPv6)
+		else if (family() == IPv6)
+		{
+			IPv6AddressImpl self(_pImpl->addr());
+			IPv6AddressImpl other(other._pImpl->addr());
+			return IPAddress((self | other).addr(), sizeof(struct in6_addr));
+		}
+#endif
+		else
+			throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	}
+	else
+		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+}
+
+
+IPAddress IPAddress::operator ^ (const IPAddress& other) const
+{
+	if (family() == other.family())
+	{
+		if (family() == IPv4)
+		{
+			IPv4AddressImpl self(_pImpl->addr());
+			IPv4AddressImpl other(other._pImpl->addr());
+			return IPAddress((self ^ other).addr(), sizeof(struct in_addr));
+		}
+#if defined(POCO_HAVE_IPv6)
+		else if (family() == IPv6)
+		{
+			IPv6AddressImpl self(_pImpl->addr());
+			IPv6AddressImpl other(other._pImpl->addr());
+			return IPAddress((self ^ other).addr(), sizeof(struct in6_addr));
+		}
+#endif
+		else
+			throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	}
+	else
+		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+}
+
+
+IPAddress IPAddress::operator ~ () const
+{
+	if (family() == IPv4)
+	{
+		IPv4AddressImpl self(_pImpl->addr());
+		return IPAddress((~self).addr(), sizeof(struct in_addr));
+	}
+#if defined(POCO_HAVE_IPv6)
+	else if (family() == IPv6)
+	{
+		IPv6AddressImpl self(_pImpl->addr());
+		return IPAddress((~self).addr(), sizeof(struct in6_addr));
+	}
+#endif
+	else
+		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+}
+
+
 poco_socklen_t IPAddress::length() const
 {
 	return _pImpl->length();
@@ -966,6 +1225,21 @@ IPAddress IPAddress::broadcast()
 	struct in_addr ia;
 	ia.s_addr = INADDR_NONE;
 	return IPAddress(&ia, sizeof(ia));
+}
+
+
+BinaryWriter& operator << (BinaryWriter& writer, const IPAddress& value)
+{
+	writer.stream().write((const char*) value.addr(), value.length());
+	return writer;
+}
+
+BinaryReader& operator >> (BinaryReader& reader, IPAddress& value)
+{
+	char buf[sizeof(struct in6_addr)];
+	reader.stream().read(buf, value.length());
+	value = IPAddress(buf, value.length());
+	return reader;
 }
 
 

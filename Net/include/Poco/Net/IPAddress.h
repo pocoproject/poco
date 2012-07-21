@@ -45,6 +45,10 @@
 
 
 namespace Poco {
+
+class BinaryReader;
+class BinaryWriter;
+
 namespace Net {
 
 
@@ -121,7 +125,7 @@ public:
 
 #if defined(_WIN32)
 	IPAddress(const SOCKET_ADDRESS& socket_address);
-			/// Creates an IPAddress from a SOCKET_ADDRESS wrapper for Windows.
+			/// Creates an IPAddress from Windows SOCKET_ADDRESS structure.
 #endif
 
 	IPAddress(const struct sockaddr& sockaddr);
@@ -308,6 +312,10 @@ public:
 	bool operator <= (const IPAddress& addr) const;
 	bool operator >  (const IPAddress& addr) const;
 	bool operator >= (const IPAddress& addr) const;
+	IPAddress operator & (const IPAddress& addr) const;
+	IPAddress operator | (const IPAddress& addr) const;
+	IPAddress operator ^ (const IPAddress& addr) const;
+	IPAddress operator ~ () const;
 		
 	poco_socklen_t length() const;
 		/// Returns the length in bytes of the internal socket address structure.	
@@ -385,6 +393,9 @@ inline void swap(IPAddress& addr1, IPAddress& addr2)
 	addr1.swap(addr2);
 }
 
+
+BinaryWriter& operator << (BinaryWriter& writer, const IPAddress& value);
+BinaryReader& operator >> (BinaryReader& reader, IPAddress& value);
 
 } } // namespace Poco::Net
 

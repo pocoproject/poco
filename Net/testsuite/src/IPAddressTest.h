@@ -57,6 +57,8 @@ public:
 	void testRelationals6();
 	void testWildcard();
 	void testBroadcast();
+	void testPrefixCons();
+	void testOperators();
 	
 	void setUp();
 	void tearDown();

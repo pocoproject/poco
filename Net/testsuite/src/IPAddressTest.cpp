@@ -78,25 +78,25 @@ void IPAddressTest::testStringConv()
 void IPAddressTest::testStringConv6()
 {
 #ifdef POCO_HAVE_IPv6
-	IPAddress ia1("1080:0:0:0:8:600:200A:425C");
+	IPAddress ia1("1080:0:0:0:8:600:200a:425c");
 	assert (ia1.family() == IPAddress::IPv6);
-	assert (ia1.toString() == "1080::8:600:200A:425C");
+	assert (ia1.toString() == "1080::8:600:200a:425c");
 	
 	IPAddress ia2("1080::8:600:200A:425C");
 	assert (ia2.family() == IPAddress::IPv6);
-	assert (ia2.toString() == "1080::8:600:200A:425C");
+	assert (ia2.toString() == "1080::8:600:200a:425c");
 	
 	IPAddress ia3("::192.168.1.120");
 	assert (ia3.family() == IPAddress::IPv6);
 	assert (ia3.toString() == "::192.168.1.120");
 
-	IPAddress ia4("::FFFF:192.168.1.120");
+	IPAddress ia4("::ffff:192.168.1.120");
 	assert (ia4.family() == IPAddress::IPv6);
-	assert (ia4.toString() == "::FFFF:192.168.1.120");
+	assert (ia4.toString() == "::ffff:192.168.1.120");
 
 	IPAddress ia5(64, IPAddress::IPv6);
 	assert (ia5.family() == IPAddress::IPv6);
-	assert (ia5.toString() == "FFFF:FFFF:FFFF:FFFF::");
+	assert (ia5.toString() == "ffff:ffff:ffff:ffff::");
 #endif
 }
 
@@ -544,6 +544,29 @@ void IPAddressTest::testBroadcast()
 }
 
 
+void IPAddressTest::testPrefixCons()
+{
+	IPAddress mask(15, IPAddress::IPv4);
+
+	assert(mask.toString() == "255.254.0.0");
+}
+
+
+void IPAddressTest::testOperators()
+{
+	IPAddress ip("10.0.0.51");
+	IPAddress mask(24, IPAddress::IPv4);
+
+	IPAddress net = ip & mask;
+	assert(net.toString() == "10.0.0.0");
+
+	IPAddress host("0.0.0.51");
+	assert((net | host) == ip);
+
+	assert((~mask).toString() == "0.0.0.255");
+}
+
+
 void IPAddressTest::testRelationals6()
 {
 #ifdef POCO_HAVE_IPv6
@@ -576,6 +599,8 @@ CppUnit::Test* IPAddressTest::suite()
 	CppUnit_addTest(pSuite, IPAddressTest, testRelationals6);
 	CppUnit_addTest(pSuite, IPAddressTest, testWildcard);
 	CppUnit_addTest(pSuite, IPAddressTest, testBroadcast);
+	CppUnit_addTest(pSuite, IPAddressTest, testPrefixCons);
+	CppUnit_addTest(pSuite, IPAddressTest, testOperators);
 
 	return pSuite;
 }

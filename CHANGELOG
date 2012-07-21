@@ -18,6 +18,9 @@ Release 1.5.0 (2012-07-30)
 - fixed SF#3538780: SocketAddress needs operator < function
 - fixed SF#3538775: Issues building on Fedora/Centos, etc. for AMD64
 - fixed SF#3538786: Use size_t for describing data-blocks in DigestEngine
+- IPAddress bitwise operators (&,|,^,~)
+- IPAddress BinaryReader/Writer << and >> operators
+- IPAddress force IPv6 always lowercase (RFC 5952)
 
 Release 1.4.4 (2012-07-??)
 ==========================
