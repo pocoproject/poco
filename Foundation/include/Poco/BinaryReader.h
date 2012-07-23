@@ -41,6 +41,8 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Buffer.h"
+#include "Poco/MemoryStream.h"
 #include <vector>
 #include <istream>
 
@@ -167,6 +169,44 @@ private:
 	bool           _flipBytes; 
 	TextConverter* _pTextConverter;
 };
+
+
+template <typename T>
+class BasicMemoryBinaryReader : public BinaryReader
+	/// A convenient wrapper for using Buffer and MemoryStream with BinaryReader.
+{
+public:
+	BasicMemoryBinaryReader(Buffer<T>& data, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
+		BinaryReader(_istr, byteOrder),
+		_data(data),
+		_istr(data.begin(), data.size())
+	{
+	}
+
+	BasicMemoryBinaryReader(Buffer<T>& data, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
+		BinaryReader(_istr, encoding, byteOrder),
+		_data(data),
+		_istr(data.begin(), data.size())
+	{
+	}
+
+	Buffer<T>& data()
+	{
+		return _data;
+	}
+
+	const Buffer<T>& data() const
+	{
+		return _data;
+	}
+
+private:
+	Buffer<T>& _data;
+	MemoryInputStream _istr;
+};
+
+
+typedef BasicMemoryBinaryReader<char> MemoryBinaryReader;
 
 
 //

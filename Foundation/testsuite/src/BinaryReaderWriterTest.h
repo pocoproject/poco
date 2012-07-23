@@ -51,6 +51,7 @@ public:
 	void testNative();
 	void testBigEndian();
 	void testLittleEndian();
+	void testWrappers();
 	void write(Poco::BinaryWriter& writer);
 	void read(Poco::BinaryReader& reader);
 

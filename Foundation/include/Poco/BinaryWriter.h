@@ -41,6 +41,8 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Buffer.h"
+#include "Poco/MemoryStream.h"
 #include <vector>
 #include <ostream>
 
@@ -182,6 +184,44 @@ private:
 	bool           _flipBytes;
 	TextConverter* _pTextConverter;
 };
+
+
+template <typename T>
+class BasicMemoryBinaryWriter : public BinaryWriter
+	/// A convenient wrapper for using Buffer and MemoryStream with BinarWriter.
+{
+public:
+	BasicMemoryBinaryWriter(Buffer<T>& data, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER): 
+		BinaryWriter(_ostr, byteOrder),
+		_data(data),
+		_ostr(data.begin(), data.size())
+	{
+	}
+
+	BasicMemoryBinaryWriter(Buffer<T>& data, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER): 
+		BinaryWriter(_ostr, encoding, byteOrder),
+		_data(data),
+		_ostr(data.begin(), data.size())
+	{
+	}
+
+	Buffer<T>& data()
+	{
+		return _data;
+	}
+
+	const Buffer<T>& data() const
+	{
+		return _data;
+	}
+
+private:
+	Buffer<T>& _data;
+	MemoryOutputStream _ostr;
+};
+
+
+typedef BasicMemoryBinaryWriter<char> MemoryBinaryWriter;
 
 
 //

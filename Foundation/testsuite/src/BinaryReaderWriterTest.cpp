@@ -35,11 +35,15 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/BinaryReader.h"
+#include "Poco/Buffer.h"
 #include <sstream>
 
 
 using Poco::BinaryWriter;
+using Poco::MemoryBinaryWriter;
 using Poco::BinaryReader;
+using Poco::MemoryBinaryReader;
+using Poco::Buffer;
 using Poco::Int32;
 using Poco::UInt32;
 using Poco::Int64;
@@ -245,6 +249,27 @@ void BinaryReaderWriterTest::read(BinaryReader& reader)
 }
 
 
+void BinaryReaderWriterTest::testWrappers()
+{
+	bool b = false; char c = '0'; int i = 0;
+	Buffer<char> buf(64);
+
+	MemoryBinaryWriter writer(buf);
+	writer << true;
+	writer << false;
+	writer << 'a';
+	writer << 1;
+	writer << -1;
+
+	MemoryBinaryReader reader(writer.data());
+	reader >> b; assert (b);
+	reader >> b; assert (!b);
+	reader >> c; assert ('a' == c);
+	reader >> i; assert (1 == i);
+	reader >> i; assert (-1 == i);
+}
+
+
 void BinaryReaderWriterTest::setUp()
 {
 }
@@ -262,6 +287,7 @@ CppUnit::Test* BinaryReaderWriterTest::suite()
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testNative);
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testBigEndian);
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testLittleEndian);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testWrappers);
 
 	return pSuite;
 }
