@@ -69,7 +69,7 @@ class Net_API MailMessage: public MessageHeader
 	/// encodings are supported: 7bit, 8bit, quoted-printable
 	/// and base64.
 {
-public:	
+public:
 	typedef std::vector<MailRecipient> Recipients;
 	
 	enum ContentDisposition
@@ -94,6 +94,9 @@ public:
 		
 	void addRecipient(const MailRecipient& recipient);
 		/// Adds a recipient for the message.
+
+	void setRecipients(const Recipients& recipient);
+		/// Clears existing and sets new recipient list for the message.
 		
 	const Recipients& recipients() const;
 		/// Returns the recipients of the message.

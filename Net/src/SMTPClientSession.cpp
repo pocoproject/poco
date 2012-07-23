@@ -318,7 +318,7 @@ void SMTPClientSession::close()
 }
 
 
-void SMTPClientSession::sendMessage(const MailMessage& message)
+void SMTPClientSession::sendCommands(const MailMessage& message, const Recipients* pRecipients)
 {
 	std::string response;
 	int status = 0;
@@ -335,17 +335,55 @@ void SMTPClientSession::sendMessage(const MailMessage& message)
 	{
 		status = sendCommand("MAIL FROM:", fromField.substr(emailPos, fromField.size() - emailPos), response);
 	}
+
 	if (!isPositiveCompletion(status)) throw SMTPException("Cannot send message", response, status);
-	for (MailMessage::Recipients::const_iterator it = message.recipients().begin(); it != message.recipients().end(); ++it)
+	
+	std::ostringstream recipient;
+	if (pRecipients)
 	{
-		std::string recipient("<");
-		recipient.append(it->getAddress());
-		recipient.append(">");
-		int status = sendCommand("RCPT TO:", recipient, response);
-		if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient, response, status);
+		for (Recipients::const_iterator it = pRecipients->begin(); it != pRecipients->end(); ++it)
+		{
+			recipient << '<' << *it << '>';
+			int status = sendCommand("RCPT TO:", recipient.str(), response);
+			if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
+			recipient.str("");
+		}
 	}
+	else
+	{
+		for (MailMessage::Recipients::const_iterator it = message.recipients().begin(); it != message.recipients().end(); ++it)
+		{
+			recipient << '<' << it->getAddress() << '>';
+			int status = sendCommand("RCPT TO:", recipient.str(), response);
+			if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
+			recipient.str("");
+		}
+	}
+
 	status = sendCommand("DATA", response);
 	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot send message data", response, status);
+}
+
+
+void SMTPClientSession::sendMessage(const MailMessage& message)
+{
+	sendCommands(message);
+	transportMessage(message);
+}
+
+
+void SMTPClientSession::sendMessage(const MailMessage& message, const Recipients& recipients)
+{
+	sendCommands(message, &recipients);
+	transportMessage(message);
+}
+
+
+void SMTPClientSession::transportMessage(const MailMessage& message)
+{
+	std::string response;
+	int status = 0;
+	
 	SocketOutputStream socketStream(_socket);
 	MailOutputStream mailStream(socketStream);
 	message.write(mailStream);

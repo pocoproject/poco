@@ -133,6 +133,12 @@ void MailMessage::addRecipient(const MailRecipient& recipient)
 }
 
 
+void MailMessage::setRecipients(const Recipients& recipients)
+{
+	_recipients.assign(recipients.begin(), recipients.end());
+}
+
+
 void MailMessage::setSender(const std::string& sender)
 {
 	set(HEADER_FROM, sender);

@@ -59,6 +59,8 @@ class Net_API SMTPClientSession
 	/// client for sending e-mail messages.
 {
 public:
+	typedef std::vector<std::string> Recipients;
+
 	enum
 	{
 		SMTP_PORT = 25
@@ -130,7 +132,18 @@ public:
 	void sendMessage(const MailMessage& message);
 		/// Sends the given mail message by sending a MAIL FROM command,
 		/// a RCPT TO command for every recipient, and a DATA command with
-		/// the message headers and content.
+		/// the message headers and content. Using this function results in
+		/// RCPT TO commands list generated from the recipient list supplied
+		/// with the message itself.
+		///
+		/// Throws a SMTPException in case of a SMTP-specific error, or a
+		/// NetException in case of a general network communication failure.
+
+	void sendMessage(const MailMessage& message, const Recipients& recipients);
+		/// Sends the given mail message by sending a MAIL FROM command,
+		/// a RCPT TO command for every recipient, and a DATA command with
+		/// the message headers and content. Using this function results in
+		/// message header being generated from the supplied recipients list.
 		///
 		/// Throws a SMTPException in case of a SMTP-specific error, or a
 		/// NetException in case of a general network communication failure.
@@ -176,6 +189,9 @@ protected:
 	DialogSocket& socket();
 
 private:
+	void sendCommands(const MailMessage& message, const Recipients* pRecipients = 0);
+	void transportMessage(const MailMessage& message);
+
 	DialogSocket _socket;
 	bool         _isOpen;
 };

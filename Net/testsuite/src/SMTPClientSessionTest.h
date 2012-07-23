@@ -50,6 +50,8 @@ public:
 	void testLoginHELO();
 	void testLoginFailed();
 	void testSend();
+	void testSendMultiRecipient();
+	void testMultiSeparateRecipient();
 	void testSendFailed();
 	
 	void setUp();
