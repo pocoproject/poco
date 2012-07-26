@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/testsuite/Makefile#1 $
+# $Id: //poco/1.4/Foundation/testsuite/Makefile#2 $
 #
 # Makefile for Poco Foundation testsuite
 #

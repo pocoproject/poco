@@ -1,7 +1,7 @@
 //
 // CharacterData.cpp
 //
-// $Id: //poco/1.4/XML/src/CharacterData.cpp#1 $
+// $Id: //poco/1.4/XML/src/CharacterData.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -64,9 +64,16 @@ CharacterData::~CharacterData()
 
 void CharacterData::setData(const XMLString& data)
 {
-	XMLString oldData = getData();
-	_data = data;
-	if (events()) dispatchCharacterDataModified(oldData, _data);
+	if (events())
+	{
+		XMLString oldData = _data;
+		_data = data;
+		dispatchCharacterDataModified(oldData, _data);
+	}
+	else
+	{
+		_data = data;
+	}
 }
 
 
@@ -81,9 +88,16 @@ XMLString CharacterData::substringData(unsigned long offset, unsigned long count
 
 void CharacterData::appendData(const XMLString& arg)
 {
-	XMLString oldData = _data;
-	_data.append(arg);
-	if (events()) dispatchCharacterDataModified(oldData, _data);
+	if (events())
+	{
+		XMLString oldData = _data;
+		_data.append(arg);
+		dispatchCharacterDataModified(oldData, _data);
+	}
+	else
+	{
+		_data.append(arg);
+	}
 }
 
 
@@ -92,9 +106,16 @@ void CharacterData::insertData(unsigned long offset, const XMLString& arg)
 	if (offset > _data.length())
 		throw DOMException(DOMException::INDEX_SIZE_ERR);
 
-	XMLString oldData = _data;
-	_data.insert(offset, arg);
-	if (events()) dispatchCharacterDataModified(oldData, _data);
+	if (events())
+	{
+		XMLString oldData = _data;
+		_data.insert(offset, arg);
+		dispatchCharacterDataModified(oldData, _data);
+	}
+	else
+	{
+		_data.insert(offset, arg);
+	}
 }
 
 
@@ -103,9 +124,14 @@ void CharacterData::deleteData(unsigned long offset, unsigned long count)
 	if (offset >= _data.length())
 		throw DOMException(DOMException::INDEX_SIZE_ERR);
 
-	XMLString oldData = _data;
-	_data.replace(offset, count, EMPTY_STRING);
-	if (events()) dispatchCharacterDataModified(oldData, _data);
+	if (events())
+	{
+		XMLString oldData = _data;
+		_data.replace(offset, count, EMPTY_STRING);
+		dispatchCharacterDataModified(oldData, _data);
+	}
+	else
+		_data.replace(offset, count, EMPTY_STRING);
 }
 
 
@@ -114,9 +140,16 @@ void CharacterData::replaceData(unsigned long offset, unsigned long count, const
 	if (offset >= _data.length())
 		throw DOMException(DOMException::INDEX_SIZE_ERR);
 
-	XMLString oldData = _data;
-	_data.replace(offset, count, arg);
-	if (events()) dispatchCharacterDataModified(oldData, _data);
+	if (events())
+	{
+		XMLString oldData = _data;
+		_data.replace(offset, count, arg);
+		dispatchCharacterDataModified(oldData, _data);
+	}
+	else
+	{
+		_data.replace(offset, count, arg);
+	}
 }
 
 

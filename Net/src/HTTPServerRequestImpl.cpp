@@ -1,7 +1,7 @@
 //
 // HTTPServerRequestImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerRequestImpl.cpp#1 $
+// $Id: //poco/1.4/Net/src/HTTPServerRequestImpl.cpp#3 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -35,6 +35,7 @@
 
 
 #include "Poco/Net/HTTPServerRequestImpl.h"
+#include "Poco/Net/HTTPServerResponseImpl.h"
 #include "Poco/Net/HTTPServerSession.h"
 #include "Poco/Net/HTTPHeaderStream.h"
 #include "Poco/Net/HTTPStream.h"
@@ -54,12 +55,14 @@ namespace Net {
 const std::string HTTPServerRequestImpl::EXPECT("Expect");
 
 
-HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponse& response, HTTPServerSession& session, HTTPServerParams* pParams):
+HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, HTTPServerSession& session, HTTPServerParams* pParams):
 	_response(response),
 	_session(session),
 	_pStream(0),
 	_pParams(pParams, true)
 {
+	response.attachRequest(this);
+
 	HTTPHeaderInputStream hs(session);
 	read(hs);
 	
@@ -69,8 +72,12 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponse& response, HTTPS
 	
 	if (getChunkedTransferEncoding())
 		_pStream = new HTTPChunkedInputStream(session);
-	else if (getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
+	else if (hasContentLength())
+#if defined(POCO_HAVE_INT64)
+		_pStream = new HTTPFixedLengthInputStream(session, getContentLength64());
+#else
 		_pStream = new HTTPFixedLengthInputStream(session, getContentLength());
+#endif
 	else if (getMethod() == HTTPRequest::HTTP_GET || getMethod() == HTTPRequest::HTTP_HEAD)
 		_pStream = new HTTPFixedLengthInputStream(session, 0);
 	else

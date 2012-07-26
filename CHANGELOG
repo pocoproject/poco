@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.4 (2012-05-??)
+Release 1.4.4 (2012-08-??)
 ==========================
 
 - ZipStream now builds correctly in unbundled build.
@@ -30,6 +30,10 @@ Release 1.4.4 (2012-05-??)
 - Added Poco::ObjectPool class template.
 - Poco::Net::HTTPServer has a new stopAll() method allowing stopping/aborting of all 
   currently active client connections.
+- The HTTP server framework now actively prevents sending a message body in the
+  response to a HEAD request, or in case of a 204 No Content or 304 Not Modified
+  response status.
+- fixed a DOM parser performance bug (patch by Peter Klotz)
 
 
 Release 1.4.3p1 (2012-01-23)
@@ -1710,4 +1714,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#60 $
+$Id: //poco/1.4/dist/CHANGELOG#62 $

@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerConnection.cpp#5 $
+// $Id: //poco/1.4/Net/src/HTTPServerConnection.cpp#7 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -83,7 +83,7 @@ void HTTPServerConnection::run()
 			{
 				HTTPServerResponseImpl response(session);
 				HTTPServerRequestImpl request(response, session, _pParams);
-				
+
 				Poco::Timestamp now;
 				response.setDate(now);
 				response.setVersion(request.getVersion());
@@ -149,7 +149,14 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 	{
 		try
 		{
+			// Note: On Windows, select() will not return if one of its socket is being
+			// shut down. Therefore we have to call close(), which works better.
+			// On other platforms, we do the more graceful thing.
+#if defined(_WIN32)
 			socket().close();
+#else
+			socket().shutdown();
+#endif
 		}
 		catch (...)
 		{
@@ -161,7 +168,11 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 
 		try
 		{
+#if defined(_WIN32)
 			socket().close();
+#else
+			socket().shutdown();
+#endif
 		}
 		catch (...)
 		{

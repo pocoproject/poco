@@ -9,7 +9,7 @@
 include $(POCO_BASE)/build/rules/global
 
 # Where to find the PageCompiler executable
-PAGECOMPILER = $(POCO_BASE)/PageCompiler/bin/$(POCO_HOST_OSNAME)/$(POCO_HOST_OSARCH)/cpspc$(OSARCH_POSTFIX)
+PAGECOMPILER = $(POCO_BASE)/PageCompiler/bin/$(POCO_HOST_OSNAME)/$(POCO_HOST_OSARCH)/cpspc
 
 objects = HTTPTimeServerApp TimeHandler
 

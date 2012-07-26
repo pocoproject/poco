@@ -1,7 +1,7 @@
 //
 // HTTPServerResponseImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerResponseImpl.cpp#2 $
+// $Id: //poco/1.4/Net/src/HTTPServerResponseImpl.cpp#4 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -35,6 +35,7 @@
 
 
 #include "Poco/Net/HTTPServerResponseImpl.h"
+#include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/HTTPServerSession.h"
 #include "Poco/Net/HTTPHeaderStream.h"
 #include "Poco/Net/HTTPStream.h"
@@ -66,6 +67,7 @@ namespace Net {
 
 HTTPServerResponseImpl::HTTPServerResponseImpl(HTTPServerSession& session):
 	_session(session),
+	_pRequest(0),
 	_pStream(0)
 {
 }
@@ -88,17 +90,31 @@ std::ostream& HTTPServerResponseImpl::send()
 {
 	poco_assert (!_pStream);
 
-	if (getChunkedTransferEncoding())
+	if (_pRequest && _pRequest->getMethod() == HTTPRequest::HTTP_HEAD ||
+		getStatus() < 200 ||
+		getStatus() == HTTPResponse::HTTP_NO_CONTENT ||
+		getStatus() == HTTPResponse::HTTP_NOT_MODIFIED)
+	{
+		Poco::CountingOutputStream cs;
+		write(cs);
+		_pStream = new HTTPFixedLengthOutputStream(_session, cs.chars());
+		write(*_pStream);
+	}
+	else if (getChunkedTransferEncoding())
 	{
 		HTTPHeaderOutputStream hs(_session);
 		write(hs);
 		_pStream = new HTTPChunkedOutputStream(_session);
 	}
-	else if (getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
+	else if (hasContentLength())
 	{
 		Poco::CountingOutputStream cs;
 		write(cs);
+#if defined(POCO_HAVE_INT64)	
+		_pStream = new HTTPFixedLengthOutputStream(_session, getContentLength64() + cs.chars());
+#else
 		_pStream = new HTTPFixedLengthOutputStream(_session, getContentLength() + cs.chars());
+#endif
 		write(*_pStream);
 	}
 	else
@@ -132,7 +148,10 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 	{
 		_pStream = new HTTPHeaderOutputStream(_session);
 		write(*_pStream);
-		StreamCopier::copyStream(istr, *_pStream);
+		if (_pRequest && _pRequest->getMethod() != HTTPRequest::HTTP_HEAD)
+		{
+			StreamCopier::copyStream(istr, *_pStream);
+		}
 	}
 	else throw OpenFileException(path);
 }
@@ -147,7 +166,10 @@ void HTTPServerResponseImpl::sendBuffer(const void* pBuffer, std::size_t length)
 	
 	_pStream = new HTTPHeaderOutputStream(_session);
 	write(*_pStream);
-	_pStream->write(static_cast<const char*>(pBuffer), static_cast<std::streamsize>(length));
+	if (_pRequest && _pRequest->getMethod() != HTTPRequest::HTTP_HEAD)
+	{
+		_pStream->write(static_cast<const char*>(pBuffer), static_cast<std::streamsize>(length));
+	}
 }
 
 

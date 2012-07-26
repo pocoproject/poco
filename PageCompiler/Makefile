@@ -8,7 +8,6 @@
 
 include $(POCO_BASE)/build/rules/global
 
-SYSLIBS += -lc -lm
 objects = Page PageReader \
 	CodeWriter ApacheCodeWriter OSPCodeWriter \
 	PageCompiler

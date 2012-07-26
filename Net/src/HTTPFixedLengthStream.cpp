@@ -1,7 +1,7 @@
 //
 // HTTPFixedLengthStream.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPFixedLengthStream.cpp#1 $
+// $Id: //poco/1.4/Net/src/HTTPFixedLengthStream.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -50,7 +50,7 @@ namespace Net {
 //
 
 
-HTTPFixedLengthStreamBuf::HTTPFixedLengthStreamBuf(HTTPSession& session, std::streamsize length, openmode mode):
+HTTPFixedLengthStreamBuf::HTTPFixedLengthStreamBuf(HTTPSession& session, ContentLength length, openmode mode):
 	HTTPBasicStreamBuf(HTTPBufferAllocator::BUFFER_SIZE, mode),
 	_session(session),
 	_length(length),
@@ -70,7 +70,7 @@ int HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::streamsize lengt
 	if (_count < _length)
 	{
 		if (_count + length > _length)
-			length = _length - _count;
+			length = static_cast<std::streamsize>(_length - _count);
 		n = _session.read(buffer, length);
 		if (n > 0) _count += n;
 	}
@@ -84,7 +84,7 @@ int HTTPFixedLengthStreamBuf::writeToDevice(const char* buffer, std::streamsize 
 	if (_count < _length)
 	{
 		if (_count + length > _length)
-			length = _length - _count;
+			length = static_cast<std::streamsize>(_length - _count);
 		n = _session.write(buffer, length);
 		if (n > 0) _count += n;
 	}
@@ -97,7 +97,7 @@ int HTTPFixedLengthStreamBuf::writeToDevice(const char* buffer, std::streamsize 
 //
 
 
-HTTPFixedLengthIOS::HTTPFixedLengthIOS(HTTPSession& session, std::streamsize length, HTTPFixedLengthStreamBuf::openmode mode):
+HTTPFixedLengthIOS::HTTPFixedLengthIOS(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length, HTTPFixedLengthStreamBuf::openmode mode):
 	_buf(session, length, mode)
 {
 	poco_ios_init(&_buf);
@@ -130,7 +130,7 @@ HTTPFixedLengthStreamBuf* HTTPFixedLengthIOS::rdbuf()
 Poco::MemoryPool HTTPFixedLengthInputStream::_pool(sizeof(HTTPFixedLengthInputStream));
 
 
-HTTPFixedLengthInputStream::HTTPFixedLengthInputStream(HTTPSession& session, std::streamsize length):
+HTTPFixedLengthInputStream::HTTPFixedLengthInputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length):
 	HTTPFixedLengthIOS(session, length, std::ios::in),
 	std::istream(&_buf)
 {
@@ -162,7 +162,7 @@ void HTTPFixedLengthInputStream::operator delete(void* ptr)
 Poco::MemoryPool HTTPFixedLengthOutputStream::_pool(sizeof(HTTPFixedLengthOutputStream));
 
 
-HTTPFixedLengthOutputStream::HTTPFixedLengthOutputStream(HTTPSession& session, std::streamsize length):
+HTTPFixedLengthOutputStream::HTTPFixedLengthOutputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length):
 	HTTPFixedLengthIOS(session, length, std::ios::out),
 	std::ostream(&_buf)
 {
