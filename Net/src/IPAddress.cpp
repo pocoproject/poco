@@ -348,13 +348,6 @@ public:
 		std::memcpy(&_addr, addr, sizeof(_addr));
 	}
 
-#if !defined(s6_addr16)
-#if defined(_WIN32)
-#define s6_addr16	u.Word
-#else
-#define s6_addr16	__u6_addr.__u6_addr16
-#endif
-#endif
 
 	IPv6AddressImpl(unsigned prefix):
 		_scope(0)
@@ -1058,16 +1051,16 @@ IPAddress IPAddress::operator & (const IPAddress& other) const
 	{
 		if (family() == IPv4)
 		{
-			IPv4AddressImpl self(_pImpl->addr());
-			IPv4AddressImpl other(other._pImpl->addr());
-			return IPAddress((self & other).addr(), sizeof(struct in_addr));
+			IPv4AddressImpl t(_pImpl->addr());
+			IPv4AddressImpl o(other._pImpl->addr());
+			return IPAddress((t & o).addr(), sizeof(struct in_addr));
 		}
 #if defined(POCO_HAVE_IPv6)
 		else if (family() == IPv6)
 		{
-			IPv6AddressImpl self(_pImpl->addr());
-			IPv6AddressImpl other(other._pImpl->addr());
-			return IPAddress((self & other).addr(), sizeof(struct in6_addr));
+			IPv6AddressImpl t(_pImpl->addr());
+			IPv6AddressImpl o(other._pImpl->addr());
+			return IPAddress((t & o).addr(), sizeof(struct in6_addr));
 		}
 #endif
 		else
@@ -1084,16 +1077,16 @@ IPAddress IPAddress::operator | (const IPAddress& other) const
 	{
 		if (family() == IPv4)
 		{
-			IPv4AddressImpl self(_pImpl->addr());
-			IPv4AddressImpl other(other._pImpl->addr());
-			return IPAddress((self | other).addr(), sizeof(struct in_addr));
+			IPv4AddressImpl t(_pImpl->addr());
+			IPv4AddressImpl o(other._pImpl->addr());
+			return IPAddress((t | o).addr(), sizeof(struct in_addr));
 		}
 #if defined(POCO_HAVE_IPv6)
 		else if (family() == IPv6)
 		{
-			IPv6AddressImpl self(_pImpl->addr());
-			IPv6AddressImpl other(other._pImpl->addr());
-			return IPAddress((self | other).addr(), sizeof(struct in6_addr));
+			IPv6AddressImpl t(_pImpl->addr());
+			IPv6AddressImpl o(other._pImpl->addr());
+			return IPAddress((t | o).addr(), sizeof(struct in6_addr));
 		}
 #endif
 		else
@@ -1110,16 +1103,16 @@ IPAddress IPAddress::operator ^ (const IPAddress& other) const
 	{
 		if (family() == IPv4)
 		{
-			IPv4AddressImpl self(_pImpl->addr());
-			IPv4AddressImpl other(other._pImpl->addr());
-			return IPAddress((self ^ other).addr(), sizeof(struct in_addr));
+			IPv4AddressImpl t(_pImpl->addr());
+			IPv4AddressImpl o(other._pImpl->addr());
+			return IPAddress((t ^ o).addr(), sizeof(struct in_addr));
 		}
 #if defined(POCO_HAVE_IPv6)
 		else if (family() == IPv6)
 		{
-			IPv6AddressImpl self(_pImpl->addr());
-			IPv6AddressImpl other(other._pImpl->addr());
-			return IPAddress((self ^ other).addr(), sizeof(struct in6_addr));
+			IPv6AddressImpl t(_pImpl->addr());
+			IPv6AddressImpl o(other._pImpl->addr());
+			return IPAddress((t ^ o).addr(), sizeof(struct in6_addr));
 		}
 #endif
 		else
@@ -1134,13 +1127,13 @@ IPAddress IPAddress::operator ~ () const
 {
 	if (family() == IPv4)
 	{
-		IPv4AddressImpl self(_pImpl->addr());
+		IPv4AddressImpl self(this->_pImpl->addr());
 		return IPAddress((~self).addr(), sizeof(struct in_addr));
 	}
 #if defined(POCO_HAVE_IPv6)
 	else if (family() == IPv6)
 	{
-		IPv6AddressImpl self(_pImpl->addr());
+		IPv6AddressImpl self(this->_pImpl->addr());
 		return IPAddress((~self).addr(), sizeof(struct in6_addr));
 	}
 #endif
