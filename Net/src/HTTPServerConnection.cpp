@@ -105,7 +105,15 @@ void HTTPServerConnection::run()
 				catch (Poco::Exception&)
 				{
 					if (!response.sent())
-						sendErrorResponse(session, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+					{
+						try
+						{
+							sendErrorResponse(session, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+						}
+						catch (...)
+						{
+						}
+					}
 					throw;
 				}
 			}
@@ -140,7 +148,14 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 	{
 		try
 		{
+			// Note: On Windows, select() will not return if one of its socket is being
+			// shut down. Therefore we have to call close(), which works better.
+			// On other platforms, we do the more graceful thing.
+#if defined(_WIN32)
 			socket().close();
+#else
+			socket().shutdown();
+#endif
 		}
 		catch (...)
 		{
@@ -152,7 +167,11 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 
 		try
 		{
+#if defined(_WIN32)
 			socket().close();
+#else
+			socket().shutdown();
+#endif
 		}
 		catch (...)
 		{

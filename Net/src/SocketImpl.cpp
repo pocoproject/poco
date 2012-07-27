@@ -523,6 +523,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		FD_SET(sockfd, &fdExcept);
 	}
 	Poco::Timespan remainingTime(timeout);
+	int errorCode;
 	int rc;
 	do
 	{
@@ -531,7 +532,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		tv.tv_usec = (long) remainingTime.useconds();
 		Poco::Timestamp start;
 		rc = ::select(int(sockfd) + 1, &fdRead, &fdWrite, &fdExcept, &tv);
-		if (rc < 0 && lastError() == POCO_EINTR)
+		if (rc < 0 && (errorCode = lastError()) == POCO_EINTR)
 		{
 			Poco::Timestamp end;
 			Poco::Timespan waited = end - start;
@@ -541,8 +542,8 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 				remainingTime = 0;
 		}
 	}
-	while (rc < 0 && lastError() == POCO_EINTR);
-	if (rc < 0) error();
+	while (rc < 0 && errorCode == POCO_EINTR);
+	if (rc < 0) error(errorCode);
 	return rc > 0; 
 
 #endif // POCO_HAVE_FD_EPOLL
