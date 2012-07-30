@@ -58,6 +58,7 @@ public:
 	void testWildcard();
 	void testBroadcast();
 	void testPrefixCons();
+	void testPrefixLen();
 	void testOperators();
 	
 	void setUp();

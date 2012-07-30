@@ -546,9 +546,21 @@ void IPAddressTest::testBroadcast()
 
 void IPAddressTest::testPrefixCons()
 {
-	IPAddress mask(15, IPAddress::IPv4);
+	IPAddress ia1(15, IPAddress::IPv4);
+	IPAddress ia2(62, IPAddress::IPv6);
 
-	assert(mask.toString() == "255.254.0.0");
+	assert(ia1.toString() == "255.254.0.0");
+	assert(ia2.toString() == "ffff:ffff:ffff:fffc::");
+}
+
+
+void IPAddressTest::testPrefixLen()
+{
+	IPAddress ia1(15, IPAddress::IPv4);
+	IPAddress ia2(62, IPAddress::IPv6);
+
+	assert(ia1.prefixLength() == 15);
+	assert(ia2.prefixLength() == 62);
 }
 
 
@@ -600,6 +612,7 @@ CppUnit::Test* IPAddressTest::suite()
 	CppUnit_addTest(pSuite, IPAddressTest, testWildcard);
 	CppUnit_addTest(pSuite, IPAddressTest, testBroadcast);
 	CppUnit_addTest(pSuite, IPAddressTest, testPrefixCons);
+	CppUnit_addTest(pSuite, IPAddressTest, testPrefixLen);
 	CppUnit_addTest(pSuite, IPAddressTest, testOperators);
 
 	return pSuite;

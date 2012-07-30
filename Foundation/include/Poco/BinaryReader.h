@@ -200,6 +200,11 @@ public:
 		return _data;
 	}
 
+	MemoryInputStream& stream() const
+	{
+		return _istr;
+	}
+
 private:
 	Buffer<T>& _data;
 	MemoryInputStream _istr;

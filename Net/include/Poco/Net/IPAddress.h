@@ -325,6 +325,9 @@ public:
 		
 	int af() const;
 		/// Returns the address family (AF_INET or AF_INET6) of the address.
+
+	unsigned prefixLength() const;
+		/// Returns the prefix length.
 		
 	void mask(const IPAddress& mask);
 		/// Masks the IP address using the given netmask, which is usually

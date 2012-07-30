@@ -54,6 +54,28 @@ using Poco::UInt16;
 using Poco::UInt32;
 
 
+namespace {
+
+template <typename T>
+unsigned maskBits(T val, unsigned size)
+	/// Returns the length of the mask (number of bits set in val).
+	/// The val should be either all zeros or two contiguos areas of 1s and 0s. 
+	/// The algorithm ignores invalid non-contiguous series of 1s and treats val 
+	/// as if all bits between MSb and last non-zero bit are set to 1.
+{
+	unsigned count = 0;
+	if (val)
+	{
+		val = (val ^ (val - 1)) >> 1;
+		for (count = 0; val; ++count) val >>= 1;
+	}
+	else count = size;
+	return size - count;
+}
+
+} // namespace
+
+
 namespace Poco {
 namespace Net {
 
@@ -87,6 +109,8 @@ public:
 	virtual bool isOrgLocalMC() const = 0;
 	virtual bool isGlobalMC() const = 0;
 	virtual void mask(const IPAddressImpl* pMask, const IPAddressImpl* pSet) = 0;
+	virtual unsigned prefixLength() const = 0;
+
 	virtual IPAddressImpl* clone() const = 0;
 
 protected:
@@ -162,6 +186,11 @@ public:
 	int af() const
 	{
 		return AF_INET;
+	}
+
+	unsigned prefixLength() const
+	{
+		return maskBits(ntohl(_addr.s_addr), 32);
 	}
 	
 	Poco::UInt32 scope() const
@@ -353,14 +382,23 @@ public:
 		_scope(0)
 	{
 		unsigned i = 0;
-		for (; prefix > 0; ++i, prefix -= 16) {
-			if (prefix >= 16)
-				_addr.s6_addr16[i] = 0xffff;
-			else
-				_addr.s6_addr16[i] = htons(~(0xffff >> prefix));
+#ifdef POCO_OS_FAMILY_WINDOWS
+		for (; prefix > 16; ++i, prefix -= 16) {
+			_addr.s6_addr16[i] = 0xffff;
 		}
+		if (prefix > 0)
+			_addr.s6_addr16[i++] = htons(~(0xffffU >> prefix));
 		while (i < 8)
 			_addr.s6_addr16[i++] = 0;
+#else
+		for (; prefix > 32; ++i, prefix -= 32) {
+			_addr.s6_addr32[i] = 0xffffffff;
+		}
+		if (prefix > 0)
+			_addr.s6_addr32[i++] = htonl(~(0xffffffffU >> prefix));
+		while (i < 4)
+			_addr.s6_addr32[i++] = 0;
+#endif
 	}
 
 	std::string toString() const
@@ -447,6 +485,31 @@ public:
 		return AF_INET6;
 	}
 	
+	unsigned prefixLength() const
+	{
+		unsigned bits = 0;
+		unsigned bitPos = 128;
+#if defined(POCO_OS_FAMILY_UNIX)
+		for (int i = 3; i >= 0; --i)
+		{
+			unsigned addr = ntohl(_addr.s6_addr32[i]);
+			if (bits = maskBits(addr, 32)) return (bitPos - (32 - bits));
+			bitPos -= 32;
+		}
+		return 0;
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+		for (int i = 7; i >= 0; --i)
+		{
+			unsigned short addr = ntohs(_addr.s6_addr16[i]);
+			if (bits = maskBits(addr, 16)) return (bitPos - (16 - bits));
+			bitPos -= 16;
+		}
+		return 0;
+#else
+#warning prefixLength() not implemented
+		throw NotImplementedException("prefixLength() not implemented");
+#endif
+	}
 	Poco::UInt32 scope() const
 	{
 		return _scope;
@@ -593,22 +656,14 @@ public:
 	{
 		IPv6AddressImpl result(&_addr);
 #ifdef POCO_OS_FAMILY_WINDOWS
-		result._addr.s6_addr[0] &= addr._addr.s6_addr[0];
-		result._addr.s6_addr[1] &= addr._addr.s6_addr[1];
-		result._addr.s6_addr[2] &= addr._addr.s6_addr[2];
-		result._addr.s6_addr[3] &= addr._addr.s6_addr[3];
-		result._addr.s6_addr[4] &= addr._addr.s6_addr[4];
-		result._addr.s6_addr[5] &= addr._addr.s6_addr[5];
-		result._addr.s6_addr[6] &= addr._addr.s6_addr[6];
-		result._addr.s6_addr[7] &= addr._addr.s6_addr[7];
-		result._addr.s6_addr[8] &= addr._addr.s6_addr[8];
-		result._addr.s6_addr[9] &= addr._addr.s6_addr[9];
-		result._addr.s6_addr[10] &= addr._addr.s6_addr[10];
-		result._addr.s6_addr[11] &= addr._addr.s6_addr[11];
-		result._addr.s6_addr[12] &= addr._addr.s6_addr[12];
-		result._addr.s6_addr[13] &= addr._addr.s6_addr[13];
-		result._addr.s6_addr[14] &= addr._addr.s6_addr[14];
-		result._addr.s6_addr[15] &= addr._addr.s6_addr[15];
+		result._addr.s6_addr16[0] &= addr._addr.s6_addr16[0];
+		result._addr.s6_addr16[1] &= addr._addr.s6_addr16[1];
+		result._addr.s6_addr16[2] &= addr._addr.s6_addr16[2];
+		result._addr.s6_addr16[3] &= addr._addr.s6_addr16[3];
+		result._addr.s6_addr16[4] &= addr._addr.s6_addr16[4];
+		result._addr.s6_addr16[5] &= addr._addr.s6_addr16[5];
+		result._addr.s6_addr16[6] &= addr._addr.s6_addr16[6];
+		result._addr.s6_addr16[7] &= addr._addr.s6_addr16[7];
 #else
 		result._addr.s6_addr32[0] &= addr._addr.s6_addr32[0];
 		result._addr.s6_addr32[1] &= addr._addr.s6_addr32[1];
@@ -622,22 +677,14 @@ public:
 	{
 		IPv6AddressImpl result(&_addr);
 #ifdef POCO_OS_FAMILY_WINDOWS
-		result._addr.s6_addr[0] |= addr._addr.s6_addr[0];
-		result._addr.s6_addr[1] |= addr._addr.s6_addr[1];
-		result._addr.s6_addr[2] |= addr._addr.s6_addr[2];
-		result._addr.s6_addr[3] |= addr._addr.s6_addr[3];
-		result._addr.s6_addr[4] |= addr._addr.s6_addr[4];
-		result._addr.s6_addr[5] |= addr._addr.s6_addr[5];
-		result._addr.s6_addr[6] |= addr._addr.s6_addr[6];
-		result._addr.s6_addr[7] |= addr._addr.s6_addr[7];
-		result._addr.s6_addr[8] |= addr._addr.s6_addr[8];
-		result._addr.s6_addr[9] |= addr._addr.s6_addr[9];
-		result._addr.s6_addr[10] |= addr._addr.s6_addr[10];
-		result._addr.s6_addr[11] |= addr._addr.s6_addr[11];
-		result._addr.s6_addr[12] |= addr._addr.s6_addr[12];
-		result._addr.s6_addr[13] |= addr._addr.s6_addr[13];
-		result._addr.s6_addr[14] |= addr._addr.s6_addr[14];
-		result._addr.s6_addr[15] |= addr._addr.s6_addr[15];
+		result._addr.s6_addr16[0] |= addr._addr.s6_addr16[0];
+		result._addr.s6_addr16[1] |= addr._addr.s6_addr16[1];
+		result._addr.s6_addr16[2] |= addr._addr.s6_addr16[2];
+		result._addr.s6_addr16[3] |= addr._addr.s6_addr16[3];
+		result._addr.s6_addr16[4] |= addr._addr.s6_addr16[4];
+		result._addr.s6_addr16[5] |= addr._addr.s6_addr16[5];
+		result._addr.s6_addr16[6] |= addr._addr.s6_addr16[6];
+		result._addr.s6_addr16[7] |= addr._addr.s6_addr16[7];
 #else
 		result._addr.s6_addr32[0] |= addr._addr.s6_addr32[0];
 		result._addr.s6_addr32[1] |= addr._addr.s6_addr32[1];
@@ -651,22 +698,14 @@ public:
 	{
 		IPv6AddressImpl result(&_addr);
 #ifdef POCO_OS_FAMILY_WINDOWS
-		result._addr.s6_addr[0] ^= addr._addr.s6_addr[0];
-		result._addr.s6_addr[1] ^= addr._addr.s6_addr[1];
-		result._addr.s6_addr[2] ^= addr._addr.s6_addr[2];
-		result._addr.s6_addr[3] ^= addr._addr.s6_addr[3];
-		result._addr.s6_addr[4] ^= addr._addr.s6_addr[4];
-		result._addr.s6_addr[5] ^= addr._addr.s6_addr[5];
-		result._addr.s6_addr[6] ^= addr._addr.s6_addr[6];
-		result._addr.s6_addr[7] ^= addr._addr.s6_addr[7];
-		result._addr.s6_addr[8] ^= addr._addr.s6_addr[8];
-		result._addr.s6_addr[9] ^= addr._addr.s6_addr[9];
-		result._addr.s6_addr[10] ^= addr._addr.s6_addr[10];
-		result._addr.s6_addr[11] ^= addr._addr.s6_addr[11];
-		result._addr.s6_addr[12] ^= addr._addr.s6_addr[12];
-		result._addr.s6_addr[13] ^= addr._addr.s6_addr[13];
-		result._addr.s6_addr[14] ^= addr._addr.s6_addr[14];
-		result._addr.s6_addr[15] ^= addr._addr.s6_addr[15];
+		result._addr.s6_addr16[0] ^= addr._addr.s6_addr16[0];
+		result._addr.s6_addr16[1] ^= addr._addr.s6_addr16[1];
+		result._addr.s6_addr16[2] ^= addr._addr.s6_addr16[2];
+		result._addr.s6_addr16[3] ^= addr._addr.s6_addr16[3];
+		result._addr.s6_addr16[4] ^= addr._addr.s6_addr16[4];
+		result._addr.s6_addr16[5] ^= addr._addr.s6_addr16[5];
+		result._addr.s6_addr16[6] ^= addr._addr.s6_addr16[6];
+		result._addr.s6_addr16[7] ^= addr._addr.s6_addr16[7];
 #else
 		result._addr.s6_addr32[0] ^= addr._addr.s6_addr32[0];
 		result._addr.s6_addr32[1] ^= addr._addr.s6_addr32[1];
@@ -680,22 +719,14 @@ public:
 	{
 		IPv6AddressImpl result(&_addr);
 #ifdef POCO_OS_FAMILY_WINDOWS
-		result._addr.s6_addr[0] ^= 0xff;
-		result._addr.s6_addr[1] ^= 0xff;
-		result._addr.s6_addr[2] ^= 0xff;
-		result._addr.s6_addr[3] ^= 0xff;
-		result._addr.s6_addr[4] ^= 0xff;
-		result._addr.s6_addr[5] ^= 0xff;
-		result._addr.s6_addr[6] ^= 0xff;
-		result._addr.s6_addr[7] ^= 0xff;
-		result._addr.s6_addr[8] ^= 0xff;
-		result._addr.s6_addr[9] ^= 0xff;
-		result._addr.s6_addr[10] ^= 0xff;
-		result._addr.s6_addr[11] ^= 0xff;
-		result._addr.s6_addr[12] ^= 0xff;
-		result._addr.s6_addr[13] ^= 0xff;
-		result._addr.s6_addr[14] ^= 0xff;
-		result._addr.s6_addr[15] ^= 0xff;
+		result._addr.s6_addr16[0] ^= 0xffff;
+		result._addr.s6_addr16[1] ^= 0xffff;
+		result._addr.s6_addr16[2] ^= 0xffff;
+		result._addr.s6_addr16[3] ^= 0xffff;
+		result._addr.s6_addr16[4] ^= 0xffff;
+		result._addr.s6_addr16[5] ^= 0xffff;
+		result._addr.s6_addr16[6] ^= 0xffff;
+		result._addr.s6_addr16[7] ^= 0xffff;
 #else
 		result._addr.s6_addr32[0] ^= 0xffffffff;
 		result._addr.s6_addr32[1] ^= 0xffffffff;
@@ -1159,6 +1190,11 @@ int IPAddress::af() const
 	return _pImpl->af();
 }
 
+
+unsigned IPAddress::prefixLength() const
+{
+	return _pImpl->prefixLength();
+}
 
 void IPAddress::init(IPAddressImpl* pImpl)
 {

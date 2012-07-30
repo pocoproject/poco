@@ -215,6 +215,11 @@ public:
 		return _data;
 	}
 
+	MemoryOutputStream& stream() const
+	{
+		return _ostr;
+	}
+
 private:
 	Buffer<T>& _data;
 	MemoryOutputStream _ostr;
