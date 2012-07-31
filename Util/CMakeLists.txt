@@ -3,6 +3,7 @@ set(LIBNAME "${LIBNAME}${LIB_EXT}")
 
 set( BASE_SRCS
 src/AbstractConfiguration.cpp
+src/JSONConfiguration.cpp
 src/Application.cpp
 src/ConfigurationMapper.cpp
 src/ConfigurationView.cpp
@@ -47,7 +48,7 @@ add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-target_link_libraries( ${LIBNAME} PocoXML${LIB_EXT} PocoFoundation${LIB_EXT})
+target_link_libraries( ${LIBNAME} PocoJSON${LIB_EXT} PocoXML${LIB_EXT} PocoFoundation${LIB_EXT})
 
 install(
     DIRECTORY include/Poco

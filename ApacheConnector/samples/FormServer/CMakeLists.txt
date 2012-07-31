@@ -3,6 +3,6 @@ set(SAMPLE_NAME "FormServer")
 set(LOCAL_SRCS "")
 aux_source_directory(src LOCAL_SRCS)
 
-add_library( ${SAMPLE_NAME} SHARED ${LOCAL_SRCS} )
+add_library( ${SAMPLE_NAME} ${LOCAL_SRCS} )
 #set_target_properties( ${SAMPLE_NAME} PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} )
 target_link_libraries( ${SAMPLE_NAME} PocoNet PocoFoundation )
