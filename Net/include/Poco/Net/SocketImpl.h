@@ -105,7 +105,7 @@ public:
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
-		
+
 	virtual void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
 		/// Bind a local IPv6 address to the socket.
 		///
@@ -122,7 +122,7 @@ public:
 		///
 		/// If the library has not been built with IPv6 support,
 		/// a Poco::NotImplementedException will be thrown.
-		
+
 	virtual void listen(int backlog = 64);
 		/// Puts the socket into listening state.
 		///
@@ -352,35 +352,37 @@ public:
 
 	virtual bool getBlocking() const;
 		/// Returns the blocking mode of the socket.
-		
+		/// This method will only work if the blocking modes of
+		/// the socket are changed via the setBlocking method!
+
 	virtual bool secure() const;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
 
 	int socketError();
 		/// Returns the value of the SO_ERROR socket option.
-	
+
 	poco_socket_t sockfd() const;
-		/// Returns the socket descriptor for the 
+		/// Returns the socket descriptor for the
 		/// underlying native socket.
-	
+
 	void ioctl(poco_ioctl_request_t request, int& arg);
 		/// A wrapper for the ioctl system call.
 
 	void ioctl(poco_ioctl_request_t request, void* arg);
 		/// A wrapper for the ioctl system call.
-	
-#if defined(POCO_OS_FAMILY_UNIX)
-    int fcntl(poco_fcntl_request_t request);
-        /// A wrapper for the fcntl system call.
 
-    int fcntl(poco_fcntl_request_t request, long arg);
-        /// A wrapper for the fcntl system call.
+#if defined(POCO_OS_FAMILY_UNIX)
+	int fcntl(poco_fcntl_request_t request);
+		/// A wrapper for the fcntl system call.
+
+	int fcntl(poco_fcntl_request_t request, long arg);
+		/// A wrapper for the fcntl system call.
 #endif
-    
+
 	bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
-	
+
 protected:
 	SocketImpl();
 		/// Creates a SocketImpl.
@@ -418,7 +420,7 @@ protected:
 
 	void reset(poco_socket_t fd = POCO_INVALID_SOCKET);
 		/// Allows subclasses to set the socket manually, iff no valid socket is set yet.
-	
+
 	static int lastError();
 		/// Returns the last error code.
 

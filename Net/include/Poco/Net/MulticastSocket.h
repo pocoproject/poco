@@ -80,14 +80,14 @@ public:
 	~MulticastSocket();
 		/// Destroys the DatagramSocket.
 
-	MulticastSocket& operator = (const Socket& socket);
+	MulticastSocket& operator =(const Socket& socket);
 		/// Assignment operator.
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.	
+		/// increments the reference count of the SocketImpl.
 
-	void setInterface(const NetworkInterface& interfc);
+	void setInterface(const NetworkInterface& interface);
 		/// Sets the interface used for sending multicast packets.
 		///
 		/// To select the default interface, specify an empty
@@ -95,39 +95,39 @@ public:
 		///
 		/// This is done by setting the IP_MULTICAST_IF/IPV6_MULTICAST_IF
 		/// socket option.
-	
+
 	NetworkInterface getInterface() const;
 		/// Returns the interface used for sending multicast packets.
-		
+
 	void setLoopback(bool flag);
 		/// Enable or disable loopback for multicast packets.
 		///
 		/// Sets the value of the IP_MULTICAST_LOOP/IPV6_MULTICAST_LOOP
 		/// socket option.
-		
+
 	bool getLoopback() const;
 		/// Returns true iff loopback for multicast packets is enabled,
 		/// false otherwise.
-		
+
 	void setTimeToLive(unsigned value);
 		/// Specifies the TTL/hop limit for outgoing packets.
 		///
 		/// Sets the value of the IP_MULTICAST_TTL/IPV6_MULTICAST_HOPS
 		/// socket option.
-		
+
 	unsigned getTimeToLive() const;
 		/// Returns the TTL/hop limit for outgoing packets.
 		
 	void joinGroup(const IPAddress& groupAddress);
 		/// Joins the specified multicast group at the default interface.
-		
-	void joinGroup(const IPAddress& groupAddress, const NetworkInterface& interfc);
+
+	void joinGroup(const IPAddress& groupAddress, const NetworkInterface& interface);
 		/// Joins the specified multicast group at the given interface.
-		
+
 	void leaveGroup(const IPAddress& groupAddress);
 		/// Leaves the specified multicast group at the default interface.
-		
-	void leaveGroup(const IPAddress& groupAddress, const NetworkInterface& interfc);
+
+	void leaveGroup(const IPAddress& groupAddress, const NetworkInterface& interface);
 		/// Leaves the specified multicast group at the given interface.
 };
 

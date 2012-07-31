@@ -101,6 +101,10 @@ public:
 	TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams = 0);
 		/// Creates the TCPServer, using the given ServerSocket.
 		///
+		/// The server takes ownership of the TCPServerConnectionFactory
+		/// and deletes it when it's no longer needed.
+		///
+		/// The server also takes ownership of the TCPServerParams object.
 		/// If no TCPServerParams object is given, the server's TCPServerDispatcher
 		/// creates its own one.
 		///
@@ -109,6 +113,10 @@ public:
 	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams::Ptr pParams = 0);
 		/// Creates the TCPServer, using the given ServerSocket.
 		///
+		/// The server takes ownership of the TCPServerConnectionFactory
+		/// and deletes it when it's no longer needed.
+		///
+		/// The server also takes ownership of the TCPServerParams object.
 		/// If no TCPServerParams object is given, the server's TCPServerDispatcher
 		/// creates its own one.
 		///
@@ -116,11 +124,11 @@ public:
 
 	virtual ~TCPServer();
 		/// Destroys the TCPServer and its TCPServerConnectionFactory.
-				
+
 	const TCPServerParams& params() const;
 		/// Returns a const reference to the TCPServerParam object
 		/// used by the server's TCPServerDispatcher.	
-				
+
 	void start();
 		/// Starts the server. A new thread will be
 		/// created that waits for and accepts incoming
@@ -128,7 +136,7 @@ public:
 		///
 		/// Before start() is called, the ServerSocket passed to
 		/// TCPServer must have been bound and put into listening state.
-		
+
 	void stop();
 		/// Stops the server.
 		///

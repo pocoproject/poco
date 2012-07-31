@@ -61,10 +61,14 @@ class Net_API TCPServerDispatcher: public Poco::Runnable
 public:
 	TCPServerDispatcher(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, TCPServerParams::Ptr pParams);
 		/// Creates the TCPServerDispatcher.
+		///
+		/// The dispatcher takes ownership of the TCPServerParams object.
+		/// If no TCPServerParams object is supplied, the TCPServerDispatcher
+		/// creates one.
 
 	void duplicate();
 		/// Increments the object's reference count.
-		
+
 	void release();
 		/// Decrements the object's reference count
 		/// and deletes the object if the count

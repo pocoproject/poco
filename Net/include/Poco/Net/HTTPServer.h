@@ -76,16 +76,26 @@ public:
 	HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, const ServerSocket& socket, HTTPServerParams::Ptr pParams);
 		/// Creates the HTTPServer, using the given ServerSocket.
 		///
-		/// New threads are taken from the default thread pool.
+		/// The server takes ownership of the HTTPRequstHandlerFactory
+		/// and deletes it when it's no longer needed.
+		///
+		/// The server also takes ownership of the HTTPServerParams object.
+		///
+		/// News threads are taken from the default thread pool.
 
 	HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams::Ptr pParams);
 		/// Creates the HTTPServer, using the given ServerSocket.
 		///
-		/// New threads are taken from the given thread pool.
+		/// The server takes ownership of the HTTPRequstHandlerFactory
+		/// and deletes it when it's no longer needed.
+		///
+		/// The server also takes ownership of the HTTPServerParams object.
+		///
+		/// News threads are taken from the given thread pool.
 
 	~HTTPServer();
 		/// Destroys the HTTPServer and its HTTPRequestHandlerFactory.
-	
+
 	void stopAll(bool abortCurrent = false);
 		/// Stops the server. In contrast to TCPServer::stop(), which also
 		/// stops the server, but allows all client connections to finish at
@@ -95,7 +105,7 @@ public:
 		/// complete. If abortCurrent is false, the underlying sockets of
 		/// all client connections are shut down, causing all requests
 		/// to abort.
-		
+
 private:
 	HTTPRequestHandlerFactory::Ptr _pFactory;
 };
