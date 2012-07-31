@@ -48,13 +48,31 @@ namespace Poco {
 
 class Foundation_API UnicodeConverter
 	/// A convenience class that converts strings from
-	/// UTF-8 encoded std::strings to UTF-16 encoded std::wstrings 
+	/// UTF-8 encoded std::strings to UTF-16 or UTF-32 encoded std::wstrings
 	/// and vice-versa.
 	///
 	/// This class is mainly used for working with the Unicode Windows APIs
-	/// and probably won't be of much use anywhere else.
+	/// and probably won't be of much use anywhere else ???
 {
 public:
+	static void toWideUTF(const std::string& utf8String, std::wstring& utf32String);
+		/// Converts the given UTF-8 encoded string into a native encoded wstring.
+
+	static void toWideUTF(const char* utf8String, int length, std::wstring& utf32String);
+		/// Converts the given UTF-8 encoded character sequence into a native encoded string.
+
+	static void toWideUTF(const char* utf8String, std::wstring& utf32String);
+		/// Converts the given zero-terminated UTF-8 encoded character sequence into a native encoded wstring.
+
+	static void toUTF32(const std::string& utf8String, std::wstring& utf32String);
+		/// Converts the given UTF-8 encoded string into an UTF-32 encoded wstring.
+
+	static void toUTF32(const char* utf8String, int length, std::wstring& utf32String);
+		/// Converts the given UTF-8 encoded character sequence into an UTF-32 encoded string.
+
+	static void toUTF32(const char* utf8String, std::wstring& utf32String);
+		/// Converts the given zero-terminated UTF-8 encoded character sequence into an UTF-32 encoded wstring.
+
 	static void toUTF16(const std::string& utf8String, std::wstring& utf16String);
 		/// Converts the given UTF-8 encoded string into an UTF-16 encoded wstring.
 

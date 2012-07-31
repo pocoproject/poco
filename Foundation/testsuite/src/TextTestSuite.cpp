@@ -37,9 +37,7 @@
 #include "StreamConverterTest.h"
 #include "TextEncodingTest.h"
 #include "UTF8StringTest.h"
-#ifdef _WINDOWS
 #include "UnicodeConverterTest.h"
-#endif
 
 
 CppUnit::Test* TextTestSuite::suite()
@@ -52,9 +50,7 @@ CppUnit::Test* TextTestSuite::suite()
 	pSuite->addTest(StreamConverterTest::suite());
 	pSuite->addTest(TextEncodingTest::suite());
 	pSuite->addTest(UTF8StringTest::suite());
-#ifdef _WINDOWS
 	pSuite->addTest(UnicodeConverterTest::suite());
-#endif
 
 	return pSuite;
 }

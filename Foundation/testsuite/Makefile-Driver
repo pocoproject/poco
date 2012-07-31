@@ -37,7 +37,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	LRUCacheTest ExpireCacheTest ExpireLRUCacheTest CacheTestSuite AnyTest FormatTest \
         HashingTestSuite HashTableTest SimpleHashTableTest LinearHashTableTest \
         HashSetTest HashMapTest SharedMemoryTest \
-        UniqueExpireCacheTest UniqueExpireLRUCacheTest \
+        UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
         TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
         MemoryStreamTest ObjectPoolTest
 

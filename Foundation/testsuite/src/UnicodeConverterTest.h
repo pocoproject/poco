@@ -46,6 +46,15 @@ public:
 	UnicodeConverterTest(const std::string& name);
 	~UnicodeConverterTest();
 
+#ifdef _WINDOWS
+	void testString16();
+	void testCharPtrLength16();
+	void testCharPtr16();
+#else
+	void testString32();
+	void testCharPtrLength32();
+	void testCharPtr32();
+#endif
 	void testString();
 	void testCharPtrLength();
 	void testCharPtr();
