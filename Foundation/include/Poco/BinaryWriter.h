@@ -215,7 +215,12 @@ public:
 		return _data;
 	}
 
-	MemoryOutputStream& stream() const
+	const MemoryOutputStream& stream() const
+	{
+		return _ostr;
+	}
+
+	MemoryOutputStream& stream()
 	{
 		return _ostr;
 	}

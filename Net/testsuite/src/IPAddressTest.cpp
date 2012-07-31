@@ -551,10 +551,12 @@ void IPAddressTest::testBroadcast()
 void IPAddressTest::testPrefixCons()
 {
 	IPAddress ia1(15, IPAddress::IPv4);
-	IPAddress ia2(62, IPAddress::IPv6);
-
 	assert(ia1.toString() == "255.254.0.0");
+
+#ifdef POCO_HAVE_IPv6
+	IPAddress ia2(62, IPAddress::IPv6);
 	assert(ia2.toString() == "ffff:ffff:ffff:fffc::");
+#endif
 }
 
 
@@ -575,6 +577,7 @@ void IPAddressTest::testPrefixLen()
 	IPAddress ia5(25, IPAddress::IPv4);
 	assert(ia5.prefixLength() == 25);
 
+#ifdef POCO_HAVE_IPv6
 	IPAddress ia6(62, IPAddress::IPv6);
 	assert(ia6.prefixLength() == 62);
 
@@ -586,6 +589,7 @@ void IPAddressTest::testPrefixLen()
 
 	IPAddress ia9(65, IPAddress::IPv6);
 	assert(ia9.prefixLength() == 65);
+#endif
 }
 
 

@@ -200,7 +200,12 @@ public:
 		return _data;
 	}
 
-	MemoryInputStream& stream() const
+	const MemoryInputStream& stream() const
+	{
+		return _istr;
+	}
+
+	MemoryInputStream& stream()
 	{
 		return _istr;
 	}
