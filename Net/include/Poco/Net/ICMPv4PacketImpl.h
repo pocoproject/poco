@@ -43,6 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/ICMPPacketImpl.h"
+#include <cstddef>
 
 
 namespace Poco {
@@ -66,6 +67,12 @@ public:
 		Poco::UInt16 id;
 		Poco::UInt16 seq;
 	};
+
+	// compile-time shield against misalignment
+	poco_static_assert (offsetof(Header, code) == 0x01);
+	poco_static_assert (offsetof(Header, checksum) == 0x02);
+	poco_static_assert (offsetof(Header, id) == 0x04);
+	poco_static_assert (offsetof(Header, seq) == 0x06);
 
 	enum MessageType
 	{
@@ -175,7 +182,7 @@ private:
 	static const std::string REDIRECT_MESSAGE_CODE[REDIRECT_MESSAGE_LENGTH];
 	static const std::string TIME_EXCEEDED_CODE[TIME_EXCEEDED_LENGTH];
 	static const std::string PARAMETER_PROBLEM_CODE[PARAMETER_PROBLEM_LENGTH];
-  
+
 	Poco::UInt16 _seq;
 };
 
