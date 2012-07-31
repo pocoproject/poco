@@ -903,19 +903,22 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 			IPAddress addr;
 			bool haveAddr = false;
 			int ifIndex(-1);
-			switch (currIface->ifa_addr->sa_family)
+			if (currIface->ifa_addr)
 			{
-			case AF_INET6:
-				ifIndex = if_nametoindex(currIface->ifa_name);
-				addr = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(currIface->ifa_addr)->sin6_addr, sizeof(struct in6_addr), ifIndex);
-				haveAddr = true;
-				break;
-			case AF_INET:
-				addr = IPAddress(*(currIface->ifa_addr));
-				haveAddr = true;
-				break;
-			default:
-				break;
+                switch (currIface->ifa_addr->sa_family)
+                {
+                case AF_INET6:
+                    ifIndex = if_nametoindex(currIface->ifa_name);
+                    addr = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(currIface->ifa_addr)->sin6_addr, sizeof(struct in6_addr), ifIndex);
+                    haveAddr = true;
+                    break;
+                case AF_INET:
+                    addr = IPAddress(*(currIface->ifa_addr));
+                    haveAddr = true;
+                    break;
+                default:
+                    break;
+                }
 			}
 			if (haveAddr) 
 			{
