@@ -172,7 +172,7 @@ int UTF32Encoding::convert(int ch, unsigned char* bytes, int length) const
 
 int UTF32Encoding::queryConvert(const unsigned char* bytes, int length) const
 {
-	int ret = -2;
+	int ret = -4;
 
 	if (length >= 4)
 	{
