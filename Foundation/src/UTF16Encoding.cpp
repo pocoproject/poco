@@ -224,7 +224,7 @@ int UTF16Encoding::queryConvert(const unsigned char* bytes, int length) const
 		*p++ = *bytes++;
 		*p++ = *bytes++;
 		if (_flipBytes) 
-			ByteOrder::flipBytes(ret);
+			ByteOrder::flipBytes(uc);
 		if (uc >= 0xd800 && uc < 0xdc00)
 		{
 			if (length >= 4)
@@ -234,7 +234,7 @@ int UTF16Encoding::queryConvert(const unsigned char* bytes, int length) const
 				*p++ = *bytes++;
 				*p++ = *bytes++;
 				if (_flipBytes) 
-					ByteOrder::flipBytes(ret);
+					ByteOrder::flipBytes(uc2);
 				if (uc2 >= 0xdc00 && uc < 0xe000)
 				{
 					ret = ((uc & 0x3ff) << 10) + (uc2 & 0x3ff) + 0x10000;
