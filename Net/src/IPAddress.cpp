@@ -149,7 +149,7 @@ public:
 	
 	IPv4AddressImpl(unsigned prefix)
 	{
-		UInt32 addr = ~(0xffffffff >> prefix);
+		UInt32 addr = (prefix == 32) ? 0xffffffff : ~(0xffffffff >> prefix);
 		_addr.s_addr = htonl(addr);
 	}
 
@@ -383,15 +383,15 @@ public:
 	{
 		unsigned i = 0;
 #ifdef POCO_OS_FAMILY_WINDOWS
-		for (; prefix > 16; ++i, prefix -= 16) {
+		for (; prefix >= 16; ++i, prefix -= 16) {
 			_addr.s6_addr16[i] = 0xffff;
 		}
 		if (prefix > 0)
-			_addr.s6_addr16[i++] = htons(~(0xffffU >> prefix));
+			_addr.s6_addr16[i++] = htons(~(0xffff >> prefix));
 		while (i < 8)
 			_addr.s6_addr16[i++] = 0;
 #else
-		for (; prefix > 32; ++i, prefix -= 32) {
+		for (; prefix >= 32; ++i, prefix -= 32) {
 			_addr.s6_addr32[i] = 0xffffffff;
 		}
 		if (prefix > 0)

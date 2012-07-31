@@ -97,6 +97,10 @@ void IPAddressTest::testStringConv6()
 	IPAddress ia5(64, IPAddress::IPv6);
 	assert (ia5.family() == IPAddress::IPv6);
 	assert (ia5.toString() == "ffff:ffff:ffff:ffff::");
+
+	IPAddress ia6(32, IPAddress::IPv6);
+	assert (ia6.family() == IPAddress::IPv6);
+	assert (ia6.toString() == "ffff:ffff::");
 #endif
 }
 
@@ -557,10 +561,31 @@ void IPAddressTest::testPrefixCons()
 void IPAddressTest::testPrefixLen()
 {
 	IPAddress ia1(15, IPAddress::IPv4);
-	IPAddress ia2(62, IPAddress::IPv6);
-
 	assert(ia1.prefixLength() == 15);
-	assert(ia2.prefixLength() == 62);
+
+	IPAddress ia2(16, IPAddress::IPv4);
+	assert(ia2.prefixLength() == 16);
+
+	IPAddress ia3(23, IPAddress::IPv4);
+	assert(ia3.prefixLength() == 23);
+
+	IPAddress ia4(24, IPAddress::IPv4);
+	assert(ia4.prefixLength() == 24);
+
+	IPAddress ia5(25, IPAddress::IPv4);
+	assert(ia5.prefixLength() == 25);
+
+	IPAddress ia6(62, IPAddress::IPv6);
+	assert(ia6.prefixLength() == 62);
+
+	IPAddress ia7(63, IPAddress::IPv6);
+	assert(ia7.prefixLength() == 63);
+
+	IPAddress ia8(64, IPAddress::IPv6);
+	assert(ia8.prefixLength() == 64);
+
+	IPAddress ia9(65, IPAddress::IPv6);
+	assert(ia9.prefixLength() == 65);
 }
 
 
