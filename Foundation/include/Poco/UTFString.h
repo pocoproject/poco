@@ -73,9 +73,9 @@ namespace Poco {
 				typedef std::wstring              UTF32String;
 			#endif
 		#else // default to 32-bit wchar_t
-			typedef Poco::Uint16              UTF16Char;
+			typedef Poco::UInt16              UTF16Char;
 			typedef std::basic_string<UInt16> UTF16String;
-			typedef UInt32                    UTF32Char;
+			typedef wchar_t                   UTF32Char;
 			typedef std::wstring              UTF32String;
 		#endif //POCO_OS_FAMILY_WINDOWS
 	//#endif // POCO_ENABLE_CPP11
