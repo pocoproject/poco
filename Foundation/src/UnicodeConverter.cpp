@@ -43,6 +43,7 @@
 #include "Poco/UTF8Encoding.h"
 #include "Poco/UTF16Encoding.h"
 #include "Poco/UTF32Encoding.h"
+#include <cstring>
 
 
 namespace Poco {

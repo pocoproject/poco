@@ -38,6 +38,8 @@
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
+#include "Poco/UnicodeConverter.h"
+#include <cstring>
 
 
 class UnicodeConverterTest: public CppUnit::TestCase
@@ -63,9 +65,9 @@ private:
 
 		// Convert from UTF-8 to wide
 		T wtext, wtext2, wtext3;
-		UnicodeConverter::convert(text, wtext);
-		UnicodeConverter::convert((const char*) supp, strlen((const char*) supp), wtext2);
-		UnicodeConverter::convert((const char*) supp, wtext3);
+		Poco::UnicodeConverter::convert(text, wtext);
+		Poco::UnicodeConverter::convert((const char*) supp, strlen((const char*) supp), wtext2);
+		Poco::UnicodeConverter::convert((const char*) supp, wtext3);
 
 		std::string text2, text3, text4;
 	
@@ -74,9 +76,9 @@ private:
 		assert (text != text4);
 
 		// Convert from wide to UTF-8
-		UnicodeConverter::convert(wtext, text2);
-		UnicodeConverter::convert(wtext2, text3);
-		UnicodeConverter::convert(wtext3, text4);
+		Poco::UnicodeConverter::convert(wtext, text2);
+		Poco::UnicodeConverter::convert(wtext2, text3);
+		Poco::UnicodeConverter::convert(wtext3, text4);
 
 		assert (text == text2);
 		assert (text == text3);
