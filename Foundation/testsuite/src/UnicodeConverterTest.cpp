@@ -34,8 +34,14 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/UnicodeConverter.h"
+#include "Poco/UTFString.h"
+
 
 using Poco::UnicodeConverter;
+using Poco::UTF16Char;
+using Poco::UTF16String;
+using Poco::UTF32Char;
+using Poco::UTF32String;
 
 
 UnicodeConverterTest::UnicodeConverterTest(const std::string& name): CppUnit::TestCase(name)
@@ -48,141 +54,18 @@ UnicodeConverterTest::~UnicodeConverterTest()
 }
 
 
-#ifdef _WINDOWS
-
-void UnicodeConverterTest::testString16()
+void UnicodeConverterTest::testUTF16()
 {
-	const unsigned char supp[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
-	std::string text((const char*) supp);
-
-	std::wstring wtext;
-
-	UnicodeConverter::toUTF16 (text, wtext);
-
-	std::string text2;
-
-	UnicodeConverter::toUTF8 (wtext, text2);
-
-	assert (text == text2);
+	
+	runTests<UTF16String>();
 }
 
-void UnicodeConverterTest::testCharPtrLength16()
+
+void UnicodeConverterTest::testUTF32()
 {
-	const unsigned char supp[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
-	std::string text((const char*) supp);
-
-	std::wstring wtext;
-	std::string text2;
-
-	UnicodeConverter::toUTF16 ((const char*)supp, 14, wtext);
-	UnicodeConverter::toUTF8 (wtext.c_str (), (int) wtext.size (), text2);
-
-	assert (text == text2);
+	runTests<UTF32String>();
 }
 
-void UnicodeConverterTest::testCharPtr16()
-{
-	const unsigned char supp[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
-	std::string text((const char*) supp);
-
-	std::wstring wtext;
-	std::string text2;
-
-	UnicodeConverter::toUTF16 ((const char*)supp, wtext);
-	UnicodeConverter::toUTF8 (wtext.c_str (), text2);
-
-	assert (text == text2);
-}
-
-#else
-
-void UnicodeConverterTest::testString32()
-{
-	const unsigned char utf8Chars[] = "ľščťžýáíéúäô ĽŠČŤŽÝÁÍÉÚÄÔ";
-	std::string text((const char*) utf8Chars);
-
-	std::wstring wtext;
-
-	UnicodeConverter::toUTF32 (text, wtext);
-
-	std::string text2;
-
-	UnicodeConverter::toUTF8 (wtext, text2);
-	assert (text == text2);
-}
-
-void UnicodeConverterTest::testCharPtrLength32()
-{
-	const unsigned char supp[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
-	std::string text((const char*) supp);
-
-	std::wstring wtext;
-	std::string text2;
-
-	UnicodeConverter::toUTF32 ((const char*)supp, 14, wtext);
-	UnicodeConverter::toUTF8 (wtext.c_str (), (int) wtext.size (), text2);
-
-	assert (text == text2);
-}
-
-void UnicodeConverterTest::testCharPtr32()
-{
-	const unsigned char supp[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
-	std::string text((const char*) supp);
-
-	std::wstring wtext;
-	std::string text2;
-
-	UnicodeConverter::toUTF32 ((const char*)supp, wtext);
-	UnicodeConverter::toUTF8 (wtext.c_str (), text2);
-
-	assert (text == text2);
-}
-
-#endif
-
-void UnicodeConverterTest::testString()
-{
-	const unsigned char utf8Chars[] = "ľščťžýáíéúäô ĽŠČŤŽÝÁÍÉÚÄÔ";
-	std::string text((const char*) utf8Chars);
-
-	std::wstring wtext;
-
-	UnicodeConverter::toWideUTF (text, wtext);
-
-	std::string text2;
-
-	UnicodeConverter::toUTF8 (wtext, text2);
-	assert (text == text2);
-}
-
-void UnicodeConverterTest::testCharPtrLength()
-{
-	const unsigned char supp[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
-	std::string text((const char*) supp);
-
-	std::wstring wtext;
-	std::string text2;
-
-	UnicodeConverter::toWideUTF ((const char*)supp, 14, wtext);
-	UnicodeConverter::toUTF8 (wtext.c_str (), (int) wtext.size (), text2);
-
-	assert (text == text2);
-}
-
-void UnicodeConverterTest::testCharPtr()
-{
-	const unsigned char supp[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
-	std::string text((const char*) supp);
-
-	std::wstring wtext;
-	std::string text2;
-
-	UnicodeConverter::toWideUTF ((const char*)supp, wtext);
-	UnicodeConverter::toUTF8 (wtext.c_str (), text2);
-
-	assert (text == text2);
-}
 
 void UnicodeConverterTest::setUp()
 {
@@ -198,18 +81,8 @@ CppUnit::Test* UnicodeConverterTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("UnicodeConverterTest");
 
-#ifdef _WINDOWS
-	CppUnit_addTest(pSuite, UnicodeConverterTest, testString16);
-	CppUnit_addTest(pSuite, UnicodeConverterTest, testCharPtrLength16);
-	CppUnit_addTest(pSuite, UnicodeConverterTest, testCharPtr16);
-#else
-	CppUnit_addTest(pSuite, UnicodeConverterTest, testString32);
-	CppUnit_addTest(pSuite, UnicodeConverterTest, testCharPtrLength32);
-	CppUnit_addTest(pSuite, UnicodeConverterTest, testCharPtr32);
-#endif
-	CppUnit_addTest(pSuite, UnicodeConverterTest, testString);
-	CppUnit_addTest(pSuite, UnicodeConverterTest, testCharPtrLength);
-	CppUnit_addTest(pSuite, UnicodeConverterTest, testCharPtr);
+	CppUnit_addTest(pSuite, UnicodeConverterTest, testUTF16);
+	CppUnit_addTest(pSuite, UnicodeConverterTest, testUTF32);
 
 	return pSuite;
 }

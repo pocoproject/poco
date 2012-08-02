@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/UTFString.h"
 
 
 namespace Poco {
@@ -55,41 +56,87 @@ class Foundation_API UnicodeConverter
 	/// and probably won't be of much use anywhere else ???
 {
 public:
-	static void toWideUTF(const std::string& utf8String, std::wstring& utf32String);
-		/// Converts the given UTF-8 encoded string into a native encoded wstring.
+	static void convert(const std::string& utf8String, UTF32String& utf32String);
+		/// Converts the given UTF-8 encoded string into an UTF-32 encoded wide string.
 
-	static void toWideUTF(const char* utf8String, int length, std::wstring& utf32String);
-		/// Converts the given UTF-8 encoded character sequence into a native encoded string.
+	static void convert(const char* utf8String,  std::size_t length, UTF32String& utf32String);
+		/// Converts the given UTF-8 encoded character sequence into an UTF-32 encoded wide string.
 
-	static void toWideUTF(const char* utf8String, std::wstring& utf32String);
-		/// Converts the given zero-terminated UTF-8 encoded character sequence into a native encoded wstring.
+	static void convert(const char* utf8String, UTF32String& utf32String);
+		/// Converts the given zero-terminated UTF-8 encoded character sequence into an UTF-32 encoded wide string.
 
-	static void toUTF32(const std::string& utf8String, std::wstring& utf32String);
-		/// Converts the given UTF-8 encoded string into an UTF-32 encoded wstring.
+	static void convert(const std::string& utf8String, UTF16String& utf16String);
+		/// Converts the given UTF-8 encoded string into an UTF-16 encoded wide string.
 
-	static void toUTF32(const char* utf8String, int length, std::wstring& utf32String);
-		/// Converts the given UTF-8 encoded character sequence into an UTF-32 encoded string.
+	static void convert(const char* utf8String,  std::size_t length, UTF16String& utf16String);	
+		/// Converts the given UTF-8 encoded character sequence into an UTF-16 encoded wide string.
 
-	static void toUTF32(const char* utf8String, std::wstring& utf32String);
-		/// Converts the given zero-terminated UTF-8 encoded character sequence into an UTF-32 encoded wstring.
+	static void convert(const char* utf8String, UTF16String& utf16String);	
+		/// Converts the given zero-terminated UTF-8 encoded character sequence into an UTF-16 encoded wide string.
 
-	static void toUTF16(const std::string& utf8String, std::wstring& utf16String);
-		/// Converts the given UTF-8 encoded string into an UTF-16 encoded wstring.
+	static void convert(const UTF16String& utf16String, std::string& utf8String);
+		/// Converts the given UTF-16 encoded wide string into an UTF-8 encoded string.
 
-	static void toUTF16(const char* utf8String, int length, std::wstring& utf16String);	
-		/// Converts the given UTF-8 encoded character sequence into an UTF-16 encoded string.
+	static void convert(const UTF32String& utf32String, std::string& utf8String);
+		/// Converts the given UTF-32 encoded wide string into an UTF-8 encoded string.
 
-	static void toUTF16(const char* utf8String, std::wstring& utf16String);	
-		/// Converts the given zero-terminated UTF-8 encoded character sequence into an UTF-16 encoded wstring.
+	static void convert(const UTF16Char* utf16String,  std::size_t length, std::string& utf8String);
+		/// Converts the given zero-terminated UTF-16 encoded wide character sequence into an UTF-8 encoded string.
 
-	static void toUTF8(const std::wstring& utf16String, std::string& utf8String);
-		/// Converts the given UTF-16 encoded wstring into an UTF-8 encoded string.
+	static void convert(const UTF32Char* utf16String, std::size_t length, std::string& utf8String);
+		/// Converts the given zero-terminated UTF-32 encoded wide character sequence into an UTF-8 encoded string.
 
-	static void toUTF8(const wchar_t* utf16String, int length, std::string& utf8String);
-		/// Converts the given zero-terminated UTF-16 encoded wide character sequence into an UTF-8 encoded wstring.
-
-	static void toUTF8(const wchar_t* utf16String, std::string& utf8String);
+	static void convert(const UTF16Char* utf16String, std::string& utf8String);
 		/// Converts the given UTF-16 encoded zero terminated character sequence into an UTF-8 encoded string.
+
+	static void convert(const UTF32Char* utf32String, std::string& utf8String);
+		/// Converts the given UTF-32 encoded zero terminated character sequence into an UTF-8 encoded string.
+
+	template <typename F, typename T>
+	static void toUTF32(const F& f, T& t)
+	{
+		convert(f, t);
+	}
+
+	template <typename F, typename T>
+	static void toUTF32(const F& f, std::size_t l, T& t)
+	{
+		convert(f, l, t);
+	}
+
+	template <typename F, typename T>
+	static void toUTF16(const F& f, T& t)
+	{
+		convert(f, t);
+	}
+
+	template <typename F, typename T>
+	static void toUTF16(const F& f, std::size_t l, T& t)
+	{
+		convert(f, l, t);
+	}
+
+	template <typename F, typename T>
+	static void toUTF8(const F& f, T& t)
+	{
+		convert(f, t);
+	}
+
+	template <typename F, typename T>
+	static void toUTF8(const F& f, std::size_t l, T& t)
+	{
+		convert(f, l, t);
+	}
+
+	template <typename T>
+	static size_t UTFStrlen(const T* ptr)
+		/// Returns the length (in characters) of a zero-terminated UTF string.
+	{
+		if (ptr == 0) return 0;
+		const T* p;
+		for (p = ptr; *p; ++p);
+		return p - ptr;
+	}
 };
 
 

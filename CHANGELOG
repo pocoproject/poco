@@ -23,6 +23,7 @@ Release 1.5.0 (2012-08-??)
 - IPAddress force IPv6 always lowercase (RFC 5952)
 - fixed SF#3538785: SMTPClientSession::sendMessage() should take recipient list 
 - added IPAddress::prefixLength()
+- UTF portability improvements
 
 Release 1.4.4 (2012-08-??)
 ==========================

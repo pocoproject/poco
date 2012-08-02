@@ -43,53 +43,12 @@
 #include "Poco/UTF8Encoding.h"
 #include "Poco/UTF16Encoding.h"
 #include "Poco/UTF32Encoding.h"
-#include <cstring>
-#include <wchar.h>
 
 
 namespace Poco {
 
 
-void UnicodeConverter::toWideUTF(const std::string& utf8String, std::wstring& utfWideString)
-{
-	if (sizeof(wchar_t) == 2)
-	{
-		toUTF16(utf8String, utfWideString);
-	}
-	else
-	{
-		toUTF32(utf8String, utfWideString);
-	}
-}
-
-
-void UnicodeConverter::toWideUTF(const char* utf8String, int length, std::wstring& utfWideString)
-{
-	if (sizeof(wchar_t) == 2)
-	{
-		toUTF16(utf8String, utfWideString);
-	}
-	else
-	{
-		toUTF32(utf8String, utfWideString);
-	}
-}
-
-
-void UnicodeConverter::toWideUTF(const char* utf8String, std::wstring& utfWideString)
-{
-	if (sizeof(wchar_t) == 2)
-	{
-		toUTF16(utf8String, utfWideString);
-	}
-	else
-	{
-		toUTF32(utf8String, utfWideString);
-	}
-}
-
-
-void UnicodeConverter::toUTF32(const std::string& utf8String, std::wstring& utf32String)
+void UnicodeConverter::convert(const std::string& utf8String, UTF32String& utf32String)
 {
 	utf32String.clear();
 	UTF8Encoding utf8Encoding;
@@ -99,64 +58,36 @@ void UnicodeConverter::toUTF32(const std::string& utf8String, std::wstring& utf3
 	while (it != end)
 	{
 		int cc = *it++;
-		utf32String += (wchar_t) cc;
+		utf32String += (UTF32Char) cc;
 	}
 }
 
 
-void UnicodeConverter::toUTF32(const char* utf8String, int length, std::wstring& utf32String)
+void UnicodeConverter::convert(const char* utf8String, std::size_t length, UTF32String& utf32String)
 {
-	poco_check_ptr (utf8String);
-
-	utf32String.clear();
-
-	UTF8Encoding utf8Encoding;
-	UTF32Encoding utf32Encoding;
-	const unsigned char* it  = (const unsigned char*) utf8String;
-	const unsigned char* end = (const unsigned char*) utf8String + length;
-
-	while (it < end)
+	if (!utf8String || !length)
 	{
-		int n = utf8Encoding.queryConvert(it, 1);
-		int uc;
-		int read = 1;
-
-		while (-1 > n && (end - it) >= -n)
-		{
-			read = -n;
-			n = utf8Encoding.queryConvert(it, read);
-		}
-
-		if (-1 > n)
-		{
-			it = end;
-		}
-		else
-		{
-			it += read;
-		}
-
-		if (-1 >= n)
-		{
-			uc = 0xfffd;	// Replacement Character (instead of '?')
-		}
-		else
-		{
-			uc = n;
-		}
-
-		utf32String += (wchar_t) uc;
+		utf32String.clear();
+		return;
 	}
+
+	convert(std::string(utf8String, utf8String + length), utf32String);
 }
 
 
-void UnicodeConverter::toUTF32(const char* utf8String, std::wstring& utf32String)
+void UnicodeConverter::convert(const char* utf8String, UTF32String& utf32String)
 {
-	toUTF32(utf8String, (int) std::strlen(utf8String), utf32String);
+	if (!utf8String || !strlen(utf8String))
+	{
+		utf32String.clear();
+		return;
+	}
+
+	convert(utf8String, std::strlen(utf8String), utf32String);
 }
 
 
-void UnicodeConverter::toUTF16(const std::string& utf8String, std::wstring& utf16String)
+void UnicodeConverter::convert(const std::string& utf8String, UTF16String& utf16String)
 {
 	utf16String.clear();
 	UTF8Encoding utf8Encoding;
@@ -167,120 +98,87 @@ void UnicodeConverter::toUTF16(const std::string& utf8String, std::wstring& utf1
 		int cc = *it++;
 		if (cc <= 0xffff)
 		{
-			utf16String += (wchar_t) cc;
+			utf16String += (UTF16Char) cc;
 		}
 		else
 		{
 			cc -= 0x10000;
-			utf16String += (wchar_t) ((cc >> 10) & 0x3ff) | 0xd800;
-			utf16String += (wchar_t) (cc & 0x3ff) | 0xdc00;
+			utf16String += (UTF16Char) ((cc >> 10) & 0x3ff) | 0xd800;
+			utf16String += (UTF16Char) (cc & 0x3ff) | 0xdc00;
 		}
 	}
 }
 
 
-void UnicodeConverter::toUTF16(const char* utf8String, int length, std::wstring& utf16String)
+void UnicodeConverter::convert(const char* utf8String,  std::size_t length, UTF16String& utf16String)
 {
-	poco_check_ptr (utf8String);
+	if (!utf8String || !length)
+	{
+		utf16String.clear();
+		return;
+	}
 
-	utf16String.clear();
+	convert(std::string(utf8String, utf8String + length), utf16String);
+}
 
+
+void UnicodeConverter::convert(const char* utf8String, UTF16String& utf16String)
+{
+	if (!utf8String || !strlen(utf8String))
+	{
+		utf16String.clear();
+		return;
+	}
+
+	convert(std::string(utf8String), utf16String);
+}
+
+
+void UnicodeConverter::convert(const UTF16String& utf16String, std::string& utf8String)
+{
+	utf8String.clear();
 	UTF8Encoding utf8Encoding;
 	UTF16Encoding utf16Encoding;
-	const unsigned char* it  = (const unsigned char*) utf8String;
-	const unsigned char* end = (const unsigned char*) utf8String + length;
-	
-	while (it < end)
-	{
-		int n = utf8Encoding.queryConvert(it, 1);
-		int uc;
-		int read = 1;
-
-		while (-1 > n && (end - it) >= -n)
-		{
-			read = -n;
-			n = utf8Encoding.queryConvert(it, read);
-		}
-		
-		if (-1 > n)
-		{
-			it = end;
-		}
-		else
-		{
-			it += read;
-		}
-
-		if (-1 >= n)
-		{
-			uc = 0xfffd;	// Replacement Character (instead of '?')
-		}
-		else
-		{
-			uc = n;
-		}
-
-		if (uc > 0xffff)
-		{
-			uc -= 0x10000;
-			utf16String += (wchar_t) ((uc >> 10) & 0x3ff) | 0xd800 ;
-			utf16String += (wchar_t) (uc & 0x3ff) | 0xdc00 ;
-		}
-		else
-		{
-			utf16String += (wchar_t) uc;
-		}
-	}
+	TextConverter converter(utf16Encoding, utf8Encoding);
+	converter.convert(utf16String.data(), (int) utf16String.length() * sizeof(UTF16Char), utf8String);
 }
 
 
-void UnicodeConverter::toUTF16(const char* utf8String, std::wstring& utf16String)
-{
-	toUTF16(utf8String, (int) std::strlen(utf8String), utf16String);
-}
-
-
-void UnicodeConverter::toUTF8(const std::wstring& utf16String, std::string& utf8String)
+void UnicodeConverter::convert(const UTF32String& utf32String, std::string& utf8String)
 {
 	utf8String.clear();
 	UTF8Encoding utf8Encoding;
-	if (sizeof(wchar_t) == 2)
-	{
-		UTF16Encoding utf16Encoding;
-		TextConverter converter(utf16Encoding, utf8Encoding);
-		converter.convert(utf16String.data(), (int) utf16String.length() * sizeof(wchar_t), utf8String);
-	}
-	else
-	{
-		UTF32Encoding utf32Encoding;
-		TextConverter converter(utf32Encoding, utf8Encoding);
-		converter.convert(utf16String.data(), (int) utf16String.length() * sizeof(wchar_t), utf8String);
-	}
+	UTF32Encoding utf32Encoding;
+	TextConverter converter(utf32Encoding, utf8Encoding);
+	converter.convert(utf32String.data(), (int) utf32String.length() * sizeof(UTF32Char), utf8String);
 }
 
 
-void UnicodeConverter::toUTF8(const wchar_t* utf16String, int length, std::string& utf8String)
+void UnicodeConverter::convert(const UTF16Char* utf16String,  std::size_t length, std::string& utf8String)
 {
 	utf8String.clear();
 	UTF8Encoding utf8Encoding;
-	if (sizeof(wchar_t) == 2)
-	{
-		UTF16Encoding utf16Encoding;
-		TextConverter converter(utf16Encoding, utf8Encoding);
-		converter.convert(utf16String, (int) length * sizeof(wchar_t), utf8String);
-	}
-	else
-	{
-		UTF32Encoding utf32Encoding;
-		TextConverter converter(utf32Encoding, utf8Encoding);
-		converter.convert(utf16String, (int) length * sizeof(wchar_t), utf8String);
-	}
+	UTF16Encoding utf16Encoding;
+	TextConverter converter(utf16Encoding, utf8Encoding);
+	converter.convert(utf16String, (int) length * sizeof(UTF16Char), utf8String);
 }
 
 
-void UnicodeConverter::toUTF8(const wchar_t* utf16String, std::string& utf8String)
+void UnicodeConverter::convert(const UTF32Char* utf32String,  std::size_t length, std::string& utf8String)
 {
-	toUTF8(utf16String, (int) wcslen(utf16String), utf8String);
+	toUTF8(UTF32String(utf32String, length), utf8String);
+}
+
+
+void UnicodeConverter::convert(const UTF16Char* utf16String, std::string& utf8String)
+{
+	toUTF8(utf16String, UTFStrlen(utf16String), utf8String);
+}
+
+
+void UnicodeConverter::convert(const UTF32Char* utf32String, std::string& utf8String)
+{
+	toUTF8(utf32String, UTFStrlen(utf32String), utf8String);
 }
 
 
