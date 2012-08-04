@@ -92,21 +92,24 @@ public:
 	class ConstIterator: public std::iterator<std::forward_iterator_tag, Value>
 	{
 	public:
-		ConstIterator()
+		ConstIterator(): _initialized(false)
 		{
 		}
 		
 		ConstIterator(const BucketVecIterator& vecIt, const BucketVecIterator& endIt, const BucketIterator& buckIt):
 			_vecIt(vecIt),
 			_endIt(endIt),
-			_buckIt(buckIt)
+			_buckIt(buckIt),
+			_initialized(true)
 		{
 		}
 
 		ConstIterator(const ConstIterator& it):
 			_vecIt(it._vecIt),
 			_endIt(it._endIt),
-			_buckIt(it._buckIt)
+			_buckIt(it._buckIt),
+			_initialized(it._initialized)
+
 		{
 		}
 		
@@ -120,9 +123,21 @@ public:
 		void swap(ConstIterator& it)
 		{
 			using std::swap;
-			swap(_vecIt, it._vecIt);
-			swap(_endIt, it._endIt);
-			swap(_buckIt, it._buckIt);
+			// uninitialized iterators crash when swapped
+			if (_initialized)
+			{
+				swap(_vecIt, it._vecIt);
+				swap(_endIt, it._endIt);
+				swap(_buckIt, it._buckIt);
+				swap(_initialized, it._initialized);
+			}
+			else 
+			{
+				_vecIt = it._vecIt;
+				_endIt = it._endIt;
+				_buckIt = it._buckIt;
+				_initialized = it._initialized;
+			}
 		}
 		
 		bool operator == (const ConstIterator& it) const
@@ -170,6 +185,7 @@ public:
 		BucketVecIterator _vecIt;
 		BucketVecIterator _endIt;
 		BucketIterator    _buckIt;
+		bool              _initialized;
 		
 		friend class LinearHashTable;
 	};
@@ -194,7 +210,7 @@ public:
 		Iterator& operator = (const Iterator& it)
 		{
 			Iterator tmp(it);
-			swap(tmp);
+			ConstIterator::swap(tmp);
 			return *this;
 		}
 		

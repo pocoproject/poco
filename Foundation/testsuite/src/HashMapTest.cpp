@@ -155,7 +155,8 @@ void HashMapTest::testIterator()
 	}
 	
 	std::map<int, int> values;
-	IntMap::Iterator it = hm.begin();
+	IntMap::Iterator it; // do not initialize here to test proper behavior of uninitialized iterators
+	it = hm.begin();
 	while (it != hm.end())
 	{
 		assert (values.find(it->first) == values.end());

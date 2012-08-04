@@ -126,18 +126,18 @@ public:
 	}
 	
 	void resize(std::size_t newCapacity, bool preserveContent = true)
-		/// Resizes the buffer. If preserveContent is true,
+		/// Resizes the buffer capacity and size. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
 		/// new buffer. The new capacity can be larger or smaller than
-		/// the current one, but it must not be 0. 
+		/// the current one; if it is smaller, capacity will remain intact.
+		/// Size will always be set to the new capacity.
+		///  
 		/// Buffers only wrapping externally owned storage can not be 
 		/// resized. If resize is attempted on those, IllegalAccessException
 		/// is thrown.
 	{
 		if (!_ownMem)
 			throw Poco::InvalidAccessException("Cannot resize buffer which does not own its storage.");
-
-		poco_assert(newCapacity);
 
 		if (newCapacity > _capacity)
 		{

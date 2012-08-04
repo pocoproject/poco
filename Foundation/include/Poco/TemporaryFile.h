@@ -67,7 +67,7 @@ public:
 	TemporaryFile();
 		/// Creates the TemporaryFile.
 
-    TemporaryFile(const std::string& tempDir);
+	TemporaryFile(const std::string& tempDir);
 		/// Creates the TemporaryFile using the given directory.
 
 	~TemporaryFile();
