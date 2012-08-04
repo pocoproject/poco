@@ -52,9 +52,11 @@ public:
 	void log(const Poco::Message& msg);
 	MsgList& list();
 	void clear();
+	const Poco::Message& getLastMessage() const { return _lastMessage; }
 	
 private:	
 	MsgList _msgList;
+	Poco::Message _lastMessage;
 };
 
 

@@ -46,6 +46,7 @@ TestChannel::~TestChannel()
 void TestChannel::log(const Poco::Message& msg)
 {
 	_msgList.push_back(msg);
+	_lastMessage = msg;
 }
 
 

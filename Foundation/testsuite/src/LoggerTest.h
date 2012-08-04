@@ -48,6 +48,7 @@ public:
 
 	void testLogger();
 	void testFormat();
+	void testFormatAny();
 	void testDump();
 
 	void setUp();

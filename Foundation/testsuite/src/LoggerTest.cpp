@@ -187,6 +187,40 @@ void LoggerTest::testFormat()
 	assert (str == "1234");
 }
 
+void LoggerTest::testFormatAny()
+{
+	AutoPtr<TestChannel> pChannel = new TestChannel;
+	Logger& root = Logger::root();
+	root.setChannel(pChannel.get());
+
+	root.error("%s%s", std::string("foo"), std::string("bar"));
+	assert (pChannel->getLastMessage().getText() == "foobar");
+
+	root.error("foo%s", std::string("bar"));
+	assert (pChannel->getLastMessage().getText() == "foobar");
+
+	root.error("the amount is %% %d", 100);
+	assert (pChannel->getLastMessage().getText() == "the amount is % 100");
+
+	root.error("%d", 1);
+	assert (pChannel->getLastMessage().getText() == "1");
+
+	root.error("%d%d", 1, 2);
+	assert (pChannel->getLastMessage().getText() == "12");
+
+	root.error("%d%d%d", 1, 2, 3);
+	assert (pChannel->getLastMessage().getText() == "123");
+
+	root.error("%d%d%d%d", 1, 2, 3, 4);
+	assert (pChannel->getLastMessage().getText() == "1234");
+
+	root.error("%d%d%d%d%d", 1, 2, 3, 4, 5);
+	assert (pChannel->getLastMessage().getText() == "12345");
+
+	root.error("%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6);
+	assert (pChannel->getLastMessage().getText() == "123456");
+}
+
 
 void LoggerTest::testDump()
 {
@@ -245,6 +279,7 @@ CppUnit::Test* LoggerTest::suite()
 
 	CppUnit_addTest(pSuite, LoggerTest, testLogger);
 	CppUnit_addTest(pSuite, LoggerTest, testFormat);
+	CppUnit_addTest(pSuite, LoggerTest, testFormatAny);
 	CppUnit_addTest(pSuite, LoggerTest, testDump);
 
 	return pSuite;
