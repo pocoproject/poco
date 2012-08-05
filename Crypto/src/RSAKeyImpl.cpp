@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSAKeyImpl.cpp#4 $
+// $Id: //poco/1.4/Crypto/src/RSAKeyImpl.cpp#5 $
 //
 // Library: Crypto
 // Package: RSA
@@ -106,7 +106,8 @@ RSAKeyImpl::RSAKeyImpl(
 			RSA* pubKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, 0, 0);
 			if (!pubKey) 
 			{
-				BIO_seek(bio, 0);
+				int rc = BIO_seek(bio, 0);
+				if (rc != 0) throw Poco::FileException("Failed to load public key", publicKeyFile);
 				pubKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, 0, 0);
 			}
 			BIO_free(bio);
@@ -166,7 +167,8 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 		RSA* publicKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, 0, 0);
 		if (!publicKey) 
 		{
-			BIO_seek(bio, 0);
+			int rc = BIO_seek(bio, 0);
+			if (rc != 0) throw Poco::FileException("Failed to load public key");
 			publicKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, 0, 0);
 		}
 		BIO_free(bio);
