@@ -1,7 +1,7 @@
 //
 // CryptoTest.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTest.cpp#2 $
+// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTest.cpp#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -145,6 +145,36 @@ void CryptoTest::testEncryptDecryptWithSalt()
 }
 
 
+void CryptoTest::testEncryptDecryptDESECB()
+{
+	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("des-ecb", "password"));
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
+		std::string result = pCipher->decryptString(out, Cipher::ENC_NONE);
+		poco_assert (in == result);
+	}
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
+		std::string result = pCipher->decryptString(out, Cipher::ENC_BASE64);
+		poco_assert (in == result);
+	}
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
+		std::string result = pCipher->decryptString(out, Cipher::ENC_BINHEX);
+		poco_assert (in == result);
+	}
+}
+
+
 void CryptoTest::testStreams()
 {
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256"));
@@ -218,6 +248,7 @@ CppUnit::Test* CryptoTest::suite()
 
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecrypt);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptWithSalt);
+	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptDESECB);
 	CppUnit_addTest(pSuite, CryptoTest, testStreams);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 

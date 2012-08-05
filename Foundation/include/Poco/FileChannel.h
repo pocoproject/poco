@@ -1,7 +1,7 @@
 //
 // FileChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FileChannel.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/FileChannel.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -154,7 +154,7 @@ class Foundation_API FileChannel: public Channel
 	///
 	/// The purgeAge property can have the following values:
 	///
-	///   * <n> [seconds]  the maximum age is <n> seconds.
+	///   * <n> [seconds]: the maximum age is <n> seconds.
 	///   * <n> minutes:   the maximum age is <n> minutes.
 	///   * <n> hours:     the maximum age is <n> hours.
 	///   * <n> days:      the maximum age is <n> days.

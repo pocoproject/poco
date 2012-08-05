@@ -1,7 +1,7 @@
 //
 // CipherImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/CipherImpl.cpp#3 $
+// $Id: //poco/1.4/Crypto/src/CipherImpl.cpp#4 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -116,7 +116,7 @@ namespace
 			&_ctx,
 			_pCipher,
 			&_key[0],
-			&_iv[0],
+			_iv.empty() ? 0 : &_iv[0],
 			(dir == DIR_ENCRYPT) ? 1 : 0);
 	}
 

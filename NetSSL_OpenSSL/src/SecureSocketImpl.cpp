@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#6 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -241,6 +241,10 @@ void SecureSocketImpl::shutdown()
 			// done with it.
 			int rc = SSL_shutdown(_pSSL);
 			if (rc < 0) handleError(rc);
+			if (_pSocket->getBlocking())
+			{
+				_pSocket->shutdown();
+			}
 		}
 	}
 }

@@ -1,7 +1,7 @@
 //
 // CryptoTest.h
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTest.h#2 $
+// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTest.h#3 $
 //
 // Definition of the CryptoTest class.
 //
@@ -53,6 +53,7 @@ public:
 
 	void testEncryptDecrypt();
 	void testEncryptDecryptWithSalt();
+	void testEncryptDecryptDESECB();
 	void testStreams();
 	void testCertificate();
 	
