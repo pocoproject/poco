@@ -1,7 +1,7 @@
 //
 // WinConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/WinConfigurationTest.cpp#1 $
+// $Id: //poco/1.4/Util/testsuite/src/WinConfigurationTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,6 +36,7 @@
 #include "Poco/Util/WinRegistryConfiguration.h"
 #include "Poco/Environment.h"
 #include "Poco/AutoPtr.h"
+#include <algorithm>
 
 
 using Poco::Util::WinRegistryConfiguration;
@@ -74,6 +75,36 @@ void WinConfigurationTest::testConfiguration()
 	
 	pView->setString("sub.foo", "bar");
 	assert (pView->getString("sub.foo", "default") == "bar");
+
+	Poco::Util::AbstractConfiguration::Keys keys;
+	pReg->keys(keys);
+	assert (keys.size() == 3);
+	assert (std::find(keys.begin(), keys.end(), "name1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "name2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "config") != keys.end());
+
+	pReg->keys("config", keys);
+	assert (keys.size() == 1);
+	assert (std::find(keys.begin(), keys.end(), "sub") != keys.end());
+
+	AutoPtr<WinRegistryConfiguration> pRootReg = new WinRegistryConfiguration("");
+
+	assert (pRootReg->getInt("HKEY_CURRENT_USER.Software.Applied Informatics.Test.name1") == 1);
+
+	pRootReg->keys(keys);
+	assert (keys.size() == 6);
+	assert (std::find(keys.begin(), keys.end(), "HKEY_CLASSES_ROOT") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "HKEY_CURRENT_CONFIG") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "HKEY_CURRENT_USER") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "HKEY_LOCAL_MACHINE") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "HKEY_PERFORMANCE_DATA") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "HKEY_USERS") != keys.end());
+
+	pRootReg->keys("HKEY_CURRENT_USER.Software.Applied Informatics.Test", keys);
+	assert (keys.size() == 3);
+	assert (std::find(keys.begin(), keys.end(), "name1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "name2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "config") != keys.end());
 }
 
 
