@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#7 $
+// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#8 $
 //
 // Library: Foundation
 // Package: Threading
@@ -186,15 +186,20 @@ void ThreadImpl::startImpl(Runnable& target)
 	if (_pData->stackSize != 0)
 	{
 		if (0 != pthread_attr_setstacksize(&attributes, _pData->stackSize))
+		{
+			pthread_attr_destroy(&attributes);	
 			throw SystemException("cannot set thread stack size");
+		}
 	}
 
 	_pData->pRunnableTarget = &target;
 	if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
 	{
 		_pData->pRunnableTarget = 0;
+		pthread_attr_destroy(&attributes);	
 		throw SystemException("cannot start thread");
 	}
+	pthread_attr_destroy(&attributes);
 
     if (_pData->policy == SCHED_OTHER)
 	{
