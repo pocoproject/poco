@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.4/Net/src/Socket.cpp#3 $
+// $Id: //poco/1.4/Net/src/Socket.cpp#4 $
 //
 // Library: Net
 // Package: Sockets
@@ -334,6 +334,12 @@ bool Socket::supportsIPv6()
 #else
 	return false;
 #endif
+}
+
+
+void Socket::init(int af)
+{
+	_pImpl->init(af);
 }
 
 
