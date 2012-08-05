@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#7 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -140,7 +140,13 @@ void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespa
 	poco_assert (!_pSSL);
 
 	_pSocket->connect(address, timeout);
+	Poco::Timespan receiveTimeout = _pSocket->getReceiveTimeout();
+	Poco::Timespan sendTimeout = _pSocket->getSendTimeout();
+	_pSocket->setReceiveTimeout(timeout);
+	_pSocket->setSendTimeout(timeout);
 	connectSSL(performHandshake);
+	_pSocket->setReceiveTimeout(receiveTimeout);
+	_pSocket->setSendTimeout(sendTimeout);	
 }
 
 
