@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.cpp
 //
-// $Id: //poco/1.4/Util/src/WinRegistryKey.cpp#6 $
+// $Id: //poco/1.4/Util/src/WinRegistryKey.cpp#7 $
 //
 // Library: Util
 // Package: Windows
@@ -355,7 +355,7 @@ bool WinRegistryKey::exists()
 		return true;
 	}
 #else
-	if (RegOpenKeyEx(_hRootKey, _subKey.c_str(), 0, KEY_READ | _extraSam, &hKey) != ERROR_SUCCESS)
+	if (RegOpenKeyEx(_hRootKey, _subKey.c_str(), 0, KEY_READ | _extraSam, &hKey) == ERROR_SUCCESS)
 	{
 		RegCloseKey(hKey);
 		return true;
