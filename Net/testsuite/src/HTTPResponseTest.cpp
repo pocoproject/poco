@@ -1,7 +1,7 @@
 //
 // HTTPResponseTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPResponseTest.cpp#2 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPResponseTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -106,6 +106,20 @@ void HTTPResponseTest::testRead2()
 	assert (istr.get() == -1);
 }
 
+
+void HTTPResponseTest::testRead3()
+{
+	std::string s("HTTP/1.1 200 \r\nContent-Length: 0\r\n\r\n");
+	std::istringstream istr(s);
+	HTTPResponse response;
+	response.read(istr);
+	assert (response.getVersion() == HTTPMessage::HTTP_1_1);
+	assert (response.getStatus() == HTTPResponse::HTTP_OK);
+	assert (response.getReason() == "");
+	assert (response.size() == 1);
+	assert (response.getContentLength() == 0);
+	assert (istr.get() == -1);
+}
 
 void HTTPResponseTest::testInvalid1()
 {
@@ -226,6 +240,7 @@ CppUnit::Test* HTTPResponseTest::suite()
 	CppUnit_addTest(pSuite, HTTPResponseTest, testWrite2);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testRead1);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testRead2);
+	CppUnit_addTest(pSuite, HTTPResponseTest, testRead3);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid1);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid2);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid3);

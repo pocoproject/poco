@@ -1,7 +1,7 @@
 //
 // HTTPResponseTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPResponseTest.h#1 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPResponseTest.h#2 $
 //
 // Definition of the HTTPResponseTest class.
 //
@@ -50,6 +50,7 @@ public:
 	void testWrite2();
 	void testRead1();
 	void testRead2();
+	void testRead3();
 	void testInvalid1();
 	void testInvalid2();
 	void testInvalid3();

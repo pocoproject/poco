@@ -1,7 +1,7 @@
 //
 // MessageHeader.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/MessageHeader.h#3 $
+// $Id: //poco/1.4/Net/include/Poco/Net/MessageHeader.h#4 $
 //
 // Library: Net
 // Package: Messages
@@ -167,7 +167,7 @@ private:
 		/// Limits for basic sanity checks when reading a header
 	{
 		MAX_NAME_LENGTH  = 256,
-		MAX_VALUE_LENGTH = 4096,
+		MAX_VALUE_LENGTH = 8192,
 		DFL_FIELD_LIMIT  = 100
 	};
 	

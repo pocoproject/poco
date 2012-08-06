@@ -1,7 +1,7 @@
 //
 // MessageHeaderTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.cpp#3 $
+// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.cpp#4 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -219,7 +219,7 @@ void MessageHeaderTest::testReadInvalid1()
 void MessageHeaderTest::testReadInvalid2()
 {
 	std::string s("name1: value1\r\nname2: ");
-	s.append(8000, 'x');
+	s.append(20000, 'x');
 	std::istringstream istr(s);
 	MessageHeader mh;
 	try
