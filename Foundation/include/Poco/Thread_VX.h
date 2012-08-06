@@ -1,7 +1,7 @@
 //
 // Thread_VX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread_VX.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/Thread_VX.h#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -124,7 +124,7 @@ protected:
 			pCallbackTarget(0),
 			task(0),
 			prio(PRIO_NORMAL_IMPL),
-			osPrio(0),
+			osPrio(127),
 			done(false),
 			stackSize(POCO_THREAD_STACK_SIZE)
 		{
