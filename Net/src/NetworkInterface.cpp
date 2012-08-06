@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#9 $
+// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#10 $
 //
 // Library: Net
 // Package: Sockets
@@ -512,14 +512,19 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 			while (pInfo) 
 			{
 				IPAddress address(std::string(pInfo->IpAddressList.IpAddress.String));
-				if (!address.isWildcard()) // only return interfaces that have an address assigned.
+				PIP_ADDR_STRING pIpAddressList = &pInfo->IpAddressList;
+				while (pIpAddressList)
 				{
-					IPAddress subnetMask(std::string(pInfo->IpAddressList.IpMask.String));
-					IPAddress broadcastAddress(address);
-					broadcastAddress.mask(subnetMask, IPAddress::broadcast());
-					std::string name(pInfo->AdapterName);
-					std::string displayName(pInfo->Description);
-					result.push_back(NetworkInterface(name, displayName, address, subnetMask, broadcastAddress));
+					if (!address.isWildcard()) // only return interfaces that have an address assigned.
+					{
+						IPAddress subnetMask(std::string(pInfo->IpAddressList.IpMask.String));
+						IPAddress broadcastAddress(address);
+						broadcastAddress.mask(subnetMask, IPAddress::broadcast());
+						std::string name(pInfo->AdapterName);
+						std::string displayName(pInfo->Description);
+						result.push_back(NetworkInterface(name, displayName, address, subnetMask, broadcastAddress));
+					}
+					pIpAddressList = pIpAddressList->Next;
 				}
 				pInfo = pInfo->Next;
 			}

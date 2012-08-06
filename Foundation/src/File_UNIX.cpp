@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_UNIX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/File_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -100,14 +100,12 @@ bool FileImpl::canReadImpl() const
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 	{
-		if (geteuid() == 0)
-			return true;
-		else if (st.st_uid == geteuid())
+		if (st.st_uid == geteuid())
 			return (st.st_mode & S_IRUSR) != 0;
 		else if (st.st_gid == getegid())
 			return (st.st_mode & S_IRGRP) != 0;
 		else
-			return (st.st_mode & S_IROTH) != 0;
+			return (st.st_mode & S_IROTH) != 0 || geteuid() == 0;
 	}
 	else handleLastErrorImpl(_path);
 	return false;
@@ -121,14 +119,12 @@ bool FileImpl::canWriteImpl() const
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 	{
-		if (geteuid() == 0)
-			return true;
-		else if (st.st_uid == geteuid())
+		if (st.st_uid == geteuid())
 			return (st.st_mode & S_IWUSR) != 0;
 		else if (st.st_gid == getegid())
 			return (st.st_mode & S_IWGRP) != 0;
 		else
-			return (st.st_mode & S_IWOTH) != 0;
+			return (st.st_mode & S_IWOTH) != 0 || geteuid() == 0;
 	}
 	else handleLastErrorImpl(_path);
 	return false;
