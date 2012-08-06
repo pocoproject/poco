@@ -1,7 +1,7 @@
 //
 // LogFile_WIN32.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LogFile_WIN32.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/LogFile_WIN32.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -61,7 +61,7 @@ LogFileImpl::~LogFileImpl()
 }
 
 
-void LogFileImpl::writeImpl(const std::string& text)
+void LogFileImpl::writeImpl(const std::string& text, bool flush)
 {
 	if (INVALID_HANDLE_VALUE == _hFile)	createFile();
 
@@ -70,8 +70,11 @@ void LogFileImpl::writeImpl(const std::string& text)
 	if (!res) throw WriteFileException(_path);
 	res = WriteFile(_hFile, "\r\n", 2, &bytesWritten, NULL);
 	if (!res) throw WriteFileException(_path);
-	res = FlushFileBuffers(_hFile);
-	if (!res) throw WriteFileException(_path);
+	if (flush)
+	{
+		res = FlushFileBuffers(_hFile);
+		if (!res) throw WriteFileException(_path);
+	}
 }
 
 

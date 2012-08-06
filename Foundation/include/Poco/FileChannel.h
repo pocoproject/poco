@@ -1,7 +1,7 @@
 //
 // FileChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FileChannel.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/FileChannel.h#4 $
 //
 // Library: Foundation
 // Package: Logging
@@ -166,6 +166,15 @@ class Foundation_API FileChannel: public Channel
 	/// If the number is exceeded, archived log files are 
 	/// deleted, starting with the oldest.
 	///
+	/// The flush property specifies whether each log message is flushed
+	/// immediately to the log file (which may hurt application performance,
+	/// but ensures that everything is in the log in case of a system crash),
+	//  or whether it's allowed to stay in the system's file buffer for some time. 
+	/// Valid values are:
+	///
+	///   * true:   Every essages is immediately flushed to the log file (default).
+	///   * false:  Messages are not immediately flushed to the log file.
+	///
 	/// For a more lightweight file channel class, see SimpleFileChannel.
 {
 public:
@@ -204,6 +213,9 @@ public:
 		///   * purgeCount: Maximum number of archived log files before
 		///                 files are purged. See the FileChannel class
 		///                 for details.
+		///   * flush:      Specifies whether messages are immediately
+		///                 flushed to the log file. See the FileChannel class
+		///                 for details.
 
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
@@ -226,6 +238,7 @@ public:
 	static const std::string PROP_COMPRESS;
 	static const std::string PROP_PURGEAGE;
 	static const std::string PROP_PURGECOUNT;
+	static const std::string PROP_FLUSH;
 
 protected:
 	~FileChannel();
@@ -234,6 +247,7 @@ protected:
 	void setCompress(const std::string& compress);
 	void setPurgeAge(const std::string& age);
 	void setPurgeCount(const std::string& count);
+	void setFlush(const std::string& flush);
 	void purge();
 
 private:
@@ -244,6 +258,7 @@ private:
 	bool             _compress;
 	std::string      _purgeAge;
 	std::string      _purgeCount;
+	bool             _flush;
 	LogFile*         _pFile;
 	RotateStrategy*  _pRotateStrategy;
 	ArchiveStrategy* _pArchiveStrategy;

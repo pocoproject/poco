@@ -1,7 +1,7 @@
 //
 // LogFile_VMS.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LogFile_VMS.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/LogFile_VMS.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -59,14 +59,17 @@ LogFileImpl::~LogFileImpl()
 }
 
 
-void LogFileImpl::writeImpl(const std::string& text)
+void LogFileImpl::writeImpl(const std::string& text, bool flush)
 {
 	int rc = fputs(text.c_str(), _file);
 	if (rc == EOF) throw WriteFileException(_path);
 	rc = fputc('\n', _file);
 	if (rc == EOF) throw WriteFileException(_path);
-	rc = fflush(_file);
-	if (rc == EOF) throw WriteFileException(_path);
+	if (flush)
+	{
+		rc = fflush(_file);
+		if (rc == EOF) throw WriteFileException(_path);
+	}
 }
 
 

@@ -1,7 +1,7 @@
 //
 // SimpleFileChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SimpleFileChannel.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/SimpleFileChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -40,6 +40,7 @@
 #include "Poco/Message.h"
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
@@ -48,10 +49,12 @@ namespace Poco {
 const std::string SimpleFileChannel::PROP_PATH          = "path";
 const std::string SimpleFileChannel::PROP_SECONDARYPATH = "secondaryPath";
 const std::string SimpleFileChannel::PROP_ROTATION      = "rotation";
+const std::string SimpleFileChannel::PROP_FLUSH         = "flush";
 
 
 SimpleFileChannel::SimpleFileChannel(): 
 	_limit(0),
+	_flush(true),
 	_pFile(0)
 {
 }
@@ -61,6 +64,7 @@ SimpleFileChannel::SimpleFileChannel(const std::string& path):
 	_path(path),
 	_secondaryPath(path + ".0"),
 	_limit(0),
+	_flush(true),
 	_pFile(0)
 {
 }
@@ -111,7 +115,7 @@ void SimpleFileChannel::log(const Message& msg)
 	{
 		rotate();
 	}
-	_pFile->write(msg.getText());
+	_pFile->write(msg.getText(), _flush);
 }
 
 	
@@ -129,6 +133,8 @@ void SimpleFileChannel::setProperty(const std::string& name, const std::string& 
 		_secondaryPath = value;
 	else if (name == PROP_ROTATION)
 		setRotation(value);
+	else if (name == PROP_FLUSH)
+		setFlush(value);
 	else
 		Channel::setProperty(name, value);
 }
@@ -142,6 +148,8 @@ std::string SimpleFileChannel::getProperty(const std::string& name) const
 		return _secondaryPath;
 	else if (name == PROP_ROTATION)
 		return _rotation;
+	else if (name == PROP_FLUSH)
+		return std::string(_flush ? "true" : "false");
 	else
 		return Channel::getProperty(name);
 }
@@ -199,6 +207,12 @@ void SimpleFileChannel::setRotation(const std::string& rotation)
 	else
 		throw InvalidArgumentException("rotation", rotation);
 	_rotation = rotation;
+}
+
+
+void SimpleFileChannel::setFlush(const std::string& flush)
+{
+	_flush = icompare(flush, "true") == 0;
 }
 
 

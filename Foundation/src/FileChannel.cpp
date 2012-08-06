@@ -1,7 +1,7 @@
 //
 // FileChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FileChannel.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/FileChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -59,11 +59,13 @@ const std::string FileChannel::PROP_TIMES      = "times";
 const std::string FileChannel::PROP_COMPRESS   = "compress";
 const std::string FileChannel::PROP_PURGEAGE   = "purgeAge";
 const std::string FileChannel::PROP_PURGECOUNT = "purgeCount";
+const std::string FileChannel::PROP_FLUSH      = "flush	";
 
 
 FileChannel::FileChannel(): 
 	_times("utc"),
 	_compress(false),
+	_flush(true),
 	_pFile(0),
 	_pRotateStrategy(0),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
@@ -76,6 +78,7 @@ FileChannel::FileChannel(const std::string& path):
 	_path(path),
 	_times("utc"),
 	_compress(false),
+	_flush(true),
 	_pFile(0),
 	_pRotateStrategy(0),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
@@ -135,7 +138,7 @@ void FileChannel::log(const Message& msg)
 		// to the new file.
 		_pRotateStrategy->mustRotate(_pFile);
 	}
-	_pFile->write(msg.getText());
+	_pFile->write(msg.getText(), _flush);
 }
 
 	
@@ -165,6 +168,8 @@ void FileChannel::setProperty(const std::string& name, const std::string& value)
 		setPurgeAge(value);
 	else if (name == PROP_PURGECOUNT)
 		setPurgeCount(value);
+	else if (name == PROP_FLUSH)
+		setFlush(value);
 	else
 		Channel::setProperty(name, value);
 }
@@ -186,6 +191,8 @@ std::string FileChannel::getProperty(const std::string& name) const
 		return _purgeAge;
 	else if (name == PROP_PURGECOUNT)
 		return _purgeCount;
+	else if (name == PROP_FLUSH)
+		return std::string(_flush ? "true" : "false");
 	else
 		return Channel::getProperty(name);
 }
@@ -343,6 +350,12 @@ void FileChannel::setPurgeCount(const std::string& count)
 	delete _pPurgeStrategy;
 	_pPurgeStrategy = new PurgeByCountStrategy(n);
 	_purgeCount = count;
+}
+
+
+void FileChannel::setFlush(const std::string& flush)
+{
+	_flush = icompare(flush, "true") == 0;
 }
 
 
