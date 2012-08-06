@@ -34,6 +34,30 @@ Release 1.4.4 (2012-08-??)
   response to a HEAD request, or in case of a 204 No Content or 304 Not Modified
   response status.
 - fixed a DOM parser performance bug (patch by Peter Klotz)
+- updated iOS build configuration to use xcode-select for finding toolchain
+- Poco::Net::SecureSocketImpl::shutdown() now also shuts down the underlying socket.
+- fixed SF# 3552597: Crypto  des-ecb error
+- fixed SF# 3550553: SecureSocketImpl::connect hangs
+- fixed SF# 3543047: Poco::Timer bug for long startInterval/periodic interval 
+- fixed SF# 3539695: Thread attributes should be destroyed using the pthread_attr_destroy() 
+- fixed SF# 3532311: Not able to set socket option on ServerSocket before bind
+  Added Poco::Net::Socket::init(int af) which can be used to explicitely
+  initialize the underlying socket before calling bind(), connect(), etc.
+- fixed SF# 3521347: Typo in UnWindows.h undef
+- fixed SF# 3519474: WinRegistryConfiguration bug
+  Also added tests and fixed another potential issue with an empty root path passed to the constructor.
+- fixed SF# 3516827: wrong return value of WinRegistryKey::exists()
+- fixed SF# 3515284: RSA publickey format(X.509 SubjectPublicKeyInfo)
+- fixed SF# 3503267: VxWorks OS prio is not set in standard constructor
+- fixed SF# 3500438: HTTPResponse failure when reason is empty
+- fixed SF# 3495656: numberformater, numberparser error in mingw
+- fixed SF# 3496493: Reference counting broken in TaskManager postNotification
+- fixed SF# 3483174: LogFile flushing behavior on Windows
+  Flushing is now configurable for FileChannel and SimpleFileChannel
+  using the "flush" property (true or false).
+- fixed SF# 3479561: Subsequent IPs on a NIC is not enumerated
+- fixed SF# 3478665: Permission checks in Poco::File not correct for root
+- fixed SF# 3475050: Threading bug in initializeNetwork() on Windows
 
 
 Release 1.4.3p1 (2012-01-23)
@@ -1714,4 +1738,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#62 $
+$Id: //poco/1.4/dist/CHANGELOG#63 $
