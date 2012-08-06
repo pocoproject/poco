@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.4/Net/src/DNS.cpp#10 $
+// $Id: //poco/1.4/Net/src/DNS.cpp#11 $
 //
 // Library: Net
 // Package: NetCore
@@ -271,21 +271,13 @@ void DNS::aierror(int code, const std::string& arg)
 }
 
 
-#if defined(_WIN32)
-static Poco::AtomicCounter initializeCount;
-#endif
-
-
 void initializeNetwork()
 {
 #if defined(_WIN32)
-	if (++initializeCount == 1)
-	{
-		WORD    version = MAKEWORD(2, 2);
-		WSADATA data;
-		if (WSAStartup(version, &data) != 0)
-			throw NetException("Failed to initialize network subsystem");
-	}
+	WORD    version = MAKEWORD(2, 2);
+	WSADATA data;
+	if (WSAStartup(version, &data) != 0)
+		throw NetException("Failed to initialize network subsystem");
 #endif // _WIN32
 }
 		
@@ -293,10 +285,7 @@ void initializeNetwork()
 void uninitializeNetwork()
 {
 #if defined(_WIN32)
-	if (--initializeCount == 0)
-	{
-		WSACleanup();
-	}
+	WSACleanup();
 #endif // _WIN32
 }
 
