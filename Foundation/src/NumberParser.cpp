@@ -1,7 +1,7 @@
 //
 // NumberParser.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NumberParser.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/NumberParser.cpp#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -45,7 +45,7 @@
 
 #if defined(POCO_LONG_IS_64_BIT)
 	#define I64_FMT "l"
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) || defined(__MINGW32__ )
 	#define I64_FMT "I64"
 #elif defined(__APPLE__) 
 	#define I64_FMT "q"

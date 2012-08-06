@@ -1,7 +1,7 @@
 //
 // TaskManager.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TaskManager.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/TaskManager.cpp#2 $
 //
 // Library: Foundation
 // Package: Tasks
@@ -122,7 +122,7 @@ void TaskManager::removeObserver(const AbstractObserver& observer)
 }
 
 
-void TaskManager::postNotification(Notification* pNf)
+void TaskManager::postNotification(const Notification::Ptr& pNf)
 {
 	_nc.postNotification(pNf);
 }
