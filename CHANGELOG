@@ -58,6 +58,10 @@ Release 1.4.4 (2012-08-??)
 - fixed SF# 3479561: Subsequent IPs on a NIC is not enumerated
 - fixed SF# 3478665: Permission checks in Poco::File not correct for root
 - fixed SF# 3475050: Threading bug in initializeNetwork() on Windows
+- fixed SF# 3552680: websocket small frames bug and proposed fix
+- fixed a WebSocket interop issue with Firefox
+- added Poco::Net::MessageHeader::hasToken()
+- Poco::AtomicCounter now uses GCC 4.3 builtin atomics on more platforms
 
 
 Release 1.4.3p1 (2012-01-23)
@@ -1738,4 +1742,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#63 $
+$Id: //poco/1.4/dist/CHANGELOG#64 $

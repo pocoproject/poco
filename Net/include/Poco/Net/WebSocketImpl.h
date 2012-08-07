@@ -1,7 +1,7 @@
 //
 // WebSocketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocketImpl.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/WebSocketImpl.h#2 $
 //
 // Library: Net
 // Package: WebSocket
@@ -90,6 +90,7 @@ protected:
 	enum
 	{
 		FRAME_FLAG_MASK   = 0x80,
+		MIN_HEADER_LENGTH = 2,
 		MAX_HEADER_LENGTH = 14
 	};
 	

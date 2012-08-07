@@ -1,7 +1,7 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.4/Net/src/MessageHeader.cpp#4 $
+// $Id: //poco/1.4/Net/src/MessageHeader.cpp#5 $
 //
 // Library: Net
 // Package: Messages
@@ -136,6 +136,20 @@ void MessageHeader::setFieldLimit(int limit)
 	poco_assert (limit >= 0);
 	
 	_fieldLimit = limit;
+}
+
+
+bool MessageHeader::hasToken(const std::string& fieldName, const std::string& token) const
+{
+	std::string field = get(fieldName, "");
+	std::vector<std::string> tokens;
+	splitElements(field, tokens, true);
+	for (std::vector<std::string>::const_iterator it = tokens.begin(); it != tokens.end(); ++it)
+	{
+		if (Poco::icompare(*it, token) == 0)
+			return true;
+	}
+	return false;
 }
 
 
