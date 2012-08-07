@@ -47,9 +47,10 @@ namespace Poco {
 
 
 Glob::Glob(const std::string& pattern, int options): 
-	_pattern(pattern),
-	_options(options)
+        _pattern(pattern),
+        _options(options)
 {
+        poco_assert (!_pattern.empty());
 }
 
 
@@ -89,17 +90,17 @@ void Glob::glob(const Path& pathPattern, std::set<std::string>& files, int optio
 {
 	Path pattern(pathPattern);
 	pattern.makeDirectory(); // to simplify pattern handling later on
-	Path base(pattern);
-	Path absBase(base);
-	absBase.makeAbsolute();
-	// In case of UNC paths we must not pop the topmost directory
-	// (which must not contain wildcards), otherwise collect() will fail
-	// as one cannot create a DirectoryIterator with only a node name ("\\srv\").
-	int minDepth = base.getNode().empty() ? 0 : 1;
-	while (base.depth() > minDepth && base[base.depth() - 1] != "..") 
-	{
-		base.popDirectory();
-		absBase.popDirectory();
+        Path base(pattern);
+        Path absBase(base);
+        absBase.makeAbsolute();
+        // In case of UNC paths we must not pop the topmost directory
+        // (which must not contain wildcards), otherwise collect() will fail
+        // as one cannot create a DirectoryIterator with only a node name ("\\srv\").
+        int minDepth = base.getNode().empty() ? 0 : 1;
+        while (base.depth() > minDepth && base[base.depth() - 1] != "..") 
+        {
+                base.popDirectory();
+                absBase.popDirectory();
 	}
 	if (pathPattern.isDirectory()) options |= GLOB_DIRS_ONLY;
 	collect(pattern, absBase, base, pathPattern[base.depth()], files, options);		
