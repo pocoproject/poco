@@ -42,6 +42,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketDefs.h"
+#include <vector>
 
 
 namespace Poco {
@@ -74,6 +75,8 @@ class Net_API IPAddress
 	/// supports IPv6.
 {
 public:
+	typedef std::vector<IPAddress> List;
+
 	enum Family
 		/// Possible address families for IP addresses.
 	{
@@ -193,7 +196,7 @@ public:
 		/// Only IPv4 addresses can be broadcast addresses. In a broadcast
 		/// address, all bits are one.
 		///
-		/// For a IPv6 address, returns always false.
+		/// For an IPv6 address, returns always false.
 	
 	bool isLoopback() const;
 		/// Returns true iff the address is a loopback address.

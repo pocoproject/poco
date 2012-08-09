@@ -441,7 +441,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip1.isOrgLocalMC());
 	assert (!ip1.isGlobalMC());
 
-	IPAddress ip2("FF01:0:0:0:0:0:0:FB"); // node-local unicast
+	IPAddress ip2("ff01:0:0:0:0:0:0:FB"); // node-local unicast
 	assert (!ip2.isWildcard());
 	assert (!ip2.isBroadcast());
 	assert (!ip2.isLoopback());
@@ -456,7 +456,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip2.isOrgLocalMC());
 	assert (!ip2.isGlobalMC()); 
 
-	IPAddress ip3("FF05:0:0:0:0:0:0:FB"); // site local unicast
+	IPAddress ip3("ff05:0:0:0:0:0:0:FB"); // site local unicast
 	assert (!ip3.isWildcard());
 	assert (!ip3.isBroadcast());
 	assert (!ip3.isLoopback());
@@ -471,7 +471,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip3.isOrgLocalMC());
 	assert (!ip3.isGlobalMC());
 
-	IPAddress ip4("FF18:0:0:0:0:0:0:FB"); // org local unicast
+	IPAddress ip4("ff18:0:0:0:0:0:0:FB"); // org local unicast
 	assert (!ip4.isWildcard());
 	assert (!ip4.isBroadcast());
 	assert (!ip4.isLoopback());
@@ -486,7 +486,7 @@ void IPAddressTest::testMCClassification6()
 	assert (ip4.isOrgLocalMC());
 	assert (!ip4.isGlobalMC());
 
-	IPAddress ip5("FF1F:0:0:0:0:0:0:FB"); // global unicast
+	IPAddress ip5("ff1f:0:0:0:0:0:0:FB"); // global unicast
 	assert (!ip5.isWildcard());
 	assert (!ip5.isBroadcast());
 	assert (!ip5.isLoopback());

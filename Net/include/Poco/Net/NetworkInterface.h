@@ -43,7 +43,8 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Mutex.h"
-#include <vector>
+#include "Poco/Tuple.h"
+#include <map>
 
 
 namespace Poco {
@@ -61,11 +62,25 @@ class Net_API NetworkInterface
 	/// messages.
 	/// 
 	/// The class also provides static member functions for
-	/// enumerating or searching network interfaces.
+	/// enumerating or searching network interfaces and their
+	/// respective configuration values.
 {
 public:
-	typedef std::vector<NetworkInterface> NetworkInterfaceList;
-	
+	typedef std::vector<NetworkInterface>                List;
+	typedef List                                         NetworkInterfaceList;//@deprecated
+	typedef std::map<std::size_t, NetworkInterface>      Map;
+	typedef Poco::Tuple<IPAddress, IPAddress, IPAddress> AddressTuple;
+	typedef std::vector<AddressTuple>                    AddressList;
+	typedef AddressList::iterator                        AddressIterator;
+	typedef AddressList::const_iterator                  ConstAddressIterator;
+
+	enum AddressType
+	{
+		IP_ADDRESS,
+		SUBNET_MASK,
+		BROADCAST_ADDRESS
+	};
+
 	enum IPVersion
 	{
 		IPv4_ONLY,    /// Return interfaces with IPv4 address only
@@ -73,7 +88,7 @@ public:
 		IPv4_OR_IPv6  /// Return interfaces with IPv4 or IPv6 address
 	};
 
-	NetworkInterface();
+	NetworkInterface(std::size_t index = 0);
 		/// Creates a NetworkInterface representing the
 		/// default interface.
 		///
@@ -88,15 +103,18 @@ public:
 
 	NetworkInterface& operator = (const NetworkInterface& interfc);
 		/// Assigns another NetworkInterface.
-		
+	
+	bool operator < (const NetworkInterface& other) const;
+		/// Operatorr less-than.
+	
+	bool operator == (const NetworkInterface& other) const;
+		/// Operator equal. Compares interface indices.
+
 	void swap(NetworkInterface& other);
 		/// Swaps the NetworkInterface with another one.	
 		
-	int index() const;
+	std::size_t index() const;
 		/// Returns the interface index.
-		///
-		/// Only supported if IPv6 is available.
-		/// Returns -1 if IPv6 is not available.
 		
 	const std::string& name() const;
 		/// Returns the interface name.
@@ -110,16 +128,25 @@ public:
 		///
 		/// On other platforms this is the same as name().
 
-	const IPAddress& address() const;
+	const IPAddress& address(std::size_t index = 0) const;
 		/// Returns the IP address bound to the interface.
-		
-	const IPAddress& subnetMask() const;
-		/// Returns the IPv4 subnet mask for this network interface.
-		
-	const IPAddress& broadcastAddress() const;
-		/// Returns the IPv4 broadcast address for this network interface.
 
-	const IPAddress& destAddress() const;
+	void addAddress(const IPAddress& address);
+		/// Adds address to the interface.
+
+	void addAddress(const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress);
+		/// Adds address to the interface.
+
+	const AddressList& addressList() const;
+		/// Returns the list of IP addresses bound to the interface.
+		
+	const IPAddress& subnetMask(std::size_t index = 0) const;
+		/// Returns the subnet mask for this network interface.
+		
+	const IPAddress& broadcastAddress(std::size_t index = 0) const;
+		/// Returns the broadcast address for this network interface.
+
+	const IPAddress& destAddress(std::size_t index = 0) const;
 		/// Returns the IPv4 point-to-point destiation address for this network interface.
 
 	int mtu() const;
@@ -184,13 +211,22 @@ public:
 		/// with the given index does not exist (or IPv6 is not
 		/// available).
 		
-	static NetworkInterfaceList list();
+	static List list();
 		/// Returns a list with all network interfaces
 		/// on the system.
 		///
 		/// If there are multiple addresses bound to one interface,
-		/// multiple NetworkInterface instances are created for
+		/// multiple NetworkInterface entries are listed for
 		/// the same interface.
+
+	static Map map();
+		/// Returns a map with all network interfaces
+		/// on the system. Map is keyed by interface system
+		/// indices.
+		///
+		/// If there are multiple addresses bound to one interface,
+		/// they are contained within the NetworkInterface (second) 
+		/// member of the pair.
 
 protected:
 	NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, int index = -1);
@@ -198,7 +234,7 @@ protected:
 
 	NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index = -1);
 		/// Creates the NetworkInterface.
-		
+
 	NetworkInterface(const std::string& name, const IPAddress& address, int index = -1);
 		/// Creates the NetworkInterface.
 
@@ -211,11 +247,30 @@ protected:
 	int interfaceNameToIndex(const std::string& interfaceName) const;
 		/// Determines the interface index of the interface with the given name.
 
+	NetworkInterfaceImpl& impl() { return *_pImpl; };
+
 private:
 	NetworkInterfaceImpl* _pImpl;
 	
 	static Poco::FastMutex _mutex;
 };
+
+
+///
+/// inlines
+///
+
+
+inline bool NetworkInterface::operator < (const NetworkInterface& other) const
+{
+	return this->index() < other.index();
+}
+
+
+inline bool NetworkInterface::operator == (const NetworkInterface& other) const
+{
+	return this->index() == other.index();
+}
 
 
 } } // namespace Poco::Net
