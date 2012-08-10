@@ -104,7 +104,7 @@ void MulticastSocket::setInterface(const NetworkInterface& interfc)
 	else
 	{
 #if defined(POCO_HAVE_IPv6)
-		impl()->setOption(IPPROTO_IPV6, IPV6_MULTICAST_IF, UInt32(interfc.index()));
+		impl()->setOption(IPPROTO_IPV6, IPV6_MULTICAST_IF, interfc.index());
 #endif
 	}
 }
