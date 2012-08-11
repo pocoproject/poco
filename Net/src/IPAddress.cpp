@@ -549,7 +549,7 @@ public:
 	bool isSiteLocal() const
 	{
 		const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
-		return (ntohs(words[0]) & 0xFFE0) == 0xFEC0;
+		return ((ntohs(words[0]) & 0xFFE0) == 0xFEC0) || ((ntohs(words[0]) & 0xFF00) == 0xFC00);
 	}
 	
 	bool isIPv4Compatible() const

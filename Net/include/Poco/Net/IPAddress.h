@@ -236,8 +236,10 @@ public:
 		/// IPv4 site local addresses are in on of the 10.0.0.0/24,
 		/// 192.168.0.0/16 or 172.16.0.0 to 172.31.255.255 ranges.
 		///
-		/// IPv6 site local addresses have 1111 1110 11 as the first
-		/// 10 bits, followed by 38 zeros.
+		/// Originally, IPv6 site-local addresses had FEC0/10 (1111 1110 11) 
+		/// prefix (RFC 4291), followed by 38 zeros. Interfaces using  
+		/// this mask are supported, but obsolete; RFC 4193 prescribes
+		/// fc00::/7 (1111 110) as local unicast prefix.
 		
 	bool isIPv4Compatible() const;
 		/// Returns true iff the address is IPv4 compatible.

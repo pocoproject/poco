@@ -88,12 +88,12 @@ public:
 		IPv4_OR_IPv6  /// Return interfaces with IPv4 or IPv6 address
 	};
 
-	NetworkInterface(std::size_t index = 0);
+	NetworkInterface(unsigned index = ~0);
 		/// Creates a NetworkInterface representing the
 		/// default interface.
 		///
 		/// The name is empty, the IP address is the wildcard
-		/// address and the index is zero.
+		/// address and the index is max value of unsigned integer.
 	
 	NetworkInterface(const NetworkInterface& interfc);
 		/// Creates the NetworkInterface by copying another one.
@@ -113,8 +113,8 @@ public:
 	void swap(NetworkInterface& other);
 		/// Swaps the NetworkInterface with another one.	
 		
-	std::size_t index() const;
-		/// Returns the interface index.
+	unsigned index() const;
+		/// Returns the interface OS index.
 		
 	const std::string& name() const;
 		/// Returns the interface name.
@@ -149,11 +149,11 @@ public:
 	const IPAddress& destAddress(std::size_t index = 0) const;
 		/// Returns the IPv4 point-to-point destiation address for this network interface.
 
-	int mtu() const;
+	unsigned mtu() const;
 		/// Returns the MTU for this interface.
- 		
-	int ifindex() const;
-		/// Returns the OS's index for this interface.
+
+	bool supportsIP() const;
+		/// Returns true if the interface supports IP.
 
 	bool supportsIPv4() const;
 		/// Returns true if the interface supports IPv4.

@@ -405,7 +405,7 @@ void IPAddressTest::testClassification6()
 	assert (!ip10.isOrgLocalMC());
 	assert (!ip10.isGlobalMC());
 
-	IPAddress ip6("fec0::21f:5bff:fec6:6707"); // site local unicast
+	IPAddress ip6("fec0::21f:5bff:fec6:6707"); // site local unicast (RFC 4291)
 	assert (!ip6.isWildcard());
 	assert (!ip6.isBroadcast());
 	assert (!ip6.isLoopback());
@@ -419,6 +419,21 @@ void IPAddressTest::testClassification6()
 	assert (!ip6.isSiteLocalMC());
 	assert (!ip6.isOrgLocalMC());
 	assert (!ip6.isGlobalMC());
+
+	IPAddress ip7("fc00::21f:5bff:fec6:6707"); // site local unicast (RFC 4193)
+	assert (!ip7.isWildcard());
+	assert (!ip7.isBroadcast());
+	assert (!ip7.isLoopback());
+	assert (!ip7.isMulticast());
+	assert (ip7.isUnicast());
+	assert (!ip7.isLinkLocal());
+	assert (ip7.isSiteLocal());
+	assert (!ip7.isWellKnownMC());
+	assert (!ip7.isNodeLocalMC());
+	assert (!ip7.isLinkLocalMC());
+	assert (!ip7.isSiteLocalMC());
+	assert (!ip7.isOrgLocalMC());
+	assert (!ip7.isGlobalMC());
 #endif
 }
 

@@ -70,11 +70,11 @@ public:
 	typedef NetworkInterface::AddressTuple AddressTuple;
 	typedef NetworkInterface::AddressList  AddressList;
 
-	NetworkInterfaceImpl(int index = -1);
+	NetworkInterfaceImpl(unsigned index = ~0);
 	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, int index = -1);
 	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index = -1);
 
-	int index() const;
+	unsigned index() const;
 	const std::string& name() const;
 	const std::string& displayName() const;
 	void addAddress(const AddressTuple& address);
@@ -91,8 +91,7 @@ public:
 	void setDisplayName(const std::string& name);
 	void addAddress(const IPAddress& addr);
 
-	int mtu() const;
-	int ifindex() const;
+	unsigned mtu() const;
 	bool broadcast() const;
 	bool loopback() const;
 	bool multicast() const;
@@ -117,17 +116,17 @@ protected:
 	void getPeerAddress();
 
 private:	
-	std::string     _name;
-	std::string     _displayName;
-	AddressList     _addressList;
-	std::size_t     _index;
-	bool            _broadcast;
-	bool            _loopback;
-	bool            _multicast;
-	bool            _pointToPoint;
-	bool            _up;
-	bool            _running;
-	int             _mtu;
+	std::string _name;
+	std::string _displayName;
+	AddressList _addressList;
+	unsigned    _index;
+	bool        _broadcast;
+	bool        _loopback;
+	bool        _multicast;
+	bool        _pointToPoint;
+	bool        _up;
+	bool        _running;
+	unsigned    _mtu;
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	friend NetworkInterface::Map NetworkInterface::map();
@@ -136,9 +135,9 @@ private:
 };
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(int index):
+NetworkInterfaceImpl::NetworkInterfaceImpl(unsigned index):
 	_index(index),
-	_mtu(-1)
+	_mtu(~0)
 {
 	_addressList.resize(1);
 }
@@ -293,7 +292,7 @@ bool NetworkInterfaceImpl::supportsIPv6() const
 }
 
 
-inline int NetworkInterfaceImpl::index() const
+inline unsigned NetworkInterfaceImpl::index() const
 {
 	return _index;
 }
@@ -311,7 +310,7 @@ inline const std::string& NetworkInterfaceImpl::displayName() const
 }
 
 
-void NetworkInterfaceImpl::addAddress(const AddressTuple& address)
+inline void NetworkInterfaceImpl::addAddress(const AddressTuple& address)
 {
 	_addressList.push_back(address);
 }
@@ -343,7 +342,7 @@ inline const NetworkInterface::AddressList& NetworkInterfaceImpl::addressList() 
 }
 
 
-inline const IPAddress& NetworkInterfaceImpl::subnetMask(std::size_t index) const
+const IPAddress& NetworkInterfaceImpl::subnetMask(std::size_t index) const
 {
 	if (index < _addressList.size()) 
 		return _addressList[index].get<NetworkInterface::SUBNET_MASK>();
@@ -352,7 +351,7 @@ inline const IPAddress& NetworkInterfaceImpl::subnetMask(std::size_t index) cons
 }
 
 
-inline const IPAddress& NetworkInterfaceImpl::broadcastAddress(std::size_t index) const
+const IPAddress& NetworkInterfaceImpl::broadcastAddress(std::size_t index) const
 {
 	if (index < _addressList.size()) 
 		return _addressList[index].get<NetworkInterface::BROADCAST_ADDRESS>();
@@ -361,7 +360,7 @@ inline const IPAddress& NetworkInterfaceImpl::broadcastAddress(std::size_t index
 }
 
 
-inline const IPAddress& NetworkInterfaceImpl::destAddress(std::size_t index) const
+const IPAddress& NetworkInterfaceImpl::destAddress(std::size_t index) const
 {
 	if (!pointToPoint()) 
 		throw InvalidAccessException("Only PPP addresses have destination address.");
@@ -372,7 +371,7 @@ inline const IPAddress& NetworkInterfaceImpl::destAddress(std::size_t index) con
 }
 
 
-inline int NetworkInterfaceImpl::mtu() const
+inline unsigned NetworkInterfaceImpl::mtu() const
 {
 	return _mtu;
 }
@@ -558,7 +557,7 @@ void NetworkInterface::swap(NetworkInterface& other)
 }
 
 
-std::size_t NetworkInterface::index() const
+unsigned NetworkInterface::index() const
 {
 	return _pImpl->index();
 }
@@ -618,9 +617,15 @@ const IPAddress& NetworkInterface::destAddress(std::size_t index) const
 }
 
 
-int NetworkInterface::mtu() const
+unsigned NetworkInterface::mtu() const
 {
 	return _pImpl->mtu();
+}
+
+
+bool NetworkInterface::supportsIP() const
+{
+	return _pImpl->supportsIPv4() || _pImpl->supportsIPv6();
 }
 
 
@@ -641,25 +646,30 @@ bool NetworkInterface::supportsBroadcast() const
 	return _pImpl->broadcast();
 }
 
+
 bool NetworkInterface::supportsMulticast() const
 {
 	return _pImpl->multicast();
 }
+
 
 bool NetworkInterface::isLoopback() const
 {
 	return _pImpl->loopback();
 }
 
+
 bool NetworkInterface::isPointToPoint() const
 {
 	return _pImpl->pointToPoint();
 }
 
+
 bool NetworkInterface::isRunning() const
 {
 	return _pImpl->running();
 }
+
 
 bool NetworkInterface::isUp() const
 {
@@ -783,6 +793,60 @@ NetworkInterface::List NetworkInterface::list()
 namespace Poco {
 namespace Net {
 
+
+namespace {
+
+
+IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr)
+	/// This function relies on (1) subnet prefix being at the position 
+	/// immediately preceding and (2) broadcast address being at the position
+	/// immediately succeeding the IPv4 unicast address.
+	/// 
+	/// Since there is no explicit guarantee on order, to ensure correctness,
+	/// the above constraints are checked prior to returning the result.
+{
+	PIP_ADAPTER_PREFIX pPrev = 0;
+	for (int i = 0; pPrefix; pPrefix = pPrefix->Next, ++i)
+	{
+		ADDRESS_FAMILY family = pPrefix->Address.lpSockaddr->sa_family;
+		if ((family == AF_INET) && (addr == IPAddress(pPrefix->Address)))
+			break;
+		pPrev = pPrefix;
+	}
+
+	if (pPrefix && pPrefix->Next && pPrev) 
+	{
+		IPAddress prefix(pPrev->PrefixLength, IPAddress::IPv4);
+		IPAddress mask(pPrefix->Next->Address);
+		if ((prefix & mask) == (prefix & addr)) 
+			return IPAddress(pPrefix->Next->Address);
+	}
+	
+	return IPAddress(IPAddress::IPv4);
+}
+
+
+std::string getErrorMessage(DWORD errorCode)
+{
+	std::string errMsg;
+	DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+	LPWSTR lpMsgBuf = 0;
+	if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
+		UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
+#else
+	LPTSTR lpMsgBuf = 0;
+	if (FormatMessageA(dwFlg, 0, errorCode, 0, (LPTSTR) & lpMsgBuf, 0, NULL))
+		errMsg = lpMsgBuf;
+#endif
+	LocalFree(lpMsgBuf);
+	return errMsg;
+}
+
+
+} /// namespace
+
+
 NetworkInterface::Map NetworkInterface::map()
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -797,109 +861,90 @@ NetworkInterface::Map NetworkInterface::map()
 #endif
 	DWORD dwRetVal = 0;
 	ULONG iterations = 0;
-	PIP_ADAPTER_ADDRESSES pAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(memory.begin());
+	PIP_ADAPTER_ADDRESSES pAddress = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(memory.begin());
 	do
 	{
-		if ((dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen)) == ERROR_BUFFER_OVERFLOW)
-			memory.resize(outBufLen);
-		else break;
-	} while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (++iterations <= 2));
+		if (ERROR_BUFFER_OVERFLOW == (dwRetVal = GetAdaptersAddresses(family, flags, 0, pAddress, &outBufLen)))
+			memory.resize(outBufLen); // adjust size and try again
+		else if (ERROR_NO_DATA == dwRetVal) // no network interfaces found
+			return result;
+		else if (NO_ERROR != dwRetVal) // error occurred
+			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", getErrorMessage(dwRetVal)));
+		else
+			break; // all good
+	} while ((ERROR_BUFFER_OVERFLOW == dwRetVal) && (++iterations <= 2));
 
-	if (dwRetVal == ERROR_NO_DATA) return result;// no network interfaces found
-
-	if (dwRetVal == NO_ERROR)
+	poco_assert (NO_ERROR == dwRetVal);
+	for (; pAddress; pAddress = pAddress->Next)
 	{
-		for (PIP_ADAPTER_ADDRESSES pAddress = pAddresses; pAddress; pAddress = pAddress->Next)
+		IPAddress address;
+		IPAddress subnetMask;
+		IPAddress broadcastAddress;
+		unsigned ifIndex = ~0;
+		
+#if defined(POCO_HAVE_IPv6)
+		poco_assert (pAddress->Ipv6IfIndex == pAddress->IfIndex);
+		if (pAddress->Flags & IP_ADAPTER_IPV6_ENABLED) ifIndex = pAddress->Ipv6IfIndex;
+		else
+#endif
+		if (pAddress->Flags & IP_ADAPTER_IPV4_ENABLED) ifIndex = pAddress->IfIndex;
+		
+		for (PIP_ADAPTER_UNICAST_ADDRESS pUniAddr = pAddress->FirstUnicastAddress; 
+			pUniAddr; 
+			pUniAddr = pUniAddr->Next)
 		{
-			IPAddress address;
-			IPAddress subnetMask;
-			IPAddress broadcastAddress;
-			IPAddress destAddress;
-			unsigned ifIndex = ~0;
-			
-#if defined(POCO_HAVE_IPv6)
-			if (pAddress->Flags & IP_ADAPTER_IPV6_ENABLED) ifIndex = pAddress->Ipv6IfIndex;
-			else
-#endif
-			if (pAddress->Flags & IP_ADAPTER_IPV4_ENABLED) ifIndex = pAddress->IfIndex;
-
-			PIP_ADAPTER_PREFIX pPrefix = pAddress->FirstPrefix;
-			for (PIP_ADAPTER_UNICAST_ADDRESS pUniAddr = pAddress->FirstUnicastAddress; 
-				pUniAddr; 
-				pUniAddr = pUniAddr->Next, pPrefix = pPrefix ? pPrefix->Next : 0)
-			{
-				std::string name(pAddress->AdapterName);
-				std::string displayName;
+			std::string name(pAddress->AdapterName);
+			std::string displayName;
 #ifdef POCO_WIN32_UTF8
-				Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, displayName);
+			Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, displayName);
 #else
-				char displayNameBuffer[1024];
-				int rc = WideCharToMultiByte(CP_ACP, WC_DEFAULTCHAR, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
-				if (rc) displayName = displayNameBuffer;
+			char displayNameBuffer[1024];
+			int rc = WideCharToMultiByte(CP_ACP, WC_DEFAULTCHAR, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
+			if (rc) displayName = displayNameBuffer;
 #endif
-				address = IPAddress(pUniAddr->Address);
-				ADDRESS_FAMILY family = pUniAddr->Address.lpSockaddr->sa_family;
-				Map::iterator ifIt = result.find(ifIndex);
-				switch (family)
+			UINT8 prefixLength = pUniAddr->OnLinkPrefixLength;
+			address = IPAddress(pUniAddr->Address);
+			ADDRESS_FAMILY family = pUniAddr->Address.lpSockaddr->sa_family;
+			Map::iterator ifIt = result.find(ifIndex);
+			switch (family)
+			{
+				case AF_INET:
 				{
-					case AF_INET:
+					// Windows lists broadcast address on localhost
+					bool hasBroadcast = (pAddress->IfType == IF_TYPE_ETHERNET_CSMACD) || (pAddress->IfType == IF_TYPE_SOFTWARE_LOOPBACK);
+					// On Windows, a valid broadcast address will be all 1's (== address | ~subnetMask); we go an extra mile here in order to
+					// make sure we reflect the actual value held by system and protect against misconfiguration (e.g. bad DHCP config entry)
+					broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address); 
+					subnetMask = prefixLength ? IPAddress(prefixLength, IPAddress::IPv4) : IPAddress();
+					if (ifIt == result.end()) // network interface not cached yet, insert
 					{
-						bool hasBroadcast = (pAddress->IfType == IF_TYPE_ETHERNET_CSMACD);
-						subnetMask = pPrefix ? IPAddress(pPrefix->Length, IPAddress::IPv4) : IPAddress();
-						broadcastAddress = address | ~subnetMask;
-						if (ifIt == result.end()) 
-						{
-							if (hasBroadcast)
-								ifIt = result.insert(Map::value_type(ifIndex, NetworkInterface(name, displayName, address, subnetMask, broadcastAddress, ifIndex))).first;
-							else
-								ifIt = result.insert(Map::value_type(ifIndex, NetworkInterface(name, displayName, address, ifIndex))).first;
-						}
+						if (hasBroadcast)
+							ifIt = result.insert(Map::value_type(ifIndex, NetworkInterface(name, displayName, address, subnetMask, broadcastAddress, ifIndex))).first;
 						else
-						{
-							if (hasBroadcast)
-								ifIt->second.addAddress(address, subnetMask, broadcastAddress);
-							else
-								ifIt->second.addAddress(address);
-						}
-					} break;
-#if defined(POCO_HAVE_IPv6)
-					case AF_INET6:
+							ifIt = result.insert(Map::value_type(ifIndex, NetworkInterface(name, displayName, address, ifIndex))).first;
+					}
+					else // network interface is cached, add address to it
 					{
-						if (ifIt == result.end()) ifIt = result.insert(Map::value_type(ifIndex, NetworkInterface(name, displayName, address, ifIndex))).first;
+						if (hasBroadcast)
+							ifIt->second.addAddress(address, subnetMask, broadcastAddress);
 						else
 							ifIt->second.addAddress(address);
-					} break;
+					}
+				} break;
+#if defined(POCO_HAVE_IPv6)
+				case AF_INET6:
+				{
+					if (ifIt == result.end()) ifIt = result.insert(Map::value_type(ifIndex, NetworkInterface(name, displayName, address, ifIndex))).first;
+					else
+						ifIt->second.addAddress(address);
+				} break;
 #endif
-				} // switch family
-					ifIt->second.impl().setFlags(pAddress->Flags, pAddress->IfType);
-					ifIt->second.impl().setMtu(pAddress->Mtu);
-					ifIt->second.impl().setUp(pAddress->OperStatus == IfOperStatusUp);
-			} // for addresses
-		} // for adapters
-	} // if no error
-	else // error occurred
-	{
-		std::string errMsg;
-		DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
-		LPWSTR lpMsgBuf = 0;
-		if (FormatMessageW(dwFlg, 0, dwRetVal, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
-		{
-			UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
-			LocalFree(lpMsgBuf);
-		}
-#else
-		LPTSTR lpMsgBuf = 0;
-		if (FormatMessageA(dwFlg, 0, dwRetVal, 0, (LPTSTR) & lpMsgBuf, 0, NULL))
-		{
-			errMsg = lpMsgBuf;
-			LocalFree(lpMsgBuf);
-		}
-#endif
-		
-		throw SystemException(format("An error occurred whiel trying to obtain list of network interfaces: [%s]", errMsg));
-	}
-
+			} // switch family
+			ifIt->second.impl().setFlags(pAddress->Flags, pAddress->IfType);
+			ifIt->second.impl().setMtu(pAddress->Mtu);
+			ifIt->second.impl().setUp(pAddress->OperStatus == IfOperStatusUp);
+		} // for addresses
+	} // for adapters
 	return result;
 }
 

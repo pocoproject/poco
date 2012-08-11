@@ -614,7 +614,7 @@ void SocketImpl::setReceiveTimeout(const Poco::Timespan& timeout)
 	int value = (int) timeout.totalMilliseconds();
 	setOption(SOL_SOCKET, SO_RCVTIMEO, value);
 #else
-  setOption(SOL_SOCKET, SO_RCVTIMEO, timeout);
+	setOption(SOL_SOCKET, SO_RCVTIMEO, timeout);
 #endif
 #else
 	_recvTimeout = timeout;
