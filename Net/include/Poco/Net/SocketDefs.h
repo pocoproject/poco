@@ -162,7 +162,20 @@
 #include <netinet/tcp.h>
 #include <netdb.h>
 #if defined(POCO_OS_FAMILY_UNIX)
+#if (POCO_OS == POCO_OS_LINUX)
+// <linux/if.h> is needed by NetworkInterface for ifmap, ifreq and ifconf definitions
+#include <linux/if.h>
+// if_nametoindex and if_indextoname are needed by IPAddress and NetworkInterface
+// we can't get them from <net/if.h> because of a conflict with <linux/if.h>, so
+// we declare them here
+extern "C"
+{
+extern unsigned int if_nametoindex (__const char *__ifname) __THROW;
+extern char *if_indextoname (unsigned int __ifindex, char *__ifname) __THROW;
+}
+#else // (POCO_OS != POCO_OS_LINUX)
 #include <net/if.h>
+#endif // (POCO_OS != POCO_OS_LINUX)
 #endif
 #if defined(sun) || defined(__APPLE__)
 #include <sys/sockio.h>

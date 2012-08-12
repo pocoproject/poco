@@ -24,6 +24,8 @@ Release 1.5.0 (2012-08-??)
 - fixed SF#3538785: SMTPClientSession::sendMessage() should take recipient list 
 - added IPAddress::prefixLength()
 - UTF portability improvements
+- fixed SF#3556186: Linux shouldn't use <net/if.h> in Net/SocketDefs.h
+- added IPAddress RFC 4291 compatible site-local prefix support
 
 Release 1.4.4 (2012-08-??)
 ==========================

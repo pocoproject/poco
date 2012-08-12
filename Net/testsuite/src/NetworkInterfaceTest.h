@@ -46,7 +46,6 @@ public:
 	NetworkInterfaceTest(const std::string& name);
 	~NetworkInterfaceTest();
 
-	void testList();
 	void testMap();
 	void testForName();
 	void testForAddress();

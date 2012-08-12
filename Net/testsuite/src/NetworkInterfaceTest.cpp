@@ -36,6 +36,7 @@
 #include "Poco/Net/NetworkInterface.h"
 #include "Poco/Net/IPAddress.h"
 #include <iostream>
+#include <iomanip>
 
 
 using Poco::Net::NetworkInterface;
@@ -65,6 +66,14 @@ void NetworkInterfaceTest::testMap()
 		std::cout << "DisplayName: " << it->second.displayName() << std::endl;
 		std::cout << "Status: " << (it->second.isUp() ? "Up" : "Down") << std::endl;
 
+		NetworkInterface::MacAddress mac(it->second.macAddress());
+		if (!mac.empty()) {
+			std::cout << "Mac Address: (" << it->second.hwType() << ")";
+			for (unsigned i = 0; i < mac.size(); ++i)
+				std::cout << ((i == 0) ? ' ' : ':') << std::hex << std::setw(2) << std::setfill('0') << (unsigned)mac[i];
+			std::cout << std::endl;
+		}
+
 		typedef NetworkInterface::AddressList List;
 		const List& ipList = it->second.addressList();
 		List::const_iterator ipIt = ipList.begin();
@@ -76,7 +85,7 @@ void NetworkInterfaceTest::testMap()
 			std::cout << "----------" << std::endl;
 			std::cout << "Address:     " << ipIt->get<NetworkInterface::IP_ADDRESS>().toString() << std::endl;
 			IPAddress addr = ipIt->get<NetworkInterface::SUBNET_MASK>();
-			if (!addr.isWildcard()) std::cout << "Subnet:      " << addr.toString() << std::endl;
+			if (!addr.isWildcard()) std::cout << "Subnet:      " << addr.toString() << " (/" << addr.prefixLength() << ")" << std::endl;
 			addr = ipIt->get<NetworkInterface::BROADCAST_ADDRESS>();
 			if (!addr.isWildcard()) std::cout << "Broadcast:   " << addr.toString() << std::endl;
 		}
@@ -86,68 +95,40 @@ void NetworkInterfaceTest::testMap()
 }
 
 
-void NetworkInterfaceTest::testList()
-{
-	NetworkInterface::List list = NetworkInterface::list();
-	assert (!list.empty());
-	for (NetworkInterface::NetworkInterfaceList::const_iterator it = list.begin(); it != list.end(); ++it)
-	{
-		std::cout << "==============" << std::endl;
-
-		std::cout << "Index:       " << it->index() << std::endl;
-		std::cout << "Name:        " << it->name() << std::endl;
-		std::cout << "DisplayName: " << it->displayName() << std::endl;
-
-		typedef NetworkInterface::AddressList List;
-		const List& ipList = it->addressList();
-		List::const_iterator ipIt = ipList.begin();
-		List::const_iterator ipEnd = ipList.end();
-		for (int counter = 0; ipIt != ipEnd; ++ipIt, ++counter)
-		{
-			std::cout << "IP Address:  " << ipIt->get<NetworkInterface::IP_ADDRESS>().toString() << std::endl;
-			IPAddress addr = ipIt->get<NetworkInterface::SUBNET_MASK>();
-			if (!addr.isWildcard()) std::cout << "Subnet:      " << ipIt->get<NetworkInterface::SUBNET_MASK>().toString() << std::endl;
-			addr = ipIt->get<NetworkInterface::BROADCAST_ADDRESS>();
-			if (!addr.isWildcard()) std::cout << "Broadcast:   " << ipIt->get<NetworkInterface::BROADCAST_ADDRESS>().toString() << std::endl;
-		}
-
-		std::cout << "==============" << std::endl << std::endl;
-	}
-}
-
-
 void NetworkInterfaceTest::testForName()
 {
-	NetworkInterface::NetworkInterfaceList list = NetworkInterface::list();
-	for (NetworkInterface::NetworkInterfaceList::const_iterator it = list.begin(); it != list.end(); ++it)
+	NetworkInterface::Map map = NetworkInterface::map();
+	for (NetworkInterface::Map::const_iterator it = map.begin(); it != map.end(); ++it)
 	{
-		NetworkInterface ifc = NetworkInterface::forName(it->name());
-		assert (ifc.name() == it->name());
+		NetworkInterface ifc = NetworkInterface::forName(it->second.name());
+		assert (ifc.name() == it->second.name());
 	}
 }
 
 
 void NetworkInterfaceTest::testForAddress()
 {
-	NetworkInterface::NetworkInterfaceList list = NetworkInterface::list();
-	for (NetworkInterface::NetworkInterfaceList::const_iterator it = list.begin(); it != list.end(); ++it)
+	NetworkInterface::Map map = NetworkInterface::map();
+	for (NetworkInterface::Map::const_iterator it = map.begin(); it != map.end(); ++it)
 	{
-		NetworkInterface ifc = NetworkInterface::forAddress(it->address());
-		assert (ifc.address() == it->address());
+		// not all interfaces have IP configured
+		if (it->second.addressList().empty())
+			continue;
+
+		NetworkInterface ifc = NetworkInterface::forAddress(it->second.address());
+		assert (ifc.address() == it->second.address());
 	}
 }
 
 
 void NetworkInterfaceTest::testForIndex()
 {
-#if defined(POCO_HAVE_IPv6)
-	NetworkInterface::NetworkInterfaceList list = NetworkInterface::list();
-	for (NetworkInterface::NetworkInterfaceList::const_iterator it = list.begin(); it != list.end(); ++it)
+	NetworkInterface::Map map = NetworkInterface::map();
+	for (NetworkInterface::Map::const_iterator it = map.begin(); it != map.end(); ++it)
 	{
-		NetworkInterface ifc = NetworkInterface::forIndex(it->index());
-		assert (ifc.index() == it->index());
+		NetworkInterface ifc = NetworkInterface::forIndex(it->second.index());
+		assert (ifc.index() == it->second.index());
 	}
-#endif
 }
 
 
@@ -165,7 +146,6 @@ CppUnit::Test* NetworkInterfaceTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NetworkInterfaceTest");
 
-	CppUnit_addTest(pSuite, NetworkInterfaceTest, testList);
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testMap);
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testForName);
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testForAddress);

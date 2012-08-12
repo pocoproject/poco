@@ -68,11 +68,12 @@ class Net_API NetworkInterface
 public:
 	typedef std::vector<NetworkInterface>                List;
 	typedef List                                         NetworkInterfaceList;//@deprecated
-	typedef std::map<std::size_t, NetworkInterface>      Map;
+	typedef std::map<unsigned, NetworkInterface>         Map;
 	typedef Poco::Tuple<IPAddress, IPAddress, IPAddress> AddressTuple;
 	typedef std::vector<AddressTuple>                    AddressList;
 	typedef AddressList::iterator                        AddressIterator;
 	typedef AddressList::const_iterator                  ConstAddressIterator;
+	typedef std::vector<unsigned char>                   MacAddress;
 
 	enum AddressType
 	{
@@ -88,7 +89,7 @@ public:
 		IPv4_OR_IPv6  /// Return interfaces with IPv4 or IPv6 address
 	};
 
-	NetworkInterface(unsigned index = ~0);
+	NetworkInterface(unsigned index = 0);
 		/// Creates a NetworkInterface representing the
 		/// default interface.
 		///
@@ -128,7 +129,7 @@ public:
 		///
 		/// On other platforms this is the same as name().
 
-	const IPAddress& address(std::size_t index = 0) const;
+	const IPAddress& address(unsigned index = 0) const;
 		/// Returns the IP address bound to the interface.
 
 	void addAddress(const IPAddress& address);
@@ -140,17 +141,22 @@ public:
 	const AddressList& addressList() const;
 		/// Returns the list of IP addresses bound to the interface.
 		
-	const IPAddress& subnetMask(std::size_t index = 0) const;
+	const IPAddress& subnetMask(unsigned index = 0) const;
 		/// Returns the subnet mask for this network interface.
 		
-	const IPAddress& broadcastAddress(std::size_t index = 0) const;
+	const IPAddress& broadcastAddress(unsigned index = 0) const;
 		/// Returns the broadcast address for this network interface.
 
-	const IPAddress& destAddress(std::size_t index = 0) const;
+	const IPAddress& destAddress(unsigned index = 0) const;
 		/// Returns the IPv4 point-to-point destiation address for this network interface.
+
+	const MacAddress& macAddress() const;
 
 	unsigned mtu() const;
 		/// Returns the MTU for this interface.
+
+	unsigned hwType() const;
+		/// returns the MIB IfType of the interface.
 
 	bool supportsIP() const;
 		/// Returns true if the interface supports IP.
@@ -201,7 +207,7 @@ public:
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the give address does not exist.
 
-	static NetworkInterface forIndex(int index);
+	static NetworkInterface forIndex(unsigned index);
 		/// Returns the NetworkInterface for the given interface index.
 		/// If an index of 0 is specified, a NetworkInterface instance
 		/// representing the default interface (empty name and
@@ -211,14 +217,6 @@ public:
 		/// with the given index does not exist (or IPv6 is not
 		/// available).
 		
-	static List list();
-		/// Returns a list with all network interfaces
-		/// on the system.
-		///
-		/// If there are multiple addresses bound to one interface,
-		/// multiple NetworkInterface entries are listed for
-		/// the same interface.
-
 	static Map map();
 		/// Returns a map with all network interfaces
 		/// on the system. Map is keyed by interface system
@@ -229,22 +227,22 @@ public:
 		/// member of the pair.
 
 protected:
-	NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, int index = -1);
+	NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, unsigned index = 0);
 		/// Creates the NetworkInterface.
 
-	NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index = -1);
+	NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, unsigned index = 0);
 		/// Creates the NetworkInterface.
 
-	NetworkInterface(const std::string& name, const IPAddress& address, int index = -1);
+	NetworkInterface(const std::string& name, const IPAddress& address, unsigned index = 0);
 		/// Creates the NetworkInterface.
 
-	NetworkInterface(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index = -1);
+	NetworkInterface(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, unsigned index = 0);
 		/// Creates the NetworkInterface.
 		
 	IPAddress interfaceNameToAddress(const std::string& interfaceName) const;
 		/// Determines the IPAddress bound to the interface with the given name.
 		
-	int interfaceNameToIndex(const std::string& interfaceName) const;
+	unsigned interfaceNameToIndex(const std::string& interfaceName) const;
 		/// Determines the interface index of the interface with the given name.
 
 	NetworkInterfaceImpl& impl() { return *_pImpl; };
