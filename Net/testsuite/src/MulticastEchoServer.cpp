@@ -107,11 +107,16 @@ const NetworkInterface& MulticastEchoServer::interfc() const
 
 Poco::Net::NetworkInterface MulticastEchoServer::findInterface()
 {
-	NetworkInterface::Map map = NetworkInterface::map();
-	for (NetworkInterface::Map::const_iterator it = map.begin(); it != map.end(); ++it)
+	NetworkInterface::Map m = NetworkInterface::map();
+	for (NetworkInterface::Map::const_iterator it = m.begin(); it != m.end(); ++it)
 	{
-		if (it->second.supportsIPv4() && it->second.address().isUnicast() && !it->second.isLoopback() && it->second.isPointToPoint())
+		if (it->second.supportsIPv4() && 
+			it->second.findFirstAddress(IPAddress::IPv4).isUnicast() && 
+			!it->second.isLoopback() && 
+			!it->second.isPointToPoint())
+		{
 			return it->second;
+		}
 	}
 	return NetworkInterface();
 }

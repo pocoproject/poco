@@ -47,6 +47,7 @@ public:
 	~NetworkInterfaceTest();
 
 	void testMap();
+	void testList();
 	void testForName();
 	void testForAddress();
 	void testForIndex();
