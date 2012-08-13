@@ -307,7 +307,7 @@ const IPAddress& NetworkInterfaceImpl::findFirstAddress(IPAddress::Family family
 		if (addr.family() == family) return addr;
 	}
 
-	throw NotFoundException(format("%s family address not found.", family == IPAddress::IPv4 ? "IPv4" : "IPv6"));
+	throw NotFoundException(format("%s family address not found.", (family == IPAddress::IPv4) ? std::string("IPv4") : std::string("IPv6")));
 }
 
 
