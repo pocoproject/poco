@@ -73,7 +73,7 @@ public:
 	typedef std::vector<AddressTuple>                    AddressList;
 	typedef AddressList::iterator                        AddressIterator;
 	typedef AddressList::const_iterator                  ConstAddressIterator;
-	typedef std::vector<unsigned char>                   MacAddress;
+	typedef std::vector<unsigned char>                   MACAddress;
 
 	enum AddressType
 	{
@@ -82,6 +82,20 @@ public:
 		BROADCAST_ADDRESS
 	};
 
+	enum Type
+	{
+		NI_TYPE_ETHERNET_CSMACD,
+		NI_TYPE_ISO88025_TOKENRING,
+		NI_TYPE_FRAMERELAY,
+		NI_TYPE_PPP,
+		NI_TYPE_SOFTWARE_LOOPBACK,
+		NI_TYPE_ATM,
+		NI_TYPE_IEEE80211,
+		NI_TYPE_TUNNEL,
+		NI_TYPE_IEEE1394,
+		NI_TYPE_OTHER
+	};
+	
 	enum IPVersion
 	{
 		IPv4_ONLY,    /// Return interfaces with IPv4 address only
@@ -131,7 +145,7 @@ public:
 		///
 		/// On other platforms this is the same as name().
 
-	const IPAddress& findFirstAddress(IPAddress::Family family) const;
+	const IPAddress& firstAddress(IPAddress::Family family) const;
 		/// Returns the first IP address bound to the interface.
 
 	const IPAddress& address(unsigned index) const;
@@ -155,12 +169,13 @@ public:
 	const IPAddress& destAddress(unsigned index) const;
 		/// Returns the IPv4 point-to-point destiation address for this network interface.
 
-	const MacAddress& macAddress() const;
+	const MACAddress& macAddress() const;
+		/// Returns MAC (Media Access Control) address for the interface.
 
 	unsigned mtu() const;
 		/// Returns the MTU for this interface.
 
-	unsigned hwType() const;
+	NetworkInterface::Type type() const;
 		/// returns the MIB IfType of the interface.
 
 	bool supportsIP() const;

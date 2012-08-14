@@ -99,7 +99,7 @@ void MulticastSocket::setInterface(const NetworkInterface& interfc)
 {
 	if (!interfc.supportsIPv6())
 	{
-		impl()->setOption(IPPROTO_IP, IP_MULTICAST_IF, interfc.findFirstAddress(IPAddress::IPv4));
+		impl()->setOption(IPPROTO_IP, IP_MULTICAST_IF, interfc.firstAddress(IPAddress::IPv4));
 	}
 	else
 	{
@@ -217,7 +217,7 @@ void MulticastSocket::joinGroup(const IPAddress& groupAddress, const NetworkInte
 	{
 		struct ip_mreq mr;
 		std::memcpy(&mr.imr_multiaddr, groupAddress.addr(), groupAddress.length());
-		std::memcpy(&mr.imr_interface, interfc.findFirstAddress(IPAddress::IPv4).addr(), interfc.findFirstAddress(IPAddress::IPv4).length());
+		std::memcpy(&mr.imr_interface, interfc.firstAddress(IPAddress::IPv4).addr(), interfc.firstAddress(IPAddress::IPv4).length());
 		impl()->setRawOption(IPPROTO_IP, IP_ADD_MEMBERSHIP, &mr, sizeof(mr));
 	}
 	else
@@ -245,7 +245,7 @@ void MulticastSocket::leaveGroup(const IPAddress& groupAddress, const NetworkInt
 	{
 		struct ip_mreq mr;
 		std::memcpy(&mr.imr_multiaddr, groupAddress.addr(), groupAddress.length());
-		std::memcpy(&mr.imr_interface, interfc.findFirstAddress(IPAddress::IPv4).addr(), interfc.findFirstAddress(IPAddress::IPv4).length());
+		std::memcpy(&mr.imr_interface, interfc.firstAddress(IPAddress::IPv4).addr(), interfc.firstAddress(IPAddress::IPv4).length());
 		impl()->setRawOption(IPPROTO_IP, IP_DROP_MEMBERSHIP, &mr, sizeof(mr));
 	}
 	else

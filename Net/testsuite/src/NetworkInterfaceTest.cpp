@@ -67,11 +67,12 @@ void NetworkInterfaceTest::testMap()
 		std::cout << "DisplayName: " << it->second.displayName() << std::endl;
 		std::cout << "Status: " << (it->second.isUp() ? "Up" : "Down") << std::endl;
 
-		NetworkInterface::MacAddress mac(it->second.macAddress());
-		if (!mac.empty()) {
-			std::cout << "Mac Address: (" << it->second.hwType() << ")";
+		NetworkInterface::MACAddress mac(it->second.macAddress());
+		if (!mac.empty() && (it->second.type() != NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK))
+		{
+			std::cout << "MAC Address: ";
 			for (unsigned i = 0; i < mac.size(); ++i)
-				std::cout << ((i == 0) ? ' ' : ':') << std::hex << std::setw(2) << std::setfill('0') << (unsigned)mac[i];
+				std::cout << ((i == 0) ? ' ' : ':') << std::hex << std::setw(2) << std::setfill('0') << (unsigned) mac[i];
 			std::cout << std::dec << std::endl;
 		}
 
@@ -102,7 +103,7 @@ void NetworkInterfaceTest::testList()
 	assert (!list.empty());
 	for (NetworkInterface::NetworkInterfaceList::const_iterator it = list.begin(); it != list.end(); ++it)
 	{
-		std::cout << "==============" << std::endl;
+		std::cout << std::endl << "==============" << std::endl;
 
 		std::cout << "Index:       " << it->index() << std::endl;
 		std::cout << "Name:        " << it->name() << std::endl;
@@ -147,14 +148,14 @@ void NetworkInterfaceTest::testForAddress()
 
 		if (it->second.supportsIPv4())
 		{
-			NetworkInterface ifc = NetworkInterface::forAddress(it->second.findFirstAddress(IPAddress::IPv4));
-			assert (ifc.findFirstAddress(IPAddress::IPv4) == it->second.findFirstAddress(IPAddress::IPv4));
+			NetworkInterface ifc = NetworkInterface::forAddress(it->second.firstAddress(IPAddress::IPv4));
+			assert (ifc.firstAddress(IPAddress::IPv4) == it->second.firstAddress(IPAddress::IPv4));
 		}
 		else
 		{
 			try
 			{
-				it->second.findFirstAddress(IPAddress::IPv4);
+				it->second.firstAddress(IPAddress::IPv4);
 				fail ("must throw");
 			}
 			catch (NotFoundException&) { }
