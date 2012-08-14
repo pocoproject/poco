@@ -1112,6 +1112,26 @@ namespace Poco {
 namespace Net {
 
 
+namespace {
+	
+static NetworkInterface::Type fromNative(u_char nativeType)
+{
+	switch (nativeType) 
+	{
+		case IFT_ETHER:		return NetworkInterface::NI_TYPE_ETHERNET_CSMACD;
+		case IFT_ISO88025:	return NetworkInterface::NI_TYPE_ISO88025_TOKENRING;
+		case IFT_FRELAY:	return NetworkInterface::NI_TYPE_FRAMERELAY;
+		case IFT_PPP:		return NetworkInterface::NI_TYPE_PPP;
+		case IFT_LOOP:		return NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK;
+		case IFT_ATM:		return NetworkInterface::NI_TYPE_ATM;
+		case IFT_IEEE1394:	return NetworkInterface::NI_TYPE_IEEE1394;
+		default:			return NetworkInterface::NI_TYPE_OTHER;
+	}
+}
+	
+}
+	
+	
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -1130,13 +1150,15 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	{
 		for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next) 
 		{
+			if (!currIface->ifa_addr) continue;
+			
 			IPAddress address, subnetMask, broadcastAddress;
-			struct sockaddr_dl* sdl;
-
-			switch (currIface->ifa_addr->sa_family)
+			unsigned family = currIface->ifa_addr->sa_family;
+			switch (family)
 			{
 			case AF_LINK:
-				sdl = (struct sockaddr_dl*)currIface->ifa_addr;
+			{
+				struct sockaddr_dl* sdl = (struct sockaddr_dl*) currIface->ifa_addr;
 				ifIndex = sdl->sdl_index;
 				intf = NetworkInterface(ifIndex);
 				intf.impl().setName(currIface->ifa_name);
@@ -1144,12 +1166,14 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				intf.impl().getPhyParams();
 
 				intf.impl().setMACAddress(LLADDR(sdl), sdl->sdl_alen);
-				intf.impl().setType(sdl->sdl_type);
+				intf.impl().setType(fromNative(sdl->sdl_type));
 
-				ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
+				if ((upOnly && intf.isUp()) || !upOnly)			
+					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
+				
 				break;
+			}
 			case AF_INET:
-				// need to use Map to search by name, i.e. result.find(name)
 				ifIndex = if_nametoindex(currIface->ifa_name);
 				ifIt = result.find(ifIndex);
 
@@ -1162,30 +1186,29 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 					broadcastAddress = IPAddress(*(currIface->ifa_dstaddr));
 				else
 					broadcastAddress = IPAddress();
-
-				ifIt->second.addAddress(address, subnetMask, broadcastAddress);
 				break;
 #if defined(POCO_HAVE_IPv6)
 			case AF_INET6:
-				// need to use Map to search by name, i.e. result.find(name)
 				ifIndex = if_nametoindex(currIface->ifa_name);
 				ifIt = result.find(ifIndex);
 
 				address = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(currIface->ifa_addr)->sin6_addr, sizeof(struct in6_addr), ifIndex);
 				subnetMask = IPAddress(*(currIface->ifa_netmask));
-
-				if (currIface->ifa_flags & IFF_BROADCAST && currIface->ifa_broadaddr)
-					broadcastAddress = IPAddress(*(currIface->ifa_broadaddr));
-				else if (currIface->ifa_flags & IFF_POINTOPOINT && currIface->ifa_dstaddr)
-					broadcastAddress = IPAddress(*(currIface->ifa_dstaddr));
-				else
-					broadcastAddress = IPAddress();
-
-				ifIt->second.addAddress(address, subnetMask, broadcastAddress);
+				broadcastAddress = IPAddress();
 				break;
 #endif
 			default:
 				continue;
+			}
+			
+			if (family == AF_INET || family == AF_INET6)
+			{
+				intf = NetworkInterface(std::string(currIface->ifa_name), address, subnetMask, broadcastAddress, ifIndex);
+				if ((upOnly && intf.isUp()) || !upOnly)
+				{
+					if ((ifIt = result.find(ifIndex)) != result.end())
+						ifIt->second.addAddress(address, subnetMask, broadcastAddress);
+				}
 			}
 		}
 	}
