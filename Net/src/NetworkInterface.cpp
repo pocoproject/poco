@@ -784,13 +784,12 @@ NetworkInterface NetworkInterface::forAddress(const IPAddress& addr)
 	throw InterfaceNotFoundException(addr.toString());
 }
 
-
+	
 NetworkInterface NetworkInterface::forIndex(unsigned i)
 {
 	if (i != NetworkInterface::NO_INDEX)
 	{
 		Map map = NetworkInterface::map();
-
 		Map::const_iterator it = map.find(i);
 		if (it != map.end())
 			return it->second;
@@ -1100,7 +1099,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 
 #elif defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_QNX) || (POCO_OS == POCO_OS_SOLARIS)
 //
-// BSD variants, QNX and Solaris
+// BSD variants, QNX(?) and Solaris
 //
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -1108,7 +1107,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 #include <net/if.h>
 #include <net/if_dl.h>
 #include <net/if_types.h>
-#include <iostream>
+
 
 namespace Poco {
 namespace Net {
@@ -1144,7 +1143,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setType(fromNative(sdl->sdl_type));
 }
 
-}
+} // namespace
 	
 	
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
@@ -1173,6 +1172,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			{
 #if defined(POCO_OS_FAMILY_BSD) 
 			case AF_LINK:
+			{
+				struct sockaddr_dl* sdl = (struct sockaddr_dl*) currIface->ifa_addr;
 				ifIndex = sdl->sdl_index;
 				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
 				{
@@ -1181,6 +1182,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
 				}
 				break;
+			}
 #endif
 			case AF_INET:
 				ifIndex = if_nametoindex(currIface->ifa_name);
