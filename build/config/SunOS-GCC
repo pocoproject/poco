@@ -68,4 +68,4 @@ SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=6
 #
 # System Specific Libraries
 #
-SYSLIBS  = -lpthread -ldl -lrt
+SYSLIBS  = -lpthread -lrt -lxnet -lsocket -lnsl -lresolv -ldl

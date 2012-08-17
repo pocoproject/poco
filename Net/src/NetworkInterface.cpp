@@ -63,7 +63,6 @@ namespace Net {
 // NetworkInterfaceImpl
 //
 
-
 class NetworkInterfaceImpl: public Poco::RefCountedObject
 {
 public:
@@ -108,9 +107,6 @@ public:
 	bool running() const;
 	bool up() const;
 
-protected:
-	~NetworkInterfaceImpl();
-
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	void setFlags(DWORD flags, DWORD iftype);
 #else
@@ -121,8 +117,11 @@ protected:
 	void setMtu(unsigned mtu);
 	void setType(Type type);
 	void setIndex(unsigned index);
-	void getPhyParams();
-	void getPeerAddress();
+	void setPhyParams();
+	void setPeerAddress();
+	
+protected:
+	~NetworkInterfaceImpl();
 
 private:	
 	std::string _name;
@@ -164,8 +163,8 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_mtu(0)
 {
 	_addressList.push_back(AddressTuple(address, IPAddress(), IPAddress()));
-	getPhyParams();
-	if (_pointToPoint) getPeerAddress();
+	setPhyParams();
+	if (_pointToPoint) setPeerAddress();
 }
 
 
@@ -181,8 +180,8 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_running(false),
 	_mtu(0)
 {
-	getPhyParams();
-	if (_pointToPoint) getPeerAddress();
+	setPhyParams();
+	if (_pointToPoint) setPeerAddress();
 }
 
 
@@ -199,12 +198,12 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_mtu(0)
 {
 	_addressList.push_back(AddressTuple(address, subnetMask, broadcastAddress));
-	getPhyParams();
-	if (_pointToPoint) getPeerAddress();
+	setPhyParams();
+	if (_pointToPoint) setPeerAddress();
 }
 
 
-void NetworkInterfaceImpl::getPhyParams()
+void NetworkInterfaceImpl::setPhyParams()
 {
 #if !defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_VXWORKS)
 	struct ifreq ifr;
@@ -220,7 +219,7 @@ void NetworkInterfaceImpl::getPhyParams()
 }
 
 
-void NetworkInterfaceImpl::getPeerAddress()
+void NetworkInterfaceImpl::setPeerAddress()
 {
 	AddressList::iterator it = _addressList.begin();
 	AddressList::iterator end = _addressList.end();
@@ -948,9 +947,10 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #endif
 	DWORD dwRetVal = 0;
 	ULONG iterations = 0;
-	PIP_ADAPTER_ADDRESSES pAddress = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(memory.begin());
+	PIP_ADAPTER_ADDRESSES pAddress = 0;
 	do
 	{
+		pAddress = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(memory.begin()); // leave in the loop, begin may change after resize
 		poco_assert (memory.capacity() >= outBufLen);
 		if (ERROR_BUFFER_OVERFLOW == (dwRetVal = GetAdaptersAddresses(family, flags, 0, pAddress, &outBufLen)))
 			memory.resize(outBufLen); // adjust size and try again
@@ -1048,7 +1048,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 // VxWorks
 //
 
+#error TODO
 
+/*
 namespace Poco {
 namespace Net {
 
@@ -1094,11 +1096,11 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 
 
 } } // namespace Poco::Net
+*/
 
-
-#elif defined(POCO_OS_FAMILY_BSD) || POCO_OS == POCO_OS_QNX
+#elif defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_QNX) || (POCO_OS == POCO_OS_SOLARIS)
 //
-// BSD variants
+// BSD variants, QNX and Solaris
 //
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -1106,7 +1108,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 #include <net/if.h>
 #include <net/if_dl.h>
 #include <net/if_types.h>
-
+#include <iostream>
 
 namespace Poco {
 namespace Net {
@@ -1114,7 +1116,7 @@ namespace Net {
 
 namespace {
 	
-static NetworkInterface::Type fromNative(u_char nativeType)
+NetworkInterface::Type fromNative(u_char nativeType)
 {
 	switch (nativeType) 
 	{
@@ -1124,11 +1126,24 @@ static NetworkInterface::Type fromNative(u_char nativeType)
 		case IFT_PPP:		return NetworkInterface::NI_TYPE_PPP;
 		case IFT_LOOP:		return NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK;
 		case IFT_ATM:		return NetworkInterface::NI_TYPE_ATM;
+#if (POCO_OS != POCO_OS_SOLARIS)		
 		case IFT_IEEE1394:	return NetworkInterface::NI_TYPE_IEEE1394;
+#endif
 		default:			return NetworkInterface::NI_TYPE_OTHER;
 	}
 }
-	
+
+void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
+{
+	struct sockaddr_dl* sdl = (struct sockaddr_dl*) iface->ifa_addr;
+	impl.setName(iface->ifa_name);
+	impl.setDisplayName(iface->ifa_name);
+	impl.setPhyParams();
+
+	impl.setMACAddress(LLADDR(sdl), sdl->sdl_alen);
+	impl.setType(fromNative(sdl->sdl_type));
+}
+
 }
 	
 	
@@ -1156,27 +1171,27 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			unsigned family = currIface->ifa_addr->sa_family;
 			switch (family)
 			{
+#if defined(POCO_OS_FAMILY_BSD) 
 			case AF_LINK:
-			{
-				struct sockaddr_dl* sdl = (struct sockaddr_dl*) currIface->ifa_addr;
 				ifIndex = sdl->sdl_index;
-				intf = NetworkInterface(ifIndex);
-				intf.impl().setName(currIface->ifa_name);
-				intf.impl().setDisplayName(currIface->ifa_name);
-				intf.impl().getPhyParams();
-
-				intf.impl().setMACAddress(LLADDR(sdl), sdl->sdl_alen);
-				intf.impl().setType(fromNative(sdl->sdl_type));
-
-				if ((upOnly && intf.isUp()) || !upOnly)			
+				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
+				{
+					intf = NetworkInterface(ifIndex);
+					setInterfaceParams(currIface, intf.impl());
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
-				
+				}
 				break;
-			}
+#endif
 			case AF_INET:
 				ifIndex = if_nametoindex(currIface->ifa_name);
 				ifIt = result.find(ifIndex);
-
+				if ((ifIt == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
+				{
+					intf = NetworkInterface(ifIndex);
+					setInterfaceParams(currIface, intf.impl());
+					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
+				}
+				
 				address = IPAddress(*(currIface->ifa_addr));
 				subnetMask = IPAddress(*(currIface->ifa_netmask));
 
@@ -1191,8 +1206,15 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			case AF_INET6:
 				ifIndex = if_nametoindex(currIface->ifa_name);
 				ifIt = result.find(ifIndex);
-
-				address = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(currIface->ifa_addr)->sin6_addr, sizeof(struct in6_addr), ifIndex);
+				if ((ifIt == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
+				{
+					intf = NetworkInterface(ifIndex);
+					setInterfaceParams(currIface, intf.impl());
+					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
+				}
+				
+				address = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(currIface->ifa_addr)->sin6_addr,
+					sizeof(struct in6_addr), ifIndex);
 				subnetMask = IPAddress(*(currIface->ifa_netmask));
 				broadcastAddress = IPAddress();
 				break;
@@ -1295,7 +1317,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				intf = NetworkInterface(ifIndex);
 				intf.impl().setName(iface->ifa_name);
 				intf.impl().setDisplayName(iface->ifa_name);
-				intf.impl().getPhyParams();
+				intf.impl().setPhyParams();
 
 				intf.impl().setMACAddress(sll->sll_addr, sll->sll_halen);
 				intf.impl().setType(fromNative(sll->sll_hatype));
@@ -1361,12 +1383,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 //
 // Non-BSD Unix variants
 //
-
-
-namespace Poco {
-namespace Net {
-
-
+#error TODO
+/*
 NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -1446,7 +1464,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 	delete [] buf;
 	return result;
 }
-
+*/
 
 } } // namespace Poco::Net
 
