@@ -104,6 +104,11 @@ public:
 	};
 
 	static const unsigned NO_INDEX = ~0;
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	static const char MAC_SEPARATOR = '-';
+#else
+	static const char MAC_SEPARATOR = ':';
+#endif
 
 	NetworkInterface(unsigned index = NO_INDEX);
 		/// Creates a NetworkInterface representing the
@@ -316,6 +321,9 @@ inline bool NetworkInterface::operator == (const NetworkInterface& other) const
 
 
 } } // namespace Poco::Net
+
+
+Net_API std::ostream& operator<<(std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac);
 
 
 #endif // Net_NetworkInterface_INCLUDED

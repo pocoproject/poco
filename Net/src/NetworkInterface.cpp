@@ -48,11 +48,27 @@
 #include <ipifcons.h>
 #endif
 #include <cstring>
+#include <iostream>
+#include <iomanip>
 
 
 using Poco::NumberFormatter;
 using Poco::FastMutex;
 using Poco::format;
+
+
+std::ostream& operator<<(std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac)
+{
+	std::ios state(0);
+	state.copyfmt(os);
+	for (unsigned i = 0; i < mac.size(); ++i)
+	{
+		if (i > 0) os << Poco::Net::NetworkInterface::MAC_SEPARATOR;
+		os << std::hex << std::setw(2) << std::setfill('0') << (unsigned) mac[i];
+	}
+	os.copyfmt(state);
+	return os;
+}
 
 
 namespace Poco {

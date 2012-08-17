@@ -26,6 +26,8 @@ Release 1.5.0 (2012-08-??)
 - UTF portability improvements
 - fixed SF#3556186: Linux shouldn't use <net/if.h> in Net/SocketDefs.h
 - added IPAddress RFC 4291 compatible site-local prefix support
+- fixed SF# 3012166: IPv6 patch
+- added SF# 3558085: Add formatter to MACAddress object
 
 Release 1.4.4 (2012-08-??)
 ==========================

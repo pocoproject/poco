@@ -69,12 +69,7 @@ void NetworkInterfaceTest::testMap()
 
 		NetworkInterface::MACAddress mac(it->second.macAddress());
 		if (!mac.empty() && (it->second.type() != NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK))
-		{
-			std::cout << "MAC Address: ";
-			for (unsigned i = 0; i < mac.size(); ++i)
-				std::cout << ((i == 0) ? ' ' : ':') << std::hex << std::setw(2) << std::setfill('0') << (unsigned) mac[i];
-			std::cout << std::dec << std::endl;
-		}
+			std::cout << "MAC Address: " << mac << std::endl;
 
 		typedef NetworkInterface::AddressList List;
 		const List& ipList = it->second.addressList();
@@ -108,6 +103,11 @@ void NetworkInterfaceTest::testList()
 		std::cout << "Index:       " << it->index() << std::endl;
 		std::cout << "Name:        " << it->name() << std::endl;
 		std::cout << "DisplayName: " << it->displayName() << std::endl;
+		std::cout << "Status: " << (it->isUp() ? "Up" : "Down") << std::endl;
+
+		NetworkInterface::MACAddress mac(it->macAddress());
+		if (!mac.empty() && (it->type() != NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK))
+			std::cout << "MAC Address: " << mac << std::endl;
 
 		typedef NetworkInterface::AddressList List;
 		const List& ipList = it->addressList();
