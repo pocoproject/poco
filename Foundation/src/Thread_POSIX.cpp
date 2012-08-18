@@ -87,7 +87,7 @@ ThreadImpl::ThreadImpl():
 {
 }
 
-			
+
 ThreadImpl::~ThreadImpl()
 {
 	if (isRunningImpl())
@@ -158,19 +158,19 @@ void ThreadImpl::setStackSizeImpl(int size)
 #ifndef PTHREAD_STACK_MIN
 	_pData->stackSize = 0;
 #else
- 	if (size != 0)
- 	{
+	if (size != 0)
+	{
 #if defined(__APPLE__)
 		// we must round up to a multiple of the memory page size
 		const int PAGE_SIZE = 4096;
 		size = ((size + PAGE_SIZE - 1)/PAGE_SIZE)*PAGE_SIZE;
 #endif
 #if !defined(POCO_ANDROID)
- 		if (size < PTHREAD_STACK_MIN)
- 			size = PTHREAD_STACK_MIN;
+		if (size < PTHREAD_STACK_MIN)
+			size = PTHREAD_STACK_MIN;
 #endif
 	}
- 	_pData->stackSize = size;
+	_pData->stackSize = size;
 #endif
 }
 
@@ -201,7 +201,7 @@ void ThreadImpl::startImpl(Runnable& target)
 	}
 	pthread_attr_destroy(&attributes);
 
-    if (_pData->policy == SCHED_OTHER)
+	if (_pData->policy == SCHED_OTHER)
 	{
 		if (_pData->prio != PRIO_NORMAL_IMPL)
 		{
@@ -298,7 +298,7 @@ ThreadImpl* ThreadImpl::currentImpl()
 
 ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 {
-    return pthread_self();
+	return pthread_self();
 }
 
 
