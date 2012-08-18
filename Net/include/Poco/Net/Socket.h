@@ -306,6 +306,16 @@ public:
 	static bool supportsIPv6();
 		/// Returns true if the system supports IPv6.
 
+	void init(int af);
+		/// Creates the underlying system socket for the given
+		/// address family.
+		///
+		/// Normally, this method should not be called directly, as
+		/// socket creation will be handled automatically. There are
+		/// a few situations where calling this method after creation
+		/// of the Socket object makes sense. One example is setting
+		/// a socket option before calling bind() on a ServerSocket.
+
 protected:
 	Socket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.
@@ -629,6 +639,13 @@ inline bool Socket::supportsIPv6()
 	return false;
 #endif
 }
+
+
+inline void Socket::init(int af)
+{
+	_pImpl->init(af);
+}
+
 
 } } // namespace Poco::Net
 
