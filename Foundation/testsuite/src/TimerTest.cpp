@@ -65,7 +65,7 @@ void TimerTest::testTimer()
 	t.start(tc);
 	_event.wait();
 	sw.stop();
-	assert (sw.elapsed() >= 80000 && sw.elapsed() < 250000);
+	assert (sw.elapsed() >= 80000 && sw.elapsed() < 120000);
 	sw.restart();
 	_event.wait();
 	sw.stop();

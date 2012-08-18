@@ -18,9 +18,9 @@ Release 1.5.0 (2012-08-??)
 - fixed SF#3538780: SocketAddress needs operator < function
 - fixed SF#3538775: Issues building on Fedora/Centos, etc. for AMD64
 - fixed SF#3538786: Use size_t for describing data-blocks in DigestEngine
-- IPAddress bitwise operators (&,|,^,~)
-- IPAddress BinaryReader/Writer << and >> operators
-- IPAddress force IPv6 always lowercase (RFC 5952)
+- added IPAddress bitwise operators (&,|,^,~)
+- added IPAddress BinaryReader/Writer << and >> operators
+- modified IPAddress to force IPv6 to lowercase (RFC 5952)
 - fixed SF#3538785: SMTPClientSession::sendMessage() should take recipient list 
 - added IPAddress::prefixLength()
 - UTF portability improvements
@@ -28,6 +28,7 @@ Release 1.5.0 (2012-08-??)
 - added IPAddress RFC 4291 compatible site-local prefix support
 - fixed SF# 3012166: IPv6 patch
 - added SF# 3558085: Add formatter to MACAddress object
+- fixed SF# 3535990: POCO_HAVE_IPv6 without POCO_WIN32_UTF8 conflict
 
 Release 1.4.4 (2012-08-??)
 ==========================

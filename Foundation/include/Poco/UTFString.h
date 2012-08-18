@@ -48,13 +48,19 @@ namespace Poco {
 
 
 // UTF string types
-#ifndef POCO_NO_WSTRING
-	//#if defined(POCO_ENABLE_CPP11) //TODO
+
+//#if defined(POCO_ENABLE_CPP11) //TODO
 	//	typedef char16_t       UTF16Char;
 	//	typedef std::u16string UTF16String;
 	//	typedef char32_t       UTF32Char;
 	//	typedef std::u32string UTF32String;
-	//#else
+//#else
+	#ifdef POCO_NO_WSTRING
+		typedef Poco::UInt16              UTF16Char;
+		typedef std::basic_string<UInt16> UTF16String;
+		typedef UInt32                    UTF32Char;
+		typedef std::basic_string<UInt32> UTF32String;
+	#else // POCO_NO_WSTRING
 		#if defined(POCO_OS_FAMILY_WINDOWS)
 			typedef wchar_t                   UTF16Char;
 			typedef std::wstring              UTF16String;
@@ -78,9 +84,8 @@ namespace Poco {
 			typedef wchar_t                   UTF32Char;
 			typedef std::wstring              UTF32String;
 		#endif //POCO_OS_FAMILY_WINDOWS
-	//#endif // POCO_ENABLE_CPP11
-#endif //POCO_NO_WSTRING
-
+	#endif //POCO_NO_WSTRING
+//#endif // POCO_ENABLE_CPP11
 
 } // namespace Poco
 

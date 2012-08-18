@@ -49,7 +49,6 @@ namespace Poco {
 Glob::Glob(const std::string& pattern, int options)
 	: _pattern(pattern), _options(options)
 {
-	poco_assert(!_pattern.empty());
 }
 
 

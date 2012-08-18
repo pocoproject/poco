@@ -41,11 +41,11 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/Format.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(POCO_WIN32_UTF8)
-#include "Poco/UnicodeConverter.h"
-#endif
-#include <iphlpapi.h>
-#include <ipifcons.h>
+	#if defined(POCO_WIN32_UTF8)
+		#include "Poco/UnicodeConverter.h"
+	#endif
+	#include <iphlpapi.h>
+	#include <ipifcons.h>
 #endif
 #include <cstring>
 #include <iostream>
@@ -997,7 +997,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, displayName);
 #else
 		char displayNameBuffer[1024];
-		int rc = WideCharToMultiByte(CP_ACP, WC_DEFAULTCHAR, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
+		int rc = WideCharToMultiByte(CP_ACP, 0, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
 		if (rc) displayName = displayNameBuffer;
 #endif
 

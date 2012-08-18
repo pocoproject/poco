@@ -178,7 +178,7 @@ void Timer::run()
 					sleep = 0;
 					break;
 				}
-				_nextInvocation += static_cast<Timestamp::TimeVal>(_startInterval)*1000;
+				_nextInvocation += static_cast<Timestamp::TimeVal>(interval)*1000;
 				++_skipped;
 			}
 		}
@@ -210,7 +210,7 @@ void Timer::run()
 			}
 			interval = _periodicInterval;
 		}
-		_nextInvocation += static_cast<Timestamp::TimeVal>(_startInterval)*1000;
+		_nextInvocation += static_cast<Timestamp::TimeVal>(interval)*1000;
 		_skipped = 0;
 	}
 	while (interval > 0);
