@@ -147,7 +147,7 @@ public:
 		VA,  /* value    */
 		AR,  /* array    */
 		ST,  /* string   */
-		ES,  /* escape   */
+		EC,  /* escape   */
 		U1,  /* u1       */
 		U2,  /* u2       */
 		U3,  /* u3       */
@@ -394,7 +394,7 @@ private:
 			// _escaped char 
 			case EX:
 				_escaped = 1;
-				_state = ES;
+				_state = EC;
 				break;
 			// integer detected by minus
 			case MX:

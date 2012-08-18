@@ -98,7 +98,7 @@ const int Parser::_stateTransitionTable[NR_STATES][NR_CLASSES] = {
 /*value  VA*/ {VA,VA,-6,xx,-5,xx,xx,xx,SB,xx,CB,xx,MX,xx,ZX,IX,xx,xx,xx,xx,xx,FA,xx,NU,xx,xx,TR,xx,xx,xx,xx,xx},
 /*array  AR*/ {AR,AR,-6,xx,-5,-7,xx,xx,SB,xx,CB,xx,MX,xx,ZX,IX,xx,xx,xx,xx,xx,FA,xx,NU,xx,xx,TR,xx,xx,xx,xx,xx},
 /*string ST*/ {ST,xx,ST,ST,ST,ST,ST,ST,-4,EX,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST},
-/*escape ES*/ {xx,xx,xx,xx,xx,xx,xx,xx,ST,ST,ST,xx,xx,xx,xx,xx,xx,ST,xx,xx,xx,ST,xx,ST,ST,xx,ST,U1,xx,xx,xx,xx},
+/*escape EC*/ {xx,xx,xx,xx,xx,xx,xx,xx,ST,ST,ST,xx,xx,xx,xx,xx,xx,ST,xx,xx,xx,ST,xx,ST,ST,xx,ST,U1,xx,xx,xx,xx},
 /*u1     U1*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,U2,U2,U2,U2,U2,U2,U2,U2,xx,xx,xx,xx,xx,xx,U2,U2,xx,xx},
 /*u2     U2*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,U3,U3,U3,U3,U3,U3,U3,U3,xx,xx,xx,xx,xx,xx,U3,U3,xx,xx},
 /*u3     U3*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,U4,U4,U4,U4,U4,U4,U4,U4,xx,xx,xx,xx,xx,xx,U4,U4,xx,xx},
