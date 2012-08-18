@@ -151,7 +151,13 @@ void SecureSocketImpl::connectNB(const SocketAddress& address)
 	poco_assert (!_pSSL);
 
 	_pSocket->connectNB(address);
+	Poco::Timespan receiveTimeout = _pSocket->getReceiveTimeout();
+	Poco::Timespan sendTimeout = _pSocket->getSendTimeout();
+	_pSocket->setReceiveTimeout(timeout);
+	_pSocket->setSendTimeout(timeout);
 	connectSSL(false);
+	_pSocket->setReceiveTimeout(receiveTimeout);
+	_pSocket->setSendTimeout(sendTimeout);
 }
 
 
