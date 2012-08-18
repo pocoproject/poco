@@ -53,6 +53,7 @@ public:
 
 	void testEncryptDecrypt();
 	void testEncryptDecryptWithSalt();
+	void testEncryptDecryptDESECB();
 	void testStreams();
 	void testCertificate();
 	

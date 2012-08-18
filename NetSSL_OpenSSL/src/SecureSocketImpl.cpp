@@ -241,6 +241,7 @@ void SecureSocketImpl::shutdown()
 			// done with it.
 			int rc = SSL_shutdown(_pSSL);
 			if (rc < 0) handleError(rc);
+			if (_pSocket->getBlocking()) _pSocket->shutdown();
 		}
 	}
 }

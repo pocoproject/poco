@@ -116,7 +116,7 @@ namespace
 			&_ctx,
 			_pCipher,
 			&_key[0],
-			&_iv[0],
+			_iv.empty() ? 0 : &_iv[0],
 			(dir == DIR_ENCRYPT) ? 1 : 0);
 	}
 

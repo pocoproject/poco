@@ -155,7 +155,7 @@ class Foundation_API FileChannel: public Channel
 	/// The purgeAge property can have the following values:
 	///
 	///   * "none" or ""   no purging
-	///   * <n> [seconds]  the maximum age is <n> seconds.
+	///   * <n> [seconds]: the maximum age is <n> seconds.
 	///   * <n> minutes:   the maximum age is <n> minutes.
 	///   * <n> hours:     the maximum age is <n> hours.
 	///   * <n> days:      the maximum age is <n> days.
