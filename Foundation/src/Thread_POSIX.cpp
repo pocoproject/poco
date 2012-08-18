@@ -87,7 +87,7 @@ ThreadImpl::ThreadImpl():
 {
 }
 
-			
+
 ThreadImpl::~ThreadImpl()
 {
 	if (isRunningImpl())
@@ -158,8 +158,8 @@ void ThreadImpl::setStackSizeImpl(int size)
 #ifndef PTHREAD_STACK_MIN
 	_pData->stackSize = 0;
 #else
- 	if (size != 0)
- 	{
+	if (size != 0)
+	{
 #if defined(__APPLE__)
 		// we must round up to a multiple of the memory page size
 		const int PAGE_SIZE = 4096;
@@ -186,17 +186,22 @@ void ThreadImpl::startImpl(Runnable& target)
 	if (_pData->stackSize != 0)
 	{
 		if (0 != pthread_attr_setstacksize(&attributes, _pData->stackSize))
+		{
+			pthread_attr_destroy(&attributes);
 			throw SystemException("cannot set thread stack size");
+		}
 	}
 
 	_pData->pRunnableTarget = &target;
 	if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
 	{
 		_pData->pRunnableTarget = 0;
+		pthread_attr_destroy(&attributes);
 		throw SystemException("cannot start thread");
 	}
+	pthread_attr_destroy(&attributes);
 
-    if (_pData->policy == SCHED_OTHER)
+	if (_pData->policy == SCHED_OTHER)
 	{
 		if (_pData->prio != PRIO_NORMAL_IMPL)
 		{
@@ -293,7 +298,7 @@ ThreadImpl* ThreadImpl::currentImpl()
 
 ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 {
-    return pthread_self();
+	return pthread_self();
 }
 
 
