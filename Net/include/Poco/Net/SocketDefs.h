@@ -285,5 +285,32 @@ extern char *if_indextoname (unsigned int __ifindex, char *__ifname) __THROW;
 #define INADDR_NONE 0xFFFFFFFF
 #endif
 
+#ifndef INADDR_ANY
+#define INADDR_ANY 0x00000000
+#endif
+
+#ifndef INADDR_BROADCAST
+#define INADDR_BROADCAST 0xffffffff
+#endif
+
+#ifndef INADDR_LOOPBACK
+#define INADDR_LOOPBACK 0x7f000001
+#endif
+
+#ifndef INADDR_UNSPEC_GROUP
+#define INADDR_UNSPEC_GROUP 0xe0000000
+#endif
+
+#ifndef INADDR_ALLHOSTS_GROUP
+#define INADDR_ALLHOSTS_GROUP 0xe0000001
+#endif
+
+#ifndef INADDR_ALLRTRS_GROUP
+#define INADDR_ALLRTRS_GROUP 0xe0000002
+#endif
+
+#ifndef INADDR_MAX_LOCAL_GROUP
+#define INADDR_MAX_LOCAL_GROUP 0xe00000ff
+#endif
 
 #endif // Net_SocketDefs_INCLUDED
