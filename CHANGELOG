@@ -64,6 +64,7 @@ Release 1.4.4 (2012-08-??)
   response to a HEAD request, or in case of a 204 No Content or 304 Not Modified
   response status.
 - fixed a DOM parser performance bug (patch by Peter Klotz)
+- fixed SF# 3559325: Util Windows broken in non-Unicode
 
 Release 1.4.3p1 (2012-01-23)
 ============================

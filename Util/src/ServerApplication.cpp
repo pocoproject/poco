@@ -181,7 +181,7 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 #if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	_serviceStatusHandle = RegisterServiceCtrlHandlerW(L"", ServiceControlHandler);
 #else
-	_serviceStatusHandle = RegisterServiceCtrlHandler("", ServiceControlHandler);
+	_serviceStatusHandle = RegisterServiceCtrlHandlerA("", ServiceControlHandler);
 #endif
 	if (!_serviceStatusHandle)
 		throw SystemException("cannot register service control handler");
@@ -365,7 +365,7 @@ bool ServerApplication::isService()
 	svcDispatchTable[0].lpServiceProc = ServiceMain;
 	svcDispatchTable[1].lpServiceName = NULL;
 	svcDispatchTable[1].lpServiceProc = NULL; 
-	return StartServiceCtrlDispatcher(svcDispatchTable) != 0; 
+	return StartServiceCtrlDispatcherA(svcDispatchTable) != 0; 
 #endif
 }
 

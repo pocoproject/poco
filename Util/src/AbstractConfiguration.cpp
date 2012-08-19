@@ -339,7 +339,6 @@ void AbstractConfiguration::remove(const std::string& key)
 	}
 	{
 		FastMutex::ScopedLock lock(_mutex);
-
 		removeRaw(key);
 	}
 	if (_eventsEnabled)
@@ -451,7 +450,6 @@ void AbstractConfiguration::setRawWithEvent(const std::string& key, std::string 
 	}
 	{
 		FastMutex::ScopedLock lock(_mutex);
-
 		setRaw(key, value);
 	}
 	if (_eventsEnabled)

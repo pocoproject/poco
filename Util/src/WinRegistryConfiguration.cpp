@@ -51,9 +51,11 @@ namespace Util {
 WinRegistryConfiguration::WinRegistryConfiguration(const std::string& rootPath, REGSAM extraSam): _rootPath(rootPath), _extraSam(extraSam)
 {
 	// rootPath must end with backslash
-	std::string::iterator it = _rootPath.end();
-	if (*(--it) != '\\')
-		_rootPath.append("\\");
+	if (!_rootPath.empty())
+	{
+		if (_rootPath[_rootPath.length() - 1] != '\\')
+			_rootPath += '\\';
+	}
 }
 
 
@@ -102,7 +104,9 @@ void WinRegistryConfiguration::setRaw(const std::string& key, const std::string&
 
 void WinRegistryConfiguration::enumerate(const std::string& key, Keys& range) const
 {
-	if (key.empty())
+	std::string keyName;
+	std::string fullPath = _rootPath + convertToRegFormat(key, keyName);
+	if (fullPath.empty())
 	{
 		// return all root level keys
 		range.push_back("HKEY_CLASSES_ROOT");
@@ -114,8 +118,8 @@ void WinRegistryConfiguration::enumerate(const std::string& key, Keys& range) co
 	}
 	else
 	{
-		std::string keyName;
-		std::string fullPath = _rootPath + convertToRegFormat(key, keyName);
+		fullPath += '\\';
+		fullPath += keyName;
 		WinRegistryKey aKey(fullPath, true, _extraSam);
 		aKey.values(range);
 		aKey.subKeys(range);
@@ -138,7 +142,7 @@ std::string WinRegistryConfiguration::convertToRegFormat(const std::string& key,
 		return std::string();
 	}
 	std::string prefix(key.substr(0,pos));
-	value = key.substr(pos+1);
+	value = key.substr(pos + 1);
 	Poco::translateInPlace(prefix, ".", "\\");
 	return prefix;
 }

@@ -134,7 +134,7 @@ void WinService::registerService(const std::string& path, const std::string& dis
 		upath.c_str(),
 		NULL, NULL, NULL, NULL, NULL);
 #else
-	_svcHandle = CreateService(
+	_svcHandle = CreateServiceA(
 		_scmHandle,
 		_name.c_str(),
 		displayName.c_str(), 
@@ -296,7 +296,7 @@ bool WinService::tryOpen() const
 		Poco::UnicodeConverter::toUTF16(_name, uname);
 		_svcHandle = OpenServiceW(_scmHandle, uname.c_str(), SERVICE_ALL_ACCESS);
 #else
-		_svcHandle = OpenService(_scmHandle, _name.c_str(), SERVICE_ALL_ACCESS);
+		_svcHandle = OpenServiceA(_scmHandle, _name.c_str(), SERVICE_ALL_ACCESS);
 #endif
 	}
 	return _svcHandle != 0;
@@ -325,7 +325,7 @@ POCO_LPQUERY_SERVICE_CONFIG WinService::config() const
 #if defined(POCO_WIN32_UTF8)
 		while (!QueryServiceConfigW(_svcHandle, pSvcConfig, size, &bytesNeeded))
 #else
-		while (!QueryServiceConfig(_svcHandle, pSvcConfig, size, &bytesNeeded))
+		while (!QueryServiceConfigA(_svcHandle, pSvcConfig, size, &bytesNeeded))
 #endif
 		{
 			if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
