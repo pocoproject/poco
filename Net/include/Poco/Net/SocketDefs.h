@@ -313,4 +313,16 @@ extern char *if_indextoname (unsigned int __ifindex, char *__ifname) __THROW;
 #define INADDR_MAX_LOCAL_GROUP 0xe00000ff
 #endif
 
+
+#if defined(POCO_ARCH_BIG_ENDIAN)
+	#define poco_ntoh_16(x) (x)
+	#define poco_ntoh_32(x) (x)
+#else
+	#define poco_ntoh_16(x) \
+		((((x) >> 8) & 0x00ff) | (((x) << 8) & 0xff00))
+	#define poco_ntoh_32(x) \
+		((((x) >> 24) & 0x000000ff) | (((x) >> 8) & 0x0000ff00) | (((x) << 8) & 0x00ff0000) | (((x) << 24) & 0xff000000))
+#endif
+
+
 #endif // Net_SocketDefs_INCLUDED

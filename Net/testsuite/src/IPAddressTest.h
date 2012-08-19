@@ -60,7 +60,8 @@ public:
 	void testPrefixCons();
 	void testPrefixLen();
 	void testOperators();
-	
+	void testByteOrderMacros();
+
 	void setUp();
 	void tearDown();
 

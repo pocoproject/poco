@@ -630,6 +630,15 @@ void IPAddressTest::testRelationals6()
 }
 
 
+void IPAddressTest::testByteOrderMacros()
+{
+	Poco::UInt16 a16 = 0xDEAD;
+	assert (poco_ntoh_16(a16) == ntohs(a16));
+	Poco::UInt32 a32 = 0xDEADBEEF;
+	assert (poco_ntoh_32(a32) == ntohl(a32));
+}
+
+
 void IPAddressTest::setUp()
 {
 }
@@ -658,6 +667,7 @@ CppUnit::Test* IPAddressTest::suite()
 	CppUnit_addTest(pSuite, IPAddressTest, testPrefixCons);
 	CppUnit_addTest(pSuite, IPAddressTest, testPrefixLen);
 	CppUnit_addTest(pSuite, IPAddressTest, testOperators);
+	CppUnit_addTest(pSuite, IPAddressTest, testByteOrderMacros);
 
 	return pSuite;
 }
