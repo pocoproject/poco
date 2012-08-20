@@ -43,7 +43,6 @@ pcre_objects = pcre_chartables pcre_compile pcre_globals pcre_maketables \
 pcre_utf8_objects = pcre_ucd pcre_tables
 
 ifdef POCO_UNBUNDLED
-	objects += $(pcre_utf8_objects) 
 	SYSLIBS += -lpcre -lz
 else
 	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects)
