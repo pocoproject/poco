@@ -121,4 +121,9 @@
 // #define POCO_UTIL_NO_XMLCONFIGURATION
 
 
+// No IPv6 support
+// Define to disable IPv6
+// #define POCO_NET_NO_IPv6
+
+
 #endif // Foundation_Config_INCLUDED

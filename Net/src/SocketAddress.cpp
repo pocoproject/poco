@@ -358,11 +358,13 @@ int SocketAddress::af() const
 std::string SocketAddress::toString() const
 {
 	std::string result;
+#if defined(POCO_HAVE_IPv6)
 	if (host().family() == IPAddress::IPv6)
 		result.append("[");
 	result.append(host().toString());
 	if (host().family() == IPAddress::IPv6)
 		result.append("]");
+#endif
 	result.append(":");
 	NumberFormatter::append(result, port());
 	return result;

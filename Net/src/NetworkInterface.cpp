@@ -280,6 +280,7 @@ bool NetworkInterfaceImpl::supportsIPv4() const
 
 bool NetworkInterfaceImpl::supportsIPv6() const
 {
+#ifdef POCO_HAVE_IPv6
 	AddressList::const_iterator it = _addressList.begin();
 	AddressList::const_iterator end = _addressList.end();
 	for (; it != end; ++it)
@@ -287,7 +288,7 @@ bool NetworkInterfaceImpl::supportsIPv6() const
 		if (IPAddress::IPv6 == it->get<NetworkInterface::IP_ADDRESS>().family())
 			return true;
 	}
-
+#endif
 	return false;
 }
 
@@ -1241,7 +1242,11 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				continue;
 			}
 			
-			if (family == AF_INET || family == AF_INET6)
+			if (family == AF_INET
+#ifdef POCO_HAVE_IPv6
+			|| family == AF_INET6
+#endif
+			)
 			{
 				intf = NetworkInterface(std::string(currIface->ifa_name), address, subnetMask, broadcastAddress, ifIndex);
 				if ((upOnly && intf.isUp()) || !upOnly)

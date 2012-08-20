@@ -5,6 +5,7 @@
 #
 
 sinclude config.make
+sinclude config.build
 
 ifndef POCO_BASE
 $(warning WARNING: POCO_BASE is not defined. Assuming current directory.)
@@ -24,7 +25,8 @@ ifeq ($(LINKMODE),BOTH)
 SHAREDONLY='(' -name static -prune ')' -o
 endif
 
-.PHONY: all libexecs cppunit tests samples clean distclean install
+# TESTS and SAMPLES are set by confgure script in config.make
+poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 
 all: libexecs tests samples
 
@@ -53,6 +55,7 @@ libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec
 tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Zip-tests PDF-tests CppParser-tests
 samples  =  Foundation-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples Zip-samples PageCompiler-samples PDF-samples
 
+.PHONY: poco all libexecs cppunit tests samples clean distclean install
 .PHONY: $(libexecs)
 .PHONY: $(tests)
 .PHONY: $(samples)
@@ -66,7 +69,7 @@ Foundation-libexec:
 
 Foundation-tests: Foundation-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Foundation/testsuite
-	
+
 Foundation-samples: Foundation-libexec 
 	$(MAKE) -C $(POCO_BASE)/Foundation/samples
 
@@ -75,7 +78,7 @@ XML-libexec:  Foundation-libexec
 
 XML-tests: XML-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/XML/testsuite
-	
+
 XML-samples: XML-libexec 
 	$(MAKE) -C $(POCO_BASE)/XML/samples
 
@@ -84,7 +87,7 @@ JSON-libexec:  Foundation-libexec
 
 JSON-tests: JSON-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/JSON/testsuite
-	
+
 JSON-samples: JSON-libexec 
 	$(MAKE) -C $(POCO_BASE)/JSON/samples
 
@@ -93,7 +96,7 @@ Util-libexec:  Foundation-libexec XML-libexec
 
 Util-tests: Util-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Util/testsuite
-	
+
 Util-samples: Util-libexec 
 	$(MAKE) -C $(POCO_BASE)/Util/samples
 
@@ -102,7 +105,7 @@ Net-libexec:  Foundation-libexec
 
 Net-tests: Net-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Net/testsuite
-	
+
 Net-samples: Net-libexec  Foundation-libexec XML-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Net/samples
 
@@ -111,7 +114,7 @@ Crypto-libexec:  Foundation-libexec
 
 Crypto-tests: Crypto-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Crypto/testsuite
-	
+
 Crypto-samples: Crypto-libexec  Foundation-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Crypto/samples
 
@@ -120,7 +123,7 @@ NetSSL_OpenSSL-libexec:  Foundation-libexec Net-libexec Util-libexec Crypto-libe
 
 NetSSL_OpenSSL-tests: NetSSL_OpenSSL-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/testsuite
-	
+
 NetSSL_OpenSSL-samples: NetSSL_OpenSSL-libexec 
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples
 
@@ -129,7 +132,7 @@ Data-libexec:  Foundation-libexec
 
 Data-tests: Data-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/testsuite
-	
+
 Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/samples
 
@@ -156,13 +159,13 @@ Zip-libexec:  Foundation-libexec Net-libexec Util-libexec XML-libexec
 
 Zip-tests: Zip-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Zip/testsuite
-	
+
 Zip-samples: Zip-libexec 
 	$(MAKE) -C $(POCO_BASE)/Zip/samples
 
 PageCompiler-libexec:  Net-libexec Util-libexec XML-libexec Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/PageCompiler
-	
+
 PageCompiler-samples: PageCompiler-libexec 
 	$(MAKE) -C $(POCO_BASE)/PageCompiler/samples
 
@@ -174,7 +177,7 @@ PDF-libexec: Foundation-libexec
 
 PDF-tests: PDF-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/PDF/testsuite
-	
+
 PDF-samples: PDF-libexec 
 	$(MAKE) -C $(POCO_BASE)/PDF/samples
 

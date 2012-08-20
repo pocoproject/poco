@@ -14,16 +14,14 @@
 
 include $(POCO_BASE)/build/rules/global
 
-# adjust for the target system (usually '/usr/lib' or '/usr/local/lib')
-ODBCLIBDIR = /usr/lib$(LIB64SUFFIX)
 ifeq ($(LINKMODE),STATIC)
 LIBLINKEXT = $(STATICLIBLINKEXT)
 else
 LIBLINKEXT = $(SHAREDLIBLINKEXT)
 endif
 
-INCLUDE += -I/usr/local/include -I/usr/include -I/usr/include/odbc -I/usr/local/include/odbc
-SYSLIBS += -L/usr/lib$(LIB64SUFFIX) -L/usr/local/lib$(LIB64SUFFIX) -L/usr/lib$(LIB64SUFFIX)/odbc -L/usr/local/lib$(LIB64SUFFIX)/odbc
+INCLUDE += $(POCO_ODBC_INCLUDE)
+SYSLIBS += $(POCO_ODBC_LIBRARY)
 
 ifeq ($(POCO_CONFIG),MinGW)
 # -DODBCVER=0x0300: SQLHandle declaration issue
@@ -33,26 +31,28 @@ else ifeq ($(POCO_CONFIG),CYGWIN)
 # -DODBCVER=0x0300: SQLHandle declaration issue
 # -DNOMINMAX      : MIN/MAX macros defined in windows conflict with libstdc++
 CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
-# CYGWIN platform has its own ODBC library in /lib/w32api
+# CYGWIN platform has its own ODBC library in /lib/w32api 
 SYSLIBS += -L/lib/w32api -lodbc32 -lodbccp32
 else
-ifeq (0, $(shell test -e $(ODBCLIBDIR)/libodbc$(LIBLINKEXT); echo $$?))
+ifeq (0, $(shell test -e $(POCO_ODBC_LIBRARY)/libodbc$(LIBLINKEXT); echo $$?))
 SYSLIBS += -lodbc -lodbcinst
 COMMONFLAGS += -DPOCO_UNIXODBC
 else
-ifeq (0, $(shell test -h $(ODBCLIBDIR)/libodbc$(LIBLINKEXT); echo $$?))
+ifeq (0, $(shell test -h $(POCO_ODBC_LIBRARY)/libodbc$(LIBLINKEXT); echo $$?))
 SYSLIBS += -lodbc -lodbcinst
 COMMONFLAGS += -DPOCO_UNIXODBC
 else
-ifeq (0, $(shell test -e $(ODBCLIBDIR)/libiodbc$(LIBLINKEXT); echo $$?))
+ifeq (0, $(shell test -e $(POCO_ODBC_LIBRARY)/libiodbc$(LIBLINKEXT); echo $$?))
 SYSLIBS += -liodbc -liodbcinst
 COMMONFLAGS += -DPOCO_IODBC -I/usr/include/iodbc
 else
-ifeq (0, $(shell test -h $(ODBCLIBDIR)/libiodbc$(LIBLINKEXT); echo $$?))
+ifeq (0, $(shell test -h $(POCO_ODBC_LIBRARY)/libiodbc$(LIBLINKEXT); echo $$?))
 SYSLIBS += -liodbc -liodbcinst -I/usr/include/iodbc
 COMMONFLAGS += -DPOCO_IODBC
 else
-$(error No ODBC library found. Please install unixODBC or iODBC and try again)
+ifndef (POCO_NO_ODBC)
+$(warning No ODBC library found. Please install unixODBC or iODBC.)
+endif
 endif
 endif
 endif
