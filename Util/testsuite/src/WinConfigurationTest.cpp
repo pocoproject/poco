@@ -34,12 +34,14 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Util/WinRegistryConfiguration.h"
+#include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Environment.h"
 #include "Poco/AutoPtr.h"
 #include <algorithm>
 
 
 using Poco::Util::WinRegistryConfiguration;
+using Poco::Util::WinRegistryKey;
 using Poco::Environment;
 using Poco::AutoPtr;
 
@@ -56,6 +58,10 @@ WinConfigurationTest::~WinConfigurationTest()
 
 void WinConfigurationTest::testConfiguration()
 {
+	WinRegistryKey regKey("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test");
+	if (regKey.exists()) regKey.deleteKey();
+	assert (!regKey.exists());
+
 	AutoPtr<WinRegistryConfiguration> pReg = new WinRegistryConfiguration("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test");
 	pReg->setString("name1", "value1");
 	assert (pReg->getString("name1") == "value1");
