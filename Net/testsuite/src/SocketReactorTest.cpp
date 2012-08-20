@@ -1,7 +1,7 @@
 //
 // SocketReactorTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/SocketReactorTest.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/SocketReactorTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -194,6 +194,7 @@ namespace
 			_failed(false),
 			_shutdown(false)
 		{
+			reactor.addEventHandler(socket(), Observer<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
 			reactor.addEventHandler(socket(), Observer<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
 		}
 		
@@ -201,6 +202,13 @@ namespace
 		{
 			pNf->release();
 			_shutdown = true;
+		}
+		
+		void onTimeout(TimeoutNotification* pNf)
+		{
+			pNf->release();
+			_failed = true;
+			reactor()->stop();
 		}
 		
 		void onError(int error)
@@ -253,6 +261,7 @@ void SocketReactorTest::testSocketReactor()
 void SocketReactorTest::testSocketConnectorFail()
 {
 	SocketReactor reactor;
+	reactor.setTimeout(Poco::Timespan(3, 0));
 	SocketAddress sa("192.168.168.192", 12345);
 	FailConnector connector(sa, reactor);
 	assert (!connector.failed());
