@@ -85,7 +85,7 @@ SharedMemoryImpl::SharedMemoryImpl(const Poco::File& file, SharedMemory::AccessM
 
 	_size = static_cast<DWORD>(file.getSize());
 
-	DWORD shareMode = FILE_SHARE_READ;
+	DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	DWORD fileMode  = GENERIC_READ;
 
 	if (mode == SharedMemory::AM_WRITE)
