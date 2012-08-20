@@ -1,7 +1,7 @@
 //
 // ZLibTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ZLibTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ZLibTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,7 +35,9 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/InflatingStream.h"
 #include "Poco/DeflatingStream.h"
+#include "Poco/MemoryStream.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Buffer.h"
 #include <sstream>
 
 
@@ -110,6 +112,22 @@ void ZLibTest::testDeflate3()
 	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 	buffer3 >> data;
 	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+}
+
+
+void ZLibTest::testDeflate4()
+{
+	Poco::Buffer<char> buffer(1024);
+	Poco::MemoryOutputStream ostr(buffer.begin(), static_cast<std::streamsize>(buffer.size()));
+	DeflatingOutputStream deflater(ostr, -10, Z_BEST_SPEED);
+	std::string data(36828, 'x');
+	deflater << data;
+	deflater.close();
+	Poco::MemoryInputStream istr(buffer.begin(), ostr.charsWritten());
+	InflatingInputStream inflater(istr, -10);
+	std::string data2;
+	inflater >> data2;
+	assert (data2 == data);
 }
 
 
@@ -196,6 +214,7 @@ CppUnit::Test* ZLibTest::suite()
 	CppUnit_addTest(pSuite, ZLibTest, testDeflate1);
 	CppUnit_addTest(pSuite, ZLibTest, testDeflate2);
 	CppUnit_addTest(pSuite, ZLibTest, testDeflate3);
+	CppUnit_addTest(pSuite, ZLibTest, testDeflate4);
 	CppUnit_addTest(pSuite, ZLibTest, testGzip1);
 	CppUnit_addTest(pSuite, ZLibTest, testGzip2);
 	CppUnit_addTest(pSuite, ZLibTest, testGzip3);

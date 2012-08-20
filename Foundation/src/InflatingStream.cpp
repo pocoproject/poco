@@ -1,7 +1,7 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/InflatingStream.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/InflatingStream.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -190,9 +190,8 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			_pIstr->read(_buffer, INFLATE_BUFFER_SIZE);
 			n = static_cast<int>(_pIstr->gcount());
 		}
-		if (n == 0) return 0;
-		_zstr.next_in   = (unsigned char*) _buffer;
-		_zstr.avail_in  = n;
+		_zstr.next_in  = (unsigned char*) _buffer;
+		_zstr.avail_in = n;
 	}
 	_zstr.next_out  = (unsigned char*) buffer;
 	_zstr.avail_out = static_cast<unsigned>(length);

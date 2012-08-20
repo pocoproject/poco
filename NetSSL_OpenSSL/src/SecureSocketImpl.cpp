@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#8 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -258,7 +258,13 @@ void SecureSocketImpl::shutdown()
 
 void SecureSocketImpl::close()
 {
-	shutdown();
+	try
+	{
+		shutdown();
+	}
+	catch (...)
+	{
+	}
 	_pSocket->close();
 }
 

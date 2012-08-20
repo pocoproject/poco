@@ -1,7 +1,7 @@
 //
 // ZLibTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ZLibTest.h#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ZLibTest.h#2 $
 //
 // Definition of the ZLibTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testDeflate1();
 	void testDeflate2();
 	void testDeflate3();
+	void testDeflate4();
 	void testGzip1();
 	void testGzip2();
 	void testGzip3();
