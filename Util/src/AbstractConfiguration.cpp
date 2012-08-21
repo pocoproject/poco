@@ -174,6 +174,18 @@ Int64 AbstractConfiguration::getInt64(const std::string& key) const
 }
 
 
+UInt64 AbstractConfiguration::getUInt64(const std::string& key) const
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return NumberParser::parseUnsigned64(internalExpand(value));
+	else
+		throw NotFoundException(key);
+}
+
+
 Int64 AbstractConfiguration::getInt64(const std::string& key, Int64 defaultValue) const
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -181,6 +193,18 @@ Int64 AbstractConfiguration::getInt64(const std::string& key, Int64 defaultValue
 	std::string value;
 	if (getRaw(key, value))
 		return NumberParser::parse64(internalExpand(value));
+	else
+		return defaultValue;
+}
+
+
+UInt64 AbstractConfiguration::getUInt64(const std::string& key, UInt64 defaultValue) const
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return NumberParser::parseUnsigned64(internalExpand(value));
 	else
 		return defaultValue;
 }
@@ -247,6 +271,12 @@ void AbstractConfiguration::setInt(const std::string& key, int value)
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
+	
+void AbstractConfiguration::setUInt(const std::string& key, unsigned int value)
+{
+	setRawWithEvent(key, NumberFormatter::format(value));
+}
+
 
 #if defined(POCO_HAVE_INT64)
 
@@ -254,7 +284,15 @@ void AbstractConfiguration::setInt64(const std::string& key, Int64 value)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	setRaw(key, NumberFormatter::format(value));
+	setRawWithEvent(key, NumberFormatter::format(value));
+}
+
+
+void AbstractConfiguration::setUInt64(const std::string& key, UInt64 value)
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
 #endif // defined(POCO_HAVE_INT64)
@@ -416,6 +454,33 @@ int AbstractConfiguration::parseInt(const std::string& value)
 		return NumberParser::parseHex(value.substr(2));
 	else
 		return NumberParser::parse(value);
+}
+
+
+int AbstractConfiguration::parseUInt(const std::string& value)
+{
+	if (value.compare(0, 2, "0x") == 0)
+		return NumberParser::parseHex(value.substr(2));
+	else
+		return NumberParser::parseUnsigned(value);
+}
+
+
+Int64 AbstractConfiguration::parseInt64(const std::string& value)
+{
+	if (value.compare(0, 2, "0x") == 0)
+		return NumberParser::parseHex64(value.substr(2));
+	else
+		return NumberParser::parse64(value);
+}
+
+
+UInt64 AbstractConfiguration::parseUInt64(const std::string& value)
+{
+	if (value.compare(0, 2, "0x") == 0)
+		return NumberParser::parseHex64(value.substr(2));
+	else
+		return NumberParser::parseUnsigned64(value);
 }
 
 

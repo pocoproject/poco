@@ -26,12 +26,13 @@ Release 1.5.0 (2012-08-??)
 - UTF portability improvements
 - fixed SF#3556186: Linux shouldn't use <net/if.h> in Net/SocketDefs.h
 - added IPAddress RFC 4291 compatible site-local prefix support
-- fixed SF# 3012166: IPv6 patch
-- added SF# 3558085: Add formatter to MACAddress object
-- fixed SF# 3535990: POCO_HAVE_IPv6 without POCO_WIN32_UTF8 conflict
-- fixed SF #3552774: Don't hide default target in subordinate makefile
-- fixed SF #3534307: Building IPv6 for Linux by default
-- fixed SF #3516844: poco missing symbols with external >=lipcre-8.13 
+- fixed SF#3012166: IPv6 patch
+- added SF#3558085: Add formatter to MACAddress object
+- fixed SF#3535990: POCO_HAVE_IPv6 without POCO_WIN32_UTF8 conflict
+- fixed SF#3552774: Don't hide default target in subordinate makefile
+- fixed SF#3534307: Building IPv6 for Linux by default
+- fixed SF#3516844: poco missing symbols with external >=lipcre-8.13 
+- added SF#3544720: AbstractConfigurator to support 64bit values
 
 Release 1.4.4 (2012-08-??)
 ==========================

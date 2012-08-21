@@ -57,7 +57,9 @@ public:
 	void testExpand();
 	void testSetString();
 	void testSetInt();
+	void testSetUInt();
 	void testSetInt64();
+	void testSetUInt64();
 	void testSetDouble();
 	void testSetBool();
 	void testKeys();
@@ -91,11 +93,13 @@ protected:
 		CppUnit_addTest(suite, cls, testHasProperty); \
 		CppUnit_addTest(suite, cls, testGetString); \
 		CppUnit_addTest(suite, cls, testGetInt); \
+		CppUnit_addTest(suite, cls, testGetInt64); \
 		CppUnit_addTest(suite, cls, testGetDouble); \
 		CppUnit_addTest(suite, cls, testGetBool); \
 		CppUnit_addTest(suite, cls, testExpand); \
 		CppUnit_addTest(suite, cls, testSetString); \
 		CppUnit_addTest(suite, cls, testSetInt); \
+		CppUnit_addTest(suite, cls, testSetInt64); \
 		CppUnit_addTest(suite, cls, testSetDouble); \
 		CppUnit_addTest(suite, cls, testSetBool); \
 		CppUnit_addTest(suite, cls, testKeys); \
