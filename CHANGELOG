@@ -33,6 +33,7 @@ Release 1.5.0 (2012-08-??)
 - fixed SF#3534307: Building IPv6 for Linux by default
 - fixed SF#3516844: poco missing symbols with external >=lipcre-8.13 
 - added SF#3544720: AbstractConfigurator to support 64bit values
+- fixed SF#3522081: WinRegistryConfiguration unable to read REG_QWORD values
 
 Release 1.4.4 (2012-08-??)
 ==========================

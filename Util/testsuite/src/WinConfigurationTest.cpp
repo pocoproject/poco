@@ -37,12 +37,18 @@
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Environment.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/types.h"
+#undef min
+#undef max
+#include <limits>
 
 
 using Poco::Util::WinRegistryConfiguration;
 using Poco::Util::WinRegistryKey;
 using Poco::Environment;
 using Poco::AutoPtr;
+using Poco::Int64;
+using Poco::UInt64;
 
 
 WinConfigurationTest::WinConfigurationTest(const std::string& name): CppUnit::TestCase(name)
@@ -68,6 +74,10 @@ void WinConfigurationTest::testConfiguration()
 	assert (pReg->getInt("name1") == 1);
 	pReg->setString("name2", "value2");
 	assert (pReg->getString("name2") == "value2");
+	pReg->setUInt64("name2", std::numeric_limits<UInt64>::max()); // overwrite should also change type
+	assert (pReg->getUInt64("name2") == std::numeric_limits<UInt64>::max());
+	pReg->setInt64("name2", std::numeric_limits<Int64>::min()); 
+	assert (pReg->getInt64("name2") == std::numeric_limits<Int64>::min());
 	assert (pReg->hasProperty("name1"));
 	assert (pReg->hasProperty("name2"));
 	

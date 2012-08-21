@@ -64,7 +64,8 @@ public:
 		REGT_NONE = 0, 
 		REGT_STRING = 1, 
 		REGT_STRING_EXPAND = 2, 
-		REGT_DWORD = 4
+		REGT_DWORD = 4, 
+		REGT_QWORD = 11
 	};
 
 	WinRegistryKey(const std::string& key, bool readOnly = false, REGSAM extraSam = 0);
@@ -124,6 +125,16 @@ public:
 		/// An empty name denotes the default value.
 		///
 		/// Throws a NotFoundException if the value does not exist.
+
+#if defined(POCO_HAVE_INT64)
+
+	Poco::Int64 getInt64(const std::string& name);
+		/// Returns the numeric value (REG_QWORD) with the given name.
+		/// An empty name denotes the default value.
+		///
+		/// Throws a NotFoundException if the value does not exist.
+
+#endif // POCO_HAVE_INT64
 
 	void deleteValue(const std::string& name);
 		/// Deletes the value with the given name.

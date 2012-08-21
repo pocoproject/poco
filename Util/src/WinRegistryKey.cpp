@@ -247,7 +247,7 @@ void WinRegistryKey::setInt(const std::string& name, int value)
 #endif
 }
 
-	
+
 int WinRegistryKey::getInt(const std::string& name)
 {
 	open();
@@ -266,6 +266,27 @@ int WinRegistryKey::getInt(const std::string& name)
 	return data;
 }
 
+#if defined(POCO_HAVE_INT64)
+
+Poco::Int64 WinRegistryKey::getInt64(const std::string& name)
+{
+	open();
+	DWORD type;
+	Poco::Int64 data;
+	DWORD size = sizeof(data);
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(name, uname);
+	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, (BYTE*) &data, &size) != ERROR_SUCCESS || type != REG_DWORD)
+		throw NotFoundException(key(name));
+#else
+	if (RegQueryValueExA(_hKey, name.c_str(), NULL, &type, (BYTE*) &data, &size) != ERROR_SUCCESS || type != REG_DWORD)
+		throw NotFoundException(key(name));
+#endif
+	return data;
+}
+
+#endif // POCO_HAVE_INT64
 
 void WinRegistryKey::deleteValue(const std::string& name)
 {
