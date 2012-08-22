@@ -104,6 +104,12 @@ RSAKeyImpl::RSAKeyImpl(
 		if (rc)
 		{
 			RSA* pubKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, 0, 0);
+			if (!pubKey)
+			{
+				int rc = BIO_seek(bio, 0);
+				if (rc != 0) throw Poco::FileException("Failed to load public key", publicKeyFile);
+				pubKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, 0, 0);
+			}
 			BIO_free(bio);
 			if (!pubKey)
 			{
@@ -159,6 +165,12 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 		BIO* bio = BIO_new_mem_buf(const_cast<char*>(publicKeyData.data()), static_cast<int>(publicKeyData.size()));
 		if (!bio) throw Poco::IOException("Cannot create BIO for reading public key");
 		RSA* publicKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, 0, 0);
+		if (!publicKey)
+		{
+			int rc = BIO_seek(bio, 0);
+			if (rc != 0) throw Poco::FileException("Failed to load public key");
+			publicKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, 0, 0);
+		}
 		BIO_free(bio);
 		if (!publicKey)
 		{
