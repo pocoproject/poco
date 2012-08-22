@@ -264,6 +264,7 @@ namespace
 			_failed(false),
 			_shutdown(false)
 		{
+			reactor.addEventHandler(socket(), Observer<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
 			reactor.addEventHandler(socket(), Observer<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
 		}
 		
@@ -273,6 +274,13 @@ namespace
 			_shutdown = true;
 		}
 		
+		void onTimeout(TimeoutNotification* pNf)
+		{
+			pNf->release();
+			_failed = true;
+			reactor()->stop();
+		}
+
 		void onError(int error)
 		{
 			_failed = true;
@@ -326,6 +334,7 @@ void SocketReactorTest::testSocketReactor()
 void SocketReactorTest::testSocketConnectorFail()
 {
 	SocketReactor reactor;
+	reactor.setTimeout(Poco::Timespan(3, 0));
 	SocketAddress sa("192.168.168.192", 12345);
 	FailConnector connector(sa, reactor);
 	assert (!connector.failed());

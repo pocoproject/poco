@@ -219,7 +219,7 @@ void MessageHeaderTest::testReadInvalid1()
 void MessageHeaderTest::testReadInvalid2()
 {
 	std::string s("name1: value1\r\nname2: ");
-	s.append(8000, 'x');
+	s.append(9000, 'x');
 	std::istringstream istr(s);
 	MessageHeader mh;
 	try
