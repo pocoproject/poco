@@ -122,7 +122,7 @@ void TaskManager::removeObserver(const AbstractObserver& observer)
 }
 
 
-void TaskManager::postNotification(Notification* pNf)
+void TaskManager::postNotification(const Notification::Ptr& pNf)
 {
 	_nc.postNotification(pNf);
 }

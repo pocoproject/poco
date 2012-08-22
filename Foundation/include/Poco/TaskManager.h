@@ -121,9 +121,9 @@ public:
 	static const int MIN_PROGRESS_NOTIFICATION_INTERVAL;
 
 protected:
-	void postNotification(Notification* pNf);
-	  /// Posts a notification to the task manager's 
-	  /// notification center.
+	void postNotification(const Notification::Ptr& pNf);
+		/// Posts a notification to the task manager's 
+		/// notification center.
 
 	void taskStarted(Task* pTask);
 	void taskProgress(Task* pTask, float progress);

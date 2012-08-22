@@ -46,11 +46,11 @@
 
 
 #if defined(POCO_LONG_IS_64_BIT)
-        #define I64_FMT "l"
-#elif defined(_MSC_VER)
-        #define I64_FMT "I64"
+	#define I64_FMT "l"
+#elif defined(_MSC_VER) || defined(__MINGW32__)
+	#define I64_FMT "I64"
 #elif defined(__APPLE__) 
-        #define I64_FMT "q"
+	#define I64_FMT "q"
 #else
 	#define I64_FMT "ll"
 #endif
