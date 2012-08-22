@@ -56,7 +56,7 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:	
-    typedef int TIDImpl;
+	typedef int TIDImpl;
 	typedef void (*Callable)(void*);
 
 	enum Priority
@@ -88,9 +88,9 @@ public:
 		void*     pData; 
 	};
 
-	ThreadImpl();				
+	ThreadImpl();
 	~ThreadImpl();
-    
+
 	TIDImpl tidImpl() const;
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
@@ -124,7 +124,7 @@ protected:
 			pCallbackTarget(0),
 			task(0),
 			prio(PRIO_NORMAL_IMPL),
-			osPrio(0),
+			osPrio(127),
 			done(false),
 			stackSize(POCO_THREAD_STACK_SIZE)
 		{
