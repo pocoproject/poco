@@ -748,7 +748,7 @@ bool NetworkInterface::isUp() const
 
 NetworkInterface NetworkInterface::forName(const std::string& name, bool requireIPv6)
 {
-	Map map = NetworkInterface::map();
+	Map map = NetworkInterface::map(false, false);
 	Map::const_iterator it = map.begin();
 	Map::const_iterator end = map.end();
 
@@ -763,7 +763,7 @@ NetworkInterface NetworkInterface::forName(const std::string& name, bool require
 
 NetworkInterface NetworkInterface::forName(const std::string& name, IPVersion ipVersion)
 {
-	Map map = NetworkInterface::map();
+	Map map = NetworkInterface::map(false, false);
 	Map::const_iterator it = map.begin();
 	Map::const_iterator end = map.end();
 
@@ -785,7 +785,7 @@ NetworkInterface NetworkInterface::forName(const std::string& name, IPVersion ip
 	
 NetworkInterface NetworkInterface::forAddress(const IPAddress& addr)
 {
-	Map map = NetworkInterface::map();
+	Map map = NetworkInterface::map(true, false);
 	Map::const_iterator it = map.begin();
 	Map::const_iterator end = map.end();
 
@@ -806,7 +806,7 @@ NetworkInterface NetworkInterface::forIndex(unsigned i)
 {
 	if (i != NetworkInterface::NO_INDEX)
 	{
-		Map map = NetworkInterface::map();
+		Map map = NetworkInterface::map(false, false);
 		Map::const_iterator it = map.find(i);
 		if (it != map.end())
 			return it->second;

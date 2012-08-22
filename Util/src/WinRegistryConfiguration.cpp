@@ -85,9 +85,11 @@ bool WinRegistryConfiguration::getRaw(const std::string& key, std::string& value
 		case WinRegistryKey::REGT_DWORD:
 			value = Poco::NumberFormatter::format(aKey.getInt(keyName));
 			break;
+#if defined(POCO_HAVE_INT64)
 		case WinRegistryKey::REGT_QWORD:
 			value = Poco::NumberFormatter::format(aKey.getInt64(keyName));
 			break;
+#endif
 		default:
 			exists = false;
 		}

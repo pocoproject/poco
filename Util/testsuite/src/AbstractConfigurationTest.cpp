@@ -250,8 +250,10 @@ void AbstractConfigurationTest::testSetInt()
 
 	pConf->setInt("set.int1", 42);
 	pConf->setInt("set.int2", -100);
+	pConf->setInt("set.uint", 42U);
 	assert (pConf->getInt("set.int1") == 42);
 	assert (pConf->getInt("set.int2") == -100);
+	assert (pConf->getInt("set.uint") == 42U);
 }
 
 
@@ -422,9 +424,15 @@ Poco::AutoPtr<AbstractConfiguration> AbstractConfigurationTest::createConfigurat
 	pConfig->setString("prop4.int1", "42");
 	pConfig->setString("prop4.int2", "-42");
 	pConfig->setString("prop4.uint", NumberFormatter::format(std::numeric_limits<unsigned>::max()));
+#if defined(POCO_HAVE_INT64)
 	pConfig->setString("prop4.bigint1", NumberFormatter::format(std::numeric_limits<Int64>::max()));
 	pConfig->setString("prop4.bigint2", NumberFormatter::format(std::numeric_limits<Int64>::min()));
 	pConfig->setString("prop4.biguint", NumberFormatter::format(std::numeric_limits<UInt64>::max()));
+#else /// just to make sure property count is consistent
+	pConfig->setString("prop4.bigint1", 0));
+	pConfig->setString("prop4.bigint2", 0));
+	pConfig->setString("prop4.biguint", 0));
+#endif
 	pConfig->setString("prop4.hex", "0x1f");
 	pConfig->setString("prop4.double1", "1");
 	pConfig->setString("prop4.double2", "-1.5");

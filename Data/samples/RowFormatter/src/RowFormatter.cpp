@@ -1,10 +1,10 @@
 //
-// RecordSet.cpp
+// RowFormatter.cpp
 //
 // $Id: //poco/Main/Data/samples/RecordSet/src/RowFormatter.cpp#2 $
 //
-// This sample demonstrates the Data library recordset formatting
-// capabilities.
+// This sample demonstrates the Data library recordset row formatting
+// and streaming capabilities.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
