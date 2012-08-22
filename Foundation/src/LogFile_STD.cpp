@@ -58,9 +58,13 @@ LogFileImpl::~LogFileImpl()
 }
 
 
-void LogFileImpl::writeImpl(const std::string& text)
+void LogFileImpl::writeImpl(const std::string& text, bool flush)
 {
-	_str << text << std::endl;
+	_str << text;
+	if (flush)
+		_str << std::endl;
+	else
+		_str << "\n";
 	if (!_str.good()) throw WriteFileException(_path);
 }
 

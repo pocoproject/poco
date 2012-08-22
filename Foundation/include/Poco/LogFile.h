@@ -68,9 +68,11 @@ public:
 	~LogFile();
 		/// Destroys the LogFile.
 
-	void write(const std::string& text);
+	void write(const std::string& text, bool flush = true);
 		/// Writes the given text to the log file.
-	
+		/// If flush is true, the text will be immediately
+		/// flushed to the file.
+
 	UInt64 size() const;
 		/// Returns the current size in bytes of the log file.
 	
@@ -85,9 +87,9 @@ public:
 //
 // inlines
 //
-inline void LogFile::write(const std::string& text)
+inline void LogFile::write(const std::string& text, bool flush)
 {
-	writeImpl(text);
+	writeImpl(text, flush);
 }
 
 

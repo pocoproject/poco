@@ -59,14 +59,17 @@ LogFileImpl::~LogFileImpl()
 }
 
 
-void LogFileImpl::writeImpl(const std::string& text)
+void LogFileImpl::writeImpl(const std::string& text, bool flush)
 {
 	int rc = fputs(text.c_str(), _file);
 	if (rc == EOF) throw WriteFileException(_path);
 	rc = fputc('\n', _file);
 	if (rc == EOF) throw WriteFileException(_path);
-	rc = fflush(_file);
-	if (rc == EOF) throw WriteFileException(_path);
+	if (flush)
+	{
+		rc = fflush(_file);
+		if (rc == EOF) throw WriteFileException(_path);
+	}
 }
 
 
