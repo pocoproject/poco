@@ -122,7 +122,12 @@ public:
 		/// Specify 0 for unlimited (not recommended).
 		///
 		/// The default limit is 100.
-		
+	
+	bool hasToken(const std::string& fieldName, const std::string& token) const;
+		/// Returns true iff the field with the given fieldName contains
+		/// the given token. Tokens in a header field are expected to be
+		/// comma-separated and are case insensitive.
+
 	static void splitElements(const std::string& s, std::vector<std::string>& elements, bool ignoreEmpty = true);
 		/// Splits the given string into separate elements. Elements are expected
 		/// to be separated by commas.

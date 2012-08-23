@@ -139,6 +139,20 @@ void MessageHeader::setFieldLimit(int limit)
 }
 
 
+bool MessageHeader::hasToken(const std::string& fieldName, const std::string& token) const
+{
+	std::string field = get(fieldName, "");
+	std::vector<std::string> tokens;
+	splitElements(field, tokens, true);
+	for (std::vector<std::string>::const_iterator it = tokens.begin(); it != tokens.end(); ++it)
+	{
+		if (Poco::icompare(*it, token) == 0)
+			return true;
+	}
+	return false;
+}
+
+
 void MessageHeader::splitElements(const std::string& s, std::vector<std::string>& elements, bool ignoreEmpty)
 {
 	elements.clear();
