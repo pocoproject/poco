@@ -518,6 +518,7 @@ public:
 	void sessionTransaction(const std::string& connect);
 	void transaction(const std::string& connect);
 	void transactor();
+	void nullable();
 
 	void reconnect();
 

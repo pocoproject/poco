@@ -51,6 +51,7 @@
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Data/DynamicLOB.h"
 #include "Poco/Data/DynamicDateTime.h"
+#include "Poco/Data/Nullable.h"
 #include "Poco/Exception.h"
 #include <cstring>
 #include <sstream>
@@ -92,6 +93,7 @@ using Poco::Data::AbstractExtractionVec;
 using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBinding;
 using Poco::Data::AbstractBindingVec;
+using Poco::Data::Nullable;
 using Poco::Data::NotConnectedException;
 
 
@@ -1385,6 +1387,38 @@ void DataTest::testExternalBindingAndExtraction()
 }
 
 
+void DataTest::testNullable()
+{
+	Nullable<int> i;
+	Nullable<double> f;
+	Nullable<std::string> s;
+
+	assert (i.isNull());
+	assert (f.isNull());
+	assert (s.isNull());
+
+	i = 1;
+	f = 1.5;
+	s = "abc";
+
+	assert (!i.isNull());
+	assert (!f.isNull());
+	assert (!s.isNull());
+
+	assert (i == 1);
+	assert (f == 1.5);
+	assert (s == "abc");
+
+	i.setNull();
+	f.setNull();
+	s.setNull();
+
+	assert (i.isNull());
+	assert (f.isNull());
+	assert (s.isNull());
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1415,6 +1449,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testRowFormat);
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
+	CppUnit_addTest(pSuite, DataTest, testNullable);
 
 	return pSuite;
 }

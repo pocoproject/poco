@@ -44,6 +44,7 @@
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Data/TypeHandler.h"
+#include "Poco/Data/Nullable.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
@@ -73,6 +74,7 @@ using Poco::Data::Time;
 using Poco::Data::AbstractExtractionVec;
 using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBindingVec;
+using Poco::Data::Nullable;
 using Poco::Data::NotConnectedException;
 using Poco::Tuple;
 using Poco::Any;
@@ -1958,6 +1960,42 @@ void SQLiteTest::testPrimaryKeyConstraint()
 }
 
 
+void SQLiteTest::testNullable()
+{
+	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	ses << "DROP TABLE IF EXISTS NullableTest", now;
+
+	ses << "CREATE TABLE NullableTest (i INTEGER, r REAL, s VARCHAR, d DATETIME)", now;
+
+	ses << "INSERT INTO NullableTest VALUES(:i, :r, :s, :d)", use(null), use(null), use(null), use(null), now;
+	
+	Nullable<int> i = 1;
+	Nullable<double> f = 1.5;
+	Nullable<std::string> s = "abc";
+	Nullable<DateTime> d = DateTime();
+
+	assert (!i.isNull());
+	assert (!f.isNull());
+	assert (!s.isNull());
+	assert (!d.isNull());
+
+	ses << "SELECT i, r, s FROM NullableTest", into(i), into(f), into(s), into(d), now;
+
+	assert (i.isNull());
+	assert (f.isNull());
+	assert (s.isNull());
+	assert (d.isNull());
+
+	RecordSet rs(ses, "SELECT * FROM NullableTest");
+
+	rs.moveFirst();
+	assert (rs.isNull("i"));
+	assert (rs.isNull("r"));
+	assert (rs.isNull("s"));
+	assert (rs.isNull("d"));
+}
+
+
 void SQLiteTest::testNull()
 {
 	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -2564,6 +2602,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testDateTime);
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);
+	CppUnit_addTest(pSuite, SQLiteTest, testNullable);
 	CppUnit_addTest(pSuite, SQLiteTest, testNull);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);

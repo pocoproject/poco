@@ -73,65 +73,65 @@ class TypeHandler: public AbstractTypeHandler
 	/// Converts Rows to a Type and the other way around. Provide template specializations to support your own complex types.
 	///
 	/// Take as example the following (simplified) class:
-	///    class Person
-	///    {
-	///    private:
-	///        std::string _lastName;
-	///        std::string _firstName;
-	///        int         _age;
-	///    public:
-	///        const std::string& getLastName();
-	///        [...] // other set/get methods (returning const reference), a default constructor, 
-	///        [...] // optional < operator (for set, multiset) or function operator (for map, multimap)
-	///    };
+	///	class Person
+	///	{
+	///	private:
+	///		std::string _lastName;
+	///		std::string _firstName;
+	///		int		 _age;
+	///	public:
+	///		const std::string& getLastName();
+	///		[...] // other set/get methods (returning const reference), a default constructor, 
+	///		[...] // optional < operator (for set, multiset) or function operator (for map, multimap)
+	///	};
 	///
 	/// The TypeHandler must provide a custom bind, size, prepare and extract method:
-	///    
-	///    template <>
-	///    class TypeHandler<struct Person>
-	///    {
-	///    public:
-	///        static std::size_t size()
-	///        {
-	///            return 3; // lastName + firstname + age occupy three columns
-	///        }
-	///    
-	///        static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
-	///        {
-	///            // the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))
-	///            // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
-	///            poco_assert_dbg (pBinder != 0);
-	///            TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder, dir);
-	///            TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder, dir);
-	///            TypeHandler<int>::bind(pos++, obj.getAge(), pBinder);
-	///        }
-	///    
-	///        static void prepare(std::size_t pos, Person& obj, AbstractPreparator* pPreparator)
-	///        {
-	///            // the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))
-	///            poco_assert_dbg (pPreparator != 0);
-	///            TypeHandler<std::string>::prepare(pos++, obj.getLastName(), pPreparator);
-	///            TypeHandler<std::string>::prepare(pos++, obj.getFirstName(), pPreparator);
-	///            TypeHandler<int>::prepare(pos++, obj.getAge(), pPreparator);
-	///        }
-	///    
-	///        static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor* pExt)
-	///        {
-	///            // defVal is the default person we should use if we encunter NULL entries, so we take the individual fields
-	///            // as defaults. You can do more complex checking, ie return defVal if only one single entry of the fields is null etc...
-	///            poco_assert_dbg (pExt != 0);
-	///            std::string lastName;
-	///            std::string firstName;
-	///            int age = 0;
-	///            // the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))
-	///            TypeHandler<std::string>::extract(pos++, lastName, defVal.getLastName(), pExt);
-	///            TypeHandler<std::string>::extract(pos++, firstName, defVal.getFirstName(), pExt);
-	///            TypeHandler<int>::extract(pos++, age, defVal.getAge(), pExt);
-	///            obj.setLastName(lastName);
-	///            obj.setFirstName(firstName);
-	///            obj.setAge(age);
-	///        }
-	///    };
+	///	
+	///	template <>
+	///	class TypeHandler<struct Person>
+	///	{
+	///	public:
+	///		static std::size_t size()
+	///		{
+	///			return 3; // lastName + firstname + age occupy three columns
+	///		}
+	///	
+	///		static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
+	///		{
+	///			// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))
+	///			// Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
+	///			poco_assert_dbg (pBinder != 0);
+	///			TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder, dir);
+	///			TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder, dir);
+	///			TypeHandler<int>::bind(pos++, obj.getAge(), pBinder);
+	///		}
+	///	
+	///		static void prepare(std::size_t pos, Person& obj, AbstractPreparator* pPreparator)
+	///		{
+	///			// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))
+	///			poco_assert_dbg (pPreparator != 0);
+	///			TypeHandler<std::string>::prepare(pos++, obj.getLastName(), pPreparator);
+	///			TypeHandler<std::string>::prepare(pos++, obj.getFirstName(), pPreparator);
+	///			TypeHandler<int>::prepare(pos++, obj.getAge(), pPreparator);
+	///		}
+	///	
+	///		static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor* pExt)
+	///		{
+	///			// defVal is the default person we should use if we encunter NULL entries, so we take the individual fields
+	///			// as defaults. You can do more complex checking, ie return defVal if only one single entry of the fields is null etc...
+	///			poco_assert_dbg (pExt != 0);
+	///			std::string lastName;
+	///			std::string firstName;
+	///			int age = 0;
+	///			// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))
+	///			TypeHandler<std::string>::extract(pos++, lastName, defVal.getLastName(), pExt);
+	///			TypeHandler<std::string>::extract(pos++, firstName, defVal.getFirstName(), pExt);
+	///			TypeHandler<int>::extract(pos++, age, defVal.getAge(), pExt);
+	///			obj.setLastName(lastName);
+	///			obj.setFirstName(firstName);
+	///			obj.setAge(age);
+	///		}
+	///	};
 	///
 	/// Note that the TypeHandler template specialization must always be declared in the namespace Poco::Data.
 	/// Apart from that no further work is needed. One can now use Person with into and use clauses.
@@ -271,63 +271,63 @@ private:
 };
 
 template <typename T>
-class TypeHandler< Nullable<T> > 
-    /// Specialization of type handler for Nullable.
+class TypeHandler<Nullable<T> > 
+	/// Specialization of type handler for Nullable.
 {
 public:
 
-    static void bind(std::size_t pos, const Nullable<T>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir) 
-    {
-        poco_assert_dbg (pBinder != 0);
-        if (obj.isNull()) 
-        {
-	    pBinder->bind(pos++, Poco::Data::Keywords::null, dir);
-        }
-        else 
-        {
-            pBinder->bind(pos++, obj.getValue(), dir);
-        }
-    }
+	static void bind(std::size_t pos, const Nullable<T>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir) 
+	{
+		poco_assert_dbg (pBinder != 0);
+		if (obj.isNull()) 
+		{
+		pBinder->bind(pos++, Poco::Data::Keywords::null, dir);
+		}
+		else 
+		{
+			pBinder->bind(pos++, obj.getValue(), dir);
+		}
+	}
 	
-    static void prepare(std::size_t pos, Nullable<T>& obj, AbstractPreparator* pPreparator) 
-    {
-        poco_assert_dbg (pPreparator != 0);
-        if (obj.isNull()) 
-        {
-            pPreparator->prepare(pos++, (Poco::Any&)Poco::Data::Keywords::null);
-        }
-        else 
-        {
-            pPreparator->prepare(pos++, (T&)obj.getValue());
-        }
-    }
+	static void prepare(std::size_t pos, Nullable<T>& obj, AbstractPreparator* pPreparator) 
+	{
+		poco_assert_dbg (pPreparator != 0);
+		if (obj.isNull()) 
+		{
+			pPreparator->prepare(pos++, (Poco::Any&)Poco::Data::Keywords::null);
+		}
+		else 
+		{
+			pPreparator->prepare(pos++, (T&)obj.getValue());
+		}
+	}
 
-    static std::size_t size() 
-    {
-        return 1u;
-    }
+	static std::size_t size() 
+	{
+		return 1u;
+	}
 
-    static void extract(std::size_t pos, Nullable<T>& obj, const Nullable<T>& , AbstractExtractor* pExt) 
-    {
-        poco_assert_dbg (pExt != 0);
-        T value;
-    
-        if (pExt->extract(pos++, value)) 
-        {
-	        obj.setValue(value);
-        }
-        else 
-        {
-	        obj.setNull(true);
-        }
-    }
+	static void extract(std::size_t pos, Nullable<T>& obj, const Nullable<T>& , AbstractExtractor* pExt) 
+	{
+		poco_assert_dbg (pExt != 0);
+		T value;
+	
+		if (pExt->extract(pos++, value)) 
+		{
+			obj.setValue(value);
+		}
+		else 
+		{
+			obj.setNull(true);
+		}
+	}
 
 private:
 
-    TypeHandler();
-    ~TypeHandler();
-    TypeHandler(const TypeHandler&);
-    TypeHandler& operator=(const TypeHandler&);
+	TypeHandler();
+	~TypeHandler();
+	TypeHandler(const TypeHandler&);
+	TypeHandler& operator=(const TypeHandler&);
 };
 
 
@@ -389,7 +389,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -519,7 +519,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -644,7 +644,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -764,7 +764,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -879,7 +879,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -989,7 +989,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1094,7 +1094,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1194,7 +1194,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1289,7 +1289,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1379,7 +1379,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1455,7 +1455,7 @@ class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1527,7 +1527,7 @@ class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList> 
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1595,7 +1595,7 @@ class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1659,7 +1659,7 @@ class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1719,7 +1719,7 @@ class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1775,7 +1775,7 @@ class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1827,7 +1827,7 @@ class TypeHandler<Poco::Tuple<T0, T1, T2, T3, NullTypeList> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, NullTypeList> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, NullTypeList> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1871,11 +1871,11 @@ private:
 
 
 template <class T0, class T1, class T2>
-    class TypeHandler<Poco::Tuple<T0, T1, T2, NullTypeList> >
+	class TypeHandler<Poco::Tuple<T0, T1, T2, NullTypeList> >
 {
 public:
-        typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, NullTypeList> >::REFTYPE      TupleRef;
+		typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, NullTypeList> >::CONSTREFTYPE TupleConstRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, NullTypeList> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1919,7 +1919,7 @@ class TypeHandler<Poco::Tuple<T0, T1, NullTypeList> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, NullTypeList> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, NullTypeList> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
@@ -1959,7 +1959,7 @@ class TypeHandler<Poco::Tuple<T0, NullTypeList> >
 {
 public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, NullTypeList> >::REFTYPE      TupleRef;
+	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, NullTypeList> >::REFTYPE	  TupleRef;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{

@@ -44,130 +44,130 @@
 
 namespace Poco {
 namespace Data {
-           
+		   
 template <typename T>
 class Nullable {
-    /// Nullable class - template for field, that can be null
+	/// Nullable class - template for field, that can be null
 public:
-    Nullable()
-        : _value(), _isNull(true) 
-        /// Creates the Nullable.
-    {
-    }
+	Nullable()
+		: _value(), _isNull(true) 
+		/// Creates the Nullable.
+	{
+	}
 
-    Nullable(const T& value)
-        : _value(value), _isNull(false) 
-        /// Creates the Nullable from value
-    {
-    }
+	Nullable(const T& value)
+		: _value(value), _isNull(false) 
+		/// Creates the Nullable from value
+	{
+	}
 
-    Nullable(const NullData&)
-        : _value(), _isNull(true) 
-        /// Creates the Nullable from null
-    {
-    }
+	Nullable(const NullData&)
+		: _value(), _isNull(true) 
+		/// Creates the Nullable from null
+	{
+	}
 
-    Nullable& operator=(const T& value)
-        /// Assigns new value to Nullable
-    {
-        _isNull = false;
-        _value = value;
-        return *this;
-    }
+	Nullable& operator=(const T& value)
+		/// Assigns new value to Nullable
+	{
+		_isNull = false;
+		_value = value;
+		return *this;
+	}
 
-    Nullable& operator=(const Nullable<T>& other)
-        /// Assigns other Nullable to Nullable
-    {
-        _isNull = other._isNull;
-        _value = other._value;
-        return *this;
-    }
+	Nullable& operator=(const Nullable<T>& other)
+		/// Assigns other Nullable to Nullable
+	{
+		_isNull = other._isNull;
+		_value = other._value;
+		return *this;
+	}
 
-    Nullable& operator=(const NullData&)
-        /// Assigns null to Nullable
-    {
-        _isNull = true;
-        return *this;
-    }
+	Nullable& operator=(const NullData&)
+		/// Assigns null to Nullable
+	{
+		_isNull = true;
+		return *this;
+	}
 
-    bool operator==(const Nullable<T>& other) const
-        /// Compares two Nullable
-    {
-        return (_isNull && other._isNull) || (_isNull == other._isNull && _value == other._value);
-    }
+	bool operator==(const Nullable<T>& other) const
+		/// Compares two Nullable
+	{
+		return (_isNull && other._isNull) || (_isNull == other._isNull && _value == other._value);
+	}
 
-    bool operator==(const T& value) const
-        /// Compares Nullable with value
-    {
-        return (!_isNull && _value == value);
-    }
+	bool operator==(const T& value) const
+		/// Compares Nullable with value
+	{
+		return (!_isNull && _value == value);
+	}
 
-    bool operator==(const NullData&) const
-        /// Compares Nullable with null
-    {
-        return _isNull;
-    }
+	bool operator==(const NullData&) const
+		/// Compares Nullable with null
+	{
+		return _isNull;
+	}
 
-    bool operator!=(const NullData&) const
-        /// Compares Nullable for non null
-    {
-        return !_isNull;
-    }
+	bool operator!=(const NullData&) const
+		/// Compares Nullable for non null
+	{
+		return !_isNull;
+	}
 
-    bool operator!=(const T& value) const
-        /// Compares Nullable with value for non equal
-    {
-        return (_isNull || _value != value);
-    }
+	bool operator!=(const T& value) const
+		/// Compares Nullable with value for non equal
+	{
+		return (_isNull || _value != value);
+	}
 
-    bool operator < (const Nullable<T>& other) const
-        /// Compares two Nullable objects
-    {
-        if (_isNull < other._isNull)
-            return true;
-        return (_value < other._value);
-    }
+	bool operator < (const Nullable<T>& other) const
+		/// Compares two Nullable objects
+	{
+		if (_isNull < other._isNull)
+			return true;
+		return (_value < other._value);
+	}
 
-    operator T& ()
-        /// Get reference to the value
-    {
-        return _value;
-    }
+	operator T& ()
+		/// Get reference to the value
+	{
+		return _value;
+	}
 
-    operator const T& () const
-        /// Get const reference to the value
-    {
-        return _value;
-    }
+	operator const T& () const
+		/// Get const reference to the value
+	{
+		return _value;
+	}
 
-    bool isNull() const
-        /// Test Nullable for null
-    { 
-        return _isNull; 
-    }
+	bool isNull() const
+		/// Test Nullable for null
+	{ 
+		return _isNull; 
+	}
 
-    void setNull(bool isNull)
-        /// Change Nullable "isNull" sign
-    {
-        _isNull = isNull; 
-    }
+	void setNull(bool isNull = true)
+		/// Change Nullable "isNull" sign
+	{
+		_isNull = isNull; 
+	}
 
-    const T& getValue() const
-        /// Get value
-    { 
-        return _value; 
-    }
+	const T& getValue() const
+		/// Get value
+	{ 
+		return _value; 
+	}
 
-    void setValue(const T& value)
-        /// Set value
-    { 
-        _isNull = false; _value = value; 
-    }
+	void setValue(const T& value)
+		/// Set value
+	{ 
+		_isNull = false; _value = value; 
+	}
 
 private:
 
-    T _value;
-    bool _isNull;
+	T _value;
+	bool _isNull;
 };
 
 //
@@ -177,39 +177,39 @@ private:
 template <typename T>
 bool operator == (const T& value, const Nullable<T>& nValue) 
 {
-    return (!nValue.isNull() && value == nValue.getValue());
+	return (!nValue.isNull() && value == nValue.getValue());
 }
 
 template <typename T>
 bool operator != (const T& value, const Nullable<T>& nValue) 
 {
-    return (nValue.isNull() || value != nValue.getValue());
+	return (nValue.isNull() || value != nValue.getValue());
 }
 
 template <typename T>
 bool operator == (const NullData&, const Nullable<T>& nValue) 
 {
-    return nValue.isNull();
+	return nValue.isNull();
 }
 
 template <typename T>
 bool operator != (const NullData&, const Nullable<T>& nValue) 
 {
-    return !nValue.isNull();
+	return !nValue.isNull();
 }
 
 template <typename T>
 std::ostream& operator<<(std::ostream& out, const Nullable<T>& obj) 
 {
-    if (obj.isNull()) 
-    {
-        out << "NULL";
-    }
-    else 
-    {
-        out << obj.getValue();
-    }
-    return out;
+	if (obj.isNull()) 
+	{
+		out << "NULL";
+	}
+	else 
+	{
+		out << obj.getValue();
+	}
+	return out;
 }
   
 } } // namespace Poco::Data

@@ -167,6 +167,7 @@ public:
 	virtual void testSessionTransaction();
 	virtual void testTransaction();
 	virtual void testTransactor();
+	virtual void testNullable();
 
 	virtual void testReconnect();
 

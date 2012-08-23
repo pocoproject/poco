@@ -1204,6 +1204,21 @@ void ODBCTest::testTransactor()
 }
 
 
+void ODBCTest::testNullable()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->nullable();
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testReconnect()
 {
 	if (!_pSession) fail ("Test not available.");

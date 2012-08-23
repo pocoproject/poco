@@ -71,8 +71,7 @@ Extractor::~Extractor()
 
 bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 {
-	if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = sqlite3_column_int(_pStmt, (int) pos);
 	return true;
 }
@@ -80,8 +79,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 {
-	if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = sqlite3_column_int64(_pStmt, (int) pos);
 	return true;
 }
@@ -90,18 +88,16 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 #ifndef POCO_LONG_IS_64_BIT
 bool Extractor::extract(std::size_t pos, long& val)
 {
-        if (isNull(pos))
-                return false;
-        val = sqlite3_column_int(_pStmt, (int) pos);
-        return true;
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
 }
 #endif
 
 
 bool Extractor::extract(std::size_t pos, double& val)
 {
-        if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = sqlite3_column_double(_pStmt, (int) pos);
 	return true;
 }
@@ -109,8 +105,7 @@ bool Extractor::extract(std::size_t pos, double& val)
 
 bool Extractor::extract(std::size_t pos, std::string& val)
 {
-	if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	const char *pBuf = reinterpret_cast<const char*>(sqlite3_column_text(_pStmt, (int) pos));
 	if (!pBuf)
 		val.clear();
@@ -122,8 +117,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 {
-        if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = sqlite3_column_int(_pStmt, (int) pos);
 	return true;
 }
@@ -131,8 +125,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 {
-	if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = sqlite3_column_int(_pStmt, (int) pos);
 	return true;
 }
@@ -140,8 +133,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 {
-	if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = sqlite3_column_int(_pStmt, (int) pos);
 	return true;
 }
@@ -149,8 +141,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 {
-	if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = sqlite3_column_int(_pStmt, (int) pos);
 	return true;
 }
@@ -158,8 +149,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt32& val)
 {
-	if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = sqlite3_column_int(_pStmt, (int) pos);
 	return true;
 }
@@ -167,8 +157,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt32& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 {
-	if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = sqlite3_column_int64(_pStmt, (int) pos);
 	return true;
 }
@@ -176,8 +165,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 
 bool Extractor::extract(std::size_t pos, bool& val)
 {
-	if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = (0 != sqlite3_column_int(_pStmt, (int) pos));
 	return true;
 }
@@ -185,8 +173,7 @@ bool Extractor::extract(std::size_t pos, bool& val)
 
 bool Extractor::extract(std::size_t pos, float& val)
 {
-	if (isNull(pos))
-		return false;
+	if (isNull(pos)) return false;
 	val = static_cast<float>(sqlite3_column_double(_pStmt, (int) pos));
 	return true;
 }
@@ -202,60 +189,63 @@ bool Extractor::extract(std::size_t pos, char& val)
 
 bool Extractor::extract(std::size_t pos, Date& val)
 {
-        std::string str;
-        extract(pos, str);
-        int tzd;
-        DateTime dt = DateTimeParser::parse(Utility::SQLITE_DATE_FORMAT, str, tzd);
-        val = dt;
-        return true;
+	if (isNull(pos)) return false;
+	std::string str;
+	extract(pos, str);
+	int tzd;
+	DateTime dt = DateTimeParser::parse(Utility::SQLITE_DATE_FORMAT, str, tzd);
+	val = dt;
+	return true;
 }
 
 
 bool Extractor::extract(std::size_t pos, Time& val)
-        {
-        std::string str;
-        extract(pos, str);
-        int tzd;
-        DateTime dt = DateTimeParser::parse(Utility::SQLITE_TIME_FORMAT, str, tzd);
-        val = dt;
-        return true;
-        }
+{
+	if (isNull(pos)) return false;
+	std::string str;
+	extract(pos, str);
+	int tzd;
+	DateTime dt = DateTimeParser::parse(Utility::SQLITE_TIME_FORMAT, str, tzd);
+	val = dt;
+	return true;
+}
 
 
 bool Extractor::extract(std::size_t pos, DateTime& val)
-        {
-        std::string dt;
-        extract(pos, dt);
-        int tzd;
-        DateTimeParser::parse(dt, val, tzd);
-        return true;
-        }
+{
+	if (isNull(pos)) return false;
+	std::string dt;
+	extract(pos, dt);
+	int tzd;
+	DateTimeParser::parse(dt, val, tzd);
+	return true;
+}
 
 
 bool Extractor::extract(std::size_t pos, Poco::Any& val)
-        {
-        return extractImpl(pos, val);
-        }
+{
+	return extractImpl(pos, val);
+}
 
 
 bool Extractor::extract(std::size_t pos, Poco::DynamicAny& val)
-        {
-        return extractImpl(pos, val);
-        }
+{
+	return extractImpl(pos, val);
+}
 
 
 bool Extractor::isNull(std::size_t pos, std::size_t)
 {
-        if (pos >= _nulls.size())
-                _nulls.resize(pos + 1);
+	if (pos >= _nulls.size())
+		_nulls.resize(pos + 1);
 
-        if (!_nulls[pos].first)
-{
-                _nulls[pos].first = true;
-                _nulls[pos].second = (SQLITE_NULL == sqlite3_column_type(_pStmt, pos));
-        }
-        
-        return _nulls[pos].second;
+	if (!_nulls[pos].first)
+	{
+		_nulls[pos].first = true;
+		_nulls[pos].second = (SQLITE_NULL == sqlite3_column_type(_pStmt, pos));
+	}
+	
+	return _nulls[pos].second;
 }
 
 

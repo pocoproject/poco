@@ -107,6 +107,7 @@ using Poco::Message;
 using Poco::NotFoundException;
 using Poco::InvalidAccessException;
 using Poco::InvalidArgumentException;
+using Poco::NotImplementedException;
 using Poco::BadCastException;
 using Poco::RangeException;
 
@@ -3783,6 +3784,12 @@ void SQLExecutor::transactor()
 	assert (0 == count);
 
 	session().setFeature("autoCommit", autoCommit);
+}
+
+
+void SQLExecutor::nullable()
+{
+	throw NotImplementedException("TODO - see SQLite test for nullable");
 }
 
 
