@@ -49,6 +49,7 @@ public:
 	void testDeflate1();
 	void testDeflate2();
 	void testDeflate3();
+	void testDeflate4();
 	void testGzip1();
 	void testGzip2();
 	void testGzip3();
