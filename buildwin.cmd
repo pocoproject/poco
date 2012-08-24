@@ -18,14 +18,14 @@ rem
 rem Usage:
 rem ------
 rem buildwin DEVENV VS_VERSION [ACTION] [LINKMODE] [CONFIG] [PLATFORM] [SAMPLES] [TESTS]
-rem DEVENV:     devenv|vcexpress|msbuild
-rem VS_VERSION: 71|80|90|100
-rem ACTION:     build|rebuild|clean
-rem LINKMODE:   static_mt|static_md|shared|all
-rem CONFIG:     release|debug|both
-rem PLATFORM:   Win32|x64|WinCE
-rem SAMPLES:    samples|nosamples
-rem TESTS:      tests|notests
+rem DEVENV:     devenv | vcexpress | msbuild
+rem VS_VERSION: 71 | 80 | 90 | 100
+rem ACTION:     build | rebuild | clean
+rem LINKMODE:   static_mt | static_md | shared | all
+rem CONFIG:     release | debug | both
+rem PLATFORM:   Win32 | x64 | WinCE
+rem SAMPLES:    samples | nosamples
+rem TESTS:      tests | notests
 
 rem
 rem DEVENV and VS_VERSION are required arguments. Default is build all.
@@ -52,7 +52,7 @@ if "%1"=="" goto usage
 set BUILD_TOOL="%1"
 
 rem if not msbuild, validate that there is a VS environment
-if %BUILD_TOOL%=="msbuild" (
+if "%BUILD_TOOL%"=="msbuild" (
    if not defined WindowsSdkDir (
    echo Error: No Windows SDK environment found.
    echo Please run this script from a Windows SDK Command Prompt
@@ -65,12 +65,12 @@ if %BUILD_TOOL%=="msbuild" (
    goto :EOF)
 )
 
-rem VS version {71|80|90|100}
+rem VS version {71 | 80 | 90 | 100}
 if "%2"=="" goto usage
 set VS_VERSION=vs%2
 
-set VCPROJ_EXT="vcproj"
-if %VS_VERSION%==100 (set VCPROJ_EXT="vcxproj")
+set VCPROJ_EXT=vcproj
+if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
 
 rem Action [build|rebuild|clean]
 set ACTION=%3
@@ -124,46 +124,46 @@ set RELEASE_STATIC_MT=0
 set DEBUG_STATIC_MD=0
 set RELEASE_STATIC_MD=0
 
-if "%LINK_MODE%"=="shared" (
-if "%CONFIGURATION%"=="release" (set RELEASE_SHARED=1) else (
-if "%CONFIGURATION%"=="both" (set RELEASE_SHARED=1) else (
+if %LINK_MODE%==shared (
+if %CONFIGURATION%==release (set RELEASE_SHARED=1) else (
+if %CONFIGURATION%==both (set RELEASE_SHARED=1) else (
 if "%CONFIGURATION%"=="" (set RELEASE_SHARED=1))))
 
-if "%LINK_MODE%"=="shared" (
-if "%CONFIGURATION%"=="debug" (set DEBUG_SHARED=1) else (
-if "%CONFIGURATION%"=="both" (set DEBUG_SHARED=1) else (
+if %LINK_MODE%==shared (
+if %CONFIGURATION%==debug (set DEBUG_SHARED=1) else (
+if %CONFIGURATION%==both (set DEBUG_SHARED=1) else (
 if "%CONFIGURATION%"=="" (set DEBUG_SHARED=1))))
 
-if "%LINK_MODE%"=="static_mt" (
-if "%CONFIGURATION%"=="release" (set RELEASE_STATIC_MT=1) else (
-if "%CONFIGURATION%"=="both" (set RELEASE_STATIC_MT=1) else (
+if %LINK_MODE%==static_mt (
+if %CONFIGURATION%==release (set RELEASE_STATIC_MT=1) else (
+if %CONFIGURATION%==both (set RELEASE_STATIC_MT=1) else (
 if "%CONFIGURATION%"=="" (set RELEASE_STATIC_MT=1))))
 
-if "%LINK_MODE%"=="static_md" (
-if "%CONFIGURATION%"=="release" (set RELEASE_STATIC_MD=1) else (
-if "%CONFIGURATION%"=="both" (set RELEASE_STATIC_MD=1) else (
+if %LINK_MODE%==static_md (
+if %CONFIGURATION%==release (set RELEASE_STATIC_MD=1) else (
+if %CONFIGURATION%==both (set RELEASE_STATIC_MD=1) else (
 if "%CONFIGURATION%"=="" (set RELEASE_STATIC_MD=1))))
 
-if "%LINK_MODE%"=="static_mt" (
-if "%CONFIGURATION%"=="debug" (set DEBUG_STATIC_MT=1) else (
-if "%CONFIGURATION%"=="both" (set DEBUG_STATIC_MT=1) else (
+if %LINK_MODE%==static_mt (
+if %CONFIGURATION%==debug (set DEBUG_STATIC_MT=1) else (
+if %CONFIGURATION%==both (set DEBUG_STATIC_MT=1) else (
 if "%CONFIGURATION%"=="" (set DEBUG_STATIC_MT=1))))
 
-if "%LINK_MODE%"=="static_md" (
-if "%CONFIGURATION%"=="debug" (set DEBUG_STATIC_MD=1) else (
-if "%CONFIGURATION%"=="both" (set DEBUG_STATIC_MD=1) else (
+if %LINK_MODE%==static_md (
+if %CONFIGURATION%==debug (set DEBUG_STATIC_MD=1) else (
+if %CONFIGURATION%==both (set DEBUG_STATIC_MD=1) else (
 if "%CONFIGURATION%"=="" (set DEBUG_STATIC_MD=1))))
 
-if "%LINK_MODE%"=="all" (
-if "%CONFIGURATION%"=="debug" (
+if %LINK_MODE%==all (
+if %CONFIGURATION%==debug (
 set DEBUG_STATIC_MT=1
 set DEBUG_STATIC_MD=1
 set DEBUG_SHARED=1) else (
-if "%CONFIGURATION%"=="release" (
+if %CONFIGURATION%==release (
 set RELEASE_STATIC_MT=1
 set RELEASE_STATIC_MD=1
 set RELEASE_SHARED=1) else (
-if "%CONFIGURATION%"=="both" (
+if %CONFIGURATION%==both (
 set DEBUG_STATIC_MT=1
 set DEBUG_STATIC_MD=1
 set DEBUG_SHARED=1
@@ -179,15 +179,15 @@ set RELEASE_STATIC_MD=1
 set RELEASE_SHARED=1)))))
 
 if "%LINK_MODE%"=="" (
-if "%CONFIGURATION%"=="debug" (
+if %CONFIGURATION%==debug (
 set DEBUG_STATIC_MT=1
 set DEBUG_STATIC_MD=1
 set DEBUG_SHARED=1) else (
-if "%CONFIGURATION%"=="release" (
+if %CONFIGURATION%==release (
 set RELEASE_STATIC_MT=1
 set RELEASE_STATIC_MD=1
 set RELEASE_SHARED=1) else (
-if "%CONFIGURATION%"=="both" (
+if %CONFIGURATION%==both (
 set DEBUG_STATIC_MT=1
 set DEBUG_STATIC_MD=1
 set DEBUG_SHARED=1
@@ -225,20 +225,22 @@ for /f %%G in ('findstr /R "." components') do (
 if exist %%G (
   cd %%G
   for /f "tokens=1,2,3,4 delims=/" %%Q in ("%%G") do (
-   set PROJECT_NAME=%%Q%PLATFORM_SUFFIX%_%VS_VERSION%.vcproj
-   set TEST_PROJECT_NAME=testsuite/TestSuite%PLATFORM_SUFFIX%_%VS_VERSION%.vcproj
+   set PROJECT_NAME=%%Q%PLATFORM_SUFFIX%_%VS_VERSION%.%VCPROJ_EXT%
+   set TEST_PROJECT_NAME=testsuite/TestSuite%PLATFORM_SUFFIX%_%VS_VERSION%.%VCPROJ_EXT%
    if exist !PROJECT_NAME! (call :build %%G )
-   set PROJECT_NAME=%%R%PLATFORM_SUFFIX%_%VS_VERSION%.vcproj
+   set PROJECT_NAME=%%R%PLATFORM_SUFFIX%_%VS_VERSION%.%VCPROJ_EXT%
    if exist !PROJECT_NAME! (call :build %%G )
-   set PROJECT_NAME=%%S%PLATFORM_SUFFIX%_%VS_VERSION%.vcproj
+   set PROJECT_NAME=%%S%PLATFORM_SUFFIX%_%VS_VERSION%.%VCPROJ_EXT%
    if exist !PROJECT_NAME! (call :build %%G )
-   set PROJECT_NAME=%%T%PLATFORM_SUFFIX%_%VS_VERSION%.vcproj
+   set PROJECT_NAME=%%T%PLATFORM_SUFFIX%_%VS_VERSION%.%VCPROJ_EXT%
    if exist !PROJECT_NAME! (call :build %%G )
    )
   )
   cd %POCO_BASE%
 )
 )
+
+goto samples
 
 rem ////////////////////
 rem / build subroutine /
@@ -247,88 +249,90 @@ rem ////////////////////
 
  echo.
  echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- echo ++++
+ echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  echo ++++ Building %1 [!PROJECT_NAME!]
- echo ++++
+ echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  echo.
 echo %TESTS%
-if %BUILD_TOOL%=="msbuild" (
+if %BUILD_TOOL%==msbuild (
  if %DEBUG_SHARED%==1      (%BUILD_TOOL% !PROJECT_NAME! /m /p:Configuration=debug_shared /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% !TEST_PROJECT_NAME! /m /p:Configuration=debug_shared /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.)
    )
  )
  if %RELEASE_SHARED%==1    (%BUILD_TOOL% !PROJECT_NAME! /m /p:Configuration=release_shared /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% !TEST_PROJECT_NAME! /m /p:Configuration=release_shared /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.)
    )
  )
  if %DEBUG_STATIC_MT%==1   (%BUILD_TOOL% !PROJECT_NAME! /m /p:Configuration=debug_static_mt /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% !TEST_PROJECT_NAME! /m /p:Configuration=debug_static_mt /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.)
    )
  )
  if %RELEASE_STATIC_MT%==1 (%BUILD_TOOL% !PROJECT_NAME! /m /p:Configuration=release_static_mt /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% !TEST_PROJECT_NAME! /m /p:Configuration=release_static_mt /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.)
    )
  )
  if %DEBUG_STATIC_MD%==1   (%BUILD_TOOL% !PROJECT_NAME! /m /p:Configuration=debug_static_md /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% !TEST_PROJECT_NAME! /m /p:Configuration=debug_static_md /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.)
    )
  )
  if %RELEASE_STATIC_MD%==1 (%BUILD_TOOL% !PROJECT_NAME! /m /p:Configuration=release_static_md /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% !TEST_PROJECT_NAME! /m /p:Configuration=release_static_md /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.)
    )
  )
 ) else (
- echo "building"
  if %DEBUG_SHARED%==1      (%BUILD_TOOL% /useenv /%ACTION% debug_shared !PROJECT_NAME! && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
-      echo ****
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% /useenv /%ACTION% debug_shared !TEST_PROJECT_NAME! && echo. && echo. && echo.)
    )
  )
  if %RELEASE_SHARED%==1    (%BUILD_TOOL% /useenv /%ACTION% release_shared !PROJECT_NAME! && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% /useenv /%ACTION% release_shared !TEST_PROJECT_NAME! && echo. && echo. && echo.)
    )
  )
  if %DEBUG_STATIC_MT%==1   (%BUILD_TOOL% /useenv /%ACTION% debug_static_mt !PROJECT_NAME! && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% /useenv /%ACTION% debug_static_mt !TEST_PROJECT_NAME! && echo. && echo. && echo.)
    )
  )
  if %RELEASE_STATIC_MT%==1 (%BUILD_TOOL% /useenv /%ACTION% release_static_mt !PROJECT_NAME! && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% /useenv /%ACTION% release_static_mt !TEST_PROJECT_NAME! && echo. && echo. && echo.)
    )
  )
  if %DEBUG_STATIC_MD%==1   (%BUILD_TOOL% /useenv /%ACTION% debug_static_md !PROJECT_NAME! && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% /useenv /%ACTION% debug_static_md !TEST_PROJECT_NAME! && echo. && echo. && echo.)
    )
  )
  if %RELEASE_STATIC_MD%==1 (%BUILD_TOOL% /useenv /%ACTION% release_static_md !PROJECT_NAME! && echo. && echo. && echo.
-   if "%TESTS%"=="tests" (
+   if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (%BUILD_TOOL% /useenv /%ACTION% release_static_md !TEST_PROJECT_NAME! && echo. && echo. && echo.)
    )
  )
 )
 
  echo ------------------------------------------------------------------------
- echo ----
  echo ---- Done building %1 [!PROJECT_NAME!]
- echo ----
  echo ------------------------------------------------------------------------
  echo.
  
 exit /b
 
-if "%SAMPLES%"=="nosamples" goto :EOF
+rem ////////////////////
+rem / build samples /
+rem ////////////////////
+
+:samples
+
+if %SAMPLES%==nosamples goto :EOF
 
 rem root level component samples
 for /f %%G in ('findstr /R "." components') do (
@@ -336,14 +340,14 @@ if exist %%G\samples\samples%PLATFORM_SUFFIX%_%VS_VERSION%.sln (
   cd %%G\samples
     echo.
     echo.
-    echo ########################################################################
-    echo ####
-    echo #### Building %%G/samples
-    echo ####
-    echo ########################################################################
+    echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    echo ++++ Building %%G/samples
+    echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     echo.
   set PROJECT_NAME=samples%PLATFORM_SUFFIX%_%VS_VERSION%
-  if %BUILD_TOOL%=="msbuild" (
+  if %BUILD_TOOL%==msbuild (
   if %DEBUG_SHARED%==1      (%BUILD_TOOL% !PROJECT_NAME!.sln /m /p:Configuration=debug_shared /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.)
   if %RELEASE_SHARED%==1    (%BUILD_TOOL% !PROJECT_NAME!.sln /m /p:Configuration=release_shared /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.)
   if %DEBUG_STATIC_MT%==1   (%BUILD_TOOL% !PROJECT_NAME!.sln /m /p:Configuration=debug_static_mt /p:Platform=%PLATFORM% /verbosity:minimal /p:VCBuildAdditionalOptions="/useenv" /t:%ACTION% && echo. && echo. && echo.)
@@ -363,20 +367,25 @@ if exist %%G\samples\samples%PLATFORM_SUFFIX%_%VS_VERSION%.sln (
 )
 )
 
+ echo ------------------------------------------------------------------------
+ echo ---- Build completed.
+ echo ------------------------------------------------------------------------
+ echo.
+
 goto :EOF
 
 :usage
 echo Usage:
 echo ------
 echo buildwin DEVENV VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS]
-echo DEVENV:     "devenv|vcexpress|msbuild"
-echo VS_VERSION: "71|80|90|100"
-echo ACTION:     "build|rebuild|clean"
-echo LINKMODE:   "static_mt|static_md|shared|all"
-echo CONFIG:     "release|debug|both"
-echo PLATFORM:   "Win32|x64|WinCE"
-echo SAMPLES:    "samples|nosamples"
-echo TESTS:    "tests|notests"
+echo DEVENV:     "devenv | vcexpress | msbuild"
+echo VS_VERSION: "71 | 80 | 90 | 100"
+echo ACTION:     "build | rebuild | clean"
+echo LINKMODE:   "static_mt | static_md | shared | all"
+echo CONFIG:     "release | debug | both"
+echo PLATFORM:   "Win32 | x64 | WinCE"
+echo SAMPLES:    "samples | nosamples"
+echo TESTS:      "tests | notests"
 
 echo.
 echo Default is build all.
