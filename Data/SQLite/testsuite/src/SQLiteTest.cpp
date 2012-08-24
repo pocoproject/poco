@@ -42,10 +42,11 @@
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Utility.h"
-#include "Poco/Data/SQLite/SQLiteException.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Data/Nullable.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
 #include "Poco/SharedPtr.h"
@@ -93,6 +94,7 @@ using Poco::NullPointerException;
 using Poco::Data::SQLite::ConstraintViolationException;
 using Poco::Data::SQLite::ParameterCountMismatchException;
 using Poco::Int32;
+using Poco::Dynamic::Var;
 
 
 class Person
@@ -1979,7 +1981,7 @@ void SQLiteTest::testNullable()
 	assert (!s.isNull());
 	assert (!d.isNull());
 
-	ses << "SELECT i, r, s FROM NullableTest", into(i), into(f), into(s), into(d), now;
+	ses << "SELECT i, r, s, d FROM NullableTest", into(i), into(f), into(s), into(d), now;
 
 	assert (i.isNull());
 	assert (f.isNull());
@@ -1993,6 +1995,23 @@ void SQLiteTest::testNullable()
 	assert (rs.isNull("r"));
 	assert (rs.isNull("s"));
 	assert (rs.isNull("d"));
+
+	Var di = 1;
+	Var df = 1.5;
+	Var ds = "abc";
+	Var dd = DateTime();
+
+	assert (!di.isEmpty());
+	assert (!df.isEmpty());
+	assert (!ds.isEmpty());
+	assert (!dd.isEmpty());
+
+	ses << "SELECT i, r, s, d FROM NullableTest", into(di), into(df), into(ds), into(dd), now;
+
+	assert (di.isEmpty());
+	assert (df.isEmpty());
+	assert (ds.isEmpty());
+	assert (dd.isEmpty());
 }
 
 

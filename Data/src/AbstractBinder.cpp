@@ -505,6 +505,8 @@ void AbstractBinder::bind(std::size_t pos, const Poco::Dynamic::Var& val, Direct
 		bind(pos, val.extract<Time>(), dir);
 	else if(type == typeid(BLOB))
 		bind(pos, val.extract<BLOB>(), dir);
+	else if(type == typeid(void))
+		bind(pos, Keywords::null, dir);
 #ifndef POCO_LONG_IS_64_BIT
 	else if(type == typeid(long))
 		bind(pos, val.extract<long>(), dir);
