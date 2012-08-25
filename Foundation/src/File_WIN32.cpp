@@ -1,7 +1,7 @@
 //
 // File_WIN32.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_WIN32.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/File_WIN32.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -193,7 +193,7 @@ bool FileImpl::isDeviceImpl() const
 {
 	poco_assert (!_path.empty());
 
-	FileHandle fh(_path, GENERIC_READ, 0, OPEN_EXISTING);
+	FileHandle fh(_path, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING);
 	DWORD type = GetFileType(fh.get());
 	if (type == FILE_TYPE_CHAR)
 		return true;

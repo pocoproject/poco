@@ -1,7 +1,7 @@
 //
 // File_UNIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/File_UNIX.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/File_UNIX.h#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -84,6 +84,7 @@ private:
 	std::string _path;
 	
 	friend class DirectoryIteratorImpl;
+	friend class LinuxDirectoryWatcherStrategy;
 };
 
 

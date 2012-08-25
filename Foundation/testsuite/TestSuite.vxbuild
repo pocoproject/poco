@@ -30,6 +30,7 @@ SOURCES="
 	DateTimeTest.cpp
 	DateTimeTestSuite.cpp
 	DigestStreamTest.cpp
+	DirectoryWatcherTest.cpp
 	Driver.cpp
 	DummyDelegate.cpp
 	DynamicAnyTest.cpp

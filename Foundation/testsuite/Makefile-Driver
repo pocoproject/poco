@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/testsuite/Makefile-Driver#3 $
+# $Id: //poco/1.4/Foundation/testsuite/Makefile-Driver#4 $
 #
 # Makefile for Poco Foundation testsuite
 #
@@ -39,7 +39,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	HashSetTest HashMapTest SharedMemoryTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest \
 	TuplesTest NamedTuplesTest TypeListTest DynamicAnyTest FileStreamTest \
-	MemoryStreamTest ObjectPoolTest
+	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest
 
 target         = testrunner
 target_version = 1

@@ -62,6 +62,14 @@ Release 1.4.4 (2012-08-??)
 - fixed a WebSocket interop issue with Firefox
 - added Poco::Net::MessageHeader::hasToken()
 - Poco::AtomicCounter now uses GCC 4.3 builtin atomics on more platforms
+- fixed SF# 3555938: NetSSL: socket closed twice
+- socket exceptions now include OS error code
+- fixed SF# 3556975: Need to fix Shared Memory for memory map
+- Poco::Net::SecureSocketImpl::close() now catches exceptions thrown by its call to shutdown().
+- fixed SF# 3535990: POCO_HAVE_IPv6 without POCO_WIN32_UTF8 conflict
+- fixed SF# 3559665: Poco::InflatingInputStream may not always inflate completely
+- added Poco::DirectoryWatcher class
+- fixed SF# 3561464: Poco::File::isDevice() can throw due to sharing violation
 
 
 Release 1.4.3p1 (2012-01-23)
@@ -1742,4 +1750,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#64 $
+$Id: //poco/1.4/dist/CHANGELOG#65 $

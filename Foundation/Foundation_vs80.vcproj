@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Foundation"
 	ProjectGUID="{8164D41D-B053-405B-826C-CF37AC0EF176}"
 	RootNamespace="Foundation"
@@ -3738,6 +3738,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\src\DirectoryWatcher.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\File.cpp"
 					>
 				</File>
@@ -4191,6 +4195,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\DirectoryIterator_WIN32U.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\DirectoryWatcher.h"
 					>
 				</File>
 				<File

@@ -300,6 +300,7 @@
     <ClCompile Include="src\ByteOrder.cpp" />
     <ClCompile Include="src\Checksum.cpp" />
     <ClCompile Include="src\Debugger.cpp" />
+    <ClCompile Include="src\DirectoryWatcher.cpp" />
     <ClCompile Include="src\DynamicAny.cpp" />
     <ClCompile Include="src\DynamicAnyHolder.cpp" />
     <ClCompile Include="src\Environment.cpp" />
@@ -981,6 +982,7 @@
     <ClInclude Include="include\Poco\Checksum.h" />
     <ClInclude Include="include\Poco\Config.h" />
     <ClInclude Include="include\Poco\Debugger.h" />
+    <ClInclude Include="include\Poco\DirectoryWatcher.h" />
     <ClInclude Include="include\Poco\DynamicAny.h" />
     <ClInclude Include="include\Poco\DynamicAnyHolder.h" />
     <ClInclude Include="include\Poco\DynamicFactory.h" />

@@ -1,7 +1,7 @@
 //
 // DynamicAnyTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DynamicAnyTest.cpp#3 $
+// $Id: //poco/1.4/Foundation/testsuite/src/DynamicAnyTest.cpp#5 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -1175,7 +1175,11 @@ void DynamicAnyTest::testConversionOperator()
 	assert (i == 42);
 	
 	any = 123;
-	std::string s = any;//'s(any)' bombs on gcc 3.4.4
+#if defined(_MSC_VER)
+	std::string s(any);
+#else
+	std::string s = any;	
+#endif
 	assert (s == "123");
 
 	any = 321;
