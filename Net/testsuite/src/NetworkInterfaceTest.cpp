@@ -94,7 +94,7 @@ void NetworkInterfaceTest::testMap()
 
 void NetworkInterfaceTest::testList()
 {
-	NetworkInterface::List list = NetworkInterface::list();
+	NetworkInterface::List list = NetworkInterface::list(false, false);
 	assert (!list.empty());
 	for (NetworkInterface::NetworkInterfaceList::const_iterator it = list.begin(); it != list.end(); ++it)
 	{
