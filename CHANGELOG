@@ -1,4 +1,4 @@
-This is the changelog file for the POCO C++ Libraries.
+﻿This is the changelog file for the POCO C++ Libraries.
 
 Release 1.4.4 (2012-08-??)
 ==========================
@@ -34,6 +34,7 @@ Release 1.4.4 (2012-08-??)
   response to a HEAD request, or in case of a 204 No Content or 304 Not Modified
   response status.
 - fixed a DOM parser performance bug (patch by Peter Klotz)
+- fixed SF# 3559325: Util Windows broken in non-Unicode
 - updated iOS build configuration to use xcode-select for finding toolchain
 - Poco::Net::SecureSocketImpl::shutdown() now also shuts down the underlying socket.
 - fixed SF# 3552597: Crypto  des-ecb error
