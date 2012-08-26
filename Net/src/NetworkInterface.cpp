@@ -1161,8 +1161,8 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 }
 
 } // namespace
-	
-	
+
+
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -1176,7 +1176,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 
 	if (getifaddrs(&ifaces) < 0) 
 		throw NetException("cannot get network adapter list");
-	
+
 	try 
 	{
 		for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next) 
@@ -1192,7 +1192,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			{
 				struct sockaddr_dl* sdl = (struct sockaddr_dl*) currIface->ifa_addr;
 				ifIndex = sdl->sdl_index;
-				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
+				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly) && !ipOnly)
 				{
 					intf = NetworkInterface(ifIndex);
 					setInterfaceParams(currIface, intf.impl());
@@ -1306,6 +1306,17 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 	}
 }
 
+void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
+{
+	struct sockaddr_dl* sdl = (struct sockaddr_dl*) iface->ifa_addr;
+	impl.setName(iface->ifa_name);
+	impl.setDisplayName(iface->ifa_name);
+	impl.setPhyParams();
+
+	impl.setMACAddress(sdl->sll_addr, sdl->sll_halen);
+	impl.setType(fromNative(sdl->sll_hatype));
+}
+
 }
 
 
@@ -1337,21 +1348,24 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			{
 				struct sockaddr_ll* sll = (struct sockaddr_ll*)iface->ifa_addr;
 				ifIndex = sll->sll_ifindex;
-				intf = NetworkInterface(ifIndex);
-				intf.impl().setName(iface->ifa_name);
-				intf.impl().setDisplayName(iface->ifa_name);
-				intf.impl().setPhyParams();
-
-				intf.impl().setMACAddress(sll->sll_addr, sll->sll_halen);
-				intf.impl().setType(fromNative(sll->sll_hatype));
-
-				if ((upOnly && intf.isUp()) || !upOnly)			
+				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly) && !ipOnly)
+				{
+					intf = NetworkInterface(ifIndex);
+					setInterfaceParams(iface, intf.impl());
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
+				}
 				break;
 			}
 			case AF_INET:
-			{
 				ifIndex = if_nametoindex(iface->ifa_name);
+
+				if ((ifIt == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
+				{
+					intf = NetworkInterface(ifIndex);
+					setInterfaceParams(iface, intf.impl());
+					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
+				}
+
 				address = IPAddress(*(iface->ifa_addr));
 				subnetMask = IPAddress(*(iface->ifa_netmask));
 
@@ -1360,13 +1374,18 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				else if (iface->ifa_flags & IFF_POINTOPOINT && iface->ifa_dstaddr)
 					broadcastAddress = IPAddress(*(iface->ifa_dstaddr));
 				else
-					broadcastAddress = IPAddress();				
+					broadcastAddress = IPAddress();
 			
 				break;
-			}
 #if defined(POCO_HAVE_IPv6)
 			case AF_INET6:
 				ifIndex = if_nametoindex(iface->ifa_name);
+				if ((ifIt == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
+				{
+					intf = NetworkInterface(ifIndex);
+					setInterfaceParams(iface, intf.impl());
+					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
+				}
 				address = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(iface->ifa_addr)->sin6_addr, sizeof(struct in6_addr), ifIndex);
 				subnetMask = IPAddress(*(iface->ifa_netmask));
 				broadcastAddress = IPAddress();
@@ -1374,16 +1393,6 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #endif
 			default:
 				continue;
-			}
-			
-			if (family == AF_INET || family == AF_INET6)
-			{
-				intf = NetworkInterface(std::string(iface->ifa_name), address, subnetMask, broadcastAddress, ifIndex);
-				if ((upOnly && intf.isUp()) || !upOnly)
-				{
-					if ((ifIt = result.find(ifIndex)) != result.end())
-						ifIt->second.addAddress(address, subnetMask, broadcastAddress);
-				}
 			}
 		} // for interface
 	}

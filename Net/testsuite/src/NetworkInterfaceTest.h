@@ -51,6 +51,8 @@ public:
 	void testForName();
 	void testForAddress();
 	void testForIndex();
+	void testMapIpOnly();
+	void testMapUpOnly();
 
 	void setUp();
 	void tearDown();

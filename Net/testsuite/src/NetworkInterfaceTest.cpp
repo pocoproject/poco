@@ -69,7 +69,7 @@ void NetworkInterfaceTest::testMap()
 
 		NetworkInterface::MACAddress mac(it->second.macAddress());
 		if (!mac.empty() && (it->second.type() != NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK))
-			std::cout << "MAC Address: " << mac << std::endl;
+			std::cout << "MAC Address: (" << it->second.type() << ") " << mac << std::endl;
 
 		typedef NetworkInterface::AddressList List;
 		const List& ipList = it->second.addressList();
@@ -107,7 +107,7 @@ void NetworkInterfaceTest::testList()
 
 		NetworkInterface::MACAddress mac(it->macAddress());
 		if (!mac.empty() && (it->type() != NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK))
-			std::cout << "MAC Address: " << mac << std::endl;
+			std::cout << "MAC Address: (" << it->type() << ") " << mac << std::endl;
 
 		typedef NetworkInterface::AddressList List;
 		const List& ipList = it->addressList();
@@ -117,7 +117,7 @@ void NetworkInterfaceTest::testList()
 		{
 			std::cout << "IP Address:  " << ipIt->get<NetworkInterface::IP_ADDRESS>().toString() << std::endl;
 			IPAddress addr = ipIt->get<NetworkInterface::SUBNET_MASK>();
-			if (!addr.isWildcard()) std::cout << "Subnet:      " << ipIt->get<NetworkInterface::SUBNET_MASK>().toString() << std::endl;
+			if (!addr.isWildcard()) std::cout << "Subnet:      " << ipIt->get<NetworkInterface::SUBNET_MASK>().toString() << " (/" << ipIt->get<NetworkInterface::SUBNET_MASK>().prefixLength() << ")" << std::endl;
 			addr = ipIt->get<NetworkInterface::BROADCAST_ADDRESS>();
 			if (!addr.isWildcard()) std::cout << "Broadcast:   " << ipIt->get<NetworkInterface::BROADCAST_ADDRESS>().toString() << std::endl;
 		}
@@ -175,6 +175,28 @@ void NetworkInterfaceTest::testForIndex()
 }
 
 
+void NetworkInterfaceTest::testMapIpOnly()
+{
+	NetworkInterface::Map m = NetworkInterface::map(true, false);
+	assert (!m.empty());
+	for (NetworkInterface::Map::const_iterator it = m.begin(); it != m.end(); ++it)
+	{
+		assert(it->second.supportsIPv4() || it->second.supportsIPv6());
+	}
+}
+
+
+void NetworkInterfaceTest::testMapUpOnly()
+{
+	NetworkInterface::Map m = NetworkInterface::map(false, true);
+	assert (!m.empty());
+	for (NetworkInterface::Map::const_iterator it = m.begin(); it != m.end(); ++it)
+	{
+		assert(it->second.isUp());
+	}
+}
+
+
 void NetworkInterfaceTest::setUp()
 {
 }
@@ -194,6 +216,8 @@ CppUnit::Test* NetworkInterfaceTest::suite()
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testForName);
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testForAddress);
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testForIndex);
+	CppUnit_addTest(pSuite, NetworkInterfaceTest, testMapIpOnly);
+	CppUnit_addTest(pSuite, NetworkInterfaceTest, testMapUpOnly);
 
 	return pSuite;
 }
