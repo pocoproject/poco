@@ -33,6 +33,7 @@ SOURCES="
 	DigestEngine.cpp 
 	DigestStream.cpp 
 	DirectoryIterator.cpp 
+	DirectoryWatcher.cpp 
 	DynamicAny.cpp 
 	DynamicAnyHolder.cpp
 	Environment.cpp

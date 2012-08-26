@@ -1,9 +1,11 @@
 //
-// FilesystemTestSuite.cpp
+// DirectoryWatcherTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FilesystemTestSuite.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/DirectoryWatcherTest.h#1 $
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Definition of the DirectoryWatcherTest class.
+//
+// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,21 +32,52 @@
 //
 
 
-#include "FilesystemTestSuite.h"
-#include "PathTest.h"
-#include "FileTest.h"
-#include "GlobTest.h"
-#include "DirectoryWatcherTest.h"
+#ifndef DirectoryWatcherTest_INCLUDED
+#define DirectoryWatcherTest_INCLUDED
 
 
-CppUnit::Test* FilesystemTestSuite::suite()
+#include "Poco/Foundation.h"
+#include "Poco/DirectoryWatcher.h"
+#include "Poco/Path.h"
+#include "CppUnit/TestCase.h"
+
+
+class DirectoryWatcherTest: public CppUnit::TestCase
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FilesystemTestSuite");
+public:
+	DirectoryWatcherTest(const std::string& name);
+	~DirectoryWatcherTest();
 
-	pSuite->addTest(PathTest::suite());
-	pSuite->addTest(FileTest::suite());
-	pSuite->addTest(GlobTest::suite());
-	pSuite->addTest(DirectoryWatcherTest::suite());
+	void testAdded();
+	void testRemoved();
+	void testModified();
+	void testMoved();
 	
-	return pSuite;
-}
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+	
+protected:
+	void onItemAdded(const Poco::DirectoryWatcher::DirectoryEvent& ev);
+	void onItemRemoved(const Poco::DirectoryWatcher::DirectoryEvent& ev);
+	void onItemModified(const Poco::DirectoryWatcher::DirectoryEvent& ev);
+	void onItemMovedFrom(const Poco::DirectoryWatcher::DirectoryEvent& ev);
+	void onItemMovedTo(const Poco::DirectoryWatcher::DirectoryEvent& ev);
+	void onError(const Poco::Exception& exc);
+	
+	Poco::Path path() const;
+
+private:
+	struct DirEvent
+	{
+		Poco::DirectoryWatcher::DirectoryEventType type;
+		std::string callback;
+		std::string path;
+	};
+	std::vector<DirEvent> _events;
+	bool _error;
+};
+
+
+#endif // DirectoryWatcherTest_INCLUDED

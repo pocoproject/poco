@@ -1208,6 +1208,10 @@
 				Name="Source Files"
 				>
 				<File
+					RelativePath=".\src\DirectoryWatcherTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\FilesystemTestSuite.cpp"
 					>
 				</File>
@@ -1227,6 +1231,10 @@
 			<Filter
 				Name="Header Files"
 				>
+				<File
+					RelativePath=".\src\DirectoryWatcherTest.h"
+					>
+				</File>
 				<File
 					RelativePath=".\src\FilesystemTestSuite.h"
 					>

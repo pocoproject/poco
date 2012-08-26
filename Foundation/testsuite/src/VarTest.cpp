@@ -1406,7 +1406,11 @@ void VarTest::testConversionOperator()
 	assert (any == i);
 
 	any = 123;
+#if defined(_MSC_VER) // gcc bombs on s(any)
+	std::string s(any);
+#else
 	std::string s = any;
+#endif
 	assert (s == "123");
 	assert (s == any);
 	assert (any == s);

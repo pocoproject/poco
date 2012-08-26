@@ -193,7 +193,7 @@ bool FileImpl::isDeviceImpl() const
 {
 	poco_assert (!_path.empty());
 
-	FileHandle fh(_path, GENERIC_READ, 0, OPEN_EXISTING);
+	FileHandle fh(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING);
 	DWORD type = GetFileType(fh.get());
 	if (type == FILE_TYPE_CHAR)
 		return true;

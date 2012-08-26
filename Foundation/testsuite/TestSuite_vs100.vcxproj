@@ -307,6 +307,7 @@
     <ClCompile Include="src\ByteOrderTest.cpp" />
     <ClCompile Include="src\CoreTest.cpp" />
     <ClCompile Include="src\CoreTestSuite.cpp" />
+    <ClCompile Include="src\DirectoryWatcherTest.cpp" />
     <ClCompile Include="src\DynamicFactoryTest.cpp" />
     <ClCompile Include="src\FIFOBufferStreamTest.cpp" />
     <ClCompile Include="src\FormatTest.cpp" />
@@ -439,6 +440,7 @@
     <ClInclude Include="src\ByteOrderTest.h" />
     <ClInclude Include="src\CoreTest.h" />
     <ClInclude Include="src\CoreTestSuite.h" />
+    <ClInclude Include="src\DirectoryWatcherTest.h" />
     <ClInclude Include="src\DynamicFactoryTest.h" />
     <ClInclude Include="src\FIFOBufferStreamTest.h" />
     <ClInclude Include="src\FormatTest.h" />
