@@ -1192,24 +1192,20 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			{
 				struct sockaddr_dl* sdl = (struct sockaddr_dl*) currIface->ifa_addr;
 				ifIndex = sdl->sdl_index;
+				intf = NetworkInterface(ifIndex);
+				setInterfaceParams(currIface, intf.impl());
 				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly) && !ipOnly)
-				{
-					intf = NetworkInterface(ifIndex);
-					setInterfaceParams(currIface, intf.impl());
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
-				}
 				break;
 			}
 #endif
 			case AF_INET:
 				ifIndex = if_nametoindex(currIface->ifa_name);
 				ifIt = result.find(ifIndex);
+				intf = NetworkInterface(ifIndex);
+				setInterfaceParams(currIface, intf.impl());
 				if ((ifIt == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
-				{
-					intf = NetworkInterface(ifIndex);
-					setInterfaceParams(currIface, intf.impl());
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
-				}
 				
 				address = IPAddress(*(currIface->ifa_addr));
 				subnetMask = IPAddress(*(currIface->ifa_netmask));
@@ -1225,12 +1221,10 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			case AF_INET6:
 				ifIndex = if_nametoindex(currIface->ifa_name);
 				ifIt = result.find(ifIndex);
+				intf = NetworkInterface(ifIndex);
+				setInterfaceParams(currIface, intf.impl());
 				if ((ifIt == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
-				{
-					intf = NetworkInterface(ifIndex);
-					setInterfaceParams(currIface, intf.impl());
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
-				}
 				
 				address = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(currIface->ifa_addr)->sin6_addr,
 					sizeof(struct in6_addr), ifIndex);
@@ -1248,7 +1242,6 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #endif
 			)
 			{
-				intf = NetworkInterface(std::string(currIface->ifa_name), address, subnetMask, broadcastAddress, ifIndex);
 				if ((upOnly && intf.isUp()) || !upOnly)
 				{
 					if ((ifIt = result.find(ifIndex)) != result.end())
@@ -1348,23 +1341,22 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			{
 				struct sockaddr_ll* sll = (struct sockaddr_ll*)iface->ifa_addr;
 				ifIndex = sll->sll_ifindex;
+				intf = NetworkInterface(ifIndex);
+				setInterfaceParams(iface, intf.impl());
+				
 				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly) && !ipOnly)
-				{
-					intf = NetworkInterface(ifIndex);
-					setInterfaceParams(iface, intf.impl());
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
-				}
+				
 				break;
 			}
 			case AF_INET:
 				ifIndex = if_nametoindex(iface->ifa_name);
 				ifIt = result.find(ifIndex);
+				intf = NetworkInterface(ifIndex);
+				setInterfaceParams(iface, intf.impl());
+					
 				if ((ifIt == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
-				{
-					intf = NetworkInterface(ifIndex);
-					setInterfaceParams(iface, intf.impl());
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
-				}
 
 				address = IPAddress(*(iface->ifa_addr));
 				subnetMask = IPAddress(*(iface->ifa_netmask));
@@ -1381,15 +1373,16 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			case AF_INET6:
 				ifIndex = if_nametoindex(iface->ifa_name);
 				ifIt = result.find(ifIndex);
+				intf = NetworkInterface(ifIndex);
+				setInterfaceParams(iface, intf.impl());
+					
 				if ((ifIt == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
-				{
-					intf = NetworkInterface(ifIndex);
-					setInterfaceParams(iface, intf.impl());
 					result.insert(Map::value_type(ifIndex, intf)).first;
-				}
+
 				address = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(iface->ifa_addr)->sin6_addr, sizeof(struct in6_addr), ifIndex);
 				subnetMask = IPAddress(*(iface->ifa_netmask));
 				broadcastAddress = IPAddress();
+					
 				break;
 #endif
 			default:
