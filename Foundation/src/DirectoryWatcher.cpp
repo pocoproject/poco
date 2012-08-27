@@ -1,7 +1,7 @@
 //
 // DirectoryWatcher.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#5 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -394,15 +394,15 @@ private:
 #else
 
 
-class DefaultDirectoryWatcherStrategy: public DirectoryWatcherStrategy
+class PollingDirectoryWatcherStrategy: public DirectoryWatcherStrategy
 {
 public:
-	DefaultDirectoryWatcherStrategy(DirectoryWatcher& owner):
+	PollingDirectoryWatcherStrategy(DirectoryWatcher& owner):
 		DirectoryWatcherStrategy(owner)
 	{
 	}
 	
-	~DefaultDirectoryWatcherStrategy()
+	~PollingDirectoryWatcherStrategy()
 	{
 	}
 	
@@ -496,7 +496,7 @@ void DirectoryWatcher::init()
 #elif POCO_OS == POCO_OS_LINUX
 	_pStrategy = new LinuxDirectoryWatcherStrategy(*this);
 #else
-	_pStrategy = new DefaultDirectoryWatcherStrategy(*this);
+	_pStrategy = new PollingDirectoryWatcherStrategy(*this);
 #endif
 	_thread.start(*this);
 }

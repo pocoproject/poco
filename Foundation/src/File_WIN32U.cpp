@@ -1,7 +1,7 @@
 //
 // File_WIN32U.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_WIN32U.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/File_WIN32U.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -195,15 +195,30 @@ bool FileImpl::isLinkImpl() const
 
 bool FileImpl::isDeviceImpl() const
 {
-	poco_assert (!_path.empty());
-
-	FileHandle fh(_path, _upath, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING);
-	DWORD type = GetFileType(fh.get());
-	if (type == FILE_TYPE_CHAR)
-		return true;
-	else if (type == FILE_TYPE_UNKNOWN && GetLastError() != NO_ERROR)
-		handleLastErrorImpl(_path);
-	return false;
+	return
+		_path.compare(0, 4, "\\\\.\\") == 0 ||
+		icompare(_path, "CON") == 0 ||
+		icompare(_path, "PRN") == 0 ||
+		icompare(_path, "AUX") == 0 ||
+		icompare(_path, "NUL") == 0 ||
+		icompare(_path, "LPT1") == 0 ||
+		icompare(_path, "LPT2") == 0 ||
+		icompare(_path, "LPT3") == 0 ||
+		icompare(_path, "LPT4") == 0 ||
+		icompare(_path, "LPT5") == 0 ||
+		icompare(_path, "LPT6") == 0 ||
+		icompare(_path, "LPT7") == 0 ||
+		icompare(_path, "LPT8") == 0 ||
+		icompare(_path, "LPT9") == 0 ||
+		icompare(_path, "COM1") == 0 ||
+		icompare(_path, "COM2") == 0 ||
+		icompare(_path, "COM3") == 0 ||
+		icompare(_path, "COM4") == 0 ||
+		icompare(_path, "COM5") == 0 ||
+		icompare(_path, "COM6") == 0 ||
+		icompare(_path, "COM7") == 0 ||
+		icompare(_path, "COM8") == 0 ||
+		icompare(_path, "COM9") == 0;
 }
 
 
@@ -381,48 +396,49 @@ bool FileImpl::createDirectoryImpl()
 
 void FileImpl::handleLastErrorImpl(const std::string& path)
 {
-	switch (GetLastError())
+	DWORD err = GetLastError();
+	switch (err)
 	{
 	case ERROR_FILE_NOT_FOUND:
-		throw FileNotFoundException(path);
+		throw FileNotFoundException(path, err);
 	case ERROR_PATH_NOT_FOUND:
 	case ERROR_BAD_NETPATH:
 	case ERROR_CANT_RESOLVE_FILENAME:
 	case ERROR_INVALID_DRIVE:
-		throw PathNotFoundException(path);
+		throw PathNotFoundException(path, err);
 	case ERROR_ACCESS_DENIED:
-		throw FileAccessDeniedException(path);
+		throw FileAccessDeniedException(path, err);
 	case ERROR_ALREADY_EXISTS:
 	case ERROR_FILE_EXISTS:
-		throw FileExistsException(path);
+		throw FileExistsException(path, err);
 	case ERROR_INVALID_NAME:
 	case ERROR_DIRECTORY:
 	case ERROR_FILENAME_EXCED_RANGE:
 	case ERROR_BAD_PATHNAME:
-		throw PathSyntaxException(path);
+		throw PathSyntaxException(path, err);
 	case ERROR_FILE_READ_ONLY:
-		throw FileReadOnlyException(path);
+		throw FileReadOnlyException(path, err);
 	case ERROR_CANNOT_MAKE:
-		throw CreateFileException(path);
+		throw CreateFileException(path, err);
 	case ERROR_DIR_NOT_EMPTY:
-		throw FileException("directory not empty", path);
+		throw FileException("directory not empty", path, err);
 	case ERROR_WRITE_FAULT:
-		throw WriteFileException(path);
+		throw WriteFileException(path, err);
 	case ERROR_READ_FAULT:
-		throw ReadFileException(path);
+		throw ReadFileException(path, err);
 	case ERROR_SHARING_VIOLATION:
-		throw FileException("sharing violation", path);
+		throw FileException("sharing violation", path, err);
 	case ERROR_LOCK_VIOLATION:
-		throw FileException("lock violation", path);
+		throw FileException("lock violation", path, err);
 	case ERROR_HANDLE_EOF:
-		throw ReadFileException("EOF reached", path);
+		throw ReadFileException("EOF reached", path, err);
 	case ERROR_HANDLE_DISK_FULL:
 	case ERROR_DISK_FULL:
-		throw WriteFileException("disk is full", path);
+		throw WriteFileException("disk is full", path, err);
 	case ERROR_NEGATIVE_SEEK:
-		throw FileException("negative seek", path);
+		throw FileException("negative seek", path, err);
 	default:
-		throw FileException(path);
+		throw FileException(path, err);
 	}
 }
 

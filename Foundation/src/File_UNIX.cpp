@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_UNIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/File_UNIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -433,36 +433,36 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	switch (errno)
 	{
 	case EIO:
-		throw IOException(path);
+		throw IOException(path, errno);
 	case EPERM:
-		throw FileAccessDeniedException("insufficient permissions", path);
+		throw FileAccessDeniedException("insufficient permissions", path, errno);
 	case EACCES:
-		throw FileAccessDeniedException(path);
+		throw FileAccessDeniedException(path, errno);
 	case ENOENT:
-		throw FileNotFoundException(path);
+		throw FileNotFoundException(path, errno);
 	case ENOTDIR:
-		throw OpenFileException("not a directory", path);
+		throw OpenFileException("not a directory", path, errno);
 	case EISDIR:
-		throw OpenFileException("not a file", path);
+		throw OpenFileException("not a file", path, errno);
 	case EROFS:
-		throw FileReadOnlyException(path);
+		throw FileReadOnlyException(path, errno);
 	case EEXIST:
-		throw FileExistsException(path);
+		throw FileExistsException(path, errno);
 	case ENOSPC:
-		throw FileException("no space left on device", path);
+		throw FileException("no space left on device", path, errno);
 	case EDQUOT:
-		throw FileException("disk quota exceeded", path);
+		throw FileException("disk quota exceeded", path, errno);
 #if !defined(_AIX)
 	case ENOTEMPTY:
-		throw FileException("directory not empty", path);
+		throw FileException("directory not empty", path, errno);
 #endif
 	case ENAMETOOLONG:
-		throw PathSyntaxException(path);
+		throw PathSyntaxException(path, errno);
 	case ENFILE:
 	case EMFILE:
-		throw FileException("too many open files", path);
+		throw FileException("too many open files", path, errno);
 	default:
-		throw FileException(std::strerror(errno), path);
+		throw FileException(std::strerror(errno), path, errno);
 	}
 }
 
