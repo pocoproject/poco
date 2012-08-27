@@ -153,7 +153,7 @@ public:
 	const IPAddress& firstAddress(IPAddress::Family family) const;
 		/// Returns the first IP address bound to the interface.
 
-	const IPAddress& address(unsigned index) const;
+	const IPAddress& address(unsigned index = 0) const;
 		/// Returns the IP address bound to the interface at index position.
 
 	void addAddress(const IPAddress& address);
