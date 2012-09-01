@@ -1973,7 +1973,7 @@ void SQLiteTest::testNullable()
 	
 	Nullable<int> i = 1;
 	Nullable<double> f = 1.5;
-	Nullable<std::string> s = "abc";
+	Nullable<std::string> s = std::string("abc");
 	Nullable<DateTime> d = DateTime();
 
 	assert (!i.isNull());
