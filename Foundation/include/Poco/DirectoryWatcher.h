@@ -1,7 +1,7 @@
 //
 // DirectoryWatcher.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DirectoryWatcher.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/DirectoryWatcher.h#4 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -72,10 +72,12 @@ class Foundation_API DirectoryWatcher: protected Runnable
 	///
 	/// On Windows, this class is implemented using FindFirstChangeNotification()/FindNextChangeNotification().
 	/// On Linux, this class is implemented using inotify.
+	/// On FreeBSD and Darwin (Mac OS X, iOS), this class uses kevent/kqueue.
 	/// On all other platforms, the watched directory is periodically scanned
 	/// for changes. This can negatively affect performance if done too often.
 	/// Therefore, the interval in which scans are done can be specified in
-	/// the constructor.
+	/// the constructor. Note that periodic scanning will also be done on FreeBSD
+	/// and Darwin if events for changes to files (DW_ITEM_MODIFIED) are enabled.
 	///
 	/// DW_ITEM_MOVED_FROM and DW_ITEM_MOVED_TO events will only be reported
 	/// on Linux. On other platforms, a file rename or move operation
@@ -150,7 +152,7 @@ public:
 	DirectoryWatcher(const std::string& path, int eventMask = DW_FILTER_ENABLE_ALL, int scanInterval = DW_DEFAULT_SCAN_INTERVAL);
 		/// Creates a DirectoryWatcher for the directory given in path.
 		/// To enable only specific events, an eventMask can be specified by
-		/// OR-ing the desired event IDs (e.g., DW_FILE_ADDED | DW_FILE_MODIFIED).
+		/// OR-ing the desired event IDs (e.g., DW_ITEM_ADDED | DW_ITEM_MODIFIED).
 		/// On platforms where no native filesystem notifications are available,
 		/// scanInterval specifies the interval in seconds between scans
 		/// of the directory.
@@ -158,7 +160,7 @@ public:
 	DirectoryWatcher(const File& directory, int eventMask = DW_FILTER_ENABLE_ALL, int scanInterval = DW_DEFAULT_SCAN_INTERVAL);
 		/// Creates a DirectoryWatcher for the specified directory
 		/// To enable only specific events, an eventMask can be specified by
-		/// OR-ing the desired event IDs (e.g., DW_FILE_ADDED | DW_FILE_MODIFIED).
+		/// OR-ing the desired event IDs (e.g., DW_ITEM_ADDED | DW_ITEM_MODIFIED).
 		/// On platforms where no native filesystem notifications are available,
 		/// scanInterval specifies the interval in seconds between scans
 		/// of the directory.

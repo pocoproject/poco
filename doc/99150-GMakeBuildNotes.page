@@ -329,7 +329,9 @@ in your Makefile, e.g.
 !!Make Targets
 
 Independently of which kind of product (library, executable, plugin) is 
-being built, there are always five make targets available:
+being built, there are always five make targets available.
+Note that this targets are only available in project-level Makefiles, not
+the global Makefile.
 
 
 !clean

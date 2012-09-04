@@ -157,7 +157,7 @@ following copyrighted material, the use of which is hereby acknowledged.
 ----    
 
 
-!!!zlib 1.2.3
+!!!zlib 1.2.5
 
     Copyright (C) 1995-2004 Jean-loup Gailly and Mark Adler
     
@@ -182,7 +182,7 @@ following copyrighted material, the use of which is hereby acknowledged.
 ----
 
 
-!!!SQlite 3.6.20
+!!!SQlite 3.7.14
 
 The original author of SQLite has dedicated the code to the 
 public domain (http://www.sqlite.org/copyright.html). 

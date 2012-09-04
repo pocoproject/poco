@@ -1,7 +1,7 @@
 //
 // HTTPSClientSessionTest.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -319,7 +319,7 @@ void HTTPSClientSessionTest::testInterop()
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
 	assert (str == "This is a test file for NetSSL.\n");
-	assert (cert.commonName() == "secure.appinf.com");
+	assert (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
 }
 
 
@@ -340,7 +340,7 @@ void HTTPSClientSessionTest::testProxy()
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
 	assert (str == "This is a test file for NetSSL.\n");
-	assert (cert.commonName() == "secure.appinf.com");
+	assert (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
 }
 
 

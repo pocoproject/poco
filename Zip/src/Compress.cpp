@@ -1,7 +1,7 @@
 //
 // Compress.cpp
 //
-// $Id: //poco/1.4/Zip/src/Compress.cpp#1 $
+// $Id: //poco/1.4/Zip/src/Compress.cpp#2 $
 //
 // Library: Zip
 // Package: Zip
@@ -228,6 +228,12 @@ void Compress::addDirectory(const Poco::Path& entryName, const Poco::DateTime& l
 
 void Compress::addRecursive(const Poco::Path& entry, ZipCommon::CompressionLevel cl, bool excludeRoot, const Poco::Path& name)
 {
+	addRecursive(entry, ZipCommon::CM_DEFLATE, cl, excludeRoot, name);
+}
+
+
+void Compress::addRecursive(const Poco::Path& entry, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl, bool excludeRoot, const Poco::Path& name)
+{
 	Poco::File aFile(entry);
 	if (!aFile.isDirectory())
 		throw ZipException("Not a directory: "+ entry.toString());
@@ -260,13 +266,13 @@ void Compress::addRecursive(const Poco::Path& entry, ZipCommon::CompressionLevel
 		{
 			realFile.makeDirectory();
 			renamedFile.makeDirectory();
-			addRecursive(realFile, cl, false, renamedFile);
+			addRecursive(realFile, cm, cl, false, renamedFile);
 		}
 		else
 		{
 			realFile.makeFile();
 			renamedFile.makeFile();
-			addFile(realFile, renamedFile, ZipCommon::CM_DEFLATE, cl);
+			addFile(realFile, renamedFile, cm, cl);
 		}
 	}
 }

@@ -1,6 +1,6 @@
-﻿This is the changelog file for the POCO C++ Libraries.
+This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.4 (2012-08-??)
+Release 1.4.4 (2012-09-03)
 ==========================
 
 - ZipStream now builds correctly in unbundled build.
@@ -34,7 +34,6 @@ Release 1.4.4 (2012-08-??)
   response to a HEAD request, or in case of a 204 No Content or 304 Not Modified
   response status.
 - fixed a DOM parser performance bug (patch by Peter Klotz)
-- fixed SF# 3559325: Util Windows broken in non-Unicode
 - updated iOS build configuration to use xcode-select for finding toolchain
 - Poco::Net::SecureSocketImpl::shutdown() now also shuts down the underlying socket.
 - fixed SF# 3552597: Crypto  des-ecb error
@@ -71,6 +70,8 @@ Release 1.4.4 (2012-08-??)
 - fixed SF# 3559665: Poco::InflatingInputStream may not always inflate completely
 - added Poco::DirectoryWatcher class
 - fixed SF# 3561464: Poco::File::isDevice() can throw due to sharing violation
+- Poco::Zip::Compress::addRecursive() has a second variant that allows to specify the compression method.
+- Upgraded internal SQLite to 3.7.14
 
 
 Release 1.4.3p1 (2012-01-23)
@@ -1751,4 +1752,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#65 $
+$Id: //poco/1.4/dist/CHANGELOG#66 $

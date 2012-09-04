@@ -1,7 +1,7 @@
 //
 // WebSocketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocketImpl.h#3 $
+// $Id: //poco/1.4/Net/include/Poco/Net/WebSocketImpl.h#4 $
 //
 // Library: Net
 // Package: WebSocket
@@ -66,7 +66,7 @@ public:
 	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
 	virtual void connect(const SocketAddress& address);
 	virtual void connect(const SocketAddress& address, const Poco::Timespan& timeout);
-	virtual void connectNB(const SocketAddress& address, const Poco::Timespan& timeout);
+	virtual void connectNB(const SocketAddress& address);
 	virtual void bind(const SocketAddress& address, bool reuseAddress = false);
 	virtual void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
 	virtual void listen(int backlog = 64);

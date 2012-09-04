@@ -1,7 +1,7 @@
 //
 // WebSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#4 $
+// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#5 $
 //
 // Library: Net
 // Package: WebSocket
@@ -221,7 +221,7 @@ void WebSocketImpl::connect(const SocketAddress& address, const Poco::Timespan& 
 }
 
 
-void WebSocketImpl::connectNB(const SocketAddress& address, const Poco::Timespan& timeout)
+void WebSocketImpl::connectNB(const SocketAddress& address)
 {
 	throw Poco::InvalidAccessException("Cannot connectNB() a WebSocketImpl");
 }

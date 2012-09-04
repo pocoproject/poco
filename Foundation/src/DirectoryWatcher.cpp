@@ -1,7 +1,7 @@
 //
 // DirectoryWatcher.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#5 $
+// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#6 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -48,6 +48,11 @@
 #include <sys/inotify.h>
 #include <sys/select.h>
 #include <unistd.h>
+#elif POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
 #endif
 #include <algorithm>
 #include <map>
@@ -391,6 +396,89 @@ private:
 };
 
 
+#elif POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD
+
+
+class BSDDirectoryWatcherStrategy: public DirectoryWatcherStrategy
+{
+public:
+	BSDDirectoryWatcherStrategy(DirectoryWatcher& owner):
+		DirectoryWatcherStrategy(owner),
+		_queueFD(-1),
+		_dirFD(-1),
+		_stopped(false)
+	{
+		_dirFD = open(owner.directory().path().c_str(), O_EVTONLY);
+		if (_dirFD < 0) throw Poco::FileNotFoundException(owner.directory().path());
+		_queueFD = kqueue();
+		if (_queueFD < 0) 
+		{
+			close(_dirFD);
+			throw Poco::SystemException("Cannot create kqueue", errno);
+		}
+	}
+	
+	~BSDDirectoryWatcherStrategy()
+	{
+		close(_dirFD);
+		close(_queueFD);
+	}
+	
+	void run()
+	{
+		Poco::Timestamp lastScan;
+		ItemInfoMap entries;
+		scan(entries);
+
+		while (!_stopped)
+		{
+			struct timespec timeout;
+			timeout.tv_sec = 0;
+			timeout.tv_nsec = 200000000;
+			unsigned eventFilter = NOTE_WRITE;
+			struct kevent event;
+			struct kevent eventData;
+			EV_SET(&event, _dirFD, EVFILT_VNODE, EV_ADD | EV_CLEAR, eventFilter, 0, 0);
+			int nEvents = kevent(_queueFD, &event, 1, &eventData, 1, &timeout);
+			if (nEvents < 0 || eventData.flags == EV_ERROR)
+			{
+				try
+				{
+					FileImpl::handleLastErrorImpl(owner().directory().path());
+				}
+				catch (Poco::Exception& exc)
+				{
+					owner().scanError(&owner(), exc);
+				}				
+			}
+			else if (nEvents > 0 || ((owner().eventMask() & DirectoryWatcher::DW_ITEM_MODIFIED) && lastScan.isElapsed(owner().scanInterval()*1000000)))
+			{
+				ItemInfoMap newEntries;
+				scan(newEntries);
+				compare(entries, newEntries);
+				std::swap(entries, newEntries);
+				lastScan.update();
+			}
+		}
+	}
+	
+	void stop()
+	{
+		_stopped = true;
+	}
+	
+	bool supportsMoveEvents() const
+	{
+		return false;
+	}
+
+private:
+	int _queueFD;
+	int _dirFD; 
+	bool _stopped;
+};
+
+
 #else
 
 
@@ -495,6 +583,8 @@ void DirectoryWatcher::init()
 	_pStrategy = new WindowsDirectoryWatcherStrategy(*this);
 #elif POCO_OS == POCO_OS_LINUX
 	_pStrategy = new LinuxDirectoryWatcherStrategy(*this);
+#elif POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD
+	_pStrategy = new BSDDirectoryWatcherStrategy(*this); 
 #else
 	_pStrategy = new PollingDirectoryWatcherStrategy(*this);
 #endif
