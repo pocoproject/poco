@@ -1208,7 +1208,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
 				
 				address = IPAddress(*(currIface->ifa_addr));
-				subnetMask = IPAddress(*(currIface->ifa_netmask));
+				
+				if (( currIface->ifa_flags & IFF_LOOPBACK ) == 0 && currIface->ifa_netmask)
+					subnetMask = IPAddress(*(currIface->ifa_netmask));
 
 				if (currIface->ifa_flags & IFF_BROADCAST && currIface->ifa_broadaddr)
 					broadcastAddress = IPAddress(*(currIface->ifa_broadaddr));
