@@ -330,7 +330,8 @@ in your Makefile, e.g.
 
 Independently of which kind of product (library, executable, plugin) is 
 being built, there are always five make targets available:
-
+Note that these targets are only available in project-level Makefiles, not
+the global Makefile.
 
 !clean
 

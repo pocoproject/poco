@@ -53,9 +53,8 @@
 	#if !defined(POCO_HAVE_GCC_ATOMICS) && !defined(POCO_NO_GCC_ATOMICS)
 		#define POCO_HAVE_GCC_ATOMICS
 	#endif
-#else
-	#include "Poco/Mutex.h"
 #endif // POCO_OS
+#include "Poco/Mutex.h"
 
 
 namespace Poco {

@@ -319,7 +319,7 @@ void HTTPSClientSessionTest::testInterop()
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
 	assert (str == "This is a test file for NetSSL.\n");
-	assert (cert.commonName() == "secure.appinf.com");
+	assert (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
 }
 
 
@@ -340,7 +340,7 @@ void HTTPSClientSessionTest::testProxy()
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
 	assert (str == "This is a test file for NetSSL.\n");
-	assert (cert.commonName() == "secure.appinf.com");
+	assert (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
 }
 
 

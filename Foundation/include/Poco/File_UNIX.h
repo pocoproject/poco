@@ -85,6 +85,7 @@ private:
 	
 	friend class DirectoryIteratorImpl;
 	friend class LinuxDirectoryWatcherStrategy;
+	friend class BSDDirectoryWatcherStrategy;
 };
 
 

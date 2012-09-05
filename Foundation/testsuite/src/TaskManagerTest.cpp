@@ -290,6 +290,7 @@ void TaskManagerTest::testFinish()
 	pTT->cont();
 	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
 	assert (pTT->state() == Task::TASK_FINISHED);
+	while (!to.finished()) Thread::sleep(50);
 	assert (to.finished());
 	while (tm.count() == 1) Thread::sleep(50);
 	list = tm.taskList();

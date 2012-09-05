@@ -222,7 +222,7 @@ void WebSocketImpl::connect(const SocketAddress& address, const Poco::Timespan& 
 }
 
 
-void WebSocketImpl::connectNB(const SocketAddress& address, const Poco::Timespan& timeout)
+void WebSocketImpl::connectNB(const SocketAddress& address)
 {
 	throw Poco::InvalidAccessException("Cannot connectNB() a WebSocketImpl");
 }

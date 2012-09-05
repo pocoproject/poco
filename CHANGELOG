@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.5.0 (2012-08-??)
+Release 1.5.0 (2012-09-??)
 ==========================
 
 - added JSON
@@ -34,7 +34,7 @@ Release 1.5.0 (2012-08-??)
 - added SF#3544720: AbstractConfigurator to support 64bit values
 - fixed SF#3522081: WinRegistryConfiguration unable to read REG_QWORD values
 
-Release 1.4.4 (2012-08-??)
+Release 1.4.4 (2012-09-03)
 ==========================
 
 - ZipStream now builds correctly in unbundled build.
@@ -105,7 +105,8 @@ Release 1.4.4 (2012-08-??)
 - fixed SF# 3559665: Poco::InflatingInputStream may not always inflate completely
 - added Poco::DirectoryWatcher class
 - fixed SF# 3561464: Poco::File::isDevice() can throw due to sharing violation
-
+- Poco::Zip::Compress::addRecursive() has a second variant that allows to specify the compression method.
+- Upgraded internal SQLite to 3.7.14
 
 Release 1.4.3p1 (2012-01-23)
 ============================

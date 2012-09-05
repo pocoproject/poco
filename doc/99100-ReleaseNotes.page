@@ -1,6 +1,82 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.4.4
+
+!!Summary of Changes
+
+  - ZipStream now builds correctly in unbundled build.
+  - added proxy digest authentication support to Net library
+  - integrated MySQL BLOB fixes from Franky Braem.
+  - use standard OpenSSL import libraries (libeay32.lib, ssleay32.lib) for Crypto and 
+    NetSSL_OpenSSL Visual Studio project files.
+  - fixed a potential buffer corruption issue in Poco::Net::SecureStreamSocket if lazy 
+    handshake is enabled and the first attempt to complete the handshake fails
+  - Poco::DateTimeParser::tryParse() without format specifier now correctly parses ISO8601 
+    date/times with fractional seconds.
+  - Poco::Process::launch() now has additional overloads allowing to specify an initial 
+    directory and/or environment.
+  - Poco::Net::FTPClientSession: timeout was not applied to data connection, only to 
+    control connection.
+  - Fixed potential IPv6 issue with socket constructors if IPv6 SocketAddress is given 
+    (contributed by ??????? ????????? <milovidov@yandex-team.ru>).
+  - Added an additional (optional) parameter to Poco::Thread::setOSPriority() allowing to 
+    specify a scheduling policy. Currently this is only used on POSIX platforms and allows 
+    specifying SCHED_OTHER (default), SCHED_FIFO or SCHED_RR, as well as other 
+    platform-specific policy values.
+  - Added Poco::Crypto::DigestEngine class providing a Poco::DigestEngine interface to
+    the digest algorithms provided by OpenSSL.
+  - Fixed some potential compiler warnings in Crypto library
+  - In some cases, when an SSL exception was unexpectedly closed, a generic Poco::IOException
+    was thrown. This was fixed to throw a SSLConnectionUnexpectedlyClosedException instead.
+  - Added Poco::ObjectPool class template.
+  - Poco::Net::HTTPServer has a new stopAll() method allowing stopping/aborting of all 
+    currently active client connections.
+  - The HTTP server framework now actively prevents sending a message body in the
+    response to a HEAD request, or in case of a 204 No Content or 304 Not Modified
+    response status.
+  - fixed a DOM parser performance bug (patch by Peter Klotz)
+  - fixed SF# 3559325: Util Windows broken in non-Unicode
+  - updated iOS build configuration to use xcode-select for finding toolchain
+  - Poco::Net::SecureSocketImpl::shutdown() now also shuts down the underlying socket.
+  - fixed SF# 3552597: Crypto  des-ecb error
+  - fixed SF# 3550553: SecureSocketImpl::connect hangs
+  - fixed SF# 3543047: Poco::Timer bug for long startInterval/periodic interval 
+  - fixed SF# 3539695: Thread attributes should be destroyed using the pthread_attr_destroy() 
+  - fixed SF# 3532311: Not able to set socket option on ServerSocket before bind
+    Added Poco::Net::Socket::init(int af) which can be used to explicitely
+    initialize the underlying socket before calling bind(), connect(), etc.
+  - fixed SF# 3521347: Typo in UnWindows.h undef
+  - fixed SF# 3519474: WinRegistryConfiguration bug
+    Also added tests and fixed another potential issue with an empty root path passed to the constructor.
+  - fixed SF# 3516827: wrong return value of WinRegistryKey::exists()
+  - fixed SF# 3515284: RSA publickey format(X.509 SubjectPublicKeyInfo)
+  - fixed SF# 3503267: VxWorks OS prio is not set in standard constructor
+  - fixed SF# 3500438: HTTPResponse failure when reason is empty
+  - fixed SF# 3495656: numberformater, numberparser error in mingw
+  - fixed SF# 3496493: Reference counting broken in TaskManager postNotification
+  - fixed SF# 3483174: LogFile flushing behavior on Windows
+    Flushing is now configurable for FileChannel and SimpleFileChannel
+    using the "flush" property (true or false).
+  - fixed SF# 3479561: Subsequent IPs on a NIC is not enumerated
+  - fixed SF# 3478665: Permission checks in Poco::File not correct for root
+  - fixed SF# 3475050: Threading bug in initializeNetwork() on Windows
+  - fixed SF# 3552680: websocket small frames bug and proposed fix
+  - fixed a WebSocket interop issue with Firefox
+  - added Poco::Net::MessageHeader::hasToken()
+  - Poco::AtomicCounter now uses GCC 4.3 builtin atomics on more platforms
+  - fixed SF# 3555938: NetSSL: socket closed twice
+  - socket exceptions now include OS error code
+  - fixed SF# 3556975: Need to fix Shared Memory for memory map
+  - Poco::Net::SecureSocketImpl::close() now catches exceptions thrown by its call to shutdown().
+  - fixed SF# 3535990: POCO_HAVE_IPv6 without POCO_WIN32_UTF8 conflict
+  - fixed SF# 3559665: Poco::InflatingInputStream may not always inflate completely
+  - added Poco::DirectoryWatcher class
+  - fixed SF# 3561464: Poco::File::isDevice() can throw due to sharing violation
+  - Poco::Zip::Compress::addRecursive() has a second variant that allows to specify the compression method.
+  - Upgraded internal SQLite to 3.7.14
+
+
 !!!Release 1.4.3p1
 
 !!Summary of Changes

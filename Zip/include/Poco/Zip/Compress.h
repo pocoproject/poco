@@ -76,6 +76,10 @@ public:
 		/// Adds a directory entry recursively to the zip file, set excludeRoot to false to exclude the parent directory.
 		/// If excludeRoot is true you can specify an empty name to add the files as relative files
 
+	void addRecursive(const Poco::Path& entry, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl = ZipCommon::CL_MAXIMUM, bool excludeRoot = true, const Poco::Path& name = Poco::Path());
+		/// Adds a directory entry recursively to the zip file, set excludeRoot to false to exclude the parent directory.
+		/// If excludeRoot is true you can specify an empty name to add the files as relative files
+
 	void setZipComment(const std::string& comment);
 		/// Sets the Zip file comment.
 

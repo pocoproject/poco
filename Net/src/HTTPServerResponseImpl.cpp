@@ -90,7 +90,7 @@ std::ostream& HTTPServerResponseImpl::send()
 {
 	poco_assert (!_pStream);
 
-	if (_pRequest && _pRequest->getMethod() == HTTPRequest::HTTP_HEAD ||
+	if ((_pRequest && _pRequest->getMethod() == HTTPRequest::HTTP_HEAD) ||
 		getStatus() < 200 ||
 		getStatus() == HTTPResponse::HTTP_NO_CONTENT ||
 		getStatus() == HTTPResponse::HTTP_NOT_MODIFIED)
