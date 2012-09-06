@@ -125,6 +125,7 @@ public:
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	void setFlags(DWORD flags, DWORD iftype);
+	void setRunning(bool running);
 #else
 	void setFlags(short flags);
 #endif
@@ -416,7 +417,7 @@ inline bool NetworkInterfaceImpl::up() const
 
 void NetworkInterfaceImpl::setFlags(DWORD flags, DWORD iftype)
 {
-	_running = _up = true;
+	_running = _up = false;
 	switch (iftype) {
 	case IF_TYPE_ETHERNET_CSMACD:
 	case IF_TYPE_ISO88025_TOKENRING:
@@ -435,6 +436,11 @@ void NetworkInterfaceImpl::setFlags(DWORD flags, DWORD iftype)
 	}
 	if (!(flags & IP_ADAPTER_NO_MULTICAST))
 		_multicast = true;
+}
+
+void NetworkInterfaceImpl::setRunning(bool running)
+{
+	_running = running;
 }
 
 #else
@@ -989,6 +995,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			ifIt->second.impl().setFlags(pAddress->Flags, pAddress->IfType);
 			ifIt->second.impl().setMtu(pAddress->Mtu);
 			ifIt->second.impl().setUp(pAddress->OperStatus == IfOperStatusUp);
+			ifIt->second.impl().setRunning(pAddress->ReceiveLinkSpeed > 0 || pAddress->TransmitLinkSpeed > 0);
 			ifIt->second.impl().setType(fromNative(pAddress->IfType));
 			if (pAddress->PhysicalAddressLength)
 				ifIt->second.impl().setMACAddress(pAddress->PhysicalAddress, pAddress->PhysicalAddressLength);
