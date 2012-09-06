@@ -215,7 +215,7 @@ inline void ThreadImpl::yieldImpl()
 
 inline int ThreadImpl::getStackSizeImpl() const
 {
-	return _pData->stackSize;
+	return static_cast<int>(_pData->stackSize);
 }
 
 
