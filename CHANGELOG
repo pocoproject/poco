@@ -33,6 +33,15 @@ Release 1.5.0 (2012-09-??)
 - fixed SF#3516844: poco missing symbols with external >=lipcre-8.13 
 - added SF#3544720: AbstractConfigurator to support 64bit values
 - fixed SF#3522081: WinRegistryConfiguration unable to read REG_QWORD values
+- fixed SF#3563626: For Win32 set Up/Running flags on NetworkInterface
+- fixed SF#3560807: Deprecate setPeerAddress() as this is now done in getifaddrs
+
+Release 1.4.4p1 (2012-??-??)
+============================
+
+- fixed SF# 3558012 Compilation fails when building with -ansi or -std=c++0x
+- fixed SF# 3563517 Get rid of loss-of-precision warnings on x64 MacOS
+
 
 Release 1.4.4 (2012-09-03)
 ==========================
