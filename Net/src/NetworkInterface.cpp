@@ -134,7 +134,6 @@ public:
 	void setType(Type type);
 	void setIndex(unsigned index);
 	void setPhyParams();
-	void setPeerAddress();
 	
 protected:
 	~NetworkInterfaceImpl();
@@ -180,7 +179,6 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 {
 	_addressList.push_back(AddressTuple(address, IPAddress(), IPAddress()));
 	setPhyParams();
-	if (_pointToPoint) setPeerAddress();
 }
 
 
@@ -197,7 +195,6 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_mtu(0)
 {
 	setPhyParams();
-	if (_pointToPoint) setPeerAddress();
 }
 
 
@@ -215,7 +212,6 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 {
 	_addressList.push_back(AddressTuple(address, subnetMask, broadcastAddress));
 	setPhyParams();
-	if (_pointToPoint) setPeerAddress();
 }
 
 
@@ -232,30 +228,6 @@ void NetworkInterfaceImpl::setPhyParams()
 	ds.impl()->ioctl(SIOCGIFMTU, &ifr);
 	setMtu(ifr.ifr_mtu);
 #endif
-}
-
-
-void NetworkInterfaceImpl::setPeerAddress()
-{
-	AddressList::iterator it = _addressList.begin();
-	AddressList::iterator end = _addressList.end();
-	for (; it != end; ++it)
-	{
-		IPAddress::Family family = it->get<NetworkInterface::IP_ADDRESS>().family();
-		DatagramSocket ds(family);
-#if !defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_VXWORKS)
-		struct ifreq ifr;
-		std::strncpy(ifr.ifr_name, _name.c_str(), IFNAMSIZ);
-		ds.impl()->ioctl(SIOCGIFDSTADDR, &ifr);
-		 // for PPP-type connections, broadcastAddress member holds the peer address
-		if (ifr.ifr_dstaddr.sa_family == AF_INET)
-			it->set<NetworkInterface::BROADCAST_ADDRESS>(IPAddress(ifr.ifr_dstaddr));
-		else
-			it->set<NetworkInterface::BROADCAST_ADDRESS>(IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(&ifr.ifr_dstaddr)->sin6_addr, sizeof(struct in6_addr), _index)); 
-#else
-			//TODO
-#endif
-	}
 }
 
 
