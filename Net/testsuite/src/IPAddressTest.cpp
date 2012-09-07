@@ -634,8 +634,10 @@ void IPAddressTest::testByteOrderMacros()
 {
 	Poco::UInt16 a16 = 0xDEAD;
 	assert (poco_ntoh_16(a16) == ntohs(a16));
+	assert (poco_hton_16(a16) == htons(a16));
 	Poco::UInt32 a32 = 0xDEADBEEF;
 	assert (poco_ntoh_32(a32) == ntohl(a32));
+	assert (poco_hton_32(a32) == htonl(a32));
 }
 
 
