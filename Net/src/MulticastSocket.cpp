@@ -97,16 +97,18 @@ MulticastSocket& MulticastSocket::operator = (const Socket& socket)
 
 void MulticastSocket::setInterface(const NetworkInterface& interfc)
 {
-	if (!interfc.supportsIPv6())
+	if (address().family() == IPAddress::IPv4)
 	{
 		impl()->setOption(IPPROTO_IP, IP_MULTICAST_IF, interfc.firstAddress(IPAddress::IPv4));
 	}
-	else
-	{
 #if defined(POCO_HAVE_IPv6)
+	else if (address().family() == IPAddress::IPv6)
+	{
 		impl()->setOption(IPPROTO_IPV6, IPV6_MULTICAST_IF, interfc.index());
-#endif
 	}
+#endif
+	else
+		throw UnsupportedFamilyException("Unknown or unsupported socket family.");
 }
 
 	

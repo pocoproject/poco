@@ -71,6 +71,7 @@ POCO_DECLARE_EXCEPTION(Net_API, POP3Exception, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, ICMPException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, HTMLFormException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, WebSocketException, NetException)
+POCO_DECLARE_EXCEPTION(Net_API, UnsupportedFamilyException, NetException)
 
 
 } } // namespace Poco::Net
