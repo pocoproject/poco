@@ -184,7 +184,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 		if (ifap->ifa_addr && ifap->ifa_addr->sa_family == AF_LINK) 
 		{
 			struct sockaddr_dl* sdl = reinterpret_cast<struct sockaddr_dl*>(ifap->ifa_addr);
-			caddr_t ap = (caddr_t) (sdl->sdl_data + sdl->sdl_nlen);
+			caddr_t ap = LLADDR(sdl);
 			int alen = sdl->sdl_alen;
 			if (ap && alen > 0) 
 			{

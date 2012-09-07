@@ -6,6 +6,8 @@ Release 1.4.4p1 (2012-??-??)
 
 - fixed SF# 3558012 Compilation fails when building with -ansi or -std=c++0x
 - fixed SF# 3563517 Get rid of loss-of-precision warnings on x64 MacOS
+- fixed SF#3562244: Portability fix for AF_LINK
+
 
 Release 1.4.4 (2012-09-03)
 ==========================
