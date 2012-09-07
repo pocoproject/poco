@@ -179,14 +179,18 @@ public:
 	BasicMemoryBinaryReader(Buffer<T>& data, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
 		BinaryReader(_istr, byteOrder),
 		_data(data),
-		_istr(data.begin(), data.size())
+		_istr(data.begin(), data.capacity())
 	{
 	}
 
 	BasicMemoryBinaryReader(Buffer<T>& data, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
 		BinaryReader(_istr, encoding, byteOrder),
 		_data(data),
-		_istr(data.begin(), data.size())
+		_istr(data.begin(), data.capacity())
+	{
+	}
+
+	~BasicMemoryBinaryReader()
 	{
 	}
 

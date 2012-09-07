@@ -194,15 +194,20 @@ public:
 	BasicMemoryBinaryWriter(Buffer<T>& data, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER): 
 		BinaryWriter(_ostr, byteOrder),
 		_data(data),
-		_ostr(data.begin(), data.size())
+		_ostr(data.begin(), data.capacity())
 	{
 	}
 
 	BasicMemoryBinaryWriter(Buffer<T>& data, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER): 
 		BinaryWriter(_ostr, encoding, byteOrder),
 		_data(data),
-		_ostr(data.begin(), data.size())
+		_ostr(data.begin(), data.capacity())
 	{
+	}
+
+	~BasicMemoryBinaryWriter()
+	{
+		flush();
 	}
 
 	Buffer<T>& data()
