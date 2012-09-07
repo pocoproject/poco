@@ -35,12 +35,17 @@ Release 1.5.0 (2012-09-??)
 - fixed SF#3522081: WinRegistryConfiguration unable to read REG_QWORD values
 - fixed SF#3563626: For Win32 set Up/Running flags on NetworkInterface
 - fixed SF#3560807: Deprecate setPeerAddress() as this is now done in getifaddrs
+- fixed SF#3560776: Fix byte-ordering issues with INADDR_* literals
+- fixed SF#3563627: Set IP address on multicast socket from socket family
+- fixed SF#3563999: Size BinaryWriter based on buffer's capacity(), not size()
+
 
 Release 1.4.4p1 (2012-??-??)
 ============================
 
 - fixed SF# 3558012 Compilation fails when building with -ansi or -std=c++0x
 - fixed SF# 3563517 Get rid of loss-of-precision warnings on x64 MacOS
+- fixed SF#3562244: Portability fix for AF_LINK
 
 
 Release 1.4.4 (2012-09-03)
