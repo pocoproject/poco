@@ -53,7 +53,7 @@ class Net_API DatagramSocketImpl: public SocketImpl
 {
 public:
 	DatagramSocketImpl();
-		/// Creates a StreamSocketImpl.
+		/// Creates a DatagramSocketImpl.
 		///
 		/// If the system supports IPv6, the socket will
 		/// be an IPv6 socket. Otherwise, it will be
