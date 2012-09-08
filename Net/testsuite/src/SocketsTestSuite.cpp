@@ -34,7 +34,6 @@
 #include "SocketTest.h"
 #include "SocketStreamTest.h"
 #include "DatagramSocketTest.h"
-#include "NetworkInterfaceTest.h"
 #include "MulticastSocketTest.h"
 #include "DialogSocketTest.h"
 #include "RawSocketTest.h"
@@ -47,7 +46,6 @@ CppUnit::Test* SocketsTestSuite::suite()
 	pSuite->addTest(SocketTest::suite());
 	pSuite->addTest(SocketStreamTest::suite());
 	pSuite->addTest(DatagramSocketTest::suite());
-	pSuite->addTest(NetworkInterfaceTest::suite());
 	pSuite->addTest(MulticastSocketTest::suite());
 	pSuite->addTest(DialogSocketTest::suite());
 	pSuite->addTest(RawSocketTest::suite());

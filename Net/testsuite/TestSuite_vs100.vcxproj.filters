@@ -177,9 +177,6 @@
     <ClInclude Include="src\MulticastSocketTest.h">
       <Filter>Sockets\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\NetworkInterfaceTest.h">
-      <Filter>Sockets\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\RawSocketTest.h">
       <Filter>Sockets\Header Files</Filter>
     </ClInclude>
@@ -309,6 +306,9 @@
     <ClInclude Include="src\WebSocketTestSuite.h">
       <Filter>WebSocket\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\NetworkInterfaceTest.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNSTest.cpp">
@@ -345,9 +345,6 @@
       <Filter>Sockets\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MulticastSocketTest.cpp">
-      <Filter>Sockets\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NetworkInterfaceTest.cpp">
       <Filter>Sockets\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RawSocketTest.cpp">
@@ -478,6 +475,9 @@
     </ClCompile>
     <ClCompile Include="src\WebSocketTestSuite.cpp">
       <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NetworkInterfaceTest.cpp">
+      <Filter>NetCore\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

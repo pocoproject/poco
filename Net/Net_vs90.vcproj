@@ -395,6 +395,8 @@
 				<File
 					RelativePath=".\include\Poco\Net\NetException.h"/>
 				<File
+					RelativePath=".\include\Poco\Net\NetworkInterface.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\SocketAddress.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\SocketDefs.h"/>
@@ -409,6 +411,8 @@
 					RelativePath=".\src\IPAddress.cpp"/>
 				<File
 					RelativePath=".\src\NetException.cpp"/>
+				<File
+					RelativePath=".\src\NetworkInterface.cpp"/>
 				<File
 					RelativePath=".\src\SocketAddress.cpp"/>
 			</Filter>
@@ -425,8 +429,6 @@
 					RelativePath=".\include\Poco\Net\DialogSocket.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\MulticastSocket.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\NetworkInterface.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\RawSocket.h"/>
 				<File
@@ -456,8 +458,6 @@
 					RelativePath=".\src\DialogSocket.cpp"/>
 				<File
 					RelativePath=".\src\MulticastSocket.cpp"/>
-				<File
-					RelativePath=".\src\NetworkInterface.cpp"/>
 				<File
 					RelativePath=".\src\RawSocket.cpp"/>
 				<File

@@ -4,7 +4,7 @@
 // $Id: //poco/1.4/Net/src/NetworkInterface.cpp#9 $
 //
 // Library: Net
-// Package: Sockets
+// Package: NetCore
 // Module:  NetworkInterface
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -970,13 +970,17 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #endif
 		if (pAddress->Flags & IP_ADAPTER_IPV4_ENABLED) ifIndex = pAddress->IfIndex;
 		
-		std::string name(pAddress->AdapterName);
+		std::string name;
 		std::string displayName;
 #ifdef POCO_WIN32_UTF8
-		Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, displayName);
+		Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, name);
+		Poco::UnicodeConverter::toUTF8(pAddress->Description, displayName);
 #else
+		char nameBuffer[1024];
+		rc = WideCharToMultiByte(CP_ACP, 0, pAddress->FriendlyName, -1, nameBuffer, sizeof(nameBuffer), NULL, NULL);
+		if (rc) name = nameBuffer;
 		char displayNameBuffer[1024];
-		int rc = WideCharToMultiByte(CP_ACP, 0, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
+		int rc = WideCharToMultiByte(CP_ACP, 0, pAddress->Description, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
 		if (rc) displayName = displayNameBuffer;
 #endif
 

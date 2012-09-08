@@ -402,6 +402,8 @@
 				<File
 					RelativePath=".\src\NetCoreTestSuite.h"/>
 				<File
+					RelativePath=".\src\NetworkInterfaceTest.h"/>
+				<File
 					RelativePath=".\src\SocketAddressTest.h"/>
 			</Filter>
 			<Filter
@@ -412,6 +414,8 @@
 					RelativePath=".\src\IPAddressTest.cpp"/>
 				<File
 					RelativePath=".\src\NetCoreTestSuite.cpp"/>
+				<File
+					RelativePath=".\src\NetworkInterfaceTest.cpp"/>
 				<File
 					RelativePath=".\src\SocketAddressTest.cpp"/>
 			</Filter>
@@ -454,8 +458,6 @@
 				<File
 					RelativePath=".\src\MulticastSocketTest.h"/>
 				<File
-					RelativePath=".\src\NetworkInterfaceTest.h"/>
-				<File
 					RelativePath=".\src\RawSocketTest.h"/>
 				<File
 					RelativePath=".\src\SocketsTestSuite.h"/>
@@ -480,8 +482,6 @@
 					RelativePath=".\src\MulticastEchoServer.cpp"/>
 				<File
 					RelativePath=".\src\MulticastSocketTest.cpp"/>
-				<File
-					RelativePath=".\src\NetworkInterfaceTest.cpp"/>
 				<File
 					RelativePath=".\src\RawSocketTest.cpp"/>
 				<File

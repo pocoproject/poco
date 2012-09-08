@@ -34,6 +34,7 @@
 #include "IPAddressTest.h"
 #include "SocketAddressTest.h"
 #include "DNSTest.h"
+#include "NetworkInterfaceTest.h"
 
 
 CppUnit::Test* NetCoreTestSuite::suite()
@@ -43,6 +44,7 @@ CppUnit::Test* NetCoreTestSuite::suite()
 	pSuite->addTest(IPAddressTest::suite());
 	pSuite->addTest(SocketAddressTest::suite());
 	pSuite->addTest(DNSTest::suite());
+	pSuite->addTest(NetworkInterfaceTest::suite());
 
 	return pSuite;
 }
