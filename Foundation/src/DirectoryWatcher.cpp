@@ -482,15 +482,15 @@ private:
 #else
 
 
-class DefaultDirectoryWatcherStrategy: public DirectoryWatcherStrategy
+class PollingDirectoryWatcherStrategy: public DirectoryWatcherStrategy
 {
 public:
-	DefaultDirectoryWatcherStrategy(DirectoryWatcher& owner):
+	PollingDirectoryWatcherStrategy(DirectoryWatcher& owner):
 		DirectoryWatcherStrategy(owner)
 	{
 	}
 	
-	~DefaultDirectoryWatcherStrategy()
+	~PollingDirectoryWatcherStrategy()
 	{
 	}
 	
@@ -586,7 +586,7 @@ void DirectoryWatcher::init()
 #elif POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD
 	_pStrategy = new BSDDirectoryWatcherStrategy(*this);
 #else
-	_pStrategy = new DefaultDirectoryWatcherStrategy(*this);
+	_pStrategy = new PollingDirectoryWatcherStrategy(*this);
 #endif
 	_thread.start(*this);
 }
