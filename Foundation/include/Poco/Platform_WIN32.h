@@ -82,11 +82,11 @@
 	#elif defined (WINVER)
 		#define _WIN32_WINNT WINVER
 	#else
-		#define _WIN32_WINNT 0x0500
+		#define _WIN32_WINNT 0x0601
 	#endif
 #endif
 
-  
+
 #if (_MSC_VER >= 1300) && (_MSC_VER < 1400) // Visual Studio 2003, MSVC++ 7.1
 	#define POCO_MSVS_VERSION 2003
 	#define POCO_MSVC_VERSION 71
