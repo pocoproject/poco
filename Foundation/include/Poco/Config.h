@@ -43,8 +43,10 @@
 // Define to enable Windows Unicode (UTF-8) support
 #define POCO_WIN32_UTF8
 
+
 // Define to enable C++11 support
 //#define POCO_ENABLE_CPP11
+
 
 // Define to disable implicit linking
 // #define POCO_NO_AUTOMATIC_LIBS
@@ -108,6 +110,10 @@
 // LoggingFactory - avoids SyslogChannel being
 // linked to executable on Unix/Linux systems.
 // #define POCO_NO_SYSLOGCHANNEL
+
+
+// Define to enable MSVC secure warnings
+// #define POCO_MSVC_SECURE_WARNINGS
 
 
 // No support for INI file configurations in

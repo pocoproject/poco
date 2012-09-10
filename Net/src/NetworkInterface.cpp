@@ -857,13 +857,16 @@ namespace Net {
 namespace {
 
 
-IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr)
+IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr, ULONG* pprefix = 0)
 	/// This function relies on (1) subnet prefix being at the position 
 	/// immediately preceding and (2) broadcast address being at the position
 	/// immediately succeeding the IPv4 unicast address.
 	/// 
 	/// Since there is no explicit guarantee on order, to ensure correctness,
 	/// the above constraints are checked prior to returning the result.
+	/// Additionally, on pre-Vista versions on Windows, the main structure does
+	/// not contain prefix length; for those platforms, this function
+	/// returns prefix through pprefix argument.
 {
 	PIP_ADAPTER_PREFIX pPrev = 0;
 	for (int i = 0; pPrefix; pPrefix = pPrefix->Next, ++i)
@@ -876,10 +879,13 @@ IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr)
 
 	if (pPrefix && pPrefix->Next && pPrev) 
 	{
-		IPAddress prefix(pPrev->PrefixLength, IPAddress::IPv4);
+		IPAddress ipPrefix(pPrev->PrefixLength, IPAddress::IPv4);
 		IPAddress mask(pPrefix->Next->Address);
-		if ((prefix & mask) == (prefix & addr)) 
+		if ((ipPrefix & mask) == (ipPrefix & addr))
+		{
+			if (pprefix) *pprefix = pPrefix->Length;
 			return IPAddress(pPrefix->Next->Address);
+		}
 	}
 	
 	return IPAddress(IPAddress::IPv4);
@@ -931,7 +937,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	ULONG outBufLen = 16384;
 	Poco::Buffer<UCHAR> memory(outBufLen);
 	ULONG flags = (GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_INCLUDE_PREFIX);
-#if (POCO_OS != POCO_OS_WINDOWS_CE)
+#ifdef GAA_FLAG_INCLUDE_ALL_INTERFACES
 	flags |= GAA_FLAG_INCLUDE_ALL_INTERFACES;
 #endif
 #if defined(POCO_HAVE_IPv6)
@@ -965,11 +971,19 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		unsigned ifIndex = 0;
 
 #if defined(POCO_HAVE_IPv6)
+	#if defined (IP_ADAPTER_IPV6_ENABLED)
 		if (pAddress->Flags & IP_ADAPTER_IPV6_ENABLED) ifIndex = pAddress->Ipv6IfIndex;
-		else
+	#else
+		ifIndex = pAddress->Ipv6IfIndex;
+	#endif
 #endif
+#if defined (IP_ADAPTER_IPV4_ENABLED)
 		if (pAddress->Flags & IP_ADAPTER_IPV4_ENABLED) ifIndex = pAddress->IfIndex;
-		
+#else
+		ifIndex = pAddress->IfIndex;
+#endif	
+		if (ifIndex == 0) continue;
+
 		std::string name;
 		std::string displayName;
 #ifdef POCO_WIN32_UTF8
@@ -999,7 +1013,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			ifIt->second.impl().setFlags(pAddress->Flags, pAddress->IfType);
 			ifIt->second.impl().setMtu(pAddress->Mtu);
 			ifIt->second.impl().setUp(pAddress->OperStatus == IfOperStatusUp);
+#if (_WIN32_WINNT >= 0x0600) // Vista and newer only
 			ifIt->second.impl().setRunning(pAddress->ReceiveLinkSpeed > 0 || pAddress->TransmitLinkSpeed > 0);
+#endif
 			ifIt->second.impl().setType(fromNative(pAddress->IfType));
 			if (pAddress->PhysicalAddressLength)
 				ifIt->second.impl().setMACAddress(pAddress->PhysicalAddress, pAddress->PhysicalAddressLength);
@@ -1008,7 +1024,6 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				pUniAddr; 
 				pUniAddr = pUniAddr->Next)
 			{
-				UINT8 prefixLength = pUniAddr->OnLinkPrefixLength;
 				address = IPAddress(pUniAddr->Address);
 				ADDRESS_FAMILY family = pUniAddr->Address.lpSockaddr->sa_family;
 				switch (family)
@@ -1017,12 +1032,31 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				{
 					// Windows lists broadcast address on localhost
 					bool hasBroadcast = (pAddress->IfType == IF_TYPE_ETHERNET_CSMACD) || (pAddress->IfType == IF_TYPE_SOFTWARE_LOOPBACK);
-					// On Windows, a valid broadcast address will be all 1's (== address | ~subnetMask); we go an extra mile here in order to
-					// make sure we reflect the actual value held by system and protect against misconfiguration (e.g. bad DHCP config entry)
-					broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address); 
-					subnetMask = prefixLength ? IPAddress(prefixLength, IPAddress::IPv4) : IPAddress();
 					if (hasBroadcast)
+					{
+						// On Windows, a valid broadcast address will be all 1's (== address | ~subnetMask); additionaly, on pre-Vista versions of
+						// OS, master address structure does not contain member for prefix length; we go an extra mile here in order to make sure
+						// we reflect the actual values held by system and protect against misconfiguration (e.g. bad DHCP config entry)
+#if (_WIN32_WINNT >= 0x0600) // Vista and newer
+						UINT8 prefixLength = pUniAddr->OnLinkPrefixLength;
+						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
+#else
+						ULONG prefixLength = 0;
+						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
+						// if previous call did not do it, make last-ditch attempt for prefix and broadcast
+						if (prefixLength == 0 && pAddress->FirstPrefix)
+							prefixLength = pAddress->FirstPrefix->Length;
+						poco_assert (prefixLength <= 32);
+						if (broadcastAddress.isWildcard())
+						{
+							IPAddress mask ((unsigned) prefixLength, IPAddress::IPv4);
+							IPAddress host(mask & address);
+							broadcastAddress = host | ~mask;
+						}
+#endif
+						subnetMask = prefixLength ? IPAddress(prefixLength, IPAddress::IPv4) : IPAddress();
 						ifIt->second.addAddress(address, subnetMask, broadcastAddress);
+					}
 					else
 						ifIt->second.addAddress(address);
 				} break;

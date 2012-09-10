@@ -224,7 +224,9 @@ void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV
 	{
 		init(address.af());
 	}
+#ifdef IPV6_V6ONLY)
 	setOption(IPPROTO_IPV6, IPV6_V6ONLY, ipV6Only ? 1 : 0);
+#endif
 	if (reuseAddress)
 	{
 		setReuseAddress(true);

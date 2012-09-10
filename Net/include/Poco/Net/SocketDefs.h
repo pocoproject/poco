@@ -89,6 +89,9 @@
 	#define POCO_TRY_AGAIN       WSATRY_AGAIN
 	#define POCO_NO_RECOVERY     WSANO_RECOVERY
 	#define POCO_NO_DATA         WSANO_DATA
+	#ifndef ADDRESS_FAMILY
+		#define ADDRESS_FAMILY USHORT
+	#endif
 #elif defined(POCO_VXWORKS)
 	#include <hostLib.h>
 	#include <ifLib.h>

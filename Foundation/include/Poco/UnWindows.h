@@ -54,6 +54,13 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+// Reduce bloat
+#if defined(_WIN32)
+	#if !defined(WIN32_LEAN_AND_MEAN) && !defined(POCO_BLOATED_WIN32)
+		#define WIN32_LEAN_AND_MEAN
+	#endif
+#endif
+
 
 #include <windows.h>
 

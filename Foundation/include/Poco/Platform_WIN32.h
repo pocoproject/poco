@@ -41,6 +41,11 @@
 #define Foundation_Platform_WIN32_INCLUDED
 
 
+#if defined(_MSC_VER) && !defined(POCO_MSVC_SECURE_WARNINGS)
+	#define _CRT_SECURE_NO_DEPRECATE
+#endif 
+
+
 // Verify that we're built with the multithreaded 
 // versions of the runtime libraries
 #if defined(_MSC_VER) && !defined(_MT)
@@ -52,20 +57,6 @@
 #if defined(NDEBUG) && defined(_DEBUG)
 	#error Inconsistent build settings (check for /MD[d])
 #endif
-
-
-// Reduce bloat imported by "Poco/UnWindows.h"
-#if defined(_WIN32)
-//	#if !defined(_WIN32_WINNT)
-//		#define _WIN32_WINNT 0x0501
-//	#endif
-	#if !defined(WIN32_LEAN_AND_MEAN) && !defined(POCO_BLOATED_WIN32)
-		#define WIN32_LEAN_AND_MEAN
-	#endif
-#endif
-
-
-#include "Poco/UnWindows.h"
 
 
 #if !defined(_WIN32_WINNT)
@@ -88,9 +79,29 @@
 	#elif defined (_WIN32_WINNT_WIN2K)
 		//Windows 2000 _WIN32_WINNT_WIN2K (0x0500)
 		#define _WIN32_WINNT _WIN32_WINNT_WIN2K
+	#elif defined (WINVER)
+		#define _WIN32_WINNT WINVER
 	#else
 		#define _WIN32_WINNT 0x0500
 	#endif
+#endif
+
+  
+#if (_MSC_VER >= 1300) && (_MSC_VER < 1400) // Visual Studio 2003, MSVC++ 7.1
+	#define POCO_MSVS_VERSION 2003
+	#define POCO_MSVC_VERSION 71
+#elif (_MSC_VER >= 1400) && (_MSC_VER < 1500) // Visual Studio 2005, MSVC++ 8.0
+	#define POCO_MSVS_VERSION 2005
+	#define POCO_MSVC_VERSION 80
+#elif (_MSC_VER >= 1500) && (_MSC_VER < 1600) // Visual Studio 2008, MSVC++ 9.0
+	#define POCO_MSVS_VERSION 2008
+	#define POCO_MSVC_VERSION 90
+#elif (_MSC_VER >= 1600) && (_MSC_VER < 1700) // Visual Studio 2010, MSVC++ 10.0
+	#define POCO_MSVS_VERSION 2010
+	#define POCO_MSVC_VERSION 100
+#elif (_MSC_VER >= 1700) && (_MSC_VER < 1800) // Visual Studio 2011, MSVC++ 11.0
+	#define POCO_MSVS_VERSION 2011
+	#define POCO_MSVC_VERSION 110
 #endif
 
 
@@ -103,14 +114,15 @@
 // Turn off some annoying warnings
 #if defined(_MSC_VER)
 	#pragma warning(disable:4018)	// signed/unsigned comparison
-	#pragma warning(disable:4251)	// ... needs to have dll-interface warning 
-	#pragma warning(disable:4355)	// 'this' : used in base member initializer list
-	#pragma warning(disable:4996)	// VC++ 8.0 deprecation warnings
-	#pragma warning(disable:4351)	// new behavior: elements of array '...' will be default initialized
-	#pragma warning(disable:4675)	// resolved overload was found by argument-dependent lookup
-	#pragma warning(disable:4275)	// non dll-interface class 'std::exception' used as base for dll-interface class 'Poco::Exception'
 	#pragma warning(disable:4250)	// VC++ 11.0: inheriting from std stream classes produces C4250 warning;
 									// see <http://connect.microsoft.com/VisualStudio/feedback/details/733720/inheriting-from-std-fstream-produces-c4250-warning>
+	#pragma warning(disable:4251)	// ... needs to have dll-interface warning
+	#pragma warning(disable:4275)	// non dll-interface class 'std::exception' used as base for dll-interface class 'Poco::Exception'
+	#pragma warning(disable:4344)	// behavior change: use of explicit template arguments results in call to '...' but '...' is a better match
+	#pragma warning(disable:4351)	// new behavior: elements of array '...' will be default initialized
+	#pragma warning(disable:4355)	// 'this' : used in base member initializer list
+	#pragma warning(disable:4675)	// resolved overload was found by argument-dependent lookup
+	#pragma warning(disable:4996)	// VC++ 8.0 deprecation warnings
 #endif
 
 
