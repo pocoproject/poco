@@ -34,6 +34,9 @@
 //
 
 
+#ifdef __GNUC__
+// TODO: determine g++ version able to do the right thing without these specializations
+
 #include "Poco/Data/DynamicLOB.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Dynamic/Var.h"
@@ -83,3 +86,7 @@ Var::operator BLOB () const
 
 
 } } // namespace Poco::Data
+
+
+#endif // __GNUC__
+

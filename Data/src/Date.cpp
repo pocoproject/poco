@@ -114,13 +114,22 @@ bool Date::operator < (const Date& date)
 
 Date& Date::operator = (const Var& var)
 {
-	*this = var.operator Date(); // g++ workaround
+#ifndef __GNUC__
+// g++ used to choke on this, newer versions seem to digest it fine
+// TODO: determine the version able to handle it properly
+	*this = var.extract<Date>();
+#else
+	*this = var.operator Date();
+#endif
 	return *this;
 }
 
 
 } } // namespace Poco::Data
 
+
+#ifdef __GNUC__
+// only needed for g++ (see comment in Date::operator = above)
 
 namespace Poco {
 namespace Dynamic {
@@ -148,3 +157,6 @@ Var::operator Date () const
 
 
 } } // namespace Poco::Dynamic
+
+
+#endif // __GNUC__

@@ -111,13 +111,22 @@ bool Time::operator < (const Time& time)
 
 Time& Time::operator = (const Var& var)
 {
-	*this = var.operator Time(); // g++ workaround
+#ifndef __GNUC__
+// g++ used to choke on this, newer versions seem to digest it fine
+// TODO: determine the version able to handle it properly
+	*this = var.extract<Time>();
+#else
+	*this = var.operator Time(); 
+#endif
 	return *this;
 }
 
 
 } } // namespace Poco::Data
 
+
+#ifdef __GNUC__
+// only needed for g++ (see comment in Time::operator = above)
 
 namespace Poco {
 namespace Dynamic {
@@ -145,3 +154,6 @@ Var::operator Time () const
 
 
 } } // namespace Poco::Dynamic
+
+
+#endif // __GNUC__
