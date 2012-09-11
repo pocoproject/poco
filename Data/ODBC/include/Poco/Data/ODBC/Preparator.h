@@ -226,6 +226,9 @@ public:
 	void prepare(std::size_t pos, const long& val);
 		/// Prepares a long.
 
+	void prepare(std::size_t pos, const unsigned long& val);
+		/// Prepares an unsigned long.
+
 	void prepare(std::size_t pos, const std::vector<long>& val);
 		/// Prepares a long vector.
 
@@ -870,6 +873,12 @@ inline void Preparator::prepare(std::size_t pos, const std::list<Poco::UInt64>& 
 
 #ifndef POCO_LONG_IS_64_BIT
 inline void Preparator::prepare(std::size_t pos, const long&)
+{
+	prepareFixedSize<long>(pos, SQL_C_SLONG);
+}
+
+
+inline void Preparator::prepare(std::size_t pos, const unsigned long&)
 {
 	prepareFixedSize<long>(pos, SQL_C_SLONG);
 }

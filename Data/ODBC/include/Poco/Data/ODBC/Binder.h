@@ -199,6 +199,9 @@ public:
 	void bind(std::size_t pos, const long& val, Direction dir);
 		/// Binds a long.
 
+	void bind(std::size_t pos, const unsigned long& val, Direction dir);
+		/// Binds an unsigned long.
+
 	void bind(std::size_t pos, const std::vector<long>& val, Direction dir);
 		/// Binds a long vector.
 
@@ -1115,6 +1118,12 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::UInt64>& val, Di
 
 #ifndef POCO_LONG_IS_64_BIT
 inline void Binder::bind(std::size_t pos, const long& val, Direction dir)
+{
+	bindImpl(pos, val, SQL_C_SLONG, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const unsigned long& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_SLONG, dir);
 }

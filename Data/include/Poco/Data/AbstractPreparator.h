@@ -184,6 +184,9 @@ public:
 	virtual void prepare(std::size_t pos, const long&) = 0;
 		/// Prepares a long.
 
+	virtual void prepare(std::size_t pos, const unsigned long&) = 0;
+		/// Prepares an unsigned long.
+
 	virtual void prepare(std::size_t pos, const std::vector<long>& val);
 		/// Prepares a long vector.
 

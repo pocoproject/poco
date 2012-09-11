@@ -94,6 +94,11 @@ void Preparator::prepare(std::size_t pos, const Poco::UInt64&)
 void Preparator::prepare(std::size_t pos, const long&)
 {
 }
+
+
+void Preparator::prepare(std::size_t pos, const unsigned long&)
+{
+}
 #endif
 
 

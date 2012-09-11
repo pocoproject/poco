@@ -114,6 +114,13 @@ void Binder::bind(std::size_t pos, const long& val, Direction dir)
 	poco_assert(dir == PD_IN);
 	realBind(pos, MYSQL_TYPE_LONGLONG, &val, 0);
 }
+
+
+void Binder::bind(std::size_t pos, const unsigned long& val, Direction dir)
+{
+	poco_assert(dir == PD_IN);
+	realBind(pos, MYSQL_TYPE_LONGLONG, &val, 0);
+}
 #endif
 
 

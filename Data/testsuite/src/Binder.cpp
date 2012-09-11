@@ -94,6 +94,11 @@ void Binder::bind(std::size_t pos, const Poco::UInt64 &val, Direction dir)
 void Binder::bind(std::size_t pos, const long& val, Direction dir)
 {
 }
+
+
+void Binder::bind(std::size_t pos, const unsigned long& val, Direction dir)
+{
+}
 #endif
 
 

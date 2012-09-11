@@ -288,7 +288,7 @@ void SQLiteTest::testBinding()
 	tmp << "SELECT name FROM sqlite_master WHERE tbl_name=?", use(tableName), into(result), now;
 	assert (result == tableName);
 
-	// following will not compile:
+	// following should not compile:
 	//tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", use("Simpson"), use("Bart"), use("Springfield"), use(age), now;
 	//tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", use(lastName), use(firstName), use(address), use(12), now;
 	//tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", useRef(lastName), useRef(firstName), useRef(address), useRef(12), now;

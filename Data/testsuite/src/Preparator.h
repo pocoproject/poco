@@ -82,6 +82,9 @@ public:
 #ifndef POCO_LONG_IS_64_BIT
 	void prepare(std::size_t pos, const long&);
 		/// Preparations a long.
+
+	void prepare(std::size_t pos, const unsigned long&);
+		/// Preparations an unsigned long.
 #endif
 
 	void prepare(std::size_t pos, const bool&);

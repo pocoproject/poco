@@ -178,6 +178,9 @@ public:
 	virtual bool extract(std::size_t pos, long& val) = 0;
 		/// Extracts a long. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, unsigned long& val) = 0;
+		/// Extracts an unsigned long. Returns false if null was received.
+
 	virtual bool extract(std::size_t pos, std::vector<long>& val);
 		/// Extracts a long vector.
 

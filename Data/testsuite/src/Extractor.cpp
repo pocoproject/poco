@@ -105,6 +105,13 @@ bool Extractor::extract(std::size_t pos, long& val)
 	val = 0;
 	return true;
 }
+
+
+bool Extractor::extract(std::size_t pos, unsigned long& val)
+{
+	val = 0;
+	return true;
+}
 #endif
 
 

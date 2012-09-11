@@ -177,6 +177,9 @@ public:
 	bool extract(std::size_t pos, long& val);
 		/// Extracts a long.
 
+	bool extract(std::size_t pos, unsigned long& val);
+		/// Extracts an unsigned long.
+
 	bool extract(std::size_t pos, std::vector<long>& val);
 		/// Extracts a long vector.
 

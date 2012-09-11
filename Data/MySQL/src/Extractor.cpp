@@ -104,9 +104,14 @@ bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 
 #ifndef POCO_LONG_IS_64_BIT
 bool Extractor::extract(std::size_t pos, long& val)
-		/// Extracts a long. Returns false if null was received.
 {
-	return realExtractFixed(pos, MYSQL_TYPE_LONGLONG, &val);
+	return realExtractFixed(pos, MYSQL_TYPE_LONG, &val);
+}
+
+
+bool Extractor::extract(std::size_t pos, unsigned long& val)
+{
+	return realExtractFixed(pos, MYSQL_TYPE_LONG, &val);
 }
 #endif
 

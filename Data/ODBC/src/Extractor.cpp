@@ -517,6 +517,15 @@ bool Extractor::extract(std::size_t pos, long& val)
 }
 
 
+bool Extractor::extract(std::size_t pos, unsigned long& val)
+{
+	if (Preparator::DE_MANUAL == _dataExtraction)
+		return extractManualImpl(pos, val, SQL_C_SLONG);
+	else
+		return extractBoundImpl(pos, val);
+}
+
+
 bool Extractor::extract(std::size_t pos, std::vector<long>& val)
 {
 	if (Preparator::DE_BOUND == _dataExtraction)

@@ -41,6 +41,9 @@
 #ifndef PDF_PDF_INCLUDED
 #define PDF_PDF_INCLUDED
 
+#if defined(_MSC_VER) && !defined(POCO_MSVC_SECURE_WARNINGS) && !defined(_CRT_SECURE_NO_DEPRECATE)
+	#define _CRT_SECURE_NO_DEPRECATE
+#endif
 
 #include "Poco/Foundation.h"
 #include "hpdf.h"

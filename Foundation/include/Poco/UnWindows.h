@@ -54,6 +54,11 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
+#ifndef Foundation_UnWindows_INCLUDED
+#define Foundation_UnWindows_INCLUDED
+
+
 // Reduce bloat
 #if defined(_WIN32)
 	#if !defined(WIN32_LEAN_AND_MEAN) && !defined(POCO_BLOATED_WIN32)
@@ -62,12 +67,20 @@
 #endif
 
 
+#if defined(_WIN32_WINNT) && (_WIN32_WINNT < 0x0501)
+	#error unsupported OS version
+#elif !defined(_WIN32_WINNT)
+	// define minimum supported
+	#define _WIN32_WINNT 0x0501
+#endif
+
+
 #include <windows.h>
 
 
 #if !defined(POCO_NO_UNWINDOWS)
 // A list of annoying macros to #undef.
-// Feel free to extend as required.
+// Extend as required.
 #undef GetBinaryType
 #undef GetShortPathName
 #undef GetLongPathName
@@ -115,3 +128,5 @@
 #undef GetVersion
 #undef GetObject
 #endif // POCO_NO_UNWINDOWS
+
+#endif // Foundation_UnWindows_INCLUDED
