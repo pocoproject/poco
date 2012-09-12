@@ -126,19 +126,18 @@ std::size_t StatementImpl::execute(const bool& reset)
 
 void StatementImpl::assignSubTotal(bool reset)
 {
-	typedef CountVec::iterator IT;
 	if (_extractors.size() == _subTotalRowCount.size())
 	{
-		IT it  = _subTotalRowCount.begin();
-		IT end = _subTotalRowCount.end();
+		CountVec::iterator it  = _subTotalRowCount.begin();
+		CountVec::iterator end = _subTotalRowCount.end();
 		for (int counter = 0; it != end; ++it, ++counter)
 		{
 			if (_extractors[counter].size())
 			{
 				if (reset)
-					*it += IT::value_type(_extractors[counter][0]->numOfRowsHandled());
+					*it += CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
 				else
-					*it = IT::value_type(_extractors[counter][0]->numOfRowsHandled());
+					*it = CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
 			}
 		}
 	}
