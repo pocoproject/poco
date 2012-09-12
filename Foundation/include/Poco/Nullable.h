@@ -146,7 +146,7 @@ public:
 	bool operator!=(const C& value) const
 		/// Compares Nullable with value for non equality
 	{
-		return !(*this == other);
+		return _value != value;
 	}
 
 	bool operator!=(const Nullable<C>& other) const
