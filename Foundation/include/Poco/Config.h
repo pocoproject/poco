@@ -67,7 +67,7 @@
 // Define to desired default thread stack size
 // Zero means OS default
 #ifndef POCO_THREAD_STACK_SIZE
-#define POCO_THREAD_STACK_SIZE 0
+	#define POCO_THREAD_STACK_SIZE 0
 #endif
 
 

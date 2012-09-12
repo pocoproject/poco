@@ -36,6 +36,9 @@
 //
 
 
+#ifndef POCO_NO_WSTRING
+
+
 #ifndef Foundation_UnicodeConverter_INCLUDED
 #define Foundation_UnicodeConverter_INCLUDED
 
@@ -79,3 +82,5 @@ public:
 
 
 #endif // Foundation_UnicodeConverter_INCLUDED
+
+#endif // POCO_NO_WSTRING
