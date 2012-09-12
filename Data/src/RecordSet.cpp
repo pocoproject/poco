@@ -311,7 +311,7 @@ bool RecordSet::moveLast()
 
 void RecordSet::setRowFormatter(RowFormatter* pRowFormatter)
 {
-	pRowFormatter->setTotalRowCount(getTotalRowCount());
+	pRowFormatter->setTotalRowCount(static_cast<int>(getTotalRowCount()));
 	Statement::setRowFormatter(pRowFormatter);
 	RowMap::iterator it = _rowMap.begin();
 	RowMap::iterator end = _rowMap.end();
@@ -348,7 +348,7 @@ void RecordSet::formatValues(std::size_t offset, std::size_t length) const
 std::ostream& RecordSet::copy(std::ostream& os, std::size_t offset, std::size_t length) const
 {
 	RowFormatter& rf = const_cast<RowFormatter&>((*_pBegin)->getFormatter());
-	rf.setTotalRowCount(getTotalRowCount());
+	rf.setTotalRowCount(static_cast<int>(getTotalRowCount()));
 	if (RowFormatter::FORMAT_PROGRESSIVE == rf.getMode())
 	{
 		os << rf.prefix();

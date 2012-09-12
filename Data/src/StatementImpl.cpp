@@ -126,18 +126,19 @@ std::size_t StatementImpl::execute(const bool& reset)
 
 void StatementImpl::assignSubTotal(bool reset)
 {
+	typedef CountVec::iterator IT;
 	if (_extractors.size() == _subTotalRowCount.size())
 	{
-		CountVec::iterator it  = _subTotalRowCount.begin();
-		CountVec::iterator end = _subTotalRowCount.end();
+		IT it  = _subTotalRowCount.begin();
+		IT end = _subTotalRowCount.end();
 		for (int counter = 0; it != end; ++it, ++counter)
 		{
 			if (_extractors[counter].size())
 			{
 				if (reset)
-					*it += _extractors[counter][0]->numOfRowsHandled();
+					*it += IT::value_type(_extractors[counter][0]->numOfRowsHandled());
 				else
-					*it = _extractors[counter][0]->numOfRowsHandled();
+					*it = IT::value_type(_extractors[counter][0]->numOfRowsHandled());
 			}
 		}
 	}
@@ -434,7 +435,7 @@ void StatementImpl::removeBind(const std::string& name)
 
 std::size_t StatementImpl::columnsExtracted(int dataSet) const
 {
-	if (USE_CURRENT_DATA_SET == dataSet) dataSet = _curDataSet;
+	if (USE_CURRENT_DATA_SET == dataSet) dataSet = static_cast<int>(_curDataSet);
 	if (_columnsExtracted.size() > 0)
 	{
 		poco_assert (dataSet >= 0 && dataSet < _columnsExtracted.size());
@@ -447,7 +448,7 @@ std::size_t StatementImpl::columnsExtracted(int dataSet) const
 
 std::size_t StatementImpl::rowsExtracted(int dataSet) const
 {
-	if (USE_CURRENT_DATA_SET == dataSet) dataSet = _curDataSet;
+	if (USE_CURRENT_DATA_SET == dataSet) dataSet = static_cast<int>(_curDataSet);
 	if (extractions().size() > 0)
 	{
 		poco_assert (dataSet >= 0 && dataSet < _extractors.size());
@@ -461,7 +462,7 @@ std::size_t StatementImpl::rowsExtracted(int dataSet) const
 
 std::size_t StatementImpl::subTotalRowCount(int dataSet) const
 {
-	if (USE_CURRENT_DATA_SET == dataSet) dataSet = _curDataSet;
+	if (USE_CURRENT_DATA_SET == dataSet) dataSet = static_cast<int>(_curDataSet);
 	if (_subTotalRowCount.size() > 0)
 	{
 		poco_assert (dataSet >= 0 && dataSet < _subTotalRowCount.size());
