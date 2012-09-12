@@ -52,12 +52,13 @@ namespace Poco {
 template <typename C>
 class Nullable
 	/// Nullable is a simple wrapper class for value types
-	/// that allows to introduce a "null" value or state
-	/// to value objects.
+	/// that allows objects or native type variables 
+	/// to have "null" value.
 	///
 	/// The class is useful for passing parameters to functions
 	/// when parameters are optional and no default values 
-	/// should be used.
+	/// should be used or when a non-assigned state is needed,
+	/// such as in e.g. fetching null values from database.
 	///
 	/// A Nullable can be default constructed. In this case, 
 	/// the Nullable will have a Null value and isNull() will
@@ -116,16 +117,19 @@ public:
 	}
 	
 	Nullable& operator = (const C& value)
+		/// Assigns a value to the Nullable.
 	{
 		return assign(value);
 	}
 
 	Nullable& operator = (const Nullable& other)
+		/// Assigns another Nullable.
 	{
 		return assign(other);
 	}
 
 	void swap(Nullable& other)
+		/// Swaps this Nullable with other.
 	{
 		std::swap(_value, other._value);
 		std::swap(_isNull, other._isNull);
@@ -158,7 +162,7 @@ public:
 	bool operator < (const Nullable<C>& other) const
 		/// Compares two Nullable objects. Return true if this object's
 		/// value is smaler than the other object's value.
-		/// Null value is smaller than any non-null value.
+		/// Null value is smaller than a non-null value.
 	{
 		if (_isNull && other._isNull) return false;
 
@@ -173,7 +177,7 @@ public:
 	bool operator > (const Nullable<C>& other) const
 		/// Compares two Nullable objects. Return true if this object's
 		/// value is greater than the other object's value.
-		/// Any non-null value is greater than a null value.
+		/// A non-null value is greater than a null value.
 	{
 		return !(*this == other) && !(*this < other);
 	}
@@ -221,7 +225,7 @@ public:
 	}
 
 private:
-	C _value;
+	C    _value;
 	bool _isNull;
 };
 
@@ -240,6 +244,7 @@ std::ostream& operator<<(std::ostream& out, const Nullable<C>& obj)
 	return out;
 }
 
+	
 } // namespace Poco
 
 
