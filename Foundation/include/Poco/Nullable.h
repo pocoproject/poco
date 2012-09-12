@@ -43,6 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#include <iostream>
 
 
 namespace Poco {
@@ -130,6 +131,53 @@ public:
 		std::swap(_isNull, other._isNull);
 	}
 
+	bool operator==(const Nullable<C>& other) const
+		/// Compares two Nullables for equality
+	{
+		return (_isNull && other._isNull) || (_isNull == other._isNull && _value == other._value);
+	}
+
+	bool operator==(const C& value) const
+		/// Compares Nullable with value for equality
+	{
+		return (!_isNull && _value == value);
+	}
+
+	bool operator!=(const C& value) const
+		/// Compares Nullable with value for non equality
+	{
+		return !(*this == other);
+	}
+
+	bool operator!=(const Nullable<C>& other) const
+		/// Compares two Nullables for non equality
+	{
+		return !(*this == other);
+	}
+
+	bool operator < (const Nullable<C>& other) const
+		/// Compares two Nullable objects. Return true if this object's
+		/// value is smaler than the other object's value.
+		/// Null value is smaller than any non-null value.
+	{
+		if (_isNull && other._isNull) return false;
+
+		if (!_isNull && !other._isNull)
+			return (_value < other._value);
+
+		if (_isNull && !other._isNull) return true;
+
+		return false;
+	}
+
+	bool operator > (const Nullable<C>& other) const
+		/// Compares two Nullable objects. Return true if this object's
+		/// value is greater than the other object's value.
+		/// Any non-null value is greater than a null value.
+	{
+		return !(*this == other) && !(*this < other);
+	}
+
 	const C& value() const
 		/// Returns the Nullable's value.
 		///
@@ -146,6 +194,18 @@ public:
 		/// given default value if the Nullable is empty.
 	{
 		return _isNull ? deflt : _value;
+	}
+
+	operator C& ()
+		/// Get reference to the value
+	{
+		return value();
+	}
+
+	operator const C& () const
+		/// Get const reference to the value
+	{
+		return value();
 	}
 
 	bool isNull() const
@@ -172,6 +232,13 @@ inline void swap(Nullable<C>& n1, Nullable<C>& n2)
 	n1.swap(n2);
 }
 
+
+template <typename C>
+std::ostream& operator<<(std::ostream& out, const Nullable<C>& obj) 
+{
+	if (!obj.isNull()) out << obj.value();
+	return out;
+}
 
 } // namespace Poco
 

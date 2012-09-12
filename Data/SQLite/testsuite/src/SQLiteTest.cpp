@@ -44,7 +44,7 @@
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Data/TypeHandler.h"
-#include "Poco/Data/Nullable.h"
+#include "Poco/Nullable.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Tuple.h"
@@ -75,8 +75,8 @@ using Poco::Data::Time;
 using Poco::Data::AbstractExtractionVec;
 using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBindingVec;
-using Poco::Data::Nullable;
 using Poco::Data::NotConnectedException;
+using Poco::Nullable;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;

@@ -65,7 +65,6 @@ public:
 	void testRowFormat();
 	void testDateAndTime();
 	void testExternalBindingAndExtraction();
-	void testNullable();
 
 	void setUp();
 	void tearDown();

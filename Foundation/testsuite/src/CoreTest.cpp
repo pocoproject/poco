@@ -47,6 +47,7 @@
 #include "Poco/Delegate.h"
 #include "Poco/Exception.h"
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <cstring>
 
@@ -750,10 +751,39 @@ void CoreTest::testAtomicCounter()
 
 void CoreTest::testNullable()
 {
+	Nullable<int> i;
+	Nullable<double> f;
+	Nullable<std::string> s;
+
+	assert (i.isNull());
+	assert (f.isNull());
+	assert (s.isNull());
+
+	i = 1;
+	f = 1.5;
+	s = "abc";
+
+	assert (!i.isNull());
+	assert (!f.isNull());
+	assert (!s.isNull());
+
+	assert (i == 1);
+	assert (f == 1.5);
+	assert (s == "abc");
+
+	i.clear();
+	f.clear();
+	s.clear();
+
+	assert (i.isNull());
+	assert (f.isNull());
+	assert (s.isNull());
+
 	Nullable<int> n1;
 	assert (n1.isNull());
 	
 	assert (n1.value(42) == 42);
+	assert (n1.isNull());
 	
 	try
 	{
@@ -777,8 +807,27 @@ void CoreTest::testNullable()
 	assert (!n1.isNull());
 	assert (n1.value() == 42);
 	
+	std::ostringstream str;
+	str << n1;
+	assert (str.str() == "42");
+
 	n1.clear();
 	assert (n1.isNull());
+
+	str.str(""); str << n1;
+	assert (str.str().empty());
+
+	n2.clear();
+	assert (n1 == n2);
+	n1 = 1; n2 = 1;
+	assert (n1 == n2);
+	n1.clear();
+	assert (n1 < n2);
+	assert (n2 > n1);
+	n2 = -1; n1 = 0;
+	assert (n2 < n1);
+	assert (n2 != n1);
+	assert (n1 > n2);
 }
 
 

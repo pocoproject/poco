@@ -44,7 +44,7 @@
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Data/AbstractPreparator.h"
-#include "Poco/Data/Nullable.h"
+#include "Poco/Nullable.h"
 #include "Poco/Tuple.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/SharedPtr.h"
@@ -285,7 +285,7 @@ public:
 		}
 		else 
 		{
-			pBinder->bind(pos++, obj.getValue(), dir);
+			pBinder->bind(pos++, obj.value(), dir);
 		}
 	}
 	
@@ -298,7 +298,7 @@ public:
 		}
 		else 
 		{
-			pPreparator->prepare(pos++, (T&)obj.getValue());
+			pPreparator->prepare(pos++, (T&)obj.value());
 		}
 	}
 
@@ -310,15 +310,15 @@ public:
 	static void extract(std::size_t pos, Nullable<T>& obj, const Nullable<T>& , AbstractExtractor* pExt) 
 	{
 		poco_assert_dbg (pExt != 0);
-		T value;
+		T val;
 	
-		if (pExt->extract(pos++, value)) 
+		if (pExt->extract(pos++, val)) 
 		{
-			obj.setValue(value);
+			obj.value(val);
 		}
 		else 
 		{
-			obj.setNull(true);
+			obj.clear();
 		}
 	}
 
