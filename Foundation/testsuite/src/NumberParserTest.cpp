@@ -68,6 +68,9 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parse("-123") == -123);
 	assert(NumberParser::parseUnsigned("123") == 123);
 	assert(NumberParser::parseHex("12AB") == 0x12ab);
+	assert(NumberParser::parseHex("0x12AB") == 0x12ab);
+	assert(NumberParser::parseOct("123") == 0123);
+	assert(NumberParser::parseOct("0123") == 0123);
 
 	assert(NumberParser::parseBool("0") == false);
 	assert(NumberParser::parseBool("FALSE") == false);
@@ -81,6 +84,9 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parse64("-123") == -123);
 	assert(NumberParser::parseUnsigned64("123") == 123);
 	assert(NumberParser::parseHex64("12AB") == 0x12ab);
+	assert(NumberParser::parseHex64("0x12AB") == 0x12ab);
+	assert(NumberParser::parseOct64("123") == 0123);
+	assert(NumberParser::parseOct64("0123") == 0123);
 #endif
 
 	assertEqualDelta(12.34, NumberParser::parseFloat("12.34"), 0.01);

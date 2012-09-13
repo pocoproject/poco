@@ -41,6 +41,10 @@
 
 
 #include "Poco/Foundation.h"
+#include <string>
+#undef min
+#undef max
+#include <limits>
 
 
 namespace Poco {
@@ -76,6 +80,15 @@ public:
 		/// Parses an unsigned integer value in hexadecimal notation from the given string.
 		/// Returns true if a valid integer has been found, false otherwise. 
 
+	static unsigned parseOct(const std::string& s);
+		/// Parses an integer value in octal notation from the given string.
+		/// Throws a SyntaxException if the string does not hold a number in
+		/// hexadecimal notation.
+
+	static bool tryParseOct(const std::string& s, unsigned& value);
+		/// Parses an unsigned integer value in octal notation from the given string.
+		/// Returns true if a valid integer has been found, false otherwise. 
+
 #if defined(POCO_HAVE_INT64)
 
 	static Int64 parse64(const std::string& s);
@@ -100,6 +113,14 @@ public:
 
 	static bool tryParseHex64(const std::string& s, UInt64& value);
 		/// Parses an unsigned 64-bit integer value in hexadecimal notation from the given string.
+		/// Returns true if a valid integer has been found, false otherwise. 
+
+	static UInt64 parseOct64(const std::string& s);
+		/// Parses a 64 bit-integer value in octal notation from the given string.
+		/// Throws a SyntaxException if the string does not hold a number in hexadecimal notation.
+
+	static bool tryParseOct64(const std::string& s, UInt64& value);
+		/// Parses an unsigned 64-bit integer value in octal notation from the given string.
 		/// Returns true if a valid integer has been found, false otherwise. 
 
 #endif // defined(POCO_HAVE_INT64)
@@ -130,6 +151,124 @@ public:
 		/// String forms are NOT case sensitive.
 		/// Returns true if a valid bool number has been found,
 		/// false otherwise.
+
+private:
+
+	template <typename T>
+	static bool strToIntOct(const std::string &s, T& result) 
+	{
+		if (s.empty()) return false;
+		if (std::numeric_limits<T>::is_signed) return false;
+		std::string::const_iterator it = s.begin();
+		std::string::const_iterator end = s.end();
+		while (std::isspace(*it)) ++it;
+		while (*it == '0') ++it;
+
+		unsigned base = 010;
+		T n = 0;
+		for (; it != end; ++it)
+		{
+			if (*it >= '0' && *it <= '7')
+			{
+				if (n > (std::numeric_limits<T>::max() / base))
+					return false;
+				n = n * base + *it - '0';
+			}
+			else break;
+		}
+		if (it != end)
+		{
+			while (std::isspace(*it)) ++it;
+			if (it != end) return false;
+		}
+
+		result = n;
+		return true;
+	}
+
+	template <typename T>
+	static bool strToIntDec(const std::string &s, T& result) 
+	{
+		if (s.empty()) return false;
+		int sign = 1;
+		std::string::const_iterator it = s.begin();
+		std::string::const_iterator end = s.end();
+		while (std::isspace(*it)) ++it;
+		if (std::numeric_limits<T>::is_signed)
+		{
+			if (*it == '-') 
+			{ 
+				sign = -1; 
+				++it; 
+			}
+			else if (*it == '+') ++it;
+		}
+
+		unsigned base = 10;
+		T n = 0;
+		for (; it != end; ++it)
+		{
+			if (*it >= '0' && *it <= '9')
+			{
+				if (n > (std::numeric_limits<T>::max() / base))
+					return false;
+				n = n * base + *it - '0';
+			}
+			else break;
+		}
+		if (it != end)
+		{
+			while (std::isspace(*it)) ++it;
+			if (it != end) return false;
+		}
+
+		result = sign * n;
+		return true;
+	}
+
+	template <typename T>
+	static bool strToIntHex(const std::string &s, T& result) 
+	{
+		if (s.empty()) return false;
+		if (std::numeric_limits<T>::is_signed) return false;
+		std::string::const_iterator it = s.begin();
+		std::string::const_iterator end = s.end();
+		while (std::isspace(*it)) ++it;
+		
+		bool beginWithZero = false;
+		if (*it == '0') 
+		{
+			beginWithZero = true;
+			++it;
+		}
+		if (beginWithZero && (*it != 'x') && (*it != 'X')) return false;
+		else if ((*it == 'x') || (*it == 'X')) ++it;
+
+		unsigned base = 0x10;
+		T n = 0;
+		for (; it != end; ++it)
+		{
+			if ((*it >= '0' && *it <= '9') || (*it >= 'A' && *it <= 'F'))
+			{
+				if (n > (std::numeric_limits<T>::max() / base))
+					return false;
+				
+				if (*it >= '0' && *it <= '9')
+					n = n * base + *it - '0';
+				else if (*it >= 'A' && *it <= 'F')
+					n = n * base + *it - 'A' + 10;
+			}
+			else break;
+		}
+		if (it != end)
+		{
+			while (std::isspace(*it)) ++it;
+			if (it != end) return false;
+		}
+
+		result = n;
+		return true;
+	}
 };
 
 

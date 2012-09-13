@@ -71,8 +71,7 @@ int NumberParser::parse(const std::string& s)
 
 bool NumberParser::tryParse(const std::string& s, int& value)
 {
-	char temp;
-	return std::sscanf(s.c_str(), "%d%c", &value, &temp) == 1;
+	return strToIntDec(s, value);
 }
 
 
@@ -88,8 +87,7 @@ unsigned NumberParser::parseUnsigned(const std::string& s)
 
 bool NumberParser::tryParseUnsigned(const std::string& s, unsigned& value)
 {
-	char temp;
-	return std::sscanf(s.c_str(), "%u%c", &value, &temp) == 1;
+	return strToIntDec(s, value);
 }
 
 
@@ -105,8 +103,23 @@ unsigned NumberParser::parseHex(const std::string& s)
 
 bool NumberParser::tryParseHex(const std::string& s, unsigned& value)
 {
-	char temp;
-	return std::sscanf(s.c_str(), "%x%c", &value, &temp) == 1;
+	return strToIntHex(s, value);
+}
+
+
+unsigned NumberParser::parseOct(const std::string& s)
+{
+	unsigned result;
+	if (tryParseOct(s, result))
+		return result;
+	else
+		throw SyntaxException("Not a valid hexadecimal integer", s);
+}
+
+
+bool NumberParser::tryParseOct(const std::string& s, unsigned& value)
+{
+	return strToIntOct(s, value);
 }
 
 
@@ -125,8 +138,7 @@ Int64 NumberParser::parse64(const std::string& s)
 
 bool NumberParser::tryParse64(const std::string& s, Int64& value)
 {
-	char temp;
-	return std::sscanf(s.c_str(), "%"I64_FMT"d%c", &value, &temp) == 1;
+	return strToIntDec(s, value);
 }
 
 
@@ -142,8 +154,7 @@ UInt64 NumberParser::parseUnsigned64(const std::string& s)
 
 bool NumberParser::tryParseUnsigned64(const std::string& s, UInt64& value)
 {
-	char temp;
-	return std::sscanf(s.c_str(), "%"I64_FMT"u%c", &value, &temp) == 1;
+	return strToIntDec(s, value);
 }
 
 
@@ -159,8 +170,23 @@ UInt64 NumberParser::parseHex64(const std::string& s)
 
 bool NumberParser::tryParseHex64(const std::string& s, UInt64& value)
 {
-	char temp;
-	return std::sscanf(s.c_str(), "%"I64_FMT"x%c", &value, &temp) == 1;
+	return strToIntHex(s, value);
+}
+
+
+UInt64 NumberParser::parseOct64(const std::string& s)
+{
+	UInt64 result;
+	if (tryParseOct64(s, result))
+		return result;
+	else
+		throw SyntaxException("Not a valid hexadecimal integer", s);
+}
+
+
+bool NumberParser::tryParseOct64(const std::string& s, UInt64& value)
+{
+	return strToIntOct(s, value);
 }
 
 
@@ -176,70 +202,70 @@ double NumberParser::parseFloat(const std::string& s)
 		throw SyntaxException("Not a valid floating-point number", s);
 }
 
-        
+
 bool NumberParser::tryParseFloat(const std::string& s, double& value)
 {
-        Poco::MemoryInputStream istr(s.data(), s.size());
+	Poco::MemoryInputStream istr(s.data(), s.size());
 #if !defined(POCO_NO_LOCALE)
-        istr.imbue(std::locale::classic());
+	istr.imbue(std::locale::classic());
 #endif
-        istr >> value;
-        return istr.eof() && !istr.fail();
+	istr >> value;
+	return istr.eof() && !istr.fail();
 }
 
 
 bool NumberParser::parseBool(const std::string& s)
 {
-        bool result;
-        if (tryParseBool(s, result))
-                return result;
-        else
-                throw SyntaxException("Not a valid bool number", s);
+	bool result;
+	if (tryParseBool(s, result))
+		return result;
+	else
+		throw SyntaxException("Not a valid bool number", s);
 }
 
-        
+	
 bool NumberParser::tryParseBool(const std::string& s, bool& value)
 {
-        int n;
-        if (NumberParser::tryParse(s, n))
-        {
-                value = (n != 0);
-                return true;
-        }
+	int n;
+	if (NumberParser::tryParse(s, n))
+	{
+		value = (n != 0);
+		return true;
+	}
 
-        if (icompare(s, "true") == 0)
-        {
-                value = true;
-                return true;
-        }
-        else if (icompare(s, "yes") == 0)
-        {
-                value = true;
-                return true;
-        }
-        else if (icompare(s, "on") == 0)
-        {
-                value = true;
-                return true;
-        }
-        
-        if (icompare(s, "false") == 0)
-        {
-                value = false;
-                return true;
-        }
-        else if (icompare(s, "no") == 0)
-        {
-                value = false;
-                return true;
-        }
-        else if (icompare(s, "off") == 0)
-        {
-                value = false;
-                return true;
-        }
-        
-        return false;
+	if (icompare(s, "true") == 0)
+	{
+		value = true;
+		return true;
+	}
+	else if (icompare(s, "yes") == 0)
+	{
+		value = true;
+		return true;
+	}
+	else if (icompare(s, "on") == 0)
+	{
+		value = true;
+		return true;
+	}
+	
+	if (icompare(s, "false") == 0)
+	{
+		value = false;
+		return true;
+	}
+	else if (icompare(s, "no") == 0)
+	{
+		value = false;
+		return true;
+	}
+	else if (icompare(s, "off") == 0)
+	{
+		value = false;
+		return true;
+	}
+	
+	return false;
 }
 
 
