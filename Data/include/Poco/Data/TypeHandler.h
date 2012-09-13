@@ -314,7 +314,7 @@ public:
 	
 		if (pExt->extract(pos++, val)) 
 		{
-			obj.value(val);
+			obj = val;
 		}
 		else 
 		{

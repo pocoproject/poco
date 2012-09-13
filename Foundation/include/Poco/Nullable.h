@@ -182,6 +182,17 @@ public:
 		return !(*this == other) && !(*this < other);
 	}
 
+	C& value()
+		/// Returns the Nullable's value.
+		///
+		/// Throws a NullValueException if the Nullable is empty.
+	{
+		if (!_isNull)
+			return _value;
+		else
+			throw NullValueException();
+	}
+
 	const C& value() const
 		/// Returns the Nullable's value.
 		///

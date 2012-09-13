@@ -338,7 +338,7 @@ private:
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
-		return new InternalExtraction<C>(*pData, pCol, static_cast<Poco::UInt32>(currentDataSet()));
+		return new InternalExtraction<C>(*pData, pCol, Position(currentDataSet()));
 	}
 
 	template <class C>
@@ -349,7 +349,7 @@ private:
 		return new InternalBulkExtraction<C>(*pData,
 			pCol,
 			static_cast<Poco::UInt32>(getExtractionLimit()),
-			static_cast<Poco::UInt32>(currentDataSet()));
+			Position(currentDataSet()));
 	}
 
 	template <class T>

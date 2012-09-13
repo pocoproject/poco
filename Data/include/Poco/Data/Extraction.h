@@ -786,7 +786,8 @@ inline Extraction<T>* into(T& t, const Position& pos)
 
 template <typename T> 
 inline Extraction<T>* into(T& t, const Position& pos, const T& def)
-	/// Convenience function to allow for a more compact creation of an extraction object with the given default
+	/// Convenience function to allow for a more compact creation of an extraction object 
+	/// with multiple recordset support and the given default
 {
 	return new Extraction<T>(t, def, pos);
 }
