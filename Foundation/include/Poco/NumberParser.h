@@ -161,8 +161,14 @@ private:
 		if (std::numeric_limits<T>::is_signed) return false;
 		std::string::const_iterator it = s.begin();
 		std::string::const_iterator end = s.end();
-		while (std::isspace(*it)) ++it;
-		while (*it == '0') ++it;
+		while (it != end && std::isspace(*it)) ++it;
+		if (it == end) return false;
+		while (it != end && *it == '0') ++it;
+		if (it == end)
+		{
+			result = 0;
+			return true;
+		}
 
 		unsigned base = 010;
 		T n = 0;
@@ -176,11 +182,9 @@ private:
 			}
 			else break;
 		}
-		if (it != end)
-		{
-			while (std::isspace(*it)) ++it;
-			if (it != end) return false;
-		}
+		
+		while (it != end && std::isspace(*it)) ++it;
+		if (it != end) return false;
 
 		result = n;
 		return true;
@@ -193,7 +197,8 @@ private:
 		int sign = 1;
 		std::string::const_iterator it = s.begin();
 		std::string::const_iterator end = s.end();
-		while (std::isspace(*it)) ++it;
+		while (it != end && std::isspace(*it)) ++it;
+		if (it == end) return false;
 		if (std::numeric_limits<T>::is_signed)
 		{
 			if (*it == '-') 
@@ -202,6 +207,7 @@ private:
 				++it; 
 			}
 			else if (*it == '+') ++it;
+			if (it == end) return false;
 		}
 
 		unsigned base = 10;
@@ -216,11 +222,9 @@ private:
 			}
 			else break;
 		}
-		if (it != end)
-		{
-			while (std::isspace(*it)) ++it;
-			if (it != end) return false;
-		}
+		
+		while (it != end && std::isspace(*it)) ++it;
+		if (it != end) return false;
 
 		result = sign * n;
 		return true;
@@ -233,16 +237,27 @@ private:
 		if (std::numeric_limits<T>::is_signed) return false;
 		std::string::const_iterator it = s.begin();
 		std::string::const_iterator end = s.end();
-		while (std::isspace(*it)) ++it;
+		while (it != end && std::isspace(*it)) ++it;
+		if (it == end) return false;
 		
-		bool beginWithZero = false;
+		bool beginWith0x = false;
 		if (*it == '0') 
 		{
-			beginWithZero = true;
-			++it;
+			beginWith0x = true;
+			while (it != end && *it == '0')
+			{
+				++it;
+				beginWith0x = false;
+			}
+			if (it == end) 
+			{
+				result = 0;
+				return true;
+			}
 		}
-		if (beginWithZero && (*it != 'x') && (*it != 'X')) return false;
+		if (beginWith0x && (*it != 'x') && (*it != 'X')) return false;
 		else if ((*it == 'x') || (*it == 'X')) ++it;
+		if (it == end) return false;
 
 		unsigned base = 0x10;
 		T n = 0;

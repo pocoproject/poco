@@ -65,12 +65,21 @@ NumberParserTest::~NumberParserTest()
 void NumberParserTest::testParse()
 {
 	assert(NumberParser::parse("123") == 123);
+	assert(NumberParser::parse("0") == 0);
+	assert(NumberParser::parse("000") == 0);
+	assert(NumberParser::parse("  123  ") == 123);
+	assert(NumberParser::parse(" 123") == 123);
+	assert(NumberParser::parse("123 ") == 123);
 	assert(NumberParser::parse("-123") == -123);
 	assert(NumberParser::parseUnsigned("123") == 123);
 	assert(NumberParser::parseHex("12AB") == 0x12ab);
 	assert(NumberParser::parseHex("0x12AB") == 0x12ab);
+	assert(NumberParser::parseHex("0x0") == 0);
+	assert(NumberParser::parseHex("00") == 0);
 	assert(NumberParser::parseOct("123") == 0123);
 	assert(NumberParser::parseOct("0123") == 0123);
+	assert(NumberParser::parseOct("0") == 0);
+	assert(NumberParser::parseOct("000") == 0);
 
 	assert(NumberParser::parseBool("0") == false);
 	assert(NumberParser::parseBool("FALSE") == false);
@@ -119,47 +128,46 @@ void NumberParserTest::testParseError()
 		NumberParser::parse("");
 		NumberParser::parseBool("");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
+	} catch (SyntaxException&) { }
+
+	try
 	{
-	}
+		NumberParser::parse(" ");
+		NumberParser::parseBool("");
+		failmsg("must throw SyntaxException");
+	} catch (SyntaxException&) { }
+
+	try
+	{
+		NumberParser::parse("1 1");
+		NumberParser::parseBool("");
+		failmsg("must throw SyntaxException");
+	} catch (SyntaxException&) { }
 
 	try
 	{
 		NumberParser::parse("asd");
 		NumberParser::parseBool("asd");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
-	{
-	}
+	} catch (SyntaxException&) { }
 
 	try
 	{
 		NumberParser::parseUnsigned("a123");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
-	{
-	}
+	} catch (SyntaxException&) { }
 
 	try
 	{
 		NumberParser::parseHex("z23");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
-	{
-	}
+	} catch (SyntaxException&) { }
 
 	try
 	{
 		NumberParser::parseHex("23z");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
-	{
-	}
+	} catch (SyntaxException&) { }
 	
 #if defined(POCO_HAVE_INT64)
 
@@ -167,37 +175,25 @@ void NumberParserTest::testParseError()
 	{
 		NumberParser::parse64("asd");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
-	{
-	}
+	} catch (SyntaxException&) { }
 
 	try
 	{
 		NumberParser::parseUnsigned64("");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
-	{
-	}
+	} catch (SyntaxException&) { }
 
 	try
 	{
 		NumberParser::parseHex64("zaz");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
-	{
-	}
+	} catch (SyntaxException&) { }
 
 	try
 	{
 		NumberParser::parseHex64("12345z");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
-	{
-	}
+	} catch (SyntaxException&) { }
 	
 #endif
 
@@ -205,19 +201,13 @@ void NumberParserTest::testParseError()
 	{
 		NumberParser::parseFloat("a12.3");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
-	{
-	}
+	} catch (SyntaxException&) { }
 
 	try
 	{
 		NumberParser::parseFloat("12.3aa");
 		failmsg("must throw SyntaxException");
-	}
-	catch (SyntaxException&)
-	{
-	}
+	} catch (SyntaxException&) { }
 }
 
 

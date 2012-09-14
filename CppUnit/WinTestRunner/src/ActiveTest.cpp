@@ -31,12 +31,12 @@ void ActiveTest::run(TestResult* result)
 // only creates one of these at a time.
 UINT ActiveTest::threadFunction(LPVOID thisInstance)
 {
-    ActiveTest* test = (ActiveTest*) thisInstance;
+	ActiveTest* test = (ActiveTest*) thisInstance;
 
-    test->run();
-    test->_runCompleted.SetEvent();
+	test->run();
+	test->_runCompleted.SetEvent();
 
-    return 0;
+	return 0;
 }
 
 

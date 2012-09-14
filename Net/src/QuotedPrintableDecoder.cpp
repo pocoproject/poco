@@ -72,7 +72,7 @@ int QuotedPrintableDecoderBuf::readFromDevice()
 		}
 		else if (Poco::Ascii::isHexDigit(ch))
 		{
-			std::string hex;
+			std::string hex = "0x";
 			hex += (char) ch;
 			ch = _buf.sbumpc();
 			if (Poco::Ascii::isHexDigit(ch))
