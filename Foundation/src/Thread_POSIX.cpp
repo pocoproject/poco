@@ -119,7 +119,7 @@ void ThreadImpl::setOSPriorityImpl(int prio, int policy )
 		{
 			struct sched_param par;
 			par.sched_priority = prio;
-			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
+			if (pthread_setschedparam(_pData->thread, policy, &par))
 				throw SystemException("cannot set thread priority");
 		}
 		_pData->prio   = reverseMapPrio(prio, policy);
