@@ -493,7 +493,7 @@ public:
 		for (int i = 3; i >= 0; --i)
 		{
 			unsigned addr = ntohl(_addr.s6_addr32[i]);
-			if (bits = maskBits(addr, 32)) return (bitPos - (32 - bits));
+			if ((bits = maskBits(addr, 32))) return (bitPos - (32 - bits));
 			bitPos -= 32;
 		}
 		return 0;
@@ -501,7 +501,7 @@ public:
 		for (int i = 7; i >= 0; --i)
 		{
 			unsigned short addr = ntohs(_addr.s6_addr16[i]);
-			if (bits = maskBits(addr, 16)) return (bitPos - (16 - bits));
+			if ((bits = maskBits(addr, 16))) return (bitPos - (16 - bits));
 			bitPos -= 16;
 		}
 		return 0;
