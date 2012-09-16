@@ -66,6 +66,7 @@ public:
 
 private:
 	void dropObject(const std::string& type, const std::string& tableName);
+	void recreateNullableTable();
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
 	void recreatePersonDateTable();

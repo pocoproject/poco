@@ -35,8 +35,9 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
+#include "Poco/Nullable.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/DateTime.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/NumberFormatter.h"
@@ -94,9 +95,10 @@ using Poco::Data::ODBC::DataTruncatedException;
 using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
+using Poco::Nullable;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 using Poco::Stopwatch;
 using Poco::NumberFormatter;
@@ -2731,7 +2733,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 		pRF->add(intFldName, RowFilter::VALUE_EQUAL, 1);
 		assert (!pRF->isEmpty());
 
-		DynamicAny da;
+		Var da;
 		try 
 		{
 			da = rset.value(0, 1);
@@ -3271,9 +3273,9 @@ void SQLExecutor::any()
 
 void SQLExecutor::dynamicAny()
 {
-	DynamicAny i = 42;
-	DynamicAny f = 42.5;
-	DynamicAny s = "42";
+	Var i = 42;
+	Var f = 42.5;
+	Var s = "42";
 
 	Session tmp = session();
 	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
@@ -3789,7 +3791,51 @@ void SQLExecutor::transactor()
 
 void SQLExecutor::nullable()
 {
-	throw NotImplementedException("TODO - see SQLite test for nullable");
+	try { session() << "INSERT INTO NullableTest VALUES(NULL, NULL, NULL, NULL)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("nullable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("nullable()"); }
+
+	Nullable<int> i = 1;
+	Nullable<double> f = 1.5;
+	Nullable<std::string> s = std::string("abc");
+	Nullable<DateTime> d = DateTime();
+
+	assert (!i.isNull());
+	assert (!f.isNull());
+	assert (!s.isNull());
+	assert (!d.isNull());
+
+	session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(s), into(i), into(f), into(d), now;
+
+	assert (i.isNull());
+	assert (f.isNull());
+	assert (s.isNull());
+	assert (d.isNull());
+
+	RecordSet rs(session(), "SELECT * FROM NullableTest");
+
+	rs.moveFirst();
+	assert (rs.isNull("EmptyString"));
+	assert (rs.isNull("EmptyInteger"));
+	assert (rs.isNull("EmptyFloat"));
+	assert (rs.isNull("EmptyDateTime"));
+
+	Var di = 1;
+	Var df = 1.5;
+	Var ds = "abc";
+	Var dd = DateTime();
+
+	assert (!di.isEmpty());
+	assert (!df.isEmpty());
+	assert (!ds.isEmpty());
+	assert (!dd.isEmpty());
+
+	session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(di), into(df), into(ds), into(dd), now;
+
+	assert (di.isEmpty());
+	assert (df.isEmpty());
+	assert (ds.isEmpty());
+	assert (dd.isEmpty());
 }
 
 

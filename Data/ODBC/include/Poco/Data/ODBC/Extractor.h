@@ -483,9 +483,16 @@ private:
 	bool extAny(std::size_t pos, T& val)
 	{
 		NT i;
-		extract(pos, i);
-		val = i;
-		return true;
+		if (extract(pos, i))
+		{
+			val = i;
+			return true;
+		}
+		else
+		{
+			val = Nullable<NT>();
+			return false;
+		}
 	}
 
 	template <typename T>

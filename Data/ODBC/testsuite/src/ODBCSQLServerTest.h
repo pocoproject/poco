@@ -48,10 +48,11 @@ class ODBCSQLServerTest: public ODBCTest
 	/// SQLServer ODBC test class
 	/// Tested:
 	/// 
-	/// Driver			|	DB							| OS
-	/// ----------------+-------------------------------+------------------------------------------
-	/// 2000.86.1830.00 | SQL Server Express 9.0.2047	| MS Windows XP Professional x64 v.2003/SP1
-	/// 2005.90.2047.00 | SQL Server Express 9.0.2047	| MS Windows XP Professional x64 v.2003/SP1
+	/// Driver				|	DB								| OS
+	/// --------------------+-----------------------------------+------------------------------------------
+	/// 2000.86.1830.00		| SQL Server Express 9.0.2047		| MS Windows XP Professional x64 v.2003/SP1
+	/// 2005.90.2047.00		| SQL Server Express 9.0.2047		| MS Windows XP Professional x64 v.2003/SP1
+	/// 2009.100.1600.01	| SQL Server Express 10.50.1600.1	| MS Windows XP Professional x64 v.2003/SP1
 	///
 
 {
@@ -76,6 +77,7 @@ public:
 
 private:
 	void dropObject(const std::string& type, const std::string& name);
+	void recreateNullableTable();
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
 	void recreatePersonDateTimeTable();

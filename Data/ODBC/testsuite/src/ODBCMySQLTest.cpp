@@ -261,6 +261,15 @@ void ODBCMySQLTest::dropObject(const std::string& type, const std::string& name)
 }
 
 
+void ODBCMySQLTest::recreateNullableTable()
+{
+	dropObject("TABLE", "NullableTest");
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
+}
+
+
 void ODBCMySQLTest::recreatePersonTable()
 {
 	dropObject("TABLE", "Person");

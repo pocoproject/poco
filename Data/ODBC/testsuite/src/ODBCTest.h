@@ -175,6 +175,7 @@ protected:
 	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;
 
 	virtual void dropObject(const std::string& type, const std::string& name);
+	virtual void recreateNullableTable();
 	virtual void recreatePersonTable();
 	virtual void recreatePersonTupleTable();
 	virtual void recreatePersonBLOBTable();
@@ -271,6 +272,12 @@ inline void ODBCTest::testStoredFunctionDynamicAny()
 inline void ODBCTest::dropObject(const std::string& type, const std::string& name)
 {
 	throw Poco::NotImplementedException("ODBCTest::dropObject()");
+}
+
+
+inline void ODBCTest::recreateNullableTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateNullableTable()");
 }
 
 

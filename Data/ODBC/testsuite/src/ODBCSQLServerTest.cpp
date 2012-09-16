@@ -87,7 +87,7 @@ using Poco::DateTime;
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && !defined(FORCE_FREE_TDS)
 	#ifdef POCO_ODBC_USE_SQL_NATIVE
-		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Native Client"
+		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Server Native Client 10.0"
 	#else
 		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Server"
 	#endif
@@ -103,9 +103,9 @@ using Poco::DateTime;
 #define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
 #define MS_SQL_SERVER_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MS_SQL_SERVER_PORT "1433"
-#define MS_SQL_SERVER_DB "test"
-#define MS_SQL_SERVER_UID "test"
-#define MS_SQL_SERVER_PWD "test"
+#define MS_SQL_SERVER_DB "poco"
+#define MS_SQL_SERVER_UID "poco"
+#define MS_SQL_SERVER_PWD "poco"
 
 
 ODBCTest::SessionPtr ODBCSQLServerTest::_pSession;
@@ -115,6 +115,7 @@ std::string          ODBCSQLServerTest::_dsn = MS_SQL_SERVER_DSN;
 std::string          ODBCSQLServerTest::_uid = MS_SQL_SERVER_UID;
 std::string          ODBCSQLServerTest::_pwd = MS_SQL_SERVER_PWD;
 std::string          ODBCSQLServerTest::_db  = MS_SQL_SERVER_DB;
+
 std::string ODBCSQLServerTest::_connectString = "DRIVER=" MS_SQL_SERVER_ODBC_DRIVER ";"
 	"UID=" MS_SQL_SERVER_UID ";"
 	"PWD=" MS_SQL_SERVER_PWD ";"
@@ -125,6 +126,7 @@ std::string ODBCSQLServerTest::_connectString = "DRIVER=" MS_SQL_SERVER_ODBC_DRI
 	"TDS_Version=" FREE_TDS_VERSION ";"
 #endif
 	;
+
 
 ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name): 
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
@@ -566,6 +568,15 @@ void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& n
 
 		if (!ignoreError) throw;
 	}
+}
+
+
+void ODBCSQLServerTest::recreateNullableTable()
+{
+	dropObject("TABLE", "NullableTest");
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime DATETIME NULL)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
 
 

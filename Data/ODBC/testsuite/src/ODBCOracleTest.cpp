@@ -68,8 +68,8 @@ using Poco::DateTime;
 #define ORACLE_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define ORACLE_PORT "1521"
 #define ORACLE_SID "XE"
-#define ORACLE_UID "scott"
-#define ORACLE_PWD "tiger"
+#define ORACLE_UID "poco"
+#define ORACLE_PWD "poco"
 
 
 ODBCTest::SessionPtr ODBCOracleTest::_pSession;
@@ -686,6 +686,15 @@ void ODBCOracleTest::dropObject(const std::string& type, const std::string& name
 
 		if (!ignoreError) throw;
 	}
+}
+
+
+void ODBCOracleTest::recreateNullableTable()
+{
+	dropObject("TABLE", "NullableTest");
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR2(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat NUMBER NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
 
 
