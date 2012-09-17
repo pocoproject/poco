@@ -65,6 +65,7 @@ using Poco::Nullable;
 using Poco::Ascii;
 using Poco::BasicEvent;
 using Poco::delegate;
+using Poco::NullType;
 using Poco::InvalidAccessException;
 
 
@@ -828,6 +829,13 @@ void CoreTest::testNullable()
 	assert (n2 < n1);
 	assert (n2 != n1);
 	assert (n1 > n2);
+
+	NullType nd;
+	assert (n1 != nd);
+	assert (nd != n1);
+	n1.clear();
+	assert (n1 == nd);
+	assert (nd == n1);
 }
 
 

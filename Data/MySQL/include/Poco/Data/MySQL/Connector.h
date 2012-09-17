@@ -65,10 +65,10 @@ public:
 	virtual Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
 		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT);
 		/// Creates a MySQL SessionImpl object and initializes it with the given connectionString.
-		
+
 	static void registerConnector();
 		/// Registers the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
-		
+
 	static void unregisterConnector();
 		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
 };

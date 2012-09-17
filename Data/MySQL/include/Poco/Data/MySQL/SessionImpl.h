@@ -138,8 +138,8 @@ public:
 	Poco::Any getInsertId(const std::string&);
 		/// Get insert id
 
-    SessionHandle& handle();
-        // Get handle
+	SessionHandle& handle();
+		// Get handle
 
 	const std::string& connectorName();
 		/// Returns the name of the connector.
@@ -204,7 +204,7 @@ inline Poco::Any SessionImpl::getInsertId(const std::string&)
 
 inline SessionHandle& SessionImpl::handle()
 {
-    return _handle;
+	return _handle;
 }
 
 

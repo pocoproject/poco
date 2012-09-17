@@ -112,6 +112,9 @@ public:
 	SQLExecutor(const std::string& name, Poco::Data::Session* _pSession);
 	~SQLExecutor();
 
+	void execute(const std::string& sql);
+		/// Execute a query.
+
 	void bareboneODBCTest(const std::string& dbConnString,
 		const std::string& tableCreateString,
 		DataBinding bindMode, 
@@ -125,8 +128,8 @@ public:
 		SQLExecutor::DataExtraction extractMode,
 		const std::string& insert = MULTI_INSERT,
 		const std::string& select = MULTI_SELECT);
-		/// These functions use "bare bone" ODBC API calls (i.e. calls are not 
-		/// "wrapped" in PocoData framework structures).
+		/// The above two functions use "bare bone" ODBC API calls  
+		/// (i.e. calls are not "wrapped" in PocoData framework structures).
 		/// The purpose of the functions is to verify that a driver behaves
 		/// correctly as well as to determine its capabilities 
 		/// (e.g. SQLGetData() restrictions relaxation policy, if any). 

@@ -81,7 +81,7 @@ protected:
 	virtual bool hasNext();
 		/// Returns true if a call to next() will return data.
 		
-    virtual std::size_t next();
+	virtual std::size_t next();
 		/// Retrieves the next row from the resultset.
 		/// Will throw, if the resultset is empty.
 	

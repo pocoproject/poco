@@ -184,21 +184,21 @@ void SessionImpl::begin()
 	if (_inTransaction)
 		throw Poco::InvalidAccessException("Already in transaction.");
 
-    _handle.startTransaction();
+	_handle.startTransaction();
 	_inTransaction = true;
 }
 
 
 void SessionImpl::commit()
 {
-    _handle.commit();
+	_handle.commit();
 	_inTransaction = false;
 }
 	
 
 void SessionImpl::rollback()
 {
-    _handle.rollback();
+	_handle.rollback();
 	_inTransaction = false;
 }
 

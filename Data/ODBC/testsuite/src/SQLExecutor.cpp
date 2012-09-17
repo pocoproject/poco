@@ -62,6 +62,7 @@
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
+#include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
@@ -92,7 +93,7 @@ using Poco::Data::ODBC::Preparator;
 using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::DataTruncatedException;
-using Poco::Data::ODBC::StatementDiagnostics;
+using Poco::Data::ODBC::StatementError;
 using Poco::format;
 using Poco::Tuple;
 using Poco::Nullable;
@@ -112,6 +113,7 @@ using Poco::InvalidArgumentException;
 using Poco::NotImplementedException;
 using Poco::BadCastException;
 using Poco::RangeException;
+using Poco::TimeoutException;
 
 
 struct Person
@@ -945,6 +947,14 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 	// Environment end
 	rc = SQLFreeHandle(SQL_HANDLE_ENV, henv);
 	poco_odbc_check_stmt (rc, hstmt);
+}
+
+
+void SQLExecutor::execute(const std::string& sql)
+{
+	try { session() << sql, now;  }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (sql); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (sql); }
 }
 
 
@@ -2927,10 +2937,15 @@ void SQLExecutor::notNulls(const std::string& sqlState)
 		fail ("must fail");
 	}catch (StatementException& se) 
 	{ 
-		//make sure we're failing for the right reason
+		//double check if we're failing for the right reason
 		//default sqlState value is "23502"; some drivers report "HY???" codes
 		if (se.diagnostics().fields().size())
-			assert (sqlState == se.diagnostics().sqlState(0));
+		{
+			std::string st = se.diagnostics().sqlState(0);
+			if (sqlState != st)
+				std::cerr << '[' << name() << ']' << " Warning: expected SQL state [" << sqlState << 
+					"], received [" << se.diagnostics().sqlState(0) << "] instead." << std::endl;
+		}
 	}
 }
 
@@ -3431,21 +3446,21 @@ void SQLExecutor::setTransactionIsolation(Session& session, Poco::UInt32 ti)
 	}
 	else
 	{
-		std::cout << "Transaction isolation not supported: ";
+		std::cerr << '[' << name() << ']' << " Warning, transaction isolation not supported: ";
 		switch (ti)
 		{
 		case Session::TRANSACTION_READ_COMMITTED:
-			std::cout << "READ COMMITTED"; break;
+			std::cerr << "READ COMMITTED"; break;
 		case Session::TRANSACTION_READ_UNCOMMITTED:
-			std::cout << "READ UNCOMMITTED"; break;
+			std::cerr << "READ UNCOMMITTED"; break;
 		case Session::TRANSACTION_REPEATABLE_READ:
-			std::cout << "REPEATABLE READ"; break;
+			std::cerr << "REPEATABLE READ"; break;
 		case Session::TRANSACTION_SERIALIZABLE:
-			std::cout << "SERIALIZABLE"; break;
+			std::cerr << "SERIALIZABLE"; break;
 		default:
-			std::cout << "UNKNOWN"; break;
+			std::cerr << "UNKNOWN"; break;
 		}
-		std::cout << std::endl;
+		std::cerr << std::endl;
 	}
 }
 
@@ -3552,7 +3567,10 @@ void SQLExecutor::transaction(const std::string& connect)
 	local.setFeature("autoCommit", true);
 
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
-	setTransactionIsolation(local, Session::TRANSACTION_READ_COMMITTED);
+	if (local.hasTransactionIsolation(Session::TRANSACTION_READ_UNCOMMITTED))
+		setTransactionIsolation(local, Session::TRANSACTION_READ_UNCOMMITTED);
+	else if (local.hasTransactionIsolation(Session::TRANSACTION_READ_COMMITTED))
+		setTransactionIsolation(local, Session::TRANSACTION_READ_COMMITTED);
 
 	std::string funct = "transaction()";
 	std::vector<std::string> lastNames;
@@ -3633,16 +3651,27 @@ void SQLExecutor::transaction(const std::string& connect)
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	Statement stmt1 = (local << "SELECT COUNT(*) FROM PERSON", into(locCount), async, now);
+	Statement stmt1 = (local << "SELECT count(*) FROM PERSON", into(locCount), async, now);
 
 	try { session() << "SELECT count(*) FROM PERSON", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (0 == count);
+	try 
+	{
+		stmt1.wait(5000);
+		if (local.getTransactionIsolation() == Session::TRANSACTION_READ_UNCOMMITTED)
+			assert (0 == locCount);
+	} catch (TimeoutException&)
+	{ std::cerr << '[' << name() << ']' << " Warning: async query timed out." << std::endl; }
 	session().commit();
-
-	stmt1.wait();
-	assert (0 == locCount);
+	// repeat for those that don't support uncommitted read isolation
+	if (local.getTransactionIsolation() == Session::TRANSACTION_READ_COMMITTED)
+	{
+		stmt1.wait();
+		local << "SELECT count(*) FROM PERSON", into(locCount), now;
+		assert (0 == locCount);
+	}
 
 	std::string sql1 = format("INSERT INTO PERSON VALUES ('%s','%s','%s',%d)", lastNames[0], firstNames[0], addresses[0], ages[0]);
 	std::string sql2 = format("INSERT INTO PERSON VALUES ('%s','%s','%s',%d)", lastNames[1], firstNames[1], addresses[1], ages[1]);

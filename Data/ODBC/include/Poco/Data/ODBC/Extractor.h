@@ -51,7 +51,8 @@
 #include "Poco/Data/Time.h"
 #include "Poco/DateTime.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
+#include "Poco/Nullable.h"
 #include "Poco/Exception.h"
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS

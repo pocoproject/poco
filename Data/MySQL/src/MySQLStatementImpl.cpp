@@ -41,10 +41,10 @@ namespace Data {
 namespace MySQL {
 
 
-MySQLStatementImpl::MySQLStatementImpl(SessionImpl& h) 
-        : Poco::Data::StatementImpl(h), 
-          _stmt(h.handle()), 
-          _extractor(_stmt, _metadata), 
+MySQLStatementImpl::MySQLStatementImpl(SessionImpl& h) :
+	Poco::Data::StatementImpl(h), 
+	_stmt(h.handle()), 
+	_extractor(_stmt, _metadata), 
 	_hasNext(NEXT_DONTKNOW)
 {
 }
@@ -63,7 +63,7 @@ std::size_t MySQLStatementImpl::columnsReturned() const
 
 std::size_t MySQLStatementImpl::affectedRowCount() const
 {
-    return 0;
+	return 0;
 }
 
 	
@@ -116,7 +116,7 @@ std::size_t MySQLStatementImpl::next()
 	}
 
 	_hasNext = NEXT_DONTKNOW;
-    return 1;
+	return 1;
 }
 
 
@@ -136,7 +136,7 @@ bool MySQLStatementImpl::canCompile() const
 	return (_stmt.state() < StatementExecutor::STMT_COMPILED);
 }
 
-	
+
 void MySQLStatementImpl::compileImpl()
 {
 	_metadata.reset();
@@ -147,7 +147,7 @@ void MySQLStatementImpl::compileImpl()
 		_stmt.bindResult(_metadata.row());
 }
 
-	
+
 void MySQLStatementImpl::bindImpl()
 {
 	Poco::Data::AbstractBindingVec& binds = bindings();
@@ -165,13 +165,13 @@ void MySQLStatementImpl::bindImpl()
 	_hasNext = NEXT_DONTKNOW;
 }
 
-	
+
 AbstractExtractor& MySQLStatementImpl::extractor()
 {
 	return _extractor;
 }
 
-	
+
 AbstractBinder& MySQLStatementImpl::binder()
 {
 	return _binder;

@@ -67,17 +67,17 @@ int StatementExecutor::state() const
 
 void StatementExecutor::prepare(const std::string& query)
 {
-    if (_state >= STMT_COMPILED)
-    {
-        _state = STMT_COMPILED;
-        return;
-    }
+	if (_state >= STMT_COMPILED)
+	{
+		_state = STMT_COMPILED;
+		return;
+	}
 	
-    if (mysql_stmt_prepare(_pHandle, query.c_str(), static_cast<unsigned int>(query.length())) != 0)
-        throw StatementException("mysql_stmt_prepare error", _pHandle, query);
+	if (mysql_stmt_prepare(_pHandle, query.c_str(), static_cast<unsigned int>(query.length())) != 0)
+		throw StatementException("mysql_stmt_prepare error", _pHandle, query);
 
-    _query = query;
-    _state = STMT_COMPILED;
+	_query = query;
+	_state = STMT_COMPILED;
 }
 
 

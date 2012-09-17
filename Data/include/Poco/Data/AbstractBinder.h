@@ -45,6 +45,7 @@
 #include "Poco/Data/Time.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/DateTime.h"
+#include "Poco/Nullable.h"
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
 #include <vector>
@@ -57,10 +58,7 @@ namespace Poco {
 namespace Data {
 
 
-enum NullData
-{
-	NULL_GENERIC = 0
-};
+typedef NullType NullData;
 
 
 namespace Keywords {

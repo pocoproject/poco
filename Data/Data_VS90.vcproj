@@ -451,10 +451,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\Nullable.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\Data\Position.h"
 					>
 				</File>

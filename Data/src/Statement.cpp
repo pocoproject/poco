@@ -167,14 +167,16 @@ void Statement::setAsync(bool async)
 std::size_t Statement::wait(long milliseconds)
 {
 	if (!_pResult) return 0;
-
+	bool success = true;
 	if (WAIT_FOREVER != milliseconds)
-		_pResult->wait(milliseconds);
+		success = _pResult->tryWait(milliseconds);
 	else
 		_pResult->wait();
 
 	if (_pResult->exception())
 		throw *_pResult->exception();
+	else if (!success)
+		throw TimeoutException("Statement timed out.");
 
 	return _pResult->data();
 }

@@ -52,7 +52,7 @@
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(MYSQL_EXPORTS)
+	#if defined(MySQL_EXPORTS)
 		#define MySQL_API __declspec(dllexport)
 	#else
 		#define MySQL_API __declspec(dllimport)
@@ -69,7 +69,7 @@
 // Automatically link Data library.
 //
 #if defined(_MSC_VER)
-	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(MYSQL_EXPORTS)
+	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(MySQL_EXPORTS)
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
 				#pragma comment(lib, "PocoDataMySQLd.lib")

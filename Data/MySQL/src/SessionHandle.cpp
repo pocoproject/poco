@@ -96,7 +96,7 @@ void SessionHandle::options(mysql_option opt, unsigned int i)
 void SessionHandle::connect(const char* host, const char* user, const char* password, const char* db, unsigned int port)
 {
 	if (!mysql_real_connect(_pHandle, host, user, password, db, port, 0, 0))
-		throw ConnectionFailedException("mysql_real_connect error");
+		throw ConnectionFailedException(mysql_error(_pHandle));
 }
 
 
@@ -112,21 +112,21 @@ void SessionHandle::close()
 
 void SessionHandle::startTransaction()
 {
-    if (mysql_autocommit(_pHandle, false) != 0)
+	if (mysql_autocommit(_pHandle, false) != 0)
 		throw TransactionException("Start transaction failed.", _pHandle);
 }
 
 
 void SessionHandle::commit()
 {
-    if (mysql_commit(_pHandle) != 0)
+	if (mysql_commit(_pHandle) != 0)
 		throw TransactionException("Commit failed.", _pHandle);
 }
 
 
 void SessionHandle::rollback()
 {
-    if (mysql_rollback(_pHandle) != 0)
+	if (mysql_rollback(_pHandle) != 0)
 		throw TransactionException("Rollback failed.", _pHandle);
 }
 

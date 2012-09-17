@@ -61,7 +61,7 @@ using Poco::NotFoundException;
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
-	#define MYSQL_ODBC_DRIVER "MySQL ODBC 3.51 Driver"
+	#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.1 Driver"
 #else
 	#define MYSQL_ODBC_DRIVER "MySQL"
 #endif
@@ -69,7 +69,7 @@ using Poco::NotFoundException;
 #define MYSQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MYSQL_DB "test"
 #define MYSQL_UID "root"
-#define MYSQL_PWD "mysql"
+#define MYSQL_PWD "poco"
 
 
 ODBCTest::SessionPtr ODBCMySQLTest::_pSession;
@@ -88,6 +88,7 @@ std::string          ODBCMySQLTest::_connectString = "DRIVER=" MYSQL_ODBC_DRIVER
 ODBCMySQLTest::ODBCMySQLTest(const std::string& name): 
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
+	_pExecutor->execute("SET @@global.sql_mode= '';"); // disable strict mode
 }
 
 
@@ -115,17 +116,27 @@ void ODBCMySQLTest::testBareboneODBC()
 
 /*
 MySQL supports batch statements as of 3.51.18
-http://bugs.mysql.com/bug.php?id=7445
+(http://bugs.mysql.com/bug.php?id=7445)
+has different SQL syntax for it and behaves differently
+compared to other DBMS systems in regards to SQLMoreResults.
+So, we skip this test.
 
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
 		"Second INTEGER,"
 		"Third FLOAT)";
 
-	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	std::string MULTI_INSERT = "INSERT INTO Test VALUES "
+		"('1', 2, 3.5),"
+		"('2', 3, 4.5),"
+		"('3', 4, 5.5),"
+		"('4', 5, 6.5),"
+		"('5', 6, 7.5);";
+
+	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, MULTI_INSERT);
+	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, MULTI_INSERT);
+	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, MULTI_INSERT);
+	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, MULTI_INSERT);
 */
 }
 

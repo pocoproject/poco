@@ -42,7 +42,7 @@
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
-#include "Poco/Data/Nullable.h"
+#include "Poco/Nullable.h"
 #include "Poco/Data/DataException.h"
 #include <iostream>
 
@@ -53,7 +53,7 @@ using Poco::Data::MySQL::StatementException;
 using Poco::format;
 using Poco::NotFoundException;
 using Poco::Int32;
-using Poco::Data::Nullable;
+using Poco::Nullable;
 using Poco::Tuple;
 using Poco::NamedTuple;
 
@@ -63,14 +63,15 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 //
 // Parameters for barebone-test
 #define MYSQL_USER "root"
-#define MYSQL_PWD  ""
+#define MYSQL_PWD  "poco"
 #define MYSQL_HOST "localhost"
 #define MYSQL_PORT 3306
 #define MYSQL_DB   "test"
 
 //
-// Connection string to POCO
-std::string MySQLTest::_dbConnString = "user=" MYSQL_USER 
+// Connection string
+std::string MySQLTest::_dbConnString = "host=" MYSQL_HOST
+	";user=" MYSQL_USER
 	";password=" MYSQL_PWD 
 	";db=" MYSQL_DB 
 	";compress=true;auto-reconnect=true";
@@ -79,7 +80,7 @@ std::string MySQLTest::_dbConnString = "user=" MYSQL_USER
 MySQLTest::MySQLTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-    MySQL::Connector::registerConnector();
+	MySQL::Connector::registerConnector();
 }
 
 
@@ -605,27 +606,27 @@ void MySQLTest::testTupleWithNullable()
 	typedef Poco::Tuple<Int32, Nullable<std::string>, Nullable<Int32> > Info;
 
 	Info info(0, std::string("Address"), 10);
- 	*_pSession << "INSERT INTO NullableStringTest VALUES(?, ?, ?)", use(info), now;
+	*_pSession << "INSERT INTO NullableStringTest VALUES(?, ?, ?)", use(info), now;
 	
 	info.set<0>(info.get<0>()++);
 	info.set<1>(null);
- 	*_pSession << "INSERT INTO NullableStringTest VALUES(?, ?, ?)", use(info), now;
+	*_pSession << "INSERT INTO NullableStringTest VALUES(?, ?, ?)", use(info), now;
 
 	info.set<0>(info.get<0>()++);
 	info.set<1>(std::string("Address!"));
 	info.set<2>(null);
- 	*_pSession << "INSERT INTO NullableStringTest VALUES(?, ?, ?)", use(info), now;
+	*_pSession << "INSERT INTO NullableStringTest VALUES(?, ?, ?)", use(info), now;
 
 	std::vector<Info> infos;
 	infos.push_back(Info(10, std::string("A"), 0));
 	infos.push_back(Info(11, null, 12));
 	infos.push_back(Info(12, std::string("B"), null));
 
- 	*_pSession << "INSERT INTO NullableStringTest VALUES(?, ?, ?)", use(infos), now;
+	*_pSession << "INSERT INTO NullableStringTest VALUES(?, ?, ?)", use(infos), now;
 
 	std::vector<Info> result;
 
- 	*_pSession << "SELECT Id, Address, Age FROM NullableStringTest", into(result), now;
+	*_pSession << "SELECT Id, Address, Age FROM NullableStringTest", into(result), now;
 
 	assert(result[0].get<1>() == std::string("Address"));
 	assert(result[0].get<2>() == 10);
@@ -650,10 +651,10 @@ void MySQLTest::testTupleWithNullable()
 
 void MySQLTest::dropTable(const std::string& tableName)
 {
-    
-    try { *_pSession << format("DROP TABLE IF EXISTS %s", tableName), now; }
-    catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("dropTable()"); }
-    catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("dropTable()"); }
+	
+	try { *_pSession << format("DROP TABLE IF EXISTS %s", tableName), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("dropTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("dropTable()"); }
 }
 
 
@@ -718,7 +719,7 @@ void MySQLTest::recreateNullableIntTable()
 {
 	dropTable("NullableIntTest");
 	try { 
-	    *_pSession << "CREATE TABLE NullableIntTest (Id INTEGER(10), Value INTEGER(10))", now;
+		*_pSession << "CREATE TABLE NullableIntTest (Id INTEGER(10), Value INTEGER(10))", now;
 	}
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateNullableIntTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateNullableIntTable()"); }
@@ -729,7 +730,7 @@ void MySQLTest::recreateNullableStringTable()
 {
 	dropTable("NullableStringTest");
 	try { 
-	    *_pSession << "CREATE TABLE NullableStringTest (Id INTEGER(10), Address VARCHAR(30), Age INTEGER(10))", now;
+		*_pSession << "CREATE TABLE NullableStringTest (Id INTEGER(10), Address VARCHAR(30), Age INTEGER(10))", now;
 	}
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateNullableStringTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateNullableStringTable()"); }
@@ -765,7 +766,7 @@ CppUnit::Test* MySQLTest::suite()
 	{
 		_pSession = new Session(MySQL::Connector::KEY, _dbConnString);
 	}
-    catch (ConnectionFailedException& ex)
+	catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
 		return 0;
@@ -775,55 +776,55 @@ CppUnit::Test* MySQLTest::suite()
 
 	_pExecutor = new SQLExecutor("MySQL SQL Executor", _pSession);
 
-    CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MySQLTest");
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MySQLTest");
 
-    CppUnit_addTest(pSuite, MySQLTest, testBareboneMySQL);
-    CppUnit_addTest(pSuite, MySQLTest, testSimpleAccess);
-    CppUnit_addTest(pSuite, MySQLTest, testComplexType);
-    CppUnit_addTest(pSuite, MySQLTest, testSimpleAccessVector);
-    CppUnit_addTest(pSuite, MySQLTest, testComplexTypeVector);
-    CppUnit_addTest(pSuite, MySQLTest, testInsertVector);
-    CppUnit_addTest(pSuite, MySQLTest, testInsertEmptyVector);
-    CppUnit_addTest(pSuite, MySQLTest, testInsertSingleBulk);
-    CppUnit_addTest(pSuite, MySQLTest, testInsertSingleBulkVec);
-    CppUnit_addTest(pSuite, MySQLTest, testLimit);
-    CppUnit_addTest(pSuite, MySQLTest, testLimitOnce);
-    CppUnit_addTest(pSuite, MySQLTest, testLimitPrepare);
-    CppUnit_addTest(pSuite, MySQLTest, testLimitZero);
-    CppUnit_addTest(pSuite, MySQLTest, testPrepare);
-    CppUnit_addTest(pSuite, MySQLTest, testSetSimple);
-    CppUnit_addTest(pSuite, MySQLTest, testSetComplex);
-    CppUnit_addTest(pSuite, MySQLTest, testSetComplexUnique);
-    CppUnit_addTest(pSuite, MySQLTest, testMultiSetSimple);
-    CppUnit_addTest(pSuite, MySQLTest, testMultiSetComplex);
-    CppUnit_addTest(pSuite, MySQLTest, testMapComplex);
-    CppUnit_addTest(pSuite, MySQLTest, testMapComplexUnique);
-    CppUnit_addTest(pSuite, MySQLTest, testMultiMapComplex);
-    CppUnit_addTest(pSuite, MySQLTest, testSelectIntoSingle);
-    CppUnit_addTest(pSuite, MySQLTest, testSelectIntoSingleStep);
-    CppUnit_addTest(pSuite, MySQLTest, testSelectIntoSingleFail);
-    CppUnit_addTest(pSuite, MySQLTest, testLowerLimitOk);
-    CppUnit_addTest(pSuite, MySQLTest, testLowerLimitFail);
-    CppUnit_addTest(pSuite, MySQLTest, testCombinedLimits);
-    CppUnit_addTest(pSuite, MySQLTest, testCombinedIllegalLimits);
-    CppUnit_addTest(pSuite, MySQLTest, testRange);
-    CppUnit_addTest(pSuite, MySQLTest, testIllegalRange);
-    CppUnit_addTest(pSuite, MySQLTest, testSingleSelect);
-    CppUnit_addTest(pSuite, MySQLTest, testEmptyDB);
-    //CppUnit_addTest(pSuite, MySQLTest, testBLOB);
-    CppUnit_addTest(pSuite, MySQLTest, testBLOBStmt);
-    CppUnit_addTest(pSuite, MySQLTest, testFloat);
-    CppUnit_addTest(pSuite, MySQLTest, testDouble);
-    CppUnit_addTest(pSuite, MySQLTest, testTuple);
-    CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
-    CppUnit_addTest(pSuite, MySQLTest, testInternalExtraction);
-    CppUnit_addTest(pSuite, MySQLTest, testNull);
-    CppUnit_addTest(pSuite, MySQLTest, testNullableInt);
-    CppUnit_addTest(pSuite, MySQLTest, testNullableString);
-    CppUnit_addTest(pSuite, MySQLTest, testTupleWithNullable);
+	CppUnit_addTest(pSuite, MySQLTest, testBareboneMySQL);
+	CppUnit_addTest(pSuite, MySQLTest, testSimpleAccess);
+	CppUnit_addTest(pSuite, MySQLTest, testComplexType);
+	CppUnit_addTest(pSuite, MySQLTest, testSimpleAccessVector);
+	CppUnit_addTest(pSuite, MySQLTest, testComplexTypeVector);
+	CppUnit_addTest(pSuite, MySQLTest, testInsertVector);
+	CppUnit_addTest(pSuite, MySQLTest, testInsertEmptyVector);
+	CppUnit_addTest(pSuite, MySQLTest, testInsertSingleBulk);
+	CppUnit_addTest(pSuite, MySQLTest, testInsertSingleBulkVec);
+	CppUnit_addTest(pSuite, MySQLTest, testLimit);
+	CppUnit_addTest(pSuite, MySQLTest, testLimitOnce);
+	CppUnit_addTest(pSuite, MySQLTest, testLimitPrepare);
+	CppUnit_addTest(pSuite, MySQLTest, testLimitZero);
+	CppUnit_addTest(pSuite, MySQLTest, testPrepare);
+	CppUnit_addTest(pSuite, MySQLTest, testSetSimple);
+	CppUnit_addTest(pSuite, MySQLTest, testSetComplex);
+	CppUnit_addTest(pSuite, MySQLTest, testSetComplexUnique);
+	CppUnit_addTest(pSuite, MySQLTest, testMultiSetSimple);
+	CppUnit_addTest(pSuite, MySQLTest, testMultiSetComplex);
+	CppUnit_addTest(pSuite, MySQLTest, testMapComplex);
+	CppUnit_addTest(pSuite, MySQLTest, testMapComplexUnique);
+	CppUnit_addTest(pSuite, MySQLTest, testMultiMapComplex);
+	CppUnit_addTest(pSuite, MySQLTest, testSelectIntoSingle);
+	CppUnit_addTest(pSuite, MySQLTest, testSelectIntoSingleStep);
+	CppUnit_addTest(pSuite, MySQLTest, testSelectIntoSingleFail);
+	CppUnit_addTest(pSuite, MySQLTest, testLowerLimitOk);
+	CppUnit_addTest(pSuite, MySQLTest, testLowerLimitFail);
+	CppUnit_addTest(pSuite, MySQLTest, testCombinedLimits);
+	CppUnit_addTest(pSuite, MySQLTest, testCombinedIllegalLimits);
+	CppUnit_addTest(pSuite, MySQLTest, testRange);
+	CppUnit_addTest(pSuite, MySQLTest, testIllegalRange);
+	CppUnit_addTest(pSuite, MySQLTest, testSingleSelect);
+	CppUnit_addTest(pSuite, MySQLTest, testEmptyDB);
+	//CppUnit_addTest(pSuite, MySQLTest, testBLOB);
+	CppUnit_addTest(pSuite, MySQLTest, testBLOBStmt);
+	CppUnit_addTest(pSuite, MySQLTest, testFloat);
+	CppUnit_addTest(pSuite, MySQLTest, testDouble);
+	CppUnit_addTest(pSuite, MySQLTest, testTuple);
+	CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
+	CppUnit_addTest(pSuite, MySQLTest, testInternalExtraction);
+	CppUnit_addTest(pSuite, MySQLTest, testNull);
+	CppUnit_addTest(pSuite, MySQLTest, testNullableInt);
+	CppUnit_addTest(pSuite, MySQLTest, testNullableString);
+	CppUnit_addTest(pSuite, MySQLTest, testTupleWithNullable);
 	CppUnit_addTest(pSuite, MySQLTest, testSessionTransaction);
 	CppUnit_addTest(pSuite, MySQLTest, testTransaction);
 	CppUnit_addTest(pSuite, MySQLTest, testReconnect);
 
-    return pSuite;
+	return pSuite;
 }
