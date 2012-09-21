@@ -277,8 +277,8 @@ void ODBCStatementImpl::clear()
 		//(returned by 3.x drivers when cursor is not opened)
 		for (int i = 0; i < diagnostics.count(); ++i)
 		{
-			if (ignoreError =
-				(INVALID_CURSOR_STATE == std::string(diagnostics.sqlState(i))))
+			if ((ignoreError =
+				(INVALID_CURSOR_STATE == std::string(diagnostics.sqlState(i)))))
 			{
 				break;
 			}

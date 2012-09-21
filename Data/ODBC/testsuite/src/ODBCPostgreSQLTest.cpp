@@ -571,7 +571,7 @@ void ODBCPostgreSQLTest::recreateLogTable()
 
 CppUnit::Test* ODBCPostgreSQLTest::suite()
 {
-	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
+	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString)))
 	{
 		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
 

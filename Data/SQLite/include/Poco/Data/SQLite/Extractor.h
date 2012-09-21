@@ -46,6 +46,8 @@
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/Constants.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include "sqlite3.h"

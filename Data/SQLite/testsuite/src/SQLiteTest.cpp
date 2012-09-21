@@ -356,9 +356,10 @@ void SQLiteTest::testInMemory()
 	assert (result == tableName);
 
 	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
-
+	
 	// load db from file to memory
 	Session mem (Poco::Data::SQLite::Connector::KEY, ":memory:");
+	sqlite3* p = 0; Any a = p; // ??? clang generated code fails to AnyCast without these
 	sqlite3* pMemHandle = AnyCast<sqlite3*>(mem.getProperty("handle"));
 	assert (Poco::Data::SQLite::Utility::fileToMemory(pMemHandle, "dummy.db"));
 

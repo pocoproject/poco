@@ -74,7 +74,7 @@ protected:
 	typename BaseType::int_type readFromDevice()
 	{
 		if (_it != _lob.end())
-			return charToInt(*_it++);
+			return BaseType::charToInt(*_it++);
 		else
 			return -1;
 	}
