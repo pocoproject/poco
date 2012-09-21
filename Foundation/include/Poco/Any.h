@@ -54,117 +54,117 @@ class Any
 	/// by Applied Informatics.
 {
 public:
-    Any():
+	Any():
 		_content(0)
 		/// Creates an empty any type.
-    {
-    }
+	{
+	}
 
-    template <typename ValueType>
-    Any(const ValueType& value):
+	template <typename ValueType>
+	Any(const ValueType& value):
 		_content(new Holder<ValueType>(value))
 		/// Creates an any which stores the init parameter inside.
 		///
 		/// Example: 
-		///     Any a(13); 
-		///     Any a(string("12345"));
-    {
-    }
+		///	 Any a(13); 
+		///	 Any a(string("12345"));
+	{
+	}
 
-    Any(const Any& other):
+	Any(const Any& other):
 		_content(other._content ? other._content->clone() : 0)
 		/// Copy constructor, works with empty Anys and initialized Any values.
-    {
-    }
+	{
+	}
 
-    ~Any()
-    {
-        delete _content;
-    }
+	~Any()
+	{
+		delete _content;
+	}
 
-    Any& swap(Any& rhs)
+	Any& swap(Any& rhs)
 		/// Swaps the content of the two Anys.
-    {
-        std::swap(_content, rhs._content);
-        return *this;
-    }
+	{
+		std::swap(_content, rhs._content);
+		return *this;
+	}
 
-    template <typename ValueType>
-    Any& operator = (const ValueType& rhs)
+	template <typename ValueType>
+	Any& operator = (const ValueType& rhs)
 		/// Assignment operator for all types != Any.
 		///
 		/// Example: 
-		///    Any a = 13; 
-		///    Any a = string("12345");
-    {
-        Any(rhs).swap(*this);
-        return *this;
-    }
+		///	Any a = 13; 
+		///	Any a = string("12345");
+	{
+		Any(rhs).swap(*this);
+		return *this;
+	}
 
-    Any& operator = (const Any& rhs)
+	Any& operator = (const Any& rhs)
 		/// Assignment operator for Any.
-    {
-        Any(rhs).swap(*this);
-        return *this;
-    }
+	{
+		Any(rhs).swap(*this);
+		return *this;
+	}
 
-    bool empty() const
+	bool empty() const
 		/// returns true if the Any is empty
-    {
-        return !_content;
-    }
+	{
+		return !_content;
+	}
 
-    const std::type_info& type() const
+	const std::type_info& type() const
 		/// Returns the type information of the stored content.
 		/// If the Any is empty typeid(void) is returned.
 		/// It is suggested to always query an Any for its type info before trying to extract
 		/// data via an AnyCast/RefAnyCast.
-    {
-        return _content ? _content->type() : typeid(void);
-    }
+	{
+		return _content ? _content->type() : typeid(void);
+	}
 
 private:
-    class Placeholder
-    {
-    public:
-        virtual ~Placeholder()
-        {
-        }
+	class Placeholder
+	{
+	public:
+		virtual ~Placeholder()
+		{
+		}
 
-        virtual const std::type_info& type() const = 0;
-        virtual Placeholder* clone() const = 0;
-    };
+		virtual const std::type_info& type() const = 0;
+		virtual Placeholder* clone() const = 0;
+	};
 
-    template <typename ValueType>
-    class Holder: public Placeholder
-    {
-    public: 
-        Holder(const ValueType& value):
+	template <typename ValueType>
+	class Holder: public Placeholder
+	{
+	public: 
+		Holder(const ValueType& value):
 			_held(value)
-        {
-        }
+		{
+		}
 
-        virtual const std::type_info& type() const
-        {
-            return typeid(ValueType);
-        }
+		virtual const std::type_info& type() const
+		{
+			return typeid(ValueType);
+		}
 
-        virtual Placeholder* clone() const
-        {
-            return new Holder(_held);
-        }
+		virtual Placeholder* clone() const
+		{
+			return new Holder(_held);
+		}
 
-        ValueType _held;
-    };
+		ValueType _held;
+	};
 
 private:
-    template <typename ValueType>
-    friend ValueType* AnyCast(Any*);
+	template <typename ValueType>
+	friend ValueType* AnyCast(Any*);
 
-    template <typename ValueType>
-    friend ValueType* UnsafeAnyCast(Any*);
+	template <typename ValueType>
+	friend ValueType* UnsafeAnyCast(Any*);
 
-    Placeholder* _content;
+	Placeholder* _content;
 };
 
 
@@ -174,12 +174,12 @@ ValueType* AnyCast(Any* operand)
 	/// to the stored value. 
 	///
 	/// Example Usage: 
-	///     MyType* pTmp = AnyCast<MyType*>(pAny).
+	///	 MyType* pTmp = AnyCast<MyType*>(pAny).
 	/// Will return NULL if the cast fails, i.e. types don't match.
 {
-    return operand && operand->type() == typeid(ValueType)
-                ? &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held
-                : 0;
+	return operand && operand->type() == typeid(ValueType)
+				? &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held
+				: 0;
 }
 
 
@@ -189,10 +189,10 @@ const ValueType* AnyCast(const Any* operand)
 	/// to the stored value. 
 	///
 	/// Example Usage:
-	///     const MyType* pTmp = AnyCast<MyType*>(pAny).
+	///	 const MyType* pTmp = AnyCast<MyType*>(pAny).
 	/// Will return NULL if the cast fails, i.e. types don't match.
 {
-    return AnyCast<ValueType>(const_cast<Any*>(operand));
+	return AnyCast<ValueType>(const_cast<Any*>(operand));
 }
 
 
@@ -201,15 +201,15 @@ ValueType AnyCast(const Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an const Any&.
 	///
 	/// Example Usage: 
-	///     MyType tmp = AnyCast<MyType>(anAny).
+	///	 MyType tmp = AnyCast<MyType>(anAny).
 	/// Will throw a BadCastException if the cast fails.
 	/// Dont use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& = ...
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
-    ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
-    if (!result) throw BadCastException("Failed to convert between const Any types");
-    return *result;
+	ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
+	if (!result) throw BadCastException("Failed to convert between const Any types");
+	return *result;
 }
 
 
@@ -218,15 +218,15 @@ ValueType AnyCast(Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an Any&.
 	///
 	/// Example Usage: 
-	///     MyType tmp = AnyCast<MyType>(anAny).
+	///	 MyType tmp = AnyCast<MyType>(anAny).
 	/// Will throw a BadCastException if the cast fails.
 	/// Dont use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& tmp = ...
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
-    ValueType* result = AnyCast<ValueType>(&operand);
-    if (!result) throw BadCastException("Failed to convert between Any types");
-    return *result;
+	ValueType* result = AnyCast<ValueType>(&operand);
+	if (!result) throw BadCastException("Failed to convert between Any types");
+	return *result;
 }
 
 
@@ -235,11 +235,11 @@ const ValueType& RefAnyCast(const Any & operand)
 	/// AnyCast operator used to return a const reference to the internal data. 
 	///
 	/// Example Usage: 
-	///     const MyType& tmp = RefAnyCast<MyType>(anAny);
+	///	 const MyType& tmp = RefAnyCast<MyType>(anAny);
 {
-    ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
-    if (!result) throw BadCastException("RefAnyCast: Failed to convert between const Any types");
-    return *result;
+	ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
+	if (!result) throw BadCastException("RefAnyCast: Failed to convert between const Any types");
+	return *result;
 }
 
 
@@ -248,11 +248,11 @@ ValueType& RefAnyCast(Any& operand)
 	/// AnyCast operator used to return a reference to the internal data.
 	///
 	/// Example Usage: 
-	///     MyType& tmp = RefAnyCast<MyType>(anAny);
+	///	 MyType& tmp = RefAnyCast<MyType>(anAny);
 {
-    ValueType* result = AnyCast<ValueType>(&operand);
-    if (!result) throw BadCastException("RefAnyCast: Failed to convert between Any types");
-    return *result;
+	ValueType* result = AnyCast<ValueType>(&operand);
+	if (!result) throw BadCastException("RefAnyCast: Failed to convert between Any types");
+	return *result;
 }
 
 
@@ -264,7 +264,7 @@ ValueType* UnsafeAnyCast(Any* operand)
 	/// use typeid() comparison, e.g., when our types may travel across
 	/// different shared libraries.
 {
-    return &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held;
+	return &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held;
 }
 
 
@@ -276,7 +276,7 @@ const ValueType* UnsafeAnyCast(const Any* operand)
 	/// use typeid() comparison, e.g., when our types may travel across
 	/// different shared libraries.
 {
-    return AnyCast<ValueType>(const_cast<Any*>(operand));
+	return AnyCast<ValueType>(const_cast<Any*>(operand));
 }
 
 

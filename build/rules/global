@@ -271,36 +271,6 @@ INCLUDE = $(foreach p,$(POCO_ADD_INCLUDE),-I$(p)) -Iinclude $(foreach p,$(COMPON
 LIBRARY = $(foreach p,$(POCO_ADD_LIBRARY),-L$(p)) -L$(LIBPATH) $(POCO_LIBRARY)
 
 #
-# Build ODBC Include directory List if not supplied from config
-#
-ifndef POCO_ODBC_INCLUDE
-POCO_ODBC_INCLUDE =  -I/usr/local/include -I/usr/include -I/usr/include/odbc -I/usr/local/include/odbc
-endif
-
-#
-# Build ODBC library directory if not supplied from config
-#
-ifndef POCO_NO_ODBC
-ifndef POCO_ODBC_LIBRARY
-ifeq (0, $(shell test -e $/usr/lib/libodbc$(LIBLINKEXT); echo $$?))
-POCO_ODBC_LIBRARY = /usr/lib$(LIB64SUFFIX)
-else
-ifeq (0, $(shell test -e $/usr/local/lib/libodbc$(LIBLINKEXT); echo $$?))
-POCO_ODBC_LIBRARY = /usr/local/lib$(LIB64SUFFIX)
-else
-ifeq (0, $(shell test -e $/usr/local/lib/libodbc$(LIBLINKEXT); echo $$?))
-POCO_ODBC_LIBRARY = /usr/lib$(LIB64SUFFIX)/odbc
-else
-ifeq (0, $(shell test -e $/usr/local/lib/libodbc$(LIBLINKEXT); echo $$?))
-POCO_ODBC_LIBRARY = /usr/local/lib$(LIB64SUFFIX)/odbc
-endif
-endif
-endif
-endif
-endif
-endif
-
-#
 # Strip Command definition
 #
 ifeq ($(strip $(STRIP)),)
