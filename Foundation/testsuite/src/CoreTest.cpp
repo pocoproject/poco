@@ -785,6 +785,10 @@ void CoreTest::testNullable()
 	
 	assert (n1.value(42) == 42);
 	assert (n1.isNull());
+	assert (!(0 == n1));
+	assert (0 != n1);
+	assert (!(n1 == 0));
+	assert (n1 != 0);
 	
 	try
 	{
@@ -803,6 +807,11 @@ void CoreTest::testNullable()
 	assert (!n2.isNull());
 	assert (n2.value() == 42);
 	assert (n2.value(99) == 42);
+	
+	assert (!(0 == n2));
+	assert (0 != n2);
+	assert (!(n2 == 0));
+	assert (n2 != 0);
 	
 	n1 = n2;
 	assert (!n1.isNull());

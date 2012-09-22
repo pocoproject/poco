@@ -202,22 +202,22 @@ void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const ch
 
 	MYSQL_BIND bind_param[5] = {{0}};
 
-	bind_param[0].buffer        = const_cast<char*>(str[0].c_str());
+	bind_param[0].buffer		= const_cast<char*>(str[0].c_str());
 	bind_param[0].buffer_length = static_cast<unsigned long>(str[0].length());
 	bind_param[0].buffer_type   = MYSQL_TYPE_STRING;
 
-	bind_param[1].buffer        = const_cast<char*>(str[1].c_str());
+	bind_param[1].buffer		= const_cast<char*>(str[1].c_str());
 	bind_param[1].buffer_length = static_cast<unsigned long>(str[1].length());
 	bind_param[1].buffer_type   = MYSQL_TYPE_STRING;
 
-	bind_param[2].buffer        = const_cast<char*>(str[2].c_str());
+	bind_param[2].buffer		= const_cast<char*>(str[2].c_str());
 	bind_param[2].buffer_length = static_cast<unsigned long>(str[2].length());
 	bind_param[2].buffer_type   = MYSQL_TYPE_STRING;
 
-	bind_param[3].buffer        = &fourth;
+	bind_param[3].buffer		= &fourth;
 	bind_param[3].buffer_type   = MYSQL_TYPE_LONG;
 
-	bind_param[4].buffer        = &fifth;
+	bind_param[4].buffer		= &fifth;
 	bind_param[4].buffer_type   = MYSQL_TYPE_FLOAT;
 
 	rc = mysql_stmt_bind_param(hstmt, bind_param);
@@ -237,28 +237,28 @@ void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const ch
 
 	MYSQL_BIND bind_result[5] = {{0}};
 	
-	bind_result[0].buffer        = chr[0];
+	bind_result[0].buffer		= chr[0];
 	bind_result[0].buffer_length = sizeof(chr[0]);
 	bind_result[0].buffer_type   = MYSQL_TYPE_STRING;
-	bind_result[0].length        = &lengths[0];
+	bind_result[0].length		= &lengths[0];
 
-	bind_result[1].buffer        = chr[1];
+	bind_result[1].buffer		= chr[1];
 	bind_result[1].buffer_length = sizeof(chr[1]);
 	bind_result[1].buffer_type   = MYSQL_TYPE_STRING;
-	bind_result[1].length        = &lengths[1];
+	bind_result[1].length		= &lengths[1];
 
-	bind_result[2].buffer        = chr[2];
+	bind_result[2].buffer		= chr[2];
 	bind_result[2].buffer_length = sizeof(chr[2]);
 	bind_result[2].buffer_type   = MYSQL_TYPE_STRING;
-	bind_result[2].length        = &lengths[2];
+	bind_result[2].length		= &lengths[2];
 
-	bind_result[3].buffer        = &fourth;
+	bind_result[3].buffer		= &fourth;
 	bind_result[3].buffer_type   = MYSQL_TYPE_LONG;
-	bind_result[3].length        = &lengths[3];
+	bind_result[3].length		= &lengths[3];
 
-	bind_result[4].buffer        = &fifth;
+	bind_result[4].buffer		= &fifth;
 	bind_result[4].buffer_type   = MYSQL_TYPE_FLOAT;
-	bind_result[4].length        = &lengths[4];
+	bind_result[4].length		= &lengths[4];
 
 	rc = mysql_stmt_bind_result(hstmt, bind_result);
 	assert (rc == 0);
@@ -1487,34 +1487,34 @@ void SQLExecutor::doNull()
 {
 	std::string funct = "null()";
 	
-    *_pSession << "INSERT INTO Vectors VALUES (?, ?, ?)", 
-                        use(Poco::Data::Keywords::null), 
-                        use(Poco::Data::Keywords::null), 
-                        use(Poco::Data::Keywords::null), now;
+	*_pSession << "INSERT INTO Vectors VALUES (?, ?, ?)", 
+						use(Poco::Data::Keywords::null), 
+						use(Poco::Data::Keywords::null), 
+						use(Poco::Data::Keywords::null), now;
 
-    int count = 0;
-    try { *_pSession << "SELECT COUNT(*) FROM Vectors", into(count), now; }
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Vectors", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assert (count == 1);
 
 	int i0 = 0;
 	Statement stmt1 = (*_pSession << "SELECT i0 FROM Vectors", into(i0, Poco::Data::Position(0), -1));
-    try { stmt1.execute(); }
+	try { stmt1.execute(); }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	poco_assert (i0 == -1);
 
 	float flt0 = 0;
-    Statement stmt2 = (*_pSession << "SELECT flt0 FROM Vectors", into(flt0, Poco::Data::Position(0), 3.25f));
-    try { stmt2.execute(); }
+	Statement stmt2 = (*_pSession << "SELECT flt0 FROM Vectors", into(flt0, Poco::Data::Position(0), 3.25f));
+	try { stmt2.execute(); }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	poco_assert (flt0 == 3.25);
 
 	std::string str0("string");
-    Statement stmt3 = (*_pSession << "SELECT str0 FROM Vectors", into(str0, Poco::Data::Position(0), std::string("DEFAULT")));
-    try { stmt3.execute(); }
+	Statement stmt3 = (*_pSession << "SELECT str0 FROM Vectors", into(str0, Poco::Data::Position(0), std::string("DEFAULT")));
+	try { stmt3.execute(); }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	poco_assert (str0 == "DEFAULT");

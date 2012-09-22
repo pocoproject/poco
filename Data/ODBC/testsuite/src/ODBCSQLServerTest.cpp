@@ -737,7 +737,7 @@ void ODBCSQLServerTest::recreateLogTable()
 
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
-	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db))
+	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db)))
 	{
 		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
 

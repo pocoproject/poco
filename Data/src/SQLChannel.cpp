@@ -118,16 +118,15 @@ void SQLChannel::log(const Message& msg)
 
 void SQLChannel::logAsync(const Message& msg)
 {
-	if (!_pSession || !_pSession->isConnected()) open();
-
-	std::size_t ret = wait();
-	if (0 == ret && !_pLogStatement->done() && !_pLogStatement->initialized()) 
+	poco_check_ptr (_pLogStatement);
+	if (0 == wait() && !_pLogStatement->done() && !_pLogStatement->initialized()) 
 	{
 		if (_throw) 
 			throw TimeoutException("Timed out waiting for previous statement completion");
 		else return;
 	}
 
+	if (!_pSession || !_pSession->isConnected()) open();
 	logSync(msg);
 }
 

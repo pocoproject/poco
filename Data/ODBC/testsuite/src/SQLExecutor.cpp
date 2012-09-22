@@ -3393,6 +3393,7 @@ void SQLExecutor::sqlChannel(const std::string& connect)
 		rs2.moveNext();
 		assert ("WarningSource" == rs2["Source"]);
 		assert ("f Warning sync message" == rs2["Text"]);
+		
 	} 
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlChannel()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlChannel()"); }
@@ -3420,8 +3421,8 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 		assert ("TestSQLChannel" == rs["Source"]);
 		assert ("b Warning message" == rs["Text"]);
 	} 
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlChannel()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlChannel()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlLogger()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlLogger()"); }
 }
 
 

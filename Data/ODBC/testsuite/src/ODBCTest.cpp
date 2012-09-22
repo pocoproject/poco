@@ -1266,21 +1266,27 @@ bool ODBCTest::canConnect(const std::string& driver,
 
 	Utility::DSNMap dataSources;
 	Utility::dataSources(dataSources);
-	Utility::DSNMap::iterator itDSN = dataSources.begin();
-	for (; itDSN != dataSources.end(); ++itDSN)
+	if (dataSources.size() > 0)
 	{
-		if (itDSN->first == dsn && itDSN->second == driver)
+		Utility::DSNMap::iterator itDSN = dataSources.begin();
+		std::cout << dataSources.size() << " DSNs found, enumerating ..." << std::endl;
+		for (; itDSN != dataSources.end(); ++itDSN)
 		{
-			std::cout << "DSN found: " << itDSN->first 
-				<< " (" << itDSN->second << ')' << std::endl;
+			if (itDSN->first == dsn && itDSN->second == driver)
+			{
+				std::cout << "DSN found: " << itDSN->first
+					<< " (" << itDSN->second << ')' << std::endl;
 
-			dbConnString = format("DSN=%s;UID=%s;PWD=%s;", dsn, uid, pwd);
-			if (!db.empty()) 
-				format(dbConnString, "DATABASE=%s;", db);
+				dbConnString = format("DSN=%s;UID=%s;PWD=%s;", dsn, uid, pwd);
+				if (!db.empty())
+					format(dbConnString, "DATABASE=%s;", db);
 
-			return true;
+				return true;
+			}
 		}
 	}
+	else
+		std::cout << "No DSNs found, will attempt DSN-less connection ..." << std::endl;
 
 	dsn = "";
 	return true;
@@ -1310,6 +1316,7 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	Poco::Data::ODBC::Connector::registerConnector();
 	try
 	{
+		std::cout << "Conecting to [" << dbConnString << ']' << std::endl;
 		return new Session(Poco::Data::ODBC::Connector::KEY, dbConnString);
 	}catch (ConnectionFailedException& ex)
 	{

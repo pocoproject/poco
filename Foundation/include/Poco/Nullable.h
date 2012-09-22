@@ -183,7 +183,7 @@ public:
 	bool operator != (const C& value) const
 		/// Compares Nullable with value for non equality
 	{
-		return _value != value;
+		return !(*this == value);
 	}
 
 	bool operator != (const Nullable<C>& other) const

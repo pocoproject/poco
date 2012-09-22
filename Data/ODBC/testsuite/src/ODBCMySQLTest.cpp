@@ -60,11 +60,7 @@ using Poco::Tuple;
 using Poco::NotFoundException;
 
 
-#ifdef POCO_OS_FAMILY_WINDOWS
-	#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.1 Driver"
-#else
-	#define MYSQL_ODBC_DRIVER "MySQL"
-#endif
+#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.2 Driver"
 #define MYSQL_DSN "PocoDataMySQLTest"
 #define MYSQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MYSQL_DB "test"
@@ -78,7 +74,7 @@ std::string          ODBCMySQLTest::_driver = MYSQL_ODBC_DRIVER;
 std::string          ODBCMySQLTest::_dsn = MYSQL_DSN;
 std::string          ODBCMySQLTest::_uid = MYSQL_UID;
 std::string          ODBCMySQLTest::_pwd = MYSQL_PWD;
-std::string          ODBCMySQLTest::_connectString = "DRIVER=" MYSQL_ODBC_DRIVER ";"
+std::string          ODBCMySQLTest::_connectString = "DRIVER={" MYSQL_ODBC_DRIVER "};"
 	"DATABASE=" MYSQL_DB ";"
 	"SERVER=" MYSQL_SERVER ";"
 	"UID=" MYSQL_UID ";"
@@ -504,14 +500,14 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testFilter);
-		//CppUnit_addTest(pSuite, ODBCOracleTest, testInternalBulkExtraction);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testNull);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testRowIterator);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAny);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testDynamicAny);
-		CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
+		//CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLLogger);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSessionTransaction);
