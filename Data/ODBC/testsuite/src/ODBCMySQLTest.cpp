@@ -60,7 +60,7 @@ using Poco::Tuple;
 using Poco::NotFoundException;
 
 
-#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.2w Driver"
+#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.2 Driver"
 #define MYSQL_DSN "PocoDataMySQLTest"
 #define MYSQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MYSQL_DB "test"
@@ -465,7 +465,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testPrepare);
-		CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
+		//CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplex);

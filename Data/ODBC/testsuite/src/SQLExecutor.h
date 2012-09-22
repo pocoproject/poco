@@ -252,7 +252,7 @@ public:
 		assert (.5 == floats.front());
 		assert (floats.size() - 1 + .5 == floats.back());
 		assert (bools.front());
-		assert ((0 == ((bools.size() - 1) % 2) == bools.back()));
+		assert (((0 == ((bools.size() - 1) % 2)) == bools.back()));
 
 		ints.clear();
 
@@ -305,7 +305,7 @@ public:
 		assert (.5 == floats.front());
 		assert (floats.size() - 1 + .5 == floats.back());
 		assert (bools.front());
-		assert ((0 == ((bools.size() - 1) % 2) == bools.back()));
+		assert (((0 == ((bools.size() - 1) % 2)) == bools.back()));
 	}
 
 	void doBulkPerformance(Poco::UInt32 size);
@@ -361,7 +361,7 @@ public:
 		blobs.clear();
 		floats.clear();
 		dateTimes.clear();
-		
+
 		try 
 		{ 
 			session() << "SELECT * FROM MiscTest ORDER BY First", 

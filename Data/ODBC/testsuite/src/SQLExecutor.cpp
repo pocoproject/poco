@@ -1702,6 +1702,7 @@ void SQLExecutor::prepare()
 	{
 		Statement stmt((session() << "INSERT INTO Strings VALUES (?)", use(data)));
 	}
+
 	// stmt should not have been executed when destroyed
 	int count = 100;
 	try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
