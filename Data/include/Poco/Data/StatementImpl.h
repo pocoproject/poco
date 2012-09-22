@@ -338,7 +338,7 @@ private:
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
-		return new InternalExtraction<C>(*pData, pCol, Position(currentDataSet()));
+		return new InternalExtraction<C>(*pData, pCol, Poco::UInt32(currentDataSet()));
 	}
 
 	template <class C>
