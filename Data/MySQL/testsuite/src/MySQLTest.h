@@ -57,6 +57,7 @@ public:
 	MySQLTest(const std::string& name);
 	~MySQLTest();
 
+	void testConnectNoDB();
 	void testBareboneMySQL();
 
 	void testSimpleAccess();

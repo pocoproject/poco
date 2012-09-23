@@ -90,6 +90,27 @@ MySQLTest::~MySQLTest()
 }
 
 
+void MySQLTest::testConnectNoDB()
+{
+	std::string dbConnString = "host=" MYSQL_HOST
+		";user=" MYSQL_USER
+		";password=" MYSQL_PWD
+		";compress=true;auto-reconnect=true";
+	
+	try
+	{
+		Session session(MySQL::Connector::KEY, dbConnString);
+		std::cout << "Connected to [" << "MySQL" << "] without database. Disconnecting ..." << std::endl;
+		session.close();
+		std::cout << "Disconnected." << std::endl;
+	}
+	catch (ConnectionFailedException& ex)
+	{
+		std::cout << ex.displayText() << std::endl;
+	}
+}
+	
+	
 void MySQLTest::testBareboneMySQL()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -778,6 +799,7 @@ CppUnit::Test* MySQLTest::suite()
 
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MySQLTest");
 
+	CppUnit_addTest(pSuite, MySQLTest, testConnectNoDB);
 	CppUnit_addTest(pSuite, MySQLTest, testBareboneMySQL);
 	CppUnit_addTest(pSuite, MySQLTest, testSimpleAccess);
 	CppUnit_addTest(pSuite, MySQLTest, testComplexType);

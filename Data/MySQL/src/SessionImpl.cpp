@@ -129,8 +129,9 @@ void SessionImpl::open(const std::string& connect)
 	if (options["user"] == "")
 		throw MySQLException("create session: specify user name");
 
-	if (options["db"] == "")
-		throw MySQLException("create session: specify database");
+	const char * db = NULL;
+	if (!options["db"].empty())
+		db = options["db"].c_str();
 
 	unsigned int port = 0;
 	if (!NumberParser::tryParseUnsigned(options["port"], port) || 0 == port || port > 65535)
@@ -154,7 +155,7 @@ void SessionImpl::open(const std::string& connect)
 	_handle.connect(options["host"].c_str(), 
 			options["user"].c_str(), 
 			options["password"].c_str(), 
-			options["db"].c_str(), 
+			db, 
 			port);
 
 	addFeature("autoCommit", 
