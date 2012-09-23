@@ -111,6 +111,7 @@ void DataTest::testSession()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
 	assert ("test" == sess.impl()->connectorName());
+	assert (sess.connector() == sess.impl()->connectorName());
 	assert ("cs" == sess.impl()->connectionString());
 	assert ("test:///cs" == sess.uri());
 
