@@ -252,7 +252,7 @@ void BinaryReaderWriterTest::read(BinaryReader& reader)
 void BinaryReaderWriterTest::testWrappers()
 {
 	bool b = false; char c = '0'; int i = 0;
-	Buffer<char> buf(64);
+	Buffer<char> buf(2 * sizeof(bool) + sizeof(char) + 2 * sizeof(int));
 
 	MemoryBinaryWriter writer(buf);
 	writer << true;
@@ -265,8 +265,18 @@ void BinaryReaderWriterTest::testWrappers()
 	reader >> b; assert (b);
 	reader >> b; assert (!b);
 	reader >> c; assert ('a' == c);
+	assert(reader.available() == sizeof(i) * 2);
 	reader >> i; assert (1 == i);
+	assert(reader.available() == sizeof(i));
 	reader >> i; assert (-1 == i);
+	assert(reader.available() == 0);
+
+	reader.setExceptions(std::istream::eofbit);
+	try
+	{
+		reader >> i;
+		fail ("must throw on EOF");
+	} catch(std::exception&) { }
 }
 
 

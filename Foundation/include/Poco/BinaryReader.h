@@ -164,6 +164,12 @@ public:
 		/// Returns the byte-order used by the reader, which is
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
 
+	void setExceptions(std::ios_base::iostate st = (std::istream::failbit | std::istream::badbit));
+		/// Sets the stream to throw exception on specified state (default failbit and badbit);
+
+	std::streamsize available() const;
+		/// Returns the number of available bytes in the stream.
+
 private:
 	std::istream&  _istr;
 	bool           _flipBytes; 
@@ -176,14 +182,14 @@ class BasicMemoryBinaryReader : public BinaryReader
 	/// A convenient wrapper for using Buffer and MemoryStream with BinaryReader.
 {
 public:
-	BasicMemoryBinaryReader(Buffer<T>& data, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
+	BasicMemoryBinaryReader(const Buffer<T>& data, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
 		BinaryReader(_istr, byteOrder),
 		_data(data),
 		_istr(data.begin(), data.capacity())
 	{
 	}
 
-	BasicMemoryBinaryReader(Buffer<T>& data, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
+	BasicMemoryBinaryReader(const Buffer<T>& data, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
 		BinaryReader(_istr, encoding, byteOrder),
 		_data(data),
 		_istr(data.begin(), data.capacity())
@@ -192,11 +198,6 @@ public:
 
 	~BasicMemoryBinaryReader()
 	{
-	}
-
-	Buffer<T>& data()
-	{
-		return _data;
 	}
 
 	const Buffer<T>& data() const
@@ -215,7 +216,7 @@ public:
 	}
 
 private:
-	Buffer<T>& _data;
+	const Buffer<T>& _data;
 	MemoryInputStream _istr;
 };
 
@@ -265,6 +266,18 @@ inline BinaryReader::StreamByteOrder BinaryReader::byteOrder() const
 #else
 	return _flipBytes ? BIG_ENDIAN_BYTE_ORDER : LITTLE_ENDIAN_BYTE_ORDER;
 #endif
+}
+
+
+inline void BinaryReader::setExceptions(std::ios_base::iostate st)
+{
+	_istr.exceptions(st);
+}
+
+
+inline std::streamsize BinaryReader::available() const
+{
+	return _istr.rdbuf()->in_avail();
 }
 
 
