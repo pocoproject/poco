@@ -70,19 +70,7 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(MySQL_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoDataMySQLd.lib")
-			#else
-				#pragma comment(lib, "PocoDataMySQL.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoDataMySQLmtd.lib")
-			#else
-				#pragma comment(lib, "PocoDataMySQLmt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoDataMySQL" POCO_LIB_SUFFIX)
 	#endif
 #endif
 

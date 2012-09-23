@@ -72,20 +72,9 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(CppParser_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoCppParserd.lib")
-			#else
-				#pragma comment(lib, "PocoCppParser.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoCppParsermtd.lib")
-			#else
-				#pragma comment(lib, "PocoCppParsermt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoCppParser" POCO_LIB_SUFFIX)
 	#endif
 #endif
+
 
 #endif // CppParser_CppParser_INCLUDED

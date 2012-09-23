@@ -68,25 +68,12 @@
 
 
 //
-// Automatically link Data library.
+// Automatically link SQLite library.
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(SQLite_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoDataSQLited.lib")
-			#else
-				#pragma comment(lib, "PocoDataSQLite.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoDataSQLitemtd.lib")
-			#else
-				#pragma comment(lib, "PocoDataSQLitemt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoDataSQLite" POCO_LIB_SUFFIX)
 	#endif
 #endif
-
 
 #endif // SQLite_SQLite_INCLUDED

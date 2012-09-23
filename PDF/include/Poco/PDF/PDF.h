@@ -41,7 +41,8 @@
 #ifndef PDF_PDF_INCLUDED
 #define PDF_PDF_INCLUDED
 
-#if defined(_MSC_VER) && !defined(POCO_MSVC_SECURE_WARNINGS) && !defined(_CRT_SECURE_NO_DEPRECATE)
+#if defined(_MSC_VER) && !defined(POCO_MSVC_SECURE_WARNINGS) && (!defined(_CRT_SECURE_NO_WARNINGS) || !defined(_CRT_SECURE_NO_DEPRECATE))
+	#define _CRT_SECURE_NO_WARNINGS
 	#define _CRT_SECURE_NO_DEPRECATE
 #endif
 
@@ -76,19 +77,7 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(PDF_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoPDFd.lib")
-			#else
-				#pragma comment(lib, "PocoPDF.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoPDFmtd.lib")
-			#else
-				#pragma comment(lib, "PocoPDFmt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoPDF" POCO_LIB_SUFFIX)
 	#endif
 #endif
 

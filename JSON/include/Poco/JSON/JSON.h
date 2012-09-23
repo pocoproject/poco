@@ -71,9 +71,9 @@
 // Automatically link JSON library.
 //
 #if defined(_MSC_VER)
-#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(JSON_EXPORTS)
-#pragma comment(lib, "PocoJSON" POCO_LIB_SUFFIX)
-#endif
+	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(JSON_EXPORTS)
+		#pragma comment(lib, "PocoJSON" POCO_LIB_SUFFIX)
+	#endif
 #endif
 
 

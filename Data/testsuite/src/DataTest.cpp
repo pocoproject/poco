@@ -1197,7 +1197,7 @@ void DataTest::testRowFormat()
 	SimpleRowFormatter rf;
 	std::streamsize sz = rf.getColumnWidth();
 
-	std::string line(sz * 5, '-');
+	std::string line(std::string::size_type(sz * 5), '-');
 	std::ostringstream os;
 	os << std::left << std::setw(sz) << "field0"
 		<< std::setw(sz) << "field1"
