@@ -84,7 +84,7 @@ std::string& SimpleRowFormatter::formatNames(const NameVecPtr pNames, std::strin
 	_rowCount = 0;
 
 	std::ostringstream str;
-	std::string line(_colWidth * pNames->size(), '-');
+	std::string line(std::string::size_type(pNames->size() * _colWidth), '-');
 
 	NameVec::const_iterator it = pNames->begin();
 	NameVec::const_iterator end = pNames->end();
