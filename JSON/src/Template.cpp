@@ -38,12 +38,16 @@
 #include "Poco/JSON/TemplateCache.h"
 #include "Poco/JSON/Query.h"
 
-namespace Poco
-{
-namespace JSON
-{
+
+using Poco::Dynamic::Var;
+
+
+namespace Poco {
+namespace JSON {
+
 
 POCO_IMPLEMENT_EXCEPTION(JSONTemplateException, Exception, "Template Exception")
+
 
 class Part
 {
@@ -58,10 +62,11 @@ public:
 	{
 	}
 
-	virtual void render(const DynamicAny& data, std::ostream& out) const = 0;
+	virtual void render(const Var& data, std::ostream& out) const = 0;
 
 	typedef std::vector<SharedPtr<Part> > VectorParts;
 };
+
 
 class StringPart : public Part
 {
@@ -81,7 +86,7 @@ public:
 	}
 
 
-	void render(const DynamicAny& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const
 	{
 		out << _content;
 	}
@@ -102,6 +107,7 @@ private:
 
 	std::string _content;
 };
+
 
 class MultiPart : public Part
 {
@@ -125,7 +131,7 @@ public:
 	}
 
 
-	void render(const DynamicAny& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const
 	{
 		for(VectorParts::const_iterator it = _parts.begin(); it != _parts.end(); ++it)
 		{
@@ -137,6 +143,7 @@ protected:
 
 	VectorParts _parts;
 };
+
 
 class EchoPart : public Part
 {
@@ -151,10 +158,10 @@ public:
 	}
 
 
-	void render(const DynamicAny& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const
 	{
 		Query query(data);
-		DynamicAny value = query.find(_query);
+		Var value = query.find(_query);
 
 		if ( ! value.isEmpty() )
 		{
@@ -167,6 +174,7 @@ private:
 	std::string _query;
 };
 
+
 class LogicQuery
 {
 public:
@@ -178,18 +186,18 @@ public:
 	{
 	}
 
-	virtual bool apply(const DynamicAny& data) const
+	virtual bool apply(const Var& data) const
 	{
 		bool logic = false;
 
 		Query query(data);
-		DynamicAny value = query.find(_queryString);
+		Var value = query.find(_queryString);
 
 		if ( ! value.isEmpty() ) // When empty, logic will be false
 		{
 			if ( value.isString() )
 				// An empty string must result in false, otherwise true
-				// Which is not the case when we convert to bool with DynamicAny
+				// Which is not the case when we convert to bool with Var
 			{
 				std::string s = value.convert<std::string>();
 				logic = ! s.empty();
@@ -198,7 +206,7 @@ public:
 			{
 				// All other values, try to convert to bool
 				// An empty object or array will turn into false
-				// all other values depend on the convert<> in DynamicAny
+				// all other values depend on the convert<> in Var
 				logic = value.convert<bool>();
 			}
 		}
@@ -209,6 +217,7 @@ public:
 protected:
 	std::string _queryString;
 };
+
 
 class LogicExistQuery : public LogicQuery
 {
@@ -221,10 +230,10 @@ public:
 	{
 	}
 
-	virtual bool apply(const DynamicAny& data) const
+	virtual bool apply(const Var& data) const
 	{
 		Query query(data);
-		DynamicAny value = query.find(_queryString);
+		Var value = query.find(_queryString);
 
 		return !value.isEmpty();
 	}
@@ -242,7 +251,7 @@ public:
 	{
 	}
 
-	virtual bool apply(const DynamicAny& data) const
+	virtual bool apply(const Var& data) const
 	{
 		return true;
 	}
@@ -273,7 +282,7 @@ public:
 		_queries.push_back(new LogicElseQuery());
 	}
 
-	void render(const DynamicAny& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const
 	{
 		int count = 0;
 		for(std::vector<SharedPtr<LogicQuery> >::const_iterator it = _queries.begin(); it != _queries.end(); ++it, ++count)
@@ -291,6 +300,7 @@ private:
 	std::vector<SharedPtr<LogicQuery> > _queries;
 };
 
+
 class LoopPart : public MultiPart
 {
 public:
@@ -304,7 +314,7 @@ public:
 
 	}
 
-	void render(const DynamicAny& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const
 	{
 		Query query(data);
 
@@ -316,7 +326,7 @@ public:
 			{
 				for(int i = 0; i < array->size(); i++)
 				{
-					DynamicAny value = array->get(i);
+					Var value = array->get(i);
 					dataObject->set(_name, value);
 					MultiPart::render(data, out);
 				}
@@ -361,7 +371,7 @@ public:
 	}
 
 
-	void render(const DynamicAny& data, std::ostream& out) const
+	void render(const Var& data, std::ostream& out) const
 	{
 		TemplateCache* cache = TemplateCache::instance();
 		if ( cache == NULL )
@@ -383,11 +393,13 @@ private:
 
 };
 
+
 Template::Template(const Path& templatePath)
 	: _parts(NULL)
 	, _templatePath(templatePath)
 {
 }
+
 
 Template::Template()
 	: _parts(NULL)
@@ -713,6 +725,7 @@ void Template::readWhiteSpace(std::istream& in)
 	}
 }
 
+
 std::string Template::readString(std::istream& in)
 {
 	std::string str;
@@ -728,9 +741,11 @@ std::string Template::readString(std::istream& in)
 	return str;
 }
 
-void Template::render(const DynamicAny& data, std::ostream& out) const
+
+void Template::render(const Var& data, std::ostream& out) const
 {
 	_parts->render(data, out);
 }
+
 
 }} // Namespace Poco::JSON

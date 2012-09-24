@@ -73,7 +73,10 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parse("-123") == -123);
 	assert(NumberParser::parseUnsigned("123") == 123);
 	assert(NumberParser::parseHex("12AB") == 0x12ab);
+	assert(NumberParser::parseHex("0X12AB") == 0x12ab);
 	assert(NumberParser::parseHex("0x12AB") == 0x12ab);
+	assert(NumberParser::parseHex("0x12aB") == 0x12ab);
+	assert(NumberParser::parseHex("0X98Fe") == 0x98fe);
 	assert(NumberParser::parseHex("0x0") == 0);
 	assert(NumberParser::parseHex("00") == 0);
 	assert(NumberParser::parseOct("123") == 0123);

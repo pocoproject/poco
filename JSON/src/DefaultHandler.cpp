@@ -36,14 +36,18 @@
 #include "Poco/JSON/DefaultHandler.h"
 #include "Poco/JSON/Object.h"
 
-namespace Poco
-{
-namespace JSON
-{
+
+using Poco::Dynamic::Var;
+
+
+namespace Poco {
+namespace JSON {
+
 
 DefaultHandler::DefaultHandler() : Handler()
 {
 }
+
 
 DefaultHandler::~DefaultHandler()
 {
@@ -60,7 +64,7 @@ void DefaultHandler::startObject()
 	}
 	else
 	{
-		DynamicAny parent = _stack.top();
+		Var parent = _stack.top();
 
 		if ( parent.type() == typeid(Array::Ptr) )
 		{
@@ -96,7 +100,7 @@ void DefaultHandler::startArray()
 	}
 	else
 	{
-		DynamicAny parent = _stack.top();
+		Var parent = _stack.top();
 
 		if ( parent.type() == typeid(Array::Ptr) )
 		{
@@ -128,9 +132,9 @@ void DefaultHandler::key(const std::string& k)
 }
 
 
-void DefaultHandler::setValue(const Poco::DynamicAny& value)
+void DefaultHandler::setValue(const Var& value)
 {
-	DynamicAny parent = _stack.top();
+	Var parent = _stack.top();
 
 	if ( parent.type() == typeid(Array::Ptr) )
 	{

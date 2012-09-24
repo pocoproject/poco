@@ -37,45 +37,52 @@
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Stringifier.h"
 
-namespace Poco
-{
-namespace JSON
-{
+
+using Poco::Dynamic::Var;
+
+
+namespace Poco {
+namespace JSON {
+
 
 Array::Array()
 {
 
 }
 
+
 Array::Array(const Array& copy) : _values(copy._values)
 {
 
 }
+
 
 Array::~Array()
 {
 
 }
 
-DynamicAny Array::get(unsigned int index) const
+
+Var Array::get(unsigned int index) const
 {
-	DynamicAny value;
+	Var value;
 	try
 	{
 		value = _values.at(index);
 	}
-	catch(std::out_of_range)
+	catch(std::out_of_range&)
 	{
 		//Ignore, we return an empty value
 	}
 	return value;
 }
 
+
 Array::Ptr Array::getArray(unsigned int index) const
 {
 	Array::Ptr result;
 
-	DynamicAny value = get(index);
+	Var value = get(index);
 	if ( value.type() == typeid(Array::Ptr) )
 	{
 		result = value.extract<Array::Ptr>();
@@ -88,7 +95,7 @@ Object::Ptr Array::getObject(unsigned int index) const
 {
 	Object::Ptr result;
 
-	DynamicAny value = get(index);
+	Var value = get(index);
 	if ( value.type() == typeid(Object::Ptr) )
 	{
 		result = value.extract<Object::Ptr>();
@@ -96,9 +103,10 @@ Object::Ptr Array::getObject(unsigned int index) const
 	return result;
 }
 
+
 bool Array::isObject(unsigned int index) const
 {
-	DynamicAny value = get(index);
+	Var value = get(index);
 	return value.type() == typeid(Object::Ptr);
 }
 
@@ -143,5 +151,6 @@ void Array::stringify(std::ostream& out, unsigned int indent) const
 
 	out << "]";
 }
+
 
 }} // Namespace Poco::JSON

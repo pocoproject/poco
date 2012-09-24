@@ -40,10 +40,12 @@
 #include <iostream>
 #include <sstream>
 
-namespace Poco
-{
-namespace JSON
-{
+
+using Poco::Dynamic::Var;
+
+
+namespace Poco {
+namespace JSON {
 
 
 Object::Object()
@@ -51,9 +53,11 @@ Object::Object()
 
 }
 
+
 Object::Object(const Object& copy) : _values(copy._values)
 {
 }
+
 
 Object::~Object()
 {
@@ -61,9 +65,9 @@ Object::~Object()
 }
 
 
-DynamicAny Object::get(const std::string& key) const
+Var Object::get(const std::string& key) const
 {
-	DynamicAny value;
+	Var value;
 
 	ValueMap::const_iterator it = _values.find(key);
 	if ( it != _values.end() )
@@ -78,7 +82,7 @@ Array::Ptr Object::getArray(const std::string& key) const
 {
 	Array::Ptr result;
 
-	DynamicAny value = get(key);
+	Var value = get(key);
 	if ( value.type() == typeid(Array::Ptr) )
 	{
 		result = value.extract<Array::Ptr>();
@@ -91,7 +95,7 @@ Object::Ptr Object::getObject(const std::string& key) const
 {
 	Object::Ptr result;
 
-	DynamicAny value = get(key);
+	Var value = get(key);
 	if ( value.type() == typeid(Object::Ptr) )
 	{
 		result = value.extract<Object::Ptr>();

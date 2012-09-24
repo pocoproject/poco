@@ -51,6 +51,7 @@ JSONConfigurationTest::~JSONConfigurationTest()
 {
 }
 
+
 void JSONConfigurationTest::testLoad()
 {
 	JSONConfiguration config;

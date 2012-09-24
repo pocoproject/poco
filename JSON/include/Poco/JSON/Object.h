@@ -50,10 +50,8 @@
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Array.h"
 
-namespace Poco
-{
-namespace JSON
-{
+namespace Poco {
+namespace JSON {
 
 
 class JSON_API Object
@@ -63,33 +61,28 @@ public:
 
 	typedef SharedPtr<Object> Ptr;
 
-
 	Object();
 		/// Default constructor
 
 	Object(const Object& copy);
 		/// Copy constructor
 
-
 	virtual ~Object();
 		/// Destructor
 
-	DynamicAny get(const std::string& key) const;
+	Dynamic::Var get(const std::string& key) const;
 		/// Retrieves a property. An empty value is
 		/// returned when the property doesn't exist.
-
 
 	Array::Ptr getArray(const std::string& key) const;
 		/// Returns a SharedPtr to an array when the property
 		/// is an array. An empty SharedPtr is returned when
 		/// the element doesn't exist or is not an array.
 
-
 	Object::Ptr getObject(const std::string& key) const;
 		/// Returns a SharedPtr to an object when the property
 		/// is an object. An empty SharedPtr is returned when
 		/// the property doesn't exist or is not an object
-
 
 	template<typename T>
 	T getValue(const std::string& key) const
@@ -99,29 +92,24 @@ public:
 		/// which can also throw exceptions for invalid values.
 		/// Note: This will not work for an array or an object.
 	{
-		DynamicAny value = get(key);
+		Dynamic::Var value = get(key);
 		return value.convert<T>();
 	}
 
 	void getNames(std::vector<std::string>& names) const;
 		/// Returns all property names
 
-
 	bool has(const std::string& key) const;
 		/// Returns true when the given property exists
-
 
 	bool isArray(const std::string& key) const;
 		/// Returns true when the given property contains an array
 
-
 	bool isNull(const std::string& key) const;
 		/// Returns true when the given property contains a null value
 
-
 	bool isObject(const std::string& key) const;
 		/// Returns true when the given property contains an object
-
 
 	template<typename T>
 	T optValue(const std::string& key, const T& def) const
@@ -146,27 +134,21 @@ public:
 		return value;
 	}
 
-
 	unsigned int size() const;
 		/// Returns the number of properties
 
-
-	void set(const std::string& key, const DynamicAny& value);
+	void set(const std::string& key, const Dynamic::Var& value);
 		/// Sets a new value
-
 
 	void stringify(std::ostream& out, unsigned int indent = 0) const;
 		/// Prints the object to out. When indent is 0, the object
 		/// will be printed on one line without indentation.
 
-
 	void remove(const std::string& key);
 		/// Removes the property with the given key
 
-
 private:
-
-	typedef std::map<std::string, DynamicAny> ValueMap;
+	typedef std::map<std::string, Dynamic::Var> ValueMap;
 	ValueMap _values;
 };
 
@@ -177,11 +159,13 @@ inline bool Object::has(const std::string& key) const
 	return it != _values.end();
 }
 
+
 inline bool Object::isArray(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
 	return it != _values.end() || it->second.type() == typeid(Array::Ptr);
 }
+
 
 inline bool Object::isNull(const std::string& key) const
 {
@@ -189,35 +173,38 @@ inline bool Object::isNull(const std::string& key) const
 	return it == _values.end() || it->second.isEmpty();
 }
 
+
 inline bool Object::isObject(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
 	return it != _values.end() || it->second.type() == typeid(Object::Ptr);
 }
 
-inline void Object::set(const std::string& key, const DynamicAny& value)
+
+inline void Object::set(const std::string& key, const Dynamic::Var& value)
 {
 	_values[key] = value;
 }
+
 
 inline unsigned int Object::size() const
 {
 	return _values.size();
 }
 
+
 inline void Object::remove(const std::string& key)
 {
 	_values.erase(key);
 }
 
+
 }} // Namespace Poco::JSON
 
 
-namespace Poco
-{
+namespace Poco {
+namespace Dynamic {
 
-namespace Dynamic
-{
 
 template <>
 class VarHolderImpl<JSON::Object::Ptr>: public VarHolder
@@ -357,7 +344,7 @@ private:
 	JSON::Object::Ptr _val;
 };
 
-}
-}
+}} // namespace Poco::JSON
+
 
 #endif // JSON_Object_INCLUDED

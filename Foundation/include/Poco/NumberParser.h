@@ -263,7 +263,7 @@ private:
 		T n = 0;
 		for (; it != end; ++it)
 		{
-			if ((*it >= '0' && *it <= '9') || (*it >= 'A' && *it <= 'F'))
+			if ((*it >= '0' && *it <= '9') || (*it >= 'A' && *it <= 'F') || (*it >= 'a' && *it <= 'f'))
 			{
 				if (n > (std::numeric_limits<T>::max() / base))
 					return false;
@@ -272,6 +272,8 @@ private:
 					n = n * base + *it - '0';
 				else if (*it >= 'A' && *it <= 'F')
 					n = n * base + *it - 'A' + 10;
+				else if (*it >= 'a' && *it <= 'f')
+					n = n * base + *it - 'a' + 10;
 			}
 			else break;
 		}

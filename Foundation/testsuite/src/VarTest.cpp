@@ -1406,23 +1406,30 @@ void VarTest::testConversionOperator()
 	assert (any == i);
 
 	any = 123;
-#if defined(_MSC_VER) // gcc bombs on s(any)
-	std::string s(any);
-#else
-	std::string s = any;
+#ifdef _MSC_VER
+	std::string s1(any);
+#else // gcc won't compile above (ambiguous cctor call)
+	std::string s1 = any;
 #endif
-	assert (s == "123");
-	assert (s == any);
-	assert (any == s);
+	assert (s1 == "123");
+	assert (s1 == any);
+	assert (any == s1);
 	assert ("123" == any);
 
 	any = 321;
-	s = any.convert<std::string>();
-	assert (s == "321");
+	s1 =any.convert<std::string>();
+	assert (s1 == "321");
 
 	any = "456";
 	assert (any == "456");
 	assert ("456" == any);
+
+	any = 789;
+	std::string s2 = any;
+	assert (s2 == "789");
+	assert (s2 == any);
+	assert (any == s2);
+	assert ("789" == any);
 
 	Var any2 = "1.5";
 	double d = any2;

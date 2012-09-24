@@ -45,13 +45,12 @@
 #include "Poco/Path.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Logger.h"
-
 #include "Poco/JSON/Template.h"
 
-namespace Poco
-{
-namespace JSON
-{
+
+namespace Poco {
+namespace JSON {
+
 
 class JSON_API TemplateCache
 	/// Use to cache parsed templates. Templates are
@@ -66,15 +65,12 @@ public:
 		/// Constructor. The cache must be created
 		/// and not destroyed as long as it is used.
 
-
 	virtual ~TemplateCache();
 		/// Destructor
-
 
 	void addPath(const Path& path);
 		/// Add a path for resolving template paths.
 		/// The order of check is FIFO.
-
 
 	Template::Ptr getTemplate(const Path& path);
 		/// Returns a template from the cache.
@@ -85,32 +81,20 @@ public:
 		/// even when the template isn't stored anymore in
 		/// the cache.
 
-
 	static TemplateCache* instance();
 		/// Returns the only instance of this cache
-
 
 	void setLogger(Logger& logger);
 		/// Sets the logger for the cache.
 
-
 private:
 
-	static TemplateCache* _instance;
-
-
-	std::vector<Path> _includePaths;
-
-
+	static TemplateCache*                _instance;
+	std::vector<Path>                    _includePaths;
 	std::map<std::string, Template::Ptr> _cache;
-
-
-	Logger* _logger;
-
-
+	Logger*                              _logger;
+	
 	void setup();
-
-
 	Path resolvePath(const Path& path) const;
 };
 

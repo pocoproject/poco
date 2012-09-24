@@ -450,8 +450,8 @@ std::string AbstractConfiguration::uncheckedExpand(const std::string& value) con
 
 int AbstractConfiguration::parseInt(const std::string& value)
 {
-	if (value.compare(0, 2, "0x") == 0)
-		return NumberParser::parseHex(value.substr(2));
+	if ((value.compare(0, 2, "0x") == 0) || (value.compare(0, 2, "0X") == 0))
+		return NumberParser::parseHex(value);
 	else
 		return NumberParser::parse(value);
 }
@@ -459,8 +459,8 @@ int AbstractConfiguration::parseInt(const std::string& value)
 
 int AbstractConfiguration::parseUInt(const std::string& value)
 {
-	if (value.compare(0, 2, "0x") == 0)
-		return NumberParser::parseHex(value.substr(2));
+	if ((value.compare(0, 2, "0x") == 0) || (value.compare(0, 2, "0X") == 0))
+		return NumberParser::parseHex(value);
 	else
 		return NumberParser::parseUnsigned(value);
 }
@@ -468,8 +468,8 @@ int AbstractConfiguration::parseUInt(const std::string& value)
 
 Int64 AbstractConfiguration::parseInt64(const std::string& value)
 {
-	if (value.compare(0, 2, "0x") == 0)
-		return NumberParser::parseHex64(value.substr(2));
+	if ((value.compare(0, 2, "0x") == 0) || (value.compare(0, 2, "0X") == 0))
+		return NumberParser::parseHex64(value);
 	else
 		return NumberParser::parse64(value);
 }
@@ -477,8 +477,8 @@ Int64 AbstractConfiguration::parseInt64(const std::string& value)
 
 UInt64 AbstractConfiguration::parseUInt64(const std::string& value)
 {
-	if (value.compare(0, 2, "0x") == 0)
-		return NumberParser::parseHex64(value.substr(2));
+	if ((value.compare(0, 2, "0x") == 0) || (value.compare(0, 2, "0X") == 0))
+		return NumberParser::parseHex64(value);
 	else
 		return NumberParser::parseUnsigned64(value);
 }

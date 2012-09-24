@@ -41,24 +41,24 @@
 
 #include <iostream>
 
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/JSON/JSON.h"
 
-namespace Poco
-{
-namespace JSON
-{
+namespace Poco {
+namespace JSON {
+
 
 class JSON_API Stringifier
 	/// Helper class for creating a String from a JSON object or array
 {
 public:
 
-	static void stringify(const DynamicAny& any, std::ostream& out, unsigned int indent = 0);
+	static void stringify(const Dynamic::Var& any, std::ostream& out, unsigned int indent = 0);
 		/// Writes a String representation of the value to the output stream.
 		/// When indent is 0, the String will be created as small as possible.
 };
 
-}} // Namespace Poco::JSON
+
+}} // namespace Poco::JSON
 
 #endif // JSON_JSONStringifier_INCLUDED

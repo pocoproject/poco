@@ -40,13 +40,12 @@
 
 
 #include "Poco/JSON/Handler.h"
-
 #include <stack>
 
-namespace Poco
-{
-namespace JSON
-{
+
+namespace Poco {
+namespace JSON {
+
 
 class JSON_API DefaultHandler : public Handler
 	/// Provides a default handler for the JSON parser.
@@ -55,82 +54,60 @@ class JSON_API DefaultHandler : public Handler
 {
 public:
 
-
 	DefaultHandler();
 		/// Default Constructor
-
 
 	virtual ~DefaultHandler();
 		/// Destructor
 
-
 	void startObject();
 		/// Handles a {, meaning a new object will be read
-
 
 	void endObject();
 		/// Handles a }, meaning the object is read
 
-
 	void startArray();
 		/// Handles a [, meaning a new array will be read
-
 
 	void endArray();
 		/// Handles a ], meaning the array is read
 
-
 	void key(const std::string& k);
 		/// A key is read
 
-
-	DynamicAny result() const;
+	Dynamic::Var result() const;
 		/// Returns the result of the parser. Which is an object or an array.
-
 
 	virtual void value(int v);
 		/// An integer value is read
-
 
 #if defined(POCO_HAVE_INT64)
 	virtual void value(Int64 v);
 		/// A 64-bit integer value is read
 #endif
 
-
 	virtual void value(const std::string& s);
 		/// A string value is read.
-
 
 	virtual void value(double d);
 		/// A double value is read
 
-
 	virtual void value(bool b);
 		/// A boolean value is read
-
 
 	virtual void null();
 		/// A null value is read
 
-
 private:
+	void setValue(const Poco::Dynamic::Var& value);
 
-
-	void setValue(const Poco::DynamicAny& value);
-
-
-	std::stack<DynamicAny> _stack;
-
-
-	std::string _key;
-
-
-	DynamicAny _result;
+	std::stack<Dynamic::Var> _stack;
+	std::string              _key;
+	Dynamic::Var             _result;
 };
 
 
-inline DynamicAny DefaultHandler::result() const
+inline Dynamic::Var DefaultHandler::result() const
 {
 	return _result;
 }
@@ -140,6 +117,7 @@ inline void DefaultHandler::value(int v)
 {
 	setValue(v);
 }
+
 
 #if defined(POCO_HAVE_INT64)
 inline void DefaultHandler::value(Int64 v)
@@ -169,11 +147,11 @@ inline void DefaultHandler::value(bool b)
 
 inline void DefaultHandler::null()
 {
-	Poco::DynamicAny empty;
+	Poco::Dynamic::Var empty;
 	setValue(empty);
 }
 
 
-}} // Namespace Poco::JSON
+}} // namespace Poco::JSON
 
 #endif // JSON_DefaultHandler_INCLUDED

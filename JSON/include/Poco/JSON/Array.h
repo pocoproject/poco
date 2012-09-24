@@ -46,10 +46,8 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
 
-namespace Poco
-{
-namespace JSON
-{
+namespace Poco {
+namespace JSON {
 
 class Object;
 
@@ -58,36 +56,27 @@ class JSON_API Array
 {
 public:
 
-	typedef std::vector<DynamicAny> ValueVector;
-
-
+	typedef std::vector<Dynamic::Var> ValueVector;
 	typedef SharedPtr<Array> Ptr;
-
 
 	Array();
 		/// Default constructor
 
-
 	Array(const Array& copy);
 		/// Copy Constructor
-
 
 	virtual ~Array();
 		/// Destructor
 
-
 	ValueVector::const_iterator begin() const;
 		/// Returns iterator
-
 
 	ValueVector::const_iterator end() const;
 		/// Returns iterator
 
-
-	DynamicAny get(unsigned int index) const;
+	Dynamic::Var get(unsigned int index) const;
 		/// Retrieves an element. Will return an empty value
 		/// when the element doesn't exist.
-
 
 	Array::Ptr getArray(unsigned int index) const;
 		/// Retrieves an array. When the element is not
@@ -101,10 +90,9 @@ public:
 		/// exceptions for invalid values.
 		/// Note: This will not work for an array or an object.
 	{
-		DynamicAny value = get(index);
+		Dynamic::Var value = get(index);
 		return value.convert<T>();
 	}
-
 
 	SharedPtr<Object> getObject(unsigned int index) const;
 		/// Retrieves an object. When the element is not
@@ -113,19 +101,15 @@ public:
 	unsigned int size() const;
 		/// Returns the size of the array
 
-
 	bool isArray(unsigned int index) const;
 		/// Returns true when the element is an array
-
 
 	bool isNull(unsigned int index) const;
 		/// Returns true when the element is null or
 		/// when the element doesn't exist.
 
-
 	bool isObject(unsigned int index) const;
 		/// Returns true when the element is an object
-
 
 	template<typename T>
 	T optElement(unsigned int index, const T& def) const
@@ -149,24 +133,20 @@ public:
 		return value;
 	}
 
-
-	void add(const DynamicAny& value)
+	void add(const Dynamic::Var& value)
 		/// Add the given value to the array
 	{
 		_values.push_back(value);
 	}
 
-
 	void stringify(std::ostream& out, unsigned int indent) const;
 		/// Prints the array to out. When indent is 0, the array
 		/// will be printed on one line without indentation.
-
 
 	void remove(unsigned int index);
 		/// Removes the element on the given index.
 
 private:
-
 	ValueVector _values;
 };
 
@@ -176,28 +156,32 @@ inline Array::ValueVector::const_iterator Array::begin() const
 	return _values.begin();
 }
 
+
 inline Array::ValueVector::const_iterator Array::end() const
 
 {
 	return _values.end();
 }
 
+
 inline unsigned int Array::size() const
 {
 	return _values.size();
 }
 
+
 inline bool Array::isArray(unsigned int index) const
 {
-	DynamicAny value = get(index);
+	Dynamic::Var value = get(index);
 	return value.type() == typeid(Array::Ptr);
 }
+
 
 inline bool Array::isNull(unsigned int index) const
 {
 	if ( index < _values.size() )
 	{
-		DynamicAny value = _values[index];
+		Dynamic::Var value = _values[index];
 		return value.isEmpty();
 	}
 	return true;
@@ -211,11 +195,9 @@ inline void Array::remove(unsigned int index)
 
 }} // Namespace Poco::JSON
 
-namespace Poco
-{
 
-namespace Dynamic
-{
+namespace Poco {
+namespace Dynamic {
 
 template <>
 class VarHolderImpl<JSON::Array::Ptr>: public VarHolder
@@ -355,8 +337,7 @@ private:
 	JSON::Array::Ptr _val;
 };
 
-} // Namespace Dynamic
-} // Namespace Poco
+}} // namespace Poco::JSON
 
 
 #endif // JSON_Array_INCLUDED

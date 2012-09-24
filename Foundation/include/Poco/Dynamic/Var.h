@@ -156,6 +156,8 @@ public:
 		if (!_pHolder)
 			throw InvalidAccessException("Can not convert empty value.");
 
+		if (typeid(T) == _pHolder->type()) return extract<T>();
+
 		T result;
 		_pHolder->convert(result);
 		return result;
@@ -188,6 +190,11 @@ public:
 		}
 	}
 
+	operator const std::string & ();
+		/// Specialization of the cast operator for const std::string reference.
+		/// The main reason for this specialization is to help compilers
+		/// with construction/assignment of Var to std::string.
+
 	template <typename T>
 	const T& extract() const
 		/// Returns a const reference to the actual value.
@@ -209,8 +216,6 @@ public:
 				_pHolder->type().name(),
 				typeid(T).name()));
 	}
-
-
 
 	template <typename T> 
 	Var& operator = (const T& other)
@@ -558,6 +563,7 @@ private:
 ///
 /// Var members
 ///
+
 inline void Var::swap(Var& ptr)
 {
 	std::swap(_pHolder, ptr._pHolder);

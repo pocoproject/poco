@@ -43,20 +43,21 @@
 #include <stack>
 
 #include "Poco/JSON/JSON.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Path.h"
 #include "Poco/Timestamp.h"
 
 
-namespace Poco
-{
-namespace JSON
-{
+namespace Poco {
+namespace JSON {
+
 
 class MultiPart;
 
+
 POCO_DECLARE_EXCEPTION(JSON_API, JSONTemplateException, Poco::Exception)
+
 
 class JSON_API Template
 	/// Template is a template engine which uses JSON as input
@@ -125,7 +126,7 @@ public:
 		/// Returns the time when the template was parsed
 
 
-	void render(const DynamicAny& data, std::ostream& out) const;
+	void render(const Dynamic::Var& data, std::ostream& out) const;
 		/// Renders the template and send the output to the stream
 
 
@@ -177,6 +178,6 @@ inline Timestamp Template::parseTime() const
 	return _parseTime;
 }
 
-}} // Namespace Poco::JSON
+}} // namespace Poco::JSON
 
 #endif // JSON_JSONTemplate_INCLUDED

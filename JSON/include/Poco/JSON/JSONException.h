@@ -43,13 +43,12 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco
-{
-namespace JSON
-{
+namespace Poco {
+namespace JSON {
 
 POCO_DECLARE_EXCEPTION(JSON_API, JSONException, Poco::Exception)
 
-}} // Namespace Poco::JSON
+}} // namespace Poco::JSON
+
 
 #endif //JSON_JSONException_INCLUDED

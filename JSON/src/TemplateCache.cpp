@@ -94,7 +94,7 @@ Template::Ptr TemplateCache::getTemplate(const Path& path)
 				tpl->parse();
 				_cache[templatePathname] = tpl;
 			}
-			catch(JSONTemplateException jte)
+			catch(JSONTemplateException& jte)
 			{
 				if ( _logger )
 				{
@@ -128,7 +128,7 @@ Template::Ptr TemplateCache::getTemplate(const Path& path)
 				tpl->parse();
 				_cache[templatePathname] = tpl;
 			}
-			catch(JSONTemplateException jte)
+			catch(JSONTemplateException& jte)
 			{
 				if ( _logger )
 				{

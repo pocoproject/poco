@@ -40,7 +40,6 @@
 #include "Poco/JSON/JSONException.h"
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/JSON/DefaultHandler.h"
-//#include "Poco/Util/JSONConfiguration.h"
 #include "Poco/JSON/Template.h"
 
 #include "Poco/Path.h"
@@ -50,6 +49,9 @@
 #include "Poco/Glob.h"
 
 #include <set>
+
+using namespace Poco::JSON;
+using namespace Poco::Dynamic;
 
 
 JSONTest::JSONTest(const std::string& name): CppUnit::TestCase("JSON")
@@ -77,26 +79,26 @@ void JSONTest::tearDown()
 void JSONTest::testNullProperty()
 {
 	std::string json = "{ \"test\" : null }";
-	Poco::JSON::Parser parser;
+	Parser parser;
 
-	Poco::DynamicAny result;
+	Var result;
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
+	Object::Ptr object = result.extract<Object::Ptr>();
 	assert(object->isNull("test"));
-	Poco::DynamicAny test = object->get("test");
+	Var test = object->get("test");
 	assert(test.isEmpty());
 }
 
@@ -104,26 +106,26 @@ void JSONTest::testNullProperty()
 void JSONTest::testTrueProperty()
 {
 	std::string json = "{ \"test\" : true }";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-	Poco::DynamicAny test = object->get("test");
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
 	assert(test.type() == typeid(bool));
 	bool value = test;
 	assert(value);
@@ -133,26 +135,26 @@ void JSONTest::testTrueProperty()
 void JSONTest::testFalseProperty()
 {
 	std::string json = "{ \"test\" : false }";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-	Poco::DynamicAny test = object->get("test");
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
 	assert(test.type() == typeid(bool));
 	bool value = test;
 	assert(!value);
@@ -162,26 +164,26 @@ void JSONTest::testFalseProperty()
 void JSONTest::testNumberProperty()
 {
 	std::string json = "{ \"test\" : 1969 }";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-	Poco::DynamicAny test = object->get("test");
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
 	assert(test.isInteger());
 	int value = test;
 	assert(value == 1969);
@@ -191,26 +193,26 @@ void JSONTest::testNumberProperty()
 void JSONTest::testStringProperty()
 {
 	std::string json = "{ \"test\" : \"value\" }";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-	Poco::DynamicAny test = object->get("test");
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
 	assert(test.isString());
 	std::string value = test;
 	assert(value.compare("value") == 0);
@@ -220,25 +222,25 @@ void JSONTest::testStringProperty()
 void JSONTest::testEmptyObject()
 {
 	std::string json = "{}";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
+	Object::Ptr object = result.extract<Object::Ptr>();
 	assert(object->size() == 0);
 }
 
@@ -246,26 +248,26 @@ void JSONTest::testEmptyObject()
 void JSONTest::testDoubleProperty()
 {
 	std::string json = "{ \"test\" : 123.45 }";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-	Poco::DynamicAny test = object->get("test");
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
 	assert(test.isNumeric());
 	double value = test;
 	assert(value == 123.45);
@@ -275,26 +277,26 @@ void JSONTest::testDoubleProperty()
 void JSONTest::testDouble2Property()
 {
 	std::string json = "{ \"test\" : 12e34 }";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-	Poco::DynamicAny test = object->get("test");
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
 	assert(test.isNumeric());
 	double value = test;
 	assert(value == 12e34);
@@ -304,26 +306,26 @@ void JSONTest::testDouble2Property()
 void JSONTest::testDouble3Property()
 {
 	std::string json = "{ \"test\" : 12e-34 }";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-	Poco::DynamicAny test = object->get("test");
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
 	assert(test.isNumeric());
 	double value = test;
 	assert(value == 12e-34);
@@ -333,28 +335,28 @@ void JSONTest::testDouble3Property()
 void JSONTest::testObjectProperty()
 {
 	std::string json = "{ \"test\" : { \"property\" : \"value\" } }";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
-	Poco::DynamicAny test = object->get("test");
-	assert(test.type() == typeid(Poco::JSON::Object::Ptr));
-	object = test.extract<Poco::JSON::Object::Ptr>();
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
+	assert(test.type() == typeid(Object::Ptr));
+	object = test.extract<Object::Ptr>();
 
 	test = object->get("property");
 	assert(test.isString());
@@ -366,25 +368,25 @@ void JSONTest::testObjectProperty()
 void JSONTest::testEmptyArray()
 {
 	std::string json = "[]";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assert(result.type() == typeid(Array::Ptr));
 
-	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
+	Array::Ptr array = result.extract<Array::Ptr>();
 	assert(array->size() == 0);
 }
 
@@ -392,25 +394,25 @@ void JSONTest::testEmptyArray()
 void JSONTest::testNestedArray()
 {
 	std::string json = "[[[[]]]]";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assert(result.type() == typeid(Array::Ptr));
 
-	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
+	Array::Ptr array = result.extract<Array::Ptr>();
 	assert(array->size() == 1);
 }
 
@@ -418,27 +420,27 @@ void JSONTest::testNestedArray()
 void JSONTest::testNullElement()
 {
 	std::string json = "[ null ]";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assert(result.type() == typeid(Array::Ptr));
 
-	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
+	Array::Ptr array = result.extract<Array::Ptr>();
 	assert(array->isNull(0));
-	Poco::DynamicAny test = array->get(0);
+	Var test = array->get(0);
 	assert(test.isEmpty());
 }
 
@@ -446,26 +448,26 @@ void JSONTest::testNullElement()
 void JSONTest::testTrueElement()
 {
 	std::string json = "[ true ]";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assert(result.type() == typeid(Array::Ptr));
 
-	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
-	Poco::DynamicAny test = array->get(0);
+	Array::Ptr array = result.extract<Array::Ptr>();
+	Var test = array->get(0);
 	assert(test.type() == typeid(bool));
 	bool value = test;
 	assert(value);
@@ -475,26 +477,26 @@ void JSONTest::testTrueElement()
 void JSONTest::testFalseElement()
 {
 	std::string json = "[ false ]";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assert(result.type() == typeid(Array::Ptr));
 
-	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
-	Poco::DynamicAny test = array->get(0);
+	Array::Ptr array = result.extract<Array::Ptr>();
+	Var test = array->get(0);
 	assert(test.type() == typeid(bool));
 	bool value = test;
 	assert(!value);
@@ -504,26 +506,26 @@ void JSONTest::testFalseElement()
 void JSONTest::testNumberElement()
 {
 	std::string json = "[ 1969 ]";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assert(result.type() == typeid(Array::Ptr));
 
-	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
-	Poco::DynamicAny test = array->get(0);
+	Array::Ptr array = result.extract<Array::Ptr>();
+	Var test = array->get(0);
 	assert(test.isInteger());
 	int value = test;
 	assert(value == 1969);
@@ -533,26 +535,26 @@ void JSONTest::testNumberElement()
 void JSONTest::testStringElement()
 {
 	std::string json = "[ \"value\" ]";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assert(result.type() == typeid(Array::Ptr));
 
-	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
-	Poco::DynamicAny test = array->get(0);
+	Array::Ptr array = result.extract<Array::Ptr>();
+	Var test = array->get(0);
 	assert(test.isString());
 	std::string value = test;
 	assert(value.compare("value") == 0);
@@ -562,26 +564,26 @@ void JSONTest::testStringElement()
 void JSONTest::testEmptyObjectElement()
 {
 	std::string json = "[{}]";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assert(result.type() == typeid(Array::Ptr));
 
-	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
-	Poco::JSON::Object::Ptr object = array->getObject(0);
+	Array::Ptr array = result.extract<Array::Ptr>();
+	Object::Ptr object = array->getObject(0);
 	assert(object->size() == 0);
 }
 
@@ -589,26 +591,26 @@ void JSONTest::testEmptyObjectElement()
 void JSONTest::testDoubleElement()
 {
 	std::string json = "[ 123.45 ]";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assert(result.type() == typeid(Array::Ptr));
 
-	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
-	Poco::DynamicAny test = array->get(0);
+	Array::Ptr array = result.extract<Array::Ptr>();
+	Var test = array->get(0);
 	assert(test.isNumeric());
 	double value = test;
 	assert(value == 123.45);
@@ -618,25 +620,25 @@ void JSONTest::testDoubleElement()
 void JSONTest::testOptValue()
 {
 	std::string json = "{ }";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
+	Object::Ptr object = result.extract<Object::Ptr>();
 	int n = object->optValue("test", 123);
 	assert(n == 123);
 }
@@ -645,25 +647,25 @@ void JSONTest::testOptValue()
 void JSONTest::testQuery()
 {
 	std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ] }";
-	Poco::JSON::Parser parser;
-	Poco::DynamicAny result;
+	Parser parser;
+	Var result;
 
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		DefaultHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+	assert(result.type() == typeid(Object::Ptr));
 
-	Poco::JSON::Query query(result);
+	Query query(result);
 
 	std::string firstChild = query.findValue("children[0]", "");
 	assert(firstChild.compare("Jonas") == 0);
@@ -689,21 +691,28 @@ void JSONTest::testValidJanssonFiles()
 				Poco::FileInputStream fis(filePath.toString());
 				std::cout << filePath.toString() << std::endl;
 
-				Poco::JSON::Parser parser;
-				Poco::DynamicAny result;
+				Parser parser;
+				Var result;
 
 				try
 				{
-					Poco::JSON::DefaultHandler handler;
+					DefaultHandler handler;
 					parser.setHandler(&handler);
 					parser.parse(fis);
 					result = handler.result();
 					std::cout << "Ok!" << std::endl;
 				}
-				catch(Poco::JSON::JSONException jsone)
+				catch(JSONException& jsone)
 				{
-					// We shouldn't get here.
-					assert(false);
+					std::string err = jsone.displayText();
+					std::cout << "Failed:" << err << std::endl;
+					fail (err);
+				}
+				catch(Poco::Exception& e)
+				{
+					std::string err = e.displayText();
+					std::cout << "Failed:" << err << std::endl;
+					fail (err);
 				}
 			}
 		}
@@ -730,28 +739,25 @@ void JSONTest::testInvalidJanssonFiles()
 				Poco::FileInputStream fis(filePath.toString());
 				std::cout << filePath.toString() << std::endl;
 
-				Poco::JSON::Parser parser;
-				Poco::DynamicAny result;
+				Parser parser;
+				Var result;
 
 				try
 				{
-					Poco::JSON::DefaultHandler handler;
+					DefaultHandler handler;
 					parser.setHandler(&handler);
 					parser.parse(fis);
 					result = handler.result();
 					// We shouldn't get here.
 					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl; 
-					assert(false);
+					fail(result.convert<std::string>());
 				}
-				catch(Poco::JSON::JSONException jsone)
+				catch(JSONException&)
 				{
-					std::cout << "Ok! We got an exception " << jsone.message() << std::endl;
 					continue;
 				}
-				catch(Poco::SyntaxException se)
-				{
-					std::cout << "Ok! We got an exception " << se.message() << std::endl;
-				}
+				catch(Poco::SyntaxException&)
+				{ }
 			}
 		}
 	}
@@ -760,11 +766,11 @@ void JSONTest::testInvalidJanssonFiles()
 
 void JSONTest::testTemplate()
 {
-	Poco::JSON::Template tpl;
+	Template tpl;
 	tpl.parse("Hello world! From <?= person.name ?>\n<?if person.toOld ?>You're to old<?endif?>\n");
 
-	Poco::JSON::Object::Ptr data = new Poco::JSON::Object();
-	Poco::JSON::Object::Ptr person = new Poco::JSON::Object();
+	Object::Ptr data = new Object();
+	Object::Ptr person = new Object();
 	data->set("person", person);
 	person->set("name", "Franky");
 	person->set("toOld", true);

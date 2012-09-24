@@ -42,7 +42,7 @@
 #include <istream>
 #include <sstream>
 
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/StreamTokenizer.h"
 
 #include "Poco/JSON/JSON.h"
@@ -50,10 +50,9 @@
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Handler.h"
 
-namespace Poco
-{
-namespace JSON
-{
+namespace Poco {
+namespace JSON {
+
 
 class JSON_API Parser
 	/// A class for passing JSON strings or streams
@@ -63,18 +62,14 @@ public:
 	Parser();
 		/// Constructor
 
-
 	virtual ~Parser();
 		/// Destructor
-
 
 	void parse(const std::string& source);
 		/// Parses a string
 
-
 	void parse(std::istream& in);
 		/// Parses a JSON from the input stream
-
 
 	void setHandler(Handler* handler);
 		/// Set the handler
@@ -82,13 +77,10 @@ public:
 	Handler* getHandler();
 		/// Returns the handler
 
-
 private:
-
 
 	const Token* nextToken();
 		/// Returns the next token
-
 
 	void readObject();
 		/// Starts reading an object
@@ -97,23 +89,17 @@ private:
 	void readArray();
 		/// Starts reading an array
 
-
 	bool readRow(bool firstCall = false);
 		/// Reads a property value pair. Returns true when a next row is expected.
-
 
 	void readValue(const Token* token);
 		/// Read a value from the token
 
-
 	bool readElements(bool firstCall = false);
 		/// Read all elements of an array
 
-
 	StreamTokenizer _tokenizer;
-
-
-	Handler* _handler;
+	Handler*        _handler;
 };
 
 
@@ -135,6 +121,8 @@ inline Handler* Parser::getHandler()
 	return _handler;
 }
 
-}} // Namespace Poco::JSON
+
+}} // namespace Poco::JSON
+
 
 #endif // JSON_JSONParser_INCLUDED

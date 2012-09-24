@@ -44,39 +44,33 @@
 #include "Poco/JSON/Array.h"
 
 
-namespace Poco
-{
-namespace JSON
-{
+namespace Poco {
+namespace JSON {
+
 
 class JSON_API Query
 	/// Class that can be used to search for a value in a JSON object or array.
 {
 public:
-	Query(const DynamicAny& source);
+	Query(const Dynamic::Var& source);
 		/// Constructor. Pass the start object/array.
-
 
 	virtual ~Query();
 		/// Destructor
-
 
 	Object::Ptr findObject(const std::string& path) const;
 		/// Search for an object. When the object can't be found, an empty
 		/// SharedPtr is returned.
 
-
 	Array::Ptr findArray(const std::string& path) const;
 		/// Search for an array. When the array can't be found, an empty
 		/// SharedPtr is returned.
 
-
-	DynamicAny find(const std::string& path) const;
+	Dynamic::Var find(const std::string& path) const;
 		/// Searches a value
 		/// For example: "person.children[0].name" will return the
 		/// the name of the first child. When the value can't be found
 		/// an empty value is returned.
-
 
 	template<typename T>
 	T findValue(const std::string& path, const T& def) const
@@ -85,16 +79,14 @@ public:
 		/// the default value will be returned.
 	{
 		T result = def;
-		DynamicAny value = find(path);
+		Dynamic::Var value = find(path);
 		if ( ! value.isEmpty() )
 		{
 			try
 			{
 				result = value.convert<T>();
 			}
-			catch(...)
-			{
-			}
+			catch(...) { }
 		}
 		return result;
 	}
@@ -108,11 +100,11 @@ public:
 	}
 
 private:
-
-	DynamicAny _source;
-
+	Dynamic::Var _source;
 };
 
-}} // Namespace JSON
+
+}} // namespace Poco::JSON
+
 
 #endif // JSON_JSONQuery_INCLUDED

@@ -52,16 +52,16 @@ if "%1"=="" goto usage
 set VS_VERSION=vs%1
 
 if not defined VCINSTALLDIR (
-  if %1==71 (set VSENV="%VS71COMNTOOLS%vsvars32.bat") else ( 
-  if %1==80 (set VSENV="%VS80COMNTOOLS%vsvars32.bat") else (
-  if %1==90 (set VSENV="%VS90COMNTOOLS%vsvars32.bat") else (
-  if %1==100 (set VSENV="%VS100COMNTOOLS%vsvars32.bat")
+  if %1==71 (call "%VS71COMNTOOLS%vsvars32.bat") else ( 
+  if %1==80 (call "%VS80COMNTOOLS%vsvars32.bat") else (
+  if %1==90 (call "%VS90COMNTOOLS%vsvars32.bat") else (
+  if %1==100 (call "%VS100COMNTOOLS%vsvars32.bat")
   ))))
-  call %VSENV%
+
   if not defined VSINSTALLDIR (
     echo Error: No Visual C++ environment found.
     echo Please run this script from a Visual Studio Command Prompt
-    echo or run "%%VSnnCOMNTOOLS%%\vcvars32.bat" first.
+    echo or run "%%VSnnCOMNTOOLS%%\vsvars32.bat" first.
     goto :EOF
   )
 )

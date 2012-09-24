@@ -41,24 +41,29 @@
 
 #include "Poco/JSON/Query.h"
 
-namespace Poco
-{
-namespace JSON
-{
 
-Query::Query(const DynamicAny& source) : _source(source)
+using Poco::Dynamic::Var;
+
+
+namespace Poco {
+namespace JSON {
+
+
+Query::Query(const Var& source) : _source(source)
 {
 
 }
+
 
 Query::~Query()
 {
 }
 
+
 Object::Ptr Query::findObject(const std::string& path) const
 {
 	Object::Ptr obj;
-	DynamicAny result = find(path);
+	Var result = find(path);
 	if ( result.type() == typeid(Object::Ptr) )
 	{
 		obj = result.extract<Object::Ptr>();
@@ -66,10 +71,11 @@ Object::Ptr Query::findObject(const std::string& path) const
 	return obj;
 }
 
+
 Array::Ptr Query::findArray(const std::string& path) const
 {
 	Array::Ptr arr;
-	DynamicAny result = find(path);
+	Var result = find(path);
 	if ( result.type() == typeid(Array::Ptr) )
 	{
 		arr = result.extract<Array::Ptr>();
@@ -78,9 +84,9 @@ Array::Ptr Query::findArray(const std::string& path) const
 }
 
 
-DynamicAny Query::find(const std::string& path) const
+Var Query::find(const std::string& path) const
 {
-	DynamicAny result = _source;
+	Var result = _source;
 	StringTokenizer tokenizer(path, ".");
 	for(StringTokenizer::Iterator token = tokenizer.begin(); token != tokenizer.end(); token++)
 	{
@@ -137,5 +143,6 @@ DynamicAny Query::find(const std::string& path) const
 	}
 	return result;
 }
+
 
 }} // Namespace Poco::JSON

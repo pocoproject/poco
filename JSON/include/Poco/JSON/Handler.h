@@ -39,64 +39,50 @@
 #define JSON_Handler_INCLUDED
 
 
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/JSON/JSON.h"
 
-namespace Poco
-{
-namespace JSON
-{
+namespace Poco {
+namespace JSON {
+
 
 class JSON_API Handler
 {
 public:
-
-
 	virtual void startObject() = 0;
 		/// The parser has read a {, meaning a new object will be read
-
 
 	virtual void endObject() = 0;
 		/// The parser has read a }, meaning the object is read
 
-
 	virtual void startArray() = 0;
 		/// The parser has read a [, meaning a new array will be read
-
 
 	virtual void endArray() = 0;
 		/// The parser has read a ], meaning the array is read
 
-
 	virtual void key(const std::string& k) = 0;
 		/// A key of an object is read
-
 
 	virtual void null() = 0;
 		/// A null value is read
 
-
 	virtual void value(int v) = 0;
 		/// An integer value is read
 		
-
 #if defined(POCO_HAVE_INT64)
 	virtual void value(Int64 v) = 0;
 		/// A 64-bit integer value is read
 #endif
 
-
 	virtual void value(const std::string& value) = 0;
 		/// A string value is read.
-
 
 	virtual void value(double d) = 0;
 		/// A double value is read
 
-
 	virtual void value(bool b) = 0;
 		/// A boolean value is read
-
 
 protected:
 
@@ -107,6 +93,6 @@ private:
 };
 
 
-}} // Namespace Poco::JSON
+}} // namespace Poco::JSON
 
 #endif // JSON_Handler_INCLUDED

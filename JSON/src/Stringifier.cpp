@@ -39,12 +39,15 @@
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Object.h"
 
-namespace Poco
-{
-namespace JSON
-{
 
-void Stringifier::stringify(const DynamicAny& any, std::ostream& out, unsigned int indent)
+using Poco::Dynamic::Var;
+
+
+namespace Poco {
+namespace JSON {
+
+
+void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent)
 {
 	if ( any.type() == typeid(Object::Ptr) )
 	{
@@ -110,5 +113,6 @@ void Stringifier::stringify(const DynamicAny& any, std::ostream& out, unsigned i
 		out << any.convert<std::string>();
 	}
 }
+
 
 }}  // Namespace Poco::JSON
