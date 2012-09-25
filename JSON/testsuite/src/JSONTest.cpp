@@ -781,7 +781,7 @@ void JSONTest::testTemplate()
 std::string JSONTest::getTestFilesPath(const std::string& type)
 {
 	std::ostringstream ostr;
-	ostr << "testfiles/" << type << '/';
+	ostr << "data/" << type << '/';
 	std::string validDir(ostr.str());
 	Poco::Path pathPattern(validDir);
 	if (Poco::File(pathPattern).exists())
@@ -791,7 +791,7 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 	}
 
 	ostr.str("");
-	ostr << "/JSON/testsuite/testfiles/" << type << '/';
+	ostr << "/JSON/testsuite/data/" << type << '/';
 	validDir = Poco::Environment::get("POCO_BASE") + ostr.str();
 	pathPattern = validDir;
 
