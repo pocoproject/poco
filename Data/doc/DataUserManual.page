@@ -7,11 +7,12 @@ send/retrieve data to/from various different SQL databases.
 The following complete example shows how to use it:
 
     
-    #include "Poco/Data/Common.h"
     #include "Poco/Data/SQLite/Connector.h"
+    #include "Poco/Data/Session.h"
     #include <iostream>
     
     using namespace Poco::Data;
+    using namespace Poco::Data::Keywords;
     
     
     void init()
@@ -77,22 +78,25 @@ Inserting data works by <* using *> the content of other variables. Assume we ha
 
     ForeName (Name VARCHAR(30))
 ----
-If we want to insert one single forename we could simply write:
+If we want to insert one single forename we could write:
     
     std::string aName("Peter");
     ses << "INSERT INTO FORENAME VALUES(" << aName << ")", now;
 ----
 
-Well, we could do that, but we won't. A much better solution is to use <!placeholders!> and connect each placeholder via a <!use!> 
+Another way is to use <!placeholders!> and connect each placeholder via a <!use!> 
 expression with a variable that will provide the value during execution. 
-Placeholders are recognized by having a <!:!> in front of their name. Rewriting the above code now simply gives
+Universal placeholders are question marks <!?!> . Rewriting the above code now simply gives
 
     std::string aName("Peter");
-    ses << "INSERT INTO FORENAME VALUES(:name)", use(aName), now;
+    ses << "INSERT INTO FORENAME VALUES(?)", use(aName), now;
 ----
 
-In this example the <!use!> expression matches the <* :name *> with the <*Peter*> value. 
-Note that apart from the nicer syntax, the real benefit of placeholders - which is performance - doesn't show here. 
+In this example the <!use!> expression matches the <* ? *> with the <*Peter*> value. 
+Note that apart from the nicer syntax, the real benefit of placeholders - which is performance - doesn't show here.
+Some database systems (e.g. SQLite) support descriptive placeholders (e.g. !:name!) but, for universal appliciablity,
+it is recommended to use the questin mark.
+
 Check the <*Working with Statements*> section to find out more.
 
 Retrieving data from the Database works similar. The <!into!> expression matches the returned database values to 
@@ -117,7 +121,7 @@ Lets assume we have a Person table that contains an age, a first and a last name
     std::string firstName("Peter";
     std::string lastName("Junior");
     int age = 0;
-    ses << INSERT INTO PERSON VALUES (:fn, :ln, :age)", use(firstName), use(lastName), use(age), now;
+    ses << INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
     ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age), now;
 ----
 
@@ -127,25 +131,19 @@ The same is true for the <*into*> statement. We select <*firstname*> as the firs
 thus <*into(firstName)*> must be the first into clause.
 
 !! Handling NULL entries
-A common case with databases are optional data fields that can contain NULL. To accomodate for NULL, the <*into*> expression allows 
-you to define default values.
-For example, assume that age is such an optional field and we want to provide as default value <!-1!> 
-which is done by writing <!into(age, -1)!>:
+A common case with databases are optional data fields that can contain NULL. To accomodate for NULL, use Nullable template:
 
     std::string firstName("Peter";
     std::string lastName("Junior");
-    int age = 0;
-    ses << INSERT INTO PERSON VALUES (:fn, :ln, :age)", use(firstName), use(lastName), use(age), now;
-    ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age, -1), now;
+    Nullable<int> age = 0;
+    ses << INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
+    ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age), now;
 ----
 
-While you can achieve the same effect by initializing age previously to -1 (<*int age = -1*>), 
-this won't work with collection types. Here you must provide the second parameter
-to init. Otherwise, values will be initialized to compiler specific values.
+Nullable is a template wrapping any type with purpose of allowing it to have null value.
 
 !!!Working with Statements
-We often mentioned the term <*Statement*> in the previous section, yet we only worked with database session objects so far, 
-or at least, that's what you have been made believe ;-).
+We mentioned the term <*Statement*> in the previous section, yet we only worked with database session objects so far.
 In reality, you have already worked with Statements. Lets take a look at the method signature of the << operator at Session:
 
     template <typename T>
@@ -159,19 +157,19 @@ part which executed the statement. Afterwards the statement was destroyed.
 Let's take one of the previous examples and change it so that we assign the statement:
     
     std::string aName("Peter");
-    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(:name)", use(aName) );
+    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(?)", use(aName) );
 ----
-Note that we must put brackets around the right part of the assignment, otherwise the compiler will complain.
-If you don't like the above syntax, the following alternative is equivalent:
+Note that the parenthesis around the right part of the assignment are necessary to compile.
+Here is an equivalent syntax without parenthesis:
 
     Statement stmt(ses);
-    stmt << "INSERT INTO FORENAME VALUES(:name)", use(aName);
+    stmt << "INSERT INTO FORENAME VALUES(?)", use(aName);
 ----
 
 What did we achieve by assigning the statement to a variable? Well, currently nothing, apart that we can control when to <*execute*>:
 
     std::string aName("Peter");
-    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(:name)", use(aName) );
+    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(?)", use(aName) );
     stmt.execute();
     poco_assert (stmt.done());
 ----
@@ -188,7 +186,7 @@ A prepared statement is created by omitting the <*now*> clause.
 The advantage of a prepared statement is performance. Assume the following loop:
 
     std::string aName();
-    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(:name)", use(aName) );
+    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(?)", use(aName) );
     for (int i = 0; i < 100; ++i)
     {
         aName.append("x");
@@ -202,15 +200,19 @@ Still, this isn't the best way to insert a collection of values into a database.
 
 !!Things NOT To Do
 <!use!> expects as input a <!reference!> parameter, which is bound later during execution. 
-Thus, one can only use variables, but never constants.
-The following code will very likely fail (but this is platform/compiler dependent and also depends if your 
-building in release or debug mode, it will work from Monday to Thursday but will always fail on Friday, so shortly spoken: the kind of bugs
-software developers <*really*> love):
+To prevent binding to a non-existing storage, the following will not compile:
     
-    Statement stmt = (ses << INSERT INTO PERSON VALUES (:fn, :ln, :age)", use("Peter"), use("Junior"), use(4)); //ERR!
+    Statement stmt = (ses << "INSERT INTO PERSON VALUES (?, ?, ?)", use("Peter"), use("Junior"), use(4)); //ERR!
     stmt.execute();
 ----
-The constant values <*Junior*>, <*Peter*> and <*4*> must be assigned to variables prior, otherwise their values will be invalid when execute is called.
+
+The constant values <*Junior*>, <*Peter*> and <*4*> must be assigned to variables priorto execution:
+
+    std::string fn("Peter"), ln("Junior");
+    int age = 4;
+    Statement stmt = (ses << "INSERT INTO PERSON VALUES (?, ?, ?)", use(fn), use(ln), use(age)); //ERR!
+    stmt.execute();
+----
 
 !!!Collection Support
 If one needs to handle many values at once, one ought to use a collection class.
@@ -230,7 +232,7 @@ A bulk insert example via vector would be:
         aName.append("x");
         data.push_back(aName);
     }
-    ses << "INSERT INTO FORENAME VALUES(:name)", use(data), now;
+    ses << "INSERT INTO FORENAME VALUES(?)", use(data), now;
 ----
 
 The same example would work with set or multiset but not with map and multimap (std::string has no () operator).
@@ -322,33 +324,33 @@ The third parameter to range is an optional boolean value which specifies if the
 if the amount of rows returned by the query must match exactly. Per default exact matching is off.
 
 !!!Complex Data Type Mapping
-All the previous examples were contented to work with only the most basic data types: integer, string, ...
+All the previous examples were intented to work with only the most basic data types: integer, string, ...
 a situation, unlikely to occur in real-world scenarios.
 Assume you have a class Person:
 
     class Person
     {
     public:
-        // default constructor+destr.
+        // default ctor & dtor.
         // getter and setter methods for all members
         [...] 
         
         bool operator <(const Person& p) const
             /// we need this for set and multiset support
         {
-            return _socialSecNr < p._socialSecNr;
+            return _ssn < p._ssn;
         }
         
         Poco::UInt64 operator()() const
             /// we need this operator to return the key for the map and multimap
         {
-            return _socialSecNr;
+            return _ssn;
         }
         
     private:
         std::string _firstName;
         std::string _lastName;
-        Poco::UInt64 _socialSecNr;
+        Poco::UInt64 _ssn;
     }
 ----
 
@@ -371,21 +373,21 @@ The template specialization must implement the following methods:
        static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder)
         {
             poco_assert_dbg (pBinder != 0);
-            // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
+            // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SSN INTEGER(3))
             // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
             TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder);
             TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder);
-            TypeHandler<Poco::UInt64>::bind(pos++, obj.getSocialSecNr(), pBinder);
+            TypeHandler<Poco::UInt64>::bind(pos++, obj.getSSN(), pBinder);
         }
     
         static void prepare(std::size_t pos, const Person& obj, AbstractPreparation* pPrepare)
         {
             poco_assert_dbg (pBinder != 0);
-            // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
+            // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SSN INTEGER(3))
             // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
             TypeHandler<std::string>::prepare(pos++, obj.getFirstName(), pPrepare);
             TypeHandler<std::string>::prepare(pos++, obj.getLastName(), pPrepare);
-            TypeHandler<Poco::UInt64>::prepare(pos++, obj.getSocialSecNr(), pPrepare);
+            TypeHandler<Poco::UInt64>::prepare(pos++, obj.getSSN(), pPrepare);
         }
     
         static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor* pExt)
@@ -394,13 +396,13 @@ The template specialization must implement the following methods:
             poco_assert_dbg (pExt != 0);
             std::string firstName;
             std::string lastName;
-            Poco::UInt64 socialSecNr = 0;
+            Poco::UInt64 ssn = 0;
             TypeHandler<std::string>::extract(pos++, firstName, defVal.getFirstName(), pExt);
             TypeHandler<std::string>::extract(pos++, lastName, defVal.getLastName(), pExt);
-            TypeHandler<Poco::UInt64>::extract(pos++, socialSecNr, defVal.getSocialSecNr(), pExt);
+            TypeHandler<Poco::UInt64>::extract(pos++, ssn, defVal.getSSN(), pExt);
             obj.setFirstName(firstName);
             obj.setLastName(lastName);
-            obj.setSocialSecNr(socialSecNr);
+            obj.setSSN(ssn);
         }
     };
     
@@ -485,7 +487,7 @@ Consider the following example:
     people.push_back(Person("Lisa Simpson", "Springfield", 10));
     
     Statement insert(session);
-    insert << "INSERT INTO Person VALUES(:name, :address, :age)",
+    insert << "INSERT INTO Person VALUES(?, ?, ?)",
         use(people), now;
 ----
     
@@ -500,7 +502,7 @@ Of course, tuples can also be used in queries:
     {
         std::cout << "Name: " << it->get<0>() << 
             ", Address: " << it->get<1>() << 
-            ", Age: " << it->get<2>() <<std::endl;
+            ", Age: " << it->get<2>() << std::endl;
     }
 ----
 

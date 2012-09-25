@@ -259,7 +259,7 @@ Extract now changes to:
     virtual void prepare(std::size_t pos, const BLOB&) = 0;
 ----
 
-Note that it is recommended to prepare a statement only once in the compileImpl of <[StatementImpl]>. The AbstractPrepare objects (which make use of <[AbstractPreparation]>
+Note that it is recommended to prepare a statement only once in the compileImpl of <[StatementImpl]>. The AbstractPreparator objects (which make use of <[AbstractPreparation]>
 can be created by iterating over the Extractor objects of the StatementImpl:
 
     Poco::Data::AbstractExtractingVec::iterator it = extractings().begin();
@@ -267,7 +267,7 @@ can be created by iterating over the Extractor objects of the StatementImpl:
     std::size_t pos = 0; // sqlite starts with pos 0 for results! your DB maybe with 1
     for (; it != itEnd; ++it)
     {
-         AbstractPrepare* pPrep = (*it)->createPrepareObject(pPreparation, pos);
+         AbstractPreparator* pPrep = (*it)->createPrepareObject(pPreparation, pos);
         _prepareVec.push_back(pPrep);
         (*it)->extract(pos);
         pos += (*it)->numOfColumnsHandled();
