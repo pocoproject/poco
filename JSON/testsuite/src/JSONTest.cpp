@@ -767,7 +767,7 @@ void JSONTest::testInvalidJanssonFiles()
 void JSONTest::testTemplate()
 {
 	Template tpl;
-	tpl.parse("Hello world! From <?= person.name ?>\n<?if person.toOld ?>You're to old<?endif?>\n");
+	tpl.parse("Hello world! From <?= person.name ?>\n<?if person.toOld ?>You're too old<?endif?>\n");
 
 	Object::Ptr data = new Object();
 	Object::Ptr person = new Object();
