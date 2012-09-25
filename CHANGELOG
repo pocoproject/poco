@@ -38,7 +38,10 @@ Release 1.5.0 (2012-09-??)
 - fixed SF#3560776: Fix byte-ordering issues with INADDR_* literals
 - fixed SF#3563627: Set IP address on multicast socket from socket family
 - fixed SF#3563999: Size BinaryWriter based on buffer's capacity(), not size()
-
+- fixed SF#102 Fix building Poco on Debian GNU/kFreeBSD
+- fixed SF#321 Binding DatTime or Timestamp
+- fixed SF#307 Detect the SQL driver type at run time
+- added VS 2012 Projects/Solutions
 
 Release 1.4.4p1 (2012-??-??)
 ============================
