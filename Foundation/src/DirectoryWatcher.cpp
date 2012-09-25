@@ -53,7 +53,7 @@
 	#include <sys/types.h>
 	#include <sys/event.h>
 	#include <sys/time.h>
-	#if POCO_OS == POCO_OS_FREE_BSD
+	#if (POCO_OS == POCO_OS_FREE_BSD) && !defined(O_EVTONLY)
 		#define O_EVTONLY 0x8000
 	#endif
 #endif
