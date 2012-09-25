@@ -1,7 +1,7 @@
 //
 // ProGen.cpp
 //
-// $Id: //poco/1.4/ProGen/src/ProGen.cpp#4 $
+// $Id: //poco/1.4/ProGen/src/ProGen.cpp#5 $
 //
 // Visual Studio project file generator.
 //
@@ -262,8 +262,6 @@ protected:
 		for (int fileIndex = 0; fileIndex < pFileElems->length(); fileIndex++)
 		{
 			Poco::XML::Element* pFileElem = static_cast<Poco::XML::Element*>(pFileElems->item(fileIndex));
-			Poco::Path relativePath(pFileElem->getAttribute("RelativePath"));
-			bool isResource = relativePath.getExtension() == "rc";
 			Poco::XML::Element* pFileConfigElem = pFileElem->getChildElement("FileConfiguration");
 			if (pFileConfigElem)
 			{
@@ -278,13 +276,6 @@ protected:
 				{
 					Poco::AutoPtr<Poco::XML::Element> pNewFileConfigElem = static_cast<Poco::XML::Element*>(pPrototypeFileConfigElem->cloneNode(true));
 					pNewFileConfigElem->setAttribute("Name", *it + "|" + platform);
-					if (isResource)
-					{
-						if (it->find("static") != std::string::npos)
-							pNewFileConfigElem->setAttribute("ExcludedFromBuild", "true");
-						else
-							pNewFileConfigElem->removeAttribute("ExcludedFromBuild");
-					}
 					pFileElem->appendChild(pNewFileConfigElem);
 				}
 			}
@@ -342,6 +333,11 @@ protected:
 		else if (tool == "vs100")
 		{
 			solutionStream << "Microsoft Visual Studio Solution File, Format Version 11.00\r\n# Visual Studio 2010\r\n";
+			generateSolution80(solutionStream, solutionPath, solutionGUID, projectConfig, templateProps, platform, tool);
+		}
+		else if (tool == "vs110")
+		{
+			solutionStream << "Microsoft Visual Studio Solution File, Format Version 12.00\r\n# Visual Studio 2012\r\n";
 			generateSolution80(solutionStream, solutionPath, solutionGUID, projectConfig, templateProps, platform, tool);
 		}
 	}
@@ -543,6 +539,30 @@ protected:
 		}
 	}
 	
+	void fix2012Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
+	{
+		fix2010Project(pProjectDoc, configSet, platform, projectProps, templateProps);
+		Poco::AutoPtr<Poco::XML::NodeList> pConfigurationTypeList = pProjectDoc->getElementsByTagName("ConfigurationType");
+		for (unsigned long i = 0; i < pConfigurationTypeList->length(); i++)
+		{
+			Poco::XML::Element* pConfigurationTypeElem = static_cast<Poco::XML::Element*>(pConfigurationTypeList->item(i));
+			Poco::XML::Node* pPropertyGroupElem = pConfigurationTypeElem->parentNode();
+			Poco::AutoPtr<Poco::XML::Element> pPlatformToolsetElem = pProjectDoc->createElement("PlatformToolset");
+			Poco::AutoPtr<Poco::XML::Text> pText = pProjectDoc->createTextNode("v110");
+			pPlatformToolsetElem->appendChild(pText);
+			pPropertyGroupElem->appendChild(pPlatformToolsetElem);
+		}
+	}
+	
+	void writeProject(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::string& path)
+	{
+		Poco::XML::DOMWriter writer;
+		writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT | Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
+		writer.setNewLine(Poco::XML::XMLWriter::NEWLINE_CRLF);
+		writer.setIndent("  ");
+		writer.writeNode(path, pProjectDoc);
+	}
+	
 	void generateProject(const Poco::Util::AbstractConfiguration& projectConfig, const Poco::Path& projectPath, const Poco::Path& templatePath, const std::string& platform, const std::string& tool)
 	{
 		Poco::File templateDir(templatePath);
@@ -712,11 +732,17 @@ protected:
 								logger().information("Fixing Visual Studio 2010 project file: " + vcxprojPath.toString());
 								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
 								fix2010Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
-								Poco::XML::DOMWriter writer;
-								writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT | Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
-								writer.setNewLine(Poco::XML::XMLWriter::NEWLINE_CRLF);
-								writer.setIndent("  ");
-								writer.writeNode(vcxprojPath.toString(), pProjectDoc);
+								writeProject(pProjectDoc, vcxprojPath.toString());
+							}
+						}
+						if (config().getBool("progen.postprocess." + postprocess + ".fix2012ProjectFile", false))
+						{
+							if (projectFile.exists())
+							{
+								logger().information("Fixing Visual Studio 2012 project file: " + vcxprojPath.toString());
+								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
+								fix2012Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
+								writeProject(pProjectDoc, vcxprojPath.toString());
 							}
 						}
 						if (config().getBool("progen.postprocess." + postprocess + ".deleteOriginalFile", false))
