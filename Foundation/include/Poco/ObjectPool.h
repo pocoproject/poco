@@ -189,7 +189,7 @@ class ObjectPool
 public:
 	ObjectPool(std::size_t capacity, std::size_t peakCapacity):
 		/// Creates a new ObjectPool with the given capacity
-		/// and peak capcacity.
+		/// and peak capacity.
 		///
 		/// The PoolableObjectFactory must have a public default constructor.
 		_capacity(capacity),
