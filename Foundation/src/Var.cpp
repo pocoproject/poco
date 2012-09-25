@@ -69,15 +69,6 @@ Var::~Var()
 }
 
 
-Var::operator const std::string & ()
-{
-	if (typeid(std::string) != _pHolder->type())
-		*this = this->convert<std::string>();
-
-	return extract<std::string>();
-}
-
-
 Var& Var::operator = (const Var& other)
 {
 	Var tmp(other);

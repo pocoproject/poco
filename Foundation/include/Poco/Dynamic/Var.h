@@ -190,11 +190,6 @@ public:
 		}
 	}
 
-	operator const std::string & ();
-		/// Specialization of the cast operator for const std::string reference.
-		/// The main reason for this specialization is to help compilers
-		/// with construction/assignment of Var to std::string.
-
 	template <typename T>
 	const T& extract() const
 		/// Returns a const reference to the actual value.
