@@ -18,7 +18,7 @@ rem
 rem Usage:
 rem ------
 rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIG] [PLATFORM] [SAMPLES] [TESTS]
-rem VS_VERSION: 71 | 80 | 90 | 100
+rem VS_VERSION: 71 | 80 | 90 | 100 | 110
 rem ACTION:     build | rebuild | clean
 rem LINKMODE:   static_mt | static_md | shared | all
 rem CONFIG:     release | debug | both
@@ -47,7 +47,7 @@ set PATH=%POCO_BASE%\bin;%PATH%
 rem TODO: VCExpress, MSBuild
 set BUILD_TOOL=devenv
 
-rem VS version {71 | 80 | 90 | 100}
+rem VS version {71 | 80 | 90 | 100 | 110}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
 
@@ -55,7 +55,8 @@ if not defined VCINSTALLDIR (
   if %1==71 (call "%VS71COMNTOOLS%vsvars32.bat") else ( 
   if %1==80 (call "%VS80COMNTOOLS%vsvars32.bat") else (
   if %1==90 (call "%VS90COMNTOOLS%vsvars32.bat") else (
-  if %1==100 (call "%VS100COMNTOOLS%vsvars32.bat")
+  if %1==100 (call "%VS100COMNTOOLS%vsvars32.bat") else (
+  if %1==110 (call "%VS110COMNTOOLS%vsvars32.bat")
   ))))
 
   if not defined VSINSTALLDIR (
@@ -68,6 +69,7 @@ if not defined VCINSTALLDIR (
 
 set VCPROJ_EXT=vcproj
 if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
+if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
 
 rem Action [build|rebuild|clean]
 set ACTION=%2
@@ -348,7 +350,7 @@ goto :EOF
 echo Usage:
 echo ------
 echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS]
-echo VS_VERSION: "71 | 80 | 90 | 100"
+echo VS_VERSION: "71 | 80 | 90 | 100 | 110"
 echo ACTION:     "build | rebuild | clean"
 echo LINKMODE:   "static_mt | static_md | shared | all"
 echo CONFIG:     "release | debug | both"
