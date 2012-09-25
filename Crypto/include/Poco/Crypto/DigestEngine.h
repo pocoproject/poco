@@ -73,7 +73,7 @@ public:
 	const Poco::DigestEngine::Digest& digest();
 
 protected:
-	void updateImpl(const void* data, unsigned length);
+	void updateImpl(const void* data, std::size_t length);
 	
 private:
 	std::string _name;

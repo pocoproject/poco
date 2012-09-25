@@ -84,7 +84,7 @@ const Poco::DigestEngine::Digest& DigestEngine::digest()
 }
 
 
-void DigestEngine::updateImpl(const void* data, unsigned length)
+void DigestEngine::updateImpl(const void* data, std::size_t length)
 {
 	EVP_DigestUpdate(_ctx, data, length);
 }
