@@ -6,8 +6,18 @@
 # Makefile fragment for finding ODBC library
 #
 
-ifndef POCO_ODBC_LIB_DIR
-POCO_ODBC_LIB_DIR = /usr/lib
+ifndef POCO_ODBC_INCLUDE
+POCO_ODBC_INCLUDE = /usr/include
+endif
+
+ifndef POCO_ODBC_LIB
+ifeq (0, $(shell test -d /usr/lib/$(OSARCH)-linux-gnu; echo $$?))
+POCO_ODBC_LIB = /usr/lib/$(OSARCH)-linux-gnu
+else ifeq (0, $(shell test -d /usr/lib64; echo $$?))
+POCO_ODBC_LIB = /usr/lib64
+else 
+POCO_ODBC_LIB = /usr/lib
+endif
 endif
 
 ifeq ($(LINKMODE),STATIC)
@@ -16,19 +26,20 @@ else
 LIBLINKEXT = $(SHAREDLIBLINKEXT)
 endif
 
-SYSLIBS += -L$(POCO_ODBC_LIB_DIR)
+INCLUDE += -I$(POCO_ODBC_INCLUDE)
+SYSLIBS += -L$(POCO_ODBC_LIB)
 
-###########
-# MinGW   #
-###########
+##
+## MinGW
+##
 ifeq ($(POCO_CONFIG),MinGW)
 # -DODBCVER=0x0300: SQLHandle declaration issue
 # -DNOMINMAX      : MIN/MAX macros defined in windows conflict with libstdc++
 CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
 
-###########
-# Cygwin  #
-###########
+##
+## Cygwin
+##
 else ifeq ($(POCO_CONFIG),CYGWIN)
 # -DODBCVER=0x0300: SQLHandle declaration issue
 # -DNOMINMAX      : MIN/MAX macros defined in windows conflict with libstdc++
@@ -36,20 +47,20 @@ CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
 # CYGWIN platform has its own ODBC library in /lib/w32api 
 SYSLIBS += -L/lib/w32api -lodbc32 -lodbccp32
 
-############
-# unixODBC #
-############
-else ifeq (0, $(shell test -e $(POCO_ODBC_LIB_DIR)/libodbc$(LIBLINKEXT); echo $$?))
+##
+## unixODBC
+##
+else ifeq (0, $(shell test -e $(POCO_ODBC_LIB)/libodbc$(LIBLINKEXT); echo $$?))
 SYSLIBS += -lodbc -lodbcinst
 COMMONFLAGS += -DPOCO_UNIXODBC
 
-############
-# iODBC    #
-############
-else ifeq (0, $(shell test -e $(POCO_ODBC_LIB_DIR)/libiodbc$(LIBLINKEXT); echo$$?))
+##
+## iODBC
+##
+else ifeq (0, $(shell test -e $(POCO_ODBC_LIB)/libiodbc$(LIBLINKEXT); echo $$?))
 SYSLIBS += -liodbc -liodbcinst
-COMMONFLAGS += -DPOCO_IODBC
+COMMONFLAGS += -DPOCO_IODBC -I/usr/include/iodbc
 
 else
-$(error No ODBC library found in $(POCO_ODBC_LIB_DIR). Please install unixODBC or iODBC and try again.)
+$(error No ODBC library found. Please install unixODBC or iODBC or specify POCO_ODBC_LIB and try again)
 endif

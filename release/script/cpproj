@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: //poco/1.3/release/script/cpproj#2 $
+# $Id: //poco/1.4/release/script/cpproj#6 $
 #
 # cpproj
 #
@@ -11,6 +11,7 @@
 
 src=$1
 dst=$2
+extradirs="doc templates res bundle sql"
 
 if [ "$src" = "" ] ; then
 	echo "usage: $0 <source> <destination>"
@@ -32,9 +33,17 @@ fi
 cp ${src}/src/* ${dst}/src
 cp ${src}/*.sln ${dst}
 cp ${src}/*.vcproj ${dst}
+cp ${src}/*.vcxproj ${dst}
+cp ${src}/*.vcxproj.filters ${dst}
+cp ${src}/*.vcxproj.user ${dst}
 cp ${src}/Makefile* ${dst}
+cp ${src}/*.make ${dst}
+cp ${src}/*.progen ${dst}
 if [ "`find ${src} -name '*.vmsbuild'`" != "" ] ; then
 	cp ${src}/*.vmsbuild ${dst}
+fi
+if [ "`find ${src} -name '*.vxbuild'`" != "" ] ; then
+	cp ${src}/*.vxbuild ${dst}
 fi
 if [ "`find ${src} -name '*.bndlspec'`" != "" ] ; then
 	cp ${src}/*.bndlspec ${dst}
@@ -43,16 +52,6 @@ fi
 if [ -f ${src}/.project ] ; then
 	cp ${src}/.project ${dst}
 	cp ${src}/.cdtproject ${dst}
-fi
-
-if [ -d ${src}/doc ] ; then
-	mkdir -p ${dst}/doc
-	cp -R ${src}/doc/* ${dst}/doc
-fi
-
-if [ -d ${src}/templates ] ; then
-	mkdir -p ${dst}/templates
-	cp -R ${src}/templates/* ${dst}/templates
 fi
 
 if [ -d ${src}/testsuite ] ; then
@@ -71,12 +70,20 @@ if [ -d ${src}/testsuite ] ; then
 
 	cp ${src}/testsuite/src/* ${dst}/testsuite/src
 	cp ${src}/testsuite/*.vcproj ${dst}/testsuite
+	cp ${src}/testsuite/*.vcxproj ${dst}/testsuite
+	cp ${src}/testsuite/*.vcxproj.filters ${dst}/testsuite
+	cp ${src}/testsuite/*.vcxproj.user ${dst}/testsuite
 	cp ${src}/testsuite/Makefile* ${dst}/testsuite
+	cp ${src}/testsuite/*.make ${dst}/testsuite
+	cp ${src}/testsuite/*.progen ${dst}/testsuite
 	if [ "`find ${src}/testsuite -name '*.vmsbuild'`" != "" ] ; then
 		cp ${src}/testsuite/*.vmsbuild ${dst}/testsuite
 	fi
 	if [ "`find ${src}/testsuite -name '*.opt'`" != "" ] ; then
 		cp ${src}/testsuite/*.opt ${dst}/testsuite
+	fi
+	if [ "`find ${src}/testsuite -name '*.vxbuild'`" != "" ] ; then
+		cp ${src}/testsuite/*.vxbuild ${dst}/testsuite
 	fi
 	if [ "`find ${src}/testsuite -name '*.properties'`" != "" ] ; then
 		cp ${src}/testsuite/*.properties ${dst}/testsuite
@@ -89,23 +96,26 @@ if [ -d ${src}/testsuite ] ; then
 	fi
 fi
 
-if [ -d ${src}/bundle ] ; then
-	mkdir -p ${dst}/bundle
-	cp -R ${src}/bundle/* ${dst}/bundle
+if [ -f ${src}/extradirs ] ; then
+	extradirs="$extradirs `cat ${src}/extradirs`"
 fi
 
-if [ -d ${src}/res ] ; then
-	mkdir -p ${dst}/res
-	cp -R ${src}/res/* ${dst}/res
-fi
+for extradir in $extradirs ;
+do
+	if [ -d ${src}/${extradir} ] ; then
+		mkdir -p ${dst}/${extradir}
+		cp -R ${src}/${extradir}/* ${dst}/${extradir}
+	fi
+done
 
 if [ -d ${src}/samples ] ; then
 	mkdir -p ${dst}/samples
 
 	cp ${src}/samples/*.sln ${dst}/samples
 	cp ${src}/samples/Makefile* ${dst}/samples
+	cp ${src}/samples/*.progen ${dst}/samples
 	
-	samples=`find ${src}/samples -maxdepth 1 -mindepth 1 -type d -print | sed "s:^.*/::"`
+	samples=`find ${src}/samples/* -type d -print -prune | sed "s:^.*/::"`
 	
 	for sample in $samples ;
 	do
@@ -125,14 +135,32 @@ if [ -d ${src}/samples ] ; then
 				mkdir -p ${dst}/samples/${sample}/res
 				cp -R ${src}/samples/${sample}/res/* ${dst}/samples/${sample}/res
 			fi
+
+			if [ -d ${src}/samples/${sample}/xml ] ; then
+				mkdir -p ${dst}/samples/${sample}/xml
+				cp -R ${src}/samples/${sample}/xml/* ${dst}/samples/${sample}/xml
+			fi
+
+			if [ -d ${src}/samples/${sample}/media ] ; then
+				mkdir -p ${dst}/samples/${sample}/media
+				cp -R ${src}/samples/${sample}/media/* ${dst}/samples/${sample}/media
+			fi
 			
 			cp ${src}/samples/${sample}/*.vcproj ${dst}/samples/${sample}
+			cp ${src}/samples/${sample}/*.vcxproj ${dst}/samples/${sample}
+			cp ${src}/samples/${sample}/*.vcxproj.filters ${dst}/samples/${sample}
+			cp ${src}/samples/${sample}/*.vcxproj.user ${dst}/samples/${sample}
 			cp ${src}/samples/${sample}/Makefile* ${dst}/samples/${sample}
+			cp ${src}/samples/${sample}/*.make ${dst}/samples/${sample}
+			cp ${src}/samples/${sample}/*.progen ${dst}/samples/${sample}
 			if [ "`find ${src}/samples/${sample}/ -name '*.vmsbuild'`" != "" ] ; then
 				cp ${src}/samples/${sample}/*.vmsbuild ${dst}/samples/${sample}
 			fi
 			if [ "`find ${src}/samples/${sample}/ -name '*.opt'`" != "" ] ; then
 				cp ${src}/samples/${sample}/*.opt ${dst}/samples/${sample}
+			fi
+			if [ "`find ${src}/samples/${sample}/ -name '*.vxbuild'`" != "" ] ; then
+				cp ${src}/samples/${sample}/*.vxbuild ${dst}/samples/${sample}
 			fi
 			if [ "`find ${src}/samples/${sample}/ -name '*.properties'`" != "" ] ; then
 				cp ${src}/samples/${sample}/*.properties ${dst}/samples/${sample}
