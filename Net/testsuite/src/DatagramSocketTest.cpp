@@ -96,6 +96,9 @@ void DatagramSocketTest::testSendToReceiveFrom()
 
 void DatagramSocketTest::testBroadcast()
 {
+#if (POCO_OS == POCO_OS_FREE_BSD)
+	fail ("TODO! hangs on FreeBSD");
+#else
 	UDPEchoServer echoServer;
 	DatagramSocket ss(IPAddress::IPv4);
 	SocketAddress sa("255.255.255.255", echoServer.port());
@@ -116,6 +119,7 @@ void DatagramSocketTest::testBroadcast()
 	assert (n == 5);
 	assert (std::string(buffer, n) == "hello");
 	ss.close();
+#endif
 }
 
 

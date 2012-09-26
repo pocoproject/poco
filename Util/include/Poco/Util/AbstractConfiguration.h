@@ -389,7 +389,7 @@ private:
 
 	mutable int _depth;
 	bool        _eventsEnabled;
-	mutable Poco::FastMutex _mutex;
+	mutable Poco::Mutex _mutex;
 	
 	friend class LayeredConfiguration;
 	friend class ConfigurationView;

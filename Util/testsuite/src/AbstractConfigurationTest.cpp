@@ -265,6 +265,7 @@ void AbstractConfigurationTest::testSetInt64()
 	pConf->setInt64("set.bigint1", std::numeric_limits<Int64>::max());
 	pConf->setInt64("set.bigint2", std::numeric_limits<Int64>::min());
 	pConf->setInt64("set.biguint", std::numeric_limits<UInt64>::max());
+
 	assert (pConf->getInt64("set.bigint1") == std::numeric_limits<Int64>::max());
 	assert (pConf->getInt64("set.bigint2") == std::numeric_limits<Int64>::min());
 	assert (pConf->getInt64("set.biguint") == std::numeric_limits<UInt64>::max());

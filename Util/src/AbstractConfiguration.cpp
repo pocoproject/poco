@@ -42,7 +42,7 @@
 #include "Poco/String.h"
 
 
-using Poco::FastMutex;
+using Poco::Mutex;
 using Poco::NotFoundException;
 using Poco::SyntaxException;
 using Poco::CircularReferenceException;
@@ -69,7 +69,7 @@ AbstractConfiguration::~AbstractConfiguration()
 
 bool AbstractConfiguration::hasProperty(const std::string& key) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	return getRaw(key, value);
@@ -90,7 +90,7 @@ bool AbstractConfiguration::has(const std::string& key) const
 	
 std::string AbstractConfiguration::getString(const std::string& key) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -102,7 +102,7 @@ std::string AbstractConfiguration::getString(const std::string& key) const
 	
 std::string AbstractConfiguration::getString(const std::string& key, const std::string& defaultValue) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -114,7 +114,7 @@ std::string AbstractConfiguration::getString(const std::string& key, const std::
 
 std::string AbstractConfiguration::getRawString(const std::string& key) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -126,7 +126,8 @@ std::string AbstractConfiguration::getRawString(const std::string& key) const
 	
 std::string AbstractConfiguration::getRawString(const std::string& key, const std::string& defaultValue) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -138,7 +139,7 @@ std::string AbstractConfiguration::getRawString(const std::string& key, const st
 	
 int AbstractConfiguration::getInt(const std::string& key) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -150,7 +151,7 @@ int AbstractConfiguration::getInt(const std::string& key) const
 	
 int AbstractConfiguration::getInt(const std::string& key, int defaultValue) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -164,7 +165,7 @@ int AbstractConfiguration::getInt(const std::string& key, int defaultValue) cons
 
 Int64 AbstractConfiguration::getInt64(const std::string& key) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -176,7 +177,7 @@ Int64 AbstractConfiguration::getInt64(const std::string& key) const
 
 UInt64 AbstractConfiguration::getUInt64(const std::string& key) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -188,7 +189,7 @@ UInt64 AbstractConfiguration::getUInt64(const std::string& key) const
 
 Int64 AbstractConfiguration::getInt64(const std::string& key, Int64 defaultValue) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -200,7 +201,7 @@ Int64 AbstractConfiguration::getInt64(const std::string& key, Int64 defaultValue
 
 UInt64 AbstractConfiguration::getUInt64(const std::string& key, UInt64 defaultValue) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -214,7 +215,7 @@ UInt64 AbstractConfiguration::getUInt64(const std::string& key, UInt64 defaultVa
 
 double AbstractConfiguration::getDouble(const std::string& key) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -226,7 +227,7 @@ double AbstractConfiguration::getDouble(const std::string& key) const
 	
 double AbstractConfiguration::getDouble(const std::string& key, double defaultValue) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -238,7 +239,7 @@ double AbstractConfiguration::getDouble(const std::string& key, double defaultVa
 
 bool AbstractConfiguration::getBool(const std::string& key) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -250,7 +251,7 @@ bool AbstractConfiguration::getBool(const std::string& key) const
 
 bool AbstractConfiguration::getBool(const std::string& key, bool defaultValue) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string value;
 	if (getRaw(key, value))
@@ -282,7 +283,7 @@ void AbstractConfiguration::setUInt(const std::string& key, unsigned int value)
 
 void AbstractConfiguration::setInt64(const std::string& key, Int64 value)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
@@ -290,7 +291,7 @@ void AbstractConfiguration::setInt64(const std::string& key, Int64 value)
 
 void AbstractConfiguration::setUInt64(const std::string& key, UInt64 value)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
@@ -311,7 +312,7 @@ void AbstractConfiguration::setBool(const std::string& key, bool value)
 
 void AbstractConfiguration::keys(Keys& range) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	std::string key;
 	range.clear();
@@ -321,7 +322,7 @@ void AbstractConfiguration::keys(Keys& range) const
 
 void AbstractConfiguration::keys(const std::string& key, Keys& range) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	range.clear();
 	enumerate(key, range);
@@ -363,7 +364,7 @@ namespace
 
 std::string AbstractConfiguration::expand(const std::string& value) const
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Mutex::ScopedLock lock(_mutex);
 
 	return internalExpand(value);
 }
@@ -376,7 +377,8 @@ void AbstractConfiguration::remove(const std::string& key)
 		propertyRemoving(this, key);
 	}
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		
+		Mutex::ScopedLock lock(_mutex);
 		removeRaw(key);
 	}
 	if (_eventsEnabled)
@@ -514,7 +516,7 @@ void AbstractConfiguration::setRawWithEvent(const std::string& key, std::string 
 		propertyChanging(this, kv);
 	}
 	{
-		FastMutex::ScopedLock lock(_mutex);
+		Mutex::ScopedLock lock(_mutex);
 		setRaw(key, value);
 	}
 	if (_eventsEnabled)

@@ -56,6 +56,9 @@ ThreadPoolTest::~ThreadPoolTest()
 
 void ThreadPoolTest::testThreadPool()
 {
+#if (POCO_OS == POCO_OS_FREE_BSD)
+	fail ("TODO! - segfaults on FreeBSD");
+#else 
 	ThreadPool pool(2, 3, 3);
 	pool.setStackSize(1);
 
@@ -147,6 +150,7 @@ void ThreadPoolTest::testThreadPool()
 	assert (pool.used() == 0);
 	assert (pool.capacity() == 4);
 	assert (pool.available() == 4);
+#endif // POCO_OS_FREE_BSD
 }
 
 

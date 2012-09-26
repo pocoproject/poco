@@ -289,11 +289,15 @@ void ThreadTest::testThreadStackSize()
 	assert (stackSize >= thread.getStackSize());
 #endif
 	tmp = MyRunnable::_staticVar;
+#if POCO_OS == POCO_OS_FREE_BSD 
+	fail ("FreeBSD segfaults - TODO!");
+#else
 	thread.start(freeFunc, &tmp);
 	thread.join();
 	assert (tmp * 2 == MyRunnable::_staticVar);
-
+#endif
 	thread.setStackSize(0);
+
 	assert (0 == thread.getStackSize());
 	tmp = MyRunnable::_staticVar;
 	thread.start(freeFunc, &tmp);

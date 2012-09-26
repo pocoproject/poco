@@ -9,10 +9,14 @@
 include $(POCO_BASE)/build/rules/global
 
 # Note: linking order is important, do not change it.
+ifeq ($(POCO_CONFIG),FreeBSD)
+SYSLIBS += -lssl -lcrypto -lz
+else
 SYSLIBS += -lssl -lcrypto -lz -ldl
+endif
 
 objects = CryptoTestSuite Driver \
-	CryptoTest RSATest
+	CryptoTest DigestEngineTest RSATest
 
 target         = testrunner
 target_version = 1
