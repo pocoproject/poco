@@ -103,7 +103,7 @@ public:
 protected:
 	virtual void runTest();
 	TestResult* defaultResult();
-	
+
 	void assertImplementation(bool condition,
 	                          const std::string& conditionExpression = "",
 	                          long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
@@ -158,9 +158,14 @@ protected:
 	                long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	                const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
-	void fail(const std::string&message = "",
+	void fail(const std::string& message = "",
 	          long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	          const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+        void warn(const std::string& message = "",
+                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
 
 private:
 	const std::string _name;

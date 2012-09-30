@@ -50,9 +50,34 @@
 #endif
 #include <limits>
 #include <cmath>
+#include <locale>
 
 
 namespace Poco {
+
+
+inline char decimalSeparator()
+        /// Returns decimal separator from global locale or
+        /// default '.' for platforms where locale is unavailable.
+{
+#if !defined(POCO_NO_LOCALE)
+        return std::use_facet<std::numpunct<char> >(std::locale()).decimal_point();
+#else
+        return '.';
+#endif
+}
+
+
+inline char thousandSeparator()
+        /// Returns thousand separator from global locale or
+        /// default ',' for platforms where locale is unavailable.
+{
+#if !defined(POCO_NO_LOCALE)
+        return std::use_facet<std::numpunct<char> >(std::locale()).thousands_sep();
+#else
+        return ',';
+#endif
+}
 
 
 template <typename I>
@@ -71,7 +96,7 @@ bool strToInt(const char* pStr, I& result, short base = -1)
 	if (!pStr || (pStr && *pStr == '\0')) return false;
 	while ((*pStr != '\0') && (*pStr == ' ')) ++pStr;
 	if (*pStr == '\0') return false;
-	
+
 	char sign = 1;
 
 	if (*pStr == '-')
@@ -92,7 +117,7 @@ bool strToInt(const char* pStr, I& result, short base = -1)
 			result = 0;
 			return true;
 		}
-		
+
 		if ((*pStr == 'x') || (*pStr == 'X'))
 		{
 			base = 0x10;
@@ -129,7 +154,7 @@ bool strToInt(const char* pStr, I& result, short base = -1)
 			}
 			else return false;
 			break;
-		
+
 		case '8': case '9':
 			if (allowDigits && (base == 10 || base == 16))
 			{
@@ -196,30 +221,6 @@ bool strToInt(const std::string& str, I& result, short base = -1)
 	/// bool strToInt(const char*, I&, short&) implementation.
 {
 	return strToInt(str.c_str(), result, base);
-}
-
-
-inline char decimalSeparator()
-	/// Returns decimal separator from global locale or
-	/// default '.' for platforms where locale is unavailable.
-{
-#if !defined(POCO_NO_LOCALE)
-	return std::use_facet<std::numpunct<char> >(std::locale()).decimal_point();
-#else
-	return '.';
-#endif
-}
-
-
-inline char thousandSeparator()
-	/// Returns thousand separator from global locale or
-	/// default ',' for platforms where locale is unavailable.
-{
-#if !defined(POCO_NO_LOCALE)
-	return std::use_facet<std::numpunct<char> >(std::locale()).thousands_sep();
-#else
-	return ',';
-#endif
 }
 
 

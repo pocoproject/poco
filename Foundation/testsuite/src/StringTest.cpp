@@ -39,6 +39,7 @@
 #include "Poco/Stopwatch.h"
 #include <iostream>
 #include <iomanip>
+#include <cstdio>
 
 
 using Poco::trimLeft;
@@ -527,39 +528,44 @@ void StringTest::testStringToFloatError()
 void StringTest::testNumericLocale()
 {
 #if !defined(POCO_NO_LOCALE)
-	char dp = decimalSeparator();
-	char ts = thousandSeparator();
-	std::locale loc;
-	std::cout << "Original locale: '" << loc.c_str() << '\'' << std::endl;
-	std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
-	std::cout << "Thousand separator: '" << ts << '\'' << std::endl;
+	try
+	{
+		char dp = decimalSeparator();
+		char ts = thousandSeparator();
+		std::locale loc;
+		std::cout << "Original locale: '" << loc.name() << '\'' << std::endl;
+		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
+		std::cout << "Thousand separator: '" << ts << '\'' << std::endl;
 
-	std::locale::global(std::locale("German"));
-	std::locale locGerman;
-	assert (',' == decimalSeparator());
-	assert ('.' == thousandSeparator());
-	std::cout << "New locale: '" << locGerman.c_str() << '\'' << std::endl;
-	std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
-	std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
+		std::locale::global(std::locale("German"));
+		std::locale locGerman;
+		assert (',' == decimalSeparator());
+		assert ('.' == thousandSeparator());
+		std::cout << "New locale: '" << locGerman.name() << '\'' << std::endl;
+		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
+		std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
 
-	std::locale::global(std::locale("US"));
-	std::locale locUS;
-	assert ('.' == decimalSeparator());
-	assert (',' == thousandSeparator());
-	std::cout << "New locale: '" << locUS.c_str() << '\'' << std::endl;
-	std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
-	std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
+		std::locale::global(std::locale("US"));
+		std::locale locUS;
+		assert ('.' == decimalSeparator());
+		assert (',' == thousandSeparator());
+		std::cout << "New locale: '" << locUS.name() << '\'' << std::endl;
+		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
+		std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
 
-	std::locale::global(loc);
-	dp = decimalSeparator();
-	ts = thousandSeparator();
-	std::cout << "Final locale: '" << loc.c_str() << '\'' << std::endl;
-	std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
-	std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
-	assert (dp == decimalSeparator());
-	assert (ts == thousandSeparator());
-#else
-	std::cout << "No locale available, skipping." << std::endl;
+		std::locale::global(loc);
+		dp = decimalSeparator();
+		ts = thousandSeparator();
+		std::cout << "Final locale: '" << loc.name() << '\'' << std::endl;
+		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
+		std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
+		assert (dp == decimalSeparator());
+		assert (ts == thousandSeparator());
+	} catch (std::runtime_error& ex)
+	{
+		std::cout << ex.what() << std::endl;
+		warn ("Locale not found, skipping test");
+	}
 #endif
 }
 

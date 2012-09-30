@@ -11,6 +11,7 @@
 #include "CppUnit/TestResult.h"
 #include "CppUnit/estring.h"
 #include <typeinfo>
+#include <iostream>
 
 
 using namespace std;
@@ -94,9 +95,15 @@ void TestCase::assertNull(const void* pointer, const std::string& pointerExpress
 }
 
 
-void TestCase::fail (const std::string& message, long lineNumber, const std::string& fileName)
+void TestCase::fail(const std::string& message, long lineNumber, const std::string& fileName)
 {
 	throw CppUnitException(std::string("fail: ") + message, lineNumber, fileName);
+}
+
+
+void TestCase::warn(const std::string& message, long lineNumber, const std::string& fileName)
+{
+	std::cout << "Warning [" << fileName << ':' << lineNumber << "]: " << message << std::endl;
 }
 
 

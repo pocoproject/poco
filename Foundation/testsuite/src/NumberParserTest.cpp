@@ -41,6 +41,7 @@
 #include "Poco/Stopwatch.h"
 #include <iostream>
 #include <iomanip>
+#include <cstdio>
 
 
 using Poco::NumberParser;
