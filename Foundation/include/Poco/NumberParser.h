@@ -55,6 +55,10 @@ class Foundation_API NumberParser
 	/// for parsing numbers out of strings.
 {
 public:
+	static const unsigned short NUM_BASE_OCT = 010;
+	static const unsigned short NUM_BASE_DEC = 10;
+	static const unsigned short NUM_BASE_HEX = 0x10;
+
 	static int parse(const std::string& s);
 		/// Parses an integer value in decimal notation from the given string.
 		/// Throws a SyntaxException if the string does not hold a number in decimal notation.
@@ -127,7 +131,7 @@ public:
 
 	static double parseFloat(const std::string& s);
 		/// Parses a double value in decimal floating point notation
-		/// from the given string. 
+		/// from the given string.
 		/// Throws a SyntaxException if the string does not hold a floating-point 
 		/// number in decimal notation.
 		
@@ -151,141 +155,6 @@ public:
 		/// String forms are NOT case sensitive.
 		/// Returns true if a valid bool number has been found,
 		/// false otherwise.
-
-private:
-
-	template <typename T>
-	static bool strToIntOct(const std::string &s, T& result) 
-	{
-		if (s.empty()) return false;
-		if (std::numeric_limits<T>::is_signed) return false;
-		std::string::const_iterator it = s.begin();
-		std::string::const_iterator end = s.end();
-		while (it != end && std::isspace(*it)) ++it;
-		if (it == end) return false;
-		while (it != end && *it == '0') ++it;
-		if (it == end)
-		{
-			result = 0;
-			return true;
-		}
-
-		unsigned base = 010;
-		T n = 0;
-		for (; it != end; ++it)
-		{
-			if (*it >= '0' && *it <= '7')
-			{
-				if (n > (std::numeric_limits<T>::max() / base))
-					return false;
-				n = n * base + *it - '0';
-			}
-			else break;
-		}
-		
-		while (it != end && std::isspace(*it)) ++it;
-		if (it != end) return false;
-
-		result = n;
-		return true;
-	}
-
-	template <typename T>
-	static bool strToIntDec(const std::string &s, T& result) 
-	{
-		if (s.empty()) return false;
-		int sign = 1;
-		std::string::const_iterator it = s.begin();
-		std::string::const_iterator end = s.end();
-		while (it != end && std::isspace(*it)) ++it;
-		if (it == end) return false;
-		if (std::numeric_limits<T>::is_signed)
-		{
-			if (*it == '-') 
-			{ 
-				sign = -1; 
-				++it; 
-			}
-			else if (*it == '+') ++it;
-			if (it == end) return false;
-		}
-
-		unsigned base = 10;
-		T n = 0;
-		for (; it != end; ++it)
-		{
-			if (*it >= '0' && *it <= '9')
-			{
-				if (n > (std::numeric_limits<T>::max() / base))
-					return false;
-				n = n * base + *it - '0';
-			}
-			else break;
-		}
-		
-		while (it != end && std::isspace(*it)) ++it;
-		if (it != end) return false;
-
-		result = sign * n;
-		return true;
-	}
-
-	template <typename T>
-	static bool strToIntHex(const std::string &s, T& result) 
-	{
-		if (s.empty()) return false;
-		if (std::numeric_limits<T>::is_signed) return false;
-		std::string::const_iterator it = s.begin();
-		std::string::const_iterator end = s.end();
-		while (it != end && std::isspace(*it)) ++it;
-		if (it == end) return false;
-		
-		bool beginWith0x = false;
-		if (*it == '0') 
-		{
-			beginWith0x = true;
-			while (it != end && *it == '0')
-			{
-				++it;
-				beginWith0x = false;
-			}
-			if (it == end) 
-			{
-				result = 0;
-				return true;
-			}
-		}
-		if (beginWith0x && (*it != 'x') && (*it != 'X')) return false;
-		else if ((*it == 'x') || (*it == 'X')) ++it;
-		if (it == end) return false;
-
-		unsigned base = 0x10;
-		T n = 0;
-		for (; it != end; ++it)
-		{
-			if ((*it >= '0' && *it <= '9') || (*it >= 'A' && *it <= 'F') || (*it >= 'a' && *it <= 'f'))
-			{
-				if (n > (std::numeric_limits<T>::max() / base))
-					return false;
-				
-				if (*it >= '0' && *it <= '9')
-					n = n * base + *it - '0';
-				else if (*it >= 'A' && *it <= 'F')
-					n = n * base + *it - 'A' + 10;
-				else if (*it >= 'a' && *it <= 'f')
-					n = n * base + *it - 'a' + 10;
-			}
-			else break;
-		}
-		if (it != end)
-		{
-			while (std::isspace(*it)) ++it;
-			if (it != end) return false;
-		}
-
-		result = n;
-		return true;
-	}
 };
 
 

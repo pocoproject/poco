@@ -299,7 +299,7 @@ void JSONTest::testDouble2Property()
 	Var test = object->get("test");
 	assert(test.isNumeric());
 	double value = test;
-	assert(value == 12e34);
+	assert(value >= 1.99e34 && value <= 12.01e34);
 }
 
 

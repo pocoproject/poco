@@ -35,6 +35,12 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/Types.h"
+#include "Poco/Format.h"
+#include "Poco/NumericString.h"
+#include "Poco/MemoryStream.h"
+#include "Poco/Stopwatch.h"
+#include <iostream>
+#include <iomanip>
 
 
 using Poco::NumberParser;
@@ -50,6 +56,9 @@ using Poco::UInt32;
 using Poco::Int64;
 using Poco::UInt64;
 #endif
+using Poco::format;
+using Poco::decimalSeparator;
+using Poco::thousandSeparator;
 
 
 NumberParserTest::NumberParserTest(const std::string& name): CppUnit::TestCase(name)
@@ -64,12 +73,21 @@ NumberParserTest::~NumberParserTest()
 
 void NumberParserTest::testParse()
 {
+	const char ts = thousandSeparator();
+
 	assert(NumberParser::parse("123") == 123);
+	assert(NumberParser::parse(format("123%c456", ts)) == 123456);
+	assert(NumberParser::parse(format("1%c234%c567", ts, ts)) == 1234567);
+	assert(NumberParser::parse("+123") == 123);
+	assert(NumberParser::parse("-123") == -123);
 	assert(NumberParser::parse("0") == 0);
 	assert(NumberParser::parse("000") == 0);
 	assert(NumberParser::parse("  123  ") == 123);
 	assert(NumberParser::parse(" 123") == 123);
 	assert(NumberParser::parse("123 ") == 123);
+	assert(NumberParser::parse("0123") == 123);
+	assert(NumberParser::parse("+0123") == 123);
+	assert(NumberParser::parse("-0123") == -123);
 	assert(NumberParser::parse("-123") == -123);
 	assert(NumberParser::parseUnsigned("123") == 123);
 	assert(NumberParser::parseHex("12AB") == 0x12ab);
@@ -94,6 +112,8 @@ void NumberParserTest::testParse()
 #if defined(POCO_HAVE_INT64)
 	assert(NumberParser::parse64("123") == 123);
 	assert(NumberParser::parse64("-123") == -123);
+	assert(NumberParser::parse64("0123") == 123);
+	assert(NumberParser::parse64("-0123") == -123);
 	assert(NumberParser::parseUnsigned64("123") == 123);
 	assert(NumberParser::parseHex64("12AB") == 0x12ab);
 	assert(NumberParser::parseHex64("0x12AB") == 0x12ab);
@@ -101,7 +121,75 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parseOct64("0123") == 0123);
 #endif
 
-	assertEqualDelta(12.34, NumberParser::parseFloat("12.34"), 0.01);
+#ifndef POCO_NO_FPENVIRONMENT
+	const char dp = decimalSeparator();
+	
+	assertEqualDelta(1.0, NumberParser::parseFloat(format("1", dp)), 0.01);
+	assertEqualDelta(0.0, NumberParser::parseFloat(format("0%c0", dp)), 0.01);
+	assertEqualDelta(0., NumberParser::parseFloat(format("0%c0", dp)), 0.01);
+	assertEqualDelta(.0, NumberParser::parseFloat(format("0%c0", dp)), 0.01);
+	assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c34", dp)), 0.01);
+	assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c34f", dp)), 0.01);
+	assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c34", dp)), 0.01);
+	assertEqualDelta(-12.34, NumberParser::parseFloat(format("-12%c34", dp)), 0.01);
+	assertEqualDelta(.34, NumberParser::parseFloat(format("%c34", dp)), 0.01);
+	assertEqualDelta(-.34, NumberParser::parseFloat(format("-%c34", dp)), 0.01);
+	assertEqualDelta(12., NumberParser::parseFloat(format("12%c", dp)), 0.01);
+	assertEqualDelta(-12., NumberParser::parseFloat(format("-12%c", dp)), 0.01);
+	assertEqualDelta(12, NumberParser::parseFloat("12"), 0.01);
+	assertEqualDelta(-12, NumberParser::parseFloat("-12"), 0.01);
+	assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c3456789012345678901234567890", dp)), 0.01);
+
+	assertEqualDelta(1234.3456789, NumberParser::parseFloat(format("1%c234%c3456789012345678901234567890", ts, dp)), 0.00000001);
+	assertEqualDelta(12345.3456789, NumberParser::parseFloat(format("12%c345%c3456789012345678901234567890", ts, dp)), 0.00000001);
+	assertEqualDelta(123456.3456789, NumberParser::parseFloat(format("123%c456%c3456789012345678901234567890", ts, dp)), 0.00000001);
+	assertEqualDelta(1234567.3456789, NumberParser::parseFloat(format("1%c234%c567%c3456789012345678901234567890", ts, ts, dp)), 0.00000001);
+	assertEqualDelta(12345678.3456789, NumberParser::parseFloat(format("12%c345%c678%c3456789012345678901234567890", ts, ts, dp)), 0.00000001);
+	assertEqualDelta(123456789.3456789, NumberParser::parseFloat(format("123%c456%c789%c3456789012345678901234567890", ts, ts, dp)), 0.00000001);
+
+	if ((std::numeric_limits<double>::max() / 10) < 1.23456e10)
+		fail ("test value larger than max value for this platform");
+	else
+	{
+		double d = 1.234e100;
+		assertEqualDelta(d, NumberParser::parseFloat(format("1%c234e100", dp)), 0.01);
+		assertEqualDelta(d, NumberParser::parseFloat(format("1%c234E+100", dp)), 0.01);
+		
+		d = 1.234e-100;
+		assertEqualDelta(d, NumberParser::parseFloat(format("1%c234E-100", dp)), 0.01);
+		
+		d = -1.234e100;
+		assertEqualDelta(d, NumberParser::parseFloat(format("-1%c234e+100", dp)), 0.01);
+		assertEqualDelta(d, NumberParser::parseFloat(format("-1%c234E100", dp)), 0.01);
+		
+		d = 1.234e-100;
+		assertEqualDelta(d, NumberParser::parseFloat(format(" 1%c234e-100 ", dp)), 0.01);
+		assertEqualDelta(d, NumberParser::parseFloat(format(" 1%c234e-100 ", dp)), 0.01);
+		assertEqualDelta(d, NumberParser::parseFloat(format("  1%c234e-100 ", dp)), 0.01);
+
+		d = 1234.234e-100;
+		assertEqualDelta(d, NumberParser::parseFloat(format(" 1%c234%c234e-100 ", ts, dp)), 0.01);
+		d = 12345.234e-100;
+		assertEqualDelta(d, NumberParser::parseFloat(format(" 12%c345%c234e-100 ", ts, dp)), 0.01);
+		d = 123456.234e-100;
+		assertEqualDelta(d, NumberParser::parseFloat(format("  123%c456%c234e-100 ", ts, dp)), 0.01);
+
+		d = -1234.234e-100;
+		assertEqualDelta(d, NumberParser::parseFloat(format(" -1%c234%c234e-100 ", ts, dp)), 0.01);
+		d = -12345.234e-100;
+		assertEqualDelta(d, NumberParser::parseFloat(format(" -12%c345%c234e-100 ", ts, dp)), 0.01);
+		d = -123456.234e-100;
+		assertEqualDelta(d, NumberParser::parseFloat(format("  -123%c456%c234e-100 ", ts, dp)), 0.01);
+	}
+
+	double d = 12.34e-10;
+	assertEqualDelta(d, NumberParser::parseFloat(format("12%c34e-10", dp)), 0.01);
+	assertEqualDelta(-12.34, NumberParser::parseFloat(format("-12%c34", dp)), 0.01);
+	
+	assertEqualDelta(12.34, NumberParser::parseFloat(format("   12%c34", dp)), 0.01);
+	assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c34   ", dp)), 0.01);
+	assertEqualDelta(12.34, NumberParser::parseFloat(format(" 12%c34  ", dp)), 0.01);
+#endif // POCO_NO_FPENVIRONMENT
 }
 
 
@@ -126,6 +214,9 @@ void NumberParserTest::testLimits()
 
 void NumberParserTest::testParseError()
 {
+	const char dp = decimalSeparator();
+	const char ts = thousandSeparator();
+
 	try
 	{
 		NumberParser::parse("");
@@ -198,19 +289,22 @@ void NumberParserTest::testParseError()
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
 	
-#endif
-
 	try
 	{
-		NumberParser::parseFloat("a12.3");
+		NumberParser::parseHex64(format("123%c45", ts));
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
 
+#endif // POCO_HAVE_INT64
+
+#ifndef POCO_NO_FPENVIRONMENT
 	try
 	{
-		NumberParser::parseFloat("12.3aa");
+		NumberParser::parseFloat(format("a12%c3", dp));
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
+
+#endif // POCO_NO_FPENVIRONMENT
 }
 
 

@@ -893,6 +893,9 @@
 					RelativePath=".\include\Poco\NumberParser.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\NumericString.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Platform.h">
 				</File>
 				<File

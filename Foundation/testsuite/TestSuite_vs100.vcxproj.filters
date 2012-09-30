@@ -959,11 +959,11 @@
     <ClInclude Include="src\VarTest.h">
       <Filter>Dynamic\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ArrayTest.h">
-      <Filter>Core\Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\FIFOBufferStreamTest.h">
       <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArrayTest.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

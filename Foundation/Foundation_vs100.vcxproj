@@ -1007,6 +1007,7 @@
     <ClInclude Include="include\Poco\FPEnvironment_SUN.h" />
     <ClInclude Include="include\Poco\FPEnvironment_WIN32.h" />
     <ClInclude Include="include\Poco\Instantiator.h" />
+    <ClInclude Include="include\Poco\Latin2Encoding.h" />
     <ClInclude Include="include\Poco\MemoryPool.h" />
     <ClInclude Include="include\Poco\MetaProgramming.h" />
     <ClInclude Include="include\Poco\NamedTuple.h" />
@@ -1014,6 +1015,7 @@
     <ClInclude Include="include\Poco\Nullable.h" />
     <ClInclude Include="include\Poco\NumberFormatter.h" />
     <ClInclude Include="include\Poco\NumberParser.h" />
+    <ClInclude Include="include\Poco\NumericString.h" />
     <ClInclude Include="include\Poco\ObjectPool.h" />
     <ClInclude Include="include\Poco\Platform.h" />
     <ClInclude Include="include\Poco\Platform_POSIX.h" />

@@ -36,13 +36,14 @@
 
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
-#include "Poco/MemoryStream.h"
 #include "Poco/String.h"
-#if !defined(POCO_NO_LOCALE)
-#include <locale>
-#endif
+#include "Poco/NumericString.h"
 #include <cstdio>
 #include <cctype>
+#include <stdlib.h>
+#if !defined(POCO_NO_LOCALE)
+	#include <locale>
+#endif
 
 
 #if defined(POCO_LONG_IS_64_BIT)
@@ -71,7 +72,7 @@ int NumberParser::parse(const std::string& s)
 
 bool NumberParser::tryParse(const std::string& s, int& value)
 {
-	return strToIntDec(s, value);
+	return strToInt(s.c_str(), value, NUM_BASE_DEC);
 }
 
 
@@ -87,7 +88,7 @@ unsigned NumberParser::parseUnsigned(const std::string& s)
 
 bool NumberParser::tryParseUnsigned(const std::string& s, unsigned& value)
 {
-	return strToIntDec(s, value);
+	return strToInt(s.c_str(), value, NUM_BASE_DEC);
 }
 
 
@@ -103,7 +104,7 @@ unsigned NumberParser::parseHex(const std::string& s)
 
 bool NumberParser::tryParseHex(const std::string& s, unsigned& value)
 {
-	return strToIntHex(s, value);
+	return strToInt(s.c_str(), value, NUM_BASE_HEX);
 }
 
 
@@ -119,7 +120,7 @@ unsigned NumberParser::parseOct(const std::string& s)
 
 bool NumberParser::tryParseOct(const std::string& s, unsigned& value)
 {
-	return strToIntOct(s, value);
+	return strToInt(s.c_str(), value, NUM_BASE_OCT);
 }
 
 
@@ -138,7 +139,7 @@ Int64 NumberParser::parse64(const std::string& s)
 
 bool NumberParser::tryParse64(const std::string& s, Int64& value)
 {
-	return strToIntDec(s, value);
+	return strToInt(s.c_str(), value, NUM_BASE_DEC);
 }
 
 
@@ -154,7 +155,7 @@ UInt64 NumberParser::parseUnsigned64(const std::string& s)
 
 bool NumberParser::tryParseUnsigned64(const std::string& s, UInt64& value)
 {
-	return strToIntDec(s, value);
+	return strToInt(s.c_str(), value, NUM_BASE_DEC);
 }
 
 
@@ -170,7 +171,7 @@ UInt64 NumberParser::parseHex64(const std::string& s)
 
 bool NumberParser::tryParseHex64(const std::string& s, UInt64& value)
 {
-	return strToIntHex(s, value);
+	return strToInt(s.c_str(), value, NUM_BASE_HEX);
 }
 
 
@@ -186,7 +187,7 @@ UInt64 NumberParser::parseOct64(const std::string& s)
 
 bool NumberParser::tryParseOct64(const std::string& s, UInt64& value)
 {
-	return strToIntOct(s, value);
+	return strToInt(s.c_str(), value, NUM_BASE_OCT);
 }
 
 
@@ -205,12 +206,7 @@ double NumberParser::parseFloat(const std::string& s)
 
 bool NumberParser::tryParseFloat(const std::string& s, double& value)
 {
-	Poco::MemoryInputStream istr(s.data(), s.size());
-#if !defined(POCO_NO_LOCALE)
-	istr.imbue(std::locale::classic());
-#endif
-	istr >> value;
-	return istr.eof() && !istr.fail();
+	return strToFloat(s.c_str(), value);
 }
 
 

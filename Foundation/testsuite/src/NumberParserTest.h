@@ -60,6 +60,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+
 	template <class T> bool testUpperLimit()
 	{
 		T n = std::numeric_limits<T>::max();

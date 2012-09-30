@@ -95,10 +95,10 @@ public:
 	FPEnvironment(RoundingMode mode);
 		/// Remembers the current environment and
 		/// sets the given rounding mode.
-		
+
 	FPEnvironment(const FPEnvironment& env);
 		/// Copy constructor.
-		
+
 	~FPEnvironment();
 		/// Restores the previous environment (unless
 		/// keepCurrent() has been called previously)
@@ -121,18 +121,18 @@ public:
 		
 	static RoundingMode getRoundingMode();
 		/// Returns the current rounding mode.
-		
-	static bool isInfinite(float value);		
+
+	static bool isInfinite(float value);
 	static bool isInfinite(double value);
 	static bool isInfinite(long double value);
 		/// Returns true iff the given number is infinite.
 
-	static bool isNaN(float value);		
+	static bool isNaN(float value);
 	static bool isNaN(double value);
 	static bool isNaN(long double value);
 		/// Returns true iff the given number is NaN.
 
-	static float copySign(float target, float source);		
+	static float copySign(float target, float source);
 	static double copySign(double target, double source);
 	static long double copySign(long double target, long double source);
 		/// Copies the sign from source to target.

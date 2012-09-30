@@ -36,15 +36,15 @@ void TestCase::assertImplementation(bool condition, const std::string& condition
 
 void TestCase::loop1assertImplementation(bool condition, const std::string& conditionExpression, long lineNumber, long data1lineNumber, const std::string& fileName)
 {
-    if (!condition)
-        throw CppUnitException(conditionExpression, lineNumber, data1lineNumber, fileName);
+	if (!condition)
+		throw CppUnitException(conditionExpression, lineNumber, data1lineNumber, fileName);
 }
 
 
 void TestCase::loop2assertImplementation(bool condition, const std::string& conditionExpression, long lineNumber, long data1lineNumber, long data2lineNumber, const std::string& fileName)
 {
-    if (!condition)
-        throw CppUnitException(conditionExpression, lineNumber, data1lineNumber, data2lineNumber, fileName);
+	if (!condition)
+		throw CppUnitException(conditionExpression, lineNumber, data1lineNumber, data2lineNumber, fileName);
 }
 
 

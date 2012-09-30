@@ -38,6 +38,7 @@
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
+#include "Poco/NumericString.h"
 
 
 class StringTest: public CppUnit::TestCase
@@ -61,12 +62,61 @@ public:
 	void testReplaceInPlace();
 	void testCat();
 
+	void testStringToInt();
+	void testStringToFloat();
+	void testStringToFloatError();
+	void testNumericLocale();
+	void benchmark();
+
 	void setUp();
 	void tearDown();
 
 	static CppUnit::Test* suite();
 
 private:
+
+	template <typename T>
+	void stringToInt()
+	{
+		T result = 0;
+		if (123 <= std::numeric_limits<T>::max())
+			assert(strToInt("123", result)); assert(result == 123);
+		
+		assert(strToInt("0", result)); assert(result == 0);
+		assert(strToInt("000", result)); assert(result == 0);
+		
+		if (123 < std::numeric_limits<T>::max())
+			{ assert(strToInt("  123  ", result)); assert(result == 123); }
+		if (123 < std::numeric_limits<T>::max())
+			{ assert(strToInt(" 123", result)); assert(result == 123); }
+		if (123 < std::numeric_limits<T>::max())
+			{ assert(strToInt("123 ", result)); assert(result == 123); }
+		if (std::numeric_limits<T>::is_signed && (-123 > std::numeric_limits<T>::min()))
+			{ assert(strToInt("-123", result)); assert(result == -123); }
+		if (0x123 < std::numeric_limits<T>::max())
+			{ assert(strToInt("123", result, 0x10)); assert(result == 0x123); }
+		if (0x12ab < std::numeric_limits<T>::max())
+			{ assert(strToInt("12AB", result, 0x10)); assert(result == 0x12ab); }
+		if (0x12ab < std::numeric_limits<T>::max())
+			{ assert(strToInt("0X12AB", result)); assert(result == 0x12ab); }
+		if (0x12ab < std::numeric_limits<T>::max())
+			{ assert(strToInt("0x12AB", result)); assert(result == 0x12ab); }
+		if (0x12ab < std::numeric_limits<T>::max())
+			{ assert(strToInt("0x12aB", result)); assert(result == 0x12ab); }
+		if (0x98fe < std::numeric_limits<T>::max())
+			{ assert(strToInt("0X98Fe", result)); assert(result == 0x98fe); }
+		if (123 < std::numeric_limits<T>::max())
+			{ assert(strToInt("0x0", result)); assert(result == 0); }
+		if (123 < std::numeric_limits<T>::max())
+			{ assert(strToInt("00", result, 0x10)); assert(result == 0); }
+		if (0123 < std::numeric_limits<T>::max())
+			{ assert(strToInt("123", result, 010));  assert(result == 0123); }
+		if (0123 < std::numeric_limits<T>::max())
+			{ assert(strToInt("0123", result)); assert(result == 0123); }
+		
+		assert(strToInt("0", result, 010)); assert(result == 0);
+		assert(strToInt("000", result)); assert(result == 0);
+	}
 };
 
 

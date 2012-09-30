@@ -39,7 +39,6 @@
 #include "Poco/RotateStrategy.h"
 #include "Poco/PurgeStrategy.h"
 #include "Poco/Message.h"
-#include "Poco/NumberParser.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTime.h"
 #include "Poco/LocalDateTime.h"
@@ -47,7 +46,6 @@
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
-
 
 namespace Poco {
 
@@ -232,7 +230,6 @@ void FileChannel::setRotation(const std::string& rotation)
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	std::string unit;
 	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
-	
 	RotateStrategy* pStrategy = 0;
 	if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
 	{

@@ -42,6 +42,7 @@ Release 1.5.0 (2012-09-??)
 - fixed SF#321 Binding DatTime or Timestamp
 - fixed SF#307 Detect the SQL driver type at run time
 - added VS 2012 Projects/Solutions
+- enhanced and accelerated numeric parsing for integers and floats
 
 Release 1.4.4p1 (2012-??-??)
 ============================
