@@ -54,10 +54,10 @@ export POCO_BUILD
 cwd = $(shell pwd)
 inpoco = $(shell echo | awk '{print index("$(cwd)","$(POCO_BASE)")}')
 inproj = $(shell echo | awk '{print index("$(cwd)","$(PROJECT_BASE)")}')
-ifeq ($(inpoco),1)
+ifneq ($(inpoco),0)
 PROJECT_BASE = $(POCO_BASE)
 else
-ifeq ($(inproj),1)
+ifneq ($(inproj),0)
 else
 $(error Current working directory not under $$PROJECT_BASE)
 endif
