@@ -162,9 +162,9 @@ protected:
 	          long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	          const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
-        void warn(const std::string& message = "",
-                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+	void warn(const std::string& message = "",
+              long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+              const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 
 private:
@@ -245,6 +245,9 @@ inline std::string TestCase::toString()
 	(this->assertNotNull((ptr), #ptr, __LINE__, __FILE__))
 
 #define failmsg(msg) \
+	(this->fail(msg, __LINE__, __FILE__))
+
+#define warnmsg(msg) \
 	(this->fail(msg, __LINE__, __FILE__))
 
 

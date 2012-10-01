@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.5.0 (2012-09-??)
+Release 1.5.0 (2012-10-01)
 ==========================
 
 - added JSON
@@ -43,6 +43,8 @@ Release 1.5.0 (2012-09-??)
 - fixed SF#307 Detect the SQL driver type at run time
 - added VS 2012 Projects/Solutions
 - enhanced and accelerated numeric parsing for integers and floats
+- fixed SF#590 Segfault on FreeBSD when stack size not rounded
+- added warn function and warnmsg macro in CppUnit
 
 Release 1.4.4p1 (2012-??-??)
 ============================

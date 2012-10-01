@@ -57,138 +57,106 @@ namespace Poco {
 
 
 inline char decimalSeparator()
-        /// Returns decimal separator from global locale or
-        /// default '.' for platforms where locale is unavailable.
+	/// Returns decimal separator from global locale or
+	/// default '.' for platforms where locale is unavailable.
 {
 #if !defined(POCO_NO_LOCALE)
-        return std::use_facet<std::numpunct<char> >(std::locale()).decimal_point();
+	return std::use_facet<std::numpunct<char> >(std::locale()).decimal_point();
 #else
-        return '.';
+	return '.';
 #endif
 }
 
 
 inline char thousandSeparator()
-        /// Returns thousand separator from global locale or
-        /// default ',' for platforms where locale is unavailable.
+	/// Returns thousand separator from global locale or
+	/// default ',' for platforms where locale is unavailable.
 {
 #if !defined(POCO_NO_LOCALE)
-        return std::use_facet<std::numpunct<char> >(std::locale()).thousands_sep();
+	return std::use_facet<std::numpunct<char> >(std::locale()).thousands_sep();
 #else
-        return ',';
+	return ',';
 #endif
 }
 
 
 template <typename I>
-bool strToInt(const char* pStr, I& result, short base = -1)
-	/// Converts zero-terminated array to integer number;
-	/// If base is equal to -1, this functin will try to determine
-	/// the numeric base (using '0' prefix for octal, '0x' for 
-	/// hexadecimal and no prefix for decimal).
-	/// Thousand separators are recognized for base10 and the locale
-	/// and silently skipped but not verified for correct positioning.
-	/// Returns true if succesful. If parsing was unsuccesful,
-	/// the return value is false with result value undetermined.
+bool strToInt(const char* pStr, I& result, short base)
+	/// Converts zero-terminated character array to integer number;
+	/// Thousand separators are recognized for base10 and current locale;
+	/// it is silently skipped but not verified for correct positioning.
+	/// Function returns true if succesful. If parsing was unsuccesful,
+	/// the return value is false with the result value undetermined.
 {
-	if (!std::numeric_limits<I>::is_integer) return false;
-
-	if (!pStr || (pStr && *pStr == '\0')) return false;
-	while ((*pStr != '\0') && (*pStr == ' ')) ++pStr;
+	if (!pStr) return false;
+	while (*pStr == ' ') ++pStr;
 	if (*pStr == '\0') return false;
-
-	char sign = 1;
-
-	if (*pStr == '-')
+	I sign = 1;
+	if ((base == 10) && (*pStr == '-'))
 	{
-		++pStr;
 		sign = -1;
+		++pStr;
 	}
 	else if (*pStr == '+') ++pStr;
-	if (*pStr == '\0') return false;
 
-	result = 0;
-
-	if (*pStr == '0')
-	{
-		while ((*pStr != '\0') && (*pStr == '0')) ++pStr; 
-		if (*pStr == '\0') 
-		{
-			result = 0;
-			return true;
-		}
-
-		if ((*pStr == 'x') || (*pStr == 'X'))
-		{
-			base = 0x10;
-			++pStr;
-			if (*pStr == '\0') return false;
-		}
-		else if (base == -1) base = 010;
-	}
-	else if (base == -1) base = 10;
-
-	while ((*pStr == '0'))
-	{
-		if (*pStr != '\0')
-		{
-			result = 0;
-			return true;
-		}
-		++pStr;
-	}
-	if (*pStr == '\0') return false;
-
+	// parser states:
+	const char STATE_SIGNIFICANT_DIGITS = 1;
+	char state = 0;
 	const char thSep = thousandSeparator();
-	bool allowDigits = true;
+	
+	result = 0;
+	I limitCheck = std::numeric_limits<I>::max() / base;
 	for (; *pStr != '\0'; ++pStr)
 	{
 		switch (*pStr)
 		{
-		case '0': case '1': case '2': case '3': case '4':
+		case 'x': case 'X': 
+			if (base != 0x10) return false;
+
+		case '0': 
+			if (state < STATE_SIGNIFICANT_DIGITS) break;
+
+		case '1': case '2': case '3': case '4':
 		case '5': case '6': case '7':
-			if (allowDigits)
-			{
-				if (result > (std::numeric_limits<I>::max() / base)) return false;
-				result = result * base + (*pStr - '0');
-			}
-			else return false;
+			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
+			if (result > limitCheck) return false;
+			result = result * base + (*pStr - '0');
+
 			break;
 
 		case '8': case '9':
-			if (allowDigits && (base == 10 || base == 16))
+			if ((base == 10) || (base == 0x10))
 			{
-				if (result > (std::numeric_limits<I>::max() / base)) return false;
+				if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
+				if (result > limitCheck) return false;
 				result = result * base + (*pStr - '0');
 			}
 			else return false;
+
 			break;
 
 		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-			if (allowDigits && base == 16)
-			{
-				if (result > (std::numeric_limits<I>::max() / base)) return false;
-				result = result * base + (10 + *pStr - 'a');
-			}
-			else return false;
+			if (base != 0x10) return false;
+			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
+			if (result > limitCheck) return false;
+			result = result * base + (10 + *pStr - 'a');
+
 			break;
 
 		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-			if (allowDigits && base == 16)
-			{
-				if (result > (std::numeric_limits<I>::max() / base)) return false;
-				result = result * base + (10 + *pStr - 'A');
-			}
-			else
-				return false;
+			if (base != 0x10) return false;
+
+			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
+			if (result > limitCheck) return false;
+			result = result * base + (10 + *pStr - 'A');
+
 			break;
 
 		case 'U':
 		case 'u':
 		case 'L':
 		case 'l':
-			allowDigits = false;
-			break;
+			goto done;
 
 		case '.':
 			if ((base == 10) && (thSep == '.')) break;
@@ -199,23 +167,23 @@ bool strToInt(const char* pStr, I& result, short base = -1)
 			else return false;
 
 		case ' ':
-			if (base == 10) break;
-			else return false;
+			if ((base == 10) && (thSep == ' ')) break;
+			goto done;
 
 		default:
 			return false;
 		}
 	}
 
-	if ((base == 10) && (std::numeric_limits<I>::is_signed))
-		result *= sign;
+done:
+	if ((sign < 0) && (base == 10)) result *= sign;
 
 	return true;
 }
 
 
 template <typename I>
-bool strToInt(const std::string& str, I& result, short base = -1)
+bool strToInt(const std::string& str, I& result, short base)
 	/// Converts string to integer number;
 	/// This is a wrapper function, for details see see the
 	/// bool strToInt(const char*, I&, short&) implementation.

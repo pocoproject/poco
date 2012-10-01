@@ -564,24 +564,63 @@ void StringTest::testNumericLocale()
 	} catch (std::runtime_error& ex)
 	{
 		std::cout << ex.what() << std::endl;
-		warn ("Locale not found, skipping test");
+		warnmsg ("Locale not found, skipping test");
 	}
 #endif
 }
 
 
-bool parseStream(const std::string& s, double& value)
+void StringTest::benchmarkStrToInt()
 {
-	MemoryInputStream istr(s.data(), s.size());
-#if !defined(POCO_NO_LOCALE)
-	istr.imbue(std::locale::classic());
-#endif
-	istr >> value;
-	return istr.eof() && !istr.fail();
+	Poco::Stopwatch sw;
+	int number = 123456789;
+	std::string num = "123456789";
+	int res;
+	sw.start();
+	for (int i = 0; i < 1000000; ++i) parseStream(num, res);
+	sw.stop();
+	std::cout << "parseStream Number: " << res << std::endl;
+	double timeStream = sw.elapsed() / 1000.0;
+
+	char* pC = 0;
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) res = std::strtol(num.c_str(), &pC, 10);
+	sw.stop();
+	std::cout << "std::strtol Number: " << res << std::endl;
+	double timeStrtol = sw.elapsed() / 1000.0;
+	
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) strToInt(num.c_str(), res, 10);
+	sw.stop();
+	std::cout << "strToInt Number: " << res << std::endl;
+	double timeStrToInt = sw.elapsed() / 1000.0;
+	
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%d%c", &res);
+	sw.stop();
+	std::cout << "sscanf Number: " << res << std::endl;
+	double timeScanf = sw.elapsed() / 1000.0;
+
+	int graph;
+	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
+	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << timeStream << "[ms]" << std::endl;
+
+	std::cout << std::setw(14) << "std::strtol:\t" << std::setw(10) << std::setfill(' ') << timeStrtol << "[ms]" << 
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtol) << '\t' ;
+	graph = (int) (timeStream / timeStrtol); for (int i = 0; i < graph; ++i) std::cout << '|';
+
+	std::cout << std::endl << std::setw(14) << "strToInt:\t" << std::setw(10) << std::setfill(' ') << timeStrToInt << "[ms]" << 
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToInt) << '\t' ;
+	graph = (int) (timeStream / timeStrToInt); for (int i = 0; i < graph; ++i) std::cout << '|';
+
+	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
+	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '|';
+	std::cout << std::endl;
 }
 
 
-void StringTest::benchmark()
+void StringTest::benchmarkStrToFloat()
 {
 	Poco::Stopwatch sw;
 	double number = 1.23456e-123;
@@ -599,7 +638,7 @@ void StringTest::benchmark()
 	sw.stop();
 	std::cout << "std::strtod Number: " << res << std::endl;
 	double timeStrtod = sw.elapsed() / 1000.0;
-	
+
 	sw.restart();
 	char ou = 0;
 	for (int i = 0; i < 1000000; ++i) strToFloat(num.c_str(), res, ou);
@@ -662,7 +701,8 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testStringToFloat);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloatError);
 	CppUnit_addTest(pSuite, StringTest, testNumericLocale);
-	CppUnit_addTest(pSuite, StringTest, benchmark);
+	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);
+	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToInt);
 
 	return pSuite;
 }

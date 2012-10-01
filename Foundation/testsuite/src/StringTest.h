@@ -66,7 +66,8 @@ public:
 	void testStringToFloat();
 	void testStringToFloatError();
 	void testNumericLocale();
-	void benchmark();
+	void benchmarkStrToFloat();
+	void benchmarkStrToInt();
 
 	void setUp();
 	void tearDown();
@@ -80,43 +81,55 @@ private:
 	{
 		T result = 0;
 		if (123 <= std::numeric_limits<T>::max())
-			assert(strToInt("123", result)); assert(result == 123);
+			assert(strToInt("123", result, 10)); assert(result == 123);
 		
-		assert(strToInt("0", result)); assert(result == 0);
-		assert(strToInt("000", result)); assert(result == 0);
+		assert(strToInt("0", result, 10)); assert(result == 0);
+		assert(strToInt("000", result, 10)); assert(result == 0);
 		
 		if (123 < std::numeric_limits<T>::max())
-			{ assert(strToInt("  123  ", result)); assert(result == 123); }
+			{ assert(strToInt("  123  ", result, 10)); assert(result == 123); }
 		if (123 < std::numeric_limits<T>::max())
-			{ assert(strToInt(" 123", result)); assert(result == 123); }
+			{ assert(strToInt(" 123", result, 10)); assert(result == 123); }
 		if (123 < std::numeric_limits<T>::max())
-			{ assert(strToInt("123 ", result)); assert(result == 123); }
+			{ assert(strToInt("123 ", result, 10)); assert(result == 123); }
 		if (std::numeric_limits<T>::is_signed && (-123 > std::numeric_limits<T>::min()))
-			{ assert(strToInt("-123", result)); assert(result == -123); }
+			{ assert(strToInt("-123", result, 10)); assert(result == -123); }
 		if (0x123 < std::numeric_limits<T>::max())
 			{ assert(strToInt("123", result, 0x10)); assert(result == 0x123); }
 		if (0x12ab < std::numeric_limits<T>::max())
 			{ assert(strToInt("12AB", result, 0x10)); assert(result == 0x12ab); }
 		if (0x12ab < std::numeric_limits<T>::max())
-			{ assert(strToInt("0X12AB", result)); assert(result == 0x12ab); }
+			{ assert(strToInt("0X12AB", result, 0x10)); assert(result == 0x12ab); }
 		if (0x12ab < std::numeric_limits<T>::max())
-			{ assert(strToInt("0x12AB", result)); assert(result == 0x12ab); }
+			{ assert(strToInt("0x12AB", result, 0x10)); assert(result == 0x12ab); }
 		if (0x12ab < std::numeric_limits<T>::max())
-			{ assert(strToInt("0x12aB", result)); assert(result == 0x12ab); }
+			{ assert(strToInt("0x12aB", result, 0x10)); assert(result == 0x12ab); }
 		if (0x98fe < std::numeric_limits<T>::max())
-			{ assert(strToInt("0X98Fe", result)); assert(result == 0x98fe); }
+			{ assert(strToInt("0X98Fe", result, 0x10)); assert(result == 0x98fe); }
 		if (123 < std::numeric_limits<T>::max())
-			{ assert(strToInt("0x0", result)); assert(result == 0); }
+			{ assert(strToInt("0x0", result, 0x10)); assert(result == 0); }
 		if (123 < std::numeric_limits<T>::max())
 			{ assert(strToInt("00", result, 0x10)); assert(result == 0); }
 		if (0123 < std::numeric_limits<T>::max())
 			{ assert(strToInt("123", result, 010));  assert(result == 0123); }
 		if (0123 < std::numeric_limits<T>::max())
-			{ assert(strToInt("0123", result)); assert(result == 0123); }
+			{ assert(strToInt("0123", result, 010)); assert(result == 0123); }
 		
 		assert(strToInt("0", result, 010)); assert(result == 0);
-		assert(strToInt("000", result)); assert(result == 0);
+		assert(strToInt("000", result, 010)); assert(result == 0);
 	}
+
+	template <typename T>
+	bool parseStream(const std::string& s, T& value)
+	{
+		MemoryInputStream istr(s.data(), s.size());
+#if !defined(POCO_NO_LOCALE)
+		istr.imbue(std::locale::classic());
+#endif
+		istr >> value;
+		return istr.eof() && !istr.fail();
+	}
+
 };
 
 
