@@ -39,7 +39,7 @@
 #include "Poco/Event.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
-#include <iostream>
+//#include <iostream>
 #if defined(__sun) && defined(__SVR4) && !defined(__EXTENSIONS__)
 #define __EXTENSIONS__
 #endif
@@ -273,6 +273,7 @@ void ThreadTest::testThreadStackSize()
 	int stackSize = 50000000;
 
 	Thread thread;
+
 	assert (0 == thread.getStackSize());
 	thread.setStackSize(stackSize);
 	assert (stackSize <= thread.getStackSize());
@@ -283,21 +284,21 @@ void ThreadTest::testThreadStackSize()
 
 	stackSize = 1;
 	thread.setStackSize(stackSize);
-#ifdef PTHREAD_STACK_MIN
-	assert (PTHREAD_STACK_MIN == thread.getStackSize());
-#else
-	assert (stackSize >= thread.getStackSize());
+
+#if !defined(POCO_OS_FAMILY_BSD) // on BSD family, stack size is rounded
+	#ifdef PTHREAD_STACK_MIN
+		assert (PTHREAD_STACK_MIN == thread.getStackSize());
+	#else
+		assert (stackSize >= thread.getStackSize());
+	#endif
 #endif
+
 	tmp = MyRunnable::_staticVar;
-#if POCO_OS == POCO_OS_FREE_BSD 
-	fail ("FreeBSD segfaults - TODO!");
-#else
 	thread.start(freeFunc, &tmp);
 	thread.join();
 	assert (tmp * 2 == MyRunnable::_staticVar);
-#endif
-	thread.setStackSize(0);
 
+	thread.setStackSize(0);
 	assert (0 == thread.getStackSize());
 	tmp = MyRunnable::_staticVar;
 	thread.start(freeFunc, &tmp);
