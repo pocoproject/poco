@@ -39,6 +39,7 @@
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
 #include "Poco/NumericString.h"
+#include "Poco/MemoryStream.h"
 
 
 class StringTest: public CppUnit::TestCase
@@ -122,7 +123,7 @@ private:
 	template <typename T>
 	bool parseStream(const std::string& s, T& value)
 	{
-		MemoryInputStream istr(s.data(), s.size());
+		Poco::MemoryInputStream istr(s.data(), s.size());
 #if !defined(POCO_NO_LOCALE)
 		istr.imbue(std::locale::classic());
 #endif
