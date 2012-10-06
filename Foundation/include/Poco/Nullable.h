@@ -270,7 +270,7 @@ public:
 	}
 
 	bool isNull() const
-		/// Returns true iff the Nullable is empty.
+		/// Returns true if the Nullable is empty.
 	{
 		return _isNull;
 	}
