@@ -527,7 +527,7 @@ void StringTest::testStringToFloatError()
 
 void StringTest::testNumericLocale()
 {
-#if !defined(POCO_NO_LOCALE)
+#if !defined(POCO_NO_LOCALE) && POCO_OS == POCO_OS_WINDOWS_NT
 	try
 	{
 		char dp = decimalSeparator();
