@@ -1,12 +1,11 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.5.0 (2012-10-01)
+Release 1.5.0 (2012-10-11)
 ==========================
 
-- added JSON
+- added JSON library
 - added Util::JSONConfiguration
-- added PDF
 - added FIFOBuffer and FIFOBufferStream
 - fixed SF# 3522906: Unregistering handlers from SocketReactor
 - fixed SF# 3522084: AbstractConfiguration does not support 64-bit integers
@@ -45,14 +44,10 @@ Release 1.5.0 (2012-10-01)
 - enhanced and accelerated numeric parsing for integers and floats
 - fixed SF#590 Segfault on FreeBSD when stack size not rounded
 - added warn function and warnmsg macro in CppUnit
-
-Release 1.4.4p1 (2012-??-??)
-============================
-
 - fixed SF# 3558012 Compilation fails when building with -ansi or -std=c++0x
 - fixed SF# 3563517 Get rid of loss-of-precision warnings on x64 MacOS
 - fixed SF#3562244: Portability fix for AF_LINK
-- fixed SF #3562400: DatagramSocketImpl'comment is faile
+- fixed SF #3562400: DatagramSocketImpl comment is incorrect
 
 
 Release 1.4.4 (2012-09-03)
