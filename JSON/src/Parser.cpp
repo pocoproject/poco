@@ -566,6 +566,12 @@ void Parser::readValue(const Token* token)
 {
 	switch(token->tokenClass())
 	{
+	default:
+	case Token::IDENTIFIER_TOKEN:
+	case Token::OPERATOR_TOKEN:
+	case Token::CHAR_LITERAL_TOKEN:
+		break;
+			
 	case Token::INTEGER_LITERAL_TOKEN:
 		if ( _handler != NULL )
 		{
