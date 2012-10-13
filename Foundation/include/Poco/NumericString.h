@@ -91,7 +91,7 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	if (!pStr) return false;
 	while (isspace(*pStr)) ++pStr;
 	if (*pStr == '\0') return false;
-	I sign = 1;
+	char sign = 1;
 	if ((base == 10) && (*pStr == '-'))
 	{
 		sign = -1;
