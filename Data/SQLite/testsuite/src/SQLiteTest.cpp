@@ -293,10 +293,8 @@ void SQLiteTest::testBinding()
 	//tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", use(lastName), use(firstName), use(address), use(12), now;
 	//tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", useRef(lastName), useRef(firstName), useRef(address), useRef(12), now;
 
-	// following will compile (and may work), but is not really a smart way to go
 	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", useRef("Simpson"), useRef("Bart"), useRef("Springfield"), useRef(age), now;
 
-	// these are fine
 	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", use(rLastName), use(rFirstName), use(rAddress), use(rAge), now;
 	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", useRef(crLastName), useRef(crFirstName), useRef(crAddress), useRef(crAge), now;
 	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", bind("Simpson"), bind("Bart"), bind("Springfield"), bind(12), now;

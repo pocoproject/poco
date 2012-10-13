@@ -5,11 +5,10 @@ POCO Data Library
 
 POCO Data is POCO's database abstraction layer which allows users to
 easily send/retrieve data to/from various databases. Currently supported
-database connectors are SQLite, MySQL and ODBC. Although ODBC covers
-most of the databases in use today, due to its lack of popularity on
-POSIX platforms, additional native connectors (Oracle, PostgreSQl, ...)
-are planned in the future. The intent behind the framework is to produce
-the integration between C++ and SQL in a simple and natural way.
+database connectors are SQLite, MySQL and ODBC. Framework is opened
+for extension, so additional native connectors (Oracle, PostgreSQL, ...)
+can be added. The intent behind the Poco::Data framework is to produce the
+integration between C++ and relational databses in a simple and natural way.
 
 The following complete example shows how to use POCO Data:
 
@@ -87,9 +86,10 @@ The above example is pretty much self explanatory.
 
 The <[using namespace Poco::Data ]> is for convenience only but highly
 recommended for good readable code. While <[ses << "SELECT COUNT(*)
-FROM PERSON", Poco::Data::Keywords::into(count), Poco::Data::Keywords::now;]> is valid, the
-aesthetic aspect of it is discutable. This document uses convention
-introduced in the example above.
+FROM PERSON", Poco::Data::Keywords::into(count), Poco::Data::Keywords::now;]> 
+is valid, the aesthetic aspect of the code is improved by eliminating the need
+for full namespace qualification; this document uses convention introduced in 
+the example above.
 
 The remainder of this tutorial is split up into the following parts:
 
@@ -111,15 +111,15 @@ Sessions are created via the Session constructor:
     Session session("SQLite", "sample.db");
 ----
 
-The first parameter contains the type of the Session one wants to
-create, for the moment "SQLite", "ODBC" and "MySQL" are supported. The second
+The first parameter contains the type of the Session one wants to create.
+Currently, supported bac-ends are "SQLite", "ODBC" and "MySQL". The second
 parameter contains the initialization string.
 
 In the case of SQLite, the location of the database file is sufficient.
 For ODBC, the connection string is required. Connection string may be
 simple "DSN=MyDSNName" when a DSN is configured or a complete connection
 string defining all the necessary connection parameters (for details,
-consult your ODBC driver dcoumentation).
+consult your ODBC driver documentation).
 
 
 !!!Inserting and Retrieving Data
@@ -138,16 +138,15 @@ If we want to insert one single forename we could simply write:
     session << "INSERT INTO FORENAME VALUES(" << aName << ")", now;
 ----
 
-Well, we could do that, but we won't (in case you are wondering about
-the mysterious <[now]>, be patient, explanation is coming soon). A
-much better solution is to use <*placeholders*> and connect each
+However, a better solution is to use <*placeholders*> and connect each
 placeholder via a <[use]> expression with a variable that will provide
 the value during execution. Placeholders, depending on your database are
 recognized by having either a colon(<[:]>) in front of the name or
 simply by a question mark (<[?]>) as a placeholder. While having the
 placeholders marked with a colon followed by a human-readable name is
-very convenient due to readability, not all SQL dialects support this. Consult your
-database SQL documentation to determine the valid placeholder syntax.
+very convenient due to readability, not all SQL dialects support this and
+universally accepted standard placeholder is  (<[?]>). Consult your database
+SQL documentation to determine the valid placeholder syntax.
 
 Rewriting the above code now simply gives:
 
@@ -155,11 +154,10 @@ Rewriting the above code now simply gives:
     ses << "INSERT INTO FORENAME VALUES(?)", use(aName), now;
 ----
 
-In this example the <[use]> expression matches the placeholder with
-the <[Peter]> value. Note that apart from the nicer syntax, the real
-benefits of placeholders -- which are performance and protection against SQL injection 
-attacks -- don't show here.
-Check the <[Statements]> section to find out more.
+In this example the <[use]> expression matches the placeholder with the
+<[Peter]> value. Note that apart from the nicer syntax, the real benefits of 
+placeholders -- which are performance and protection against SQL injection 
+attacks -- don't show here. Check the <[Statements]> section to find out more.
 
 Retrieving data from the Database works similar. The <[into]>
 expression matches the returned database values to C++ objects, it also
@@ -167,8 +165,17 @@ allows to provide a default value in case null data is returned from the
 database:
 
     std::string aName;
-    ses << "SELECT NAME FROM FORENAME", into(aName), now; // the default is the empty string
-    ses << "SELECT NAME FROM FORENAME", into(aName, "default"), now;
+    ses << "SELECT NAME FROM FORENAME", into(aName), now;
+    ses << "SELECT NAME FROM FORENAME", into(aName, 0, "default"), now;
+
+You'll note the integer zero argument in the second into() call. The reason for 
+that is that Poco::Data supports multiple result sets for those databases/drivers 
+that have such capbility and we have to indicate the resultset we are referring to. 
+Attempting to create sufficient overloads of <[into()]> creates more trouble than 
+what it's worth and null values can effectively be dealt with through use of either 
+Poco::Nullable wrapper (see Handling Null Entries later in this document) or 
+Poco::Dynamic::Var, which will be set as empty for null values when used as query 
+output target. 
 ----
 
 It is also possible to combine into and use expressions:
@@ -201,17 +208,42 @@ first into clause.
 
 
 !! Handling NULL entries
-A common case with databases are optional data fields that can contain NULL. To accomodate for NULL, use the Poco::Nullable template:
+A common case with databases are optional data fields that can contain NULL.
+To accomodate for NULL, use the Poco::Nullable template:
 
     std::string firstName("Peter";
-    std::string lastName("Junior");
+    Poco::Nullable<std::string> lastName("Junior");
     Poco::Nullable<int> age = 0;
     ses << INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
     ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age), now;
+    // now you can check if age was null:
+    if (!lastName.isNull()) { ... }
 ----
 
-Poco::Nullable is a template wrapping any type with purpose of allowing it to have null value.
+The above used Poco::Nullable is a lightweight template class, wrapping any type 
+for the purpose of allowing it to have null value.
 
+If the returned value was null, age.isNull() will return true. Whether empty
+string is null or not is more of a philosophical question (a topic for discussion
+in some other time and place); for the purpose of this document, suffice it to say 
+that different databases handle it differently and Poco::Data provides a way to 
+tweak it to user's needs through folowing <[Session]> features:
+
+  *emptyStringIsNull
+  *forceEmptyString
+  
+So, if your database does not treat empty strings as null but you want Poco::Data
+to emulate such behavior, modify the session like this:
+
+    ses.setFeature("emptyStringIsNull", true);
+
+On the other side, if your database treats empty strings as nulls but you do not
+want it to, you'll alter the session feature:
+
+    ses.setFeature("forceEmptyString", true);
+
+Obviously, the above features are mutually exclusive; an attempt to se them both
+to true will result in an exception being thrown by the Data framework.
 
 !! Multiple Data Sets
 
@@ -360,13 +392,13 @@ statement was fully completed.
 
 A prepared statement is created by omitting the "now" clause.
 
-    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(:name)", use(aName) );
+    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(?)", use(aName) );
 ----
 
 The advantage of a prepared statement is performance. Assume the following loop:
 
     std::string aName;
-    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(:name)", use(aName) );
+    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(?)", use(aName) );
     for (int i = 0; i < 100; ++i)
     {
         aName.append("x");
@@ -379,8 +411,9 @@ once and then use the placeholder in combination with the <[use]> clause
 to insert 100 different values into the database.
 
 Still, this isn't the best way to insert a collection of values into a
-database.
-
+database. Poco::Data is STL-aware and will cooperate with STL containers
+to extract multiple rows from the database. More on that in the chapter
+titled "STL Containers".
 
 !!Asynchronous Execution
 
@@ -468,24 +501,17 @@ prior to engaging into a next attempt to execute.
 !!Things NOT To Do
 
 The <[use]> keyword expects as input a <[reference]> parameter, which is bound
-later during execution. Thus, one can only use variables, but never
-constants.
+later during execution. Thus, one should never pass temporaries to <[use()]>:
 
-The following code will very likely fail (but this is platform/compiler
-dependent and also depends if your building in release or debug mode, it
-will work from Monday to Thursday but will always fail on Friday,
-shortly the kind of bugs software developers REALLY love):
-
-    Statement stmt = (ses << "INSERT INTO PERSON VALUES (?, ?, ?)", use("Peter"), use("Junior"), use(4)); //ERR
-    stmt.execute();
+    Statement stmt = (ses << "INSERT INTO PERSON VALUES (?, ?, ?)", use(getForename()), use(getSurname()), use(getAge())); //!!!
+    // do something else
+    stmt.execute(); // oops!
 ----
 
-The constant values <[Junior]>, <[Peter]> and <[4]> must be assigned to
-variables prior, otherwise their values will be invalid when execute is
-called. It is possible to execute the statement returning data without
-supplying the storage and have the statement itself store the returned
-data for later retrieval through <[RecordSet]>. for details, see
-<[RecordSet]> chapter.
+It is possible to use bind() instead of use(). The bind() call will always create a
+copy of the supplied argument. Also, it is possible to execute a statement returning 
+data without supplying the storage and have the statement itself store the returned
+data for later retrieval through <[RecordSet]>. For details, see <[RecordSet]> chapter.
 
 
 !!Things TO Do
@@ -497,20 +523,19 @@ The following example is valid:
     std::string fname = "Bart";
     std::string lname = "Simpson";
     int age = 42;
-    Statement stmt = (ses << "INSERT INTO %s VALUES (?, ?, %d)","PERSON", use(fname), use(lname), 12);
+    Statement stmt = (ses << "INSERT INTO %s VALUES (?, ?, %d)", "PERSON", use(fname), use(lname), 12);
     stmt.execute();
 ----
 
 Placeholders for values are very similar (but not identical) to standard
-printf family of functions. For details refer to Poco::format()
+printf family of functions. For details refer to <[Poco::format()]>
 documentation. Note: If you are alarmed by mention of <[printf()]>, a
 well-known source of many security problems in C and C++ code, do not
 worry. Poco::format() family of functions is <[safe]> (and, admittedly,
 slower than printf).
 
-For cases where this type of formatting is used with queries containing the percent sign, use double percent ("%%"). 
-
-For example:
+For cases where this type of formatting is used with queries containing 
+the percent sign, use double percent ("%%"):
 
     Statement stmt = (ses << "SELECT * FROM %s WHERE Name LIKE 'Simp%%'", "Person");
     stmt.execute();
@@ -544,14 +569,12 @@ A "one-at-atime" bulk insert example via vector would be:
         aName.append("x");
         data.push_back(aName);
     }
-    ses << "INSERT INTO FORENAME VALUES(:name)", use(data), now;
+    ses << "INSERT INTO FORENAME VALUES(?)", use(data), now;
 ----
-
 
 The same example would work with list, deque, set or multiset but not with map and multimap (std::string has no () operator).
 
 Note that <[use]> requires a <*non-empty*> container!
-
 
 Now reconsider the following example:
 
@@ -609,7 +632,7 @@ responsibility to make sure the Tuple data types correspond to the table
 column data types.
 
 I can already see the reader wondering if it's possible to put tuples in
-a container and kill more than one bird with a single stone. As usual,
+a container and kill more than one bird with one stone. As usual,
 POCO Data will not disappoint you:
 
     typedef Poco::Tuple<std::string, std::string, int> Person;
@@ -776,10 +799,11 @@ Data types supported are:
 
   * All POD types
   * std::string
-  * Poco::Data::BLOB
+  * Poco::Data::LOB (with BLOB and CLOB specializations)
   * Poco::DateTime
   * Poco::Data::Date
   * Poco::Data::Time
+  * Poco::Dynamic::Var
 
 !!Important Considerations
 
@@ -1017,13 +1041,25 @@ The following code fragment shows how to use the SessionPool:
 Pooled sessions are automatically returned to the pool when the
 Session variable holding them is destroyed.
 
+One session pool, of course, holds sessions for one database
+connection. For sessions to multiple databases, there is 
+SessionPoolContainer:
+
+    SessionPoolContainer spc;
+    AutoPtr<SessionPool> pPool1 = new SessionPool("ODBC", "DSN1");
+    AutoPtr<SessionPool> pPool2 = new SessionPool("ODBC", "DSN2");
+    spc.add(pPool1);
+    spc.add(pPool2);
+----
 
 !!!Conclusion
 
 This document provides an overview of the most important features
-offered by the POCO Data framework. The framework also supports BLOB
-type as well as Poco::DateTime binding. The usage of these data types
-is no different than any C++ type, so we did not go into details here.
+offered by the POCO Data framework. The framework also supports LOB
+(specialized to BLOB and CLOB) type as well as Poco::DateTime binding. 
+The usage of these data types is no different than any C++ type, so we 
+did not go into details here.
+
 The great deal of <[RecordSet]> and <[Row]> runtime "magic" is achieved
 through employment of Poco::Dynamic::Var, which is the POCO
 equivalent of dynamic language data type. Obviously, due to its nature,

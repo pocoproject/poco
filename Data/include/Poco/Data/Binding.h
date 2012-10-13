@@ -1358,10 +1358,9 @@ inline Binding<T>* use(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	// If this test fails with an error, you tried to pass a const ref value to use().
-	// This check is here to avoid passing in local variables (like use(1) )
 	// Resolve this either by using bind (which will copy the value) or
-	// if you are sure that the const ref will still exist when execute is called (which can be a lot later!)
-	// then - and only then - use the "useRef" keyword instead
+	// if you are sure that the const ref will still exist when execute is called 
+	// (which can be much later!), then use the "useRef" keyword instead
 	poco_static_assert (!IsConst<T>::VALUE);
 	return new Binding<T>(t, name, AbstractBinding::PD_IN);
 }
