@@ -198,14 +198,14 @@ bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
 
 #ifndef POCO_NO_FPENVIRONMENT
 
-namespace {
+namespace Impl {
 
 static char DUMMY_EXP_UNDERFLOW = 0; // dummy default val
 
 }
 
 template <typename F>
-bool strToFloat (const char* pStr, F& result, char& eu = DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
+bool strToFloat (const char* pStr, F& result, char& eu = Impl::DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
 	/// Converts zero-terminated array to floating-point number;
 	/// Returns true if succesful. Exponent underflow (i.e. loss of precision)
 	/// is signalled in eu. Thousand separators are recognized for the locale
@@ -348,7 +348,7 @@ bool strToFloat (const char* pStr, F& result, char& eu = DUMMY_EXP_UNDERFLOW, ch
 
 
 template <typename F>
-bool strToFloat (const std::string& s, F& result, char& eu = DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
+bool strToFloat (const std::string& s, F& result, char& eu = Impl::DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
 	/// Converts string to floating-point number;
 	/// This is a wrapper function, for details see see the
 	/// bool strToFloat(const char*, F&, char&, char, char) implementation.
