@@ -362,10 +362,13 @@ void StringTest::testCat()
 
 void StringTest::testStringToInt()
 {
+//gcc on Mac emits warnings that cannot be suppressed
+#ifndef POCO_OS_FAMILY_BSD
 	stringToInt<Poco::Int8>();
 	stringToInt<Poco::UInt8>();
 	stringToInt<Poco::Int16>();
 	stringToInt<Poco::UInt16>();
+#endif
 	stringToInt<Poco::Int32>();
 	stringToInt<Poco::UInt32>();
 #if defined(POCO_HAVE_INT64)
