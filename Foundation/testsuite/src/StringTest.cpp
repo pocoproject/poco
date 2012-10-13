@@ -39,6 +39,7 @@
 #include "Poco/Stopwatch.h"
 #include <iostream>
 #include <iomanip>
+#include <cstdio>
 
 
 using Poco::trimLeft;
@@ -590,7 +591,6 @@ void StringTest::testNumericLocale()
 void StringTest::benchmarkStrToInt()
 {
 	Poco::Stopwatch sw;
-	int number = 123456789;
 	std::string num = "123456789";
 	int res;
 	sw.start();
@@ -613,7 +613,7 @@ void StringTest::benchmarkStrToInt()
 	double timeStrToInt = sw.elapsed() / 1000.0;
 	
 	sw.restart();
-	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%d%c", &res);
+	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%d", &res);
 	sw.stop();
 	std::cout << "sscanf Number: " << res << std::endl;
 	double timeScanf = sw.elapsed() / 1000.0;
@@ -640,7 +640,6 @@ void StringTest::benchmarkStrToInt()
 void StringTest::benchmarkStrToFloat()
 {
 	Poco::Stopwatch sw;
-	double number = 1.23456e-123;
 	std::string num = "1.23456e-123";
 	double res;
 	sw.start();
@@ -664,7 +663,7 @@ void StringTest::benchmarkStrToFloat()
 	double timeStrToFloat = sw.elapsed() / 1000.0;
 	
 	sw.restart();
-	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%f%c", &res);
+	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%lf", &res);
 	sw.stop();
 	std::cout << "sscanf Number: " << res << std::endl;
 	double timeScanf = sw.elapsed() / 1000.0;
