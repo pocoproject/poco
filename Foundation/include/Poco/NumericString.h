@@ -81,7 +81,7 @@ inline char thousandSeparator()
 
 
 template <typename I>
-bool strToInt(const char* pStr, I& result, short base)
+bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	/// Converts zero-terminated character array to integer number;
 	/// Thousand separators are recognized for base10 and current locale;
 	/// it is silently skipped but not verified for correct positioning.
@@ -89,7 +89,7 @@ bool strToInt(const char* pStr, I& result, short base)
 	/// the return value is false with the result value undetermined.
 {
 	if (!pStr) return false;
-	while (*pStr == ' ') ++pStr;
+	while (isspace(*pStr)) ++pStr;
 	if (*pStr == '\0') return false;
 	I sign = 1;
 	if ((base == 10) && (*pStr == '-'))
@@ -102,7 +102,6 @@ bool strToInt(const char* pStr, I& result, short base)
 	// parser states:
 	const char STATE_SIGNIFICANT_DIGITS = 1;
 	char state = 0;
-	const char thSep = thousandSeparator();
 	
 	result = 0;
 	I limitCheck = std::numeric_limits<I>::max() / base;
@@ -168,6 +167,11 @@ bool strToInt(const char* pStr, I& result, short base)
 
 		case ' ':
 			if ((base == 10) && (thSep == ' ')) break;
+		case '\t':
+		case '\n':
+		case '\v':
+		case '\f':
+		case '\r':
 			goto done;
 
 		default:
@@ -183,12 +187,12 @@ done:
 
 
 template <typename I>
-bool strToInt(const std::string& str, I& result, short base)
+bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
 	/// Converts string to integer number;
 	/// This is a wrapper function, for details see see the
-	/// bool strToInt(const char*, I&, short&) implementation.
+	/// bool strToInt(const char*, I&, short, char) implementation.
 {
-	return strToInt(str.c_str(), result, base);
+	return strToInt(str.c_str(), result, base, thSep);
 }
 
 
@@ -201,7 +205,7 @@ static char DUMMY_EXP_UNDERFLOW = 0; // dummy default val
 }
 
 template <typename F>
-bool strToFloat (const char* pStr, F& result, char& eu = DUMMY_EXP_UNDERFLOW)
+bool strToFloat (const char* pStr, F& result, char& eu = DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
 	/// Converts zero-terminated array to floating-point number;
 	/// Returns true if succesful. Exponent underflow (i.e. loss of precision)
 	/// is signalled in eu. Thousand separators are recognized for the locale
@@ -210,7 +214,9 @@ bool strToFloat (const char* pStr, F& result, char& eu = DUMMY_EXP_UNDERFLOW)
 	/// If parsing was unsuccesful, the return value is false with
 	/// result and eu values undetermined.
 {
-	if (!pStr || (pStr && *pStr == '\0')) return false;
+	poco_assert (decSep != thSep);
+
+	if (pStr == 0 || *pStr == '\0') return false;
 
 	// parser states:
 	const char STATE_LEADING_SPACES = 0;
@@ -220,7 +226,6 @@ bool strToFloat (const char* pStr, F& result, char& eu = DUMMY_EXP_UNDERFLOW)
 	const char STATE_EXP_DIGITS = 4;
 	const char STATE_SUFFIX = 5; // 'f' suffix
 
-	const char decSep = decimalSeparator();
 	char numSign = 1, expSign = 1;
 	char state = STATE_LEADING_SPACES;
 	F mantissa = 0.0, exponent = 0.0;
@@ -234,21 +239,37 @@ bool strToFloat (const char* pStr, F& result, char& eu = DUMMY_EXP_UNDERFLOW)
 		case '.':
 			if (decSep == '.')
 			{
-				if (state > STATE_DIGITS_BEFORE_DEC_POINT) return false;
+				if (state >= STATE_DIGITS_AFTER_DEC_POINT) return false;
 				state = STATE_DIGITS_AFTER_DEC_POINT;
+				break;
 			}
-			break;
+			else if ((thSep == '.') && (state == STATE_DIGITS_BEFORE_DEC_POINT))
+				break;
+			else
+				return false;
 
 		case ',':
 			if (decSep == ',')
 			{
-				if (state > STATE_DIGITS_BEFORE_DEC_POINT) return false;
+				if (state >= STATE_DIGITS_AFTER_DEC_POINT) return false;
 				state = STATE_DIGITS_AFTER_DEC_POINT;
+				break;
 			}
-			break;
+			else if ((thSep == ',') && (state == STATE_DIGITS_BEFORE_DEC_POINT))
+				break;
+			else
+				return false;
 
-		case ' ':
-			if ((state > STATE_LEADING_SPACES) && (state < STATE_DIGITS_AFTER_DEC_POINT))
+		case ' ': // space (SPC)
+			if ((thSep == ' ') && (state == STATE_DIGITS_BEFORE_DEC_POINT)) break;
+		case '\t': // horizontal tab (TAB)
+		case '\n': // line feed (LF)
+		case '\v': // vertical tab (VT)
+		case '\f': // form feed (FF)
+		case '\r': // carriage return (CR)
+			if ((state >= STATE_DIGITS_AFTER_DEC_POINT) || (state >= STATE_EXP_DIGITS))
+				break;
+			else if ((state > STATE_LEADING_SPACES) && (state < STATE_DIGITS_AFTER_DEC_POINT))
 				return false;
 			break;
 
@@ -327,12 +348,12 @@ bool strToFloat (const char* pStr, F& result, char& eu = DUMMY_EXP_UNDERFLOW)
 
 
 template <typename F>
-bool strToFloat (const std::string& s, F& result, char& eu = DUMMY_EXP_UNDERFLOW)
+bool strToFloat (const std::string& s, F& result, char& eu = DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
 	/// Converts string to floating-point number;
 	/// This is a wrapper function, for details see see the
-	/// bool strToFloat(const char*, F&, char&) implementation.
+	/// bool strToFloat(const char*, F&, char&, char, char) implementation.
 {
-	return strToFloat(s.c_str(), result, eu); 
+	return strToFloat(s.c_str(), result, eu, decSep, thSep); 
 }
 
 

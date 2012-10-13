@@ -60,35 +60,35 @@
 namespace Poco {
 
 
-int NumberParser::parse(const std::string& s)
+int NumberParser::parse(const std::string& s, char thSep)
 {
 	int result;
-	if (tryParse(s, result))
+	if (tryParse(s, result, thSep))
 		return result;
 	else
 		throw SyntaxException("Not a valid integer", s);
 }
 
 
-bool NumberParser::tryParse(const std::string& s, int& value)
+bool NumberParser::tryParse(const std::string& s, int& value, char thSep)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_DEC);
+	return strToInt(s.c_str(), value, NUM_BASE_DEC, thSep);
 }
 
 
-unsigned NumberParser::parseUnsigned(const std::string& s)
+unsigned NumberParser::parseUnsigned(const std::string& s, char thSep)
 {
 	unsigned result;
-	if (tryParseUnsigned(s, result))
+	if (tryParseUnsigned(s, result, thSep))
 		return result;
 	else
 		throw SyntaxException("Not a valid unsigned integer", s);
 }
 
 
-bool NumberParser::tryParseUnsigned(const std::string& s, unsigned& value)
+bool NumberParser::tryParseUnsigned(const std::string& s, unsigned& value, char thSep)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_DEC);
+	return strToInt(s.c_str(), value, NUM_BASE_DEC, thSep);
 }
 
 
@@ -127,35 +127,35 @@ bool NumberParser::tryParseOct(const std::string& s, unsigned& value)
 #if defined(POCO_HAVE_INT64)
 
 
-Int64 NumberParser::parse64(const std::string& s)
+Int64 NumberParser::parse64(const std::string& s, char thSep)
 {
 	Int64 result;
-	if (tryParse64(s, result))
+	if (tryParse64(s, result, thSep))
 		return result;
 	else
 		throw SyntaxException("Not a valid integer", s);
 }
 
 
-bool NumberParser::tryParse64(const std::string& s, Int64& value)
+bool NumberParser::tryParse64(const std::string& s, Int64& value, char thSep)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_DEC);
+	return strToInt(s.c_str(), value, NUM_BASE_DEC, thSep);
 }
 
 
-UInt64 NumberParser::parseUnsigned64(const std::string& s)
+UInt64 NumberParser::parseUnsigned64(const std::string& s, char thSep)
 {
 	UInt64 result;
-	if (tryParseUnsigned64(s, result))
+	if (tryParseUnsigned64(s, result, thSep))
 		return result;
 	else
 		throw SyntaxException("Not a valid unsigned integer", s);
 }
 
 
-bool NumberParser::tryParseUnsigned64(const std::string& s, UInt64& value)
+bool NumberParser::tryParseUnsigned64(const std::string& s, UInt64& value, char thSep)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_DEC);
+	return strToInt(s.c_str(), value, NUM_BASE_DEC, thSep);
 }
 
 
@@ -194,19 +194,20 @@ bool NumberParser::tryParseOct64(const std::string& s, UInt64& value)
 #endif // defined(POCO_HAVE_INT64)
 
 
-double NumberParser::parseFloat(const std::string& s)
+double NumberParser::parseFloat(const std::string& s, char decSep, char thSep)
 {
 	double result;
-	if (tryParseFloat(s, result))
+	if (tryParseFloat(s, result, decSep, thSep))
 		return result;
 	else
 		throw SyntaxException("Not a valid floating-point number", s);
 }
 
 
-bool NumberParser::tryParseFloat(const std::string& s, double& value)
+bool NumberParser::tryParseFloat(const std::string& s, double& value, char decSep, char thSep)
 {
-	return strToFloat(s.c_str(), value);
+	char eu;
+	return strToFloat(s.c_str(), value, eu, decSep, thSep);
 }
 
 

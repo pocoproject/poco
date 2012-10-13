@@ -39,7 +39,6 @@
 #include "Poco/Stopwatch.h"
 #include <iostream>
 #include <iomanip>
-#include <cstdio>
 
 
 using Poco::trimLeft;
@@ -379,130 +378,148 @@ void StringTest::testStringToFloat()
 {
 #ifndef POCO_NO_FPENVIRONMENT
 	
-	const char ds = decimalSeparator();
-	const char ts = thousandSeparator();
 	double result;
-	assert(strToFloat(format("1", ds), result));
-	assertEqualDelta(1.0, result, 0.01);
-	assert(strToFloat(format("0", ds), result));
-	assertEqualDelta(0.0, result, 0.01);
-	assert(strToFloat(format("0%c0", ds), result));
-	assertEqualDelta(0.0, result, 0.01);
-	assert(strToFloat(format("0%c0", ds), result));
-	assertEqualDelta(0., result, 0.01);
-	assert(strToFloat(format("0%c0", ds), result));
-	assertEqualDelta(.0, result, 0.01);
-	assert(strToFloat(format("12%c34", ds), result));
-	assertEqualDelta(12.34, result, 0.01);
-	assert(strToFloat(format("12%c34f", ds), result));
-	assertEqualDelta(12.34, result, 0.01);
-	assert(strToFloat(format("12%c34", ds), result));
-	assertEqualDelta(12.34, result, 0.01);
-	assert(strToFloat(format("-12%c34", ds), result));
-	assertEqualDelta(-12.34, result, 0.01);
-	assert(strToFloat(format("%c34", ds), result));
-	assertEqualDelta(.34, result, 0.01);
-	assert(strToFloat(format("-%c34", ds), result));
-	assertEqualDelta(-.34, result, 0.01);
-	assert(strToFloat(format("12%c", ds), result));
-	assertEqualDelta(12., result, 0.01);
-	assert(strToFloat(format("-12%c", ds), result));
-	assertEqualDelta(-12., result, 0.01);
-	assert(strToFloat("12", result));
-	assertEqualDelta(12, result, 0.01);
-	assert(strToFloat("-12", result));
-	assertEqualDelta(-12, result, 0.01);
-	assert(strToFloat(format("12%c3456789012345678901234567890", ds), result));
-	assertEqualDelta(12.34, result, 0.01);
+	char eu;
+	std::string sep(".,");
 
-	assert(strToFloat(format("1%c234%c3456789012345678901234567890", ts, ds), result));
-	assertEqualDelta(1234.3456789, result, 0.00000001);
-	assert(strToFloat(format("12%c345%c3456789012345678901234567890", ts, ds), result));
-	assertEqualDelta(12345.3456789, result, 0.00000001);
-	assert(strToFloat(format("123%c456%c3456789012345678901234567890", ts, ds), result));
-	assertEqualDelta(123456.3456789, result, 0.00000001);
-	assert(strToFloat(format("1%c234%c567%c3456789012345678901234567890", ts, ts, ds), result));
-	assertEqualDelta(1234567.3456789, result, 0.00000001);
-	assert(strToFloat(format("12%c345%c678%c3456789012345678901234567890", ts, ts, ds), result));
-	assertEqualDelta(12345678.3456789, result, 0.00000001);
-	assert(strToFloat(format("123%c456%c789%c3456789012345678901234567890", ts, ts, ds), result));
-	assertEqualDelta(123456789.3456789, result, 0.00000001);
-
-	if ((std::numeric_limits<double>::max() / 10) < 1.23456e10)
-		fail ("test value larger than max value for this platform");
-	else
+	for (int i = 0; i < 2; ++i)
 	{
-		double d = 12e34;
-		assert(strToFloat(format("12e34", ds), result));
-		assertEqualDelta(d, result, 0.01e34);
+		char ds = sep[i];
+		for (int j = 0; j < 2; ++j)
+		{
+			char ts = sep[j];
+			if (ts == ds) continue;
+
+			assert(strToFloat("1", result, eu, ds, ts));
+			assertEqualDelta(1.0, result, 0.01);
+			assert(strToFloat(format("%c1", ds), result, eu, ds, ts));
+			assertEqualDelta(.1, result, 0.01);
+			assert(strToFloat(format("1%c", ds), result, eu, ds, ts));
+			assertEqualDelta(1., result, 0.01);
+			assert(strToFloat("0", result, eu, ds, ts));
+			assertEqualDelta(0.0, result, 0.01);
+			assert(strToFloat(format("0%c", ds), result, eu, ds, ts));
+			assertEqualDelta(0.0, result, 0.01);
+			assert(strToFloat(format("%c0", ds), result, eu, ds, ts));
+			assertEqualDelta(0.0, result, 0.01);
+			assert(strToFloat(format("0%c0", ds), result, eu, ds, ts));
+			assertEqualDelta(0.0, result, 0.01);
+			assert(strToFloat(format("0%c0", ds), result, eu, ds, ts));
+			assertEqualDelta(0., result, 0.01);
+			assert(strToFloat(format("0%c0", ds), result, eu, ds, ts));
+			assertEqualDelta(.0, result, 0.01);
+			assert(strToFloat(format("12%c34", ds), result, eu, ds, ts));
+			assertEqualDelta(12.34, result, 0.01);
+			assert(strToFloat(format("12%c34f", ds), result, eu, ds, ts));
+			assertEqualDelta(12.34, result, 0.01);
+			assert(strToFloat(format("12%c34", ds), result, eu, ds, ts));
+			assertEqualDelta(12.34, result, 0.01);
+			assert(strToFloat(format("-12%c34", ds), result, eu, ds, ts));
+			assertEqualDelta(-12.34, result, 0.01);
+			assert(strToFloat(format("%c34", ds), result, eu, ds, ts));
+			assertEqualDelta(.34, result, 0.01);
+			assert(strToFloat(format("-%c34", ds), result, eu, ds, ts));
+			assertEqualDelta(-.34, result, 0.01);
+			assert(strToFloat(format("12%c", ds), result, eu, ds, ts));
+			assertEqualDelta(12., result, 0.01);
+			assert(strToFloat(format("-12%c", ds), result, eu, ds, ts));
+			assertEqualDelta(-12., result, 0.01);
+			assert(strToFloat("12", result, eu, ds, ts));
+			assertEqualDelta(12, result, 0.01);
+			assert(strToFloat("-12", result, eu, ds, ts));
+			assertEqualDelta(-12, result, 0.01);
+			assert(strToFloat(format("12%c3456789012345678901234567890", ds), result, eu, ds, ts));
+			assertEqualDelta(12.34, result, 0.01);
+
+			assert(strToFloat(format("1%c234%c3456789012345678901234567890", ts, ds), result, eu, ds, ts));
+			assertEqualDelta(1234.3456789, result, 0.00000001);
+			assert(strToFloat(format("12%c345%c3456789012345678901234567890", ts, ds), result, eu, ds, ts));
+			assertEqualDelta(12345.3456789, result, 0.00000001);
+			assert(strToFloat(format("123%c456%c3456789012345678901234567890", ts, ds), result, eu, ds, ts));
+			assertEqualDelta(123456.3456789, result, 0.00000001);
+			assert(strToFloat(format("1%c234%c567%c3456789012345678901234567890", ts, ts, ds), result, eu, ds, ts));
+			assertEqualDelta(1234567.3456789, result, 0.00000001);
+			assert(strToFloat(format("12%c345%c678%c3456789012345678901234567890", ts, ts, ds), result, eu, ds, ts));
+			assertEqualDelta(12345678.3456789, result, 0.00000001);
+			assert(strToFloat(format("123%c456%c789%c3456789012345678901234567890", ts, ts, ds), result, eu, ds, ts));
+			assertEqualDelta(123456789.3456789, result, 0.00000001);
+
+			if ((std::numeric_limits<double>::max() / 10) < 1.23456e10)
+				fail ("test value larger than max value for this platform");
+			else
+			{
+				double d = 12e34;
+				assert(strToFloat(format("12e34", ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01e34);
 			
-		d = 1.234e100;
-		assert(strToFloat(format("1%c234e100", ds), result));
-		assertEqualDelta(d, result, 0.01);
-		assert(strToFloat(format("1%c234E+100", ds), result));
-		assertEqualDelta(d, result, 0.01);
+				d = 1.234e100;
+				assert(strToFloat(format("1%c234e100", ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
+				assert(strToFloat(format("1%c234E+100", ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
 		
-		d = 1.234e-100;
-		assert(strToFloat(format("1%c234E-100", ds), result));
-		assertEqualDelta(d, result, 0.01);
+				d = 1.234e-100;
+				assert(strToFloat(format("1%c234E-100", ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
 		
-		d = -1.234e100;
-		assert(strToFloat(format("-1%c234e+100", ds), result));
-		assertEqualDelta(d, result, 0.01);
-		assert(strToFloat(format("-1%c234E100", ds), result));
-		assertEqualDelta(d, result, 0.01);
+				d = -1.234e100;
+				assert(strToFloat(format("-1%c234e+100", ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
+				assert(strToFloat(format("-1%c234E100", ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
 		
-		d = 1.234e-100;
-		assert(strToFloat(format(" 1%c234e-100 ", ds), result));
-		assertEqualDelta(d, result, 0.01);
-		assert(strToFloat(format(" 1%c234e-100 ", ds), result));
-		assertEqualDelta(d, result, 0.01);
-		assert(strToFloat(format("  1%c234e-100 ", ds), result));
-		assertEqualDelta(d, result, 0.01);
+				d = 1.234e-100;
+				assert(strToFloat(format(" 1%c234e-100 ", ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
+				assert(strToFloat(format(" 1%c234e-100 ", ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
+				assert(strToFloat(format("  1%c234e-100 ", ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
 
-		d = 1234.234e-100;
-		assert(strToFloat(format(" 1%c234%c234e-100 ", ts, ds), result));
-		assertEqualDelta(d, result, 0.01);
-		d = 12345.234e-100;
-		assert(strToFloat(format(" 12%c345%c234e-100 ", ts, ds), result));
-		assertEqualDelta(d, result, 0.01);
-		d = 123456.234e-100;
-		assert(strToFloat(format("  123%c456%c234e-100 ", ts, ds), result));
-		assertEqualDelta(d, result, 0.01);
+				d = 1234.234e-100;
+				assert(strToFloat(format(" 1%c234%c234e-100 ", ts, ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
+				d = 12345.234e-100;
+				assert(strToFloat(format(" 12%c345%c234e-100 ", ts, ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
+				d = 123456.234e-100;
+				assert(strToFloat(format("  123%c456%c234e-100 ", ts, ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
 
-		d = -1234.234e-100;
-		assert(strToFloat(format(" -1%c234%c234e-100 ", ts, ds), result));
-		assertEqualDelta(d, result, 0.01);
-		d = -12345.234e-100;
-		assert(strToFloat(format(" -12%c345%c234e-100 ", ts, ds), result));
-		assertEqualDelta(d, result, 0.01);
-		d = -123456.234e-100;
-		char ou = 0;
-		assert(strToFloat(format("  -123%c456%c234e-100 ", ts, ds), result));
-		assertEqualDelta(d, result, 0.01);
-		assert (ou == 0);
-	}
+				d = -1234.234e-100;
+				assert(strToFloat(format(" -1%c234%c234e-100 ", ts, ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
+				d = -12345.234e-100;
+				assert(strToFloat(format(" -12%c345%c234e-100 ", ts, ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
+				d = -123456.234e-100;
+				char ou = 0;
+				assert(strToFloat(format("  -123%c456%c234e-100 ", ts, ds), result, eu, ds, ts));
+				assertEqualDelta(d, result, 0.01);
+				assert (ou == 0);
+			}
 
-	double d = 12.34e-10;
-	assert(strToFloat(format("12%c34e-10", ds), result));
-	assertEqualDelta(d, result, 0.01);
-	assert(strToFloat(format("-12%c34", ds), result));
-	assertEqualDelta(-12.34, result, 0.01);
+			double d = 12.34e-10;
+			assert(strToFloat(format("12%c34e-10", ds), result, eu, ds, ts));
+			assertEqualDelta(d, result, 0.01);
+			assert(strToFloat(format("-12%c34", ds), result, eu, ds, ts));
+			assertEqualDelta(-12.34, result, 0.01);
 	
-	assert(strToFloat(format("   12%c34", ds), result));
-	assertEqualDelta(12.34, result, 0.01);
-	assert(strToFloat(format("12%c34   ", ds), result));
-	assertEqualDelta(12.34, result, 0.01);
-	assert(strToFloat(format(" 12%c34  ", ds), result));
-	assertEqualDelta(12.34, result, 0.01);
-
+			assert(strToFloat(format("   12%c34", ds), result, eu, ds, ts));
+			assertEqualDelta(12.34, result, 0.01);
+			assert(strToFloat(format("12%c34   ", ds), result, eu, ds, ts));
+			assertEqualDelta(12.34, result, 0.01);
+			assert(strToFloat(format(" 12%c34  ", ds), result, eu, ds, ts));
+			assertEqualDelta(12.34, result, 0.01);
+		}
+	}
 #endif // POCO_NO_FPENVIRONMENT
 }
 
 
 void StringTest::testStringToFloatError()
 {
-#ifndef POCO_NO_FPENVIRONMENT
+#if !defined(POCO_NO_FPENVIRONMENT) && !defined(POCO_NO_LOCALE)
 	const char ds = decimalSeparator();
 	const char ts = thousandSeparator();
 
@@ -659,9 +676,11 @@ void StringTest::benchmarkStrToFloat()
 	std::cout << std::setw(14) << "std::strtod:\t" << std::setw(10) << std::setfill(' ') << timeStrtod << "[ms]" << 
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtod) << '\t' ;
 	graph = (int) (timeStream / timeStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
+
 	std::cout << std::endl << std::setw(14) << "strToFloat:\t" << std::setw(10) << std::setfill(' ') << timeStrToFloat << "[ms]" << 
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToFloat) << '\t' ;
 	graph = (int) (timeStream / timeStrToFloat); for (int i = 0; i < graph; ++i) std::cout << '#';
+
 	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
 	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '#';

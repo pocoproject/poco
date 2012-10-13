@@ -59,19 +59,19 @@ public:
 	static const unsigned short NUM_BASE_DEC = 10;
 	static const unsigned short NUM_BASE_HEX = 0x10;
 
-	static int parse(const std::string& s);
+	static int parse(const std::string& s, char thousandSeparator = ',');
 		/// Parses an integer value in decimal notation from the given string.
 		/// Throws a SyntaxException if the string does not hold a number in decimal notation.
 	
-	static bool tryParse(const std::string& s, int& value);
+	static bool tryParse(const std::string& s, int& value, char thousandSeparator = ',');
 		/// Parses an integer value in decimal notation from the given string.
 		/// Returns true if a valid integer has been found, false otherwise. 
 	
-	static unsigned parseUnsigned(const std::string& s);
+	static unsigned parseUnsigned(const std::string& s, char thousandSeparator = ',');
 		/// Parses an unsigned integer value in decimal notation from the given string.
 		/// Throws a SyntaxException if the string does not hold a number in decimal notation.
 
-	static bool tryParseUnsigned(const std::string& s, unsigned& value);
+	static bool tryParseUnsigned(const std::string& s, unsigned& value, char thousandSeparator = ',');
 		/// Parses an unsigned integer value in decimal notation from the given string.
 		/// Returns true if a valid integer has been found, false otherwise. 
 
@@ -95,19 +95,19 @@ public:
 
 #if defined(POCO_HAVE_INT64)
 
-	static Int64 parse64(const std::string& s);
+	static Int64 parse64(const std::string& s, char thousandSeparator = ',');
 		/// Parses a 64-bit integer value in decimal notation from the given string.
 		/// Throws a SyntaxException if the string does not hold a number in decimal notation.
 
-	static bool tryParse64(const std::string& s, Int64& value);
+	static bool tryParse64(const std::string& s, Int64& value, char thousandSeparator = ',');
 		/// Parses a 64-bit integer value in decimal notation from the given string.
 		/// Returns true if a valid integer has been found, false otherwise. 
 
-	static UInt64 parseUnsigned64(const std::string& s);
+	static UInt64 parseUnsigned64(const std::string& s, char thousandSeparator = ',');
 		/// Parses an unsigned 64-bit integer value in decimal notation from the given string.
 		/// Throws a SyntaxException if the string does not hold a number in decimal notation.
 
-	static bool tryParseUnsigned64(const std::string& s, UInt64& value);
+	static bool tryParseUnsigned64(const std::string& s, UInt64& value, char thousandSeparator = ',');
 		/// Parses an unsigned 64-bit integer value in decimal notation from the given string.
 		/// Returns true if a valid integer has been found, false otherwise. 
 
@@ -129,13 +129,13 @@ public:
 
 #endif // defined(POCO_HAVE_INT64)
 
-	static double parseFloat(const std::string& s);
+	static double parseFloat(const std::string& s, char decimalSeparator = '.', char thousandSeparator = ',');
 		/// Parses a double value in decimal floating point notation
 		/// from the given string.
 		/// Throws a SyntaxException if the string does not hold a floating-point 
 		/// number in decimal notation.
 		
-	static bool tryParseFloat(const std::string& s, double& value);
+	static bool tryParseFloat(const std::string& s, double& value, char decimalSeparator = '.', char thousandSeparator = ',');
 		/// Parses a double value in decimal floating point notation
 		/// from the given string.
 		/// Returns true if a valid floating point number has been found,
