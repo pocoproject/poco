@@ -1,7 +1,7 @@
 //
 // Page.h
 //
-// $Id: //poco/1.4/PageCompiler/src/Page.h#1 $
+// $Id: //poco/1.4/PageCompiler/src/Page.h#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -83,6 +83,9 @@ public:
 		///    - on
 		///
 		/// Otherwise, the return value will be false.
+		
+	int getInt(const std::string& property, int deflt = 0) const;
+		/// Returns the integer value of the given property.
 		
 private:
 	Page(const Page&);

@@ -245,6 +245,28 @@ Allows you to specify whether the response is sent using chunked transfer encodi
 Defaults to <[true]>.
 Set the value to <[false]> to disable chunked transfer encoding.
 
+!compressed
+
+Enables or disables response body compression. If set to <[true]>, and the client supports
+the "gzip" content encoding (indicated by the "Accept-Encoding" header),
+the response body will be compressed using the "gzip" format and the
+"Content-Encoding" header will be set accordingly. 
+Defaults to <[false]>. Cannot be enabled together with response buffering.
+
+!compressionLevel
+
+Specify the compression level, if response body compression is enabled.
+Valid values are 1 (fastest) to 9 (best compression). Defaults to 1.
+
+!buffered
+
+Enables or disables response buffering. Response buffering is disabled by default.
+Set to <[true]> to enable buffering, or to <[false]> to disable it.
+If response buffering is enabled, everything written to the response stream
+is actually written to a string stream (<[std::ostringstream]>).
+Sending of the HTTP response back to the client is deferred to 
+when the page is complete.
+
 !session (OSP only)
 
 For use with the POCO Open Service Platform only.
@@ -273,15 +295,6 @@ a new session will be created if the request does not contain a (valid) session 
 If set to <[false]> and there is no existing session that matches the session
 cookie. the <[session]> variable will be null. 
 
-!buffered
-
-Enables or disables response buffering. Response buffering is disabled by default.
-Set to <[true]> to enable buffering, or to <[false]> to disable it.
-If response buffering is enabled, everything written to the response stream
-is actually written to a string stream (<[std::ostringstream]>).
-Sending of the HTTP response back to the client is deferred to 
-when the page is complete.
-
 !precondition
 
 Allows to specify a C++ boolean expression which will be evaluated before processing
@@ -294,6 +307,17 @@ If that function returns false, it can send its own response to the client.
 Example:
     <%@ page precondition="checkCredentials(request, response)" %>
 ----
+
+!path
+
+Specify a server path for the page. If specified, the generated handler class
+will contain a public static <[const std::string]> member variable named <[PATH]>
+containing the specified path.
+
+Example:
+    <%@ page path="/index.html" %>
+----
+
 
 !!Implicit Objects
 

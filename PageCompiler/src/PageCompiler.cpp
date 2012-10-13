@@ -1,7 +1,7 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/PageCompiler.cpp#3 $
+// $Id: //poco/1.4/PageCompiler/src/PageCompiler.cpp#4 $
 //
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
@@ -140,6 +140,13 @@ protected:
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHeaderPrefix)));
 
 		options.addOption(
+			Option("base-file-name", "b", "Use <name> instead of the class name for the output file name.")
+				.required(false)
+				.repeatable(false)
+				.argument("<name>")
+				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleBase)));
+
+		options.addOption(
 			Option("osp", "O", "Add factory class definition and implementation for use with the Open Service Platform.")
 				.required(false)
 				.repeatable(false)
@@ -191,6 +198,11 @@ protected:
 			_headerPrefix += '/';
 	}
 
+	void handleBase(const std::string& name, const std::string& value)
+	{
+		_base = value;
+	}
+
 	void handleOSP(const std::string& name, const std::string& value)
 	{
 		_generateOSPCode = true;	
@@ -205,7 +217,7 @@ protected:
 	{
 		_emitLineDirectives = false;
 	}
-
+	
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -255,19 +267,32 @@ protected:
 		{
 			compile(*it);
 		}
-
+		
 		return Application::EXIT_OK;
 	}
 
-	void compile(const std::string& path)
+	void parse(const std::string& path, Page& page, std::string& clazz)
 	{
-		Page page;
-
 		FileInputStream srcStream(path);
 		PageReader pageReader(page, path);
 		pageReader.emitLineDirectives(_emitLineDirectives);
 		pageReader.parse(srcStream);
 
+		Path p(path);
+		
+		if (page.has("page.class"))
+		{
+			clazz = page.get("page.class");
+		}
+		else
+		{
+			clazz = p.getBaseName() + "Handler";
+			clazz[0] = Poco::Ascii::toUpper(clazz[0]);
+		}			
+	}
+	
+	void write(const std::string& path, const Page& page, const std::string& clazz)
+	{
 		Path p(path);
 		config().setString("inputFileName", p.getFileName());
 		config().setString("inputFilePath", p.toString());
@@ -275,17 +300,10 @@ protected:
 		DateTime now;
 		config().setString("dateTime", DateTimeFormatter::format(now, DateTimeFormat::SORTABLE_FORMAT));
 
-		std::string clazz;
 		if (page.has("page.class"))
 		{
-			clazz = page.get("page.class");
 			p.setBaseName(clazz);
 		}
-		else
-		{
-			clazz = p.getBaseName() + "Handler";
-			clazz[0] = Poco::Ascii::toUpper(clazz[0]);
-		}			
 
 		std::auto_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
 
@@ -293,6 +311,12 @@ protected:
 		{
 			p = Path(_outputDir, p.getBaseName());
 		}
+		
+		if (!_base.empty())
+		{
+			p.setBaseName(_base);
+		}
+		
 		p.setExtension("cpp");
 		std::string implPath = p.toString();
 		std::string implFileName = p.getFileName();
@@ -318,6 +342,20 @@ protected:
 		OutputLineEndingConverter headerLEC(headerStream);
 		writeFileHeader(headerLEC);
 		pCodeWriter->writeHeader(headerLEC, headerFileName);
+	}
+	
+	void compile(const std::string& path)
+	{
+		Page page;
+		std::string clazz;
+		parse(path, page, clazz);
+		write(path, page, clazz);
+
+		FileInputStream srcStream(path);
+		PageReader pageReader(page, path);
+		pageReader.emitLineDirectives(_emitLineDirectives);
+		pageReader.parse(srcStream);
+
 	}
 
 	void writeFileHeader(std::ostream& ostr)
@@ -348,6 +386,7 @@ private:
 	std::string _outputDir;
 	std::string _headerOutputDir;
 	std::string _headerPrefix;
+	std::string _base;
 };
 
 
