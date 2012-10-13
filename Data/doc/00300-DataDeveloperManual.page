@@ -1,5 +1,5 @@
 POCO Data Connectors Developer Guide
-Data
+POCO Data Library
 
 !!!Overview
 Developing one's own <*Data Connector*> implementation is rather straight-forward.
