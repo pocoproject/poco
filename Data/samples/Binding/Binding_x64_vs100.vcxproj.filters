@@ -2,14 +2,14 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{ea64c750-1948-47f5-953a-bb1fbf35d710}</UniqueIdentifier>
+      <UniqueIdentifier>{e632f5f6-92dc-4bd4-a2c0-792e900a14e3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{976e1de7-e809-4863-a90b-7da06dee29b4}</UniqueIdentifier>
+      <UniqueIdentifier>{6eda1939-2478-4c10-9ae7-a65a16b74db5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Tuple.cpp">
+    <ClCompile Include="src\Binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
