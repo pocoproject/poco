@@ -8,13 +8,13 @@ to existing code.
 
 !!Summary of Changes
 
-  - RowFormatter class for convenient output formatting.
-  - Stored procedures support (for databases that support it).
-  - Transaction support (for databases that support it).
+  - Poco::Data::RowFormatter class for convenient output formatting.
+  - Stored procedures support (for databases and ODBC drivers that support it).
+  - Improved transaction support (for databases that support it).
   - Bulk execution (for ODBC drivers that support it).
   - Batch queries and multiple results (for databases and ODBC drivers that support it).
   - Stored procedures/functions support (for databases that support it)
-  - Session pool containers.
+  - New Poco::Data::SessionPoolContainer class.
 
 
 !!Incompatible Changes and Possible Transition Issues

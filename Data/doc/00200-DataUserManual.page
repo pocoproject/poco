@@ -38,8 +38,8 @@ The following complete example shows how to use it:
     }
 ----
 
-The above example is pretty much self explanatory. The <[Poco/Data/Common.h]> file pulls in some common includes,
-the SQLite::Connector is used to register the SQLite connector so that we can later create an SQLite session
+The above example is pretty much self explanatory. First we pull in some necessary header files.
+The SQLite::Connector is used to register the SQLite connector so that we can later create an SQLite session
 via the SessionFactory. The two-argument constructor
 
     Sesssion ses("SQLite", "sample.db");
@@ -51,8 +51,8 @@ is actually equivalent to:
 
 The << operator is used to send SQL statements to the Session, the <*into(count)*> simply informs the session where to store the result of the query.
 Take note of the <!now!> at the end of the SQL statement. It is required, otherwise the statement would not be executed. 
-The <* <[ using namespace Poco::Data ]> *> is for convenience only but highly recommended for good readable code 
-(while <* <[ ses << "SELECT COUNT(*) FROM PERSON", Poco::Data::into(count), Poco::Data::now; ]> *> is valid, it simply looks... strange).
+The <* <[ using namespace Poco::Data::Keywords ]> *> is for convenience only but highly recommended for good readable code 
+(while <* <[ ses << "SELECT COUNT(*) FROM PERSON", Poco::Data::Keywords::into(count), Poco::Data::Keywords::now; ]> *> is valid, it simply looks... strange).
 
 The remainder of this tutorial is split up into the following parts:
   * Creating Sessions
@@ -66,7 +66,7 @@ The remainder of this tutorial is split up into the following parts:
 Sessions are always created via the SessionFactory create method, or implicitly
 via the two-argument Session constructor.
 
-Session create(const std::string& connectorKey, const std::string& connectionString);
+    Session create(const std::string& connectorKey, const std::string& connectionString);
 ----
 The first parameter contains the type of the Session one wants to create. For the moment "SQLite" is supported 
 directly, and via the ODBC driver support for Oracle, SQLite, DB2, SQLServer and PostgreSQL is available. 
@@ -81,7 +81,7 @@ Inserting data works by <* using *> the content of other variables. Assume we ha
 If we want to insert one single forename we could write:
     
     std::string aName("Peter");
-    ses << "INSERT INTO FORENAME VALUES(" << aName << ")", now;
+    ses << "INSERT INTO FORENAME VALUES('" << aName << "')", now;
 ----
 
 Another way is to use <!placeholders!> and connect each placeholder via a <!use!> 
@@ -93,9 +93,9 @@ Universal placeholders are question marks <!?!> . Rewriting the above code now s
 ----
 
 In this example the <!use!> expression matches the <* ? *> with the <*Peter*> value. 
-Note that apart from the nicer syntax, the real benefit of placeholders - which is performance - doesn't show here.
-Some database systems (e.g. SQLite) support descriptive placeholders (e.g. !:name!) but, for universal appliciablity,
-it is recommended to use the questin mark.
+Note that apart from the nicer syntax, the real benefits of placeholders - which are performance and security against SQL injection attacks - don't show here.
+Some database systems (e.g. SQLite) support descriptive placeholders (e.g. <[:name]>) but, for universal applicability,
+it is recommended to use the question mark.
 
 Check the <*Working with Statements*> section to find out more.
 
@@ -111,7 +111,7 @@ It is also possible to combine into and use expressions:
 
     std::string aName;
     std::string match("Peter")
-    ses << "SELECT NAME FROM FORENAME WHERE NAME=:name", into(aName), use(match), now;
+    ses << "SELECT NAME FROM FORENAME WHERE NAME = ?", into(aName), use(match), now;
     poco_assert (aName == match);
 ----
 
@@ -131,16 +131,16 @@ The same is true for the <*into*> statement. We select <*firstname*> as the firs
 thus <*into(firstName)*> must be the first into clause.
 
 !! Handling NULL entries
-A common case with databases are optional data fields that can contain NULL. To accomodate for NULL, use Nullable template:
+A common case with databases are optional data fields that can contain NULL. To accomodate for NULL, use the Poco::Nullable template:
 
     std::string firstName("Peter";
     std::string lastName("Junior");
-    Nullable<int> age = 0;
+    Poco::Nullable<int> age = 0;
     ses << INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
     ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age), now;
 ----
 
-Nullable is a template wrapping any type with purpose of allowing it to have null value.
+Poco::Nullable is a template wrapping any type with purpose of allowing it to have null value.
 
 !!!Working with Statements
 We mentioned the term <*Statement*> in the previous section, yet we only worked with database session objects so far.
@@ -180,7 +180,7 @@ simply guarantees that the statement was fully completed.
 !!Prepared Statements
 A prepared statement is created by omitting the <*now*> clause.
 
-    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(:name)", use(aName) );
+    Statement stmt = ( ses << "INSERT INTO FORENAME VALUES(?)", use(aName) );
 ----
 
 The advantage of a prepared statement is performance. Assume the following loop:
@@ -210,7 +210,7 @@ The constant values <*Junior*>, <*Peter*> and <*4*> must be assigned to variable
 
     std::string fn("Peter"), ln("Junior");
     int age = 4;
-    Statement stmt = (ses << "INSERT INTO PERSON VALUES (?, ?, ?)", use(fn), use(ln), use(age)); //ERR!
+    Statement stmt = (ses << "INSERT INTO PERSON VALUES (?, ?, ?)", use(fn), use(ln), use(age)); // ERR!
     stmt.execute();
 ----
 
@@ -316,7 +316,7 @@ using a collection class, one would write:
 And for the lazy ones, there is the <!range!> command:
 
     std::string aName;
-    Statement stmt = (ses << "SELECT NAME FROM FORENAME", into(aName), range(1,1));
+    Statement stmt = (ses << "SELECT NAME FROM FORENAME", into(aName), range(1, 1));
     while (!stmt.done())
         stmt.execute();
 ----
@@ -335,13 +335,13 @@ Assume you have a class Person:
         // getter and setter methods for all members
         [...] 
         
-        bool operator <(const Person& p) const
+        bool operator < (const Person& p) const
             /// we need this for set and multiset support
         {
             return _ssn < p._ssn;
         }
         
-        Poco::UInt64 operator()() const
+        Poco::UInt64 operator() () const
             /// we need this operator to return the key for the map and multimap
         {
             return _ssn;
