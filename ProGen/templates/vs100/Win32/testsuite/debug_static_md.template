@@ -25,7 +25,7 @@
 		Name="VCCLCompilerTool"
 		Optimization="4"
 		AdditionalIncludeDirectories="..\include;${project.pocobase}\CppUnit\include;${project.pocobase}\CppUnit\WinTestRunner\include;${configuration.compiler.includes}"
-		PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;${configuration.compiler.defines}"
+		PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;${configuration.compiler.defines}"
 		StringPooling="true"
 		MinimalRebuild="true"
 		BasicRuntimeChecks="3"
