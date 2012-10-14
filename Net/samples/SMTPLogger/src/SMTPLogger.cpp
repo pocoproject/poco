@@ -49,9 +49,9 @@ using Poco::Exception;
 
 
 #if defined(POCO_OS_FAMILY_UNIX)
-const std::string fileName = "${POCO_BASE}/Net/samples/SMTPLogger/logo.gif";
+const std::string fileName = "${POCO_BASE}/Net/samples/SMTPLogger/res/logo.gif";
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-const std::string fileName = "%POCO_BASE%/Net/samples/SMTPLogger/logo.gif";
+const std::string fileName = "%POCO_BASE%/Net/samples/SMTPLogger/res/logo.gif";
 #endif
 
 
