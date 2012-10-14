@@ -33,8 +33,8 @@ Global
 		{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}.debug_shared|Win32.Build.0 = debug_shared|Win32
 		{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}.debug_static_md|Win32.ActiveCfg = debug_static_md|Win32
 		{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}.debug_static_md|Win32.Build.0 = debug_static_md|Win32
-		{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}.debug_static_mt|Win32.ActiveCfg = release_static_mt|Win32
-		{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}.debug_static_mt|Win32.Build.0 = release_static_mt|Win32
+		{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}.debug_static_mt|Win32.ActiveCfg = debug_static_mt|Win32
+		{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}.debug_static_mt|Win32.Build.0 = debug_static_mt|Win32
 		{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}.release_shared|Win32.ActiveCfg = release_shared|Win32
 		{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}.release_shared|Win32.Build.0 = release_shared|Win32
 		{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}.release_static_md|Win32.ActiveCfg = release_static_md|Win32
