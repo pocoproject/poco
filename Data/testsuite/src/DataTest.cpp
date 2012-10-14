@@ -929,7 +929,7 @@ void DataTest::testRow()
 
 	try
 	{
-		int i; i = row["a bad name"]; // to silence gcc
+		int i; i = row["a bad name"].convert<int>(); // to silence gcc
 		fail ("must fail");
 	}catch (NotFoundException&) {}
 
