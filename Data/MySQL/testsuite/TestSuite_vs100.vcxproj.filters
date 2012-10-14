@@ -2,28 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="MySQL">
-      <UniqueIdentifier>{8cc6e752-5910-4bd2-bac2-c2417666470e}</UniqueIdentifier>
+      <UniqueIdentifier>{54a4279b-c88e-4b73-9e0c-69cb976bcb1a}</UniqueIdentifier>
     </Filter>
     <Filter Include="MySQL\Header Files">
-      <UniqueIdentifier>{2b2aa624-8e45-459f-b591-ff9f3889ae6d}</UniqueIdentifier>
+      <UniqueIdentifier>{921d2f53-c3c4-41b0-a9ce-9b46ea06f4a5}</UniqueIdentifier>
     </Filter>
     <Filter Include="MySQL\Source Files">
-      <UniqueIdentifier>{1cd08739-37ad-4512-a387-810580a32ad2}</UniqueIdentifier>
+      <UniqueIdentifier>{19f0a35f-9247-4f0d-b085-e35670bd30e6}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{cc277002-bdb4-47a4-a4fd-3aed882b6c4e}</UniqueIdentifier>
+      <UniqueIdentifier>{eb1972f8-3e7e-4319-b3a0-989b55a453e0}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{d1becb83-ed40-4ebb-b10f-bef7c37bdec7}</UniqueIdentifier>
+      <UniqueIdentifier>{4c04b792-c936-4dda-9ee4-fa6f7ab22fec}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{bd7e6d0f-1a3d-4ed9-9384-fa97e95dedff}</UniqueIdentifier>
+      <UniqueIdentifier>{8813a610-73cf-4fcf-baa7-3a51132e9086}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{f63b4684-264a-4e5e-8c74-6271fc290af0}</UniqueIdentifier>
+      <UniqueIdentifier>{5357844f-3bd0-4d41-9ddd-cb529227c811}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{6c316cd9-f630-46f6-af02-11288ad1d061}</UniqueIdentifier>
+      <UniqueIdentifier>{d9999b97-9efc-4f54-9879-5d285c7df7c9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
