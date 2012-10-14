@@ -24,6 +24,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwitterClient", "TwitterCli
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebSocketServer", "WebSocketServer\WebSocketServer_x64_vs100.vcxproj", "{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SMTPLogger", "SMTPLogger\SMTPLogger_x64_vs100.vcxproj", "{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_shared|x64 = debug_shared|x64
@@ -250,6 +252,24 @@ Global
 		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_md|x64.ActiveCfg = release_static_md|x64
 		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_md|x64.Build.0 = release_static_md|x64
 		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_md|x64.Deploy.0 = release_static_md|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_shared|x64.Build.0 = debug_shared|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_shared|x64.Deploy.0 = debug_shared|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_shared|x64.ActiveCfg = release_shared|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_shared|x64.Build.0 = release_shared|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_shared|x64.Deploy.0 = release_shared|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_static_mt|x64.ActiveCfg = debug_static_mt|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_static_mt|x64.Build.0 = debug_static_mt|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_static_mt|x64.Deploy.0 = debug_static_mt|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_static_mt|x64.ActiveCfg = release_static_mt|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_static_mt|x64.Build.0 = release_static_mt|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_static_mt|x64.Deploy.0 = release_static_mt|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_static_md|x64.ActiveCfg = debug_static_md|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_static_md|x64.Build.0 = debug_static_md|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_static_md|x64.Deploy.0 = debug_static_md|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_static_md|x64.ActiveCfg = release_static_md|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_static_md|x64.Build.0 = release_static_md|x64
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_static_md|x64.Deploy.0 = release_static_md|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

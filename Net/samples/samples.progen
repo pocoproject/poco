@@ -13,4 +13,5 @@ vc.solution.include = \
 	Ping\\Ping;\
 	TimeServer\\TimeServer;\
 	TwitterClient\\TwitterClient;\
-	WebSocketServer\\WebSocketServer
+	WebSocketServer\\WebSocketServer;\
+	SMTPLogger\\SMTPLogger

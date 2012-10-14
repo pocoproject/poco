@@ -47,6 +47,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebSocketServer", "WebSocke
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SMTPLogger", "SMTPLogger\SMTPLogger_vs71.vcproj", "{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		debug_shared = debug_shared
@@ -201,6 +205,18 @@ Global
 		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_static_md.Build.0 = debug_static_md|Win32
 		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_md.ActiveCfg = release_static_md|Win32
 		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_md.Build.0 = release_static_md|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_shared.ActiveCfg = debug_shared|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_shared.Build.0 = debug_shared|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_shared.ActiveCfg = release_shared|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_shared.Build.0 = release_shared|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_static_mt.ActiveCfg = debug_static_mt|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_static_mt.Build.0 = debug_static_mt|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_static_mt.ActiveCfg = release_static_mt|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_static_mt.Build.0 = release_static_mt|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_static_md.ActiveCfg = debug_static_md|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.debug_static_md.Build.0 = debug_static_md|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_static_md.ActiveCfg = release_static_md|Win32
+		{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}.release_static_md.Build.0 = release_static_md|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

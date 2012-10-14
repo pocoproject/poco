@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	Name="SMTPLogger"
-	Version="8.00"
+	Version="9.00"
 	ProjectType="Visual C++"
 	ProjectGUID="{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}"
 	RootNamespace="SMTPLogger"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="x64"/>
 	</Platforms>
 	<ToolFiles/>
 	<Configurations>
 		<Configuration
-			Name="debug_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="debug_shared|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -44,7 +44,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""/>
 			<Tool
@@ -56,14 +56,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\SMTPLoggerd.exe"
+				OutputFile="bin64\SMTPLoggerd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\SMTPLoggerd.pdb"
+				ProgramDatabaseFile="bin64\SMTPLoggerd.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -80,9 +80,9 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="release_shared|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -125,14 +125,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\SMTPLogger.exe"
+				OutputFile="bin64\SMTPLogger.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -149,9 +149,9 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static_mt|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="debug_static_mt|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -180,7 +180,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""/>
 			<Tool
@@ -192,14 +192,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\static_mt\SMTPLoggerd.exe"
+				OutputFile="bin64\static_mt\SMTPLoggerd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\static_mt\SMTPLoggerd.pdb"
+				ProgramDatabaseFile="bin64\static_mt\SMTPLoggerd.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -216,9 +216,9 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static_mt|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="release_static_mt|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -261,14 +261,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\static_mt\SMTPLogger.exe"
+				OutputFile="bin64\static_mt\SMTPLogger.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -285,9 +285,9 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static_md|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="debug_static_md|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -316,7 +316,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""/>
 			<Tool
@@ -328,14 +328,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\static_md\SMTPLoggerd.exe"
+				OutputFile="bin64\static_md\SMTPLoggerd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\static_md\SMTPLoggerd.pdb"
+				ProgramDatabaseFile="bin64\static_md\SMTPLoggerd.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -352,9 +352,9 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static_md|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="release_static_md|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -397,14 +397,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\static_md\SMTPLogger.exe"
+				OutputFile="bin64\static_md\SMTPLogger.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
