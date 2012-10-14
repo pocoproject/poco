@@ -214,7 +214,7 @@ void JSONTest::testStringProperty()
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
 	assert(test.isString());
-	std::string value = test;
+	std::string value = test.convert<std::string>();
 	assert(value.compare("value") == 0);
 }
 
@@ -360,7 +360,7 @@ void JSONTest::testObjectProperty()
 
 	test = object->get("property");
 	assert(test.isString());
-	std::string value = test;
+	std::string value = test.convert<std::string>();
 	assert(value.compare("value") == 0);
 }
 
@@ -556,7 +556,7 @@ void JSONTest::testStringElement()
 	Array::Ptr array = result.extract<Array::Ptr>();
 	Var test = array->get(0);
 	assert(test.isString());
-	std::string value = test;
+	std::string value = test.convert<std::string>();
 	assert(value.compare("value") == 0);
 }
 

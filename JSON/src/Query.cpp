@@ -101,11 +101,11 @@ Var Query::find(const std::string& path) const
 			{
 				if ( firstOffset == -1 )
 				{
-					firstOffset = matches[0].offset;
+					firstOffset = static_cast<int>(matches[0].offset);
 				}
 				std::string num = token->substr(matches[1].offset, matches[1].length);
 				indexes.push_back(NumberParser::parse(num));
-				offset = matches[0].offset + matches[0].length;
+				offset = static_cast<int>(matches[0].offset + matches[0].length);
 			}
 
 			std::string name(*token);
