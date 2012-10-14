@@ -32,8 +32,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\JSON\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -104,8 +104,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\JSON\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -170,8 +170,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\JSON\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -243,8 +243,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\JSON\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
@@ -310,8 +310,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\JSON\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -382,8 +382,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\JSON\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -476,6 +476,8 @@
 				<File
 					RelativePath=".\src\IniFileConfigurationTest.h"/>
 				<File
+					RelativePath=".\src\JSONConfigurationTest.h"/>
+				<File
 					RelativePath=".\src\LayeredConfigurationTest.h"/>
 				<File
 					RelativePath=".\src\LoggingConfiguratorTest.h"/>
@@ -502,6 +504,8 @@
 					RelativePath=".\src\FilesystemConfigurationTest.cpp"/>
 				<File
 					RelativePath=".\src\IniFileConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\JSONConfigurationTest.cpp"/>
 				<File
 					RelativePath=".\src\LayeredConfigurationTest.cpp"/>
 				<File
