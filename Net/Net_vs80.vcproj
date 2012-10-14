@@ -847,6 +847,8 @@
 					RelativePath=".\include\Poco\Net\RemoteSyslogChannel.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\RemoteSyslogListener.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SMTPChannel.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">
@@ -854,6 +856,8 @@
 					RelativePath=".\src\RemoteSyslogChannel.cpp"/>
 				<File
 					RelativePath=".\src\RemoteSyslogListener.cpp"/>
+				<File
+					RelativePath=".\src\SMTPChannel.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
@@ -876,12 +880,14 @@
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
-				Name="debug_shared|Win32">
+				Name="debug_shared|Win32"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="release_shared|Win32">
+				Name="release_shared|Win32"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>

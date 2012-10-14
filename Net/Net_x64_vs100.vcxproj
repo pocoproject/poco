@@ -270,13 +270,13 @@
     <ClInclude Include="include\Poco\Net\IPAddress.h"/>
     <ClInclude Include="include\Poco\Net\Net.h"/>
     <ClInclude Include="include\Poco\Net\NetException.h"/>
+    <ClInclude Include="include\Poco\Net\NetworkInterface.h"/>
     <ClInclude Include="include\Poco\Net\SocketAddress.h"/>
     <ClInclude Include="include\Poco\Net\SocketDefs.h"/>
     <ClInclude Include="include\Poco\Net\DatagramSocket.h"/>
     <ClInclude Include="include\Poco\Net\DatagramSocketImpl.h"/>
     <ClInclude Include="include\Poco\Net\DialogSocket.h"/>
     <ClInclude Include="include\Poco\Net\MulticastSocket.h"/>
-    <ClInclude Include="include\Poco\Net\NetworkInterface.h"/>
     <ClInclude Include="include\Poco\Net\RawSocket.h"/>
     <ClInclude Include="include\Poco\Net\RawSocketImpl.h"/>
     <ClInclude Include="include\Poco\Net\ServerSocket.h"/>
@@ -357,6 +357,7 @@
     <ClInclude Include="include\Poco\Net\ICMPv4PacketImpl.h"/>
     <ClInclude Include="include\Poco\Net\RemoteSyslogChannel.h"/>
     <ClInclude Include="include\Poco\Net\RemoteSyslogListener.h"/>
+    <ClInclude Include="include\Poco\Net\SMTPChannel.h"/>
     <ClInclude Include="include\Poco\Net\WebSocket.h"/>
     <ClInclude Include="include\Poco\Net\WebSocketImpl.h"/>
   </ItemGroup>
@@ -365,12 +366,12 @@
     <ClCompile Include="src\HostEntry.cpp"/>
     <ClCompile Include="src\IPAddress.cpp"/>
     <ClCompile Include="src\NetException.cpp"/>
+    <ClCompile Include="src\NetworkInterface.cpp"/>
     <ClCompile Include="src\SocketAddress.cpp"/>
     <ClCompile Include="src\DatagramSocket.cpp"/>
     <ClCompile Include="src\DatagramSocketImpl.cpp"/>
     <ClCompile Include="src\DialogSocket.cpp"/>
     <ClCompile Include="src\MulticastSocket.cpp"/>
-    <ClCompile Include="src\NetworkInterface.cpp"/>
     <ClCompile Include="src\RawSocket.cpp"/>
     <ClCompile Include="src\RawSocketImpl.cpp"/>
     <ClCompile Include="src\ServerSocket.cpp"/>
@@ -448,13 +449,16 @@
     <ClCompile Include="src\ICMPv4PacketImpl.cpp"/>
     <ClCompile Include="src\RemoteSyslogChannel.cpp"/>
     <ClCompile Include="src\RemoteSyslogListener.cpp"/>
+    <ClCompile Include="src\SMTPChannel.cpp"/>
     <ClCompile Include="src\WebSocket.cpp"/>
     <ClCompile Include="src\WebSocketImpl.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">true</ExcludedFromBuild>
     </ResourceCompile>

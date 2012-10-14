@@ -365,6 +365,7 @@
     <ClInclude Include="include\Poco\Net\ICMPv4PacketImpl.h"/>
     <ClInclude Include="include\Poco\Net\RemoteSyslogChannel.h"/>
     <ClInclude Include="include\Poco\Net\RemoteSyslogListener.h"/>
+    <ClInclude Include="include\Poco\Net\SMTPChannel.h"/>
     <ClInclude Include="include\Poco\Net\WebSocket.h"/>
     <ClInclude Include="include\Poco\Net\WebSocketImpl.h"/>
   </ItemGroup>
@@ -456,11 +457,19 @@
     <ClCompile Include="src\ICMPv4PacketImpl.cpp"/>
     <ClCompile Include="src\RemoteSyslogChannel.cpp"/>
     <ClCompile Include="src\RemoteSyslogListener.cpp"/>
+    <ClCompile Include="src\SMTPChannel.cpp"/>
     <ClCompile Include="src\WebSocket.cpp"/>
     <ClCompile Include="src\WebSocketImpl.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\DLLVersion.rc"/>
+    <ResourceCompile Include="..\DLLVersion.rc">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">true</ExcludedFromBuild>
+    </ResourceCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

@@ -894,6 +894,8 @@
 					RelativePath=".\include\Poco\Net\RemoteSyslogChannel.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\RemoteSyslogListener.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SMTPChannel.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">
@@ -901,6 +903,8 @@
 					RelativePath=".\src\RemoteSyslogChannel.cpp"/>
 				<File
 					RelativePath=".\src\RemoteSyslogListener.cpp"/>
+				<File
+					RelativePath=".\src\SMTPChannel.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
@@ -923,12 +927,14 @@
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
-				Name="debug_shared|Digi JumpStart (ARMV4I)">
+				Name="debug_shared|Digi JumpStart (ARMV4I)"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="release_shared|Digi JumpStart (ARMV4I)">
+				Name="release_shared|Digi JumpStart (ARMV4I)"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
