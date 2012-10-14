@@ -5,7 +5,7 @@
 //
 // This sample shows a benchmark of the JSON parser.
 //
-// Copyright (c) 2004-2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -31,6 +31,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/Timestamp.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/DefaultHandler.h"
@@ -40,15 +41,16 @@
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
 #include "Poco/StreamCopier.h"
-
 #include <iostream>
 #include <iomanip>
+
 
 void printTimeDiff(const Poco::Timestamp& start, const Poco::Timestamp& end)
 {
 	Poco::Timestamp::TimeDiff diff = end - start;
 	std::cout << std::setw(25) << std::left << diff;
 }
+
 
 int main(int argc, char** argv)
 {
