@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ODBC">
+      <UniqueIdentifier>{7418360e-8df5-4f97-b4bc-84f59dce44a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ODBC\Header Files">
+      <UniqueIdentifier>{0d811364-b118-4f5b-a6a4-0e2fec949b2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ODBC\Source Files">
+      <UniqueIdentifier>{205f1816-f0fa-44fd-8b71-d7726f582521}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite">
+      <UniqueIdentifier>{1ca179ad-577b-4722-b582-38072161dbb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Header Files">
+      <UniqueIdentifier>{6f60fe33-03d4-4397-97db-d57973df7241}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Source Files">
+      <UniqueIdentifier>{39b38a18-d710-4bbf-bf00-bd40a913fc06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver">
+      <UniqueIdentifier>{47680b07-c073-4ad8-9683-db988f3150f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver\Source Files">
+      <UniqueIdentifier>{acfbabd9-ec7c-46d5-969e-32daf25bd5c7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ODBCAccessTest.h">
+      <Filter>ODBC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ODBCDB2Test.h">
+      <Filter>ODBC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ODBCMySQLTest.h">
+      <Filter>ODBC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ODBCOracleTest.h">
+      <Filter>ODBC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ODBCPostgreSQLTest.h">
+      <Filter>ODBC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ODBCSQLiteTest.h">
+      <Filter>ODBC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ODBCSQLServerTest.h">
+      <Filter>ODBC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ODBCTest.h">
+      <Filter>ODBC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SQLExecutor.h">
+      <Filter>ODBC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ODBCTestSuite.h">
+      <Filter>_Suite\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ODBCAccessTest.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCDB2Test.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCMySQLTest.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCOracleTest.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCPostgreSQLTest.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCSQLiteTest.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCSQLServerTest.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCTest.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SQLExecutor.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCTestSuite.cpp">
+      <Filter>_Suite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinDriver.cpp">
+      <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
