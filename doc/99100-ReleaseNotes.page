@@ -53,9 +53,10 @@ AAAIntroduction
 !!Incompatible Changes and Possible Transition Issues
 
   - Keywords for the Data library (now, use, into, etc.) now reside in Poco::Data::Keywords namespace.
-  - Please note that 1.5 releases are development releases and not considered stable. Interfaces may
+  - Please note that 1.5.x releases are development releases and not considered stable. Interfaces may
     change, and backwards compatibility with the stable 1.4 release series
-    is not guaranteed. The next stable release incorporating 1.5 features will be release 1.6. 
+    is not guaranteed. There may also be some rough edges. 
+    The next stable release incorporating 1.5 features will be 1.6. 
 
 
 !!!Release 1.4.4
