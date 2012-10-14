@@ -67,6 +67,14 @@
 #endif
 
 
+#if defined(_WIN32_WINNT) && (_WIN32_WINNT < 0x0501)
+	#error Unsupported Windows version.
+#elif !defined(_WIN32_WINNT)
+	// define minimum supported
+	#define _WIN32_WINNT 0x0501
+#endif
+
+
 #include <windows.h>
 
 
