@@ -923,7 +923,7 @@ void DataTest::testRow()
 
 	try
 	{
-		int i; i = row[5]; // to silence gcc
+		int i; i = row[5].convert<int>(); // to silence gcc
 		fail ("must fail");
 	}catch (RangeException&) {}
 
