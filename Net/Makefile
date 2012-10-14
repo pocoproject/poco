@@ -8,7 +8,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-SHAREDOPT_CXX   += -DNet_EXPORTS
+SHAREDOPT_CXX += -DNet_EXPORTS
 
 objects = \
 	DNS HTTPResponse HostEntry Socket \
@@ -30,7 +30,7 @@ objects = \
 	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
-	RemoteSyslogChannel RemoteSyslogListener \
+	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
 	WebSocket WebSocketImpl
 
 target         = PocoNet
