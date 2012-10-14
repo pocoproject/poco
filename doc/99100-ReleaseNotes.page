@@ -1,6 +1,63 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.5.0
+
+!!Summary of Changes
+
+  - added JSON library
+  - added Util::JSONConfiguration
+  - added FIFOBuffer and FIFOBufferStream
+  - fixed SF# 3522906: Unregistering handlers from SocketReactor
+  - fixed SF# 3522084: AbstractConfiguration does not support 64-bit integers
+  - HTTPServer::stopAll(): close the socket instead of just shutting it down, as the latter won't wake up a select() on Windows
+  - added SMTPLogger
+  - added cmake support
+  - fixed SF#3538778: NetworkInterface enumeration uses deprecated API
+  - fixed SF#3538779: IPAddress lacks useful constructors: from prefix mask, native SOCKADDR
+  - fixed SF#3538780: SocketAddress needs operator < function
+  - fixed SF#3538775: Issues building on Fedora/Centos, etc. for AMD64
+  - fixed SF#3538786: Use size_t for describing data-blocks in DigestEngine
+  - added IPAddress bitwise operators (&,|,^,~)
+  - added IPAddress BinaryReader/Writer << and >> operators
+  - modified IPAddress to force IPv6 to lowercase (RFC 5952)
+  - fixed SF#3538785: SMTPClientSession::sendMessage() should take recipient list 
+  - added IPAddress::prefixLength()
+  - UTF portability improvements
+  - fixed SF#3556186: Linux shouldn't use <net/if.h> in Net/SocketDefs.h
+  - added IPAddress RFC 4291 compatible site-local prefix support
+  - fixed SF#3012166: IPv6 patch
+  - added SF#3558085: Add formatter to MACAddress object
+  - fixed SF#3552774: Don't hide default target in subordinate makefile
+  - fixed SF#3534307: Building IPv6 for Linux by default
+  - fixed SF#3516844: poco missing symbols with external >=lipcre-8.13 
+  - added SF#3544720: AbstractConfigurator to support 64bit values
+  - fixed SF#3522081: WinRegistryConfiguration unable to read REG_QWORD values
+  - fixed SF#3563626: For Win32 set Up/Running flags on NetworkInterface
+  - fixed SF#3560807: Deprecate setPeerAddress() as this is now done in getifaddrs
+  - fixed SF#3560776: Fix byte-ordering issues with INADDR_* literals
+  - fixed SF#3563627: Set IP address on multicast socket from socket family
+  - fixed SF#3563999: Size BinaryWriter based on buffer's capacity(), not size()
+  - fixed SF#102 Fix building Poco on Debian GNU/FreeBSD
+  - fixed SF#321 Binding DatTime or Timestamp
+  - fixed SF#307 Detect the SQL driver type at run time
+  - added VS 2012 Projects/Solutions
+  - enhanced and accelerated numeric parsing for integers and floats
+  - fixed SF#590 Segfault on FreeBSD when stack size not rounded
+  - added warn function and warnmsg macro in CppUnit
+  - fixed SF# 3558012 Compilation fails when building with -ansi or -std=c++0x
+  - fixed SF# 3563517 Get rid of loss-of-precision warnings on x64 MacOS
+  - fixed SF#3562244: Portability fix for AF_LINK
+  - fixed SF #3562400: DatagramSocketImpl comment is incorrect
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - Keywords for the Data library (now, use, into, etc.) now reside in Poco::Data::Keywords namespace.
+  - Please note that 1.5 releases are development releases and not considered stable. Interfaces may
+    change, and backwards compatibility with the stable 1.4 release series
+    is not guaranteed. The next stable release incorporating 1.5 features will be release 1.6. 
+
+
 !!!Release 1.4.4
 
 !!Summary of Changes

@@ -51,7 +51,7 @@ The following complete example shows how to use POCO Data:
         };
         
         Statement insert(session);
-        insert << "INSERT INTO Person VALUES(:name, :address, :age)",
+        insert << "INSERT INTO Person VALUES(?, ?, ?)",
             use(person.name),
             use(person.address),
             use(person.age);
@@ -112,14 +112,18 @@ Sessions are created via the Session constructor:
 ----
 
 The first parameter contains the type of the Session one wants to create.
-Currently, supported bac-ends are "SQLite", "ODBC" and "MySQL". The second
-parameter contains the initialization string.
+Currently, supported backends are "SQLite", "ODBC" and "MySQL". The second
+parameter contains the connection string.
 
-In the case of SQLite, the location of the database file is sufficient.
-For ODBC, the connection string is required. Connection string may be
-simple "DSN=MyDSNName" when a DSN is configured or a complete connection
-string defining all the necessary connection parameters (for details,
-consult your ODBC driver documentation).
+In the case of SQLite, the path of the database file is sufficient as connection string.
+
+For ODBC, the connection string may be a simple "DSN=MyDSNName" when a DSN is configured or 
+a complete ODBC driver-specific connection string defining all the necessary connection parameters 
+(for details, consult your ODBC driver documentation). 
+
+For MySQL, the connection string is a semicolon-delimited list of name-value pairs 
+specifying various parameters like host, port, user, password, database, compression and 
+automatic reconnect. Example: <["host=localhost;port=3306;db=mydb;user=alice;password=s3cr3t;compress=true;auto-reconnect=true"]>
 
 
 !!!Inserting and Retrieving Data
@@ -508,7 +512,7 @@ later during execution. Thus, one should never pass temporaries to <[use()]>:
     stmt.execute(); // oops!
 ----
 
-It is possible to use bind() instead of use(). The bind() call will always create a
+It is possible to use <[bind()]> instead of <[use()]>. The <[bind()]> call will always create a
 copy of the supplied argument. Also, it is possible to execute a statement returning 
 data without supplying the storage and have the statement itself store the returned
 data for later retrieval through <[RecordSet]>. For details, see <[RecordSet]> chapter.
