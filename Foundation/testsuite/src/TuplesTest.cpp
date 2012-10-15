@@ -557,8 +557,8 @@ void TuplesTest::testTupleOrder()
 
 void TuplesTest::testMemOverhead()
 {
-	Tuple<short> small(0);
-	int sz = sizeof(small);
+	Tuple<short> smallOne(0);
+	int sz = sizeof(smallOne);
 	assert (sz == 4 || sz == 8); //depending on architecture and alignment
 	Tuple<long> notSoSmall(0);
 	sz = sizeof(notSoSmall);

@@ -50,7 +50,9 @@
 #endif
 #include <limits>
 #include <cmath>
+#if !defined(POCO_NO_LOCALE)
 #include <locale>
+#endif
 
 
 namespace Poco {

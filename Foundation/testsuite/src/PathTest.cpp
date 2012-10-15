@@ -42,7 +42,6 @@
 
 using Poco::Path;
 using Poco::PathSyntaxException;
-using Poco::Random;
 using Poco::Environment;
 
 
@@ -1458,7 +1457,7 @@ void PathTest::testAbsolute()
 
 void PathTest::testRobustness()
 {
-	Random r;
+	Poco::Random r;
 	for (int i = 0; i < 256; ++i)
 	{
 		int len = r.next(1024);

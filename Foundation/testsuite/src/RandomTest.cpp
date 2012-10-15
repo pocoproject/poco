@@ -38,7 +38,6 @@
 #include <cmath>
 
 
-using Poco::Random;
 using Poco::UInt32;
 
 
@@ -54,8 +53,8 @@ RandomTest::~RandomTest()
 
 void RandomTest::testSequence1()
 {
-	Random rnd1;
-	Random rnd2;
+	Poco::Random rnd1;
+	Poco::Random rnd2;
 	rnd1.seed(12345);
 	rnd2.seed(12345);
 	for (int i = 0; i < 100; ++i)
@@ -67,8 +66,8 @@ void RandomTest::testSequence1()
 
 void RandomTest::testSequence2()
 {
-	Random rnd1;
-	Random rnd2;
+	Poco::Random rnd1;
+	Poco::Random rnd2;
 	rnd1.seed(12345);
 	rnd2.seed(54321);
 	
@@ -87,7 +86,7 @@ void RandomTest::testSequence2()
 
 void RandomTest::testDistribution1()
 {
-	Random rnd;
+	Poco::Random rnd;
 	rnd.seed(123456);
 	const int n = 11;
 	int d[n] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -104,7 +103,7 @@ void RandomTest::testDistribution1()
 
 void RandomTest::testDistribution2()
 {
-	Random rnd;
+	Poco::Random rnd;
 	rnd.seed();
 	const int n = 101;
 	std::vector<int> d(n, 0);
@@ -127,7 +126,7 @@ void RandomTest::testDistribution2()
 
 void RandomTest::testDistribution3()
 {
-	Random rnd;
+	Poco::Random rnd;
 	rnd.seed();
 	const int n = 101;
 	std::vector<int> d(n, 0);

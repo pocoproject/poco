@@ -43,7 +43,6 @@
 // Define to enable Windows Unicode (UTF-8) support
 #define POCO_WIN32_UTF8
 
-
 // Define to enable C++11 support
 //#define POCO_ENABLE_CPP11
 
@@ -130,6 +129,12 @@
 // No IPv6 support
 // Define to disable IPv6
 // #define POCO_NET_NO_IPv6
+
+
+// Windows CE has no locale support
+#if defined(_WIN32_WCE)
+#define POCO_NO_LOCALE
+#endif
 
 
 #endif // Foundation_Config_INCLUDED

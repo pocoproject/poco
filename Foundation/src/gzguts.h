@@ -32,7 +32,9 @@
 #endif
 
 #if defined(__TURBOC__) || defined(_MSC_VER) || defined(_WIN32)
-#  include <io.h>
+#  if !defined(_WIN32_WCE)
+#    include <io.h>
+#  endif
 #endif
 
 #ifdef NO_DEFLATE       /* for compatibility with old definition */
