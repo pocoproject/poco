@@ -33,10 +33,10 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Stringifier.h"
-
 #include <iostream>
 #include <sstream>
 
@@ -153,7 +153,7 @@ void Object::stringify(std::ostream& out, unsigned int indent) const
 	}
 
 	out << '}';
-
 }
 
-}} // Namespace Poco::JSON
+
+} } // namespace Poco::JSON

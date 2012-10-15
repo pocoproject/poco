@@ -33,19 +33,18 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include "Poco/Ascii.h"
-#include "Poco/Token.h"
+
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/JSONException.h"
+#include "Poco/Ascii.h"
+#include "Poco/Token.h"
 #undef min
 #undef max
 #include <limits>
 
 
-namespace Poco
-{
-namespace JSON
-{
+namespace Poco {
+namespace JSON {
 
 
 class SeparatorToken: public Token
@@ -89,6 +88,7 @@ public:
 	{
 	}
 };
+
 
 class StringToken: public Token
 {
@@ -243,6 +243,7 @@ public:
 	}
 };
 
+
 class KeywordToken : public Token
 {
 public:
@@ -280,6 +281,7 @@ public:
 		}
 	}
 };
+
 
 class NumberToken: public Token
 {
@@ -418,9 +420,7 @@ public:
 	}
 
 private:
-
 	Class _activeClass;
-
 };
 
 
@@ -697,4 +697,4 @@ bool Parser::readElements(bool firstCall)
 	throw JSONException(format("Invalid token '%s' found.", token->asString()));
 }
 
-}}
+} } // namespace Poco::JSON

@@ -35,6 +35,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef JSON_JSONException_INCLUDED
 #define JSON_JSONException_INCLUDED
 
@@ -46,7 +47,9 @@
 namespace Poco {
 namespace JSON {
 
+
 POCO_DECLARE_EXCEPTION(JSON_API, JSONException, Poco::Exception)
+
 
 }} // namespace Poco::JSON
 

@@ -33,13 +33,12 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include <sstream>
 
+#include "Poco/JSON/Query.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/RegularExpression.h"
 #include "Poco/NumberParser.h"
-
-#include "Poco/JSON/Query.h"
+#include <sstream>
 
 
 using Poco::Dynamic::Var;
@@ -49,7 +48,7 @@ namespace Poco {
 namespace JSON {
 
 
-Query::Query(const Var& source) : _source(source)
+Query::Query(const Var& source): _source(source)
 {
 
 }
@@ -145,4 +144,4 @@ Var Query::find(const std::string& path) const
 }
 
 
-}} // Namespace Poco::JSON
+} } // Namespace Poco::JSON

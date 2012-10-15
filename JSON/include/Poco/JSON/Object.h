@@ -35,30 +35,29 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef JSON_Object_INCLUDED
 #define JSON_Object_INCLUDED
 
 
+#include "Poco/JSON/JSON.h"
+#include "Poco/JSON/Array.h"
+#include "Poco/SharedPtr.h"
+#include "Poco/Dynamic/Var.h"
 #include <map>
 #include <vector>
 #include <iostream>
 #include <sstream>
 
-#include "Poco/SharedPtr.h"
-#include "Poco/Dynamic/Var.h"
-
-#include "Poco/JSON/JSON.h"
-#include "Poco/JSON/Array.h"
 
 namespace Poco {
 namespace JSON {
 
 
 class JSON_API Object
-	/// Represents a JSON object
+	/// Represents a JSON object.
 {
 public:
-
 	typedef SharedPtr<Object> Ptr;
 
 	Object();
@@ -343,6 +342,7 @@ public:
 private:
 	JSON::Object::Ptr _val;
 };
+
 
 }} // namespace Poco::JSON
 

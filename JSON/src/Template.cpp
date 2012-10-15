@@ -32,11 +32,13 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#include "Poco/File.h"
-#include "Poco/FileStream.h"
+
+
 #include "Poco/JSON/Template.h"
 #include "Poco/JSON/TemplateCache.h"
 #include "Poco/JSON/Query.h"
+#include "Poco/File.h"
+#include "Poco/FileStream.h"
 
 
 using Poco::Dynamic::Var;
@@ -52,11 +54,9 @@ POCO_IMPLEMENT_EXCEPTION(JSONTemplateException, Exception, "Template Exception")
 class Part
 {
 public:
-
 	Part()
 	{
 	}
-
 
 	virtual ~Part()
 	{
@@ -68,10 +68,9 @@ public:
 };
 
 
-class StringPart : public Part
+class StringPart: public Part
 {
 public:
-
 	StringPart() : Part()
 	{
 	}
@@ -80,23 +79,19 @@ public:
 	{
 	}
 
-
 	virtual ~StringPart()
 	{
 	}
-
 
 	void render(const Var& data, std::ostream& out) const
 	{
 		out << _content;
 	}
 
-
 	void setContent(const std::string& content)
 	{
 		_content = content;
 	}
-
 
 	inline std::string getContent() const
 	{
@@ -104,32 +99,25 @@ public:
 	}
 
 private:
-
 	std::string _content;
 };
 
 
-class MultiPart : public Part
+class MultiPart: public Part
 {
 public:
-
 	MultiPart()
 	{
-
 	}
-
 
 	virtual ~MultiPart()
 	{
-
 	}
-
 
 	virtual void addPart(Part* part)
 	{
 		_parts.push_back(part);
 	}
-
 
 	void render(const Var& data, std::ostream& out) const
 	{
@@ -140,15 +128,13 @@ public:
 	}
 
 protected:
-
 	VectorParts _parts;
 };
 
 
-class EchoPart : public Part
+class EchoPart: public Part
 {
 public:
-
 	EchoPart(const std::string& query) : Part(), _query(query)
 	{
 	}
@@ -156,7 +142,6 @@ public:
 	virtual ~EchoPart()
 	{
 	}
-
 
 	void render(const Var& data, std::ostream& out) const
 	{
@@ -170,7 +155,6 @@ public:
 	}
 
 private:
-
 	std::string _query;
 };
 
@@ -261,7 +245,6 @@ public:
 class LogicPart : public MultiPart
 {
 public:
-
 	LogicPart() : MultiPart()
 	{
 	}
@@ -296,22 +279,19 @@ public:
 	}
 
 private:
-
 	std::vector<SharedPtr<LogicQuery> > _queries;
 };
 
 
-class LoopPart : public MultiPart
+class LoopPart: public MultiPart
 {
 public:
-
 	LoopPart(const std::string& name, const std::string& query) : MultiPart(), _name(name), _query(query)
 	{
 	}
 
 	virtual ~LoopPart()
 	{
-
 	}
 
 	void render(const Var& data, std::ostream& out) const
@@ -336,14 +316,12 @@ public:
 	}
 
 private:
-
 	std::string _name;
-
 	std::string _query;
 };
 
 
-class IncludePart : public Part
+class IncludePart: public Part
 {
 public:
 
@@ -370,7 +348,6 @@ public:
 	{
 	}
 
-
 	void render(const Var& data, std::ostream& out) const
 	{
 		TemplateCache* cache = TemplateCache::instance();
@@ -388,9 +365,7 @@ public:
 	}
 
 private:
-
 	Path _path;
-
 };
 
 
@@ -748,4 +723,4 @@ void Template::render(const Var& data, std::ostream& out) const
 }
 
 
-}} // Namespace Poco::JSON
+} } // Namespace Poco::JSON

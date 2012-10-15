@@ -35,68 +35,66 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef JSON_JSONParser_INCLUDED
 #define JSON_JSONParser_INCLUDED
 
-
-#include <istream>
-#include <sstream>
-
-#include "Poco/Dynamic/Var.h"
-#include "Poco/StreamTokenizer.h"
 
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Handler.h"
+#include "Poco/Dynamic/Var.h"
+#include "Poco/StreamTokenizer.h"
+#include <istream>
+#include <sstream>
+
 
 namespace Poco {
 namespace JSON {
 
 
 class JSON_API Parser
-	/// A class for passing JSON strings or streams
+	/// A class for passing JSON strings or streams.
 {
 public:
 
 	Parser();
-		/// Constructor
+		/// Constructor.
 
 	virtual ~Parser();
-		/// Destructor
+		/// Destructor.
 
 	void parse(const std::string& source);
-		/// Parses a string
+		/// Parses a string.
 
 	void parse(std::istream& in);
-		/// Parses a JSON from the input stream
+		/// Parses a JSON from the input stream.
 
 	void setHandler(Handler* handler);
-		/// Set the handler
+		/// Set the handler.
 
 	Handler* getHandler();
-		/// Returns the handler
+		/// Returns the handler.
 
 private:
-
 	const Token* nextToken();
-		/// Returns the next token
+		/// Returns the next token.
 
 	void readObject();
-		/// Starts reading an object
-
+		/// Starts reading an object.
 
 	void readArray();
-		/// Starts reading an array
+		/// Starts reading an array.
 
 	bool readRow(bool firstCall = false);
 		/// Reads a property value pair. Returns true when a next row is expected.
 
 	void readValue(const Token* token);
-		/// Read a value from the token
+		/// Read a value from the token.
 
 	bool readElements(bool firstCall = false);
-		/// Read all elements of an array
+		/// Read all elements of an array.
 
 	StreamTokenizer _tokenizer;
 	Handler*        _handler;

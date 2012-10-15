@@ -33,11 +33,11 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include <iomanip>
 
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Object.h"
+#include <iomanip>
 
 
 using Poco::Dynamic::Var;
@@ -115,4 +115,4 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 }
 
 
-}}  // Namespace Poco::JSON
+} }  // Namespace Poco::JSON

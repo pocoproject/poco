@@ -35,19 +35,21 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef JSON_Array_INCLUDED
 #define JSON_Array_INCLUDED
 
 
-#include <vector>
-#include <sstream>
-
 #include "Poco/JSON/JSON.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
+#include <vector>
+#include <sstream>
+
 
 namespace Poco {
 namespace JSON {
+
 
 class Object;
 
@@ -55,7 +57,6 @@ class Object;
 class JSON_API Array
 {
 public:
-
 	typedef std::vector<Dynamic::Var> ValueVector;
 	typedef SharedPtr<Array> Ptr;
 
@@ -199,6 +200,7 @@ inline void Array::remove(unsigned int index)
 namespace Poco {
 namespace Dynamic {
 
+
 template <>
 class VarHolderImpl<JSON::Array::Ptr>: public VarHolder
 {
@@ -336,6 +338,7 @@ public:
 private:
 	JSON::Array::Ptr _val;
 };
+
 
 }} // namespace Poco::JSON
 

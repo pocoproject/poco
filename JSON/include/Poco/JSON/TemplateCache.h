@@ -39,13 +39,13 @@
 #define JSON_JSONTemplateCache_INCLUDED
 
 
-#include <vector>
-#include <map>
-
+#include "Poco/JSON/JSON.h"
+#include "Poco/JSON/Template.h"
 #include "Poco/Path.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Logger.h"
-#include "Poco/JSON/Template.h"
+#include <vector>
+#include <map>
 
 
 namespace Poco {
@@ -60,13 +60,12 @@ class JSON_API TemplateCache
 	/// and load a new one.
 {
 public:
-
 	TemplateCache();
 		/// Constructor. The cache must be created
 		/// and not destroyed as long as it is used.
 
 	virtual ~TemplateCache();
-		/// Destructor
+		/// Destructor.
 
 	void addPath(const Path& path);
 		/// Add a path for resolving template paths.
@@ -88,7 +87,6 @@ public:
 		/// Sets the logger for the cache.
 
 private:
-
 	static TemplateCache*                _instance;
 	std::vector<Path>                    _includePaths;
 	std::map<std::string, Template::Ptr> _cache;

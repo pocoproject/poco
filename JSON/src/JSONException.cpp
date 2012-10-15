@@ -33,12 +33,16 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/JSON/JSONException.h"
 #include <typeinfo>
+
 
 namespace Poco {
 namespace JSON {
 
+
 POCO_IMPLEMENT_EXCEPTION(JSONException, Exception, "JSON Exception")
 
-}} // Namespace Poco::JSON
+
+} } // Namespace Poco::JSON

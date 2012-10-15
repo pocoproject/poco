@@ -33,15 +33,17 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/File.h"
 #include "Poco/JSON/TemplateCache.h"
 
-namespace Poco
-{
-namespace JSON
-{
+
+namespace Poco {
+namespace JSON {
+
 
 TemplateCache* TemplateCache::_instance = NULL;
+
 
 TemplateCache::TemplateCache() : _logger(NULL)
 {
@@ -169,4 +171,5 @@ Path TemplateCache::resolvePath(const Path& path) const
 	throw FileNotFoundException(path.toString());
 }
 
-}} // Poco::JSON
+
+} } // Poco::JSON

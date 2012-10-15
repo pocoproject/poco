@@ -35,12 +35,14 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef JSON_Handler_INCLUDED
 #define JSON_Handler_INCLUDED
 
 
-#include "Poco/Dynamic/Var.h"
 #include "Poco/JSON/JSON.h"
+#include "Poco/Dynamic/Var.h"
+
 
 namespace Poco {
 namespace JSON {
@@ -94,5 +96,6 @@ private:
 
 
 }} // namespace Poco::JSON
+
 
 #endif // JSON_Handler_INCLUDED

@@ -33,16 +33,18 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/JSON/Handler.h"
 #include "Poco/JSON/Object.h"
 
-namespace Poco
-{
-namespace JSON
-{
+
+namespace Poco {
+namespace JSON {
+
 
 Handler::~Handler()
 {
 }
 
-}} // Namespace Poco::JSON
+
+} } // namespace Poco::JSON

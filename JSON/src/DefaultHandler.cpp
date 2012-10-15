@@ -33,6 +33,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/JSON/DefaultHandler.h"
 #include "Poco/JSON/Object.h"
 
@@ -151,4 +152,4 @@ void DefaultHandler::setValue(const Var& value)
 }
 
 
-}} // Namespace Poco::JSON
+} } // namespace Poco::JSON

@@ -35,6 +35,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef JSON_DefaultHandler_INCLUDED
 #define JSON_DefaultHandler_INCLUDED
 
@@ -153,5 +154,6 @@ inline void DefaultHandler::null()
 
 
 }} // namespace Poco::JSON
+
 
 #endif // JSON_DefaultHandler_INCLUDED
