@@ -30,6 +30,9 @@
 //
 
 
+#if !defined(_WIN32_WCE)
+
+
 #include "WinConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
@@ -147,3 +150,6 @@ CppUnit::Test* WinConfigurationTest::suite()
 
 	return pSuite;
 }
+
+
+#endif // _WIN32_WCE
