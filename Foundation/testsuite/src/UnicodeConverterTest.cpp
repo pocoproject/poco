@@ -30,6 +30,9 @@
 //
 
 
+#ifndef POCO_NO_WSTRING
+
+
 #include "Poco/UnicodeConverter.h"
 #include "UnicodeConverterTest.h"
 #include "CppUnit/TestCaller.h"
@@ -86,3 +89,6 @@ CppUnit::Test* UnicodeConverterTest::suite()
 
 	return pSuite;
 }
+
+
+#endif
