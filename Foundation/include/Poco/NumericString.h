@@ -198,8 +198,6 @@ bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
 }
 
 
-#ifndef POCO_NO_FPENVIRONMENT
-
 namespace Impl {
 
 static char DUMMY_EXP_UNDERFLOW = 0; // dummy default val
@@ -357,9 +355,6 @@ bool strToFloat (const std::string& s, F& result, char& eu = Impl::DUMMY_EXP_UND
 {
 	return strToFloat(s.c_str(), result, eu, decSep, thSep); 
 }
-
-
-#endif // POCO_NO_FPENVIRONMENT
 
 
 } // namespace Poco
