@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="CppParser">
-      <UniqueIdentifier>{fe377055-0525-44e6-acc7-8d7b1f6c3eab}</UniqueIdentifier>
+      <UniqueIdentifier>{0de1e4c2-7981-448e-8fa7-dd860a0bf734}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppParser\Header Files">
-      <UniqueIdentifier>{217c0ad9-ad83-4781-9937-3cd83b413b56}</UniqueIdentifier>
+      <UniqueIdentifier>{b646c19b-967a-48c7-9dc9-8b073b84c071}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppParser\Source Files">
-      <UniqueIdentifier>{3952c193-998f-4899-bbd1-3fdd17661c10}</UniqueIdentifier>
+      <UniqueIdentifier>{9f794384-3146-4a72-ba9c-f60346a9f55c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Symbol Table">
-      <UniqueIdentifier>{b956ea7f-4ced-4a5f-9e27-ed5236d5aad4}</UniqueIdentifier>
+      <UniqueIdentifier>{0d441282-2c28-4d3f-9c80-066f3fb5c156}</UniqueIdentifier>
     </Filter>
     <Filter Include="Symbol Table\Header Files">
-      <UniqueIdentifier>{c2c26550-40a8-4cee-9f8f-d9e18530d4ba}</UniqueIdentifier>
+      <UniqueIdentifier>{6a8d173b-488c-4aec-8d4e-83b687680088}</UniqueIdentifier>
     </Filter>
     <Filter Include="Symbol Table\Source Files">
-      <UniqueIdentifier>{2422599c-57fd-475a-9fda-4a981d3645f3}</UniqueIdentifier>
+      <UniqueIdentifier>{b062fe72-2363-4b1e-a71c-e986d95a20eb}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes">
-      <UniqueIdentifier>{aa2c1c4c-dbf1-4818-aeeb-d5d8b82d7f77}</UniqueIdentifier>
+      <UniqueIdentifier>{2ec881d9-fe2a-4f0e-ac28-e61d01eadac0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes\Header Files">
-      <UniqueIdentifier>{4ec2c692-a128-4bae-8906-3b341dfc867e}</UniqueIdentifier>
+      <UniqueIdentifier>{2326fad4-7fe9-4ddb-84ef-563f605b8d5e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes\Source Files">
-      <UniqueIdentifier>{778a11b1-307d-4120-af80-2af792b2699a}</UniqueIdentifier>
+      <UniqueIdentifier>{e6601398-0222-4e2c-85f6-0e9070610b26}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +44,9 @@
     </ClInclude>
     <ClInclude Include="include\Poco\CppParser\Utility.h">
       <Filter>CppParser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppParser\BuiltIn.h">
+      <Filter>Symbol Table\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\CppParser\Decl.h">
       <Filter>Symbol Table\Header Files</Filter>
@@ -94,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="src\Utility.cpp">
       <Filter>CppParser\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BuiltIn.cpp">
+      <Filter>Symbol Table\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Decl.cpp">
       <Filter>Symbol Table\Source Files</Filter>

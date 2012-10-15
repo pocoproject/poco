@@ -270,6 +270,7 @@
     <ClInclude Include="include\Poco\CppParser\Parser.h"/>
     <ClInclude Include="include\Poco\CppParser\Tokenizer.h"/>
     <ClInclude Include="include\Poco\CppParser\Utility.h"/>
+    <ClInclude Include="include\Poco\CppParser\BuiltIn.h"/>
     <ClInclude Include="include\Poco\CppParser\Decl.h"/>
     <ClInclude Include="include\Poco\CppParser\Enum.h"/>
     <ClInclude Include="include\Poco\CppParser\EnumValue.h"/>
@@ -288,6 +289,7 @@
     <ClCompile Include="src\Parser.cpp"/>
     <ClCompile Include="src\Tokenizer.cpp"/>
     <ClCompile Include="src\Utility.cpp"/>
+    <ClCompile Include="src\BuiltIn.cpp"/>
     <ClCompile Include="src\Decl.cpp"/>
     <ClCompile Include="src\Enum.cpp"/>
     <ClCompile Include="src\EnumValue.cpp"/>

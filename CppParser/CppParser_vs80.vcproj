@@ -413,6 +413,8 @@
 			<Filter
 				Name="Header Files">
 				<File
+					RelativePath=".\include\Poco\CppParser\BuiltIn.h"/>
+				<File
 					RelativePath=".\include\Poco\CppParser\Decl.h"/>
 				<File
 					RelativePath=".\include\Poco\CppParser\Enum.h"/>
@@ -435,6 +437,8 @@
 			</Filter>
 			<Filter
 				Name="Source Files">
+				<File
+					RelativePath=".\src\BuiltIn.cpp"/>
 				<File
 					RelativePath=".\src\Decl.cpp"/>
 				<File
