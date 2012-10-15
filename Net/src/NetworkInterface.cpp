@@ -1140,7 +1140,9 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <net/if_dl.h>
+#ifndef POCO_NO_NET_IFTYPES
 #include <net/if_types.h>
+#endif
 
 
 namespace Poco {
@@ -1153,6 +1155,7 @@ NetworkInterface::Type fromNative(u_char nativeType)
 {
 	switch (nativeType) 
 	{
+#ifndef POCO_NO_NET_IFTYPES
 		case IFT_ETHER:		return NetworkInterface::NI_TYPE_ETHERNET_CSMACD;
 		case IFT_ISO88025:	return NetworkInterface::NI_TYPE_ISO88025_TOKENRING;
 		case IFT_FRELAY:	return NetworkInterface::NI_TYPE_FRAMERELAY;
@@ -1162,7 +1165,9 @@ NetworkInterface::Type fromNative(u_char nativeType)
 #if (POCO_OS != POCO_OS_SOLARIS)		
 		case IFT_IEEE1394:	return NetworkInterface::NI_TYPE_IEEE1394;
 #endif
+#endif
 		default:			return NetworkInterface::NI_TYPE_OTHER;
+
 	}
 }
 
