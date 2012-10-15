@@ -1,11 +1,11 @@
 //
-// Enum.cpp
+// BuiltIn.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Enum.cpp#1 $
+// $Id: //poco/1.4/CppParser/src/BuiltIn.cpp#1 $
 //
 // Library: CppParser
 // Package: SymbolTable
-// Module:  Enum
+// Module:  BuiltIn
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,81 +34,35 @@
 //
 
 
-#include "Poco/CppParser/Enum.h"
-#include "Poco/CppParser/EnumValue.h"
-#include "Poco/NumberFormatter.h"
-#include <sstream>
-
-
-using Poco::NumberFormatter;
+#include "Poco/CppParser/BuiltIn.h"
+#include "Poco/String.h"
+#include <cctype>
 
 
 namespace Poco {
 namespace CppParser {
 
 
-int Enum::_count = 0;
-
-
-Enum::Enum(const std::string& name, NameSpace* pNameSpace):
-	Symbol(processName(name), pNameSpace)
+BuiltIn::BuiltIn(const std::string& name, NameSpace* pNameSpace):
+	Symbol(name, pNameSpace)
 {
 }
 
 
-Enum::~Enum()
+BuiltIn::~BuiltIn()
 {
 }
 
 
-void Enum::addValue(EnumValue* pValue)
+Symbol::Kind BuiltIn::kind() const
 {
-	poco_check_ptr (pValue);
-	
-	_values.push_back(pValue);
-}
-
-	
-Enum::Iterator Enum::begin() const
-{
-	return _values.begin();
+	return Symbol::SYM_BUILTIN;
 }
 
 
-Enum::Iterator Enum::end() const
+std::string BuiltIn::toString() const
 {
-	return _values.end();
-}
-
-
-std::string Enum::processName(const std::string& name)
-{
-	if (name.empty())
-	{
-		std::string result("#AnonEnum");
-		result.append(NumberFormatter::format0(_count++, 4));
-		return result;
-	}
-	else return name;
-}
-
-
-Symbol::Kind Enum::kind() const
-{
-	return Symbol::SYM_ENUM;
-}
-
-
-std::string Enum::toString() const
-{
-	std::ostringstream ostr;
-	ostr << "enum " << name() << "\n{\n";
-	for (Iterator it = begin(); it != end(); ++it)
-	{
-		ostr << "\t" << (*it)->toString() << "\n";
-	}
-	ostr << "};";
-	return ostr.str();
+	return fullName();
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Enum.h
 //
-// $Id: //poco/1.3/CppParser/include/Poco/CppParser/Enum.h#1 $
+// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Enum.h#1 $
 //
 // Library: CppParser
 // Package: SymbolTable

@@ -1,7 +1,7 @@
 //
 // Variable.cpp
 //
-// $Id: //poco/1.3/CppParser/src/Variable.cpp#3 $
+// $Id: //poco/1.4/CppParser/src/Variable.cpp#1 $
 //
 // Library: CppParser
 // Package: SymbolTable

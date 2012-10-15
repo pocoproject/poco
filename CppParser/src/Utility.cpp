@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.3/CppParser/src/Utility.cpp#5 $
+// $Id: //poco/1.4/CppParser/src/Utility.cpp#2 $
 //
 // Library: CppParser
 // Package: CppParser
@@ -186,6 +186,7 @@ void Utility::detectPrefixAndIncludes(const std::string& origHFile, std::vector<
 	istr.close();
 }
 
+
 std::string Utility::preprocessFile(const std::string& file, const std::string& exec, const std::string& options, const std::string& path)
 {
 	Path pp(file);
@@ -276,17 +277,16 @@ void Utility::buildFileList(std::set<std::string>& files, const std::vector<std:
 		Glob::glob(*itInc, temp, options);
 	}
 
-	std::vector <std::string>::const_iterator itExc = excludePattern.begin();
-	std::vector <std::string>::const_iterator itExcEnd = excludePattern.end();
-
 	for (std::set<std::string>::const_iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		Path p(*it);
 		bool include = true;
+		std::vector <std::string>::const_iterator itExc = excludePattern.begin();
+		std::vector <std::string>::const_iterator itExcEnd = excludePattern.end();
 		for (; itExc != itExcEnd; ++itExc)
 		{
 			Glob glob(*itExc, options);
-			if (glob.match(p.getFileName()))
+			if (glob.match(p.toString()))
 				include = false;
 		}
 		if (include)

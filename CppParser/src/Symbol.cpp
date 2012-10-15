@@ -1,7 +1,7 @@
 //
 // Symbol.cpp
 //
-// $Id: //poco/1.3/CppParser/src/Symbol.cpp#6 $
+// $Id: //poco/1.4/CppParser/src/Symbol.cpp#1 $
 //
 // Library: CppParser
 // Package: SymbolTable
@@ -136,8 +136,14 @@ std::string Symbol::extractName(const std::string& decl)
 {
 	poco_assert (!decl.empty());
 
+	// special cases: operator () and operator []
+	if (decl.find("operator ()") != std::string::npos)
+		return "operator ()";
+	else if (decl.find("operator[]") != std::string::npos)
+		return "operator []";
+		
 	std::string::size_type pos = decl.find('(');
-	// check for function pointer
+	// another special case: function pointer
 	if (pos != std::string::npos && pos < decl.size() - 1)
 	{
 		std::string::size_type i = pos + 1;
@@ -154,11 +160,14 @@ std::string Symbol::extractName(const std::string& decl)
 	if (pos == std::string::npos || (pos > 0 && decl[pos - 1] == '('))
 		pos = decl.size();
 	--pos;
+	// check for constant
 	std::string::size_type eqPos = decl.find('=');
 	if (eqPos != std::string::npos)
 	{
+		// special case: default template parameter
 		std::string::size_type gtPos = decl.find('>', eqPos);
-		if ((gtPos == std::string::npos || gtPos > pos) && eqPos < pos && eqPos > 0 && decl[eqPos + 1] != '=')
+		std::string::size_type ltPos = decl.find('<', eqPos);
+		if ((gtPos == std::string::npos || gtPos > pos || (ltPos != std::string::npos && gtPos > ltPos)) && eqPos < pos && eqPos > 0 && decl[eqPos + 1] != '=')
 			pos = eqPos - 1;
 	}
 	while (pos > 0 && std::isspace(decl[pos])) --pos;

@@ -1,7 +1,7 @@
 //
 // Attributes.h
 //
-// $Id: //poco/1.3/CppParser/include/Poco/CppParser/Attributes.h#1 $
+// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Attributes.h#2 $
 //
 // Library: CppParser
 // Package: Attributes
@@ -105,6 +105,10 @@ public:
 
 	void set(const std::string& name, const std::string& value);
 		/// Sets the value of an attribute.
+	
+	void remove(const std::string& name);
+		/// Removes the attribute with the given name.
+		/// Does nothing if the attribute does not exist.
 		
 	const std::string& operator [] (const std::string& name) const;
 	std::string& operator [] (const std::string& name);		

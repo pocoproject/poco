@@ -1,7 +1,7 @@
 //
 // Parameter.cpp
 //
-// $Id: //poco/1.3/CppParser/src/Parameter.cpp#3 $
+// $Id: //poco/1.4/CppParser/src/Parameter.cpp#2 $
 //
 // Library: CppParser
 // Package: SymbolTable
@@ -51,16 +51,18 @@ int Parameter::_count(0);
 
 
 Parameter::Parameter(const std::string& decl, Function* pFunction):
-	Decl(handleDecl (decl), 0), // handle init values
+	Decl(handleDecl(decl), 0), // handle init values
 	_type(),
 	_isRef(false),
 	_isPointer(false),
 	_isConst(false)
 {
-	
 	std::size_t pos = declaration().rfind(name());
-	
-	std::string tmp = declaration().substr(0, pos);
+	std::string tmp;
+	if (pos == 0 && name().size() == declaration().size())
+		tmp = declaration();
+	else
+		tmp = declaration().substr(0, pos);
 	_type = Poco::trim(tmp);
 	std::size_t rightCut = _type.size();
 	while (rightCut > 0 && (_type[rightCut-1] == '&' || _type[rightCut-1] == '*' || _type[rightCut-1] == '\t' || _type[rightCut-1] == ' '))
@@ -83,7 +85,6 @@ Parameter::Parameter(const std::string& decl, Function* pFunction):
 		_isConst = true;
 	}
 
-	
 	Poco::trimInPlace(_type);
 	pos = decl.find("=");
 	_hasDefaultValue = (pos != std::string::npos);
@@ -154,7 +155,6 @@ std::string Parameter::handleDecl(const std::string& decl)
 		mustAdd = true;
 	if (mustAdd)
 	{
-		
 		result.append(" ");
 		result.append("param");
 		result.append(Poco::NumberFormatter::format(++_count));

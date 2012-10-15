@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/CppParser/Makefile#1 $
+# $Id: //poco/1.4/CppParser/Makefile#2 $
 #
 # Makefile for Poco CppParser
 #
@@ -11,7 +11,7 @@ include $(POCO_BASE)/build/rules/global
 SHAREDOPT_CXX   += -DCppParser_EXPORTS
 
 objects = CppToken Decl Enum EnumValue Function NameSpace Parameter \
-	Parser Struct Symbol Tokenizer TypeDef Utility Variable \
+	Parser Struct Symbol Tokenizer TypeDef BuiltIn Utility Variable \
 	Attributes AttributesParser
 
 target         = PocoCppParser

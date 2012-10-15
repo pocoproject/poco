@@ -1,7 +1,7 @@
 //
 // Parser.cpp
 //
-// $Id: //poco/1.3/CppParser/src/Parser.cpp#7 $
+// $Id: //poco/1.4/CppParser/src/Parser.cpp#1 $
 //
 // Library: CppParser
 // Package: CppParser
@@ -682,13 +682,18 @@ const Token* Parser::parseParameters(const Token* pNext, Function* pFunc)
 	{
 		std::string decl;
 		int depth = 0;
-		while ((depth > 0 || (!isOperator(pNext, OperatorToken::OP_CLOSPARENT) && !isOperator(pNext, OperatorToken::OP_COMMA))) && !isEOF(pNext))
+		int tdepth = 0;
+		while ((depth > 0 || tdepth > 0 || (!isOperator(pNext, OperatorToken::OP_CLOSPARENT) && !isOperator(pNext, OperatorToken::OP_COMMA))) && !isEOF(pNext))
 		{
 			append(decl, pNext);
 			if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
 				++depth;
 			else if (isOperator(pNext, OperatorToken::OP_CLOSPARENT))
 				--depth;
+			else if (isOperator(pNext, OperatorToken::OP_LT))
+				++tdepth;
+			else if (isOperator(pNext, OperatorToken::OP_GT))
+				--tdepth;
 			pNext = next();
 		}
 		if (isOperator(pNext, OperatorToken::OP_COMMA))

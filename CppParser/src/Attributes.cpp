@@ -1,7 +1,7 @@
 //
 // Attributes.cpp
 //
-// $Id: //poco/1.3/CppParser/src/Attributes.cpp#1 $
+// $Id: //poco/1.4/CppParser/src/Attributes.cpp#2 $
 //
 // Library: CppParser
 // Package: Attributes
@@ -140,6 +140,14 @@ bool Attributes::getBool(const std::string& name, bool defaultValue) const
 void Attributes::set(const std::string& name, const std::string& value)
 {
 	_map[name] = value;
+}
+
+
+void Attributes::remove(const std::string& name)
+{
+	AttrMap::iterator it = _map.find(name);
+	if (it != _map.end())
+		_map.erase(it);
 }
 
 

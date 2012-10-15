@@ -1,7 +1,7 @@
 //
 // Symbol.h
 //
-// $Id: //poco/1.3/CppParser/include/Poco/CppParser/Symbol.h#1 $
+// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Symbol.h#2 $
 //
 // Library: CppParser
 // Package: SymbolTable
@@ -68,6 +68,7 @@ public:
 		SYM_PARAMETER,  /// A function parameter
 		SYM_STRUCT,     /// A struct or class
 		SYM_TYPEDEF,    /// A typedef
+		SYM_BUILTIN,    /// A built-in type
 		SYM_VARIABLE    /// A (member) variable
 	};
 	
@@ -140,7 +141,10 @@ public:
 	
 	const Attributes& attrs() const;
 		/// Returns the symbol's attributes.
-		
+
+	Attributes& attrs();
+		/// Returns the symbol's attributes.
+				
 	const Attributes& getAttributes() const;
 		/// Returns the symbol's attributes.
 		
@@ -249,6 +253,12 @@ inline const std::string& Symbol::getLibrary() const
 
 
 inline const Attributes& Symbol::attrs() const
+{
+	return _attrs;
+}
+
+
+inline Attributes& Symbol::attrs()
 {
 	return _attrs;
 }

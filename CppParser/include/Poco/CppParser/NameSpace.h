@@ -1,7 +1,7 @@
 //
 // NameSpace.h
 //
-// $Id: //poco/1.3/CppParser/include/Poco/CppParser/NameSpace.h#2 $
+// $Id: //poco/1.4/CppParser/include/Poco/CppParser/NameSpace.h#1 $
 //
 // Library: CppParser
 // Package: SymbolTable

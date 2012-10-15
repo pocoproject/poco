@@ -1,7 +1,7 @@
 //
 // CppToken.cpp
 //
-// $Id: //poco/1.3/CppParser/src/CppToken.cpp#4 $
+// $Id: //poco/1.4/CppParser/src/CppToken.cpp#2 $
 //
 // Library: CppParser
 // Package: CppParser
@@ -36,6 +36,7 @@
 
 #include "Poco/CppParser/CppToken.h"
 #include "Poco/Exception.h"
+#include "Poco/NumberParser.h"
 #include <cctype>
 #include <cstdlib>
 
@@ -613,14 +614,14 @@ void NumberLiteralToken::finish(std::istream& istr)
 
 int NumberLiteralToken::asInteger() const
 {
-	return static_cast<int>(strtol(_value.c_str(), 0, 0));
+	return static_cast<int>(std::strtol(_value.c_str(), 0, 0));
 	
 }
 
 
 double NumberLiteralToken::asFloat() const
 {
-	return strtod(_value.c_str(), 0);
+	return std::strtod(_value.c_str(), 0);
 }
 
 

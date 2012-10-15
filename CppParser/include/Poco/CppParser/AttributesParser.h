@@ -1,7 +1,7 @@
 //
 // AttributesParser.h
 //
-// $Id: //poco/1.3/CppParser/include/Poco/CppParser/AttributesParser.h#1 $
+// $Id: //poco/1.4/CppParser/include/Poco/CppParser/AttributesParser.h#2 $
 //
 // Library: CppParser
 // Package: Attributes
@@ -61,10 +61,10 @@ class CppParser_API AttributesParser
 	/// with the syntax:
 	///     //@ <attrDecl>[,<attrDec>...]
 	/// where <attrDecl> is
-	///     <name>=<value>
+	///     <name>[=<value>]
 	/// <name> is a valid C++ identifier, or two identifiers separated by 
 	/// a period (struct accessor notation).
-	/// <value> is a string, integer, bool literal, or a complex value
+	/// <value> is a string, integer, identifier, bool literal, or a complex value
 	/// in the form
 	///    {<name>=<value>[,<name>=<value>...]}
 {
