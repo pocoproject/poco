@@ -52,8 +52,10 @@ Thumbs.db
 *.user
 *.aps
 *.pch
+*.ipch
 *.ncb
 *.suo
+*.sdf
 *.tlb
 *.tlh
 *.ilk
