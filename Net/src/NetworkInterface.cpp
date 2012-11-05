@@ -131,7 +131,7 @@ public:
 #endif
 
 	void setUp(bool up);
-	void setMtu(unsigned mtu);
+	void setMTU(unsigned mtu);
 	void setType(Type type);
 	void setIndex(unsigned index);
 	void setPhyParams();
@@ -227,7 +227,7 @@ void NetworkInterfaceImpl::setPhyParams()
 	setFlags(ifr.ifr_flags);
 
 	ds.impl()->ioctl(SIOCGIFMTU, &ifr);
-	setMtu(ifr.ifr_mtu);
+	setMTU(ifr.ifr_mtu);
 #endif
 }
 
@@ -466,7 +466,7 @@ inline void NetworkInterfaceImpl::setUp(bool up)
 }
 
 
-inline void NetworkInterfaceImpl::setMtu(unsigned mtu)
+inline void NetworkInterfaceImpl::setMTU(unsigned mtu)
 {
 	_mtu = mtu;
 }
@@ -1011,7 +1011,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				ifIt = result.insert(Map::value_type(ifIndex, ni)).first;
 		
 			ifIt->second.impl().setFlags(pAddress->Flags, pAddress->IfType);
-			ifIt->second.impl().setMtu(pAddress->Mtu);
+			ifIt->second.impl().setMTU(pAddress->Mtu);
 			ifIt->second.impl().setUp(pAddress->OperStatus == IfOperStatusUp);
 #if (_WIN32_WINNT >= 0x0600) // Vista and newer only
 			ifIt->second.impl().setRunning(pAddress->ReceiveLinkSpeed > 0 || pAddress->TransmitLinkSpeed > 0);

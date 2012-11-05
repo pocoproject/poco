@@ -1,7 +1,9 @@
 //
-// NetCoreTestSuite.cpp
+// RouteTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/NetCoreTestSuite.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/RouteTest.h#1 $
+//
+// Definition of the RouteTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -30,23 +32,32 @@
 //
 
 
-#include "NetCoreTestSuite.h"
-#include "IPAddressTest.h"
-#include "SocketAddressTest.h"
-#include "DNSTest.h"
-#include "NetworkInterfaceTest.h"
-#include "RouteTest.h"
+#ifndef RouteTest_INCLUDED
+#define RouteTest_INCLUDED
 
 
-CppUnit::Test* NetCoreTestSuite::suite()
+#include "Poco/Net/Net.h"
+#include "CppUnit/TestCase.h"
+
+
+class RouteTest: public CppUnit::TestCase
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NetCoreTestSuite");
+public:
+	RouteTest(const std::string& name);
+	~RouteTest();
 
-	pSuite->addTest(IPAddressTest::suite());
-	pSuite->addTest(SocketAddressTest::suite());
-	pSuite->addTest(DNSTest::suite());
-	pSuite->addTest(NetworkInterfaceTest::suite());
-	pSuite->addTest(RouteTest::suite());
+	void testDefaultRoute();
+	void testAllRoutes();
+	void testAllHostsRoutes();
+	void testLoopbackRoute();
+	
+	void setUp();
+	void tearDown();
 
-	return pSuite;
-}
+	static CppUnit::Test* suite();
+
+private:
+};
+
+
+#endif // RouteTest_INCLUDED

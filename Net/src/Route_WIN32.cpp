@@ -1,9 +1,13 @@
 //
-// NetCoreTestSuite.cpp
+// Route_WIN32.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/NetCoreTestSuite.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Route_WIN32.cpp#2 $
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Library: Net
+// Package: NetCore
+// Module:  Route
+//
+// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,23 +34,43 @@
 //
 
 
-#include "NetCoreTestSuite.h"
-#include "IPAddressTest.h"
-#include "SocketAddressTest.h"
-#include "DNSTest.h"
-#include "NetworkInterfaceTest.h"
-#include "RouteTest.h"
+namespace Poco {
+namespace Net {
 
 
-CppUnit::Test* NetCoreTestSuite::suite()
+Route::RouteList Route::list(IPAddress::Family family)
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NetCoreTestSuite");
+	std::time_t now;
+	PMIB_IPFORWARD_TABLE2 pIpForwardTable2 = NULL;
 
-	pSuite->addTest(IPAddressTest::suite());
-	pSuite->addTest(SocketAddressTest::suite());
-	pSuite->addTest(DNSTest::suite());
-	pSuite->addTest(NetworkInterfaceTest::suite());
-	pSuite->addTest(RouteTest::suite());
+	if (GetIpForwardTable2(((family == IPAddress::IPv4) ? AF_INET : AF_INET6), &pIpForwardTable2) != NO_ERROR)
+		throw std::runtime_error("Couldn't fetch routing table");
 
-	return pSuite;
+	::time(&now);
+
+	RouteList list;
+
+	for (unsigned i = 0; i < pIpForwardTable2->NumEntries; ++i)
+	{
+		PMIB_IPFORWARD_ROW2 pIp2 = &pIpForwardTable2->Table[i];
+		IPAddress::Family family2 = (pIp2->DestinationPrefix.Prefix.si_family == AF_INET ? IPAddress::IPv4 : IPAddress::IPv6);
+
+		IPAddress dest(*(struct sockaddr *)&pIp2->DestinationPrefix.Prefix);
+		IPAddress netmask(pIp2->DestinationPrefix.PrefixLength, family2);
+		IPAddress nexthop(*(struct sockaddr *)&pIp2->NextHop);
+
+		Route route(dest, netmask, nexthop, pIp2->InterfaceIndex, nexthop.isWildcard() ? ROUTE_INDIRECT : ROUTE_INDIRECT);
+		route.setMetric(pIp2->Metric);
+		route.setAge(now - pIp2->Age);
+		route.setProto((RouteProto) pIp2->Protocol);
+
+		list.push_back(route);
+	}
+
+	FreeMibTable(pIpForwardTable2);
+
+	return list;
 }
+
+
+}} // namespace Poco::Net

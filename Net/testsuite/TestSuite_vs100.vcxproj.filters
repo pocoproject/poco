@@ -309,6 +309,9 @@
     <ClInclude Include="src\WebSocketTestSuite.h">
       <Filter>WebSocket\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\RouteTest.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNSTest.cpp">
@@ -478,6 +481,9 @@
     </ClCompile>
     <ClCompile Include="src\WebSocketTestSuite.cpp">
       <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RouteTest.cpp">
+      <Filter>NetCore\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
