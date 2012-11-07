@@ -133,6 +133,8 @@ void StringTokenizerTest::testStringTokenizer()
 		assert (*it++ == "a");
 		assert (it != st.end());
 		assert (*it++ == "");
+		assert (it != st.end());
+		assert (*it++ == "");
 		assert (it == st.end());
 	}
 	{
@@ -142,6 +144,8 @@ void StringTokenizerTest::testStringTokenizer()
 		assert (st.find("") == 1);
 		assert (it != st.end());
 		assert (*it++ == "a");
+		assert (it != st.end());
+		assert (*it++ == "");
 		assert (it != st.end());
 		assert (*it++ == "");
 		assert (it == st.end());
@@ -306,6 +310,8 @@ void StringTokenizerTest::testStringTokenizer()
 		assert (*it++ == "ab");
 		assert (it != st.end());
 		assert (*it++ == "cd");
+		assert (it != st.end());
+		assert (*it++ == "");
 		assert (it == st.end());
 	}
 	{
