@@ -36,6 +36,7 @@
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Net/Route.h"
 #include "Poco/Net/NetException.h"
+#include <iomanip>
 
 
 using Poco::Net::IPAddress;
@@ -66,14 +67,65 @@ RouteTest::~RouteTest()
 // with results we get back from NetworkInterface::list().
 //
 
-void RouteTest::testDefaultRoute()
+void RouteTest::testAllRoutes()
 {
 	Route::RouteList routes = Route::list(IPAddress::IPv4);
 	assert(routes.size() >= 3);
+
+	std::cout << "Active IPv4 Routes:" << std::endl;
+	std::cout << "=============================================================================" << std::endl;
+	std::cout << std::setw(17) << "Destinaton" 
+		<< std::setw(17) << "Netmask" 
+		<< std::setw(17) << "Gateway" 
+		<< std::setw(17) << "Interface" 
+		<< std::setw(8) << "Metric" << std::endl;
+
+	Route::RouteList::const_iterator it = routes.begin();
+	Route::RouteList::const_iterator end = routes.end();
+	for (; it != end; ++it)
+	{
+		IPAddress ip = it->getNetworkInterface().firstAddress(IPAddress::IPv4);
+		if (!ip.isLinkLocal())
+		{
+			std::string gateway = it->getNextHop().isWildcard() ? "On-link" : it->getNextHop().toString();
+			std::cout << std::setw(17) << it->getDest().toString()
+				<< std::setw(17) << it->getNetmask().toString()
+				<< std::setw(17) << gateway
+				<< std::setw(17) << ip.toString()
+				<< std::setw(8) << it->getMetric() << std::endl;
+		}
+	}
+	std::cout << "=============================================================================" << std::endl;
+
+	routes = Route::list(IPAddress::IPv6);
+	assert(routes.size() >= 3);
+
+	std::cout << std::endl << "Active IPv6 Routes:" << std::endl;
+	std::cout << "=============================================================" << std::endl;
+	std::cout << std::setw(4) << "If"
+		<< std::setw(7) << "Metric" 
+		<< std::setw(41) << "Destinaton" 
+		<< std::setw(8) << "Gateway" 
+		<< std::endl;
+
+	it = routes.begin();
+	for (; it != end; ++it)
+	{
+		IPAddress ip = it->getNetworkInterface().firstAddress(IPAddress::IPv6);
+		if (!ip.isLinkLocal())
+		{
+			std::string gateway = it->getNextHop().isWildcard() ? "On-link" : it->getNextHop().toString();
+			std::cout << std::setw(4) << it->getIfIndex()
+				<< std::setw(7) << it->getMetric()
+				<< std::setw(41) << it->getDest().toString()
+				<< std::setw(8) << gateway << std::endl;
+		}
+	}
+	std::cout << "=============================================================" << std::endl;
 }
 
 
-void RouteTest::testAllRoutes()
+void RouteTest::testDefaultRoute()
 {
 	Route::RouteList defaults = Route::defaults(IPAddress::IPv4);
 	assert(defaults.size() >= 1);

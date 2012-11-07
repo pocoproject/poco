@@ -43,7 +43,7 @@
 #include "Poco/Net/Net.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && (_WIN32_WINNT >= 0x600) // only Vista/Longhorn and up
 	#ifndef POCO_NET_HAS_ROUTE
 		#define POCO_NET_HAS_ROUTE
 	#endif

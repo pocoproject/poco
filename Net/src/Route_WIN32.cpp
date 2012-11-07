@@ -34,17 +34,48 @@
 //
 
 
+#include "Poco/Error.h"
+
+
 namespace Poco {
 namespace Net {
+
+
+static unsigned int getCompleteMetric(PMIB_IPFORWARD_ROW2 pIp2)
+	/// The route metric specified in the Metric member of the MIB_IPFORWARD_ROW2 structure 
+	/// represents just the route metric offset. The complete metric is a combination of this 
+	/// route metric offset added to the interface metric specified in the Metric member of 
+	/// the MIB_IPINTERFACE_ROW structure of the associated interface.
+{
+	MIB_IPINTERFACE_ROW intfcRow;
+	intfcRow.InterfaceLuid = pIp2->InterfaceLuid;
+	intfcRow.InterfaceIndex = pIp2->InterfaceIndex;
+	intfcRow.Family = pIp2->DestinationPrefix.Prefix.si_family;
+	DWORD ret = GetIpInterfaceEntry(&intfcRow);
+	if (NO_ERROR == ret) return pIp2->Metric + intfcRow.Metric;
+
+	std::string error;
+	switch (ret)
+	{
+	case ERROR_FILE_NOT_FOUND:
+		throw RuntimeException("Unknown network interface LUID or interface index");
+	case ERROR_INVALID_PARAMETER:
+		throw RuntimeException("An invalid parameter was passed to the function.");
+	case ERROR_NOT_FOUND:
+		throw RuntimeException("Network interface/family mismatch.");
+	default:
+		throw RuntimeException(Error::getMessage(ret));
+	}
+}
 
 
 Route::RouteList Route::list(IPAddress::Family family)
 {
 	std::time_t now;
-	PMIB_IPFORWARD_TABLE2 pIpForwardTable2 = NULL;
+	PMIB_IPFORWARD_TABLE2 pIpForwardTable2 = 0;
 
 	if (GetIpForwardTable2(((family == IPAddress::IPv4) ? AF_INET : AF_INET6), &pIpForwardTable2) != NO_ERROR)
-		throw std::runtime_error("Couldn't fetch routing table");
+		throw RuntimeException("Couldn't fetch routing table.");
 
 	::time(&now);
 
@@ -59,8 +90,9 @@ Route::RouteList Route::list(IPAddress::Family family)
 		IPAddress netmask(pIp2->DestinationPrefix.PrefixLength, family2);
 		IPAddress nexthop(*(struct sockaddr *)&pIp2->NextHop);
 
-		Route route(dest, netmask, nexthop, pIp2->InterfaceIndex, nexthop.isWildcard() ? ROUTE_INDIRECT : ROUTE_INDIRECT);
-		route.setMetric(pIp2->Metric);
+		Route route(dest, netmask, nexthop, pIp2->InterfaceIndex, nexthop.isWildcard() ? ROUTE_DIRECT : ROUTE_INDIRECT);
+		
+		route.setMetric(getCompleteMetric(pIp2));
 		route.setAge(now - pIp2->Age);
 		route.setProto((RouteProto) pIp2->Protocol);
 
