@@ -82,166 +82,169 @@ class RouteHelper;
 class Net_API Route
 {
 public:
-		typedef std::list<Route> RouteList;
+	typedef std::list<Route> RouteList;
 
-		enum RouteType
-		{
-			ROUTE_NONE = 0,
-			ROUTE_OTHER = 1,
-			ROUTE_INVALID = 2,
-			ROUTE_DIRECT = 3,
-			ROUTE_INDIRECT = 4
-		};
+	static const unsigned int ROUTE_METRIC_UNKNOWN = ~0;
+	static const unsigned int ROUTE_MTU_UNKNOWN = 0;
+	static const unsigned int ROUTE_HOPS_UNKNOWN = ~0;
+	static const unsigned int ROUTE_USE_UNKNOWN = ~1;
+	static const unsigned int ROUTE_CREATED_UNKNOWN = 0;
+	
+	enum RouteType
+	{
+		ROUTE_NONE = 0,
+		ROUTE_OTHER = 1,
+		ROUTE_INVALID = 2,
+		ROUTE_DIRECT = 3,
+		ROUTE_INDIRECT = 4
+	};
 
-		enum RouteProto
-		{
-			ROUTE_PROTO_NONE = 0,
-			ROUTE_PROTO_OTHER = 1,
-			ROUTE_PROTO_LOCAL = 2,
-			ROUTE_PROTO_NET_MGMT = 3,
-			ROUTE_PROTO_ICMP = 4,
-			ROUTE_PROTO_EGP = 5,
-			ROUTE_PROTO_GGP = 6,
-			ROUTE_PROTO_HELLO = 7,
-			ROUTE_PROTO_RIP = 8,
-			ROUTE_PROTO_ISIS = 9,
-			ROUTE_PROTO_ESIS = 10,
-			ROUTE_PROTO_CISCO = 11, // EIGRP?
-			ROUTE_PROTO_BBN = 12,
-			ROUTE_PROTO_OSPF = 13,
-			ROUTE_PROTO_BGP = 14,
-		};
+	enum RouteProto
+	{
+		ROUTE_PROTO_NONE = 0,
+		ROUTE_PROTO_OTHER = 1,
+		ROUTE_PROTO_LOCAL = 2,
+		ROUTE_PROTO_NET_MGMT = 3,
+		ROUTE_PROTO_ICMP = 4,
+		ROUTE_PROTO_EGP = 5,
+		ROUTE_PROTO_GGP = 6,
+		ROUTE_PROTO_HELLO = 7,
+		ROUTE_PROTO_RIP = 8,
+		ROUTE_PROTO_ISIS = 9,
+		ROUTE_PROTO_ESIS = 10,
+		ROUTE_PROTO_CISCO = 11, // EIGRP?
+		ROUTE_PROTO_BBN = 12,
+		ROUTE_PROTO_OSPF = 13,
+		ROUTE_PROTO_BGP = 14,
+	};
 
-		~Route();
-			/// Destroys Route.
+	Route(const IPAddress& dst, const IPAddress& netmask, const IPAddress& nextHop, unsigned ifIndex, RouteType type);
+	/// Creates Route.
+	
+	Route(const IPAddress& dst, const IPAddress& netmask, unsigned ifIndex, RouteType type);
+	/// Creates Route.
+	
+	Route(const IPAddress& dst, unsigned prefix, const IPAddress& nextHop, unsigned ifIndex, RouteType type);
+	/// Creates Route.
+	
+	Route(const IPAddress& dst, unsigned prefix, unsigned ifIndex, RouteType type);
+	/// Creates Route.
+	
+	~Route();
+		/// Destroys Route.
 
-		const IPAddress getDest() const;
-			/// Returns destination.
+	const IPAddress getDest() const;
+		/// Returns destination.
 
-		unsigned getPrefix() const;
-			/// Returns prefix.
+	unsigned getPrefix() const;
+		/// Returns prefix.
 
-		const IPAddress getNetmask() const;
-			/// Returns net mask (IPv4 only).
+	const IPAddress getNetmask() const;
+		/// Returns net mask (IPv4 only).
 
-		const IPAddress getNextHop() const;
-			/// Returns next hop.
+	const IPAddress getNextHop() const;
+		/// Returns next hop.
 
-		unsigned getIfIndex() const;
-			/// Returns interface index.
+	unsigned getIfIndex() const;
+		/// Returns interface index.
 
-		const NetworkInterface getNetworkInterface() const;
-			/// Returns netwrok interface.
+	const NetworkInterface getNetworkInterface() const;
+		/// Returns netwrok interface.
 
-		RouteType getType() const;
-			/// Returns route type.
+	RouteType getType() const;
+		/// Returns route type.
 
-		unsigned getMetric() const;
-			/// Returns metric; not available on all platforms.
+	unsigned getMetric() const;
+		/// Returns metric; not available on all platforms.
 
-		unsigned getHops() const;
-			/// Returns hops count; not available on all platforms.
+	unsigned getHops() const;
+		/// Returns hops count; not available on all platforms.
 
-		unsigned getMTU() const;
-			/// Returns MTU; not available on all platforms.
+	unsigned getMTU() const;
+		/// Returns MTU; not available on all platforms.
 
-		unsigned getUsage() const;
-			/// Returns usage; not available on all platforms.
+	unsigned getUsage() const;
+		/// Returns usage; not available on all platforms.
 
-		RouteProto getProto() const;
-			/// Returns proto; not available on all platforms.
+	RouteProto getProto() const;
+		/// Returns proto; not available on all platforms.
 
-		std::time_t getAge() const;
-			/// Returns age; not available on all platforms.
+	std::time_t getAge() const;
+		/// Returns age; not available on all platforms.
 
-		bool validMetric() const;
-			/// Returns true if metric is valid; not available on all platforms.
+	bool validMetric() const;
+		/// Returns true if metric is valid; not available on all platforms.
 
-		bool validHops() const;
-			/// Returns true if hops are valid; not available on all platforms.
+	bool validHops() const;
+		/// Returns true if hops are valid; not available on all platforms.
 
-		bool validMTU() const;
-			/// Returns true if MTU is valid; not available on all platforms.
+	bool validMTU() const;
+		/// Returns true if MTU is valid; not available on all platforms.
 
-		bool validUsage() const;
-			/// Returns true if usage is valid; not available on all platforms.
+	bool validUsage() const;
+		/// Returns true if usage is valid; not available on all platforms.
 
-		bool validProto() const;
-			/// Returns true if proto is valid; not available on all platforms.
+	bool validProto() const;
+		/// Returns true if proto is valid; not available on all platforms.
 
-		bool validAge() const;
-			/// Returns true if age is valid; not available on all platforms.
+	bool validAge() const;
+		/// Returns true if age is valid; not available on all platforms.
 
 
-		bool operator == (const Route& other) const;
-			/// Return strue if this route is equal to other.
+	bool operator == (const Route& other) const;
+		/// Return strue if this route is equal to other.
 
-		bool operator != (const Route& other) const;
-			/// Return strue if this route is not equal to other.
+	bool operator != (const Route& other) const;
+		/// Return strue if this route is not equal to other.
 
-		static RouteList list(IPAddress::Family family);
-			/// Retruns the list of routes.
+	static RouteList list(IPAddress::Family family);
+		/// Retruns the list of routes.
 
-		static RouteList defaults(IPAddress::Family family);
-			/// Returns default routes.
+	static RouteList defaults(IPAddress::Family family);
+		/// Returns default routes.
 
-		static RouteList match(IPAddress target);
-			/// Retruns routes matching target.
+	static RouteList match(IPAddress target);
+		/// Retruns routes matching target.
 
-		static const IPAddress getDefaultAddress(IPAddress::Family family);
-			/// Returns default IP address for the family.
+	static const IPAddress getDefaultAddress(IPAddress::Family family);
+		/// Returns default IP address for the family.
 
-		static std::string protocolName(RouteProto proto);
-			/// Returns protocol as string.
+	static std::string protocolName(RouteProto proto);
+		/// Returns protocol as string.
 
-protected:
-		void setMTU(unsigned mtu);
-			/// Sets the MTU to specified value.
+	void setMTU(unsigned mtu);
+		/// Sets the MTU to specified value.
 
-		void setAge(std::time_t created);
-			/// Sets MTU to specified value.
+	void setAge(std::time_t created);
+		/// Sets MTU to specified value.
 
-		void setProto(RouteProto proto);
-			/// Sets proto to specified value.
+	void setProto(RouteProto proto);
+		/// Sets proto to specified value.
 
-		void setMetric(unsigned metric);
-			/// Sets metric to specified value.
+	void setMetric(unsigned metric);
+		/// Sets metric to specified value.
 
-		void setHops(unsigned hops);
-			/// Sets hops to specified value.
+	void setHops(unsigned hops);
+		/// Sets hops to specified value.
 
-		void setUsage(unsigned use);
-			/// Sets usage to specified value.
+	void setUsage(unsigned use);
+		/// Sets usage to specified value.
 
 private:
-		Route(const IPAddress& dst, const IPAddress& netmask, const IPAddress& nextHop, unsigned ifIndex, RouteType type);
-			/// Creates Route.
+	// portable attributes
+	IPAddress	_dst;
+	IPAddress	_netmask;
+	IPAddress	_nextHop;
+	unsigned	_ifIndex;
+	RouteType	_type;
 
-		Route(const IPAddress& dst, const IPAddress& netmask, unsigned ifIndex, RouteType type);
-			/// Creates Route.
-
-		Route(const IPAddress& dst, unsigned prefix, const IPAddress& nextHop, unsigned ifIndex, RouteType type);
-			/// Creates Route.
-
-		Route(const IPAddress& dst, unsigned prefix, unsigned ifIndex, RouteType type);
-			/// Creates Route.
-
-		// portable attributes
-		IPAddress	_dst;
-		IPAddress	_netmask;
-		IPAddress	_nextHop;
-		unsigned	_ifIndex;
-		RouteType	_type;
-
-		// optional attributes supported on some platforms
-		unsigned	_metric;
-		unsigned	_mtu;
-		unsigned	_hops;
-		unsigned	_use;
-		RouteProto	_proto;
-		Timestamp	_created;
-
-		friend class RouteHelper;
+	// optional attributes supported on some platforms
+	unsigned	_metric;
+	unsigned	_mtu;
+	unsigned	_hops;
+	unsigned	_use;
+	RouteProto	_proto;
+	Timestamp	_created;
 };
 
 

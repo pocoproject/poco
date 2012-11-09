@@ -42,10 +42,10 @@
 
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Net/NetException.h"
-#include <iphlpapi.h>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+	#include <iphlpapi.h>
 	#include "Route_WIN32.cpp"
 #elif defined(POCO_OS_FAMILY_BSD)
 	#include "Route_BSD.cpp"
@@ -57,20 +57,19 @@
 namespace Poco {
 namespace Net {
 
-
+	
 Route::Route(const IPAddress& dst, const IPAddress& netmask, const IPAddress& nextHop, unsigned ifIndex, RouteType type) :
 	_dst(dst),
 	_netmask(netmask),
 	_nextHop(nextHop),
 	_ifIndex(ifIndex),
 	_type(type),
-	// attributes that might not be available on all platforms are set to sentinel values.
-	_metric(~0),
-	_hops(~0),
-	_mtu(0),
-	_use(~1),
+	_metric(ROUTE_METRIC_UNKNOWN),
+	_mtu(ROUTE_MTU_UNKNOWN),
+	_hops(ROUTE_HOPS_UNKNOWN),
+	_use(~ROUTE_USE_UNKNOWN),
 	_proto(ROUTE_PROTO_NONE),
-	_created(0)
+	_created(ROUTE_CREATED_UNKNOWN)
 {
 	if (_dst.family() != _nextHop.family())
 		throw InvalidArgumentException("Destination and nextHop have different families");
@@ -83,13 +82,12 @@ Route::Route(const IPAddress& dst, const IPAddress& netmask, unsigned ifIndex, R
 	_nextHop(IPAddress(dst.family())),
 	_ifIndex(ifIndex),
 	_type(type),
-	// attributes that might not be available on all platforms are set to sentinel values.
-	_metric(~0),
-	_hops(~0),
-	_mtu(0),
-	_use(~1),
+	_metric(ROUTE_METRIC_UNKNOWN),
+	_mtu(ROUTE_MTU_UNKNOWN),
+	_hops(ROUTE_HOPS_UNKNOWN),
+	_use(~ROUTE_USE_UNKNOWN),
 	_proto(ROUTE_PROTO_NONE),
-	_created(0)
+	_created(ROUTE_CREATED_UNKNOWN)
 {
 	if (_dst.family() != _nextHop.family())
 		throw InvalidArgumentException("Destination and nextHop have different families");
@@ -102,17 +100,17 @@ Route::Route(const IPAddress& dst, unsigned prefix, const IPAddress& nextHop, un
 	_nextHop(nextHop),
 	_ifIndex(ifIndex),
 	_type(type),
-	// attributes that might not be available on all platforms are set to sentinel values.
-	_metric(~0),
-	_hops(~0),
-	_mtu(0),
-	_use(~1),
+	_metric(ROUTE_METRIC_UNKNOWN),
+	_mtu(ROUTE_MTU_UNKNOWN),
+	_hops(ROUTE_HOPS_UNKNOWN),
+	_use(~ROUTE_USE_UNKNOWN),
 	_proto(ROUTE_PROTO_NONE),
-	_created(0)
+	_created(ROUTE_CREATED_UNKNOWN)
 {
 	if (_dst.family() != _nextHop.family())
 		throw InvalidArgumentException("Destination and nextHop have different families");
 }
+
 
 Route::Route(const IPAddress& dst, unsigned prefix, unsigned ifIndex, RouteType type) :
 	_dst(dst),
@@ -120,13 +118,12 @@ Route::Route(const IPAddress& dst, unsigned prefix, unsigned ifIndex, RouteType 
 	_nextHop(IPAddress(dst.family())),
 	_ifIndex(ifIndex),
 	_type(type),
-	// attributes that might not be available on all platforms are set to sentinel values.
-	_metric(~0),
-	_hops(~0),
-	_mtu(0),
-	_use(~1),
+	_metric(ROUTE_METRIC_UNKNOWN),
+	_mtu(ROUTE_MTU_UNKNOWN),
+	_hops(ROUTE_HOPS_UNKNOWN),
+	_use(~ROUTE_USE_UNKNOWN),
 	_proto(ROUTE_PROTO_NONE),
-	_created(0)
+	_created(ROUTE_CREATED_UNKNOWN)
 {
 	if (_dst.family() != _nextHop.family())
 		throw InvalidArgumentException("Destination and nextHop have different families");
@@ -167,16 +164,17 @@ void Route::setProto(RouteProto proto)
 Route::RouteList Route::defaults(IPAddress::Family family)
 {
 	Route::RouteList defaults, routes = Route::list(family);
-
-	for (Route::RouteList::const_iterator it = routes.begin();
-		 it != routes.end(); it++) {
+	RouteList::const_iterator it = routes.begin();
+	RouteList::const_iterator end = routes.end();
+	for (; it != end; ++it)
+	{
 		if (it->getPrefix() != 0) continue;
 
 		// look for insertion point
 		Route::RouteList::iterator it2 = defaults.begin();
 		Route::RouteList::const_iterator end = defaults.end();
 		while (it2 != end && it2->getMetric() <= it->getMetric())
-			it2++;
+			++it2;
 		defaults.insert(it2, *it);
 	}
 
@@ -187,17 +185,21 @@ Route::RouteList Route::defaults(IPAddress::Family family)
 Route::RouteList Route::match(IPAddress target)
 {
 	Route::RouteList targets, routes = Route::list(target.family());
-
-	for (Route::RouteList::const_iterator it = routes.begin();
-		 it != routes.end(); it++) {
+	RouteList::const_iterator it = routes.begin();
+	RouteList::const_iterator end = routes.end();
+	for (; it != end; ++it)
+	{
 		if ((target & it->getNetmask()) != it->getDest()) continue;
 
 		// look for insertion point
 		Route::RouteList::iterator it2 = targets.begin();
 		while (it2 != targets.end()
 			&& (it2->getPrefix() > it->getPrefix()
-			 || (it2->getPrefix() == it->getPrefix() && it2->getMetric() <= it->getMetric())))
-			it2++;
+			|| (it2->getPrefix() == it->getPrefix() &&
+				it2->getMetric() <= it->getMetric())))
+		{
+			++it2;
+		}
 		targets.insert(it2, *it);
 	}
 

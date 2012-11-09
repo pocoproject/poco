@@ -41,7 +41,6 @@
 #include <net/route.h>
 #include <sys/sysctl.h>
 #include <netinet/in.h>
-
 #include <string>
 
 
@@ -53,14 +52,20 @@
 					}
 #define ADVANCE(x, n)	(x += ROUNDUP((n)->sa_len))
 
-#define SIN_OFFSET	(offsetof(sockaddr_in,sin_addr))
-#define SIN_LENGTH		(sizeof(struct in_addr))
-#define SIN6_OFFSET	(offsetof(sockaddr_in6,sin6_addr))
-#define SIN6_LENGTH	(sizeof(struct in6_addr))
+#define SIN_OFFSET  (offsetof(sockaddr_in,sin_addr))
+#define SIN_LENGTH  (sizeof(struct in_addr))
+#define SIN6_OFFSET (offsetof(sockaddr_in6,sin6_addr))
+#define SIN6_LENGTH (sizeof(struct in6_addr))
 
 
+
+namespace Poco {
+namespace Net {
+		
+		
 static int seq = rand();
 
+	
 static void get_rtaddrs(unsigned addrs, struct sockaddr *sa, struct sockaddr **rti_info)
 {
 	for (unsigned i = 0; i < RTAX_MAX; i++) {
@@ -73,6 +78,7 @@ static void get_rtaddrs(unsigned addrs, struct sockaddr *sa, struct sockaddr **r
 	}
 }
 
+	
 static IPAddress unpack_sockaddr_inX(struct sockaddr *sa, bool ipv4)
 {
 	const unsigned offset = (ipv4 ? SIN_OFFSET : SIN6_OFFSET);
@@ -90,37 +96,34 @@ static IPAddress unpack_sockaddr_inX(struct sockaddr *sa, bool ipv4)
 
 	return ip;
 }
+	
 
-class RouteHelper {
-public:
-	static Route* createRoute(struct rt_msghdr2 *rtm, struct sockaddr **rti_info);
-
-private:
-	RouteHelper();
-	~RouteHelper();
-};
-
-Route* RouteHelper::createRoute(struct rt_msghdr2 *rtm, struct sockaddr **rti_info)
+static Route createRoute(struct rt_msghdr2 *rtm, struct sockaddr **rti_info)
 {
 	IPAddress dest, netmask, nexthop;
 	int ifIndex = rtm->rtm_index;
 	bool adjacent = false;
 	sa_family_t family = AF_MAX;
-	char macaddr[16];		// should be plenty, right?
+	char macaddr[16];
 
-	for (unsigned i = 0; i < RTAX_MAX; i++) {
+	for (unsigned i = 0; i < RTAX_MAX; i++)
+	{
 		sockaddr* sa = (struct sockaddr*)rti_info[i];
 
-		if (sa == NULL) continue;
+		if (sa == 0) continue;
 
-		switch (i) {
+		switch (i)
+		{
 		case RTAX_DST:
 			poco_assert(sa->sa_family == AF_INET || sa->sa_family == AF_INET6);
 			family = sa->sa_family;
-			if (family == AF_INET) {
+			if (family == AF_INET)
+			{
 				struct sockaddr_in *sin = (struct sockaddr_in *)sa;
 				dest = IPAddress(&sin->sin_addr, SIN_LENGTH);
-			} else {
+			}
+			else
+			{
 				struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)sa;
 				dest = IPAddress(&sin6->sin6_addr, SIN6_LENGTH, rtm->rtm_index);
 			}
@@ -128,27 +131,28 @@ Route* RouteHelper::createRoute(struct rt_msghdr2 *rtm, struct sockaddr **rti_in
 
 		case RTAX_GATEWAY:
 			poco_assert((sa->sa_family == family || sa->sa_family == AF_LINK));
-			switch (sa->sa_family) {
+			switch (sa->sa_family)
+			{
 			case AF_INET:
-			{
-				struct sockaddr_in *sin = (struct sockaddr_in *)sa;
-				nexthop = IPAddress(&sin->sin_addr, SIN_LENGTH);
-				break;
-			}
+				{
+					struct sockaddr_in *sin = (struct sockaddr_in *)sa;
+					nexthop = IPAddress(&sin->sin_addr, SIN_LENGTH);
+					break;
+				}
 			case AF_INET6:
-			{
-				struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)sa;
-				nexthop = IPAddress(&sin6->sin6_addr, SIN6_LENGTH, rtm->rtm_index);
-				break;
-			}
+				{
+					struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)sa;
+					nexthop = IPAddress(&sin6->sin6_addr, SIN6_LENGTH, rtm->rtm_index);
+					break;
+				}
 			case AF_LINK:
-			{
-				struct sockaddr_dl *sdl = (struct sockaddr_dl *)sa;
-				adjacent = true;
-				ifIndex = sdl->sdl_index;
-				memcpy(macaddr, sdl->sdl_data, sdl->sdl_alen);
-				break;
-			}
+				{
+					struct sockaddr_dl *sdl = (struct sockaddr_dl *)sa;
+					adjacent = true;
+					ifIndex = sdl->sdl_index;
+					memcpy(macaddr, sdl->sdl_data, sdl->sdl_alen);
+					break;
+				}
 			default:
 				break;
 			}
@@ -168,28 +172,52 @@ Route* RouteHelper::createRoute(struct rt_msghdr2 *rtm, struct sockaddr **rti_in
 		}
 	}
 
-	if (rtm->rtm_flags & RTF_HOST) {
-		poco_assert(! (rtm->rtm_addrs & RTA_NETMASK));
+	if (rtm->rtm_flags & RTF_HOST)
+	{
+		poco_assert(!(rtm->rtm_addrs & RTA_NETMASK));
 		if (family == AF_INET)
 			netmask = IPAddress(32, IPAddress::IPv4);
 		else
 			netmask = IPAddress(128, IPAddress::IPv6);
 	}
 
-	Route *route;
-
 	if (adjacent)
-		route = new Route(dest, netmask, ifIndex, Route::ROUTE_DIRECT);
+	{
+		Route route(dest, netmask, ifIndex, Route::ROUTE_DIRECT);
+		route.setMTU(rtm->rtm_rmx.rmx_mtu);
+		route.setHops(rtm->rtm_rmx.rmx_hopcount);
+		route.setUsage(rtm->rtm_use);
+		// OSX uses expire, not metric; we reuse metric member here
+		if (rtm->rtm_rmx.rmx_expire)
+		{
+			time_t expTime;
+			if ((expTime = rtm->rtm_rmx.rmx_expire - ::time(0)) > 0)
+				route.setMetric(expTime);
+			else route.setMetric(Route::ROUTE_METRIC_UNKNOWN);
+		}
+		else route.setMetric(Route::ROUTE_METRIC_UNKNOWN);
+		return route;
+	}
 	else
-		route = new Route(dest, netmask, nexthop, ifIndex, Route::ROUTE_INDIRECT);
-
-	route->setMTU(rtm->rtm_rmx.rmx_mtu);
-	route->setHops(rtm->rtm_rmx.rmx_hopcount);
-	route->setUsage(rtm->rtm_use);
-
-	return route;
+	{
+		Route route(dest, netmask, nexthop, ifIndex, Route::ROUTE_INDIRECT);
+		route.setMTU(rtm->rtm_rmx.rmx_mtu);
+		route.setHops(rtm->rtm_rmx.rmx_hopcount);
+		route.setUsage(rtm->rtm_use);
+		// OSX uses expire, not metric; we reuse metric member here
+		if (rtm->rtm_rmx.rmx_expire)
+		{
+			time_t expTime;
+			if ((expTime = rtm->rtm_rmx.rmx_expire - ::time(0)) > 0)
+				route.setMetric(expTime);
+			else route.setMetric(Route::ROUTE_METRIC_UNKNOWN);
+		}
+		else route.setMetric(Route::ROUTE_METRIC_UNKNOWN);
+		return route;
+	}
 }
 
+	
 Route::RouteList Route::list(IPAddress::Family family)
 {
 	Route::RouteList routes;
@@ -208,10 +236,11 @@ Route::RouteList Route::list(IPAddress::Family family)
 	char *buf = new char[needed];
 
 	if (sysctl(mib, 6, buf, &needed, NULL, 0) < 0)
-		throw std::runtime_error("sysctl faield to populate routing table");
+		throw std::runtime_error("sysctl failed to populate routing table");
 
 	struct rt_msghdr2 *rtm = NULL;
-	for (char *next = buf, *lim = &buf[needed]; next < lim; next += rtm->rtm_msglen) {
+	for (char *next = buf, *lim = &buf[needed]; next < lim; next += rtm->rtm_msglen)
+	{
 		rtm = (struct rt_msghdr2 *)next;
 
 		struct sockaddr_in *sin = (struct sockaddr_in*)(rtm + 1);
@@ -224,14 +253,15 @@ Route::RouteList Route::list(IPAddress::Family family)
 		struct sockaddr* rti_info[RTAX_MAX];
 		get_rtaddrs(rtm->rtm_addrs, (struct sockaddr *)sin, rti_info);
 
-		Route *route = RouteHelper::createRoute(rtm, rti_info);
-
 		// RTF_IFSCOPE?
 
-		routes.push_back(route);
+		routes.push_back(createRoute(rtm, rti_info));
 	}
 
 	delete[] buf;
 
 	return routes;
 }
+	
+
+}} // namespace Poco::Net
