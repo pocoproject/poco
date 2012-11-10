@@ -1,9 +1,15 @@
 //
-// NetCoreTestSuite.cpp
+// Error.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/NetCoreTestSuite.cpp#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Error.h#1 $
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Library: Foundation
+// Package: Core
+// Module:  Error
+//
+// Definition of the Error class.
+//
+// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,23 +36,33 @@
 //
 
 
-#include "NetCoreTestSuite.h"
-#include "IPAddressTest.h"
-#include "SocketAddressTest.h"
-#include "DNSTest.h"
-#include "NetworkInterfaceTest.h"
-#include "RouteTest.h"
+#ifndef Foundation_Error_INCLUDED
+#define Foundation_Error_INCLUDED
 
 
-CppUnit::Test* NetCoreTestSuite::suite()
+#include "Poco/Foundation.h"
+
+
+namespace Poco {
+
+
+class Foundation_API Error
+	/// The Error class provides utility functions
+	/// for error reporting.
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NetCoreTestSuite");
+public:
 
-	pSuite->addTest(IPAddressTest::suite());
-	pSuite->addTest(SocketAddressTest::suite());
-	pSuite->addTest(DNSTest::suite());
-	pSuite->addTest(NetworkInterfaceTest::suite());
-	pSuite->addTest(RouteTest::suite());
+#ifdef POCO_OS_FAMILY_WINDOWS
+	static std::string getMessage(DWORD errorCode);
+		/// Utility function translating numeric error code to string.
+#else
+	static std::string getMessage(int errorCode);
+		/// Utility function translating numeric error code to string.
+#endif
+};
 
-	return pSuite;
-}
+
+} // namespace Poco
+
+
+#endif // Foundation_Error_INCLUDED

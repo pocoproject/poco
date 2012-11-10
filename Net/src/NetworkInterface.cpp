@@ -43,6 +43,7 @@
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#if defined(POCO_WIN32_UTF8)
 		#include "Poco/UnicodeConverter.h"
+		#include "Poco/Error.h"
 	#endif
 	#include <iphlpapi.h>
 	#include <ipifcons.h>
@@ -131,7 +132,7 @@ public:
 #endif
 
 	void setUp(bool up);
-	void setMtu(unsigned mtu);
+	void setMTU(unsigned mtu);
 	void setType(Type type);
 	void setIndex(unsigned index);
 	void setPhyParams();
@@ -227,7 +228,7 @@ void NetworkInterfaceImpl::setPhyParams()
 	setFlags(ifr.ifr_flags);
 
 	ds.impl()->ioctl(SIOCGIFMTU, &ifr);
-	setMtu(ifr.ifr_mtu);
+	setMTU(ifr.ifr_mtu);
 #endif
 }
 
@@ -466,7 +467,7 @@ inline void NetworkInterfaceImpl::setUp(bool up)
 }
 
 
-inline void NetworkInterfaceImpl::setMtu(unsigned mtu)
+inline void NetworkInterfaceImpl::setMTU(unsigned mtu)
 {
 	_mtu = mtu;
 }
@@ -892,24 +893,6 @@ IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr,
 }
 
 
-std::string getErrorMessage(DWORD errorCode)
-{
-	std::string errMsg;
-	DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
-	LPWSTR lpMsgBuf = 0;
-	if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
-		UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
-#else
-	LPTSTR lpMsgBuf = 0;
-	if (FormatMessageA(dwFlg, 0, errorCode, 0, (LPTSTR) & lpMsgBuf, 0, NULL))
-		errMsg = lpMsgBuf;
-#endif
-	LocalFree(lpMsgBuf);
-	return errMsg;
-}
-
-
 NetworkInterface::Type fromNative(DWORD type)
 {
 	switch (type) 
@@ -957,7 +940,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		else if (ERROR_NO_DATA == dwRetVal) // no network interfaces found
 			return result;
 		else if (NO_ERROR != dwRetVal) // error occurred
-			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", getErrorMessage(dwRetVal)));
+			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", Error::getMessage(dwRetVal)));
 		else
 			break;
 	} while ((ERROR_BUFFER_OVERFLOW == dwRetVal) && (++iterations <= 2));
@@ -1011,7 +994,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				ifIt = result.insert(Map::value_type(ifIndex, ni)).first;
 		
 			ifIt->second.impl().setFlags(pAddress->Flags, pAddress->IfType);
-			ifIt->second.impl().setMtu(pAddress->Mtu);
+			ifIt->second.impl().setMTU(pAddress->Mtu);
 			ifIt->second.impl().setUp(pAddress->OperStatus == IfOperStatusUp);
 #if (_WIN32_WINNT >= 0x0600) // Vista and newer only
 			ifIt->second.impl().setRunning(pAddress->ReceiveLinkSpeed > 0 || pAddress->TransmitLinkSpeed > 0);

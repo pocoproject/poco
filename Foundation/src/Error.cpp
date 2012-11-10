@@ -1,9 +1,13 @@
 //
-// NetCoreTestSuite.cpp
+// Error.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/NetCoreTestSuite.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Error.cpp#3 $
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Library: Foundation
+// Package: Core
+// Module:  Error
+//
+// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,23 +34,44 @@
 //
 
 
-#include "NetCoreTestSuite.h"
-#include "IPAddressTest.h"
-#include "SocketAddressTest.h"
-#include "DNSTest.h"
-#include "NetworkInterfaceTest.h"
-#include "RouteTest.h"
+#include "Poco/Foundation.h"
+#include "Poco/UnicodeConverter.h"
+#include "Poco/Error.h"
+#include <string>
 
 
-CppUnit::Test* NetCoreTestSuite::suite()
-{
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NetCoreTestSuite");
+namespace Poco {
 
-	pSuite->addTest(IPAddressTest::suite());
-	pSuite->addTest(SocketAddressTest::suite());
-	pSuite->addTest(DNSTest::suite());
-	pSuite->addTest(NetworkInterfaceTest::suite());
-	pSuite->addTest(RouteTest::suite());
 
-	return pSuite;
-}
+#ifdef POCO_OS_FAMILY_WINDOWS
+
+	std::string Error::getMessage(DWORD errorCode)
+	{
+		std::string errMsg;
+		DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
+	#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+		LPWSTR lpMsgBuf = 0;
+		if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
+			UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
+	#else
+		LPTSTR lpMsgBuf = 0;
+		if (FormatMessageA(dwFlg, 0, errorCode, 0, (LPTSTR) & lpMsgBuf, 0, NULL))
+			errMsg = lpMsgBuf;
+	#endif
+		LocalFree(lpMsgBuf);
+		return errMsg;
+	}
+
+#else
+
+	std::string Error::getMessage(int errorCode)
+	{
+#error todo
+		char errmsg[256];
+		return std::string(strerror_r(errorCode, errMsg, 256));
+	}
+
+#endif
+
+
+} // namespace Poco
