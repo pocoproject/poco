@@ -1,7 +1,7 @@
 //
 // WebSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/WebSocketTest.cpp#2 $
+// $Id: //poco/1.4/Net/testsuite/src/WebSocketTest.cpp#3 $
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -107,6 +107,16 @@ namespace
 
 WebSocketTest::WebSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
+}
+
+
+WebSocketTest::~WebSocketTest()
+{
+}
+
+
+void WebSocketTest::testWebSocket()
+{
 	Poco::Net::ServerSocket ss(0);
 	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
 	server.start();
@@ -117,11 +127,39 @@ WebSocketTest::WebSocketTest(const std::string& name): CppUnit::TestCase(name)
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
-	std::string payload("Hello, world!");
+
+	std::string payload("x");
 	ws.sendFrame(payload.data(), payload.size());
 	char buffer[1024];
 	int flags;
 	int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+	assert (n == payload.size());
+	assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+	assert (flags == WebSocket::FRAME_TEXT);
+
+	for (int i = 2; i < 20; i++)
+	{
+		payload.assign(i, 'x');
+		ws.sendFrame(payload.data(), payload.size());
+		n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+		assert (n == payload.size());
+		assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+		assert (flags == WebSocket::FRAME_TEXT);
+	}
+
+	for (int i = 125; i < 129; i++)
+	{
+		payload.assign(i, 'x');
+		ws.sendFrame(payload.data(), payload.size());
+		n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+		assert (n == payload.size());
+		assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+		assert (flags == WebSocket::FRAME_TEXT);
+	}
+
+	payload = "Hello, world!";
+	ws.sendFrame(payload.data(), payload.size());
+	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 	assert (n == payload.size());
 	assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
 	assert (flags == WebSocket::FRAME_TEXT);
@@ -139,16 +177,6 @@ WebSocketTest::WebSocketTest(const std::string& name): CppUnit::TestCase(name)
 	assert ((flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CLOSE);
 	
 	server.stop();
-}
-
-
-WebSocketTest::~WebSocketTest()
-{
-}
-
-
-void WebSocketTest::testWebSocket()
-{
 }
 
 

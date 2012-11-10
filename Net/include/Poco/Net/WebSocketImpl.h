@@ -1,7 +1,7 @@
 //
 // WebSocketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocketImpl.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/WebSocketImpl.h#5 $
 //
 // Library: Net
 // Package: WebSocket
@@ -93,6 +93,7 @@ protected:
 		MAX_HEADER_LENGTH = 14
 	};
 	
+	int receiveNBytes(void* buffer, int bytes);
 	virtual ~WebSocketImpl();
 
 private:
