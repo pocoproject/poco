@@ -1,7 +1,7 @@
 //
 // Symbol.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Symbol.cpp#1 $
+// $Id: //poco/1.4/CppParser/src/Symbol.cpp#2 $
 //
 // Library: CppParser
 // Package: SymbolTable
@@ -160,8 +160,27 @@ std::string Symbol::extractName(const std::string& decl)
 	if (pos == std::string::npos || (pos > 0 && decl[pos - 1] == '('))
 		pos = decl.size();
 	--pos;
-	// check for constant
-	std::string::size_type eqPos = decl.find('=');
+	// check for constant; start searching after template
+	std::string::size_type eqStart = 0;
+	if (decl.compare(0, 8, "template") == 0)
+	{
+		eqStart = 8;
+		while (std::isspace(decl[eqStart]) && eqStart < decl.size()) ++eqStart;
+		if (eqStart < decl.size() && decl[eqStart] == '<')
+		{
+			++eqStart;
+			int tc = 1;
+			while (tc > 0 && eqStart < decl.size())
+			{
+				if (decl[eqStart] == '<')
+					++tc;
+				else if (decl[eqStart] == '>')
+					--tc;
+				++eqStart;
+			}
+		}
+	}
+	std::string::size_type eqPos = decl.find('=', eqStart);
 	if (eqPos != std::string::npos)
 	{
 		// special case: default template parameter
