@@ -1,7 +1,7 @@
 //
 // FileChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FileChannel.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/FileChannel.cpp#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -39,6 +39,7 @@
 #include "Poco/RotateStrategy.h"
 #include "Poco/PurgeStrategy.h"
 #include "Poco/Message.h"
+#include "Poco/NumberParser.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTime.h"
 #include "Poco/LocalDateTime.h"
@@ -47,23 +48,25 @@
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
 
+
 namespace Poco {
 
 
-const std::string FileChannel::PROP_PATH       = "path";
-const std::string FileChannel::PROP_ROTATION   = "rotation";
-const std::string FileChannel::PROP_ARCHIVE    = "archive";
-const std::string FileChannel::PROP_TIMES      = "times";
-const std::string FileChannel::PROP_COMPRESS   = "compress";
-const std::string FileChannel::PROP_PURGEAGE   = "purgeAge";
-const std::string FileChannel::PROP_PURGECOUNT = "purgeCount";
-const std::string FileChannel::PROP_FLUSH      = "flush ";
-
+const std::string FileChannel::PROP_PATH         = "path";
+const std::string FileChannel::PROP_ROTATION     = "rotation";
+const std::string FileChannel::PROP_ARCHIVE      = "archive";
+const std::string FileChannel::PROP_TIMES        = "times";
+const std::string FileChannel::PROP_COMPRESS     = "compress";
+const std::string FileChannel::PROP_PURGEAGE     = "purgeAge";
+const std::string FileChannel::PROP_PURGECOUNT   = "purgeCount";
+const std::string FileChannel::PROP_FLUSH        = "flush	";
+const std::string FileChannel::PROP_ROTATEONOPEN = "rotateOnOpen";
 
 FileChannel::FileChannel(): 
 	_times("utc"),
 	_compress(false),
 	_flush(true),
+	_rotateOnOpen(false),
 	_pFile(0),
 	_pRotateStrategy(0),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
@@ -77,6 +80,7 @@ FileChannel::FileChannel(const std::string& path):
 	_times("utc"),
 	_compress(false),
 	_flush(true),
+	_rotateOnOpen(false),
 	_pFile(0),
 	_pRotateStrategy(0),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
@@ -101,6 +105,18 @@ void FileChannel::open()
 	if (!_pFile)
 	{
 		_pFile = new LogFile(_path);
+		if (_rotateOnOpen && _pFile->size() > 0)
+		{
+			try
+			{
+				_pFile = _pArchiveStrategy->archive(_pFile);
+				purge();
+			}
+			catch (...)
+			{
+				_pFile = new LogFile(_path);
+			}
+		}
 	}
 }
 
@@ -168,6 +184,8 @@ void FileChannel::setProperty(const std::string& name, const std::string& value)
 		setPurgeCount(value);
 	else if (name == PROP_FLUSH)
 		setFlush(value);
+	else if (name == PROP_ROTATEONOPEN)
+		setRotateOnOpen(value);
 	else
 		Channel::setProperty(name, value);
 }
@@ -191,6 +209,8 @@ std::string FileChannel::getProperty(const std::string& name) const
 		return _purgeCount;
 	else if (name == PROP_FLUSH)
 		return std::string(_flush ? "true" : "false");
+	else if (name == PROP_ROTATEONOPEN)
+		return std::string(_rotateOnOpen ? "true" : "false");
 	else
 		return Channel::getProperty(name);
 }
@@ -230,6 +250,7 @@ void FileChannel::setRotation(const std::string& rotation)
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	std::string unit;
 	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
+	
 	RotateStrategy* pStrategy = 0;
 	if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
 	{
@@ -306,28 +327,14 @@ void FileChannel::setCompress(const std::string& compress)
 
 void FileChannel::setPurgeAge(const std::string& age)
 {
-	delete _pPurgeStrategy;
-	_pPurgeStrategy = 0;
-	_purgeAge = "none";
-	if (age.empty() || 0 == icompare(age, "none"))
-		return;
-
-	std::string::const_iterator it = age.begin();
+	std::string::const_iterator it  = age.begin();
 	std::string::const_iterator end = age.end();
-
 	int n = 0;
-	while (it != end && Ascii::isSpace(*it))
-		++it;
-	while (it != end && Ascii::isDigit(*it))
-	{
-		n *= 10;
-		n += *it++ - '0';
-	}
-	while (it != end && Ascii::isSpace(*it))
-		++it;
+	while (it != end && Ascii::isSpace(*it)) ++it;
+	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+	while (it != end && Ascii::isSpace(*it)) ++it;
 	std::string unit;
-	while (it != end && Ascii::isAlpha(*it))
-		unit += *it++;
+	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
 	
 	Timespan::TimeDiff factor = Timespan::SECONDS;
 	if (unit == "minutes")
@@ -339,15 +346,28 @@ void FileChannel::setPurgeAge(const std::string& age)
 	else if (unit == "weeks")
 		factor = 7*Timespan::DAYS;
 	else if (unit == "months")
-		factor = 30 * Timespan::DAYS;
+		factor = 30*Timespan::DAYS;
 	else if (unit != "seconds")
 		throw InvalidArgumentException("purgeAge", age);
-
-	if (0 == n)
-		throw InvalidArgumentException("Zero is not valid purge age.");
-
-	_pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor * n));
+		
+	delete _pPurgeStrategy;
+	_pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor*n));
 	_purgeAge = age;
+}
+
+
+void FileChannel::setPurgeCount(const std::string& count)
+{
+	std::string::const_iterator it  = count.begin();
+	std::string::const_iterator end = count.end();
+	int n = 0;
+	while (it != end && Ascii::isSpace(*it)) ++it;
+	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+	while (it != end && Ascii::isSpace(*it)) ++it;
+
+	delete _pPurgeStrategy;
+	_pPurgeStrategy = new PurgeByCountStrategy(n);
+	_purgeCount = count;
 }
 
 
@@ -357,33 +377,9 @@ void FileChannel::setFlush(const std::string& flush)
 }
 
 
-void FileChannel::setPurgeCount(const std::string& count)
+void FileChannel::setRotateOnOpen(const std::string& rotateOnOpen)
 {
-	delete _pPurgeStrategy;
-	_pPurgeStrategy = 0;
-	_purgeAge = "none";
-	if (count.empty() || 0 == icompare(count, "none"))
-		return;
-
-	int n = 0;
-	std::string::const_iterator it = count.begin();
-	std::string::const_iterator end = count.end();
-
-	while (it != end && Ascii::isSpace(*it))
-		++it;
-	while (it != end && Ascii::isDigit(*it))
-	{
-		n *= 10;
-		n += *it++ - '0';
-	}
-	while (it != end && Ascii::isSpace(*it))
-		++it;
-
-	if (0 == n)
-		throw InvalidArgumentException("Zero is not valid purge count.");
-
-	_pPurgeStrategy = new PurgeByCountStrategy(n);
-	_purgeCount = count;
+	_rotateOnOpen = icompare(rotateOnOpen, "true") == 0;
 }
 
 
