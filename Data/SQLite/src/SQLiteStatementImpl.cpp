@@ -194,12 +194,12 @@ void SQLiteStatementImpl::bindImpl()
 
 	if (_bindBegin != bindings().end())
 	{
-		_affectedRowCount = (*_bindBegin)->numOfRowsHandled();
+		std::size_t boundRowCount = (*_bindBegin)->numOfRowsHandled();
 
 		Bindings::iterator oldBegin = _bindBegin;
 		for (std::size_t pos = 1; _bindBegin != bindEnd && (*_bindBegin)->canBind(); ++_bindBegin)
 		{
-			if (_affectedRowCount != (*_bindBegin)->numOfRowsHandled())
+			if (boundRowCount != (*_bindBegin)->numOfRowsHandled())
 				throw BindingException("Size mismatch in Bindings. All Bindings MUST have the same size");
 
 			(*_bindBegin)->bind(pos);
