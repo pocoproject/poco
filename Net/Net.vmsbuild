@@ -1,7 +1,0 @@
-#
-# Net.vmsbuild
-#
-# $Id: //poco/1.4/Net/Net.vmsbuild#1 $
-#
-LIB=PocoNet
-<SourceFilesHere>

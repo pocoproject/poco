@@ -1,8 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/Main/Net/samples/SMTPLogger/SMTPLogger.vmsbuild#1 $
-#
-EXE=SMTPLogger
-SMTPLogger
-<SourceFilesHere>
