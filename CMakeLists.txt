@@ -143,6 +143,11 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
   add_definitions( -D_BSD_SOURCE -library=stlport4)
 endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 
+# iOS
+if (IOS)
+  add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_STAT64 -DPOCO_NO_SHAREDLIBS -DPOCO_NO_NET_IFTYPES )
+endif(IOS)
+
 IF (ENABLE_TESTS)
    add_subdirectory(CppUnit)
 ENDIF ()
