@@ -68,7 +68,7 @@ Thumbs.db
 *.manifest
 *.tlog
 *.lastbuildstate
-*.unsuccesfulbuild
+*.unsuccessfulbuild
 release_shared/
 debug_share/
 release_static/
