@@ -28,7 +28,7 @@ objects = \
 	FTPClientSession FTPStreamFactory PartHandler PartSource NullPartHandler \
 	SocketReactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
 	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
-	RawSocket RawSocketImpl Route ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
+	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
 	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
 	WebSocket WebSocketImpl

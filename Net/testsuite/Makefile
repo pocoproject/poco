@@ -24,7 +24,7 @@ objects = \
 	SocketReactorTest ReactorTestSuite \
 	MailTestSuite MailMessageTest MailStreamTest \
 	SMTPClientSessionTest POP3ClientSessionTest \
-	RawSocketTest RouteTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
+	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
 	WebSocketTest WebSocketTestSuite \
 	SyslogTest
 
