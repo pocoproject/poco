@@ -1,0 +1,23 @@
+# Set default behaviour, in case users don't have core.autocrlf set.
+* text=auto
+
+# Explicitly declare text files we want to always be normalized and converted 
+# to native line endings on checkout.
+*.cpp text
+*.c text
+*.h text
+*.cmd text 
+*.sln text 
+*.vcproj text 
+*.vcxproj text 
+*.vcxproj.filters text 
+*.page text
+*.html text
+*.css text
+
+# Denote all files that are truly binary and should not be modified.
+*.bin binary
+*.mc binary
+*.png binary
+*.jpg binary
+*.gif binary
