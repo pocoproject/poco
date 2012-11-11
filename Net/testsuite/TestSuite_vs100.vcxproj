@@ -304,7 +304,6 @@
     <ClInclude Include="src\IPAddressTest.h" />
     <ClInclude Include="src\NetCoreTestSuite.h" />
     <ClInclude Include="src\NetworkInterfaceTest.h" />
-    <ClInclude Include="src\RouteTest.h" />
     <ClInclude Include="src\SocketAddressTest.h" />
     <ClInclude Include="src\NetTestSuite.h" />
     <ClInclude Include="src\DatagramSocketTest.h" />
@@ -362,7 +361,6 @@
     <ClCompile Include="src\IPAddressTest.cpp" />
     <ClCompile Include="src\NetCoreTestSuite.cpp" />
     <ClCompile Include="src\NetworkInterfaceTest.cpp" />
-    <ClCompile Include="src\RouteTest.cpp" />
     <ClCompile Include="src\SocketAddressTest.cpp" />
     <ClCompile Include="src\NetTestSuite.cpp" />
     <ClCompile Include="src\WinDriver.cpp" />

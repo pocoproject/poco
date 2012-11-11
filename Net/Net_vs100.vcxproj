@@ -273,7 +273,6 @@
     <ClInclude Include="include\Poco\Net\Net.h" />
     <ClInclude Include="include\Poco\Net\NetException.h" />
     <ClInclude Include="include\Poco\Net\NetworkInterface.h" />
-    <ClInclude Include="include\Poco\Net\Route.h" />
     <ClInclude Include="include\Poco\Net\SocketAddress.h" />
     <ClInclude Include="include\Poco\Net\SocketDefs.h" />
     <ClInclude Include="include\Poco\Net\DatagramSocket.h" />
@@ -370,31 +369,6 @@
     <ClCompile Include="src\IPAddress.cpp" />
     <ClCompile Include="src\NetException.cpp" />
     <ClCompile Include="src\NetworkInterface.cpp" />
-    <ClCompile Include="src\Route.cpp" />
-    <ClCompile Include="src\Route_BSD.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Route_Linux.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Route_WIN32.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="src\SocketAddress.cpp" />
     <ClCompile Include="src\DatagramSocket.cpp" />
     <ClCompile Include="src\DatagramSocketImpl.cpp" />
