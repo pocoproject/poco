@@ -1,13 +1,29 @@
-﻿This is the changelog file for the POCO C++ Libraries.
+This is the changelog file for the POCO C++ Libraries.
 
-
-Release 1.4.4p1 (2012-??-??)
+Release 1.4.5 (2012-11-12)
 ==========================
 
+- added Visual Studio 2012 project files
+- buildwin.cmd now support building with msbuild for VS2010 and 2012.
+- added Poco::Optional class
 - fixed SF# 3558012 Compilation fails when building with -ansi or -std=c++0x
 - fixed SF# 3563517 Get rid of loss-of-precision warnings on x64 MacOS
 - fixed SF#3562244: Portability fix for AF_LINK
-- fixed SF #3562400: DatagramSocketImpl'comment is faile
+- fixed SF #3562400: DatagramSocketImpl comment 
+- fixed SF# 594: Websocket fails with small masked payloads
+- fixed SF# 588: Missing POCO_ARCH and POCO_ARCH_LITTLE_ENDIAN define for WinCE on SH4
+- fixed SF# 581: Out-of-bound array access in Unicode::properties() function.
+- fixed SF# 590: Segfault on FreeBSD when stack size not rounded
+- fixed SF# 586: Poco::DateTimeParser and ISO8601 issues when seconds fraction has more than 6 digits
+- Poco::Net::HTTPSSessionInstantiator::registerInstantiator() now optionally accepts a 
+  Poco::Net::Context object.
+- added Poco::XML::XMLWriter::depth() member function.
+- added Poco::XML::XMLWriter::uniquePrefix() and Poco::XML::XMLWriter::isNamespaceMapped().
+- Poco::FileChannel now supports a new rotateOnOpen property (true/false) which can be used
+  to force rotation of the log file when it's opened.
+- fixed a bug in Poco::XML::XMLWriter::emptyElement(): need to pop namespace context
+- OS X builds now use Clang as default compiler
+- Updated SQLite to 3.7.14.1
 
 
 Release 1.4.4 (2012-09-03)
@@ -1762,4 +1778,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#66 $
+$Id: //poco/1.4/dist/CHANGELOG#68 $

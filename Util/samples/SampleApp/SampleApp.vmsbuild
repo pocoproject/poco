@@ -1,7 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/1.4/Util/samples/SampleApp/SampleApp.vmsbuild#1 $
-#
-EXE=SampleApp
-SampleApp

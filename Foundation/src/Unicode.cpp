@@ -1,7 +1,7 @@
 //
 // Unicode.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Unicode.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Unicode.cpp#2 $
 //
 // Library: Foundation
 // Package: Text
@@ -49,6 +49,7 @@ namespace Poco {
 
 void Unicode::properties(int ch, CharacterProperties& props)
 {
+	if (ch > UCP_MAX_CODEPOINT) ch = 0;
 	const ucd_record* ucd = GET_UCD(ch);
 	props.category = static_cast<CharacterCategory>(_pcre_ucp_gentype[ucd->chartype]);
 	props.type     = static_cast<CharacterType>(ucd->chartype);

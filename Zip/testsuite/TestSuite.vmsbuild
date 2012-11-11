@@ -1,9 +1,0 @@
-#
-# TestSuite.vmsbuild
-#
-# $Id: //poco/1.4/Zip/testsuite/TestSuite.vmsbuild#1 $
-#
-EXE=TestRunner
-ZipTestSuite
-Driver
-<SourceFilesHere>

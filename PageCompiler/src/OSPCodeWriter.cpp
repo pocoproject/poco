@@ -1,7 +1,7 @@
 //
 // OSPCodeWriter.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/OSPCodeWriter.cpp#2 $
+// $Id: //poco/1.4/PageCompiler/src/OSPCodeWriter.cpp#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -64,15 +64,19 @@ void OSPCodeWriter::writeHandlerClass(std::ostream& ostr)
 
 void OSPCodeWriter::writeHandlerMembers(std::ostream& ostr)
 {
-	ostr << "\n";
-	ostr << "protected:\n";
-	ostr << "\tPoco::OSP::BundleContext::Ptr context() const\n";
-	ostr << "\t{\n";
-	ostr << "\t\treturn _pContext;\n";
-	ostr << "\t}\n";
-	ostr << "\n";
-	ostr << "private:\n";
-	ostr << "\tPoco::OSP::BundleContext::Ptr _pContext;\n";
+	std::string base(page().get("page.baseClass", ""));
+	if (base.empty())
+	{
+		ostr << "\n";
+		ostr << "protected:\n";
+		ostr << "\tPoco::OSP::BundleContext::Ptr context() const\n";
+		ostr << "\t{\n";
+		ostr << "\t\treturn _pContext;\n";
+		ostr << "\t}\n";
+		ostr << "\n";
+		ostr << "private:\n";
+		ostr << "\tPoco::OSP::BundleContext::Ptr _pContext;\n";
+	}
 }
 
 
@@ -97,9 +101,16 @@ void OSPCodeWriter::writeImplIncludes(std::ostream& ostr)
 
 void OSPCodeWriter::writeConstructor(std::ostream& ostr)
 {
-	std::string base(page().get("page.baseClass", "Poco::Net::HTTPRequestHandler"));
+	std::string base(page().get("page.baseClass", ""));
 	ostr << clazz() << "::" << clazz() << "(Poco::OSP::BundleContext::Ptr pContext):\n";
-	ostr << "\t_pContext(pContext)\n";
+	if (base.empty())
+	{
+		ostr << "\t_pContext(pContext)\n";
+	}
+	else
+	{
+		ostr << "\t" << base << "(pContext)\n";
+	}
 	ostr << "{\n}\n";
 	ostr << "\n\n";
 }

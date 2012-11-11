@@ -1,7 +1,7 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#4 $
+// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -123,6 +123,11 @@
 #endif
 
 
+#if !defined(POCO_OS)
+	#error "Unknown Platform."
+#endif
+
+
 //
 // Hardware Architecture and Byte Order
 //
@@ -188,9 +193,9 @@
 #elif defined(__s390__)
 	#define POCO_ARCH POCO_ARCH_S390
 	#define POCO_ARCH_BIG_ENDIAN 1
-#elif defined(__sh__) || defined(__sh)
+#elif defined(__sh__) || defined(__sh) || defined(SHx) || defined(_SHX_)
 	#define POCO_ARCH POCO_ARCH_SH
-	#if defined(__LITTLE_ENDIAN__)
+	#if defined(__LITTLE_ENDIAN__) || (POCO_OS == POCO_OS_WINDOWS_CE)
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#else
 		#define POCO_ARCH_BIG_ENDIAN 1
@@ -203,6 +208,11 @@
 		#define POCO_ARCH_BIG_ENDIAN 1
 	#endif
 
+#endif
+
+
+#if !defined(POCO_ARCH)
+	#error "Unknown Hardware Architecture."
 #endif
 
 

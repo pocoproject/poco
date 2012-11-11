@@ -1,8 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/1.4/XML/samples/DOMWriter/DOMWriter.vmsbuild#1 $
-#
-EXE=DOMWriter
-DOMWriter
-<SourceFilesHere>

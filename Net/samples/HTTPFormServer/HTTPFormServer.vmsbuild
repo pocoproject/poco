@@ -1,8 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/1.4/Net/samples/HTTPFormServer/HTTPFormServer.vmsbuild#1 $
-#
-EXE=HTTPFormServer
-HTTPFormServer
-<SourceFilesHere>

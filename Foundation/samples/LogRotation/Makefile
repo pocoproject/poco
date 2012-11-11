@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id$
+# $Id: //poco/1.4/Foundation/samples/LogRotation/Makefile#1 $
 #
 # Makefile for Poco LogRotation
 #

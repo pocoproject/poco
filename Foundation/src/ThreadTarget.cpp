@@ -1,7 +1,7 @@
 //
 // ThreadTarget.cpp
 //
-// $Id$
+// $Id: //poco/1.4/Foundation/src/ThreadTarget.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading

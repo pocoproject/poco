@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug_shared|x64">
+      <Configuration>debug_shared</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="debug_static_md|x64">
+      <Configuration>debug_static_md</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="debug_static_mt|x64">
+      <Configuration>debug_static_mt</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_shared|x64">
+      <Configuration>release_shared</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_static_md|x64">
+      <Configuration>release_static_md</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_static_mt|x64">
+      <Configuration>release_static_mt</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Data</ProjectName>
+    <ProjectGuid>{240E83C3-368D-11DB-9FBC-00123FC423B5}</ProjectGuid>
+    <RootNamespace>Data</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings"/>
+  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;" Label="PropertySheets">
+    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  </ImportGroup>
+  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;" Label="PropertySheets">
+    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  </ImportGroup>
+  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;" Label="PropertySheets">
+    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  </ImportGroup>
+  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;" Label="PropertySheets">
+    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  </ImportGroup>
+  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;" Label="PropertySheets">
+    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  </ImportGroup>
+  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;" Label="PropertySheets">
+    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">..\bin64\</OutDir>
+    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">obj64\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">true</LinkIncremental>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">..\bin64\</OutDir>
+    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">obj64\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">false</LinkIncremental>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">..\lib64\</OutDir>
+    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">obj64\$(Configuration)\</IntDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">..\lib64\</OutDir>
+    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">obj64\$(Configuration)\</IntDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">..\lib64\</OutDir>
+    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">obj64\$(Configuration)\</IntDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">..\lib64\</OutDir>
+    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">obj64\$(Configuration)\</IntDir>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">PocoData64d</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">PocoDatamdd</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">PocoDatamtd</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">PocoData64</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">PocoDatamd</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">PocoDatamt</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;Data_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader/>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\bin64\PocoData64d.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>..\bin64\PocoData64d.pdb</ProgramDatabaseFile>
+      <AdditionalLibraryDirectories>..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <ImportLibrary>..\lib64\PocoDatad.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;Data_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader/>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat/>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\bin64\PocoData64.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <ImportLibrary>..\lib64\PocoData.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader/>
+      <ProgramDataBaseFileName>..\lib64\PocoDatamtd.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>..\lib64\PocoDatamtd.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader/>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat/>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>..\lib64\PocoDatamt.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader/>
+      <ProgramDataBaseFileName>..\lib64\PocoDatamdd.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>..\lib64\PocoDatamdd.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader/>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat/>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>..\lib64\PocoDatamd.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\Data\AbstractBinder.h"/>
+    <ClInclude Include="include\Poco\Data\AbstractBinding.h"/>
+    <ClInclude Include="include\Poco\Data\AbstractExtraction.h"/>
+    <ClInclude Include="include\Poco\Data\AbstractExtractor.h"/>
+    <ClInclude Include="include\Poco\Data\AbstractPreparation.h"/>
+    <ClInclude Include="include\Poco\Data\AbstractPrepare.h"/>
+    <ClInclude Include="include\Poco\Data\AbstractSessionImpl.h"/>
+    <ClInclude Include="include\Poco\Data\Binding.h"/>
+    <ClInclude Include="include\Poco\Data\BLOB.h"/>
+    <ClInclude Include="include\Poco\Data\BLOBStream.h"/>
+    <ClInclude Include="include\Poco\Data\Column.h"/>
+    <ClInclude Include="include\Poco\Data\Common.h"/>
+    <ClInclude Include="include\Poco\Data\Connector.h"/>
+    <ClInclude Include="include\Poco\Data\Data.h"/>
+    <ClInclude Include="include\Poco\Data\DataException.h"/>
+    <ClInclude Include="include\Poco\Data\Extraction.h"/>
+    <ClInclude Include="include\Poco\Data\Limit.h"/>
+    <ClInclude Include="include\Poco\Data\MetaColumn.h"/>
+    <ClInclude Include="include\Poco\Data\Prepare.h"/>
+    <ClInclude Include="include\Poco\Data\Range.h"/>
+    <ClInclude Include="include\Poco\Data\RecordSet.h"/>
+    <ClInclude Include="include\Poco\Data\Session.h"/>
+    <ClInclude Include="include\Poco\Data\SessionFactory.h"/>
+    <ClInclude Include="include\Poco\Data\SessionImpl.h"/>
+    <ClInclude Include="include\Poco\Data\Statement.h"/>
+    <ClInclude Include="include\Poco\Data\StatementCreator.h"/>
+    <ClInclude Include="include\Poco\Data\StatementImpl.h"/>
+    <ClInclude Include="include\Poco\Data\TypeHandler.h"/>
+    <ClInclude Include="include\Poco\Data\PooledSessionHolder.h"/>
+    <ClInclude Include="include\Poco\Data\PooledSessionImpl.h"/>
+    <ClInclude Include="include\Poco\Data\SessionPool.h"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AbstractBinder.cpp"/>
+    <ClCompile Include="src\AbstractBinding.cpp"/>
+    <ClCompile Include="src\AbstractExtraction.cpp"/>
+    <ClCompile Include="src\AbstractExtractor.cpp"/>
+    <ClCompile Include="src\AbstractPreparation.cpp"/>
+    <ClCompile Include="src\AbstractPrepare.cpp"/>
+    <ClCompile Include="src\BLOB.cpp"/>
+    <ClCompile Include="src\BLOBStream.cpp"/>
+    <ClCompile Include="src\Connector.cpp"/>
+    <ClCompile Include="src\DataException.cpp"/>
+    <ClCompile Include="src\Limit.cpp"/>
+    <ClCompile Include="src\MetaColumn.cpp"/>
+    <ClCompile Include="src\Range.cpp"/>
+    <ClCompile Include="src\RecordSet.cpp"/>
+    <ClCompile Include="src\Session.cpp"/>
+    <ClCompile Include="src\SessionFactory.cpp"/>
+    <ClCompile Include="src\SessionImpl.cpp"/>
+    <ClCompile Include="src\Statement.cpp"/>
+    <ClCompile Include="src\StatementCreator.cpp"/>
+    <ClCompile Include="src\StatementImpl.cpp"/>
+    <ClCompile Include="src\PooledSessionHolder.cpp"/>
+    <ClCompile Include="src\PooledSessionImpl.cpp"/>
+    <ClCompile Include="src\SessionPool.cpp"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">true</ExcludedFromBuild>
+    </ResourceCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <ImportGroup Label="ExtensionTargets"/>
+</Project>

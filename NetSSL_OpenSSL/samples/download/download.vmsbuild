@@ -1,8 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/Main/template/sample.vmsbuild#3 $
-#
-EXE=download
-download
-<SourceFilesHere>
