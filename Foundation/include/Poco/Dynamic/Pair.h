@@ -90,10 +90,15 @@ public:
 	}
 
 	Pair& swap(Pair& other)
+
 		/// Swaps the content of the two Pairs.
+
 	{
+
 		std::swap(_data, other._data);
+
 		return *this;
+
 	}
 
 	Pair& operator = (const Pair& other)

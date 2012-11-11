@@ -87,6 +87,7 @@ namespace Poco {
 	#endif //POCO_NO_WSTRING
 //#endif // POCO_ENABLE_CPP11
 
+
 } // namespace Poco
 
 

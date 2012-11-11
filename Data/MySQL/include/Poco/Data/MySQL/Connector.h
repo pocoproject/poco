@@ -39,12 +39,15 @@
 #ifndef Data_MySQL_Connector_INCLUDED
 #define Data_MySQL_Connector_INCLUDED
 
+
 #include "MySQL.h"
 #include "Poco/Data/Connector.h"
+
 
 namespace Poco {
 namespace Data {
 namespace MySQL {
+
 
 class MySQL_API Connector: public Poco::Data::Connector
 	/// Connector instantiates MySQL SessionImpl objects.

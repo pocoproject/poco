@@ -40,13 +40,14 @@
 #define Util_JSONConfiguration_INCLUDED
 
 
-#include <istream>
-
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/JSON/Object.h"
+#include <istream>
+
 
 namespace Poco {
 namespace Util {
+
 
 class Util_API JSONConfiguration : public AbstractConfiguration
 	/// This configuration class extracts configuration properties
@@ -153,6 +154,7 @@ private:
 
  	JSON::Object::Ptr _object;
 };
+
 
 } } // namespace Poco::Util
 

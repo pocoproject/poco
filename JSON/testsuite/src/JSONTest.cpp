@@ -33,7 +33,6 @@
 #include "JSONTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Query.h"
@@ -41,14 +40,13 @@
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/JSON/DefaultHandler.h"
 #include "Poco/JSON/Template.h"
-
 #include "Poco/Path.h"
 #include "Poco/Environment.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
 #include "Poco/Glob.h"
-
 #include <set>
+
 
 using namespace Poco::JSON;
 using namespace Poco::Dynamic;
