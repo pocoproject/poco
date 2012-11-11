@@ -3,476 +3,827 @@
      conforming SGML systems and applications as defined in
      ISO 8879, provided this notice is included in all copies.
 -->
+
 <!-- Character entity set. Typical invocation:
     <!ENTITY % HTMLlat1 PUBLIC
        "-//W3C//ENTITIES Latin 1 for XHTML//EN"
        "http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent">
     %HTMLlat1;
 -->
+
 <!-- no-break space = non-breaking space,
                                   U+00A0 ISOnum -->
+
 <!-- inverted exclamation mark, U+00A1 ISOnum -->
+
 <!-- cent sign, U+00A2 ISOnum -->
+
 <!-- pound sign, U+00A3 ISOnum -->
+
 <!-- currency sign, U+00A4 ISOnum -->
+
 <!-- yen sign = yuan sign, U+00A5 ISOnum -->
+
 <!-- broken bar = broken vertical bar,
                                   U+00A6 ISOnum -->
+
 <!-- section sign, U+00A7 ISOnum -->
+
 <!-- diaeresis = spacing diaeresis,
                                   U+00A8 ISOdia -->
+
 <!-- copyright sign, U+00A9 ISOnum -->
+
 <!-- feminine ordinal indicator, U+00AA ISOnum -->
+
 <!-- left-pointing double angle quotation mark
                                   = left pointing guillemet, U+00AB ISOnum -->
+
 <!-- not sign = angled dash,
                                   U+00AC ISOnum -->
+
 <!-- soft hyphen = discretionary hyphen,
                                   U+00AD ISOnum -->
+
 <!-- registered sign = registered trade mark sign,
                                   U+00AE ISOnum -->
+
 <!-- macron = spacing macron = overline
                                   = APL overbar, U+00AF ISOdia -->
+
 <!-- degree sign, U+00B0 ISOnum -->
+
 <!-- plus-minus sign = plus-or-minus sign,
                                   U+00B1 ISOnum -->
+
 <!-- superscript two = superscript digit two
                                   = squared, U+00B2 ISOnum -->
+
 <!-- superscript three = superscript digit three
                                   = cubed, U+00B3 ISOnum -->
+
 <!-- acute accent = spacing acute,
                                   U+00B4 ISOdia -->
+
 <!-- micro sign, U+00B5 ISOnum -->
+
 <!-- pilcrow sign = paragraph sign,
                                   U+00B6 ISOnum -->
+
 <!-- middle dot = Georgian comma
                                   = Greek middle dot, U+00B7 ISOnum -->
+
 <!-- cedilla = spacing cedilla, U+00B8 ISOdia -->
+
 <!-- superscript one = superscript digit one,
                                   U+00B9 ISOnum -->
+
 <!-- masculine ordinal indicator,
                                   U+00BA ISOnum -->
+
 <!-- right-pointing double angle quotation mark
                                   = right pointing guillemet, U+00BB ISOnum -->
+
 <!-- vulgar fraction one quarter
                                   = fraction one quarter, U+00BC ISOnum -->
+
 <!-- vulgar fraction one half
                                   = fraction one half, U+00BD ISOnum -->
+
 <!-- vulgar fraction three quarters
                                   = fraction three quarters, U+00BE ISOnum -->
+
 <!-- inverted question mark
                                   = turned question mark, U+00BF ISOnum -->
+
 <!-- latin capital letter A with grave
                                   = latin capital letter A grave,
                                   U+00C0 ISOlat1 -->
+
 <!-- latin capital letter A with acute,
                                   U+00C1 ISOlat1 -->
+
 <!-- latin capital letter A with circumflex,
                                   U+00C2 ISOlat1 -->
+
 <!-- latin capital letter A with tilde,
                                   U+00C3 ISOlat1 -->
+
 <!-- latin capital letter A with diaeresis,
                                   U+00C4 ISOlat1 -->
+
 <!-- latin capital letter A with ring above
                                   = latin capital letter A ring,
                                   U+00C5 ISOlat1 -->
+
 <!-- latin capital letter AE
                                   = latin capital ligature AE,
                                   U+00C6 ISOlat1 -->
+
 <!-- latin capital letter C with cedilla,
                                   U+00C7 ISOlat1 -->
+
 <!-- latin capital letter E with grave,
                                   U+00C8 ISOlat1 -->
+
 <!-- latin capital letter E with acute,
                                   U+00C9 ISOlat1 -->
+
 <!-- latin capital letter E with circumflex,
                                   U+00CA ISOlat1 -->
+
 <!-- latin capital letter E with diaeresis,
                                   U+00CB ISOlat1 -->
+
 <!-- latin capital letter I with grave,
                                   U+00CC ISOlat1 -->
+
 <!-- latin capital letter I with acute,
                                   U+00CD ISOlat1 -->
+
 <!-- latin capital letter I with circumflex,
                                   U+00CE ISOlat1 -->
+
 <!-- latin capital letter I with diaeresis,
                                   U+00CF ISOlat1 -->
+
 <!-- latin capital letter ETH, U+00D0 ISOlat1 -->
+
 <!-- latin capital letter N with tilde,
                                   U+00D1 ISOlat1 -->
+
 <!-- latin capital letter O with grave,
                                   U+00D2 ISOlat1 -->
+
 <!-- latin capital letter O with acute,
                                   U+00D3 ISOlat1 -->
+
 <!-- latin capital letter O with circumflex,
                                   U+00D4 ISOlat1 -->
+
 <!-- latin capital letter O with tilde,
                                   U+00D5 ISOlat1 -->
+
 <!-- latin capital letter O with diaeresis,
                                   U+00D6 ISOlat1 -->
+
 <!-- multiplication sign, U+00D7 ISOnum -->
+
 <!-- latin capital letter O with stroke
                                   = latin capital letter O slash,
                                   U+00D8 ISOlat1 -->
+
 <!-- latin capital letter U with grave,
                                   U+00D9 ISOlat1 -->
+
 <!-- latin capital letter U with acute,
                                   U+00DA ISOlat1 -->
+
 <!-- latin capital letter U with circumflex,
                                   U+00DB ISOlat1 -->
+
 <!-- latin capital letter U with diaeresis,
                                   U+00DC ISOlat1 -->
+
 <!-- latin capital letter Y with acute,
                                   U+00DD ISOlat1 -->
+
 <!-- latin capital letter THORN,
                                   U+00DE ISOlat1 -->
+
 <!-- latin small letter sharp s = ess-zed,
                                   U+00DF ISOlat1 -->
+
 <!-- latin small letter a with grave
                                   = latin small letter a grave,
                                   U+00E0 ISOlat1 -->
+
 <!-- latin small letter a with acute,
                                   U+00E1 ISOlat1 -->
+
 <!-- latin small letter a with circumflex,
                                   U+00E2 ISOlat1 -->
+
 <!-- latin small letter a with tilde,
                                   U+00E3 ISOlat1 -->
+
 <!-- latin small letter a with diaeresis,
                                   U+00E4 ISOlat1 -->
+
 <!-- latin small letter a with ring above
                                   = latin small letter a ring,
                                   U+00E5 ISOlat1 -->
+
 <!-- latin small letter ae
                                   = latin small ligature ae, U+00E6 ISOlat1 -->
+
 <!-- latin small letter c with cedilla,
                                   U+00E7 ISOlat1 -->
+
 <!-- latin small letter e with grave,
                                   U+00E8 ISOlat1 -->
+
 <!-- latin small letter e with acute,
                                   U+00E9 ISOlat1 -->
+
 <!-- latin small letter e with circumflex,
                                   U+00EA ISOlat1 -->
+
 <!-- latin small letter e with diaeresis,
                                   U+00EB ISOlat1 -->
+
 <!-- latin small letter i with grave,
                                   U+00EC ISOlat1 -->
+
 <!-- latin small letter i with acute,
                                   U+00ED ISOlat1 -->
+
 <!-- latin small letter i with circumflex,
                                   U+00EE ISOlat1 -->
+
 <!-- latin small letter i with diaeresis,
                                   U+00EF ISOlat1 -->
+
 <!-- latin small letter eth, U+00F0 ISOlat1 -->
+
 <!-- latin small letter n with tilde,
                                   U+00F1 ISOlat1 -->
+
 <!-- latin small letter o with grave,
                                   U+00F2 ISOlat1 -->
+
 <!-- latin small letter o with acute,
                                   U+00F3 ISOlat1 -->
+
 <!-- latin small letter o with circumflex,
                                   U+00F4 ISOlat1 -->
+
 <!-- latin small letter o with tilde,
                                   U+00F5 ISOlat1 -->
+
 <!-- latin small letter o with diaeresis,
                                   U+00F6 ISOlat1 -->
+
 <!-- division sign, U+00F7 ISOnum -->
+
 <!-- latin small letter o with stroke,
                                   = latin small letter o slash,
                                   U+00F8 ISOlat1 -->
+
 <!-- latin small letter u with grave,
                                   U+00F9 ISOlat1 -->
+
 <!-- latin small letter u with acute,
                                   U+00FA ISOlat1 -->
+
 <!-- latin small letter u with circumflex,
                                   U+00FB ISOlat1 -->
+
 <!-- latin small letter u with diaeresis,
                                   U+00FC ISOlat1 -->
+
 <!-- latin small letter y with acute,
                                   U+00FD ISOlat1 -->
+
 <!-- latin small letter thorn,
                                   U+00FE ISOlat1 -->
+
 <!-- latin small letter y with diaeresis,
                                   U+00FF ISOlat1 -->>
 
+
+
 <rdf:RDF xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/">
+
 	<channel rdf:about="http://meerkat.oreillynet.com/">
+
 		<title>XML.com</title>
+
 		<link>http://www.xml.com/</link>
+
 		<description>XML.com features a rich mix of information and services for the XML community.</description>
+
 		<sy:updatePeriod>hourly</sy:updatePeriod>
+
 		<sy:updateFrequency>2</sy:updateFrequency>
+
 		<sy:updateBase>2000-01-01T12:00+00:00</sy:updateBase>
+
 		<image rdf:resource="http://meerkat.oreillynet.com/icons/meerkat-powered.jpg"/>
+
 		<items>
+
 			<rdf:Seq>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/02/09/xforms.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/02/09/cssorxsl.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/02/09/xml-http-request.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/02/02/xpath2.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/02/02/silent.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/02/02/xpath2.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/02/02/tmapi.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/01/26/formtax.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/01/26/hacking-ooo.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/01/26/simile.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/01/19/amara.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/01/19/print.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/01/19/review.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/01/12/saml2.html"/>
+
 				<rdf:li rdf:resource="http://www.xml.com/pub/a/2005/01/12/comega.html"/>
+
 			</rdf:Seq>
+
 		</items>
+
 		<textinput rdf:resource="http://meerkat.oreillynet.com/"/>
+
 	</channel>
+
 	<image rdf:about="http://meerkat.oreillynet.com/icons/meerkat-powered.jpg">
+
 		<title>Meerkat Powered!</title>
+
 		<url>http://meerkat.oreillynet.com/icons/meerkat-powered.jpg</url>
+
 		<link>http://meerkat.oreillynet.com</link>
+
 	</image>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/02/09/xforms.html">
+
 		<title>Features: Top 10 XForms Engines</title>
+
 		<link>http://www.xml.com/pub/a/2005/02/09/xforms.html</link>
+
 		<description>
     Micah Dubinko, one of the gurus of XForms, offers a rundown on the state of XForms engines for 2005.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Micah Dubinko</dc:creator>
+
 		<dc:subject>Web, Applications</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-02-09</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/02/09/cssorxsl.html">
+
 		<title>Features: Comparing CSS and XSL: A Reply from Norm Walsh</title>
+
 		<link>http://www.xml.com/pub/a/2005/02/09/cssorxsl.html</link>
+
 		<description>
     Norm Walsh responds to a recent article about CSS and XSL, explaining how and when and why you&apos;d want to use XSLFO or CSS or XSLT.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Norman Walsh</dc:creator>
+
 		<dc:subject>Style</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-02-09</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/02/09/xml-http-request.html">
+
 		<title>Features: Very Dynamic Web Interfaces</title>
+
 		<link>http://www.xml.com/pub/a/2005/02/09/xml-http-request.html</link>
+
 		<description>
     Drew McLellan explains how to use XMLHTTPRequest and Javascript to create web applications with very dynamic, smooth interfaces.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Drew McLellan</dc:creator>
+
 		<dc:subject>Web Development, Instruction</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-02-09</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/02/02/xpath2.html">
+
 		<title>Transforming XML: The XPath 2.0 Data Model</title>
+
 		<link>http://www.xml.com/pub/a/2005/02/02/xpath2.html</link>
+
 		<description>
     Bob DuCharme, in his latest Transforming XML column, examines the XPath 2.0, hence the XSLT 2.0, data model.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Bob DuCharme</dc:creator>
+
 		<dc:subject>Style, Style</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-02-02</dc:date>
+
 		<dc:type>Transforming XML</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/02/02/silent.html">
+
 		<title>XML Tourist: The Silent Soundtrack</title>
+
 		<link>http://www.xml.com/pub/a/2005/02/02/silent.html</link>
+
 		<description>
     In this installation of XML Tourist, John E. Simpson presents an overview of the types of sound-to-text captioning available. Pinpointing closed captioning as the most suitable for use with computerized multimedia, he then explains how XML-based solutions address synchronization issues.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>John E. Simpson</dc:creator>
+
 		<dc:subject>Graphics, Vertical Industries</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-02-02</dc:date>
+
 		<dc:type>XML Tourist</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/02/02/xpath2.html">
+
 		<title>Transforming XML: The XML 2.0 Data Model</title>
+
 		<link>http://www.xml.com/pub/a/2005/02/02/xpath2.html</link>
+
 		<description>
     Bob DuCharme, in his latest Transforming XML column, examines the XPath 2.0, hence the XSLT 2.0, data model.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Bob DuCharme</dc:creator>
+
 		<dc:subject>Style, Style</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-02-02</dc:date>
+
 		<dc:type>Transforming XML</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/02/02/tmapi.html">
+
 		<title>Features: An Introduction to TMAPI</title>
+
 		<link>http://www.xml.com/pub/a/2005/02/02/tmapi.html</link>
+
 		<description>
     TMAPI, a Java Topic Map API, is the standard way to interact with XML Topic Maps programmatically from Java. This article provides a tutorial for TMAPI. 
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Robert Barta, Oliver Leimig</dc:creator>
+
 		<dc:subject>Metadata, Metadata</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-02-02</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/01/26/formtax.html">
+
 		<title>Features: Formal Taxonomies for the U.S. Government</title>
+
 		<link>http://www.xml.com/pub/a/2005/01/26/formtax.html</link>
+
 		<description>
     Mike Daconta, Metadata Program Manager at the Department of Homeland Security, introduces the notion of a formal taxonomy in the context of the Federal Enteriprise Architecture&apos;s Data Reference Model.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Michael Daconta</dc:creator>
+
 		<dc:subject>Metadata, Metadata</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-01-26</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/01/26/hacking-ooo.html">
+
 		<title>Features: Hacking Open Office</title>
+
 		<link>http://www.xml.com/pub/a/2005/01/26/hacking-ooo.html</link>
+
 		<description>
     Peter Sefton shows us how to use XML tools to hack Open Office file formats.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Peter Sefton</dc:creator>
+
 		<dc:subject>Programming, Tools, Publishing</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-01-26</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/01/26/simile.html">
+
 		<title>Features: SIMILE: Practical Metadata for the Semantic Web</title>
+
 		<link>http://www.xml.com/pub/a/2005/01/26/simile.html</link>
+
 		<description>
     Digital libraries and generic metadata form part of the background assumptions and forward-looking goals of the Semantic Web. SIMILE is an interesting project aimed at realizing some of those goals.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Stephen Garland, Ryan Lee, Stefano Mazzocchi</dc:creator>
+
 		<dc:subject>Semantic Web, Metadata</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-01-26</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/01/19/amara.html">
+
 		<title>Python and XML: Introducing the Amara XML Toolkit</title>
+
 		<link>http://www.xml.com/pub/a/2005/01/19/amara.html</link>
+
 		<description>
     Uche Ogbuji introduces Amara, his new collection of XML tools for Python.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Uche Ogbuji</dc:creator>
+
 		<dc:subject>Programming, Programming</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-01-19</dc:date>
+
 		<dc:type>Python and XML</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/01/19/print.html">
+
 		<title>Features: Printing XML: Why CSS Is Better than XSL</title>
+
 		<link>http://www.xml.com/pub/a/2005/01/19/print.html</link>
+
 		<description>
     One of the old school debates among XML developers is &amp;quot;CSS versus XSLT.&amp;quot; H&amp;aring;kun Wium Lie and Michael Day revive that debate with a shot across XSL&apos;s bow.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Michael Day, H&amp;aring;kon Wium Lie</dc:creator>
+
 		<dc:subject>Style, Publishing</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-01-19</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/01/19/review.html">
+
 		<title>Features: Reviewing the Architecture of the World Wide Web</title>
+
 		<link>http://www.xml.com/pub/a/2005/01/19/review.html</link>
+
 		<description>
     Harry Halpin reviews the final published edition of the W3C TAG&apos;s Architecture of the World Wide Web document.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Harry Halpin</dc:creator>
+
 		<dc:subject>Web, Perspectives</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-01-19</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/01/12/saml2.html">
+
 		<title>Features: SAML 2: The Building Blocks of Federated Identity</title>
+
 		<link>http://www.xml.com/pub/a/2005/01/12/saml2.html</link>
+
 		<description>
     Paul Madsen reports on the developments in web services security, including a new major release of SAML, which provides the basis for building federated identity.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Paul Madsen</dc:creator>
+
 		<dc:subject>Web Services, Specifications</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-01-12</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<item rdf:about="http://www.xml.com/pub/a/2005/01/12/comega.html">
+
 		<title>Features: Introducing Comega</title>
+
 		<link>http://www.xml.com/pub/a/2005/01/12/comega.html</link>
+
 		<description>
     Dare Obasanjo explains some of the ways in which C&amp;omega;--a new language from Microsoft Research--makes XML processing easier and more natural.
    </description>
+
 		<dc:source>XML.com</dc:source>
+
 		<dc:creator>Dare Obasanjo</dc:creator>
+
 		<dc:subject>Programming, Instruction</dc:subject>
+
 		<dc:publisher>O&apos;Reilly Media, Inc.</dc:publisher>
+
 		<dc:date>2005-01-12</dc:date>
+
 		<dc:type>Features</dc:type>
+
 		<dc:format>text/html</dc:format>
+
 		<dc:language>en-us</dc:language>
+
 		<dc:rights>Copyright 2005, O&apos;Reilly Media, Inc.</dc:rights>
+
 	</item>
+
 	<textinput rdf:about="http://meerkat.oreillynet.com/">
+
 		<title>Search</title>
+
 		<description>Search Meerkat...</description>
+
 		<name>s</name>
+
 		<link>http://meerkat.oreillynet.com/</link>
+
 	</textinput>
+
 </rdf:RDF>
+
