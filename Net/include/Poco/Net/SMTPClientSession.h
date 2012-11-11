@@ -148,6 +148,11 @@ public:
 		/// Throws a SMTPException in case of a SMTP-specific error, or a
 		/// NetException in case of a general network communication failure.
 
+	void sendMessage(std::istream& istr);
+		/// Sends the mail message from the supplied stream. Content of the stream
+		/// is copied without any checking. Only the completion status is checked and,
+		/// if not valid, SMTPExcpetion is thrown.
+
 	int sendCommand(const std::string& command, std::string& response);
 		/// Sends the given command verbatim to the server
 		/// and waits for a response.
@@ -158,6 +163,19 @@ public:
 	int sendCommand(const std::string& command, const std::string& arg, std::string& response);
 		/// Sends the given command verbatim to the server
 		/// and waits for a response.
+		///
+		/// Throws a SMTPException in case of a SMTP-specific error, or a
+		/// NetException in case of a general network communication failure.
+
+	void sendAddresses(const std::string& from, const Recipients& recipients);
+		/// Sends the message preamble by sending a MAIL FROM command,
+		/// and a RCPT TO command for every recipient.
+		///
+		/// Throws a SMTPException in case of a SMTP-specific error, or a
+		/// NetException in case of a general network communication failure.
+
+	void sendData();
+		/// Sends the message preamble by sending a DATA command.
 		///
 		/// Throws a SMTPException in case of a SMTP-specific error, or a
 		/// NetException in case of a general network communication failure.
