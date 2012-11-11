@@ -458,6 +458,8 @@ void AbstractBinder::bind(std::size_t pos, const Any& val, Direction dir)
 		bind(pos, RefAnyCast<Time>(val), dir);
 	else if(type == typeid(BLOB))
 		bind(pos, RefAnyCast<BLOB>(val), dir);
+	else if(type == typeid(void))
+		bind(pos, Keywords::null, dir);
 #ifndef POCO_LONG_IS_64_BIT
 	else if(type == typeid(long))
 		bind(pos, RefAnyCast<long>(val), dir);
