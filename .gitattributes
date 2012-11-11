@@ -3,6 +3,7 @@
 
 # Explicitly declare text files we want to always be normalized and converted 
 # to native line endings on checkout.
+*.txt text
 *.cpp text
 *.c text
 *.h text
@@ -13,7 +14,9 @@
 *.vcxproj.filters text 
 *.page text
 *.html text
+*.xhtml text
 *.css text
+*.js text
 *.progen text
 *.xml text
 *.xsd text
