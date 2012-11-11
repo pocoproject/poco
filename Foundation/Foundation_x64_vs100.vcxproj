@@ -1009,6 +1009,7 @@
     <ClInclude Include="include\Poco\NumberFormatter.h" />
     <ClInclude Include="include\Poco\NumberParser.h" />
     <ClInclude Include="include\Poco\ObjectPool.h" />
+    <ClInclude Include="include\Poco\Optional.h" />
     <ClInclude Include="include\Poco\Platform.h" />
     <ClInclude Include="include\Poco\Platform_POSIX.h" />
     <ClInclude Include="include\Poco\Platform_VMS.h" />

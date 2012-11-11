@@ -2,10 +2,10 @@
     #error This file is not editable by Visual C++.
 #endif //APSTUDIO_INVOKED
 
-#include "afxres.h"
+#include "winres.h"
 
-#define POCO_VERSION 1,4,3,0
-#define POCO_VERSION_STR "1.4.3"
+#define POCO_VERSION 1,4,5,0
+#define POCO_VERSION_STR "1.4.5"
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION POCO_VERSION

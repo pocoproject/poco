@@ -1,7 +1,7 @@
 //
 // FileChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FileChannel.h#4 $
+// $Id: //poco/1.4/Foundation/include/Poco/FileChannel.h#5 $
 //
 // Library: Foundation
 // Package: Logging
@@ -172,8 +172,16 @@ class Foundation_API FileChannel: public Channel
 	//  or whether it's allowed to stay in the system's file buffer for some time. 
 	/// Valid values are:
 	///
-	///   * true:   Every essages is immediately flushed to the log file (default).
-	///   * false:  Messages are not immediately flushed to the log file.
+	///   * true:  Every essages is immediately flushed to the log file (default).
+	///   * false: Messages are not immediately flushed to the log file.
+	///
+	/// The rotateOnOpen property specifies whether an existing log file should be 
+	/// rotated (and archived) when the channel is opened. Valid values are:
+	///
+	///   * true:  The log file is rotated (and archived) when the channel is opened.
+	///   * false: Log messages will be appended to an existing log file,
+	///            if it exists (unless other conditions for a rotation are met). 
+	///            This is the default.
 	///
 	/// For a more lightweight file channel class, see SimpleFileChannel.
 {
@@ -197,25 +205,27 @@ public:
 		/// Sets the property with the given name. 
 		/// 
 		/// The following properties are supported:
-		///   * path:       The log file's path.
-		///   * rotation:   The log file's rotation mode. See the 
-		///                 FileChannel class for details.
-		///   * archive:    The log file's archive mode. See the
-		///                 FileChannel class for details.
-		///   * times:      The log file's time mode. See the
-		///                 FileChannel class for details.
-		///   * compress:   Enable or disable compression of
-		///                 archived files. See the FileChannel class
-		///                 for details.
-		///   * purgeAge:   Maximum age of an archived log file before
-		///                 it is purged. See the FileChannel class for
-		///                 details.
-		///   * purgeCount: Maximum number of archived log files before
-		///                 files are purged. See the FileChannel class
-		///                 for details.
-		///   * flush:      Specifies whether messages are immediately
-		///                 flushed to the log file. See the FileChannel class
-		///                 for details.
+		///   * path:         The log file's path.
+		///   * rotation:     The log file's rotation mode. See the 
+		///                   FileChannel class for details.
+		///   * archive:      The log file's archive mode. See the
+		///                   FileChannel class for details.
+		///   * times:        The log file's time mode. See the
+		///                   FileChannel class for details.
+		///   * compress:     Enable or disable compression of
+		///                   archived files. See the FileChannel class
+		///                   for details.
+		///   * purgeAge:     Maximum age of an archived log file before
+		///                   it is purged. See the FileChannel class for
+		///                   details.
+		///   * purgeCount:   Maximum number of archived log files before
+		///                   files are purged. See the FileChannel class
+		///                   for details.
+		///   * flush:        Specifies whether messages are immediately
+		///                   flushed to the log file. See the FileChannel class
+		///                   for details.
+		///   * rotateOnOpen: Specifies whether an existing log file should be 
+		///                   rotated and archived when the channel is opened.
 
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
@@ -239,6 +249,7 @@ public:
 	static const std::string PROP_PURGEAGE;
 	static const std::string PROP_PURGECOUNT;
 	static const std::string PROP_FLUSH;
+	static const std::string PROP_ROTATEONOPEN;
 
 protected:
 	~FileChannel();
@@ -248,6 +259,7 @@ protected:
 	void setPurgeAge(const std::string& age);
 	void setPurgeCount(const std::string& count);
 	void setFlush(const std::string& flush);
+	void setRotateOnOpen(const std::string& rotateOnOpen);
 	void purge();
 
 private:
@@ -259,6 +271,7 @@ private:
 	std::string      _purgeAge;
 	std::string      _purgeCount;
 	bool             _flush;
+	bool             _rotateOnOpen;
 	LogFile*         _pFile;
 	RotateStrategy*  _pRotateStrategy;
 	ArchiveStrategy* _pArchiveStrategy;

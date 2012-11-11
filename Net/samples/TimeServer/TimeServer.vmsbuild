@@ -1,8 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/1.4/Net/samples/TimeServer/TimeServer.vmsbuild#1 $
-#
-EXE=TimeServer
-TimeServer
-<SourceFilesHere>

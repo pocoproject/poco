@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="Foundation"
 	ProjectGUID="{8164D41D-B053-405B-826C-CF37AC0EF176}"
 	RootNamespace="Foundation"
@@ -1197,6 +1197,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\ObjectPool.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Optional.h"
 					>
 				</File>
 				<File

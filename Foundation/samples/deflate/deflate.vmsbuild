@@ -1,8 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/1.4/Foundation/samples/deflate/deflate.vmsbuild#1 $
-#
-EXE=deflate
-deflate
-<SourceFilesHere>

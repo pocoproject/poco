@@ -1,7 +1,7 @@
 //
 // DirectoryWatcher.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#6 $
+// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#7 $
 //
 // Library: Foundation
 // Package: Filesystem

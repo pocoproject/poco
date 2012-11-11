@@ -1,7 +1,0 @@
-#
-# sample.vmsbuild
-#
-# $Id: //poco/Main/Net/samples/HTTPTimeServer/HTTPTimeServer.vmsbuild#1 $
-#
-EXE=HTTPSTimeServer
-HTTPSTimeServer

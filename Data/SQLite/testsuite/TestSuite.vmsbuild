@@ -1,9 +1,0 @@
-#
-# TestSuite.vmsbuild
-#
-# $Id: //poco/1.4/Data/SQLite/testsuite/TestSuite.vmsbuild#1 $
-#
-EXE=TestRunner
-SQLiteTestSuite
-Driver
-SQLiteTest

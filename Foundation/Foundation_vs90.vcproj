@@ -1197,6 +1197,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Optional.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Platform.h"
 					>
 				</File>

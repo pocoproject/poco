@@ -1,7 +1,7 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DateTimeParser.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/DateTimeParser.cpp#4 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -48,12 +48,17 @@ namespace Poco {
 	while (it != end && !Ascii::isDigit(*it)) ++it
 
 
+#define SKIP_DIGITS() \
+	while (it != end && Ascii::isDigit(*it)) ++it
+
+
 #define PARSE_NUMBER(var) \
 	while (it != end && Ascii::isDigit(*it)) var = var*10 + ((*it++) - '0')
 
 
 #define PARSE_NUMBER_N(var, n) \
 	{ int i = 0; while (i++ < n && it != end && Ascii::isDigit(*it)) var = var*10 + ((*it++) - '0'); }
+
 
 #define PARSE_FRACTIONAL_N(var, n) \
 	{ int i = 0; while (i < n && it != end && Ascii::isDigit(*it)) { var = var*10 + ((*it++) - '0'); i++; } while (i++ < n) var *= 10; }
@@ -153,6 +158,7 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 						++it;
 						PARSE_FRACTIONAL_N(millis, 3);
 						PARSE_FRACTIONAL_N(micros, 3);
+						SKIP_DIGITS();
 					}
 					break;
 				case 'i':
@@ -168,6 +174,7 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 					SKIP_JUNK();
 					PARSE_FRACTIONAL_N(millis, 3);
 					PARSE_FRACTIONAL_N(micros, 3);
+					SKIP_DIGITS();
 					break;
 				case 'z':
 				case 'Z':
