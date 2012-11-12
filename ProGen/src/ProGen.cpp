@@ -1,7 +1,7 @@
 //
 // ProGen.cpp
 //
-// $Id: //poco/1.4/ProGen/src/ProGen.cpp#6 $
+// $Id: //poco/1.4/ProGen/src/ProGen.cpp#7 $
 //
 // Visual Studio project file generator.
 //
@@ -354,7 +354,7 @@ protected:
 		std::string projectGUID = projectConfig.getString("vc.project.guid", "");
 		std::string projectPlatform = templateProps.getString("project.platform", platform);
 		std::string projectSuffix = templateProps.getString("project.finalSuffix",  templateProps.getString("project.suffix"));
-		bool includesHaveDependencies = false;
+		bool includesHaveDependencies = projectConfig.getBool("vc.solution.fixedBuildOrder", false);
 		if (!projectName.empty())
 		{
 			solutionStream << "Project(\"{" << solutionGUID << "}\") = \"" << projectName << "\", \"" << projectName << projectSuffix << "\", \"{" << projectGUID << "}\"\r\n";
