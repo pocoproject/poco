@@ -1,5 +1,5 @@
 //
-// Types.h
+// UTFString.h
 //
 // $Id: //poco/1.4/Foundation/include/Poco/UTFString.h#2 $
 //
