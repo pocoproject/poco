@@ -72,14 +72,14 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-        template <class D> std::string rotation(TimeRotation rtype) const;
-        void remove(const std::string& baseName);
-        std::string filename() const;
+		template <class D> std::string rotation(TimeRotation rtype) const;
+		void remove(const std::string& baseName);
+		std::string filename() const;
 
-        void purgeAge(const std::string& purgeAge);
-        void noPurgeAge(const std::string& purgeAge);
-        void purgeCount(const std::string& pc);
-        void noPurgeCount(const std::string& pc);
+		void purgeAge(const std::string& purgeAge);
+		void noPurgeAge(const std::string& purgeAge);
+		void purgeCount(const std::string& pc);
+		void noPurgeCount(const std::string& pc);
 };
 
 

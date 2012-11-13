@@ -51,7 +51,7 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:	
-    typedef DWORD TIDImpl;
+	typedef DWORD TIDImpl;
 	typedef void (*Callable)(void*);
 
 #if defined(_DLL)

@@ -66,9 +66,9 @@ bool Debugger::isAvailable()
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 		#if defined(_WIN32_WCE)
 			#if (_WIN32_WCE >= 0x600)
-			    BOOL isDebuggerPresent;
-			    if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &isDebuggerPresent))
-			    {
+				BOOL isDebuggerPresent;
+				if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &isDebuggerPresent))
+				{
 					return isDebuggerPresent ? true : false;
 				}
 				return false;

@@ -740,30 +740,30 @@ void URITest::testSwap()
 
 void URITest::testOther()
 {
-    // The search string is "hello%world"; google happens to ignore the '%'
-    // character, so it finds lots of hits for "hello world" programs. This is
-    // a convenient reproduction case, and a URL that actually works.
-    Poco::URI uri("http://google.com/search?q=hello%25world#frag%20ment");
+	// The search string is "hello%world"; google happens to ignore the '%'
+	// character, so it finds lots of hits for "hello world" programs. This is
+	// a convenient reproduction case, and a URL that actually works.
+	Poco::URI uri("http://google.com/search?q=hello%25world#frag%20ment");
 
-    assert(uri.getHost() == "google.com");
-    assert(uri.getPath() == "/search");
-    assert(uri.getQuery() == "q=hello%world");
-    assert(uri.getRawQuery() == "q=hello%25world");
-    assert(uri.getFragment() == "frag ment");
-    assert(uri.toString() == "http://google.com/search?q=hello%25world#frag%20ment");
-    assert(uri.getPathEtc() == "/search?q=hello%25world#frag%20ment");
+	assert(uri.getHost() == "google.com");
+	assert(uri.getPath() == "/search");
+	assert(uri.getQuery() == "q=hello%world");
+	assert(uri.getRawQuery() == "q=hello%25world");
+	assert(uri.getFragment() == "frag ment");
+	assert(uri.toString() == "http://google.com/search?q=hello%25world#frag%20ment");
+	assert(uri.getPathEtc() == "/search?q=hello%25world#frag%20ment");
 
-    uri.setQuery("q=goodbye cruel world");
-    assert(uri.getQuery() == "q=goodbye cruel world");
-    assert(uri.getRawQuery() == "q=goodbye%20cruel%20world");
-    assert(uri.toString() == "http://google.com/search?q=goodbye%20cruel%20world#frag%20ment");
-    assert(uri.getPathEtc() == "/search?q=goodbye%20cruel%20world#frag%20ment");
+	uri.setQuery("q=goodbye cruel world");
+	assert(uri.getQuery() == "q=goodbye cruel world");
+	assert(uri.getRawQuery() == "q=goodbye%20cruel%20world");
+	assert(uri.toString() == "http://google.com/search?q=goodbye%20cruel%20world#frag%20ment");
+	assert(uri.getPathEtc() == "/search?q=goodbye%20cruel%20world#frag%20ment");
 
-    uri.setRawQuery("q=pony%7eride");
-    assert(uri.getQuery() == "q=pony~ride");
-    assert(uri.getRawQuery() == "q=pony%7eride");
-    assert(uri.toString() == "http://google.com/search?q=pony%7eride#frag%20ment");
-    assert(uri.getPathEtc() == "/search?q=pony%7eride#frag%20ment");
+	uri.setRawQuery("q=pony%7eride");
+	assert(uri.getQuery() == "q=pony~ride");
+	assert(uri.getRawQuery() == "q=pony%7eride");
+	assert(uri.toString() == "http://google.com/search?q=pony%7eride#frag%20ment");
+	assert(uri.getPathEtc() == "/search?q=pony%7eride#frag%20ment");
 }
 
 

@@ -78,47 +78,47 @@ public:
 		std::memset(&st1, 0, sizeof(SYSTEMTIME));
 		std::memset(&st2, 0, sizeof(SYSTEMTIME));
 		GetSystemTime(&st1);
-        while (true)
-        {
-            GetSystemTime(&st2);
+		while (true)
+		{
+			GetSystemTime(&st2);
 
-            // wait for a rollover
+			// wait for a rollover
 			if (st1.wSecond != st2.wSecond)
-            {
-                _offset = GetTickCount() % 1000;
-                break;
-            }
-        }
+			{
+				_offset = GetTickCount() % 1000;
+				break;
+			}
+		}
 	}
 
 	void calibrate(int seconds)
-    {
-        SYSTEMTIME st1, st2;
+	{
+		SYSTEMTIME st1, st2;
 		systemTime(&st1);
 
 		WORD s = st1.wSecond;
-        int sum = 0;
-        int remaining = seconds;
-        while (remaining > 0)
-        {
-            systemTime(&st2);
-            WORD s2 = st2.wSecond;
+		int sum = 0;
+		int remaining = seconds;
+		while (remaining > 0)
+		{
+			systemTime(&st2);
+			WORD s2 = st2.wSecond;
 
 			if (s != s2)
-            {
-                remaining--;
-                // store the offset from zero
+			{
+				remaining--;
+				// store the offset from zero
 				sum += (st2.wMilliseconds > 500) ? (st2.wMilliseconds - 1000) : st2.wMilliseconds;
-                s = st2.wSecond;
-            }
-        }
+				s = st2.wSecond;
+			}
+		}
 
-        // adjust the offset by the average deviation from zero (round to the integer farthest from zero)
-        if (sum < 0)
+		// adjust the offset by the average deviation from zero (round to the integer farthest from zero)
+		if (sum < 0)
 			_offset += (int) std::floor(sum / (float)seconds);
-        else
+		else
 			_offset += (int) std::ceil(sum / (float)seconds);
-    }
+	}
 
 	void systemTime(SYSTEMTIME* pST)
 	{

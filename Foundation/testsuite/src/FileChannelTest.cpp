@@ -446,17 +446,17 @@ void FileChannelTest::noPurgeAge(const std::string& npa)
 
 void FileChannelTest::testPurgeAge()
 {
-        purgeAge("5 seconds");
-        try
-        {
-                noPurgeAge("0 seconds");
-                fail ("must fail");
-        } catch (InvalidArgumentException&)
-        {
-        }
+		purgeAge("5 seconds");
+		try
+		{
+				noPurgeAge("0 seconds");
+				fail ("must fail");
+		} catch (InvalidArgumentException&)
+		{
+		}
 
-        noPurgeAge("");
-        noPurgeAge("none");
+		noPurgeAge("");
+		noPurgeAge("none");
 }
 
 

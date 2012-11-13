@@ -121,17 +121,17 @@ void DateTimeTest::testJulian()
 	assert (dt.dayOfWeek() == 1);
 	assert (dt.julianDay() == 0);
 
-    // Test that we can represent down to the microsecond.
-    dt = DateTime(2010, 1, 31, 17, 30, 15, 800, 3);
+	// Test that we can represent down to the microsecond.
+	dt = DateTime(2010, 1, 31, 17, 30, 15, 800, 3);
 
-    assert (dt.year() == 2010);
-    assert (dt.month() == 1);
-    assert (dt.day() == 31);
-    assert (dt.hour() == 17);
-    assert (dt.minute() == 30);
-    assert (dt.second() == 15);
-    assert (dt.millisecond() == 800);
-    assert (dt.microsecond() == 3);
+	assert (dt.year() == 2010);
+	assert (dt.month() == 1);
+	assert (dt.day() == 31);
+	assert (dt.hour() == 17);
+	assert (dt.minute() == 30);
+	assert (dt.second() == 15);
+	assert (dt.millisecond() == 800);
+	assert (dt.microsecond() == 3);
 }
 
 
@@ -341,245 +341,245 @@ void DateTimeTest::testAMPM()
 
 void DateTimeTest::testRelational()
 {
-    DateTime dt1(2005, 1, 1, 0, 15, 30);
-    DateTime dt2(2005, 1, 2, 0, 15, 30);
-    DateTime dt3(dt1);
+	DateTime dt1(2005, 1, 1, 0, 15, 30);
+	DateTime dt2(2005, 1, 2, 0, 15, 30);
+	DateTime dt3(dt1);
 	
-    assert (dt1 < dt2);
-    assert (dt1 <= dt2);
-    assert (dt2 > dt1);
-    assert (dt2 >= dt1);
-    assert (dt1 != dt2);
-    assert (!(dt1 == dt2));
+	assert (dt1 < dt2);
+	assert (dt1 <= dt2);
+	assert (dt2 > dt1);
+	assert (dt2 >= dt1);
+	assert (dt1 != dt2);
+	assert (!(dt1 == dt2));
 	
-    assert (dt1 == dt3);
-    assert (!(dt1 != dt3));
-    assert (dt1 >= dt3);
-    assert (dt1 <= dt3);
-    assert (!(dt1 > dt3));
-    assert (!(dt1 < dt3));
+	assert (dt1 == dt3);
+	assert (!(dt1 != dt3));
+	assert (dt1 >= dt3);
+	assert (dt1 <= dt3);
+	assert (!(dt1 > dt3));
+	assert (!(dt1 < dt3));
 
-    static const struct 
-    {
-        int year;
-        int month;  
-        int day;
-    } values[] = 
-    {
-        {    1,  1,  1 }, 
-        {   10,  4,  5 }, 
-        {  100,  6,  7 },
-        { 1000,  8,  9 }, 
-        { 2000,  1, 31 }, 
-        { 2002,  7,  4 },
-        { 2002, 12, 31 }, 
-        { 2003,  1,  1 }, 
-        { 2003,  1,  2 },
-        { 2003,  8,  5 }, 
-        { 2003,  8,  6 }, 
-        { 2003,  8,  7 },
-        { 2004,  9,  3 }, 
-        { 2004,  9,  4 }, 
-    };
+	static const struct 
+	{
+		int year;
+		int month;  
+		int day;
+	} values[] = 
+	{
+		{	1,  1,  1 }, 
+		{   10,  4,  5 }, 
+		{  100,  6,  7 },
+		{ 1000,  8,  9 }, 
+		{ 2000,  1, 31 }, 
+		{ 2002,  7,  4 },
+		{ 2002, 12, 31 }, 
+		{ 2003,  1,  1 }, 
+		{ 2003,  1,  2 },
+		{ 2003,  8,  5 }, 
+		{ 2003,  8,  6 }, 
+		{ 2003,  8,  7 },
+		{ 2004,  9,  3 }, 
+		{ 2004,  9,  4 }, 
+	};
 
-    const int num_values = sizeof values / sizeof *values;
-    for (int i = 0; i < num_values; ++i) 
-    {
-        DateTime v;
-        const DateTime& V = v;
-        v.assign(values[i].year, values[i].month, values[i].day);
-        for (int j = 0; j < num_values; ++j) 
-        {
-            DateTime u;  
-            const DateTime& U = u;
-            u.assign(values[j].year, values[j].month, values[j].day);
+	const int num_values = sizeof values / sizeof *values;
+	for (int i = 0; i < num_values; ++i) 
+	{
+		DateTime v;
+		const DateTime& V = v;
+		v.assign(values[i].year, values[i].month, values[i].day);
+		for (int j = 0; j < num_values; ++j) 
+		{
+			DateTime u;  
+			const DateTime& U = u;
+			u.assign(values[j].year, values[j].month, values[j].day);
 
-            loop_2_assert(i, j, (j <  i) == (U <  V));
-            loop_2_assert(i, j, (j <= i) == (U <= V));
-            loop_2_assert(i, j, (j >= i) == (U >= V));
-            loop_2_assert(i, j, (j >  i) == (U >  V));
-        }
-    }
+			loop_2_assert(i, j, (j <  i) == (U <  V));
+			loop_2_assert(i, j, (j <= i) == (U <= V));
+			loop_2_assert(i, j, (j >= i) == (U >= V));
+			loop_2_assert(i, j, (j >  i) == (U >  V));
+		}
+	}
 }
 
 
 void DateTimeTest::testArithmetics()
 {
-    DateTime dt1(2005, 1, 1, 0, 15, 30);
-    DateTime dt2(2005, 1, 2, 0, 15, 30);
+	DateTime dt1(2005, 1, 1, 0, 15, 30);
+	DateTime dt2(2005, 1, 2, 0, 15, 30);
 	
-    Timespan s = dt2 - dt1;
-    assert (s.days() == 1);
+	Timespan s = dt2 - dt1;
+	assert (s.days() == 1);
 	
-    DateTime dt3 = dt1 + s;
-    assert (dt3 == dt2);
+	DateTime dt3 = dt1 + s;
+	assert (dt3 == dt2);
 	
-    dt3 -= s;
-    assert (dt3 == dt1);
-    dt1 += s;
-    assert (dt1 == dt2);
+	dt3 -= s;
+	assert (dt3 == dt1);
+	dt1 += s;
+	assert (dt1 == dt2);
 
-    static const struct 
-    {
-        int lineNum;		// source line number
-        int year1;			// operand/result date1 year
-        int month1;			// operand/result date1 month
-        unsigned int day1;	// operand/result date1 day
-        int numDays;		// operand/result 'int' number of days
-        int year2;			// operand/result date2 year
-        int month2;			// operand/result date2 month
-        unsigned int day2;	// operand/result date2 day
-    } data[] = 
-    {
-        //          - - - -first- - - -           - - - second - - - 
-        //line no.  year   month   day   numDays  year   month   day
-        //-------   -----  -----  -----  -------  -----  -----  ----- 
-        { __LINE__,       1,     1,     1,      1,      1,     1,     2 },
-        { __LINE__,      10,     2,    28,      1,     10,     3,     1 },
-        { __LINE__,     100,     3,    31,      2,    100,     4,     2 },
-        { __LINE__,    1000,     4,    30,      4,   1000,     5,     4 },
-        { __LINE__,    1000,     6,     1,    -31,   1000,     5,     1 },
-        { __LINE__,    1001,     1,     1,   -365,   1000,     1,     1 },
-        { __LINE__,    1100,     5,    31,     30,   1100,     6,    30 },
-        { __LINE__,    1200,     6,    30,     32,   1200,     8,     1 },
-        { __LINE__,    1996,     2,    28,    367,   1997,     3,     1 },
-        { __LINE__,    1997,     2,    28,    366,   1998,     3,     1 },
-        { __LINE__,    1998,     2,    28,    365,   1999,     2,    28 },
-        { __LINE__,    1999,     2,    28,    364,   2000,     2,    27 },
-        { __LINE__,    1999,     2,    28,   1096,   2002,     2,    28 },
-        { __LINE__,    2002,     2,    28,  -1096,   1999,     2,    28 },
-    };
+	static const struct 
+	{
+		int lineNum;		// source line number
+		int year1;			// operand/result date1 year
+		int month1;			// operand/result date1 month
+		unsigned int day1;	// operand/result date1 day
+		int numDays;		// operand/result 'int' number of days
+		int year2;			// operand/result date2 year
+		int month2;			// operand/result date2 month
+		unsigned int day2;	// operand/result date2 day
+	} data[] = 
+	{
+		//          - - - -first- - - -           - - - second - - - 
+		//line no.  year   month   day   numDays  year   month   day
+		//-------   -----  -----  -----  -------  -----  -----  ----- 
+		{ __LINE__,       1,     1,     1,      1,      1,     1,     2 },
+		{ __LINE__,      10,     2,    28,      1,     10,     3,     1 },
+		{ __LINE__,     100,     3,    31,      2,    100,     4,     2 },
+		{ __LINE__,    1000,     4,    30,      4,   1000,     5,     4 },
+		{ __LINE__,    1000,     6,     1,    -31,   1000,     5,     1 },
+		{ __LINE__,    1001,     1,     1,   -365,   1000,     1,     1 },
+		{ __LINE__,    1100,     5,    31,     30,   1100,     6,    30 },
+		{ __LINE__,    1200,     6,    30,     32,   1200,     8,     1 },
+		{ __LINE__,    1996,     2,    28,    367,   1997,     3,     1 },
+		{ __LINE__,    1997,     2,    28,    366,   1998,     3,     1 },
+		{ __LINE__,    1998,     2,    28,    365,   1999,     2,    28 },
+		{ __LINE__,    1999,     2,    28,    364,   2000,     2,    27 },
+		{ __LINE__,    1999,     2,    28,   1096,   2002,     2,    28 },
+		{ __LINE__,    2002,     2,    28,  -1096,   1999,     2,    28 },
+	};
 
-    const int num_data = sizeof data / sizeof *data;
-    for (int di = 0; di < num_data; ++di) 
-    {
-        const int line     = data[di].lineNum;
-        const int num_days = data[di].numDays;
-        DateTime x = DateTime(data[di].year1, data[di].month1, data[di].day1);
-        const DateTime& X = x;
-        x += Timespan(num_days, 0, 0, 0, 0);
-        loop_1_assert(line, data[di].year2 == X.year());
-        loop_1_assert(line, data[di].month2 == X.month());
-        loop_1_assert(line, data[di].day2 == X.day());
-    }
+	const int num_data = sizeof data / sizeof *data;
+	for (int di = 0; di < num_data; ++di) 
+	{
+		const int line	 = data[di].lineNum;
+		const int num_days = data[di].numDays;
+		DateTime x = DateTime(data[di].year1, data[di].month1, data[di].day1);
+		const DateTime& X = x;
+		x += Timespan(num_days, 0, 0, 0, 0);
+		loop_1_assert(line, data[di].year2 == X.year());
+		loop_1_assert(line, data[di].month2 == X.month());
+		loop_1_assert(line, data[di].day2 == X.day());
+	}
 }
 
 void DateTimeTest::testIncrementDecrement()
 {
-    static const struct 
-    {
-        int lineNum;		// source line number
-        int year1;			// (first) date year
-        int month1;			// (first) date month
-        unsigned int day1;	// (first) date day
-        int year2;			// (second) date year
-        int month2;			// (second) date month
-        unsigned int day2;	// (second) date day
-    } data[] = 
-    {
-       //          - - - -first- - - -    - - - second - - - 
-       //line no.  year   month   day     year   month   day
-       //-------   -----  -----  -----    -----  -----  ----- 
-      { __LINE__,       1,     1,     1,       1,     1,     2 },
-      { __LINE__,      10,     2,    28,      10,     3,     1 },
-      { __LINE__,     100,     3,    31,     100,     4,     1 },
-      { __LINE__,    1000,     4,    30,    1000,     5,     1 },
-      { __LINE__,    1100,     5,    31,    1100,     6,     1 },
-      { __LINE__,    1200,     6,    30,    1200,     7,     1 },
-      { __LINE__,    1300,     7,    31,    1300,     8,     1 },
-      { __LINE__,    1400,     8,    31,    1400,     9,     1 },
-      { __LINE__,    1500,     9,    30,    1500,    10,     1 },
-      { __LINE__,    1600,    10,    31,    1600,    11,     1 },
-      { __LINE__,    1700,    11,    30,    1700,    12,     1 },
-      { __LINE__,    1800,    12,    31,    1801,     1,     1 },
-      { __LINE__,    1996,     2,    28,    1996,     2,    29 },
-      { __LINE__,    1997,     2,    28,    1997,     3,     1 },
-      { __LINE__,    1998,     2,    28,    1998,     3,     1 },
-      { __LINE__,    1999,     2,    28,    1999,     3,     1 },
-      { __LINE__,    2000,     2,    28,    2000,     2,    29 },
-      { __LINE__,    2001,     2,    28,    2001,     3,     1 },
-      { __LINE__,    2004,     2,    28,    2004,     2,    29 },
-      { __LINE__,    2100,     2,    28,    2100,     3,     1 },
-      { __LINE__,    2400,     2,    28,    2400,     2,    29 },
-    };
+	static const struct 
+	{
+		int lineNum;		// source line number
+		int year1;			// (first) date year
+		int month1;			// (first) date month
+		unsigned int day1;	// (first) date day
+		int year2;			// (second) date year
+		int month2;			// (second) date month
+		unsigned int day2;	// (second) date day
+	} data[] = 
+	{
+		 //          - - - -first- - - -    - - - second - - - 
+		 //line no.  year   month   day     year   month   day
+		 //-------   -----  -----  -----    -----  -----  ----- 
+		{ __LINE__,       1,     1,     1,       1,     1,     2 },
+		{ __LINE__,      10,     2,    28,      10,     3,     1 },
+		{ __LINE__,     100,     3,    31,     100,     4,     1 },
+		{ __LINE__,    1000,     4,    30,    1000,     5,     1 },
+		{ __LINE__,    1100,     5,    31,    1100,     6,     1 },
+		{ __LINE__,    1200,     6,    30,    1200,     7,     1 },
+		{ __LINE__,    1300,     7,    31,    1300,     8,     1 },
+		{ __LINE__,    1400,     8,    31,    1400,     9,     1 },
+		{ __LINE__,    1500,     9,    30,    1500,    10,     1 },
+		{ __LINE__,    1600,    10,    31,    1600,    11,     1 },
+		{ __LINE__,    1700,    11,    30,    1700,    12,     1 },
+		{ __LINE__,    1800,    12,    31,    1801,     1,     1 },
+		{ __LINE__,    1996,     2,    28,    1996,     2,    29 },
+		{ __LINE__,    1997,     2,    28,    1997,     3,     1 },
+		{ __LINE__,    1998,     2,    28,    1998,     3,     1 },
+		{ __LINE__,    1999,     2,    28,    1999,     3,     1 },
+		{ __LINE__,    2000,     2,    28,    2000,     2,    29 },
+		{ __LINE__,    2001,     2,    28,    2001,     3,     1 },
+		{ __LINE__,    2004,     2,    28,    2004,     2,    29 },
+		{ __LINE__,    2100,     2,    28,    2100,     3,     1 },
+		{ __LINE__,    2400,     2,    28,    2400,     2,    29 },
+	};
 
-    const int num_data = sizeof data / sizeof *data;
-    int di;
+	const int num_data = sizeof data / sizeof *data;
+	int di;
 
-    for (di = 0; di < num_data; ++di) 
-    {
-        const int line = data[di].lineNum;
-        DateTime x = DateTime(data[di].year1, data[di].month1, 
-                              data[di].day1);
-        // Would do pre-increment of x here.
-        const DateTime& X = x;
-        x = x + Timespan(1,0,0,0,0);  
-        DateTime y = x; const DateTime& Y = y;
+	for (di = 0; di < num_data; ++di) 
+	{
+		const int line = data[di].lineNum;
+		DateTime x = DateTime(data[di].year1, data[di].month1, 
+							  data[di].day1);
+		// Would do pre-increment of x here.
+		const DateTime& X = x;
+		x = x + Timespan(1,0,0,0,0);  
+		DateTime y = x; const DateTime& Y = y;
 
-        loop_1_assert(line, data[di].year2  == X.year());
-        loop_1_assert(line, data[di].month2 == X.month());
-        loop_1_assert(line, data[di].day2   == X.day());
+		loop_1_assert(line, data[di].year2  == X.year());
+		loop_1_assert(line, data[di].month2 == X.month());
+		loop_1_assert(line, data[di].day2   == X.day());
 
-        loop_1_assert(line, data[di].year2  == Y.year());
-        loop_1_assert(line, data[di].month2 == Y.month());
-        loop_1_assert(line, data[di].day2   == Y.day());
-    }
+		loop_1_assert(line, data[di].year2  == Y.year());
+		loop_1_assert(line, data[di].month2 == Y.month());
+		loop_1_assert(line, data[di].day2   == Y.day());
+	}
 
-    for (di = 0; di < num_data; ++di) 
-    {
-        const int line = data[di].lineNum;
-        DateTime x = DateTime(data[di].year1, data[di].month1, data[di].day1);
-        DateTime x1 = DateTime(data[di].year1, data[di].month1, data[di].day1);
-        DateTime x2 = DateTime(data[di].year2, data[di].month2, data[di].day2);
-        DateTime y = x; const DateTime& Y = y;
+	for (di = 0; di < num_data; ++di) 
+	{
+		const int line = data[di].lineNum;
+		DateTime x = DateTime(data[di].year1, data[di].month1, data[di].day1);
+		DateTime x1 = DateTime(data[di].year1, data[di].month1, data[di].day1);
+		DateTime x2 = DateTime(data[di].year2, data[di].month2, data[di].day2);
+		DateTime y = x; const DateTime& Y = y;
 
-        // Would do post increment of x here.
-        const DateTime& X = x;
-        x = x + Timespan(1,0,0,0,0);  
+		// Would do post increment of x here.
+		const DateTime& X = x;
+		x = x + Timespan(1,0,0,0,0);  
 
-        loop_1_assert(line, data[di].year2  == X.year());
-        loop_1_assert(line, data[di].month2 == X.month());
-        loop_1_assert(line, data[di].day2   == X.day());
-        loop_1_assert(line, data[di].year1  == Y.year());
-        loop_1_assert(line, data[di].month1 == Y.month());
-        loop_1_assert(line, data[di].day1   == Y.day());
-    }
-            
-    for (di = 0; di < num_data; ++di) 
-    {
-        const int line = data[di].lineNum;
-        DateTime x = DateTime(data[di].year2, data[di].month2, data[di].day2);
-        const DateTime& X = x;
-        x = x - Timespan(1,0,0,0,0);  
-        DateTime y = x; DateTime Y = y;
+		loop_1_assert(line, data[di].year2  == X.year());
+		loop_1_assert(line, data[di].month2 == X.month());
+		loop_1_assert(line, data[di].day2   == X.day());
+		loop_1_assert(line, data[di].year1  == Y.year());
+		loop_1_assert(line, data[di].month1 == Y.month());
+		loop_1_assert(line, data[di].day1   == Y.day());
+	}
+			
+	for (di = 0; di < num_data; ++di) 
+	{
+		const int line = data[di].lineNum;
+		DateTime x = DateTime(data[di].year2, data[di].month2, data[di].day2);
+		const DateTime& X = x;
+		x = x - Timespan(1,0,0,0,0);  
+		DateTime y = x; DateTime Y = y;
 
-        loop_1_assert(line, data[di].year1  == X.year());
-        loop_1_assert(line, data[di].month1 == X.month());
-        loop_1_assert(line, data[di].day1   == X.day());
+		loop_1_assert(line, data[di].year1  == X.year());
+		loop_1_assert(line, data[di].month1 == X.month());
+		loop_1_assert(line, data[di].day1   == X.day());
 
-        loop_1_assert(line, data[di].year1  == Y.year());
-        loop_1_assert(line, data[di].month1 == Y.month());
-        loop_1_assert(line, data[di].day1   == Y.day());
-    }
+		loop_1_assert(line, data[di].year1  == Y.year());
+		loop_1_assert(line, data[di].month1 == Y.month());
+		loop_1_assert(line, data[di].day1   == Y.day());
+	}
 
-    for (di = 0; di < num_data; ++di) 
-    {
-        const int line = data[di].lineNum;
-        DateTime x1 = DateTime(data[di].year1, data[di].month1, data[di].day1);
-        DateTime x = DateTime(data[di].year2, data[di].month2, data[di].day2);
-        DateTime y = x; DateTime Y = y;
-        const DateTime& X = x;
-        // would post-decrement x here.
-        x = x - Timespan(1,0,0,0,0);  
+	for (di = 0; di < num_data; ++di) 
+	{
+		const int line = data[di].lineNum;
+		DateTime x1 = DateTime(data[di].year1, data[di].month1, data[di].day1);
+		DateTime x = DateTime(data[di].year2, data[di].month2, data[di].day2);
+		DateTime y = x; DateTime Y = y;
+		const DateTime& X = x;
+		// would post-decrement x here.
+		x = x - Timespan(1,0,0,0,0);  
 
-        loop_1_assert(line, data[di].year1  == X.year());
-        loop_1_assert(line, data[di].month1 == X.month());
-        loop_1_assert(line, data[di].day1   == X.day());
+		loop_1_assert(line, data[di].year1  == X.year());
+		loop_1_assert(line, data[di].month1 == X.month());
+		loop_1_assert(line, data[di].day1   == X.day());
 
-        loop_1_assert(line, data[di].year2  == Y.year());
-        loop_1_assert(line, data[di].month2 == Y.month());
-        loop_1_assert(line, data[di].day2   == Y.day());
-    }
+		loop_1_assert(line, data[di].year2  == Y.year());
+		loop_1_assert(line, data[di].month2 == Y.month());
+		loop_1_assert(line, data[di].day2   == Y.day());
+	}
 }
 
 
@@ -598,37 +598,37 @@ void DateTimeTest::testSwap()
 
 void DateTimeTest::testUsage()
 {
-    DateTime dt1(1776, 7, 4);
-    assert (dt1.year() == 1776);
-    assert (dt1.month() == 7);
-    assert (dt1.day() == 4);
+	DateTime dt1(1776, 7, 4);
+	assert (dt1.year() == 1776);
+	assert (dt1.month() == 7);
+	assert (dt1.day() == 4);
 
-    DateTime dt2(dt1);
-    dt2 += Timespan(6, 0, 0, 0, 0);
-    assert (dt2.year() == 1776);
-    assert (dt2.month() == 7);
-    assert (dt2.day() == 10);
+	DateTime dt2(dt1);
+	dt2 += Timespan(6, 0, 0, 0, 0);
+	assert (dt2.year() == 1776);
+	assert (dt2.month() == 7);
+	assert (dt2.day() == 10);
 
-    Timespan span = dt2 - dt1;
-    assert (span.days() == 6);
+	Timespan span = dt2 - dt1;
+	assert (span.days() == 6);
 
-    // TODO - When adding months and years we need to be
-    // able to specify the end-end convention.
-    // We cannot do this in POCO at the moment.
+	// TODO - When adding months and years we need to be
+	// able to specify the end-end convention.
+	// We cannot do this in POCO at the moment.
 }
 
 
 void DateTimeTest::testSetYearDay()
 {
-    static const struct 
-    {
-        int d_lineNum;			// source line number
-        int d_year;				// year under test
-        unsigned int d_day;		// day-of-year under test
-        int d_expMonth;			// expected month
-        unsigned int d_expDay;	// expected day
-    } data[] = 
-    {
+	static const struct 
+	{
+		int d_lineNum;			// source line number
+		int d_year;				// year under test
+		unsigned int d_day;		// day-of-year under test
+		int d_expMonth;			// expected month
+		unsigned int d_expDay;	// expected day
+	} data[] = 
+	{
 		//line no.  year   dayOfYr     exp. month   exp. day
 		//-------   -----  -------     ----------   --------
 		{ __LINE__,          1,       1,          1,         1 },   
@@ -638,93 +638,93 @@ void DateTimeTest::testSetYearDay()
 		{ __LINE__,       1996,       2,          1,         2 },
 		{ __LINE__,       1996,     365,         12,        30 },
 		{ __LINE__,       1996,     366,         12,        31 }
-    };
-
-    const int num_data = sizeof data / sizeof *data;
-    for (int di = 0; di < num_data; ++di) 
-    {
-        const int line      = data[di].d_lineNum;
-        const int year      = data[di].d_year;
-        const unsigned int day = data[di].d_day;
-
-        const int exp_month = data[di].d_expMonth;
-        const unsigned int exp_day   = data[di].d_expDay;
-        const DateTime r(year, exp_month, exp_day);
-        DateTime x;
-        const DateTime& X = x;
-
-#if 0
-        // TODO - need to be able to assign a day number in the year
-        // but POCO is not able to do this.
-
-        x.assign(year, day);                
-
-        // TODO - need to be able to assert with the loop counter
-        // but cppUnit is not able to do this.
-
-        assert (r   == x);
-        assert (day == X.dayOfYear());
-#endif
-    }
-
-    static const struct 
-    {
-        int d_lineNum;  // source line number
-        int d_year;     // year under test
-        int d_day;      // day-of-year under test
-        int d_exp;      // expected status
-    } data2[] = 
-    {
-        //line no.  year   dayOfYr     expected value
-        //-------   -----  -------     --------------
-        { __LINE__,          1,       1,          1 },   
-        { __LINE__,          1,      -1,          0 },
-        { __LINE__,          1,       0,          0 },
-        { __LINE__,          1,     365,          1 },
-        { __LINE__,          1,     366,          0 },
-        { __LINE__,          1,     367,          0 },
-        { __LINE__,          0,       0,          0 },   
-        { __LINE__,         -1,      -1,          0 },   
-        { __LINE__,       1996,       1,          1 },   
-        { __LINE__,       1996,       2,          1 },
-        { __LINE__,       1996,      32,          1 },
-        { __LINE__,       1996,     365,          1 },
-        { __LINE__,       1996,     366,          1 },
-        { __LINE__,       1996,     367,          0 },
 	};
 
-    const int num_data2 = sizeof data2 / sizeof *data2;
-    for (int di = 0; di < num_data2; ++di) 
-    {
-        const int line  = data2[di].d_lineNum;
-        const int year  = data2[di].d_year;
-        const int day   = data2[di].d_day;
-        const int exp   = data2[di].d_exp;
-        DateTime x;  
-        const DateTime& X = x;
-        if (1 == exp)
-        {
-            DateTime r;
-            const DateTime& r2 = r;
+	const int num_data = sizeof data / sizeof *data;
+	for (int di = 0; di < num_data; ++di) 
+	{
+		const int line	  = data[di].d_lineNum;
+		const int year	  = data[di].d_year;
+		const unsigned int day = data[di].d_day;
+
+		const int exp_month = data[di].d_expMonth;
+		const unsigned int exp_day   = data[di].d_expDay;
+		const DateTime r(year, exp_month, exp_day);
+		DateTime x;
+		const DateTime& X = x;
+
 #if 0
-            r.set(year, day);
+		// TODO - need to be able to assign a day number in the year
+		// but POCO is not able to do this.
+
+		x.assign(year, day);				
+
+		// TODO - need to be able to assert with the loop counter
+		// but cppUnit is not able to do this.
+
+		assert (r   == x);
+		assert (day == X.dayOfYear());
 #endif
-        }
-    }
+	}
+
+	static const struct 
+	{
+		int d_lineNum;  // source line number
+		int d_year;	 // year under test
+		int d_day;	  // day-of-year under test
+		int d_exp;	  // expected status
+	} data2[] = 
+	{
+		//line no.  year   dayOfYr     expected value
+		//-------   -----  -------     --------------
+		{ __LINE__,          1,       1,          1 },   
+		{ __LINE__,          1,      -1,          0 },
+		{ __LINE__,          1,       0,          0 },
+		{ __LINE__,          1,     365,          1 },
+		{ __LINE__,          1,     366,          0 },
+		{ __LINE__,          1,     367,          0 },
+		{ __LINE__,          0,       0,          0 },   
+		{ __LINE__,         -1,      -1,          0 },   
+		{ __LINE__,       1996,       1,          1 },   
+		{ __LINE__,       1996,       2,          1 },
+		{ __LINE__,       1996,      32,          1 },
+		{ __LINE__,       1996,     365,          1 },
+		{ __LINE__,       1996,     366,          1 },
+		{ __LINE__,       1996,     367,          0 },
+	};
+
+	const int num_data2 = sizeof data2 / sizeof *data2;
+	for (int di = 0; di < num_data2; ++di) 
+	{
+		const int line  = data2[di].d_lineNum;
+		const int year  = data2[di].d_year;
+		const int day   = data2[di].d_day;
+		const int exp   = data2[di].d_exp;
+		DateTime x;  
+		const DateTime& X = x;
+		if (1 == exp)
+		{
+			DateTime r;
+			const DateTime& r2 = r;
+#if 0
+			r.set(year, day);
+#endif
+		}
+	}
 }
 
 
 void DateTimeTest::testIsValid()
 {
-    static const struct 
-    {
-        int  d_lineNum;  // source line number
-        int  d_year;     // year under test
-        int  d_month;    // month under test
-        int  d_day;      // day under test
-        bool d_exp;      // expected value
-    } data[] = 
-    {
+	static const struct 
+	{
+		int  d_lineNum;  // source line number
+		int  d_year;	 // year under test
+		int  d_month;	// month under test
+		int  d_day;	  // day under test
+		bool d_exp;	  // expected value
+	} data[] = 
+	{
 		//line no.  year   month   day     expected value
 		//-------   -----  -----  -----    --------------
 		{ __LINE__,    0,     0,     0,      false },   
@@ -761,34 +761,34 @@ void DateTimeTest::testIsValid()
 		{ __LINE__, 2100,     2,    29,      false },   
 	};
 
-    const int num_data = sizeof data / sizeof *data;
-    for (int di = 0; di < num_data; ++di) 
-    {
-        const int  line  = data[di].d_lineNum;
-        const int  year  = data[di].d_year;
-        const int  month = data[di].d_month;
-        const int  day   = data[di].d_day;
-        const bool exp   = data[di].d_exp;
+	const int num_data = sizeof data / sizeof *data;
+	for (int di = 0; di < num_data; ++di) 
+	{
+		const int  line  = data[di].d_lineNum;
+		const int  year  = data[di].d_year;
+		const int  month = data[di].d_month;
+		const int  day   = data[di].d_day;
+		const bool exp   = data[di].d_exp;
 
 		bool isValid = DateTime::isValid(year, month, day);
-        loop_1_assert(line, exp == isValid);
-    }
+		loop_1_assert(line, exp == isValid);
+	}
 }
 
 
 void DateTimeTest::testDayOfWeek()
 {
-    typedef DateTime::DaysOfWeek DOW;
+	typedef DateTime::DaysOfWeek DOW;
 
-    static const struct 
-    {
-        int d_lineNum;	// source line number
-        int d_year;		// year under test
-        int d_month;	// month under test
-        int d_day;		// day under test
-        DOW d_expDay;	// number of days to be added
-    } data[] = 
-    {
+	static const struct 
+	{
+		int d_lineNum;	// source line number
+		int d_year;		// year under test
+		int d_month;	// month under test
+		int d_day;		// day under test
+		DOW d_expDay;	// number of days to be added
+	} data[] = 
+	{
 		//Line no.    year   month   day    expDay
 		//-------   -----  -----  -----   -------
 		{ __LINE__,  1600,   1,       1,   DateTime::SATURDAY  },
@@ -820,16 +820,16 @@ void DateTimeTest::testDayOfWeek()
 		{ __LINE__,  2000,   1,       2,   DateTime::SUNDAY    },
 		{ __LINE__,  2000,   1,       3,   DateTime::MONDAY    },
 		{ __LINE__,  2000,   1,       4,   DateTime::TUESDAY   },
-    };
-            
-    const int num_data = sizeof data / sizeof *data;
-    for (int di = 0; di < num_data ; ++di) 
-    {
-        const int line = data[di].d_lineNum;
-        DateTime x = DateTime(data[di].d_year, data[di].d_month, data[di].d_day);
-        const DateTime& X = x;
-        loop_1_assert(line, data[di].d_expDay == X.dayOfWeek());
-    }
+	};
+			
+	const int num_data = sizeof data / sizeof *data;
+	for (int di = 0; di < num_data ; ++di) 
+	{
+		const int line = data[di].d_lineNum;
+		DateTime x = DateTime(data[di].d_year, data[di].d_month, data[di].d_day);
+		const DateTime& X = x;
+		loop_1_assert(line, data[di].d_expDay == X.dayOfWeek());
+	}
 }
 
 

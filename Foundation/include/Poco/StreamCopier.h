@@ -54,13 +54,13 @@ class Foundation_API StreamCopier
 	/// into another.
 {
 public:
-    static std::streamsize copyStream(std::istream& istr, std::ostream& ostr, std::size_t bufferSize = 8192);
+	static std::streamsize copyStream(std::istream& istr, std::ostream& ostr, std::size_t bufferSize = 8192);
 		/// Writes all bytes readable from istr to ostr, using an internal buffer.
 		///
 		/// Returns the number of bytes copied.
 
 #if defined(POCO_HAVE_INT64)
-    static Poco::UInt64 copyStream64(std::istream& istr, std::ostream& ostr, std::size_t bufferSize = 8192);
+	static Poco::UInt64 copyStream64(std::istream& istr, std::ostream& ostr, std::size_t bufferSize = 8192);
 		/// Writes all bytes readable from istr to ostr, using an internal buffer.
 		///
 		/// Returns the number of bytes copied as a 64-bit unsigned integer.
@@ -69,13 +69,13 @@ public:
 		/// integer is used to count the number of bytes copied.
 #endif
 
-    static std::streamsize copyStreamUnbuffered(std::istream& istr, std::ostream& ostr);
+	static std::streamsize copyStreamUnbuffered(std::istream& istr, std::ostream& ostr);
 		/// Writes all bytes readable from istr to ostr.
 		///
 		/// Returns the number of bytes copied.
 
 #if defined(POCO_HAVE_INT64)
-    static Poco::UInt64 copyStreamUnbuffered64(std::istream& istr, std::ostream& ostr);
+	static Poco::UInt64 copyStreamUnbuffered64(std::istream& istr, std::ostream& ostr);
 		/// Writes all bytes readable from istr to ostr.
 		///
 		/// Returns the number of bytes copied as a 64-bit unsigned integer.
@@ -84,13 +84,13 @@ public:
 		/// integer is used to count the number of bytes copied.
 #endif
 
-    static std::streamsize copyToString(std::istream& istr, std::string& str, std::size_t bufferSize = 8192);
+	static std::streamsize copyToString(std::istream& istr, std::string& str, std::size_t bufferSize = 8192);
 		/// Appends all bytes readable from istr to the given string, using an internal buffer.
 		///
 		/// Returns the number of bytes copied.
 
 #if defined(POCO_HAVE_INT64)
-    static Poco::UInt64 copyToString64(std::istream& istr, std::string& str, std::size_t bufferSize = 8192);
+	static Poco::UInt64 copyToString64(std::istream& istr, std::string& str, std::size_t bufferSize = 8192);
 		/// Appends all bytes readable from istr to the given string, using an internal buffer.
 		///
 		/// Returns the number of bytes copied as a 64-bit unsigned integer.
