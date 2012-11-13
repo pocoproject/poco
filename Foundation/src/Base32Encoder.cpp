@@ -45,13 +45,14 @@ const unsigned char Base32EncoderBuf::OUT_ENCODING[32] =
 	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
 	'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
 	'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-	'Y', 'Z', '2', '3', '4', '5', '6', '8',
+	'Y', 'Z', '2', '3', '4', '5', '6', '7',
 };
 
 
-Base32EncoderBuf::Base32EncoderBuf(std::ostream& ostr): 
+Base32EncoderBuf::Base32EncoderBuf(std::ostream& ostr, bool padding): 
 	_groupLength(0),
-	_buf(*ostr.rdbuf())
+	_buf(*ostr.rdbuf()),
+	_doPadding(padding)
 {
 }
 
@@ -112,14 +113,14 @@ int Base32EncoderBuf::close()
 		if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
 		idx = ((_group[0] & 0x07) << 2);
 		if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
-#if 0
-		if (_buf.sputc('=') == eof) return eof;
-		if (_buf.sputc('=') == eof) return eof;
-		if (_buf.sputc('=') == eof) return eof;
-		if (_buf.sputc('=') == eof) return eof;
-		if (_buf.sputc('=') == eof) return eof;
-		if (_buf.sputc('=') == eof) return eof;
-#endif
+		if (_doPadding) {
+			if (_buf.sputc('=') == eof) return eof;
+			if (_buf.sputc('=') == eof) return eof;
+			if (_buf.sputc('=') == eof) return eof;
+			if (_buf.sputc('=') == eof) return eof;
+			if (_buf.sputc('=') == eof) return eof;
+			if (_buf.sputc('=') == eof) return eof;
+		}
 	}
 	else if (_groupLength == 2)
 	{
@@ -133,12 +134,12 @@ int Base32EncoderBuf::close()
 		if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
 		idx = ((_group[1] & 0x01) << 4);
 		if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
-#if 0
-		if (_buf.sputc('=') == eof) return eof;
-		if (_buf.sputc('=') == eof) return eof;
-		if (_buf.sputc('=') == eof) return eof;
-		if (_buf.sputc('=') == eof) return eof;
-#endif
+		if (_doPadding) {
+			if (_buf.sputc('=') == eof) return eof;
+			if (_buf.sputc('=') == eof) return eof;
+			if (_buf.sputc('=') == eof) return eof;
+			if (_buf.sputc('=') == eof) return eof;
+		}
 	}
 	else if (_groupLength == 3)
 	{
@@ -154,11 +155,11 @@ int Base32EncoderBuf::close()
 		if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
 		idx = ((_group[2] & 0x0F) << 1);
 		if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
-#if 0
-		if (_buf.sputc('=') == eof) return eof;
-		if (_buf.sputc('=') == eof) return eof;
-		if (_buf.sputc('=') == eof) return eof;
-#endif
+		if (_doPadding) {
+			if (_buf.sputc('=') == eof) return eof;
+			if (_buf.sputc('=') == eof) return eof;
+			if (_buf.sputc('=') == eof) return eof;
+		}
 	}
 	else if (_groupLength == 4)
 	{
@@ -178,16 +179,15 @@ int Base32EncoderBuf::close()
 		if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
 		idx = ((_group[3] & 0x03) << 3);
 		if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
-#if 0
-		if (_buf.sputc('=') == eof) return eof;
-#endif
+		if (_doPadding && _buf.sputc('=') == eof) return eof;
 	}
 	_groupLength = 0;
 	return _buf.pubsync();
 }
 
 
-Base32EncoderIOS::Base32EncoderIOS(std::ostream& ostr): _buf(ostr)
+Base32EncoderIOS::Base32EncoderIOS(std::ostream& ostr, bool padding):
+	_buf(ostr, padding)
 {
 	poco_ios_init(&_buf);
 }
@@ -210,7 +210,8 @@ Base32EncoderBuf* Base32EncoderIOS::rdbuf()
 }
 
 
-Base32Encoder::Base32Encoder(std::ostream& ostr): Base32EncoderIOS(ostr), std::ostream(&_buf)
+Base32Encoder::Base32Encoder(std::ostream& ostr, bool padding):
+	Base32EncoderIOS(ostr, padding), std::ostream(&_buf)
 {
 }
 

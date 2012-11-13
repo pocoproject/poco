@@ -59,7 +59,7 @@ class Foundation_API Base32EncoderBuf: public UnbufferedStreamBuf
 	/// not updated to match the buffer's state.
 {
 public:
-	Base32EncoderBuf(std::ostream& ostr);
+	Base32EncoderBuf(std::ostream& ostr, bool padding = true);
 	~Base32EncoderBuf();
 	
 	int close();
@@ -71,6 +71,7 @@ private:
 	unsigned char   _group[5];
 	int             _groupLength;
 	std::streambuf& _buf;
+	bool		_doPadding;
 	
 	static const unsigned char OUT_ENCODING[32];
 	
@@ -88,7 +89,7 @@ class Foundation_API Base32EncoderIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	Base32EncoderIOS(std::ostream& ostr);
+	Base32EncoderIOS(std::ostream& ostr, bool padding = true);
 	~Base32EncoderIOS();
 	int close();
 	Base32EncoderBuf* rdbuf();
@@ -116,7 +117,7 @@ class Foundation_API Base32Encoder: public Base32EncoderIOS, public std::ostream
 	/// not updated to match the buffer's state.
 {
 public:
-	Base32Encoder(std::ostream& ostr);
+	Base32Encoder(std::ostream& ostr, bool padding = true);
 	~Base32Encoder();
 
 private:
