@@ -121,7 +121,8 @@
 
 
 // No support for JSON configuration in 
-// Poco::Util::Application.
+// Poco::Util::Application. Avoids linking of JSON
+// library and saves a few 100 Kbytes.
 // #define POCO_UTIL_NO_JSONCONFIGURATION
 
 
