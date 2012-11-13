@@ -888,6 +888,12 @@
     <ClCompile Include="src\Error.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Base32Decoder.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Base32Encoder.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Any.h">
@@ -1837,6 +1843,12 @@
     </ClInclude>
     <ClInclude Include="include\Poco\Error.h">
       <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Base32Decoder.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Base32Encoder.h">
+      <Filter>Streams\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -270,6 +270,12 @@
     <ClCompile Include="src\Void.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Base32Decoder.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Base32Encoder.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Base64Decoder.cpp">
       <Filter>Streams\Source Files</Filter>
     </ClCompile>
@@ -1045,6 +1051,12 @@
     </ClInclude>
     <ClInclude Include="include\Poco\Void.h">
       <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Base32Decoder.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Base32Encoder.h">
+      <Filter>Streams\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Base64Decoder.h">
       <Filter>Streams\Header Files</Filter>

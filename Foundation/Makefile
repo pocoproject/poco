@@ -8,7 +8,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder \
+objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
+	Base32Decoder Base32Encoder Base64Decoder Base64Encoder \
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Configurable ConsoleChannel \
 	CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator DirectoryWatcher \

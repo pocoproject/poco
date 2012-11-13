@@ -1265,6 +1265,14 @@
 				Name="Source Files"
 				>
 				<File
+					RelativePath=".\src\Base32Decoder.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Base32Encoder.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Base64Decoder.cpp"
 					>
 				</File>
@@ -1444,6 +1452,14 @@
 			<Filter
 				Name="Header Files"
 				>
+				<File
+					RelativePath=".\include\Poco\Base32Decoder.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Base32Encoder.h"
+					>
+				</File>
 				<File
 					RelativePath=".\include\Poco\Base64Decoder.h"
 					>

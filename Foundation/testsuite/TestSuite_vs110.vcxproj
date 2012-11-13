@@ -330,6 +330,7 @@
     <ClCompile Include="src\StringTokenizerTest.cpp" />
     <ClCompile Include="src\TuplesTest.cpp" />
     <ClCompile Include="src\TypeListTest.cpp" />
+    <ClCompile Include="src\Base32Test.cpp" />
     <ClCompile Include="src\Base64Test.cpp" />
     <ClCompile Include="src\BinaryReaderWriterTest.cpp" />
     <ClCompile Include="src\CountingStreamTest.cpp" />
@@ -463,6 +464,7 @@
     <ClInclude Include="src\StringTokenizerTest.h" />
     <ClInclude Include="src\TuplesTest.h" />
     <ClInclude Include="src\TypeListTest.h" />
+    <ClInclude Include="src\Base32Test.h" />
     <ClInclude Include="src\Base64Test.h" />
     <ClInclude Include="src\BinaryReaderWriterTest.h" />
     <ClInclude Include="src\CountingStreamTest.h" />

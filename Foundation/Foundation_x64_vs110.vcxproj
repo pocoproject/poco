@@ -396,6 +396,8 @@
     <ClCompile Include="src\Var.cpp" />
     <ClCompile Include="src\VarHolder.cpp" />
     <ClCompile Include="src\Void.cpp" />
+    <ClCompile Include="src\Base32Decoder.cpp" />
+    <ClCompile Include="src\Base32Encoder.cpp" />
     <ClCompile Include="src\Base64Decoder.cpp" />
     <ClCompile Include="src\Base64Encoder.cpp" />
     <ClCompile Include="src\BinaryReader.cpp" />
@@ -1044,6 +1046,8 @@
     <ClInclude Include="include\Poco\UTF32Encoding.h" />
     <ClInclude Include="include\Poco\Version.h" />
     <ClInclude Include="include\Poco\Void.h" />
+    <ClInclude Include="include\Poco\Base32Decoder.h" />
+    <ClInclude Include="include\Poco\Base32Encoder.h" />
     <ClInclude Include="include\Poco\Base64Decoder.h" />
     <ClInclude Include="include\Poco\Base64Encoder.h" />
     <ClInclude Include="include\Poco\BinaryReader.h" />

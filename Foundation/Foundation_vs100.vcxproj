@@ -290,6 +290,8 @@
   <ItemGroup>
     <ClCompile Include="src\Ascii.cpp" />
     <ClCompile Include="src\AtomicCounter.cpp" />
+    <ClCompile Include="src\Base32Decoder.cpp" />
+    <ClCompile Include="src\Base32Encoder.cpp" />
     <ClCompile Include="src\Bugcheck.cpp" />
     <ClCompile Include="src\ByteOrder.cpp" />
     <ClCompile Include="src\Checksum.cpp" />
@@ -977,6 +979,8 @@
     <ClInclude Include="include\Poco\AtomicCounter.h" />
     <ClInclude Include="include\Poco\AutoPtr.h" />
     <ClInclude Include="include\Poco\AutoReleasePool.h" />
+    <ClInclude Include="include\Poco\Base32Decoder.h" />
+    <ClInclude Include="include\Poco\Base32Encoder.h" />
     <ClInclude Include="include\Poco\Buffer.h" />
     <ClInclude Include="include\Poco\Bugcheck.h" />
     <ClInclude Include="include\Poco\ByteOrder.h" />
