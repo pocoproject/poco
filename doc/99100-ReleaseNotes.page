@@ -25,6 +25,11 @@ AAAIntroduction
     to force rotation of the log file when it's opened.
   - fixed a bug in Poco::XML::XMLWriter::emptyElement(): need to pop namespace context
   - OS X builds now use Clang as default compiler
+  - Updated SQLite to 3.7.14.1
+  - POCO_SERVER_MAIN macro now has a try ... catch block for Poco::Exception and writes 
+    the displayText to stderr.
+  - Poco/Platform.h now defines POCO_LOCAL_STATIC_INIT_IS_THREADSAFE macro if the compiler
+    generates thread-safe static local initialization code.
 
 
 !!!Release 1.4.4
