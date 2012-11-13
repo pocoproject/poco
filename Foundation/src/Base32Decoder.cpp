@@ -38,6 +38,7 @@
 #include "Poco/Base32Encoder.h"
 #include "Poco/Exception.h"
 #include "Poco/Mutex.h"
+#include <cstring>
 
 
 namespace Poco {
@@ -89,7 +90,7 @@ int Base32DecoderBuf::readFromDevice()
 	else
 	{
 		unsigned char buffer[8];
-		memset(buffer, '=', sizeof(buffer));
+		std::memset(buffer, '=', sizeof(buffer));
 		int c;
 
 		// per RFC-4648, Section 6, permissible block lengths are:
