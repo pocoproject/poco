@@ -247,33 +247,57 @@ private:
 	#define POCO_SERVER_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)	\
 	{									\
-		App app;						\
-		return app.run(argc, argv);		\
+		try 							\
+		{								\
+			App app;					\
+			return app.run(argc, argv);	\
+		}								\
+		catch (Poco::Exception& exc)	\
+		{								\
+			std::cerr << exc.displayText() << std::endl;	\
+			return Poco::Util::Application::EXIT_SOFTWARE; 	\
+		}								\
 	}
 #elif defined(POCO_VXWORKS)
 	#define POCO_SERVER_MAIN(App) \
-	int pocoSrvMain(const char* appName, ...) \
-	{ \
-		std::vector<std::string> args; \
-		args.push_back(std::string(appName)); \
-		va_list vargs; \
-		va_start(vargs, appName); \
-		const char* arg = va_arg(vargs, const char*); \
-		while (arg) \
-		{ \
-			args.push_back(std::string(arg)); \
-			arg = va_arg(vargs, const char*); \
-		} \
-		va_end(vargs); \
-		App app; \
-		return app.run(args); \
+	int pocoSrvMain(const char* appName, ...) 				\
+	{ 														\
+		std::vector<std::string> args; 						\
+		args.push_back(std::string(appName)); 				\
+		va_list vargs; 										\
+		va_start(vargs, appName); 							\
+		const char* arg = va_arg(vargs, const char*); 		\
+		while (arg) 										\
+		{ 													\
+			args.push_back(std::string(arg));				\
+			arg = va_arg(vargs, const char*); 				\
+		} 													\
+		va_end(vargs); 										\
+		try													\
+		{ 													\
+			App app;										\
+			return app.run(args); 							\
+		} 													\
+		catch (Poco::Exception& exc)						\
+		{													\
+			std::cerr << exc.displayText() << std::endl;	\
+			return Poco::Util::Application::EXIT_SOFTWARE; 	\
+		}													\
 	}
 #else
 	#define POCO_SERVER_MAIN(App) \
 	int main(int argc, char** argv)		\
 	{									\
-		App app;						\
-		return app.run(argc, argv);		\
+		try 							\
+		{								\
+			App app;					\
+			return app.run(argc, argv);	\
+		}								\
+		catch (Poco::Exception& exc)	\
+		{								\
+			std::cerr << exc.displayText() << std::endl;	\
+			return Poco::Util::Application::EXIT_SOFTWARE; 	\
+		}								\
 	}
 #endif
 
