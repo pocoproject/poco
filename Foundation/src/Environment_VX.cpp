@@ -1,7 +1,7 @@
 
 // Environment_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_VX.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/Environment_VX.cpp#4 $
 //
 // Library: Foundation
 // Package: Core

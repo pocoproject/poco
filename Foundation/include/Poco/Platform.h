@@ -1,7 +1,7 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#5 $
+// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -213,6 +213,16 @@
 
 #if !defined(POCO_ARCH)
 	#error "Unknown Hardware Architecture."
+#endif
+
+
+//
+// Thread-safety of local static initialization
+//
+#if __cplusplus >= 201103L || __GNUC__ >= 4 || defined(__clang__)
+#ifndef POCO_LOCAL_STATIC_INIT_IS_THREADSAFE
+#define POCO_LOCAL_STATIC_INIT_IS_THREADSAFE 1
+#endif
 #endif
 
 
