@@ -206,8 +206,8 @@ public:
 	static RouteList match(IPAddress target);
 		/// Retruns routes matching target.
 
-	static const IPAddress getDefaultAddress(IPAddress::Family family);
-		/// Returns default IP address for the family.
+	static IPAddress::List getDefaultAddresses(IPAddress::Family family);
+		/// Returns default IP addresses for the family.
 
 	static std::string protocolName(RouteProto proto);
 		/// Returns protocol as string.

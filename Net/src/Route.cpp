@@ -207,18 +207,20 @@ Route::RouteList Route::match(IPAddress target)
 }
 
 
-const IPAddress Route::getDefaultAddress(IPAddress::Family family)
+IPAddress::List Route::getDefaultAddresses(IPAddress::Family family)
 {
 	Route::RouteList routes = Route::defaults(family);
+	IPAddress::List addresses;
 
-	if (! routes.empty()) {
-		Route::RouteList::const_iterator it = routes.begin();
-
+	RouteList::const_iterator it = routes.begin();
+	RouteList::const_iterator end = routes.end();
+	for (; it != end; ++it) {
 		IPAddress addr = it->getNetworkInterface().firstAddress(family);
-		return addr;
+
+		addresses.push_back(addr);
 	}
 
-	return IPAddress::wildcard(family);
+	return addresses;
 }
 
 
