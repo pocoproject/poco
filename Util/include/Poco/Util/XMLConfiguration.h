@@ -36,6 +36,11 @@
 //
 
 
+// Avoid accidental linking of XML library when XMLConfiguration
+// is not desired.
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
+
+
 #ifndef Util_XMLConfiguration_INCLUDED
 #define Util_XMLConfiguration_INCLUDED
 
@@ -215,3 +220,5 @@ private:
 
 
 #endif // Util_XMLConfiguration_INCLUDED
+
+#endif // POCO_UTIL_NO_XMLCONFIGURATION
