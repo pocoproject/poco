@@ -60,6 +60,9 @@ RELEASEOPT_CC   = -O2 -DNDEBUG
 RELEASEOPT_CXX  = -O2 -DNDEBUG
 RELEASEOPT_LINK = -O2
 
+# needed to build libmnl
+CXXFLAGS	+= -std=c++0x
+
 #
 # System Specific Flags
 #

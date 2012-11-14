@@ -42,6 +42,9 @@
 #include <libmnl/libmnl.h>
 #include <linux/rtnetlink.h>
 
+namespace Poco {
+namespace Net {
+
 class RouteHelper
 {
 public:
@@ -117,7 +120,7 @@ void RouteHelper::createRouteIPv4(Route::RouteList *routes, struct rt_container 
 		// route->setPriority(rt_stuff->priority);
 
 		// no hops, usage, mtu, or age...
-		routes->push_back(route);
+		routes->push_back(*route);
 	}
 }
 
@@ -136,7 +139,7 @@ void RouteHelper::createRouteIPv6(Route::RouteList *routes, struct rt_container 
 		// route->setPriority(rt_stuff->priority);
 
 		// no hops, usage, mtu, or age...
-		routes->push_back(route);
+		routes->push_back(*route);
 	}
 }
 
@@ -330,3 +333,5 @@ Route::RouteList Route::list(IPAddress::Family family)
 
 	return routes;
 }
+
+}} // namespace Poco::Net
