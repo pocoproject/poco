@@ -108,7 +108,7 @@ static Route::RouteProto xlateProto(unsigned prot)
 void RouteHelper::createRouteIPv4(Route::RouteList *routes, struct rt_container *rt_stuff)
 {
 	if (rt_stuff->table == RT_TABLE_MAIN && rt_stuff->type <= RTN_MULTICAST) {
-		Route *route;
+		Route* route;
 
 		if (rt_stuff->gw.in4.s_addr != 0)
 			route = new Route(IPAddress(&rt_stuff->dest.in4, sizeof(rt_stuff->dest.in4)), IPAddress(rt_stuff->prefix, IPAddress::IPv4), IPAddress(&rt_stuff->gw.in4, sizeof(rt_stuff->gw.in4)), rt_stuff->oif, Route::ROUTE_INDIRECT);
@@ -121,13 +121,15 @@ void RouteHelper::createRouteIPv4(Route::RouteList *routes, struct rt_container 
 
 		// no hops, usage, mtu, or age...
 		routes->push_back(*route);
+
+		delete route;
 	}
 }
 
 void RouteHelper::createRouteIPv6(Route::RouteList *routes, struct rt_container *rt_stuff)
 {
 	if (rt_stuff->table == RT_TABLE_MAIN && rt_stuff->type <= RTN_MULTICAST) {
-		Route *route;
+		Route* route;
 
 		if (!in6zero(rt_stuff->gw.in6))
 			route = new Route(IPAddress(&rt_stuff->dest.in6, sizeof(rt_stuff->dest.in6)), IPAddress(rt_stuff->prefix, IPAddress::IPv6), IPAddress(&rt_stuff->gw.in6, sizeof(rt_stuff->gw.in6), rt_stuff->oif), rt_stuff->oif, Route::ROUTE_INDIRECT);
@@ -140,6 +142,8 @@ void RouteHelper::createRouteIPv6(Route::RouteList *routes, struct rt_container 
 
 		// no hops, usage, mtu, or age...
 		routes->push_back(*route);
+
+		delete route;
 	}
 }
 

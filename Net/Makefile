@@ -37,4 +37,6 @@ target         = PocoNet
 target_version = $(LIBVERSION)
 target_libs    = PocoFoundation
 
+SYSLIBS += -lmnl
+
 include $(POCO_BASE)/build/rules/lib
