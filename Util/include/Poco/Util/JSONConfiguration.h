@@ -36,6 +36,11 @@
 //
 
 
+// Avoid accidental linking of JSON library when JSONConfiguration
+// is not desired.
+#ifndef POCO_UTIL_NO_JSONCONFIGURATION
+
+
 #ifndef Util_JSONConfiguration_INCLUDED
 #define Util_JSONConfiguration_INCLUDED
 
@@ -160,3 +165,5 @@ private:
 
 
 #endif // Util_JSONConfiguration_INCLUDED
+
+#endif // POCO_UTIL_NO_JSONCONFIGURATION
