@@ -151,7 +151,8 @@ public:
 		/// On other platforms this is the same as name().
 
 	const IPAddress& firstAddress(IPAddress::Family family) const;
-		/// Returns the first IP address bound to the interface.
+		/// Returns the first IP address bound to the interface,
+		/// or wildcard if there is none.
 
 	const IPAddress& address(unsigned index = 0) const;
 		/// Returns the IP address bound to the interface at index position.

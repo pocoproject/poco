@@ -146,19 +146,15 @@ void NetworkInterfaceTest::testForAddress()
 		// not all interfaces have IP configured
 		if (it->second.addressList().empty()) continue;
 
+		IPAddress first = it->second.firstAddress(IPAddress::IPv4);
 		if (it->second.supportsIPv4())
 		{
-			NetworkInterface ifc = NetworkInterface::forAddress(it->second.firstAddress(IPAddress::IPv4));
-			assert (ifc.firstAddress(IPAddress::IPv4) == it->second.firstAddress(IPAddress::IPv4));
+			NetworkInterface ifc = NetworkInterface::forAddress(first);
+			assert (ifc.firstAddress(IPAddress::IPv4) == first);
 		}
 		else
 		{
-			try
-			{
-				it->second.firstAddress(IPAddress::IPv4);
-				fail ("must throw");
-			}
-			catch (NotFoundException&) { }
+			assert(first.isWildcard());
 		}
 	}
 }

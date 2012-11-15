@@ -240,30 +240,21 @@ NetworkInterfaceImpl::~NetworkInterfaceImpl()
 
 bool NetworkInterfaceImpl::supportsIPv4() const
 {
-	AddressList::const_iterator it = _addressList.begin();
-	AddressList::const_iterator end = _addressList.end();
-	for (; it != end; ++it)
-	{
-		if (IPAddress::IPv4 == it->get<NetworkInterface::IP_ADDRESS>().family())
-			return true;
-	}
+	IPAddress addr = firstAddress(IPAddress::IPv4);
 
-	return false;
+	return !addr.isWildcard();
 }
 
 
 bool NetworkInterfaceImpl::supportsIPv6() const
 {
 #ifdef POCO_HAVE_IPv6
-	AddressList::const_iterator it = _addressList.begin();
-	AddressList::const_iterator end = _addressList.end();
-	for (; it != end; ++it)
-	{
-		if (IPAddress::IPv6 == it->get<NetworkInterface::IP_ADDRESS>().family())
-			return true;
-	}
-#endif
+	IPAddress addr = firstAddress(IPAddress::IPv6);
+
+	return !addr.isWildcard();
+#else
 	return false;
+#endif
 }
 
 
@@ -295,7 +286,10 @@ const IPAddress& NetworkInterfaceImpl::firstAddress(IPAddress::Family family) co
 		if (addr.family() == family) return addr;
 	}
 
-	throw NotFoundException(format("%s family address not found.", (family == IPAddress::IPv4) ? std::string("IPv4") : std::string("IPv6")));
+	// because testing isWildcard() is a lot faster than catching an
+	// exception... and having an unconfigured interface is hardly
+	// an 'exceptional' state.
+	return IPAddress(family);
 }
 
 
