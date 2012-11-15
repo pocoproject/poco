@@ -1010,6 +1010,7 @@
     <ClInclude Include="include\Poco\FPEnvironment_WIN32.h" />
     <ClInclude Include="include\Poco\Instantiator.h" />
     <ClInclude Include="include\Poco\Latin2Encoding.h" />
+    <ClInclude Include="include\Poco\ListMap.h" />
     <ClInclude Include="include\Poco\MemoryPool.h" />
     <ClInclude Include="include\Poco\MetaProgramming.h" />
     <ClInclude Include="include\Poco\NamedTuple.h" />

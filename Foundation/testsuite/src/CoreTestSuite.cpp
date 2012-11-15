@@ -57,6 +57,7 @@
 #endif
 #include "TypeListTest.h"
 #include "ObjectPoolTest.h"
+#include "ListMapTest.h"
 
 
 CppUnit::Test* CoreTestSuite::suite()
@@ -89,6 +90,7 @@ CppUnit::Test* CoreTestSuite::suite()
 #endif
 	pSuite->addTest(TypeListTest::suite());
 	pSuite->addTest(ObjectPoolTest::suite());
+	pSuite->addTest(ListMapTest::suite());
 
 	return pSuite;
 }

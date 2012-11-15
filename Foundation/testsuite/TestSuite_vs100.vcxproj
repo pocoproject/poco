@@ -312,6 +312,7 @@
     <ClCompile Include="src\FIFOBufferStreamTest.cpp" />
     <ClCompile Include="src\FormatTest.cpp" />
     <ClCompile Include="src\FPETest.cpp" />
+    <ClCompile Include="src\ListMapTest.cpp" />
     <ClCompile Include="src\MemoryPoolTest.cpp" />
     <ClCompile Include="src\NamedTuplesTest.cpp" />
     <ClCompile Include="src\NDCTest.cpp" />
@@ -445,6 +446,7 @@
     <ClInclude Include="src\FIFOBufferStreamTest.h" />
     <ClInclude Include="src\FormatTest.h" />
     <ClInclude Include="src\FPETest.h" />
+    <ClInclude Include="src\ListMapTest.h" />
     <ClInclude Include="src\MemoryPoolTest.h" />
     <ClInclude Include="src\NamedTuplesTest.h" />
     <ClInclude Include="src\NDCTest.h" />

@@ -94,13 +94,13 @@ void NameValueCollection::set(const std::string& name, const std::string& value)
 	if (it != _map.end())
 		it->second = value;
 	else
-		_map.insert(HeaderMap::value_type(name, value));
+		_map.insert(HeaderMap::ValueType(name, value));
 }
 
 	
 void NameValueCollection::add(const std::string& name, const std::string& value)
 {
-	_map.insert(HeaderMap::value_type(name, value));
+	_map.insert(HeaderMap::ValueType(name, value));
 }
 
 	
