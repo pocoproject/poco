@@ -1,7 +1,9 @@
 //
-// StreamsTestSuite.cpp
+// Base32Test.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/StreamsTestSuite.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/Base32Test.h#1 $
+//
+// Definition of the Base32Test class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -30,41 +32,31 @@
 //
 
 
-#include "StreamsTestSuite.h"
-#include "Base32Test.h"
-#include "Base64Test.h"
-#include "HexBinaryTest.h"
-#include "StreamCopierTest.h"
-#include "CountingStreamTest.h"
-#include "NullStreamTest.h"
-#include "ZLibTest.h"
-#include "StreamTokenizerTest.h"
-#include "BinaryReaderWriterTest.h"
-#include "LineEndingConverterTest.h"
-#include "TeeStreamTest.h"
-#include "FileStreamTest.h"
-#include "MemoryStreamTest.h"
-#include "FIFOBufferStreamTest.h"
+#ifndef Base32Test_INCLUDED
+#define Base32Test_INCLUDED
 
 
-CppUnit::Test* StreamsTestSuite::suite()
+#include "Poco/Foundation.h"
+#include "CppUnit/TestCase.h"
+
+
+class Base32Test: public CppUnit::TestCase
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("StreamsTestSuite");
+public:
+	Base32Test(const std::string& name);
+	~Base32Test();
 
-	pSuite->addTest(Base32Test::suite());
-	pSuite->addTest(Base64Test::suite());
-	pSuite->addTest(HexBinaryTest::suite());
-	pSuite->addTest(StreamCopierTest::suite());
-	pSuite->addTest(CountingStreamTest::suite());
-	pSuite->addTest(NullStreamTest::suite());
-	pSuite->addTest(ZLibTest::suite());
-	pSuite->addTest(StreamTokenizerTest::suite());
-	pSuite->addTest(BinaryReaderWriterTest::suite());
-	pSuite->addTest(LineEndingConverterTest::suite());
-	pSuite->addTest(TeeStreamTest::suite());
-	pSuite->addTest(FileStreamTest::suite());
-	pSuite->addTest(MemoryStreamTest::suite());
-	pSuite->addTest(FIFOBufferStreamTest::suite());
+	void testEncoder();
+	void testDecoder();
+	void testEncodeDecode();
 
-	return pSuite;
-}
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
+private:
+};
+
+
+#endif // Base32Test_INCLUDED

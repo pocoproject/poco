@@ -240,6 +240,9 @@
     <ClCompile Include="src\TypeListTest.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Base32Test.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Base64Test.cpp">
       <Filter>Streams\Source Files</Filter>
     </ClCompile>
@@ -637,6 +640,9 @@
     </ClInclude>
     <ClInclude Include="src\TypeListTest.h">
       <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Base32Test.h">
+      <Filter>Streams\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Base64Test.h">
       <Filter>Streams\Header Files</Filter>
