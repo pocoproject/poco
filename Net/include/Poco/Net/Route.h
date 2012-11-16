@@ -84,11 +84,11 @@ class Net_API Route
 public:
 	typedef std::list<Route> RouteList;
 
-	static const unsigned int ROUTE_METRIC_UNKNOWN = ~0;
-	static const unsigned int ROUTE_MTU_UNKNOWN = 0;
-	static const unsigned int ROUTE_HOPS_UNKNOWN = ~0;
-	static const unsigned int ROUTE_USE_UNKNOWN = ~1;
-	static const unsigned int ROUTE_CREATED_UNKNOWN = 0;
+	static const unsigned int ROUTE_METRIC_UNKNOWN = ~0U;
+	static const unsigned int ROUTE_MTU_UNKNOWN = 0U;
+	static const unsigned int ROUTE_HOPS_UNKNOWN = ~0U;
+	static const unsigned int ROUTE_USE_UNKNOWN = ~1U;
+	static const unsigned int ROUTE_CREATED_UNKNOWN = 0U;
 	
 	enum RouteType
 	{
