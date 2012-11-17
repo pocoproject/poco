@@ -1,7 +1,7 @@
 //
 // Struct.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Struct.h#1 $
+// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Struct.h#2 $
 //
 // Library: CppParser
 // Package: SymbolTable
@@ -61,7 +61,8 @@ public:
 	{
 		FN_TEMPLATE = 1,
 		FN_INLINE   = 2, // when the whole class is inlined in a c++ file
-		FN_TEMPLATE_SPECIALIZATION = 4
+		FN_TEMPLATE_SPECIALIZATION = 4,
+		FN_FINAL = 8
 	};
 	
 	struct Base
@@ -115,9 +116,15 @@ public:
 
 	void makeInline();
 		/// Changes the class to a inline class, i.e. definition and implementation are hidden in a cpp file.
+		
+	void makeFinal();
+		/// Makes the class final.
 
 	bool isInline() const;
 		/// Returns true if the complete class is inlined in a cpp file.
+
+	bool isFinal() const;
+		/// Returns true if the class is final.
 
 	void constructors(Functions& functions) const;
 		/// Returns all constructors, sorted by their parameter count.
@@ -190,9 +197,21 @@ inline void Struct::makeInline()
 }
 
 
+inline void Struct::makeFinal()
+{
+	_flags |= FN_FINAL;
+}
+
+
 inline bool Struct::isInline() const
 {
 	return (_flags & FN_INLINE) != 0;
+}
+
+
+inline bool Struct::isFinal() const
+{
+	return (_flags & FN_FINAL) != 0;
 }
 
 

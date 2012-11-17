@@ -1,7 +1,7 @@
 //
 // CppToken.cpp
 //
-// $Id: //poco/1.4/CppParser/src/CppToken.cpp#2 $
+// $Id: //poco/1.4/CppParser/src/CppToken.cpp#3 $
 //
 // Library: CppParser
 // Package: CppParser
@@ -254,6 +254,8 @@ int OperatorToken::asInteger() const
 IdentifierToken::IdentifierToken()
 {
 	int i = 1;
+	_kwMap["alignas"] = i++;
+	_kwMap["alignof"] = i++;
 	_kwMap["and"] = i++;
 	_kwMap["and_eq"] = i++;
 	_kwMap["asm"] = i++;
@@ -265,11 +267,15 @@ IdentifierToken::IdentifierToken()
 	_kwMap["case"] = i++;
 	_kwMap["catch"] = i++;
 	_kwMap["char"] = i++;
+	_kwMap["char16_t"] = i++;
+	_kwMap["char32_t"] = i++;
 	_kwMap["class"] = i++;
 	_kwMap["compl"] = i++;
 	_kwMap["const"] = i++;
+	_kwMap["constexpr"] = i++;
 	_kwMap["const_cast"] = i++;
 	_kwMap["continue"] = i++;
+	_kwMap["decltype"] = i++;
 	_kwMap["default"] = i++;
 	_kwMap["delete"] = i++;
 	_kwMap["do"] = i++;
@@ -292,8 +298,10 @@ IdentifierToken::IdentifierToken()
 	_kwMap["mutable"] = i++;
 	_kwMap["namespace"] = i++;
 	_kwMap["new"] = i++;
+	_kwMap["noexcept"] = i++;
 	_kwMap["not"] = i++;
 	_kwMap["not_eq"] = i++;
+	_kwMap["nullptr"] = i++;
 	_kwMap["operator"] = i++;
 	_kwMap["or"] = i++;
 	_kwMap["or_eq"] = i++;
@@ -307,11 +315,13 @@ IdentifierToken::IdentifierToken()
 	_kwMap["signed"] = i++;
 	_kwMap["sizeof"] = i++;
 	_kwMap["static"] = i++;
+	_kwMap["static_assert"] = i++;
 	_kwMap["static_cast"] = i++;
 	_kwMap["struct"] = i++;
 	_kwMap["switch"] = i++;
 	_kwMap["template"] = i++;
 	_kwMap["this"] = i++;
+	_kwMap["thread_local"] = i++;
 	_kwMap["throw"] = i++;
 	_kwMap["true"] = i++;
 	_kwMap["try"] = i++;
