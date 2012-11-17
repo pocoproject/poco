@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.5 (2012-11-15)
+Release 1.4.5 (2012-11-19)
 ==========================
 
 - added Visual Studio 2012 project files
@@ -1782,4 +1782,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#69 $
+$Id: //poco/1.4/dist/CHANGELOG#70 $
