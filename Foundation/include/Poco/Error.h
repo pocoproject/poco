@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {
