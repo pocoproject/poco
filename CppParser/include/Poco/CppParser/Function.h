@@ -1,7 +1,7 @@
 //
 // Function.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Function.h#1 $
+// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Function.h#2 $
 //
 // Library: CppParser
 // Package: SymbolTable
@@ -58,12 +58,17 @@ class CppParser_API Function: public Decl
 public:
 	enum Flags
 	{
-		FN_STATIC       = 1,  /// The function is static.
-		FN_VIRTUAL      = 2,  /// The function is virtual.
-		FN_INLINE       = 4,  /// The function is inline.
-		FN_CONST        = 8,  /// The function is const.
-		FN_TEMPLATE     = 16, /// The function is a template.
-		FN_PURE_VIRTUAL = 32  /// The function is pure virtual.
+		FN_STATIC       = 1,   /// The function is static.
+		FN_VIRTUAL      = 2,   /// The function is virtual.
+		FN_INLINE       = 4,   /// The function is inline.
+		FN_CONST        = 8,   /// The function is const.
+		FN_TEMPLATE     = 16,  /// The function is a template.
+		FN_PURE_VIRTUAL = 32,  /// The function is pure virtual.
+		FN_FINAL        = 64,  /// The function is final.
+		FN_OVERRIDE     = 128, /// The function is override.
+		FN_NOEXCEPT     = 256, /// The function is noexcept.
+		FN_DEFAULT      = 512, /// The function is default.
+		FN_DELETE       = 1024 /// The function has been deleted.
 	};
 	
 	typedef std::vector<Parameter*> Parameters;
@@ -94,6 +99,21 @@ public:
 		
 	void makePureVirtual();
 		/// Sets the FN_PURE_VIRTUAL flag.
+		
+	void makeFinal();
+		/// Sets the FN_FINAL flag.
+		
+	void makeOverride();
+		/// Sets the FN_OVERRIDE flag.
+		
+	void makeNoexcept();
+		/// Sets the FN_NOEXCEPT flag.
+
+	void makeDefault();
+		/// Sets the FN_DEFAULT flag.
+	
+	void makeDelete();
+		/// Sets the FN_DELETE flag.
 	
 	int flags() const;
 		/// Returns the function's flags.

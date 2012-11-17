@@ -1,7 +1,7 @@
 //
 // Function.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Function.cpp#1 $
+// $Id: //poco/1.4/CppParser/src/Function.cpp#2 $
 //
 // Library: CppParser
 // Package: SymbolTable
@@ -125,6 +125,36 @@ void Function::makeConst()
 void Function::makePureVirtual()
 {
 	_flags |= FN_PURE_VIRTUAL;
+}
+
+
+void Function::makeFinal()
+{
+	_flags |= FN_FINAL;
+}
+
+	
+void Function::makeOverride()
+{
+	_flags |= FN_OVERRIDE;
+}
+
+	
+void Function::makeNoexcept()
+{
+	_flags |= FN_NOEXCEPT;
+}
+
+
+void Function::makeDefault()
+{
+	_flags |= FN_DEFAULT;
+}
+
+
+void Function::makeDelete()
+{
+	_flags |= FN_DELETE;
 }
 
 
