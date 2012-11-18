@@ -1,7 +1,7 @@
 //
 // WindowsTestSuite.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/WindowsTestSuite.cpp#1 $
+// $Id: //poco/1.4/Util/testsuite/src/WindowsTestSuite.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -30,6 +30,9 @@
 //
 
 
+#if !defined(_WIN32_WCE)
+
+
 #include "WindowsTestSuite.h"
 #include "WinRegistryTest.h"
 #include "WinConfigurationTest.h"
@@ -44,3 +47,6 @@ CppUnit::Test* WindowsTestSuite::suite()
 
 	return pSuite;
 }
+
+
+#endif // !defined(_WIN32_WCE)

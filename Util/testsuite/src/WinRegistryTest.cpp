@@ -1,7 +1,7 @@
 //
 // WinRegistryTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/WinRegistryTest.cpp#1 $
+// $Id: //poco/1.4/Util/testsuite/src/WinRegistryTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -28,6 +28,9 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+
+
+#if !defined(_WIN32_WCE)
 
 
 #include "WinRegistryTest.h"
@@ -123,3 +126,6 @@ CppUnit::Test* WinRegistryTest::suite()
 
 	return pSuite;
 }
+
+
+#endif // !defined(_WIN32_WCE)
