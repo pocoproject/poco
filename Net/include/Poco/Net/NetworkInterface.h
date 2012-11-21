@@ -258,6 +258,14 @@ public:
 		/// multiple NetworkInterface entries are listed for
 		/// the same interface.
 		
+	static Map full();
+		/// Returns a map containing system network interfaces
+		/// Map is keyed by interface system indices.
+		///
+		/// If there are multiple addresses bound to one interface,
+		/// they are contained within the NetworkInterface (second) 
+		/// member of the pair.
+
 	static Map map(bool ipOnly = true, bool upOnly = true);
 		/// Returns a map containing system network interfaces
 		/// Map is keyed by interface system indices.
