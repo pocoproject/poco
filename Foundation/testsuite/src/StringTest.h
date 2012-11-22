@@ -70,6 +70,8 @@ public:
 	void benchmarkStrToFloat();
 	void benchmarkStrToInt();
 
+	void testIntToString();
+
 	void setUp();
 	void tearDown();
 

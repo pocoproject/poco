@@ -217,6 +217,7 @@ void NumberParserTest::testLimits()
 	assert(testLowerLimit<Int16>());
 	assert(testUpperLimit<UInt16>());
 	assert(testUpperLimit<Int32>());
+	assert(testLowerLimit<Int32>());
 	assert(testUpperLimit<UInt32>());
 
 #if defined(POCO_HAVE_INT64)

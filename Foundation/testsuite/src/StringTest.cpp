@@ -37,6 +37,7 @@
 #include "Poco/Format.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Exception.h"
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
@@ -60,11 +61,13 @@ using Poco::replaceInPlace;
 using Poco::cat;
 using Poco::strToInt;
 using Poco::strToFloat;
+using Poco::intToStr;
 using Poco::thousandSeparator;
 using Poco::decimalSeparator;
 using Poco::format;
 using Poco::MemoryInputStream;
 using Poco::Stopwatch;
+using Poco::RangeException;
 
 
 StringTest::StringTest(const std::string& name): CppUnit::TestCase(name)
@@ -690,6 +693,106 @@ void StringTest::benchmarkStrToFloat()
 }
 
 
+void StringTest::testIntToString()
+{
+	//intToStr(T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
+
+	// decimal
+	std::string result;
+	assert (intToStr(0, 10, result));
+	assert (result == "0");
+	assert (intToStr(0, 10, result, false, 10, '0'));
+	assert (result == "0000000000");
+	assert (intToStr(1234567890, 10, result));
+	assert (result == "1234567890");
+	assert (intToStr(-1234567890, 10, result));
+	assert (result == "-1234567890");
+	assert (intToStr(-1234567890, 10, result, false, 15, '0'));
+	assert (result == "-00001234567890");
+	assert (intToStr(-1234567890, 10, result, false, 15));
+	assert (result == "    -1234567890");
+	assert (intToStr(-1234567890, 10, result, false, 0, 0, ','));
+	assert (result == "-1,234,567,890");
+
+	// binary
+	assert (intToStr(1234567890, 2, result));
+	assert (result == "1001001100101100000001011010010");
+	assert (intToStr(1234567890, 2, result, true));
+	assert (result == "1001001100101100000001011010010");
+	assert (intToStr(1234567890, 2, result, true, 35, '0'));
+	assert (result == "00001001001100101100000001011010010");
+	assert (intToStr(0xFF, 2, result));
+	assert (result == "11111111");
+	assert (intToStr(0x0F, 2, result, false, 8, '0'));
+	assert (result == "00001111");
+	assert (intToStr(0x0F, 2, result));
+	assert (result == "1111");
+	assert (intToStr(0xF0, 2, result));
+	assert (result == "11110000");
+	assert (intToStr(0xFFFF, 2, result));
+	assert (result == "1111111111111111");
+	assert (intToStr(0xFF00, 2, result));
+	assert (result == "1111111100000000");
+	assert (intToStr(0xFFFFFFFF, 2, result));
+	assert (result == "11111111111111111111111111111111");
+	assert (intToStr(0xFF00FF00, 2, result));
+	assert (result == "11111111000000001111111100000000");
+	assert (intToStr(0xF0F0F0F0, 2, result));
+	assert (result == "11110000111100001111000011110000");
+#if defined(POCO_HAVE_INT64)
+	assert (intToStr(0xFFFFFFFFFFFFFFFF, 2, result));
+	std::cout << 0xFFFFFFFFFFFFFFFF << std::endl;
+	assert (result == "1111111111111111111111111111111111111111111111111111111111111111");
+	assert (intToStr(0xFF00000FF00000FF, 2, result));
+	assert (result == "1111111100000000000000000000111111110000000000000000000011111111");
+#endif
+
+	// octal
+	assert (intToStr(1234567890, 010, result));
+	assert (result == "11145401322");
+	assert (intToStr(1234567890, 010, result, true));
+	assert (result == "011145401322");
+	assert (intToStr(1234567890, 010, result, true, 15, '0'));
+	assert (result == "000011145401322");
+	assert (intToStr(012345670, 010, result, true));
+	assert (result == "012345670");
+	assert (intToStr(012345670, 010, result));
+	assert (result == "12345670");
+
+	// hexadecimal
+	assert (intToStr(0, 0x10, result, true));
+	assert (result == "0x0");
+	assert (intToStr(0, 0x10, result, true, 4, '0'));
+	assert (result == "0x00");
+	assert (intToStr(0, 0x10, result, false, 4, '0'));
+	assert (result == "0000");
+	assert (intToStr(1234567890, 0x10, result));
+	assert (result == "499602D2");
+	assert (intToStr(1234567890, 0x10, result, true));
+	assert (result == "0x499602D2");
+	assert (intToStr(1234567890, 0x10, result, true, 15, '0'));
+	assert (result == "0x00000499602D2");
+	assert (intToStr(0x1234567890ABCDEF, 0x10, result, true));
+	assert (result == "0x1234567890ABCDEF");
+	assert (intToStr(0xDEADBEEF, 0x10, result));
+	assert (result == "DEADBEEF");
+#if defined(POCO_HAVE_INT64)
+	assert (intToStr(0xFFFFFFFFFFFFFFFF, 0x10, result));
+	assert (result == "FFFFFFFFFFFFFFFF");
+	assert (intToStr(0xFFFFFFFFFFFFFFFF, 0x10, result, true));
+	assert (result == "0xFFFFFFFFFFFFFFFF");
+#endif
+
+	try
+	{
+		char pResult[POCO_MAX_NUM_STRING_LEN];
+		unsigned sz = POCO_MAX_NUM_STRING_LEN;
+		intToStr(0, 10, pResult, sz, false, sz + 1, ' ');
+		fail ("must throw RangeException");
+	} catch (RangeException&) { }
+}
+
+
 void StringTest::setUp()
 {
 }
@@ -724,6 +827,7 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testNumericLocale);
 	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);
 	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToInt);
+	CppUnit_addTest(pSuite, StringTest, testIntToString);
 
 	return pSuite;
 }

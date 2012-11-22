@@ -78,185 +78,181 @@ std::string NumberFormatter::format(bool value, BoolFormat format)
 
 void NumberFormatter::append(std::string& str, int value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%d", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append(std::string& str, int value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%*d", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append0(std::string& str, int value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*d", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, int value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%X", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, int value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*X", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append(std::string& str, unsigned value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%u", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append(std::string& str, unsigned value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%*u", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append0(std::string& str, unsigned int value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*u", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, unsigned value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%X", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, unsigned value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*X", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append(std::string& str, long value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%ld", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append(std::string& str, long value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%*ld", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append0(std::string& str, long value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*ld", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, long value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%lX", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, long value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*lX", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append(std::string& str, unsigned long value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%lu", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append(std::string& str, unsigned long value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%*lu", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append0(std::string& str, unsigned long value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*lu", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, unsigned long value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%lX", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, unsigned long value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*lX", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
@@ -265,93 +261,91 @@ void NumberFormatter::appendHex(std::string& str, unsigned long value, int width
 
 void NumberFormatter::append(std::string& str, Int64 value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%"I64_FMT"d", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append(std::string& str, Int64 value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%*"I64_FMT"d", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append0(std::string& str, Int64 value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*"I64_FMT"d", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, Int64 value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%"I64_FMT"X", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, Int64 value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*"I64_FMT"X", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append(std::string& str, UInt64 value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%"I64_FMT"u", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append(std::string& str, UInt64 value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%*"I64_FMT"u", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::append0(std::string& str, UInt64 value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*"I64_FMT"u", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, UInt64 value)
 {
-	char buffer[64];
-	std::sprintf(buffer, "%"I64_FMT"X", value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz);
+	str.append(result, sz);
 }
 
 
 void NumberFormatter::appendHex(std::string& str, UInt64 value, int width)
 {
-	poco_assert (width > 0 && width < 64);
-
-	char buffer[64];
-	std::sprintf(buffer, "%0*"I64_FMT"X", width, value);
-	str.append(buffer);
+	char result[NF_MAX_NUM_STRING_SIZE];
+	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	intToStr(value, 0x10, result, sz, false, width, '0');
+	str.append(result, sz);
 }
 
 
