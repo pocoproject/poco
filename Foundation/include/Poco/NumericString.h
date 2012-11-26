@@ -250,7 +250,6 @@ bool strToFloat (const char* pStr, F& result, char& eu = Impl::DUMMY_EXP_UNDERFL
 	char numSign = 1, expSign = 1;
 	char state = STATE_LEADING_SPACES;
 	F mantissa = 0.0, exponent = 0.0, pow10 = 1.0;
-	int powCnt = 0;
 
 	result = 0.0;
 	eu = 0;
