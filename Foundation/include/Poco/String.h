@@ -482,6 +482,22 @@ S& replaceInPlace(S& str, const typename S::value_type* from, const typename S::
 
 
 template <class S>
+S& replaceInPlace(S& str, const typename S::value_type from, const typename S::value_type to, typename S::size_type start = 0)
+{
+	if (from == to) return str;
+
+	typename S::size_type pos = 0;
+	do
+	{
+		pos = str.find(from, start);
+		if (pos != S::npos) str[pos] = to;
+	} while (pos != S::npos);
+
+	return str;
+}
+
+
+template <class S>
 S replace(const S& str, const S& from, const S& to, typename S::size_type start = 0)
 	/// Replace all occurences of from (which must not be the empty string)
 	/// in str with to, starting at position start.

@@ -264,6 +264,9 @@
     <ClCompile Include="src\String.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\NumericString.cpp">
+      <Filter>Core\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\StringTokenizer.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>

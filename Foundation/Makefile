@@ -20,7 +20,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	MemoryPool MD4Engine MD5Engine Manifest Message Mutex \
 	NestedDiagnosticContext Notification NotificationCenter \
 	NotificationQueue PriorityNotificationQueue TimedNotificationQueue \
-	NullStream NumberFormatter NumberParser AbstractObserver \
+	NullStream NumberFormatter NumberParser NumericString AbstractObserver \
 	Path PatternFormatter Process PurgeStrategy RWLock Random RandomStream \
 	RegularExpression RefCountedObject Runnable RotateStrategy Condition \
 	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \

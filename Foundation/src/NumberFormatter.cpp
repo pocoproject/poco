@@ -78,8 +78,8 @@ std::string NumberFormatter::format(bool value, BoolFormat format)
 
 void NumberFormatter::append(std::string& str, int value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz);
 	str.append(result, sz);
 }
@@ -87,8 +87,8 @@ void NumberFormatter::append(std::string& str, int value)
 
 void NumberFormatter::append(std::string& str, int value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width);
 	str.append(result, sz);
 }
@@ -96,8 +96,8 @@ void NumberFormatter::append(std::string& str, int value, int width)
 
 void NumberFormatter::append0(std::string& str, int value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -105,8 +105,8 @@ void NumberFormatter::append0(std::string& str, int value, int width)
 
 void NumberFormatter::appendHex(std::string& str, int value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz);
 	str.append(result, sz);
 }
@@ -114,8 +114,8 @@ void NumberFormatter::appendHex(std::string& str, int value)
 
 void NumberFormatter::appendHex(std::string& str, int value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -123,8 +123,8 @@ void NumberFormatter::appendHex(std::string& str, int value, int width)
 
 void NumberFormatter::append(std::string& str, unsigned value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz);
 	str.append(result, sz);
 }
@@ -132,8 +132,8 @@ void NumberFormatter::append(std::string& str, unsigned value)
 
 void NumberFormatter::append(std::string& str, unsigned value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width);
 	str.append(result, sz);
 }
@@ -141,8 +141,8 @@ void NumberFormatter::append(std::string& str, unsigned value, int width)
 
 void NumberFormatter::append0(std::string& str, unsigned int value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -150,8 +150,8 @@ void NumberFormatter::append0(std::string& str, unsigned int value, int width)
 
 void NumberFormatter::appendHex(std::string& str, unsigned value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz);
 	str.append(result, sz);
 }
@@ -159,8 +159,8 @@ void NumberFormatter::appendHex(std::string& str, unsigned value)
 
 void NumberFormatter::appendHex(std::string& str, unsigned value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -168,8 +168,8 @@ void NumberFormatter::appendHex(std::string& str, unsigned value, int width)
 
 void NumberFormatter::append(std::string& str, long value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz);
 	str.append(result, sz);
 }
@@ -177,8 +177,8 @@ void NumberFormatter::append(std::string& str, long value)
 
 void NumberFormatter::append(std::string& str, long value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width);
 	str.append(result, sz);
 }
@@ -186,8 +186,8 @@ void NumberFormatter::append(std::string& str, long value, int width)
 
 void NumberFormatter::append0(std::string& str, long value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -195,8 +195,8 @@ void NumberFormatter::append0(std::string& str, long value, int width)
 
 void NumberFormatter::appendHex(std::string& str, long value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz);
 	str.append(result, sz);
 }
@@ -204,8 +204,8 @@ void NumberFormatter::appendHex(std::string& str, long value)
 
 void NumberFormatter::appendHex(std::string& str, long value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -213,8 +213,8 @@ void NumberFormatter::appendHex(std::string& str, long value, int width)
 
 void NumberFormatter::append(std::string& str, unsigned long value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz);
 	str.append(result, sz);
 }
@@ -222,8 +222,8 @@ void NumberFormatter::append(std::string& str, unsigned long value)
 
 void NumberFormatter::append(std::string& str, unsigned long value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -231,8 +231,8 @@ void NumberFormatter::append(std::string& str, unsigned long value, int width)
 
 void NumberFormatter::append0(std::string& str, unsigned long value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -240,8 +240,8 @@ void NumberFormatter::append0(std::string& str, unsigned long value, int width)
 
 void NumberFormatter::appendHex(std::string& str, unsigned long value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz);
 	str.append(result, sz);
 }
@@ -249,8 +249,8 @@ void NumberFormatter::appendHex(std::string& str, unsigned long value)
 
 void NumberFormatter::appendHex(std::string& str, unsigned long value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -261,8 +261,8 @@ void NumberFormatter::appendHex(std::string& str, unsigned long value, int width
 
 void NumberFormatter::append(std::string& str, Int64 value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz);
 	str.append(result, sz);
 }
@@ -270,8 +270,8 @@ void NumberFormatter::append(std::string& str, Int64 value)
 
 void NumberFormatter::append(std::string& str, Int64 value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -279,8 +279,8 @@ void NumberFormatter::append(std::string& str, Int64 value, int width)
 
 void NumberFormatter::append0(std::string& str, Int64 value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -288,8 +288,8 @@ void NumberFormatter::append0(std::string& str, Int64 value, int width)
 
 void NumberFormatter::appendHex(std::string& str, Int64 value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz);
 	str.append(result, sz);
 }
@@ -297,8 +297,8 @@ void NumberFormatter::appendHex(std::string& str, Int64 value)
 
 void NumberFormatter::appendHex(std::string& str, Int64 value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -306,8 +306,8 @@ void NumberFormatter::appendHex(std::string& str, Int64 value, int width)
 
 void NumberFormatter::append(std::string& str, UInt64 value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz);
 	str.append(result, sz);
 }
@@ -315,8 +315,8 @@ void NumberFormatter::append(std::string& str, UInt64 value)
 
 void NumberFormatter::append(std::string& str, UInt64 value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -324,8 +324,8 @@ void NumberFormatter::append(std::string& str, UInt64 value, int width)
 
 void NumberFormatter::append0(std::string& str, UInt64 value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -333,8 +333,8 @@ void NumberFormatter::append0(std::string& str, UInt64 value, int width)
 
 void NumberFormatter::appendHex(std::string& str, UInt64 value)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz);
 	str.append(result, sz);
 }
@@ -342,8 +342,8 @@ void NumberFormatter::appendHex(std::string& str, UInt64 value)
 
 void NumberFormatter::appendHex(std::string& str, UInt64 value, int width)
 {
-	char result[NF_MAX_NUM_STRING_SIZE];
-	unsigned sz = NF_MAX_NUM_STRING_SIZE;
+	char result[NF_MAX_INT_STRING_LEN];
+	unsigned sz = NF_MAX_INT_STRING_LEN;
 	intToStr(value, 0x10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
@@ -354,53 +354,31 @@ void NumberFormatter::appendHex(std::string& str, UInt64 value, int width)
 
 void NumberFormatter::append(std::string& str, float value)
 {
-	char buffer[64];
-	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
-#if !defined(POCO_NO_LOCALE)
-	ostr.imbue(std::locale::classic());
-#endif
-	ostr << std::setprecision(8) << value;
-	str.append(buffer, static_cast<std::string::size_type>(ostr.charsWritten()));
+	char buffer[NF_MAX_FLT_STRING_LEN];
+	floatToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
+	str.append(buffer);
 }
 
 
 void NumberFormatter::append(std::string& str, double value)
 {
-	char buffer[64];
-	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
-#if !defined(POCO_NO_LOCALE)
-	ostr.imbue(std::locale::classic());
-#endif
-	ostr << std::setprecision(16) << value;
-	str.append(buffer, static_cast<std::string::size_type>(ostr.charsWritten()));
+	char buffer[NF_MAX_FLT_STRING_LEN];
+	doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
+	str.append(buffer);
 }
 
 
 void NumberFormatter::append(std::string& str, double value, int precision)
 {
-	poco_assert (precision >= 0 && precision < 32);
-
-	char buffer[64];
-	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
-#if !defined(POCO_NO_LOCALE)
-	ostr.imbue(std::locale::classic());
-#endif
-	ostr << std::fixed << std::showpoint << std::setprecision(precision) << value;
-	str.append(buffer, static_cast<std::string::size_type>(ostr.charsWritten()));
+	std::string result;
+	str.append(doubleToStr(result, value, precision));
 }
 
 
 void NumberFormatter::append(std::string& str, double value, int width, int precision)
 {
-	poco_assert (width > 0 && width < 64 && precision >= 0 && precision < width);
-
-	char buffer[64];
-	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
-#if !defined(POCO_NO_LOCALE)
-	ostr.imbue(std::locale::classic());
-#endif
-	ostr << std::fixed << std::showpoint << std::setw(width) << std::setprecision(precision) << value;
-	str.append(buffer, static_cast<std::string::size_type>(ostr.charsWritten()));
+	std::string result;
+	str.append(doubleToStr(result, value, precision, width));
 }
 
 

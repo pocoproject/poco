@@ -380,6 +380,7 @@
     <ClCompile Include="src\NestedDiagnosticContext.cpp" />
     <ClCompile Include="src\NumberFormatter.cpp" />
     <ClCompile Include="src\NumberParser.cpp" />
+    <ClCompile Include="src\NumericString.cpp" />
     <ClCompile Include="src\RefCountedObject.cpp" />
     <ClCompile Include="src\String.cpp" />
     <ClCompile Include="src\StringTokenizer.cpp" />

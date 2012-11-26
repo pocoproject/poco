@@ -127,6 +127,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>CppUnitd.lib;WinTestRunnerd.lib;PocoFoundationd.lib;%(AdditionalDependencies)</AdditionalDependencies>

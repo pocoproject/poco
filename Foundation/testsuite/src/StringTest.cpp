@@ -62,6 +62,9 @@ using Poco::cat;
 using Poco::strToInt;
 using Poco::strToFloat;
 using Poco::intToStr;
+using Poco::strToDoubleDC;
+using Poco::floatToStr;
+using Poco::doubleToStr;
 using Poco::thousandSeparator;
 using Poco::decimalSeparator;
 using Poco::format;
@@ -554,12 +557,16 @@ void StringTest::testNumericLocale()
 #if !defined(POCO_NO_LOCALE) && POCO_OS == POCO_OS_WINDOWS_NT
 	try
 	{
+		char buffer[POCO_MAX_FLT_STRING_LEN];
+
 		char dp = decimalSeparator();
 		char ts = thousandSeparator();
 		std::locale loc;
 		std::cout << "Original locale: '" << loc.name() << '\'' << std::endl;
 		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
 		std::cout << "Thousand separator: '" << ts << '\'' << std::endl;
+		doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, 1.23);
+		std::cout << "1.23 == '" << buffer << '\'' << std::endl;
 
 		std::locale::global(std::locale("German"));
 		std::locale locGerman;
@@ -568,6 +575,8 @@ void StringTest::testNumericLocale()
 		std::cout << "New locale: '" << locGerman.name() << '\'' << std::endl;
 		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
 		std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
+		doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, 1.23);
+		std::cout << "1.23 == '" << buffer << '\'' << std::endl;
 
 		std::locale::global(std::locale("US"));
 		std::locale locUS;
@@ -576,6 +585,8 @@ void StringTest::testNumericLocale()
 		std::cout << "New locale: '" << locUS.name() << '\'' << std::endl;
 		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
 		std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
+		doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, 1.23);
+		std::cout << "1.23 == '" << buffer << '\'' << std::endl;
 
 		std::locale::global(loc);
 		dp = decimalSeparator();
@@ -583,6 +594,9 @@ void StringTest::testNumericLocale()
 		std::cout << "Final locale: '" << loc.name() << '\'' << std::endl;
 		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
 		std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
+		doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, 1.23);
+		std::cout << "1.23 == '" << buffer << '\'' << std::endl;
+
 		assert (dp == decimalSeparator());
 		assert (ts == thousandSeparator());
 	} catch (std::runtime_error& ex)
@@ -646,21 +660,24 @@ void StringTest::benchmarkStrToInt()
 void StringTest::benchmarkStrToFloat()
 {
 	Poco::Stopwatch sw;
-	std::string num = "1.23456e-123";
+	std::string num = "1.0372157551632929e-112";
+	std::cout << "The Number: " << num << std::endl;
 	double res;
 	sw.start();
 	for (int i = 0; i < 1000000; ++i) parseStream(num, res);
 	sw.stop();
-	std::cout << "parseStream Number: " << res << std::endl;
+	std::cout << "parseStream Number: " << std::setprecision(std::numeric_limits<double>::digits10) << res << std::endl;
 	double timeStream = sw.elapsed() / 1000.0;
 
+	// standard strtod
 	char* pC = 0;
 	sw.restart();
 	for (int i = 0; i < 1000000; ++i) res = std::strtod(num.c_str(), &pC);
 	sw.stop();
 	std::cout << "std::strtod Number: " << res << std::endl;
-	double timeStrtod = sw.elapsed() / 1000.0;
+	double timeStdStrtod = sw.elapsed() / 1000.0;
 
+	// POCO Way
 	sw.restart();
 	char ou = 0;
 	for (int i = 0; i < 1000000; ++i) strToFloat(num.c_str(), res, ou);
@@ -668,19 +685,27 @@ void StringTest::benchmarkStrToFloat()
 	std::cout << "strToFloat Number: " << res << std::endl;
 	double timeStrToFloat = sw.elapsed() / 1000.0;
 	
+	// standard sscanf
 	sw.restart();
 	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%lf", &res);
 	sw.stop();
 	std::cout << "sscanf Number: " << res << std::endl;
 	double timeScanf = sw.elapsed() / 1000.0;
 
+	// double-conversion Strtod
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) strToDoubleDC(num.c_str());
+	sw.stop();
+	std::cout << "Strtod Number: " << res << std::endl;
+	double timeStrtod = sw.elapsed() / 1000.0;
+
 	int graph;
 	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
-	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << timeStream << "[ms]" << std::endl;
+	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
 
-	std::cout << std::setw(14) << "std::strtod:\t" << std::setw(10) << std::setfill(' ') << timeStrtod << "[ms]" << 
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtod) << '\t' ;
-	graph = (int) (timeStream / timeStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
+	std::cout << std::setw(14) << "std::strtod:\t" << std::setw(10) << std::setfill(' ') << timeStdStrtod << "[ms]" << 
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStdStrtod) << '\t' ;
+	graph = (int) (timeStream / timeStdStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
 
 	std::cout << std::endl << std::setw(14) << "strToFloat:\t" << std::setw(10) << std::setfill(' ') << timeStrToFloat << "[ms]" << 
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToFloat) << '\t' ;
@@ -689,6 +714,11 @@ void StringTest::benchmarkStrToFloat()
 	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
 	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl << std::setw(14) << "StrtoD:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtod) << '\t' ;
+	graph = (int) (timeStream / timeStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
+
 	std::cout << std::endl;
 }
 
@@ -785,11 +815,108 @@ void StringTest::testIntToString()
 
 	try
 	{
-		char pResult[POCO_MAX_NUM_STRING_LEN];
-		unsigned sz = POCO_MAX_NUM_STRING_LEN;
+		char pResult[POCO_MAX_INT_STRING_LEN];
+		unsigned sz = POCO_MAX_INT_STRING_LEN;
 		intToStr(0, 10, pResult, sz, false, sz + 1, ' ');
 		fail ("must throw RangeException");
 	} catch (RangeException&) { }
+}
+
+
+void StringTest::testFloatToString()
+{
+	double val = 1.03721575516329e-112;
+	std::string str;
+	
+	assert (doubleToStr(str, val, 15, 21) == "1.03721575516329e-112");
+	assert (doubleToStr(str, val, 15, 22) == " 1.03721575516329e-112");
+	val = -val;
+	assert (doubleToStr(str, val, 15, 22) == "-1.03721575516329e-112");
+	assert (doubleToStr(str, val, 15, 23) == " -1.03721575516329e-112");
+	
+	val = -10372157551632.9;
+	assert (doubleToStr(str, val, 1, 21, ',') == "-10,372,157,551,632.9");
+	assert (doubleToStr(str, val, 1, 22, ',') == " -10,372,157,551,632.9");
+	assert (doubleToStr(str, val, 2, 22, ',') == "-10,372,157,551,632.90");
+	assert (doubleToStr(str, val, 2, 22, '.', ',') == "-10.372.157.551.632,90");
+	assert (doubleToStr(str, val, 2, 22, ' ', ',') == "-10 372 157 551 632,90");
+}
+
+
+void formatStream(double value, std::string& str)
+{
+	char buffer[128];
+	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
+#if !defined(POCO_NO_LOCALE)
+	ostr.imbue(std::locale::classic());
+#endif
+	ostr << std::setprecision(16) << value;
+	str.assign(buffer, static_cast<std::string::size_type>(ostr.charsWritten()));
+}
+
+
+void formatSprintf(double value, std::string& str)
+{
+	char buffer[128];
+	std::sprintf(buffer, "%.*g", 16, value);
+	str = buffer;
+}
+
+
+void StringTest::benchmarkFloatToStr()
+{
+	Poco::Stopwatch sw;
+	double val = 1.0372157551632929e-112;
+	std::cout << "The Number: " << std::setprecision(std::numeric_limits<double>::digits10) << val << std::endl;
+	std::string str;
+	sw.start();
+	for (int i = 0; i < 1000000; ++i) formatStream(val, str);
+	sw.stop();
+	std::cout << "formatStream Number: " << str << std::endl;
+	double timeStream = sw.elapsed() / 1000.0;
+
+	// standard sprintf
+	str = "";
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) formatSprintf(val, str);
+	sw.stop();
+	std::cout << "std::sprintf Number: " << str << std::endl;
+	double timeSprintf = sw.elapsed() / 1000.0;
+	
+	// POCO Way (via double-conversion)
+	// no padding
+	sw.restart();
+	char buffer[POCO_MAX_FLT_STRING_LEN];
+	for (int i = 0; i < 1000000; ++i) doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, val);
+	sw.stop();
+	std::cout << "doubleToStr(char) Number: " << buffer << std::endl;
+	double timeDoubleToStrChar = sw.elapsed() / 1000.0;
+
+	// with padding 
+	str = "";
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) doubleToStr(str, val);
+	sw.stop();
+	std::cout << "doubleToStr(std::string) Number: " << str << std::endl;
+	double timeDoubleToStrString = sw.elapsed() / 1000.0;
+
+	int graph;
+	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
+	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
+	
+	std::cout << std::setw(14) << "sprintf:\t" << std::setw(10) << std::setfill(' ') << timeSprintf << "[ms]" << 
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeSprintf) << '\t' ;
+	graph = (int) (timeStream / timeSprintf); for (int i = 0; i < graph; ++i) std::cout << '#';
+	
+	std::cout << std::endl << std::setw(14) << "doubleToChar:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrChar << "[ms]" << 
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeDoubleToStrChar) << '\t' ;
+	graph = (int) (timeStream / timeDoubleToStrChar); for (int i = 0; i < graph; ++i) std::cout << '#';
+	
+	std::cout << std::endl << std::setw(14) << "doubleToString:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrString << "[ms]" << 
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeDoubleToStrString) << '\t' ;
+	graph = (int) (timeStream / timeDoubleToStrString); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl;
 }
 
 
@@ -825,9 +952,11 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testStringToFloat);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloatError);
 	CppUnit_addTest(pSuite, StringTest, testNumericLocale);
-	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);
+	CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);
 	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToInt);
 	CppUnit_addTest(pSuite, StringTest, testIntToString);
+	CppUnit_addTest(pSuite, StringTest, testFloatToString);
+	CppUnit_addTest(pSuite, StringTest, benchmarkFloatToStr);
 
 	return pSuite;
 }

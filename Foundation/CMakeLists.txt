@@ -130,6 +130,7 @@ set( BASE_SRCS
   src/StreamCopier.cpp
   src/StreamTokenizer.cpp
   src/String.cpp
+  src/NumericString.cpp
   src/StringTokenizer.cpp
   src/SynchronizedObject.cpp
   src/Task.cpp

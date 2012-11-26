@@ -6514,6 +6514,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\NumericString.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\StringTokenizer.cpp"
 					>
 				</File>

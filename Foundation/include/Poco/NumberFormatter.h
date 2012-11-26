@@ -65,7 +65,8 @@ public:
 		FMT_ON_OFF
 	};
 
-	static const unsigned NF_MAX_NUM_STRING_SIZE = 32;
+	static const unsigned NF_MAX_INT_STRING_LEN = 32; // increase for 64-bit binary formatting support
+	static const unsigned NF_MAX_FLT_STRING_LEN = POCO_MAX_FLT_STRING_LEN;
 
 	static std::string format(int value);
 		/// Formats an integer value in decimal notation.
@@ -404,6 +405,8 @@ public:
 		/// Formats a pointer in an eight (32-bit architectures) or
 		/// sixteen (64-bit architectures) characters wide
 		/// field in hexadecimal notation.
+
+private:
 };
 
 
@@ -660,7 +663,7 @@ inline std::string NumberFormatter::formatHex(UInt64 value, int width, bool pref
 inline std::string NumberFormatter::format(float value)
 {
 	std::string result;
-	append(result, value);
+	floatToStr(result, value);
 	return result;
 }
 
@@ -668,7 +671,7 @@ inline std::string NumberFormatter::format(float value)
 inline std::string NumberFormatter::format(double value)
 {
 	std::string result;
-	append(result, value);
+	doubleToStr(result, value);
 	return result;
 }
 
@@ -676,7 +679,7 @@ inline std::string NumberFormatter::format(double value)
 inline std::string NumberFormatter::format(double value, int precision)
 {
 	std::string result;
-	append(result, value, precision);
+	doubleToStr(result, value, precision);
 	return result;
 }
 
@@ -684,7 +687,7 @@ inline std::string NumberFormatter::format(double value, int precision)
 inline std::string NumberFormatter::format(double value, int width, int precision)
 {
 	std::string result;
-	append(result, value, width, precision);
+	doubleToStr(result, value, precision, width);
 	return result;
 }
 

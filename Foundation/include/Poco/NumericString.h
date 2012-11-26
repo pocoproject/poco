@@ -55,10 +55,24 @@
 	#include <locale>
 #endif
 
-#define POCO_MAX_NUM_STRING_LEN 65
+// TODO: 
+// POCO version is fast but simplistic, hence less accurate, undef this for 
+// double-conversion library use in string => float/double conversions (T.B.D.)
+// (double-conversion library is always used for float/double => string)
+#define POCO_STR_TO_FLOAT_FAST
+
+#define POCO_MAX_INT_STRING_LEN 65
+#define POCO_MAX_FLT_STRING_LEN 128
 
 
 namespace Poco {
+
+
+namespace Impl {
+
+static char DUMMY_EXP_UNDERFLOW = 0; // dummy default val
+
+}
 
 
 inline char decimalSeparator()
@@ -205,22 +219,22 @@ bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
 }
 
 
-namespace Impl {
-
-static char DUMMY_EXP_UNDERFLOW = 0; // dummy default val
-
-}
-
 template <typename F>
 bool strToFloat (const char* pStr, F& result, char& eu = Impl::DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
 	/// Converts zero-terminated array to floating-point number;
-	/// Returns true if succesful. Exponent underflow (i.e. loss of precision)
+	/// Returns true if succesful. Exponent underflow (i.e. loss of precision due to exponent value)
 	/// is signalled in eu. Thousand separators are recognized for the locale
 	/// and silently skipped but not verified for correct positioning.
 	///
 	/// If parsing was unsuccesful, the return value is false with
 	/// result and eu values undetermined.
+	/// This function will perform  fast but significant rounding errors may occur after
+	/// the platform precision is exceeded.
+	/// For better precision conversion, use double-conversion wrappers (strToFloatDC and strToDoubleDC).
 {
+#ifndef POCO_STR_TO_FLOAT_FAST
+	// TODO: for high-precision, use double-conversion here 
+#else
 	poco_assert (decSep != thSep);
 
 	if (pStr == 0 || *pStr == '\0') return false;
@@ -235,8 +249,9 @@ bool strToFloat (const char* pStr, F& result, char& eu = Impl::DUMMY_EXP_UNDERFL
 
 	char numSign = 1, expSign = 1;
 	char state = STATE_LEADING_SPACES;
-	F mantissa = 0.0, exponent = 0.0;
-	F pow10 = 1.;
+	F mantissa = 0.0, exponent = 0.0, pow10 = 1.0;
+	int powCnt = 0;
+
 	result = 0.0;
 	eu = 0;
 	for (; *pStr != '\0'; ++pStr)
@@ -307,12 +322,12 @@ bool strToFloat (const char* pStr, F& result, char& eu = Impl::DUMMY_EXP_UNDERFL
 			}
 			else if (state <= STATE_DIGITS_AFTER_DEC_POINT) // fractional part digits
 			{
-				mantissa += (*pStr - '0') / (pow10 *= 10.);
+				mantissa += F(*pStr - '0') / (pow10 *= 10.);
 				state = STATE_DIGITS_AFTER_DEC_POINT;
 			}
 			else if (state <= STATE_EXP_DIGITS) // exponent digits
 			{
-				exponent = exponent * 10 + (*pStr - '0');
+				exponent = exponent * 10. + (*pStr - '0');
 				state = STATE_EXP_DIGITS;
 			}
 			else return false;
@@ -351,6 +366,7 @@ bool strToFloat (const char* pStr, F& result, char& eu = Impl::DUMMY_EXP_UNDERFL
 	return (state != STATE_LEADING_SPACES) && // empty/zero-length string
 		!FPEnvironment::isInfinite(result) &&
 		!FPEnvironment::isNaN(result);
+#endif // POCO_STR_TO_FLOAT_FAST
 }
 
 
@@ -524,12 +540,77 @@ bool intToStr (T number, unsigned short base, std::string& result, bool prefix =
 	/// Converts integer to string; This is a wrapper function, for details see see the
 	/// bool intToStr(T, unsigned short, char*, int, int, char, char) implementation.
 {
-	char res[POCO_MAX_NUM_STRING_LEN] = {0};
-	unsigned size = POCO_MAX_NUM_STRING_LEN;
+	char res[POCO_MAX_INT_STRING_LEN] = {0};
+	unsigned size = POCO_MAX_INT_STRING_LEN;
 	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep);
 	result.assign(res, size);
 	return ret;
 }
+
+
+//
+// Functions using double-conversion library (http://code.google.com/p/double-conversion/).
+// Library is the implementation of the Grisu algorithm as described in Florian Loitsch's paper:
+// http://florian.loitsch.com/publications/dtoa-pldi2010.pdf
+//
+// For a complete (and simpler) story on floating-point numbers rendering accuracy and performance, see:
+// http://www.serpentine.com/blog/2011/06/29/here-be-dragons-advances-in-problems-you-didnt-even-know-you-had/
+//
+
+Foundation_API void floatToStr(char* buffer,
+	int bufferSize,
+	float value,
+	int lowDec = -std::numeric_limits<double>::digits10,
+	int highDec = std::numeric_limits<double>::digits10);
+	/// Converts a float value to string. Converted string must be shorter than bufferSize.
+	/// Conversion is done by computing the shortest string of digits that correctly represents
+	/// the input number. Depending on lowDec and highDec values, the function returns
+	/// decimal or exponential representation.
+
+
+Foundation_API std::string& floatToStr(std::string& str,
+	float value,
+	int precision = 0,
+	int width = 0,
+	char thSep = 0,
+	char decSep = 0);
+	/// Converts a float value, assigns it to the supplied string and returns the reference.
+	/// This function calls floatToStr(char*, int, float, int, int) and formats the result according to
+	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
+
+
+Foundation_API void doubleToStr(char* buffer,
+	int bufferSize,
+	double value,
+	int lowDec = -std::numeric_limits<double>::digits10,
+	int highDec = std::numeric_limits<double>::digits10);
+	/// Converts a double value to string. Converted string must be shorter than bufferSize.
+	/// Conversion is done by computing the shortest string of digits that correctly represents
+	/// the input number. Depending on lowDec and highDec values, the function returns
+	/// decimal or exponential representation.
+
+
+Foundation_API std::string& doubleToStr(std::string& str,
+	double value,
+	int precision = 0,
+	int width = 0,
+	char thSep = 0,
+	char decSep = 0);
+	/// Converts a double value, assigns it to the supplied string and returns the reference.
+	/// This function calls doubleToStr(char*, int, float, int, int) and formats the result according to
+	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
+
+
+Foundation_API float strToFloatDC(const char* str);
+	/// For testing and performance comparison purposes only.
+
+
+Foundation_API double strToDoubleDC(const char* str);
+	/// For testing and performance comparison purposes only.
+
+//
+// end double-conversion functions declarations
+//
 
 
 } // namespace Poco

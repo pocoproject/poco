@@ -894,6 +894,9 @@
     <ClCompile Include="src\Base32Encoder.cpp">
       <Filter>Streams\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\NumericString.cpp">
+      <Filter>Core\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Any.h">

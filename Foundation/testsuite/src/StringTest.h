@@ -71,6 +71,8 @@ public:
 	void benchmarkStrToInt();
 
 	void testIntToString();
+	void testFloatToString();
+	void benchmarkFloatToStr();
 
 	void setUp();
 	void tearDown();
@@ -132,7 +134,6 @@ private:
 		istr >> value;
 		return istr.eof() && !istr.fail();
 	}
-
 };
 
 
