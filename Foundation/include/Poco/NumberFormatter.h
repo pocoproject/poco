@@ -441,7 +441,7 @@ inline std::string NumberFormatter::format0(int value, int width)
 inline std::string NumberFormatter::formatHex(int value, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix);
+	uIntToStr(static_cast<unsigned int>(value), 0x10, result, prefix);
 	return result;
 }
 
@@ -449,7 +449,7 @@ inline std::string NumberFormatter::formatHex(int value, bool prefix)
 inline std::string NumberFormatter::formatHex(int value, int width, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix, width, '0');
+	uIntToStr(static_cast<unsigned int>(value), 0x10, result, prefix, width, '0');
 	return result;
 }
 
@@ -457,7 +457,7 @@ inline std::string NumberFormatter::formatHex(int value, int width, bool prefix)
 inline std::string NumberFormatter::format(unsigned value)
 {
 	std::string result;
-	intToStr(value, 10, result);
+	uIntToStr(value, 10, result);
 	return result;
 }
 
@@ -465,7 +465,7 @@ inline std::string NumberFormatter::format(unsigned value)
 inline std::string NumberFormatter::format(unsigned value, int width)
 {
 	std::string result;
-	intToStr(value, 10, result, false, width, ' ');
+	uIntToStr(value, 10, result, false, width, ' ');
 	return result;
 }
 
@@ -473,7 +473,7 @@ inline std::string NumberFormatter::format(unsigned value, int width)
 inline std::string NumberFormatter::format0(unsigned int value, int width)
 {
 	std::string result;
-	intToStr(value, 10, result, false, width, '0');
+	uIntToStr(value, 10, result, false, width, '0');
 	return result;
 }
 
@@ -481,7 +481,7 @@ inline std::string NumberFormatter::format0(unsigned int value, int width)
 inline std::string NumberFormatter::formatHex(unsigned value, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix);
+	uIntToStr(value, 0x10, result, prefix);
 	return result;
 }
 
@@ -489,7 +489,7 @@ inline std::string NumberFormatter::formatHex(unsigned value, bool prefix)
 inline std::string NumberFormatter::formatHex(unsigned value, int width, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix, width, '0');
+	uIntToStr(value, 0x10, result, prefix, width, '0');
 	return result;
 }
 
@@ -521,7 +521,7 @@ inline std::string NumberFormatter::format0(long value, int width)
 inline std::string NumberFormatter::formatHex(long value, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix);
+	uIntToStr(static_cast<unsigned long>(value), 0x10, result, prefix);
 	return result;
 }
 
@@ -529,7 +529,7 @@ inline std::string NumberFormatter::formatHex(long value, bool prefix)
 inline std::string NumberFormatter::formatHex(long value, int width, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix, width, '0');
+	uIntToStr(static_cast<unsigned long>(value), 0x10, result, prefix, width, '0');
 	return result;
 }
 
@@ -537,7 +537,7 @@ inline std::string NumberFormatter::formatHex(long value, int width, bool prefix
 inline std::string NumberFormatter::format(unsigned long value)
 {
 	std::string result;
-	intToStr(value, 10, result);
+	uIntToStr(value, 10, result);
 	return result;
 }
 
@@ -545,7 +545,7 @@ inline std::string NumberFormatter::format(unsigned long value)
 inline std::string NumberFormatter::format(unsigned long value, int width)
 {
 	std::string result;
-	intToStr(value, 10, result, false, width, ' ');
+	uIntToStr(value, 10, result, false, width, ' ');
 	return result;
 }
 
@@ -553,7 +553,7 @@ inline std::string NumberFormatter::format(unsigned long value, int width)
 inline std::string NumberFormatter::format0(unsigned long value, int width)
 {
 	std::string result;
-	intToStr(value, 10, result, false, width, '0');
+	uIntToStr(value, 10, result, false, width, '0');
 	return result;
 }
 
@@ -561,7 +561,7 @@ inline std::string NumberFormatter::format0(unsigned long value, int width)
 inline std::string NumberFormatter::formatHex(unsigned long value, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix);
+	uIntToStr(value, 0x10, result, prefix);
 	return result;
 }
 
@@ -569,7 +569,7 @@ inline std::string NumberFormatter::formatHex(unsigned long value, bool prefix)
 inline std::string NumberFormatter::formatHex(unsigned long value, int width, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix, width, '0');
+	uIntToStr(value, 0x10, result, prefix, width, '0');
 	return result;
 }
 
@@ -604,7 +604,7 @@ inline std::string NumberFormatter::format0(Int64 value, int width)
 inline std::string NumberFormatter::formatHex(Int64 value, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix);
+	uIntToStr(static_cast<UInt64>(value), 0x10, result, prefix);
 	return result;
 }
 
@@ -612,7 +612,7 @@ inline std::string NumberFormatter::formatHex(Int64 value, bool prefix)
 inline std::string NumberFormatter::formatHex(Int64 value, int width, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix, width, '0');
+	uIntToStr(static_cast<UInt64>(value), 0x10, result, prefix, width, '0');
 	return result;
 }
 
@@ -620,7 +620,7 @@ inline std::string NumberFormatter::formatHex(Int64 value, int width, bool prefi
 inline std::string NumberFormatter::format(UInt64 value)
 {
 	std::string result;
-	intToStr(value, 10, result);
+	uIntToStr(value, 10, result);
 	return result;
 }
 
@@ -628,7 +628,7 @@ inline std::string NumberFormatter::format(UInt64 value)
 inline std::string NumberFormatter::format(UInt64 value, int width)
 {
 	std::string result;
-	intToStr(value, 10, result, false, width, ' ');
+	uIntToStr(value, 10, result, false, width, ' ');
 	return result;
 }
 
@@ -636,7 +636,7 @@ inline std::string NumberFormatter::format(UInt64 value, int width)
 inline std::string NumberFormatter::format0(UInt64 value, int width)
 {
 	std::string result;
-	intToStr(value, 10, result, false, width, '0');
+	uIntToStr(value, 10, result, false, width, '0');
 	return result;
 }
 
@@ -644,7 +644,7 @@ inline std::string NumberFormatter::format0(UInt64 value, int width)
 inline std::string NumberFormatter::formatHex(UInt64 value, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix);
+	uIntToStr(value, 0x10, result, prefix);
 	return result;
 }
 
@@ -652,7 +652,7 @@ inline std::string NumberFormatter::formatHex(UInt64 value, bool prefix)
 inline std::string NumberFormatter::formatHex(UInt64 value, int width, bool prefix)
 {
 	std::string result;
-	intToStr(value, 0x10, result, prefix, width, '0');
+	uIntToStr(value, 0x10, result, prefix, width, '0');
 	return result;
 }
 
