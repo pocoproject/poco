@@ -567,6 +567,7 @@ void StringTest::testNumericLocale()
 		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
 		std::cout << "Thousand separator: '" << ts << '\'' << std::endl;
 		doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, 1.23);
+		assert (std::strncmp(buffer, "1.23", 4) == 0);
 		std::cout << "1.23 == '" << buffer << '\'' << std::endl;
 
 		std::locale::global(std::locale("German"));
@@ -577,6 +578,7 @@ void StringTest::testNumericLocale()
 		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
 		std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
 		doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, 1.23);
+		assert (std::strncmp(buffer, "1.23", 4) == 0);
 		std::cout << "1.23 == '" << buffer << '\'' << std::endl;
 
 		std::locale::global(std::locale("US"));
@@ -587,6 +589,7 @@ void StringTest::testNumericLocale()
 		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
 		std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
 		doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, 1.23);
+		assert (std::strncmp(buffer, "1.23", 4) == 0);
 		std::cout << "1.23 == '" << buffer << '\'' << std::endl;
 
 		std::locale::global(loc);
@@ -596,6 +599,7 @@ void StringTest::testNumericLocale()
 		std::cout << "Decimal point: '" << decimalSeparator() << '\'' << std::endl;
 		std::cout << "Thousand separator: '" << thousandSeparator() << '\'' << std::endl;
 		doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, 1.23);
+		assert (std::strncmp(buffer, "1.23", 4) == 0);
 		std::cout << "1.23 == '" << buffer << '\'' << std::endl;
 
 		assert (dp == decimalSeparator());
