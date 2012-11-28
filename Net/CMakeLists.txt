@@ -71,7 +71,6 @@ set( BASE_SRCS
   src/RawSocketImpl.cpp
   src/RemoteSyslogChannel.cpp
   src/RemoteSyslogListener.cpp
-  src/Route.cpp
   src/ServerSocket.cpp
   src/ServerSocketImpl.cpp
   src/SMTPChannel.cpp
