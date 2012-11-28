@@ -289,17 +289,17 @@ public:
 		s = oss.str();
 	}
 
-	void convert(DateTime& val) const
+	void convert(DateTime& /*val*/) const
 	{
 		//TODO: val = _val;
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime& /*ldt*/) const
 	{
 		//TODO: ldt = _val.timestamp();
 	}
 
-	void convert(Timestamp& ts) const
+	void convert(Timestamp& /*ts*/) const
 	{
 		//TODO: ts = _val.timestamp();
 	}
