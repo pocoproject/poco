@@ -19,6 +19,15 @@
 config.build
 config.make
 
+# CMake #
+########
+cmake_install.cmake
+cmake_uninstall.cmake
+CMakeFiles
+CMakeCache.txt
+CPackConfig.cmake
+CPackSourceConfig.cmake
+
 # Packages #
 ############
 # it's better to unpack these files and commit the raw source
