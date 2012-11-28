@@ -285,17 +285,17 @@ public:
 		s = oss.str();
 	}
 
-	void convert(DateTime& val) const
+	void convert(DateTime& /*val*/) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime& /*ldt*/) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(Timestamp& ts) const
+	void convert(Timestamp& /*ts*/) const
 	{
 		throw BadCastException();
 	}
