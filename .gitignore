@@ -43,10 +43,11 @@ CPackSourceConfig.cmake
 
 # Logs and databases #
 ######################
-*.log
+*.log*
 *.sqlite
 *.db
 test*.txt
+XML/testsuite/rss.xml
 
 # OS generated files #
 ######################

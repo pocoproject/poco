@@ -482,7 +482,7 @@ S& replaceInPlace(S& str, const typename S::value_type* from, const typename S::
 
 
 template <class S>
-S& replaceInPlace(S& str, const typename S::value_type from, const typename S::value_type to, typename S::size_type start = 0)
+S& replaceInPlace(S& str, const typename S::value_type from, const typename S::value_type to = 0, typename S::size_type start = 0)
 {
 	if (from == to) return str;
 
@@ -490,10 +490,21 @@ S& replaceInPlace(S& str, const typename S::value_type from, const typename S::v
 	do
 	{
 		pos = str.find(from, start);
-		if (pos != S::npos) str[pos] = to;
+		if (pos != S::npos)
+		{
+			if (to) str[pos] = to;
+			else str.erase(pos, 1);
+		}
 	} while (pos != S::npos);
 
 	return str;
+}
+
+
+template <class S>
+S& removeInPlace(S& str, const typename S::value_type ch, typename S::size_type start = 0)
+{
+	return replaceInPlace(str, ch, 0, start);
 }
 
 
@@ -517,14 +528,36 @@ S replace(const S& str, const typename S::value_type* from, const typename S::va
 }
 
 
+template <class S>
+S replace(const S& str, const typename S::value_type from, const typename S::value_type to = 0, typename S::size_type start = 0)
+{
+	S result(str);
+	replaceInPlace(result, from, to, start);
+	return result;
+}
+
+
+template <class S>
+S remove(const S& str, const typename S::value_type ch, typename S::size_type start = 0)
+{
+	S result(str);
+	replaceInPlace(result, ch, 0, start);
+	return result;
+}
+
+
 #else
 
 
-std::string Foundation_API replace(const std::string& str, const std::string& from, const std::string& to, std::string::size_type start = 0);
-std::string Foundation_API replace(const std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start = 0);
-std::string& Foundation_API replaceInPlace(std::string& str, const std::string& from, const std::string& to, std::string::size_type start = 0);
-std::string& Foundation_API replaceInPlace(std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start = 0);
-	
+Foundation_API std::string replace(const std::string& str, const std::string& from, const std::string& to, std::string::size_type start = 0);
+Foundation_API std::string replace(const std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start = 0);
+Foundation_API std::string replace(const std::string& str, const std::string::value_type from, const std::string::value_type to = 0, std::string::size_type start = 0);
+Foundation_API std::string remove(const std::string& str, const std::string::value_type ch, std::string::size_type start = 0);
+Foundation_API std::string& replaceInPlace(std::string& str, const std::string& from, const std::string& to, std::string::size_type start = 0);
+Foundation_API std::string& replaceInPlace(std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start = 0);
+Foundation_API std::string& replaceInPlace(std::string& str, const std::string::value_type from, const std::string::value_type to = 0, std::string::size_type start = 0);
+Foundation_API std::string& removeInPlace(std::string& str, const std::string::value_type ch, std::string::size_type start = 0);
+
 
 #endif	
 

@@ -1,5 +1,8 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.5.0 (2012-12-17)
+==========================
+- using double-conversion library for floating-point numeric/string conversions
 
 Release 1.5.0 (2012-10-14)
 ==========================

@@ -165,6 +165,22 @@ std::string replace(const std::string& str, const std::string::value_type* from,
 	return result;
 }
 
+
+std::string replace(const std::string& str, const std::string::value_type from, const std::string::value_type to, std::string::size_type start)
+{
+	std::string result(str);
+	replaceInPlace(result, from, to, start);
+	return result;
+}
+
+
+std::string remove(const std::string& str, const std::string::value_type ch, std::string::size_type start)
+{
+	std::string result(str);
+	replaceInPlace(result, ch, 0, start);
+	return result;
+}
+
 	
 std::string& replaceInPlace(std::string& str, const std::string& from, const std::string& to, std::string::size_type start)
 {
@@ -212,6 +228,31 @@ std::string& replaceInPlace(std::string& str, const std::string::value_type* fro
 	while (pos != std::string::npos);
 	str.swap(result);
 	return str;
+}
+
+
+std::string& replaceInPlace(std::string& str, const std::string::value_type from, const std::string::value_type to, std::string::size_type start)
+{
+	if (from == to) return str;
+
+	std::string::size_type pos = 0;
+	do
+	{
+		pos = str.find(from, start);
+		if (pos != std::string::npos)
+		{
+			if (to) str[pos] = to;
+			else str.erase(pos, 1);
+		}
+	} while (pos != std::string::npos);
+
+	return str;
+}
+
+
+std::string& removeInPlace(std::string& str, const std::string::value_type ch, std::string::size_type start)
+{
+	return replaceInPlace(str, ch, 0, start);
 }
 
 

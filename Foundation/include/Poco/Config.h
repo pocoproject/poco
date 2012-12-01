@@ -139,7 +139,7 @@
 
 // Windows CE has no locale support
 #if defined(_WIN32_WCE)
-#define POCO_NO_LOCALE
+	#define POCO_NO_LOCALE
 #endif
 
 

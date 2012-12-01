@@ -33,20 +33,21 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-
+// +++ double conversion +++
+#include "diy-fp.cc"
+#include "cached-powers.cc"
 #include "bignum-dtoa.cc"
 #include "bignum.cc"
-#include "cached-powers.cc"
-#include "diy-fp.cc"
-#include "double-conversion.cc"
 #include "fast-dtoa.cc"
 #include "fixed-dtoa.cc"
 #include "strtod.cc"
-
+#include "double-conversion.cc"
+// --- double conversion ---
 
 #include "Poco/NumericString.h"
 #include "Poco/String.h"
 #include <cctype>
+
 
 namespace {
 
@@ -78,7 +79,7 @@ void insertThousandSep(std::string& str, char thSep, char decSep = '.')
 		while (it != begin)
 		{
 			--it;
-			if (*it == 'e') break;
+			if ((*it == 'e') || (*it == 'E')) break;
 		}
 	}
 	if (decPos != std::string::npos)
@@ -115,7 +116,7 @@ void floatToStr(char* buffer, int bufferSize, float value, int lowDec, int highD
 	StringBuilder builder(buffer, bufferSize);
 	int flags = DoubleToStringConverter::UNIQUE_ZERO |
 		DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
-	DoubleToStringConverter dc(flags, "inf", "nan", 'e', lowDec, highDec, 0, 0);
+	DoubleToStringConverter dc(flags, POCO_FLT_INF, POCO_FLT_NAN, POCO_FLT_EXP, lowDec, highDec, 0, 0);
 	dc.ToShortestSingle(value, &builder);
 	builder.Finalize();
 }
@@ -143,7 +144,7 @@ void doubleToStr(char* buffer, int bufferSize, double value, int lowDec, int hig
 	StringBuilder builder(buffer, bufferSize);
 	int flags = DoubleToStringConverter::UNIQUE_ZERO |
 		DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
-	DoubleToStringConverter dc(flags, "inf", "nan", 'e', lowDec, highDec, 0, 0);
+	DoubleToStringConverter dc(flags, POCO_FLT_INF, POCO_FLT_NAN, POCO_FLT_EXP, lowDec, highDec, 0, 0);
 	dc.ToShortest(value, &builder);
 	builder.Finalize();
 }
@@ -166,31 +167,58 @@ std::string& doubleToStr(std::string& str, double value, int precision, int widt
 }
 
 
-float strToFloatDC(const char* str)
+float strToFloat(const char* str)
 {
 	using namespace double_conversion;
 
-	double empty_string_value = 0.0;
 	int processed;
 	int flags = StringToDoubleConverter::ALLOW_LEADING_SPACES |
 		StringToDoubleConverter::ALLOW_TRAILING_SPACES;
-	StringToDoubleConverter converter(flags, empty_string_value, Single::NaN(), 0, 0);
+	StringToDoubleConverter converter(flags, 0.0, Single::NaN(), POCO_FLT_INF, POCO_FLT_NAN);
 	float result = converter.StringToFloat(str, strlen(str), &processed);
 	return result;
 }
 
 
-double strToDoubleDC(const char* str)
+double strToDouble(const char* str)
 {
 	using namespace double_conversion;
-
-	double empty_string_value = 0.0;
 	int processed;
 	int flags = StringToDoubleConverter::ALLOW_LEADING_SPACES |
 		StringToDoubleConverter::ALLOW_TRAILING_SPACES;
-	StringToDoubleConverter converter(flags, empty_string_value, Double::NaN(), 0, 0);
+	StringToDoubleConverter converter(flags, 0.0, Double::NaN(), POCO_FLT_INF, POCO_FLT_NAN);
 	double result = converter.StringToDouble(str, strlen(str), &processed);
 	return result;
+}
+
+
+bool strToFloat(const std::string& str, float& result, char decSep, char thSep)
+{
+	using namespace double_conversion;
+
+	std::string tmp(str);
+	removeInPlace(tmp, thSep);
+	removeInPlace(tmp, 'f');
+	replaceInPlace(tmp, decSep, '.');
+	result = strToFloat(tmp.c_str());
+	return !FPEnvironment::isInfinite(result) &&
+		!FPEnvironment::isNaN(result);
+}
+
+
+bool strToDouble(const std::string& str, double& result, char decSep, char thSep)
+{
+	if (str.empty()) return false;
+
+	using namespace double_conversion;
+
+	std::string tmp(str);
+	removeInPlace(tmp, thSep);
+	replaceInPlace(tmp, decSep, '.');
+	removeInPlace(tmp, 'f');
+	result = strToDouble(tmp.c_str());
+	return !FPEnvironment::isInfinite(result) &&
+		!FPEnvironment::isNaN(result);
 }
 
 

@@ -55,14 +55,12 @@
 	#include <locale>
 #endif
 
-// TODO: 
-// POCO version is fast but simplistic, hence less accurate, undef this for 
-// double-conversion library use in string => float/double conversions (T.B.D.)
-// (double-conversion library is always used for float/double => string)
-#define POCO_STR_TO_FLOAT_FAST
 
 #define POCO_MAX_INT_STRING_LEN 65
 #define POCO_MAX_FLT_STRING_LEN 128
+#define POCO_FLT_INF "inf"
+#define POCO_FLT_NAN "nan"
+#define POCO_FLT_EXP 'e'
 
 
 namespace Poco {
@@ -209,173 +207,6 @@ bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
 	/// bool strToInt(const char*, I&, short, char) implementation.
 {
 	return strToInt(str.c_str(), result, base, thSep);
-}
-	
-	
-namespace Impl {
-		
-static char DUMMY_EXP_UNDERFLOW; // dummy default val
-
-}
-
-
-template <typename F>
-bool strToFloat (const char* pStr, F& result, char& eu = Impl::DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
-	/// Converts zero-terminated array to floating-point number;
-	/// Returns true if succesful. Exponent underflow (i.e. loss of precision due to exponent value)
-	/// is signalled in eu. Thousand separators are recognized for the locale
-	/// and silently skipped but not verified for correct positioning.
-	///
-	/// If parsing was unsuccesful, the return value is false with
-	/// result and eu values undetermined.
-	/// This function will perform  fast but significant rounding errors may occur after
-	/// the platform precision is exceeded.
-	/// For better precision conversion, use double-conversion wrappers (strToFloatDC and strToDoubleDC).
-{
-#ifndef POCO_STR_TO_FLOAT_FAST
-	// TODO: for high-precision, use double-conversion here 
-#else
-	poco_assert (decSep != thSep);
-
-	if (pStr == 0 || *pStr == '\0') return false;
-
-	// parser states:
-	const char STATE_LEADING_SPACES = 0;
-	const char STATE_DIGITS_BEFORE_DEC_POINT = 1;
-	const char STATE_DIGITS_AFTER_DEC_POINT = 2;
-	const char STATE_EXP_CHAR = 3;
-	const char STATE_EXP_DIGITS = 4;
-	const char STATE_SUFFIX = 5; // 'f' suffix
-
-	char numSign = 1, expSign = 1;
-	char state = STATE_LEADING_SPACES;
-	F mantissa = 0.0, exponent = 0.0, pow10 = 1.0;
-
-	result = 0.0;
-	eu = 0;
-	for (; *pStr != '\0'; ++pStr)
-	{
-		switch (*pStr)
-		{
-		case '.':
-			if (decSep == '.')
-			{
-				if (state >= STATE_DIGITS_AFTER_DEC_POINT) return false;
-				state = STATE_DIGITS_AFTER_DEC_POINT;
-				break;
-			}
-			else if ((thSep == '.') && (state == STATE_DIGITS_BEFORE_DEC_POINT))
-				break;
-			else
-				return false;
-
-		case ',':
-			if (decSep == ',')
-			{
-				if (state >= STATE_DIGITS_AFTER_DEC_POINT) return false;
-				state = STATE_DIGITS_AFTER_DEC_POINT;
-				break;
-			}
-			else if ((thSep == ',') && (state == STATE_DIGITS_BEFORE_DEC_POINT))
-				break;
-			else
-				return false;
-
-		case ' ': // space (SPC)
-			if ((thSep == ' ') && (state == STATE_DIGITS_BEFORE_DEC_POINT)) break;
-		case '\t': // horizontal tab (TAB)
-		case '\n': // line feed (LF)
-		case '\v': // vertical tab (VT)
-		case '\f': // form feed (FF)
-		case '\r': // carriage return (CR)
-			if ((state >= STATE_DIGITS_AFTER_DEC_POINT) || (state >= STATE_EXP_DIGITS))
-				break;
-			else if ((state > STATE_LEADING_SPACES) && (state < STATE_DIGITS_AFTER_DEC_POINT))
-				return false;
-			break;
-
-		case '-':
-			if (state == STATE_LEADING_SPACES)
-				numSign = -1;
-			else if (state == STATE_EXP_CHAR) // exponential char
-				expSign = -1;
-			else return false;
-		case '+':
-			break;
-
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-			if (state >= STATE_SUFFIX) return false; // constant suffix
-			if (state <= STATE_DIGITS_BEFORE_DEC_POINT) // integral part digits
-			{
-				result = result * 10 + (*pStr - '0');
-				state = STATE_DIGITS_BEFORE_DEC_POINT;
-			}
-			else if (state <= STATE_DIGITS_AFTER_DEC_POINT) // fractional part digits
-			{
-				mantissa += F(*pStr - '0') / (pow10 *= 10.);
-				state = STATE_DIGITS_AFTER_DEC_POINT;
-			}
-			else if (state <= STATE_EXP_DIGITS) // exponent digits
-			{
-				exponent = exponent * 10. + (*pStr - '0');
-				state = STATE_EXP_DIGITS;
-			}
-			else return false;
-			break;
-
-		case 'E':
-		case 'e':
-			if (state > STATE_DIGITS_AFTER_DEC_POINT) return false;
-			state = STATE_EXP_CHAR;
-			break;
-
-		case 'F':
-		case 'f':
-			state = STATE_SUFFIX;
-			break;
-
-		default:
-			return false;
-		}
-	}
-
-	if (exponent > std::numeric_limits<F>::max_exponent10)
-	{
-		eu = expSign;
-		exponent = std::numeric_limits<F>::max_exponent10;
-	}
-
-	result += mantissa;
-	if (numSign != 1) result *= numSign;
-	if (exponent > 1.0)
-	{
-		F scale = std::pow(10., exponent);
-		result = (expSign < 0) ? (result / scale) : (result * scale);
-	}
-
-	return (state != STATE_LEADING_SPACES) && // empty/zero-length string
-		!FPEnvironment::isInfinite(result) &&
-		!FPEnvironment::isNaN(result);
-#endif // POCO_STR_TO_FLOAT_FAST
-}
-
-
-template <typename F>
-bool strToFloat (const std::string& s, F& result, char& eu = Impl::DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
-	/// Converts string to floating-point number;
-	/// This is a wrapper function, for details see see the
-	/// bool strToFloat(const char*, F&, char&, char, char) implementation.
-{
-	return strToFloat(s.c_str(), result, eu, decSep, thSep); 
 }
 
 
@@ -636,12 +467,10 @@ bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix 
 
 
 //
-// Functions using double-conversion library (http://code.google.com/p/double-conversion/).
-// Library is the implementation of the Grisu algorithm as described in Florian Loitsch's paper:
-// http://florian.loitsch.com/publications/dtoa-pldi2010.pdf
+// Wrappers for double-conversion library (http://code.google.com/p/double-conversion/).
 //
-// For a complete (and simpler) story on floating-point numbers rendering accuracy and performance, see:
-// http://www.serpentine.com/blog/2011/06/29/here-be-dragons-advances-in-problems-you-didnt-even-know-you-had/
+// Library is the implementation of the algorithm described in Florian Loitsch's paper:
+// http://florian.loitsch.com/publications/dtoa-pldi2010.pdf
 //
 
 Foundation_API void floatToStr(char* buffer,
@@ -688,12 +517,31 @@ Foundation_API std::string& doubleToStr(std::string& str,
 	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
 
 
-Foundation_API float strToFloatDC(const char* str);
-	/// For testing and performance comparison purposes only.
+Foundation_API float strToFloat(const char* str);
+	/// Converts the string of characters into single-precision floating point number.
+	/// Function uses double_convesrion::DoubleToStringConverter to do the conversion.
 
 
-Foundation_API double strToDoubleDC(const char* str);
-	/// For testing and performance comparison purposes only.
+Foundation_API bool strToFloat(const std::string&, float& result, char decSep = '.', char thSep = ',');
+	/// Converts the string of characters into single-precision floating point number.
+	/// The conversion result is assigned to the result parameter.
+	/// If decimal separator and/or thousand separator are different from defaults, they should be
+	/// supplied to ensure proper conversion.
+	/// 
+	/// Returns true if succesful, false otherwise.
+
+
+Foundation_API double strToDouble(const char* str);
+	/// Converts the string of characters into double-precision floating point number.
+
+
+Foundation_API bool strToDouble(const std::string& str, double& result, char decSep = '.', char thSep = ',');
+	/// Converts the string of characters into double-precision floating point number.
+	/// The conversion result is assigned to the result parameter.
+	/// If decimal separator and/or thousand separator are different from defaults, they should be
+	/// supplied to ensure proper conversion.
+	/// 
+	/// Returns true if succesful, false otherwise.
 
 //
 // end double-conversion functions declarations

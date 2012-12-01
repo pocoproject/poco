@@ -65,6 +65,7 @@ public:
 
 	void testStringToInt();
 	void testStringToFloat();
+	void testStringToDouble();
 	void testStringToFloatError();
 	void testNumericLocale();
 	void benchmarkStrToFloat();
