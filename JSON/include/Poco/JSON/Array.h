@@ -57,7 +57,7 @@ class Object;
 class JSON_API Array
 {
 public:
-	typedef std::vector<Dynamic::Var> ValueVector;
+	typedef std::vector<Dynamic::Var> ValueVec;
 	typedef SharedPtr<Array> Ptr;
 
 	Array();
@@ -69,10 +69,10 @@ public:
 	virtual ~Array();
 		/// Destructor
 
-	ValueVector::const_iterator begin() const;
+	ValueVec::const_iterator begin() const;
 		/// Returns iterator
 
-	ValueVector::const_iterator end() const;
+	ValueVec::const_iterator end() const;
 		/// Returns iterator
 
 	Dynamic::Var get(unsigned int index) const;
@@ -148,26 +148,26 @@ public:
 		/// Removes the element on the given index.
 
 private:
-	ValueVector _values;
+	ValueVec _values;
 };
 
 
-inline Array::ValueVector::const_iterator Array::begin() const
+inline Array::ValueVec::const_iterator Array::begin() const
 {
 	return _values.begin();
 }
 
 
-inline Array::ValueVector::const_iterator Array::end() const
+inline Array::ValueVec::const_iterator Array::end() const
 
 {
 	return _values.end();
 }
 
 
-inline unsigned int Array::size() const
+inline std::size_t Array::size() const
 {
-	return _values.size();
+	return static_cast<std::size_t>(_values.size());
 }
 
 

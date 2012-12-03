@@ -186,9 +186,9 @@ inline void Object::set(const std::string& key, const Dynamic::Var& value)
 }
 
 
-inline unsigned int Object::size() const
+inline std::size_t Object::size() const
 {
-	return _values.size();
+	return static_cast<std::size_t>(_values.size());
 }
 
 
