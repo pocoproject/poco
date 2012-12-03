@@ -39,16 +39,6 @@
 #ifndef Net_SocketDefs_INCLUDED
 #define Net_SocketDefs_INCLUDED
 
-#ifndef __THROW
-# ifndef __GNUC_PREREQ
-#  define __GNUC_PREREQ(maj, min) (0)
-# endif
-# if defined __cplusplus && __GNUC_PREREQ (2,8)
-#  define __THROW	throw ()
-# else
-#  define __THROW
-# endif
-#endif
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#include "Poco/UnWindows.h"

@@ -54,4 +54,28 @@
 #endif
 
 
+//
+// Thread-safety of local static initialization
+//
+#if __cplusplus >= 201103L || __GNUC__ >= 4 || defined(__clang__)
+	#ifndef POCO_LOCAL_STATIC_INIT_IS_THREADSAFE
+		#define POCO_LOCAL_STATIC_INIT_IS_THREADSAFE 1
+	#endif
+#endif
+
+
+#ifdef __GNUC__
+	#ifndef __THROW
+		#ifndef __GNUC_PREREQ
+			#define __GNUC_PREREQ(maj, min) (0)
+		#endif
+		#if defined __cplusplus && __GNUC_PREREQ (2,8)
+			#define __THROW throw ()
+		#else
+			#define __THROW
+		#endif
+	#endif
+#endif // __GNUC__
+
+
 #endif // Foundation_Platform_POSIX_INCLUDED
