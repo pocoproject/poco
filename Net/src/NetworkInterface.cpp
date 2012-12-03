@@ -1276,7 +1276,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 
 
 #include <sys/types.h>
+#ifndef POCO_ANDROID // Android doesn't have <ifaddrs.h>
 #include <ifaddrs.h>
+#endif
 #include <linux/if.h>
 #include <linux/if_packet.h>
 #include <net/if_arp.h>
@@ -1306,6 +1308,8 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 	}
 }
 
+#ifndef POCO_ANDROID
+
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
 	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
@@ -1317,11 +1321,14 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setType(fromNative(sdl->sll_hatype));
 }
 
+#endif
+
 }
 
 
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
+#ifndef POCO_ANDROID
 	FastMutex::ScopedLock lock(_mutex);
 	Map result;
 	unsigned ifIndex = 0;
@@ -1420,6 +1427,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	if (ifaces) freeifaddrs(ifaces);
 
 	return result;
+#else
+	throw Poco::NotImplementedException("Not implemented in Android");
+#endif
 }
 
 
