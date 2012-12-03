@@ -99,7 +99,7 @@ public:
 		/// Retrieves an object. When the element is not
 		/// an object or doesn't exist, an empty SharedPtr is returned.
 
-	unsigned int size() const;
+	std::size_t  size() const;
 		/// Returns the size of the array
 
 	bool isArray(unsigned int index) const;

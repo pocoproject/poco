@@ -133,7 +133,7 @@ public:
 		return value;
 	}
 
-	unsigned int size() const;
+	std::size_t size() const;
 		/// Returns the number of properties
 
 	void set(const std::string& key, const Dynamic::Var& value);
