@@ -46,6 +46,7 @@ public:
 	JSONTest(const std::string& name);
 	~JSONTest();
 
+	void testStringifier();
 	void testNullProperty();
 	void testTrueProperty();
 	void testFalseProperty();

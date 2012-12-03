@@ -74,6 +74,22 @@ void JSONTest::tearDown()
 }
 
 
+void JSONTest::testStringifier()
+{
+	Object obj;
+
+	Array arr;
+	Object obj2;
+
+	obj.set("array", arr);
+	obj.set("obj2", obj2);
+
+	std::ostringstream ostr;
+	obj.stringify(ostr);
+	assert (ostr.str() == "{\"array\":[],\"obj2\":{}}");
+}
+
+
 void JSONTest::testNullProperty()
 {
 	std::string json = "{ \"test\" : null }";
@@ -806,6 +822,7 @@ CppUnit::Test* JSONTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("JSONTest");
 
+	CppUnit_addTest(pSuite, JSONTest, testStringifier);
 	CppUnit_addTest(pSuite, JSONTest, testNullProperty);
 	CppUnit_addTest(pSuite, JSONTest, testTrueProperty);
 	CppUnit_addTest(pSuite, JSONTest, testFalseProperty);
