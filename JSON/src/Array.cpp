@@ -102,6 +102,17 @@ Object::Ptr Array::getObject(unsigned int index) const
 }
 
 
+bool Array::isNull(unsigned int index) const
+{
+	if ( index < _values.size() )
+	{
+		Dynamic::Var value = _values[index];
+		return value.isEmpty();
+	}
+	return true;
+}
+
+
 bool Array::isObject(unsigned int index) const
 {
 	Var value = get(index);

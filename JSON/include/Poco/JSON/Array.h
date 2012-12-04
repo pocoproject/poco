@@ -134,11 +134,8 @@ public:
 		return value;
 	}
 
-	void add(const Dynamic::Var& value)
+	void add(const Dynamic::Var& value);
 		/// Add the given value to the array
-	{
-		_values.push_back(value);
-	}
 
 	void stringify(std::ostream& out, unsigned int indent) const;
 		/// Prints the array to out. When indent is 0, the array
@@ -178,14 +175,9 @@ inline bool Array::isArray(unsigned int index) const
 }
 
 
-inline bool Array::isNull(unsigned int index) const
+inline void Array::add(const Dynamic::Var& value)
 {
-	if ( index < _values.size() )
-	{
-		Dynamic::Var value = _values[index];
-		return value.isEmpty();
-	}
-	return true;
+	_values.push_back(value);
 }
 
 

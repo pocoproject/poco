@@ -118,8 +118,7 @@ public:
 	{
 		T value = def;
 		ValueMap::const_iterator it = _values.find(key);
-		if (      it != _values.end()
-		          && ! it->second.isEmpty() )
+		if (it != _values.end() && ! it->second.isEmpty() )
 		{
 			try
 			{
