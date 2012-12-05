@@ -690,14 +690,14 @@ typedef std::basic_string<char, i_char_traits<char> > istring;
 
 
 template<typename T>
-int isubstr(const T& str, const T& sought)
+std::size_t isubstr(const T& str, const T& sought)
 {
 	typename T::const_iterator it = std::search(str.begin(), str.end(),
 		sought.begin(), sought.end(), 
 		i_char_traits<typename T::value_type>::eq);
 
 	if (it != str.end()) return it - str.begin();
-	else return T::npos;
+	else return static_cast<std::size_t>(T::npos);
 }
 
 
