@@ -193,7 +193,7 @@ public:
 		pBinder->bind(pos++, obj.getAge(), dir);
 	}
 
-	static void prepare(std::size_t pos, Person& obj, AbstractPreparator* pPrepare)
+	static void prepare(std::size_t pos, const Person& obj, AbstractPreparator* pPrepare)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
 		poco_assert_dbg (pPrepare != 0);
@@ -673,6 +673,11 @@ void SQLiteTest::testAffectedRows()
 	int count = 100;
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str VARCHAR(30))", now;
+
+	Statement stmt((tmp << "SELECT * FROM Strings"));
+	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
+	assert (count == 0);
+	assert (0 == stmt.execute());
 
 	Statement stmt1((tmp << "INSERT INTO Strings VALUES(:str)", use(str)));
 	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
@@ -1242,6 +1247,12 @@ void SQLiteTest::testCombinedLimits()
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
 	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(people), now;
+
+	std::string a, b, c;
+	Statement stmt = (tmp << "SELECT LastName, FirstName, Address FROM Person WHERE Address = 'invalid value'",
+		into(a), into(b), into(c), limit(1));
+	assert (!stmt.done() && stmt.execute() == 0);
+	
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 2);
@@ -2543,6 +2554,32 @@ void SQLiteTest::testReconnect()
 }
 
 
+void SQLiteTest::testSystemTable()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+
+	int cnt = -1;
+	session << "SELECT count(*) FROM sys.dual", into(cnt), now;
+	assert (0 == cnt);
+
+	session << "INSERT INTO sys.dual VALUES ('test')", now;
+	session << "SELECT count(*) FROM sys.dual", into(cnt), now;
+	assert (1 == cnt);
+
+	session << "DELETE FROM sys.dual", now;
+	session << "SELECT count(*) FROM sys.dual", into(cnt), now;
+	assert (0 == cnt);
+
+	try
+	{
+		session << "DROP TABLE sys.dual", now;
+		fail ("must throw");
+	}
+	catch (InvalidAccessException&) { }
+
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -2633,6 +2670,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testMultipleResults);
 	CppUnit_addTest(pSuite, SQLiteTest, testPair);
 	CppUnit_addTest(pSuite, SQLiteTest, testReconnect);
+	CppUnit_addTest(pSuite, SQLiteTest, testSystemTable);
 
 	return pSuite;
 }

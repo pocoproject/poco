@@ -612,6 +612,19 @@ const IPAddress& NetworkInterface::firstAddress(IPAddress::Family family) const
 }
 
 
+void NetworkInterface::firstAddress(IPAddress& addr, IPAddress::Family family) const
+{
+	try
+	{
+		addr = firstAddress(family);
+	}
+	catch (NotFoundException&)
+	{
+		addr = IPAddress(family);
+	}
+}
+
+
 void NetworkInterface::addAddress(const IPAddress& address)
 {
 	_pImpl->addAddress(AddressTuple(address, IPAddress(), IPAddress()));

@@ -96,7 +96,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return 1u;
+		return 0;
 	}
 
 	std::size_t numOfRowsAllowed() const

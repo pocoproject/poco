@@ -43,6 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Ascii.h"
 #include <cstring>
+#include <locale>
 
 
 namespace Poco {
@@ -639,6 +640,64 @@ S cat(const S& delim, const It& begin, const It& end)
 		result += *it;
 	}
 	return result;
+}
+
+
+//
+// case-insensitive string equality
+//
+
+
+template <typename charT>
+struct i_char_traits : public std::char_traits<charT>
+{
+	static bool eq(charT c1, charT c2)
+	{
+		return Ascii::toLower(c1) == Ascii::toLower(c2);
+	}
+
+	static bool ne(charT c1, charT c2)
+	{
+		return !eq(c1, c2);
+	}
+
+	static bool lt(charT c1, charT c2)
+	{
+		return Ascii::toLower(c1) < Ascii::toLower(c2);
+	}
+
+	static int compare(const charT* s1, const charT* s2, size_t n)
+	{
+		for (int i = 0; i < n && s1 && s2; ++i, ++s1, ++s2)
+		{
+			if (Ascii::toLower(*s1) == Ascii::toLower(*s2)) continue;
+			else if (Ascii::toLower(*s1) < Ascii::toLower(*s2)) return -1;
+			else return 1;
+		}
+
+		return 0;
+	}
+
+	static const charT* find(const charT* s, int n, charT a)
+	{
+		while(n-- > 0 && Ascii::toLower(*s) != Ascii::toLower(a)) { ++s; }
+		return s;
+	}
+};
+
+
+typedef std::basic_string<char, i_char_traits<char> > istring;
+
+
+template<typename T>
+int isubstr(const T& str, const T& sought)
+{
+	typename T::const_iterator it = std::search(str.begin(), str.end(),
+		sought.begin(), sought.end(), 
+		i_char_traits<typename T::value_type>::eq);
+
+	if (it != str.end()) return it - str.begin();
+	else return T::npos;
 }
 
 

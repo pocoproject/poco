@@ -52,13 +52,16 @@ namespace Data {
 namespace SQLite {
 
 
+const std::size_t SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = std::numeric_limits<std::size_t>::max();
+
+
 SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB):
 	StatementImpl(rSession),
 	_pDB(pDB),
 	_pStmt(0),
 	_stepCalled(false),
 	_nextResponse(0),
-	_affectedRowCount(0),
+	_affectedRowCount(POCO_SQLITE_INV_ROW_CNT),
 	_canBind(false),
 	_isExtracted(false),
 	_canCompile(true)
@@ -75,9 +78,29 @@ SQLiteStatementImpl::~SQLiteStatementImpl()
 
 void SQLiteStatementImpl::compileImpl()
 {
-	if (!_pLeftover) _bindBegin = bindings().begin();
+	if (!_pLeftover)
+	{
+		// Executed to force reset of previous changes count to zero.
+		// Without this, execute() will not return accurate (zero) count if select 
+		// statement returns no results previous [insert|update|delete] affected rows.
+		if (sqlite3_changes(_pDB))
+		{
+			if (SQLITE_OK != sqlite3_exec(_pDB, "delete from sys.dual where 1 <> 1;", 0, 0, 0))
+				throw ExecutionException("Error updating system database.");
+		}
+
+		_bindBegin = bindings().begin();
+	}
 
 	std::string statement(toString());
+
+	if (isubstr(statement, std::string("drop")) != istring::npos &&
+		isubstr(statement, std::string("table")) != istring::npos &&
+		isubstr(statement, std::string("dual")) != istring::npos)
+	{
+		throw InvalidAccessException("Cannot drop system table!");
+	}
+
 	sqlite3_stmt* pStmt = 0;
 	const char* pSql = _pLeftover ? _pLeftover->c_str() : statement.c_str();
 
@@ -194,12 +217,12 @@ void SQLiteStatementImpl::bindImpl()
 
 	if (_bindBegin != bindings().end())
 	{
-		std::size_t boundRowCount = (*_bindBegin)->numOfRowsHandled();
+		_affectedRowCount = (*_bindBegin)->numOfRowsHandled();
 
 		Bindings::iterator oldBegin = _bindBegin;
 		for (std::size_t pos = 1; _bindBegin != bindEnd && (*_bindBegin)->canBind(); ++_bindBegin)
 		{
-			if (boundRowCount != (*_bindBegin)->numOfRowsHandled())
+			if (_affectedRowCount != (*_bindBegin)->numOfRowsHandled())
 				throw BindingException("Size mismatch in Bindings. All Bindings MUST have the same size");
 
 			(*_bindBegin)->bind(pos);
@@ -220,7 +243,7 @@ void SQLiteStatementImpl::bindImpl()
 void SQLiteStatementImpl::clear()
 {
 	_columns[currentDataSet()].clear();
-	_affectedRowCount = 0;
+	_affectedRowCount = POCO_SQLITE_INV_ROW_CNT;
 
 	if (_pStmt)
 	{
@@ -304,7 +327,7 @@ const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
 
 std::size_t SQLiteStatementImpl::affectedRowCount() const
 {
-	return _affectedRowCount ? _affectedRowCount : sqlite3_changes(_pDB);
+	return _affectedRowCount != POCO_SQLITE_INV_ROW_CNT ? _affectedRowCount : sqlite3_changes(_pDB);
 }
 
 

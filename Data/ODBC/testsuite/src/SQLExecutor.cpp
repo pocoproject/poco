@@ -211,7 +211,7 @@ public:
 		pBinder->bind(pos++, obj.age, dir);
 	}
 
-	static void prepare(std::size_t pos, Person& obj, AbstractPreparator* pPrepare)
+	static void prepare(std::size_t pos, const Person& obj, AbstractPreparator* pPrepare)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
 		poco_assert_dbg (pPrepare != 0);
