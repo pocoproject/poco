@@ -767,6 +767,26 @@ void URITest::testOther()
 }
 
 
+void URITest::testEncodeDecode()
+{
+	std::string str;
+	URI::encode("http://google.com/search?q=hello+world#frag ment", "+#?", str);
+	assert (str == "http://google.com/search%3Fq=hello%2Bworld%23frag%20ment");
+
+	str = "";
+	URI::encode("http://google.com/search?q=hello+world#frag ment", "", str);
+	assert (str == "http://google.com/search?q=hello+world#frag%20ment");
+	
+	str = "";
+	URI::decode("http://google.com/search?q=hello+world#frag%20ment", str, true);
+	assert (str == "http://google.com/search?q=hello world#frag ment");
+	
+	str = "";
+	URI::decode("http://google.com/search?q=hello%2Bworld#frag%20ment", str);
+	assert (str == "http://google.com/search?q=hello+world#frag ment");
+}
+
+
 void URITest::setUp()
 {
 }
@@ -788,6 +808,7 @@ CppUnit::Test* URITest::suite()
 	CppUnit_addTest(pSuite, URITest, testNormalize);
 	CppUnit_addTest(pSuite, URITest, testResolve);
 	CppUnit_addTest(pSuite, URITest, testSwap);
+	CppUnit_addTest(pSuite, URITest, testEncodeDecode);
 	CppUnit_addTest(pSuite, URITest, testOther);
 
 	return pSuite;

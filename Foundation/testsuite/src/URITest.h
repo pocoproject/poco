@@ -53,6 +53,7 @@ public:
 	void testNormalize();
 	void testResolve();
 	void testSwap();
+	void testEncodeDecode();
 	void testOther();
 
 	void setUp();
