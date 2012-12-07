@@ -14,6 +14,7 @@ Release 1.5.0 (2012-12-17)
 - fixed GH #16: NetworkInterface::firstAddress() should not throw on unconfigured interfaces
 - Android compile/build support (by Rangel Reale)
 - TypeHandler::prepare() now takes const-reference
+- fixed GH #27: Poco::URI::decode() doesn't properly handle '+'
 
 Release 1.5.0 (2012-10-14)
 ==========================

@@ -1991,7 +1991,6 @@ private:
 };
 
 
-
 template <class K, class V>
 class TypeHandler<std::pair<K, V> >: public AbstractTypeHandler
 {
@@ -2055,12 +2054,10 @@ public:
 			TypeHandler<T>::extract(pos, *obj, *obj, pExt);
 	}
 
-	static void prepare(std::size_t pos, const Poco::AutoPtr<T>& obj, AbstractPreparator* pPreparator)
+	static void prepare(std::size_t pos, const Poco::AutoPtr<T>&, AbstractPreparator* pPreparator)
 	{
 		poco_assert_dbg (pPreparator != 0);
-		if (!obj)
-			obj = new T();
-		TypeHandler<T>::prepare(pos, *obj, pPreparator);
+		TypeHandler<T>::prepare(pos, T(), pPreparator);
 	}
 
 private:
@@ -2097,11 +2094,10 @@ public:
 			TypeHandler<T>::extract(pos, *obj, *obj, pExt);
 	}
 
-	static void prepare(std::size_t pos, const Poco::SharedPtr<T>& obj, AbstractPreparator* pPreparator)
+	static void prepare(std::size_t pos, const Poco::SharedPtr<T>&, AbstractPreparator* pPreparator)
 	{
 		poco_assert_dbg (pPreparator != 0);
-		// *obj will trigger a nullpointer exception if empty
-		TypeHandler<T>::prepare(pos, *obj, pPreparator);
+		TypeHandler<T>::prepare(pos, T(), pPreparator);
 	}
 
 private:
