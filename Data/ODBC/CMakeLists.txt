@@ -1,5 +1,4 @@
 set(LIBNAME "PocoDataODBC")
-set(LIBNAME "${LIBNAME}${LIB_EXT}")
 
 set(SRCS 
 src/Binder.cpp
@@ -26,7 +25,7 @@ add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-target_link_libraries( ${LIBNAME} PocoData${LIB_EXT} PocoFoundation${LIB_EXT} ${ODBC_LINK_FLAGS})
+target_link_libraries( ${LIBNAME} PocoData PocoFoundation ${ODBC_LINK_FLAGS})
 
 install(
     DIRECTORY include/Poco
