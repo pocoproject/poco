@@ -50,10 +50,10 @@ endif ()
 #    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL) 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   message(STATUS "Debug output enabled")
-  set(LIB_EXT "d" CACHE STRING "Set debug library postfix" FORCE)
+  set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set debug library postfix" FORCE)
 else ()
   message(STATUS "Optimized output enabled")
-  set(LIB_EXT "" CACHE STRING "Set debug library postfix" FORCE)
+  set(CMAKE_DEBUG_POSTFIX "" CACHE STRING "Set debug library postfix" FORCE)
 endif ()
 
 option(ENABLE_TESTS
