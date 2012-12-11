@@ -98,6 +98,21 @@ void PatternFormatterTest::testPatternFormatter()
 	fmt.setProperty("pattern", "%[testParam] %p");
 	fmt.format(msg, result);
 	assert (result == "Test Parameter Error");
+
+	result.clear();
+	fmt.setProperty("pattern", "start %v[10] end");
+	fmt.format(msg, result);
+	assert (result == "start TestSource end");
+
+	result.clear();
+	fmt.setProperty("pattern", "start %v[12] end");
+	fmt.format(msg, result);
+	assert (result == "start TestSource   end");
+
+	result.clear();
+	fmt.setProperty("pattern", "start %v[8] end");
+	fmt.format(msg, result);
+	assert (result == "start stSource end");
 }
 
 
