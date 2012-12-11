@@ -133,7 +133,7 @@ public:
 	{
 		// receive bytes and transfer(echo) them to the output FIFO buffer
 		int len = _socket.receiveBytes(_fifoIn);
-		_fifoIn.drain(_fifoOut.write(_fifoIn.buffer(), len));
+		_fifoIn.drain(_fifoOut.write(_fifoIn.buffer()));
 	}
 	
 	void onSocketWritable(const AutoPtr<WritableNotification>& pNf)
