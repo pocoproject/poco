@@ -17,6 +17,7 @@ Release 1.5.0 (2012-12-17)
 - fixed GH #27: Poco::URI::decode() doesn't properly handle '+'
 - fixed GH #31: JSON implementation bug
 - fixed SF #597: Configure script ignores cflags
+- fixed SF #593: Poco 1.5.0 on FreeBSD: cannot find -ldl
 
 Release 1.5.0 (2012-10-14)
 ==========================
