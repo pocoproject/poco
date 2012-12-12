@@ -57,7 +57,7 @@ class Object;
 class JSON_API Array
 {
 public:
-	typedef std::vector<Dynamic::Var> ValueVector;
+	typedef std::vector<Dynamic::Var> ValueVec;
 	typedef SharedPtr<Array> Ptr;
 
 	Array();
@@ -69,10 +69,10 @@ public:
 	virtual ~Array();
 		/// Destructor
 
-	ValueVector::const_iterator begin() const;
+	ValueVec::const_iterator begin() const;
 		/// Returns iterator
 
-	ValueVector::const_iterator end() const;
+	ValueVec::const_iterator end() const;
 		/// Returns iterator
 
 	Dynamic::Var get(unsigned int index) const;
@@ -99,7 +99,7 @@ public:
 		/// Retrieves an object. When the element is not
 		/// an object or doesn't exist, an empty SharedPtr is returned.
 
-	unsigned int size() const;
+	std::size_t  size() const;
 		/// Returns the size of the array
 
 	bool isArray(unsigned int index) const;
@@ -134,11 +134,8 @@ public:
 		return value;
 	}
 
-	void add(const Dynamic::Var& value)
+	void add(const Dynamic::Var& value);
 		/// Add the given value to the array
-	{
-		_values.push_back(value);
-	}
 
 	void stringify(std::ostream& out, unsigned int indent) const;
 		/// Prints the array to out. When indent is 0, the array
@@ -148,26 +145,26 @@ public:
 		/// Removes the element on the given index.
 
 private:
-	ValueVector _values;
+	ValueVec _values;
 };
 
 
-inline Array::ValueVector::const_iterator Array::begin() const
+inline Array::ValueVec::const_iterator Array::begin() const
 {
 	return _values.begin();
 }
 
 
-inline Array::ValueVector::const_iterator Array::end() const
+inline Array::ValueVec::const_iterator Array::end() const
 
 {
 	return _values.end();
 }
 
 
-inline unsigned int Array::size() const
+inline std::size_t Array::size() const
 {
-	return _values.size();
+	return static_cast<std::size_t>(_values.size());
 }
 
 
@@ -178,14 +175,9 @@ inline bool Array::isArray(unsigned int index) const
 }
 
 
-inline bool Array::isNull(unsigned int index) const
+inline void Array::add(const Dynamic::Var& value)
 {
-	if ( index < _values.size() )
-	{
-		Dynamic::Var value = _values[index];
-		return value.isEmpty();
-	}
-	return true;
+	_values.push_back(value);
 }
 
 
@@ -285,17 +277,17 @@ public:
 		s = oss.str();
 	}
 
-	void convert(DateTime& val) const
+	void convert(DateTime& /*val*/) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime& /*ldt*/) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(Timestamp& ts) const
+	void convert(Timestamp& /*ts*/) const
 	{
 		throw BadCastException();
 	}

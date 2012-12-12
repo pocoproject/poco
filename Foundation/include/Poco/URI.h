@@ -246,10 +246,12 @@ public:
 		/// URI-encodes the given string by escaping reserved and non-ASCII
 		/// characters. The encoded string is appended to encodedStr.
 		
-	static void decode(const std::string& str, std::string& decodedStr);
+	static void decode(const std::string& str, std::string& decodedStr, bool plusAsSpace = false);
 		/// URI-decodes the given string by replacing percent-encoded
 		/// characters with the actual character. The decoded string
 		/// is appended to decodedStr.
+		/// When plusAsSpace is true, non-encoded plus signs in the query are decoded as spaces.
+		/// (http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1)
 
 protected:
 	bool equals(const URI& uri) const;

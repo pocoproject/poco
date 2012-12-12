@@ -43,7 +43,7 @@
 #include "Poco/ActiveMethod.h"
 #include "Poco/ActiveResult.h"
 #include "Poco/String.h"
-#include "Poco/Exception.h"
+#include "Poco/Data/DataException.h"
 #include "sqlite3.h"
 #include <cstdlib>
 
@@ -193,6 +193,14 @@ void SessionImpl::open(const std::string& connect)
 	} catch (SQLiteException& ex)
 	{
 		throw ConnectionFailedException(ex.displayText());
+	}
+
+	if (SQLITE_OK != sqlite3_exec(_pDB,
+		"attach database ':memory:' as sys;"
+		"create table sys.dual (dummy);", 
+		0, 0, 0))
+	{
+		throw ExecutionException("Cannot create system database.");
 	}
 
 	_connected = true;

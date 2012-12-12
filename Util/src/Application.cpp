@@ -40,6 +40,7 @@
 #include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/Util/IniFileConfiguration.h"
 #include "Poco/Util/XMLConfiguration.h"
+#include "Poco/Util/JSONConfiguration.h"
 #include "Poco/Util/LoggingSubsystem.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionProcessor.h"
@@ -251,6 +252,13 @@ int Application::loadConfiguration(int priority)
 		++n;
 	}
 #endif
+#ifndef POCO_UTIL_NO_JSONCONFIGURATION
+	if (findAppConfigFile(appPath.getBaseName(), "json", cfgPath))
+	{
+		_pConfig->add(new JSONConfiguration(cfgPath.toString()), priority, false, false);
+		++n;
+	}
+#endif
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "xml", cfgPath))
 	{
@@ -275,6 +283,10 @@ void Application::loadConfiguration(const std::string& path, int priority)
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 	else if (icompare(ext, "ini") == 0)
 		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false, false);
+#endif
+#ifndef POCO_UTIL_NO_JSONONFIGURATION
+	else if (icompare(ext, "json") == 0)
+		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false, false);
 #endif
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	else if (icompare(ext, "xml") == 0)

@@ -138,11 +138,19 @@ void SMTPChannel::log(const Message& msg)
 				Poco::FileInputStream fis(_attachment, std::ios::in | std::ios::binary | std::ios::ate);
 				if (fis.good())
 				{
-					int size = fis.tellg();
-					char* pMem = new char [size];
+					typedef std::allocator<std::string::value_type>::size_type SST;
+
+					std::streamoff size = fis.tellg();
+					poco_assert (std::numeric_limits<unsigned int>::max() >= size);
+					poco_assert (std::numeric_limits<SST>::max() >= size);
+					char* pMem = new char [static_cast<unsigned int>(size)];
 					fis.seekg(std::ios::beg);
 					fis.read(pMem, size);
-					message.addAttachment(_attachment, new StringPartSource(std::string(pMem, size), _type, _attachment));
+					message.addAttachment(_attachment,
+						new StringPartSource(std::string(pMem, static_cast<SST>(size)), 
+							_type,
+							_attachment));
+
 					delete [] pMem;
 				}
 			}

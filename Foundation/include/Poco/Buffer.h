@@ -51,9 +51,8 @@ namespace Poco {
 
 template <class T>
 class Buffer
-	/// A very simple buffer class that allocates a buffer of
-	/// a given type and size in the constructor and
-	/// deallocates the buffer in the destructor.
+	/// A buffer class that allocates a buffer of a given type and size 
+	/// in the constructor and deallocates the buffer in the destructor.
 	///
 	/// This class is useful everywhere where a temporary buffer
 	/// is needed.

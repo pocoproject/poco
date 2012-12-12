@@ -201,8 +201,8 @@
 		#define POCO_ARCH_BIG_ENDIAN 1
 	#endif
 #elif defined (nios2) || defined(__nios2) || defined(__nios2__)
-    #define POCO_ARCH POCO_ARCH_NIOS2
-    #if defined(__nios2_little_endian) || defined(nios2_little_endian) || defined(__nios2_little_endian__)
+	#define POCO_ARCH POCO_ARCH_NIOS2
+	#if defined(__nios2_little_endian) || defined(nios2_little_endian) || defined(__nios2_little_endian__)
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#else
 		#define POCO_ARCH_BIG_ENDIAN 1
@@ -213,16 +213,6 @@
 
 #if !defined(POCO_ARCH)
 	#error "Unknown Hardware Architecture."
-#endif
-
-
-//
-// Thread-safety of local static initialization
-//
-#if __cplusplus >= 201103L || __GNUC__ >= 4 || defined(__clang__)
-#ifndef POCO_LOCAL_STATIC_INIT_IS_THREADSAFE
-#define POCO_LOCAL_STATIC_INIT_IS_THREADSAFE 1
-#endif
 #endif
 
 

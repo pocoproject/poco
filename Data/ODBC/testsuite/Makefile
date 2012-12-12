@@ -20,7 +20,10 @@ include $(POCO_BASE)/Data/ODBC/ODBC.make
 # Note:                                                                                          #
 #  Do not change linking order or move this line up, these libs have to be linked in this order. #
 ##################################################################################################
-SYSLIBS += -lltdl -ldl
+SYSLIBS += -lltdl
+ifneq ($(POCO_CONFIG),FreeBSD)
+SYSLIBS += -ldl
+endif
 
 objects = ODBCTestSuite Driver \
 	ODBCDB2Test ODBCMySQLTest ODBCOracleTest ODBCPostgreSQLTest \

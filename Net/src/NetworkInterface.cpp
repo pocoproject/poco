@@ -606,6 +606,19 @@ const IPAddress& NetworkInterface::firstAddress(IPAddress::Family family) const
 }
 
 
+void NetworkInterface::firstAddress(IPAddress& addr, IPAddress::Family family) const
+{
+	try
+	{
+		addr = firstAddress(family);
+	}
+	catch (NotFoundException&)
+	{
+		addr = IPAddress(family);
+	}
+}
+
+
 void NetworkInterface::addAddress(const IPAddress& address)
 {
 	_pImpl->addAddress(AddressTuple(address, IPAddress(), IPAddress()));
@@ -1260,7 +1273,9 @@ NetworkInterface::Map NetworkInterface::full()
 
 
 #include <sys/types.h>
+#ifndef POCO_ANDROID // Android doesn't have <ifaddrs.h>
 #include <ifaddrs.h>
+#endif
 #include <linux/if.h>
 #include <linux/if_packet.h>
 #include <net/if_arp.h>
@@ -1290,6 +1305,8 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 	}
 }
 
+#ifndef POCO_ANDROID
+
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
 	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
@@ -1301,11 +1318,14 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setType(fromNative(sdl->sll_hatype));
 }
 
+#endif
+
 }
 
 
 NetworkInterface::Map NetworkInterface::full()
 {
+#ifndef POCO_ANDROID
 	FastMutex::ScopedLock lock(_mutex);
 	Map result;
 	unsigned ifIndex = 0;
@@ -1381,6 +1401,9 @@ NetworkInterface::Map NetworkInterface::full()
 	if (ifaces) freeifaddrs(ifaces);
 
 	return result;
+#else
+	throw Poco::NotImplementedException("Not implemented in Android");
+#endif
 }
 
 

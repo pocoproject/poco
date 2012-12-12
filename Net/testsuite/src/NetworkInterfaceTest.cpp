@@ -149,12 +149,27 @@ void NetworkInterfaceTest::testForAddress()
 		IPAddress first = it->second.firstAddress(IPAddress::IPv4);
 		if (it->second.supportsIPv4())
 		{
-			NetworkInterface ifc = NetworkInterface::forAddress(first);
-			assert (ifc.firstAddress(IPAddress::IPv4) == first);
+			NetworkInterface ifc = NetworkInterface::forAddress(it->second.firstAddress(IPAddress::IPv4));
+			assert (ifc.firstAddress(IPAddress::IPv4) == it->second.firstAddress(IPAddress::IPv4));
+
+			IPAddress addr(IPAddress::IPv4);
+			assert (addr.isWildcard());
+			it->second.firstAddress(addr, IPAddress::IPv4);
+			assert (!addr.isWildcard());
 		}
 		else
 		{
-			assert(first.isWildcard());
+			try
+			{
+				it->second.firstAddress(IPAddress::IPv4);
+				fail ("must throw");
+			}
+			catch (NotFoundException&) { }
+
+			IPAddress addr(IPAddress::IPv4);
+			assert (addr.isWildcard());
+			it->second.firstAddress(addr, IPAddress::IPv4);
+			assert (addr.isWildcard());
 		}
 	}
 }

@@ -1,7 +1,7 @@
 //
 // CppToken.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/CppToken.h#1 $
+// $Id: //poco/1.4/CppParser/include/Poco/CppParser/CppToken.h#2 $
 //
 // Library: CppParser
 // Package: CppParser
@@ -134,7 +134,9 @@ class CppParser_API IdentifierToken: public CppToken
 public:
 	enum Keywords
 	{
-		KW_AND = 1,
+		KW_ALIGNAS = 1,
+		KW_ALIGNOF,
+		KW_AND,
 		KW_AND_EQ,
 		KW_ASM,
 		KW_AUTO,
@@ -145,11 +147,15 @@ public:
 		KW_CASE,
 		KW_CATCH,
 		KW_CHAR,
+		KW_CHAR_16T,
+		KW_CHAR_32T,
 		KW_CLASS,
 		KW_COMPL,
 		KW_CONST,
+		KW_CONSTEXPR,
 		KW_CONST_CAST,
 		KW_CONTINUE,
+		KW_DECLTYPE,
 		KW_DEFAULT,
 		KW_DELETE,
 		KW_DO,
@@ -172,8 +178,10 @@ public:
 		KW_MUTABLE,
 		KW_NAMESPACE,
 		KW_NEW,
+		KW_NOEXCEPT,
 		KW_NOT,
 		KW_NOT_EQ,
+		KW_NULLPTR,
 		KW_OPERATOR,
 		KW_OR,
 		KW_OR_EQ,
@@ -187,11 +195,13 @@ public:
 		KW_SIGNED,
 		KW_SIZEOF,
 		KW_STATIC,
+		KW_STATIC_ASSERT,
 		KW_STATIC_CAST,
 		KW_STRUCT,
 		KW_SWITCH,
 		KW_TEMPLATE,
 		KW_THIS,
+		KW_THREAD_LOCAL,
 		KW_THROW,
 		KW_TRUE,
 		KW_TRY,

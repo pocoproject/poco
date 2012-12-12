@@ -50,10 +50,10 @@ endif ()
 #    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL) 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   message(STATUS "Debug output enabled")
-  set(LIB_EXT "d" CACHE STRING "Set debug library postfix" FORCE)
+  set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set debug library postfix" FORCE)
 else ()
   message(STATUS "Optimized output enabled")
-  set(LIB_EXT "" CACHE STRING "Set debug library postfix" FORCE)
+  set(CMAKE_DEBUG_POSTFIX "" CACHE STRING "Set debug library postfix" FORCE)
 endif ()
 
 option(ENABLE_TESTS
@@ -143,6 +143,11 @@ endif (CMAKE_COMPILER_IS_CYGWIN)
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
   add_definitions( -D_BSD_SOURCE -library=stlport4)
 endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
+
+# iOS
+if (IOS)
+  add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_STAT64 -DPOCO_NO_SHAREDLIBS -DPOCO_NO_NET_IFTYPES )
+endif(IOS)
 
 IF (ENABLE_TESTS)
    add_subdirectory(CppUnit)

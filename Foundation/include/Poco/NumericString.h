@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Buffer.h"
 #include "Poco/FPEnvironment.h"
 #ifdef min
 	#undef min
@@ -51,8 +52,15 @@
 #include <limits>
 #include <cmath>
 #if !defined(POCO_NO_LOCALE)
-#include <locale>
+	#include <locale>
 #endif
+
+
+#define POCO_MAX_INT_STRING_LEN 65
+#define POCO_MAX_FLT_STRING_LEN 128
+#define POCO_FLT_INF "inf"
+#define POCO_FLT_NAN "nan"
+#define POCO_FLT_EXP 'e'
 
 
 namespace Poco {
@@ -81,6 +89,10 @@ inline char thousandSeparator()
 #endif
 }
 
+
+//
+// String to Number Conversions
+//
 
 template <typename I>
 bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
@@ -198,163 +210,342 @@ bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
 }
 
 
+//
+// Number to String Conversions
+//
+
 namespace Impl {
 
-static char DUMMY_EXP_UNDERFLOW = 0; // dummy default val
-
-}
-
-template <typename F>
-bool strToFloat (const char* pStr, F& result, char& eu = Impl::DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
-	/// Converts zero-terminated array to floating-point number;
-	/// Returns true if succesful. Exponent underflow (i.e. loss of precision)
-	/// is signalled in eu. Thousand separators are recognized for the locale
-	/// and silently skipped but not verified for correct positioning.
-	///
-	/// If parsing was unsuccesful, the return value is false with
-	/// result and eu values undetermined.
-{
-	poco_assert (decSep != thSep);
-
-	if (pStr == 0 || *pStr == '\0') return false;
-
-	// parser states:
-	const char STATE_LEADING_SPACES = 0;
-	const char STATE_DIGITS_BEFORE_DEC_POINT = 1;
-	const char STATE_DIGITS_AFTER_DEC_POINT = 2;
-	const char STATE_EXP_CHAR = 3;
-	const char STATE_EXP_DIGITS = 4;
-	const char STATE_SUFFIX = 5; // 'f' suffix
-
-	char numSign = 1, expSign = 1;
-	char state = STATE_LEADING_SPACES;
-	F mantissa = 0.0, exponent = 0.0;
-	F pow10 = 1.;
-	result = 0.0;
-	eu = 0;
-	for (; *pStr != '\0'; ++pStr)
+	class Ptr
+		/// Utility char pointer wrapper class.
+		/// Class ensures increment/decrement remain within boundaries.
 	{
-		switch (*pStr)
+	public:
+		Ptr(char* ptr, unsigned offset): _beg(ptr), _cur(ptr), _end(ptr + offset)
 		{
-		case '.':
-			if (decSep == '.')
-			{
-				if (state >= STATE_DIGITS_AFTER_DEC_POINT) return false;
-				state = STATE_DIGITS_AFTER_DEC_POINT;
-				break;
-			}
-			else if ((thSep == '.') && (state == STATE_DIGITS_BEFORE_DEC_POINT))
-				break;
-			else
-				return false;
-
-		case ',':
-			if (decSep == ',')
-			{
-				if (state >= STATE_DIGITS_AFTER_DEC_POINT) return false;
-				state = STATE_DIGITS_AFTER_DEC_POINT;
-				break;
-			}
-			else if ((thSep == ',') && (state == STATE_DIGITS_BEFORE_DEC_POINT))
-				break;
-			else
-				return false;
-
-		case ' ': // space (SPC)
-			if ((thSep == ' ') && (state == STATE_DIGITS_BEFORE_DEC_POINT)) break;
-		case '\t': // horizontal tab (TAB)
-		case '\n': // line feed (LF)
-		case '\v': // vertical tab (VT)
-		case '\f': // form feed (FF)
-		case '\r': // carriage return (CR)
-			if ((state >= STATE_DIGITS_AFTER_DEC_POINT) || (state >= STATE_EXP_DIGITS))
-				break;
-			else if ((state > STATE_LEADING_SPACES) && (state < STATE_DIGITS_AFTER_DEC_POINT))
-				return false;
-			break;
-
-		case '-':
-			if (state == STATE_LEADING_SPACES)
-				numSign = -1;
-			else if (state == STATE_EXP_CHAR) // exponential char
-				expSign = -1;
-			else return false;
-		case '+':
-			break;
-
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-			if (state >= STATE_SUFFIX) return false; // constant suffix
-			if (state <= STATE_DIGITS_BEFORE_DEC_POINT) // integral part digits
-			{
-				result = result * 10 + (*pStr - '0');
-				state = STATE_DIGITS_BEFORE_DEC_POINT;
-			}
-			else if (state <= STATE_DIGITS_AFTER_DEC_POINT) // fractional part digits
-			{
-				mantissa += (*pStr - '0') / (pow10 *= 10.);
-				state = STATE_DIGITS_AFTER_DEC_POINT;
-			}
-			else if (state <= STATE_EXP_DIGITS) // exponent digits
-			{
-				exponent = exponent * 10 + (*pStr - '0');
-				state = STATE_EXP_DIGITS;
-			}
-			else return false;
-			break;
-
-		case 'E':
-		case 'e':
-			if (state > STATE_DIGITS_AFTER_DEC_POINT) return false;
-			state = STATE_EXP_CHAR;
-			break;
-
-		case 'F':
-		case 'f':
-			state = STATE_SUFFIX;
-			break;
-
-		default:
-			return false;
 		}
-	}
+	
+		char*& operator ++ () // prefix
+		{
+			check(_cur + 1);
+			return ++_cur;
+		}
 
-	if (exponent > std::numeric_limits<F>::max_exponent10)
-	{
-		eu = expSign;
-		exponent = std::numeric_limits<F>::max_exponent10;
-	}
+		char* operator ++ (int) // postfix
+		{
+			check(_cur + 1);
+			char* tmp = _cur++;
+			return tmp;
+		}
+	
+		char*& operator -- () // prefix
+		{
+			check(_cur - 1);
+			return --_cur;
+		}
 
-	result += mantissa;
-	if (numSign != 1) result *= numSign;
-	if (exponent > 1.0)
-	{
-		F scale = std::pow(10., exponent);
-		result = (expSign < 0) ? (result / scale) : (result * scale);
-	}
+		char* operator -- (int) // postfix
+		{
+			check(_cur - 1);
+			char* tmp = _cur--;
+			return tmp;
+		}
 
-	return (state != STATE_LEADING_SPACES) && // empty/zero-length string
-		!FPEnvironment::isInfinite(result) &&
-		!FPEnvironment::isNaN(result);
-}
+		char*& operator += (int incr)
+		{
+			check(_cur + incr);
+			return _cur += incr;
+		}
+
+		char*& operator -= (int decr)
+		{
+			check(_cur - decr);
+			return _cur -= decr;
+		}
+
+		operator char* () const
+		{
+			return _cur;
+		}
+
+		unsigned span() const
+		{
+			return _end - _beg;
+		}
+
+	private:
+		void check(char* ptr)
+		{
+			if (ptr > _end) throw RangeException();
+		}
+
+		const char* _beg;
+		char*       _cur;
+		const char* _end;
+};	
+
+} // namespace Impl
 
 
-template <typename F>
-bool strToFloat (const std::string& s, F& result, char& eu = Impl::DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
-	/// Converts string to floating-point number;
-	/// This is a wrapper function, for details see see the
-	/// bool strToFloat(const char*, F&, char&, char, char) implementation.
+template <typename T>
+bool intToStr(T value,
+	unsigned short base,
+	char* result,
+	unsigned& size,
+	bool prefix = false,
+	int width = -1,
+	char fill = ' ',
+	char thSep = 0)
+	/// Converts integer to string. Numeric bases from binary to hexadecimal are supported.
+	/// If width is non-zero, it pads the return value with fill character to the specified width.
+	/// When padding is zero character ('0'), it is prepended to the number itself; all other
+	/// paddings are prepended to the formatted result with minus sign or base prefix included
+	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal, 
+	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
+	/// Formatted string has at least [width] total length.
 {
-	return strToFloat(s.c_str(), result, eu, decSep, thSep); 
+	if (base < 2 || base > 0x10)
+	{
+		*result = '\0';
+		return false;
+	}
+
+	Impl::Ptr ptr(result, size);
+	int thCount = 0;
+	T tmpVal;
+	do
+	{
+		tmpVal = value;
+		value /= base;
+		*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
+		if (thSep && (base == 10) && (++thCount == 3))
+		{
+			*ptr++ = thSep;
+			thCount = 0;
+		}
+	} while (value);
+
+	if ('0' == fill)
+	{
+		if (tmpVal < 0) --width;
+		if (prefix && base == 010) --width;
+		if (prefix && base == 0x10) width -= 2;
+		while ((ptr - result) < width) *ptr++ = fill;
+	}
+
+	if (prefix && base == 010) *ptr++ = '0';
+	else if (prefix && base == 0x10)
+	{
+		*ptr++ = 'x';
+		*ptr++ = '0';
+	}
+
+	if (tmpVal < 0) *ptr++ = '-';
+
+	if ('0' != fill)
+	{
+		while ((ptr - result) < width) *ptr++ = fill;
+	}
+
+	size = ptr - result;
+	poco_assert_dbg (size <= ptr.span());
+	poco_assert_dbg ((-1 == width) || (size >= width));
+	*ptr-- = '\0';
+
+	char* ptrr = result;
+	char tmp;
+	while(ptrr < ptr)
+	{
+		 tmp    = *ptr;
+		*ptr--  = *ptrr;
+		*ptrr++ = tmp;
+	}
+
+	return true;
 }
+
+
+template <typename T>
+bool uIntToStr(T value,
+	unsigned short base,
+	char* result,
+	unsigned& size,
+	bool prefix = false,
+	int width = -1,
+	char fill = ' ',
+	char thSep = 0)
+	/// Converts unsigned integer to string. Numeric bases from binary to hexadecimal are supported.
+	/// If width is non-zero, it pads the return value with fill character to the specified width.
+	/// When padding is zero character ('0'), it is prepended to the number itself; all other
+	/// paddings are prepended to the formatted result with minus sign or base prefix included
+	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal,
+	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
+	/// Formatted string has at least [width] total length.
+{
+	if (base < 2 || base > 0x10)
+	{
+		*result = '\0';
+		return false;
+	}
+	
+	Impl::Ptr ptr(result, size);
+	int thCount = 0;
+	T tmpVal;
+	do
+	{
+		tmpVal = value;
+		value /= base;
+		*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
+		if (thSep && (base == 10) && (++thCount == 3))
+		{
+			*ptr++ = thSep;
+			thCount = 0;
+		}
+	} while (value);
+	
+	if ('0' == fill)
+	{
+		if (prefix && base == 010) --width;
+		if (prefix && base == 0x10) width -= 2;
+		while ((ptr - result) < width) *ptr++ = fill;
+	}
+	
+	if (prefix && base == 010) *ptr++ = '0';
+	else if (prefix && base == 0x10)
+	{
+		*ptr++ = 'x';
+		*ptr++ = '0';
+	}
+	
+	if ('0' != fill)
+	{
+		while ((ptr - result) < width) *ptr++ = fill;
+	}
+	
+	size = ptr - result;
+	poco_assert_dbg (size <= ptr.span());
+	poco_assert_dbg ((-1 == width) || (size >= width));
+	*ptr-- = '\0';
+	
+	char* ptrr = result;
+	char tmp;
+	while(ptrr < ptr)
+	{
+		tmp    = *ptr;
+		*ptr--  = *ptrr;
+		*ptrr++ = tmp;
+	}
+	
+	return true;
+}
+
+
+template <typename T>
+bool intToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
+	/// Converts integer to string; This is a wrapper function, for details see see the
+	/// bool intToStr(T, unsigned short, char*, int, int, char, char) implementation.
+{
+	char res[POCO_MAX_INT_STRING_LEN] = {0};
+	unsigned size = POCO_MAX_INT_STRING_LEN;
+	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep);
+	result.assign(res, size);
+	return ret;
+}
+	
+	
+template <typename T>
+bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
+	/// Converts unsigned integer to string; This is a wrapper function, for details see see the
+	/// bool uIntToStr(T, unsigned short, char*, int, int, char, char) implementation.
+{
+	char res[POCO_MAX_INT_STRING_LEN] = {0};
+	unsigned size = POCO_MAX_INT_STRING_LEN;
+	bool ret = uIntToStr(number, base, res, size, prefix, width, fill, thSep);
+	result.assign(res, size);
+	return ret;
+}
+
+
+//
+// Wrappers for double-conversion library (http://code.google.com/p/double-conversion/).
+//
+// Library is the implementation of the algorithm described in Florian Loitsch's paper:
+// http://florian.loitsch.com/publications/dtoa-pldi2010.pdf
+//
+
+Foundation_API void floatToStr(char* buffer,
+	int bufferSize,
+	float value,
+	int lowDec = -std::numeric_limits<double>::digits10,
+	int highDec = std::numeric_limits<double>::digits10);
+	/// Converts a float value to string. Converted string must be shorter than bufferSize.
+	/// Conversion is done by computing the shortest string of digits that correctly represents
+	/// the input number. Depending on lowDec and highDec values, the function returns
+	/// decimal or exponential representation.
+
+
+Foundation_API std::string& floatToStr(std::string& str,
+	float value,
+	int precision = 0,
+	int width = 0,
+	char thSep = 0,
+	char decSep = 0);
+	/// Converts a float value, assigns it to the supplied string and returns the reference.
+	/// This function calls floatToStr(char*, int, float, int, int) and formats the result according to
+	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
+
+
+Foundation_API void doubleToStr(char* buffer,
+	int bufferSize,
+	double value,
+	int lowDec = -std::numeric_limits<double>::digits10,
+	int highDec = std::numeric_limits<double>::digits10);
+	/// Converts a double value to string. Converted string must be shorter than bufferSize.
+	/// Conversion is done by computing the shortest string of digits that correctly represents
+	/// the input number. Depending on lowDec and highDec values, the function returns
+	/// decimal or exponential representation.
+
+
+Foundation_API std::string& doubleToStr(std::string& str,
+	double value,
+	int precision = 0,
+	int width = 0,
+	char thSep = 0,
+	char decSep = 0);
+	/// Converts a double value, assigns it to the supplied string and returns the reference.
+	/// This function calls doubleToStr(char*, int, float, int, int) and formats the result according to
+	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
+
+
+Foundation_API float strToFloat(const char* str);
+	/// Converts the string of characters into single-precision floating point number.
+	/// Function uses double_convesrion::DoubleToStringConverter to do the conversion.
+
+
+Foundation_API bool strToFloat(const std::string&, float& result, char decSep = '.', char thSep = ',');
+	/// Converts the string of characters into single-precision floating point number.
+	/// The conversion result is assigned to the result parameter.
+	/// If decimal separator and/or thousand separator are different from defaults, they should be
+	/// supplied to ensure proper conversion.
+	/// 
+	/// Returns true if succesful, false otherwise.
+
+
+Foundation_API double strToDouble(const char* str);
+	/// Converts the string of characters into double-precision floating point number.
+
+
+Foundation_API bool strToDouble(const std::string& str, double& result, char decSep = '.', char thSep = ',');
+	/// Converts the string of characters into double-precision floating point number.
+	/// The conversion result is assigned to the result parameter.
+	/// If decimal separator and/or thousand separator are different from defaults, they should be
+	/// supplied to ensure proper conversion.
+	/// 
+	/// Returns true if succesful, false otherwise.
+
+//
+// end double-conversion functions declarations
+//
 
 
 } // namespace Poco

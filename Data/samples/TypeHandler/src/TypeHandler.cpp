@@ -32,6 +32,7 @@
 
 
 #include "Poco/SharedPtr.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/TypeHandler.h"
@@ -41,15 +42,18 @@
 
 
 using namespace Poco::Data::Keywords;
+using Poco::DateTime;
+using Poco::DateTimeFormatter;
 using Poco::Data::Session;
 using Poco::Data::Statement;
 
 
 struct Person
 {
-	std::string name;
-	std::string address;
-	int         age;
+	std::string   name;
+	std::string   address;
+	int           age;
+	DateTime birthday;
 };
 
 
@@ -73,6 +77,7 @@ public:
 		TypeHandler<std::string>::bind(pos++, person.name, pBinder, dir);
 		TypeHandler<std::string>::bind(pos++, person.address, pBinder, dir);
 		TypeHandler<int>::bind(pos++, person.age, pBinder, dir);
+		TypeHandler<DateTime>::bind(pos++, person.birthday, pBinder, dir);
 	}
 	
 	static void extract(std::size_t pos, Person& person, const Person& deflt, AbstractExtractor* pExtr)
@@ -80,13 +85,15 @@ public:
 		TypeHandler<std::string>::extract(pos++, person.name, deflt.name, pExtr);
 		TypeHandler<std::string>::extract(pos++, person.address, deflt.address, pExtr);
 		TypeHandler<int>::extract(pos++, person.age, deflt.age, pExtr);
+		TypeHandler<DateTime>::extract(pos++, person.birthday, deflt.birthday, pExtr);
 	}
 	
-	static void prepare(std::size_t pos, Person& person, AbstractPreparator* pPrep)
+	static void prepare(std::size_t pos, const Person& person, AbstractPreparator* pPrep)
 	{
 		TypeHandler<std::string>::prepare(pos++, person.name, pPrep);
 		TypeHandler<std::string>::prepare(pos++, person.address, pPrep);
 		TypeHandler<int>::prepare(pos++, person.age, pPrep);
+		TypeHandler<DateTime>::prepare(pos++, person.birthday, pPrep);
 	}
 };
 
@@ -106,49 +113,59 @@ int main(int argc, char** argv)
 	session << "DROP TABLE IF EXISTS Person", now;
 	
 	// (re)create table
-	session << "CREATE TABLE Person (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3))", now;
+	session << "CREATE TABLE Person (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3), Birthday DATE)", now;
 	
 	// insert some rows
 	Person person = 
 	{
 		"Bart Simpson",
 		"Springfield",
-		12
+		10,
+		DateTime(1980, 4, 1)
 	};
 	
 	Statement insert(session);
-	insert << "INSERT INTO Person VALUES(?, ?, ?)",
+	insert << "INSERT INTO Person VALUES(?, ?, ?, ?)",
 		use(person);
 		
 	insert.execute();
 	
 	person.name    = "Lisa Simpson";
 	person.address = "Springfield";
-	person.age     = 10;
-	
+	person.age     = 8;
+	person.birthday = DateTime(1982, 5, 9);
+
 	insert.execute();
 	
 	// a simple query
 	Statement select(session);
-	select << "SELECT Name, Address, Age FROM Person",
+	select << "SELECT Name, Address, Age, Birthday FROM Person",
 		into(person),
 		range(0, 1); //  iterate over result set one row at a time
 		
 	while (!select.done())
 	{
 		select.execute();
-		std::cout << person.name << " " << person.address << " " << person.age << std::endl;
+		std::cout << person.name << "\t"
+			<< person.address << "\t"
+			<< person.age << "\t"
+			<< DateTimeFormatter::format(person.birthday, "%b %d %Y") 
+		<< std::endl;
 	}
 	
 	// another query - store the result in a container
 	std::vector<Person> persons;
-	session << "SELECT Name, Address, Age FROM Person",
+	session << "SELECT Name, Address, Age, Birthday FROM Person",
 		into(persons),
 		now;
 		
 	for (std::vector<Person>::const_iterator it = persons.begin(); it != persons.end(); ++it)
 	{
-		std::cout << it->name << " " << it->address << " " << it->age << std::endl;
+		std::cout << it->name << "\t"
+			<< it->address << "\t"
+			<< it->age << "\t"
+			<< DateTimeFormatter::format(it->birthday, "%b %d %Y") 
+		<< std::endl;
 	}
 	
 	return 0;

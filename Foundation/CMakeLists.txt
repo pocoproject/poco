@@ -1,7 +1,4 @@
 set(LIBNAME "PocoFoundation")
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    set(LIBNAME "${LIBNAME}d")
-endif()
 
 if (WIN32)
   # cmake has CMAKE_RC_COMPILER, but no message compiler
@@ -54,6 +51,7 @@ set( BASE_SRCS
   src/DigestStream.cpp
   src/DirectoryIterator.cpp
   src/Environment.cpp
+  src/Error.cpp
   src/ErrorHandler.cpp
   src/Event.cpp
   src/EventArgs.cpp
@@ -130,6 +128,7 @@ set( BASE_SRCS
   src/StreamCopier.cpp
   src/StreamTokenizer.cpp
   src/String.cpp
+  src/NumericString.cpp
   src/StringTokenizer.cpp
   src/SynchronizedObject.cpp
   src/Task.cpp

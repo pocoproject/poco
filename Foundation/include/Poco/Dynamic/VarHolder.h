@@ -349,67 +349,67 @@ inline const std::type_info& VarHolder::type() const
 	throw NotImplementedException("Not implemented: VarHolder::type()");
 }
 
-inline void VarHolder::convert(Int8& val) const
+inline void VarHolder::convert(Int8& /*val*/) const
 {
 	throw BadCastException("Can not convert to Int8");
 }
 
 
-inline void VarHolder::convert(Int16& val) const
+inline void VarHolder::convert(Int16& /*val*/) const
 {
 	throw BadCastException("Can not convert to Int16");
 }
 
 
-inline void VarHolder::convert(Int32& val) const
+inline void VarHolder::convert(Int32& /*val*/) const
 {
 	throw BadCastException("Can not convert to Int32");
 }
 
 
-inline void VarHolder::convert(Int64& val) const
+inline void VarHolder::convert(Int64& /*val*/) const
 {
 	throw BadCastException("Can not convert to Int64");
 }
 
 
-inline void VarHolder::convert(UInt8& val) const
+inline void VarHolder::convert(UInt8& /*val*/) const
 {
 	throw BadCastException("Can not convert to UInt8");
 }
 
 
-inline void VarHolder::convert(UInt16& val) const
+inline void VarHolder::convert(UInt16& /*val*/) const
 {
 	throw BadCastException("Can not convert to UInt16");
 }
 
 
-inline void VarHolder::convert(UInt32& val) const
+inline void VarHolder::convert(UInt32& /*val*/) const
 {
 	throw BadCastException("Can not convert to UInt32");
 }
 
 
-inline void VarHolder::convert(UInt64& val) const
+inline void VarHolder::convert(UInt64& /*val*/) const
 {
 	throw BadCastException("Can not convert to UInt64");
 }
 
 
-inline void VarHolder::convert(DateTime& val) const
+inline void VarHolder::convert(DateTime& /*val*/) const
 {
 	throw BadCastException("Can not convert to DateTime");
 }
 
 
-inline void VarHolder::convert(LocalDateTime& val) const
+inline void VarHolder::convert(LocalDateTime& /*val*/) const
 {
 	throw BadCastException("Can not convert to LocalDateTime");
 }
 
 
-inline void VarHolder::convert(Timestamp& val) const
+inline void VarHolder::convert(Timestamp& /*val*/) const
 {
 	throw BadCastException("Can not convert to Timestamp");
 }
@@ -433,31 +433,31 @@ inline void VarHolder::convert(unsigned long& val) const
 #endif
 
 
-inline void VarHolder::convert(bool& val) const
+inline void VarHolder::convert(bool& /*val*/) const
 {
 	throw BadCastException("Can not convert to bool");
 }
 
 
-inline void VarHolder::convert(float& val) const
+inline void VarHolder::convert(float& /*val*/) const
 {
 	throw BadCastException("Can not convert to float");
 }
 
 
-inline void VarHolder::convert(double& val) const
+inline void VarHolder::convert(double& /*val*/) const
 {
 	throw BadCastException("Can not convert to double");
 }
 
 
-inline void VarHolder::convert(char& val) const
+inline void VarHolder::convert(char& /*val*/) const
 {
 	throw BadCastException("Can not convert to char");
 }
 
 
-inline void VarHolder::convert(std::string& val) const
+inline void VarHolder::convert(std::string& /*val*/) const
 {
 	throw BadCastException("Can not convert to std::string");
 }
@@ -2754,17 +2754,17 @@ public:
 		return typeid(DateTime);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& /*val*/) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& /*val*/) const
 	{
 		throw BadCastException();
 	}
 	
-	void convert(Int32& val) const
+	void convert(Int32& /*val*/) const
 	{
 		throw BadCastException();
 	}

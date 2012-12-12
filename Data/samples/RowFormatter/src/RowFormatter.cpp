@@ -33,6 +33,7 @@
 
 
 #include "Poco/SharedPtr.h"
+#include "Poco/DateTime.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/Statement.h"
@@ -43,6 +44,7 @@
 
 
 using namespace Poco::Data::Keywords;
+using Poco::DateTime;
 using Poco::Data::Session;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
@@ -111,13 +113,13 @@ int main(int argc, char** argv)
 	session << "DROP TABLE IF EXISTS Simpsons", now;
 	
 	// (re)create table
-	session << "CREATE TABLE Simpsons (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3))", now;
+	session << "CREATE TABLE Simpsons (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3), Birthday DATE)", now;
 	
 	// insert some rows
-	session << "INSERT INTO Simpsons VALUES('Homer Simpson', 'Springfield', 42)", now;
-	session << "INSERT INTO Simpsons VALUES('Marge Simpson', 'Springfield', 38)", now;
-	session << "INSERT INTO Simpsons VALUES('Bart Simpson', 'Springfield', 12)", now;
-	session << "INSERT INTO Simpsons VALUES('Lisa Simpson', 'Springfield', 10)", now;
+	session << "INSERT INTO Simpsons VALUES('Homer Simpson', 'Springfield', 42, ?)", use(DateTime(1956, 3, 1)), now;
+	session << "INSERT INTO Simpsons VALUES('Marge Simpson', 'Springfield', 38, ?)", use(DateTime(1954, 10, 1)), now;
+	session << "INSERT INTO Simpsons VALUES('Bart Simpson', 'Springfield', 12, ?)", use(DateTime(1980, 4, 1)), now;
+	session << "INSERT INTO Simpsons VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(DateTime(1982, 5, 9)), now;
 		
 	// create a statement and print the column names and data as HTML table
 	HTMLTableFormatter tf;

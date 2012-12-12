@@ -151,8 +151,14 @@ public:
 		/// On other platforms this is the same as name().
 
 	const IPAddress& firstAddress(IPAddress::Family family) const;
-		/// Returns the first IP address bound to the interface,
-		/// or wildcard if there is none.
+		/// Returns the first IP address bound to the interface.
+		/// Throws NotFoundException if the address family is not
+		/// configured on the interface.
+
+	void firstAddress(IPAddress& addr, IPAddress::Family family = IPAddress::IPv4) const;
+		/// Returns the first IP address bound to the interface.
+		/// If the address family is not configured on the interface,
+		/// the address returned in addr will be unspecified (wildcard).
 
 	const IPAddress& address(unsigned index = 0) const;
 		/// Returns the IP address bound to the interface at index position.
@@ -235,9 +241,6 @@ public:
 
 	static NetworkInterface forIndex(unsigned index);
 		/// Returns the NetworkInterface for the given interface index.
-		/// If an index of 0 is specified, a NetworkInterface instance
-		/// representing the default interface (empty name and
-		/// wildcard address) is returned.
 		///
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the given index does not exist (or IPv6 is not
