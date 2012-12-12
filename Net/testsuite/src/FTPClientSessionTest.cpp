@@ -1,7 +1,7 @@
 //
 // FTPClientSessionTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/FTPClientSessionTest.cpp#1 $
+// $Id: //poco/svn/Net/testsuite/src/FTPClientSessionTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -93,14 +93,11 @@ FTPClientSessionTest::~FTPClientSessionTest()
 }
 
 
-void FTPClientSessionTest::testLogin()
+void FTPClientSessionTest::login(DialogServer& server, FTPClientSession& session)
 {
-	DialogServer server;
-	server.addResponse("220 localhost FTP ready");
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	FTPClientSession session("localhost", server.port());
 	session.login("user", "password");
 	std::string cmd = server.popCommand();
 	assert (cmd == "USER user");
@@ -110,10 +107,84 @@ void FTPClientSessionTest::testLogin()
 	assert (cmd == "TYPE I");
 	
 	assert (session.getFileType() == FTPClientSession::TYPE_BINARY);
-	
+}
+
+
+void FTPClientSessionTest::testLogin1()
+{
+	DialogServer server;
+	server.addResponse("220 localhost FTP ready");
+	FTPClientSession session("localhost", server.port());
+	assert (session.isOpen());
+	assert (!session.isLoggedIn());
+	login(server, session);
+	assert (session.isOpen());
+	assert (session.isLoggedIn());
+	server.addResponse("221 Good Bye");
+	session.logout();
+	assert (session.isOpen());
+	assert (!session.isLoggedIn());
+
+	server.clearCommands();
+	server.clearResponses();
+	login(server, session);
+	assert (session.isOpen());
+	assert (session.isLoggedIn());
 	server.addResponse("221 Good Bye");
 	session.close();
+	assert (!session.isOpen());
+	assert (!session.isLoggedIn());
 }
+
+
+void FTPClientSessionTest::testLogin2()
+{
+	DialogServer server;
+	server.addResponse("220 localhost FTP ready");
+	server.addResponse("331 Password required");
+	server.addResponse("230 Welcome");
+	server.addResponse("200 Type set to I");
+	FTPClientSession session("localhost", server.port(), "user", "password");
+	assert (session.isOpen());
+	assert (session.isLoggedIn());
+	server.addResponse("221 Good Bye");
+	session.close();
+	assert (!session.isOpen());
+	assert (!session.isLoggedIn());
+
+	server.clearCommands();
+	server.clearResponses();
+	server.addResponse("220 localhost FTP ready");
+	server.addResponse("331 Password required");
+	server.addResponse("230 Welcome");
+	server.addResponse("200 Type set to I");
+	session.open("localhost", server.port(), "user", "password");
+	assert (session.isOpen());
+	assert (session.isLoggedIn());
+	server.addResponse("221 Good Bye");
+	session.close();
+	assert (!session.isOpen());
+	assert (!session.isLoggedIn());
+}
+
+
+void FTPClientSessionTest::testLogin3()
+{
+	DialogServer server;
+	server.addResponse("220 localhost FTP ready");
+	server.addResponse("331 Password required");
+	server.addResponse("230 Welcome");
+	server.addResponse("200 Type set to I");
+	FTPClientSession session;
+	assert (!session.isOpen());
+	assert (!session.isLoggedIn());
+	session.open("localhost", server.port(), "user", "password");
+	server.addResponse("221 Good Bye");
+	session.close();
+	assert (!session.isOpen());
+	assert (!session.isLoggedIn());
+}
+
 
 
 void FTPClientSessionTest::testLoginFailed1()
@@ -535,7 +606,9 @@ CppUnit::Test* FTPClientSessionTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FTPClientSessionTest");
 
-	CppUnit_addTest(pSuite, FTPClientSessionTest, testLogin);
+	CppUnit_addTest(pSuite, FTPClientSessionTest, testLogin1);
+	CppUnit_addTest(pSuite, FTPClientSessionTest, testLogin2);
+	CppUnit_addTest(pSuite, FTPClientSessionTest, testLogin3);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testLoginFailed1);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testLoginFailed2);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testCommands);
