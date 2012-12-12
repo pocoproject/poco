@@ -218,7 +218,7 @@ bool SessionImpl::canTransact()
 	if (ODBC_TXN_CAPABILITY_UNKNOWN == _canTransact)
 	{
 		SQLUSMALLINT ret;
-		checkError(Poco::Data::ODBC::SQLGetInfo(_db, SQL_TXN_CAPABLE, &ret, 0, 0), 
+		checkError(Poco::Data::ODBC::SQLGetInfo(_db, SQL_TXN_CAPABLE, &ret, sizeof(ret), 0), 
 			"Failed to obtain transaction capability info.");
 
 		_canTransact = (SQL_TC_NONE != ret) ? 
