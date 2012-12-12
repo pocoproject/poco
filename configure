@@ -150,7 +150,7 @@ while [ $# -ge 1 ]; do
         odbcinclude="`echo ${1} | awk '{print substr($0,16)}'`" ;;
 
 	--cflags=*)
-		cflags="`echo ${1} | awk '{print substr($0,10)}'`" ;;
+		flags="`echo ${1} | awk '{print substr($0,10)}'`" ;;
 
 	--no-samples)
 		samples="" ;;
