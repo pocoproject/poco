@@ -18,6 +18,9 @@ Release 1.5.0 (2012-12-17)
 - fixed GH #31: JSON implementation bug
 - fixed SF #597: Configure script ignores cflags
 - fixed SF #593: Poco 1.5.0 on FreeBSD: cannot find -ldl
+- added SF #542: SocketAddress() needs port-only constructor
+- fixed SF #215: Wrong return type in SocketConnector.h
+- applied SF Patch #97: fix c++0x / clang++ bugs
 
 Release 1.5.0 (2012-10-14)
 ==========================
