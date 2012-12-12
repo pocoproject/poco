@@ -15,6 +15,7 @@ Release 1.5.0 (2012-12-17)
 - Android compile/build support (by Rangel Reale)
 - TypeHandler::prepare() now takes const-reference
 - fixed GH #27: Poco::URI::decode() doesn't properly handle '+'
+- fixed GH #31: JSON implementation bug
 
 Release 1.5.0 (2012-10-14)
 ==========================

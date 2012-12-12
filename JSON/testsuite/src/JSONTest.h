@@ -57,6 +57,7 @@ public:
 	void testDouble2Property();
 	void testDouble3Property();
 	void testObjectProperty();
+	void testObjectArray();
 	void testEmptyArray();
 	void testNestedArray();
 	void testNullElement();
