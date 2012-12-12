@@ -233,6 +233,12 @@ SocketAddress::SocketAddress(const IPAddress& addr, Poco::UInt16 port)
 }
 
 
+SocketAddress::SocketAddress(Poco::UInt16 port)
+{
+	init(IPAddress(), port);
+}
+
+
 SocketAddress::SocketAddress(const std::string& addr, Poco::UInt16 port)
 {
 	init(addr, port);
