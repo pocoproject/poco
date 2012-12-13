@@ -95,7 +95,7 @@ public:
 	unsigned index() const;
 	const std::string& name() const;
 	const std::string& displayName() const;
-	void firstAddress(IPAddress& address, IPAddress::Family family) const;
+	const IPAddress& firstAddress(IPAddress::Family family) const;
 	void addAddress(const AddressTuple& address);
 	const IPAddress& address(unsigned index) const;
 	const NetworkInterface::AddressList& addressList() const;
@@ -240,9 +240,7 @@ NetworkInterfaceImpl::~NetworkInterfaceImpl()
 
 bool NetworkInterfaceImpl::supportsIPv4() const
 {
-	IPAddress addr(IPAddress::IPv4);
-
-	firstAddress(addr, IPAddress::IPv4);
+	const IPAddress& addr = firstAddress(IPAddress::IPv4);
 
 	return !addr.isWildcard();
 }
@@ -251,9 +249,7 @@ bool NetworkInterfaceImpl::supportsIPv4() const
 bool NetworkInterfaceImpl::supportsIPv6() const
 {
 #ifdef POCO_HAVE_IPv6
-	IPAddress addr(IPAddress::IPv6);
-
-	firstAddress(addr, IPAddress::IPv6);
+	const IPAddress& addr = firstAddress(IPAddress::IPv6);
 
 	return !addr.isWildcard();
 #else
@@ -280,7 +276,7 @@ inline const std::string& NetworkInterfaceImpl::displayName() const
 }
 
 
-void NetworkInterfaceImpl::firstAddress(IPAddress& address, IPAddress::Family family) const
+const IPAddress& NetworkInterfaceImpl::firstAddress(IPAddress::Family family) const
 {
 	AddressList::const_iterator it = _addressList.begin();
 	AddressList::const_iterator end = _addressList.end();
@@ -288,17 +284,13 @@ void NetworkInterfaceImpl::firstAddress(IPAddress& address, IPAddress::Family fa
 	{
 		const IPAddress& addr = it->get<NetworkInterface::IP_ADDRESS>();
 		if (addr.family() == family)
-		{
-			address = addr;
-			return;
-		}
+			return addr;
 	}
 
 	// because testing isWildcard() is a lot faster than catching an
 	// exception... and having an unconfigured interface is hardly
 	// an 'exceptional' state.
-	address = IPAddress(family);
-	return;
+	return IPAddress::wildcard(family);
 }
 
 
@@ -611,18 +603,17 @@ const std::string& NetworkInterface::displayName() const
 
 const IPAddress& NetworkInterface::firstAddress(IPAddress::Family family) const
 {
-	IPAddress addr(family);
+	const IPAddress& addr = _pImpl->firstAddress(family);
 
-	_pImpl->firstAddress(addr, family);
 	if (addr.isWildcard())
 		throw NotFoundException(format("%s family address not found.", (family == IPAddress::IPv4) ? std::string("IPv4") : std::string("IPv6")));
 	return addr;
 }
 
 
-void NetworkInterface::firstAddress(IPAddress& addr, IPAddress::Family family) const
+const IPAddress& NetworkInterface::firstAddressNoThrow(IPAddress::Family family) const
 {
-	_pImpl->firstAddress(addr, family);
+	return _pImpl->firstAddress(family);
 }
 
 

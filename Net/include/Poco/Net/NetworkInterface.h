@@ -155,7 +155,7 @@ public:
 		/// Throws NotFoundException if the address family is not
 		/// configured on the interface.
 
-	void firstAddress(IPAddress& addr, IPAddress::Family family = IPAddress::IPv4) const;
+	const IPAddress& firstAddressNoThrow(IPAddress::Family family) const;
 		/// Returns the first IP address bound to the interface.
 		/// If the address family is not configured on the interface,
 		/// the address returned in addr will be unspecified (wildcard).
