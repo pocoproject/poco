@@ -91,5 +91,6 @@ release_static/
 debug_static/
 bin/
 bin64/
+lib/
 pocomsg.h
 
