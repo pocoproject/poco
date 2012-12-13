@@ -66,7 +66,11 @@
 
 
 #if !defined(ODBC_API)
-	#define ODBC_API
+	#if defined (__GNUC__) && (__GNUC__ >= 4)
+		#define ODBC_API __attribute__ ((visibility ("default")))
+	#else
+		#define ODBC_API
+	#endif
 #endif
 
 

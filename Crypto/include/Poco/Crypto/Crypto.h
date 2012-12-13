@@ -90,7 +90,11 @@ enum RSAPaddingMode
 
 
 #if !defined(Crypto_API)
-	#define Crypto_API
+	#if defined (__GNUC__) && (__GNUC__ >= 4)
+		#define Crypto_API __attribute__ ((visibility ("default")))
+	#else
+		#define Crypto_API
+	#endif
 #endif
 
 
