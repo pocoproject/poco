@@ -1243,17 +1243,21 @@ void IPAddress::mask(const IPAddress& mask, const IPAddress& set)
 }
 
 
-IPAddress IPAddress::wildcard(Family family)
+const IPAddress IPAddress::wildcardIPv4(IPv4);
+const IPAddress IPAddress::wildcardIPv6(IPv6);
+
+const IPAddress& IPAddress::wildcard(Family family)
 {
-	return IPAddress(family);
+	return ((family == IPv4) ? wildcardIPv4 : wildcardIPv6);
 }
 
 
-IPAddress IPAddress::broadcast()
+static const struct in_addr bcast = { INADDR_NONE };
+const IPAddress IPAddress::broadcastIPv4(&bcast, sizeof(bcast));
+
+const IPAddress& IPAddress::broadcast()
 {
-	struct in_addr ia;
-	ia.s_addr = INADDR_NONE;
-	return IPAddress(&ia, sizeof(ia));
+	return broadcastIPv4; 
 }
 
 
