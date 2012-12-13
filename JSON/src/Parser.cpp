@@ -575,18 +575,20 @@ void Parser::readValue(const Token* token)
 	case Token::INTEGER_LITERAL_TOKEN:
 		if ( _handler != NULL )
 		{
-			int value = token->asInteger();
 #if defined(POCO_HAVE_INT64)
-			if (    value == std::numeric_limits<int>::max() 
-			     || value == std::numeric_limits<int>::min() )
-			{
-				_handler->value(NumberParser::parse64(token->asString()));
-			}
-			else
-			{
-				_handler->value(token->asInteger());
-			}
+            Int64 value = token->asInteger();
+            // if number is 32-bit, then handle as such
+			if (    value > std::numeric_limits<int>::max()
+                || value < std::numeric_limits<int>::min() )
+            {
+                _handler->value(value);
+            }
+            else
+            {
+                _handler->value(static_cast<int>(value));
+            }
 #else
+			int value = token->asInteger();
 			_handle->value(value);
 #endif
 		}
@@ -696,6 +698,5 @@ bool Parser::readElements(bool firstCall)
 
 	throw JSONException(format("Invalid token '%s' found.", token->asString()));
 }
-
 
 } } // namespace Poco::JSON
