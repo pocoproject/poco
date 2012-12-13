@@ -44,6 +44,7 @@
 #include "Poco/Ascii.h"
 #include <cstring>
 #include <locale>
+#include <algorithm>
 
 
 namespace Poco {
