@@ -76,10 +76,25 @@ std::string Token::asString() const
 }
 
 
+#if defined(POCO_HAVE_INT64)
+
+
+Int64 Token::asInteger() const
+{
+	return NumberParser::parse64(_value);
+}
+
+
+#else
+
+
 int Token::asInteger() const
 {
 	return NumberParser::parse(_value);
 }
+
+
+#endif
 
 
 double Token::asFloat() const
