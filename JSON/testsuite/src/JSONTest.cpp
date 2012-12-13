@@ -203,6 +203,40 @@ void JSONTest::testNumberProperty()
 	assert(value == 1969);
 }
 
+#if defined(POCO_HAVE_INT64)
+
+
+void JSONTest::testNumber64Property()
+{
+	std::string json = "{ \"test\" : 5000000000000000 }";
+	Parser parser;
+	Var result;
+    
+	try
+	{
+		DefaultHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+    
+	assert(result.type() == typeid(Object::Ptr));
+    
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
+	assert(test.isInteger());
+    Int64 value = test;
+	assert(value == 5000000000000000);
+}
+
+
+#endif
+
 
 void JSONTest::testStringProperty()
 {
@@ -860,6 +894,9 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testTrueProperty);
 	CppUnit_addTest(pSuite, JSONTest, testFalseProperty);
 	CppUnit_addTest(pSuite, JSONTest, testNumberProperty);
+#if defined(POCO_HAVE_INT64)
+	CppUnit_addTest(pSuite, JSONTest, testNumber64Property);
+#endif
 	CppUnit_addTest(pSuite, JSONTest, testStringProperty);
 	CppUnit_addTest(pSuite, JSONTest, testEmptyObject);
 	CppUnit_addTest(pSuite, JSONTest, testDoubleProperty);
