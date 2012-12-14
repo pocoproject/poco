@@ -58,19 +58,9 @@ std::string PathImpl::homeImpl()
 }
 
 
-std::string PathImpl::tempImpl()
+std::string PathImpl::systemImpl()
 {
-	Buffer<wchar_t> buffer(MAX_PATH_LEN);
-	DWORD n = GetTempPathW(static_cast<DWORD>(buffer.size()), buffer.begin());
-	if (n > 0)
-	{
-		std::string result;
-		UnicodeConverter::toUTF8(buffer.begin(), result);
-		if (result[n - 1] != '\\')
-			result.append("\\");
-		return result;
-	}
-	throw SystemException("Cannot get current directory");
+	return("\\");
 }
 
 
