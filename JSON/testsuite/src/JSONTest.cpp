@@ -230,7 +230,7 @@ void JSONTest::testNumber64Property()
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
 	assert(test.isInteger());
-    Int64 value = test;
+    Poco::Int64 value = test;
 	assert(value == 5000000000000000);
 }
 
