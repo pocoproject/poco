@@ -63,7 +63,11 @@
 
 
 #if !defined(SQLite_API)
-	#define SQLite_API
+	#if defined (__GNUC__) && (__GNUC__ >= 4)
+		#define SQLite_API __attribute__ ((visibility ("default")))
+	#else
+		#define SQLite_API
+	#endif
 #endif
 
 

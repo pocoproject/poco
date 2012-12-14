@@ -63,7 +63,11 @@
 
 
 #if !defined(Net_API)
-	#define Net_API
+	#if defined (__GNUC__) && (__GNUC__ >= 4)
+		#define Net_API __attribute__ ((visibility ("default")))
+	#else
+		#define Net_API
+	#endif
 #endif
 
 
