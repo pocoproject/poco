@@ -73,6 +73,7 @@ public:
 	void testSwap();
 	void testResolve();
 	void testPushPop();
+	void testWindowsSystem();
 
 	void setUp();
 	void tearDown();

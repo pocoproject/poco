@@ -599,7 +599,7 @@ Path& Path::clear()
 	_dirs.clear();
 	_version.clear();
 	_absolute = false;
-    return *this;
+	return *this;
 }
 
 
