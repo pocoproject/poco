@@ -68,30 +68,59 @@ int main(int argc, char** argv)
 			std::cout << intf.name() << " [" << intf.index() << "]: ";
 			std::cout << "<";
 			if (intf.isUp())
-				std::cout << sep << "UP"; sep = ",";
+			{
+				std::cout << sep << "UP";
+				sep = ",";
+			}
 
 			if (intf.isRunning())
-				std::cout << sep << "RUNNING"; sep = ",";
+			{
+				std::cout << sep << "RUNNING";
+				sep = ",";
+			}
 
 			if (intf.isLoopback())
-				std::cout << sep << "LOOPBACK"; sep = ",";
+			{
+				std::cout << sep << "LOOPBACK";
+				sep = ",";
+			}
 
 			if (intf.isPointToPoint())
-				std::cout << sep << "P2P"; sep = ",";
+			{
+				std::cout << sep << "P2P";
+				sep = ",";
+			}
 			
 			if (intf.supportsIPv4())
-				std::cout << sep << "IPv4"; sep = ",";
+			{
+				std::cout << sep << "IPv4";
+				sep = ",";
+			}
 
 			if (intf.supportsIPv6())
-				std::cout << sep << "IPv6"; sep = ",";
+			{
+				std::cout << sep << "IPv6";
+				sep = ",";
+			}
 
 			if (intf.supportsBroadcast())
-				std::cout << sep << "BCAST"; sep = ",";
+			{
+				std::cout << sep << "BCAST";
+				sep = ",";
+			}
 
 			if (intf.supportsMulticast())
-				std::cout << sep << "MCAST"; sep = ",";
+			{
+				std::cout << sep << "MCAST";
+				sep = ",";
+			}
 
-			std::cout << sep << std::dec << intf.mtu(); sep = ",";
+			if (!intf.isLoopback())
+			{
+				std::cout << sep << std::dec << intf.mtu();
+				sep = ",";
+			}
+
 			std::cout << ">" << std::endl;
 
 			const NetworkInterface::AddressList& ipList = intf.addressList();
