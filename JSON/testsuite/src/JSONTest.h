@@ -51,6 +51,9 @@ public:
 	void testTrueProperty();
 	void testFalseProperty();
 	void testNumberProperty();
+#if defined(POCO_HAVE_INT64)
+	void testNumber64Property();
+#endif
 	void testStringProperty();
 	void testEmptyObject();
 	void testDoubleProperty();
