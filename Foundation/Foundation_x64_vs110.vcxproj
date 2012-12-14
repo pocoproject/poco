@@ -340,6 +340,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\Error.cpp" />
     <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\FIFOBufferStream.cpp" />
     <ClCompile Include="src\Format.cpp" />
@@ -1009,6 +1010,7 @@
     <ClInclude Include="include\Poco\Environment_VMS.h" />
     <ClInclude Include="include\Poco\Environment_WIN32.h" />
     <ClInclude Include="include\Poco\Environment_WIN32U.h" />
+    <ClInclude Include="include\Poco\Error.h" />
     <ClInclude Include="include\Poco\Exception.h" />
     <ClInclude Include="include\Poco\FIFOBufferStream.h" />
     <ClInclude Include="include\Poco\Format.h" />
