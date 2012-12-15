@@ -116,10 +116,14 @@ int main(int argc, char** argv)
 	session << "CREATE TABLE Simpsons (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3), Birthday DATE)", now;
 	
 	// insert some rows
-	session << "INSERT INTO Simpsons VALUES('Homer Simpson', 'Springfield', 42, ?)", use(DateTime(1956, 3, 1)), now;
-	session << "INSERT INTO Simpsons VALUES('Marge Simpson', 'Springfield', 38, ?)", use(DateTime(1954, 10, 1)), now;
-	session << "INSERT INTO Simpsons VALUES('Bart Simpson', 'Springfield', 12, ?)", use(DateTime(1980, 4, 1)), now;
-	session << "INSERT INTO Simpsons VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(DateTime(1982, 5, 9)), now;
+	DateTime hd(1956, 3, 1);
+	session << "INSERT INTO Simpsons VALUES('Homer Simpson', 'Springfield', 42, ?)", use(hd), now;
+	DateTime md(1954, 10, 1);
+	session << "INSERT INTO Simpsons VALUES('Marge Simpson', 'Springfield', 38, ?)", use(md), now;
+	DateTime bd(1980, 4, 1);
+	session << "INSERT INTO Simpsons VALUES('Bart Simpson', 'Springfield', 12, ?)", use(bd), now;
+	DateTime ld(1982, 5, 9);
+	session << "INSERT INTO Simpsons VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(ld), now;
 		
 	// create a statement and print the column names and data as HTML table
 	HTMLTableFormatter tf;

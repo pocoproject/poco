@@ -35,9 +35,12 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
+#include "Poco/DateTime.h"
 #include "Poco/Any.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/Transaction.h"
@@ -58,6 +61,7 @@ using Poco::Data::MySQL::ConnectionException;
 using Poco::Data::MySQL::StatementException;
 using Poco::format;
 using Poco::Tuple;
+using Poco::DateTime;
 using Poco::Any;
 using Poco::AnyCast;
 using Poco::NotFoundException;
@@ -1251,6 +1255,90 @@ void SQLExecutor::emptyDB()
 }
 
 
+void SQLExecutor::dateTime()
+{
+	std::string funct = "dateTime()";
+	std::string lastName("Bart");
+	std::string firstName("Simpson");
+	std::string address("Springfield");
+	DateTime birthday(1980, 4, 1, 5, 45, 12);
+	
+	int count = 0;
+	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (count == 1);
+	
+	DateTime bd;
+	assert (bd != birthday);
+	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (bd == birthday);
+	
+	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
+}
+
+
+void SQLExecutor::date()
+{
+	std::string funct = "date()";
+	std::string lastName("Bart");
+	std::string firstName("Simpson");
+	std::string address("Springfield");
+	Date birthday(1980, 4, 1);
+	
+	int count = 0;
+	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (count == 1);
+	
+	Date bd;
+	assert (bd != birthday);
+	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (bd == birthday);
+	
+	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
+}
+
+
+void SQLExecutor::time()
+{
+	std::string funct = "date()";
+	std::string lastName("Bart");
+	std::string firstName("Simpson");
+	std::string address("Springfield");
+	Time birthday(1, 2, 3);
+	
+	int count = 0;
+	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (count == 1);
+	
+	Time bd;
+	assert (bd != birthday);
+	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (bd == birthday);
+	
+	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
+}
+
+
 void SQLExecutor::blob(int bigSize)
 {
 	std::string funct = "blob()";
@@ -1295,6 +1383,7 @@ void SQLExecutor::blob(int bigSize)
 	assert (res == big);
 }
 
+
 void SQLExecutor::blobStmt()
 {
 	std::string funct = "blobStmt()";
@@ -1320,6 +1409,7 @@ void SQLExecutor::blobStmt()
 	poco_assert (res == blob);
 }
 
+
 void SQLExecutor::tuples()
 {
 	typedef Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
@@ -1337,6 +1427,7 @@ void SQLExecutor::tuples()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assert (ret == t);
 }
+
 
 void SQLExecutor::tupleVector()
 {

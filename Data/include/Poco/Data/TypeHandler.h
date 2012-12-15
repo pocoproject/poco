@@ -294,11 +294,11 @@ public:
 		poco_assert_dbg (pPreparator != 0);
 		if (obj.isNull()) 
 		{
-			pPreparator->prepare(pos++, (Poco::Any&)Poco::Data::Keywords::null);
+			pPreparator->prepare(pos++, Poco::Data::Keywords::null);
 		}
 		else 
 		{
-			pPreparator->prepare(pos++, (T&)obj.value());
+			pPreparator->prepare(pos++, obj.value());
 		}
 	}
 
