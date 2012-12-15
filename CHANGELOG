@@ -27,6 +27,8 @@ Release 1.5.0 (2012-12-17)
 - fixed GH #26: Cannot compile on gcc 
 - merged SF #111: FTP Client logging (Marian Krivos)
 - fixed GH #30: Poco::Path::home() throws when called from Windows Service
+- fixed GH #22: MySQL connection string lowercased
+- added MySQL support for Date/Time
 
 Release 1.5.0 (2012-10-14)
 ==========================
