@@ -87,9 +87,13 @@ Thumbs.db
 *.lastbuildstate
 *.unsuccessfulbuild
 release_shared/
-debug_share/
+debug_shared/
 release_static/
 debug_static/
+release_static_md/
+debug_static_md/
+release_static_mt/
+debug_static_mt/
 bin/
 bin64/
 lib/
