@@ -1316,7 +1316,6 @@ void SQLExecutor::dateTime()
 	assert (count == 1);
 	
 	DateTime bd;
-	assert (bd != birthday);
 	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }

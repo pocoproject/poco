@@ -95,7 +95,7 @@ public:
 	void testIllegalRange();
 	void testSingleSelect();
 	void testEmptyDB();
-	void testDateTime();
+
 	void testBLOB();
 	void testBLOBStmt();
 
