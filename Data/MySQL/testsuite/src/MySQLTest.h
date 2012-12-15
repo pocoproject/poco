@@ -130,6 +130,8 @@ private:
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
 	void recreatePersonDateTimeTable();
+	void recreatePersonDateTable();
+	void recreatePersonTimeTable();
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateFloatsTable();

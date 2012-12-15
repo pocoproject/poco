@@ -423,6 +423,10 @@ void MySQLTest::testDateTime()
 
 	recreatePersonDateTimeTable();
 	_pExecutor->dateTime();
+	recreatePersonDateTable();
+	_pExecutor->date();
+	recreatePersonTimeTable();
+	_pExecutor->time();
 }
 
 
@@ -712,6 +716,24 @@ void MySQLTest::recreatePersonDateTimeTable()
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
+}
+
+
+void MySQLTest::recreatePersonDateTable()
+{
+	dropTable("Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATE)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonDateTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonDateTable()"); }
+}
+
+
+void MySQLTest::recreatePersonTimeTable()
+{
+	dropTable("Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday TIME)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonTimeTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonTimeTable()"); }
 }
 
 
