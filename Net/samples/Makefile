@@ -22,3 +22,4 @@ projects:
 	$(MAKE) -C TwitterClient $(MAKECMDGOALS)
 	$(MAKE) -C WebSocketServer $(MAKECMDGOALS)
 	$(MAKE) -C SMTPLogger $(MAKECMDGOALS)
+	$(MAKE) -C ifconfig $(MAKECMDGOALS)

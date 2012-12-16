@@ -51,6 +51,7 @@
 #include "Poco/ActiveMethod.h"
 #include "Poco/ActiveResult.h"
 #include "Poco/Format.h"
+#include <algorithm>
 
 
 namespace Poco {
@@ -834,6 +835,7 @@ inline void swap(Statement& s1, Statement& s2)
 
 namespace std
 {
+	using std::swap;
 	template<>
 	inline void swap<Poco::Data::Statement>(Poco::Data::Statement& s1, 
 		Poco::Data::Statement& s2)

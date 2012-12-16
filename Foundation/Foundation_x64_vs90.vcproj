@@ -739,6 +739,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\src\Error.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Exception.cpp"
 					>
 				</File>
@@ -1124,6 +1128,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Environment_WIN32U.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Error.h"
 					>
 				</File>
 				<File

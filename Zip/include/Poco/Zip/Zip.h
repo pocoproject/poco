@@ -63,7 +63,11 @@
 
 
 #if !defined(Zip_API)
-	#define Zip_API
+	#if defined (__GNUC__) && (__GNUC__ >= 4)
+		#define Zip_API __attribute__ ((visibility ("default")))
+	#else
+		#define Zip_API
+	#endif
 #endif
 
 

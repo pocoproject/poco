@@ -61,7 +61,11 @@
 
 
 #if !defined(MySQL_API)
-	#define MySQL_API
+	#if defined (__GNUC__) && (__GNUC__ >= 4)
+		#define MySQL_API __attribute__ ((visibility ("default")))
+	#else
+		#define MySQL_API
+	#endif
 #endif
 
 

@@ -71,8 +71,10 @@ int main(int argc, char** argv)
 	session << "CREATE TABLE Person (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3), Birthday DATE)", now;
 	
 	// insert some rows
-	session << "INSERT INTO Person VALUES('Bart Simpson', 'Springfield', 12, ?)", use(DateTime(1980, 4, 1)), now;
-	session << "INSERT INTO Person VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(DateTime(1982, 5, 9)), now;
+	DateTime bd(1980, 4, 1);
+	DateTime ld(1982, 5, 9);
+	session << "INSERT INTO Person VALUES('Bart Simpson', 'Springfield', 12, ?)", use(bd), now;
+	session << "INSERT INTO Person VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(ld), now;
 		
 	// a simple query
 	Statement select(session);

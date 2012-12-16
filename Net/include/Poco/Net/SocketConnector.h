@@ -205,7 +205,7 @@ protected:
 		return _pReactor;
 	}
 	
-	Socket& socket()
+	StreamSocket& socket()
 		/// Returns a reference to the SocketConnector's socket.
 	{
 		return _socket;

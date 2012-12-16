@@ -161,7 +161,7 @@ inline bool Object::has(const std::string& key) const
 inline bool Object::isArray(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
-	return it != _values.end() || it->second.type() == typeid(Array::Ptr);
+	return it != _values.end() && it->second.type() == typeid(Array::Ptr);
 }
 
 
@@ -175,7 +175,7 @@ inline bool Object::isNull(const std::string& key) const
 inline bool Object::isObject(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
-	return it != _values.end() || it->second.type() == typeid(Object::Ptr);
+	return it != _values.end() && it->second.type() == typeid(Object::Ptr);
 }
 
 

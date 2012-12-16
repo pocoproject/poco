@@ -44,6 +44,7 @@
 #include "Poco/Formatter.h"
 #include "Poco/Message.h"
 
+#include <vector>
 
 namespace Poco {
 
@@ -91,6 +92,7 @@ class Foundation_API PatternFormatter: public Formatter
 	///   * %z - time zone differential in ISO 8601 format (Z or +NN.NN)
 	///   * %Z - time zone differential in RFC format (GMT or +NNNN)
 	///   * %E - epoch time (UTC, seconds since midnight, January 1, 1970)
+	///   * %v[width] - the message source (%s) but text length is padded/cropped to 'width'
 	///   * %[name] - the value of the message parameter with the given name
 	///   * %% - percent sign
 
@@ -138,8 +140,27 @@ protected:
 		/// Returns a string for the given priority value.
 	
 private:
-	bool        _localTime;
-	std::string _pattern;
+
+	struct PatternAction
+	{
+		PatternAction(): key(0), length(0) {}
+
+		char key;
+		int length;
+		std::string property;
+		std::string prepend;
+	};
+
+	std::vector<PatternAction>  _patternActions;
+	bool                        _localTime;
+	Timestamp::TimeDiff         _localTimeOffset;
+	std::string                 _pattern;
+
+
+	void ParsePattern();
+		/// Will parse the _pattern string into the vector of PatternActions,
+		/// which contains the message key, any text that needs to be written first
+		/// a proprety in case of %[] and required length.
 };
 
 

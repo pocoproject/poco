@@ -241,9 +241,6 @@ public:
 
 	static NetworkInterface forIndex(unsigned index);
 		/// Returns the NetworkInterface for the given interface index.
-		/// If an index of 0 is specified, a NetworkInterface instance
-		/// representing the default interface (empty name and
-		/// wildcard address) is returned.
 		///
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the given index does not exist (or IPv6 is not

@@ -39,6 +39,15 @@
 #include "Poco/Environment.h"
 #include <iostream>
 
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32_WCE)
+#include "Poco/Path_WINCE.h"
+#else
+#include "Poco/Path_WIN32U.h"
+#endif
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+#include "Poco/Path_WIN32.h"
+#endif
 
 using Poco::Path;
 using Poco::PathSyntaxException;
@@ -1625,6 +1634,14 @@ void PathTest::testPushPop()
 }
 
 
+void PathTest::testWindowsSystem()
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	std::cout << Poco::PathImpl::systemImpl() << std::endl;
+#endif
+}
+
+
 void PathTest::setUp()
 {
 }
@@ -1666,6 +1683,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testSwap);
 	CppUnit_addTest(pSuite, PathTest, testResolve);
 	CppUnit_addTest(pSuite, PathTest, testPushPop);
+	CppUnit_addTest(pSuite, PathTest, testWindowsSystem);
 
 	return pSuite;
 }

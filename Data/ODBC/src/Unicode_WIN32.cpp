@@ -54,7 +54,7 @@ SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
 	SQLUSMALLINT   iCol,
 	SQLUSMALLINT   iField,
 	SQLPOINTER	   pCharAttr,
-	SQLSMALLINT	   cbCharAttrMax,	
+	SQLSMALLINT	   cbCharAttrMax,
 	SQLSMALLINT*   pcbCharAttr,
 	NumAttrPtrType pNumAttr)
 {
@@ -66,7 +66,7 @@ SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
 			iCol,
 			iField,
 			buffer.begin(),
-			(SQLSMALLINT) buffer.size() * sizeof(wchar_t),	
+			(SQLSMALLINT) buffer.sizeBytes(),
 			pcbCharAttr,
 			pNumAttr);
 
@@ -78,7 +78,7 @@ SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
 		iCol,
 		iField,
 		pCharAttr,
-		cbCharAttrMax,	
+		cbCharAttrMax,
 		pcbCharAttr,
 		pNumAttr);
 }
@@ -150,7 +150,7 @@ SQLRETURN SQLDescribeCol(SQLHSTMT hstmt,
 		pibScale,
 		pfNullable);
 
-	makeUTF8(buffer, *pcbColName, szColName, cbColNameMax);
+	makeUTF8(buffer, *pcbColName * sizeof(wchar_t), szColName, cbColNameMax);
 	return rc;
 }
 
@@ -195,7 +195,7 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC hdbc,
 		SQLRETURN rc = SQLGetConnectAttrW(hdbc,
 				fAttribute,
 				buffer.begin(),
-				(SQLINTEGER) buffer.size() * sizeof(wchar_t),
+				(SQLINTEGER) buffer.sizeBytes(),
 				pcbValue);
 
 		makeUTF8(buffer, *pcbValue, rgbValue, cbValueMax);
@@ -263,7 +263,7 @@ SQLRETURN SQLGetDescField(SQLHDESC hdesc,
 			iRecord,
 			iField,
 			buffer.begin(),
-			(SQLINTEGER) buffer.size() * sizeof(wchar_t),
+			(SQLINTEGER) buffer.sizeBytes(),
 			pcbValue);
 
 		makeUTF8(buffer, *pcbValue, rgbValue, cbValueMax);
@@ -312,7 +312,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT fHandleType,
 			iRecord,
 			fDiagField,
 			buffer.begin(),
-			(SQLSMALLINT) buffer.size() * sizeof(wchar_t),
+			(SQLSMALLINT) buffer.sizeBytes(),
 			pcbDiagInfo);
 
 		makeUTF8(buffer, *pcbDiagInfo, rgbDiagInfo, cbDiagInfoMax);
@@ -351,8 +351,8 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT fHandleType,
 		(SQLSMALLINT) bufErr.size(),
 		pcbErrorMsg);
 
-	makeUTF8(bufState, stateLen, szSqlState, stateLen);
-	makeUTF8(bufErr, *pcbErrorMsg, szErrorMsg, cbErrorMsgMax);
+	makeUTF8(bufState, stateLen * sizeof(wchar_t), szSqlState, stateLen);
+	makeUTF8(bufErr, *pcbErrorMsg * sizeof(wchar_t), szErrorMsg, cbErrorMsgMax);
 
 	return rc;
 }
@@ -438,7 +438,7 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT hstmt,
 		return SQLGetStmtAttrW(hstmt,
 			fAttribute,
 			(SQLPOINTER) buffer.begin(),
-			(SQLINTEGER) buffer.size() * sizeof(wchar_t),
+			(SQLINTEGER) buffer.sizeBytes(),
 			pcbValue);
 	}
 
@@ -485,7 +485,7 @@ SQLRETURN SQLGetInfo(SQLHDBC hdbc,
 		SQLRETURN rc = SQLGetInfoW(hdbc,
 			fInfoType,
 			(SQLPOINTER) buffer.begin(),
-			(SQLSMALLINT) buffer.size() * sizeof(wchar_t),
+			(SQLSMALLINT) buffer.sizeBytes(),
 			pcbInfoValue);
 
 		makeUTF8(buffer, *pcbInfoValue, rgbInfoValue, cbInfoValueMax);
@@ -579,8 +579,8 @@ SQLRETURN SQLDataSources(SQLHENV henv,
 		(SQLSMALLINT) bufDesc.size(),
 		pcbDesc);
 
-	makeUTF8(bufDSN, *pcbDSN, szDSN, cbDSNMax);
-	makeUTF8(bufDesc, *pcbDesc, szDesc, cbDescMax);
+	makeUTF8(bufDSN, *pcbDSN * sizeof(wchar_t), szDSN, cbDSNMax);
+	makeUTF8(bufDesc, *pcbDesc * sizeof(wchar_t), szDesc, cbDescMax);
 
 	return rc;
 }
@@ -612,7 +612,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 		pcbConnStrOut,
 		fDriverCompletion);
 
-	makeUTF8(bufOut, *pcbConnStrOut, szConnStrOut, cbConnStrOutMax);
+	makeUTF8(bufOut, *pcbConnStrOut * sizeof(wchar_t), szConnStrOut, cbConnStrOutMax);
 
 	return rc;
 }
@@ -637,7 +637,7 @@ SQLRETURN SQLBrowseConnect(SQLHDBC hdbc,
 		(SQLSMALLINT) bufConnStrOut.size(),
 		pcbConnStrOut);
 
-	makeUTF8(bufConnStrOut, *pcbConnStrOut, szConnStrOut, cbConnStrOutMax);
+	makeUTF8(bufConnStrOut, *pcbConnStrOut * sizeof(wchar_t), szConnStrOut, cbConnStrOutMax);
 
 	return rc;
 }
@@ -694,7 +694,7 @@ SQLRETURN SQLNativeSql(SQLHDBC hdbc,
 		(SQLINTEGER) bufSQLOut.size(),
 		pcbSqlStr);
 
-	makeUTF8(bufSQLOut, *pcbSqlStr, szSqlStr, cbSqlStrMax);
+	makeUTF8(bufSQLOut, *pcbSqlStr * sizeof(wchar_t), szSqlStr, cbSqlStrMax);
 
 	return rc;
 }
@@ -771,8 +771,8 @@ SQLRETURN SQLDrivers(SQLHENV henv,
 		(SQLSMALLINT) bufDriverAttr.size(),
 		pcbDrvrAttr);
 
-	makeUTF8(bufDriverDesc, *pcbDriverDesc, szDriverDesc, cbDriverDescMax);
-	makeUTF8(bufDriverAttr, *pcbDrvrAttr, szDriverAttributes, cbDrvrAttrMax);
+	makeUTF8(bufDriverDesc, *pcbDriverDesc * sizeof(wchar_t), szDriverDesc, cbDriverDescMax);
+	makeUTF8(bufDriverAttr, *pcbDrvrAttr * sizeof(wchar_t), szDriverAttributes, cbDrvrAttrMax);
 
 	return rc;
 }
