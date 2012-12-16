@@ -148,10 +148,9 @@ void SMTPClientSession::loginUsingCRAMSHA1(const std::string& username, const st
 
 void SMTPClientSession::loginUsingCRAM(const std::string& username, const std::string& method, Poco::DigestEngine& hmac)
 {
-	int status = 0;
 	std::string response;
-	
-	status = sendCommand(std::string("AUTH ") + method, response);
+	int status = sendCommand(std::string("AUTH ") + method, response);
+
 	if (!isPositiveIntermediate(status)) throw SMTPException(std::string("Cannot authenticate using ") + method, response, status);
 	std::string challengeBase64 = response.substr(4);
 	
@@ -179,10 +178,8 @@ void SMTPClientSession::loginUsingCRAM(const std::string& username, const std::s
 
 void SMTPClientSession::loginUsingLogin(const std::string& username, const std::string& password)
 {
-	int status = 0;
 	std::string response;
-	
-	status = sendCommand("AUTH LOGIN", response);
+	int status = sendCommand("AUTH LOGIN", response);
 	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate using LOGIN", response, status);
 	
 	std::ostringstream usernameBase64;
@@ -231,15 +228,13 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 
 void SMTPClientSession::loginUsingPlain(const std::string& username, const std::string& password)
 {
-	int status = 0;
-	std::string response;
-	
 	std::ostringstream credentialsBase64;
 	Base64Encoder credentialsEncoder(credentialsBase64);
 	credentialsEncoder << username << '\0' << password;
 	credentialsEncoder.close();
 
-	status = sendCommand("AUTH PLAIN", credentialsBase64.str(), response);
+	std::string response;
+	int status = sendCommand("AUTH PLAIN", credentialsBase64.str(), response);
 	if (!isPositiveCompletion(status)) throw SMTPException("Login using PLAIN failed", response, status);
 }
 
@@ -422,15 +417,14 @@ void SMTPClientSession::sendMessage(const MailMessage& message, const Recipients
 
 void SMTPClientSession::transportMessage(const MailMessage& message)
 {
-	std::string response;
-	int status = 0;
-	
 	SocketOutputStream socketStream(_socket);
 	MailOutputStream mailStream(socketStream);
 	message.write(mailStream);
 	mailStream.close();
 	socketStream.flush();
-	status = _socket.receiveStatusMessage(response);
+	
+	std::string response;
+	int status = _socket.receiveStatusMessage(response);
 	if (!isPositiveCompletion(status)) throw SMTPException("The server rejected the message", response, status);
 }
 
