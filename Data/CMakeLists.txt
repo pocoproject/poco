@@ -31,7 +31,7 @@ if(MYSQL_FOUND)
     add_subdirectory( MySQL )
 endif(MYSQL_FOUND)
 
-include(../contrib/cmake/FindODBC.cmake)
+include(FindODBC)
 
 if(CMAKE_SYSTEM MATCHES "Windows")
 	message(STATUS "Windows native ODBC Support Enabled")
