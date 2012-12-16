@@ -360,6 +360,47 @@ void SMTPClientSession::sendCommands(const MailMessage& message, const Recipient
 }
 
 
+void SMTPClientSession::sendAddresses(const std::string& from, const Recipients& recipients)
+{
+	std::string response;
+	int status = 0;
+
+	std::string::size_type emailPos = from.find('<');
+	if (emailPos == std::string::npos)
+	{
+		std::string sender("<");
+		sender.append(from);
+		sender.append(">");
+		status = sendCommand("MAIL FROM:", sender, response);
+	}
+	else
+	{
+		status = sendCommand("MAIL FROM:", from.substr(emailPos, from.size() - emailPos), response);
+	}
+
+	if (!isPositiveCompletion(status)) throw SMTPException("Cannot send message", response, status);
+	
+	std::ostringstream recipient;
+
+	for (Recipients::const_iterator it = recipients.begin(); it != recipients.end(); ++it)
+	{
+
+		recipient << '<' << *it << '>';
+		int status = sendCommand("RCPT TO:", recipient.str(), response);
+		if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
+		recipient.str("");
+	}
+}
+
+
+void SMTPClientSession::sendData()
+{
+	std::string response;
+	int status = sendCommand("DATA", response);
+	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot send message data", response, status);
+}
+
+
 void SMTPClientSession::sendMessage(const MailMessage& message)
 {
 	sendCommands(message);
@@ -399,6 +440,21 @@ int SMTPClientSession::sendCommand(const std::string& command, const std::string
 {
 	_socket.sendMessage(command, arg);
 	return _socket.receiveStatusMessage(response);
+}
+
+
+void SMTPClientSession::sendMessage(std::istream& istr)
+{
+	std::string response;
+	int status = 0;
+	
+	SocketOutputStream socketStream(_socket);
+	MailOutputStream mailStream(socketStream);
+	StreamCopier::copyStream(istr, mailStream);
+	mailStream.close();
+	socketStream.flush();
+	status = _socket.receiveStatusMessage(response);
+	if (!isPositiveCompletion(status)) throw SMTPException("The server rejected the message", response, status);
 }
 
 
