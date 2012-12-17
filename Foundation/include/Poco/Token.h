@@ -106,12 +106,12 @@ public:
 		/// Returns a string representation of the token.
 	
 #if defined(POCO_HAVE_INT64)
-	virtual Int64 asInteger() const;
+	virtual Int64 asInteger64() const;
         /// Returns a 64-bit integer representation of the token.
-#else
+#endif
+
 	virtual int asInteger() const;
 		/// Returns an integer representation of the token.
-#endif
 	
 	virtual double asFloat() const;
 		/// Returns a floating-point representation of the token.
