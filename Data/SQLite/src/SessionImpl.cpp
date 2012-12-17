@@ -60,7 +60,7 @@ const std::string SessionImpl::ABORT_TRANSACTION("ROLLBACK");
 
 SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	Poco::Data::AbstractSessionImpl<SessionImpl>(fileName, loginTimeout),
-	_connector(toLower(Connector::KEY)),
+	_connector(Connector::KEY),
 	_pDB(0),
 	_connected(false),
 	_isTransaction(false)

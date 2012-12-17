@@ -103,7 +103,7 @@ class TypeHandler: public AbstractTypeHandler
 	///			poco_assert_dbg (pBinder != 0);
 	///			TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder, dir);
 	///			TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder, dir);
-	///			TypeHandler<int>::bind(pos++, obj.getAge(), pBinder);
+	///			TypeHandler<int>::bind(pos++, obj.getAge(), pBinder, dir);
 	///		}
 	///	
 	///		static void prepare(std::size_t pos, const Person& obj, AbstractPreparator* pPreparator)
