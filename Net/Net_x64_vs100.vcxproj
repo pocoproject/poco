@@ -365,6 +365,7 @@
     <ClCompile Include="src\DNS.cpp"/>
     <ClCompile Include="src\HostEntry.cpp"/>
     <ClCompile Include="src\IPAddress.cpp"/>
+    <ClCompile Include="src\Net.cpp"/>
     <ClCompile Include="src\NetException.cpp"/>
     <ClCompile Include="src\NetworkInterface.cpp"/>
     <ClCompile Include="src\SocketAddress.cpp"/>

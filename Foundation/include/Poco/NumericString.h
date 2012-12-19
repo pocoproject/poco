@@ -221,7 +221,7 @@ namespace Impl {
 		/// Class ensures increment/decrement remain within boundaries.
 	{
 	public:
-		Ptr(char* ptr, unsigned offset): _beg(ptr), _cur(ptr), _end(ptr + offset)
+		Ptr(char* ptr, std::size_t offset): _beg(ptr), _cur(ptr), _end(ptr + offset)
 		{
 		}
 	
@@ -268,7 +268,7 @@ namespace Impl {
 			return _cur;
 		}
 
-		unsigned span() const
+		std::size_t span() const
 		{
 			return _end - _beg;
 		}
@@ -291,7 +291,7 @@ template <typename T>
 bool intToStr(T value,
 	unsigned short base,
 	char* result,
-	unsigned& size,
+	std::size_t& size,
 	bool prefix = false,
 	int width = -1,
 	char fill = ' ',
@@ -369,7 +369,7 @@ template <typename T>
 bool uIntToStr(T value,
 	unsigned short base,
 	char* result,
-	unsigned& size,
+	std::size_t& size,
 	bool prefix = false,
 	int width = -1,
 	char fill = ' ',
@@ -446,7 +446,7 @@ bool intToStr (T number, unsigned short base, std::string& result, bool prefix =
 	/// bool intToStr(T, unsigned short, char*, int, int, char, char) implementation.
 {
 	char res[POCO_MAX_INT_STRING_LEN] = {0};
-	unsigned size = POCO_MAX_INT_STRING_LEN;
+	std::size_t size = POCO_MAX_INT_STRING_LEN;
 	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep);
 	result.assign(res, size);
 	return ret;
@@ -459,7 +459,7 @@ bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix 
 	/// bool uIntToStr(T, unsigned short, char*, int, int, char, char) implementation.
 {
 	char res[POCO_MAX_INT_STRING_LEN] = {0};
-	unsigned size = POCO_MAX_INT_STRING_LEN;
+	std::size_t size = POCO_MAX_INT_STRING_LEN;
 	bool ret = uIntToStr(number, base, res, size, prefix, width, fill, thSep);
 	result.assign(res, size);
 	return ret;
