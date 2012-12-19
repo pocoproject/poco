@@ -146,6 +146,7 @@ void NetworkInterfaceTest::testForAddress()
 		// not all interfaces have IP configured
 		if (it->second.addressList().empty()) continue;
 
+		IPAddress first = it->second.firstAddress(IPAddress::IPv4);
 		if (it->second.supportsIPv4())
 		{
 			NetworkInterface ifc = NetworkInterface::forAddress(it->second.firstAddress(IPAddress::IPv4));
