@@ -171,9 +171,7 @@ Base32DecoderBuf* Base32DecoderIOS::rdbuf()
 
 Base32Decoder::Base32Decoder(std::istream& istr): Base32DecoderIOS(istr), std::istream(&_buf)
 {
-#ifdef POCO_OS_FAMILY_WINDOWS
 	unsetf(std::ios_base::skipws);
-#endif
 }
 
 
