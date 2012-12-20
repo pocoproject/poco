@@ -118,12 +118,12 @@ int main(int argc, char** argv)
 	// insert some rows
 	DateTime hd(1956, 3, 1);
 	session << "INSERT INTO Simpsons VALUES('Homer Simpson', 'Springfield', 42, ?)", use(hd), now;
-	DateTime md(1954, 10, 1);
-	session << "INSERT INTO Simpsons VALUES('Marge Simpson', 'Springfield', 38, ?)", use(md), now;
-	DateTime bd(1980, 4, 1);
-	session << "INSERT INTO Simpsons VALUES('Bart Simpson', 'Springfield', 12, ?)", use(bd), now;
-	DateTime ld(1982, 5, 9);
-	session << "INSERT INTO Simpsons VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(ld), now;
+	hd.assign(1954, 10, 1);
+	session << "INSERT INTO Simpsons VALUES('Marge Simpson', 'Springfield', 38, ?)", use(hd), now;
+	hd.assign(1980, 4, 1);
+	session << "INSERT INTO Simpsons VALUES('Bart Simpson', 'Springfield', 12, ?)", use(hd), now;
+	hd.assign(1982, 5, 9);
+	session << "INSERT INTO Simpsons VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(hd), now;
 		
 	// create a statement and print the column names and data as HTML table
 	HTMLTableFormatter tf;

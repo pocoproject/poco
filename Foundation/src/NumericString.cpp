@@ -175,7 +175,7 @@ float strToFloat(const char* str)
 	int flags = StringToDoubleConverter::ALLOW_LEADING_SPACES |
 		StringToDoubleConverter::ALLOW_TRAILING_SPACES;
 	StringToDoubleConverter converter(flags, 0.0, Single::NaN(), POCO_FLT_INF, POCO_FLT_NAN);
-	float result = converter.StringToFloat(str, strlen(str), &processed);
+	float result = converter.StringToFloat(str, static_cast<int>(strlen(str)), &processed);
 	return result;
 }
 
@@ -187,7 +187,7 @@ double strToDouble(const char* str)
 	int flags = StringToDoubleConverter::ALLOW_LEADING_SPACES |
 		StringToDoubleConverter::ALLOW_TRAILING_SPACES;
 	StringToDoubleConverter converter(flags, 0.0, Double::NaN(), POCO_FLT_INF, POCO_FLT_NAN);
-	double result = converter.StringToDouble(str, strlen(str), &processed);
+	double result = converter.StringToDouble(str, static_cast<int>(strlen(str)), &processed);
 	return result;
 }
 

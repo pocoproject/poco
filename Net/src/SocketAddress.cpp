@@ -82,16 +82,10 @@ public:
 protected:
 	SocketAddressImpl()
 	{
-#if defined(_WIN32)
-		Poco::Net::initializeNetwork();
-#endif
 	}
 
 	virtual ~SocketAddressImpl()
 	{
-#if defined(_WIN32)
-		Poco::Net::uninitializeNetwork();
-#endif
 	}
 
 private:

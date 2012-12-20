@@ -30,7 +30,7 @@ objects = ODBCTestSuite Driver \
 	ODBCSQLiteTest ODBCSQLServerTest ODBCTest SQLExecutor
 
 ifeq ($(POCO_CONFIG),MinGW)
-    objects += ODBCAccessTest
+	objects += ODBCAccessTest
 endif
 
 target         = testrunner

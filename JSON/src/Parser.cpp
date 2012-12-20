@@ -576,7 +576,7 @@ void Parser::readValue(const Token* token)
 		if ( _handler != NULL )
 		{
 #if defined(POCO_HAVE_INT64)
-            Int64 value = token->asInteger();
+            Int64 value = token->asInteger64();
             // if number is 32-bit, then handle as such
 			if (    value > std::numeric_limits<int>::max()
                 || value < std::numeric_limits<int>::min() )

@@ -83,7 +83,7 @@ StringTokenizer::~StringTokenizer()
 
 void StringTokenizer::trim (std::string& token)
 {
-	int front = 0, back = 0, length = token.length();
+	std::size_t front = 0, back = 0, length = token.length();
 	std::string::const_iterator tIt = token.begin();
 	std::string::const_iterator tEnd = token.end();
 	for (; tIt != tEnd; ++tIt, ++front)

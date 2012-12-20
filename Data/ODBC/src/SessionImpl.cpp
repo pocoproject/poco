@@ -55,7 +55,7 @@ SessionImpl::SessionImpl(const std::string& connect,
 	bool autoBind,
 	bool autoExtract): 
 	Poco::Data::AbstractSessionImpl<SessionImpl>(connect, loginTimeout),
-		_connector(toLower(Connector::KEY)),
+		_connector(Connector::KEY),
 		_maxFieldSize(maxFieldSize),
 		_autoBind(autoBind),
 		_autoExtract(autoExtract),
@@ -73,7 +73,7 @@ SessionImpl::SessionImpl(const std::string& connect,
 	bool enforceCapability,
 	bool autoBind,
 	bool autoExtract): Poco::Data::AbstractSessionImpl<SessionImpl>(connect),
-		_connector(toLower(Connector::KEY)),
+		_connector(Connector::KEY),
 		_maxFieldSize(maxFieldSize),
 		_autoBind(autoBind),
 		_autoExtract(autoExtract),
@@ -218,7 +218,7 @@ bool SessionImpl::canTransact()
 	if (ODBC_TXN_CAPABILITY_UNKNOWN == _canTransact)
 	{
 		SQLUSMALLINT ret;
-		checkError(Poco::Data::ODBC::SQLGetInfo(_db, SQL_TXN_CAPABLE, &ret, sizeof(ret), 0), 
+		checkError(Poco::Data::ODBC::SQLGetInfo(_db, SQL_TXN_CAPABLE, &ret, 0, 0), 
 			"Failed to obtain transaction capability info.");
 
 		_canTransact = (SQL_TC_NONE != ret) ? 

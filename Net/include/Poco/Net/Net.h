@@ -81,25 +81,6 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
-
-
-void Net_API initializeNetwork();
-	/// Initialize the network subsystem.
-	/// Calls WSAStartup() on Windows, does nothing
-	/// on other platforms.
-
-
-void Net_API uninitializeNetwork();
-	/// Uninitialize the network subsystem.
-	/// Calls WSACleanup() on Windows, does nothing
-	/// on other platforms.
-
-
-} } // namespace Poco::Net
-
-
 // Default to enabled IPv6 support if not explicitly disabled
 #if !defined(POCO_NET_NO_IPv6) && !defined (POCO_HAVE_IPv6)
 	#define POCO_HAVE_IPv6
@@ -126,6 +107,31 @@ void Net_API uninitializeNetwork();
 		#endif
 	#endif
 #endif
+
+
+namespace Poco {
+namespace Net {
+
+
+inline void Net_API initializeNetwork();
+	/// Initialize the network subsystem.
+
+
+inline void Net_API uninitializeNetwork();
+	/// Uninitialize the network subsystem.
+
+}} // namespace Poco::Net
+
+
+//
+// Automate network initialization on Windows.
+//
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NET_NO_WINDOWS_INIT)
+	#if defined(POCO_STATIC)
+		extern "C" const struct NetworkInitializer pocoNetworkInitializer;
+		#pragma comment(linker, "/include:_pocoNetworkInitializer")
+	#endif // POCO_STATIC
+#endif // POCO_NET_NO_WINDOWS_INIT
 
 
 #endif // Net_Net_INCLUDED

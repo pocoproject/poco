@@ -178,9 +178,15 @@ public:
 	}
 
 	std::size_t capacity() const
-		/// Returns the allocated memory size.
+		/// Returns the allocated memory size in elements.
 	{
 		return _capacity;
+	}
+
+	std::size_t capacityBytes() const
+		/// Returns the allocated memory size in bytes.
+	{
+		return _capacity * sizeof(T);
 	}
 
 	void swap(Buffer& other)
@@ -224,9 +230,15 @@ public:
 	}
 
 	std::size_t size() const
-		/// Returns the used size of the buffer.
+		/// Returns the used size of the buffer in elements.
 	{
 		return _used;
+	}
+
+	std::size_t sizeBytes() const
+		/// Returns the used size of the buffer in bytes.
+	{
+		return _used * sizeof(T);
 	}
 	
 	T* begin()
