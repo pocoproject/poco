@@ -147,6 +147,9 @@ Base64DecoderBuf* Base64DecoderIOS::rdbuf()
 
 Base64Decoder::Base64Decoder(std::istream& istr): Base64DecoderIOS(istr), std::istream(&_buf)
 {
+#ifdef POCO_OS_FAMILY_WINDOWS
+	unsetf(std::ios_base::skipws);
+#endif
 }
 
 
