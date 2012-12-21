@@ -37,8 +37,6 @@
 #include "Poco/Base64Decoder.h"
 #include "Poco/Exception.h"
 #include <sstream>
-#include <iterator>
-#include <algorithm>
 
 
 using Poco::Base64Encoder;
@@ -179,19 +177,6 @@ void Base64Test::testEncodeDecode()
 }
 
 
-void Base64Test::testDecodeCR()
-{
-	std::istringstream input("DQ==");
-	Poco::Base64Decoder decoder(input);
-	std::vector<Poco::UInt8> result;
-	typedef std::istream_iterator<Poco::UInt8> istream_iterator_type;
-	istream_iterator_type eos;
-	std::copy(istream_iterator_type(decoder), eos, std::back_inserter(result));
-	assert(1 == result.size());
-	assert(0x0d == result[0]);
-}
-
-
 void Base64Test::setUp()
 {
 }
@@ -209,7 +194,6 @@ CppUnit::Test* Base64Test::suite()
 	CppUnit_addTest(pSuite, Base64Test, testEncoder);
 	CppUnit_addTest(pSuite, Base64Test, testDecoder);
 	CppUnit_addTest(pSuite, Base64Test, testEncodeDecode);
-	CppUnit_addTest(pSuite, Base64Test, testDecodeCR);
 
 	return pSuite;
 }

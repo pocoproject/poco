@@ -211,11 +211,6 @@
 #endif
 
 
-#if !defined(POCO_ARCH)
-	#error "Unknown or Unsupported Hardware Architecture."
-#endif
-
-
 #if defined(_MSC_VER)
 	#define POCO_COMPILER_MSVC
 #elif defined(__clang__)
@@ -244,8 +239,11 @@
 	#define POCO_COMPILER_IBM_XLC // IBM XL C++
 #elif defined (__IBMCPP__) && defined(__COMPILER_VER__)
 	#define POCO_COMPILER_IBM_XLC_ZOS // IBM z/OS C++
-#else
-	#error "Unknown or Unsupported Compiler."
+#endif
+
+
+#if !defined(POCO_ARCH)
+	#error "Unknown Hardware Architecture."
 #endif
 
 

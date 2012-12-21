@@ -49,7 +49,6 @@ public:
 	void testEncoder();
 	void testDecoder();
 	void testEncodeDecode();
-	void testDecodeCR();
 
 	void setUp();
 	void tearDown();

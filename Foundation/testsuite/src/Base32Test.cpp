@@ -37,8 +37,6 @@
 #include "Poco/Base32Decoder.h"
 #include "Poco/Exception.h"
 #include <sstream>
-#include <iterator>
-#include <algorithm>
 
 
 using Poco::Base32Encoder;
@@ -184,19 +182,6 @@ void Base32Test::testEncodeDecode()
 }
 
 
-void Base32Test::testDecodeCR()
-{
-	std::istringstream input("BU======");
-	Poco::Base32Decoder decoder(input);
-	std::vector<Poco::UInt8> result;
-	typedef std::istream_iterator<Poco::UInt8> istream_iterator_type;
-	istream_iterator_type eos;
-	std::copy(istream_iterator_type(decoder), eos, std::back_inserter(result));
-	assert(1 == result.size());
-	assert(0x0d == result[0]);
-}
-
-
 void Base32Test::setUp()
 {
 }
@@ -214,7 +199,6 @@ CppUnit::Test* Base32Test::suite()
 	CppUnit_addTest(pSuite, Base32Test, testEncoder);
 	CppUnit_addTest(pSuite, Base32Test, testDecoder);
 	CppUnit_addTest(pSuite, Base32Test, testEncodeDecode);
-	CppUnit_addTest(pSuite, Base32Test, testDecodeCR);
 
 	return pSuite;
 }
