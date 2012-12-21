@@ -1167,6 +1167,18 @@ IPAddress IPAddress::operator ~ () const
 }
 
 
+const sockaddr IPAddress::operator () () const
+{
+	sockaddr sock;
+
+	sock.sa_family = af();
+	poco_set_sa_len(&sock, (sock.sa_family == AF_INET) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6));
+	memcpy(&sock.sa_data, addr(), length());
+
+	return sock;
+}
+
+
 poco_socklen_t IPAddress::length() const
 {
 	return _pImpl->length();
