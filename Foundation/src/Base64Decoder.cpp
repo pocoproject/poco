@@ -147,6 +147,7 @@ Base64DecoderBuf* Base64DecoderIOS::rdbuf()
 
 Base64Decoder::Base64Decoder(std::istream& istr): Base64DecoderIOS(istr), std::istream(&_buf)
 {
+	unsetf(std::ios_base::skipws);
 }
 
 

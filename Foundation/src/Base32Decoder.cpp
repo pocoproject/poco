@@ -171,6 +171,7 @@ Base32DecoderBuf* Base32DecoderIOS::rdbuf()
 
 Base32Decoder::Base32Decoder(std::istream& istr): Base32DecoderIOS(istr), std::istream(&_buf)
 {
+	unsetf(std::ios_base::skipws);
 }
 
 
