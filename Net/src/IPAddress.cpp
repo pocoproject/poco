@@ -1171,9 +1171,18 @@ IPAddress::operator const sockaddr () const
 {
 	sockaddr sock;
 
+	memset(&sock, 0, sizeof(sock));
+
 	sock.sa_family = af();
-	poco_set_sa_len(&sock, (sock.sa_family == AF_INET) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6));
-	memcpy(&sock.sa_data, addr(), length());
+	if (sock.sa_family == AF_INET) {
+		poco_set_sin_len((sockaddr_in *)&sock);
+		memcpy(&((struct sockaddr_in *)&sock)->sin_addr, addr(), sizeof(in_addr));
+#if defined(POCO_HAVE_IPv6)
+	} else {
+		poco_set_sin6_len((sockaddr_in6 *)&sock);
+		memcpy(&((struct sockaddr_in6 *)&sock)->sin6_addr, addr(), sizeof(in6_addr));
+#endif
+	}
 
 	return sock;
 }
