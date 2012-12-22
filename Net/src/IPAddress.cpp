@@ -1167,7 +1167,7 @@ IPAddress IPAddress::operator ~ () const
 }
 
 
-const sockaddr IPAddress::operator () () const
+IPAddress::operator const sockaddr () const
 {
 	sockaddr sock;
 
