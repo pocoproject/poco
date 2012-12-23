@@ -88,7 +88,6 @@ void SQLiteStatementImpl::compileImpl()
 			if (SQLITE_OK != sqlite3_exec(_pDB, "delete from sys.dual where 1 <> 1;", 0, 0, 0))
 				throw ExecutionException("Error updating system database.");
 		}
-
 		_bindBegin = bindings().begin();
 	}
 
