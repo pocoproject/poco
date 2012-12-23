@@ -31,6 +31,11 @@
 
 
 #include "MulticastEchoServer.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "Poco/Timespan.h"
 #include <iostream>
 
@@ -120,3 +125,5 @@ Poco::Net::NetworkInterface MulticastEchoServer::findInterface()
 	}
 	return NetworkInterface();
 }
+
+#endif // POCO_NET_HAS_INTERFACE

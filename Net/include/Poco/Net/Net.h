@@ -134,4 +134,12 @@ inline void Net_API uninitializeNetwork();
 #endif // POCO_NET_NO_WINDOWS_INIT
 
 
+//
+// Define POCO_NET_HAS_INTERFACE for platforms that have network interface detection implemented.
+//
+#if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
+	#define POCO_NET_HAS_INTERFACE
+#endif
+
+
 #endif // Net_Net_INCLUDED

@@ -31,6 +31,11 @@
 
 
 #include "NetworkInterfaceTest.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/NetworkInterface.h"
@@ -231,3 +236,6 @@ CppUnit::Test* NetworkInterfaceTest::suite()
 
 	return pSuite;
 }
+
+
+#endif // POCO_NET_HAS_INTERFACE

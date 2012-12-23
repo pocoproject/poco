@@ -41,6 +41,11 @@
 
 
 #include "Poco/Net/Net.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Mutex.h"
 #include "Poco/Tuple.h"
@@ -328,6 +333,9 @@ inline bool NetworkInterface::operator == (const NetworkInterface& other) const
 
 
 Net_API std::ostream& operator<<(std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac);
+
+
+#endif // POCO_NET_HAS_INTERFACE
 
 
 #endif // Net_NetworkInterface_INCLUDED
