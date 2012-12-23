@@ -53,6 +53,10 @@ namespace Data {
 namespace SQLite {
 
 
+const int Utility::THREAD_MODE_SINGLE = SQLITE_CONFIG_SINGLETHREAD;
+const int Utility::THREAD_MODE_MULTI = SQLITE_CONFIG_MULTITHREAD;
+const int Utility::THREAD_MODE_SERIAL = SQLITE_CONFIG_SERIALIZED;
+
 const std::string Utility::SQLITE_DATE_FORMAT = "%Y-%m-%d";
 const std::string Utility::SQLITE_TIME_FORMAT = "%H:%M:%S";
 Utility::TypeMap Utility::_types;
@@ -252,6 +256,18 @@ bool Utility::memoryToFile(const std::string& fileName, sqlite3* pInMemory)
 
 	sqlite3_close(pFile);
 	return SQLITE_OK == rc;
+}
+
+
+bool Utility::isThreadSafe()
+{
+	return 0 != sqlite3_threadsafe;
+}
+
+
+bool Utility::setThreadMode(int mode)
+{
+	return SQLITE_OK == sqlite3_config((int) mode);
 }
 
 

@@ -63,6 +63,10 @@ public:
 	static const std::string SQLITE_TIME_FORMAT;
 	typedef std::map<std::string, MetaColumn::ColumnDataType> TypeMap;
 
+	static const int THREAD_MODE_SINGLE;
+	static const int THREAD_MODE_MULTI;
+	static const int THREAD_MODE_SERIAL;
+
 	Utility();
 		/// Maps SQLite column declared types to Poco::Data types through
 		/// static TypeMap member.
@@ -91,6 +95,14 @@ public:
 		/// database on disk.
 		/// 
 		/// Returns true if succesful
+
+	static bool isThreadSafe();
+		/// Returns true if SQLite was compiled in thread or serialized mode.
+		/// See http://www.sqlite.org/c3ref/threadsafe.html for details.
+
+	static bool setThreadMode(int mode);
+		/// Sets the threading mode to single, multi or serialized.
+		/// See http://www.sqlite.org/threadsafe.html for details.
 
 private:
 	static TypeMap _types;
