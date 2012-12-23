@@ -56,6 +56,14 @@ namespace SQLite {
 const int Utility::THREAD_MODE_SINGLE = SQLITE_CONFIG_SINGLETHREAD;
 const int Utility::THREAD_MODE_MULTI = SQLITE_CONFIG_MULTITHREAD;
 const int Utility::THREAD_MODE_SERIAL = SQLITE_CONFIG_SERIALIZED;
+int Utility::_threadMode =
+#if (SQLITE_THREADSAFE == 0)
+	SQLITE_CONFIG_SINGLETHREAD;
+#elif (SQLITE_THREADSAFE == 1)
+	SQLITE_CONFIG_SERIALIZED;
+#elif (SQLITE_THREADSAFE == 2)
+	SQLITE_CONFIG_MULTITHREAD;
+#endif
 
 const std::string Utility::SQLITE_DATE_FORMAT = "%Y-%m-%d";
 const std::string Utility::SQLITE_TIME_FORMAT = "%H:%M:%S";
@@ -261,13 +269,33 @@ bool Utility::memoryToFile(const std::string& fileName, sqlite3* pInMemory)
 
 bool Utility::isThreadSafe()
 {
-	return 0 != sqlite3_threadsafe;
+	return 0 != sqlite3_threadsafe();
+}
+
+
+int Utility::getThreadMode()
+{
+	return _threadMode;
 }
 
 
 bool Utility::setThreadMode(int mode)
 {
-	return SQLITE_OK == sqlite3_config((int) mode);
+#if (SQLITE_THREADSAFE != 0)
+	if (SQLITE_OK == sqlite3_shutdown())
+	{
+		if (SQLITE_OK == sqlite3_config(mode))
+		{
+			_threadMode = mode;
+			if (SQLITE_OK == sqlite3_initialize())
+				return true;
+		}
+		sqlite3_initialize();
+	}
+	return false;
+#else
+	return false;
+#endif
 }
 
 

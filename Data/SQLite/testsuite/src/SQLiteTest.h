@@ -134,7 +134,7 @@ public:
 	void testReconnect();
 	void testSystemTable();
 
-	void benchmarkThreadModesTiming();
+	void testThreadModes();
 
 	void setUp();
 	void tearDown();

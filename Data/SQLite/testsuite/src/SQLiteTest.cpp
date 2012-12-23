@@ -2606,10 +2606,13 @@ void SQLiteTest::testSystemTable()
 }
 
 
-void SQLiteTest::benchmarkThreadModesTiming()
+void SQLiteTest::testThreadModes()
 {
 	using namespace Poco::Data::SQLite;
 	typedef std::vector<int> ModeVec;
+
+	assert (Utility::isThreadSafe());
+	assert (Utility::getThreadMode() == Utility::THREAD_MODE_SERIAL);
 
 	const int datasize = 1000;
 	ModeVec mode;
@@ -2622,32 +2625,35 @@ void SQLiteTest::benchmarkThreadModesTiming()
 	ModeVec::iterator end = mode.end();
 	for (; it != end; ++it)
 	{
-		sw.start();
-		Utility::setThreadMode(*it);
-		Session tmp (Connector::KEY, "dummy.db");
-		std::vector<int> iv;
-		int count = 0;
-		for (int i =0; i < datasize; ++i) iv.push_back(i);
-
-		tmp << "DROP TABLE IF EXISTS Ints", now;
-		tmp << "CREATE TABLE IF NOT EXISTS Ints (theInt INTEGER)", now;
+		sw.restart();
+		assert (Utility::setThreadMode(*it));
 		{
+			Session tmp (Connector::KEY, "dummy.db");
+			std::vector<int> iv(datasize);
+			int count = 0;
+
+			tmp << "DROP TABLE IF EXISTS Ints", now;
+			tmp << "CREATE TABLE IF NOT EXISTS Ints (theInt INTEGER)", now;
 			Statement stmt((tmp << "INSERT INTO Ints VALUES(?)", use(iv)));
 			tmp << "SELECT COUNT(*) FROM Ints", into(count), now;
 			assert (count == 0);
 			stmt.execute();
 			tmp << "SELECT COUNT(*) FROM Ints", into(count), now;
 			assert (count == datasize);
+			count = 0;
+			tmp << "SELECT COUNT(*) FROM Ints", into(count), now;
+			assert (count == datasize);
 		}
-		count = 0;
-		tmp << "SELECT COUNT(*) FROM Ints", into(count), now;
-		assert (count == datasize);
 		sw.stop();
 		std::cout << "Mode: " << ((*it == Utility::THREAD_MODE_SINGLE) ? "single,"
                                 :(*it == Utility::THREAD_MODE_MULTI) ? "multi,"
                                 :(*it == Utility::THREAD_MODE_SERIAL) ? "serial,"
                                 : "unknown,") << " Time: " << sw.elapsed() / 1000.0 << " [ms]" << std::endl;
 	}
+
+	assert (Utility::setThreadMode(Utility::THREAD_MODE_SERIAL));
+	assert (Utility::isThreadSafe());
+	assert (Utility::getThreadMode() == Utility::THREAD_MODE_SERIAL);
 }
 
 
@@ -2742,7 +2748,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testPair);
 	CppUnit_addTest(pSuite, SQLiteTest, testReconnect);
 	CppUnit_addTest(pSuite, SQLiteTest, testSystemTable);
-	CppUnit_addTest(pSuite, SQLiteTest, benchmarkThreadModesTiming);
+	CppUnit_addTest(pSuite, SQLiteTest, testThreadModes);
 
 	return pSuite;
 }
