@@ -4,7 +4,7 @@
 // $Id: //poco/1.4/Net/samples/download/src/ifconfig.cpp#1 $
 //
 // This sample demonstrates the (display only) ifconfig-like capabilities 
-// of the NetworkInterface class.
+// of the NetworkInterface class (on platforms where it is supported).
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,17 @@
 //
 
 
+#include "Poco/Net/NetworkInterface.h"
+#include <iostream>
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "Poco/Path.h"
 #include "Poco/Exception.h"
 #include "Poco/Net/IPAddress.h"
-#include "Poco/Net/NetworkInterface.h"
 #include <memory>
-#include <iostream>
 
 
 using Poco::Path;
@@ -148,3 +153,16 @@ int main(int argc, char** argv)
 	
 	return 0;
 }
+
+
+#else // POCO_NET_HAS_INTERFACE
+
+
+int main(int argc, char** argv)
+{
+	std::cout << "NetworkInterface not supported on this platform." << std::endl;
+	return 0;
+}
+
+
+#endif // POCO_NET_HAS_INTERFACE
