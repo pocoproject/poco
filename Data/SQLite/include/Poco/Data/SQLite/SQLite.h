@@ -80,4 +80,16 @@
 	#endif
 #endif
 
+
+//
+// Thread safety mode defaults to "serialized".
+// See http://www.sqlite.org/threadsafe.html for details.
+// Threading mode significantly affects performance 
+// (see TestSuite::benchmarkThreadModesTiming)
+//
+#ifndef SQLITE_THREADSAFE
+	#define SQLITE_THREADSAFE 1
+#endif
+
+
 #endif // SQLite_SQLite_INCLUDED

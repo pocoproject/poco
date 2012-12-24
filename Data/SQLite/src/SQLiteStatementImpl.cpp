@@ -88,7 +88,6 @@ void SQLiteStatementImpl::compileImpl()
 			if (SQLITE_OK != sqlite3_exec(_pDB, "delete from sys.dual where 1 <> 1;", 0, 0, 0))
 				throw ExecutionException("Error updating system database.");
 		}
-
 		_bindBegin = bindings().begin();
 	}
 
@@ -215,14 +214,15 @@ void SQLiteStatementImpl::bindImpl()
 	else if (bindCount > remainingBindCount)
 		throw ParameterCountMismatchException();
 
+	std::size_t boundRowCount;
 	if (_bindBegin != bindings().end())
 	{
-		_affectedRowCount = (*_bindBegin)->numOfRowsHandled();
+		boundRowCount = (*_bindBegin)->numOfRowsHandled();
 
 		Bindings::iterator oldBegin = _bindBegin;
 		for (std::size_t pos = 1; _bindBegin != bindEnd && (*_bindBegin)->canBind(); ++_bindBegin)
 		{
-			if (_affectedRowCount != (*_bindBegin)->numOfRowsHandled())
+			if (boundRowCount != (*_bindBegin)->numOfRowsHandled())
 				throw BindingException("Size mismatch in Bindings. All Bindings MUST have the same size");
 
 			(*_bindBegin)->bind(pos);
@@ -270,6 +270,9 @@ bool SQLiteStatementImpl::hasNext()
 	_stepCalled = true;
 	_nextResponse = sqlite3_step(_pStmt);
 
+	if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
+	_affectedRowCount += sqlite3_changes(_pDB);
+
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
 		Utility::throwException(_nextResponse);
 
@@ -296,6 +299,8 @@ std::size_t SQLiteStatementImpl::next()
 			_isExtracted = true;
 		}
 		_stepCalled = false;
+		if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
+		_affectedRowCount += (*extracts.begin())->numOfRowsHandled();
 	}
 	else if (SQLITE_DONE == _nextResponse)
 	{
@@ -303,8 +308,7 @@ std::size_t SQLiteStatementImpl::next()
 	}
 	else
 	{
-		int rc = _nextResponse;
-		Utility::throwException(rc, std::string("Iterator Error: trying to access the next value"));
+		Utility::throwException(_nextResponse, std::string("Iterator Error: trying to access the next value"));
 	}
 	
 	return 1u;

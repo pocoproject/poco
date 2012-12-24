@@ -142,10 +142,10 @@ public:
 		{
 			T* ptr = new T[newCapacity];
 			if (preserveContent)
-				std::memcpy(ptr, _ptr, newCapacity);
+				std::memcpy(ptr, _ptr, _capacity);
 
 			delete [] _ptr;
-			_ptr  = ptr;
+			_ptr = ptr;
 			_capacity = newCapacity;
 		}
 		

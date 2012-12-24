@@ -58,6 +58,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/Stopwatch.h"
 #include <iostream>
 
 
@@ -618,7 +619,6 @@ void SQLiteTest::testSharedPtrComplexTypeVector()
 }
 
 
-
 void SQLiteTest::testInsertVector()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -680,6 +680,7 @@ void SQLiteTest::testAffectedRows()
 	assert (0 == stmt.execute());
 
 	Statement stmt1((tmp << "INSERT INTO Strings VALUES(:str)", use(str)));
+	count  = -1;
 	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
 	assert (count == 0);
 	assert (4 == stmt1.execute());
@@ -692,10 +693,13 @@ void SQLiteTest::testAffectedRows()
 	Statement stmt3(tmp << "DELETE FROM Strings WHERE str = 's1'");
 	assert (1 == stmt3.execute());
 
+	Statement stmt4(tmp << "DELETE FROM Strings WHERE str = 'bad value'");
+	assert (0 == stmt4.execute());
+
 	// see SQLiteStatementImpl::affectedRows() documentation for explanation
 	// why "WHERE 1" is necessary here
-	Statement stmt4(tmp << "DELETE FROM Strings WHERE 1");
-	assert (3 == stmt4.execute());
+	Statement stmt5(tmp << "DELETE FROM Strings WHERE 1");
+	assert (3 == stmt5.execute());
 }
 
 
@@ -2263,8 +2267,6 @@ void SQLiteTest::testDynamicAny()
 }
 
 
-
-
 void SQLiteTest::testPair()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -2298,6 +2300,7 @@ void SQLiteTest::testPair()
 	assert (ret[0].first == "Senior" || ret[1].first == "Senior");
 	
 }
+
 
 void SQLiteTest::testSQLChannel()
 {
@@ -2557,18 +2560,41 @@ void SQLiteTest::testReconnect()
 void SQLiteTest::testSystemTable()
 {
 	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	int cntFile = 0;
+	session << "DROP TABLE IF EXISTS Test", now;
+	session << "CREATE TABLE Test (Test INTEGER)", now;
+	session << "INSERT INTO Test VALUES (1)", now;
+	session << "SELECT count(*) FROM Test", into(cntFile), now;
+	assert (1 == cntFile);
 
-	int cnt = -1;
-	session << "SELECT count(*) FROM sys.dual", into(cnt), now;
-	assert (0 == cnt);
+	int cntMem = -1;
+	session << "SELECT count(*) FROM sys.dual", into(cntMem), now;
+	assert (0 == cntMem);
 
 	session << "INSERT INTO sys.dual VALUES ('test')", now;
-	session << "SELECT count(*) FROM sys.dual", into(cnt), now;
-	assert (1 == cnt);
+	session << "SELECT count(*) FROM sys.dual", into(cntMem), now;
+	assert (1 == cntMem);
+
+	// connect another session
+	Session session2(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	// verify it has it's own sys table
+	session2 << "SELECT count(*) FROM sys.dual", into(cntMem), now;
+	assert (0 == cntMem);
+	// verify it shares the file table
+	session2 << "SELECT count(*) FROM Test", into(cntFile), now;
+	assert (1 == cntFile);
+	session2 << "INSERT INTO sys.dual VALUES ('test')", now;
+	session2 << "SELECT count(*) FROM sys.dual", into(cntMem), now;
+	assert (1 == cntMem);
 
 	session << "DELETE FROM sys.dual", now;
-	session << "SELECT count(*) FROM sys.dual", into(cnt), now;
-	assert (0 == cnt);
+	session << "SELECT count(*) FROM sys.dual", into(cntMem), now;
+	assert (0 == cntMem);
+	session2 << "SELECT count(*) FROM sys.dual", into(cntMem), now;
+	assert (1 == cntMem);
+	session2 << "DELETE FROM sys.dual", now;
+	session2 << "SELECT count(*) FROM sys.dual", into(cntMem), now;
+	assert (0 == cntMem);
 
 	try
 	{
@@ -2577,6 +2603,57 @@ void SQLiteTest::testSystemTable()
 	}
 	catch (InvalidAccessException&) { }
 
+}
+
+
+void SQLiteTest::testThreadModes()
+{
+	using namespace Poco::Data::SQLite;
+	typedef std::vector<int> ModeVec;
+
+	assert (Utility::isThreadSafe());
+	assert (Utility::getThreadMode() == Utility::THREAD_MODE_SERIAL);
+
+	const int datasize = 1000;
+	ModeVec mode;
+	mode.push_back(Utility::THREAD_MODE_SINGLE);
+	mode.push_back(Utility::THREAD_MODE_MULTI);
+	mode.push_back(Utility::THREAD_MODE_SERIAL);
+
+	Poco::Stopwatch sw;
+	ModeVec::iterator it = mode.begin();
+	ModeVec::iterator end = mode.end();
+	for (; it != end; ++it)
+	{
+		sw.restart();
+		assert (Utility::setThreadMode(*it));
+		{
+			Session tmp (Connector::KEY, "dummy.db");
+			std::vector<int> iv(datasize);
+			int count = 0;
+
+			tmp << "DROP TABLE IF EXISTS Ints", now;
+			tmp << "CREATE TABLE IF NOT EXISTS Ints (theInt INTEGER)", now;
+			Statement stmt((tmp << "INSERT INTO Ints VALUES(?)", use(iv)));
+			tmp << "SELECT COUNT(*) FROM Ints", into(count), now;
+			assert (count == 0);
+			stmt.execute();
+			tmp << "SELECT COUNT(*) FROM Ints", into(count), now;
+			assert (count == datasize);
+			count = 0;
+			tmp << "SELECT COUNT(*) FROM Ints", into(count), now;
+			assert (count == datasize);
+		}
+		sw.stop();
+		std::cout << "Mode: " << ((*it == Utility::THREAD_MODE_SINGLE) ? "single,"
+                                :(*it == Utility::THREAD_MODE_MULTI) ? "multi,"
+                                :(*it == Utility::THREAD_MODE_SERIAL) ? "serial,"
+                                : "unknown,") << " Time: " << sw.elapsed() / 1000.0 << " [ms]" << std::endl;
+	}
+
+	assert (Utility::setThreadMode(Utility::THREAD_MODE_SERIAL));
+	assert (Utility::isThreadSafe());
+	assert (Utility::getThreadMode() == Utility::THREAD_MODE_SERIAL);
 }
 
 
@@ -2671,6 +2748,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testPair);
 	CppUnit_addTest(pSuite, SQLiteTest, testReconnect);
 	CppUnit_addTest(pSuite, SQLiteTest, testSystemTable);
+	CppUnit_addTest(pSuite, SQLiteTest, testThreadModes);
 
 	return pSuite;
 }

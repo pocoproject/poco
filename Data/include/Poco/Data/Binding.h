@@ -96,7 +96,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return 1;
+		return 1u;
 	}
 
 	bool canBind() const
@@ -120,8 +120,8 @@ public:
 	}
 
 private:
-	const T&     _val;
-	bool         _bound;
+	const T& _val;
+	bool     _bound;
 };
 
 

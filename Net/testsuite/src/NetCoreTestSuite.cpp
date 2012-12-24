@@ -44,7 +44,8 @@ CppUnit::Test* NetCoreTestSuite::suite()
 	pSuite->addTest(IPAddressTest::suite());
 	pSuite->addTest(SocketAddressTest::suite());
 	pSuite->addTest(DNSTest::suite());
+#ifdef POCO_NET_HAS_INTERFACE
 	pSuite->addTest(NetworkInterfaceTest::suite());
-
+#endif // POCO_NET_HAS_INTERFACE
 	return pSuite;
 }

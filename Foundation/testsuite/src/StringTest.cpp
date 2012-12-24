@@ -665,8 +665,11 @@ void StringTest::testStringToDouble()
 
 void StringTest::testStringToFloatError()
 {
-	const char ds = decimalSeparator();
-	const char ts = thousandSeparator();
+	char ds = decimalSeparator();
+	if (ds == 0) ds = '.';
+	char ts = thousandSeparator();
+	if (ts == 0) ts = ',';
+	assert (ds != ts);
 
 	double result = 0.0;
 	assert (!strToDouble(format("a12%c3", ds), result));

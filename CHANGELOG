@@ -29,6 +29,11 @@ Release 1.5.0 (2012-12-17)
 - fixed GH #30: Poco::Path::home() throws when called from Windows Service
 - fixed GH #22: MySQL connection string lowercased
 - added MySQL support for Date/Time
+- upgraded SQLite to version 3.7.15.1 (2012-12-19)
+- fixed SQLite affectedRows reporting and added tests
+- added SQLite::Utility::isThreadSafe() function
+- added SQLite::Utility::setThreadMode(int mode) function
+- fixed GH #41: Buffer::resize crash
 
 Release 1.5.0 (2012-10-14)
 ==========================

@@ -41,6 +41,11 @@
 
 
 #include "Poco/Net/Net.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/NetworkInterface.h"
 
@@ -133,6 +138,9 @@ public:
 
 
 } } // namespace Poco::Net
+
+
+#endif // POCO_NET_HAS_INTERFACE
 
 
 #endif // Net_MulticastSocket_INCLUDED

@@ -37,6 +37,11 @@
 
 
 #include "Poco/Net/Net.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "CppUnit/TestCase.h"
 
 
@@ -61,6 +66,9 @@ public:
 
 private:
 };
+
+
+#endif // POCO_NET_HAS_INTERFACE
 
 
 #endif // NetworkInterfaceTest_INCLUDED
