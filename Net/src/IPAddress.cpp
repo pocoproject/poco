@@ -1180,7 +1180,8 @@ IPAddress::operator const sockaddr () const
 #if defined(POCO_HAVE_IPv6)
 	} else {
 		poco_set_sin6_len((sockaddr_in6 *)&sock);
-		memcpy(&((struct sockaddr_in6 *)&sock)->sin6_addr, addr(), sizeof(in6_addr));
+		memcpy(&((sockaddr_in6 *)&sock)->sin6_addr, addr(), sizeof(in6_addr));
+		((sockaddr_in6 *)&sock)->sin6_scope_id = scope();
 #endif
 	}
 
