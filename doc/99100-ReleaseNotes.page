@@ -1,6 +1,53 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.5.1
+
+!!Summary of Changes
+
+  - using double-conversion library for floating-point numeric/string conversions
+  - added Poco::istring (case-insensitive string) and Poco::isubstr (case-insensitive substring)
+  - added Poco::Data::SQLite sys.dual (in-memory system table)
+  - applied SF Patch #120: The ExpireLRUCache does not compile with a tuple as key on Visual Studio 2010
+  - fixed SF Bug #599: Poco::JSON::Array and JSON::Object size() member can implicitly lose precision
+  - fixed SF Bug #602: iterating database table rows not correct if no data in table
+  - fixed SF Bug #603: count() is missing in HashMap
+  - fixed GH #23: Poco::JSON::Object::stringify throw BadCastException
+  - fixed GH #16: Poco::Net::NetworkInterface::firstAddress() should not throw on unconfigured interfaces
+  - Android compile/build support (Rangel Reale)
+  - improved iPhone compile/build (Rangel Reale)
+  - TypeHandler::prepare() now takes const-reference
+  - fixed GH #27: Poco::URI::decode() doesn't properly handle '+'
+  - fixed GH #31: Poco::JSON implementation bug
+  - fixed SF #597: Configure script ignores cflags
+  - fixed SF #593: Poco 1.5.0 on FreeBSD: cannot find -ldl
+  - added SF #542: SocketAddress() needs port-only constructor
+  - fixed SF #215: Wrong return type in SocketConnector.h
+  - applied SF Patch #97: fix c++0x / clang++ bugs
+  - fixed GH32/SF596: Poco::JSON: Parsing long integer (int64) value fails.
+  - added Net ifconfig sample (contributed by Philip Prindeville)
+  - merged GH #34: add algorithm header (Roger Meier/Philip Prindeville)
+  - improved CMake build (Mathaus Mendel)
+  - fixed GH #26: Cannot compile on gcc 
+  - merged SF #111: FTP Client logging (Marian Krivos)
+  - fixed GH #30: Poco::Path::home() throws when called from Windows Service
+  - fixed GH #22: Poco::Data::MySQL connection string lowercased
+  - added MySQL support for Date/Time
+  - upgraded SQLite to version 3.7.15.1 (2012-12-19)
+  - improved SQLite execute() return (affected rows) value and added tests
+  - added bool Poco::Data::SQLite::Utility::isThreadSafe() function
+  - added bool Poco::Data::SQLite::Utility::setThreadMode(int) function
+  - added int Poco::Data::SQLite::Utility::getThreadMode() function
+  - fixed GH #41: Buffer::resize crash
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - Please note that 1.5.x releases are development releases and not considered stable. Interfaces may
+    change, and backwards compatibility with the stable 1.4 release series
+    is not guaranteed. There may also be some rough edges. 
+    The next stable release incorporating 1.5 features will be 1.6. 
+
+
 !!!Release 1.5.0
 
 !!Summary of Changes

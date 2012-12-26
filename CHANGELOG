@@ -1,10 +1,9 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.0 (2012-12-17)
+Release 1.5.1 (2012-12-25)
 ==========================
 - using double-conversion library for floating-point numeric/string conversions
 - added Poco::istring (case-insensitive string) and Poco::isubstr
-- improved SQLite execute() return (affected rows) value
 - added SQLite sys.dual (in-memory system table)
 - applied SF Patch #120: The ExpireLRUCache does not compile with a tuple as key on Visual Studio 2010
 - fixed SF Bug #599: JSON::Array and JSON::Object size() member can implicitly lose precision
@@ -30,10 +29,11 @@ Release 1.5.0 (2012-12-17)
 - fixed GH #22: MySQL connection string lowercased
 - added MySQL support for Date/Time
 - upgraded SQLite to version 3.7.15.1 (2012-12-19)
-- fixed SQLite affectedRows reporting and added tests
+- improved SQLite execute() return (affected rows) value and added tests
 - added SQLite::Utility::isThreadSafe() function
 - added SQLite::Utility::setThreadMode(int mode) function
 - fixed GH #41: Buffer::resize crash
+
 
 Release 1.5.0 (2012-10-14)
 ==========================
