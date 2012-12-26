@@ -324,9 +324,6 @@ public:
 	IPAddress operator ^ (const IPAddress& addr) const;
 	IPAddress operator ~ () const;
 		
-	operator const sockaddr () const;
-		/// cast to sockaddr
-		
 	poco_socklen_t length() const;
 		/// Returns the length in bytes of the internal socket address structure.	
 		
