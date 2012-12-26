@@ -137,6 +137,9 @@ public:
 	bool operator == (const SocketAddress& addr) const;
 	bool operator != (const SocketAddress& addr) const;
 
+	operator const struct sockaddr& () const;
+		/// Typecast to a struct sockaddr reference.
+
 	enum
 	{
 		MAX_ADDRESS_LENGTH = 
@@ -182,6 +185,12 @@ inline 	bool SocketAddress::operator == (const SocketAddress& addr) const
 inline bool SocketAddress::operator != (const SocketAddress& addr) const
 {
 	return host() != addr.host() || port() != addr.port();
+}
+
+
+inline SocketAddress::operator const struct sockaddr& () const
+{
+	return *(addr());
 }
 
 
