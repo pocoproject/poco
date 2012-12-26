@@ -42,10 +42,6 @@ AAAIntroduction
 
 !!Incompatible Changes and Possible Transition Issues
 
-  - Poco::Net::NetworkInterface::findFirstAddress() (1.5.0) was renamed to firstAddress() (1.5.1).
-  - typedef Poco::Net::NetworkInterface::MacAddress (1.5.0) was renamed to MACAddress (1.5.1).
-  - introduced NetworkInterface::Type (1.5.1).
-  - unsigned Poco::Net::NetworkInterface::hwType() (1.5.0) changed to NetworkInterface::Type type() (1.5.1)
   - Please note that 1.5.x releases are development releases and not considered stable. Interfaces may
     change, and backwards compatibility with the stable 1.4 release series
     is not guaranteed. There may also be some rough edges. 
