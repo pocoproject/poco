@@ -33,6 +33,8 @@ Release 1.5.1 (2012-12-25)
 - added SQLite::Utility::isThreadSafe() function
 - added SQLite::Utility::setThreadMode(int mode) function
 - fixed GH #41: Buffer::resize crash
+- fixed GH #42: Linux unbundled builds don't link
+- fixed GH #44: Problems with win x64 build
 
 
 Release 1.5.0 (2012-10-14)
