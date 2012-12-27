@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Foundation"
 	ProjectGUID="{8164D41D-B053-405B-826C-CF37AC0EF176}"
 	RootNamespace="Foundation"
@@ -519,14 +519,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\DynamicAny.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\DynamicAnyHolder.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\Environment.cpp"
 					>
 				</File>
@@ -1031,15 +1023,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\NumericString.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\RefCountedObject.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\src\String.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\NumericString.cpp"
 					>
 				</File>
 				<File
@@ -1136,6 +1128,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Exception.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\FIFOBuffer.h"
 					>
 				</File>
 				<File
@@ -1308,6 +1304,10 @@
 				</File>
 				<File
 					RelativePath=".\src\DeflatingStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FIFOBufferStream.cpp"
 					>
 				</File>
 				<File
@@ -1504,6 +1504,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\DeflatingStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\FIFOBufferStream.h"
 					>
 				</File>
 				<File
@@ -5581,6 +5585,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Latin2Encoding.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Latin9Encoding.cpp"
 					>
 				</File>
@@ -5617,11 +5625,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\UTF32Encoding.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\UTF8Encoding.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\src\UTF8String.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Windows1250Encoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Windows1251Encoding.cpp"
 					>
 				</File>
 				<File
@@ -5638,6 +5658,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Latin1Encoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Latin2Encoding.h"
 					>
 				</File>
 				<File
@@ -5677,11 +5701,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\UTF32Encoding.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\UTF8Encoding.h"
 					>
 				</File>
 				<File
 					RelativePath=".\include\Poco\UTF8String.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows1250Encoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows1251Encoding.h"
 					>
 				</File>
 				<File
@@ -5998,6 +6034,42 @@
 				</File>
 				<File
 					RelativePath=".\src\HashStatistic.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Dynamic"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Dynamic\Pair.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Dynamic\Struct.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Dynamic\Var.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Dynamic\VarHolder.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\Var.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\VarHolder.cpp"
 					>
 				</File>
 			</Filter>

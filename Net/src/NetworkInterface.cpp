@@ -788,8 +788,8 @@ NetworkInterface NetworkInterface::forAddress(const IPAddress& addr)
 
 	for (; it != end; ++it)
 	{
-		const unsigned count = it->second.addressList().size();
-		for (unsigned i = 0; i < count; ++i)
+		const std::size_t count = it->second.addressList().size();
+		for (int i = 0; i < count; ++i)
 		{
 			if (it->second.address(i) == addr)
 				return it->second;
