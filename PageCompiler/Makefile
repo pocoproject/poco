@@ -13,9 +13,7 @@ objects = Page PageReader \
 	PageCompiler
 
 ifdef POCO_UNBUNDLED
-        SYSLIBS += -lz -lpcre -lexpat
-else
-        objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects) $(expat_objects)
+	SYSLIBS += -lz -lpcre -lexpat
 endif
 
 target         = cpspc

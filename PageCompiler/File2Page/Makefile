@@ -11,9 +11,7 @@ include $(POCO_BASE)/build/rules/global
 objects = File2Page
 
 ifdef POCO_UNBUNDLED
-	SYSLIBS += -lz -lpcre -lexpat
-else
-	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects) $(expat_objects)
+        SYSLIBS += -lz -lpcre -lexpat
 endif
 
 target         = f2cpsp

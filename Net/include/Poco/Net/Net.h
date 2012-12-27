@@ -120,6 +120,7 @@ inline void Net_API initializeNetwork();
 inline void Net_API uninitializeNetwork();
 	/// Uninitialize the network subsystem.
 
+
 }} // namespace Poco::Net
 
 
@@ -129,7 +130,11 @@ inline void Net_API uninitializeNetwork();
 #if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NET_NO_WINDOWS_INIT)
 	#if defined(POCO_STATIC)
 		extern "C" const struct NetworkInitializer pocoNetworkInitializer;
-		#pragma comment(linker, "/include:_pocoNetworkInitializer")
+		#ifdef _WIN64
+			#pragma comment(linker, "/include:pocoNetworkInitializer")
+		#else
+			#pragma comment(linker, "/include:_pocoNetworkInitializer")
+		#endif
 	#endif // POCO_STATIC
 #endif // POCO_NET_NO_WINDOWS_INIT
 

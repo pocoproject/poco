@@ -13,6 +13,7 @@ projects:
 	$(MAKE) -C Activity $(MAKECMDGOALS)
 	$(MAKE) -C Timer $(MAKECMDGOALS)
 	$(MAKE) -C BinaryReaderWriter $(MAKECMDGOALS)
+	$(MAKE) -C LineEndingConverter $(MAKECMDGOALS)
 	$(MAKE) -C base64decode $(MAKECMDGOALS)
 	$(MAKE) -C base64encode $(MAKECMDGOALS)
 	$(MAKE) -C deflate $(MAKECMDGOALS)
