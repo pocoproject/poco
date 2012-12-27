@@ -12,8 +12,14 @@ objects = Page PageReader \
 	CodeWriter ApacheCodeWriter OSPCodeWriter \
 	PageCompiler
 
+ifdef POCO_UNBUNDLED
+        SYSLIBS += -lz -lpcre -lexpat
+else
+        objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects) $(expat_objects)
+endif
+
 target         = cpspc
 target_version = 1
-target_libs    = PocoNet PocoUtil PocoXML PocoFoundation
+target_libs    = PocoNet PocoUtil PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
