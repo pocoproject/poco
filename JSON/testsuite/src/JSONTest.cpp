@@ -33,6 +33,7 @@
 #include "JSONTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Query.h"
@@ -40,13 +41,14 @@
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/JSON/DefaultHandler.h"
 #include "Poco/JSON/Template.h"
+
 #include "Poco/Path.h"
 #include "Poco/Environment.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
 #include "Poco/Glob.h"
-#include <set>
 
+#include <set>
 
 using namespace Poco::JSON;
 using namespace Poco::Dynamic;
@@ -71,22 +73,6 @@ void JSONTest::setUp()
 
 void JSONTest::tearDown()
 {
-}
-
-
-void JSONTest::testStringifier()
-{
-	Object obj;
-
-	Array arr;
-	Object obj2;
-
-	obj.set("array", arr);
-	obj.set("obj2", obj2);
-
-	std::ostringstream ostr;
-	obj.stringify(ostr);
-	assert (ostr.str() == "{\"array\":[],\"obj2\":{}}");
 }
 
 
@@ -822,7 +808,6 @@ CppUnit::Test* JSONTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("JSONTest");
 
-	CppUnit_addTest(pSuite, JSONTest, testStringifier);
 	CppUnit_addTest(pSuite, JSONTest, testNullProperty);
 	CppUnit_addTest(pSuite, JSONTest, testTrueProperty);
 	CppUnit_addTest(pSuite, JSONTest, testFalseProperty);

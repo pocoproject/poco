@@ -697,5 +697,4 @@ bool Parser::readElements(bool firstCall)
 	throw JSONException(format("Invalid token '%s' found.", token->asString()));
 }
 
-
 } } // namespace Poco::JSON

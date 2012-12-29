@@ -36,23 +36,17 @@
 //
 
 
-// Avoid accidental linking of JSON library when JSONConfiguration
-// is not desired.
-#ifndef POCO_UTIL_NO_JSONCONFIGURATION
-
-
 #ifndef Util_JSONConfiguration_INCLUDED
 #define Util_JSONConfiguration_INCLUDED
 
 
-#include "Poco/Util/AbstractConfiguration.h"
-#include "Poco/JSON/Object.h"
 #include <istream>
 
+#include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/JSON/Object.h"
 
 namespace Poco {
 namespace Util {
-
 
 class Util_API JSONConfiguration : public AbstractConfiguration
 	/// This configuration class extracts configuration properties
@@ -160,10 +154,7 @@ private:
  	JSON::Object::Ptr _object;
 };
 
-
 } } // namespace Poco::Util
 
 
 #endif // Util_JSONConfiguration_INCLUDED
-
-#endif // POCO_UTIL_NO_JSONCONFIGURATION

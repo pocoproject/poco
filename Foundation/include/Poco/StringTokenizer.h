@@ -70,6 +70,10 @@ public:
 		/// Additionally, options can be specified:
 		///   * TOK_IGNORE_EMPTY: empty tokens are ignored
 		///   * TOK_TRIM: trailing and leading whitespace is removed from tokens.
+		/// An empty token at the end of str is always ignored. For example,
+		/// a StringTokenizer with the following arguments:
+		///     StringTokenizer(",ab,cd,", ",");
+		/// will produce three tokens, "", "ab" and "cd".
 
 	~StringTokenizer();
 		/// Destroys the tokenizer.
@@ -108,8 +112,6 @@ private:
 	StringTokenizer(const StringTokenizer&);
 	StringTokenizer& operator = (const StringTokenizer&);
 	
-	void trim (std::string& token);
-
 	TokenVec _tokens;
 };
 

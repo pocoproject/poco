@@ -290,8 +290,6 @@
   <ItemGroup>
     <ClCompile Include="src\Ascii.cpp" />
     <ClCompile Include="src\AtomicCounter.cpp" />
-    <ClCompile Include="src\Base32Decoder.cpp" />
-    <ClCompile Include="src\Base32Encoder.cpp" />
     <ClCompile Include="src\Bugcheck.cpp" />
     <ClCompile Include="src\ByteOrder.cpp" />
     <ClCompile Include="src\Checksum.cpp" />
@@ -330,7 +328,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\Error.cpp" />
     <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\FIFOBufferStream.cpp" />
     <ClCompile Include="src\Format.cpp" />
@@ -380,7 +377,6 @@
     <ClCompile Include="src\NestedDiagnosticContext.cpp" />
     <ClCompile Include="src\NumberFormatter.cpp" />
     <ClCompile Include="src\NumberParser.cpp" />
-    <ClCompile Include="src\NumericString.cpp" />
     <ClCompile Include="src\RefCountedObject.cpp" />
     <ClCompile Include="src\String.cpp" />
     <ClCompile Include="src\StringTokenizer.cpp" />
@@ -980,8 +976,6 @@
     <ClInclude Include="include\Poco\AtomicCounter.h" />
     <ClInclude Include="include\Poco\AutoPtr.h" />
     <ClInclude Include="include\Poco\AutoReleasePool.h" />
-    <ClInclude Include="include\Poco\Base32Decoder.h" />
-    <ClInclude Include="include\Poco\Base32Encoder.h" />
     <ClInclude Include="include\Poco\Buffer.h" />
     <ClInclude Include="include\Poco\Bugcheck.h" />
     <ClInclude Include="include\Poco\ByteOrder.h" />
@@ -1001,7 +995,6 @@
     <ClInclude Include="include\Poco\Environment_VMS.h" />
     <ClInclude Include="include\Poco\Environment_WIN32.h" />
     <ClInclude Include="include\Poco\Environment_WIN32U.h" />
-    <ClInclude Include="include\Poco\Error.h" />
     <ClInclude Include="include\Poco\Exception.h" />
     <ClInclude Include="include\Poco\FIFOBuffer.h" />
     <ClInclude Include="include\Poco\FIFOBufferStream.h" />

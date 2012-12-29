@@ -32,13 +32,6 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-
-
-// Avoid accidental linking of JSON library when JSONConfiguration
-// is not desired.
-#ifndef POCO_UTIL_NO_JSONCONFIGURATION
-
-
 #include "Poco/FileStream.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Util/JSONConfiguration.h"
@@ -48,10 +41,10 @@
 #include "Poco/RegularExpression.h"
 #include "Poco/NumberParser.h"
 
-
-namespace Poco {
-namespace Util {
-
+namespace Poco
+{
+namespace Util
+{
 
 JSONConfiguration::JSONConfiguration() : _object(new JSON::Object())
 {
@@ -146,7 +139,6 @@ void JSONConfiguration::getIndexes(std::string& name, std::vector<int>& indexes)
 		name = name.substr(0, firstOffset);
 	}
 }
-
 
 JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::string& lastPart)
 {
@@ -262,22 +254,16 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 	return currentObject;
 }
 
-
 void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny& value)
 {
-
 	std::string sValue;
-	
 	value.convert<std::string>(sValue);
 	KeyValue kv(key, sValue);
-	
 	if (eventsEnabled())
-	
 	{
-
 		propertyChanging(this, kv);
 	}
-	
+
 	std::string lastPart;
 	JSON::Object::Ptr parentObject = findStart(key, lastPart);
 
@@ -319,15 +305,11 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 		}
 		arr->add(value);
 	}
-
 	if (eventsEnabled())
-
 	{
-
 		propertyChanged(this, kv);
 	}
 }
-
 
 void JSONConfiguration::setString(const std::string& key, const std::string& value)
 {
@@ -340,24 +322,20 @@ void JSONConfiguration::setRaw(const std::string& key, const std::string& value)
 	setValue(key, value);
 }
 
-
 void JSONConfiguration::setInt(const std::string& key, int value)
 {
 	setValue(key, value);
 }
-
 
 void JSONConfiguration::setBool(const std::string& key, bool value)
 {
 	setValue(key, value);
 }
 
-
 void JSONConfiguration::setDouble(const std::string& key, double value)
 {
 	setValue(key, value);
 }
-
 
 void JSONConfiguration::enumerate(const std::string& key, Keys& range) const
 {
@@ -376,13 +354,11 @@ void JSONConfiguration::save(std::ostream& ostr, unsigned int indent) const
 	_object->stringify(ostr, indent);
 }
 
-
 void JSONConfiguration::removeRaw(const std::string& key)
-
 {
-	
 	std::string lastPart;
 	JSON::Object::Ptr parentObject = findStart(key, lastPart);
+	
 	std::vector<int> indexes;
 	getIndexes(lastPart, indexes);
 
@@ -393,9 +369,8 @@ void JSONConfiguration::removeRaw(const std::string& key)
 	else
 	{
 		DynamicAny result = parentObject->get(lastPart);
-		if (!result.isEmpty() && result.type() == typeid(JSON::Array::Ptr))
+		if ( !result.isEmpty() && result.type() == typeid(JSON::Array::Ptr) )
 		{
-
 			JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
 			for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
 			{
@@ -404,10 +379,6 @@ void JSONConfiguration::removeRaw(const std::string& key)
 			arr->remove(indexes.back());
 		}
 	}
-
 }
 
-
-} } // namespace Poco::Util
-
-#endif // POCO_UTIL_NO_JSONCONFIGURATION
+}} // Namespace Poco::Util
