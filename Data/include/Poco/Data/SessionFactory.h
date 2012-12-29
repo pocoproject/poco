@@ -45,6 +45,7 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Mutex.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/String.h"
 #include <map>
 
 
@@ -71,6 +72,7 @@ class Data_API SessionFactory
 	///      Session ses("SQLite", "dummy.db");
 {
 public:
+	
 	static SessionFactory& instance();
 		/// returns the static instance of the singleton.
 
@@ -92,7 +94,7 @@ public:
 	Session create(const std::string& uri,
 		std::size_t timeout = Session::LOGIN_TIMEOUT_DEFAULT);
 		/// Creates a Session for the given URI (must be in key:///connectionString format). 
-		///	Throws an Poco:Data::UnknownDataBaseException if no Connector is registered for the key.
+		/// Throws a Poco:Data::UnknownDataBaseException if no Connector is registered for the key.
 
 private:
 	SessionFactory();
@@ -107,7 +109,15 @@ private:
 		SessionInfo(Connector* pSI);
 	};
 
-	typedef std::map<std::string, SessionInfo> Connectors;
+	struct ILT
+	{
+		bool operator() (const std::string& s1, const std::string& s2) const
+		{
+			return Poco::icompare(s1, s2) < 0;
+		}
+	};
+	
+	typedef std::map<std::string, SessionInfo, ILT> Connectors;
 	Connectors      _connectors;
 	Poco::FastMutex _mutex;
 };

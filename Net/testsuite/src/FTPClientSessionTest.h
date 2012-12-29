@@ -1,7 +1,7 @@
 //
 // FTPClientSessionTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/FTPClientSessionTest.h#1 $
+// $Id: //poco/svn/Net/testsuite/src/FTPClientSessionTest.h#2 $
 //
 // Definition of the FTPClientSessionTest class.
 //
@@ -40,13 +40,24 @@
 #include "CppUnit/TestCase.h"
 
 
+namespace Poco {
+namespace Net {
+
+class FTPClientSession;
+
+} }
+
+class DialogServer;
+
 class FTPClientSessionTest: public CppUnit::TestCase
 {
 public:
 	FTPClientSessionTest(const std::string& name);
 	~FTPClientSessionTest();
 
-	void testLogin();
+	void testLogin1();
+	void testLogin2();
+	void testLogin3();
 	void testLoginFailed1();
 	void testLoginFailed2();
 	void testCommands();
@@ -63,6 +74,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void login(DialogServer& server, Poco::Net::FTPClientSession& session);
 };
 
 

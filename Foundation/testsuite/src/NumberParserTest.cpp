@@ -230,8 +230,11 @@ void NumberParserTest::testLimits()
 
 void NumberParserTest::testParseError()
 {
-	const char dp = decimalSeparator();
-	const char ts = thousandSeparator();
+	char dp = decimalSeparator();
+	if (dp == 0) dp = '.';
+	char ts = thousandSeparator();
+	if (ts == 0) ts = ',';
+	assert (dp != ts);
 
 	try
 	{

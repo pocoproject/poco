@@ -95,7 +95,7 @@ public:
 	void testIllegalRange();
 	void testSingleSelect();
 	void testEmptyDB();
-
+	void testDateTime();
 	void testBLOB();
 	void testBLOBStmt();
 
@@ -129,6 +129,9 @@ private:
 	void dropTable(const std::string& tableName);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
+	void recreatePersonDateTimeTable();
+	void recreatePersonDateTable();
+	void recreatePersonTimeTable();
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateFloatsTable();

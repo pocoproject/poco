@@ -130,7 +130,16 @@ namespace
 		case MYSQL_TYPE_LONGLONG: 
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT64;
 			return Poco::Data::MetaColumn::FDT_INT64;
-
+			
+		case MYSQL_TYPE_DATE:
+			return Poco::Data::MetaColumn::FDT_DATE;
+			
+		case MYSQL_TYPE_TIME:
+			return Poco::Data::MetaColumn::FDT_TIME;
+			
+		case MYSQL_TYPE_DATETIME:
+			return Poco::Data::MetaColumn::FDT_TIMESTAMP;
+			
 		case MYSQL_TYPE_STRING:
 		case MYSQL_TYPE_VAR_STRING:
 			return Poco::Data::MetaColumn::FDT_STRING;

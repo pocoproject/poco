@@ -415,6 +415,8 @@
 				<File
 					RelativePath=".\src\IPAddress.cpp"/>
 				<File
+					RelativePath=".\src\Net.cpp"/>
+				<File
 					RelativePath=".\src\NetException.cpp"/>
 				<File
 					RelativePath=".\src\NetworkInterface.cpp"/>

@@ -1,7 +1,4 @@
 set(LIBNAME "PocoFoundation")
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    set(LIBNAME "${LIBNAME}d")
-endif()
 
 
 set( BASE_SRCS 
@@ -34,6 +31,7 @@ set( BASE_SRCS
   src/DigestStream.cpp
   src/DirectoryIterator.cpp
   src/Environment.cpp
+  src/Error.cpp
   src/ErrorHandler.cpp
   src/Event.cpp
   src/EventArgs.cpp

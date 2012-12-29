@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="TestSuite"
 	ProjectGUID="{F1EE93DF-347F-4CB3-B191-C4E63F38E972}"
 	Keyword="Win32Proj"
@@ -536,6 +536,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ArrayTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\AutoPtrTest.cpp"
 					>
 				</File>
@@ -553,10 +557,6 @@
 				</File>
 				<File
 					RelativePath=".\src\CoreTestSuite.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\DynamicAnyTest.cpp"
 					>
 				</File>
 				<File
@@ -625,6 +625,10 @@
 				>
 				<File
 					RelativePath=".\src\AnyTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ArrayTest.h"
 					>
 				</File>
 				<File
@@ -736,6 +740,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\FIFOBufferStreamTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\FileStreamTest.cpp"
 					>
 				</File>
@@ -793,6 +801,10 @@
 				</File>
 				<File
 					RelativePath=".\src\CountingStreamTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FIFOBufferStreamTest.h"
 					>
 				</File>
 				<File
@@ -1781,6 +1793,26 @@
 				</File>
 				<File
 					RelativePath=".\src\SimpleHashTableTest.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Dynamic"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\VarTest.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\VarTest.cpp"
 					>
 				</File>
 			</Filter>

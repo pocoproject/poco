@@ -41,6 +41,11 @@
 
 
 #include "Poco/Net/Net.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Mutex.h"
 #include "Poco/Tuple.h"
@@ -155,6 +160,11 @@ public:
 		/// Throws NotFoundException if the address family is not
 		/// configured on the interface.
 
+	void firstAddress(IPAddress& addr, IPAddress::Family family = IPAddress::IPv4) const;
+		/// Returns the first IP address bound to the interface.
+		/// If the address family is not configured on the interface,
+		/// the address returned in addr will be unspecified (wildcard).
+
 	const IPAddress& address(unsigned index = 0) const;
 		/// Returns the IP address bound to the interface at index position.
 
@@ -236,9 +246,6 @@ public:
 
 	static NetworkInterface forIndex(unsigned index);
 		/// Returns the NetworkInterface for the given interface index.
-		/// If an index of 0 is specified, a NetworkInterface instance
-		/// representing the default interface (empty name and
-		/// wildcard address) is returned.
 		///
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the given index does not exist (or IPv6 is not
@@ -326,6 +333,9 @@ inline bool NetworkInterface::operator == (const NetworkInterface& other) const
 
 
 Net_API std::ostream& operator<<(std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac);
+
+
+#endif // POCO_NET_HAS_INTERFACE
 
 
 #endif // Net_NetworkInterface_INCLUDED

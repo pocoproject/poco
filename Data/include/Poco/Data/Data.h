@@ -63,7 +63,11 @@
 
 
 #if !defined(Data_API)
-	#define Data_API
+	#if defined (__GNUC__) && (__GNUC__ >= 4)
+		#define Data_API __attribute__ ((visibility ("default")))
+	#else
+		#define Data_API
+	#endif
 #endif
 
 

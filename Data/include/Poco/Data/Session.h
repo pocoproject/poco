@@ -47,6 +47,7 @@
 #include "Poco/Data/Binding.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Any.h"
+#include <algorithm>
 
 
 namespace Poco {
@@ -502,6 +503,7 @@ inline void swap(Session& s1, Session& s2)
 
 namespace std
 {
+	using std::swap;
 	template<>
 	inline void swap<Poco::Data::Session>(Poco::Data::Session& s1, 
 		Poco::Data::Session& s2)

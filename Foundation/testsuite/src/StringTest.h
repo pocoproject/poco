@@ -56,6 +56,7 @@ public:
 	void testTrimInPlace();
 	void testToUpper();
 	void testToLower();
+	void testIstring();
 	void testIcompare();
 	void testTranslate();
 	void testTranslateInPlace();

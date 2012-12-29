@@ -67,9 +67,6 @@ SocketImpl::SocketImpl():
 	_sockfd(POCO_INVALID_SOCKET),
 	_blocking(true)
 {
-#if defined(_WIN32)
-	Poco::Net::initializeNetwork();
-#endif
 }
 
 
@@ -77,18 +74,12 @@ SocketImpl::SocketImpl(poco_socket_t sockfd):
 	_sockfd(sockfd),
 	_blocking(true)
 {
-#if defined(_WIN32)
-	Poco::Net::initializeNetwork();
-#endif
 }
 
 
 SocketImpl::~SocketImpl()
 {
 	close();
-#if defined(_WIN32)
-	Poco::Net::uninitializeNetwork();
-#endif
 }
 
 	

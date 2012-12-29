@@ -12,6 +12,10 @@ objects = Page PageReader \
 	CodeWriter ApacheCodeWriter OSPCodeWriter \
 	PageCompiler
 
+ifdef POCO_UNBUNDLED
+	SYSLIBS += -lz -lpcre -lexpat
+endif
+
 target         = cpspc
 target_version = 1
 target_libs    = PocoNet PocoUtil PocoXML PocoFoundation

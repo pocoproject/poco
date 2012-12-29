@@ -35,6 +35,11 @@
 
 
 #include "Poco/Net/MulticastSocket.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "Poco/Net/NetException.h"
 #include <cstring>
 
@@ -263,3 +268,6 @@ void MulticastSocket::leaveGroup(const IPAddress& groupAddress, const NetworkInt
 
 
 } } // namespace Poco::Net
+
+
+#endif // POCO_NET_HAS_INTERFACE

@@ -46,9 +46,10 @@ CppUnit::Test* SocketsTestSuite::suite()
 	pSuite->addTest(SocketTest::suite());
 	pSuite->addTest(SocketStreamTest::suite());
 	pSuite->addTest(DatagramSocketTest::suite());
-	pSuite->addTest(MulticastSocketTest::suite());
 	pSuite->addTest(DialogSocketTest::suite());
 	pSuite->addTest(RawSocketTest::suite());
-
+#ifdef POCO_NET_HAS_INTERFACE
+	pSuite->addTest(MulticastSocketTest::suite());
+#endif
 	return pSuite;
 }

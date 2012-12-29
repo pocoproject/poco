@@ -43,7 +43,7 @@
 #include "Poco/ActiveMethod.h"
 #include "Poco/ActiveResult.h"
 #include "Poco/String.h"
-#include "Poco/Exception.h"
+#include "Poco/Data/DataException.h"
 #include "sqlite3.h"
 #include <cstdlib>
 
@@ -60,7 +60,7 @@ const std::string SessionImpl::ABORT_TRANSACTION("ROLLBACK");
 
 SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	Poco::Data::AbstractSessionImpl<SessionImpl>(fileName, loginTimeout),
-	_connector(toLower(Connector::KEY)),
+	_connector(Connector::KEY),
 	_pDB(0),
 	_connected(false),
 	_isTransaction(false)
@@ -193,6 +193,14 @@ void SessionImpl::open(const std::string& connect)
 	} catch (SQLiteException& ex)
 	{
 		throw ConnectionFailedException(ex.displayText());
+	}
+
+	if (SQLITE_OK != sqlite3_exec(_pDB,
+		"attach database ':memory:' as sys;"
+		"create table sys.dual (dummy);", 
+		0, 0, 0))
+	{
+		throw ExecutionException("Cannot create system database.");
 	}
 
 	_connected = true;

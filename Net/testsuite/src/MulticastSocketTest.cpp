@@ -31,6 +31,11 @@
 
 
 #include "MulticastSocketTest.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "MulticastEchoServer.h"
@@ -94,3 +99,6 @@ CppUnit::Test* MulticastSocketTest::suite()
 
 	return pSuite;
 }
+
+
+#endif // POCO_NET_HAS_INTERFACE

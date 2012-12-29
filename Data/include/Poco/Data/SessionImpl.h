@@ -227,7 +227,7 @@ inline std::size_t SessionImpl::getLoginTimeout() const
 inline std::string SessionImpl::uri(const std::string& connector,
 	const std::string& connectionString)
 {
-	return format("%s:///%s", toLower(connector), connectionString);
+	return format("%s:///%s", connector, connectionString);
 }
 
 

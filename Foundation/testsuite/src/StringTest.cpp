@@ -54,6 +54,8 @@ using Poco::toUpperInPlace;
 using Poco::toLower;
 using Poco::toLowerInPlace;
 using Poco::icompare;
+using Poco::istring;
+using Poco::isubstr;
 using Poco::translate;
 using Poco::translateInPlace;
 using Poco::replace;
@@ -225,6 +227,36 @@ void StringTest::testToLower()
 		std::string s = "aBC";
 		assert (toLowerInPlace(s) == "abc");
 	}
+}
+
+
+void StringTest::testIstring()
+{
+	istring is1 = "AbC";
+	istring is2 = "aBc";
+	assert (is1 == is2);
+
+	const char c1[] = { 'G', 0, (char) 0xFC, 'n', 't', 'e', 'r', '\0' };
+	const char c2[] = { 'g', 0, (char) 0xDC, 'N', 'T', 'E', 'R', '\0' };
+	is1 = c1;
+	is2 = c2;
+	assert (is1 == is2);
+	is1[0] = 'f';
+	assert (is1 < is2);
+	is1[0] = 'F';
+	assert (is1 < is2);
+	is1[0] = 'H';
+	assert (is1 > is2);
+	is1[0] = 'h';
+	assert (is1 > is2);
+
+	is1 = "aAaBbBcCc";
+	is2 = "bbb";
+	assert (isubstr(is1, is2) == 3);
+	is2 = "bC";
+	assert (isubstr(is1, is2) == 5);
+	is2 = "xxx";
+	assert (isubstr(is1, is2) == istring::npos);
 }
 
 
@@ -633,8 +665,11 @@ void StringTest::testStringToDouble()
 
 void StringTest::testStringToFloatError()
 {
-	const char ds = decimalSeparator();
-	const char ts = thousandSeparator();
+	char ds = decimalSeparator();
+	if (ds == 0) ds = '.';
+	char ts = thousandSeparator();
+	if (ts == 0) ts = ',';
+	assert (ds != ts);
 
 	double result = 0.0;
 	assert (!strToDouble(format("a12%c3", ds), result));
@@ -918,7 +953,7 @@ void StringTest::testIntToString()
 	try
 	{
 		char pResult[POCO_MAX_INT_STRING_LEN];
-		unsigned sz = POCO_MAX_INT_STRING_LEN;
+		std::size_t sz = POCO_MAX_INT_STRING_LEN;
 		intToStr(0, 10, pResult, sz, false, sz + 1, ' ');
 		fail ("must throw RangeException");
 	} catch (RangeException&) { }
@@ -1044,6 +1079,7 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testTrimRightInPlace);
 	CppUnit_addTest(pSuite, StringTest, testToUpper);
 	CppUnit_addTest(pSuite, StringTest, testToLower);
+	CppUnit_addTest(pSuite, StringTest, testIstring);
 	CppUnit_addTest(pSuite, StringTest, testIcompare);
 	CppUnit_addTest(pSuite, StringTest, testTranslate);
 	CppUnit_addTest(pSuite, StringTest, testTranslateInPlace);

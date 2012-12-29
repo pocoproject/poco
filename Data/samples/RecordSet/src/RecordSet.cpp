@@ -32,6 +32,7 @@
 
 
 #include "Poco/SharedPtr.h"
+#include "Poco/DateTime.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/RecordSet.h"
@@ -41,6 +42,7 @@
 
 
 using namespace Poco::Data::Keywords;
+using Poco::DateTime;
 using Poco::Data::Session;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
@@ -66,11 +68,13 @@ int main(int argc, char** argv)
 	session << "DROP TABLE IF EXISTS Person", now;
 	
 	// (re)create table
-	session << "CREATE TABLE Person (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3))", now;
+	session << "CREATE TABLE Person (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3), Birthday DATE)", now;
 	
 	// insert some rows
-	session << "INSERT INTO Person VALUES('Bart Simpson', 'Springfield', 12)", now;
-	session << "INSERT INTO Person VALUES('Lisa Simpson', 'Springfield', 10)", now;
+	DateTime bd(1980, 4, 1);
+	DateTime ld(1982, 5, 9);
+	session << "INSERT INTO Person VALUES('Bart Simpson', 'Springfield', 12, ?)", use(bd), now;
+	session << "INSERT INTO Person VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(ld), now;
 		
 	// a simple query
 	Statement select(session);

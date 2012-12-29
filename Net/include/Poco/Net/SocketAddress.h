@@ -64,16 +64,20 @@ public:
 		/// Creates a wildcard (all zero) IPv4 SocketAddress.
 
 	SocketAddress(const IPAddress& host, Poco::UInt16 port);
-		/// Creates a SocketAddress from an IP address and a port number.
+		/// Creates a SocketAddress from an IP address and given port number.
+
+	SocketAddress(Poco::UInt16 port);
+		/// Creates a SocketAddress with unspecified (wildcard) IP address 
+		/// and given port number.
 
 	SocketAddress(const std::string& host, Poco::UInt16 port);
-		/// Creates a SocketAddress from an IP address and a port number.
+		/// Creates a SocketAddress from an IP address and given port number.
 		///
 		/// The IP address must either be a domain name, or it must
 		/// be in dotted decimal (IPv4) or hex string (IPv6) format.
 
 	SocketAddress(const std::string& host, const std::string& port);
-		/// Creates a SocketAddress from an IP address and a
+		/// Creates a SocketAddress from an IP address and the
 		/// service name or port number.
 		///
 		/// The IP address must either be a domain name, or it must
@@ -83,7 +87,7 @@ public:
 		/// a service name.
 
 	explicit SocketAddress(const std::string& hostAndPort);
-		/// Creates a SocketAddress from an IP address or host name and a
+		/// Creates a SocketAddress from an IP address or host name and the
 		/// port number/service name. Host name/address and port number must
 		/// be separated by a colon. In case of an IPv6 address,
 		/// the address part must be enclosed in brackets.

@@ -35,6 +35,11 @@
 
 
 #include "Poco/Net/NetworkInterface.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
@@ -612,6 +617,19 @@ const IPAddress& NetworkInterface::firstAddress(IPAddress::Family family) const
 }
 
 
+void NetworkInterface::firstAddress(IPAddress& addr, IPAddress::Family family) const
+{
+	try
+	{
+		addr = firstAddress(family);
+	}
+	catch (NotFoundException&)
+	{
+		addr = IPAddress(family);
+	}
+}
+
+
 void NetworkInterface::addAddress(const IPAddress& address)
 {
 	_pImpl->addAddress(AddressTuple(address, IPAddress(), IPAddress()));
@@ -770,8 +788,8 @@ NetworkInterface NetworkInterface::forAddress(const IPAddress& addr)
 
 	for (; it != end; ++it)
 	{
-		const unsigned count = it->second.addressList().size();
-		for (unsigned i = 0; i < count; ++i)
+		const std::size_t count = it->second.addressList().size();
+		for (int i = 0; i < count; ++i)
 		{
 			if (it->second.address(i) == addr)
 				return it->second;
@@ -936,7 +954,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		pAddress = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(memory.begin()); // leave in the loop, begin may change after resize
 		poco_assert (memory.capacity() >= outBufLen);
 		if (ERROR_BUFFER_OVERFLOW == (dwRetVal = GetAdaptersAddresses(family, flags, 0, pAddress, &outBufLen)))
-			memory.resize(outBufLen); // adjust size and try again
+			memory.resize(outBufLen, false); // adjust size and try again
 		else if (ERROR_NO_DATA == dwRetVal) // no network interfaces found
 			return result;
 		else if (NO_ERROR != dwRetVal) // error occurred
@@ -1527,3 +1545,6 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 
 
 #endif
+
+
+#endif // POCO_NET_HAS_INTERFACE

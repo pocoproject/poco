@@ -44,6 +44,7 @@
 #include "Poco/Data/Row.h"
 #include "Poco/Dynamic/Var.h"
 #include <iterator>
+#include <algorithm>
 
 
 namespace Poco {
@@ -158,6 +159,7 @@ inline bool RowIterator::operator != (const RowIterator& other) const
 
 namespace std
 {
+	using std::swap;
 	template<>
 	inline void swap<Poco::Data::RowIterator>(Poco::Data::RowIterator& s1, 
 		Poco::Data::RowIterator& s2)

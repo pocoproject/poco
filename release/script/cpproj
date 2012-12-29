@@ -35,7 +35,6 @@ cp ${src}/*.sln ${dst}
 cp ${src}/*.vcproj ${dst}
 cp ${src}/*.vcxproj ${dst}
 cp ${src}/*.vcxproj.filters ${dst}
-cp ${src}/*.vcxproj.user ${dst}
 cp ${src}/Makefile* ${dst}
 cp ${src}/*.make ${dst}
 cp ${src}/*.progen ${dst}
@@ -72,7 +71,6 @@ if [ -d ${src}/testsuite ] ; then
 	cp ${src}/testsuite/*.vcproj ${dst}/testsuite
 	cp ${src}/testsuite/*.vcxproj ${dst}/testsuite
 	cp ${src}/testsuite/*.vcxproj.filters ${dst}/testsuite
-	cp ${src}/testsuite/*.vcxproj.user ${dst}/testsuite
 	cp ${src}/testsuite/Makefile* ${dst}/testsuite
 	cp ${src}/testsuite/*.make ${dst}/testsuite
 	cp ${src}/testsuite/*.progen ${dst}/testsuite
@@ -149,7 +147,6 @@ if [ -d ${src}/samples ] ; then
 			cp ${src}/samples/${sample}/*.vcproj ${dst}/samples/${sample}
 			cp ${src}/samples/${sample}/*.vcxproj ${dst}/samples/${sample}
 			cp ${src}/samples/${sample}/*.vcxproj.filters ${dst}/samples/${sample}
-			cp ${src}/samples/${sample}/*.vcxproj.user ${dst}/samples/${sample}
 			cp ${src}/samples/${sample}/Makefile* ${dst}/samples/${sample}
 			cp ${src}/samples/${sample}/*.make ${dst}/samples/${sample}
 			cp ${src}/samples/${sample}/*.progen ${dst}/samples/${sample}

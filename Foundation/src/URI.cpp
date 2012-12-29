@@ -595,14 +595,18 @@ void URI::encode(const std::string& str, const std::string& reserved, std::strin
 }
 
 	
-void URI::decode(const std::string& str, std::string& decodedStr)
+void URI::decode(const std::string& str, std::string& decodedStr, bool plusAsSpace)
 {
+	bool inQuery = false;
 	std::string::const_iterator it  = str.begin();
 	std::string::const_iterator end = str.end();
 	while (it != end)
 	{
 		char c = *it++;
-		if (c == '%')
+		if (c == '?') inQuery = true;
+		// spaces may be encoded as plus signs in the query
+		if (inQuery && plusAsSpace && c == '+') c = ' ';
+		else if (c == '%')
 		{
 			if (it == end) throw SyntaxException("URI encoding: no hex digit following percent sign", str);
 			char hi = *it++;

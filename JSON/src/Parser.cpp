@@ -38,6 +38,7 @@
 #include "Poco/JSON/JSONException.h"
 #include "Poco/Ascii.h"
 #include "Poco/Token.h"
+#include "Poco/UnicodeConverter.h"
 #undef min
 #undef max
 #include <limits>
@@ -140,28 +141,28 @@ public:
 				switch(c)
 				{
 				case '"' :
-					c = '"';
+					_value += '"';
 					break;
 				case '\\' :
-					c = '\\';
+					_value += '\\';
 					break;
 				case '/' :
-					c = '/';
+					_value += '/';
 					break;
 				case 'b' :
-					c = '\b';
+					_value += '\b';
 					break;
 				case 'f' :
-					c = '\f';
+					_value += '\f';
 					break;
 				case 'n' :
-					c = '\n';
+					_value += '\n';
 					break;
 				case 'r' :
-					c = '\r';
+					_value += '\r';
 					break;
 				case 't' :
-					c = '\t';
+					_value += '\t';
 					break;
 				case 'u' : // Unicode
 				{
@@ -196,7 +197,11 @@ public:
 					{
 						throw JSONException("Invalid unicode");
 					}
-					c = unicode;
+					//unicode to utf8
+					std::string utf8;
+					UnicodeConverter::toUTF8((const UTF32Char*)&unicode,1,utf8);
+					_value += utf8;
+
 					break;
 				}
 				default:
@@ -204,8 +209,9 @@ public:
 					throw JSONException(format("Invalid escape '%c' character used", (char) c));
 				}
 				}
+			}else{
+				_value += c;
 			}
-			_value += c;
 			c = istr.get();
 		}
 
@@ -575,18 +581,20 @@ void Parser::readValue(const Token* token)
 	case Token::INTEGER_LITERAL_TOKEN:
 		if ( _handler != NULL )
 		{
-			int value = token->asInteger();
 #if defined(POCO_HAVE_INT64)
-			if (    value == std::numeric_limits<int>::max() 
-			     || value == std::numeric_limits<int>::min() )
-			{
-				_handler->value(NumberParser::parse64(token->asString()));
-			}
-			else
-			{
-				_handler->value(token->asInteger());
-			}
+            Int64 value = token->asInteger64();
+            // if number is 32-bit, then handle as such
+			if (    value > std::numeric_limits<int>::max()
+                || value < std::numeric_limits<int>::min() )
+            {
+                _handler->value(value);
+            }
+            else
+            {
+                _handler->value(static_cast<int>(value));
+            }
 #else
+			int value = token->asInteger();
 			_handle->value(value);
 #endif
 		}

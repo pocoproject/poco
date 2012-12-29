@@ -23,6 +23,9 @@ SET(PROJECT_VERSION ${COMPLETE_VERSION})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+# Append our module directory to CMake
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
@@ -50,10 +53,10 @@ endif ()
 #    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL) 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   message(STATUS "Debug output enabled")
-  set(LIB_EXT "d" CACHE STRING "Set debug library postfix" FORCE)
+  set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set debug library postfix" FORCE)
 else ()
   message(STATUS "Optimized output enabled")
-  set(LIB_EXT "" CACHE STRING "Set debug library postfix" FORCE)
+  set(CMAKE_DEBUG_POSTFIX "" CACHE STRING "Set debug library postfix" FORCE)
 endif ()
 
 option(ENABLE_TESTS
@@ -98,9 +101,9 @@ include(FindCygwin)
 include(FindOpenSSL)
 #include(CMakeDetermineCompilerId)
 
-include(contrib/cmake/FindMySQL.cmake)
-include(contrib/cmake/FindAPR.cmake)
-include(contrib/cmake/FindApache2.cmake)
+include(FindMySQL)
+include(FindAPR)
+include(FindApache2)
 
 # OS Detection
 if(CMAKE_SYSTEM MATCHES "Windows")
@@ -179,7 +182,7 @@ endif(APRUTIL_FOUND AND APACHE_FOUND)
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ
 CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/contrib/cmake/cmake_uninstall.cmake.in"
+  "${CMAKE_MODULE_PATH}/cmake_uninstall.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
   IMMEDIATE @ONLY)
 

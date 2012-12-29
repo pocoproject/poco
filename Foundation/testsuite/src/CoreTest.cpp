@@ -128,10 +128,10 @@ void CoreTest::testFixedLength()
 	assert (sizeof(Poco::UInt16) == 2);
 	assert (sizeof(Poco::Int32) == 4);
 	assert (sizeof(Poco::UInt32) == 4);
-	#if defined(POCO_HAVE_INT64)
+#if defined(POCO_HAVE_INT64)
 	assert (sizeof(Poco::Int64) == 8);
 	assert (sizeof(Poco::UInt64) == 8);
-	#endif
+#endif
 	assert (sizeof(Poco::IntPtr) == sizeof(void*));
 	assert (sizeof(Poco::UIntPtr) == sizeof(void*));	
 }
@@ -201,7 +201,9 @@ void CoreTest::testBuffer()
 	std::size_t s = 10;
 	Buffer<int> b(s);
 	assert (b.size() == s);
+	assert (b.sizeBytes() == s * sizeof(int));
 	assert (b.capacity() == s);
+	assert (b.capacityBytes() == s * sizeof(int));
 	std::vector<int> v;
 	for (int i = 0; i < s; ++i)
 		v.push_back(i);
