@@ -859,6 +859,35 @@ void JSONTest::testTemplate()
 }
 
 
+void JSONTest::testUnicode()
+{
+	const unsigned char supp[] = {0x61, 0xE1, 0xE9, 0x78, 0xED, 0xF3, 0xFA, 0x0};
+	std::string text((const char*) supp);
+
+	std::string json = "{ \"test\" : \"a\u00E1\u00E9x\u00ED\u00F3\u00FA\" }";
+	Parser parser;
+
+	Var result;
+	try
+	{
+		DefaultHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
+	assert(test.convert<std::string>() == text);
+}
+
+
 std::string JSONTest::getTestFilesPath(const std::string& type)
 {
 	std::ostringstream ostr;
@@ -918,6 +947,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testTemplate);
+	CppUnit_addTest(pSuite, JSONTest, testUnicode);
 
 	return pSuite;
 }
