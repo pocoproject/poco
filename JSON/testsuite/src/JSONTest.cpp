@@ -861,10 +861,10 @@ void JSONTest::testTemplate()
 
 void JSONTest::testUnicode()
 {
-	const unsigned char supp[] = {0x61, 0xE1, 0xE9, 0x78, 0xED, 0xF3, 0xFA, 0x0};
+	const unsigned char supp[] = {0x61, 0xC3, 0xA1, 0xC3, 0xA9, 0xC3, 0xAD, 0x78, 0xC3, 0xB3, 0xC3, 0xBA, 0x0};
 	std::string text((const char*) supp);
 
-	std::string json = "{ \"test\" : \"a\u00E1\u00E9x\u00ED\u00F3\u00FA\" }";
+	std::string json = "{ \"test\" : \"a\\u00E1\\u00E9\\u00EDx\\u00F3\\u00FA\" }";
 	Parser parser;
 
 	Var result;
