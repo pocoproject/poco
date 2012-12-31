@@ -162,7 +162,7 @@ public:
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
 		
-	int run(const std::vector<std::string>& args);
+	int run(const ArgVec& args);
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
 
@@ -265,7 +265,7 @@ private:
 	#define POCO_SERVER_MAIN(App) \
 	int pocoSrvMain(const char* appName, ...) 				\
 	{ 														\
-		std::vector<std::string> args; 						\
+		ArgVec args; 						\
 		args.push_back(std::string(appName)); 				\
 		va_list vargs; 										\
 		va_start(vargs, appName); 							\

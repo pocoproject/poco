@@ -134,6 +134,8 @@ public:
 		PRIO_SYSTEM      = 100
 	};
 	
+	typedef std::vector<std::string> ArgVec;
+
 	Application();
 		/// Creates the Application.
 
@@ -168,7 +170,7 @@ public:
 		/// Unicode command line arguments from wmain().
 #endif
 
-	void init(const std::vector<std::string>& args);
+	void init(const ArgVec& args);
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g., 
 		/// "application.path", "application.name", etc.).
@@ -336,7 +338,7 @@ protected:
 	void setLogger(Poco::Logger& logger);
 		/// Sets the logger used by the application.
 
-	virtual int main(const std::vector<std::string>& args);
+	virtual int main(const ArgVec& args);
 		/// The application's main logic.
 		///
 		/// Unprocessed command line arguments are passed in args.
@@ -361,13 +363,15 @@ protected:
 	void init();
 		/// Common initialization code.
 
+	const ArgVec& getArgs() const;
+
 	~Application();
 		/// Destroys the Application and deletes all registered subsystems.
 
 private:
 	void setup();
 	void setArgs(int argc, char* argv[]);
-	void setArgs(const std::vector<std::string>& args);
+	void setArgs(const ArgVec& args);
 	void getApplicationPath(Poco::Path& path) const;
 	void processOptions();
 	bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
@@ -375,7 +379,6 @@ private:
 	typedef Poco::AutoPtr<Subsystem> SubsystemPtr;
 	typedef std::vector<SubsystemPtr> SubsystemVec;
 	typedef Poco::AutoPtr<LayeredConfiguration> ConfigPtr;
-	typedef std::vector<std::string> ArgVec;
 	
 	ConfigPtr       _pConfig;
 	SubsystemVec    _subsystems;
@@ -463,6 +466,12 @@ inline Poco::Timespan Application::uptime() const
 }
 
 
+inline const Application::ArgVec& Application::getArgs() const
+{
+	return _args;
+}
+
+
 } } // namespace Poco::Util
 
 
@@ -489,7 +498,7 @@ inline Poco::Timespan Application::uptime() const
 	#define POCO_APP_MAIN(App) \
 	int pocoAppMain(const char* appName, ...) \
 	{ \
-		std::vector<std::string> args; \
+		ArgVec args; \
 		args.push_back(std::string(appName)); \
 		va_list vargs; \
 		va_start(vargs, appName); \
