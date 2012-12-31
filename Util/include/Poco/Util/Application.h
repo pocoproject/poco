@@ -273,6 +273,9 @@ public:
 	const OptionSet& options() const;
 		/// Returns the application's option set.
 
+	const ArgVec& getArgs() const;
+		/// Returns the application's command-line arguments.
+
 	static Application& instance();
 		/// Returns a reference to the Application singleton.
 		///
@@ -365,8 +368,6 @@ protected:
 
 	void init();
 		/// Common initialization code.
-
-	const ArgVec& getArgs() const;
 
 	~Application();
 		/// Destroys the Application and deletes all registered subsystems.
