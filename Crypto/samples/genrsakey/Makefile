@@ -18,6 +18,10 @@ objects = genrsakey
 
 target         = genrsakey
 target_version = 1
-target_libs    = PocoCrypto PocoUtil PocoXML PocoFoundation
+target_libs    = PocoCrypto PocoUtil PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
+
+ifdef POCO_UNBUNDLED
+        SYSLIBS += -lpcre -lexpat
+endif
