@@ -173,7 +173,7 @@ void NetworkInterfaceTest::testForAddress()
 
 			IPAddress addr(IPAddress::IPv4);
 			assert (addr.isWildcard());
-			it->second.firstAddress(addr, IPAddress::IPv4);
+			addr = it->second.firstAddressNoThrow(IPAddress::IPv4);
 			assert (addr.isWildcard());
 		}
 	}
