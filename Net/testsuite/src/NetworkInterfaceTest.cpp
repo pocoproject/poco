@@ -151,15 +151,15 @@ void NetworkInterfaceTest::testForAddress()
 		// not all interfaces have IP configured
 		if (it->second.addressList().empty()) continue;
 
-		IPAddress first = it->second.firstAddress(IPAddress::IPv4);
-		if (it->second.supportsIPv4())
+		IPAddress first = it->second.firstAddressNoThrow(IPAddress::IPv4);
+		if (!first.isWildcard())
 		{
-			NetworkInterface ifc = NetworkInterface::forAddress(it->second.firstAddress(IPAddress::IPv4));
+			NetworkInterface ifc = NetworkInterface::forAddress(first);
 			assert (ifc.firstAddress(IPAddress::IPv4) == it->second.firstAddress(IPAddress::IPv4));
 
 			IPAddress addr(IPAddress::IPv4);
 			assert (addr.isWildcard());
-			it->second.firstAddress(addr, IPAddress::IPv4);
+			addr = it->second.firstAddressNoThrow(IPAddress::IPv4);
 			assert (!addr.isWildcard());
 		}
 		else
