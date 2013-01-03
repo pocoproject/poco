@@ -38,6 +38,7 @@
 #include "Poco/JSON/JSONException.h"
 #include "Poco/Ascii.h"
 #include "Poco/Token.h"
+#include "Poco/UTF8Encoding.h"
 #undef min
 #undef max
 #include <limits>
@@ -66,11 +67,11 @@ public:
 	bool start(char c, std::istream& istr)
 	{
 		if (   c == '{'
-		        || c == '}'
-		        || c == ']'
-		        || c == '['
-		        || c == ','
-		        || c == ':' )
+				|| c == '}'
+				|| c == ']'
+				|| c == '['
+				|| c == ','
+				|| c == ':' )
 		{
 			_value = c;
 			return true;
@@ -118,8 +119,8 @@ public:
 
 	void finish(std::istream& istr)
 	{
-		int c = istr.get();
-		while (c != -1)
+		int c = 0;
+		while ((c = istr.get()) != -1)
 		{
 			if ( c == 0 )
 			{
@@ -133,6 +134,31 @@ public:
 
 			if ( c == '"' )
 				break;
+				
+			if(0x80 <= c && c <= 0xFF)
+			{
+				int count = utf8_check_first(c);
+				if (!count)
+				{
+					throw JSONException(format("Unable to decode byte 0x%x", (unsigned int) c));
+				}
+
+				char buffer[5];
+				buffer[0] = c;
+				for(int i = 1; i < count; ++i)
+				{
+					buffer[i] = istr.get();
+				}
+				
+				if ( !UTF8Encoding::isLegal((unsigned char*) buffer, count) )
+				{
+					throw JSONException("No legal UTF8 found");
+				}
+				buffer[count] = '\0';
+				_value += buffer;
+
+				continue;
+			}
 
 			if ( c == '\\' ) // Escaped String
 			{
@@ -196,8 +222,17 @@ public:
 					{
 						throw JSONException("Invalid unicode");
 					}
-					c = unicode;
-					break;
+					
+					Poco::UTF8Encoding utf8encoding;
+					int length = utf8encoding.convert(unicode, NULL, 0);
+					unsigned char convert[length];
+					utf8encoding.convert(unicode, convert, length);
+					for(int i = 0; i < length; ++i)
+					{
+						_value += (char) convert[i];
+					}
+					//c = unicode;
+					continue;
 				}
 				default:
 				{
@@ -206,7 +241,6 @@ public:
 				}
 			}
 			_value += c;
-			c = istr.get();
 		}
 
 		if ( c == -1 )
@@ -240,6 +274,49 @@ public:
 		}
 
 		return value;
+	}
+	
+private:
+	int utf8_check_first(char byte)
+	{
+		unsigned char u = (unsigned char) byte;
+
+		if(u < 0x80)
+			return 1;
+
+		if (0x80 <= u && u <= 0xBF) 
+		{
+			/* second, third or fourth byte of a multi-byte
+			sequence, i.e. a "continuation byte" */
+			return 0;
+		}
+		else if(u == 0xC0 || u == 0xC1) 
+		{
+			/* overlong encoding of an ASCII byte */
+			return 0;
+		}
+		else if(0xC2 <= u && u <= 0xDF) 
+		{
+			/* 2-byte sequence */
+			return 2;
+		}
+		else if(0xE0 <= u && u <= 0xEF) 
+		{
+			/* 3-byte sequence */
+			return 3;
+		}
+		else if(0xF0 <= u && u <= 0xF4) 
+		{
+			/* 4-byte sequence */
+			return 4;
+		}
+		else 
+		{ 
+			/* u >= 0xF5 */
+			/* Restricted (start of 4-, 5- or 6-byte sequence) or invalid
+			UTF-8 */
+			return 0;
+		}
 	}
 };
 
@@ -524,7 +601,7 @@ bool Parser::readRow(bool firstCall)
 		token = nextToken();
 
 		if (    token->is(Token::SEPARATOR_TOKEN)
-		        && token->asChar() == ':' )
+				&& token->asChar() == ':' )
 		{
 			readValue(nextToken());
 
@@ -576,17 +653,17 @@ void Parser::readValue(const Token* token)
 		if ( _handler != NULL )
 		{
 #if defined(POCO_HAVE_INT64)
-            Int64 value = token->asInteger64();
-            // if number is 32-bit, then handle as such
+			Int64 value = token->asInteger64();
+			// if number is 32-bit, then handle as such
 			if (    value > std::numeric_limits<int>::max()
-                || value < std::numeric_limits<int>::min() )
-            {
-                _handler->value(value);
-            }
-            else
-            {
-                _handler->value(static_cast<int>(value));
-            }
+				|| value < std::numeric_limits<int>::min() )
+			{
+				_handler->value(value);
+			}
+			else
+			{
+				_handler->value(static_cast<int>(value));
+			}
 #else
 			int value = token->asInteger();
 			_handle->value(value);
@@ -637,17 +714,19 @@ void Parser::readValue(const Token* token)
 		}
 		break;
 	case Token::SEPARATOR_TOKEN:
-	{
-		if ( token->asChar() == '{' )
 		{
-			readObject();
+			if ( token->asChar() == '{' )
+			{
+				readObject();
+			}
+			else if ( token->asChar() == '[' )
+			{
+				readArray();
+			}
+			break;
 		}
-		else if ( token->asChar() == '[' )
-		{
-			readArray();
-		}
-		break;
-	}
+	case Token::INVALID_TOKEN:
+		throw JSONException(format("Invalid token '%s' found", token->asString()));
 	}
 }
 

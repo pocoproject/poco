@@ -75,6 +75,8 @@ public:
 	void testInvalidJanssonFiles();
 	void testTemplate();
 	void testItunes();
+	void testUnicode(); 
+	void testInvalidUnicodeJanssonFiles();
 
 	void setUp();
 	void tearDown();
