@@ -225,13 +225,13 @@ public:
 					
 					Poco::UTF8Encoding utf8encoding;
 					int length = utf8encoding.convert(unicode, NULL, 0);
-					unsigned char convert[length];
+					unsigned char* convert = new unsigned char[length];
 					utf8encoding.convert(unicode, convert, length);
 					for(int i = 0; i < length; ++i)
 					{
 						_value += (char) convert[i];
 					}
-					//c = unicode;
+					delete[] convert;
 					continue;
 				}
 				default:
