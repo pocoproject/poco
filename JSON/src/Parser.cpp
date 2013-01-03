@@ -38,7 +38,6 @@
 #include "Poco/JSON/JSONException.h"
 #include "Poco/Ascii.h"
 #include "Poco/Token.h"
-#include "Poco/UnicodeConverter.h"
 #undef min
 #undef max
 #include <limits>
@@ -141,28 +140,28 @@ public:
 				switch(c)
 				{
 				case '"' :
-					_value += '"';
+					c = '"';
 					break;
 				case '\\' :
-					_value += '\\';
+					c = '\\';
 					break;
 				case '/' :
-					_value += '/';
+					c = '/';
 					break;
 				case 'b' :
-					_value += '\b';
+					c = '\b';
 					break;
 				case 'f' :
-					_value += '\f';
+					c = '\f';
 					break;
 				case 'n' :
-					_value += '\n';
+					c = '\n';
 					break;
 				case 'r' :
-					_value += '\r';
+					c = '\r';
 					break;
 				case 't' :
-					_value += '\t';
+					c = '\t';
 					break;
 				case 'u' : // Unicode
 				{
@@ -197,11 +196,7 @@ public:
 					{
 						throw JSONException("Invalid unicode");
 					}
-					//unicode to utf8
-					std::string utf8;
-					UnicodeConverter::toUTF8((const UTF32Char*)&unicode,1,utf8);
-					_value += utf8;
-
+					c = unicode;
 					break;
 				}
 				default:
@@ -209,9 +204,8 @@ public:
 					throw JSONException(format("Invalid escape '%c' character used", (char) c));
 				}
 				}
-			}else{
-				_value += c;
 			}
+			_value += c;
 			c = istr.get();
 		}
 
