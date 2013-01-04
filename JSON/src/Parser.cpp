@@ -225,13 +225,12 @@ public:
 					
 					Poco::UTF8Encoding utf8encoding;
 					int length = utf8encoding.convert(unicode, NULL, 0);
-					unsigned char* convert = new unsigned char[length];
-					utf8encoding.convert(unicode, convert, length);
+					std::vector<unsigned char> convert(length);
+					utf8encoding.convert(unicode, &convert[0], length);
 					for(int i = 0; i < length; ++i)
 					{
 						_value += (char) convert[i];
 					}
-					delete[] convert;
 					continue;
 				}
 				default:
