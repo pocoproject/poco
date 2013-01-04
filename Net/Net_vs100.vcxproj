@@ -273,6 +273,8 @@
     <ClInclude Include="include\Poco\Net\Net.h" />
     <ClInclude Include="include\Poco\Net\NetException.h" />
     <ClInclude Include="include\Poco\Net\NetworkInterface.h" />
+    <ClInclude Include="include\Poco\Net\ParallelSocketAcceptor.h" />
+    <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h" />
     <ClInclude Include="include\Poco\Net\SocketAddress.h" />
     <ClInclude Include="include\Poco\Net\SocketDefs.h" />
     <ClInclude Include="include\Poco\Net\DatagramSocket.h" />
