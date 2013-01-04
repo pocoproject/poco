@@ -33,6 +33,7 @@
 #include "JSONTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Query.h"
@@ -40,13 +41,17 @@
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/JSON/DefaultHandler.h"
 #include "Poco/JSON/Template.h"
+
 #include "Poco/Path.h"
 #include "Poco/Environment.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
 #include "Poco/Glob.h"
-#include <set>
+#include "Poco/UTF8Encoding.h"
+#include "Poco/Latin1Encoding.h"
+#include "Poco/TextConverter.h"
 
+#include <set>
 
 using namespace Poco::JSON;
 using namespace Poco::Dynamic;
@@ -71,22 +76,6 @@ void JSONTest::setUp()
 
 void JSONTest::tearDown()
 {
-}
-
-
-void JSONTest::testStringifier()
-{
-	Object obj;
-
-	Array arr;
-	Object obj2;
-
-	obj.set("array", arr);
-	obj.set("obj2", obj2);
-
-	std::ostringstream ostr;
-	obj.stringify(ostr);
-	assert (ostr.str() == "{\"array\":[],\"obj2\":{}}");
 }
 
 
@@ -845,6 +834,50 @@ void JSONTest::testInvalidJanssonFiles()
 }
 
 
+void JSONTest::testInvalidUnicodeJanssonFiles()
+{
+	Poco::Path pathPattern(getTestFilesPath("invalid-unicode"));
+
+	std::set<std::string> paths;
+	Poco::Glob::glob(pathPattern, paths);
+
+	for(std::set<std::string>::iterator it = paths.begin(); it != paths.end(); ++it)
+	{
+		Poco::Path filePath(*it, "input");
+
+		if ( filePath.isFile() )
+		{
+			Poco::File inputFile(filePath);
+			if ( inputFile.exists() )
+			{
+				Poco::FileInputStream fis(filePath.toString());
+				std::cout << filePath.toString() << std::endl;
+
+				Parser parser;
+				Var result;
+
+				try
+				{
+					DefaultHandler handler;
+					parser.setHandler(&handler);
+					parser.parse(fis);
+					result = handler.result();
+					// We shouldn't get here.
+					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl; 
+					fail(result.convert<std::string>());
+				}
+				catch(JSONException&)
+				{
+					continue;
+				}
+				catch(Poco::SyntaxException&)
+				{ }
+			}
+		}
+	}
+}
+
+
 void JSONTest::testTemplate()
 {
 	Template tpl;
@@ -858,6 +891,40 @@ void JSONTest::testTemplate()
 	tpl.render(data, std::cout);
 }
 
+void JSONTest::testUnicode()
+{
+	const unsigned char supp[] = {0x61, 0xE1, 0xE9, 0x78, 0xED, 0xF3, 0xFA, 0x0};
+	std::string text((const char*) supp);
+
+	std::string json = "{ \"test\" : \"a\\u00E1\\u00E9x\\u00ED\\u00F3\\u00FA\" }";
+	Parser parser;
+
+	Var result;
+	try
+	{
+		DefaultHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
+
+	Poco::Latin1Encoding latin1;
+	Poco::UTF8Encoding utf8;
+	Poco::TextConverter converter(latin1, utf8);
+	std::string original;
+	converter.convert(text, original);
+
+	assert(test.convert<std::string>() == original);
+}
 
 std::string JSONTest::getTestFilesPath(const std::string& type)
 {
@@ -879,8 +946,10 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 	if (Poco::File(pathPattern).exists())
 		validDir += '*';
 	else
+	{
+		std::cout << "Can't find " << validDir << std::endl;
 		throw Poco::NotFoundException("cannot locate directory containing valid JSON test files");
-
+	}
 	return validDir;
 }
 
@@ -889,7 +958,6 @@ CppUnit::Test* JSONTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("JSONTest");
 
-	CppUnit_addTest(pSuite, JSONTest, testStringifier);
 	CppUnit_addTest(pSuite, JSONTest, testNullProperty);
 	CppUnit_addTest(pSuite, JSONTest, testTrueProperty);
 	CppUnit_addTest(pSuite, JSONTest, testFalseProperty);
@@ -917,7 +985,9 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testQuery);
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidJanssonFiles);
+	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testTemplate);
+	CppUnit_addTest(pSuite, JSONTest, testUnicode);
 
 	return pSuite;
 }
