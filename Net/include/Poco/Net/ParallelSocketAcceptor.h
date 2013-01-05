@@ -75,7 +75,7 @@ class ParallelSocketAcceptor
 	/// details.
 {
 public:
-	typedef typename Poco::Net::ParallelSocketReactor<SR> ParallelReactor;
+	typedef Poco::Net::ParallelSocketReactor<SR> ParallelReactor;
 
 	explicit ParallelSocketAcceptor(ServerSocket& socket,
 		unsigned threads = Poco::Environment::processorCount()):

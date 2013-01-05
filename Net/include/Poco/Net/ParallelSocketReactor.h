@@ -91,7 +91,7 @@ protected:
 	void onIdle()
 	{
 		SR::onIdle();
-		Poco::Thread::sleep(100);
+		Poco::Thread::yield();
 	}
 	
 private:
