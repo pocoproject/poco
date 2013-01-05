@@ -284,6 +284,112 @@ void CoreTest::testBuffer()
 }
 
 
+void CoreTest::testFIFOBufferEOFAndError()
+{
+	typedef FIFOBuffer::Type T;
+
+	FIFOBuffer f(20, true);
+	
+	assert (f.isEmpty());
+	assert (!f.isFull());
+
+	Buffer<T> b(10);
+	std::vector<T> v;
+
+	f.readable += delegate(this, &CoreTest::onReadable);
+	f.writable += delegate(this, &CoreTest::onWritable);
+
+	for (T c = '0'; c < '0' +  10; ++c)
+		v.push_back(c);
+
+	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	assert(0 == _notToReadable);
+	assert(0 == _readableToNot);
+	assert (10 == f.write(b));
+	assert(1 == _notToReadable);
+	assert(0 == _readableToNot);
+	assert (20 == f.size());
+	assert (10 == f.used());
+	assert (!f.isEmpty());
+	f.setEOF();
+	assert(0 == _notToWritable);
+	assert(1 == _writableToNot);
+	assert (f.hasEOF());
+	assert (!f.isEOF());
+	assert(1 == _notToReadable);
+	assert(0 == _readableToNot);
+	assert (20 == f.size());
+	assert (10 == f.used());
+	assert (0 == f.write(b));
+	assert (!f.isEmpty());
+	assert (5 == f.read(b, 5));
+	assert(1 == _notToReadable);
+	assert(0 == _readableToNot);
+	assert (f.hasEOF());
+	assert (!f.isEOF());
+	assert (5 == f.read(b, 5));
+	assert(1 == _notToReadable);
+	assert(1 == _readableToNot);
+	assert (f.hasEOF());
+	assert (f.isEOF());
+	assert(0 == _notToWritable);
+	assert(1 == _writableToNot);
+
+	f.setEOF(false);
+	assert (!f.hasEOF());
+	assert (!f.isEOF());
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+	assert(1 == _notToReadable);
+	assert(1 == _readableToNot);
+
+	assert (5 == f.write(b));
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+	assert(2 == _notToReadable);
+	assert(1 == _readableToNot);
+	assert (20 == f.size());
+	assert (5 == f.used());
+	f.setError();
+	assert (0 == f.write(b));
+	
+	try
+	{
+		f.copy(b.begin(), 5);
+		fail ("must throw InvalidAccessException");
+	}
+	catch (InvalidAccessException&) { }
+
+	try
+	{
+		f.advance(5);
+		fail ("must throw InvalidAccessException");
+	}
+	catch (InvalidAccessException&) { }
+	
+	assert(1 == _notToWritable);
+	assert(2 == _writableToNot);
+	assert(2 == _notToReadable);
+	assert(2 == _readableToNot);
+	assert (20 == f.size());
+	assert (0 == f.used());
+	f.setError(false);
+	assert(2 == _notToWritable);
+	assert(2 == _writableToNot);
+	assert(2 == _notToReadable);
+	assert(2 == _readableToNot);
+	assert (20 == f.size());
+	assert (0 == f.used());
+	assert (5 == f.write(b));
+	assert(2 == _notToWritable);
+	assert(2 == _writableToNot);
+	assert(3 == _notToReadable);
+	assert(2 == _readableToNot);
+	assert (20 == f.size());
+	assert (5 == f.used());
+}
+
+
 void CoreTest::testFIFOBufferChar()
 {
 	typedef FIFOBuffer::Type T;
@@ -964,6 +1070,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferChar);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferInt);
+	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferEOFAndError);
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);

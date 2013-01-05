@@ -40,6 +40,9 @@
 #define Net_SocketDefs_INCLUDED
 
 
+#define POCO_ENOERR 0
+
+
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#include "Poco/UnWindows.h"
 	#include <winsock2.h>
