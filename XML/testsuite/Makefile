@@ -19,3 +19,7 @@ target_version = 1
 target_libs    = PocoXML PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec
+
+ifdef POCO_UNBUNDLED
+        SYSLIBS += -lexpat
+endif
