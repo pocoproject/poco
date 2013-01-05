@@ -1,9 +1,13 @@
 //
-// SocketReactorTest.h
+// ParallelSocketReactor.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/SocketReactorTest.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/ParallelSocketReactor.h#1 $
 //
-// Definition of the SocketReactorTest class.
+// Library: Net
+// Package: Reactor
+// Module:  ParallelSocketReactor
+//
+// Definition of the ParallelSocketReactor class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,32 +36,70 @@
 //
 
 
-#ifndef SocketReactorTest_INCLUDED
-#define SocketReactorTest_INCLUDED
+#ifndef Net_ParallelSocketReactor_INCLUDED
+#define Net_ParallelSocketReactor_INCLUDED
 
 
-#include "Poco/Net/Net.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/Net/SocketReactor.h"
+#include "Poco/Net/SocketNotification.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/NObserver.h"
+#include "Poco/Thread.h"
+#include "Poco/SharedPtr.h"
 
 
-class SocketReactorTest: public CppUnit::TestCase
+using Poco::Net::Socket;
+using Poco::Net::SocketReactor;
+using Poco::Net::ReadableNotification;
+using Poco::Net::ShutdownNotification;
+using Poco::Net::ServerSocket;
+using Poco::Net::StreamSocket;
+using Poco::NObserver;
+using Poco::AutoPtr;
+using Poco::Thread;
+
+
+namespace Poco {
+namespace Net {
+
+
+template <class SR>
+class ParallelSocketReactor: public SR
 {
 public:
-	SocketReactorTest(const std::string& name);
-	~SocketReactorTest();
+	typedef Poco::SharedPtr<ParallelSocketReactor> Ptr;
 
-	void testSocketReactor();
-	void testParallelSocketReactor();
-	void testSocketConnectorFail();
-	void testSocketConnectorTimeout();
-
-	void setUp();
-	void tearDown();
-
-	static CppUnit::Test* suite();
-
+	ParallelSocketReactor()
+	{
+		_thread.start(*this);
+	}
+	
+	ParallelSocketReactor(const Poco::Timespan& timeout):
+		SR(timeout)
+	{
+		_thread.start(*this);
+	}
+	
+	~ParallelSocketReactor()
+	{
+		this->stop();
+		_thread.join();
+	}
+	
+protected:
+	void onIdle()
+	{
+		SR::onIdle();
+		Poco::Thread::yield();
+	}
+	
 private:
+	Poco::Thread _thread;
 };
 
 
-#endif // SocketReactorTest_INCLUDED
+} } // namespace Poco::Net
+
+
+#endif // Net_ParallelSocketReactor_INCLUDED
