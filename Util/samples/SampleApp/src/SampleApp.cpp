@@ -160,9 +160,8 @@ protected:
 		if (!_helpRequested)
 		{
 			logger().information("Command line:");
-			const ArgVec argVec = argv();
 			std::ostringstream ostr;
-			for (ArgVec::const_iterator it = argVec.begin(); it != argVec.end(); ++it)
+			for (ArgVec::const_iterator it = argv().begin(); it != argv().end(); ++it)
 			{
 				ostr << *it << ' ';
 			}

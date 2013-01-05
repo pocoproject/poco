@@ -303,6 +303,12 @@ std::string Application::commandName() const
 }
 
 
+std::string Application::commandPath() const
+{
+	return _pConfig->getString("application.path");
+}
+
+
 void Application::stopOptionsProcessing()
 {
 	_stopOptionsProcessing = true;
