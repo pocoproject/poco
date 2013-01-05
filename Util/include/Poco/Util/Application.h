@@ -105,6 +105,8 @@ class Util_API Application: public Subsystem
 	/// Unicode command line arguments.
 {
 public:
+	typedef std::vector<std::string> ArgVec;
+
 	enum ExitCode
 		/// Commonly used exit status codes.
 		/// Based on the definitions in the 4.3BSD <sysexits.h> header file.
@@ -270,6 +272,15 @@ public:
 		/// "application.logger" configuration property. If that property
 		/// is not specified, the logger is "Application".
 		
+	const ArgVec& argv() const;
+		/// Returns reference to vector of the application's arguments as 
+		/// specified on the command line. If user overrides the 
+		/// Application::main(const ArgVec&) function, it will receive
+		/// only the command line parameters that were not processed in
+		/// Application::processOptons(). This function returns the 
+		/// full set of command line parameters as received in
+		/// main(argc, argv*).
+		
 	const OptionSet& options() const;
 		/// Returns the application's option set.
 
@@ -388,7 +399,8 @@ private:
 	SubsystemVec    _subsystems;
 	bool            _initialized;
 	std::string     _command;
-	ArgVec          _args;
+	ArgVec          _argv;
+	ArgVec          _unprocessedArgs;
 	OptionSet       _options;
 	bool            _unixOptions;
 	Poco::Logger*   _pLogger;
@@ -439,6 +451,12 @@ inline Poco::Logger& Application::logger() const
 {
 	poco_check_ptr (_pLogger);
 	return *_pLogger;
+}
+
+
+inline const Application::ArgVec& Application::argv() const
+{
+	return _argv;
 }
 
 

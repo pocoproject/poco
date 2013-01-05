@@ -167,7 +167,7 @@ void Application::init(int argc, wchar_t* argv[])
 #endif
 
 
-void Application::init(const std::vector<std::string>& args)
+void Application::init(const ArgVec& args)
 {
 	setArgs(args);
 	init();
@@ -337,7 +337,7 @@ int Application::run()
 	{
 		initialize(*this);
 		rc = EXIT_SOFTWARE;
-		rc = main(_args);
+		rc = main(_unprocessedArgs);
 		uninitialize();
 	}
 	catch (Poco::Exception& exc)
@@ -356,7 +356,7 @@ int Application::run()
 }
 
 
-int Application::main(const std::vector<std::string>& args)
+int Application::main(const ArgVec& args)
 {
 	return EXIT_OK;
 }
@@ -366,24 +366,24 @@ void Application::setArgs(int argc, char* argv[])
 {
 	_command = argv[0];
 	_pConfig->setInt("application.argc", argc);
-	_args.reserve(argc);
+	_unprocessedArgs.reserve(argc);
 	std::string argvKey = "application.argv[";
 	for (int i = 0; i < argc; ++i)
 	{
 		std::string arg(argv[i]);
 		_pConfig->setString(argvKey + NumberFormatter::format(i) + "]", arg);
-		_args.push_back(arg);
+		_unprocessedArgs.push_back(arg);
 	}
 }
 
 
-void Application::setArgs(const std::vector<std::string>& args)
+void Application::setArgs(const ArgVec& args)
 {
 	poco_assert (!args.empty());
 	
 	_command = args[0];
 	_pConfig->setInt("application.argc", (int) args.size());
-	_args = args;
+	_unprocessedArgs = args;
 	std::string argvKey = "application.argv[";
 	for (int i = 0; i < args.size(); ++i)
 	{
@@ -397,9 +397,10 @@ void Application::processOptions()
 	defineOptions(_options);
 	OptionProcessor processor(_options);
 	processor.setUnixStyle(_unixOptions);
-	_args.erase(_args.begin());
-	ArgVec::iterator it = _args.begin();
-	while (it != _args.end() && !_stopOptionsProcessing)
+	_argv = _unprocessedArgs;
+	_unprocessedArgs.erase(_unprocessedArgs.begin());
+	ArgVec::iterator it = _unprocessedArgs.begin();
+	while (it != _unprocessedArgs.end() && !_stopOptionsProcessing)
 	{
 		std::string name;
 		std::string value;
@@ -409,7 +410,7 @@ void Application::processOptions()
 			{
 				handleOption(name, value);
 			}
-			it = _args.erase(it);
+			it = _unprocessedArgs.erase(it);
 		}
 		else ++it;
 	}
