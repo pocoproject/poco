@@ -38,6 +38,7 @@
 #include "Poco/JSON/JSONException.h"
 #include "Poco/Ascii.h"
 #include "Poco/Token.h"
+#include "Poco/UTF8Encoding.h"
 #undef min
 #undef max
 #include <limits>
@@ -65,12 +66,12 @@ public:
 
 	bool start(char c, std::istream& istr)
 	{
-		if (   c == '{'
-		        || c == '}'
-		        || c == ']'
-		        || c == '['
-		        || c == ','
-		        || c == ':' )
+		if (c == '{'
+         || c == '}'
+         || c == ']'
+         || c == '['
+         || c == ','
+         || c == ':')
 		{
 			_value = c;
 			return true;
@@ -108,7 +109,7 @@ public:
 
 	bool start(char c, std::istream& istr)
 	{
-		if ( c == '"')
+		if (c == '"')
 		{
 			_value = ""; // We don't need the quote!
 			return true;
@@ -118,10 +119,10 @@ public:
 
 	void finish(std::istream& istr)
 	{
-		int c = istr.get();
-		while (c != -1)
+		int c = 0;
+		while ((c = istr.get()) != -1)
 		{
-			if ( c == 0 )
+			if (c == 0)
 			{
 				throw JSONException("Null byte not allowed");
 			}
@@ -131,38 +132,47 @@ public:
 				throw JSONException(format("Control character 0x%x not allowed", (unsigned int) c));
 			}
 
-			if ( c == '"' )
+			if (c == '"')
 				break;
+				
+			if(0x80 <= c && c <= 0xFF)
+			{
+				int count = utf8_check_first(c);
+				if (!count)
+				{
+					throw JSONException(format("Unable to decode byte 0x%x", (unsigned int) c));
+				}
 
-			if ( c == '\\' ) // Escaped String
+				char buffer[5];
+				buffer[0] = c;
+				for(int i = 1; i < count; ++i)
+				{
+					buffer[i] = istr.get();
+				}
+				
+				if ( !UTF8Encoding::isLegal((unsigned char*) buffer, count) )
+				{
+					throw JSONException("No legal UTF8 found");
+				}
+				buffer[count] = '\0';
+				_value += buffer;
+
+				continue;
+			}
+
+			if (c == '\\') // Escaped String
 			{
 				c = istr.get();
 				switch(c)
 				{
-				case '"' :
-					c = '"';
-					break;
-				case '\\' :
-					c = '\\';
-					break;
-				case '/' :
-					c = '/';
-					break;
-				case 'b' :
-					c = '\b';
-					break;
-				case 'f' :
-					c = '\f';
-					break;
-				case 'n' :
-					c = '\n';
-					break;
-				case 'r' :
-					c = '\r';
-					break;
-				case 't' :
-					c = '\t';
-					break;
+				case '"' :  c = '"';  break;
+				case '\\' : c = '\\'; break;
+				case '/' :  c = '/';  break;
+				case 'b' :  c = '\b'; break;
+				case 'f' :  c = '\f'; break;
+				case 'n' :  c = '\n'; break;
+				case 'r' :  c = '\r'; break;
+				case 't' :  c = '\t'; break;
 				case 'u' : // Unicode
 				{
 					Poco::Int32 unicode = decodeUnicode(istr);
@@ -196,8 +206,16 @@ public:
 					{
 						throw JSONException("Invalid unicode");
 					}
-					c = unicode;
-					break;
+					
+					Poco::UTF8Encoding utf8encoding;
+					int length = utf8encoding.convert(unicode, NULL, 0);
+					std::vector<unsigned char> convert(length);
+					utf8encoding.convert(unicode, &convert[0], length);
+					for(int i = 0; i < length; ++i)
+					{
+						_value += (char) convert[i];
+					}
+					continue;
 				}
 				default:
 				{
@@ -206,7 +224,6 @@ public:
 				}
 			}
 			_value += c;
-			c = istr.get();
 		}
 
 		if ( c == -1 )
@@ -240,6 +257,49 @@ public:
 		}
 
 		return value;
+	}
+	
+private:
+	int utf8_check_first(char byte)
+	{
+		unsigned char u = (unsigned char) byte;
+
+		if(u < 0x80)
+			return 1;
+
+		if (0x80 <= u && u <= 0xBF) 
+		{
+			/* second, third or fourth byte of a multi-byte
+			sequence, i.e. a "continuation byte" */
+			return 0;
+		}
+		else if(u == 0xC0 || u == 0xC1) 
+		{
+			/* overlong encoding of an ASCII byte */
+			return 0;
+		}
+		else if(0xC2 <= u && u <= 0xDF) 
+		{
+			/* 2-byte sequence */
+			return 2;
+		}
+		else if(0xE0 <= u && u <= 0xEF) 
+		{
+			/* 3-byte sequence */
+			return 3;
+		}
+		else if(0xF0 <= u && u <= 0xF4) 
+		{
+			/* 4-byte sequence */
+			return 4;
+		}
+		else 
+		{ 
+			/* u >= 0xF5 */
+			/* Restricted (start of 4-, 5- or 6-byte sequence) or invalid
+			UTF-8 */
+			return 0;
+		}
 	}
 };
 
@@ -307,7 +367,7 @@ public:
 		if ( c == -1 )
 			return false;
 
-		if ( Ascii::isDigit(c) )
+		if (Ascii::isDigit(c))
 		{
 			if ( c == '0' )
 			{
@@ -321,14 +381,14 @@ public:
 			return true;
 		}
 
-		if ( c == '-' )
+		if (c == '-')
 		{
 			_value = c;
 
 			int nc = istr.peek();
-			if ( Ascii::isDigit(nc) )
+			if (Ascii::isDigit(nc))
 			{
-				if ( nc == '0' )
+				if (nc == '0')
 				{
 					_value += '0';
 					istr.get();
@@ -351,7 +411,7 @@ public:
 		int c;
 		while( (c = istr.peek()) != -1)
 		{
-			if ( Ascii::isDigit(c) )
+			if (Ascii::isDigit(c))
 			{
 				_value += c;
 				istr.get();
@@ -362,7 +422,7 @@ public:
 				{
 				case '.': // Float
 				{
-					if ( _activeClass == Token::FLOAT_LITERAL_TOKEN )
+					if (_activeClass == Token::FLOAT_LITERAL_TOKEN)
 					{
 						throw JSONException("Invalid float value");
 					}
@@ -383,7 +443,7 @@ public:
 				case 'E':
 				case 'e':
 				{
-					if ( _activeClass == Token::DOUBLE_LITERAL_TOKEN )
+					if (_activeClass == Token::DOUBLE_LITERAL_TOKEN)
 					{
 						throw JSONException("Invalid double value");
 					}
@@ -395,14 +455,14 @@ public:
 
 					// When the next char is - or + then read the next char
 					c = istr.peek();
-					if ( c == '-' || c == '+' )
+					if (c == '-' || c == '+')
 					{
 						_value += c;
 						istr.get();
 						c = istr.peek();
 					}
 
-					if ( ! Ascii::isDigit(c) )
+					if (! Ascii::isDigit(c))
 					{
 						throw JSONException("Invalid double value");
 					}
@@ -444,7 +504,7 @@ Parser::~Parser()
 const Token* Parser::nextToken()
 {
 	const Token* token = _tokenizer.next();
-	if ( token->is(Token::EOF_TOKEN) )
+	if (token->is(Token::EOF_TOKEN))
 	{
 		throw JSONException("Unexpected EOF found");
 	}
@@ -457,14 +517,14 @@ void Parser::parse(std::istream& in)
 	_tokenizer.attachToStream(in);
 	const Token* token = nextToken();
 
-	if ( token->is(Token::SEPARATOR_TOKEN) )
+	if (token->is(Token::SEPARATOR_TOKEN))
 	{
 		// This must be a { or a [
-		if ( token->asChar() == '{' )
+		if (token->asChar() == '{')
 		{
 			readObject();
 		}
-		else if ( token->asChar() == '[' )
+		else if (token->asChar() == '[')
 		{
 			readArray();
 		}
@@ -473,7 +533,7 @@ void Parser::parse(std::istream& in)
 			throw JSONException(format("Invalid separator '%c' found. Expecting { or [", token->asChar()));
 		}
 		token = _tokenizer.next();
-		if ( ! token->is(Token::EOF_TOKEN) )
+		if (! token->is(Token::EOF_TOKEN))
 		{
 			throw JSONException(format("EOF expected but found '%s'", token->asString()));
 		}
@@ -487,7 +547,7 @@ void Parser::parse(std::istream& in)
 
 void Parser::readObject()
 {
-	if ( _handler != NULL )
+	if (_handler != NULL)
 	{
 		_handler->startObject();
 	}
@@ -497,7 +557,7 @@ void Parser::readObject()
 		while(readRow());
 	}
 
-	if ( _handler != NULL )
+	if (_handler != NULL)
 	{
 		_handler->endObject();
 	}
@@ -508,12 +568,12 @@ bool Parser::readRow(bool firstCall)
 {
 	const Token* token = nextToken();
 
-	if ( firstCall && token->tokenClass() == Token::SEPARATOR_TOKEN && token->asChar() == '}' )
+	if (firstCall && token->tokenClass() == Token::SEPARATOR_TOKEN && token->asChar() == '}')
 	{
 		return false; // End of object is possible for an empty object
 	}
 
-	if ( token->tokenClass() == Token::STRING_LITERAL_TOKEN )
+	if (token->tokenClass() == Token::STRING_LITERAL_TOKEN)
 	{
 		std::string propertyName = token->tokenString();
 		if ( _handler != NULL )
@@ -523,20 +583,20 @@ bool Parser::readRow(bool firstCall)
 
 		token = nextToken();
 
-		if (    token->is(Token::SEPARATOR_TOKEN)
-		        && token->asChar() == ':' )
+		if (   token->is(Token::SEPARATOR_TOKEN)
+            && token->asChar() == ':')
 		{
 			readValue(nextToken());
 
 			token = nextToken();
 
-			if ( token->is(Token::SEPARATOR_TOKEN) )
+			if (token->is(Token::SEPARATOR_TOKEN))
 			{
-				if ( token->asChar() == ',' )
+				if (token->asChar() == ',')
 				{
 					return true; // Read next row
 				}
-				else if ( token->asChar() == '}' )
+				else if (token->asChar() == '}')
 				{
 					return false; // End of object
 				}
@@ -573,20 +633,20 @@ void Parser::readValue(const Token* token)
 		break;
 			
 	case Token::INTEGER_LITERAL_TOKEN:
-		if ( _handler != NULL )
+		if (_handler != NULL)
 		{
 #if defined(POCO_HAVE_INT64)
-            Int64 value = token->asInteger64();
-            // if number is 32-bit, then handle as such
-			if (    value > std::numeric_limits<int>::max()
-                || value < std::numeric_limits<int>::min() )
-            {
-                _handler->value(value);
-            }
-            else
-            {
-                _handler->value(static_cast<int>(value));
-            }
+			Int64 value = token->asInteger64();
+			// if number is 32-bit, then handle as such
+			if (   value > std::numeric_limits<int>::max()
+                || value < std::numeric_limits<int>::min())
+			{
+				_handler->value(value);
+			}
+			else
+			{
+				_handler->value(static_cast<int>(value));
+			}
 #else
 			int value = token->asInteger();
 			_handle->value(value);
@@ -595,23 +655,23 @@ void Parser::readValue(const Token* token)
 		break;
 	case Token::KEYWORD_TOKEN:
 	{
-		if ( token->tokenString().compare("null") == 0 )
+		if (token->tokenString().compare("null") == 0)
 		{
-			if ( _handler != NULL )
+			if (_handler != NULL)
 			{
 				_handler->null();
 			}
 		}
-		else  if ( token->tokenString().compare("true") == 0 )
+		else  if (token->tokenString().compare("true") == 0)
 		{
-			if ( _handler != NULL )
+			if (_handler != NULL)
 			{
 				_handler->value(true);
 			}
 		}
-		else if ( token->tokenString().compare("false") == 0 )
+		else if (token->tokenString().compare("false") == 0)
 		{
-			if ( _handler != NULL )
+			if (_handler != NULL)
 			{
 				_handler->value(false);
 			}
@@ -625,46 +685,48 @@ void Parser::readValue(const Token* token)
 	case Token::FLOAT_LITERAL_TOKEN:
 		// Fall through
 	case Token::DOUBLE_LITERAL_TOKEN:
-		if ( _handler != NULL )
+		if (_handler != NULL)
 		{
 			_handler->value(token->asFloat());
 		}
 		break;
 	case Token::STRING_LITERAL_TOKEN:
-		if ( _handler != NULL )
+		if (_handler != NULL)
 		{
 			_handler->value(token->tokenString());
 		}
 		break;
 	case Token::SEPARATOR_TOKEN:
-	{
-		if ( token->asChar() == '{' )
 		{
-			readObject();
+			if (token->asChar() == '{')
+			{
+				readObject();
+			}
+			else if (token->asChar() == '[')
+			{
+				readArray();
+			}
+			break;
 		}
-		else if ( token->asChar() == '[' )
-		{
-			readArray();
-		}
-		break;
-	}
+	case Token::INVALID_TOKEN:
+		throw JSONException(format("Invalid token '%s' found", token->asString()));
 	}
 }
 
 
 void Parser::readArray()
 {
-	if ( _handler != NULL )
+	if (_handler != NULL)
 	{
 		_handler->startArray();
 	}
 
-	if ( readElements(true) ) // First call is special: check for empty array
+	if (readElements(true)) // First call is special: check for empty array
 	{
 		while(readElements());
 	}
 
-	if ( _handler != NULL )
+	if (_handler != NULL)
 	{
 		_handler->endArray();
 	}
@@ -675,7 +737,7 @@ bool Parser::readElements(bool firstCall)
 {
 	const Token* token = nextToken();
 
-	if ( firstCall && token->is(Token::SEPARATOR_TOKEN) && token->asChar() == ']' )
+	if (firstCall && token->is(Token::SEPARATOR_TOKEN) && token->asChar() == ']')
 	{
 		// End of array is possible for an empty array
 		return false;
@@ -687,10 +749,10 @@ bool Parser::readElements(bool firstCall)
 
 	if ( token->is(Token::SEPARATOR_TOKEN) )
 	{
-		if ( token->asChar() == ']' )
+		if (token->asChar() == ']')
 			return false; // End of array
 
-		if ( token->asChar() == ',' )
+		if (token->asChar() == ',')
 			return true;
 
 		throw JSONException(format("Invalid separator '%c' found. Expecting , or ]", token->asChar()));
