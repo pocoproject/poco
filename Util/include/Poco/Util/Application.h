@@ -273,7 +273,7 @@ public:
 	const OptionSet& options() const;
 		/// Returns the application's option set.
 
-	const ArgVec& getArgs() const;
+	const ArgVec getArgs() const;
 		/// Returns the application's command-line arguments.
 
 	static Application& instance();
@@ -467,12 +467,6 @@ inline Poco::Timespan Application::uptime() const
 	Poco::Timespan uptime = now - _startTime;
 	
 	return uptime;
-}
-
-
-inline const Application::ArgVec& Application::getArgs() const
-{
-	return _args;
 }
 
 

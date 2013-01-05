@@ -309,6 +309,21 @@ std::string Application::commandPath() const
 }
 
 
+const Application::ArgVec Application::getArgs() const
+{
+	ArgVec args;
+
+	int argc = _pConfig->getInt("application.argc");
+	args.reserve(argc);
+	std::string argvKey = "application.argv[";
+	for (int i = 0; i < argc; ++i) {
+		std::string arg = _pConfig->getString(argvKey + NumberFormatter::format(i) + "]");
+		args.push_back(arg);
+	}
+	return args;
+}
+
+
 void Application::stopOptionsProcessing()
 {
 	_stopOptionsProcessing = true;
