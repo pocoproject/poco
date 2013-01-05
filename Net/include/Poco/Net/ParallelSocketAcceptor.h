@@ -61,7 +61,7 @@ namespace Poco {
 namespace Net {
 
 
-template <class ServiceHandler, typename SR>
+template <class ServiceHandler, class SR>
 class ParallelSocketAcceptor
 	/// This class implements the Acceptor part of the Acceptor-Connector design pattern.
 	/// Only the difference from single-threaded version is documented here, For full 
