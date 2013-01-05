@@ -12,6 +12,10 @@ objects = zip
 
 target         = zip
 target_version = 1
-target_libs    = PocoZip PocoUtil PocoXML PocoFoundation
+target_libs    = PocoZip PocoUtil PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
+
+ifdef POCO_UNBUNDLED
+        SYSLIBS += -lz -lpcre -lexpat
+endif

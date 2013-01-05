@@ -15,9 +15,13 @@ objects = HTTPTimeServerApp TimeHandler
 
 target         = HTTPTimeServer
 target_version = 1
-target_libs    = PocoUtil PocoNet PocoXML PocoFoundation
+target_libs    = PocoUtil PocoJSON PocoNet PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
+
+ifdef POCO_UNBUNDLED
+        SYSLIBS += -lz -lpcre -lexpat
+endif
 
 # Rule for runnning PageCompiler
 src/%.cpp: src/%.cpsp
