@@ -284,9 +284,6 @@ public:
 	const OptionSet& options() const;
 		/// Returns the application's option set.
 
-	const ArgVec getArgs() const;
-		/// Returns the application's command-line arguments.
-
 	static Application& instance();
 		/// Returns a reference to the Application singleton.
 		///
