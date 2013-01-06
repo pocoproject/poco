@@ -212,6 +212,36 @@ void NetworkInterfaceTest::testMapUpOnly()
 }
 
 
+void NetworkInterfaceTest::testListMapConformance()
+{
+	NetworkInterface::Map m = NetworkInterface::map(false, false);
+	assert (!m.empty());
+	NetworkInterface::List l = NetworkInterface::list(false, false);
+	assert (!l.empty());
+
+	int counter = 0;
+	NetworkInterface::Map::const_iterator mapIt = m.begin();
+	NetworkInterface::List::const_iterator listIt = l.begin();
+	for (; mapIt != m.end(); ++mapIt)
+	{
+		NetworkInterface::MACAddress mac(mapIt->second.macAddress());
+
+		typedef NetworkInterface::AddressList List;
+		const List& ipList = mapIt->second.addressList();
+		List::const_iterator ipIt = ipList.begin();
+		List::const_iterator ipEnd = ipList.end();
+		for (; ipIt != ipEnd; ++ipIt, ++counter, ++listIt)
+		{
+			NetworkInterface::MACAddress lmac = listIt->macAddress();
+			assert (lmac == mac);
+			if (listIt == l.end()) fail ("wrong number of list items");
+		}
+	}
+
+	assert (counter == l.size());
+}
+
+
 void NetworkInterfaceTest::setUp()
 {
 }
@@ -233,6 +263,7 @@ CppUnit::Test* NetworkInterfaceTest::suite()
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testForIndex);
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testMapIpOnly);
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testMapUpOnly);
+	CppUnit_addTest(pSuite, NetworkInterfaceTest, testListMapConformance);
 
 	return pSuite;
 }
