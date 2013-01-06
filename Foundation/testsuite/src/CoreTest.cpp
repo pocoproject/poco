@@ -265,15 +265,15 @@ void CoreTest::testBuffer()
 	assert ( !std::memcmp(g.begin(), "hellohello", 10) );
 
 	char h[10];
-	Buffer<char> i(h, 10);
+	Buffer<char> buf(h, 10);
 	try
 	{
-		i.append("hello", 5);
+		buf.append("hello", 5);
 		fail ("must fail");
 	}
 	catch (InvalidAccessException&) { }
 
-	i.assign("hello", 5);
+	buf.assign("hello", 5);
 	assert ( !std::memcmp(&h[0], "hello", 5) );
 
 	const char j[10] = "hello";
@@ -656,13 +656,13 @@ void CoreTest::testFIFOBufferChar()
 	assert(1 == _notToWritable);
 	assert(1 == _writableToNot);
 
-	const char c[3] = {'4', '5', '6' };
+	const char arr[3] = {'4', '5', '6' };
 	try
 	{
-		f.copy(&c[0], 8);
+		f.copy(&arr[0], 8);
 	} catch (InvalidAccessException&) { }
 
-	f.copy(&c[0], 3);
+	f.copy(&arr[0], 3);
 	assert(7 == _notToReadable);
 	assert(6 == _readableToNot);
 	assert(1 == _notToWritable);
@@ -673,7 +673,7 @@ void CoreTest::testFIFOBufferChar()
 	assert (4 == f.available());
 
 	const char d[4] = {'7', '8', '9', '0' };
-	f.copy(&c[0], 4);
+	f.copy(&arr[0], 4);
 	assert(7 == _notToReadable);
 	assert(6 == _readableToNot);
 	assert(1 == _notToWritable);
@@ -686,7 +686,7 @@ void CoreTest::testFIFOBufferChar()
 
 	try
 	{
-		f.copy(&c[0], 1);
+		f.copy(&arr[0], 1);
 	} catch (InvalidAccessException&) { }
 
 	f.drain(1);
