@@ -2,5 +2,5 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: ./configure --omit=Data/MySQL,Data/ODBC & make
+script: ./configure --omit=Data/MySQL,Data/ODBC & make -s
 
