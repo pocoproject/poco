@@ -124,8 +124,8 @@ void HTTPTestServer::run()
 bool HTTPTestServer::requestComplete() const
 {
 	return ((_lastRequest.substr(0, 3) == "GET" || _lastRequest.substr(0, 4) == "HEAD") && 
-	       (_lastRequest.find("\r\n\r\n") != std::string::npos)) ||
-	       (_lastRequest.find("\r\n0\r\n") != std::string::npos);
+	        (_lastRequest.find("\r\n\r\n") != std::string::npos)) ||
+	        (_lastRequest.find("\r\n0\r\n") != std::string::npos);
 }
 
 

@@ -84,7 +84,7 @@ HostEntry DNS::hostByName(const std::string& hostname)
 		return HostEntry(he);
 	}
 #endif
-	error(lastError(), hostname);      // will throw an appropriate exception
+	error(lastError(), hostname); // will throw an appropriate exception
 	throw NetException(); // to silence compiler
 }
 

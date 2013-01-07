@@ -141,7 +141,7 @@ public:
 	void logout();
 
 	void close();
-		/// Sends a QUIT command and closes the connection to the server.       
+		/// Sends a QUIT command and closes the connection to the server.
 		///
 		/// Throws a FTPException in case of a FTP-specific error, or a
 		/// NetException in case of a general network communication failure.
