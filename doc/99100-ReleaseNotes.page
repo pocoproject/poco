@@ -38,6 +38,7 @@ AAAIntroduction
   - added bool Poco::Data::SQLite::Utility::isThreadSafe() function
   - added bool Poco::Data::SQLite::Utility::setThreadMode(int) function
   - added int Poco::Data::SQLite::Utility::getThreadMode() function
+  - fixed GH #36: 'distclean' requires 3 traversals of project tree
   - fixed GH #41: Buffer::resize crash
   - fixed GH #42: Linux unbundled builds don't link
   - fixed GH #44: Problems with win x64 build
