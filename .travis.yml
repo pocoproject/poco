@@ -2,4 +2,4 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: cmake .
+script: ./configure & make
