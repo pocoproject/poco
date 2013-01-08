@@ -38,7 +38,17 @@ AAAIntroduction
   - added bool Poco::Data::SQLite::Utility::isThreadSafe() function
   - added bool Poco::Data::SQLite::Utility::setThreadMode(int) function
   - added int Poco::Data::SQLite::Utility::getThreadMode() function
+  - fixed GH #36: 'distclean' requires 3 traversals of project tree
   - fixed GH #41: Buffer::resize crash
+  - fixed GH #42: Linux unbundled builds don't link
+  - fixed GH #44: Problems with win x64 build
+  - fixed GH #46: 1.5.1 build fails on OS X when using libc++
+  - fixed GH #48: Need getArgs() accessor to Util::Application to retrieve start-up arguments
+  - fixed GH #49: NetworkInterface::list doesn't return MAC addresses
+  - fixed GH #51: Android should use isfinite, isinf, isnan and signbit from the std namespace
+  - fixed GH #53: JSON unicode fixes and running tests on invalid unicode JSON
+  - added ParallelAcceptor and ParallelReactor classes
+  - added EOF and error to FIFOBuffer
 
 !!Incompatible Changes and Possible Transition Issues
 

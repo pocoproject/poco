@@ -58,6 +58,7 @@ public:
 	void testForIndex();
 	void testMapIpOnly();
 	void testMapUpOnly();
+	void testListMapConformance();
 
 	void setUp();
 	void tearDown();

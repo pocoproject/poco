@@ -254,7 +254,7 @@ public:
 		/// Returns the command name used to invoke the application.
 
 	std::string commandPath() const;
-		/// Returns the command path used to invoke the application.
+		/// Returns the full command path used to invoke the application.
 
 	LayeredConfiguration& config() const;
 		/// Returns the application's configuration.
