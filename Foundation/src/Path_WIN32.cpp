@@ -1,7 +1,7 @@
 //
 // Path_WIN32.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path_WIN32.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/Path_WIN32.cpp#5 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -59,8 +59,18 @@ std::string PathImpl::currentImpl()
 
 std::string PathImpl::homeImpl()
 {
-	std::string result = EnvironmentImpl::getImpl("HOMEDRIVE");
-	result.append(EnvironmentImpl::getImpl("HOMEPATH"));
+	std::string result;
+	try
+	{
+		// windows service has no home dir, return system directory instead
+		result = EnvironmentImpl::getImpl("HOMEDRIVE");
+		result.append(EnvironmentImpl::getImpl("HOMEPATH"));
+	}
+	catch (NotFoundException&) 
+	{
+		result = systemImpl();
+	}
+
 	std::string::size_type n = result.size();
 	if (n > 0 && result[n - 1] != '\\')
 		result.append("\\");
@@ -88,6 +98,21 @@ std::string PathImpl::tempImpl()
 std::string PathImpl::nullImpl()
 {
 	return "NUL:";
+}
+
+
+std::string PathImpl::systemImpl()
+{
+	char buffer[MAX_PATH];
+	DWORD n = GetSystemDirectoryA(buffer, sizeof(buffer));
+	if (n > 0 && n < sizeof(buffer))
+	{
+		std::string result(buffer, n);
+		if (result[n - 1] != '\\')
+			result.append("\\");
+		return result;
+	}
+	else throw SystemException("Cannot get system directory");
 }
 
 

@@ -1,7 +1,7 @@
 //
 // HashMapTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/HashMapTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/HashMapTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -70,6 +70,7 @@ void HashMapTest::testInsert()
 		assert (it != hm.end());
 		assert (it->first == i);
 		assert (it->second == i*2);
+		assert (hm.count(i) == 1);
 		assert (hm.size() == i + 1);
 	}		
 	

@@ -1,5 +1,17 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.4.6 (2013-01-10)
+==========================
+
+- changed FPEnvironment_DUMMY.h to include <cmath> instead of <math.h>
+- updated bundled SQLite to 3.7.15.1
+- fixed GH# 30: Poco::Path::home() throws
+- fixed SF Patch #120 The ExpireLRUCache does not compile with a tuple as key on VS2010
+- fixed SF# 603 count() is missing in HashMap
+- Crypto and NetSSL_OpenSSL project files now use OpenSSL *MD.lib library files for 
+  static_md builds. Previously, the DLL import libs were used.
+
+
 Release 1.4.5 (2012-11-19)
 ==========================
 
@@ -1782,4 +1794,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#70 $
+$Id: //poco/1.4/dist/CHANGELOG#72 $

@@ -349,7 +349,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnitmdd.lib iphlpapi.lib ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="CppUnitmdd.lib iphlpapi.lib ws2_32.lib iphlpapi.lib libeay32mdd.lib ssleay32mdd.lib Crypt32.lib"
 				OutputFile="bin\$(PlatformName)\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -424,7 +424,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnitmd.lib iphlpapi.lib ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="CppUnitmd.lib iphlpapi.lib ws2_32.lib iphlpapi.lib libeay32md.lib ssleay32md.lib Crypt32.lib"
 				OutputFile="bin\$(PlatformName)\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
