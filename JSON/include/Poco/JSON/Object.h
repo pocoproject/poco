@@ -118,8 +118,7 @@ public:
 	{
 		T value = def;
 		ValueMap::const_iterator it = _values.find(key);
-		if (      it != _values.end()
-		          && ! it->second.isEmpty() )
+		if (it != _values.end() && ! it->second.isEmpty() )
 		{
 			try
 			{
@@ -133,7 +132,7 @@ public:
 		return value;
 	}
 
-	unsigned int size() const;
+	std::size_t size() const;
 		/// Returns the number of properties
 
 	void set(const std::string& key, const Dynamic::Var& value);
@@ -162,7 +161,7 @@ inline bool Object::has(const std::string& key) const
 inline bool Object::isArray(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
-	return it != _values.end() || it->second.type() == typeid(Array::Ptr);
+	return it != _values.end() && it->second.type() == typeid(Array::Ptr);
 }
 
 
@@ -176,7 +175,7 @@ inline bool Object::isNull(const std::string& key) const
 inline bool Object::isObject(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
-	return it != _values.end() || it->second.type() == typeid(Object::Ptr);
+	return it != _values.end() && it->second.type() == typeid(Object::Ptr);
 }
 
 
@@ -186,9 +185,9 @@ inline void Object::set(const std::string& key, const Dynamic::Var& value)
 }
 
 
-inline unsigned int Object::size() const
+inline std::size_t Object::size() const
 {
-	return _values.size();
+	return static_cast<std::size_t>(_values.size());
 }
 
 
@@ -289,17 +288,17 @@ public:
 		s = oss.str();
 	}
 
-	void convert(DateTime& val) const
+	void convert(DateTime& /*val*/) const
 	{
 		//TODO: val = _val;
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime& /*ldt*/) const
 	{
 		//TODO: ldt = _val.timestamp();
 	}
 
-	void convert(Timestamp& ts) const
+	void convert(Timestamp& /*ts*/) const
 	{
 		//TODO: ts = _val.timestamp();
 	}

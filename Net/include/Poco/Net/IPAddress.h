@@ -179,14 +179,14 @@ public:
 		/// For dealing with IPv4 compatible addresses in a mixed environment,
 		/// a special syntax is available: x:x:x:x:x:x:d.d.d.d, where the 'x's are the 
 		/// hexadecimal values of the six high-order 16-bit pieces of the address, 
-        /// and the 'd's are the decimal values of the four low-order 8-bit pieces of the 
-        /// standard IPv4 representation address. Example: ::FFFF:192.168.1.120
-        ///
-        /// If an IPv6 address contains a non-zero scope identifier, it is added
-        /// to the string, delimited by a percent character. On Windows platforms,
-        /// the numeric value (which specifies an interface index) is directly
-        /// appended. On Unix platforms, the name of the interface corresponding
-        /// to the index (interpretation of the scope identifier) is added.
+		/// and the 'd's are the decimal values of the four low-order 8-bit pieces of the 
+		/// standard IPv4 representation address. Example: ::FFFF:192.168.1.120
+		///
+		/// If an IPv6 address contains a non-zero scope identifier, it is added
+		/// to the string, delimited by a percent character. On Windows platforms,
+		/// the numeric value (which specifies an interface index) is directly
+		/// appended. On Unix platforms, the name of the interface corresponding
+		/// to the index (interpretation of the scope identifier) is added.
 	
 	bool isWildcard() const;
 		/// Returns true iff the address is a wildcard (all zero)

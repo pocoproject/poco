@@ -123,7 +123,7 @@ protected:
 		helpFormatter.format(std::cout);
 	}
 
-	int main(const std::vector<std::string>& args)
+	int main(const ArgVec& args)
 	{
 		if (!_helpRequested)
 		{

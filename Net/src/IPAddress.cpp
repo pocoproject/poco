@@ -116,16 +116,10 @@ public:
 protected:
 	IPAddressImpl()
 	{
-#if defined(_WIN32)
-		Poco::Net::initializeNetwork();
-#endif
 	}
 	
 	virtual ~IPAddressImpl()
 	{
-#if defined(_WIN32)
-		Poco::Net::uninitializeNetwork();
-#endif
 	}
 
 private:

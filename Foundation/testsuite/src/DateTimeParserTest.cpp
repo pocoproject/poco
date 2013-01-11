@@ -1,7 +1,7 @@
 //
 // DateTimeParserTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeParserTest.cpp#3 $
+// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeParserTest.cpp#4 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -197,6 +197,17 @@ void DateTimeParserTest::testISO8601Frac()
 	assert (dt.millisecond() == 123);
 	assert (dt.microsecond() == 450);
 	assert (tzd == -3600);
+
+	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2010-09-23T16:17:01.2817002+02:00", tzd);
+	assert (dt.year() == 2010);
+	assert (dt.month() == 9);
+	assert (dt.day() == 23);
+	assert (dt.hour() == 16);
+	assert (dt.minute() == 17);
+	assert (dt.second() == 1);
+	assert (dt.millisecond() == 281);
+	assert (dt.microsecond() == 700);
+	assert (tzd == 7200);
 
 	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00", tzd);
 	assert (dt.year() == 2005);

@@ -120,6 +120,12 @@
 // #define POCO_UTIL_NO_INIFILECONFIGURATION
 
 
+// No support for JSON configuration in 
+// Poco::Util::Application. Avoids linking of JSON
+// library and saves a few 100 Kbytes.
+// #define POCO_UTIL_NO_JSONCONFIGURATION
+
+
 // No support for XML configuration in 
 // Poco::Util::Application. Avoids linking of XML
 // library and saves a few 100 Kbytes.
@@ -133,7 +139,7 @@
 
 // Windows CE has no locale support
 #if defined(_WIN32_WCE)
-#define POCO_NO_LOCALE
+	#define POCO_NO_LOCALE
 #endif
 
 

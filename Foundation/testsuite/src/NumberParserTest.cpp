@@ -217,6 +217,7 @@ void NumberParserTest::testLimits()
 	assert(testLowerLimit<Int16>());
 	assert(testUpperLimit<UInt16>());
 	assert(testUpperLimit<Int32>());
+	assert(testLowerLimit<Int32>());
 	assert(testUpperLimit<UInt32>());
 
 #if defined(POCO_HAVE_INT64)
@@ -229,8 +230,11 @@ void NumberParserTest::testLimits()
 
 void NumberParserTest::testParseError()
 {
-	const char dp = decimalSeparator();
-	const char ts = thousandSeparator();
+	char dp = decimalSeparator();
+	if (dp == 0) dp = '.';
+	char ts = thousandSeparator();
+	if (ts == 0) ts = ',';
+	assert (dp != ts);
 
 	try
 	{

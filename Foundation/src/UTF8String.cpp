@@ -62,19 +62,19 @@ int UTF8::icompare(const std::string& str, std::string::size_type pos, std::stri
 	TextIterator uend2(end2);
 	while (uit1 != uend1 && uit2 != uend2)
 	{
-        int c1 = Unicode::toLower(*uit1);
-        int c2 = Unicode::toLower(*uit2);
-        if (c1 < c2)
-            return -1;
-        else if (c1 > c2)
-            return 1;
-        ++uit1; ++uit2;
+		int c1 = Unicode::toLower(*uit1);
+		int c2 = Unicode::toLower(*uit2);
+		if (c1 < c2)
+			return -1;
+		else if (c1 > c2)
+			return 1;
+		++uit1; ++uit2;
 	}
-    
-    if (uit1 == uend1)
+	
+	if (uit1 == uend1)
 		return uit2 == uend2 ? 0 : -1;
-    else
-        return 1;
+	else
+		return 1;
 }
 
 
@@ -132,19 +132,19 @@ int UTF8::icompare(const std::string& str, std::string::size_type pos, std::stri
 	TextIterator uend(str.begin() + pos + n);
 	while (uit != uend && *ptr)
 	{
-        int c1 = Unicode::toLower(*uit);
-        int c2 = Unicode::toLower(*ptr);
-        if (c1 < c2)
-            return -1;
-        else if (c1 > c2)
-            return 1;
-        ++uit; ++ptr;
+		int c1 = Unicode::toLower(*uit);
+		int c2 = Unicode::toLower(*ptr);
+		if (c1 < c2)
+			return -1;
+		else if (c1 > c2)
+			return 1;
+		++uit; ++ptr;
 	}
-    
-    if (uit == uend)
+	
+	if (uit == uend)
 		return *ptr == 0 ? 0 : -1;
-    else
-        return 1;
+	else
+		return 1;
 }
 
 

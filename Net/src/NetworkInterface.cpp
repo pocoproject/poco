@@ -35,6 +35,11 @@
 
 
 #include "Poco/Net/NetworkInterface.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
@@ -43,6 +48,7 @@
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#if defined(POCO_WIN32_UTF8)
 		#include "Poco/UnicodeConverter.h"
+		#include "Poco/Error.h"
 	#endif
 	#include <iphlpapi.h>
 	#include <ipifcons.h>
@@ -87,9 +93,15 @@ public:
 	typedef NetworkInterface::Type         Type;
 	
 	NetworkInterfaceImpl(unsigned index);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, unsigned index);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, unsigned index = 0);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, unsigned index);
+	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = 0);
+	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = 0);
+	NetworkInterfaceImpl(const std::string& name,
+		const std::string& displayName,
+		const IPAddress& address,
+		const IPAddress& subnetMask,
+		const IPAddress& broadcastAddress,
+		unsigned index,
+		NetworkInterface::MACAddress* pMACAddress = 0);
 
 	unsigned index() const;
 	const std::string& name() const;
@@ -131,7 +143,7 @@ public:
 #endif
 
 	void setUp(bool up);
-	void setMtu(unsigned mtu);
+	void setMTU(unsigned mtu);
 	void setType(Type type);
 	void setIndex(unsigned index);
 	void setPhyParams();
@@ -166,7 +178,7 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(unsigned index):
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, unsigned index):
+NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress):
 	_name(name),
 	_displayName(displayName),
 	_index(index),
@@ -180,10 +192,11 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 {
 	_addressList.push_back(AddressTuple(address, IPAddress(), IPAddress()));
 	setPhyParams();
+	if (pMACAddress) setMACAddress(*pMACAddress);
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, unsigned index):
+NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, unsigned index, NetworkInterface::MACAddress* pMACAddress):
 	_name(name),
 	_displayName(displayName),
 	_index(index),
@@ -196,10 +209,17 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_mtu(0)
 {
 	setPhyParams();
+	if (pMACAddress) setMACAddress(*pMACAddress);
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, unsigned index):
+NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name,
+	const std::string& displayName,
+	const IPAddress& address,
+	const IPAddress& subnetMask,
+	const IPAddress& broadcastAddress,
+	unsigned index,
+	NetworkInterface::MACAddress* pMACAddress):
 	_name(name),
 	_displayName(displayName),
 	_index(index),
@@ -213,6 +233,7 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 {
 	_addressList.push_back(AddressTuple(address, subnetMask, broadcastAddress));
 	setPhyParams();
+	if (pMACAddress) setMACAddress(*pMACAddress);
 }
 
 
@@ -227,7 +248,7 @@ void NetworkInterfaceImpl::setPhyParams()
 	setFlags(ifr.ifr_flags);
 
 	ds.impl()->ioctl(SIOCGIFMTU, &ifr);
-	setMtu(ifr.ifr_mtu);
+	setMTU(ifr.ifr_mtu);
 #endif
 }
 
@@ -466,7 +487,7 @@ inline void NetworkInterfaceImpl::setUp(bool up)
 }
 
 
-inline void NetworkInterfaceImpl::setMtu(unsigned mtu)
+inline void NetworkInterfaceImpl::setMTU(unsigned mtu)
 {
 	_mtu = mtu;
 }
@@ -501,8 +522,11 @@ inline void NetworkInterfaceImpl::addAddress(const IPAddress& addr)
 	_addressList.push_back(addr);
 }
 
+
 inline void NetworkInterfaceImpl::setMACAddress(const NetworkInterface::MACAddress& addr)
 {
+	
+
 	_macAddress = addr;
 }
 
@@ -536,32 +560,43 @@ NetworkInterface::NetworkInterface(const NetworkInterface& interfc):
 }
 
 
-NetworkInterface::NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, unsigned index):
-	_pImpl(new NetworkInterfaceImpl(name, displayName, address, index))
+NetworkInterface::NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, unsigned index, MACAddress* pMACAddress):
+	_pImpl(new NetworkInterfaceImpl(name, displayName, address, index, pMACAddress))
 {
 }
 
 
-NetworkInterface::NetworkInterface(const std::string& name, const std::string& displayName, unsigned index):
-	_pImpl(new NetworkInterfaceImpl(name, displayName, index))
+NetworkInterface::NetworkInterface(const std::string& name, const std::string& displayName, unsigned index, MACAddress* pMACAddress):
+	_pImpl(new NetworkInterfaceImpl(name, displayName, index, pMACAddress))
 {
 }
 
 
-NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& address, unsigned index):
-	_pImpl(new NetworkInterfaceImpl(name, name, address, index))
+NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& address, unsigned index, MACAddress* pMACAddress):
+	_pImpl(new NetworkInterfaceImpl(name, name, address, index, pMACAddress))
 {
 }
 
 
-NetworkInterface::NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, unsigned index):
-	_pImpl(new NetworkInterfaceImpl(name, displayName, address, subnetMask, broadcastAddress, index))
+NetworkInterface::NetworkInterface(const std::string& name,
+	const std::string& displayName,
+	const IPAddress& address,
+	const IPAddress& subnetMask,
+	const IPAddress& broadcastAddress,
+	unsigned index,
+	MACAddress* pMACAddress):
+	_pImpl(new NetworkInterfaceImpl(name, displayName, address, subnetMask, broadcastAddress, index, pMACAddress))
 {
 }
 
 
-NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, unsigned index):
-	_pImpl(new NetworkInterfaceImpl(name, name, address, subnetMask, broadcastAddress, index))
+NetworkInterface::NetworkInterface(const std::string& name,
+	const IPAddress& address,
+	const IPAddress& subnetMask,
+	const IPAddress& broadcastAddress,
+	unsigned index,
+	MACAddress* pMACAddress):
+	_pImpl(new NetworkInterfaceImpl(name, name, address, subnetMask, broadcastAddress, index, pMACAddress))
 {
 }
 
@@ -608,6 +643,19 @@ const std::string& NetworkInterface::displayName() const
 const IPAddress& NetworkInterface::firstAddress(IPAddress::Family family) const
 {
 	return _pImpl->firstAddress(family);
+}
+
+
+void NetworkInterface::firstAddress(IPAddress& addr, IPAddress::Family family) const
+{
+	try
+	{
+		addr = firstAddress(family);
+	}
+	catch (NotFoundException&)
+	{
+		addr = IPAddress(family);
+	}
 }
 
 
@@ -769,8 +817,8 @@ NetworkInterface NetworkInterface::forAddress(const IPAddress& addr)
 
 	for (; it != end; ++it)
 	{
-		const unsigned count = it->second.addressList().size();
-		for (unsigned i = 0; i < count; ++i)
+		const std::size_t count = it->second.addressList().size();
+		for (int i = 0; i < count; ++i)
 		{
 			if (it->second.address(i) == addr)
 				return it->second;
@@ -806,6 +854,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 		int index = it->second.index();
 		std::string name = it->second.name();
 		std::string displayName = it->second.displayName();
+		NetworkInterface::MACAddress mac = it->second.macAddress();
 
 		typedef NetworkInterface::AddressList List;
 		const List& ipList = it->second.addressList();
@@ -817,11 +866,11 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 			IPAddress mask = ipIt->get<NetworkInterface::SUBNET_MASK>();
 			NetworkInterface ni;
 			if (mask.isWildcard())
-				ni = NetworkInterface(name, displayName, addr, index);
+				ni = NetworkInterface(name, displayName, addr, index, &mac);
 			else
 			{
 				IPAddress broadcast = ipIt->get<NetworkInterface::BROADCAST_ADDRESS>();
-				ni = NetworkInterface(name, displayName, addr, mask, broadcast, index);
+				ni = NetworkInterface(name, displayName, addr, mask, broadcast, index, &mac);
 			}
 
 			list.push_back(ni);
@@ -892,24 +941,6 @@ IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr,
 }
 
 
-std::string getErrorMessage(DWORD errorCode)
-{
-	std::string errMsg;
-	DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
-	LPWSTR lpMsgBuf = 0;
-	if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
-		UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
-#else
-	LPTSTR lpMsgBuf = 0;
-	if (FormatMessageA(dwFlg, 0, errorCode, 0, (LPTSTR) & lpMsgBuf, 0, NULL))
-		errMsg = lpMsgBuf;
-#endif
-	LocalFree(lpMsgBuf);
-	return errMsg;
-}
-
-
 NetworkInterface::Type fromNative(DWORD type)
 {
 	switch (type) 
@@ -953,11 +984,11 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		pAddress = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(memory.begin()); // leave in the loop, begin may change after resize
 		poco_assert (memory.capacity() >= outBufLen);
 		if (ERROR_BUFFER_OVERFLOW == (dwRetVal = GetAdaptersAddresses(family, flags, 0, pAddress, &outBufLen)))
-			memory.resize(outBufLen); // adjust size and try again
+			memory.resize(outBufLen, false); // adjust size and try again
 		else if (ERROR_NO_DATA == dwRetVal) // no network interfaces found
 			return result;
 		else if (NO_ERROR != dwRetVal) // error occurred
-			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", getErrorMessage(dwRetVal)));
+			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", Error::getMessage(dwRetVal)));
 		else
 			break;
 	} while ((ERROR_BUFFER_OVERFLOW == dwRetVal) && (++iterations <= 2));
@@ -1011,7 +1042,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				ifIt = result.insert(Map::value_type(ifIndex, ni)).first;
 		
 			ifIt->second.impl().setFlags(pAddress->Flags, pAddress->IfType);
-			ifIt->second.impl().setMtu(pAddress->Mtu);
+			ifIt->second.impl().setMTU(pAddress->Mtu);
 			ifIt->second.impl().setUp(pAddress->OperStatus == IfOperStatusUp);
 #if (_WIN32_WINNT >= 0x0600) // Vista and newer only
 			ifIt->second.impl().setRunning(pAddress->ReceiveLinkSpeed > 0 || pAddress->TransmitLinkSpeed > 0);
@@ -1293,7 +1324,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 
 
 #include <sys/types.h>
+#ifndef POCO_ANDROID // Android doesn't have <ifaddrs.h>
 #include <ifaddrs.h>
+#endif
 #include <linux/if.h>
 #include <linux/if_packet.h>
 #include <net/if_arp.h>
@@ -1323,6 +1356,8 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 	}
 }
 
+#ifndef POCO_ANDROID
+
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
 	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
@@ -1334,11 +1369,14 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setType(fromNative(sdl->sll_hatype));
 }
 
+#endif
+
 }
 
 
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
+#ifndef POCO_ANDROID
 	FastMutex::ScopedLock lock(_mutex);
 	Map result;
 	unsigned ifIndex = 0;
@@ -1437,6 +1475,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	if (ifaces) freeifaddrs(ifaces);
 
 	return result;
+#else
+	throw Poco::NotImplementedException("Not implemented in Android");
+#endif
 }
 
 
@@ -1534,3 +1575,6 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 
 
 #endif
+
+
+#endif // POCO_NET_HAS_INTERFACE

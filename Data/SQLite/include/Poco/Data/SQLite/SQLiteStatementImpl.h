@@ -141,6 +141,8 @@ private:
 	bool             _canBind;
 	bool             _isExtracted;
 	bool             _canCompile;
+
+	static const std::size_t POCO_SQLITE_INV_ROW_CNT;
 };
 
 

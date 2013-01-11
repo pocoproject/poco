@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Utility.cpp#2 $
+// $Id: //poco/1.4/CppParser/src/Utility.cpp#3 $
 //
 // Library: CppParser
 // Package: CppParser
@@ -202,8 +202,14 @@ std::string Utility::preprocessFile(const std::string& file, const std::string& 
 	}
 	StringTokenizer tokenizer(popts, ",;\n", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 	std::vector<std::string> args(tokenizer.begin(), tokenizer.end());
+#ifdef _WIN32
+	std::string quotedFile("\"");
+	quotedFile += file;
+	quotedFile += "\"";
+	args.push_back(quotedFile);
+#else
 	args.push_back(file);
-	
+#endif
 	if (!path.empty())
 	{
 		std::string newPath(Environment::get("PATH"));

@@ -1,7 +1,7 @@
 //
 // ProGen.cpp
 //
-// $Id: //poco/1.4/ProGen/src/ProGen.cpp#5 $
+// $Id: //poco/1.4/ProGen/src/ProGen.cpp#7 $
 //
 // Visual Studio project file generator.
 //
@@ -263,6 +263,7 @@ protected:
 		{
 			Poco::XML::Element* pFileElem = static_cast<Poco::XML::Element*>(pFileElems->item(fileIndex));
 			Poco::XML::Element* pFileConfigElem = pFileElem->getChildElement("FileConfiguration");
+			Poco::Path relativePath = pFileElem->getAttribute("RelativePath");
 			if (pFileConfigElem)
 			{
 				Poco::AutoPtr<Poco::XML::Element> pPrototypeFileConfigElem = static_cast<Poco::XML::Element*>(pFileConfigElem->cloneNode(true));
@@ -276,6 +277,10 @@ protected:
 				{
 					Poco::AutoPtr<Poco::XML::Element> pNewFileConfigElem = static_cast<Poco::XML::Element*>(pPrototypeFileConfigElem->cloneNode(true));
 					pNewFileConfigElem->setAttribute("Name", *it + "|" + platform);
+					if (relativePath.getExtension() == "rc" && it->find("static") != std::string::npos)
+					{
+						pNewFileConfigElem->setAttribute("ExcludedFromBuild", "true");
+					}
 					pFileElem->appendChild(pNewFileConfigElem);
 				}
 			}
@@ -349,7 +354,7 @@ protected:
 		std::string projectGUID = projectConfig.getString("vc.project.guid", "");
 		std::string projectPlatform = templateProps.getString("project.platform", platform);
 		std::string projectSuffix = templateProps.getString("project.finalSuffix",  templateProps.getString("project.suffix"));
-		bool includesHaveDependencies = false;
+		bool includesHaveDependencies = projectConfig.getBool("vc.solution.fixedBuildOrder", false);
 		if (!projectName.empty())
 		{
 			solutionStream << "Project(\"{" << solutionGUID << "}\") = \"" << projectName << "\", \"" << projectName << projectSuffix << "\", \"{" << projectGUID << "}\"\r\n";

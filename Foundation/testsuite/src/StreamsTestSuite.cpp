@@ -31,6 +31,7 @@
 
 
 #include "StreamsTestSuite.h"
+#include "Base32Test.h"
 #include "Base64Test.h"
 #include "HexBinaryTest.h"
 #include "StreamCopierTest.h"
@@ -50,6 +51,7 @@ CppUnit::Test* StreamsTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("StreamsTestSuite");
 
+	pSuite->addTest(Base32Test::suite());
 	pSuite->addTest(Base64Test::suite());
 	pSuite->addTest(HexBinaryTest::suite());
 	pSuite->addTest(StreamCopierTest::suite());

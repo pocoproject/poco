@@ -39,6 +39,10 @@
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/Session.h"
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
 class SQLExecutor: public CppUnit::TestCase
 {
 public:
@@ -101,7 +105,13 @@ public:
 
 	void blob(int bigSize = 1024);
 	void blobStmt();
+<<<<<<< HEAD
 
+=======
+	void dateTime();
+	void date();
+	void time();
+>>>>>>> develop
 	void floats();
 	void doubles();
 	void tuples();

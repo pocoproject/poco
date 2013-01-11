@@ -69,10 +69,12 @@ public:
 	};
 
 	// compile-time shield against misalignment
+#ifndef POCO_ANDROID	
 	poco_static_assert (offsetof(Header, code) == 0x01);
 	poco_static_assert (offsetof(Header, checksum) == 0x02);
 	poco_static_assert (offsetof(Header, id) == 0x04);
 	poco_static_assert (offsetof(Header, seq) == 0x06);
+#endif
 
 	enum MessageType
 	{

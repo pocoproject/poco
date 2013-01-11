@@ -63,7 +63,11 @@
 
 
 #if !defined(Net_API)
-	#define Net_API
+	#if defined (__GNUC__) && (__GNUC__ >= 4)
+		#define Net_API __attribute__ ((visibility ("default")))
+	#else
+		#define Net_API
+	#endif
 #endif
 
 
@@ -75,25 +79,6 @@
 		#pragma comment(lib, "PocoNet" POCO_LIB_SUFFIX)
 	#endif
 #endif
-
-
-namespace Poco {
-namespace Net {
-
-
-void Net_API initializeNetwork();
-	/// Initialize the network subsystem.
-	/// Calls WSAStartup() on Windows, does nothing
-	/// on other platforms.
-
-
-void Net_API uninitializeNetwork();
-	/// Uninitialize the network subsystem.
-	/// Calls WSACleanup() on Windows, does nothing
-	/// on other platforms.
-
-
-} } // namespace Poco::Net
 
 
 // Default to enabled IPv6 support if not explicitly disabled
@@ -121,6 +106,44 @@ void Net_API uninitializeNetwork();
 			#define s6_addr32 __u6_addr.__u6_addr32
 		#endif
 	#endif
+#endif
+
+
+namespace Poco {
+namespace Net {
+
+
+inline void Net_API initializeNetwork();
+	/// Initialize the network subsystem.
+
+
+inline void Net_API uninitializeNetwork();
+	/// Uninitialize the network subsystem.
+
+
+}} // namespace Poco::Net
+
+
+//
+// Automate network initialization on Windows.
+//
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NET_NO_WINDOWS_INIT)
+	#if defined(POCO_STATIC)
+		extern "C" const struct NetworkInitializer pocoNetworkInitializer;
+		#ifdef _WIN64
+			#pragma comment(linker, "/include:pocoNetworkInitializer")
+		#else
+			#pragma comment(linker, "/include:_pocoNetworkInitializer")
+		#endif
+	#endif // POCO_STATIC
+#endif // POCO_NET_NO_WINDOWS_INIT
+
+
+//
+// Define POCO_NET_HAS_INTERFACE for platforms that have network interface detection implemented.
+//
+#if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
+	#define POCO_NET_HAS_INTERFACE
 #endif
 
 

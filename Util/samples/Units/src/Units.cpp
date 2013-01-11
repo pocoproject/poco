@@ -35,12 +35,24 @@
 #include "Poco/Util/Units.h"
 #include <iostream>
 
+<<<<<<< HEAD
 using namespace Poco::Util::Units::Values;
 using namespace Poco::Util::Units::Constants;
 
 using Poco::Util::Units::square;
 using Poco::Util::Units::cube;
 
+=======
+
+using namespace Poco::Util::Units::Values;
+using namespace Poco::Util::Units::Constants;
+
+
+using Poco::Util::Units::square;
+using Poco::Util::Units::cube;
+
+
+>>>>>>> develop
 namespace Poco {
 namespace Util {
 namespace Units {

@@ -410,6 +410,8 @@
 				<File
 					RelativePath=".\src\IPAddress.cpp"/>
 				<File
+					RelativePath=".\src\Net.cpp"/>
+				<File
 					RelativePath=".\src\NetException.cpp"/>
 				<File
 					RelativePath=".\src\NetworkInterface.cpp"/>
@@ -754,6 +756,8 @@
 				<File
 					RelativePath=".\include\Poco\Net\SocketAcceptor.h"/>
 				<File
+					RelativePath=".\include\Poco\Net\ParallelSocketAcceptor.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\SocketConnector.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\SocketNotification.h"/>
@@ -761,6 +765,8 @@
 					RelativePath=".\include\Poco\Net\SocketNotifier.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\SocketReactor.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\ParallelSocketReactor.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">

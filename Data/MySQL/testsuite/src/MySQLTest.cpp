@@ -417,6 +417,19 @@ void MySQLTest::testEmptyDB()
 }
 
 
+void MySQLTest::testDateTime()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonDateTimeTable();
+	_pExecutor->dateTime();
+	recreatePersonDateTable();
+	_pExecutor->date();
+	recreatePersonTimeTable();
+	_pExecutor->time();
+}
+
+
 void MySQLTest::testBLOB()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -697,6 +710,33 @@ void MySQLTest::recreatePersonBLOBTable()
 }
 
 
+void MySQLTest::recreatePersonDateTimeTable()
+{
+	dropTable("Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
+}
+
+
+void MySQLTest::recreatePersonDateTable()
+{
+	dropTable("Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATE)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonDateTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonDateTable()"); }
+}
+
+
+void MySQLTest::recreatePersonTimeTable()
+{
+	dropTable("Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday TIME)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonTimeTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonTimeTable()"); }
+}
+
+
 void MySQLTest::recreateIntsTable()
 {
 	dropTable("Strings");
@@ -833,6 +873,7 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testIllegalRange);
 	CppUnit_addTest(pSuite, MySQLTest, testSingleSelect);
 	CppUnit_addTest(pSuite, MySQLTest, testEmptyDB);
+	CppUnit_addTest(pSuite, MySQLTest, testDateTime);
 	//CppUnit_addTest(pSuite, MySQLTest, testBLOB);
 	CppUnit_addTest(pSuite, MySQLTest, testBLOBStmt);
 	CppUnit_addTest(pSuite, MySQLTest, testFloat);

@@ -128,10 +128,10 @@ void CoreTest::testFixedLength()
 	assert (sizeof(Poco::UInt16) == 2);
 	assert (sizeof(Poco::Int32) == 4);
 	assert (sizeof(Poco::UInt32) == 4);
-	#if defined(POCO_HAVE_INT64)
+#if defined(POCO_HAVE_INT64)
 	assert (sizeof(Poco::Int64) == 8);
 	assert (sizeof(Poco::UInt64) == 8);
-	#endif
+#endif
 	assert (sizeof(Poco::IntPtr) == sizeof(void*));
 	assert (sizeof(Poco::UIntPtr) == sizeof(void*));	
 }
@@ -201,7 +201,9 @@ void CoreTest::testBuffer()
 	std::size_t s = 10;
 	Buffer<int> b(s);
 	assert (b.size() == s);
+	assert (b.sizeBytes() == s * sizeof(int));
 	assert (b.capacity() == s);
+	assert (b.capacityBytes() == s * sizeof(int));
 	std::vector<int> v;
 	for (int i = 0; i < s; ++i)
 		v.push_back(i);
@@ -263,15 +265,15 @@ void CoreTest::testBuffer()
 	assert ( !std::memcmp(g.begin(), "hellohello", 10) );
 
 	char h[10];
-	Buffer<char> i(h, 10);
+	Buffer<char> buf(h, 10);
 	try
 	{
-		i.append("hello", 5);
+		buf.append("hello", 5);
 		fail ("must fail");
 	}
 	catch (InvalidAccessException&) { }
 
-	i.assign("hello", 5);
+	buf.assign("hello", 5);
 	assert ( !std::memcmp(&h[0], "hello", 5) );
 
 	const char j[10] = "hello";
@@ -279,6 +281,112 @@ void CoreTest::testBuffer()
 	k.append("hello", 5);
 	assert ( !std::memcmp(&j[0], "hello", 5) );
 	assert ( !std::memcmp(k.begin(), "hellohello", 10) );
+}
+
+
+void CoreTest::testFIFOBufferEOFAndError()
+{
+	typedef FIFOBuffer::Type T;
+
+	FIFOBuffer f(20, true);
+	
+	assert (f.isEmpty());
+	assert (!f.isFull());
+
+	Buffer<T> b(10);
+	std::vector<T> v;
+
+	f.readable += delegate(this, &CoreTest::onReadable);
+	f.writable += delegate(this, &CoreTest::onWritable);
+
+	for (T c = '0'; c < '0' +  10; ++c)
+		v.push_back(c);
+
+	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	assert(0 == _notToReadable);
+	assert(0 == _readableToNot);
+	assert (10 == f.write(b));
+	assert(1 == _notToReadable);
+	assert(0 == _readableToNot);
+	assert (20 == f.size());
+	assert (10 == f.used());
+	assert (!f.isEmpty());
+	f.setEOF();
+	assert(0 == _notToWritable);
+	assert(1 == _writableToNot);
+	assert (f.hasEOF());
+	assert (!f.isEOF());
+	assert(1 == _notToReadable);
+	assert(0 == _readableToNot);
+	assert (20 == f.size());
+	assert (10 == f.used());
+	assert (0 == f.write(b));
+	assert (!f.isEmpty());
+	assert (5 == f.read(b, 5));
+	assert(1 == _notToReadable);
+	assert(0 == _readableToNot);
+	assert (f.hasEOF());
+	assert (!f.isEOF());
+	assert (5 == f.read(b, 5));
+	assert(1 == _notToReadable);
+	assert(1 == _readableToNot);
+	assert (f.hasEOF());
+	assert (f.isEOF());
+	assert(0 == _notToWritable);
+	assert(1 == _writableToNot);
+
+	f.setEOF(false);
+	assert (!f.hasEOF());
+	assert (!f.isEOF());
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+	assert(1 == _notToReadable);
+	assert(1 == _readableToNot);
+
+	assert (5 == f.write(b));
+	assert(1 == _notToWritable);
+	assert(1 == _writableToNot);
+	assert(2 == _notToReadable);
+	assert(1 == _readableToNot);
+	assert (20 == f.size());
+	assert (5 == f.used());
+	f.setError();
+	assert (0 == f.write(b));
+	
+	try
+	{
+		f.copy(b.begin(), 5);
+		fail ("must throw InvalidAccessException");
+	}
+	catch (InvalidAccessException&) { }
+
+	try
+	{
+		f.advance(5);
+		fail ("must throw InvalidAccessException");
+	}
+	catch (InvalidAccessException&) { }
+	
+	assert(1 == _notToWritable);
+	assert(2 == _writableToNot);
+	assert(2 == _notToReadable);
+	assert(2 == _readableToNot);
+	assert (20 == f.size());
+	assert (0 == f.used());
+	f.setError(false);
+	assert(2 == _notToWritable);
+	assert(2 == _writableToNot);
+	assert(2 == _notToReadable);
+	assert(2 == _readableToNot);
+	assert (20 == f.size());
+	assert (0 == f.used());
+	assert (5 == f.write(b));
+	assert(2 == _notToWritable);
+	assert(2 == _writableToNot);
+	assert(3 == _notToReadable);
+	assert(2 == _readableToNot);
+	assert (20 == f.size());
+	assert (5 == f.used());
 }
 
 
@@ -548,13 +656,13 @@ void CoreTest::testFIFOBufferChar()
 	assert(1 == _notToWritable);
 	assert(1 == _writableToNot);
 
-	const char c[3] = {'4', '5', '6' };
+	const char arr[3] = {'4', '5', '6' };
 	try
 	{
-		f.copy(&c[0], 8);
+		f.copy(&arr[0], 8);
 	} catch (InvalidAccessException&) { }
 
-	f.copy(&c[0], 3);
+	f.copy(&arr[0], 3);
 	assert(7 == _notToReadable);
 	assert(6 == _readableToNot);
 	assert(1 == _notToWritable);
@@ -565,7 +673,7 @@ void CoreTest::testFIFOBufferChar()
 	assert (4 == f.available());
 
 	const char d[4] = {'7', '8', '9', '0' };
-	f.copy(&c[0], 4);
+	f.copy(&arr[0], 4);
 	assert(7 == _notToReadable);
 	assert(6 == _readableToNot);
 	assert(1 == _notToWritable);
@@ -578,7 +686,7 @@ void CoreTest::testFIFOBufferChar()
 
 	try
 	{
-		f.copy(&c[0], 1);
+		f.copy(&arr[0], 1);
 	} catch (InvalidAccessException&) { }
 
 	f.drain(1);
@@ -962,6 +1070,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferChar);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferInt);
+	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferEOFAndError);
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);

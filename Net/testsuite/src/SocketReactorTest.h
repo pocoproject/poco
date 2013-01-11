@@ -47,6 +47,7 @@ public:
 	~SocketReactorTest();
 
 	void testSocketReactor();
+	void testParallelSocketReactor();
 	void testSocketConnectorFail();
 	void testSocketConnectorTimeout();
 

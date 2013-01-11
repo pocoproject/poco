@@ -42,7 +42,7 @@
 
 namespace Poco {
 namespace Data {
-namespace ODBC {		
+namespace ODBC {
 
 
 inline void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::wstring& target)
@@ -56,28 +56,20 @@ inline void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::wstring& target
 }
 
 
-inline void makeUTF16(SQLCHAR* pSQLChar, SQLSMALLINT length, std::wstring& target)
-	/// Utility function for conversion from UTF-8 to UTF-16.
+inline void makeUTF8(Poco::Buffer<wchar_t>& buffer, SQLINTEGER length, SQLPOINTER pTarget, SQLINTEGER targetLength)
+	/// Utility function for conversion from UTF-16 to UTF-8. Length is in bytes.
 {
-	makeUTF16(pSQLChar, (SQLINTEGER) length, target);
-}
+	if (buffer.sizeBytes() < length)
+		throw InvalidArgumentException("Specified length exceeds available length.");
+	else if ((length % 2) != 0)
+		throw InvalidArgumentException("Length must be an even number.");
 
-
-inline void makeUTF8(Poco::Buffer<wchar_t>& buffer, int length, SQLPOINTER pTarget, SQLINTEGER targetLength)
-	/// Utility function for conversion from UTF-16 to UTF-8.
-{
+	length /= sizeof(wchar_t);
 	std::string result;
 	UnicodeConverter::toUTF8(buffer.begin(), length, result);
 	
 	std::memset(pTarget, 0, targetLength);
 	std::strncpy((char*) pTarget, result.c_str(), result.size() < targetLength ? result.size() : targetLength);
-}
-
-
-inline void makeUTF8(Poco::Buffer<wchar_t>& buffer, int length, SQLPOINTER pTarget, SQLSMALLINT targetLength)
-	/// Utility function for conversion from UTF-16 to UTF-8.
-{
-	makeUTF8(buffer, length, pTarget, (SQLINTEGER) targetLength);
 }
 
 

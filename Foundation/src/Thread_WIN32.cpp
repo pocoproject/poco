@@ -101,7 +101,7 @@ ThreadImpl::ThreadImpl():
 {
 }
 
-			
+
 ThreadImpl::~ThreadImpl()
 {
 	if (_thread) CloseHandle(_thread);
@@ -226,7 +226,7 @@ ThreadImpl* ThreadImpl::currentImpl()
 
 ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 {
-    return GetCurrentThreadId();
+	return GetCurrentThreadId();
 }
 
 

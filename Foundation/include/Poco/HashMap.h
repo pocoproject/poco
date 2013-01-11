@@ -180,6 +180,12 @@ public:
 		return _table.find(value);
 	}
 
+	std::size_t count(const KeyType& key) const
+	{
+		ValueType value(key);
+		return _table.find(value) != _table.end() ? 1 : 0;
+	}
+
 	std::pair<Iterator, bool> insert(const PairType& pair)
 	{
 		ValueType value(pair.first, pair.second);

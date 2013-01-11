@@ -193,7 +193,7 @@ Timestamp File::getLastModified() const
 File& File::setLastModified(const Timestamp& ts)
 {
 	setLastModifiedImpl(ts);
-    return *this;
+	return *this;
 }
 
 	
@@ -206,28 +206,28 @@ File::FileSize File::getSize() const
 File& File::setSize(FileSizeImpl size)
 {
 	setSizeImpl(size);
-    return *this;
+	return *this;
 }
 
 	
 File& File::setWriteable(bool flag)
 {
 	setWriteableImpl(flag);
-    return *this;
+	return *this;
 }
 
 
 File& File::setReadOnly(bool flag)
 {
 	setWriteableImpl(!flag);
-    return *this;
+	return *this;
 }
 
 
 File& File::setExecutable(bool flag)
 {
 	setExecutableImpl(flag);
-    return *this;
+	return *this;
 }
 
 	

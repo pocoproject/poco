@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/Darwin64#1 $
+# $Id: //poco/1.4/build/config/Darwin64#2 $
 #
 # Darwin64
 #
@@ -11,4 +11,4 @@
 ARCHFLAGS = -arch x86_64
 POCO_TARGET_OSARCH = x86_64
 
-include $(POCO_BASE)/build/config/Darwin
+include $(POCO_BASE)/build/config/Darwin-clang

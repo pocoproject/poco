@@ -48,6 +48,7 @@ public:
 
 	void testFormat();
 	void testFormat0();
+	void testFormatBool();
 	void testFormatHex();
 	void testFormatFloat();
 	

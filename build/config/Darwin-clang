@@ -49,7 +49,7 @@ SHAREDLIBLINKEXT = .dylib
 # Compiler and Linker Flags
 #
 CFLAGS          = $(ARCHFLAGS)
-CXXFLAGS        = $(ARCHFLAGS) -Wall -Wno-sign-compare
+CXXFLAGS        = $(ARCHFLAGS) -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
 LINKFLAGS       = $(ARCHFLAGS)
 SHLIBFLAGS      = $(ARCHFLAGS)
 DYLIBFLAGS      = $(ARCHFLAGS)

@@ -105,6 +105,11 @@ public:
 	virtual std::string asString() const;
 		/// Returns a string representation of the token.
 	
+#if defined(POCO_HAVE_INT64)
+	virtual Int64 asInteger64() const;
+        /// Returns a 64-bit integer representation of the token.
+#endif
+
 	virtual int asInteger() const;
 		/// Returns an integer representation of the token.
 	

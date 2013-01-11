@@ -37,6 +37,11 @@
 
 
 #include "Poco/Net/Net.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "CppUnit/TestCase.h"
 
 
@@ -53,6 +58,7 @@ public:
 	void testForIndex();
 	void testMapIpOnly();
 	void testMapUpOnly();
+	void testListMapConformance();
 
 	void setUp();
 	void tearDown();
@@ -61,6 +67,9 @@ public:
 
 private:
 };
+
+
+#endif // POCO_NET_HAS_INTERFACE
 
 
 #endif // NetworkInterfaceTest_INCLUDED

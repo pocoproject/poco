@@ -39,6 +39,7 @@
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include <iostream>
+#include <sstream>
 
 
 using Poco::Util::Application;
@@ -154,12 +155,19 @@ protected:
 		config().setString(name, value);
 	}
 
-	int main(const std::vector<std::string>& args)
+	int main(const ArgVec& args)
 	{
 		if (!_helpRequested)
 		{
+			logger().information("Command line:");
+			std::ostringstream ostr;
+			for (ArgVec::const_iterator it = argv().begin(); it != argv().end(); ++it)
+			{
+				ostr << *it << ' ';
+			}
+			logger().information(ostr.str());
 			logger().information("Arguments to main():");
-			for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
+			for (ArgVec::const_iterator it = args.begin(); it != args.end(); ++it)
 			{
 				logger().information(*it);
 			}

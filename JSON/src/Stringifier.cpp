@@ -49,7 +49,17 @@ namespace JSON {
 
 void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent)
 {
-	if ( any.type() == typeid(Object::Ptr) )
+	if ( any.type() == typeid(Object) )
+	{
+		const Object& o = any.extract<Object>();
+		o.stringify(out, indent == 0 ? 0 : indent + 2);
+	}
+	else if ( any.type() == typeid(Array) )
+	{
+		const Array& a = any.extract<Array>();
+		a.stringify(out, indent == 0 ? 0 : indent + 2);
+	}
+	else if ( any.type() == typeid(Object::Ptr) )
 	{
 		const Object::Ptr& o = any.extract<Object::Ptr>();
 		o->stringify(out, indent == 0 ? 0 : indent + 2);

@@ -1,5 +1,5 @@
 //
-// MySQLException.cpp
+// SessionImpl.cpp
 //
 // $Id: //poco/1.4/Data/MySQL/src/SessionImpl.cpp#1 $
 //
@@ -67,7 +67,7 @@ const std::string SessionImpl::MYSQL_SERIALIZABLE = "SERIALIZABLE";
 
 
 SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) : 
-	Poco::Data::AbstractSessionImpl<SessionImpl>(toLower(connectionString), loginTimeout),
+	Poco::Data::AbstractSessionImpl<SessionImpl>(connectionString, loginTimeout),
 	_handle(0),
 	_connected(false),
 	_inTransaction(false)

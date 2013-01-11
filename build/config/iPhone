@@ -30,7 +30,7 @@ IPHONE_SDK_VERSION_MIN ?= $(patsubst %.sdk,%,$(patsubst $(IPHONE_SDK_ROOT_DIR)%,
 
 POCO_TARGET_OSNAME     ?= $(IPHONE_SDK)
 POCO_TARGET_OSARCH     ?= armv6
-TOOL_PREFIX            ?= /Developer/Platforms/$(IPHONE_SDK).platform/Developer/usr/bin
+TOOL_PREFIX            ?= $(shell xcode-select -print-path)/Platforms/$(IPHONE_SDK).platform/Developer/usr/bin
 OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) -mthumb -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN)
 
 #

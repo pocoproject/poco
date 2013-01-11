@@ -102,6 +102,17 @@ Object::Ptr Array::getObject(unsigned int index) const
 }
 
 
+bool Array::isNull(unsigned int index) const
+{
+	if ( index < _values.size() )
+	{
+		Dynamic::Var value = _values[index];
+		return value.isEmpty();
+	}
+	return true;
+}
+
+
 bool Array::isObject(unsigned int index) const
 {
 	Var value = get(index);
@@ -115,7 +126,7 @@ void Array::stringify(std::ostream& out, unsigned int indent) const
 	if ( indent > 0 )
 		out << std::endl;
 
-	for(ValueVector::const_iterator it = _values.begin(); it != _values.end();)
+	for(ValueVec::const_iterator it = _values.begin(); it != _values.end();)
 	{
 		for(int i = 0; i < indent; i++)
 		{

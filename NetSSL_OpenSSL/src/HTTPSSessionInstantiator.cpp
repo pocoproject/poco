@@ -1,7 +1,7 @@
 //
 // HTTPSSessionInstantiator.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSSessionInstantiator.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSSessionInstantiator.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -48,6 +48,12 @@ HTTPSSessionInstantiator::HTTPSSessionInstantiator()
 }
 
 
+HTTPSSessionInstantiator::HTTPSSessionInstantiator(Context::Ptr pContext) :
+	_pContext(pContext)
+{
+}
+
+
 HTTPSSessionInstantiator::~HTTPSSessionInstantiator()
 {
 }
@@ -56,7 +62,7 @@ HTTPSSessionInstantiator::~HTTPSSessionInstantiator()
 HTTPClientSession* HTTPSSessionInstantiator::createClientSession(const Poco::URI& uri)
 {
 	poco_assert (uri.getScheme() == "https");
-	HTTPSClientSession* pSession = new HTTPSClientSession(uri.getHost(), uri.getPort());
+	HTTPSClientSession* pSession = _pContext.isNull() ? new HTTPSClientSession(uri.getHost(), uri.getPort()) : new HTTPSClientSession(uri.getHost(), uri.getPort(), _pContext);
 	pSession->setProxy(proxyHost(), proxyPort());
 	pSession->setProxyCredentials(proxyUsername(), proxyPassword());
 	return pSession;
@@ -66,6 +72,12 @@ HTTPClientSession* HTTPSSessionInstantiator::createClientSession(const Poco::URI
 void HTTPSSessionInstantiator::registerInstantiator()
 {
 	HTTPSessionFactory::defaultFactory().registerProtocol("https", new HTTPSSessionInstantiator);
+}
+
+
+void HTTPSSessionInstantiator::registerInstantiator(Context::Ptr context)
+{
+	HTTPSessionFactory::defaultFactory().registerProtocol("https", new HTTPSSessionInstantiator(context));
 }
 
 

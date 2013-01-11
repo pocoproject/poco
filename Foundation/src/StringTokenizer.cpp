@@ -44,43 +44,62 @@ namespace Poco {
 
 StringTokenizer::StringTokenizer(const std::string& str, const std::string& separators, int options)
 {
-	std::string::const_iterator it1 = str.begin();
-	std::string::const_iterator it2;
-	std::string::const_iterator it3;
+	std::string::const_iterator it = str.begin();
 	std::string::const_iterator end = str.end();
-	
-	while (it1 != end)
+	std::string token;
+	bool doTrim = ((options & TOK_TRIM) != 0);
+	bool ignoreEmpty = ((options & TOK_IGNORE_EMPTY) != 0);
+	bool lastToken = false;
+
+	for (;it != end; ++it)
 	{
-		if (options & TOK_TRIM)
+		if (separators.find(*it) != std::string::npos) 
 		{
-			while (it1 != end && Ascii::isSpace(*it1)) ++it1;
-		}
-		it2 = it1;
-		while (it2 != end && separators.find(*it2) == std::string::npos) ++it2;
-		it3 = it2;
-		if (it3 != it1 && (options & TOK_TRIM))
-		{
-			--it3;
-			while (it3 != it1 && Ascii::isSpace(*it3)) --it3;
-			if (!Ascii::isSpace(*it3)) ++it3;
-		}
-		if (options & TOK_IGNORE_EMPTY)
-		{
-			if (it3 != it1)
-				_tokens.push_back(std::string(it1, it3));
+			if (doTrim) trim(token);
+			if (!token.empty() || !ignoreEmpty)_tokens.push_back(token);
+			if (!ignoreEmpty) lastToken = true;
+			token = "";
 		}
 		else
 		{
-			_tokens.push_back(std::string(it1, it3));
+			token += *it;
+			lastToken = false;
 		}
-		it1 = it2;
-		if (it1 != end) ++it1;
 	}
+
+	if (!token.empty())
+	{
+		if (doTrim) trim(token);
+		if (!token.empty()) _tokens.push_back(token);
+	}
+	else if (lastToken) _tokens.push_back("");
 }
 
 
 StringTokenizer::~StringTokenizer()
 {
+}
+
+
+void StringTokenizer::trim (std::string& token)
+{
+	std::size_t front = 0, back = 0, length = token.length();
+	std::string::const_iterator tIt = token.begin();
+	std::string::const_iterator tEnd = token.end();
+	for (; tIt != tEnd; ++tIt, ++front)
+	{
+		if (!Ascii::isSpace(*tIt)) break;
+	}
+	if (tIt != tEnd)
+	{
+		std::string::const_reverse_iterator tRit = token.rbegin();
+		std::string::const_reverse_iterator tRend = token.rend();
+		for (; tRit != tRend; ++tRit, ++back)
+		{
+			if (!Ascii::isSpace(*tRit)) break;
+		}
+	}
+	token = token.substr(front, length - back - front);
 }
 
 

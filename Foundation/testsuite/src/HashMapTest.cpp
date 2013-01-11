@@ -70,6 +70,7 @@ void HashMapTest::testInsert()
 		assert (it != hm.end());
 		assert (it->first == i);
 		assert (it->second == i*2);
+		assert (hm.count(i) == 1);
 		assert (hm.size() == i + 1);
 	}		
 	

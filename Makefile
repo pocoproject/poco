@@ -234,6 +234,4 @@ clean:
 
 distclean:
 	rm -rf $(POCO_BUILD)/lib
-	find $(POCO_BUILD) -name obj -type d -print0 | xargs -0 rm -rf
-	find $(POCO_BUILD) -name .dep -type d -print0 | xargs -0 rm -rf
-	find $(POCO_BUILD) -name bin -type d -print0 | xargs -0 rm -rf
+	find $(POCO_BUILD) \( -name bin -o -name .dep -o -name obj \) -type d -print0 | xargs -0 rm -rf

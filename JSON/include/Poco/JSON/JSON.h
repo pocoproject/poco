@@ -63,7 +63,11 @@
 
 
 #if !defined(JSON_API)
-	#define JSON_API
+	#if defined (__GNUC__) && (__GNUC__ >= 4)
+		#define JSON_API __attribute__ ((visibility ("default")))
+	#else
+		#define JSON_API
+	#endif
 #endif
 
 

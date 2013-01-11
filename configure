@@ -150,7 +150,7 @@ while [ $# -ge 1 ]; do
         odbcinclude="`echo ${1} | awk '{print substr($0,16)}'`" ;;
 
 	--cflags=*)
-		cflags="`echo ${1} | awk '{print substr($0,10)}'`" ;;
+		flags="`echo ${1} | awk '{print substr($0,10)}'`" ;;
 
 	--no-samples)
 		samples="" ;;
@@ -174,7 +174,7 @@ while [ $# -ge 1 ]; do
 		flags="$flags -DPOCO_NET_NO_IPv6" ;;
 
 	--poquito)
-		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION" ;;
+		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_JSONCONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION" ;;
 
 	--unbundled)
  		flags="$flags -DPOCO_UNBUNDLED"

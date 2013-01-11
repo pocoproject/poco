@@ -544,6 +544,9 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\src\Error.cpp">
+				</File>
+				<File
 					RelativePath=".\src\Exception.cpp">
 				</File>
 				<File
@@ -763,6 +766,9 @@
 					RelativePath=".\src\NumberParser.cpp">
 				</File>
 				<File
+					RelativePath=".\src\NumericString.cpp">
+				</File>
+				<File
 					RelativePath=".\src\RefCountedObject.cpp">
 				</File>
 				<File
@@ -834,6 +840,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Environment_WIN32U.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Error.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Exception.h">
@@ -951,6 +960,12 @@
 			<Filter
 				Name="Source Files"
 				Filter="">
+				<File
+					RelativePath=".\src\Base32Decoder.cpp">
+				</File>
+				<File
+					RelativePath=".\src\Base32Encoder.cpp">
+				</File>
 				<File
 					RelativePath=".\src\Base64Decoder.cpp">
 				</File>
@@ -1084,6 +1099,12 @@
 			<Filter
 				Name="Header Files"
 				Filter="">
+				<File
+					RelativePath=".\include\Poco\Base32Decoder.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Base32Encoder.h">
+				</File>
 				<File
 					RelativePath=".\include\Poco\Base64Decoder.h">
 				</File>

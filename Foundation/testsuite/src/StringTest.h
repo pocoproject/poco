@@ -56,6 +56,7 @@ public:
 	void testTrimInPlace();
 	void testToUpper();
 	void testToLower();
+	void testIstring();
 	void testIcompare();
 	void testTranslate();
 	void testTranslateInPlace();
@@ -65,10 +66,15 @@ public:
 
 	void testStringToInt();
 	void testStringToFloat();
+	void testStringToDouble();
 	void testStringToFloatError();
 	void testNumericLocale();
 	void benchmarkStrToFloat();
 	void benchmarkStrToInt();
+
+	void testIntToString();
+	void testFloatToString();
+	void benchmarkFloatToStr();
 
 	void setUp();
 	void tearDown();
@@ -130,7 +136,6 @@ private:
 		istr >> value;
 		return istr.eof() && !istr.fail();
 	}
-
 };
 
 

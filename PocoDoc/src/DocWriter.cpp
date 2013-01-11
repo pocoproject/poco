@@ -1,7 +1,7 @@
 //
 // DocWriter.cpp
 //
-// $Id: //poco/1.4/PocoDoc/src/DocWriter.cpp#1 $
+// $Id: //poco/1.4/PocoDoc/src/DocWriter.cpp#3 $
 //
 // Copyright (c) 2005-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -512,7 +512,7 @@ void DocWriter::writeClass(const Struct* pStruct)
 		header += tr("Struct") + " ";
 	header += pStruct->fullName();
 	writeHeader(ostr, header);
-	writeTitle(ostr, pStruct->nameSpace(), pStruct->declaration());
+	writeTitle(ostr, pStruct->nameSpace(), pStruct->declaration() + (pStruct->isFinal() ? " final" : ""));
 	beginBody(ostr);
 	writeFileInfo(ostr, pStruct);
 	const std::string& doc = pStruct->getDocumentation();
@@ -1852,7 +1852,15 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc)
 	ostr << ")";
 	if (pFunc->flags() & Function::FN_CONST)
 		ostr << " const";
-	if (pFunc->flags() & Function::FN_PURE_VIRTUAL)
+	if (pFunc->flags() & Function::FN_OVERRIDE)
+		ostr << " override";
+	else if (pFunc->flags() & Function::FN_FINAL)
+		ostr << " final";
+	if (pFunc->flags() & Function::FN_DELETE)
+		ostr << " = delete";
+	else if (pFunc->flags() & Function::FN_DEFAULT)
+		ostr << " = default";
+	else if (pFunc->flags() & Function::FN_PURE_VIRTUAL)
 		ostr << " = 0";
 	ostr << ";</p>\n";
 	

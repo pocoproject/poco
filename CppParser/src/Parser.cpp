@@ -1,7 +1,7 @@
 //
 // Parser.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Parser.cpp#1 $
+// $Id: //poco/1.4/CppParser/src/Parser.cpp#2 $
 //
 // Library: CppParser
 // Package: CppParser
@@ -151,11 +151,13 @@ inline void Parser::append(std::string& decl, const std::string& token)
 	}
 	decl.append(token);
 	if (token == "const"
+	 || token == "constexpr"
 	 || token == "static"
 	 || token == "mutable"
 	 || token == "inline"
 	 || token == "volatile"
-	 || token == "register")
+	 || token == "register"
+	 || token == "thread_local")
 		decl.append(" ");
 }
 
@@ -300,6 +302,12 @@ const Token* Parser::parseClass(const Token* pNext, std::string& decl)
 	else
 		syntaxError("class/struct name");
 	pNext = next();
+	bool isFinal = false;
+	if (isIdentifier(pNext) && pNext->asString() == "final")
+	{
+		pNext = next();
+		isFinal = true;
+	}
 	if (!isOperator(pNext, OperatorToken::OP_SEMICOLON))
 	{
 		// if we have a template specialization the next token will be a <
@@ -320,6 +328,7 @@ const Token* Parser::parseClass(const Token* pNext, std::string& decl)
 		if (isOperator(pNext, OperatorToken::OP_COLON) || isOperator(pNext, OperatorToken::OP_OPENBRACE))
 		{
 			Struct* pClass = new Struct(decl, isClass, currentNameSpace());
+			if (isFinal) pClass->makeFinal();
 			pushNameSpace(pClass, line);
 			_access = access;
 			if (isOperator(pNext, OperatorToken::OP_COLON))
@@ -632,22 +641,44 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 	pNext = parseParameters(pNext, pFunc);
 	expectOperator(pNext, OperatorToken::OP_CLOSPARENT, ")");
 	pNext = next();
-	if (isKeyword(pNext, IdentifierToken::KW_CONST))
-	{
-		if (pFunc) pFunc->makeConst();
-		pNext = next();
-	}
-	if (isKeyword(pNext, IdentifierToken::KW_THROW))
-	{
-		while (!isOperator(pNext, OperatorToken::OP_ASSIGN) && !isOperator(pNext, OperatorToken::OP_SEMICOLON) && 
-		       !isOperator(pNext, OperatorToken::OP_OPENBRACE) && !isEOF(pNext))
+	while (pNext->is(Poco::Token::IDENTIFIER_TOKEN) || pNext->is(Poco::Token::KEYWORD_TOKEN))
+	{ 
+		if (isKeyword(pNext, IdentifierToken::KW_CONST))
+		{
+			if (pFunc) pFunc->makeConst();
 			pNext = next();
+		}
+		if (isKeyword(pNext, IdentifierToken::KW_THROW))
+		{
+			while (!isOperator(pNext, OperatorToken::OP_ASSIGN) && !isOperator(pNext, OperatorToken::OP_SEMICOLON) && 
+				   !isOperator(pNext, OperatorToken::OP_OPENBRACE) && !isEOF(pNext))
+				pNext = next();
+		}
+		else if (isKeyword(pNext, IdentifierToken::KW_NOEXCEPT))
+		{
+			if (pFunc) pFunc->makeNoexcept();
+			pNext = next();
+		}
+		else if (isIdentifier(pNext) && pNext->asString() == "override")
+		{
+			if (pFunc) pFunc->makeOverride();
+			pNext = next();
+		}
+		else if (isIdentifier(pNext) && pNext->asString() == "final")
+		{
+			if (pFunc) pFunc->makeFinal();
+			pNext = next();
+		}
 	}
 	if (isOperator(pNext, OperatorToken::OP_ASSIGN))
 	{
 		pNext = next();
-		if (!pNext->is(Token::INTEGER_LITERAL_TOKEN))
-			syntaxError("0");
+		if (!pNext->is(Token::INTEGER_LITERAL_TOKEN) && !isKeyword(pNext, IdentifierToken::KW_DEFAULT) && !isKeyword(pNext, IdentifierToken::KW_DELETE))
+			syntaxError("0, default or delete");
+		if (isKeyword(pNext, IdentifierToken::KW_DEFAULT))
+			pFunc->makeDefault();
+		else if (isKeyword(pNext, IdentifierToken::KW_DELETE))
+			pFunc->makeDelete();
 		pNext = next();
 		if (pFunc) pFunc->makePureVirtual();
 		expectOperator(pNext, OperatorToken::OP_SEMICOLON, ";");

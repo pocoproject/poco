@@ -347,10 +347,18 @@
     <ClInclude Include="include\Poco\Net\FTPClientSession.h"/>
     <ClInclude Include="include\Poco\Net\FTPStreamFactory.h"/>
     <ClInclude Include="include\Poco\Net\SocketAcceptor.h"/>
+<<<<<<< HEAD
+=======
+    <ClInclude Include="include\Poco\Net\ParallelSocketAcceptor.h"/>
+>>>>>>> develop
     <ClInclude Include="include\Poco\Net\SocketConnector.h"/>
     <ClInclude Include="include\Poco\Net\SocketNotification.h"/>
     <ClInclude Include="include\Poco\Net\SocketNotifier.h"/>
     <ClInclude Include="include\Poco\Net\SocketReactor.h"/>
+<<<<<<< HEAD
+=======
+    <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h"/>
+>>>>>>> develop
     <ClInclude Include="include\Poco\Net\MailMessage.h"/>
     <ClInclude Include="include\Poco\Net\MailRecipient.h"/>
     <ClInclude Include="include\Poco\Net\MailStream.h"/>
@@ -373,6 +381,10 @@
     <ClCompile Include="src\DNS.cpp"/>
     <ClCompile Include="src\HostEntry.cpp"/>
     <ClCompile Include="src\IPAddress.cpp"/>
+<<<<<<< HEAD
+=======
+    <ClCompile Include="src\Net.cpp"/>
+>>>>>>> develop
     <ClCompile Include="src\NetException.cpp"/>
     <ClCompile Include="src\NetworkInterface.cpp"/>
     <ClCompile Include="src\SocketAddress.cpp"/>

@@ -47,6 +47,12 @@
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
 #include "Poco/Glob.h"
+<<<<<<< HEAD
+=======
+#include "Poco/UTF8Encoding.h"
+#include "Poco/Latin1Encoding.h"
+#include "Poco/TextConverter.h"
+>>>>>>> develop
 
 #include <set>
 
@@ -189,6 +195,43 @@ void JSONTest::testNumberProperty()
 	assert(value == 1969);
 }
 
+<<<<<<< HEAD
+=======
+#if defined(POCO_HAVE_INT64)
+
+
+void JSONTest::testNumber64Property()
+{
+	std::string json = "{ \"test\" : 5000000000000000 }";
+	Parser parser;
+	Var result;
+    
+	try
+	{
+		DefaultHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+    
+	assert(result.type() == typeid(Object::Ptr));
+    
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
+	assert(test.isInteger());
+    Poco::Int64 value = test;
+	assert(value == 5000000000000000);
+}
+
+
+#endif
+
+>>>>>>> develop
 
 void JSONTest::testStringProperty()
 {
@@ -352,8 +395,16 @@ void JSONTest::testObjectProperty()
 	}
 
 	assert(result.type() == typeid(Object::Ptr));
+<<<<<<< HEAD
 
 	Object::Ptr object = result.extract<Object::Ptr>();
+=======
+	
+	Object::Ptr object = result.extract<Object::Ptr>();
+	assert (object->isObject("test"));
+	assert (!object->isArray("test"));
+
+>>>>>>> develop
 	Var test = object->get("test");
 	assert(test.type() == typeid(Object::Ptr));
 	object = test.extract<Object::Ptr>();
@@ -365,6 +416,39 @@ void JSONTest::testObjectProperty()
 }
 
 
+<<<<<<< HEAD
+=======
+void JSONTest::testObjectArray()
+{
+	std::string json = "{ \"test\" : { \"test1\" : [1, 2, 3], \"test2\" : 4 } }";
+	Parser parser;
+	Var result;
+
+	try
+	{
+		DefaultHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+
+	assert(result.type() == typeid(Object::Ptr));
+	Object::Ptr object = result.extract<Object::Ptr>();
+	assert(object->isObject("test"));
+	object = object->getObject("test");
+	assert(!object->isObject("test1"));
+	assert(object->isArray("test1"));
+	assert(!object->isObject("test2"));
+	assert(!object->isArray("test2"));
+}
+
+
+>>>>>>> develop
 void JSONTest::testEmptyArray()
 {
 	std::string json = "[]";
@@ -764,6 +848,53 @@ void JSONTest::testInvalidJanssonFiles()
 }
 
 
+<<<<<<< HEAD
+=======
+void JSONTest::testInvalidUnicodeJanssonFiles()
+{
+	Poco::Path pathPattern(getTestFilesPath("invalid-unicode"));
+
+	std::set<std::string> paths;
+	Poco::Glob::glob(pathPattern, paths);
+
+	for(std::set<std::string>::iterator it = paths.begin(); it != paths.end(); ++it)
+	{
+		Poco::Path filePath(*it, "input");
+
+		if ( filePath.isFile() )
+		{
+			Poco::File inputFile(filePath);
+			if ( inputFile.exists() )
+			{
+				Poco::FileInputStream fis(filePath.toString());
+				std::cout << filePath.toString() << std::endl;
+
+				Parser parser;
+				Var result;
+
+				try
+				{
+					DefaultHandler handler;
+					parser.setHandler(&handler);
+					parser.parse(fis);
+					result = handler.result();
+					// We shouldn't get here.
+					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl; 
+					fail(result.convert<std::string>());
+				}
+				catch(JSONException&)
+				{
+					continue;
+				}
+				catch(Poco::SyntaxException&)
+				{ }
+			}
+		}
+	}
+}
+
+
+>>>>>>> develop
 void JSONTest::testTemplate()
 {
 	Template tpl;
@@ -777,6 +908,43 @@ void JSONTest::testTemplate()
 	tpl.render(data, std::cout);
 }
 
+<<<<<<< HEAD
+=======
+void JSONTest::testUnicode()
+{
+	const unsigned char supp[] = {0x61, 0xE1, 0xE9, 0x78, 0xED, 0xF3, 0xFA, 0x0};
+	std::string text((const char*) supp);
+
+	std::string json = "{ \"test\" : \"a\\u00E1\\u00E9x\\u00ED\\u00F3\\u00FA\" }";
+	Parser parser;
+
+	Var result;
+	try
+	{
+		DefaultHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
+
+	Poco::Latin1Encoding latin1;
+	Poco::UTF8Encoding utf8;
+	Poco::TextConverter converter(latin1, utf8);
+	std::string original;
+	converter.convert(text, original);
+
+	assert(test.convert<std::string>() == original);
+}
+>>>>>>> develop
 
 std::string JSONTest::getTestFilesPath(const std::string& type)
 {
@@ -798,8 +966,15 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 	if (Poco::File(pathPattern).exists())
 		validDir += '*';
 	else
+<<<<<<< HEAD
 		throw Poco::NotFoundException("cannot locate directory containing valid JSON test files");
 
+=======
+	{
+		std::cout << "Can't find " << validDir << std::endl;
+		throw Poco::NotFoundException("cannot locate directory containing valid JSON test files");
+	}
+>>>>>>> develop
 	return validDir;
 }
 
@@ -812,12 +987,22 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testTrueProperty);
 	CppUnit_addTest(pSuite, JSONTest, testFalseProperty);
 	CppUnit_addTest(pSuite, JSONTest, testNumberProperty);
+<<<<<<< HEAD
+=======
+#if defined(POCO_HAVE_INT64)
+	CppUnit_addTest(pSuite, JSONTest, testNumber64Property);
+#endif
+>>>>>>> develop
 	CppUnit_addTest(pSuite, JSONTest, testStringProperty);
 	CppUnit_addTest(pSuite, JSONTest, testEmptyObject);
 	CppUnit_addTest(pSuite, JSONTest, testDoubleProperty);
 	CppUnit_addTest(pSuite, JSONTest, testDouble2Property);
 	CppUnit_addTest(pSuite, JSONTest, testDouble3Property);
 	CppUnit_addTest(pSuite, JSONTest, testObjectProperty);
+<<<<<<< HEAD
+=======
+	CppUnit_addTest(pSuite, JSONTest, testObjectArray);
+>>>>>>> develop
 	CppUnit_addTest(pSuite, JSONTest, testEmptyArray);
 	CppUnit_addTest(pSuite, JSONTest, testNestedArray);
 	CppUnit_addTest(pSuite, JSONTest, testNullElement);
@@ -831,7 +1016,13 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testQuery);
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidJanssonFiles);
+<<<<<<< HEAD
 	CppUnit_addTest(pSuite, JSONTest, testTemplate);
+=======
+	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);
+	CppUnit_addTest(pSuite, JSONTest, testTemplate);
+	CppUnit_addTest(pSuite, JSONTest, testUnicode);
+>>>>>>> develop
 
 	return pSuite;
 }

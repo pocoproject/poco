@@ -37,6 +37,11 @@
 
 
 #include "Poco/Net/Net.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "Poco/Net/MulticastSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetworkInterface.h"
@@ -80,6 +85,9 @@ private:
 	Poco::Event  _ready;
 	bool         _stop;
 };
+
+
+#endif // POCO_NET_HAS_INTERFACE
 
 
 #endif // MulticastEchoServer_INCLUDED

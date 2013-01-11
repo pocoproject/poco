@@ -19,6 +19,10 @@ objects = HTTPSTimeServer
 
 target         = HTTPSTimeServer
 target_version = 1
-target_libs    = PocoNetSSL PocoCrypto PocoNet PocoUtil PocoXML PocoFoundation
+target_libs    = PocoNetSSL PocoCrypto PocoNet PocoUtil PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
+
+ifdef POCO_UNBUNDLED
+        SYSLIBS += -lpcre -lexpat
+endif

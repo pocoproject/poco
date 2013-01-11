@@ -133,9 +133,9 @@ HostEntry& HostEntry::operator = (const HostEntry& entry)
 {
 	if (&entry != this)
 	{
-		_name          = entry._name;
-		_aliases       = entry._aliases;
-		_addresses     = entry._addresses;
+		_name      = entry._name;
+		_aliases   = entry._aliases;
+		_addresses = entry._addresses;
 	}
 	return *this;
 }

@@ -548,6 +548,9 @@
 				Name="Source Files"
 				Filter="">
 				<File
+					RelativePath=".\src\Base32Test.cpp">
+				</File>
+				<File
 					RelativePath=".\src\Base64Test.cpp">
 				</File>
 				<File
@@ -590,6 +593,9 @@
 			<Filter
 				Name="Header Files"
 				Filter="">
+				<File
+					RelativePath=".\src\Base32Test.h">
+				</File>
 				<File
 					RelativePath=".\src\Base64Test.h">
 				</File>

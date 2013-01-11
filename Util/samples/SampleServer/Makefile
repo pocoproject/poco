@@ -12,6 +12,10 @@ objects = SampleServer
 
 target         = SampleServer
 target_version = 1
-target_libs    = PocoUtil PocoXML PocoFoundation
+target_libs    = PocoUtil PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
+
+ifdef POCO_UNBUNDLED
+        SYSLIBS += -lz -lpcre -lexpat
+endif

@@ -31,6 +31,11 @@
 
 
 #include "NetworkInterfaceTest.h"
+
+
+#ifdef POCO_NET_HAS_INTERFACE
+
+
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/NetworkInterface.h"
@@ -150,6 +155,11 @@ void NetworkInterfaceTest::testForAddress()
 		{
 			NetworkInterface ifc = NetworkInterface::forAddress(it->second.firstAddress(IPAddress::IPv4));
 			assert (ifc.firstAddress(IPAddress::IPv4) == it->second.firstAddress(IPAddress::IPv4));
+
+			IPAddress addr(IPAddress::IPv4);
+			assert (addr.isWildcard());
+			it->second.firstAddress(addr, IPAddress::IPv4);
+			assert (!addr.isWildcard());
 		}
 		else
 		{
@@ -159,6 +169,11 @@ void NetworkInterfaceTest::testForAddress()
 				fail ("must throw");
 			}
 			catch (NotFoundException&) { }
+
+			IPAddress addr(IPAddress::IPv4);
+			assert (addr.isWildcard());
+			it->second.firstAddress(addr, IPAddress::IPv4);
+			assert (addr.isWildcard());
 		}
 	}
 }
@@ -197,6 +212,36 @@ void NetworkInterfaceTest::testMapUpOnly()
 }
 
 
+void NetworkInterfaceTest::testListMapConformance()
+{
+	NetworkInterface::Map m = NetworkInterface::map(false, false);
+	assert (!m.empty());
+	NetworkInterface::List l = NetworkInterface::list(false, false);
+	assert (!l.empty());
+
+	int counter = 0;
+	NetworkInterface::Map::const_iterator mapIt = m.begin();
+	NetworkInterface::List::const_iterator listIt = l.begin();
+	for (; mapIt != m.end(); ++mapIt)
+	{
+		NetworkInterface::MACAddress mac(mapIt->second.macAddress());
+
+		typedef NetworkInterface::AddressList List;
+		const List& ipList = mapIt->second.addressList();
+		List::const_iterator ipIt = ipList.begin();
+		List::const_iterator ipEnd = ipList.end();
+		for (; ipIt != ipEnd; ++ipIt, ++counter, ++listIt)
+		{
+			NetworkInterface::MACAddress lmac = listIt->macAddress();
+			assert (lmac == mac);
+			if (listIt == l.end()) fail ("wrong number of list items");
+		}
+	}
+
+	assert (counter == l.size());
+}
+
+
 void NetworkInterfaceTest::setUp()
 {
 }
@@ -218,6 +263,10 @@ CppUnit::Test* NetworkInterfaceTest::suite()
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testForIndex);
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testMapIpOnly);
 	CppUnit_addTest(pSuite, NetworkInterfaceTest, testMapUpOnly);
+	CppUnit_addTest(pSuite, NetworkInterfaceTest, testListMapConformance);
 
 	return pSuite;
 }
+
+
+#endif // POCO_NET_HAS_INTERFACE

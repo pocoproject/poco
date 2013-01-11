@@ -56,7 +56,7 @@ inline void makeUTF16(SQLCHAR* pSQLChar, SQLSMALLINT length, std::string& target
 }
 
 
-inline void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLINTEGER targetLength);
+void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, SQLINTEGER length, SQLPOINTER pTarget, SQLINTEGER targetLength);
 	/// Utility function for conversion from UTF-16 to UTF-8.
 
 

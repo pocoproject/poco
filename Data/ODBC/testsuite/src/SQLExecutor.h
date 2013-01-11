@@ -467,10 +467,10 @@ public:
 		C1 address(size, "Address");
 		C2 img(size, CLOB("0123456789", 10));
 		int count = 0;
-		try { session() << "INSERT INTO PERSON VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(img), now; }
+		try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(img), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		try { session() << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+		try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 		assert (count == size);

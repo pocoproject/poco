@@ -34,6 +34,11 @@
 //
 
 
+// Avoid accidental linking of XML library when XMLConfiguration
+// is not desired.
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
+
+
 #include "Poco/Util/XMLConfiguration.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/DOM/DOMParser.h"
@@ -484,3 +489,5 @@ Poco::XML::Node* XMLConfiguration::findAttribute(const std::string& name, Poco::
 
 
 } } // namespace Poco::Util
+
+#endif // POCO_UTIL_NO_XMLCONFIGURATION
