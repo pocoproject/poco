@@ -10,7 +10,7 @@ Release 1.4.6 (2013-01-10)
 - fixed SF# 603 count() is missing in HashMap
 - Crypto and NetSSL_OpenSSL project files now use OpenSSL *MD.lib library files for 
   static_md builds. Previously, the DLL import libs were used.
-- Poco::Environment::osDisplayName() now recognized Windows 8/Server 2012
+- Poco::Environment::osDisplayName() now recognizes Windows 8/Server 2012
 
 
 Release 1.4.5 (2012-11-19)
@@ -1795,4 +1795,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#73 $
+$Id: //poco/1.4/dist/CHANGELOG#74 $
