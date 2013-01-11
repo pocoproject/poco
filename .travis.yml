@@ -1,6 +1,0 @@
-language: cpp
-compiler:
-  - gcc
-  - clang
-script: ./configure --omit=Data & make -s
-
