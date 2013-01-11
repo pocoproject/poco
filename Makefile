@@ -51,9 +51,9 @@ install: libexecs
 	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib$(LIB64SUFFIX) \;
 	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib$(LIB64SUFFIX) \;
 
-libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec PDF-libexec CppParser-libexec
-tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Zip-tests PDF-tests CppParser-tests
-samples  =  Foundation-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples Zip-samples PageCompiler-samples PDF-samples
+libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec 
+tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests
+samples  =  Foundation-samples XML-samples JSON-samples Util-samples Net-samples
 
 .PHONY: poco all libexecs cppunit tests samples clean distclean install
 .PHONY: $(libexecs)
@@ -109,85 +109,6 @@ Net-tests: Net-libexec cppunit
 Net-samples: Net-libexec  Foundation-libexec XML-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Net/samples
 
-Crypto-libexec:  Foundation-libexec
-	$(MAKE) -C $(POCO_BASE)/Crypto
-
-Crypto-tests: Crypto-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Crypto/testsuite
-
-Crypto-samples: Crypto-libexec  Foundation-libexec Util-libexec
-	$(MAKE) -C $(POCO_BASE)/Crypto/samples
-
-NetSSL_OpenSSL-libexec:  Foundation-libexec Net-libexec Util-libexec Crypto-libexec
-	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL
-
-NetSSL_OpenSSL-tests: NetSSL_OpenSSL-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/testsuite
-
-NetSSL_OpenSSL-samples: NetSSL_OpenSSL-libexec 
-	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples
-
-Data-libexec:  Foundation-libexec
-	$(MAKE) -C $(POCO_BASE)/Data
-
-Data-tests: Data-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/testsuite
-
-Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/samples
-
-Data/SQLite-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/SQLite
-
-Data/SQLite-tests: Data/SQLite-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite
-
-Data/ODBC-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/ODBC
-
-Data/ODBC-tests: Data/ODBC-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite
-
-Data/MySQL-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/MySQL
-
-Data/MySQL-tests: Data/MySQL-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite
-
-Zip-libexec:  Foundation-libexec Net-libexec Util-libexec XML-libexec
-	$(MAKE) -C $(POCO_BASE)/Zip
-
-Zip-tests: Zip-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Zip/testsuite
-
-Zip-samples: Zip-libexec 
-	$(MAKE) -C $(POCO_BASE)/Zip/samples
-
-PageCompiler-libexec:  Net-libexec Util-libexec XML-libexec Foundation-libexec
-	$(MAKE) -C $(POCO_BASE)/PageCompiler
-
-PageCompiler-samples: PageCompiler-libexec 
-	$(MAKE) -C $(POCO_BASE)/PageCompiler/samples
-
-PageCompiler/File2Page-libexec:  Net-libexec Util-libexec XML-libexec Foundation-libexec
-	$(MAKE) -C $(POCO_BASE)/PageCompiler/File2Page
-
-PDF-libexec: Foundation-libexec
-	$(MAKE) -C $(POCO_BASE)/PDF
-
-PDF-tests: PDF-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/PDF/testsuite
-
-PDF-samples: PDF-libexec 
-	$(MAKE) -C $(POCO_BASE)/PDF/samples
-
-CppParser-libexec: Foundation-libexec
-	$(MAKE) -C $(POCO_BASE)/CppParser
-
-CppParser-tests: CppParser-libexec 
-	$(MAKE) -C $(POCO_BASE)/CppParser/testsuite
-
-
 clean:
 	$(MAKE) -C $(POCO_BASE)/Foundation clean
 	$(MAKE) -C $(POCO_BASE)/Foundation/testsuite clean
@@ -195,42 +116,15 @@ clean:
 	$(MAKE) -C $(POCO_BASE)/XML clean
 	$(MAKE) -C $(POCO_BASE)/XML/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/XML/samples clean
+	$(MAKE) -C $(POCO_BASE)/JSON clean
+	$(MAKE) -C $(POCO_BASE)/JSON/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/JSON/samples clean
 	$(MAKE) -C $(POCO_BASE)/Util clean
 	$(MAKE) -C $(POCO_BASE)/Util/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Util/samples clean
 	$(MAKE) -C $(POCO_BASE)/Net clean
 	$(MAKE) -C $(POCO_BASE)/Net/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Net/samples clean
-	$(MAKE) -C $(POCO_BASE)/Crypto clean
-	$(MAKE) -C $(POCO_BASE)/Crypto/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/Crypto/samples clean
-	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL clean
-	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples clean
-	$(MAKE) -C $(POCO_BASE)/Data clean
-	$(MAKE) -C $(POCO_BASE)/Data/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/Data/samples clean
-	$(MAKE) -C $(POCO_BASE)/Data/SQLite clean
-	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/Data/ODBC clean
-	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/Data/MySQL clean
-	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/Zip clean
-	$(MAKE) -C $(POCO_BASE)/Zip/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/Zip/samples clean
-	$(MAKE) -C $(POCO_BASE)/PageCompiler clean
-	$(MAKE) -C $(POCO_BASE)/PageCompiler/samples clean
-	$(MAKE) -C $(POCO_BASE)/PageCompiler/File2Page clean
-	$(MAKE) -C $(POCO_BASE)/PDF clean
-	$(MAKE) -C $(POCO_BASE)/PDF/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/PDF/samples clean
-	$(MAKE) -C $(POCO_BASE)/CppParser clean
-	$(MAKE) -C $(POCO_BASE)/CppParser/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/CppUnit clean
-	$(MAKE) -C $(POCO_BASE)/JSON clean
-	$(MAKE) -C $(POCO_BASE)/JSON/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/JSON/samples clean
 
 distclean:
 	rm -rf $(POCO_BUILD)/lib
