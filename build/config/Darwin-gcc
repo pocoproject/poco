@@ -1,15 +1,15 @@
 #
-# $Id: //poco/1.4/build/config/Darwin-clang#5 $
+# $Id: //poco/1.4/build/config/Darwin-gcc#2 $
 #
 # Darwin
 #
-# Build settings for Mac OS X 10.6 (clang++)
+# Build settings for Mac OS X 10.6 (GCC 4.2)
 # The build settings defined in this file are compatible
-# with XCode 4 C++ projects.
-# 
-# NOTE: This build configuration will build 64-bit binaries.
-# Use the Darwin32-clang build configuration to build 32-bit binaries.
+# with XCode 3.2.5 C++ projects.
 #
+# NOTE: This build configuration will build 64-bit binaries.
+# Use the Darwin32 build configuration to build 32-bit binaries.
+# 
 
 #
 # General Settings
@@ -27,16 +27,16 @@ endif
 #
 # Tools
 #
-CC      = clang
-CXX     = clang++
+CC      = gcc
+CXX     = g++
 LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
 RANLIB  = ranlib
 SHLIB   = $(CXX) -dynamiclib -o $@
-DYLIB   = $(CXX) -dynamic -bundle $(RORELOCS) -Wl,-bind_at_load -o $@ 
+DYLIB   = $(CXX) -dynamic -bundle $(RORELOCS) -bind_at_load -o $@ 
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = 
-DEP     = $(POCO_BASE)/build/script/makedepend.clang
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
 CP      = cp
@@ -62,17 +62,17 @@ STATICOPT_LINK  =
 SHAREDOPT_CC    = -fPIC 
 SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  = 
-DEBUGOPT_CC     = -O0 -g -gdwarf-2 -fasm-blocks -D_DEBUG=$(DEBUGLEVEL)
-DEBUGOPT_CXX    = -O0 -g -gdwarf-2 -fasm-blocks -D_DEBUG=$(DEBUGLEVEL) 
+DEBUGOPT_CC     = -O0 -g -gdwarf-2 -D_DEBUG=$(DEBUGLEVEL)
+DEBUGOPT_CXX    = -O0 -g -gdwarf-2 -D_DEBUG=$(DEBUGLEVEL) -mfix-and-continue -fvisibility-inlines-hidden -fasm-blocks
 DEBUGOPT_LINK   =
-RELEASEOPT_CC   = -DNDEBUG -Os -fasm-blocks
-RELEASEOPT_CXX  = -DNDEBUG -O2 -fasm-blocks
+RELEASEOPT_CC   = -DNDEBUG -Os
+RELEASEOPT_CXX  = -DNDEBUG -Os -fvisibility-inlines-hidden -fasm-blocks
 RELEASEOPT_LINK =
 
 #
 # System Specific Flags
 #
-SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64
+SYSFLAGS = -DPOCO_HAVE_IPv6
 
 #
 # System Specific Libraries

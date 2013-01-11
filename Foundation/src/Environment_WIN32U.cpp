@@ -1,7 +1,7 @@
 //
 // Environment_WIN32U.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_WIN32U.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Environment_WIN32U.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -117,7 +117,9 @@ std::string EnvironmentImpl::osDisplayNameImpl()
 		case 0:
 			return "Windows Vista/Server 2008";
 		case 1:
-			return "Windows 7/Server 2008 SP2";
+			return "Windows 7/Server 2008 R2";
+		case 2:
+			return "Windows 8/Server 2012";
 		default:
 			return "Unknown";
 		}
