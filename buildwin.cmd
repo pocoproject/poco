@@ -7,9 +7,9 @@ rem
 rem POCO C++ Libraries command-line build script 
 rem for MS Visual Studio 2003 to 2012
 rem
-rem $Id: //poco/1.4/dist/buildwin.cmd#6 $
+rem $Id: //poco/1.4/dist/buildwin.cmd#7 $
 rem
-rem Copyright (c) 2006-2012 by Applied Informatics Software Engineering GmbH
+rem Copyright (c) 2006-2013 by Applied Informatics Software Engineering GmbH
 rem and Contributors.
 rem
 rem Original version by Aleksandar Fabijanic.
@@ -42,21 +42,22 @@ set INCLUDE=%INCLUDE%;%OPENSSL_INCLUDE%
 set LIB=%LIB%;%OPENSSL_LIB%
 
 set POCO_BASE=%CD%
-set PATH=%POCO_BASE%\bin;%PATH%
+set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 
 rem VS version {71|80|90|100|110}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
 
 if "%7"=="" goto use_devenv
-set BUILD_TOOL="%7"
+set BUILD_TOOL=%7
 goto use_custom
+
 :use_devenv
 set BUILD_TOOL=devenv
 if "%VS_VERSION%"=="vs100" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs110" (set BUILD_TOOL=msbuild)
-:use_custom
 
+:use_custom
 if not "%BUILD_TOOL%"=="msbuild" (set USEENV=/useenv)
 if "%BUILD_TOOL%"=="msbuild" (
 set ACTIONSW=/t:
