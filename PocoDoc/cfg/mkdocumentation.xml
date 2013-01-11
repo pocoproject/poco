@@ -36,7 +36,19 @@
 				-I/usr/local/mysql/include,
 				-D_DEBUG,
 				-E,
-				-C
+				-C,
+				-DFoundation_API=,
+				-DXML_API=,
+				-DJSON_API=,
+				-DUtil_API=,
+				-DNet_API=,
+				-DCrypto_API=,
+				-DNetSSL_API=,
+				-DZip_API=,
+				-DData_API=,
+				-DSQLite_API=,
+				-DMySQL_API=,
+				-DODBC_API=
 			</options>
 			<path></path>
 			<usePipe>true</usePipe>

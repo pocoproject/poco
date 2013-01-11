@@ -64,13 +64,6 @@ release=$version$tag
 #
 
 echo "Building tools"
-osname=`uname -s | tr ' ' '_'`
-osarch=`uname -m | tr ' ' '_'`
-
-if [ $osname = "Darwin" ] ; then
-	archpath=`dirname stage/tools/PocoDoc/bin/Darwin/*/PocoDoc`
-	osarch=`basename $archpath`
-fi
 
 tools=$POCO_BASE/stage/tools
 rm -rf $tools
@@ -80,8 +73,19 @@ mkrelease -o $tools $version CppParser PocoDoc
 cd $tools
 ./configure --no-tests --no-samples
 make -s -j8
-export PATH=$tools/PocoDoc/bin/$osname/$osarch:$PATH
+
 cd $POCO_BASE
+
+osname=`uname -s | tr ' ' '_'`
+osarch=`uname -m | tr ' ' '_'`
+
+if [ $osname = "Darwin" ] ; then
+	archpath=`dirname stage/tools/PocoDoc/bin/Darwin/*/PocoDoc`
+	osarch=`basename $archpath`
+fi
+
+export PATH=$tools/PocoDoc/bin/$osname/$osarch:$PATH
+echo PATH=$PATH
 
 echo "Building documentation $release (using $docConfig)"
 mkdocumentation $reltag $relspec -C $docConfig -v $version
