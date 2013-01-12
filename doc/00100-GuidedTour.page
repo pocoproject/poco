@@ -305,7 +305,7 @@ server.
     using Poco::Util::Application;
     using Poco::Util::Option;
     using Poco::Util::OptionSet;
-    using Poco::Util::OptionCallback
+    using Poco::Util::OptionCallback;
     using Poco::Util::HelpFormatter;
     
     class TimeRequestHandler: public HTTPRequestHandler
