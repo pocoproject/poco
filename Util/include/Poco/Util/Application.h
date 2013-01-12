@@ -136,6 +136,8 @@ public:
 		PRIO_SYSTEM      = 100
 	};
 	
+	typedef std::vector<std::string> ArgVec;
+
 	Application();
 		/// Creates the Application.
 
@@ -350,7 +352,7 @@ protected:
 	void setLogger(Poco::Logger& logger);
 		/// Sets the logger used by the application.
 
-	virtual int main(const std::vector<std::string>& args);
+	virtual int main(const ArgVec& args);
 		/// The application's main logic.
 		///
 		/// Unprocessed command line arguments are passed in args.
@@ -509,7 +511,7 @@ inline Poco::Timespan Application::uptime() const
 	#define POCO_APP_MAIN(App) \
 	int pocoAppMain(const char* appName, ...) \
 	{ \
-		std::vector<std::string> args; \
+		ArgVec args; \
 		args.push_back(std::string(appName)); \
 		va_list vargs; \
 		va_start(vargs, appName); \

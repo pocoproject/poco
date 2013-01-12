@@ -370,10 +370,10 @@ public:
 		///
 		/// Returns false and leaves result unchanged otherwise.
 
-	static IPAddress wildcard(Family family = IPv4);
+	static const IPAddress& wildcard(Family family = IPv4);
 		/// Returns a wildcard IPv4 or IPv6 address (0.0.0.0).
 		
-	static IPAddress broadcast();
+	static const IPAddress& broadcast();
 		/// Returns a broadcast IPv4 address (255.255.255.255).
 
 	enum
@@ -389,6 +389,10 @@ public:
 
 protected:
 	void init(IPAddressImpl* pImpl);
+
+	static const IPAddress wildcardIPv4;
+	static const IPAddress wildcardIPv6;
+	static const IPAddress broadcastIPv4;
 
 private:
 	IPAddressImpl* _pImpl;

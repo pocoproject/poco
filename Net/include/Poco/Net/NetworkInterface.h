@@ -160,7 +160,7 @@ public:
 		/// Throws NotFoundException if the address family is not
 		/// configured on the interface.
 
-	void firstAddress(IPAddress& addr, IPAddress::Family family = IPAddress::IPv4) const;
+	const IPAddress& firstAddressNoThrow(IPAddress::Family family) const;
 		/// Returns the first IP address bound to the interface.
 		/// If the address family is not configured on the interface,
 		/// the address returned in addr will be unspecified (wildcard).
@@ -266,6 +266,14 @@ public:
 		/// multiple NetworkInterface entries are listed for
 		/// the same interface.
 		
+	static Map full();
+		/// Returns a map containing system network interfaces
+		/// Map is keyed by interface system indices.
+		///
+		/// If there are multiple addresses bound to one interface,
+		/// they are contained within the NetworkInterface (second) 
+		/// member of the pair.
+
 	static Map map(bool ipOnly = true, bool upOnly = true);
 		/// Returns a map containing system network interfaces
 		/// Map is keyed by interface system indices.
