@@ -131,13 +131,13 @@ inline bool FPEnvironmentImpl::isNaNImpl(long double value)
 
 inline float FPEnvironmentImpl::copySignImpl(float target, float source)
 {
-	return std::copysignf(target, source);
+	return copysignf(target, source);
 }
 
 
 inline double FPEnvironmentImpl::copySignImpl(double target, double source)
 {
-	return std::copysign(target, source);
+	return copysign(target, source);
 }
 
 
