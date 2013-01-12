@@ -47,12 +47,9 @@
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
 #include "Poco/Glob.h"
-<<<<<<< HEAD
-=======
 #include "Poco/UTF8Encoding.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/TextConverter.h"
->>>>>>> develop
 
 #include <set>
 
@@ -195,8 +192,7 @@ void JSONTest::testNumberProperty()
 	assert(value == 1969);
 }
 
-<<<<<<< HEAD
-=======
+
 #if defined(POCO_HAVE_INT64)
 
 
@@ -231,7 +227,6 @@ void JSONTest::testNumber64Property()
 
 #endif
 
->>>>>>> develop
 
 void JSONTest::testStringProperty()
 {
@@ -395,16 +390,11 @@ void JSONTest::testObjectProperty()
 	}
 
 	assert(result.type() == typeid(Object::Ptr));
-<<<<<<< HEAD
-
-	Object::Ptr object = result.extract<Object::Ptr>();
-=======
 	
 	Object::Ptr object = result.extract<Object::Ptr>();
 	assert (object->isObject("test"));
 	assert (!object->isArray("test"));
 
->>>>>>> develop
 	Var test = object->get("test");
 	assert(test.type() == typeid(Object::Ptr));
 	object = test.extract<Object::Ptr>();
@@ -416,8 +406,6 @@ void JSONTest::testObjectProperty()
 }
 
 
-<<<<<<< HEAD
-=======
 void JSONTest::testObjectArray()
 {
 	std::string json = "{ \"test\" : { \"test1\" : [1, 2, 3], \"test2\" : 4 } }";
@@ -448,7 +436,6 @@ void JSONTest::testObjectArray()
 }
 
 
->>>>>>> develop
 void JSONTest::testEmptyArray()
 {
 	std::string json = "[]";
@@ -848,8 +835,6 @@ void JSONTest::testInvalidJanssonFiles()
 }
 
 
-<<<<<<< HEAD
-=======
 void JSONTest::testInvalidUnicodeJanssonFiles()
 {
 	Poco::Path pathPattern(getTestFilesPath("invalid-unicode"));
@@ -894,7 +879,6 @@ void JSONTest::testInvalidUnicodeJanssonFiles()
 }
 
 
->>>>>>> develop
 void JSONTest::testTemplate()
 {
 	Template tpl;
@@ -908,8 +892,7 @@ void JSONTest::testTemplate()
 	tpl.render(data, std::cout);
 }
 
-<<<<<<< HEAD
-=======
+
 void JSONTest::testUnicode()
 {
 	const unsigned char supp[] = {0x61, 0xE1, 0xE9, 0x78, 0xED, 0xF3, 0xFA, 0x0};
@@ -944,7 +927,7 @@ void JSONTest::testUnicode()
 
 	assert(test.convert<std::string>() == original);
 }
->>>>>>> develop
+
 
 std::string JSONTest::getTestFilesPath(const std::string& type)
 {
@@ -966,15 +949,11 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 	if (Poco::File(pathPattern).exists())
 		validDir += '*';
 	else
-<<<<<<< HEAD
-		throw Poco::NotFoundException("cannot locate directory containing valid JSON test files");
-
-=======
 	{
 		std::cout << "Can't find " << validDir << std::endl;
 		throw Poco::NotFoundException("cannot locate directory containing valid JSON test files");
 	}
->>>>>>> develop
+
 	return validDir;
 }
 
@@ -987,22 +966,16 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testTrueProperty);
 	CppUnit_addTest(pSuite, JSONTest, testFalseProperty);
 	CppUnit_addTest(pSuite, JSONTest, testNumberProperty);
-<<<<<<< HEAD
-=======
 #if defined(POCO_HAVE_INT64)
 	CppUnit_addTest(pSuite, JSONTest, testNumber64Property);
 #endif
->>>>>>> develop
 	CppUnit_addTest(pSuite, JSONTest, testStringProperty);
 	CppUnit_addTest(pSuite, JSONTest, testEmptyObject);
 	CppUnit_addTest(pSuite, JSONTest, testDoubleProperty);
 	CppUnit_addTest(pSuite, JSONTest, testDouble2Property);
 	CppUnit_addTest(pSuite, JSONTest, testDouble3Property);
 	CppUnit_addTest(pSuite, JSONTest, testObjectProperty);
-<<<<<<< HEAD
-=======
 	CppUnit_addTest(pSuite, JSONTest, testObjectArray);
->>>>>>> develop
 	CppUnit_addTest(pSuite, JSONTest, testEmptyArray);
 	CppUnit_addTest(pSuite, JSONTest, testNestedArray);
 	CppUnit_addTest(pSuite, JSONTest, testNullElement);
@@ -1016,13 +989,9 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testQuery);
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidJanssonFiles);
-<<<<<<< HEAD
-	CppUnit_addTest(pSuite, JSONTest, testTemplate);
-=======
 	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testTemplate);
 	CppUnit_addTest(pSuite, JSONTest, testUnicode);
->>>>>>> develop
 
 	return pSuite;
 }

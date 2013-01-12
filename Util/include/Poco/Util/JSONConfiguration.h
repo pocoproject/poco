@@ -36,37 +36,24 @@
 //
 
 
-<<<<<<< HEAD
-=======
 // Avoid accidental linking of JSON library when JSONConfiguration
 // is not desired.
 #ifndef POCO_UTIL_NO_JSONCONFIGURATION
 
 
->>>>>>> develop
 #ifndef Util_JSONConfiguration_INCLUDED
 #define Util_JSONConfiguration_INCLUDED
 
 
-<<<<<<< HEAD
-#include <istream>
-
-#include "Poco/Util/AbstractConfiguration.h"
-#include "Poco/JSON/Object.h"
-=======
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/JSON/Object.h"
 #include <istream>
 
->>>>>>> develop
 
 namespace Poco {
 namespace Util {
 
-<<<<<<< HEAD
-=======
 
->>>>>>> develop
 class Util_API JSONConfiguration : public AbstractConfiguration
 	/// This configuration class extracts configuration properties
 	/// from a JSON object. An XPath-like syntax for property
@@ -173,16 +160,11 @@ private:
  	JSON::Object::Ptr _object;
 };
 
-<<<<<<< HEAD
-=======
 
->>>>>>> develop
 } } // namespace Poco::Util
 
 
 #endif // Util_JSONConfiguration_INCLUDED
-<<<<<<< HEAD
-=======
+
 
 #endif // POCO_UTIL_NO_JSONCONFIGURATION
->>>>>>> develop

@@ -32,8 +32,6 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-<<<<<<< HEAD
-=======
 
 
 // Avoid accidental linking of JSON library when JSONConfiguration
@@ -41,7 +39,6 @@
 #ifndef POCO_UTIL_NO_JSONCONFIGURATION
 
 
->>>>>>> develop
 #include "Poco/FileStream.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Util/JSONConfiguration.h"
@@ -51,17 +48,10 @@
 #include "Poco/RegularExpression.h"
 #include "Poco/NumberParser.h"
 
-<<<<<<< HEAD
-namespace Poco
-{
-namespace Util
-{
-=======
 
 namespace Poco {
 namespace Util {
 
->>>>>>> develop
 
 JSONConfiguration::JSONConfiguration() : _object(new JSON::Object())
 {
@@ -133,148 +123,6 @@ bool JSONConfiguration::getRaw(const std::string & key, std::string & value) con
 
 
 void JSONConfiguration::getIndexes(std::string& name, std::vector<int>& indexes)
-<<<<<<< HEAD
-{
-	indexes.clear();
-
-	RegularExpression::MatchVec matches;
-	int firstOffset = -1;
-	int offset = 0;
-	RegularExpression regex("\\[([0-9]+)\\]");
-	while(regex.match(name, offset, matches) > 0 )
-	{
-		if ( firstOffset == -1 )
-		{
-			firstOffset = matches[0].offset;
-		}
-		std::string num = name.substr(matches[1].offset, matches[1].length);
-		indexes.push_back(NumberParser::parse(num));
-		offset = matches[0].offset + matches[0].length;
-	}
-
-	if ( firstOffset != -1 )
-	{
-		name = name.substr(0, firstOffset);
-	}
-}
-
-JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::string& lastPart)
-{
-	JSON::Object::Ptr currentObject = _object;
-
-	StringTokenizer tokenizer(key, ".");
-	lastPart = tokenizer[tokenizer.count() - 1];
-
-	for(int i = 0; i < tokenizer.count() - 1; ++i)
-	{
-		std::vector<int> indexes;
-		std::string name = tokenizer[i];
-		getIndexes(name, indexes);
-
-		DynamicAny result = currentObject->get(name);
-
-		if ( result.isEmpty() ) // Not found
-		{
-			if ( indexes.empty() ) // We want an object, create it
-			{
-				JSON::Object::Ptr newObject = new JSON::Object();
-				currentObject->set(name, newObject);
-				currentObject = newObject;
-			}
-			else // We need an array
-			{
-				JSON::Array::Ptr newArray;
-				JSON::Array::Ptr parentArray;
-				JSON::Array::Ptr topArray;
-				for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end(); ++it)
-				{
-					newArray = new JSON::Array();
-					if ( topArray.isNull() )
-					{
-						topArray = newArray;
-					}
-
-					if ( ! parentArray.isNull() )
-					{
-						parentArray->add(newArray);
-					}
-
-					for(int i = 0; i <= *it - 1; ++i)
-					{
-						Poco::DynamicAny nullValue;
-						newArray->add(nullValue);
-					}
-
-					parentArray = newArray;
-				}
-
-				currentObject->set(name, topArray);
-				currentObject = new JSON::Object();
-				newArray->add(currentObject);
-			}
-		}
-		else // We have a value
-		{
-			if ( indexes.empty() ) // We want an object
-			{
-				if ( result.type() == typeid(JSON::Object::Ptr) )
-				{
-					currentObject = result.extract<JSON::Object::Ptr>();
-				}
-				else
-				{
-					throw SyntaxException("Expected a JSON object");
-				}
-			}
-			else
-			{
-				if ( result.type() == typeid(JSON::Array::Ptr) )
-				{
-					JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
-
-					for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
-					{
-						JSON::Array::Ptr currentArray = arr;
-						arr = arr->getArray(*it);
-						if ( arr.isNull() )
-						{
-							arr = new JSON::Array();
-							currentArray->add(arr);
-						}
-					}
-
-					result = arr->get(*indexes.rbegin());
-					if ( result.isEmpty() ) // Index doesn't exist
-					{
-						JSON::Object::Ptr newObject = new JSON::Object();
-						arr->add(newObject);
-						currentObject = newObject;
-					}
-					else // Index is available
-					{
-						if ( result.type() == typeid(JSON::Object::Ptr) )
-						{
-							currentObject = result.extract<JSON::Object::Ptr>();
-						}
-						else
-						{
-							throw SyntaxException("Expected a JSON object");
-						}
-					}
-				}
-				else
-				{
-					throw SyntaxException("Expected a JSON array");
-				}
-			}
-		}
-	}
-	return currentObject;
-}
-
-void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny& value)
-=======
->>>>>>> develop
 {
 	indexes.clear();
 
@@ -419,10 +267,6 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 {
 
 	std::string sValue;
-<<<<<<< HEAD
-=======
-	
->>>>>>> develop
 	value.convert<std::string>(sValue);
 	KeyValue kv(key, sValue);
 	
@@ -439,15 +283,6 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 	std::vector<int> indexes;
 	getIndexes(lastPart, indexes);
 
-<<<<<<< HEAD
-	std::string lastPart;
-	JSON::Object::Ptr parentObject = findStart(key, lastPart);
-
-	std::vector<int> indexes;
-	getIndexes(lastPart, indexes);
-
-=======
->>>>>>> develop
 	if ( indexes.empty() ) // No Array
 	{
 		parentObject->set(lastPart, value);
@@ -492,54 +327,12 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 	}
 }
 
-<<<<<<< HEAD
-void JSONConfiguration::setString(const std::string& key, const std::string& value)
-{
-	setValue(key, value);
-}
-
-
-void JSONConfiguration::setRaw(const std::string& key, const std::string& value)
-{
-	setValue(key, value);
-}
-
-void JSONConfiguration::setInt(const std::string& key, int value)
-{
-	setValue(key, value);
-}
-
-void JSONConfiguration::setBool(const std::string& key, bool value)
-{
-	setValue(key, value);
-}
-
-void JSONConfiguration::setDouble(const std::string& key, double value)
-=======
 
 void JSONConfiguration::setString(const std::string& key, const std::string& value)
->>>>>>> develop
 {
 	setValue(key, value);
 }
 
-<<<<<<< HEAD
-void JSONConfiguration::enumerate(const std::string& key, Keys& range) const
-{
-	JSON::Query query(_object);
-	Poco::DynamicAny result = query.find(key);
-	if ( result.type() == typeid(JSON::Object::Ptr) )
-	{
-		JSON::Object::Ptr object = result.extract<JSON::Object::Ptr>();
-		object->getNames(range);
-	}
-}
-
-
-void JSONConfiguration::save(std::ostream& ostr, unsigned int indent) const
-{
-	_object->stringify(ostr, indent);
-=======
 
 void JSONConfiguration::setRaw(const std::string& key, const std::string& value)
 {
@@ -574,7 +367,6 @@ void JSONConfiguration::enumerate(const std::string& key, Keys& range) const
 		JSON::Object::Ptr object = result.extract<JSON::Object::Ptr>();
 		object->getNames(range);
 	}
->>>>>>> develop
 }
 
 
@@ -587,15 +379,8 @@ void JSONConfiguration::save(std::ostream& ostr, unsigned int indent) const
 void JSONConfiguration::removeRaw(const std::string& key)
 
 {
-<<<<<<< HEAD
 	std::string lastPart;
 	JSON::Object::Ptr parentObject = findStart(key, lastPart);
-	
-=======
-	
-	std::string lastPart;
-	JSON::Object::Ptr parentObject = findStart(key, lastPart);
->>>>>>> develop
 	std::vector<int> indexes;
 	getIndexes(lastPart, indexes);
 
@@ -606,14 +391,8 @@ void JSONConfiguration::removeRaw(const std::string& key)
 	else
 	{
 		DynamicAny result = parentObject->get(lastPart);
-<<<<<<< HEAD
-		if ( !result.isEmpty() && result.type() == typeid(JSON::Array::Ptr) )
-		{
-=======
 		if (!result.isEmpty() && result.type() == typeid(JSON::Array::Ptr))
 		{
-
->>>>>>> develop
 			JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
 			for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
 			{
@@ -622,11 +401,6 @@ void JSONConfiguration::removeRaw(const std::string& key)
 			arr->remove(indexes.back());
 		}
 	}
-<<<<<<< HEAD
-}
-
-}} // Namespace Poco::Util
-=======
 
 }
 
@@ -634,4 +408,3 @@ void JSONConfiguration::removeRaw(const std::string& key)
 } } // namespace Poco::Util
 
 #endif // POCO_UTIL_NO_JSONCONFIGURATION
->>>>>>> develop

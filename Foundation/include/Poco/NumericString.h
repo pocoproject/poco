@@ -41,10 +41,7 @@
 
 
 #include "Poco/Foundation.h"
-<<<<<<< HEAD
-=======
 #include "Poco/Buffer.h"
->>>>>>> develop
 #include "Poco/FPEnvironment.h"
 #ifdef min
 	#undef min
@@ -55,12 +52,6 @@
 #include <limits>
 #include <cmath>
 #if !defined(POCO_NO_LOCALE)
-<<<<<<< HEAD
-#include <locale>
-#endif
-
-
-=======
 	#include <locale>
 #endif
 
@@ -72,7 +63,6 @@
 #define POCO_FLT_EXP 'e'
 
 
->>>>>>> develop
 namespace Poco {
 
 
@@ -100,13 +90,10 @@ inline char thousandSeparator()
 }
 
 
-<<<<<<< HEAD
-=======
 //
 // String to Number Conversions
 //
 
->>>>>>> develop
 template <typename I>
 bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	/// Converts zero-terminated character array to integer number;
@@ -223,165 +210,6 @@ bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
 }
 
 
-<<<<<<< HEAD
-namespace Impl {
-
-static char DUMMY_EXP_UNDERFLOW = 0; // dummy default val
-
-}
-
-template <typename F>
-bool strToFloat (const char* pStr, F& result, char& eu = Impl::DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
-	/// Converts zero-terminated array to floating-point number;
-	/// Returns true if succesful. Exponent underflow (i.e. loss of precision)
-	/// is signalled in eu. Thousand separators are recognized for the locale
-	/// and silently skipped but not verified for correct positioning.
-	///
-	/// If parsing was unsuccesful, the return value is false with
-	/// result and eu values undetermined.
-{
-	poco_assert (decSep != thSep);
-
-	if (pStr == 0 || *pStr == '\0') return false;
-
-	// parser states:
-	const char STATE_LEADING_SPACES = 0;
-	const char STATE_DIGITS_BEFORE_DEC_POINT = 1;
-	const char STATE_DIGITS_AFTER_DEC_POINT = 2;
-	const char STATE_EXP_CHAR = 3;
-	const char STATE_EXP_DIGITS = 4;
-	const char STATE_SUFFIX = 5; // 'f' suffix
-
-	char numSign = 1, expSign = 1;
-	char state = STATE_LEADING_SPACES;
-	F mantissa = 0.0, exponent = 0.0;
-	F pow10 = 1.;
-	result = 0.0;
-	eu = 0;
-	for (; *pStr != '\0'; ++pStr)
-	{
-		switch (*pStr)
-		{
-		case '.':
-			if (decSep == '.')
-			{
-				if (state >= STATE_DIGITS_AFTER_DEC_POINT) return false;
-				state = STATE_DIGITS_AFTER_DEC_POINT;
-				break;
-			}
-			else if ((thSep == '.') && (state == STATE_DIGITS_BEFORE_DEC_POINT))
-				break;
-			else
-				return false;
-
-		case ',':
-			if (decSep == ',')
-			{
-				if (state >= STATE_DIGITS_AFTER_DEC_POINT) return false;
-				state = STATE_DIGITS_AFTER_DEC_POINT;
-				break;
-			}
-			else if ((thSep == ',') && (state == STATE_DIGITS_BEFORE_DEC_POINT))
-				break;
-			else
-				return false;
-
-		case ' ': // space (SPC)
-			if ((thSep == ' ') && (state == STATE_DIGITS_BEFORE_DEC_POINT)) break;
-		case '\t': // horizontal tab (TAB)
-		case '\n': // line feed (LF)
-		case '\v': // vertical tab (VT)
-		case '\f': // form feed (FF)
-		case '\r': // carriage return (CR)
-			if ((state >= STATE_DIGITS_AFTER_DEC_POINT) || (state >= STATE_EXP_DIGITS))
-				break;
-			else if ((state > STATE_LEADING_SPACES) && (state < STATE_DIGITS_AFTER_DEC_POINT))
-				return false;
-			break;
-
-		case '-':
-			if (state == STATE_LEADING_SPACES)
-				numSign = -1;
-			else if (state == STATE_EXP_CHAR) // exponential char
-				expSign = -1;
-			else return false;
-		case '+':
-			break;
-
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-			if (state >= STATE_SUFFIX) return false; // constant suffix
-			if (state <= STATE_DIGITS_BEFORE_DEC_POINT) // integral part digits
-			{
-				result = result * 10 + (*pStr - '0');
-				state = STATE_DIGITS_BEFORE_DEC_POINT;
-			}
-			else if (state <= STATE_DIGITS_AFTER_DEC_POINT) // fractional part digits
-			{
-				mantissa += (*pStr - '0') / (pow10 *= 10.);
-				state = STATE_DIGITS_AFTER_DEC_POINT;
-			}
-			else if (state <= STATE_EXP_DIGITS) // exponent digits
-			{
-				exponent = exponent * 10 + (*pStr - '0');
-				state = STATE_EXP_DIGITS;
-			}
-			else return false;
-			break;
-
-		case 'E':
-		case 'e':
-			if (state > STATE_DIGITS_AFTER_DEC_POINT) return false;
-			state = STATE_EXP_CHAR;
-			break;
-
-		case 'F':
-		case 'f':
-			state = STATE_SUFFIX;
-			break;
-
-		default:
-			return false;
-		}
-	}
-
-	if (exponent > std::numeric_limits<F>::max_exponent10)
-	{
-		eu = expSign;
-		exponent = std::numeric_limits<F>::max_exponent10;
-	}
-
-	result += mantissa;
-	if (numSign != 1) result *= numSign;
-	if (exponent > 1.0)
-	{
-		F scale = std::pow(10., exponent);
-		result = (expSign < 0) ? (result / scale) : (result * scale);
-	}
-
-	return (state != STATE_LEADING_SPACES) && // empty/zero-length string
-		!FPEnvironment::isInfinite(result) &&
-		!FPEnvironment::isNaN(result);
-}
-
-
-template <typename F>
-bool strToFloat (const std::string& s, F& result, char& eu = Impl::DUMMY_EXP_UNDERFLOW, char decSep = '.', char thSep = ',')
-	/// Converts string to floating-point number;
-	/// This is a wrapper function, for details see see the
-	/// bool strToFloat(const char*, F&, char&, char, char) implementation.
-{
-	return strToFloat(s.c_str(), result, eu, decSep, thSep); 
-}
-=======
 //
 // Number to String Conversions
 //
@@ -718,7 +546,6 @@ Foundation_API bool strToDouble(const std::string& str, double& result, char dec
 //
 // end double-conversion functions declarations
 //
->>>>>>> develop
 
 
 } // namespace Poco

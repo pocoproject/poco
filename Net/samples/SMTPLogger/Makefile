@@ -15,10 +15,7 @@ target_version = 1
 target_libs    = PocoNet PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
-<<<<<<< HEAD
-=======
 
 ifdef POCO_UNBUNDLED
         SYSLIBS += -lz
 endif
->>>>>>> develop

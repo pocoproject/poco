@@ -50,22 +50,16 @@ public:
 	void testTrueProperty();
 	void testFalseProperty();
 	void testNumberProperty();
-<<<<<<< HEAD
-=======
 #if defined(POCO_HAVE_INT64)
 	void testNumber64Property();
 #endif
->>>>>>> develop
 	void testStringProperty();
 	void testEmptyObject();
 	void testDoubleProperty();
 	void testDouble2Property();
 	void testDouble3Property();
 	void testObjectProperty();
-<<<<<<< HEAD
-=======
 	void testObjectArray();
->>>>>>> develop
 	void testEmptyArray();
 	void testNestedArray();
 	void testNullElement();
@@ -81,11 +75,8 @@ public:
 	void testInvalidJanssonFiles();
 	void testTemplate();
 	void testItunes();
-<<<<<<< HEAD
-=======
 	void testUnicode(); 
 	void testInvalidUnicodeJanssonFiles();
->>>>>>> develop
 
 	void setUp();
 	void tearDown();

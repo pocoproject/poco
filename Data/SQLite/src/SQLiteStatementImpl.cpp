@@ -52,23 +52,16 @@ namespace Data {
 namespace SQLite {
 
 
-<<<<<<< HEAD
-=======
 const std::size_t SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = std::numeric_limits<std::size_t>::max();
 
 
->>>>>>> develop
 SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB):
 	StatementImpl(rSession),
 	_pDB(pDB),
 	_pStmt(0),
 	_stepCalled(false),
 	_nextResponse(0),
-<<<<<<< HEAD
-	_affectedRowCount(0),
-=======
 	_affectedRowCount(POCO_SQLITE_INV_ROW_CNT),
->>>>>>> develop
 	_canBind(false),
 	_isExtracted(false),
 	_canCompile(true)
@@ -85,11 +78,6 @@ SQLiteStatementImpl::~SQLiteStatementImpl()
 
 void SQLiteStatementImpl::compileImpl()
 {
-<<<<<<< HEAD
-	if (!_pLeftover) _bindBegin = bindings().begin();
-
-	std::string statement(toString());
-=======
 	if (!_pLeftover)
 	{
 		// Executed to force reset of previous changes count to zero.
@@ -112,7 +100,6 @@ void SQLiteStatementImpl::compileImpl()
 		throw InvalidAccessException("Cannot drop system table!");
 	}
 
->>>>>>> develop
 	sqlite3_stmt* pStmt = 0;
 	const char* pSql = _pLeftover ? _pLeftover->c_str() : statement.c_str();
 
@@ -227,25 +214,15 @@ void SQLiteStatementImpl::bindImpl()
 	else if (bindCount > remainingBindCount)
 		throw ParameterCountMismatchException();
 
-<<<<<<< HEAD
-	if (_bindBegin != bindings().end())
-	{
-		_affectedRowCount = (*_bindBegin)->numOfRowsHandled();
-=======
 	std::size_t boundRowCount;
 	if (_bindBegin != bindings().end())
 	{
 		boundRowCount = (*_bindBegin)->numOfRowsHandled();
->>>>>>> develop
 
 		Bindings::iterator oldBegin = _bindBegin;
 		for (std::size_t pos = 1; _bindBegin != bindEnd && (*_bindBegin)->canBind(); ++_bindBegin)
 		{
-<<<<<<< HEAD
-			if (_affectedRowCount != (*_bindBegin)->numOfRowsHandled())
-=======
 			if (boundRowCount != (*_bindBegin)->numOfRowsHandled())
->>>>>>> develop
 				throw BindingException("Size mismatch in Bindings. All Bindings MUST have the same size");
 
 			(*_bindBegin)->bind(pos);
@@ -266,11 +243,7 @@ void SQLiteStatementImpl::bindImpl()
 void SQLiteStatementImpl::clear()
 {
 	_columns[currentDataSet()].clear();
-<<<<<<< HEAD
-	_affectedRowCount = 0;
-=======
 	_affectedRowCount = POCO_SQLITE_INV_ROW_CNT;
->>>>>>> develop
 
 	if (_pStmt)
 	{
@@ -297,12 +270,9 @@ bool SQLiteStatementImpl::hasNext()
 	_stepCalled = true;
 	_nextResponse = sqlite3_step(_pStmt);
 
-<<<<<<< HEAD
-=======
 	if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
 	_affectedRowCount += sqlite3_changes(_pDB);
 
->>>>>>> develop
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
 		Utility::throwException(_nextResponse);
 
@@ -329,11 +299,8 @@ std::size_t SQLiteStatementImpl::next()
 			_isExtracted = true;
 		}
 		_stepCalled = false;
-<<<<<<< HEAD
-=======
 		if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
 		_affectedRowCount += (*extracts.begin())->numOfRowsHandled();
->>>>>>> develop
 	}
 	else if (SQLITE_DONE == _nextResponse)
 	{
@@ -341,12 +308,7 @@ std::size_t SQLiteStatementImpl::next()
 	}
 	else
 	{
-<<<<<<< HEAD
-		int rc = _nextResponse;
-		Utility::throwException(rc, std::string("Iterator Error: trying to access the next value"));
-=======
 		Utility::throwException(_nextResponse, std::string("Iterator Error: trying to access the next value"));
->>>>>>> develop
 	}
 	
 	return 1u;
@@ -369,11 +331,7 @@ const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
 
 std::size_t SQLiteStatementImpl::affectedRowCount() const
 {
-<<<<<<< HEAD
-	return _affectedRowCount ? _affectedRowCount : sqlite3_changes(_pDB);
-=======
 	return _affectedRowCount != POCO_SQLITE_INV_ROW_CNT ? _affectedRowCount : sqlite3_changes(_pDB);
->>>>>>> develop
 }
 
 

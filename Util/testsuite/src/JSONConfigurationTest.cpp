@@ -28,21 +28,15 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-<<<<<<< HEAD
-=======
 
 
->>>>>>> develop
 #include "JSONConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Util/JSONConfiguration.h"
 #include "Poco/JSON/JSONException.h"
 
-<<<<<<< HEAD
-=======
 
->>>>>>> develop
 using Poco::Util::JSONConfiguration;
 using Poco::Util::AbstractConfiguration;
 using Poco::AutoPtr;
@@ -111,10 +105,7 @@ void JSONConfigurationTest::testLoad()
 
 }
 
-<<<<<<< HEAD
-=======
 
->>>>>>> develop
 AbstractConfiguration* JSONConfigurationTest::allocConfiguration() const
 {
 	return new JSONConfiguration;

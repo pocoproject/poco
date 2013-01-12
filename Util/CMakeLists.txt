@@ -1,8 +1,4 @@
 set(LIBNAME "PocoUtil")
-<<<<<<< HEAD
-set(LIBNAME "${LIBNAME}${LIB_EXT}")
-=======
->>>>>>> develop
 
 set( BASE_SRCS
 src/AbstractConfiguration.cpp
@@ -51,11 +47,7 @@ add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-<<<<<<< HEAD
-target_link_libraries( ${LIBNAME} PocoJSON${LIB_EXT} PocoXML${LIB_EXT} PocoFoundation${LIB_EXT})
-=======
 target_link_libraries( ${LIBNAME} PocoJSON PocoXML PocoFoundation)
->>>>>>> develop
 
 install(
     DIRECTORY include/Poco

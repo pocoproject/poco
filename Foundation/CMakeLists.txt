@@ -1,11 +1,4 @@
 set(LIBNAME "PocoFoundation")
-<<<<<<< HEAD
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    set(LIBNAME "${LIBNAME}d")
-endif()
-
-
-=======
 
 if (WIN32)
   # cmake has CMAKE_RC_COMPILER, but no message compiler
@@ -28,7 +21,6 @@ if (WIN32)
   mark_as_advanced(CMAKE_MC_COMPILER)
 endif(WIN32)
   
->>>>>>> develop
 set( BASE_SRCS 
   src/ASCIIEncoding.cpp
   src/Ascii.cpp
@@ -59,10 +51,7 @@ set( BASE_SRCS
   src/DigestStream.cpp
   src/DirectoryIterator.cpp
   src/Environment.cpp
-<<<<<<< HEAD
-=======
   src/Error.cpp
->>>>>>> develop
   src/ErrorHandler.cpp
   src/Event.cpp
   src/EventArgs.cpp
@@ -139,10 +128,7 @@ set( BASE_SRCS
   src/StreamCopier.cpp
   src/StreamTokenizer.cpp
   src/String.cpp
-<<<<<<< HEAD
-=======
   src/NumericString.cpp
->>>>>>> develop
   src/StringTokenizer.cpp
   src/SynchronizedObject.cpp
   src/Task.cpp
@@ -217,8 +203,6 @@ set(WIN_SRCS
   src/WindowsConsoleChannel.cpp
 )
 
-<<<<<<< HEAD
-=======
 if (WIN32)
   set(RES_SRCS ${CMAKE_SOURCE_DIR}/Foundation/include/Poco/pocomsg.h)
   set_source_files_properties(${RES_SRCS} PROPERTIES GENERATED true)
@@ -235,7 +219,6 @@ if (WIN32)
   list(APPEND WIN_SRCS ${RES_SRCS})
 endif (WIN32)
 
->>>>>>> develop
 set(LIN_SRCS
   src/SyslogChannel.cpp
 )

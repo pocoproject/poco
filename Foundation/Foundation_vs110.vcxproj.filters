@@ -222,12 +222,9 @@
     <ClCompile Include="src\Environment_WIN32U.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
-<<<<<<< HEAD
-=======
     <ClCompile Include="src\Error.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
->>>>>>> develop
     <ClCompile Include="src\Exception.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
@@ -270,27 +267,21 @@
     <ClCompile Include="src\String.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
-<<<<<<< HEAD
-=======
     <ClCompile Include="src\NumericString.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
->>>>>>> develop
     <ClCompile Include="src\StringTokenizer.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Void.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
-<<<<<<< HEAD
-=======
     <ClCompile Include="src\Base32Decoder.cpp">
       <Filter>Streams\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Base32Encoder.cpp">
       <Filter>Streams\Source Files</Filter>
     </ClCompile>
->>>>>>> develop
     <ClCompile Include="src\Base64Decoder.cpp">
       <Filter>Streams\Source Files</Filter>
     </ClCompile>
@@ -965,12 +956,9 @@
     <ClInclude Include="include\Poco\Environment_WIN32U.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
-<<<<<<< HEAD
-=======
     <ClInclude Include="include\Poco\Error.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
->>>>>>> develop
     <ClInclude Include="include\Poco\Exception.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
@@ -1073,15 +1061,12 @@
     <ClInclude Include="include\Poco\Void.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
-<<<<<<< HEAD
-=======
     <ClInclude Include="include\Poco\Base32Decoder.h">
       <Filter>Streams\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Base32Encoder.h">
       <Filter>Streams\Header Files</Filter>
     </ClInclude>
->>>>>>> develop
     <ClInclude Include="include\Poco\Base64Decoder.h">
       <Filter>Streams\Header Files</Filter>
     </ClInclude>

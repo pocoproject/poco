@@ -1,9 +1,5 @@
 //
-<<<<<<< HEAD
-// Types.h
-=======
 // UTFString.h
->>>>>>> develop
 //
 // $Id: //poco/1.4/Foundation/include/Poco/UTFString.h#2 $
 //
@@ -91,10 +87,7 @@ namespace Poco {
 	#endif //POCO_NO_WSTRING
 //#endif // POCO_ENABLE_CPP11
 
-<<<<<<< HEAD
-=======
 
->>>>>>> develop
 } // namespace Poco
 
 
