@@ -1,5 +1,9 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.5.2 (2013-03-??)
+==========================
+- fixed GH #57: poco-1.5.1: Doesn't compile for Android
+
 Release 1.5.1 (2013-01-11)
 ==========================
 - using double-conversion library for floating-point numeric/string conversions
