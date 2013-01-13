@@ -44,7 +44,7 @@ set INCLUDE=%INCLUDE%;%MYSQL_INCLUDE%
 set LIB=%LIB%;%MYSQL_LIB%
 
 set POCO_BASE=%CD%
-set PATH=%POCO_BASE%\bin;%PATH%
+set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 
 rem VS_VERSION {71 | 80 | 90 | 100 | 110}
 if "%1"=="" goto usage
@@ -71,7 +71,7 @@ if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
 
 if "%8"=="" goto use_devenv
-set BUILD_TOOL="%8"
+set BUILD_TOOL=%8
 goto use_custom
 :use_devenv
 set BUILD_TOOL=devenv
