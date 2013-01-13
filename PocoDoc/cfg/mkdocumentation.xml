@@ -37,18 +37,7 @@
 				-D_DEBUG,
 				-E,
 				-C,
-				-DFoundation_API=,
-				-DXML_API=,
-				-DJSON_API=,
-				-DUtil_API=,
-				-DNet_API=,
-				-DCrypto_API=,
-				-DNetSSL_API=,
-				-DZip_API=,
-				-DData_API=,
-				-DSQLite_API=,
-				-DMySQL_API=,
-				-DODBC_API=
+				-DPOCO_NO_GCC_API_ATTRIBUTE
 			</options>
 			<path></path>
 			<usePipe>true</usePipe>
