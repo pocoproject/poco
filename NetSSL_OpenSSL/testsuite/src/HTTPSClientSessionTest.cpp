@@ -46,6 +46,7 @@
 #include "Poco/Net/Context.h"
 #include "Poco/Net/Session.h"
 #include "Poco/Net/SSLManager.h"
+#include "Poco/Net/SSLException.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/StreamCopier.h"
@@ -434,6 +435,40 @@ void HTTPSClientSessionTest::testCachedSession()
 }
 
 
+void HTTPSClientSessionTest::testUnknownContentLength()
+{
+	HTTPSTestServer srv;
+	HTTPSClientSession s("localhost", srv.port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/nolength");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+	assert (response.getContentType() == "text/plain");
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assert (ostr.str() == HTTPSTestServer::SMALL_BODY);
+}
+
+
+void HTTPSClientSessionTest::testServerAbort()
+{
+	HTTPSTestServer srv;
+	HTTPSClientSession s("localhost", srv.port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/nolength/connection/abort");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+	assert (response.getContentType() == "text/plain");
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assert (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	assert ( dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
+	         s.networkException()) != NULL );
+}
+
+
 void HTTPSClientSessionTest::setUp()
 {
 }
@@ -460,6 +495,8 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testInterop);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testUnknownContentLength);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbort);
 
 	return pSuite;
 }
