@@ -58,6 +58,9 @@ public:
 	void testInterop();
 	void testProxy();
 	void testCachedSession();
+	void testUnknownContentLength();
+	void testServerAbort();
+
 
 	void setUp();
 	void tearDown();

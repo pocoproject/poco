@@ -33,6 +33,7 @@
 #include "HTTPSTestServer.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/SecureStreamSocketImpl.h"
 #include "Poco/Timespan.h"
 #include "Poco/NumberFormatter.h"
 #include <iostream>
@@ -43,6 +44,7 @@ using Poco::Net::StreamSocket;
 using Poco::Net::SecureStreamSocket;
 using Poco::Net::SecureServerSocket;
 using Poco::Net::SocketAddress;
+using Poco::Net::SecureStreamSocketImpl;
 using Poco::NumberFormatter;
 
 
@@ -115,6 +117,10 @@ void HTTPSTestServer::run()
 				}
 				std::string response = handleRequest();
 				ss.sendBytes(response.data(), (int) response.size());
+				if(_lastRequest.find("/connection/abort")!=std::string::npos) {
+					SecureStreamSocketImpl* sss = dynamic_cast<SecureStreamSocketImpl*>(ss.impl());
+					if(sss!=NULL) sss->abort();
+				}
 				Poco::Thread::sleep(1000);
 			}
 			catch (Poco::Exception& exc)
@@ -162,6 +168,17 @@ std::string HTTPSTestServer::handleRequest() const
 		response.append("Content-Length: "); 
 		response.append(NumberFormatter::format((int) body.size()));
 		response.append("\r\n");
+		response.append("Connection: Close\r\n");
+		response.append("\r\n");
+		if (_lastRequest.substr(0, 3) == "GET")
+			response.append(body);
+	}
+	else if (_lastRequest.substr(0, 13) == "GET /nolength" ||
+	         _lastRequest.substr(0, 14) == "HEAD /nolength")
+	{
+		std::string body(SMALL_BODY);
+		response.append("HTTP/1.0 200 OK\r\n");
+		response.append("Content-Type: text/plain\r\n");
 		response.append("Connection: Close\r\n");
 		response.append("\r\n");
 		if (_lastRequest.substr(0, 3) == "GET")

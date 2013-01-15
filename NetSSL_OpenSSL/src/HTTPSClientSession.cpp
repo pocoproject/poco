@@ -38,6 +38,7 @@
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureStreamSocketImpl.h"
 #include "Poco/Net/SSLManager.h"
+#include "Poco/Net/SSLException.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/NetException.h"
@@ -186,6 +187,15 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 		{
 			_pSession = secureSocket.currentSession();
 		}
+	}
+}
+
+
+int HTTPSClientSession::read(char* buffer, std::streamsize length) {
+	try {
+		return HTTPClientSession::read(buffer, length);
+	} catch(SSLConnectionUnexpectedlyClosedException&) {
+		return 0;
 	}
 }
 

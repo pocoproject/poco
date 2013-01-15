@@ -170,6 +170,7 @@ protected:
 	void connect(const SocketAddress& address);
 	std::string proxyRequestPrefix() const;
 	void proxyAuthenticate(HTTPRequest& request);
+	int read(char* buffer, std::streamsize length);
 
 private:
 	HTTPSClientSession(const HTTPSClientSession&);
