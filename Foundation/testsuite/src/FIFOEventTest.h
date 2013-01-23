@@ -44,6 +44,7 @@
 
 class FIFOEventTest: public CppUnit::TestCase
 {
+	Poco::FIFOEvent<void> Void;
 	Poco::FIFOEvent<int> Simple;
 	Poco::FIFOEvent<const int> ConstSimple;
 	Poco::FIFOEvent<Poco::EventArgs*> Complex;
@@ -72,7 +73,7 @@ public:
 	static CppUnit::Test* suite();
 
 protected:
-
+	void onVoid(const void* pSender);
 	void onSimple(const void* pSender, int& i);
 	void onSimpleOther(const void* pSender, int& i);
 	void onConstSimple(const void* pSender, const int& i);

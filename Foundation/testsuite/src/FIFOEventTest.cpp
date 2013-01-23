@@ -61,6 +61,14 @@ void FIFOEventTest::testNoDelegate()
 	EventArgs args;
 
 	assert (_count == 0);
+	Void.notify(this);
+	assert (_count == 0);
+
+	Void += delegate(this, &FIFOEventTest::onVoid);
+	Void -= delegate(this, &FIFOEventTest::onVoid);
+	Void.notify(this);
+	assert (_count == 0);
+
 	Simple.notify(this, tmp);
 	assert (_count == 0);
 
@@ -105,34 +113,38 @@ void FIFOEventTest::testSingleDelegate()
 
 	assert (_count == 0);
 
+	Void += delegate(this, &FIFOEventTest::onVoid);
+	Void.notify(this);
+	assert (_count == 1);
+
 	Simple += delegate(this, &FIFOEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assert (_count == 2);
 	
 	ConstSimple += delegate(this, &FIFOEventTest::onConstSimple);
 	ConstSimple.notify(this, tmp);
-	assert (_count == 2);
+	assert (_count == 3);
 	
 	EventArgs* pArgs = &args;
 	Complex += delegate(this, &FIFOEventTest::onComplex);
 	Complex.notify(this, pArgs);
-	assert (_count == 3);
+	assert (_count == 4);
 
 	Complex2 += delegate(this, &FIFOEventTest::onComplex2);
 	Complex2.notify(this, args);
-	assert (_count == 4);
+	assert (_count == 5);
 
 	const EventArgs* pCArgs = &args;
 	ConstComplex += delegate(this, &FIFOEventTest::onConstComplex);
 	ConstComplex.notify(this, pCArgs);
-	assert (_count == 5);
+	assert (_count == 6);
 
 	Const2Complex += delegate(this, &FIFOEventTest::onConst2Complex);
 	Const2Complex.notify(this, pArgs);
-	assert (_count == 6);
+	assert (_count == 7);
 	// check if 2nd notify also works
 	Const2Complex.notify(this, pArgs);
-	assert (_count == 7);
+	assert (_count == 8);
 	
 }
 
@@ -353,6 +365,11 @@ void FIFOEventTest::testAsyncNotify()
 	assert (_count == LARGEINC);
 }
 
+void FIFOEventTest::onVoid(const void* pSender)
+{
+	_count++;
+}
+
 void FIFOEventTest::onSimple(const void* pSender, int& i)
 {
 	_count++;
@@ -405,6 +422,7 @@ void FIFOEventTest::setUp()
 	// must clear events, otherwise repeating test executions will fail
 	// because tests are only created once, only setup is called before 
 	// each test run
+	Void.clear();
 	Simple.clear();
 	ConstSimple.clear();
 	Complex.clear();

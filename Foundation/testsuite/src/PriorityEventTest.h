@@ -44,6 +44,7 @@
 
 class PriorityEventTest: public CppUnit::TestCase
 {
+	Poco::PriorityEvent<void> Void;
 	Poco::PriorityEvent<int> Simple;
 	Poco::PriorityEvent<const int> ConstSimple;
 	Poco::PriorityEvent<Poco::EventArgs*> Complex;
@@ -72,6 +73,10 @@ public:
 	static CppUnit::Test* suite();
 
 protected:
+	static void onStaticVoid(const void* pSender);
+
+	void onVoid(const void* pSender);
+
 	static void onStaticSimple(const void* pSender, int& i);
 	static void onStaticSimple2(void* pSender, int& i);
 	static void onStaticSimple3(int& i);
