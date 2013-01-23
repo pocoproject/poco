@@ -62,6 +62,17 @@ void BasicEventTest::testNoDelegate()
 	EventArgs args;
 
 	assert (_count == 0);
+	assert (Void.empty());
+	Void.notify(this);
+	assert (_count == 0);
+
+	Void += delegate(this, &BasicEventTest::onVoid);
+	assert (!Void.empty());
+	Void -= delegate(this, &BasicEventTest::onVoid);
+	assert (Void.empty());
+	Void.notify(this);
+
+	assert (_count == 0);
 	assert (Simple.empty());
 	Simple.notify(this, tmp);
 	assert (_count == 0);
@@ -114,6 +125,13 @@ void BasicEventTest::testNoDelegate()
 	Simple.notify(this, tmp);
 	assert (_count == 3);
 	Simple -= delegate(BasicEventTest::onStaticSimple);
+
+	Void += delegate(&BasicEventTest::onStaticVoid);
+	Void += delegate(&BasicEventTest::onStaticVoid);
+
+	Void.notify(this);
+	assert (_count == 5);
+	Void -= delegate(BasicEventTest::onStaticVoid);
 }
 
 void BasicEventTest::testSingleDelegate()
@@ -123,34 +141,38 @@ void BasicEventTest::testSingleDelegate()
 
 	assert (_count == 0);
 
+	Void += delegate(this, &BasicEventTest::onVoid);
+	Void.notify(this);
+	assert (_count == 1);
+
 	Simple += delegate(this, &BasicEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assert (_count == 2);
 	
 	ConstSimple += delegate(this, &BasicEventTest::onConstSimple);
 	ConstSimple.notify(this, tmp);
-	assert (_count == 2);
+	assert (_count == 3);
 	
 	EventArgs* pArgs = &args;
 	Complex += delegate(this, &BasicEventTest::onComplex);
 	Complex.notify(this, pArgs);
-	assert (_count == 3);
+	assert (_count == 4);
 
 	Complex2 += delegate(this, &BasicEventTest::onComplex2);
 	Complex2.notify(this, args);
-	assert (_count == 4);
+	assert (_count == 5);
 
 	const EventArgs* pCArgs = &args;
 	ConstComplex += delegate(this, &BasicEventTest::onConstComplex);
 	ConstComplex.notify(this, pCArgs);
-	assert (_count == 5);
+	assert (_count == 6);
 
 	Const2Complex += delegate(this, &BasicEventTest::onConst2Complex);
 	Const2Complex.notify(this, pArgs);
-	assert (_count == 6);
+	assert (_count == 7);
 	// check if 2nd notify also works
 	Const2Complex.notify(this, pArgs);
-	assert (_count == 7);
+	assert (_count == 8);
 	
 }
 
@@ -315,6 +337,16 @@ void BasicEventTest::testAsyncNotify()
 	assert (_count == LARGEINC);
 }
 
+void BasicEventTest::onStaticVoid(const void* pSender)
+{
+	BasicEventTest* p = const_cast<BasicEventTest*>(reinterpret_cast<const BasicEventTest*>(pSender));
+	p->_count++;
+}
+
+void BasicEventTest::onVoid(const void* pSender)
+{
+	_count++;
+}
 
 void BasicEventTest::onSimpleNoSender(int& i)
 {
@@ -394,6 +426,7 @@ void BasicEventTest::setUp()
 	// must clear events, otherwise repeating test executions will fail
 	// because tests are only created once, only setup is called before 
 	// each test run
+	Void.clear();
 	Simple.clear();
 	ConstSimple.clear();
 	Complex.clear();

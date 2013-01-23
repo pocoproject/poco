@@ -44,6 +44,7 @@
 
 class BasicEventTest: public CppUnit::TestCase
 {
+	Poco::BasicEvent<void> Void;
 	Poco::BasicEvent<int> Simple;
 	Poco::BasicEvent<const int> ConstSimple;
 	Poco::BasicEvent<Poco::EventArgs*> Complex;
@@ -72,9 +73,14 @@ public:
 
 protected:
 
+	static void onStaticVoid(const void* pSender);
+
+	void onVoid(const void* pSender);
+
 	static void onStaticSimple(const void* pSender, int& i);
 	static void onStaticSimple2(void* pSender, int& i);
 	static void onStaticSimple3(int& i);
+
 	void onSimpleNoSender(int& i);
 	void onSimple(const void* pSender, int& i);
 	void onSimpleOther(const void* pSender, int& i);
