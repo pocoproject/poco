@@ -86,10 +86,10 @@ public:
 	virtual unsigned prefixLength() const = 0;
 
 	virtual IPAddressImpl* clone() const = 0;
+	virtual ~IPAddressImpl();
 
 protected:
 	IPAddressImpl();
-	virtual ~IPAddressImpl();
 
 private:
 	IPAddressImpl(const IPAddressImpl&);
