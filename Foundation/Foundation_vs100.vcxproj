@@ -1024,6 +1024,7 @@
     <ClInclude Include="include\Poco\NumberParser.h" />
     <ClInclude Include="include\Poco\NumericString.h" />
     <ClInclude Include="include\Poco\ObjectPool.h" />
+    <ClInclude Include="include\Poco\Optional.h" />
     <ClInclude Include="include\Poco\Platform.h" />
     <ClInclude Include="include\Poco\Platform_POSIX.h" />
     <ClInclude Include="include\Poco\Platform_VMS.h" />
@@ -1033,6 +1034,7 @@
     <ClInclude Include="include\Poco\RefCountedObject.h" />
     <ClInclude Include="include\Poco\SharedPtr.h" />
     <ClInclude Include="include\Poco\SingletonHolder.h" />
+    <ClInclude Include="include\Poco\SmallObjectAllocator.h" />
     <ClInclude Include="include\Poco\String.h" />
     <ClInclude Include="include\Poco\StringTokenizer.h" />
     <ClInclude Include="include\Poco\Tuple.h" />

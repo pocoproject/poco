@@ -392,6 +392,8 @@
 				<File
 					RelativePath=".\include\Poco\Net\IPAddress.h"/>
 				<File
+					RelativePath=".\include\Poco\Net\IPAddressImpl.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\Net.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\NetException.h"/>
@@ -410,6 +412,8 @@
 					RelativePath=".\src\HostEntry.cpp"/>
 				<File
 					RelativePath=".\src\IPAddress.cpp"/>
+				<File
+					RelativePath=".\src\IPAddressImpl.cpp"/>
 				<File
 					RelativePath=".\src\Net.cpp"/>
 				<File

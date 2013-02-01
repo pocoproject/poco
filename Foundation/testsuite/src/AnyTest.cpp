@@ -72,6 +72,9 @@ AnyTest::~AnyTest()
 
 void AnyTest::testInt()
 {
+	Any e;
+	assert (e.empty());
+
 	Any a = 13;
 	assert (a.type() == typeid(int));
 	int* i = AnyCast<int>(&a);

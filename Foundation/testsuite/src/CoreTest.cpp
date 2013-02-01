@@ -45,6 +45,7 @@
 #include "Poco/Ascii.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/Delegate.h"
+#include "Poco/SmallObjectAllocator.h"
 #include "Poco/Exception.h"
 #include <iostream>
 #include <sstream>
@@ -64,6 +65,7 @@ using Poco::AtomicCounter;
 using Poco::Nullable;
 using Poco::Ascii;
 using Poco::BasicEvent;
+using Poco::SmallObjectAllocator;
 using Poco::delegate;
 using Poco::NullType;
 using Poco::InvalidAccessException;
@@ -94,6 +96,37 @@ namespace
 		AtomicCounter& _counter;
 	};
 }
+
+
+class Small
+{
+};
+
+
+struct Parent
+{
+	Parent() { i = -1; }
+	virtual ~Parent() { i= -2; }
+
+	static int i;
+};
+
+
+int Parent::i = 0;
+
+
+struct Medium : public Parent
+{
+	
+};
+
+
+struct Large
+{
+	Large() : i(1), j(2), k(3), l(4) { }
+	long i,j,k;
+	const long l;
+};
 
 
 //
@@ -1031,6 +1064,137 @@ void CoreTest::testAscii()
 }
 
 
+void CoreTest::testSmallObjectAllocator()
+{
+	{
+		SmallObjectAllocator<int> soa1;
+		assert (!soa1.isOnHeap());
+		int& i = soa1.get();
+		i = 42;
+		int j = i;
+		assert (j == 42);
+		int* pi = &i;
+		assert (*pi == 42);
+		*pi = 24;
+		assert (i == 24);
+		SmallObjectAllocator<int> soa2(soa1);
+		assert (soa1.get() == soa2.get());
+		assert (soa2.get() == 24);
+
+		SmallObjectAllocator<int> soa3;
+		soa3 = soa2;
+		assert (soa3.get() == soa2.get());
+		assert (soa3.get() == 24);
+	}
+	{
+		// force heap alloc
+		SmallObjectAllocator<int, 1> soa1;
+		assert (soa1.isOnHeap());
+		int& i = soa1.get();
+		i = 42;
+		int j = i;
+		assert (j == 42);
+		int* pi = &i;
+		assert (*pi == 42);
+		*pi = 24;
+		assert (i == 24);
+		SmallObjectAllocator<int, 1> soa2(soa1);
+		assert (soa1.get() == soa2.get());
+		assert (soa2.get() == 24);
+
+		SmallObjectAllocator<int, 1> soa3;
+		soa3 = soa2;
+		assert (soa3.get() == soa2.get());
+		assert (soa3.get() == 24);
+	}
+
+	SmallObjectAllocator<Small> soa2;
+	assert (!soa2.isOnHeap());
+	
+	{
+		assert (Parent::i == 0);
+		SmallObjectAllocator<Medium> soa3;
+		assert (!soa3.isOnHeap());
+		assert (Parent::i == -1);
+	}
+	assert (Parent::i == -2);
+
+	{
+		typedef SmallObjectAllocator<Large, 4> LargeType;
+		LargeType soa4;
+		assert (soa4.isOnHeap());
+		Large large = soa4.get();
+		assert (large.i == 1);
+		assert (large.j == 2);
+		assert (large.k == 3);
+
+		const LargeType soa5;
+		assert (soa5.get().l == 4);
+	}
+
+	Parent::i = 0; // only to make sure subsequent runs don't fail
+
+	SmallObjectAllocator<char*> soa6(2);
+	assert (!soa6.isOnHeap());
+	char* pC2 = soa6.get();
+	pC2[0] = 'x';
+	pC2[1] = '\0';
+	std::string str2(pC2);
+	assert (str2 == "x");
+
+	std::size_t sz = POCO_SMALL_OBJECT_SIZE + 1;
+	Poco::SmallStringAllocator soa7(sz);
+	assert (soa7.isOnHeap());
+	char* pC = soa7.get();
+	char c = '0';
+	int i = 0;
+
+	// test this only for default values
+	if (POCO_SMALL_OBJECT_SIZE == 15)
+	{
+		for (i = 0; i < sz - 1; ++i)
+			pC[i] = c++;
+		pC[i] = '\0';
+		std::string str(pC);
+		assert (str == "0123456789:;<=>");
+
+		Poco::SmallStringAllocator soa7("0123456789:;<=>");
+		assert (str == soa7.get());
+
+		soa7 = "";
+		assert (soa7.get()[0] == '\0');
+		soa7 = "0123456789:;<=>";
+		assert (str == soa7.get());
+	}
+	else if (POCO_SMALL_OBJECT_SIZE == 7)
+	{
+		for (i = 0; i < sz - 1; ++i)
+			pC[i] = c++;
+		pC[i] = '\0';
+		std::string str(pC);
+		assert (str == "0123456");
+
+		Poco::SmallStringAllocator soa7("0123456");
+		assert (str == soa7.get());
+
+		soa7 = "";
+		assert (soa7.get()[0] == '\0');
+		soa7 = "0123456";
+		assert (str == soa7.get());
+	}
+
+	std::string str("0123456789");
+	Poco::SmallObjectAllocator<std::string> soa8(str);
+	assert (!soa8.isOnHeap());
+	assert(soa8.get() == str);
+
+	Poco::SmallObjectAllocator<std::string, 1> soa9;
+	assert (soa9.isOnHeap());
+	soa9 = str;
+	assert(soa9.get() == str);
+}
+
+
 void CoreTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1074,6 +1238,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
+	CppUnit_addTest(pSuite, CoreTest, testSmallObjectAllocator);
 
 	return pSuite;
 }

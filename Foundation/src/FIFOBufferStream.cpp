@@ -95,14 +95,14 @@ FIFOBufferStreamBuf::~FIFOBufferStreamBuf()
 int FIFOBufferStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	poco_assert (length > 0);
-	return _fifoBuffer.read(buffer, static_cast<std::size_t>(length));
+	return static_cast<int>(_fifoBuffer.read(buffer, static_cast<std::size_t>(length)));
 }
 
 
 int FIFOBufferStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	poco_assert (length > 0);
-	return _fifoBuffer.write(buffer, static_cast<std::size_t>(length));
+	return static_cast<int>(_fifoBuffer.write(buffer, static_cast<std::size_t>(length)));
 }
 
 

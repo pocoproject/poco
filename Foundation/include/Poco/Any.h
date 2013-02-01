@@ -5,7 +5,7 @@
 //
 // Library: Foundation
 // Package: Core
-// Module:  Any
+// Module:	Any
 //
 // Copyright Kevlin Henney, 2000, 2001, 2002. All rights reserved.
 // Extracted from Boost 1.33.1 lib and adapted for poco: Peter Schojer/AppliedInformatics 2006-02-02
@@ -52,17 +52,198 @@ class Any
 	///
 	/// Code taken from the Boost 1.33.1 library. Original copyright by Kevlin Henney. Modified for Poco
 	/// by Applied Informatics.
+	///
+	/// Modified for small object optimization support (optionally supported through conditional compilation)
+	/// by Alex Fabijanic.
 {
+
+#ifndef POCO_NO_SOO
+
 public:
-	Any():
-		_content(0)
+
+	Any()
+		/// Creates an empty any type.
+	{
+	}
+
+	template<typename ValueType>
+	Any(const ValueType & value)
+		/// Creates an any which stores the init parameter inside.
+		///
+		/// Example: 
+		///	 Any a(13); 
+		///	 Any a(string("12345"));
+	{
+		construct(value);
+	}
+
+	Any(const Any& other)
+		/// Copy constructor, works with both empty and initialized Any values.
+	{
+		construct(other);
+	}
+
+	~Any()
+	{
+		if(!empty())
+		{
+			if(flag())
+				content()->~Placeholder();
+			else
+				delete content();
+		}
+	}
+
+	template<typename ValueType>
+	Any & operator=(const ValueType& value)
+		/// Assignment operator for all types != Any.
+		///
+		/// Example: 
+		///   Any a = 13; 
+		///   Any a = string("12345");
+	{
+		this->~Any();
+		construct(value);
+		return *this;
+	}
+	
+	Any& operator = (Any value)
+		/// Assignment operator for Any.
+	{
+		this->~Any();
+		construct(value);
+		return *this;
+	}
+	
+	bool empty() const
+		/// Returns true if the Any is empty.
+	{
+		//return !(flags() & ASSIGNED);
+		return _placeholder.pHolder == 0;
+	}
+	
+	const std::type_info & type() const
+		/// Returns the type information of the stored content.
+		/// If the Any is empty typeid(void) is returned.
+		/// It is recommended to always query an Any for its type info before
+		/// trying to extract data via an AnyCast/RefAnyCast.
+	{
+		return empty() ? typeid(void) : content()->type();
+	}
+
+private:
+
+	class Placeholder
+	{
+	public:
+	
+		virtual ~Placeholder()
+		{
+		}
+	
+		virtual const std::type_info & type() const = 0;
+		virtual Placeholder * clone(Placeholder* pMem = 0) const = 0;
+	};
+
+	template<typename ValueType>
+	class Holder : public Placeholder
+	{
+	public:
+		Holder(const ValueType & value) : _held(value)
+		{
+		}
+	
+		virtual const std::type_info & type() const
+		{
+			return typeid(ValueType);
+		}
+	
+		virtual Placeholder * clone(Placeholder* pMem = 0) const
+		{
+			return pMem && (sizeof(_held) <= POCO_SMALL_OBJECT_SIZE) ?
+				new (pMem) Holder(_held) : 
+				new Holder(_held);
+		}
+
+		ValueType _held;
+
+	private:
+		Holder & operator = (const Holder &);
+	};
+
+	Placeholder* content() const
+	{
+		if (empty()) return 0;
+
+		if(flag())
+			return (Placeholder *) &(_placeholder.holder);
+		else
+			return _placeholder.pHolder;
+	}
+
+	template<typename ValueType>
+	void construct(const ValueType & value)
+	{
+		if (sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE)
+		{
+			new (_placeholder.holder) Holder<ValueType>(value);
+			flag() = 1;
+		}
+		else
+		{
+			_placeholder.pHolder = new Holder<ValueType>(value);
+			flag() = 0;
+		}
+	}
+	
+	void construct(const Any & other)
+	{
+		if(other.flag())
+		{
+			other.content()->clone((Placeholder*) &_placeholder.holder);
+			flag() = 1;
+			return;
+		}
+		else if(!(other.empty()))
+			_placeholder.pHolder = other._placeholder.pHolder->clone();
+
+		flag() = 0;
+	}
+
+	union PH
+		/// Placeholder union. If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE
+		/// bytes of storage, it will be placement-new-allocated into the local buffer
+		/// (i.e. there will be no heap-allocation. The local buffer size is one byte
+		/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
+		/// where the object was allocated (0 => heap, 1 => local).
+	{
+		PH ()
+		{
+			std::memset(holder, 0, sizeof(PH));
+		}
+
+		Placeholder*          pHolder;
+		mutable unsigned char holder[POCO_SMALL_OBJECT_SIZE + 1];
+	} _placeholder;
+
+	unsigned char& flag() const
+	{
+		return _placeholder.holder[POCO_SMALL_OBJECT_SIZE];
+	}
+
+
+#else // if POCO_NO_SOO
+
+
+public:
+	Any(): _pHolder(0)
 		/// Creates an empty any type.
 	{
 	}
 
 	template <typename ValueType>
 	Any(const ValueType& value):
-		_content(new Holder<ValueType>(value))
+		_pHolder(new Holder<ValueType>(value))
 		/// Creates an any which stores the init parameter inside.
 		///
 		/// Example: 
@@ -72,20 +253,20 @@ public:
 	}
 
 	Any(const Any& other):
-		_content(other._content ? other._content->clone() : 0)
-		/// Copy constructor, works with empty Anys and initialized Any values.
+		_pHolder(other._pHolder ? other._pHolder->clone() : 0)
+		/// Copy constructor, works with both empty and initialized Any values.
 	{
 	}
 
 	~Any()
 	{
-		delete _content;
+		delete _pHolder;
 	}
 
 	Any& swap(Any& rhs)
 		/// Swaps the content of the two Anys.
 	{
-		std::swap(_content, rhs._content);
+		std::swap(_pHolder, rhs._pHolder);
 		return *this;
 	}
 
@@ -94,8 +275,8 @@ public:
 		/// Assignment operator for all types != Any.
 		///
 		/// Example: 
-		///	Any a = 13; 
-		///	Any a = string("12345");
+		///   Any a = 13; 
+		///   Any a = string("12345");
 	{
 		Any(rhs).swap(*this);
 		return *this;
@@ -109,18 +290,18 @@ public:
 	}
 
 	bool empty() const
-		/// returns true if the Any is empty
+		/// Returns true if the Any is empty.
 	{
-		return !_content;
+		return !_pHolder;
 	}
 
 	const std::type_info& type() const
 		/// Returns the type information of the stored content.
 		/// If the Any is empty typeid(void) is returned.
-		/// It is suggested to always query an Any for its type info before trying to extract
-		/// data via an AnyCast/RefAnyCast.
+		/// It is recommended to always query an Any for its type info before
+		/// trying to extract data via an AnyCast/RefAnyCast.
 	{
-		return _content ? _content->type() : typeid(void);
+		return _pHolder ? _pHolder->type() : typeid(void);
 	}
 
 private:
@@ -155,16 +336,27 @@ private:
 		}
 
 		ValueType _held;
+
+	private:
+		Holder & operator=(const Holder &);
 	};
 
+	Placeholder* content() const
+	{
+		return _pHolder;
+	}
+
 private:
+	Placeholder* _pHolder;
+
+#endif // POCO_NO_SOO
+
 	template <typename ValueType>
 	friend ValueType* AnyCast(Any*);
 
 	template <typename ValueType>
 	friend ValueType* UnsafeAnyCast(Any*);
 
-	Placeholder* _content;
 };
 
 
@@ -178,7 +370,7 @@ ValueType* AnyCast(Any* operand)
 	/// Will return NULL if the cast fails, i.e. types don't match.
 {
 	return operand && operand->type() == typeid(ValueType)
-				? &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held
+				? &static_cast<Any::Holder<ValueType>*>(operand->content())->_held
 				: 0;
 }
 
@@ -264,7 +456,7 @@ ValueType* UnsafeAnyCast(Any* operand)
 	/// use typeid() comparison, e.g., when our types may travel across
 	/// different shared libraries.
 {
-	return &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held;
+	return &static_cast<Any::Holder<ValueType>*>(operand->_pHolder)->_held;
 }
 
 

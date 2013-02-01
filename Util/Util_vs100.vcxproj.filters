@@ -153,6 +153,9 @@
     <ClInclude Include="include\Poco\Util\TimerTaskAdapter.h">
       <Filter>Timer\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Util\Units.h">
+      <Filter>Util\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp">

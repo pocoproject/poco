@@ -220,6 +220,17 @@ namespace Poco {
 #endif
 
 
+// Small object size in bytes. Where applicable (e.g.
+// SmallObjectAllocator<char*> specialization of , Any, etc)
+// objects longer than this value will be alocated on the heap.
+// See Poco/SmallObjectAllocator.h for details.
+#if (POCO_PTR_IS_64_BIT == 1)
+	#define POCO_SMALL_OBJECT_SIZE 63
+#else
+	#define POCO_SMALL_OBJECT_SIZE 31
+#endif
+
+
 } // namespace Poco
 
 

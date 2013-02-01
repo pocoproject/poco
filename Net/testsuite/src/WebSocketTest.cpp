@@ -129,7 +129,7 @@ void WebSocketTest::testWebSocket()
 	WebSocket ws(cs, request, response);
 
 	std::string payload("x");
-	ws.sendFrame(payload.data(), payload.size());
+	ws.sendFrame(payload.data(), (int) payload.size());
 	char buffer[1024];
 	int flags;
 	int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
@@ -140,7 +140,7 @@ void WebSocketTest::testWebSocket()
 	for (int i = 2; i < 20; i++)
 	{
 		payload.assign(i, 'x');
-		ws.sendFrame(payload.data(), payload.size());
+		ws.sendFrame(payload.data(), (int) payload.size());
 		n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 		assert (n == payload.size());
 		assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
@@ -150,7 +150,7 @@ void WebSocketTest::testWebSocket()
 	for (int i = 125; i < 129; i++)
 	{
 		payload.assign(i, 'x');
-		ws.sendFrame(payload.data(), payload.size());
+		ws.sendFrame(payload.data(), (int) payload.size());
 		n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 		assert (n == payload.size());
 		assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
@@ -158,14 +158,14 @@ void WebSocketTest::testWebSocket()
 	}
 
 	payload = "Hello, world!";
-	ws.sendFrame(payload.data(), payload.size());
+	ws.sendFrame(payload.data(), (int) payload.size());
 	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 	assert (n == payload.size());
 	assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
 	assert (flags == WebSocket::FRAME_TEXT);
 	
 	payload = "Hello, universe!";
-	ws.sendFrame(payload.data(), payload.size(), WebSocket::FRAME_BINARY);
+	ws.sendFrame(payload.data(), (int) payload.size(), WebSocket::FRAME_BINARY);
 	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 	assert (n == payload.size());
 	assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
