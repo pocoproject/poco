@@ -84,18 +84,18 @@ protected:
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 		
-		_icmpClient.pingBegin += Delegate<Ping, ICMPEventArgs>(this, &Ping::onBegin);
-		_icmpClient.pingReply += Delegate<Ping, ICMPEventArgs>(this, &Ping::onReply);
-		_icmpClient.pingError += Delegate<Ping, ICMPEventArgs>(this, &Ping::onError);
-		_icmpClient.pingEnd   += Delegate<Ping, ICMPEventArgs>(this, &Ping::onEnd);
+		_icmpClient.pingBegin += delegate(this, &Ping::onBegin);
+		_icmpClient.pingReply += delegate(this, &Ping::onReply);
+		_icmpClient.pingError += delegate(this, &Ping::onError);
+		_icmpClient.pingEnd   += delegate(this, &Ping::onEnd);
 	}
 	
 	void uninitialize()
 	{
-		_icmpClient.pingBegin -= Delegate<Ping, ICMPEventArgs>(this, &Ping::onBegin);
-		_icmpClient.pingReply -= Delegate<Ping, ICMPEventArgs>(this, &Ping::onReply);
-		_icmpClient.pingError -= Delegate<Ping, ICMPEventArgs>(this, &Ping::onError);
-		_icmpClient.pingEnd   -= Delegate<Ping, ICMPEventArgs>(this, &Ping::onEnd);
+		_icmpClient.pingBegin -= delegate(this, &Ping::onBegin);
+		_icmpClient.pingReply -= delegate(this, &Ping::onReply);
+		_icmpClient.pingError -= delegate(this, &Ping::onError);
+		_icmpClient.pingEnd   -= delegate(this, &Ping::onEnd);
 
 		Application::uninitialize();
 	}

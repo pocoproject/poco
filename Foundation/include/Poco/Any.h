@@ -87,7 +87,7 @@ public:
 	{
 		if(!empty())
 		{
-			if(flag())
+			if(isLocal())
 				content()->~Placeholder();
 			else
 				delete content();
@@ -102,7 +102,7 @@ public:
 		///   Any a = 13; 
 		///   Any a = string("12345");
 	{
-		this->~Any();
+		if (isLocal()) this->~Any();
 		construct(value);
 		return *this;
 	}
@@ -110,7 +110,7 @@ public:
 	Any& operator = (Any value)
 		/// Assignment operator for Any.
 	{
-		this->~Any();
+		if (isLocal()) this->~Any();
 		construct(value);
 		return *this;
 	}
@@ -118,8 +118,8 @@ public:
 	bool empty() const
 		/// Returns true if the Any is empty.
 	{
-		//return !(flags() & ASSIGNED);
-		return _placeholder.pHolder == 0;
+		char buf[POCO_SMALL_OBJECT_SIZE] = { 0 };
+		return 0 == std::memcmp(_placeholder.holder, buf, POCO_SMALL_OBJECT_SIZE);
 	}
 	
 	const std::type_info & type() const
@@ -140,9 +140,9 @@ private:
 		virtual ~Placeholder()
 		{
 		}
-	
+
 		virtual const std::type_info & type() const = 0;
-		virtual Placeholder * clone(Placeholder* pMem = 0) const = 0;
+		virtual void clone(Placeholder**) const = 0;
 	};
 
 	template<typename ValueType>
@@ -152,17 +152,29 @@ private:
 		Holder(const ValueType & value) : _held(value)
 		{
 		}
-	
+
 		virtual const std::type_info & type() const
 		{
 			return typeid(ValueType);
 		}
-	
-		virtual Placeholder * clone(Placeholder* pMem = 0) const
+
+		static void setFlag(Placeholder** pMem, unsigned char val)
 		{
-			return pMem && (sizeof(_held) <= POCO_SMALL_OBJECT_SIZE) ?
-				new (pMem) Holder(_held) : 
-				new Holder(_held);
+			reinterpret_cast<unsigned char*>(pMem)[POCO_SMALL_OBJECT_SIZE] = val;
+		}
+
+		virtual void clone(Placeholder** ppMem) const
+		{
+			if ((sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE))
+			{
+				new (ppMem) Holder(_held);
+				setFlag(ppMem, 1);
+			}
+			else
+			{
+				*ppMem = new Holder(_held);
+				setFlag(ppMem, 0);
+			}
 		}
 
 		ValueType _held;
@@ -173,10 +185,8 @@ private:
 
 	Placeholder* content() const
 	{
-		if (empty()) return 0;
-
-		if(flag())
-			return (Placeholder *) &(_placeholder.holder);
+		if(isLocal())
+			return reinterpret_cast<Placeholder*>(&(_placeholder.holder));
 		else
 			return _placeholder.pHolder;
 	}
@@ -187,27 +197,26 @@ private:
 		if (sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE)
 		{
 			new (_placeholder.holder) Holder<ValueType>(value);
-			flag() = 1;
+			isLocal() = 1;
 		}
 		else
 		{
 			_placeholder.pHolder = new Holder<ValueType>(value);
-			flag() = 0;
+			isLocal() = 0;
 		}
 	}
-	
+
 	void construct(const Any & other)
 	{
-		if(other.flag())
-		{
-			other.content()->clone((Placeholder*) &_placeholder.holder);
-			flag() = 1;
-			return;
-		}
-		else if(!(other.empty()))
-			_placeholder.pHolder = other._placeholder.pHolder->clone();
-
-		flag() = 0;
+		if(other.empty())
+			erase(_placeholder.holder);
+		else
+			other.content()->clone(&_placeholder.pHolder);
+	}
+	
+	inline static void erase(unsigned char* pHolder, std::size_t sz= POCO_SMALL_OBJECT_SIZE + 1)
+	{
+		std::memset(pHolder, 0, sz);
 	}
 
 	union PH
@@ -219,14 +228,14 @@ private:
 	{
 		PH ()
 		{
-			std::memset(holder, 0, sizeof(PH));
+			erase(holder);
 		}
 
 		Placeholder*          pHolder;
 		mutable unsigned char holder[POCO_SMALL_OBJECT_SIZE + 1];
 	} _placeholder;
 
-	unsigned char& flag() const
+	unsigned char& isLocal() const
 	{
 		return _placeholder.holder[POCO_SMALL_OBJECT_SIZE];
 	}
