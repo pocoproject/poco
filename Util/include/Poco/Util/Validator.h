@@ -62,7 +62,7 @@ public:
 		/// Validates the value for the given option.
 		/// Does nothing if the value is valid.
 		///
-		/// Throws an InvalidOptionException otherwise.
+		/// Throws an OptionException otherwise.
 
 protected:
 	Validator();
