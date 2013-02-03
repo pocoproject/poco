@@ -103,7 +103,7 @@ void AnyTest::testCopyCtor()
 	assert (original.type() == copy.type());
 	assert (AnyCast<std::string>(original) == AnyCast<std::string>(copy));
 	assert (text == AnyCast<std::string>(copy));
-	assert(AnyCast<std::string>(&original) != AnyCast<std::string>(&copy));
+	assert (AnyCast<std::string>(&original) != AnyCast<std::string>(&copy));
 }
 
 
@@ -113,12 +113,19 @@ void AnyTest::testCopyAssign()
 	Any original = text, copy;
 	Any* assignResult = &(copy = original);
 	
-	assert(!copy.empty());
-	assert(original.type() == copy.type());
-	assert(AnyCast<std::string>(original) == AnyCast<std::string>(copy));
-	assert(text == AnyCast<std::string>(copy));
-	assert(AnyCast<std::string>(&original) != AnyCast<std::string>(&copy));
-	assert(assignResult == &copy);
+	assert (!copy.empty());
+	assert (original.type() == copy.type());
+	assert (AnyCast<std::string>(original) == AnyCast<std::string>(copy));
+	assert (text == AnyCast<std::string>(copy));
+	assert (AnyCast<std::string>(&original) != AnyCast<std::string>(&copy));
+	assert (assignResult == &copy);
+
+	// test self assignment
+	Any& ref = original;
+	original = ref;
+	assert (AnyCast<std::string>(original) == AnyCast<std::string>(copy));
+	original = original;
+	assert (AnyCast<std::string>(original) == AnyCast<std::string>(copy));
 }
 
 
@@ -129,12 +136,12 @@ void AnyTest::testConvertingAssign()
 	Any* assignResult = &(value = text);
 	
 	assert (!value.empty());
-	assert(value.type() == typeid(std::string));
-	assert(0 == AnyCast<int>(&value));
-	assert(0 != AnyCast<std::string>(&value));
-	assert(AnyCast<std::string>(value) == text);
-	assert(AnyCast<std::string>(&value) != &text);
-	assert(assignResult == &value);
+	assert (value.type() == typeid(std::string));
+	assert (0 == AnyCast<int>(&value));
+	assert (0 != AnyCast<std::string>(&value));
+	assert (AnyCast<std::string>(value) == text);
+	assert (AnyCast<std::string>(&value) != &text);
+	assert (assignResult == &value);
 }
 
 
@@ -203,7 +210,9 @@ void AnyTest::testSwap()
 	assert (swapped.type() == typeid(std::string));
 	assert (text == AnyCast<std::string>(swapped));
 	assert (0 != originalPtr);
+#ifdef POCO_NO_SOO // pointers only match when heap-allocated
 	assert (originalPtr == AnyCast<std::string>(&swapped));
+#endif
 	assert (swapResult == &original);
 }
 

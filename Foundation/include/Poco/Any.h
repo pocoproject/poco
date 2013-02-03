@@ -60,6 +60,8 @@ class Any
 
 #ifndef POCO_NO_SOO
 
+	union PH;
+
 public:
 
 	Any()
@@ -81,7 +83,8 @@ public:
 	Any(const Any& other)
 		/// Copy constructor, works with both empty and initialized Any values.
 	{
-		construct(other);
+		if ((this != &other) && !other.empty())
+			construct(other);
 	}
 
 	~Any()
@@ -90,7 +93,7 @@ public:
 	{
 		if(!empty())
 		{
-			if(isLocal())
+			if(_placeholder.isLocal())
 				content()->~Placeholder();
 			else
 				delete content();
@@ -100,18 +103,20 @@ public:
 	Any& swap(Any& other)
 		/// Swaps the content of the two Anys.
 		/// 
-		/// When small object optimizaton (SOO) is enabled,
+		/// When small object optimizaton is enabled,
 		/// swap is only exception-safe when both (*this and
 		/// other) objects are allocated on the heap.
 	{
-		if (!isLocal() && !other.isLocal())
+		if (this == &other) return *this;
+
+		if (!_placeholder.isLocal() && !other._placeholder.isLocal())
 		{
 			std::swap(_placeholder.pHolder, other._placeholder.pHolder);
 		}
 		else
 		{
 			Any tmp(*this);
-			if (isLocal()) this->~Any();
+			if (_placeholder.isLocal()) this->~Any();
 			construct(other);
 			other = tmp;
 		}
@@ -127,14 +132,18 @@ public:
 		///   Any a = 13; 
 		///   Any a = string("12345");
 	{
-		Any(rhs).swap(*this);
+		construct(rhs);
 		return *this;
 	}
 	
-	Any& operator = (Any rhs)
+	Any& operator = (const Any& rhs)
 		/// Assignment operator for Any.
 	{
-		Any(rhs).swap(*this);
+		if ((this != &rhs) && !rhs.empty())
+			construct(rhs);
+		else if ((this != &rhs) && rhs.empty())
+			_placeholder.erase();
+
 		return *this;
 	}
 	
@@ -165,7 +174,7 @@ private:
 		}
 
 		virtual const std::type_info & type() const = 0;
-		virtual void clone(Placeholder**) const = 0;
+		virtual void clone(Any::PH*) const = 0;
 	};
 
 	template<typename ValueType>
@@ -181,22 +190,17 @@ private:
 			return typeid(ValueType);
 		}
 
-		static void setFlag(Placeholder** pMem, unsigned char val)
-		{
-			reinterpret_cast<unsigned char*>(pMem)[POCO_SMALL_OBJECT_SIZE] = val;
-		}
-
-		virtual void clone(Placeholder** ppMem) const
+		virtual void clone(Any::PH* pPlaceholder) const
 		{
 			if ((sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE))
 			{
-				new (ppMem) Holder(_held);
-				setFlag(ppMem, 1);
+				new ((Placeholder*) pPlaceholder->holder) Holder(_held);
+				pPlaceholder->setLocal(true);
 			}
 			else
 			{
-				*ppMem = new Holder(_held);
-				setFlag(ppMem, 0);
+				pPlaceholder->pHolder = new Holder(_held);
+				pPlaceholder->setLocal(false);
 			}
 		}
 
@@ -208,10 +212,7 @@ private:
 
 	Placeholder* content() const
 	{
-		if(isLocal())
-			return reinterpret_cast<Placeholder*>(&(_placeholder.holder));
-		else
-			return _placeholder.pHolder;
+		return _placeholder.content();
 	}
 
 	template<typename ValueType>
@@ -220,26 +221,21 @@ private:
 		if (sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE)
 		{
 			new (_placeholder.holder) Holder<ValueType>(value);
-			isLocal() = 1;
+			_placeholder.setLocal(true);
 		}
 		else
 		{
 			_placeholder.pHolder = new Holder<ValueType>(value);
-			isLocal() = 0;
+			_placeholder.setLocal(false);
 		}
 	}
 
 	void construct(const Any& other)
 	{
-		if(other.empty())
-			erase(_placeholder.holder);
+		if(!other.empty())
+			other.content()->clone(&_placeholder);
 		else
-			other.content()->clone(&_placeholder.pHolder);
-	}
-	
-	inline static void erase(unsigned char* pHolder, std::size_t sz= POCO_SMALL_OBJECT_SIZE + 1)
-	{
-		std::memset(pHolder, 0, sz);
+			_placeholder.erase();
 	}
 
 	union PH
@@ -251,17 +247,35 @@ private:
 	{
 		PH ()
 		{
-			erase(holder);
+			erase();
+		}
+
+		void erase()
+		{
+			std::memset(holder, 0, sizeof(PH));
+		}
+
+		bool isLocal() const
+		{
+			return holder[POCO_SMALL_OBJECT_SIZE] != 0;
+		}
+
+		void setLocal(bool local) const
+		{
+			holder[POCO_SMALL_OBJECT_SIZE] = local ? 1 : 0;
+		}
+
+		Placeholder* content() const
+		{
+			if(isLocal())
+				return reinterpret_cast<Placeholder*>(&holder[0]);
+			else
+				return pHolder;
 		}
 
 		Placeholder*          pHolder;
 		mutable unsigned char holder[POCO_SMALL_OBJECT_SIZE + 1];
 	} _placeholder;
-
-	unsigned char& isLocal() const
-	{
-		return _placeholder.holder[POCO_SMALL_OBJECT_SIZE];
-	}
 
 
 #else // if POCO_NO_SOO
