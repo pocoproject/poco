@@ -39,6 +39,7 @@
 
 
 #include "Poco/Exception.h"
+#include "Poco/MetaProgramming.h"
 #include <algorithm>
 #include <typeinfo>
 
@@ -84,6 +85,8 @@ public:
 	}
 
 	~Any()
+		/// Destructor. If Any is locally held, calls Placeholder destructor;
+		/// otherwise, deletes the placeholder from the heap.
 	{
 		if(!empty())
 		{
@@ -94,24 +97,44 @@ public:
 		}
 	}
 
+	Any& swap(Any& other)
+		/// Swaps the content of the two Anys.
+		/// 
+		/// When small object optimizaton (SOO) is enabled,
+		/// swap is only exception-safe when both (*this and
+		/// other) objects are allocated on the heap.
+	{
+		if (!isLocal() && !other.isLocal())
+		{
+			std::swap(_placeholder.pHolder, other._placeholder.pHolder);
+		}
+		else
+		{
+			Any tmp(*this);
+			if (isLocal()) this->~Any();
+			construct(other);
+			other = tmp;
+		}
+
+		return *this;
+	}
+
 	template<typename ValueType>
-	Any & operator=(const ValueType& value)
+	Any & operator = (const ValueType& rhs)
 		/// Assignment operator for all types != Any.
 		///
 		/// Example: 
 		///   Any a = 13; 
 		///   Any a = string("12345");
 	{
-		if (isLocal()) this->~Any();
-		construct(value);
+		Any(rhs).swap(*this);
 		return *this;
 	}
 	
-	Any& operator = (Any value)
+	Any& operator = (Any rhs)
 		/// Assignment operator for Any.
 	{
-		if (isLocal()) this->~Any();
-		construct(value);
+		Any(rhs).swap(*this);
 		return *this;
 	}
 	
@@ -192,7 +215,7 @@ private:
 	}
 
 	template<typename ValueType>
-	void construct(const ValueType & value)
+	void construct(const ValueType& value)
 	{
 		if (sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE)
 		{
@@ -206,7 +229,7 @@ private:
 		}
 	}
 
-	void construct(const Any & other)
+	void construct(const Any& other)
 	{
 		if(other.empty())
 			erase(_placeholder.holder);
@@ -408,9 +431,9 @@ ValueType AnyCast(const Any& operand)
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
-	ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
-	if (!result) throw BadCastException("Failed to convert between const Any types");
-	return *result;
+	typedef TypeWrapper<ValueType>::TYPE NonRef;
+
+	return AnyCast<NonRef&>(const_cast<Any&>(operand));
 }
 
 
@@ -425,7 +448,9 @@ ValueType AnyCast(Any& operand)
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
-	ValueType* result = AnyCast<ValueType>(&operand);
+	typedef TypeWrapper<ValueType>::TYPE NonRef;
+
+	NonRef* result = AnyCast<NonRef>(&operand);
 	if (!result) throw BadCastException("Failed to convert between Any types");
 	return *result;
 }
