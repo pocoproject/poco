@@ -431,7 +431,7 @@ ValueType AnyCast(const Any& operand)
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
-	typedef TypeWrapper<ValueType>::TYPE NonRef;
+	typedef typename TypeWrapper<ValueType>::TYPE NonRef;
 
 	return AnyCast<NonRef&>(const_cast<Any&>(operand));
 }
@@ -448,7 +448,7 @@ ValueType AnyCast(Any& operand)
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
-	typedef TypeWrapper<ValueType>::TYPE NonRef;
+	typedef typename TypeWrapper<ValueType>::TYPE NonRef;
 
 	NonRef* result = AnyCast<NonRef>(&operand);
 	if (!result) throw BadCastException("Failed to convert between Any types");
@@ -490,7 +490,7 @@ ValueType* UnsafeAnyCast(Any* operand)
 	/// use typeid() comparison, e.g., when our types may travel across
 	/// different shared libraries.
 {
-	return &static_cast<Any::Holder<ValueType>*>(operand->_pHolder)->_held;
+	return &static_cast<Any::Holder<ValueType>*>(operand->content())->_held;
 }
 
 
