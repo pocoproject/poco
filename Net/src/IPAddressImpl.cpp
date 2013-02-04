@@ -641,18 +641,18 @@ IPv6AddressImpl IPv6AddressImpl::parse(const std::string& addr)
 		std::string scope(addr, pos + 1, addr.size() - start - pos);
 		Poco::UInt32 scopeId(0);
 		if (!(scopeId = if_nametoindex(scope.c_str())))
-			return 0;
+			return IPv6AddressImpl();
 		if (inet_pton(AF_INET6, unscopedAddr.c_str(), &ia) == 1)
 			return IPv6AddressImpl(&ia, scopeId);
 		else
-			return 0;
+			return IPv6AddressImpl();
 	}
 	else
 	{
 		if (inet_pton(AF_INET6, addr.c_str(), &ia) == 1)
-			return new IPv6AddressImpl(&ia);
+			return IPv6AddressImpl(&ia);
 		else
-			return 0;
+			return IPv6AddressImpl();
 	}
 #endif
 }

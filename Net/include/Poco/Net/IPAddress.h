@@ -392,6 +392,9 @@ private:
 	Ptr pImpl() const;
 
 	char _memory[sizeof(Poco::Net::Impl::IPv6AddressImpl)];
+	
+	friend class IPv4AddressImpl;
+	friend class IPv6AddressImpl;
 };
 
 

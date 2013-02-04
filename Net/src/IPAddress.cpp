@@ -71,9 +71,9 @@ IPAddress::IPAddress()
 IPAddress::IPAddress(const IPAddress& addr)
 {
 	if (addr.family() == IPv4)
-		std::memcpy(pImpl(), addr.pImpl(), sizeof (IPv4AddressImpl));
+		new (_memory) IPv4AddressImpl(addr.addr());
 	else
-		std::memcpy(pImpl(), addr.pImpl(), sizeof (IPv6AddressImpl));
+		new (_memory) IPv6AddressImpl(addr.addr());
 }
 
 
@@ -95,14 +95,14 @@ IPAddress::IPAddress(const std::string& addr)
 	IPv4AddressImpl empty4 = IPv4AddressImpl();
 	if (addr.empty() || trim(addr) == "0.0.0.0")
 	{
-		std::memcpy(pImpl(), &empty4, sizeof(empty4));
+		new (_memory) IPv4AddressImpl(empty4.addr());
 		return;
 	}
 
 	IPv4AddressImpl addr4(IPv4AddressImpl::parse(addr));
 	if (addr4 != empty4)
 	{
-		std::memcpy(pImpl(), &addr4, sizeof(addr4));
+		new (_memory) IPv4AddressImpl(addr4.addr());
 		return;
 	}
 
@@ -110,14 +110,14 @@ IPAddress::IPAddress(const std::string& addr)
 	IPv6AddressImpl empty6 = IPv6AddressImpl();
 	if (addr.empty() || trim(addr) == "::")
 	{
-		std::memcpy(pImpl(), &empty6, sizeof(empty6));
+		new (_memory) IPv6AddressImpl(empty6.addr());
 		return;
 	}
 
 	IPv6AddressImpl addr6(IPv6AddressImpl::parse(addr));
 	if (addr6 != IPv6AddressImpl())
 	{
-		std::memcpy(pImpl(), &addr6, sizeof(addr6));
+		new (_memory) IPv6AddressImpl(addr6.addr());
 		return;
 	}
 #endif
@@ -131,14 +131,14 @@ IPAddress::IPAddress(const std::string& addr, Family family)
 	if (family == IPv4)
 	{
 		IPv4AddressImpl addr4(IPv4AddressImpl::parse(addr));
-		std::memcpy(pImpl(), &addr4, sizeof(addr4));
+		new (_memory) IPv4AddressImpl(addr4.addr());
 		return;
 	}
 #if defined(POCO_HAVE_IPv6)
 	else if (family == IPv6)
 	{
 		IPv6AddressImpl addr6(IPv6AddressImpl::parse(addr));
-		std::memcpy(pImpl(), &addr6, sizeof(addr6));
+		new (_memory) IPv6AddressImpl(addr6.addr());
 		return;
 	}
 #endif
@@ -230,9 +230,9 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 	if (&addr != this)
 	{
 		if (addr.family() == IPAddress::IPv4)
-			std::memcpy(pImpl(), addr.pImpl(), sizeof(IPv4AddressImpl));
+			new (_memory) IPv4AddressImpl(addr.addr());
 		else
-			std::memcpy(pImpl(), addr.pImpl(), sizeof(IPv6AddressImpl));
+			new (_memory) IPv6AddressImpl(addr.addr());
 	}
 	return *this;
 }
@@ -544,14 +544,15 @@ bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 	IPv4AddressImpl impl4(IPv4AddressImpl::parse(addr));
 	if (impl4 != IPv4AddressImpl())
 	{
-		std::memcpy(result.pImpl(), &impl4, sizeof(impl4));
+		
+		new (result._memory) IPv4AddressImpl(impl4.addr());
 		return true;
 	}
 #if defined(POCO_HAVE_IPv6)
 	IPv6AddressImpl impl6(IPv6AddressImpl::parse(addr));
 	if (impl6 != IPv6AddressImpl())
 	{
-		std::memcpy(result.pImpl(), &impl6, sizeof(impl6));
+		new (result._memory) IPv6AddressImpl(impl6.addr());
 		return true;
 	}
 #endif

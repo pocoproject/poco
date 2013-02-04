@@ -86,10 +86,11 @@
 // #define POCO_THREAD_PRIORITY_MAX 31
 
 
-// Define to disable small object optimization.
-// If not defined, Any and Dynamic::Var (and similar
-// optimization candidates) will be auto-allocated on the
-// stack in cases when value holder fits into .
+// Define to disable small object optimization. If not 
+// defined, Any and Dynamic::Var (and similar optimization
+// candidates) will be auto-allocated on the stack in 
+// cases when value holder fits into POCO_SMALL_OBJECT_SIZE
+// (see Poco/Types.h for default values).
 // #define POCO_NO_SOO
 
 // Following are options to remove certain features
