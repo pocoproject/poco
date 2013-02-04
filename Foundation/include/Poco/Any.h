@@ -42,6 +42,7 @@
 #include "Poco/MetaProgramming.h"
 #include <algorithm>
 #include <typeinfo>
+#include <cstring>
 
 
 namespace Poco {
@@ -220,7 +221,7 @@ private:
 	{
 		if (sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE)
 		{
-			new (_placeholder.holder) Holder<ValueType>(value);
+			new (reinterpret_cast<Placeholder*>(_placeholder.holder)) Holder<ValueType>(value);
 			_placeholder.setLocal(true);
 		}
 		else
@@ -268,7 +269,7 @@ private:
 		Placeholder* content() const
 		{
 			if(isLocal())
-				return reinterpret_cast<Placeholder*>(&holder[0]);
+				return reinterpret_cast<Placeholder*>(holder);
 			else
 				return pHolder;
 		}
