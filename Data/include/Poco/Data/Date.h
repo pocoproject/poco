@@ -225,9 +225,9 @@ public:
 		val = DateTimeFormatter::format(dt, "%Y/%m/%d");
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const Poco::Data::Date& value() const

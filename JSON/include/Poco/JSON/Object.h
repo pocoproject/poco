@@ -291,21 +291,24 @@ public:
 	void convert(DateTime& /*val*/) const
 	{
 		//TODO: val = _val;
+		throw NotImplementedException("Conversion not implemented: JSON:Object => DateTime");
 	}
 
 	void convert(LocalDateTime& /*ldt*/) const
 	{
 		//TODO: ldt = _val.timestamp();
+		throw NotImplementedException("Conversion not implemented: JSON:Object => LocalDateTime");
 	}
 
 	void convert(Timestamp& /*ts*/) const
 	{
 		//TODO: ts = _val.timestamp();
+		throw NotImplementedException("Conversion not implemented: JSON:Object => Timestamp");
 	}
 
-	VarHolderImpl* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const JSON::Object::Ptr& value() const

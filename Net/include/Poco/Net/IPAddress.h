@@ -393,8 +393,8 @@ private:
 
 	char _memory[sizeof(Poco::Net::Impl::IPv6AddressImpl)];
 	
-	friend class IPv4AddressImpl;
-	friend class IPv6AddressImpl;
+	friend class Poco::Net::Impl::IPv4AddressImpl;
+	friend class Poco::Net::Impl::IPv6AddressImpl;
 };
 
 

@@ -93,6 +93,16 @@
 // (see Poco/Types.h for default values).
 // #define POCO_NO_SOO
 
+
+// Small object size in bytes. Where applicable (e.g.
+// SmallObjectAllocator<char*> specialization, Any, Var, etc)
+// objects longer than this value will be alocated on the heap.
+// See Poco/SmallObjectAllocator.h for usage of this value.
+#if !defined(POCO_SMALL_OBJECT_SIZE)
+	#define POCO_SMALL_OBJECT_SIZE 32
+#endif
+
+
 // Following are options to remove certain features
 // to reduce library/executable size for smaller
 // embedded platforms. By enabling these options,

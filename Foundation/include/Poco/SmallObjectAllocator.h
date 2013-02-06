@@ -150,7 +150,7 @@ class SmallObjectAllocator <char*>
 	/// 
 	/// The treshold between auto and heap allocation
 	/// is controlled through POCO_SMALL_OBJECT_SIZE compile
-	/// time constant, which on 32 or 64 systems defaults
+	/// time constant, which on 32 or 64-bit systems defaults
 	/// to 31 or 63 bytes respectively. This specialization
 	/// adds an extra byte to indicate the allocation strategy.
 	/// 

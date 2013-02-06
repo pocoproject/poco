@@ -48,6 +48,68 @@
 namespace Poco {
 
 
+namespace Dynamic {
+
+class Var;
+class VarHolder;
+template <class> class VarHolderImpl;
+
+}
+
+
+template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
+union Placeholder
+	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
+	/// object optimization).
+	/// 
+	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage, 
+	/// it will be placement-new-allocated into the local buffer
+	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
+	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
+	/// where the object was allocated (0 => heap, 1 => local).
+{
+public:
+	static const unsigned int SIZE = SizeV;
+
+	Placeholder ()
+	{
+		erase();
+	}
+
+	void erase()
+	{
+		std::memset(holder, 0, sizeof(Placeholder));
+	}
+
+	bool isLocal() const
+	{
+		return holder[SIZE] != 0;
+	}
+
+	void setLocal(bool local) const
+	{
+		holder[SIZE] = local ? 1 : 0;
+	}
+
+	PlaceholderT* content() const
+	{
+		if(isLocal())
+			return reinterpret_cast<PlaceholderT*>(holder);
+		else
+			return pHolder;
+	}
+
+private:
+	PlaceholderT*         pHolder;
+	mutable unsigned char holder[SIZE + 1];
+
+	friend class Any;
+	friend class Dynamic::Var;
+	friend class Dynamic::VarHolder;
+	template <class> friend class VarHolderImpl;
+};
+
+
 class Any
 	/// An Any class represents a general type and is capable of storing any type, supporting type-safe extraction
 	/// of the internally stored data.
@@ -58,12 +120,9 @@ class Any
 	/// Modified for small object optimization support (optionally supported through conditional compilation)
 	/// by Alex Fabijanic.
 {
+public:
 
 #ifndef POCO_NO_SOO
-
-	union PH;
-
-public:
 
 	Any()
 		/// Creates an empty any type.
@@ -75,8 +134,8 @@ public:
 		/// Creates an any which stores the init parameter inside.
 		///
 		/// Example: 
-		///	 Any a(13); 
-		///	 Any a(string("12345"));
+		///   Any a(13); 
+		///   Any a(string("12345"));
 	{
 		construct(value);
 	}
@@ -89,13 +148,13 @@ public:
 	}
 
 	~Any()
-		/// Destructor. If Any is locally held, calls Placeholder destructor;
+		/// Destructor. If Any is locally held, calls ValueHolder destructor;
 		/// otherwise, deletes the placeholder from the heap.
 	{
 		if(!empty())
 		{
-			if(_placeholder.isLocal())
-				content()->~Placeholder();
+			if(_valueHolder.isLocal())
+				content()->~ValueHolder();
 			else
 				delete content();
 		}
@@ -110,14 +169,14 @@ public:
 	{
 		if (this == &other) return *this;
 
-		if (!_placeholder.isLocal() && !other._placeholder.isLocal())
+		if (!_valueHolder.isLocal() && !other._valueHolder.isLocal())
 		{
-			std::swap(_placeholder.pHolder, other._placeholder.pHolder);
+			std::swap(_valueHolder.pHolder, other._valueHolder.pHolder);
 		}
 		else
 		{
 			Any tmp(*this);
-			if (_placeholder.isLocal()) this->~Any();
+			if (_valueHolder.isLocal()) this->~Any();
 			construct(other);
 			other = tmp;
 		}
@@ -143,7 +202,7 @@ public:
 		if ((this != &rhs) && !rhs.empty())
 			construct(rhs);
 		else if ((this != &rhs) && rhs.empty())
-			_placeholder.erase();
+			_valueHolder.erase();
 
 		return *this;
 	}
@@ -152,7 +211,7 @@ public:
 		/// Returns true if the Any is empty.
 	{
 		char buf[POCO_SMALL_OBJECT_SIZE] = { 0 };
-		return 0 == std::memcmp(_placeholder.holder, buf, POCO_SMALL_OBJECT_SIZE);
+		return 0 == std::memcmp(_valueHolder.holder, buf, _valueHolder.SIZE);
 	}
 	
 	const std::type_info & type() const
@@ -166,20 +225,20 @@ public:
 
 private:
 
-	class Placeholder
+	class ValueHolder
 	{
 	public:
 	
-		virtual ~Placeholder()
+		virtual ~ValueHolder()
 		{
 		}
 
 		virtual const std::type_info & type() const = 0;
-		virtual void clone(Any::PH*) const = 0;
+		virtual void clone(Placeholder<ValueHolder>*) const = 0;
 	};
 
 	template<typename ValueType>
-	class Holder : public Placeholder
+	class Holder : public ValueHolder
 	{
 	public:
 		Holder(const ValueType & value) : _held(value)
@@ -191,11 +250,11 @@ private:
 			return typeid(ValueType);
 		}
 
-		virtual void clone(Any::PH* pPlaceholder) const
+		virtual void clone(Placeholder<ValueHolder>* pPlaceholder) const
 		{
-			if ((sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE))
+			if ((sizeof(Holder<ValueType>) <= pPlaceholder->SIZE))
 			{
-				new ((Placeholder*) pPlaceholder->holder) Holder(_held);
+				new ((ValueHolder*) pPlaceholder->holder) Holder(_held);
 				pPlaceholder->setLocal(true);
 			}
 			else
@@ -211,78 +270,40 @@ private:
 		Holder & operator = (const Holder &);
 	};
 
-	Placeholder* content() const
+	ValueHolder* content() const
 	{
-		return _placeholder.content();
+		return _valueHolder.content();
 	}
 
 	template<typename ValueType>
 	void construct(const ValueType& value)
 	{
-		if (sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE)
+		if (sizeof(Holder<ValueType>) <= _valueHolder.SIZE)
 		{
-			new (reinterpret_cast<Placeholder*>(_placeholder.holder)) Holder<ValueType>(value);
-			_placeholder.setLocal(true);
+			new (reinterpret_cast<ValueHolder*>(_valueHolder.holder)) Holder<ValueType>(value);
+			_valueHolder.setLocal(true);
 		}
 		else
 		{
-			_placeholder.pHolder = new Holder<ValueType>(value);
-			_placeholder.setLocal(false);
+			_valueHolder.pHolder = new Holder<ValueType>(value);
+			_valueHolder.setLocal(false);
 		}
 	}
 
 	void construct(const Any& other)
 	{
 		if(!other.empty())
-			other.content()->clone(&_placeholder);
+			other.content()->clone(&_valueHolder);
 		else
-			_placeholder.erase();
+			_valueHolder.erase();
 	}
-
-	union PH
-		/// Placeholder union. If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE
-		/// bytes of storage, it will be placement-new-allocated into the local buffer
-		/// (i.e. there will be no heap-allocation. The local buffer size is one byte
-		/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
-		/// where the object was allocated (0 => heap, 1 => local).
-	{
-		PH ()
-		{
-			erase();
-		}
-
-		void erase()
-		{
-			std::memset(holder, 0, sizeof(PH));
-		}
-
-		bool isLocal() const
-		{
-			return holder[POCO_SMALL_OBJECT_SIZE] != 0;
-		}
-
-		void setLocal(bool local) const
-		{
-			holder[POCO_SMALL_OBJECT_SIZE] = local ? 1 : 0;
-		}
-
-		Placeholder* content() const
-		{
-			if(isLocal())
-				return reinterpret_cast<Placeholder*>(holder);
-			else
-				return pHolder;
-		}
-
-		Placeholder*          pHolder;
-		mutable unsigned char holder[POCO_SMALL_OBJECT_SIZE + 1];
-	} _placeholder;
+	
+	Placeholder<ValueHolder> _valueHolder;
 
 
 #else // if POCO_NO_SOO
 
 
-public:
 	Any(): _pHolder(0)
 		/// Creates an empty any type.
 	{
@@ -352,19 +373,19 @@ public:
 	}
 
 private:
-	class Placeholder
+	class ValueHolder
 	{
 	public:
-		virtual ~Placeholder()
+		virtual ~ValueHolder()
 		{
 		}
 
 		virtual const std::type_info& type() const = 0;
-		virtual Placeholder* clone() const = 0;
+		virtual ValueHolder* clone() const = 0;
 	};
 
 	template <typename ValueType>
-	class Holder: public Placeholder
+	class Holder: public ValueHolder
 	{
 	public: 
 		Holder(const ValueType& value):
@@ -377,7 +398,7 @@ private:
 			return typeid(ValueType);
 		}
 
-		virtual Placeholder* clone() const
+		virtual ValueHolder* clone() const
 		{
 			return new Holder(_held);
 		}
@@ -388,13 +409,13 @@ private:
 		Holder & operator=(const Holder &);
 	};
 
-	Placeholder* content() const
+	ValueHolder* content() const
 	{
 		return _pHolder;
 	}
 
 private:
-	Placeholder* _pHolder;
+	ValueHolder* _pHolder;
 
 #endif // POCO_NO_SOO
 

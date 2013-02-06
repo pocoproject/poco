@@ -325,9 +325,9 @@ public:
 		throw BadCastException("Struct -> Poco::Timestamp");
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const Struct<std::string>& value() const
@@ -496,9 +496,9 @@ public:
 		throw BadCastException("Struct -> Poco::Timestamp");
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const Struct<int>& value() const

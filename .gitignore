@@ -100,3 +100,6 @@ lib/
 lib64/
 pocomsg.h
 
+# Temporary files #
+###################
+*.bak
