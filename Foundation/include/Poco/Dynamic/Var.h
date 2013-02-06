@@ -584,7 +584,7 @@ private:
 	template<typename ValueType>
 	void construct(const ValueType& value)
 	{
-		if (sizeof(VarHolderImpl<ValueType>) <= _placeholder.SIZE)
+		if (sizeof(VarHolderImpl<ValueType>) <= Placeholder<ValueType>::Size::value)
 		{
 			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<ValueType>(value);
 			_placeholder.setLocal(true);
@@ -599,7 +599,7 @@ private:
 	void construct(const char* value)
 	{
 		std::string val(value);
-		if (sizeof(VarHolderImpl<std::string>) <= _placeholder.SIZE)
+		if (sizeof(VarHolderImpl<std::string>) <= Placeholder<std::string>::Size::value)
 		{
 			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<std::string>(val);
 			_placeholder.setLocal(true);

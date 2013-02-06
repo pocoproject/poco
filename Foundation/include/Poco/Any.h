@@ -69,7 +69,11 @@ union Placeholder
 	/// where the object was allocated (0 => heap, 1 => local).
 {
 public:
-	static const unsigned int SIZE = SizeV;
+
+	struct Size
+	{
+		static const unsigned int value = SizeV;
+	};
 
 	Placeholder ()
 	{
@@ -83,12 +87,12 @@ public:
 
 	bool isLocal() const
 	{
-		return holder[SIZE] != 0;
+		return holder[SizeV] != 0;
 	}
 
 	void setLocal(bool local) const
 	{
-		holder[SIZE] = local ? 1 : 0;
+		holder[SizeV] = local ? 1 : 0;
 	}
 
 	PlaceholderT* content() const
@@ -101,7 +105,7 @@ public:
 
 private:
 	PlaceholderT*         pHolder;
-	mutable unsigned char holder[SIZE + 1];
+	mutable unsigned char holder[SizeV + 1];
 
 	friend class Any;
 	friend class Dynamic::Var;
@@ -211,7 +215,7 @@ public:
 		/// Returns true if the Any is empty.
 	{
 		char buf[POCO_SMALL_OBJECT_SIZE] = { 0 };
-		return 0 == std::memcmp(_valueHolder.holder, buf, _valueHolder.SIZE);
+		return 0 == std::memcmp(_valueHolder.holder, buf, POCO_SMALL_OBJECT_SIZE);
 	}
 	
 	const std::type_info & type() const
@@ -252,7 +256,7 @@ private:
 
 		virtual void clone(Placeholder<ValueHolder>* pPlaceholder) const
 		{
-			if ((sizeof(Holder<ValueType>) <= pPlaceholder->SIZE))
+			if ((sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE))
 			{
 				new ((ValueHolder*) pPlaceholder->holder) Holder(_held);
 				pPlaceholder->setLocal(true);
@@ -278,7 +282,7 @@ private:
 	template<typename ValueType>
 	void construct(const ValueType& value)
 	{
-		if (sizeof(Holder<ValueType>) <= _valueHolder.SIZE)
+		if (sizeof(Holder<ValueType>) <= Placeholder<ValueType>::Size::value)
 		{
 			new (reinterpret_cast<ValueHolder*>(_valueHolder.holder)) Holder<ValueType>(value);
 			_valueHolder.setLocal(true);
