@@ -4,6 +4,7 @@ Release 1.5.2 (2013-03-??)
 ==========================
 - fixed GH #57: poco-1.5.1: Doesn't compile for Android
 - added VoidEvent (by Arturo Castro)
+- fixed GH #80: NumberFormatter::append broken
 
 Release 1.5.1 (2013-01-11)
 ==========================

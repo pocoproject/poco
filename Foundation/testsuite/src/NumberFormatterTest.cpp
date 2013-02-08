@@ -235,6 +235,55 @@ void NumberFormatterTest::testFormatFloat()
 }
 
 
+void NumberFormatterTest::testAppend()
+{
+	std::string s;
+	NumberFormatter::append(s, 123);
+	assert (s == "123");
+	s.erase();
+	NumberFormatter::append(s, 123, 4);
+	assert (s == " 123");
+	s.erase();
+	NumberFormatter::append0(s, 123, 5);
+	assert (s == "00123");
+	s.erase();
+	NumberFormatter::appendHex(s, 0xDEAD);
+	assert (s == "DEAD");
+	s.erase();
+	NumberFormatter::appendHex(s, 0xDEAD, 6);
+	assert (s == "00DEAD");
+	s.erase();
+	NumberFormatter::append(s, 123u);
+	assert (s == "123");
+	s.erase();
+	NumberFormatter::append(s, 123u, 4);
+	assert (s == " 123");
+	s.erase();
+	NumberFormatter::append0(s, 123u, 5);
+	assert (s == "00123");
+
+	
+	s.erase();
+	NumberFormatter::append(s, 123.4);
+	assert (s == "123.4");
+	s.erase();
+	NumberFormatter::append(s, 123.4567, 2);
+	assert (s == "123.45");
+	s.erase();
+	NumberFormatter::append(s, 123.4567, 10, 5);
+	assert (s == " 123.45670");
+	s.erase();
+	NumberFormatter::append(s, 123., 2);
+	assert (s == "123.00");
+	s.erase();
+	NumberFormatter::append(s, static_cast<double>(1234567), 2);
+	assert (s == "1234567.00");
+	s.erase();
+	NumberFormatter::append(s, 1234567, 10, 1);
+	assert (s == " 1234567.0");
+}
+
+
 void NumberFormatterTest::setUp()
 {
 }
@@ -254,6 +303,7 @@ CppUnit::Test* NumberFormatterTest::suite()
 	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatBool);
 	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatHex);
 	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatFloat);
+	CppUnit_addTest(pSuite, NumberFormatterTest, testAppend);
 
 	return pSuite;
 }

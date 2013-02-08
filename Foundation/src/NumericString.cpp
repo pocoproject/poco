@@ -57,8 +57,19 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	/// Alternative prefix (e.g. zero instead of space) can be supplied by caller.
 	/// Used only internally.
 {
-	std::string::size_type frac = str.length() - str.find(decSep) - 1;
-	if (precision && (frac < precision)) str.append(precision - frac, '0');
+	std::string::size_type decSepPos = str.find(decSep);
+	if (decSepPos == std::string::npos)
+	{
+		str.append(1, '.');
+		decSepPos = str.size() - 1;
+	}
+
+	std::string::size_type frac = str.length() - decSepPos - 1;
+	if (precision)
+	{
+		if (frac < precision) str.append(precision - frac, '0');
+		else if (frac > precision) str = str.substr(0, frac + precision);
+	}
 	if (width && (str.length() < width)) str.insert(str.begin(), width - str.length(), prefix);
 }
 

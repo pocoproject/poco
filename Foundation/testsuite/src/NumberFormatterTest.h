@@ -51,7 +51,8 @@ public:
 	void testFormatBool();
 	void testFormatHex();
 	void testFormatFloat();
-	
+	void testAppend();
+
 	void setUp();
 	void tearDown();
 
