@@ -746,6 +746,170 @@ private:
 #endif // POCO_HAVE_IPv6
 
 
+#ifdef POCO_OS_FAMILY_UNIX
+
+class LocalAddressImpl: public IPAddressImpl
+{
+public:
+	LocalAddressImpl()
+	{
+		std::memset(&_addr, 0, sizeof(_addr));
+	}
+
+	LocalAddressImpl(const void* addr)
+	{
+		std::memcpy(&_addr, addr, sizeof(_addr));
+	}
+
+	std::string toString() const
+	{
+		std::string result(_addr.sun_path);
+		return result;
+	}
+
+	poco_socklen_t length() const
+	{
+		return SUN_LEN(&_addr);
+	}
+
+	const void* addr() const
+	{
+		return &_addr;
+	}
+
+	IPAddress::Family family() const
+	{
+		return IPAddress::LOCAL;
+	}
+
+	int af() const
+	{
+		return AF_LOCAL;
+	}
+
+	unsigned prefixLength() const
+	{
+		//TODO
+		return 0;
+	}
+
+	Poco::UInt32 scope() const
+	{
+		return 0;
+	}
+	
+	bool isWildcard() const
+	{
+		return false;
+	}
+
+	bool isBroadcast() const
+	{
+		return false;
+	}
+
+	bool isLoopback() const
+	{
+		return false;
+	}
+
+	bool isMulticast() const
+	{
+		return false;
+	}
+
+	bool isLinkLocal() const
+	{
+		return true;
+	}
+
+	bool isSiteLocal() const
+	{
+		return true;
+	}
+
+	bool isIPv4Compatible() const
+	{
+		return false;
+	}
+
+	bool isIPv4Mapped() const
+	{
+		return false;
+	}
+
+	bool isWellKnownMC() const
+	{
+		return false;
+	}
+
+	bool isNodeLocalMC() const
+	{
+		return false;
+	}
+
+	bool isLinkLocalMC() const
+	{
+		return false;
+	}
+
+	bool isSiteLocalMC() const
+	{
+		return false;
+	}
+
+	bool isOrgLocalMC() const
+	{
+		return false;
+	}
+
+	bool isGlobalMC() const
+	{
+		return false;
+	}
+
+	static LocalAddressImpl* parse(const std::string& addr)
+	{
+		struct sockaddr_un ua;
+
+		if (addr.empty() ||
+			addr.size() >= sizeof(ua.sun_path)) return 0;
+
+		ua.sun_family = AF_LOCAL;
+		std::memset(&ua.sun_path, 0, sizeof(ua.sun_path));
+		std::memcpy(ua.sun_path, addr.data(), addr.size());
+		return new LocalAddressImpl(&ua);
+	}
+
+	void mask(const IPAddressImpl* pMask, const IPAddressImpl* pSet)
+	{
+		return;
+	}
+
+	IPAddressImpl* clone() const
+	{
+		return new LocalAddressImpl(&_addr);
+	}
+
+private:
+	LocalAddressImpl(const LocalAddressImpl& addr)
+	{
+		std::memcpy(&_addr, &addr._addr, sizeof(_addr));
+	}
+
+	LocalAddressImpl& operator = (const LocalAddressImpl&);
+
+	struct sockaddr_un _addr;
+};
+
+
+#endif //POCO_OS_FAMILY_UNIX
+
+
+
+
+
+
 //
 // IPAddress
 //
@@ -770,6 +934,10 @@ IPAddress::IPAddress(Family family): _pImpl(0)
 	else if (family == IPv6)
 		_pImpl = new IPv6AddressImpl();
 #endif
+#ifdef POCO_OS_FAMILY_UNIX
+	else if (family == LOCAL)
+		_pImpl = new LocalAddressImpl();
+#endif
 	else
 		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
@@ -777,10 +945,15 @@ IPAddress::IPAddress(Family family): _pImpl(0)
 
 IPAddress::IPAddress(const std::string& addr)
 {
-	_pImpl = IPv4AddressImpl::parse(addr);
+	if (!addr.empty() && 0 != std::isdigit(addr[0]))
+		_pImpl = IPv4AddressImpl::parse(addr);
 #if defined(POCO_HAVE_IPv6)
-	if (!_pImpl)
+	if (!_pImpl && !addr.empty() && '[' == addr[0])
 		_pImpl = IPv6AddressImpl::parse(addr);
+#endif
+#ifdef POCO_OS_FAMILY_UNIX
+	if (!_pImpl&& !addr.empty() && std::string::npos != addr.find("/"))
+		_pImpl = LocalAddressImpl::parse(addr);
 #endif
 	if (!_pImpl) throw InvalidAddressException(addr);
 }
@@ -793,6 +966,10 @@ IPAddress::IPAddress(const std::string& addr, Family family): _pImpl(0)
 #if defined(POCO_HAVE_IPv6)
 	else if (family == IPv6)
 		_pImpl = IPv6AddressImpl::parse(addr);
+#endif
+#ifdef POCO_OS_FAMILY_UNIX
+	else if (family == LOCAL)
+		_pImpl = LocalAddressImpl::parse(addr);
 #endif
 	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 	if (!_pImpl) throw InvalidAddressException(addr);
@@ -807,8 +984,12 @@ IPAddress::IPAddress(const void* addr, poco_socklen_t length)
 	else if (length == sizeof(struct in6_addr))
 		_pImpl = new IPv6AddressImpl(addr);
 #endif
-	else throw Poco::InvalidArgumentException("Invalid address length passed to IPAddress()");
-}
+#ifdef POCO_OS_FAMILY_UNIX
+	if (0 == _pImpl)
+		_pImpl = new LocalAddressImpl(addr);
+#endif
+	if (0 == _pImpl)
+		throw Poco::InvalidArgumentException("Invalid address length passed to IPAddress()");}
 
 
 IPAddress::IPAddress(const void* addr, poco_socklen_t length, Poco::UInt32 scope)
@@ -818,6 +999,9 @@ IPAddress::IPAddress(const void* addr, poco_socklen_t length, Poco::UInt32 scope
 #if defined(POCO_HAVE_IPv6)
 	else if (length == sizeof(struct in6_addr))
 		_pImpl = new IPv6AddressImpl(addr, scope);
+#endif
+#ifdef POCO_OS_FAMILY_UNIX
+	//TODO
 #endif
 	else throw Poco::InvalidArgumentException("Invalid address length passed to IPAddress()");
 }
@@ -840,6 +1024,9 @@ IPAddress::IPAddress(unsigned prefix, Family family): _pImpl(0)
 		}
 	}
 #endif
+#ifdef POCO_OS_FAMILY_UNIX
+	//TODO
+#endif
 	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 	if (!_pImpl) throw Poco::InvalidArgumentException("Invalid prefix length passed to IPAddress()");
 }
@@ -855,6 +1042,9 @@ IPAddress::IPAddress(const SOCKET_ADDRESS& socket_address)
 	else if (family == AF_INET6)
 		_pImpl = new IPv6AddressImpl(&reinterpret_cast<const struct sockaddr_in6*>(socket_address.lpSockaddr)->sin6_addr, reinterpret_cast<const struct sockaddr_in6*>(socket_address.lpSockaddr)->sin6_scope_id);
 #endif
+#ifdef POCO_OS_FAMILY_UNIX
+	//TODO
+#endif
 	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 #endif
@@ -868,6 +1058,9 @@ IPAddress::IPAddress(const struct sockaddr& sockaddr)
 #if defined(POCO_HAVE_IPv6)
 	else if (family == AF_INET6)
 		_pImpl = new IPv6AddressImpl(&reinterpret_cast<const struct sockaddr_in6*>(&sockaddr)->sin6_addr, reinterpret_cast<const struct sockaddr_in6*>(&sockaddr)->sin6_scope_id);
+#endif
+#ifdef POCO_OS_FAMILY_UNIX
+	//TODO
 #endif
 	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
@@ -1205,9 +1398,17 @@ IPAddress IPAddress::parse(const std::string& addr)
 
 bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 {
-	IPAddressImpl* pImpl = IPv4AddressImpl::parse(addr);
+	IPAddressImpl* pImpl = 0;
+
+	if (!addr.empty() && 0 != std::isdigit(addr[0]))
+		pImpl = IPv4AddressImpl::parse(addr);
 #if defined(POCO_HAVE_IPv6)
-	if (!pImpl) pImpl = IPv6AddressImpl::parse(addr);
+	if (!pImpl && !addr.empty() && '[' == addr[0])
+		pImpl = IPv6AddressImpl::parse(addr);
+#endif
+#ifdef POCO_OS_FAMILY_UNIX
+	if (!pImpl && std::string::npos != addr.find("/"))
+		pImpl = LocalAddressImpl::parse(addr);
 #endif
 	if (pImpl)
 	{

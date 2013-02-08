@@ -84,6 +84,9 @@ public:
 #ifdef POCO_HAVE_IPv6
 		,IPv6
 #endif
+#ifdef POCO_OS_FAMILY_UNIX
+		,LOCAL
+#endif
 	};
 	
 	IPAddress();
@@ -379,10 +382,15 @@ public:
 	enum
 	{
 		MAX_ADDRESS_LENGTH = 
-#if defined(POCO_HAVE_IPv6)
-			sizeof(struct in6_addr)
+
+#ifdef POCO_OS_FAMILY_UNIX
+		sizeof(struct sockaddr_un)
 #else
-			sizeof(struct in_addr)
+	#if defined(POCO_HAVE_IPv6)
+				sizeof(struct in6_addr)
+	#else
+				sizeof(struct in_addr)
+	#endif
 #endif
 			/// Maximum length in bytes of a socket address.
 	};

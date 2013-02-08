@@ -39,6 +39,9 @@
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
+#include "Poco/File.h"
+
+
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 #if defined(POCO_HAVE_FD_EPOLL)
 #include <sys/epoll.h>
@@ -57,7 +60,7 @@ using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::NumberFormatter;
 using Poco::Timespan;
-
+using Poco::File;
 
 namespace Poco {
 namespace Net {
@@ -80,14 +83,25 @@ SocketImpl::SocketImpl(poco_socket_t sockfd):
 SocketImpl::~SocketImpl()
 {
 	close();
+
+#ifdef POCO_OS_FAMILY_UNIX
+	if (!_path.empty())
+	{
+		try
+		{
+			File f(_path);
+			if (f.exists()) f.remove();
+		} catch (Exception&) { }
+	}
+#endif
 }
 
-	
+
 SocketImpl* SocketImpl::acceptConnection(SocketAddress& clientAddr)
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
-	char buffer[SocketAddress::MAX_ADDRESS_LENGTH];
+	char buffer[SocketAddress::MAX_ADDRESS_LENGTH] = { 0 };
 	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buffer);
 	poco_socklen_t saLen = sizeof(buffer);
 	poco_socket_t sd;
@@ -106,11 +120,26 @@ SocketImpl* SocketImpl::acceptConnection(SocketAddress& clientAddr)
 }
 
 
-void SocketImpl::connect(const SocketAddress& address)
+void SocketImpl::connect(const SocketAddress& address, const SocketAddress* pFromAddress)
 {
 	if (_sockfd == POCO_INVALID_SOCKET)
 	{
 		init(address.af());
+#ifdef POCO_OS_FAMILY_UNIX
+		if (pFromAddress && (AF_LOCAL == address.af()))
+			bind(*pFromAddress, true);
+		else if (!pFromAddress && (AF_LOCAL == address.af()))
+#define AGFEO
+#ifdef AGFEO
+		// Hinweis:
+		// hier muesste immer eine Client und eine Server-Adresse bzw. Pfad angegeben werden
+		// das ist nicht immer moeglich, z.B. wenn mehrere Clients ohne Server betrieben werden.
+		// Deshalb hier UNIX-domain socket ohne bind-Adresse (Server) zulassen
+		{}
+#else
+			throw InvalidArgumentException("UNIX domain socket requires client address.");
+#endif	// AGFEO
+#endif
 	}
 	int rc;
 	do
@@ -122,20 +151,37 @@ void SocketImpl::connect(const SocketAddress& address)
 #endif
 	}
 	while (rc != 0 && lastError() == POCO_EINTR);
-	if (rc != 0) 
+	if (rc != 0)
 	{
 		int err = lastError();
 		error(err, address.toString());
 	}
 }
 
-
-void SocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout)
+void SocketImpl::connect(const SocketAddress& address,
+	const Poco::Timespan& timeout,
+	const SocketAddress* pFromAddress)
 {
-	if (_sockfd == POCO_INVALID_SOCKET)
-	{
-		init(address.af());
-	}
+	poco_assert (_sockfd == POCO_INVALID_SOCKET);
+
+	init(address.af());
+
+#ifdef POCO_OS_FAMILY_UNIX
+	if (pFromAddress && (AF_LOCAL == address.af()))
+		bind(*pFromAddress, true);
+	else if (!pFromAddress && (AF_LOCAL == address.af()))
+#define AGFEO
+#ifdef AGFEO
+		// Hinweis:
+		// hier muesste immer eine Client und eine Server-Adresse bzw. Pfad angegeben werden
+		// das ist nicht immer moeglich, z.B. wenn mehrere Clients ohne Server betrieben werden.
+		// Deshalb hier UNIX-domain socket ohne bind-Adresse (Server) zulassen
+		{}
+#else
+			throw InvalidArgumentException("UNIX domain socket requires client address.");
+#endif	// AGFEO
+#endif
+
 	setBlocking(false);
 	try
 	{
@@ -163,12 +209,26 @@ void SocketImpl::connect(const SocketAddress& address, const Poco::Timespan& tim
 	setBlocking(true);
 }
 
-
-void SocketImpl::connectNB(const SocketAddress& address)
+void SocketImpl::connectNB(const SocketAddress& address, const SocketAddress* pFromAddress)
 {
 	if (_sockfd == POCO_INVALID_SOCKET)
 	{
 		init(address.af());
+#ifdef POCO_OS_FAMILY_UNIX
+		if (pFromAddress && (AF_LOCAL == address.af()))
+			bind(*pFromAddress, true);
+		else if (!pFromAddress && (AF_LOCAL == address.af()))
+#define AGFEO
+#ifdef AGFEO
+		// Hinweis:
+		// hier muesste immer eine Client und eine Server-Adresse bzw. Pfad angegeben werden
+		// das ist nicht immer moeglich, z.B. wenn mehrere Clients ohne Server betrieben werden.
+		// Deshalb hier UNIX-domain socket ohne bind-Adresse (Server) zulassen
+		{}
+#else
+			throw InvalidArgumentException("UNIX domain socket requires client address.");
+#endif	// AGFEO
+#endif
 	}
 	setBlocking(false);
 #if defined(POCO_VXWORKS)
@@ -196,6 +256,11 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 		setReuseAddress(true);
 		setReusePort(true);
 	}
+#ifdef POCO_OS_FAMILY_UNIX
+	if (AF_LOCAL == address.af()) _path = address.toString();
+#endif
+
+
 #if defined(POCO_VXWORKS)
 	int rc = ::bind(_sockfd, (sockaddr*) address.addr(), address.length());
 #else
@@ -210,7 +275,7 @@ void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV
 #if defined(POCO_HAVE_IPv6)
 	if (address.family() != IPAddress::IPv6)
 		throw Poco::InvalidArgumentException("SocketAddress must be an IPv6 address");
-		
+
 	if (_sockfd == POCO_INVALID_SOCKET)
 	{
 		init(address.af());
@@ -232,11 +297,11 @@ void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV
 #endif
 }
 
-	
+
 void SocketImpl::listen(int backlog)
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-	
+
 	int rc = ::listen(_sockfd, backlog);
 	if (rc != 0) error();
 }
@@ -260,7 +325,7 @@ void SocketImpl::shutdownReceive()
 	if (rc != 0) error();
 }
 
-	
+
 void SocketImpl::shutdownSend()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
@@ -269,7 +334,7 @@ void SocketImpl::shutdownSend()
 	if (rc != 0) error();
 }
 
-	
+
 void SocketImpl::shutdown()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
@@ -310,7 +375,7 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 			throw TimeoutException();
 	}
 #endif
-	
+
 	int rc;
 	do
 	{
@@ -359,8 +424,8 @@ int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, in
 			throw TimeoutException();
 	}
 #endif
-	
-	char abuffer[SocketAddress::MAX_ADDRESS_LENGTH];
+
+	char abuffer[SocketAddress::MAX_ADDRESS_LENGTH] = { 0 };
 	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(abuffer);
 	poco_socklen_t saLen = sizeof(abuffer);
 	int rc;
@@ -544,13 +609,13 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 #endif // POCO_HAVE_FD_EPOLL
 }
 
-	
+
 void SocketImpl::setSendBufferSize(int size)
 {
 	setOption(SOL_SOCKET, SO_SNDBUF, size);
 }
 
-	
+
 int SocketImpl::getSendBufferSize()
 {
 	int result;
@@ -564,7 +629,7 @@ void SocketImpl::setReceiveBufferSize(int size)
 	setOption(SOL_SOCKET, SO_RCVBUF, size);
 }
 
-	
+
 int SocketImpl::getReceiveBufferSize()
 {
 	int result;
@@ -632,11 +697,11 @@ Poco::Timespan SocketImpl::getReceiveTimeout()
 	return result;
 }
 
-	
+
 SocketAddress SocketImpl::address()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-	
+
 	char buffer[SocketAddress::MAX_ADDRESS_LENGTH];
 	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buffer);
 	poco_socklen_t saLen = sizeof(buffer);
@@ -648,11 +713,11 @@ SocketAddress SocketImpl::address()
 	return SocketAddress();
 }
 
-	
+
 SocketAddress SocketImpl::peerAddress()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-	
+
 	char buffer[SocketAddress::MAX_ADDRESS_LENGTH];
 	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buffer);
 	poco_socklen_t saLen = sizeof(buffer);
@@ -694,18 +759,18 @@ void SocketImpl::setOption(int level, int option, const Poco::Timespan& value)
 	struct timeval tv;
 	tv.tv_sec  = (long) value.totalSeconds();
 	tv.tv_usec = (long) value.useconds();
-	
+
 	setRawOption(level, option, &tv, sizeof(tv));
 }
 
-	
+
 void SocketImpl::setRawOption(int level, int option, const void* value, poco_socklen_t length)
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
 #if defined(POCO_VXWORKS)
 	int rc = ::setsockopt(_sockfd, level, option, (char*) value, length);
-#else	
+#else
 	int rc = ::setsockopt(_sockfd, level, option, reinterpret_cast<const char*>(value), length);
 #endif
 	if (rc == -1) error();
@@ -754,7 +819,7 @@ void SocketImpl::getOption(int level, int option, IPAddress& value)
 void SocketImpl::getRawOption(int level, int option, void* value, poco_socklen_t& length)
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-	
+
 	int rc = ::getsockopt(_sockfd, level, option, reinterpret_cast<char*>(value), &length);
 	if (rc == -1) error();
 }
@@ -768,7 +833,7 @@ void SocketImpl::setLinger(bool on, int seconds)
 	setRawOption(SOL_SOCKET, SO_LINGER, &l, sizeof(l));
 }
 
-	
+
 void SocketImpl::getLinger(bool& on, int& seconds)
 {
 	struct linger l;
@@ -875,7 +940,7 @@ void SocketImpl::setBroadcast(bool flag)
 	setOption(SOL_SOCKET, SO_BROADCAST, value);
 }
 
-	
+
 bool SocketImpl::getBroadcast()
 {
 	int value(0);

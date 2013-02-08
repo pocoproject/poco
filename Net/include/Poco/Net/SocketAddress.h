@@ -140,17 +140,21 @@ public:
 	enum
 	{
 		MAX_ADDRESS_LENGTH = 
-#if defined(POCO_HAVE_IPv6)
-			sizeof(struct sockaddr_in6)
+#ifdef POCO_OS_FAMILY_UNIX
+		sizeof(struct sockaddr_un)
 #else
-			sizeof(struct sockaddr_in)
+	#if defined(POCO_HAVE_IPv6)
+				sizeof(struct sockaddr_in6)
+	#else
+				sizeof(struct sockaddr_in)
+	#endif
 #endif
 			/// Maximum length in bytes of a socket address.
 	};
 
 protected:
-	void init(const IPAddress& host, Poco::UInt16 port);
-	void init(const std::string& host, Poco::UInt16 port);
+	void init(const IPAddress& host, Poco::UInt16 port=0);
+	void init(const std::string& host, Poco::UInt16 port=0);
 	Poco::UInt16 resolveService(const std::string& service);
 
 private:

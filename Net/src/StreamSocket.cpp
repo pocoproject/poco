@@ -51,9 +51,24 @@ StreamSocket::StreamSocket(): Socket(new StreamSocketImpl)
 {
 }
 
-
-StreamSocket::StreamSocket(const SocketAddress& address): Socket(new StreamSocketImpl(address.family()))
+StreamSocket::StreamSocket(const SocketAddress& address, const SocketAddress* pFromAddress):
+	Socket(new StreamSocketImpl)
 {
+#ifdef POCO_OS_FAMILY_UNIX
+	if (pFromAddress && (AF_LOCAL == address.af()))
+		impl()->bind(*pFromAddress, true);
+	else if (!pFromAddress && (AF_LOCAL == address.af()))
+#define AGFEO
+#ifdef AGFEO
+		// Hinweis:
+		// hier muesste immer eine Client und eine Server-Adresse bzw. Pfad angegeben werden
+		// das ist nicht immer moeglich, z.B. wenn mehrere Clients ohne Server betrieben werden.
+		// Deshalb hier UNIX-domain socket ohne bind-Adresse (Server) zulassen
+		{}
+#else
+			throw InvalidArgumentException("UNIX domain socket requires client address.");
+#endif	// AGFEO
+#endif
 	connect(address);
 }
 
@@ -92,21 +107,23 @@ StreamSocket& StreamSocket::operator = (const Socket& socket)
 }
 
 
-void StreamSocket::connect(const SocketAddress& address)
+void StreamSocket::connect(const SocketAddress& address, const SocketAddress* pFromAddress)
 {
-	impl()->connect(address);
+	impl()->connect(address, pFromAddress);
 }
 
 
-void StreamSocket::connect(const SocketAddress& address, const Poco::Timespan& timeout)
+void StreamSocket::connect(const SocketAddress& address,
+	const Poco::Timespan& timeout,
+	const SocketAddress* pFromAddress)
 {
-	impl()->connect(address, timeout);
+	impl()->connect(address, timeout, pFromAddress);
 }
 
 
-void StreamSocket::connectNB(const SocketAddress& address)
+void StreamSocket::connectNB(const SocketAddress& address, const SocketAddress* pFromAddress)
 {
-	impl()->connectNB(address);
+	impl()->connectNB(address, pFromAddress);
 }
 
 
@@ -115,13 +132,13 @@ void StreamSocket::shutdownReceive()
 	impl()->shutdownReceive();
 }
 
-	
+
 void StreamSocket::shutdownSend()
 {
 	impl()->shutdownSend();
 }
 
-	
+
 void StreamSocket::shutdown()
 {
 	impl()->shutdown();

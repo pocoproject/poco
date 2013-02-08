@@ -63,16 +63,18 @@ public:
 		/// Before sending or receiving data, the socket
 		/// must be connected with a call to connect().
 
-	explicit StreamSocket(const SocketAddress& address);
+	explicit StreamSocket(const SocketAddress& address, const SocketAddress* pFromAddress = 0);
 		/// Creates a stream socket and connects it to
-		/// the socket specified by address.
+		/// the socket specified by address. The optional (pFromAddress)
+		/// second argument is used only by UNIX domain sockets which must be
+		/// explicitly bound to local address.
 
 	explicit StreamSocket(IPAddress::Family family);
 		/// Creates an unconnected stream socket
 		/// for the given address family.
 		///
 		/// This is useful if certain socket options
-		/// (like send and receive buffer) sizes, that must 
+		/// (like send and receive buffer) sizes, that must
 		/// be set before connecting the socket, will be
 		/// set later on.
 
@@ -90,24 +92,33 @@ public:
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.	
+		/// increments the reference count of the SocketImpl.
 
-	void connect(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
-		/// the TCP server at the given address.
+	void connect(const SocketAddress& address, const SocketAddress* pFromAddress = 0);
+		/// Initializes the socket and establishes a connection to
+		/// the TCP server at the given address. The optional (pFromAddress)
+		/// second argument is used only by UNIX domain sockets which must be
+		/// explicitly bound to local address.
 		///
 		/// Can also be used for UDP sockets. In this case, no
 		/// connection is established. Instead, incoming and outgoing
 		/// packets are restricted to the specified address.
 
-	void connect(const SocketAddress& address, const Poco::Timespan& timeout);
-		/// Initializes the socket, sets the socket timeout and 
+	void connect(const SocketAddress& address,
+		const Poco::Timespan& timeout,
+		const SocketAddress* pFromAddress = 0);
+		/// Initializes the socket, sets the socket timeout and
 		/// establishes a connection to the TCP server at the given address.
+		/// The optional (pFromAddress)
+		/// second argument is used only by UNIX domain sockets which must be
+		/// explicitly bound to local address.
 
-	void connectNB(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
+	void connectNB(const SocketAddress& address, const SocketAddress* pFromAddress = 0);
+		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address. Prior to opening the
-		/// connection the socket is set to nonblocking mode.
+		/// connection the socket is set to nonblocking mode. The optional (pFromAddress)
+		/// second argument is used only by UNIX domain sockets which must be
+		/// explicitly bound to local address.
 
 	void shutdownReceive();
 		/// Shuts down the receiving part of the socket connection.
