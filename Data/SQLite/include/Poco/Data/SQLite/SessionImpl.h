@@ -41,6 +41,7 @@
 
 
 #include "Poco/Data/SQLite/SQLite.h"
+#include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Binder.h"
 #include "Poco/Data/AbstractSessionImpl.h"
 #include "Poco/SharedPtr.h"
@@ -128,7 +129,6 @@ public:
 		/// Returns the name of the connector.
 
 private:
-
 	std::string _connector;
 	sqlite3*    _pDB;
 	bool        _connected;

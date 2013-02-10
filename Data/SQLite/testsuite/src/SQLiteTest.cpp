@@ -251,13 +251,11 @@ private:
 
 SQLiteTest::SQLiteTest(const std::string& name): CppUnit::TestCase(name)
 {
-	Poco::Data::SQLite::Connector::registerConnector();
 }
 
 
 SQLiteTest::~SQLiteTest()
 {
-	Poco::Data::SQLite::Connector::unregisterConnector();
 }
 
 

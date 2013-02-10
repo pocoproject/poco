@@ -50,9 +50,6 @@ int main(int argc, char** argv)
 	typedef Poco::Tuple<std::string, std::string, int> Person;
 	typedef std::vector<Person> People;
 
-	// register SQLite connector
-	Poco::Data::SQLite::Connector::registerConnector();
-	
 	// create a session
 	Session session("SQLite", "sample.db");
 

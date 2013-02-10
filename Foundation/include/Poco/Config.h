@@ -51,6 +51,14 @@
 // #define POCO_NO_AUTOMATIC_LIBS
 
 
+// Define to disable automatic initialization
+// Defining this will disable ALL automatic 
+// initialization framework-wide (e.g. Net
+// on Windows, all Data back-ends, etc).
+// 
+// #define POCO_NO_AUTOMATIC_LIB_INIT
+
+
 // Define to disable FPEnvironment support
 // #define POCO_NO_FPENVIRONMENT
 
