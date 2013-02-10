@@ -145,7 +145,7 @@ Var::operator Date () const
 	if (!_pHolder)
 		throw InvalidAccessException("Can not convert empty value.");
 
-	if (typeid(Date) == _pHolder->type())
+	if (typeid(Date) == content()->type())
 		return extract<Date>();
 	else
 	{
