@@ -139,15 +139,17 @@ using Poco::DateTime;
 template <>
 Var::operator Time () const
 {
-	if (!_pHolder)
+	VarHolder* pHolder = content();
+
+	if (!pHolder)
 		throw InvalidAccessException("Can not convert empty value.");
 
-	if (typeid(Time) == _pHolder->type())
+	if (typeid(Time) == pHolder->type())
 		return extract<Time>();
 	else
 	{
 		Poco::DateTime result;
-		_pHolder->convert(result);
+		pHolder->convert(result);
 		return Time(result);
 	}
 }
