@@ -67,24 +67,25 @@ void Net_API uninitializeNetwork()
 } } // namespace Poco::Net
 
 
-struct NetworkInitializer
-	/// Network initializer for windows statically
-	/// linked library.
-{
-	NetworkInitializer()
-		/// Calls Poco::Net::initializeNetwork();
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
+
+	struct NetworkInitializer
+		/// Network initializer for windows statically
+		/// linked library.
 	{
-		Poco::Net::initializeNetwork();
-	}
+		NetworkInitializer()
+			/// Calls Poco::Net::initializeNetwork();
+		{
+			Poco::Net::initializeNetwork();
+		}
 
-	~NetworkInitializer()
-		/// Calls Poco::Net::uninitializeNetwork();
-	{
-		Poco::Net::uninitializeNetwork();
-	}
-};
+		~NetworkInitializer()
+			/// Calls Poco::Net::uninitializeNetwork();
+		{
+			Poco::Net::uninitializeNetwork();
+		}
+	};
 
-
-#ifndef POCO_NO_AUTOMATIC_LIB_INIT
 	const NetworkInitializer pocoNetworkInitializer;
+
 #endif

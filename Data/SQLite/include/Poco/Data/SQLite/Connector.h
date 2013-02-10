@@ -97,8 +97,8 @@ public:
 ///
 inline const std::string& Connector::name() const
 {
-	static const std::string name(POCO_DATA_SQLITE_CONNECTOR_NAME);
-	return name;
+	static const std::string n(POCO_DATA_SQLITE_CONNECTOR_NAME);
+	return n;
 }
 
 
@@ -138,14 +138,14 @@ struct SQLite_API SQLiteConnectorRegistrator
 			#elif defined(_WIN32)
 				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
 			#endif
-		#else  // SQLite_EXPORTS
+		#else  // !SQLite_EXPORTS
 			#if defined(_WIN64)
 				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
 			#elif defined(_WIN32)
 				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
 			#endif
 		#endif // SQLite_EXPORTS
-		#else // !POCO_OS_FAMILY_WINDOWS
+	#else // !POCO_OS_FAMILY_WINDOWS
 			#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) extern "C" const struct SQLiteConnectorRegistrator s;
 	#endif // POCO_OS_FAMILY_WINDOWS
 	POCO_DATA_SQLITE_FORCE_SYMBOL(pocoSQLiteConnectorRegistrator)
