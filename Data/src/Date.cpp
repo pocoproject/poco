@@ -152,7 +152,7 @@ Var::operator Date () const
 	else
 	{
 		Poco::DateTime result;
-		_pHolder->convert(result);
+		pHolder->convert(result);
 		return Date(result);
 	}
 }
