@@ -83,6 +83,12 @@ Options:
     Pass additional flags to compiler.
     Example: --cflags=-wall
 
+  --cxxflags=<flags>
+    Pass additional flags to C++ compilter.
+
+  --shlibflags=<flags>
+    Pass additional flags for shared library generation.
+
   --poquito
     Omit a few features for smaller codesize when linking
     statically for embedded targets.
@@ -114,6 +120,8 @@ cd $build
 tests=1
 samples=1
 flags=""
+cxxflags=""
+shlibflags=""
 omit=""
 includepath=""
 librarypath=""
@@ -151,6 +159,12 @@ while [ $# -ge 1 ]; do
 
 	--cflags=*)
 		flags="`echo ${1} | awk '{print substr($0,10)}'`" ;;
+
+	--cxxflags=*)
+		cxxflags="`echo ${1} | awk '{print substr($0,12)}'`" ;;
+
+	--shlibflags=*)
+		shlibflags="`echo ${1} | awk '{print substr($0,14)}'`" ;;
 
 	--no-samples)
 		samples="" ;;
@@ -251,6 +265,8 @@ echo "POCO_BASE = $base" >>$build/config.make
 echo "POCO_BUILD = $build" >>$build/config.make
 echo "POCO_PREFIX = $prefix" >>$build/config.make
 echo "POCO_FLAGS = $flags" >>$build/config.make
+echo "POCO_CXX_FLAGS = $cxxflags" >>$build/config.make
+echo "POCO_SHLIB_FLAGS = $shlibflags" >>$build/config.make
 echo "OMIT = $omit" >>$build/config.make
 if [ -n "$stdcxx_base" ] ; then
 	echo "STDCXX_BASE = $stdcxx_base" >>$build/config.make
@@ -280,6 +296,8 @@ export POCO_BASE
 export POCO_BUILD
 export POCO_PREFIX
 export POCO_FLAGS
+export POCO_CXX_FLAGS
+export POCO_SHLIB_FLAGS
 __EOF__
 
 if [ -n "$stdcxx_base" ] ; then
