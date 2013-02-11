@@ -136,12 +136,19 @@ public:
 
 	void testThreadModes();
 
+	void testUpdateCallback();
+
 	void setUp();
 	void tearDown();
+
+	static void sqliteUpdateCallbackFn(void*, int, const char*, const char*, Poco::Int64);
 
 	static CppUnit::Test* suite();
 
 private:
+	static int _insertCounter;
+	static int _updateCounter;
+	static int _deleteCounter;
 };
 
 

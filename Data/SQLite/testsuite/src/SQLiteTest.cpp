@@ -96,6 +96,7 @@ using Poco::Data::SQLite::ConstraintViolationException;
 using Poco::Data::SQLite::ParameterCountMismatchException;
 using Poco::Int32;
 using Poco::Dynamic::Var;
+using Poco::Data::SQLite::Utility;
 
 
 class Person
@@ -247,6 +248,11 @@ private:
 
 
 } } // namespace Poco::Data
+
+
+int SQLiteTest::_insertCounter;
+int SQLiteTest::_updateCounter;
+int SQLiteTest::_deleteCounter;
 
 
 SQLiteTest::SQLiteTest(const std::string& name): CppUnit::TestCase(name)
@@ -2655,6 +2661,124 @@ void SQLiteTest::testThreadModes()
 }
 
 
+void SQLiteTest::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, Poco::Int64 val)
+{
+	poco_check_ptr(pVal);
+	Poco::Int64* pV = reinterpret_cast<Poco::Int64*>(pVal);
+	if (opCode == Utility::OPERATION_INSERT)
+	{
+		poco_assert (*pV == 2);
+		poco_assert (val == 1);
+		std::cout << "Inserted " << pDB << '.' << pTable << ", RowID=" << val << std::endl;
+		++_insertCounter;
+	}
+	else if (opCode == Utility::OPERATION_UPDATE)
+	{
+		poco_assert (*pV == 3);
+		poco_assert (val == 1);
+		std::cout << "Updated " << pDB << '.' << pTable << ", RowID=" << val << std::endl;
+		++_updateCounter;
+	}
+	else if (opCode == Utility::OPERATION_DELETE)
+	{
+		poco_assert (*pV == 4);
+		poco_assert (val == 1);
+		std::cout << "Deleted " << pDB << '.' << pTable << ", RowID=" << val << std::endl;
+		++_deleteCounter;
+	}
+}
+
+
+void SQLiteTest::testUpdateCallback()
+{
+	// will be updated by callback
+	_insertCounter = 0;
+	_updateCounter = 0;
+	_deleteCounter = 0;
+
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (tmp.isConnected());
+	sqlite3* pDB = AnyCast<sqlite3*>(tmp.getProperty("handle"));
+	Poco::Int64 val = 1;
+	assert (Utility::registerUpdateHandler(pDB, &sqliteUpdateCallbackFn, &val));
+
+	std::string tableName("Person");
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	int age = 133132;
+	int count = 0;
+	std::string result;
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "SELECT name FROM sqlite_master WHERE tbl_name=?", use(tableName), into(result), now;
+	assert (result == tableName);
+
+	// insert
+	val = 2;
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 1);
+	assert (_insertCounter == 1);
+	tmp << "SELECT LastName FROM PERSON", into(result), now;
+	assert (lastName == result);
+	tmp << "SELECT Age FROM PERSON", into(count), now;
+	assert (count == age);
+	
+	// update
+	val = 3;
+	tmp << "UPDATE PERSON SET Age = -1", now;
+	tmp << "SELECT Age FROM PERSON", into(age), now;
+	assert (-1 == age);
+	assert (_updateCounter == 1);
+	
+	// delete
+	val =4;
+	tmp << "DELETE FROM Person WHERE Age = -1", now;
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 0);
+	assert (_deleteCounter == 1);
+
+	// disarm callback and do the same drill
+	assert (Utility::registerUpdateHandler(pDB, (Utility::UpdateCallbackType) 0, &val));
+	
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "SELECT name FROM sqlite_master WHERE tbl_name=?", use(tableName), into(result), now;
+	assert (result == tableName);
+
+	// must remain zero now
+	_insertCounter = 0;
+	_updateCounter = 0;
+	_deleteCounter = 0;
+
+	// insert
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 1);
+	assert (_insertCounter == 0);
+	tmp << "SELECT LastName FROM PERSON", into(result), now;
+	assert (lastName == result);
+	tmp << "SELECT Age FROM PERSON", into(count), now;
+	assert (count == age);
+	
+	// update
+	tmp << "UPDATE PERSON SET Age = -1", now;
+	tmp << "SELECT Age FROM PERSON", into(age), now;
+	assert (-1 == age);
+	assert (_updateCounter == 0);
+	
+	// delete
+	tmp << "DELETE FROM Person WHERE Age = -1", now;
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 0);
+	assert (_deleteCounter == 0);
+
+	tmp.close();
+	assert (!tmp.isConnected());
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -2747,6 +2871,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testReconnect);
 	CppUnit_addTest(pSuite, SQLiteTest, testSystemTable);
 	CppUnit_addTest(pSuite, SQLiteTest, testThreadModes);
+	CppUnit_addTest(pSuite, SQLiteTest, testUpdateCallback);
 
 	return pSuite;
 }
