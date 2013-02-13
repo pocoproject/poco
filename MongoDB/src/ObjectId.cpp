@@ -56,7 +56,13 @@ ObjectId::~ObjectId()
 
 std::string ObjectId::toString() const
 {
-	return format("%X:%X:%X", (unsigned int) _id[0], (unsigned int) _id[4], (unsigned int) _id[8]);
+	std::string s;
+
+	for(int i = 0; i < 12; ++i)
+	{
+		s += format("%x", (unsigned int) _id[i]);
+	}
+	return s;
 }
 
 }} // Namespace Poco::MongoDB

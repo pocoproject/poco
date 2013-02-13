@@ -6,12 +6,10 @@
 
 namespace Poco
 {
-namespace MongoDB
-{
-	
-	
+
+
 template<>
-class PoolableObjectFactory<Connection, Connection::Ptr>
+class PoolableObjectFactory<MongoDB::Connection, MongoDB::Connection::Ptr>
 {
 public:
 	PoolableObjectFactory(Net::SocketAddress& address)
@@ -26,29 +24,29 @@ public:
 	}
 
 
-	Connection::Ptr createObject()
+	MongoDB::Connection::Ptr createObject()
 	{
-		return new Connection(_address);
+		return new MongoDB::Connection(_address);
 	}
 	
 	
-	bool validateObject(Connection::Ptr pObject)
+	bool validateObject(MongoDB::Connection::Ptr pObject)
 	{
 		return true;
 	}
 	
 
-	void activateObject(Connection::Ptr pObject)
+	void activateObject(MongoDB::Connection::Ptr pObject)
 	{
 	}
 	
 
-	void deactivateObject(Connection::Ptr pObject)
+	void deactivateObject(MongoDB::Connection::Ptr pObject)
 	{
 	}
 	
 
-	void destroyObject(Connection::Ptr pObject)
+	void destroyObject(MongoDB::Connection::Ptr pObject)
 	{
 	}
 	
@@ -57,8 +55,35 @@ private:
 
 	Net::SocketAddress _address;
 };
+
+namespace MongoDB
+{
 	
-	
-}} // Poco::MongoDB
+
+class PooledConnection
+{
+public:
+	PooledConnection(Poco::ObjectPool<Connection, Connection::Ptr>& pool) : _pool(pool)
+	{
+		_connection = _pool.borrowObject();
+	}
+
+	virtual ~PooledConnection()
+	{
+		_pool.returnObject(_connection);
+	}
+
+	operator Connection::Ptr () { return _connection; }
+
+private:
+	Poco::ObjectPool<Connection, Connection::Ptr>& _pool;
+
+	Connection::Ptr _connection;
+};
+
+} // MongoDB
+
+
+} // Poco
 
 #endif //_MongoDB_PoolableConnectionFactory_included

@@ -38,10 +38,8 @@
 #ifndef _MongoDB_BSONWriter_included
 #define _MongoDB_BSONWriter_included
 
-#include "Poco/BinaryWriter.h"
-
 #include "Poco/MongoDB/MongoDB.h"
-#include "Poco/MongoDB/Document.h"
+#include "Poco/BinaryWriter.h"
 
 namespace Poco
 {
@@ -53,15 +51,23 @@ class MongoDB_API BSONWriter
 	/// Class for writing BSON to a Poco::BinaryWriter.
 {
 public:
-	BSONWriter(Poco::BinaryWriter& writer);
+	BSONWriter(const Poco::BinaryWriter& writer) : _writer(writer)
 		/// Constructor
+	{
+	}
 
-	virtual ~BSONWriter();
+	virtual ~BSONWriter()
 		/// Destructor
+	{
+	}
 
-
-	void write(const Document& v);
-
+	template<typename T>
+	void write(T& t)
+		/// Writes the value to the writer. The default implementation uses
+		/// the << operator. Special types can write their own version.
+	{
+		_writer << t;
+	}
 
 	void writeCString(const std::string& value);
 		/// Writes a cstring to the writer. A cstring is a string
@@ -71,6 +77,12 @@ private:
 
 	Poco::BinaryWriter _writer;
 };
+
+inline void BSONWriter::writeCString(const std::string& value)
+{
+	_writer.writeRaw(value);
+	_writer << (unsigned char) 0x00;
+}
 
 }} // Namespace Poco::MongoDB
 

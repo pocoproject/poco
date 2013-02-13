@@ -1,13 +1,13 @@
 //
-// Array.h
+// Database.cpp
 //
 // $Id$
 //
 // Library: MongoDB
 // Package: MongoDB
-// Module:  ObjectId
+// Module:  Database
 //
-// Definition of the ObjectId class.
+// Implementation of the Database class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,67 +35,34 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_ObjectId_included
-#define _MongoDB_ObjectId_included
-
-#include "Poco/MongoDB/MongoDB.h"
-#include "Poco/MongoDB/Element.h"
+#include "Poco/MongoDB/Database.h"
 
 namespace Poco
 {
 namespace MongoDB
 {
 
-class ObjectId
+
+Database::Database( const std::string& db) : _dbname(db)
 {
-public:
-
-	typedef SharedPtr<ObjectId> Ptr;
-
-
-	ObjectId();
-
-
-	virtual ~ObjectId();
-
-
-	std::string toString() const;
-
-private:
-	unsigned char _id[12];
-
-	friend class BSONWriter;
-	friend class BSONReader;
-};
-
-// BSON Embedded Document
-// spec: ObjectId
-template<>
-struct ElementTraits<ObjectId::Ptr>
-{
-	enum { TypeId = 0x07 };
-
-
-	static std::string toString(const ObjectId::Ptr& id)
-	{
-		return id->toString();
-	}
-};
-
-template<>
-inline void BSONReader::read<ObjectId::Ptr>(ObjectId::Ptr& to)
-{
-	_reader.readRaw((char*) to->_id, 12);
 }
 
-template<>
-inline void BSONWriter::write<ObjectId::Ptr>(ObjectId::Ptr& from)
+Database::~Database()
 {
-	_writer.writeRaw((char*) from->_id, 12);
+}
+
+Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createQueryRequest(const std::string& collectionName)
+{
+	return new Poco::MongoDB::QueryRequest(_dbname + '.' + collectionName);
+}
+
+Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const std::string& collectionName)
+{
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createQueryRequest("$cmd");
+	request->numberToReturn(1);
+	request->query().add("count", collectionName);
+	return request;
 }
 
 
 }} // Namespace Poco::MongoDB
-
-
-#endif //_MongoDB_ObjectId_included

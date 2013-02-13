@@ -34,7 +34,7 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#include "Poco/MongoDB/BSONWriter.h"
+
 #include "Poco/MongoDB/InsertRequest.h"
 
 namespace Poco
@@ -57,13 +57,13 @@ InsertRequest::~InsertRequest()
 void InsertRequest::buildRequest(BinaryWriter& writer)
 {
 	//TODO: throw exception when no document is added
-	BSONWriter bsonWriter(writer);
+
 	writer << _flags;
+	BSONWriter bsonWriter(writer);
 	bsonWriter.writeCString(_fullCollectionName);
-	for(Documents::iterator it = _documents.begin(); it != _documents.end(); ++it)
+	for(Document::Vector::iterator it = _documents.begin(); it != _documents.end(); ++it)
 	{
-		BSONWriter bsonWriter(writer);
-		bsonWriter.write(**it);
+		bsonWriter.write(*it);
 	}
 }
 

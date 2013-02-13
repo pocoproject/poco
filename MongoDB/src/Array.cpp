@@ -37,10 +37,8 @@
 
 #include "Poco/MongoDB/Array.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 Array::Array() : Document()
 {

@@ -31,10 +31,13 @@
 #include <iostream>
 
 #include "Poco/DateTime.h"
+#include "Poco/ObjectPool.h"
 
 #include "Poco/MongoDB/InsertRequest.h"
 #include "Poco/MongoDB/QueryRequest.h"
 #include "Poco/MongoDB/DeleteRequest.h"
+#include "Poco/MongoDB/PoolableConnectionFactory.h"
+#include "Poco/MongoDB/Database.h"
 
 #include "Poco/Net/NetException.h"
 
@@ -141,6 +144,9 @@ void MongoDBTest::testQueryRequest()
 			assert(birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
 			Poco::Timestamp lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
 			assert(doc->isType<NullValue>("unknown"));
+
+			std::string id = doc->get("_id")->toString();
+			std::cout << id << std::endl;
 		}
 		catch(Poco::NotFoundException& nfe)
 		{
@@ -152,6 +158,52 @@ void MongoDBTest::testQueryRequest()
 		fail("No document returned");
 	}
 }
+
+void MongoDBTest::testDBQueryRequest()
+{
+	if ( ! _connected )
+	{
+		std::cout << "test skipped." << std::endl;
+		return;
+	}
+
+	Database db("team");
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = db.createQueryRequest("players");
+	request->query().add("lastname" , std::string("Braem"));
+
+	Poco::MongoDB::ResponseMessage response;
+	_mongo.sendRequest(*request, response);
+
+	if ( response.documents().size() > 0 )
+	{
+		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+
+		try
+		{
+			std::string lastname = doc->get<std::string>("lastname");
+			assert(lastname.compare("Braem") == 0);
+			std::string firstname = doc->get<std::string>("firstname");
+			assert(firstname.compare("Franky") == 0);
+			Poco::Timestamp birthDateTimestamp = doc->get<Poco::Timestamp>("birthdate");
+			Poco::DateTime birthDate(birthDateTimestamp);
+			assert(birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
+			Poco::Timestamp lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
+			assert(doc->isType<NullValue>("unknown"));
+
+			std::string id = doc->get("_id")->toString();
+			std::cout << id << std::endl;
+		}
+		catch(Poco::NotFoundException& nfe)
+		{
+			fail(nfe.message() + " not found.");
+		}
+	}
+	else
+	{
+		fail("No document returned");
+	}
+}
+
 
 void MongoDBTest::testCountCommand()
 {
@@ -181,6 +233,34 @@ void MongoDBTest::testCountCommand()
 	}
 }
 
+
+void MongoDBTest::testDBCountCommand()
+{
+	if ( ! _connected )
+	{
+		std::cout << "test skipped." << std::endl;
+		return;
+	}
+
+	Poco::MongoDB::Database db("team");
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = db.createCountRequest("players");
+
+	Poco::MongoDB::ResponseMessage response;
+	_mongo.sendRequest(*request, response);
+
+	if ( response.documents().size() > 0 )
+	{
+		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+		double count = doc->get<double>("n");
+		assert(count == 1);
+	}
+	else
+	{
+		fail("Didn't get a response from the count command");
+	}
+}
+
+
 void MongoDBTest::testDeleteRequest()
 {
 	if ( ! _connected )
@@ -195,13 +275,55 @@ void MongoDBTest::testDeleteRequest()
 	_mongo.sendRequest(request);
 }
 
+
+void MongoDBTest::testConnectionPool()
+{
+	Poco::PoolableObjectFactory<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> factory("localhost:27017");
+	Poco::ObjectPool<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> pool(factory, 10, 15);
+
+	Poco::MongoDB::PooledConnection pooledConnection(pool);
+
+	Poco::MongoDB::QueryRequest request("team.$cmd");
+	request.numberToReturn(1);
+	request.query().add("count", std::string("players"));
+
+	Poco::MongoDB::ResponseMessage response;
+	((Connection::Ptr) pooledConnection)->sendRequest(request, response);
+
+	if ( response.documents().size() > 0 )
+	{
+		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+		double count = doc->get<double>("n");
+		assert(count == 1);
+	}
+	else
+	{
+		fail("Didn't get a response from the count command");
+	}
+
+	/*
+	Poco::MongoDB::Connection::Ptr pooledConnection1 = pool.borrowObject();
+	assert(!pooledConnection1.isNull());
+	pool.returnObject(pooledConnection1);
+
+	std::cout << "Available: " << pool.available() << std::endl;
+
+	Poco::MongoDB::Connection::Ptr pooledConnection2 = pool.borrowObject();
+	assert(!pooledConnection2.isNull());
+
+	pool.returnObject(pooledConnection2);*/
+}
+
 CppUnit::Test* MongoDBTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTest");
 
 	CppUnit_addTest(pSuite, MongoDBTest, testInsertRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testQueryRequest);
+	CppUnit_addTest(pSuite, MongoDBTest, testDBQueryRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testCountCommand);
+	CppUnit_addTest(pSuite, MongoDBTest, testDBCountCommand);
+	CppUnit_addTest(pSuite, MongoDBTest, testConnectionPool);
 	CppUnit_addTest(pSuite, MongoDBTest, testDeleteRequest);
 
 	return pSuite;

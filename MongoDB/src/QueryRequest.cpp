@@ -36,7 +36,6 @@
 //
 
 #include "Poco/MongoDB/QueryRequest.h"
-#include "Poco/MongoDB/BSONWriter.h"
 
 namespace Poco
 {
@@ -55,22 +54,22 @@ QueryRequest::QueryRequest(const std::string& collectionName, QueryRequest::Flag
 {
 }
 
+
 QueryRequest::~QueryRequest()
 {
 }
 
 void QueryRequest::buildRequest(BinaryWriter& writer)
 {
-	BSONWriter bsonWriter(writer);
 	writer << _flags;
-	bsonWriter.writeCString(_fullCollectionName);
+	BSONWriter(writer).writeCString(_fullCollectionName);
 	writer << _numberToSkip;
 	writer << _numberToReturn;
-	bsonWriter.write(_query);
+	_query.write(writer);
 
 	if ( ! _returnFieldSelector.empty() )
 	{
-		bsonWriter.write(_returnFieldSelector);
+		_returnFieldSelector.write(writer);
 	}
 }
 

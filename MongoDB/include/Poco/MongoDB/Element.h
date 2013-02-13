@@ -47,7 +47,8 @@
 #include "Poco/Timestamp.h"
 #include "Poco/RegularExpression.h"
 #include "Poco/Nullable.h"
-
+#include "Poco/NumberFormatter.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/BSONReader.h"
 #include "Poco/MongoDB/BSONWriter.h"
@@ -68,6 +69,9 @@ public:
 	virtual ~Element();
 
 
+	virtual std::string toString() const = 0;
+
+
 	virtual int type() const = 0;
 
 
@@ -77,11 +81,11 @@ public:
 
 private:
 
-//	virtual void read(BinaryReader& reader) = 0;
+	virtual void read(BinaryReader& reader) = 0;
 
-//	virtual void write(BinaryWriter& writer) = 0;
+	virtual void write(BinaryWriter& writer) = 0;
 
-//	friend class Document;
+	friend class Document;
 
 	std::string _name;
 };
@@ -116,6 +120,11 @@ template<>
 struct ElementTraits<double>
 {
 	enum { TypeId = 0x01 };
+
+	static std::string toString(const double& value)
+	{
+		return Poco::NumberFormatter::format(value);
+	}
 };
 
 // BSON UTF-8 string
@@ -125,8 +134,13 @@ template<>
 struct ElementTraits<std::string>
 {
 	enum { TypeId = 0x02 };
+
+	static std::string toString(const std::string& value)
+	{
+		return value;
+	}
 };
-/*
+
 template<>
 inline void BSONReader::read<std::string>(std::string& to)
 {
@@ -142,7 +156,7 @@ inline void BSONWriter::write<std::string>(std::string& from)
 	_writer << (Poco::Int32) (from.length() + 1);
 	writeCString(from);
 }
-*/
+
 
 
 // BSON bool
@@ -151,8 +165,13 @@ template<>
 struct ElementTraits<bool>
 {
 	enum { TypeId = 0x08 };
+
+	static std::string toString(const bool& value)
+	{
+		return value ? "true" : "false";
+	}
 };
-/*
+
 template<>
 inline void BSONReader::read<bool>(bool& to)
 {
@@ -166,13 +185,19 @@ inline void BSONWriter::write<bool>(bool& from)
 {
 	_writer << (from ? 0x01 : 0x00);
 }
-*/
+
 // BSON 32-bit integer
 // spec: int32
 template<>
 struct ElementTraits<Int32>
 {
 	enum { TypeId = 0x10 };
+
+
+	static std::string toString(const Int32& value)
+	{
+		return Poco::NumberFormatter::format(value);
+	}
 };
 
 // BSON UTC datetime
@@ -181,8 +206,13 @@ template<>
 struct ElementTraits<Timestamp>
 {
 	enum { TypeId = 0x09 };
+
+	static std::string toString(const Timestamp& value)
+	{
+		return DateTimeFormatter::format(value, "%Y-%m-%dT%H:%M:%s%z");
+	}
 };
-/*
+
 template<>
 inline void BSONReader::read<Timestamp>(Timestamp& to)
 {
@@ -197,7 +227,7 @@ inline void BSONWriter::write<Timestamp>(Timestamp& from)
 {
 	_writer << (from.epochMicroseconds() / 1000);
 }
-*/
+
 typedef Nullable<unsigned char> NullValue;
 
 // BSON Null Value
@@ -206,8 +236,13 @@ template<>
 struct ElementTraits<NullValue>
 {
 	enum { TypeId = 0x0A };
+
+	static std::string toString(const NullValue& value)
+	{
+		return "null";
+	}
 };
-/*
+
 template<>
 inline void BSONReader::read<NullValue>(NullValue& to)
 {
@@ -217,7 +252,7 @@ template<>
 inline void BSONWriter::write<NullValue>(NullValue& from)
 {
 }
-*/
+
 
 class RegularExpression
 {
@@ -318,8 +353,14 @@ template<>
 struct ElementTraits<RegularExpression::Ptr>
 {
 	enum { TypeId = 0x0B };
+
+	static std::string toString(const RegularExpression::Ptr& value)
+	{
+		//TODO
+		return "RE: not implemented yet";
+	}
 };
-/*
+
 template<>
 inline void BSONReader::read<RegularExpression::Ptr>(RegularExpression::Ptr& to)
 {
@@ -335,7 +376,7 @@ inline void BSONWriter::write<RegularExpression::Ptr>(RegularExpression::Ptr& fr
 	writeCString(from->getPattern());
 	writeCString(from->getOptions());
 }
-*/
+
 
 class JavaScriptCode
 {
@@ -381,8 +422,13 @@ template<>
 struct ElementTraits<JavaScriptCode::Ptr>
 {
 	enum { TypeId = 0x0D };
+
+	static std::string toString(const JavaScriptCode::Ptr& value)
+	{
+		return value.isNull() ? "" : value->code();
+	}
 };
-/*
+
 template<>
 inline void BSONReader::read<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& to)
 {
@@ -398,13 +444,18 @@ inline void BSONWriter::write<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& from)
 	std::string code = from->code();
 	BSONWriter(_writer).write(code);
 }
-*/
+
 // BSON 64-bit integer
 // spec: int64
 template<>
 struct ElementTraits<Int64>
 {
 	enum { TypeId = 0x12 };
+
+	static std::string toString(const Int64& value)
+	{
+		return NumberFormatter::format(value);
+	}
 };
 
 
@@ -423,10 +474,13 @@ public:
 	
 	T value() const { return _value; }
 
+
+	std::string toString() const { return ElementTraits<T>::toString(_value); }
+
 	
 	int type() const { return ElementTraits<T>::TypeId; }
 
-/*
+
 	void read(BinaryReader& reader)
 	{
 		BSONReader(reader).read(_value);
@@ -436,7 +490,7 @@ public:
 	{
 		BSONWriter(writer).write(_value);
 	}
-*/
+
 private:
 
 	T _value;
@@ -445,4 +499,3 @@ private:
 }} // Namespace Poco::MongoDB
 
 #endif //  _MongoDB_Element_included
-

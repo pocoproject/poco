@@ -57,10 +57,19 @@ public:
 	void testQueryRequest();
 
 
+	void testDBQueryRequest();
+
+
 	void testCountCommand();
 
 
+	void testDBCountCommand();
+
+
 	void testDeleteRequest();
+
+
+	void testConnectionPool();
 
 
 	void setUp();

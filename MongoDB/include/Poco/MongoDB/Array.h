@@ -59,13 +59,20 @@ public:
 		/// Destructor
 
 };
-/*
+
 // BSON Embedded Array
 // spec: document
 template<>
 struct ElementTraits<Array::Ptr>
 {
 	enum { TypeId = 0x04 };
+
+	static std::string toString(const Array::Ptr& value)
+	{
+		//TODO:
+		return value.isNull() ? "null" : "[]";
+	}
+
 };
 
 template<>
@@ -79,7 +86,7 @@ inline void BSONWriter::write<Array::Ptr>(Array::Ptr& from)
 {
 	from->write(_writer);
 }
-*/
+
 
 }} // Namespace Poco::MongoDB
 

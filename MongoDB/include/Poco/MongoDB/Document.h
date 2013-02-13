@@ -38,18 +38,19 @@
 #ifndef _MongoDB_Document_included
 #define _MongoDB_Document_included
 
-#include "Poco/SharedPtr.h"
-#include "Poco/Dynamic/Struct.h"
+#include <algorithm>
+
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
+
+#include "Poco/MongoDB/MongoDB.h"
+#include "Poco/MongoDB/Element.h"
 
 namespace Poco
 {
 namespace MongoDB
 {
 
-	typedef Dynamic::Struct<std::string> Document;
-	typedef SharedPtr<Document> DocumentPtr;
-	typedef std::vector<DocumentPtr> Documents;
-/*
 class ElementFindByName
 {
 public:
@@ -184,6 +185,12 @@ template<>
 struct ElementTraits<Document::Ptr>
 {
 	enum { TypeId = 0x03 };
+
+	static std::string toString(const Document::Ptr& value)
+	{
+		//TODO
+		return value.isNull() ? "null" : "{}";
+	}
 };
 
 template<>
@@ -197,7 +204,7 @@ inline void BSONWriter::write<Document::Ptr>(Document::Ptr& from)
 {
 	from->write(_writer);
 }
-*/
+
 }} // Namespace Poco::MongoDB
 
 #endif //  _MongoDB_Document_included

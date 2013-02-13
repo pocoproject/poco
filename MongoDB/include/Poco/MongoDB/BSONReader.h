@@ -39,7 +39,6 @@
 #define _MongoDB_BSONReader_included
 
 #include "Poco/MongoDB/MongoDB.h"
-#include "Poco/MongoDB/Document.h"
 
 namespace Poco
 {
@@ -50,7 +49,7 @@ class MongoDB_API BSONReader
 	/// Class for reading BSON from a Poco::BinaryReader
 {
 public:
-	BSONReader(Poco::BinaryReader& reader) : _reader(reader)
+	BSONReader(const Poco::BinaryReader& reader) : _reader(reader)
 		/// Constructor
 	{
 	}
@@ -60,9 +59,13 @@ public:
 	{
 	}
 
-	void read(Document& v);
+	template<typename T>
+	void read(T& t)
 		/// Reads the value from the reader. The default implementation uses the >> operator to
 		/// the given argument. Special types can write their own version.
+	{
+		_reader >> t;
+	}
 
 	std::string readCString();
 		/// Reads a cstring from the reader.

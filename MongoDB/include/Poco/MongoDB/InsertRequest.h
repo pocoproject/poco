@@ -71,7 +71,7 @@ public:
 		/// Destructor
 		
 
-	Documents& documents();
+	Document::Vector& documents();
 		/// Returns the documents to insert into the database
 
 protected:
@@ -85,11 +85,11 @@ private:
 
 	std::string _fullCollectionName;
 
-	Documents _documents;
+	Document::Vector _documents;
 };
 
 
-inline Documents& InsertRequest::documents()
+inline Document::Vector& InsertRequest::documents()
 {
 	return _documents;
 }

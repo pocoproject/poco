@@ -36,7 +36,6 @@
 //
 
 #include "Poco/MongoDB/ResponseMessage.h"
-#include "Poco/MongoDB/BSONReader.h"
 #include "Poco/Net/SocketStream.h"
 
 namespace Poco
@@ -75,9 +74,8 @@ void ResponseMessage::read(std::istream& istr)
 
 	for(int i = 0; i < _numberReturned; ++i)
 	{
-		DocumentPtr doc = new Document();
-		BSONReader bsonReader(reader);
-		bsonReader.read(*doc);
+		Document::Ptr doc = new Document();
+		doc->read(reader);
 		_documents.push_back(doc);
 	}
 }

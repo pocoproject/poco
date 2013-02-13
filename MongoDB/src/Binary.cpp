@@ -37,10 +37,8 @@
 
 #include "Poco/MongoDB/Binary.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 
 Binary::Binary() : _buffer(0)
@@ -52,14 +50,20 @@ Binary::Binary(Poco::Int32 size, unsigned char subtype) : _buffer(size), _subtyp
 {
 }
 
+
 Binary::~Binary()
 {
 }
 
-void Binary::resize(std::size_t newSize)
+
+std::string Binary::toString() const
 {
-	//TODO:
-	//_buffer.resize(newSize);
+	std::ostringstream oss;
+	Base64Encoder encoder(oss);
+	MemoryInputStream mis((const char*) _buffer.begin(), _buffer.size());
+	StreamCopier::copyStream(mis, encoder);
+	return oss.str();
 }
+
 
 }} // Namespace Poco::MongoDB

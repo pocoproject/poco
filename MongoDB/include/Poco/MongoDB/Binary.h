@@ -39,13 +39,16 @@
 #define _MongoDB_Binary_included
 
 #include "Poco/MongoDB/MongoDB.h"
-#include "Poco/Buffer.h"
 #include "Poco/MongoDB/Element.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/Buffer.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/MemoryStream.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+#include <sstream>
+
+namespace Poco {
+namespace MongoDB {
 
 class MongoDB_API Binary
 	/// Implements BSON Binary. It's a wrapper around a Poco::Buffer<unsigned char>.
@@ -63,14 +66,11 @@ public:
 
 
 	virtual ~Binary();
+		/// Destructor
 
 
-	unsigned char* begin();
-		/// Returns the start of the buffer
-
-
-	Poco::Int32 size() const;
-		/// Returns the size of the buffer
+	Buffer<unsigned char>& buffer();
+		/// Returns a reference to the buffer
 
 
 	unsigned char subtype() const;
@@ -81,26 +81,17 @@ public:
 		/// Sets the subtype
 
 
-	void resize(std::size_t newSize);
-		/// Resizes the buffer
+	std::string toString() const;
+		/// Returns the binary encoded in Base64
+
 
 private:
 
-	Poco::Buffer<unsigned char> _buffer;
+	Buffer<unsigned char> _buffer;
 
 
 	unsigned char _subtype;
 };
-
-inline unsigned char* Binary::begin()
-{
-	return _buffer.begin();
-}
-
-inline Poco::Int32 Binary::size() const
-{
-	return _buffer.size();
-}
 
 
 inline unsigned char Binary::subtype() const
@@ -114,13 +105,24 @@ inline void Binary::subtype(unsigned char type)
 	_subtype = type;
 }
 
-/*
+
+inline Buffer<unsigned char>& Binary::buffer()
+{
+	return _buffer;
+}
+
+
 // BSON Embedded Document
 // spec: binary
 template<>
 struct ElementTraits<Binary::Ptr>
 {
 	enum { TypeId = 0x05 };
+
+	static std::string toString(const Binary::Ptr& value)
+	{
+		return value.isNull() ? "" : value->toString();
+	}
 };
 
 template<>
@@ -129,22 +131,22 @@ inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 	Poco::Int32 size;
 	_reader >> size;
 
-	to->resize(size);
+	to->buffer().resize(size);
 
 	unsigned char subtype;
 	_reader >> subtype;
 	to->subtype(subtype);
 	
-	_reader.readRaw((char*) to->begin(), size);
+	_reader.readRaw((char*) to->buffer().begin(), size);
 }
 
 template<>
 inline void BSONWriter::write<Binary::Ptr>(Binary::Ptr& from)
 {
 	_writer << from->subtype();
-	_writer.writeRaw((char*) from->begin(), from->size());
+	_writer.writeRaw((char*) from->buffer().begin(), from->buffer().size());
 }
-*/
+
 
 }} // Namespace Poco::MongoDB
 

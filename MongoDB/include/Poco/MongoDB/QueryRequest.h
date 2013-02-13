@@ -40,8 +40,7 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/RequestMessage.h"
-
-#include "Poco/Dynamic/Struct.h"
+#include "Poco/MongoDB/Document.h"
 
 namespace Poco
 {
@@ -86,11 +85,11 @@ public:
 	void flags(Flags flag);
 		/// Set the flags
 
-	Dynamic::Struct<std::string>& query();
+	Document& query();
 		/// Returns the query document
 		
 
-	Dynamic::Struct<std::string>& returnFieldSelector();
+	Document& returnFieldSelector();
 		/// Returns the selector document
 		
 
@@ -123,9 +122,9 @@ private:
 
 	Int32 _numberToReturn;
 
-	Dynamic::Struct<std::string> _query;
+	Document _query;
 
-	Dynamic::Struct<std::string> _returnFieldSelector;
+	Document _returnFieldSelector;
 };
 
 inline QueryRequest::Flags QueryRequest::flags() const
@@ -138,12 +137,12 @@ inline void QueryRequest::flags(QueryRequest::Flags flags)
 	_flags = flags;
 }
 
-inline Dynamic::Struct<std::string>& QueryRequest::query()
+inline Document& QueryRequest::query()
 {
 	return _query;
 }
 
-inline Dynamic::Struct<std::string>& QueryRequest::returnFieldSelector()
+inline Document& QueryRequest::returnFieldSelector()
 {
 	return _returnFieldSelector;
 }

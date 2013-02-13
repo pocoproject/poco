@@ -36,7 +36,6 @@
 //
 
 #include "Poco/MongoDB/UpdateRequest.h"
-#include "Poco/MongoDB/BSONWriter.h"
 
 namespace Poco
 {
@@ -59,12 +58,11 @@ UpdateRequest::~UpdateRequest()
 
 void UpdateRequest::buildRequest(BinaryWriter& writer)
 {
-	BSONWriter bsonWriter(writer);
 	writer << 0; // 0 - reserved for future use
-	bsonWriter.writeCString(_fullCollectionName);
+	BSONWriter(writer).writeCString(_fullCollectionName);
 	writer << _flags;
-	bsonWriter.write(_selector);
-	bsonWriter.write(_update);
+	_selector.write(writer);
+	_update.write(writer);
 }
 
 }} // Namespace MongoDB

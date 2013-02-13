@@ -78,24 +78,21 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 
 		QueryRequest request("admin.$cmd");
 		request.numberToReturn(1);
-		request.query().insert("isMaster", 1);
+		request.query().add("isMaster", 1);
 
 		ResponseMessage response;
 		conn->sendRequest(request, response);
 
 		if ( response.documents().size() > 0 )
 		{
-			DocumentPtr doc = response.documents()[0];
-			Dynamic::Var isMasterVar = (*doc)["ismaster"];
-			if ( !isMasterVar.isEmpty() && isMasterVar )
+			Document::Ptr doc = response.documents()[0];
+			if ( doc->get<bool>("ismaster") )
 			{
 				return conn;
 			}
-			else if ( doc->contains("primary") )
+			else if ( doc->exists("primary") )
 			{
-				Dynamic::Var& primary = (*doc)["primary"];
-				Net::SocketAddress primaryAddress(primary.convert<std::string>());
-				return isMaster(primaryAddress);
+				return isMaster(Net::SocketAddress(doc->get<std::string>("primary")));
 			}
 		}
 	}

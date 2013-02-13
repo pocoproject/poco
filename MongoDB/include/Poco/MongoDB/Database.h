@@ -1,13 +1,13 @@
 //
-// Array.h
+// Database.h
 //
 // $Id$
 //
 // Library: MongoDB
 // Package: MongoDB
-// Module:  ObjectId
+// Module:  Database
 //
-// Definition of the ObjectId class.
+// Definition of the Database class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,68 +34,36 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-
-#ifndef _MongoDB_ObjectId_included
-#define _MongoDB_ObjectId_included
+#ifndef _MongoDB_Database_included
+#define _MongoDB_Database_included
 
 #include "Poco/MongoDB/MongoDB.h"
-#include "Poco/MongoDB/Element.h"
+#include "Poco/MongoDB/Document.h"
+#include "Poco/MongoDB/QueryRequest.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
-class ObjectId
+
+class MongoDB_API Database
 {
 public:
+	Database(const std::string& db);
 
-	typedef SharedPtr<ObjectId> Ptr;
-
-
-	ObjectId();
-
-
-	virtual ~ObjectId();
+	
+	virtual ~Database();
 
 
-	std::string toString() const;
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName);
+
+
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCountRequest(const std::string& collectionName);
+
 
 private:
-	unsigned char _id[12];
-
-	friend class BSONWriter;
-	friend class BSONReader;
+	std::string _dbname;
 };
-
-// BSON Embedded Document
-// spec: ObjectId
-template<>
-struct ElementTraits<ObjectId::Ptr>
-{
-	enum { TypeId = 0x07 };
-
-
-	static std::string toString(const ObjectId::Ptr& id)
-	{
-		return id->toString();
-	}
-};
-
-template<>
-inline void BSONReader::read<ObjectId::Ptr>(ObjectId::Ptr& to)
-{
-	_reader.readRaw((char*) to->_id, 12);
-}
-
-template<>
-inline void BSONWriter::write<ObjectId::Ptr>(ObjectId::Ptr& from)
-{
-	_writer.writeRaw((char*) from->_id, 12);
-}
-
 
 }} // Namespace Poco::MongoDB
 
-
-#endif //_MongoDB_ObjectId_included
+#endif // _MongoDB_Database_included

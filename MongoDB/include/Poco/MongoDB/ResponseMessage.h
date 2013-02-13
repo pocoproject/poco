@@ -66,7 +66,7 @@ public:
 		/// Reads the response from the stream
 		
 
-	Documents& documents();
+	Document::Vector& documents();
 		/// Returns the retrieved documents
 		
 
@@ -90,11 +90,11 @@ private:
 	Int32 _numberReturned;
 
 
-	Documents _documents;
+	Document::Vector _documents;
 };
 
 
-inline Documents& ResponseMessage::documents()
+inline Document::Vector& ResponseMessage::documents()
 {
 	return _documents;
 }

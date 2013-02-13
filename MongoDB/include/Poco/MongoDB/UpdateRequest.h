@@ -40,8 +40,7 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/RequestMessage.h"
-
-#include "Poco/Dynamic/Struct.h"
+#include "Poco/MongoDB/Document.h"
 
 namespace Poco
 {
@@ -78,11 +77,11 @@ public:
 		/// Destructor
 		
 
-	Dynamic::Struct<std::string>& selector();
+	Document& selector();
 		/// Returns the selector document
 		
 
-	Dynamic::Struct<std::string>& update();
+	Document& update();
 		/// The document to update
 
 
@@ -105,9 +104,9 @@ private:
 
 	std::string _fullCollectionName;
 
-	Dynamic::Struct<std::string> _selector;
+	Document _selector;
 
-	Dynamic::Struct<std::string> _update;
+	Document _update;
 };
 
 
@@ -121,12 +120,12 @@ inline void UpdateRequest::flags(UpdateRequest::Flags flags)
 	_flags = flags;
 }
 
-inline Dynamic::Struct<std::string>& UpdateRequest::selector()
+inline Document& UpdateRequest::selector()
 {
 	return _selector;
 }
 
-inline Dynamic::Struct<std::string>& UpdateRequest::update()
+inline Document& UpdateRequest::update()
 {
 	return _update;
 }

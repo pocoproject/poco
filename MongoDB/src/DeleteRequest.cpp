@@ -36,7 +36,6 @@
 //
 
 #include "Poco/MongoDB/DeleteRequest.h"
-#include "Poco/MongoDB/BSONWriter.h"
 
 namespace Poco
 {
@@ -58,11 +57,10 @@ DeleteRequest::~DeleteRequest()
 
 void DeleteRequest::buildRequest(BinaryWriter& writer)
 {
-	BSONWriter bsonWriter(writer);
 	writer << 0; // 0 - reserved for future use
-	bsonWriter.writeCString(_fullCollectionName);
+	BSONWriter(writer).writeCString(_fullCollectionName);
 	writer << _flags;
-	bsonWriter.write(_selector);
+	_selector.write(writer);
 }
 
 
