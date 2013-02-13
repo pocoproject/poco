@@ -1,8 +1,7 @@
 -- Where is POCO?
 
---poco_dir = "C:/Users/u77589/Documents/poco-1.4.3p1-all"
-poco_dir = "/home/bronx/Development/PocoTrunk"
-poco_lib_dir = poco_dir .. "/lib"
+poco_dir = "/home/bronx/Development/poco"
+poco_lib_dir = "/usr/local/lib"
 
 -- Solution
 
@@ -55,8 +54,6 @@ project "PocoMongoDB"
   includedirs { 
                   poco_dir .. "/Foundation/include"
                 , poco_dir .. "/Net/include"
-                , poco_dir .. "/Util/include"
-                , poco_dir .. "/XML/include"
                 , "include"
               }  
               
@@ -80,10 +77,15 @@ project "MongoDBTestSuite"
     targetsuffix "d"
 
   configuration { }
-
+  
   files { 
             "testsuite/src/*.cpp"
         }
+
+  configuration "Linux"
+  	excludes { "testsuite/src/Win*.*" }
+
+  configuration { }
 
   includedirs { 
                   poco_dir .. "/Foundation/include"
@@ -100,12 +102,14 @@ project "MongoDBTestSuite"
     links { 
               "PocoFoundationd" 
             , "PocoMongoDBd"
+            , "CppUnitd"
           }
   
   configuration "Release"
     links { 
               "PocoFoundation" 
             , "PocoMongoDB"
+            , "CppUnit"
           }
 
 project "MongoDBSample"
