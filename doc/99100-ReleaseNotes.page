@@ -1,6 +1,23 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.4.6p1
+
+!!Summary of Changes
+
+  - fixed GH# 71: WebSocket and broken Timeouts (POCO_BROKEN_TIMEOUTS)
+  - fixed an ambiguity error with VC++ 2010 in Data/MySQL testsuite
+  - Poco::Net::NetworkInterface now provides the interface index even for IPv4
+  - added DNS::reload() as a wrapper for res_init().
+  - On Linux, Poco::Environment::nodeId() first always tries to obtain the
+    MAC address of eth0, before looking for other interfaces.
+  - Poco::Net::HTTPSession now always resets the buffer in connect() to clear 
+    any leftover data from a (failed) previous session
+  - fixed copysign namespace issue in FPEnvironment_DUMMY.h
+  - fixed a warning in Poco/Crypto/OpenSSLInitializer.h
+  - added a build configuration for BeagleBoard/Angstrom
+
+
 !!!Release 1.4.6
 
 !!Summary of Changes

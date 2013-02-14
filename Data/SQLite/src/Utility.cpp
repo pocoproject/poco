@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.4/Data/SQLite/src/Utility.cpp#1 $
+// $Id: //poco/1.4/Data/SQLite/src/Utility.cpp#2 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -200,7 +200,7 @@ void Utility::throwException(int rc, const std::string& addErrMsg)
 	case SQLITE_DONE:
 		break; // sqlite_step() has finished executing
 	default:
-		throw SQLiteException(std::string("Unkown error code: ") + Poco::NumberFormatter::format(rc), addErrMsg);
+		throw SQLiteException(std::string("Unknown error code: ") + Poco::NumberFormatter::format(rc), addErrMsg);
 	}
 }
 
