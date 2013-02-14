@@ -1,7 +1,7 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPSession.cpp#2 $
+// $Id: //poco/1.4/Net/src/HTTPSession.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -197,6 +197,9 @@ void HTTPSession::connect(const SocketAddress& address)
 	_socket.connect(address, _timeout);
 	_socket.setReceiveTimeout(_timeout);
 	_socket.setNoDelay(true);
+	// There may be leftover data from a previous (failed) request in the buffer,
+	// so we clear it.
+	_pCurrent = _pEnd = _pBuffer;
 }
 
 

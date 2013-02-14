@@ -1,7 +1,7 @@
 //
 // Thread.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread.h#5 $
+// $Id: //poco/1.4/Foundation/include/Poco/Thread.h#6 $
 //
 // Library: Foundation
 // Package: Threading
@@ -160,6 +160,10 @@ public:
 
 	void start(Runnable& target);
 		/// Starts the thread with the given target.
+		///
+		/// Note that the given Runnable object must be
+		/// valid during the entire lifetime of the thread, as
+		/// only a reference to it is stored internally.
 
 	void start(Callable target, void* pData = 0);
 		/// Starts the thread with the given target and parameter.

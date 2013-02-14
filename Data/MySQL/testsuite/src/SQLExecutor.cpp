@@ -1,7 +1,7 @@
 //
 // SQLExecutor.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/SQLExecutor.cpp#1 $
+// $Id: //poco/1.4/Data/MySQL/testsuite/src/SQLExecutor.cpp#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -1405,7 +1405,7 @@ void SQLExecutor::internalExtraction()
 		int i = rset.value<int>(0,0);
 		assert (1 == i);
 
-		std::string s = rset.value(0,0);
+		std::string s = rset.value(0,0).convert<std::string>();
 		assert ("1" == s);
 
 		int a = rset.value<int>(0,2);

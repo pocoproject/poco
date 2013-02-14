@@ -1,18 +1,18 @@
 #
-# $Id: //poco/1.4/build/config/DigiEL#3 $
+# $Id: //poco/1.4/build/config/BeagleBoard#1 $
 #
-# DigiEL
+# BeagleBoard
 #
-# Make settings for Digi Embedded Linux 4 (gcc 4.0.3, uclibc 0.9.28)
+# Make settings for Open Embedded/Angstrom BeagleBoard
 #
 
 #
 # General Settings
 #
-LINKMODE          ?= STATIC
-TOOL               = arm-linux
+LINKMODE          ?= SHARED
 POCO_TARGET_OSNAME = Linux
-POCO_TARGET_OSARCH = armv5tejl
+POCO_TARGET_OSARCH = armv7l
+TOOL               = arm-angstrom-linux-gnueabi
 
 #
 # Define Tools
@@ -20,11 +20,11 @@ POCO_TARGET_OSARCH = armv5tejl
 CC      = $(TOOL)-gcc
 CXX     = $(TOOL)-g++
 LINK    = $(CXX)
+STRIP   = $(TOOL)-strip
 LIB     = $(TOOL)-ar -cr
 RANLIB  = $(TOOL)-ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-STRIP   = $(TOOL)-strip
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
@@ -40,10 +40,10 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          =
+CFLAGS          = -mfpu=neon -mfloat-abi=softfp -march=armv7-a
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        =
+CXXFLAGS        = -mfpu=neon -mfloat-abi=softfp -march=armv7-a
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS       =
@@ -58,14 +58,14 @@ SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
-RELEASEOPT_CC   = -O2 -DNDEBUG
+RELEASEOPT_CC   = -O3 -DNDEBUG
 RELEASEOPT_CXX  = -O2 -DNDEBUG
 RELEASEOPT_LINK = -O2
 
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -D_REENTRANT -D_THREAD_SAFE -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SHAREDMEMORY -DPOCO_HAVE_ADDRINFO -DPOCO_HAVE_LIBRESOLV
+SYSFLAGS = -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -D_REENTRANT -D_THREAD_SAFE -DPOCO_NO_FPENVIRONMENT
 
 #
 # System Specific Libraries

@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.4/Net/src/DNS.cpp#11 $
+// $Id: //poco/1.4/Net/src/DNS.cpp#12 $
 //
 // Library: Net
 // Package: NetCore
@@ -39,11 +39,15 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Environment.h"
 #include "Poco/NumberFormatter.h"
-#include "Poco/AtomicCounter.h"
+#include "Poco/RWLock.h"
 #include <cstring>
 
 
-using Poco::FastMutex;
+#if defined(POCO_HAVE_LIBRESOLV)
+#include <resolv.h>
+#endif
+
+
 using Poco::Environment;
 using Poco::NumberFormatter;
 using Poco::IOException;
@@ -71,9 +75,18 @@ namespace Poco {
 namespace Net {
 
 
+#if defined(POCO_HAVE_LIBRESOLV)
+static Poco::RWLock resolverLock;
+#endif
+
+
 HostEntry DNS::hostByName(const std::string& hostname)
 {
 	NetworkInitializer networkInitializer;
+
+#if defined(POCO_HAVE_LIBRESOLV)
+	Poco::ScopedReadRWLock readLock(resolverLock);
+#endif
 	
 #if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
 	struct addrinfo* pAI;
@@ -104,7 +117,7 @@ HostEntry DNS::hostByName(const std::string& hostname)
 		return HostEntry(he);
 	}
 #endif
-	error(lastError(), hostname);      // will throw an appropriate exception
+	error(lastError(), hostname); // will throw an appropriate exception
 	throw NetException(); // to silence compiler
 }
 
@@ -112,6 +125,10 @@ HostEntry DNS::hostByName(const std::string& hostname)
 HostEntry DNS::hostByAddress(const IPAddress& address)
 {
 	NetworkInitializer networkInitializer;
+
+#if defined(POCO_HAVE_LIBRESOLV)
+	Poco::ScopedReadRWLock readLock(resolverLock);
+#endif
 
 #if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
 	SocketAddress sa(address, 0);
@@ -188,6 +205,15 @@ HostEntry DNS::thisHost()
 }
 
 
+void DNS::reload()
+{
+#if defined(POCO_HAVE_LIBRESOLV)
+	Poco::ScopedWriteRWLock writeLock(resolverLock);
+	res_init();
+#endif
+}
+
+
 void DNS::flushCache()
 {
 }
@@ -242,7 +268,7 @@ void DNS::error(int code, const std::string& arg)
 
 void DNS::aierror(int code, const std::string& arg)
 {
-#if defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
 	switch (code)
 	{
 	case EAI_AGAIN:
@@ -267,7 +293,7 @@ void DNS::aierror(int code, const std::string& arg)
 	default:
 		throw DNSException("EAI", NumberFormatter::format(code));
 	}
-#endif // POCO_HAVE_IPv6
+#endif // POCO_HAVE_IPv6 || defined(POCO_HAVE_ADDRINFO)
 }
 
 

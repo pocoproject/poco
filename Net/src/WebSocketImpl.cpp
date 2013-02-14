@@ -1,7 +1,7 @@
 //
 // WebSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#6 $
+// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#7 $
 //
 // Library: Net
 // Package: WebSocket
@@ -295,6 +295,30 @@ void WebSocketImpl::sendUrgent(unsigned char data)
 bool WebSocketImpl::secure() const
 {
 	return _pStreamSocketImpl->secure();
+}
+
+
+void WebSocketImpl::setSendTimeout(const Poco::Timespan& timeout)
+{
+	_pStreamSocketImpl->setSendTimeout(timeout);
+}
+
+
+Poco::Timespan WebSocketImpl::getSendTimeout()
+{
+	return _pStreamSocketImpl->getSendTimeout();
+}
+
+
+void WebSocketImpl::setReceiveTimeout(const Poco::Timespan& timeout)
+{
+	_pStreamSocketImpl->setReceiveTimeout(timeout);
+}
+
+
+Poco::Timespan WebSocketImpl::getReceiveTimeout()
+{
+	return _pStreamSocketImpl->getReceiveTimeout();
 }
 
 	

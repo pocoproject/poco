@@ -1,7 +1,7 @@
 //
 // FPEnvironment_DUMMY.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FPEnvironment_DUMMY.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/FPEnvironment_DUMMY.h#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -131,21 +131,13 @@ inline bool FPEnvironmentImpl::isNaNImpl(long double value)
 
 inline float FPEnvironmentImpl::copySignImpl(float target, float source)
 {
-#if defined(__APPLE__) || defined(POCO_ANDROID)
 	return copysignf(target, source);
-#else
-	return std::copysignf(target, source);
-#endif
 }
 
 
 inline double FPEnvironmentImpl::copySignImpl(double target, double source)
 {
-#if defined(__APPLE__) || defined(POCO_ANDROID)
 	return copysign(target, source);
-#else
-	return std::copysign(target, source);
-#endif
 }
 
 
