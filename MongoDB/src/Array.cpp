@@ -34,6 +34,7 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+#include <sstream>
 
 #include "Poco/MongoDB/Array.h"
 
@@ -48,5 +49,23 @@ Array::Array() : Document()
 Array::~Array()
 {
 }
+
+
+std::string Array::toString() const
+{
+	std::ostringstream oss;
+	oss << "[" << std::endl;
+	for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+	{
+		if ( it != _elements.begin() )
+		{
+			oss << ", ";
+		}
+		oss << (*it)->toString();
+	}
+	oss << "]" << std::endl;
+	return oss.str();
+}
+
 
 }} // Namespace Poco::Mongo
