@@ -137,7 +137,7 @@ struct ElementTraits<std::string>
 
 	static std::string toString(const std::string& value)
 	{
-		return value;
+		return '"' + value + '"';
 	}
 };
 
@@ -175,7 +175,7 @@ struct ElementTraits<bool>
 template<>
 inline void BSONReader::read<bool>(bool& to)
 {
-	Int32 b;
+	unsigned char b;
 	_reader >> b;
 	to = b != 0;
 }
@@ -183,7 +183,8 @@ inline void BSONReader::read<bool>(bool& to)
 template<>
 inline void BSONWriter::write<bool>(bool& from)
 {
-	_writer << (from ? 0x01 : 0x00);
+	unsigned char b = from ? 0x01 : 0x00;
+	_writer << b;
 }
 
 // BSON 32-bit integer
