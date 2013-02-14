@@ -66,7 +66,13 @@ public:
 	void testDBCountCommand();
 
 
+	void testDBCount2Command();
+
+
 	void testDeleteRequest();
+
+
+	void testBuildInfo();
 
 
 	void testConnectionPool();

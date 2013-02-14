@@ -144,6 +144,8 @@ void MongoDBTest::testQueryRequest()
 			assert(birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
 			Poco::Timestamp lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
 			assert(doc->isType<NullValue>("unknown"));
+			bool active = doc->get<bool>("active");
+			assert(!active);
 
 			std::string id = doc->get("_id")->toString();
 			std::cout << id << std::endl;
@@ -261,6 +263,20 @@ void MongoDBTest::testDBCountCommand()
 }
 
 
+void MongoDBTest::testDBCount2Command()
+{
+	if ( ! _connected )
+	{
+		std::cout << "test skipped." << std::endl;
+		return;
+	}
+
+	Poco::MongoDB::Database db("team");
+	double count = db.count(_mongo, "players");
+	assert(count == 1);
+}
+
+
 void MongoDBTest::testDeleteRequest()
 {
 	if ( ! _connected )
@@ -273,6 +289,42 @@ void MongoDBTest::testDeleteRequest()
 	request.selector().add("lastname", std::string("Braem"));
 
 	_mongo.sendRequest(request);
+}
+
+
+void MongoDBTest::testBuildInfo()
+{
+	if ( ! _connected )
+	{
+		std::cout << "test skipped." << std::endl;
+		return;
+	}
+
+	Poco::MongoDB::QueryRequest request("team.$cmd");
+	request.numberToReturn(1);
+	request.query().add("buildInfo", 1);
+
+	Poco::MongoDB::ResponseMessage response;
+
+	try
+	{
+		_mongo.sendRequest(request, response);
+	}
+	catch(Poco::NotImplementedException& nie)
+	{
+		std::cout << nie.message() << std::endl;
+		return;
+	}
+
+	if ( response.documents().size() > 0 )
+	{
+		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+		std::cout << doc->toString();
+	}
+	else
+	{
+		fail("Didn't get a response from the buildinfo command");
+	}
 }
 
 
@@ -300,18 +352,6 @@ void MongoDBTest::testConnectionPool()
 	{
 		fail("Didn't get a response from the count command");
 	}
-
-	/*
-	Poco::MongoDB::Connection::Ptr pooledConnection1 = pool.borrowObject();
-	assert(!pooledConnection1.isNull());
-	pool.returnObject(pooledConnection1);
-
-	std::cout << "Available: " << pool.available() << std::endl;
-
-	Poco::MongoDB::Connection::Ptr pooledConnection2 = pool.borrowObject();
-	assert(!pooledConnection2.isNull());
-
-	pool.returnObject(pooledConnection2);*/
 }
 
 CppUnit::Test* MongoDBTest::suite()
@@ -323,8 +363,10 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testDBQueryRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testCountCommand);
 	CppUnit_addTest(pSuite, MongoDBTest, testDBCountCommand);
+	CppUnit_addTest(pSuite, MongoDBTest, testDBCount2Command);
 	CppUnit_addTest(pSuite, MongoDBTest, testConnectionPool);
 	CppUnit_addTest(pSuite, MongoDBTest, testDeleteRequest);
+	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
 
 	return pSuite;
 }
