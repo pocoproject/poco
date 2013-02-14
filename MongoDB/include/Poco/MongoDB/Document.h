@@ -82,13 +82,13 @@ public:
 
 	virtual ~Document();
 
-	
+
 	void read(BinaryReader& reader);
 
-	
+
 	void write(BinaryWriter& writer);
 
-	
+
 	template<typename T>
 	T get(const std::string& name)
 	{
@@ -123,6 +123,10 @@ public:
 
 		return element;
 	}
+
+
+	void elements(std::vector<std::string>& keys) const;
+
 
 	bool exists(const std::string& name)
 	{
@@ -159,10 +163,10 @@ public:
 	void clear();
 
 
-	std::string toString() const;
+	virtual std::string toString() const;
 
 
-private:
+protected:
 
 	ElementSet _elements;
 };
@@ -179,6 +183,15 @@ inline void Document::clear()
 	_elements.clear();
 }
 
+
+inline void Document::elements(std::vector<std::string>& keys) const
+{
+	for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+	{
+		keys.push_back((*it)->name());
+	}
+}
+
 // BSON Embedded Document
 // spec: document
 template<>
@@ -188,8 +201,7 @@ struct ElementTraits<Document::Ptr>
 
 	static std::string toString(const Document::Ptr& value)
 	{
-		//TODO
-		return value.isNull() ? "null" : "{}";
+		return value.isNull() ? "null" : value->toString();
 	}
 };
 
