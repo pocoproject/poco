@@ -42,7 +42,6 @@
 #include <stdlib.h>
 #include <sys/utsname.h>
 #include <sys/param.h>
-#include <cstring>
 #if defined(POCO_OS_FAMILY_BSD)
 #include <sys/sysctl.h>
 #elif POCO_OS == POCO_OS_HPUX
@@ -215,6 +214,10 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 #endif 
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <cstdio>
 
 
 namespace Poco {
@@ -223,6 +226,26 @@ namespace Poco {
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
 	std::memset(&id, 0, sizeof(id));
+
+	// ideally, the following code should be rewritten
+	// to use netlink
+
+	// first try to obtain the MAC address of eth0 using /sys/class/net
+	int fd = open("/sys/class/net/eth0/address", O_RDONLY);
+	if (fd >= 0)
+	{
+		char buffer[18];
+		int n = read(fd, buffer, 17);
+		close(fd);
+		if (n == 17)
+		{
+			buffer[n] = 0;
+			if (std::sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &id[0], &id[1], &id[2], &id[3], &id[4], &id[5]) == 6)
+				return;
+		}
+	}	
+
+	// if that did not work, search active interfaces
 	int sock = socket(PF_INET, SOCK_DGRAM, 0);
 	if (sock == -1) return;
 
