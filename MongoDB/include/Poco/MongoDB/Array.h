@@ -58,6 +58,8 @@ public:
 	virtual ~Array();
 		/// Destructor
 
+
+	std::string toString() const;
 };
 
 // BSON Embedded Array
@@ -70,7 +72,7 @@ struct ElementTraits<Array::Ptr>
 	static std::string toString(const Array::Ptr& value)
 	{
 		//TODO:
-		return value.isNull() ? "null" : "[]";
+		return value.isNull() ? "null" : value->toString();
 	}
 
 };
