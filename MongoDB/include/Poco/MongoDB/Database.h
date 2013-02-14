@@ -38,26 +38,46 @@
 #define _MongoDB_Database_included
 
 #include "Poco/MongoDB/MongoDB.h"
+#include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/QueryRequest.h"
+#include "Poco/MongoDB/InsertRequest.h"
 
 namespace Poco {
 namespace MongoDB {
 
 
 class MongoDB_API Database
+	/// Database is a helper class for creating requests. MongoDB works with
+	/// collection names and uses the part before the first dot as the name of
+	/// the database.
 {
 public:
 	Database(const std::string& db);
+		/// Constructor
 
-	
+
 	virtual ~Database();
+		/// Destructor
 
 
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName);
+	double count(Connection& connection, const std::string& collectionName) const;
+		/// Sends a count request for the given collection to MongoDB. When
+		/// the command fails, -1 is returned.
 
 
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCountRequest(const std::string& collectionName);
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName) const;
+		/// Creates a QueryRequest. The collectionname must not contain the database name!
+
+
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCountRequest(const std::string& collectionName) const;
+		/// Creates a QueryRequest to count the given collection. The collectionname must not contain
+		/// the database name!
+
+
+	Poco::SharedPtr<Poco::MongoDB::InsertRequest> createInsertRequest(const std::string& collectionName) const;
+		/// Creates an InsertRequest to insert new documents in the given collection.
+		/// The collectionname must not contain the database name!
 
 
 private:

@@ -51,17 +51,42 @@ Database::~Database()
 {
 }
 
-Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createQueryRequest(const std::string& collectionName)
+
+double Database::count(Connection& connection, const std::string& collectionName) const
+{
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> countRequest = createCountRequest(collectionName);
+
+	Poco::MongoDB::ResponseMessage response;
+	connection.sendRequest(*countRequest, response);
+
+	if ( response.documents().size() > 0 )
+	{
+		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+		return doc->get<double>("n");
+	}
+
+	return -1;
+}
+
+
+Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createQueryRequest(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::QueryRequest(_dbname + '.' + collectionName);
 }
 
-Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const std::string& collectionName)
+
+Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const std::string& collectionName) const
 {
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createQueryRequest("$cmd");
 	request->numberToReturn(1);
 	request->query().add("count", collectionName);
 	return request;
+}
+
+
+Poco::SharedPtr<Poco::MongoDB::InsertRequest> Database::createInsertRequest(const std::string& collectionName) const
+{
+	return new Poco::MongoDB::InsertRequest(_dbname + '.' + collectionName);
 }
 
 
