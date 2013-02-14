@@ -133,10 +133,16 @@ void Document::read(BinaryReader& reader)
 std::string Document::toString() const
 {
 	std::ostringstream oss;
+	oss << "{" << std::endl;
 	for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
 	{
-		oss << (*it)->name() << " ";
+		if ( it != _elements.begin() )
+		{
+			oss << ", ";
+		}
+		oss << '"' << (*it)->name() << '"' << " : " << (*it)->toString();
 	}
+	oss << "}" << std::endl;
 	return oss.str();
 }
 
