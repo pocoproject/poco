@@ -209,6 +209,54 @@ private:
 
 #endif // POCO_HAVE_IPv6
 
+#ifdef POCO_OS_FAMILY_UNIX
+class LocalSocketAddressImpl: public SocketAddressImpl
+{
+public:
+	LocalSocketAddressImpl(const struct sockaddr_un* pAddr)
+	{
+		std::memcpy(&_addr, pAddr, sizeof(_addr));
+	}
+
+	LocalSocketAddressImpl(const char* pPath)
+	{
+		std::size_t len = std::strlen(pPath);
+		poco_assert (len < sizeof(_addr.sun_path));
+		_addr.sun_family = AF_LOCAL;
+		std::memset(&_addr.sun_path, 0, sizeof(_addr.sun_path));
+		std::strncpy(_addr.sun_path, pPath, len);
+	}
+
+	IPAddress host() const
+	{
+		return IPAddress(std::string(_addr.sun_path, std::strlen(_addr.sun_path)), 
+			IPAddress::LOCAL);
+	}
+
+	UInt16 port() const
+	{
+		return 0;
+	}
+
+	poco_socklen_t length() const
+	{
+		return sizeof(_addr);
+	}
+
+	const struct sockaddr* addr() const
+	{
+		return reinterpret_cast<const struct sockaddr*>(&_addr);
+	}
+
+	int af() const
+	{
+		return _addr.sun_family;
+	}
+
+private:
+	struct sockaddr_un _addr;
+};
+#endif //POCO_OS_FAMILY_UNIX
 
 //
 // SocketAddress
@@ -253,24 +301,36 @@ SocketAddress::SocketAddress(const std::string& hostAndPort)
 	std::string port;
 	std::string::const_iterator it  = hostAndPort.begin();
 	std::string::const_iterator end = hostAndPort.end();
-	if (*it == '[')
+	if (*it == '[') // IPv6
 	{
 		++it;
 		while (it != end && *it != ']') host += *it++;
 		if (it == end) throw InvalidArgumentException("Malformed IPv6 address");
 		++it;
+
+		init(host, resolveService(port));
 	}
-	else
+	else if (std::isdigit(hostAndPort[0]))
 	{
 		while (it != end && *it != ':') host += *it++;
+
+		if (it != end && *it == ':')
+		{
+			++it;
+			while (it != end) port += *it++;
+		}
+
+		init(host, resolveService(port));
 	}
-	if (it != end && *it == ':')
+#ifdef POCO_OS_FAMILY_UNIX
+	else if (std::string::npos != hostAndPort.find("/"))
 	{
-		++it;
-		while (it != end) port += *it++;
+		init(hostAndPort);
+
 	}
+#endif
 	else throw InvalidArgumentException("Missing port number");
-	init(host, resolveService(port));
+
 }
 
 
@@ -281,7 +341,7 @@ SocketAddress::SocketAddress(const SocketAddress& addr)
 }
 
 
-SocketAddress::SocketAddress(const struct sockaddr* addr, poco_socklen_t length)
+SocketAddress::SocketAddress(const struct sockaddr* addr, poco_socklen_t length): _pImpl(0)
 {
 	if (length == sizeof(struct sockaddr_in))
 		_pImpl = new IPv4SocketAddressImpl(reinterpret_cast<const struct sockaddr_in*>(addr));
@@ -289,7 +349,12 @@ SocketAddress::SocketAddress(const struct sockaddr* addr, poco_socklen_t length)
 	else if (length == sizeof(struct sockaddr_in6))
 		_pImpl = new IPv6SocketAddressImpl(reinterpret_cast<const struct sockaddr_in6*>(addr));
 #endif
-	else throw Poco::InvalidArgumentException("Invalid address length passed to SocketAddress()");
+#ifdef POCO_OS_FAMILY_UNIX
+	//else if (length == sizeof(struct sockaddr_un))
+	if (!_pImpl)
+		_pImpl = new LocalSocketAddressImpl(reinterpret_cast<const struct sockaddr_un*>(addr));
+#endif
+	if (!_pImpl) throw Poco::InvalidArgumentException("Invalid address length passed to SocketAddress()");
 }
 
 
@@ -365,8 +430,11 @@ std::string SocketAddress::toString() const
 	if (host().family() == IPAddress::IPv6)
 		result.append("]");
 #endif
-	result.append(":");
-	NumberFormatter::append(result, port());
+	if ((host().family() == IPAddress::IPv6) || (host().family() == IPAddress::IPv4))
+	{
+		result.append(":");
+		NumberFormatter::append(result, port());
+	}
 	return result;
 }
 
@@ -379,31 +447,49 @@ void SocketAddress::init(const IPAddress& host, Poco::UInt16 port)
 	else if (host.family() == IPAddress::IPv6)
 		_pImpl = new IPv6SocketAddressImpl(host.addr(), htons(port), host.scope());
 #endif
+#ifdef POCO_OS_FAMILY_UNIX
+	else if (host.family() == IPAddress::LOCAL)
+		_pImpl = new LocalSocketAddressImpl(reinterpret_cast<const struct sockaddr_un*>(host.addr()));
+#endif
+
 	else throw Poco::NotImplementedException("unsupported IP address family");
 }
 
 
 void SocketAddress::init(const std::string& host, Poco::UInt16 port)
 {
-	IPAddress ip;
-	if (IPAddress::tryParse(host, ip))
+	if (!host.empty())
 	{
-		init(ip, port);
-	}
-	else
-	{
-		HostEntry he = DNS::hostByName(host);
-		HostEntry::AddressList addresses = he.addresses();
-		if (addresses.size() > 0)
+		if (std::isdigit(host[0]))
 		{
-#if defined(POCO_HAVE_IPv6)
-			// if we get both IPv4 and IPv6 addresses, prefer IPv4
-			std::sort(addresses.begin(), addresses.end(), AFLT());
-#endif
-			init(addresses[0], port);
+			IPAddress ip;
+			if (IPAddress::tryParse(host, ip))
+				init(ip, port);
 		}
-		else throw HostNotFoundException("No address found for host", host);
+		else if (std::isalpha(host[0]))
+		{
+			HostEntry he = DNS::hostByName(host);
+			HostEntry::AddressList addresses = he.addresses();
+			if (addresses.size() > 0)
+			{
+#if defined(POCO_HAVE_IPv6)
+				// if we get both IPv4 and IPv6 addresses, prefer IPv4
+				std::sort(addresses.begin(), addresses.end(), AFLT());
+#endif
+				init(addresses[0], port);
+			}
+			else throw HostNotFoundException("No address found for host", host);
+		}
+#ifdef POCO_OS_FAMILY_UNIX
+		else if (std::string::npos != host.find("/"))
+		{
+			IPAddress addr(IPAddress::LOCAL);
+			if (IPAddress::tryParse(host, addr)) init(addr);
+		}
+#endif
 	}
+	else throw InvalidArgumentException("Host name is empty.");
+
 }
 
 

@@ -79,23 +79,33 @@ public:
 		///
 		/// The client socket's address is returned in clientAddr.
 	
-	virtual void connect(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
-		/// the TCP server at the given address.
+	virtual void connect(const SocketAddress& address, const SocketAddress* pFromAddress = 0);
+		/// Initializes the socket and establishes a connection to
+		/// the TCP server at the given address. The optional (pFromAddress)
+		/// second argument is used only by UNIX domain sockets which must be
+		/// explicitly bound to local address.
 		///
 		/// Can also be used for UDP sockets. In this case, no
 		/// connection is established. Instead, incoming and outgoing
 		/// packets are restricted to the specified address.
 
-	virtual void connect(const SocketAddress& address, const Poco::Timespan& timeout);
-		/// Initializes the socket, sets the socket timeout and 
+	virtual void connect(const SocketAddress& address,
+		const Poco::Timespan& timeout,
+		const SocketAddress* pFromAddress = 0);
+		/// Initializes the socket, sets the socket timeout and
 		/// establishes a connection to the TCP server at the given address.
+		/// The optional (pFromAddress)
+		/// second argument is used only by UNIX domain sockets which must be
+		/// explicitly bound to local address.
 
-	virtual void connectNB(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
+	virtual void connectNB(const SocketAddress& address, const SocketAddress* pFromAddress = 0);
+		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
-	
+		/// The optional (pFromAddress)
+		/// second argument is used only by UNIX domain sockets which must be
+		/// explicitly bound to local address.
+
 	virtual void bind(const SocketAddress& address, bool reuseAddress = false);
 		/// Bind a local address to the socket.
 		///
@@ -446,7 +456,9 @@ private:
 	Poco::Timespan _sndTimeout;
 #endif
 	bool          _blocking;
-	
+#ifdef POCO_OS_FAMILY_UNIX
+	std::string   _path;
+#endif
 	friend class Socket;
 	friend class SecureSocketImpl;
 };

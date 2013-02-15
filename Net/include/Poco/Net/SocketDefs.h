@@ -168,6 +168,7 @@
 	#include <netinet/tcp.h>
 	#include <netdb.h>
 	#if defined(POCO_OS_FAMILY_UNIX)
+			#include <sys/un.h>
 		#if (POCO_OS == POCO_OS_LINUX)
 			// <linux/if.h> is needed by NetworkInterface for ifmap, ifreq and ifconf definitions
 			#include <linux/if.h>
