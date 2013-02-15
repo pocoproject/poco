@@ -1,13 +1,13 @@
 //
-// Binary.cpp
+// JavaScriptCode.cpp
 //
 // $Id$
 //
 // Library: MongoDB
 // Package: MongoDB
-// Module:  Binary
+// Module:  JavaScriptCode
 //
-// Implementation of the Binary class.
+// Implementation of the JavaScriptCode class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,36 +34,19 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-
-#include "Poco/MongoDB/Binary.h"
+#include "Poco/MongoDB/JavaScriptCode.h"
 
 namespace Poco {
 namespace MongoDB {
 
 
-Binary::Binary() : _buffer(0)
+JavaScriptCode::JavaScriptCode()
 {
+
 }
 
-
-Binary::Binary(Poco::Int32 size, unsigned char subtype) : _buffer(size), _subtype(subtype)
+JavaScriptCode::~JavaScriptCode()
 {
 }
-
-
-Binary::~Binary()
-{
-}
-
-
-std::string Binary::toString(int indent) const
-{
-	std::ostringstream oss;
-	Base64Encoder encoder(oss);
-	MemoryInputStream mis((const char*) _buffer.begin(), _buffer.size());
-	StreamCopier::copyStream(mis, encoder);
-	return oss.str();
-}
-
 
 }} // Namespace Poco::MongoDB

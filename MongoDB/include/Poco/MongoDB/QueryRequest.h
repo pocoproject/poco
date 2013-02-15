@@ -42,10 +42,8 @@
 #include "Poco/MongoDB/RequestMessage.h"
 #include "Poco/MongoDB/Document.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 
 class MongoDB_API QueryRequest : public RequestMessage
@@ -79,32 +77,35 @@ public:
 		/// Destructor
 		
 
-	Flags flags() const;
+	Flags getFlags() const;
 		/// Returns the flags
 
-	void flags(Flags flag);
+
+	void setFlags(Flags flag);
 		/// Set the flags
+
 
 	Document& query();
 		/// Returns the query document
-		
+
 
 	Document& returnFieldSelector();
 		/// Returns the selector document
-		
 
-	Int32 numberToSkip() const;
+
+	Int32 getNumberToSkip() const;
 		/// Returns the number of documents to skip
 
-	void numberToSkip(Int32 n);
+
+	void setNumberToSkip(Int32 n);
 		/// Sets the number of documents to skip
 
 
-	Int32 numberToReturn() const;
+	Int32 getNumberToReturn() const;
 		/// Returns the number to return
 
 
-	void numberToReturn(Int32 n);
+	void setNumberToReturn(Int32 n);
 		/// Sets the number to return (limit)
 
 protected:
@@ -127,12 +128,12 @@ private:
 	Document _returnFieldSelector;
 };
 
-inline QueryRequest::Flags QueryRequest::flags() const
+inline QueryRequest::Flags QueryRequest::getFlags() const
 {
 	return _flags;
 }
 
-inline void QueryRequest::flags(QueryRequest::Flags flags)
+inline void QueryRequest::setFlags(QueryRequest::Flags flags)
 {
 	_flags = flags;
 }
@@ -147,22 +148,22 @@ inline Document& QueryRequest::returnFieldSelector()
 	return _returnFieldSelector;
 }
 
-inline Int32 QueryRequest::numberToSkip() const
+inline Int32 QueryRequest::getNumberToSkip() const
 {
 	return _numberToSkip;
 }
 
-inline void QueryRequest::numberToSkip(Int32 n)
+inline void QueryRequest::setNumberToSkip(Int32 n)
 {
 	_numberToSkip = n;
 }
 
-inline Int32 QueryRequest::numberToReturn() const
+inline Int32 QueryRequest::getNumberToReturn() const
 {
 	return _numberToReturn;
 }
 
-inline void QueryRequest::numberToReturn(Int32 n)
+inline void QueryRequest::setNumberToReturn(Int32 n)
 {
 	_numberToReturn = n;
 }

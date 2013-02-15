@@ -36,6 +36,7 @@
 #include "Poco/MongoDB/InsertRequest.h"
 #include "Poco/MongoDB/QueryRequest.h"
 #include "Poco/MongoDB/DeleteRequest.h"
+#include "Poco/MongoDB/GetMoreRequest.h"
 #include "Poco/MongoDB/PoolableConnectionFactory.h"
 #include "Poco/MongoDB/Database.h"
 
@@ -123,7 +124,7 @@ void MongoDBTest::testQueryRequest()
 
 	Poco::MongoDB::QueryRequest request("team.players");
 	request.query().add("lastname" , std::string("Braem"));
-	request.numberToReturn(1);
+	request.setNumberToReturn(1);
 
 	Poco::MongoDB::ResponseMessage response;
 
@@ -216,7 +217,7 @@ void MongoDBTest::testCountCommand()
 	}
 
 	Poco::MongoDB::QueryRequest request("team.$cmd");
-	request.numberToReturn(1);
+	request.setNumberToReturn(1);
 	request.query().add("count", std::string("players"));
 
 	Poco::MongoDB::ResponseMessage response;
@@ -292,6 +293,57 @@ void MongoDBTest::testDeleteRequest()
 }
 
 
+void MongoDBTest::testGetMoreRequest()
+{
+	if ( ! _connected )
+	{
+		std::cout << "test skipped." << std::endl;
+		return;
+	}
+
+	Poco::MongoDB::Database db("team");
+	Poco::SharedPtr<Poco::MongoDB::InsertRequest> insertRequest = db.createInsertRequest("numbers");
+	for(int i = 0; i < 10000; ++i)
+	{
+		Document::Ptr doc = new Document();
+		doc->add("number", i);
+		insertRequest->documents().push_back(doc);
+	}
+	_mongo.sendRequest(*insertRequest);
+
+	double count = db.count(_mongo, "numbers");
+	assert(count == 10000);
+
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> queryRequest = db.createQueryRequest("numbers");
+	Poco::MongoDB::ResponseMessage response;
+
+	int n = 0;
+	_mongo.sendRequest(*queryRequest, response);
+	while(response.documents().size() > 0)
+	{
+		std::cout << "CursorID: " << response.cursorID() << std::endl;
+		n += response.documents().size();
+		Poco::MongoDB::GetMoreRequest getMore("team.numbers", response.cursorID());
+		response.clear();
+		_mongo.sendRequest(getMore, response);
+	}
+	std::cout << "n= " << n << std::endl;
+	assert(n == 10000);
+
+	Poco::MongoDB::QueryRequest drop("team.$cmd");
+	drop.setNumberToReturn(1);
+	drop.query().add("drop", std::string("numbers"));
+
+	Poco::MongoDB::ResponseMessage responseDrop;
+	_mongo.sendRequest(drop, responseDrop);
+
+	if ( responseDrop.documents().size() > 0 )
+	{
+		std::cout << responseDrop.documents()[0]->toString(2) << std::endl;
+	}
+}
+
+
 void MongoDBTest::testBuildInfo()
 {
 	if ( ! _connected )
@@ -301,7 +353,7 @@ void MongoDBTest::testBuildInfo()
 	}
 
 	Poco::MongoDB::QueryRequest request("team.$cmd");
-	request.numberToReturn(1);
+	request.setNumberToReturn(1);
 	request.query().add("buildInfo", 1);
 
 	Poco::MongoDB::ResponseMessage response;
@@ -336,7 +388,7 @@ void MongoDBTest::testConnectionPool()
 	Poco::MongoDB::PooledConnection pooledConnection(pool);
 
 	Poco::MongoDB::QueryRequest request("team.$cmd");
-	request.numberToReturn(1);
+	request.setNumberToReturn(1);
 	request.query().add("count", std::string("players"));
 
 	Poco::MongoDB::ResponseMessage response;
@@ -367,6 +419,7 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testConnectionPool);
 	CppUnit_addTest(pSuite, MongoDBTest, testDeleteRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
+	CppUnit_addTest(pSuite, MongoDBTest, testGetMoreRequest);
 
 	return pSuite;
 }

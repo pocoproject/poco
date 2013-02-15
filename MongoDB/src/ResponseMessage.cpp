@@ -54,7 +54,10 @@ ResponseMessage::~ResponseMessage()
 
 void ResponseMessage::clear()
 {
+	_responseFlags = 0;
+	_startingFrom = 0;
 	_cursorID = 0;
+	_numberReturned = 0;
 	_documents.clear();
 }
 

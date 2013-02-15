@@ -51,6 +51,16 @@ DeleteRequest::DeleteRequest(const std::string& collectionName, DeleteRequest::F
 {
 }
 
+
+DeleteRequest::DeleteRequest(const std::string& collectionName, bool justOne)
+	: RequestMessage(MessageHeader::Delete),
+	_flags(justOne ? DELETE_SINGLE_REMOVE : DELETE_NONE),
+	_fullCollectionName(collectionName),
+	_selector()
+{
+}
+
+
 DeleteRequest::~DeleteRequest()
 {
 }

@@ -39,11 +39,10 @@
 #define _MongoDB_BSONReader_included
 
 #include "Poco/MongoDB/MongoDB.h"
+#include "Poco/BinaryReader.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 class MongoDB_API BSONReader
 	/// Class for reading BSON from a Poco::BinaryReader

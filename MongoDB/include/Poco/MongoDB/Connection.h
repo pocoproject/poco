@@ -45,10 +45,8 @@
 #include "Poco/MongoDB/RequestMessage.h"
 #include "Poco/MongoDB/ResponseMessage.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 class MongoDB_API Connection
 	/// Represents a connection to a MongoDB server
@@ -96,7 +94,7 @@ public:
 	void connect(const Net::SocketAddress& addrs);
 		/// Connects to the given MongoDB server.
 
-	
+
 	void disconnect();
 		/// Disconnects from the MongoDB server
 

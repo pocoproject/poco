@@ -44,10 +44,8 @@
 
 #include <istream>
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 
 class MongoDB_API ResponseMessage : public Message
@@ -56,7 +54,7 @@ class MongoDB_API ResponseMessage : public Message
 public:
 	ResponseMessage();
 		/// Constructor
-	
+
 
 	virtual ~ResponseMessage();
 		/// Destructor
@@ -64,14 +62,15 @@ public:
 
 	void read(std::istream& istr);
 		/// Reads the response from the stream
-		
+
 
 	Document::Vector& documents();
 		/// Returns the retrieved documents
-		
+
 
 	Int64 cursorID() const;
 		/// Returns the cursor id
+
 
 	void clear();
 		/// Clears the response
@@ -79,14 +78,14 @@ public:
 private:
 	
 	Int32 _responseFlags;
-	
-	
+
+
 	Int64 _cursorID;
-	
-	
+
+
 	Int32 _startingFrom;
-	
-	
+
+
 	Int32 _numberReturned;
 
 

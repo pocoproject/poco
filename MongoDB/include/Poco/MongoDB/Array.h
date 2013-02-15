@@ -59,7 +59,7 @@ public:
 		/// Destructor
 
 
-	std::string toString() const;
+	std::string toString(int indent = 0) const;
 };
 
 // BSON Embedded Array
@@ -69,7 +69,7 @@ struct ElementTraits<Array::Ptr>
 {
 	enum { TypeId = 0x04 };
 
-	static std::string toString(const Array::Ptr& value)
+	static std::string toString(const Array::Ptr& value, int indent = 0)
 	{
 		//TODO:
 		return value.isNull() ? "null" : value->toString();

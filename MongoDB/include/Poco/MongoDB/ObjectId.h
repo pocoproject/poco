@@ -40,13 +40,24 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
+#include "Poco/Timestamp.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
-class ObjectId
+class MongoDB_API ObjectId
+	/// ObjectId is a 12-byte BSON type, constructed using:
+	///
+	/// - a 4-byte timestamp,
+	/// - a 3-byte machine identifier,
+	/// - a 2-byte process id, and
+	/// - a 3-byte counter, starting with a random value.
+	///
+	/// In MongoDB, documents stored in a collection require a unique _id field that acts
+	/// as a primary key. Because ObjectIds are small, most likely unique, and fast to generate,
+	/// MongoDB uses ObjectIds as the default value for the _id field if the _id field is not
+	/// specified; i.e., the mongod adds the _id field and generates a unique ObjectId to assign
+	/// as its value.
 {
 public:
 
@@ -54,12 +65,20 @@ public:
 
 
 	ObjectId();
+		/// Constructor
 
 
 	virtual ~ObjectId();
+		/// Destructor
+
+
+	Timestamp timestamp() const;
+		/// Returns the timestamp which is stored in the first four bytes of the id
 
 
 	std::string toString() const;
+		/// Returns the id in string format
+
 
 private:
 	unsigned char _id[12];
@@ -67,6 +86,18 @@ private:
 	friend class BSONWriter;
 	friend class BSONReader;
 };
+
+
+inline Timestamp ObjectId::timestamp() const
+{
+	int time;
+	char* T = (char *) &time;
+	T[0] = _id[3];
+	T[1] = _id[2];
+	T[2] = _id[1];
+	T[3] = _id[0];
+	return Timestamp::fromEpochTime((time_t) time);
+}
 
 // BSON Embedded Document
 // spec: ObjectId
@@ -76,7 +107,7 @@ struct ElementTraits<ObjectId::Ptr>
 	enum { TypeId = 0x07 };
 
 
-	static std::string toString(const ObjectId::Ptr& id)
+	static std::string toString(const ObjectId::Ptr& id, int indent = 0)
 	{
 		return id->toString();
 	}

@@ -43,10 +43,8 @@
 
 #include <ostream>
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 
 class MongoDB_API RequestMessage : public Message
@@ -55,15 +53,15 @@ class MongoDB_API RequestMessage : public Message
 public:
 	RequestMessage(MessageHeader::OpCode opcode);
 		/// Constructor
-		
-	
+
+
 	virtual ~RequestMessage();
 		/// Destructor
-		
+
 
 	void send(std::ostream& ostr);
 		/// Sends the request to stream
-		
+
 
 protected:
 

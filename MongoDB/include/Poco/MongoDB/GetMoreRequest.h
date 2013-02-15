@@ -41,10 +41,8 @@
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/RequestMessage.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 
 class MongoDB_API GetMoreRequest : public RequestMessage
@@ -58,17 +56,18 @@ public:
 		/// name with the collection name, using a "." for the concatenation. For example, 
 		/// for the database "foo" and the collection "bar", the full collection name is 
 		/// "foo.bar". The cursorID has been returned by the response on the query request.
+		/// By default the numberToReturn is set to 100.
 
 
 	virtual ~GetMoreRequest();
 		/// Destructor
 
 
-	Int32 numberToReturn() const;
+	Int32 getNumberToReturn() const;
 		/// Returns the limit of returned documents
 
 
-	void numberToReturn(Int32 n);
+	void setNumberToReturn(Int32 n);
 		/// Sets the limit of returned documents
 
 
@@ -91,12 +90,12 @@ private:
 	Int64 _cursorID;
 };
 
-inline Int32 GetMoreRequest::numberToReturn() const
+inline Int32 GetMoreRequest::getNumberToReturn() const
 {
 	return _numberToReturn;
 }
 
-inline void GetMoreRequest::numberToReturn(Int32 n)
+inline void GetMoreRequest::setNumberToReturn(Int32 n)
 {
 	_numberToReturn = n;
 }

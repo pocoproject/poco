@@ -47,10 +47,8 @@
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/MessageHeader.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 
 class MongoDB_API Message
@@ -85,7 +83,7 @@ inline MessageHeader& Message::header()
 
 inline void Message::messageLength(Int32 length)
 {
-	_header.messageLength(length);
+	_header.setMessageLength(length);
 }
 
 

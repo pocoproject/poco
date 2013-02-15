@@ -41,10 +41,8 @@
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/BinaryWriter.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 
 class MongoDB_API BSONWriter
@@ -56,10 +54,12 @@ public:
 	{
 	}
 
+
 	virtual ~BSONWriter()
 		/// Destructor
 	{
 	}
+
 
 	template<typename T>
 	void write(T& t)
@@ -68,6 +68,7 @@ public:
 	{
 		_writer << t;
 	}
+
 
 	void writeCString(const std::string& value);
 		/// Writes a cstring to the writer. A cstring is a string

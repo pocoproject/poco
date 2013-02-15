@@ -78,7 +78,7 @@ Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createQueryRequest(const 
 Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const std::string& collectionName) const
 {
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createQueryRequest("$cmd");
-	request->numberToReturn(1);
+	request->setNumberToReturn(1);
 	request->query().add("count", collectionName);
 	return request;
 }

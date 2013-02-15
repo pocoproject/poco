@@ -81,7 +81,7 @@ public:
 		/// Sets the subtype
 
 
-	std::string toString() const;
+	std::string toString(int indent = 0) const;
 		/// Returns the binary encoded in Base64
 
 
@@ -119,7 +119,7 @@ struct ElementTraits<Binary::Ptr>
 {
 	enum { TypeId = 0x05 };
 
-	static std::string toString(const Binary::Ptr& value)
+	static std::string toString(const Binary::Ptr& value, int indent = 0)
 	{
 		return value.isNull() ? "" : value->toString();
 	}

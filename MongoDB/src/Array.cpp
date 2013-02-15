@@ -51,19 +51,41 @@ Array::~Array()
 }
 
 
-std::string Array::toString() const
+std::string Array::toString(int indent) const
 {
 	std::ostringstream oss;
-	oss << "[" << std::endl;
+	oss << "[";
+	if ( indent > 0 )
+	{
+		oss << std::endl;
+	}
+
 	for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
 	{
 		if ( it != _elements.begin() )
 		{
-			oss << ", ";
+			if ( indent > 0 )
+			{
+				for(int i = 0; i < indent; ++i)
+				{
+					oss << ' ';
+				}
+			}
+			oss << ",";
+			if ( indent > 0 )
+			{
+				oss << std::endl;
+			}
 		}
 		oss << (*it)->toString();
 	}
-	oss << "]" << std::endl;
+	oss << "]";
+
+	if ( indent >  0 )
+	{
+		oss << std::endl;
+	}
+
 	return oss.str();
 }
 

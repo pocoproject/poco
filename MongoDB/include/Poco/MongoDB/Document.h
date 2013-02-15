@@ -68,6 +68,7 @@ private:
 };
 
 class MongoDB_API Document
+	/// Represents a BSON document
 {
 public:
 
@@ -78,64 +79,76 @@ public:
 
 
 	Document();
+		/// Constructor
 
 
 	virtual ~Document();
+		/// Destructor
 
 
-	void read(BinaryReader& reader);
+	void addElement(Element::Ptr element);
+		/// Add an element to the document
 
 
-	void write(BinaryWriter& writer);
+	template<typename T>
+	void add(const std::string& name, T value)
+		/// Creates an element with the given name and value
+		// adds it to the document.
+	{
+		addElement(new ConcreteElement<T>(name, value));
+	}
+
+
+	void clear();
+		/// Removes all elements from the document.
+
+
+	void elementNames(std::vector<std::string>& keys) const;
+		/// Puts all element names into std::vector.
+
+
+	bool empty() const;
+		/// Returns true when the document doesn't contain any documents.
+
+
+	bool exists(const std::string& name);
+		/// Returns true when the document has an element with the given name
 
 
 	template<typename T>
 	T get(const std::string& name)
+		/// Returns the element with the given name and tries to convert
+		/// it to the template type. When the element is not found, a
+		/// NotFoundException will be thrown. When the element can't be
+		/// converted a BadCastException will be thrown.
 	{
 		Element::Ptr element = get(name);
 		if ( element.isNull() )
 		{
-			throw Poco::NotFoundException(name);
+			throw NotFoundException(name);
 		}
 		else
 		{
 			if ( ElementTraits<T>::TypeId == element->type() )
 			{
 				ConcreteElement<T>* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
-				return concrete->value();
+				if ( concrete != NULL )
+				{
+					return concrete->value();
+				}
 			}
-			else
-			{
-				throw std::runtime_error("Invalid type mismatch!");
-			}
+			throw BadCastException("Invalid type mismatch!");
 		}
 	}
 
-	Element::Ptr get(const std::string& name)
-	{
-		Element::Ptr element;
-
-		ElementSet::iterator it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
-		if ( it != _elements.end() )
-		{
-			return *it;
-		}
-
-		return element;
-	}
-
-
-	void elements(std::vector<std::string>& keys) const;
-
-
-	bool exists(const std::string& name)
-	{
-		return std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name)) != _elements.end();
-	}
+	Element::Ptr get(const std::string& name);
+		/// Returns the element with the given name.
+		/// An empty element will be returned when the element is not found.
 
 
 	template<typename T>
 	bool isType(const std::string& name)
+		/// Returns true when the type of the element equals the TypeId of ElementTrait
 	{
 		Element::Ptr element = get(name);
 		if ( element.isNull() )
@@ -147,23 +160,16 @@ public:
 	}
 
 
-	void addElement(Element::Ptr element);
+	void read(BinaryReader& reader);
+		/// Reads a document from the reader
 
 
-	template<typename T>
-	void add(const std::string& name, T value)
-	{
-		addElement(new ConcreteElement<T>(name, value));
-	}
+	virtual std::string toString(int indent = 0) const;
+		/// Returns a String representation of the document.
 
 
-	bool empty() const;
-
-
-	void clear();
-
-
-	virtual std::string toString() const;
+	void write(BinaryWriter& writer);
+		/// Writes a document to the reader
 
 
 protected:
@@ -172,25 +178,32 @@ protected:
 };
 
 
-inline bool Document::empty() const
-{
-	return _elements.empty();
-}
-
-
 inline void Document::clear()
 {
 	_elements.clear();
 }
 
 
-inline void Document::elements(std::vector<std::string>& keys) const
+inline bool Document::empty() const
+{
+	return _elements.empty();
+}
+
+
+inline void Document::elementNames(std::vector<std::string>& keys) const
 {
 	for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
 	{
 		keys.push_back((*it)->name());
 	}
 }
+
+
+inline bool Document::exists(const std::string& name)
+{
+	return std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name)) != _elements.end();
+}
+
 
 // BSON Embedded Document
 // spec: document
@@ -199,9 +212,9 @@ struct ElementTraits<Document::Ptr>
 {
 	enum { TypeId = 0x03 };
 
-	static std::string toString(const Document::Ptr& value)
+	static std::string toString(const Document::Ptr& value, int indent = 0)
 	{
-		return value.isNull() ? "null" : value->toString();
+		return value.isNull() ? "null" : value->toString(indent);
 	}
 };
 

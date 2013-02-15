@@ -53,39 +53,48 @@
 #include "Poco/MongoDB/BSONReader.h"
 #include "Poco/MongoDB/BSONWriter.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 
 class MongoDB_API Element
+	/// Represents an element of a Document or an Array
 {
 public:
 
 	Element(const std::string& name);
+		/// Constructor
 
 
 	virtual ~Element();
+		/// Destructor
 
 
-	virtual std::string toString() const = 0;
+	std::string name() const;
+		/// Returns the name of the element
+
+
+	virtual std::string toString(int indent = 0) const = 0;
+		/// Returns a string representation of the element.
 
 
 	virtual int type() const = 0;
+		/// Returns the MongoDB type of the element.
 
 
 	typedef Poco::SharedPtr<Element> Ptr;
 
-	std::string name() const;
 
 private:
 
 	virtual void read(BinaryReader& reader) = 0;
 
+
 	virtual void write(BinaryWriter& writer) = 0;
 
+
 	friend class Document;
+
 
 	std::string _name;
 };
@@ -95,6 +104,7 @@ inline std::string Element::name() const
 {
 	return _name;
 }
+
 
 class ElementComparator
 {
@@ -121,7 +131,7 @@ struct ElementTraits<double>
 {
 	enum { TypeId = 0x01 };
 
-	static std::string toString(const double& value)
+	static std::string toString(const double& value, int indent = 0)
 	{
 		return Poco::NumberFormatter::format(value);
 	}
@@ -135,7 +145,7 @@ struct ElementTraits<std::string>
 {
 	enum { TypeId = 0x02 };
 
-	static std::string toString(const std::string& value)
+	static std::string toString(const std::string& value, int indent = 0)
 	{
 		return '"' + value + '"';
 	}
@@ -166,7 +176,7 @@ struct ElementTraits<bool>
 {
 	enum { TypeId = 0x08 };
 
-	static std::string toString(const bool& value)
+	static std::string toString(const bool& value, int indent = 0)
 	{
 		return value ? "true" : "false";
 	}
@@ -195,7 +205,7 @@ struct ElementTraits<Int32>
 	enum { TypeId = 0x10 };
 
 
-	static std::string toString(const Int32& value)
+	static std::string toString(const Int32& value, int indent = 0)
 	{
 		return Poco::NumberFormatter::format(value);
 	}
@@ -208,7 +218,7 @@ struct ElementTraits<Timestamp>
 {
 	enum { TypeId = 0x09 };
 
-	static std::string toString(const Timestamp& value)
+	static std::string toString(const Timestamp& value, int indent = 0)
 	{
 		return DateTimeFormatter::format(value, "%Y-%m-%dT%H:%M:%s%z");
 	}
@@ -238,7 +248,7 @@ struct ElementTraits<NullValue>
 {
 	enum { TypeId = 0x0A };
 
-	static std::string toString(const NullValue& value)
+	static std::string toString(const NullValue& value, int indent = 0)
 	{
 		return "null";
 	}
@@ -254,198 +264,6 @@ inline void BSONWriter::write<NullValue>(NullValue& from)
 {
 }
 
-
-class RegularExpression
-{
-public:
-
-	typedef SharedPtr<RegularExpression> Ptr;
-
-
-	RegularExpression()
-	{
-	}
-	
-	
-	RegularExpression(const std::string& pattern, const std::string& options) : _pattern(pattern), _options(options) {}
-
-	
-	virtual ~RegularExpression()
-	{
-	}
-
-	
-	std::string getPattern() const;
-
-	
-	void setPattern(const std::string& pattern);
-
-
-	std::string getOptions() const;
-
-
-	void setOptions(const std::string& options);
-
-
-	SharedPtr<Poco::RegularExpression> createRE()
-	{
-		int options = 0;
-		for(std::string::iterator optIt = _options.begin(); optIt != _options.end(); ++optIt)
-		{
-			switch(*optIt)
-			{
-			case 'i': // Case Insensitive
-				options |= Poco::RegularExpression::RE_CASELESS;
-				break;
-			case 'm': // Multiline matching
-				options |= Poco::RegularExpression::RE_MULTILINE;
-				break;
-			case 'x': // Verbose mode
-				//No equivalent in Poco
-				break;
-			case 'l': // \w \W Locale dependent
-				//No equivalent in Poco
-				break;
-			case 's': // Dotall mode
-				options |= Poco::RegularExpression::RE_DOTALL;
-				break;
-			case 'u': // \w \W Unicode
-				//No equivalent in Poco
-				break;
-			}
-		}
-		return new Poco::RegularExpression(_pattern, options);
-	}
-
-
-private:
-
-	std::string _pattern;
-	std::string _options;
-};
-
-
-inline std::string RegularExpression::getPattern() const
-{
-	return _pattern;
-}
-
-
-inline void RegularExpression::setPattern(const std::string& pattern)
-{
-	_pattern = pattern;
-}
-
-
-inline std::string RegularExpression::getOptions() const
-{
-	return _options;
-}
-
-
-inline void RegularExpression::setOptions(const std::string& options)
-{
-	_options = options;
-}
-
-// BSON Regex
-// spec: cstring cstring
-template<>
-struct ElementTraits<RegularExpression::Ptr>
-{
-	enum { TypeId = 0x0B };
-
-	static std::string toString(const RegularExpression::Ptr& value)
-	{
-		//TODO
-		return "RE: not implemented yet";
-	}
-};
-
-template<>
-inline void BSONReader::read<RegularExpression::Ptr>(RegularExpression::Ptr& to)
-{
-	std::string pattern = readCString();
-	std::string options = readCString();
-
-	to = new RegularExpression(pattern, options);
-}
-
-template<>
-inline void BSONWriter::write<RegularExpression::Ptr>(RegularExpression::Ptr& from)
-{
-	writeCString(from->getPattern());
-	writeCString(from->getOptions());
-}
-
-
-class JavaScriptCode
-{
-public:
-	typedef SharedPtr<JavaScriptCode> Ptr;
-
-
-	JavaScriptCode()
-	{
-	}
-
-
-	virtual ~JavaScriptCode()
-	{
-	}
-
-
-	void code(const std::string& s);
-
-
-	std::string code() const;
-
-private:
-
-	std::string _code;
-};
-
-
-inline void JavaScriptCode::code(const std::string& s)
-{
-	_code = s;
-}
-
-
-inline std::string JavaScriptCode::code() const
-{
-	return _code;
-}
-
-// BSON JavaScript code
-// spec: string
-template<>
-struct ElementTraits<JavaScriptCode::Ptr>
-{
-	enum { TypeId = 0x0D };
-
-	static std::string toString(const JavaScriptCode::Ptr& value)
-	{
-		return value.isNull() ? "" : value->code();
-	}
-};
-
-template<>
-inline void BSONReader::read<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& to)
-{
-	std::string code;
-	BSONReader(_reader).read(code);
-	to = new JavaScriptCode();
-	to->code(code);
-}
-
-template<>
-inline void BSONWriter::write<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& from)
-{
-	std::string code = from->code();
-	BSONWriter(_writer).write(code);
-}
-
 // BSON 64-bit integer
 // spec: int64
 template<>
@@ -453,7 +271,7 @@ struct ElementTraits<Int64>
 {
 	enum { TypeId = 0x12 };
 
-	static std::string toString(const Int64& value)
+	static std::string toString(const Int64& value, int indent = 0)
 	{
 		return NumberFormatter::format(value);
 	}
@@ -476,7 +294,7 @@ public:
 	T value() const { return _value; }
 
 
-	std::string toString() const { return ElementTraits<T>::toString(_value); }
+	std::string toString(int indent = 0) const { return ElementTraits<T>::toString(_value, indent); }
 
 	
 	int type() const { return ElementTraits<T>::TypeId; }

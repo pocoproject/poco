@@ -48,7 +48,7 @@ QueryRequest::QueryRequest(const std::string& collectionName, QueryRequest::Flag
 	_flags(flags), 
 	_fullCollectionName(collectionName),
 	_numberToSkip(0), 
-	_numberToReturn(0), 
+	_numberToReturn(100),
 	_query(), 
 	_returnFieldSelector()
 {

@@ -9,7 +9,9 @@ namespace Poco
 
 
 template<>
-class PoolableObjectFactory<MongoDB::Connection, MongoDB::Connection::Ptr>
+class MongoDB_API PoolableObjectFactory<MongoDB::Connection, MongoDB::Connection::Ptr>
+	/// PoolableObjectFactory specialisation for Connection. New connections
+	/// are created with the given address.
 {
 public:
 	PoolableObjectFactory(Net::SocketAddress& address)
@@ -58,9 +60,10 @@ private:
 
 namespace MongoDB
 {
-	
 
-class PooledConnection
+
+class MongoDB_API PooledConnection
+	/// Helper class for borrowing and returning a connection automatically from a pool.
 {
 public:
 	PooledConnection(Poco::ObjectPool<Connection, Connection::Ptr>& pool) : _pool(pool)

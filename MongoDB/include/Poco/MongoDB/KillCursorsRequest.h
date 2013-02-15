@@ -41,10 +41,8 @@
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/RequestMessage.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 
 class MongoDB_API KillCursorsRequest : public RequestMessage
@@ -55,8 +53,8 @@ class MongoDB_API KillCursorsRequest : public RequestMessage
 public:
 	KillCursorsRequest();
 		/// Constructor
-		
-		
+
+
 	virtual ~KillCursorsRequest();
 		/// Destructor
 		

@@ -1,13 +1,13 @@
 //
-// Binary.cpp
+// JavaScriptCode.h
 //
 // $Id$
 //
 // Library: MongoDB
 // Package: MongoDB
-// Module:  Binary
+// Module:  JavaScriptCode
 //
-// Implementation of the Binary class.
+// Definition of the JavaScriptCode class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,35 +35,89 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include "Poco/MongoDB/Binary.h"
+#ifndef _MongoDB_JavaScriptCode_included
+#define _MongoDB_JavaScriptCode_included
+
+#include "Poco/MongoDB/MongoDB.h"
+#include "Poco/MongoDB/BSONReader.h"
+#include "Poco/MongoDB/BSONWriter.h"
+#include "Poco/MongoDB/Element.h"
+#include "Poco/SharedPtr.h"
 
 namespace Poco {
 namespace MongoDB {
 
 
-Binary::Binary() : _buffer(0)
+class MongoDB_API JavaScriptCode
+	/// Represents JavaScript type in BSON
 {
+public:
+	typedef SharedPtr<JavaScriptCode> Ptr;
+
+
+	JavaScriptCode();
+		/// Constructor
+
+
+	virtual ~JavaScriptCode();
+		/// Destructor
+
+
+	void setCode(const std::string& s);
+		/// Set the code
+
+
+	std::string getCode() const;
+		/// Get the code
+
+private:
+
+	std::string _code;
+};
+
+
+inline void JavaScriptCode::setCode(const std::string& s)
+{
+	_code = s;
 }
 
 
-Binary::Binary(Poco::Int32 size, unsigned char subtype) : _buffer(size), _subtype(subtype)
+inline std::string JavaScriptCode::getCode() const
 {
+	return _code;
 }
 
-
-Binary::~Binary()
+// BSON JavaScript code
+// spec: string
+template<>
+struct ElementTraits<JavaScriptCode::Ptr>
 {
+	enum { TypeId = 0x0D };
+
+	static std::string toString(const JavaScriptCode::Ptr& value, int indent = 0)
+	{
+		return value.isNull() ? "" : value->getCode();
+	}
+};
+
+
+template<>
+inline void BSONReader::read<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& to)
+{
+	std::string code;
+	BSONReader(_reader).read(code);
+	to = new JavaScriptCode();
+	to->setCode(code);
 }
 
-
-std::string Binary::toString(int indent) const
+template<>
+inline void BSONWriter::write<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& from)
 {
-	std::ostringstream oss;
-	Base64Encoder encoder(oss);
-	MemoryInputStream mis((const char*) _buffer.begin(), _buffer.size());
-	StreamCopier::copyStream(mis, encoder);
-	return oss.str();
+	std::string code = from->getCode();
+	BSONWriter(_writer).write(code);
 }
 
 
 }} // Namespace Poco::MongoDB
+
+#endif //  _MongoDB_JavaScriptCode_included

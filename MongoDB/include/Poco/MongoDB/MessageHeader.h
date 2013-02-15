@@ -43,12 +43,10 @@
 
 #define MSG_HEADER_SIZE	16
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
-class MessageHeader
+class MongoDB_API MessageHeader
 	/// Represents the header which is always prepended to a request
 	/// or response of MongoDB
 {
@@ -68,31 +66,31 @@ public:
 
 	virtual ~MessageHeader();
 		/// Destructor
-		
+
 
 	void read(BinaryReader& reader);
 		/// Reads the header
-		
-	
+
+
 	void write(BinaryWriter& writer);
 		/// Writes the header
 
-	
+
+	Int32 getMessageLength() const;
+		/// Returns the message length
+
+
 	OpCode opCode() const;
 		/// Returns the OpCode
-		
 
-	Int32 messageLength() const;
-		/// Returns the message length
-		
 
-	Int32 requestID() const;
+	Int32 getRequestID() const;
 		/// Returns the request id of the current message
-		
 
-	void requestID(Int32 id);
+
+	void setRequestID(Int32 id);
 		/// Sets the request id of the current message
-		
+
 
 	Int32 responseTo() const;
 		/// Returns the request id from the original request. 
@@ -101,21 +99,21 @@ private:
 
 	MessageHeader(OpCode opcode);
 		/// Constructor.
-		
-	
+
+
 	Int32 _messageLength;
 
-	
-	void messageLength(Int32 length);
+
+	void setMessageLength(Int32 length);
 		/// Sets the message length
-		
+
 
 	Int32 _requestID;
-	
-	
+
+
 	Int32 _responseTo;
-	
-	
+
+
 	OpCode _opCode;
 
 
@@ -128,22 +126,22 @@ inline MessageHeader::OpCode MessageHeader::opCode() const
 	return _opCode;
 }
 
-inline Int32 MessageHeader::messageLength() const
+inline Int32 MessageHeader::getMessageLength() const
 {
 	return _messageLength;
 }
 
-inline void MessageHeader::messageLength(Int32 length)
+inline void MessageHeader::setMessageLength(Int32 length)
 {
 	_messageLength = MSG_HEADER_SIZE + length;
 }
 
-inline void MessageHeader::requestID(Int32 id)
+inline void MessageHeader::setRequestID(Int32 id)
 {
 	_requestID = id;
 }
 
-inline Int32 MessageHeader::requestID() const
+inline Int32 MessageHeader::getRequestID() const
 {
 	return _requestID;
 }

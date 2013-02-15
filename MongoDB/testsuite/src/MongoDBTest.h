@@ -78,6 +78,9 @@ public:
 	void testConnectionPool();
 
 
+	void testGetMoreRequest();
+
+
 	void setUp();
 
 

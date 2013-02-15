@@ -41,6 +41,8 @@
 #include "Poco/MongoDB/Binary.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/Array.h"
+#include "Poco/MongoDB/RegularExpression.h"
+#include "Poco/MongoDB/JavaScriptCode.h"
 
 namespace Poco
 {
@@ -55,6 +57,21 @@ Document::Document()
 Document::~Document()
 {
 }
+
+
+Element::Ptr Document::get(const std::string& name)
+{
+	Element::Ptr element;
+
+	ElementSet::iterator it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
+	if ( it != _elements.end() )
+	{
+		return *it;
+	}
+
+	return element;
+}
+
 
 void Document::read(BinaryReader& reader)
 {
@@ -130,7 +147,7 @@ void Document::read(BinaryReader& reader)
 }
 
 
-std::string Document::toString() const
+std::string Document::toString(int indent) const
 {
 	std::ostringstream oss;
 	oss << "{" << std::endl;

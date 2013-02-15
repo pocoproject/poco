@@ -42,10 +42,8 @@
 #include "Poco/MongoDB/RequestMessage.h"
 #include "Poco/MongoDB/Document.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 
 class MongoDB_API InsertRequest : public RequestMessage
@@ -69,7 +67,7 @@ public:
 
 	virtual ~InsertRequest();
 		/// Destructor
-		
+
 
 	Document::Vector& documents();
 		/// Returns the documents to insert into the database

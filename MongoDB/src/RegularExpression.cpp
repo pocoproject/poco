@@ -1,13 +1,13 @@
 //
-// Binary.cpp
+// RegularExpression.cpp
 //
 // $Id$
 //
 // Library: MongoDB
 // Package: MongoDB
-// Module:  Binary
+// Module:  RegularExpression
 //
-// Implementation of the Binary class.
+// Implementation of the RegularExpression class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,35 +35,57 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include "Poco/MongoDB/Binary.h"
+#include <sstream>
+
+#include "Poco/MongoDB/RegularExpression.h"
 
 namespace Poco {
 namespace MongoDB {
 
 
-Binary::Binary() : _buffer(0)
+RegularExpression::RegularExpression()
 {
 }
 
 
-Binary::Binary(Poco::Int32 size, unsigned char subtype) : _buffer(size), _subtype(subtype)
+RegularExpression::RegularExpression(const std::string& pattern, const std::string& options) : _pattern(pattern), _options(options)
 {
 }
 
 
-Binary::~Binary()
+RegularExpression::~RegularExpression()
 {
 }
 
 
-std::string Binary::toString(int indent) const
+SharedPtr<Poco::RegularExpression> RegularExpression::createRE() const
 {
-	std::ostringstream oss;
-	Base64Encoder encoder(oss);
-	MemoryInputStream mis((const char*) _buffer.begin(), _buffer.size());
-	StreamCopier::copyStream(mis, encoder);
-	return oss.str();
+	int options = 0;
+	for(std::string::const_iterator optIt = _options.begin(); optIt != _options.end(); ++optIt)
+	{
+		switch(*optIt)
+		{
+		case 'i': // Case Insensitive
+			options |= Poco::RegularExpression::RE_CASELESS;
+			break;
+		case 'm': // Multiline matching
+			options |= Poco::RegularExpression::RE_MULTILINE;
+			break;
+		case 'x': // Verbose mode
+			//No equivalent in Poco
+			break;
+		case 'l': // \w \W Locale dependent
+			//No equivalent in Poco
+			break;
+		case 's': // Dotall mode
+			options |= Poco::RegularExpression::RE_DOTALL;
+			break;
+		case 'u': // \w \W Unicode
+			//No equivalent in Poco
+			break;
+		}
+	}
+	return new Poco::RegularExpression(_pattern, options);
 }
-
 
 }} // Namespace Poco::MongoDB

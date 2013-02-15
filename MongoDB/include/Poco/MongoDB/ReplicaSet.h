@@ -42,21 +42,24 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/MongoDB/Connection.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
 
 class MongoDB_API ReplicaSet
+	/// Class for working with a replicaset
 {
 public:
 	ReplicaSet(const std::vector<Net::SocketAddress>& addresses);
+		/// Constructor
 
 
 	virtual ~ReplicaSet();
+		/// Destructor
 
 
 	Connection::Ptr findMaster();
+		/// Tries to find the master MongoDB instance from the addresses
+
 
 private:
 
