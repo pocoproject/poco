@@ -49,6 +49,11 @@ Binder::Binder()
 
 Binder::~Binder()
 {
+    for (std::vector<MYSQL_TIME*>::iterator it = _dates.begin(); it != _dates.end(); ++it)
+    {
+        delete *it;
+        *it = 0;
+    }
 }
 
 
@@ -188,9 +193,9 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 
 	mt.time_type  = MYSQL_TIMESTAMP_DATETIME;
 
-	_dates.push_back(mt);
+	_dates.push_back(new MYSQL_TIME(mt));
 
-	realBind(pos, MYSQL_TYPE_DATETIME, &_dates.back(), sizeof(mt));	
+	realBind(pos, MYSQL_TYPE_DATETIME, _dates.back(), sizeof(MYSQL_TIME));
 }
 
 
@@ -203,9 +208,9 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 	mt.month = val.month();
 	mt.day   = val.day();
 
-	_dates.push_back(mt);
+	_dates.push_back(new MYSQL_TIME(mt));
 	
-	realBind(pos, MYSQL_TYPE_DATE, &_dates.back(), sizeof(mt));	
+	realBind(pos, MYSQL_TYPE_DATE, _dates.back(), sizeof(MYSQL_TIME));
 }
 
 
@@ -220,9 +225,9 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 
 	mt.time_type = MYSQL_TIMESTAMP_TIME;
 	
-	_dates.push_back(mt);
+	_dates.push_back(new MYSQL_TIME(mt));
 	
-	realBind(pos, MYSQL_TYPE_TIME, &_dates.back(), sizeof(mt));	
+	realBind(pos, MYSQL_TYPE_TIME, _dates.back(), sizeof(MYSQL_TIME));
 }
 
 
