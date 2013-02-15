@@ -251,6 +251,8 @@ public:
 		/// Update linked times
 
 private:
+	Binder(const Binder&);
+		/// Don't copy the binder
 
 	virtual void bind(std::size_t, const char* const&, Direction)
 		/// Binds a const char ptr. 
@@ -265,7 +267,7 @@ private:
 private:
 
 	std::vector<MYSQL_BIND> _bindArray;
-	std::vector<MYSQL_TIME> _dates;
+	std::vector<MYSQL_TIME*> _dates;
 };
 
 
