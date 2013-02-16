@@ -75,7 +75,7 @@ public:
 
 	virtual ~QueryRequest();
 		/// Destructor
-		
+
 
 	Flags getFlags() const;
 		/// Returns the flags
@@ -85,12 +85,8 @@ public:
 		/// Set the flags
 
 
-	Document& query();
-		/// Returns the query document
-
-
-	Document& returnFieldSelector();
-		/// Returns the selector document
+	std::string fullCollectionName() const;
+		/// Returns the <db>.<collection> used for this query
 
 
 	Int32 getNumberToSkip() const;
@@ -107,6 +103,15 @@ public:
 
 	void setNumberToReturn(Int32 n);
 		/// Sets the number to return (limit)
+
+
+	Document& query();
+		/// Returns the query document
+
+
+	Document& returnFieldSelector();
+		/// Returns the selector document
+
 
 protected:
 
@@ -128,40 +133,54 @@ private:
 	Document _returnFieldSelector;
 };
 
+
 inline QueryRequest::Flags QueryRequest::getFlags() const
 {
 	return _flags;
 }
+
 
 inline void QueryRequest::setFlags(QueryRequest::Flags flags)
 {
 	_flags = flags;
 }
 
+
+inline std::string QueryRequest::fullCollectionName() const
+{
+	return _fullCollectionName;
+}
+
+
 inline Document& QueryRequest::query()
 {
 	return _query;
 }
+
 
 inline Document& QueryRequest::returnFieldSelector()
 {
 	return _returnFieldSelector;
 }
 
+
 inline Int32 QueryRequest::getNumberToSkip() const
 {
 	return _numberToSkip;
 }
+
 
 inline void QueryRequest::setNumberToSkip(Int32 n)
 {
 	_numberToSkip = n;
 }
 
+
 inline Int32 QueryRequest::getNumberToReturn() const
 {
 	return _numberToReturn;
 }
+
 
 inline void QueryRequest::setNumberToReturn(Int32 n)
 {
