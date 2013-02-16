@@ -31,7 +31,7 @@ poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation XML Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Zip PageCompiler PageCompiler/File2Page PDF CppParser JSON
+COMPONENTS = Foundation XML Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Zip PageCompiler PageCompiler/File2Page PDF CppParser JSON MongoDB
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
@@ -51,8 +51,8 @@ install: libexecs
 	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib$(LIB64SUFFIX) \;
 	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib$(LIB64SUFFIX) \;
 
-libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec PDF-libexec CppParser-libexec
-tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Zip-tests PDF-tests CppParser-tests
+libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec PDF-libexec CppParser-libexec MongoDB-libexec
+tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Zip-tests PDF-tests CppParser-tests MongoDB-tests
 samples  =  Foundation-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples Zip-samples PageCompiler-samples PDF-samples
 
 .PHONY: poco all libexecs cppunit tests samples clean distclean install
@@ -187,6 +187,12 @@ CppParser-libexec: Foundation-libexec
 CppParser-tests: CppParser-libexec 
 	$(MAKE) -C $(POCO_BASE)/CppParser/testsuite
 
+MongoDB-libexec: Foundation-libexec Net-libexec
+	$(MAKE) -C $(POCO_BASE)/MongoDB
+
+MongoDB-tests: MongoDB-libexec Net-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/MongoDB/testsuite
+
 
 clean:
 	$(MAKE) -C $(POCO_BASE)/Foundation clean
@@ -231,6 +237,8 @@ clean:
 	$(MAKE) -C $(POCO_BASE)/JSON clean
 	$(MAKE) -C $(POCO_BASE)/JSON/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/JSON/samples clean
+	$(MAKE) -C $(POCO_BASE)/MongoDB clean
+	$(MAKE) -C $(POCO_BASE)/MongoDB/testsuite clean
 
 distclean:
 	rm -rf $(POCO_BUILD)/lib
