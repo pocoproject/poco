@@ -45,8 +45,8 @@ namespace MongoDB
 
 InsertRequest::InsertRequest(const std::string& collectionName, Flags flags) 
 	: RequestMessage(MessageHeader::Insert), 
-	_fullCollectionName(collectionName),
-	_flags(flags)
+	_flags(flags),
+	_fullCollectionName(collectionName)
 {
 }
 

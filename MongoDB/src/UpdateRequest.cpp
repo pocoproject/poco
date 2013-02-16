@@ -45,8 +45,8 @@ namespace MongoDB
 
 UpdateRequest::UpdateRequest(const std::string& collectionName, UpdateRequest::Flags flags) 
 	: RequestMessage(MessageHeader::Update), 
-	_fullCollectionName(collectionName),
 	_flags(flags),
+	_fullCollectionName(collectionName),
 	_selector(),
 	_update()
 {
