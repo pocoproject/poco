@@ -7,7 +7,7 @@ PROJECT(Poco)
 
 cmake_minimum_required(VERSION 2.8.0)
 
-set(SHARED_LIBRARY_VERSION "15")
+set(SHARED_LIBRARY_VERSION "21")
 
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
 set(CPACK_PACKAGE_VERSION_MINOR "5")
@@ -102,8 +102,9 @@ include(FindOpenSSL)
 #include(CMakeDetermineCompilerId)
 
 include(FindMySQL)
-include(FindAPR)
-include(FindApache2)
+
+#include(FindAPR)
+#include(FindApache2)
 
 # OS Detection
 if(CMAKE_SYSTEM MATCHES "Windows")
