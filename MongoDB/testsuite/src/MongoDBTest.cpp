@@ -39,6 +39,7 @@
 #include "Poco/MongoDB/GetMoreRequest.h"
 #include "Poco/MongoDB/PoolableConnectionFactory.h"
 #include "Poco/MongoDB/Database.h"
+#include "Poco/MongoDB/Cursor.h"
 
 #include "Poco/Net/NetException.h"
 
@@ -293,7 +294,7 @@ void MongoDBTest::testDeleteRequest()
 }
 
 
-void MongoDBTest::testGetMoreRequest()
+void MongoDBTest::testCursorRequest()
 {
 	if ( ! _connected )
 	{
@@ -314,18 +315,14 @@ void MongoDBTest::testGetMoreRequest()
 	double count = db.count(_mongo, "numbers");
 	assert(count == 10000);
 
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> queryRequest = db.createQueryRequest("numbers");
-	Poco::MongoDB::ResponseMessage response;
+	Poco::MongoDB::Cursor cursor("team", "numbers");
 
 	int n = 0;
-	_mongo.sendRequest(*queryRequest, response);
-	while(response.documents().size() > 0)
+	Poco::MongoDB::ResponseMessage& response = cursor.next(_mongo);
+	while(response.cursorID() != 0)
 	{
-		std::cout << "CursorID: " << response.cursorID() << std::endl;
 		n += response.documents().size();
-		Poco::MongoDB::GetMoreRequest getMore("team.numbers", response.cursorID());
-		response.clear();
-		_mongo.sendRequest(getMore, response);
+		response = cursor.next(_mongo);
 	}
 	std::cout << "n= " << n << std::endl;
 	assert(n == 10000);
@@ -419,7 +416,7 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testConnectionPool);
 	CppUnit_addTest(pSuite, MongoDBTest, testDeleteRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
-	CppUnit_addTest(pSuite, MongoDBTest, testGetMoreRequest);
+	CppUnit_addTest(pSuite, MongoDBTest, testCursorRequest);
 
 	return pSuite;
 }

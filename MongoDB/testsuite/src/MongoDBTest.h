@@ -78,7 +78,7 @@ public:
 	void testConnectionPool();
 
 
-	void testGetMoreRequest();
+	void testCursorRequest();
 
 
 	void setUp();
