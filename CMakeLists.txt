@@ -94,7 +94,7 @@ ELSE ()
 ENDIF ()
 
 # Set local include path
-include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include Crypto/include Web/include JSON/include PDF/include)
+include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include Crypto/include Web/include JSON/include MongoDB/include PDF/include)
 
 include(CheckTypeSize)
 include(FindCygwin)
@@ -159,6 +159,7 @@ ENDIF ()
 add_subdirectory(Foundation)
 add_subdirectory(XML)
 add_subdirectory(JSON)
+add_subdirectory(MongoDB)
 add_subdirectory(PDF)
 add_subdirectory(Util)
 add_subdirectory(Net)
