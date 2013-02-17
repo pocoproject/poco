@@ -276,6 +276,7 @@
     <ClInclude Include="include\Poco\Net\DNS.h"/>
     <ClInclude Include="include\Poco\Net\HostEntry.h"/>
     <ClInclude Include="include\Poco\Net\IPAddress.h"/>
+    <ClInclude Include="include\Poco\Net\IPAddressImpl.h"/>
     <ClInclude Include="include\Poco\Net\Net.h"/>
     <ClInclude Include="include\Poco\Net\NetException.h"/>
     <ClInclude Include="include\Poco\Net\NetworkInterface.h"/>
@@ -375,6 +376,7 @@
     <ClCompile Include="src\DNS.cpp"/>
     <ClCompile Include="src\HostEntry.cpp"/>
     <ClCompile Include="src\IPAddress.cpp"/>
+    <ClCompile Include="src\IPAddressImpl.cpp"/>
     <ClCompile Include="src\Net.cpp"/>
     <ClCompile Include="src\NetException.cpp"/>
     <ClCompile Include="src\NetworkInterface.cpp"/>

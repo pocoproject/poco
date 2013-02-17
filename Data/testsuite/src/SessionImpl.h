@@ -105,7 +105,7 @@ public:
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
-	const std::string& connectorName();
+	const std::string& connectorName() const;
 		/// Returns the name of the connector.
 
 	void setConnected(const std::string& name, bool value);

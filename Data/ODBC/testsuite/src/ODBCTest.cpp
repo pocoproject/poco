@@ -1313,7 +1313,6 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
 	
-	Poco::Data::ODBC::Connector::registerConnector();
 	try
 	{
 		std::cout << "Conecting to [" << dbConnString << ']' << std::endl;

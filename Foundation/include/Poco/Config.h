@@ -51,6 +51,14 @@
 // #define POCO_NO_AUTOMATIC_LIBS
 
 
+// Define to disable automatic initialization
+// Defining this will disable ALL automatic 
+// initialization framework-wide (e.g. Net
+// on Windows, all Data back-ends, etc).
+// 
+// #define POCO_NO_AUTOMATIC_LIB_INIT
+
+
 // Define to disable FPEnvironment support
 // #define POCO_NO_FPENVIRONMENT
 
@@ -84,6 +92,23 @@
 // maximum thread priority value on POSIX
 // platforms (returned by Poco::Thread::getMaxOSPriority()).
 // #define POCO_THREAD_PRIORITY_MAX 31
+
+
+// Define to disable small object optimization. If not 
+// defined, Any and Dynamic::Var (and similar optimization
+// candidates) will be auto-allocated on the stack in 
+// cases when value holder fits into POCO_SMALL_OBJECT_SIZE
+// (see Poco/Types.h for default values).
+// #define POCO_NO_SOO
+
+
+// Small object size in bytes. Where applicable (e.g.
+// SmallObjectAllocator<char*> specialization, Any, Var, etc)
+// objects longer than this value will be alocated on the heap.
+// See Poco/SmallObjectAllocator.h for usage of this value.
+#if !defined(POCO_SMALL_OBJECT_SIZE)
+	#define POCO_SMALL_OBJECT_SIZE 32
+#endif
 
 
 // Following are options to remove certain features

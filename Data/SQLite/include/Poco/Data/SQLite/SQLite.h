@@ -84,7 +84,7 @@
 //
 // Thread safety mode defaults to "serialized".
 // See http://www.sqlite.org/threadsafe.html for details.
-// Threading mode significantly affects performance 
+// Threading mode may significantly affect performance 
 // (see TestSuite::benchmarkThreadModesTiming)
 //
 #ifndef SQLITE_THREADSAFE

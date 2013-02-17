@@ -331,4 +331,25 @@
 #define poco_hton_16(x) poco_ntoh_16(x)
 #define poco_hton_32(x) poco_ntoh_32(x)
 
+
+#if !defined(s6_addr16)
+	#if defined(POCO_OS_FAMILY_WINDOWS)
+		#define s6_addr16 u.Word
+	#else
+		#define s6_addr16 __u6_addr.__u6_addr16
+	#endif
+#endif
+
+
+#if !defined(s6_addr32)
+	#if defined(POCO_OS_FAMILY_UNIX)
+		#if (POCO_OS == POCO_OS_SOLARIS)
+			#define s6_addr32 _S6_un._S6_u32
+		#else
+			#define s6_addr32 __u6_addr.__u6_addr32
+		#endif
+	#endif
+#endif
+
+
 #endif // Net_SocketDefs_INCLUDED

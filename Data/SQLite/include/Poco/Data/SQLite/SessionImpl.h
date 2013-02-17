@@ -41,6 +41,7 @@
 
 
 #include "Poco/Data/SQLite/SQLite.h"
+#include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Binder.h"
 #include "Poco/Data/AbstractSessionImpl.h"
 #include "Poco/SharedPtr.h"
@@ -51,6 +52,9 @@ struct sqlite3_stmt;
 
 
 namespace Poco {
+
+class Mutex;
+
 namespace Data {
 namespace SQLite {
 
@@ -124,17 +128,22 @@ public:
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
-	const std::string& connectorName();
+	void autoCommit(const std::string&, bool val);
+		/// Sets autocommit property for the session.
+
+	bool isAutoCommit(const std::string& name="");
+		/// Returns autocommit property value.
+
+	const std::string& connectorName() const;
 		/// Returns the name of the connector.
 
 private:
-
 	std::string _connector;
 	sqlite3*    _pDB;
 	bool        _connected;
 	bool        _isTransaction;
 	int         _timeout;
-	
+	Mutex       _mutex;
 	static const std::string DEFERRED_BEGIN_TRANSACTION;
 	static const std::string COMMIT_TRANSACTION;
 	static const std::string ABORT_TRANSACTION;
@@ -156,7 +165,7 @@ inline 	bool SessionImpl::isTransaction()
 }
 
 
-inline const std::string& SessionImpl::connectorName()
+inline const std::string& SessionImpl::connectorName() const
 {
 	return _connector;
 }

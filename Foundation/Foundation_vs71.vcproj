@@ -905,6 +905,12 @@
 					RelativePath=".\include\Poco\NumericString.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Optional.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\ObjectPool.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Platform.h">
 				</File>
 				<File
@@ -927,6 +933,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\SingletonHolder.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\SmallObjectAllocator.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\String.h">

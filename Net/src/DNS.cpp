@@ -271,23 +271,4 @@ void DNS::aierror(int code, const std::string& arg)
 }
 
 
-void initializeNetwork()
-{
-#if defined(_WIN32)
-	WORD    version = MAKEWORD(2, 2);
-	WSADATA data;
-	if (WSAStartup(version, &data) != 0)
-		throw NetException("Failed to initialize network subsystem");
-#endif // _WIN32
-}
-		
-
-void uninitializeNetwork()
-{
-#if defined(_WIN32)
-	WSACleanup();
-#endif // _WIN32
-}
-
-
 } } // namespace Poco::Net

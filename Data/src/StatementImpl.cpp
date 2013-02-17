@@ -476,7 +476,8 @@ void StatementImpl::formatSQL(std::vector<Any>& arguments)
 {
 	std::string sql;
 	Poco::format(sql, _ostr.str(), arguments);
-	_ostr.str("");	_ostr << sql;
+	_ostr.str("");
+	_ostr << sql;
 }
 
 

@@ -122,7 +122,7 @@ public:
 	bool isTransaction();
 		/// Returns true iff a transaction is in progress.
 
-	const std::string& connectorName();
+	const std::string& connectorName() const;
 		/// Returns the name of the connector.
 
 	bool canTransact();
@@ -263,7 +263,7 @@ inline bool SessionImpl::isAutoExtract(const std::string& name)
 }
 
 
-inline const std::string& SessionImpl::connectorName()
+inline const std::string& SessionImpl::connectorName() const
 {
 	return _connector;
 }

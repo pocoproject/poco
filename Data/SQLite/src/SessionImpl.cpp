@@ -37,12 +37,12 @@
 #include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteStatementImpl.h"
-#include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Data/Session.h"
 #include "Poco/ActiveMethod.h"
 #include "Poco/ActiveResult.h"
 #include "Poco/String.h"
+#include "Poco/Mutex.h"
 #include "Poco/Data/DataException.h"
 #include "sqlite3.h"
 #include <cstdlib>
@@ -68,6 +68,9 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	open();
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 	setProperty("handle", _pDB);
+	addFeature("autoCommit", 
+		&SessionImpl::autoCommit, 
+		&SessionImpl::isAutoCommit);
 }
 
 
@@ -86,6 +89,7 @@ Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
 
 void SessionImpl::begin()
 {
+	Poco::Mutex::ScopedLock l(_mutex);
 	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(DEFERRED_BEGIN_TRANSACTION);
 	tmp.execute();
@@ -95,6 +99,7 @@ void SessionImpl::begin()
 
 void SessionImpl::commit()
 {
+	Poco::Mutex::ScopedLock l(_mutex);
 	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(COMMIT_TRANSACTION);
 	tmp.execute();
@@ -104,6 +109,7 @@ void SessionImpl::commit()
 
 void SessionImpl::rollback()
 {
+	Poco::Mutex::ScopedLock l(_mutex);
 	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(ABORT_TRANSACTION);
 	tmp.execute();
@@ -231,6 +237,23 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 	int rc = sqlite3_busy_timeout(_pDB, tout);
 	if (rc != 0) Utility::throwException(rc);
 	_timeout = tout;
+}
+
+
+void SessionImpl::autoCommit(const std::string&, bool)
+{
+	// The problem here is to decide whether to call commit or rollback
+	// when autocommit is set to true. Hence, it is best not to implement
+	// this explicit call and only implicitly support autocommit setting.
+	throw NotImplementedException(
+		"SQLite autocommit is implicit with begin/commit/rollback.");
+}
+
+
+bool SessionImpl::isAutoCommit(const std::string&)
+{
+	Poco::Mutex::ScopedLock l(_mutex);
+	return (0 != sqlite3_get_autocommit(_pDB));
 }
 
 

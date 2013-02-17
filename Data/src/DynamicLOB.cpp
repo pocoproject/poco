@@ -53,15 +53,17 @@ using Poco::Data::BLOB;
 template <>
 Var::operator CLOB () const
 {
-	if (!_pHolder)
+	VarHolder* pHolder = content();
+
+	if (!pHolder)
 		throw InvalidAccessException("Can not convert empty value.");
 
-	if (typeid(CLOB) == _pHolder->type())
+	if (typeid(CLOB) == pHolder->type())
 		return extract<CLOB>();
 	else
 	{
 		std::string result;
-		_pHolder->convert(result);
+		pHolder->convert(result);
 		return CLOB(result);
 	}
 }
@@ -70,15 +72,17 @@ Var::operator CLOB () const
 template <>
 Var::operator BLOB () const
 {
-	if (!_pHolder)
+	VarHolder* pHolder = content();
+
+	if (!pHolder)
 		throw InvalidAccessException("Can not convert empty value.");
 
-	if (typeid(BLOB) == _pHolder->type())
+	if (typeid(BLOB) == pHolder->type())
 		return extract<BLOB>();
 	else
 	{
 		std::string result;
-		_pHolder->convert(result);
+		pHolder->convert(result);
 		return BLOB(reinterpret_cast<const unsigned char*>(result.data()),
 			result.size());
 	}

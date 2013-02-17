@@ -279,22 +279,22 @@ public:
 
 	void convert(DateTime& /*val*/) const
 	{
-		throw BadCastException();
+		throw BadCastException("Cannot convert Array to DateTime");
 	}
 
 	void convert(LocalDateTime& /*ldt*/) const
 	{
-		throw BadCastException();
+		throw BadCastException("Cannot convert Array to LocalDateTime");
 	}
 
 	void convert(Timestamp& /*ts*/) const
 	{
-		throw BadCastException();
+		throw BadCastException("Cannot convert Array to Timestamp");
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const JSON::Array::Ptr& value() const

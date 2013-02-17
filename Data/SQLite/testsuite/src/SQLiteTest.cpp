@@ -45,6 +45,7 @@
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Nullable.h"
+#include "Poco/Data/Transaction.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Tuple.h"
@@ -73,6 +74,7 @@ using Poco::Data::LimitException;
 using Poco::Data::CLOB;
 using Poco::Data::Date;
 using Poco::Data::Time;
+using Poco::Data::Transaction;
 using Poco::Data::AbstractExtractionVec;
 using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBindingVec;
@@ -87,15 +89,19 @@ using Poco::Logger;
 using Poco::Message;
 using Poco::AutoPtr;
 using Poco::Thread;
+using Poco::format;
 using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::BadCastException;
 using Poco::NotFoundException;
 using Poco::NullPointerException;
+using Poco::TimeoutException;
+using Poco::NotImplementedException;
 using Poco::Data::SQLite::ConstraintViolationException;
 using Poco::Data::SQLite::ParameterCountMismatchException;
 using Poco::Int32;
 using Poco::Dynamic::Var;
+using Poco::Data::SQLite::Utility;
 
 
 class Person
@@ -249,15 +255,18 @@ private:
 } } // namespace Poco::Data
 
 
+int SQLiteTest::_insertCounter;
+int SQLiteTest::_updateCounter;
+int SQLiteTest::_deleteCounter;
+
+
 SQLiteTest::SQLiteTest(const std::string& name): CppUnit::TestCase(name)
 {
-	Poco::Data::SQLite::Connector::registerConnector();
 }
 
 
 SQLiteTest::~SQLiteTest()
 {
-	Poco::Data::SQLite::Connector::unregisterConnector();
 }
 
 
@@ -358,9 +367,7 @@ void SQLiteTest::testInMemory()
 	
 	// load db from file to memory
 	Session mem (Poco::Data::SQLite::Connector::KEY, ":memory:");
-	sqlite3* p = 0; Any a = p; // ??? clang generated code fails to AnyCast without these
-	sqlite3* pMemHandle = AnyCast<sqlite3*>(mem.getProperty("handle"));
-	assert (Poco::Data::SQLite::Utility::fileToMemory(pMemHandle, "dummy.db"));
+	assert (Poco::Data::SQLite::Utility::fileToMemory(mem, "dummy.db"));
 
 	mem << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 1);
@@ -374,7 +381,7 @@ void SQLiteTest::testInMemory()
 	
 	// save db from memory to file on the disk
 	Session dsk (Poco::Data::SQLite::Connector::KEY, "dsk.db");
-	assert (Poco::Data::SQLite::Utility::memoryToFile("dsk.db", pMemHandle));
+	assert (Poco::Data::SQLite::Utility::memoryToFile("dsk.db", mem));
 
 	dsk << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 1);
@@ -2657,6 +2664,551 @@ void SQLiteTest::testThreadModes()
 }
 
 
+void SQLiteTest::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, Poco::Int64 row)
+{
+	poco_check_ptr(pVal);
+	Poco::Int64* pV = reinterpret_cast<Poco::Int64*>(pVal);
+	if (opCode == Utility::OPERATION_INSERT)
+	{
+		poco_assert (*pV == 2);
+		poco_assert (row == 1);
+		std::cout << "Inserted " << pDB << '.' << pTable << ", RowID=" << row << std::endl;
+		++_insertCounter;
+	}
+	else if (opCode == Utility::OPERATION_UPDATE)
+	{
+		poco_assert (*pV == 3);
+		poco_assert (row == 1);
+		std::cout << "Updated " << pDB << '.' << pTable << ", RowID=" << row << std::endl;
+		++_updateCounter;
+	}
+	else if (opCode == Utility::OPERATION_DELETE)
+	{
+		poco_assert (*pV == 4);
+		poco_assert (row == 1);
+		std::cout << "Deleted " << pDB << '.' << pTable << ", RowID=" << row << std::endl;
+		++_deleteCounter;
+	}
+}
+
+
+void SQLiteTest::testUpdateCallback()
+{
+	// will be updated by callback
+	_insertCounter = 0;
+	_updateCounter = 0;
+	_deleteCounter = 0;
+
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (tmp.isConnected());
+	Poco::Int64 val = 1;
+	assert (Utility::registerUpdateHandler(tmp, &sqliteUpdateCallbackFn, &val));
+
+	std::string tableName("Person");
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	int age = 133132;
+	int count = 0;
+	std::string result;
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "SELECT name FROM sqlite_master WHERE tbl_name=?", use(tableName), into(result), now;
+	assert (result == tableName);
+
+	// insert
+	val = 2;
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 1);
+	assert (_insertCounter == 1);
+	tmp << "SELECT LastName FROM PERSON", into(result), now;
+	assert (lastName == result);
+	tmp << "SELECT Age FROM PERSON", into(count), now;
+	assert (count == age);
+	
+	// update
+	val = 3;
+	tmp << "UPDATE PERSON SET Age = -1", now;
+	tmp << "SELECT Age FROM PERSON", into(age), now;
+	assert (-1 == age);
+	assert (_updateCounter == 1);
+	
+	// delete
+	val =4;
+	tmp << "DELETE FROM Person WHERE Age = -1", now;
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 0);
+	assert (_deleteCounter == 1);
+
+	// disarm callback and do the same drill
+	assert (Utility::registerUpdateHandler(tmp, (Utility::UpdateCallbackType) 0, &val));
+	
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "SELECT name FROM sqlite_master WHERE tbl_name=?", use(tableName), into(result), now;
+	assert (result == tableName);
+
+	// must remain zero now
+	_insertCounter = 0;
+	_updateCounter = 0;
+	_deleteCounter = 0;
+
+	// insert
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 1);
+	assert (_insertCounter == 0);
+	tmp << "SELECT LastName FROM PERSON", into(result), now;
+	assert (lastName == result);
+	tmp << "SELECT Age FROM PERSON", into(count), now;
+	assert (count == age);
+	
+	// update
+	tmp << "UPDATE PERSON SET Age = -1", now;
+	tmp << "SELECT Age FROM PERSON", into(age), now;
+	assert (-1 == age);
+	assert (_updateCounter == 0);
+	
+	// delete
+	tmp << "DELETE FROM Person WHERE Age = -1", now;
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 0);
+	assert (_deleteCounter == 0);
+
+	tmp.close();
+	assert (!tmp.isConnected());
+}
+
+
+int SQLiteTest::sqliteCommitCallbackFn(void* pVal)
+{
+	poco_check_ptr(pVal);
+	Poco::Int64* pV = reinterpret_cast<Poco::Int64*>(pVal);
+	poco_assert ((*pV) == 1);
+	++(*pV);
+	return 0;
+}
+
+
+void SQLiteTest::testCommitCallback()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (tmp.isConnected());
+	Poco::Int64 val = 1;
+	assert (Utility::registerUpdateHandler(tmp, &sqliteCommitCallbackFn, &val));
+
+	std::string tableName("Person");
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	int age = 133132;
+	std::string result;
+	tmp.begin();
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
+	tmp.commit();
+	assert (val == 2);
+
+	assert (Utility::registerUpdateHandler(tmp, (Utility::CommitCallbackType) 0, &val));
+	val = 0;
+	tmp.begin();
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
+	tmp.commit();
+	assert (val == 0);
+
+}
+
+
+void SQLiteTest::sqliteRollbackCallbackFn(void* pVal)
+{
+	poco_check_ptr(pVal);
+	Poco::Int64* pV = reinterpret_cast<Poco::Int64*>(pVal);
+	poco_assert ((*pV) == 1);
+	++(*pV);
+}
+
+
+void SQLiteTest::testRollbackCallback()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (tmp.isConnected());
+	Poco::Int64 val = 1;
+	assert (Utility::registerUpdateHandler(tmp, &sqliteRollbackCallbackFn, &val));
+
+	std::string tableName("Person");
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	int age = 133132;
+	std::string result;
+	tmp.begin();
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
+	tmp.rollback();
+	assert (val == 2);
+
+	assert (Utility::registerUpdateHandler(tmp, (Utility::RollbackCallbackType) 0, &val));
+	val = 0;
+	tmp.begin();
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
+	tmp.rollback();
+	assert (val == 0);
+}
+
+
+void SQLiteTest::setTransactionIsolation(Session& session, Poco::UInt32 ti)
+{
+	if (session.hasTransactionIsolation(ti))
+	{
+		std::string funct = "setTransactionIsolation()";
+
+		try 
+		{
+			Transaction t(session, false);
+			t.setIsolation(ti);
+			
+			assert (ti == t.getIsolation());
+			assert (t.isIsolation(ti));
+			
+			assert (ti == session.getTransactionIsolation());
+			assert (session.isTransactionIsolation(ti));
+		}
+		catch(Poco::Exception& e){ std::cout << funct << ':' << e.displayText() << std::endl;}
+	}
+	else
+	{
+		std::cerr << '[' << name() << ']' << " Warning, transaction isolation not supported: ";
+		switch (ti)
+		{
+		case Session::TRANSACTION_READ_COMMITTED:
+			std::cerr << "READ COMMITTED"; break;
+		case Session::TRANSACTION_READ_UNCOMMITTED:
+			std::cerr << "READ UNCOMMITTED"; break;
+		case Session::TRANSACTION_REPEATABLE_READ:
+			std::cerr << "REPEATABLE READ"; break;
+		case Session::TRANSACTION_SERIALIZABLE:
+			std::cerr << "SERIALIZABLE"; break;
+		default:
+			std::cerr << "UNKNOWN"; break;
+		}
+		std::cerr << std::endl;
+	}
+}
+
+
+void SQLiteTest::testSessionTransaction()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (session.isConnected());
+
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	if (!session.canTransact())
+	{
+		std::cout << "Session not capable of transactions." << std::endl;
+		return;
+	}
+
+	Session local (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (local.isConnected());
+	
+	try
+	{
+		local.setFeature("autoCommit", true);
+		fail ("Setting SQLite auto-commit explicitly must fail!");
+	}
+	catch (NotImplementedException&) { }
+	assert (local.getFeature("autoCommit"));
+
+	std::string funct = "transaction()";
+	std::vector<std::string> lastNames;
+	std::vector<std::string> firstNames;
+	std::vector<std::string> addresses;
+	std::vector<int> ages;
+	std::string tableName("Person");
+	lastNames.push_back("LN1");
+	lastNames.push_back("LN2");
+	firstNames.push_back("FN1");
+	firstNames.push_back("FN2");
+	addresses.push_back("ADDR1");
+	addresses.push_back("ADDR2");
+	ages.push_back(1);
+	ages.push_back(2);
+	int count = 0, locCount = 0;
+	std::string result;
+
+	setTransactionIsolation(session, Session::TRANSACTION_READ_COMMITTED);
+
+	session.begin();
+	assert (!session.getFeature("autoCommit"));
+	assert (session.isTransaction());
+	session << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
+	assert (session.isTransaction());
+
+	Statement stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
+
+	session << "SELECT COUNT(*) FROM Person", into(count), now;
+	assert (2 == count);
+	assert (session.isTransaction());
+	session.rollback();
+	assert (!session.isTransaction());
+	assert (session.getFeature("autoCommit"));
+
+	stmt.wait();
+	assert (0 == locCount);
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (0 == count);
+	assert (!session.isTransaction());
+
+	session.begin();
+	session << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
+	assert (session.isTransaction());
+	assert (!session.getFeature("autoCommit"));
+
+	Statement stmt1 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
+	assert (0 == locCount);
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (2 == count);
+
+	session.commit();
+	assert (!session.isTransaction());
+	assert (session.getFeature("autoCommit"));
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (2 == count);
+
+	/* TODO: see http://www.sqlite.org/pragma.html#pragma_read_uncommitted
+	setTransactionIsolation(session, Session::TRANSACTION_READ_UNCOMMITTED);
+	*/
+
+	session.close();
+	assert (!session.isConnected());
+	
+	local.close();
+	assert (!local.isConnected());
+}
+
+
+void SQLiteTest::testTransaction()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (session.isConnected());
+
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	if (!session.canTransact())
+	{
+		std::cout << "Session not transaction-capable." << std::endl;
+		return;
+	}
+
+	Session local(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+
+	setTransactionIsolation(session, Session::TRANSACTION_READ_COMMITTED);
+
+	std::string funct = "transaction()";
+	std::vector<std::string> lastNames;
+	std::vector<std::string> firstNames;
+	std::vector<std::string> addresses;
+	std::vector<int> ages;
+	std::string tableName("Person");
+	lastNames.push_back("LN1");
+	lastNames.push_back("LN2");
+	firstNames.push_back("FN1");
+	firstNames.push_back("FN2");
+	addresses.push_back("ADDR1");
+	addresses.push_back("ADDR2");
+	ages.push_back(1);
+	ages.push_back(2);
+	int count = 0, locCount = 0;
+	std::string result;
+
+	session.setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
+
+	{
+		Transaction trans(session);
+		assert (trans.isActive());
+		assert (session.isTransaction());
+		
+		session << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
+		
+		assert (session.isTransaction());
+		assert (trans.isActive());
+
+		session << "SELECT COUNT(*) FROM Person", into(count), now;
+		assert (2 == count);
+		assert (session.isTransaction());
+		assert (trans.isActive());
+		// no explicit commit, so transaction RAII must roll back here
+	}
+	assert (!session.isTransaction());
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (0 == count);
+	assert (!session.isTransaction());
+
+	{
+		Transaction trans(session);
+		session << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now;
+
+		Statement stmt1 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
+
+		assert (session.isTransaction());
+		assert (trans.isActive());
+		trans.commit();
+		assert (!session.isTransaction());
+		assert (!trans.isActive());
+		assert (0 == locCount);
+	}
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (2 == count);
+	local << "SELECT count(*) FROM Person", into(count), now;
+	assert (2 == count);
+
+	session << "DELETE FROM Person", now;
+
+	std::string sql1 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[0], firstNames[0], addresses[0], ages[0]);
+	std::string sql2 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[1], firstNames[1], addresses[1], ages[1]);
+	std::vector<std::string> sql;
+	sql.push_back(sql1);
+	sql.push_back(sql2);
+
+	Transaction trans(session);
+
+	trans.execute(sql1, false);
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (1 == count);
+	trans.execute(sql2, false);
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (2 == count);
+
+	Statement stmt2 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
+	assert (0 == locCount);
+
+	trans.rollback();
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (0 == count);
+
+	trans.execute(sql);
+	
+	Statement stmt3 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
+	assert (2 == locCount);
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (2 == count);
+
+	session.close();
+	assert (!session.isConnected());
+	
+	local.close();
+	assert (!local.isConnected());
+}
+
+
+struct TestCommitTransactor
+{
+	void operator () (Session& session) const
+	{
+		session << "INSERT INTO Person VALUES ('lastName','firstName','address',10)", now;
+	}
+};
+
+
+struct TestRollbackTransactor
+{
+	void operator () (Session& session) const
+	{
+		session << "INSERT INTO Person VALUES ('lastName','firstName','address',10)", now;
+		throw Poco::Exception("test");
+	}
+};
+
+
+void SQLiteTest::testTransactor()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (session.isConnected());
+
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	std::string funct = "transaction()";
+	int count = 0;
+
+	assert (session.getFeature("autoCommit"));
+	session.setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
+
+	TestCommitTransactor ct;
+	Transaction t1(session, ct);
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (1 == count);
+
+	session << "DELETE FROM Person", now;
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (0 == count);
+
+	try
+	{
+		TestRollbackTransactor rt;
+		Transaction t(session, rt);
+		fail ("must fail");
+	} catch (Poco::Exception&) { }
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (0 == count);
+
+	try
+	{
+		TestRollbackTransactor rt;
+		Transaction t(session);
+		t.transact(rt);
+		fail ("must fail");
+	} catch (Poco::Exception&) { }
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (0 == count);
+
+	try
+	{
+		TestRollbackTransactor rt;
+		Transaction t(session, false);
+		t.transact(rt);
+		fail ("must fail");
+	} catch (Poco::Exception&) { }
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (0 == count);
+
+	try
+	{
+		TestRollbackTransactor rt;
+		Transaction t(session, true);
+		t.transact(rt);
+		fail ("must fail");
+	} catch (Poco::Exception&) { }
+
+	session << "SELECT count(*) FROM Person", into(count), now;
+	assert (0 == count);
+
+	session.close();
+	assert (!session.isConnected());
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -2749,6 +3301,12 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testReconnect);
 	CppUnit_addTest(pSuite, SQLiteTest, testSystemTable);
 	CppUnit_addTest(pSuite, SQLiteTest, testThreadModes);
+	CppUnit_addTest(pSuite, SQLiteTest, testUpdateCallback);
+	CppUnit_addTest(pSuite, SQLiteTest, testCommitCallback);
+	CppUnit_addTest(pSuite, SQLiteTest, testRollbackCallback);
+	CppUnit_addTest(pSuite, SQLiteTest, testSessionTransaction);
+	CppUnit_addTest(pSuite, SQLiteTest, testTransaction);
+	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);
 
 	return pSuite;
 }

@@ -145,7 +145,7 @@ bool SessionImpl::isTransactionIsolation(Poco::UInt32)
 }
 
 
-const std::string& SessionImpl::connectorName()
+const std::string& SessionImpl::connectorName() const
 {
 	return Connector::KEY;
 }

@@ -42,6 +42,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketDefs.h"
+#include "Poco/Net/IPAddressImpl.h"
 #include <vector>
 
 
@@ -51,9 +52,6 @@ class BinaryReader;
 class BinaryWriter;
 
 namespace Net {
-
-
-class IPAddressImpl;
 
 
 class Net_API IPAddress
@@ -80,9 +78,9 @@ public:
 	enum Family
 		/// Possible address families for IP addresses.
 	{
-		IPv4
+		IPv4 = Poco::Net::Impl::IPAddressImpl::IPv4
 #ifdef POCO_HAVE_IPv6
-		,IPv6
+		,IPv6 = Poco::Net::Impl::IPAddressImpl::IPv6
 #endif
 	};
 	
@@ -143,7 +141,7 @@ public:
 	IPAddress& operator = (const IPAddress& addr);
 		/// Assigns an IPAddress.
 		
-	void swap(IPAddress& address);
+	//void swap(IPAddress& address);
 		/// Swaps the IPAddress with another one.
 		
 	Family family() const;
@@ -387,25 +385,28 @@ public:
 			/// Maximum length in bytes of a socket address.
 	};
 
-protected:
-	void init(IPAddressImpl* pImpl);
-
 private:
-	IPAddressImpl* _pImpl;
+	typedef Poco::Net::Impl::IPAddressImpl Impl;
+	typedef Impl* Ptr;
+
+	Ptr pImpl() const;
+
+	char _memory[sizeof(Poco::Net::Impl::IPv6AddressImpl)];
+	
+	friend class Poco::Net::Impl::IPv4AddressImpl;
+	friend class Poco::Net::Impl::IPv6AddressImpl;
 };
 
 
-//
-// inlines
-//
-inline void swap(IPAddress& addr1, IPAddress& addr2)
+inline IPAddress::Ptr IPAddress::pImpl() const
 {
-	addr1.swap(addr2);
+	return reinterpret_cast<Ptr>(const_cast<char *>(_memory));
 }
 
 
 BinaryWriter& operator << (BinaryWriter& writer, const IPAddress& value);
 BinaryReader& operator >> (BinaryReader& reader, IPAddress& value);
+
 
 } } // namespace Poco::Net
 

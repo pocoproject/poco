@@ -37,9 +37,6 @@
 #include "Poco/Net/Net.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
-
-
 #include "Poco/Net/SocketDefs.h"
 #include "Poco/Net/NetException.h"
 
@@ -50,68 +47,45 @@ namespace Net {
 
 void Net_API initializeNetwork()
 {
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	WORD    version = MAKEWORD(2, 2);
 	WSADATA data;
 	if (WSAStartup(version, &data) != 0)
 		throw NetException("Failed to initialize network subsystem");
+#endif
 }
 
 
 void Net_API uninitializeNetwork()
 {
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	WSACleanup();
+#endif
 }
 
 
 } } // namespace Poco::Net
 
 
-#if !defined(POCO_NET_NO_WINDOWS_INIT)
-	#if defined (POCO_DLL)
-		BOOL APIENTRY DllMain(HANDLE, DWORD reasonForCall, LPVOID)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
+
+	struct NetworkInitializer
+		/// Network initializer for windows statically
+		/// linked library.
+	{
+		NetworkInitializer()
+			/// Calls Poco::Net::initializeNetwork();
 		{
-			switch(reasonForCall)
-			{
-			case DLL_PROCESS_ATTACH:
-				Poco::Net::initializeNetwork();
-				break;
-			case DLL_PROCESS_DETACH:
-				Poco::Net::uninitializeNetwork();
-			}
-			return TRUE;
+			Poco::Net::initializeNetwork();
 		}
-	#else // POCO_STATIC
-		struct NetworkInitializer
-			/// Network initializer for windows statically
-			/// linked library.
+
+		~NetworkInitializer()
+			/// Calls Poco::Net::uninitializeNetwork();
 		{
-			NetworkInitializer()
-				/// Calls Poco::Net::initializeNetwork();
-			{
-				Poco::Net::initializeNetwork();
-			}
+			Poco::Net::uninitializeNetwork();
+		}
+	};
 
-			~NetworkInitializer()
-				/// Calls Poco::Net::uninitializeNetwork();
-			{
-				Poco::Net::uninitializeNetwork();
-			}
-		};
+	const NetworkInitializer pocoNetworkInitializer;
 
-		const NetworkInitializer pocoNetworkInitializer;
-	#endif // POCO_DLL/POCO_STATIC
-
-#endif // POCO_NET_NO_WINDOWS_INIT
-
-
-#else // POCO_OS_FAMILY_WINDOWS
-
-void Net_API initializeNetwork()
-{
-}
-
-void Net_API uninitializeNetwork()
-{
-}
-
-#endif // POCO_OS_FAMILY_WINDOWS
+#endif

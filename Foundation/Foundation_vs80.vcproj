@@ -1208,6 +1208,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\ObjectPool.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Optional.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Platform.h"
 					>
 				</File>
@@ -1237,6 +1245,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\SingletonHolder.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\SmallObjectAllocator.h"
 					>
 				</File>
 				<File

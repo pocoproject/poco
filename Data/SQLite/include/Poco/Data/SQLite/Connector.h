@@ -44,6 +44,12 @@
 #include "Poco/Data/Connector.h"
 
 
+// Note: to avoid static (de)initialization problems,
+// during connector automatic (un)registration, it is 
+// best to have this as a macro.
+#define POCO_DATA_SQLITE_CONNECTOR_NAME "sqlite"
+
+
 namespace Poco {
 namespace Data {
 namespace SQLite {
@@ -91,11 +97,62 @@ public:
 ///
 inline const std::string& Connector::name() const
 {
-	return KEY;
+	static const std::string n(POCO_DATA_SQLITE_CONNECTOR_NAME);
+	return n;
 }
 
 
 } } } // namespace Poco::Data::SQLite
 
+
+// 
+// Automatic Connector registration
+// 
+
+struct SQLite_API SQLiteConnectorRegistrator
+	/// Connector registering class.
+	/// A global instance of this class is instantiated
+	/// with sole purpose to automatically register the 
+	/// SQLite connector with central Poco Data registry.
+{
+	SQLiteConnectorRegistrator()
+		/// Calls Poco::Data::SQLite::registerConnector();
+	{
+		Poco::Data::SQLite::Connector::registerConnector();
+	}
+
+	~SQLiteConnectorRegistrator()
+		/// Calls Poco::Data::SQLite::unregisterConnector();
+	{
+		Poco::Data::SQLite::Connector::unregisterConnector();
+	}
+};
+
+
+#if !defined(POCO_NO_AUTOMATIC_LIB_INIT)
+	#if defined(POCO_OS_FAMILY_WINDOWS)
+		extern "C" const struct SQLite_API SQLiteConnectorRegistrator pocoSQLiteConnectorRegistrator;
+		#if defined(SQLite_EXPORTS)
+			#if defined(_WIN64)
+				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
+			#elif defined(_WIN32)
+				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
+			#endif
+		#else  // !SQLite_EXPORTS
+			#if defined(_WIN64)
+				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
+			#elif defined(_WIN32)
+				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
+			#endif
+		#endif // SQLite_EXPORTS
+	#else // !POCO_OS_FAMILY_WINDOWS
+			#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) extern "C" const struct SQLiteConnectorRegistrator s;
+	#endif // POCO_OS_FAMILY_WINDOWS
+	POCO_DATA_SQLITE_FORCE_SYMBOL(pocoSQLiteConnectorRegistrator)
+#endif // POCO_NO_AUTOMATIC_LIB_INIT
+
+// 
+// End automatic Connector registration
+// 
 
 #endif // Data_SQLite_Connector_INCLUDED

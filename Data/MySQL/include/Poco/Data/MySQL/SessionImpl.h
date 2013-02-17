@@ -141,7 +141,7 @@ public:
 	SessionHandle& handle();
 		// Get handle
 
-	const std::string& connectorName();
+	const std::string& connectorName() const;
 		/// Returns the name of the connector.
 
 private:
@@ -208,7 +208,7 @@ inline SessionHandle& SessionImpl::handle()
 }
 
 
-inline const std::string& SessionImpl::connectorName()
+inline const std::string& SessionImpl::connectorName() const
 {
 	return _connector;
 }

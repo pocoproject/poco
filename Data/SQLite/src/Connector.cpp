@@ -44,12 +44,15 @@
 #endif
 
 
+const SQLiteConnectorRegistrator pocoSQLiteConnectorRegistrator;
+
+
 namespace Poco {
 namespace Data {
 namespace SQLite {
 
 
-const std::string Connector::KEY("sqlite");
+const std::string Connector::KEY(POCO_DATA_SQLITE_CONNECTOR_NAME);
 
 
 Connector::Connector()
@@ -77,7 +80,7 @@ void Connector::registerConnector()
 
 void Connector::unregisterConnector()
 {
-	Poco::Data::SessionFactory::instance().remove(KEY);
+	Poco::Data::SessionFactory::instance().remove(POCO_DATA_SQLITE_CONNECTOR_NAME);
 }
 
 

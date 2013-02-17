@@ -272,9 +272,9 @@ public:
 		val.assign(_val.begin(), _val.end());
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const Poco::Data::BLOB& value() const
@@ -310,9 +310,9 @@ public:
 		val.assign(_val.begin(), _val.end());
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const Poco::Data::CLOB& value() const

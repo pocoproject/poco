@@ -38,8 +38,10 @@
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Exception.h"
-
 #include <mysql.h>
+
+
+const MySQLConnectorRegistrator pocoMySQLConnectorRegistrator;
 
 
 namespace Poco {
@@ -47,7 +49,7 @@ namespace Data {
 namespace MySQL {
 
 
-std::string Connector::KEY("mysql");
+std::string Connector::KEY(POCO_DATA_MYSQL_CONNECTOR_NAME);
 
 
 Connector::Connector()
@@ -61,7 +63,8 @@ Connector::~Connector()
 
 const std::string& Connector::name() const
 {
-	return KEY;
+	static const std::string n(POCO_DATA_MYSQL_CONNECTOR_NAME);
+	return n;
 }
 
 Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::string& connectionString,
@@ -84,7 +87,7 @@ void Connector::registerConnector()
 
 void Connector::unregisterConnector()
 {
-	Poco::Data::SessionFactory::instance().remove(KEY);
+	Poco::Data::SessionFactory::instance().remove(POCO_DATA_MYSQL_CONNECTOR_NAME);
 	mysql_library_end();
 }
 

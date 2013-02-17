@@ -229,9 +229,9 @@ public:
 		val = DateTimeFormatter::format(dt, "%H:%M:%S");
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const Poco::Data::Time& value() const

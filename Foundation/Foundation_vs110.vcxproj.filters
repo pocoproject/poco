@@ -1037,6 +1037,9 @@
     <ClInclude Include="include\Poco\SingletonHolder.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\SmallObjectAllocator.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\String.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
@@ -1848,6 +1851,9 @@
       <Filter>Text\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\ObjectPool.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Optional.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

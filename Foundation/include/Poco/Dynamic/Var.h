@@ -53,6 +53,7 @@ namespace Dynamic {
 template <typename T>
 class Struct;
 
+
 class Foundation_API Var
 	/// Var allows to store data of different types and to convert between these types transparently.
 	/// Var puts forth the best effort to provide intuitive and reasonable conversion semantics and prevent 
@@ -88,7 +89,7 @@ class Foundation_API Var
 	/// 	  '+', '+=', '-', '-=', '*', '*=' , '/' and '/=' 
 	///
 	/// 	- for integral values, following operations are supported:
-	///		  prefix and postfix increment (++) and decement (--)
+	///		  prefix and postfix increment (++) and decrement (--)
 	/// 
 	/// 	- for all other types, InvalidArgumentException is thrown upon attempt of an arithmetic operation
 	/// 
@@ -100,11 +101,15 @@ public:
 		/// Creates an empty Var.
 
 	template <typename T> 
-	Var(const T& val):
-		_pHolder(new VarHolderImpl<T>(val))
+	Var(const T& val)
 		/// Creates the Var from the given value.
+#ifdef POCO_NO_SOO
+		:_pHolder(new VarHolderImpl<T>(val)) { }
+#else
 	{
+		construct(val);
 	}
+#endif
 
 	Var(const char* pVal);
 		// Convenience constructor for const char* which gets mapped to a std::string internally, i.e. pVal is deep-copied.
@@ -133,10 +138,12 @@ public:
 		/// not available for the given type.
 		/// Throws InvalidAccessException if Var is empty.
 	{
-		if (!_pHolder)
+		VarHolder* pHolder = content();
+
+		if (!pHolder)
 			throw InvalidAccessException("Can not convert empty value.");
 
-		_pHolder->convert(val);
+		pHolder->convert(val);
 	}
 	
 	template <typename T> 
@@ -153,13 +160,15 @@ public:
 		/// not available for the given type.
 		/// Throws InvalidAccessException if Var is empty.
 	{
-		if (!_pHolder)
+		VarHolder* pHolder = content();
+
+		if (!pHolder)
 			throw InvalidAccessException("Can not convert empty value.");
 
-		if (typeid(T) == _pHolder->type()) return extract<T>();
+		if (typeid(T) == pHolder->type()) return extract<T>();
 
 		T result;
-		_pHolder->convert(result);
+		pHolder->convert(result);
 		return result;
 	}
 	
@@ -177,15 +186,17 @@ public:
 		/// not available for the given type.
 		/// Throws InvalidAccessException if Var is empty.
 	{
-		if (!_pHolder)
+		VarHolder* pHolder = content();
+
+		if (!pHolder)
 				throw InvalidAccessException("Can not convert empty value.");
 
-		if (typeid(T) == _pHolder->type())
+		if (typeid(T) == pHolder->type())
 			return extract<T>();
 		else
 		{
 			T result;
-			_pHolder->convert(result);
+			pHolder->convert(result);
 			return result;
 		}
 	}
@@ -199,16 +210,18 @@ public:
 		/// is thrown.
 		/// Throws InvalidAccessException if Var is empty.
 	{
-		if (_pHolder && _pHolder->type() == typeid(T))
+		VarHolder* pHolder = content();
+
+		if (pHolder && pHolder->type() == typeid(T))
 		{
-			VarHolderImpl<T>* pHolderImpl = static_cast<VarHolderImpl<T>*>(_pHolder);
+			VarHolderImpl<T>* pHolderImpl = static_cast<VarHolderImpl<T>*>(pHolder);
 			return pHolderImpl->value();
 		}
-		else if (!_pHolder)
+		else if (!pHolder)
 			throw InvalidAccessException("Can not extract empty value.");
 		else
 			throw BadCastException(format("Can not convert %s to %s.",
-				_pHolder->type().name(),
+				pHolder->type().name(),
 				typeid(T).name()));
 	}
 
@@ -216,8 +229,12 @@ public:
 	Var& operator = (const T& other)
 		/// Assignment operator for assigning POD to Var
 	{
+#ifdef POCO_NO_SOO
 		Var tmp(other);
 		swap(tmp);
+#else
+		construct(other);
+#endif
 		return *this;
 	}
 
@@ -536,9 +553,11 @@ private:
 	template <typename T, typename E>
 	VarHolderImpl<T>* holderImpl(const std::string errorMessage = "") const
 	{
-		if (_pHolder && _pHolder->type() == typeid(T))
-			return static_cast<VarHolderImpl<T>*>(_pHolder);
-		else if (!_pHolder)
+		VarHolder* pHolder = content();
+
+		if (pHolder && pHolder->type() == typeid(T))
+			return static_cast<VarHolderImpl<T>*>(pHolder);
+		else if (!pHolder)
 			throw InvalidAccessException("Can not access empty value.");
 		else
 			throw E(errorMessage);
@@ -546,7 +565,64 @@ private:
 
 	Var& structIndexOperator(VarHolderImpl<Struct<int> >* pStr, int n) const;
 
+#ifdef POCO_NO_SOO
+
+	VarHolder* content() const
+	{
+		return _pHolder;
+	}
+
 	VarHolder* _pHolder;
+
+#else
+
+	VarHolder* content() const
+	{
+		return _placeholder.content();
+	}
+
+	template<typename ValueType>
+	void construct(const ValueType& value)
+	{
+		if (sizeof(VarHolderImpl<ValueType>) <= Placeholder<ValueType>::Size::value)
+		{
+			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<ValueType>(value);
+			_placeholder.setLocal(true);
+		}
+		else
+		{
+			_placeholder.pHolder = new VarHolderImpl<ValueType>(value);
+			_placeholder.setLocal(false);
+		}
+	}
+
+	void construct(const char* value)
+	{
+		std::string val(value);
+		if (sizeof(VarHolderImpl<std::string>) <= Placeholder<std::string>::Size::value)
+		{
+			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<std::string>(val);
+			_placeholder.setLocal(true);
+		}
+		else
+		{
+			_placeholder.pHolder = new VarHolderImpl<std::string>(val);
+			_placeholder.setLocal(false);
+		}
+	}
+
+	void construct(const Var& other)
+	{
+		if(!other.isEmpty())
+			other.content()->clone(&_placeholder);
+		else
+			_placeholder.erase();
+	}
+
+	Placeholder<VarHolder> _placeholder;
+
+#endif // POCO_NO_SOO
+
 };
 
 
@@ -559,15 +635,36 @@ private:
 /// Var members
 ///
 
-inline void Var::swap(Var& ptr)
+inline void Var::swap(Var& other)
 {
-	std::swap(_pHolder, ptr._pHolder);
+#ifdef POCO_NO_SOO
+
+	std::swap(_pHolder, other._pHolder);
+
+#else
+
+	if (this == &other) return;
+
+	if (!_placeholder.isLocal() && !other._placeholder.isLocal())
+	{
+		std::swap(_placeholder.pHolder, other._placeholder.pHolder);
+	}
+	else
+	{
+		Var tmp(*this);
+		if (_placeholder.isLocal()) this->~Var();
+		construct(other);
+		other = tmp;
+	}
+
+#endif
 }
 
 
 inline const std::type_info& Var::type() const
 {
-	return _pHolder ? _pHolder->type() : typeid(void);
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->type() : typeid(void);
 }
 
 
@@ -603,49 +700,56 @@ inline bool Var::operator ! () const
 
 inline bool Var::isEmpty() const
 {
-	return 0 == _pHolder;
+	return 0 == content();
 }
 
 
 inline bool Var::isArray() const
 {
-	return _pHolder ? _pHolder->isArray() : false;
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isArray() : false;
 }
 
 
 inline bool Var::isStruct() const
 {
-	return _pHolder ? _pHolder->isStruct() : false;
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isStruct() : false;
 }
 
 
 inline bool Var::isInteger() const
 {
-	return _pHolder ? _pHolder->isInteger() : false;
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isInteger() : false;
 }
 
 
 inline bool Var::isSigned() const
 {
-	return _pHolder ? _pHolder->isSigned() : false;
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isSigned() : false;
 }
 
 
 inline bool Var::isNumeric() const
 {
-	return _pHolder ? _pHolder->isNumeric() : false;
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isNumeric() : false;
 }
 
 
 inline bool Var::isString() const
 {
-	return _pHolder ? _pHolder->isString() : false;
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isString() : false;
 }
 
 
 ///
 /// Var non-member functions
 ///
+
 inline const Var operator + (const char* other, const Var& da)
 	/// Addition operator for adding Var to const char*
 {

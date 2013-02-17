@@ -5,7 +5,7 @@
 //
 // Library: Foundation
 // Package: Core
-// Module:  Any
+// Module:	Any
 //
 // Copyright Kevlin Henney, 2000, 2001, 2002. All rights reserved.
 // Extracted from Boost 1.33.1 lib and adapted for poco: Peter Schojer/AppliedInformatics 2006-02-02
@@ -39,11 +39,79 @@
 
 
 #include "Poco/Exception.h"
+#include "Poco/MetaProgramming.h"
 #include <algorithm>
 #include <typeinfo>
+#include <cstring>
 
 
 namespace Poco {
+
+
+namespace Dynamic {
+
+class Var;
+class VarHolder;
+template <class> class VarHolderImpl;
+
+}
+
+
+template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
+union Placeholder
+	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
+	/// object optimization).
+	/// 
+	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage, 
+	/// it will be placement-new-allocated into the local buffer
+	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
+	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
+	/// where the object was allocated (0 => heap, 1 => local).
+{
+public:
+
+	struct Size
+	{
+		static const unsigned int value = SizeV;
+	};
+
+	Placeholder ()
+	{
+		erase();
+	}
+
+	void erase()
+	{
+		std::memset(holder, 0, sizeof(Placeholder));
+	}
+
+	bool isLocal() const
+	{
+		return holder[SizeV] != 0;
+	}
+
+	void setLocal(bool local) const
+	{
+		holder[SizeV] = local ? 1 : 0;
+	}
+
+	PlaceholderT* content() const
+	{
+		if(isLocal())
+			return reinterpret_cast<PlaceholderT*>(holder);
+		else
+			return pHolder;
+	}
+
+private:
+	PlaceholderT*         pHolder;
+	mutable unsigned char holder[SizeV + 1];
+
+	friend class Any;
+	friend class Dynamic::Var;
+	friend class Dynamic::VarHolder;
+	template <class> friend class Dynamic::VarHolderImpl;
+};
 
 
 class Any
@@ -52,17 +120,202 @@ class Any
 	///
 	/// Code taken from the Boost 1.33.1 library. Original copyright by Kevlin Henney. Modified for Poco
 	/// by Applied Informatics.
+	///
+	/// Modified for small object optimization support (optionally supported through conditional compilation)
+	/// by Alex Fabijanic.
 {
 public:
-	Any():
-		_content(0)
+
+#ifndef POCO_NO_SOO
+
+	Any()
+		/// Creates an empty any type.
+	{
+	}
+
+	template<typename ValueType>
+	Any(const ValueType & value)
+		/// Creates an any which stores the init parameter inside.
+		///
+		/// Example: 
+		///   Any a(13); 
+		///   Any a(string("12345"));
+	{
+		construct(value);
+	}
+
+	Any(const Any& other)
+		/// Copy constructor, works with both empty and initialized Any values.
+	{
+		if ((this != &other) && !other.empty())
+			construct(other);
+	}
+
+	~Any()
+		/// Destructor. If Any is locally held, calls ValueHolder destructor;
+		/// otherwise, deletes the placeholder from the heap.
+	{
+		if(!empty())
+		{
+			if(_valueHolder.isLocal())
+				content()->~ValueHolder();
+			else
+				delete content();
+		}
+	}
+
+	Any& swap(Any& other)
+		/// Swaps the content of the two Anys.
+		/// 
+		/// When small object optimizaton is enabled,
+		/// swap is only exception-safe when both (*this and
+		/// other) objects are allocated on the heap.
+	{
+		if (this == &other) return *this;
+
+		if (!_valueHolder.isLocal() && !other._valueHolder.isLocal())
+		{
+			std::swap(_valueHolder.pHolder, other._valueHolder.pHolder);
+		}
+		else
+		{
+			Any tmp(*this);
+			if (_valueHolder.isLocal()) this->~Any();
+			construct(other);
+			other = tmp;
+		}
+
+		return *this;
+	}
+
+	template<typename ValueType>
+	Any & operator = (const ValueType& rhs)
+		/// Assignment operator for all types != Any.
+		///
+		/// Example: 
+		///   Any a = 13; 
+		///   Any a = string("12345");
+	{
+		construct(rhs);
+		return *this;
+	}
+	
+	Any& operator = (const Any& rhs)
+		/// Assignment operator for Any.
+	{
+		if ((this != &rhs) && !rhs.empty())
+			construct(rhs);
+		else if ((this != &rhs) && rhs.empty())
+			_valueHolder.erase();
+
+		return *this;
+	}
+	
+	bool empty() const
+		/// Returns true if the Any is empty.
+	{
+		char buf[POCO_SMALL_OBJECT_SIZE] = { 0 };
+		return 0 == std::memcmp(_valueHolder.holder, buf, POCO_SMALL_OBJECT_SIZE);
+	}
+	
+	const std::type_info & type() const
+		/// Returns the type information of the stored content.
+		/// If the Any is empty typeid(void) is returned.
+		/// It is recommended to always query an Any for its type info before
+		/// trying to extract data via an AnyCast/RefAnyCast.
+	{
+		return empty() ? typeid(void) : content()->type();
+	}
+
+private:
+
+	class ValueHolder
+	{
+	public:
+	
+		virtual ~ValueHolder()
+		{
+		}
+
+		virtual const std::type_info & type() const = 0;
+		virtual void clone(Placeholder<ValueHolder>*) const = 0;
+	};
+
+	template<typename ValueType>
+	class Holder : public ValueHolder
+	{
+	public:
+		Holder(const ValueType & value) : _held(value)
+		{
+		}
+
+		virtual const std::type_info & type() const
+		{
+			return typeid(ValueType);
+		}
+
+		virtual void clone(Placeholder<ValueHolder>* pPlaceholder) const
+		{
+			if ((sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE))
+			{
+				new ((ValueHolder*) pPlaceholder->holder) Holder(_held);
+				pPlaceholder->setLocal(true);
+			}
+			else
+			{
+				pPlaceholder->pHolder = new Holder(_held);
+				pPlaceholder->setLocal(false);
+			}
+		}
+
+		ValueType _held;
+
+	private:
+		Holder & operator = (const Holder &);
+	};
+
+	ValueHolder* content() const
+	{
+		return _valueHolder.content();
+	}
+
+	template<typename ValueType>
+	void construct(const ValueType& value)
+	{
+		if (sizeof(Holder<ValueType>) <= Placeholder<ValueType>::Size::value)
+		{
+			new (reinterpret_cast<ValueHolder*>(_valueHolder.holder)) Holder<ValueType>(value);
+			_valueHolder.setLocal(true);
+		}
+		else
+		{
+			_valueHolder.pHolder = new Holder<ValueType>(value);
+			_valueHolder.setLocal(false);
+		}
+	}
+
+	void construct(const Any& other)
+	{
+		if(!other.empty())
+			other.content()->clone(&_valueHolder);
+		else
+			_valueHolder.erase();
+	}
+	
+	Placeholder<ValueHolder> _valueHolder;
+
+
+#else // if POCO_NO_SOO
+
+
+	Any(): _pHolder(0)
 		/// Creates an empty any type.
 	{
 	}
 
 	template <typename ValueType>
 	Any(const ValueType& value):
-		_content(new Holder<ValueType>(value))
+		_pHolder(new Holder<ValueType>(value))
 		/// Creates an any which stores the init parameter inside.
 		///
 		/// Example: 
@@ -72,20 +325,20 @@ public:
 	}
 
 	Any(const Any& other):
-		_content(other._content ? other._content->clone() : 0)
-		/// Copy constructor, works with empty Anys and initialized Any values.
+		_pHolder(other._pHolder ? other._pHolder->clone() : 0)
+		/// Copy constructor, works with both empty and initialized Any values.
 	{
 	}
 
 	~Any()
 	{
-		delete _content;
+		delete _pHolder;
 	}
 
 	Any& swap(Any& rhs)
 		/// Swaps the content of the two Anys.
 	{
-		std::swap(_content, rhs._content);
+		std::swap(_pHolder, rhs._pHolder);
 		return *this;
 	}
 
@@ -94,8 +347,8 @@ public:
 		/// Assignment operator for all types != Any.
 		///
 		/// Example: 
-		///	Any a = 13; 
-		///	Any a = string("12345");
+		///   Any a = 13; 
+		///   Any a = string("12345");
 	{
 		Any(rhs).swap(*this);
 		return *this;
@@ -109,34 +362,34 @@ public:
 	}
 
 	bool empty() const
-		/// returns true if the Any is empty
+		/// Returns true if the Any is empty.
 	{
-		return !_content;
+		return !_pHolder;
 	}
 
 	const std::type_info& type() const
 		/// Returns the type information of the stored content.
 		/// If the Any is empty typeid(void) is returned.
-		/// It is suggested to always query an Any for its type info before trying to extract
-		/// data via an AnyCast/RefAnyCast.
+		/// It is recommended to always query an Any for its type info before
+		/// trying to extract data via an AnyCast/RefAnyCast.
 	{
-		return _content ? _content->type() : typeid(void);
+		return _pHolder ? _pHolder->type() : typeid(void);
 	}
 
 private:
-	class Placeholder
+	class ValueHolder
 	{
 	public:
-		virtual ~Placeholder()
+		virtual ~ValueHolder()
 		{
 		}
 
 		virtual const std::type_info& type() const = 0;
-		virtual Placeholder* clone() const = 0;
+		virtual ValueHolder* clone() const = 0;
 	};
 
 	template <typename ValueType>
-	class Holder: public Placeholder
+	class Holder: public ValueHolder
 	{
 	public: 
 		Holder(const ValueType& value):
@@ -149,22 +402,33 @@ private:
 			return typeid(ValueType);
 		}
 
-		virtual Placeholder* clone() const
+		virtual ValueHolder* clone() const
 		{
 			return new Holder(_held);
 		}
 
 		ValueType _held;
+
+	private:
+		Holder & operator=(const Holder &);
 	};
 
+	ValueHolder* content() const
+	{
+		return _pHolder;
+	}
+
 private:
+	ValueHolder* _pHolder;
+
+#endif // POCO_NO_SOO
+
 	template <typename ValueType>
 	friend ValueType* AnyCast(Any*);
 
 	template <typename ValueType>
 	friend ValueType* UnsafeAnyCast(Any*);
 
-	Placeholder* _content;
 };
 
 
@@ -178,7 +442,7 @@ ValueType* AnyCast(Any* operand)
 	/// Will return NULL if the cast fails, i.e. types don't match.
 {
 	return operand && operand->type() == typeid(ValueType)
-				? &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held
+				? &static_cast<Any::Holder<ValueType>*>(operand->content())->_held
 				: 0;
 }
 
@@ -207,9 +471,9 @@ ValueType AnyCast(const Any& operand)
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
-	ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
-	if (!result) throw BadCastException("Failed to convert between const Any types");
-	return *result;
+	typedef typename TypeWrapper<ValueType>::TYPE NonRef;
+
+	return AnyCast<NonRef&>(const_cast<Any&>(operand));
 }
 
 
@@ -224,7 +488,9 @@ ValueType AnyCast(Any& operand)
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
-	ValueType* result = AnyCast<ValueType>(&operand);
+	typedef typename TypeWrapper<ValueType>::TYPE NonRef;
+
+	NonRef* result = AnyCast<NonRef>(&operand);
 	if (!result) throw BadCastException("Failed to convert between Any types");
 	return *result;
 }
@@ -264,7 +530,7 @@ ValueType* UnsafeAnyCast(Any* operand)
 	/// use typeid() comparison, e.g., when our types may travel across
 	/// different shared libraries.
 {
-	return &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held;
+	return &static_cast<Any::Holder<ValueType>*>(operand->content())->_held;
 }
 
 

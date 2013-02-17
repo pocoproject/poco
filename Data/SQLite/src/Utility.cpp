@@ -40,6 +40,7 @@
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/String.h"
+#include "Poco/Any.h"
 #include "Poco/Exception.h"
 #if defined(POCO_UNBUNDLED)
 #include <sqlite3.h>
@@ -65,14 +66,18 @@ int Utility::_threadMode =
 	SQLITE_CONFIG_MULTITHREAD;
 #endif
 
+const int Utility::OPERATION_INSERT = SQLITE_INSERT;
+const int Utility::OPERATION_DELETE = SQLITE_DELETE;
+const int Utility::OPERATION_UPDATE = SQLITE_UPDATE;
+
 const std::string Utility::SQLITE_DATE_FORMAT = "%Y-%m-%d";
 const std::string Utility::SQLITE_TIME_FORMAT = "%H:%M:%S";
 Utility::TypeMap Utility::_types;
-
+Poco::Mutex Utility::_mutex;
 
 Utility::Utility()
 {
-	Poco::FastMutex::ScopedLock l(_mutex);
+	Poco::Mutex::ScopedLock l(_mutex);
 
 	if (_types.empty())
 	{
@@ -129,7 +134,7 @@ Utility::Utility()
 }
 
 
-std::string Utility::lastError(sqlite3 *pDB)
+std::string Utility::lastError(sqlite3* pDB)
 {
 	return std::string(sqlite3_errmsg(pDB));
 }
@@ -216,7 +221,7 @@ void Utility::throwException(int rc, const std::string& addErrMsg)
 	case SQLITE_DONE:
 		break; // sqlite_step() has finished executing
 	default:
-		throw SQLiteException(std::string("Unkown error code: ") + Poco::NumberFormatter::format(rc), addErrMsg);
+		throw SQLiteException(std::string("Unknown error code: ") + Poco::NumberFormatter::format(rc), addErrMsg);
 	}
 }
 
@@ -297,6 +302,27 @@ bool Utility::setThreadMode(int mode)
 	return false;
 #endif
 }
+
+
+void* Utility::eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam)
+{
+	typedef void(*pF)(void*, int, const char*, const char*, sqlite3_int64);
+	return sqlite3_update_hook(pDB, reinterpret_cast<pF>(callbackFn), pParam);
+}
+
+
+void* Utility::eventHookRegister(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam)
+{
+	return sqlite3_commit_hook(pDB, callbackFn, pParam);
+}
+
+
+void* Utility::eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, void* pParam)
+{
+	return sqlite3_rollback_hook(pDB, callbackFn, pParam);
+}
+
+
 
 
 } } } // namespace Poco::Data::SQLite

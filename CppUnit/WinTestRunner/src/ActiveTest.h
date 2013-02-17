@@ -38,16 +38,16 @@ public:
 	ActiveTest(Test* test);
 	~ActiveTest();
 
-    void run(TestResult* result);
+	void run(TestResult* result);
 
 protected:
-    HANDLE      _threadHandle;
-    CEvent      _runCompleted;
-    TestResult* _currentTestResult;
-
-    void run ();
-    void setTestResult(TestResult* result);
-    static UINT threadFunction(LPVOID thisInstance);
+	HANDLE      _threadHandle;
+	CEvent      _runCompleted;
+	TestResult* _currentTestResult;
+	
+	void run ();
+	void setTestResult(TestResult* result);
+	static UINT threadFunction(LPVOID thisInstance);
 };
 
 

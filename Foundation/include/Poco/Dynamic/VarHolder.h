@@ -50,6 +50,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/String.h"
+#include "Poco/Any.h"
 #include "Poco/Exception.h"
 #include <vector>
 #include <typeinfo>
@@ -67,6 +68,7 @@ class Var;
 
 bool Foundation_API isJSONString(const Var& any);
 	/// Returns true for values that should be JSON-formatted as string.
+
 
 void Foundation_API appendJSONString(std::string& val, const Var& any);
 	/// Converts the any to a JSON value and adds it to val
@@ -92,13 +94,17 @@ public:
 	virtual ~VarHolder();
 		/// Destroys the VarHolder.
 
-	virtual VarHolder* clone() const;
-		/// Throws NotImplementedException. Implementation should
+	virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = 0) const = 0;
+		/// Implementation must implement this function to
 		/// deep-copy the VarHolder.
-		
-	virtual const std::type_info& type() const;
-		/// Throws NotImplementedException. Implementation should
-		/// return the type information for the stored content.
+		/// If small object optimization is enabled (i.e. if 
+		/// POCO_NO_SOO is not defined), VarHolder will be
+		/// instantiated in-place if it's size is smaller
+		/// than POCO_SMALL_OBJECT_SIZE.
+
+	virtual const std::type_info& type() const = 0;
+		/// Implementation must return the type information
+		/// (typeid) for the stored content.
 
 	virtual void convert(Int8& val) const;
 		/// Throws BadCastException. Must be overriden in a type
@@ -145,12 +151,15 @@ public:
 		/// specialization in order to suport the conversion.
 
 #ifndef POCO_LONG_IS_64_BIT
+
 	void convert(long& val) const;
 		/// Calls convert(Int32).
 
 	void convert(unsigned long& val) const;
 		/// Calls convert(UInt32).
+
 #endif
+
 	virtual void convert(bool& val) const;
 		/// Throws BadCastException. Must be overriden in a type
 		/// specialization in order to suport the conversion.
@@ -198,6 +207,35 @@ public:
 protected:
 	VarHolder();
 		/// Creates the VarHolder.
+
+	template <typename T>
+	VarHolder* cloneHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
+		/// Instantiates value holder wrapper. If size of the wrapper is
+		/// larger than POCO_SMALL_OBJECT_SIZE, holder is instantiated on
+		/// the heap, otherwise it is instantiated in-place (in the 
+		/// pre-allocated buffer inside the holder).
+		/// 
+		/// Called from clone() member function of the implementation when
+		/// smal object optimization is enabled.
+	{
+#ifdef POCO_NO_SOO
+		return new VarHolderImpl<T>(val);
+#else
+		poco_check_ptr (pVarHolder);
+		if ((sizeof(VarHolderImpl<T>) <= Placeholder<T>::Size::value))
+		{
+			new ((VarHolder*) pVarHolder->holder) VarHolderImpl<T>(val);
+			pVarHolder->setLocal(true);
+			return (VarHolder*) pVarHolder->holder;
+		}
+		else
+		{
+			pVarHolder->pHolder = new VarHolderImpl<T>(val);
+			pVarHolder->setLocal(false);
+			return pVarHolder->pHolder;
+		}
+#endif
+	}
 
 	template <typename F, typename T>
 	void convertToSmaller(const F& from, T& to) const
@@ -338,16 +376,6 @@ private:
 // inlines
 //
 
-inline VarHolder* VarHolder::clone() const
-{
-	throw NotImplementedException("Not implemented: VarHolder::clone()");
-}
-
-
-inline const std::type_info& VarHolder::type() const
-{
-	throw NotImplementedException("Not implemented: VarHolder::type()");
-}
 
 inline void VarHolder::convert(Int8& /*val*/) const
 {
@@ -414,8 +442,8 @@ inline void VarHolder::convert(Timestamp& /*val*/) const
 	throw BadCastException("Can not convert to Timestamp");
 }
 
-
 #ifndef POCO_LONG_IS_64_BIT
+
 inline void VarHolder::convert(long& val) const
 {
 	Int32 tmp;
@@ -430,8 +458,8 @@ inline void VarHolder::convert(unsigned long& val) const
 	convert(tmp);
 	val = tmp;
 }
-#endif
 
+#endif
 
 inline void VarHolder::convert(bool& /*val*/) const
 {
@@ -533,9 +561,9 @@ public:
 		return typeid(T);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const T& value() const
@@ -634,9 +662,9 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const Int8& value() const
@@ -767,9 +795,9 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const Int16& value() const
@@ -900,9 +928,9 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const Int32& value() const
@@ -1048,9 +1076,9 @@ public:
 		val = Timestamp(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const Int64& value() const
@@ -1181,9 +1209,9 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const UInt8& value() const
@@ -1314,9 +1342,9 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const UInt16& value() const
@@ -1447,9 +1475,9 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const UInt32& value() const
@@ -1601,9 +1629,9 @@ public:
 		val = Timestamp(tmp);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const UInt64& value() const
@@ -1732,9 +1760,9 @@ public:
 		val = (_val ? "true" : "false");
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const bool& value() const
@@ -1866,9 +1894,9 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const float& value() const
@@ -2006,9 +2034,9 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const double& value() const
@@ -2137,9 +2165,9 @@ public:
 		val = std::string(1, _val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const char& value() const
@@ -2316,9 +2344,9 @@ public:
 		ts = tmp.timestamp();
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const std::string& value() const
@@ -2452,9 +2480,9 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const long& value() const
@@ -2585,9 +2613,9 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 
 	const unsigned long& value() const
@@ -2678,9 +2706,9 @@ public:
 		val.append(" ]");
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const std::vector<T>& value() const
@@ -2799,9 +2827,9 @@ public:
 		ts = _val.timestamp();
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const DateTime& value() const
@@ -2895,9 +2923,9 @@ public:
 		ts = _val.timestamp();
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const LocalDateTime& value() const
@@ -2991,9 +3019,9 @@ public:
 		ts = _val;
 	}
 
-	VarHolder* clone() const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
-		return new VarHolderImpl(_val);
+		return cloneHolder(pVarHolder, _val);
 	}
 	
 	const Timestamp& value() const

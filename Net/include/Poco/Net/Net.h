@@ -89,54 +89,48 @@
 #endif // POCO_NET_NO_IPv6, POCO_HAVE_IPv6
 
 
-#if !defined(s6_addr16)
-	#if defined(POCO_OS_FAMILY_WINDOWS)
-		#define s6_addr16 u.Word
-	#else
-		#define s6_addr16 __u6_addr.__u6_addr16
-	#endif
-#endif
-
-
-#if !defined(s6_addr32)
-	#if defined(POCO_OS_FAMILY_UNIX)
-		#if (POCO_OS == POCO_OS_SOLARIS)
-			#define s6_addr32 _S6_un._S6_u32
-		#else
-			#define s6_addr32 __u6_addr.__u6_addr32
-		#endif
-	#endif
-#endif
-
-
 namespace Poco {
 namespace Net {
 
 
 inline void Net_API initializeNetwork();
 	/// Initialize the network subsystem.
+	/// (Windows only, no-op elsewhere)
 
 
 inline void Net_API uninitializeNetwork();
 	/// Uninitialize the network subsystem.
+	/// (Windows only, no-op elsewhere)
 
 
 }} // namespace Poco::Net
 
 
 //
-// Automate network initialization on Windows.
+// Automate network initialization (only relevant on Windows).
 //
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NET_NO_WINDOWS_INIT)
-	#if defined(POCO_STATIC)
-		extern "C" const struct NetworkInitializer pocoNetworkInitializer;
-		#ifdef _WIN64
-			#pragma comment(linker, "/include:pocoNetworkInitializer")
-		#else
-			#pragma comment(linker, "/include:_pocoNetworkInitializer")
-		#endif
-	#endif // POCO_STATIC
-#endif // POCO_NET_NO_WINDOWS_INIT
+
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
+
+extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
+
+#if defined(Net_EXPORTS)
+	#if defined(_WIN64)
+		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
+	#elif defined(_WIN32)
+		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
+	#endif
+#else  // !Net_EXPORTS
+	#if defined(_WIN64)
+		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
+	#elif defined(_WIN32)
+		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
+	#endif
+#endif // Net_EXPORTS
+
+POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
+
+#endif // POCO_OS_FAMILY_WINDOWS
 
 
 //
