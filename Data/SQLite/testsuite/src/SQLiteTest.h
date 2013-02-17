@@ -40,6 +40,14 @@
 #include "CppUnit/TestCase.h"
 
 
+namespace Poco {
+namespace Data {
+
+class Session;
+
+} }
+
+
 class SQLiteTest: public CppUnit::TestCase
 {
 public:
@@ -137,15 +145,25 @@ public:
 	void testThreadModes();
 
 	void testUpdateCallback();
+	void testCommitCallback();
+	void testRollbackCallback();
+
+	void testSessionTransaction();
+	void testTransaction();
+	void testTransactor();
 
 	void setUp();
 	void tearDown();
 
 	static void sqliteUpdateCallbackFn(void*, int, const char*, const char*, Poco::Int64);
+	static int sqliteCommitCallbackFn(void*);
+	static void sqliteRollbackCallbackFn(void*);
 
 	static CppUnit::Test* suite();
 
 private:
+	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);
+
 	static int _insertCounter;
 	static int _updateCounter;
 	static int _deleteCounter;

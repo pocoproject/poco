@@ -163,7 +163,7 @@ void PooledSessionImpl::close()
 }
 
 
-const std::string& PooledSessionImpl::connectorName()
+const std::string& PooledSessionImpl::connectorName() const
 {
 	return access()->connectorName();
 }
@@ -193,7 +193,7 @@ Poco::Any PooledSessionImpl::getProperty(const std::string& name)
 }
 
 
-SessionImpl* PooledSessionImpl::access()
+SessionImpl* PooledSessionImpl::access() const
 {
 	if (_pHolder)
 	{

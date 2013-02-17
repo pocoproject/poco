@@ -274,10 +274,10 @@ public:
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
-	std::string connector();
+	std::string connector() const;
 		/// Returns the connector name for this session.
 
-	std::string uri();
+	std::string uri() const;
 		/// Returns the URI for this session.
 
 	static std::string uri(const std::string& connector,
@@ -443,7 +443,7 @@ inline bool Session::isTransactionIsolation(Poco::UInt32 ti)
 }
 
 
-inline std::string Session::connector()
+inline std::string Session::connector() const
 {
 	return _pImpl->connectorName();
 }
@@ -456,7 +456,7 @@ inline std::string Session::uri(const std::string& connector,
 }
 
 
-inline std::string Session::uri()
+inline std::string Session::uri() const
 {
 	return _pImpl->uri();
 }

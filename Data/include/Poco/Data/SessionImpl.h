@@ -139,16 +139,16 @@ public:
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
-	virtual const std::string& connectorName() = 0;
+	virtual const std::string& connectorName() const = 0;
 		/// Returns the name of the connector.
 
-	const std::string& connectionString();
+	const std::string& connectionString() const;
 		/// Returns the connection string.
 
 	static std::string uri(const std::string& connector, const std::string& connectionString);
 		/// Returns formatted URI.
 
-	std::string uri();
+	std::string uri() const;
 		/// Returns the URI for this session.
 
 	virtual void setFeature(const std::string& name, bool state) = 0;
@@ -206,7 +206,7 @@ private:
 //
 // inlines
 //
-inline const std::string& SessionImpl::connectionString()
+inline const std::string& SessionImpl::connectionString() const
 {
 	return _connectionString;
 }
@@ -231,7 +231,7 @@ inline std::string SessionImpl::uri(const std::string& connector,
 }
 
 
-inline std::string SessionImpl::uri()
+inline std::string SessionImpl::uri() const
 {
 	return uri(connectorName(), connectionString());
 }

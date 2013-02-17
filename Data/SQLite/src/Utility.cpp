@@ -40,6 +40,7 @@
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/String.h"
+#include "Poco/Any.h"
 #include "Poco/Exception.h"
 #if defined(POCO_UNBUNDLED)
 #include <sqlite3.h>
@@ -133,7 +134,7 @@ Utility::Utility()
 }
 
 
-std::string Utility::lastError(sqlite3 *pDB)
+std::string Utility::lastError(sqlite3* pDB)
 {
 	return std::string(sqlite3_errmsg(pDB));
 }
@@ -220,7 +221,7 @@ void Utility::throwException(int rc, const std::string& addErrMsg)
 	case SQLITE_DONE:
 		break; // sqlite_step() has finished executing
 	default:
-		throw SQLiteException(std::string("Unkown error code: ") + Poco::NumberFormatter::format(rc), addErrMsg);
+		throw SQLiteException(std::string("Unknown error code: ") + Poco::NumberFormatter::format(rc), addErrMsg);
 	}
 }
 
@@ -303,20 +304,20 @@ bool Utility::setThreadMode(int mode)
 }
 
 
-void* Utility::eventHook(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam)
+void* Utility::eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam)
 {
 	typedef void(*pF)(void*, int, const char*, const char*, sqlite3_int64);
 	return sqlite3_update_hook(pDB, reinterpret_cast<pF>(callbackFn), pParam);
 }
 
 
-void* Utility::eventHook(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam)
+void* Utility::eventHookRegister(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam)
 {
 	return sqlite3_commit_hook(pDB, callbackFn, pParam);
 }
 
 
-void* Utility::eventHook(sqlite3* pDB, RollbackCallbackType callbackFn, void* pParam)
+void* Utility::eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, void* pParam)
 {
 	return sqlite3_rollback_hook(pDB, callbackFn, pParam);
 }
