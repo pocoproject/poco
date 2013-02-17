@@ -6,6 +6,7 @@ src/AnyTest.cpp
 src/ArrayTest.cpp
 src/AutoPtrTest.cpp
 src/AutoReleasePoolTest.cpp
+src/Base32Test.cpp
 src/Base64Test.cpp
 src/BasicEventTest.cpp
 src/BinaryReaderWriterTest.cpp
@@ -23,6 +24,7 @@ src/DateTimeParserTest.cpp
 src/DateTimeTest.cpp
 src/DateTimeTestSuite.cpp
 src/DigestStreamTest.cpp
+src/DirectoryWatcherTest.cpp
 src/Driver.cpp
 src/DummyDelegate.cpp
 src/DynamicFactoryTest.cpp

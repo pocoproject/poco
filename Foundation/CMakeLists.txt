@@ -29,6 +29,8 @@ set( BASE_SRCS
   src/ActiveDispatcher.cpp
   src/ArchiveStrategy.cpp
   src/AsyncChannel.cpp
+  src/Base32Decoder.cpp
+  src/Base32Encoder.cpp
   src/Base64Decoder.cpp
   src/Base64Encoder.cpp
   src/BinaryReader.cpp
@@ -50,8 +52,11 @@ set( BASE_SRCS
   src/DigestEngine.cpp
   src/DigestStream.cpp
   src/DirectoryIterator.cpp
+  src/RecursiveDirectoryIterator.cpp
+  src/RecursiveDirectoryIteratorStrategies.cpp
+  src/DirectoryWatcher.cpp
   src/Environment.cpp
-  src/Error.cpp
+#  src/Error.cpp
   src/ErrorHandler.cpp
   src/Event.cpp
   src/EventArgs.cpp
