@@ -155,10 +155,40 @@ std::string Document::toString(int indent) const
 	{
 		if ( it != _elements.begin() )
 		{
-			oss << ", ";
+			oss << ",";
+			if ( indent > 0 )
+			{
+				oss << std::endl;
+			}
 		}
-		oss << '"' << (*it)->name() << '"' << " : " << (*it)->toString();
+		if ( indent > 0 )
+		{
+			for(int i = 0; i < indent; ++i)
+			{
+				oss << ' ';
+			}
+		}
+		oss << '"' << (*it)->name() << '"' << " : ";
+		if ( indent > 0 )
+		{
+			oss << (*it)->toString(indent + 2);
+		}
+		else
+		{
+			oss << (*it)->toString();
+		}
 	}
+
+	if ( indent > 0 )
+	{
+		oss << std::endl;
+		indent -= 2;
+		for(int i = 0; i < indent; ++i)
+		{
+			oss << ' ';
+		}
+	}
+
 	oss << "}" << std::endl;
 	return oss.str();
 }

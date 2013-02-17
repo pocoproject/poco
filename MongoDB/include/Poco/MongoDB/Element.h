@@ -39,13 +39,14 @@
 #define _MongoDB_Element_included
 
 #include <string>
+#include <sstream>
+#include <iomanip>
 #include <set>
 
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Timestamp.h"
-#include "Poco/RegularExpression.h"
 #include "Poco/Nullable.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTimeFormatter.h"
@@ -147,7 +148,51 @@ struct ElementTraits<std::string>
 
 	static std::string toString(const std::string& value, int indent = 0)
 	{
-		return '"' + value + '"';
+		std::ostringstream oss;
+
+		oss << '"';
+
+		for(std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+		{
+			switch (*it)
+			{
+			case '"':
+				oss << "\\\"";
+				break;
+			case '\\':
+				oss << "\\\\";
+				break;
+			case '\b':
+				oss << "\\b";
+				break;
+			case '\f':
+				oss << "\\f";
+				break;
+			case '\n':
+				oss << "\\n";
+				break;
+			case '\r':
+				oss << "\\r";
+				break;
+			case '\t':
+				oss << "\\t";
+				break;
+			default:
+				{
+					if ( *it > 0 && *it <= 0x1F )
+					{
+						oss << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(*it);
+					}
+					else
+					{
+						oss << *it;
+					}
+					break;
+				}
+			}
+		}
+		oss << '"';
+		return oss.str();
 	}
 };
 

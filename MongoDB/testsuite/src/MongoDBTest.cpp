@@ -368,7 +368,7 @@ void MongoDBTest::testBuildInfo()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		std::cout << doc->toString();
+		std::cout << doc->toString(2);
 	}
 	else
 	{

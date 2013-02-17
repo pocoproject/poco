@@ -64,27 +64,31 @@ std::string Array::toString(int indent) const
 	{
 		if ( it != _elements.begin() )
 		{
-			if ( indent > 0 )
-			{
-				for(int i = 0; i < indent; ++i)
-				{
-					oss << ' ';
-				}
-			}
 			oss << ",";
 			if ( indent > 0 )
 			{
 				oss << std::endl;
 			}
 		}
+
+		for(int i = 0; i < indent; ++i)
+		{
+			oss << ' ';
+		}
 		oss << (*it)->toString();
 	}
-	oss << "]";
 
-	if ( indent >  0 )
+	if ( indent > 0 )
 	{
 		oss << std::endl;
+		indent -= 2;
+		for(int i = 0; i < indent; ++i)
+		{
+			oss << ' ';
+		}
 	}
+
+	oss << "]";
 
 	return oss.str();
 }
