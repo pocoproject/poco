@@ -2557,55 +2557,6 @@ void SQLiteTest::testReconnect()
 }
 
 
-void SQLiteTest::testSystemTable()
-{
-	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
-	int cntFile = 0;
-	session << "DROP TABLE IF EXISTS Test", now;
-	session << "CREATE TABLE Test (Test INTEGER)", now;
-	session << "INSERT INTO Test VALUES (1)", now;
-	session << "SELECT count(*) FROM Test", into(cntFile), now;
-	assert (1 == cntFile);
-
-	int cntMem = -1;
-	session << "SELECT count(*) FROM sys.dual", into(cntMem), now;
-	assert (0 == cntMem);
-
-	session << "INSERT INTO sys.dual VALUES ('test')", now;
-	session << "SELECT count(*) FROM sys.dual", into(cntMem), now;
-	assert (1 == cntMem);
-
-	// connect another session
-	Session session2(Poco::Data::SQLite::Connector::KEY, "dummy.db");
-	// verify it has it's own sys table
-	session2 << "SELECT count(*) FROM sys.dual", into(cntMem), now;
-	assert (0 == cntMem);
-	// verify it shares the file table
-	session2 << "SELECT count(*) FROM Test", into(cntFile), now;
-	assert (1 == cntFile);
-	session2 << "INSERT INTO sys.dual VALUES ('test')", now;
-	session2 << "SELECT count(*) FROM sys.dual", into(cntMem), now;
-	assert (1 == cntMem);
-
-	session << "DELETE FROM sys.dual", now;
-	session << "SELECT count(*) FROM sys.dual", into(cntMem), now;
-	assert (0 == cntMem);
-	session2 << "SELECT count(*) FROM sys.dual", into(cntMem), now;
-	assert (1 == cntMem);
-	session2 << "DELETE FROM sys.dual", now;
-	session2 << "SELECT count(*) FROM sys.dual", into(cntMem), now;
-	assert (0 == cntMem);
-
-	try
-	{
-		session << "DROP TABLE sys.dual", now;
-		fail ("must throw");
-	}
-	catch (InvalidAccessException&) { }
-
-}
-
-
 void SQLiteTest::testThreadModes()
 {
 	using namespace Poco::Data::SQLite;
@@ -2747,7 +2698,6 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testMultipleResults);
 	CppUnit_addTest(pSuite, SQLiteTest, testPair);
 	CppUnit_addTest(pSuite, SQLiteTest, testReconnect);
-	CppUnit_addTest(pSuite, SQLiteTest, testSystemTable);
 	CppUnit_addTest(pSuite, SQLiteTest, testThreadModes);
 
 	return pSuite;

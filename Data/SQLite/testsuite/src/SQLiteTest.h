@@ -132,7 +132,6 @@ public:
 	void testMultipleResults();
 
 	void testReconnect();
-	void testSystemTable();
 
 	void testThreadModes();
 

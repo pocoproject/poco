@@ -80,25 +80,10 @@ void SQLiteStatementImpl::compileImpl()
 {
 	if (!_pLeftover)
 	{
-		// Executed to force reset of previous changes count to zero.
-		// Without this, execute() will not return accurate (zero) count if select 
-		// statement returns no results previous [insert|update|delete] affected rows.
-		if (sqlite3_changes(_pDB))
-		{
-			if (SQLITE_OK != sqlite3_exec(_pDB, "delete from sys.dual where 1 <> 1;", 0, 0, 0))
-				throw ExecutionException("Error updating system database.");
-		}
 		_bindBegin = bindings().begin();
 	}
 
 	std::string statement(toString());
-
-	if (isubstr(statement, std::string("drop")) != istring::npos &&
-		isubstr(statement, std::string("table")) != istring::npos &&
-		isubstr(statement, std::string("dual")) != istring::npos)
-	{
-		throw InvalidAccessException("Cannot drop system table!");
-	}
 
 	sqlite3_stmt* pStmt = 0;
 	const char* pSql = _pLeftover ? _pLeftover->c_str() : statement.c_str();
@@ -271,7 +256,8 @@ bool SQLiteStatementImpl::hasNext()
 	_nextResponse = sqlite3_step(_pStmt);
 
 	if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
-	_affectedRowCount += sqlite3_changes(_pDB);
+	if (!sqlite3_stmt_readonly(_pStmt))
+		_affectedRowCount += sqlite3_changes(_pDB);
 
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
 		Utility::throwException(_nextResponse);
@@ -331,7 +317,8 @@ const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
 
 std::size_t SQLiteStatementImpl::affectedRowCount() const
 {
-	return _affectedRowCount != POCO_SQLITE_INV_ROW_CNT ? _affectedRowCount : sqlite3_changes(_pDB);
+	if (_affectedRowCount != POCO_SQLITE_INV_ROW_CNT) return _affectedRowCount;
+	return _pStmt == 0 || sqlite3_stmt_readonly(_pStmt) ? 0 : sqlite3_changes(_pDB);
 }
 
 
