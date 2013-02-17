@@ -100,3 +100,8 @@ lib/
 lib64/
 pocomsg.h
 
+# Eclipse generated files #
+######################
+.project
+.cproject
+.settings

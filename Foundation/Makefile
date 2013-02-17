@@ -21,8 +21,8 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	NestedDiagnosticContext Notification NotificationCenter \
 	NotificationQueue PriorityNotificationQueue TimedNotificationQueue \
 	NullStream NumberFormatter NumberParser NumericString AbstractObserver \
-	Path PatternFormatter Process PurgeStrategy RWLock Random RandomStream \
-	RegularExpression RefCountedObject Runnable RotateStrategy Condition \
+	Path PatternFormatter Process PurgeStrategy RWLock Random RandomStream RecursiveDirectoryIterator \
+	RecursiveDirectoryIteratorStrategies RegularExpression RefCountedObject Runnable RotateStrategy Condition \
 	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel Stopwatch StreamChannel StreamConverter StreamCopier \
 	StreamTokenizer String StringTokenizer SynchronizedObject \
