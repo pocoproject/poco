@@ -59,7 +59,7 @@ Cursor::Cursor(const std::string& fullCollectionName, QueryRequest::Flags flags)
 
 Cursor::~Cursor()
 {
-	poco_assert_dbg(_response.cursorID());
+	poco_assert_dbg(!_response.cursorID());
 }
 
 

@@ -38,6 +38,8 @@
 #ifndef _MongoDB_RegularExpression_included
 #define _MongoDB_RegularExpression_included
 
+#include "Poco/RegularExpression.h"
+
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
 

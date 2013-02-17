@@ -72,7 +72,7 @@ struct ElementTraits<Array::Ptr>
 	static std::string toString(const Array::Ptr& value, int indent = 0)
 	{
 		//TODO:
-		return value.isNull() ? "null" : value->toString();
+		return value.isNull() ? "null" : value->toString(indent);
 	}
 
 };
