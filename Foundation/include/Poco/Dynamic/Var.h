@@ -572,6 +572,11 @@ private:
 		return _pHolder;
 	}
 
+	void destruct()
+	{
+		if(!isEmpty()) delete content();
+	}
+
 	VarHolder* _pHolder;
 
 #else
@@ -619,6 +624,17 @@ private:
 			_placeholder.erase();
 	}
 
+	void destruct()
+	{
+		if(!isEmpty())
+		{
+			if(_placeholder.isLocal())
+				content()->~VarHolder();
+			else
+				delete content();
+		}
+	}
+
 	Placeholder<VarHolder> _placeholder;
 
 #endif // POCO_NO_SOO
@@ -652,7 +668,7 @@ inline void Var::swap(Var& other)
 	else
 	{
 		Var tmp(*this);
-		if (_placeholder.isLocal()) this->~Var();
+		if (_placeholder.isLocal()) destruct();
 		construct(other);
 		other = tmp;
 	}

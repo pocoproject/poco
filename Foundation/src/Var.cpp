@@ -79,15 +79,7 @@ Var::Var(const Var& other)
 
 Var::~Var()
 {
-	if(!isEmpty())
-	{
-#ifndef POCO_NO_SOO
-		if(_placeholder.isLocal())
-			content()->~VarHolder();
-		else
-#endif
-			delete content();
-	}
+	destruct();
 }
 
 
