@@ -147,9 +147,9 @@ public:
 		/// See http://www.sqlite.org/c3ref/update_hook.html and 
 		/// http://www.sqlite.org/c3ref/commit_hook.html for details.
 	{
-		typedef std::pair<typename CBT, T*> CBPair;
+		typedef std::pair<CBT, T*> CBPair;
 		typedef std::multimap<sqlite3*, CBPair> CBMap;
-		typedef CBMap::iterator CBMapIt;
+		typedef typename CBMap::iterator CBMapIt;
 		typedef std::pair<CBMapIt, CBMapIt> CBMapItPair;
 
 		static CBMap retMap;
@@ -159,7 +159,7 @@ public:
 		{
 			if (retMap.find(pDB) == retMap.end())
 			{
-				retMap.insert(CBMap::value_type(pDB, CBPair(callbackFn, pParam)));
+				retMap.insert(std::make_pair(pDB, CBPair(callbackFn, pParam)));
 				return true;
 			}
 		}
@@ -223,6 +223,9 @@ private:
 
 inline sqlite3* Utility::dbHandle(const Session& session)
 {
+#ifdef POCO_COMPILER_CLANG
+	sqlite3* p = 0; Any a = p; // ??? clang fails to AnyCast without these ???
+#endif
 	return AnyCast<sqlite3*>(session.getProperty("handle"));
 }
 
