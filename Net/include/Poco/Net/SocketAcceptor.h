@@ -88,7 +88,7 @@ class SocketAcceptor
 	/// Subclasses can override the createServiceHandler() factory method
 	/// if special steps are necessary to create a ServiceHandler object.
 {
-public:		
+public:
 	explicit SocketAcceptor(ServerSocket& socket):
 		_socket(socket),
 		_pReactor(0)

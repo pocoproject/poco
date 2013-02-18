@@ -104,13 +104,13 @@ public:
 		registerAcceptor(reactor);
 	}
 
-	~ParallelSocketAcceptor()
+	virtual ~ParallelSocketAcceptor()
 		/// Destroys the ParallelSocketAcceptor.
 	{
 		unregisterAcceptor();
 	}
 	
-	void registerAcceptor(SocketReactor& reactor)
+	virtual void registerAcceptor(SocketReactor& reactor)
 		/// Registers the ParallelSocketAcceptor with a SocketReactor.
 		///
 		/// A subclass can override this and, for example, also register
@@ -124,7 +124,7 @@ public:
 			ReadableNotification>(*this, &ParallelSocketAcceptor::onAccept));
 	}
 	
-	void unregisterAcceptor()
+	virtual void unregisterAcceptor()
 		/// Unregisters the ParallelSocketAcceptor.
 		///
 		/// A subclass can override this and, for example, also unregister
@@ -146,7 +146,7 @@ public:
 	}
 
 protected:
-	ServiceHandler* createServiceHandler(StreamSocket& socket)
+	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
 		/// Create and initialize a new ServiceHandler instance.
 		///
 		/// Subclasses can override this method.
