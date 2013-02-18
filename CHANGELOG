@@ -2,9 +2,16 @@ This is the changelog file for the POCO C++ Libraries.
 
 Release 1.5.2 (2013-03-??)
 ==========================
+- added MongoDB library (by Franky Braem)
 - fixed GH #57: poco-1.5.1: Doesn't compile for Android
 - added VoidEvent (by Arturo Castro)
 - fixed GH #80: NumberFormatter::append broken
+- fixed GH #93: ParallelSocketAcceptor virtual functions
+- small object optimization for IPAddress, Any and Dynamic::Var
+- SQLite events (insert, update, delete, commit, rollback) handlers
+- merged GH #91: Improve SQLite multi-threaded use (by Rangel Reale)
+- merged GH #86: Invalid pointers to vector internals (by Adrian Imboden)
+- automatic library initialization macros
 
 Release 1.5.1 (2013-01-11)
 ==========================
