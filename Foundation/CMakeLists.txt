@@ -56,7 +56,7 @@ set( BASE_SRCS
   src/RecursiveDirectoryIteratorStrategies.cpp
   src/DirectoryWatcher.cpp
   src/Environment.cpp
-#  src/Error.cpp
+  src/Error.cpp
   src/ErrorHandler.cpp
   src/Event.cpp
   src/EventArgs.cpp
