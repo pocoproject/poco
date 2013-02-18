@@ -76,11 +76,6 @@ protected:
 		/// Used to find out the number of rows affected by insert, delete or update.
 		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT. 
 		/// Changes associated with creating and dropping tables are not counted.
-		/// SQLite implements the command "DELETE FROM table" without a WHERE clause by 
-		/// dropping and recreating the table. Because of this optimization, the change count 
-		/// for "DELETE FROM table" will be zero regardless of the number of elements that 
-		/// were originally in the table. To get an accurate count of the number of rows deleted, 
-		/// use "DELETE FROM table WHERE 1".
 
 	const MetaColumn& metaColumn(std::size_t pos) const;
 		/// Returns column meta data.
