@@ -681,32 +681,43 @@ void SQLiteTest::testAffectedRows()
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str VARCHAR(30))", now;
 
-	Statement stmt((tmp << "SELECT * FROM Strings"));
-	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
-	assert (count == 0);
-	assert (0 == stmt.execute());
-
-	Statement stmt1((tmp << "INSERT INTO Strings VALUES(:str)", use(str)));
+	Statement stmt((tmp << "INSERT INTO Strings VALUES(:str)", use(str)));
 	count  = -1;
 	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
 	assert (count == 0);
-	assert (4 == stmt1.execute());
+	assert (4 == stmt.execute());
 	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
 	assert (count == 4);
 
-	Statement stmt2(tmp << "UPDATE Strings SET str = 's4' WHERE str = 's3'");
-	assert (2 == stmt2.execute());
+	Statement stmt0(tmp << "DELETE FROM Strings");
+	assert (4 == stmt0.execute());
+	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
+	assert (count == 0);
 
-	Statement stmt3(tmp << "DELETE FROM Strings WHERE str = 's1'");
-	assert (1 == stmt3.execute());
+	Statement stmt1((tmp << "SELECT * FROM Strings"));
+	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
+	assert (count == 0);
+	assert (0 == stmt1.execute());
 
-	Statement stmt4(tmp << "DELETE FROM Strings WHERE str = 'bad value'");
-	assert (0 == stmt4.execute());
+	Statement stmt2((tmp << "INSERT INTO Strings VALUES(:str)", use(str)));
+	count  = -1;
+	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
+	assert (count == 0);
+	assert (4 == stmt2.execute());
+	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
+	assert (count == 4);
 
-	// see SQLiteStatementImpl::affectedRows() documentation for explanation
-	// why "WHERE 1" is necessary here
-	Statement stmt5(tmp << "DELETE FROM Strings WHERE 1");
-	assert (3 == stmt5.execute());
+	Statement stmt3(tmp << "UPDATE Strings SET str = 's4' WHERE str = 's3'");
+	assert (2 == stmt3.execute());
+
+	Statement stmt4(tmp << "DELETE FROM Strings WHERE str = 's1'");
+	assert (1 == stmt4.execute());
+
+	Statement stmt5(tmp << "DELETE FROM Strings WHERE str = 'bad value'");
+	assert (0 == stmt5.execute());
+
+	Statement stmt6(tmp << "DELETE FROM Strings");
+	assert (3 == stmt6.execute());
 }
 
 
