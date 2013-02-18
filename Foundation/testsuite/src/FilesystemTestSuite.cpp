@@ -35,6 +35,7 @@
 #include "FileTest.h"
 #include "GlobTest.h"
 #include "DirectoryWatcherTest.h"
+#include "DirectoryIteratorsTest.h"
 
 
 CppUnit::Test* FilesystemTestSuite::suite()
@@ -45,6 +46,7 @@ CppUnit::Test* FilesystemTestSuite::suite()
 	pSuite->addTest(FileTest::suite());
 	pSuite->addTest(GlobTest::suite());
 	pSuite->addTest(DirectoryWatcherTest::suite());
+	pSuite->addTest(DirectoryIteratorsTest::suite());
 	
 	return pSuite;
 }

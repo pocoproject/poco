@@ -24,6 +24,7 @@ src/DateTimeParserTest.cpp
 src/DateTimeTest.cpp
 src/DateTimeTestSuite.cpp
 src/DigestStreamTest.cpp
+src/DirectoryIteratorsTest.cpp
 src/DirectoryWatcherTest.cpp
 src/Driver.cpp
 src/DummyDelegate.cpp
