@@ -116,7 +116,7 @@ public:
 
 
 	template<typename T>
-	T get(const std::string& name)
+	T get(const std::string& name) const
 		/// Returns the element with the given name and tries to convert
 		/// it to the template type. When the element is not found, a
 		/// NotFoundException will be thrown. When the element can't be
@@ -141,7 +141,33 @@ public:
 		}
 	}
 
-	Element::Ptr get(const std::string& name);
+
+	template<typename T>
+	T get(const std::string& name, const T& def) const
+		/// Returns the element with the given name and tries to convert
+		/// it to the template type. When the element is not found, or
+		/// has the wrong type, the def argument will be returned.
+	{
+		Element::Ptr element = get(name);
+		if ( element.isNull() )
+		{
+			return def;
+		}
+
+		if ( ElementTraits<T>::TypeId == element->type() )
+		{
+			ConcreteElement<T>* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
+			if ( concrete != NULL )
+			{
+				return concrete->value();
+			}
+		}
+
+		return def;
+	}
+
+
+	Element::Ptr get(const std::string& name) const;
 		/// Returns the element with the given name.
 		/// An empty element will be returned when the element is not found.
 

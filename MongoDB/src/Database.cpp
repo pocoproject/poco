@@ -69,6 +69,37 @@ double Database::count(Connection& connection, const std::string& collectionName
 }
 
 
+Document::Ptr Database::getLastErrorDoc(Connection& connection) const
+{
+	Document::Ptr errorDoc;
+
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createQueryRequest("$cmd");
+	request->setNumberToReturn(1);
+	request->query().add("getLastError", 1);
+
+	Poco::MongoDB::ResponseMessage response;
+	connection.sendRequest(*request, response);
+
+	if ( response.documents().size() > 0 )
+	{
+		errorDoc = response.documents()[0];
+	}
+
+	return errorDoc;
+}
+
+std::string Database::getLastError(Connection& connection) const
+{
+	Document::Ptr errorDoc = getLastErrorDoc(connection);
+	if ( !errorDoc.isNull() && errorDoc->isType<std::string>("err") )
+	{
+		return errorDoc->get<std::string>("err");
+	}
+
+	return "";
+}
+
+
 Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createQueryRequest(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::QueryRequest(_dbname + '.' + collectionName);
