@@ -319,9 +319,11 @@ void MongoDBTest::testCursorRequest()
 
 	int n = 0;
 	Poco::MongoDB::ResponseMessage& response = cursor.next(_mongo);
-	while(response.cursorID() != 0)
+	while(1)
 	{
 		n += response.documents().size();
+		if ( response.cursorID() == 0 )
+			break;
 		response = cursor.next(_mongo);
 	}
 	std::cout << "n= " << n << std::endl;

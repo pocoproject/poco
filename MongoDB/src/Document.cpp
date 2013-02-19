@@ -59,11 +59,11 @@ Document::~Document()
 }
 
 
-Element::Ptr Document::get(const std::string& name)
+Element::Ptr Document::get(const std::string& name) const
 {
 	Element::Ptr element;
 
-	ElementSet::iterator it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
+	ElementSet::const_iterator it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
 	if ( it != _elements.end() )
 	{
 		return *it;
