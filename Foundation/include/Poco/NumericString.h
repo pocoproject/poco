@@ -349,7 +349,7 @@ bool intToStr(T value,
 
 	size = ptr - result;
 	poco_assert_dbg (size <= ptr.span());
-	poco_assert_dbg ((-1 == width) || (size >= width));
+	poco_assert_dbg ((-1 == width) || (size >= size_t(width)));
 	*ptr-- = '\0';
 
 	char* ptrr = result;
@@ -424,7 +424,7 @@ bool uIntToStr(T value,
 	
 	size = ptr - result;
 	poco_assert_dbg (size <= ptr.span());
-	poco_assert_dbg ((-1 == width) || (size >= width));
+	poco_assert_dbg ((-1 == width) || (size >= size_t(width)));
 	*ptr-- = '\0';
 	
 	char* ptrr = result;
