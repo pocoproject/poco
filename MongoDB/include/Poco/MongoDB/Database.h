@@ -80,6 +80,14 @@ public:
 		/// The collectionname must not contain the database name!
 
 
+	Document::Ptr getLastErrorDoc(Connection& connection) const;
+		/// Sends the getLastError command to the database and returns the document
+
+
+	std::string getLastError(Connection& connection) const;
+		/// Sends the getLastError command to the database and returns the err element
+		/// from the error document. When err is null, an empty string is returned.
+
 private:
 	std::string _dbname;
 };
