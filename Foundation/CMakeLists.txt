@@ -31,6 +31,8 @@ set( BASE_SRCS
   src/AsyncChannel.cpp
   src/Base64Decoder.cpp
   src/Base64Encoder.cpp
+  src/Base32Decoder.cpp
+  src/Base32Encoder.cpp
   src/BinaryReader.cpp
   src/BinaryWriter.cpp
   src/Bugcheck.cpp
@@ -50,6 +52,7 @@ set( BASE_SRCS
   src/DigestEngine.cpp
   src/DigestStream.cpp
   src/DirectoryIterator.cpp
+  src/DirectoryWatcher.cpp
   src/Environment.cpp
   src/Error.cpp
   src/ErrorHandler.cpp
