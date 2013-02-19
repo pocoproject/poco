@@ -116,6 +116,8 @@ set( BASE_SRCS
   src/RWLock.cpp
   src/Random.cpp
   src/RandomStream.cpp
+  src/RecursiveDirectoryIterator.cpp
+  src/RecursiveDirectoryIteratorStrategies.cpp
   src/RefCountedObject.cpp
   src/RegularExpression.cpp
   src/RotateStrategy.cpp
@@ -126,6 +128,7 @@ set( BASE_SRCS
   src/SharedMemory.cpp
   src/SignalHandler.cpp
   src/SimpleFileChannel.cpp
+  src/SortedDirectoryIterator.cpp
   src/SplitterChannel.cpp
   src/Stopwatch.cpp
   src/StreamChannel.cpp
