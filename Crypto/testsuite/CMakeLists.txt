@@ -1,5 +1,6 @@
 set( TEST_SRCS
 src/CryptoTest.cpp
+src/DigestEngineTest.cpp
 src/CryptoTestSuite.cpp
 src/Driver.cpp
 src/RSATest.cpp
