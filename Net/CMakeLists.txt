@@ -49,6 +49,7 @@ set( BASE_SRCS
   src/ICMPSocketImpl.cpp
   src/ICMPv4PacketImpl.cpp
   src/IPAddress.cpp
+  src/IPAddressImpl.cpp
   src/MailMessage.cpp
   src/MailRecipient.cpp
   src/MailStream.cpp

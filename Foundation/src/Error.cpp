@@ -38,6 +38,7 @@
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Error.h"
 #include <string>
+#include <string.h>
 
 
 namespace Poco {
@@ -66,9 +67,24 @@ namespace Poco {
 
 	std::string Error::getMessage(int errorCode)
 	{
-#error todo
-		char errmsg[256];
-		return std::string(strerror_r(errorCode, errMsg, 256));
+		/* Reentrant version of `strerror'.
+		   There are 2 flavors of `strerror_r', GNU which returns the string
+		   and may or may not use the supplied temporary buffer and POSIX one
+		   which fills the string into the buffer.
+		   To use the POSIX version, -D_XOPEN_SOURCE=600 or -D_POSIX_C_SOURCE=200112L
+		   without -D_GNU_SOURCE is needed, otherwise the GNU version is
+		   preferred.
+		*/
+#ifdef _GNU_SOURCE
+		char errmsg[256] = "";
+		return std::string(strerror_r(errorCode, errmsg, 256));
+#elif (_XOPEN_SOURCE >= 600)
+		char errmsg[256] = "";
+		strerror_r(errorCode, errmsg, 256);
+		return errmsg;
+#else
+		return std::string(strerror(errorCode));
+#endif
 	}
 
 #endif
