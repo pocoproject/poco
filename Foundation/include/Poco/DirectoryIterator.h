@@ -81,7 +81,7 @@ public:
 	DirectoryIterator(const Path& path);
 		/// Creates a directory iterator for the given path.
 
-	~DirectoryIterator();
+	virtual ~DirectoryIterator();
 		/// Destroys the DirectoryIterator.
 
 	const std::string& name() const;
@@ -95,7 +95,7 @@ public:
 	DirectoryIterator& operator = (const Path& path);
 	DirectoryIterator& operator = (const std::string& path);
 	
-	DirectoryIterator& operator ++ ();   // prefix
+	virtual DirectoryIterator& operator ++ ();   // prefix
 	
 	//@ deprecated
 	DirectoryIterator operator ++ (int); // postfix
@@ -109,9 +109,11 @@ public:
 	bool operator == (const DirectoryIterator& iterator) const;
 	bool operator != (const DirectoryIterator& iterator) const;
 
-private:
+protected:
 	Path _path;
 	File _file;
+
+private:
 	DirectoryIteratorImpl* _pImpl;
 };
 
