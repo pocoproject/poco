@@ -48,6 +48,9 @@
     <ClInclude Include="src\sqlite3.h">
       <Filter>3rdparty\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Data\SQLite\Notifier.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Binder.cpp">
@@ -73,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="src\sqlite3.c">
       <Filter>3rdparty\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Notifier.cpp">
+      <Filter>SQLite\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -42,6 +42,7 @@
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Utility.h"
+#include "Poco/Data/SQLite/Notifier.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Nullable.h"
@@ -60,6 +61,7 @@
 #include "Poco/Exception.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Delegate.h"
 #include <iostream>
 
 
@@ -79,6 +81,7 @@ using Poco::Data::AbstractExtractionVec;
 using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBindingVec;
 using Poco::Data::NotConnectedException;
+using Poco::Data::SQLite::Notifier;
 using Poco::Nullable;
 using Poco::Tuple;
 using Poco::Any;
@@ -102,6 +105,7 @@ using Poco::Data::SQLite::ParameterCountMismatchException;
 using Poco::Int32;
 using Poco::Dynamic::Var;
 using Poco::Data::SQLite::Utility;
+using Poco::delegate;
 
 
 class Person
@@ -2765,6 +2769,7 @@ void SQLiteTest::testCommitCallback()
 	std::string firstName("firstname");
 	std::string address("Address");
 	int age = 133132;
+	int count = 0;
 	std::string result;
 	tmp.begin();
 	tmp << "DROP TABLE IF EXISTS Person", now;
@@ -2806,6 +2811,7 @@ void SQLiteTest::testRollbackCallback()
 	std::string firstName("firstname");
 	std::string address("Address");
 	int age = 133132;
+	int count = 0;
 	std::string result;
 	tmp.begin();
 	tmp << "DROP TABLE IF EXISTS Person", now;
@@ -2822,6 +2828,123 @@ void SQLiteTest::testRollbackCallback()
 	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(lastName), use(firstName), use(address), use(age), now;
 	tmp.rollback();
 	assert (val == 0);
+}
+
+
+void SQLiteTest::testNotifier()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (session.isConnected());
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	Notifier notifier(session);
+	notifier.insert += delegate(this, &SQLiteTest::onInsert);
+	notifier.update += delegate(this, &SQLiteTest::onUpdate);
+	notifier.erase += delegate(this, &SQLiteTest::onDelete);
+
+	_insertCounter = 0;
+	_updateCounter = 0;
+	_deleteCounter = 0;
+
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	assert (_insertCounter == 1);
+	assert (notifier.getRow() == 1);
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Lisa', 'Springfield', 10)", now;
+	assert (_insertCounter == 2);
+	assert (notifier.getRow() == 2);
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Homer', 'Springfield', 42)", now;
+	assert (_insertCounter == 3);
+	assert (notifier.getRow() == 3);
+
+	session << "UPDATE PERSON SET Age = 11 WHERE FirstName = 'Bart'", now;
+	assert (_updateCounter == 1);
+	assert (notifier.getRow() == 1);
+	session << "UPDATE PERSON SET Age = 9 WHERE FirstName = 'Lisa'", now;
+	assert (_updateCounter == 2);
+	assert (notifier.getRow() == 2);
+	session << "UPDATE PERSON SET Age = 41 WHERE FirstName = 'Homer'", now;
+	assert (_updateCounter == 3);
+	assert (notifier.getRow() == 3);
+
+	notifier.setRow(0);
+	// SQLite optimizes DELETE so here we must have
+	// the WHERE clause to trigger per-row notifications
+	session << "DELETE FROM PERSON WHERE 1=1", now;
+	assert (_deleteCounter == 3);
+	assert (notifier.getRow() == 3);
+
+	notifier.insert -= delegate(this, &SQLiteTest::onInsert);
+	notifier.update -= delegate(this, &SQLiteTest::onUpdate);
+	notifier.erase -= delegate(this, &SQLiteTest::onDelete);
+
+	notifier.disableUpdate();
+
+	notifier.setRow(0);
+	_commitCounter = 0;
+	notifier.commit += delegate(this, &SQLiteTest::onCommit);
+	session.begin();
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Lisa', 'Springfield', 10)", now;
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Homer', 'Springfield', 42)", now;
+	session.commit();
+	assert (_commitCounter == 1);
+	assert (notifier.getRow() == 0);
+	notifier.commit -= delegate(this, &SQLiteTest::onCommit);
+
+	session << "DELETE FROM PERSON", now;
+
+	notifier.setRow(0);
+	_rollbackCounter = 0;
+	notifier.rollback += delegate(this, &SQLiteTest::onRollback);
+	session.begin();
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Lisa', 'Springfield', 10)", now;
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Homer', 'Springfield', 42)", now;
+	session.rollback();
+	assert (_rollbackCounter == 1);
+	assert (notifier.getRow() == 0);
+	notifier.rollback -= delegate(this, &SQLiteTest::onRollback);
+}
+
+
+void SQLiteTest::onInsert(const void* pSender)
+{
+	Notifier* pN = reinterpret_cast<Notifier*>(const_cast<void*>(pSender));
+	std::cout << "onInsert, row:" << pN->getRow() << std::endl;
+	++_insertCounter;
+}
+
+
+void SQLiteTest::onUpdate(const void* pSender)
+{
+	Notifier* pN = reinterpret_cast<Notifier*>(const_cast<void*>(pSender));
+	std::cout << "onUpdate, row:" << pN->getRow() << std::endl;
+	++_updateCounter;
+}
+
+
+void SQLiteTest::onDelete(const void* pSender)
+{
+	Notifier* pN = reinterpret_cast<Notifier*>(const_cast<void*>(pSender));
+	std::cout << "onDelete, row:" << pN->getRow() << std::endl;
+	++_deleteCounter;
+}
+
+
+void SQLiteTest::onCommit(const void* pSender)
+{
+	Notifier* pN = reinterpret_cast<Notifier*>(const_cast<void*>(pSender));
+	std::cout << "onCommit, row:" << pN->getRow() << std::endl;
+	++_commitCounter;
+}
+
+
+void SQLiteTest::onRollback(const void* pSender)
+{
+	Notifier* pN = reinterpret_cast<Notifier*>(const_cast<void*>(pSender));
+	std::cout << "onRollback, row:" << pN->getRow() << std::endl;
+	++_rollbackCounter;
 }
 
 
@@ -3265,6 +3388,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testUpdateCallback);
 	CppUnit_addTest(pSuite, SQLiteTest, testCommitCallback);
 	CppUnit_addTest(pSuite, SQLiteTest, testRollbackCallback);
+	CppUnit_addTest(pSuite, SQLiteTest, testNotifier);
 	CppUnit_addTest(pSuite, SQLiteTest, testSessionTransaction);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransaction);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);

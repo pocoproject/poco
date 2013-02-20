@@ -270,6 +270,7 @@
     <ClInclude Include="include\Poco\Data\SQLite\Binder.h" />
     <ClInclude Include="include\Poco\Data\SQLite\Connector.h" />
     <ClInclude Include="include\Poco\Data\SQLite\Extractor.h" />
+    <ClInclude Include="include\Poco\Data\SQLite\Notifier.h" />
     <ClInclude Include="include\Poco\Data\SQLite\SessionImpl.h" />
     <ClInclude Include="include\Poco\Data\SQLite\SQLite.h" />
     <ClInclude Include="include\Poco\Data\SQLite\SQLiteException.h" />
@@ -281,6 +282,7 @@
     <ClCompile Include="src\Binder.cpp" />
     <ClCompile Include="src\Connector.cpp" />
     <ClCompile Include="src\Extractor.cpp" />
+    <ClCompile Include="src\Notifier.cpp" />
     <ClCompile Include="src\SessionImpl.cpp" />
     <ClCompile Include="src\SQLiteException.cpp" />
     <ClCompile Include="src\SQLiteStatementImpl.cpp" />

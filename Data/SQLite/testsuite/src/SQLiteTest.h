@@ -146,6 +146,7 @@ public:
 	void testUpdateCallback();
 	void testCommitCallback();
 	void testRollbackCallback();
+	void testNotifier();
 
 	void testSessionTransaction();
 	void testTransaction();
@@ -158,6 +159,12 @@ public:
 	static int sqliteCommitCallbackFn(void*);
 	static void sqliteRollbackCallbackFn(void*);
 
+	void onInsert(const void* pSender);
+	void onUpdate(const void* pSender);
+	void onDelete(const void* pSender);
+	void onCommit(const void* pSender);
+	void onRollback(const void* pSender);
+
 	static CppUnit::Test* suite();
 
 private:
@@ -166,6 +173,9 @@ private:
 	static int _insertCounter;
 	static int _updateCounter;
 	static int _deleteCounter;
+
+	int _commitCounter;
+	int _rollbackCounter;
 };
 
 

@@ -14,7 +14,7 @@ SYSFLAGS += -DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS \
         -DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_COMPLETE \
         -DSQLITE_OMIT_TCL_VARIABLE -DSQLITE_OMIT_DEPRECATED
 
-objects = Binder Extractor SessionImpl Connector \
+objects = Binder Extractor Notifier SessionImpl Connector \
         SQLiteException SQLiteStatementImpl Utility
 
 sqlite_objects = sqlite3

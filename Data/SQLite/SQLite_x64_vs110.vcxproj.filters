@@ -30,6 +30,9 @@
     <ClInclude Include="include\Poco\Data\SQLite\Extractor.h">
       <Filter>SQLite\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Data\SQLite\Notifier.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Data\SQLite\SessionImpl.h">
       <Filter>SQLite\Header Files</Filter>
     </ClInclude>
@@ -57,6 +60,9 @@
       <Filter>SQLite\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Extractor.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Notifier.cpp">
       <Filter>SQLite\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SessionImpl.cpp">

@@ -439,6 +439,8 @@
 				<File
 					RelativePath=".\include\Poco\Data\SQLite\Extractor.h"/>
 				<File
+					RelativePath=".\include\Poco\Data\SQLite\Notifier.h"/>
+				<File
 					RelativePath=".\include\Poco\Data\SQLite\SessionImpl.h"/>
 				<File
 					RelativePath=".\include\Poco\Data\SQLite\SQLite.h"/>
@@ -457,6 +459,8 @@
 					RelativePath=".\src\Connector.cpp"/>
 				<File
 					RelativePath=".\src\Extractor.cpp"/>
+				<File
+					RelativePath=".\src\Notifier.cpp"/>
 				<File
 					RelativePath=".\src\SessionImpl.cpp"/>
 				<File

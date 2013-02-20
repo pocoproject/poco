@@ -297,10 +297,8 @@ bool Utility::setThreadMode(int mode)
 		}
 		sqlite3_initialize();
 	}
-	return false;
-#else
-	return false;
 #endif
+	return false;
 }
 
 
