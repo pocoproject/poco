@@ -99,6 +99,14 @@ public:
 	}
 
 
+	void add(const std::string& name, const char* value)
+		/// Creates an element with the given name and value
+		// adds it to the document.
+	{
+		addElement(new ConcreteElement<std::string>(name, std::string(value)));
+	}
+
+
 	void clear();
 		/// Removes all elements from the document.
 
