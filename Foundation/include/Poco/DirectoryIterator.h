@@ -109,7 +109,7 @@ public:
 	bool operator == (const DirectoryIterator& iterator) const;
 	bool operator != (const DirectoryIterator& iterator) const;
 
-public:
+protected:
 	Path _path;
 	File _file;
 

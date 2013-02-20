@@ -33,7 +33,9 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/RecursiveDirectoryIteratorStrategies.h"
+
 
 namespace Poco
 {
@@ -44,22 +46,25 @@ using namespace std;
 // TraverseBase
 //
 TraverseBase::TraverseBase(DepthFunPtr depthDeterminer, UInt16 maxDepth)
-		: _depthDeterminer(depthDeterminer), _maxDepth(maxDepth)
+	: _depthDeterminer(depthDeterminer), _maxDepth(maxDepth)
 {
 }
+
 
 inline bool TraverseBase::isFiniteDepth()
 {
 	return _maxDepth != D_INFINITE;
 }
 
+
 //
 // ChildrenFirstTraverse
 //
 ChildrenFirstTraverse::ChildrenFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth)
-		: TraverseBase(depthDeterminer, maxDepth)
+	: TraverseBase(depthDeterminer, maxDepth)
 {
 }
+
 
 const string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 {
@@ -108,14 +113,16 @@ const string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 	return itStack->top()->path();
 }
 
+
 //
 // SiblingsFirstTraverse
 //
 SiblingsFirstTraverse::SiblingsFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth)
-		: TraverseBase(depthDeterminer, maxDepth)
+	: TraverseBase(depthDeterminer, maxDepth)
 {
 	_dirsStack.push(queue<string>());
 }
+
 
 const string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 {
@@ -167,5 +174,6 @@ const string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 
 	return itStack->top()->path();
 }
+
 
 } // namespace Poco

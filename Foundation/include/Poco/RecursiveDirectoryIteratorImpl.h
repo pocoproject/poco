@@ -35,6 +35,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef Foundation_RecursiveDirectoryIteratorImpl_INCLUDE
 #define Foundation_RecursiveDirectoryIteratorImpl_INCLUDE
 
@@ -42,6 +43,7 @@
 #include "Poco/RecursiveDirectoryIteratorStrategies.h"
 #include <stack>
 #include <functional>
+
 
 namespace Poco
 {
@@ -57,105 +59,72 @@ public:
 	{
 		D_INFINITE = 0
 	};
-	/// Constant for infinite traverse depth.
+		/// Constant for infinite traverse depth.
 
-	RecursiveDirectoryIteratorImpl(const std::string& path, UInt16 maxDepth = D_INFINITE);
-	~RecursiveDirectoryIteratorImpl();
+	RecursiveDirectoryIteratorImpl(const std::string& path, UInt16 maxDepth = D_INFINITE)
+		: _maxDepth(maxDepth), _traverseStrategy(std::ptr_fun(depthFun), _maxDepth), _isFinished(false), _rc(1)
+	{
+		_itStack.push(DirectoryIterator(path));
+		_current = _itStack.top()->path();
+	}
 
-	void duplicate();
-	void release();
-	UInt16 depth() const;
-	UInt16 maxDepth() const;
+	~RecursiveDirectoryIteratorImpl()
+	{
+	}
 
-	const std::string& get() const;
-	const std::string& next();
+	inline void duplicate()
+	{
+		++_rc;
+	}
+
+	inline void release()
+	{
+		if (--_rc == 0)
+			delete this;
+	}
+
+	inline UInt16 depth() const
+	{
+		return depthFun(_itStack);
+	}
+
+	inline UInt16 maxDepth() const
+	{
+		return _maxDepth;
+	}
+
+	inline const std::string& get() const
+	{
+		return _current;
+	}
+	const std::string& next()
+	{
+		if (_isFinished)
+			return _current;
+
+		_current = _traverseStrategy.next(&_itStack, &_isFinished);
+
+		return _current;
+	}
 
 private:
 	typedef std::stack<DirectoryIterator> Stack;
 
-	static UInt16 depthFun(const Stack& stack);
-	/// Function which implements the logic of determining
-	/// recursion depth.
+	static UInt16 depthFun(const Stack& stack)
+		/// Function which implements the logic of determining
+		/// recursion depth.
+	{
+		return stack.size();
+	}
 
 	UInt16 _maxDepth;
 	TTraverseStrategy _traverseStrategy;
-
 	bool _isFinished;
-
 	Stack _itStack;
 	std::string _current;
 	int _rc;
 };
 
-//
-// inlines
-//
-template<class TTraverseStrategy>
-inline void RecursiveDirectoryIteratorImpl<TTraverseStrategy>::duplicate()
-{
-	++_rc;
-}
-
-template<class TTraverseStrategy>
-inline void RecursiveDirectoryIteratorImpl<TTraverseStrategy>::release()
-{
-	if (--_rc == 0)
-		delete this;
-}
-
-template<class TTraverseStrategy>
-inline UInt16 RecursiveDirectoryIteratorImpl<TTraverseStrategy>::depth() const
-{
-	return depthFun(_itStack);
-}
-
-template<class TTraverseStrategy>
-inline UInt16 RecursiveDirectoryIteratorImpl<TTraverseStrategy>::maxDepth() const
-{
-	return _maxDepth;
-}
-
-template<class TTraverseStrategy>
-inline const std::string&
-RecursiveDirectoryIteratorImpl<TTraverseStrategy>::get() const
-{
-	return _current;
-}
-
-template<class TTraverseStrategy>
-inline UInt16 RecursiveDirectoryIteratorImpl<TTraverseStrategy>::depthFun(const Stack& stack)
-{
-	return stack.size();
-}
-
-//
-// not inlines
-//
-template<class TTraverseStrategy>
-RecursiveDirectoryIteratorImpl<TTraverseStrategy>::RecursiveDirectoryIteratorImpl(const std::string& path, UInt16 maxDepth)
-		: _maxDepth(maxDepth), _traverseStrategy(std::ptr_fun(depthFun), _maxDepth), _isFinished(false)
-{
-	_itStack.push(DirectoryIterator(path));
-	_current = _itStack.top()->path();
-}
-
-template<class TTraverseStrategy>
-RecursiveDirectoryIteratorImpl<TTraverseStrategy>::~RecursiveDirectoryIteratorImpl()
-{
-
-}
-
-template<class TTraverseStrategy>
-const std::string&
-RecursiveDirectoryIteratorImpl<TTraverseStrategy>::next()
-{
-	if (_isFinished)
-		return _current;
-
-	_current = _traverseStrategy.next(&_itStack, &_isFinished);
-
-	return _current;
-}
 
 } // namespace Poco
 

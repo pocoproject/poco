@@ -35,6 +35,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef Foundation_RecursiveDirectoryIteratorStategies_INCLUDE
 #define Foundation_RecursiveDirectoryIteratorStategies_INCLUDE
 
@@ -43,6 +44,7 @@
 #include <stack>
 #include <queue>
 #include <functional>
+
 
 namespace Poco
 {
@@ -57,7 +59,7 @@ public:
 	{
 		D_INFINITE = 0
 	};
-	/// Constant for infinite traverse depth.
+		/// Constant for infinite traverse depth.
 
 	TraverseBase(DepthFunPtr depthDeterminer, UInt16 maxDepth = D_INFINITE);
 
@@ -66,7 +68,6 @@ protected:
 
 	DepthFunPtr _depthDeterminer;
 	UInt16 _maxDepth;
-
 	DirectoryIterator _itEnd;
 
 private:
@@ -74,6 +75,7 @@ private:
 	TraverseBase(const TraverseBase&);
 	TraverseBase& operator=(const TraverseBase&);
 };
+
 
 class ChildrenFirstTraverse: public TraverseBase
 {
@@ -87,6 +89,7 @@ private:
 	ChildrenFirstTraverse(const ChildrenFirstTraverse&);
 	ChildrenFirstTraverse& operator=(const ChildrenFirstTraverse&);
 };
+
 
 class SiblingsFirstTraverse: public TraverseBase
 {
@@ -102,6 +105,7 @@ private:
 
 	std::stack<std::queue<std::string> > _dirsStack;
 };
+
 
 } // namespace Poco
 

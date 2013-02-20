@@ -35,6 +35,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef Foundation_RecursiveDirectoryIterator_INCLUDE
 #define Foundation_RecursiveDirectoryIterator_INCLUDE
 
@@ -43,6 +44,7 @@
 #include "Poco/Path.h"
 #include "Poco/RecursiveDirectoryIteratorImpl.h"
 #include "Poco/RecursiveDirectoryIteratorStrategies.h"
+
 
 namespace Poco
 {
@@ -54,27 +56,27 @@ class RecursiveDirectoryIteratorImpl;
 
 template<class TTravStr = ChildrenFirstTraverse>
 class RecursiveDirectoryIterator
-/// The RecursiveDirectoryIterator class is used to enumerate
-/// all files in a directory and its subdirectories.
-///
-/// RecursiveDirectoryIterator has some limitations:
-///   * only forward iteration (++) is supported
-///   * an iterator copied from another one will always
-///     point to the same file as the original iterator,
-///     even is the original iterator has been advanced
-///     (all copies of an iterator share their state with
-///     the original iterator)
-///
-/// The class can follow different traversal strategies:
-///   * depth-first strategy;
-///   * siblings-first strategy.
-/// The stategies are set by template parameter.
-/// There are two corresponding typedefs:
-///   * SimpleRecursiveDirectoryIterator;
-///   * SiblingsFirstRecursiveDirectoryIterator.
-///
-/// The depth of traversal can be limited by constructor
-/// parameter maxDepth (which sets the infinite depth by default).
+	/// The RecursiveDirectoryIterator class is used to enumerate
+	/// all files in a directory and its subdirectories.
+	///
+	/// RecursiveDirectoryIterator has some limitations:
+	///		* only forward iteration (++) is supported
+	///		* an iterator copied from another one will always
+	///		point to the same file as the original iterator,
+	///		even is the original iterator has been advanced
+	///		(all copies of an iterator share their state with
+	///		the original iterator)
+	///
+	/// The class can follow different traversal strategies:
+	///		* depth-first strategy;
+	///		* siblings-first strategy.
+	/// The stategies are set by template parameter.
+	/// There are two corresponding typedefs:
+	///		* SimpleRecursiveDirectoryIterator;
+	///		* SiblingsFirstRecursiveDirectoryIterator.
+	///
+	/// The depth of traversal can be limited by constructor
+	/// parameter maxDepth (which sets the infinite depth by default).
 {
 public:
 	typedef RecursiveDirectoryIterator<TTravStr> MyType;
@@ -83,53 +85,150 @@ public:
 	{
 		D_INFINITE = 0
 	};
-	/// Constant for infinite traverse depth.
+		/// Constant for infinite traverse depth.
 
-	RecursiveDirectoryIterator();
-	/// Creates the end iterator.
+	RecursiveDirectoryIterator()
+		/// Creates the end iterator.
+		: _pImpl(0)
+	{
+	}
 
 	RecursiveDirectoryIterator(const std::string& path, UInt16 maxDepth = D_INFINITE);
-	/// Creates a recursive directory iterator for the given path.
+		/// Creates a recursive directory iterator for the given path.
 
-	RecursiveDirectoryIterator(const MyType& iterator);
-	/// Creates a copy of another recursive directory iterator.
+	RecursiveDirectoryIterator(const MyType& iterator)
+		/// Creates a copy of another recursive directory iterator.
+		: _pImpl(iterator._pImpl), _path(iterator._path), _file(iterator._file)
+	{
+	}
 
-	RecursiveDirectoryIterator(const DirectoryIterator& iterator, UInt16 maxDepth = D_INFINITE);
-	/// Creates a recursive directory iterator for the path of
-	/// non-recursive directory iterator.
+	RecursiveDirectoryIterator(const DirectoryIterator& iterator, UInt16 maxDepth = D_INFINITE)
+		/// Creates a recursive directory iterator for the path of
+		/// non-recursive directory iterator.
+		: _pImpl(new ImplType(iterator->path(), maxDepth)), _path(Path(_pImpl->get())), _file(_path)
+	{
+	}
 
-	RecursiveDirectoryIterator(const File& file, UInt16 maxDepth = D_INFINITE);
-	/// Creates a recursive directory iterator for the given path.
+	RecursiveDirectoryIterator(const File& file, UInt16 maxDepth = D_INFINITE)
+		/// Creates a recursive directory iterator for the given path.
+		: _pImpl(new ImplType(file.path(), maxDepth)), _path(Path(_pImpl->get())), _file(_path)
+	{
+	}
 
-	RecursiveDirectoryIterator(const Path& path, UInt16 maxDepth = D_INFINITE);
-	/// Creates a recursive directory iterator for the given path.
+	RecursiveDirectoryIterator(const Path& path, UInt16 maxDepth = D_INFINITE)
+		/// Creates a recursive directory iterator for the given path.
+		: _pImpl(new ImplType(path.toString(), maxDepth)), _path(Path(_pImpl->get())), _file(_path)
+	{
+	}
 
-	~RecursiveDirectoryIterator();
-	/// Destroys the DirectoryIterator.
 
-	const std::string& name() const;
-	/// Returns the current filename.
+	~RecursiveDirectoryIterator()
+		/// Destroys the DirectoryIterator.
+	{
+		if (_pImpl)
+			_pImpl->release();
+	}
 
-	const Poco::Path& path() const;
-	/// Returns the current path.
+	const std::string& name() const
+		/// Returns the current filename.
+	{
+		return _path.getFileName();
+	}
 
-	UInt16 depth() const;
-	/// Depth of recursion (counting from 1).
+	const Poco::Path& path() const
+		/// Returns the current path.
+	{
+		return _path;
+	}
 
-	UInt16 maxDepth() const;
-	/// Max depth of recursion (counting from 1).
+	UInt16 depth() const
+		/// Depth of recursion (counting from 1).
+	{
+		return _pImpl->depth();
+	}
 
-	MyType& operator =(const MyType& it);
-	MyType& operator =(const File& file);
-	MyType& operator =(const Path& path);
-	MyType& operator =(const std::string& path);
+	UInt16 maxDepth() const
+		/// Max depth of recursion (counting from 1).
+	{
+		return _pImpl->maxDepth();
+	}
 
-	MyType& operator ++();
 
-	const File& operator *() const;
-	File& operator *();
-	const File* operator ->() const;
-	File* operator ->();
+	MyType& operator =(const MyType& it)
+	{
+		if (_pImpl)
+			_pImpl->release();
+		_pImpl = it._pImpl;
+		if (_pImpl)
+		{
+			_pImpl->duplicate();
+			_path = it._path;
+			_file = _path;
+		}
+		return *this;
+	}
+
+	MyType& operator =(const File& file)
+	{
+		if (_pImpl)
+			_pImpl->release();
+		_pImpl = new ImplType(file.path());
+		_path = Path(_pImpl->get());
+		_file = _path;
+		return *this;
+	}
+
+
+	MyType& operator =(const Path& path)
+	{
+		if (_pImpl)
+			_pImpl->release();
+		_pImpl = new ImplType(path.toString());
+		_path = Path(_pImpl->get());
+		_file = _path;
+		return *this;
+	}
+
+	MyType& operator =(const std::string& path)
+	{
+		if (_pImpl)
+			_pImpl->release();
+		_pImpl = new ImplType(path);
+		_path = Path(_pImpl->get());
+		_file = _path;
+		return *this;
+	}
+
+	MyType& operator ++()
+	{
+		if (_pImpl)
+		{
+			_path = Path(_pImpl->next());
+			_file = _path;
+		}
+		return *this;
+	}
+
+	const File& operator *() const
+	{
+		return _file;
+	}
+
+	File& operator *()
+	{
+		return _file;
+	}
+
+	const File* operator ->() const
+	{
+		return &_file;
+	}
+
+	File* operator ->()
+	{
+		return &_file;
+	}
+
 
 	template<class T1, class T2>
 	friend inline bool operator ==(const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b);
@@ -143,6 +242,7 @@ private:
 	Path _path;
 	File _file;
 };
+
 
 //
 // friend comparsion operators
@@ -159,172 +259,6 @@ inline bool operator !=(const RecursiveDirectoryIterator<T1>& a, const Recursive
 	return a.path().toString() != b.path().toString();;
 }
 
-//
-// inlines
-//
-template<class TTravStr>
-inline const std::string&
-RecursiveDirectoryIterator<TTravStr>::name() const
-{
-	return _path.getFileName();
-}
-
-template<class TTravStr>
-inline const Path&
-RecursiveDirectoryIterator<TTravStr>::path() const
-{
-	return _path;
-}
-
-template<class TTravStr>
-inline UInt16 RecursiveDirectoryIterator<TTravStr>::depth() const
-{
-	return _pImpl->depth();
-}
-
-template<class TTravStr>
-inline UInt16 RecursiveDirectoryIterator<TTravStr>::maxDepth() const
-{
-	return _pImpl->maxDepth();
-}
-
-template<class TTravStr>
-inline const File&
-RecursiveDirectoryIterator<TTravStr>::operator *() const
-{
-	return _file;
-}
-
-template<class TTravStr>
-inline File&
-RecursiveDirectoryIterator<TTravStr>::operator *()
-{
-	return _file;
-}
-
-template<class TTravStr>
-inline const File*
-RecursiveDirectoryIterator<TTravStr>::operator ->() const
-{
-	return &_file;
-}
-
-template<class TTravStr>
-inline File*
-RecursiveDirectoryIterator<TTravStr>::operator ->()
-{
-	return &_file;
-}
-
-//
-// not inlines
-//
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>::RecursiveDirectoryIterator()
-		: _pImpl(0)
-{
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>::RecursiveDirectoryIterator(const std::string& path, UInt16 maxDepth)
-		: _pImpl(new ImplType(path, maxDepth)), _path(Path(_pImpl->get())), _file(_path)
-{
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>::RecursiveDirectoryIterator(const MyType& iterator)
-		: _pImpl(iterator._pImpl), _path(iterator._path), _file(iterator._file)
-{
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>::RecursiveDirectoryIterator(const DirectoryIterator& iterator, UInt16 maxDepth)
-		: _pImpl(new ImplType(iterator->path(), maxDepth)), _path(Path(_pImpl->get())), _file(_path)
-{
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>::RecursiveDirectoryIterator(const File& file, UInt16 maxDepth)
-		: _pImpl(new ImplType(file.path(), maxDepth)), _path(Path(_pImpl->get())), _file(_path)
-{
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>::RecursiveDirectoryIterator(const Path& path, UInt16 maxDepth)
-		: _pImpl(new ImplType(path.toString(), maxDepth)), _path(Path(_pImpl->get())), _file(_path)
-{
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>::~RecursiveDirectoryIterator()
-{
-	if (_pImpl)
-		_pImpl->release();
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>&
-RecursiveDirectoryIterator<TTravStr>::operator =(const MyType& it)
-{
-	if (_pImpl)
-		_pImpl->release();
-	_pImpl = it._pImpl;
-	if (_pImpl)
-	{
-		_pImpl->duplicate();
-		_path = it._path;
-		_file = _path;
-	}
-	return *this;
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>&
-RecursiveDirectoryIterator<TTravStr>::operator =(const File& file)
-{
-	if (_pImpl)
-		_pImpl->release();
-	_pImpl = new ImplType(file.path());
-	_path = Path(_pImpl->get());
-	_file = _path;
-	return *this;
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>&
-RecursiveDirectoryIterator<TTravStr>::operator =(const Path& path)
-{
-	if (_pImpl)
-		_pImpl->release();
-	_pImpl = new ImplType(path.toString());
-	_path = Path(_pImpl->get());
-	_file = _path;
-	return *this;
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>&
-RecursiveDirectoryIterator<TTravStr>::operator =(const std::string& path)
-{
-	if (_pImpl)
-		_pImpl->release();
-	_pImpl = new ImplType(path);
-	_path = Path(_pImpl->get());
-	_file = _path;
-	return *this;
-}
-
-template<class TTravStr>
-RecursiveDirectoryIterator<TTravStr>&
-RecursiveDirectoryIterator<TTravStr>::operator ++()
-{
-	if (_pImpl)
-	{
-		_path = Path(_pImpl->next());
-		_file = _path;
-	}
-	return *this;
-}
 
 //
 // exported instances
@@ -334,11 +268,13 @@ RecursiveDirectoryIterator<ChildrenFirstTraverse> ;
 template class Foundation_API
 RecursiveDirectoryIterator<SiblingsFirstTraverse> ;
 
+
 //
 // typedefs
 //
 typedef RecursiveDirectoryIterator<ChildrenFirstTraverse> SimpleRecursiveDirectoryIterator;
 typedef RecursiveDirectoryIterator<SiblingsFirstTraverse> SiblingsFirstRecursiveDirectoryIterator;
+
 
 } // namespace Poco
 
