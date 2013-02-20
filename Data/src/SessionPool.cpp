@@ -79,7 +79,7 @@ Session SessionPool::get(const std::string& name, bool value)
 Session SessionPool::get()
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	if (_shutdown) throw InvalidAccessException("Session pull has been shut down.");
+    if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 	
 	purgeDeadSessions();
 
@@ -178,7 +178,7 @@ int SessionPool::available() const
 void SessionPool::setFeature(const std::string& name, bool state)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	if (_shutdown) throw InvalidAccessException("Session pull has been shut down.");
+	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 
 	if (_nSessions > 0)
 		throw InvalidAccessException("Features can not be set after the first session was created.");
@@ -190,7 +190,7 @@ void SessionPool::setFeature(const std::string& name, bool state)
 bool SessionPool::getFeature(const std::string& name)
 {
 	FeatureMap::ConstIterator it = _featureMap.find(name);
-	if (_shutdown) throw InvalidAccessException("Session pull has been shut down.");
+	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 
 	if (_featureMap.end() == it)
 		throw NotFoundException("Feature not found:" + name);
@@ -202,7 +202,7 @@ bool SessionPool::getFeature(const std::string& name)
 void SessionPool::setProperty(const std::string& name, const Poco::Any& value)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	if (_shutdown) throw InvalidAccessException("Session pull has been shut down.");
+	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 
 	if (_nSessions > 0)
 		throw InvalidAccessException("Properties can not be set after first session was created.");
