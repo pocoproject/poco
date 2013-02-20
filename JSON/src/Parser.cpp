@@ -583,8 +583,8 @@ bool Parser::readRow(bool firstCall)
 
 		token = nextToken();
 
-		if (   token->is(Token::SEPARATOR_TOKEN)
-            && token->asChar() == ':')
+		if (token->is(Token::SEPARATOR_TOKEN)
+		 && token->asChar() == ':')
 		{
 			readValue(nextToken());
 
@@ -638,8 +638,8 @@ void Parser::readValue(const Token* token)
 #if defined(POCO_HAVE_INT64)
 			Int64 value = token->asInteger64();
 			// if number is 32-bit, then handle as such
-			if (   value > std::numeric_limits<int>::max()
-                || value < std::numeric_limits<int>::min())
+			if (value > std::numeric_limits<int>::max()
+			|| value < std::numeric_limits<int>::min())
 			{
 				_handler->value(value);
 			}

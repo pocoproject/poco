@@ -200,7 +200,7 @@ void JSONTest::testNumber64Property()
 	std::string json = "{ \"test\" : 5000000000000000 }";
 	Parser parser;
 	Var result;
-    
+
 	try
 	{
 		DefaultHandler handler;
@@ -213,13 +213,13 @@ void JSONTest::testNumber64Property()
 		std::cout << jsone.message() << std::endl;
 		assert(false);
 	}
-    
+
 	assert(result.type() == typeid(Object::Ptr));
-    
+
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
 	assert(test.isInteger());
-    Poco::Int64 value = test;
+	Poco::Int64 value = test;
 	assert(value == 5000000000000000);
 }
 

@@ -122,8 +122,8 @@ Var Query::find(const std::string& path) const
 				}
 			}
 
-			if (    !result.isEmpty()
-			        && !indexes.empty() )
+			if (!result.isEmpty()
+			 && !indexes.empty() )
 			{
 				for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end(); ++it )
 				{
