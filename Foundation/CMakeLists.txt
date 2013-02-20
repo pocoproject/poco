@@ -52,6 +52,7 @@ set( BASE_SRCS
   src/DigestEngine.cpp
   src/DigestStream.cpp
   src/DirectoryIterator.cpp
+  src/RecursiveDirectoryIteratorStrategies.cpp
   src/DirectoryWatcher.cpp
   src/Environment.cpp
   src/Error.cpp
@@ -124,6 +125,7 @@ set( BASE_SRCS
   src/SharedMemory.cpp
   src/SignalHandler.cpp
   src/SimpleFileChannel.cpp
+  src/SortedDirectoryIterator.cpp
   src/SplitterChannel.cpp
   src/Stopwatch.cpp
   src/StreamChannel.cpp

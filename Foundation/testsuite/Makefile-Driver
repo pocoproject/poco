@@ -39,7 +39,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	HashSetTest HashMapTest SharedMemoryTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
-	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest
+	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest
 
 target         = testrunner
 target_version = 1

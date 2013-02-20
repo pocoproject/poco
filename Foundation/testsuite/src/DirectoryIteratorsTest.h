@@ -1,9 +1,11 @@
 //
-// FilesystemTestSuite.cpp
+// DirectoryIteratorsTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FilesystemTestSuite.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/DirectoryIteratorsTest.h#1 $
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Definition of the DirectoryIteratorsTest class.
+//
+// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,23 +32,37 @@
 //
 
 
-#include "FilesystemTestSuite.h"
-#include "PathTest.h"
-#include "FileTest.h"
-#include "GlobTest.h"
-#include "DirectoryWatcherTest.h"
-#include "DirectoryIteratorsTest.h"
+#ifndef DirectoryIteratorsTest_INCLUDED
+#define DirectoryIteratorsTest_INCLUDED
 
 
-CppUnit::Test* FilesystemTestSuite::suite()
+#include "Poco/Foundation.h"
+#include "Poco/Path.h"
+#include "CppUnit/TestCase.h"
+
+
+class DirectoryIteratorsTest: public CppUnit::TestCase
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FilesystemTestSuite");
+public:
+	DirectoryIteratorsTest(const std::string& name);
+	~DirectoryIteratorsTest();
 
-	pSuite->addTest(PathTest::suite());
-	pSuite->addTest(FileTest::suite());
-	pSuite->addTest(GlobTest::suite());
-	pSuite->addTest(DirectoryWatcherTest::suite());
-	pSuite->addTest(DirectoryIteratorsTest::suite());
+	void testDirectoryIterator();
+	void testSortedDirectoryIterator();
+	void testSimpleRecursiveDirectoryIterator();
+	void testSiblingsFirstRecursiveDirectoryIterator();
 	
-	return pSuite;
-}
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+	
+protected:
+	Poco::Path path() const;
+	void createSubdir(Poco::Path& p);
+
+private:
+};
+
+
+#endif // DirectoryIteratorsTest_INCLUDED
