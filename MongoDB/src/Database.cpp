@@ -75,7 +75,7 @@ Document::Ptr Database::getLastErrorDoc(Connection& connection) const
 
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createQueryRequest("$cmd");
 	request->setNumberToReturn(1);
-	request->query().add("getLastError", 1);
+	request->selector().add("getLastError", 1);
 
 	Poco::MongoDB::ResponseMessage response;
 	connection.sendRequest(*request, response);
@@ -110,7 +110,7 @@ Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const 
 {
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createQueryRequest("$cmd");
 	request->setNumberToReturn(1);
-	request->query().add("count", collectionName);
+	request->selector().add("count", collectionName);
 	return request;
 }
 
