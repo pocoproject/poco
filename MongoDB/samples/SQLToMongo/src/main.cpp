@@ -37,19 +37,41 @@
 #include "Poco/MongoDB/Database.h"
 #include "Poco/MongoDB/Cursor.h"
 
-// INSERT INTO USERS
-// VALUES( "Braem", 33)
+// INSERT INTO players
+// VALUES( "Messi", "Lionel", 1987)
 void sample1(Poco::MongoDB::Connection& connection)
 {
 	std::cout << "*** SAMPLE 1 ***" << std::endl;
 
-	Poco::MongoDB::Database db("mydb");
+	Poco::MongoDB::Database db("sample");
+	Poco::SharedPtr<Poco::MongoDB::InsertRequest> insertUserRequest = db.createInsertRequest("players");
 
-	Poco::SharedPtr<Poco::MongoDB::InsertRequest> insertUserRequest = db.createInsertRequest("users");
-	Poco::MongoDB::Document::Ptr user = new Poco::MongoDB::Document();
-	user->add("lastname", std::string("Braem"));
-	user->add("age", 33);
-	insertUserRequest->documents().push_back(user);
+	// With one insert request, we can add multiple documents
+
+	Poco::MongoDB::Document::Ptr player = new Poco::MongoDB::Document();
+	player->add("lastname", "Messi");
+	player->add("firstname", "Lionel");
+	player->add("birthyear", 1987);
+	insertUserRequest->documents().push_back(player);
+
+	player = new Poco::MongoDB::Document();
+	player->add("lastname", "Valdes");
+	player->add("firstname", "Victor");
+	player->add("birthyear", 1982);
+	insertUserRequest->documents().push_back(player);
+
+	player = new Poco::MongoDB::Document();
+	player->add("lastname", "Puyol");
+	player->add("firstname", "Carles");
+	player->add("birthyear", 1978);
+	insertUserRequest->documents().push_back(player);
+
+	player = new Poco::MongoDB::Document();
+	player->add("lastname", "Piqué");
+	player->add("firstname", "Gerard");
+	player->add("birthyear", 1987);
+	insertUserRequest->documents().push_back(player);
+
 	connection.sendRequest(*insertUserRequest);
 	std::string lastError = db.getLastError(connection);
 	if ( !lastError.empty() )
@@ -58,22 +80,22 @@ void sample1(Poco::MongoDB::Connection& connection)
 	}
 }
 
-// SELECT lastname, age FROM users
+// SELECT lastname, birthyear FROM players
 void sample2(Poco::MongoDB::Connection& connection)
 {
 	std::cout << "*** SAMPLE 2 ***" << std::endl;
 
-	Poco::MongoDB::Cursor cursor("mydb", "users");
+	Poco::MongoDB::Cursor cursor("sample", "players");
 	// Selecting fields is done by adding them to the returnFieldSelector
 	// Use 1 as value of the element.
 	cursor.query().returnFieldSelector().add("lastname", 1);
-	cursor.query().returnFieldSelector().add("age", 1);
+	cursor.query().returnFieldSelector().add("birthyear", 1);
 	Poco::MongoDB::ResponseMessage& response = cursor.next(connection);
 	while(1)
 	{
 		for(Poco::MongoDB::Document::Vector::const_iterator it = response.documents().begin(); it != response.documents().end(); ++it)
 		{
-			std::cout << "LastName: " << (*it)->get<std::string>("lastname") << " Age: " << (*it)->get<int>("age") << std::endl;
+			std::cout << (*it)->get<std::string>("lastname") << " (" << (*it)->get<int>("birthyear") << ')' << std::endl;
 		}
 
 		// When the cursorID is 0, there are no documents left, so break out ...
@@ -87,18 +109,18 @@ void sample2(Poco::MongoDB::Connection& connection)
 	}
 }
 
-// SELECT * FROM users
+// SELECT * FROM players
 void sample3(Poco::MongoDB::Connection& connection)
 {
 	std::cout << "*** SAMPLE 3 ***" << std::endl;
 
-	Poco::MongoDB::Cursor cursor("mydb", "users");
+	Poco::MongoDB::Cursor cursor("sample", "players");
 	Poco::MongoDB::ResponseMessage& response = cursor.next(connection);
 	while(1)
 	{
 		for(Poco::MongoDB::Document::Vector::const_iterator it = response.documents().begin(); it != response.documents().end(); ++it)
 		{
-			std::cout << "LastName: " << (*it)->get<std::string>("lastname") << " Age: " << (*it)->get<int>("age") << std::endl;
+			std::cout << (*it)->get<std::string>("lastname") << ' ' << (*it)->get<std::string>("firstname") << " (" << (*it)->get<int>("birthyear") << ')' << std::endl;
 		}
 
 		// When the cursorID is 0, there are no documents left, so break out ...
@@ -112,12 +134,112 @@ void sample3(Poco::MongoDB::Connection& connection)
 	};
 }
 
+
+// SELECT * FROM players WHERE birthyear = 1978
+void sample4(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 4 ***" << std::endl;
+
+	Poco::MongoDB::Cursor cursor("sample", "players");
+	cursor.query().selector().add("birthyear", 1978);
+
+	Poco::MongoDB::ResponseMessage& response = cursor.next(connection);
+	while(1)
+	{
+		for(Poco::MongoDB::Document::Vector::const_iterator it = response.documents().begin(); it != response.documents().end(); ++it)
+		{
+			std::cout << (*it)->get<std::string>("lastname") << ' ' << (*it)->get<std::string>("firstname") << " (" << (*it)->get<int>("birthyear") << ')' << std::endl;
+		}
+
+		// When the cursorID is 0, there are no documents left, so break out ...
+		if ( response.cursorID() == 0 )
+		{
+			break;
+		}
+
+		// Get the next bunch of documents
+		response = cursor.next(connection);
+	};
+}
+
+// SELECT * FROM players WHERE birthyear = 1987 ORDER BY name
+void sample5(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 5 ***" << std::endl;
+
+	Poco::MongoDB::Cursor cursor("sample", "players");
+
+	// When orderby is needed, use 2 separate documents in the query selector
+	Poco::MongoDB::Document::Ptr query = new Poco::MongoDB::Document();
+	query->add("birthyear", 1987);
+	cursor.query().selector().add("$query", query);
+
+	Poco::MongoDB::Document::Ptr order = new Poco::MongoDB::Document();
+	order->add("lastname", 0);
+	cursor.query().selector().add("$orderby", order);
+
+	Poco::MongoDB::ResponseMessage& response = cursor.next(connection);
+	while(1)
+	{
+		for(Poco::MongoDB::Document::Vector::const_iterator it = response.documents().begin(); it != response.documents().end(); ++it)
+		{
+			std::cout << (*it)->get<std::string>("lastname") << ' ' << (*it)->get<std::string>("firstname") << " (" << (*it)->get<int>("birthyear") << ')' << std::endl;
+		}
+
+		// When the cursorID is 0, there are no documents left, so break out ...
+		if ( response.cursorID() == 0 )
+		{
+			break;
+		}
+
+		// Get the next bunch of documents
+		response = cursor.next(connection);
+	};
+}
+
+
+// SELECT * FROM players WHERE birthyear > 1969 and birthyear <= 1980
+void sample6(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 6 ***" << std::endl;
+
+	Poco::MongoDB::Cursor cursor("sample", "players");
+
+	Poco::MongoDB::Document::Ptr oper = new Poco::MongoDB::Document();
+	oper->add("$gt", 1969);
+	oper->add("$lte", 1980);
+
+	cursor.query().selector().add("birthyear", oper);
+
+	Poco::MongoDB::ResponseMessage& response = cursor.next(connection);
+	while(1)
+	{
+		for(Poco::MongoDB::Document::Vector::const_iterator it = response.documents().begin(); it != response.documents().end(); ++it)
+		{
+			std::cout << (*it)->get<std::string>("lastname") << ' ' << (*it)->get<std::string>("firstname") << " (" << (*it)->get<int>("birthyear") << ')' << std::endl;
+		}
+
+		// When the cursorID is 0, there are no documents left, so break out ...
+		if ( response.cursorID() == 0 )
+		{
+			break;
+		}
+
+		// Get the next bunch of documents
+		response = cursor.next(connection);
+	};
+}
+
+
 int main(int argc, char** argv)
 {
 	Poco::MongoDB::Connection connection("localhost", 27017);
 	sample1(connection);
 	sample2(connection);
 	sample3(connection);
+	sample4(connection);
+	sample5(connection);
+	sample6(connection);
 
 	return 0;
 }
