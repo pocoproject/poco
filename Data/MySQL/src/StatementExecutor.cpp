@@ -118,7 +118,9 @@ void StatementExecutor::execute()
 
 	_state = STMT_EXECUTED;
 
-	_affectedRowCount = mysql_affected_rows(_pSessionHandle);
+	my_ulonglong affectedRows = mysql_affected_rows(_pSessionHandle);
+	if (affectedRows != ((my_ulonglong) - 1))
+		_affectedRowCount = affectedRows; //Was really a DELETE, UPDATE or INSERT statement
 }
 
 
