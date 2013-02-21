@@ -481,7 +481,7 @@ void SQLExecutor::insertSingleBulk()
 	for (x = 0; x < 100; ++x)
 	{
 		std::size_t i = stmt.execute();
-		assert (i == 0);
+		assert (i == 1);
 	}
 
 	int count = 0;
