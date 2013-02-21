@@ -85,6 +85,8 @@ public:
 
 	bool fetchColumn(std::size_t n, MYSQL_BIND *bind);
 		/// Fetches the column.
+
+	std::size_t getAffectedRowCount() const;
 		
 	operator MYSQL_STMT* ();
 		/// Cast operator to native handle type.
@@ -95,9 +97,10 @@ private:
 	StatementExecutor& operator=(const StatementExecutor&);
 
 private:
-
+	MYSQL* _pSessionHandle;
 	MYSQL_STMT* _pHandle;
 	int _state;
+	std::size_t _affectedRowCount;
 	std::string _query;
 };
 
