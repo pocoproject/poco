@@ -80,6 +80,11 @@ public:
 		/// The collectionname must not contain the database name!
 
 
+	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection, const std::string& collection, const std::string& indexName, Poco::MongoDB::Document::Ptr keys, bool unique = false, bool background = false, int version = 0, int ttl = 0);
+		/// Creates an index. The document returned is the result of a getLastError call.
+		/// For more info look at the ensureIndex information on the MongoDB website.
+
+ 
 	Document::Ptr getLastErrorDoc(Connection& connection) const;
 		/// Sends the getLastError command to the database and returns the document
 
