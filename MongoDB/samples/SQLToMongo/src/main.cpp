@@ -170,13 +170,8 @@ void sample5(Poco::MongoDB::Connection& connection)
 	Poco::MongoDB::Cursor cursor("sample", "players");
 
 	// When orderby is needed, use 2 separate documents in the query selector
-	Poco::MongoDB::Document::Ptr query = new Poco::MongoDB::Document();
-	query->add("birthyear", 1987);
-	cursor.query().selector().add("$query", query);
-
-	Poco::MongoDB::Document::Ptr order = new Poco::MongoDB::Document();
-	order->add("lastname", 0);
-	cursor.query().selector().add("$orderby", order);
+	cursor.query().selector().addNewDocument("$query").add("birthyear", 1987);
+	cursor.query().selector().addNewDocument("$orderby").add("lastname", 0);
 
 	Poco::MongoDB::ResponseMessage& response = cursor.next(connection);
 	while(1)
@@ -205,11 +200,9 @@ void sample6(Poco::MongoDB::Connection& connection)
 
 	Poco::MongoDB::Cursor cursor("sample", "players");
 
-	Poco::MongoDB::Document::Ptr oper = new Poco::MongoDB::Document();
-	oper->add("$gt", 1969);
-	oper->add("$lte", 1980);
-
-	cursor.query().selector().add("birthyear", oper);
+	cursor.query().selector().addNewDocument("birthyear")
+		.add("$gt", 1969)
+		.add("$lte", 1980);
 
 	Poco::MongoDB::ResponseMessage& response = cursor.next(connection);
 	while(1)
@@ -231,6 +224,32 @@ void sample6(Poco::MongoDB::Connection& connection)
 }
 
 
+// CREATE INDEX playername
+// ON players(lastname)
+void sample7(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 7 ***" << std::endl;
+
+	Poco::MongoDB::Database db("sample");
+	Poco::MongoDB::Document::Ptr keys = new Poco::MongoDB::Document();
+	keys->add("lastname", 1);
+	Poco::MongoDB::Document::Ptr errorDoc = db.ensureIndex(connection, "players", "lastname", keys);
+
+	/* Sample above is the same as the following code:
+	Poco::MongoDB::Document::Ptr index = new Poco::MongoDB::Document();
+	index->add("ns", "sample.players");
+	index->add("name", "lastname");
+	index->addNewDocument("key").add("lastname", 1);
+
+	Poco::SharedPtr<Poco::MongoDB::InsertRequest> insertRequest = db.createInsertRequest("system.indexes");
+	insertRequest->documents().push_back(index);
+	connection.sendRequest(*insertRequest);
+	Poco::MongoDB::Document::Ptr errorDoc = db.getLastErrorDoc(connection);
+	*/
+	std::cout << errorDoc->toString(2);
+}
+
+
 int main(int argc, char** argv)
 {
 	Poco::MongoDB::Connection connection("localhost", 27017);
@@ -240,6 +259,7 @@ int main(int argc, char** argv)
 	sample4(connection);
 	sample5(connection);
 	sample6(connection);
+	sample7(connection);
 
 	return 0;
 }
