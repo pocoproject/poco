@@ -636,20 +636,46 @@ void Parser::readValue(const Token* token)
 		if (_handler != NULL)
 		{
 #if defined(POCO_HAVE_INT64)
-			Int64 value = token->asInteger64();
-			// if number is 32-bit, then handle as such
-			if (value > std::numeric_limits<int>::max()
-			|| value < std::numeric_limits<int>::min())
-			{
-				_handler->value(value);
-			}
-			else
-			{
-				_handler->value(static_cast<int>(value));
-			}
+            try
+            {
+                Int64 value = token->asInteger64();
+                // if number is 32-bit, then handle as such
+                if (    value > std::numeric_limits<int>::max()
+                    || value < std::numeric_limits<int>::min() )
+                {
+                    _handler->value(value);
+                }
+                else
+                {
+                    _handler->value(static_cast<int>(value));
+                }
+            }
+            // try to handle error as unsigned in case of overflow
+            catch ( const SyntaxException& )
+            {
+                UInt64 value = token->asUnsignedInteger64();
+                // if number is 32-bit, then handle as such
+                if ( value > std::numeric_limits<unsigned>::max() )
+                {
+                    _handler->value(value);
+                }
+                else
+                {
+                    _handler->value(static_cast<unsigned>(value));
+                }
+            }
 #else
-			int value = token->asInteger();
-			_handle->value(value);
+            try
+            {
+                int value = token->asInteger();
+                _handle->value(value);
+            }
+            // try to handle error as unsigned in case of overflow
+            catch ( const SyntaxException& )
+            {
+                unsigned value = token->asUnsignedInteger();
+                _handle->value(value);
+            }
 #endif
 		}
 		break;
