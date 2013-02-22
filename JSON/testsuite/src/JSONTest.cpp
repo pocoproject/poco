@@ -192,12 +192,42 @@ void JSONTest::testNumberProperty()
 	assert(value == 1969);
 }
 
+
+void JSONTest::testUnsignedNumberProperty()
+{
+    // 4294967295 == unsigned(-1)
+	std::string json = "{ \"test\" : 4294967295 }";
+	Parser parser;
+	Var result;
+
+	try
+	{
+		DefaultHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
+	assert(test.isInteger());
+	unsigned value = test;
+	assert(value == -1);
+}
+
 #if defined(POCO_HAVE_INT64)
 
 
 void JSONTest::testNumber64Property()
 {
-	std::string json = "{ \"test\" : 5000000000000000 }";
+	std::string json = "{ \"test\" : -5000000000000000 }";
 	Parser parser;
 	Var result;
 
@@ -220,9 +250,38 @@ void JSONTest::testNumber64Property()
 	Var test = object->get("test");
 	assert(test.isInteger());
 	Poco::Int64 value = test;
-	assert(value == 5000000000000000);
+	assert(value == -5000000000000000);
 }
 
+
+void JSONTest::testUnsignedNumber64Property()
+{
+    // 18446744073709551615 == UInt64(-1)
+	std::string json = "{ \"test\" : 18446744073709551615 }";
+	Parser parser;
+	Var result;
+
+	try
+	{
+		DefaultHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	Var test = object->get("test");
+	assert(test.isInteger());
+	Poco::UInt64 value = test;
+	assert(value == -1);
+}
 
 #endif
 
@@ -962,8 +1021,10 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testTrueProperty);
 	CppUnit_addTest(pSuite, JSONTest, testFalseProperty);
 	CppUnit_addTest(pSuite, JSONTest, testNumberProperty);
+	CppUnit_addTest(pSuite, JSONTest, testUnsignedNumberProperty);
 #if defined(POCO_HAVE_INT64)
 	CppUnit_addTest(pSuite, JSONTest, testNumber64Property);
+	CppUnit_addTest(pSuite, JSONTest, testUnsignedNumber64Property);
 #endif
 	CppUnit_addTest(pSuite, JSONTest, testStringProperty);
 	CppUnit_addTest(pSuite, JSONTest, testEmptyObject);

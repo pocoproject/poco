@@ -82,9 +82,17 @@ public:
 	virtual void value(int v);
 		/// An integer value is read
 
+	virtual void value(unsigned v);
+		/// An unsigned value is read. This will only be triggered if the
+        /// value cannot fit into a signed int.
+
 #if defined(POCO_HAVE_INT64)
 	virtual void value(Int64 v);
 		/// A 64-bit integer value is read
+
+	virtual void value(UInt64 v);
+		/// An unsigned 64-bit integer value is read. This will only be
+        /// triggered if the value cannot fit into a signed 64-bit integer.
 #endif
 
 	virtual void value(const std::string& s);
@@ -120,8 +128,20 @@ inline void DefaultHandler::value(int v)
 }
 
 
+inline void DefaultHandler::value(unsigned v)
+{
+	setValue(v);
+}
+
+
 #if defined(POCO_HAVE_INT64)
 inline void DefaultHandler::value(Int64 v)
+{
+	setValue(v);
+}
+
+
+inline void DefaultHandler::value(UInt64 v)
 {
 	setValue(v);
 }

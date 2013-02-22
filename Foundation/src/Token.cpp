@@ -81,12 +81,24 @@ Int64 Token::asInteger64() const
 {
 	return NumberParser::parse64(_value);
 }
+
+
+UInt64 Token::asUnsignedInteger64() const
+{
+	return NumberParser::parseUnsigned64(_value);
+}
 #endif
 
 
 int Token::asInteger() const
 {
 	return NumberParser::parse(_value);
+}
+
+
+unsigned Token::asUnsignedInteger() const
+{
+	return NumberParser::parseUnsigned(_value);
 }
 
 
