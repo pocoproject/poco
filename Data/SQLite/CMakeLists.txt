@@ -8,6 +8,7 @@ set(SRCS
 	src/Binder.cpp
 	src/Connector.cpp
 	src/Extractor.cpp
+	src/Notifier.cpp
 	src/SQLiteException.cpp
 	src/SQLiteStatementImpl.cpp
 	src/SessionImpl.cpp
