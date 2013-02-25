@@ -25,7 +25,7 @@ rem CONFIGURATION: release|debug|both
 rem PLATFORM:      Win32|x64|WinCE
 rem SAMPLES:       samples|nosamples
 rem TESTS:         tests|notests
-rem TOOL:          devenv|vcexpress|msbuild
+rem TOOL:          devenv|vcexpress|wdexpress|msbuild
 rem
 rem VS_VERSION is required argument. Default is build all.
 
@@ -381,7 +381,7 @@ echo CONFIGURATION: "release|debug|both"
 echo PLATFORM:      "Win32|x64|WinCE"
 echo SAMPLES:       "samples|nosamples"
 echo TESTS:         "tests|notests"
-echo TOOL:          "devenv|vcexpress|msbuild"
+echo TOOL:          "devenv|vcexpress|wdexpress|msbuild"
 echo.
 echo Default is build all.
 endlocal
