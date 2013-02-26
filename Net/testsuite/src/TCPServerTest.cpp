@@ -251,7 +251,8 @@ void TCPServerTest::testMultiConnections()
 	ss5.close();
 	ss6.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 0);}
+	assert (srv.currentConnections() == 0);
+}
 
 
 void TCPServerTest::setUp()

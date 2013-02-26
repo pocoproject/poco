@@ -47,6 +47,7 @@
 #include "Poco/SHA1Engine.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/String.h"
+#include "Poco/StringTokenizer.h"
 #include "Poco/Random.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
@@ -133,8 +134,8 @@ WebSocket::Mode WebSocket::mode() const
 
 WebSocketImpl* WebSocket::accept(HTTPServerRequest& request, HTTPServerResponse& response)
 {
-	if (icompare(request.get("Connection", ""), "Upgrade") == 0 &&
-	    icompare(request.get("Upgrade", ""), "websocket") == 0)
+	StringTokenizer st(request.get("Connection", ""), ",", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+	if (st.has("Upgrade") && icompare(request.get("Upgrade", ""), "websocket") == 0)
 	{
 		std::string version = request.get("Sec-WebSocket-Version", "");
 		if (version.empty()) throw WebSocketException("Missing Sec-WebSocket-Version in handshake request", WS_ERR_HANDSHAKE_NO_VERSION);
