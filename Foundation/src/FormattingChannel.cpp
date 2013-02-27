@@ -117,7 +117,7 @@ void FormattingChannel::log(const Message& msg)
 			_pChannel->log(msg);
 		}
 	}
-};
+}
 
 
 void FormattingChannel::setProperty(const std::string& name, const std::string& value)

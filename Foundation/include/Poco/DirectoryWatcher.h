@@ -101,7 +101,7 @@ public:
 		DW_ITEM_MOVED_FROM = 8,
 			/// An item has been renamed or moved. This event delivers the old name.
 
-		DW_ITEM_MOVED_TO = 16,
+		DW_ITEM_MOVED_TO = 16
 			/// An item has been renamed or moved. This event delivers the new name.
 	};
 
