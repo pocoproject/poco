@@ -51,6 +51,13 @@ Array::~Array()
 }
 
 
+Element::Ptr Array::get(int pos) const
+{
+	std::string name = Poco::NumberFormatter::format(pos);
+	return Document::get(name);
+}
+
+
 std::string Array::toString(int indent) const
 {
 	std::ostringstream oss;
