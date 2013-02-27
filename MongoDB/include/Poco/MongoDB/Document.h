@@ -207,6 +207,10 @@ public:
 		/// Reads a document from the reader
 
 
+	size_t size() const;
+		/// Returns the number of elements in the document.
+
+
 	virtual std::string toString(int indent = 0) const;
 		/// Returns a String representation of the document.
 
@@ -260,6 +264,12 @@ inline void Document::elementNames(std::vector<std::string>& keys) const
 inline bool Document::exists(const std::string& name)
 {
 	return std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name)) != _elements.end();
+}
+
+
+inline size_t Document::size() const
+{
+	return _elements.size();
 }
 
 
