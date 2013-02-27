@@ -60,20 +60,33 @@ public:
 		/// Destructor
 
 
-	void read(std::istream& istr);
-		/// Reads the response from the stream
-
-
-	Document::Vector& documents();
-		/// Returns the retrieved documents
-
-
 	Int64 cursorID() const;
 		/// Returns the cursor id
 
 
 	void clear();
 		/// Clears the response
+
+
+	size_t count() const;
+		/// Returns the number of documents in the response
+
+
+	Document::Vector& documents();
+		/// Returns the retrieved documents
+
+
+	bool empty() const;
+		/// Returns true when the response doesn't contain any documents
+
+
+	bool hasDocuments() const;
+		/// Returns true when there is at least one document
+
+
+	void read(std::istream& istr);
+		/// Reads the response from the stream
+
 
 private:
 	
@@ -93,9 +106,15 @@ private:
 };
 
 
-inline Document::Vector& ResponseMessage::documents()
+inline size_t ResponseMessage::count() const
 {
-	return _documents;
+	return _documents.size();
+}
+
+
+inline bool ResponseMessage::empty() const
+{
+	return _documents.size() == 0;
 }
 
 
@@ -104,6 +123,17 @@ inline Int64 ResponseMessage::cursorID() const
 	return _cursorID;
 }
 
+
+inline Document::Vector& ResponseMessage::documents()
+{
+	return _documents;
+}
+
+
+inline bool ResponseMessage::hasDocuments() const
+{
+	return _documents.size() > 0;
+}
 
 }} // Namespace Poco::MongoDB
 
