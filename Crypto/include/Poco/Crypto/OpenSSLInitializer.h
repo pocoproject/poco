@@ -118,14 +118,16 @@ inline bool OpenSSLInitializer::isFIPSEnabled()
 #endif
 }
 
-
+#ifdef OPENSSL_FIPS
 inline void OpenSSLInitializer::enableFIPSMode(bool enabled)
 {
-#ifdef OPENSSL_FIPS
 	FIPS_mode_set(enabled);
-#endif
 }
-
+#else
+inline void OpenSSLInitializer::enableFIPSMode(bool /*enabled*/)
+{
+}
+#endif
 
 } } // namespace Poco::Crypto
 
