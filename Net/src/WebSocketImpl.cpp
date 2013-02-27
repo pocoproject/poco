@@ -297,5 +297,29 @@ bool WebSocketImpl::secure() const
 	return _pStreamSocketImpl->secure();
 }
 
-	
+
+void WebSocketImpl::setSendTimeout(const Poco::Timespan& timeout)
+{
+	_pStreamSocketImpl->setSendTimeout(timeout);
+}
+
+
+Poco::Timespan WebSocketImpl::getSendTimeout()
+{
+	return _pStreamSocketImpl->getSendTimeout();
+}
+
+
+void WebSocketImpl::setReceiveTimeout(const Poco::Timespan& timeout)
+{
+	_pStreamSocketImpl->setReceiveTimeout(timeout);
+}
+
+
+Poco::Timespan WebSocketImpl::getReceiveTimeout()
+{
+	return _pStreamSocketImpl->getReceiveTimeout();
+}
+
+
 } } // namespace Poco::Net

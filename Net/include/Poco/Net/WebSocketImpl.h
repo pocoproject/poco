@@ -78,6 +78,10 @@ public:
 	virtual int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
 	virtual void sendUrgent(unsigned char data);
 	virtual bool secure() const;
+	virtual void setSendTimeout(const Poco::Timespan& timeout); 
+	virtual Poco::Timespan getSendTimeout();
+	virtual void setReceiveTimeout(const Poco::Timespan& timeout);
+	virtual Poco::Timespan getReceiveTimeout();
 
 	// Internal
 	int frameFlags() const;
