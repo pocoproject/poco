@@ -160,6 +160,10 @@ public:
 
 	void start(Runnable& target);
 		/// Starts the thread with the given target.
+		///
+		/// Note that the given Runnable object must remain
+		/// valid during the entire lifetime of the thread, as
+		/// only a reference to it is stored internally.
 
 	void start(Callable target, void* pData = 0);
 		/// Starts the thread with the given target and parameter.
