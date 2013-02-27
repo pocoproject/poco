@@ -138,12 +138,6 @@ std::string Database::getLastError(Connection& connection) const
 }
 
 
-Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createQueryRequest(const std::string& collectionName) const
-{
-	return new Poco::MongoDB::QueryRequest(_dbname + '.' + collectionName);
-}
-
-
 Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const std::string& collectionName) const
 {
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createQueryRequest("$cmd");
@@ -156,6 +150,12 @@ Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const 
 Poco::SharedPtr<Poco::MongoDB::InsertRequest> Database::createInsertRequest(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::InsertRequest(_dbname + '.' + collectionName);
+}
+
+
+Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createQueryRequest(const std::string& collectionName) const
+{
+	return new Poco::MongoDB::QueryRequest(_dbname + '.' + collectionName);
 }
 
 
