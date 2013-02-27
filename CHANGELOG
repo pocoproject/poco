@@ -15,6 +15,7 @@ Release 1.5.2 (2013-03-??)
 - fixed GH #110: WebSocket accept() fails when Connection header contains multiple tokens
 - fixed GH# 71: WebSocket and broken Timeouts (POCO_BROKEN_TIMEOUTS)
 - fixed a warning in Poco/Crypto/OpenSSLInitializer.h
+- fixed GH# 109: Bug in Poco::Net::SMTPClientSession::loginUsingPlain
 
 Release 1.5.1 (2013-01-11)
 ==========================

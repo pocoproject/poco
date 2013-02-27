@@ -230,7 +230,7 @@ void SMTPClientSession::loginUsingPlain(const std::string& username, const std::
 {
 	std::ostringstream credentialsBase64;
 	Base64Encoder credentialsEncoder(credentialsBase64);
-	credentialsEncoder << username << '\0' << password;
+	credentialsEncoder << '\0' << username << '\0' << password;
 	credentialsEncoder.close();
 
 	std::string response;
