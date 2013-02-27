@@ -16,6 +16,7 @@ Release 1.5.2 (2013-03-??)
 - fixed GH# 71: WebSocket and broken Timeouts (POCO_BROKEN_TIMEOUTS)
 - fixed a warning in Poco/Crypto/OpenSSLInitializer.h
 - fixed GH# 109: Bug in Poco::Net::SMTPClientSession::loginUsingPlain
+- added clang libc++ build configurations for Darwin and iPhone (Andrea Bigagli)
 
 Release 1.5.1 (2013-01-11)
 ==========================
