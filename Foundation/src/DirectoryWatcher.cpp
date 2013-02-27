@@ -1,7 +1,7 @@
 //
 // DirectoryWatcher.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#7 $
+// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#8 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -53,6 +53,7 @@
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
+#include <unistd.h>
 #endif
 #include <algorithm>
 #include <map>

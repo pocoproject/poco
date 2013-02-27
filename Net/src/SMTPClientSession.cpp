@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/SMTPClientSession.cpp#1 $
+// $Id: //poco/1.4/Net/src/SMTPClientSession.cpp#2 $
 //
 // Library: Net
 // Package: Mail
@@ -236,7 +236,7 @@ void SMTPClientSession::loginUsingPlain(const std::string& username, const std::
 	
 	std::ostringstream credentialsBase64;
 	Base64Encoder credentialsEncoder(credentialsBase64);
-	credentialsEncoder << username << '\0' << password;
+	credentialsEncoder << '\0' << username << '\0' << password;
 	credentialsEncoder.close();
 
 	status = sendCommand("AUTH PLAIN", credentialsBase64.str(), response);

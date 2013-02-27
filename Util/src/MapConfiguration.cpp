@@ -1,7 +1,7 @@
 //
 // MapConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/MapConfiguration.cpp#1 $
+// $Id: //poco/1.4/Util/src/MapConfiguration.cpp#2 $
 //
 // Library: Util
 // Package: Configuration
@@ -55,6 +55,15 @@ MapConfiguration::~MapConfiguration()
 void MapConfiguration::clear()
 {
 	_map.clear();
+}
+
+
+void MapConfiguration::copyTo(AbstractConfiguration& config)
+{
+	for (iterator it = _map.begin(); it != _map.end(); ++it)
+	{
+		config.setString(it->first, it->second);
+	}
 }
 
 

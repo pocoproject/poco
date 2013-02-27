@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.6p1 (2013-02-21)
+Release 1.4.6p1 (2013-02-28)
 ============================
 
 - fixed GH# 71: WebSocket and broken Timeouts (POCO_BROKEN_TIMEOUTS)
@@ -14,6 +14,8 @@ Release 1.4.6p1 (2013-02-21)
 - fixed copysign namespace issue in FPEnvironment_DUMMY.h
 - fixed a warning in Poco/Crypto/OpenSSLInitializer.h
 - added a build configuration for BeagleBoard/Angstrom
+- fixed GH# 109: Bug in Poco::Net::SMTPClientSession::loginUsingPlain) 
+- fixed compile errors with clang -std=c++11
 
 
 Release 1.4.6 (2013-01-10)
@@ -22,7 +24,7 @@ Release 1.4.6 (2013-01-10)
 - changed FPEnvironment_DUMMY.h to include <cmath> instead of <math.h>
 - updated bundled SQLite to 3.7.15.1
 - fixed GH# 30: Poco::Path::home() throws
-- fixed SF Patch #120 The ExpireLRUCache does not compile with a tuple as key on VS2010
+- fixed SF Patch# 120 The ExpireLRUCache does not compile with a tuple as key on VS2010
 - fixed SF# 603 count() is missing in HashMap
 - Crypto and NetSSL_OpenSSL project files now use OpenSSL *MD.lib library files for 
   static_md builds. Previously, the DLL import libs were used.
@@ -37,8 +39,8 @@ Release 1.4.5 (2012-11-19)
 - added Poco::Optional class
 - fixed SF# 3558012 Compilation fails when building with -ansi or -std=c++0x
 - fixed SF# 3563517 Get rid of loss-of-precision warnings on x64 MacOS
-- fixed SF#3562244: Portability fix for AF_LINK
-- fixed SF #3562400: DatagramSocketImpl comment 
+- fixed SF# 3562244: Portability fix for AF_LINK
+- fixed SF# 3562400: DatagramSocketImpl comment 
 - fixed SF# 594: Websocket fails with small masked payloads
 - fixed SF# 588: Missing POCO_ARCH and POCO_ARCH_LITTLE_ENDIAN define for WinCE on SH4
 - fixed SF# 581: Out-of-bound array access in Unicode::properties() function.
@@ -1811,4 +1813,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#75 $
+$Id: //poco/1.4/dist/CHANGELOG#77 $
