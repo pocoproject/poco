@@ -220,9 +220,5 @@ void Document::write(BinaryWriter& writer)
 	writer << '\0';
 }
 
-void Document::addElement(Element::Ptr element)
-{
-	_elements.insert(element);
-}
 
 }} // Namespace Poco::MongoDB

@@ -66,8 +66,8 @@ public:
 		/// the command fails, -1 is returned.
 
 
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName) const;
-		/// Creates a QueryRequest. The collectionname must not contain the database name!
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCommand() const;
+		/// Creates a QueryRequest for a command.
 
 
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCountRequest(const std::string& collectionName) const;
@@ -80,6 +80,15 @@ public:
 		/// The collectionname must not contain the database name!
 
 
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName) const;
+		/// Creates a QueryRequest. The collectionname must not contain the database name!
+
+
+	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection, const std::string& collection, const std::string& indexName, Poco::MongoDB::Document::Ptr keys, bool unique = false, bool background = false, int version = 0, int ttl = 0);
+		/// Creates an index. The document returned is the result of a getLastError call.
+		/// For more info look at the ensureIndex information on the MongoDB website.
+
+ 
 	Document::Ptr getLastErrorDoc(Connection& connection) const;
 		/// Sends the getLastError command to the database and returns the document
 
@@ -91,6 +100,14 @@ public:
 private:
 	std::string _dbname;
 };
+
+
+inline Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCommand() const
+{
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> cmd = createQueryRequest("$cmd");
+	cmd->setNumberToReturn(1);
+	return cmd;
+}
 
 }} // Namespace Poco::MongoDB
 

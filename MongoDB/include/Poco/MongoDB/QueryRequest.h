@@ -105,12 +105,12 @@ public:
 		/// Sets the number to return (limit)
 
 
-	Document& query();
-		/// Returns the query document
+	Document& selector();
+		/// Returns the selector document
 
 
 	Document& returnFieldSelector();
-		/// Returns the selector document
+		/// Returns the field selector document
 
 
 protected:
@@ -128,7 +128,7 @@ private:
 
 	Int32 _numberToReturn;
 
-	Document _query;
+	Document _selector;
 
 	Document _returnFieldSelector;
 };
@@ -152,9 +152,9 @@ inline std::string QueryRequest::fullCollectionName() const
 }
 
 
-inline Document& QueryRequest::query()
+inline Document& QueryRequest::selector()
 {
-	return _query;
+	return _selector;
 }
 
 

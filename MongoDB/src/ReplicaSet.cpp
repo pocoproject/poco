@@ -78,7 +78,7 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 
 		QueryRequest request("admin.$cmd");
 		request.setNumberToReturn(1);
-		request.query().add("isMaster", 1);
+		request.selector().add("isMaster", 1);
 
 		ResponseMessage response;
 		conn->sendRequest(request, response);

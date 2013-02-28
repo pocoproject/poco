@@ -86,17 +86,34 @@ public:
 		/// Destructor
 
 
-	void addElement(Element::Ptr element);
-		/// Add an element to the document
+	Document& addElement(Element::Ptr element);
+		/// Add an element to the document.
+		/// The active document is returned to allow chaining of the add methods.
 
 
 	template<typename T>
-	void add(const std::string& name, T value)
-		/// Creates an element with the given name and value
+	Document& add(const std::string& name, T value)
+		/// Creates an element with the given name and value and
 		// adds it to the document.
+		/// The active document is returned to allow chaining of the add methods.
 	{
-		addElement(new ConcreteElement<T>(name, value));
+		return addElement(new ConcreteElement<T>(name, value));
 	}
+
+
+	Document& add(const std::string& name, const char* value)
+		/// Creates an element with the given name and value and
+		// adds it to the document.
+		/// The active document is returned to allow chaining of the add methods.
+	{
+		return addElement(new ConcreteElement<std::string>(name, std::string(value)));
+	}
+
+
+	Document& addNewDocument(const std::string& name);
+		/// Create a new document and add it to this document.
+		/// Unlike the other add methods, this method returns
+		/// a reference to the new document.
 
 
 	void clear();
@@ -190,6 +207,10 @@ public:
 		/// Reads a document from the reader
 
 
+	size_t size() const;
+		/// Returns the number of elements in the document.
+
+
 	virtual std::string toString(int indent = 0) const;
 		/// Returns a String representation of the document.
 
@@ -202,6 +223,21 @@ protected:
 
 	ElementSet _elements;
 };
+
+
+inline Document& Document::addElement(Element::Ptr element)
+{
+	_elements.insert(element);
+	return *this;
+}
+
+
+inline Document& Document::addNewDocument(const std::string& name)
+{
+	Document::Ptr newDoc = new Document();
+	add(name, newDoc);
+	return *newDoc;
+}
 
 
 inline void Document::clear()
@@ -228,6 +264,12 @@ inline void Document::elementNames(std::vector<std::string>& keys) const
 inline bool Document::exists(const std::string& name)
 {
 	return std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name)) != _elements.end();
+}
+
+
+inline size_t Document::size() const
+{
+	return _elements.size();
 }
 
 

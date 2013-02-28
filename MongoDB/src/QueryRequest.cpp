@@ -49,7 +49,7 @@ QueryRequest::QueryRequest(const std::string& collectionName, QueryRequest::Flag
 	_fullCollectionName(collectionName),
 	_numberToSkip(0), 
 	_numberToReturn(100),
-	_query(), 
+	_selector(),
 	_returnFieldSelector()
 {
 }
@@ -65,7 +65,7 @@ void QueryRequest::buildRequest(BinaryWriter& writer)
 	BSONWriter(writer).writeCString(_fullCollectionName);
 	writer << _numberToSkip;
 	writer << _numberToReturn;
-	_query.write(writer);
+	_selector.write(writer);
 
 	if ( ! _returnFieldSelector.empty() )
 	{
