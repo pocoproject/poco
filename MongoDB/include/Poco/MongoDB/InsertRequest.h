@@ -69,6 +69,12 @@ public:
 		/// Destructor
 
 
+	Document& addNewDocument();
+		/// Adds a new document for insertion. A reference to the empty document is
+		/// returned. InsertRequest is the owner of the Document and will free it
+		/// on destruction.
+
+
 	Document::Vector& documents();
 		/// Returns the documents to insert into the database
 
@@ -85,6 +91,16 @@ private:
 
 	Document::Vector _documents;
 };
+
+
+inline Document& InsertRequest::addNewDocument()
+{
+	Document::Ptr doc = new Document();
+
+	_documents.push_back(doc);
+
+	return *doc;
+}
 
 
 inline Document::Vector& InsertRequest::documents()

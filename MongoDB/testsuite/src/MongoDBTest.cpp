@@ -124,7 +124,7 @@ void MongoDBTest::testQueryRequest()
 	}
 
 	Poco::MongoDB::QueryRequest request("team.players");
-	request.query().add("lastname" , std::string("Braem"));
+	request.selector().add("lastname" , std::string("Braem"));
 	request.setNumberToReturn(1);
 
 	Poco::MongoDB::ResponseMessage response;
@@ -173,7 +173,7 @@ void MongoDBTest::testDBQueryRequest()
 
 	Database db("team");
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = db.createQueryRequest("players");
-	request->query().add("lastname" , std::string("Braem"));
+	request->selector().add("lastname" , std::string("Braem"));
 
 	Poco::MongoDB::ResponseMessage response;
 	_mongo.sendRequest(*request, response);
@@ -219,7 +219,7 @@ void MongoDBTest::testCountCommand()
 
 	Poco::MongoDB::QueryRequest request("team.$cmd");
 	request.setNumberToReturn(1);
-	request.query().add("count", std::string("players"));
+	request.selector().add("count", std::string("players"));
 
 	Poco::MongoDB::ResponseMessage response;
 
@@ -331,7 +331,7 @@ void MongoDBTest::testCursorRequest()
 
 	Poco::MongoDB::QueryRequest drop("team.$cmd");
 	drop.setNumberToReturn(1);
-	drop.query().add("drop", std::string("numbers"));
+	drop.selector().add("drop", std::string("numbers"));
 
 	Poco::MongoDB::ResponseMessage responseDrop;
 	_mongo.sendRequest(drop, responseDrop);
@@ -353,7 +353,7 @@ void MongoDBTest::testBuildInfo()
 
 	Poco::MongoDB::QueryRequest request("team.$cmd");
 	request.setNumberToReturn(1);
-	request.query().add("buildInfo", 1);
+	request.selector().add("buildInfo", 1);
 
 	Poco::MongoDB::ResponseMessage response;
 
@@ -388,7 +388,7 @@ void MongoDBTest::testConnectionPool()
 
 	Poco::MongoDB::QueryRequest request("team.$cmd");
 	request.setNumberToReturn(1);
-	request.query().add("count", std::string("players"));
+	request.selector().add("count", std::string("players"));
 
 	Poco::MongoDB::ResponseMessage response;
 	((Connection::Ptr) pooledConnection)->sendRequest(request, response);
