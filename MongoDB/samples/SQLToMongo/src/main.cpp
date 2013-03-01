@@ -368,7 +368,7 @@ void sample9(Poco::MongoDB::Connection& connection)
 	connection.sendRequest(query, response);
 	if ( response.hasDocuments() )
 	{
-		std::cout << response.documents()[0]->toString(2);
+		std::cout << response.documents()[0]->toString(2) << std::endl;
 	}
 
 	// QueryRequest can be created using the Database class
@@ -378,7 +378,7 @@ void sample9(Poco::MongoDB::Connection& connection)
 	connection.sendRequest(*queryPtr, response);
 	if ( response.hasDocuments() )
 	{
-		std::cout << response.documents()[0]->toString(2);
+		std::cout << response.documents()[0]->toString(2) << std::endl;
 	}
 }
 
@@ -389,7 +389,6 @@ void sample10(Poco::MongoDB::Connection& connection)
 
 	Poco::MongoDB::Database db("sample");
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> command = db.createCommand();
-	std::cout << command->fullCollectionName() << std::endl;
 
 	command->selector()
 		.add("distinct", "players")
@@ -446,7 +445,7 @@ void sample12(Poco::MongoDB::Connection& connection)
 	connection.sendRequest(*request);
 
 	Poco::MongoDB::Document::Ptr lastError = db.getLastErrorDoc(connection);
-	std::cout << "Count: " << lastError->toString(2);
+	std::cout << "LastError: " << lastError->toString(2) << std::endl;
 }
 
 
@@ -462,7 +461,7 @@ void sample13(Poco::MongoDB::Connection& connection)
 	connection.sendRequest(*request);
 
 	Poco::MongoDB::Document::Ptr lastError = db.getLastErrorDoc(connection);
-	std::cout << "Count: " << lastError->toString(2);
+	std::cout << "LastError: " << lastError->toString(2) << std::endl;
 }
 
 
@@ -470,7 +469,7 @@ int main(int argc, char** argv)
 {
 	Poco::MongoDB::Connection connection("localhost", 27017);
 
-//	sample1(connection);
+	sample1(connection);
 	sample2(connection);
 	sample3(connection);
 	sample4(connection);
