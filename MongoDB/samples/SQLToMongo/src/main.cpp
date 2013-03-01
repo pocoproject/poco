@@ -368,7 +368,7 @@ void sample9(Poco::MongoDB::Connection& connection)
 	connection.sendRequest(query, response);
 	if ( response.hasDocuments() )
 	{
-		std::cout << response.documents()[0]->toString(2);
+		std::cout << response.documents()[0]->toString(2) << std::endl;
 	}
 
 	// QueryRequest can be created using the Database class
@@ -378,7 +378,7 @@ void sample9(Poco::MongoDB::Connection& connection)
 	connection.sendRequest(*queryPtr, response);
 	if ( response.hasDocuments() )
 	{
-		std::cout << response.documents()[0]->toString(2);
+		std::cout << response.documents()[0]->toString(2) << std::endl;
 	}
 }
 
@@ -389,7 +389,6 @@ void sample10(Poco::MongoDB::Connection& connection)
 
 	Poco::MongoDB::Database db("sample");
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> command = db.createCommand();
-	std::cout << command->fullCollectionName() << std::endl;
 
 	command->selector()
 		.add("distinct", "players")
@@ -411,6 +410,61 @@ void sample10(Poco::MongoDB::Connection& connection)
 
 }
 
+// SELECT COUNT(*) FROM players WHERE birthyear > 1980
+void sample11(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 11 ***" << std::endl;
+
+	Poco::MongoDB::Database db("sample");
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> count = db.createCountRequest("players");
+	count->selector().addNewDocument("query")
+		.addNewDocument("birthyear")
+			.add("$gt", 1980);
+
+	Poco::MongoDB::ResponseMessage response;
+	connection.sendRequest(*count, response);
+
+	if ( response.hasDocuments() )
+	{
+		std::cout << "Count: " << response.documents()[0]->get<double>("n") << std::endl;
+	}
+}
+
+
+//UPDATE players SET birthyear = birthyear + 1 WHERE firstname = 'Victor'
+void sample12(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 12 ***" << std::endl;
+
+	Poco::MongoDB::Database db("sample");
+	Poco::SharedPtr<Poco::MongoDB::UpdateRequest> request = db.createUpdateRequest("players");
+	request->selector().add("firstname", "Victor");
+
+	request->update().addNewDocument("$inc").add("birthyear", 1);
+
+	connection.sendRequest(*request);
+
+	Poco::MongoDB::Document::Ptr lastError = db.getLastErrorDoc(connection);
+	std::cout << "LastError: " << lastError->toString(2) << std::endl;
+}
+
+
+//DELETE players WHERE firstname = 'Victor'
+void sample13(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 13 ***" << std::endl;
+
+	Poco::MongoDB::Database db("sample");
+	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> request = db.createDeleteRequest("players");
+	request->selector().add("firstname", "Victor");
+
+	connection.sendRequest(*request);
+
+	Poco::MongoDB::Document::Ptr lastError = db.getLastErrorDoc(connection);
+	std::cout << "LastError: " << lastError->toString(2) << std::endl;
+}
+
+
 int main(int argc, char** argv)
 {
 	Poco::MongoDB::Connection connection("localhost", 27017);
@@ -425,6 +479,9 @@ int main(int argc, char** argv)
 	sample8(connection);
 	sample9(connection);
 	sample10(connection);
+	sample11(connection);
+	sample12(connection);
+	sample13(connection);
 
 	return 0;
 }
