@@ -411,11 +411,66 @@ void sample10(Poco::MongoDB::Connection& connection)
 
 }
 
+// SELECT COUNT(*) FROM players WHERE birthyear > 1980
+void sample11(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 11 ***" << std::endl;
+
+	Poco::MongoDB::Database db("sample");
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> count = db.createCountRequest("players");
+	count->selector().addNewDocument("query")
+		.addNewDocument("birthyear")
+			.add("$gt", 1980);
+
+	Poco::MongoDB::ResponseMessage response;
+	connection.sendRequest(*count, response);
+
+	if ( response.hasDocuments() )
+	{
+		std::cout << "Count: " << response.documents()[0]->get<double>("n") << std::endl;
+	}
+}
+
+
+//UPDATE players SET birthyear = birthyear + 1 WHERE firstname = 'Victor'
+void sample12(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 12 ***" << std::endl;
+
+	Poco::MongoDB::Database db("sample");
+	Poco::SharedPtr<Poco::MongoDB::UpdateRequest> request = db.createUpdateRequest("players");
+	request->selector().add("firstname", "Victor");
+
+	request->update().addNewDocument("$inc").add("birthyear", 1);
+
+	connection.sendRequest(*request);
+
+	Poco::MongoDB::Document::Ptr lastError = db.getLastErrorDoc(connection);
+	std::cout << "Count: " << lastError->toString(2);
+}
+
+
+//DELETE players WHERE firstname = 'Victor'
+void sample13(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 13 ***" << std::endl;
+
+	Poco::MongoDB::Database db("sample");
+	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> request = db.createDeleteRequest("players");
+	request->selector().add("firstname", "Victor");
+
+	connection.sendRequest(*request);
+
+	Poco::MongoDB::Document::Ptr lastError = db.getLastErrorDoc(connection);
+	std::cout << "Count: " << lastError->toString(2);
+}
+
+
 int main(int argc, char** argv)
 {
 	Poco::MongoDB::Connection connection("localhost", 27017);
 
-	sample1(connection);
+//	sample1(connection);
 	sample2(connection);
 	sample3(connection);
 	sample4(connection);
@@ -425,6 +480,9 @@ int main(int argc, char** argv)
 	sample8(connection);
 	sample9(connection);
 	sample10(connection);
+	sample11(connection);
+	sample12(connection);
+	sample13(connection);
 
 	return 0;
 }
