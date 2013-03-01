@@ -150,7 +150,13 @@ void Document::read(BinaryReader& reader)
 std::string Document::toString(int indent) const
 {
 	std::ostringstream oss;
-	oss << "{" << std::endl;
+
+	oss << "{";
+	if ( indent > 0 )
+	{
+		oss << std::endl;
+	}
+
 	for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
 	{
 		if ( it != _elements.begin() )
@@ -189,7 +195,8 @@ std::string Document::toString(int indent) const
 		}
 	}
 
-	oss << "}" << std::endl;
+	oss << "}";
+
 	return oss.str();
 }
 
