@@ -19,7 +19,8 @@ AAAIntroduction
   - fixed GH# 109: Bug in Poco::Net::SMTPClientSession::loginUsingPlain) 
   - fixed compile errors with clang -std=c++11
   - fixed GH# 116: Wrong timezone parsing in DateTimeParse (fix by Matej Knopp)
-
+  - updated bundled SQLite to 3.7.15.2
+  
 
 !!!Release 1.4.6
 
