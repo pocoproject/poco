@@ -1,7 +1,7 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DateTimeParser.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/DateTimeParser.cpp#5 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -304,6 +304,7 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 		{"AWDT",   9*3600}
 	};
 
+	int tzd = 0;
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	if (it != end)
 	{
@@ -317,10 +318,13 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 			for (unsigned i = 0; i < sizeof(zones)/sizeof(Zone); ++i)
 			{
 				if (designator == zones[i].designator)
-					return zones[i].timeZoneDifferential;
+				{
+					tzd = zones[i].timeZoneDifferential;
+					break;
+				}
 			}
 		}
-		else if (*it == '+' || *it == '-')
+		if (it != end && (*it == '+' || *it == '-'))
 		{
 			int sign = *it == '+' ? 1 : -1;
 			++it;
@@ -329,10 +333,10 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 			if (it != end && *it == ':') ++it;
 			int minutes = 0;
 			PARSE_NUMBER_N(minutes, 2);
-			return sign*(hours*3600 + minutes*60);
+			tzd += sign*(hours*3600 + minutes*60);
 		}
 	}
-	return 0;
+	return tzd;
 }
 
 

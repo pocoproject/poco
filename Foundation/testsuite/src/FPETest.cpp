@@ -1,7 +1,7 @@
 //
 // FPETest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FPETest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/FPETest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -81,7 +81,9 @@ void FPETest::testClassify()
 #elif defined(_MSC_VER)
 #pragma optimize("", off)
 #elif defined(__APPLE__)
+#if !defined(__clang__)
 #pragma GCC optimization_level 0
+#endif
 #endif
 
 
@@ -132,7 +134,9 @@ void FPETest::testFlags()
 #elif defined(_MSC_VER)
 #pragma optimize("", on)
 #elif defined(__APPLE__)
+#if !defined(__clang__)
 #pragma GCC optimization_level reset
+#endif
 #endif
 
 

@@ -18,6 +18,7 @@ AAAIntroduction
   - added a build configuration for BeagleBoard/Angstrom
   - fixed GH# 109: Bug in Poco::Net::SMTPClientSession::loginUsingPlain) 
   - fixed compile errors with clang -std=c++11
+  - fixed GH# 116: Wrong timezone parsing in DateTimeParse (fix by Matej Knopp)
 
 
 !!!Release 1.4.6

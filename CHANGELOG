@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.6p1 (2013-02-28)
+Release 1.4.6p1 (2013-03-06)
 ============================
 
 - fixed GH# 71: WebSocket and broken Timeouts (POCO_BROKEN_TIMEOUTS)
@@ -16,6 +16,7 @@ Release 1.4.6p1 (2013-02-28)
 - added a build configuration for BeagleBoard/Angstrom
 - fixed GH# 109: Bug in Poco::Net::SMTPClientSession::loginUsingPlain) 
 - fixed compile errors with clang -std=c++11
+- fixed GH# 116: Wrong timezone parsing in DateTimeParse (fix by Matej Knopp)
 
 
 Release 1.4.6 (2013-01-10)
@@ -1813,4 +1814,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#77 $
+$Id: //poco/1.4/dist/CHANGELOG#78 $

@@ -1,7 +1,7 @@
 //
 // DateTimeParserTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeParserTest.cpp#4 $
+// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeParserTest.cpp#5 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -341,6 +341,15 @@ void DateTimeParserTest::testRFC1123()
 	assert (dt.minute() == 17);
 	assert (dt.second() == 30);
 	assert (tzd == -14400);
+
+	dt = DateTimeParser::parse(DateTimeFormat::RFC1123_FORMAT, "Sun, 20 Jul 1969 16:17:30 GMT+01:00", tzd);
+	assert (dt.year() == 1969);
+	assert (dt.month() == 7);
+	assert (dt.day() == 20);
+	assert (dt.hour() == 16);
+	assert (dt.minute() == 17);
+	assert (dt.second() == 30);
+	assert (tzd == 3600);
 }
 
 
