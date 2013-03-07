@@ -195,7 +195,7 @@ void JSONTest::testNumberProperty()
 
 void JSONTest::testUnsignedNumberProperty()
 {
-    // 4294967295 == unsigned(-1)
+	// 4294967295 == unsigned(-1)
 	std::string json = "{ \"test\" : 4294967295 }";
 	Parser parser;
 	Var result;
@@ -256,7 +256,7 @@ void JSONTest::testNumber64Property()
 
 void JSONTest::testUnsignedNumber64Property()
 {
-    // 18446744073709551615 == UInt64(-1)
+	// 18446744073709551615 == UInt64(-1)
 	std::string json = "{ \"test\" : 18446744073709551615 }";
 	Parser parser;
 	Var result;
@@ -801,6 +801,33 @@ void JSONTest::testQuery()
 }
 
 
+void JSONTest::testStringify()
+{
+	std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ] }";
+	Parser parser;
+	Var result;
+
+	try
+	{
+		DefaultHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+
+	assert(result.type() == typeid(Object::Ptr));
+	std::ostringstream ostr;
+	Stringifier::stringify(result, ostr);
+	//TODO: need map that does not order for internal container
+	assert (ostr.str() == "{\"name\":\"Franky\",\"children\":[\"Jonas\",\"Ellen\"]}");
+}
+
+
 void JSONTest::testValidJanssonFiles()
 {
 	Poco::Path pathPattern(getTestFilesPath("valid"));
@@ -1044,6 +1071,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testDoubleElement);
 	CppUnit_addTest(pSuite, JSONTest, testOptValue);
 	CppUnit_addTest(pSuite, JSONTest, testQuery);
+	CppUnit_addTest(pSuite, JSONTest, testStringify);
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);

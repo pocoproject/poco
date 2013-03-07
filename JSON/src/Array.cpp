@@ -123,39 +123,20 @@ bool Array::isObject(unsigned int index) const
 void Array::stringify(std::ostream& out, unsigned int indent) const
 {
 	out << "[";
-	if ( indent > 0 )
-		out << std::endl;
 
-	for(ValueVec::const_iterator it = _values.begin(); it != _values.end();)
+	if (indent > 0) out << std::endl;
+
+	for (ValueVec::const_iterator it = _values.begin(); it != _values.end();)
 	{
-		for(int i = 0; i < indent; i++)
-		{
-			out << ' ';
-		}
+		for(int i = 0; i < indent; i++) out << ' ';
 
 		Stringifier::stringify(*it, out, indent);
 
 		if ( ++it != _values.end() )
 		{
 			out << ",";
-			if ( indent > 0 )
-			{
-				out << std::endl;
-			}
+			if ( indent > 0 ) out << std::endl;
 		}
-	}
-
-	if ( indent > 0 )
-	{
-		out << std::endl;
-	}
-
-	if ( indent > 0 )
-		indent -= 2;
-
-	for(int i = 0; i < indent; i++)
-	{
-		out << ' ';
 	}
 
 	out << "]";

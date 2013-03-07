@@ -146,6 +146,7 @@ public:
 		/// Removes the property with the given key
 
 private:
+	//TODO: unordered map
 	typedef std::map<std::string, Dynamic::Var> ValueMap;
 	ValueMap _values;
 };

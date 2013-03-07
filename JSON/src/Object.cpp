@@ -117,41 +117,23 @@ void Object::getNames(std::vector<std::string>& names) const
 void Object::stringify(std::ostream& out, unsigned int indent) const
 {
 	out << '{';
-	if ( indent > 0 )
-	{
-		out << std::endl;
-	}
 
-	for(ValueMap::const_iterator it = _values.begin(); it != _values.end();)
+	if (indent > 0) out << std::endl;
+
+	for (ValueMap::const_iterator it = _values.begin(); it != _values.end();)
 	{
-		for(int i = 0; i < indent; i++)
-		{
-			out << ' ';
-		}
+		for(int i = 0; i < indent; i++) out << ' ';
 
 		out << '"' << it->first << '"';
 		out << (( indent > 0 ) ? " : " : ":");
 
 		Stringifier::stringify(it->second, out, indent);
 
-		if ( ++it != _values.end() )
-		{
-			out << ',';
-		}
+		if ( ++it != _values.end() ) out << ',';
 
-		if ( indent > 0 )
-		{
-			out << std::endl;
-		}
+		if ( indent > 0 ) out << std::endl;
 	}
-
-	if ( indent > 0 )
-		indent -= 2;
-	for(int i = 0; i < indent; i++)
-	{
-		out << ' ';
-	}
-
+	
 	out << '}';
 }
 

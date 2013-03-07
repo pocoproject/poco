@@ -13,10 +13,12 @@ Release 1.5.2 (2013-03-??)
 - merged GH #86: Invalid pointers to vector internals (by Adrian Imboden)
 - automatic library initialization macros
 - fixed GH #110: WebSocket accept() fails when Connection header contains multiple tokens
-- fixed GH# 71: WebSocket and broken Timeouts (POCO_BROKEN_TIMEOUTS)
+- fixed GH #71: WebSocket and broken Timeouts (POCO_BROKEN_TIMEOUTS)
 - fixed a warning in Poco/Crypto/OpenSSLInitializer.h
-- fixed GH# 109: Bug in Poco::Net::SMTPClientSession::loginUsingPlain
+- fixed GH #109: Bug in Poco::Net::SMTPClientSession::loginUsingPlain
 - added clang libc++ build configurations for Darwin and iPhone (Andrea Bigagli)
+- fixed GH #116: Wrong timezone parsing in DateTimeParse (fix by Matej Knopp)
+- fixed GH #118: JSON::Object::stringify endless loop
 
 Release 1.5.1 (2013-01-11)
 ==========================

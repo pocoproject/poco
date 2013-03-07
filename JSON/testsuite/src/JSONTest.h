@@ -73,6 +73,8 @@ public:
 	void testDoubleElement();
 	void testOptValue();
 	void testQuery();
+	void testStringify();
+
 	void testValidJanssonFiles();
 	void testInvalidJanssonFiles();
 	void testTemplate();
