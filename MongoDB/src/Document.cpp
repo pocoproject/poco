@@ -151,51 +151,36 @@ std::string Document::toString(int indent) const
 {
 	std::ostringstream oss;
 
-	oss << "{";
-	if ( indent > 0 )
-	{
-		oss << std::endl;
-	}
+	oss << '{';
+
+	if ( indent > 0 ) oss << std::endl;
+
 
 	for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
 	{
 		if ( it != _elements.begin() )
 		{
-			oss << ",";
-			if ( indent > 0 )
-			{
-				oss << std::endl;
-			}
+			oss << ',';
+			if ( indent > 0 ) oss << std::endl;
 		}
-		if ( indent > 0 )
-		{
-			for(int i = 0; i < indent; ++i)
-			{
-				oss << ' ';
-			}
-		}
-		oss << '"' << (*it)->name() << '"' << " : ";
-		if ( indent > 0 )
-		{
-			oss << (*it)->toString(indent + 2);
-		}
-		else
-		{
-			oss << (*it)->toString();
-		}
+
+		for(int i = 0; i < indent; ++i) oss << ' ';
+
+		oss << '"' << (*it)->name() << '"';
+		oss << (( indent > 0 ) ? " : " : ":");
+
+		oss << (*it)->toString(indent > 0 ? indent + 2 : 0);
 	}
 
 	if ( indent > 0 )
 	{
 		oss << std::endl;
-		indent -= 2;
-		for(int i = 0; i < indent; ++i)
-		{
-			oss << ' ';
-		}
+		if ( indent >= 2 ) indent -= 2;
+
+		for(int i = 0; i < indent; ++i) oss << ' ';
 	}
 
-	oss << "}";
+	oss << '}';
 
 	return oss.str();
 }
