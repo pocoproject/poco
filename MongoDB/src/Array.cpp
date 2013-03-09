@@ -61,38 +61,29 @@ Element::Ptr Array::get(int pos) const
 std::string Array::toString(int indent) const
 {
 	std::ostringstream oss;
+
 	oss << "[";
-	if ( indent > 0 )
-	{
-		oss << std::endl;
-	}
+
+	if ( indent > 0 ) oss << std::endl;
 
 	for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
 	{
 		if ( it != _elements.begin() )
 		{
 			oss << ",";
-			if ( indent > 0 )
-			{
-				oss << std::endl;
-			}
+			if ( indent > 0 ) oss << std::endl;
 		}
 
-		for(int i = 0; i < indent; ++i)
-		{
-			oss << ' ';
-		}
+		for(int i = 0; i < indent; ++i) oss << ' ';
+
 		oss << (*it)->toString();
 	}
 
 	if ( indent > 0 )
 	{
 		oss << std::endl;
-		indent -= 2;
-		for(int i = 0; i < indent; ++i)
-		{
-			oss << ' ';
-		}
+		if ( indent >= 2 ) indent -= 2;
+		for(int i = 0; i < indent; ++i) oss << ' ';
 	}
 
 	oss << "]";
