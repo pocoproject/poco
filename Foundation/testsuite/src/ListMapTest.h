@@ -50,7 +50,8 @@ public:
 	void testErase();
 	void testIterator();
 	void testConstIterator();
-	void testIndex();
+	void testIntIndex();
+	void testStringIndex();
 
 	void setUp();
 	void tearDown();

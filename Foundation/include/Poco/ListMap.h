@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <list>
 #include <utility>
@@ -49,17 +50,15 @@
 namespace Poco {
 
 
-template <class Key, class Mapped, class Container = std::list<std::pair<Key, Mapped> > >
+template <class Key, class Mapped, class Container = std::list<std::pair<Key, Mapped> >, bool CaseSensitive = false >
 class ListMap
-	/// This class implements a map in terms of a sequential container.
+	/// This class implements a multimap in terms of a sequential container.
 	/// The use for this type of associative container is wherever automatic
 	/// ordering of elements is not desirable. Naturally, this container will
-	/// have inferior data retrieval perofrmance and it is not recommended for
+	/// have inferior data retrieval performance and it is not recommended for
 	/// use with large datasets. The main purpose within POCO is for Internet
-	/// messages (email in particular), in order to prevent autmomatic header 
-	/// reordering.
-	///
-	/// A ListMap can be used just like a std::map.
+	/// messages (email message, http headers etc), to prevent autmomatic 
+	/// header entry reordering.
 {
 public:
 	typedef Key                 KeyType;
@@ -100,26 +99,34 @@ public:
 	}
 	
 	ConstIterator begin() const
+		/// Returns the beginning of the map.
 	{
 		return _list.begin();
 	}
 	
 	ConstIterator end() const
+		/// Returns the end of the map.
 	{
 		return _list.end();
 	}
 	
 	Iterator begin()
+		/// Returns the beginning of the map.
 	{
 		return _list.begin();
 	}
 	
 	Iterator end()
+		/// Returns the end of the map.
 	{
 		return _list.end();
 	}
 	
 	ConstIterator find(const KeyType& key) const
+		/// Finds the first occurence of the key and
+		/// returns iterator pointing to the found entry
+		/// or iterator pointing to the end if entry is
+		/// not found.
 	{
 		Container::const_iterator it = _list.begin();
 		Container::const_iterator end = _list.end();
@@ -131,6 +138,10 @@ public:
 	}
 
 	Iterator find(const KeyType& key)
+		/// Finds the first occurence of the key and
+		/// returns iterator pointing to the found entry
+		/// or iterator pointing to the end if entry is
+		/// not found.
 	{
 		Container::iterator it = _list.begin();
 		Container::iterator end = _list.end();
@@ -141,12 +152,27 @@ public:
 		return end;
 	}
 
-	std::pair<Iterator, bool> insert(const ValueType& val)
+	Iterator insert(const ValueType& val)
+		/// Inserts the value into the map. If one or more values 
+		/// already exist, new value is inserted at the end of the 
+		/// block. Thus, all the equal value entries are located
+		/// sequentially at all times.
+		/// Returns iterator pointing to the newly inserted value 
 	{
-		_list.push_back(val);
-		Iterator it = _list.end();
-		std::pair<Iterator, bool> p(--it, true);
-		return p;
+		Iterator it = find(val.first);
+
+		if (it == _list.end())
+		{
+			_list.push_back(val);
+			it = _list.end();
+			--it;
+		}
+		else
+		{
+			_list.insert(it, 1, val);
+		}
+
+		return it;
 	}
 	
 	void erase(Iterator it)
@@ -158,10 +184,20 @@ public:
 	{
 		SizeType count = 0;
 		Iterator it = find(key);
+		bool removed = false;
 		while (it != _list.end())
 		{
-			++count;
-			it = _list.erase(it);
+			if (isEqual(it->first, key))
+			{
+				++count;
+				it = _list.erase(it);
+				removed = true;
+			}
+			else
+			{
+				if (removed) return count;
+				++it;
+			}
 		}
 		return count;
 	}
@@ -197,8 +233,8 @@ public:
 			return it->second;
 		else
 		{
-			_list.push_back(ValueType(key, KeyType()));
-			it = find(key);
+			ValueType value(key, Mapped());
+			Iterator it = insert(value);
 			return it->second;
 		}
 	}
@@ -210,10 +246,27 @@ private:
 		return val1 == val2;
 	}
 
-	template <>
 	bool isEqual(const std::string& s1, const std::string& s2) const
 	{
-		return Poco::icompare(s1, s2) == 0;
+		if (!CaseSensitive)
+			return Poco::icompare(s1, s2) == 0;
+		else
+			return s1 == s2;
+	}
+
+	bool isEqual(const std::string& s1, const char* s2) const
+	{
+		return isEqual(s1, std::string(s2));
+	}
+
+	bool isEqual(const char* s1, const std::string& s2) const
+	{
+		return isEqual(std::string(s1), s2);
+	}
+
+	bool isEqual(const char* s1, const char* s2) const
+	{
+		return isEqual(std::string(s1), std::string(s2));
 	}
 
 	Container _list;

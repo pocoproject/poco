@@ -62,10 +62,9 @@ void ListMapTest::testInsert()
 	
 	for (int i = 0; i < N; ++i)
 	{
-		std::pair<IntMap::Iterator, bool> res = hm.insert(IntMap::ValueType(i, i*2));
-		assert (res.first->first == i);
-		assert (res.first->second == i*2);
-		assert (res.second);
+		IntMap::Iterator res = hm.insert(IntMap::ValueType(i, i*2));
+		assert (res->first == i);
+		assert (res->second == i*2);
 		IntMap::Iterator it = hm.find(i);
 		assert (it != hm.end());
 		assert (it->first == i);
@@ -83,11 +82,12 @@ void ListMapTest::testInsert()
 		assert (it->second == i*2);
 	}
 	
+	hm.clear();
 	for (int i = 0; i < N; ++i)
 	{
-		std::pair<IntMap::Iterator, bool> res = hm.insert(IntMap::ValueType(i, 0));
-		assert (res.first->first == i);
-		assert (res.first->second == 0);
+		IntMap::Iterator res = hm.insert(IntMap::ValueType(i, 0));
+		assert (res->first == i);
+		assert (res->second == 0);
 	}		
 }
 
@@ -192,7 +192,7 @@ void ListMapTest::testConstIterator()
 }
 
 
-void ListMapTest::testIndex()
+void ListMapTest::testIntIndex()
 {
 	typedef ListMap<int, int> IntMap;
 	IntMap hm;
@@ -210,6 +210,32 @@ void ListMapTest::testIndex()
 	{
 		const IntMap& im = hm;
 		int x = im[4];
+		fail("no such key - must throw");
+	}
+	catch (Poco::NotFoundException&)
+	{
+	}
+}
+
+
+void ListMapTest::testStringIndex()
+{
+	typedef ListMap<const char*, std::string> StringMap;
+	StringMap hm;
+
+	hm["index1"] = "value2";
+	hm["index2"] = "value4";
+	hm["index3"] = "value6";
+	
+	assert (hm.size() == 3);
+	assert (hm["index1"] == "value2");
+	assert (hm["Index2"] == "value4");
+	assert (hm["inDeX3"] == "value6");
+	
+	try
+	{
+		const StringMap& im = hm;
+		std::string x = im["index4"];
 		fail("no such key - must throw");
 	}
 	catch (Poco::NotFoundException&)
@@ -236,7 +262,8 @@ CppUnit::Test* ListMapTest::suite()
 	CppUnit_addTest(pSuite, ListMapTest, testErase);
 	CppUnit_addTest(pSuite, ListMapTest, testIterator);
 	CppUnit_addTest(pSuite, ListMapTest, testConstIterator);
-	CppUnit_addTest(pSuite, ListMapTest, testIndex);
+	CppUnit_addTest(pSuite, ListMapTest, testIntIndex);
+	CppUnit_addTest(pSuite, ListMapTest, testStringIndex);
 
 	return pSuite;
 }
