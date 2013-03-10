@@ -43,8 +43,11 @@
 // Define to enable Windows Unicode (UTF-8) support
 #define POCO_WIN32_UTF8
 
+
+#if defined(__cplusplus) && (__cplusplus > 199711L)
 // Define to enable C++11 support
-//#define POCO_ENABLE_CPP11
+//	#define POCO_ENABLE_CPP11
+#endif
 
 
 // Define to disable implicit linking

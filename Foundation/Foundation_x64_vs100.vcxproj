@@ -385,8 +385,10 @@
     <ClCompile Include="src\NumberFormatter.cpp" />
     <ClCompile Include="src\NumberParser.cpp" />
     <ClCompile Include="src\RefCountedObject.cpp" />
+    <ClCompile Include="src\SortedDirectoryIterator.cpp" />
     <ClCompile Include="src\String.cpp" />
     <ClCompile Include="src\NumericString.cpp" />
+    <ClCompile Include="src\DirectoryIteratorStrategy.cpp" />
     <ClCompile Include="src\StringTokenizer.cpp" />
     <ClCompile Include="src\UTF32Encoding.cpp" />
     <ClCompile Include="src\Var.cpp" />
@@ -1017,6 +1019,7 @@
     <ClInclude Include="include\Poco\FPEnvironment_WIN32.h" />
     <ClInclude Include="include\Poco\Instantiator.h" />
     <ClInclude Include="include\Poco\Latin2Encoding.h" />
+    <ClInclude Include="include\Poco\ListMap.h" />
     <ClInclude Include="include\Poco\MemoryPool.h" />
     <ClInclude Include="include\Poco\MetaProgramming.h" />
     <ClInclude Include="include\Poco\NamedTuple.h" />
@@ -1033,10 +1036,14 @@
     <ClInclude Include="include\Poco\Platform_WIN32.h" />
     <ClInclude Include="include\Poco\Poco.h" />
     <ClInclude Include="include\Poco\PriorityStrategy.h" />
+    <ClInclude Include="include\Poco\RecursiveDirectoryIterator.h" />
+    <ClInclude Include="include\Poco\RecursiveDirectoryIteratorImpl.h" />
+    <ClInclude Include="include\Poco\DirectoryIteratorStrategy.h" />
     <ClInclude Include="include\Poco\RefCountedObject.h" />
     <ClInclude Include="include\Poco\SharedPtr.h" />
     <ClInclude Include="include\Poco\SingletonHolder.h" />
     <ClInclude Include="include\Poco\SmallObjectAllocator.h" />
+    <ClInclude Include="include\Poco\SortedDirectoryIterator.h" />
     <ClInclude Include="include\Poco\String.h" />
     <ClInclude Include="include\Poco\StringTokenizer.h" />
     <ClInclude Include="include\Poco\Tuple.h" />

@@ -37,8 +37,8 @@
 #include <algorithm>
 
 
-namespace Poco
-{
+namespace Poco {
+
 
 SortedDirectoryIterator::SortedDirectoryIterator()
 	: DirectoryIterator(), _is_finished(true)

@@ -584,6 +584,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\DirectoryIteratorsTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\DynamicFactoryTest.cpp"
 					>
 				</File>
@@ -593,6 +597,10 @@
 				</File>
 				<File
 					RelativePath=".\src\FPETest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ListMapTest.cpp"
 					>
 				</File>
 				<File
@@ -676,6 +684,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\DirectoryIteratorsTest.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\DynamicFactoryTest.h"
 					>
 				</File>
@@ -685,6 +697,10 @@
 				</File>
 				<File
 					RelativePath=".\src\FPETest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ListMapTest.h"
 					>
 				</File>
 				<File

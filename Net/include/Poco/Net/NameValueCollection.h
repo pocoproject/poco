@@ -42,7 +42,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/String.h"
-#include <map>
+#include "Poco/ListMap.h"
 
 
 namespace Poco {
@@ -59,17 +59,9 @@ class Net_API NameValueCollection
 	/// same name.
 {
 public:
-	struct ILT
-	{
-		bool operator() (const std::string& s1, const std::string& s2) const
-		{
-			return Poco::icompare(s1, s2) < 0;
-		}
-	};
-	
-	typedef std::multimap<std::string, std::string, ILT> HeaderMap;
-	typedef HeaderMap::iterator Iterator;
-	typedef HeaderMap::const_iterator ConstIterator;
+	typedef Poco::ListMap<std::string, std::string> HeaderMap;
+	typedef HeaderMap::Iterator Iterator;
+	typedef HeaderMap::ConstIterator ConstIterator;
 	
 	NameValueCollection();
 		/// Creates an empty NameValueCollection.

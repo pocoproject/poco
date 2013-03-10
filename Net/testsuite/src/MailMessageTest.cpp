@@ -136,13 +136,13 @@ void MailMessageTest::testWriteQP()
 	message.write(str);
 	std::string s = str.str();
 	assert (s == 
-		"CC: Jane Doe <jane.doe@no.where>\r\n"
-		"Content-Transfer-Encoding: quoted-printable\r\n"
-		"Content-Type: text/plain\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-		"From: poco@appinf.com\r\n"
+		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
+		"From: poco@appinf.com\r\n"
+		"Content-Transfer-Encoding: quoted-printable\r\n"
 		"To: John Doe <john.doe@no.where>\r\n"
+		"CC: Jane Doe <jane.doe@no.where>\r\n"
 		"\r\n"
 		"Hello, world!\r\n"
 		"This is a test for the MailMessage class.\r\n"
@@ -172,11 +172,11 @@ void MailMessageTest::testWrite8Bit()
 	message.write(str);
 	std::string s = str.str();
 	assert (s == 
-		"Content-Transfer-Encoding: 8bit\r\n"
-		"Content-Type: text/plain\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-		"From: poco@appinf.com\r\n"
+		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
+		"From: poco@appinf.com\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
 		"To: John Doe <john.doe@no.where>\r\n"
 		"\r\n"
 		"Hello, world!\r\n"
@@ -204,11 +204,11 @@ void MailMessageTest::testWriteBase64()
 	message.write(str);
 	std::string s = str.str();
 	assert (s == 
-		"Content-Transfer-Encoding: base64\r\n"
-		"Content-Type: text/plain\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-		"From: poco@appinf.com\r\n"
+		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
+		"From: poco@appinf.com\r\n"
+		"Content-Transfer-Encoding: base64\r\n"
 		"To: John Doe <john.doe@no.where>\r\n"
 		"\r\n"
 		"SGVsbG8sIHdvcmxkIQ0KVGhpcyBpcyBhIHRlc3QgZm9yIHRoZSBNYWlsTWVzc2FnZSBjbGFz\r\n"
@@ -244,15 +244,15 @@ void MailMessageTest::testWriteManyRecipients()
 	message.write(str);
 	std::string s = str.str();
 	assert (s == 
-		"Content-Transfer-Encoding: 8bit\r\n"
-		"Content-Type: text/plain\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-		"From: poco@appinf.com\r\n"
+		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
+		"From: poco@appinf.com\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
 		"To: John Doe <john.doe@no.where>, Jane Doe <jane.doe@no.where>, \r\n"
-        "\tFrank Foo <walter.foo@no.where>, Bernie Bar <bernie.bar@no.where>, \r\n"
-        "\tJoe Spammer <joe.spammer@no.where>\r\n"
-   		"\r\n"
+		"\tFrank Foo <walter.foo@no.where>, Bernie Bar <bernie.bar@no.where>, \r\n"
+		"\tJoe Spammer <joe.spammer@no.where>\r\n"
+		"\r\n"
 		"Hello, world!\r\n"
 		"This is a test for the MailMessage class.\r\n"
 	);
@@ -279,32 +279,32 @@ void MailMessageTest::testWriteMultiPart()
 	message.write(str);
 	std::string s = str.str();
 	std::string rawMsg(
-		"Content-Type: multipart/mixed; boundary=$\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-		"From: poco@appinf.com\r\n"
-		"Mime-Version: 1.0\r\n"
+		"Content-Type: multipart/mixed; boundary=$\r\n"
 		"Subject: Test Message\r\n"
+		"From: poco@appinf.com\r\n"
 		"To: John Doe <john.doe@no.where>\r\n"
+		"Mime-Version: 1.0\r\n"
 		"\r\n"
 		"--$\r\n"
-		"Content-Disposition: inline\r\n"
-		"Content-Transfer-Encoding: 8bit\r\n"
 		"Content-Type: text/plain\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"Content-Disposition: inline\r\n"
 		"\r\n"
 		"Hello World!\r\n"
 		"\r\n"
 		"--$\r\n"
-		"Content-Disposition: attachment; filename=sample.dat\r\n"
 		"Content-ID: abcd1234\r\n"
-		"Content-Transfer-Encoding: base64\r\n"
 		"Content-Type: application/octet-stream; name=sample\r\n"
+		"Content-Transfer-Encoding: base64\r\n"
+		"Content-Disposition: attachment; filename=sample.dat\r\n"
 		"\r\n"
 		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
 		"--$--\r\n"
 	);
-	std::string::size_type p1 = s.find('=') + 1;
-	std::string::size_type p2 = s.find('\r');
-	std::string boundary(s, p1, p2 - p1);
+	std::string::size_type p2 = s.rfind("--");
+	std::string::size_type p1 = s.rfind("--", p2 - 1);
+	std::string boundary(s, p1 + 2, p2 - 2 - p1);
 	std::string msg;
 	for (std::string::const_iterator it = rawMsg.begin(); it != rawMsg.end(); ++it)
 	{

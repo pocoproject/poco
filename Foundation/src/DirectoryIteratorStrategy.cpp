@@ -34,13 +34,11 @@
 //
 
 
-#include "Poco/RecursiveDirectoryIteratorStrategies.h"
+#include "Poco/DirectoryIteratorStrategy.h"
 
 
-namespace Poco
-{
+namespace Poco {
 
-using namespace std;
 
 //
 // TraverseBase
@@ -66,13 +64,13 @@ ChildrenFirstTraverse::ChildrenFirstTraverse(DepthFunPtr depthDeterminer, UInt16
 }
 
 
-const string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
+const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 {
 	// pointer mustn't point to NULL and iteration mustn't be finished
 	poco_check_ptr(isFinished);
 	poco_assert(!(*isFinished));
 
-	stack<DirectoryIterator> it;
+	std::stack<DirectoryIterator> it;
 
 	//_depthDeterminer(it);
 
@@ -120,11 +118,11 @@ const string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 SiblingsFirstTraverse::SiblingsFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth)
 	: TraverseBase(depthDeterminer, maxDepth)
 {
-	_dirsStack.push(queue<string>());
+	_dirsStack.push(std::queue<std::string>());
 }
 
 
-const string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
+const std::string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 {
 	// pointer mustn't point to NULL and iteration mustn't be finished
 	poco_check_ptr(isFinished);
@@ -134,7 +132,7 @@ const string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 	bool isDepthLimitReached = isFiniteDepth() && _depthDeterminer(*itStack) >= _maxDepth;
 	if (!isDepthLimitReached && itStack->top()->isDirectory())
 	{
-		const string& p = itStack->top()->path();
+		const std::string& p = itStack->top()->path();
 		_dirsStack.top().push(p);
 	}
 
@@ -147,7 +145,7 @@ const string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 		// try to find first not empty directory and go deeper
 		while (!_dirsStack.top().empty())
 		{
-			string dir = _dirsStack.top().front();
+			std::string dir = _dirsStack.top().front();
 			_dirsStack.top().pop();
 			DirectoryIterator child_it(dir);
 
@@ -155,7 +153,7 @@ const string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 			if (child_it != _itEnd)
 			{
 				itStack->push(child_it);
-				_dirsStack.push(queue<string>());
+				_dirsStack.push(std::queue<std::string>());
 				return child_it->path();
 			}
 		}

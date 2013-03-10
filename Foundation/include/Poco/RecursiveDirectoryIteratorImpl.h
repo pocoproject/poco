@@ -39,17 +39,19 @@
 #ifndef Foundation_RecursiveDirectoryIteratorImpl_INCLUDE
 #define Foundation_RecursiveDirectoryIteratorImpl_INCLUDE
 
+
 #include "Poco/Foundation.h"
-#include "Poco/RecursiveDirectoryIteratorStrategies.h"
+#include "Poco/DirectoryIteratorStrategy.h"
 #include <stack>
 #include <functional>
 
 
-namespace Poco
-{
+namespace Poco {
+
 
 class ChildrenFirstTraverse;
 class SiblingsFirstTraverse;
+
 
 template<class TTraverseStrategy = ChildrenFirstTraverse>
 class RecursiveDirectoryIteratorImpl
