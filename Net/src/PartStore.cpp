@@ -1,11 +1,11 @@
 //
-// PartSource.cpp
+// PartStore.cpp
 //
-// $Id: //poco/1.4/Net/src/PartSource.cpp#1 $
+// $Id: //poco/1.4/Net/src/PartStore.cpp#1 $
 //
 // Library: Net
 // Package: Messages
-// Module:  PartSource
+// Module:  PartStore
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,39 +34,69 @@
 //
 
 
-#include "Poco/Net/PartSource.h"
+#include "Poco/Net/PartStore.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/File.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
 namespace Net {
 
 
-PartSource::PartSource():
-	_mediaType("application/octet-stream")
-{
-}
+/// PartStore
 
-	
-PartSource::PartSource(const std::string& mediaType):
-	_mediaType(mediaType)
+PartStore::PartStore(const std::string& mediaType): PartSource(mediaType)
 {
 }
 
 
-PartSource::~PartSource()
+PartStore::~PartStore()
 {
 }
 
 
-namespace
+/// FilePartStore
+
+FilePartStore::FilePartStore(const std::string& content, const std::string& mediaType, const std::string& filename):
+	PartStore(mediaType),
+	_filename(filename),
+	_path(TemporaryFile::tempName()),
+	_fstr(_path)
 {
-	static const std::string EMPTY;
+	_fstr << content << std::flush;
+	_fstr.seekg(0, std::ios::beg);
 }
 
 
-const std::string& PartSource::filename() const
+FilePartStore::~FilePartStore()
 {
-	return EMPTY;
+	try
+	{
+		_fstr.close();
+		File(_path).remove();
+	}
+	catch (Exception&)
+	{
+	}
+}
+
+
+std::istream& FilePartStore::stream()
+{
+	return _fstr;
+}
+
+
+const std::string& FilePartStore::filename() const
+{
+	return _filename;
+}
+
+
+const std::string& FilePartStore::path() const
+{
+	return _path;
 }
 
 

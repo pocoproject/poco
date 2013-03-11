@@ -51,6 +51,8 @@ public:
 	void testWriteBase64();
 	void testWriteManyRecipients();
 	void testWriteMultiPart();
+	void testReadWriteMultiPart();
+	void testReadWriteMultiPartStore();
 	void testReadQP();
 	void testRead8Bit();
 	void testReadMultiPart();

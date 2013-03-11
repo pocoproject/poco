@@ -222,6 +222,9 @@
     <ClInclude Include="include\Poco\Net\PartSource.h">
       <Filter>Messages\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\PartStore.h">
+      <Filter>Messages\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Net\QuotedPrintableDecoder.h">
       <Filter>Messages\Header Files</Filter>
     </ClInclude>
@@ -513,6 +516,9 @@
       <Filter>Messages\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PartSource.cpp">
+      <Filter>Messages\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PartStore.cpp">
       <Filter>Messages\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\QuotedPrintableDecoder.cpp">

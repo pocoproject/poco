@@ -72,7 +72,7 @@ public:
 	std::istream& stream();
 		/// Returns a string input stream for the string.
 		
-	const std::string& filename();
+	const std::string& filename() const;
 		/// Returns the filename portion of the path.
 
 private:
