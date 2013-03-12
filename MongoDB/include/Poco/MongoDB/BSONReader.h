@@ -35,8 +35,8 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_BSONReader_included
-#define _MongoDB_BSONReader_included
+#ifndef MongoDB_BSONReader_INCLUDED
+#define MongoDB_BSONReader_INCLUDED
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/BinaryReader.h"
@@ -75,6 +75,7 @@ private:
 	Poco::BinaryReader _reader;
 };
 
+
 inline std::string BSONReader::readCString()
 {
 	std::string val;
@@ -98,6 +99,7 @@ inline std::string BSONReader::readCString()
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //  _MongoDB_BSONReader_included
+
+#endif //  MongoDB_BSONReader_INCLUDED

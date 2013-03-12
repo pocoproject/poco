@@ -35,12 +35,15 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_DeleteRequest_included
-#define _MongoDB_DeleteRequest_included
+
+#ifndef MongoDB_DeleteRequest_INCLUDED
+#define MongoDB_DeleteRequest_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/RequestMessage.h"
 #include "Poco/MongoDB/Document.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -57,7 +60,6 @@ class MongoDB_API DeleteRequest : public RequestMessage
 	///      Delete only the first document
 {
 public:
-
 	typedef enum
 	{
 		DELETE_NONE = 0,
@@ -70,7 +72,6 @@ public:
 		/// for the database "foo" and the collection "bar", the full collection name is 
 		/// "foo.bar".
 
-
 	DeleteRequest(const std::string& collectionName, bool justOne);
 		/// Constructor. The full collection name is the concatenation of the database
 		/// name with the collection name, using a "." for the concatenation. For example,
@@ -78,36 +79,25 @@ public:
 		/// "foo.bar". When justOne is true, only the first matching document will
 		/// be removed (the same as using flag DELETE_SINGLE_REMOVE).
 
-
 	virtual ~DeleteRequest();
 		/// Destructor
-
 
 	Flags flags() const;
 		/// Returns flags
 
-
 	void flags(Flags flag);
 		/// Sets flags
-
 
 	Document& selector();
 		/// Returns the selector document
 
 protected:
-
-
 	void buildRequest(BinaryWriter& writer);
 		/// Writes the OP_DELETE request to the writer
 
 private:
-
-	Flags _flags;
-
-
+	Flags       _flags;
 	std::string _fullCollectionName;
-
-
 	Document _selector;
 };
 
@@ -129,6 +119,7 @@ inline Document& DeleteRequest::selector()
 	return _selector;
 }
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //_MongoDB_DeleteRequest_included
+
+#endif //MongoDB_DeleteRequest_INCLUDED

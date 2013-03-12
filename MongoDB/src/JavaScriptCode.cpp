@@ -49,4 +49,4 @@ JavaScriptCode::~JavaScriptCode()
 {
 }
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB

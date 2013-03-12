@@ -35,8 +35,8 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_Binary_included
-#define _MongoDB_Binary_included
+#ifndef MongoDB_Binary_INCLUDED
+#define MongoDB_Binary_INCLUDED
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
@@ -56,40 +56,29 @@ class MongoDB_API Binary
 public:
 	typedef SharedPtr<Binary> Ptr;
 
-
 	Binary();
 		/// Constructor
-
 
 	Binary(Poco::Int32 size, unsigned char subtype);
 		/// Constructor
 
-
 	virtual ~Binary();
 		/// Destructor
-
 
 	Buffer<unsigned char>& buffer();
 		/// Returns a reference to the buffer
 
-
 	unsigned char subtype() const;
 		/// Returns the subtype
-
 
 	void subtype(unsigned char type);
 		/// Sets the subtype
 
-
 	std::string toString(int indent = 0) const;
 		/// Returns the binary encoded in Base64
 
-
 private:
-
 	Buffer<unsigned char> _buffer;
-
-
 	unsigned char _subtype;
 };
 
@@ -125,6 +114,7 @@ struct ElementTraits<Binary::Ptr>
 	}
 };
 
+
 template<>
 inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 {
@@ -148,6 +138,6 @@ inline void BSONWriter::write<Binary::Ptr>(Binary::Ptr& from)
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif // _MongoDB_Binary_included
+#endif // MongoDB_Binary_INCLUDED

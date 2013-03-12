@@ -35,8 +35,8 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_Array_included
-#define _MongoDB_Array_included
+#ifndef MongoDB_Array_INCLUDED
+#define MongoDB_Array_INCLUDED
 
 #include "Poco/NumberFormatter.h"
 
@@ -52,14 +52,11 @@ class MongoDB_API Array : public Document
 public:
 	typedef SharedPtr<Array> Ptr;
 
-	
 	Array();
 		/// Constructor
 
-
 	virtual ~Array();
 		/// Destructor
-
 
 	template<typename T>
 	T get(int pos) const
@@ -71,7 +68,6 @@ public:
 		return Document::get<T>(Poco::NumberFormatter::format(pos));
 	}
 
-
 	template<typename T>
 	T get(int pos, const T& def) const
 		/// Returns the element on the given index and tries to convert
@@ -81,11 +77,9 @@ public:
 		return Document::get<T>(Poco::NumberFormatter::format(pos), def);
 	}
 
-
 	Element::Ptr get(int pos) const;
 		/// Returns the element on the given index.
 		/// An empty element will be returned when the element is not found.
-
 
 	template<typename T>
 	bool isType(int pos)
@@ -93,7 +87,6 @@ public:
 	{
 		return Document::isType<T>(Poco::NumberFormatter::format(pos));
 	}
-
 
 	std::string toString(int indent = 0) const;
 };
@@ -110,14 +103,15 @@ struct ElementTraits<Array::Ptr>
 		//TODO:
 		return value.isNull() ? "null" : value->toString(indent);
 	}
-
 };
+
 
 template<>
 inline void BSONReader::read<Array::Ptr>(Array::Ptr& to)
 {
 	to->read(_reader);
 }
+
 
 template<>
 inline void BSONWriter::write<Array::Ptr>(Array::Ptr& from)
@@ -126,6 +120,7 @@ inline void BSONWriter::write<Array::Ptr>(Array::Ptr& from)
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //_MongoDB_Array_included
+
+#endif //MongoDB_Array_INCLUDED

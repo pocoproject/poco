@@ -147,4 +147,4 @@ Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const 
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB

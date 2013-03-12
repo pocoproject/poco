@@ -213,4 +213,4 @@ void Document::write(BinaryWriter& writer)
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB

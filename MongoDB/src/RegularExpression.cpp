@@ -88,4 +88,4 @@ SharedPtr<Poco::RegularExpression> RegularExpression::createRE() const
 	return new Poco::RegularExpression(_pattern, options);
 }
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB

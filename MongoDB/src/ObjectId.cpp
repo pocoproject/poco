@@ -65,4 +65,4 @@ std::string ObjectId::toString() const
 	return s;
 }
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB

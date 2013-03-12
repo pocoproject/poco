@@ -105,4 +105,4 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 }
 
 
-}} // Poco::MongoDB
+} } // namespace Poco::MongoDB

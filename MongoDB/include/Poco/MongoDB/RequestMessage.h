@@ -35,13 +35,15 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_RequestMessage_included
-#define _MongoDB_RequestMessage_included
+
+#ifndef MongoDB_RequestMessage_INCLUDED
+#define MongoDB_RequestMessage_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Message.h"
-
 #include <ostream>
+
 
 namespace Poco {
 namespace MongoDB {
@@ -54,21 +56,18 @@ public:
 	RequestMessage(MessageHeader::OpCode opcode);
 		/// Constructor
 
-
 	virtual ~RequestMessage();
 		/// Destructor
-
 
 	void send(std::ostream& ostr);
 		/// Sends the request to stream
 
-
 protected:
-
 	virtual void buildRequest(BinaryWriter& ss) = 0;
 };
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //_MongoDB_RequestMessage_included
+
+#endif //MongoDB_RequestMessage_INCLUDED

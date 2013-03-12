@@ -66,4 +66,4 @@ std::string Binary::toString(int indent) const
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
