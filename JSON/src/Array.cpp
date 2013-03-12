@@ -150,7 +150,7 @@ void Array::stringify(std::ostream& out, unsigned int indent) const
 		out << std::endl;
 	}
 
-	if ( indent > 0 )
+	if ( indent > 1 )
 		indent -= 2;
 
 	for(int i = 0; i < indent; i++)
