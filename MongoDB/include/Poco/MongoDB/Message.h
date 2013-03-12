@@ -67,7 +67,7 @@ public:
 protected:
 	MessageHeader _header;
 
-	void messageLength(Int32 length);
+	void messageLength(std::size_t length);
 		/// Sets the message length in the message header
 };
 
@@ -78,7 +78,7 @@ inline MessageHeader& Message::header()
 }
 
 
-inline void Message::messageLength(Int32 length)
+inline void Message::messageLength(std::size_t length)
 {
 	_header.setMessageLength(length);
 }
