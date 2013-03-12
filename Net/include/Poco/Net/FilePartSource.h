@@ -43,7 +43,6 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/PartSource.h"
 #include "Poco/FileStream.h"
-#include "Poco/TemporaryFile.h"
 
 
 namespace Poco {

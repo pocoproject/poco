@@ -114,7 +114,7 @@ namespace
 
 				NameValueCollection::ConstIterator it = header.begin();
 				NameValueCollection::ConstIterator end = header.end();
-				PartSource* pPS = _pMsg->getPartStore(tmp, 
+				PartSource* pPS = _pMsg->createPartStore(tmp, 
 					header[MailMessage::HEADER_CONTENT_TYPE], 
 					getFileNameFromDisp(it->second));
 				poco_check_ptr (pPS);
@@ -680,7 +680,7 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 }
 
 
-PartSource* MailMessage::getPartStore(const std::string& content, const std::string& mediaType, const std::string& filename)
+PartSource* MailMessage::createPartStore(const std::string& content, const std::string& mediaType, const std::string& filename)
 {
 	if (!_pStoreFactory) return new StringPartSource(content, mediaType, filename);
 	else return _pStoreFactory->createPartStore(content, mediaType, filename);

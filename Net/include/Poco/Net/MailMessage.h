@@ -219,15 +219,15 @@ public:
 		/// To include non-ASCII characters in the part name or filename, 
 		/// use RFC 2047 word encoding (see encodeWord()).
 
-	PartSource* getPartStore(const std::string& content,
+	PartSource* createPartStore(const std::string& content,
 		const std::string& mediaType,
 		const std::string& filename = "");
-		/// Returns either built-in default (StringPartSource) part store or, 
+		/// Returns either default StringPartSource part store or, 
 		/// if the part store factory was provided during contruction,
 		/// the one created by PartStoreFactory.
-		/// Returned part store is allocated on the heap; it is caller's responsibility 
-		/// to delete it after use. Typical use is handler passing it back to MailMessage,
-		/// which takes care of the cleanup.
+		/// Returned part store is allocated on the heap; it is caller's 
+		/// responsibility to delete it after use. Typical use is handler 
+		/// passing it back to MailMessage, which takes care of the cleanup.
 
 	const PartVec& parts() const;
 		/// Returns const reference to the vector containing part stores.
