@@ -22,6 +22,7 @@ Release 1.5.2 (2013-03-??)
 - added Recursive and SortedDirectoryIterator (Marian Krivos)
 - added ListMap (map-like container with preserving insertion order)
 - MailMessage: attachments saving support and consistent read/write
+- fixed GH #124: Possibile buffer overrun in Foundation/EventLogChannel
 
 Release 1.5.1 (2013-01-11)
 ==========================

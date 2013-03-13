@@ -56,9 +56,10 @@ EventLogChannel::EventLogChannel():
 	_logFile("Application"),
 	_h(0)
 {
+	static const int length = 256;
 #if defined(POCO_WIN32_UTF8)
-	wchar_t name[256];
-	int n = GetModuleFileNameW(NULL, name, sizeof(name));
+	wchar_t name[length];
+	int n = GetModuleFileNameW(NULL, name, length);
 	if (n > 0)
 	{
 		wchar_t* end = name + n - 1;
@@ -68,8 +69,8 @@ EventLogChannel::EventLogChannel():
 		UnicodeConverter::toUTF8(uname, _name);
 	}
 #else
-	char name[256];
-	int n = GetModuleFileNameA(NULL, name, sizeof(name));
+	char name[length];
+	int n = GetModuleFileNameA(NULL, name, length);
 	if (n > 0)
 	{
 		char* end = name + n - 1;
