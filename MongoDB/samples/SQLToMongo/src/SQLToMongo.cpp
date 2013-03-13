@@ -38,6 +38,7 @@
 #include "Poco/MongoDB/Cursor.h"
 #include "Poco/MongoDB/Array.h"
 
+
 // INSERT INTO players
 // VALUES( "Messi", "Lionel", 1987)
 void sample1(Poco::MongoDB::Connection& connection)
@@ -159,6 +160,7 @@ void sample1(Poco::MongoDB::Connection& connection)
 	}
 }
 
+
 // SELECT lastname, birthyear FROM players
 void sample2(Poco::MongoDB::Connection& connection)
 {
@@ -187,6 +189,7 @@ void sample2(Poco::MongoDB::Connection& connection)
 		response = cursor.next(connection);
 	}
 }
+
 
 // SELECT * FROM players
 void sample3(Poco::MongoDB::Connection& connection)
@@ -240,6 +243,7 @@ void sample4(Poco::MongoDB::Connection& connection)
 		response = cursor.next(connection);
 	};
 }
+
 
 // SELECT * FROM players WHERE birthyear = 1987 ORDER BY name
 void sample5(Poco::MongoDB::Connection& connection)
