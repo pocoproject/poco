@@ -139,7 +139,7 @@ public:
 
 	enum
 	{
-		MAX_ADDRESS_LENGTH = 
+		MAX_ADDRESS_LENGTH =
 #if defined(POCO_HAVE_IPv6)
 			sizeof(struct sockaddr_in6)
 #else
@@ -173,15 +173,15 @@ inline IPAddress::Family SocketAddress::family() const
 }
 
 
-inline 	bool SocketAddress::operator == (const SocketAddress& addr) const
+inline 	bool SocketAddress::operator == (const SocketAddress& sockAddr) const
 {
-	return host() == addr.host() && port() == addr.port();
+	return host() == sockAddr.host() && port() == sockAddr.port();
 }
 
 
-inline bool SocketAddress::operator != (const SocketAddress& addr) const
+inline bool SocketAddress::operator != (const SocketAddress& sockAddr) const
 {
-	return host() != addr.host() || port() != addr.port();
+	return host() != sockAddr.host() || port() != sockAddr.port();
 }
 
 

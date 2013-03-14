@@ -193,6 +193,7 @@ void JSONTest::testNumberProperty()
 }
 
 
+<<<<<<< HEAD
 void JSONTest::testUnsignedNumberProperty()
 {
 	// 4294967295 == unsigned(-1)
@@ -222,6 +223,8 @@ void JSONTest::testUnsignedNumberProperty()
 	assert(value == -1);
 }
 
+=======
+>>>>>>> upstream/master
 #if defined(POCO_HAVE_INT64)
 
 
@@ -977,6 +980,7 @@ void JSONTest::testTemplate()
 	tpl.render(data, std::cout);
 }
 
+
 void JSONTest::testUnicode()
 {
 	const unsigned char supp[] = {0x61, 0xE1, 0xE9, 0x78, 0xED, 0xF3, 0xFA, 0x0};
@@ -1012,6 +1016,7 @@ void JSONTest::testUnicode()
 	assert(test.convert<std::string>() == original);
 }
 
+
 std::string JSONTest::getTestFilesPath(const std::string& type)
 {
 	std::ostringstream ostr;
@@ -1036,6 +1041,7 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 		std::cout << "Can't find " << validDir << std::endl;
 		throw Poco::NotFoundException("cannot locate directory containing valid JSON test files");
 	}
+
 	return validDir;
 }
 

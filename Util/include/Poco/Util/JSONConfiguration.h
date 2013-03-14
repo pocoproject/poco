@@ -166,4 +166,5 @@ private:
 
 #endif // Util_JSONConfiguration_INCLUDED
 
+
 #endif // POCO_UTIL_NO_JSONCONFIGURATION
