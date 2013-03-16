@@ -267,7 +267,6 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 {
 
 	std::string sValue;
-	
 	value.convert<std::string>(sValue);
 	KeyValue kv(key, sValue);
 	
@@ -380,7 +379,6 @@ void JSONConfiguration::save(std::ostream& ostr, unsigned int indent) const
 void JSONConfiguration::removeRaw(const std::string& key)
 
 {
-	
 	std::string lastPart;
 	JSON::Object::Ptr parentObject = findStart(key, lastPart);
 	std::vector<int> indexes;
@@ -395,7 +393,6 @@ void JSONConfiguration::removeRaw(const std::string& key)
 		DynamicAny result = parentObject->get(lastPart);
 		if (!result.isEmpty() && result.type() == typeid(JSON::Array::Ptr))
 		{
-
 			JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
 			for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
 			{

@@ -102,9 +102,11 @@ public:
 
 	void blob(int bigSize = 1024);
 	void blobStmt();
+
 	void dateTime();
 	void date();
 	void time();
+
 	void floats();
 	void doubles();
 	void tuples();

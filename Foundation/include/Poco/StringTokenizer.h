@@ -107,7 +107,7 @@ public:
 private:
 	StringTokenizer(const StringTokenizer&);
 	StringTokenizer& operator = (const StringTokenizer&);
-	
+
 	void trim (std::string& token);
 
 	TokenVec _tokens;

@@ -272,39 +272,39 @@ inline bool Timespan::operator <= (const Timespan& ts) const
 }
 
 
-inline bool Timespan::operator == (TimeDiff microseconds) const
+inline bool Timespan::operator == (TimeDiff microsecondsIn) const
 {
-	return _span == microseconds;
+	return _span == microsecondsIn;
 }
 
 
-inline bool Timespan::operator != (TimeDiff microseconds) const
+inline bool Timespan::operator != (TimeDiff microsecondsIn) const
 {
-	return _span != microseconds;
+	return _span != microsecondsIn;
 }
 
 
-inline bool Timespan::operator >  (TimeDiff microseconds) const
+inline bool Timespan::operator >  (TimeDiff microsecondsIn) const
 {
-	return _span > microseconds;
+	return _span > microsecondsIn;
 }
 
 
-inline bool Timespan::operator >= (TimeDiff microseconds) const
+inline bool Timespan::operator >= (TimeDiff microsecondsIn) const
 {
-	return _span >= microseconds;
+	return _span >= microsecondsIn;
 }
 
 
-inline bool Timespan::operator <  (TimeDiff microseconds) const
+inline bool Timespan::operator <  (TimeDiff microsecondsIn) const
 {
-	return _span < microseconds;
+	return _span < microsecondsIn;
 }
 
 
-inline bool Timespan::operator <= (TimeDiff microseconds) const
+inline bool Timespan::operator <= (TimeDiff microsecondsIn) const
 {
-	return _span <= microseconds;
+	return _span <= microsecondsIn;
 }
 
 
