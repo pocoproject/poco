@@ -272,11 +272,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Array.cpp"/>
-    <ClCompile Include="src\DefaultHandler.cpp"/>
+    <ClCompile Include="src\ParseHandler.cpp"/>
     <ClCompile Include="src\Handler.cpp"/>
     <ClCompile Include="src\JSONException.cpp"/>
     <ClCompile Include="src\Object.cpp"/>
     <ClCompile Include="src\Parser.cpp"/>
+    <ClCompile Include="src\PrintHandler.cpp"/>
     <ClCompile Include="src\Query.cpp"/>
     <ClCompile Include="src\Stringifier.cpp"/>
     <ClCompile Include="src\Template.cpp"/>
@@ -290,6 +291,8 @@
     <ClInclude Include="include\Poco\JSON\JSONException.h"/>
     <ClInclude Include="include\Poco\JSON\Object.h"/>
     <ClInclude Include="include\Poco\JSON\Parser.h"/>
+    <ClInclude Include="include\Poco\JSON\ParseHandler.h"/>
+    <ClInclude Include="include\Poco\JSON\PrintHandler.h"/>
     <ClInclude Include="include\Poco\JSON\Query.h"/>
     <ClInclude Include="include\Poco\JSON\Stringifier.h"/>
     <ClInclude Include="include\Poco\JSON\Template.h"/>

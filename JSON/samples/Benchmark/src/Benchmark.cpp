@@ -34,7 +34,7 @@
 
 #include "Poco/Timestamp.h"
 #include "Poco/JSON/Parser.h"
-#include "Poco/JSON/DefaultHandler.h"
+#include "Poco/JSON/ParseHandler.h"
 #include "Poco/JSON/JSONException.h"
 #include "Poco/Environment.h"
 #include "Poco/Path.h"
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 	
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		Poco::JSON::ParseHandler handler;
 		Poco::JSON::Parser parser;
 		parser.setHandler(&handler);
 		Poco::Timestamp time1;

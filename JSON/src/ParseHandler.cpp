@@ -1,11 +1,11 @@
 //
-// DefaultHandler.cpp
+// ParseHandler.cpp
 //
 // $Id$
 //
 // Library: JSON
 // Package: JSON
-// Module:  DefaultHandler
+// Module:  ParseHandler
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,7 +34,7 @@
 //
 
 
-#include "Poco/JSON/DefaultHandler.h"
+#include "Poco/JSON/ParseHandler.h"
 #include "Poco/JSON/Object.h"
 
 
@@ -45,19 +45,20 @@ namespace Poco {
 namespace JSON {
 
 
-DefaultHandler::DefaultHandler() : Handler()
+ParseHandler::ParseHandler(bool preserveObjectOrder) : Handler(),
+	_preserveObjectOrder(preserveObjectOrder)
 {
 }
 
 
-DefaultHandler::~DefaultHandler()
+ParseHandler::~ParseHandler()
 {
 }
 
 
-void DefaultHandler::startObject()
+void ParseHandler::startObject()
 {
-	Object::Ptr newObj = new Object();
+	Object::Ptr newObj = new Object(_preserveObjectOrder);
 
 	if ( _stack.empty() ) // The first object
 	{
@@ -85,13 +86,13 @@ void DefaultHandler::startObject()
 }
 
 
-void DefaultHandler::endObject()
+void ParseHandler::endObject()
 {
 	_stack.pop();
 }
 
 
-void DefaultHandler::startArray()
+void ParseHandler::startArray()
 {
 	Array::Ptr newArr = new Array();
 
@@ -121,19 +122,19 @@ void DefaultHandler::startArray()
 }
 
 
-void DefaultHandler::endArray()
+void ParseHandler::endArray()
 {
 	_stack.pop();
 }
 
 
-void DefaultHandler::key(const std::string& k)
+void ParseHandler::key(const std::string& k)
 {
 	_key = k;
 }
 
 
-void DefaultHandler::setValue(const Var& value)
+void ParseHandler::setValue(const Var& value)
 {
 	Var parent = _stack.top();
 

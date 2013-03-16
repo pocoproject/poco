@@ -40,13 +40,6 @@
 namespace Poco {
 
 
-#if defined(_WIN32)
-#define POCO_DEFAULT_NEWLINE_CHARS "\r\n"
-#else
-#define POCO_DEFAULT_NEWLINE_CHARS "\n"
-#endif
-
-
 const std::string LineEnding::NEWLINE_DEFAULT(POCO_DEFAULT_NEWLINE_CHARS);
 const std::string LineEnding::NEWLINE_CR("\r");
 const std::string LineEnding::NEWLINE_CRLF("\r\n");

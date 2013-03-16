@@ -51,6 +51,9 @@ namespace JSON {
 class JSON_API Handler
 {
 public:
+	Handler();
+		/// Constructor;
+
 	virtual void startObject() = 0;
 		/// The parser has read a {, meaning a new object will be read
 
@@ -74,7 +77,7 @@ public:
 
 	virtual void value(unsigned v) = 0;
 		/// An unsigned value is read. This will only be triggered if the
-        /// value cannot fit into a signed int.
+		/// value cannot fit into a signed int.
 
 #if defined(POCO_HAVE_INT64)
 	virtual void value(Int64 v) = 0;
@@ -82,7 +85,7 @@ public:
 
 	virtual void value(UInt64 v) = 0;
 		/// An unsigned 64-bit integer value is read. This will only be
-        /// triggered if the value cannot fit into a signed 64-bit integer.
+		/// triggered if the value cannot fit into a signed 64-bit integer.
 #endif
 
 	virtual void value(const std::string& value) = 0;
@@ -93,6 +96,9 @@ public:
 
 	virtual void value(bool b) = 0;
 		/// A boolean value is read
+
+	virtual void comma();
+		/// A comma is read
 
 protected:
 

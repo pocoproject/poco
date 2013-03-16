@@ -47,27 +47,29 @@ namespace Poco {
 namespace JSON {
 
 
-void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent)
+void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step, bool preserveInsertionOrder)
 {
+	if (step == -1) step = indent;
+
 	if ( any.type() == typeid(Object) )
 	{
 		const Object& o = any.extract<Object>();
-		o.stringify(out, indent == 0 ? 0 : indent + 2);
+		o.stringify(out, indent == 0 ? 0 : indent, step);
 	}
 	else if ( any.type() == typeid(Array) )
 	{
 		const Array& a = any.extract<Array>();
-		a.stringify(out, indent == 0 ? 0 : indent + 2);
+		a.stringify(out, indent == 0 ? 0 : indent, step);
 	}
 	else if ( any.type() == typeid(Object::Ptr) )
 	{
 		const Object::Ptr& o = any.extract<Object::Ptr>();
-		o->stringify(out, indent == 0 ? 0 : indent + 2);
+		o->stringify(out, indent == 0 ? 0 : indent, step);
 	}
 	else if ( any.type() == typeid(Array::Ptr) )
 	{
 		const Array::Ptr& a = any.extract<Array::Ptr>();
-		a->stringify(out, indent == 0 ? 0 : indent + 2);
+		a->stringify(out, indent == 0 ? 0 : indent, step);
 	}
 	else if ( any.isEmpty() )
 	{
@@ -75,48 +77,8 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 	}
 	else if ( any.isString() )
 	{
-		out << '"';
 		std::string value = any.convert<std::string>();
-		for(std::string::const_iterator it = value.begin(); it != value.end(); ++it)
-		{
-			switch (*it)
-			{
-			case '"':
-				out << "\\\"";
-				break;
-			case '\\':
-				out << "\\\\";
-				break;
-			case '\b':
-				out << "\\b";
-				break;
-			case '\f':
-				out << "\\f";
-				break;
-			case '\n':
-				out << "\\n";
-				break;
-			case '\r':
-				out << "\\r";
-				break;
-			case '\t':
-				out << "\\t";
-				break;
-			default:
-			{
-				if ( *it > 0 && *it <= 0x1F )
-				{
-					out << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(*it);
-				}
-				else
-				{
-					out << *it;
-				}
-				break;
-			}
-			}
-		}
-		out << '"';
+		formatString(value, out);
 	}
 	else
 	{
@@ -124,5 +86,50 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 	}
 }
 
+
+void Stringifier::formatString(const std::string& value, std::ostream& out)
+{
+	out << '"';
+	for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+	{
+		switch (*it)
+		{
+		case '"':
+			out << "\\\"";
+			break;
+		case '\\':
+			out << "\\\\";
+			break;
+		case '\b':
+			out << "\\b";
+			break;
+		case '\f':
+			out << "\\f";
+			break;
+		case '\n':
+			out << "\\n";
+			break;
+		case '\r':
+			out << "\\r";
+			break;
+		case '\t':
+			out << "\\t";
+			break;
+		default:
+		{
+			if ( *it > 0 && *it <= 0x1F )
+			{
+				out << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(*it);
+			}
+			else
+			{
+				out << *it;
+			}
+			break;
+		}
+		}
+	}
+	out << '"';
+}
 
 } }  // Namespace Poco::JSON

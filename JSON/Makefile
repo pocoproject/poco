@@ -11,7 +11,7 @@ include $(POCO_BASE)/build/rules/global
 INCLUDE += -I $(POCO_BASE)/JSON/include/Poco/JSON
 
 objects = Array Object Parser Handler  \
-	Stringifier DefaultHandler Query JSONException \
+	Stringifier ParseHandler Query JSONException \
 	Template TemplateCache
 
 target         = PocoJSON

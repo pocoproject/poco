@@ -42,7 +42,17 @@ namespace Poco {
 namespace JSON {
 
 
+Handler::Handler()
+{
+}
+
+
 Handler::~Handler()
+{
+}
+
+
+void Handler::comma()
 {
 }
 
