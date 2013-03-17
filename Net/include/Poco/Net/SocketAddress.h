@@ -41,8 +41,7 @@
 
 
 #include "Poco/Net/Net.h"
-#include "Poco/Net/SocketDefs.h"
-#include "Poco/Net/IPAddress.h"
+#include "Poco/Net/SocketAddressImpl.h"
 
 
 namespace Poco {
@@ -50,7 +49,6 @@ namespace Net {
 
 
 class IPAddress;
-class SocketAddressImpl;
 
 
 class Net_API SocketAddress
@@ -63,20 +61,20 @@ public:
 	SocketAddress();
 		/// Creates a wildcard (all zero) IPv4 SocketAddress.
 
-	SocketAddress(const IPAddress& host, Poco::UInt16 port);
+	SocketAddress(const IPAddress& hostAddress, Poco::UInt16 portNumber);
 		/// Creates a SocketAddress from an IP address and given port number.
 
 	SocketAddress(Poco::UInt16 port);
 		/// Creates a SocketAddress with unspecified (wildcard) IP address 
 		/// and given port number.
 
-	SocketAddress(const std::string& host, Poco::UInt16 port);
+	SocketAddress(const std::string& hostAddress, Poco::UInt16 portNumber);
 		/// Creates a SocketAddress from an IP address and given port number.
 		///
 		/// The IP address must either be a domain name, or it must
 		/// be in dotted decimal (IPv4) or hex string (IPv6) format.
 
-	SocketAddress(const std::string& host, const std::string& port);
+	SocketAddress(const std::string& hostAddress, const std::string& portNumber);
 		/// Creates a SocketAddress from an IP address and the
 		/// service name or port number.
 		///
@@ -106,11 +104,8 @@ public:
 	~SocketAddress();
 		/// Destroys the SocketAddress.
 
-	SocketAddress& operator = (const SocketAddress& addr);
+	SocketAddress& operator = (const SocketAddress& socketAddress);
 		/// Assigns another SocketAddress.
-
-	void swap(SocketAddress& addr);
-		/// Swaps the SocketAddress with another one.
 
 	IPAddress host() const;
 		/// Returns the host IP address.
@@ -133,9 +128,9 @@ public:
 	IPAddress::Family family() const;
 		/// Returns the address family of the host's address.
 
-	bool operator < (const SocketAddress& addr) const;
-	bool operator == (const SocketAddress& addr) const;
-	bool operator != (const SocketAddress& addr) const;
+	bool operator < (const SocketAddress& socketAddress) const;
+	bool operator == (const SocketAddress& socketAddress) const;
+	bool operator != (const SocketAddress& socketAddress) const;
 
 	enum
 	{
@@ -149,21 +144,35 @@ public:
 	};
 
 protected:
-	void init(const IPAddress& host, Poco::UInt16 port);
-	void init(const std::string& host, Poco::UInt16 port);
+	void init(const IPAddress& hostAddress, Poco::UInt16 portNumber);
+	void init(const std::string& hostAddress, Poco::UInt16 portNumber);
 	Poco::UInt16 resolveService(const std::string& service);
 
 private:
-	SocketAddressImpl* _pImpl;
+	typedef Poco::Net::Impl::SocketAddressImpl Impl;
+	typedef Impl* Ptr;
+
+	Ptr pImpl() const;
+	void destruct();
+
+	char _memory[sizeof(Poco::Net::Impl::IPv6SocketAddressImpl)];
 };
 
 
 //
 // inlines
 //
-inline void swap(SocketAddress& a1, SocketAddress& a2)
+
+
+inline void SocketAddress::destruct()
 {
-	a1.swap(a2);
+	pImpl()->~SocketAddressImpl();
+}
+
+
+inline SocketAddress::Ptr SocketAddress::pImpl() const
+{
+	return reinterpret_cast<Ptr>(const_cast<char *>(_memory));
 }
 
 
@@ -173,15 +182,15 @@ inline IPAddress::Family SocketAddress::family() const
 }
 
 
-inline 	bool SocketAddress::operator == (const SocketAddress& addr) const
+inline 	bool SocketAddress::operator == (const SocketAddress& socketAddress) const
 {
-	return host() == addr.host() && port() == addr.port();
+	return host() == socketAddress.host() && port() == socketAddress.port();
 }
 
 
-inline bool SocketAddress::operator != (const SocketAddress& addr) const
+inline bool SocketAddress::operator != (const SocketAddress& socketAddress) const
 {
-	return host() != addr.host() || port() != addr.port();
+	return host() != socketAddress.host() || port() != socketAddress.port();
 }
 
 

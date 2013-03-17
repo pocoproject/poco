@@ -150,6 +150,9 @@
     <ClInclude Include="include\Poco\Net\SocketAddress.h">
       <Filter>NetCore\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketAddressImpl.h">
+      <Filter>NetCore\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Net\SocketDefs.h">
       <Filter>NetCore\Header Files</Filter>
     </ClInclude>
@@ -447,6 +450,9 @@
       <Filter>NetCore\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SocketAddress.cpp">
+      <Filter>NetCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketAddressImpl.cpp">
       <Filter>NetCore\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DatagramSocket.cpp">

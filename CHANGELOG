@@ -27,6 +27,8 @@ Release 1.5.2 (2013-03-??)
 - added PrintHandler
 - renamed DefaultHandler to ParseHandler
 - redefined DefaultHandler as typedef to ParseHandler
+- fixed GH #127: Eliminate -Wshadow warnings
+- SocketAddress small object optimization
 
 Release 1.5.1 (2013-01-11)
 ==========================

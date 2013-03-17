@@ -66,10 +66,10 @@ void DatagramSocketTest::testEcho()
 {
 	UDPEchoServer echoServer;
 	DatagramSocket ss;
+	char buffer[256];
 	ss.connect(SocketAddress("localhost", echoServer.port()));
 	int n = ss.sendBytes("hello", 5);
 	assert (n == 5);
-	char buffer[256];
 	n = ss.receiveBytes(buffer, sizeof(buffer));
 	assert (n == 5);
 	assert (std::string(buffer, n) == "hello");

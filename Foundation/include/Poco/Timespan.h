@@ -63,7 +63,7 @@ public:
 		/// Creates a Timespan. Useful for creating
 		/// a Timespan from a struct timeval.
 	
-	Timespan(int days, int hours, int minutes, int seconds, int microseconds);
+	Timespan(int days, int hours, int minutes, int seconds, int microSeconds);
 		/// Creates a Timespan.
 
 	Timespan(const Timespan& timespan);
@@ -78,7 +78,7 @@ public:
 	Timespan& operator = (TimeDiff microseconds);
 		/// Assignment operator.
 		
-	Timespan& assign(int days, int hours, int minutes, int seconds, int microseconds);
+	Timespan& assign(int days, int hours, int minutes, int seconds, int microSeconds);
 		/// Assigns a new span.
 		
 	Timespan& assign(long seconds, long microseconds);
@@ -95,22 +95,22 @@ public:
 	bool operator <  (const Timespan& ts) const;
 	bool operator <= (const Timespan& ts) const;
 
-	bool operator == (TimeDiff microseconds) const;
-	bool operator != (TimeDiff microseconds) const;
-	bool operator >  (TimeDiff microseconds) const;
-	bool operator >= (TimeDiff microseconds) const;
-	bool operator <  (TimeDiff microseconds) const;
-	bool operator <= (TimeDiff microseconds) const;
+	bool operator == (TimeDiff microSeconds) const;
+	bool operator != (TimeDiff microSeconds) const;
+	bool operator >  (TimeDiff microSeconds) const;
+	bool operator >= (TimeDiff microSeconds) const;
+	bool operator <  (TimeDiff microSeconds) const;
+	bool operator <= (TimeDiff microSeconds) const;
 	
 	Timespan operator + (const Timespan& d) const;
 	Timespan operator - (const Timespan& d) const;
 	Timespan& operator += (const Timespan& d);
 	Timespan& operator -= (const Timespan& d);
 
-	Timespan operator + (TimeDiff microseconds) const;
-	Timespan operator - (TimeDiff microseconds) const;
-	Timespan& operator += (TimeDiff microseconds);
-	Timespan& operator -= (TimeDiff microseconds);
+	Timespan operator + (TimeDiff microSeconds) const;
+	Timespan operator - (TimeDiff microSeconds) const;
+	Timespan& operator += (TimeDiff microSeconds);
+	Timespan& operator -= (TimeDiff microSeconds);
 
 	int days() const;
 		/// Returns the number of days.
@@ -272,39 +272,39 @@ inline bool Timespan::operator <= (const Timespan& ts) const
 }
 
 
-inline bool Timespan::operator == (TimeDiff microseconds) const
+inline bool Timespan::operator == (TimeDiff microSeconds) const
 {
-	return _span == microseconds;
+	return _span == microSeconds;
 }
 
 
-inline bool Timespan::operator != (TimeDiff microseconds) const
+inline bool Timespan::operator != (TimeDiff microSeconds) const
 {
-	return _span != microseconds;
+	return _span != microSeconds;
 }
 
 
-inline bool Timespan::operator >  (TimeDiff microseconds) const
+inline bool Timespan::operator >  (TimeDiff microSeconds) const
 {
-	return _span > microseconds;
+	return _span > microSeconds;
 }
 
 
-inline bool Timespan::operator >= (TimeDiff microseconds) const
+inline bool Timespan::operator >= (TimeDiff microSeconds) const
 {
-	return _span >= microseconds;
+	return _span >= microSeconds;
 }
 
 
-inline bool Timespan::operator <  (TimeDiff microseconds) const
+inline bool Timespan::operator <  (TimeDiff microSeconds) const
 {
-	return _span < microseconds;
+	return _span < microSeconds;
 }
 
 
-inline bool Timespan::operator <= (TimeDiff microseconds) const
+inline bool Timespan::operator <= (TimeDiff microSeconds) const
 {
-	return _span <= microseconds;
+	return _span <= microSeconds;
 }
 
 

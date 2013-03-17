@@ -110,8 +110,8 @@ private:
 	ICMPEventArgs();
 
 	void setRepetitions(int repetitions);
-	void setDataSize(int dataSize);
-	void setTTL(int ttl);
+	void setDataSize(int sz);
+	void setTTL(int timeToLive);
 	void setReplyTime(int index, int time);
 	void setError(int index, const std::string& text);
 	ICMPEventArgs& operator ++ ();
@@ -137,9 +137,9 @@ inline int ICMPEventArgs::repetitions() const
 }
 
 
-inline void ICMPEventArgs::setDataSize(int dataSize)
+inline void ICMPEventArgs::setDataSize(int sz)
 {
-	_dataSize = dataSize;
+	_dataSize = sz;
 }
 
 
@@ -149,9 +149,9 @@ inline int ICMPEventArgs::dataSize() const
 }
 
 
-inline void ICMPEventArgs::setTTL(int ttl)
+inline void ICMPEventArgs::setTTL(int timeToLive)
 {
-	_ttl = ttl;
+	_ttl = timeToLive;
 }
 
 

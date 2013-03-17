@@ -66,7 +66,7 @@ public:
 		
 	void run();
 		/// Does the work.
-		
+
 private:
 	Poco::Net::DatagramSocket _socket;
 	Poco::Thread _thread;

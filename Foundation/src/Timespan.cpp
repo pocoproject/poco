@@ -54,20 +54,20 @@ Timespan::Timespan():
 }
 
 	
-Timespan::Timespan(TimeDiff microseconds):
-	_span(microseconds)
+Timespan::Timespan(TimeDiff microSeconds):
+	_span(microSeconds)
 {
 }
 
 
-Timespan::Timespan(long seconds, long microseconds):
-	_span(TimeDiff(seconds)*SECONDS + microseconds)
+Timespan::Timespan(long seconds, long microSeconds):
+	_span(TimeDiff(seconds)*SECONDS + microSeconds)
 {
 }
 
 	
-Timespan::Timespan(int days, int hours, int minutes, int seconds, int microseconds):
-	_span(TimeDiff(microseconds) + TimeDiff(seconds)*SECONDS + TimeDiff(minutes)*MINUTES + TimeDiff(hours)*HOURS + TimeDiff(days)*DAYS)
+Timespan::Timespan(int days, int hours, int minutes, int seconds, int microSeconds):
+	_span(TimeDiff(microSeconds) + TimeDiff(seconds)*SECONDS + TimeDiff(minutes)*MINUTES + TimeDiff(hours)*HOURS + TimeDiff(days)*DAYS)
 {
 }
 
@@ -90,23 +90,23 @@ Timespan& Timespan::operator = (const Timespan& timespan)
 }
 
 
-Timespan& Timespan::operator = (TimeDiff microseconds)
+Timespan& Timespan::operator = (TimeDiff microSeconds)
 {
-	_span = microseconds;
+	_span = microSeconds;
 	return *this;
 }
 
 
-Timespan& Timespan::assign(int days, int hours, int minutes, int seconds, int microseconds)
+Timespan& Timespan::assign(int days, int hours, int minutes, int seconds, int microSeconds)
 {
-	_span = TimeDiff(microseconds) + TimeDiff(seconds)*SECONDS + TimeDiff(minutes)*MINUTES + TimeDiff(hours)*HOURS + TimeDiff(days)*DAYS;
+	_span = TimeDiff(microSeconds) + TimeDiff(seconds)*SECONDS + TimeDiff(minutes)*MINUTES + TimeDiff(hours)*HOURS + TimeDiff(days)*DAYS;
 	return *this;
 }
 
 
-Timespan& Timespan::assign(long seconds, long microseconds)
+Timespan& Timespan::assign(long seconds, long microSeconds)
 {
-	_span = TimeDiff(seconds)*SECONDS + TimeDiff(microseconds);
+	_span = TimeDiff(seconds)*SECONDS + TimeDiff(microSeconds);
 	return *this;
 }
 
@@ -143,28 +143,28 @@ Timespan& Timespan::operator -= (const Timespan& d)
 }
 
 
-Timespan Timespan::operator + (TimeDiff microseconds) const
+Timespan Timespan::operator + (TimeDiff microSeconds) const
 {
-	return Timespan(_span + microseconds);
+	return Timespan(_span + microSeconds);
 }
 
 
-Timespan Timespan::operator - (TimeDiff microseconds) const
+Timespan Timespan::operator - (TimeDiff microSeconds) const
 {
-	return Timespan(_span - microseconds);
+	return Timespan(_span - microSeconds);
 }
 
 
-Timespan& Timespan::operator += (TimeDiff microseconds)
+Timespan& Timespan::operator += (TimeDiff microSeconds)
 {
-	_span += microseconds;
+	_span += microSeconds;
 	return *this;
 }
 
 
-Timespan& Timespan::operator -= (TimeDiff microseconds)
+Timespan& Timespan::operator -= (TimeDiff microSeconds)
 {
-	_span -= microseconds;
+	_span -= microSeconds;
 	return *this;
 }
 

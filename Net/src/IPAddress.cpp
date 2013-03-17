@@ -221,7 +221,7 @@ IPAddress::IPAddress(const struct sockaddr& sockaddr)
 
 IPAddress::~IPAddress()
 {
-	pImpl()->~IPAddressImpl();
+	destruct();
 }
 
 
@@ -229,6 +229,7 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 {
 	if (&addr != this)
 	{
+		destruct();
 		if (addr.family() == IPAddress::IPv4)
 			new (_memory) IPv4AddressImpl(addr.addr());
 		else

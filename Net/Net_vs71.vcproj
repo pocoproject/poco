@@ -381,6 +381,8 @@
 				<File
 					RelativePath=".\include\Poco\Net\SocketAddress.h"/>
 				<File
+					RelativePath=".\include\Poco\Net\SocketAddressImpl.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\SocketDefs.h"/>
 			</Filter>
 			<Filter
@@ -401,6 +403,8 @@
 					RelativePath=".\src\NetworkInterface.cpp"/>
 				<File
 					RelativePath=".\src\SocketAddress.cpp"/>
+				<File
+					RelativePath=".\src\SocketAddressImpl.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter

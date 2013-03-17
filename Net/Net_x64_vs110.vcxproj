@@ -279,6 +279,7 @@
     <ClInclude Include="include\Poco\Net\NetException.h"/>
     <ClInclude Include="include\Poco\Net\NetworkInterface.h"/>
     <ClInclude Include="include\Poco\Net\SocketAddress.h"/>
+    <ClInclude Include="include\Poco\Net\SocketAddressImpl.h"/>
     <ClInclude Include="include\Poco\Net\SocketDefs.h"/>
     <ClInclude Include="include\Poco\Net\DatagramSocket.h"/>
     <ClInclude Include="include\Poco\Net\DatagramSocketImpl.h"/>
@@ -380,6 +381,7 @@
     <ClCompile Include="src\NetException.cpp"/>
     <ClCompile Include="src\NetworkInterface.cpp"/>
     <ClCompile Include="src\SocketAddress.cpp"/>
+    <ClCompile Include="src\SocketAddressImpl.cpp"/>
     <ClCompile Include="src\DatagramSocket.cpp"/>
     <ClCompile Include="src\DatagramSocketImpl.cpp"/>
     <ClCompile Include="src\DialogSocket.cpp"/>

@@ -141,9 +141,6 @@ public:
 	IPAddress& operator = (const IPAddress& addr);
 		/// Assigns an IPAddress.
 		
-	//void swap(IPAddress& address);
-		/// Swaps the IPAddress with another one.
-		
 	Family family() const;
 		/// Returns the address family (IPv4 or IPv6) of the address.
 
@@ -390,12 +387,16 @@ private:
 	typedef Impl* Ptr;
 
 	Ptr pImpl() const;
+	void destruct();
 
 	char _memory[sizeof(Poco::Net::Impl::IPv6AddressImpl)];
-	
-	friend class Poco::Net::Impl::IPv4AddressImpl;
-	friend class Poco::Net::Impl::IPv6AddressImpl;
 };
+
+
+inline void IPAddress::destruct()
+{
+	pImpl()->~IPAddressImpl();
+}
 
 
 inline IPAddress::Ptr IPAddress::pImpl() const
