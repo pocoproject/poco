@@ -36,6 +36,7 @@
 
 #include "Poco/JSON/PrintHandler.h"
 #include "Poco/JSON/Stringifier.h"
+#include <iostream>
 
 
 namespace Poco {

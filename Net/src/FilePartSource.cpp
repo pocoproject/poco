@@ -90,7 +90,7 @@ std::istream& FilePartSource::stream()
 }
 
 
-const std::string& FilePartSource::filename()
+const std::string& FilePartSource::filename() const
 {
 	return _filename;
 }

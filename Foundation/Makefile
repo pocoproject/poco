@@ -22,7 +22,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	NotificationQueue PriorityNotificationQueue TimedNotificationQueue \
 	NullStream NumberFormatter NumberParser NumericString AbstractObserver \
 	Path PatternFormatter Process PurgeStrategy RWLock Random RandomStream \
-	RecursiveDirectoryIteratorStrategy RegularExpression RefCountedObject Runnable RotateStrategy \
+	DirectoryIteratorStrategy RegularExpression RefCountedObject Runnable RotateStrategy \
 	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel SortedDirectoryIterator Stopwatch StreamChannel \
 	StreamConverter StreamCopier StreamTokenizer String StringTokenizer SynchronizedObject \

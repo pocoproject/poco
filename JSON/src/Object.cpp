@@ -35,8 +35,6 @@
 
 
 #include "Poco/JSON/Object.h"
-#include "Poco/JSON/Array.h"
-#include "Poco/JSON/Stringifier.h"
 #include <iostream>
 #include <sstream>
 

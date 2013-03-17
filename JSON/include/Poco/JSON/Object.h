@@ -42,6 +42,7 @@
 
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Array.h"
+#include "Poco/JSON/Stringifier.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
 #include <map>
@@ -156,8 +157,10 @@ private:
 		out << '{';
 
 		if (indent > 0) out << std::endl;
-
-		for (C::const_iterator it = container.begin(); it != container.end();)
+		
+		typename C::const_iterator it = container.begin();
+		typename C::const_iterator end = container.end();
+		for (; it != end;)
 		{
 			for(int i = 0; i < indent; i++) out << ' ';
 

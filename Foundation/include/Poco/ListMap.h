@@ -128,8 +128,8 @@ public:
 		/// or iterator pointing to the end if entry is
 		/// not found.
 	{
-		Container::const_iterator it = _list.begin();
-		Container::const_iterator end = _list.end();
+		typename Container::const_iterator it = _list.begin();
+		typename Container::const_iterator end = _list.end();
 		for(; it != end; ++it)
 		{
 			if (isEqual(it->first, key)) return it;
@@ -143,8 +143,8 @@ public:
 		/// or iterator pointing to the end if entry is
 		/// not found.
 	{
-		Container::iterator it = _list.begin();
-		Container::iterator end = _list.end();
+		typename Container::iterator it = _list.begin();
+		typename Container::iterator end = _list.end();
 		for(; it != end; ++it)
 		{
 			if (isEqual(it->first, key)) return it;
