@@ -35,11 +35,14 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef MongoDB_BSONWriter_INCLUDED
 #define MongoDB_BSONWriter_INCLUDED
 
+
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/BinaryWriter.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -81,6 +84,7 @@ inline void BSONWriter::writeCString(const std::string& value)
 	_writer.writeRaw(value);
 	_writer << (unsigned char) 0x00;
 }
+
 
 } } // namespace Poco::MongoDB
 

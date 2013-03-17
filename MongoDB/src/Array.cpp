@@ -34,12 +34,15 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#include <sstream>
+
 
 #include "Poco/MongoDB/Array.h"
+#include <sstream>
+
 
 namespace Poco {
 namespace MongoDB {
+
 
 Array::Array() : Document()
 {

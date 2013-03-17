@@ -35,14 +35,14 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include "Poco/MongoDB/ObjectId.h"
 
+#include "Poco/MongoDB/ObjectId.h"
 #include "Poco/Format.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
+
 
 ObjectId::ObjectId()
 {

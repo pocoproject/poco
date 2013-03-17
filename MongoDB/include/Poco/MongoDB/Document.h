@@ -67,6 +67,7 @@ private:
 	std::string _name;
 };
 
+
 class MongoDB_API Document
 	/// Represents a BSON document
 {
@@ -269,6 +270,7 @@ inline void BSONReader::read<Document::Ptr>(Document::Ptr& to)
 {
 	to->read(_reader);
 }
+
 
 template<>
 inline void BSONWriter::write<Document::Ptr>(Document::Ptr& from)

@@ -35,19 +35,20 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/RequestMessage.h"
 #include "Poco/Net/SocketStream.h"
 #include "Poco/StreamCopier.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 RequestMessage::RequestMessage(MessageHeader::OpCode opcode) : Message(opcode)
 {
 }
+
 
 RequestMessage::~RequestMessage()
 {
@@ -69,4 +70,5 @@ void RequestMessage::send(std::ostream& ostr)
 	ostr.flush();
 }
 
-}} // Namespace MongoDB
+
+} } // namespace Poco::MongoDB

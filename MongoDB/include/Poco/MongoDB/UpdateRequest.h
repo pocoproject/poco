@@ -88,7 +88,7 @@ public:
 
 	void flags(Flags flags);
 		/// Sets the flags
-		
+
 protected:
 	void buildRequest(BinaryWriter& writer);
 
@@ -123,5 +123,6 @@ inline Document& UpdateRequest::update()
 
 
 } } // namespace Poco::MongoDB
+
 
 #endif //MongoDB_UpdateRequest_INCLUDED

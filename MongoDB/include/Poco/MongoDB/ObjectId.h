@@ -35,6 +35,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef MongoDB_ObjectId_INCLUDED
 #define MongoDB_ObjectId_INCLUDED
 
@@ -46,6 +47,7 @@
 
 namespace Poco {
 namespace MongoDB {
+
 
 class MongoDB_API ObjectId
 	/// ObjectId is a 12-byte BSON type, constructed using:

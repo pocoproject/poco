@@ -35,7 +35,9 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/Binary.h"
+
 
 namespace Poco {
 namespace MongoDB {

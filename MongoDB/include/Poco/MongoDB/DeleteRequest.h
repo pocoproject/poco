@@ -98,7 +98,7 @@ protected:
 private:
 	Flags       _flags;
 	std::string _fullCollectionName;
-	Document _selector;
+	Document    _selector;
 };
 
 
@@ -118,6 +118,7 @@ inline Document& DeleteRequest::selector()
 {
 	return _selector;
 }
+
 
 } } // namespace Poco::MongoDB
 

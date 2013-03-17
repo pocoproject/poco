@@ -35,12 +35,12 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/KillCursorsRequest.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 KillCursorsRequest::KillCursorsRequest() 
@@ -48,9 +48,11 @@ KillCursorsRequest::KillCursorsRequest()
 {
 }
 
+
 KillCursorsRequest::~KillCursorsRequest()
 {
 }
+
 
 void KillCursorsRequest::buildRequest(BinaryWriter& writer)
 {
@@ -63,4 +65,4 @@ void KillCursorsRequest::buildRequest(BinaryWriter& writer)
 }
 
 
-}} // Namespace MongoDB
+} } // namespace Poco::MongoDB

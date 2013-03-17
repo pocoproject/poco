@@ -34,15 +34,16 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#include <iostream>
+
 
 #include "Poco/Net/SocketStream.h"
 #include "Poco/MongoDB/Connection.h"
+#include <iostream>
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
+
 
 Connection::Connection() : _address(), _socket()
 {
@@ -53,6 +54,7 @@ Connection::Connection(const std::string& hostAndPort) : _address(hostAndPort), 
 {
 	connect();
 }
+
 
 Connection::Connection(const std::string& host, int port) : _address(host, port), _socket()
 {
@@ -90,6 +92,7 @@ void Connection::connect(const std::string& hostAndPort)
 	connect();
 }
 
+
 void Connection::connect(const std::string& host, int port)
 {
 	_address = Net::SocketAddress(host, port);
@@ -103,16 +106,19 @@ void Connection::connect(const Net::SocketAddress& addrs)
 	connect();
 }
 
+
 void Connection::disconnect()
 {
 	_socket.close();
 }
+
 
 void Connection::sendRequest(RequestMessage& request)
 {
 	Net::SocketOutputStream sos(_socket);
 	request.send(sos);
 }
+
 
 void Connection::sendRequest(RequestMessage& request, ResponseMessage& response)
 {

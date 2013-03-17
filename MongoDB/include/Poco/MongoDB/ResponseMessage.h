@@ -119,6 +119,7 @@ inline bool ResponseMessage::hasDocuments() const
 	return _documents.size() > 0;
 }
 
+
 } } // namespace Poco::MongoDB
 
 

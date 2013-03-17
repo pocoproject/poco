@@ -35,12 +35,12 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/InsertRequest.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 InsertRequest::InsertRequest(const std::string& collectionName, Flags flags) 
@@ -50,9 +50,11 @@ InsertRequest::InsertRequest(const std::string& collectionName, Flags flags)
 {
 }
 
+
 InsertRequest::~InsertRequest()
 {
 }
+
 
 void InsertRequest::buildRequest(BinaryWriter& writer)
 {
@@ -67,4 +69,5 @@ void InsertRequest::buildRequest(BinaryWriter& writer)
 	}
 }
 
-}} // Namespace MongoDB
+
+} } // namespace Poco::MongoDB

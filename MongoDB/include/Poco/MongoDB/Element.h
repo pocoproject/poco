@@ -35,13 +35,10 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef MongoDB_Element_INCLUDED
 #define MongoDB_Element_INCLUDED
 
-#include <string>
-#include <sstream>
-#include <iomanip>
-#include <set>
 
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
@@ -53,6 +50,11 @@
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/BSONReader.h"
 #include "Poco/MongoDB/BSONWriter.h"
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include <set>
+
 
 namespace Poco {
 namespace MongoDB {
@@ -129,7 +131,7 @@ struct ElementTraits<double>
 
 // BSON UTF-8 string
 // spec: int32 (byte*) "\x00"
-// int32 is the number bytes in byte* + 1 (for trailing "\x00"
+// int32 is the number bytes in byte* + 1 (for trailing "\x00")
 template<>
 struct ElementTraits<std::string>
 {
@@ -225,6 +227,7 @@ inline void BSONReader::read<bool>(bool& to)
 	_reader >> b;
 	to = b != 0;
 }
+
 
 template<>
 inline void BSONWriter::write<bool>(bool& from)

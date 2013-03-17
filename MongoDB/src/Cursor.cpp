@@ -35,14 +35,14 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/Cursor.h"
 #include "Poco/MongoDB/GetMoreRequest.h"
 #include "Poco/MongoDB/KillCursorsRequest.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 Cursor::Cursor(const std::string& db, const std::string& collection, QueryRequest::Flags flags)
@@ -91,5 +91,5 @@ void Cursor::kill(Connection& connection)
 	_response.clear();
 }
 
-} } // Namespace Poco::MongoDB
 
+} } // Namespace Poco::MongoDB

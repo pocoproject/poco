@@ -35,8 +35,10 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef MongoDB_Binary_INCLUDED
 #define MongoDB_Binary_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
@@ -44,11 +46,12 @@
 #include "Poco/Buffer.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/MemoryStream.h"
-
 #include <sstream>
+
 
 namespace Poco {
 namespace MongoDB {
+
 
 class MongoDB_API Binary
 	/// Implements BSON Binary. It's a wrapper around a Poco::Buffer<unsigned char>.
@@ -130,6 +133,7 @@ inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 	_reader.readRaw((char*) to->buffer().begin(), size);
 }
 
+
 template<>
 inline void BSONWriter::write<Binary::Ptr>(Binary::Ptr& from)
 {
@@ -139,5 +143,6 @@ inline void BSONWriter::write<Binary::Ptr>(Binary::Ptr& from)
 
 
 } } // namespace Poco::MongoDB
+
 
 #endif // MongoDB_Binary_INCLUDED

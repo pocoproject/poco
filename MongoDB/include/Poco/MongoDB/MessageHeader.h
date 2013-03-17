@@ -35,15 +35,13 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef MongoDB_MessageHeader_INCLUDED
 #define MongoDB_MessageHeader_INCLUDED
 
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/MessageHeader.h"
-
-
-#define MSG_HEADER_SIZE	16
 
 
 namespace Poco {
@@ -55,6 +53,8 @@ class MongoDB_API MessageHeader
 	/// or response of MongoDB
 {
 public:
+	static const unsigned int MSG_HEADER_SIZE = 16;
+
 	typedef enum
 	{
 		  Reply = 1

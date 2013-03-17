@@ -35,16 +35,18 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/Element.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
+
 
 Element::Element(const std::string& name) : _name(name)
 {
 }
+
 
 Element::~Element() 
 {

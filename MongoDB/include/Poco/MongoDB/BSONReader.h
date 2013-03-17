@@ -35,14 +35,18 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef MongoDB_BSONReader_INCLUDED
 #define MongoDB_BSONReader_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/BinaryReader.h"
 
+
 namespace Poco {
 namespace MongoDB {
+
 
 class MongoDB_API BSONReader
 	/// Class for reading BSON from a Poco::BinaryReader
@@ -85,14 +89,8 @@ inline std::string BSONReader::readCString()
 		_reader >> c;
 		if ( _reader.good() )
 		{
-			if (c == 0x00)
-			{
-				return val;
-			}
-			else
-			{
-				val += c;
-			}
+			if (c == 0x00) return val;
+			else val += c;
 		}
 	}
 	return val;

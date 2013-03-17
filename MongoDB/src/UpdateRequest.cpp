@@ -35,12 +35,12 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/UpdateRequest.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 UpdateRequest::UpdateRequest(const std::string& collectionName, UpdateRequest::Flags flags) 
@@ -52,9 +52,11 @@ UpdateRequest::UpdateRequest(const std::string& collectionName, UpdateRequest::F
 {
 }
 
+
 UpdateRequest::~UpdateRequest()
 {
 }
+
 
 void UpdateRequest::buildRequest(BinaryWriter& writer)
 {
@@ -65,4 +67,5 @@ void UpdateRequest::buildRequest(BinaryWriter& writer)
 	_update.write(writer);
 }
 
-}} // Namespace MongoDB
+
+} } // namespace Poco::MongoDB
