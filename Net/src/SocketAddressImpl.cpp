@@ -36,23 +36,8 @@
 
 #include "Poco/Net/SocketAddressImpl.h"
 #include "Poco/Net/SocketDefs.h"
-/*
-#include "Poco/Net/IPAddress.h"
-#include "Poco/Net/NetException.h"
-#include "Poco/Net/DNS.h"
-#include "Poco/RefCountedObject.h"
-#include "Poco/NumberParser.h"
-#include "Poco/NumberFormatter.h"
-#include <algorithm>
 #include <cstring>
 
-
-using Poco::RefCountedObject;
-using Poco::NumberParser;
-using Poco::NumberFormatter;
-using Poco::UInt16;
-using Poco::InvalidArgumentException;
-*/
 
 namespace Poco {
 namespace Net {
