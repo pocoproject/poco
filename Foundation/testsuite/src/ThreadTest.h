@@ -51,6 +51,7 @@ public:
 	void testCurrent();
 	void testThreads();
 	void testJoin();
+	void testNotJoin();
 	void testThreadTarget();
 	void testThreadFunction();
 	void testThreadStackSize();

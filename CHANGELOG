@@ -29,6 +29,7 @@ Release 1.5.2 (2013-03-??)
 - redefined DefaultHandler as typedef to ParseHandler
 - fixed GH #127: Eliminate -Wshadow warnings
 - SocketAddress small object optimization
+- fixed GH #79: Poco::Thread leak on Linux
 
 Release 1.5.1 (2013-01-11)
 ==========================

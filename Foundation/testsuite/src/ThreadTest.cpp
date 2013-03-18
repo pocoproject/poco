@@ -112,6 +112,28 @@ void freeFunc(void* pData)
 }
 
 
+class NonJoinRunnable : public Runnable
+{
+public:
+	NonJoinRunnable() : _finished(false)
+	{
+	}
+	
+	void run()
+	{
+		_finished = true;
+	}
+	
+	bool finished() const
+	{
+		return _finished;
+	}
+	
+private:
+	bool _finished;
+};
+
+
 ThreadTest::ThreadTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -226,6 +248,22 @@ void ThreadTest::testJoin()
 }
 
 
+void ThreadTest::testNotJoin()
+{
+	Thread thread;
+	NonJoinRunnable r;
+	thread.start(r);
+	
+	while (!r.finished())
+	{
+		Thread::sleep(10);
+	}
+	
+	Thread::sleep(100);
+	assert (!thread.isRunning());
+}
+
+
 void ThreadTest::testThreadTarget()
 {
 	ThreadTarget te(&MyRunnable::staticFunc);
@@ -335,6 +373,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testCurrent);
 	CppUnit_addTest(pSuite, ThreadTest, testThreads);
 	CppUnit_addTest(pSuite, ThreadTest, testJoin);
+	CppUnit_addTest(pSuite, ThreadTest, testNotJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadTarget);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadFunction);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
