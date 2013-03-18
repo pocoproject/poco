@@ -287,7 +287,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32.lib ssleay32.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32mdd.lib ssleay32mdd.lib Crypt32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_md\Maild.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -349,7 +349,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32.lib ssleay32.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib libeay32md.lib ssleay32md.lib Crypt32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_md\Mail.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
