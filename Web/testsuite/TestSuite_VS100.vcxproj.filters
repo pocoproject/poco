@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="SOAP">
+      <UniqueIdentifier>{37e54074-257a-4b53-b703-8e08a279ef53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SOAP\Header Files">
+      <UniqueIdentifier>{85a820e1-1bad-48d3-a35c-87e880f64781}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SOAP\Source Files">
+      <UniqueIdentifier>{a793df3e-4a0d-4b83-9672-870485282c93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite">
+      <UniqueIdentifier>{a3529dbd-3d05-4217-8c16-81e138fd9fc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Header Files">
+      <UniqueIdentifier>{2f2ee11c-34ed-4c37-92a8-8eda19c1ec39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Source Files">
+      <UniqueIdentifier>{7deccd41-5e6b-4120-96a1-88ec2e9f8035}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver">
+      <UniqueIdentifier>{1e15c9e7-38bf-4225-9cec-f6f6e2fef39d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver\Source Files">
+      <UniqueIdentifier>{d624dc27-38be-44d1-82e9-f59bc5114822}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JSON">
+      <UniqueIdentifier>{9e7bc095-d556-4b14-8149-820f6fe0f212}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JSON\Source Files">
+      <UniqueIdentifier>{7c6f54c5-f886-4577-a584-740a7adb785e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JSON\Header Files">
+      <UniqueIdentifier>{10d3f939-32f2-4895-965a-c348950e629b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\SOAPTest.h">
+      <Filter>SOAP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WebTestSuite.h">
+      <Filter>_Suite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\JSONTest.h">
+      <Filter>JSON\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\SOAPTest.cpp">
+      <Filter>SOAP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebTestSuite.cpp">
+      <Filter>_Suite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinDriver.cpp">
+      <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONTest.cpp">
+      <Filter>JSON\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -108,7 +108,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -142,7 +142,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -170,7 +170,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -204,7 +204,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -232,7 +232,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -266,7 +266,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -293,6 +293,41 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Benchmark.cpp" />
+    <ClCompile Include="src\json.c" />
+    <ClCompile Include="src\libjson\Source\internalJSONNode.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONAllocator.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONChildren.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONDebug.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONIterators.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONMemory.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONNode.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONNode_Mutex.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONPreparse.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONStream.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONValidator.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONWorker.cpp" />
+    <ClCompile Include="src\libjson\Source\JSONWriter.cpp" />
+    <ClCompile Include="src\libjson\Source\JSON_Base64.cpp" />
+    <ClCompile Include="src\libjson\Source\libjson.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\json.h" />
+    <ClInclude Include="src\libjson\Source\internalJSONNode.h" />
+    <ClInclude Include="src\libjson\Source\JSONAllocator.h" />
+    <ClInclude Include="src\libjson\Source\JSONChildren.h" />
+    <ClInclude Include="src\libjson\Source\JSONDebug.h" />
+    <ClInclude Include="src\libjson\Source\JSONDefs.h" />
+    <ClInclude Include="src\libjson\Source\JSONGlobals.h" />
+    <ClInclude Include="src\libjson\Source\JSONMemory.h" />
+    <ClInclude Include="src\libjson\Source\JSONMemoryPool.h" />
+    <ClInclude Include="src\libjson\Source\JSONNode.h" />
+    <ClInclude Include="src\libjson\Source\JSONPreparse.h" />
+    <ClInclude Include="src\libjson\Source\JSONSingleton.h" />
+    <ClInclude Include="src\libjson\Source\JSONStream.h" />
+    <ClInclude Include="src\libjson\Source\JSONValidator.h" />
+    <ClInclude Include="src\libjson\Source\JSONWorker.h" />
+    <ClInclude Include="src\libjson\Source\JSON_Base64.h" />
+    <ClInclude Include="src\libjson\Source\NumberToString.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Web">
+      <UniqueIdentifier>{612db5b5-1a22-4f02-8394-c98d5b3b143a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Web\Header Files">
+      <UniqueIdentifier>{df3adb23-c9d0-4893-9a43-d466ff777dad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Web\Source Files">
+      <UniqueIdentifier>{b8755e7d-2332-42ec-a1ee-959e0b48de90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SOAP">
+      <UniqueIdentifier>{6d64eb8f-c9ed-4bcc-8426-ddf6ecd25e85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SOAP\Header Files">
+      <UniqueIdentifier>{805be987-4b5f-4db5-b3fb-74d5a79b4dc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SOAP\Source Files">
+      <UniqueIdentifier>{38115583-6641-4f49-94a0-462bf0045e38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JSON">
+      <UniqueIdentifier>{03eb8b82-32ef-43db-8b4e-043058a02ec1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JSON\Source Files">
+      <UniqueIdentifier>{813c1fcc-fe96-468d-9bbb-9e41f9cca2d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JSON\Header Files">
+      <UniqueIdentifier>{865fac70-ecb1-4c66-95ba-4fd4cc182ba0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ExtJS">
+      <UniqueIdentifier>{ba08e34d-ce44-4610-a6b5-97548590d4e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ExtJS\Header Files">
+      <UniqueIdentifier>{0c01f04b-57fc-46bc-a5a9-2ad8fba9e3b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ExtJS\Source Files">
+      <UniqueIdentifier>{a58dd886-8c03-4840-9d25-4dd3791a88a5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\Web\Web.h">
+      <Filter>Web\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\SOAPBody.h">
+      <Filter>SOAP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\SOAPElement.h">
+      <Filter>SOAP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\SOAPEnvelope.h">
+      <Filter>SOAP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\SOAPHeader.h">
+      <Filter>SOAP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\SOAPMessage.h">
+      <Filter>SOAP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\JSONCondenser.h">
+      <Filter>JSON\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\JSONConfiguration.h">
+      <Filter>JSON\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\JSONEntity.h">
+      <Filter>JSON\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\JSONHandler.h">
+      <Filter>JSON\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\JSONParser.h">
+      <Filter>JSON\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\JSONPrettyPrinter.h">
+      <Filter>JSON\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\JSONPrinter.h">
+      <Filter>JSON\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\ExtJS\DirectAction.h">
+      <Filter>ExtJS\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\ExtJS\DirectHandler.h">
+      <Filter>ExtJS\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Web\ExtJS\DirectResponse.h">
+      <Filter>ExtJS\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\SOAPBody.cpp">
+      <Filter>SOAP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SOAPElement.cpp">
+      <Filter>SOAP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SOAPEnvelope.cpp">
+      <Filter>SOAP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SOAPHeader.cpp">
+      <Filter>SOAP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SOAPMessage.cpp">
+      <Filter>SOAP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONCondenser.cpp">
+      <Filter>JSON\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONConfiguration.cpp">
+      <Filter>JSON\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONEntity.cpp">
+      <Filter>JSON\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONHandler.cpp">
+      <Filter>JSON\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONParser.cpp">
+      <Filter>JSON\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONPrettyPrinter.cpp">
+      <Filter>JSON\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONPrinter.cpp">
+      <Filter>JSON\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirectAction.cpp">
+      <Filter>ExtJS\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirectHandler.cpp">
+      <Filter>ExtJS\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirectResponse.cpp">
+      <Filter>ExtJS\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,7 @@
+#
+# Web.vmsbuild
+#
+# $Id: //poco/Main/template/library.vmsbuild#2 $
+#
+LIB=PocoWeb
+<SourceFilesHere>

@@ -1,0 +1,28 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Web", "Web_VS80.vcproj", "{D65D874E-4A48-4AE2-BD57-62FE49F2A907}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_VS80.vcproj", "{005FDB40-03AD-4B87-9099-1CCD64A2F64E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D65D874E-4A48-4AE2-BD57-62FE49F2A907} = {D65D874E-4A48-4AE2-BD57-62FE49F2A907}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|Win32 = debug_shared|Win32
+		release_shared|Win32 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D65D874E-4A48-4AE2-BD57-62FE49F2A907}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{D65D874E-4A48-4AE2-BD57-62FE49F2A907}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{D65D874E-4A48-4AE2-BD57-62FE49F2A907}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{D65D874E-4A48-4AE2-BD57-62FE49F2A907}.release_shared|Win32.Build.0 = release_shared|Win32
+		{005FDB40-03AD-4B87-9099-1CCD64A2F64E}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{005FDB40-03AD-4B87-9099-1CCD64A2F64E}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{005FDB40-03AD-4B87-9099-1CCD64A2F64E}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{005FDB40-03AD-4B87-9099-1CCD64A2F64E}.release_shared|Win32.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Web", "Web_VS71.vcproj", "{d65d874e-4a48-4ae2-bd57-62fe49f2a907}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_VS71.vcproj", "{005fdb40-03ad-4b87-9099-1ccd64a2f64e}"
+	ProjectSection(ProjectDependencies) = postProject
+		{d65d874e-4a48-4ae2-bd57-62fe49f2a907} = {d65d874e-4a48-4ae2-bd57-62fe49f2a907}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug_shared = debug_shared
+		release_shared = release_shared
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{d65d874e-4a48-4ae2-bd57-62fe49f2a907}.debug_shared.ActiveCfg = debug_shared|Win32
+		{d65d874e-4a48-4ae2-bd57-62fe49f2a907}.debug_shared.Build.0 = debug_shared|Win32
+		{d65d874e-4a48-4ae2-bd57-62fe49f2a907}.release_shared.ActiveCfg = release_shared|Win32
+		{d65d874e-4a48-4ae2-bd57-62fe49f2a907}.release_shared.Build.0 = release_shared|Win32
+		{005fdb40-03ad-4b87-9099-1ccd64a2f64e}.debug_shared.ActiveCfg = debug_shared|Win32
+		{005fdb40-03ad-4b87-9099-1ccd64a2f64e}.debug_shared.Build.0 = debug_shared|Win32
+		{005fdb40-03ad-4b87-9099-1ccd64a2f64e}.release_shared.ActiveCfg = release_shared|Win32
+		{005fdb40-03ad-4b87-9099-1ccd64a2f64e}.release_shared.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

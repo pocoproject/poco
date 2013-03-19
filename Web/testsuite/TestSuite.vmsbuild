@@ -1,0 +1,9 @@
+#
+# TestSuite.vmsbuild
+#
+# $Id: //poco/Main/template/TestSuite.vmsbuild#3 $
+#
+EXE=TestRunner
+WebTestSuite
+Driver
+<SourceFilesHere>
