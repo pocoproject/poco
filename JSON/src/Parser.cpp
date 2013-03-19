@@ -594,7 +594,10 @@ bool Parser::readRow(bool firstCall)
 			{
 				if (token->asChar() == ',')
 				{
-					_handler->comma();
+					if (_handler != NULL)
+					{
+						_handler->comma();
+					}
 					return true; // Read next row
 				}
 				else if (token->asChar() == '}')
@@ -781,7 +784,10 @@ bool Parser::readElements(bool firstCall)
 
 		if (token->asChar() == ',')
 		{
-			_handler->comma();
+			if (_handler != NULL)
+			{
+				_handler->comma();
+			}
 			return true;
 		}
 
