@@ -31,6 +31,8 @@ Release 1.5.2 (2013-03-??)
 - SocketAddress small object optimization
 - fixed GH #79: Poco::Thread leak on Linux
 - fixed GH #61: static_md build configs for Crypto and NetSSL
+- fixed GH #130: prefer sysconf over sysctlbyname
+- fixed GH #131: no timezone global var on OpenBSD
 
 Release 1.5.1 (2013-01-11)
 ==========================

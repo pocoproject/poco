@@ -52,7 +52,7 @@ public:
 	
 	int timeZone()
 	{
-	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined(POCO_ANDROID) // no timezone global var
+	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined (__OpenBSD__) || defined(POCO_ANDROID) // no timezone global var
 		std::time_t now = std::time(NULL);
 		struct std::tm t;
 		gmtime_r(&now, &t);

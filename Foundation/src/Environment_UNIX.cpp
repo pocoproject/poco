@@ -133,7 +133,11 @@ std::string EnvironmentImpl::nodeNameImpl()
 
 unsigned EnvironmentImpl::processorCountImpl()
 {
-#if defined(POCO_OS_FAMILY_BSD)
+#if defined(_SC_NPROCESSORS_ONLN)
+	int count = sysconf(_SC_NPROCESSORS_ONLN);
+	if (count <= 0) count = 1;
+	return static_cast<int>(count);
+#elif defined(POCO_OS_FAMILY_BSD)
 	unsigned count;
 	std::size_t size = sizeof(count);
 	if (sysctlbyname("hw.ncpu", &count, &size, 0, 0))
@@ -142,10 +146,6 @@ unsigned EnvironmentImpl::processorCountImpl()
 		return count;
 #elif POCO_OS == POCO_OS_HPUX
 	return pthread_num_processors_np();
-#elif defined(_SC_NPROCESSORS_ONLN)
-	int count = sysconf(_SC_NPROCESSORS_ONLN);
-	if (count <= 0) count = 1;
-	return static_cast<int>(count);
 #else
 	return 1;
 #endif
