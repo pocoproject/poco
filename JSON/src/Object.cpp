@@ -35,8 +35,6 @@
 
 
 #include "Poco/JSON/Object.h"
-#include "Poco/JSON/Array.h"
-#include "Poco/JSON/Stringifier.h"
 #include <iostream>
 #include <sstream>
 
@@ -48,20 +46,20 @@ namespace Poco {
 namespace JSON {
 
 
-Object::Object()
+Object::Object(bool preserveInsertionOrder): _preserveInsOrder(preserveInsertionOrder)
 {
-
 }
 
 
-Object::Object(const Object& copy) : _values(copy._values)
+Object::Object(const Object& copy) : _values(copy._values),
+	_keys(copy._keys),
+	_preserveInsOrder(copy._preserveInsOrder)
 {
 }
 
 
 Object::~Object()
 {
-
 }
 
 
@@ -114,27 +112,43 @@ void Object::getNames(std::vector<std::string>& names) const
 }
 
 
-void Object::stringify(std::ostream& out, unsigned int indent) const
+void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 {
-	out << '{';
+	if (step == -1) step = indent;
 
-	if (indent > 0) out << std::endl;
+	if(!_preserveInsOrder)
+		doStringify(_values, out, indent, step);
+	else
+		doStringify(_keys, out, indent, step);
+}
 
-	for (ValueMap::const_iterator it = _values.begin(); it != _values.end();)
+
+const std::string& Object::getKey(KeyPtrList::const_iterator& iter) const
+{
+	ValueMap::const_iterator it = _values.begin();
+	ValueMap::const_iterator end = _values.end();
+	for (; it != end; ++it)
 	{
-		for(int i = 0; i < indent; i++) out << ' ';
-
-		out << '"' << it->first << '"';
-		out << (( indent > 0 ) ? " : " : ":");
-
-		Stringifier::stringify(it->second, out, indent);
-
-		if ( ++it != _values.end() ) out << ',';
-
-		if ( indent > 0 ) out << std::endl;
+		if (it->second == **iter) return it->first;
 	}
-	
-	out << '}';
+
+	throw NotFoundException((*iter)->convert<std::string>());
+}
+
+
+void Object::set(const std::string& key, const Dynamic::Var& value)
+{
+	_values[key] = value;
+	if (_preserveInsOrder)
+	{
+		KeyPtrList::iterator it = _keys.begin();
+		KeyPtrList::iterator end = _keys.end();
+		for (; it != end; ++it)
+		{
+			if (key == **it) return;
+		}
+		_keys.push_back(&_values[key]);
+	}
 }
 
 

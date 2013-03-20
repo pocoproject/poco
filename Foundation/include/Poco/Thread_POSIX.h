@@ -155,7 +155,8 @@ private:
 			prio(PRIO_NORMAL_IMPL),
 			policy(SCHED_OTHER),
 			done(false),
-			stackSize(POCO_THREAD_STACK_SIZE)
+			stackSize(POCO_THREAD_STACK_SIZE),
+			joined(false)
 		{
 		#if defined(POCO_VXWORKS)
 			// This workaround is for VxWorks 5.x where
@@ -172,6 +173,7 @@ private:
 		int           policy;
 		Event         done;
 		std::size_t   stackSize;
+		bool          joined;
 	};
 
 	AutoPtr<ThreadData> _pData;

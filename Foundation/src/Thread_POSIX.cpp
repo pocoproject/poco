@@ -51,7 +51,6 @@
 #	include <time.h>
 #endif
 
-
 //
 // Block SIGPIPE in main thread.
 //
@@ -114,8 +113,10 @@ ThreadImpl::ThreadImpl():
 
 ThreadImpl::~ThreadImpl()
 {
-	if (isRunningImpl())
+	if (!_pData->joined)
+	{
 		pthread_detach(_pData->thread);
+	}
 }
 
 
@@ -269,9 +270,11 @@ void ThreadImpl::startImpl(Callable target, void* pData)
 	{
 		_pData->pCallbackTarget->callback = 0;
 		_pData->pCallbackTarget->pData = 0;
+		pthread_attr_destroy(&attributes);
 		throw SystemException("cannot start thread");
 	}
-
+	pthread_attr_destroy(&attributes);
+	
 	if (_pData->policy == SCHED_OTHER)
 	{
 		if (_pData->prio != PRIO_NORMAL_IMPL)
@@ -297,7 +300,8 @@ void ThreadImpl::joinImpl()
 	_pData->done.wait();
 	void* result;
 	if (pthread_join(_pData->thread, &result))
-		throw SystemException("cannot join thread"); 
+		throw SystemException("cannot join thread");
+	_pData->joined = true;
 }
 
 
@@ -460,7 +464,6 @@ void* ThreadImpl::callableEntry(void* pThread)
 
 	pData->pCallbackTarget->callback = 0;
 	pData->pCallbackTarget->pData = 0;
-
 	pData->done.set();
 	return 0;
 }

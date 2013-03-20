@@ -43,6 +43,7 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/MailRecipient.h"
+#include "Poco/Net/PartStore.h"
 #include "Poco/Timestamp.h"
 #include <vector>
 
@@ -86,12 +87,28 @@ public:
 		ENCODING_BASE64
 	};
 
-	MailMessage();
+	struct Part
+	{
+		std::string             name;
+		PartSource*             pSource;
+		ContentDisposition      disposition;
+		ContentTransferEncoding encoding;
+	};
+	
+	typedef std::vector<Part> PartVec;
+
+	MailMessage(PartStoreFactory* pStoreFactory = 0);
 		/// Creates an empty MailMessage.
+		/// 
+		/// If pStoreFactory is not null, message attachments will be 
+		/// handled by the object created by the factory. Most
+		/// common reason is to temporarily save attachments to 
+		/// the file system in order to avoid potential memory 
+		/// exhaustion when attachment files are very large.
 
 	virtual ~MailMessage();
 		/// Destroys the MailMessage.
-		
+
 	void addRecipient(const MailRecipient& recipient);
 		/// Adds a recipient for the message.
 
@@ -164,7 +181,10 @@ public:
 	bool isMultipart() const;
 		/// Returns true iff the message is a multipart message.
 
-	void addPart(const std::string& name, PartSource* pSource, ContentDisposition disposition, ContentTransferEncoding encoding); 
+	void addPart(const std::string& name,
+		PartSource* pSource,
+		ContentDisposition disposition,
+		ContentTransferEncoding encoding); 
 		/// Adds a part/attachment to the mail message.
 		///
 		/// The MailMessage takes ownership of the PartSource and deletes it
@@ -178,7 +198,8 @@ public:
 		/// To include non-ASCII characters in the part name or filename, 
 		/// use RFC 2047 word encoding (see encodeWord()).
 
-	void addContent(PartSource* pSource, ContentTransferEncoding encoding = ENCODING_QUOTED_PRINTABLE);
+	void addContent(PartSource* pSource,
+		ContentTransferEncoding encoding = ENCODING_QUOTED_PRINTABLE);
 		/// Adds a part to the mail message by calling
 		/// addPart("", pSource, CONTENT_INLINE, encoding);
 		///
@@ -186,8 +207,10 @@ public:
 		/// must not contain any non-ASCII characters.
 		/// To include non-ASCII characters in the part name or filename, 
 		/// use RFC 2047 word encoding (see encodeWord()).
-		
-	void addAttachment(const std::string& name, PartSource* pSource, ContentTransferEncoding encoding = ENCODING_BASE64);
+
+	void addAttachment(const std::string& name,
+		PartSource* pSource,
+		ContentTransferEncoding encoding = ENCODING_BASE64);
 		/// Adds an attachment to the mail message by calling
 		/// addPart(name, pSource, CONTENT_ATTACHMENT, encoding);
 		///
@@ -195,6 +218,19 @@ public:
 		/// must not contain any non-ASCII characters.
 		/// To include non-ASCII characters in the part name or filename, 
 		/// use RFC 2047 word encoding (see encodeWord()).
+
+	PartSource* createPartStore(const std::string& content,
+		const std::string& mediaType,
+		const std::string& filename = "");
+		/// Returns either default StringPartSource part store or, 
+		/// if the part store factory was provided during contruction,
+		/// the one created by PartStoreFactory.
+		/// Returned part store is allocated on the heap; it is caller's 
+		/// responsibility to delete it after use. Typical use is handler 
+		/// passing it back to MailMessage, which takes care of the cleanup.
+
+	const PartVec& parts() const;
+		/// Returns const reference to the vector containing part stores.
 
 	void read(std::istream& istr, PartHandler& handler);
 		/// Reads the MailMessage from the given input stream.
@@ -212,7 +248,7 @@ public:
 
 	void write(std::ostream& ostr) const;
 		/// Writes the mail message to the given output stream.
-		
+
 	static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
 		/// If the given string contains non-ASCII characters, 
 		/// encodes the given string using RFC 2047 "Q" word encoding.
@@ -223,15 +259,25 @@ public:
 		/// Returns the encoded string, or the original string if it 
 		/// consists only of ASCII characters.
 
+	static const std::string HEADER_SUBJECT;
+	static const std::string HEADER_FROM;
+	static const std::string HEADER_TO;
+	static const std::string HEADER_CC;
+	static const std::string HEADER_BCC;
+	static const std::string HEADER_DATE;
+	static const std::string HEADER_CONTENT_TYPE;
+	static const std::string HEADER_CONTENT_TRANSFER_ENCODING;
+	static const std::string HEADER_CONTENT_DISPOSITION;
+	static const std::string HEADER_CONTENT_ID;
+	static const std::string HEADER_MIME_VERSION;
+	static const std::string EMPTY_HEADER;
+	static const std::string TEXT_PLAIN;
+	static const std::string CTE_7BIT;
+	static const std::string CTE_8BIT;
+	static const std::string CTE_QUOTED_PRINTABLE;
+	static const std::string CTE_BASE64;
+
 protected:
-	struct Part
-	{
-		std::string             name;
-		PartSource*             pSource;
-		ContentDisposition      disposition;
-		ContentTransferEncoding encoding;
-	};
-	typedef std::vector<Part> PartVec;
 
 	void makeMultipart();
 	void writeHeader(const MessageHeader& header, std::ostream& ostr) const;
@@ -247,23 +293,6 @@ protected:
 	static int lineLength(const std::string& str);
 	static void appendRecipient(const MailRecipient& recipient, std::string& str);
 
-	static const std::string HEADER_SUBJECT;
-	static const std::string HEADER_FROM;
-	static const std::string HEADER_TO;
-	static const std::string HEADER_CC;
-	static const std::string HEADER_BCC;
-	static const std::string HEADER_DATE;
-	static const std::string HEADER_CONTENT_TYPE;
-	static const std::string HEADER_CONTENT_TRANSFER_ENCODING;
-	static const std::string HEADER_CONTENT_DISPOSITION;
-	static const std::string HEADER_MIME_VERSION;
-	static const std::string EMPTY_HEADER;
-	static const std::string TEXT_PLAIN;
-	static const std::string CTE_7BIT;
-	static const std::string CTE_8BIT;
-	static const std::string CTE_QUOTED_PRINTABLE;
-	static const std::string CTE_BASE64;
-
 private:
 	MailMessage(const MailMessage&);
 	MailMessage& operator = (const MailMessage&);
@@ -272,6 +301,8 @@ private:
 	PartVec                 _parts;
 	std::string             _content;
 	ContentTransferEncoding _encoding;
+	mutable std::string     _boundary;
+	PartStoreFactory*       _pStoreFactory;
 };
 
 
@@ -287,6 +318,12 @@ inline const MailMessage::Recipients& MailMessage::recipients() const
 inline const std::string& MailMessage::getContent() const
 {
 	return _content;
+}
+
+
+inline const MailMessage::PartVec& MailMessage::parts() const
+{
+	return _parts;
 }
 
 

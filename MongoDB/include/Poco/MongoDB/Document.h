@@ -35,21 +35,21 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_Document_included
-#define _MongoDB_Document_included
 
-#include <algorithm>
+#ifndef MongoDB_Document_INCLUDED
+#define MongoDB_Document_INCLUDED
+
 
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
-
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
+#include <algorithm>
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
+
 
 class ElementFindByName
 {
@@ -67,29 +67,23 @@ private:
 	std::string _name;
 };
 
+
 class MongoDB_API Document
 	/// Represents a BSON document
 {
 public:
-
 	typedef SharedPtr<Document> Ptr;
-
-
 	typedef std::vector<Document::Ptr> Vector;
-
 
 	Document();
 		/// Constructor
 
-
 	virtual ~Document();
 		/// Destructor
-
 
 	Document& addElement(Element::Ptr element);
 		/// Add an element to the document.
 		/// The active document is returned to allow chaining of the add methods.
-
 
 	template<typename T>
 	Document& add(const std::string& name, T value)
@@ -100,7 +94,6 @@ public:
 		return addElement(new ConcreteElement<T>(name, value));
 	}
 
-
 	Document& add(const std::string& name, const char* value)
 		/// Creates an element with the given name and value and
 		// adds it to the document.
@@ -109,28 +102,22 @@ public:
 		return addElement(new ConcreteElement<std::string>(name, std::string(value)));
 	}
 
-
 	Document& addNewDocument(const std::string& name);
 		/// Create a new document and add it to this document.
 		/// Unlike the other add methods, this method returns
 		/// a reference to the new document.
 
-
 	void clear();
 		/// Removes all elements from the document.
-
 
 	void elementNames(std::vector<std::string>& keys) const;
 		/// Puts all element names into std::vector.
 
-
 	bool empty() const;
 		/// Returns true when the document doesn't contain any documents.
 
-
 	bool exists(const std::string& name);
 		/// Returns true when the document has an element with the given name
-
 
 	template<typename T>
 	T get(const std::string& name) const
@@ -158,7 +145,6 @@ public:
 		}
 	}
 
-
 	template<typename T>
 	T get(const std::string& name, const T& def) const
 		/// Returns the element with the given name and tries to convert
@@ -183,11 +169,9 @@ public:
 		return def;
 	}
 
-
 	Element::Ptr get(const std::string& name) const;
 		/// Returns the element with the given name.
 		/// An empty element will be returned when the element is not found.
-
 
 	template<typename T>
 	bool isType(const std::string& name)
@@ -202,25 +186,19 @@ public:
 		return ElementTraits<T>::TypeId == element->type();
 	}
 
-
 	void read(BinaryReader& reader);
 		/// Reads a document from the reader
-
 
 	size_t size() const;
 		/// Returns the number of elements in the document.
 
-
 	virtual std::string toString(int indent = 0) const;
 		/// Returns a String representation of the document.
-
 
 	void write(BinaryWriter& writer);
 		/// Writes a document to the reader
 
-
 protected:
-
 	ElementSet _elements;
 };
 
@@ -286,11 +264,13 @@ struct ElementTraits<Document::Ptr>
 	}
 };
 
+
 template<>
 inline void BSONReader::read<Document::Ptr>(Document::Ptr& to)
 {
 	to->read(_reader);
 }
+
 
 template<>
 inline void BSONWriter::write<Document::Ptr>(Document::Ptr& from)
@@ -298,6 +278,7 @@ inline void BSONWriter::write<Document::Ptr>(Document::Ptr& from)
 	from->write(_writer);
 }
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //  _MongoDB_Document_included
+
+#endif //  MongoDB_Document_INCLUDED

@@ -40,137 +40,15 @@
 #define JSON_DefaultHandler_INCLUDED
 
 
-#include "Poco/JSON/Handler.h"
-#include <stack>
+#include "Poco/JSON/ParseHandler.h"
 
 
 namespace Poco {
 namespace JSON {
 
 
-class JSON_API DefaultHandler : public Handler
-	/// Provides a default handler for the JSON parser.
-	/// This handler will build up an object or array based
-	/// on the handlers called by the parser.
-{
-public:
-
-	DefaultHandler();
-		/// Default Constructor
-
-	virtual ~DefaultHandler();
-		/// Destructor
-
-	void startObject();
-		/// Handles a {, meaning a new object will be read
-
-	void endObject();
-		/// Handles a }, meaning the object is read
-
-	void startArray();
-		/// Handles a [, meaning a new array will be read
-
-	void endArray();
-		/// Handles a ], meaning the array is read
-
-	void key(const std::string& k);
-		/// A key is read
-
-	Dynamic::Var result() const;
-		/// Returns the result of the parser. Which is an object or an array.
-
-	virtual void value(int v);
-		/// An integer value is read
-
-	virtual void value(unsigned v);
-		/// An unsigned value is read. This will only be triggered if the
-        /// value cannot fit into a signed int.
-
-#if defined(POCO_HAVE_INT64)
-	virtual void value(Int64 v);
-		/// A 64-bit integer value is read
-
-	virtual void value(UInt64 v);
-		/// An unsigned 64-bit integer value is read. This will only be
-        /// triggered if the value cannot fit into a signed 64-bit integer.
-#endif
-
-	virtual void value(const std::string& s);
-		/// A string value is read.
-
-	virtual void value(double d);
-		/// A double value is read
-
-	virtual void value(bool b);
-		/// A boolean value is read
-
-	virtual void null();
-		/// A null value is read
-
-private:
-	void setValue(const Poco::Dynamic::Var& value);
-
-	std::stack<Dynamic::Var> _stack;
-	std::string              _key;
-	Dynamic::Var             _result;
-};
-
-
-inline Dynamic::Var DefaultHandler::result() const
-{
-	return _result;
-}
-
-
-inline void DefaultHandler::value(int v)
-{
-	setValue(v);
-}
-
-
-inline void DefaultHandler::value(unsigned v)
-{
-	setValue(v);
-}
-
-
-#if defined(POCO_HAVE_INT64)
-inline void DefaultHandler::value(Int64 v)
-{
-	setValue(v);
-}
-
-
-inline void DefaultHandler::value(UInt64 v)
-{
-	setValue(v);
-}
-#endif
-
-
-inline void DefaultHandler::value(const std::string& s)
-{
-	setValue(s);
-}
-
-
-inline void DefaultHandler::value(double d)
-{
-	setValue(d);
-}
-
-
-inline void DefaultHandler::value(bool b)
-{
-	setValue(b);
-}
-
-
-inline void DefaultHandler::null()
-{
-	Poco::Dynamic::Var empty;
-	setValue(empty);
-}
+//@deprecated
+typedef ParseHandler DefaultHandler;
 
 
 }} // namespace Poco::JSON

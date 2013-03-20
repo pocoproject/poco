@@ -433,7 +433,7 @@
 			<File
 				RelativePath=".\src\Array.cpp"/>
 			<File
-				RelativePath=".\src\DefaultHandler.cpp"/>
+				RelativePath=".\src\ParseHandler.cpp"/>
 			<File
 				RelativePath=".\src\Handler.cpp"/>
 			<File
@@ -442,6 +442,8 @@
 				RelativePath=".\src\Object.cpp"/>
 			<File
 				RelativePath=".\src\Parser.cpp"/>
+			<File
+				RelativePath=".\src\PrintHandler.cpp"/>
 			<File
 				RelativePath=".\src\Query.cpp"/>
 			<File
@@ -467,6 +469,10 @@
 				RelativePath=".\include\Poco\JSON\Object.h"/>
 			<File
 				RelativePath=".\include\Poco\JSON\Parser.h"/>
+			<File
+				RelativePath=".\include\Poco\JSON\ParseHandler.h"/>
+			<File
+				RelativePath=".\include\Poco\JSON\PrintHandler.h"/>
 			<File
 				RelativePath=".\include\Poco\JSON\Query.h"/>
 			<File

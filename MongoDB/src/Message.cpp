@@ -35,20 +35,22 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/Message.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 Message::Message(MessageHeader::OpCode opcode) : _header(opcode)
 {
 }
 
+
 Message::~Message()
 {
 }
 
-}} // Namespace MongoDB
+
+} } // namespace Poco::MongoDB

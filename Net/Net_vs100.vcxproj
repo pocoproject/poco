@@ -276,7 +276,9 @@
     <ClInclude Include="include\Poco\Net\NetworkInterface.h" />
     <ClInclude Include="include\Poco\Net\ParallelSocketAcceptor.h" />
     <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h" />
+    <ClInclude Include="include\Poco\Net\PartStore.h" />
     <ClInclude Include="include\Poco\Net\SocketAddress.h" />
+    <ClInclude Include="include\Poco\Net\SocketAddressImpl.h" />
     <ClInclude Include="include\Poco\Net\SocketDefs.h" />
     <ClInclude Include="include\Poco\Net\DatagramSocket.h" />
     <ClInclude Include="include\Poco\Net\DatagramSocketImpl.h" />
@@ -374,6 +376,7 @@
     <ClCompile Include="src\Net.cpp" />
     <ClCompile Include="src\NetException.cpp" />
     <ClCompile Include="src\NetworkInterface.cpp" />
+    <ClCompile Include="src\PartStore.cpp" />
     <ClCompile Include="src\SocketAddress.cpp" />
     <ClCompile Include="src\DatagramSocket.cpp" />
     <ClCompile Include="src\DatagramSocketImpl.cpp" />
@@ -384,6 +387,7 @@
     <ClCompile Include="src\ServerSocket.cpp" />
     <ClCompile Include="src\ServerSocketImpl.cpp" />
     <ClCompile Include="src\Socket.cpp" />
+    <ClCompile Include="src\SocketAddressImpl.cpp" />
     <ClCompile Include="src\SocketImpl.cpp" />
     <ClCompile Include="src\SocketStream.cpp" />
     <ClCompile Include="src\StreamSocket.cpp" />

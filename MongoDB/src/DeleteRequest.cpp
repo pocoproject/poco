@@ -35,12 +35,12 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/DeleteRequest.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 DeleteRequest::DeleteRequest(const std::string& collectionName, DeleteRequest::Flags flags) 
@@ -65,6 +65,7 @@ DeleteRequest::~DeleteRequest()
 {
 }
 
+
 void DeleteRequest::buildRequest(BinaryWriter& writer)
 {
 	writer << 0; // 0 - reserved for future use
@@ -74,4 +75,4 @@ void DeleteRequest::buildRequest(BinaryWriter& writer)
 }
 
 
-}} // Namespace MongoDB
+} } // namespace Poco::MongoDB

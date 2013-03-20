@@ -2,23 +2,38 @@ This is the changelog file for the POCO C++ Libraries.
 
 Release 1.5.2 (2013-03-??)
 ==========================
-- added MongoDB library (by Franky Braem)
+- added MongoDB library (Franky Braem)
 - fixed GH #57: poco-1.5.1: Doesn't compile for Android
-- added VoidEvent (by Arturo Castro)
+- added VoidEvent (Arturo Castro)
 - fixed GH #80: NumberFormatter::append broken
 - fixed GH #93: ParallelSocketAcceptor virtual functions
-- small object optimization for IPAddress, Any and Dynamic::Var
+- small object optimization for IPAddress, SocketAddress, Any and Dynamic::Var
 - SQLite events (insert, update, delete, commit, rollback) handlers
-- merged GH #91: Improve SQLite multi-threaded use (by Rangel Reale)
-- merged GH #86: Invalid pointers to vector internals (by Adrian Imboden)
+- merged GH #91: Improve SQLite multi-threaded use (Rangel Reale)
+- merged GH #86: Invalid pointers to vector internals (Adrian Imboden)
 - automatic library initialization macros
 - fixed GH #110: WebSocket accept() fails when Connection header contains multiple tokens
 - fixed GH #71: WebSocket and broken Timeouts (POCO_BROKEN_TIMEOUTS)
 - fixed a warning in Poco/Crypto/OpenSSLInitializer.h
 - fixed GH #109: Bug in Poco::Net::SMTPClientSession::loginUsingPlain
 - added clang libc++ build configurations for Darwin and iPhone (Andrea Bigagli)
-- fixed GH #116: Wrong timezone parsing in DateTimeParse (fix by Matej Knopp)
+- fixed GH #116: Wrong timezone parsing in DateTimeParse (Matej Knopp)
 - fixed GH #118: JSON::Object::stringify endless loop
+- added Recursive and SortedDirectoryIterator (Marian Krivos)
+- added ListMap (map-like container with preserving insertion order)
+- MailMessage: attachments saving support and consistent read/write
+- fixed GH #124: Possible buffer overrun in Foundation/EventLogChannel
+- fixed GH #119: JSON::Object holds values in ordered map
+- added JSON::PrintHandler
+- renamed JSON::DefaultHandler to ParseHandler
+- redefined JSON::DefaultHandler as typedef to ParseHandler
+- fixed GH #127: Eliminate -Wshadow warnings
+- fixed GH #79: Poco::Thread leak on Linux
+- fixed GH #61: static_md build configs for Crypto and NetSSL
+- fixed GH #130: prefer sysconf over sysctlbyname
+- fixed GH #131: no timezone global var on OpenBSD
+- fixed GH #102: Some subprojects don't have x64 solutions for VS 2010
+- added GH #75: Poco::Uri addQueryParameter method
 
 Release 1.5.1 (2013-01-11)
 ==========================

@@ -35,11 +35,14 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_BSONWriter_included
-#define _MongoDB_BSONWriter_included
+
+#ifndef MongoDB_BSONWriter_INCLUDED
+#define MongoDB_BSONWriter_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/BinaryWriter.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -54,12 +57,10 @@ public:
 	{
 	}
 
-
 	virtual ~BSONWriter()
 		/// Destructor
 	{
 	}
-
 
 	template<typename T>
 	void write(T& t)
@@ -69,15 +70,14 @@ public:
 		_writer << t;
 	}
 
-
 	void writeCString(const std::string& value);
 		/// Writes a cstring to the writer. A cstring is a string
 		/// terminated with 0x00
 
 private:
-
 	Poco::BinaryWriter _writer;
 };
+
 
 inline void BSONWriter::writeCString(const std::string& value)
 {
@@ -85,6 +85,8 @@ inline void BSONWriter::writeCString(const std::string& value)
 	_writer << (unsigned char) 0x00;
 }
 
-}} // Namespace Poco::MongoDB
 
-#endif //  _MongoDB_BSONWriter_included
+} } // namespace Poco::MongoDB
+
+
+#endif //  MongoDB_BSONWriter_INCLUDED

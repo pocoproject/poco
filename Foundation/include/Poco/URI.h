@@ -175,6 +175,13 @@ public:
 	void setQuery(const std::string& query);	
 		/// Sets the query part of the URI.
 
+	void addQueryParameter(const std::string& param, const std::string& val = "");
+		/// Adds "param=val" to the query; "param" may not be empty.
+		/// If val is empty, only '=' is appended to the parameter.
+		/// 
+		/// In addition to regular encoding, function also encodes '&' and '=',
+		/// if found in param or val.
+
 	const std::string& getRawQuery() const;
 		/// Returns the unencoded query part of the URI.
 		

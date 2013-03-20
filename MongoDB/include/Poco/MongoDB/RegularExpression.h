@@ -35,13 +35,15 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_RegularExpression_included
-#define _MongoDB_RegularExpression_included
+
+#ifndef MongoDB_RegularExpression_INCLUDED
+#define MongoDB_RegularExpression_INCLUDED
+
 
 #include "Poco/RegularExpression.h"
-
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -51,43 +53,33 @@ class MongoDB_API RegularExpression
 	/// Represents a regular expression in BSON format
 {
 public:
-
 	typedef SharedPtr<RegularExpression> Ptr;
-
 
 	RegularExpression();
 		/// Constructor
 
-
 	RegularExpression(const std::string& pattern, const std::string& options);
 		/// Constructor
-
 
 	virtual ~RegularExpression();
 		/// Destructor
 
-
 	SharedPtr<Poco::RegularExpression> createRE() const;
 		/// Tries to create a Poco::RegularExpression
-
 
 	std::string getOptions() const;
 		/// Returns the options
 
-
 	void setOptions(const std::string& options);
 		/// Sets the options
 
-
 	std::string getPattern() const;
 		/// Returns the pattern
-
 
 	void setPattern(const std::string& pattern);
 		/// Sets the pattern
 
 private:
-
 	std::string _pattern;
 	std::string _options;
 };
@@ -115,6 +107,7 @@ inline void RegularExpression::setOptions(const std::string& options)
 {
 	_options = options;
 }
+
 
 // BSON Regex
 // spec: cstring cstring
@@ -149,6 +142,7 @@ inline void BSONWriter::write<RegularExpression::Ptr>(RegularExpression::Ptr& fr
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //  _MongoDB_RegularExpression_included
+
+#endif //  MongoDB_RegularExpression_INCLUDED

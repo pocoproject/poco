@@ -35,7 +35,9 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/Binary.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -66,4 +68,4 @@ std::string Binary::toString(int indent) const
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB

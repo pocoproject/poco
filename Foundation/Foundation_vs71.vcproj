@@ -769,7 +769,13 @@
 					RelativePath=".\src\NumericString.cpp">
 				</File>
 				<File
+					RelativePath=".\src\DirectoryIteratorStrategy.cpp">
+				</File>
+				<File
 					RelativePath=".\src\RefCountedObject.cpp">
+				</File>
+				<File
+					RelativePath=".\src\SortedDirectoryIterator.cpp">
 				</File>
 				<File
 					RelativePath=".\src\String.cpp">
@@ -936,6 +942,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\SmallObjectAllocator.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\SortedDirectoryIterator.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\String.h">
@@ -4375,6 +4384,9 @@
 					RelativePath=".\include\Poco\Latin2Encoding.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\ListMap.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Latin9Encoding.h">
 				</File>
 				<File
@@ -4543,6 +4555,15 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\PriorityStrategy.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\RecursiveDirectoryIterator.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\RecursiveDirectoryIteratorImpl.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\DirectoryIteratorStrategy.h">
 				</File>
 			</Filter>
 			<Filter

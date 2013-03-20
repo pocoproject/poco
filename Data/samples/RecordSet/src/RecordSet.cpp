@@ -48,14 +48,6 @@ using Poco::Data::Statement;
 using Poco::Data::RecordSet;
 
 
-struct Person
-{
-	std::string name;
-	std::string address;
-	int         age;
-};
-
-
 int main(int argc, char** argv)
 {
 	// create a session

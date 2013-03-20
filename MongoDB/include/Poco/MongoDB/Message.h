@@ -35,17 +35,18 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_Message_included
-#define _MongoDB_Message_included
 
-#include <sstream>
+#ifndef MongoDB_Message_INCLUDED
+#define MongoDB_Message_INCLUDED
+
 
 #include "Poco/Net/Socket.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
-
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/MessageHeader.h"
+#include <sstream>
+
 
 namespace Poco {
 namespace MongoDB {
@@ -61,16 +62,13 @@ public:
 	virtual ~Message();
 		/// Destructor
 
-	
 	MessageHeader& header();
 		/// Returns the message header
 
 protected:
-
 	MessageHeader _header;
 
-
-	void messageLength(Int32 length);
+	void messageLength(std::size_t length);
 		/// Sets the message length in the message header
 };
 
@@ -81,12 +79,13 @@ inline MessageHeader& Message::header()
 }
 
 
-inline void Message::messageLength(Int32 length)
+inline void Message::messageLength(std::size_t length)
 {
 	_header.setMessageLength(length);
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //_MongoDB_Message_included
+
+#endif //MongoDB_Message_INCLUDED

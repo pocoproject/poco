@@ -37,8 +37,11 @@
 #include "Poco/Net/MailRecipient.h"
 #include "Poco/Net/PartHandler.h"
 #include "Poco/Net/StringPartSource.h"
+#include "Poco/Net/PartStore.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/Timestamp.h"
+#include "Poco/FileStream.h"
+#include "Poco/String.h"
 #include <sstream>
 #include <vector>
 
@@ -49,7 +52,12 @@ using Poco::Net::MessageHeader;
 using Poco::Net::PartHandler;
 using Poco::Net::MediaType;
 using Poco::Net::StringPartSource;
+using Poco::Net::FilePartStoreFactory;
+using Poco::Net::FilePartStore;
 using Poco::Timestamp;
+using Poco::FileInputStream;
+using Poco::replaceInPlace;
+using Poco::icompare;
 
 
 namespace
@@ -135,14 +143,15 @@ void MailMessageTest::testWriteQP()
 	std::ostringstream str;
 	message.write(str);
 	std::string s = str.str();
+
 	assert (s == 
-		"CC: Jane Doe <jane.doe@no.where>\r\n"
-		"Content-Transfer-Encoding: quoted-printable\r\n"
-		"Content-Type: text/plain\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-		"From: poco@appinf.com\r\n"
+		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
+		"From: poco@appinf.com\r\n"
+		"Content-Transfer-Encoding: quoted-printable\r\n"
 		"To: John Doe <john.doe@no.where>\r\n"
+		"CC: Jane Doe <jane.doe@no.where>\r\n"
 		"\r\n"
 		"Hello, world!\r\n"
 		"This is a test for the MailMessage class.\r\n"
@@ -172,11 +181,11 @@ void MailMessageTest::testWrite8Bit()
 	message.write(str);
 	std::string s = str.str();
 	assert (s == 
-		"Content-Transfer-Encoding: 8bit\r\n"
-		"Content-Type: text/plain\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-		"From: poco@appinf.com\r\n"
+		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
+		"From: poco@appinf.com\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
 		"To: John Doe <john.doe@no.where>\r\n"
 		"\r\n"
 		"Hello, world!\r\n"
@@ -204,11 +213,11 @@ void MailMessageTest::testWriteBase64()
 	message.write(str);
 	std::string s = str.str();
 	assert (s == 
-		"Content-Transfer-Encoding: base64\r\n"
-		"Content-Type: text/plain\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-		"From: poco@appinf.com\r\n"
+		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
+		"From: poco@appinf.com\r\n"
+		"Content-Transfer-Encoding: base64\r\n"
 		"To: John Doe <john.doe@no.where>\r\n"
 		"\r\n"
 		"SGVsbG8sIHdvcmxkIQ0KVGhpcyBpcyBhIHRlc3QgZm9yIHRoZSBNYWlsTWVzc2FnZSBjbGFz\r\n"
@@ -244,15 +253,15 @@ void MailMessageTest::testWriteManyRecipients()
 	message.write(str);
 	std::string s = str.str();
 	assert (s == 
-		"Content-Transfer-Encoding: 8bit\r\n"
-		"Content-Type: text/plain\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-		"From: poco@appinf.com\r\n"
+		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
+		"From: poco@appinf.com\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
 		"To: John Doe <john.doe@no.where>, Jane Doe <jane.doe@no.where>, \r\n"
-        "\tFrank Foo <walter.foo@no.where>, Bernie Bar <bernie.bar@no.where>, \r\n"
-        "\tJoe Spammer <joe.spammer@no.where>\r\n"
-   		"\r\n"
+		"\tFrank Foo <walter.foo@no.where>, Bernie Bar <bernie.bar@no.where>, \r\n"
+		"\tJoe Spammer <joe.spammer@no.where>\r\n"
+		"\r\n"
 		"Hello, world!\r\n"
 		"This is a test for the MailMessage class.\r\n"
 	);
@@ -279,31 +288,31 @@ void MailMessageTest::testWriteMultiPart()
 	message.write(str);
 	std::string s = str.str();
 	std::string rawMsg(
-		"Content-Type: multipart/mixed; boundary=$\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
-		"From: poco@appinf.com\r\n"
-		"Mime-Version: 1.0\r\n"
+		"Content-Type: multipart/mixed; boundary=$\r\n"
 		"Subject: Test Message\r\n"
+		"From: poco@appinf.com\r\n"
 		"To: John Doe <john.doe@no.where>\r\n"
+		"Mime-Version: 1.0\r\n"
 		"\r\n"
 		"--$\r\n"
-		"Content-Disposition: inline\r\n"
-		"Content-Transfer-Encoding: 8bit\r\n"
 		"Content-Type: text/plain\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"Content-Disposition: inline\r\n"
 		"\r\n"
 		"Hello World!\r\n"
 		"\r\n"
 		"--$\r\n"
-		"Content-Disposition: attachment; filename=sample.dat\r\n"
 		"Content-ID: abcd1234\r\n"
-		"Content-Transfer-Encoding: base64\r\n"
 		"Content-Type: application/octet-stream; name=sample\r\n"
+		"Content-Transfer-Encoding: base64\r\n"
+		"Content-Disposition: attachment; filename=sample.dat\r\n"
 		"\r\n"
 		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
 		"--$--\r\n"
 	);
 	std::string::size_type p1 = s.find('=') + 1;
-	std::string::size_type p2 = s.find('\r');
+	std::string::size_type p2 = s.find('\r', p1);
 	std::string boundary(s, p1, p2 - p1);
 	std::string msg;
 	for (std::string::const_iterator it = rawMsg.begin(); it != rawMsg.end(); ++it)
@@ -313,6 +322,7 @@ void MailMessageTest::testWriteMultiPart()
 		else
 			msg += *it;
 	}
+
 	assert (s == msg);
 }
 
@@ -416,6 +426,111 @@ void MailMessageTest::testReadMultiPart()
 }
 
 
+void MailMessageTest::testReadWriteMultiPart()
+{
+	std::string msgin(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_31E8A8D61DF53389\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"Subject: Test Message\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"--MIME_boundary_31E8A8D61DF53389\r\n"
+		"Content-Disposition: inline\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"Hello World!\r\n"
+		"\r\n"
+		"--MIME_boundary_31E8A8D61DF53389\r\n"
+		"Content-Disposition: attachment; filename=sample.dat\r\n"
+		"Content-ID: abcd1234\r\n"
+		"Content-Transfer-Encoding: base64\r\n"
+		"Content-Type: application/octet-stream; name=sample\r\n"
+		"\r\n"
+		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
+		"--MIME_boundary_31E8A8D61DF53389--\r\n"
+	);
+
+	std::istringstream istr(msgin);
+	std::ostringstream ostr;
+	MailMessage message;
+
+	message.read(istr);
+	message.write(ostr);
+	
+	std::string msgout(ostr.str());
+	assert (msgout == msgin);
+}
+
+
+void MailMessageTest::testReadWriteMultiPartStore()
+{
+	std::string msgin(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_31E8A8D61DF53389\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"Subject: Test Message\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"--MIME_boundary_31E8A8D61DF53389\r\n"
+		"Content-Disposition: inline\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"Hello World!\r\n"
+		"\r\n"
+		"--MIME_boundary_31E8A8D61DF53389\r\n"
+		"Content-Disposition: attachment; filename=sample.dat\r\n"
+		"Content-ID: abcd1234\r\n"
+		"Content-Transfer-Encoding: base64\r\n"
+		"Content-Type: application/octet-stream; name=sample\r\n"
+		"\r\n"
+		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
+		"--MIME_boundary_31E8A8D61DF53389--\r\n"
+	);
+
+	std::istringstream istr(msgin);
+	std::ostringstream ostr;
+	FilePartStoreFactory pfsf;
+	MailMessage message(&pfsf);
+
+	message.read(istr);
+	
+	MailMessage::PartVec::const_iterator it = message.parts().begin();
+	MailMessage::PartVec::const_iterator end = message.parts().end();
+	for (; it != end; ++it)
+	{
+		FilePartStore* fps = dynamic_cast<FilePartStore*>(it->pSource);
+		if (fps && fps->filename().size())
+		{
+			std::string filename = fps->filename();
+			assert (filename == "sample.dat");
+			std::string path = fps->path();
+			// for security reasons, the filesystem temporary
+			// filename is not the same as attachment name
+			std::size_t sz = (path.size() > filename.size()) ? filename.size() : path.size();
+			assert (0 != icompare(path, path.size() - sz, sz, path));
+			
+			Poco::FileInputStream fis(path);
+			assert (fis.good());
+			std::string read;
+			std::string line;
+			while (std::getline(fis, line)) read += line;
+
+			assert (!read.empty());
+			assert (read == "This is some binary data. Really.");
+		}
+	}
+	
+	message.write(ostr);
+	std::string msgout(ostr.str());
+	assert (msgout == msgin);
+}
+
+
 void MailMessageTest::testEncodeWord()
 {
 	std::string plain("this is pure ASCII");
@@ -460,6 +575,8 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadQP);
 	CppUnit_addTest(pSuite, MailMessageTest, testRead8Bit);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPart);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPartStore);
 	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWord);
 
 	return pSuite;

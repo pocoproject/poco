@@ -247,4 +247,11 @@
 #endif
 
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	#define POCO_DEFAULT_NEWLINE_CHARS "\r\n"
+#else
+	#define POCO_DEFAULT_NEWLINE_CHARS "\n"
+#endif
+
+
 #endif // Foundation_Platform_INCLUDED

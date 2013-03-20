@@ -39,7 +39,8 @@
 #include "Poco/JSON/Query.h"
 #include "Poco/JSON/JSONException.h"
 #include "Poco/JSON/Stringifier.h"
-#include "Poco/JSON/DefaultHandler.h"
+#include "Poco/JSON/ParseHandler.h"
+#include "Poco/JSON/PrintHandler.h"
 #include "Poco/JSON/Template.h"
 
 #include "Poco/Path.h"
@@ -87,7 +88,7 @@ void JSONTest::testNullProperty()
 	Var result;
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -114,7 +115,7 @@ void JSONTest::testTrueProperty()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -143,7 +144,7 @@ void JSONTest::testFalseProperty()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -172,7 +173,7 @@ void JSONTest::testNumberProperty()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -202,7 +203,7 @@ void JSONTest::testUnsignedNumberProperty()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -233,7 +234,7 @@ void JSONTest::testNumber64Property()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -263,7 +264,7 @@ void JSONTest::testUnsignedNumber64Property()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -294,7 +295,7 @@ void JSONTest::testStringProperty()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -323,7 +324,7 @@ void JSONTest::testEmptyObject()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -341,6 +342,83 @@ void JSONTest::testEmptyObject()
 }
 
 
+void JSONTest::testComplexObject()
+{
+	std::string json = 
+	"{"
+		"\"id\": 1,"
+		"\"jsonrpc\": \"2.0\","
+		"\"total\": 1,"
+		"\"result\": ["
+			"{"
+				"\"id\": 1,"
+				"\"guid\": \"67acfb26-17eb-4a75-bdbd-f0669b7d8f73\","
+				"\"picture\": \"http://placehold.it/32x32\","
+				"\"age\": 40,"
+				"\"name\": \"Angelina Crossman\","
+				"\"gender\": \"female\","
+				"\"company\": \"Raylog\","
+				"\"phone\": \"892-470-2803\","
+				"\"email\": \"angelina@raylog.com\","
+				"\"address\": \"20726, CostaMesa, Horatio Streets\","
+				"\"about\": \"Consectetuer suscipit volutpat eros dolor euismod, "
+				"et dignissim in feugiat sed, ea tation exerci quis. Consectetuer, "
+				"dolor dolore ad vero ullamcorper, tincidunt facilisis at in facilisi, "
+				"iusto illum illum. Autem nibh, sed elit consequat volutpat tation, "
+				"nisl lorem lorem sed tation, facilisis dolore. Augue odio molestie, "
+				"dolor zzril nostrud aliquam sed, wisi dolor et ut iusto, ea. Magna "
+				"ex qui facilisi, hendrerit quis in eros ut, zzril nibh dolore nisl "
+				"suscipit, vulputate elit ut lobortis exerci, nulla dolore eros at "
+				"aliquam, ullamcorper vero ad iusto. Adipiscing, nisl eros exerci "
+				"nisl vel, erat in luptatum in duis, iusto.\","
+				"\"registered\": \"2008-04-09T11:13:17 +05:00\","
+				"\"tags\": ["
+					"\"ut\","
+					"\"accumsan\","
+					"\"feugait\","
+					"\"ex\","
+					"\"odio\","
+					"\"consequat\","
+					"\"delenit\""
+				"],"
+				"\"friends\": ["
+					"{"
+						"\"id\": 1,"
+						"\"name\": \"Hailey Hardman\""
+					"},"
+					"{"
+						"\"id\": 2,"
+						"\"name\": \"Bailey Oldridge\""
+					"},"
+					"{"
+						"\"id\": 3,"
+						"\"name\": \"Makayla Campbell\""
+					"}"
+				"]"
+			"}"
+		"]"
+	"}";
+	
+	Parser parser;
+	Var result;
+
+	try
+	{
+		ParseHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+
+	assert(result.type() == typeid(Object::Ptr));
+}
+
+
 void JSONTest::testDoubleProperty()
 {
 	std::string json = "{ \"test\" : 123.45 }";
@@ -349,7 +427,7 @@ void JSONTest::testDoubleProperty()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -378,7 +456,7 @@ void JSONTest::testDouble2Property()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -407,7 +485,7 @@ void JSONTest::testDouble3Property()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -436,7 +514,7 @@ void JSONTest::testObjectProperty()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -472,7 +550,7 @@ void JSONTest::testObjectArray()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -494,6 +572,37 @@ void JSONTest::testObjectArray()
 }
 
 
+void JSONTest::testArrayOfObjects()
+{
+	std::string json = "[ {\"test\" : 0}, { \"test1\" : [1, 2, 3], \"test2\" : 4 } ]";
+	Parser parser;
+	Var result;
+
+	try
+	{
+		ParseHandler handler;
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+
+	assert(result.type() == typeid(Array::Ptr));
+	Array::Ptr arr = result.extract<Array::Ptr>();
+	Object::Ptr object = arr->getObject(0);
+	assert (object->getValue<int>("test") == 0);
+	object = arr->getObject(1);
+	arr = object->getArray("test1");
+	result = arr->get(0);
+	assert (result == 1);
+
+}
+
+
 void JSONTest::testEmptyArray()
 {
 	std::string json = "[]";
@@ -502,7 +611,7 @@ void JSONTest::testEmptyArray()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -528,7 +637,7 @@ void JSONTest::testNestedArray()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -554,7 +663,7 @@ void JSONTest::testNullElement()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -582,7 +691,7 @@ void JSONTest::testTrueElement()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -611,7 +720,7 @@ void JSONTest::testFalseElement()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -640,7 +749,7 @@ void JSONTest::testNumberElement()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -669,7 +778,7 @@ void JSONTest::testStringElement()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -698,7 +807,7 @@ void JSONTest::testEmptyObjectElement()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -725,7 +834,7 @@ void JSONTest::testDoubleElement()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -754,7 +863,7 @@ void JSONTest::testOptValue()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -781,7 +890,7 @@ void JSONTest::testQuery()
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -801,15 +910,77 @@ void JSONTest::testQuery()
 }
 
 
+void JSONTest::testPrintHandler()
+{
+	std::string json = "{ \"name\" : \"Homer\", \"age\" : 38, \"wife\" : \"Marge\", \"age\" : 36, \"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ] }";
+	Parser parser;
+	std::ostringstream ostr;
+	PrintHandler handler(ostr);
+	parser.setHandler(&handler);
+	parser.parse(json);
+	assert (ostr.str() == "{\"name\":\"Homer\",\"age\":38,\"wife\":\"Marge\",\"age\":36,\"children\":[\"Bart\",\"Lisa\",\"Maggie\"]}");
+
+	handler.setIndent(1);
+	ostr.str("");
+	parser.parse(json);
+	assert (ostr.str() == "{\n"
+		" \"name\" : \"Homer\",\n"
+		" \"age\" : 38,\n"
+		" \"wife\" : \"Marge\",\n"
+		" \"age\" : 36,\n"
+		" \"children\" : [\n"
+		"  \"Bart\",\n"
+		"  \"Lisa\",\n"
+		"  \"Maggie\"\n"
+		" ]\n"
+		"}"
+	);
+
+	handler.setIndent(2);
+	ostr.str("");
+	parser.parse(json);
+	assert (ostr.str() == "{\n"
+		"  \"name\" : \"Homer\",\n"
+		"  \"age\" : 38,\n"
+		"  \"wife\" : \"Marge\",\n"
+		"  \"age\" : 36,\n"
+		"  \"children\" : [\n"
+		"    \"Bart\",\n"
+		"    \"Lisa\",\n"
+		"    \"Maggie\"\n"
+		"  ]\n"
+		"}"
+	);
+
+	handler.setIndent(4);
+	ostr.str("");
+	parser.parse(json);
+	assert (ostr.str() == "{\n"
+		"    \"name\" : \"Homer\",\n"
+		"    \"age\" : 38,\n"
+		"    \"wife\" : \"Marge\",\n"
+		"    \"age\" : 36,\n"
+		"    \"children\" : [\n"
+		"        \"Bart\",\n"
+		"        \"Lisa\",\n"
+		"        \"Maggie\"\n"
+		"    ]\n"
+		"}"
+	);
+}
+
+
 void JSONTest::testStringify()
 {
-	std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ] }";
+	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
+						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
+						"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", \"town\" : \"Springfield\" } } }";
 	Parser parser;
 	Var result;
 
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -822,9 +993,221 @@ void JSONTest::testStringify()
 
 	assert(result.type() == typeid(Object::Ptr));
 	std::ostringstream ostr;
+
+	Stringifier::condense(result, ostr);
+	std::string str = "{"
+						"\"Simpsons\":{"
+						"\"address\":{"
+						"\"number\":742,"
+						"\"street\":\"Evergreen Terrace\","
+						"\"town\":\"Springfield\""
+						"},"
+						"\"children\":["
+						"\"Bart\","
+						"\"Lisa\","
+						"\"Maggie\"],"
+						"\"husband\":{"
+						"\"age\":38,"
+						"\"name\":\"Homer\""
+						"},"
+						"\"wife\":{"
+						"\"age\":36,\"name\":\"Marge\""
+						"}}}";
+	assert (ostr.str() == str);
+
+	ostr.str("");
 	Stringifier::stringify(result, ostr);
-	//TODO: need map that does not order for internal container
-	assert (ostr.str() == "{\"name\":\"Franky\",\"children\":[\"Jonas\",\"Ellen\"]}");
+	assert (ostr.str() == str);
+
+	ostr.str("");
+	Stringifier::stringify(result, ostr, 1);
+	str = "{\n"
+		" \"Simpsons\" : {\n"
+		"  \"address\" : {\n"
+		"   \"number\" : 742,\n"
+		"   \"street\" : \"Evergreen Terrace\",\n"
+		"   \"town\" : \"Springfield\"\n"
+		"  },\n"
+		"  \"children\" : [\n"
+		"   \"Bart\",\n"
+		"   \"Lisa\",\n"
+		"   \"Maggie\"\n"
+		"  ],\n"
+		"  \"husband\" : {\n"
+		"   \"age\" : 38,\n"
+		"   \"name\" : \"Homer\"\n"
+		"  },\n"
+		"  \"wife\" : {\n"
+		"   \"age\" : 36,\n"
+		"   \"name\" : \"Marge\"\n"
+		"  }\n"
+		" }\n"
+		"}";
+	assert (ostr.str() == str);
+
+	ostr.str("");
+	Stringifier::stringify(result, ostr, 2);
+	str = "{\n"
+		"  \"Simpsons\" : {\n"
+		"    \"address\" : {\n"
+		"      \"number\" : 742,\n"
+		"      \"street\" : \"Evergreen Terrace\",\n"
+		"      \"town\" : \"Springfield\"\n"
+		"    },\n"
+		"    \"children\" : [\n"
+		"      \"Bart\",\n"
+		"      \"Lisa\",\n"
+		"      \"Maggie\"\n"
+		"    ],\n"
+		"    \"husband\" : {\n"
+		"      \"age\" : 38,\n"
+		"      \"name\" : \"Homer\"\n"
+		"    },\n"
+		"    \"wife\" : {\n"
+		"      \"age\" : 36,\n"
+		"      \"name\" : \"Marge\"\n"
+		"    }\n"
+		"  }\n"
+		"}";
+	assert (ostr.str() == str);
+
+	ostr.str("");
+	Stringifier::stringify(result, ostr, 4);
+	str = "{\n"
+		"    \"Simpsons\" : {\n"
+		"        \"address\" : {\n"
+		"            \"number\" : 742,\n"
+		"            \"street\" : \"Evergreen Terrace\",\n"
+		"            \"town\" : \"Springfield\"\n"
+		"        },\n"
+		"        \"children\" : [\n"
+		"            \"Bart\",\n"
+		"            \"Lisa\",\n"
+		"            \"Maggie\"\n"
+		"        ],\n"
+		"        \"husband\" : {\n"
+		"            \"age\" : 38,\n"
+		"            \"name\" : \"Homer\"\n"
+		"        },\n"
+		"        \"wife\" : {\n"
+		"            \"age\" : 36,\n"
+		"            \"name\" : \"Marge\"\n"
+		"        }\n"
+		"    }\n"
+		"}";
+	assert (ostr.str() == str);
+}
+
+
+void JSONTest::testStringifyPreserveOrder()
+{
+	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
+						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
+						"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", \"town\" : \"Springfield\" } } }";
+	Parser parser;
+	Var result;
+
+	try
+	{
+		ParseHandler handler(true);
+		parser.setHandler(&handler);
+		parser.parse(json);
+		result = handler.result();
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+
+	assert(result.type() == typeid(Object::Ptr));
+	std::ostringstream ostr;
+
+	Stringifier::condense(result, ostr);
+	assert (ostr.str() == "{\"Simpsons\":{\"husband\":{\"name\":\"Homer\",\"age\":38},\"wife\":{\"name\":\"Marge\",\"age\":36},"
+						"\"children\":[\"Bart\",\"Lisa\",\"Maggie\"],"
+						"\"address\":{\"number\":742,\"street\":\"Evergreen Terrace\",\"town\":\"Springfield\"}}}");
+
+	ostr.str("");
+	Stringifier::stringify(result, ostr);
+	assert (ostr.str() == "{\"Simpsons\":{\"husband\":{\"name\":\"Homer\",\"age\":38},\"wife\":{\"name\":\"Marge\",\"age\":36},"
+						"\"children\":[\"Bart\",\"Lisa\",\"Maggie\"],"
+						"\"address\":{\"number\":742,\"street\":\"Evergreen Terrace\",\"town\":\"Springfield\"}}}");
+	
+	ostr.str("");
+	Stringifier::stringify(result, ostr, 1);
+	assert (ostr.str() == "{\n"
+						" \"Simpsons\" : {\n"
+						"  \"husband\" : {\n"
+						"   \"name\" : \"Homer\",\n"
+						"   \"age\" : 38\n"
+						"  },\n"
+						"  \"wife\" : {\n"
+						"   \"name\" : \"Marge\",\n"
+						"   \"age\" : 36\n"
+						"  },\n"
+						"  \"children\" : [\n"
+						"   \"Bart\",\n"
+						"   \"Lisa\",\n"
+						"   \"Maggie\"\n"
+						"  ],\n"
+						"  \"address\" : {\n"
+						"   \"number\" : 742,\n"
+						"   \"street\" : \"Evergreen Terrace\",\n" 
+						"   \"town\" : \"Springfield\"\n"
+						"  }\n"
+						" }\n"
+						"}");
+
+	ostr.str("");
+	Stringifier::stringify(result, ostr, 2);
+	assert (ostr.str() == "{\n"
+						"  \"Simpsons\" : {\n"
+						"    \"husband\" : {\n"
+						"      \"name\" : \"Homer\",\n"
+						"      \"age\" : 38\n"
+						"    },\n"
+						"    \"wife\" : {\n"
+						"      \"name\" : \"Marge\",\n"
+						"      \"age\" : 36\n"
+						"    },\n"
+						"    \"children\" : [\n"
+						"      \"Bart\",\n"
+						"      \"Lisa\",\n"
+						"      \"Maggie\"\n"
+						"    ],\n"
+						"    \"address\" : {\n"
+						"      \"number\" : 742,\n"
+						"      \"street\" : \"Evergreen Terrace\",\n" 
+						"      \"town\" : \"Springfield\"\n"
+						"    }\n"
+						"  }\n"
+						"}");
+
+	ostr.str("");
+	Stringifier::stringify(result, ostr, 4);
+	assert (ostr.str() == "{\n"
+						"    \"Simpsons\" : {\n"
+						"        \"husband\" : {\n"
+						"            \"name\" : \"Homer\",\n"
+						"            \"age\" : 38\n"
+						"        },\n"
+						"        \"wife\" : {\n"
+						"            \"name\" : \"Marge\",\n"
+						"            \"age\" : 36\n"
+						"        },\n"
+						"        \"children\" : [\n"
+						"            \"Bart\",\n"
+						"            \"Lisa\",\n"
+						"            \"Maggie\"\n"
+						"        ],\n"
+						"        \"address\" : {\n"
+						"            \"number\" : 742,\n"
+						"            \"street\" : \"Evergreen Terrace\",\n" 
+						"            \"town\" : \"Springfield\"\n"
+						"        }\n"
+						"    }\n"
+						"}");
 }
 
 
@@ -852,7 +1235,7 @@ void JSONTest::testValidJanssonFiles()
 
 				try
 				{
-					DefaultHandler handler;
+					ParseHandler handler;
 					parser.setHandler(&handler);
 					parser.parse(fis);
 					result = handler.result();
@@ -900,7 +1283,7 @@ void JSONTest::testInvalidJanssonFiles()
 
 				try
 				{
-					DefaultHandler handler;
+					ParseHandler handler;
 					parser.setHandler(&handler);
 					parser.parse(fis);
 					result = handler.result();
@@ -944,7 +1327,7 @@ void JSONTest::testInvalidUnicodeJanssonFiles()
 
 				try
 				{
-					DefaultHandler handler;
+					ParseHandler handler;
 					parser.setHandler(&handler);
 					parser.parse(fis);
 					result = handler.result();
@@ -967,15 +1350,19 @@ void JSONTest::testInvalidUnicodeJanssonFiles()
 void JSONTest::testTemplate()
 {
 	Template tpl;
-	tpl.parse("Hello world! From <?= person.name ?>\n<?if person.toOld ?>You're too old<?endif?>\n");
+	tpl.parse("Hello world! From <?= person.name?>.\n<?if person.tooOld?>You're too old.<?endif?>");
 
 	Object::Ptr data = new Object();
 	Object::Ptr person = new Object();
 	data->set("person", person);
 	person->set("name", "Franky");
-	person->set("toOld", true);
-	tpl.render(data, std::cout);
+	person->set("tooOld", true);
+	std::ostringstream ostr;
+	tpl.render(data, ostr);
+	std::cout << ostr.str();
+	assert (ostr.str() == "Hello world! From Franky.\nYou're too old.");
 }
+
 
 void JSONTest::testUnicode()
 {
@@ -988,7 +1375,7 @@ void JSONTest::testUnicode()
 	Var result;
 	try
 	{
-		DefaultHandler handler;
+		ParseHandler handler;
 		parser.setHandler(&handler);
 		parser.parse(json);
 		result = handler.result();
@@ -1011,6 +1398,7 @@ void JSONTest::testUnicode()
 
 	assert(test.convert<std::string>() == original);
 }
+
 
 std::string JSONTest::getTestFilesPath(const std::string& type)
 {
@@ -1055,11 +1443,13 @@ CppUnit::Test* JSONTest::suite()
 #endif
 	CppUnit_addTest(pSuite, JSONTest, testStringProperty);
 	CppUnit_addTest(pSuite, JSONTest, testEmptyObject);
+	CppUnit_addTest(pSuite, JSONTest, testComplexObject);
 	CppUnit_addTest(pSuite, JSONTest, testDoubleProperty);
 	CppUnit_addTest(pSuite, JSONTest, testDouble2Property);
 	CppUnit_addTest(pSuite, JSONTest, testDouble3Property);
 	CppUnit_addTest(pSuite, JSONTest, testObjectProperty);
 	CppUnit_addTest(pSuite, JSONTest, testObjectArray);
+	CppUnit_addTest(pSuite, JSONTest, testArrayOfObjects);
 	CppUnit_addTest(pSuite, JSONTest, testEmptyArray);
 	CppUnit_addTest(pSuite, JSONTest, testNestedArray);
 	CppUnit_addTest(pSuite, JSONTest, testNullElement);
@@ -1071,7 +1461,9 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testDoubleElement);
 	CppUnit_addTest(pSuite, JSONTest, testOptValue);
 	CppUnit_addTest(pSuite, JSONTest, testQuery);
+	CppUnit_addTest(pSuite, JSONTest, testPrintHandler);
 	CppUnit_addTest(pSuite, JSONTest, testStringify);
+	CppUnit_addTest(pSuite, JSONTest, testStringifyPreserveOrder);
 	CppUnit_addTest(pSuite, JSONTest, testValidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);

@@ -43,16 +43,18 @@
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/RecursiveDirectoryIteratorImpl.h"
-#include "Poco/RecursiveDirectoryIteratorStrategies.h"
+#include "Poco/DirectoryIteratorStrategy.h"
 
 
-namespace Poco
-{
+namespace Poco {
+
 
 class DirectoryIterator;
 
+
 template<class TTravStr>
 class RecursiveDirectoryIteratorImpl;
+
 
 template<class TTravStr = ChildrenFirstTraverse>
 class RecursiveDirectoryIterator
@@ -60,20 +62,20 @@ class RecursiveDirectoryIterator
 	/// all files in a directory and its subdirectories.
 	///
 	/// RecursiveDirectoryIterator has some limitations:
-	///		* only forward iteration (++) is supported
-	///		* an iterator copied from another one will always
-	///		point to the same file as the original iterator,
-	///		even is the original iterator has been advanced
-	///		(all copies of an iterator share their state with
-	///		the original iterator)
+	///   * only forward iteration (++) is supported
+	///   * an iterator copied from another one will always
+	///     point to the same file as the original iterator,
+	///     even is the original iterator has been advanced
+	///     (all copies of an iterator share their state with
+	///     the original iterator)
 	///
 	/// The class can follow different traversal strategies:
-	///		* depth-first strategy;
-	///		* siblings-first strategy.
+	///     * depth-first strategy;
+	///     * siblings-first strategy.
 	/// The stategies are set by template parameter.
 	/// There are two corresponding typedefs:
-	///		* SimpleRecursiveDirectoryIterator;
-	///		* SiblingsFirstRecursiveDirectoryIterator.
+	///     * SimpleRecursiveDirectoryIterator;
+	///     * SiblingsFirstRecursiveDirectoryIterator.
 	///
 	/// The depth of traversal can be limited by constructor
 	/// parameter maxDepth (which sets the infinite depth by default).
@@ -258,15 +260,6 @@ inline bool operator !=(const RecursiveDirectoryIterator<T1>& a, const Recursive
 {
 	return a.path().toString() != b.path().toString();;
 }
-
-
-//
-// exported instances
-//
-template class Foundation_API
-RecursiveDirectoryIterator<ChildrenFirstTraverse> ;
-template class Foundation_API
-RecursiveDirectoryIterator<SiblingsFirstTraverse> ;
 
 
 //

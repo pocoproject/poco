@@ -449,6 +449,8 @@
 				<File
 					RelativePath=".\include\Poco\Net\SocketAddress.h"/>
 				<File
+					RelativePath=".\include\Poco\Net\SocketAddressImpl.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\SocketDefs.h"/>
 			</Filter>
 			<Filter
@@ -469,6 +471,8 @@
 					RelativePath=".\src\NetworkInterface.cpp"/>
 				<File
 					RelativePath=".\src\SocketAddress.cpp"/>
+				<File
+					RelativePath=".\src\SocketAddressImpl.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
@@ -555,6 +559,8 @@
 				<File
 					RelativePath=".\include\Poco\Net\PartSource.h"/>
 				<File
+					RelativePath=".\include\Poco\Net\PartStore.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\QuotedPrintableDecoder.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\QuotedPrintableEncoder.h"/>
@@ -581,6 +587,8 @@
 					RelativePath=".\src\PartHandler.cpp"/>
 				<File
 					RelativePath=".\src\PartSource.cpp"/>
+				<File
+					RelativePath=".\src\PartStore.cpp"/>
 				<File
 					RelativePath=".\src\QuotedPrintableDecoder.cpp"/>
 				<File

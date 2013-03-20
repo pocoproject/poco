@@ -42,10 +42,12 @@
 
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Array.h"
+#include "Poco/JSON/Stringifier.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
 #include <map>
 #include <vector>
+#include <deque>
 #include <iostream>
 #include <sstream>
 
@@ -60,8 +62,10 @@ class JSON_API Object
 public:
 	typedef SharedPtr<Object> Ptr;
 
-	Object();
-		/// Default constructor
+	Object(bool preserveInsertionOrder = false);
+		/// Default constructor. If preserveInsertionOrder, object
+		/// will preserve the items insertion order. Otherwise, items
+		/// will be sorted by keys.
 
 	Object(const Object& copy);
 		/// Copy constructor
@@ -138,17 +142,57 @@ public:
 	void set(const std::string& key, const Dynamic::Var& value);
 		/// Sets a new value
 
-	void stringify(std::ostream& out, unsigned int indent = 0) const;
+	void stringify(std::ostream& out, unsigned int indent = 0, int step = -1) const;
 		/// Prints the object to out. When indent is 0, the object
-		/// will be printed on one line without indentation.
+		/// will be printed on a single line without indentation.
 
 	void remove(const std::string& key);
 		/// Removes the property with the given key
 
 private:
-	//TODO: unordered map
+
+	template <typename C>
+	void doStringify(const C& container, std::ostream& out, unsigned int indent, int step) const
+	{
+		out << '{';
+
+		if (indent > 0) out << std::endl;
+		
+		typename C::const_iterator it = container.begin();
+		typename C::const_iterator end = container.end();
+		for (; it != end;)
+		{
+			for(int i = 0; i < indent; i++) out << ' ';
+
+			out << '"' << getKey(it) << '"';
+			out << ((indent > 0) ? " : " : ":");
+
+			Stringifier::stringify(getValue(it), out, indent + step, step);
+
+			if ( ++it != container.end() ) out << ',';
+
+			if (step > 0) out << '\n';
+		}
+
+		if (indent >= step) indent -= step;
+
+		for (int i = 0; i < indent; i++)
+			out << ' ';
+
+		out << '}';
+	}
+
 	typedef std::map<std::string, Dynamic::Var> ValueMap;
-	ValueMap _values;
+	typedef std::deque<Dynamic::Var*> KeyPtrList;
+
+	const std::string& getKey(ValueMap::const_iterator& it) const;
+	const Dynamic::Var& getValue(ValueMap::const_iterator& it) const;
+	const std::string& getKey(KeyPtrList::const_iterator& it) const;
+	const Dynamic::Var& getValue(KeyPtrList::const_iterator& it) const;
+
+	ValueMap   _values;
+	KeyPtrList _keys;
+	bool       _preserveInsOrder;
 };
 
 
@@ -180,12 +224,6 @@ inline bool Object::isObject(const std::string& key) const
 }
 
 
-inline void Object::set(const std::string& key, const Dynamic::Var& value)
-{
-	_values[key] = value;
-}
-
-
 inline std::size_t Object::size() const
 {
 	return static_cast<std::size_t>(_values.size());
@@ -195,6 +233,24 @@ inline std::size_t Object::size() const
 inline void Object::remove(const std::string& key)
 {
 	_values.erase(key);
+}
+
+
+inline const std::string& Object::getKey(ValueMap::const_iterator& it) const
+{
+	return it->first;
+}
+
+
+inline const Dynamic::Var& Object::getValue(ValueMap::const_iterator& it) const
+{
+	return it->second;
+}
+
+
+inline const Dynamic::Var& Object::getValue(KeyPtrList::const_iterator& it) const
+{
+	return **it;
 }
 
 

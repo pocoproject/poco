@@ -34,18 +34,20 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+
+
 #include "Poco/MongoDB/ReplicaSet.h"
 #include "Poco/MongoDB/QueryRequest.h"
 #include "Poco/MongoDB/ResponseMessage.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+namespace Poco {
+namespace MongoDB {
+
 
 ReplicaSet::ReplicaSet(const std::vector<Net::SocketAddress> &addresses) : _addresses(addresses)
 {
 }
+
 
 ReplicaSet::~ReplicaSet()
 {
@@ -67,6 +69,7 @@ Connection::Ptr ReplicaSet::findMaster()
 
 	return master;
 }
+
 
 Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 {
@@ -105,4 +108,4 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 }
 
 
-}} // Poco::MongoDB
+} } // namespace Poco::MongoDB

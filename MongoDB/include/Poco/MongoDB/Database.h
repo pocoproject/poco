@@ -34,8 +34,11 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#ifndef _MongoDB_Database_included
-#define _MongoDB_Database_included
+
+
+#ifndef MongoDB_Database_INCLUDED
+#define MongoDB_Database_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Connection.h"
@@ -44,6 +47,7 @@
 #include "Poco/MongoDB/InsertRequest.h"
 #include "Poco/MongoDB/UpdateRequest.h"
 #include "Poco/MongoDB/DeleteRequest.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -58,51 +62,47 @@ public:
 	Database(const std::string& db);
 		/// Constructor
 
-
 	virtual ~Database();
 		/// Destructor
-
 
 	double count(Connection& connection, const std::string& collectionName) const;
 		/// Sends a count request for the given collection to MongoDB. When
 		/// the command fails, -1 is returned.
 
-
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCommand() const;
 		/// Creates a QueryRequest for a command.
-
 
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCountRequest(const std::string& collectionName) const;
 		/// Creates a QueryRequest to count the given collection. The collectionname must not contain
 		/// the database name!
 
-
 	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> createDeleteRequest(const std::string& collectionName) const;
 		/// Creates a DeleteRequest to delete documents in the given collection.
 		/// The collectionname must not contain the database name!
-
 
 	Poco::SharedPtr<Poco::MongoDB::InsertRequest> createInsertRequest(const std::string& collectionName) const;
 		/// Creates an InsertRequest to insert new documents in the given collection.
 		/// The collectionname must not contain the database name!
 
-
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName) const;
 		/// Creates a QueryRequest. The collectionname must not contain the database name!
-
 
 	Poco::SharedPtr<Poco::MongoDB::UpdateRequest> createUpdateRequest(const std::string& collectionName) const;
 		/// Creates an UpdateRequest. The collectionname must not contain the database name!
 
-
-	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection, const std::string& collection, const std::string& indexName, Poco::MongoDB::Document::Ptr keys, bool unique = false, bool background = false, int version = 0, int ttl = 0);
+	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection,
+		const std::string& collection,
+		const std::string& indexName,
+		Poco::MongoDB::Document::Ptr keys,
+		bool unique = false,
+		bool background = false,
+		int version = 0,
+		int ttl = 0);
 		/// Creates an index. The document returned is the result of a getLastError call.
 		/// For more info look at the ensureIndex information on the MongoDB website.
 
- 
 	Document::Ptr getLastErrorDoc(Connection& connection) const;
 		/// Sends the getLastError command to the database and returns the document
-
 
 	std::string getLastError(Connection& connection) const;
 		/// Sends the getLastError command to the database and returns the err element
@@ -121,29 +121,34 @@ inline Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCommand() co
 }
 
 
-inline Poco::SharedPtr<Poco::MongoDB::DeleteRequest> Database::createDeleteRequest(const std::string& collectionName) const
+inline Poco::SharedPtr<Poco::MongoDB::DeleteRequest>
+Database::createDeleteRequest(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::DeleteRequest(_dbname + '.' + collectionName);
 }
 
 
-inline Poco::SharedPtr<Poco::MongoDB::InsertRequest> Database::createInsertRequest(const std::string& collectionName) const
+inline Poco::SharedPtr<Poco::MongoDB::InsertRequest>
+Database::createInsertRequest(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::InsertRequest(_dbname + '.' + collectionName);
 }
 
 
-inline Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createQueryRequest(const std::string& collectionName) const
+inline Poco::SharedPtr<Poco::MongoDB::QueryRequest>
+Database::createQueryRequest(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::QueryRequest(_dbname + '.' + collectionName);
 }
 
 
-inline Poco::SharedPtr<Poco::MongoDB::UpdateRequest> Database::createUpdateRequest(const std::string& collectionName) const
+inline Poco::SharedPtr<Poco::MongoDB::UpdateRequest>
+Database::createUpdateRequest(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::UpdateRequest(_dbname + '.' + collectionName);
 }
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif // _MongoDB_Database_included
+
+#endif // MongoDB_Database_INCLUDED

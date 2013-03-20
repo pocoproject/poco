@@ -35,17 +35,19 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/ResponseMessage.h"
 #include "Poco/Net/SocketStream.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
+
 
 ResponseMessage::ResponseMessage() : Message(MessageHeader::Reply), _responseFlags(0), _cursorID(0), _startingFrom(0), _numberReturned(0)
 {
 }
+
 
 ResponseMessage::~ResponseMessage()
 {
@@ -83,4 +85,5 @@ void ResponseMessage::read(std::istream& istr)
 	}
 }
 
-}} // Namespace MongoDB
+
+} } // namespace Poco::MongoDB

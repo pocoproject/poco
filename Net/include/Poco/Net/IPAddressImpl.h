@@ -61,7 +61,10 @@ public:
 		,IPv6
 #endif
 	};
+	
+	virtual ~IPAddressImpl();
 
+	virtual IPAddressImpl* clone() const = 0;
 	virtual std::string toString() const = 0;
 	virtual poco_socklen_t length() const = 0;
 	virtual const void* addr() const = 0;
@@ -84,9 +87,6 @@ public:
 	virtual bool isGlobalMC() const = 0;
 	virtual void mask(const IPAddressImpl* pMask, const IPAddressImpl* pSet) = 0;
 	virtual unsigned prefixLength() const = 0;
-
-	virtual IPAddressImpl* clone() const = 0;
-	virtual ~IPAddressImpl();
 
 protected:
 	IPAddressImpl();

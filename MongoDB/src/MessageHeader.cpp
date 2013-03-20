@@ -34,24 +34,27 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#include "Poco/MongoDB/Message.h"
 
+
+#include "Poco/MongoDB/Message.h"
 #include "Poco/Exception.h"
 #include "Poco/Net/SocketStream.h"
 #include "Poco/StreamCopier.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
+
 
 MessageHeader::MessageHeader(OpCode opCode) : _messageLength(0), _requestID(0), _responseTo(0), _opCode(opCode)
 {
 }
 
+
 MessageHeader::~MessageHeader()
 {
 }
+
 
 void MessageHeader::read(BinaryReader& reader)
 {
@@ -69,6 +72,7 @@ void MessageHeader::read(BinaryReader& reader)
 	}
 }
 
+
 void MessageHeader::write(BinaryWriter& writer)
 {
 	writer << _messageLength;
@@ -77,4 +81,5 @@ void MessageHeader::write(BinaryWriter& writer)
 	writer << (Int32) _opCode;
 }
 
-}} // Namespace MongoDB
+
+} } // namespace Poco::MongoDB

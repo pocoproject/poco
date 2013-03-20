@@ -32,42 +32,38 @@
 //
 
 
-#include "Poco/Timestamp.h"
 #include "Poco/JSON/Parser.h"
-#include "Poco/JSON/DefaultHandler.h"
+#include "Poco/JSON/ParseHandler.h"
 #include "Poco/JSON/JSONException.h"
 #include "Poco/Environment.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Stopwatch.h"
 #include <iostream>
 #include <iomanip>
 
 
-void printTimeDiff(const Poco::Timestamp& start, const Poco::Timestamp& end)
-{
-	Poco::Timestamp::TimeDiff diff = end - start;
-	std::cout << std::setw(25) << std::left << diff;
-}
-
-
 int main(int argc, char** argv)
 {
+	Poco::Stopwatch sw;
 	Poco::JSON::Object::Ptr obj;
 
 	std::string dir = Poco::Environment::get("POCO_BASE") + "/JSON/samples/Benchmark/";
-	Poco::Path filePath(dir, "input");
+	Poco::Path filePath(dir, "input.json");
 
 	std::ostringstream ostr;
 
-	if ( filePath.isFile() )
+	if (filePath.isFile())
 	{
 		Poco::File inputFile(filePath);
 		if ( inputFile.exists() )
 		{
+			sw.start();
 			Poco::FileInputStream fis(filePath.toString());
 			Poco::StreamCopier::copyStream(fis, ostr);
+			sw.stop();
 		}
 		else
 		{
@@ -76,21 +72,33 @@ int main(int argc, char** argv)
 		}
 	}
 
-	std::cout << std::setw(25) << "POCO JSON";
+	std::cout << "JSON Benchmark" << std::endl;
+	std::cout << "==============" << std::endl;
 
 	std::string jsonStr = ostr.str();
-	
+	std::cout << "Total of " << jsonStr.size() << " bytes," << std::endl << "loaded in " << sw.elapsed() << " [us]," << std::endl;
+
+	std::cout << std::endl << "POCO JSON Parse" << std::endl;
+	std::cout << "---------" << std::endl;
+	Poco::JSON::Parser parser;
+	sw.restart();
+	parser.parse(jsonStr);
+	sw.stop();
+	std::cout << "parsed in " << sw.elapsed() << " [us]," << std::endl;
+
+	std::cout << std::endl << "POCO JSON Handle/Stringify" << std::endl;
+	std::cout << "--------------------------" << std::endl;
 	try
 	{
-		Poco::JSON::DefaultHandler handler;
+		Poco::JSON::ParseHandler handler;
 		Poco::JSON::Parser parser;
 		parser.setHandler(&handler);
-		Poco::Timestamp time1;
+		sw.restart();
 		parser.parse(jsonStr);
 		Poco::DynamicAny result = handler.result();
-		Poco::Timestamp time2;
-		printTimeDiff(time1, time2);
-
+		sw.stop();
+		std::cout << "parsed/handled in " << sw.elapsed() << " [us]," << std::endl;
+		
 		if ( result.type() == typeid(Poco::JSON::Object::Ptr) )
 		{
 			obj = result.extract<Poco::JSON::Object::Ptr>();
@@ -98,10 +106,10 @@ int main(int argc, char** argv)
 
 		//Serialize to string
 		std::ostringstream out;
-		Poco::Timestamp time3;
+		sw.restart();
 		obj->stringify(out);
-		Poco::Timestamp time4;
-		printTimeDiff(time3, time4);
+		sw.stop();
+		std::cout << "stringified in " << sw.elapsed() << " [us]." << std::endl;
 		std::cout << std::endl;
 	}
 	catch(Poco::JSON::JSONException jsone)

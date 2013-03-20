@@ -35,13 +35,13 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/GetMoreRequest.h"
 #include "Poco/MongoDB/Element.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 GetMoreRequest::GetMoreRequest(const std::string& collectionName, Int64 cursorID) 
@@ -52,9 +52,11 @@ GetMoreRequest::GetMoreRequest(const std::string& collectionName, Int64 cursorID
 {
 }
 
+
 GetMoreRequest::~GetMoreRequest()
 {
 }
+
 
 void GetMoreRequest::buildRequest(BinaryWriter& writer)
 {
@@ -65,4 +67,4 @@ void GetMoreRequest::buildRequest(BinaryWriter& writer)
 }
 
 
-}} // Namespace MongoDB
+} } // namespace Poco::MongoDB

@@ -35,12 +35,12 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/QueryRequest.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 QueryRequest::QueryRequest(const std::string& collectionName, QueryRequest::Flags flags) 
@@ -59,6 +59,7 @@ QueryRequest::~QueryRequest()
 {
 }
 
+
 void QueryRequest::buildRequest(BinaryWriter& writer)
 {
 	writer << _flags;
@@ -74,4 +75,4 @@ void QueryRequest::buildRequest(BinaryWriter& writer)
 }
 
 
-}} // Namespace MongoDB
+} } // namespace Poco::MongoDB

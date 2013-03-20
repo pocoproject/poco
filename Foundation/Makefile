@@ -11,7 +11,7 @@ include $(POCO_BASE)/build/rules/global
 objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	Base32Decoder Base32Encoder Base64Decoder Base64Encoder \
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Configurable ConsoleChannel \
-	CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
+	Condition CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator DirectoryWatcher \
 	Environment Event Error EventArgs ErrorHandler Exception FIFOBufferStream FPEnvironment File \
 	FileChannel Formatter FormattingChannel Glob HexBinaryDecoder LineEndingConverter \
@@ -22,7 +22,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	NotificationQueue PriorityNotificationQueue TimedNotificationQueue \
 	NullStream NumberFormatter NumberParser NumericString AbstractObserver \
 	Path PatternFormatter Process PurgeStrategy RWLock Random RandomStream \
-	RecursiveDirectoryIteratorStrategies RegularExpression RefCountedObject Runnable RotateStrategy Condition \
+	DirectoryIteratorStrategy RegularExpression RefCountedObject Runnable RotateStrategy \
 	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel SortedDirectoryIterator Stopwatch StreamChannel \
 	StreamConverter StreamCopier StreamTokenizer String StringTokenizer SynchronizedObject \

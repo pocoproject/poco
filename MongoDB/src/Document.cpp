@@ -35,7 +35,6 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include <sstream>
 
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/Binary.h"
@@ -43,16 +42,17 @@
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/RegularExpression.h"
 #include "Poco/MongoDB/JavaScriptCode.h"
+#include <sstream>
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 Document::Document()
 {
 }
+
 
 Document::~Document()
 {
@@ -198,14 +198,14 @@ void Document::write(BinaryWriter& writer)
 		Poco::BinaryWriter tempWriter(sstream);
 		for(ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
 		{
-			tempWriter << (unsigned char) (*it)->type();
+			tempWriter << static_cast<unsigned char>((*it)->type());
 			BSONWriter(tempWriter).writeCString((*it)->name());
 			Element::Ptr element = *it;
 			element->write(tempWriter);
 		}
 		tempWriter.flush();
 		
-		Poco::Int32 len = 5 + sstream.tellp(); /* 5 = sizeof(len) + 0-byte */
+		Poco::Int32 len = static_cast<Poco::Int32>(5 + sstream.tellp()); /* 5 = sizeof(len) + 0-byte */
 		writer << len;
 		writer.writeRaw(sstream.str());
 	}
@@ -213,4 +213,4 @@ void Document::write(BinaryWriter& writer)
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB

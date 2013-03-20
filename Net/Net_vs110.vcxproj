@@ -281,6 +281,7 @@
     <ClInclude Include="include\Poco\Net\NetException.h"/>
     <ClInclude Include="include\Poco\Net\NetworkInterface.h"/>
     <ClInclude Include="include\Poco\Net\SocketAddress.h"/>
+    <ClInclude Include="include\Poco\Net\SocketAddressImpl.h"/>
     <ClInclude Include="include\Poco\Net\SocketDefs.h"/>
     <ClInclude Include="include\Poco\Net\DatagramSocket.h"/>
     <ClInclude Include="include\Poco\Net\DatagramSocketImpl.h"/>
@@ -304,6 +305,7 @@
     <ClInclude Include="include\Poco\Net\NullPartHandler.h"/>
     <ClInclude Include="include\Poco\Net\PartHandler.h"/>
     <ClInclude Include="include\Poco\Net\PartSource.h"/>
+    <ClInclude Include="include\Poco\Net\PartStore.h"/>
     <ClInclude Include="include\Poco\Net\QuotedPrintableDecoder.h"/>
     <ClInclude Include="include\Poco\Net\QuotedPrintableEncoder.h"/>
     <ClInclude Include="include\Poco\Net\StringPartSource.h"/>
@@ -381,6 +383,7 @@
     <ClCompile Include="src\NetException.cpp"/>
     <ClCompile Include="src\NetworkInterface.cpp"/>
     <ClCompile Include="src\SocketAddress.cpp"/>
+    <ClCompile Include="src\SocketAddressImpl.cpp"/>
     <ClCompile Include="src\DatagramSocket.cpp"/>
     <ClCompile Include="src\DatagramSocketImpl.cpp"/>
     <ClCompile Include="src\DialogSocket.cpp"/>
@@ -403,6 +406,7 @@
     <ClCompile Include="src\NullPartHandler.cpp"/>
     <ClCompile Include="src\PartHandler.cpp"/>
     <ClCompile Include="src\PartSource.cpp"/>
+    <ClCompile Include="src\PartStore.cpp"/>
     <ClCompile Include="src\QuotedPrintableDecoder.cpp"/>
     <ClCompile Include="src\QuotedPrintableEncoder.cpp"/>
     <ClCompile Include="src\StringPartSource.cpp"/>

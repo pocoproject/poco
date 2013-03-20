@@ -12,7 +12,7 @@ SHAREDOPT_CXX += -DNet_EXPORTS
 
 objects = \
 	DNS HTTPResponse HostEntry Socket \
-	DatagramSocket HTTPServer IPAddress IPAddressImpl SocketAddress \
+	DatagramSocket HTTPServer IPAddress IPAddressImpl SocketAddress SocketAddressImpl \
 	HTTPBasicCredentials HTTPCookie HTMLForm MediaType DialogSocket \
 	DatagramSocketImpl FilePartSource HTTPServerConnection MessageHeader \
 	HTTPChunkedStream HTTPServerConnectionFactory MulticastSocket SocketStream \
@@ -25,7 +25,7 @@ objects = \
 	HTTPRequestHandler HTTPStream HTTPIOStream ServerSocket TCPServerDispatcher TCPServerConnectionFactory \
 	HTTPRequestHandlerFactory HTTPStreamFactory ServerSocketImpl TCPServerParams \
 	QuotedPrintableEncoder QuotedPrintableDecoder StringPartSource \
-	FTPClientSession FTPStreamFactory PartHandler PartSource NullPartHandler \
+	FTPClientSession FTPStreamFactory PartHandler PartSource PartStore NullPartHandler \
 	SocketReactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
 	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \

@@ -349,7 +349,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="iphlpapi.lib libeay32.lib ssleay32.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib libeay32mdd.lib ssleay32mdd.lib Crypt32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\Maild.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
@@ -424,7 +424,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="iphlpapi.lib libeay32.lib ssleay32.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib libeay32md.lib ssleay32md.lib Crypt32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\Mail.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"

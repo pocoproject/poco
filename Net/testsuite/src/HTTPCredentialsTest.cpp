@@ -172,7 +172,8 @@ void HTTPCredentialsTest::testDigestCredentials()
 	HTTPResponse response;
 	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
 	creds.authenticate(request, response);
-	assert (request.get("Authorization") == "Digest nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", response=\"40e4889cfbd0e561f71e3107a2863bc4\", uri=\"/digest/\", username=\"user\"");
+	std::string auth = request.get("Authorization");
+	assert (auth == "Digest username=\"user\", nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", uri=\"/digest/\", response=\"40e4889cfbd0e561f71e3107a2863bc4\"");
 }
 
 
@@ -244,8 +245,9 @@ void HTTPCredentialsTest::testCredentialsDigest()
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
 	HTTPResponse response;
 	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
-	creds.authenticate(request, response);	
-	assert (request.get("Authorization") == "Digest nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", response=\"40e4889cfbd0e561f71e3107a2863bc4\", uri=\"/digest/\", username=\"user\"");
+	creds.authenticate(request, response);
+	std::string auth = request.get("Authorization");
+	assert (auth == "Digest username=\"user\", nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", uri=\"/digest/\", response=\"40e4889cfbd0e561f71e3107a2863bc4\"");
 }
 
 
@@ -256,7 +258,7 @@ void HTTPCredentialsTest::testProxyCredentialsDigest()
 	HTTPResponse response;
 	response.set("Proxy-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
 	creds.proxyAuthenticate(request, response);	
-	assert (request.get("Proxy-Authorization") == "Digest nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", response=\"40e4889cfbd0e561f71e3107a2863bc4\", uri=\"/digest/\", username=\"user\"");
+	assert (request.get("Proxy-Authorization") == "Digest username=\"user\", nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", uri=\"/digest/\", response=\"40e4889cfbd0e561f71e3107a2863bc4\"");
 }
 
 

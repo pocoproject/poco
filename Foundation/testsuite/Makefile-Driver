@@ -16,7 +16,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	DateTimeParserTest DateTimeTest LocalDateTimeTest DateTimeTestSuite DigestStreamTest \
 	Driver DynamicFactoryTest FPETest FileChannelTest FileTest GlobTest FilesystemTestSuite \
 	FIFOBufferStreamTest FoundationTestSuite HMACEngineTest HexBinaryTest LoggerTest \
-	LoggingFactoryTest LoggingRegistryTest LoggingTestSuite LogStreamTest \
+	ListMapTest LoggingFactoryTest LoggingRegistryTest LoggingTestSuite LogStreamTest \
 	NamedEventTest NamedMutexTest ProcessesTestSuite ProcessTest \
 	MemoryPoolTest MD4EngineTest MD5EngineTest ManifestTest \
 	NDCTest NotificationCenterTest NotificationQueueTest \

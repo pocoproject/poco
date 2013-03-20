@@ -73,7 +73,7 @@ void HTTPRequestTest::testWrite2()
 	std::ostringstream ostr;
 	request.write(ostr);
 	std::string s = ostr.str();
-	assert (s == "HEAD /index.html HTTP/1.1\r\nConnection: Keep-Alive\r\nHost: localhost\r\nUser-Agent: Poco\r\n\r\n");
+	assert (s == "HEAD /index.html HTTP/1.1\r\nHost: localhost\r\nConnection: Keep-Alive\r\nUser-Agent: Poco\r\n\r\n");
 }
 
 
@@ -88,7 +88,7 @@ void HTTPRequestTest::testWrite3()
 	std::ostringstream ostr;
 	request.write(ostr);
 	std::string s = ostr.str();
-	assert (s == "POST /test.cgi HTTP/1.1\r\nConnection: Close\r\nContent-Length: 100\r\nContent-Type: text/plain\r\nHost: localhost:8000\r\nUser-Agent: Poco\r\n\r\n");
+	assert (s == "POST /test.cgi HTTP/1.1\r\nHost: localhost:8000\r\nConnection: Close\r\nUser-Agent: Poco\r\nContent-Length: 100\r\nContent-Type: text/plain\r\n\r\n");
 }
 
 

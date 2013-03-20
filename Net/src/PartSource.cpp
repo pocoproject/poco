@@ -64,7 +64,7 @@ namespace
 }
 
 
-const std::string& PartSource::filename()
+const std::string& PartSource::filename() const
 {
 	return EMPTY;
 }

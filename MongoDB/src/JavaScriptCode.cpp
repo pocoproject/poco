@@ -34,7 +34,10 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+
+
 #include "Poco/MongoDB/JavaScriptCode.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -45,8 +48,10 @@ JavaScriptCode::JavaScriptCode()
 
 }
 
+
 JavaScriptCode::~JavaScriptCode()
 {
 }
 
-}} // Namespace Poco::MongoDB
+
+} } // namespace Poco::MongoDB

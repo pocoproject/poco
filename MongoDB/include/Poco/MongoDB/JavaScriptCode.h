@@ -35,14 +35,17 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_JavaScriptCode_included
-#define _MongoDB_JavaScriptCode_included
+
+#ifndef MongoDB_JavaScriptCode_INCLUDED
+#define MongoDB_JavaScriptCode_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/BSONReader.h"
 #include "Poco/MongoDB/BSONWriter.h"
 #include "Poco/MongoDB/Element.h"
 #include "Poco/SharedPtr.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -54,24 +57,19 @@ class MongoDB_API JavaScriptCode
 public:
 	typedef SharedPtr<JavaScriptCode> Ptr;
 
-
 	JavaScriptCode();
 		/// Constructor
-
 
 	virtual ~JavaScriptCode();
 		/// Destructor
 
-
 	void setCode(const std::string& s);
 		/// Set the code
-
 
 	std::string getCode() const;
 		/// Get the code
 
 private:
-
 	std::string _code;
 };
 
@@ -110,6 +108,7 @@ inline void BSONReader::read<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& to)
 	to->setCode(code);
 }
 
+
 template<>
 inline void BSONWriter::write<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& from)
 {
@@ -118,6 +117,7 @@ inline void BSONWriter::write<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& from)
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //  _MongoDB_JavaScriptCode_included
+
+#endif //  MongoDB_JavaScriptCode_INCLUDED

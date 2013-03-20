@@ -35,15 +35,19 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_ObjectId_included
-#define _MongoDB_ObjectId_included
+
+#ifndef MongoDB_ObjectId_INCLUDED
+#define MongoDB_ObjectId_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
 #include "Poco/Timestamp.h"
 
+
 namespace Poco {
 namespace MongoDB {
+
 
 class MongoDB_API ObjectId
 	/// ObjectId is a 12-byte BSON type, constructed using:
@@ -60,25 +64,19 @@ class MongoDB_API ObjectId
 	/// as its value.
 {
 public:
-
 	typedef SharedPtr<ObjectId> Ptr;
-
 
 	ObjectId();
 		/// Constructor
 
-
 	virtual ~ObjectId();
 		/// Destructor
-
 
 	Timestamp timestamp() const;
 		/// Returns the timestamp which is stored in the first four bytes of the id
 
-
 	std::string toString() const;
 		/// Returns the id in string format
-
 
 private:
 	unsigned char _id[12];
@@ -99,6 +97,7 @@ inline Timestamp ObjectId::timestamp() const
 	return Timestamp::fromEpochTime((time_t) time);
 }
 
+
 // BSON Embedded Document
 // spec: ObjectId
 template<>
@@ -106,18 +105,19 @@ struct ElementTraits<ObjectId::Ptr>
 {
 	enum { TypeId = 0x07 };
 
-
 	static std::string toString(const ObjectId::Ptr& id, int indent = 0)
 	{
 		return id->toString();
 	}
 };
 
+
 template<>
 inline void BSONReader::read<ObjectId::Ptr>(ObjectId::Ptr& to)
 {
 	_reader.readRaw((char*) to->_id, 12);
 }
+
 
 template<>
 inline void BSONWriter::write<ObjectId::Ptr>(ObjectId::Ptr& from)
@@ -126,7 +126,7 @@ inline void BSONWriter::write<ObjectId::Ptr>(ObjectId::Ptr& from)
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
 
-#endif //_MongoDB_ObjectId_included
+#endif //MongoDB_ObjectId_INCLUDED

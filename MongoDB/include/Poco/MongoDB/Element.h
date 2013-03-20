@@ -35,13 +35,10 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_Element_included
-#define _MongoDB_Element_included
 
-#include <string>
-#include <sstream>
-#include <iomanip>
-#include <set>
+#ifndef MongoDB_Element_INCLUDED
+#define MongoDB_Element_INCLUDED
+
 
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
@@ -53,6 +50,11 @@
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/BSONReader.h"
 #include "Poco/MongoDB/BSONWriter.h"
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include <set>
+
 
 namespace Poco {
 namespace MongoDB {
@@ -62,41 +64,28 @@ class MongoDB_API Element
 	/// Represents an element of a Document or an Array
 {
 public:
+	typedef Poco::SharedPtr<Element> Ptr;
 
 	Element(const std::string& name);
 		/// Constructor
 
-
 	virtual ~Element();
 		/// Destructor
-
 
 	std::string name() const;
 		/// Returns the name of the element
 
-
 	virtual std::string toString(int indent = 0) const = 0;
 		/// Returns a string representation of the element.
-
 
 	virtual int type() const = 0;
 		/// Returns the MongoDB type of the element.
 
-
-	typedef Poco::SharedPtr<Element> Ptr;
-
-
 private:
-
 	virtual void read(BinaryReader& reader) = 0;
-
-
 	virtual void write(BinaryWriter& writer) = 0;
 
-
 	friend class Document;
-
-
 	std::string _name;
 };
 
@@ -125,6 +114,7 @@ struct ElementTraits
 {
 };
 
+
 // BSON Floating point
 // spec: double
 template<>
@@ -138,9 +128,10 @@ struct ElementTraits<double>
 	}
 };
 
+
 // BSON UTF-8 string
 // spec: int32 (byte*) "\x00"
-// int32 is the number bytes in byte* + 1 (for trailing "\x00"
+// int32 is the number bytes in byte* + 1 (for trailing "\x00")
 template<>
 struct ElementTraits<std::string>
 {
@@ -196,6 +187,7 @@ struct ElementTraits<std::string>
 	}
 };
 
+
 template<>
 inline void BSONReader::read<std::string>(std::string& to)
 {
@@ -205,13 +197,13 @@ inline void BSONReader::read<std::string>(std::string& to)
 	to.erase(to.end() - 1); // remove terminating 0
 }
 
+
 template<>
 inline void BSONWriter::write<std::string>(std::string& from)
 {
 	_writer << (Poco::Int32) (from.length() + 1);
 	writeCString(from);
 }
-
 
 
 // BSON bool
@@ -227,6 +219,7 @@ struct ElementTraits<bool>
 	}
 };
 
+
 template<>
 inline void BSONReader::read<bool>(bool& to)
 {
@@ -235,12 +228,14 @@ inline void BSONReader::read<bool>(bool& to)
 	to = b != 0;
 }
 
+
 template<>
 inline void BSONWriter::write<bool>(bool& from)
 {
 	unsigned char b = from ? 0x01 : 0x00;
 	_writer << b;
 }
+
 
 // BSON 32-bit integer
 // spec: int32
@@ -256,6 +251,7 @@ struct ElementTraits<Int32>
 	}
 };
 
+
 // BSON UTC datetime
 // spec: int64
 template<>
@@ -269,6 +265,7 @@ struct ElementTraits<Timestamp>
 	}
 };
 
+
 template<>
 inline void BSONReader::read<Timestamp>(Timestamp& to)
 {
@@ -278,13 +275,16 @@ inline void BSONReader::read<Timestamp>(Timestamp& to)
 	to += (value % 1000 * 1000);
 }
 
+
 template<>
 inline void BSONWriter::write<Timestamp>(Timestamp& from)
 {
 	_writer << (from.epochMicroseconds() / 1000);
 }
 
+
 typedef Nullable<unsigned char> NullValue;
+
 
 // BSON Null Value
 // spec:
@@ -299,15 +299,18 @@ struct ElementTraits<NullValue>
 	}
 };
 
+
 template<>
 inline void BSONReader::read<NullValue>(NullValue& to)
 {
 }
 
+
 template<>
 inline void BSONWriter::write<NullValue>(NullValue& from)
 {
 }
+
 
 // BSON 64-bit integer
 // spec: int64
@@ -336,14 +339,22 @@ public:
 	}
 
 	
-	T value() const { return _value; }
+	T value() const
+	{
+		return _value;
+	}
 
 
-	std::string toString(int indent = 0) const { return ElementTraits<T>::toString(_value, indent); }
+	std::string toString(int indent = 0) const
+	{
+		return ElementTraits<T>::toString(_value, indent);
+	}
 
 	
-	int type() const { return ElementTraits<T>::TypeId; }
-
+	int type() const
+	{
+		return ElementTraits<T>::TypeId;
+	}
 
 	void read(BinaryReader& reader)
 	{
@@ -356,10 +367,11 @@ public:
 	}
 
 private:
-
 	T _value;
 };
 
-}} // Namespace Poco::MongoDB
 
-#endif //  _MongoDB_Element_included
+} } // namespace Poco::MongoDB
+
+
+#endif //  MongoDB_Element_INCLUDED

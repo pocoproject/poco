@@ -60,7 +60,7 @@ public:
 		///
 		/// Subclasses must override this method.
 		
-	virtual const std::string& filename();
+	virtual const std::string& filename() const;
 		/// Returns the filename for the part or attachment.
 		///
 		/// May be overridded by subclasses. The default

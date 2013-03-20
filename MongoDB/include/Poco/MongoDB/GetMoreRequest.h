@@ -35,11 +35,14 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_GetMoreRequest_included
-#define _MongoDB_GetMoreRequest_included
+
+#ifndef MongoDB_GetMoreRequest_INCLUDED
+#define MongoDB_GetMoreRequest_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/RequestMessage.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -62,43 +65,40 @@ public:
 	virtual ~GetMoreRequest();
 		/// Destructor
 
-
 	Int32 getNumberToReturn() const;
 		/// Returns the limit of returned documents
 
-
 	void setNumberToReturn(Int32 n);
 		/// Sets the limit of returned documents
-
 
 	Int64 cursorID() const;
 		/// Returns the cursor id
 
 protected:
-
 	void buildRequest(BinaryWriter& writer);
 
-
 private:
-
 	Int32 _flags;
-
 	std::string _fullCollectionName;
-
 	Int32 _numberToReturn;
-
 	Int64 _cursorID;
 };
 
+
+//
+// inlines
+//
 inline Int32 GetMoreRequest::getNumberToReturn() const
 {
 	return _numberToReturn;
 }
 
+
 inline void GetMoreRequest::setNumberToReturn(Int32 n)
 {
 	_numberToReturn = n;
 }
+
 
 inline Int64 GetMoreRequest::cursorID() const
 {
@@ -106,6 +106,7 @@ inline Int64 GetMoreRequest::cursorID() const
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //_MongoDB_GetMoreRequest_included
+
+#endif //MongoDB_GetMoreRequest_INCLUDED

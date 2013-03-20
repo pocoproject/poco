@@ -35,12 +35,15 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_QueryRequest_included
-#define _MongoDB_QueryRequest_included
+
+#ifndef MongoDB_QueryRequest_INCLUDED
+#define MongoDB_QueryRequest_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/RequestMessage.h"
 #include "Poco/MongoDB/Document.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -48,10 +51,9 @@ namespace MongoDB {
 
 class MongoDB_API QueryRequest : public RequestMessage
 	/// Class for creating an OP_QUERY client request. This request
-    /// is used to query documents from the database.
+	/// is used to query documents from the database.
 {
 public:
-
 	typedef enum
 	{
 		QUERY_NONE = 0, 
@@ -64,7 +66,6 @@ public:
 		QUERY_PARTIAL = 128
 	} Flags;
 
-
 	QueryRequest(const std::string& collectionName, Flags flags = QUERY_NONE);
 		/// Constructor.
 		/// The full collection name is the concatenation of the database 
@@ -72,65 +73,46 @@ public:
 		/// for the database "foo" and the collection "bar", the full collection name is 
 		/// "foo.bar".
 
-
 	virtual ~QueryRequest();
 		/// Destructor
-
 
 	Flags getFlags() const;
 		/// Returns the flags
 
-
 	void setFlags(Flags flag);
 		/// Set the flags
-
 
 	std::string fullCollectionName() const;
 		/// Returns the <db>.<collection> used for this query
 
-
 	Int32 getNumberToSkip() const;
 		/// Returns the number of documents to skip
-
 
 	void setNumberToSkip(Int32 n);
 		/// Sets the number of documents to skip
 
-
 	Int32 getNumberToReturn() const;
 		/// Returns the number to return
-
 
 	void setNumberToReturn(Int32 n);
 		/// Sets the number to return (limit)
 
-
 	Document& selector();
 		/// Returns the selector document
-
 
 	Document& returnFieldSelector();
 		/// Returns the field selector document
 
-
 protected:
-
 	void buildRequest(BinaryWriter& writer);
 
-
 private:
-
-	Flags _flags;
-
+	Flags       _flags;
 	std::string _fullCollectionName;
-
-	Int32 _numberToSkip;
-
-	Int32 _numberToReturn;
-
-	Document _selector;
-
-	Document _returnFieldSelector;
+	Int32       _numberToSkip;
+	Int32       _numberToReturn;
+	Document    _selector;
+	Document    _returnFieldSelector;
 };
 
 
@@ -188,6 +170,7 @@ inline void QueryRequest::setNumberToReturn(Int32 n)
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //_MongoDB_QueryRequest_included
+
+#endif //MongoDB_QueryRequest_INCLUDED

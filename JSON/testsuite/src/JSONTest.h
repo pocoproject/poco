@@ -57,11 +57,13 @@ public:
 #endif
 	void testStringProperty();
 	void testEmptyObject();
+	void testComplexObject();
 	void testDoubleProperty();
 	void testDouble2Property();
 	void testDouble3Property();
 	void testObjectProperty();
 	void testObjectArray();
+	void testArrayOfObjects();
 	void testEmptyArray();
 	void testNestedArray();
 	void testNullElement();
@@ -73,7 +75,9 @@ public:
 	void testDoubleElement();
 	void testOptValue();
 	void testQuery();
+	void testPrintHandler();
 	void testStringify();
+	void testStringifyPreserveOrder();
 
 	void testValidJanssonFiles();
 	void testInvalidJanssonFiles();

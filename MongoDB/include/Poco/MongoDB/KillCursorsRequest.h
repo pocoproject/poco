@@ -35,11 +35,14 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_KillCursorsRequest_included
-#define _MongoDB_KillCursorsRequest_included
+
+#ifndef MongoDB_KillCursorsRequest_INCLUDED
+#define MongoDB_KillCursorsRequest_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/RequestMessage.h"
+
 
 namespace Poco {
 namespace MongoDB {
@@ -54,21 +57,17 @@ public:
 	KillCursorsRequest();
 		/// Constructor
 
-
 	virtual ~KillCursorsRequest();
 		/// Destructor
-		
 		
 	std::vector<Int64>& cursors();
 		/// Return the cursors
 		
-		
 protected:
-
 	void buildRequest(BinaryWriter& writer);
-
 	std::vector<Int64> _cursors;
 };
+
 
 inline std::vector<Int64>& KillCursorsRequest::cursors()
 {
@@ -76,6 +75,7 @@ inline std::vector<Int64>& KillCursorsRequest::cursors()
 } 
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //_MongoDB_KillCursorsRequest_included
+
+#endif //MongoDB_KillCursorsRequest_INCLUDED

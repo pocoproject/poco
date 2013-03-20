@@ -74,7 +74,7 @@ std::istream& StringPartSource::stream()
 }
 
 	
-const std::string& StringPartSource::filename()
+const std::string& StringPartSource::filename() const
 {
 	return _filename;
 }

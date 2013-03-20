@@ -35,9 +35,10 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include <sstream>
 
 #include "Poco/MongoDB/RegularExpression.h"
+#include <sstream>
+
 
 namespace Poco {
 namespace MongoDB {
@@ -88,4 +89,5 @@ SharedPtr<Poco::RegularExpression> RegularExpression::createRE() const
 	return new Poco::RegularExpression(_pattern, options);
 }
 
-}} // Namespace Poco::MongoDB
+
+} } // namespace Poco::MongoDB

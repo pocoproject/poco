@@ -67,11 +67,11 @@ public:
 	bool start(char c, std::istream& istr)
 	{
 		if (c == '{'
-         || c == '}'
-         || c == ']'
-         || c == '['
-         || c == ','
-         || c == ':')
+		 || c == '}'
+		 || c == ']'
+		 || c == '['
+		 || c == ','
+		 || c == ':')
 		{
 			_value = c;
 			return true;
@@ -594,6 +594,10 @@ bool Parser::readRow(bool firstCall)
 			{
 				if (token->asChar() == ',')
 				{
+					if (_handler != NULL)
+					{
+						_handler->comma();
+					}
 					return true; // Read next row
 				}
 				else if (token->asChar() == '}')
@@ -636,46 +640,46 @@ void Parser::readValue(const Token* token)
 		if (_handler != NULL)
 		{
 #if defined(POCO_HAVE_INT64)
-            try
-            {
-                Int64 value = token->asInteger64();
-                // if number is 32-bit, then handle as such
-                if (    value > std::numeric_limits<int>::max()
-                    || value < std::numeric_limits<int>::min() )
-                {
-                    _handler->value(value);
-                }
-                else
-                {
-                    _handler->value(static_cast<int>(value));
-                }
-            }
-            // try to handle error as unsigned in case of overflow
-            catch ( const SyntaxException& )
-            {
-                UInt64 value = token->asUnsignedInteger64();
-                // if number is 32-bit, then handle as such
-                if ( value > std::numeric_limits<unsigned>::max() )
-                {
-                    _handler->value(value);
-                }
-                else
-                {
-                    _handler->value(static_cast<unsigned>(value));
-                }
-            }
+			try
+			{
+				Int64 value = token->asInteger64();
+				// if number is 32-bit, then handle as such
+				if (	value > std::numeric_limits<int>::max()
+					|| value < std::numeric_limits<int>::min() )
+				{
+					_handler->value(value);
+				}
+				else
+				{
+					_handler->value(static_cast<int>(value));
+				}
+			}
+			// try to handle error as unsigned in case of overflow
+			catch ( const SyntaxException& )
+			{
+				UInt64 value = token->asUnsignedInteger64();
+				// if number is 32-bit, then handle as such
+				if ( value > std::numeric_limits<unsigned>::max() )
+				{
+					_handler->value(value);
+				}
+				else
+				{
+					_handler->value(static_cast<unsigned>(value));
+				}
+			}
 #else
-            try
-            {
-                int value = token->asInteger();
-                _handle->value(value);
-            }
-            // try to handle error as unsigned in case of overflow
-            catch ( const SyntaxException& )
-            {
-                unsigned value = token->asUnsignedInteger();
-                _handle->value(value);
-            }
+			try
+			{
+				int value = token->asInteger();
+				_handle->value(value);
+			}
+			// try to handle error as unsigned in case of overflow
+			catch ( const SyntaxException& )
+			{
+				unsigned value = token->asUnsignedInteger();
+				_handle->value(value);
+			}
 #endif
 		}
 		break;
@@ -773,13 +777,19 @@ bool Parser::readElements(bool firstCall)
 
 	token = nextToken();
 
-	if ( token->is(Token::SEPARATOR_TOKEN) )
+	if (token->is(Token::SEPARATOR_TOKEN))
 	{
 		if (token->asChar() == ']')
 			return false; // End of array
 
 		if (token->asChar() == ',')
+		{
+			if (_handler != NULL)
+			{
+				_handler->comma();
+			}
 			return true;
+		}
 
 		throw JSONException(format("Invalid separator '%c' found. Expecting , or ]", token->asChar()));
 	}

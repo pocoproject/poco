@@ -80,7 +80,7 @@ public:
 	std::istream& stream();
 		/// Returns a file input stream for the given file.
 		
-	const std::string& filename();
+	const std::string& filename() const;
 		/// Returns the filename portion of the path.
 
 private:

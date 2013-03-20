@@ -36,8 +36,8 @@
 //
 
 
-#ifndef Foundation_RecursiveDirectoryIteratorStategies_INCLUDE
-#define Foundation_RecursiveDirectoryIteratorStategies_INCLUDE
+#ifndef Foundation_RecursiveDirectoryIteratorStrategy_INCLUDE
+#define Foundation_RecursiveDirectoryIteratorStrategy_INCLUDE
 
 #include "Poco/Foundation.h"
 #include "Poco/DirectoryIterator.h"
@@ -49,7 +49,7 @@
 namespace Poco
 {
 
-class TraverseBase
+class Foundation_API TraverseBase
 {
 public:
 	typedef std::stack<DirectoryIterator> Stack;
@@ -77,7 +77,7 @@ private:
 };
 
 
-class ChildrenFirstTraverse: public TraverseBase
+class Foundation_API ChildrenFirstTraverse: public TraverseBase
 {
 public:
 	ChildrenFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth = D_INFINITE);
@@ -91,7 +91,7 @@ private:
 };
 
 
-class SiblingsFirstTraverse: public TraverseBase
+class Foundation_API SiblingsFirstTraverse: public TraverseBase
 {
 public:
 	SiblingsFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth = D_INFINITE);
@@ -109,4 +109,4 @@ private:
 
 } // namespace Poco
 
-#endif // Foundation_RecursiveDirectoryIteratorStategies_INCLUDE
+#endif // Foundation_RecursiveDirectoryIteratorStrategy_INCLUDE

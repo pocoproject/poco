@@ -35,12 +35,12 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "Poco/MongoDB/Database.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 Database::Database( const std::string& db) : _dbname(db)
@@ -126,6 +126,7 @@ Document::Ptr Database::getLastErrorDoc(Connection& connection) const
 	return errorDoc;
 }
 
+
 std::string Database::getLastError(Connection& connection) const
 {
 	Document::Ptr errorDoc = getLastErrorDoc(connection);
@@ -147,4 +148,4 @@ Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const 
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB

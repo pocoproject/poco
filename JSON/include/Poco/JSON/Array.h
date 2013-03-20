@@ -137,9 +137,9 @@ public:
 	void add(const Dynamic::Var& value);
 		/// Add the given value to the array
 
-	void stringify(std::ostream& out, unsigned int indent) const;
-		/// Prints the array to out. When indent is 0, the array
-		/// will be printed on one line without indentation.
+	void stringify(std::ostream& out, unsigned int indent = 0, int step = -1) const;
+		/// Prints the array to out. When indent has zero value,
+		/// the array will be printed without newline breaks and spaces between elements.
 
 	void remove(unsigned int index);
 		/// Removes the element on the given index.

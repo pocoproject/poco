@@ -94,8 +94,8 @@ void DirectoryIteratorsTest::testSortedDirectoryIterator()
 	assertEquals("2", result[2]);
 	assertEquals("A", result[3]);
 	assertEquals("B", result[4]);
-	assertEquals("a", result[5]);
-	assertEquals("b", result[6]);
+	assertEquals("c", result[5]);
+	assertEquals("d", result[6]);
 }
 
 
@@ -139,14 +139,8 @@ void DirectoryIteratorsTest::testSiblingsFirstRecursiveDirectoryIterator()
 
 void DirectoryIteratorsTest::setUp()
 {
-	try
-	{
-		File d(path());
-		d.remove(true);
-	}
-	catch (...)
-	{
-	}
+	File d(path());
+	if (d.exists()) d.remove(true);
 
 	/*
 	  Build Directory Tree like this:
@@ -156,22 +150,22 @@ void DirectoryIteratorsTest::setUp()
 		|-- 2
 		|-- A
 		|-- B
-		|-- a
-		|-- b
+		|-- c
+		|-- d
 		`-- first
 			|-- 1
 			|-- 2
 			|-- A
 			|-- B
-			|-- a
-			|-- b
+			|-- c
+			|-- d
 			`-- second
 				|-- 1
 				|-- 2
 				|-- A
 				|-- B
-				|-- a
-				`-- b
+				|-- c
+				`-- d
 
 		2 directories, 18 files
 	 */
@@ -190,12 +184,12 @@ void DirectoryIteratorsTest::createSubdir(Path& p)
 {
 	File d(p);
 	d.createDirectories();
-	FileStream f1(p.toString() + "b");
+	FileStream f1(p.toString() + "d");
 	FileStream f2(p.toString() + "1");
 	FileStream f3(p.toString() + "A");
 	FileStream f4(p.toString() + "2");
 	FileStream f5(p.toString() + "B");
-	FileStream f6(p.toString() + "a");
+	FileStream f6(p.toString() + "c");
 }
 
 

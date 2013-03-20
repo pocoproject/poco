@@ -35,17 +35,18 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _MongoDB_UpdateRequest_included
-#define _MongoDB_UpdateRequest_included
+
+#ifndef MongoDB_UpdateRequest_INCLUDED
+#define MongoDB_UpdateRequest_INCLUDED
+
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/RequestMessage.h"
 #include "Poco/MongoDB/Document.h"
 
-namespace Poco
-{
-namespace MongoDB
-{
+
+namespace Poco {
+namespace MongoDB {
 
 
 class UpdateRequest : public RequestMessage
@@ -53,7 +54,6 @@ class UpdateRequest : public RequestMessage
 	/// to update a document.
 {
 public:
-	
 	typedef enum
 	{
 		UPDATE_NOFLAGS = 0,
@@ -72,7 +72,6 @@ public:
 		/// for the database "foo" and the collection "bar", the full collection name is 
 		/// "foo.bar".
 
-
 	virtual ~UpdateRequest();
 		/// Destructor
 		
@@ -84,29 +83,21 @@ public:
 	Document& update();
 		/// The document to update
 
-
 	Flags flags() const;
 		/// Returns the flags
 
-
 	void flags(Flags flags);
 		/// Sets the flags
-		
 
 protected:
-
 	void buildRequest(BinaryWriter& writer);
 
 
 private:
-
-	Flags _flags;
-
+	Flags       _flags;
 	std::string _fullCollectionName;
-
-	Document _selector;
-
-	Document _update;
+	Document    _selector;
+	Document    _update;
 };
 
 
@@ -131,6 +122,7 @@ inline Document& UpdateRequest::update()
 }
 
 
-}} // Namespace Poco::MongoDB
+} } // namespace Poco::MongoDB
 
-#endif //_MongoDB_UpdateRequest_included
+
+#endif //MongoDB_UpdateRequest_INCLUDED

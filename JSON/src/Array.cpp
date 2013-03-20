@@ -120,8 +120,10 @@ bool Array::isObject(unsigned int index) const
 }
 
 
-void Array::stringify(std::ostream& out, unsigned int indent) const
+void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 {
+	if (step == -1) step = indent;
+
 	out << "[";
 
 	if (indent > 0) out << std::endl;
@@ -130,14 +132,21 @@ void Array::stringify(std::ostream& out, unsigned int indent) const
 	{
 		for(int i = 0; i < indent; i++) out << ' ';
 
-		Stringifier::stringify(*it, out, indent);
+		Stringifier::stringify(*it, out, indent + step, step);
 
 		if ( ++it != _values.end() )
 		{
 			out << ",";
-			if ( indent > 0 ) out << std::endl;
+			if (step > 0) out << '\n';
 		}
 	}
+
+	if (step > 0) out << '\n';
+
+	if (indent >= step) indent -= step;
+
+	for (int i = 0; i < indent; i++)
+		out << ' ';
 
 	out << "]";
 }
