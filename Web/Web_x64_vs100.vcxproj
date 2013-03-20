@@ -26,36 +26,67 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\DirectAction.cpp" />
+    <ClCompile Include="src\DirectHandler.cpp" />
+    <ClCompile Include="src\DirectResponse.cpp" />
+    <ClCompile Include="src\JSONCondenser.cpp" />
+    <ClCompile Include="src\JSONConfiguration.cpp" />
+    <ClCompile Include="src\JSONEntity.cpp" />
+    <ClCompile Include="src\JSONHandler.cpp" />
+    <ClCompile Include="src\JSONParser.cpp" />
+    <ClCompile Include="src\JSONPrettyPrinter.cpp" />
+    <ClCompile Include="src\JSONPrinter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\Web\ExtJS\DirectAction.h" />
+    <ClInclude Include="include\Poco\Web\ExtJS\DirectHandler.h" />
+    <ClInclude Include="include\Poco\Web\ExtJS\DirectResponse.h" />
+    <ClInclude Include="include\Poco\Web\JSONCondenser.h" />
+    <ClInclude Include="include\Poco\Web\JSONConfiguration.h" />
+    <ClInclude Include="include\Poco\Web\JSONEntity.h" />
+    <ClInclude Include="include\Poco\Web\JSONHandler.h" />
+    <ClInclude Include="include\Poco\Web\JSONParser.h" />
+    <ClInclude Include="include\Poco\Web\JSONPrettyPrinter.h" />
+    <ClInclude Include="include\Poco\Web\JSONPrinter.h" />
+    <ClInclude Include="include\Poco\Web\Web.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>Benchmark</ProjectName>
-    <ProjectGuid>{D0381ECF-E750-32DA-8EEF-92D56B172D15}</ProjectGuid>
-    <RootNamespace>Benchmark</RootNamespace>
+    <ProjectName>Web</ProjectName>
+    <ProjectGuid>{0E7FE914-0690-3EB4-9119-93A97CC97741}</ProjectGuid>
+    <RootNamespace>Web</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
@@ -80,36 +111,32 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">bin64\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">..\bin64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">obj64\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">bin64\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">..\bin64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">obj64\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">bin64\static_mt\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">..\lib64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">bin64\static_mt\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">..\lib64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">bin64\static_md\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">..\lib64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">bin64\static_md\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">..\lib64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">false</LinkIncremental>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">Benchmarkd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">Benchmarkd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">Benchmarkd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">Benchmark</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">Benchmark</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">Benchmark</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoWeb64d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoWebmdd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoWebmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoWeb64</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">PocoWebmd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">PocoWebmt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;Web_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -125,13 +152,14 @@
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>bin64\Benchmarkd.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\bin64\PocoWeb64d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>bin64\Benchmarkd.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>..\bin64\PocoWeb64d.pdb</ProgramDatabaseFile>
+      <AdditionalLibraryDirectories>..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
+      <ImportLibrary>..\lib64\PocoWebd.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -142,8 +170,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;Web_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -157,21 +185,23 @@
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>bin64\Benchmark.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\bin64\PocoWeb64.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <ImportLibrary>..\lib64\PocoWeb.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -181,21 +211,15 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader />
+      <ProgramDataBaseFileName>..\lib64\PocoWebmtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>iphlpapi.lib;winmm.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>bin64\static_mt\Benchmarkd.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>bin64\static_mt\Benchmarkd.pdb</ProgramDatabaseFile>
-      <SubSystem>Console</SubSystem>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
+    <Lib>
+      <OutputFile>..\lib64\PocoWebmtd.lib</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
     <ClCompile>
@@ -204,8 +228,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -218,22 +242,15 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>iphlpapi.lib;winmm.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>bin64\static_mt\Benchmark.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
+    <Lib>
+      <OutputFile>..\lib64\PocoWebmt.lib</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -243,21 +260,15 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader />
+      <ProgramDataBaseFileName>..\lib64\PocoWebmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>iphlpapi.lib;winmm.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>bin64\static_md\Benchmarkd.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>bin64\static_md\Benchmarkd.pdb</ProgramDatabaseFile>
-      <SubSystem>Console</SubSystem>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
+    <Lib>
+      <OutputFile>..\lib64\PocoWebmdd.lib</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
     <ClCompile>
@@ -266,8 +277,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\..\..\Foundation\include;..\..\..\JSON\include;..\..\..\Web\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -280,55 +291,10 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>iphlpapi.lib;winmm.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>bin64\static_md\Benchmark.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
+    <Lib>
+      <OutputFile>..\lib64\PocoWebmd.lib</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="src\Benchmark.cpp" />
-    <ClCompile Include="src\json.c" />
-    <ClCompile Include="src\libjson\Source\internalJSONNode.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONAllocator.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONChildren.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONDebug.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONIterators.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONMemory.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONNode.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONNode_Mutex.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONPreparse.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONStream.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONValidator.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONWorker.cpp" />
-    <ClCompile Include="src\libjson\Source\JSONWriter.cpp" />
-    <ClCompile Include="src\libjson\Source\JSON_Base64.cpp" />
-    <ClCompile Include="src\libjson\Source\libjson.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\json.h" />
-    <ClInclude Include="src\libjson\Source\internalJSONNode.h" />
-    <ClInclude Include="src\libjson\Source\JSONAllocator.h" />
-    <ClInclude Include="src\libjson\Source\JSONChildren.h" />
-    <ClInclude Include="src\libjson\Source\JSONDebug.h" />
-    <ClInclude Include="src\libjson\Source\JSONDefs.h" />
-    <ClInclude Include="src\libjson\Source\JSONGlobals.h" />
-    <ClInclude Include="src\libjson\Source\JSONMemory.h" />
-    <ClInclude Include="src\libjson\Source\JSONMemoryPool.h" />
-    <ClInclude Include="src\libjson\Source\JSONNode.h" />
-    <ClInclude Include="src\libjson\Source\JSONPreparse.h" />
-    <ClInclude Include="src\libjson\Source\JSONSingleton.h" />
-    <ClInclude Include="src\libjson\Source\JSONStream.h" />
-    <ClInclude Include="src\libjson\Source\JSONValidator.h" />
-    <ClInclude Include="src\libjson\Source\JSONWorker.h" />
-    <ClInclude Include="src\libjson\Source\JSON_Base64.h" />
-    <ClInclude Include="src\libjson\Source\NumberToString.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

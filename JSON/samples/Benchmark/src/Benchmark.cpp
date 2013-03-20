@@ -92,8 +92,9 @@ int main(int argc, char** argv)
 	std::cout << std::endl << "POCO JSON" << std::endl;
 	std::cout << "---------" << std::endl;
 	Poco::JSON::Parser parser;
+	std::istringstream istr(jsonStr);
 	sw.restart();
-	parser.parse(jsonStr);
+	parser.parse(istr);
 	sw.stop();
 	std::cout << "parsed in " << sw.elapsed() << " [us]," << std::endl;
 
@@ -120,8 +121,9 @@ int main(int argc, char** argv)
 		Poco::JSON::ParseHandler handler;
 		Poco::JSON::Parser parser;
 		parser.setHandler(&handler);
+		std::istringstream istr2(jsonStr);
 		sw.restart();
-		parser.parse(jsonStr);
+		parser.parse(istr2);
 		Poco::DynamicAny result = handler.result();
 		sw.stop();
 		std::cout << "parsed in " << sw.elapsed() << " [us]," << std::endl;
