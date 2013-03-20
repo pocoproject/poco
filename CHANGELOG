@@ -33,6 +33,7 @@ Release 1.5.2 (2013-03-??)
 - fixed GH #61: static_md build configs for Crypto and NetSSL
 - fixed GH #130: prefer sysconf over sysctlbyname
 - fixed GH #131: no timezone global var on OpenBSD
+- fixed GH #102: Some subprojects don't have x64 solutions for VS 2010
 
 Release 1.5.1 (2013-01-11)
 ==========================
