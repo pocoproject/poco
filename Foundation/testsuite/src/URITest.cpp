@@ -764,6 +764,13 @@ void URITest::testOther()
 	assert(uri.getRawQuery() == "q=pony%7eride");
 	assert(uri.toString() == "http://google.com/search?q=pony%7eride#frag%20ment");
 	assert(uri.getPathEtc() == "/search?q=pony%7eride#frag%20ment");
+
+	uri.addQueryParameter("pa=ra&m1");
+	assert(uri.getRawQuery() == "q=pony%7eride&pa%3Dra%26m1=");
+	assert(uri.getQuery() == "q=pony~ride&pa=ra&m1=");
+	uri.addQueryParameter("pa=ra&m2", "val&ue");
+	assert(uri.getRawQuery() == "q=pony%7eride&pa%3Dra%26m1=&pa%3Dra%26m2=val%26ue");
+	assert(uri.getQuery() == "q=pony~ride&pa=ra&m1=&pa=ra&m2=val&ue");
 }
 
 
