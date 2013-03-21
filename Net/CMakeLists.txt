@@ -77,6 +77,7 @@ set( BASE_SRCS
   src/SMTPClientSession.cpp
   src/Socket.cpp
   src/SocketAddress.cpp
+  src/SocketAddressImpl.cpp
   src/SocketImpl.cpp
   src/SocketNotification.cpp
   src/SocketNotifier.cpp
