@@ -38,8 +38,12 @@
 #include "Poco/Util/SystemConfiguration.h"
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/Util/PropertyFileConfiguration.h"
+#ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 #include "Poco/Util/IniFileConfiguration.h"
+#endif
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
 #include "Poco/Util/XMLConfiguration.h"
+#endif
 #include "Poco/Util/JSONConfiguration.h"
 #include "Poco/Util/LoggingSubsystem.h"
 #include "Poco/Util/Option.h"
