@@ -41,6 +41,11 @@
 
 
 #include "Poco/Util/Util.h"
+
+
+#ifndef POCO_UTIL_NO_INIFILECONFIGURATION
+
+
 #include "Poco/Util/AbstractConfiguration.h"
 #include <map>
 #include <istream>
@@ -108,6 +113,9 @@ private:
 
 
 } } // namespace Poco::Util
+
+
+#endif // POCO_UTIL_NO_INIFILECONFIGURATION
 
 
 #endif // Util_IniFileConfiguration_INCLUDED

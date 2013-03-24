@@ -36,16 +36,16 @@
 //
 
 
-// Avoid accidental linking of XML library when XMLConfiguration
-// is not desired.
-#ifndef POCO_UTIL_NO_XMLCONFIGURATION
-
-
 #ifndef Util_XMLConfiguration_INCLUDED
 #define Util_XMLConfiguration_INCLUDED
 
 
 #include "Poco/Util/Util.h"
+
+
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
+
+
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/AutoPtr.h"
@@ -219,6 +219,7 @@ private:
 } } // namespace Poco::Util
 
 
-#endif // Util_XMLConfiguration_INCLUDED
-
 #endif // POCO_UTIL_NO_XMLCONFIGURATION
+
+
+#endif // Util_XMLConfiguration_INCLUDED

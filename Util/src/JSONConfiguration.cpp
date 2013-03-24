@@ -34,14 +34,15 @@
 //
 
 
-// Avoid accidental linking of JSON library when JSONConfiguration
-// is not desired.
+
+#include "Poco/Util/JSONConfiguration.h"
+
+
 #ifndef POCO_UTIL_NO_JSONCONFIGURATION
 
 
 #include "Poco/FileStream.h"
 #include "Poco/StringTokenizer.h"
-#include "Poco/Util/JSONConfiguration.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Query.h"
 #include "Poco/JSON/DefaultHandler.h"
@@ -409,5 +410,6 @@ void JSONConfiguration::removeRaw(const std::string& key)
 
 
 } } // namespace Poco::Util
+
 
 #endif // POCO_UTIL_NO_JSONCONFIGURATION
