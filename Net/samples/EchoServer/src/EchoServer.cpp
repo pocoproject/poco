@@ -131,9 +131,13 @@ public:
 	
 	void onSocketReadable(const AutoPtr<ReadableNotification>& pNf)
 	{
-		// receive bytes and transfer(echo) them to the output FIFO buffer
-		int len = _socket.receiveBytes(_fifoIn);
-		_fifoIn.drain(_fifoOut.write(_fifoIn.buffer()));
+		// some socket implementations (windows) report available 
+		// bytes on client disconnect, so we  double-check here
+		if (_socket.available())
+		{
+			int len = _socket.receiveBytes(_fifoIn);
+			_fifoIn.drain(_fifoOut.write(_fifoIn.buffer()));
+		}
 	}
 	
 	void onSocketWritable(const AutoPtr<WritableNotification>& pNf)
