@@ -43,7 +43,7 @@
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
-#include "Poco/JSON/Handler.h"
+#include "Poco/JSON/ParseHandler.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/StreamTokenizer.h"
 #include <istream>
@@ -59,23 +59,26 @@ class JSON_API Parser
 {
 public:
 
-	Parser();
+	Parser(const Handler::Ptr& pHandler = new ParseHandler);
 		/// Constructor.
 
 	virtual ~Parser();
 		/// Destructor.
 
-	void parse(const std::string& source);
+	Dynamic::Var parse(const std::string& source);
 		/// Parses a string.
 
-	void parse(std::istream& in);
+	Dynamic::Var parse(std::istream& in);
 		/// Parses a JSON from the input stream.
 
-	void setHandler(Handler* handler);
+	void setHandler(const Handler::Ptr& pHandler);
 		/// Set the handler.
 
-	Handler* getHandler();
+	const Handler::Ptr& getHandler();
 		/// Returns the handler.
+
+	Dynamic::Var result() const;
+		/// Returns the result of parsing;
 
 private:
 	const Token* nextToken();
@@ -97,26 +100,32 @@ private:
 		/// Read all elements of an array.
 
 	StreamTokenizer _tokenizer;
-	Handler*        _handler;
+	Handler::Ptr    _pHandler;
 };
 
 
-inline void Parser::parse(const std::string& source)
+inline Dynamic::Var Parser::parse(const std::string& source)
 {
 	std::istringstream is(source);
-	parse(is);
+	return parse(is);
 }
 
 
-inline void Parser::setHandler(Handler* handler)
+inline void Parser::setHandler(const Handler::Ptr& pHandler)
 {
-	_handler = handler;
+	_pHandler = pHandler;
 }
 
 
-inline Handler* Parser::getHandler()
+inline const Handler::Ptr& Parser::getHandler()
 {
-	return _handler;
+	return _pHandler;
+}
+
+
+inline Dynamic::Var Parser::result() const
+{
+	return _pHandler->result();
 }
 
 
