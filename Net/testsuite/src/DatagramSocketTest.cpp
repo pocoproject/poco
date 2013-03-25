@@ -135,7 +135,8 @@ CppUnit::Test* DatagramSocketTest::suite()
 
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEcho);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testSendToReceiveFrom);
+#if (POCO_OS != POCO_OS_FREE_BSD) // TODO
 	CppUnit_addTest(pSuite, DatagramSocketTest, testBroadcast);
-
+#endif
 	return pSuite;
 }
