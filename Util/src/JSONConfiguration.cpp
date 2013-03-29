@@ -45,7 +45,6 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Query.h"
-#include "Poco/JSON/DefaultHandler.h"
 #include "Poco/RegularExpression.h"
 #include "Poco/NumberParser.h"
 
@@ -91,10 +90,8 @@ void JSONConfiguration::load(const std::string& path)
 void JSONConfiguration::load(std::istream& istr)
 {
 	JSON::Parser parser;
-	JSON::DefaultHandler handler;
-	parser.setHandler(&handler);
 	parser.parse(istr);
-	DynamicAny result = handler.result();
+	DynamicAny result = parser.result();
 	if ( result.type() == typeid(JSON::Object::Ptr) )
 	{
 		_object = result.extract<JSON::Object::Ptr>();
