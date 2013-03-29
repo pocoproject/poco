@@ -88,10 +88,7 @@ void JSONTest::testNullProperty()
 	Var result;
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -115,10 +112,7 @@ void JSONTest::testTrueProperty()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -144,10 +138,7 @@ void JSONTest::testFalseProperty()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -173,10 +164,7 @@ void JSONTest::testNumberProperty()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -203,10 +191,7 @@ void JSONTest::testUnsignedNumberProperty()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -234,10 +219,7 @@ void JSONTest::testNumber64Property()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -264,10 +246,7 @@ void JSONTest::testUnsignedNumber64Property()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -295,10 +274,7 @@ void JSONTest::testStringProperty()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -324,10 +300,7 @@ void JSONTest::testEmptyObject()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -404,10 +377,7 @@ void JSONTest::testComplexObject()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -427,10 +397,7 @@ void JSONTest::testDoubleProperty()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -456,10 +423,7 @@ void JSONTest::testDouble2Property()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -485,10 +449,7 @@ void JSONTest::testDouble3Property()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -514,10 +475,7 @@ void JSONTest::testObjectProperty()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -550,10 +508,7 @@ void JSONTest::testObjectArray()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -580,10 +535,7 @@ void JSONTest::testArrayOfObjects()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -611,10 +563,7 @@ void JSONTest::testEmptyArray()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -637,10 +586,7 @@ void JSONTest::testNestedArray()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -663,10 +609,7 @@ void JSONTest::testNullElement()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -691,10 +634,7 @@ void JSONTest::testTrueElement()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -720,10 +660,7 @@ void JSONTest::testFalseElement()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -749,10 +686,7 @@ void JSONTest::testNumberElement()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -778,10 +712,7 @@ void JSONTest::testStringElement()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -807,10 +738,7 @@ void JSONTest::testEmptyObjectElement()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -834,10 +762,7 @@ void JSONTest::testDoubleElement()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -863,10 +788,7 @@ void JSONTest::testOptValue()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -890,10 +812,7 @@ void JSONTest::testQuery()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -915,12 +834,12 @@ void JSONTest::testPrintHandler()
 	std::string json = "{ \"name\" : \"Homer\", \"age\" : 38, \"wife\" : \"Marge\", \"age\" : 36, \"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ] }";
 	Parser parser;
 	std::ostringstream ostr;
-	PrintHandler handler(ostr);
-	parser.setHandler(&handler);
+	PrintHandler::Ptr pHandler = new PrintHandler(ostr);
+	parser.setHandler(pHandler);
 	parser.parse(json);
 	assert (ostr.str() == "{\"name\":\"Homer\",\"age\":38,\"wife\":\"Marge\",\"age\":36,\"children\":[\"Bart\",\"Lisa\",\"Maggie\"]}");
 
-	handler.setIndent(1);
+	pHandler->setIndent(1);
 	ostr.str("");
 	parser.parse(json);
 	assert (ostr.str() == "{\n"
@@ -936,7 +855,7 @@ void JSONTest::testPrintHandler()
 		"}"
 	);
 
-	handler.setIndent(2);
+	pHandler->setIndent(2);
 	ostr.str("");
 	parser.parse(json);
 	assert (ostr.str() == "{\n"
@@ -952,7 +871,7 @@ void JSONTest::testPrintHandler()
 		"}"
 	);
 
-	handler.setIndent(4);
+	pHandler->setIndent(4);
 	ostr.str("");
 	parser.parse(json);
 	assert (ostr.str() == "{\n"
@@ -980,10 +899,7 @@ void JSONTest::testStringify()
 
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -1104,15 +1020,14 @@ void JSONTest::testStringifyPreserveOrder()
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
 						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
 						"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", \"town\" : \"Springfield\" } } }";
-	Parser parser;
+
+	ParseHandler::Ptr pHandler = new ParseHandler(true);
+	Parser parser(pHandler);
 	Var result;
 
 	try
 	{
-		ParseHandler handler(true);
-		parser.setHandler(&handler);
-		parser.parse(json);
-		result = handler.result();
+		result = parser.parse(json);
 	}
 	catch(JSONException& jsone)
 	{
@@ -1124,6 +1039,7 @@ void JSONTest::testStringifyPreserveOrder()
 	std::ostringstream ostr;
 
 	Stringifier::condense(result, ostr);
+	std::cout << ostr.str() << std::endl;
 	assert (ostr.str() == "{\"Simpsons\":{\"husband\":{\"name\":\"Homer\",\"age\":38},\"wife\":{\"name\":\"Marge\",\"age\":36},"
 						"\"children\":[\"Bart\",\"Lisa\",\"Maggie\"],"
 						"\"address\":{\"number\":742,\"street\":\"Evergreen Terrace\",\"town\":\"Springfield\"}}}");
@@ -1235,10 +1151,8 @@ void JSONTest::testValidJanssonFiles()
 
 				try
 				{
-					ParseHandler handler;
-					parser.setHandler(&handler);
 					parser.parse(fis);
-					result = handler.result();
+					result = parser.result();
 					std::cout << "Ok!" << std::endl;
 				}
 				catch(JSONException& jsone)
@@ -1283,10 +1197,8 @@ void JSONTest::testInvalidJanssonFiles()
 
 				try
 				{
-					ParseHandler handler;
-					parser.setHandler(&handler);
 					parser.parse(fis);
-					result = handler.result();
+					result = parser.result();
 					// We shouldn't get here.
 					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl; 
 					fail(result.convert<std::string>());
@@ -1327,10 +1239,8 @@ void JSONTest::testInvalidUnicodeJanssonFiles()
 
 				try
 				{
-					ParseHandler handler;
-					parser.setHandler(&handler);
 					parser.parse(fis);
-					result = handler.result();
+					result = parser.result();
 					// We shouldn't get here.
 					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl; 
 					fail(result.convert<std::string>());
@@ -1375,10 +1285,8 @@ void JSONTest::testUnicode()
 	Var result;
 	try
 	{
-		ParseHandler handler;
-		parser.setHandler(&handler);
 		parser.parse(json);
-		result = handler.result();
+		result = parser.result();
 	}
 	catch(JSONException& jsone)
 	{

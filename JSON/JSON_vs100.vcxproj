@@ -268,7 +268,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\JSON\Array.h" />
-    <ClInclude Include="include\Poco\JSON\DefaultHandler.h" />
     <ClInclude Include="include\Poco\JSON\Handler.h" />
     <ClInclude Include="include\Poco\JSON\JSON.h" />
     <ClInclude Include="include\Poco\JSON\JSONException.h" />

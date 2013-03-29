@@ -41,6 +41,7 @@
 
 
 #include "Poco/JSON/JSON.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
 
 
@@ -51,8 +52,13 @@ namespace JSON {
 class JSON_API Handler
 {
 public:
+	typedef SharedPtr<Handler> Ptr;
+
 	Handler();
 		/// Constructor;
+	
+	virtual ~Handler();
+		/// Destructor
 
 	virtual void startObject() = 0;
 		/// The parser has read a {, meaning a new object will be read
@@ -100,12 +106,9 @@ public:
 	virtual void comma();
 		/// A comma is read
 
-protected:
-
-	virtual ~Handler();
-		/// Destructor
-
-private:
+	virtual Dynamic::Var result() const;
+		/// Returns the result of the parser (an object, array or string),
+		/// empty Var if there is no result.
 };
 
 
