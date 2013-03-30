@@ -34,6 +34,8 @@ Release 1.5.2 (2013-03-??)
 - fixed GH #102: Some subprojects don't have x64 solutions for VS 2010
 - added GH #75: Poco::Uri addQueryParameter method
 - Poco::Environment::osDisplayName() now recognized Windows 8/Server 2012
+- fixed SF #140: Poco::Runnable threading cleanup issue
+- simplified default TCP/HTTPServer construction
 
 Release 1.5.1 (2013-01-11)
 ==========================
