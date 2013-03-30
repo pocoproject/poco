@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="SQLToMongo"
-	Version="7.10"
 	ProjectType="Visual C++"
+	Version="7.10"
+	Name="SQLToMongo"
 	ProjectGUID="{D0381ECF-E750-32DA-8EEF-92D56B172D15}"
 	RootNamespace="SQLToMongo"
 	Keyword="Win32Proj">
@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\MongoDB\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\MongoDB\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
@@ -84,7 +84,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\MongoDB\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\MongoDB\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -143,7 +143,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\MongoDB\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\MongoDB\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
@@ -207,7 +207,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\MongoDB\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\MongoDB\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
@@ -266,7 +266,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\MongoDB\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\MongoDB\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
@@ -330,7 +330,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\MongoDB\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\MongoDB\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -381,15 +381,19 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
-	<References/>
+	<References>
+	</References>
 	<Files>
 		<Filter
-			Name="Header Files"/>
+			Name="Header Files">
+		</Filter>
 		<Filter
 			Name="Source Files">
 			<File
-				RelativePath=".\src\SQLToMongo.cpp"/>
+				RelativePath=".\src\SQLToMongo.cpp">
+			</File>
 		</Filter>
 	</Files>
-	<Globals/>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

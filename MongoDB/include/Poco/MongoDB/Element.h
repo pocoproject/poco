@@ -271,7 +271,7 @@ inline void BSONReader::read<Timestamp>(Timestamp& to)
 {
 	Poco::Int64 value;
 	_reader >> value;
-	to = Timestamp::fromEpochTime(value / 1000);
+	to = Timestamp::fromEpochTime(static_cast<std::time_t>(value / 1000));
 	to += (value % 1000 * 1000);
 }
 

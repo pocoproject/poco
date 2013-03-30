@@ -48,6 +48,9 @@
 namespace Poco {
 
 
+class Any;
+
+
 namespace Dynamic {
 
 class Var;
@@ -103,7 +106,11 @@ public:
 			return pHolder;
 	}
 
-private:
+// MSVC71 doesn't extend friendship to nested class (Any::Holder)
+#if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 71))
+	private:
+#endif
+	
 	PlaceholderT*         pHolder;
 	mutable unsigned char holder[SizeV + 1];
 
