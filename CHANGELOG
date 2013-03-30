@@ -36,6 +36,7 @@ Release 1.5.2 (2013-03-??)
 - Poco::Environment::osDisplayName() now recognized Windows 8/Server 2012
 - fixed GH #140: Poco::Runnable threading cleanup issue
 - simplified default TCP/HTTPServer construction
+- fixed GH #141: Application::run() documentation/implementation discrepancy
 
 Release 1.5.1 (2013-01-11)
 ==========================
