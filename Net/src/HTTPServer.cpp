@@ -42,6 +42,13 @@ namespace Poco {
 namespace Net {
 
 
+HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::UInt16 portNumber, HTTPServerParams::Ptr pParams):
+	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), portNumber, pParams),
+	_pFactory(pFactory)
+{
+}
+
+
 HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
 	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), socket, pParams),
 	_pFactory(pFactory)

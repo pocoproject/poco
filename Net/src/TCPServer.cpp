@@ -50,6 +50,15 @@ namespace Poco {
 namespace Net {
 
 
+TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 portNumber, TCPServerParams::Ptr pParams):
+	_socket(ServerSocket(portNumber)),
+	_pDispatcher(new TCPServerDispatcher(pFactory, Poco::ThreadPool::defaultPool(), pParams)),
+	_thread(threadName(_socket)),
+	_stopped(true)
+{
+}
+
+
 TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams):
 	_socket(socket),
 	_pDispatcher(new TCPServerDispatcher(pFactory, Poco::ThreadPool::defaultPool(), pParams)),
