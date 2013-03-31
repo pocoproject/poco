@@ -668,9 +668,17 @@ inline void Var::swap(Var& other)
 	else
 	{
 		Var tmp(*this);
-		if (_placeholder.isLocal()) destruct();
-		construct(other);
-		other = tmp;
+		try
+		{
+			if (_placeholder.isLocal()) destruct();
+			construct(other);
+			other = tmp;
+		}
+		catch (...)
+		{
+			construct(tmp);
+			throw;
+		}
 	}
 
 #endif

@@ -106,9 +106,9 @@ public:
 			return pHolder;
 	}
 
-// MSVC71 doesn't extend friendship to nested class (Any::Holder)
-#if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 71))
-	private:
+// MSVC71,80 won't extend friendship to nested class (Any::Holder)
+#if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 80))
+// private:
 #endif
 	
 	PlaceholderT*         pHolder;
@@ -165,7 +165,7 @@ public:
 		if(!empty())
 		{
 			if(_valueHolder.isLocal())
-				content()->~ValueHolder();
+				destruct();
 			else
 				delete content();
 		}
@@ -174,9 +174,9 @@ public:
 	Any& swap(Any& other)
 		/// Swaps the content of the two Anys.
 		/// 
-		/// When small object optimizaton is enabled,
-		/// swap is only exception-safe when both (*this and
-		/// other) objects are allocated on the heap.
+		/// When small object optimizaton is enabled, swap only
+		/// has no-throw guarantee when both (*this and other)
+		/// objects are allocated on the heap.
 	{
 		if (this == &other) return *this;
 
@@ -187,16 +187,24 @@ public:
 		else
 		{
 			Any tmp(*this);
-			if (_valueHolder.isLocal()) this->~Any();
-			construct(other);
-			other = tmp;
+			try
+			{
+				if (_valueHolder.isLocal()) destruct();
+				construct(other);
+				other = tmp;
+			}
+			catch (...)
+			{
+				construct(tmp);
+				throw;
+			}
 		}
 
 		return *this;
 	}
 
 	template<typename ValueType>
-	Any & operator = (const ValueType& rhs)
+	Any& operator = (const ValueType& rhs)
 		/// Assignment operator for all types != Any.
 		///
 		/// Example: 
@@ -309,6 +317,11 @@ private:
 			_valueHolder.erase();
 	}
 	
+	void destruct()
+	{
+		content()->~ValueHolder();
+	}
+
 	Placeholder<ValueHolder> _valueHolder;
 
 

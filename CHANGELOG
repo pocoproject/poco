@@ -33,7 +33,7 @@ Release 1.5.2 (2013-03-??)
 - fixed GH #131: no timezone global var on OpenBSD
 - fixed GH #102: Some subprojects don't have x64 solutions for VS 2010
 - added GH #75: Poco::Uri addQueryParameter method
-- Poco::Environment::osDisplayName() now recognized Windows 8/Server 2012
+- Poco::Environment::osDisplayName() now recognizes Windows 8/Server 2012
 - fixed GH #140: Poco::Runnable threading cleanup issue
 - simplified default TCP/HTTPServer construction
 - fixed GH #141: Application::run() documentation/implementation discrepancy
