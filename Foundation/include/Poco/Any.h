@@ -60,7 +60,11 @@ template <class> class VarHolderImpl;
 }
 
 
-template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
+template <typename PlaceholderT
+#ifndef POCO_NO_SOO
+	, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE
+#endif
+>
 union Placeholder
 	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
 	/// object optimization).
@@ -112,7 +116,9 @@ public:
 #endif
 	
 	PlaceholderT*         pHolder;
+#ifndef POCO_NO_SOO
 	mutable unsigned char holder[SizeV + 1];
+#endif
 
 	friend class Any;
 	friend class Dynamic::Var;

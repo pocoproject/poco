@@ -1044,7 +1044,6 @@
     <ClInclude Include="include\Poco\RefCountedObject.h" />
     <ClInclude Include="include\Poco\SharedPtr.h" />
     <ClInclude Include="include\Poco\SingletonHolder.h" />
-    <ClInclude Include="include\Poco\SmallObjectAllocator.h" />
     <ClInclude Include="include\Poco\SortedDirectoryIterator.h" />
     <ClInclude Include="include\Poco\String.h" />
     <ClInclude Include="include\Poco\StringTokenizer.h" />

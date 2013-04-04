@@ -941,9 +941,6 @@
 					RelativePath=".\include\Poco\SingletonHolder.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\SmallObjectAllocator.h">
-				</File>
-				<File
 					RelativePath=".\include\Poco\SortedDirectoryIterator.h">
 				</File>
 				<File
