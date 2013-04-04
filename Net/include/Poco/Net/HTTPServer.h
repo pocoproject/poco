@@ -73,6 +73,14 @@ class Net_API HTTPServer: public TCPServer
 	/// information about the HTTP protocol.
 {
 public:
+	HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::UInt16 portNumber = 80, HTTPServerParams::Ptr pParams = new HTTPServerParams);
+		/// Creates HTTPServer listening on the given port (default 80).
+		///
+		/// The server takes ownership of the HTTPRequstHandlerFactory
+		/// and deletes it when it's no longer needed.
+		///
+		/// New threads are taken from the default thread pool.
+
 	HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, const ServerSocket& socket, HTTPServerParams::Ptr pParams);
 		/// Creates the HTTPServer, using the given ServerSocket.
 		///
@@ -81,7 +89,7 @@ public:
 		///
 		/// The server also takes ownership of the HTTPServerParams object.
 		///
-		/// News threads are taken from the default thread pool.
+		/// New threads are taken from the default thread pool.
 
 	HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams::Ptr pParams);
 		/// Creates the HTTPServer, using the given ServerSocket.
@@ -91,7 +99,7 @@ public:
 		///
 		/// The server also takes ownership of the HTTPServerParams object.
 		///
-		/// News threads are taken from the given thread pool.
+		/// New threads are taken from the given thread pool.
 
 	~HTTPServer();
 		/// Destroys the HTTPServer and its HTTPRequestHandlerFactory.

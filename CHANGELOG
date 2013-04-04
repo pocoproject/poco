@@ -25,8 +25,7 @@ Release 1.5.2 (2013-03-??)
 - fixed GH #124: Possible buffer overrun in Foundation/EventLogChannel
 - fixed GH #119: JSON::Object holds values in ordered map
 - added JSON::PrintHandler
-- renamed JSON::DefaultHandler to ParseHandler
-- redefined JSON::DefaultHandler as typedef to ParseHandler
+- renamed JSON::DefaultHandler to ParseHandler (breaking change!)
 - fixed GH #127: Eliminate -Wshadow warnings
 - fixed GH #79: Poco::Thread leak on Linux
 - fixed GH #61: static_md build configs for Crypto and NetSSL
@@ -34,6 +33,11 @@ Release 1.5.2 (2013-03-??)
 - fixed GH #131: no timezone global var on OpenBSD
 - fixed GH #102: Some subprojects don't have x64 solutions for VS 2010
 - added GH #75: Poco::Uri addQueryParameter method
+- Poco::Environment::osDisplayName() now recognizes Windows 8/Server 2012
+- fixed GH #140: Poco::Runnable threading cleanup issue
+- simplified default TCP/HTTPServer construction
+- fixed GH #141: Application::run() documentation/implementation discrepancy
+- changed RowFormatter to SharedPtr<RowFormatter> in Data::RecordSet interface (breaking change!)
 
 Release 1.5.1 (2013-01-11)
 ==========================

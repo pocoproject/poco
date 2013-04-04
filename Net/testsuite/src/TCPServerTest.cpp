@@ -97,15 +97,14 @@ TCPServerTest::~TCPServerTest()
 
 void TCPServerTest::testOneConnection()
 {
-	ServerSocket svs(0);
-	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>());
 	srv.start();
 	assert (srv.currentConnections() == 0);
 	assert (srv.currentThreads() == 0);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("localhost", srv.socket().address().port());
 	StreamSocket ss1(sa);
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
@@ -125,15 +124,14 @@ void TCPServerTest::testOneConnection()
 
 void TCPServerTest::testTwoConnections()
 {
-	ServerSocket svs(0);
-	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>());
 	srv.start();
 	assert (srv.currentConnections() == 0);
 	assert (srv.currentThreads() == 0);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("localhost", srv.socket().address().port());
 	StreamSocket ss1(sa);
 	StreamSocket ss2(sa);
 	std::string data("hello, world");

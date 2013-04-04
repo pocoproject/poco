@@ -284,7 +284,7 @@ void Application::loadConfiguration(const std::string& path, int priority)
 	else if (icompare(ext, "ini") == 0)
 		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false, false);
 #endif
-#ifndef POCO_UTIL_NO_JSONONFIGURATION
+#ifndef POCO_UTIL_NO_JSONCONFIGURATION
 	else if (icompare(ext, "json") == 0)
 		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false, false);
 #endif
@@ -318,12 +318,12 @@ void Application::stopOptionsProcessing()
 int Application::run()
 {
 	int rc = EXIT_CONFIG;
+	initialize(*this);
+
 	try
 	{
-		initialize(*this);
 		rc = EXIT_SOFTWARE;
 		rc = main(_unprocessedArgs);
-		uninitialize();
 	}
 	catch (Poco::Exception& exc)
 	{
@@ -337,6 +337,8 @@ int Application::run()
 	{
 		logger().fatal("system exception");
 	}
+
+	uninitialize();
 	return rc;
 }
 

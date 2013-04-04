@@ -1049,9 +1049,6 @@
     <ClInclude Include="include\Poco\SingletonHolder.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\SmallObjectAllocator.h">
-      <Filter>Core\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Poco\String.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>

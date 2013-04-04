@@ -12,9 +12,6 @@
     <ClInclude Include="include\Poco\JSON\Array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\JSON\DefaultHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Poco\JSON\Handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>

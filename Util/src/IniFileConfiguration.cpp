@@ -35,6 +35,11 @@
 
 
 #include "Poco/Util/IniFileConfiguration.h"
+
+
+#ifndef POCO_UTIL_NO_INIFILECONFIGURATION
+
+
 #include "Poco/Exception.h"
 #include "Poco/String.h"
 #include "Poco/Path.h"
@@ -202,3 +207,6 @@ void IniFileConfiguration::parseLine(std::istream& istr)
 
 
 } } // namespace Poco::Util
+
+
+#endif // POCO_UTIL_NO_INIFILECONFIGURATION

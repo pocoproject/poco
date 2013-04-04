@@ -62,17 +62,21 @@ static Poco::RWLock resolverLock;
 #endif
 
 
-HostEntry DNS::hostByName(const std::string& hostname)
+HostEntry DNS::hostByName(const std::string& hostname, unsigned 
+#ifdef POCO_HAVE_ADDRINFO
+						  hintFlags
+#endif
+						 )
 {
 #if defined(POCO_HAVE_LIBRESOLV)
 	Poco::ScopedReadRWLock readLock(resolverLock);
 #endif
 	
-#if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
+#if defined(POCO_HAVE_ADDRINFO)
 	struct addrinfo* pAI;
 	struct addrinfo hints;
 	std::memset(&hints, 0, sizeof(hints));
-	hints.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
+	hints.ai_flags = hintFlags;
 	int rc = getaddrinfo(hostname.c_str(), NULL, &hints, &pAI); 
 	if (rc == 0)
 	{
@@ -102,13 +106,17 @@ HostEntry DNS::hostByName(const std::string& hostname)
 }
 
 
-HostEntry DNS::hostByAddress(const IPAddress& address)
+HostEntry DNS::hostByAddress(const IPAddress& address, unsigned 
+#ifdef POCO_HAVE_ADDRINFO
+							 hintFlags
+#endif
+							)
 {
 #if defined(POCO_HAVE_LIBRESOLV)
 	Poco::ScopedReadRWLock readLock(resolverLock);
 #endif
 
-#if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
+#if defined(POCO_HAVE_ADDRINFO)
 	SocketAddress sa(address, 0);
 	static char fqname[1024];
 	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD); 
@@ -117,7 +125,7 @@ HostEntry DNS::hostByAddress(const IPAddress& address)
 		struct addrinfo* pAI;
 		struct addrinfo hints;
 		std::memset(&hints, 0, sizeof(hints));
-		hints.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
+		hints.ai_flags = hintFlags;
 		rc = getaddrinfo(fqname, NULL, &hints, &pAI);
 		if (rc == 0)
 		{
@@ -148,7 +156,7 @@ HostEntry DNS::hostByAddress(const IPAddress& address)
 	}
 #endif
 	int err = lastError();
-	error(err, address.toString());      // will throw an appropriate exception
+	error(err, address.toString()); // will throw an appropriate exception
 	throw NetException(); // to silence compiler
 }
 

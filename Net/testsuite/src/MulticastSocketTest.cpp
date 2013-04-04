@@ -94,9 +94,9 @@ void MulticastSocketTest::tearDown()
 CppUnit::Test* MulticastSocketTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MulticastSocketTest");
-
+#if (POCO_OS != POCO_OS_FREE_BSD) // TODO
 	CppUnit_addTest(pSuite, MulticastSocketTest, testMulticast);
-
+#endif
 	return pSuite;
 }
 

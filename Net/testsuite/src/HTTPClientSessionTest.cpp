@@ -167,13 +167,15 @@ void HTTPClientSessionTest::testPostLargeChunked()
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body(16000, 'x');
 	request.setChunkedTransferEncoding(true);
-	s.sendRequest(request) << body;
+	std::ostream& os = s.sendRequest(request);
+	os << body;
+	os.flush();
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
 	assert (response.getChunkedTransferEncoding());
 	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
 	std::ostringstream ostr;
-	StreamCopier::copyStream(rs, ostr);
+	StreamCopier::copyStream(rs, ostr, 16000);
 	assert (ostr.str() == body);
 }
 

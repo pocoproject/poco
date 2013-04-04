@@ -81,7 +81,7 @@ public:
 		/// Currently this is only implemented for
 		/// Windows. There it will return names like
 		/// "Windows XP" or "Windows 7/Server 2008 SP2".
-		/// On other platform, returns the same as
+		/// On other platforms, returns the same as
 		/// osName().
 		
 	static std::string osVersion();

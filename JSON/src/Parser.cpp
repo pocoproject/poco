@@ -484,7 +484,7 @@ private:
 };
 
 
-Parser::Parser() : _tokenizer(), _handler(NULL)
+Parser::Parser(const Handler::Ptr& pHandler) : _tokenizer(), _pHandler(pHandler)
 {
 	_tokenizer.addToken(new WhitespaceToken());
 	_tokenizer.addToken(new InvalidToken());
@@ -512,7 +512,7 @@ const Token* Parser::nextToken()
 }
 
 
-void Parser::parse(std::istream& in)
+Dynamic::Var Parser::parse(std::istream& in)
 {
 	_tokenizer.attachToStream(in);
 	const Token* token = nextToken();
@@ -542,14 +542,16 @@ void Parser::parse(std::istream& in)
 	{
 		throw JSONException(format("Invalid token '%s' found. Expecting { or [", token->asString()));
 	}
+
+	return result();
 }
 
 
 void Parser::readObject()
 {
-	if (_handler != NULL)
+	if (!_pHandler.isNull())
 	{
-		_handler->startObject();
+		_pHandler->startObject();
 	}
 
 	if ( readRow(true) ) // First call is special: check for empty object
@@ -557,9 +559,9 @@ void Parser::readObject()
 		while(readRow());
 	}
 
-	if (_handler != NULL)
+	if (!_pHandler.isNull())
 	{
-		_handler->endObject();
+		_pHandler->endObject();
 	}
 }
 
@@ -576,9 +578,9 @@ bool Parser::readRow(bool firstCall)
 	if (token->tokenClass() == Token::STRING_LITERAL_TOKEN)
 	{
 		std::string propertyName = token->tokenString();
-		if ( _handler != NULL )
+		if ( !_pHandler.isNull() )
 		{
-			_handler->key(propertyName);
+			_pHandler->key(propertyName);
 		}
 
 		token = nextToken();
@@ -594,9 +596,9 @@ bool Parser::readRow(bool firstCall)
 			{
 				if (token->asChar() == ',')
 				{
-					if (_handler != NULL)
+					if (!_pHandler.isNull())
 					{
-						_handler->comma();
+						_pHandler->comma();
 					}
 					return true; // Read next row
 				}
@@ -637,7 +639,7 @@ void Parser::readValue(const Token* token)
 		break;
 			
 	case Token::INTEGER_LITERAL_TOKEN:
-		if (_handler != NULL)
+		if (!_pHandler.isNull())
 		{
 #if defined(POCO_HAVE_INT64)
 			try
@@ -647,11 +649,11 @@ void Parser::readValue(const Token* token)
 				if (	value > std::numeric_limits<int>::max()
 					|| value < std::numeric_limits<int>::min() )
 				{
-					_handler->value(value);
+					_pHandler->value(value);
 				}
 				else
 				{
-					_handler->value(static_cast<int>(value));
+					_pHandler->value(static_cast<int>(value));
 				}
 			}
 			// try to handle error as unsigned in case of overflow
@@ -661,11 +663,11 @@ void Parser::readValue(const Token* token)
 				// if number is 32-bit, then handle as such
 				if ( value > std::numeric_limits<unsigned>::max() )
 				{
-					_handler->value(value);
+					_pHandler->value(value);
 				}
 				else
 				{
-					_handler->value(static_cast<unsigned>(value));
+					_pHandler->value(static_cast<unsigned>(value));
 				}
 			}
 #else
@@ -687,23 +689,23 @@ void Parser::readValue(const Token* token)
 	{
 		if (token->tokenString().compare("null") == 0)
 		{
-			if (_handler != NULL)
+			if (!_pHandler.isNull())
 			{
-				_handler->null();
+				_pHandler->null();
 			}
 		}
 		else  if (token->tokenString().compare("true") == 0)
 		{
-			if (_handler != NULL)
+			if (!_pHandler.isNull())
 			{
-				_handler->value(true);
+				_pHandler->value(true);
 			}
 		}
 		else if (token->tokenString().compare("false") == 0)
 		{
-			if (_handler != NULL)
+			if (!_pHandler.isNull())
 			{
-				_handler->value(false);
+				_pHandler->value(false);
 			}
 		}
 		else
@@ -715,15 +717,15 @@ void Parser::readValue(const Token* token)
 	case Token::FLOAT_LITERAL_TOKEN:
 		// Fall through
 	case Token::DOUBLE_LITERAL_TOKEN:
-		if (_handler != NULL)
+		if (!_pHandler.isNull())
 		{
-			_handler->value(token->asFloat());
+			_pHandler->value(token->asFloat());
 		}
 		break;
 	case Token::STRING_LITERAL_TOKEN:
-		if (_handler != NULL)
+		if (!_pHandler.isNull())
 		{
-			_handler->value(token->tokenString());
+			_pHandler->value(token->tokenString());
 		}
 		break;
 	case Token::SEPARATOR_TOKEN:
@@ -746,9 +748,9 @@ void Parser::readValue(const Token* token)
 
 void Parser::readArray()
 {
-	if (_handler != NULL)
+	if (!_pHandler.isNull())
 	{
-		_handler->startArray();
+		_pHandler->startArray();
 	}
 
 	if (readElements(true)) // First call is special: check for empty array
@@ -756,9 +758,9 @@ void Parser::readArray()
 		while(readElements());
 	}
 
-	if (_handler != NULL)
+	if (!_pHandler.isNull())
 	{
-		_handler->endArray();
+		_pHandler->endArray();
 	}
 }
 
@@ -784,9 +786,9 @@ bool Parser::readElements(bool firstCall)
 
 		if (token->asChar() == ',')
 		{
-			if (_handler != NULL)
+			if (!_pHandler.isNull())
 			{
-				_handler->comma();
+				_pHandler->comma();
 			}
 			return true;
 		}

@@ -58,7 +58,6 @@ public:
 	void testAtomicCounter();
 	void testNullable();
 	void testAscii();
-	void testSmallObjectAllocator();
 
 	void setUp();
 	void tearDown();

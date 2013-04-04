@@ -239,14 +239,15 @@ public:
 		/// not been registered.
 
 	virtual int run();
-		/// Runs the application by performing additional initializations
+		/// Runs the application by performing additional (un)initializations
 		/// and calling the main() method.
 		///
 		/// First calls initialize(), then calls main(), and
 		/// finally calls uninitialize(). The latter will be called
 		/// even if main() throws an exception. If initialize() throws
 		/// an exception, main() will not be called and the exception
-		/// will be propagated to the caller.
+		/// will be propagated to the caller. If uninitialize() throws
+		/// an exception, the exception will be propagated to the caller.
 
 	std::string commandName() const;
 		/// Returns the command name used to invoke the application.

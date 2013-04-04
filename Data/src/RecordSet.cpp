@@ -35,7 +35,6 @@
 
 
 #include "Poco/Data/RecordSet.h"
-#include "Poco/Data/Session.h"
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
@@ -55,7 +54,7 @@ const std::size_t RecordSet::UNKNOWN_TOTAL_ROW_COUNT = std::numeric_limits<std::
 
 
 RecordSet::RecordSet(const Statement& rStatement,
-	RowFormatter* pRowFormatter): 
+	RowFormatterPtr pRowFormatter): 
 	Statement(rStatement),
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
@@ -69,7 +68,7 @@ RecordSet::RecordSet(const Statement& rStatement,
 
 RecordSet::RecordSet(Session& rSession, 
 	const std::string& query, 
-	RowFormatter* pRowFormatter): 
+	RowFormatterPtr pRowFormatter): 
 	Statement((rSession << query, now)),
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
@@ -309,7 +308,7 @@ bool RecordSet::moveLast()
 }
 
 
-void RecordSet::setRowFormatter(RowFormatter* pRowFormatter)
+void RecordSet::setRowFormatter(RowFormatterPtr pRowFormatter)
 {
 	pRowFormatter->setTotalRowCount(static_cast<int>(getTotalRowCount()));
 	Statement::setRowFormatter(pRowFormatter);

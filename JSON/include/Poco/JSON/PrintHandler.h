@@ -55,6 +55,8 @@ class JSON_API PrintHandler : public Handler
 	/// otherwise, the proper indentation is applied to elements.
 {
 public:
+	typedef SharedPtr<PrintHandler> Ptr;
+
 	static const unsigned JSON_PRINT_FLAT = 0;
 
 	PrintHandler(unsigned indent = 0);
@@ -115,10 +117,8 @@ public:
 	void comma();
 		/// A comma is read; it will be written to the output as "true" or "false".
 
-	void setIndent(unsigned indent)
-	{
-		_indent = indent;
-	}
+	void setIndent(unsigned indent);
+		/// Sets indentation.
 
 private:
 
@@ -131,6 +131,12 @@ private:
 	std::string   _tab;
 	bool          _array;
 };
+
+
+inline void PrintHandler::setIndent(unsigned indent)
+{
+	_indent = indent;
+}
 
 
 }} // namespace Poco::JSON

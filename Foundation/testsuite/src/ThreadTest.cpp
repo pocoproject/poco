@@ -264,6 +264,19 @@ void ThreadTest::testNotJoin()
 }
 
 
+void ThreadTest::testNotRun()
+{
+	Thread thread;
+}
+
+
+void ThreadTest::testNotRunJoin()
+{
+	Thread thread;
+	thread.join();
+}
+
+
 void ThreadTest::testThreadTarget()
 {
 	ThreadTarget te(&MyRunnable::staticFunc);
@@ -374,6 +387,8 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testThreads);
 	CppUnit_addTest(pSuite, ThreadTest, testJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testNotJoin);
+	CppUnit_addTest(pSuite, ThreadTest, testNotRun);
+	CppUnit_addTest(pSuite, ThreadTest, testNotRunJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadTarget);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadFunction);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);

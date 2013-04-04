@@ -54,7 +54,6 @@ class JSON_API ParseHandler : public Handler
 	/// on the handlers called by the parser.
 {
 public:
-
 	ParseHandler(bool preserveObjectOrder = false);
 		/// Creates the ParseHandler.
 

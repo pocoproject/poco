@@ -57,4 +57,10 @@ void Handler::comma()
 }
 
 
+Dynamic::Var Handler::result() const
+{
+	return Dynamic::Var();
+}
+
+
 } } // namespace Poco::JSON

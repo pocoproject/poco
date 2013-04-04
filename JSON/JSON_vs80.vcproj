@@ -411,8 +411,6 @@
 			<File
 				RelativePath=".\include\Poco\JSON\Array.h"/>
 			<File
-				RelativePath=".\include\Poco\JSON\DefaultHandler.h"/>
-			<File
 				RelativePath=".\include\Poco\JSON\Handler.h"/>
 			<File
 				RelativePath=".\include\Poco\JSON\JSON.h"/>

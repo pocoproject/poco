@@ -268,8 +268,26 @@
 
 
 #if defined(POCO_HAVE_ADDRINFO)
-	#if !defined(AI_ADDRCONFIG)
+	#ifndef AI_PASSIVE
+		#define AI_PASSIVE 0
+	#endif
+	#ifndef AI_CANONNAME
+		#define AI_CANONNAME 0
+	#endif
+	#ifndef AI_NUMERICHOST
+		#define AI_NUMERICHOST 0
+	#endif
+	#ifndef AI_NUMERICSERV
+		#define AI_NUMERICSERV 0
+	#endif
+	#ifndef AI_ALL
+		#define AI_ALL 0
+	#endif
+	#ifndef AI_ADDRCONFIG
 		#define AI_ADDRCONFIG 0
+	#endif
+	#ifndef AI_V4MAPPED
+		#define AI_V4MAPPED 0
 	#endif
 #endif
 

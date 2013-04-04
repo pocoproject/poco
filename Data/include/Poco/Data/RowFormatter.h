@@ -232,22 +232,21 @@ inline void RowFormatter::setMode(Mode mode)
 }
 
 
+typedef SharedPtr<RowFormatter> RowFormatterPtr;
+
+
 namespace Keywords {
 
 
 template <typename T>
-inline T* format(const T& formatter)
+inline RowFormatterPtr format(const T& formatter)
 	/// Utility function used to pass formatter to the statement.
-	/// Statement takes the ownership of the formatter.
 {
 	return new T(formatter);
 }
 
 
 } // namespace Keywords
-
-
-typedef SharedPtr<RowFormatter> RowFormatterPtr;
 
 
 } } // namespace Poco::Data

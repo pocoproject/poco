@@ -156,6 +156,7 @@ private:
 			policy(SCHED_OTHER),
 			done(false),
 			stackSize(POCO_THREAD_STACK_SIZE),
+			started(false),
 			joined(false)
 		{
 		#if defined(POCO_VXWORKS)
@@ -173,6 +174,7 @@ private:
 		int           policy;
 		Event         done;
 		std::size_t   stackSize;
+		bool          started;
 		bool          joined;
 	};
 
