@@ -2769,7 +2769,6 @@ void SQLiteTest::testCommitCallback()
 	std::string firstName("firstname");
 	std::string address("Address");
 	int age = 133132;
-	int count = 0;
 	std::string result;
 	tmp.begin();
 	tmp << "DROP TABLE IF EXISTS Person", now;
@@ -2811,7 +2810,6 @@ void SQLiteTest::testRollbackCallback()
 	std::string firstName("firstname");
 	std::string address("Address");
 	int age = 133132;
-	int count = 0;
 	std::string result;
 	tmp.begin();
 	tmp << "DROP TABLE IF EXISTS Person", now;
