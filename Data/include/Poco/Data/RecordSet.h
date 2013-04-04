@@ -98,13 +98,31 @@ public:
 	static const std::size_t UNKNOWN_TOTAL_ROW_COUNT;
 
 	explicit RecordSet(const Statement& rStatement,
-		RowFormatter* pRowFormatter = 0);
+		RowFormatterPtr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
 	explicit RecordSet(Session& rSession, 
 		const std::string& query,
-		RowFormatter* pRowFormatter = 0);
+		RowFormatterPtr pRowFormatter = 0);
 		/// Creates the RecordSet.
+
+	explicit RecordSet(Session& rSession, 
+		const std::string& query,
+		const RowFormatter& rowFormatter);
+		/// Creates the RecordSet.
+
+	template <class RF>
+	RecordSet(Session& rSession, const std::string& query, const RF& rowFormatter): 
+		Statement((rSession << query, now)),
+		_currentRow(0),
+		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
+		_pEnd(new RowIterator(this, true)),
+		_pFilter(0),
+		_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
+		/// Creates the RecordSet.
+	{
+		setRowFormatter(Keywords::format(rowFormatter));
+	}
 
 	RecordSet(const RecordSet& other);
 		/// Copy-creates the recordset.
@@ -112,7 +130,7 @@ public:
 	~RecordSet();
 		/// Destroys the RecordSet.
 
-	void setRowFormatter(RowFormatter* pRowFormatter);
+	void setRowFormatter(RowFormatterPtr pRowFormatter);
 		/// Assigns the row formatter to the statement and all recordset rows.
 
 	Statement& operator = (const Statement& stmt);

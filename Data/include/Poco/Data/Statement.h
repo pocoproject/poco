@@ -250,7 +250,7 @@ public:
 		///
 		/// Set per default to zero to Limit::LIMIT_UNLIMITED, which disables the limit.
 
-	Statement& operator , (RowFormatter* pRowFformatter);
+	Statement& operator , (RowFormatterPtr pRowFformatter);
 		/// Sets the row formatter for the statement.
 
 	Statement& operator , (const Range& extrRange);
@@ -401,7 +401,7 @@ public:
 		/// Returns false if the current data set index points to the last
 		/// data set. Otherwise, it returns true.
 
-	void setRowFormatter(RowFormatter* pRowFormatter);
+	void setRowFormatter(RowFormatterPtr pRowFormatter);
 		/// Sets the row formatter for this statement.
 		/// Statement takes the ownership of the formatter.
 
@@ -545,7 +545,7 @@ inline void Data_API reset(Statement& statement)
 // inlines
 //
 
-inline Statement& Statement::operator , (RowFormatter* pRowFformatter)
+inline Statement& Statement::operator , (RowFormatterPtr pRowFformatter)
 {
 	_pRowFormatter = pRowFformatter;
 	return *this;
@@ -811,7 +811,7 @@ inline bool Statement::isAsync() const
 }
 
 
-inline void Statement::setRowFormatter(RowFormatter* pRowFormatter)
+inline void Statement::setRowFormatter(RowFormatterPtr pRowFormatter)
 {
 	_pRowFormatter = pRowFormatter;
 }
