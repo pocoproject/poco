@@ -35,7 +35,6 @@
 
 
 #include "Poco/Data/RecordSet.h"
-#include "Poco/Data/Session.h"
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"

@@ -41,6 +41,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/Session.h"
 #include "Poco/Data/Extraction.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
@@ -113,7 +114,7 @@ public:
 
 	template <class RF>
 	RecordSet(Session& rSession, const std::string& query, const RF& rowFormatter): 
-		Statement((rSession << query, now)),
+		Statement((rSession << query, Keywords::now)),
 		_currentRow(0),
 		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 		_pEnd(new RowIterator(this, true)),
