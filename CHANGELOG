@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.2 (2013-03-??)
+Release 1.5.2 (2013-04-29)
 ==========================
 - added MongoDB library (Franky Braem)
 - fixed GH #57: poco-1.5.1: Doesn't compile for Android
@@ -38,6 +38,7 @@ Release 1.5.2 (2013-03-??)
 - simplified default TCP/HTTPServer construction
 - fixed GH #141: Application::run() documentation/implementation discrepancy
 - changed RowFormatter to SharedPtr<RowFormatter> in Data::RecordSet interface (breaking change!)
+- fixed GH #144: Poco::Dynamic emits invalid JSON
 
 Release 1.5.1 (2013-01-11)
 ==========================

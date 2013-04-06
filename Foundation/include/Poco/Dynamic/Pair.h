@@ -120,6 +120,13 @@ public:
 		return _data.second;
 	}
 
+	std::string toString()
+	{
+		std::string str;
+		Var(*this).convert<std::string>(str);
+		return str;
+	}
+
 private:
 	Data _data;
 };
@@ -208,9 +215,9 @@ public:
 		// JSON format definition: { string ':' value } string:value pair n-times, sep. by ','
 		val.append("{ ");
 		Var key(_val.first());
-		appendJSONString(val, key);
+		appendJSONKey(val, key);
 		val.append(" : ");
-		appendJSONString(val, _val.second());
+		appendJSONValue(val, _val.second());
 		val.append(" }");	
 	}
 
@@ -357,9 +364,9 @@ public:
 		// JSON format definition: { string ':' value } string:value pair n-times, sep. by ','
 		val.append("{ ");
 		Var key(_val.first());
-		appendJSONString(val, key);
+		appendJSONKey(val, key);
 		val.append(" : ");
-		appendJSONString(val, _val.second());
+		appendJSONValue(val, _val.second());
 		val.append(" }");	
 	}
 
