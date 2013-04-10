@@ -60,7 +60,8 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_autoBind(autoBind),
 		_autoExtract(autoExtract),
 		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
-		_inTransaction(false)
+		_inTransaction(false),
+		_queryTimeout(-1)
 {
 	setFeature("bulk", true);
 	open();
@@ -78,7 +79,8 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_autoBind(autoBind),
 		_autoExtract(autoExtract),
 		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
-		_inTransaction(false)
+		_inTransaction(false),
+		_queryTimeout(-1)
 {
 	setFeature("bulk", true);
 	open();
@@ -167,6 +169,10 @@ void SessionImpl::open(const std::string& connect)
 	addProperty("maxFieldSize",
 		&SessionImpl::setMaxFieldSize,
 		&SessionImpl::getMaxFieldSize);
+
+	addProperty("queryTimeout",
+		&SessionImpl::setQueryTimeout,
+		&SessionImpl::getQueryTimeout);
 
 	Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, 0, 0);
 

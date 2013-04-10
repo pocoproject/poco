@@ -68,6 +68,15 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_affectedRowCount(0),
 	_canCompile(true)
 {
+	int queryTimeout = rSession.queryTimeout();
+	if (queryTimeout >= 0)
+	{
+		SQLULEN uqt = static_cast<SQLULEN>(queryTimeout);
+		SQLSetStmtAttr(_stmt,
+			SQL_ATTR_QUERY_TIMEOUT,
+			(SQLPOINTER) uqt,
+			0);
+	}
 }
 
 
