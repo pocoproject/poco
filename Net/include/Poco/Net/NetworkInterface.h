@@ -155,6 +155,14 @@ public:
 		///
 		/// On other platforms this is the same as name().
 
+	const std::string& adapterName() const;
+		/// Returns the interface adapter name.
+		///
+		/// On Windows platforms, this is the network adapter LUID.
+		/// The adapter name is used by some Windows Net APIs like Dhcp. 
+		///
+		/// On other platforms this is the same as name().
+
 	const IPAddress& firstAddress(IPAddress::Family family) const;
 		/// Returns the first IP address bound to the interface.
 		/// Throws NotFoundException if the address family is not
@@ -282,10 +290,10 @@ public:
 		/// member of the pair.
 
 protected:
-	NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
 		/// Creates the NetworkInterface.
 
-	NetworkInterface(const std::string& name, const std::string& displayName, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index, MACAddress* pMACAddress = 0);
 		/// Creates the NetworkInterface.
 
 	NetworkInterface(const std::string& name, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
@@ -293,6 +301,7 @@ protected:
 
 	NetworkInterface(const std::string& name,
 		const std::string& displayName,
+		const std::string& adapterName,
 		const IPAddress& address,
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
