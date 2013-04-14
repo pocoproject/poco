@@ -59,6 +59,7 @@ template <class> class VarHolderImpl;
 
 }
 
+#ifndef POCO_NO_SOO
 
 template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
 union Placeholder
@@ -108,17 +109,61 @@ public:
 
 // MSVC71,80 won't extend friendship to nested class (Any::Holder)
 #if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 80))
-// private:
+private:
 #endif
 	
 	PlaceholderT*         pHolder;
+#ifndef POCO_NO_SOO
 	mutable unsigned char holder[SizeV + 1];
+#endif
 
 	friend class Any;
 	friend class Dynamic::Var;
 	friend class Dynamic::VarHolder;
 	template <class> friend class Dynamic::VarHolderImpl;
 };
+
+
+#else // !POCO_NO_SOO
+
+
+template <typename PlaceholderT>
+union Placeholder
+	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
+	/// object optimization).
+	/// 
+	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage, 
+	/// it will be placement-new-allocated into the local buffer
+	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
+	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
+	/// where the object was allocated (0 => heap, 1 => local).
+{
+public:
+
+	Placeholder ()
+	{
+	}
+
+	PlaceholderT* content() const
+	{
+		return pHolder;
+	}
+
+// MSVC71,80 won't extend friendship to nested class (Any::Holder)
+#if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 80))
+private:
+#endif
+	
+	PlaceholderT*         pHolder;
+
+	friend class Any;
+	friend class Dynamic::Var;
+	friend class Dynamic::VarHolder;
+	template <class> friend class Dynamic::VarHolderImpl;
+};
+
+
+#endif // POCO_NO_SOO
 
 
 class Any

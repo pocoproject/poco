@@ -1999,9 +1999,11 @@ void VarTest::testDynamicStructInt()
 	Dynamic::Struct<int> aStruct;
 	aStruct[0] = "Junior";
 	aStruct[1] = "POCO";
+	aStruct[2] = 10;
 	Var a1(aStruct);
 	assert (a1[0] == "Junior");
 	assert (a1[1] == "POCO");
+	assert (a1[2] == 10);
 	a1[0] = "Senior";
 	assert (a1[0] == "Senior");
 
@@ -2039,13 +2041,15 @@ void VarTest::testDynamicPair()
 	catch (InvalidAccessException&) { }
 
 	Var va(aPair);
-	assert ("{ 0 : null }" == va.convert<std::string>());
+	assert ("{ \"0\" : null }" == va.convert<std::string>());
+	assert (aPair.toString() == va.convert<std::string>());
 
 	aPair = Pair<int>(4, "123");
 	assert ("123" == aPair.second());
 
 	va = aPair;
-	assert ("{ 4 : \"123\" }" == va.convert<std::string>());
+	assert ("{ \"4\" : \"123\" }" == va.convert<std::string>());
+	assert (aPair.toString() == va.convert<std::string>());
 
 	int i = 1;
 	std::string s = "2";
@@ -2063,10 +2067,12 @@ void VarTest::testDynamicPair()
 	assert ("2" == pPair.second());
 
 	Var vp(pPair);
-	assert ("{ 1 : \"2\" }" == vp.convert<std::string>());
+	assert ("{ \"1\" : \"2\" }" == vp.convert<std::string>());
+	assert (pPair.toString() == vp.convert<std::string>());
 
 	Var vs(sPair);
 	assert ("{ \"2\" : 1 }" == vs.convert<std::string>());
+	assert (sPair.toString() == vs.convert<std::string>());
 }
 
 
@@ -2094,6 +2100,7 @@ void VarTest::testStructToString()
 	std::string res = a1.convert<std::string>();
 	std::string expected = "{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }";
 	assert (res == expected);
+	assert (aStruct.toString() == res);
 }
 
 
@@ -2127,6 +2134,7 @@ void VarTest::testArrayOfStructsToString()
 								"] ] ]";
 	
 	assert (res == expected);
+	assert (a1.toString() == res);
 }
 
 
@@ -2153,6 +2161,7 @@ void VarTest::testStructWithArraysToString()
 								"\"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : [ \"string\", 23 ] }";
 
 	assert (res == expected);
+	assert (aStruct.toString() == res);
 }
 
 

@@ -204,6 +204,13 @@ public:
 		return keys;
 	}
 
+	std::string toString()
+	{
+		std::string str;
+		Var(*this).convert<std::string>(str);
+		return str;
+	}
+
 private:
 	Data _data;
 };
@@ -294,20 +301,20 @@ public:
 		if (!_val.empty())
 		{
 			Var key(it->first);
-			appendJSONString(val, key);
+			appendJSONKey(val, key);
 			val.append(" : ");
-			appendJSONString(val, it->second);
+			appendJSONValue(val, it->second);
 			++it;
 		}
 		for (; it != itEnd; ++it)
 		{
 			val.append(", ");
 			Var key(it->first);
-			appendJSONString(val, key);
+			appendJSONKey(val, key);
 			val.append(" : ");
-			appendJSONString(val, it->second);
+			appendJSONValue(val, it->second);
 		}
-		val.append(" }");	
+		val.append(" }");
 	}
 
 	void convert(Poco::DateTime&) const
@@ -465,18 +472,18 @@ public:
 		if (!_val.empty())
 		{
 			Var key(it->first);
-			appendJSONString(val, key);
+			appendJSONKey(val, key);
 			val.append(" : ");
-			appendJSONString(val, it->second);
+			appendJSONValue(val, it->second);
 			++it;
 		}
 		for (; it != itEnd; ++it)
 		{
 			val.append(", ");
 			Var key(it->first);
-			appendJSONString(val, key);
+			appendJSONKey(val, key);
 			val.append(" : ");
-			appendJSONString(val, it->second);
+			appendJSONValue(val, it->second);
 		}
 		val.append(" }");	
 	}

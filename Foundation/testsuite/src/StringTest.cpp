@@ -677,7 +677,6 @@ void StringTest::testStringToFloatError()
 	assert (!strToDouble(format("12c%c3", ds), result));
 	assert (!strToDouble(format("12%cx3", ds), result));
 
-	double d = -123456.234e-100;
 	assert(!strToDouble(format("123%c456%c234e1000000", ts, ds), result));
 	assert(!strToDouble(format("123%c456%c234e+1000000", ts, ds), result));
 	//assert(!strToDouble(0, result, ou)); // strToDouble is resilient to null pointers

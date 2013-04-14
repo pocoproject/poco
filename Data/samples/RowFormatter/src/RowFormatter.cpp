@@ -49,6 +49,7 @@ using Poco::Data::Session;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
 using Poco::Data::RowFormatter;
+using Poco::Data::RowFormatterPtr;
 
 
 class HTMLTableFormatter : public RowFormatter
@@ -103,15 +104,18 @@ public:
 
 int main(int argc, char** argv)
 {
+	// register SQLite connector
+	Poco::Data::SQLite::Connector::registerConnector();
+	
 	// create a session
 	Session session("SQLite", "sample.db");
 
 	// drop sample table, if it exists
 	session << "DROP TABLE IF EXISTS Simpsons", now;
-
+	
 	// (re)create table
 	session << "CREATE TABLE Simpsons (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3), Birthday DATE)", now;
-
+	
 	// insert some rows
 	DateTime hd(1956, 3, 1);
 	session << "INSERT INTO Simpsons VALUES('Homer Simpson', 'Springfield', 42, ?)", use(hd), now;
@@ -121,7 +125,7 @@ int main(int argc, char** argv)
 	session << "INSERT INTO Simpsons VALUES('Bart Simpson', 'Springfield', 12, ?)", use(hd), now;
 	hd.assign(1982, 5, 9);
 	session << "INSERT INTO Simpsons VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(hd), now;
-
+		
 	// create a statement and print the column names and data as HTML table
 	HTMLTableFormatter tf;
 	Statement stmt = (session << "SELECT * FROM Simpsons", format(tf), now);
@@ -129,8 +133,8 @@ int main(int argc, char** argv)
 	std::cout << rs << std::endl;
 
 	// Note: The code above is divided into individual steps for clarity purpose.
-	// The four lines can be reduced to the following single line of code:
-	std::cout << RecordSet(session, "SELECT * FROM Simpsons", new HTMLTableFormatter);
+	// The four lines can be reduced to the following single line:
+	std::cout << RecordSet(session, "SELECT * FROM Simpsons", HTMLTableFormatter());
 
 	// simple formatting example (uses the default SimpleRowFormatter provided by framework)
 	std::cout << std::endl << "Simple formatting:" << std::endl << std::endl;

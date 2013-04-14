@@ -344,8 +344,7 @@ void URI::addQueryParameter(const std::string& param, const std::string& val)
 {
 	std::string reserved(RESERVED_QUERY);
 	reserved += "=&";
-	if (_query.empty()) _query.append(1, '?');
-	else _query.append(1, '&');
+	if (!_query.empty()) _query.append(1, '&');
 	encode(param, reserved, _query);
 	_query.append(1, '=');
 	encode(val, reserved, _query);

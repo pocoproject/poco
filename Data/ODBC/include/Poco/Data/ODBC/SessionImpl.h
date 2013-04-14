@@ -169,6 +169,18 @@ public:
 	int maxStatementLength();
 		/// Returns maximum length of SQL statement allowed by driver.
 
+	void setQueryTimeout(const std::string&, const Poco::Any& value);
+		/// Sets the timeout (in seconds) for queries.
+		/// Value must be of type int.
+		
+	Poco::Any getQueryTimeout(const std::string&);
+		/// Returns the timeout (in seconds) for queries,
+		/// or -1 if no timeout has been set.
+		
+	int queryTimeout() const;
+		/// Returns the timeout (in seconds) for queries,
+		/// or -1 if no timeout has been set.
+
 	const ConnectionHandle& dbc() const;
 		/// Returns the connection handle.
 
@@ -195,6 +207,7 @@ private:
 	TypeInfo               _dataTypes;
 	char                   _canTransact;
 	bool                   _inTransaction;
+	int                    _queryTimeout;
 	Poco::FastMutex        _mutex;
 };
 
@@ -272,6 +285,24 @@ inline const std::string& SessionImpl::connectorName() const
 inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti)
 {
 	return 0 != (ti & getTransactionIsolation());
+}
+
+
+inline void SessionImpl::setQueryTimeout(const std::string&, const Poco::Any& value)
+{
+	_queryTimeout = Poco::AnyCast<int>(value);
+}
+
+
+inline Poco::Any SessionImpl::getQueryTimeout(const std::string&)
+{
+	return _queryTimeout;
+}
+
+
+inline int SessionImpl::queryTimeout() const
+{
+	return _queryTimeout;
 }
 
 

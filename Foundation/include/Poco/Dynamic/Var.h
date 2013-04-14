@@ -510,12 +510,30 @@ public:
 	bool isString() const;
 		/// Returns true if stored value is std::string.
 
+	std::string toString() const
+		/// Returns the stored value as string.
+	{
+		VarHolder* pHolder = content();
+
+		if (!pHolder)
+				throw InvalidAccessException("Can not convert empty value.");
+
+		if (typeid(std::string) == pHolder->type())
+			return extract<std::string>();
+		else
+		{
+			std::string result;
+			pHolder->convert(result);
+			return result;
+		}
+	}
+
 	static Var parse(const std::string& val);
 		/// Parses the string which must be in JSON format
 
-	static std::string toString(const Var& any);
-		/// Converts the Var to a string in JSON format. Note that toString will return
-		/// a different result than any.convert<std::string>()!
+	static std::string toString(const Var& var);
+		/// Converts the Var to a string in JSON format. Note that toString(const Var&) will return
+		/// a different result than Var::convert<std::string>() and Var::toString()!
 	
 private:
 	static Var parse(const std::string& val, std::string::size_type& offset);

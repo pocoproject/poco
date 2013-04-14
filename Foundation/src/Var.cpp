@@ -499,7 +499,7 @@ void Var::skipWhiteSpace(const std::string& val, std::string::size_type& pos)
 std::string Var::toString(const Var& any)
 {
 	std::string res;
-	appendJSONString(res, any);
+	appendJSONValue(res, any);
 	return res;
 }
 

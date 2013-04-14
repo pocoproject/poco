@@ -1859,9 +1859,6 @@
     <ClInclude Include="include\Poco\Base32Encoder.h">
       <Filter>Streams\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\SmallObjectAllocator.h">
-      <Filter>Core\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Poco\Optional.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>

@@ -90,12 +90,10 @@ int main(int argc, char** argv)
 	std::cout << "--------------------------" << std::endl;
 	try
 	{
-		Poco::JSON::ParseHandler handler;
 		Poco::JSON::Parser parser;
-		parser.setHandler(&handler);
 		sw.restart();
 		parser.parse(jsonStr);
-		Poco::DynamicAny result = handler.result();
+		Poco::DynamicAny result = parser.result();
 		sw.stop();
 		std::cout << "parsed/handled in " << sw.elapsed() << " [us]," << std::endl;
 		

@@ -70,8 +70,20 @@ bool Foundation_API isJSONString(const Var& any);
 	/// Returns true for values that should be JSON-formatted as string.
 
 
+void Foundation_API appendJSONKey(std::string& val, const Var& any);
+	/// Converts the any to a JSON key (i.e. wraps it into double quotes 
+	/// regardless of the underlying type) and appends it to val.
+
+
 void Foundation_API appendJSONString(std::string& val, const Var& any);
-	/// Converts the any to a JSON value and adds it to val
+	/// Converts the any to a JSON string (i.e. wraps it into double quotes) 
+	/// regardless of the underlying type) and appends it to val.
+
+
+void Foundation_API appendJSONValue(std::string& val, const Var& any);
+	/// Converts the any to a JSON value (if underlying type qualifies 
+	/// as string - see isJSONString() - , it is wrapped into double quotes) 
+	/// and appends it to val
 
 
 class Foundation_API VarHolder
@@ -2694,14 +2706,14 @@ public:
 		typename std::vector<T>::const_iterator itEnd = _val.end();
 		if (!_val.empty())
 		{
-			appendJSONString(val, *it);
+			appendJSONValue(val, *it);
 			++it;
 		}
 		for (; it != itEnd; ++it)
 		{
 			
 			val.append(", ");
-			appendJSONString(val, *it);
+			appendJSONValue(val, *it);
 		}
 		val.append(" ]");
 	}
