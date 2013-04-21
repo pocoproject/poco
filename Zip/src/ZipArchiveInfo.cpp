@@ -105,7 +105,7 @@ std::string ZipArchiveInfo::createHeader() const
 
 
 void ZipArchiveInfo::setZipComment(const std::string& comment)
-{    
+{
 	// Confirm string is of valid size
 	if (comment.size() > 65535)
 		throw ZipException("Maximum number of entries for a ZIP file reached: 65535");
@@ -113,7 +113,7 @@ void ZipArchiveInfo::setZipComment(const std::string& comment)
 	// Change the value of the ZIP Comment Size to reflect new comment size
 	ZipUtil::set16BitValue(static_cast<Poco::UInt16>(comment.size()), _rawInfo, ZIPCOMMENT_LENGTH_POS);
 
-    // Now change our internal comment
+	// Now change our internal comment
 	_comment = comment;
 }
 

@@ -83,7 +83,7 @@ public:
 
 	FileHeaders::const_iterator headerEnd() const;
 
-    const std::string& getZipComment() const;
+	const std::string& getZipComment() const;
 
 private:
 	void parse(std::istream& in, ParseCallback& pc);
