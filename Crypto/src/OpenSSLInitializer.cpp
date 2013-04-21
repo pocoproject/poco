@@ -92,7 +92,9 @@ void OpenSSLInitializer::initialize()
 		int nMutexes = CRYPTO_num_locks();
 		_mutexes = new Poco::FastMutex[nMutexes];
 		CRYPTO_set_locking_callback(&OpenSSLInitializer::lock);
-#ifndef POCO_OS_FAMILY_WINDOWS // SF# 1828231: random unhandled exceptions when linking with ssl
+// not needed on windows 
+// (see SF# 1828231: random unhandled exceptions when linking with ssl)
+#ifndef POCO_OS_FAMILY_WINDOWS
 		CRYPTO_set_id_callback(&OpenSSLInitializer::id);
 #endif
 		CRYPTO_set_dynlock_create_callback(&OpenSSLInitializer::dynlockCreate);
@@ -111,6 +113,11 @@ void OpenSSLInitializer::uninitialize()
 		EVP_cleanup();
 		ERR_free_strings();
 		CRYPTO_set_locking_callback(0);
+// not needed on windows 
+// (see SF# 1828231: random unhandled exceptions when linking with ssl)
+#ifndef POCO_OS_FAMILY_WINDOWS
+		CRYPTO_set_id_callback(0);
+#endif
 		delete [] _mutexes;
 	}
 }
