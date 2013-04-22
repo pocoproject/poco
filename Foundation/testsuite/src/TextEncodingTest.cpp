@@ -40,6 +40,7 @@
 #include "Poco/Windows1250Encoding.h"
 #include "Poco/Windows1251Encoding.h"
 #include "Poco/Windows1252Encoding.h"
+#include "Poco/UTF8Encoding.h"
 
 
 using namespace Poco;
@@ -105,6 +106,10 @@ void TextEncodingTest::testTextEncoding()
 	TextEncoding::global(new Windows1252Encoding);
 	TextEncoding& glob7 = TextEncoding::global();
 	assert (std::string("Windows-1252") == glob7.canonicalName());
+
+	TextEncoding::global(new UTF8Encoding);
+	TextEncoding& glob8 = TextEncoding::global();
+	assert (std::string("UTF-8") == glob8.canonicalName());
 }
 
 

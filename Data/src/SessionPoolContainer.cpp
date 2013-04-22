@@ -69,7 +69,7 @@ void SessionPoolContainer::add(SessionPool* pPool)
 		throw SessionPoolExistsException("Session pool already exists: " + pPool->name());
 
 	pPool->duplicate();
-	_sessionPools.insert(SessionPoolMap::ValueType(pPool->name(), pPool));
+	_sessionPools.insert(SessionPoolMap::value_type(pPool->name(), pPool));
 }
 
 
@@ -82,7 +82,7 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 	std::string name = SessionPool::name(sessionKey, connectionString);
 
 	FastMutex::ScopedLock lock(_mutex);
-	SessionPoolMap::Iterator it = _sessionPools.find(name);
+	SessionPoolMap::iterator it = _sessionPools.find(name);
 
 	// pool already exists, silently return a session from it
 	if (it != _sessionPools.end()) return it->second->get();
@@ -90,8 +90,8 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 	SessionPool* pSP = 
 		new SessionPool(sessionKey, connectionString, minSessions, maxSessions, idleTime);
 
-	std::pair<SessionPoolMap::Iterator, bool> ins = 
-		_sessionPools.insert(SessionPoolMap::ValueType(name, pSP));
+	std::pair<SessionPoolMap::iterator, bool> ins = 
+		_sessionPools.insert(SessionPoolMap::value_type(name, pSP));
 
 	return ins.first->second->get();
 }
@@ -111,7 +111,7 @@ SessionPool& SessionPoolContainer::getPool(const std::string& name)
 	std::string n = Session::uri(uri.getScheme(), path.substr(1));
 
 	FastMutex::ScopedLock lock(_mutex);
-	SessionPoolMap::Iterator it = _sessionPools.find(n);
+	SessionPoolMap::iterator it = _sessionPools.find(n);
 	if (_sessionPools.end() == it) throw NotFoundException(n);
 	return *it->second;
 }
@@ -119,8 +119,8 @@ SessionPool& SessionPoolContainer::getPool(const std::string& name)
 
 void SessionPoolContainer::shutdown()
 {
-	SessionPoolMap::Iterator it = _sessionPools.begin();
-	SessionPoolMap::Iterator end = _sessionPools.end();
+	SessionPoolMap::iterator it = _sessionPools.begin();
+	SessionPoolMap::iterator end = _sessionPools.end();
 	for (; it != end; ++it) it->second->shutdown();
 }
 

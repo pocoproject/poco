@@ -108,16 +108,8 @@ private:
 		Poco::SharedPtr<Connector> ptrSI;
 		SessionInfo(Connector* pSI);
 	};
-
-	struct ILT
-	{
-		bool operator() (const std::string& s1, const std::string& s2) const
-		{
-			return Poco::icompare(s1, s2) < 0;
-		}
-	};
 	
-	typedef std::map<std::string, SessionInfo, ILT> Connectors;
+	typedef std::map<std::string, SessionInfo, Poco::CILess> Connectors;
 	Connectors      _connectors;
 	Poco::FastMutex _mutex;
 };

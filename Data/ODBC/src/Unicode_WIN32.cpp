@@ -35,6 +35,7 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
+#include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Unicode_WIN32.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
@@ -612,7 +613,8 @@ SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 		pcbConnStrOut,
 		fDriverCompletion);
 
-	makeUTF8(bufOut, *pcbConnStrOut * sizeof(wchar_t), szConnStrOut, cbConnStrOutMax);
+	if (!Utility::isError(rc))
+		makeUTF8(bufOut, *pcbConnStrOut * sizeof(wchar_t), szConnStrOut, cbConnStrOutMax);
 
 	return rc;
 }

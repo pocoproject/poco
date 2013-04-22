@@ -234,9 +234,15 @@ void SessionPoolTest::testSessionPool()
 void SessionPoolTest::testSessionPoolContainer()
 {
 	SessionPoolContainer spc;
-	AutoPtr<SessionPool> pPool = new SessionPool("test", "cs");
+	AutoPtr<SessionPool> pPool = new SessionPool("TeSt", "Cs");
 	spc.add(pPool);
 	assert (1 == spc.count());
+
+	Poco::Data::Session sess = spc.get("test:///cs");
+	assert ("test" == sess.impl()->connectorName());
+	assert ("Cs" == sess.impl()->connectionString());
+	assert ("test:///Cs" == sess.uri());
+
 	try { spc.add(pPool); fail ("must fail"); }
 	catch (SessionPoolExistsException&) { }
 	spc.remove(pPool->name());
@@ -244,10 +250,10 @@ void SessionPoolTest::testSessionPoolContainer()
 	try { spc.get("test"); fail ("must fail"); }
 	catch (NotFoundException&) { }
 
-	spc.add("test", "cs");
-	spc.add("test", "cs");//duplicate request, must be silently ignored
+	spc.add("tEsT", "cs");
+	spc.add("TeSt", "cs");//duplicate request, must be silently ignored
 	assert (1 == spc.count());
-	spc.remove("test:///cs");
+	spc.remove("TesT:///cs");
 	assert (0 == spc.count());
 	try { spc.get("test"); fail ("must fail"); }
 	catch (NotFoundException&) { }

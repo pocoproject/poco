@@ -58,20 +58,22 @@ using Poco::DateTime;
 #ifdef POCO_ODBC_USE_MAMMOTH_NG
 	#define POSTGRESQL_ODBC_DRIVER "Mammoth ODBCng Beta"
 #elif defined (POCO_ODBC_UNICODE)
-	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL Unicode"
+	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ODBC Driver(UNICODE)"
+	#define POSTGRESQL_DSN "PocoDataPgSQLTestW"
 #else
-	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ANSI"
+	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ODBC Driver(ANSI)"
+	#define POSTGRESQL_DSN "PocoDataPgSQLTest"
 #endif
-#define POSTGRESQL_DSN "PocoDataPgSQLTest"
-#define POSTGRESQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
-#define POSTGRESQL_PORT "5432"
-#define POSTGRESQL_DB "postgres"
-#define POSTGRESQL_UID "postgres"
-#define POSTGRESQL_PWD "postgres"
 
+#define POSTGRESQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
+#define POSTGRESQL_PORT    "5432"
+#define POSTGRESQL_DB      "postgres"
+#define POSTGRESQL_UID     "postgres"
+#define POSTGRESQL_PWD     "postgres"
+#define POSTGRESQL_VERSION "9.2"
 
 #ifdef POCO_OS_FAMILY_WINDOWS
-const std::string ODBCPostgreSQLTest::_libDir = "C:\\\\Program Files\\\\PostgreSQL\\\\8.2\\\\lib\\\\";
+const std::string ODBCPostgreSQLTest::_libDir = "C:\\\\Program Files\\\\PostgreSQL\\\\" POSTGRESQL_VERSION "\\\\lib\\\\";
 #else
 const std::string ODBCPostgreSQLTest::_libDir = "/usr/local/pgsql/lib/";
 #endif
