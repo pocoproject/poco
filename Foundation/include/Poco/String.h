@@ -652,17 +652,17 @@ S cat(const S& delim, const It& begin, const It& end)
 template <typename charT>
 struct i_char_traits : public std::char_traits<charT>
 {
-	static bool eq(charT c1, charT c2)
+	inline static bool eq(charT c1, charT c2)
 	{
 		return Ascii::toLower(c1) == Ascii::toLower(c2);
 	}
 
-	static bool ne(charT c1, charT c2)
+	inline static bool ne(charT c1, charT c2)
 	{
 		return !eq(c1, c2);
 	}
 
-	static bool lt(charT c1, charT c2)
+	inline static bool lt(charT c1, charT c2)
 	{
 		return Ascii::toLower(c1) < Ascii::toLower(c2);
 	}
@@ -688,10 +688,13 @@ struct i_char_traits : public std::char_traits<charT>
 
 
 typedef std::basic_string<char, i_char_traits<char> > istring;
+	/// Case-insensitive std::string counterpart.
 
 
 template<typename T>
 std::size_t isubstr(const T& str, const T& sought)
+	/// Case-insensitive substring; searches for a substring
+	/// without regards to case.
 {
 	typename T::const_iterator it = std::search(str.begin(), str.end(),
 		sought.begin(), sought.end(), 
@@ -700,6 +703,18 @@ std::size_t isubstr(const T& str, const T& sought)
 	if (it != str.end()) return it - str.begin();
 	else return static_cast<std::size_t>(T::npos);
 }
+
+
+struct CILess
+	/// Case-insensitive less-than functor; useful for standard maps
+	/// and sets with std::strings keys and case-insensitive ordering
+	/// requirement.
+{
+	inline bool operator() (const std::string& s1, const std::string& s2) const
+	{
+		return icompare(s1, s2) < 0;
+	}
+};
 
 
 } // namespace Poco

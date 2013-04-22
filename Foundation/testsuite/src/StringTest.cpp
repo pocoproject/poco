@@ -41,6 +41,8 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
+#include <map>
+#include <set>
 
 
 using Poco::trimLeft;
@@ -73,6 +75,7 @@ using Poco::doubleToStr;
 using Poco::thousandSeparator;
 using Poco::decimalSeparator;
 using Poco::format;
+using Poco::CILess;
 using Poco::MemoryInputStream;
 using Poco::Stopwatch;
 using Poco::RangeException;
@@ -302,6 +305,39 @@ void StringTest::testIcompare()
 	assert (icompare(ss1, 2, 2, "bb") < 0);
 	
 	assert (icompare(ss1, 2, "aaa") > 0);
+}
+
+
+void StringTest::testCILessThan()
+{
+	typedef std::map<std::string, int, CILess> CIMapType;
+	CIMapType ciMap;
+	
+	ciMap["z"] = 1;
+	ciMap["b"] = 2;
+	ciMap["A"] = 3;
+	ciMap["Z"] = 4;
+
+	assert (ciMap.size() == 3);
+	CIMapType::iterator it = ciMap.begin();
+	assert (it->first == "A"); ++it;
+	assert (it->first == "b"); ++it;
+	assert (it->first == "z");
+	assert (it->second == 4);
+
+	typedef std::set<std::string, CILess> CISetType;
+	
+	CISetType ciSet;
+	ciSet.insert("z");
+	ciSet.insert("b");
+	ciSet.insert("A");
+	ciSet.insert("Z");
+
+	assert (ciSet.size() == 3);
+	CISetType::iterator sIt = ciSet.begin();
+	assert (*sIt == "A"); ++sIt;
+	assert (*sIt == "b"); ++sIt;
+	assert (*sIt == "z");
 }
 
 
@@ -1080,6 +1116,7 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testToLower);
 	CppUnit_addTest(pSuite, StringTest, testIstring);
 	CppUnit_addTest(pSuite, StringTest, testIcompare);
+	CppUnit_addTest(pSuite, StringTest, testCILessThan);
 	CppUnit_addTest(pSuite, StringTest, testTranslate);
 	CppUnit_addTest(pSuite, StringTest, testTranslateInPlace);
 	CppUnit_addTest(pSuite, StringTest, testReplace);

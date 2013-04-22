@@ -51,7 +51,7 @@ public:
 	void testManipulator();
 	void testManipulatorDel();
 	void testManipulatorReplace();
-    void testSetZipComment();
+	void testSetZipComment();
 
 	void setUp();
 	void tearDown();

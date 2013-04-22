@@ -43,7 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionPool.h"
-#include "Poco/HashMap.h"
+#include "Poco/String.h"
 #include "Poco/Mutex.h"
 
 
@@ -92,7 +92,7 @@ public:
 		/// Shuts down all the held pools.
 
 private:
-	typedef HashMap<std::string, AutoPtr<SessionPool> > SessionPoolMap;
+	typedef std::map<std::string, AutoPtr<SessionPool>, Poco::CILess> SessionPoolMap;
 
 	SessionPoolContainer(const SessionPoolContainer&);
 	SessionPoolContainer& operator = (const SessionPoolContainer&);
