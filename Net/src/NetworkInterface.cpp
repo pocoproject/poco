@@ -1030,13 +1030,13 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		unsigned ifIndex = 0;
 
 #if defined(POCO_HAVE_IPv6)
-	#if defined (IP_ADAPTER_IPV6_ENABLED)
+	#if (_WIN32_WINNT >= 0x600) && defined (IP_ADAPTER_IPV6_ENABLED)
 		if (pAddress->Flags & IP_ADAPTER_IPV6_ENABLED) ifIndex = pAddress->Ipv6IfIndex;
 	#else
 		ifIndex = pAddress->Ipv6IfIndex;
 	#endif
 #endif
-#if defined (IP_ADAPTER_IPV4_ENABLED)
+#if (_WIN32_WINNT >= 0x600) && defined (IP_ADAPTER_IPV4_ENABLED)
 		if (pAddress->Flags & IP_ADAPTER_IPV4_ENABLED) ifIndex = pAddress->IfIndex;
 #else
 		ifIndex = pAddress->IfIndex;
