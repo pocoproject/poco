@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shell", "Shell_x64_vs110.vcxproj", "{8153C1CE-25D6-4D39-B565-5C4527F0DBA5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client_x64_vs110.vcxproj", "{6E47E601-FBE0-47AE-B33F-BCBBB72210DE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|x64 = debug_shared|x64
+		release_shared|x64 = release_shared|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8153C1CE-25D6-4D39-B565-5C4527F0DBA5}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{8153C1CE-25D6-4D39-B565-5C4527F0DBA5}.debug_shared|x64.Build.0 = debug_shared|x64
+		{8153C1CE-25D6-4D39-B565-5C4527F0DBA5}.release_shared|x64.ActiveCfg = release_shared|x64
+		{8153C1CE-25D6-4D39-B565-5C4527F0DBA5}.release_shared|x64.Build.0 = release_shared|x64
+		{6E47E601-FBE0-47AE-B33F-BCBBB72210DE}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{6E47E601-FBE0-47AE-B33F-BCBBB72210DE}.debug_shared|x64.Build.0 = debug_shared|x64
+		{6E47E601-FBE0-47AE-B33F-BCBBB72210DE}.release_shared|x64.ActiveCfg = release_shared|x64
+		{6E47E601-FBE0-47AE-B33F-BCBBB72210DE}.release_shared|x64.Build.0 = release_shared|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

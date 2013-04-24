@@ -1,0 +1,39 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShellBundle", "ShellBundle_vs71.vcproj", "{9D75D447-6A02-4059-8DE7-5550D1FF1138}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8153C1CE-25D6-4D39-B565-5C4527F0DBA5} = {8153C1CE-25D6-4D39-B565-5C4527F0DBA5}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shell", "Shell_vs71.vcproj", "{8153C1CE-25D6-4D39-B565-5C4527F0DBA5}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client_vs71.vcproj", "{6E47E601-FBE0-47AE-B33F-BCBBB72210DE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8153C1CE-25D6-4D39-B565-5C4527F0DBA5} = {8153C1CE-25D6-4D39-B565-5C4527F0DBA5}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug_shared = debug_shared
+		release_shared = release_shared
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{9D75D447-6A02-4059-8DE7-5550D1FF1138}.debug_shared.ActiveCfg = debug_shared|Win32
+		{9D75D447-6A02-4059-8DE7-5550D1FF1138}.debug_shared.Build.0 = debug_shared|Win32
+		{9D75D447-6A02-4059-8DE7-5550D1FF1138}.release_shared.ActiveCfg = release_shared|Win32
+		{9D75D447-6A02-4059-8DE7-5550D1FF1138}.release_shared.Build.0 = release_shared|Win32
+		{8153C1CE-25D6-4D39-B565-5C4527F0DBA5}.debug_shared.ActiveCfg = debug_shared|Win32
+		{8153C1CE-25D6-4D39-B565-5C4527F0DBA5}.debug_shared.Build.0 = debug_shared|Win32
+		{8153C1CE-25D6-4D39-B565-5C4527F0DBA5}.release_shared.ActiveCfg = release_shared|Win32
+		{8153C1CE-25D6-4D39-B565-5C4527F0DBA5}.release_shared.Build.0 = release_shared|Win32
+		{6E47E601-FBE0-47AE-B33F-BCBBB72210DE}.debug_shared.ActiveCfg = debug_shared|Win32
+		{6E47E601-FBE0-47AE-B33F-BCBBB72210DE}.debug_shared.Build.0 = debug_shared|Win32
+		{6E47E601-FBE0-47AE-B33F-BCBBB72210DE}.release_shared.ActiveCfg = release_shared|Win32
+		{6E47E601-FBE0-47AE-B33F-BCBBB72210DE}.release_shared.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
