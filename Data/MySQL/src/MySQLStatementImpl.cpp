@@ -44,7 +44,8 @@ namespace MySQL {
 MySQLStatementImpl::MySQLStatementImpl(SessionImpl& h) :
 	Poco::Data::StatementImpl(h), 
 	_stmt(h.handle()), 
-	_extractor(_stmt, _metadata), 
+	_pBinder(new Binder),
+	_pExtractor(new Extractor(_stmt, _metadata)), 
 	_hasNext(NEXT_DONTKNOW)
 {
 }
@@ -160,21 +161,21 @@ void MySQLStatementImpl::bindImpl()
 		pos += (*it)->numOfColumnsHandled();
 	}
 
-	_stmt.bindParams(_binder.getBindArray(), _binder.size());
+	_stmt.bindParams(_pBinder->getBindArray(), _pBinder->size());
 	_stmt.execute();
 	_hasNext = NEXT_DONTKNOW;
 }
 
 
-AbstractExtractor& MySQLStatementImpl::extractor()
+Poco::Data::AbstractExtractor::Ptr MySQLStatementImpl::extractor()
 {
-	return _extractor;
+	return _pExtractor;
 }
 
 
-AbstractBinder& MySQLStatementImpl::binder()
+Poco::Data::AbstractBinder::Ptr MySQLStatementImpl::binder()
 {
-	return _binder;
+	return _pBinder;
 }
 
 

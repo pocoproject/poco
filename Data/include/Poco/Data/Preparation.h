@@ -56,7 +56,7 @@ class Preparation: public AbstractPreparation
 	/// Class for calling the appropriate AbstractPreparator method.
 {
 public:
-	Preparation(AbstractPreparator* pPreparator, std::size_t pos, T& val): 
+	Preparation(AbstractPreparator::Ptr& pPreparator, std::size_t pos, T& val): 
 		AbstractPreparation(pPreparator), 
 		_pos(pos), 
 		_val(val)

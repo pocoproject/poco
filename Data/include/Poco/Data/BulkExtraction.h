@@ -128,7 +128,7 @@ public:
 	{
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t col)
+	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t col)
 	{
 		Poco::UInt32 limit = getLimit();
 		if (limit != _rResult.size()) _rResult.resize(limit);
@@ -221,7 +221,7 @@ namespace Keywords {
 
 
 template <typename T> 
-BulkExtraction<std::vector<T> >* into(std::vector<T>& t, const Bulk& bulk, const Position& pos = Position(0))
+AbstractExtraction::Ptr into(std::vector<T>& t, const Bulk& bulk, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::vector bulk extraction support.
 {
@@ -230,7 +230,7 @@ BulkExtraction<std::vector<T> >* into(std::vector<T>& t, const Bulk& bulk, const
 
 
 template <typename T> 
-BulkExtraction<std::vector<T> >* into(std::vector<T>& t, BulkFnType, const Position& pos = Position(0))
+AbstractExtraction::Ptr into(std::vector<T>& t, BulkFnType, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::vector bulk extraction support.
 {
@@ -241,7 +241,7 @@ BulkExtraction<std::vector<T> >* into(std::vector<T>& t, BulkFnType, const Posit
 
 
 template <typename T> 
-BulkExtraction<std::deque<T> >* into(std::deque<T>& t, const Bulk& bulk, const Position& pos = Position(0))
+AbstractExtraction::Ptr into(std::deque<T>& t, const Bulk& bulk, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::deque bulk extraction support.
 {
@@ -250,7 +250,7 @@ BulkExtraction<std::deque<T> >* into(std::deque<T>& t, const Bulk& bulk, const P
 
 
 template <typename T> 
-BulkExtraction<std::deque<T> >* into(std::deque<T>& t, BulkFnType, const Position& pos = Position(0))
+AbstractExtraction::Ptr into(std::deque<T>& t, BulkFnType, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::deque bulk extraction support.
 {
@@ -261,7 +261,7 @@ BulkExtraction<std::deque<T> >* into(std::deque<T>& t, BulkFnType, const Positio
 
 
 template <typename T> 
-BulkExtraction<std::list<T> >* into(std::list<T>& t, const Bulk& bulk, const Position& pos = Position(0))
+AbstractExtraction::Ptr into(std::list<T>& t, const Bulk& bulk, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::list bulk extraction support.
 {
@@ -270,7 +270,7 @@ BulkExtraction<std::list<T> >* into(std::list<T>& t, const Bulk& bulk, const Pos
 
 
 template <typename T> 
-BulkExtraction<std::list<T> >* into(std::list<T>& t, BulkFnType, const Position& pos = Position(0))
+AbstractExtraction::Ptr into(std::list<T>& t, BulkFnType, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::list bulk extraction support.
 {

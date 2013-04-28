@@ -49,7 +49,7 @@ namespace Poco {
 namespace Data {
 
 
-Statement::Statement(StatementImpl* pImpl):
+Statement::Statement(StatementImpl::Ptr pImpl):
 	_pImpl(pImpl),
 	_async(false)
 {
@@ -207,7 +207,7 @@ Statement& Statement::operator , (Manipulator manip)
 }
 
 
-Statement& Statement::addBind(AbstractBinding* pBind, bool duplicate)
+Statement& Statement::addBind(AbstractBinding::Ptr pBind)
 {
 	if (pBind->isBulk())
 	{
@@ -221,13 +221,12 @@ Statement& Statement::addBind(AbstractBinding* pBind, bool duplicate)
 	}
 	else _pImpl->forbidBulk();
 
-	if (duplicate) pBind->duplicate();
 	_pImpl->addBind(pBind);
 	return *this;
 }
 
 
-Statement& Statement::addExtract(AbstractExtraction* pExtract, bool duplicate)
+Statement& Statement::addExtract(AbstractExtraction::Ptr pExtract)
 {
 	if (pExtract->isBulk())
 	{
@@ -244,7 +243,6 @@ Statement& Statement::addExtract(AbstractExtraction* pExtract, bool duplicate)
 	}
 	else _pImpl->forbidBulk();
 
-	if (duplicate) pExtract->duplicate();
 	_pImpl->addExtract(pExtract);
 	return *this;
 }

@@ -92,10 +92,10 @@ protected:
 	void bindImpl();
 		/// Binds parameters
 
-	AbstractExtractor& extractor();
+	AbstractExtraction::ExtractorPtr extractor();
 		/// Returns the concrete extractor used by the statement.
 
-	AbstractBinder& binder();
+	AbstractBinding::BinderPtr binder();
 		/// Returns the concrete binder used by the statement.
 
 private:
@@ -109,15 +109,15 @@ private:
 //
 // inlines
 //
-inline AbstractExtractor& TestStatementImpl::extractor()
+inline AbstractExtraction::ExtractorPtr TestStatementImpl::extractor()
 {
-	return *_ptrExtractor;
+	return _ptrExtractor;
 }
 
 
-inline AbstractBinder& TestStatementImpl::binder()
+inline AbstractBinding::BinderPtr TestStatementImpl::binder()
 {
-	return *_ptrBinder;
+	return _ptrBinder;
 }
 
 

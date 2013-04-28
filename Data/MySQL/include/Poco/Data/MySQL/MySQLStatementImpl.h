@@ -59,7 +59,6 @@ class MySQL_API MySQLStatementImpl: public Poco::Data::StatementImpl
 	/// Implements statement functionality needed for MySQL
 {
 public:
-
 	MySQLStatementImpl(SessionImpl& s);
 		/// Creates the MySQLStatementImpl.
 		
@@ -69,7 +68,7 @@ public:
 protected:
 
 	virtual std::size_t columnsReturned() const;
-		/// Returns number of columns returned by query.		
+		/// Returns number of columns returned by query.
 
 	virtual std::size_t affectedRowCount() const;
 		/// Returns the number of affected rows.
@@ -97,10 +96,10 @@ protected:
 	virtual void bindImpl();
 		/// Binds parameters
 		
-	virtual AbstractExtractor& extractor();
+	virtual Poco::Data::AbstractExtractor::Ptr extractor();
 		/// Returns the concrete extractor used by the statement.
 		
-	virtual AbstractBinder& binder();
+	virtual Poco::Data::AbstractBinder::Ptr binder();
 		/// Returns the concrete binder used by the statement.
 
 private:
@@ -113,8 +112,8 @@ private:
 
 	StatementExecutor _stmt;
 	ResultMetadata    _metadata;
-	Binder            _binder;
-	Extractor         _extractor;
+	Binder::Ptr       _pBinder;
+	Extractor::Ptr    _pExtractor;
 	int               _hasNext;
 	};
 

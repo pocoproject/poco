@@ -104,10 +104,10 @@ protected:
 	void bindImpl();
 		/// Binds parameters
 
-	AbstractExtractor& extractor();
+	AbstractExtraction::ExtractorPtr extractor();
 		/// Returns the concrete extractor used by the statement.
 
-	AbstractBinder& binder();
+	AbstractBinding::BinderPtr binder();
 		/// Returns the concrete binder used by the statement.
 
 private:
@@ -144,15 +144,15 @@ private:
 //
 // inlines
 //
-inline AbstractExtractor& SQLiteStatementImpl::extractor()
+inline AbstractExtraction::ExtractorPtr SQLiteStatementImpl::extractor()
 {
-	return *_pExtractor;
+	return _pExtractor;
 }
 
 
-inline AbstractBinder& SQLiteStatementImpl::binder()
+inline AbstractBinding::BinderPtr SQLiteStatementImpl::binder()
 {
-	return *_pBinder;
+	return _pBinder;
 }
 
 

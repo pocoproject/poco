@@ -72,6 +72,8 @@ class Data_API AbstractExtractor
 	/// If an extractor receives null it is not allowed to change val!
 {
 public:
+	typedef SharedPtr<AbstractExtractor> Ptr;
+
 	AbstractExtractor();
 		/// Creates the AbstractExtractor.
 

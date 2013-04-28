@@ -41,7 +41,7 @@ namespace Poco {
 namespace Data {
 
 
-AbstractPreparation::AbstractPreparation(AbstractPreparator* pPreparator):
+AbstractPreparation::AbstractPreparation(PreparatorPtr pPreparator):
 	_pPreparator(pPreparator)
 {
 	poco_assert_dbg (_pPreparator);

@@ -130,7 +130,7 @@ public:
 		return !_extracted;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _rResult);
 	}
@@ -204,7 +204,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -285,7 +285,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<bool>(pPrep, pos, _default);
 	}
@@ -364,7 +364,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -443,7 +443,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -576,7 +576,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -635,7 +635,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -694,7 +694,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<V>(pPrep, pos, _default);
 	}
@@ -753,7 +753,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<V>(pPrep, pos, _default);
 	}
@@ -768,7 +768,7 @@ namespace Keywords {
 
 
 template <typename T> 
-inline Extraction<T>* into(T& t)
+inline AbstractExtraction::Ptr into(T& t)
 	/// Convenience function to allow for a more compact creation of an extraction object.
 {
 	return new Extraction<T>(t);
@@ -776,7 +776,7 @@ inline Extraction<T>* into(T& t)
 
 
 template <typename T> 
-inline Extraction<T>* into(T& t, const Position& pos)
+inline AbstractExtraction::Ptr into(T& t, const Position& pos)
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with multiple recordset support.
 {
@@ -785,7 +785,7 @@ inline Extraction<T>* into(T& t, const Position& pos)
 
 
 template <typename T> 
-inline Extraction<T>* into(T& t, const Position& pos, const T& def)
+inline AbstractExtraction::Ptr into(T& t, const Position& pos, const T& def)
 	/// Convenience function to allow for a more compact creation of an extraction object 
 	/// with multiple recordset support and the given default
 {

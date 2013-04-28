@@ -264,10 +264,9 @@ void StatementImpl::fixupExtraction()
 
 	Poco::Data::AbstractExtractionVec::iterator it    = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
-	AbstractExtractor& ex = extractor();
 	for (; it != itEnd; ++it)
 	{
-		(*it)->setExtractor(&ex);
+		(*it)->setExtractor(extractor());
 		(*it)->setLimit(_extrLimit.value()),
 		_columnsExtracted[_curDataSet] += (int)(*it)->numOfColumnsHandled();
 	}
@@ -279,8 +278,7 @@ void StatementImpl::fixupBinding()
 	// no need to call binder().reset(); here will be called before each bind anyway
 	AbstractBindingVec::iterator it    = bindings().begin();
 	AbstractBindingVec::iterator itEnd = bindings().end();
-	AbstractBinder& bin = binder();
-	for (; it != itEnd; ++it) (*it)->setBinder(&bin);
+	for (; it != itEnd; ++it) (*it)->setBinder(binder());
 }
 
 
@@ -395,7 +393,7 @@ std::size_t StatementImpl::activatePreviousDataSet()
 }
 
 
-void StatementImpl::addExtract(AbstractExtraction* pExtraction)
+void StatementImpl::addExtract(AbstractExtraction::Ptr pExtraction)
 {
 	poco_check_ptr (pExtraction);
 	std::size_t pos = pExtraction->position();

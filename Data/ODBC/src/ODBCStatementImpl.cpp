@@ -163,7 +163,7 @@ void ODBCStatementImpl::addPreparator()
 	else
 		_preparations.push_back(new Preparator(*_preparations[0]));
 
-	_extractors.push_back(new Extractor(_stmt, *_preparations.back()));
+	_extractors.push_back(new Extractor(_stmt, _preparations.back()));
 }
 
 
@@ -189,10 +189,10 @@ void ODBCStatementImpl::doPrepare()
 
 		for (std::size_t pos = 0; it != itEnd; ++it)
 		{
-			AbstractPreparation* pAP = (*it)->createPreparation(_preparations[curDataSet], pos);
+			Poco::Data::AbstractPreparator::Ptr pP = _preparations[curDataSet];
+			std::auto_ptr<AbstractPreparation> pAP((*it)->createPreparation(pP, pos));
 			pAP->prepare();
 			pos += (*it)->numOfColumnsHandled();
-			delete pAP;
 		}
 
 		_prepared = true;

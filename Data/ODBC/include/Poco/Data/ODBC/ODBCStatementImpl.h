@@ -104,10 +104,10 @@ protected:
 	void bindImpl();
 		/// Binds all parameters and executes the statement.
 
-	AbstractExtractor& extractor();
+	AbstractExtraction::ExtractorPtr extractor();
 		/// Returns the concrete extractor used by the statement.
 
-	AbstractBinder& binder();
+	AbstractBinding::BinderPtr binder();
 		/// Returns the concrete binder used by the statement.
 
 	std::string nativeSQL();
@@ -181,18 +181,18 @@ private:
 //
 // inlines
 //
-inline AbstractExtractor& ODBCStatementImpl::extractor()
+inline AbstractExtraction::ExtractorPtr ODBCStatementImpl::extractor()
 {
 	poco_assert_dbg (currentDataSet() < _extractors.size());
 	poco_assert_dbg (_extractors[currentDataSet()]);
-	return *_extractors[currentDataSet()];
+	return _extractors[currentDataSet()];
 }
 
 
-inline AbstractBinder& ODBCStatementImpl::binder()
+inline AbstractBinding::BinderPtr ODBCStatementImpl::binder()
 {
-	poco_assert_dbg (_pBinder);
-	return *_pBinder;
+	poco_assert_dbg (!_pBinder.isNull());
+	return _pBinder;
 }
 
 

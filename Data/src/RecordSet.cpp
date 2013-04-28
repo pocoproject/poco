@@ -81,7 +81,7 @@ RecordSet::RecordSet(Session& rSession,
 
 
 RecordSet::RecordSet(const RecordSet& other):
-	Statement(other.impl().duplicate()),
+	Statement(other.impl()),
 	_currentRow(other._currentRow),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
