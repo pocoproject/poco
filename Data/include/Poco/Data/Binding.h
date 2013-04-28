@@ -73,7 +73,7 @@ class Binding: public AbstractBinding
 	/// function. An attempt to pass a constant by reference shall result in compile-time error.
 {
 public:
-	typedef typename T         ValType;
+	typedef T                ValType;
 	typedef Binding<ValType> Type;
 	typedef SharedPtr<Type>    Ptr;
 
@@ -142,7 +142,7 @@ class CopyBinding: public AbstractBinding
 	/// Variables can be passed as either copies or references (i.e. using either use() or bind()).
 {
 public:
-	typedef typename T           ValType;
+	typedef T                    ValType;
 	typedef SharedPtr<ValType>   ValPtr;
 	typedef CopyBinding<ValType> Type;
 	typedef SharedPtr<Type>      Ptr;
