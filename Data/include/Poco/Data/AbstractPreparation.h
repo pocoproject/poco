@@ -67,6 +67,10 @@ public:
 		/// Preparations data.
 
 protected:
+	AbstractPreparation();
+	AbstractPreparation(const AbstractPreparation&);
+	AbstractPreparation& operator = (const AbstractPreparation&);
+
 	PreparatorPtr preparation();
 		/// Returns the preparation object
 

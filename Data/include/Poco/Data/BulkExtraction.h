@@ -60,7 +60,11 @@ class BulkExtraction: public AbstractExtraction
 	/// - std::list
 {
 public:
-	typedef typename C::value_type T;
+	typedef C                       ValType;
+	typedef typename C::value_type  CValType;
+	typedef SharedPtr<ValType>      ValPtr;
+	typedef BulkExtraction<ValType> Type;
+	typedef SharedPtr<Type>         Ptr;
 
 	BulkExtraction(C& result, Poco::UInt32 limit, const Position& pos = Position(0)): 
 		AbstractExtraction(limit, pos.value(), true),
@@ -71,7 +75,7 @@ public:
 			result.resize(limit);
 	}
 
-	BulkExtraction(C& result, const T& def, Poco::UInt32 limit, const Position& pos = Position(0)): 
+	BulkExtraction(C& result, const CValType& def, Poco::UInt32 limit, const Position& pos = Position(0)): 
 		AbstractExtraction(limit, pos.value(), true),
 		_rResult(result), 
 		_default(def)
@@ -112,7 +116,7 @@ public:
 
 	std::size_t extract(std::size_t col)
 	{
-		AbstractExtractor* pExt = getExtractor();
+		AbstractExtractor::Ptr pExt = getExtractor();
 		TypeHandler<C>::extract(col, _rResult, _default, pExt);
 		typename C::iterator it = _rResult.begin();
 		typename C::iterator end = _rResult.end();
@@ -128,7 +132,7 @@ public:
 	{
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t col)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t col)
 	{
 		Poco::UInt32 limit = getLimit();
 		if (limit != _rResult.size()) _rResult.resize(limit);
@@ -145,7 +149,7 @@ protected:
 
 private:
 	C&               _rResult;
-	T                _default;
+	CValType         _default;
 	std::deque<bool> _nulls;
 };
 
@@ -163,13 +167,17 @@ class InternalBulkExtraction: public BulkExtraction<C>
 	/// InternalBulkExtraction objects can not be copied or assigned.
 {
 public:
-	typedef typename C::value_type T;
+	typedef C                               ValType;
+	typedef typename C::value_type          CValType;
+	typedef SharedPtr<ValType>              ValPtr;
+	typedef InternalBulkExtraction<ValType> Type;
+	typedef SharedPtr<Type>                 Ptr;
 
 	explicit InternalBulkExtraction(C& result,
 		Column<C>* pColumn,
 		Poco::UInt32 limit,
 		const Position& pos = Position(0)): 
-		BulkExtraction<C>(result, T(), limit, pos), 
+		BulkExtraction<C>(result, CValType(), limit, pos), 
 		_pColumn(pColumn)
 		/// Creates InternalBulkExtraction.
 	{
@@ -186,7 +194,7 @@ public:
 		_pColumn->reset();
 	}	
 
-	const T& value(int index) const
+	const CValType& value(int index) const
 	{
 		try
 		{ 

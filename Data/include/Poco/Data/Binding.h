@@ -73,8 +73,9 @@ class Binding: public AbstractBinding
 	/// function. An attempt to pass a constant by reference shall result in compile-time error.
 {
 public:
-	typedef T                ValType;
-	typedef Binding<ValType> Type;
+	typedef T                  ValType;
+	typedef SharedPtr<ValType> ValPtr;
+	typedef Binding<ValType>   Type;
 	typedef SharedPtr<Type>    Ptr;
 
 	explicit Binding(T& val,

@@ -104,12 +104,12 @@ public:
 		/// Creates the Row.
 
 	Row(NameVecPtr pNames,
-		const RowFormatterPtr& pFormatter = 0);
+		const RowFormatter::Ptr& pFormatter = 0);
 		/// Creates the Row.
 
 	Row(NameVecPtr pNames,
 		const SortMapPtr& pSortMap,
-		const RowFormatterPtr& pFormatter = 0);
+		const RowFormatter::Ptr& pFormatter = 0);
 		/// Creates the Row.
 
 	~Row();
@@ -221,7 +221,7 @@ public:
 	const ValueVec& values() const;
 		/// Returns the const reference to values vector.
 
-	void setFormatter(const RowFormatterPtr& pFormatter = 0);
+	void setFormatter(const RowFormatter::Ptr& pFormatter = 0);
 		/// Sets the formatter for this row and takes the
 		/// shared ownership of it.
 
@@ -236,7 +236,7 @@ public:
 		/// Returns the reference to the sorting fields.
 
 private:
-	void init(const SortMapPtr& pSortMap, const RowFormatterPtr& pFormatter);
+	void init(const SortMapPtr& pSortMap, const RowFormatter::Ptr& pFormatter);
 
 	void checkEmpty(std::size_t pos, const Poco::Dynamic::Var& val);
 		/// Check if row contains only empty values and throws IllegalStateException
@@ -249,12 +249,12 @@ private:
 	bool isEqualSize(const Row& other) const;
 	bool isEqualType(const Row& other) const;
 
-	NameVecPtr              _pNames;
-	ValueVec                _values;
-	SortMapPtr              _pSortMap;
-	mutable RowFormatterPtr _pFormatter;
-	mutable std::string     _nameStr;
-	mutable std::string     _valueStr;
+	NameVecPtr                _pNames;
+	ValueVec                  _values;
+	SortMapPtr                _pSortMap;
+	mutable RowFormatter::Ptr _pFormatter;
+	mutable std::string       _nameStr;
+	mutable std::string       _valueStr;
 };
 
 

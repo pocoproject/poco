@@ -234,7 +234,7 @@ public:
 		///
 		/// Set per default to zero to Limit::LIMIT_UNLIMITED, which disables the limit.
 
-	Statement& operator , (RowFormatterPtr pRowFformatter);
+	Statement& operator , (RowFormatter::Ptr pRowFformatter);
 		/// Sets the row formatter for the statement.
 
 	Statement& operator , (const Range& extrRange);
@@ -385,7 +385,7 @@ public:
 		/// Returns false if the current data set index points to the last
 		/// data set. Otherwise, it returns true.
 
-	void setRowFormatter(RowFormatterPtr pRowFormatter);
+	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Sets the row formatter for this statement.
 		/// Statement takes the ownership of the formatter.
 
@@ -410,7 +410,7 @@ protected:
 	ImplPtr impl() const;
 		/// Returns pointer to statement implementation.
 
-	const RowFormatterPtr& getRowFormatter();
+	const RowFormatter::Ptr& getRowFormatter();
 		/// Returns the row formatter for this statement.
 
 	Session session();
@@ -436,7 +436,7 @@ private:
 	Mutex               _mutex;
 	AsyncExecMethodPtr  _pAsyncExec;
 	std::vector<Any>    _arguments;
-	RowFormatterPtr     _pRowFormatter;
+	RowFormatter::Ptr     _pRowFormatter;
 	mutable std::string _stmtString;
 };
 
@@ -530,7 +530,7 @@ inline void Data_API reset(Statement& statement)
 // inlines
 //
 
-inline Statement& Statement::operator , (RowFormatterPtr pRowFformatter)
+inline Statement& Statement::operator , (RowFormatter::Ptr pRowFformatter)
 {
 	_pRowFormatter = pRowFformatter;
 	return *this;
@@ -796,13 +796,13 @@ inline bool Statement::isAsync() const
 }
 
 
-inline void Statement::setRowFormatter(RowFormatterPtr pRowFormatter)
+inline void Statement::setRowFormatter(RowFormatter::Ptr pRowFormatter)
 {
 	_pRowFormatter = pRowFormatter;
 }
 
 
-inline const RowFormatterPtr& Statement::getRowFormatter()
+inline const RowFormatter::Ptr& Statement::getRowFormatter()
 {
 	if (!_pRowFormatter) _pRowFormatter = new SimpleRowFormatter;
 	return _pRowFormatter;

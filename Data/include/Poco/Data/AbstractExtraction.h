@@ -42,6 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/AbstractExtractor.h"
+#include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Data/Limit.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
@@ -55,7 +56,6 @@ namespace Poco {
 namespace Data {
 
 
-class AbstractPreparation;
 class AbstractPreparator;
 
 
@@ -113,9 +113,8 @@ public:
 	virtual bool canExtract() const;
 		/// Returns true. Implementations should override it for different behavior.
 
-	virtual AbstractPreparation* createPreparation(PreparatorPtr& pPrep, std::size_t pos) = 0;
-		/// Creates a Preparation object for the extracting object. The returned pointer points to
-		/// a preparation object allocated on the heap; caller must take ownership of it.
+	virtual AbstractPreparation::Ptr createPreparation(PreparatorPtr& pPrep, std::size_t pos) = 0;
+		/// Creates and returns shared pointer to Preparation object for the extracting object.
 
 	void setLimit(Poco::UInt32 limit);
 		/// Sets the limit.

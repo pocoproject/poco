@@ -335,7 +335,7 @@ private:
 		/// Resets extraction so it can be reused again.
 
 	template <class C>
-	InternalExtraction<C>* createExtract(const MetaColumn& mc)
+	typename InternalExtraction<C>::Ptr createExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -343,7 +343,7 @@ private:
 	}
 
 	template <class C>
-	InternalBulkExtraction<C>* createBulkExtract(const MetaColumn& mc)
+	typename InternalBulkExtraction<C>::Ptr createBulkExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);

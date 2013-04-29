@@ -49,7 +49,6 @@ using Poco::Data::Session;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
 using Poco::Data::RowFormatter;
-using Poco::Data::RowFormatterPtr;
 
 
 class HTMLTableFormatter : public RowFormatter

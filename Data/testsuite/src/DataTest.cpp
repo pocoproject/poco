@@ -1339,10 +1339,6 @@ void DataTest::testDateAndTime()
 
 void DataTest::testExternalBindingAndExtraction()
 {
-	AbstractExtractionVecVec extractionVec;
-	AbstractExtractionVec extraction;
-	AbstractBindingVec binding;
-
 	Session tmp (Poco::Data::Test::Connector::KEY, "dummy.db");
 
 	int i;

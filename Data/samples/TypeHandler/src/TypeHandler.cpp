@@ -72,7 +72,7 @@ public:
 		return 3;
 	}
 	
-	static void bind(std::size_t pos, const Person& person, AbstractBinder* pBinder, AbstractBinder::Direction dir)
+	static void bind(std::size_t pos, const Person& person, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
 		TypeHandler<std::string>::bind(pos++, person.name, pBinder, dir);
 		TypeHandler<std::string>::bind(pos++, person.address, pBinder, dir);
@@ -80,7 +80,7 @@ public:
 		TypeHandler<DateTime>::bind(pos++, person.birthday, pBinder, dir);
 	}
 	
-	static void extract(std::size_t pos, Person& person, const Person& deflt, AbstractExtractor* pExtr)
+	static void extract(std::size_t pos, Person& person, const Person& deflt, AbstractExtractor::Ptr pExtr)
 	{
 		TypeHandler<std::string>::extract(pos++, person.name, deflt.name, pExtr);
 		TypeHandler<std::string>::extract(pos++, person.address, deflt.address, pExtr);
@@ -88,7 +88,7 @@ public:
 		TypeHandler<DateTime>::extract(pos++, person.birthday, deflt.birthday, pExtr);
 	}
 	
-	static void prepare(std::size_t pos, const Person& person, AbstractPreparator* pPrep)
+	static void prepare(std::size_t pos, const Person& person, AbstractPreparator::Ptr pPrep)
 	{
 		TypeHandler<std::string>::prepare(pos++, person.name, pPrep);
 		TypeHandler<std::string>::prepare(pos++, person.address, pPrep);
