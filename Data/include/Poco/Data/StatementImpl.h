@@ -335,7 +335,7 @@ private:
 		/// Resets extraction so it can be reused again.
 
 	template <class C>
-	typename InternalExtraction<C>::Ptr createExtract(const MetaColumn& mc)
+	SharedPtr<InternalExtraction<C> > createExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -343,7 +343,7 @@ private:
 	}
 
 	template <class C>
-	typename InternalBulkExtraction<C>::Ptr createBulkExtract(const MetaColumn& mc)
+	SharedPtr<InternalBulkExtraction<C> > createBulkExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
