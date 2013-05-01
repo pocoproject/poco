@@ -93,7 +93,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<T>::bind(pos, _val, getBinder(), getDirection());
 		_bound = true;
 	}
@@ -114,7 +114,7 @@ namespace Keywords {
 
 
 template <typename T> 
-BulkBinding<std::vector<T> >* use(const std::vector<T>& t, BulkFnType, const std::string& name = "")
+AbstractBinding::Ptr use(const std::vector<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::vector.
 {
 	return new BulkBinding<std::vector<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -122,7 +122,7 @@ BulkBinding<std::vector<T> >* use(const std::vector<T>& t, BulkFnType, const std
 
 
 template <typename T> 
-BulkBinding<std::vector<T> >* in(const std::vector<T>& t, BulkFnType, const std::string& name = "")
+AbstractBinding::Ptr in(const std::vector<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::vector.
 {
 	return new BulkBinding<std::vector<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -130,7 +130,7 @@ BulkBinding<std::vector<T> >* in(const std::vector<T>& t, BulkFnType, const std:
 
 
 template <typename T> 
-BulkBinding<std::deque<T> >* use(const std::deque<T>& t, BulkFnType, const std::string& name = "")
+AbstractBinding::Ptr use(const std::deque<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::deque.
 {
 	return new BulkBinding<std::deque<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -138,7 +138,7 @@ BulkBinding<std::deque<T> >* use(const std::deque<T>& t, BulkFnType, const std::
 
 
 template <typename T> 
-BulkBinding<std::deque<T> >* in(const std::deque<T>& t, BulkFnType, const std::string& name = "")
+AbstractBinding::Ptr in(const std::deque<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::deque.
 {
 	return new BulkBinding<std::deque<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -146,7 +146,7 @@ BulkBinding<std::deque<T> >* in(const std::deque<T>& t, BulkFnType, const std::s
 
 
 template <typename T> 
-BulkBinding<std::list<T> >* use(const std::list<T>& t, BulkFnType, const std::string& name = "")
+AbstractBinding::Ptr use(const std::list<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::list.
 {
 	return new BulkBinding<std::list<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -154,7 +154,7 @@ BulkBinding<std::list<T> >* use(const std::list<T>& t, BulkFnType, const std::st
 
 
 template <typename T> 
-BulkBinding<std::list<T> >* in(const std::list<T>& t, BulkFnType, const std::string& name = "")
+AbstractBinding::Ptr in(const std::list<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::list.
 {
 	return new BulkBinding<std::list<T> >(t, static_cast<Poco::UInt32>(t.size()), name);

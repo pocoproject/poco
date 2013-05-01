@@ -62,6 +62,8 @@ class MySQL_API Extractor: public Poco::Data::AbstractExtractor
 	/// If NULL is received, the incoming val value is not changed and false is returned
 {
 public:
+	typedef SharedPtr<Extractor> Ptr;
+
 	Extractor(StatementExecutor& st, ResultMetadata& md);
 		/// Creates the Extractor.
 

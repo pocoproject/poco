@@ -54,54 +54,57 @@ class MySQL_API Binder: public Poco::Data::AbstractBinder
 	/// Binds placeholders in the sql query to the provided values. Performs data types mapping.
 {
 public:
+	typedef SharedPtr<Binder> Ptr;
 
 	Binder();
 		/// Creates the Binder.
 		
 	virtual ~Binder();
 		/// Destroys the Binder.
-	
+
 	virtual void bind(std::size_t pos, const Poco::Int8& val, Direction dir);
 		/// Binds an Int8.
 
 	virtual void bind(std::size_t pos, const Poco::UInt8& val, Direction dir);
 		/// Binds an UInt8.
-		
+
 	virtual void bind(std::size_t pos, const Poco::Int16& val, Direction dir);
 		/// Binds an Int16.
-		
+
 	virtual void bind(std::size_t pos, const Poco::UInt16& val, Direction dir);
 		/// Binds an UInt16.
-		
+
 	virtual void bind(std::size_t pos, const Poco::Int32& val, Direction dir);
 		/// Binds an Int32.
-		
+
 	virtual void bind(std::size_t pos, const Poco::UInt32& val, Direction dir);
 		/// Binds an UInt32.
-		
+
 	virtual void bind(std::size_t pos, const Poco::Int64& val, Direction dir);
 		/// Binds an Int64.
-		
+
 	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir);
 		/// Binds an UInt64.
 
 #ifndef POCO_LONG_IS_64_BIT
+
 	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN);
 		/// Binds a long.
 
 	virtual void bind(std::size_t pos, const unsigned long& val, Direction dir = PD_IN);
 		/// Binds an unsigned long.
-#endif
-		
+
+#endif // POCO_LONG_IS_64_BIT
+
 	virtual void bind(std::size_t pos, const bool& val, Direction dir);
 		/// Binds a boolean.
-		
+
 	virtual void bind(std::size_t pos, const float& val, Direction dir);
 		/// Binds a float.
-		
+
 	virtual void bind(std::size_t pos, const double& val, Direction dir);
 		/// Binds a double.
-		
+
 	virtual void bind(std::size_t pos, const char& val, Direction dir);
 		/// Binds a single character.
 
@@ -154,27 +157,27 @@ public:
 	virtual void bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction dir = PD_IN);
-	
+
 	virtual void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir = PD_IN); 
-	
+
 	virtual void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir = PD_IN); 
-	
+
 	virtual void bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Direction dir = PD_IN);
-	
+
 	virtual void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir = PD_IN); 
-	
+
 	virtual void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir = PD_IN); 
-	
+
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction dir = PD_IN);
-	
+
 	virtual void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir = PD_IN); 
-	
+
 	virtual void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir = PD_IN); 
-	
+
 	virtual void bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir = PD_IN);
-	
+
 	virtual void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir = PD_IN); 
-	
+
 	virtual void bind(std::size_t pos, const std::vector<bool>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<bool>& val, Direction dir = PD_IN);
@@ -261,7 +264,7 @@ private:
 	{
 	}
 	
-	void realBind(std::size_t pos, enum_field_types type, const void* buffer, int length);
+	void realBind(std::size_t pos, enum_field_types type, const void* buffer, int length, bool isUnsigned = false);
 		/// Common bind implementation
 
 private:

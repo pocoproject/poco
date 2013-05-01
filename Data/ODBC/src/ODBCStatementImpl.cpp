@@ -163,7 +163,7 @@ void ODBCStatementImpl::addPreparator()
 	else
 		_preparations.push_back(new Preparator(*_preparations[0]));
 
-	_extractors.push_back(new Extractor(_stmt, *_preparations.back()));
+	_extractors.push_back(new Extractor(_stmt, _preparations.back()));
 }
 
 
@@ -187,12 +187,13 @@ void ODBCStatementImpl::doPrepare()
 					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
 		}
 
+		AbstractPreparation::Ptr pAP = 0;
+		Poco::Data::AbstractPreparator::Ptr pP = _preparations[curDataSet];
 		for (std::size_t pos = 0; it != itEnd; ++it)
 		{
-			AbstractPreparation* pAP = (*it)->createPreparation(_preparations[curDataSet], pos);
+			pAP = (*it)->createPreparation(pP, pos);
 			pAP->prepare();
 			pos += (*it)->numOfColumnsHandled();
-			delete pAP;
 		}
 
 		_prepared = true;

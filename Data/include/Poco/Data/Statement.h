@@ -42,6 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/StatementImpl.h"
+#include "Poco/Data/Binding.h"
 #include "Poco/Data/Range.h"
 #include "Poco/Data/Bulk.h"
 #include "Poco/Data/Row.h"
@@ -82,8 +83,8 @@ class Data_API Statement
 	///
 	/// Once asyncronous, a statement can be reverted back to synchronous state in two ways:
 	/// 
-	///	1) By calling setAsync(false)
-	///	2) By means of 'sync' or 'reset' manipulators
+	///   1) By calling setAsync(false)
+	///   2) By means of 'sync' or 'reset' manipulators
 	///
 	/// See individual functions documentation for more details.
 	///
@@ -110,7 +111,7 @@ public:
 		STORAGE_UNKNOWN = StatementImpl::STORAGE_UNKNOWN_IMPL
 	};
 
-	Statement(StatementImpl* pImpl);
+	Statement(StatementImpl::Ptr pImpl);
 		/// Creates the Statement.
 
 	explicit Statement(Session& session);
@@ -153,19 +154,11 @@ public:
 	Statement& operator , (Manipulator manip);
 		/// Handles manipulators, such as now, async, etc.
 
-	Statement& operator , (AbstractBinding* bind);
+	Statement& operator , (AbstractBinding::Ptr pBind);
 		/// Registers the Binding with the Statement by calling addBind().
-		/// Statement takes the ownership of the bind in an AutoPtr.
-		/// To prevent bind destruction upon statement destruction, pass an 
-		/// AutoPtr<AbstractBinding>::duplicate() to this function.
-		/// This function is primarily intended to be a destination for 
-		/// use() and bind() utility functions return value, so it is 
-		/// recommended to call addBind() directly instead.
 
-	Statement& addBind(AbstractBinding* pBind, bool duplicate = true);
+	Statement& addBind(AbstractBinding::Ptr pBind);
 		/// Registers a single binding with the statement.
-		/// To allow the binding to outlive the statement destruction,
-		/// duplicate must be true.
 
 	void removeBind(const std::string& name);
 		/// Removes the all the bindings with specified name from the statement.
@@ -173,20 +166,20 @@ public:
 	Statement& operator , (AbstractBindingVec& bindVec);
 		/// Registers the Binding vector with the Statement.
 
-	Statement& operator , (AbstractExtraction* extract);
+	template <typename C>
+	Statement& addBinding(C& bindingCont, bool reset)
+		/// Registers binding container with the Statement.
+	{
+		if (reset) _pImpl->resetBinding();
+		typename C::iterator itAB = bindingCont.begin();
+		typename C::iterator itABEnd = bindingCont.end();
+		for (; itAB != itABEnd; ++itAB) addBind(*itAB);
+		return *this;
+	}
+
+	Statement& operator , (AbstractExtraction::Ptr extract);
 		/// Registers objects used for extracting data with the Statement by 
 		/// calling addExtract().
-		/// Statement takes the ownership of the extract in an AutoPtr.
-		/// To prevent extract destruction upon statement destruction, pass an 
-		/// AutoPtr<AbstractExtraction>::duplicate() to this function.
-		/// This function is primarily intended to be a destination for 
-		/// into() utility function return value, so it is recommended to call 
-		/// addExtract() directly instead.
-
-	Statement& addExtract(AbstractExtraction* pExtract, bool duplicate = true);
-		/// Registers a single extraction with the statement.
-		/// To allow the extraction to outlive the statement destruction,
-		/// duplicate must be true.
 
 	Statement& operator , (AbstractExtractionVec& extVec);
 		/// Registers the extraction vector with the Statement.
@@ -196,24 +189,13 @@ public:
 		/// Registers the vector of extraction vectors with the Statement.
 
 	template <typename C>
-	Statement& addBinding(C& bindingCont, bool reset)
-		/// Registers binding container with the Statement.
-	{
-		if (reset) _pImpl->resetBinding();
-		typename C::iterator itAB = bindingCont.begin();
-		typename C::iterator itABEnd = bindingCont.end();
-		for (; itAB != itABEnd; ++itAB)	addBind(itAB->duplicate());
-		return *this;
-	}
-
-	template <typename C>
 	Statement& addExtraction(C& val, bool reset)
 		/// Registers extraction container with the Statement.
 	{
 		if (reset) _pImpl->resetExtraction();
 		typename C::iterator itAE = val.begin();
 		typename C::iterator itAEEnd = val.end();
-		for (; itAE != itAEEnd; ++itAE)	addExtract(itAE->duplicate());
+		for (; itAE != itAEEnd; ++itAE) addExtract(*itAE);
 		return *this;
 	}
 
@@ -228,7 +210,9 @@ public:
 		return *this;
 	}
 
-	
+	Statement& addExtract(AbstractExtraction::Ptr pExtract);
+		/// Registers a single extraction with the statement.
+
 	Statement& operator , (const Bulk& bulk);
 		/// Sets the bulk execution mode (both binding and extraction) for this 
 		/// statement.Statement must not have any extractors or binders set at the 
@@ -250,7 +234,7 @@ public:
 		///
 		/// Set per default to zero to Limit::LIMIT_UNLIMITED, which disables the limit.
 
-	Statement& operator , (RowFormatterPtr pRowFformatter);
+	Statement& operator , (RowFormatter::Ptr pRowFformatter);
 		/// Sets the row formatter for the statement.
 
 	Statement& operator , (const Range& extrRange);
@@ -401,12 +385,12 @@ public:
 		/// Returns false if the current data set index points to the last
 		/// data set. Otherwise, it returns true.
 
-	void setRowFormatter(RowFormatterPtr pRowFormatter);
+	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Sets the row formatter for this statement.
 		/// Statement takes the ownership of the formatter.
 
 protected:
-	typedef Poco::AutoPtr<StatementImpl> StatementImplPtr;
+	typedef StatementImpl::Ptr ImplPtr;
 
 	const AbstractExtractionVec& extractions() const;
 		/// Returns the extractions vector.
@@ -423,16 +407,17 @@ protected:
 	 bool isBulkExtraction() const;
 		/// Returns true if this statement extracts data in bulk.
 
-	StatementImplPtr impl() const;
+	ImplPtr impl() const;
 		/// Returns pointer to statement implementation.
 
-	const RowFormatterPtr& getRowFormatter();
+	const RowFormatter::Ptr& getRowFormatter();
 		/// Returns the row formatter for this statement.
 
 	Session session();
 		/// Returns the underlying session.
 
 private:
+
 	const Result& doAsyncExec(bool reset = true);
 		/// Asynchronously executes the statement.
 
@@ -443,7 +428,7 @@ private:
 		return *this;
 	}
 
-	StatementImplPtr _pImpl;
+	StatementImpl::Ptr _pImpl;
 
 	// asynchronous execution related members
 	bool                _async;
@@ -451,7 +436,7 @@ private:
 	Mutex               _mutex;
 	AsyncExecMethodPtr  _pAsyncExec;
 	std::vector<Any>    _arguments;
-	RowFormatterPtr     _pRowFormatter;
+	RowFormatter::Ptr     _pRowFormatter;
 	mutable std::string _stmtString;
 };
 
@@ -545,7 +530,7 @@ inline void Data_API reset(Statement& statement)
 // inlines
 //
 
-inline Statement& Statement::operator , (RowFormatterPtr pRowFformatter)
+inline Statement& Statement::operator , (RowFormatter::Ptr pRowFformatter)
 {
 	_pRowFormatter = pRowFformatter;
 	return *this;
@@ -656,9 +641,9 @@ inline void Statement::removeBind(const std::string& name)
 }
 
 
-inline Statement& Statement::operator , (AbstractBinding* pBind)
+inline Statement& Statement::operator , (AbstractBinding::Ptr pBind)
 {
-	return addBind(pBind, false);
+	return addBind(pBind);
 }
 
 
@@ -668,9 +653,9 @@ inline Statement& Statement::operator , (AbstractBindingVec& bindVec)
 }
 
 
-inline Statement& Statement::operator , (AbstractExtraction* pExtract)
+inline Statement& Statement::operator , (AbstractExtraction::Ptr pExtract)
 {
-	return addExtract(pExtract, false);
+	return addExtract(pExtract);
 }
 
 
@@ -686,7 +671,7 @@ inline Statement& Statement::operator , (AbstractExtractionVecVec& extVecVec)
 }
 
 
-inline Statement::StatementImplPtr Statement::impl() const
+inline Statement::ImplPtr Statement::impl() const
 {
 	return _pImpl;
 }
@@ -811,13 +796,13 @@ inline bool Statement::isAsync() const
 }
 
 
-inline void Statement::setRowFormatter(RowFormatterPtr pRowFormatter)
+inline void Statement::setRowFormatter(RowFormatter::Ptr pRowFormatter)
 {
 	_pRowFormatter = pRowFormatter;
 }
 
 
-inline const RowFormatterPtr& Statement::getRowFormatter()
+inline const RowFormatter::Ptr& Statement::getRowFormatter()
 {
 	if (!_pRowFormatter) _pRowFormatter = new SimpleRowFormatter;
 	return _pRowFormatter;

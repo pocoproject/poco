@@ -56,7 +56,7 @@ class Preparation: public AbstractPreparation
 	/// Class for calling the appropriate AbstractPreparator method.
 {
 public:
-	Preparation(AbstractPreparator* pPreparator, std::size_t pos, T& val): 
+	Preparation(AbstractPreparator::Ptr& pPreparator, std::size_t pos, T& val): 
 		AbstractPreparation(pPreparator), 
 		_pos(pos), 
 		_val(val)
@@ -88,7 +88,7 @@ class Preparation<std::vector<T> >: public AbstractPreparation
 	/// the whole vector preparation, rather than only individual contained values.
 {
 public:
-	Preparation(AbstractPreparator* pPreparator, std::size_t pos, std::vector<T>& val = std::vector<T>()): 
+	Preparation(AbstractPreparator::Ptr pPreparator, std::size_t pos, std::vector<T>& val = std::vector<T>()): 
 		AbstractPreparation(pPreparator), 
 		_pos(pos), 
 		_val(val)
@@ -120,7 +120,7 @@ class Preparation<std::deque<T> >: public AbstractPreparation
 	/// the whole deque preparation, rather than only individual contained values.
 {
 public:
-	Preparation(AbstractPreparator* pPreparator, std::size_t pos, std::deque<T>& val = std::deque<T>()): 
+	Preparation(AbstractPreparator::Ptr pPreparator, std::size_t pos, std::deque<T>& val = std::deque<T>()): 
 		AbstractPreparation(pPreparator), 
 		_pos(pos), 
 		_val(val)
@@ -152,7 +152,7 @@ class Preparation<std::list<T> >: public AbstractPreparation
 	/// the whole list preparation, rather than only individual contained values.
 {
 public:
-	Preparation(AbstractPreparator* pPreparator, std::size_t pos, std::list<T>& val = std::list<T>()): 
+	Preparation(AbstractPreparator::Ptr pPreparator, std::size_t pos, std::list<T>& val = std::list<T>()): 
 		AbstractPreparation(pPreparator), 
 		_pos(pos), 
 		_val(val)

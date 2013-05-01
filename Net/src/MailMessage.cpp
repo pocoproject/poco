@@ -477,7 +477,7 @@ void MailMessage::readHeader(std::istream& istr)
 	clear();
 	MessageHeader::read(istr);
 	istr.get(); // \r
-	istr.get(); // \n
+	if ('\n' == istr.peek()) istr.get(); // \n
 }
 
 

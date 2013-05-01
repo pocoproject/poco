@@ -99,12 +99,12 @@ public:
 	static const std::size_t UNKNOWN_TOTAL_ROW_COUNT;
 
 	explicit RecordSet(const Statement& rStatement,
-		RowFormatterPtr pRowFormatter = 0);
+		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
 	explicit RecordSet(Session& rSession, 
 		const std::string& query,
-		RowFormatterPtr pRowFormatter = 0);
+		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
 	explicit RecordSet(Session& rSession, 
@@ -131,7 +131,7 @@ public:
 	~RecordSet();
 		/// Destroys the RecordSet.
 
-	void setRowFormatter(RowFormatterPtr pRowFormatter);
+	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Assigns the row formatter to the statement and all recordset rows.
 
 	Statement& operator = (const Statement& stmt);

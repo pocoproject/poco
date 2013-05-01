@@ -1339,50 +1339,44 @@ void DataTest::testDateAndTime()
 
 void DataTest::testExternalBindingAndExtraction()
 {
-	AbstractExtractionVecVec extractionVec;
-	AbstractExtractionVec extraction;
-	AbstractBindingVec binding;
-
 	Session tmp (Poco::Data::Test::Connector::KEY, "dummy.db");
 
 	int i;
-	AbstractExtraction* pExt1 = into(i);
-	AbstractExtraction* pExt2 = into(i);
-	assert (1 == pExt1->referenceCount());
-	assert (1 == pExt2->referenceCount());
+	AbstractExtraction::Ptr pExt1 = into(i);
+	AbstractExtraction::Ptr pExt2 = into(i);
+	assert (1 == pExt1.referenceCount());
+	assert (1 == pExt2.referenceCount());
 	{
 		Statement stmt(tmp);
-		stmt.addExtract(pExt1); // retain external ownership in addition to giving it to statement
-		assert (2 == pExt1->referenceCount());
-		stmt.addExtract(pExt2, false); // give ownership to statement
-		assert (1 == pExt2->referenceCount());
+		stmt.addExtract(pExt1);
+		assert (2 == pExt1.referenceCount());
 	}
-	assert (1 == pExt1->referenceCount()); 	delete pExt1;
-	// pExt2 does not exist any more
+	assert (1 == pExt1.referenceCount());
+	assert (1 == pExt2.referenceCount());
 
-	AbstractBinding* pBind1 = use(i, "mybind1");
-	AbstractBinding* pBind2 = use(i, "mybind2");
-	AbstractBinding* pBind3 = use(i, "mybind3");
-	assert (1 == pBind1->referenceCount());
-	assert (1 == pBind2->referenceCount());
-	assert (1 == pBind3->referenceCount());
+	AbstractBinding::Ptr pBind1 = use(i, "mybind1");
+	AbstractBinding::Ptr pBind2 = use(i, "mybind2");
+	AbstractBinding::Ptr pBind3 = use(i, "mybind3");
+	assert (1 == pBind1.referenceCount());
+	assert (1 == pBind2.referenceCount());
+	assert (1 == pBind3.referenceCount());
 	{
 		Statement stmt(tmp);
-		stmt.addBind(pBind1); // retain external ownership in addition to giving it to statement
-		assert (2 == pBind1->referenceCount());
-		stmt.addBind(pBind2, false);// give ownership to statement
-		assert (1 == pBind2->referenceCount());
-		stmt.addBind(pBind3);// give ownership to statement
-		assert (2 == pBind3->referenceCount());
-		stmt.removeBind(pBind3->name());// take ownership from statement
-		assert (1 == pBind3->referenceCount());
+		stmt.addBind(pBind1);
+		assert (2 == pBind1.referenceCount());
+		stmt.removeBind(pBind1->name());
+		assert (1 == pBind1.referenceCount());
+		stmt.addBind(pBind2);
+		assert (2 == pBind2.referenceCount());
+		stmt.addBind(pBind3);
+		assert (2 == pBind3.referenceCount());
 
 		try { stmt.removeBind("a bad name"); fail("must fail"); }
 		catch (NotFoundException&) { }
 	}
-	assert (1 == pBind1->referenceCount());	delete pBind1;
-	// pBind2 does not exist any more
-	assert (1 == pBind3->referenceCount());	delete pBind3;
+	assert (1 == pBind1.referenceCount());
+	assert (1 == pBind2.referenceCount());
+	assert (1 == pBind3.referenceCount());
 }
 
 

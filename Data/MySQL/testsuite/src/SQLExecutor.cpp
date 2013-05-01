@@ -113,20 +113,20 @@ template <>
 class TypeHandler<Person>
 {
 public:
-	static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
+	static void bind(std::size_t pos, const Person& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
-		poco_assert_dbg (pBinder != 0);
+		poco_assert_dbg (!pBinder.isNull());
 		pBinder->bind(pos++, obj.lastName, dir);
 		pBinder->bind(pos++, obj.firstName, dir);
 		pBinder->bind(pos++, obj.address, dir);
 		pBinder->bind(pos++, obj.age, dir);
 	}
 
-	static void prepare(std::size_t pos, const Person& obj, AbstractPreparator* pPrepare)
+	static void prepare(std::size_t pos, const Person& obj, AbstractPreparator::Ptr pPrepare)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
-		poco_assert_dbg (pPrepare != 0);
+		poco_assert_dbg (!pPrepare.isNull());
 		pPrepare->prepare(pos++, obj.lastName);
 		pPrepare->prepare(pos++, obj.firstName);
 		pPrepare->prepare(pos++, obj.address);
@@ -138,9 +138,9 @@ public:
 		return 4;
 	}
 
-	static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor* pExt)
+	static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor::Ptr pExt)
 	{
-		poco_assert_dbg (pExt != 0);
+		poco_assert_dbg (!pExt.isNull());
 		if (!pExt->extract(pos++, obj.lastName))
 			obj.lastName = defVal.lastName;
 		if (!pExt->extract(pos++, obj.firstName))

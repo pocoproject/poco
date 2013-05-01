@@ -142,7 +142,7 @@ void CompressTest::testManipulatorReplace()
 
 
 void CompressTest::testSetZipComment()
-{    
+{
 	std::string comment("Testing...123...");
 	std::ofstream out("comment.zip", std::ios::binary);
 	Poco::Path theFile(ZipTest::getTestFile("test.zip"));
@@ -173,7 +173,7 @@ CppUnit::Test* CompressTest::suite()
 	CppUnit_addTest(pSuite, CompressTest, testManipulator);
 	CppUnit_addTest(pSuite, CompressTest, testManipulatorDel);
 	CppUnit_addTest(pSuite, CompressTest, testManipulatorReplace);
-    CppUnit_addTest(pSuite, CompressTest, testSetZipComment);
+	CppUnit_addTest(pSuite, CompressTest, testSetZipComment);
 
 	return pSuite;
 }

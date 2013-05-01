@@ -50,7 +50,6 @@
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/SessionImpl.h"
 #include "Poco/RefCountedObject.h"
-#include "Poco/AutoPtr.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
@@ -65,12 +64,14 @@ namespace Poco {
 namespace Data {
 
 
-class Data_API StatementImpl: public Poco::RefCountedObject
+class Data_API StatementImpl
 	/// StatementImpl interface that subclasses must implement to define database dependent query execution.
 	///
 	/// StatementImpl's are noncopyable.
 {
 public:
+	typedef Poco::SharedPtr<StatementImpl> Ptr;
+
 	enum State
 	{
 		ST_INITIALIZED,
@@ -127,14 +128,14 @@ public:
 		_ostr << t;
 	}
 
-	void addBind(AbstractBinding* pBinding);
+	void addBind(AbstractBinding::Ptr pBinding);
 		/// Registers the Binding with the StatementImpl.
 
 	void removeBind(const std::string& name);
 		/// Unregisters all the bindings having specified name with the StatementImpl.
 		/// Bindings are released and, if this class was the sole owner, deleted.
 
-	void addExtract(AbstractExtraction* pExtraction);
+	void addExtract(AbstractExtraction::Ptr pExtraction);
 		/// Registers objects used for extracting data with the StatementImpl.
 
 	void setExtractionLimit(const Limit& extrLimit);
@@ -216,14 +217,23 @@ protected:
 	virtual void bindImpl() = 0;
 		/// Binds parameters.
 
-	virtual AbstractExtractor& extractor() = 0;
+	virtual AbstractExtraction::ExtractorPtr extractor() = 0;
 		/// Returns the concrete extractor used by the statement.
 
 	const AbstractExtractionVec& extractions() const;
-		/// Returns the extractions vector.
+		/// Returns the const reference to extractions vector.
 
-	virtual AbstractBinder& binder() = 0;
-		/// Returns the concrete binder used by the statement.
+	AbstractExtractionVec& extractions();
+		/// Returns the reference to extractions vector.
+
+	void fixupExtraction();
+		/// Sets the AbstractExtractor at the extractors.
+
+	std::size_t getExtractionLimit();
+		/// Returns the extraction limit value.
+
+	const Limit& extractionLimit() const;
+		/// Returns the extraction limit.
 
 	std::size_t columnsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
 		/// Returns the number of columns that the extractors handle.
@@ -235,15 +245,6 @@ protected:
 	std::size_t subTotalRowCount(int dataSet = USE_CURRENT_DATA_SET) const;
 		/// Returns the number of rows extracted so far for the data set.
 		/// Default value indicates current data set (if any).
-
-	const AbstractBindingVec& bindings() const;
-		/// Returns the bindings.
-
-	AbstractBindingVec& bindings();
-		/// Returns the bindings.
-
-	AbstractExtractionVec& extractions();
-		/// Returns the extractions vector.
 
 	void makeExtractors(std::size_t count);
 		/// Determines the type of the internal extraction container and
@@ -270,6 +271,15 @@ protected:
 	SessionImpl& session();
 		/// Rteurns session associated with this statement.
 
+	virtual AbstractBinding::BinderPtr binder() = 0;
+		/// Returns the concrete binder used by the statement.
+
+	const AbstractBindingVec& bindings() const;
+		/// Returns the const reference to bindings vector.
+
+	AbstractBindingVec& bindings();
+		/// Returns the reference to bindings.
+
 	void fixupBinding();
 		/// Sets the AbstractBinder at the bindings.
 
@@ -290,9 +300,6 @@ protected:
 		/// When connector-specific behavior is desired, it should be overriden 
 		/// by the statement implementation.
 
-	void fixupExtraction();
-		/// Sets the AbstractExtractor at the extractors.
-
 	std::size_t currentDataSet() const;
 		/// Returns the current data set.
 
@@ -306,12 +313,6 @@ protected:
 
 	bool hasMoreDataSets() const;
 		/// Returns true if there are data sets not activated yet.
-
-	std::size_t getExtractionLimit();
-		/// Returns the extraction limit value.
-
-	const Limit& extractionLimit() const;
-		/// Returns the extraction limit.
 
 private:
 	void compile();
@@ -334,7 +335,7 @@ private:
 		/// Resets extraction so it can be reused again.
 
 	template <class C>
-	InternalExtraction<C>* createExtract(const MetaColumn& mc)
+	SharedPtr<InternalExtraction<C> > createExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -342,7 +343,7 @@ private:
 	}
 
 	template <class C>
-	InternalBulkExtraction<C>* createBulkExtract(const MetaColumn& mc)
+	SharedPtr<InternalBulkExtraction<C> > createBulkExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -472,7 +473,7 @@ private:
 //
 
 
-inline void StatementImpl::addBind(AbstractBinding* pBinding)
+inline void StatementImpl::addBind(AbstractBinding::Ptr pBinding)
 {
 	poco_check_ptr (pBinding);
 	_bindings.push_back(pBinding);

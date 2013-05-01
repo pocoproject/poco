@@ -120,9 +120,9 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 
 const std::string& ZipArchive::getZipComment() const
 {
-    // It seems that only the "first" disk is populated (look at Compress::close()), so getting the first ZipArchiveInfo
-    DirectoryInfos::const_iterator it = _disks.begin();
-    return it->second.getZipComment();
+	// It seems that only the "first" disk is populated (look at Compress::close()), so getting the first ZipArchiveInfo
+	DirectoryInfos::const_iterator it = _disks.begin();
+	return it->second.getZipComment();
 }
 
 

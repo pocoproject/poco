@@ -64,6 +64,11 @@ class Extraction: public AbstractExtraction
 	/// Concrete Data Type specific extraction of values from a query result set.
 {
 public:
+	typedef T                   ValType;
+	typedef SharedPtr<ValType>  ValPtr;
+	typedef Extraction<ValType> Type;
+	typedef SharedPtr<Type>     Ptr;
+
 	Extraction(T& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
@@ -113,7 +118,7 @@ public:
 	{
 		if (_extracted) throw ExtractException("value already extracted");
 		_extracted = true;
-		AbstractExtractor* pExt = getExtractor();
+		AbstractExtractor::Ptr pExt = getExtractor();
 		TypeHandler<T>::extract(pos, _rResult, _default, pExt);
 		_null = isValueNull<T>(_rResult, pExt->isNull(pos));
 		
@@ -130,7 +135,7 @@ public:
 		return !_extracted;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _rResult);
 	}
@@ -148,6 +153,12 @@ class Extraction<std::vector<T> >: public AbstractExtraction
 	/// Vector Data Type specialization for extraction of values from a query result set.
 {
 public:
+	
+	typedef std::vector<T>      ValType;
+	typedef SharedPtr<ValType>  ValPtr;
+	typedef Extraction<ValType> Type;
+	typedef SharedPtr<Type>     Ptr;
+
 	Extraction(std::vector<T>& result, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
@@ -197,14 +208,14 @@ public:
 
 	std::size_t extract(std::size_t pos)
 	{
-		AbstractExtractor* pExt = getExtractor();
+		AbstractExtractor::Ptr pExt = getExtractor();
 		_rResult.push_back(_default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -228,6 +239,11 @@ class Extraction<std::vector<bool> >: public AbstractExtraction
 	/// Vector bool specialization for extraction of values from a query result set.
 {
 public:
+	typedef std::vector<bool>   ValType;
+	typedef SharedPtr<ValType>  ValPtr;
+	typedef Extraction<ValType> Type;
+	typedef SharedPtr<Type>     Ptr;
+
 	Extraction(std::vector<bool>& result, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
@@ -276,7 +292,7 @@ public:
 
 	std::size_t extract(std::size_t pos)
 	{
-		AbstractExtractor* pExt = getExtractor();
+		AbstractExtractor::Ptr pExt = getExtractor();
 
 		bool tmp = _default;
 		TypeHandler<bool>::extract(pos, tmp, _default, pExt);
@@ -285,7 +301,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<bool>(pPrep, pos, _default);
 	}
@@ -309,6 +325,11 @@ class Extraction<std::list<T> >: public AbstractExtraction
 	/// List Data Type specialization for extraction of values from a query result set.
 {
 public:
+	typedef std::list<T>        ValType;
+	typedef SharedPtr<ValType>  ValPtr;
+	typedef Extraction<ValType> Type;
+	typedef SharedPtr<Type>     Ptr;
+
 	Extraction(std::list<T>& result, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
@@ -357,14 +378,14 @@ public:
 
 	std::size_t extract(std::size_t pos)
 	{
-		AbstractExtractor* pExt = getExtractor();
+		AbstractExtractor::Ptr pExt = getExtractor();
 		_rResult.push_back(_default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -388,6 +409,11 @@ class Extraction<std::deque<T> >: public AbstractExtraction
 	/// Deque Data Type specialization for extraction of values from a query result set.
 {
 public:
+	typedef std::deque<T>       ValType;
+	typedef SharedPtr<ValType>  ValPtr;
+	typedef Extraction<ValType> Type;
+	typedef SharedPtr<Type>     Ptr;
+
 	Extraction(std::deque<T>& result, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
@@ -436,14 +462,14 @@ public:
 
 	std::size_t extract(std::size_t pos)
 	{
-		AbstractExtractor* pExt = getExtractor();
+		AbstractExtractor::Ptr pExt = getExtractor();
 		_rResult.push_back(_default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -475,10 +501,14 @@ class InternalExtraction: public Extraction<C>
 	/// InternalExtraction objects can not be copied or assigned.
 {
 public:
-	typedef typename C::value_type T;
+	typedef typename C::value_type ValType;
+	typedef SharedPtr<ValType>     ValPtr;
+	typedef Extraction<ValType>    Type;
+	typedef SharedPtr<Type>        Ptr;
+
 
 	explicit InternalExtraction(C& result, Column<C>* pColumn, const Position& pos = Position(0)): 
-		Extraction<C>(result, T(), pos), 
+		Extraction<C>(result, ValType(), pos), 
 		_pColumn(pColumn)
 		/// Creates InternalExtraction.
 	{
@@ -495,7 +525,7 @@ public:
 		_pColumn->reset();
 	}	
 
-	const T& value(int index) const
+	const ValType& value(int index) const
 	{
 		try
 		{ 
@@ -531,7 +561,11 @@ class Extraction<std::set<T> >: public AbstractExtraction
 	/// Set Data Type specialization for extraction of values from a query result set.
 {
 public:
-	typedef typename std::set<T>::iterator Iterator;
+	typedef std::set<T>                ValType;
+	typedef SharedPtr<ValType>         ValPtr;
+	typedef Extraction<ValType>        Type;
+	typedef SharedPtr<Type>            Ptr;
+	typedef typename ValType::iterator Iterator;
 
 	Extraction(std::set<T>& result, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
@@ -576,7 +610,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -592,6 +626,11 @@ class Extraction<std::multiset<T> >: public AbstractExtraction
 	/// Multiset Data Type specialization for extraction of values from a query result set.
 {
 public:
+	typedef std::multiset<T>    ValType;
+	typedef SharedPtr<ValType>  ValPtr;
+	typedef Extraction<ValType> Type;
+	typedef SharedPtr<Type>     Ptr;
+
 	Extraction(std::multiset<T>& result, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
@@ -635,7 +674,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -651,6 +690,11 @@ class Extraction<std::map<K, V> >: public AbstractExtraction
 	/// Map Data Type specialization for extraction of values from a query result set.
 {
 public:
+	typedef std::map<K, V>      ValType;
+	typedef SharedPtr<ValType>  ValPtr;
+	typedef Extraction<ValType> Type;
+	typedef SharedPtr<Type>     Ptr;
+
 	Extraction(std::map<K, V>& result, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
@@ -694,7 +738,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<V>(pPrep, pos, _default);
 	}
@@ -710,6 +754,11 @@ class Extraction<std::multimap<K, V> >: public AbstractExtraction
 	/// Multimap Data Type specialization for extraction of values from a query result set.
 {
 public:
+	typedef std::multimap<K, V> ValType;
+	typedef SharedPtr<ValType>  ValPtr;
+	typedef Extraction<ValType> Type;
+	typedef SharedPtr<Type>     Ptr;
+
 	Extraction(std::multimap<K, V>& result, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
@@ -753,7 +802,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<V>(pPrep, pos, _default);
 	}
@@ -768,7 +817,7 @@ namespace Keywords {
 
 
 template <typename T> 
-inline Extraction<T>* into(T& t)
+inline AbstractExtraction::Ptr into(T& t)
 	/// Convenience function to allow for a more compact creation of an extraction object.
 {
 	return new Extraction<T>(t);
@@ -776,7 +825,7 @@ inline Extraction<T>* into(T& t)
 
 
 template <typename T> 
-inline Extraction<T>* into(T& t, const Position& pos)
+inline AbstractExtraction::Ptr into(T& t, const Position& pos)
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with multiple recordset support.
 {
@@ -785,7 +834,7 @@ inline Extraction<T>* into(T& t, const Position& pos)
 
 
 template <typename T> 
-inline Extraction<T>* into(T& t, const Position& pos, const T& def)
+inline AbstractExtraction::Ptr into(T& t, const Position& pos, const T& def)
 	/// Convenience function to allow for a more compact creation of an extraction object 
 	/// with multiple recordset support and the given default
 {

@@ -123,15 +123,7 @@ private:
 	TextEncodingManager(const TextEncodingManager&);
 	TextEncodingManager& operator = (const TextEncodingManager&);
 	
-	struct ILT
-	{
-		bool operator() (const std::string& s1, const std::string& s2) const
-		{
-			return Poco::icompare(s1, s2) < 0;
-		}
-	};
-	
-	typedef std::map<std::string, TextEncoding::Ptr, ILT> EncodingMap;
+	typedef std::map<std::string, TextEncoding::Ptr, CILess> EncodingMap;
 	
 	EncodingMap    _encodings;
 	mutable RWLock _lock;

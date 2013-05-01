@@ -67,7 +67,7 @@ class Date;
 class Time;
 
 
-class Data_API AbstractPreparator: public Poco::RefCountedObject
+class Data_API AbstractPreparator
 	/// Interface used for database preparation where we first have to register all data types
 	/// (and memory output locations) before extracting data, e.g. ODBC.
 	/// Extract works as two-phase extract: first we call prepare once, then extract n-times.
@@ -78,6 +78,8 @@ class Data_API AbstractPreparator: public Poco::RefCountedObject
 	/// after SQL execution (e.g. SQLite) do not need this functionality at all.
 {
 public:
+	typedef SharedPtr<AbstractPreparator> Ptr;
+
 	AbstractPreparator(Poco::UInt32 length = 1u);
 		/// Creates the AbstractPreparator.
 

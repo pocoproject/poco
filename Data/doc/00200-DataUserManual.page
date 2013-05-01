@@ -963,7 +963,7 @@ The template specialization must implement the following methods:
     class TypeHandler<class Person>
     {
     public:
-        static void bind(std::size_t pos, const Person&amp; obj, AbstractBinder* pBinder)
+        static void bind(std::size_t pos, const Person&amp; obj, AbstractBinder::Ptr pBinder)
         {
             poco_assert_dbg (pBinder != 0);
             // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
@@ -978,7 +978,7 @@ The template specialization must implement the following methods:
             return 3; // we handle three columns of the Table!
         }
     
-        static void prepare(std::size_t pos, const Person&amp; obj, AbstractPreparation* pPrepare)
+        static void prepare(std::size_t pos, const Person&amp; obj, AbstractPreparation::Ptr pPrepare)
         {
             poco_assert_dbg (pBinder != 0);
             // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
@@ -988,7 +988,7 @@ The template specialization must implement the following methods:
             TypeHandler<Poco::UInt64>::prepare(pos++, obj.getSocialSecNr(), pPrepare);
         }
     
-        static void extract(std::size_t pos, Person&amp; obj, const Person&amp; defVal, AbstractExtractor* pExt)
+        static void extract(std::size_t pos, Person&amp; obj, const Person&amp; defVal, AbstractExtractor::Ptr pExt)
             /// obj will contain the result, defVal contains values we should use when one column is NULL
         {
             poco_assert_dbg (pExt != 0);

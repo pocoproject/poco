@@ -1030,13 +1030,13 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		unsigned ifIndex = 0;
 
 #if defined(POCO_HAVE_IPv6)
-	#if defined (IP_ADAPTER_IPV6_ENABLED)
+	#if (_WIN32_WINNT >= 0x600) && defined (IP_ADAPTER_IPV6_ENABLED)
 		if (pAddress->Flags & IP_ADAPTER_IPV6_ENABLED) ifIndex = pAddress->Ipv6IfIndex;
 	#else
 		ifIndex = pAddress->Ipv6IfIndex;
 	#endif
 #endif
-#if defined (IP_ADAPTER_IPV4_ENABLED)
+#if (_WIN32_WINNT >= 0x600) && defined (IP_ADAPTER_IPV4_ENABLED)
 		if (pAddress->Flags & IP_ADAPTER_IPV4_ENABLED) ifIndex = pAddress->IfIndex;
 #else
 		ifIndex = pAddress->IfIndex;
@@ -1277,7 +1277,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				ifIndex = sdl->sdl_index;
 				intf = NetworkInterface(ifIndex);
 				setInterfaceParams(currIface, intf.impl());
-				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly) && !ipOnly)
+				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
 				break;
 			}
@@ -1340,6 +1340,18 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	}
 	if (ifaces) freeifaddrs(ifaces);
 
+	if (ipOnly)
+	{
+		Map::iterator it = result.begin();
+		Map::iterator end = result.end();
+		for (; it != end;)
+		{
+			if (!it->second.supportsIPv4() && !it->second.supportsIPv6())
+				result.erase(it++);
+			else ++it;
+		}
+	}
+	
 	return result;
 }
 
@@ -1437,7 +1449,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				intf = NetworkInterface(ifIndex);
 				setInterfaceParams(iface, intf.impl());
 				
-				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly) && !ipOnly)
+				if ((result.find(ifIndex) == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
 				
 				break;
@@ -1504,6 +1516,18 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	}
 	
 	if (ifaces) freeifaddrs(ifaces);
+
+	if (ipOnly)
+	{
+		Map::iterator it = result.begin();
+		Map::iterator end = result.end();
+		for (; it != end;)
+		{
+			if (!it->second.supportsIPv4() && !it->second.supportsIPv6())
+				result.erase(it++);
+			else ++it;
+		}
+	}
 
 	return result;
 #else

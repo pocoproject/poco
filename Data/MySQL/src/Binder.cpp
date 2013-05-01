@@ -49,11 +49,11 @@ Binder::Binder()
 
 Binder::~Binder()
 {
-    for (std::vector<MYSQL_TIME*>::iterator it = _dates.begin(); it != _dates.end(); ++it)
-    {
-        delete *it;
-        *it = 0;
-    }
+	for (std::vector<MYSQL_TIME*>::iterator it = _dates.begin(); it != _dates.end(); ++it)
+	{
+		delete *it;
+		*it = 0;
+	}
 }
 
 
@@ -67,7 +67,7 @@ void Binder::bind(std::size_t pos, const Poco::Int8& val, Direction dir)
 void Binder::bind(std::size_t pos, const Poco::UInt8& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, MYSQL_TYPE_TINY, &val, 0);
+	realBind(pos, MYSQL_TYPE_TINY, &val, 0, true);
 }
 
 
@@ -81,7 +81,7 @@ void Binder::bind(std::size_t pos, const Poco::Int16& val, Direction dir)
 void Binder::bind(std::size_t pos, const Poco::UInt16& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, MYSQL_TYPE_SHORT, &val, 0);
+	realBind(pos, MYSQL_TYPE_SHORT, &val, 0, true);
 }
 
 
@@ -95,7 +95,7 @@ void Binder::bind(std::size_t pos, const Poco::Int32& val, Direction dir)
 void Binder::bind(std::size_t pos, const Poco::UInt32& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, MYSQL_TYPE_LONG, &val, 0);
+	realBind(pos, MYSQL_TYPE_LONG, &val, 0, true);
 }
 
 
@@ -109,24 +109,26 @@ void Binder::bind(std::size_t pos, const Poco::Int64& val, Direction dir)
 void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, MYSQL_TYPE_LONGLONG, &val, 0);
+	realBind(pos, MYSQL_TYPE_LONGLONG, &val, 0, true);
 }
 
 
 #ifndef POCO_LONG_IS_64_BIT
+
 void Binder::bind(std::size_t pos, const long& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, MYSQL_TYPE_LONGLONG, &val, 0);
+	realBind(pos, MYSQL_TYPE_LONG, &val, 0);
 }
 
 
 void Binder::bind(std::size_t pos, const unsigned long& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, MYSQL_TYPE_LONGLONG, &val, 0);
+	realBind(pos, MYSQL_TYPE_LONG, &val, 0, true);
 }
-#endif
+
+#endif // POCO_LONG_IS_64_BIT
 
 
 void Binder::bind(std::size_t pos, const bool& val, Direction dir)
@@ -290,7 +292,7 @@ MYSQL_BIND* Binder::getBindArray() const
 //
 ////////////////////
 
-void Binder::realBind(std::size_t pos, enum_field_types type, const void* buffer, int length)
+void Binder::realBind(std::size_t pos, enum_field_types type, const void* buffer, int length, bool isUnsigned)
 {
 	if (pos >= _bindArray.size())
 	{
@@ -303,8 +305,9 @@ void Binder::realBind(std::size_t pos, enum_field_types type, const void* buffer
 	MYSQL_BIND b = {0};
 
 	b.buffer_type   = type;
-	b.buffer		= const_cast<void*>(buffer);
+	b.buffer  = const_cast<void*>(buffer);
 	b.buffer_length = length;
+	b.is_unsigned   = isUnsigned;
 
 	_bindArray[pos] = b;
 }

@@ -39,6 +39,11 @@ Release 1.5.2 (2013-04-29)
 - fixed GH #141: Application::run() documentation/implementation discrepancy
 - changed RowFormatter to SharedPtr<RowFormatter> in Data::RecordSet interface (breaking change!)
 - fixed GH #144: Poco::Dynamic emits invalid JSON
+- removed naked pointers from Data interfaces
+- fixed GH #82: name conflict in Data::Keywords::bind
+- fixed GH #157: MySQL: cannot bind to 'long' data type on Windows/Visual C++
+- fixed GH #158: MySQL: MYSQL_BIND 'is_unsigned' member is not set
+- fixed GH #160: MultipartReader ignores first part, if preamble is missing
 
 Release 1.5.1 (2013-01-11)
 ==========================

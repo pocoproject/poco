@@ -96,6 +96,7 @@ void MailStreamTest::testMailOutputStream()
 		"This is a test.\r\n"
 		"\rThis.is.\ngarbage\r.\r\n"
 		".This line starts with a period.\r\n"
+		"\r\n"
 		".and this one too\r\n"
 		".\r\n"
 	);
@@ -113,6 +114,7 @@ void MailStreamTest::testMailOutputStream()
 		"This is a test.\r\n"
 		"\rThis.is.\ngarbage\r.\r\n"
 		"..This line starts with a period.\r\n"
+		"\r\n"
 		"..and this one too\r\n"
 		"..\r\n"
 		".\r\n"

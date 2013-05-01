@@ -57,7 +57,7 @@ AbstractBinding::~AbstractBinding()
 }
 
 
-void AbstractBinding::setBinder(AbstractBinder* pBinder)
+void AbstractBinding::setBinder(BinderPtr pBinder)
 {
 	poco_check_ptr (pBinder);
 	_pBinder = pBinder;

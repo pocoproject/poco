@@ -194,9 +194,16 @@ void NetworkInterfaceTest::testMapIpOnly()
 {
 	NetworkInterface::Map m = NetworkInterface::map(true, false);
 	assert (!m.empty());
+
+	std::cout << std::endl;
 	for (NetworkInterface::Map::const_iterator it = m.begin(); it != m.end(); ++it)
 	{
 		assert(it->second.supportsIPv4() || it->second.supportsIPv6());
+		std::cout << "Interface: (" << it->second.index() << ")" << std::endl;
+		std::cout << "Address:    " << it->second.address().toString() << std::endl;
+		NetworkInterface::MACAddress mac(it->second.macAddress());
+		if (!mac.empty() && (it->second.type() != NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK))
+			std::cout << "MAC Address:" << mac << std::endl;
 	}
 }
 

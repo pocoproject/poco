@@ -55,10 +55,13 @@ namespace Poco {
 namespace Data {
 
 
-class Data_API AbstractBinding: public Poco::RefCountedObject
+class Data_API AbstractBinding
 	/// AbstractBinding connects a value with a placeholder via an AbstractBinder interface.
 {
 public:
+	typedef SharedPtr<AbstractBinding> Ptr;
+	typedef AbstractBinder::Ptr        BinderPtr;
+
 	enum Direction
 	{
 		PD_IN = AbstractBinder::PD_IN,
@@ -72,10 +75,10 @@ public:
 	virtual ~AbstractBinding();
 		/// Destroys the AbstractBinding.
 
-	void setBinder(AbstractBinder* pBinder);
+	void setBinder(BinderPtr pBinder);
 		/// Sets the object used for binding; object does NOT take ownership of the pointer.
 
-	AbstractBinder* getBinder() const;
+	BinderPtr getBinder() const;
 		/// Returns the AbstractBinder used for binding data.
 
 	virtual std::size_t numOfColumnsHandled() const = 0;
@@ -112,23 +115,22 @@ public:
 		/// Returns the size of the bulk binding.
 
 private:
-	AbstractBinder* _pBinder;
-	std::string     _name;
-	Direction       _direction;
-	Poco::UInt32    _bulkSize;
+	BinderPtr    _pBinder;
+	std::string  _name;
+	Direction    _direction;
+	Poco::UInt32 _bulkSize;
 };
 
 
-typedef Poco::AutoPtr<AbstractBinding> AbstractBindingPtr;
-typedef std::vector<AbstractBindingPtr> AbstractBindingVec;
-typedef std::deque<AbstractBindingPtr> AbstractBindingDeq;
-typedef std::list<AbstractBindingPtr> AbstractBindingLst;
+typedef std::vector<AbstractBinding::Ptr> AbstractBindingVec;
+typedef std::deque<AbstractBinding::Ptr>  AbstractBindingDeq;
+typedef std::list<AbstractBinding::Ptr>   AbstractBindingLst;
 
 
 //
 // inlines
 //
-inline AbstractBinder* AbstractBinding::getBinder() const
+inline AbstractBinder::Ptr AbstractBinding::getBinder() const
 {
 	return _pBinder;
 }

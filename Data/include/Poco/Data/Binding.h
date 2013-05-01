@@ -73,6 +73,11 @@ class Binding: public AbstractBinding
 	/// function. An attempt to pass a constant by reference shall result in compile-time error.
 {
 public:
+	typedef T                  ValType;
+	typedef SharedPtr<ValType> ValPtr;
+	typedef Binding<ValType>   Type;
+	typedef SharedPtr<Type>    Ptr;
+
 	explicit Binding(T& val,
 		const std::string& name = "", 
 		Direction direction = PD_IN): 
@@ -106,7 +111,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<T>::bind(pos, _val, getBinder(), getDirection());
 		_bound = true;
 	}
@@ -114,8 +119,8 @@ public:
 	void reset ()
 	{
 		_bound = false;
-		AbstractBinder* pBinder = getBinder();
-		poco_check_ptr (pBinder);
+		AbstractBinder::Ptr pBinder = getBinder();
+		poco_assert_dbg (!pBinder.isNull());
 		pBinder->reset();
 	}
 
@@ -136,10 +141,13 @@ class CopyBinding: public AbstractBinding
 	/// is passed to binding, the storage it refers to must be valid at the statement execution time.
 	/// To pass a copy of a variable, constant or string literal, use utility function bind().
 	/// Variables can be passed as either copies or references (i.e. using either use() or bind()).
-	/// Constants, however, can only be passed as copies. this is best achieved using bind() utility 
-	/// function. An attempt to pass a constant by reference shall result in compile-time error.
 {
 public:
+	typedef T                    ValType;
+	typedef SharedPtr<ValType>   ValPtr;
+	typedef CopyBinding<ValType> Type;
+	typedef SharedPtr<Type>      Ptr;
+
 	explicit CopyBinding(T& val,
 		const std::string& name = "", 
 		Direction direction = PD_IN): 
@@ -173,7 +181,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<T>::bind(pos, *_pVal, getBinder(), getDirection());
 		_bound = true;
 	}
@@ -181,15 +189,15 @@ public:
 	void reset ()
 	{
 		_bound = false;
-		AbstractBinder* pBinder = getBinder();
-		poco_check_ptr (pBinder);
+		AbstractBinder::Ptr pBinder = getBinder();
+		poco_assert_dbg (!pBinder.isNull());
 		pBinder->reset();
 	}
 
 private:
-	typedef typename TypeWrapper<T>::TYPE ValueType;
-	SharedPtr<ValueType> _pVal;
-	bool         _bound;
+	//typedef typename TypeWrapper<T>::TYPE ValueType;
+	ValPtr _pVal;
+	bool   _bound;
 };
 
 
@@ -198,6 +206,11 @@ class Binding<const char*>: public AbstractBinding
 	/// Binding const char* specialization wraps char pointer into string.
 {
 public:
+	typedef const char*          ValType;
+	typedef SharedPtr<ValType>   ValPtr;
+	typedef Binding<const char*> Type;
+	typedef SharedPtr<Type>      Ptr;
+
 	explicit Binding(const char* pVal, 
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -230,7 +243,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<std::string>::bind(pos, _val, getBinder(), getDirection());
 		_bound = true;
 	}
@@ -238,8 +251,8 @@ public:
 	void reset ()
 	{
 		_bound = false;
-		AbstractBinder* pBinder = getBinder();
-		poco_check_ptr (pBinder);
+		AbstractBinder::Ptr pBinder = getBinder();
+		poco_assert_dbg (!pBinder.isNull());
 		pBinder->reset();
 	}
 
@@ -255,6 +268,11 @@ class CopyBinding<const char*>: public AbstractBinding
 	/// Binding const char* specialization wraps char pointer into string.
 {
 public:
+	typedef const char*              ValType;
+	typedef SharedPtr<ValType>       ValPtr;
+	typedef CopyBinding<const char*> Type;
+	typedef SharedPtr<Type>          Ptr;
+
 	explicit CopyBinding(const char* pVal, 
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -287,7 +305,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<std::string>::bind(pos, _val, getBinder(), getDirection());
 		_bound = true;
 	}
@@ -295,8 +313,8 @@ public:
 	void reset ()
 	{
 		_bound = false;
-		AbstractBinder* pBinder = getBinder();
-		poco_check_ptr (pBinder);
+		AbstractBinder::Ptr pBinder = getBinder();
+		poco_assert_dbg (!pBinder.isNull());
 		pBinder->reset();
 	}
 
@@ -311,6 +329,11 @@ class Binding<std::vector<T> >: public AbstractBinding
 	/// Specialization for std::vector.
 {
 public:
+	typedef std::vector<T>                   ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<Binding<ValType> >     Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit Binding(std::vector<T>& val, 
 		const std::string& name = "", 
 		Direction direction = PD_IN): 
@@ -347,7 +370,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
@@ -361,12 +384,9 @@ public:
 	}
 
 private:
-	typedef std::vector<T>                Type;
-	typedef typename Type::const_iterator Iterator;
-
-	const Type& _val;
-	Iterator    _begin;
-	Iterator    _end;
+	const ValType& _val;
+	Iterator       _begin;
+	Iterator       _end;
 };
 
 
@@ -375,6 +395,12 @@ class CopyBinding<std::vector<T> >: public AbstractBinding
 	/// Specialization for std::vector.
 {
 public:
+	
+	typedef std::vector<T>                   ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<CopyBinding<ValType> > Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit CopyBinding(std::vector<T>& val, 
 		const std::string& name = "", 
 		Direction direction = PD_IN): 
@@ -411,7 +437,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
@@ -425,13 +451,9 @@ public:
 	}
 
 private:
-	typedef std::vector<T>                Type;
-	typedef SharedPtr<Type>               TypePtr;
-	typedef typename Type::const_iterator Iterator;
-
-	TypePtr     _pVal;
-	Iterator    _begin;
-	Iterator    _end;
+	ValPtr   _pVal;
+	Iterator _begin;
+	Iterator _end;
 };
 
 
@@ -451,6 +473,11 @@ class Binding<std::vector<bool> >: public AbstractBinding
 	/// Only IN binding is supported.
 {
 public:
+	typedef std::vector<bool>            ValType;
+	typedef SharedPtr<ValType>           ValPtr;
+	typedef SharedPtr<Binding<ValType> > Ptr;
+	typedef ValType::const_iterator      Iterator;
+
 	explicit Binding(const std::vector<bool>& val, 
 		const std::string& name = "", 
 		Direction direction = PD_IN): 
@@ -491,7 +518,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<bool>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
@@ -528,6 +555,11 @@ class CopyBinding<std::vector<bool> >: public AbstractBinding
 	/// Only IN binding is supported.
 {
 public:
+	typedef std::vector<bool>                ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<CopyBinding<ValType> > Ptr;
+	typedef ValType::const_iterator          Iterator;
+
 	explicit CopyBinding(const std::vector<bool>& val, 
 		const std::string& name = "", 
 		Direction direction = PD_IN): 
@@ -568,11 +600,10 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<bool>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
-
 	}
 
 	void reset()
@@ -593,6 +624,11 @@ class Binding<std::list<T> >: public AbstractBinding
 	/// Specialization for std::list.
 {
 public:
+	typedef std::list<T>                     ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<Binding<ValType> >     Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit Binding(std::list<T>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -629,7 +665,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
@@ -642,12 +678,9 @@ public:
 	}
 
 private:
-	typedef std::list<T>                  Type;
-	typedef typename Type::const_iterator Iterator;
-
-	const Type& _val;
-	Iterator    _begin;
-	Iterator    _end;
+	const ValType& _val;
+	Iterator       _begin;
+	Iterator       _end;
 };
 
 
@@ -656,7 +689,12 @@ class CopyBinding<std::list<T> >: public AbstractBinding
 	/// Specialization for std::list.
 {
 public:
-	explicit CopyBinding(std::list<T>& val,
+	typedef typename std::list<T>            ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<CopyBinding<ValType> > Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
+	explicit CopyBinding(ValType& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
 		AbstractBinding(name, direction), 
@@ -692,7 +730,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
@@ -705,13 +743,9 @@ public:
 	}
 
 private:
-	typedef std::list<T>                  Type;
-	typedef SharedPtr<Type>               TypePtr;
-	typedef typename Type::const_iterator Iterator;
-
-	TypePtr     _pVal;
-	Iterator    _begin;
-	Iterator    _end;
+	ValPtr   _pVal;
+	Iterator _begin;
+	Iterator _end;
 };
 
 
@@ -720,6 +754,11 @@ class Binding<std::deque<T> >: public AbstractBinding
 	/// Specialization for std::deque.
 {
 public:
+	typedef std::deque<T>                    ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<Binding<ValType> >     Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit Binding(std::deque<T>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -756,7 +795,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
@@ -769,12 +808,9 @@ public:
 	}
 
 private:
-	typedef std::deque<T>                 Type;
-	typedef typename Type::const_iterator Iterator;
-
-	const Type& _val;
-	Iterator    _begin;
-	Iterator    _end;
+	const ValType& _val;
+	Iterator       _begin;
+	Iterator       _end;
 };
 
 
@@ -783,6 +819,11 @@ class CopyBinding<std::deque<T> >: public AbstractBinding
 	/// Specialization for std::deque.
 {
 public:
+	typedef std::deque<T>                    ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<CopyBinding<ValType> > Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit CopyBinding(std::deque<T>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -819,7 +860,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
@@ -832,13 +873,9 @@ public:
 	}
 
 private:
-	typedef std::deque<T>                 Type;
-	typedef SharedPtr<Type>               TypePtr;
-	typedef typename Type::const_iterator Iterator;
-
-	TypePtr     _pVal;
-	Iterator    _begin;
-	Iterator    _end;
+	ValPtr   _pVal;
+	Iterator _begin;
+	Iterator _end;
 };
 
 
@@ -847,6 +884,11 @@ class Binding<std::set<T> >: public AbstractBinding
 	/// Specialization for std::set.
 {
 public:
+	typedef std::set<T>                      ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<Binding<ValType> >     Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit Binding(std::set<T>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -883,7 +925,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
@@ -896,12 +938,9 @@ public:
 	}
 
 private:
-	typedef std::set<T>                   Type;
-	typedef typename Type::const_iterator Iterator;
-
-	const Type& _val;
-	Iterator    _begin;
-	Iterator    _end;
+	const ValType& _val;
+	Iterator       _begin;
+	Iterator       _end;
 };
 
 
@@ -910,6 +949,11 @@ class CopyBinding<std::set<T> >: public AbstractBinding
 	/// Specialization for std::set.
 {
 public:
+	typedef std::set<T>                      ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<CopyBinding<ValType> > Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit CopyBinding(std::set<T>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -946,7 +990,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
@@ -959,13 +1003,9 @@ public:
 	}
 
 private:
-	typedef std::set<T>                   Type;
-	typedef SharedPtr<Type>               TypePtr;
-	typedef typename Type::const_iterator Iterator;
-
-	TypePtr     _pVal;
-	Iterator    _begin;
-	Iterator    _end;
+	ValPtr   _pVal;
+	Iterator _begin;
+	Iterator _end;
 };
 
 
@@ -974,6 +1014,11 @@ class Binding<std::multiset<T> >: public AbstractBinding
 	/// Specialization for std::multiset.
 {
 public:
+	typedef std::multiset<T>                 ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<Binding<ValType> >     Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit Binding(std::multiset<T>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -1010,7 +1055,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
@@ -1023,12 +1068,9 @@ public:
 	}
 
 private:
-	typedef std::multiset<T>              Type;
-	typedef typename Type::const_iterator Iterator;
-
-	const Type& _val;
-	Iterator    _begin;
-	Iterator    _end;
+	const ValType& _val;
+	Iterator       _begin;
+	Iterator       _end;
 };
 
 
@@ -1037,6 +1079,11 @@ class CopyBinding<std::multiset<T> >: public AbstractBinding
 	/// Specialization for std::multiset.
 {
 public:
+	typedef std::multiset<T>             ValType;
+	typedef SharedPtr<ValType>           ValPtr;
+	typedef SharedPtr<CopyBinding<ValType> > Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit CopyBinding(std::multiset<T>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -1073,7 +1120,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
@@ -1086,13 +1133,9 @@ public:
 	}
 
 private:
-	typedef std::multiset<T>              Type;
-	typedef SharedPtr<Type>               TypePtr;
-	typedef typename Type::const_iterator Iterator;
-
-	TypePtr     _pVal;
-	Iterator    _begin;
-	Iterator    _end;
+	ValPtr    _pVal;
+	Iterator _begin;
+	Iterator _end;
 };
 
 
@@ -1101,6 +1144,11 @@ class Binding<std::map<K, V> >: public AbstractBinding
 	/// Specialization for std::map.
 {
 public:
+	typedef std::map<K, V>                   ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<Binding<ValType> >     Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit Binding(std::map<K, V>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -1137,7 +1185,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<V>::bind(pos, _begin->second, getBinder(), getDirection());
 		++_begin;
@@ -1150,12 +1198,9 @@ public:
 	}
 
 private:
-	typedef std::map<K, V>                Type;
-	typedef typename Type::const_iterator Iterator;
-
-	const Type& _val;
-	Iterator    _begin;
-	Iterator    _end;
+	const ValType& _val;
+	Iterator       _begin;
+	Iterator       _end;
 };
 
 
@@ -1164,6 +1209,11 @@ class CopyBinding<std::map<K, V> >: public AbstractBinding
 	/// Specialization for std::map.
 {
 public:
+	typedef std::map<K, V>                   ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<CopyBinding<ValType> > Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit CopyBinding(std::map<K, V>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -1200,7 +1250,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<V>::bind(pos, _begin->second, getBinder(), getDirection());
 		++_begin;
@@ -1213,13 +1263,9 @@ public:
 	}
 
 private:
-	typedef std::map<K, V>                Type;
-	typedef SharedPtr<Type>               TypePtr;
-	typedef typename Type::const_iterator Iterator;
-
-	TypePtr     _pVal;
-	Iterator    _begin;
-	Iterator    _end;
+	ValPtr   _pVal;
+	Iterator _begin;
+	Iterator _end;
 };
 
 
@@ -1228,6 +1274,11 @@ class Binding<std::multimap<K, V> >: public AbstractBinding
 	/// Specialization for std::multimap.
 {
 public:
+	typedef std::multimap<K, V>              ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<Binding<ValType> >     Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit Binding(std::multimap<K, V>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -1264,7 +1315,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<V>::bind(pos, _begin->second, getBinder(), getDirection());
 		++_begin;
@@ -1277,12 +1328,9 @@ public:
 	}
 
 private:
-	typedef std::multimap<K, V>           Type;
-	typedef typename Type::const_iterator Iterator;
-
-	const Type& _val;
-	Iterator    _begin;
-	Iterator    _end;
+	const ValType& _val;
+	Iterator       _begin;
+	Iterator       _end;
 };
 
 
@@ -1291,6 +1339,11 @@ class CopyBinding<std::multimap<K, V> >: public AbstractBinding
 	/// Specialization for std::multimap.
 {
 public:
+	typedef std::multimap<K, V>              ValType;
+	typedef SharedPtr<ValType>               ValPtr;
+	typedef SharedPtr<CopyBinding<ValType> > Ptr;
+	typedef typename ValType::const_iterator Iterator;
+
 	explicit CopyBinding(std::multimap<K, V>& val,
 		const std::string& name = "",
 		Direction direction = PD_IN): 
@@ -1327,7 +1380,7 @@ public:
 
 	void bind(std::size_t pos)
 	{
-		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(!getBinder().isNull());
 		poco_assert_dbg(canBind());
 		TypeHandler<V>::bind(pos, _begin->second, getBinder(), getDirection());
 		++_begin;
@@ -1340,13 +1393,9 @@ public:
 	}
 
 private:
-	typedef std::multimap<K, V>           Type;
-	typedef SharedPtr<Type>               TypePtr;
-	typedef typename Type::const_iterator Iterator;
-
-	TypePtr     _pVal;
-	Iterator    _begin;
-	Iterator    _end;
+	ValPtr   _pVal;
+	Iterator _begin;
+	Iterator _end;
 };
 
 
@@ -1354,29 +1403,27 @@ namespace Keywords {
 
 
 template <typename T> 
-inline Binding<T>* use(T& t, const std::string& name = "")
+inline AbstractBinding::Ptr use(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	// If this test fails with an error, you tried to pass a const ref value to use().
-	// Resolve this either by using bind (which will copy the value) or
-	// if you are sure that the const ref will still exist when execute is called 
-	// (which can be much later!), then use the "useRef" keyword instead
+	// If this fails to compile, a const ref was passed to use().
+	// This can be resolved by either (a) using bind (which will copy the value),
+	// or (b) if the const ref is guaranteed to exist when execute is called 
+	// (which can be much later!), by using the "useRef" keyword instead
 	poco_static_assert (!IsConst<T>::VALUE);
 	return new Binding<T>(t, name, AbstractBinding::PD_IN);
 }
 
 
-
-inline Binding<NullData>* use(const NullData& t, const std::string& name = "")
+inline AbstractBinding::Ptr use(const NullData& t, const std::string& name = "")
 	/// NullData overload.
 {
 	return new Binding<NullData>(const_cast<NullData&>(t), name, AbstractBinding::PD_IN);
 }
 
 
-
 template <typename T> 
-inline Binding<T>* useRef(T& t, const std::string& name = "")
+inline AbstractBinding::Ptr useRef(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	return new Binding<T>(t, name, AbstractBinding::PD_IN);
@@ -1384,14 +1431,14 @@ inline Binding<T>* useRef(T& t, const std::string& name = "")
 
 
 template <typename T> 
-inline Binding<T>* in(T& t, const std::string& name = "")
+inline AbstractBinding::Ptr in(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	return use(t, name);
 }
 
 
-inline Binding<NullData>* in(const NullData& t, const std::string& name = "")
+inline AbstractBinding::Ptr in(const NullData& t, const std::string& name = "")
 	/// NullData overload.
 {
 	return use(t, name);
@@ -1399,7 +1446,7 @@ inline Binding<NullData>* in(const NullData& t, const std::string& name = "")
 
 
 template <typename T> 
-inline Binding<T>* out(T& t)
+inline AbstractBinding::Ptr out(T& t)
 	/// Convenience function for a more compact Binding creation.
 {
 	poco_static_assert (!IsConst<T>::VALUE);
@@ -1408,7 +1455,7 @@ inline Binding<T>* out(T& t)
 
 
 template <typename T> 
-inline Binding<T>* io(T& t)
+inline AbstractBinding::Ptr io(T& t)
 	/// Convenience function for a more compact Binding creation.
 {
 	poco_static_assert (!IsConst<T>::VALUE);
@@ -1445,7 +1492,7 @@ inline AbstractBindingVec& io(AbstractBindingVec& bv)
 
 
 template <typename T> 
-inline CopyBinding<T>* bind(T t, const std::string& name)
+inline AbstractBinding::Ptr bind(T t, const std::string& name)
 	/// Convenience function for a more compact Binding creation.
 	/// This funtion differs from use() in its value copy semantics.
 {
@@ -1454,11 +1501,11 @@ inline CopyBinding<T>* bind(T t, const std::string& name)
 
 
 template <typename T> 
-inline CopyBinding<T>* bind(T t)
+inline AbstractBinding::Ptr bind(T t)
 	/// Convenience function for a more compact Binding creation.
 	/// This funtion differs from use() in its value copy semantics.
 {
-	return bind(t, "");
+	return Poco::Data::Keywords::bind(t, "");
 }
 
 

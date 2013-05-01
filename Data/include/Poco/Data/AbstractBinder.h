@@ -74,6 +74,8 @@ class Data_API AbstractBinder
 	/// Interface for Binding data types to placeholders.
 {
 public:
+	typedef SharedPtr<AbstractBinder> Ptr;
+
 	enum Direction
 		/// Binding direction for a parameter.
 	{

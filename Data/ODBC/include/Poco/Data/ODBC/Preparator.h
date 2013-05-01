@@ -81,9 +81,9 @@ class ODBC_API Preparator : public AbstractPreparator
 	///
 	/// Preparator object is used to :
 	///
-	///		1) Prepare SQL statement.
-	///		2) Provide and contain the memory locations where retrieved values are placed during recordset iteration.
-	///		3) Keep count of returned number of columns with their respective datatypes and sizes.
+	///   1) Prepare SQL statement.
+	///   2) Provide and contain the memory locations where retrieved values are placed during recordset iteration.
+	///   3) Keep count of returned number of columns with their respective datatypes and sizes.
 	///
 	/// Notes:
 	///
@@ -94,6 +94,7 @@ class ODBC_API Preparator : public AbstractPreparator
 {
 public:
 	typedef std::vector<char*> CharArray;
+	typedef SharedPtr<Preparator> Ptr;
 
 	enum DataExtraction
 	{
@@ -388,6 +389,9 @@ public:
 		/// Resizes the internal storage iff the size is zero.
 
 	Poco::Any& operator [] (std::size_t pos);
+		/// Returns reference to column data.
+
+	Poco::Any& at(std::size_t pos);
 		/// Returns reference to column data.
 
 	void setMaxFieldSize(std::size_t size);
@@ -1224,6 +1228,12 @@ inline Preparator::DataExtraction Preparator::getDataExtraction() const
 
 
 inline Poco::Any& Preparator::operator [] (std::size_t pos)
+{
+	return at(pos);
+}
+
+
+inline Poco::Any& Preparator::at(std::size_t pos)
 {
 	return _values.at(pos);
 }

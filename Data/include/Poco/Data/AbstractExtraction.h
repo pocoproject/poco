@@ -42,6 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/AbstractExtractor.h"
+#include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Data/Limit.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
@@ -55,15 +56,18 @@ namespace Poco {
 namespace Data {
 
 
-class AbstractPreparation;
 class AbstractPreparator;
 
 
-class Data_API AbstractExtraction: public Poco::RefCountedObject
+class Data_API AbstractExtraction
 	/// AbstractExtraction is the interface class that connects output positions to concrete values
 	/// retrieved via an AbstractExtractor.
 {
 public:
+	typedef SharedPtr<AbstractExtraction> Ptr;
+	typedef SharedPtr<AbstractExtractor>  ExtractorPtr;
+	typedef SharedPtr<AbstractPreparator> PreparatorPtr;
+
 	AbstractExtraction(Poco::UInt32 limit = Limit::LIMIT_UNLIMITED,
 		Poco::UInt32 position = 0, bool bulk = false);
 		/// Creates the AbstractExtraction. A limit value equal to EXTRACT_UNLIMITED (0xffffffffu) 
@@ -73,10 +77,10 @@ public:
 	virtual ~AbstractExtraction();
 		/// Destroys the AbstractExtraction.
 
-	void setExtractor(AbstractExtractor* pExtractor);
+	void setExtractor(ExtractorPtr pExtractor);
 		/// Sets the class used for extracting the data. Does not take ownership of the pointer.
 
-	AbstractExtractor* getExtractor() const;
+	ExtractorPtr getExtractor() const;
 		/// Retrieves the extractor object
 
 	Poco::UInt32 position() const;
@@ -109,8 +113,8 @@ public:
 	virtual bool canExtract() const;
 		/// Returns true. Implementations should override it for different behavior.
 
-	virtual AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos) = 0;
-		/// Creates a Preparation object for the extracting object
+	virtual AbstractPreparation::Ptr createPreparation(PreparatorPtr& pPrep, std::size_t pos) = 0;
+		/// Creates and returns shared pointer to Preparation object for the extracting object.
 
 	void setLimit(Poco::UInt32 limit);
 		/// Sets the limit.
@@ -161,34 +165,33 @@ public:
 		/// - getEmptyStringIsNull() returns true
 
 private:
-	AbstractExtractor* _pExtractor;
-	Poco::UInt32       _limit;
-	Poco::UInt32       _position;
-	bool               _bulk;
-	bool               _emptyStringIsNull;
-	bool               _forceEmptyString;
+	ExtractorPtr _pExtractor;
+	Poco::UInt32 _limit;
+	Poco::UInt32 _position;
+	bool         _bulk;
+	bool         _emptyStringIsNull;
+	bool         _forceEmptyString;
 };
 
 
-typedef Poco::AutoPtr<AbstractExtraction> AbstractExtractionPtr;
-typedef std::vector<AbstractExtractionPtr> AbstractExtractionVec;
-typedef std::vector<AbstractExtractionVec> AbstractExtractionVecVec;
-typedef std::deque<AbstractExtractionPtr> AbstractExtractionDeq;
-typedef std::vector<AbstractExtractionDeq> AbstractExtractionDeqVec;
-typedef std::list<AbstractExtractionPtr> AbstractExtractionLst;
-typedef std::vector<AbstractExtractionLst> AbstractExtractionLstVec;
+typedef std::vector<AbstractExtraction::Ptr> AbstractExtractionVec;
+typedef std::vector<AbstractExtractionVec>   AbstractExtractionVecVec;
+typedef std::deque<AbstractExtraction::Ptr>  AbstractExtractionDeq;
+typedef std::vector<AbstractExtractionDeq>   AbstractExtractionDeqVec;
+typedef std::list<AbstractExtraction::Ptr>   AbstractExtractionLst;
+typedef std::vector<AbstractExtractionLst>   AbstractExtractionLstVec;
 
 
 //
 // inlines
 //
-inline void AbstractExtraction::setExtractor(AbstractExtractor* pExtractor)
+inline void AbstractExtraction::setExtractor(ExtractorPtr pExtractor)
 {
 	_pExtractor = pExtractor;
 }
 
 
-inline AbstractExtractor* AbstractExtraction::getExtractor() const
+inline AbstractExtraction::ExtractorPtr AbstractExtraction::getExtractor() const
 {
 	return _pExtractor;
 }

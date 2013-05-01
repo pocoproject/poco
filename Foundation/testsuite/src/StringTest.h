@@ -58,6 +58,7 @@ public:
 	void testToLower();
 	void testIstring();
 	void testIcompare();
+	void testCILessThan();
 	void testTranslate();
 	void testTranslateInPlace();
 	void testReplace();

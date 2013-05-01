@@ -55,10 +55,10 @@ const std::string Extractor::FLD_SIZE_EXCEEDED_FMT = "Specified data size (%z by
 
 
 Extractor::Extractor(const StatementHandle& rStmt, 
-	Preparator& rPreparator): 
+	Preparator::Ptr pPreparator): 
 	_rStmt(rStmt), 
-	_rPreparator(rPreparator),
-	_dataExtraction(rPreparator.getDataExtraction())
+	_pPreparator(pPreparator),
+	_dataExtraction(pPreparator->getDataExtraction())
 {
 }
 
@@ -73,8 +73,8 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 {
 	if (isNull(pos)) return false;
 
-	std::size_t dataSize = _rPreparator.actualDataSize(pos);
-	char* sp = AnyCast<char*>(_rPreparator[pos]);
+	std::size_t dataSize = _pPreparator->actualDataSize(pos);
+	char* sp = AnyCast<char*>(_pPreparator->at(pos));
 	std::size_t len = std::strlen(sp);
 	if (len < dataSize) dataSize = len;
 	checkDataSize(dataSize);
@@ -88,7 +88,7 @@ template<>
 bool Extractor::extractBoundImpl<Poco::Data::Date>(std::size_t pos, Poco::Data::Date& val)
 {
 	if (isNull(pos)) return false;
-	SQL_DATE_STRUCT& ds = *AnyCast<SQL_DATE_STRUCT>(&_rPreparator[pos]);
+	SQL_DATE_STRUCT& ds = *AnyCast<SQL_DATE_STRUCT>(&(_pPreparator->at(pos)));
 	Utility::dateSync(val, ds);
 	return true;
 }
@@ -98,7 +98,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::Date> >(std::size_t pos, 
 	std::vector<Poco::Data::Date>& val)
 {
-	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_rPreparator[pos]);
+	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_pPreparator->at(pos));
 	Utility::dateSync(val, ds);
 	return true;
 }
@@ -108,7 +108,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::Date> >(std::size_t pos, 
 	std::deque<Poco::Data::Date>& val)
 {
-	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_rPreparator[pos]);
+	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_pPreparator->at(pos));
 	Utility::dateSync(val, ds);
 	return true;
 }
@@ -118,7 +118,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::list<Poco::Data::Date> >(std::size_t pos, 
 	std::list<Poco::Data::Date>& val)
 {
-	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_rPreparator[pos]);
+	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_pPreparator->at(pos));
 	Utility::dateSync(val, ds);
 	return true;
 }
@@ -129,9 +129,9 @@ bool Extractor::extractBoundImpl<Poco::Data::Time>(std::size_t pos, Poco::Data::
 {
 	if (isNull(pos)) return false;
 
-	std::size_t dataSize = _rPreparator.actualDataSize(pos);
+	std::size_t dataSize = _pPreparator->actualDataSize(pos);
 	checkDataSize(dataSize);
-	SQL_TIME_STRUCT& ts = *AnyCast<SQL_TIME_STRUCT>(&_rPreparator[pos]);
+	SQL_TIME_STRUCT& ts = *AnyCast<SQL_TIME_STRUCT>(&_pPreparator->at(pos));
 	Utility::timeSync(val, ts);
 
 	return true;
@@ -142,7 +142,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::Time> >(std::size_t pos, 
 	std::vector<Poco::Data::Time>& val)
 {
-	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_rPreparator[pos]);
+	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_pPreparator->at(pos));
 	Utility::timeSync(val, ds);
 	return true;
 }
@@ -152,7 +152,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::Time> >(std::size_t pos, 
 	std::deque<Poco::Data::Time>& val)
 {
-	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_rPreparator[pos]);
+	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_pPreparator->at(pos));
 	Utility::timeSync(val, ds);
 	return true;
 }
@@ -162,7 +162,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::list<Poco::Data::Time> >(std::size_t pos, 
 	std::list<Poco::Data::Time>& val)
 {
-	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_rPreparator[pos]);
+	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_pPreparator->at(pos));
 	Utility::timeSync(val, ds);
 	return true;
 }
@@ -173,9 +173,9 @@ bool Extractor::extractBoundImpl<Poco::DateTime>(std::size_t pos, Poco::DateTime
 {
 	if (isNull(pos)) return false;
 
-	std::size_t dataSize = _rPreparator.actualDataSize(pos);
+	std::size_t dataSize = _pPreparator->actualDataSize(pos);
 	checkDataSize(dataSize);
-	SQL_TIMESTAMP_STRUCT& tss = *AnyCast<SQL_TIMESTAMP_STRUCT>(&_rPreparator[pos]);
+	SQL_TIMESTAMP_STRUCT& tss = *AnyCast<SQL_TIMESTAMP_STRUCT>(&_pPreparator->at(pos));
 	Utility::dateTimeSync(val, tss);
 
 	return true;
@@ -186,7 +186,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::vector<Poco::DateTime> >(std::size_t pos, 
 	std::vector<Poco::DateTime>& val)
 {
-	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_rPreparator[pos]);
+	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_pPreparator->at(pos));
 	Utility::dateTimeSync(val, ds);
 	return true;
 }
@@ -196,7 +196,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::deque<Poco::DateTime> >(std::size_t pos, 
 	std::deque<Poco::DateTime>& val)
 {
-	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_rPreparator[pos]);
+	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_pPreparator->at(pos));
 	Utility::dateTimeSync(val, ds);
 	return true;
 }
@@ -206,7 +206,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::list<Poco::DateTime> >(std::size_t pos, 
 	std::list<Poco::DateTime>& val)
 {
-	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_rPreparator[pos]);
+	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_pPreparator->at(pos));
 	Utility::dateTimeSync(val, ds);
 	return true;
 }
@@ -216,8 +216,8 @@ template<>
 bool Extractor::extractBoundImplContainer<std::vector<bool> >(std::size_t pos, 
 	std::vector<bool>& val)
 {
-	std::size_t length = _rPreparator.getLength();
-	bool** p = AnyCast<bool*>(&_rPreparator[pos]);
+	std::size_t length = _pPreparator->getLength();
+	bool** p = AnyCast<bool*>(&_pPreparator->at(pos));
 	val.assign(*p, *p + length);
 	return true;
 }
@@ -227,8 +227,8 @@ template<>
 bool Extractor::extractBoundImplContainer<std::deque<bool> >(std::size_t pos, 
 	std::deque<bool>& val)
 {
-	std::size_t length = _rPreparator.getLength();
-	bool** p = AnyCast<bool*>(&_rPreparator[pos]);
+	std::size_t length = _pPreparator->getLength();
+	bool** p = AnyCast<bool*>(&_pPreparator->at(pos));
 	val.assign(*p, *p + length);
 	return true;
 }
@@ -238,8 +238,8 @@ template<>
 bool Extractor::extractBoundImplContainer<std::list<bool> >(std::size_t pos, 
 	std::list<bool>& val)
 {
-	std::size_t length = _rPreparator.getLength();
-	bool** p = AnyCast<bool*>(&_rPreparator[pos]);
+	std::size_t length = _pPreparator->getLength();
+	bool** p = AnyCast<bool*>(&_pPreparator->at(pos));
 	val.assign(*p, *p + length);
 	return true;
 }
@@ -248,7 +248,7 @@ bool Extractor::extractBoundImplContainer<std::list<bool> >(std::size_t pos,
 template<>
 bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val, SQLSMALLINT cType)
 {
-	std::size_t maxSize = _rPreparator.getMaxFieldSize();
+	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	std::size_t fetchedSize = 0;
 	std::size_t totalSize = 0;
 	
@@ -304,7 +304,7 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 	Poco::Data::CLOB& val, 
 	SQLSMALLINT cType)
 {
-	std::size_t maxSize = _rPreparator.getMaxFieldSize();
+	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	std::size_t fetchedSize = 0;
 	std::size_t totalSize = 0;
 
@@ -1209,13 +1209,13 @@ bool Extractor::isNull(std::size_t col, std::size_t row)
 		}
 	}
 	else
-		return SQL_NULL_DATA == _rPreparator.actualDataSize(col, row);
+		return SQL_NULL_DATA == _pPreparator->actualDataSize(col, row);
 }
 
 
 void Extractor::checkDataSize(std::size_t size)
 {
-	std::size_t maxSize = _rPreparator.getMaxFieldSize();
+	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	if (size > maxSize)
 		throw DataException(format(FLD_SIZE_EXCEEDED_FMT, size, maxSize));
 }

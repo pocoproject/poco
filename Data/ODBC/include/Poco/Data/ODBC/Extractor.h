@@ -71,8 +71,10 @@ class ODBC_API Extractor: public Poco::Data::AbstractExtractor
 	/// If NULL is received, the incoming val value is not changed and false is returned
 {
 public:
+	typedef Preparator::Ptr PreparatorPtr;
+
 	Extractor(const StatementHandle& rStmt, 
-		Preparator& rPreparator);
+		Preparator::Ptr pPreparator);
 		/// Creates the Extractor.
 
 	~Extractor();
@@ -370,8 +372,8 @@ private:
 	bool extractBoundImpl(std::size_t pos, T& val)
 	{
 		if (isNull(pos)) return false;
-		poco_assert_dbg (typeid(T) == _rPreparator[pos].type());
-		val = *AnyCast<T>(&_rPreparator[pos]); 
+		poco_assert_dbg (typeid(T) == _pPreparator->at(pos).type());
+		val = *AnyCast<T>(&_pPreparator->at(pos)); 
 		return true;
 	}
 
@@ -382,8 +384,8 @@ private:
 	bool extractBoundImplContainer(std::size_t pos, C& val)
 	{
 		typedef typename C::value_type Type;
-		poco_assert_dbg (typeid(std::vector<Type>) == _rPreparator[pos].type());
-		std::vector<Type>& v = RefAnyCast<std::vector<Type> >(_rPreparator[pos]);
+		poco_assert_dbg (typeid(std::vector<Type>) == _pPreparator->at(pos).type());
+		std::vector<Type>& v = RefAnyCast<std::vector<Type> >(_pPreparator->at(pos));
 		val.assign(v.begin(), v.end());
 		return true;
 	}
@@ -405,14 +407,14 @@ private:
 		typedef typename C::iterator ItType;
 		typedef typename StringType::value_type CharType;
 
-		CharType** pc = AnyCast<CharType*>(&_rPreparator[pos]);
+		CharType** pc = AnyCast<CharType*>(&(_pPreparator->at(pos)));
 		poco_assert_dbg (pc);
-		poco_assert_dbg (_rPreparator.bulkSize() == values.size());
+		poco_assert_dbg (_pPreparator->bulkSize() == values.size());
 		std::size_t colWidth = columnSize(pos);
 		ItType it = values.begin();
 		ItType end = values.end();
 		for (int row = 0; it != end; ++it, ++row)
-			it->assign(*pc + row * colWidth, _rPreparator.actualDataSize(pos, row));
+			it->assign(*pc + row * colWidth, _pPreparator->actualDataSize(pos, row));
 
 		return true;
 	}
@@ -424,14 +426,14 @@ private:
 		typedef typename LOBType::ValueType CharType;
 		typedef typename C::iterator ItType;
 
-		CharType** pc = AnyCast<CharType*>(&_rPreparator[pos]);
+		CharType** pc = AnyCast<CharType*>(&(_pPreparator->at(pos)));
 		poco_assert_dbg (pc);
-		poco_assert_dbg (_rPreparator.bulkSize() == values.size());
-		std::size_t colWidth = _rPreparator.maxDataSize(pos);
+		poco_assert_dbg (_pPreparator->bulkSize() == values.size());
+		std::size_t colWidth = _pPreparator->maxDataSize(pos);
 		ItType it = values.begin();
 		ItType end = values.end();
 		for (int row = 0; it != end; ++it, ++row)
-			it->assignRaw(*pc + row * colWidth, _rPreparator.actualDataSize(pos, row));
+			it->assignRaw(*pc + row * colWidth, _pPreparator->actualDataSize(pos, row));
 
 		return true;
 	}
@@ -441,9 +443,9 @@ private:
 	{
 		if (isNull(pos)) return false;
 
-		std::size_t dataSize = _rPreparator.actualDataSize(pos);
+		std::size_t dataSize = _pPreparator->actualDataSize(pos);
 		checkDataSize(dataSize);
-		T* sp = AnyCast<T*>(_rPreparator[pos]);
+		T* sp = AnyCast<T*>(_pPreparator->at(pos));
 		val.assignRaw(sp, dataSize);
 
 		return true;
@@ -569,10 +571,10 @@ private:
 
 	SQLINTEGER columnSize(std::size_t pos) const;
 
-	const StatementHandle&      _rStmt;
-	Preparator&                _rPreparator;
+	const StatementHandle&     _rStmt;
+	PreparatorPtr              _pPreparator;
 	Preparator::DataExtraction _dataExtraction;
-	std::vector<SQLLEN>         _lengths;
+	std::vector<SQLLEN>        _lengths;
 };
 
 
@@ -654,7 +656,7 @@ inline bool Extractor::extractBoundImplContainer(std::size_t pos,
 
 inline void Extractor::setDataExtraction(Preparator::DataExtraction ext)
 {
-	_rPreparator.setDataExtraction(_dataExtraction = ext);
+	_pPreparator->setDataExtraction(_dataExtraction = ext);
 }
 
 
@@ -686,7 +688,7 @@ inline bool Extractor::isNullLengthIndicator(SQLLEN val) const
 inline SQLINTEGER Extractor::columnSize(std::size_t pos) const
 {
 	std::size_t size = ODBCMetaColumn(_rStmt, pos).length();
-	std::size_t maxSize = _rPreparator.maxDataSize(pos);
+	std::size_t maxSize = _pPreparator->maxDataSize(pos);
 	if (size > maxSize) size = maxSize;
 	return (SQLINTEGER) size;
 }
