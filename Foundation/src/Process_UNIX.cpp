@@ -218,7 +218,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 }
 
 
-void ProcessImpl::killImpl(const ProcessHandleImpl& handle)
+void ProcessImpl::killImpl(ProcessHandleImpl& handle)
 {
 	killImpl(handle.id());
 }

@@ -56,9 +56,17 @@ ProcessHandleImpl::ProcessHandleImpl(HANDLE hProcess, UInt32 pid):
 
 ProcessHandleImpl::~ProcessHandleImpl()
 {
-	CloseHandle(_hProcess);
+	closeHandle();
 }
 
+void ProcessHandleImpl::closeHandle()
+{
+	if (_hProcess)
+	{
+		CloseHandle(_hProcess);
+		_hProcess = NULL;
+	}
+}
 
 UInt32 ProcessHandleImpl::id() const
 {
@@ -228,16 +236,18 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 }
 
 
-void ProcessImpl::killImpl(const ProcessHandleImpl& handle)
+void ProcessImpl::killImpl(ProcessHandleImpl& handle)
 {
-	if (TerminateProcess(handle.process(), 0) == 0)
+	if (handle.process()) 
 	{
-		CloseHandle(handle.process());
-		throw SystemException("cannot kill process");
+		if (TerminateProcess(handle.process(), 0) == 0)
+		{
+			handle.closeHandle();
+			throw SystemException("cannot kill process");
+		}
+		handle.closeHandle();
 	}
-	CloseHandle(handle.process());
 }
-
 
 void ProcessImpl::killImpl(PIDImpl pid)
 {
