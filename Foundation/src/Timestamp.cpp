@@ -35,6 +35,7 @@
 
 
 #include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include <algorithm>
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -253,6 +254,30 @@ void Timestamp::update()
 	_ts = TimeVal(tv.tv_sec)*resolution() + tv.tv_usec;
 	
 #endif
+}
+
+
+Timestamp  Timestamp::operator +  (const Timespan& span) const
+{
+	return *this + span.totalMicroseconds();
+}
+
+
+Timestamp  Timestamp::operator -  (const Timespan& span) const
+{
+	return *this - span.totalMicroseconds();
+}
+
+
+Timestamp& Timestamp::operator += (const Timespan& span)
+{
+	return *this += span.totalMicroseconds();
+}
+
+
+Timestamp& Timestamp::operator -= (const Timespan& span)
+{
+	return *this -= span.totalMicroseconds();
 }
 
 
