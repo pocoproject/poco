@@ -46,6 +46,7 @@
 
 namespace Poco {
 
+class Timespan;
 
 class Foundation_API Timestamp
 	/// A Timestamp stores a monotonic* time value
@@ -95,10 +96,14 @@ public:
 	bool operator <= (const Timestamp& ts) const;
 	
 	Timestamp  operator +  (TimeDiff d) const;
+	Timestamp  operator +  (const Timespan& span) const;
 	Timestamp  operator -  (TimeDiff d) const;
+	Timestamp  operator -  (const Timespan& span) const;
 	TimeDiff   operator -  (const Timestamp& ts) const;
 	Timestamp& operator += (TimeDiff d);
+	Timestamp& operator += (const Timespan& span);
 	Timestamp& operator -= (TimeDiff d);
+	Timestamp& operator -= (const Timespan& span);
 	
 	std::time_t epochTime() const;
 		/// Returns the timestamp expressed in time_t.
