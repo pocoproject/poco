@@ -104,7 +104,7 @@ inline void BSONReader::read<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& to)
 {
 	std::string code;
 	BSONReader(_reader).read(code);
-	to = new JavaScriptCode();
+	to = JavaScriptCode::Ptr(new JavaScriptCode());
 	to->setCode(code);
 }
 

@@ -150,7 +150,7 @@ void HTTPSServerTest::testIdentityRequest()
 	SecureServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPSClientSession cs("localhost", svs.address().port());
@@ -173,7 +173,7 @@ void HTTPSServerTest::testChunkedRequest()
 	SecureServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPSClientSession cs("localhost", svs.address().port());
@@ -197,7 +197,7 @@ void HTTPSServerTest::testIdentityRequestKeepAlive()
 	SecureServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(true);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPSClientSession cs("localhost", svs.address().port());
@@ -231,7 +231,7 @@ void HTTPSServerTest::testChunkedRequestKeepAlive()
 	SecureServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(true);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPSClientSession cs("localhost", svs.address().port());
@@ -266,7 +266,7 @@ void HTTPSServerTest::test100Continue()
 	SecureServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPSClientSession cs("localhost", svs.address().port());
@@ -290,7 +290,7 @@ void HTTPSServerTest::testRedirect()
 	SecureServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPSClientSession cs("localhost", svs.address().port());
@@ -310,7 +310,7 @@ void HTTPSServerTest::testAuth()
 	SecureServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPSClientSession cs("localhost", svs.address().port());
@@ -330,7 +330,7 @@ void HTTPSServerTest::testNotImpl()
 	SecureServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPSClientSession cs("localhost", svs.address().port());

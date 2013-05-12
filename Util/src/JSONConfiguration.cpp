@@ -101,8 +101,8 @@ void JSONConfiguration::load(std::istream& istr)
 
 void JSONConfiguration::loadEmpty(const std::string& root)
 {
-	_object = new JSON::Object();
-	JSON::Object::Ptr rootObject = new JSON::Object();
+	_object = SharedPtr<JSON::Object>(new JSON::Object());
+	JSON::Object::Ptr rootObject(new JSON::Object());
 	_object->set(root, rootObject);
 }
 
@@ -165,7 +165,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 		{
 			if ( indexes.empty() ) // We want an object, create it
 			{
-				JSON::Object::Ptr newObject = new JSON::Object();
+				JSON::Object::Ptr newObject(new JSON::Object());
 				currentObject->set(name, newObject);
 				currentObject = newObject;
 			}
@@ -176,7 +176,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 				JSON::Array::Ptr topArray;
 				for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end(); ++it)
 				{
-					newArray = new JSON::Array();
+					newArray = SharedPtr<JSON::Array>(new JSON::Array());
 					if ( topArray.isNull() )
 					{
 						topArray = newArray;
@@ -197,7 +197,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 				}
 
 				currentObject->set(name, topArray);
-				currentObject = new JSON::Object();
+				currentObject = SharedPtr<JSON::Object>(new JSON::Object());
 				newArray->add(currentObject);
 			}
 		}
@@ -226,7 +226,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 						arr = arr->getArray(*it);
 						if ( arr.isNull() )
 						{
-							arr = new JSON::Array();
+							arr = SharedPtr<JSON::Array>(new JSON::Array());
 							currentArray->add(arr);
 						}
 					}
@@ -234,7 +234,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 					result = arr->get(*indexes.rbegin());
 					if ( result.isEmpty() ) // Index doesn't exist
 					{
-						JSON::Object::Ptr newObject = new JSON::Object();
+						JSON::Object::Ptr newObject(new JSON::Object());
 						arr->add(newObject);
 						currentObject = newObject;
 					}
@@ -310,7 +310,7 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 					Poco::DynamicAny nullValue;
 					arr->add(nullValue);
 				}
-				nextArray = new JSON::Array();
+				nextArray = SharedPtr<JSON::Array>(new JSON::Array());
 				arr->add(nextArray);
 			}
 			arr = nextArray;

@@ -834,7 +834,7 @@ void JSONTest::testPrintHandler()
 	std::string json = "{ \"name\" : \"Homer\", \"age\" : 38, \"wife\" : \"Marge\", \"age\" : 36, \"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ] }";
 	Parser parser;
 	std::ostringstream ostr;
-	PrintHandler::Ptr pHandler = new PrintHandler(ostr);
+	PrintHandler::Ptr pHandler(new PrintHandler(ostr));
 	parser.setHandler(pHandler);
 	parser.parse(json);
 	assert (ostr.str() == "{\"name\":\"Homer\",\"age\":38,\"wife\":\"Marge\",\"age\":36,\"children\":[\"Bart\",\"Lisa\",\"Maggie\"]}");
@@ -1021,7 +1021,7 @@ void JSONTest::testStringifyPreserveOrder()
 						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
 						"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", \"town\" : \"Springfield\" } } }";
 
-	ParseHandler::Ptr pHandler = new ParseHandler(true);
+	ParseHandler::Ptr pHandler(new ParseHandler(true));
 	Parser parser(pHandler);
 	Var result;
 
@@ -1262,8 +1262,8 @@ void JSONTest::testTemplate()
 	Template tpl;
 	tpl.parse("Hello world! From <?= person.name?>.\n<?if person.tooOld?>You're too old.<?endif?>");
 
-	Object::Ptr data = new Object();
-	Object::Ptr person = new Object();
+	Object::Ptr data(new Object());
+	Object::Ptr person(new Object());
 	data->set("person", person);
 	person->set("name", "Franky");
 	person->set("tooOld", true);

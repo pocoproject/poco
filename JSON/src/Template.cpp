@@ -114,7 +114,7 @@ public:
 	{
 	}
 
-	virtual void addPart(Part* part)
+	virtual void addPart(const SharedPtr<Part>& part)
 	{
 		_parts.push_back(part);
 	}
@@ -253,16 +253,16 @@ public:
 	{
 	}
 
-	void addPart(LogicQuery* query, Part* part)
+	void addPart(const SharedPtr<LogicQuery>& query, const SharedPtr<Part>& part)
 	{
 		MultiPart::addPart(part);
 		_queries.push_back(query);
 	}
 
-	void addPart(Part* part)
+	void addPart(const SharedPtr<Part>& part)
 	{
 		MultiPart::addPart(part);
-		_queries.push_back(new LogicElseQuery());
+		_queries.push_back(SharedPtr<LogicElseQuery>(new LogicElseQuery()));
 	}
 
 	void render(const Var& data, std::ostream& out) const
@@ -370,24 +370,18 @@ private:
 
 
 Template::Template(const Path& templatePath)
-	: _parts(NULL)
-	, _templatePath(templatePath)
+	: _templatePath(templatePath)
 {
 }
 
 
 Template::Template()
-	: _parts(NULL)
 {
 }
 
 
 Template::~Template()
 {
-	if ( _parts != NULL )
-	{
-		delete _parts;
-	}
 }
 
 
@@ -406,7 +400,7 @@ void Template::parse(std::istream& in)
 {
 	_parseTime.update();
 
-	_parts = new MultiPart();
+	_parts = SharedPtr<MultiPart>(new MultiPart());
 	_currentPart = _parts;
 
 	while(in.good())
@@ -414,7 +408,7 @@ void Template::parse(std::istream& in)
 		std::string text = readText(in); // Try to read text first
 		if ( text.length() > 0 )
 		{
-			_currentPart->addPart(new StringPart(text));
+			_currentPart->addPart(SharedPtr<StringPart>(new StringPart(text)));
 		}
 
 		if ( in.bad() )
@@ -435,7 +429,7 @@ void Template::parse(std::istream& in)
 			{
 				throw JSONTemplateException("Missing query in <? echo ?>");
 			}
-			_currentPart->addPart(new EchoPart(query));
+			_currentPart->addPart(SharedPtr<EchoPart>(new EchoPart(query)));
 		}
 		else if ( command.compare("for") == 0 )
 		{
@@ -453,7 +447,7 @@ void Template::parse(std::istream& in)
 			}
 
 			_partStack.push(_currentPart);
-			LoopPart* part = new LoopPart(loopVariable, query);
+			SharedPtr<LoopPart> part(new LoopPart(loopVariable, query));
 			_partStack.push(part);
 			_currentPart->addPart(part);
 			_currentPart = part;
@@ -465,12 +459,12 @@ void Template::parse(std::istream& in)
 				throw JSONTemplateException("Unexpected <? else ?> found");
 			}
 			_currentPart = _partStack.top();
-			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if ( lp == NULL )
+			SharedPtr<LogicPart> lp = _currentPart.cast<LogicPart>();
+			if ( !lp )
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? else ?>");
 			}
-			MultiPart* part = new MultiPart();
+			SharedPtr<MultiPart> part(new MultiPart());
 			lp->addPart(part);
 			_currentPart = part;
 		}
@@ -489,13 +483,13 @@ void Template::parse(std::istream& in)
 			}
 
 			_currentPart = _partStack.top();
-			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if ( lp == NULL )
+			SharedPtr<LogicPart> lp = _currentPart.cast<LogicPart>();
+			if ( lp )
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? elsif / elif ?>");
 			}
-			MultiPart* part = new MultiPart();
-			lp->addPart(new LogicQuery(query), part);
+			SharedPtr<MultiPart> part(new MultiPart());
+			lp->addPart(SharedPtr<LogicQuery>(new LogicQuery(query)), part);
 			_currentPart = part;
 		}
 		else if ( command.compare("endfor") == 0 )
@@ -504,9 +498,9 @@ void Template::parse(std::istream& in)
 			{
 				throw JSONTemplateException("Unexpected <? endfor ?> found");
 			}
-			MultiPart* loopPart = _partStack.top();
-			LoopPart* lp = dynamic_cast<LoopPart*>(loopPart);
-			if ( lp == NULL )
+			SharedPtr<MultiPart> loopPart = _partStack.top();
+			SharedPtr<LoopPart> lp = loopPart.cast<LoopPart>();
+			if ( !lp )
 			{
 				throw JSONTemplateException("Missing <? for ?> command");
 			}
@@ -522,8 +516,8 @@ void Template::parse(std::istream& in)
 			}
 
 			_currentPart = _partStack.top();
-			LogicPart* lp = dynamic_cast<LogicPart*>(_currentPart);
-			if ( lp == NULL )
+			SharedPtr<LogicPart> lp = _currentPart.cast<LogicPart>();
+			if ( !lp )
 			{
 				throw JSONTemplateException("Missing <? if ?> or <? ifexist ?> for <? endif ?>");
 			}
@@ -541,17 +535,17 @@ void Template::parse(std::istream& in)
 				throw JSONTemplateException("Missing query in <? " + command + " ?>");
 			}
 			_partStack.push(_currentPart);
-			LogicPart* lp = new LogicPart();
+			SharedPtr<LogicPart> lp(new LogicPart());
 			_partStack.push(lp);
 			_currentPart->addPart(lp);
-			_currentPart = new MultiPart();
+			_currentPart = SharedPtr<MultiPart>(new MultiPart());
 			if ( command.compare("ifexist") == 0 )
 			{
-				lp->addPart(new LogicExistQuery(query), _currentPart);
+				lp->addPart(SharedPtr<LogicExistQuery>(new LogicExistQuery(query)), _currentPart);
 			}
 			else
 			{
-				lp->addPart(new LogicQuery(query), _currentPart);
+				lp->addPart(SharedPtr<LogicQuery>(new LogicQuery(query)), _currentPart);
 			}
 		}
 		else if ( command.compare("include") == 0 )
@@ -566,7 +560,7 @@ void Template::parse(std::istream& in)
 			{
 				Path resolvePath(_templatePath);
 				resolvePath.makeParent();
-				_currentPart->addPart(new IncludePart(resolvePath, filename));
+				_currentPart->addPart(SharedPtr<IncludePart>(new IncludePart(resolvePath, filename)));
 			}
 		}
 		else

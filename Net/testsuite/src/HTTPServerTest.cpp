@@ -163,7 +163,7 @@ void HTTPServerTest::testIdentityRequest()
 	ServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -186,7 +186,7 @@ void HTTPServerTest::testPutIdentityRequest()
 	ServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -209,7 +209,7 @@ void HTTPServerTest::testChunkedRequest()
 	ServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -233,7 +233,7 @@ void HTTPServerTest::testClosedRequest()
 	ServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -253,7 +253,7 @@ void HTTPServerTest::testClosedRequest()
 
 void HTTPServerTest::testIdentityRequestKeepAlive()
 {
-	HTTPServer srv(new RequestHandlerFactory);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory));
 	srv.start();
 	
 	HTTPClientSession cs("localhost", srv.socket().address().port());
@@ -287,7 +287,7 @@ void HTTPServerTest::testChunkedRequestKeepAlive()
 	ServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(true);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -319,7 +319,7 @@ void HTTPServerTest::testChunkedRequestKeepAlive()
 
 void HTTPServerTest::testClosedRequestKeepAlive()
 {
-	HTTPServer srv(new RequestHandlerFactory);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory));
 	srv.start();
 	
 	HTTPClientSession cs("localhost", srv.socket().address().port());//svs.address().port());
@@ -344,7 +344,7 @@ void HTTPServerTest::testMaxKeepAlive()
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(true);
 	pParams->setMaxKeepAliveRequests(4);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -400,7 +400,7 @@ void HTTPServerTest::testKeepAliveTimeout()
 	pParams->setKeepAlive(true);
 	pParams->setMaxKeepAliveRequests(4);
 	pParams->setKeepAliveTimeout(Poco::Timespan(3, 0));
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -444,7 +444,7 @@ void HTTPServerTest::test100Continue()
 	ServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -468,7 +468,7 @@ void HTTPServerTest::testRedirect()
 	ServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -488,7 +488,7 @@ void HTTPServerTest::testAuth()
 	ServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -508,7 +508,7 @@ void HTTPServerTest::testNotImpl()
 	ServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());
@@ -527,7 +527,7 @@ void HTTPServerTest::testBuffer()
 	ServerSocket svs(0);
 	HTTPServerParams* pParams = new HTTPServerParams;
 	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, pParams);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", svs.address().port());

@@ -340,7 +340,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 	{
 		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
 
-		_pExecutor = new SQLExecutor(_driver + " SQL Executor", _pSession);
+		_pExecutor = ExecPtr(new SQLExecutor(_driver + " SQL Executor", _pSession.get()));
 
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLiteTest");
 

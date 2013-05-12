@@ -319,7 +319,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -609,7 +609,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -891,7 +891,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -1165,7 +1165,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -1432,7 +1432,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -1691,7 +1691,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -1942,7 +1942,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -2184,7 +2184,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -2419,7 +2419,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -2645,7 +2645,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -2864,7 +2864,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -3075,7 +3075,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -3278,7 +3278,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -3471,7 +3471,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -3656,7 +3656,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -3835,7 +3835,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -4005,7 +4005,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -4168,7 +4168,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 			_pNames->push_back(n2);
@@ -4323,7 +4323,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 			_pNames->push_back(n1);
 		}
@@ -4469,7 +4469,7 @@ private:
 	{ 
 		if (!_pNames)
 		{
-			_pNames = new NameVec;
+			_pNames = NameVecPtr(new NameVec);
 			_pNames->push_back(n0);
 		}
 	}

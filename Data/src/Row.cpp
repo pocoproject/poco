@@ -63,7 +63,7 @@ Row::Row(NameVecPtr pNames,
 	const RowFormatter::Ptr& pFormatter): _pNames(pNames)
 {
 	if (!_pNames) throw NullPointerException();
-	init(0, pFormatter);
+	init(SortMapPtr(), pFormatter);
 }
 
 
@@ -376,7 +376,7 @@ void Row::setFormatter(const RowFormatter::Ptr& pFormatter)
 	if (pFormatter.get())
 		_pFormatter = pFormatter;
 	else 
-		_pFormatter = new SimpleRowFormatter;
+		_pFormatter = SimpleRowFormatter::Ptr(new SimpleRowFormatter);
 }
 
 
@@ -385,7 +385,7 @@ void Row::setSortMap(const SortMapPtr& pSortMap)
 	if (pSortMap.get())
 		_pSortMap = pSortMap;
 	else 
-		_pSortMap = new SortMap;
+		_pSortMap = SortMapPtr(new SortMap);
 }
 
 

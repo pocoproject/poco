@@ -68,16 +68,16 @@ public:
 		TextEncoding::Ptr pUtf8Encoding(new UTF8Encoding);
 		add(pUtf8Encoding, TextEncoding::GLOBAL);
 
-		add(new ASCIIEncoding);
-		add(new Latin1Encoding);
-		add(new Latin2Encoding);
-		add(new Latin9Encoding);
+		add(SharedPtr<ASCIIEncoding>(new ASCIIEncoding));
+		add(SharedPtr<Latin1Encoding>(new Latin1Encoding));
+		add(SharedPtr<Latin2Encoding>(new Latin2Encoding));
+		add(SharedPtr<Latin9Encoding>(new Latin9Encoding));
 		add(pUtf8Encoding);
-		add(new UTF16Encoding);
-		add(new UTF32Encoding);
-		add(new Windows1250Encoding);
-		add(new Windows1251Encoding);
-		add(new Windows1252Encoding);
+		add(SharedPtr<UTF16Encoding>(new UTF16Encoding));
+		add(SharedPtr<UTF32Encoding>(new UTF32Encoding));
+		add(SharedPtr<Windows1250Encoding>(new Windows1250Encoding));
+		add(SharedPtr<Windows1251Encoding>(new Windows1251Encoding));
+		add(SharedPtr<Windows1252Encoding>(new Windows1252Encoding));
 	}
 
 	~TextEncodingManager()
@@ -169,7 +169,7 @@ int TextEncoding::sequenceLength(const unsigned char* bytes, int length) const
 
 TextEncoding& TextEncoding::byName(const std::string& encodingName)
 {
-	TextEncoding* pEncoding = manager().find(encodingName);
+	SharedPtr<TextEncoding> pEncoding = manager().find(encodingName);
 	if (pEncoding)
 		return *pEncoding;
 	else

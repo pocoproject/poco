@@ -83,23 +83,23 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 		std::string crc(4, ' ');
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, start);
+			_ptrHelper = SharedPtr<AutoDetectInputStream>(new AutoDetectInputStream(istr, init, crc, reposition, start));
 		}
 		else
 		{
-			_ptrHelper = new PartialInputStream(istr, start, end, reposition, init, crc);
+			_ptrHelper = SharedPtr<PartialInputStream>(new PartialInputStream(istr, start, end, reposition, init, crc));
 		}
-		_ptrBuf = new Poco::InflatingInputStream(*_ptrHelper, Poco::InflatingStreamBuf::STREAM_ZIP);
+		_ptrBuf = SharedPtr<Poco::InflatingInputStream>(new Poco::InflatingInputStream(*_ptrHelper, Poco::InflatingStreamBuf::STREAM_ZIP));
 	}
 	else if (fileEntry.getCompressionMethod() == ZipCommon::CM_STORE)
 	{
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, start);
+			_ptrBuf = SharedPtr<AutoDetectInputStream>(new AutoDetectInputStream(istr, "", "", reposition, start));
 		}
 		else
 		{
-			_ptrBuf = new PartialInputStream(istr, start, end, reposition);
+			_ptrBuf = SharedPtr<PartialInputStream>(new PartialInputStream(istr, start, end, reposition));
 		}
 	}
 	else throw Poco::NotImplementedException("Unsupported compression method");
@@ -144,13 +144,13 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 			else if (fileEntry.getCompressionLevel() == ZipCommon::CL_MAXIMUM)
 				level = Z_BEST_COMPRESSION;
 			// ignore the zlib init string which is of size 2 and also ignore the 4 byte adler32 value at the end of the stream!
-			_ptrOHelper = new PartialOutputStream(*_pOstr, 2, 4, false); 
-			_ptrOBuf = new Poco::DeflatingOutputStream(*_ptrOHelper, DeflatingStreamBuf::STREAM_ZLIB, level);
+			_ptrOHelper = SharedPtr<PartialOutputStream>(new PartialOutputStream(*_pOstr, 2, 4, false));
+			_ptrOBuf = SharedPtr<DeflatingOutputStream>(new Poco::DeflatingOutputStream(*_ptrOHelper, DeflatingStreamBuf::STREAM_ZLIB, level));
 		}
 		else if (fileEntry.getCompressionMethod() == ZipCommon::CM_STORE)
 		{
-			_ptrOHelper = new PartialOutputStream(*_pOstr, 0, 0, false);
-			_ptrOBuf = new PartialOutputStream(*_ptrOHelper, 0, 0, false);
+			_ptrOHelper = SharedPtr<PartialOutputStream>(new PartialOutputStream(*_pOstr, 0, 0, false));
+			_ptrOBuf = SharedPtr<PartialOutputStream>(new PartialOutputStream(*_ptrOHelper, 0, 0, false));
 		}
 		else throw Poco::NotImplementedException("Unsupported compression method");
 
@@ -226,7 +226,7 @@ void ZipStreamBuf::close()
 			_ptrOHelper->flush();
 			_ptrOHelper->close();
 		}
-		_ptrOBuf = 0;
+		_ptrOBuf = PtrOStream();
 		poco_assert (*_pOstr);
 		// write an extra datablock if required
 		// or fix the crc entries

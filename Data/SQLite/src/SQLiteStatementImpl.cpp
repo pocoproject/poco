@@ -130,13 +130,13 @@ void SQLiteStatementImpl::compileImpl()
 	_pStmt = pStmt;
 	if (!leftOver.empty())
 	{
-		_pLeftover = new std::string(leftOver);
+		_pLeftover = SharedPtr<std::string>(new std::string(leftOver));
 		_canCompile = true;
 	}
 	else _canCompile = false;
 
-	_pBinder = new Binder(_pStmt);
-	_pExtractor = new Extractor(_pStmt);
+	_pBinder = BinderPtr(new Binder(_pStmt));
+	_pExtractor = ExtractorPtr(new Extractor(_pStmt));
 
 	if (SQLITE_DONE == _nextResponse && _isExtracted)
 	{
@@ -235,7 +235,7 @@ void SQLiteStatementImpl::clear()
 		sqlite3_finalize(_pStmt);
 		_pStmt=0;
 	}
-	_pLeftover = 0;
+	_pLeftover = SharedPtr<std::string>();
 }
 
 

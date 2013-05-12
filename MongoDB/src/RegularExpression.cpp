@@ -86,7 +86,7 @@ SharedPtr<Poco::RegularExpression> RegularExpression::createRE() const
 			break;
 		}
 	}
-	return new Poco::RegularExpression(_pattern, options);
+	return SharedPtr<Poco::RegularExpression>(new Poco::RegularExpression(_pattern, options));
 }
 
 

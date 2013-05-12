@@ -92,7 +92,7 @@ private:
 
 inline Document& InsertRequest::addNewDocument()
 {
-	Document::Ptr doc = new Document();
+	Document::Ptr doc(new Document());
 	_documents.push_back(doc);
 	return *doc;
 }

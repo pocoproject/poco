@@ -59,7 +59,7 @@ ZipManipulator::ZipManipulator(const std::string& zipFile, bool backupOriginalFi
 	_in(0)
 {
 	Poco::FileInputStream in(zipFile);
-	_in = new ZipArchive(in);
+	_in = Poco::SharedPtr<ZipArchive>(new ZipArchive(in));
 }
 
 

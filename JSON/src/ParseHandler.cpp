@@ -58,7 +58,7 @@ ParseHandler::~ParseHandler()
 
 void ParseHandler::startObject()
 {
-	Object::Ptr newObj = new Object(_preserveObjectOrder);
+	Object::Ptr newObj(new Object(_preserveObjectOrder));
 
 	if ( _stack.empty() ) // The first object
 	{
@@ -94,7 +94,7 @@ void ParseHandler::endObject()
 
 void ParseHandler::startArray()
 {
-	Array::Ptr newArr = new Array();
+	Array::Ptr newArr(new Array());
 
 	if ( _stack.empty() ) // The first array
 	{

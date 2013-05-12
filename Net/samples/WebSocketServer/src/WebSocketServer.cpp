@@ -272,7 +272,7 @@ protected:
 			// set-up a server socket
 			ServerSocket svs(port);
 			// set-up a HTTPServer instance
-			HTTPServer srv(new RequestHandlerFactory, svs, new HTTPServerParams);
+			HTTPServer srv(RequestHandlerFactory::Ptr(new RequestHandlerFactory), svs, new HTTPServerParams);
 			// start the HTTPServer
 			srv.start();
 			// wait for CTRL-C or kill

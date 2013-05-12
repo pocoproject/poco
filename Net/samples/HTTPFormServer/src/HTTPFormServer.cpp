@@ -303,7 +303,7 @@ protected:
 			// set-up a server socket
 			ServerSocket svs(port);
 			// set-up a HTTPServer instance
-			HTTPServer srv(new FormRequestHandlerFactory, svs, new HTTPServerParams);
+			HTTPServer srv(FormRequestHandlerFactory::Ptr(new FormRequestHandlerFactory), svs, new HTTPServerParams);
 			// start the HTTPServer
 			srv.start();
 			// wait for CTRL-C or kill

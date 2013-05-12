@@ -69,8 +69,8 @@ public:
 	bool hasFactory(const std::string& name) const;
 		/// Returns true if for the given name a factory is already registered
 	
-	const PrivateKeyFactory* getFactory(const std::string& name) const;
-		/// Returns NULL if for the given name a factory does not exist, otherwise the factory is returned
+	SharedPtr<const PrivateKeyFactory> getFactory(const std::string& name) const;
+		/// Returns an empty SharedPtr<const PrivateKeyFactory> if for the given name a factory does not exist, otherwise the factory is returned
 
 	void removeFactory(const std::string& name);
 		/// Removes the factory from the manager. 

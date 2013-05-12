@@ -321,7 +321,7 @@ void SSLManager::initPassphraseHandler(bool server)
 
 	std::string className(config.getString(prefix + CFG_DELEGATE_HANDLER, VAL_DELEGATE_HANDLER));
 
-	const PrivateKeyFactory* pFactory = 0;
+	SharedPtr<const PrivateKeyFactory> pFactory;
 	if (privateKeyFactoryMgr().hasFactory(className))
 	{
 		pFactory = privateKeyFactoryMgr().getFactory(className);
@@ -330,9 +330,9 @@ void SSLManager::initPassphraseHandler(bool server)
 	if (pFactory)
 	{
 		if (server)
-			_ptrServerPassphraseHandler = pFactory->create(server);
+			_ptrServerPassphraseHandler = SharedPtr<PrivateKeyPassphraseHandler>(pFactory->create(server));
 		else
-			_ptrClientPassphraseHandler = pFactory->create(server);
+			_ptrClientPassphraseHandler = SharedPtr<PrivateKeyPassphraseHandler>(pFactory->create(server));
 	}
 	else throw Poco::Util::UnknownOptionException(std::string("No passphrase handler known with the name ") + className);
 }
@@ -348,7 +348,7 @@ void SSLManager::initCertificateHandler(bool server)
 
 	std::string className(config.getString(prefix+CFG_CERTIFICATE_HANDLER, VAL_CERTIFICATE_HANDLER));
 
-	const CertificateHandlerFactory* pFactory = 0;
+	SharedPtr<const CertificateHandlerFactory> pFactory;
 	if (certificateHandlerFactoryMgr().hasFactory(className))
 	{
 		pFactory = certificateHandlerFactoryMgr().getFactory(className);
@@ -357,9 +357,9 @@ void SSLManager::initCertificateHandler(bool server)
 	if (pFactory)
 	{
 		if (server)
-			_ptrServerCertificateHandler = pFactory->create(true);
+			_ptrServerCertificateHandler = SharedPtr<InvalidCertificateHandler>(pFactory->create(true));
 		else
-			_ptrClientCertificateHandler = pFactory->create(false);
+			_ptrClientCertificateHandler = SharedPtr<InvalidCertificateHandler>(pFactory->create(false));
 	}
 	else throw Poco::Util::UnknownOptionException(std::string("No InvalidCertificate handler known with the name ") + className);
 }

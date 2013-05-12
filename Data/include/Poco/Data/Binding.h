@@ -1411,14 +1411,14 @@ inline AbstractBinding::Ptr use(T& t, const std::string& name = "")
 	// or (b) if the const ref is guaranteed to exist when execute is called 
 	// (which can be much later!), by using the "useRef" keyword instead
 	poco_static_assert (!IsConst<T>::VALUE);
-	return new Binding<T>(t, name, AbstractBinding::PD_IN);
+	return AbstractBinding::Ptr(new Binding<T>(t, name, AbstractBinding::PD_IN));
 }
 
 
 inline AbstractBinding::Ptr use(const NullData& t, const std::string& name = "")
 	/// NullData overload.
 {
-	return new Binding<NullData>(const_cast<NullData&>(t), name, AbstractBinding::PD_IN);
+	return AbstractBinding::Ptr(new Binding<NullData>(const_cast<NullData&>(t), name, AbstractBinding::PD_IN));
 }
 
 
@@ -1426,7 +1426,7 @@ template <typename T>
 inline AbstractBinding::Ptr useRef(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	return new Binding<T>(t, name, AbstractBinding::PD_IN);
+	return AbstractBinding::Ptr(new Binding<T>(t, name, AbstractBinding::PD_IN));
 }
 
 
@@ -1450,7 +1450,7 @@ inline AbstractBinding::Ptr out(T& t)
 	/// Convenience function for a more compact Binding creation.
 {
 	poco_static_assert (!IsConst<T>::VALUE);
-	return new Binding<T>(t, "", AbstractBinding::PD_OUT);
+	return AbstractBinding::Ptr(new Binding<T>(t, "", AbstractBinding::PD_OUT));
 }
 
 
@@ -1459,7 +1459,7 @@ inline AbstractBinding::Ptr io(T& t)
 	/// Convenience function for a more compact Binding creation.
 {
 	poco_static_assert (!IsConst<T>::VALUE);
-	return new Binding<T>(t, "", AbstractBinding::PD_IN_OUT);
+	return AbstractBinding::Ptr(new Binding<T>(t, "", AbstractBinding::PD_IN_OUT));
 }
 
 
@@ -1496,7 +1496,7 @@ inline AbstractBinding::Ptr bind(T t, const std::string& name)
 	/// Convenience function for a more compact Binding creation.
 	/// This funtion differs from use() in its value copy semantics.
 {
-	return new CopyBinding<T>(t, name, AbstractBinding::PD_IN);
+	return AbstractBinding::Ptr(new CopyBinding<T>(t, name, AbstractBinding::PD_IN));
 }
 
 

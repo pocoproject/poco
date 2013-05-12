@@ -130,7 +130,7 @@ inline void BSONReader::read<RegularExpression::Ptr>(RegularExpression::Ptr& to)
 	std::string pattern = readCString();
 	std::string options = readCString();
 
-	to = new RegularExpression(pattern, options);
+	to = RegularExpression::Ptr(new RegularExpression(pattern, options));
 }
 
 

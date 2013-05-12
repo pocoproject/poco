@@ -157,19 +157,19 @@ inline Session& ArchiveStrategy::session()
 
 inline void ArchiveStrategy::setCopyStatement()
 {
-	_pCopyStatement = new Statement(*_pSession);
+	_pCopyStatement = StatementPtr(new Statement(*_pSession));
 }
 
 
 inline void ArchiveStrategy::setDeleteStatement()
 {
-	_pDeleteStatement = new Statement(*_pSession);
+	_pDeleteStatement = StatementPtr(new Statement(*_pSession));
 }
 
 
 inline void ArchiveStrategy::setCountStatement()
 {
-	_pCountStatement = new Statement(*_pSession);
+	_pCountStatement = StatementPtr(new Statement(*_pSession));
 }
 
 

@@ -240,7 +240,7 @@ template <typename T>
 inline RowFormatter::Ptr format(const T& formatter)
 	/// Utility function used to pass formatter to the statement.
 {
-	return new T(formatter);
+	return RowFormatter::Ptr(new T(formatter));
 }
 
 

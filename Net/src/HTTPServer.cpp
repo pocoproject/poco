@@ -43,21 +43,21 @@ namespace Net {
 
 
 HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::UInt16 portNumber, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), portNumber, pParams),
+	TCPServer(SharedPtr<HTTPServerConnectionFactory>(new HTTPServerConnectionFactory(pParams, pFactory)), portNumber, pParams),
 	_pFactory(pFactory)
 {
 }
 
 
 HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), socket, pParams),
+	TCPServer(SharedPtr<HTTPServerConnectionFactory>(new HTTPServerConnectionFactory(pParams, pFactory)), socket, pParams),
 	_pFactory(pFactory)
 {
 }
 
 
 HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), threadPool, socket, pParams),
+	TCPServer(SharedPtr<HTTPServerConnectionFactory>(new HTTPServerConnectionFactory(pParams, pFactory)), threadPool, socket, pParams),
 	_pFactory(pFactory)
 {
 }

@@ -90,43 +90,43 @@ void Document::read(BinaryReader& reader)
 		switch(type)
 		{
 		case ElementTraits<double>::TypeId:
-			element = new ConcreteElement<double>(name, 0);
+			element = SharedPtr<ConcreteElement<double> >(new ConcreteElement<double>(name, 0));
 			break;
 		case ElementTraits<Int32>::TypeId:
-			element = new ConcreteElement<Int32>(name, 0);
+			element = SharedPtr<ConcreteElement<Int32> >(new ConcreteElement<Int32>(name, 0));
 			break;
 		case ElementTraits<std::string>::TypeId:
-			element = new ConcreteElement<std::string>(name, "");
+			element = SharedPtr<ConcreteElement<std::string> >(new ConcreteElement<std::string>(name, ""));
 			break;
 		case ElementTraits<Document::Ptr>::TypeId:
-			element = new ConcreteElement<Document::Ptr>(name, new Document());
+			element = SharedPtr<ConcreteElement<Document::Ptr> >(new ConcreteElement<Document::Ptr>(name, Document::Ptr(new Document())));
 			break;
 		case ElementTraits<Array::Ptr>::TypeId:
-			element = new ConcreteElement<Array::Ptr>(name, new Array());
+			element = SharedPtr<ConcreteElement<Array::Ptr> >(new ConcreteElement<Array::Ptr>(name, Array::Ptr(new Array())));
 			break;
 		case ElementTraits<Binary::Ptr>::TypeId:
-			element = new ConcreteElement<Binary::Ptr>(name, new Binary());
+			element = SharedPtr<ConcreteElement<Binary::Ptr> >(new ConcreteElement<Binary::Ptr>(name, Binary::Ptr(new Binary())));
 			break;
 		case ElementTraits<ObjectId::Ptr>::TypeId:
-			element = new ConcreteElement<ObjectId::Ptr>(name, new ObjectId());
+			element = SharedPtr<ConcreteElement<ObjectId::Ptr> >(new ConcreteElement<ObjectId::Ptr>(name, ObjectId::Ptr(new ObjectId())));
 			break;
 		case ElementTraits<bool>::TypeId:
-			element = new ConcreteElement<bool>(name, false);
+			element = SharedPtr<ConcreteElement<bool> >(new ConcreteElement<bool>(name, false));
 			break;
 		case ElementTraits<Poco::Timestamp>::TypeId:
-			element = new ConcreteElement<Poco::Timestamp>(name, Poco::Timestamp());
+			element = SharedPtr<ConcreteElement<Poco::Timestamp> >(new ConcreteElement<Poco::Timestamp>(name, Poco::Timestamp()));
 			break;
 		case ElementTraits<NullValue>::TypeId:
-			element = new ConcreteElement<NullValue>(name, NullValue(0));
+			element = SharedPtr<ConcreteElement<NullValue> >(new ConcreteElement<NullValue>(name, NullValue(0)));
 			break;
 		case ElementTraits<RegularExpression::Ptr>::TypeId:
-			element = new ConcreteElement<RegularExpression::Ptr>(name, new RegularExpression());
+			element = SharedPtr<ConcreteElement<RegularExpression::Ptr> >(new ConcreteElement<RegularExpression::Ptr>(name, RegularExpression::Ptr(new RegularExpression())));
 			break;
 		case ElementTraits<JavaScriptCode::Ptr>::TypeId:
-			element = new ConcreteElement<JavaScriptCode::Ptr>(name, new JavaScriptCode());
+			element = SharedPtr<ConcreteElement<JavaScriptCode::Ptr> >(new ConcreteElement<JavaScriptCode::Ptr>(name, JavaScriptCode::Ptr(new JavaScriptCode())));
 			break;
 		case ElementTraits<Int64>::TypeId:
-			element = new ConcreteElement<Int64>(name, 0);
+			element = SharedPtr<ConcreteElement<Int64> >(new ConcreteElement<Int64>(name, 0));
 			break;
 		default:
 			{

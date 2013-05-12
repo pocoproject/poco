@@ -177,7 +177,7 @@ protected:
 		poco_assert (_threads > 0);
 
 		for (unsigned i = 0; i < _threads; ++i)
-			_reactors.push_back(new ParallelReactor);
+			_reactors.push_back(typename ParallelReactor::Ptr(new ParallelReactor));
 	}
 
 private:

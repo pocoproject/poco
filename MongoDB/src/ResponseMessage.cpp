@@ -79,7 +79,7 @@ void ResponseMessage::read(std::istream& istr)
 
 	for(int i = 0; i < _numberReturned; ++i)
 	{
-		Document::Ptr doc = new Document();
+		Document::Ptr doc(new Document());
 		doc->read(reader);
 		_documents.push_back(doc);
 	}

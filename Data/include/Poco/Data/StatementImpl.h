@@ -339,7 +339,7 @@ private:
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
-		return new InternalExtraction<C>(*pData, pCol, Poco::UInt32(currentDataSet()));
+		return SharedPtr<InternalExtraction<C> >(new InternalExtraction<C>(*pData, pCol, Poco::UInt32(currentDataSet())));
 	}
 
 	template <class C>
@@ -347,10 +347,10 @@ private:
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
-		return new InternalBulkExtraction<C>(*pData,
+		return SharedPtr<InternalBulkExtraction<C> >(new InternalBulkExtraction<C>(*pData,
 			pCol,
 			static_cast<Poco::UInt32>(getExtractionLimit()),
-			Position(currentDataSet()));
+			Position(currentDataSet())));
 	}
 
 	template <class T>

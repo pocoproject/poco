@@ -54,9 +54,9 @@ TestStatementImpl::~TestStatementImpl()
 void TestStatementImpl::compileImpl()
 {
 	// prepare binding
-	_ptrBinder    = new Binder;
-	_ptrExtractor = new Extractor;
-	_ptrPreparation   = new Preparator;
+	_ptrBinder    = SharedPtr<Binder>(new Binder);
+	_ptrExtractor = SharedPtr<Extractor>(new Extractor);
+	_ptrPreparation   = SharedPtr<Preparator>(new Preparator);
 	_compiled = true;
 }
 

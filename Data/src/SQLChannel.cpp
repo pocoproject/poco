@@ -98,7 +98,7 @@ void SQLChannel::open()
 	if (_connector.empty() || _connect.empty())
 		throw IllegalStateException("Connector and connect string must be non-empty.");
 
-	_pSession = new Session(_connector, _connect);
+	_pSession = SessionPtr(new Session(_connector, _connect));
 	initLogStatement();
 }
 
@@ -181,7 +181,7 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	{
 		if (value.empty())
 		{
-			_pArchiveStrategy = 0;
+			_pArchiveStrategy = StrategyPtr();
 		}
 		else if (_pArchiveStrategy)
 		{
@@ -189,14 +189,14 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 		}
 		else
 		{
-			_pArchiveStrategy = new ArchiveByAgeStrategy(_connector, _connect, _table, value);
+			_pArchiveStrategy = StrategyPtr(new ArchiveByAgeStrategy(_connector, _connect, _table, value));
 		}
 	}
 	else if (name == PROP_MAX_AGE)
 	{
 		if (value.empty() || "forever" == value)
 		{
-			_pArchiveStrategy = 0;
+			_pArchiveStrategy = StrategyPtr();
 		}
 		else if (_pArchiveStrategy)
 		{
@@ -204,7 +204,7 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 		}
 		else
 		{
-			ArchiveByAgeStrategy* p = new ArchiveByAgeStrategy(_connector, _connect, _table);
+			StrategyPtr p(new ArchiveByAgeStrategy(_connector, _connect, _table));
 			p->setThreshold(value);
 			_pArchiveStrategy = p;
 		}
@@ -277,7 +277,7 @@ std::string SQLChannel::getProperty(const std::string& name) const
 
 void SQLChannel::initLogStatement()
 {
-	_pLogStatement = new Statement(*_pSession);
+	_pLogStatement = StatementPtr(new Statement(*_pSession));
 
 	std::string sql;
 	Poco::format(sql, "INSERT INTO %s VALUES (?,?,?,?,?,?,?,?)", _table);

@@ -70,13 +70,13 @@ bool PrivateKeyFactoryMgr::hasFactory(const std::string& name) const
 }
 		
 	
-const PrivateKeyFactory* PrivateKeyFactoryMgr::getFactory(const std::string& name) const
+SharedPtr<const PrivateKeyFactory> PrivateKeyFactoryMgr::getFactory(const std::string& name) const
 {
 	FactoriesMap::const_iterator it = _factories.find(name);
 	if (it != _factories.end())
 		return it->second;
 	else
-		return 0;
+		return SharedPtr<PrivateKeyFactory>();
 }
 
 
