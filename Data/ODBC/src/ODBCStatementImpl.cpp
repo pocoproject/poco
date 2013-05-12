@@ -117,7 +117,7 @@ void ODBCStatementImpl::compileImpl()
 
 	std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 	
-	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT);
+	_pBinder = BinderPtr(new Binder(_stmt, maxFieldSize, bind, pDT));
 	
 	makeInternalExtractors();
 	doPrepare();
@@ -158,12 +158,12 @@ void ODBCStatementImpl::addPreparator()
 
 		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 
-		_preparations.push_back(new Preparator(_stmt, statement, maxFieldSize, ext));
+		_preparations.push_back(PreparatorPtr(new Preparator(_stmt, statement, maxFieldSize, ext)));
 	}
 	else
-		_preparations.push_back(new Preparator(*_preparations[0]));
+		_preparations.push_back(PreparatorPtr(new Preparator(*_preparations[0])));
 
-	_extractors.push_back(new Extractor(_stmt, _preparations.back()));
+	_extractors.push_back(ExtractorPtr(new Extractor(_stmt, _preparations.back())));
 }
 
 
@@ -187,7 +187,7 @@ void ODBCStatementImpl::doPrepare()
 					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
 		}
 
-		AbstractPreparation::Ptr pAP = 0;
+		AbstractPreparation::Ptr pAP;
 		Poco::Data::AbstractPreparator::Ptr pP = _preparations[curDataSet];
 		for (std::size_t pos = 0; it != itEnd; ++it)
 		{

@@ -763,13 +763,13 @@ int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Cha
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(encodingHandlerData);
 	
 	XMLString encoding(name);
-	TextEncoding* knownEncoding = 0;
+	TextEncoding* knownEncoding;
 
 	EncodingMap::const_iterator it = pThis->_encodings.find(encoding);
 	if (it != pThis->_encodings.end())
 		knownEncoding = it->second;
 	else
-		knownEncoding = Poco::TextEncoding::find(fromXMLString(encoding));
+		knownEncoding = Poco::TextEncoding::find(fromXMLString(encoding)).get();
 
 	if (knownEncoding)
 	{

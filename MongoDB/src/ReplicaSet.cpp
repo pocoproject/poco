@@ -73,7 +73,7 @@ Connection::Ptr ReplicaSet::findMaster()
 
 Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 {
-	Connection::Ptr conn = new Connection();
+	Connection::Ptr conn(new Connection());
 
 	try
 	{
@@ -101,10 +101,9 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 	}
 	catch(...)
 	{
-		conn = NULL;
 	}
 	
-	return NULL; 
+	return Connection::Ptr();
 }
 
 

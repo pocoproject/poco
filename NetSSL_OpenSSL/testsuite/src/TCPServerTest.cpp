@@ -108,7 +108,7 @@ TCPServerTest::~TCPServerTest()
 void TCPServerTest::testOneConnection()
 {
 	SecureServerSocket svs(0);
-	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	TCPServer srv(TCPServerConnectionFactoryImpl<EchoConnection>::Ptr(new TCPServerConnectionFactoryImpl<EchoConnection>()), svs);
 	srv.start();
 	assert (srv.currentConnections() == 0);
 	assert (srv.currentThreads() == 0);
@@ -136,7 +136,7 @@ void TCPServerTest::testOneConnection()
 void TCPServerTest::testTwoConnections()
 {
 	SecureServerSocket svs(0);
-	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	TCPServer srv(TCPServerConnectionFactoryImpl<EchoConnection>::Ptr(new TCPServerConnectionFactoryImpl<EchoConnection>()), svs);
 	srv.start();
 	assert (srv.currentConnections() == 0);
 	assert (srv.currentThreads() == 0);
@@ -183,7 +183,7 @@ void TCPServerTest::testMultiConnections()
 	pParams->setMaxThreads(4);
 	pParams->setMaxQueued(4);
 	pParams->setThreadIdleTime(100);
-	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs, pParams);
+	TCPServer srv(TCPServerConnectionFactoryImpl<EchoConnection>::Ptr(new TCPServerConnectionFactoryImpl<EchoConnection>()), svs, pParams);
 	srv.start();
 	assert (srv.currentConnections() == 0);
 	assert (srv.currentThreads() == 0);
@@ -272,7 +272,7 @@ void TCPServerTest::testMultiConnections()
 void TCPServerTest::testReuseSocket()
 {
 	SecureServerSocket svs(0);
-	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	TCPServer srv(TCPServerConnectionFactoryImpl<EchoConnection>::Ptr(new TCPServerConnectionFactoryImpl<EchoConnection>()), svs);
 	srv.start();
 	assert (srv.currentConnections() == 0);
 	assert (srv.currentThreads() == 0);
@@ -330,7 +330,7 @@ void TCPServerTest::testReuseSession()
 	pServerContext->disableStatelessSessionResumption();
 	
 	SecureServerSocket svs(0, 64, pServerContext);
-	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	TCPServer srv(TCPServerConnectionFactoryImpl<EchoConnection>::Ptr(new TCPServerConnectionFactoryImpl<EchoConnection>()), svs);
 	srv.start();
 	assert (srv.currentConnections() == 0);
 	assert (srv.currentThreads() == 0);

@@ -65,7 +65,7 @@ public:
 
 	MongoDB::Connection::Ptr createObject()
 	{
-		return new MongoDB::Connection(_address);
+		return MongoDB::Connection::Ptr(new MongoDB::Connection(_address));
 	}
 	
 	bool validateObject(MongoDB::Connection::Ptr pObject)

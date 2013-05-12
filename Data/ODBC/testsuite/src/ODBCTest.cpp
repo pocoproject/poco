@@ -1311,15 +1311,15 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	const std::string& db)
 {
 	Utility::drivers(_drivers);
-	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
+	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return ODBCTest::SessionPtr();
 	
 	try
 	{
 		std::cout << "Conecting to [" << dbConnString << ']' << std::endl;
-		return new Session(Poco::Data::ODBC::Connector::KEY, dbConnString);
+		return ODBCTest::SessionPtr(new Session(Poco::Data::ODBC::Connector::KEY, dbConnString));
 	}catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
-		return 0;
+		return ODBCTest::SessionPtr();
 	}
 }

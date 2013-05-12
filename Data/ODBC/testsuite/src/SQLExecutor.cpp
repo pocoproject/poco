@@ -1109,8 +1109,8 @@ void SQLExecutor::sharedPtrComplexTypeVector()
 {
 	std::string funct = "sharedPtrComplexTypeVector()";
 	std::vector<Poco::SharedPtr<Person> > people;
-	people.push_back(new Person("LN1", "FN1", "ADDR1", 1));
-	people.push_back(new Person("LN2", "FN2", "ADDR2", 2));
+	people.push_back(Poco::SharedPtr<Person>(new Person("LN1", "FN1", "ADDR1", 1)));
+	people.push_back(Poco::SharedPtr<Person>(new Person("LN2", "FN2", "ADDR2", 2)));
 
 	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(people), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }

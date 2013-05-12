@@ -609,8 +609,8 @@ void SQLiteTest::testSharedPtrComplexTypeVector()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::vector<Poco::SharedPtr<Person> > people;
-	people.push_back(new Person("LN1", "FN1", "ADDR1", 1));
-	people.push_back(new Person("LN2", "FN2", "ADDR2", 2));
+	people.push_back(Poco::SharedPtr<Person>(new Person("LN1", "FN1", "ADDR1", 1)));
+	people.push_back(Poco::SharedPtr<Person>(new Person("LN2", "FN2", "ADDR2", 2)));
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
 	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(people), now;

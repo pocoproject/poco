@@ -89,7 +89,7 @@ Template::Ptr TemplateCache::getTemplate(const Path& path)
 				poco_information_f1(*_logger, "Loading template %s", templatePath.toString());
 			}
 
-			tpl = new Template(templatePath);
+			tpl = SharedPtr<Template>(new Template(templatePath));
 
 			try
 			{
@@ -123,7 +123,7 @@ Template::Ptr TemplateCache::getTemplate(const Path& path)
 				poco_information_f1(*_logger, "Reloading template %s", templatePath.toString());
 			}
 
-			tpl = new Template(templatePath);
+			tpl = SharedPtr<Template>(new Template(templatePath));
 
 			try
 			{

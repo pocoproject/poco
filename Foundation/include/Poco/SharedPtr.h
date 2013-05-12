@@ -139,7 +139,7 @@ public:
 	{
 	}
 
-	SharedPtr(C* ptr): _pCounter(new RC), _ptr(ptr)
+	explicit SharedPtr(C* ptr): _pCounter(new RC), _ptr(ptr)
 	{
 	}
 
@@ -190,11 +190,6 @@ public:
 			swap(tmp);
 		}
 		return *this;
-	}
-
-	SharedPtr& operator = (C* ptr)
-	{
-		return assign(ptr);
 	}
 
 	SharedPtr& operator = (const SharedPtr& ptr)
@@ -270,15 +265,14 @@ public:
 	{
 		return _ptr;
 	}
-
-	operator C* ()
-	{
-		return _ptr;
-	}
 	
-	operator const C* () const
+	//Don't allow implicit conversion to ptr, but allow SharedPtr
+	//to be used in conditional contexts
+	typedef C * SharedPtr::*unspecified_bool_type;
+
+	operator unspecified_bool_type() const
 	{
-		return _ptr;
+		return _ptr == 0 ? 0: &SharedPtr::_ptr;
 	}
 
 	bool operator ! () const
@@ -301,11 +295,6 @@ public:
 		return get() == ptr;
 	}
 
-	bool operator == (C* ptr) const
-	{
-		return get() == ptr;
-	}
-
 	bool operator != (const SharedPtr& ptr) const
 	{
 		return get() != ptr.get();
@@ -315,23 +304,13 @@ public:
 	{
 		return get() != ptr;
 	}
-
-	bool operator != (C* ptr) const
-	{
-		return get() != ptr;
-	}
-
+	
 	bool operator < (const SharedPtr& ptr) const
 	{
 		return get() < ptr.get();
 	}
 
 	bool operator < (const C* ptr) const
-	{
-		return get() < ptr;
-	}
-
-	bool operator < (C* ptr) const
 	{
 		return get() < ptr;
 	}
@@ -346,11 +325,6 @@ public:
 		return get() <= ptr;
 	}
 
-	bool operator <= (C* ptr) const
-	{
-		return get() <= ptr;
-	}
-
 	bool operator > (const SharedPtr& ptr) const
 	{
 		return get() > ptr.get();
@@ -361,22 +335,12 @@ public:
 		return get() > ptr;
 	}
 
-	bool operator > (C* ptr) const
-	{
-		return get() > ptr;
-	}
-
 	bool operator >= (const SharedPtr& ptr) const
 	{
 		return get() >= ptr.get();
 	}
 
 	bool operator >= (const C* ptr) const
-	{
-		return get() >= ptr;
-	}
-
-	bool operator >= (C* ptr) const
 	{
 		return get() >= ptr;
 	}

@@ -57,7 +57,7 @@ NotificationCenter::~NotificationCenter()
 void NotificationCenter::addObserver(const AbstractObserver& observer)
 {
 	Mutex::ScopedLock lock(_mutex);
-	_observers.push_back(observer.clone());
+	_observers.push_back(SharedPtr<AbstractObserver>(observer.clone()));
 }
 
 

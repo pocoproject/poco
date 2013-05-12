@@ -124,28 +124,28 @@ inline Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCommand() co
 inline Poco::SharedPtr<Poco::MongoDB::DeleteRequest>
 Database::createDeleteRequest(const std::string& collectionName) const
 {
-	return new Poco::MongoDB::DeleteRequest(_dbname + '.' + collectionName);
+	return Poco::SharedPtr<Poco::MongoDB::DeleteRequest>(new Poco::MongoDB::DeleteRequest(_dbname + '.' + collectionName));
 }
 
 
 inline Poco::SharedPtr<Poco::MongoDB::InsertRequest>
 Database::createInsertRequest(const std::string& collectionName) const
 {
-	return new Poco::MongoDB::InsertRequest(_dbname + '.' + collectionName);
+	return Poco::SharedPtr<Poco::MongoDB::InsertRequest>(new Poco::MongoDB::InsertRequest(_dbname + '.' + collectionName));
 }
 
 
 inline Poco::SharedPtr<Poco::MongoDB::QueryRequest>
 Database::createQueryRequest(const std::string& collectionName) const
 {
-	return new Poco::MongoDB::QueryRequest(_dbname + '.' + collectionName);
+	return Poco::SharedPtr<Poco::MongoDB::QueryRequest>(new Poco::MongoDB::QueryRequest(_dbname + '.' + collectionName));
 }
 
 
 inline Poco::SharedPtr<Poco::MongoDB::UpdateRequest>
 Database::createUpdateRequest(const std::string& collectionName) const
 {
-	return new Poco::MongoDB::UpdateRequest(_dbname + '.' + collectionName);
+	return Poco::SharedPtr<Poco::MongoDB::UpdateRequest>(new Poco::MongoDB::UpdateRequest(_dbname + '.' + collectionName));
 }
 
 } } // namespace Poco::MongoDB

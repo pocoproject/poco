@@ -72,13 +72,13 @@ bool CertificateHandlerFactoryMgr::hasFactory(const std::string& name) const
 }
 		
 	
-const CertificateHandlerFactory* CertificateHandlerFactoryMgr::getFactory(const std::string& name) const
+Poco::SharedPtr<const CertificateHandlerFactory> CertificateHandlerFactoryMgr::getFactory(const std::string& name) const
 {
 	FactoriesMap::const_iterator it = _factories.find(name);
 	if (it != _factories.end())
 		return it->second;
 	else
-		return 0;
+		return Poco::SharedPtr<CertificateHandlerFactory>();
 }
 
 

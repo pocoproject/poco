@@ -97,9 +97,9 @@ int main(int argc, char** argv)
 	}
 
 	// Note: we must create the passphrase handler prior Context 
-	SharedPtr<InvalidCertificateHandler> ptrCert = new ConsoleCertificateHandler(false); // ask the user via console
-	Context::Ptr ptrContext = new Context(Context::CLIENT_USE, "", "", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
-	SSLManager::instance().initializeClient(0, ptrCert, ptrContext);
+	SharedPtr<InvalidCertificateHandler> ptrCert(new ConsoleCertificateHandler(false)); // ask the user via console
+	Context::Ptr ptrContext(new Context(Context::CLIENT_USE, "", "", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"));
+	SSLManager::instance().initializeClient(SharedPtr<PrivateKeyPassphraseHandler>(), ptrCert, ptrContext);
 
 	try
 	{

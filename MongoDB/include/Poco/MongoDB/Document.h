@@ -91,7 +91,7 @@ public:
 		// adds it to the document.
 		/// The active document is returned to allow chaining of the add methods.
 	{
-		return addElement(new ConcreteElement<T>(name, value));
+		return addElement(typename ConcreteElement<T>::Ptr(new ConcreteElement<T>(name, value)));
 	}
 
 	Document& add(const std::string& name, const char* value)
@@ -99,7 +99,7 @@ public:
 		// adds it to the document.
 		/// The active document is returned to allow chaining of the add methods.
 	{
-		return addElement(new ConcreteElement<std::string>(name, std::string(value)));
+		return addElement(ConcreteElement<std::string>::Ptr(new ConcreteElement<std::string>(name, std::string(value))));
 	}
 
 	Document& addNewDocument(const std::string& name);
@@ -212,7 +212,7 @@ inline Document& Document::addElement(Element::Ptr element)
 
 inline Document& Document::addNewDocument(const std::string& name)
 {
-	Document::Ptr newDoc = new Document();
+	Document::Ptr newDoc(new Document());
 	add(name, newDoc);
 	return *newDoc;
 }

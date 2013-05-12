@@ -199,7 +199,7 @@ protected:
 			// set-up a server socket
 			ServerSocket svs(port);
 			// set-up a TCPServer instance
-			TCPServer srv(new TimeServerConnectionFactory(format), svs);
+			TCPServer srv(TimeServerConnectionFactory::Ptr(new TimeServerConnectionFactory(format)), svs);
 			// start the TCPServer
 			srv.start();
 			// wait for CTRL-C or kill

@@ -59,7 +59,7 @@ class JSON_API Parser
 {
 public:
 
-	Parser(const Handler::Ptr& pHandler = new ParseHandler);
+	Parser(const Handler::Ptr& pHandler = SharedPtr<Handler>(new ParseHandler));
 		/// Constructor.
 
 	virtual ~Parser();

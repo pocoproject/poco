@@ -74,7 +74,7 @@ void ArchiveStrategy::open()
 	if (_connector.empty() || _connect.empty())
 		throw IllegalStateException("Connector and connect string must be non-empty.");
 
-	_pSession = new Session(_connector, _connect);
+	_pSession = SessionPtr(new Session(_connector, _connect));
 }
 
 

@@ -79,7 +79,7 @@ public:
 		if (!_ptrImpl->isConnected())
 			throw NotConnectedException(_ptrImpl->connectionString());
 
-		Statement stmt(_ptrImpl->createStatementImpl());
+		Statement stmt(StatementImpl::Ptr(_ptrImpl->createStatementImpl()));
 		stmt << t;
 		return stmt;
 	}

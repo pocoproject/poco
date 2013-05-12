@@ -93,7 +93,7 @@ void MongoDBTest::testInsertRequest()
 		return;
 	}
 
-	Poco::MongoDB::Document::Ptr player = new Poco::MongoDB::Document();
+	Poco::MongoDB::Document::Ptr player(new Poco::MongoDB::Document());
 	player->add("lastname", std::string("Braem"));
 	player->add("firstname", std::string("Franky"));
 
@@ -306,7 +306,7 @@ void MongoDBTest::testCursorRequest()
 	Poco::SharedPtr<Poco::MongoDB::InsertRequest> insertRequest = db.createInsertRequest("numbers");
 	for(int i = 0; i < 10000; ++i)
 	{
-		Document::Ptr doc = new Document();
+		Document::Ptr doc(new Document());
 		doc->add("number", i);
 		insertRequest->documents().push_back(doc);
 	}

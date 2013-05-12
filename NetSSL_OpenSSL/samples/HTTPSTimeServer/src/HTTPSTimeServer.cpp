@@ -233,7 +233,7 @@ protected:
 			// set-up a server socket
 			SecureServerSocket svs(port);
 			// set-up a HTTPServer instance
-			HTTPServer srv(new TimeRequestHandlerFactory(format), svs, new HTTPServerParams);
+			HTTPServer srv(TimeRequestHandlerFactory::Ptr(new TimeRequestHandlerFactory(format)), svs, new HTTPServerParams);
 			// start the HTTPServer
 			srv.start();
 			// wait for CTRL-C or kill

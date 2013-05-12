@@ -118,7 +118,7 @@ WebSocketTest::~WebSocketTest()
 void WebSocketTest::testWebSocket()
 {
 	Poco::Net::ServerSocket ss(0);
-	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
+	Poco::Net::HTTPServer server(WebSocketRequestHandlerFactory::Ptr(new WebSocketRequestHandlerFactory), ss, new Poco::Net::HTTPServerParams);
 	server.start();
 	
 	Poco::Thread::sleep(200);

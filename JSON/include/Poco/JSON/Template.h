@@ -142,9 +142,9 @@ private:
 	std::string readString(std::istream& in);
 	void readWhiteSpace(std::istream& in);
 
-	MultiPart* _parts;
-	std::stack<MultiPart*> _partStack;
-	MultiPart* _currentPart;
+	SharedPtr<MultiPart> _parts;
+	std::stack<SharedPtr<MultiPart> > _partStack;
+	SharedPtr<MultiPart> _currentPart;
 	Path _templatePath;
 	Timestamp _parseTime;
 };

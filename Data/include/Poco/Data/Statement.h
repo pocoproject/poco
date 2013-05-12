@@ -804,7 +804,7 @@ inline void Statement::setRowFormatter(RowFormatter::Ptr pRowFormatter)
 
 inline const RowFormatter::Ptr& Statement::getRowFormatter()
 {
-	if (!_pRowFormatter) _pRowFormatter = new SimpleRowFormatter;
+	if (!_pRowFormatter) _pRowFormatter = RowFormatter::Ptr(new SimpleRowFormatter);
 	return _pRowFormatter;
 }
 

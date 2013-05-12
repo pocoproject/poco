@@ -104,12 +104,12 @@ public:
 		/// Creates the Row.
 
 	Row(NameVecPtr pNames,
-		const RowFormatter::Ptr& pFormatter = 0);
+		const RowFormatter::Ptr& pFormatter = RowFormatter::Ptr());
 		/// Creates the Row.
 
 	Row(NameVecPtr pNames,
 		const SortMapPtr& pSortMap,
-		const RowFormatter::Ptr& pFormatter = 0);
+		const RowFormatter::Ptr& pFormatter = RowFormatter::Ptr());
 		/// Creates the Row.
 
 	~Row();
@@ -128,7 +128,7 @@ public:
 	void append(const std::string& name, const T& val)
 		/// Appends the value to the row.
 	{
-		if (!_pNames) _pNames = new NameVec;
+		if (!_pNames) _pNames = NameVecPtr(new NameVec);
 		_values.push_back(val);
 		_pNames->push_back(name);
 		if (1 == _values.size()) addSortField(0);
@@ -221,14 +221,14 @@ public:
 	const ValueVec& values() const;
 		/// Returns the const reference to values vector.
 
-	void setFormatter(const RowFormatter::Ptr& pFormatter = 0);
+	void setFormatter(const RowFormatter::Ptr& pFormatter = RowFormatter::Ptr());
 		/// Sets the formatter for this row and takes the
 		/// shared ownership of it.
 
 	const RowFormatter& getFormatter() const;
 		/// Returns the reference to the formatter.
 
-	void setSortMap(const SortMapPtr& pSortMap = 0);
+	void setSortMap(const SortMapPtr& pSortMap = SortMapPtr());
 		/// Adds the sorting fields entry and takes the
 		/// shared ownership of it.
 

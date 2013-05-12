@@ -230,7 +230,7 @@ void HTTPSClientSessionTest::testPostLargeChunked()
 void HTTPSClientSessionTest::testPostLargeChunkedKeepAlive()
 {
 	SecureServerSocket svs(32322);
-	HTTPServer srv(new TestRequestHandlerFactory(), svs, new HTTPServerParams());
+	HTTPServer srv(TestRequestHandlerFactory::Ptr(new TestRequestHandlerFactory()), svs, new HTTPServerParams());
 	srv.start();
 	try
 	{

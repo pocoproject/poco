@@ -144,7 +144,7 @@ class PoolableObjectFactory <C, Poco::SharedPtr<C> >
 public:
 	Poco::SharedPtr<C> createObject()
 	{
-		return new C;
+		return Poco::SharedPtr<C>(new C);
 	}
 	
 	bool validateObject(Poco::SharedPtr<C> pObject)
@@ -244,7 +244,7 @@ public:
 			_size++;
 			return pObject;
 		}
-		else return 0;
+		else return P();
 	}
 		
 	void returnObject(P pObject)

@@ -103,7 +103,7 @@ void Statement::swap(Statement& other)
 
 Statement& Statement::reset(Session& session)
 {
-	Statement stmt(session.createStatementImpl());
+	Statement stmt(StatementImpl::Ptr(session.createStatementImpl()));
 	swap(stmt);
 	return *this;
 }
@@ -150,8 +150,8 @@ const Statement::Result& Statement::doAsyncExec(bool reset)
 {
 	if (done()) _pImpl->reset();
 	if (!_pAsyncExec)
-		_pAsyncExec = new AsyncExecMethod(_pImpl, &StatementImpl::execute);
-	_pResult = new Result((*_pAsyncExec)(reset));
+		_pAsyncExec = AsyncExecMethodPtr(new AsyncExecMethod(_pImpl.get(), &StatementImpl::execute));
+	_pResult =  ResultPtr(new Result((*_pAsyncExec)(reset)));
 	return *_pResult;
 }
 
@@ -160,7 +160,7 @@ void Statement::setAsync(bool async)
 {
 	_async = async;
 	if (_async && !_pAsyncExec)
-		_pAsyncExec = new AsyncExecMethod(_pImpl, &StatementImpl::execute);
+		_pAsyncExec = AsyncExecMethodPtr(new AsyncExecMethod(_pImpl.get(), &StatementImpl::execute));
 }
 
 

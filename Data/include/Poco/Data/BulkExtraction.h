@@ -138,7 +138,7 @@ public:
 		if (limit != _rResult.size()) _rResult.resize(limit);
 		pPrep->setLength(limit);
 		pPrep->setBulk(true);
-		return new Preparation<C>(pPrep, col, _rResult);
+		return AbstractPreparation::Ptr(new Preparation<C>(pPrep, col, _rResult));
 	}
 
 protected:
@@ -233,7 +233,7 @@ AbstractExtraction::Ptr into(std::vector<T>& t, const Bulk& bulk, const Position
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::vector bulk extraction support.
 {
-	return new BulkExtraction<std::vector<T> >(t, bulk.size(), pos);
+	return AbstractExtraction::Ptr(new BulkExtraction<std::vector<T> >(t, bulk.size(), pos));
 }
 
 
@@ -244,7 +244,7 @@ AbstractExtraction::Ptr into(std::vector<T>& t, BulkFnType, const Position& pos 
 {
 	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
-	return new BulkExtraction<std::vector<T> >(t, size, pos);
+	return AbstractExtraction::Ptr(new BulkExtraction<std::vector<T> >(t, size, pos));
 }
 
 
@@ -253,7 +253,7 @@ AbstractExtraction::Ptr into(std::deque<T>& t, const Bulk& bulk, const Position&
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::deque bulk extraction support.
 {
-	return new BulkExtraction<std::deque<T> >(t, bulk.size(), pos);
+	return AbstractExtraction::Ptr(new BulkExtraction<std::deque<T> >(t, bulk.size(), pos));
 }
 
 
@@ -264,7 +264,7 @@ AbstractExtraction::Ptr into(std::deque<T>& t, BulkFnType, const Position& pos =
 {
 	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
-	return new BulkExtraction<std::deque<T> >(t, size, pos);
+	return AbstractExtraction::Ptr(new BulkExtraction<std::deque<T> >(t, size, pos));
 }
 
 
@@ -273,7 +273,7 @@ AbstractExtraction::Ptr into(std::list<T>& t, const Bulk& bulk, const Position& 
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::list bulk extraction support.
 {
-	return new BulkExtraction<std::list<T> >(t, bulk.size(), pos);
+	return AbstractExtraction::Ptr(new BulkExtraction<std::list<T> >(t, bulk.size(), pos));
 }
 
 
@@ -284,7 +284,7 @@ AbstractExtraction::Ptr into(std::list<T>& t, BulkFnType, const Position& pos = 
 {
 	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
-	return new BulkExtraction<std::list<T> >(t, size, pos);
+	return AbstractExtraction::Ptr(new BulkExtraction<std::list<T> >(t, size, pos));
 }
 
 

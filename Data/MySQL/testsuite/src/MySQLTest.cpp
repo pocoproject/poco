@@ -57,8 +57,8 @@ using Poco::Nullable;
 using Poco::Tuple;
 using Poco::NamedTuple;
 
-Poco::SharedPtr<Poco::Data::Session> MySQLTest::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
+Poco::SharedPtr<Poco::Data::Session> MySQLTest::_pSession;
+Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor;
 
 //
 // Parameters for barebone-test
@@ -825,7 +825,7 @@ CppUnit::Test* MySQLTest::suite()
 
 	try
 	{
-		_pSession = new Session(MySQL::Connector::KEY, _dbConnString);
+		_pSession = Poco::SharedPtr<Session>(new Session(MySQL::Connector::KEY, _dbConnString));
 	}
 	catch (ConnectionFailedException& ex)
 	{
@@ -835,7 +835,7 @@ CppUnit::Test* MySQLTest::suite()
 
 	std::cout << "*** Connected to [" << "MySQL" << "] test database." << std::endl;
 
-	_pExecutor = new SQLExecutor("MySQL SQL Executor", _pSession);
+	_pExecutor = Poco::SharedPtr<SQLExecutor>(new SQLExecutor("MySQL SQL Executor", _pSession.get()));
 
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MySQLTest");
 

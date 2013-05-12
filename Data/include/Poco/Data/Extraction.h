@@ -137,7 +137,7 @@ public:
 
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
-		return new Preparation<T>(pPrep, pos, _rResult);
+		return AbstractPreparation::Ptr(new Preparation<T>(pPrep, pos, _rResult));
 	}
 
 private:
@@ -217,7 +217,7 @@ public:
 
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
-		return new Preparation<T>(pPrep, pos, _default);
+		return AbstractPreparation::Ptr(new Preparation<T>(pPrep, pos, _default));
 	}
 
 protected:
@@ -303,7 +303,7 @@ public:
 
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
-		return new Preparation<bool>(pPrep, pos, _default);
+		return SharedPtr<AbstractPreparation>(new Preparation<bool>(pPrep, pos, _default));
 	}
 
 protected:
@@ -387,7 +387,7 @@ public:
 
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
-		return new Preparation<T>(pPrep, pos, _default);
+		return AbstractPreparation::Ptr(new Preparation<T>(pPrep, pos, _default));
 	}
 
 protected:
@@ -471,7 +471,7 @@ public:
 
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
-		return new Preparation<T>(pPrep, pos, _default);
+		return AbstractPreparation::Ptr(new Preparation<T>(pPrep, pos, _default));
 	}
 
 protected:
@@ -612,7 +612,7 @@ public:
 
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
-		return new Preparation<T>(pPrep, pos, _default);
+		return AbstractPreparation::Ptr(new Preparation<T>(pPrep, pos, _default));
 	}
 
 private:
@@ -676,7 +676,7 @@ public:
 
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
-		return new Preparation<T>(pPrep, pos, _default);
+		return AbstractPreparation::Ptr(new Preparation<T>(pPrep, pos, _default));
 	}
 
 private:
@@ -740,7 +740,7 @@ public:
 
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
-		return new Preparation<V>(pPrep, pos, _default);
+		return AbstractPreparation::Ptr(new Preparation<V>(pPrep, pos, _default));
 	}
 
 private:
@@ -804,7 +804,7 @@ public:
 
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
-		return new Preparation<V>(pPrep, pos, _default);
+		return AbstractPreparation::Ptr(new Preparation<V>(pPrep, pos, _default));
 	}
 
 private:
@@ -820,7 +820,7 @@ template <typename T>
 inline AbstractExtraction::Ptr into(T& t)
 	/// Convenience function to allow for a more compact creation of an extraction object.
 {
-	return new Extraction<T>(t);
+	return AbstractExtraction::Ptr(new Extraction<T>(t));
 }
 
 
@@ -829,7 +829,7 @@ inline AbstractExtraction::Ptr into(T& t, const Position& pos)
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with multiple recordset support.
 {
-	return new Extraction<T>(t, pos);
+	return AbstractExtraction::Ptr(new Extraction<T>(t, pos));
 }
 
 
@@ -838,7 +838,7 @@ inline AbstractExtraction::Ptr into(T& t, const Position& pos, const T& def)
 	/// Convenience function to allow for a more compact creation of an extraction object 
 	/// with multiple recordset support and the given default
 {
-	return new Extraction<T>(t, def, pos);
+	return AbstractExtraction::Ptr(new Extraction<T>(t, def, pos));
 }
 
 
