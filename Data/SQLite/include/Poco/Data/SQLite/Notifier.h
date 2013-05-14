@@ -139,7 +139,7 @@ public:
 		/// and triggers the event.
 
 	static int sqliteCommitCallbackFn(void* pVal);
-		/// Commit callback event dispatcher. If an exception occurs, it is catched inside this function,
+		/// Commit callback event dispatcher. If an exception occurs, it is caught inside this function,
 		/// non-zero value is returned, which causes SQLite engine to turn commit into a rollback.
 		/// Therefore, callers should check for return value - if it is zero, callback completed succesfuly
 		/// and transaction was committed.
