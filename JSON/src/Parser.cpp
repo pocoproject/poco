@@ -39,459 +39,120 @@
 #include "Poco/Ascii.h"
 #include "Poco/Token.h"
 #include "Poco/UTF8Encoding.h"
+
 #undef min
 #undef max
 #include <limits>
+#include <clocale>
 
 
 namespace Poco {
 namespace JSON {
 
 
-class SeparatorToken: public Token
-{
-public:
-	SeparatorToken()
-	{
-	}
+#ifndef IS_HIGH_SURROGATE
+	#define IS_HIGH_SURROGATE(uc) (((uc) & 0xFC00) == 0xD800)
+#endif
+#ifndef IS_LOW_SURROGATE
+	#define IS_LOW_SURROGATE(uc)  (((uc) & 0xFC00) == 0xDC00)
+#endif
+#ifndef DECODE_SURROGATE_PAIR
+	#define DECODE_SURROGATE_PAIR(hi,lo) ((((hi) & 0x3FF) << 10) + ((lo) & 0x3FF) + 0x10000)
+#endif
+#define COUNTOF(x) (sizeof(x)/sizeof(x[0])) 
+static unsigned char utf8_lead_bits[4] = { 0x00, 0xC0, 0xE0, 0xF0 };
 
-	virtual ~SeparatorToken()
-	{
-	}
 
-	Class tokenClass() const
-	{
-		return Token::SEPARATOR_TOKEN;
-	}
+const int Parser::_asciiClass[] = {
+    xx,      xx,      xx,      xx,      xx,      xx,      xx,      xx,
+    xx,      C_WHITE, C_WHITE, xx,      xx,      C_WHITE, xx,      xx,
+    xx,      xx,      xx,      xx,      xx,      xx,      xx,      xx,
+    xx,      xx,      xx,      xx,      xx,      xx,      xx,      xx,
 
-	bool start(char c, std::istream& istr)
-	{
-		if (c == '{'
-		 || c == '}'
-		 || c == ']'
-		 || c == '['
-		 || c == ','
-		 || c == ':')
-		{
-			_value = c;
-			return true;
-		}
+    C_SPACE, C_ETC,   C_QUOTE, C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_ETC,
+    C_ETC,   C_ETC,   C_STAR,  C_PLUS,  C_COMMA, C_MINUS, C_POINT, C_SLASH,
+    C_ZERO,  C_DIGIT, C_DIGIT, C_DIGIT, C_DIGIT, C_DIGIT, C_DIGIT, C_DIGIT,
+    C_DIGIT, C_DIGIT, C_COLON, C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_ETC,
 
-		if ( c == '\'' )
-		{
-			throw JSONException("Invalid quote found");
-		}
+    C_ETC,   C_ABCDF, C_ABCDF, C_ABCDF, C_ABCDF, C_E,     C_ABCDF, C_ETC,
+    C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_ETC,
+    C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_ETC,
+    C_ETC,   C_ETC,   C_ETC,   C_LSQRB, C_BACKS, C_RSQRB, C_ETC,   C_ETC,
 
-		else return false;
-	}
-
-	void finish(std::istream& istr)
-	{
-	}
+    C_ETC,   C_LOW_A, C_LOW_B, C_LOW_C, C_LOW_D, C_LOW_E, C_LOW_F, C_ETC,
+    C_ETC,   C_ETC,   C_ETC,   C_ETC,   C_LOW_L, C_ETC,   C_LOW_N, C_ETC,
+    C_ETC,   C_ETC,   C_LOW_R, C_LOW_S, C_LOW_T, C_LOW_U, C_ETC,   C_ETC,
+    C_ETC,   C_ETC,   C_ETC,   C_LCURB, C_ETC,   C_RCURB, C_ETC,   C_ETC
 };
 
 
-class StringToken: public Token
-{
-public:
-	StringToken()
-	{
-	}
-
-	virtual ~StringToken()
-	{
-	}
-
-	Class tokenClass() const
-	{
-		return Token::STRING_LITERAL_TOKEN;
-	}
-
-	bool start(char c, std::istream& istr)
-	{
-		if (c == '"')
-		{
-			_value = ""; // We don't need the quote!
-			return true;
-		}
-		else return false;
-	}
-
-	void finish(std::istream& istr)
-	{
-		int c = 0;
-		while ((c = istr.get()) != -1)
-		{
-			if (c == 0)
-			{
-				throw JSONException("Null byte not allowed");
-			}
-
-			if ( 0 < c && c <= 0x1F )
-			{
-				throw JSONException(format("Control character 0x%x not allowed", (unsigned int) c));
-			}
-
-			if (c == '"')
-				break;
-				
-			if(0x80 <= c && c <= 0xFF)
-			{
-				int count = utf8_check_first(c);
-				if (!count)
-				{
-					throw JSONException(format("Unable to decode byte 0x%x", (unsigned int) c));
-				}
-
-				char buffer[5];
-				buffer[0] = c;
-				for(int i = 1; i < count; ++i)
-				{
-					buffer[i] = istr.get();
-				}
-				
-				if ( !UTF8Encoding::isLegal((unsigned char*) buffer, count) )
-				{
-					throw JSONException("No legal UTF8 found");
-				}
-				buffer[count] = '\0';
-				_value += buffer;
-
-				continue;
-			}
-
-			if (c == '\\') // Escaped String
-			{
-				c = istr.get();
-				switch(c)
-				{
-				case '"' :  c = '"';  break;
-				case '\\' : c = '\\'; break;
-				case '/' :  c = '/';  break;
-				case 'b' :  c = '\b'; break;
-				case 'f' :  c = '\f'; break;
-				case 'n' :  c = '\n'; break;
-				case 'r' :  c = '\r'; break;
-				case 't' :  c = '\t'; break;
-				case 'u' : // Unicode
-				{
-					Poco::Int32 unicode = decodeUnicode(istr);
-					if ( unicode == 0 )
-					{
-						throw JSONException("\\u0000 is not allowed");
-					}
-					if ( unicode >= 0xD800 && unicode <= 0xDBFF )
-					{
-						c = istr.get();
-						if ( c != '\\' )
-						{
-							throw JSONException("Invalid unicode surrogate pair");
-						}
-						c = istr.get();
-						if ( c != 'u' )
-						{
-							throw JSONException("Invalid unicode surrogate pair");
-						}
-						Poco::Int32 surrogatePair = decodeUnicode(istr);
-						if ( 0xDC00 <= surrogatePair && surrogatePair <= 0xDFFF )
-						{
-							unicode = 0x10000 + ((unicode & 0x3FF) << 10) + (surrogatePair & 0x3FF);
-						}
-						else
-						{
-							throw JSONException("Invalid unicode surrogate pair");
-						}
-					}
-					else if ( 0xDC00 <= unicode && unicode <= 0xDFFF )
-					{
-						throw JSONException("Invalid unicode");
-					}
-					
-					Poco::UTF8Encoding utf8encoding;
-					int length = utf8encoding.convert(unicode, NULL, 0);
-					std::vector<unsigned char> convert(length);
-					utf8encoding.convert(unicode, &convert[0], length);
-					for(int i = 0; i < length; ++i)
-					{
-						_value += (char) convert[i];
-					}
-					continue;
-				}
-				default:
-				{
-					throw JSONException(format("Invalid escape '%c' character used", (char) c));
-				}
-				}
-			}
-			_value += c;
-		}
-
-		if ( c == -1 )
-		{
-			throw JSONException("Unterminated string found");
-		}
-	}
-
-	Poco::Int32 decodeUnicode(std::istream& istr)
-	{
-		Poco::Int32 value = 0;
-
-		for(int i = 0; i < 4; i++)
-		{
-			value <<= 4;
-			int nc = istr.peek();
-			if ( nc == -1 )
-			{
-				throw JSONException("Invalid unicode sequence");
-			}
-			istr.get(); // No EOF, so read the character
-
-			if (nc >= '0' && nc <= '9')
-				value += nc - '0';
-			else if (nc >= 'A' && nc <= 'F')
-				value += 10 + nc - 'A';
-			else if (nc >= 'a' && nc <= 'f')
-				value += 10 + nc - 'a';
-			else
-				throw JSONException("Invalid unicode sequence. Hexadecimal digit expected");
-		}
-
-		return value;
-	}
-	
-private:
-	int utf8_check_first(char byte)
-	{
-		unsigned char u = (unsigned char) byte;
-
-		if(u < 0x80)
-			return 1;
-
-		if (0x80 <= u && u <= 0xBF) 
-		{
-			/* second, third or fourth byte of a multi-byte
-			sequence, i.e. a "continuation byte" */
-			return 0;
-		}
-		else if(u == 0xC0 || u == 0xC1) 
-		{
-			/* overlong encoding of an ASCII byte */
-			return 0;
-		}
-		else if(0xC2 <= u && u <= 0xDF) 
-		{
-			/* 2-byte sequence */
-			return 2;
-		}
-		else if(0xE0 <= u && u <= 0xEF) 
-		{
-			/* 3-byte sequence */
-			return 3;
-		}
-		else if(0xF0 <= u && u <= 0xF4) 
-		{
-			/* 4-byte sequence */
-			return 4;
-		}
-		else 
-		{ 
-			/* u >= 0xF5 */
-			/* Restricted (start of 4-, 5- or 6-byte sequence) or invalid
-			UTF-8 */
-			return 0;
-		}
-	}
+const int Parser::_stateTransitionTable[NR_STATES][NR_CLASSES] = {
+/*
+                 white                                      1-9                                   ABCDF  etc
+             space |  {  }  [  ]  :  ,  "  \  /  +  -  .  0  |  a  b  c  d  e  f  l  n  r  s  t  u  |  E  |  * */
+/*start  GO*/ {GO,GO,-6,xx,-5,xx,xx,xx,xx,xx,CB,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*ok     OK*/ {OK,OK,xx,-8,xx,-7,xx,-3,xx,xx,CB,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*object OB*/ {OB,OB,xx,-9,xx,xx,xx,xx,SB,xx,CB,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*key    KE*/ {KE,KE,xx,xx,xx,xx,xx,xx,SB,xx,CB,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*colon  CO*/ {CO,CO,xx,xx,xx,xx,-2,xx,xx,xx,CB,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*value  VA*/ {VA,VA,-6,xx,-5,xx,xx,xx,SB,xx,CB,xx,MX,xx,ZX,IX,xx,xx,xx,xx,xx,FA,xx,NU,xx,xx,TR,xx,xx,xx,xx,xx},
+/*array  AR*/ {AR,AR,-6,xx,-5,-7,xx,xx,SB,xx,CB,xx,MX,xx,ZX,IX,xx,xx,xx,xx,xx,FA,xx,NU,xx,xx,TR,xx,xx,xx,xx,xx},
+/*string ST*/ {ST,xx,ST,ST,ST,ST,ST,ST,-4,EX,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST,ST},
+/*escape ES*/ {xx,xx,xx,xx,xx,xx,xx,xx,ST,ST,ST,xx,xx,xx,xx,xx,xx,ST,xx,xx,xx,ST,xx,ST,ST,xx,ST,U1,xx,xx,xx,xx},
+/*u1     U1*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,U2,U2,U2,U2,U2,U2,U2,U2,xx,xx,xx,xx,xx,xx,U2,U2,xx,xx},
+/*u2     U2*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,U3,U3,U3,U3,U3,U3,U3,U3,xx,xx,xx,xx,xx,xx,U3,U3,xx,xx},
+/*u3     U3*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,U4,U4,U4,U4,U4,U4,U4,U4,xx,xx,xx,xx,xx,xx,U4,U4,xx,xx},
+/*u4     U4*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,UC,UC,UC,UC,UC,UC,UC,UC,xx,xx,xx,xx,xx,xx,UC,UC,xx,xx},
+/*minus  MI*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,ZE,IT,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*zero   ZE*/ {OK,OK,xx,-8,xx,-7,xx,-3,xx,xx,CB,xx,xx,DF,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*int    IT*/ {OK,OK,xx,-8,xx,-7,xx,-3,xx,xx,CB,xx,xx,DF,IT,IT,xx,xx,xx,xx,DE,xx,xx,xx,xx,xx,xx,xx,xx,DE,xx,xx},
+/*frac   FR*/ {OK,OK,xx,-8,xx,-7,xx,-3,xx,xx,CB,xx,xx,xx,FR,FR,xx,xx,xx,xx,E1,xx,xx,xx,xx,xx,xx,xx,xx,E1,xx,xx},
+/*e      E1*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,E2,E2,xx,E3,E3,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*ex     E2*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,E3,E3,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*exp    E3*/ {OK,OK,xx,-8,xx,-7,xx,-3,xx,xx,xx,xx,xx,xx,E3,E3,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*tr     T1*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,T2,xx,xx,xx,xx,xx,xx,xx},
+/*tru    T2*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,T3,xx,xx,xx,xx},
+/*1      T3*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,CB,xx,xx,xx,xx,xx,xx,xx,xx,xx,OK,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*fa     F1*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,F2,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*fal    F2*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,F3,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*fals   F3*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,F4,xx,xx,xx,xx,xx,xx},
+/*0      F4*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,CB,xx,xx,xx,xx,xx,xx,xx,xx,xx,OK,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*nu     N1*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,N2,xx,xx,xx,xx},
+/*nul    N2*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,N3,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*null   N3*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,CB,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,OK,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*/      C1*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,C2},
+/*/*     C2*/ {C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C3},
+/**      C3*/ {C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,CE,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C3},
+/*_.     FX*/ {OK,OK,xx,-8,xx,-7,xx,-3,xx,xx,xx,xx,xx,xx,FR,FR,xx,xx,xx,xx,E1,xx,xx,xx,xx,xx,xx,xx,xx,E1,xx,xx},
+/*\      D1*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,D2,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+/*\      D2*/ {xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,U1,xx,xx,xx,xx},
 };
 
 
-class KeywordToken : public Token
+Parser::Parser(const Handler::Ptr& pHandler) :
+	_pHandler(pHandler),
+	_state(GO),
+	_beforeCommentState(0),
+	_type(JSON_T_NONE),
+	_escaped(0),
+	_comment(0),
+	_utf16HighSurrogate(0),
+	//_depth(config.parseDepth() ? config.parseDepth() : -1),
+	_depth(-1),
+	_top(-1),
+	_stack(PARSER_STACK_SIZE),
+	_parseBuffer(PARSE_BUFFER_SIZE),
+	_parseBufferCount(0),
+	_commentBeginOffset(0),
+	_decimalPoint(0),
+	_allowNullByte(true),
+	_allowComments(false)
 {
-public:
-	KeywordToken()
-	{
-	}
-
-	virtual ~KeywordToken()
-	{
-	}
-
-	Class tokenClass() const
-	{
-		return Token::KEYWORD_TOKEN;
-	}
-
-	bool start(char c, std::istream& istr)
-	{
-		if ( Ascii::isAlpha(c) )
-		{
-			_value = c;
-			return true;
-		}
-		return false;
-	}
-
-	void finish(std::istream& istr)
-	{
-		int c = istr.peek();
-		while (c != -1 && Ascii::isAlpha(c) )
-		{
-			istr.get();
-			_value += c;
-			c = istr.peek();
-		}
-	}
-};
-
-
-class NumberToken: public Token
-{
-public:
-	NumberToken() : _activeClass(INTEGER_LITERAL_TOKEN)
-	{
-	}
-
-	virtual ~NumberToken()
-	{
-	}
-
-	Class tokenClass() const
-	{
-		return _activeClass;
-	}
-
-	bool start(char c, std::istream& istr)
-	{
-		// Reset the active class to integer
-		_activeClass = INTEGER_LITERAL_TOKEN;
-
-		if ( c == -1 )
-			return false;
-
-		if (Ascii::isDigit(c))
-		{
-			if ( c == '0' )
-			{
-				int nc = istr.peek();
-				if ( Ascii::isDigit(nc) ) // A digit after a zero is not allowed
-				{
-					throw JSONException("Number can't start with a zero");
-				}
-			}
-			_value = c;
-			return true;
-		}
-
-		if (c == '-')
-		{
-			_value = c;
-
-			int nc = istr.peek();
-			if (Ascii::isDigit(nc))
-			{
-				if (nc == '0')
-				{
-					_value += '0';
-					istr.get();
-
-					nc = istr.peek();
-					if ( Ascii::isDigit(nc) ) // A digit after -0 is not allowed
-					{
-						throw JSONException("Number can't start with a zero");
-					}
-				}
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	void finish(std::istream& istr)
-	{
-		int c;
-		while( (c = istr.peek()) != -1)
-		{
-			if (Ascii::isDigit(c))
-			{
-				_value += c;
-				istr.get();
-			}
-			else
-			{
-				switch(c)
-				{
-				case '.': // Float
-				{
-					if (_activeClass == Token::FLOAT_LITERAL_TOKEN)
-					{
-						throw JSONException("Invalid float value");
-					}
-					_activeClass = Token::FLOAT_LITERAL_TOKEN;
-
-					_value += c;
-					istr.get();
-
-					// After a . we need a digit
-					c = istr.peek();
-					if ( ! Ascii::isDigit(c) )
-					{
-						throw JSONException("Invalid float value");
-					}
-
-					break;
-				}
-				case 'E':
-				case 'e':
-				{
-					if (_activeClass == Token::DOUBLE_LITERAL_TOKEN)
-					{
-						throw JSONException("Invalid double value");
-					}
-					_activeClass = Token::DOUBLE_LITERAL_TOKEN;
-
-					// Add the e or E
-					_value += c;
-					istr.get();
-
-					// When the next char is - or + then read the next char
-					c = istr.peek();
-					if (c == '-' || c == '+')
-					{
-						_value += c;
-						istr.get();
-						c = istr.peek();
-					}
-
-					if (! Ascii::isDigit(c))
-					{
-						throw JSONException("Invalid double value");
-					}
-
-					break;
-				}
-				default:
-					return; // End of number token
-				}
-
-				istr.get(); // If we get here we have a valid character for a number
-				_value += c;
-			}
-		}
-	}
-
-private:
-	Class _activeClass;
-};
-
-
-Parser::Parser(const Handler::Ptr& pHandler) : _tokenizer(), _pHandler(pHandler)
-{
-	_tokenizer.addToken(new WhitespaceToken());
-	_tokenizer.addToken(new InvalidToken());
-	_tokenizer.addToken(new SeparatorToken());
-	_tokenizer.addToken(new StringToken());
-	_tokenizer.addToken(new NumberToken());
-	_tokenizer.addToken(new KeywordToken());
+	_stack.clear();
+	_parseBuffer.clear();
+	push(MODE_DONE);
+	_decimalPoint = *std::localeconv()->decimal_point;
+	clearBuffer();
 }
 
 
@@ -500,303 +161,639 @@ Parser::~Parser()
 
 }
 
-
-const Token* Parser::nextToken()
+Dynamic::Var Parser::parse(const std::string& json)
 {
-	const Token* token = _tokenizer.next();
-	if (token->is(Token::EOF_TOKEN))
-	{
-		throw JSONException("Unexpected EOF found");
-	}
-	return token;
-}
+	feeder = new StringCharacterFeeder(json.begin(), json.end());
 
-
-Dynamic::Var Parser::parse(std::istream& in)
-{
-	_tokenizer.attachToStream(in);
-	const Token* token = nextToken();
-
-	if (token->is(Token::SEPARATOR_TOKEN))
+	int c = 0;
+	while(feeder->nextChar(c))
 	{
-		// This must be a { or a [
-		if (token->asChar() == '{')
-		{
-			readObject();
-		}
-		else if (token->asChar() == '[')
-		{
-			readArray();
-		}
-		else
-		{
-			throw JSONException(format("Invalid separator '%c' found. Expecting { or [", token->asChar()));
-		}
-		token = _tokenizer.next();
-		if (! token->is(Token::EOF_TOKEN))
-		{
-			throw JSONException(format("EOF expected but found '%s'", token->asString()));
-		}
+		if (0 == parseChar(c)) throw SyntaxException("JSON syntax error");
 	}
-	else
-	{
-		throw JSONException(format("Invalid token '%s' found. Expecting { or [", token->asString()));
-	}
+
+	if (!done())
+		throw JSONException("JSON syntax error");
 
 	return result();
 }
 
 
-void Parser::readObject()
+Dynamic::Var Parser::parse(std::istream& in)
 {
-	if (!_pHandler.isNull())
+	feeder = new StreamCharacterFeeder(in);
+
+	int c = 0;
+	while(feeder->nextChar(c))
 	{
-		_pHandler->startObject();
+		if (0 == parseChar(c)) throw JSONException("JSON syntax error");
 	}
 
-	if ( readRow(true) ) // First call is special: check for empty object
-	{
-		while(readRow());
-	}
+	if (!done())
+		throw JSONException("JSON syntax error");
 
-	if (!_pHandler.isNull())
-	{
-		_pHandler->endObject();
-	}
+	return result();
 }
 
 
-bool Parser::readRow(bool firstCall)
+bool Parser::push(int mode)
 {
-	const Token* token = nextToken();
-
-	if (firstCall && token->tokenClass() == Token::SEPARATOR_TOKEN && token->asChar() == '}')
+	_top += 1;
+	if (_depth < 0)
 	{
-		return false; // End of object is possible for an empty object
-	}
-
-	if (token->tokenClass() == Token::STRING_LITERAL_TOKEN)
-	{
-		std::string propertyName = token->tokenString();
-		if ( !_pHandler.isNull() )
-		{
-			_pHandler->key(propertyName);
-		}
-
-		token = nextToken();
-
-		if (token->is(Token::SEPARATOR_TOKEN)
-		 && token->asChar() == ':')
-		{
-			readValue(nextToken());
-
-			token = nextToken();
-
-			if (token->is(Token::SEPARATOR_TOKEN))
-			{
-				if (token->asChar() == ',')
-				{
-					if (!_pHandler.isNull())
-					{
-						_pHandler->comma();
-					}
-					return true; // Read next row
-				}
-				else if (token->asChar() == '}')
-				{
-					return false; // End of object
-				}
-				else
-				{
-					throw JSONException(format("Invalid separator '%c' found. Expecting , or }", token->asChar()));
-				}
-			}
-			else
-			{
-				throw JSONException(format("Invalid token '%s' found. Expecting , or }", token->asString()));
-			}
-		}
-		else
-		{
-			throw JSONException(format("Invalid token '%s' found. Expecting :", token->asString()));
-		}
+		if (_top >= _stack.size())
+			_stack.resize(_stack.size() * 2, true);
 	}
 	else
 	{
-		throw JSONException(format("Invalid token '%s' found. Expecting key", token->asString()));
+		if (_top >= _depth) return false;
 	}
+
+	_stack[_top] = mode;
+	return true;
 }
 
 
-void Parser::readValue(const Token* token)
+bool Parser::pop(int mode)
 {
-	switch(token->tokenClass())
-	{
-	default:
-	case Token::IDENTIFIER_TOKEN:
-	case Token::OPERATOR_TOKEN:
-	case Token::CHAR_LITERAL_TOKEN:
-		break;
-			
-	case Token::INTEGER_LITERAL_TOKEN:
-		if (!_pHandler.isNull())
-		{
-#if defined(POCO_HAVE_INT64)
-			try
-			{
-				Int64 value = token->asInteger64();
-				// if number is 32-bit, then handle as such
-				if (	value > std::numeric_limits<int>::max()
-					|| value < std::numeric_limits<int>::min() )
-				{
-					_pHandler->value(value);
-				}
-				else
-				{
-					_pHandler->value(static_cast<int>(value));
-				}
-			}
-			// try to handle error as unsigned in case of overflow
-			catch ( const SyntaxException& )
-			{
-				UInt64 value = token->asUnsignedInteger64();
-				// if number is 32-bit, then handle as such
-				if ( value > std::numeric_limits<unsigned>::max() )
-				{
-					_pHandler->value(value);
-				}
-				else
-				{
-					_pHandler->value(static_cast<unsigned>(value));
-				}
-			}
-#else
-			try
-			{
-				int value = token->asInteger();
-				_handle->value(value);
-			}
-			// try to handle error as unsigned in case of overflow
-			catch ( const SyntaxException& )
-			{
-				unsigned value = token->asUnsignedInteger();
-				_handle->value(value);
-			}
-#endif
-		}
-		break;
-	case Token::KEYWORD_TOKEN:
-	{
-		if (token->tokenString().compare("null") == 0)
-		{
-			if (!_pHandler.isNull())
-			{
-				_pHandler->null();
-			}
-		}
-		else  if (token->tokenString().compare("true") == 0)
-		{
-			if (!_pHandler.isNull())
-			{
-				_pHandler->value(true);
-			}
-		}
-		else if (token->tokenString().compare("false") == 0)
-		{
-			if (!_pHandler.isNull())
-			{
-				_pHandler->value(false);
-			}
-		}
-		else
-		{
-			throw JSONException(format("Invalid keyword '%s' found", token->asString()));
-		}
-		break;
-	}
-	case Token::FLOAT_LITERAL_TOKEN:
-		// Fall through
-	case Token::DOUBLE_LITERAL_TOKEN:
-		if (!_pHandler.isNull())
-		{
-			_pHandler->value(token->asFloat());
-		}
-		break;
-	case Token::STRING_LITERAL_TOKEN:
-		if (!_pHandler.isNull())
-		{
-			_pHandler->value(token->tokenString());
-		}
-		break;
-	case Token::SEPARATOR_TOKEN:
-		{
-			if (token->asChar() == '{')
-			{
-				readObject();
-			}
-			else if (token->asChar() == '[')
-			{
-				readArray();
-			}
-			break;
-		}
-	case Token::INVALID_TOKEN:
-		throw JSONException(format("Invalid token '%s' found", token->asString()));
-	}
-}
-
-
-void Parser::readArray()
-{
-	if (!_pHandler.isNull())
-	{
-		_pHandler->startArray();
-	}
-
-	if (readElements(true)) // First call is special: check for empty array
-	{
-		while(readElements());
-	}
-
-	if (!_pHandler.isNull())
-	{
-		_pHandler->endArray();
-	}
-}
-
-
-bool Parser::readElements(bool firstCall)
-{
-	const Token* token = nextToken();
-
-	if (firstCall && token->is(Token::SEPARATOR_TOKEN) && token->asChar() == ']')
-	{
-		// End of array is possible for an empty array
+	if (_top < 0 || _stack[_top] != mode)
 		return false;
-	}
 
-	readValue(token);
+	_top -= 1;
+	return true;
+}
 
-	token = nextToken();
+void Parser::clearBuffer()
+{
+	_parseBufferCount = 0;
+	_parseBuffer[0] = 0;
+}
 
-	if (token->is(Token::SEPARATOR_TOKEN))
+
+void Parser::parseBufferPopBackChar()
+{
+	poco_assert(_parseBufferCount >= 1);
+	--_parseBufferCount;
+	_parseBuffer[_parseBufferCount] = 0;
+}
+
+
+void Parser::parseBufferPushBackChar(char c)
+{
+	if (_parseBufferCount + 1 >= _parseBuffer.size())
+		growBuffer();
+	_parseBuffer[_parseBufferCount++] = c;
+	_parseBuffer[_parseBufferCount]   = 0;
+}
+
+
+void Parser::addEscapedCharToParseBuffer(int nextChar)
+{
+	_escaped = 0;
+	// remove the backslash
+	parseBufferPopBackChar();
+	switch(nextChar)
 	{
-		if (token->asChar() == ']')
-			return false; // End of array
+	case 'b':
+		parseBufferPushBackChar('\b');
+		break;
+	case 'f':
+		parseBufferPushBackChar('\f');
+		break;
+	case 'n':
+		parseBufferPushBackChar('\n');
+		break;
+	case 'r':
+		parseBufferPushBackChar('\r');
+		break;
+	case 't':
+		parseBufferPushBackChar('\t');
+		break;
+	case '"':
+		parseBufferPushBackChar('"');
+		break;
+	case '\\':
+		parseBufferPushBackChar('\\');
+		break;
+	case '/':
+		parseBufferPushBackChar('/');
+		break;
+	case 'u':
+		parseBufferPushBackChar('\\');
+		parseBufferPushBackChar('u');
+		break;
+	default:
+		break;
+	}
+}
 
-		if (token->asChar() == ',')
+
+void Parser::addCharToParseBuffer(int nextChar, int nextClass)
+{
+	if (_escaped)
+	{
+		addEscapedCharToParseBuffer(nextChar);
+		return;
+	}
+	else if (!_comment)
+	{
+		if ((_type != JSON_T_NONE) ||
+			!((nextClass == C_SPACE) || (nextClass == C_WHITE)))
 		{
-			if (!_pHandler.isNull())
-			{
-				_pHandler->comma();
-			}
-			return true;
+			parseBufferPushBackChar((char) nextChar);
+		}
+	}
+}
+
+
+bool Parser::parseChar(int nextChar)
+{
+	int nextClass, nextState;
+
+	// Determine the character's class.
+	if (nextChar < 0 || (!_allowNullByte && nextChar == 0)) return false;
+	if (0x80 <= nextChar && nextChar <= 0xFF)
+	{
+		nextClass = C_ETC;
+		int count = utf8_check_first(nextChar);
+		if (!count)
+		{
+			throw JSONException(format("Unable to decode byte 0x%x", (unsigned int) nextChar));
 		}
 
-		throw JSONException(format("Invalid separator '%c' found. Expecting , or ]", token->asChar()));
+		char buffer[4];
+		buffer[0] = nextChar;
+		for(int i = 1; i < count; ++i)
+		{
+			int c = 0;
+			if ( !feeder->nextChar(c) ) throw JSONException("Invalid UTF8 character found");
+			buffer[i] = c;
+		}
+		
+		if ( !UTF8Encoding::isLegal((unsigned char*) buffer, count) )
+		{
+			throw JSONException("No legal UTF8 found");
+		}
+
+		for(int i = 0; i < count; ++i)
+		{
+			parseBufferPushBackChar(buffer[i]);
+		}
+		return true;
+	}
+	else
+	{
+		nextClass = _asciiClass[nextChar];
+		if (nextClass <= xx) return false; 
 	}
 
-	throw JSONException(format("Invalid token '%s' found.", token->asString()));
+	addCharToParseBuffer(nextChar, nextClass);
+
+	// Get the next _state from the _state transition table.
+	nextState = _stateTransitionTable[_state][nextClass];
+	if (nextState >= 0)
+	{
+		_state = nextState;
+	}
+	else 
+	{
+		// Or perform one of the actions.
+		switch (nextState)
+		{
+		// Unicode character 
+		case UC:
+			if(!decodeUnicodeChar()) return false;
+			// check if we need to read a second UTF-16 char
+			if (_utf16HighSurrogate) _state = D1;
+			else _state = ST;
+			break;
+		// _escaped char 
+		case EX:
+			_escaped = 1;
+			_state = ES;
+			break;
+		// integer detected by minus
+		case MX:
+			_type = JSON_T_INTEGER;
+			_state = MI;
+			break;
+		// integer detected by zero
+		case ZX:
+			_type = JSON_T_INTEGER;
+			_state = ZE;
+			break;
+			// integer detected by 1-9 
+		case IX:
+			_type = JSON_T_INTEGER;
+			_state = IT;
+			break;
+		// floating point number detected by exponent
+		case DE:
+			assertNotStringNullBool();
+			_type = JSON_T_FLOAT;
+			_state = E1;
+			break;
+		// floating point number detected by fraction
+		case DF:
+			assertNotStringNullBool();
+			_type = JSON_T_FLOAT;
+			_state = FX;
+			break;
+		// string begin "
+		case SB:
+			clearBuffer();
+			poco_assert(_type == JSON_T_NONE);
+			_type = JSON_T_STRING;
+			_state = ST;
+			break;
+
+		// n
+		case NU:
+			poco_assert(_type == JSON_T_NONE);
+			_type = JSON_T_NULL;
+			_state = N1;
+			break;
+		// f
+		case FA:
+			poco_assert(_type == JSON_T_NONE);
+			_type = JSON_T_FALSE;
+			_state = F1;
+			break;
+		// t
+		case TR:
+			poco_assert(_type == JSON_T_NONE);
+			_type = JSON_T_TRUE;
+			_state = T1;
+			break;
+
+		// closing comment
+		case CE:
+			_comment = 0;
+			poco_assert(_parseBufferCount == 0);
+			poco_assert(_type == JSON_T_NONE);
+			_state = _beforeCommentState;
+			break;
+
+		// opening comment
+		case CB:
+			if (!_allowComments) return false;
+			parseBufferPopBackChar();
+			parseBuffer();
+			poco_assert(_parseBufferCount == 0);
+			poco_assert(_type != JSON_T_STRING);
+			switch (_stack[_top])
+			{
+			case MODE_ARRAY:
+				case MODE_OBJECT:
+					switch(_state)
+					{
+					case VA:
+					case AR:
+						_beforeCommentState = _state;
+						break;
+					default:
+						_beforeCommentState = OK;
+						break;
+					}
+					break;
+					default:
+						_beforeCommentState = _state;
+						break;
+					}
+				_type = JSON_T_NONE;
+				_state = C1;
+				_comment = 1;
+				break;
+			// empty }
+			case -9:
+			{
+				clearBuffer();
+				if (_pHandler) _pHandler->endObject();
+
+				if (!pop(MODE_KEY)) return false;
+				_state = OK;
+				break;
+			}
+			// }
+			case -8:
+			{
+				parseBufferPopBackChar();
+				parseBuffer();
+				if (_pHandler) _pHandler->endObject();
+				if (!pop(MODE_OBJECT)) return false;
+				_type = JSON_T_NONE;
+				_state = OK;
+				break;
+			}
+			// ]
+			case -7:
+			{
+				parseBufferPopBackChar();
+				parseBuffer();
+				if (_pHandler) _pHandler->endArray();
+				if (!pop(MODE_ARRAY)) return false;
+				_type = JSON_T_NONE;
+				_state = OK;
+				break;
+			}
+			// {
+			case -6:
+			{
+				parseBufferPopBackChar();
+				if (_pHandler) _pHandler->startObject();
+				if (!push(MODE_KEY)) return false;
+				poco_assert(_type == JSON_T_NONE);
+				_state = OB;
+				break;
+			}
+			// [
+			case -5:
+			{
+				parseBufferPopBackChar();
+				if (_pHandler) _pHandler->startArray();
+				if (!push(MODE_ARRAY)) return false;
+				poco_assert(_type == JSON_T_NONE);
+				_state = AR;
+				break;
+			}
+			// string end "
+			case -4:
+				parseBufferPopBackChar();
+				switch (_stack[_top])
+				{
+				case MODE_KEY:
+					{
+					poco_assert(_type == JSON_T_STRING);
+					_type = JSON_T_NONE;
+					_state = CO;
+
+					if (_pHandler) 
+					{
+						std::string value(_parseBuffer.begin(), _parseBufferCount);
+						_pHandler->key(value);
+					}
+					clearBuffer();
+					break;
+					}
+				case MODE_ARRAY:
+				case MODE_OBJECT:
+					poco_assert(_type == JSON_T_STRING);
+					parseBuffer();
+					_type = JSON_T_NONE;
+					_state = OK;
+					break;
+				default:
+					return false;
+				}
+				break;
+
+			// ,
+			case -3:
+				{
+				parseBufferPopBackChar();
+				parseBuffer();
+				switch (_stack[_top])
+				{
+				case MODE_OBJECT:
+					//A comma causes a flip from object mode to key mode.
+					if (!pop(MODE_OBJECT) || !push(MODE_KEY)) return false;
+					poco_assert(_type != JSON_T_STRING);
+					_type = JSON_T_NONE;
+					_state = KE;
+					break;
+				case MODE_ARRAY:
+					poco_assert(_type != JSON_T_STRING);
+					_type = JSON_T_NONE;
+					_state = VA;
+					break;
+				default:
+					return false;
+				}
+				break;
+				}
+			// :
+			case -2:
+				// A colon causes a flip from key mode to object mode.
+				parseBufferPopBackChar();
+				if (!pop(MODE_KEY) || !push(MODE_OBJECT)) return false;
+				poco_assert(_type == JSON_T_NONE);
+				_state = VA;
+				break;
+			//Bad action.
+			default:
+				return false;
+		}
+	}
+	return true;
+}
+
+
+int Parser::decodeUnicodeChar()
+{
+	int i;
+	unsigned uc = 0;
+	char* p;
+	int trail_bytes;
+
+	poco_assert(_parseBufferCount >= 6);
+
+	p = &_parseBuffer[_parseBufferCount - 4];
+
+	for (i = 12; i >= 0; i -= 4, ++p) {
+		unsigned x = *p;
+
+		if (x >= 'a') {
+			x -= ('a' - 10);
+		} else if (x >= 'A') {
+			x -= ('A' - 10);
+		} else {
+			x &= ~0x30u;
+		}
+
+		poco_assert(x < 16);
+
+		uc |= x << i;
+	}
+
+	if ( !_allowNullByte && uc == 0 ) return 0; // Null byte not allowed
+
+	// clear UTF-16 char from buffer
+	_parseBufferCount -= 6;
+	_parseBuffer[_parseBufferCount] = 0;
+
+	// attempt decoding 
+	if (_utf16HighSurrogate) {
+		if (IS_LOW_SURROGATE(uc)) {
+			uc = DECODE_SURROGATE_PAIR(_utf16HighSurrogate, uc);
+			trail_bytes = 3;
+			_utf16HighSurrogate = 0;
+		} else {
+			// high surrogate without a following low surrogate
+			return 0;
+		}
+	} else {
+		if (uc < 0x80) {
+			trail_bytes = 0;
+		} else if (uc < 0x800) {
+			trail_bytes = 1;
+		} else if (IS_HIGH_SURROGATE(uc)) {
+			// save the high surrogate and wait for the low surrogate
+			_utf16HighSurrogate = uc;
+			return 1;
+		} else if (IS_LOW_SURROGATE(uc)) {
+			// low surrogate without a preceding high surrogate 
+			return 0;
+		} else {
+			trail_bytes = 2;
+		}
+	}
+
+	_parseBuffer[_parseBufferCount++] = (char) ((uc >> (trail_bytes * 6)) | utf8_lead_bits[trail_bytes]);
+
+	for (i = trail_bytes * 6 - 6; i >= 0; i -= 6) {
+		_parseBuffer[_parseBufferCount++] = (char) (((uc >> i) & 0x3F) | 0x80);
+	}
+
+	_parseBuffer[_parseBufferCount] = 0;
+
+	return 1;
+}
+
+
+void Parser::parseBuffer()
+{
+	if (_pHandler)
+	{
+		int type = _type; // just to silence g++
+
+		if (type != JSON_T_NONE)
+		{
+			assertNonContainer();
+
+			switch(type)
+			{
+			case JSON_T_TRUE:
+				{
+					_pHandler->value(true);
+					break;
+				}
+			case JSON_T_FALSE:
+				{
+					_pHandler->value(false);
+					break;
+				}
+			case JSON_T_NULL:
+				{
+					_pHandler->null();
+					break;
+				}
+			case JSON_T_FLOAT:
+				{ 
+					// Float can't end with a dot
+					if ( _parseBuffer[_parseBufferCount-1] == '.' ) throw SyntaxException("JSON syntax error");
+
+					double float_value = NumberParser::parseFloat(_parseBuffer.begin());
+					_pHandler->value(float_value);
+					break;
+				}
+			case JSON_T_INTEGER:
+				{
+#if defined(POCO_HAVE_INT64)
+					try
+					{
+						Int64 value = NumberParser::parse64(_parseBuffer.begin());
+						// if number is 32-bit, then handle as such
+						if (	value > std::numeric_limits<int>::max()
+							|| value < std::numeric_limits<int>::min() )
+						{
+							_pHandler->value(value);
+						}
+						else
+						{
+							_pHandler->value(static_cast<int>(value));
+						}
+					}
+					// try to handle error as unsigned in case of overflow
+					catch ( const SyntaxException& )
+					{
+						UInt64 value = NumberParser::parseUnsigned64(_parseBuffer.begin());
+						// if number is 32-bit, then handle as such
+						if ( value > std::numeric_limits<unsigned>::max() )
+						{
+							_pHandler->value(value);
+						}
+						else
+						{
+							_pHandler->value(static_cast<unsigned>(value));
+						}
+					}
+#else
+					try
+					{
+						int value = NumberParser::parse(_parseBuffer.begin());
+						_pHandler->value(value);
+					}
+					// try to handle error as unsigned in case of overflow
+					catch ( const SyntaxException& )
+					{
+						unsigned value = NumberParser::parseUnsigned(_parseBuffer.begin());
+						_pHandler->value(value);
+					}
+#endif
+				}
+				break;
+			case JSON_T_STRING:
+				{
+					std::string str(_parseBuffer.begin(), _parseBufferCount);
+					_pHandler->value(str);
+					break;
+				}
+			}
+		}
+	}
+
+	clearBuffer();
+}
+
+int Parser::utf8_check_first(char byte)
+{
+	unsigned char u = (unsigned char) byte;
+
+	if(u < 0x80)
+		return 1;
+
+	if (0x80 <= u && u <= 0xBF) 
+	{
+		/* second, third or fourth byte of a multi-byte
+		sequence, i.e. a "continuation byte" */
+		return 0;
+	}
+	else if(u == 0xC0 || u == 0xC1) 
+	{
+		/* overlong encoding of an ASCII byte */
+		return 0;
+	}
+	else if(0xC2 <= u && u <= 0xDF) 
+	{
+		/* 2-byte sequence */
+		return 2;
+	}
+	else if(0xE0 <= u && u <= 0xEF) 
+	{
+		/* 3-byte sequence */
+		return 3;
+	}
+	else if(0xF0 <= u && u <= 0xF4) 
+	{
+		/* 4-byte sequence */
+		return 4;
+	}
+	else 
+	{ 
+		/* u >= 0xF5 */
+		/* Restricted (start of 4-, 5- or 6-byte sequence) or invalid
+		UTF-8 */
+		return 0;
+	}
 }
 
 } } // namespace Poco::JSON

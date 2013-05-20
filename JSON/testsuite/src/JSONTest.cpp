@@ -1193,6 +1193,7 @@ void JSONTest::testInvalidJanssonFiles()
 				std::cout << filePath.toString() << std::endl;
 
 				Parser parser;
+				parser.allowNullByte(false);
 				Var result;
 
 				try
@@ -1235,6 +1236,7 @@ void JSONTest::testInvalidUnicodeJanssonFiles()
 				std::cout << filePath.toString() << std::endl;
 
 				Parser parser;
+				parser.allowNullByte(false);
 				Var result;
 
 				try
