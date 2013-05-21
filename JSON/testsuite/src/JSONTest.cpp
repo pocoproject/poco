@@ -841,6 +841,7 @@ void JSONTest::testPrintHandler()
 
 	pHandler->setIndent(1);
 	ostr.str("");
+	parser.reset();
 	parser.parse(json);
 	assert (ostr.str() == "{\n"
 		" \"name\" : \"Homer\",\n"
@@ -857,6 +858,7 @@ void JSONTest::testPrintHandler()
 
 	pHandler->setIndent(2);
 	ostr.str("");
+	parser.reset();
 	parser.parse(json);
 	assert (ostr.str() == "{\n"
 		"  \"name\" : \"Homer\",\n"
@@ -873,6 +875,7 @@ void JSONTest::testPrintHandler()
 
 	pHandler->setIndent(4);
 	ostr.str("");
+	parser.reset();
 	parser.parse(json);
 	assert (ostr.str() == "{\n"
 		"    \"name\" : \"Homer\",\n"
@@ -1193,7 +1196,7 @@ void JSONTest::testInvalidJanssonFiles()
 				std::cout << filePath.toString() << std::endl;
 
 				Parser parser;
-				parser.allowNullByte(false);
+				parser.setAllowNullByte(false);
 				Var result;
 
 				try
@@ -1236,7 +1239,7 @@ void JSONTest::testInvalidUnicodeJanssonFiles()
 				std::cout << filePath.toString() << std::endl;
 
 				Parser parser;
-				parser.allowNullByte(false);
+				parser.setAllowNullByte(false);
 				Var result;
 
 				try

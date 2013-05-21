@@ -53,64 +53,9 @@
 namespace Poco {
 namespace JSON {
 
-class JSON_API CharacterFeeder
-{
-public:
-	virtual ~CharacterFeeder() {}
-	virtual bool nextChar(int& c) = 0;
-};
 
+class Source;
 
-class JSON_API StreamCharacterFeeder : public CharacterFeeder
-{
-public:
-	StreamCharacterFeeder(std::istream& in) : _in(in) {}
-	virtual ~StreamCharacterFeeder() {}
-
-	bool nextChar(int& c);
-
-private:
-
-	std::istream& _in;
-};
-
-
-inline bool StreamCharacterFeeder::nextChar(int& c)
-{
-	if ( _in.good() )
-	{
-		c = _in.get();
-		return _in.good();
-	}
-	return false;
-}
-
-class JSON_API StringCharacterFeeder : public CharacterFeeder
-{
-public:
-	StringCharacterFeeder(std::string::const_iterator begin, std::string::const_iterator end) : _it(begin), _end(end)
-	{
-	}
-	virtual ~StringCharacterFeeder() {}
-
-	bool nextChar(int& c);
-
-private:
-
-	std::string::const_iterator _it;
-	std::string::const_iterator _end;
-
-};
-
-
-inline bool StringCharacterFeeder::nextChar(int& c)
-{
-	if ( _it == _end )
-		return false;
-
-	c = *_it++;
-	return true;
-}
 
 class JSON_API Parser
 	/// A class for passing JSON strings or streams.
@@ -239,23 +184,39 @@ public:
 		JSON_T_VALUE_SEPARATOR,
 		JSON_T_MAX
 	};
+	
+	static const std::size_t PARSE_BUFFER_SIZE = 3500;
+	static const std::size_t PARSER_STACK_SIZE = 128;
+	static const int UNLIMITED_DEPTH = -1;
 
-
-	static const int PARSE_BUFFER_SIZE = 3500;
-	static const int PARSER_STACK_SIZE = 128;
-
-	Parser(const Handler::Ptr& pHandler = new ParseHandler);
+	Parser(const Handler::Ptr& pHandler = new ParseHandler, std::size_t bufSize = PARSE_BUFFER_SIZE);
 		/// Constructor.
 
 	virtual ~Parser();
 		/// Destructor.
 
+	void reset();
+		/// Resets the parser.
 
-	void allowComments(bool sw);
-		/// Allow comments. By default this is false.
+	void setAllowComments(bool comments);
+		/// Allow comments. By default, comments are not allowed.
+
+	bool getAllowComments() const;
+		/// Returns true if comments are allowed, false otherwise.
+		/// By default, comments are not allowed.
 		
-	void allowNullByte(bool sw);
-		/// Allow a null byte in strings. By default this is true.
+	void setAllowNullByte(bool nullByte);
+		/// Allow null byte in strings. By default, null byte is allowed.
+
+	bool getAllowNullByte() const;
+		/// Returns true if null byte is allowed, false otherwise.
+		/// By default, null bytes are allowed.
+
+	void setDepth(std::size_t depth);
+		/// Sets the allowed JSON depth.
+
+	std::size_t getDepth() const;
+		/// Returns the allowed JSON depth.
 
 	Dynamic::Var parse(const std::string& json);
 		/// Parses a string.
@@ -273,11 +234,7 @@ public:
 		/// Returns the result of parsing;
 
 private:
-	Handler::Ptr    _pHandler;
-
-
 	typedef Poco::Buffer<char> BufType;
-
 
 	bool push(int mode);
 		/// Push a mode onto the _pStack. Return false if there is overflow.
@@ -288,80 +245,92 @@ private:
 
 	void growBuffer();
 
-
 	void clearBuffer();
-
 
 	void parseBufferPushBackChar(char c);
 
-
 	void parseBufferPopBackChar();
-
 
 	void addCharToParseBuffer(int nextChar, int nextClass);
 
-
 	void addEscapedCharToParseBuffer(int nextChar);
-
 
 	int decodeUnicodeChar();
 
-
 	void assertNotStringNullBool();
-
 
 	void assertNonContainer();
 
-
 	void parseBuffer();
 
-
-	bool parseChar(int nextChar);
+	bool parseChar(int nextChar, Source& feeder);
 		/// Called for each character (or partial character) in JSON string.
-		/// It accepts UTF-8, UTF-16, or UTF-32. If it the character is accpeted,
+		/// It accepts UTF-8, UTF-16, or UTF-32. If it the character is accepted,
 		/// it returns true, otherwise false.
 
 	bool done();
 
-
 	static int utf8_check_first(char byte);
-
 
 	static const int _asciiClass[128];
 		/// This array maps the 128 ASCII characters into character classes.
 		/// The remaining Unicode characters should be mapped to C_ETC.
 		/// Non-whitespace control characters are errors.
+
 	static const int _stateTransitionTable[NR_STATES][NR_CLASSES];
 	static const int xx = -1;
 
-	signed char _state;
-	signed char _beforeCommentState;
-	JSONType _type;
-	signed char _escaped;
-	signed char _comment;
+	Handler::Ptr   _pHandler;
+	signed char    _state;
+	signed char    _beforeCommentState;
+	JSONType       _type;
+	signed char    _escaped;
+	signed char    _comment;
 	unsigned short _utf16HighSurrogate;
-	long _depth;
-	long _top;
-	BufType _stack;
-	BufType _parseBuffer;
-	size_t _parseBufferCount;
-	size_t _commentBeginOffset;
-	char _decimalPoint;
-	bool _allowNullByte;
-	bool _allowComments;
-	SharedPtr<CharacterFeeder> feeder;
+	int            _depth;
+	int            _top;
+	BufType        _stack;
+	BufType        _parseBuffer;
+	std::size_t    _parseBufferCount;
+	char           _decimalPoint;
+	bool           _allowNullByte;
+	bool           _allowComments;
 };
 
 
-inline void Parser::allowComments(bool sw)
+inline void Parser::setAllowComments(bool sw)
 {
 	_allowComments = sw;
 }
 
 
-inline void Parser::allowNullByte(bool sw)
+inline bool Parser::getAllowComments() const
+{
+	return _allowComments;
+}
+
+
+inline void Parser::setAllowNullByte(bool sw)
 {
 	_allowNullByte = sw;
+}
+
+
+inline bool Parser::getAllowNullByte() const
+{
+	return _allowNullByte;
+}
+
+
+inline void Parser::setDepth(std::size_t depth)
+{
+	_depth = depth;
+}
+
+
+inline std::size_t Parser::getDepth() const
+{
+	return _depth;
 }
 
 
@@ -385,7 +354,7 @@ inline Dynamic::Var Parser::result() const
 
 inline bool Parser::done()
 {
-    return _state == OK && pop(MODE_DONE);
+	return _state == OK && pop(MODE_DONE);
 }
 
 
@@ -413,6 +382,7 @@ inline void Parser::growBuffer()
 {
 	_parseBuffer.resize(_parseBuffer.size() * 2, true);
 }
+
 
 }} // namespace Poco::JSON
 

@@ -129,7 +129,76 @@ const int Parser::_stateTransitionTable[NR_STATES][NR_CLASSES] = {
 };
 
 
-Parser::Parser(const Handler::Ptr& pHandler) :
+// Source
+
+class Source
+{
+public:
+	Source()
+	{
+	}
+	
+	virtual ~Source()
+	{
+	}
+	
+	virtual bool nextChar(int& c) = 0;
+};
+
+
+class StreamSource : public Source
+{
+public:
+	StreamSource(std::istream& in) : _in(in)
+	{
+	}
+	
+	virtual ~StreamSource()
+	{
+	}
+
+	bool nextChar(int& c)
+	{
+		if ( _in.good() )
+		{
+			c = _in.get();
+			return _in.good();
+		}
+		return false;
+	}
+
+private:
+	std::istream& _in;
+};
+
+
+class StringSource : public Source
+{
+public:
+	StringSource(std::string::const_iterator begin, std::string::const_iterator end) : _it(begin), _end(end)
+	{
+	}
+	
+	virtual ~StringSource()
+	{
+	}
+
+	bool nextChar(int& c)
+	{
+		if ( _it == _end ) return false;
+
+		c = *_it++;
+		return true;
+	}
+
+private:
+	std::string::const_iterator _it;
+	std::string::const_iterator _end;
+};
+
+
+// Parser
+Parser::Parser(const Handler::Ptr& pHandler, std::size_t bufSize) :
 	_pHandler(pHandler),
 	_state(GO),
 	_beforeCommentState(0),
@@ -137,38 +206,50 @@ Parser::Parser(const Handler::Ptr& pHandler) :
 	_escaped(0),
 	_comment(0),
 	_utf16HighSurrogate(0),
-	//_depth(config.parseDepth() ? config.parseDepth() : -1),
-	_depth(-1),
+	_depth(UNLIMITED_DEPTH),
 	_top(-1),
 	_stack(PARSER_STACK_SIZE),
-	_parseBuffer(PARSE_BUFFER_SIZE),
+	_parseBuffer(bufSize),
 	_parseBufferCount(0),
-	_commentBeginOffset(0),
-	_decimalPoint(0),
+	_decimalPoint('.'),
 	_allowNullByte(true),
 	_allowComments(false)
 {
-	_stack.clear();
-	_parseBuffer.clear();
 	push(MODE_DONE);
-	_decimalPoint = *std::localeconv()->decimal_point;
-	clearBuffer();
 }
 
 
 Parser::~Parser()
 {
-
 }
+
+
+void Parser::reset()
+{
+	_state = GO;
+	_beforeCommentState = 0;
+	_type = JSON_T_NONE;
+	_escaped = 0;
+	_comment = 0;
+	_utf16HighSurrogate = 0;
+	_top = -1;
+	_parseBufferCount = 0;
+
+	_stack.clear();
+	_parseBuffer.clear();
+	push(MODE_DONE);
+	clearBuffer();
+}
+
 
 Dynamic::Var Parser::parse(const std::string& json)
 {
-	feeder = new StringCharacterFeeder(json.begin(), json.end());
+	StringSource source(json.begin(), json.end());
 
 	int c = 0;
-	while(feeder->nextChar(c))
+	while(source.nextChar(c))
 	{
-		if (0 == parseChar(c)) throw SyntaxException("JSON syntax error");
+		if (0 == parseChar(c, source)) throw SyntaxException("JSON syntax error");
 	}
 
 	if (!done())
@@ -180,12 +261,12 @@ Dynamic::Var Parser::parse(const std::string& json)
 
 Dynamic::Var Parser::parse(std::istream& in)
 {
-	feeder = new StreamCharacterFeeder(in);
+	StreamSource source(in);
 
 	int c = 0;
-	while(feeder->nextChar(c))
+	while(source.nextChar(c))
 	{
-		if (0 == parseChar(c)) throw JSONException("JSON syntax error");
+		if (0 == parseChar(c, source)) throw JSONException("JSON syntax error");
 	}
 
 	if (!done())
@@ -221,6 +302,7 @@ bool Parser::pop(int mode)
 	_top -= 1;
 	return true;
 }
+
 
 void Parser::clearBuffer()
 {
@@ -305,7 +387,7 @@ void Parser::addCharToParseBuffer(int nextChar, int nextClass)
 }
 
 
-bool Parser::parseChar(int nextChar)
+bool Parser::parseChar(int nextChar, Source& source)
 {
 	int nextClass, nextState;
 
@@ -325,7 +407,7 @@ bool Parser::parseChar(int nextChar)
 		for(int i = 1; i < count; ++i)
 		{
 			int c = 0;
-			if ( !feeder->nextChar(c) ) throw JSONException("Invalid UTF8 character found");
+			if (!source.nextChar(c)) throw JSONException("Invalid UTF8 character found");
 			buffer[i] = c;
 		}
 		
@@ -702,8 +784,8 @@ void Parser::parseBuffer()
 					{
 						Int64 value = NumberParser::parse64(_parseBuffer.begin());
 						// if number is 32-bit, then handle as such
-						if (	value > std::numeric_limits<int>::max()
-							|| value < std::numeric_limits<int>::min() )
+						if (value > std::numeric_limits<int>::max()
+						 || value < std::numeric_limits<int>::min() )
 						{
 							_pHandler->value(value);
 						}

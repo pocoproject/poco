@@ -125,11 +125,13 @@ private:
 	const char* endLine() const;
 	unsigned indent();
 	bool printFlat() const;
+	void arrayValue();
 
 	std::ostream& _out;
 	unsigned      _indent;
 	std::string   _tab;
 	bool          _array;
+	bool          _value;
 };
 
 
