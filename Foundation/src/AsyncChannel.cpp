@@ -49,9 +49,9 @@ namespace Poco {
 class MessageNotification: public Notification
 {
 public:
-	MessageNotification(const Message& msg)
+	MessageNotification(const Message& msg):
+		_msg(msg)
 	{
-		_msg = msg;
 	}
 	
 	~MessageNotification()
