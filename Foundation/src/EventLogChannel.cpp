@@ -1,7 +1,7 @@
 //
 // EventLogChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/EventLogChannel.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/EventLogChannel.cpp#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -56,9 +56,10 @@ EventLogChannel::EventLogChannel():
 	_logFile("Application"),
 	_h(0)
 {
+	const DWORD maxPathLen = MAX_PATH + 1;
 #if defined(POCO_WIN32_UTF8)
-	wchar_t name[256];
-	int n = GetModuleFileNameW(NULL, name, sizeof(name));
+	wchar_t name[maxPathLen];
+	int n = GetModuleFileNameW(NULL, name, maxPathLen);
 	if (n > 0)
 	{
 		wchar_t* end = name + n - 1;
@@ -68,8 +69,8 @@ EventLogChannel::EventLogChannel():
 		UnicodeConverter::toUTF8(uname, _name);
 	}
 #else
-	char name[256];
-	int n = GetModuleFileNameA(NULL, name, sizeof(name));
+	char name[maxPathLen];
+	int n = GetModuleFileNameA(NULL, name, maxPathLen);
 	if (n > 0)
 	{
 		char* end = name + n - 1;
@@ -288,8 +289,9 @@ std::wstring EventLogChannel::findLibrary(const wchar_t* name)
 	HMODULE dll = LoadLibraryW(name);
 	if (dll)
 	{
-		wchar_t name[MAX_PATH + 1];
-		int n = GetModuleFileNameW(dll, name, sizeof(name));
+		const DWORD maxPathLen = MAX_PATH + 1;
+		wchar_t name[maxPathLen];
+		int n = GetModuleFileNameW(dll, name, maxPathLen);
 		if (n > 0) path = name;
 		FreeLibrary(dll);
 	}
@@ -302,8 +304,9 @@ std::string EventLogChannel::findLibrary(const char* name)
 	HMODULE dll = LoadLibraryA(name);
 	if (dll)
 	{
-		char name[MAX_PATH + 1];
-		int n = GetModuleFileNameA(dll, name, sizeof(name));
+		const DWORD maxPathLen = MAX_PATH + 1;
+		char name[maxPathLen];
+		int n = GetModuleFileNameA(dll, name, maxPathLen);
 		if (n > 0) path = name;
 		FreeLibrary(dll);
 	}

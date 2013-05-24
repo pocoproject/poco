@@ -1,7 +1,7 @@
 //
 // Extractor.h
 //
-// $Id: //poco/1.4/Data/ODBC/include/Poco/Data/ODBC/Extractor.h#1 $
+// $Id: //poco/1.4/Data/ODBC/include/Poco/Data/ODBC/Extractor.h#2 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -161,7 +161,7 @@ private:
 
 		//for fixed-length data, buffer must be large enough
 		//otherwise, driver may write past the end
-		poco_assert_dbg (len <= sizeof(T));
+		poco_assert_dbg (len <= static_cast<SQLLEN>(sizeof(T)));
 
 		if (Utility::isError(rc))
 			throw StatementException(_rStmt, "SQLGetData()");

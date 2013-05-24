@@ -1,7 +1,7 @@
 //
 // MailStream.cpp
 //
-// $Id: //poco/1.4/Net/src/MailStream.cpp#1 $
+// $Id: //poco/1.4/Net/src/MailStream.cpp#2 $
 //
 // Library: Net
 // Package: Mail
@@ -176,7 +176,9 @@ int MailStreamBuf::writeToDevice(char c)
 	}
 	else if (_state == ST_CR_LF_DOT)
 	{
-		_pOstr->write("\r\n..", 4);
+		// buffer contains one or more CR-LF pairs
+		_pOstr->write(_buffer.data(), (std::streamsize) _buffer.length());
+		_pOstr->write("..", 2);
 		_state = ST_DATA;
 		_buffer.clear();
 	}

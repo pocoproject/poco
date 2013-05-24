@@ -1,7 +1,7 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/1.4/Data/ODBC/include/Poco/Data/ODBC/SessionImpl.h#1 $
+// $Id: //poco/1.4/Data/ODBC/include/Poco/Data/ODBC/SessionImpl.h#2 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -132,6 +132,18 @@ public:
 
 	int maxStatementLength();
 		/// Returns maximum length of SQL statement allowed by driver.
+		
+	void setQueryTimeout(const std::string&, const Poco::Any& value);
+		/// Sets the timeout (in seconds) for queries.
+		/// Value must be of type int.
+		
+	Poco::Any getQueryTimeout(const std::string&);
+		/// Returns the timeout (in seconds) for queries,
+		/// or -1 if no timeout has been set.
+		
+	int queryTimeout() const;
+		/// Returns the timeout (in seconds) for queries,
+		/// or -1 if no timeout has been set.
 
 	const ConnectionHandle& dbc() const;
 		/// Returns the connection handle.
@@ -154,6 +166,7 @@ private:
 	bool _enforceCapability;
 	bool _autoBind;
 	bool _autoExtract;
+	int _queryTimeout;
 };
 
 
@@ -196,6 +209,24 @@ inline void SessionImpl::setMaxFieldSize(const std::string& rName, const Poco::A
 inline Poco::Any SessionImpl::getMaxFieldSize(const std::string& rName)
 {
 	return _maxFieldSize;
+}
+
+
+inline void SessionImpl::setQueryTimeout(const std::string&, const Poco::Any& value)
+{
+	_queryTimeout = Poco::AnyCast<int>(value);
+}
+
+
+inline Poco::Any SessionImpl::getQueryTimeout(const std::string&)
+{
+	return _queryTimeout;
+}
+
+
+inline int SessionImpl::queryTimeout() const
+{
+	return _queryTimeout;
 }
 
 

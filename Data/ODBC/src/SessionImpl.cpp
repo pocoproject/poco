@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/1.4/Data/ODBC/src/SessionImpl.cpp#1 $
+// $Id: //poco/1.4/Data/ODBC/src/SessionImpl.cpp#2 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -56,7 +56,8 @@ SessionImpl::SessionImpl(const std::string& connect,
 	_maxFieldSize(maxFieldSize),
 	_enforceCapability(enforceCapability),
 	_autoBind(autoBind),
-	_autoExtract(autoExtract)
+	_autoExtract(autoExtract),
+	_queryTimeout(-1)
 {
 	open();
 }
@@ -117,6 +118,10 @@ void SessionImpl::open()
 	addProperty("maxFieldSize",
 		&SessionImpl::setMaxFieldSize,
 		&SessionImpl::getMaxFieldSize);
+		
+	addProperty("queryTimeout",
+		&SessionImpl::setQueryTimeout,
+		&SessionImpl::getQueryTimeout);
 
 	if (_enforceCapability && !isCapable())
 	{

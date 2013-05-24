@@ -1,7 +1,7 @@
 //
 // FileChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FileChannel.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/FileChannel.cpp#4 $
 //
 // Library: Foundation
 // Package: Logging
@@ -59,7 +59,7 @@ const std::string FileChannel::PROP_TIMES        = "times";
 const std::string FileChannel::PROP_COMPRESS     = "compress";
 const std::string FileChannel::PROP_PURGEAGE     = "purgeAge";
 const std::string FileChannel::PROP_PURGECOUNT   = "purgeCount";
-const std::string FileChannel::PROP_FLUSH        = "flush	";
+const std::string FileChannel::PROP_FLUSH        = "flush";
 const std::string FileChannel::PROP_ROTATEONOPEN = "rotateOnOpen";
 
 FileChannel::FileChannel(): 

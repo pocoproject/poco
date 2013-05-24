@@ -1,7 +1,7 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/1.4/Crypto/src/OpenSSLInitializer.cpp#3 $
+// $Id: //poco/1.4/Crypto/src/OpenSSLInitializer.cpp#4 $
 //
 // Library: Crypto
 // Package: CryotpCore
@@ -111,6 +111,9 @@ void OpenSSLInitializer::uninitialize()
 		EVP_cleanup();
 		ERR_free_strings();
 		CRYPTO_set_locking_callback(0);
+#ifndef POCO_OS_FAMILY_WINDOWS
+		CRYPTO_set_id_callback(0);
+#endif
 		delete [] _mutexes;
 	}
 }

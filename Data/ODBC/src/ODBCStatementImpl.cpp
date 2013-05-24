@@ -1,7 +1,7 @@
 //
 // ODBCStatementImpl.cpp
 //
-// $Id: //poco/1.4/Data/ODBC/src/ODBCStatementImpl.cpp#1 $
+// $Id: //poco/1.4/Data/ODBC/src/ODBCStatementImpl.cpp#2 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -68,6 +68,16 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 		SQLSetStmtAttr(_stmt, 
 			SQL_ATTR_ROW_ARRAY_SIZE, 
 			(SQLPOINTER) 1, 
+			0);
+	}
+	
+	int queryTimeout = rSession.queryTimeout();
+	if (queryTimeout >= 0)
+	{
+		SQLULEN uqt = static_cast<SQLULEN>(queryTimeout);
+		SQLSetStmtAttr(_stmt,
+			SQL_ATTR_QUERY_TIMEOUT,
+			(SQLPOINTER) uqt,
 			0);
 	}
 }

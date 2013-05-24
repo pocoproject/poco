@@ -1,7 +1,7 @@
 //
 // AsyncChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/AsyncChannel.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/AsyncChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -49,9 +49,9 @@ namespace Poco {
 class MessageNotification: public Notification
 {
 public:
-	MessageNotification(const Message& msg)
+	MessageNotification(const Message& msg):
+		_msg(msg)
 	{
-		_msg = msg;
 	}
 	
 	~MessageNotification()
