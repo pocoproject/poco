@@ -1,7 +1,7 @@
 //
 // SocketAddress.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketAddress.cpp#7 $
+// $Id: //poco/1.4/Net/src/SocketAddress.cpp#8 $
 //
 // Library: Net
 // Package: NetCore
@@ -302,7 +302,9 @@ SocketAddress::~SocketAddress()
 bool SocketAddress::operator < (const SocketAddress& addr) const
 {
 	if (family() < addr.family()) return true;
+	if (family() > addr.family()) return false;
 	if (host() < addr.host()) return true;
+	if (host() > addr.host()) return false;
 	return (port() < addr.port());
 }
 
