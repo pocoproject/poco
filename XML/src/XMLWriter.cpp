@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.4/XML/src/XMLWriter.cpp#5 $
+// $Id: //poco/1.4/XML/src/XMLWriter.cpp#6 $
 //
 // Library: XML
 // Package: XML
@@ -493,7 +493,11 @@ void XMLWriter::startDTD(const XMLString& name, const XMLString& publicId, const
 	}
 	if (!systemId.empty())
 	{
-		writeMarkup(" SYSTEM \"");
+		if (publicId.empty())
+		{
+			writeMarkup(" SYSTEM");
+		}
+		writeMarkup(" \"");
 		writeXML(systemId);
 		writeMarkup("\"");
 	}
