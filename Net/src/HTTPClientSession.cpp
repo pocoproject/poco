@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#6 $
+// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#8 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -424,8 +424,10 @@ StreamSocket HTTPClientSession::proxyConnect()
 {
 	HTTPClientSession proxySession(getProxyHost(), getProxyPort());
 	proxySession.setTimeout(getTimeout());
-	SocketAddress targetAddress(getHost(), getPort());
-	HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress.toString(), HTTPMessage::HTTP_1_1);
+	std::string targetAddress(_host);
+	targetAddress.append(":");
+	NumberFormatter::append(targetAddress, _port);
+	HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress, HTTPMessage::HTTP_1_1);
 	HTTPResponse proxyResponse;
 	proxyRequest.set("Proxy-Connection", "keep-alive");
 	proxyRequest.set("Host", getHost());
