@@ -141,13 +141,13 @@ void SocketAddressTest::testSocketAddress()
 void SocketAddressTest::testSocketRelationals()
 {
 	SocketAddress sa1("192.168.1.100", 100);
-	SocketAddress sa2("192.168.1.100:100");
+    SocketAddress sa2("192.168.1.100:100");
 	assert (sa1 == sa2);
-	
-	SocketAddress sa3("192.168.1.101", "99");
+
+    SocketAddress sa3("192.168.1.101", "99");
 	assert (sa2 < sa3);
-	
-	SocketAddress sa4("192.168.1.100", "102");
+
+	SocketAddress sa4("192.168.1.101", "102");
 	assert (sa3 < sa4);
 }
 
