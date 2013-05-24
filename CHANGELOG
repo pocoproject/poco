@@ -22,6 +22,7 @@ Release 1.4.6p2 (2013-06-xx)
 - fixed GH# 188: Net: SocketAddress operator < unusable for std::map key
 - fixed GH# 128: DOMWriter incorrectly adds SYSTEM keyword to DTD if PUBLIC is 
   already specified
+- fixed GH# 65: Poco::format() misorders sign and padding specifiers
 
 
 Release 1.4.6p1 (2013-03-06)
@@ -1839,4 +1840,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#83 $
+$Id: //poco/1.4/dist/CHANGELOG#84 $

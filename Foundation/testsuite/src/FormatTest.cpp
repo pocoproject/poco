@@ -1,7 +1,7 @@
 //
 // FormatTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FormatTest.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/FormatTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
@@ -172,6 +172,8 @@ void FormatTest::testInt()
 	i = -42;
 	s = format("%+d", i);
 	assert (s == "-42");
+	s = format("%+04d", i);
+	assert (s == "-042");
 	s = format("%d", i);
 	assert (s == "-42");
 
