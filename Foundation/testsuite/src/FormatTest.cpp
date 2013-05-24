@@ -172,6 +172,8 @@ void FormatTest::testInt()
 	i = -42;
 	s = format("%+d", i);
 	assert (s == "-42");
+	s = format("%+04d", i);
+	assert (s == "-042");
 	s = format("%d", i);
 	assert (s == "-42");
 

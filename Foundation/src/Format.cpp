@@ -57,9 +57,9 @@ namespace
 			switch (*itFmt)
 			{
 			case '-': str.setf(std::ios::left); ++itFmt; break;
-			case '+': str.setf(std::ios::showpos); ++itFmt; break;
+			case '+': str.setf(std::ios::showpos | std::ios::internal); ++itFmt; break;
 			case '0': str.fill('0'); ++itFmt; break;
-			case '#': str.setf(std::ios::showpoint | std::ios_base::showbase); ++itFmt; break;
+			case '#': str.setf(std::ios::showpoint | std::ios::showbase); ++itFmt; break;
 			default:  isFlag = false; break;
 			}
 		}
