@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.2 (2013-04-29)
+Release 1.5.2 (2013-06-xx)
 ==========================
 - added MongoDB library (Franky Braem)
 - fixed GH #57: poco-1.5.1: Doesn't compile for Android
@@ -63,6 +63,7 @@ Release 1.5.2 (2013-04-29)
 - fixed GH #128: DOMWriter incorrectly adds SYSTEM keyword to DTD if PUBLIC is 
   already specified
 - fixed GH #65: Poco::format() misorders sign and padding specifiers
+- upgraded bundled SQLite to 3.7.17
 
 
 Release 1.5.1 (2013-01-11)
