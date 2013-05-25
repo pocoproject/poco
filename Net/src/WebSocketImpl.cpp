@@ -1,7 +1,7 @@
 //
 // WebSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#6 $
+// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#8 $
 //
 // Library: Net
 // Package: WebSocket
@@ -73,6 +73,7 @@ int WebSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	Poco::MemoryOutputStream ostr(frame.begin(), frame.size());
 	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::NETWORK_BYTE_ORDER);
 	
+	if (flags == 0) flags = WebSocket::FRAME_BINARY;
 	writer << static_cast<Poco::UInt8>(flags);
 	Poco::UInt8 lengthByte(0);
 	if (_mustMaskPayload)
@@ -321,5 +322,5 @@ Poco::Timespan WebSocketImpl::getReceiveTimeout()
 	return _pStreamSocketImpl->getReceiveTimeout();
 }
 
-
+	
 } } // namespace Poco::Net
