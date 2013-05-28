@@ -192,10 +192,10 @@ private:
 		cont.push_back(1);
 		cont.push_back("2");
 		cont.push_back(3.5);
-		Var arr(cont);
+		Poco::Dynamic::Var arr(cont);
 		assert (arr.size() == 3);
-		Var::Iterator it = arr.begin();
-		Var::Iterator end = arr.end();
+		Poco::Dynamic::Var::Iterator it = arr.begin();
+		Poco::Dynamic::Var::Iterator end = arr.end();
 		int counter = 0;
 		for (; it != end; ++it)
 		{
