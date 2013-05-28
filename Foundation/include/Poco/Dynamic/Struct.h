@@ -64,7 +64,7 @@ public:
 	typedef typename Struct<K>::Data::value_type ValueType;
 	typedef typename Struct<K>::Data::size_type SizeType;
 	typedef typename std::pair<typename Struct<K>::Iterator, bool> InsRetVal;
-	typedef typename SharedPtr<Struct<K> > Ptr;
+	typedef typename SharedPtr<typename Struct<K> > Ptr;
 
 	Struct(): _data()
 		/// Creates an empty Struct

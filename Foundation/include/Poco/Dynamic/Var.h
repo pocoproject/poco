@@ -522,7 +522,7 @@ public:
 	bool isString() const;
 		/// Returns true if stored value is std::string.
 
-	std::size_t Var::size() const;
+	std::size_t size() const;
 		/// Returns the size of this Var.
 		/// This function returns 0 when Var is empty, 1 for POD or the size (i.e. length)
 		/// for held container.

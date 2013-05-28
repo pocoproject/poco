@@ -2856,8 +2856,8 @@ public:
 		if (n >= size())
 			throw RangeException("List index out of range");
 
-		std::list<T>::size_type counter = 0;
-		std::list<T>::iterator it = _val.begin();
+		typename std::list<T>::size_type counter = 0;
+		typename std::list<T>::iterator it = _val.begin();
 		for (; counter < n; ++counter) ++it;
 
 		return *it;
@@ -2868,8 +2868,8 @@ public:
 		if (n >= size())
 			throw RangeException("List index out of range");
 
-		std::list<T>::size_type counter = 0;
-		std::list<T>::const_iterator it = _val.begin();
+		typename std::list<T>::size_type counter = 0;
+		typename std::list<T>::const_iterator it = _val.begin();
 		for (; counter < n; ++counter) ++it;
 
 		return *it;
