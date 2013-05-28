@@ -75,6 +75,7 @@ public:
 	void testDoubleElement();
 	void testOptValue();
 	void testQuery();
+	void testComment();
 	void testPrintHandler();
 	void testStringify();
 	void testStringifyPreserveOrder();

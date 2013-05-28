@@ -43,6 +43,7 @@
 #include "Poco/JSON/JSON.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
+#include "Poco/Dynamic/Struct.h"
 
 
 namespace Poco {
@@ -59,6 +60,9 @@ public:
 	
 	virtual ~Handler();
 		/// Destructor
+
+	virtual void reset() = 0;
+		/// Resets the handler state.
 
 	virtual void startObject() = 0;
 		/// The parser has read a {, meaning a new object will be read
@@ -103,10 +107,11 @@ public:
 	virtual void value(bool b) = 0;
 		/// A boolean value is read
 
-	virtual void comma();
-		/// A comma is read
+	virtual Poco::Dynamic::Var asVar() const;
+		/// Returns the result of the parser (an object, array or string),
+		/// empty Var if there is no result.
 
-	virtual Dynamic::Var result() const;
+	virtual Poco::DynamicStruct asStruct() const;
 		/// Returns the result of the parser (an object, array or string),
 		/// empty Var if there is no result.
 };

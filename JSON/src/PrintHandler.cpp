@@ -66,6 +66,15 @@ PrintHandler::~PrintHandler()
 }
 
 
+void PrintHandler::reset()
+{
+	_out.flush();
+	_tab = "";
+	_array = false;
+	_value = false;
+}
+
+
 const char* PrintHandler::endLine() const
 {
 	if (!printFlat()) return "\n";
@@ -217,4 +226,6 @@ void PrintHandler::arrayValue()
 		_out << _tab;
 	}
 }
+
+
 } } // namespace Poco::JSON

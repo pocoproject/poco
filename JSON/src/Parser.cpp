@@ -39,11 +39,11 @@
 #include "Poco/Ascii.h"
 #include "Poco/Token.h"
 #include "Poco/UTF8Encoding.h"
-
 #undef min
 #undef max
 #include <limits>
 #include <clocale>
+#include <istream>
 
 
 namespace Poco {
@@ -206,9 +206,9 @@ Parser::Parser(const Handler::Ptr& pHandler, std::size_t bufSize) :
 	_escaped(0),
 	_comment(0),
 	_utf16HighSurrogate(0),
-	_depth(UNLIMITED_DEPTH),
+	_depth(JSON_UNLIMITED_DEPTH),
 	_top(-1),
-	_stack(PARSER_STACK_SIZE),
+	_stack(JSON_PARSER_STACK_SIZE),
 	_parseBuffer(bufSize),
 	_parseBufferCount(0),
 	_decimalPoint('.'),
@@ -230,7 +230,6 @@ void Parser::reset()
 	_beforeCommentState = 0;
 	_type = JSON_T_NONE;
 	_escaped = 0;
-	_comment = 0;
 	_utf16HighSurrogate = 0;
 	_top = -1;
 	_parseBufferCount = 0;
@@ -239,6 +238,7 @@ void Parser::reset()
 	_parseBuffer.clear();
 	push(MODE_DONE);
 	clearBuffer();
+	if (_pHandler) _pHandler->reset();
 }
 
 
@@ -255,7 +255,7 @@ Dynamic::Var Parser::parse(const std::string& json)
 	if (!done())
 		throw JSONException("JSON syntax error");
 
-	return result();
+	return asVar();
 }
 
 
@@ -272,7 +272,7 @@ Dynamic::Var Parser::parse(std::istream& in)
 	if (!done())
 		throw JSONException("JSON syntax error");
 
-	return result();
+	return asVar();
 }
 
 

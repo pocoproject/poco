@@ -52,14 +52,15 @@ Handler::~Handler()
 }
 
 
-void Handler::comma()
+Dynamic::Var Handler::asVar() const
 {
+	return Dynamic::Var();
 }
 
 
-Dynamic::Var Handler::result() const
+Poco::DynamicStruct Handler::asStruct() const
 {
-	return Dynamic::Var();
+	return Poco::DynamicStruct();
 }
 
 

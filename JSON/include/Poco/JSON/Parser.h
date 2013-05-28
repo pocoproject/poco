@@ -35,6 +35,29 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+/*
+Copyright (c) 2005 JSON.org
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+The Software shall be used for Good, not Evil.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
 #ifndef JSON_JSONParser_INCLUDED
 #define JSON_JSONParser_INCLUDED
@@ -46,8 +69,6 @@
 #include "Poco/JSON/ParseHandler.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/StreamTokenizer.h"
-#include <istream>
-#include <sstream>
 
 
 namespace Poco {
@@ -58,7 +79,22 @@ class Source;
 
 
 class JSON_API Parser
-	/// A class for passing JSON strings or streams.
+	/// A RFC 4627 compatible class for parsing JSON strings or streams.
+	/// 
+	/// See http://www.ietf.org/rfc/rfc4627.txt for specification.
+	/// 
+	/// Usage example:
+	/// 
+	///    std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ] }";
+	///    Parser parser;
+	///    Var result = parser.parse(json);
+	///    // ... use result
+	///    parser.reset();
+	///    std::ostringstream ostr;
+	///    PrintHandler::Ptr pHandler = new PrintHandler(ostr);
+	///    parser.setHandler(pHandler);
+	///    parser.parse(json); // ostr.str() == json
+	/// 
 {
 public:
 
@@ -170,26 +206,20 @@ public:
 	enum JSONType
 	{
 		JSON_T_NONE = 0,
-		JSON_T_ARRAY_BEGIN,
-		JSON_T_ARRAY_END,
-		JSON_T_OBJECT_BEGIN,
-		JSON_T_OBJECT_END,
 		JSON_T_INTEGER,
 		JSON_T_FLOAT,
 		JSON_T_NULL,
 		JSON_T_TRUE,
 		JSON_T_FALSE,
 		JSON_T_STRING,
-		JSON_T_KEY,
-		JSON_T_VALUE_SEPARATOR,
 		JSON_T_MAX
 	};
 	
-	static const std::size_t PARSE_BUFFER_SIZE = 3500;
-	static const std::size_t PARSER_STACK_SIZE = 128;
-	static const int UNLIMITED_DEPTH = -1;
+	static const std::size_t JSON_PARSE_BUFFER_SIZE = 4096;
+	static const std::size_t JSON_PARSER_STACK_SIZE = 128;
+	static const int         JSON_UNLIMITED_DEPTH = -1;
 
-	Parser(const Handler::Ptr& pHandler = new ParseHandler, std::size_t bufSize = PARSE_BUFFER_SIZE);
+	Parser(const Handler::Ptr& pHandler = new ParseHandler, std::size_t bufSize = JSON_PARSE_BUFFER_SIZE);
 		/// Constructor.
 
 	virtual ~Parser();
@@ -230,10 +260,16 @@ public:
 	const Handler::Ptr& getHandler();
 		/// Returns the handler.
 
-	Dynamic::Var result() const;
+	Dynamic::Var asVar() const;
 		/// Returns the result of parsing;
 
+	Dynamic::Var result() const;
+		/// Returns the result of parsing as Dynamic::Var;
+
 private:
+	Parser(const Parser&);
+	Parser& operator = (const Parser&);
+
 	typedef Poco::Buffer<char> BufType;
 
 	bool push(int mode);
@@ -265,7 +301,7 @@ private:
 
 	bool parseChar(int nextChar, Source& feeder);
 		/// Called for each character (or partial character) in JSON string.
-		/// It accepts UTF-8, UTF-16, or UTF-32. If it the character is accepted,
+		/// It accepts UTF-8, UTF-16, or UTF-32. If the character is accepted,
 		/// it returns true, otherwise false.
 
 	bool done();
@@ -298,9 +334,9 @@ private:
 };
 
 
-inline void Parser::setAllowComments(bool sw)
+inline void Parser::setAllowComments(bool comments)
 {
-	_allowComments = sw;
+	_allowComments = comments;
 }
 
 
@@ -310,9 +346,9 @@ inline bool Parser::getAllowComments() const
 }
 
 
-inline void Parser::setAllowNullByte(bool sw)
+inline void Parser::setAllowNullByte(bool nullByte)
 {
-	_allowNullByte = sw;
+	_allowNullByte = nullByte;
 }
 
 
@@ -348,7 +384,13 @@ inline const Handler::Ptr& Parser::getHandler()
 
 inline Dynamic::Var Parser::result() const
 {
-	return _pHandler->result();
+	return _pHandler->asVar();
+}
+
+
+inline Dynamic::Var Parser::asVar() const
+{
+	return _pHandler->asVar();
 }
 
 

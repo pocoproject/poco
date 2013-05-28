@@ -4700,6 +4700,9 @@
 				<File
 					RelativePath=".\src\VarHolder.cpp">
 				</File>
+				<File
+					RelativePath=".\src\VarIterator.cpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -4715,6 +4718,9 @@
 				</File>
 				<File
 					RelativePath=".\include\poco\dynamic\VarHolder.h">
+				</File>
+				<File
+					RelativePath=".\include\poco\dynamic\VarIterator.h">
 				</File>
 			</Filter>
 		</Filter>

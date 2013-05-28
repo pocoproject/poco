@@ -6813,6 +6813,10 @@
 					RelativePath=".\include\Poco\Dynamic\VarHolder.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\Poco\Dynamic\VarIterator.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -6823,6 +6827,10 @@
 				</File>
 				<File
 					RelativePath=".\src\VarHolder.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\VarIterator.cpp"
 					>
 				</File>
 			</Filter>

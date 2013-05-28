@@ -116,7 +116,19 @@ bool Array::isNull(unsigned int index) const
 bool Array::isObject(unsigned int index) const
 {
 	Var value = get(index);
+	return isObject(value);
+}
+
+
+bool Array::isObject(const Dynamic::Var& value) const
+{
 	return value.type() == typeid(Object::Ptr);
+}
+
+
+bool Array::isObject(ConstIterator& it) const
+{
+	return it!= end() && isObject(*it);
 }
 
 
@@ -149,6 +161,64 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 		out << ' ';
 
 	out << "]";
+}
+
+
+Array::operator const Poco::Dynamic::Array& () const
+{
+	if (!_pArray)
+	{
+		ValueVec::const_iterator it = _values.begin();
+		ValueVec::const_iterator end = _values.end();
+		_pArray = new Poco::Dynamic::Array;
+		int index = 0;
+		for (; it != end; ++it, ++index)
+		{
+			if (isObject(it))
+			{
+				_pArray->insert(_pArray->end(), Poco::JSON::Object::makeStruct(getObject(index)));
+			}
+			else if (isArray(it))
+			{
+				_pArray->insert(_pArray->end(), makeArray(getArray(index)));
+			}
+			else
+			{
+				_pArray->insert(_pArray->end(), *it);
+			}
+		}
+	}
+
+	return *_pArray;
+}
+
+
+Poco::Dynamic::Array Array::makeArray(const JSON::Array::Ptr& arr)
+{
+	Poco::Dynamic::Array vec;
+
+	JSON::Array::ConstIterator it  = arr->begin();
+	JSON::Array::ConstIterator end = arr->end();
+	int index = 0;
+	for (; it != end; ++it, ++index)
+	{
+		if (arr->isObject(it))
+		{
+			Object::Ptr pObj = arr->getObject(index);
+			DynamicStruct str = Poco::JSON::Object::makeStruct(pObj);
+			vec.insert(vec.end(), str);
+		}
+		else if (arr->isArray(it))
+		{
+			Array::Ptr pArr = arr->getArray(index);
+			std::vector<Poco::Dynamic::Var> v = makeArray(pArr);
+			vec.insert(vec.end(), v);
+		}
+		else
+			vec.insert(vec.end(), *it);
+	}
+
+	return vec;
 }
 
 
