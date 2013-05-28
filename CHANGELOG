@@ -64,7 +64,10 @@ Release 1.5.2 (2013-06-xx)
   already specified
 - fixed GH #65: Poco::format() misorders sign and padding specifiers
 - upgraded bundled SQLite to 3.7.17
-
+- replaced JSON parser with Poco::Web::JSON parser (from sandbox)
+- added JSON conversion to Dynamic Struct and Array
+- added VarIterator
+- modified behavior of empty Var (empty == empty)
 
 Release 1.5.1 (2013-01-11)
 ==========================
