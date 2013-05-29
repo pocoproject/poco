@@ -56,6 +56,14 @@ ParseHandler::~ParseHandler()
 }
 
 
+void ParseHandler::reset()
+{
+	while (!_stack.empty()) _stack.pop();
+	_key = "";
+	_result.empty();
+}
+
+
 void ParseHandler::startObject()
 {
 	Object::Ptr newObj = new Object(_preserveObjectOrder);

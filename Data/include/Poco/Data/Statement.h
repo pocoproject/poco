@@ -81,7 +81,7 @@ class Data_API Statement
 	/// However, calling executAsync() on a synchronous statement shall execute 
 	/// asynchronously but without altering the underlying statement's synchronous nature.
 	///
-	/// Once asyncronous, a statement can be reverted back to synchronous state in two ways:
+	/// Once asynchronous, a statement can be reverted back to synchronous state in two ways:
 	/// 
 	///   1) By calling setAsync(false)
 	///   2) By means of 'sync' or 'reset' manipulators

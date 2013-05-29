@@ -60,6 +60,9 @@ public:
 	virtual ~ParseHandler();
 		/// Destroys the ParseHandler.
 
+	virtual void reset();
+		/// Resets the handler state.
+		
 	void startObject();
 		/// Handles a '{'; a new object is started.
 
@@ -75,7 +78,7 @@ public:
 	void key(const std::string& k);
 		/// A key is read
 
-	Dynamic::Var result() const;
+	Dynamic::Var asVar() const;
 		/// Returns the result of the parser (an object or an array).
 
 	virtual void value(int v);
@@ -117,7 +120,7 @@ private:
 };
 
 
-inline Dynamic::Var ParseHandler::result() const
+inline Dynamic::Var ParseHandler::asVar() const
 {
 	return _result;
 }
@@ -172,6 +175,10 @@ inline void ParseHandler::null()
 	Poco::Dynamic::Var empty;
 	setValue(empty);
 }
+
+
+typedef ParseHandler ParseHandler;
+//@ deprecated
 
 
 }} // namespace Poco::JSON

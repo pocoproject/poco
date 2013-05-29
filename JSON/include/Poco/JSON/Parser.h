@@ -35,6 +35,29 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+/*
+Copyright (c) 2005 JSON.org
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+The Software shall be used for Good, not Evil.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
 #ifndef JSON_JSONParser_INCLUDED
 #define JSON_JSONParser_INCLUDED
@@ -46,26 +69,186 @@
 #include "Poco/JSON/ParseHandler.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/StreamTokenizer.h"
-#include <istream>
-#include <sstream>
 
 
 namespace Poco {
 namespace JSON {
 
 
+class Source;
+
+
 class JSON_API Parser
-	/// A class for passing JSON strings or streams.
+	/// A RFC 4627 compatible class for parsing JSON strings or streams.
+	/// 
+	/// See http://www.ietf.org/rfc/rfc4627.txt for specification.
+	/// 
+	/// Usage example:
+	/// 
+	///    std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ] }";
+	///    Parser parser;
+	///    Var result = parser.parse(json);
+	///    // ... use result
+	///    parser.reset();
+	///    std::ostringstream ostr;
+	///    PrintHandler::Ptr pHandler = new PrintHandler(ostr);
+	///    parser.setHandler(pHandler);
+	///    parser.parse(json); // ostr.str() == json
+	/// 
 {
 public:
 
-	Parser(const Handler::Ptr& pHandler = new ParseHandler);
+	enum Classes
+	{
+		C_SPACE,  /* space */
+		C_WHITE,  /* other whitespace */
+		C_LCURB,  /* {  */
+		C_RCURB,  /* } */
+		C_LSQRB,  /* [ */
+		C_RSQRB,  /* ] */
+		C_COLON,  /* : */
+		C_COMMA,  /* , */
+		C_QUOTE,  /* " */
+		C_BACKS,  /* \ */
+		C_SLASH,  /* / */
+		C_PLUS,   /* + */
+		C_MINUS,  /* - */
+		C_POINT,  /* . */
+		C_ZERO ,  /* 0 */
+		C_DIGIT,  /* 123456789 */
+		C_LOW_A,  /* a */
+		C_LOW_B,  /* b */
+		C_LOW_C,  /* c */
+		C_LOW_D,  /* d */
+		C_LOW_E,  /* e */
+		C_LOW_F,  /* f */
+		C_LOW_L,  /* l */
+		C_LOW_N,  /* n */
+		C_LOW_R,  /* r */
+		C_LOW_S,  /* s */
+		C_LOW_T,  /* t */
+		C_LOW_U,  /* u */
+		C_ABCDF,  /* ABCDF */
+		C_E,      /* E */
+		C_ETC,    /* everything else */
+		C_STAR,   /* * */   
+		NR_CLASSES
+	};
+	
+	enum States
+		/// State codes
+	{
+		GO,  /* start    */
+		OK,  /* ok       */
+		OB,  /* object   */
+		KE,  /* key      */
+		CO,  /* colon    */
+		VA,  /* value    */
+		AR,  /* array    */
+		ST,  /* string   */
+		ES,  /* escape   */
+		U1,  /* u1       */
+		U2,  /* u2       */
+		U3,  /* u3       */
+		U4,  /* u4       */
+		MI,  /* minus    */
+		ZE,  /* zero     */
+		IT,  /* integer  */
+		FR,  /* fraction */
+		E1,  /* e        */
+		E2,  /* ex       */
+		E3,  /* exp      */
+		T1,  /* tr       */
+		T2,  /* tru      */
+		T3,  /* true     */
+		F1,  /* fa       */
+		F2,  /* fal      */
+		F3,  /* fals     */
+		F4,  /* false    */
+		N1,  /* nu       */
+		N2,  /* nul      */
+		N3,  /* null     */
+		C1,  /* /        */
+		C2,  /* / *     */
+		C3,  /* *        */
+		FX,  /* *.* *eE* */
+		D1,  /* second UTF-16 character decoding started by \ */
+		D2,  /* second UTF-16 character proceeded by u */
+		NR_STATES
+	};
+
+	enum Modes
+		/// Modes that can be pushed on the _pStack.
+	{
+		MODE_ARRAY = 1,
+		MODE_DONE = 2,
+		MODE_KEY = 3,
+		MODE_OBJECT = 4
+	};
+
+	enum Actions
+	{
+		CB = -10, /* _comment begin */
+		CE = -11, /* _comment end */
+		FA = -12, /* 0 */
+		TR = -13, /* 0 */
+		NU = -14, /* null */
+		DE = -15, /* double detected by exponent e E */
+		DF = -16, /* double detected by fraction . */
+		SB = -17, /* string begin */
+		MX = -18, /* integer detected by minus */
+		ZX = -19, /* integer detected by zero */
+		IX = -20, /* integer detected by 1-9 */
+		EX = -21, /* next char is _escaped */
+		UC = -22  /* Unicode character read */
+	};
+	
+	enum JSONType
+	{
+		JSON_T_NONE = 0,
+		JSON_T_INTEGER,
+		JSON_T_FLOAT,
+		JSON_T_NULL,
+		JSON_T_TRUE,
+		JSON_T_FALSE,
+		JSON_T_STRING,
+		JSON_T_MAX
+	};
+	
+	static const std::size_t JSON_PARSE_BUFFER_SIZE = 4096;
+	static const std::size_t JSON_PARSER_STACK_SIZE = 128;
+	static const int         JSON_UNLIMITED_DEPTH = -1;
+
+	Parser(const Handler::Ptr& pHandler = new ParseHandler, std::size_t bufSize = JSON_PARSE_BUFFER_SIZE);
 		/// Constructor.
 
 	virtual ~Parser();
 		/// Destructor.
 
-	Dynamic::Var parse(const std::string& source);
+	void reset();
+		/// Resets the parser.
+
+	void setAllowComments(bool comments);
+		/// Allow comments. By default, comments are not allowed.
+
+	bool getAllowComments() const;
+		/// Returns true if comments are allowed, false otherwise.
+		/// By default, comments are not allowed.
+		
+	void setAllowNullByte(bool nullByte);
+		/// Allow null byte in strings. By default, null byte is allowed.
+
+	bool getAllowNullByte() const;
+		/// Returns true if null byte is allowed, false otherwise.
+		/// By default, null bytes are allowed.
+
+	void setDepth(std::size_t depth);
+		/// Sets the allowed JSON depth.
+
+	std::size_t getDepth() const;
+		/// Returns the allowed JSON depth.
+
+	Dynamic::Var parse(const std::string& json);
 		/// Parses a string.
 
 	Dynamic::Var parse(std::istream& in);
@@ -77,37 +260,113 @@ public:
 	const Handler::Ptr& getHandler();
 		/// Returns the handler.
 
-	Dynamic::Var result() const;
+	Dynamic::Var asVar() const;
 		/// Returns the result of parsing;
 
+	Dynamic::Var result() const;
+		/// Returns the result of parsing as Dynamic::Var;
+
 private:
-	const Token* nextToken();
-		/// Returns the next token.
+	Parser(const Parser&);
+	Parser& operator = (const Parser&);
 
-	void readObject();
-		/// Starts reading an object.
+	typedef Poco::Buffer<char> BufType;
 
-	void readArray();
-		/// Starts reading an array.
+	bool push(int mode);
+		/// Push a mode onto the _pStack. Return false if there is overflow.
 
-	bool readRow(bool firstCall = false);
-		/// Reads a property value pair. Returns true when a next row is expected.
+	bool pop(int mode);
+		/// Pops the stack, assuring that the current mode matches the expectation.
+		/// Returns false if there is underflow or if the modes mismatch.
 
-	void readValue(const Token* token);
-		/// Read a value from the token.
+	void growBuffer();
 
-	bool readElements(bool firstCall = false);
-		/// Read all elements of an array.
+	void clearBuffer();
 
-	StreamTokenizer _tokenizer;
-	Handler::Ptr    _pHandler;
+	void parseBufferPushBackChar(char c);
+
+	void parseBufferPopBackChar();
+
+	void addCharToParseBuffer(int nextChar, int nextClass);
+
+	void addEscapedCharToParseBuffer(int nextChar);
+
+	int decodeUnicodeChar();
+
+	void assertNotStringNullBool();
+
+	void assertNonContainer();
+
+	void parseBuffer();
+
+	bool parseChar(int nextChar, Source& feeder);
+		/// Called for each character (or partial character) in JSON string.
+		/// It accepts UTF-8, UTF-16, or UTF-32. If the character is accepted,
+		/// it returns true, otherwise false.
+
+	bool done();
+
+	static int utf8_check_first(char byte);
+
+	static const int _asciiClass[128];
+		/// This array maps the 128 ASCII characters into character classes.
+		/// The remaining Unicode characters should be mapped to C_ETC.
+		/// Non-whitespace control characters are errors.
+
+	static const int _stateTransitionTable[NR_STATES][NR_CLASSES];
+	static const int xx = -1;
+
+	Handler::Ptr   _pHandler;
+	signed char    _state;
+	signed char    _beforeCommentState;
+	JSONType       _type;
+	signed char    _escaped;
+	signed char    _comment;
+	unsigned short _utf16HighSurrogate;
+	int            _depth;
+	int            _top;
+	BufType        _stack;
+	BufType        _parseBuffer;
+	std::size_t    _parseBufferCount;
+	char           _decimalPoint;
+	bool           _allowNullByte;
+	bool           _allowComments;
 };
 
 
-inline Dynamic::Var Parser::parse(const std::string& source)
+inline void Parser::setAllowComments(bool comments)
 {
-	std::istringstream is(source);
-	return parse(is);
+	_allowComments = comments;
+}
+
+
+inline bool Parser::getAllowComments() const
+{
+	return _allowComments;
+}
+
+
+inline void Parser::setAllowNullByte(bool nullByte)
+{
+	_allowNullByte = nullByte;
+}
+
+
+inline bool Parser::getAllowNullByte() const
+{
+	return _allowNullByte;
+}
+
+
+inline void Parser::setDepth(std::size_t depth)
+{
+	_depth = depth;
+}
+
+
+inline std::size_t Parser::getDepth() const
+{
+	return _depth;
 }
 
 
@@ -125,7 +384,45 @@ inline const Handler::Ptr& Parser::getHandler()
 
 inline Dynamic::Var Parser::result() const
 {
-	return _pHandler->result();
+	return _pHandler->asVar();
+}
+
+
+inline Dynamic::Var Parser::asVar() const
+{
+	return _pHandler->asVar();
+}
+
+
+inline bool Parser::done()
+{
+	return _state == OK && pop(MODE_DONE);
+}
+
+
+inline void Parser::assertNotStringNullBool()
+{
+	poco_assert(_type != JSON_T_FALSE &&
+		_type != JSON_T_TRUE &&
+		_type != JSON_T_NULL &&
+		_type != JSON_T_STRING);
+}
+
+
+inline void Parser::assertNonContainer()
+{
+	poco_assert(_type == JSON_T_NULL ||
+		_type == JSON_T_FALSE ||
+		_type == JSON_T_TRUE ||
+		_type == JSON_T_FLOAT ||
+		_type == JSON_T_INTEGER ||
+		_type == JSON_T_STRING);
+}
+
+
+inline void Parser::growBuffer()
+{
+	_parseBuffer.resize(_parseBuffer.size() * 2, true);
 }
 
 

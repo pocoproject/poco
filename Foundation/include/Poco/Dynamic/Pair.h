@@ -73,13 +73,13 @@ public:
 	}
 
 	template <typename T>
-	Pair(const std::pair<K, T>& val): _data(std::make_pair(val.first, Var(val.second)))
+	Pair(const std::pair<K, T>& val): _data(std::make_pair(val.first, val.second))
 		/// Creates Pair form standard pair.
 	{
 	}
 
 	template <typename T>
-	Pair(const K& first, const T& second): _data(std::make_pair(first, Var(second)))
+	Pair(const K& first, const T& second): _data(std::make_pair(first, second))
 		/// Creates pair from two values.
 	{
 	}
@@ -90,15 +90,10 @@ public:
 	}
 
 	Pair& swap(Pair& other)
-
 		/// Swaps the content of the two Pairs.
-
 	{
-
 		std::swap(_data, other._data);
-
 		return *this;
-
 	}
 
 	Pair& operator = (const Pair& other)
@@ -215,9 +210,9 @@ public:
 		// JSON format definition: { string ':' value } string:value pair n-times, sep. by ','
 		val.append("{ ");
 		Var key(_val.first());
-		appendJSONKey(val, key);
+		Impl::appendJSONKey(val, key);
 		val.append(" : ");
-		appendJSONValue(val, _val.second());
+		Impl::appendJSONValue(val, _val.second());
 		val.append(" }");	
 	}
 
@@ -364,9 +359,9 @@ public:
 		// JSON format definition: { string ':' value } string:value pair n-times, sep. by ','
 		val.append("{ ");
 		Var key(_val.first());
-		appendJSONKey(val, key);
+		Impl::appendJSONKey(val, key);
 		val.append(" : ");
-		appendJSONValue(val, _val.second());
+		Impl::appendJSONValue(val, _val.second());
 		val.append(" }");	
 	}
 

@@ -46,7 +46,8 @@ namespace JSON {
 PrintHandler::PrintHandler(unsigned indent):
 	_out(std::cout),
 	_indent(indent),
-	_array(false)
+	_array(false),
+	_value(false)
 {
 }
 
@@ -54,13 +55,23 @@ PrintHandler::PrintHandler(unsigned indent):
 PrintHandler::PrintHandler(std::ostream& out, unsigned indent):
 	_out(out),
 	_indent(indent),
-	_array(false)
+	_array(false),
+	_value(false)
 {
 }
 
 
 PrintHandler::~PrintHandler()
 {
+}
+
+
+void PrintHandler::reset()
+{
+	_out.flush();
+	_tab = "";
+	_array = false;
+	_value = false;
 }
 
 
@@ -107,6 +118,7 @@ void PrintHandler::startArray()
 	_out << '[' << endLine();
 	_tab.append(indent(), ' ');
 	_array = true;
+	_value = false;
 }
 
 
@@ -115,11 +127,17 @@ void PrintHandler::endArray()
 	_tab.erase(_tab.length() - indent());
 	_out << endLine() << _tab << ']';
 	_array = false;
+	_value = false;
 }
 
 
 void PrintHandler::key(const std::string& k)
 {
+	if (_value)
+	{
+		comma();
+		_value = false;
+	}
 	_out << _tab << '"' << k << '"';
 	if (!printFlat()) _out << ' ';
 	_out << ':';
@@ -129,66 +147,84 @@ void PrintHandler::key(const std::string& k)
 
 void PrintHandler::null()
 {
-	if (_array) _out << _tab;
+	arrayValue();
 	_out << "null";
+	_value = true;
 }
 
 
 void PrintHandler::value(int v)
 {
-	if (_array) _out << _tab;
+	arrayValue();
 	_out << v;
+	_value = true;
 }
 
 
 void PrintHandler::value(unsigned v)
 {
-	if (_array) _out << _tab;
+	arrayValue();
 	_out << v;
+	_value = true;
 }
 
 
 #if defined(POCO_HAVE_INT64)
 void PrintHandler::value(Int64 v)
 {
-	if (_array) _out << _tab;
+	arrayValue();
 	_out << v;
+	_value = true;
 }
 
 
 void PrintHandler::value(UInt64 v)
 {
-	if (_array) _out << _tab;
+	arrayValue();
 	_out << v;
+	_value = true;
 }
 #endif
 
 
 void PrintHandler::value(const std::string& value)
 {
-	if (_array) _out << _tab;
+	arrayValue();
 	Stringifier::formatString(value, _out);
+	_value = true;
 }
 
 
 
 void PrintHandler::value(double d)
 {
-	if (_array) _out << _tab;
+	arrayValue();
 	_out << d;
+	_value = true;
 }
 
 
 void PrintHandler::value(bool b)
 {
-	if (_array) _out << _tab;
+	arrayValue();
 	_out << b;
+	_value = true;
 }
 
 
 void PrintHandler::comma()
 {
 	_out << ',' << endLine();
+}
+
+
+void PrintHandler::arrayValue()
+{
+	if (_array)
+	{
+		if (_value) comma();
+		_out << _tab;
+	}
 }
 
 

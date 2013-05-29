@@ -24,6 +24,9 @@
 
 #include "ascii.h"
 #include "Poco/XML/expat.h"
+#if defined(_WIN32_WCE)
+#include <windows.h>
+#endif
 
 #ifdef XML_UNICODE
 #define XML_ENCODE_MAX XML_UTF16_ENCODE_MAX
@@ -693,7 +696,11 @@ static const XML_Char implicitContext[] = {
 static unsigned long
 generate_hash_secret_salt(void)
 {
+#if defined(_WIN32_WCE)
+  unsigned int seed = GetTickCount();
+#else
   unsigned int seed = time(NULL) % UINT_MAX;
+#endif
   srand(seed);
   return rand();
 }

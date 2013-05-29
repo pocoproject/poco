@@ -118,7 +118,19 @@ void HTTPRequest::setHost(const std::string& host)
 	
 void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 {
-	std::string value(host);
+	std::string value;
+	if (host.find(':') != std::string::npos)
+	{
+		// IPv6 address
+		value.append("[");
+		value.append(host);
+		value.append("]");
+	}
+	else
+	{
+		value.append(host);
+	}
+		
 	if (port != 80 && port != 443)
 	{
 		value.append(":");

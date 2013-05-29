@@ -162,7 +162,9 @@ SocketAddress::~SocketAddress()
 bool SocketAddress::operator < (const SocketAddress& socketAddress) const
 {
 	if (family() < socketAddress.family()) return true;
+	if (family() > socketAddress.family()) return false;
 	if (host() < socketAddress.host()) return true;
+	if (host() > socketAddress.host()) return false;
 	return (port() < socketAddress.port());
 }
 

@@ -68,6 +68,9 @@ public:
 	~PrintHandler();
 		/// Destroys the PrintHandler.
 
+	void reset();
+		/// Resets the handler state.
+
 	void startObject();
 		/// The parser has read a '{'; a new object is started.
 		/// If indent is greater than zero, a newline will be apended.
@@ -125,11 +128,13 @@ private:
 	const char* endLine() const;
 	unsigned indent();
 	bool printFlat() const;
+	void arrayValue();
 
 	std::ostream& _out;
 	unsigned      _indent;
 	std::string   _tab;
 	bool          _array;
+	bool          _value;
 };
 
 

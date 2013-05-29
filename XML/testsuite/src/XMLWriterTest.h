@@ -1,7 +1,7 @@
 //
 // XMLWriterTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/XMLWriterTest.h#1 $
+// $Id: //poco/1.4/XML/testsuite/src/XMLWriterTest.h#2 $
 //
 // Definition of the XMLWriterTest class.
 //
@@ -54,6 +54,7 @@ public:
 	void testTrivialFragmentPretty();
 	void testDTDPretty();
 	void testDTD();
+	void testDTDPublic();
 	void testDTDNotation();
 	void testDTDEntity();
 	void testAttributes();

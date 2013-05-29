@@ -43,6 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/VarHolder.h"
+#include "Poco/SharedPtr.h"
 #include <map>
 #include <set>
 
@@ -63,6 +64,7 @@ public:
 	typedef typename Struct<K>::Data::value_type ValueType;
 	typedef typename Struct<K>::Data::size_type SizeType;
 	typedef typename std::pair<typename Struct<K>::Iterator, bool> InsRetVal;
+	typedef typename Poco::SharedPtr<Struct<K> > Ptr;
 
 	Struct(): _data()
 		/// Creates an empty Struct
@@ -148,7 +150,8 @@ public:
 		return _data.begin();
 	}
 
-	inline InsRetVal insert(const K& key, const Var& value)
+	template <typename T>
+	inline InsRetVal insert(const K& key, const T& value)
 		/// Inserts a <name, Var> pair into the Struct,
 		/// returns a pair containing the iterator and a boolean which
 		/// indicates success or not (is true, when insert succeeded, false,
@@ -156,7 +159,7 @@ public:
 		/// points to that other element)
 	{
 		// fix: SunPro C++ is silly ...
-		ValueType valueType(key,value);
+		ValueType valueType(key, value);
 		return insert(valueType);
 	}
 
@@ -301,18 +304,18 @@ public:
 		if (!_val.empty())
 		{
 			Var key(it->first);
-			appendJSONKey(val, key);
+			Impl::appendJSONKey(val, key);
 			val.append(" : ");
-			appendJSONValue(val, it->second);
+			Impl::appendJSONValue(val, it->second);
 			++it;
 		}
 		for (; it != itEnd; ++it)
 		{
 			val.append(", ");
 			Var key(it->first);
-			appendJSONKey(val, key);
+			Impl::appendJSONKey(val, key);
 			val.append(" : ");
-			appendJSONValue(val, it->second);
+			Impl::appendJSONValue(val, it->second);
 		}
 		val.append(" }");
 	}
@@ -370,6 +373,11 @@ public:
 	bool isString() const
 	{
 		return false;
+	}
+	
+	std::size_t size() const
+	{
+		return _val.size();
 	}
 
 	Var& operator [] (const std::string& name)
@@ -472,18 +480,18 @@ public:
 		if (!_val.empty())
 		{
 			Var key(it->first);
-			appendJSONKey(val, key);
+			Impl::appendJSONKey(val, key);
 			val.append(" : ");
-			appendJSONValue(val, it->second);
+			Impl::appendJSONValue(val, it->second);
 			++it;
 		}
 		for (; it != itEnd; ++it)
 		{
 			val.append(", ");
 			Var key(it->first);
-			appendJSONKey(val, key);
+			Impl::appendJSONKey(val, key);
 			val.append(" : ");
-			appendJSONValue(val, it->second);
+			Impl::appendJSONValue(val, it->second);
 		}
 		val.append(" }");	
 	}
@@ -543,6 +551,11 @@ public:
 		return false;
 	}
 
+	std::size_t size() const
+	{
+		return _val.size();
+	}
+
 	Var& operator [] (int name)
 	{
 		return _val[name];
@@ -561,7 +574,6 @@ private:
 } // namespace Dynamic
 
 
-//@ deprecated
 typedef Dynamic::Struct<std::string> DynamicStruct;
 
 

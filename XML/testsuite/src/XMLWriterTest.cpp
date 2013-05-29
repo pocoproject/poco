@@ -1,7 +1,7 @@
 //
 // XMLWriterTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/XMLWriterTest.cpp#3 $
+// $Id: //poco/1.4/XML/testsuite/src/XMLWriterTest.cpp#4 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -165,6 +165,24 @@ void XMLWriterTest::testDTD()
 	std::string xml = str.str();
 	assert (xml == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 	               "<!DOCTYPE test SYSTEM \"http://www.appinf.com/DTDs/test\">"
+	               "<foo/>");
+}
+
+
+void XMLWriterTest::testDTDPublic()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::WRITE_XML_DECLARATION);
+	writer.setNewLine("\n");
+	writer.startDocument();
+	writer.startDTD("test", "test", "http://www.appinf.com/DTDs/test");
+	writer.endDTD();
+	writer.startElement("", "", "foo");
+	writer.endElement("", "", "foo");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+	               "<!DOCTYPE test PUBLIC \"test\" \"http://www.appinf.com/DTDs/test\">"
 	               "<foo/>");
 }
 
@@ -621,6 +639,7 @@ CppUnit::Test* XMLWriterTest::suite()
 	CppUnit_addTest(pSuite, XMLWriterTest, testTrivialFragmentPretty);
 	CppUnit_addTest(pSuite, XMLWriterTest, testDTDPretty);
 	CppUnit_addTest(pSuite, XMLWriterTest, testDTD);
+	CppUnit_addTest(pSuite, XMLWriterTest, testDTDPublic);
 	CppUnit_addTest(pSuite, XMLWriterTest, testDTDNotation);
 	CppUnit_addTest(pSuite, XMLWriterTest, testDTDEntity);
 	CppUnit_addTest(pSuite, XMLWriterTest, testAttributes);

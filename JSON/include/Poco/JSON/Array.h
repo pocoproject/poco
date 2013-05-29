@@ -55,9 +55,34 @@ class Object;
 
 
 class JSON_API Array
+	/// Represents a JSON array. JSON array provides a representation
+	/// based on shared pointers and optimized for performance. It is possible to 
+	/// convert object to Poco::Dynamic::Array. Conversion requires copying and therefore
+	/// has performance penalty; the benefit is in improved syntax, eg:
+	/// 
+	///    // use pointers to avoid copying
+	///    using namespace Poco::JSON;
+	///    std::string json = "[ {\"test\" : 0}, { \"test1\" : [1, 2, 3], \"test2\" : 4 } ]";
+	///    Parser parser;
+	///    Var result = parser.parse(json);
+	///    Array::Ptr arr = result.extract<Array::Ptr>();
+	///    Object::Ptr object = arr->getObject(0); // object == {\"test\" : 0}
+	///    int i = object->getValue<int>("test"); // i == 0;
+	///    Object::Ptr subObject = *arr->getObject(1); // subObject == {\"test\" : 0}
+	///    Array subArr::Ptr = subObject->getArray("test1"); // subArr == [1, 2, 3]
+	///    i = result = subArr->get(0); // i == 1;
+	/// 
+	///    // copy/convert to Poco::Dynamic::Array
+	///    Poco::Dynamic::Array da = *arr;
+	///    i = da[0]["test"];     // i == 0
+	///    i = da[1]["test1"][1]; // i == 2
+	///    i = da[1]["test2"];    // i == 4
+	/// 
 {
 public:
-	typedef std::vector<Dynamic::Var> ValueVec;
+	typedef std::vector<Dynamic::Var>                 ValueVec;
+	typedef std::vector<Dynamic::Var>::iterator       Iterator;
+	typedef std::vector<Dynamic::Var>::const_iterator ConstIterator;
 	typedef SharedPtr<Array> Ptr;
 
 	Array();
@@ -105,11 +130,23 @@ public:
 	bool isArray(unsigned int index) const;
 		/// Returns true when the element is an array
 
+	bool isArray(const Dynamic::Var& value) const;
+		/// Returns true when the element is an array
+
+	bool isArray(ConstIterator& value) const;
+		/// Returns true when the element is an array
+
 	bool isNull(unsigned int index) const;
 		/// Returns true when the element is null or
 		/// when the element doesn't exist.
 
 	bool isObject(unsigned int index) const;
+		/// Returns true when the element is an object
+
+	bool isObject(const Dynamic::Var& value) const;
+		/// Returns true when the element is an object
+
+	bool isObject(ConstIterator& value) const;
 		/// Returns true when the element is an object
 
 	template<typename T>
@@ -144,8 +181,16 @@ public:
 	void remove(unsigned int index);
 		/// Removes the element on the given index.
 
+	operator const Poco::Dynamic::Array& () const;
+
+	static Poco::Dynamic::Array makeArray(const JSON::Array::Ptr& arr);
+		/// Utility function for creation of array.
+
 private:
-	ValueVec _values;
+	typedef SharedPtr<Poco::Dynamic::Array> ArrayPtr;
+
+	ValueVec         _values;
+	mutable ArrayPtr _pArray;
 };
 
 
@@ -171,7 +216,19 @@ inline std::size_t Array::size() const
 inline bool Array::isArray(unsigned int index) const
 {
 	Dynamic::Var value = get(index);
+	return isArray(value);
+}
+
+
+inline bool Array::isArray(const Dynamic::Var& value) const
+{
 	return value.type() == typeid(Array::Ptr);
+}
+
+
+inline bool Array::isArray(ConstIterator& it) const
+{
+	return it!= end() && isArray(*it);
 }
 
 

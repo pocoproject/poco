@@ -45,6 +45,7 @@
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
+#include "Poco/Dynamic/Struct.h"
 #include <map>
 #include <vector>
 #include <deque>
@@ -57,10 +58,33 @@ namespace JSON {
 
 
 class JSON_API Object
-	/// Represents a JSON object.
+	/// Represents a JSON object. JSON object provides a representation
+	/// based on shared pointers and optimized for performance. It is possible to 
+	/// convert object to DynamicStruct. Conversion requires copying and therefore
+	/// has performance penalty; the benefit is in improved syntax, eg:
+	/// 
+	///    std::string json = "{ \"test\" : { \"property\" : \"value\" } }";
+	///    Parser parser;
+	///    Var result = parser.parse(json);
+	/// 
+	///    // use pointers to avoid copying
+	///    Object::Ptr object = result.extract<Object::Ptr>();
+	///    Var test = object->get("test"); // holds { "property" : "value" }
+	///    Object::Ptr subObject = test.extract<Object::Ptr>();
+	///    test = subObject->get("property");
+	///    std::string val = test.toString(); // val holds "value"
+	/// 
+	///    // copy/convert to Poco::DynamicStruct
+	///    Poco::DynamicStruct ds = *object;
+	///    val = ds["test"]["property"]; // val holds "value"
+	/// 
 {
 public:
-	typedef SharedPtr<Object> Ptr;
+	typedef SharedPtr<Object>                   Ptr;
+	typedef std::map<std::string, Dynamic::Var> ValueMap;
+	typedef ValueMap::value_type                ValueType;
+	typedef ValueMap::iterator                  Iterator;
+	typedef ValueMap::const_iterator            ConstIterator;
 
 	Object(bool preserveInsertionOrder = false);
 		/// Default constructor. If preserveInsertionOrder, object
@@ -68,10 +92,31 @@ public:
 		/// will be sorted by keys.
 
 	Object(const Object& copy);
-		/// Copy constructor
+		/// Copy constructor. Struct is not copied to keep the operation as
+		/// efficient as possible (when needed, it will be generated upon request).
 
 	virtual ~Object();
-		/// Destructor
+		/// Destroys Object.
+
+	Iterator begin()
+	{
+		return _values.begin();
+	}
+
+	ConstIterator begin() const
+	{
+		return _values.begin();
+	}
+
+	Iterator end()
+	{
+		return _values.end();
+	}
+
+	ConstIterator end() const
+	{
+		return _values.end();
+	}
 
 	Dynamic::Var get(const std::string& key) const;
 		/// Retrieves a property. An empty value is
@@ -108,10 +153,16 @@ public:
 	bool isArray(const std::string& key) const;
 		/// Returns true when the given property contains an array
 
+	bool isArray(ConstIterator& it) const;
+		/// Returns true when the given property contains an array
+
 	bool isNull(const std::string& key) const;
 		/// Returns true when the given property contains a null value
 
 	bool isObject(const std::string& key) const;
+		/// Returns true when the given property contains an object
+
+	bool isObject(ConstIterator& it) const;
 		/// Returns true when the given property contains an object
 
 	template<typename T>
@@ -149,8 +200,13 @@ public:
 	void remove(const std::string& key);
 		/// Removes the property with the given key
 
-private:
+	static Poco::DynamicStruct makeStruct(const Object::Ptr& obj);
+		/// Utility function for creation of struct.
 
+	operator const Poco::DynamicStruct& () const;
+		/// Cast operator to Poco::DynamiStruct.
+
+private:
 	template <typename C>
 	void doStringify(const C& container, std::ostream& out, unsigned int indent, int step) const
 	{
@@ -182,17 +238,18 @@ private:
 		out << '}';
 	}
 
-	typedef std::map<std::string, Dynamic::Var> ValueMap;
-	typedef std::deque<Dynamic::Var*> KeyPtrList;
+	typedef std::deque<Dynamic::Var*>                   KeyPtrList;
+	typedef Poco::DynamicStruct::Ptr                    StructPtr;
 
 	const std::string& getKey(ValueMap::const_iterator& it) const;
 	const Dynamic::Var& getValue(ValueMap::const_iterator& it) const;
 	const std::string& getKey(KeyPtrList::const_iterator& it) const;
 	const Dynamic::Var& getValue(KeyPtrList::const_iterator& it) const;
 
-	ValueMap   _values;
-	KeyPtrList _keys;
-	bool       _preserveInsOrder;
+	ValueMap          _values;
+	KeyPtrList        _keys;
+	bool              _preserveInsOrder;
+	mutable StructPtr _pStruct;
 };
 
 
@@ -206,6 +263,12 @@ inline bool Object::has(const std::string& key) const
 inline bool Object::isArray(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
+	return isArray(it);
+}
+
+
+inline bool Object::isArray(ConstIterator& it) const
+{
 	return it != _values.end() && it->second.type() == typeid(Array::Ptr);
 }
 
@@ -220,6 +283,12 @@ inline bool Object::isNull(const std::string& key) const
 inline bool Object::isObject(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
+	return isObject(it);
+}
+
+
+inline bool Object::isObject(ConstIterator& it) const
+{
 	return it != _values.end() && it->second.type() == typeid(Object::Ptr);
 }
 

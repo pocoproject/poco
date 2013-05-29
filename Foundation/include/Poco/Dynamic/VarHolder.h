@@ -53,6 +53,8 @@
 #include "Poco/Any.h"
 #include "Poco/Exception.h"
 #include <vector>
+#include <list>
+#include <deque>
 #include <typeinfo>
 #undef min
 #undef max
@@ -64,6 +66,9 @@ namespace Dynamic {
 
 
 class Var;
+
+
+namespace Impl {
 
 
 bool Foundation_API isJSONString(const Var& any);
@@ -86,6 +91,35 @@ void Foundation_API appendJSONValue(std::string& val, const Var& any);
 	/// and appends it to val
 
 
+template <typename C>
+void containerToJSON(C& cont, std::string& val)
+{
+	// Serialize in JSON format. Note: although this is a vector<T>, the code only 
+	// supports vector<Var>. Total specialization is not possible
+	// because of the cyclic dependency between Var and VarHolder
+
+	// JSON format definition: [ n times: elem ',' ], no ',' for last elem
+	val.append("[ ");
+	typename C::const_iterator it = cont.begin();
+	typename C::const_iterator itEnd = cont.end();
+	if (!cont.empty())
+	{
+		appendJSONValue(val, *it);
+		++it;
+	}
+	for (; it != itEnd; ++it)
+	{
+		
+		val.append(", ");
+		appendJSONValue(val, *it);
+	}
+	val.append(" ]");
+}
+
+
+} // namespace Impl
+
+
 class Foundation_API VarHolder
 	/// Interface for a data holder used by the Var class. 
 	/// Provides methods to convert between data types.
@@ -103,6 +137,8 @@ class Foundation_API VarHolder
 	/// throw BadCastException.
 {
 public:
+	typedef Var ArrayValueType;
+
 	virtual ~VarHolder();
 		/// Destroys the VarHolder.
 
@@ -193,6 +229,17 @@ public:
 		/// specialization in order to suport the conversion.
 
 	virtual bool isArray() const;
+		/// Returns true.
+
+	virtual bool isVector() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
+	virtual bool isList() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
+	virtual bool isDeque() const;
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to suport the diagnostic.
 
@@ -215,6 +262,9 @@ public:
 	virtual bool isString() const;
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to suport the diagnostic.
+
+	virtual std::size_t size() const;
+		/// Returns 1 iff Var is not empty or this function overriden.
 
 protected:
 	VarHolder();
@@ -505,6 +555,24 @@ inline void VarHolder::convert(std::string& /*val*/) const
 
 inline bool VarHolder::isArray() const
 {
+	return true;
+}
+
+
+inline bool VarHolder::isVector() const
+{
+	return false;
+}
+
+
+inline bool VarHolder::isList() const
+{
+	return false;
+}
+
+
+inline bool VarHolder::isDeque() const
+{
 	return false;
 }
 
@@ -535,6 +603,11 @@ inline bool VarHolder::isNumeric() const
 inline bool VarHolder::isString() const
 {
 	return false;
+}
+
+inline std::size_t VarHolder::size() const
+{
+	return 1u;
 }
 
 
@@ -2226,8 +2299,8 @@ private:
 };
 
 
-template <>
-class VarHolderImpl<std::string>: public VarHolder
+template <typename T>
+class VarHolderImpl<std::basic_string<T> >: public VarHolder
 {
 public:
 	VarHolderImpl(const char* pVal): _val(pVal)
@@ -2366,34 +2439,28 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
-	{
-		return false;
-	}
-
-	bool isStruct() const
-	{
-		return false;
-	}
-
-	bool isInteger() const
-	{
-		return false;
-	}
-
-	bool isSigned() const
-	{
-		return false;
-	}
-
-	bool isNumeric() const
-	{
-		return false;
-	}
-
 	bool isString() const
 	{
 		return true;
+	}
+
+	std::size_t size() const
+	{
+		return _val.length();
+	}
+
+	T& operator[](std::string::size_type n)
+	{
+		if (n < size()) return _val.operator[](n);
+
+		throw RangeException("String index out of range");
+	}
+
+	const T& operator[](std::string::size_type n) const
+	{
+		if (n < size()) return _val.operator[](n);
+
+		throw RangeException("String index out of range");
 	}
 
 private:
@@ -2401,7 +2468,7 @@ private:
 	VarHolderImpl(const VarHolderImpl&);
 	VarHolderImpl& operator = (const VarHolderImpl&);
 
-	std::string _val;
+	std::basic_string<T> _val;
 };
 
 
@@ -2696,26 +2763,7 @@ public:
 
 	void convert(std::string& val) const
 	{
-		// Serialize in JSON format: note: although this is a vector<T>, the code only 
-		// supports vector<Var>. Total specialization is not possible
-		// because of the cyclic dependency between Var and VarHolder
-
-		// JSON format definition: [ n times: elem ',' ], no ',' for last elem
-		val.append("[ ");
-		typename std::vector<T>::const_iterator it = _val.begin();
-		typename std::vector<T>::const_iterator itEnd = _val.end();
-		if (!_val.empty())
-		{
-			appendJSONValue(val, *it);
-			++it;
-		}
-		for (; it != itEnd; ++it)
-		{
-			
-			val.append(", ");
-			appendJSONValue(val, *it);
-		}
-		val.append(" ]");
+		Impl::containerToJSON(_val, val);
 	}
 
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
@@ -2728,44 +2776,28 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isVector() const
 	{
 		return true;
 	}
 
-	bool isStruct() const
+	std::size_t size() const
 	{
-		return false;
-	}
-
-	bool isInteger() const
-	{
-		return false;
-	}
-
-	bool isSigned() const
-	{
-		return false;
-	}
-
-	bool isNumeric() const
-	{
-		return false;
-	}
-
-	bool isString() const
-	{
-		return false;
+		return _val.size();
 	}
 
 	T& operator[](typename std::vector<T>::size_type n)
 	{
-		return _val.operator[](n);
+		if (n < size()) return _val.operator[](n);
+
+		throw RangeException("List index out of range");
 	}
 
 	const T& operator[](typename std::vector<T>::size_type n) const
 	{
-		return _val.operator[](n);
+		if (n < size()) return _val.operator[](n);
+
+		throw RangeException("List index out of range");
 	}
 
 private:
@@ -2774,6 +2806,146 @@ private:
 	VarHolderImpl& operator = (const VarHolderImpl&);
 
 	std::vector<T> _val;
+};
+
+
+template <typename T>
+class VarHolderImpl<std::list<T> >: public VarHolder
+{
+public:
+	VarHolderImpl(const std::list<T>& val): _val(val)
+	{
+	}
+
+	~VarHolderImpl()
+	{
+	}
+	
+	const std::type_info& type() const
+	{
+		return typeid(std::list<T>);
+	}
+
+	void convert(std::string& val) const
+	{
+		Impl::containerToJSON(_val, val);
+	}
+
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	{
+		return cloneHolder(pVarHolder, _val);
+	}
+	
+	const std::list<T>& value() const
+	{
+		return _val;
+	}
+
+	bool isList() const
+	{
+		return true;
+	}
+
+	std::size_t size() const
+	{
+		return _val.size();
+	}
+
+	T& operator[](typename std::list<T>::size_type n)
+	{
+		if (n >= size())
+			throw RangeException("List index out of range");
+
+		typename std::list<T>::size_type counter = 0;
+		typename std::list<T>::iterator it = _val.begin();
+		for (; counter < n; ++counter) ++it;
+
+		return *it;
+	}
+
+	const T& operator[](typename std::list<T>::size_type n) const
+	{
+		if (n >= size())
+			throw RangeException("List index out of range");
+
+		typename std::list<T>::size_type counter = 0;
+		typename std::list<T>::const_iterator it = _val.begin();
+		for (; counter < n; ++counter) ++it;
+
+		return *it;
+	}
+
+private:
+	VarHolderImpl();
+	VarHolderImpl(const VarHolderImpl&);
+	VarHolderImpl& operator = (const VarHolderImpl&);
+
+	std::list<T> _val;
+};
+
+
+template <typename T>
+class VarHolderImpl<std::deque<T> >: public VarHolder
+{
+public:
+	VarHolderImpl(const std::deque<T>& val): _val(val)
+	{
+	}
+
+	~VarHolderImpl()
+	{
+	}
+	
+	const std::type_info& type() const
+	{
+		return typeid(std::deque<T>);
+	}
+
+	void convert(std::string& val) const
+	{
+		Impl::containerToJSON(_val, val);
+	}
+
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	{
+		return cloneHolder(pVarHolder, _val);
+	}
+	
+	const std::deque<T>& value() const
+	{
+		return _val;
+	}
+
+	bool isDeque() const
+	{
+		return true;
+	}
+
+	std::size_t size() const
+	{
+		return _val.size();
+	}
+
+	T& operator[](typename std::deque<T>::size_type n)
+	{
+		if (n < size()) return _val.operator[](n);
+
+		throw RangeException("List index out of range");
+	}
+
+	const T& operator[](typename std::deque<T>::size_type n) const
+	{
+		if (n < size()) return _val.operator[](n);
+
+		throw RangeException("List index out of range");
+	}
+
+private:
+	VarHolderImpl();
+	VarHolderImpl(const VarHolderImpl&);
+	VarHolderImpl& operator = (const VarHolderImpl&);
+
+	std::deque<T> _val;
 };
 
 
@@ -3078,6 +3250,12 @@ private:
 
 	Timestamp _val;
 };
+
+
+typedef std::vector<Var> Vector;
+typedef std::deque<Var>  Deque;
+typedef std::list<Var>   List;
+typedef Vector           Array;
 
 
 } } // namespace Poco::Dynamic

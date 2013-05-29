@@ -38,24 +38,35 @@
 #include "Poco/Dynamic/Struct.h"
 #include <algorithm>
 #include <cctype>
+#include <vector>
+#include <list>
+#include <deque>
 
 
 namespace Poco {
 namespace Dynamic {
 
 
-Var::Var()
+Var::Var() :
 #ifdef POCO_NO_SOO
-	: _pHolder(0)
+	_pHolder(0),
 #endif
+	_pBegin(new Iterator(this, true)),
+	_pEnd(new Iterator(this, true))
 {
 }
 
 
 Var::Var(const char* pVal)
 #ifdef POCO_NO_SOO 
-	: _pHolder(new VarHolderImpl<std::string>(pVal)) { }
+	: _pHolder(new VarHolderImpl<std::string>(pVal)),
+	  _pBegin(new Iterator(this, false)),
+	  _pEnd(new Iterator(this, true))
+{
+}
 #else
+	: _pBegin(new Iterator(this, false)),
+	  _pEnd(new Iterator(this, true))
 {
 	construct(std::string(pVal));
 }
@@ -64,12 +75,14 @@ Var::Var(const char* pVal)
 
 Var::Var(const Var& other)
 #ifdef POCO_NO_SOO
-	: _pHolder(0)
+	: _pHolder(other._pHolder ? other._pHolder->clone() : 0),
+	  _pBegin(new Iterator(*other._pBegin)),
+	  _pEnd(new Iterator(*other._pEnd))
 {
-	if (other._pHolder)
-		_pHolder = other._pHolder->clone();
 }
 #else
+	: _pBegin(new Iterator(*other._pBegin)),
+	  _pEnd(new Iterator(*other._pEnd))
 {
 	if ((this != &other) && !other.isEmpty())
 			construct(other);
@@ -238,6 +251,7 @@ Var& Var::operator ++ ()
 	return *this = *this + 1;
 }
 
+
 const Var Var::operator ++ (int)
 {
 	if (!isInteger())
@@ -248,6 +262,7 @@ const Var Var::operator ++ (int)
 	return tmp;
 }
 
+
 Var& Var::operator -- ()
 {
 	if (!isInteger())
@@ -255,6 +270,7 @@ Var& Var::operator -- ()
 
 	return *this = *this - 1;
 }
+
 
 const Var Var::operator -- (int)
 {
@@ -269,7 +285,8 @@ const Var Var::operator -- (int)
 
 bool Var::operator == (const Var& other) const
 {
-	if (isEmpty() || other.isEmpty()) return false;
+	if (isEmpty() && !other.isEmpty()) return false;
+	if (isEmpty() && other.isEmpty()) return true;
 	return convert<std::string>() == other.convert<std::string>();
 }
 
@@ -352,16 +369,43 @@ void Var::empty()
 }
 
 
-Var& Var::operator [] (const std::string& name)
+Var& Var::getAt(std::size_t n)
 {
-	return holderImpl<DynamicStruct, InvalidAccessException>("Not an array.")->operator[](name);
+	if (isVector())
+		return holderImpl<std::vector<Var>,
+			InvalidAccessException>("Not a vector.")->operator[](n);
+	else if (isList())
+		return holderImpl<std::list<Var>,
+			InvalidAccessException>("Not a list.")->operator[](n);
+	else if (isDeque())
+		return holderImpl<std::deque<Var>,
+			InvalidAccessException>("Not a deque.")->operator[](n);
+	else if (isStruct())
+		return structIndexOperator(holderImpl<Struct<int>,
+			InvalidAccessException>("Not a struct."), static_cast<int>(n));
+	else if (!isString() && !isEmpty() && (n == 0))
+		return *this;
+	
+	throw RangeException("Index out of bounds.");
 }
 
 
-const Var& Var::operator [] (const std::string& name) const
+char& Var::at(std::size_t n)
 {
-	return const_cast<const Var&>(holderImpl<DynamicStruct,
-		InvalidAccessException>("Not an array.")->operator[](name));
+	if (isString())
+	{
+		return holderImpl<std::string,
+			InvalidAccessException>("Not a string.")->operator[](n);
+	}
+
+	throw InvalidAccessException("Not a string.");
+}
+
+
+Var& Var::getAt(const std::string& name)
+{
+	return holderImpl<DynamicStruct,
+		InvalidAccessException>("Not a struct.")->operator[](name);
 }
 
 
@@ -499,7 +543,7 @@ void Var::skipWhiteSpace(const std::string& val, std::string::size_type& pos)
 std::string Var::toString(const Var& any)
 {
 	std::string res;
-	appendJSONValue(res, any);
+	Impl::appendJSONValue(res, any);
 	return res;
 }
 

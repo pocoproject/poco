@@ -53,7 +53,8 @@ Object::Object(bool preserveInsertionOrder): _preserveInsOrder(preserveInsertion
 
 Object::Object(const Object& copy) : _values(copy._values),
 	_keys(copy._keys),
-	_preserveInsOrder(copy._preserveInsOrder)
+	_preserveInsOrder(copy._preserveInsOrder),
+	_pStruct(0)
 {
 }
 
@@ -65,40 +66,37 @@ Object::~Object()
 
 Var Object::get(const std::string& key) const
 {
-	Var value;
-
 	ValueMap::const_iterator it = _values.find(key);
-	if ( it != _values.end() )
+	if (it != _values.end())
 	{
-		value = it->second;
+		return it->second;
 	}
-	return value;
+
+	return Var();
 }
 
 
 Array::Ptr Object::getArray(const std::string& key) const
 {
-	Array::Ptr result;
-
-	Var value = get(key);
-	if ( value.type() == typeid(Array::Ptr) )
+	ValueMap::const_iterator it = _values.find(key);
+	if ((it != _values.end()) && (it->second.type() == typeid(Array::Ptr)))
 	{
-		result = value.extract<Array::Ptr>();
+		return it->second.extract<Array::Ptr>();
 	}
-	return result;
+
+	return 0;
 }
 
 
 Object::Ptr Object::getObject(const std::string& key) const
 {
-	Object::Ptr result;
-
-	Var value = get(key);
-	if ( value.type() == typeid(Object::Ptr) )
+	ValueMap::const_iterator it = _values.find(key);
+	if ((it != _values.end()) && (it->second.type() == typeid(Object::Ptr)))
 	{
-		result = value.extract<Object::Ptr>();
+		return it->second.extract<Object::Ptr>();
 	}
-	return result;
+
+	return 0;
 }
 
 
@@ -149,6 +147,62 @@ void Object::set(const std::string& key, const Dynamic::Var& value)
 		}
 		_keys.push_back(&_values[key]);
 	}
+}
+
+
+Poco::DynamicStruct Object::makeStruct(const Object::Ptr& obj)
+{
+	Poco::DynamicStruct ds;
+
+	ConstIterator it  = obj->begin();
+	ConstIterator end = obj->end();
+	for (; it != end; ++it)
+	{
+		if (obj->isObject(it))
+		{
+			Object::Ptr pObj = obj->getObject(it->first);
+			DynamicStruct str = makeStruct(pObj);
+			ds.insert(it->first, str);
+		}
+		else if (obj->isArray(it))
+		{
+			Array::Ptr pArr = obj->getArray(it->first);
+			std::vector<Poco::Dynamic::Var> v = Poco::JSON::Array::makeArray(pArr);
+			ds.insert(it->first, v);
+		}
+		else
+			ds.insert(it->first, it->second);
+	}
+
+	return ds;
+}
+
+
+Object::operator const Poco::DynamicStruct& () const
+{
+	if (!_pStruct)
+	{
+		ValueMap::const_iterator it = _values.begin();
+		ValueMap::const_iterator end = _values.end();
+		_pStruct = new Poco::DynamicStruct;
+		for (; it != end; ++it)
+		{
+			if (isObject(it))
+			{
+				_pStruct->insert(it->first, makeStruct(getObject(it->first)));
+			}
+			else if (isArray(it))
+			{
+				_pStruct->insert(it->first, Poco::JSON::Array::makeArray(getArray(it->first)));
+			}
+			else
+			{
+				_pStruct->insert(it->first, it->second);
+			}
+		}
+	}
+
+	return *_pStruct;
 }
 
 

@@ -870,6 +870,9 @@
     <ClCompile Include="src\VarHolder.cpp">
       <Filter>Dynamic\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\VarIterator.cpp">
+      <Filter>Dynamic\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Latin2Encoding.cpp">
       <Filter>Text\Source Files</Filter>
     </ClCompile>
@@ -1818,6 +1821,9 @@
       <Filter>Dynamic\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Dynamic\VarHolder.h">
+      <Filter>Dynamic\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Dynamic\VarIterator.h">
       <Filter>Dynamic\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Windows1250Encoding.h">

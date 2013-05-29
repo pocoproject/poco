@@ -42,7 +42,9 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Format.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/VarHolder.h"
+#include "Poco/Dynamic/VarIterator.h"
 #include <typeinfo>
 
 
@@ -97,6 +99,10 @@ class Foundation_API Var
 	/// VarHolderImpl is available. For supported types, see VarHolder documentation.
 {
 public:
+	typedef SharedPtr<Var>             Ptr;
+	typedef Poco::Dynamic::VarIterator Iterator;
+	typedef const VarIterator          ConstIterator;
+
 	Var();
 		/// Creates an empty Var.
 
@@ -104,8 +110,14 @@ public:
 	Var(const T& val)
 		/// Creates the Var from the given value.
 #ifdef POCO_NO_SOO
-		:_pHolder(new VarHolderImpl<T>(val)) { }
+		: _pHolder(new VarHolderImpl<T>(val)),
+		  _pBegin(new Iterator(this, false)),
+		  _pEnd(new Iterator(this, true))
+	{
+	}
 #else
+		: _pBegin(new Iterator(this, false)),
+		  _pEnd(new Iterator(this, true))
 	{
 		construct(val);
 	}
@@ -122,6 +134,18 @@ public:
 
 	void swap(Var& other);
 		/// Swaps the content of the this Var with the other Var.
+
+	ConstIterator& begin() const;
+		/// Returns the const Var iterator.
+
+	ConstIterator& end() const;
+		/// Returns the const Var iterator.
+
+	Iterator begin();
+		/// Returns the Var iterator.
+
+	Iterator end();
+		/// Returns the Var iterator.
 
 	template <typename T> 
 	void convert(T& val) const
@@ -427,49 +451,45 @@ public:
 
 	template <typename T>
 	bool operator && (const T& other) const
-		/// Logical AND operator
+		/// Logical AND operator.
 	{
 		if (isEmpty()) return false;
 		return convert<bool>() && other;
 	}
 
 	bool operator && (const Var& other) const;
-		/// Logical AND operator operator overload for Var
+		/// Logical AND operator operator overload for Var.
 
 	bool isArray() const;
-		/// Returns true if Var represents a vector
+		/// Returns true if Var is not empty.
+
+	bool isVector() const;
+		/// Returns true if Var represents a vector.
+
+	bool isList() const;
+		/// Returns true if Var represents a list.
+
+	bool isDeque() const;
+		/// Returns true if Var represents a deque.
 
 	bool isStruct() const;
-		/// Returns true if Var represents a struct
+		/// Returns true if Var represents a struct.
+
+	char& at(std::size_t n);
+		/// Returns character at position n. This function only works with
+		/// Var containing a std::string.
+
 
 	template <typename T>
-	Var& operator [] (T n)
-		/// Index operator, only use on Vars where isArray() or isStruct()
-		/// returns true! In all other cases InvalidAccessException is thrown.
+	Var& operator [] (const T& n)
 	{
-		if (isArray())
-			return holderImpl<std::vector<Var>,
-				InvalidAccessException>("Not an array.")->operator[](n);
-		else if (isStruct())
-			return structIndexOperator(holderImpl<Struct<int>,
-				InvalidAccessException>("Not a struct."), static_cast<int>(n));
-		else
-			throw InvalidAccessException("Must be struct or array.");
+		return getAt(n);
 	}
 
 	template <typename T>
-	const Var& operator [] (T n) const
-		/// const Index operator, only use on Vars where isArray() or isStruct()
-		/// returns true! In all other cases InvalidAccessException is thrown.
+	const Var& operator [] (const T& n) const
 	{
-		if (isArray())
-			return holderImpl<std::vector<Var>,
-				InvalidAccessException>("Not an array.")->operator[](n);
-		else if (isStruct())
-			return structIndexOperator(holderImpl<Struct<int>,
-				InvalidAccessException>("Not a struct."), static_cast<int>(n));
-		else
-			throw InvalidAccessException("Must be struct or array.");
+		return const_cast<Var*>(this)->getAt(n);
 	}
 
 	Var& operator [] (const std::string& name);
@@ -477,14 +497,6 @@ public:
 		/// returns true! In all other cases InvalidAccessException is thrown.
 
 	const Var& operator [] (const std::string& name) const;
-		/// Index operator by name, only use on Vars where isStruct
-		/// returns true! In all other cases InvalidAccessException is thrown.
-
-	Var& operator [] (const char* name);
-		/// Index operator by name, only use on Vars where isStruct
-		/// returns true! In all other cases InvalidAccessException is thrown.
-
-	const Var& operator [] (const char* name) const;
 		/// Index operator by name, only use on Vars where isStruct
 		/// returns true! In all other cases InvalidAccessException is thrown.
 
@@ -509,6 +521,11 @@ public:
 
 	bool isString() const;
 		/// Returns true if stored value is std::string.
+
+	std::size_t size() const;
+		/// Returns the size of this Var.
+		/// This function returns 0 when Var is empty, 1 for POD or the size (i.e. length)
+		/// for held container.
 
 	std::string toString() const
 		/// Returns the stored value as string.
@@ -536,6 +553,9 @@ public:
 		/// a different result than Var::convert<std::string>() and Var::toString()!
 	
 private:
+	Var& getAt(std::size_t n);
+	Var& getAt(const std::string& n);
+
 	static Var parse(const std::string& val, std::string::size_type& offset);
 		/// Parses the string which must be in JSON format
 
@@ -656,7 +676,9 @@ private:
 	Placeholder<VarHolder> _placeholder;
 
 #endif // POCO_NO_SOO
-
+	
+	Iterator* _pBegin;
+	Iterator* _pEnd;
 };
 
 
@@ -710,15 +732,42 @@ inline const std::type_info& Var::type() const
 }
 
 
-inline Var& Var::operator [] (const char* name)
+inline Var::ConstIterator& Var::begin() const
 {
-	return operator [] (std::string(name));
+	if (isEmpty()) _pBegin->setPosition(Iterator::POSITION_END);
+	else if (*_pBegin == *_pEnd) _pBegin->setPosition(0);
+
+	return *_pBegin;
+}
+
+inline Var::ConstIterator& Var::end() const
+{
+	return *_pEnd;
+}
+
+inline Var::Iterator Var::begin()
+{
+	if (isEmpty()) _pBegin->setPosition(Iterator::POSITION_END);
+	else if (*_pBegin == *_pEnd) _pBegin->setPosition(0);
+
+	return *_pBegin;
+}
+
+inline Var::Iterator Var::end()
+{
+	return *_pEnd;
 }
 
 
-inline const Var& Var::operator [] (const char* name) const
+inline Var& Var::operator [] (const std::string& name)
 {
-	return operator [] (std::string(name));
+	return getAt(name);
+}
+
+
+inline const Var& Var::operator [] (const std::string& name) const
+{
+	return const_cast<Var*>(this)->getAt(name);
 }
 
 
@@ -748,8 +797,28 @@ inline bool Var::isEmpty() const
 
 inline bool Var::isArray() const
 {
+	return !isEmpty() && !isString();
+}
+
+
+inline bool Var::isVector() const
+{
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isArray() : false;
+	return pHolder ? pHolder->isVector() : false;
+}
+
+
+inline bool Var::isList() const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isList() : false;
+}
+
+
+inline bool Var::isDeque() const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isDeque() : false;
 }
 
 
@@ -785,6 +854,13 @@ inline bool Var::isString() const
 {
 	VarHolder* pHolder = content();
 	return pHolder ? pHolder->isString() : false;
+}
+
+
+inline std::size_t Var::size() const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->size() : 0;
 }
 
 

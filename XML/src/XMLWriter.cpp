@@ -493,7 +493,11 @@ void XMLWriter::startDTD(const XMLString& name, const XMLString& publicId, const
 	}
 	if (!systemId.empty())
 	{
-		writeMarkup(" SYSTEM \"");
+		if (publicId.empty())
+		{
+			writeMarkup(" SYSTEM");
+		}
+		writeMarkup(" \"");
 		writeXML(systemId);
 		writeMarkup("\"");
 	}

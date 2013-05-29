@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#4 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#6 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -132,26 +132,7 @@ void SecureStreamSocketImpl::abort()
 
 int SecureStreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
-	const char* p = reinterpret_cast<const char*>(buffer);
-	int remaining = length;
-	int sent = 0;
-	bool blocking = getBlocking();
-	while (remaining > 0)
-	{
-		int n = _impl.sendBytes(p, remaining, flags);
-		if (n < 0 && !blocking) return n;
-		if (n > 0)
-		{
-			p += n; 
-			sent += n;
-			remaining -= n;
-		}
-		if (blocking && remaining > 0)
-			Poco::Thread::yield();
-		else
-			break;
-	}
-	return sent;
+	return _impl.sendBytes(buffer, length, flags);
 }
 
 

@@ -389,6 +389,7 @@
     <ClCompile Include="src\UTF32Encoding.cpp" />
     <ClCompile Include="src\Var.cpp" />
     <ClCompile Include="src\VarHolder.cpp" />
+    <ClCompile Include="src\VarIterator.cpp" />
     <ClCompile Include="src\Void.cpp" />
     <ClCompile Include="src\Base64Decoder.cpp" />
     <ClCompile Include="src\Base64Encoder.cpp" />
@@ -998,6 +999,7 @@
     <ClInclude Include="include\Poco\Dynamic\Struct.h" />
     <ClInclude Include="include\Poco\Dynamic\Var.h" />
     <ClInclude Include="include\Poco\Dynamic\VarHolder.h" />
+    <ClInclude Include="include\Poco\Dynamic\VarIterator.h" />
     <ClInclude Include="include\Poco\Environment.h" />
     <ClInclude Include="include\Poco\Environment_UNIX.h" />
     <ClInclude Include="include\Poco\Environment_VMS.h" />

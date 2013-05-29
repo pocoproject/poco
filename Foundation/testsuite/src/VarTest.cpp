@@ -1841,6 +1841,7 @@ void VarTest::testIsArray()
 	std::vector<Var> s16;
 	DynamicStruct s17;
 
+	Var d0;
 	Var d1(s1);
 	Var d2(s2);
 	Var d3(s3);
@@ -1859,23 +1860,24 @@ void VarTest::testIsArray()
 	Var d16(s16);
 	Var d17(s17);
 
+	assert (!d0.isArray());
 	assert (!d1.isArray());
-	assert (!d2.isArray());
-	assert (!d3.isArray());
-	assert (!d4.isArray());
-	assert (!d5.isArray());
-	assert (!d6.isArray());
-	assert (!d7.isArray());
-	assert (!d8.isArray());
-	assert (!d9.isArray());
-	assert (!d10.isArray());
-	assert (!d11.isArray());
-	assert (!d12.isArray());
-	assert (!d13.isArray());
-	assert (!d14.isArray());
-	assert (!d15.isArray());
+	assert (d2.isArray());
+	assert (d3.isArray());
+	assert (d4.isArray());
+	assert (d5.isArray());
+	assert (d6.isArray());
+	assert (d7.isArray());
+	assert (d8.isArray());
+	assert (d9.isArray());
+	assert (d10.isArray());
+	assert (d11.isArray());
+	assert (d12.isArray());
+	assert (d13.isArray());
+	assert (d14.isArray());
+	assert (d15.isArray());
 	assert (d16.isArray());
-	assert (!d17.isArray());
+	assert (d17.isArray());
 }
 
 
@@ -1920,23 +1922,39 @@ void VarTest::testArrayIdxOperator()
 	Var d17(s17);
 
 	testGetIdxMustThrow(d1, 0);
-	testGetIdxMustThrow(d2, 0);
-	testGetIdxMustThrow(d3, 0);
-	testGetIdxMustThrow(d4, 0);
-	testGetIdxMustThrow(d5, 0);
-	testGetIdxMustThrow(d6, 0);
-	testGetIdxMustThrow(d7, 0);
-	testGetIdxMustThrow(d8, 0);
-	testGetIdxMustThrow(d9, 0);
-	testGetIdxMustThrow(d10, 0);
-	testGetIdxMustThrow(d11, 0);
-	testGetIdxMustThrow(d12, 0);
-	testGetIdxMustThrow(d13, 0);
-	testGetIdxMustThrow(d14, 0);
-	testGetIdxMustThrow(d15, 0);
+	testGetIdxNoThrow(d2, 0);
+	testGetIdxNoThrow(d3, 0);
+	testGetIdxNoThrow(d4, 0);
+	testGetIdxNoThrow(d5, 0);
+	testGetIdxNoThrow(d6, 0);
+	testGetIdxNoThrow(d7, 0);
+	testGetIdxNoThrow(d8, 0);
+	testGetIdxNoThrow(d9, 0);
+	testGetIdxNoThrow(d10, 0);
+	testGetIdxNoThrow(d11, 0);
+	testGetIdxNoThrow(d12, 0);
+	testGetIdxNoThrow(d13, 0);
+	testGetIdxNoThrow(d14, 0);
+	testGetIdxNoThrow(d15, 0);
 	testGetIdx(d16, 0, s1);
 	testGetIdx(d16, 1, s2);
-	testGetIdxMustThrow(d17, 0);
+
+	testGetIdxMustThrow(d1, 1);
+	testGetIdxMustThrow(d2, 1);
+	testGetIdxMustThrow(d3, 1);
+	testGetIdxMustThrow(d4, 1);
+	testGetIdxMustThrow(d5, 1);
+	testGetIdxMustThrow(d6, 1);
+	testGetIdxMustThrow(d7, 1);
+	testGetIdxMustThrow(d8, 1);
+	testGetIdxMustThrow(d9, 1);
+	testGetIdxMustThrow(d10, 1);
+	testGetIdxMustThrow(d11, 1);
+	testGetIdxMustThrow(d12, 1);
+	testGetIdxMustThrow(d13, 1);
+	testGetIdxMustThrow(d14, 1);
+	testGetIdxMustThrow(d15, 1);
+	testGetIdxMustThrow(d17, 1);
 }
 
 
@@ -2001,9 +2019,9 @@ void VarTest::testDynamicStructInt()
 	aStruct[1] = "POCO";
 	aStruct[2] = 10;
 	Var a1(aStruct);
-	assert (a1[0] == "Junior");
-	assert (a1[1] == "POCO");
-	assert (a1[2] == 10);
+	assert (a1[0]== "Junior");
+	assert (a1[1]== "POCO");
+	assert (a1[2]== 10);
 	a1[0] = "Senior";
 	assert (a1[0] == "Senior");
 
@@ -2372,15 +2390,25 @@ void VarTest::testDate()
 	assert (tsNow == tsRes);
 }
 
+
+void VarTest::testGetIdxNoThrow(Var& a1, std::vector<Var>::size_type n)
+{
+	Var val1 = a1[n];
+}
+
+
 void VarTest::testGetIdxMustThrow(Var& a1, std::vector<Var>::size_type n)
 {
 	try
 	{
-		Var& val1 = a1[n]; 
+		Var val1 = a1[n]; 
 		fail("bad cast - must throw");
 		val1 = 0; // silence the compiler
 	}
 	catch (Poco::InvalidAccessException&)
+	{
+	}
+	catch (Poco::RangeException&)
 	{
 	}
 
@@ -2392,6 +2420,9 @@ void VarTest::testGetIdxMustThrow(Var& a1, std::vector<Var>::size_type n)
 		assert (cval1 == c1); // silence the compiler
 	}
 	catch (Poco::InvalidAccessException&)
+	{
+	}
+	catch (Poco::RangeException&)
 	{
 	}
 }
@@ -2407,7 +2438,7 @@ void VarTest::testEmpty()
 	assert (!da.isNumeric());
 	assert (!da.isSigned());
 	assert (!da.isString());
-	assert (!(da == da));
+	assert (da == da);
 	assert (!(da != da));
 
 	da = "123";
@@ -2424,14 +2455,13 @@ void VarTest::testEmpty()
 	assert (!da.isNumeric());
 	assert (!da.isSigned());
 	assert (!da.isString());
-	assert (!(da == da));
+	assert (da == da);
 	assert (!(da != da));
 
 	assert (da != "");
 	assert ("" != da);
 	assert (!(da == ""));
 	assert (!("" == da));
-	
 
 	testEmptyComparisons<unsigned char>();
 	testEmptyComparisons<char>();
@@ -2461,6 +2491,71 @@ void VarTest::testEmpty()
 		int i = da.extract<int>();
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
+}
+
+
+void VarTest::testIterator()
+{
+	Var da;
+	assert (da.isEmpty());
+	assert (da.begin() == da.end());
+
+	da = 1;
+	assert (!da.isEmpty());
+	assert (da == 1);
+	assert (da[0] == 1);
+	try
+	{
+		da[1] = 2;
+	}
+	catch (RangeException&) {}
+	assert (da.begin() != da.end());
+
+	Var::Iterator it = da.begin();
+	Var::Iterator end = da.end();
+	assert (it != end);
+	assert (++it == end);
+	assert (--it == da.begin());
+	it++;
+	assert (it == end);
+	try
+	{
+		++it;
+		fail ("must fail");
+	}
+	catch (RangeException&) {}
+	assert (it == end);
+
+	da = "abc";
+	assert (da.size() == 3);
+	assert (!da.isArray());
+	assert (da.isString());
+	//assert (da[0] == 'a');
+	assert (da.at(0) == 'a');
+	//assert (da[1] = 'b');
+	assert (da.at(1) == 'b');
+	//assert (da[2] = 'c');
+	assert (da.at(2) == 'c');
+
+	da.at(0) = 'b';
+	assert (da.at(0) == 'b');
+	// TODO: allow treatment of strings like arrays
+	//da[1] = 'c';
+	da.at(1) = 'c';
+	assert (da.at(1) == 'c');
+	//da[2] = 'a';
+	da.at(2) = 'a';
+	assert (da.at(2) == 'a');
+
+	it = da.begin();
+	end = da.end();
+	assert (it != end);
+	assert (++it != end);
+	assert (--it == da.begin());
+
+	testContainerIterator<std::vector<Var> >();
+	testContainerIterator<std::list<Var> >();
+	testContainerIterator<std::deque<Var> >();
 }
 
 
@@ -2518,6 +2613,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeComplex);
 	CppUnit_addTest(pSuite, VarTest, testDate);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
+	CppUnit_addTest(pSuite, VarTest, testIterator);
 
 	return pSuite;
 }

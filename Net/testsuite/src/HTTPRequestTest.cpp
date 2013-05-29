@@ -1,7 +1,7 @@
 //
 // HTTPRequestTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPRequestTest.cpp#3 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPRequestTest.cpp#4 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -89,6 +89,19 @@ void HTTPRequestTest::testWrite3()
 	request.write(ostr);
 	std::string s = ostr.str();
 	assert (s == "POST /test.cgi HTTP/1.1\r\nHost: localhost:8000\r\nConnection: Close\r\nUser-Agent: Poco\r\nContent-Length: 100\r\nContent-Type: text/plain\r\n\r\n");
+}
+
+
+void HTTPRequestTest::testWrite4()
+{
+	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/index.html", HTTPMessage::HTTP_1_1);
+	request.setHost("fe80::1", 88);
+	request.setKeepAlive(true);
+	request.set("User-Agent", "Poco");
+	std::ostringstream ostr;
+	request.write(ostr);
+	std::string s = ostr.str();
+	assert (s == "HEAD /index.html HTTP/1.1\r\nHost: [fe80::1]:88\r\nConnection: Keep-Alive\r\nUser-Agent: Poco\r\n\r\n");
 }
 
 
@@ -262,6 +275,7 @@ CppUnit::Test* HTTPRequestTest::suite()
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite1);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite2);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite3);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite4);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testRead1);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testRead2);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testRead3);

@@ -52,6 +52,9 @@ VarHolder::~VarHolder()
 }
 
 
+namespace Impl {
+
+
 bool isJSONString(const Var& any)
 {
 	return any.type() == typeid(std::string) || 
@@ -88,6 +91,9 @@ void appendJSONValue(std::string& val, const Var& any)
 		if (isStr) val.append(1, '"');
 	}
 }
+
+
+} // namespace Impl
 
 
 } } // namespace Poco::Dynamic
