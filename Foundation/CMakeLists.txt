@@ -166,6 +166,7 @@ set( BASE_SRCS
   src/UnicodeConverter.cpp
   src/Var.cpp
   src/VarHolder.cpp
+  src/VarIterator.cpp
   src/Void.cpp
   src/Windows1250Encoding.cpp
   src/Windows1251Encoding.cpp
