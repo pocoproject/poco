@@ -222,7 +222,6 @@ inline void swap(LOB<T>& b1, LOB<T>& b2)
 
 namespace std
 {
-	using std::swap;
 	template<>
 	inline void swap<Poco::Data::BLOB>(Poco::Data::BLOB& b1, 
 		Poco::Data::BLOB& b2)

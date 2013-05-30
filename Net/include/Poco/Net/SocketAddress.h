@@ -153,9 +153,23 @@ private:
 	typedef Impl* Ptr;
 
 	Ptr pImpl() const;
+
 	void destruct();
 
-	char _memory[sizeof(Poco::Net::Impl::IPv6SocketAddressImpl)];
+	char* storage();
+
+#ifdef POCO_ENABLE_CPP11
+	static const unsigned sz = sizeof(Poco::Net::Impl::IPv6SocketAddressImpl);
+	union
+	{
+		std::aligned_storage<sz> a;
+		char                     buffer[sz];
+	}
+#else // !POCO_ENABLE_CPP11
+	AlignedCharArrayUnion <Poco::Net::Impl::IPv6SocketAddressImpl, 
+		Poco::Net::Impl::IPv4SocketAddressImpl>
+#endif // POCO_ENABLE_CPP11
+	_memory;
 };
 
 
@@ -172,7 +186,13 @@ inline void SocketAddress::destruct()
 
 inline SocketAddress::Ptr SocketAddress::pImpl() const
 {
-	return reinterpret_cast<Ptr>(const_cast<char *>(_memory));
+	return reinterpret_cast<Ptr>(const_cast<char *>(_memory.buffer));
+}
+
+
+inline char* SocketAddress::storage()
+{
+	return _memory.buffer;
 }
 
 

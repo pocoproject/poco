@@ -75,7 +75,7 @@ struct AFLT
 
 SocketAddress::SocketAddress()
 {
-	new (_memory) IPv4SocketAddressImpl;
+	new (storage()) IPv4SocketAddressImpl;
 }
 
 
@@ -135,19 +135,19 @@ SocketAddress::SocketAddress(const std::string& hostAndPort)
 SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 {
 	if (socketAddress.family() == IPAddress::IPv4)
-		new (_memory) IPv4SocketAddressImpl(reinterpret_cast<const sockaddr_in*>(socketAddress.addr()));
+		new (storage()) IPv4SocketAddressImpl(reinterpret_cast<const sockaddr_in*>(socketAddress.addr()));
 	else
-		new (_memory) IPv6SocketAddressImpl(reinterpret_cast<const sockaddr_in6*>(socketAddress.addr()));
+		new (storage()) IPv6SocketAddressImpl(reinterpret_cast<const sockaddr_in6*>(socketAddress.addr()));
 }
 
 
 SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t length)
 {
 	if (length == sizeof(struct sockaddr_in))
-		new (_memory) IPv4SocketAddressImpl(reinterpret_cast<const struct sockaddr_in*>(sockAddr));
+		new (storage()) IPv4SocketAddressImpl(reinterpret_cast<const struct sockaddr_in*>(sockAddr));
 #if defined(POCO_HAVE_IPv6)
 	else if (length == sizeof(struct sockaddr_in6))
-		new (_memory) IPv6SocketAddressImpl(reinterpret_cast<const struct sockaddr_in6*>(sockAddr));
+		new (storage()) IPv6SocketAddressImpl(reinterpret_cast<const struct sockaddr_in6*>(sockAddr));
 #endif
 	else throw Poco::InvalidArgumentException("Invalid address length passed to SocketAddress()");
 }
@@ -175,9 +175,9 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 	{
 		destruct();
 		if (socketAddress.family() == IPAddress::IPv4)
-			new (_memory) IPv4SocketAddressImpl(reinterpret_cast<const sockaddr_in*>(socketAddress.addr()));
+			new (storage()) IPv4SocketAddressImpl(reinterpret_cast<const sockaddr_in*>(socketAddress.addr()));
 		else
-			new (_memory) IPv6SocketAddressImpl(reinterpret_cast<const sockaddr_in6*>(socketAddress.addr()));
+			new (storage()) IPv6SocketAddressImpl(reinterpret_cast<const sockaddr_in6*>(socketAddress.addr()));
 	}
 	return *this;
 }
@@ -232,10 +232,10 @@ std::string SocketAddress::toString() const
 void SocketAddress::init(const IPAddress& hostAddress, Poco::UInt16 portNumber)
 {
 	if (hostAddress.family() == IPAddress::IPv4)
-		new (_memory) IPv4SocketAddressImpl(hostAddress.addr(), htons(portNumber));
+		new (storage()) IPv4SocketAddressImpl(hostAddress.addr(), htons(portNumber));
 #if defined(POCO_HAVE_IPv6)
 	else if (hostAddress.family() == IPAddress::IPv6)
-		new (_memory) IPv6SocketAddressImpl(hostAddress.addr(), htons(portNumber), hostAddress.scope());
+		new (storage()) IPv6SocketAddressImpl(hostAddress.addr(), htons(portNumber), hostAddress.scope());
 #endif
 	else throw Poco::NotImplementedException("unsupported IP address family");
 }

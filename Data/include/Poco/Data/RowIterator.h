@@ -159,7 +159,6 @@ inline bool RowIterator::operator != (const RowIterator& other) const
 
 namespace std
 {
-	using std::swap;
 	template<>
 	inline void swap<Poco::Data::RowIterator>(Poco::Data::RowIterator& s1, 
 		Poco::Data::RowIterator& s2)

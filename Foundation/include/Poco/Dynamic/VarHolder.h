@@ -286,9 +286,9 @@ protected:
 		poco_check_ptr (pVarHolder);
 		if ((sizeof(VarHolderImpl<T>) <= Placeholder<T>::Size::value))
 		{
-			new ((VarHolder*) pVarHolder->holder) VarHolderImpl<T>(val);
+			new ((VarHolder*) pVarHolder->holder.h) VarHolderImpl<T>(val);
 			pVarHolder->setLocal(true);
-			return (VarHolder*) pVarHolder->holder;
+			return (VarHolder*) pVarHolder->holder.h;
 		}
 		else
 		{

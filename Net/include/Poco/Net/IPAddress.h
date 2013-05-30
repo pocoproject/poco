@@ -44,6 +44,11 @@
 #include "Poco/Net/SocketDefs.h"
 #include "Poco/Net/IPAddressImpl.h"
 #include <vector>
+#ifdef POCO_ENABLE_CPP11
+	#include <type_traits>
+#else
+	#include "Poco/Alignment.h"
+#endif
 
 
 namespace Poco {
@@ -387,9 +392,23 @@ private:
 	typedef Impl* Ptr;
 
 	Ptr pImpl() const;
+
 	void destruct();
 
-	char _memory[sizeof(Poco::Net::Impl::IPv6AddressImpl)];
+	char* storage();
+
+#ifdef POCO_ENABLE_CPP11
+	static const unsigned sz = sizeof(Poco::Net::Impl::IPv6AddressImpl);
+	union
+	{
+		std::aligned_storage<sz> a;
+		char                     buffer[sz];
+	}
+#else // !POCO_ENABLE_CPP11
+	AlignedCharArrayUnion <Poco::Net::Impl::IPv6AddressImpl, 
+		Poco::Net::Impl::IPv4AddressImpl>
+#endif // POCO_ENABLE_CPP11
+	_memory;
 };
 
 
@@ -401,7 +420,13 @@ inline void IPAddress::destruct()
 
 inline IPAddress::Ptr IPAddress::pImpl() const
 {
-	return reinterpret_cast<Ptr>(const_cast<char *>(_memory));
+	return reinterpret_cast<Ptr>(const_cast<char *>(_memory.buffer));
+}
+
+
+inline char* IPAddress::storage()
+{
+	return _memory.buffer;
 }
 
 
