@@ -14,3 +14,4 @@ projects:
 	$(MAKE) -C RecordSet $(MAKECMDGOALS)
 	$(MAKE) -C RowFormatter $(MAKECMDGOALS)
 	$(MAKE) -C Tuple $(MAKECMDGOALS)
+	$(MAKE) -C WebNotifier $(MAKECMDGOALS)

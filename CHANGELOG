@@ -69,6 +69,7 @@ Release 1.5.2 (2013-06-xx)
 - added VarIterator
 - modified behavior of empty Var (empty == empty)
 - added Alignment.h header for C++03 alignment needs
+- added Data/WebNotifier (DB, WebSocket) example
 
 
 Release 1.5.1 (2013-01-11)

@@ -625,7 +625,7 @@ private:
 	{
 		if (sizeof(VarHolderImpl<ValueType>) <= Placeholder<ValueType>::Size::value)
 		{
-			new (reinterpret_cast<VarHolder*>(_placeholder.holder.h)) VarHolderImpl<ValueType>(value);
+			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<ValueType>(value);
 			_placeholder.setLocal(true);
 		}
 		else
@@ -640,7 +640,7 @@ private:
 		std::string val(value);
 		if (sizeof(VarHolderImpl<std::string>) <= Placeholder<std::string>::Size::value)
 		{
-			new (reinterpret_cast<VarHolder*>(_placeholder.holder.h)) VarHolderImpl<std::string>(val);
+			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<std::string>(val);
 			_placeholder.setLocal(true);
 		}
 		else

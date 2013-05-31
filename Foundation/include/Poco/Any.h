@@ -64,6 +64,11 @@ template <class> class VarHolderImpl;
 
 #ifndef POCO_NO_SOO
 
+#ifndef POCO_ENABLE_CPP11
+	// C++11 needed for std::aligned_storage
+	#error "Any SOO can only be enabled with C++11 support"
+#endif
+
 template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
 union Placeholder
 	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
@@ -89,23 +94,23 @@ public:
 
 	void erase()
 	{
-		std::memset(holder.h, 0, sizeof(Placeholder));
+		std::memset(holder, 0, sizeof(Placeholder));
 	}
 
 	bool isLocal() const
 	{
-		return holder.h[SizeV] != 0;
+		return holder[SizeV] != 0;
 	}
 
 	void setLocal(bool local) const
 	{
-		holder.h[SizeV] = local ? 1 : 0;
+		holder[SizeV] = local ? 1 : 0;
 	}
 
 	PlaceholderT* content() const
 	{
 		if(isLocal())
-			return reinterpret_cast<PlaceholderT*>(holder.h);
+			return reinterpret_cast<PlaceholderT*>(holder);
 		else
 			return pHolder;
 	}
@@ -114,18 +119,11 @@ public:
 #if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 80))
 private:
 #endif
+	typedef typename std::aligned_storage<SizeV + 1>::type AlignerType;
 	
 	PlaceholderT* pHolder;
-#ifndef POCO_NO_SOO
-	#ifndef POCO_ENABLE_CPP11
-		#error "Any SOO can only be enabled with C++11 support"
-	#endif
-	mutable union
-	{
-		std::aligned_storage<SizeV + 1> a;
-		unsigned char                   h[SizeV + 1];
-	} holder;
-#endif
+	mutable char  holder [SizeV + 1];
+	AlignerType   aligner;
 
 	friend class Any;
 	friend class Dynamic::Var;
@@ -285,7 +283,7 @@ public:
 		/// Returns true if the Any is empty.
 	{
 		char buf[POCO_SMALL_OBJECT_SIZE] = { 0 };
-		return 0 == std::memcmp(_valueHolder.holder.h, buf, POCO_SMALL_OBJECT_SIZE);
+		return 0 == std::memcmp(_valueHolder.holder, buf, POCO_SMALL_OBJECT_SIZE);
 	}
 	
 	const std::type_info & type() const
@@ -328,7 +326,7 @@ private:
 		{
 			if ((sizeof(Holder<ValueType>) <= POCO_SMALL_OBJECT_SIZE))
 			{
-				new ((ValueHolder*) pPlaceholder->holder.h) Holder(_held);
+				new ((ValueHolder*) pPlaceholder->holder) Holder(_held);
 				pPlaceholder->setLocal(true);
 			}
 			else
@@ -354,7 +352,7 @@ private:
 	{
 		if (sizeof(Holder<ValueType>) <= Placeholder<ValueType>::Size::value)
 		{
-			new (reinterpret_cast<ValueHolder*>(_valueHolder.holder.h)) Holder<ValueType>(value);
+			new (reinterpret_cast<ValueHolder*>(_valueHolder.holder)) Holder<ValueType>(value);
 			_valueHolder.setLocal(true);
 		}
 		else

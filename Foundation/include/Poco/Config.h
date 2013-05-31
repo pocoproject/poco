@@ -101,8 +101,12 @@
 // cases when value holder fits into POCO_SMALL_OBJECT_SIZE
 // (see below).
 // 
-// !!! NOTE: Any/Dynamic::Var SOO may NOT work reliably
-// !!! without C++11 (std::aligned_storage in particular)
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!! NOTE: Any/Dynamic::Var SOO will NOT work reliably   !!!
+// !!! without C++11 (std::aligned_storage in particular). !!!
+// !!! Only comment this out if your compiler has support  !!!
+// !!! for std::aligned_storage.                           !!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // 
 #define POCO_NO_SOO
 
