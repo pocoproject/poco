@@ -67,8 +67,9 @@ SOFTWARE.
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/ParseHandler.h"
+#include "Poco/JSON/JSONException.h"
+#include "Poco/UTF8Encoding.h"
 #include "Poco/Dynamic/Var.h"
-#include "Poco/StreamTokenizer.h"
 #include <string>
 
 
@@ -341,7 +342,7 @@ private:
 			CharIntType count = utf8CheckFirst(nextChar);
 			if (!count)
 			{
-				throw JSONException(format("Unable to decode byte 0x%x", (unsigned int) nextChar));
+				throw Poco::JSON::JSONException(format("Unable to decode byte 0x%x", (unsigned int) nextChar));
 			}
 
 			char buffer[4];
@@ -349,13 +350,13 @@ private:
 			for(int i = 1; i < count; ++i)
 			{
 				int c = 0;
-				if (!source.nextChar(c)) throw JSONException("Invalid UTF8 sequence found");
+				if (!source.nextChar(c)) throw Poco::JSON::JSONException("Invalid UTF8 sequence found");
 				buffer[i] = c;
 			}
 		
-			if (!UTF8Encoding::isLegal((unsigned char*) buffer, count))
+			if (!Poco::UTF8Encoding::isLegal((unsigned char*) buffer, count))
 			{
-				throw JSONException("No legal UTF8 found");
+				throw Poco::JSON::JSONException("No legal UTF8 found");
 			}
 
 			for(int i = 0; i < count; ++i)
