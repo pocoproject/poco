@@ -92,3 +92,4 @@ CppUnit::Test* UnicodeConverterTest::suite()
 
 
 #endif
+

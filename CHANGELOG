@@ -75,6 +75,8 @@ Release 1.5.2 (2013-06-xx)
 - fixed GH #198: The "application.configDir" property is not always created.
 - fixed GH #185: Poco::NumberFormatter::format(double value, int precision) 
   ignore precision == 0
+- fixed GH #138: FreeBSD JSON tests fail
+
 
 Release 1.5.1 (2013-01-11)
 ==========================
