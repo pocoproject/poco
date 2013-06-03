@@ -36,6 +36,7 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Exception.h"
 
+GCC_DIAG_OFF(unused-variable)
 
 using Poco::StringTokenizer;
 using Poco::RangeException;

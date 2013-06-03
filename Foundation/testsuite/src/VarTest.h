@@ -41,6 +41,7 @@
 #include "Poco/Exception.h"
 #include "CppUnit/TestCase.h"
 
+GCC_DIAG_OFF(unused-but-set-variable)
 
 class VarTest: public CppUnit::TestCase
 {

@@ -37,6 +37,9 @@
 #include "Poco/NumberFormatter.h"
 
 
+GCC_DIAG_OFF(unused-variable)
+
+
 using namespace Poco;
 
 

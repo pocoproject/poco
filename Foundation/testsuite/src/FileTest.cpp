@@ -41,6 +41,7 @@
 #include <fstream>
 #include <set>
 
+GCC_DIAG_OFF(unused-variable)
 
 using Poco::File;
 using Poco::TemporaryFile;

@@ -71,7 +71,7 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 #if defined(POCO_HAVE_LIBRESOLV)
 	Poco::ScopedReadRWLock readLock(resolverLock);
 #endif
-	
+
 #if defined(POCO_HAVE_ADDRINFO)
 	struct addrinfo* pAI;
 	struct addrinfo hints;

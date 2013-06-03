@@ -38,7 +38,7 @@
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-
+#pragma GCC diagnostic ignored "-Wunused-variable"
 
 class ClassLoaderTest: public CppUnit::TestCase
 {

@@ -120,37 +120,45 @@ template <size_t Alignment> struct AlignedCharArrayImpl;
 // MSVC requires special handling here.
 #ifndef _MSC_VER
 
-	#if __has_feature(cxx_alignas)
-		#define POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(x) \
-			template <> struct AlignedCharArrayImpl<x> \
-			{ \
-				char alignas(x) aligned; \
-			}
+	#ifdef POCO_COMPILER_CLANG
+
+		#if __has_feature(cxx_alignas)
+			#define POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(x) \
+				template <> struct AlignedCharArrayImpl<x> \
+				{ \
+					char alignas(x) aligned; \
+				}
+			#define POCO_HAVE_ALIGNMENT
+		#endif
+
 	#elif defined(__GNUC__) || defined(__IBM_ATTRIBUTES)
+
 		#define POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(x) \
 			template <> struct AlignedCharArrayImpl<x> \
 			{ \
 				char aligned __attribute__((aligned(x))); \
 			}
-	#else
-		# error No supported align as directive.
+			#define POCO_HAVE_ALIGNMENT
+
 	#endif
+	
+	#ifdef POCO_HAVE_ALIGNMENT
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(1);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(2);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(4);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(8);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(16);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(32);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(64);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(128);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(512);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(1024);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(2048);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(4096);
+		POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(8192);
 
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(1);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(2);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(4);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(8);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(16);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(32);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(64);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(128);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(512);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(1024);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(2048);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(4096);
-	POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(8192);
-
-	#undef POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT
+		#undef POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT
+	#endif // POCO_HAVE_ALIGNMENT
 
 #else // _MSC_VER
 
@@ -180,49 +188,59 @@ template <size_t Alignment> struct AlignedCharArrayImpl;
 	// Any larger and MSVC complains.
 	#undef POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT
 
+	#define POCO_HAVE_ALIGNMENT
 #endif // _MSC_VER
 
+// POCO_HAVE_ALIGNMENT will be defined on the pre-C++11 platforms/compilers where
+// it can be reliably determined and used. Uncomment the line below to explicitly
+// disable use of alignment even for those platforms. 
+// #undef POCO_HAVE_ALIGNMENT
 
-template <typename T1, typename T2 = char, typename T3 = char, typename T4 = char>
-union AlignedCharArrayUnion
-	/// This union template exposes a suitably aligned and sized character
-	/// array member which can hold elements of any of up to four types.
-	///
-	/// These types may be arrays, structs, or any other types. The goal is to
-	/// produce a union type containing a character array which, when used, forms
-	/// storage suitable to placement new any of these types over. Support for more
-	/// than four types can be added at the cost of more boiler plate.
-{
-private:
-	class AlignerImpl
-	{
-		T1 t1;
-		T2 t2;
-		T3 t3;
-		T4 t4;
-	
-		AlignerImpl(); // Never defined or instantiated.
-	};
 
-	union SizerImpl
-	{
-		char arr1[sizeof(T1)];
-		char arr2[sizeof(T2)];
-		char arr3[sizeof(T3)];
-		char arr4[sizeof(T4)];
-	};
+#ifdef POCO_HAVE_ALIGNMENT
 
-public:
-	char buffer[sizeof(SizerImpl)];
-		/// The character array buffer for use by clients.
+	template <typename T1, typename T2 = char, typename T3 = char, typename T4 = char>
+	union AlignedCharArrayUnion
+		/// This union template exposes a suitably aligned and sized character
+		/// array member which can hold elements of any of up to four types.
 		///
-		/// No other member of this union should be referenced. They exist purely to
-		/// constrain the layout of this character array.
+		/// These types may be arrays, structs, or any other types. The goal is to
+		/// produce a union type containing a character array which, when used, forms
+		/// storage suitable to placement new any of these types over. Support for more
+		/// than four types can be added at the cost of more boiler plate.
+	{
+	private:
+		class AlignerImpl
+		{
+			T1 t1;
+			T2 t2;
+			T3 t3;
+			T4 t4;
+		
+			AlignerImpl(); // Never defined or instantiated.
+		};
+	
+		union SizerImpl
+		{
+			char arr1[sizeof(T1)];
+			char arr2[sizeof(T2)];
+			char arr3[sizeof(T3)];
+			char arr4[sizeof(T4)];
+		};
+	
+	public:
+		char buffer[sizeof(SizerImpl)];
+			/// The character array buffer for use by clients.
+			///
+			/// No other member of this union should be referenced. They exist purely to
+			/// constrain the layout of this character array.
+	
+	private:
+		Poco::AlignedCharArrayImpl<AlignOf<AlignerImpl>::Alignment> _nonceMember;
 
-private:
-	Poco::AlignedCharArrayImpl<AlignOf<AlignerImpl>::Alignment> _nonceMember;
 };
 
+#endif // POCO_HAVE_ALIGNMENT
 
 } // namespace Poco
 

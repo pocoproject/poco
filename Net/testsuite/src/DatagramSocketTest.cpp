@@ -104,6 +104,7 @@ void DatagramSocketTest::testBroadcast()
 		int n = ss.sendTo("hello", 5, sa);
 		// not all socket implementations fail if broadcast option is not set
 		// fail ("broadcast option not set - must throw");
+		n = n + 1; // to silence gcc
 	}
 	catch (IOException&)
 	{
