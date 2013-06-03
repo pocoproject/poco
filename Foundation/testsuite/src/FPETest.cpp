@@ -77,11 +77,11 @@ void FPETest::testClassify()
 
 
 #if defined(__HP_aCC)
-#pragma OPTIMIZE OFF
+	#pragma OPTIMIZE OFF
 #elif defined(_MSC_VER)
-#pragma optimize("", off)
-#elif defined(__APPLE__)
-#pragma GCC optimization_level 0
+	#pragma optimize("", off)
+#elif defined(__APPLE__) && defined(POCO_COMPILER_GCC)
+	#pragma GCC optimization_level 0
 #endif
 
 
@@ -128,17 +128,17 @@ void FPETest::testFlags()
 
 
 #if defined(__HP_aCC)
-#pragma OPTIMIZE ON
+	#pragma OPTIMIZE ON
 #elif defined(_MSC_VER)
-#pragma optimize("", on)
-#elif defined(__APPLE__)
-#pragma GCC optimization_level reset
+	#pragma optimize("", on)
+#elif defined(__APPLE__) && defined(POCO_COMPILER_GCC)
+	#pragma GCC optimization_level reset
 #endif
 
 
 void FPETest::testRound()
 {
-	#if !defined(__osf__) && !defined(__VMS)
+#if !defined(__osf__) && !defined(__VMS)
 	FPE::setRoundingMode(FPE::FP_ROUND_TONEAREST);			
 	assert (FPE::getRoundingMode() == FPE::FP_ROUND_TONEAREST);
 	{
@@ -146,7 +146,7 @@ void FPETest::testRound()
 		assert (FPE::getRoundingMode() == FPE::FP_ROUND_TOWARDZERO);
 	}
 	assert (FPE::getRoundingMode() == FPE::FP_ROUND_TONEAREST);	
-	#endif
+#endif
 }
 
 
