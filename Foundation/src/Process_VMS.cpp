@@ -137,7 +137,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 }
 
 
-void ProcessImpl::killImpl(const ProcessHandleImpl& handle)
+void ProcessImpl::killImpl(ProcessHandleImpl& handle)
 {
 	killImpl(handle.id());
 }
