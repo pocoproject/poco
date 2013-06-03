@@ -62,7 +62,8 @@ public:
 	UInt32 id() const;
 	HANDLE process() const;
 	int wait() const;
-	
+	void closeHandle();
+
 private:
 	HANDLE _hProcess;
 	UInt32 _pid;
@@ -89,7 +90,7 @@ public:
 		Pipe* outPipe, 
 		Pipe* errPipe,
 		const EnvImpl& env);
-	static void killImpl(const ProcessHandleImpl& handle);
+	static void killImpl(ProcessHandleImpl& handle);
 	static void killImpl(PIDImpl pid);
 	static void requestTerminationImpl(PIDImpl pid);
 	static std::string terminationEventName(PIDImpl pid);

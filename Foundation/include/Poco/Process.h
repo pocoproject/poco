@@ -237,7 +237,7 @@ public:
 		/// Waits for the process specified by handle to terminate
 		/// and returns the exit code of the process.
 		
-	static void kill(const ProcessHandle& handle);
+	static void kill(ProcessHandle& handle);
 		/// Kills the process specified by handle.
 		///
 		/// This is preferable on Windows where process IDs
