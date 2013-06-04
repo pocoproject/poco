@@ -425,6 +425,8 @@
 				<File
 					RelativePath=".\include\Poco\Util\IniFileConfiguration.h"/>
 				<File
+					RelativePath=".\include\Poco\Util\JSONConfiguration.h"/>
+				<File
 					RelativePath=".\include\Poco\Util\LayeredConfiguration.h"/>
 				<File
 					RelativePath=".\include\Poco\Util\LoggingConfigurator.h"/>
@@ -449,6 +451,8 @@
 					RelativePath=".\src\FilesystemConfiguration.cpp"/>
 				<File
 					RelativePath=".\src\IniFileConfiguration.cpp"/>
+				<File
+					RelativePath=".\src\JSONConfiguration.cpp"/>
 				<File
 					RelativePath=".\src\LayeredConfiguration.cpp"/>
 				<File
