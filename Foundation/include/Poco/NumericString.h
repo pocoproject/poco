@@ -55,9 +55,11 @@
 	#include <locale>
 #endif
 
-
+// binary numbers are supported, thus 64 (bits) + 1 (string terminating zero)
 #define POCO_MAX_INT_STRING_LEN 65
-#define POCO_MAX_FLT_STRING_LEN 128
+// value from strtod.cc (double_conversion::kMaxSignificantDecimalDigits)
+#define POCO_MAX_FLT_STRING_LEN 780
+
 #define POCO_FLT_INF "inf"
 #define POCO_FLT_NAN "nan"
 #define POCO_FLT_EXP 'e'

@@ -268,7 +268,10 @@ int Application::loadConfiguration(int priority)
 #endif
 	if (n > 0)
 	{
-		_pConfig->setString("application.configDir", cfgPath.parent().toString());
+		if (!cfgPath.isAbsolute())
+			_pConfig->setString("application.configDir", cfgPath.absolute().parent().toString());
+		else
+			_pConfig->setString("application.configDir", cfgPath.parent().toString());
 	}
 	return n;
 }

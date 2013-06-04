@@ -45,6 +45,7 @@
 // --- double conversion ---
 
 #include "Poco/NumericString.h"
+poco_static_assert(POCO_MAX_FLT_STRING_LEN == double_conversion::kMaxSignificantDecimalDigits);
 #include "Poco/String.h"
 #include <cctype>
 

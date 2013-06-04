@@ -232,6 +232,9 @@ void NumberFormatterTest::testFormatFloat()
 	assert(NumberFormatter::format(-12.25, 4) == "-12.2500");
 	assert(NumberFormatter::format(-12.25, 10, 4) == "  -12.2500");
 	assert(NumberFormatter::format(-12.25, 10, 2) == "    -12.25");
+
+	double dTest = 50.0;
+	assert (NumberFormatter::format(dTest, 3) == "50.000");
 }
 
 

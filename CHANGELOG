@@ -70,7 +70,9 @@ Release 1.5.2 (2013-06-xx)
 - modified behavior of empty Var (empty == empty)
 - added Alignment.h header for C++03 alignment needs
 - added Data/WebNotifier (DB, WebSocket) example
-
+- fixed GH #209: Poco::NumberFormatter double length
+- fixed GH #204: Upgrade zlib to 1.2.8
+- fixed GH #198: The "application.configDir" property is not always created.
 
 Release 1.5.1 (2013-01-11)
 ==========================
