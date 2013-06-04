@@ -122,6 +122,11 @@ public:
 		/// Starts the activity by acquiring a
 		/// thread for it from the default thread pool.
 	{
+		start(ThreadPool::defaultPool());
+	}
+
+	void start(ThreadPool& pool)
+	{
 		FastMutex::ScopedLock lock(_mutex);
 		
 		if (!_running)
@@ -131,7 +136,7 @@ public:
 			_running = true;
 			try
 			{
-				ThreadPool::defaultPool().start(*this);
+				pool.start(*this);
 			}
 			catch (...)
 			{
