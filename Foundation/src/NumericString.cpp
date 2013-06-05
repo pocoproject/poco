@@ -58,6 +58,10 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	/// Alternative prefix (e.g. zero instead of space) can be supplied by caller.
 	/// Used only internally.
 {
+	// these cases should never happen, if they do, it's a library bug
+	poco_assert_dbg (precision > 0);
+	poco_assert_dbg (str.length());
+
 	std::string::size_type decSepPos = str.find(decSep);
 	if (decSepPos == std::string::npos)
 	{
@@ -66,11 +70,26 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	}
 
 	std::string::size_type frac = str.length() - decSepPos - 1;
-	if (precision)
+
+	std::string::size_type ePos = str.find_first_of("eE");
+	std::auto_ptr<std::string> eStr;
+	if (ePos != std::string::npos)
 	{
-		if (frac < precision) str.append(precision - frac, '0');
-		else if (frac > precision) str = str.substr(0, frac + precision);
+		eStr.reset(new std::string(str.substr(ePos, std::string::npos)));
+		frac -= eStr->length();
+		str = str.substr(0, str.length() - eStr->length());
 	}
+
+	if (frac != precision)
+	{
+		if (frac < precision)
+			str.append(precision - frac, '0');
+		else if ((frac > precision) && (decSepPos != std::string::npos)) 
+			str = str.substr(0, decSepPos + 1 + precision);
+	}
+
+	if (eStr.get()) str += *eStr;
+
 	if (width && (str.length() < width)) str.insert(str.begin(), width - str.length(), prefix);
 }
 
@@ -136,6 +155,9 @@ void floatToStr(char* buffer, int bufferSize, float value, int lowDec, int highD
 
 std::string& floatToStr(std::string& str, float value, int precision, int width, char thSep, char decSep)
 {
+	if (!decSep) decSep = '.';
+	if (precision == 0) value = std::floor(value);
+
 	char buffer[POCO_MAX_FLT_STRING_LEN];
 	floatToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
 	str = buffer;
@@ -144,7 +166,7 @@ std::string& floatToStr(std::string& str, float value, int precision, int width,
 		replaceInPlace(str, '.', decSep);
 
 	if (thSep) insertThousandSep(str, thSep, decSep);
-	if (precision || width) pad(str, precision, width, ' ', decSep ? decSep : '.');
+	if (precision > 0 || width) pad(str, precision, width, ' ', decSep ? decSep : '.');
 	return str;
 }
 
@@ -165,6 +187,7 @@ void doubleToStr(char* buffer, int bufferSize, double value, int lowDec, int hig
 std::string& doubleToStr(std::string& str, double value, int precision, int width, char thSep, char decSep)
 {
 	if (!decSep) decSep = '.';
+	if (precision == 0) value = std::floor(value);
 
 	char buffer[POCO_MAX_FLT_STRING_LEN];
 	doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
@@ -174,7 +197,7 @@ std::string& doubleToStr(std::string& str, double value, int precision, int widt
 		replaceInPlace(str, '.', decSep);
 
 	if (thSep) insertThousandSep(str, thSep, decSep);
-	if (precision || width) pad(str, precision, width, ' ', decSep ? decSep : '.');
+	if (precision > 0 || width) pad(str, precision, width, ' ', decSep ? decSep : '.');
 	return str;
 }
 

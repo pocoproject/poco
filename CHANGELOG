@@ -73,6 +73,8 @@ Release 1.5.2 (2013-06-xx)
 - fixed GH #209: Poco::NumberFormatter double length
 - fixed GH #204: Upgrade zlib to 1.2.8
 - fixed GH #198: The "application.configDir" property is not always created.
+- fixed GH #185: Poco::NumberFormatter::format(double value, int precision) 
+  ignore precision == 0
 
 Release 1.5.1 (2013-01-11)
 ==========================
