@@ -110,14 +110,10 @@ public:
 	Var(const T& val)
 		/// Creates the Var from the given value.
 #ifdef POCO_NO_SOO
-		: _pHolder(new VarHolderImpl<T>(val)),
-		  _pBegin(new Iterator(this, false)),
-		  _pEnd(new Iterator(this, true))
+		: _pHolder(new VarHolderImpl<T>(val))
 	{
 	}
 #else
-		: _pBegin(new Iterator(this, false)),
-		  _pEnd(new Iterator(this, true))
 	{
 		construct(val);
 	}
@@ -135,10 +131,10 @@ public:
 	void swap(Var& other);
 		/// Swaps the content of the this Var with the other Var.
 
-	ConstIterator& begin() const;
+	ConstIterator begin() const;
 		/// Returns the const Var iterator.
 
-	ConstIterator& end() const;
+	ConstIterator end() const;
 		/// Returns the const Var iterator.
 
 	Iterator begin();
@@ -676,9 +672,6 @@ private:
 	Placeholder<VarHolder> _placeholder;
 
 #endif // POCO_NO_SOO
-	
-	Iterator* _pBegin;
-	Iterator* _pEnd;
 };
 
 
@@ -732,30 +725,28 @@ inline const std::type_info& Var::type() const
 }
 
 
-inline Var::ConstIterator& Var::begin() const
+inline Var::ConstIterator Var::begin() const
 {
-	if (isEmpty()) _pBegin->setPosition(Iterator::POSITION_END);
-	else if (*_pBegin == *_pEnd) _pBegin->setPosition(0);
+	if (isEmpty()) return ConstIterator(const_cast<Var*>(this), true);
 
-	return *_pBegin;
+	return ConstIterator(const_cast<Var*>(this), false);
 }
 
-inline Var::ConstIterator& Var::end() const
+inline Var::ConstIterator Var::end() const
 {
-	return *_pEnd;
+	return ConstIterator(const_cast<Var*>(this), true);
 }
 
 inline Var::Iterator Var::begin()
 {
-	if (isEmpty()) _pBegin->setPosition(Iterator::POSITION_END);
-	else if (*_pBegin == *_pEnd) _pBegin->setPosition(0);
+	if (isEmpty()) return Iterator(const_cast<Var*>(this), true);
 
-	return *_pBegin;
+	return Iterator(const_cast<Var*>(this), false);
 }
 
 inline Var::Iterator Var::end()
 {
-	return *_pEnd;
+	return Iterator(this, true);
 }
 
 

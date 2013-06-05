@@ -38,6 +38,7 @@
 #include "Poco/PatternFormatter.h"
 #include "Poco/AutoPtr.h"
 
+GCC_DIAG_OFF(unused-variable)
 
 using Poco::LoggingRegistry;
 using Poco::Channel;

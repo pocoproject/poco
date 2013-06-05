@@ -36,7 +36,6 @@
 
 #include "Poco/Thread_POSIX.h"
 #include "Poco/Thread.h"
-#include "Poco/Debugger.h"
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Timespan.h"
@@ -77,21 +76,18 @@ namespace
 #endif
 
 
-#if defined(_DEBUG) && defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
+#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
 
 
 namespace
 {
     void setThreadName(pthread_t thread, const char* threadName)
     {
-		if (Poco::Debugger::isAvailable())
-		{
 #   if (POCO_OS == POCO_OS_MAC_OS_X)
-            pthread_setname_np(threadName); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
+        pthread_setname_np(threadName); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
 #   else
-            pthread_setname_np(thread, threadName);
+        pthread_setname_np(thread, threadName);
 #   endif
-        }
     }
 }
 
@@ -405,7 +401,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-#if defined(_DEBUG) && defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
+#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
 	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName().c_str());
 #endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
@@ -446,7 +442,7 @@ void* ThreadImpl::callableEntry(void* pThread)
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-#if defined(_DEBUG) && defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
+#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
 	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName().c_str());
 #endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;

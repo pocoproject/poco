@@ -1000,11 +1000,11 @@ void StringTest::testFloatToString()
 	double val = 1.03721575516329e-112;
 	std::string str;
 	
-	assert (doubleToStr(str, val, 15, 21) == "1.03721575516329e-112");
-	assert (doubleToStr(str, val, 15, 22) == " 1.03721575516329e-112");
+	assert (doubleToStr(str, val, 14, 21) == "1.03721575516329e-112");
+	assert (doubleToStr(str, val, 14, 22) == " 1.03721575516329e-112");
 	val = -val;
-	assert (doubleToStr(str, val, 15, 22) == "-1.03721575516329e-112");
-	assert (doubleToStr(str, val, 15, 23) == " -1.03721575516329e-112");
+	assert (doubleToStr(str, val, 14, 22) == "-1.03721575516329e-112");
+	assert (doubleToStr(str, val, 14, 23) == " -1.03721575516329e-112");
 	
 	val = -10372157551632.9;
 	assert (doubleToStr(str, val, 1, 21, ',') == "-10,372,157,551,632.9");

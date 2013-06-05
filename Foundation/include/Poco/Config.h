@@ -45,7 +45,7 @@
 
 
 // Define to enable C++11 support
-//	#define POCO_ENABLE_CPP11
+// #define POCO_ENABLE_CPP11
 
 
 // Define to disable implicit linking
@@ -100,11 +100,21 @@
 // candidates) will be auto-allocated on the stack in 
 // cases when value holder fits into POCO_SMALL_OBJECT_SIZE
 // (see below).
+// 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!! NOTE: Any/Dynamic::Var SOO will NOT work reliably   !!!
+// !!! without C++11 (std::aligned_storage in particular). !!!
+// !!! Only comment this out if your compiler has support  !!!
+// !!! for std::aligned_storage.                           !!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// 
 #define POCO_NO_SOO
 
 
 // Small object size in bytes. When assigned to Any or Var,
-// objects longer than this value will be alocated on the heap.
+// objects larger than this value will be alocated on the heap,
+// while those smaller will be placement new-ed into an
+// internal buffer.
 #if !defined(POCO_SMALL_OBJECT_SIZE) && !defined(POCO_NO_SOO)
 	#define POCO_SMALL_OBJECT_SIZE 32
 #endif

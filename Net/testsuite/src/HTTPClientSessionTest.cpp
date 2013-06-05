@@ -247,7 +247,7 @@ void HTTPClientSessionTest::testKeepAlive()
 	assert (response.getChunkedTransferEncoding());
 	assert (response.getKeepAlive());
 	std::ostringstream ostr3;
-	std::streamsize n = StreamCopier::copyStream(rs3, ostr3);
+	StreamCopier::copyStream(rs3, ostr3);
 	assert (ostr3.str() == HTTPTestServer::LARGE_BODY);
 
 	request.setMethod(HTTPRequest::HTTP_HEAD);

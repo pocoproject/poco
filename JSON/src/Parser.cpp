@@ -129,75 +129,6 @@ const int Parser::_stateTransitionTable[NR_STATES][NR_CLASSES] = {
 };
 
 
-// Source
-
-class Source
-{
-public:
-	Source()
-	{
-	}
-	
-	virtual ~Source()
-	{
-	}
-	
-	virtual bool nextChar(int& c) = 0;
-};
-
-
-class StreamSource : public Source
-{
-public:
-	StreamSource(std::istream& in) : _in(in)
-	{
-	}
-	
-	virtual ~StreamSource()
-	{
-	}
-
-	bool nextChar(int& c)
-	{
-		if ( _in.good() )
-		{
-			c = _in.get();
-			return _in.good();
-		}
-		return false;
-	}
-
-private:
-	std::istream& _in;
-};
-
-
-class StringSource : public Source
-{
-public:
-	StringSource(std::string::const_iterator begin, std::string::const_iterator end) : _it(begin), _end(end)
-	{
-	}
-	
-	virtual ~StringSource()
-	{
-	}
-
-	bool nextChar(int& c)
-	{
-		if ( _it == _end ) return false;
-
-		c = *_it++;
-		return true;
-	}
-
-private:
-	std::string::const_iterator _it;
-	std::string::const_iterator _end;
-};
-
-
-// Parser
 Parser::Parser(const Handler::Ptr& pHandler, std::size_t bufSize) :
 	_pHandler(pHandler),
 	_state(GO),
@@ -244,7 +175,9 @@ void Parser::reset()
 
 Dynamic::Var Parser::parse(const std::string& json)
 {
-	StringSource source(json.begin(), json.end());
+	std::string::const_iterator it = json.begin();
+	std::string::const_iterator end = json.end();
+	Source<std::string::const_iterator> source(it, end);
 
 	int c = 0;
 	while(source.nextChar(c))
@@ -261,7 +194,9 @@ Dynamic::Var Parser::parse(const std::string& json)
 
 Dynamic::Var Parser::parse(std::istream& in)
 {
-	StreamSource source(in);
+	std::istreambuf_iterator<char> it(in.rdbuf());
+	std::istreambuf_iterator<char> end;
+	Source<std::istreambuf_iterator<char> > source(it, end);
 
 	int c = 0;
 	while(source.nextChar(c))
@@ -328,7 +263,7 @@ void Parser::parseBufferPushBackChar(char c)
 }
 
 
-void Parser::addEscapedCharToParseBuffer(int nextChar)
+void Parser::addEscapedCharToParseBuffer(CharIntType nextChar)
 {
 	_escaped = 0;
 	// remove the backslash
@@ -369,7 +304,7 @@ void Parser::addEscapedCharToParseBuffer(int nextChar)
 }
 
 
-void Parser::addCharToParseBuffer(int nextChar, int nextClass)
+void Parser::addCharToParseBuffer(CharIntType nextChar, int nextClass)
 {
 	if (_escaped)
 	{
@@ -387,289 +322,7 @@ void Parser::addCharToParseBuffer(int nextChar, int nextClass)
 }
 
 
-bool Parser::parseChar(int nextChar, Source& source)
-{
-	int nextClass, nextState;
-
-	// Determine the character's class.
-	if (nextChar < 0 || (!_allowNullByte && nextChar == 0)) return false;
-	if (0x80 <= nextChar && nextChar <= 0xFF)
-	{
-		nextClass = C_ETC;
-		int count = utf8_check_first(nextChar);
-		if (!count)
-		{
-			throw JSONException(format("Unable to decode byte 0x%x", (unsigned int) nextChar));
-		}
-
-		char buffer[4];
-		buffer[0] = nextChar;
-		for(int i = 1; i < count; ++i)
-		{
-			int c = 0;
-			if (!source.nextChar(c)) throw JSONException("Invalid UTF8 character found");
-			buffer[i] = c;
-		}
-		
-		if ( !UTF8Encoding::isLegal((unsigned char*) buffer, count) )
-		{
-			throw JSONException("No legal UTF8 found");
-		}
-
-		for(int i = 0; i < count; ++i)
-		{
-			parseBufferPushBackChar(buffer[i]);
-		}
-		return true;
-	}
-	else
-	{
-		nextClass = _asciiClass[nextChar];
-		if (nextClass <= xx) return false; 
-	}
-
-	addCharToParseBuffer(nextChar, nextClass);
-
-	// Get the next _state from the _state transition table.
-	nextState = _stateTransitionTable[_state][nextClass];
-	if (nextState >= 0)
-	{
-		_state = nextState;
-	}
-	else 
-	{
-		// Or perform one of the actions.
-		switch (nextState)
-		{
-		// Unicode character 
-		case UC:
-			if(!decodeUnicodeChar()) return false;
-			// check if we need to read a second UTF-16 char
-			if (_utf16HighSurrogate) _state = D1;
-			else _state = ST;
-			break;
-		// _escaped char 
-		case EX:
-			_escaped = 1;
-			_state = ES;
-			break;
-		// integer detected by minus
-		case MX:
-			_type = JSON_T_INTEGER;
-			_state = MI;
-			break;
-		// integer detected by zero
-		case ZX:
-			_type = JSON_T_INTEGER;
-			_state = ZE;
-			break;
-			// integer detected by 1-9 
-		case IX:
-			_type = JSON_T_INTEGER;
-			_state = IT;
-			break;
-		// floating point number detected by exponent
-		case DE:
-			assertNotStringNullBool();
-			_type = JSON_T_FLOAT;
-			_state = E1;
-			break;
-		// floating point number detected by fraction
-		case DF:
-			assertNotStringNullBool();
-			_type = JSON_T_FLOAT;
-			_state = FX;
-			break;
-		// string begin "
-		case SB:
-			clearBuffer();
-			poco_assert(_type == JSON_T_NONE);
-			_type = JSON_T_STRING;
-			_state = ST;
-			break;
-
-		// n
-		case NU:
-			poco_assert(_type == JSON_T_NONE);
-			_type = JSON_T_NULL;
-			_state = N1;
-			break;
-		// f
-		case FA:
-			poco_assert(_type == JSON_T_NONE);
-			_type = JSON_T_FALSE;
-			_state = F1;
-			break;
-		// t
-		case TR:
-			poco_assert(_type == JSON_T_NONE);
-			_type = JSON_T_TRUE;
-			_state = T1;
-			break;
-
-		// closing comment
-		case CE:
-			_comment = 0;
-			poco_assert(_parseBufferCount == 0);
-			poco_assert(_type == JSON_T_NONE);
-			_state = _beforeCommentState;
-			break;
-
-		// opening comment
-		case CB:
-			if (!_allowComments) return false;
-			parseBufferPopBackChar();
-			parseBuffer();
-			poco_assert(_parseBufferCount == 0);
-			poco_assert(_type != JSON_T_STRING);
-			switch (_stack[_top])
-			{
-			case MODE_ARRAY:
-				case MODE_OBJECT:
-					switch(_state)
-					{
-					case VA:
-					case AR:
-						_beforeCommentState = _state;
-						break;
-					default:
-						_beforeCommentState = OK;
-						break;
-					}
-					break;
-					default:
-						_beforeCommentState = _state;
-						break;
-					}
-				_type = JSON_T_NONE;
-				_state = C1;
-				_comment = 1;
-				break;
-			// empty }
-			case -9:
-			{
-				clearBuffer();
-				if (_pHandler) _pHandler->endObject();
-
-				if (!pop(MODE_KEY)) return false;
-				_state = OK;
-				break;
-			}
-			// }
-			case -8:
-			{
-				parseBufferPopBackChar();
-				parseBuffer();
-				if (_pHandler) _pHandler->endObject();
-				if (!pop(MODE_OBJECT)) return false;
-				_type = JSON_T_NONE;
-				_state = OK;
-				break;
-			}
-			// ]
-			case -7:
-			{
-				parseBufferPopBackChar();
-				parseBuffer();
-				if (_pHandler) _pHandler->endArray();
-				if (!pop(MODE_ARRAY)) return false;
-				_type = JSON_T_NONE;
-				_state = OK;
-				break;
-			}
-			// {
-			case -6:
-			{
-				parseBufferPopBackChar();
-				if (_pHandler) _pHandler->startObject();
-				if (!push(MODE_KEY)) return false;
-				poco_assert(_type == JSON_T_NONE);
-				_state = OB;
-				break;
-			}
-			// [
-			case -5:
-			{
-				parseBufferPopBackChar();
-				if (_pHandler) _pHandler->startArray();
-				if (!push(MODE_ARRAY)) return false;
-				poco_assert(_type == JSON_T_NONE);
-				_state = AR;
-				break;
-			}
-			// string end "
-			case -4:
-				parseBufferPopBackChar();
-				switch (_stack[_top])
-				{
-				case MODE_KEY:
-					{
-					poco_assert(_type == JSON_T_STRING);
-					_type = JSON_T_NONE;
-					_state = CO;
-
-					if (_pHandler) 
-					{
-						std::string value(_parseBuffer.begin(), _parseBufferCount);
-						_pHandler->key(value);
-					}
-					clearBuffer();
-					break;
-					}
-				case MODE_ARRAY:
-				case MODE_OBJECT:
-					poco_assert(_type == JSON_T_STRING);
-					parseBuffer();
-					_type = JSON_T_NONE;
-					_state = OK;
-					break;
-				default:
-					return false;
-				}
-				break;
-
-			// ,
-			case -3:
-				{
-				parseBufferPopBackChar();
-				parseBuffer();
-				switch (_stack[_top])
-				{
-				case MODE_OBJECT:
-					//A comma causes a flip from object mode to key mode.
-					if (!pop(MODE_OBJECT) || !push(MODE_KEY)) return false;
-					poco_assert(_type != JSON_T_STRING);
-					_type = JSON_T_NONE;
-					_state = KE;
-					break;
-				case MODE_ARRAY:
-					poco_assert(_type != JSON_T_STRING);
-					_type = JSON_T_NONE;
-					_state = VA;
-					break;
-				default:
-					return false;
-				}
-				break;
-				}
-			// :
-			case -2:
-				// A colon causes a flip from key mode to object mode.
-				parseBufferPopBackChar();
-				if (!pop(MODE_KEY) || !push(MODE_OBJECT)) return false;
-				poco_assert(_type == JSON_T_NONE);
-				_state = VA;
-				break;
-			//Bad action.
-			default:
-				return false;
-		}
-	}
-	return true;
-}
-
-
-int Parser::decodeUnicodeChar()
+Parser::CharIntType Parser::decodeUnicodeChar()
 {
 	int i;
 	unsigned uc = 0;
@@ -836,7 +489,7 @@ void Parser::parseBuffer()
 	clearBuffer();
 }
 
-int Parser::utf8_check_first(char byte)
+int Parser::utf8CheckFirst(char byte)
 {
 	unsigned char u = (unsigned char) byte;
 

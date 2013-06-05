@@ -48,10 +48,9 @@
 int main(int argc, char** argv)
 {
 	Poco::Stopwatch sw;
-	Poco::JSON::Object::Ptr obj;
 
 	std::string dir = Poco::Environment::get("POCO_BASE") + "/JSON/samples/Benchmark/";
-	Poco::Path filePath(dir, "input.json");
+	Poco::Path filePath(dir, "input.big.json");
 
 	std::ostringstream ostr;
 
@@ -78,36 +77,58 @@ int main(int argc, char** argv)
 	std::string jsonStr = ostr.str();
 	std::cout << "Total of " << jsonStr.size() << " bytes," << std::endl << "loaded in " << sw.elapsed() << " [us]," << std::endl;
 
-	std::cout << std::endl << "POCO JSON Parse" << std::endl;
-	std::cout << "---------" << std::endl;
-	Poco::JSON::Parser parser;
+	std::cout << std::endl << "POCO JSON barebone parse" << std::endl;
+	Poco::JSON::Parser sparser(0);
 	sw.restart();
-	parser.parse(jsonStr);
+	sparser.parse(jsonStr);
 	sw.stop();
-	std::cout << "parsed in " << sw.elapsed() << " [us]," << std::endl;
+	std::cout << "---------------------------------" << std::endl;
+	std::cout << "[std::string] parsed in " << sw.elapsed() << " [us]" << std::endl;
+	std::cout << "---------------------------------" << std::endl;
+
+	Poco::JSON::Parser iparser(0);
+	std::istringstream istr(jsonStr);
+	sw.restart();
+	iparser.parse(istr);
+	sw.stop();
+	std::cout << "----------------------------------------" << std::endl;
+	std::cout << "[std::istringstream] parsed in " << sw.elapsed() << " [us]" << std::endl;
+	std::cout << "----------------------------------------" << std::endl;
 
 	std::cout << std::endl << "POCO JSON Handle/Stringify" << std::endl;
-	std::cout << "--------------------------" << std::endl;
 	try
 	{
-		Poco::JSON::Parser parser;
+		Poco::JSON::Parser sparser;
 		sw.restart();
-		parser.parse(jsonStr);
-		Poco::DynamicAny result = parser.result();
+		sparser.parse(jsonStr);
+		Poco::DynamicAny result = sparser.result();
 		sw.stop();
-		std::cout << "parsed/handled in " << sw.elapsed() << " [us]," << std::endl;
-		
-		if ( result.type() == typeid(Poco::JSON::Object::Ptr) )
-		{
-			obj = result.extract<Poco::JSON::Object::Ptr>();
-		}
+		std::cout << "-----------------------------------------" << std::endl;
+		std::cout << "[std::string] parsed/handled in " << sw.elapsed() << " [us]" << std::endl;
+		std::cout << "-----------------------------------------" << std::endl;
+
+		Poco::JSON::Parser isparser;
+		std::istringstream istr(jsonStr);
+		sw.restart();
+		isparser.parse(istr);
+		result = isparser.result();
+		sw.stop();
+		std::cout << "------------------------------------------------" << std::endl;
+		std::cout << "[std::istringstream] parsed/handled in " << sw.elapsed() << " [us]" << std::endl;
+		std::cout << "------------------------------------------------" << std::endl;
 
 		//Serialize to string
+		Poco::JSON::Object::Ptr obj;
+		if ( result.type() == typeid(Poco::JSON::Object::Ptr) )
+			obj = result.extract<Poco::JSON::Object::Ptr>();
+
 		std::ostringstream out;
 		sw.restart();
 		obj->stringify(out);
 		sw.stop();
-		std::cout << "stringified in " << sw.elapsed() << " [us]." << std::endl;
+		std::cout << "-----------------------------------" << std::endl;
+		std::cout << "stringified in " << sw.elapsed() << " [us]" << std::endl;
+		std::cout << "-----------------------------------" << std::endl;
 		std::cout << std::endl;
 	}
 	catch(Poco::JSON::JSONException jsone)

@@ -67,15 +67,14 @@ SOFTWARE.
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/ParseHandler.h"
+#include "Poco/JSON/JSONException.h"
+#include "Poco/UTF8Encoding.h"
 #include "Poco/Dynamic/Var.h"
-#include "Poco/StreamTokenizer.h"
+#include <string>
 
 
 namespace Poco {
 namespace JSON {
-
-
-class Source;
 
 
 class JSON_API Parser
@@ -97,6 +96,8 @@ class JSON_API Parser
 	/// 
 {
 public:
+	typedef std::char_traits<char> CharTraits;
+	typedef CharTraits::int_type   CharIntType;
 
 	enum Classes
 	{
@@ -287,11 +288,11 @@ private:
 
 	void parseBufferPopBackChar();
 
-	void addCharToParseBuffer(int nextChar, int nextClass);
+	void addCharToParseBuffer(CharIntType nextChar, int nextClass);
 
-	void addEscapedCharToParseBuffer(int nextChar);
+	void addEscapedCharToParseBuffer(CharIntType nextChar);
 
-	int decodeUnicodeChar();
+	CharIntType decodeUnicodeChar();
 
 	void assertNotStringNullBool();
 
@@ -299,14 +300,320 @@ private:
 
 	void parseBuffer();
 
-	bool parseChar(int nextChar, Source& feeder);
+	template <typename IT>
+	class Source
+	{
+	public:
+		Source(const IT& it, const IT& end) : _it(it), _end(end)
+		{
+		}
+	
+		~Source()
+		{
+		}
+
+		bool nextChar(CharIntType& c)
+		{
+			if (_it == _end) return false;
+			c = *_it;
+			++_it;
+			return true;
+		}
+
+	private:
+		IT _it;
+		IT _end;
+	};
+
+	template <typename S>
+	bool parseChar(CharIntType nextChar, S& source)
 		/// Called for each character (or partial character) in JSON string.
 		/// It accepts UTF-8, UTF-16, or UTF-32. If the character is accepted,
 		/// it returns true, otherwise false.
+	{
+		CharIntType nextClass, nextState;
+		unsigned char ch = static_cast<unsigned char>(CharTraits::to_char_type(nextChar));
+
+		// Determine the character's class.
+		if (ch < 0 || (!_allowNullByte && ch == 0)) return false;
+		if (0x80 <= ch && ch <= 0xFF)
+		{
+			nextClass = C_ETC;
+			CharIntType count = utf8CheckFirst(nextChar);
+			if (!count)
+			{
+				throw Poco::JSON::JSONException(format("Unable to decode byte 0x%x", (unsigned int) nextChar));
+			}
+
+			char buffer[4];
+			buffer[0] = nextChar;
+			for(int i = 1; i < count; ++i)
+			{
+				int c = 0;
+				if (!source.nextChar(c)) throw Poco::JSON::JSONException("Invalid UTF8 sequence found");
+				buffer[i] = c;
+			}
+		
+			if (!Poco::UTF8Encoding::isLegal((unsigned char*) buffer, count))
+			{
+				throw Poco::JSON::JSONException("No legal UTF8 found");
+			}
+
+			for(int i = 0; i < count; ++i)
+			{
+				parseBufferPushBackChar(buffer[i]);
+			}
+			return true;
+		}
+		else
+		{
+			nextClass = _asciiClass[nextChar];
+			if (nextClass <= xx) return false; 
+		}
+
+		addCharToParseBuffer(nextChar, nextClass);
+
+		// Get the next _state from the _state transition table.
+		nextState = _stateTransitionTable[_state][nextClass];
+		if (nextState >= 0)
+		{
+			_state = nextState;
+		}
+		else 
+		{
+			// Or perform one of the actions.
+			switch (nextState)
+			{
+			// Unicode character 
+			case UC:
+				if(!decodeUnicodeChar()) return false;
+				// check if we need to read a second UTF-16 char
+				if (_utf16HighSurrogate) _state = D1;
+				else _state = ST;
+				break;
+			// _escaped char 
+			case EX:
+				_escaped = 1;
+				_state = ES;
+				break;
+			// integer detected by minus
+			case MX:
+				_type = JSON_T_INTEGER;
+				_state = MI;
+				break;
+			// integer detected by zero
+			case ZX:
+				_type = JSON_T_INTEGER;
+				_state = ZE;
+				break;
+				// integer detected by 1-9 
+			case IX:
+				_type = JSON_T_INTEGER;
+				_state = IT;
+				break;
+			// floating point number detected by exponent
+			case DE:
+				assertNotStringNullBool();
+				_type = JSON_T_FLOAT;
+				_state = E1;
+				break;
+			// floating point number detected by fraction
+			case DF:
+				assertNotStringNullBool();
+				_type = JSON_T_FLOAT;
+				_state = FX;
+				break;
+			// string begin "
+			case SB:
+				clearBuffer();
+				poco_assert(_type == JSON_T_NONE);
+				_type = JSON_T_STRING;
+				_state = ST;
+				break;
+
+			// n
+			case NU:
+				poco_assert(_type == JSON_T_NONE);
+				_type = JSON_T_NULL;
+				_state = N1;
+				break;
+			// f
+			case FA:
+				poco_assert(_type == JSON_T_NONE);
+				_type = JSON_T_FALSE;
+				_state = F1;
+				break;
+			// t
+			case TR:
+				poco_assert(_type == JSON_T_NONE);
+				_type = JSON_T_TRUE;
+				_state = T1;
+				break;
+
+			// closing comment
+			case CE:
+				_comment = 0;
+				poco_assert(_parseBufferCount == 0);
+				poco_assert(_type == JSON_T_NONE);
+				_state = _beforeCommentState;
+				break;
+
+			// opening comment
+			case CB:
+				if (!_allowComments) return false;
+				parseBufferPopBackChar();
+				parseBuffer();
+				poco_assert(_parseBufferCount == 0);
+				poco_assert(_type != JSON_T_STRING);
+				switch (_stack[_top])
+				{
+				case MODE_ARRAY:
+					case MODE_OBJECT:
+						switch(_state)
+						{
+						case VA:
+						case AR:
+							_beforeCommentState = _state;
+							break;
+						default:
+							_beforeCommentState = OK;
+							break;
+						}
+						break;
+						default:
+							_beforeCommentState = _state;
+							break;
+						}
+					_type = JSON_T_NONE;
+					_state = C1;
+					_comment = 1;
+					break;
+				// empty }
+				case -9:
+				{
+					clearBuffer();
+					if (_pHandler) _pHandler->endObject();
+
+					if (!pop(MODE_KEY)) return false;
+					_state = OK;
+					break;
+				}
+				// }
+				case -8:
+				{
+					parseBufferPopBackChar();
+					parseBuffer();
+					if (_pHandler) _pHandler->endObject();
+					if (!pop(MODE_OBJECT)) return false;
+					_type = JSON_T_NONE;
+					_state = OK;
+					break;
+				}
+				// ]
+				case -7:
+				{
+					parseBufferPopBackChar();
+					parseBuffer();
+					if (_pHandler) _pHandler->endArray();
+					if (!pop(MODE_ARRAY)) return false;
+					_type = JSON_T_NONE;
+					_state = OK;
+					break;
+				}
+				// {
+				case -6:
+				{
+					parseBufferPopBackChar();
+					if (_pHandler) _pHandler->startObject();
+					if (!push(MODE_KEY)) return false;
+					poco_assert(_type == JSON_T_NONE);
+					_state = OB;
+					break;
+				}
+				// [
+				case -5:
+				{
+					parseBufferPopBackChar();
+					if (_pHandler) _pHandler->startArray();
+					if (!push(MODE_ARRAY)) return false;
+					poco_assert(_type == JSON_T_NONE);
+					_state = AR;
+					break;
+				}
+				// string end "
+				case -4:
+					parseBufferPopBackChar();
+					switch (_stack[_top])
+					{
+					case MODE_KEY:
+						{
+						poco_assert(_type == JSON_T_STRING);
+						_type = JSON_T_NONE;
+						_state = CO;
+
+						if (_pHandler) 
+						{
+							std::string value(_parseBuffer.begin(), _parseBufferCount);
+							_pHandler->key(value);
+						}
+						clearBuffer();
+						break;
+						}
+					case MODE_ARRAY:
+					case MODE_OBJECT:
+						poco_assert(_type == JSON_T_STRING);
+						parseBuffer();
+						_type = JSON_T_NONE;
+						_state = OK;
+						break;
+					default:
+						return false;
+					}
+					break;
+
+				// ,
+				case -3:
+					{
+					parseBufferPopBackChar();
+					parseBuffer();
+					switch (_stack[_top])
+					{
+					case MODE_OBJECT:
+						//A comma causes a flip from object mode to key mode.
+						if (!pop(MODE_OBJECT) || !push(MODE_KEY)) return false;
+						poco_assert(_type != JSON_T_STRING);
+						_type = JSON_T_NONE;
+						_state = KE;
+						break;
+					case MODE_ARRAY:
+						poco_assert(_type != JSON_T_STRING);
+						_type = JSON_T_NONE;
+						_state = VA;
+						break;
+					default:
+						return false;
+					}
+					break;
+					}
+				// :
+				case -2:
+					// A colon causes a flip from key mode to object mode.
+					parseBufferPopBackChar();
+					if (!pop(MODE_KEY) || !push(MODE_OBJECT)) return false;
+					poco_assert(_type == JSON_T_NONE);
+					_state = VA;
+					break;
+				//Bad action.
+				default:
+					return false;
+			}
+		}
+		return true;
+	}
 
 	bool done();
 
-	static int utf8_check_first(char byte);
+	static CharIntType utf8CheckFirst(char byte);
 
 	static const int _asciiClass[128];
 		/// This array maps the 128 ASCII characters into character classes.
@@ -390,7 +697,9 @@ inline Dynamic::Var Parser::result() const
 
 inline Dynamic::Var Parser::asVar() const
 {
-	return _pHandler->asVar();
+	if (_pHandler) return _pHandler->asVar();
+
+	return Dynamic::Var();
 }
 
 

@@ -47,26 +47,20 @@ namespace Poco {
 namespace Dynamic {
 
 
-Var::Var() :
+Var::Var()
 #ifdef POCO_NO_SOO
-	_pHolder(0),
+	: _pHolder(0)
 #endif
-	_pBegin(new Iterator(this, true)),
-	_pEnd(new Iterator(this, true))
 {
 }
 
 
 Var::Var(const char* pVal)
 #ifdef POCO_NO_SOO 
-	: _pHolder(new VarHolderImpl<std::string>(pVal)),
-	  _pBegin(new Iterator(this, false)),
-	  _pEnd(new Iterator(this, true))
+	: _pHolder(new VarHolderImpl<std::string>(pVal))
 {
 }
 #else
-	: _pBegin(new Iterator(this, false)),
-	  _pEnd(new Iterator(this, true))
 {
 	construct(std::string(pVal));
 }
@@ -75,14 +69,10 @@ Var::Var(const char* pVal)
 
 Var::Var(const Var& other)
 #ifdef POCO_NO_SOO
-	: _pHolder(other._pHolder ? other._pHolder->clone() : 0),
-	  _pBegin(new Iterator(*other._pBegin)),
-	  _pEnd(new Iterator(*other._pEnd))
+	: _pHolder(other._pHolder ? other._pHolder->clone() : 0)
 {
 }
 #else
-	: _pBegin(new Iterator(*other._pBegin)),
-	  _pEnd(new Iterator(*other._pEnd))
 {
 	if ((this != &other) && !other.isEmpty())
 			construct(other);

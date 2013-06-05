@@ -55,9 +55,11 @@
 	#include <locale>
 #endif
 
-
+// binary numbers are supported, thus 64 (bits) + 1 (string terminating zero)
 #define POCO_MAX_INT_STRING_LEN 65
-#define POCO_MAX_FLT_STRING_LEN 128
+// value from strtod.cc (double_conversion::kMaxSignificantDecimalDigits)
+#define POCO_MAX_FLT_STRING_LEN 780
+
 #define POCO_FLT_INF "inf"
 #define POCO_FLT_NAN "nan"
 #define POCO_FLT_EXP 'e'
@@ -486,13 +488,14 @@ Foundation_API void floatToStr(char* buffer,
 
 Foundation_API std::string& floatToStr(std::string& str,
 	float value,
-	int precision = 0,
+	int precision = -1,
 	int width = 0,
 	char thSep = 0,
 	char decSep = 0);
 	/// Converts a float value, assigns it to the supplied string and returns the reference.
 	/// This function calls floatToStr(char*, int, float, int, int) and formats the result according to
-	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
+	/// precision (total number of digits after the decimal point, -1 means ignore precision argument) 
+	/// and width (total length of formatted string).
 
 
 Foundation_API void doubleToStr(char* buffer,
@@ -508,13 +511,14 @@ Foundation_API void doubleToStr(char* buffer,
 
 Foundation_API std::string& doubleToStr(std::string& str,
 	double value,
-	int precision = 0,
+	int precision = -1,
 	int width = 0,
 	char thSep = 0,
 	char decSep = 0);
 	/// Converts a double value, assigns it to the supplied string and returns the reference.
 	/// This function calls doubleToStr(char*, int, float, int, int) and formats the result according to
-	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
+	/// precision (total number of digits after the decimal point, -1 means ignore precision argument) 
+	/// and width (total length of formatted string).
 
 
 Foundation_API float strToFloat(const char* str);

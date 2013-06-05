@@ -85,7 +85,7 @@ public:
 		Pipe* errPipe,
 		const EnvImpl& env);
 	static int waitImpl(PIDImpl pid);
-	static void killImpl(const ProcessHandleImpl& handle);
+	static void killImpl(ProcessHandleImpl& handle);
 	static void killImpl(PIDImpl pid);
 	static void requestTerminationImpl(PIDImpl pid);
 };

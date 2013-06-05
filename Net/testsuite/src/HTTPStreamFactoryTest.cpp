@@ -122,6 +122,7 @@ void HTTPStreamFactoryTest::testError()
 	{
 		std::istream* pStr = factory.open(uri);
 		fail("not found - must throw");
+		pStr = pStr + 0; // to silence gcc
 	}
 	catch (HTTPException& exc)
 	{

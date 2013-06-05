@@ -40,10 +40,13 @@
 
 #include "Poco/Exception.h"
 #include "Poco/MetaProgramming.h"
+#include "Poco/Alignment.h"
 #include <algorithm>
 #include <typeinfo>
 #include <cstring>
-
+#ifdef POCO_ENABLE_CPP11
+	#include <type_traits>
+#endif
 
 namespace Poco {
 
@@ -61,10 +64,15 @@ template <class> class VarHolderImpl;
 
 #ifndef POCO_NO_SOO
 
+#ifndef POCO_ENABLE_CPP11
+	// C++11 needed for std::aligned_storage
+	#error "Any SOO can only be enabled with C++11 support"
+#endif
+
 template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
 union Placeholder
 	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
-	/// object optimization).
+	/// object optimization, when enabled).
 	/// 
 	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage, 
 	/// it will be placement-new-allocated into the local buffer
@@ -111,11 +119,11 @@ public:
 #if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 80))
 private:
 #endif
+	typedef typename std::aligned_storage<SizeV + 1>::type AlignerType;
 	
-	PlaceholderT*         pHolder;
-#ifndef POCO_NO_SOO
-	mutable unsigned char holder[SizeV + 1];
-#endif
+	PlaceholderT* pHolder;
+	mutable char  holder [SizeV + 1];
+	AlignerType   aligner;
 
 	friend class Any;
 	friend class Dynamic::Var;
@@ -130,7 +138,7 @@ private:
 template <typename PlaceholderT>
 union Placeholder
 	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
-	/// object optimization).
+	/// object optimization, when enabled).
 	/// 
 	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage, 
 	/// it will be placement-new-allocated into the local buffer

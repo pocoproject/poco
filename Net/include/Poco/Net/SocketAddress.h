@@ -150,12 +150,45 @@ protected:
 
 private:
 	typedef Poco::Net::Impl::SocketAddressImpl Impl;
+#ifdef POCO_HAVE_ALIGNMENT
 	typedef Impl* Ptr;
+#else
+	typedef Poco::AutoPtr<Impl> Ptr;
+#endif
 
 	Ptr pImpl() const;
+
+	void newIPv4();
+	
+	void newIPv4(const sockaddr_in*);
+	
+	void newIPv4(const IPAddress& hostAddress, Poco::UInt16 portNumber);
+	
+	void newIPv6(const sockaddr_in6*);
+	
+	void newIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumber);
+	
 	void destruct();
 
-	char _memory[sizeof(Poco::Net::Impl::IPv6SocketAddressImpl)];
+#ifdef POCO_HAVE_ALIGNMENT
+	char* storage();
+
+	#ifdef POCO_ENABLE_CPP11
+		static const unsigned sz = sizeof(Poco::Net::Impl::IPv6SocketAddressImpl);
+		typedef std::aligned_storage<sz>::type AlignerType;
+		union
+		{
+			char buffer[sz];
+		private:
+			AlignerType aligner;
+		}
+	#else // !POCO_ENABLE_CPP11
+		AlignedCharArrayUnion <Poco::Net::Impl::IPv6SocketAddressImpl>
+	#endif // POCO_ENABLE_CPP11
+		_memory;
+#else // !POCO_HAVE_ALIGNMENT
+	Ptr _pImpl;
+#endif // POCO_HAVE_ALIGNMENT
 };
 
 
@@ -166,13 +199,71 @@ private:
 
 inline void SocketAddress::destruct()
 {
+#ifdef POCO_HAVE_ALIGNMENT
 	pImpl()->~SocketAddressImpl();
+#endif
 }
 
 
 inline SocketAddress::Ptr SocketAddress::pImpl() const
 {
-	return reinterpret_cast<Ptr>(const_cast<char *>(_memory));
+#ifdef POCO_HAVE_ALIGNMENT
+	return reinterpret_cast<Ptr>(const_cast<char *>(_memory.buffer));
+#else
+	if (_pImpl) return _pImpl;
+	throw Poco::NullPointerException("Pointer to SocketAddress implementation is NULL.");
+#endif
+}
+
+
+inline void SocketAddress::newIPv4()
+{
+#ifdef POCO_HAVE_ALIGNMENT
+	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl;
+#else
+	_pImpl = new Poco::Net::Impl::IPv4SocketAddressImpl;
+#endif
+}
+
+
+inline void SocketAddress::newIPv4(const sockaddr_in* sockAddr)
+{
+#ifdef POCO_HAVE_ALIGNMENT
+	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl(sockAddr);
+#else
+	_pImpl = new Poco::Net::Impl::IPv4SocketAddressImpl(sockAddr);
+#endif
+}
+
+
+inline void SocketAddress::newIPv4(const IPAddress& hostAddress, Poco::UInt16 portNumber)
+{
+#ifdef POCO_HAVE_ALIGNMENT
+	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl(hostAddress.addr(), htons(portNumber));
+#else
+	_pImpl = new Poco::Net::Impl::IPv4SocketAddressImpl(hostAddress.addr(), htons(portNumber));
+#endif
+}
+
+
+
+inline void SocketAddress::newIPv6(const sockaddr_in6* sockAddr)
+{
+#ifdef POCO_HAVE_ALIGNMENT
+	new (storage()) Poco::Net::Impl::IPv6SocketAddressImpl(sockAddr);
+#else
+	_pImpl = new Poco::Net::Impl::IPv6SocketAddressImpl(sockAddr);
+#endif
+}
+	
+
+inline void SocketAddress::newIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumber)
+{
+#ifdef POCO_HAVE_ALIGNMENT
+	new (storage()) Poco::Net::Impl::IPv6SocketAddressImpl(hostAddress.addr(), htons(portNumber), hostAddress.scope());
+#else
+	_pImpl = new Poco::Net::Impl::IPv6SocketAddressImpl(hostAddress.addr(), htons(portNumber), hostAddress.scope());
+#endif
 }
 
 
@@ -180,6 +271,14 @@ inline IPAddress::Family SocketAddress::family() const
 {
 	return host().family();
 }
+
+
+#ifdef POCO_HAVE_ALIGNMENT
+inline char* SocketAddress::storage()
+{
+	return _memory.buffer;
+}
+#endif
 
 
 inline 	bool SocketAddress::operator == (const SocketAddress& socketAddress) const

@@ -38,6 +38,7 @@
 #include "Poco/Net/NetException.h"
 #include <sstream>
 
+GCC_DIAG_OFF(parentheses)
 
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPMessage;

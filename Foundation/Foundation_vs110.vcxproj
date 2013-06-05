@@ -983,6 +983,7 @@
     <ClCompile Include="src\HashStatistic.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Poco\Alignment.h" />
     <ClInclude Include="include\Poco\Any.h" />
     <ClInclude Include="include\Poco\Array.h" />
     <ClInclude Include="include\Poco\Ascii.h" />
