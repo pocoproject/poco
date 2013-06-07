@@ -471,6 +471,15 @@ void MySQLTest::testBLOBStmt()
 }
 
 
+void MySQLTest::testUnsignedInts()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateUnsignedIntsTable();
+	_pExecutor->unsignedInts();
+}
+
+
 void MySQLTest::testFloat()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -752,6 +761,15 @@ void MySQLTest::recreateStringsTable()
 	try { *_pSession << "CREATE TABLE Strings (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateStringsTable()"); }
+}
+
+
+void MySQLTest::recreateUnsignedIntsTable()
+{
+	dropTable("Strings");
+	try { *_pSession << "CREATE TABLE Strings (str INTEGER UNSIGNED)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateUnsignedIntegersTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateUnsignedIntegersTable()"); }
 }
 
 

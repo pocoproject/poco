@@ -86,7 +86,7 @@ void StatementExecutor::prepare(const std::string& query)
 void StatementExecutor::bindParams(MYSQL_BIND* params, std::size_t count)
 {
 	if (_state < STMT_COMPILED)
-		throw StatementException("Satement is not compiled yet");
+		throw StatementException("Statement is not compiled yet");
 
 	if (count != mysql_stmt_param_count(_pHandle))
 		throw StatementException("wrong bind parameters count", 0, _query);
@@ -101,7 +101,7 @@ void StatementExecutor::bindParams(MYSQL_BIND* params, std::size_t count)
 void StatementExecutor::bindResult(MYSQL_BIND* result)
 {
 	if (_state < STMT_COMPILED)
-		throw StatementException("Satement is not compiled yet");
+		throw StatementException("Statement is not compiled yet");
 
 	if (mysql_stmt_bind_result(_pHandle, result) != 0)
 		throw StatementException("mysql_stmt_bind_result error ", _pHandle, _query);
@@ -111,7 +111,7 @@ void StatementExecutor::bindResult(MYSQL_BIND* result)
 void StatementExecutor::execute()
 {
 	if (_state < STMT_COMPILED)
-		throw StatementException("Satement is not compiled yet");
+		throw StatementException("Statement is not compiled yet");
 
 	if (mysql_stmt_execute(_pHandle) != 0)
 		throw StatementException("mysql_stmt_execute error", _pHandle, _query);
@@ -127,7 +127,7 @@ void StatementExecutor::execute()
 bool StatementExecutor::fetch()
 {
 	if (_state < STMT_EXECUTED)
-		throw StatementException("Satement is not executed yet");
+		throw StatementException("Statement is not executed yet");
 
 	int res = mysql_stmt_fetch(_pHandle);
 
@@ -141,7 +141,7 @@ bool StatementExecutor::fetch()
 bool StatementExecutor::fetchColumn(std::size_t n, MYSQL_BIND *bind)
 {
 	if (_state < STMT_EXECUTED)
-		throw StatementException("Satement is not executed yet");
+		throw StatementException("Statement is not executed yet");
 
 	int res = mysql_stmt_fetch_column(_pHandle, bind, static_cast<unsigned int>(n), 0);
 

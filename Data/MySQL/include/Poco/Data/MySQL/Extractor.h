@@ -342,7 +342,7 @@ public:
 	
 private:
 
-	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, std::size_t length = 0);
+	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, std::size_t length = 0, bool isUnsigned = false);
 
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=(const Extractor&);
