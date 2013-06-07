@@ -34,6 +34,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/WebSocket.h"
+#include "Poco/Net/SocketStream.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPServerParams.h"
@@ -51,6 +52,7 @@ using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPServerRequest;
 using Poco::Net::HTTPServerResponse;
+using Poco::Net::SocketStream;
 using Poco::Net::WebSocket;
 using Poco::Net::WebSocketException;
 
@@ -60,18 +62,22 @@ namespace
 	class WebSocketRequestHandler: public Poco::Net::HTTPRequestHandler
 	{
 	public:
+		WebSocketRequestHandler(std::size_t bufSize = 1024): _bufSize(bufSize)
+		{
+		}
+
 		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 		{
 			try
 			{
 				WebSocket ws(request, response);
-				char buffer[1024];
+				std::auto_ptr<char> pBuffer(new char[_bufSize]);
 				int flags;
 				int n;
 				do
 				{
-					n = ws.receiveFrame(buffer, sizeof(buffer), flags);
-					ws.sendFrame(buffer, n, flags);
+					n = ws.receiveFrame(pBuffer.get(), _bufSize, flags);
+					ws.sendFrame(pBuffer.get(), n, flags);
 				}
 				while (n > 0 || (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
 			}
@@ -92,15 +98,25 @@ namespace
 				}
 			}
 		}
+
+	private:
+		std::size_t _bufSize;
 	};
 	
 	class WebSocketRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
 	{
 	public:
+		WebSocketRequestHandlerFactory(std::size_t bufSize = 1024): _bufSize(bufSize)
+		{
+		}
+
 		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
 		{
-			return new WebSocketRequestHandler;
+			return new WebSocketRequestHandler(_bufSize);
 		}
+
+	private:
+		std::size_t _bufSize;
 	};
 }
 
@@ -180,6 +196,38 @@ void WebSocketTest::testWebSocket()
 }
 
 
+void WebSocketTest::testWebSocketLarge()
+{
+	const int msgSize = 64000;
+
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory(msgSize), ss, new Poco::Net::HTTPServerParams);
+	server.start();
+	
+	Poco::Thread::sleep(200);
+	
+	HTTPClientSession cs("localhost", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
+	HTTPResponse response;
+	WebSocket ws(cs, request, response);
+	std::string payload(msgSize, 'x');
+	SocketStream sstr(ws);
+	sstr << payload;
+	sstr.flush();
+
+	char buffer[msgSize + 1];
+	int flags;
+	int n = 0;
+	do
+	{
+		n += ws.receiveFrame(buffer + n, sizeof(buffer) - n, flags);
+	} while (n > 0 && n < msgSize);
+
+	assert (n == payload.size());
+	assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+}
+
+
 void WebSocketTest::setUp()
 {
 }
@@ -195,6 +243,7 @@ CppUnit::Test* WebSocketTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("WebSocketTest");
 
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocket);
+	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLarge);
 
 	return pSuite;
 }
