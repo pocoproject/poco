@@ -62,7 +62,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 {
-	return realExtractFixed(pos, MYSQL_TYPE_TINY, &val);
+	return realExtractFixed(pos, MYSQL_TYPE_TINY, &val, true);
 }
 
 
@@ -74,7 +74,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 {
-	return realExtractFixed(pos, MYSQL_TYPE_SHORT, &val);
+	return realExtractFixed(pos, MYSQL_TYPE_SHORT, &val, true);
 }
 
 
@@ -86,7 +86,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt32& val)
 {
-	return realExtractFixed(pos, MYSQL_TYPE_LONG, &val);
+	return realExtractFixed(pos, MYSQL_TYPE_LONG, &val, true);
 }
 
 
@@ -98,7 +98,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 {
-	return realExtractFixed(pos, MYSQL_TYPE_LONGLONG, &val);
+	return realExtractFixed(pos, MYSQL_TYPE_LONGLONG, &val, true);
 }
 
 
@@ -111,7 +111,7 @@ bool Extractor::extract(std::size_t pos, long& val)
 
 bool Extractor::extract(std::size_t pos, unsigned long& val)
 {
-	return realExtractFixed(pos, MYSQL_TYPE_LONG, &val);
+	return realExtractFixed(pos, MYSQL_TYPE_LONG, &val, true);
 }
 #endif
 
@@ -255,7 +255,7 @@ void Extractor::reset()
 }
 
 
-bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, std::size_t length)
+bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, std::size_t length, bool isUnsigned)
 {
 	MYSQL_BIND bind = {0};
 	my_bool isNull = 0;
@@ -264,6 +264,7 @@ bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* b
 	bind.buffer_type   = type;
 	bind.buffer		= buffer;
 	bind.buffer_length = static_cast<unsigned long>(length);
+	bind.is_unsigned   = isUnsigned;
 	
 	if (!_stmt.fetchColumn(pos, &bind))
 		return false;

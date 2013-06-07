@@ -497,6 +497,29 @@ void SQLExecutor::insertSingleBulk()
 }
 
 
+void SQLExecutor::unsignedInts()
+{
+	std::string funct = "unsignedInts()";
+	unsigned int data = UINT32_MAX;
+	unsigned int ret = 0;
+
+	try { *_pSession << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (ret == data);
+}
+
+
 void SQLExecutor::floats()
 {
 	std::string funct = "floats()";
