@@ -186,6 +186,9 @@ public:
 	static Poco::Dynamic::Array makeArray(const JSON::Array::Ptr& arr);
 		/// Utility function for creation of array.
 
+	void clear();
+		/// Clears the contents of the array.
+
 private:
 	typedef SharedPtr<Poco::Dynamic::Array> ArrayPtr;
 
@@ -386,6 +389,145 @@ public:
 
 private:
 	JSON::Array::Ptr _val;
+};
+
+
+template <>
+class VarHolderImpl<JSON::Array>: public VarHolder
+{
+public:
+	VarHolderImpl(const JSON::Array& val): _val(val)
+	{
+	}
+
+	~VarHolderImpl()
+	{
+	}
+
+	const std::type_info& type() const
+	{
+		return typeid(JSON::Array);
+	}
+
+	void convert(Int8&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int16&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int32&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int64&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt8&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt16&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt32&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt64&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(bool& value) const
+	{
+		value = _val.size() > 0;
+	}
+
+	void convert(float&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(double&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(char&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(std::string& s) const
+	{
+		std::ostringstream oss;
+		_val.stringify(oss, 2);
+		s = oss.str();
+	}
+
+	void convert(DateTime& /*val*/) const
+	{
+		throw BadCastException("Cannot convert Array to DateTime");
+	}
+
+	void convert(LocalDateTime& /*ldt*/) const
+	{
+		throw BadCastException("Cannot convert Array to LocalDateTime");
+	}
+
+	void convert(Timestamp& /*ts*/) const
+	{
+		throw BadCastException("Cannot convert Array to Timestamp");
+	}
+
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	{
+		return cloneHolder(pVarHolder, _val);
+	}
+
+	const JSON::Array& value() const
+	{
+		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
+private:
+	JSON::Array _val;
 };
 
 

@@ -206,4 +206,12 @@ Object::operator const Poco::DynamicStruct& () const
 }
 
 
+void Object::clear()
+{
+	_values.clear();
+	_keys.clear();
+	_pStruct = 0;
+}
+
+
 } } // namespace Poco::JSON
