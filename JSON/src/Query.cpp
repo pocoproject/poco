@@ -50,6 +50,12 @@ namespace JSON {
 
 Query::Query(const Var& source): _source(source)
 {
+	if (!source.isEmpty() &&
+		source.type() != typeid(Object) &&
+		source.type() != typeid(Object::Ptr) &&
+		source.type() != typeid(Array) &&
+		source.type() != typeid(Array::Ptr))
+		throw InvalidArgumentException("Only JSON Object, Array or pointers thereof allowed.");
 }
 
 

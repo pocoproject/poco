@@ -1096,6 +1096,14 @@ void JSONTest::testQuery()
 	Query queryObj(*pObj);
 	Var idQueryObj = queryObj.find("Id");
 	assert (22 == idQueryObj);
+
+	Var bad = 1;
+	try
+	{
+		Query badQuery(bad);
+		fail ("must throw");
+	}
+	catch (Poco::InvalidArgumentException&) { }
 }
 
 

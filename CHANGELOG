@@ -77,7 +77,8 @@ Release 1.5.2 (2013-06-xx)
   ignore precision == 0
 - fixed GH #138: FreeBSD JSON tests fail
 - fixed GH #99: JSON::Query an JSON::Object
-
+- limited allowed types for JSON::Query to Object, Array, Object::Ptr, 
+  Array::Ptr and empty
 
 Release 1.5.1 (2013-01-11)
 ==========================

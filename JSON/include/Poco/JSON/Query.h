@@ -53,7 +53,9 @@ class JSON_API Query
 {
 public:
 	Query(const Dynamic::Var& source);
-		/// Constructor. Pass the start object/array or Ptr thereof.
+		/// Creates the Query; source must be JSON Object, Array, Object::Ptr,
+		/// Array::Ptr or empty Var. Any other type will trigger throwing of 
+		/// InvalidArgumentException.
 		/// Creating Query holding Ptr will typically result in faster
 		/// performance.
 
