@@ -142,6 +142,8 @@ private:
 	void recreateNullableIntTable();
 	void recreateNullableStringTable();
 
+	static void dbInfo(Poco::Data::Session& session);
+
 	static std::string _dbConnString;
 	static Poco::SharedPtr<Poco::Data::Session> _pSession;
 	static Poco::SharedPtr<SQLExecutor> _pExecutor;

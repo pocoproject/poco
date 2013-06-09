@@ -80,6 +80,9 @@ Release 1.5.2 (2013-06-xx)
 - limited allowed types for JSON::Query to Object, Array, Object::Ptr, 
   Array::Ptr and empty
 - fixed GH #175: HTMLForm does not read URL parameters on POST or PUT
+- added GH #187: MySQL: allow access to the underlying connection handle
+- added GH #186: MySQL: support for MYSQL_SECURE_AUTH
+- fixed GH #174: MySQL: 4GB allocated when reading any largetext or largeblob field
 
 
 Release 1.5.1 (2013-01-11)

@@ -189,11 +189,15 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 
 	{for (std::size_t i = 0; i < count; i++)
 	{
+		unsigned long size = fieldSize(fields[i]);
+		unsigned long zero = 0;
+		if (size == ~zero) size = 0;
+
 		_columns.push_back(MetaColumn(
 			i,                               // position
 			fields[i].name,                  // name
 			fieldType(fields[i]),            // type
-			fieldSize(fields[i]),            // length
+			size,                            // length
 			0,                               // TODO: precision
 			!IS_NOT_NULL(fields[i].flags)    // nullable
 			));
@@ -208,19 +212,19 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 
 	std::size_t offset = 0;
 
-	{for (std::size_t i = 0; i < count; i++)
+	for (std::size_t i = 0; i < count; i++)
 	{
 		std::memset(&_row[i], 0, sizeof(MYSQL_BIND));
-
+		unsigned int len = static_cast<unsigned int>(_columns[i].length());
 		_row[i].buffer_type   = fields[i].type;
-		_row[i].buffer_length = static_cast<unsigned int>(_columns[i].length());
-		_row[i].buffer        = &_buffer[0] + offset;
+		_row[i].buffer_length = len;
+		_row[i].buffer        = (len > 0) ? (&_buffer[0] + offset) : 0;
 		_row[i].length        = &_lengths[i];
 		_row[i].is_null       = &_isNull[i];
 		_row[i].is_unsigned   = (fields[i].flags & UNSIGNED_FLAG) > 0;
 		
 		offset += _row[i].buffer_length;
-	}}
+	}
 }
 
 std::size_t ResultMetadata::columnsReturned() const
