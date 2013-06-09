@@ -66,7 +66,7 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 // Parameters for barebone-test
 #define MYSQL_USER "root"
 #define MYSQL_PWD  "poco"
-#define MYSQL_HOST "192.168.1.25"//"localhost"
+#define MYSQL_HOST "localhost"
 #define MYSQL_PORT 3306
 #define MYSQL_DB   "test"
 
@@ -97,9 +97,9 @@ MySQLTest::~MySQLTest()
 void MySQLTest::dbInfo(Session& session)
 {
 	
-		std::cout << "Server Info: " << Utility::serverInfo(Utility::handle(session)) << std::endl;
-		std::cout << "Server Version: " << Utility::serverVersion(Utility::handle(session)) << std::endl;
-		std::cout << "Host Info: " << Utility::hostInfo(Utility::handle(session)) << std::endl;
+		std::cout << "Server Info: " << Utility::serverInfo(session) << std::endl;
+		std::cout << "Server Version: " << Utility::serverVersion(session) << std::endl;
+		std::cout << "Host Info: " << Utility::hostInfo(session) << std::endl;
 }
 
 
