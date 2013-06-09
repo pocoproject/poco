@@ -31,8 +31,10 @@
 #  include <stddef.h>
 #endif
 
+#ifndef _WIN32_WCE
 #if defined(__TURBOC__) || defined(_MSC_VER) || defined(_WIN32)
 #  include <io.h>
+#endif
 #endif
 
 #ifdef WINAPI_FAMILY
