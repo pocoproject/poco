@@ -1,6 +1,34 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.4.6p2
+
+!!Summary of Changes
+
+  - fixed GH #124: Possibile buffer overrun in Foundation/EventLogChannel
+  - fixed GH #156: Possible buffer overrun in Foundation/EventLogChannel
+  - XML: fixed an issue with parsing a memory buffer > 2 GB
+  - upgraded to expat 2.1.0
+  - Data/ODBC: added support for setting query timeout (via setProperty
+    of "queryTimeout"). Timeout is int, given in seconds.
+  - fixed a potential endless loop in SecureStreamSocketImpl::sendBytes() 
+    and also removed unnecessary code.
+  - fixed GH #159: Crash in openssl CRYPTO_thread_id() after library libPocoCrypto.so 
+    has been unloaded.
+  - fixed GH #155: MailOutputStream mangles consecutive newline sequences 
+  - fixed GH# 139: FileChannel::PROP_FLUSH is invalid (contains a tab character)
+  - fixed GH# 173: HTTPClientSession::proxyConnect forces DNS lookup of host names
+  - fixed GH# 194: MessageNotification constructor is inefficient.
+  - fixed GH# 189: Poco::NumberParser::tryParse() documentation bug
+  - fixed GH# 172: IPv6 Host field is stripped of Brackets in HTTPClientSession
+  - fixed GH# 188: Net: SocketAddress operator < unusable for std::map key
+  - fixed GH# 128: DOMWriter incorrectly adds SYSTEM keyword to DTD if PUBLIC is 
+    already specified
+  - fixed GH# 65: Poco::format() misorders sign and padding specifiers
+  - upgraded bundled SQLite to 3.7.17
+  - upgraded bundled zlib to 1.2.8
+
+
 !!!Release 1.4.6p1
 
 !!Summary of Changes

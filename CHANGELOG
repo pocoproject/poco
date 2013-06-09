@@ -24,6 +24,7 @@ Release 1.4.6p2 (2013-06-xx)
   already specified
 - fixed GH# 65: Poco::format() misorders sign and padding specifiers
 - upgraded bundled SQLite to 3.7.17
+- upgraded bundled zlib to 1.2.8
 
 
 Release 1.4.6p1 (2013-03-06)
@@ -1841,4 +1842,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#85 $
+$Id: //poco/1.4/dist/CHANGELOG#86 $
