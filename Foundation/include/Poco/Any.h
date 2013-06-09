@@ -534,23 +534,6 @@ const ValueType* AnyCast(const Any* operand)
 
 
 template <typename ValueType>
-ValueType AnyCast(const Any& operand)
-	/// AnyCast operator used to extract a copy of the ValueType from an const Any&.
-	///
-	/// Example Usage: 
-	///	 MyType tmp = AnyCast<MyType>(anAny).
-	/// Will throw a BadCastException if the cast fails.
-	/// Dont use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& = ...
-	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
-	/// these cases.
-{
-	typedef typename TypeWrapper<ValueType>::TYPE NonRef;
-
-	return AnyCast<NonRef&>(const_cast<Any&>(operand));
-}
-
-
-template <typename ValueType>
 ValueType AnyCast(Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an Any&.
 	///
@@ -566,6 +549,23 @@ ValueType AnyCast(Any& operand)
 	NonRef* result = AnyCast<NonRef>(&operand);
 	if (!result) throw BadCastException("Failed to convert between Any types");
 	return *result;
+}
+
+
+template <typename ValueType>
+ValueType AnyCast(const Any& operand)
+	/// AnyCast operator used to extract a copy of the ValueType from an const Any&.
+	///
+	/// Example Usage: 
+	///	 MyType tmp = AnyCast<MyType>(anAny).
+	/// Will throw a BadCastException if the cast fails.
+	/// Dont use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& = ...
+	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
+	/// these cases.
+{
+	typedef typename TypeWrapper<ValueType>::TYPE NonRef;
+
+	return AnyCast<NonRef&>(const_cast<Any&>(operand));
 }
 
 

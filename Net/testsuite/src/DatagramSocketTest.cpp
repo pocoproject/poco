@@ -36,6 +36,7 @@
 #include "UDPEchoServer.h"
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetworkInterface.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Timespan.h"
 #include "Poco/Stopwatch.h"
@@ -45,6 +46,7 @@ using Poco::Net::Socket;
 using Poco::Net::DatagramSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::IPAddress;
+using Poco::Net::NetworkInterface;
 using Poco::Timespan;
 using Poco::Stopwatch;
 using Poco::TimeoutException;
@@ -98,22 +100,38 @@ void DatagramSocketTest::testBroadcast()
 {
 	UDPEchoServer echoServer;
 	DatagramSocket ss(IPAddress::IPv4);
+
+#if (POCO_OS != POCO_OS_FREE_BSD)
 	SocketAddress sa("255.255.255.255", echoServer.port());
+#else
+	NetworkInterface ni = NetworkInterface::forName("em0");
+	SocketAddress sa(ni.broadcastAddress(1), echoServer.port());
+#endif
+	// not all socket implementations fail if broadcast option is not set
+/*
 	try
 	{
 		int n = ss.sendTo("hello", 5, sa);
-		// not all socket implementations fail if broadcast option is not set
-		// fail ("broadcast option not set - must throw");
-		n = n + 1; // to silence gcc
+		fail ("broadcast option not set - must throw");
 	}
 	catch (IOException&)
 	{
 	}
+*/
 	ss.setBroadcast(true);
+
+#if (POCO_OS == POCO_OS_FREE_BSD)
+	int opt = 1;
+	poco_socklen_t len = sizeof(opt);
+	ss.impl()->setRawOption(IPPROTO_IP, IP_ONESBCAST, (const char*) &opt, len);
+	ss.impl()->getRawOption(IPPROTO_IP, IP_ONESBCAST, &opt, len);
+	assert (opt == 1);
+#endif
+
 	int n = ss.sendTo("hello", 5, sa);
 	assert (n == 5);
-	char buffer[256];
-	n = ss.receiveBytes(buffer, sizeof(buffer));
+	char buffer[256] = { 0 };
+	n = ss.receiveBytes(buffer, 5);
 	assert (n == 5);
 	assert (std::string(buffer, n) == "hello");
 	ss.close();
@@ -136,8 +154,9 @@ CppUnit::Test* DatagramSocketTest::suite()
 
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEcho);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testSendToReceiveFrom);
-#if (POCO_OS != POCO_OS_FREE_BSD) // TODO
+#if (POCO_OS != POCO_OS_FREE_BSD) // works only with local net bcast and very randomly
 	CppUnit_addTest(pSuite, DatagramSocketTest, testBroadcast);
 #endif
+
 	return pSuite;
 }

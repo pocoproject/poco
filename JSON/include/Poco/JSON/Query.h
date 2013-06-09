@@ -53,18 +53,40 @@ class JSON_API Query
 {
 public:
 	Query(const Dynamic::Var& source);
-		/// Constructor. Pass the start object/array.
+		/// Creates the Query; source must be JSON Object, Array, Object::Ptr,
+		/// Array::Ptr or empty Var. Any other type will trigger throwing of 
+		/// InvalidArgumentException.
+		/// Creating Query holding Ptr will typically result in faster
+		/// performance.
 
 	virtual ~Query();
 		/// Destructor
 
 	Object::Ptr findObject(const std::string& path) const;
-		/// Search for an object. When the object can't be found, an empty
-		/// SharedPtr is returned.
+		/// Search for an object. When the object can't be found, a zero Ptr
+		/// is returned; otherwise, a shared pointer to internally held object
+		/// is returned.
+		/// If object (as opposed to a pointer to object) is held
+		/// internally, a shared pointer to new (heap-allocated) Object is
+		/// returned; this may be expensive operation.
+
+	Object& findObject(const std::string& path, Object& obj) const;
+		/// Search for an object. If object is found, it is assigned to the
+		/// Object through the reference passed in. When the object can't be 
+		/// found, the provided Object is emptied and returned.
 
 	Array::Ptr findArray(const std::string& path) const;
-		/// Search for an array. When the array can't be found, an empty
-		/// SharedPtr is returned.
+		/// Search for an array. When the array can't be found, a zero Ptr
+		/// is returned; otherwise, a shared pointer to internally held array
+		/// is returned.
+		/// If array (as opposed to a pointer to array) is held
+		/// internally, a shared pointer to new (heap-allocated) Object is
+		/// returned; this may be expensive operation.
+
+	Array& findArray(const std::string& path, Array& obj) const;
+		/// Search for an array. If array is found, it is assigned to the
+		/// Object through the reference passed in. When the array can't be 
+		/// found, the provided Object is emptied and returned.
 
 	Dynamic::Var find(const std::string& path) const;
 		/// Searches a value

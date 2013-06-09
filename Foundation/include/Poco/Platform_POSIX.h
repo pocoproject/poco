@@ -81,7 +81,7 @@
 // http://dbp-consulting.com/tutorials/SuppressingGCCWarnings.html
 // use example: GCC_DIAG_OFF(unused-variable)
 // 
-#if defined(POCO_COMPILER_GCC) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 402)
+#if defined(POCO_COMPILER_GCC) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 460)
 
 	#ifdef GCC_DIAG_OFF
 		#undef GCC_DIAG_OFF

@@ -99,6 +99,7 @@ public:
 	void testBLOB();
 	void testBLOBStmt();
 
+	void testUnsignedInts();
 	void testFloat();
 	void testDouble();
 
@@ -134,6 +135,7 @@ private:
 	void recreatePersonTimeTable();
 	void recreateStringsTable();
 	void recreateIntsTable();
+	void recreateUnsignedIntsTable();
 	void recreateFloatsTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();

@@ -47,6 +47,7 @@ public:
 	~SocketStreamTest();
 
 	void testStreamEcho();
+	void testLargeStreamEcho();
 	void testEOF();
 
 	void setUp();

@@ -1033,7 +1033,7 @@ void JSONTest::testOptValue()
 
 void JSONTest::testQuery()
 {
-	std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ] }";
+	std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ], \"address\": { \"street\": \"A Street\", \"number\": 123, \"city\":\"The City\"} }";
 	Parser parser;
 	Var result;
 
@@ -1059,6 +1059,51 @@ void JSONTest::testQuery()
 	assert (ds["children"].size() == 2);
 	assert (ds["children"][0] == "Jonas");
 	assert (ds["children"][1] == "Ellen");
+
+	Object::Ptr pAddress = query.findObject("address");
+	assert (pAddress->getValue<std::string>("street") == "A Street");
+	pAddress = query.findObject("bad address");
+	assert (pAddress.isNull());
+
+	Object address;
+	address.set("dummy", 123);
+	query.findObject("bad address", address);
+	assert (!address.has("dummy"));
+	Object& rAddress = query.findObject("address", address);
+	assert (rAddress.getValue<int>("number") == 123);
+
+	using Poco::JSON::Array;
+
+	Array::Ptr pChildren = query.findArray("children");
+	assert (pChildren->getElement<std::string>(0) == "Jonas");
+	pChildren = query.findArray("no children");
+	assert (pChildren.isNull());
+
+	Array children;
+	children.add("dummy");
+	query.findArray("no children", children);
+	assert (children.size() == 0);
+	Array& rChildren = query.findArray("children", children);
+	assert (rChildren.getElement<std::string>(1) == "Ellen");
+
+	Object::Ptr pObj = new Poco::JSON::Object;
+	pObj->set("Id", 22);
+
+	Query queryPointer(pObj);
+	Var idQueryPointer = queryPointer.find("Id");
+	assert(22 == idQueryPointer);
+
+	Query queryObj(*pObj);
+	Var idQueryObj = queryObj.find("Id");
+	assert (22 == idQueryObj);
+
+	Var bad = 1;
+	try
+	{
+		Query badQuery(bad);
+		fail ("must throw");
+	}
+	catch (Poco::InvalidArgumentException&) { }
 }
 
 

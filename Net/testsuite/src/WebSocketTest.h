@@ -47,6 +47,7 @@ public:
 	~WebSocketTest();
 
 	void testWebSocket();
+	void testWebSocketLarge();
 
 	void setUp();
 	void tearDown();

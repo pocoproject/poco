@@ -129,6 +129,15 @@ void HTMLForm::addPart(const std::string& name, PartSource* pSource)
 void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler)
 {
 	clear();
+
+	URI uri(request.getURI());
+	const std::string& query = uri.getRawQuery();
+	if (!query.empty())
+	{
+		std::istringstream istr(query);
+		readUrl(istr);
+	}
+
 	if (request.getMethod() == HTTPRequest::HTTP_POST || request.getMethod() == HTTPRequest::HTTP_PUT)
 	{
 		std::string mediaType;
@@ -144,12 +153,6 @@ void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartH
 		{
 			readUrl(requestBody);
 		}
-	}
-	else
-	{
-		URI uri(request.getURI());
-		std::istringstream istr(uri.getRawQuery());
-		readUrl(istr);
 	}
 }
 

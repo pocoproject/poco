@@ -206,6 +206,10 @@ public:
 	operator const Poco::DynamicStruct& () const;
 		/// Cast operator to Poco::DynamiStruct.
 
+	void clear();
+		/// Clears the contents of the object. Insertion order 
+		/// preservation property is left intact.
+
 private:
 	template <typename C>
 	void doStringify(const C& container, std::ostream& out, unsigned int indent, int step) const
@@ -469,6 +473,148 @@ public:
 
 private:
 	JSON::Object::Ptr _val;
+};
+
+
+template <>
+class VarHolderImpl<JSON::Object>: public VarHolder
+{
+public:
+	VarHolderImpl(const JSON::Object& val): _val(val)
+	{
+	}
+
+	~VarHolderImpl()
+	{
+	}
+
+	const std::type_info& type() const
+	{
+		return typeid(JSON::Object);
+	}
+
+	void convert(Int8&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int16&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int32&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int64&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt8&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt16&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt32&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt64&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(bool& value) const
+	{
+		value = _val.size() > 0;
+	}
+
+	void convert(float&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(double&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(char&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(std::string& s) const
+	{
+		std::ostringstream oss;
+		_val.stringify(oss, 2);
+		s = oss.str();
+	}
+
+	void convert(DateTime& /*val*/) const
+	{
+		//TODO: val = _val;
+		throw NotImplementedException("Conversion not implemented: JSON:Object => DateTime");
+	}
+
+	void convert(LocalDateTime& /*ldt*/) const
+	{
+		//TODO: ldt = _val.timestamp();
+		throw NotImplementedException("Conversion not implemented: JSON:Object => LocalDateTime");
+	}
+
+	void convert(Timestamp& /*ts*/) const
+	{
+		//TODO: ts = _val.timestamp();
+		throw NotImplementedException("Conversion not implemented: JSON:Object => Timestamp");
+	}
+
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	{
+		return cloneHolder(pVarHolder, _val);
+	}
+
+	const JSON::Object& value() const
+	{
+		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
+private:
+	JSON::Object _val;
 };
 
 

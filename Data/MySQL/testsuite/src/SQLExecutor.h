@@ -105,6 +105,7 @@ public:
 	void dateTime();
 	void date();
 	void time();
+	void unsignedInts();
 	void floats();
 	void doubles();
 	void tuples();

@@ -335,14 +335,14 @@ private:
 		unsigned char ch = static_cast<unsigned char>(CharTraits::to_char_type(nextChar));
 
 		// Determine the character's class.
-		if (ch < 0 || (!_allowNullByte && ch == 0)) return false;
-		if (0x80 <= ch && ch <= 0xFF)
+		if ((!_allowNullByte && ch == 0)) return false;
+		if (ch >= 0x80)
 		{
 			nextClass = C_ETC;
 			CharIntType count = utf8CheckFirst(nextChar);
 			if (!count)
 			{
-				throw Poco::JSON::JSONException(format("Unable to decode byte 0x%x", (unsigned int) nextChar));
+				throw Poco::JSON::JSONException("Bad character.");
 			}
 
 			char buffer[4];

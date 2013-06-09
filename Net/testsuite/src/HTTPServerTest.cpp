@@ -253,7 +253,7 @@ void HTTPServerTest::testClosedRequest()
 
 void HTTPServerTest::testIdentityRequestKeepAlive()
 {
-	HTTPServer srv(new RequestHandlerFactory);
+	HTTPServer srv(new RequestHandlerFactory, 8008);
 	srv.start();
 	
 	HTTPClientSession cs("localhost", srv.socket().address().port());
@@ -284,13 +284,10 @@ void HTTPServerTest::testIdentityRequestKeepAlive()
 
 void HTTPServerTest::testChunkedRequestKeepAlive()
 {
-	ServerSocket svs(0);
-	HTTPServerParams* pParams = new HTTPServerParams;
-	pParams->setKeepAlive(true);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	HTTPServer srv(new RequestHandlerFactory, 8009);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("localhost", srv.socket().address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
@@ -319,10 +316,10 @@ void HTTPServerTest::testChunkedRequestKeepAlive()
 
 void HTTPServerTest::testClosedRequestKeepAlive()
 {
-	HTTPServer srv(new RequestHandlerFactory);
+	HTTPServer srv(new RequestHandlerFactory, 8010);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", srv.socket().address().port());//svs.address().port());
+	HTTPClientSession cs("localhost", srv.socket().address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
 	request.setContentType("text/plain");

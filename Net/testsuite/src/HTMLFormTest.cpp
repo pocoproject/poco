@@ -170,7 +170,7 @@ void HTMLFormTest::testWriteMultipart()
 }
 
 
-void HTMLFormTest::testReadUrl1()
+void HTMLFormTest::testReadUrlGET()
 {
 	HTTPRequest req("GET", "/form.cgi?field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
 	HTMLForm form(req);
@@ -182,12 +182,27 @@ void HTMLFormTest::testReadUrl1()
 }
 
 
-void HTMLFormTest::testReadUrl2()
+void HTMLFormTest::testReadUrlPOST()
 {
-	HTTPRequest req("POST", "/form.cgi");
+	HTTPRequest req("POST", "/form.cgi?field0=value0");
 	std::istringstream istr("field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
 	HTMLForm form(req, istr);
-	assert (form.size() == 4);
+	assert (form.size() == 5);
+	assert (form["field0"] == "value0");
+	assert (form["field1"] == "value1");
+	assert (form["field2"] == "value 2");
+	assert (form["field3"] == "value=3");
+	assert (form["field4"] == "value&4");
+}
+
+
+void HTMLFormTest::testReadUrlPUT()
+{
+	HTTPRequest req("PUT", "/form.cgi?field0=value0");
+	std::istringstream istr("field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
+	HTMLForm form(req, istr);
+	assert (form.size() == 5);
+	assert (form["field0"] == "value0");
 	assert (form["field1"] == "value1");
 	assert (form["field2"] == "value 2");
 	assert (form["field3"] == "value=3");
@@ -360,8 +375,9 @@ CppUnit::Test* HTMLFormTest::suite()
 
 	CppUnit_addTest(pSuite, HTMLFormTest, testWriteUrl);
 	CppUnit_addTest(pSuite, HTMLFormTest, testWriteMultipart);
-	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrl1);
-	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrl2);
+	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlGET);
+	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlPOST);
+	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlPUT);
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadMultipart);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit1);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit2);

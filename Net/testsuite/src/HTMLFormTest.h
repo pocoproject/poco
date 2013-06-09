@@ -48,8 +48,9 @@ public:
 
 	void testWriteUrl();
 	void testWriteMultipart();
-	void testReadUrl1();
-	void testReadUrl2();
+	void testReadUrlGET();
+	void testReadUrlPOST();
+	void testReadUrlPUT();
 	void testReadMultipart();
 	void testSubmit1();
 	void testSubmit2();

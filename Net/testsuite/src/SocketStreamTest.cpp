@@ -87,6 +87,30 @@ void SocketStreamTest::testStreamEcho()
 }
 
 
+void SocketStreamTest::testLargeStreamEcho()
+{
+	const int msgSize = 64000;
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("localhost", echoServer.port()));
+	SocketStream str(ss);
+	std::string payload(msgSize, 'x');
+	str << payload;
+	assert (str.good());
+	str.flush();
+	assert (str.good());
+	ss.shutdownSend();
+
+	assert (str.gcount() == 0);
+	char buffer[msgSize];
+	str.read(buffer, sizeof(buffer));
+	assert (str.good());
+	assert (str.gcount() == msgSize);
+
+	ss.close();
+}
+
+
 void SocketStreamTest::testEOF()
 {
 	StreamSocket ss;
@@ -131,6 +155,7 @@ CppUnit::Test* SocketStreamTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SocketStreamTest");
 
 	CppUnit_addTest(pSuite, SocketStreamTest, testStreamEcho);
+	CppUnit_addTest(pSuite, SocketStreamTest, testLargeStreamEcho);
 	CppUnit_addTest(pSuite, SocketStreamTest, testEOF);
 
 	return pSuite;
