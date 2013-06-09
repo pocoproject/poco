@@ -77,10 +77,10 @@ Poco::UInt16 UDPEchoServer::port() const
 
 void UDPEchoServer::run()
 {
-	_ready.set();
 	Poco::Timespan span(250000);
 	while (!_stop)
 	{
+		_ready.set();
 		if (_socket.poll(span, Socket::SELECT_READ))
 		{
 			try
@@ -88,7 +88,7 @@ void UDPEchoServer::run()
 				char buffer[256];
 				SocketAddress sender;
 				int n = _socket.receiveFrom(buffer, sizeof(buffer), sender);
-				_socket.sendTo(buffer, n, sender);
+				n = _socket.sendTo(buffer, n, sender);
 			}
 			catch (Poco::Exception& exc)
 			{
