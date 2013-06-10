@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.2 (2013-06-xx)
+Release 1.5.2 (2013-06-17)
 ==========================
 - added MongoDB library (Franky Braem)
 - fixed GH #57: poco-1.5.1: Doesn't compile for Android
