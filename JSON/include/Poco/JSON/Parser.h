@@ -221,10 +221,10 @@ public:
 	static const int         JSON_UNLIMITED_DEPTH = -1;
 
 	Parser(const Handler::Ptr& pHandler = new ParseHandler, std::size_t bufSize = JSON_PARSE_BUFFER_SIZE);
-		/// Constructor.
+		/// Creates JSON Parser.
 
 	virtual ~Parser();
-		/// Destructor.
+		/// Destroys JSON Parser.
 
 	void reset();
 		/// Resets the parser.
