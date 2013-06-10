@@ -36,7 +36,7 @@
 
 #include <mysql.h>
 #include "Poco/Data/MySQL/StatementExecutor.h"
-#include <sstream>
+#include "Poco/Format.h"
 
 
 namespace Poco {
@@ -120,7 +120,7 @@ void StatementExecutor::execute()
 
 	my_ulonglong affectedRows = mysql_affected_rows(_pSessionHandle);
 	if (affectedRows != ((my_ulonglong) - 1))
-		_affectedRowCount = affectedRows; //Was really a DELETE, UPDATE or INSERT statement
+		_affectedRowCount = static_cast<std::size_t>(affectedRows); //Was really a DELETE, UPDATE or INSERT statement
 }
 
 
@@ -131,10 +131,11 @@ bool StatementExecutor::fetch()
 
 	int res = mysql_stmt_fetch(_pHandle);
 
-	if ((res != 0) && (res != MYSQL_NO_DATA))
+	// we have specified zero buffers for BLOBs, so DATA_TRUNCATED is normal in this case
+	if ((res != 0) && (res != MYSQL_NO_DATA) && (res != MYSQL_DATA_TRUNCATED)) 
 		throw StatementException("mysql_stmt_fetch error", _pHandle, _query);
 
-	return (res == 0);
+	return (res == 0) || (res == MYSQL_DATA_TRUNCATED);
 }
 
 
@@ -146,11 +147,7 @@ bool StatementExecutor::fetchColumn(std::size_t n, MYSQL_BIND *bind)
 	int res = mysql_stmt_fetch_column(_pHandle, bind, static_cast<unsigned int>(n), 0);
 
 	if ((res != 0) && (res != MYSQL_NO_DATA))
-	{
-		std::ostringstream msg;
-		msg << "mysql_stmt_fetch_column(" << n << ") error";
-		throw StatementException(msg.str(), _pHandle, _query);
-	}
+		throw StatementException(Poco::format("mysql_stmt_fetch_column(%z) error", n), _pHandle, _query);
 
 	return (res == 0);
 }

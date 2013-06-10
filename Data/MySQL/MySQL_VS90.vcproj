@@ -402,6 +402,8 @@
 				RelativePath=".\src\SessionImpl.cpp"/>
 			<File
 				RelativePath=".\src\StatementExecutor.cpp"/>
+			<File
+				RelativePath=".\src\Utility.cpp"/>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -427,6 +429,8 @@
 				RelativePath=".\include\Poco\Data\MySQL\SessionImpl.h"/>
 			<File
 				RelativePath=".\include\Poco\Data\MySQL\StatementExecutor.h"/>
+			<File
+				RelativePath=".\include\Poco\Data\MySQL\Utility.h"/>
 		</Filter>
 		<Filter
 			Name="Resource Files"

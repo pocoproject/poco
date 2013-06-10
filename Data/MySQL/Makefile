@@ -14,7 +14,7 @@ SYSFLAGS += -DTHREADSAFE -DNO_TCL
 
 objects = Binder Extractor SessionImpl Connector \
 	MySQLStatementImpl ResultMetadata MySQLException \
-	SessionHandle StatementExecutor
+	SessionHandle StatementExecutor Utility
 
 target         = PocoDataMySQL
 target_version = $(LIBVERSION)

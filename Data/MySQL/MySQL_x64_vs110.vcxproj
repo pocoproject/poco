@@ -280,6 +280,7 @@
     <ClCompile Include="src\SessionHandle.cpp"/>
     <ClCompile Include="src\SessionImpl.cpp"/>
     <ClCompile Include="src\StatementExecutor.cpp"/>
+    <ClCompile Include="src\Utility.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Data\MySQL\Binder.h"/>
@@ -292,6 +293,7 @@
     <ClInclude Include="include\Poco\Data\MySQL\SessionHandle.h"/>
     <ClInclude Include="include\Poco\Data\MySQL\SessionImpl.h"/>
     <ClInclude Include="include\Poco\Data\MySQL\StatementExecutor.h"/>
+    <ClInclude Include="include\Poco\Data\MySQL\Utility.h"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

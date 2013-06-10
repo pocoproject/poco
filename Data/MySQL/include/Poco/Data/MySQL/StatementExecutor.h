@@ -97,9 +97,9 @@ private:
 	StatementExecutor& operator=(const StatementExecutor&);
 
 private:
-	MYSQL* _pSessionHandle;
+	MYSQL*      _pSessionHandle;
 	MYSQL_STMT* _pHandle;
-	int _state;
+	int         _state;
 	std::size_t _affectedRowCount;
 	std::string _query;
 };

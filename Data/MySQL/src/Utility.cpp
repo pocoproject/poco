@@ -1,15 +1,15 @@
 //
-// Version.h
+// Utility.cpp
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Version.h#10 $
+// $Id: //poco/Main/Data/MySQL/src/Utility.cpp#5 $
 //
-// Library: Foundation
-// Package: Core
-// Module:  Version
+// Library: MySQL
+// Package: MySQL
+// Module:  Utility
 //
-// Version information for the POCO C++ Libraries.
+// Implementation of Utility
 //
-// Copyright (c) 2004-2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,25 +36,53 @@
 //
 
 
-#ifndef Foundation_Version_INCLUDED
-#define Foundation_Version_INCLUDED
+#include "Poco/Data/MySQL/Utility.h"
+#include <mysql.h>
 
 
-//
-// Version Information
-//
-// Version format is 0xAABBCCDD, where
-//    - AA is the major version number,
-//    - BB is the minor version number,
-//    - CC is the revision number, and
-//    - DD is the patch level number.
-//      Note that some patch level numbers have
-//      a special meaning:
-//      Dx are development releases
-//      Ax are alpha releases
-//      Bx are beta releases
-//
-#define POCO_VERSION 0x01050200
+namespace Poco {
+namespace Data {
+namespace MySQL {
 
 
-#endif // Foundation_Version_INCLUDED
+std::string Utility::serverInfo(MYSQL* pHandle)
+{
+	std::string info(mysql_get_server_info(pHandle));
+	return info;
+}
+
+
+std::string Utility::serverInfo(Session& session)
+{
+	std::string info(mysql_get_server_info(handle(session)));
+	return info;
+}
+
+
+unsigned long Utility::serverVersion(MYSQL* pHandle)
+{
+	return mysql_get_server_version(pHandle);
+}
+
+
+unsigned long Utility::serverVersion(Session& session)
+{
+	return mysql_get_server_version(handle(session));
+}
+
+
+std::string Utility::hostInfo(MYSQL* pHandle)
+{
+	std::string info(mysql_get_host_info(pHandle));
+	return info;
+}
+
+
+std::string Utility::hostInfo(Session& session)
+{
+	std::string info(mysql_get_host_info(handle(session)));
+	return info;
+}
+
+
+} } } // namespace Poco::Data::MySQL

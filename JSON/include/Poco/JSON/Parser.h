@@ -147,7 +147,7 @@ public:
 		VA,  /* value    */
 		AR,  /* array    */
 		ST,  /* string   */
-		ES,  /* escape   */
+		EC,  /* escape   */
 		U1,  /* u1       */
 		U2,  /* u2       */
 		U3,  /* u3       */
@@ -221,10 +221,10 @@ public:
 	static const int         JSON_UNLIMITED_DEPTH = -1;
 
 	Parser(const Handler::Ptr& pHandler = new ParseHandler, std::size_t bufSize = JSON_PARSE_BUFFER_SIZE);
-		/// Constructor.
+		/// Creates JSON Parser.
 
 	virtual ~Parser();
-		/// Destructor.
+		/// Destroys JSON Parser.
 
 	void reset();
 		/// Resets the parser.
@@ -394,7 +394,7 @@ private:
 			// _escaped char 
 			case EX:
 				_escaped = 1;
-				_state = ES;
+				_state = EC;
 				break;
 			// integer detected by minus
 			case MX:

@@ -41,6 +41,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/MySQL/Connector.h"
+#include "Poco/Data/MySQL/Utility.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 #include "Poco/Nullable.h"
 #include "Poco/Data/DataException.h"
@@ -49,6 +50,7 @@
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
 using Poco::Data::MySQL::ConnectionException;
+using Poco::Data::MySQL::Utility;
 using Poco::Data::MySQL::StatementException;
 using Poco::format;
 using Poco::NotFoundException;
@@ -74,7 +76,9 @@ std::string MySQLTest::_dbConnString = "host=" MYSQL_HOST
 	";user=" MYSQL_USER
 	";password=" MYSQL_PWD 
 	";db=" MYSQL_DB 
-	";compress=true;auto-reconnect=true";
+	";compress=true"
+	";auto-reconnect=true"
+	";secure-auth=true";
 
 
 MySQLTest::MySQLTest(const std::string& name): 
@@ -90,6 +94,15 @@ MySQLTest::~MySQLTest()
 }
 
 
+void MySQLTest::dbInfo(Session& session)
+{
+	
+		std::cout << "Server Info: " << Utility::serverInfo(session) << std::endl;
+		std::cout << "Server Version: " << Utility::serverVersion(session) << std::endl;
+		std::cout << "Host Info: " << Utility::hostInfo(session) << std::endl;
+}
+
+
 void MySQLTest::testConnectNoDB()
 {
 	std::string dbConnString = "host=" MYSQL_HOST
@@ -100,7 +113,9 @@ void MySQLTest::testConnectNoDB()
 	try
 	{
 		Session session(MySQL::Connector::KEY, dbConnString);
-		std::cout << "Connected to [" << "MySQL" << "] without database. Disconnecting ..." << std::endl;
+		std::cout << "Connected to [" << "MySQL" << "] without database." << std::endl;
+		dbInfo(session);
+		std::cout << "Disconnecting ..." << std::endl;
 		session.close();
 		std::cout << "Disconnected." << std::endl;
 	}
@@ -434,6 +449,9 @@ void MySQLTest::testBLOB()
 {
 	if (!_pSession) fail ("Test not available.");
 	
+	recreatePersonBLOBTable();
+	_pExecutor->blob();
+
 	const std::size_t maxFldSize = 65534;
 	_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize-1));
 	recreatePersonBLOBTable();
@@ -852,6 +870,7 @@ CppUnit::Test* MySQLTest::suite()
 	}
 
 	std::cout << "*** Connected to [" << "MySQL" << "] test database." << std::endl;
+	dbInfo(*_pSession);
 
 	_pExecutor = new SQLExecutor("MySQL SQL Executor", _pSession);
 

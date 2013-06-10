@@ -53,6 +53,7 @@
 
 #include <mysql.h>
 #include <iostream>
+#include <limits>
 
 
 using namespace Poco::Data;
@@ -500,8 +501,8 @@ void SQLExecutor::insertSingleBulk()
 void SQLExecutor::unsignedInts()
 {
 	std::string funct = "unsignedInts()";
-	unsigned int data = UINT32_MAX;
-	unsigned int ret = 0;
+	Poco::UInt32 data = std::numeric_limits<Poco::UInt32>::max();
+	Poco::UInt32 ret = 0;
 
 	try { *_pSession << "INSERT INTO Strings VALUES (?)", use(data), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
@@ -1362,7 +1363,7 @@ void SQLExecutor::time()
 }
 
 
-void SQLExecutor::blob(int bigSize)
+void SQLExecutor::blob(unsigned int bigSize)
 {
 	std::string funct = "blob()";
 	std::string lastName("lastname");

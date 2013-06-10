@@ -72,10 +72,8 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginT
 	_connected(false),
 	_inTransaction(false)
 {
-	addProperty("insertId", 
-		&SessionImpl::setInsertId, 
-		&SessionImpl::getInsertId);
-
+	addProperty("insertId", &SessionImpl::setInsertId, &SessionImpl::getInsertId);
+	setProperty("handle", static_cast<MYSQL*>(_handle));
 	open();
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 }
@@ -109,6 +107,7 @@ void SessionImpl::open(const std::string& connect)
 	options["db"] = "";
 	options["compress"] = "";
 	options["auto-reconnect"] = "";
+	options["secure-auth"] = "";
 
 	const std::string& connString = connectionString();
 	for (std::string::const_iterator start = connString.begin();;) 
@@ -126,7 +125,7 @@ void SessionImpl::open(const std::string& connect)
 		start = finish + 1;
 	} 
 
-	if (options["user"] == "")
+	if (options["user"].empty())
 		throw MySQLException("create session: specify user name");
 
 	const char * db = NULL;
@@ -141,15 +140,22 @@ void SessionImpl::open(const std::string& connect)
 		_handle.options(MYSQL_OPT_COMPRESS);
 	else if (options["compress"] == "false")
 		;
-	else if (options["compress"] != "")
+	else if (!options["compress"].empty())
 		throw MySQLException("create session: specify correct compress option (true or false) or skip it");
 
 	if (options["auto-reconnect"] == "true")
 		_handle.options(MYSQL_OPT_RECONNECT, true);
 	else if (options["auto-reconnect"] == "false")
 		_handle.options(MYSQL_OPT_RECONNECT, false);
-	else if (options["auto-reconnect"] != "")
+	else if (!options["auto-reconnect"].empty())
 		throw MySQLException("create session: specify correct auto-reconnect option (true or false) or skip it");
+
+	if (options["secure-auth"] == "true")
+		_handle.options(MYSQL_SECURE_AUTH, true);
+	else if (options["secure-auth"] == "false")
+		_handle.options(MYSQL_SECURE_AUTH, false);
+	else if (!options["secure-auth"].empty())
+		throw MySQLException("create session: specify correct secure-auth option (true or false) or skip it");
 
 	// Real connect
 	_handle.connect(options["host"].c_str(), 
