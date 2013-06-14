@@ -132,8 +132,8 @@
 #elif (_MSC_VER >= 1600) && (_MSC_VER < 1700) // Visual Studio 2010, MSVC++ 10.0
 	#define POCO_MSVS_VERSION 2010
 	#define POCO_MSVC_VERSION 100
-#elif (_MSC_VER >= 1700) && (_MSC_VER < 1800) // Visual Studio 2011, MSVC++ 11.0
-	#define POCO_MSVS_VERSION 2011
+#elif (_MSC_VER >= 1700) && (_MSC_VER < 1800) // Visual Studio 2012, MSVC++ 11.0
+	#define POCO_MSVS_VERSION 2012
 	#define POCO_MSVC_VERSION 110
 #endif
 
@@ -160,7 +160,7 @@
 
 
 // Enable C++11 support for VS 2010 and newer
-#if defined(_MSC_VER) && (_MSC_VER >= 1600) && !defined(POCO_ENABLE_CPP11)
+#if defined(_MSC_VER) && (_MSC_VER >= 1700) && !defined(POCO_ENABLE_CPP11)
 	#define POCO_ENABLE_CPP11
 #endif
 
