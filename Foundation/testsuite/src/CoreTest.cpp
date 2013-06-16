@@ -313,6 +313,21 @@ void CoreTest::testBuffer()
 	k.append("hello", 5);
 	assert ( !std::memcmp(&j[0], "hello", 5) );
 	assert ( !std::memcmp(k.begin(), "hellohello", 10) );
+	k.append('w');
+	assert (k.size() == 11);
+	assert ( !std::memcmp(k.begin(), "hellohellow", k.size()) );
+	k.append('o');
+	assert (k.size() == 12);
+	assert ( !std::memcmp(k.begin(), "hellohellowo", k.size()) );
+	k.append('r');
+	assert (k.size() == 13);
+	assert ( !std::memcmp(k.begin(), "hellohellowor", k.size()) );
+	k.append('l');
+	assert (k.size() == 14);
+	assert ( !std::memcmp(k.begin(), "hellohelloworl", k.size()) );
+	k.append('d');
+	assert (k.size() == 15);
+	assert ( !std::memcmp(k.begin(), "hellohelloworld", k.size()) );
 }
 
 
