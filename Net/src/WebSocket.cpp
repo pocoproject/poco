@@ -1,7 +1,7 @@
 //
 // WebSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocket.cpp#5 $
+// $Id: //poco/1.4/Net/src/WebSocket.cpp#6 $
 //
 // Library: Net
 // Package: WebSocket
@@ -76,6 +76,14 @@ WebSocket::WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& 
 WebSocket::WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& response, HTTPCredentials& credentials):
 	StreamSocket(connect(cs, request, response, credentials))
 {
+}
+
+
+WebSocket::WebSocket(const Socket& socket): 
+	StreamSocket(socket)
+{
+	if (!dynamic_cast<WebSocketImpl*>(impl()))
+		throw InvalidArgumentException("Cannot assign incompatible socket");
 }
 
 
