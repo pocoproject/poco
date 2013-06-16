@@ -1,7 +1,7 @@
 //
 // WebSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocket.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/WebSocket.h#2 $
 //
 // Library: Net
 // Package: WebSocket
@@ -185,16 +185,19 @@ public:
 		///
 		/// The result of the handshake can be obtained from the response
 		/// object.
-		
+	
+	WebSocket(const Socket& socket);
+		/// Creates a WebSocket from another Socket, which must be a WebSocket,
+		/// otherwise a Poco::InvalidArgumentException will be thrown.
+	
 	virtual ~WebSocket();
 		/// Destroys the StreamSocket.
 
 	WebSocket& operator = (const Socket& socket);
 		/// Assignment operator.
 		///
-		/// Releases the socket's SocketImpl and
-		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.	
+		/// The other socket must be a WebSocket, otherwise a Poco::InvalidArgumentException
+		/// will be thrown.
 
 	void shutdown();
 		/// Sends a Close control frame to the server end of
