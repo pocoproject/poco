@@ -97,6 +97,15 @@ AAAIntroduction
   - fixed GH #212: JSONConfiguration was missing from the vs90 project(Patrice Tarabbia)
   - fixed GH #220: add qualifiers for FPEnvironment in C99 (Lucas Clemente)
 
+!!Incompatible Changes and Possible Transition Issues
+
+  - Dynamic::Var: comparison of two empty objects now returns true
+  - WinCE does not build in this release; this will be fixed in a later release
+  - Please note that 1.5.x releases are development releases and not considered stable.
+    Interfaces may change, and backwards compatibility with the stable 1.4 release
+    series is not guaranteed. There may also be some rough edges. 
+    The next stable release incorporating 1.5 features will be 1.6. 
+
 
 !!!Release 1.5.1
 

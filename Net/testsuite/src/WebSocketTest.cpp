@@ -210,6 +210,8 @@ void WebSocketTest::testWebSocketLarge()
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
+	ws.setSendBufferSize(msgSize);
+	ws.setReceiveBufferSize(msgSize);
 	std::string payload(msgSize, 'x');
 	SocketStream sstr(ws);
 	sstr << payload;
