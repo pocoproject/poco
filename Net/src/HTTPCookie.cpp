@@ -256,7 +256,7 @@ std::string HTTPCookie::toString() const
 			result.append("; path=");
 			result.append(_path);
 		}
-		if (_maxAge >= 0)
+		if (_maxAge != -1)
 		{
 			Timestamp ts;
 			ts += _maxAge*Timestamp::resolution();
@@ -296,7 +296,7 @@ std::string HTTPCookie::toString() const
 			result.append(_path);
 			result.append("\"");
 		}
-		if (_maxAge >= 0)
+		if (_maxAge != -1)
 		{
 			result.append("; Max-Age=\"");
 			NumberFormatter::append(result, _maxAge);

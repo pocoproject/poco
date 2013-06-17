@@ -49,6 +49,7 @@ public:
 	void testCookie();
 	void testEscape();
 	void testUnescape();
+    void testExpiry();
 
 	void setUp();
 	void tearDown();
