@@ -180,7 +180,7 @@ CppUnit::Test* HTTPCookieTest::suite()
 	CppUnit_addTest(pSuite, HTTPCookieTest, testCookie);
 	CppUnit_addTest(pSuite, HTTPCookieTest, testEscape);
 	CppUnit_addTest(pSuite, HTTPCookieTest, testUnescape);
-    CppUnit_addTest(pSuite, HTTPCookieTest, testExpiry);
+	CppUnit_addTest(pSuite, HTTPCookieTest, testExpiry);
 
 	return pSuite;
 }
