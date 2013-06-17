@@ -35,6 +35,7 @@
 
 
 #include "Poco/NamedEvent_UNIX.h"
+#include "Poco/Format.h"
 #include "Poco/Exception.h"
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -77,16 +78,16 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 	_sem = sem_open(fileName.c_str(), O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO, 0);
 	if ((long) _sem == (long) SEM_FAILED) 
-		throw SystemException("cannot create named event (sem_open() failed)", _name);
+		throw SystemException(Poco::format("cannot create named mutex %s (sem_open() failed, errno=%d)", fileName, errno), _name);
 #else
 	int fd = open(fileName.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd != -1)
 		close(fd);
 	else 
-		throw SystemException("cannot create named event (lockfile)", _name);
+		throw SystemException(Poco::format("cannot create named event %s (lockfile)", fileName), _name);
 	key_t key = ftok(fileName.c_str(), 0);
 	if (key == -1)
-		throw SystemException("cannot create named event (ftok() failed)", _name);
+		throw SystemException(Poco::format("cannot create named mutex %s (ftok() failed, errno=%d)", fileName, errno), _name);
 	_semid = semget(key, 1, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH | IPC_CREAT | IPC_EXCL);
 	if (_semid >= 0)
 	{
@@ -98,7 +99,7 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 	{
 		_semid = semget(key, 1, 0);
 	}
-	else throw SystemException("cannot create named event (semget() failed)", _name);
+	else throw SystemException(Poco::format("cannot create named mutex %s (semget() failed, errno=%d)", fileName, errno), _name);
 #endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 }
 

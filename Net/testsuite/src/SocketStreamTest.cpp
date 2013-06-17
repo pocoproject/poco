@@ -94,6 +94,8 @@ void SocketStreamTest::testLargeStreamEcho()
 	StreamSocket ss;
 	ss.connect(SocketAddress("localhost", echoServer.port()));
 	SocketStream str(ss);
+	ss.setSendBufferSize(msgSize);
+	ss.setReceiveBufferSize(msgSize);
 	std::string payload(msgSize, 'x');
 	str << payload;
 	assert (str.good());

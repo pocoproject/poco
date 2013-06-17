@@ -126,7 +126,7 @@ template <size_t Alignment> struct AlignedCharArrayImpl;
 			#define POCO_ALIGNEDCHARARRAY_TEMPLATE_ALIGNMENT(x) \
 				template <> struct AlignedCharArrayImpl<x> \
 				{ \
-					char alignas(x) aligned; \
+					char aligned alignas(x); \
 				}
 			#define POCO_HAVE_ALIGNMENT
 		#endif

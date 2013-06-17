@@ -1,6 +1,112 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.5.2
+
+!!Summary of Changes
+
+  - added MongoDB library (Franky Braem)
+  - fixed GH #57: poco-1.5.1: Doesn't compile for Android
+  - added VoidEvent (Arturo Castro)
+  - fixed GH #80: NumberFormatter::append broken
+  - fixed GH #93: ParallelSocketAcceptor virtual functions
+  - optional small object optimization for IPAddress, SocketAddress, Any and Dynamic::Var
+  - SQLite events (insert, update, delete, commit, rollback) handlers
+  - merged GH #91: Improve SQLite multi-threaded use (Rangel Reale)
+  - merged GH #86: Invalid pointers to vector internals (Adrian Imboden)
+  - automatic library initialization macros
+  - fixed GH #110: WebSocket accept() fails when Connection header contains multiple tokens
+  - fixed GH #71: WebSocket and broken Timeouts (POCO_BROKEN_TIMEOUTS)
+  - fixed a warning in Poco/Crypto/OpenSSLInitializer.h
+  - fixed GH #109: Bug in Poco::Net::SMTPClientSession::loginUsingPlain
+  - added clang libc++ build configurations for Darwin and iPhone (Andrea Bigagli)
+  - fixed GH #116: Wrong timezone parsing in DateTimeParse (Matej Knopp)
+  - fixed GH #118: JSON::Object::stringify endless loop
+  - added Recursive and SortedDirectoryIterator (Marian Krivos)
+  - added ListMap (map-like container with preserving insertion order)
+  - MailMessage: attachments saving support and consistent read/write
+  - fixed GH #124: Possible buffer overrun in Foundation/EventLogChannel
+  - fixed GH #119: JSON::Object holds values in ordered map
+  - added JSON::PrintHandler
+  - renamed JSON::DefaultHandler to ParseHandler (breaking change!)
+  - fixed GH #127: Eliminate -Wshadow warnings
+  - fixed GH #79: Poco::Thread leak on Linux
+  - fixed GH #61: static_md build configs for Crypto and NetSSL
+  - fixed GH #130: prefer sysconf over sysctlbyname
+  - fixed GH #131: no timezone global var on OpenBSD
+  - fixed GH #102: Some subprojects don't have x64 solutions for VS 2010
+  - added GH #75: Poco::Uri addQueryParameter method
+  - Poco::Environment::osDisplayName() now recognizes Windows 8/Server 2012
+  - fixed GH #140: Poco::Runnable threading cleanup issue
+  - simplified default TCP/HTTPServer construction
+  - fixed GH #141: Application::run() documentation/implementation discrepancy
+  - changed RowFormatter to SharedPtr<RowFormatter> in Data::RecordSet interface (breaking change!)
+  - fixed GH #144: Poco::Dynamic emits invalid JSON
+  - removed naked pointers from Data interfaces
+  - fixed GH #82: name conflict in Data::Keywords::bind
+  - fixed GH #157: MySQL: cannot bind to 'long' data type on Windows/Visual C++
+  - fixed GH #158: MySQL: MYSQL_BIND 'is_unsigned' member is not set
+  - fixed GH #160: MultipartReader ignores first part, if preamble is missing
+  - fixed GH #156: Possible buffer overrun in Foundation/EventLogChannel
+  - XML: fixed an issue with parsing a memory buffer > 2 GB
+  - upgraded to expat 2.1.0
+  - Data/ODBC: added support for setting query timeout (via setProperty
+    of "queryTimeout"). Timeout is int, given in seconds.
+  - fixed a potential endless loop in SecureStreamSocketImpl::sendBytes() 
+    and also removed unnecessary code.
+  - fixed GH #159: Crash in openssl CRYPTO_thread_id() after library libPocoCrypto.so 
+    has been unloaded.
+  - fixed GH #155: MailOutputStream mangles consecutive newline sequences 
+  - fixed GH #139: FileChannel::PROP_FLUSH is invalid (contains a tab character)
+  - fixed GH #173: HTTPClientSession::proxyConnect forces DNS lookup of host names
+  - fixed GH #194: MessageNotification constructor is inefficient.
+  - fixed GH #189: Poco::NumberParser::tryParse() documentation bug
+  - fixed GH #172: IPv6 Host field is stripped of Brackets in HTTPClientSession
+  - fixed GH #188: Net: SocketAddress operator < unusable for std::map key
+  - fixed GH #128: DOMWriter incorrectly adds SYSTEM keyword to DTD if PUBLIC is 
+    already specified
+  - fixed GH #65: Poco::format() misorders sign and padding specifiers
+  - upgraded bundled SQLite to 3.7.17
+  - replaced JSON parser with Poco::Web::JSON parser (from sandbox)
+  - added JSON conversion to Dynamic Struct and Array
+  - added VarIterator
+  - modified behavior of empty Var (empty == empty)
+  - added Alignment.h header for C++03 alignment needs
+  - added Data/WebNotifier (DB, WebSocket) example
+  - fixed GH #209: Poco::NumberFormatter double length
+  - fixed GH #204: Upgrade zlib to 1.2.8
+  - fixed GH #198: The "application.configDir" property is not always created.
+  - fixed GH #185: Poco::NumberFormatter::format(double value, int precision) 
+    ignore precision == 0
+  - fixed GH #138: FreeBSD JSON tests fail
+  - fixed GH #99: JSON::Query an JSON::Object
+  - limited allowed types for JSON::Query to Object, Array, Object::Ptr, 
+    Array::Ptr and empty
+  - fixed GH #175: HTMLForm does not read URL parameters on POST or PUT
+  - added GH #187: MySQL: allow access to the underlying connection handle
+  - added GH #186: MySQL: support for MYSQL_SECURE_AUTH
+  - fixed GH #174: MySQL: 4GB allocated when reading any largetext or largeblob field
+  - fixed a potential memory leak in Poco::Net::HTTPClientSession if it is misused 
+    (e.g., sendRequest() is sent two times in a row without an intermediate call to 
+    receiveResponse(), or by calling receiveResponse() two times in a row without 
+    an intermediate call to sendRequest()) - GH #217
+  - removed a few unnecessary protected accessor methods from Poco::Net::HTTPClientSession 
+    that would provide inappropriate access to internal state
+  - merged GH #210: Don't call CloseHandle() twice on Windows; Ability to select the
+    threadpool that will be used to start an Activity(Patrice Tarabbia)
+  - fixed GH #212: JSONConfiguration was missing from the vs90 project(Patrice Tarabbia)
+  - fixed GH #220: add qualifiers for FPEnvironment in C99 (Lucas Clemente)
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - Dynamic::Var: comparison of two empty objects now returns true
+  - WinCE does not build in this release; this will be fixed in a later release
+  - Please note that 1.5.x releases are development releases and not considered stable.
+    Interfaces may change, and backwards compatibility with the stable 1.4 release
+    series is not guaranteed. There may also be some rough edges. 
+    The next stable release incorporating 1.5 features will be 1.6. 
+
+
 !!!Release 1.5.1
 
 !!Summary of Changes

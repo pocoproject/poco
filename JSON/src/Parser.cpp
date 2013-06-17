@@ -141,11 +141,11 @@ Parser::Parser(const Handler::Ptr& pHandler, std::size_t bufSize) :
 	_top(-1),
 	_stack(JSON_PARSER_STACK_SIZE),
 	_parseBuffer(bufSize),
-	_parseBufferCount(0),
 	_decimalPoint('.'),
 	_allowNullByte(true),
 	_allowComments(false)
 {
+	_parseBuffer.resize(0);
 	push(MODE_DONE);
 }
 
@@ -163,12 +163,10 @@ void Parser::reset()
 	_escaped = 0;
 	_utf16HighSurrogate = 0;
 	_top = -1;
-	_parseBufferCount = 0;
 
 	_stack.clear();
-	_parseBuffer.clear();
+	_parseBuffer.resize(0);
 	push(MODE_DONE);
-	clearBuffer();
 	if (_pHandler) _pHandler->reset();
 }
 
@@ -241,25 +239,23 @@ bool Parser::pop(int mode)
 
 void Parser::clearBuffer()
 {
-	_parseBufferCount = 0;
-	_parseBuffer[0] = 0;
+	_parseBuffer.resize(0);
 }
 
 
 void Parser::parseBufferPopBackChar()
 {
-	poco_assert(_parseBufferCount >= 1);
-	--_parseBufferCount;
-	_parseBuffer[_parseBufferCount] = 0;
+	poco_assert(_parseBuffer.size() >= 1);
+	_parseBuffer.resize(_parseBuffer.size() - 1);
 }
 
 
 void Parser::parseBufferPushBackChar(char c)
 {
-	if (_parseBufferCount + 1 >= _parseBuffer.size())
-		growBuffer();
-	_parseBuffer[_parseBufferCount++] = c;
-	_parseBuffer[_parseBufferCount]   = 0;
+	if (_parseBuffer.size() + 1 >= _parseBuffer.capacity())
+		_parseBuffer.resize(_parseBuffer.capacity() * 2);
+
+	_parseBuffer.append(c);
 }
 
 
@@ -329,9 +325,8 @@ Parser::CharIntType Parser::decodeUnicodeChar()
 	char* p;
 	int trail_bytes;
 
-	poco_assert(_parseBufferCount >= 6);
-
-	p = &_parseBuffer[_parseBufferCount - 4];
+	poco_assert(_parseBuffer.size() >= 6);
+	p = &_parseBuffer[_parseBuffer.size() - 4];
 
 	for (i = 12; i >= 0; i -= 4, ++p) {
 		unsigned x = *p;
@@ -352,43 +347,56 @@ Parser::CharIntType Parser::decodeUnicodeChar()
 	if ( !_allowNullByte && uc == 0 ) return 0; // Null byte not allowed
 
 	// clear UTF-16 char from buffer
-	_parseBufferCount -= 6;
-	_parseBuffer[_parseBufferCount] = 0;
+	_parseBuffer.resize(_parseBuffer.size() - 6);
 
 	// attempt decoding 
-	if (_utf16HighSurrogate) {
-		if (IS_LOW_SURROGATE(uc)) {
+	if (_utf16HighSurrogate)
+	{
+		if (IS_LOW_SURROGATE(uc))
+		{
 			uc = DECODE_SURROGATE_PAIR(_utf16HighSurrogate, uc);
 			trail_bytes = 3;
 			_utf16HighSurrogate = 0;
-		} else {
+		}
+		else
+		{
 			// high surrogate without a following low surrogate
 			return 0;
 		}
-	} else {
-		if (uc < 0x80) {
+	}
+	else
+	{
+		if (uc < 0x80)
+		{
 			trail_bytes = 0;
-		} else if (uc < 0x800) {
+		}
+		else if (uc < 0x800)
+		{
 			trail_bytes = 1;
-		} else if (IS_HIGH_SURROGATE(uc)) {
+		}
+		else if (IS_HIGH_SURROGATE(uc))
+		{
 			// save the high surrogate and wait for the low surrogate
 			_utf16HighSurrogate = uc;
 			return 1;
-		} else if (IS_LOW_SURROGATE(uc)) {
+		}
+		else if (IS_LOW_SURROGATE(uc))
+		{
 			// low surrogate without a preceding high surrogate 
 			return 0;
-		} else {
+		}
+		else
+		{
 			trail_bytes = 2;
 		}
 	}
 
-	_parseBuffer[_parseBufferCount++] = (char) ((uc >> (trail_bytes * 6)) | utf8_lead_bits[trail_bytes]);
+	_parseBuffer.append((char) ((uc >> (trail_bytes * 6)) | utf8_lead_bits[trail_bytes]));
 
-	for (i = trail_bytes * 6 - 6; i >= 0; i -= 6) {
-		_parseBuffer[_parseBufferCount++] = (char) (((uc >> i) & 0x3F) | 0x80);
+	for (i = trail_bytes * 6 - 6; i >= 0; i -= 6)
+	{
+		_parseBuffer.append((char) (((uc >> i) & 0x3F) | 0x80));
 	}
-
-	_parseBuffer[_parseBufferCount] = 0;
 
 	return 1;
 }
@@ -424,9 +432,9 @@ void Parser::parseBuffer()
 			case JSON_T_FLOAT:
 				{ 
 					// Float can't end with a dot
-					if ( _parseBuffer[_parseBufferCount-1] == '.' ) throw SyntaxException("JSON syntax error");
+					if (_parseBuffer[_parseBuffer.size() - 1] == '.' ) throw SyntaxException("JSON syntax error");
 
-					double float_value = NumberParser::parseFloat(_parseBuffer.begin());
+					double float_value = NumberParser::parseFloat(std::string(_parseBuffer.begin(), _parseBuffer.size()));
 					_pHandler->value(float_value);
 					break;
 				}
@@ -435,7 +443,7 @@ void Parser::parseBuffer()
 #if defined(POCO_HAVE_INT64)
 					try
 					{
-						Int64 value = NumberParser::parse64(_parseBuffer.begin());
+						Int64 value = NumberParser::parse64(std::string(_parseBuffer.begin(), _parseBuffer.size()));
 						// if number is 32-bit, then handle as such
 						if (value > std::numeric_limits<int>::max()
 						 || value < std::numeric_limits<int>::min() )
@@ -450,7 +458,7 @@ void Parser::parseBuffer()
 					// try to handle error as unsigned in case of overflow
 					catch ( const SyntaxException& )
 					{
-						UInt64 value = NumberParser::parseUnsigned64(_parseBuffer.begin());
+						UInt64 value = NumberParser::parseUnsigned64(std::string(_parseBuffer.begin(), _parseBuffer.size()));
 						// if number is 32-bit, then handle as such
 						if ( value > std::numeric_limits<unsigned>::max() )
 						{
@@ -464,13 +472,13 @@ void Parser::parseBuffer()
 #else
 					try
 					{
-						int value = NumberParser::parse(_parseBuffer.begin());
+						int value = NumberParser::parse(std::string(_parseBuffer.begin(), _parseBuffer.size()));
 						_pHandler->value(value);
 					}
 					// try to handle error as unsigned in case of overflow
 					catch ( const SyntaxException& )
 					{
-						unsigned value = NumberParser::parseUnsigned(_parseBuffer.begin());
+						unsigned value = NumberParser::parseUnsigned(std::string(_parseBuffer.begin(), _parseBuffer.size()));
 						_pHandler->value(value);
 					}
 #endif
@@ -478,8 +486,7 @@ void Parser::parseBuffer()
 				break;
 			case JSON_T_STRING:
 				{
-					std::string str(_parseBuffer.begin(), _parseBufferCount);
-					_pHandler->value(str);
+					_pHandler->value(std::string(_parseBuffer.begin(), _parseBuffer.size()));
 					break;
 				}
 			}
@@ -498,35 +505,34 @@ int Parser::utf8CheckFirst(char byte)
 
 	if (0x80 <= u && u <= 0xBF) 
 	{
-		/* second, third or fourth byte of a multi-byte
-		sequence, i.e. a "continuation byte" */
+		// second, third or fourth byte of a multi-byte
+		// sequence, i.e. a "continuation byte"
 		return 0;
 	}
 	else if(u == 0xC0 || u == 0xC1) 
 	{
-		/* overlong encoding of an ASCII byte */
+		// overlong encoding of an ASCII byte
 		return 0;
 	}
 	else if(0xC2 <= u && u <= 0xDF) 
 	{
-		/* 2-byte sequence */
+		// 2-byte sequence
 		return 2;
 	}
 	else if(0xE0 <= u && u <= 0xEF) 
 	{
-		/* 3-byte sequence */
+		// 3-byte sequence
 		return 3;
 	}
 	else if(0xF0 <= u && u <= 0xF4) 
 	{
-		/* 4-byte sequence */
+		// 4-byte sequence
 		return 4;
 	}
 	else 
 	{ 
-		/* u >= 0xF5 */
-		/* Restricted (start of 4-, 5- or 6-byte sequence) or invalid
-		UTF-8 */
+		// u >= 0xF5
+		// Restricted (start of 4-, 5- or 6-byte sequence) or invalid UTF-8
 		return 0;
 	}
 }

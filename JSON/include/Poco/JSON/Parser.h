@@ -453,7 +453,7 @@ private:
 			// closing comment
 			case CE:
 				_comment = 0;
-				poco_assert(_parseBufferCount == 0);
+				poco_assert(_parseBuffer.size() == 0);
 				poco_assert(_type == JSON_T_NONE);
 				_state = _beforeCommentState;
 				break;
@@ -463,7 +463,7 @@ private:
 				if (!_allowComments) return false;
 				parseBufferPopBackChar();
 				parseBuffer();
-				poco_assert(_parseBufferCount == 0);
+				poco_assert(_parseBuffer.size() == 0);
 				poco_assert(_type != JSON_T_STRING);
 				switch (_stack[_top])
 				{
@@ -553,8 +553,7 @@ private:
 
 						if (_pHandler) 
 						{
-							std::string value(_parseBuffer.begin(), _parseBufferCount);
-							_pHandler->key(value);
+							_pHandler->key(std::string(_parseBuffer.begin(), _parseBuffer.size()));
 						}
 						clearBuffer();
 						break;
@@ -634,7 +633,6 @@ private:
 	int            _top;
 	BufType        _stack;
 	BufType        _parseBuffer;
-	std::size_t    _parseBufferCount;
 	char           _decimalPoint;
 	bool           _allowNullByte;
 	bool           _allowComments;

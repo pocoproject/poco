@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.2 (2013-06-17)
+Release 1.5.2 (2013-06-24)
 ==========================
 - added MongoDB library (Franky Braem)
 - fixed GH #57: poco-1.5.1: Doesn't compile for Android
@@ -89,6 +89,10 @@ Release 1.5.2 (2013-06-17)
   an intermediate call to sendRequest()) - GH #217
 - removed a few unnecessary protected accessor methods from Poco::Net::HTTPClientSession 
   that would provide inappropriate access to internal state
+- merged GH #210: Don't call CloseHandle() twice on Windows; Ability to select the
+  threadpool that will be used to start an Activity(Patrice Tarabbia)
+- fixed GH #212: JSONConfiguration was missing from the vs90 project(Patrice Tarabbia)
+- fixed GH #220: add qualifiers for FPEnvironment in C99 (Lucas Clemente)
 
 
 Release 1.5.1 (2013-01-11)

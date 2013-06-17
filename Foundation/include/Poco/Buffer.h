@@ -166,9 +166,15 @@ public:
 		/// Resizes this buffer and appends the argument buffer.
 	{
 		if (0 == sz) return;
-		std::size_t oldSize = _used;
 		resize(_used + sz, true);
-		std::memcpy(_ptr + oldSize, buf, sz);
+		std::memcpy(_ptr + _used - sz, buf, sz);
+	}
+
+	void append(T val)
+		/// Resizes this buffer by one element and appends the argument value.
+	{
+		resize(_used + 1, true);
+		_ptr[_used - 1] = val;
 	}
 
 	void append(const Buffer& buf)

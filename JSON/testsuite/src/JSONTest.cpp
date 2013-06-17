@@ -247,7 +247,7 @@ void JSONTest::testUnsignedNumberProperty()
 	assert (!ds["test"].isEmpty());
 	assert (ds["test"].isNumeric());
 	assert (ds["test"].isInteger());
-	assert (ds["test"] == 4294967295);
+	assert (ds["test"] == 4294967295u);
 	value = ds["test"];
 	assert(value == -1);
 
@@ -255,7 +255,7 @@ void JSONTest::testUnsignedNumberProperty()
 	assert (!rds["test"].isEmpty());
 	assert (rds["test"].isNumeric());
 	assert (rds["test"].isInteger());
-	assert (rds["test"] == 4294967295);
+	assert (rds["test"] == 4294967295u);
 	value = rds["test"];
 	assert(value == -1);
 }
