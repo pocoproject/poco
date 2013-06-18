@@ -52,7 +52,6 @@ using Poco::DateTimeParser;
 using Poco::DateTime;
 using Poco::Net::NameValueCollection;
 using Poco::Net::HTTPCookie;
-using Poco::DateTimeParser;
 
 
 HTTPCookieTest::HTTPCookieTest(const std::string& name): CppUnit::TestCase(name)
