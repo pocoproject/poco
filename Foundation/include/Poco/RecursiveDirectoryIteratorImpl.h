@@ -116,7 +116,7 @@ private:
 		/// Function which implements the logic of determining
 		/// recursion depth.
 	{
-		return stack.size();
+		return static_cast<Poco::UInt16>(stack.size());
 	}
 
 	UInt16 _maxDepth;

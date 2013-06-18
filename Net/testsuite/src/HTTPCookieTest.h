@@ -41,7 +41,6 @@
 #include "CppUnit/TestCase.h"
 
 
-
 class HTTPCookieTest: public CppUnit::TestCase
 {
 public:
@@ -51,7 +50,8 @@ public:
 	void testCookie();
 	void testEscape();
 	void testUnescape();
-	void testExpiry();
+	void testExpiryFuture();
+	void testExpiryPast();
 	void testCookieExpiry(Poco::DateTime expiryTime);
 
 	void setUp();

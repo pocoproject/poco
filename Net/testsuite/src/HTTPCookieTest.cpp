@@ -36,18 +36,16 @@
 #include "Poco/Net/HTTPCookie.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
+#include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
-#include "Poco/DateTimeParser.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Net/NameValueCollection.h"
 #include <cstdlib>
-#include <sstream>
 
 using Poco::Timestamp;
 using Poco::Timespan;
 using Poco::DateTimeFormatter;
 using Poco::DateTimeFormat;
-using Poco::DateTimeParser;
 using Poco::DateTime;
 using Poco::Net::NameValueCollection;
 using Poco::Net::HTTPCookie;
@@ -112,19 +110,37 @@ void HTTPCookieTest::testUnescape()
 	assert (unescaped == "\n\t@,;\"'");
 }
 
-void HTTPCookieTest::testExpiry()
-{   
-	//----Test expiry time in the future----
-	DateTime future; //now
-	//now + 1 year
-	future.assign(future.year()+1, future.month(),future.day(),future.hour(),future.minute(),future.second(), future.millisecond(), future.microsecond());
+void HTTPCookieTest::testExpiryFuture()
+{
+	DateTime future;
+	//1 year from now
+	future.assign(future.year() + 1,
+		future.month(),
+		future.day(),
+		future.hour(),
+		future.minute(),
+		future.second(),
+		future.millisecond(),
+		future.microsecond());
 	testCookieExpiry(future);
-	//----Test expiry time in the future----
-	DateTime past; //now
-	//now - 1 year
-	past.assign(past.year()-1, past.month(),past.day(),past.hour(),past.minute(),past.second(), past.millisecond(), past.microsecond());
-	testCookieExpiry(past);	
 }
+
+void HTTPCookieTest::testExpiryPast()
+{
+	DateTime past;
+	// 1 year ago
+	past.assign(past.year() - 1,
+		past.month(),
+		past.day(),
+		past.hour(),
+		past.minute(),
+		past.second(),
+		past.millisecond(),
+		past.microsecond());
+	testCookieExpiry(past);
+}
+
+
 
 void HTTPCookieTest::testCookieExpiry(DateTime expiryTime){
 	NameValueCollection nvc;

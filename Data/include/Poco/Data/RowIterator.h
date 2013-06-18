@@ -64,7 +64,7 @@ public:
 	typedef Row*                            pointer;
 	typedef Row&                            reference;
 
-	static const int POSITION_END;
+	static const std::size_t POSITION_END;
 		/// End position indicator.
 
 	RowIterator(RecordSet* pRecordSet, bool positionEnd);

@@ -93,6 +93,8 @@ Release 1.5.2 (2013-06-24)
   threadpool that will be used to start an Activity(Patrice Tarabbia)
 - fixed GH #212: JSONConfiguration was missing from the vs90 project(Patrice Tarabbia)
 - fixed GH #220: add qualifiers for FPEnvironment in C99 (Lucas Clemente)
+- fixed GH #222: HTTPCookie doesn't support expiry times in the past (Karl Reid)
+- fixed GH #224: building 1.5.1 on Windows for x64
 
 
 Release 1.5.1 (2013-01-11)
