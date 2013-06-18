@@ -138,7 +138,7 @@ void HTTPCookieTest::testCookieExpiry(DateTime expiryTime){
 	cookie.setVersion(1);
 	std::string cookieStringV1 = cookie.toString();
 	Timestamp now;
-	//expected number of seconds until future - should be close to cookie._maxAge
+	//expected number of seconds until expiryTime - should be close to cookie._maxAge
 	int expectedMaxAge = (int) ((expiryTime.timestamp() - now)/Timestamp::resolution()); //expected number of seconds until expiryTime
 	Timestamp after; //end of cookie lifetime
 
