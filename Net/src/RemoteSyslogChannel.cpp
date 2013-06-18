@@ -88,7 +88,10 @@ RemoteSyslogChannel::~RemoteSyslogChannel()
 void RemoteSyslogChannel::open()
 {
 	if (_open) return;
-	
+
+	// reset socket for the case that it has been previously closed
+	_socket = DatagramSocket();
+
 	if (_logHost.find(':') != std::string::npos)
 		_socketAddress = SocketAddress(_logHost);
 	else
@@ -105,6 +108,8 @@ void RemoteSyslogChannel::open()
 			_host = _socket.address().host().toString();
 		}
 	}
+
+	_open = true;
 }
 
 	

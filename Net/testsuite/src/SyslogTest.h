@@ -47,6 +47,7 @@ public:
 	~SyslogTest();
 
 	void testListener();
+	void testChannelOpenClose();
 	void testOldBSD();
 
 	void setUp();
