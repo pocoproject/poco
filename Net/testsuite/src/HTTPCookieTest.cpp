@@ -140,8 +140,6 @@ void HTTPCookieTest::testExpiryPast()
 	testCookieExpiry(past);
 }
 
-
-
 void HTTPCookieTest::testCookieExpiry(DateTime expiryTime){
 	NameValueCollection nvc;
 	nvc.add("name", "value");
@@ -155,7 +153,7 @@ void HTTPCookieTest::testCookieExpiry(DateTime expiryTime){
 	std::string cookieStringV1 = cookie.toString();
 	Timestamp now;
 	//expected number of seconds until expiryTime - should be close to cookie._maxAge
-	int expectedMaxAge = (int) ((expiryTime.timestamp() - now)/Timestamp::resolution()); //expected number of seconds until expiryTime
+	int expectedMaxAge = (int) ((expiryTime.timestamp() - now) / Timestamp::resolution()); //expected number of seconds until expiryTime
 	Timestamp after; //end of cookie lifetime
 
 	//length of lifetime of the cookie
@@ -176,11 +174,11 @@ void HTTPCookieTest::testCookieExpiry(DateTime expiryTime){
 
 	//assert that the cookie's expiry time reflects the time passed to
 	//its constructor, within a delta of the lifetime of the cookie
-	assert(cookieExpireTime - expiryTime <= delta);
+	assert (cookieExpireTime - expiryTime <= delta);
 	//assert that the cookie's max age is the number of seconds between
 	//the creation of the cookie and the expiry time passed to its
 	//constuctor, within a delta of the lifetime of the cookie
-	assert(abs(cookieMaxAge - expectedMaxAge) <= delta.seconds());
+	assert (abs(cookieMaxAge - expectedMaxAge) <= delta.seconds());
 }
 
 
@@ -201,7 +199,8 @@ CppUnit::Test* HTTPCookieTest::suite()
 	CppUnit_addTest(pSuite, HTTPCookieTest, testCookie);
 	CppUnit_addTest(pSuite, HTTPCookieTest, testEscape);
 	CppUnit_addTest(pSuite, HTTPCookieTest, testUnescape);
-	CppUnit_addTest(pSuite, HTTPCookieTest, testExpiry);
+	CppUnit_addTest(pSuite, HTTPCookieTest, testExpiryFuture);
+	CppUnit_addTest(pSuite, HTTPCookieTest, testExpiryPast);
 
 	return pSuite;
 }
