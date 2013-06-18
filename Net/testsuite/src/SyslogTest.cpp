@@ -167,6 +167,45 @@ void SyslogTest::testListener()
 }
 
 
+void SyslogTest::testChannelOpenClose()
+{
+	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
+	channel->setProperty("loghost", "localhost:51400");
+	channel->open();
+	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
+	listener->open();
+	CachingChannel cl;
+	listener->addChannel(&cl);
+
+	assert (cl.getCurrentSize() == 0);
+	Poco::Message msg1("source1", "message1", Poco::Message::PRIO_CRITICAL);
+	channel->log(msg1);
+	Poco::Thread::sleep(1000);
+	assert (cl.getCurrentSize() == 1);
+
+	channel->close(); // close and re-open channel
+	channel->open();
+
+	Poco::Message msg2("source2", "message2", Poco::Message::PRIO_ERROR);
+	channel->log(msg2);
+	Poco::Thread::sleep(1000);
+	assert (cl.getCurrentSize() == 2);
+
+	listener->close();
+	std::vector<Poco::Message> msgs;
+	cl.getMessages(msgs, 0, 10);
+	assert (msgs.size() == 2);
+
+	assert (msgs[1].getSource() == "source1");
+	assert (msgs[1].getText() == "message1");
+	assert (msgs[1].getPriority() == Poco::Message::PRIO_CRITICAL);
+
+	assert (msgs[0].getSource() == "source2");
+	assert (msgs[0].getText() == "message2");
+	assert (msgs[0].getPriority() == Poco::Message::PRIO_ERROR);
+}
+
+
 void SyslogTest::testOldBSD()
 {
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
@@ -209,6 +248,7 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SyslogTest");
 
 	CppUnit_addTest(pSuite, SyslogTest, testListener);
+	CppUnit_addTest(pSuite, SyslogTest, testChannelOpenClose);
 	CppUnit_addTest(pSuite, SyslogTest, testOldBSD);
 
 	return pSuite;
