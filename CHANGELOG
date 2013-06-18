@@ -31,6 +31,7 @@ Release 1.4.6p2 (2013-06-xx)
   an intermediate call to sendRequest()) - GH #217
 - removed a few unnecessary protected accessor methods from Poco::Net::HTTPClientSession 
   that would provide inappropriate access to internal state
+- fixed GH# 223 (Poco::Net::HTTPCookie does not support expiry times in the past)
 
 
 Release 1.4.6p1 (2013-03-06)
@@ -1848,4 +1849,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#87 $
+$Id: //poco/1.4/dist/CHANGELOG#88 $

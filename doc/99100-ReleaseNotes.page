@@ -33,6 +33,7 @@ AAAIntroduction
     an intermediate call to sendRequest()) - GH #217
   - removed a few unnecessary protected accessor methods from Poco::Net::HTTPClientSession 
     that would provide inappropriate access to internal state
+  - fixed GH# 223 (Poco::Net::HTTPCookie does not support expiry times in the past)
 
 
 !!!Release 1.4.6p1
