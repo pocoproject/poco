@@ -37,6 +37,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/DateTime.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -51,6 +52,7 @@ public:
 	void testUnescape();
 	void testExpiryFuture();
 	void testExpiryPast();
+	void testCookieExpiry(Poco::DateTime expiryTime);
 
 	void setUp();
 	void tearDown();
