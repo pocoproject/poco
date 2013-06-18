@@ -36,16 +36,18 @@
 #include "Poco/Net/HTTPCookie.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
-#include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeParser.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Net/NameValueCollection.h"
 #include <cstdlib>
+#include <sstream>
 
 using Poco::Timestamp;
 using Poco::Timespan;
 using Poco::DateTimeFormatter;
 using Poco::DateTimeFormat;
+using Poco::DateTimeParser;
 using Poco::DateTime;
 using Poco::Net::NameValueCollection;
 using Poco::Net::HTTPCookie;
@@ -111,55 +113,58 @@ void HTTPCookieTest::testUnescape()
 }
 
 void HTTPCookieTest::testExpiry()
- {   
-	NameValueCollection nvc;
-	nvc.add("name", "value");
-
+{   
 	//----Test expiry time in the future----
-	Timestamp before;
-	DateTime future;
+	DateTime future; //now
 	//now + 1 year
 	future.assign(future.year()+1, future.month(),future.day(),future.hour(),future.minute(),future.second(), future.millisecond(), future.microsecond());
-	std::string futureExpiryString = DateTimeFormatter::format(future.timestamp(),DateTimeFormat::HTTP_FORMAT);
-	nvc.add("expires", futureExpiryString);
-	HTTPCookie cookie(nvc);
-	//take one second off the future time since HTTPCookie is always one second off
-	future.assign(future.year(), future.month(),future.day(),future.hour(),future.minute(),future.second()-1, future.millisecond(), future.microsecond());
-	futureExpiryString = DateTimeFormatter::format(future.timestamp(),DateTimeFormat::HTTP_FORMAT);
-
-	// assert that the cookie bears the same expiry time as the string
-	// its constructor was passed.
-	assert (cookie.toString() == "name=value; expires=" + futureExpiryString);
-
-	cookie.setVersion(1);
-	Timestamp now;
-	int futureAge = (int) ((future.timestamp() - now)/Timestamp::resolution());
-	Timestamp after;
-	Timespan diff = after - before; //time taken between creation of 'future' and 'now'
-	int margin = diff.seconds() + 1;
-	// assert that the cookie's max age is the number of seconds between now
-	// and the time indicated in the 'expires' value passed to its
-	// constructor, within a margin of error
-	assert (abs(cookie.getMaxAge() - futureAge) <= margin);
-
-	//-----Test expiry time in the past----
-	before = Timestamp();
-	DateTime past;
+	testCookieExpiry(future);
+	//----Test expiry time in the future----
+	DateTime past; //now
 	//now - 1 year
 	past.assign(past.year()-1, past.month(),past.day(),past.hour(),past.minute(),past.second(), past.millisecond(), past.microsecond());
-	std::string pastExpiryString = DateTimeFormatter::format(past.timestamp(),DateTimeFormat::HTTP_FORMAT);
-	nvc.erase("expires");
-	nvc.add("expires", pastExpiryString);
-	cookie = HTTPCookie(nvc);
-	assert (cookie.toString() == "name=value; expires=" + pastExpiryString);
+	testCookieExpiry(past);	
+}
 
+void HTTPCookieTest::testCookieExpiry(DateTime expiryTime){
+	NameValueCollection nvc;
+	nvc.add("name", "value");
+	std::string expiryString = DateTimeFormatter::format(expiryTime.timestamp(),DateTimeFormat::HTTP_FORMAT);
+	nvc.add("expires", expiryString);
+
+	Timestamp before; //start of cookie lifetime
+	HTTPCookie cookie(nvc); //cookie created
+	std::string cookieStringV0 = cookie.toString();
 	cookie.setVersion(1);
-	now = Timestamp();
-	int pastAge = (int) ((past.timestamp() - now)/Timestamp::resolution());
-	after = Timestamp();
-	diff = after - before;
-	margin = diff.seconds();
-	assert (abs(cookie.getMaxAge() - pastAge) <= margin);
+	std::string cookieStringV1 = cookie.toString();
+	Timestamp now;
+	//expected number of seconds until future - should be close to cookie._maxAge
+	int expectedMaxAge = (int) ((expiryTime.timestamp() - now)/Timestamp::resolution()); //expected number of seconds until expiryTime
+	Timestamp after; //end of cookie lifetime
+
+	//length of lifetime of the cookie
+	Timespan delta = after - before;
+
+	//pull out cookie expire time string
+	size_t startPos = cookieStringV0.find("expires=") + 8;
+	std::string cookieExpireTimeStr = cookieStringV0.substr(startPos, cookieStringV0.find(";", startPos));
+	//convert to a DateTime
+	int tzd;
+	DateTime cookieExpireTime = DateTimeParser::parse(cookieExpireTimeStr, tzd);
+	//pull out cookie max age
+	int cookieMaxAge;
+	startPos = cookieStringV1.find("Max-Age=\"") + 9;
+	std::string cookieMaxAgeStr = cookieStringV1.substr(startPos, cookieStringV1.find("\"", startPos));
+	//convert to integer
+	std::istringstream(cookieMaxAgeStr) >> cookieMaxAge;
+
+	//assert that the cookie's expiry time reflects the time passed to
+	//its constructor, within a delta of the lifetime of the cookie
+	assert(cookieExpireTime - expiryTime <= delta);
+	//assert that the cookie's max age is the number of seconds between
+	//the creation of the cookie and the expiry time passed to its
+	//constuctor, within a delta of the lifetime of the cookie
+	assert(abs(cookieMaxAge - expectedMaxAge) <= delta.seconds());
 }
 
 
