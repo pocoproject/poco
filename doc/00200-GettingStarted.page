@@ -166,20 +166,29 @@ source.
 Microsoft Visual Studio 7.1 (2003), 8.0 (2005), 9.0 (2008) or 10.0
 (2010) is required to build the POCO C++ Libraries on Windows platforms.
 Solution and project files for all versions are included. For Visual
-Studio 2008 and 2010, 64-bit (x64) builds are supported as well.
+Studio 2008, 2010 and 2012, 64-bit (x64) builds are supported as well.
 You can either build from within Visual Studio (<*Build->Batch
 Build->Select All;Rebuild*>) or from the command line. To build from the
 command line, start the Visual Studio .NET 2003/2005/2008/2010 Command
 Prompt and go (<[cd]>) to the directory where you have extracted the POCO
 C++ Libraries sources. Then, simply start the <*buildwin.cmd*> script and
-pass as argument the version of visual studio (71, 80, 90 or 100). You
+pass as argument the version of visual studio (71, 80, 90, 100 or 110). You
 can customize what is being built by <*buildwin.cmd*> by passing appropriate
 command line arguments to it. Call <*buildwin.cmd*> without arguments to see
-what is available.
+what is available. Build environment is set up by the buildwin.cmd; to avoid
+build problems, it is recommended to start the build in a clean command 
+prompt console, i.e. not in the one provided by Visual Studio for 32/64-bit 
+builds (although those will work fine if used appropriately for the right 
+32/64-bit build type).
+
+Visual Studio Express builds have limited support. In particular, the
+coupling of the TesTSuite with MFC on Windows is the obstacle for clean
+ful VS Express builds. There are plans to alleviate this in the future
+relalses.
 
 To disable certain components (e.g., NetSSL_OpenSSL or Data/MySQL) from
 the build, edit the text file named <*components*> in the distribution
-root directory and remove the respective lines.
+root directory and remove or comment the respective lines.
 
 Certain libraries, like NetSSL_OpenSSL, Crypto or Data/MySQL have
 dependencies to other libraries. Since the build script does not know where to 
@@ -223,7 +232,12 @@ To extract the sources and build all libraries, testsuites and samples, simply
     $ gmake -s
 ----
 
-See the configure script source for a list of possible options.
+For help, either invoke
+
+    $ ./configure --help
+----
+
+Alternatively, you can read the configure script source for a list of possible options.
 For starters, we recommend <[--no-tests]> and <[--no-samples]>, to reduce build times.
 On a multicore or multiprocessor machine, use parallel makes to speed up
 the build (<[make -j4]>).
