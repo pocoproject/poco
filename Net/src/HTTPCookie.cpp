@@ -115,7 +115,7 @@ HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 			int tzd;
 			DateTime exp = DateTimeParser::parse(value, tzd);
 			Timestamp now;
-			setMaxAge((int) ((exp.timestamp() - now)/Timestamp::resolution()));
+			setMaxAge((int) ((exp.timestamp() - now) / Timestamp::resolution()));
 		}
 		else if (icompare(name, "version") == 0)
 		{
@@ -256,10 +256,10 @@ std::string HTTPCookie::toString() const
 			result.append("; path=");
 			result.append(_path);
 		}
-		if (_maxAge >= 0)
+		if (_maxAge != -1)
 		{
 			Timestamp ts;
-			ts += _maxAge*Timestamp::resolution();
+			ts += _maxAge * Timestamp::resolution();
 			result.append("; expires=");
 			DateTimeFormatter::append(result, ts, DateTimeFormat::HTTP_FORMAT);
 		}
@@ -296,7 +296,7 @@ std::string HTTPCookie::toString() const
 			result.append(_path);
 			result.append("\"");
 		}
-		if (_maxAge >= 0)
+		if (_maxAge != -1)
 		{
 			result.append("; Max-Age=\"");
 			NumberFormatter::append(result, _maxAge);

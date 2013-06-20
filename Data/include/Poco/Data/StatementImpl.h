@@ -350,7 +350,7 @@ private:
 		return new InternalBulkExtraction<C>(*pData,
 			pCol,
 			static_cast<Poco::UInt32>(getExtractionLimit()),
-			Position(currentDataSet()));
+			Position(static_cast<Poco::UInt32>(currentDataSet())));
 	}
 
 	template <class T>

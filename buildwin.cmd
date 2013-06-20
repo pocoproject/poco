@@ -49,14 +49,21 @@ set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 rem VS_VERSION {71 | 80 | 90 | 100 | 110}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
+set VS_64_BIT_ENV=VC\bin\x86_amd64\vcvarsx86_amd64.bat
 
 if not defined VCINSTALLDIR (
-  if %1==71 (call "%VS71COMNTOOLS%vsvars32.bat") else ( 
-  if %1==80 (call "%VS80COMNTOOLS%vsvars32.bat") else (
-  if %1==90 (call "%VS90COMNTOOLS%vsvars32.bat") else (
-  if %1==100 (call "%VS100COMNTOOLS%vsvars32.bat") else (
-  if %1==110 (call "%VS110COMNTOOLS%vsvars32.bat")
-  ))))
+  if %VS_VERSION%==vs71  (call "%VS71COMNTOOLS%vsvars32.bat") else (
+    if %VS_VERSION%==vs80  (call "%VS80COMNTOOLS%vsvars32.bat") else (
+      if %VS_VERSION%==vs90  (
+        if %5==x64 (call "%VS90COMNTOOLS%..\..\%VS_64_BIT_ENV%") else (
+                    call "%VS90COMNTOOLS%vsvars32.bat")) else (
+          if %VS_VERSION%==vs100 (
+            if %5==x64 (call "%VS100COMNTOOLS%..\..\%VS_64_BIT_ENV%") else (
+                        call "%VS100COMNTOOLS%vsvars32.bat")) else (
+              if %VS_VERSION%==vs110 (
+                if %5==x64 (call "%VS110COMNTOOLS%..\..\%VS_64_BIT_ENV%") else (
+                            call "%VS110COMNTOOLS%vsvars32.bat")
+) ) ) )   )   )
 
   if not defined VSINSTALLDIR (
     echo Error: No Visual C++ environment found.
