@@ -45,6 +45,9 @@
 #include "Poco/AtomicCounter.h"
 #include <algorithm>
 
+#ifndef POCO_PTR_CHECKING
+	#define POCO_PTR_CHECKING 0
+#endif
 
 namespace Poco {
 
@@ -241,24 +244,40 @@ public:
 		return SharedPtr<Other, RC, RP>(_pCounter, pOther);
 	}
 
-	C* operator -> ()
+	inline C* operator -> ()
 	{
+#if POCO_PTR_CHECKING
 		return deref();
+#else
+		return _ptr;
+#endif
 	}
 
-	const C* operator -> () const
+	inline const C* operator -> () const
 	{
+#if POCO_PTR_CHECKING
 		return deref();
+#else
+		return _ptr;
+#endif
 	}
 
-	C& operator * ()
+	inline C& operator * ()
 	{
+#if POCO_PTR_CHECKING
 		return *deref();
+#else
+		return *_ptr;
+#endif
 	}
 
-	const C& operator * () const
+	inline const C& operator * () const
 	{
+#if POCO_PTR_CHECKING
 		return *deref();
+#else
+		return *_ptr;
+#endif
 	}
 
 	C* get()
@@ -387,6 +406,7 @@ public:
 	}
 
 private:
+#if POCO_PTR_CHECKING
 	C* deref() const
 	{
 		if (!_ptr)
@@ -394,6 +414,7 @@ private:
 
 		return _ptr;
 	}
+#endif
 
 	void release()
 	{
