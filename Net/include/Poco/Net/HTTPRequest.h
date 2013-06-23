@@ -1,7 +1,7 @@
 //
 // HTTPRequest.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPRequest.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPRequest.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -161,6 +161,7 @@ public:
 	static const std::string COOKIE;
 	static const std::string AUTHORIZATION;
 	static const std::string PROXY_AUTHORIZATION;
+	static const std::string UPGRADE;
 
 protected:
 	void getCredentials(const std::string& header, std::string& scheme, std::string& authInfo) const;

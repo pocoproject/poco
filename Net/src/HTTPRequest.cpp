@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#3 $
+// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#4 $
 //
 // Library: Net
 // Package: HTTP
@@ -61,6 +61,7 @@ const std::string HTTPRequest::HOST                = "Host";
 const std::string HTTPRequest::COOKIE              = "Cookie";
 const std::string HTTPRequest::AUTHORIZATION       = "Authorization";
 const std::string HTTPRequest::PROXY_AUTHORIZATION = "Proxy-Authorization";
+const std::string HTTPRequest::UPGRADE             = "Upgrade";
 
 
 HTTPRequest::HTTPRequest():
@@ -118,19 +119,7 @@ void HTTPRequest::setHost(const std::string& host)
 	
 void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 {
-	std::string value;
-	if (host.find(':') != std::string::npos)
-	{
-		// IPv6 address
-		value.append("[");
-		value.append(host);
-		value.append("]");
-	}
-	else
-	{
-		value.append(host);
-	}
-		
+	std::string value(host);
 	if (port != 80 && port != 443)
 	{
 		value.append(":");
