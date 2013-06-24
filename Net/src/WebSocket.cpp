@@ -1,7 +1,7 @@
 //
 // WebSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocket.cpp#6 $
+// $Id: //poco/1.4/Net/src/WebSocket.cpp#7 $
 //
 // Library: Net
 // Package: WebSocket
@@ -202,7 +202,14 @@ WebSocketImpl* WebSocket::connect(HTTPClientSession& cs, HTTPRequest& request, H
 			throw WebSocketException("Not authorized", WS_ERR_UNAUTHORIZED);
 		}
 	}
-	throw WebSocketException("Cannot upgrade to WebSocket connection", response.getReason(), WS_ERR_NO_HANDSHAKE);
+	if (response.getStatus() == HTTPResponse::HTTP_OK)
+	{
+		throw WebSocketException("The server does not understand the WebSocket protocol", WS_ERR_NO_HANDSHAKE);
+	}
+	else
+	{
+		throw WebSocketException("Cannot upgrade to WebSocket connection", response.getReason(), WS_ERR_NO_HANDSHAKE);
+	}
 }
 
 
