@@ -113,6 +113,7 @@ void HTTPCookieTest::testUnescape()
 	assert (unescaped == "\n\t@,;\"'");
 }
 
+
 void HTTPCookieTest::testExpiryFuture()
 {
 	DateTime future;
@@ -127,6 +128,7 @@ void HTTPCookieTest::testExpiryFuture()
 		future.microsecond());
 	testCookieExpiry(future);
 }
+
 
 void HTTPCookieTest::testExpiryPast()
 {
@@ -143,7 +145,9 @@ void HTTPCookieTest::testExpiryPast()
 	testCookieExpiry(past);
 }
 
-void HTTPCookieTest::testCookieExpiry(DateTime expiryTime){
+
+void HTTPCookieTest::testCookieExpiry(DateTime expiryTime)
+{
 	NameValueCollection nvc;
 	nvc.add("name", "value");
 	std::string expiryString = DateTimeFormatter::format(expiryTime.timestamp(),DateTimeFormat::HTTP_FORMAT);
@@ -181,7 +185,7 @@ void HTTPCookieTest::testCookieExpiry(DateTime expiryTime){
 	//assert that the cookie's max age is the number of seconds between
 	//the creation of the cookie and the expiry time passed to its
 	//constuctor, within a delta of the lifetime of the cookie
-	assert (abs(cookieMaxAge - expectedMaxAge) <= delta.seconds());
+	assert (cookieMaxAge - expectedMaxAge <= delta.seconds());
 }
 
 
