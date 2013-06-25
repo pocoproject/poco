@@ -1,7 +1,7 @@
 //
 // WebSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#8 $
+// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#9 $
 //
 // Library: Net
 // Package: WebSocket
@@ -120,6 +120,11 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 {
 	char header[MAX_HEADER_LENGTH];
 	int n = receiveNBytes(header, 2);
+	if (n <= 0)
+	{
+		_frameFlags = 0;
+		return n;
+	}
 	poco_assert (n == 2);
 	Poco::UInt8 lengthByte = static_cast<Poco::UInt8>(header[1]);
 	int maskOffset = 0;
@@ -134,7 +139,8 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 		n = receiveNBytes(header + 2, MAX_HEADER_LENGTH - 2);
 	}
 
-	poco_assert (n > 0);
+	if (n <= 0) throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
+
 	n += 2;
 	Poco::MemoryInputStream istr(header, n);
 	Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
@@ -179,7 +185,9 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 	}
 	if (received < payloadLength)
 	{
-		received += receiveNBytes(reinterpret_cast<char*>(buffer) + received, payloadLength - received);
+		n = receiveNBytes(reinterpret_cast<char*>(buffer) + received, payloadLength - received);
+		if (n <= 0) throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
+		received += n;
 	}
 	if (lengthByte & FRAME_FLAG_MASK)
 	{
@@ -196,13 +204,16 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 {
 	int received = _pStreamSocketImpl->receiveBytes(reinterpret_cast<char*>(buffer), bytes);
-	while (received < bytes)
+	if (received > 0)
 	{
-		int n = _pStreamSocketImpl->receiveBytes(reinterpret_cast<char*>(buffer) + received, bytes - received);
-		if (n > 0)
-			received += n;
-		else
-			throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
+		while (received < bytes)
+		{
+			int n = _pStreamSocketImpl->receiveBytes(reinterpret_cast<char*>(buffer) + received, bytes - received);
+			if (n > 0)
+				received += n;
+			else
+				throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
+		}
 	}
 	return received;
 }
