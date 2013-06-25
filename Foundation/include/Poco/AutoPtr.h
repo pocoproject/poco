@@ -46,7 +46,11 @@
 
 
 #ifndef POCO_PTR_CHECKING
-	#define POCO_PTR_CHECKING 0
+	#ifdef _DEBUG
+		#define POCO_PTR_CHECKING 0
+	#else
+		#define POCO_PTR_CHECKING 1
+	#endif
 #endif
 
 namespace Poco {
