@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#10 $
+// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#11 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -223,7 +223,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 #endif
 			request.write(*_pRequestStream);
 		}
-		else if (request.getMethod() != HTTPRequest::HTTP_PUT && request.getMethod() != HTTPRequest::HTTP_POST)
+		else if ((request.getMethod() != HTTPRequest::HTTP_PUT && request.getMethod() != HTTPRequest::HTTP_POST) || request.has(HTTPRequest::UPGRADE))
 		{
 			Poco::CountingOutputStream cs;
 			request.write(cs);

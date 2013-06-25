@@ -1,7 +1,7 @@
 //
 // WebSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocket.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/WebSocket.h#4 $
 //
 // Library: Net
 // Package: WebSocket
@@ -230,8 +230,8 @@ public:
 		/// terminated.
 		///
 		/// Returns the number of bytes received. 
-		/// A return value of 0 means a graceful shutdown 
-		/// of the connection from the peer.
+		/// A return value of 0 means that the peer has
+		/// shut down or closed the connection.
 		///
 		/// Throws a TimeoutException if a receive timeout has
 		/// been set and nothing is received within that interval.
