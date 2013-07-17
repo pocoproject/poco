@@ -920,6 +920,15 @@ void SocketImpl::initSocket(int af, int type, int proto)
 	_sockfd = ::socket(af, type, proto);
 	if (_sockfd == POCO_INVALID_SOCKET)
 		error();
+
+#if defined(__MACH__) && defined(__APPLE__) || defined(__FreeBSD__)
+	// SIGPIPE sends a signal that if unhandled (which is the default)
+	// will crash the process. This only happens on UNIX, and not Linux.
+	//
+	// In order to have POCO sockets behave the same across platforms, it is
+	// best to just ignore SIGPIPE all together.
+	setOption(SOL_SOCKET, SO_NOSIGPIPE, 1);
+#endif
 }
 
 
