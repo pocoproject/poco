@@ -1078,6 +1078,10 @@ void SocketImpl::error(int code, const std::string& arg)
 		throw NetException("Host is down", arg, code);
 	case POCO_EHOSTUNREACH:
 		throw NetException("No route to host", arg, code);
+#if defined(POCO_OS_FAMILY_UNIX)
+	case EPIPE:
+		throw IOException("Broken pipe", code);
+#endif
 	default:
 		throw IOException(NumberFormatter::format(code), arg, code);
 	}
