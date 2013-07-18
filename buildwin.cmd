@@ -285,7 +285,7 @@ rem ////////////////////
  echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  echo.
 
- if %DEBUG_SHARED%==1 (!BUILD_TOOL! %USEENV% %EXTRASW% /%ACTION% debug_shared !PROJECT_NAME! && echo. && echo. && echo.
+ if %DEBUG_SHARED%==1 (!BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared !PROJECT_NAME! && echo. && echo. && echo.
    if %TESTS%==tests (
      if exist !TEST_PROJECT_NAME! (!BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared !TEST_PROJECT_NAME! && echo. && echo. && echo.)
    )
