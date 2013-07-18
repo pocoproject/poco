@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketImpl.cpp#8 $
+// $Id: //poco/1.4/Net/src/SocketImpl.cpp#9 $
 //
 // Library: Net
 // Package: Sockets
@@ -879,6 +879,15 @@ void SocketImpl::initSocket(int af, int type, int proto)
 	_sockfd = ::socket(af, type, proto);
 	if (_sockfd == POCO_INVALID_SOCKET)
 		error();
+
+#if defined(__MACH__) && defined(__APPLE__) || defined(__FreeBSD__)
+	// SIGPIPE sends a signal that if unhandled (which is the default)
+	// will crash the process. This only happens on UNIX, and not Linux.
+	//
+	// In order to have POCO sockets behave the same across platforms, it is
+	// best to just ignore SIGPIPE all together.
+	setOption(SOL_SOCKET, SO_NOSIGPIPE, 1);
+#endif
 }
 
 
@@ -1009,6 +1018,10 @@ void SocketImpl::error(int code, const std::string& arg)
 		throw NetException("Host is down", arg, code);
 	case POCO_EHOSTUNREACH:
 		throw NetException("No route to host", arg, code);
+#if defined(POCO_OS_FAMILY_UNIX)
+	case EPIPE:
+		throw IOException("Broken pipe", code);
+#endif
 	default:
 		throw IOException(NumberFormatter::format(code), arg, code);
 	}

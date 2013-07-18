@@ -34,6 +34,8 @@ AAAIntroduction
   - removed a few unnecessary protected accessor methods from Poco::Net::HTTPClientSession 
     that would provide inappropriate access to internal state
   - fixed GH# 223 (Poco::Net::HTTPCookie does not support expiry times in the past)
+  - fixed GH# 233: ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool ipV6Only) 
+    does not work
 
 
 !!!Release 1.4.6p1
