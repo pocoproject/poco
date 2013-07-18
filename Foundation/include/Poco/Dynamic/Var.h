@@ -61,7 +61,7 @@ class Foundation_API Var
 	/// Var puts forth the best effort to provide intuitive and reasonable conversion semantics and prevent 
 	/// unexpected data loss, particularly when performing narrowing or signedness conversions of numeric data types.
 	///
-	/// An attempt to convert or extract from a non-initialized (“empty”) Var variable shall result
+	/// An attempt to convert or extract from a non-initialized ("empty") Var variable shall result
 	/// in an exception being thrown.
 	///
 	/// Loss of signedness is not allowed for numeric values. This means that if an attempt is made to convert 
