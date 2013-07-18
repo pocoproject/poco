@@ -1,7 +1,7 @@
 #
 # $Id: //poco/1.4/build/config/Darwin32-clang-libc++#1 $
 #
-# Darwin32-clang=libc++
+# Darwin32-clang-libc++
 #
 # Build settings for Mac OS X 10.6 (clang++) with libc++, 32-bit.
 # 
