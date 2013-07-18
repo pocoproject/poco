@@ -148,9 +148,11 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
 	return false;
 	
-	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_STRING)
+	//mysql reports TEXT types as FDT_BLOB when being extracted
+	MetaColumn::ColumnDataType columnType = _metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type();
+	if (columnType != Poco::Data::MetaColumn::FDT_STRING && columnType != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a string");
-	
+		
 	val.assign(reinterpret_cast<const char*>(_metadata.rawData(pos)), _metadata.length(pos));
 	return true;
 }
