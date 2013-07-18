@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.2 (2013-06-24)
+Release 1.5.2 (2013-07-19)
 ==========================
 - added MongoDB library (Franky Braem)
 - fixed GH #57: poco-1.5.1: Doesn't compile for Android
@@ -95,6 +95,8 @@ Release 1.5.2 (2013-06-24)
 - fixed GH #220: add qualifiers for FPEnvironment in C99 (Lucas Clemente)
 - fixed GH #222: HTTPCookie doesn't support expiry times in the past (Karl Reid)
 - fixed GH #224: building 1.5.1 on Windows for x64
+- fixed GH# 233: ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool ipV6Only) does not work
+- fixed GH# 231: Compatibility issue with Poco::Net::NetworkInterface
 
 
 Release 1.5.1 (2013-01-11)
