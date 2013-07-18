@@ -1,7 +1,7 @@
 //
 // DirectoryWatcher.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#8 $
+// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#9 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -44,7 +44,7 @@
 #if defined(POCO_WIN32_UTF8)
 #include "Poco/UnicodeConverter.h"
 #endif
-#if POCO_OS == POCO_OS_LINUX
+#if POCO_OS == POCO_OS_LINUX && !defined(POCO_NO_INOTIFY)
 #include <sys/inotify.h>
 #include <sys/select.h>
 #include <unistd.h>
@@ -269,7 +269,7 @@ private:
 };
 
 
-#elif POCO_OS == POCO_OS_LINUX
+#elif POCO_OS == POCO_OS_LINUX && !defined(POCO_NO_INOTIFY)
 
 
 class LinuxDirectoryWatcherStrategy: public DirectoryWatcherStrategy
@@ -585,7 +585,7 @@ void DirectoryWatcher::init()
 
 #if POCO_OS == POCO_OS_WINDOWS_NT
 	_pStrategy = new WindowsDirectoryWatcherStrategy(*this);
-#elif POCO_OS == POCO_OS_LINUX
+#elif POCO_OS == POCO_OS_LINUX && !defined(POCO_NO_INOTIFY)
 	_pStrategy = new LinuxDirectoryWatcherStrategy(*this);
 #elif POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD
 	_pStrategy = new BSDDirectoryWatcherStrategy(*this); 
