@@ -36,8 +36,8 @@
 //
 
 
-#ifndef Foundation_RecursiveDirectoryIteratorImpl_INCLUDE
-#define Foundation_RecursiveDirectoryIteratorImpl_INCLUDE
+#ifndef Foundation_RecursiveDirectoryIteratorImpl_INCLUDED
+#define Foundation_RecursiveDirectoryIteratorImpl_INCLUDED
 
 
 #include "Poco/Foundation.h"
@@ -59,9 +59,8 @@ class RecursiveDirectoryIteratorImpl
 public:
 	enum
 	{
-		D_INFINITE = 0
+		D_INFINITE = 0 /// Special value for infinite traverse depth.
 	};
-		/// Constant for infinite traverse depth.
 
 	RecursiveDirectoryIteratorImpl(const std::string& path, UInt16 maxDepth = D_INFINITE)
 		: _maxDepth(maxDepth), _traverseStrategy(std::ptr_fun(depthFun), _maxDepth), _isFinished(false), _rc(1)
@@ -130,4 +129,5 @@ private:
 
 } // namespace Poco
 
-#endif // Foundation_RecursiveDirectoryIteratorImpl_INCLUDE
+
+#endif // Foundation_RecursiveDirectoryIteratorImpl_INCLUDED
