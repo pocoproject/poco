@@ -54,6 +54,9 @@
 #define Foundation_AlignOf_INCLUDED
 
 
+#include <cstddef>
+
+
 #ifdef POCO_ENABLE_CPP11
 
 
@@ -116,7 +119,7 @@
 	}
 
 
-	template <size_t Alignment> struct AlignedCharArrayImpl;
+	template <std::size_t Alignment> struct AlignedCharArrayImpl;
 		/// Helper for building an aligned character array type.
 		///
 		/// This template is used to explicitly build up a collection of aligned
