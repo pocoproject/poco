@@ -130,6 +130,11 @@
 
 
 //
+// Include alignment settings early
+//
+#include "Poco/Alignment.h"
+
+//
 // Cleanup inconsistencies
 //
 #ifdef POCO_OS_FAMILY_WINDOWS

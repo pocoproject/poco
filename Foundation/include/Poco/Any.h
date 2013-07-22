@@ -40,13 +40,10 @@
 
 #include "Poco/Exception.h"
 #include "Poco/MetaProgramming.h"
-#include "Poco/Alignment.h"
 #include <algorithm>
 #include <typeinfo>
 #include <cstring>
-#ifdef POCO_ENABLE_CPP11
-	#include <type_traits>
-#endif
+
 
 namespace Poco {
 
