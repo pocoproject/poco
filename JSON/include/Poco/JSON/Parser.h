@@ -729,7 +729,7 @@ inline void Parser::assertNonContainer()
 
 inline void Parser::growBuffer()
 {
-	_parseBuffer.resize(_parseBuffer.size() * 2, true);
+	_parseBuffer.setCapacity(_parseBuffer.size() * 2, true);
 }
 
 

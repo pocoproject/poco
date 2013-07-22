@@ -202,6 +202,8 @@ void NumberParserTest::testParse()
 			assertEqualDelta(12.34, NumberParser::parseFloat(format("   12%c34", dp),dp, ts), 0.01);
 			assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c34   ", dp), dp, ts), 0.01);
 			assertEqualDelta(12.34, NumberParser::parseFloat(format(" 12%c34  ", dp), dp, ts), 0.01);
+
+			assertEqualDelta(12.34, NumberParser::parseFloat(format("\t\n 12%c34  \v\f\r", dp), dp, ts), 0.01);
 		}
 	}
 #endif // POCO_NO_FPENVIRONMENT

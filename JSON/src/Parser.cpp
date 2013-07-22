@@ -180,7 +180,8 @@ Dynamic::Var Parser::parse(const std::string& json)
 	int c = 0;
 	while(source.nextChar(c))
 	{
-		if (0 == parseChar(c, source)) throw SyntaxException("JSON syntax error");
+		if (0 == parseChar(c, source))
+			throw SyntaxException("JSON syntax error");
 	}
 
 	if (!done())
@@ -253,7 +254,7 @@ void Parser::parseBufferPopBackChar()
 void Parser::parseBufferPushBackChar(char c)
 {
 	if (_parseBuffer.size() + 1 >= _parseBuffer.capacity())
-		_parseBuffer.resize(_parseBuffer.capacity() * 2);
+		_parseBuffer.setCapacity(_parseBuffer.capacity() * 2);
 
 	_parseBuffer.append(c);
 }
