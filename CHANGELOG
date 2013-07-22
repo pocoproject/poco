@@ -1,7 +1,8 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.2 (2013-07-19)
+Release 1.5.2 (2013-07-22)
 ==========================
+
 - added MongoDB library (Franky Braem)
 - fixed GH #57: poco-1.5.1: Doesn't compile for Android
 - added VoidEvent (Arturo Castro)
@@ -102,6 +103,7 @@ Release 1.5.2 (2013-07-19)
 
 Release 1.5.1 (2013-01-11)
 ==========================
+
 - using double-conversion library for floating-point numeric/string conversions
 - added Poco::istring (case-insensitive string) and Poco::isubstr
 - added SQLite sys.dual (in-memory system table)
@@ -143,6 +145,7 @@ Release 1.5.1 (2013-01-11)
 - fixed GH #53: JSON unicode fixes and running tests on invalid unicode JSON
 - added ParallelAcceptor and ParallelReactor classes
 - added EOF and error to FIFOBuffer
+
 
 Release 1.5.0 (2012-10-14)
 ==========================
@@ -266,6 +269,7 @@ Release 1.4.4 (2012-09-03)
 - fixed SF# 3561464: Poco::File::isDevice() can throw due to sharing violation
 - Poco::Zip::Compress::addRecursive() has a second variant that allows to specify the compression method.
 - Upgraded internal SQLite to 3.7.14
+
 
 Release 1.4.3p1 (2012-01-23)
 ============================
