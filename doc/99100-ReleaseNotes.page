@@ -5,7 +5,6 @@ AAAIntroduction
 
 !!Summary of Changes
 
-  - added MongoDB library (Franky Braem)
   - fixed GH #57: poco-1.5.1: Doesn't compile for Android
   - added VoidEvent (Arturo Castro)
   - fixed GH #80: NumberFormatter::append broken
