@@ -540,12 +540,14 @@
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
-				Name="debug_shared|Win32">
+				Name="debug_shared|Win32"
+				ExcludedFromBuild="TRUE">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="release_shared|Win32">
+				Name="release_shared|Win32"
+				ExcludedFromBuild="TRUE">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>

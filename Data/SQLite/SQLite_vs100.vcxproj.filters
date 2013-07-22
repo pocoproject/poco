@@ -2,22 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="SQLite">
-      <UniqueIdentifier>{8e8a8f9a-e67a-4415-9cc3-ff05daf85222}</UniqueIdentifier>
+      <UniqueIdentifier>{4e609b41-82c4-438d-8840-b4a12d40f739}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLite\Header Files">
-      <UniqueIdentifier>{d3ea176a-3cf9-42d7-a95d-441af44526ea}</UniqueIdentifier>
+      <UniqueIdentifier>{c996c461-9baa-4a95-b0ac-429dc187ac3e}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLite\Source Files">
-      <UniqueIdentifier>{d432addb-41ca-4d6e-8619-c065c5a8bf38}</UniqueIdentifier>
+      <UniqueIdentifier>{d37df4d4-4503-40f3-8977-c3be47a49356}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rdparty">
-      <UniqueIdentifier>{e6c2135b-063d-42ae-b3ea-0b3302797d4d}</UniqueIdentifier>
+      <UniqueIdentifier>{7010d3ee-0c80-48ef-a088-389702d2caf9}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rdparty\Header Files">
-      <UniqueIdentifier>{a6dd3f3b-e1b2-47fe-b939-eafaf61bc73a}</UniqueIdentifier>
+      <UniqueIdentifier>{3d66eb31-a8d0-44da-bbe5-ef0d3d3355ca}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rdparty\Source Files">
-      <UniqueIdentifier>{7743eda6-d171-4d80-b8f5-cbdba1e942f7}</UniqueIdentifier>
+      <UniqueIdentifier>{2b154994-ff36-4807-bce5-7f3f7e5c6bad}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +28,9 @@
       <Filter>SQLite\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Data\SQLite\Extractor.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Data\SQLite\Notifier.h">
       <Filter>SQLite\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Data\SQLite\SessionImpl.h">
@@ -48,9 +51,6 @@
     <ClInclude Include="src\sqlite3.h">
       <Filter>3rdparty\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\Data\SQLite\Notifier.h">
-      <Filter>SQLite\Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Binder.cpp">
@@ -60,6 +60,9 @@
       <Filter>SQLite\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Extractor.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Notifier.cpp">
       <Filter>SQLite\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SessionImpl.cpp">
@@ -76,9 +79,6 @@
     </ClCompile>
     <ClCompile Include="src\sqlite3.c">
       <Filter>3rdparty\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Notifier.cpp">
-      <Filter>SQLite\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

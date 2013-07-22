@@ -665,13 +665,13 @@ inline bool Parser::getAllowNullByte() const
 
 inline void Parser::setDepth(std::size_t depth)
 {
-	_depth = depth;
+	_depth = static_cast<int>(depth);
 }
 
 
 inline std::size_t Parser::getDepth() const
 {
-	return _depth;
+	return static_cast<int>(_depth);
 }
 
 
