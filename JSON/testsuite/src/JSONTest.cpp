@@ -1647,6 +1647,14 @@ void JSONTest::testUnicode()
 }
 
 
+void JSONTest::testSmallBuffer()
+{
+	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler(), 4);
+	std::string jsonStr = "{ \"x\" : \"123456789012345678901234567890123456789012345678901234567890\" }";
+	parser.parse(jsonStr);
+}
+
+
 std::string JSONTest::getTestFilesPath(const std::string& type)
 {
 	std::ostringstream ostr;
@@ -1717,6 +1725,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testTemplate);
 	CppUnit_addTest(pSuite, JSONTest, testUnicode);
+	CppUnit_addTest(pSuite, JSONTest, testSmallBuffer);
 
 	return pSuite;
 }

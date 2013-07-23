@@ -177,6 +177,7 @@ done
 # Create components file
 #
 echo "CppUnit" >${target}/components
+echo "CppUnit/WinTestRunner" >${target}/components
 for comp in $comps ;
 do
 	echo $comp >>${target}/components
@@ -215,7 +216,7 @@ ifndef POCO_BUILD
 export POCO_BUILD=$(POCO_BASE)
 endif
 
-.PHONY: poco all libexecs cppunit tests samples clean distclean install
+.PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
 # TESTS and SAMPLES are set in config.make
 poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples) 
@@ -230,6 +231,9 @@ cat >>${target}/Makefile <<'ENDOFSCRIPT'
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
+
+CppUnit-clean:
+	\$(MAKE) -C \$(POCO_BASE)/CppUnit clean
 
 install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
@@ -251,9 +255,11 @@ ENDOFSCRIPT
 libexecs=""
 tests=""
 samples=""
+cleans=""
 for comp in $comps ;
 do
 	libexecs="$libexecs ${comp}-libexec"
+	cleans="$cleans ${comp}-clean"
 	if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
 		tests="$tests ${comp}-tests"
 	fi
@@ -265,14 +271,17 @@ done
 echo "libexecs = $libexecs" >>${target}/Makefile
 echo "tests    = $tests" >> ${target}/Makefile
 echo "samples  = $samples" >> ${target}/Makefile
+echo "cleans   = $cleans" >> ${target}/Makefile
 echo "" >>${target}/Makefile
 echo '.PHONY: $(libexecs)' >>${target}/Makefile
 echo '.PHONY: $(tests)' >>${target}/Makefile
 echo '.PHONY: $(samples)' >>${target}/Makefile
+echo '.PHONY: $(cleans)' >>${target}/Makefile
 echo "" >>${target}/Makefile
 echo 'libexecs: $(filter-out $(foreach f,$(OMIT),$f%),$(libexecs))' >>${target}/Makefile
 echo 'tests: $(filter-out $(foreach f,$(OMIT),$f%),$(tests))' >>${target}/Makefile
 echo 'samples: $(filter-out $(foreach f,$(OMIT),$f%),$(samples))' >>${target}/Makefile
+echo 'cleans: $(filter-out $(foreach f,$(OMIT),$f%),$(cleans))' >>${target}/Makefile
 
 for comp in $comps ;
 do
@@ -319,29 +328,29 @@ ${comp}-samples: ${comp}-libexec $sdependencies
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples
 ENDOFSCRIPT
 	fi
-done
 
-echo "" >>${target}/Makefile
-echo "clean:" >>${target}/Makefile
-for comp in $comps ;
-do
 	cat >>${target}/Makefile <<ENDOFSCRIPT
+
+${comp}-clean:
 	\$(MAKE) -C \$(POCO_BASE)/${comp} clean
 ENDOFSCRIPT
-	if [ -f ${POCO_BASE}/${comp}/testsuite/Makefile ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT
+
+	if [ -f "${POCO_BASE}/${comp}/testsuite/Makefile" ] ; then
+		cat >>${target}/Makefile <<ENDOFSCRIPT 
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite clean
 ENDOFSCRIPT
 	fi
-	if [ -f ${POCO_BASE}/${comp}/samples/Makefile ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT
+
+	if [ -f "${POCO_BASE}/${comp}/samples/Makefile" ] ; then
+		cat >>${target}/Makefile <<ENDOFSCRIPT 
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples clean
 ENDOFSCRIPT
 	fi
 done
 
 cat >>${target}/Makefile <<ENDOFSCRIPT
-	\$(MAKE) -C \$(POCO_BASE)/CppUnit clean
+
+clean: cleans CppUnit-clean
 
 distclean:
 	rm -rf \$(POCO_BUILD)/lib

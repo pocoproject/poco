@@ -132,11 +132,11 @@ void JSONConfiguration::getIndexes(std::string& name, std::vector<int>& indexes)
 	{
 		if ( firstOffset == -1 )
 		{
-			firstOffset = matches[0].offset;
+			firstOffset = static_cast<int>(matches[0].offset);
 		}
 		std::string num = name.substr(matches[1].offset, matches[1].length);
 		indexes.push_back(NumberParser::parse(num));
-		offset = matches[0].offset + matches[0].length;
+		offset = static_cast<int>(matches[0].offset + matches[0].length);
 	}
 
 	if ( firstOffset != -1 )
@@ -305,7 +305,7 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 			JSON::Array::Ptr nextArray = arr->getArray(*it);
 			if ( nextArray.isNull()  )
 			{
-				for(int i = arr->size(); i <= *it; ++i)
+				for(int i = static_cast<int>(arr->size()); i <= *it; ++i)
 				{
 					Poco::DynamicAny nullValue;
 					arr->add(nullValue);

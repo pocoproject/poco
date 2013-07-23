@@ -55,6 +55,19 @@ inline bool TraverseBase::isFiniteDepth()
 }
 
 
+bool TraverseBase::isDirectory(Poco::File& file)
+{
+	try
+	{
+		return file.isDirectory();
+	}
+	catch (...)
+	{
+		return false;
+	}
+}
+
+
 //
 // ChildrenFirstTraverse
 //
@@ -77,7 +90,7 @@ const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 	// go deeper into not empty directory
 	// (if depth limit allows)
 	bool isDepthLimitReached = isFiniteDepth() && _depthDeterminer(*itStack) >= _maxDepth;
-	if (!isDepthLimitReached && itStack->top()->isDirectory())
+	if (!isDepthLimitReached && isDirectory(*itStack->top()))
 	{
 		DirectoryIterator child_it(itStack->top().path());
 		// check if directory is empty
@@ -130,7 +143,7 @@ const std::string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 
 	// add dirs to queue (if depth limit allows)
 	bool isDepthLimitReached = isFiniteDepth() && _depthDeterminer(*itStack) >= _maxDepth;
-	if (!isDepthLimitReached && itStack->top()->isDirectory())
+	if (!isDepthLimitReached && isDirectory(*itStack->top()))
 	{
 		const std::string& p = itStack->top()->path();
 		_dirsStack.top().push(p);

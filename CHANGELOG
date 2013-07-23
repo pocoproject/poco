@@ -1,8 +1,9 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.2 (2013-06-24)
+Release 1.5.2 (2013-07-23)
 ==========================
-- added MongoDB library (Franky Braem)
+
+- added MongoDB library
 - fixed GH #57: poco-1.5.1: Doesn't compile for Android
 - added VoidEvent (Arturo Castro)
 - fixed GH #80: NumberFormatter::append broken
@@ -95,10 +96,14 @@ Release 1.5.2 (2013-06-24)
 - fixed GH #220: add qualifiers for FPEnvironment in C99 (Lucas Clemente)
 - fixed GH #222: HTTPCookie doesn't support expiry times in the past (Karl Reid)
 - fixed GH #224: building 1.5.1 on Windows for x64
+- fixed GH# 233: ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool ipV6Only) does not work
+- fixed GH# 231: Compatibility issue with Poco::Net::NetworkInterface
+- fixed GH# 236: Bug in RecursiveDirectoryIterator
 
 
 Release 1.5.1 (2013-01-11)
 ==========================
+
 - using double-conversion library for floating-point numeric/string conversions
 - added Poco::istring (case-insensitive string) and Poco::isubstr
 - added SQLite sys.dual (in-memory system table)
@@ -140,6 +145,7 @@ Release 1.5.1 (2013-01-11)
 - fixed GH #53: JSON unicode fixes and running tests on invalid unicode JSON
 - added ParallelAcceptor and ParallelReactor classes
 - added EOF and error to FIFOBuffer
+
 
 Release 1.5.0 (2012-10-14)
 ==========================
@@ -263,6 +269,7 @@ Release 1.4.4 (2012-09-03)
 - fixed SF# 3561464: Poco::File::isDevice() can throw due to sharing violation
 - Poco::Zip::Compress::addRecursive() has a second variant that allows to specify the compression method.
 - Upgraded internal SQLite to 3.7.14
+
 
 Release 1.4.3p1 (2012-01-23)
 ============================

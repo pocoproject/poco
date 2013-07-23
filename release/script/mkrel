@@ -72,8 +72,10 @@ fi
 #
 # Sync files
 #
-echo "Syncing files..."
-p4 sync ./...$label
+if [ "$label" != "" ] ; then
+	echo "Syncing files to ${label}..."
+	p4 sync ./...$label
+fi
 
 read version <$POCO_BASE/VERSION
 release=$version$reltag

@@ -36,8 +36,9 @@
 //
 
 
-#ifndef Foundation_RecursiveDirectoryIterator_INCLUDE
-#define Foundation_RecursiveDirectoryIterator_INCLUDE
+#ifndef Foundation_RecursiveDirectoryIterator_INCLUDED
+#define Foundation_RecursiveDirectoryIterator_INCLUDED
+
 
 #include "Poco/Foundation.h"
 #include "Poco/File.h"
@@ -123,7 +124,6 @@ public:
 	{
 	}
 
-
 	~RecursiveDirectoryIterator()
 		/// Destroys the DirectoryIterator.
 	{
@@ -156,7 +156,7 @@ public:
 	}
 
 
-	MyType& operator =(const MyType& it)
+	MyType& operator = (const MyType& it)
 	{
 		if (_pImpl)
 			_pImpl->release();
@@ -170,7 +170,7 @@ public:
 		return *this;
 	}
 
-	MyType& operator =(const File& file)
+	MyType& operator = (const File& file)
 	{
 		if (_pImpl)
 			_pImpl->release();
@@ -181,7 +181,7 @@ public:
 	}
 
 
-	MyType& operator =(const Path& path)
+	MyType& operator = (const Path& path)
 	{
 		if (_pImpl)
 			_pImpl->release();
@@ -191,7 +191,7 @@ public:
 		return *this;
 	}
 
-	MyType& operator =(const std::string& path)
+	MyType& operator = (const std::string& path)
 	{
 		if (_pImpl)
 			_pImpl->release();
@@ -201,7 +201,7 @@ public:
 		return *this;
 	}
 
-	MyType& operator ++()
+	MyType& operator ++ ()
 	{
 		if (_pImpl)
 		{
@@ -211,7 +211,7 @@ public:
 		return *this;
 	}
 
-	const File& operator *() const
+	const File& operator * () const
 	{
 		return _file;
 	}
@@ -221,16 +221,15 @@ public:
 		return _file;
 	}
 
-	const File* operator ->() const
+	const File* operator -> () const
 	{
 		return &_file;
 	}
 
-	File* operator ->()
+	File* operator -> ()
 	{
 		return &_file;
 	}
-
 
 	template<class T1, class T2>
 	friend inline bool operator ==(const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b);
@@ -271,4 +270,5 @@ typedef RecursiveDirectoryIterator<SiblingsFirstTraverse> SiblingsFirstRecursive
 
 } // namespace Poco
 
-#endif // Foundation_RecursiveDirectoryIterator_INCLUDE
+
+#endif // Foundation_RecursiveDirectoryIterator_INCLUDED

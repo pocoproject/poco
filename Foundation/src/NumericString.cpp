@@ -233,6 +233,7 @@ bool strToFloat(const std::string& str, float& result, char decSep, char thSep)
 	using namespace double_conversion;
 
 	std::string tmp(str);
+	trimInPlace(tmp);
 	removeInPlace(tmp, thSep);
 	removeInPlace(tmp, 'f');
 	replaceInPlace(tmp, decSep, '.');
@@ -249,6 +250,7 @@ bool strToDouble(const std::string& str, double& result, char decSep, char thSep
 	using namespace double_conversion;
 
 	std::string tmp(str);
+	trimInPlace(tmp);
 	removeInPlace(tmp, thSep);
 	replaceInPlace(tmp, decSep, '.');
 	removeInPlace(tmp, 'f');

@@ -185,13 +185,13 @@ public:
 	const AddressList& addressList() const;
 		/// Returns the list of IP addresses bound to the interface.
 		
-	const IPAddress& subnetMask(unsigned index) const;
+	const IPAddress& subnetMask(unsigned index = 0) const;
 		/// Returns the subnet mask for this network interface.
 		
-	const IPAddress& broadcastAddress(unsigned index) const;
+	const IPAddress& broadcastAddress(unsigned index = 0) const;
 		/// Returns the broadcast address for this network interface.
 
-	const IPAddress& destAddress(unsigned index) const;
+	const IPAddress& destAddress(unsigned index = 0) const;
 		/// Returns the IPv4 point-to-point destiation address for this network interface.
 
 	const MACAddress& macAddress() const;

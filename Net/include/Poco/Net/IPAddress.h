@@ -46,12 +46,6 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include <vector>
-#ifdef POCO_ENABLE_CPP11
-	#include <type_traits>
-	#define POCO_HAVE_ALIGNMENT
-#else
-	#include "Poco/Alignment.h"
-#endif
 
 
 namespace Poco {

@@ -36,8 +36,9 @@
 //
 
 
-#ifndef Foundation_RecursiveDirectoryIteratorStrategy_INCLUDE
-#define Foundation_RecursiveDirectoryIteratorStrategy_INCLUDE
+#ifndef Foundation_RecursiveDirectoryIteratorStrategy_INCLUDED
+#define Foundation_RecursiveDirectoryIteratorStrategy_INCLUDED
+
 
 #include "Poco/Foundation.h"
 #include "Poco/DirectoryIterator.h"
@@ -46,8 +47,8 @@
 #include <functional>
 
 
-namespace Poco
-{
+namespace Poco {
+
 
 class Foundation_API TraverseBase
 {
@@ -57,14 +58,14 @@ public:
 
 	enum
 	{
-		D_INFINITE = 0
+		D_INFINITE = 0 /// Special value for infinite traverse depth.
 	};
-		/// Constant for infinite traverse depth.
 
 	TraverseBase(DepthFunPtr depthDeterminer, UInt16 maxDepth = D_INFINITE);
 
 protected:
 	bool isFiniteDepth();
+	bool isDirectory(Poco::File& file);
 
 	DepthFunPtr _depthDeterminer;
 	UInt16 _maxDepth;
@@ -109,4 +110,5 @@ private:
 
 } // namespace Poco
 
-#endif // Foundation_RecursiveDirectoryIteratorStrategy_INCLUDE
+
+#endif // Foundation_RecursiveDirectoryIteratorStrategy_INCLUDED

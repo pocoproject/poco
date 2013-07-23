@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="Util"
+	Name="SQLite"
 	Version="9.00"
 	ProjectType="Visual C++"
-	ProjectGUID="{6FF56CDB-787A-4714-A28C-919003F9FA6C}"
-	RootNamespace="Util"
+	ProjectGUID="{5B889CE7-AD42-4CFE-BBC3-532B61F8329E}"
+	RootNamespace="SQLite"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -31,8 +31,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\XML\include;..\JSON\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;Util_EXPORTS"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLite_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -46,7 +46,7 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -56,14 +56,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies=""
-				OutputFile="..\bin64\PocoUtil64d.dll"
+				OutputFile="..\..\bin64\PocoDataSQLite64d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\bin64\PocoUtil64d.pdb"
-				AdditionalLibraryDirectories="..\lib64"
+				ProgramDatabaseFile="..\..\bin64\PocoDataSQLite64d.pdb"
+				AdditionalLibraryDirectories="..\..\lib64"
 				SubSystem="1"
-				ImportLibrary="..\lib64\PocoUtild.lib"
+				ImportLibrary="..\..\lib64\PocoDataSQLited.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -103,8 +103,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\XML\include;..\JSON\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;Util_EXPORTS"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLite_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -116,7 +116,7 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -126,16 +126,16 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies=""
-				OutputFile="..\bin64\PocoUtil64.dll"
+				OutputFile="..\..\bin64\PocoDataSQLite64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="false"
-				AdditionalLibraryDirectories="..\lib64"
+				AdditionalLibraryDirectories="..\..\lib64"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="0"
-				ImportLibrary="..\lib64\PocoUtil.lib"
+				ImportLibrary="..\..\lib64\PocoDataSQLite.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -171,8 +171,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\XML\include;..\JSON\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -182,12 +182,12 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoUtilmtd.pdb"
+				ProgramDataBaseFileName="..\..\lib64\PocoDataSQLitemtd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -196,7 +196,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoUtilmtd.lib"
+				OutputFile="..\..\lib64\PocoDataSQLitemtd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -232,8 +232,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\XML\include;..\JSON\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
@@ -245,7 +245,7 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -254,7 +254,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoUtilmt.lib"
+				OutputFile="..\..\lib64\PocoDataSQLitemt.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -286,8 +286,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\XML\include;..\JSON\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -297,12 +297,12 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoUtilmdd.pdb"
+				ProgramDataBaseFileName="..\..\lib64\PocoDataSQLitemdd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -311,7 +311,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoUtilmdd.lib"
+				OutputFile="..\..\lib64\PocoDataSQLitemdd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -347,8 +347,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\XML\include;..\JSON\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -360,7 +360,7 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -369,7 +369,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoUtilmd.lib"
+				OutputFile="..\..\lib64\PocoDataSQLitemd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -386,221 +386,61 @@
 	<References/>
 	<Files>
 		<Filter
-			Name="Application">
+			Name="SQLite">
 			<Filter
 				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Util\Application.h"/>
+					RelativePath=".\include\Poco\Data\SQLite\Binder.h"/>
 				<File
-					RelativePath=".\include\Poco\Util\LoggingSubsystem.h"/>
+					RelativePath=".\include\Poco\Data\SQLite\Connector.h"/>
 				<File
-					RelativePath=".\include\Poco\Util\ServerApplication.h"/>
+					RelativePath=".\include\Poco\Data\SQLite\Extractor.h"/>
 				<File
-					RelativePath=".\include\Poco\Util\Subsystem.h"/>
+					RelativePath=".\include\Poco\Data\SQLite\Notifier.h"/>
+				<File
+					RelativePath=".\include\Poco\Data\SQLite\SessionImpl.h"/>
+				<File
+					RelativePath=".\include\Poco\Data\SQLite\SQLite.h"/>
+				<File
+					RelativePath=".\include\Poco\Data\SQLite\SQLiteException.h"/>
+				<File
+					RelativePath=".\include\Poco\Data\SQLite\SQLiteStatementImpl.h"/>
+				<File
+					RelativePath=".\include\Poco\Data\SQLite\Utility.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">
 				<File
-					RelativePath=".\src\Application.cpp"/>
+					RelativePath=".\src\Binder.cpp"/>
 				<File
-					RelativePath=".\src\LoggingSubsystem.cpp"/>
+					RelativePath=".\src\Connector.cpp"/>
 				<File
-					RelativePath=".\src\ServerApplication.cpp"/>
+					RelativePath=".\src\Extractor.cpp"/>
 				<File
-					RelativePath=".\src\Subsystem.cpp"/>
+					RelativePath=".\src\Notifier.cpp"/>
+				<File
+					RelativePath=".\src\SessionImpl.cpp"/>
+				<File
+					RelativePath=".\src\SQLiteException.cpp"/>
+				<File
+					RelativePath=".\src\SQLiteStatementImpl.cpp"/>
+				<File
+					RelativePath=".\src\Utility.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Configuration">
+			Name="3rdparty">
 			<Filter
 				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Util\AbstractConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\ConfigurationMapper.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\ConfigurationView.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\FilesystemConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\IniFileConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\JSONConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\LayeredConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\LoggingConfigurator.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\MapConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\PropertyFileConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\SystemConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\XMLConfiguration.h"/>
+					RelativePath=".\src\sqlite3.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">
 				<File
-					RelativePath=".\src\AbstractConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\ConfigurationMapper.cpp"/>
-				<File
-					RelativePath=".\src\ConfigurationView.cpp"/>
-				<File
-					RelativePath=".\src\FilesystemConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\IniFileConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\JSONConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\LayeredConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\LoggingConfigurator.cpp"/>
-				<File
-					RelativePath=".\src\MapConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\PropertyFileConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\SystemConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\XMLConfiguration.cpp"/>
+					RelativePath=".\src\sqlite3.c"/>
 			</Filter>
 		</Filter>
-		<Filter
-			Name="Options">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Util\HelpFormatter.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\IntValidator.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\Option.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\OptionCallback.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\OptionException.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\OptionProcessor.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\OptionSet.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\RegExpValidator.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\Validator.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\HelpFormatter.cpp"/>
-				<File
-					RelativePath=".\src\IntValidator.cpp"/>
-				<File
-					RelativePath=".\src\Option.cpp"/>
-				<File
-					RelativePath=".\src\OptionCallback.cpp"/>
-				<File
-					RelativePath=".\src\OptionException.cpp"/>
-				<File
-					RelativePath=".\src\OptionProcessor.cpp"/>
-				<File
-					RelativePath=".\src\OptionSet.cpp"/>
-				<File
-					RelativePath=".\src\RegExpValidator.cpp"/>
-				<File
-					RelativePath=".\src\Validator.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Windows">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Util\WinRegistryConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\WinRegistryKey.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\WinService.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\WinRegistryConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\WinRegistryKey.cpp"/>
-				<File
-					RelativePath=".\src\WinService.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Util">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Util\Util.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files"/>
-		</Filter>
-		<Filter
-			Name="Timer">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Util\Timer.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\TimerTask.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\TimerTaskAdapter.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\Timer.cpp"/>
-				<File
-					RelativePath=".\src\TimerTask.cpp"/>
-			</Filter>
-		</Filter>
-		<File
-			RelativePath="..\DLLVersion.rc">
-			<FileConfiguration
-				Name="debug_shared|x64"
-				ExcludedFromBuild="true">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="release_shared|x64"
-				ExcludedFromBuild="true">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="debug_static_mt|x64"
-				ExcludedFromBuild="true">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="release_static_mt|x64"
-				ExcludedFromBuild="true">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="debug_static_md|x64"
-				ExcludedFromBuild="true">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="release_static_md|x64"
-				ExcludedFromBuild="true">
-				<Tool
-					Name="VCResourceCompilerTool"/>
-			</FileConfiguration>
-		</File>
 	</Files>
 	<Globals/>
 </VisualStudioProject>

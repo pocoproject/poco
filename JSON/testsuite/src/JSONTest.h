@@ -86,6 +86,7 @@ public:
 	void testItunes();
 	void testUnicode(); 
 	void testInvalidUnicodeJanssonFiles();
+	void testSmallBuffer();
 
 	void setUp();
 	void tearDown();

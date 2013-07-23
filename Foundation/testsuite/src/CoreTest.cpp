@@ -266,6 +266,14 @@ void CoreTest::testBuffer()
 	assert (b.size() == s*2);
 	assert (b.capacity() == s*2);
 
+	b.setCapacity(s * 4);
+	assert (b.size() == s*2);
+	assert (b.capacity() == s*4);
+
+	b.setCapacity(s);
+	assert (b.size() == s);
+	assert (b.capacity() == s);
+
 #if ENABLE_BUGCHECK_TEST
 	try { int i = b[s]; fail ("must fail"); }
 	catch (Exception&) { }
