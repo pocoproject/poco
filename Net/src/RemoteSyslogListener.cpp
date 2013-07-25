@@ -323,8 +323,8 @@ void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severi
 	int tzd = 0;
 	bool hasDate = Poco::DateTimeParser::tryParse(RemoteSyslogChannel::SYSLOG_TIMEFORMAT, timeStr, date, tzd);
 	Poco::Message logEntry(msgId, messageText, prio);
-	logEntry["host"] = hostName;
-	logEntry["app"] = appName;
+	logEntry[RemoteSyslogListener::LOG_PROP_HOST] = hostName;
+	logEntry[RemoteSyslogListener::LOG_PROP_APP] = appName;
 	
 	if (hasDate)
 		logEntry.setTime(date.timestamp());
@@ -447,6 +447,9 @@ Poco::Message::Priority SyslogParser::convert(RemoteSyslogChannel::Severity seve
 
 const std::string RemoteSyslogListener::PROP_PORT("port");
 const std::string RemoteSyslogListener::PROP_THREADS("threads");
+
+const std::string RemoteSyslogListener::LOG_PROP_APP("app");
+const std::string RemoteSyslogListener::LOG_PROP_HOST("host");
 
 
 RemoteSyslogListener::RemoteSyslogListener():
