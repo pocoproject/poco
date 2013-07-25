@@ -108,6 +108,7 @@ void SessionImpl::open(const std::string& connect)
 	options["compress"] = "";
 	options["auto-reconnect"] = "";
 	options["secure-auth"] = "";
+	options["character-set"] = "utf8";
 
 	const std::string& connString = connectionString();
 	for (std::string::const_iterator start = connString.begin();;) 
@@ -156,6 +157,9 @@ void SessionImpl::open(const std::string& connect)
 		_handle.options(MYSQL_SECURE_AUTH, false);
 	else if (!options["secure-auth"].empty())
 		throw MySQLException("create session: specify correct secure-auth option (true or false) or skip it");
+
+	if (!options["character-set"].empty())
+		_handle.options(MYSQL_SET_CHARSET_NAME, options["character-set"].c_str());
 
 	// Real connect
 	_handle.connect(options["host"].c_str(), 

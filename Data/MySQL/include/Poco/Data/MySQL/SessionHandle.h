@@ -68,6 +68,9 @@ public:
 	void options(mysql_option opt, bool b);
 		/// Set connection options
 
+	void options(mysql_option opt, const char* c);
+		/// Set connection options
+
 	void options(mysql_option opt, unsigned int i);
 		/// Set connection options
 
