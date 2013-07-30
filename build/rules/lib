@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/rules/lib#2 $
+# $Id: //poco/1.4/build/rules/lib#3 $
 #
 # lib
 #
@@ -9,14 +9,10 @@
 #
 # Target names
 #
-ifeq ($(OSNAME),CYGWIN)
-SHL_EXT = $(SHAREDLIBLINKEXT)
-else
 ifdef target_version
 SHL_EXT = $(SHAREDLIBEXT)
 else
 SHL_EXT = $(SHAREDLIBLINKEXT)
-endif
 endif
 
 LIB_RELEASE_STATIC      = $(LIBPATH)/$(LIBPREFIX)$(target)$(OSARCH_POSTFIX).a

@@ -1,7 +1,7 @@
 //
 // FPETest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FPETest.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/FPETest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -106,9 +106,9 @@ void FPETest::testFlags()
 	// some compilers are intelligent enough to optimize the calculations below away.
 	// unfortunately this leads to a failing test, so we have to trick out the
 	// compiler's optimizer a little bit by doing something with the results.
-	double a = 10;
-	double b = 0;
-	double c = div(a, b);
+	volatile double a = 10;
+	volatile double b = 0;
+	volatile double c = div(a, b);
 
 	assert (FPE::isFlag(FPE::FP_DIVIDE_BY_ZERO));
 	assert (FPE::isInfinite(c)); 

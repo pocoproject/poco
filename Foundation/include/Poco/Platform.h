@@ -1,7 +1,7 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#7 $
+// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#8 $
 //
 // Library: Foundation
 // Package: Core
@@ -102,6 +102,9 @@
 #elif defined(__QNX__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_QNX
+#elif defined(__CYGWIN__)
+	#define POCO_OS_FAMILY_UNIX 1
+	#define POCO_OS POCO_OS_CYGWIN
 #elif defined(unix) || defined(__unix) || defined(__unix__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_UNKNOWN_UNIX
@@ -111,9 +114,6 @@
 #elif defined(_WIN32) || defined(_WIN64)
 	#define POCO_OS_FAMILY_WINDOWS 1
 	#define POCO_OS POCO_OS_WINDOWS_NT
-#elif defined(__CYGWIN__)
-	#define POCO_OS_FAMILY_UNIX 1
-	#define POCO_OS POCO_OS_CYGWIN
 #elif defined(__VMS)
 	#define POCO_OS_FAMILY_VMS 1
 	#define POCO_OS POCO_OS_VMS

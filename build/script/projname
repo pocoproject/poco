@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/projname#1 $
+# $Id: //poco/1.4/build/script/projname#2 $
 #
 # projname
 #
@@ -16,4 +16,10 @@ cdir=`sh -c pwd`
 cd $PROJECT_BASE
 projbase=`sh -c pwd`
 cd "$cdir"
-sh -c pwd | sed "s:^$projbase::" | sed "s:^/::"
+if [ `uname` == "CYGWIN" ] ; then
+	# In 64-bit cygwin, the drive letters in /cygdrive seem to change case.
+	# We use a case-insensitive match in the line below to get round this.
+	sh -c pwd | sed "s:^$projbase::i" | sed "s:^/::"
+else
+	sh -c pwd | sed "s:^$projbase::" | sed "s:^/::"
+fi

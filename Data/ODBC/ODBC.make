@@ -1,7 +1,7 @@
 #
 # ODBC.make
 #
-# $Id: //poco/1.4/Data/ODBC/ODBC.make#1 $
+# $Id: //poco/1.4/Data/ODBC/ODBC.make#2 $
 #
 # Makefile fragment for finding ODBC library
 #
@@ -22,6 +22,8 @@ endif
 
 ifeq ($(LINKMODE),STATIC)
 LIBLINKEXT = .a
+else ifeq ($(POCO_CONFIG),CYGWIN)
+LIBLINKEXT = .dll.a
 else
 LIBLINKEXT = $(SHAREDLIBLINKEXT)
 endif
@@ -33,14 +35,8 @@ ifeq ($(POCO_CONFIG),MinGW)
 # -DODBCVER=0x0300: SQLHandle declaration issue
 # -DNOMINMAX      : MIN/MAX macros defined in windows conflict with libstdc++
 CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
-else ifeq ($(POCO_CONFIG),CYGWIN)
-# -DODBCVER=0x0300: SQLHandle declaration issue
-# -DNOMINMAX      : MIN/MAX macros defined in windows conflict with libstdc++
-CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
-# CYGWIN platform has its own ODBC library in /lib/w32api 
-SYSLIBS += -L/lib/w32api -lodbc32 -lodbccp32
 else ifeq (0, $(shell test -e $(ODBCLIBDIR)/libodbc$(LIBLINKEXT); echo $$?))
-SYSLIBS += -lodbc -lodbcinst
+SYSLIBS += -lodbc
 COMMONFLAGS += -DPOCO_UNIXODBC
 else ifeq (0, $(shell test -e $(ODBCLIBDIR)/libiodbc$(LIBLINKEXT); echo $$?))
 SYSLIBS += -liodbc -liodbcinst
