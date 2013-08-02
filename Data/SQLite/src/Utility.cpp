@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.4/Data/SQLite/src/Utility.cpp#2 $
+// $Id: //poco/1.4/Data/SQLite/src/Utility.cpp#3 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -99,6 +99,8 @@ void Utility::initTypeMap()
 		_types.insert(TypeMap::value_type("FLOAT", MetaColumn::FDT_DOUBLE));
 		_types.insert(TypeMap::value_type("DOUB", MetaColumn::FDT_DOUBLE));
 		_types.insert(TypeMap::value_type("DOUBLE", MetaColumn::FDT_DOUBLE));
+		_types.insert(TypeMap::value_type("DECIMAL", MetaColumn::FDT_DOUBLE));
+		_types.insert(TypeMap::value_type("NUMERIC", MetaColumn::FDT_DOUBLE));
 		_types.insert(TypeMap::value_type("CHAR", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("CLOB", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("TEXT", MetaColumn::FDT_STRING));
