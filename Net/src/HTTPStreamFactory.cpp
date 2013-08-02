@@ -1,7 +1,7 @@
 //
 // HTTPStreamFactory.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPStreamFactory.cpp#2 $
+// $Id: //poco/1.4/Net/src/HTTPStreamFactory.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -177,6 +177,12 @@ std::istream* HTTPStreamFactory::open(const URI& uri)
 void HTTPStreamFactory::registerFactory()
 {
 	URIStreamOpener::defaultOpener().registerStreamFactory("http", new HTTPStreamFactory);
+}
+
+
+void HTTPStreamFactory::unregisterFactory()
+{
+	URIStreamOpener::defaultOpener().unregisterStreamFactory("http");
 }
 
 

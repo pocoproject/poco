@@ -1,7 +1,7 @@
 //
 // FTPStreamFactory.cpp
 //
-// $Id: //poco/1.4/Net/src/FTPStreamFactory.cpp#1 $
+// $Id: //poco/1.4/Net/src/FTPStreamFactory.cpp#2 $
 //
 // Library: Net
 // Package: FTP
@@ -251,6 +251,12 @@ void FTPStreamFactory::getPathAndType(const Poco::URI& uri, std::string& path, c
 void FTPStreamFactory::registerFactory()
 {
 	URIStreamOpener::defaultOpener().registerStreamFactory("ftp", new FTPStreamFactory);
+}
+
+
+void FTPStreamFactory::unregisterFactory()
+{
+	URIStreamOpener::defaultOpener().unregisterStreamFactory("ftp");
 }
 
 

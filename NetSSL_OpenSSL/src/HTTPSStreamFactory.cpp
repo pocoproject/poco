@@ -1,7 +1,7 @@
 //
 // HTTPSStreamFactory.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSStreamFactory.cpp#2 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSStreamFactory.cpp#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -181,8 +181,13 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 
 void HTTPSStreamFactory::registerFactory()
 {
-	std::string https("https");
-	URIStreamOpener::defaultOpener().registerStreamFactory(https, new HTTPSStreamFactory);
+	URIStreamOpener::defaultOpener().registerStreamFactory("https", new HTTPSStreamFactory);
+}
+
+
+void HTTPSStreamFactory::unregisterFactory()
+{
+	URIStreamOpener::defaultOpener().unregisterStreamFactory("https");
 }
 
 
