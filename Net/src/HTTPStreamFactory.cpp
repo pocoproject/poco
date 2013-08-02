@@ -180,4 +180,10 @@ void HTTPStreamFactory::registerFactory()
 }
 
 
+void HTTPStreamFactory::unregisterFactory()
+{
+	URIStreamOpener::defaultOpener().unregisterStreamFactory("http");
+}
+
+
 } } // namespace Poco::Net
