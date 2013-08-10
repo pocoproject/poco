@@ -117,6 +117,8 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("FLOAT", MetaColumn::FDT_DOUBLE));
 		_types.insert(TypeMap::value_type("DOUB", MetaColumn::FDT_DOUBLE));
 		_types.insert(TypeMap::value_type("DOUBLE", MetaColumn::FDT_DOUBLE));
+		_types.insert(TypeMap::value_type("DECIMAL", MetaColumn::FDT_DOUBLE));
+		_types.insert(TypeMap::value_type("NUMERIC", MetaColumn::FDT_DOUBLE));
 		_types.insert(TypeMap::value_type("CHAR", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("CLOB", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("TEXT", MetaColumn::FDT_STRING));

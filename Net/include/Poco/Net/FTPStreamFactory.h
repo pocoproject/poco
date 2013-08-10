@@ -121,6 +121,10 @@ public:
 		/// Registers the FTPStreamFactory with the
 		/// default URIStreamOpener instance.
 
+	static void unregisterFactory();
+		/// Unregisters the FTPStreamFactory with the
+		/// default URIStreamOpener instance.
+
 protected:
 	static void splitUserInfo(const std::string& userInfo, std::string& username, std::string& password);
 	static void getUserInfo(const Poco::URI& uri, std::string& username, std::string& password);

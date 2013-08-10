@@ -254,4 +254,10 @@ void FTPStreamFactory::registerFactory()
 }
 
 
+void FTPStreamFactory::unregisterFactory()
+{
+	URIStreamOpener::defaultOpener().unregisterStreamFactory("ftp");
+}
+
+
 } } // namespace Poco::Net

@@ -81,6 +81,10 @@ public:
 	static void registerFactory();
 		/// Registers the HTTPSStreamFactory with the
 		/// default URIStreamOpener instance.	
+
+	static void unregisterFactory();
+		/// Unregisters the HTTPSStreamFactory with the
+		/// default URIStreamOpener instance.	
 		
 private:
 	enum

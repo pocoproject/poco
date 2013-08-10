@@ -181,8 +181,13 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 
 void HTTPSStreamFactory::registerFactory()
 {
-	std::string https("https");
-	URIStreamOpener::defaultOpener().registerStreamFactory(https, new HTTPSStreamFactory);
+	URIStreamOpener::defaultOpener().registerStreamFactory("https", new HTTPSStreamFactory);
+}
+
+
+void HTTPSStreamFactory::unregisterFactory()
+{
+	URIStreamOpener::defaultOpener().unregisterStreamFactory("https");
 }
 
 
