@@ -325,7 +325,10 @@ void FormatTest::testString()
 	std::string foo("foo");
 	std::string s(format("%s", foo));
 	assert (s == "foo");
-	
+
+	s = format("%s", "foo");
+	assert (s == "foo");
+
 	s = format("%5s", foo);
 	assert (s == "  foo");
 

@@ -226,8 +226,14 @@ namespace
 					}
 					break;
 				case 's':
-					str << RefAnyCast<std::string>(*itVal++);
+				{
+					const Any& val = *itVal++;
+					if (val.type() == typeid(char*))
+						str << AnyCast<char*>(val);
+					else
+						str << RefAnyCast<std::string>(val);
 					break;
+				}
 				case 'z':
 					str << AnyCast<std::size_t>(*itVal++); 
 					break;
