@@ -3,7 +3,7 @@ set(LIBNAME "PocoMongoDB")
 aux_source_directory(src SRCS)
 
 if (NOT POCO_STATIC)
-  add_definitions(-DMONGODB_EXPORTS)
+  add_definitions(-DMongoDB_EXPORTS)
 endif (NOT POCO_STATIC)
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )

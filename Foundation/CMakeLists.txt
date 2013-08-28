@@ -175,11 +175,6 @@ set( BASE_SRCS
   src/compress.c
   src/crc32.c
   src/deflate.c
-  src/gzclose.c
-  src/gzlib.c
-  src/gzread.c
-  src/gzwrite.c
-  src/uncompr.c
   src/infback.c
   src/inffast.c
   src/inflate.c
