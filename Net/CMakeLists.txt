@@ -59,6 +59,7 @@ set( BASE_SRCS
   src/MultipartReader.cpp
   src/MultipartWriter.cpp
   src/NameValueCollection.cpp
+  src/Net.cpp
   src/NetException.cpp
   src/NetworkInterface.cpp
   src/NullPartHandler.cpp
