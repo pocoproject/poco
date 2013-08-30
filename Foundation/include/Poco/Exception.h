@@ -96,6 +96,10 @@ public:
 		/// Returns a string consisting of the
 		/// message name and the message text.
 
+	std::string backtraceText() const;
+		/// Returns a backtrace from time the exception was
+		/// created. Available on platforms supported by Poco::Backtrace.
+
 	virtual Exception* clone() const;
 		/// Creates an exact copy of the exception.
 		///
@@ -120,7 +124,10 @@ protected:
 		/// Sets the extended message for the exception.
 		
 private:
+	void saveBacktrace();
+
 	std::string _msg;
+	std::string _bt;
 	Exception*  _pNested;
 	int			_code;
 };
