@@ -1,7 +1,7 @@
 //
 // LoggingFactory.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LoggingFactory.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/LoggingFactory.cpp#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -110,8 +110,10 @@ void LoggingFactory::registerBuiltins()
 	_channelFactory.registerClass("AsyncChannel", new Instantiator<AsyncChannel, Channel>);
 #if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
 	_channelFactory.registerClass("ConsoleChannel", new Instantiator<WindowsConsoleChannel, Channel>);
+	_channelFactory.registerClass("ColorConsoleChannel", new Instantiator<WindowsColorConsoleChannel, Channel>);
 #else
 	_channelFactory.registerClass("ConsoleChannel", new Instantiator<ConsoleChannel, Channel>);
+	_channelFactory.registerClass("ColorConsoleChannel", new Instantiator<ColorConsoleChannel, Channel>);
 #endif
 #ifndef POCO_NO_FILECHANNEL
 	_channelFactory.registerClass("FileChannel", new Instantiator<FileChannel, Channel>);
