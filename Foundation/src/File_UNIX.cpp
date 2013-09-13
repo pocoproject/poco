@@ -341,7 +341,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 	}
 	const long blockSize = st.st_blksize;
 
-	int dd = open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode & S_IRWXU);
+	int dd = open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode);
 	if (dd == -1)
 	{
 		close(sd);
