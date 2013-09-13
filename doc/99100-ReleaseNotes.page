@@ -5,7 +5,6 @@ AAAIntroduction
 
 !!Summary of Changes
 
-  - fixed GH #124: Possibile buffer overrun in Foundation/EventLogChannel
   - fixed GH #156: Possible buffer overrun in Foundation/EventLogChannel
   - XML: fixed an issue with parsing a memory buffer > 2 GB
   - upgraded to expat 2.1.0
