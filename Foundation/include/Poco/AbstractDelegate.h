@@ -94,7 +94,7 @@ public:
 	{
 	}
 
-	AbstractDelegate(const AbstractDelegate& del)
+	AbstractDelegate(const AbstractDelegate&)
 	{
 	}
 
