@@ -1,9 +1,8 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.6p2 (2013-07-19)
+Release 1.4.6p2 (2013-09-16)
 ============================
 
-- fixed GH #124: Possibile buffer overrun in Foundation/EventLogChannel
 - fixed GH #156: Possible buffer overrun in Foundation/EventLogChannel
 - XML: fixed an issue with parsing a memory buffer > 2 GB
 - upgraded to expat 2.1.0
@@ -1853,4 +1852,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#90 $
+$Id: //poco/1.4/dist/CHANGELOG#91 $
