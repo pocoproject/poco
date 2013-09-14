@@ -1,7 +1,7 @@
 //
 // EventLogChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/EventLogChannel.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/EventLogChannel.cpp#4 $
 //
 // Library: Foundation
 // Package: Logging
@@ -239,9 +239,17 @@ void EventLogChannel::setUpRegistry() const
 		std::wstring path;
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
-				path = findLibrary(L"PocoFoundationd.dll");
+				#if defined(_WIN64)
+					path = findLibrary(L"PocoFoundation64d.dll");
+				#else
+					path = findLibrary(L"PocoFoundationd.dll");
+				#endif
 			#else
-				path = findLibrary(L"PocoFoundation.dll");
+				#if defined(_WIN64)
+					path = findLibrary(L"PocoFoundation64.dll");
+				#else
+					path = findLibrary(L"PocoFoundation.dll");
+				#endif
 			#endif
 		#endif
 		
@@ -251,9 +259,17 @@ void EventLogChannel::setUpRegistry() const
 		std::string path;
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
-				path = findLibrary("PocoFoundationd.dll");
+				#if defined(_WIN64)
+					path = findLibrary("PocoFoundation64d.dll");
+				#else
+					path = findLibrary("PocoFoundationd.dll");
+				#endif
 			#else
-				path = findLibrary("PocoFoundation.dll");
+				#if defined(_WIN64)
+					path = findLibrary("PocoFoundation64.dll");
+				#else
+					path = findLibrary("PocoFoundation.dll");
+				#endif
 			#endif
 		#endif
 		
