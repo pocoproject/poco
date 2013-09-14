@@ -1,7 +1,7 @@
 //
 // UTF8String.cpp
 //
-// $Id: //poco/1.4/Foundation/src/UTF8String.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/UTF8String.cpp#2 $
 //
 // Library: Foundation
 // Package: Text
@@ -62,19 +62,19 @@ int UTF8::icompare(const std::string& str, std::string::size_type pos, std::stri
 	TextIterator uend2(end2);
 	while (uit1 != uend1 && uit2 != uend2)
 	{
-		int c1 = Unicode::toLower(*uit1);
-		int c2 = Unicode::toLower(*uit2);
-		if (c1 < c2)
-			return -1;
-		else if (c1 > c2)
-			return 1;
-		++uit1; ++uit2;
+        int c1 = Unicode::toLower(*uit1);
+        int c2 = Unicode::toLower(*uit2);
+        if (c1 < c2)
+            return -1;
+        else if (c1 > c2)
+            return 1;
+        ++uit1; ++uit2;
 	}
-	
-	if (uit1 == uend1)
+    
+    if (uit1 == uend1)
 		return uit2 == uend2 ? 0 : -1;
-	else
-		return 1;
+    else
+        return 1;
 }
 
 
@@ -125,26 +125,8 @@ int UTF8::icompare(const std::string& str1, std::string::size_type pos1, std::st
 int UTF8::icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, const std::string::value_type* ptr)
 {
 	poco_check_ptr (ptr);
-	std::string::size_type sz = str.size();
-	if (pos > sz) pos = sz;
-	if (pos + n > sz) n = sz - pos;
-	TextIterator uit(str.begin() + pos, str.begin() + pos + n, utf8); 
-	TextIterator uend(str.begin() + pos + n);
-	while (uit != uend && *ptr)
-	{
-		int c1 = Unicode::toLower(*uit);
-		int c2 = Unicode::toLower(*ptr);
-		if (c1 < c2)
-			return -1;
-		else if (c1 > c2)
-			return 1;
-		++uit; ++ptr;
-	}
-	
-	if (uit == uend)
-		return *ptr == 0 ? 0 : -1;
-	else
-		return 1;
+	std::string str2(ptr); // TODO: optimize
+	return icompare(str, pos, n, str2.begin(), str2.end());
 }
 
 
