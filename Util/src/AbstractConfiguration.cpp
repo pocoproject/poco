@@ -161,7 +161,32 @@ int AbstractConfiguration::getInt(const std::string& key, int defaultValue) cons
 }
 
 
+unsigned AbstractConfiguration::getUInt(const std::string& key) const
+{
+	Mutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return NumberParser::parseUnsigned(internalExpand(value));
+	else
+		throw NotFoundException(key);
+}
+
+
+unsigned AbstractConfiguration::getUInt(const std::string& key, unsigned defaultValue) const
+{
+	Mutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return NumberParser::parseUnsigned(internalExpand(value));
+	else
+		return defaultValue;
+}
+
+
 #if defined(POCO_HAVE_INT64)
+
 
 Int64 AbstractConfiguration::getInt64(const std::string& key) const
 {
@@ -170,18 +195,6 @@ Int64 AbstractConfiguration::getInt64(const std::string& key) const
 	std::string value;
 	if (getRaw(key, value))
 		return NumberParser::parse64(internalExpand(value));
-	else
-		throw NotFoundException(key);
-}
-
-
-UInt64 AbstractConfiguration::getUInt64(const std::string& key) const
-{
-	Mutex::ScopedLock lock(_mutex);
-
-	std::string value;
-	if (getRaw(key, value))
-		return NumberParser::parseUnsigned64(internalExpand(value));
 	else
 		throw NotFoundException(key);
 }
@@ -199,6 +212,18 @@ Int64 AbstractConfiguration::getInt64(const std::string& key, Int64 defaultValue
 }
 
 
+UInt64 AbstractConfiguration::getUInt64(const std::string& key) const
+{
+	Mutex::ScopedLock lock(_mutex);
+
+	std::string value;
+	if (getRaw(key, value))
+		return NumberParser::parseUnsigned64(internalExpand(value));
+	else
+		throw NotFoundException(key);
+}
+
+
 UInt64 AbstractConfiguration::getUInt64(const std::string& key, UInt64 defaultValue) const
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -209,6 +234,7 @@ UInt64 AbstractConfiguration::getUInt64(const std::string& key, UInt64 defaultVa
 	else
 		return defaultValue;
 }
+
 
 #endif // defined(POCO_HAVE_INT64)
 
@@ -281,6 +307,7 @@ void AbstractConfiguration::setUInt(const std::string& key, unsigned int value)
 
 #if defined(POCO_HAVE_INT64)
 
+
 void AbstractConfiguration::setInt64(const std::string& key, Int64 value)
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -296,7 +323,9 @@ void AbstractConfiguration::setUInt64(const std::string& key, UInt64 value)
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
+
 #endif // defined(POCO_HAVE_INT64)
+
 
 void AbstractConfiguration::setDouble(const std::string& key, double value)
 {
