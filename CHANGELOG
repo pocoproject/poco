@@ -35,7 +35,11 @@ Release 1.4.6p2 (2013-09-16)
   does not work
 - added ColorConsoleChannel and WindowsColorConsoleChannel classes supporting
   colorizing log messages
-
+- fixed GH# 259: Poco::EventLogChannel fails to find 64bit Poco Foundation dll
+- fixed GH# 254: UTF8::icompare unexpected behavior
+- Poco::UUID::tryParse() also accepts UUIDs without hyphens. Also updated documentation
+  (links to specifications).
+  
 
 Release 1.4.6p1 (2013-03-06)
 ============================
@@ -1852,4 +1856,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#91 $
+$Id: //poco/1.4/dist/CHANGELOG#93 $
