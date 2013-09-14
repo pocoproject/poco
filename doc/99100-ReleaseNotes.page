@@ -101,6 +101,13 @@ AAAIntroduction
   - fixed GH# 233: ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool ipV6Only) does not work
   - fixed GH# 231: Compatibility issue with Poco::Net::NetworkInterface
   - fixed GH# 236: Bug in RecursiveDirectoryIterator
+  - added ColorConsoleChannel and WindowsColorConsoleChannel classes supporting
+    colorizing log messages
+  - fixed GH# 259: Poco::EventLogChannel fails to find 64bit Poco Foundation dll
+  - fixed GH# 254: UTF8::icompare unexpected behavior
+  - Poco::UUID::tryParse() also accepts UUIDs without hyphens. Also updated documentation
+    (links to specifications).
+
 
 !!Incompatible Changes and Possible Transition Issues
 
