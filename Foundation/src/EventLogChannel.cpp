@@ -1,7 +1,7 @@
 //
 // EventLogChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/EventLogChannel.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/EventLogChannel.cpp#4 $
 //
 // Library: Foundation
 // Package: Logging
@@ -56,10 +56,10 @@ EventLogChannel::EventLogChannel():
 	_logFile("Application"),
 	_h(0)
 {
-	static const int length = MAX_PATH + 1;
+	const DWORD maxPathLen = MAX_PATH + 1;
 #if defined(POCO_WIN32_UTF8)
-	wchar_t name[length];
-	int n = GetModuleFileNameW(NULL, name, length);
+	wchar_t name[maxPathLen];
+	int n = GetModuleFileNameW(NULL, name, maxPathLen);
 	if (n > 0)
 	{
 		wchar_t* end = name + n - 1;
@@ -69,8 +69,8 @@ EventLogChannel::EventLogChannel():
 		UnicodeConverter::toUTF8(uname, _name);
 	}
 #else
-	char name[length];
-	int n = GetModuleFileNameA(NULL, name, length);
+	char name[maxPathLen];
+	int n = GetModuleFileNameA(NULL, name, maxPathLen);
 	if (n > 0)
 	{
 		char* end = name + n - 1;
@@ -239,9 +239,17 @@ void EventLogChannel::setUpRegistry() const
 		std::wstring path;
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
-				path = findLibrary(L"PocoFoundationd.dll");
+				#if defined(_WIN64)
+					path = findLibrary(L"PocoFoundation64d.dll");
+				#else
+					path = findLibrary(L"PocoFoundationd.dll");
+				#endif
 			#else
-				path = findLibrary(L"PocoFoundation.dll");
+				#if defined(_WIN64)
+					path = findLibrary(L"PocoFoundation64.dll");
+				#else
+					path = findLibrary(L"PocoFoundation.dll");
+				#endif
 			#endif
 		#endif
 		
@@ -251,9 +259,17 @@ void EventLogChannel::setUpRegistry() const
 		std::string path;
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
-				path = findLibrary("PocoFoundationd.dll");
+				#if defined(_WIN64)
+					path = findLibrary("PocoFoundation64d.dll");
+				#else
+					path = findLibrary("PocoFoundationd.dll");
+				#endif
 			#else
-				path = findLibrary("PocoFoundation.dll");
+				#if defined(_WIN64)
+					path = findLibrary("PocoFoundation64.dll");
+				#else
+					path = findLibrary("PocoFoundation.dll");
+				#endif
 			#endif
 		#endif
 		
@@ -289,9 +305,9 @@ std::wstring EventLogChannel::findLibrary(const wchar_t* name)
 	HMODULE dll = LoadLibraryW(name);
 	if (dll)
 	{
-		static const int length = MAX_PATH + 1;
-		wchar_t name[length];
-		int n = GetModuleFileNameW(dll, name, length);
+		const DWORD maxPathLen = MAX_PATH + 1;
+		wchar_t name[maxPathLen];
+		int n = GetModuleFileNameW(dll, name, maxPathLen);
 		if (n > 0) path = name;
 		FreeLibrary(dll);
 	}
@@ -304,9 +320,9 @@ std::string EventLogChannel::findLibrary(const char* name)
 	HMODULE dll = LoadLibraryA(name);
 	if (dll)
 	{
-		static const int length = MAX_PATH + 1;
-		char name[length];
-		int n = GetModuleFileNameA(dll, name, length);
+		const DWORD maxPathLen = MAX_PATH + 1;
+		char name[maxPathLen];
+		int n = GetModuleFileNameA(dll, name, maxPathLen);
 		if (n > 0) path = name;
 		FreeLibrary(dll);
 	}
