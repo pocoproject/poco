@@ -5,11 +5,11 @@ rem
 rem buildwin.cmd
 rem
 rem POCO C++ Libraries command-line build script 
-rem for MS Visual Studio 2003 to 2010
+rem for MS Visual Studio 2003 to 2012
 rem
 rem $Id: //poco/1.4/dist/buildwin.cmd#2 $
 rem
-rem Copyright (c) 2006-2012 by Applied Informatics Software Engineering GmbH
+rem Copyright (c) 2006-2013 by Applied Informatics Software Engineering GmbH
 rem and Contributors.
 rem
 rem Original version by Aleksandar Fabijanic.
