@@ -108,6 +108,7 @@ Release 1.5.2 (2013-09-16)
 - added GH# 268: Method to get JSON object value using Poco::Nullable
 - fixed GH# 267: JSON 'find' not returning empty result if object is expected but another value is found
 
+
 Release 1.5.1 (2013-01-11)
 ==========================
 
