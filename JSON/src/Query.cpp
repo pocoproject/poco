@@ -162,6 +162,9 @@ Var Query::find(const std::string& path) const
 					Object o = result.extract<Object>();
 					result = o.get(name);
 				}
+				else
+					result.empty();
+
 			}
 
 			if (!result.isEmpty() && !indexes.empty())

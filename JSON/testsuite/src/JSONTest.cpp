@@ -1076,6 +1076,9 @@ void JSONTest::testQuery()
 	Object& rAddress = query.findObject("address", address);
 	assert (rAddress.getValue<int>("number") == 123);
 
+	Var badAddr = query.find("address.street.anotherObject");
+	assert(badAddr.isEmpty());
+
 	using Poco::JSON::Array;
 
 	Array::Ptr pChildren = query.findArray("children");
@@ -1212,6 +1215,13 @@ void JSONTest::testPrintHandler()
 
 void JSONTest::testStringify()
 {
+	Poco::JSON::Object obj;
+	obj.set("one","two");
+	obj.stringify(std::cout,4);  //this works 
+	obj.stringify(std::cout,1);  //this never returns
+	std::cout << std::endl;
+
+
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
 						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
 						"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", \"town\" : \"Springfield\" } } }";
