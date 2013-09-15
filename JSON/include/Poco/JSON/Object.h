@@ -46,6 +46,7 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/Struct.h"
+#include "Poco/Nullable.h"
 #include <map>
 #include <vector>
 #include <deque>
@@ -140,6 +141,22 @@ public:
 		/// which can also throw exceptions for invalid values.
 		/// Note: This will not work for an array or an object.
 	{
+		Dynamic::Var value = get(key);
+		return value.convert<T>();
+	}
+
+	template<typename T>
+	Poco::Nullable<T> getNullableValue(const std::string& key) const
+		/// Retrieves the property with the given name and will
+		/// try to convert the value to the given template type.
+		/// Returns null if isNull.
+		/// The convert<T> method of Dynamic is called
+		/// which can also throw exceptions for invalid values.
+		/// Note: This will not work for an array or an object.
+	{
+		if (isNull(key))
+			return Poco::Nullable<T>();
+
 		Dynamic::Var value = get(key);
 		return value.convert<T>();
 	}
