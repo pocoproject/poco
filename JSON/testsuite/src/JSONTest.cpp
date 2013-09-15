@@ -51,6 +51,7 @@
 #include "Poco/UTF8Encoding.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/TextConverter.h"
+#include "Poco/Nullable.h"
 
 #include "Poco/Dynamic/Struct.h"
 
@@ -104,6 +105,9 @@ void JSONTest::testNullProperty()
 	assert(object->isNull("test"));
 	Var test = object->get("test");
 	assert(test.isEmpty());
+
+	Poco::Nullable<int> test2 = object->getNullableValue<int>("test");
+	assert(test2.isNull());
 
 	DynamicStruct ds = *object;
 	assert (ds["test"].isEmpty());
