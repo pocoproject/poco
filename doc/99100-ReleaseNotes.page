@@ -110,6 +110,8 @@ AAAIntroduction
   - added GH# 268: Method to get JSON object value using Poco::Nullable
   - fixed GH# 267: JSON 'find' not returning empty result if object is expected but another 
     value is found
+  - Added support for ARM64 architecture and iPhone 5s 64-bit builds
+    (POCO_TARGET_OSARCH=arm64).
 
 
 !!Incompatible Changes and Possible Transition Issues
