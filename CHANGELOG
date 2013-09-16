@@ -39,6 +39,8 @@ Release 1.4.6p2 (2013-09-16)
 - fixed GH# 254: UTF8::icompare unexpected behavior
 - Poco::UUID::tryParse() also accepts UUIDs without hyphens. Also updated documentation
   (links to specifications).
+- Added support for ARM64 architecture and iPhone 5s 64-bit builds
+  (POCO_TARGET_OSARCH=arm64).
   
 
 Release 1.4.6p1 (2013-03-06)
@@ -1856,4 +1858,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#93 $
+$Id: //poco/1.4/dist/CHANGELOG#94 $

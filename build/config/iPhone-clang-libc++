@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/iPhone-clang-libc++#1 $
+# $Id: //poco/1.4/build/config/iPhone-clang-libc++#2 $
 #
 # iPhone-clang-libc++
 #
@@ -31,7 +31,10 @@ IPHONE_SDK_VERSION_MIN ?= $(patsubst %.sdk,%,$(patsubst $(IPHONE_SDK_ROOT_DIR)%,
 POCO_TARGET_OSNAME     ?= $(IPHONE_SDK)
 POCO_TARGET_OSARCH     ?= armv7
 TOOL_PREFIX            ?= $(shell xcode-select -print-path)/Platforms/$(IPHONE_SDK).platform/Developer/usr/bin
-OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) -mthumb -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN)
+ifneq ($(POCO_TARGET_OSARCH),arm64)
+THUMB = -mthumb
+endif
+OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) $(THUMB) -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN)
 
 #
 # Tools
@@ -68,7 +71,7 @@ SHAREDLIBLINKEXT = .dylib
 CFLAGS          = $(OSFLAGS)
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = $(OSFLAGS) -std=c++11 -stdlib=libc++ -Wall -Wno-sign-compare 
+CXXFLAGS        = $(OSFLAGS) -stdlib=libc++ -Wall -Wno-sign-compare 
 CXXFLAGS32      =
 CXXFLAGS64      = 
 LINKFLAGS       = $(OSFLAGS) -stdlib=libc++
