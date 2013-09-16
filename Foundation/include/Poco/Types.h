@@ -69,7 +69,7 @@ namespace Poco {
 	#define POCO_HAVE_INT64 1
 #elif defined(__GNUC__) || defined(__clang__)
 	//
-	// Unix/GCC
+	// Unix/GCC/Clang
 	//
 	typedef signed char            Int8;
 	typedef unsigned char          UInt8;
