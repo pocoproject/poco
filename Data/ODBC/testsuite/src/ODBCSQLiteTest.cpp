@@ -333,6 +333,13 @@ void ODBCSQLiteTest::recreateLogTable()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
 }
 
+void ODBCSQLiteTest::recreateUnicodeTable()
+{
+	dropObject("TABLE", "UnicodeTable");
+	try { session() << "CREATE TABLE UnicodeTable (str NVARCHAR(30))", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateUnicodeTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateUnicodeTable()"); }
+}
 
 CppUnit::Test* ODBCSQLiteTest::suite()
 {

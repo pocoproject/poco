@@ -89,6 +89,7 @@ private:
 	void recreateBoolTable();
 	void recreateMiscTable();
 	void recreateLogTable();
+	void recreateUnicodeTable();
 
 	void configurePLPgSQL();
 		/// Configures PL/pgSQL in the database. A reasonable defaults

@@ -1,4 +1,4 @@
-//
+﻿//
 // SQLExecutor.cpp
 //
 // $Id: //poco/Main/Data/ODBC/testsuite/src/SQLExecutor.cpp#14 $
@@ -70,6 +70,7 @@
 #include <iostream>
 #include <sstream>
 #include <iterator>
+#include "Poco/UnicodeConverter.h"
 
 
 using namespace Poco::Data::Keywords;
@@ -2215,6 +2216,99 @@ void SQLExecutor::singleSelect()
 	assert (!stmt.done());
 	stmt.execute();
 	assert (result == p2);
+	assert (stmt.done());
+}
+
+void SQLExecutor::unicodeSelect(const std::string& dbConnString)
+{
+	{
+		std::wstring rose = L"róża";
+		std::wstring wsql= L"INSERT INTO UnicodeTable VALUES(N'róża')";
+		std::string roseUTF8;
+		std::string   sql;
+		Poco::UnicodeConverter::toUTF8(rose, roseUTF8);
+		Poco::UnicodeConverter::toUTF8(wsql, sql); 
+		session() << sql.c_str(), now;
+		session() << "INSERT INTO UnicodeTable VALUES (?)", use(roseUTF8), now;
+	}
+
+
+	std::string funct = "unicodeSelect()";
+	SQLRETURN rc;
+	SQLHENV henv = SQL_NULL_HENV;
+	SQLHDBC hdbc = SQL_NULL_HDBC;
+	SQLHSTMT hstmt = SQL_NULL_HSTMT;
+	// Environment begin
+	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+	poco_odbc_check_env (rc, henv);
+	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
+	poco_odbc_check_env (rc, henv);
+
+	// Connection begin
+	rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
+	poco_odbc_check_dbc (rc, hdbc);
+
+	SQLCHAR connectOutput[1024] = {0};
+	SQLSMALLINT result;
+	rc = SQLDriverConnect(hdbc
+		, NULL
+		,(SQLCHAR*) dbConnString.c_str()
+		,(SQLSMALLINT) SQL_NTS
+		, connectOutput
+		, sizeof(connectOutput)
+		, &result
+		, SQL_DRIVER_NOPROMPT);
+	poco_odbc_check_dbc (rc, hdbc);
+
+	// Statement begin
+	rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	poco_odbc_check_stmt (rc, hstmt);
+
+
+	std::wstring wsql= L"INSERT INTO UnicodeTable VALUES(N'";
+	// The word "Rose" in Polish, expressed in UTF16 unicode.  
+	wchar_t rose[] = {114,243,380,97,0};
+	wsql += rose;
+	wsql += L"')";
+
+	SQLWCHAR* pStr = (SQLWCHAR*) wsql.c_str();
+	SQLExecDirectW(hstmt, pStr, (SQLINTEGER) wsql.length());
+	poco_odbc_check_stmt (rc, hstmt);
+
+
+
+	
+	// The word "Rose" in Greek, converted to UTF8 and expressed in hex.  
+	std::string roseUTF8;
+	Poco::UnicodeConverter::toUTF8(rose, roseUTF8);
+	
+	std::string sql = "INSERT INTO UnicodeTable VALUES ('"; 
+	sql += roseUTF8;
+	sql += "')";
+
+	try { session() << sql.c_str(), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	try { session() << "INSERT INTO UnicodeTable VALUES (?)", use(roseUTF8), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { session() << "SELECT COUNT(*) FROM UnicodeTable", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 2);
+		
+	
+	std::string data;
+	Statement stmt = (session() << "SELECT str FROM UnicodeTable", into(data), limit(1));
+	stmt.execute();
+	assert (data == roseUTF8);
+	assert (stmt.done());
+
+	stmt.execute();
+	assert (data == roseUTF8);
 	assert (stmt.done());
 }
 

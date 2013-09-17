@@ -94,6 +94,7 @@ private:
 	void recreateBoolTable();
 	void recreateMiscTable();
 	void recreateLogTable();
+	void recreateUnicodeTable();
 
 	static SessionPtr  _pSession;
 	static ExecPtr     _pExecutor;
