@@ -193,6 +193,15 @@
 	#else
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#endif
+#elif defined(__arm64__) || defined(__arm64) 
+	#define POCO_ARCH POCO_ARCH_ARM64
+	#if defined(__ARMEB__)
+		#define POCO_ARCH_BIG_ENDIAN 1
+	#elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		#define POCO_ARCH_BIG_ENDIAN 1
+	#else
+		#define POCO_ARCH_LITTLE_ENDIAN 1
+	#endif
 #elif defined(__m68k__)
 	#define POCO_ARCH POCO_ARCH_M68K
 	#define POCO_ARCH_BIG_ENDIAN 1

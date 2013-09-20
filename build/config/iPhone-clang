@@ -1,7 +1,7 @@
 #
-# $Id: //poco/1.4/build/config/iPhone-clang-libc++#2 $
+# $Id: //poco/1.4/build/config/iPhone-clang#2 $
 #
-# iPhone-clang-libc++
+# iPhone-clang
 #
 # Build settings for iPhone OS, using Apple's iPhone SDK
 # 
@@ -71,10 +71,10 @@ SHAREDLIBLINKEXT = .dylib
 CFLAGS          = $(OSFLAGS)
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = $(OSFLAGS) -stdlib=libc++ -Wall -Wno-sign-compare 
+CXXFLAGS        = $(OSFLAGS) -Wall -Wno-sign-compare 
 CXXFLAGS32      =
 CXXFLAGS64      = 
-LINKFLAGS       = $(OSFLAGS) -stdlib=libc++
+LINKFLAGS       = $(OSFLAGS) 
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =

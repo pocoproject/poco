@@ -1,7 +1,7 @@
 //
 // UUIDTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UUIDTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/UUIDTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -55,6 +55,9 @@ void UUIDTest::testParse()
 	assert (uuid.toString() == "6ba7b810-9dad-11d1-80b4-00c04fd430c8");
 	
 	uuid.parse("6BA7B810-9DAD-11D1-80B4-00C04FD430C8");
+	assert (uuid.toString() == "6ba7b810-9dad-11d1-80b4-00c04fd430c8");	
+
+	uuid.parse("6BA7B8109DAD11D180B400C04FD430C8");
 	assert (uuid.toString() == "6ba7b810-9dad-11d1-80b4-00c04fd430c8");	
 }
 

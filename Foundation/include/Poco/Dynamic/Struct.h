@@ -236,62 +236,62 @@ public:
 		return typeid(Struct<std::string>);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8&) const
 	{
 		throw BadCastException("Cannot cast Struct type to Int8");
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16&) const
 	{
 		throw BadCastException("Cannot cast Struct type to Int16");
 	}
 	
-	void convert(Int32& val) const
+	void convert(Int32&) const
 	{
 		throw BadCastException("Cannot cast Struct type to Int32");
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64&) const
 	{
 		throw BadCastException("Cannot cast Struct type to Int64");
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8&) const
 	{
 		throw BadCastException("Cannot cast Struct type to UInt8");
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16&) const
 	{
 		throw BadCastException("Cannot cast Struct type to UInt16");
 	}
 	
-	void convert(UInt32& val) const
+	void convert(UInt32&) const
 	{
 		throw BadCastException("Cannot cast Struct type to UInt32");
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64&) const
 	{
 		throw BadCastException("Cannot cast Struct type to UInt64");
 	}
 
-	void convert(bool& val) const
+	void convert(bool&) const
 	{
 		throw BadCastException("Cannot cast Struct type to bool");
 	}
 
-	void convert(float& val) const
+	void convert(float&) const
 	{
 		throw BadCastException("Cannot cast Struct type to float");
 	}
 
-	void convert(double& val) const
+	void convert(double&) const
 	{
 		throw BadCastException("Cannot cast Struct type to double");
 	}
 
-	void convert(char& val) const
+	void convert(char&) const
 	{
 		throw BadCastException("Cannot cast Struct type to char");
 	}
@@ -412,62 +412,62 @@ public:
 		return typeid(Struct<int>);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8&) const
 	{
 		throw BadCastException("Cannot cast Struct type to Int8");
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16&) const
 	{
 		throw BadCastException("Cannot cast Struct type to Int16");
 	}
 	
-	void convert(Int32& val) const
+	void convert(Int32&) const
 	{
 		throw BadCastException("Cannot cast Struct type to Int32");
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64&) const
 	{
 		throw BadCastException("Cannot cast Struct type to Int64");
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8&) const
 	{
 		throw BadCastException("Cannot cast Struct type to UInt8");
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16&) const
 	{
 		throw BadCastException("Cannot cast Struct type to UInt16");
 	}
 	
-	void convert(UInt32& val) const
+	void convert(UInt32&) const
 	{
 		throw BadCastException("Cannot cast Struct type to UInt32");
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64&) const
 	{
 		throw BadCastException("Cannot cast Struct type to UInt64");
 	}
 
-	void convert(bool& val) const
+	void convert(bool&) const
 	{
 		throw BadCastException("Cannot cast Struct type to bool");
 	}
 
-	void convert(float& val) const
+	void convert(float&) const
 	{
 		throw BadCastException("Cannot cast Struct type to float");
 	}
 
-	void convert(double& val) const
+	void convert(double&) const
 	{
 		throw BadCastException("Cannot cast Struct type to double");
 	}
 
-	void convert(char& val) const
+	void convert(char&) const
 	{
 		throw BadCastException("Cannot cast Struct type to char");
 	}

@@ -1,7 +1,7 @@
 //
 // UUID.cpp
 //
-// $Id: //poco/1.4/Foundation/src/UUID.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/UUID.cpp#2 $
 //
 // Library: Foundation
 // Package: UUID
@@ -149,37 +149,43 @@ void UUID::parse(const std::string& uuid)
 
 bool UUID::tryParse(const std::string& uuid)
 {
-	if (uuid.size() < 36)
+	if (uuid.size() < 32)
 		return false;
 
-	if (uuid[8] != '-'|| uuid[13] != '-' || uuid[18] != '-' || uuid[23] != '-')
-		return false;
-
+	bool haveHyphens = false;
+	if (uuid[8] == '-' && uuid[13] == '-' && uuid[18] == '-' && uuid[23] == '-')
+	{
+		if (uuid.size() >= 36) 
+			haveHyphens = true;
+		else
+			return false;
+	}
+	
 	std::string::const_iterator it = uuid.begin();
 	_timeLow = 0;
 	for (int i = 0; i < 8; ++i)
 	{
 		_timeLow = (_timeLow << 4) | nibble(*it++);
 	}
-	++it;
+	if (haveHyphens) ++it;
 	_timeMid = 0;
 	for (int i = 0; i < 4; ++i)
 	{
 		_timeMid = (_timeMid << 4) | nibble(*it++);
 	}
-	++it;
+	if (haveHyphens) ++it;
 	_timeHiAndVersion = 0;
 	for (int i = 0; i < 4; ++i)
 	{
 		_timeHiAndVersion = (_timeHiAndVersion << 4) | nibble(*it++);
 	}
-	++it;
+	if (haveHyphens) ++it;
 	_clockSeq = 0;
 	for (int i = 0; i < 4; ++i)
 	{
 		_clockSeq = (_clockSeq << 4) | nibble(*it++);
 	}
-	++it;
+	if (haveHyphens) ++it;
 	for (int i = 0; i < 6; ++i)
 	{
 		_node[i] = (nibble(*it++) << 4) | nibble(*it++) ;			

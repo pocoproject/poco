@@ -281,6 +281,7 @@ protected:
 		/// smal object optimization is enabled.
 	{
 #ifdef POCO_NO_SOO
+		(void)pVarHolder;
 		return new VarHolderImpl<T>(val);
 #else
 		poco_check_ptr (pVarHolder);

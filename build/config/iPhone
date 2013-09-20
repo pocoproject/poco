@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/iPhone#3 $
+# $Id: //poco/1.4/build/config/iPhone#4 $
 #
 # iPhone
 #
@@ -23,14 +23,14 @@ LINKMODE ?= STATIC
 # Otherwise use the version found. 
 
 IPHONE_SDK             ?= iPhoneOS
-IPHONE_SDK_ROOT        ?= $(shell xcode-select -print-path)/Platforms/$(IPHONE_SDK).platform/Developer/SDKs
+IPHONE_SDK_ROOT         = $(shell xcode-select -print-path)/Platforms/$(IPHONE_SDK).platform/Developer/SDKs
 IPHONE_SDK_ROOT_DIR     = $(IPHONE_SDK_ROOT)/$(IPHONE_SDK)
 IPHONE_SDK_BASE         = $(shell ls -d $(IPHONE_SDK_ROOT_DIR)$(IPHONE_SDK_VERSION)*.sdk | tail -1)
 IPHONE_SDK_VERSION_MIN ?= $(patsubst %.sdk,%,$(patsubst $(IPHONE_SDK_ROOT_DIR)%,%,$(IPHONE_SDK_BASE)))
 
 POCO_TARGET_OSNAME     ?= $(IPHONE_SDK)
 POCO_TARGET_OSARCH     ?= armv6
-TOOL_PREFIX            ?= $(shell xcode-select -print-path)/Platforms/$(IPHONE_SDK).platform/Developer/usr/bin
+TOOL_PREFIX            ?= /Developer/Platforms/$(IPHONE_SDK).platform/Developer/usr/bin
 OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) -mthumb -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN)
 
 #
@@ -89,7 +89,7 @@ RELEASEOPT_LINK =
 #
 # System Specific Flags
 #
-SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_STAT64 -DPOCO_NO_SHAREDLIBS -DPOCO_NO_NET_IFTYPES
+SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_STAT64 -DPOCO_NO_SHAREDLIBS
 
 #
 # System Specific Libraries
