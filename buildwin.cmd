@@ -280,7 +280,7 @@ for /f %%G in ('findstr /R "." components') do (
       )
     )
   )
-  cd %POCO_BASE%
+  cd "%POCO_BASE%"
 )
 )
 
@@ -435,7 +435,7 @@ for /f %%G in ('findstr /R "." components') do (
       echo. && echo. && echo.
     )
     
-    cd %POCO_BASE%
+    cd "%POCO_BASE%"
   
     echo.
     echo ------------------------------------------------------------------------
