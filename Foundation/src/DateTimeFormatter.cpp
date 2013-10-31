@@ -45,7 +45,7 @@ namespace Poco {
 
 void DateTimeFormatter::append(std::string& str, const LocalDateTime& dateTime, const std::string& fmt)
 {
-	DateTimeFormatter::append(str, dateTime.utc(), fmt, dateTime.tzd());
+	DateTimeFormatter::append(str, dateTime._dateTime, fmt, dateTime.tzd());
 }
 
 
