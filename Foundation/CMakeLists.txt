@@ -52,6 +52,7 @@ set( BASE_SRCS
   src/DigestEngine.cpp
   src/DigestStream.cpp
   src/DirectoryIterator.cpp
+  src/DirectoryIteratorStrategy.cpp
   src/DirectoryWatcher.cpp
   src/Environment.cpp
   src/Error.cpp
