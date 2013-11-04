@@ -142,7 +142,7 @@ public:
 		{
 			T* ptr = new T[newCapacity];
 			if (preserveContent)
-				std::memcpy(ptr, _ptr, _used);
+				std::memcpy(ptr, _ptr, _used * sizeof(T));
 
 			delete [] _ptr;
 			_ptr = ptr;
@@ -171,7 +171,7 @@ public:
 		{
 			T* ptr = new T[newCapacity];
 			if (preserveContent)
-				std::memcpy(ptr, _ptr, _used < newCapacity ? _used : newCapacity);
+				std::memcpy(ptr, _ptr, (_used < newCapacity ? _used : newCapacity) * sizeof(T));
 
 			delete [] _ptr;
 			_ptr = ptr;
@@ -187,7 +187,7 @@ public:
 	{
 		if (0 == sz) return;
 		if (sz > _capacity) resize(sz, false);
-		std::memcpy(_ptr, buf, sz);
+		std::memcpy(_ptr, buf, sz * sizeof(T));
 		_used = sz;
 	}
 
@@ -196,7 +196,7 @@ public:
 	{
 		if (0 == sz) return;
 		resize(_used + sz, true);
-		std::memcpy(_ptr + _used - sz, buf, sz);
+		std::memcpy(_ptr + _used - sz, buf, sz * sizeof(T));
 	}
 
 	void append(T val)
@@ -241,7 +241,7 @@ public:
 		{
 			if (_used == other._used)
 			{
-				if (std::memcmp(_ptr, other._ptr, _used) == 0)
+				if (std::memcmp(_ptr, other._ptr, _used * sizeof(T)) == 0)
 				{
 					return true;
 				}
