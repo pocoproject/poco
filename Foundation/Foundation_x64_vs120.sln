@@ -10,6 +10,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestLibrary", "testsuite\TestLibrary_x64_vs120.vcxproj", "{0955EB03-544B-4BD4-9C10-89CF38078F5F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_x64_vs120.vcxproj", "{F1EE93DF-347F-4CB3-B191-C4E63F38E972}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0955EB03-544B-4BD4-9C10-89CF38078F5F} = {0955EB03-544B-4BD4-9C10-89CF38078F5F}
+		{8164D41D-B053-405B-826C-CF37AC0EF176} = {8164D41D-B053-405B-826C-CF37AC0EF176}
+		{6C41E55D-C0FC-4E01-AA8D-B7DA40E31D3A} = {6C41E55D-C0FC-4E01-AA8D-B7DA40E31D3A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

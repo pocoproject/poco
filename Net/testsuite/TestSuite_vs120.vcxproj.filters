@@ -329,9 +329,6 @@
     <ClCompile Include="src\NetTestSuite.cpp">
       <Filter>_Suite\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WinDriver.cpp">
-      <Filter>_Driver\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\DatagramSocketTest.cpp">
       <Filter>Sockets\Source Files</Filter>
     </ClCompile>
@@ -478,6 +475,9 @@
     </ClCompile>
     <ClCompile Include="src\WebSocketTestSuite.cpp">
       <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Driver.cpp">
+      <Filter>_Driver\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

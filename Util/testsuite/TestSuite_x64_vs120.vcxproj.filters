@@ -143,9 +143,6 @@
     <ClCompile Include="src\UtilTestSuite.cpp">
       <Filter>_Suite\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WinDriver.cpp">
-      <Filter>_Driver\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\AbstractConfigurationTest.cpp">
       <Filter>Configuration\Source Files</Filter>
     </ClCompile>
@@ -217,6 +214,9 @@
     </ClCompile>
     <ClCompile Include="src\TimerTestSuite.cpp">
       <Filter>Timer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Driver.cpp">
+      <Filter>_Driver\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

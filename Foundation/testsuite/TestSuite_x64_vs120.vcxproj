@@ -34,37 +34,37 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
@@ -135,12 +135,12 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitd.lib;WinTestRunnerd.lib;PocoFoundationd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitd.lib;PocoFoundationd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\TestSuited.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>bin64\TestSuited.pdb</ProgramDatabaseFile>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -166,13 +166,13 @@
       </DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnit.lib;WinTestRunner.lib;PocoFoundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnit.lib;PocoFoundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\TestSuite.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ProgramDatabaseFile>
       </ProgramDatabaseFile>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
@@ -201,13 +201,13 @@
       </DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitmd.lib;WinTestRunnermd.lib;PocoFoundationmd.lib;WinTestRunner.res;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmd.lib;PocoFoundationmd.lib;WinTestRunner.res;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\static_md\TestSuite.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ProgramDatabaseFile>
       </ProgramDatabaseFile>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
@@ -231,12 +231,12 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitmdd.lib;WinTestRunnermdd.lib;PocoFoundationmdd.lib;WinTestRunner.res;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmdd.lib;PocoFoundationmdd.lib;WinTestRunner.res;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\static_md\TestSuited.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>bin64\static_md\TestSuited.pdb</ProgramDatabaseFile>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -258,13 +258,13 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitmtd.lib;WinTestRunnermtd.lib;PocoFoundationmtd.lib;WinTestRunner.res;iphlpapi.lib;winmm.lib;nafxcwd.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmtd.lib;PocoFoundationmtd.lib;WinTestRunner.res;iphlpapi.lib;winmm.lib;nafxcwd.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\static_mt\TestSuited.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>nafxcwd.lib;libcmtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>bin64\static_mt\TestSuited.pdb</ProgramDatabaseFile>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -292,14 +292,14 @@
       </DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitmt.lib;WinTestRunnermt.lib;PocoFoundationmt.lib;WinTestRunner.res;iphlpapi.lib;winmm.lib;nafxcw.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmt.lib;PocoFoundationmt.lib;WinTestRunner.res;iphlpapi.lib;winmm.lib;nafxcw.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\static_mt\TestSuite.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>nafxcw.lib;libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ProgramDatabaseFile>
       </ProgramDatabaseFile>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
@@ -315,6 +315,7 @@
     <ClCompile Include="src\CoreTestSuite.cpp" />
     <ClCompile Include="src\DirectoryIteratorsTest.cpp" />
     <ClCompile Include="src\DirectoryWatcherTest.cpp" />
+    <ClCompile Include="src\Driver.cpp" />
     <ClCompile Include="src\DynamicFactoryTest.cpp" />
     <ClCompile Include="src\FIFOBufferStreamTest.cpp" />
     <ClCompile Include="src\FormatTest.cpp" />
@@ -414,7 +415,6 @@
     <ClCompile Include="src\URITest.cpp" />
     <ClCompile Include="src\URITestSuite.cpp" />
     <ClCompile Include="src\FoundationTestSuite.cpp" />
-    <ClCompile Include="src\WinDriver.cpp" />
     <ClCompile Include="src\NamedEventTest.cpp" />
     <ClCompile Include="src\NamedMutexTest.cpp" />
     <ClCompile Include="src\ProcessesTestSuite.cpp" />

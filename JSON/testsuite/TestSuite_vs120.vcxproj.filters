@@ -15,7 +15,7 @@
     <ClCompile Include="src\JSONTestSuite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WinDriver.cpp">
+    <ClCompile Include="src\Driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

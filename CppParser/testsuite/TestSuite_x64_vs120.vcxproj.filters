@@ -56,14 +56,14 @@
     <ClCompile Include="src\CppParserTestSuite.cpp">
       <Filter>_Suite\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WinDriver.cpp">
-      <Filter>_Driver\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\AttributesParserTest.cpp">
       <Filter>Attributes\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\AttributesTestSuite.cpp">
       <Filter>Attributes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Driver.cpp">
+      <Filter>_Driver\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
