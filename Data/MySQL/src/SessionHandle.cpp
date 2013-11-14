@@ -36,17 +36,62 @@
 
 #include "Poco/Data/MySQL/SessionHandle.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/SingletonHolder.h"
+#ifdef POCO_OS_FAMILY_UNIX
+#include <pthread.h>
+#endif
+
 
 #define POCO_MYSQL_VERSION_NUMBER ((NDB_VERSION_MAJOR<<16) | (NDB_VERSION_MINOR<<8) | (NDB_VERSION_BUILD&0xFF))
+
 
 namespace Poco {
 namespace Data {
 namespace MySQL {
 
 
+#ifdef POCO_OS_FAMILY_UNIX
+class ThreadCleanupHelper
+{
+public:
+	ThreadCleanupHelper()
+	{
+		if (pthread_key_create(&_key, &ThreadCleanupHelper::cleanup) != 0)
+			throw Poco::SystemException("cannot create TLS key for mysql cleanup");
+	}
+	
+	void init()
+	{
+		if (pthread_setspecific(_key, reinterpret_cast<void*>(1)))
+			throw Poco::SystemException("cannot set TLS key for mysql cleanup");
+	}
+	
+	static ThreadCleanupHelper& instance()
+	{
+		return *_sh.get();
+	}
+	
+	static void cleanup(void* data)
+	{
+		mysql_thread_end();
+	}
+	
+private:
+	pthread_key_t _key;
+	static Poco::SingletonHolder<ThreadCleanupHelper> _sh;
+};
+
+
+Poco::SingletonHolder<ThreadCleanupHelper> ThreadCleanupHelper::_sh;
+#endif
+
+
 SessionHandle::SessionHandle(MYSQL* mysql): _pHandle(0)
 {
 	init(mysql);
+#ifdef POCO_OS_FAMILY_UNIX
+	ThreadCleanupHelper::instance().init();
+#endif
 }
 
 

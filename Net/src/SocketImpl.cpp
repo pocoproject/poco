@@ -1081,6 +1081,8 @@ void SocketImpl::error(int code, const std::string& arg)
 #if defined(POCO_OS_FAMILY_UNIX)
 	case EPIPE:
 		throw IOException("Broken pipe", code);
+	case EBADF:
+		throw IOException("Bad socket descriptor", code);
 #endif
 	default:
 		throw IOException(NumberFormatter::format(code), arg, code);

@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -108,7 +108,7 @@ public:
 		
 protected:
 	static bool containsWildcards(const std::string& commonName);
-	static bool matchByAlias(const std::string& alias, const HostEntry& heData);
+	static bool matchByAlias(const std::string& alias, const std::string& hostName);
 	
 private:
 	enum
