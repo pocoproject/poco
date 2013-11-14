@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketImpl.cpp#9 $
+// $Id: //poco/1.4/Net/src/SocketImpl.cpp#10 $
 //
 // Library: Net
 // Package: Sockets
@@ -959,7 +959,7 @@ void SocketImpl::error(int code, const std::string& arg)
 	case POCO_EFAULT:
 		throw IOException("Bad address", code);
 	case POCO_EINVAL:
-		throw InvalidArgumentException(code);
+		throw SystemException("Invalid argument", code);
 	case POCO_EMFILE:
 		throw IOException("Too many open files", code);
 	case POCO_EWOULDBLOCK:
@@ -1021,6 +1021,8 @@ void SocketImpl::error(int code, const std::string& arg)
 #if defined(POCO_OS_FAMILY_UNIX)
 	case EPIPE:
 		throw IOException("Broken pipe", code);
+	case EBADF:
+		throw IOException("Bad socket descriptor", code);
 #endif
 	default:
 		throw IOException(NumberFormatter::format(code), arg, code);

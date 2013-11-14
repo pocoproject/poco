@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/X509Certificate.cpp#2 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/X509Certificate.cpp#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -107,51 +107,47 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 	std::string commonName;
 	std::set<std::string> dnsNames;
 	certificate.extractNames(commonName, dnsNames);
+	if (!commonName.empty()) dnsNames.insert(commonName);
 	bool ok = (dnsNames.find(hostName) != dnsNames.end());
-
-	char buffer[NAME_BUFFER_SIZE];
-	X509_NAME* subj = 0;
-	if (!ok && (subj = X509_get_subject_name(const_cast<X509*>(certificate.certificate()))) && X509_NAME_get_text_by_NID(subj, NID_commonName, buffer, sizeof(buffer)) > 0)
+	if (!ok)
 	{
-		buffer[NAME_BUFFER_SIZE - 1] = 0;
-		std::string commonName(buffer); // commonName can contain wildcards like *.appinf.com
-		try
+		for (std::set<std::string>::const_iterator it = dnsNames.begin(); !ok && it != dnsNames.end(); ++it)
 		{
-			// two cases: strData contains wildcards or not
-			if (containsWildcards(commonName))
+			try
 			{
-				// a compare by IPAddress is not possible with wildcards
-				// only allow compare by name
-				const HostEntry& heData = DNS::resolve(hostName);
-				ok = matchByAlias(commonName, heData);
-			}
-			else
-			{
-				// it depends on hostName if we compare by IP or by alias
-				IPAddress ip;
-				if (IPAddress::tryParse(hostName, ip))
+				// two cases: strData contains wildcards or not
+				if (containsWildcards(*it))
 				{
-					// compare by IP
-					const HostEntry& heData = DNS::resolve(commonName);
-					const HostEntry::AddressList& addr = heData.addresses();
-					HostEntry::AddressList::const_iterator it = addr.begin();
-					HostEntry::AddressList::const_iterator itEnd = addr.end();
-					for (; it != itEnd && !ok; ++it)
-					{
-						ok = (*it == ip);
-					}
+					// a compare by IPAddress is not possible with wildcards
+					// only allow compare by name
+					ok = matchByAlias(*it, hostName);
 				}
 				else
 				{
-					// compare by name
-					const HostEntry& heData = DNS::resolve(hostName);
-					ok = matchByAlias(commonName, heData);
+					// it depends on hostName if we compare by IP or by alias
+					IPAddress ip;
+					if (IPAddress::tryParse(hostName, ip))
+					{
+						// compare by IP
+						const HostEntry& heData = DNS::resolve(*it);
+						const HostEntry::AddressList& addr = heData.addresses();
+						HostEntry::AddressList::const_iterator it = addr.begin();
+						HostEntry::AddressList::const_iterator itEnd = addr.end();
+						for (; it != itEnd && !ok; ++it)
+						{
+							ok = (*it == ip);
+						}
+					}
+					else
+					{
+						// compare by name
+						ok = matchByAlias(*it, hostName);
+					}
 				}
 			}
-		}
-		catch (HostNotFoundException&)
-		{
-			return false;
+			catch (HostNotFoundException&)
+			{
+			}
 		}
 	}
 	return ok;
@@ -164,8 +160,9 @@ bool X509Certificate::containsWildcards(const std::string& commonName)
 }
 
 
-bool X509Certificate::matchByAlias(const std::string& alias, const HostEntry& heData)
+bool X509Certificate::matchByAlias(const std::string& alias, const std::string& hostName)
 {
+	const HostEntry& heData = DNS::resolve(hostName);
 	// fix wildcards
 	std::string aliasRep = Poco::replace(alias, ".", "\\.");
 	Poco::replaceInPlace(aliasRep, "*", ".*");
@@ -183,10 +180,15 @@ bool X509Certificate::matchByAlias(const std::string& alias, const HostEntry& he
 		found = expr.match(*it);
 	}
 	// Handle the case where the list of aliases is empty.
-	if (aliases.empty())
+	if (!found)
 	{
-		// Compare the host name against the wildcard host name in the certificate.
+		// Compare the resolved host name against the wildcard host name in the certificate.
 		found = expr.match(heData.name());
+	}
+	if (!found)
+	{
+		// Compare the original host name against the wildcard host name in the certificate.
+		found = expr.match(hostName);
 	}
 	return found;
 }
