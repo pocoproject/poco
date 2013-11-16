@@ -1,7 +1,7 @@
 //
 // Twitter.cpp
 //
-// $Id: //poco/1.4/Net/samples/TwitterClient/src/Twitter.cpp#2 $
+// $Id: //poco/1.4/Net/samples/TwitterClient/src/Twitter.cpp#3 $
 //
 // A C++ implementation of a Twitter client based on the POCO Net library.
 //
@@ -169,6 +169,7 @@ std::string Twitter::createNonce() const
 	{
 		base64Encoder.put(randomStream.get());
 	}
+	base64Encoder.close();
 	std::string nonce = base64Nonce.str();
 	return Poco::translate(nonce, "+/=", "");
 }
