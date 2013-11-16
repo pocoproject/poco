@@ -1,11 +1,11 @@
 //
 // TwitterApp.cpp
 //
-// $Id: //poco/1.4/Net/samples/TwitterClient/src/TweetApp.cpp#1 $
+// $Id: //poco/1.4/Net/samples/TwitterClient/src/TweetApp.cpp#2 $
 //
 // A very simple command-line Twitter client.
 //
-// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009-2013, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -69,25 +69,39 @@ protected:
 				.callback(OptionCallback<TweetApp>(this, &TweetApp::handleHelp)));
 
 		options.addOption(
-			Option("username", "u", "specify the Twitter user/account name")
+			Option("message", "m", "specify the status message to post")
 				.required(true)
 				.repeatable(false)
-				.argument("account")
-				.callback(OptionCallback<TweetApp>(this, &TweetApp::handleUsername)));
-				
-		options.addOption(
-			Option("password", "p", "specify the Twitter password")
-				.required(true)
-				.repeatable(false)
-				.argument("password")
-				.callback(OptionCallback<TweetApp>(this, &TweetApp::handlePassword)));
-
-		options.addOption(
-			Option("message", "m", "specify the status message")
-				.required(false)
-				.repeatable(true)
 				.argument("message")
 				.callback(OptionCallback<TweetApp>(this, &TweetApp::handleMessage)));
+				
+		options.addOption(
+			Option("ckey", "c", "specify the Twitter consumer key")
+				.required(true)
+				.repeatable(false)
+				.argument("consumer key")
+				.callback(OptionCallback<TweetApp>(this, &TweetApp::handleConsumerKey)));
+				
+		options.addOption(
+			Option("csecret", "s", "specify the Twitter consumer secret")
+				.required(true)
+				.repeatable(false)
+				.argument("consumer secret")
+				.callback(OptionCallback<TweetApp>(this, &TweetApp::handleConsumerSecret)));
+
+		options.addOption(
+			Option("token", "t", "specify the Twitter access token")
+				.required(false)
+				.repeatable(true)
+				.argument("access token")
+				.callback(OptionCallback<TweetApp>(this, &TweetApp::handleAccessToken)));
+
+		options.addOption(
+			Option("tsecret", "S", "specify the Twitter access token secret")
+				.required(false)
+				.repeatable(true)
+				.argument("access token secret")
+				.callback(OptionCallback<TweetApp>(this, &TweetApp::handleAccessTokenSecret)));
 	}
 	
 	void handleHelp(const std::string& name, const std::string& value)
@@ -96,21 +110,31 @@ protected:
 		stopOptionsProcessing();
 	}
 	
-	void handleUsername(const std::string& name, const std::string& value)
+	void handleConsumerKey(const std::string& name, const std::string& value)
 	{
-		_username = value;
+		_consumerKey = value;
 	}
 	
-	void handlePassword(const std::string& name, const std::string& value)
+	void handleConsumerSecret(const std::string& name, const std::string& value)
 	{
-		_password = value;
+		_consumerSecret = value;
+	}
+
+	void handleAccessToken(const std::string& name, const std::string& value)
+	{
+		_accessToken = value;
+	}
+
+	void handleAccessTokenSecret(const std::string& name, const std::string& value)
+	{
+		_accessTokenSecret = value;
 	}
 	
 	void handleMessage(const std::string& name, const std::string& value)
 	{
 		try
 		{
-			_twitter.login(_username, _password);
+			_twitter.login(_consumerKey, _consumerSecret, _accessToken, _accessTokenSecret);
 			Poco::Int64 statusId = _twitter.update(value);
 			std::cout << statusId << std::endl;
 		}
@@ -136,8 +160,10 @@ protected:
 	}
 
 private:
-	std::string _username;
-	std::string _password;
+	std::string _consumerKey;
+	std::string _consumerSecret;
+	std::string _accessToken;
+	std::string _accessTokenSecret;
 	Twitter _twitter;
 	int _status;
 };
