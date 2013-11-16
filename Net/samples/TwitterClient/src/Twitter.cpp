@@ -161,6 +161,7 @@ std::string Twitter::createNonce() const
 	{
 		base64Encoder.put(randomStream.get());
 	}
+	base64Encoder.close();
 	std::string nonce = base64Nonce.str();
 	return Poco::translate(nonce, "+/=", "");
 }
