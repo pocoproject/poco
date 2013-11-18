@@ -177,7 +177,17 @@ public:
 		/// Returns the source file line of the statement
 		/// generating the log message. May be 0
 		/// if not set.
-		
+
+    const std::string* findProperty(const std::string& param) const;
+		/// Returns a const pointer to the value of the parameter
+		/// with the given name. Returns nullptr if the
+		/// parameter does not exist.
+        ///
+        /// This method offers a slight performance gain over operator[] since
+        /// it doesn't throw an exception. It also helps by not getting trapped
+        /// on debug exception breakpoints.
+
+
 	const std::string& operator [] (const std::string& param) const;
 		/// Returns a const reference to the value of the parameter
 		/// with the given name. Throws a NotFoundException if the

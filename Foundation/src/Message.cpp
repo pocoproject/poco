@@ -240,4 +240,17 @@ std::string& Message::operator [] (const std::string& param)
 }
 
 
+const std::string* Message::findProperty(const std::string& param) const
+{
+	if (_pMap)
+    {
+        StringMap::const_iterator it = _pMap->find(param);
+		if (it == _pMap->end())
+            return 0;
+        return &it->second;
+    }
+	else
+		return 0;
+}
+
 } // namespace Poco
