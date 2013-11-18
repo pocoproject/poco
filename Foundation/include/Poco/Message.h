@@ -177,7 +177,24 @@ public:
 		/// Returns the source file line of the statement
 		/// generating the log message. May be 0
 		/// if not set.
-		
+
+	bool has(const std::string& param) const;
+		/// Returns true if a parameter with the given name exists.
+
+	const std::string& get(const std::string& param) const;
+		/// Returns a const reference to the value of the parameter
+		/// with the given name. Throws a NotFoundException if the
+		/// parameter does not exist.
+
+	const std::string& get(const std::string& param, const std::string& defaultValue) const;
+		/// Returns a const reference to the value of the parameter
+		/// with the given name. If the parameter with the given name
+		/// does not exist, then defaultValue is returned.
+
+	void set(const std::string& param, const std::string& value);
+		/// Sets the value for a parameter. If the parameter does
+		/// not exist, then it is created.
+
 	const std::string& operator [] (const std::string& param) const;
 		/// Returns a const reference to the value of the parameter
 		/// with the given name. Throws a NotFoundException if the

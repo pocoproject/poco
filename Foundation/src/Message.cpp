@@ -223,6 +223,52 @@ void Message::setSourceLine(int line)
 }
 
 
+bool Message::has(const std::string& param) const
+{
+	return _pMap && (_pMap->find(param) != _pMap->end());
+}
+
+
+const std::string& Message::get(const std::string& param) const
+{
+	if (_pMap)
+	{
+		StringMap::const_iterator it = _pMap->find(param);
+		if (it != _pMap->end())
+	 		return it->second;
+	}
+
+	throw NotFoundException();
+}
+
+
+const std::string& Message::get(const std::string& param, const std::string& defaultValue) const
+{
+	if (_pMap)
+	{
+		StringMap::const_iterator it = _pMap->find(param);
+		if (it != _pMap->end())
+	 		return it->second;
+	}
+
+	return defaultValue;
+}
+
+
+void Message::set(const std::string& param, const std::string& value)
+{
+	if (!_pMap)
+		_pMap = new StringMap;
+
+	std::pair<StringMap::iterator, bool> result =
+		_pMap->insert(std::make_pair(param, value));
+	if (!result.second)
+	{
+		result.first->second = value;
+	}
+}
+
+
 const std::string& Message::operator [] (const std::string& param) const
 {
 	if (_pMap)
