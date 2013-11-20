@@ -287,7 +287,7 @@ void ColorConsoleChannel::initColors()
 	_colors[Message::PRIO_NOTICE]      = CC_DEFAULT;
 	_colors[Message::PRIO_INFORMATION] = CC_DEFAULT;
 	_colors[Message::PRIO_DEBUG]       = CC_GRAY;
-	_colors[Message::PRIO_FATAL]       = CC_GRAY;
+	_colors[Message::PRIO_TRACE]       = CC_GRAY;
 }
 
 
