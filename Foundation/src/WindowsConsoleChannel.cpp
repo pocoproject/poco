@@ -317,7 +317,7 @@ void WindowsColorConsoleChannel::initColors()
 	_colors[Message::PRIO_NOTICE]      = _colors[0];
 	_colors[Message::PRIO_INFORMATION] = _colors[0];
 	_colors[Message::PRIO_DEBUG]       = CC_GRAY;
-	_colors[Message::PRIO_FATAL]       = CC_GRAY;
+	_colors[Message::PRIO_TRACE]       = CC_GRAY;
 }
 
 
