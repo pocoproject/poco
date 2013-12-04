@@ -74,6 +74,16 @@ void CountingStreamTest::testInput()
 	assert (ci3.lines() == 2);
 	assert (ci3.chars() == 8);
 	assert (ci3.pos() == 0);
+
+	std::istringstream istr4("foo");
+	CountingInputStream ci4(istr4);
+	while (ci4.good()) ci4.get(c);
+	ci4.addChars(10);
+	ci4.addLines(2);
+	ci4.addPos(3);
+	assert (ci4.lines() == 1 + 2);
+	assert (ci4.chars() == 3 + 10);
+	assert (ci4.pos() == 3 + 3);
 }
 
 
@@ -100,6 +110,16 @@ void CountingStreamTest::testOutput()
 	assert (co3.lines() == 2);
 	assert (co3.chars() == 8);
 	assert (co3.pos() == 0);
+
+	std::ostringstream ostr4;
+	CountingOutputStream co4(ostr4);
+	co4 << "foo";
+	co4.addChars(10);
+	co4.addLines(2);
+	co4.addPos(3);
+	assert (co4.lines() == 1 + 2);
+	assert (co4.chars() == 3 + 10);
+	assert (co4.pos() == 3 + 3);
 }
 
 

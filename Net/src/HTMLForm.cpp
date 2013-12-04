@@ -47,6 +47,7 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/URI.h"
 #include "Poco/String.h"
+#include "Poco/CountingStream.h"
 #include <sstream>
 
 
@@ -61,8 +62,21 @@ namespace Poco {
 namespace Net {
 
 
-const std::string HTMLForm::ENCODING_URL       = "application/x-www-form-urlencoded";
-const std::string HTMLForm::ENCODING_MULTIPART = "multipart/form-data";
+const std::string HTMLForm::ENCODING_URL				= "application/x-www-form-urlencoded";
+const std::string HTMLForm::ENCODING_MULTIPART			= "multipart/form-data";
+const int         HTMLForm::UNKNOWN_CONTENT_LENGTH		= -1;
+
+
+class HTMLFormCountingOutputStream : public CountingOutputStream
+{
+public:
+	HTMLFormCountingOutputStream() : _isvalid(true)  {}
+
+	bool getIsValid() const { return _isvalid; }
+	void setIsValid(bool v) { _isvalid = v; }
+private:
+	bool _isvalid;
+};
 
 
 HTMLForm::HTMLForm():
@@ -237,6 +251,20 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 }
 
 
+std::streamsize HTMLForm::calculateContentLength()
+{
+	if (_boundary.empty())
+		throw HTMLFormException("Form must be prepared");
+
+	HTMLFormCountingOutputStream c;
+	write(c);
+	if (c.getIsValid())
+		return c.chars();
+	else
+		return UNKNOWN_CONTENT_LENGTH;
+}
+
+
 void HTMLForm::write(std::ostream& ostr, const std::string& boundary)
 {
 	if (_encoding == ENCODING_URL)
@@ -358,6 +386,8 @@ void HTMLForm::writeUrl(std::ostream& ostr)
 
 void HTMLForm::writeMultipart(std::ostream& ostr)
 {
+	HTMLFormCountingOutputStream *costr(dynamic_cast<HTMLFormCountingOutputStream*>(&ostr));
+
 	MultipartWriter writer(ostr, _boundary);
 	for (NameValueCollection::ConstIterator it = begin(); it != end(); ++it)
 	{
@@ -385,7 +415,17 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 		header.set("Content-Disposition", disp);
 		header.set("Content-Type", ita->pSource->mediaType());
 		writer.nextPart(header);
-		StreamCopier::copyStream(ita->pSource->stream(), ostr);
+		if (costr)
+		{
+			// count only, don't move stream position
+			std::streamsize partlen = ita->pSource->getContentLength();
+			if (partlen != PartSource::UNKNOWN_CONTENT_LENGTH)
+				costr->addChars(partlen);
+			else
+				costr->setIsValid(false);
+		}
+		else
+			StreamCopier::copyStream(ita->pSource->stream(), ostr);
 	}
 	writer.close();
 	_boundary = writer.boundary();

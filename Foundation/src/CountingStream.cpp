@@ -116,6 +116,24 @@ void CountingStreamBuf::setCurrentLineNumber(int line)
 }
 
 
+void CountingStreamBuf::addChars(int chars)
+{
+	_chars += chars;
+}
+
+		
+void CountingStreamBuf::addLines(int lines)
+{
+	_lines += lines;
+}
+
+		
+void CountingStreamBuf::addPos(int pos)
+{
+	_pos += pos;
+}
+
+
 CountingIOS::CountingIOS()
 {
 	poco_ios_init(&_buf);
@@ -148,6 +166,24 @@ void CountingIOS::reset()
 void CountingIOS::setCurrentLineNumber(int line)
 {
 	_buf.setCurrentLineNumber(line);
+}
+
+
+void CountingIOS::addChars(int chars)
+{
+	_buf.addChars(chars);
+}
+
+		
+void CountingIOS::addLines(int lines)
+{
+	_buf.addLines(lines);
+}
+
+		
+void CountingIOS::addPos(int pos)
+{
+	_buf.addPos(pos);
 }
 
 

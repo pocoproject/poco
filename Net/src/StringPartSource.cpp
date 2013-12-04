@@ -80,4 +80,10 @@ const std::string& StringPartSource::filename() const
 }
 
 
+std::streamsize StringPartSource::getContentLength() const
+{
+	return _istr.str().length();
+}
+
+
 } } // namespace Poco::Net

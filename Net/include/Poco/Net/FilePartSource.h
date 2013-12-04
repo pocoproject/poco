@@ -83,7 +83,11 @@ public:
 	const std::string& filename() const;
 		/// Returns the filename portion of the path.
 
+	std::streamsize getContentLength() const;
+		/// Returns the file size.
+
 private:
+	std::string _path;
 	std::string _filename;
 	Poco::FileInputStream _istr;
 };

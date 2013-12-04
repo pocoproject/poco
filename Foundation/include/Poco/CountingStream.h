@@ -89,6 +89,15 @@ public:
 	int getCurrentLineNumber() const;
 		/// Returns the current line number (same as lines()).
 
+	void addChars(int chars);
+		/// Add to the total number of characters.
+		
+	void addLines(int lines);
+		/// Add to the total number of lines.
+		
+	void addPos(int pos);
+		/// Add to the number of characters on the current line.
+
 protected:
 	int readFromDevice();
 	int writeToDevice(char c);
@@ -143,6 +152,15 @@ public:
 		
 	int getCurrentLineNumber() const;
 		/// Returns the current line number (same as lines()).
+
+	void addChars(int chars);
+		/// Add to the total number of characters.
+		
+	void addLines(int lines);
+		/// Add to the total number of lines.
+		
+	void addPos(int pos);
+		/// Add to the number of characters on the current line.
 
 	CountingStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
