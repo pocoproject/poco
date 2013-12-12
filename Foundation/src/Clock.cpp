@@ -1,7 +1,7 @@
 //
 // Clock.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Clock.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Clock.cpp#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -36,6 +36,7 @@
 
 #include "Poco/Clock.h"
 #include "Poco/Exception.h"
+#include "Poco/Timestamp.h"
 #if defined(__MACH__)
 #include <mach/mach.h>
 #include <mach/clock.h>
@@ -130,7 +131,7 @@ void Clock::update()
 #endif
 	_clock = ClockVal(ts.tv_sec)*resolution() + ts.tv_nsec/1000;
 
-#elif defined(_POSIX_TIMERS) && defined(_POSIX_MONOTONIC_CLOCK)
+#elif (defined(_POSIX_TIMERS) && defined(_POSIX_MONOTONIC_CLOCK)) || defined(__QNX__)
 
 	struct timespec ts;
 	if (clock_gettime(CLOCK_MONOTONIC, &ts))
