@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.4/Util/src/Timer.cpp#1 $
+// $Id: //poco/1.4/Util/src/Timer.cpp#2 $
 //
 // Library: Util
 // Package: Timer
@@ -187,9 +187,9 @@ public:
 
 		if (!task()->isCancelled())
 		{
-			Poco::Timestamp now;
-			Poco::Timestamp nextExecution;
-			nextExecution += static_cast<Poco::Timestamp::TimeDiff>(_interval)*1000;
+			Poco::Clock now;
+			Poco::Clock nextExecution;
+			nextExecution += static_cast<Poco::Clock::ClockDiff>(_interval)*1000;
 			if (nextExecution < now) nextExecution = now;
 			queue().enqueueNotification(this, nextExecution);
 			duplicate();
@@ -205,10 +205,10 @@ private:
 class FixedRateTaskNotification: public TaskNotification
 {
 public:
-	FixedRateTaskNotification(Poco::TimedNotificationQueue& queue, TimerTask::Ptr pTask, long interval, Poco::Timestamp time):
+	FixedRateTaskNotification(Poco::TimedNotificationQueue& queue, TimerTask::Ptr pTask, long interval, Poco::Clock clock):
 		TaskNotification(queue, pTask),
 		_interval(interval),
-		_nextExecution(time)
+		_nextExecution(clock)
 	{
 	}
 	
@@ -222,8 +222,8 @@ public:
 
 		if (!task()->isCancelled())
 		{
-			Poco::Timestamp now;
-			_nextExecution += static_cast<Poco::Timestamp::TimeDiff>(_interval)*1000;
+			Poco::Clock now;
+			_nextExecution += static_cast<Poco::Clock::ClockDiff>(_interval)*1000;
 			if (_nextExecution < now) _nextExecution = now;
 			queue().enqueueNotification(this, _nextExecution);
 			duplicate();
@@ -233,7 +233,7 @@ public:
 	
 private:
 	long _interval;
-	Poco::Timestamp _nextExecution;
+	Poco::Clock _nextExecution;
 };
 
 
@@ -252,7 +252,7 @@ Timer::Timer(Poco::Thread::Priority priority)
 
 Timer::~Timer()
 {
-	_queue.enqueueNotification(new StopNotification(_queue), 0);
+	_queue.enqueueNotification(new StopNotification(_queue), Poco::Clock(0));
 	_thread.join();
 }
 
@@ -260,7 +260,7 @@ Timer::~Timer()
 void Timer::cancel(bool wait)
 {
 	Poco::AutoPtr<CancelNotification> pNf = new CancelNotification(_queue);
-	_queue.enqueueNotification(pNf, 0);
+	_queue.enqueueNotification(pNf, Poco::Clock(0));
 	if (wait)
 	{
 		pNf->wait();
@@ -273,12 +273,18 @@ void Timer::schedule(TimerTask::Ptr pTask, Poco::Timestamp time)
 	_queue.enqueueNotification(new TaskNotification(_queue, pTask), time);
 }
 
+
+void Timer::schedule(TimerTask::Ptr pTask, Poco::Clock clock)
+{
+	_queue.enqueueNotification(new TaskNotification(_queue, pTask), clock);
+}
+
 	
 void Timer::schedule(TimerTask::Ptr pTask, long delay, long interval)
 {
-	Poco::Timestamp time;
-	time += static_cast<Poco::Timestamp::TimeDiff>(delay)*1000;
-	schedule(pTask, time, interval);
+	Poco::Clock clock;
+	clock += static_cast<Poco::Clock::ClockDiff>(delay)*1000;
+	schedule(pTask, clock, interval);
 }
 
 
@@ -287,18 +293,34 @@ void Timer::schedule(TimerTask::Ptr pTask, Poco::Timestamp time, long interval)
 	_queue.enqueueNotification(new PeriodicTaskNotification(_queue, pTask, interval), time);
 }
 
+
+void Timer::schedule(TimerTask::Ptr pTask, Poco::Clock clock, long interval)
+{
+	_queue.enqueueNotification(new PeriodicTaskNotification(_queue, pTask, interval), clock);
+}
+
 	
 void Timer::scheduleAtFixedRate(TimerTask::Ptr pTask, long delay, long interval)
 {
-	Poco::Timestamp time;
-	time += static_cast<Poco::Timestamp::TimeDiff>(delay)*1000;
-	scheduleAtFixedRate(pTask, time, interval);
+	Poco::Clock clock;
+	clock += static_cast<Poco::Clock::ClockDiff>(delay)*1000;
+	scheduleAtFixedRate(pTask, clock, interval);
 }
 
 
 void Timer::scheduleAtFixedRate(TimerTask::Ptr pTask, Poco::Timestamp time, long interval)
 {
-	_queue.enqueueNotification(new FixedRateTaskNotification(_queue, pTask, interval, time), time);
+	Poco::Timestamp tsNow;
+	Poco::Clock clock;
+	Poco::Timestamp::TimeDiff diff = time - tsNow;
+	clock += diff;
+	_queue.enqueueNotification(new FixedRateTaskNotification(_queue, pTask, interval, clock), clock);
+}
+
+
+void Timer::scheduleAtFixedRate(TimerTask::Ptr pTask, Poco::Clock clock, long interval)
+{
+	_queue.enqueueNotification(new FixedRateTaskNotification(_queue, pTask, interval, clock), clock);
 }
 
 
