@@ -756,6 +756,9 @@
     <ClCompile Include="src\UUIDGenerator.cpp">
       <Filter>UUID\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Clock.cpp">
+      <Filter>DateTime\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\DateTime.cpp">
       <Filter>DateTime\Source Files</Filter>
     </ClCompile>
@@ -1579,6 +1582,9 @@
     </ClInclude>
     <ClInclude Include="include\Poco\UUIDGenerator.h">
       <Filter>UUID\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Clock.h">
+      <Filter>DateTime\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\DateTime.h">
       <Filter>DateTime\Header Files</Filter>

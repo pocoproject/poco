@@ -932,6 +932,7 @@
     </ClCompile>
     <ClCompile Include="src\UUID.cpp" />
     <ClCompile Include="src\UUIDGenerator.cpp" />
+    <ClCompile Include="src\Clock.cpp" />
     <ClCompile Include="src\DateTime.cpp" />
     <ClCompile Include="src\DateTimeFormat.cpp" />
     <ClCompile Include="src\DateTimeFormatter.cpp" />
@@ -1234,6 +1235,7 @@
     <ClInclude Include="include\Poco\SharedMemory_WIN32.h" />
     <ClInclude Include="include\Poco\UUID.h" />
     <ClInclude Include="include\Poco\UUIDGenerator.h" />
+    <ClInclude Include="include\Poco\Clock.h" />
     <ClInclude Include="include\Poco\DateTime.h" />
     <ClInclude Include="include\Poco\DateTimeFormat.h" />
     <ClInclude Include="include\Poco\DateTimeFormatter.h" />

@@ -417,6 +417,9 @@
     <ClCompile Include="src\UUIDTestSuite.cpp">
       <Filter>UUID\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ClockTest.cpp">
+      <Filter>DateTime\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\DateTimeFormatterTest.cpp">
       <Filter>DateTime\Source Files</Filter>
     </ClCompile>
@@ -820,6 +823,9 @@
     </ClInclude>
     <ClInclude Include="src\UUIDTestSuite.h">
       <Filter>UUID\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ClockTest.h">
+      <Filter>DateTime\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DateTimeFormatterTest.h">
       <Filter>DateTime\Header Files</Filter>

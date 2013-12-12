@@ -4170,6 +4170,9 @@
 				Name="Source Files"
 				Filter="">
 				<File
+					RelativePath=".\src\Clock.cpp">
+				</File>
+				<File
 					RelativePath=".\src\DateTime.cpp">
 				</File>
 				<File
@@ -4278,6 +4281,9 @@
 			<Filter
 				Name="Header Files"
 				Filter="">
+				<File
+					RelativePath=".\include\Poco\Clock.h">
+				</File>
 				<File
 					RelativePath=".\include\Poco\DateTime.h">
 				</File>

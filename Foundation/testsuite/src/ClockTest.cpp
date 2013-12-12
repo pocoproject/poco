@@ -1,13 +1,9 @@
 //
-// Stopwatch.cpp
+// ClockTest.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Stopwatch.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ClockTest.cpp#1 $
 //
-// Library: Foundation
-// Package: DateTime
-// Module:  Stopwatch
-//
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2013, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -34,49 +30,78 @@
 //
 
 
-#include "Poco/Stopwatch.h"
+#include "ClockTest.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
+#include "Poco/Clock.h"
+#include "Poco/Thread.h"
+#include <iostream>
 
 
-namespace Poco {
+using Poco::Clock;
+using Poco::Thread;
 
 
-Stopwatch::Stopwatch(): _elapsed(0), _running(false)
+ClockTest::ClockTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
 
-Stopwatch::~Stopwatch()
+ClockTest::~ClockTest()
 {
 }
 
 
-Clock::ClockDiff Stopwatch::elapsed() const
+void ClockTest::testClock()
 {
-	if (_running)
-	{
-		Clock current;
-		return _elapsed + (current - _start);
-	}
-	else
-	{
-		return _elapsed;
-	}
+	Clock t1;
+	Thread::sleep(200);
+	Clock t2;
+	Clock t3 = t2;
+	assert (t1 != t2);
+	assert (!(t1 == t2));
+	assert (t2 > t1);
+	assert (t2 >= t1);
+	assert (!(t1 > t2));
+	assert (!(t1 >= t2));
+	assert (t2 == t3);
+	assert (!(t2 != t3));
+	assert (t2 >= t3);
+	assert (t2 <= t3);
+	Clock::ClockDiff d = (t2 - t1);
+	assert (d >= 180000 && d <= 300000);
+	
+	Clock::ClockDiff acc = Clock::accuracy();
+	assert (acc > 0 && acc < Clock::resolution());
+	std::cout << "Clock accuracy: " << acc << std::endl;
+	
+	t1.swap(t2);
+	assert (t1 > t2);
+	t2.swap(t1);
+	
+	Clock now;
+	Thread::sleep(201);
+	assert (now.elapsed() >= 200000);
+	assert (now.isElapsed(200000));
+	assert (!now.isElapsed(2000000));
 }
 
 
-void Stopwatch::reset()
+void ClockTest::setUp()
 {
-	_elapsed = 0;
-	_running = false;
 }
 
 
-void Stopwatch::restart()
+void ClockTest::tearDown()
 {
-	_elapsed = 0;
-	_start.update();
-	_running = true;
 }
 
 
-} // namespace Poco
+CppUnit::Test* ClockTest::suite()
+{
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ClockTest");
+
+	CppUnit_addTest(pSuite, ClockTest, testClock);
+
+	return pSuite;
+}

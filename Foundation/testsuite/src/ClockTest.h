@@ -1,11 +1,9 @@
 //
-// Stopwatch.cpp
+// ClockTest.h
 //
-// $Id: //poco/1.4/Foundation/src/Stopwatch.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ClockTest.h#1 $
 //
-// Library: Foundation
-// Package: DateTime
-// Module:  Stopwatch
+// Definition of the ClockTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,49 +32,29 @@
 //
 
 
-#include "Poco/Stopwatch.h"
+#ifndef ClockTest_INCLUDED
+#define ClockTest_INCLUDED
 
 
-namespace Poco {
+#include "Poco/Foundation.h"
+#include "CppUnit/TestCase.h"
 
 
-Stopwatch::Stopwatch(): _elapsed(0), _running(false)
+class ClockTest: public CppUnit::TestCase
 {
-}
+public:
+	ClockTest(const std::string& name);
+	~ClockTest();
+
+	void testClock();
+
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
+private:
+};
 
 
-Stopwatch::~Stopwatch()
-{
-}
-
-
-Clock::ClockDiff Stopwatch::elapsed() const
-{
-	if (_running)
-	{
-		Clock current;
-		return _elapsed + (current - _start);
-	}
-	else
-	{
-		return _elapsed;
-	}
-}
-
-
-void Stopwatch::reset()
-{
-	_elapsed = 0;
-	_running = false;
-}
-
-
-void Stopwatch::restart()
-{
-	_elapsed = 0;
-	_start.update();
-	_running = true;
-}
-
-
-} // namespace Poco
+#endif // ClockTest_INCLUDED

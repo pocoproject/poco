@@ -410,6 +410,7 @@
     <ClCompile Include="src\UUIDGeneratorTest.cpp" />
     <ClCompile Include="src\UUIDTest.cpp" />
     <ClCompile Include="src\UUIDTestSuite.cpp" />
+    <ClCompile Include="src\ClockTest.cpp" />
     <ClCompile Include="src\DateTimeFormatterTest.cpp" />
     <ClCompile Include="src\DateTimeParserTest.cpp" />
     <ClCompile Include="src\DateTimeTest.cpp" />
@@ -545,6 +546,7 @@
     <ClInclude Include="src\UUIDGeneratorTest.h" />
     <ClInclude Include="src\UUIDTest.h" />
     <ClInclude Include="src\UUIDTestSuite.h" />
+    <ClInclude Include="src\ClockTest.h" />
     <ClInclude Include="src\DateTimeFormatterTest.h" />
     <ClInclude Include="src\DateTimeParserTest.h" />
     <ClInclude Include="src\DateTimeTest.h" />

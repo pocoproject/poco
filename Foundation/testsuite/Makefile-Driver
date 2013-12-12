@@ -11,7 +11,7 @@ include $(POCO_BASE)/build/rules/global
 objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	AutoPtrTest ArrayTest SharedPtrTest AutoReleasePoolTest \
 	Base32Test Base64Test BinaryReaderWriterTest LineEndingConverterTest \
-	ByteOrderTest ChannelTest ClassLoaderTest CoreTest CoreTestSuite \
+	ByteOrderTest ChannelTest ClassLoaderTest ClockTest CoreTest CoreTestSuite \
 	CountingStreamTest CryptTestSuite DateTimeFormatterTest \
 	DateTimeParserTest DateTimeTest LocalDateTimeTest DateTimeTestSuite DigestStreamTest \
 	Driver DynamicFactoryTest FPETest FileChannelTest FileTest GlobTest FilesystemTestSuite \

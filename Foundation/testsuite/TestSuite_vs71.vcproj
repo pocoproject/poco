@@ -1022,6 +1022,9 @@
 				Name="Source Files"
 				Filter="">
 				<File
+					RelativePath=".\src\ClockTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\DateTimeFormatterTest.cpp">
 				</File>
 				<File
@@ -1052,6 +1055,9 @@
 			<Filter
 				Name="Header Files"
 				Filter="">
+				<File
+					RelativePath=".\src\ClockTest.h">
+				</File>
 				<File
 					RelativePath=".\src\DateTimeFormatterTest.h">
 				</File>
