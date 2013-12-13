@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#5 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#11 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -146,7 +146,7 @@ void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespa
 	_pSocket->setSendTimeout(timeout);
 	connectSSL(performHandshake);
 	_pSocket->setReceiveTimeout(receiveTimeout);
-	_pSocket->setSendTimeout(sendTimeout);
+	_pSocket->setSendTimeout(sendTimeout);	
 }
 
 
@@ -155,6 +155,7 @@ void SecureSocketImpl::connectNB(const SocketAddress& address)
 	if (_pSSL) reset();
 	
 	poco_assert (!_pSSL);
+
 	_pSocket->connectNB(address);
 	connectSSL(false);
 }
@@ -231,12 +232,12 @@ void SecureSocketImpl::listen(int backlog)
 void SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
-	{
-		// Don't shut down the socket more than once.
-		int shutdownState = SSL_get_shutdown(_pSSL);
-		bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
-		if (!shutdownSent)
-		{
+	{        
+        // Don't shut down the socket more than once.
+        int shutdownState = SSL_get_shutdown(_pSSL);
+        bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
+        if (!shutdownSent)
+        {
 			// A proper clean shutdown would require us to
 			// retry the shutdown if we get a zero return
 			// value, until SSL_shutdown() returns 1.
@@ -246,7 +247,10 @@ void SecureSocketImpl::shutdown()
 			// done with it.
 			int rc = SSL_shutdown(_pSSL);
 			if (rc < 0) handleError(rc);
-			if (_pSocket->getBlocking()) _pSocket->shutdown();
+			if (_pSocket->getBlocking())
+			{
+				_pSocket->shutdown();
+			}
 		}
 	}
 }
@@ -254,7 +258,13 @@ void SecureSocketImpl::shutdown()
 
 void SecureSocketImpl::close()
 {
-	try { shutdown(); } catch (...) { }
+	try
+	{
+		shutdown();
+	}
+	catch (...)
+	{
+	}
 	_pSocket->close();
 }
 
@@ -403,12 +413,21 @@ int SecureSocketImpl::handleError(int rc)
 {
 	if (rc > 0) return rc;
 
-	int sslError = SSL_get_error(_pSSL, rc);	
+	int sslError = SSL_get_error(_pSSL, rc);
+	int error = SocketImpl::lastError();
+
 	switch (sslError)
 	{
 	case SSL_ERROR_ZERO_RETURN:
 		return 0;
 	case SSL_ERROR_WANT_READ:
+		if (_pSocket->getBlocking() && error != 0)
+		{
+			if (error == POCO_EAGAIN)
+				throw TimeoutException(error);
+			else
+				SocketImpl::error(error);
+		}
 		return SecureStreamSocket::ERR_SSL_WANT_READ;
 	case SSL_ERROR_WANT_WRITE:
 		return SecureStreamSocket::ERR_SSL_WANT_WRITE;
@@ -418,12 +437,22 @@ int SecureSocketImpl::handleError(int rc)
 		// these should not occur
 		poco_bugcheck();
 		return rc;
+	case SSL_ERROR_SYSCALL:
+		if (error != 0)
+		{
+			if (_pSocket->getBlocking() && error == POCO_EAGAIN)
+				throw TimeoutException(error);
+			else
+				SocketImpl::error(error);
+			return rc;
+		}
+		// fallthrough
 	default:
 		{
 			long lastError = ERR_get_error();
 			if (lastError == 0)
 			{
-				if (rc == 0)
+				if (rc == 0 || rc == -1)
 				{
 					throw SSLConnectionUnexpectedlyClosedException();
 				}
