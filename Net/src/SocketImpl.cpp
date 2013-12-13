@@ -324,7 +324,7 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 		if (err == POCO_EAGAIN && !_blocking)
 			;
 		else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
-			throw TimeoutException();
+			throw TimeoutException(err);
 		else
 			error(err);
 	}
@@ -380,7 +380,7 @@ int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, in
 		if (err == POCO_EAGAIN && !_blocking)
 			;
 		else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
-			throw TimeoutException();
+			throw TimeoutException(err);
 		else
 			error(err);
 	}
