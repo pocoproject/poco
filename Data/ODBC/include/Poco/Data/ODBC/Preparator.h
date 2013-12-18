@@ -1029,7 +1029,7 @@ inline void Preparator::prepare(std::size_t pos, const std::list<std::string>& v
 
 inline void Preparator::prepare(std::size_t pos, const Poco::Data::BLOB&)
 {
-	prepareVariableLen<Poco::Data::BLOB::ValueType>(pos, SQL_C_BINARY, maxDataSize(pos), DT_CHAR);
+	prepareVariableLen<Poco::Data::BLOB::ValueType>(pos, SQL_C_BINARY, maxDataSize(pos), DT_UCHAR);
 }
 
 
