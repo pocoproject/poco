@@ -8,6 +8,14 @@ Release 1.5.3 (2013-12-xx)
 - Poco::Data::MySQL: added SQLite thread cleanup handler
 - Poco::Net::X509Certificate: improved and fixed domain name verification for 
   wildcard domains
+- added Poco::Clock class, which uses a system-provided monotonic clock
+  (if available) and is thus not affected by system realtime clock changes.
+  Monotonic Clock is available on Windows, Linux, OS X and on POSIX platforms
+  supporting clock_gettime() and CLOCK_MONOTONIC.	  
+- Poco::Timer, Poco::Stopwatch, Poco::TimedNotificationQueue and Poco::Util::Timer
+  have been changed to use Poco::Clock instead of Poco::Timestamp and are now
+  unaffected by system realtime clock changes.
+- fixed GH# 350: Memory leak in Data/ODBC with BLOB
 
 
 Release 1.5.2 (2013-09-16)
