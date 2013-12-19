@@ -98,7 +98,6 @@ public:
 	virtual bool extract(std::size_t pos, long& val);
 		/// Extracts a long. Returns false if null was received.
 
-
 	virtual bool extract(std::size_t pos, unsigned long& val);
 		/// Extracts an unsigned long. Returns false if null was received.
 #endif
@@ -342,7 +341,7 @@ public:
 	
 private:
 
-	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, std::size_t length = 0, bool isUnsigned = false);
+	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, bool isUnsigned = false);
 
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=(const Extractor&);
