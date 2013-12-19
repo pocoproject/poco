@@ -348,13 +348,13 @@ public:
 		/// Returns true if statement is in a state that allows the internal storage to be modified.
 
 	Storage storage() const;
-		/// Returns the internal storage type for the stamement.
+		/// Returns the internal storage type for the statement.
 
 	void setStorage(const std::string& storage);
-		/// Sets the internal storage type for the stamement.
+		/// Sets the internal storage type for the statement.
 
 	const std::string& getStorage() const;
-		/// Returns the internal storage type for the stamement.
+		/// Returns the internal storage type for the statement.
 
 	std::size_t columnsExtracted(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
 		/// Returns the number of columns returned for current data set.
