@@ -210,6 +210,8 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 	mt.month = val.month();
 	mt.day   = val.day();
 
+	mt.time_type = MYSQL_TIMESTAMP_DATE;
+
 	_dates.push_back(new MYSQL_TIME(mt));
 	
 	realBind(pos, MYSQL_TYPE_DATE, _dates.back(), sizeof(MYSQL_TIME));
