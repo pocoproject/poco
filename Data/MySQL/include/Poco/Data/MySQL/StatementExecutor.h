@@ -42,8 +42,6 @@
 #include <mysql.h>
 #include "Poco/Data/MySQL/MySQLException.h"
 
-#include <vector>
-
 namespace Poco {
 namespace Data {
 namespace MySQL {

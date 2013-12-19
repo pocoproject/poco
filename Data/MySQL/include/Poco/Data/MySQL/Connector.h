@@ -40,7 +40,7 @@
 #define Data_MySQL_Connector_INCLUDED
 
 
-#include "MySQL.h"
+#include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/Connector.h"
 
 

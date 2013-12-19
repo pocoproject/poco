@@ -143,7 +143,7 @@ bool Extractor::extract(std::size_t pos, char& val)
 bool Extractor::extract(std::size_t pos, std::string& val)
 {
 	if (_metadata.columnsReturned() <= pos)
-		throw MySQLException("Extractor: attempt to extract more paremeters, than query result contain");
+		throw MySQLException("Extractor: attempt to extract more parameters, than query result contain");
 	
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
 	return false;
@@ -161,7 +161,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 {
 	if (_metadata.columnsReturned() <= pos)
-		throw MySQLException("Extractor: attempt to extract more paremeters, than query result contain");
+		throw MySQLException("Extractor: attempt to extract more parameters, than query result contain");
 	
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
 	return false;
@@ -177,7 +177,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 {
 	if (_metadata.columnsReturned() <= pos)
-		throw MySQLException("Extractor: attempt to extract more paremeters, than query result contain");
+		throw MySQLException("Extractor: attempt to extract more parameters, than query result contain");
 	
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
 	return false;
@@ -243,7 +243,7 @@ bool Extractor::isNull(std::size_t col, std::size_t row)
 	poco_assert(row == POCO_DATA_INVALID_ROW);
 
 	if (_metadata.columnsReturned() <= col)
-		throw MySQLException("Extractor: attempt to extract more paremeters, than query result contain");
+		throw MySQLException("Extractor: attempt to extract more parameters, than query result contain");
 
 	if (_metadata.isNull(static_cast<Poco::UInt32>(col)))
 		return true;
