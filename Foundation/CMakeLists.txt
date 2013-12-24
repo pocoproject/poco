@@ -39,6 +39,7 @@ set( BASE_SRCS
   src/ByteOrder.cpp
   src/Channel.cpp
   src/Checksum.cpp
+  src/Clock.cpp
   src/Condition.cpp
   src/Configurable.cpp
   src/ConsoleChannel.cpp

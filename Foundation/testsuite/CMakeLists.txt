@@ -14,6 +14,7 @@ src/ByteOrderTest.cpp
 src/CacheTestSuite.cpp
 src/ChannelTest.cpp
 src/ClassLoaderTest.cpp
+src/ClockTest.cpp
 src/ConditionTest.cpp
 src/CoreTest.cpp
 src/CoreTestSuite.cpp
