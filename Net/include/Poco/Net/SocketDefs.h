@@ -179,6 +179,11 @@
 			extern unsigned int if_nametoindex (__const char *__ifname) __THROW;
 			extern char *if_indextoname (unsigned int __ifindex, char *__ifname) __THROW;
 			}
+		#elif (POCO_OS == POCO_OS_HPUX)
+			extern "C"
+			{
+				#include <net/if.h>
+			}
 		#else
 			#include <net/if.h>
 		#endif
