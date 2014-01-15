@@ -2,14 +2,17 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{f95002f7-ceed-402b-9692-6b79535cd94e}</UniqueIdentifier>
+      <UniqueIdentifier>{fc0d158f-de64-49cd-93d3-2398c02fa6e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{8d7e2a37-888a-4254-8d0c-b7909d1348b1}</UniqueIdentifier>
+      <UniqueIdentifier>{c17f36c6-24ad-4d1b-b402-1529e083e263}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Array.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParseHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Handler.cpp">
@@ -39,9 +42,6 @@
     <ClCompile Include="src\TemplateCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ParseHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\JSON\Array.h">
@@ -62,6 +62,9 @@
     <ClInclude Include="include\Poco\JSON\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\JSON\ParseHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\JSON\PrintHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -75,9 +78,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\JSON\TemplateCache.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Poco\JSON\ParseHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
