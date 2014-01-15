@@ -5,6 +5,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MongoDB", "MongoDB_vs120.vcxproj", "{4FF2F34B-7F37-3ACD-AFBC-F21D6D426199}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_vs120.vcxproj", "{96CF3103-E49E-3F5E-A11D-6DBCDA043053}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4FF2F34B-7F37-3ACD-AFBC-F21D6D426199} = {4FF2F34B-7F37-3ACD-AFBC-F21D6D426199}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
