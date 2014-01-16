@@ -47,8 +47,8 @@ for /f %%C in ('findstr /R "." components') do (
 
 		  set /a runs=!runs! + 1
 		  set dir=%CD%
-		  cd %%C\testsuite\%BINDIR%
-		  %TESTRUNNER% %TESTRUNNERARGS%
+		  cd %%C\testsuite
+		  %BINDIR%\%TESTRUNNER% %TESTRUNNERARGS%
 		  if !ERRORLEVEL! neq 0 (
 		    set /a failures=!failures! + 1
 		    set failedTests=!failedTests! %%C
