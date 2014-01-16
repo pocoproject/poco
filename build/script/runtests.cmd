@@ -14,7 +14,7 @@ rem
 setlocal EnableDelayedExpansion
 
 set TESTRUNNER=TestSuite.exe
-set TESTRUNNERARGS=/B
+set TESTRUNNERARGS=/B:TestSuite.out
 
 set runs=0
 set failures=0
@@ -48,6 +48,9 @@ for /f %%C in ('findstr /R "." components') do (
 		    set /a failures=!failures! + 1
 		    set failedTests=!failedTests! %%C
 		    set status=1
+		  )
+		  if exists TestSuite.out (
+		    type TestSuite.out
 		  )
 		  cd !dir!
         )
