@@ -12,6 +12,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
+#include <cctype>
 
 
 namespace CppUnit {
@@ -41,9 +42,9 @@ void TextTestResult::setup()
 		std::string::const_iterator end = ignored.end();
 		while (it != end)
 		{
-			while (it != end && *it == ' ') ++it;
+			while (it != end && std::isspace(*it)) ++it;
 			std::string test;
-			while (it != end && *it != ' ') test += *it++;
+			while (it != end && !std::isspace(*it)) test += *it++;
 			if (!test.empty()) _ignored.insert(test);
 		}
 	}
