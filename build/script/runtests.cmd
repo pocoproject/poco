@@ -17,7 +17,7 @@ set TESTRUNNER=TestSuite.exe
 set TESTRUNNERARGS=/B:TestSuite.out
 set BINDIR=bin
 
-if "%1"=="64" )
+if "%1"=="64" (
   set BINDIR=bin64
 )
 
