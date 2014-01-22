@@ -274,6 +274,9 @@
     <ClInclude Include="include\Poco\Net\Net.h" />
     <ClInclude Include="include\Poco\Net\NetException.h" />
     <ClInclude Include="include\Poco\Net\NetworkInterface.h" />
+    <ClInclude Include="include\Poco\Net\NTPClient.h" />
+    <ClInclude Include="include\Poco\Net\NTPEventArgs.h" />
+    <ClInclude Include="include\Poco\Net\NTPPacket.h" />
     <ClInclude Include="include\Poco\Net\ParallelSocketAcceptor.h" />
     <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h" />
     <ClInclude Include="include\Poco\Net\PartStore.h" />
@@ -376,6 +379,9 @@
     <ClCompile Include="src\Net.cpp" />
     <ClCompile Include="src\NetException.cpp" />
     <ClCompile Include="src\NetworkInterface.cpp" />
+    <ClCompile Include="src\NTPClient.cpp" />
+    <ClCompile Include="src\NTPEventArgs.cpp" />
+    <ClCompile Include="src\NTPPacket.cpp" />
     <ClCompile Include="src\PartStore.cpp" />
     <ClCompile Include="src\SocketAddress.cpp" />
     <ClCompile Include="src\DatagramSocket.cpp" />
