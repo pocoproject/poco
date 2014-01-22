@@ -470,6 +470,14 @@ void GlobTest::testGlob()
 	assert (files.find("globtest/src/") != files.end());
 	assert (files.find("globtest/testsuite/") != files.end());
 
+	files.clear();
+	Glob::glob("globtest/testsuite/src/*", "globtest/testsuite/", files);
+	translatePaths(files);
+	assert (files.size() == 3);
+	assert (files.find("globtest/testsuite/src/test.h") != files.end());
+	assert (files.find("globtest/testsuite/src/test.c") != files.end());
+	assert (files.find("globtest/testsuite/src/main.c") != files.end());
+
 #if !defined(_WIN32_WCE)
 	// won't work if current directory is root dir
 	files.clear();

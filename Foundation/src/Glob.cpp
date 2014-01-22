@@ -106,6 +106,18 @@ void Glob::glob(const Path& pathPattern, std::set<std::string>& files, int optio
 }
 
 
+void Glob::glob(const Path& pathPattern, const Path& basePath, std::set<std::string>& files, int options)
+{
+	Path pattern(pathPattern);
+	pattern.makeDirectory(); // to simplify pattern handling later on
+	Path absBase(basePath);
+	absBase.makeAbsolute();
+	if (pathPattern.isDirectory())
+		options |= GLOB_DIRS_ONLY;
+	collect(pattern, absBase, basePath, pathPattern[basePath.depth()], files, options);
+}
+
+
 bool Glob::match(TextIterator& itp, const TextIterator& endp, TextIterator& its, const TextIterator& ends)
 {
 	while (itp != endp)

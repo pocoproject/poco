@@ -139,6 +139,18 @@ public:
 		/// Directories that for whatever reason cannot be traversed are
 		/// ignored.
 
+	static void glob(const Path& pathPattern, const Path& basePath, std::set<std::string>& files, int options = 0);
+		/// Creates a set of files that match the given pathPattern, starting from basePath.
+		///
+		/// The pattern may contain wildcard expressions even in intermediate
+		/// directory names (e.g. /usr/include/*/*.h).
+		///
+		/// Note that, for obvious reasons, escaping characters in a pattern
+		/// with a backslash does not work in Windows-style paths.
+		///
+		/// Directories that for whatever reason cannot be traversed are
+		/// ignored.
+
 protected:
 	bool match(TextIterator& itp, const TextIterator& endp, TextIterator& its, const TextIterator& ends);
 	bool matchAfterAsterisk(TextIterator itp, const TextIterator& endp, TextIterator its, const TextIterator& ends);
