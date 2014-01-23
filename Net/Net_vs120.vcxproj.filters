@@ -127,6 +127,15 @@
     <Filter Include="WebSocket\Source Files">
       <UniqueIdentifier>{865a0e39-c61d-47ef-af4a-8ecc4640e5b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NTP">
+      <UniqueIdentifier>{d1558faf-7e8e-42ee-8806-66d322509132}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP\Header Files">
+      <UniqueIdentifier>{159b8a21-1aee-4157-8856-015fd2f59a97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP\Source Files">
+      <UniqueIdentifier>{29c80f8f-6d4d-4b77-b4a5-17a75057f489}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Net\DNS.h">
@@ -429,6 +438,15 @@
     <ClInclude Include="include\Poco\Net\WebSocketImpl.h">
       <Filter>WebSocket\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTPClient.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTPEventArgs.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTPPacket.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNS.cpp">
@@ -712,6 +730,15 @@
     </ClCompile>
     <ClCompile Include="src\WebSocketImpl.cpp">
       <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPClient.cpp">
+      <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPEventArgs.cpp">
+      <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPPacket.cpp">
+      <Filter>NTP\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

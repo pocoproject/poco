@@ -858,6 +858,27 @@
 			</Filter>
 		</Filter>
 		<Filter
+			Name="NTP">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\include\Poco\Net\NTPClient.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\NTPEventArgs.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\NTPPacket.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\NTPClient.cpp"/>
+				<File
+					RelativePath=".\src\NTPEventArgs.cpp"/>
+				<File
+					RelativePath=".\src\NTPPacket.cpp"/>
+			</Filter>
+		</Filter>
+		<Filter
 			Name="Logging">
 			<Filter
 				Name="Header Files">

@@ -725,6 +725,23 @@
 			</Filter>
 		</Filter>
 		<Filter
+			Name="NTP">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\src\NTPClientTest.h"/>
+				<File
+					RelativePath=".\src\NTPClientTestSuite.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\NTPClientTest.cpp"/>
+				<File
+					RelativePath=".\src\NTPClientTestSuite.cpp"/>
+			</Filter>
+		</Filter>
+		<Filter
 			Name="Logging">
 			<Filter
 				Name="Header Files">
