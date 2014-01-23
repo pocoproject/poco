@@ -84,7 +84,7 @@ public:
 	{
 	}
 
-	virtual int_type overflow(int_type c)
+	virtual int_type overflow(int_type /*c*/)
 	{
 		return char_traits::eof();
 	}

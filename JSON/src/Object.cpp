@@ -112,7 +112,7 @@ void Object::getNames(std::vector<std::string>& names) const
 
 void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 {
-	if (step == -1) step = indent;
+	if (step < 0) step = indent;
 
 	if(!_preserveInsOrder)
 		doStringify(_values, out, indent, step);

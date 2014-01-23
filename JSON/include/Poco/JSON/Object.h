@@ -229,7 +229,7 @@ public:
 
 private:
 	template <typename C>
-	void doStringify(const C& container, std::ostream& out, unsigned int indent, int step) const
+	void doStringify(const C& container, std::ostream& out, unsigned int indent, unsigned int step) const
 	{
 		out << '{';
 
@@ -239,7 +239,7 @@ private:
 		typename C::const_iterator end = container.end();
 		for (; it != end;)
 		{
-			for(int i = 0; i < indent; i++) out << ' ';
+			for(unsigned int i = 0; i < indent; i++) out << ' ';
 
 			out << '"' << getKey(it) << '"';
 			out << ((indent > 0) ? " : " : ":");
@@ -248,12 +248,12 @@ private:
 
 			if ( ++it != container.end() ) out << ',';
 
-			if (step > 0) out << '\n';
+			if (step > 0) out << std::endl;
 		}
 
 		if (indent >= step) indent -= step;
 
-		for (int i = 0; i < indent; i++)
+		for (unsigned int i = 0; i < indent; i++)
 			out << ' ';
 
 		out << '}';
