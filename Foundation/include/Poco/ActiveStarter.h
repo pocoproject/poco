@@ -56,7 +56,7 @@ class ActiveStarter
 	/// thread pool.
 {
 public:
-	static void start(OwnerType* pOwner, ActiveRunnableBase::Ptr pRunnable)
+	static void start(OwnerType* /*pOwner*/, ActiveRunnableBase::Ptr pRunnable)
 	{
 		ThreadPool::defaultPool().start(*pRunnable);
 		pRunnable->duplicate(); // The runnable will release itself.

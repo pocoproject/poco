@@ -114,7 +114,7 @@ public:
 	{
 	}
 	
-	bool mustRotate(LogFile* pFile)
+	bool mustRotate(LogFile* /*pFile*/)
 	{
 		if (DT() >= _threshold)
 		{
