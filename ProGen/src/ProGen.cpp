@@ -1,7 +1,7 @@
 //
 // ProGen.cpp
 //
-// $Id: //poco/1.4/ProGen/src/ProGen.cpp#7 $
+// $Id: //poco/1.4/ProGen/src/ProGen.cpp#9 $
 //
 // Visual Studio project file generator.
 //
@@ -650,6 +650,7 @@ protected:
 					setProperty(*pProps, "configuration.compiler.defines", projectConfig, "vc.project.compiler.defines", platform, config);
 					setProperty(*pProps, "configuration.compiler.disableWarnings", projectConfig, "vc.project.compiler.disableWarnings", platform, config);
 					setProperty(*pProps, "configuration.linker.dependencies", projectConfig, "vc.project.linker.dependencies", platform, config, " ");
+					setProperty(*pProps, "configuration.linker.libraries", projectConfig, "vc.project.linker.libraries", platform, config);
 					setProperty(*pProps, "configuration.postbuild", projectConfig, "vc.project.postbuild", platform, config);
 					std::string libSuffix = this->config().getString("progen.libsuffix." + config, "");
 					Poco::StringTokenizer rawDependencies(pProps->getString("configuration.linker.dependencies"), " ", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
@@ -774,7 +775,7 @@ protected:
 						{
 							if (projectFile.exists())
 							{
-								logger().information("Fixing Visual Studio 2012 project file: " + vcxprojPath.toString());
+								logger().information("Fixing Visual Studio 2013 project file: " + vcxprojPath.toString());
 								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
 								fix2013Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
 								writeProject(pProjectDoc, vcxprojPath.toString());
