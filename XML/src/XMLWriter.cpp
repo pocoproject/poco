@@ -52,7 +52,6 @@ const std::string XMLWriter::NEWLINE_CR         = "\r";
 const std::string XMLWriter::NEWLINE_CRLF       = "\r\n";
 const std::string XMLWriter::NEWLINE_LF         = "\n";
 const std::string XMLWriter::MARKUP_QUOTENC     = "&quot;";
-const std::string XMLWriter::MARKUP_APOSENC     = "&apos;";
 const std::string XMLWriter::MARKUP_AMPENC      = "&amp;";
 const std::string XMLWriter::MARKUP_LTENC       = "&lt;";
 const std::string XMLWriter::MARKUP_GTENC       = "&gt;";
@@ -343,7 +342,6 @@ void XMLWriter::characters(const XMLChar ch[], int start, int length)
 			switch (c)
 			{
 			case '"':  writeMarkup(MARKUP_QUOTENC); break;
-			case '\'': writeMarkup(MARKUP_APOSENC); break;
 			case '&':  writeMarkup(MARKUP_AMPENC); break;
 			case '<':  writeMarkup(MARKUP_LTENC); break;
 			case '>':  writeMarkup(MARKUP_GTENC); break;
@@ -787,7 +785,6 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 			switch (c)
 			{
 			case '"':  writeMarkup(MARKUP_QUOTENC); break;
-			case '\'': writeMarkup(MARKUP_APOSENC); break;
 			case '&':  writeMarkup(MARKUP_AMPENC); break;
 			case '<':  writeMarkup(MARKUP_LTENC); break;
 			case '>':  writeMarkup(MARKUP_GTENC); break;
