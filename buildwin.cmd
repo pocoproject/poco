@@ -5,11 +5,11 @@ rem
 rem buildwin.cmd
 rem
 rem POCO C++ Libraries command-line build script 
-rem for MS Visual Studio 2003 to 2012
+rem for MS Visual Studio 2003 to 2013
 rem
 rem $Id: //poco/1.4/dist/buildwin.cmd#2 $
 rem
-rem Copyright (c) 2006-2013 by Applied Informatics Software Engineering GmbH
+rem Copyright (c) 2006-2014 by Applied Informatics Software Engineering GmbH
 rem and Contributors.
 rem
 rem Original version by Aleksandar Fabijanic.
@@ -18,7 +18,7 @@ rem
 rem Usage:
 rem ------
 rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
-rem VS_VERSION:    71|80|90|100|110
+rem VS_VERSION:    71|80|90|100|110|120
 rem ACTION:        build|rebuild|clean
 rem LINKMODE:      static_mt|static_md|shared|all
 rem CONFIGURATION: release|debug|both
@@ -46,7 +46,7 @@ set LIB=%LIB%;%MYSQL_LIB%
 set POCO_BASE=%CD%
 set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 
-rem VS_VERSION {71 | 80 | 90 | 100 | 110}
+rem VS_VERSION {71 | 80 | 90 | 100 | 110 | 120}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
 set VS_64_BIT_ENV=VC\bin\x86_amd64\vcvarsx86_amd64.bat
@@ -62,8 +62,11 @@ if not defined VCINSTALLDIR (
                         call "%VS100COMNTOOLS%vsvars32.bat")) else (
               if %VS_VERSION%==vs110 (
                 if %5==x64 (call "%VS110COMNTOOLS%..\..\%VS_64_BIT_ENV%") else (
-                            call "%VS110COMNTOOLS%vsvars32.bat")
-) ) ) )   )   )
+                            call "%VS110COMNTOOLS%vsvars32.bat") else (
+                  if %VS_VERSION%==vs120 (
+                    if %5==x64 (call "%VS120COMNTOOLS%..\..\%VS_64_BIT_ENV%") else (
+                                call "%VS120COMNTOOLS%vsvars32.bat)     
+) ) ) ) ) ) )
 
   if not defined VSINSTALLDIR (
     echo Error: No Visual C++ environment found.
@@ -76,6 +79,7 @@ if not defined VCINSTALLDIR (
 set VCPROJ_EXT=vcproj
 if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
+if %VS_VERSION%==vs120 (set VCPROJ_EXT=vcxproj)
 
 if "%8"=="" goto use_devenv
 set BUILD_TOOL=%8
@@ -84,6 +88,7 @@ goto use_custom
 set BUILD_TOOL=devenv
 if "%VS_VERSION%"=="vs100" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs110" (set BUILD_TOOL=msbuild)
+if "%VS_VERSION%"=="vs120" (set BUILD_TOOL=msbuild)
 :use_custom
 if not "%BUILD_TOOL%"=="msbuild" (set USEENV=/useenv)
 if "%BUILD_TOOL%"=="msbuild" (
@@ -97,6 +102,7 @@ if not "%BUILD_TOOL%"=="msbuild" (
 )
 if "%VS_VERSION%"=="vs100" (goto msbuildok)
 if "%VS_VERSION%"=="vs110" (goto msbuildok)
+if "%VS_VERSION%"=="vs120" (goto msbuildok)
 if "%BUILD_TOOL%"=="msbuild" (
   echo "Cannot use msbuild with Visual Studio 2008 or earlier."
   exit /b 2
@@ -476,7 +482,7 @@ exit /b 1
 echo Usage:
 echo ------
 echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
-echo VS_VERSION:    "71|80|90|100|110"
+echo VS_VERSION:    "71|80|90|100|110|120"
 echo ACTION:        "build|rebuild|clean"
 echo LINKMODE:      "static_mt|static_md|shared|all"
 echo CONFIGURATION: "release|debug|both"
