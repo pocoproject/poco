@@ -52,28 +52,52 @@ set VS_VERSION=vs%1
 set VS_64_BIT_ENV=VC\bin\x86_amd64\vcvarsx86_amd64.bat
 
 if not defined VCINSTALLDIR (
-  if %VS_VERSION%==vs71  (call "%VS71COMNTOOLS%vsvars32.bat") else (
-    if %VS_VERSION%==vs80  (call "%VS80COMNTOOLS%vsvars32.bat") else (
-      if %VS_VERSION%==vs90  (
-        if %5==x64 (call "%VS90COMNTOOLS%..\..\%VS_64_BIT_ENV%") else (
-                    call "%VS90COMNTOOLS%vsvars32.bat")) else (
-          if %VS_VERSION%==vs100 (
-            if %5==x64 (call "%VS100COMNTOOLS%..\..\%VS_64_BIT_ENV%") else (
-                        call "%VS100COMNTOOLS%vsvars32.bat")) else (
-              if %VS_VERSION%==vs110 (
-                if %5==x64 (call "%VS110COMNTOOLS%..\..\%VS_64_BIT_ENV%") else (
-                            call "%VS110COMNTOOLS%vsvars32.bat") else (
-                  if %VS_VERSION%==vs120 (
-                    if %5==x64 (call "%VS120COMNTOOLS%..\..\%VS_64_BIT_ENV%") else (
-                                call "%VS120COMNTOOLS%vsvars32.bat)     
-) ) ) ) ) ) )
+  if %VS_VERSION%==vs71 (
+    call "%VS71COMNTOOLS%vsvars32.bat"
+  ) else (
+    if %VS_VERSION%==vs80 (
+      call "%VS80COMNTOOLS%vsvars32.bat"
+    ) else (
+      if %VS_VERSION%==vs90 (
+        if %5==x64 (
+          call "%VS90COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+        ) else (
+          call "%VS90COMNTOOLS%vsvars32.bat"
+        )
+      ) else (
+        if %VS_VERSION%==vs100 (
+          if %5==x64 (
+            call "%VS100COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+          ) else (
+            call "%VS100COMNTOOLS%vsvars32.bat"
+          )
+        ) else (
+          if %VS_VERSION%==vs110 (
+            if %5==x64 (
+              call "%VS110COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+            ) else (
+              call "%VS110COMNTOOLS%vsvars32.bat"
+            ) 
+          ) else (
+            if %VS_VERSION%==vs120 (
+              if %5==x64 (
+                call "%VS120COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+              ) else (
+                call "%VS120COMNTOOLS%vsvars32.bat
+              )     
+            ) 
+          ) 
+        ) 
+      ) 
+    ) 
+  ) 
+)
 
-  if not defined VSINSTALLDIR (
-    echo Error: No Visual C++ environment found.
-    echo Please run this script from a Visual Studio Command Prompt
-    echo or run "%%VSnnCOMNTOOLS%%\vsvars32.bat" first.
-    goto :EOF
-  )
+if not defined VSINSTALLDIR (
+  echo Error: No Visual C++ environment found.
+  echo Please run this script from a Visual Studio Command Prompt
+  echo or run "%%VSnnCOMNTOOLS%%\vsvars32.bat" first.
+  goto :EOF
 )
 
 set VCPROJ_EXT=vcproj
