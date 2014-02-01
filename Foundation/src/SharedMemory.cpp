@@ -34,12 +34,6 @@
 //
 
 
-#if defined(__sun)
-#undef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 500
-#endif
-
-
 #include "Poco/SharedMemory.h"
 #include "Poco/Exception.h"
 #if defined(POCO_NO_SHAREDMEMORY)

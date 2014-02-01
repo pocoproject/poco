@@ -143,11 +143,11 @@ while [ $# -ge 1 ]; do
 	--library-path=*)
 		librarypath="`echo ${1} | awk '{print substr($0,16)}' | tr ',;' '  '`" ;;
 
-    --odbc-lib=*)
-        odbclib="`echo ${1} | awk '{print substr($0,16)}'`" ;;
+	--odbc-lib=*)
+		odbclib="`echo ${1} | awk '{print substr($0,12)}'`" ;;
 
-    --odbc-include=*)
-        odbcinclude="`echo ${1} | awk '{print substr($0,16)}'`" ;;
+	--odbc-include=*)
+		odbcinclude="`echo ${1} | awk '{print substr($0,16)}'`" ;;
 
 	--cflags=*)
 		flags="`echo ${1} | awk '{print substr($0,10)}'`" ;;
