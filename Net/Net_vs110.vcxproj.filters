@@ -731,15 +731,15 @@
     <ClCompile Include="src\WebSocketImpl.cpp">
       <Filter>WebSocket\Source Files</Filter>
     </ClCompile>
-    <ClInclude Include="src\Net\NTPClient.cpp">
+    <ClCompile Include="src\NTPClient.cpp">
       <Filter>NTP\Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Net\NTPEventArgs.cpp">
+    </ClCompile>
+    <ClCompile Include="src\NTPEventArgs.cpp">
       <Filter>NTP\Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Net\NTPPacket.cpp">
+    </ClCompile>
+    <ClCompile Include="src\NTPPacket.cpp">
       <Filter>NTP\Source Files</Filter>
-    </ClInclude>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc" />
