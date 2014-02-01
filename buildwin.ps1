@@ -3,7 +3,8 @@
 # 
 # Usage:
 # ------
-# buildwin.ps1 [-vs_version   120 | 110 | 100 | 90 | 80 | 71]
+# buildwin.ps1 [-poco_base    dir]
+#              [-vs_version   120 | 110 | 100 | 90 | 80 | 71]
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
@@ -11,7 +12,7 @@
 #              [-samples]
 #              [-tests]
 #              [-omit         "Lib1X;LibY;LibZ;..."]
-#              [-tool         devenv | vcexpress | wdexpress | msbuild]
+#              [-tool         msbuild | devenv | vcexpress | wdexpress]
 #              [-openssl_base dir]
 #              [-mysql_base   dir]
 
@@ -137,7 +138,8 @@ function Process-Input
   {
     Write-Host 'Usage:'
     Write-Host '------'
-    Write-Host 'buildwin.ps1 [-vs_version   120 | 110 | 100 | 90 | 80 | 71]'
+    Write-Host 'buildwin.ps1 [-poco_base    dir]'
+    Write-Host '             [-vs_version   120 | 110 | 100 | 90 | 80 | 71]'
     Write-Host '             [-action       build | rebuild | clean]'
     Write-Host '             [-linkmode     shared | static_mt | static_md | all]'
     Write-Host '             [-config       release | debug | both]'
@@ -145,7 +147,7 @@ function Process-Input
     Write-Host '             [-samples]'
     Write-Host '             [-tests]'
     Write-Host '             [-omit         "Lib1X;LibY;LibZ;..."]'
-    Write-Host '             [-tool         devenv | vcexpress | wdexpress | msbuild]'
+    Write-Host '             [-tool         msbuild | devenv | vcexpress | wdexpress]'
     Write-Host '             [-openssl_base dir]'
     Write-Host '             [-mysql_base   dir]'
 
