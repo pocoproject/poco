@@ -330,9 +330,14 @@ function Build
       Write-Host "| Building $vsProject"
       Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
-      if ($tool -eq 'devenv') { Build-Devenv $vsProject }
+      if ($tool -eq 'devenv')      { Build-Devenv $vsProject }
       elseif ($tool -eq 'msbuild') { Build-MSBuild $vsProject }
-      else{ Write-Host "Tool not supported: $tool" }
+      elseif ($tool -ne '')        { Write-Host "Build tool not supported: $tool" }
+      else 
+      {
+        Write-Host "Build tool not specified. Exiting."
+        Exit
+      } 
 
       if ($tests)
       {
