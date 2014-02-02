@@ -104,7 +104,8 @@ void Clock::update()
 	LARGE_INTEGER perfFreq;
 	if (QueryPerformanceCounter(&perfCounter) && QueryPerformanceFrequency(&perfFreq))
 	{
-		_clock = perfCounter.QuadPart*resolution()/perfFreq.QuadPart;
+		_clock = resolution()*(perfCounter.QuadPart/perfFreq.QuadPart);
+		_clock += (perfCounter.QuadPart % perfFreq.QuadPart)*resolution()/perfFreq.QuadPart;
 	}
 	else throw Poco::SystemException("cannot get system clock");
 
