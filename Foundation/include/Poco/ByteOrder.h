@@ -1,7 +1,7 @@
 //
 // ByteOrder.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ByteOrder.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/ByteOrder.h#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -154,7 +154,7 @@ inline Int16 ByteOrder::flipBytes(Int16 value)
 inline UInt32 ByteOrder::flipBytes(UInt32 value)
 {
 #if defined(POCO_HAVE_MSC_BYTESWAP)
-	return _byteswap_ulong(value)
+	return _byteswap_ulong(value);
 #elif defined(POCO_HAVE_GCC_BYTESWAP)
 	return __builtin_bswap32(value);
 #else
@@ -174,7 +174,7 @@ inline Int32 ByteOrder::flipBytes(Int32 value)
 inline UInt64 ByteOrder::flipBytes(UInt64 value)
 {
 #if defined(POCO_HAVE_MSC_BYTESWAP)
-	return _byteswap_uint64(value)
+	return _byteswap_uint64(value);
 #elif defined(POCO_HAVE_GCC_BYTESWAP)
 	return __builtin_bswap64(value);
 #else
