@@ -214,7 +214,9 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.dead() == 0);
 	assert (pool.allocated() == pool.used() + pool.idle());
 
+	assert (pool.isActive());
 	pool.shutdown();
+	assert (!pool.isActive());
 	try
 	{
 		Session s7(pool.get());
@@ -236,6 +238,10 @@ void SessionPoolTest::testSessionPoolContainer()
 	SessionPoolContainer spc;
 	AutoPtr<SessionPool> pPool = new SessionPool("TeSt", "Cs");
 	spc.add(pPool);
+	assert (pPool->isActive());
+	assert (spc.isActive("test", "cs"));
+	assert (spc.isActive("test:///cs"));
+	assert (spc.has("test:///cs"));
 	assert (1 == spc.count());
 
 	Poco::Data::Session sess = spc.get("test:///cs");
@@ -245,7 +251,14 @@ void SessionPoolTest::testSessionPoolContainer()
 
 	try { spc.add(pPool); fail ("must fail"); }
 	catch (SessionPoolExistsException&) { }
+	pPool->shutdown();
+	assert (!pPool->isActive());
+	assert (!spc.isActive("test", "cs"));
+	assert (!spc.isActive("test:///cs"));
 	spc.remove(pPool->name());
+	assert (!spc.has("test:///cs"));
+	assert (!spc.isActive("test", "cs"));
+	assert (!spc.isActive("test:///cs"));
 	assert (0 == spc.count());
 	try { spc.get("test"); fail ("must fail"); }
 	catch (NotFoundException&) { }

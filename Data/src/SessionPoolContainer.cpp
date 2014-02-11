@@ -97,6 +97,22 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 }
 
 
+bool SessionPoolContainer::isActive(const std::string& sessionKey,
+		const std::string& connectionString) const
+{
+	std::string name = connectionString.empty() ? 
+		sessionKey : SessionPool::name(sessionKey, connectionString);
+
+	SessionPoolMap::const_iterator it = _sessionPools.find(name);
+	if (it != _sessionPools.end() && it->second->isActive())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
 Session SessionPoolContainer::get(const std::string& name)
 {
 	return getPool(name).get();

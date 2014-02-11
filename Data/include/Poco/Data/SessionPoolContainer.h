@@ -74,6 +74,16 @@ public:
 		/// newly created pool. If pool already exists, request to add is silently
 		/// ignored and session is returned from the existing pool.
 
+	bool has(const std::string& name) const;
+		/// Returns true if the requested name exists, false otherwise.
+
+	bool isActive(const std::string& sessionKey,
+		const std::string& connectionString = "") const;
+		/// Returns true if the session is active (i.e. not shut down).
+		/// If connectionString is empty string, sessionKey must be a 
+		/// fully qualified session name as registered with the pool
+		/// container.
+
 	Session get(const std::string& name);
 		/// Returns the requested Session.
 		/// Throws NotFoundException if session is not found.
@@ -100,6 +110,12 @@ private:
 	SessionPoolMap  _sessionPools;
 	Poco::FastMutex _mutex;
 };
+
+
+inline bool SessionPoolContainer::has(const std::string& name) const
+{
+	return _sessionPools.find(name) != _sessionPools.end();
+}
 
 
 inline void SessionPoolContainer::remove(const std::string& name)

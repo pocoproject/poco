@@ -174,6 +174,10 @@ public:
 		/// Returns the requested property.
 
 	void shutdown();
+		/// Shuts down the session pool.
+
+	bool isActive() const;
+		/// Returns true if session pool is active (not shut down).
 
 protected:
 	typedef Poco::AutoPtr<PooledSessionHolder>    PooledSessionHolderPtr;
@@ -230,6 +234,12 @@ inline std::string SessionPool::name(const std::string& connector,
 inline std::string SessionPool::name() const
 {
 	return name(_connector, _connectionString);
+}
+
+
+inline bool SessionPool::isActive() const
+{
+	return !_shutdown;
 }
 
 
