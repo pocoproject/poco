@@ -239,7 +239,8 @@ void DialogSocket::refill()
 	if (_pNext == _pEnd)
 	{
 		int n = receiveBytes(_pBuffer, RECEIVE_BUFFER_SIZE);
-		if(n>0) {
+		if(n>0)
+		{
 			_pNext = _pBuffer;
 			_pEnd  = _pBuffer + n;
 		}
