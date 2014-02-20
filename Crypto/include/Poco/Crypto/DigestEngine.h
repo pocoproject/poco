@@ -67,6 +67,9 @@ public:
 	const std::string& algorithm() const;
 		/// Returns the name of the digest algorithm.
 	
+	const int nid() const;
+		/// Returns the NID of the digest algorithm.
+
 	// DigestEngine
 	std::size_t digestLength() const;
 	void reset();
@@ -89,6 +92,12 @@ inline const std::string& DigestEngine::algorithm() const
 {
 	return _name;
 }
+
+inline const int DigestEngine::nid() const
+{
+	return EVP_MD_nid(_ctx->digest);
+}
+
 
 
 } } // namespace Poco::Crypto

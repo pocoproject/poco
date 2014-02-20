@@ -43,8 +43,7 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/DigestEngine.h"
-#include "Poco/MD5Engine.h"
-#include "Poco/SHA1Engine.h"
+#include "Poco/Crypto/DigestEngine.h"
 #include <openssl/rsa.h>
 #include <istream>
 #include <ostream>
@@ -72,12 +71,17 @@ public:
 	enum DigestType
 	{
 		DIGEST_MD5,
-		DIGEST_SHA1
+		DIGEST_SHA1,
 	};
 	
 	RSADigestEngine(const RSAKey& key, DigestType digestType = DIGEST_SHA1);
 		/// Creates the RSADigestEngine with the given RSA key,
 		/// using the SHA-1 hash algorithm.
+		/// Kept for backward compatibility
+
+	RSADigestEngine(const RSAKey& key, const std::string &algorithm);
+		/// Creates the RSADigestEngine with the given RSA key,
+		/// using the given DigestEngine for computing the hash algorithm.
 
 	~RSADigestEngine();
 		/// Destroys the RSADigestEngine.
@@ -113,12 +117,9 @@ protected:
 
 private:
 	RSAKey _key;
-	Poco::DigestEngine& _engine;
-	int _type;
+	Poco::Crypto::DigestEngine _engine;
 	Poco::DigestEngine::Digest _digest;
 	Poco::DigestEngine::Digest _signature;
-	Poco::MD5Engine _md5Engine;
-	Poco::SHA1Engine _sha1Engine;
 };
 
 
