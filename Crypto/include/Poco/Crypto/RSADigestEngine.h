@@ -57,10 +57,10 @@ class Crypto_API RSADigestEngine: public Poco::DigestEngine
 	/// This class implements a Poco::DigestEngine that can be
 	/// used to compute a secure digital signature.
 	///
-	/// First another Poco::DigestEngine (Poco::MD5Engine
-	/// or Poco::SHA1Engine) is used to compute a cryptographic
-	/// hash of the data to be signed. Then, the hash value is
-	/// encrypted, using the RSA private key.
+	/// First another Poco::Crypto::DigestEngine is used
+	/// to compute a cryptographic hash of the data to be
+	/// signed. Then, the hash value is encrypted, using
+	/// the RSA private key.
 	///
 	/// To verify a signature, pass it to the verify() 
 	/// member function. It will decrypt the signature
@@ -74,14 +74,15 @@ public:
 		DIGEST_SHA1,
 	};
 	
+	//@ deprecated
 	RSADigestEngine(const RSAKey& key, DigestType digestType = DIGEST_SHA1);
 		/// Creates the RSADigestEngine with the given RSA key,
-		/// using the SHA-1 hash algorithm.
+		/// using the MD5 or SHA-1 hash algorithm.
 		/// Kept for backward compatibility
 
 	RSADigestEngine(const RSAKey& key, const std::string &algorithm);
 		/// Creates the RSADigestEngine with the given RSA key,
-		/// using the given DigestEngine for computing the hash algorithm.
+		/// using the given hash algorithm for computing the hash.
 
 	~RSADigestEngine();
 		/// Destroys the RSADigestEngine.
