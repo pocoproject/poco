@@ -263,6 +263,7 @@ CppUnit::Test* RSATest::suite()
 
 	CppUnit_addTest(pSuite, RSATest, testNewKeys);
 	CppUnit_addTest(pSuite, RSATest, testSign);
+	CppUnit_addTest(pSuite, RSATest, testSignSha256);
 	CppUnit_addTest(pSuite, RSATest, testSignManipulated);
 	CppUnit_addTest(pSuite, RSATest, testRSACipher);
 	CppUnit_addTest(pSuite, RSATest, testRSACipherLarge);
