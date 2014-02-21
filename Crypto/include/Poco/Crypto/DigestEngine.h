@@ -67,6 +67,9 @@ public:
 	const std::string& algorithm() const;
 		/// Returns the name of the digest algorithm.
 	
+	int nid() const;
+		/// Returns the NID (OpenSSL object identifier) of the digest algorithm.
+
 	// DigestEngine
 	std::size_t digestLength() const;
 	void reset();
