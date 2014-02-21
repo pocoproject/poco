@@ -89,5 +89,10 @@ void DigestEngine::updateImpl(const void* data, std::size_t length)
 	EVP_DigestUpdate(_ctx, data, length);
 }
 
+int DigestEngine::nid() const
+{
+	return EVP_MD_nid(_ctx->digest);
+}
+
 
 } } // namespace Poco::Crypto
