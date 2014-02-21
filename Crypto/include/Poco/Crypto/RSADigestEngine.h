@@ -71,7 +71,7 @@ public:
 	enum DigestType
 	{
 		DIGEST_MD5,
-		DIGEST_SHA1,
+		DIGEST_SHA1
 	};
 	
 	//@ deprecated
@@ -82,7 +82,7 @@ public:
 
 	RSADigestEngine(const RSAKey& key, const std::string &name);
 		/// Creates the RSADigestEngine with the given RSA key,
-		/// using a DigestEngine using the digest with the given name
+		/// using the hash algorithm with the given name
 		/// (e.g., "MD5", "SHA1", "SHA256", "SHA512", etc.).
 		/// See the OpenSSL documentation for a list of supported digest algorithms.
 		///
