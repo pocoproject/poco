@@ -49,9 +49,9 @@ RSADigestEngine::RSADigestEngine(const RSAKey& key, DigestType digestType):
 {
 }
 
-RSADigestEngine::RSADigestEngine(const RSAKey& key, const std::string &algorithm):
+RSADigestEngine::RSADigestEngine(const RSAKey& key, const std::string &name):
 	_key(key),
-	_engine(algorithm)
+	_engine(name)
 {
 }
 
