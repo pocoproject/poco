@@ -44,7 +44,6 @@
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/DigestEngine.h"
 #include "Poco/Crypto/DigestEngine.h"
-#include <openssl/rsa.h>
 #include <istream>
 #include <ostream>
 
