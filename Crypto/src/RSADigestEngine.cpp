@@ -35,8 +35,7 @@
 
 
 #include "Poco/Crypto/RSADigestEngine.h"
-#include <openssl/pem.h>
-#include <openssl/evp.h>
+#include <openssl/rsa.h>
 
 
 namespace Poco {
