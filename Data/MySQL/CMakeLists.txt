@@ -22,7 +22,9 @@ install(
     
 install(
     TARGETS ${LIBNAME}
-    DESTINATION lib
+    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so file
+    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
+    RUNTIME DESTINATION bin              # .dll file
     )
 
 if (ENABLE_TESTS)

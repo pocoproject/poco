@@ -205,7 +205,7 @@ set(WIN_SRCS
 )
 
 if (WIN32)
-  set(RES_SRCS ${CMAKE_SOURCE_DIR}/Foundation/include/Poco/pocomsg.h)
+  set(RES_SRCS ${CMAKE_SOURCE_DIR}/Foundation/src/pocomsg.h)
   set_source_files_properties(${RES_SRCS} PROPERTIES GENERATED true)
   add_custom_command(
     OUTPUT ${RES_SRCS}
@@ -248,7 +248,9 @@ install(
     
 install(
     TARGETS ${LIBNAME}
-    DESTINATION lib
+    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so file
+    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
+    RUNTIME DESTINATION bin              # .dll file
     )
 
 if (ENABLE_TESTS)

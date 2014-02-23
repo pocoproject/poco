@@ -549,7 +549,7 @@ IPAddress IPAddress::parse(const std::string& addr)
  bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 {
 	IPv4AddressImpl impl4(IPv4AddressImpl::parse(addr));
-	if (impl4 != IPv4AddressImpl())
+	if (impl4 != IPv4AddressImpl() || trim(addr) == "0.0.0.0")
 	{
 		result.newIPv4(impl4.addr());
 		return true;
