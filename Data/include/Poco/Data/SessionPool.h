@@ -118,7 +118,7 @@ public:
 	template <typename T>
 	Session get(const std::string& name, const T& value)
 		/// Returns a Session with requested property set.
-		/// The property can be diferent from the default pool
+		/// The property can be different from the default pool
 		/// value, in which case it is reset back to the pool 
 		/// value when the session is reclaimed by the pool.
 	{
@@ -132,7 +132,7 @@ public:
 
 	Session get(const std::string& name, bool value);
 		/// Returns a Session with requested feature set.
-		/// The feature can be diferent from the default pool
+		/// The feature can be different from the default pool
 		/// value, in which case it is reset back to the pool 
 		/// value when the session is reclaimed by the pool.
 
