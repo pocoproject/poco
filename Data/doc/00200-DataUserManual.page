@@ -18,8 +18,8 @@ The following complete example shows how to use POCO Data:
     #include <iostream>
     
     using namespace Poco::Data::Keywords;
-    using Poco::Data:Session;
-    using Poco::Data:Statement;
+    using Poco::Data::Session;
+    using Poco::Data::Statement;
     
     struct Person
     {
@@ -849,7 +849,7 @@ No worries -- that's what the RecordSet class does:
         std::cout << rs.columnName(col) << std::endl;
     
     // iterate over all rows and columns
-    for (RecordSet::Iterator it = rset.begin(); it != rset.end(); ++it) 
+    for (RecordSet::Iterator it = rs.begin(); it != rs.end(); ++it) 
         std::cout << *it << " ";
 ----
 
@@ -857,12 +857,12 @@ As you may see above, <[RecordSet]> class comes with a full-blown C++
 compatible iterator that allows the above loop to be turned into a
 one-liner:
 
-    std::copy(rset.begin(), rset.end(), std::ostream_iterator<Row>(std::cout));
+    std::copy(rs.begin(), rs.end(), std::ostream_iterator<Row>(std::cout));
 ----
 
 RecordSet has the stream operator defined, so this shortcut to the above functionality will work, too:
 
-    std::cout << rset;
+    std::cout << rs;
 ----
 
 The default formatter supplied with RecordSet is quite rudimentary, but
@@ -965,7 +965,7 @@ The template specialization must implement the following methods:
     public:
         static void bind(std::size_t pos, const Person&amp; obj, AbstractBinder::Ptr pBinder)
         {
-            poco_assert_dbg (pBinder != 0);
+            poco_assert_dbg (!pBinder.isNull());
             // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
             // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
             TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder);
@@ -980,7 +980,7 @@ The template specialization must implement the following methods:
     
         static void prepare(std::size_t pos, const Person&amp; obj, AbstractPreparation::Ptr pPrepare)
         {
-            poco_assert_dbg (pBinder != 0);
+            poco_assert_dbg (!pPrepare.isNull());
             // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
             // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
             TypeHandler<std::string>::prepare(pos++, obj.getFirstName(), pPrepare);
@@ -991,7 +991,7 @@ The template specialization must implement the following methods:
         static void extract(std::size_t pos, Person&amp; obj, const Person&amp; defVal, AbstractExtractor::Ptr pExt)
             /// obj will contain the result, defVal contains values we should use when one column is NULL
         {
-            poco_assert_dbg (pExt != 0);
+            poco_assert_dbg (!pExt.isNull());
             std::string firstName;
             std::string lastName;
             Poco::UInt64 socialSecNr = 0;
