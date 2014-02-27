@@ -965,7 +965,7 @@ The template specialization must implement the following methods:
     public:
         static void bind(std::size_t pos, const Person&amp; obj, AbstractBinder::Ptr pBinder)
         {
-            poco_assert_dbg (pBinder != 0);
+            poco_assert_dbg (!pBinder.isNull());
             // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
             // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
             TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder);
@@ -980,7 +980,7 @@ The template specialization must implement the following methods:
     
         static void prepare(std::size_t pos, const Person&amp; obj, AbstractPreparation::Ptr pPrepare)
         {
-            poco_assert_dbg (pBinder != 0);
+            poco_assert_dbg (!pPrepare.isNull());
             // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
             // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
             TypeHandler<std::string>::prepare(pos++, obj.getFirstName(), pPrepare);
@@ -991,7 +991,7 @@ The template specialization must implement the following methods:
         static void extract(std::size_t pos, Person&amp; obj, const Person&amp; defVal, AbstractExtractor::Ptr pExt)
             /// obj will contain the result, defVal contains values we should use when one column is NULL
         {
-            poco_assert_dbg (pExt != 0);
+            poco_assert_dbg (!pExt.isNull());
             std::string firstName;
             std::string lastName;
             Poco::UInt64 socialSecNr = 0;
