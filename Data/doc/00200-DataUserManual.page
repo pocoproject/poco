@@ -857,12 +857,12 @@ As you may see above, <[RecordSet]> class comes with a full-blown C++
 compatible iterator that allows the above loop to be turned into a
 one-liner:
 
-    std::copy(rset.begin(), rset.end(), std::ostream_iterator<Row>(std::cout));
+    std::copy(rs.begin(), rs.end(), std::ostream_iterator<Row>(std::cout));
 ----
 
 RecordSet has the stream operator defined, so this shortcut to the above functionality will work, too:
 
-    std::cout << rset;
+    std::cout << rs;
 ----
 
 The default formatter supplied with RecordSet is quite rudimentary, but
