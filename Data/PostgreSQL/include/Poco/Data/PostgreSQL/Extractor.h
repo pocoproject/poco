@@ -43,19 +43,17 @@
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLTypes.h"
 #include "Poco/Data/PostgreSQL/StatementExecutor.h"
-//#include "Poco/Data/PostgreSQL/ResultMetadata.h"
 
 #include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Data/LOB.h"
+
 #include "Poco/Types.h"
+#include "Poco/Any.h"
+#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 
 
 namespace Poco {
-
-namespace Dynamic {
-	class Var;
-}
-
 namespace Data {
 namespace PostgreSQL {
 
@@ -348,6 +346,30 @@ private:
     const OutputParameter & extractPreamble( std::size_t aPosition ) const;
 
     bool isColumnNull( const OutputParameter & anOutputParameter ) const;
+    
+	template <typename T>
+	bool extractStringImpl(std::size_t pos, T& val)
+    /// Utility function for extraction of Any and DynamicAny.
+	{
+        OutputParameter outputParameter = extractPreamble( pos );
+        
+        if ( isColumnNull( outputParameter ) )
+        {
+            return false;
+        }
+        
+        std::string tempString;  // since the postgreSQL API in use is all about strings...
+        
+        bool returnValue = extract( pos, tempString );
+        
+        if ( returnValue )
+        {
+            val = tempString;
+        }
+        
+		return returnValue;
+	}
+    
 
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=( const Extractor & );

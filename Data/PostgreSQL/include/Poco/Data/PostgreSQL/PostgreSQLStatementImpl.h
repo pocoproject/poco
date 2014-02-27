@@ -103,7 +103,7 @@ protected:
 		/// Returns the concrete binder used by the statement.
 
 private:
-	enum
+	enum NextState
 	{
 		NEXT_DONTKNOW,
 		NEXT_TRUE,
@@ -113,7 +113,7 @@ private:
 	StatementExecutor _statementExecutor;
 	Binder::Ptr       _pBinder;
 	Extractor::Ptr    _pExtractor;
-	int               _hasNext;
+	NextState         _hasNext;
 };
 
 

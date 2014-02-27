@@ -103,6 +103,8 @@ public:
 
 private:
 
+    void clearResults();
+
 	StatementExecutor            ( const StatementExecutor & );
 	StatementExecutor& operator= ( const StatementExecutor & );
 
