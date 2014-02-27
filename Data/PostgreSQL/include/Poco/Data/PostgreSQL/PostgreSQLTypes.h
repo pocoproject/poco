@@ -109,9 +109,9 @@ class OutputParameter
 public:
     explicit OutputParameter( PostgreSQLSupportedFieldTypes aFieldType,
                               Oid                           anInternalFieldType,
-                              int                           aRowNumber,
+                              std::size_t                   aRowNumber,
                               const char *                  aDataPtr,
-                              int                           theSize,
+                              std::size_t                   theSize,
                               bool                          anIsNull );
     
     explicit OutputParameter();
@@ -120,24 +120,24 @@ public:
     
     void                            setValues( PostgreSQLSupportedFieldTypes aFieldType,
                                                Oid                           anInternalFieldType,
-                                               int                           aRowNumber,
+                                               std::size_t                   aRowNumber,
                                                const char *                  aDataPtr,
-                                               int                           theSize,
+                                               std::size_t                   theSize,
                                                bool                          anIsNull);
     
     PostgreSQLSupportedFieldTypes   fieldType() const;
     Oid                             internalFieldType() const;
-    int                             rowNumber() const;
+    std::size_t                     rowNumber() const;
     const char *                    pData() const;
-    int                             size() const;
+    std::size_t                     size() const;
     bool                            isNull() const;
 
 private:
     PostgreSQLSupportedFieldTypes   _fieldType;
     Oid                             _internalFieldType;
-    int                             _rowNumber;
+    std::size_t                     _rowNumber;
     const char *                    _pData;
-    int                             _size;
+    std::size_t                     _size;
     bool                            _isNull;
 };
 
@@ -218,7 +218,7 @@ inline
 InputParameter::InputParameter()
     : _fieldType                      ( POSTGRESQL_TYPE_NONE ),
       _pData                          ( 0 ),
-      _size                           ( -1 ),
+      _size                           ( 0 ),
       _isBinary                       ( false ),
      _pNonStringVersionRepresentation ( 0 )
 {
@@ -321,15 +321,15 @@ InputParameter::pInternalRepresentation() const
 inline
 OutputParameter::OutputParameter( PostgreSQLSupportedFieldTypes aFieldType,
                                   Oid                           anInternalFieldType,
-                                  int                           aRowNumber,
+                                  std::size_t                   aRowNumber,
                                   const char *                  aDataPtr,
-                                  int                           theSize,
+                                  std::size_t                   theSize,
                                   bool                          anIsNull )
     : _fieldType         ( aFieldType ),
       _internalFieldType ( anInternalFieldType ),
       _rowNumber         ( aRowNumber ),
       _pData             ( aDataPtr ),
-      _size              ( theSize),
+      _size              ( theSize ),
       _isNull            ( anIsNull )
 {
 }
@@ -338,9 +338,9 @@ inline
 OutputParameter::OutputParameter( )
     : _fieldType         ( POSTGRESQL_TYPE_NONE ),
       _internalFieldType ( -1 ),
-      _rowNumber         ( -1 ),
+      _rowNumber         ( 0 ),
       _pData             ( 0 ),
-      _size              ( -1 ),
+      _size              ( 0 ),
       _isNull            ( true )
 {
 }
@@ -354,9 +354,9 @@ inline
 void
 OutputParameter::setValues( PostgreSQLSupportedFieldTypes aFieldType,
                             Oid                           anInternalFieldType,
-                            int                           aRowNumber,
+                            std::size_t                   aRowNumber,
                             const char *                  aDataPtr,
-                            int                           theSize,
+                            std::size_t                   theSize,
                             bool                          anIsNull )
 {
     _fieldType         = aFieldType;
@@ -383,7 +383,7 @@ OutputParameter::internalFieldType() const
 }
 
 inline
-int
+std::size_t
 OutputParameter::rowNumber() const
 {
     return _rowNumber;
@@ -397,7 +397,7 @@ OutputParameter::pData() const
 }
 
 inline
-int
+std::size_t
 OutputParameter::size() const
 {
     return _size;

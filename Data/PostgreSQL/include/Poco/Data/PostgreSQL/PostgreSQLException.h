@@ -42,13 +42,8 @@
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/DataException.h"
 
-#include <libpq-fe.h>
-
 #include <typeinfo>
 #include <string>
-
-typedef struct st_postgresql POSTGRESQL;
-typedef struct st_postgresql_stmt POSTGRESQL_STMT;
 
 namespace Poco {
 namespace Data {

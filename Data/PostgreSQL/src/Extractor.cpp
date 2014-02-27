@@ -417,8 +417,8 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
     // Format: \x10843029479abcf ...  two characters for every byte
     //
     //  The code below can be made more efficient by converting more than one byte at a time
-    //  also if the blob had a resize nethod it would be useful to allocate memory in one
-    //  attempt
+    //  also if BLOB had a resize method it would be useful to allocate memory in one
+    //  attempt.
     //
     
     const char * pBLOB = reinterpret_cast< const char * >( outputParameter.pData() );
@@ -537,13 +537,13 @@ bool Extractor::extract(std::size_t pos, Time& val)
 
 bool Extractor::extract(std::size_t pos, Any& val)
 {
-	return false;
+    return extractStringImpl ( pos, val );
 }
 
 
 bool Extractor::extract(std::size_t pos, Dynamic::Var& val)
 {
-	return false;
+    return extractStringImpl ( pos, val );
 }
 
 

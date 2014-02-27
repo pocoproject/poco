@@ -41,19 +41,33 @@
 #include "Poco/UUID.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/NumberParser.h"
+#include "Poco/NumberParser.h"
 
 #include <regex>
+#include <set>
 
 namespace
 {
 	std::size_t countOfPlaceHoldersInSQLStatement( const std::string & aSQLStatement )
 	{
+    
+        // Find unique placeholders.
+        // Unique placeholders allow the same placeholder to be used multiple times in the same statement.
+
         std::regex const expression( "[$][0-9]+" );  // match literal dollar signs followed directly by one or more digits
+
+        std::sregex_iterator itr( aSQLStatement.begin(), aSQLStatement.end(), expression );
+        std::sregex_iterator eItr;
         
-        std::ptrdiff_t const match_count(std::distance(
-                                                        std::sregex_iterator( aSQLStatement.begin(), aSQLStatement.end(), expression ),
-                                                        std::sregex_iterator() ) );
-        return match_count;
+        std::set< std::string > placeholderSet;
+
+        while ( itr != eItr )
+        {
+            placeholderSet.insert( itr->str() );
+            ++itr;
+        }
+
+        return placeholderSet.size();
 	}
 }
 
@@ -67,7 +81,7 @@ StatementExecutor::StatementExecutor( SessionHandle & aSessionHandle )
       _state                           ( STMT_INITED ),
       _pResultHandle                   ( 0 ),
       _countPlaceholdersInSQLStatement ( 0 ),
-      _currentRow                      ( -1 ),
+      _currentRow                      ( 0 ),
       _affectedRowCount                ( 0 )
 {
 }
@@ -104,6 +118,15 @@ void StatementExecutor::prepare( const std::string & aSQLStatement )
 		return;
 	}
 
+    // clear out the metadata.  One way or another it is now obsolete.
+    _countPlaceholdersInSQLStatement = 0;
+	_SQLStatement                    = std::string();
+    _preparedStatementName           = std::string();
+    _resultColumns.clear();
+    
+    // clear out any result data.  One way or another it is now obsolete.
+    clearResults();
+
     // prepare parameters for the call to PQprepare
     const char* ptrCSQLStatement = aSQLStatement.c_str();
     std::size_t countPlaceholdersInSQLStatement = countOfPlaceHoldersInSQLStatement( aSQLStatement );
@@ -113,11 +136,6 @@ void StatementExecutor::prepare( const std::string & aSQLStatement )
     std::string statementName = uuid.toString();
     const char* pStatementName = statementName.c_str();
     
-    // clear out the meta data.  One way or another it is now obsolete.
-    _resultColumns.clear();
-    // clear out any result data.  One way or another it is now obsolete.
-    _outputParameterVector.clear();
-
     PGresult * ptrPGResult = 0;
     
     {
@@ -158,12 +176,10 @@ void StatementExecutor::prepare( const std::string & aSQLStatement )
     {
         PQResultClear resultClearer( ptrPGResult );
     
+        if (    ! ptrPGResult
+             || PQresultStatus( ptrPGResult ) != PGRES_COMMAND_OK )
         {
-            if ( ! ptrPGResult  ||
-                 PQresultStatus( ptrPGResult ) != PGRES_COMMAND_OK )
-            {
                 throw StatementException( std::string( "postgresql_stmt_describe error: " ) + PQresultErrorMessage ( ptrPGResult ) + " " + aSQLStatement );
-            }
         }
     
         // remember the structure of the statement result
@@ -176,20 +192,27 @@ void StatementExecutor::prepare( const std::string & aSQLStatement )
     
         for ( int i = 0; i < fieldCount; ++i )
         {
+            int columnLength    = PQfsize( ptrPGResult, i );
+            int columnPrecision = PQfmod( ptrPGResult, i );
+            
+            if (    columnLength    < 0   // PostgreSQL confusion correction
+                 && columnPrecision > 0 )
+            {
+                columnLength    = columnPrecision;
+                columnPrecision = -1;
+            }
+            
             _resultColumns.push_back(
-                               MetaColumn( i,                                   // position
-                                           PQfname( ptrPGResult, i ),           // name
-                                           Poco::Data::MetaColumn::FDT_UNKNOWN, // type - TODO: Map from OIDS to Metacolumn types
-                                           0,                                   // length
-                                           PQfmod( ptrPGResult, i ),            // precision
-                                           true                                 // nullable? - no easy way to tell, so assume yes
+                               MetaColumn( i,                                               // position
+                                           PQfname( ptrPGResult, i ),                       // name
+                                           Poco::Data::MetaColumn::FDT_STRING,              // type - TODO: Map from OIDS to Metacolumn types
+                                           (-1 == columnLength ? 0 : columnLength),         // length - NOT CORRECT WHEN RESULTS ARE IN TEXT FORMAT AND DATATYPE IS NOT TEXT
+                                           (-1 == columnPrecision ? 0 : columnPrecision),   // precision
+                                           true                                             // nullable? - no easy way to tell, so assume yes
                                          )
                               );
         
         }
-        
-        // setup a vector for the results
-        _outputParameterVector.resize( fieldCount );
     }
    
 	_SQLStatement                    = aSQLStatement;
@@ -235,7 +258,7 @@ void StatementExecutor::execute()
     }
     
     if (    _countPlaceholdersInSQLStatement != 0
-         && _inputParameterVector.size() != _countPlaceholdersInSQLStatement )
+         && _inputParameterVector.size()     != _countPlaceholdersInSQLStatement )
     {
 		throw StatementException( "Count of Parameters in Statement different than supplied parameters" );
     }
@@ -269,6 +292,9 @@ void StatementExecutor::execute()
         }
     }
     
+    // clear out any result data.  One way or another it is now obsolete.
+    clearResults();
+    
     PGresult * ptrPGResult = 0;
    
     {
@@ -289,12 +315,12 @@ void StatementExecutor::execute()
                                        _inputParameterVector.size() != 0 ? &pParameterVector[ 0 ]      : 0,
                                        _inputParameterVector.size() != 0 ? &parameterLengthVector[ 0 ] : 0,
                                        _inputParameterVector.size() != 0 ? &parameterFormatVector[ 0 ] : 0,
-                                       0 // text based result please
+                                       0 // text based result please!
                                       );
 
     }
-    
-    // Don't setup to auto clear the result.  It is required to retrieve the results later.
+
+    // Don't setup to auto clear the result (ptrPGResult).  It is required to retrieve the results later.
 
 	if (    ! ptrPGResult
          || (    PQresultStatus( ptrPGResult ) != PGRES_COMMAND_OK
@@ -324,42 +350,33 @@ void StatementExecutor::execute()
                                 );
     }
 
-    // clear out any old result first
-    {
-        PQResultClear resultClearer( _pResultHandle );
-    }
-    
     _pResultHandle = ptrPGResult;
 
     // are there any results?
+    
     int affectedRowCount = 0;
     
     if ( PGRES_TUPLES_OK == PQresultStatus( _pResultHandle ) )
     {
          affectedRowCount = PQntuples( _pResultHandle );
-        
-        if ( affectedRowCount > 0 )
+       
+        if ( affectedRowCount >= 0 )
         {
-            _currentRow = 0;
-        }
-        
-        if ( _affectedRowCount != affectedRowCount )
-        {
-            _affectedRowCount = affectedRowCount;
+            _affectedRowCount = static_cast< std::size_t >( affectedRowCount );
         }
     }
     else
-    {   // non Select DML statments also have an affected row count
-        // unfortunately postgres offers up this count as a char * - go figure!
+    {   // non Select DML statments also have an affected row count.
+        // unfortunately PostgreSQL offers up this count as a char * - go figure!
         const char * pNonSelectAffectedRowCountString = PQcmdTuples( _pResultHandle );
         if ( 0 != pNonSelectAffectedRowCountString )
         {
             if (    Poco::NumberParser::tryParse( pNonSelectAffectedRowCountString, affectedRowCount )
-                 && _affectedRowCount != affectedRowCount
+                 && affectedRowCount >= 0
                )
             {
-                _affectedRowCount = affectedRowCount;
-                _currentRow = _affectedRowCount;  // no fetching on these statements
+                _affectedRowCount = static_cast< std::size_t >( affectedRowCount );
+                _currentRow = _affectedRowCount;  // no fetching on these statements!
             }
         }
     }
@@ -381,18 +398,21 @@ StatementExecutor::fetch()
 		throw StatementException( "Statement is not yet executed" );
     }
     
+    std::size_t countColumns = columnsReturned();
+
+    // first time to fetch?
 	if ( 0 == _outputParameterVector.size() )
     {
-		throw StatementException( "No output location for Statement" );
+        // setup a output vector for the results
+        _outputParameterVector.resize( countColumns );
     }
     
-    if ( _currentRow == getAffectedRowCount() )  // already retrieved last row?
+    // already retrieved last row?
+    if ( _currentRow == getAffectedRowCount() )
     {
         return false;
     }
     
-    std::size_t countColumns = columnsReturned();
-
     if (    0 == countColumns
          || PGRES_TUPLES_OK != PQresultStatus( _pResultHandle ) )
     {
@@ -401,11 +421,13 @@ StatementExecutor::fetch()
     
     for ( std::size_t i = 0; i < countColumns; ++i )
     {
-        _outputParameterVector.at( i ).setValues( POSTGRESQL_TYPE_NONE,                                             // TODO - set based on Oid
+        int fieldLength = PQgetlength( _pResultHandle, static_cast< int > ( _currentRow ), static_cast< int > ( i ) );
+    
+        _outputParameterVector.at( i ).setValues( POSTGRESQL_TYPE_STRING,                                           // TODO - set based on Oid
                                                   PQftype( _pResultHandle, i ),                                     // Oid of column
                                                   _currentRow,                                                      // the row number of the result
                                                   PQgetvalue( _pResultHandle, _currentRow, i ),                     // a pointer to the data
-                                                  PQgetlength( _pResultHandle, _currentRow, i ),                    // the length of the data returned
+                                                  ( -1 == fieldLength ? 0 : fieldLength ),                          // the length of the data returned
                                                   PQgetisnull( _pResultHandle, _currentRow, i ) == 1 ? true : false // is the column null
                                                 );
     }
@@ -450,5 +472,20 @@ StatementExecutor::resultColumn( std::size_t aPosition ) const
     
 	return _outputParameterVector.at( aPosition );
 }
+
+
+void
+StatementExecutor::clearResults()
+{
+    // clear out any old result first
+    {
+        PQResultClear resultClearer( _pResultHandle );
+    }
+
+    _outputParameterVector.clear();
+    _affectedRowCount = 0;
+    _currentRow = 0;
+}
+
 
 }}}
