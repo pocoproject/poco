@@ -57,7 +57,10 @@ TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 port
 {
 	
 	Poco::ThreadPool& pool = Poco::ThreadPool::defaultPool();
-	if (pParams && pParams->getMaxThreads() != 0) pool.addCapacity(pParams->getMaxThreads() - pool.capacity());
+	if (pParams && pParams->getMaxThreads() != 0)
+	{
+		pool.addCapacity(pParams->getMaxThreads() - pool.capacity());
+	}
 	_pDispatcher = new TCPServerDispatcher(pFactory, pool, pParams);
 	
 }
@@ -69,7 +72,10 @@ TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocke
 	_stopped(true)
 {
 	Poco::ThreadPool& pool = Poco::ThreadPool::defaultPool();
-	if (pParams && pParams->getMaxThreads() != 0) pool.addCapacity(pParams->getMaxThreads() - pool.capacity());
+	if (pParams && pParams->getMaxThreads() != 0)
+	{
+		pool.addCapacity(pParams->getMaxThreads() - pool.capacity());
+	}
 	_pDispatcher = new TCPServerDispatcher(pFactory, pool, pParams);
 }
 
