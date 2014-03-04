@@ -135,6 +135,11 @@ public:
 		/// creates its own one.
 		///
 		/// New threads are taken from the given thread pool.
+		///
+		/// The maximum number of threads created will be the lowest value between
+		/// the thread pool capacity and the maxThreads parameter on TCPServerParams
+		/// object. Let the maxThreads parameter on TCPServerParams be 0 (zero) to
+		/// use the current capacity of the thread pool as limit.
 
 	virtual ~TCPServer();
 		/// Destroys the TCPServer and its TCPServerConnectionFactory.
