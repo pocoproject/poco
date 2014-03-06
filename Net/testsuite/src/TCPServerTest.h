@@ -49,6 +49,7 @@ public:
 	void testOneConnection();
 	void testTwoConnections();
 	void testMultiConnections();
+	void testThreadCapacity();
 
 	void setUp();
 	void tearDown();
