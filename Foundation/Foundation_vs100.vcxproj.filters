@@ -1889,6 +1889,9 @@
     <ClInclude Include="include\poco\DirectoryIteratorStrategy.h">
       <Filter>Filesystem\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\PBKDF2Engine.h">
+      <Filter>Crypt\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\pocomsg.rc">

@@ -1,9 +1,11 @@
 //
-// CryptTestSuite.cpp
+// PBKDF2EngineTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/CryptTestSuite.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/PBKDF2EngineTest.h#1 $
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Definition of the PBKDF2EngineTest class.
+//
+// Copyright (c) 2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,29 +32,34 @@
 //
 
 
-#include "CryptTestSuite.h"
-#include "MD4EngineTest.h"
-#include "MD5EngineTest.h"
-#include "SHA1EngineTest.h"
-#include "HMACEngineTest.h"
-#include "PBKDF2EngineTest.h"
-#include "DigestStreamTest.h"
-#include "RandomTest.h"
-#include "RandomStreamTest.h"
+#ifndef PBKDF2EngineTest_INCLUDED
+#define PBKDF2EngineTest_INCLUDED
 
 
-CppUnit::Test* CryptTestSuite::suite()
+#include "Poco/Foundation.h"
+#include "CppUnit/TestCase.h"
+
+
+class PBKDF2EngineTest: public CppUnit::TestCase
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("CryptTestSuite");
+public:
+	PBKDF2EngineTest(const std::string& name);
+	~PBKDF2EngineTest();
 
-	pSuite->addTest(MD4EngineTest::suite());
-	pSuite->addTest(MD5EngineTest::suite());
-	pSuite->addTest(SHA1EngineTest::suite());
-	pSuite->addTest(HMACEngineTest::suite());
-	pSuite->addTest(PBKDF2EngineTest::suite());
-	pSuite->addTest(DigestStreamTest::suite());
-	pSuite->addTest(RandomTest::suite());
-	pSuite->addTest(RandomStreamTest::suite());
+	void testPBKDF2a();
+	void testPBKDF2b();
+	void testPBKDF2c();
+	void testPBKDF2d();
+	void testPBKDF2e();
+	void testPBKDF2f();
 
-	return pSuite;
-}
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
+private:
+};
+
+
+#endif // PBKDF2EngineTest_INCLUDED

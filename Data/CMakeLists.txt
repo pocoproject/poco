@@ -8,6 +8,11 @@ if (NOT POCO_STATIC)
   add_definitions(-DData_EXPORTS -DTHREADSAFE -DODBC_EXPORTS -DMySQL_EXPORTS -DSQLite_EXPORTS)
 endif (NOT POCO_STATIC)
 
+if(MSVC AND NOT(MSVC_VERSION LESS 1400))
+    set_source_files_properties(src/StatementImpl.cpp
+        PROPERTIES COMPILE_FLAGS "/bigobj")
+endif()
+
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
 	PROPERTIES

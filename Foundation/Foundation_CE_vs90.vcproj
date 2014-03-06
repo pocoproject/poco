@@ -1886,6 +1886,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\PBKDF2Engine.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Random.h"
 					>
 				</File>

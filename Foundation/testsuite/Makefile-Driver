@@ -22,7 +22,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	NDCTest NotificationCenterTest NotificationQueueTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
-	NumberParserTest PathTest PatternFormatterTest RWLockTest \
+	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
 	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest \
 	SemaphoreTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
 	SimpleFileChannelTest StopwatchTest \
