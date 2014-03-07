@@ -1,7 +1,7 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPCookie.cpp#1 $
+// $Id: //poco/1.4/Net/src/HTTPCookie.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -102,7 +102,7 @@ HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 		{
 			setPath(value);
 		}
-		else if (icompare(name, "Priority") == 0)
+		else if (icompare(name, "priority") == 0)
 		{
 			setPriority(value);
 		}
@@ -222,6 +222,7 @@ void HTTPCookie::setPath(const std::string& path)
 {
 	_path = path;
 }
+
 
 void HTTPCookie::setPriority(const std::string& priority)
 {

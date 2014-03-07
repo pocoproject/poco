@@ -1,7 +1,7 @@
 //
 // HTTPCookie.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPCookie.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPCookie.h#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -260,6 +260,7 @@ inline const std::string& HTTPCookie::getPath() const
 {
 	return _path;
 }
+
 
 inline const std::string& HTTPCookie::getPriority() const
 {

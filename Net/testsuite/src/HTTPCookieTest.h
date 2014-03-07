@@ -1,7 +1,7 @@
 //
 // HTTPCookieTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPCookieTest.h#1 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPCookieTest.h#2 $
 //
 // Definition of the HTTPCookieTest class.
 //

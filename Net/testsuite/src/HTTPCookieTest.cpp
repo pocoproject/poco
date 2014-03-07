@@ -1,7 +1,7 @@
 //
 // HTTPCookieTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPCookieTest.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPCookieTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -43,6 +43,7 @@
 #include "Poco/Net/NameValueCollection.h"
 #include <cstdlib>
 #include <sstream>
+
 
 using Poco::Timestamp;
 using Poco::Timespan;
@@ -104,8 +105,7 @@ void HTTPCookieTest::testCookie()
 	cookie.setPriority("Medium");
 	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Priority=\"Medium\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");
 	cookie.setPriority("High");
-	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Priority=\"High\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");
-	
+	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Priority=\"High\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");	
 }
 
 
