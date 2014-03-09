@@ -450,6 +450,7 @@ void MailMessageTest::testReadMultiPart()
 	assert (handler.disp()[1] == "attachment; filename=sample.dat");
 }
 
+
 void MailMessageTest::testReadMultiPartDefaultTransferEncoding()
 {
 	std::istringstream istr(

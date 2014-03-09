@@ -102,9 +102,8 @@ namespace
 			Poco::StreamCopier::copyToString(stream, tmp);
 			if (_pMsg)
 			{
-				
 				MailMessage::ContentTransferEncoding cte = MailMessage::ENCODING_7BIT;
-				if(header.has(MailMessage::HEADER_CONTENT_TRANSFER_ENCODING))
+				if (header.has(MailMessage::HEADER_CONTENT_TRANSFER_ENCODING))
 				{
 					std::string enc = header[MailMessage::HEADER_CONTENT_TRANSFER_ENCODING];
 					if (enc == MailMessage::CTE_8BIT)
