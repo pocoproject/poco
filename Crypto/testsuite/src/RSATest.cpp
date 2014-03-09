@@ -169,6 +169,7 @@ void RSATest::testSignSha256()
 	assert (eng2.verify(sig));
 }
 
+
 void RSATest::testSignManipulated()
 {
 	std::string msg("Test this sign message");
