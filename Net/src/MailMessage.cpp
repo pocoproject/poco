@@ -104,13 +104,16 @@ namespace
 			{
 				
 				MailMessage::ContentTransferEncoding cte = MailMessage::ENCODING_7BIT;
-				std::string enc = header[MailMessage::HEADER_CONTENT_TRANSFER_ENCODING];
-				if (enc == MailMessage::CTE_8BIT)
-					cte = MailMessage::ENCODING_8BIT;
-				else if (enc == MailMessage::CTE_QUOTED_PRINTABLE)
-					cte = MailMessage::ENCODING_QUOTED_PRINTABLE;
-				else if (enc == MailMessage::CTE_BASE64)
-					cte = MailMessage::ENCODING_BASE64;
+				if(header.has(MailMessage::HEADER_CONTENT_TRANSFER_ENCODING))
+				{
+					std::string enc = header[MailMessage::HEADER_CONTENT_TRANSFER_ENCODING];
+					if (enc == MailMessage::CTE_8BIT)
+						cte = MailMessage::ENCODING_8BIT;
+					else if (enc == MailMessage::CTE_QUOTED_PRINTABLE)
+						cte = MailMessage::ENCODING_QUOTED_PRINTABLE;
+					else if (enc == MailMessage::CTE_BASE64)
+						cte = MailMessage::ENCODING_BASE64;
+				}
 
 				NameValueCollection::ConstIterator it = header.begin();
 				NameValueCollection::ConstIterator end = header.end();
