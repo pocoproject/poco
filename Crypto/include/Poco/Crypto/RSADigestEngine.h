@@ -43,9 +43,7 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/DigestEngine.h"
-#include "Poco/MD5Engine.h"
-#include "Poco/SHA1Engine.h"
-#include <openssl/rsa.h>
+#include "Poco/Crypto/DigestEngine.h"
 #include <istream>
 #include <ostream>
 
@@ -58,10 +56,10 @@ class Crypto_API RSADigestEngine: public Poco::DigestEngine
 	/// This class implements a Poco::DigestEngine that can be
 	/// used to compute a secure digital signature.
 	///
-	/// First another Poco::DigestEngine (Poco::MD5Engine
-	/// or Poco::SHA1Engine) is used to compute a cryptographic
-	/// hash of the data to be signed. Then, the hash value is
-	/// encrypted, using the RSA private key.
+	/// First another Poco::Crypto::DigestEngine is created and
+	/// used to compute a cryptographic hash of the data to be
+	/// signed. Then, the hash value is encrypted, using
+	/// the RSA private key.
 	///
 	/// To verify a signature, pass it to the verify() 
 	/// member function. It will decrypt the signature
@@ -75,9 +73,19 @@ public:
 		DIGEST_SHA1
 	};
 	
+	//@ deprecated
 	RSADigestEngine(const RSAKey& key, DigestType digestType = DIGEST_SHA1);
 		/// Creates the RSADigestEngine with the given RSA key,
-		/// using the SHA-1 hash algorithm.
+		/// using the MD5 or SHA-1 hash algorithm.
+		/// Kept for backward compatibility
+
+	RSADigestEngine(const RSAKey& key, const std::string &name);
+		/// Creates the RSADigestEngine with the given RSA key,
+		/// using the hash algorithm with the given name
+		/// (e.g., "MD5", "SHA1", "SHA256", "SHA512", etc.).
+		/// See the OpenSSL documentation for a list of supported digest algorithms.
+		///
+		/// Throws a Poco::NotFoundException if no algorithm with the given name exists.
 
 	~RSADigestEngine();
 		/// Destroys the RSADigestEngine.
@@ -113,12 +121,9 @@ protected:
 
 private:
 	RSAKey _key;
-	Poco::DigestEngine& _engine;
-	int _type;
+	Poco::Crypto::DigestEngine _engine;
 	Poco::DigestEngine::Digest _digest;
 	Poco::DigestEngine::Digest _signature;
-	Poco::MD5Engine _md5Engine;
-	Poco::SHA1Engine _sha1Engine;
 };
 
 
