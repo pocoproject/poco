@@ -72,7 +72,7 @@
 #elif defined(_AIX) || defined(__TOS_AIX__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_AIX
-#elif defined(hpux) || defined(_hpux)
+#elif defined(hpux) || defined(_hpux) || defined(__hpux)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_HPUX
 #elif defined(__digital__) || defined(__osf__)

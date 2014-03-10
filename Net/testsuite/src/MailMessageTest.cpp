@@ -358,6 +358,31 @@ void MailMessageTest::testReadQP()
 }
 
 
+void MailMessageTest::testReadDefaultTransferEncoding()
+{
+	std::istringstream istr(
+		"Content-Type: text/plain\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Subject: Test Message\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"Hello, world!\r\n"
+		"This is a test for the MailMessage class.\r\n"
+	);
+
+	MailMessage message;
+	message.read(istr);
+
+	assert (message.getSender() == "poco@appinf.com");
+	assert (message.getContentType() == "text/plain");
+	assert (message.getContent() ==
+		"Hello, world!\r\n"
+		"This is a test for the MailMessage class.\r\n"
+	);
+}
+
+
 void MailMessageTest::testRead8Bit()
 {
 	std::istringstream istr(
@@ -415,6 +440,47 @@ void MailMessageTest::testReadMultiPart()
 	MailMessage message;
 	message.read(istr, handler);
 	
+	assert (handler.data().size() == 2);
+	assert (handler.data()[0] == "Hello World!\r\n");
+	assert (handler.type()[0] == "text/plain");
+	assert (handler.disp()[0] == "inline");
+
+	assert (handler.data()[1] == "This is some binary data. Really.");
+	assert (handler.type()[1] == "application/octet-stream; name=sample");
+	assert (handler.disp()[1] == "attachment; filename=sample.dat");
+}
+
+
+void MailMessageTest::testReadMultiPartDefaultTransferEncoding()
+{
+	std::istringstream istr(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"Subject: Test Message\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: inline\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"Hello World!\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=sample.dat\r\n"
+		"Content-Transfer-Encoding: base64\r\n"
+		"Content-Type: application/octet-stream; name=sample\r\n"
+		"\r\n"
+		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+
+	StringPartHandler handler;
+	MailMessage message;
+	message.read(istr, handler);
+
 	assert (handler.data().size() == 2);
 	assert (handler.data()[0] == "Hello World!\r\n");
 	assert (handler.type()[0] == "text/plain");
@@ -573,8 +639,10 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteManyRecipients);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadQP);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadDefaultTransferEncoding);
 	CppUnit_addTest(pSuite, MailMessageTest, testRead8Bit);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartDefaultTransferEncoding);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPartStore);
 	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWord);

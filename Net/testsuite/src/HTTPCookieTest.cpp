@@ -1,7 +1,7 @@
 //
 // HTTPCookieTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPCookieTest.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPCookieTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -44,6 +44,7 @@
 #include <cstdlib>
 #include <sstream>
 
+
 using Poco::Timestamp;
 using Poco::Timespan;
 using Poco::DateTimeFormatter;
@@ -80,8 +81,15 @@ void HTTPCookieTest::testCookie()
 	assert (cookie.toString() == "name=value; domain=appinf.com; path=/; secure");
 	cookie.setHttpOnly(true);
 	assert (cookie.toString() == "name=value; domain=appinf.com; path=/; secure; HttpOnly");
+	cookie.setPriority("Low");
+	assert (cookie.toString() == "name=value; domain=appinf.com; path=/; Priority=Low; secure; HttpOnly");
+	cookie.setPriority("Medium");
+	assert (cookie.toString() == "name=value; domain=appinf.com; path=/; Priority=Medium; secure; HttpOnly");
+	cookie.setPriority("High");
+	assert (cookie.toString() == "name=value; domain=appinf.com; path=/; Priority=High; secure; HttpOnly");
+	cookie.setPriority("");
 	cookie.setHttpOnly(false);
-	
+
 	cookie.setVersion(1);
 	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; secure; Version=\"1\"");
 	
@@ -91,6 +99,13 @@ void HTTPCookieTest::testCookie()
 	
 	cookie.setHttpOnly(true);
 	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");
+
+	cookie.setPriority("Low");
+	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Priority=\"Low\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");
+	cookie.setPriority("Medium");
+	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Priority=\"Medium\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");
+	cookie.setPriority("High");
+	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Priority=\"High\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");	
 }
 
 

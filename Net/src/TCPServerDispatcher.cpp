@@ -197,6 +197,13 @@ int TCPServerDispatcher::currentThreads() const
 	return _currentThreads;
 }
 
+int TCPServerDispatcher::maxThreads() const
+{
+	FastMutex::ScopedLock lock(_mutex);
+	
+	return _threadPool.capacity();
+}
+
 
 int TCPServerDispatcher::totalConnections() const
 {

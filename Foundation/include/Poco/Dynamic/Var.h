@@ -788,7 +788,11 @@ inline bool Var::isEmpty() const
 
 inline bool Var::isArray() const
 {
-	return !isEmpty() && !isString();
+	if (isEmpty() || 
+		isString()) return false;
+
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isArray() : false;
 }
 
 

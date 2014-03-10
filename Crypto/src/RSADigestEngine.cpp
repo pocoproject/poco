@@ -35,7 +35,7 @@
 
 
 #include "Poco/Crypto/RSADigestEngine.h"
-#include <openssl/pem.h>
+#include <openssl/rsa.h>
 
 
 namespace Poco {
@@ -44,8 +44,13 @@ namespace Crypto {
 
 RSADigestEngine::RSADigestEngine(const RSAKey& key, DigestType digestType):
 	_key(key),
-	_engine(digestType == DIGEST_MD5 ? static_cast<Poco::DigestEngine&>(_md5Engine) : static_cast<Poco::DigestEngine&>(_sha1Engine)),
-	_type(digestType == DIGEST_MD5 ? NID_md5 : NID_sha1)
+	_engine(digestType == DIGEST_MD5 ? "MD5" : "SHA1")
+{
+}
+
+RSADigestEngine::RSADigestEngine(const RSAKey& key, const std::string &name):
+	_key(key),
+	_engine(name)
 {
 }
 
@@ -86,7 +91,7 @@ const DigestEngine::Digest& RSADigestEngine::signature()
 		digest();
 		_signature.resize(_key.size());
 		unsigned sigLen = static_cast<unsigned>(_signature.size());
-		RSA_sign(_type, &_digest[0], static_cast<unsigned>(_digest.size()), &_signature[0], &sigLen, _key.impl()->getRSA());
+		RSA_sign(_engine.nid(), &_digest[0], static_cast<unsigned>(_digest.size()), &_signature[0], &sigLen, _key.impl()->getRSA());
 		// truncate _sig to sigLen
 		if (sigLen < _signature.size())
 			_signature.resize(sigLen);
@@ -99,7 +104,7 @@ bool RSADigestEngine::verify(const DigestEngine::Digest& sig)
 {
 	digest();
 	DigestEngine::Digest sigCpy = sig; // copy becausse RSA_verify can modify sigCpy
-	int ret = RSA_verify(_type, &_digest[0], static_cast<unsigned>(_digest.size()), &sigCpy[0], static_cast<unsigned>(sigCpy.size()), _key.impl()->getRSA());
+	int ret = RSA_verify(_engine.nid(), &_digest[0], static_cast<unsigned>(_digest.size()), &sigCpy[0], static_cast<unsigned>(sigCpy.size()), _key.impl()->getRSA());
 	return ret != 0;
 }
 

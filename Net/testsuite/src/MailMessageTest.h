@@ -53,9 +53,11 @@ public:
 	void testWriteMultiPart();
 	void testReadWriteMultiPart();
 	void testReadWriteMultiPartStore();
+	void testReadDefaultTransferEncoding();
 	void testReadQP();
 	void testRead8Bit();
 	void testReadMultiPart();
+	void testReadMultiPartDefaultTransferEncoding();
 	void testEncodeWord();
 
 	void setUp();

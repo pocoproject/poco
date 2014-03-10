@@ -175,6 +175,7 @@ void TCPServerTest::testMultiConnections()
 	srv.start();
 	assert (srv.currentConnections() == 0);
 	assert (srv.currentThreads() == 0);
+	assert (srv.maxThreads() >= 4);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
@@ -252,6 +253,16 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.currentConnections() == 0);
 }
 
+void TCPServerTest::testThreadCapacity(){
+	ServerSocket svs(0);
+	TCPServerParams* pParams = new TCPServerParams;
+	pParams->setMaxThreads(64);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs, pParams);
+	srv.start();
+	assert (srv.maxThreads() >= 64);
+}
+
+
 
 void TCPServerTest::setUp()
 {
@@ -270,6 +281,7 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testOneConnection);
 	CppUnit_addTest(pSuite, TCPServerTest, testTwoConnections);
 	CppUnit_addTest(pSuite, TCPServerTest, testMultiConnections);
+	CppUnit_addTest(pSuite, TCPServerTest, testThreadCapacity);
 
 	return pSuite;
 }

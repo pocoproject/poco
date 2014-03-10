@@ -162,6 +162,9 @@ public:
 	int currentThreads() const;
 		/// Returns the number of currently used connection threads.
 
+	int maxThreads() const;
+		/// Returns the maximum number of threads available.
+
 	int totalConnections() const;
 		/// Returns the total number of handled connections.
 		
