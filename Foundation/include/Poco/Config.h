@@ -120,6 +120,11 @@
 #endif
 
 
+// Define to disable compilation of DirectoryWatcher
+// on platforms with no inotify.
+// #define POCO_NO_INOTIFY
+
+
 // Following are options to remove certain features
 // to reduce library/executable size for smaller
 // embedded platforms. By enabling these options,

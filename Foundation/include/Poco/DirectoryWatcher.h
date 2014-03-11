@@ -41,6 +41,11 @@
 
 
 #include "Poco/Foundation.h"
+
+
+#ifndef POCO_NO_INOTIFY
+
+
 #include "Poco/File.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/Runnable.h"
@@ -242,4 +247,8 @@ inline const File& DirectoryWatcher::directory() const
 } // namespace Poco
 
 
+#endif // POCO_NO_INOTIFY
+
+
 #endif // Foundation_DirectoryWatcher_INCLUDED
+

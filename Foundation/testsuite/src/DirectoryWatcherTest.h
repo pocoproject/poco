@@ -37,6 +37,11 @@
 
 
 #include "Poco/Foundation.h"
+
+
+#ifndef POCO_NO_INOTIFY
+
+
 #include "Poco/DirectoryWatcher.h"
 #include "Poco/Path.h"
 #include "CppUnit/TestCase.h"
@@ -80,4 +85,9 @@ private:
 };
 
 
+#endif // POCO_NO_INOTIFY
+
+
 #endif // DirectoryWatcherTest_INCLUDED
+
+
