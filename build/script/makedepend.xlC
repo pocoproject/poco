@@ -27,5 +27,5 @@ $CXX -qmakedep -E -w $@ $cwd/$source >/dev/null
 
 ufile=`basename $source`
 ufile=`echo $ufile | sed "s#\.cpp#\.u#"`
-cat $ufile | sort | uniq | grep -v '/usr/include' | grep -v '/usr/vacpp' | sed "s#\(.*\.o\)#$dir1/\1 $dir2/\1 $dir3/\1 $dir4/\1#" >$target
+cat $ufile | sort | uniq | grep -v '/usr/include' | grep -v '/usr/vacpp' | sed "s#\(.*\.o$\)#$dir1/\1 $dir2/\1 $dir3/\1 $dir4/\1#" >$target
 
