@@ -40,6 +40,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Thread.h"
+#include "Poco/ThreadPool.h"
 #include <iostream>
 
 
@@ -52,6 +53,7 @@ using Poco::Net::StreamSocket;
 using Poco::Net::ServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Thread;
+using Poco::ThreadPool;
 
 
 namespace
@@ -253,6 +255,94 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.currentConnections() == 0);
 }
 
+
+void TCPServerTest::testMultiConnectionsDefaultParams()
+{
+	ServerSocket svs(0);
+	TCPServerParams* pParams = new TCPServerParams;
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs, pParams);
+	srv.start();
+	assert (srv.currentConnections() == 0);
+	assert (srv.currentThreads() == 0);
+	assert (srv.maxThreads() == Poco::ThreadPool::defaultPool().capacity());
+	assert (srv.queuedConnections() == 0);
+	assert (srv.totalConnections() == 0);
+
+	SocketAddress sa("localhost", svs.address().port());
+	StreamSocket ss1(sa);
+	StreamSocket ss2(sa);
+	StreamSocket ss3(sa);
+	StreamSocket ss4(sa);
+	std::string data("hello, world");
+	ss1.sendBytes(data.data(), (int) data.size());
+	ss2.sendBytes(data.data(), (int) data.size());
+	ss3.sendBytes(data.data(), (int) data.size());
+	ss4.sendBytes(data.data(), (int) data.size());
+
+	char buffer[256];
+	int n = ss1.receiveBytes(buffer, sizeof(buffer));
+	assert (n > 0);
+	assert (std::string(buffer, n) == data);
+
+	n = ss2.receiveBytes(buffer, sizeof(buffer));
+	assert (n > 0);
+	assert (std::string(buffer, n) == data);
+
+	n = ss3.receiveBytes(buffer, sizeof(buffer));
+	assert (n > 0);
+	assert (std::string(buffer, n) == data);
+
+	n = ss4.receiveBytes(buffer, sizeof(buffer));
+	assert (n > 0);
+	assert (std::string(buffer, n) == data);
+
+	assert (srv.currentConnections() == 4);
+	assert (srv.currentThreads() == 4);
+	assert (srv.queuedConnections() == 0);
+	assert (srv.totalConnections() == 4);
+
+	StreamSocket ss5(sa);
+	Thread::sleep(200);
+	assert (srv.queuedConnections() == 1);
+	StreamSocket ss6(sa);
+	Thread::sleep(200);
+	assert (srv.queuedConnections() == 2);
+
+	ss1.close();
+	Thread::sleep(300);
+	assert (srv.currentConnections() == 4);
+	assert (srv.currentThreads() == 4);
+	assert (srv.queuedConnections() == 1);
+	assert (srv.totalConnections() == 5);
+
+	ss2.close();
+	Thread::sleep(300);
+	assert (srv.currentConnections() == 4);
+	assert (srv.currentThreads() == 4);
+	assert (srv.queuedConnections() == 0);
+	assert (srv.totalConnections() == 6);
+
+	ss3.close();
+	Thread::sleep(300);
+	assert (srv.currentConnections() == 3);
+	assert (srv.currentThreads() == 3);
+	assert (srv.queuedConnections() == 0);
+	assert (srv.totalConnections() == 6);
+
+	ss4.close();
+	Thread::sleep(300);
+	assert (srv.currentConnections() == 2);
+	assert (srv.currentThreads() == 2);
+	assert (srv.queuedConnections() == 0);
+	assert (srv.totalConnections() == 6);
+
+	ss5.close();
+	ss6.close();
+	Thread::sleep(300);
+	assert (srv.currentConnections() == 0);
+}
+
+
 void TCPServerTest::testThreadCapacity(){
 	ServerSocket svs(0);
 	TCPServerParams* pParams = new TCPServerParams;
@@ -262,6 +352,13 @@ void TCPServerTest::testThreadCapacity(){
 	assert (srv.maxThreads() >= 64);
 }
 
+
+void TCPServerTest::testDefaultThreadCapacity(){
+	ServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+	assert (srv.maxThreads() == Poco::ThreadPool::defaultPool().capacity());
+}
 
 
 void TCPServerTest::setUp()
@@ -281,7 +378,9 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testOneConnection);
 	CppUnit_addTest(pSuite, TCPServerTest, testTwoConnections);
 	CppUnit_addTest(pSuite, TCPServerTest, testMultiConnections);
+	CppUnit_addTest(pSuite, TCPServerTest, testMultiConnectionsDefaultParams);
 	CppUnit_addTest(pSuite, TCPServerTest, testThreadCapacity);
+	CppUnit_addTest(pSuite, TCPServerTest, testDefaultThreadCapacity);
 
 	return pSuite;
 }
