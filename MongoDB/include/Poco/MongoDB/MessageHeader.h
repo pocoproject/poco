@@ -121,6 +121,7 @@ inline Int32 MessageHeader::getMessageLength() const
 
 inline void MessageHeader::setMessageLength(Int32 length)
 {
+	poco_assert (_messageLength >= 0);
 	_messageLength = MSG_HEADER_SIZE + length;
 }
 
