@@ -62,9 +62,13 @@ set( BASE_SRCS
   src/Net.cpp
   src/NetException.cpp
   src/NetworkInterface.cpp
+  src/NTPClient.cpp
+  src/NTPEventArgs.cpp
+  src/NTPPacket.cpp
   src/NullPartHandler.cpp
   src/PartHandler.cpp
   src/PartSource.cpp
+  src/PartStore.cpp
   src/POP3ClientSession.cpp
   src/QuotedPrintableDecoder.cpp
   src/QuotedPrintableEncoder.cpp

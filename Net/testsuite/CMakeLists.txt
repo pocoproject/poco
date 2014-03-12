@@ -39,6 +39,8 @@ src/NameValueCollectionTest.cpp
 src/NetCoreTestSuite.cpp
 src/NetTestSuite.cpp
 src/NetworkInterfaceTest.cpp
+src/NTPClientTest.cpp
+src/NTPClientTestSuite.cpp
 src/POP3ClientSessionTest.cpp
 src/QuotedPrintableTest.cpp
 src/RawSocketTest.cpp
