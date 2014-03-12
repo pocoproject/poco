@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.3 (2014-02-xx)
+Release 1.5.3 (2014-05-xx)
 ==========================
 
 - fixed GH# 316: Poco::DateTimeFormatter::append() gives wrong result for 
@@ -16,6 +16,26 @@ Release 1.5.3 (2014-02-xx)
   have been changed to use Poco::Clock instead of Poco::Timestamp and are now
   unaffected by system realtime clock changes.
 - fixed GH# 350: Memory leak in Data/ODBC with BLOB
+- Correctly set MySQL time_type for Poco::Data::Date.
+- fixed GH #352: Removed redundant #includes and fixed spelling mistakes. 
+- fixed setting of MYSQL_BIND is_unsigned value.
+- fixed GH #360: CMakeLists foundation: add Clock.cpp in the list of source files
+- Add extern "C" around <net/if.h> on HPUX platform.
+- added runtests.sh
+- fixed CPPUNIT_IGNORE parsing
+- fixed Glob from start path, for platforms not alowing transverse from root (Android)
+- added NTPClient (Rangel Reale)
+- added PowerShell build script
+- added SmartOS build support
+- fix warnings in headers
+- XMLWriter: removed unnecessary apostrophe escaping (&apos)
+- MongoDB: use Int32 for messageLength
+- fixed GH #380: SecureSocket+DialogSocket crashes with SIGSEGV when timeout occours
+- Improve RSADigestEngine, using Poco::Crypto::DigestEngine to calculate hash before signing
+- added Poco::PBKDF2Engine
+- added support for a 'Priority' attribute on cookies.
+- GH #386: fixed bug in MailMessage without content-transfer-encoding header
+- GH #384: ew hash algorithms support for RSADigestEngine
 
 
 Release 1.5.2 (2013-09-16)
