@@ -133,13 +133,13 @@ struct SQLite_API SQLiteConnectorRegistrator
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 		extern "C" const struct SQLite_API SQLiteConnectorRegistrator pocoSQLiteConnectorRegistrator;
 		#if defined(SQLite_EXPORTS)
-			#if defined(_WIN64)
+			#if defined(_WIN64 || defined(_WIN32_WCE)
 				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
 			#elif defined(_WIN32)
 				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
 			#endif
 		#else  // !SQLite_EXPORTS
-			#if defined(_WIN64)
+			#if defined(_WIN64) || defined(_WIN32_WCE)
 				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
 			#elif defined(_WIN32)
 				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
