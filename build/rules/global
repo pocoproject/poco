@@ -51,7 +51,7 @@ export POCO_BUILD
 # Also, if we're building under $POCO_BASE, disarm
 # $PROJECT_BASE
 #
-cwd = $(shell pwd)
+cwd = $(CURDIR)
 inpoco = $(shell echo | awk '{print index("$(cwd)","$(POCO_BASE)")}')
 inproj = $(shell echo | awk '{print index("$(cwd)","$(PROJECT_BASE)")}')
 ifneq ($(inpoco),0)
