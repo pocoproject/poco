@@ -117,7 +117,7 @@ bool FileImpl::existsImpl() const
 	poco_assert (!_path.empty());
 
 	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
+	if (attr == INVALID_FILE_ATTRIBUTES)
 	{
 		switch (GetLastError())
 		{
@@ -139,7 +139,7 @@ bool FileImpl::canReadImpl() const
 	poco_assert (!_path.empty());
 	
 	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
+	if (attr == INVALID_FILE_ATTRIBUTES)
 	{
 		switch (GetLastError())
 		{
@@ -158,7 +158,7 @@ bool FileImpl::canWriteImpl() const
 	poco_assert (!_path.empty());
 	
 	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
+	if (attr == INVALID_FILE_ATTRIBUTES)
 		handleLastErrorImpl(_path);
 	return (attr & FILE_ATTRIBUTE_READONLY) == 0;
 }
@@ -182,7 +182,7 @@ bool FileImpl::isDirectoryImpl() const
 	poco_assert (!_path.empty());
 
 	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
+	if (attr == INVALID_FILE_ATTRIBUTES)
 		handleLastErrorImpl(_path);
 	return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
@@ -205,7 +205,7 @@ bool FileImpl::isHiddenImpl() const
 	poco_assert (!_path.empty());
 
 	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
+	if (attr == INVALID_FILE_ATTRIBUTES)
 		handleLastErrorImpl(_path);
 	return (attr & FILE_ATTRIBUTE_HIDDEN) != 0;
 }
@@ -270,7 +270,7 @@ void FileImpl::setSizeImpl(FileSizeImpl size)
 	FileHandle fh(_path, _upath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING);
 	LARGE_INTEGER li;
 	li.QuadPart = size;
-	if (SetFilePointer(fh.get(), li.LowPart, &li.HighPart, FILE_BEGIN) == -1)
+	if (SetFilePointer(fh.get(), li.LowPart, &li.HighPart, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
 		handleLastErrorImpl(_path);
 	if (SetEndOfFile(fh.get()) == 0) 
 		handleLastErrorImpl(_path);
