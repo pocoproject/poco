@@ -109,10 +109,16 @@ public:
 		///
 		/// Directories will be created as necessary. File attributes
 		/// will not be restored.
+		///
+		/// Progress and errors for single entries will be reported
+		/// via the extracted and failed events.
 		
 	std::string extract(const ArchiveEntry& entry, const std::string& destPath);
 		/// Extracts a specific entry to the given path.
 		/// 
+		/// Directories will be created as necessary. File attributes
+		/// will not be restored.
+		///
 		/// Returns the absolute path of the extracted entry.
 
 private:

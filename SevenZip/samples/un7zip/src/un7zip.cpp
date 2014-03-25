@@ -110,7 +110,7 @@ protected:
 			Option("extract", "x", "Extract single file or entire archive.")
 				.required(false)
 				.repeatable(false)
-				.argument("[file]", false)
+				.argument("file", false)
 				.callback(OptionCallback<Un7zipApp>(this, &Un7zipApp::handleExtract)));
 	}
 	
@@ -141,7 +141,7 @@ protected:
 	{
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
-		helpFormatter.setUsage("OPTIONS outdir");
+		helpFormatter.setUsage("OPTIONS archive");
 		helpFormatter.setHeader("A application that demonstrates usage of Poco::SevenZip::Archive.");
 		helpFormatter.format(std::cout);
 	}
