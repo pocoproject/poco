@@ -1,7 +1,7 @@
 //
 // Version.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Version.h#16 $
+// $Id: //poco/1.4/Foundation/include/Poco/Version.h#18 $
 //
 // Library: Foundation
 // Package: Core

@@ -1,16 +1,5 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.6p3 (2013-12-20)
-============================
-
-- fixed GH# 305 (memcpy in Poco::Buffer uses wrong size if type != char)
-- fixed GH# 316: Poco::DateTimeFormatter::append() gives wrong result for 
-  Poco::LocalDateTime
-- Poco::Data::MySQL: added SQLite thread cleanup handler
-- Poco::Net::X509Certificate: improved and fixed domain name verification for 
-  wildcard domains
-
-
 Release 1.4.6p2 (2013-09-16)
 ============================
 
@@ -1869,4 +1858,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#95 $
+$Id: //poco/1.4/dist/CHANGELOG#94 $

@@ -1,7 +1,7 @@
 //
 // Buffer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Buffer.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/Buffer.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -81,7 +81,7 @@ public:
 		if (preserveContent)
 		{
 			std::size_t n = newSize > _size ? _size : newSize;
-			std::memcpy(ptr, _ptr, n*sizeof(T));
+			std::memcpy(ptr, _ptr, n);
 		}
 		delete [] _ptr;
 		_ptr  = ptr;

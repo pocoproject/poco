@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#9 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#11 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -413,12 +413,21 @@ int SecureSocketImpl::handleError(int rc)
 {
 	if (rc > 0) return rc;
 
-	int sslError = SSL_get_error(_pSSL, rc);	
+	int sslError = SSL_get_error(_pSSL, rc);
+	int error = SocketImpl::lastError();
+
 	switch (sslError)
 	{
 	case SSL_ERROR_ZERO_RETURN:
 		return 0;
 	case SSL_ERROR_WANT_READ:
+		if (_pSocket->getBlocking() && error != 0)
+		{
+			if (error == POCO_EAGAIN)
+				throw TimeoutException(error);
+			else
+				SocketImpl::error(error);
+		}
 		return SecureStreamSocket::ERR_SSL_WANT_READ;
 	case SSL_ERROR_WANT_WRITE:
 		return SecureStreamSocket::ERR_SSL_WANT_WRITE;
@@ -428,6 +437,16 @@ int SecureSocketImpl::handleError(int rc)
 		// these should not occur
 		poco_bugcheck();
 		return rc;
+	case SSL_ERROR_SYSCALL:
+		if (error != 0)
+		{
+			if (_pSocket->getBlocking() && error == POCO_EAGAIN)
+				throw TimeoutException(error);
+			else
+				SocketImpl::error(error);
+			return rc;
+		}
+		// fallthrough
 	default:
 		{
 			long lastError = ERR_get_error();

@@ -1,7 +1,7 @@
 //
 // SesssionHandle.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/SessionHandle.cpp#2 $
+// $Id: //poco/1.4/Data/MySQL/src/SessionHandle.cpp#1 $
 //
 // Library: Data/MySQL
 // Package: MySQL
@@ -35,52 +35,12 @@
 
 
 #include "Poco/Data/MySQL/SessionHandle.h"
-#include "Poco/SingletonHolder.h"
 #include <cstring>
-#ifdef POCO_OS_FAMILY_UNIX
-#include <pthread.h>
-#endif
 
 
 namespace Poco {
 namespace Data {
 namespace MySQL {
-
-
-#ifdef POCO_OS_FAMILY_UNIX
-class ThreadCleanupHelper
-{
-public:
-	ThreadCleanupHelper()
-	{
-		if (pthread_key_create(&_key, &ThreadCleanupHelper::cleanup) != 0)
-			throw Poco::SystemException("cannot create TLS key for mysql cleanup");
-	}
-	
-	void init()
-	{
-		if (pthread_setspecific(_key, reinterpret_cast<void*>(1)))
-			throw Poco::SystemException("cannot set TLS key for mysql cleanup");
-	}
-	
-	static ThreadCleanupHelper& instance()
-	{
-		return *_sh.get();
-	}
-	
-	static void cleanup(void* data)
-	{
-		mysql_thread_end();
-	}
-	
-private:
-	pthread_key_t _key;
-	static Poco::SingletonHolder<ThreadCleanupHelper> _sh;
-};
-
-
-Poco::SingletonHolder<ThreadCleanupHelper> ThreadCleanupHelper::_sh;
-#endif
 
 
 SessionHandle::SessionHandle(MYSQL* mysql)
@@ -91,9 +51,6 @@ SessionHandle::SessionHandle(MYSQL* mysql)
 	{
 		throw ConnectionException("mysql_init error");
 	}
-#ifdef POCO_OS_FAMILY_UNIX
-	ThreadCleanupHelper::instance().init();
-#endif
 }
 
 
