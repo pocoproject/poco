@@ -1,0 +1,10 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+before_install:
+ - sudo apt-get update -qq
+# - sudo DEBIAN_FRONTEND=noninteractive apt-get -qq -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
+ - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev
+script: ./configure && make -s -j2
+
