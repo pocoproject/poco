@@ -1,6 +1,14 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.4.6p3
+
+!!Summary of Changes
+
+  - Fixed a potential security vulnerability in client-side X509
+    certificate verification.
+
+
 !!!Release 1.4.6p2
 
 !!Summary of Changes
