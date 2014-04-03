@@ -1369,7 +1369,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #ifndef POCO_ANDROID // Android doesn't have <ifaddrs.h>
 #include <ifaddrs.h>
 #endif
-#include <linux/if.h>
+#include <net/if.h>
 #include <linux/if_packet.h>
 #include <net/if_arp.h>
 #include <iostream>
