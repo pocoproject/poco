@@ -179,7 +179,8 @@ exit /b 1
 )
 set PLATFORMSW=/p:Platform=%WEC2013_PLATFORM%)
 set USEENV=
-set EXTRASW=/m /p:VisualStudioVersion=11.0
+if %VS_VERSION%==vs110 (set EXTRASW=/m /p:VisualStudioVersion=11.0)
+if %VS_VERSION%==vs120 (set EXTRASW=/m /p:VisualStudioVersion=12.0)
 )
 
 rem SAMPLES [samples|nosamples]
