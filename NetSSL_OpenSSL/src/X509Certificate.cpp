@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/X509Certificate.cpp#3 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/X509Certificate.cpp#4 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -138,6 +138,10 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 							ok = (*it == ip);
 						}
 					}
+					else
+					{
+						ok = Poco::icompare(*it, hostName) == 0;
+					}
 				}
 			}
 			catch (HostNotFoundException&)
@@ -158,13 +162,15 @@ bool X509Certificate::containsWildcards(const std::string& commonName)
 bool X509Certificate::matchWildcard(const std::string& wildcard, const std::string& hostName)
 {
 	// fix wildcards
-	std::string wildcardExpr = Poco::replace(wildcard, ".", "\\.");
+	std::string wildcardExpr("^");
+	wildcardExpr += Poco::replace(wildcard, ".", "\\.");
 	Poco::replaceInPlace(wildcardExpr, "*", ".*");
 	Poco::replaceInPlace(wildcardExpr, "..*", ".*");
 	Poco::replaceInPlace(wildcardExpr, "?", ".?");
 	Poco::replaceInPlace(wildcardExpr, "..?", ".?");
+	wildcardExpr += "$";
 
-	Poco::RegularExpression expr(wildcardExpr);
+	Poco::RegularExpression expr(wildcardExpr, Poco::RegularExpression::RE_CASELESS);
 	return expr.match(hostName);
 }
 
