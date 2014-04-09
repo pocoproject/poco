@@ -120,7 +120,7 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 				{
 					// a compare by IPAddress is not possible with wildcards
 					// only allow compare by name
-					ok = matchByAlias(*it, hostName);
+					ok = matchWildcard(*it, hostName);
 				}
 				else
 				{
@@ -137,11 +137,6 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 						{
 							ok = (*it == ip);
 						}
-					}
-					else
-					{
-						// compare by name
-						ok = matchByAlias(*it, hostName);
 					}
 				}
 			}
@@ -160,37 +155,17 @@ bool X509Certificate::containsWildcards(const std::string& commonName)
 }
 
 
-bool X509Certificate::matchByAlias(const std::string& alias, const std::string& hostName)
+bool X509Certificate::matchWildcard(const std::string& wildcard, const std::string& hostName)
 {
-	const HostEntry& heData = DNS::resolve(hostName);
 	// fix wildcards
-	std::string aliasRep = Poco::replace(alias, ".", "\\.");
-	Poco::replaceInPlace(aliasRep, "*", ".*");
-	Poco::replaceInPlace(aliasRep, "..*", ".*");
-	Poco::replaceInPlace(aliasRep, "?", ".?");
-	Poco::replaceInPlace(aliasRep, "..?", ".?");
-	// compare by name
-	Poco::RegularExpression expr(aliasRep);
-	bool found = false;
-	const HostEntry::AliasList& aliases = heData.aliases();
-	HostEntry::AliasList::const_iterator it = aliases.begin();
-	HostEntry::AliasList::const_iterator itEnd = aliases.end();
-	for (; it != itEnd && !found; ++it)
-	{
-		found = expr.match(*it);
-	}
-	// Handle the case where the list of aliases is empty.
-	if (!found)
-	{
-		// Compare the resolved host name against the wildcard host name in the certificate.
-		found = expr.match(heData.name());
-	}
-	if (!found)
-	{
-		// Compare the original host name against the wildcard host name in the certificate.
-		found = expr.match(hostName);
-	}
-	return found;
+	std::string wildcardExpr = Poco::replace(wildcard, ".", "\\.");
+	Poco::replaceInPlace(wildcardExpr, "*", ".*");
+	Poco::replaceInPlace(wildcardExpr, "..*", ".*");
+	Poco::replaceInPlace(wildcardExpr, "?", ".?");
+	Poco::replaceInPlace(wildcardExpr, "..?", ".?");
+
+	Poco::RegularExpression expr(wildcardExpr);
+	return expr.match(hostName);
 }
 
 
