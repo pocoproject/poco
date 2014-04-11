@@ -181,5 +181,9 @@
 	#define POCO_NO_LOCALE
 #endif
 
+// Enable the poco_debug_* and poco_trace_* macros
+// even if the _DEBUG variable is not set.
+// This allows the use of these macros in a release version.
+// #define POCO_LOG_DEBUG
 
 #endif // Foundation_Config_INCLUDED
