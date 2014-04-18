@@ -1,7 +1,7 @@
 //
 // ZipStream.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipStream.cpp#3 $
+// $Id: //poco/1.4/Zip/src/ZipStream.cpp#4 $
 //
 // Library: Zip
 // Package: Zip
@@ -163,6 +163,11 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 
 ZipStreamBuf::~ZipStreamBuf()
 {
+	// make sure destruction of streams happens in correct order
+	_ptrOBuf = 0;
+	_ptrOHelper = 0;
+	_ptrBuf = 0;
+	_ptrHelper = 0;
 }
 
 
