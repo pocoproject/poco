@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#9 $
+// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#10 $
 //
 // Library: Foundation
 // Package: Threading
@@ -100,6 +100,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 	if (prio != _pData->prio)
 	{
 		_pData->prio = prio;
+		_pData->policy = SCHED_OTHER;
 		if (isRunningImpl())
 		{
 			struct sched_param par;
@@ -111,7 +112,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
-void ThreadImpl::setOSPriorityImpl(int prio, int policy )
+void ThreadImpl::setOSPriorityImpl(int prio, int policy)
 {
 	if (prio != _pData->osPrio || policy != _pData->policy)
 	{
@@ -214,7 +215,7 @@ void ThreadImpl::startImpl(Runnable& target)
 	else
 	{
 		struct sched_param par;
-		par.sched_priority = mapPrio(_pData->prio, _pData->policy);
+		par.sched_priority = _pData->osPrio;
 		if (pthread_setschedparam(_pData->thread, _pData->policy, &par))
 			throw SystemException("cannot set thread priority");
 	}

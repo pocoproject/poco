@@ -695,8 +695,6 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 	{
 		for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next) 
 		{
-			if(currIface->ifa_addr == 0) continue;
-
 			IPAddress addr;
 			bool haveAddr = false;
 			int ifIndex(-1);

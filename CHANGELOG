@@ -1,12 +1,5 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.6p3 (2014-04-02)
-============================
-
-- Fixed a potential security vulnerability in client-side X509
-  certificate verification.
-
-
 Release 1.4.6p2 (2013-09-16)
 ============================
 

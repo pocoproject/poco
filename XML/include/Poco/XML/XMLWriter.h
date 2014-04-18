@@ -1,7 +1,7 @@
 //
 // XMLWriter.h
 //
-// $Id: //poco/1.4/XML/include/Poco/XML/XMLWriter.h#3 $
+// $Id: //poco/1.4/XML/include/Poco/XML/XMLWriter.h#4 $
 //
 // Library: XML
 // Package: XML
@@ -353,7 +353,6 @@ private:
 	std::string      _indent;
 
 	static const std::string MARKUP_QUOTENC;
-	static const std::string MARKUP_APOSENC;
 	static const std::string MARKUP_AMPENC;
 	static const std::string MARKUP_LTENC;
 	static const std::string MARKUP_GTENC;
