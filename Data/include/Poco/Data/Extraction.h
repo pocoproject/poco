@@ -220,6 +220,11 @@ public:
 		return new Preparation<T>(pPrep, pos, _default);
 	}
 
+	void reset()
+	{
+		_nulls.clear();
+	}
+
 protected:
 
 	const std::vector<T>& result() const
@@ -306,6 +311,11 @@ public:
 		return new Preparation<bool>(pPrep, pos, _default);
 	}
 
+	void reset()
+	{
+		_nulls.clear();
+	}
+
 protected:
 
 	const std::vector<bool>& result() const
@@ -388,6 +398,11 @@ public:
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
+	}
+
+	void reset()
+	{
+		_nulls.clear();
 	}
 
 protected:
@@ -474,6 +489,11 @@ public:
 		return new Preparation<T>(pPrep, pos, _default);
 	}
 
+	void reset()
+	{
+		_nulls.clear();
+	}
+
 protected:
 
 	const std::deque<T>& result() const
@@ -522,6 +542,7 @@ public:
 
 	void reset()
 	{
+		Extraction<C>::reset();
 		_pColumn->reset();
 	}	
 
