@@ -1,6 +1,28 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.4.6p4
+
+!!Summary of Changes
+
+  - no longer use reverse DNS lookups for cert hostname validation
+  - cert hostname validation is case insensitive and more strict
+  - HTMLForm: in URL encoding, percent-encode more special characters
+  - fixed thread priority issues on POSIX platforms with non-standard scheduling policy
+  - XMLWriter no longer escapes apostrophe character
+  - fixed GH# 316: Poco::DateTimeFormatter::append() gives wrong result for Poco::LocalDateTime
+  - fixed GH# 305 (memcpy in Poco::Buffer uses wrong size if type != char)
+  - Zip: fixed a crash caused by an I/O error (e.g., full disk) while creating a Zip archive
+
+
+!!!Release 1.4.6p3
+
+!!Summary of Changes
+
+  - Fixed a potential security vulnerability in client-side X509
+    certificate verification.
+
+
 !!!Release 1.4.6p2
 
 !!Summary of Changes
