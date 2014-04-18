@@ -223,10 +223,7 @@ private:
 
 inline sqlite3* Utility::dbHandle(const Session& session)
 {
-#ifdef POCO_COMPILER_CLANG
-	sqlite3* p = 0; Any a = p; // ??? clang fails to AnyCast without these ???
-#endif
-	return AnyCast<sqlite3*>(session.getProperty("handle"));
+	return reinterpret_cast<sqlite3*>(AnyCast<void*>(session.getProperty("handle")));
 }
 
 

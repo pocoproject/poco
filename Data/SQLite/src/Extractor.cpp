@@ -118,7 +118,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 	if (!pBuf)
 		val.clear();
 	else
-		val = std::string(pBuf);
+		val.assign(pBuf);
 	return true;
 }
 
