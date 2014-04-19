@@ -170,7 +170,7 @@ if "%PLATFORM%"=="" (set PLATFORM_SUFFIX=) else (
 if "%PLATFORM%"=="Win32" (set PLATFORM_SUFFIX=) else (
 if "%PLATFORM%"=="x64" (set PLATFORM_SUFFIX=_x64) else (
 if "%PLATFORM%"=="WinCE" (set PLATFORM_SUFFIX=_CE) else (
-if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013))))
+if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013)))))
 
 if "%PLATFORM%"=="WEC2013" (
 if "%WEC2013_PLATFORM%"=="" (
@@ -325,7 +325,6 @@ for /f %%G in ('findstr /R "." components') do (
   )
   cd "%POCO_BASE%"
 )
-)
 
 goto samples
 
@@ -334,86 +333,86 @@ rem / build subroutine /
 rem ////////////////////
 :build
 
- echo.
- echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- echo ++++ Building [!PROJECT_FILE!]
- echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- echo.
+echo.
+echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+echo ++++ Building [!PROJECT_FILE!]
+echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+echo.
 
- if %DEBUG_SHARED%==1 (
-   !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !PROJECT_FILE! 
-   if ERRORLEVEL 1 exit /b 1
-   echo. && echo. && echo.
-   if %TESTS%==tests (
-     if exist !TEST_PROJECT_FILE! (
-       !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !TEST_PROJECT_FILE!
-       if ERRORLEVEL 1 exit /b 1
-       echo. && echo. && echo.
-     )
-   )
- )
- if %RELEASE_SHARED%==1 (
-   !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !PROJECT_FILE! 
-   if ERRORLEVEL 1 exit /b 1
-   echo. && echo. && echo.
-   if %TESTS%==tests (
-     if exist !TEST_PROJECT_FILE! (
-       !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !TEST_PROJECT_FILE!
-       if ERRORLEVEL 1 exit /b 1
-       echo. && echo. && echo.
-     )
-   )
- )
- if %DEBUG_STATIC_MT%==1 (
-   !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !PROJECT_FILE!
-   if ERRORLEVEL 1 exit /b 1
-   echo. && echo. && echo.
-   if %TESTS%==tests (
-     if exist !TEST_PROJECT_FILE! (
-       !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !TEST_PROJECT_FILE!
-       if ERRORLEVEL 1 exit /b 1
-       echo. && echo. && echo.
-     )
-   )
- )
- if %RELEASE_STATIC_MT%==1 (
-   !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !PROJECT_FILE! 
-   if ERRORLEVEL 1 exit /b 1
-   echo. && echo. && echo.
-   if %TESTS%==tests (
-     if exist !TEST_PROJECT_FILE! (
-       !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !TEST_PROJECT_FILE!
-       if ERRORLEVEL 1 exit /b 1
-       echo. && echo. && echo.
-     )
-   )
- )
- if %DEBUG_STATIC_MD%==1 (
-   !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !PROJECT_FILE! 
-   if ERRORLEVEL 1 exit /b 1
-   echo. && echo. && echo.
-   if %TESTS%==tests (
-     if exist !TEST_PROJECT_FILE! (
-       !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !TEST_PROJECT_FILE!
-       if ERRORLEVEL 1 exit /b 1
-       echo. && echo. && echo.
-     )
-   )
- )
- if %RELEASE_STATIC_MD%==1 (
-   !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_md %PLATFORMSW% !PROJECT_FILE!
-   if ERRORLEVEL 1 exit /b 1
-   echo. && echo. && echo.
-   if %TESTS%==tests (
-     if exist !TEST_PROJECT_FILE! (
-       !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_md %PLATFORMSW% !TEST_PROJECT_FILE!
-       if ERRORLEVEL 1 exit /b 1
-       echo. && echo. && echo.
-     )
-   )
- )
+if %DEBUG_SHARED%==1 (
+  !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !PROJECT_FILE! 
+  if ERRORLEVEL 1 exit /b 1
+  echo. && echo. && echo.
+  if %TESTS%==tests (
+    if exist !TEST_PROJECT_FILE! (
+      !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !TEST_PROJECT_FILE!
+      if ERRORLEVEL 1 exit /b 1
+      echo. && echo. && echo.
+    )
+  )
+)
+if %RELEASE_SHARED%==1 (
+  !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !PROJECT_FILE! 
+  if ERRORLEVEL 1 exit /b 1
+  echo. && echo. && echo.
+  if %TESTS%==tests (
+    if exist !TEST_PROJECT_FILE! (
+      !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !TEST_PROJECT_FILE!
+      if ERRORLEVEL 1 exit /b 1
+      echo. && echo. && echo.
+    )
+  )
+)
+if %DEBUG_STATIC_MT%==1 (
+  !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !PROJECT_FILE!
+  if ERRORLEVEL 1 exit /b 1
+  echo. && echo. && echo.
+  if %TESTS%==tests (
+    if exist !TEST_PROJECT_FILE! (
+      !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !TEST_PROJECT_FILE!
+      if ERRORLEVEL 1 exit /b 1
+      echo. && echo. && echo.
+    )
+  )
+)
+if %RELEASE_STATIC_MT%==1 (
+  !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !PROJECT_FILE! 
+  if ERRORLEVEL 1 exit /b 1
+  echo. && echo. && echo.
+  if %TESTS%==tests (
+    if exist !TEST_PROJECT_FILE! (
+      !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !TEST_PROJECT_FILE!
+      if ERRORLEVEL 1 exit /b 1
+      echo. && echo. && echo.
+    )
+  )
+)
+if %DEBUG_STATIC_MD%==1 (
+  !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !PROJECT_FILE! 
+  if ERRORLEVEL 1 exit /b 1
+  echo. && echo. && echo.
+  if %TESTS%==tests (
+    if exist !TEST_PROJECT_FILE! (
+      !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !TEST_PROJECT_FILE!
+      if ERRORLEVEL 1 exit /b 1
+      echo. && echo. && echo.
+    )
+  )
+)
+if %RELEASE_STATIC_MD%==1 (
+  !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_md %PLATFORMSW% !PROJECT_FILE!
+  if ERRORLEVEL 1 exit /b 1
+  echo. && echo. && echo.
+  if %TESTS%==tests (
+    if exist !TEST_PROJECT_FILE! (
+      !BUILD_TOOL! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_md %PLATFORMSW% !TEST_PROJECT_FILE!
+      if ERRORLEVEL 1 exit /b 1
+      echo. && echo. && echo.
+    )
+  )
+)
 
 echo.
 echo ------------------------------------------------------------------------
