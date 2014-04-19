@@ -8,7 +8,7 @@
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
-#              [-platform     Win32 | x64 | WinCE]
+#              [-platform     Win32 | x64 | WinCE | WEC2013]
 #              [-samples]
 #              [-tests]
 #              [-omit         "Lib1X;LibY;LibZ;..."]
@@ -39,7 +39,7 @@ Param
   [string] $config = 'release',
 
   [Parameter()]
-  [ValidateSet('Win32', 'x64', 'WinCE')]
+  [ValidateSet('Win32', 'x64', 'WinCE', 'WEC2013')]
   [string] $platform = 'x64',
   
   [switch] $tests = $false,
@@ -140,7 +140,7 @@ function Process-Input
     Write-Host '             [-action       build | rebuild | clean]'
     Write-Host '             [-linkmode     shared | static_mt | static_md | all]'
     Write-Host '             [-config       release | debug | both]'
-    Write-Host '             [-platform     Win32 | x64 | WinCE]'
+    Write-Host '             [-platform     Win32 | x64 | WinCE | WEC2013]'
     Write-Host '             [-samples]'
     Write-Host '             [-tests]'
     Write-Host '             [-omit         "Lib1X;LibY;LibZ;..."]'
