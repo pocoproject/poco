@@ -274,6 +274,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Data\SQLite\Binder.h" />
+    <ClInclude Include="include\Poco\Data\SQLite\Config.h" />
     <ClInclude Include="include\Poco\Data\SQLite\Connector.h" />
     <ClInclude Include="include\Poco\Data\SQLite\Extractor.h" />
     <ClInclude Include="include\Poco\Data\SQLite\Notifier.h" />

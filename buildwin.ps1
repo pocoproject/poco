@@ -60,9 +60,6 @@ Param
 )
 
 
-$omitArray = @()
-
-
 function Set-Environment
 {
   if ($poco_base -eq '') { $script:poco_base = Get-Location }
@@ -172,10 +169,6 @@ function Process-Input
     if ($omit -ne '')
     {
       Write-Host "Omit:          $omit"
-    
-      $omit.Split(',;') | ForEach {
-        $omitArray += "$_"
-      }
     }
 
     if ($openssl_base -ne '')
@@ -208,14 +201,14 @@ function Build-MSBuild([string] $vsProject)
         {
           $projectConfig = "$cfg"
           $projectConfig += "_$mode"
-          Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+          Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform"
         }
       }
       else #config
       {
         $projectConfig = "$config"
         $projectConfig += "_$mode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform"
       }
     }
   }
@@ -228,14 +221,14 @@ function Build-MSBuild([string] $vsProject)
       {
         $projectConfig = "$cfg"
         $projectConfig += "_$mode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform"
       }
     }
     else #config
     {
       $projectConfig = "$config"
       $projectConfig += "_$linkmode"
-      Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+      Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform"
     }
   }
 }
@@ -322,6 +315,11 @@ function Build
     $componentArr = $_.split('/')
     $componentName = $componentArr[$componentArr.Length - 1]
     $suffix = "_vs$vs_version"
+    
+    $omitArray = @()
+    $omit.Split(',;') | ForEach {
+        $omitArray += "$_"
+    }
 
     if ($omitArray -NotContains $component)
     {
