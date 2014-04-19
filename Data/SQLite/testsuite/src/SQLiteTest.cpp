@@ -3287,11 +3287,9 @@ void SQLiteTest::testTransactor()
 }
 
 
-#ifdef POCO_DATA_SQLITE_FTS
-
-
 void SQLiteTest::testFTS3()
 {
+#ifdef SQLITE_ENABLE_FTS3
 	Session session(Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	assert(session.isConnected());
 
@@ -3328,10 +3326,10 @@ void SQLiteTest::testFTS3()
 	docid = 0;
 	session << "SELECT count(*) FROM docs WHERE docs MATCH 'database and sqlite'", into(docid), now;
 	assert(docid == 0);
+#else
+	std::cout << "SQLite FTS not enabled, test not executed." << std::endl;
+#endif // SQLITE_ENABLE_FTS3
 }
-
-
-#endif // POCO_DATA_SQLITE_FTS
 
 
 void SQLiteTest::setUp()
