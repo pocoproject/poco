@@ -8,7 +8,7 @@
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
-#              [-platform     Win32 | x64 | WinCE]
+#              [-platform     Win32 | x64 | WinCE | WEC2013]
 #              [-samples]
 #              [-tests]
 #              [-omit         "Lib1X;LibY;LibZ;..."]
@@ -39,7 +39,7 @@ Param
   [string] $config = 'release',
 
   [Parameter()]
-  [ValidateSet('Win32', 'x64', 'WinCE')]
+  [ValidateSet('Win32', 'x64', 'WinCE', 'WEC2013')]
   [string] $platform = 'x64',
   
   [switch] $tests = $false,
@@ -58,9 +58,6 @@ Param
 
   [switch] $help
 )
-
-
-$omitArray = @()
 
 
 function Set-Environment
@@ -143,7 +140,7 @@ function Process-Input
     Write-Host '             [-action       build | rebuild | clean]'
     Write-Host '             [-linkmode     shared | static_mt | static_md | all]'
     Write-Host '             [-config       release | debug | both]'
-    Write-Host '             [-platform     Win32 | x64 | WinCE]'
+    Write-Host '             [-platform     Win32 | x64 | WinCE | WEC2013]'
     Write-Host '             [-samples]'
     Write-Host '             [-tests]'
     Write-Host '             [-omit         "Lib1X;LibY;LibZ;..."]'
@@ -172,10 +169,6 @@ function Process-Input
     if ($omit -ne '')
     {
       Write-Host "Omit:          $omit"
-    
-      $omit.Split(',;') | ForEach {
-        $omitArray += "$_"
-      }
     }
 
     if ($openssl_base -ne '')
@@ -208,14 +201,14 @@ function Build-MSBuild([string] $vsProject)
         {
           $projectConfig = "$cfg"
           $projectConfig += "_$mode"
-          Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+          Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform"
         }
       }
       else #config
       {
         $projectConfig = "$config"
         $projectConfig += "_$mode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform"
       }
     }
   }
@@ -228,14 +221,14 @@ function Build-MSBuild([string] $vsProject)
       {
         $projectConfig = "$cfg"
         $projectConfig += "_$mode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform"
       }
     }
     else #config
     {
       $projectConfig = "$config"
       $projectConfig += "_$linkmode"
-      Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+      Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform"
     }
   }
 }
@@ -322,6 +315,11 @@ function Build
     $componentArr = $_.split('/')
     $componentName = $componentArr[$componentArr.Length - 1]
     $suffix = "_vs$vs_version"
+    
+    $omitArray = @()
+    $omit.Split(',;') | ForEach {
+        $omitArray += "$_"
+    }
 
     if ($omitArray -NotContains $component)
     {

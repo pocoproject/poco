@@ -176,6 +176,10 @@
 // #define POCO_NET_NO_IPv6
 
 
+// Enable SQLite Full Text Search
+#define POCO_DATA_SQLITE_FTS
+
+
 // Windows CE has no locale support
 #if defined(_WIN32_WCE)
 	#define POCO_NO_LOCALE

@@ -3287,6 +3287,53 @@ void SQLiteTest::testTransactor()
 }
 
 
+#ifdef POCO_DATA_SQLITE_FTS
+
+
+void SQLiteTest::testFTS3()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert(session.isConnected());
+
+	session << "DROP TABLE IF EXISTS docs", now;
+	session << "CREATE VIRTUAL TABLE docs USING fts3()", now;
+
+	session << "INSERT INTO docs(docid, content) VALUES(1, 'a database is a software system')", now;
+	session << "INSERT INTO docs(docid, content) VALUES(2, 'sqlite is a software system')", now;
+	session << "INSERT INTO docs(docid, content) VALUES(3, 'sqlite is a database')", now;
+
+	int docid = 0;
+	session << "SELECT docid FROM docs WHERE docs MATCH 'sqlite AND database'", into(docid), now;
+	assert(docid == 3);
+
+	docid = 0;
+	session << "SELECT docid FROM docs WHERE docs MATCH 'database sqlite'", into(docid), now;
+	assert(docid == 3);
+
+	std::vector<int> docids;
+	session << "SELECT docid FROM docs WHERE docs MATCH 'sqlite OR database' ORDER BY docid", 
+		into(docids), now;
+	assert(docids.size() == 3);
+	assert(docids[0] == 1);
+	assert(docids[1] == 2);
+	assert(docids[2] == 3);
+
+	std::string content;
+	docid = 0;
+	session << "SELECT docid, content FROM docs WHERE docs MATCH 'database NOT sqlite'", 
+		into(docid), into(content), now;
+	assert(docid == 1);
+	assert(content == "a database is a software system");
+
+	docid = 0;
+	session << "SELECT count(*) FROM docs WHERE docs MATCH 'database and sqlite'", into(docid), now;
+	assert(docid == 0);
+}
+
+
+#endif // POCO_DATA_SQLITE_FTS
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -3385,6 +3432,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testSessionTransaction);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransaction);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);
+	CppUnit_addTest(pSuite, SQLiteTest, testFTS3);
 
 	return pSuite;
 }
