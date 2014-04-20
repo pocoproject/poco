@@ -76,7 +76,7 @@ void ICMPClientTest::testPing()
 	// warning: may fail depending on the existence of the addresses at test site
 	// if so, adjust accordingly (i.e. specify non-existent or unreachable IP addresses)
 	assert(0 == _icmpClient.ping("192.168.243.1"));
-	assert(0 == _icmpClient.ping("10.0.0.1"));
+	assert(0 == _icmpClient.ping("10.11.12.13"));
 }
 
 
