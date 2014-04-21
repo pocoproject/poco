@@ -700,9 +700,11 @@ protected:
 					setProperty(*pProps, "configuration.compiler.includes", projectConfig, "vc.project.compiler.include", platform, config);
 					setProperty(*pProps, "configuration.compiler.defines", projectConfig, "vc.project.compiler.defines", platform, config);
 					setProperty(*pProps, "configuration.compiler.disableWarnings", projectConfig, "vc.project.compiler.disableWarnings", platform, config);
+					setProperty(*pProps, "configuration.compiler.additionalOptions", projectConfig, "vc.project.compiler.additionalOptions", platform, config);
 					setProperty(*pProps, "configuration.linker.dependencies", projectConfig, "vc.project.linker.dependencies", platform, config, " ");
 					setProperty(*pProps, "configuration.linker.libraries", projectConfig, "vc.project.linker.libraries", platform, config);
 					setProperty(*pProps, "configuration.linker.entry", projectConfig, "vc.project.linker.entry", platform, config);
+					setProperty(*pProps, "configuration.linker.additionalOptions", projectConfig, "vc.project.linker.additionalOptions", platform, config);
 					setProperty(*pProps, "configuration.postbuild", projectConfig, "vc.project.postbuild", platform, config);
 					std::string libSuffix = this->config().getString("progen.libsuffix." + config, "");
 					Poco::StringTokenizer rawDependencies(pProps->getString("configuration.linker.dependencies"), " ", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
