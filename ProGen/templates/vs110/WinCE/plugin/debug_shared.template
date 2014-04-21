@@ -30,6 +30,7 @@
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		CompileForArchitecture="2"
 		InterworkCalls="false"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -57,6 +58,7 @@
 		EnableCOMDATFolding="0"
 		RandomizedBaseAddress="1"
 		TargetMachine="0"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

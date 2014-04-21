@@ -28,7 +28,8 @@
 		WarningLevel="3"
 		Detect64BitPortabilityProblems="FALSE"
 		DebugInformationFormat="0"
-		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"/>
+		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"/>
 	<Tool
 		Name="VCCustomBuildTool"/>
 	<Tool
@@ -42,7 +43,8 @@
 		SubSystem="2"
 		OptimizeReferences="2"
 		EnableCOMDATFolding="2"
-		TargetMachine="1"/>
+		TargetMachine="1"
+		AdditionalOptions="${configuration.linker.additionalOptions}"/>
 	<Tool
 		Name="VCMIDLTool"/>
 	<Tool

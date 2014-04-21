@@ -32,6 +32,7 @@
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		CompileForArchitecture="2"
 		InterworkCalls="false"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -60,6 +61,7 @@
 		EnableCOMDATFolding="0"
 		ImportLibrary="${project.pocobase}\lib\$(PlatformName)\${project.target}.lib"
 		TargetMachine="0"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

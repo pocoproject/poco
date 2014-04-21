@@ -30,6 +30,7 @@
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		CompileForArchitecture="2"
 		InterworkCalls="false"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -59,6 +60,7 @@
 		RandomizedBaseAddress="1"
 		ImportLibrary="${project.pocobase}\lib\$(PlatformName)\${project.target}d.lib"
 		TargetMachine="0"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

@@ -40,6 +40,7 @@
 		DebugInformationFormat="4"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -62,6 +63,7 @@
 		ProgramDatabaseFile="bin\static_mt\${project.target}d.pdb"
 		SubSystem="2"
 		TargetMachine="1"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

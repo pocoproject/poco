@@ -24,7 +24,8 @@
 		Detect64BitPortabilityProblems="FALSE"
 		DebugInformationFormat="4"
 		CompileAs="0"
-		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"/>
+		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"/>
 	<Tool
 		Name="VCCustomBuildTool"/>
 	<Tool

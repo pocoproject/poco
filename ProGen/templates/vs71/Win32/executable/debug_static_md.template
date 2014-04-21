@@ -23,7 +23,8 @@
 		WarningLevel="3"
 		Detect64BitPortabilityProblems="FALSE"
 		DebugInformationFormat="4"
-		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"/>
+		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"/>
 	<Tool
 		Name="VCCustomBuildTool"/>
 	<Tool
@@ -35,7 +36,8 @@
 		GenerateDebugInformation="TRUE"
 		ProgramDatabaseFile="bin\static_md\${project.target}d.pdb"
 		SubSystem="1"
-		TargetMachine="1"/>
+		TargetMachine="1"
+		AdditionalOptions="${configuration.linker.additionalOptions}"/>
 	<Tool
 		Name="VCMIDLTool"/>
 	<Tool
