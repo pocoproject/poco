@@ -556,11 +556,8 @@ protected:
 		for (unsigned long i = 0; i < pConfigurationTypeList->length(); i++)
 		{
 			Poco::XML::Element* pConfigurationTypeElem = static_cast<Poco::XML::Element*>(pConfigurationTypeList->item(i));
-			Poco::XML::Node* pPropertyGroupElem = pConfigurationTypeElem->parentNode();
-			Poco::AutoPtr<Poco::XML::Element> pPlatformToolsetElem = pProjectDoc->createElement("PlatformToolset");
-			Poco::AutoPtr<Poco::XML::Text> pText = pProjectDoc->createTextNode("v110");
-			pPlatformToolsetElem->appendChild(pText);
-			pPropertyGroupElem->appendChild(pPlatformToolsetElem);
+			removeElement(pConfigurationTypeElem->parentNode(), "PlatformToolset");
+			appendElement(pConfigurationTypeElem->parentNode(), "PlatformToolset", "v110");
 		}
 	}
 
@@ -611,11 +608,8 @@ protected:
 		for (unsigned long i = 0; i < pConfigurationTypeList->length(); i++)
 		{
 			Poco::XML::Element* pConfigurationTypeElem = static_cast<Poco::XML::Element*>(pConfigurationTypeList->item(i));
-			Poco::XML::Node* pPropertyGroupElem = pConfigurationTypeElem->parentNode();
-			Poco::AutoPtr<Poco::XML::Element> pPlatformToolsetElem = pProjectDoc->createElement("PlatformToolset");
-			Poco::AutoPtr<Poco::XML::Text> pText = pProjectDoc->createTextNode("v120");
-			pPlatformToolsetElem->appendChild(pText);
-			pPropertyGroupElem->appendChild(pPlatformToolsetElem);
+			removeElement(pConfigurationTypeElem->parentNode(), "PlatformToolset");
+			appendElement(pConfigurationTypeElem->parentNode(), "PlatformToolset", "v120");
 		}
 	}
 
