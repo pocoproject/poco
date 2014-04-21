@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Archive">
-      <UniqueIdentifier>{d6613904-ec91-4dd6-8933-00b33fdf12a4}</UniqueIdentifier>
+      <UniqueIdentifier>{d0fdab13-e26a-43e2-98c3-fa8e8a81f97a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Archive\Header Files">
-      <UniqueIdentifier>{53abb692-7bf5-4958-85c2-92870f40e7ae}</UniqueIdentifier>
+      <UniqueIdentifier>{3a8482be-af8a-4fe5-ab1b-40490bdbe450}</UniqueIdentifier>
     </Filter>
     <Filter Include="Archive\Source Files">
-      <UniqueIdentifier>{b5f20620-6773-432c-8c30-55f01c1365b7}</UniqueIdentifier>
+      <UniqueIdentifier>{709e485d-f314-407f-ba06-6d76dc16256f}</UniqueIdentifier>
     </Filter>
     <Filter Include="LZMA SDK">
-      <UniqueIdentifier>{cecd4b72-ad5c-40ab-957a-3e9ece59f853}</UniqueIdentifier>
+      <UniqueIdentifier>{e19cbb81-d587-43f8-90ea-609043f9d574}</UniqueIdentifier>
     </Filter>
     <Filter Include="LZMA SDK\Header Files">
-      <UniqueIdentifier>{267c86b6-8ce6-4003-90c0-4a2f637802e7}</UniqueIdentifier>
+      <UniqueIdentifier>{8a3742e6-a6ad-4361-a6bb-a379789fc57e}</UniqueIdentifier>
     </Filter>
     <Filter Include="LZMA SDK\Source Files">
-      <UniqueIdentifier>{aaec9809-4479-4e86-b6eb-74801bf6aedf}</UniqueIdentifier>
+      <UniqueIdentifier>{c37d4e73-270d-41f3-a506-89e054f06d12}</UniqueIdentifier>
     </Filter>
     <Filter Include="SevenZip">
-      <UniqueIdentifier>{8dcb9c7a-43a8-4362-8b4d-629bc435e3d9}</UniqueIdentifier>
+      <UniqueIdentifier>{4e0662f8-5669-42e3-aab4-4f7e35c4930f}</UniqueIdentifier>
     </Filter>
     <Filter Include="SevenZip\Header Files">
-      <UniqueIdentifier>{565cc784-5d62-463f-9125-b9b347c2246e}</UniqueIdentifier>
+      <UniqueIdentifier>{3893dd36-2db1-45ff-920c-d55100bb7846}</UniqueIdentifier>
     </Filter>
     <Filter Include="SevenZip\Source Files">
-      <UniqueIdentifier>{ca86a13a-6831-487d-873d-ae166fb6f7d6}</UniqueIdentifier>
+      <UniqueIdentifier>{6d00a762-639c-41b9-9513-270b8073280c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

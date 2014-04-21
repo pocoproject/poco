@@ -2,64 +2,64 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Application">
-      <UniqueIdentifier>{a35fecc8-9361-4713-b341-c4905e21e370}</UniqueIdentifier>
+      <UniqueIdentifier>{42112a02-8158-4fde-a6b5-178649604348}</UniqueIdentifier>
     </Filter>
     <Filter Include="Application\Header Files">
-      <UniqueIdentifier>{b7bf0bbc-ccdb-4895-9a49-3f7986c84cd7}</UniqueIdentifier>
+      <UniqueIdentifier>{1ffb660a-30fc-4e2b-b589-e8e18f45cd9b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Application\Source Files">
-      <UniqueIdentifier>{1abf2563-ccb3-44aa-bf9b-9ed3b44c874c}</UniqueIdentifier>
+      <UniqueIdentifier>{c1431f77-ec64-4de5-84bb-93b95f633787}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{413a624c-a718-46e8-ac12-fc72ae9bd59b}</UniqueIdentifier>
+      <UniqueIdentifier>{5baefaea-a147-44e9-9b89-6e59ddc93fbc}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{e6418da9-85d5-4e51-8b17-c2e212b43d44}</UniqueIdentifier>
+      <UniqueIdentifier>{1ee79d0d-d31e-4280-8002-fbb05282a0d4}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{34087807-43ed-48cc-a89a-8415ed7f341c}</UniqueIdentifier>
+      <UniqueIdentifier>{cc4b1415-e04a-46a3-a594-248b644b1d69}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{fa935e5a-9091-4626-b189-69cad7c8d992}</UniqueIdentifier>
+      <UniqueIdentifier>{37550843-7af1-49da-a7d3-c7b5749da7b3}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{ae55e579-9cf1-48a4-ad05-49d9e98cb5a2}</UniqueIdentifier>
+      <UniqueIdentifier>{b10297ba-13e0-49da-9064-ee4932464710}</UniqueIdentifier>
     </Filter>
     <Filter Include="Configuration">
-      <UniqueIdentifier>{7e08444e-2bcf-44cb-82c1-cd6c5302c281}</UniqueIdentifier>
+      <UniqueIdentifier>{6d1d3733-88c8-4838-acae-fd82ec648e90}</UniqueIdentifier>
     </Filter>
     <Filter Include="Configuration\Header Files">
-      <UniqueIdentifier>{fc7ee45c-f585-4536-9f55-09c5cbd0479d}</UniqueIdentifier>
+      <UniqueIdentifier>{6062d6da-9927-4ebd-9234-afa0c3a10400}</UniqueIdentifier>
     </Filter>
     <Filter Include="Configuration\Source Files">
-      <UniqueIdentifier>{b6da558a-5129-4011-987d-62281640a430}</UniqueIdentifier>
+      <UniqueIdentifier>{114c54c7-a44c-4333-a8e7-9e85d7c18c51}</UniqueIdentifier>
     </Filter>
     <Filter Include="Options">
-      <UniqueIdentifier>{91001d65-9f31-4527-93c5-daaa20481869}</UniqueIdentifier>
+      <UniqueIdentifier>{d4635106-8520-430b-b43c-fbef92649b2f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Options\Header Files">
-      <UniqueIdentifier>{abd15ee0-8fd4-4599-a084-93a0849b1b92}</UniqueIdentifier>
+      <UniqueIdentifier>{92c00d26-1ce0-4446-b79f-f823f2a959bd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Options\Source Files">
-      <UniqueIdentifier>{69886462-436b-4679-acd4-9949811876fc}</UniqueIdentifier>
+      <UniqueIdentifier>{fb22346c-3c8b-4cda-ab30-c87d18a67264}</UniqueIdentifier>
     </Filter>
     <Filter Include="Windows">
-      <UniqueIdentifier>{b106ba11-9052-4eb4-8355-5a548518f23f}</UniqueIdentifier>
+      <UniqueIdentifier>{2c3e6107-a610-44ce-9459-9d81f0a3adf1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Windows\Header Files">
-      <UniqueIdentifier>{9a95138e-d59c-4def-808c-ece97d137547}</UniqueIdentifier>
+      <UniqueIdentifier>{ece3f473-ef23-41ce-8518-3e860546fd12}</UniqueIdentifier>
     </Filter>
     <Filter Include="Windows\Source Files">
-      <UniqueIdentifier>{952fa7bf-80fc-4eee-bcfd-dd4e37241449}</UniqueIdentifier>
+      <UniqueIdentifier>{3a3bb109-4d52-4e0d-a462-421b7062b615}</UniqueIdentifier>
     </Filter>
     <Filter Include="Timer">
-      <UniqueIdentifier>{716d92ba-c4f4-427c-92d6-cf73e905ad21}</UniqueIdentifier>
+      <UniqueIdentifier>{ea544660-9d73-407c-9a96-bd6e9d9f7d32}</UniqueIdentifier>
     </Filter>
     <Filter Include="Timer\Header Files">
-      <UniqueIdentifier>{a9e8f0e3-5584-47c8-a52f-679f0ff5cc6e}</UniqueIdentifier>
+      <UniqueIdentifier>{61d4947e-b469-4753-8127-54dbff41a404}</UniqueIdentifier>
     </Filter>
     <Filter Include="Timer\Source Files">
-      <UniqueIdentifier>{cfc53565-7710-4f5a-8ad6-741392a1f4f7}</UniqueIdentifier>
+      <UniqueIdentifier>{dee8078f-ab0a-4db8-803f-59f099d09721}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +143,9 @@
     <ClCompile Include="src\UtilTestSuite.cpp">
       <Filter>_Suite\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\WinDriver.cpp">
+      <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\AbstractConfigurationTest.cpp">
       <Filter>Configuration\Source Files</Filter>
     </ClCompile>
@@ -214,9 +217,6 @@
     </ClCompile>
     <ClCompile Include="src\TimerTestSuite.cpp">
       <Filter>Timer\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Driver.cpp">
-      <Filter>_Driver\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
