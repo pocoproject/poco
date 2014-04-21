@@ -44,7 +44,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions=""
 		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="${project.pocobase}\bin\$(PlatformName)\${project.target}d.dll"
 		LinkIncremental="2"

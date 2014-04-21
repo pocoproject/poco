@@ -45,7 +45,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions=""
 		AdditionalDependencies="iphlpapi.lib ${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\static_mt\${project.target}d.exe"
 		LinkIncremental="2"

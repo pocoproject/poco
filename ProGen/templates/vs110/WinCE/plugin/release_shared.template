@@ -45,7 +45,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions=""
 		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="${project.outdir}\bin\$(PlatformName)\${project.target}.dll"
 		LinkIncremental="1"

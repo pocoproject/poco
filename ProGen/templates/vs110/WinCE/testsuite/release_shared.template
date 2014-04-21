@@ -52,7 +52,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions=""
 		AdditionalDependencies="CppUnit.lib ${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\shared\${project.target}.exe"
 		LinkIncremental="1"

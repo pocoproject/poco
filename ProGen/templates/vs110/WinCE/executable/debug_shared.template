@@ -45,7 +45,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions=""
 		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\shared\${project.target}d.exe"
 		LinkIncremental="2"

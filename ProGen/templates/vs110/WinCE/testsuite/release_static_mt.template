@@ -55,7 +55,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions=""
 		AdditionalDependencies="CppUnitmt.lib iphlpapi.lib ${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\static_mt\${project.target}.exe"
 		LinkIncremental="1"
