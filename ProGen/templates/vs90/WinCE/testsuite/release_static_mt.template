@@ -55,7 +55,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions="/FORCE:MULTIPLE"
+		AdditionalOptions="/FORCE:MULTIPLE ${configuration.linker.additionalOptions}"
 		AdditionalDependencies="CppUnitmt.lib iphlpapi.lib ${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\static_mt\${project.target}.exe"
 		LinkIncremental="1"
@@ -66,7 +66,6 @@
 		OptimizeReferences="2"
 		EnableCOMDATFolding="2"
 		TargetMachine="0"
-		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

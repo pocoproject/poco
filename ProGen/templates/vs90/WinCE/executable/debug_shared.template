@@ -52,7 +52,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions="/FORCE:MULTIPLE"
+		AdditionalOptions="/FORCE:MULTIPLE ${configuration.linker.additionalOptions}"
 		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\shared\${project.target}d.exe"
 		LinkIncremental="2"
@@ -62,7 +62,6 @@
 		SubSystem="0"
 		RandomizedBaseAddress="1"
 		TargetMachine="0"
-		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

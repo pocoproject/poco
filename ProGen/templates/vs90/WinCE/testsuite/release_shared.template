@@ -52,7 +52,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions="/FORCE:MULTIPLE"
+		AdditionalOptions="/FORCE:MULTIPLE ${configuration.linker.additionalOptions}"
 		AdditionalDependencies="CppUnit.lib ${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\shared\${project.target}.exe"
 		LinkIncremental="1"
@@ -63,7 +63,6 @@
 		OptimizeReferences="2"
 		EnableCOMDATFolding="2"
 		TargetMachine="0"
-		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

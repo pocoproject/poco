@@ -50,7 +50,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions="/FORCE:MULTIPLE"
+		AdditionalOptions="/FORCE:MULTIPLE ${configuration.linker.additionalOptions}"
 		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="${project.outdir}\bin\$(PlatformName)\${project.target}d.dll"
 		LinkIncremental="2"
@@ -65,7 +65,6 @@
 		EnableCOMDATFolding="0"
 		RandomizedBaseAddress="1"
 		TargetMachine="0"
-		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

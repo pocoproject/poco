@@ -53,7 +53,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions="/FORCE:MULTIPLE"
+		AdditionalOptions="/FORCE:MULTIPLE ${configuration.linker.additionalOptions}"
 		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="${project.pocobase}\bin\$(PlatformName)\${project.target}.dll"
 		LinkIncremental="1"
@@ -68,7 +68,6 @@
 		EnableCOMDATFolding="0"
 		ImportLibrary="${project.pocobase}\lib\$(PlatformName)\${project.target}.lib"
 		TargetMachine="0"
-		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

@@ -51,7 +51,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions="/FORCE:MULTIPLE"
+		AdditionalOptions="/FORCE:MULTIPLE ${configuration.linker.additionalOptions}"
 		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="${project.outdir}\bin\$(PlatformName)\${project.target}d.dll"
 		LinkIncremental="2"
@@ -67,7 +67,6 @@
 		RandomizedBaseAddress="1"
 		ImportLibrary="${project.outdir}\lib\$(PlatformName)\${project.target}d.lib"
 		TargetMachine="0"
-		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"
