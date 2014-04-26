@@ -60,18 +60,18 @@ namespace Poco {
 Thread::Thread(): 
 	_id(uniqueId()), 
 	_name(makeName()), 
-	_pTLS(0)
+	_pTLS(0),
+	_event(true)
 {
-	_event.reset();
 }
 
 
 Thread::Thread(const std::string& name): 
 	_id(uniqueId()), 
 	_name(name), 
-	_pTLS(0)
+	_pTLS(0),
+	_event(true)
 {
-	_event.reset();
 }
 
 
@@ -124,10 +124,9 @@ bool Thread::tryJoin(long milliseconds)
 }
 
 
-void Thread::trySleep(long milliseconds)
+bool Thread::trySleep(long milliseconds)
 {
-	_event.tryWait(milliseconds);
-	_event.reset();
+	return !_event.tryWait(milliseconds);
 }
 
 void Thread::wakeUp()

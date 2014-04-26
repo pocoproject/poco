@@ -187,16 +187,27 @@ public:
 	bool isRunning() const;
 		/// Returns true if the thread is running.
 
-	void trySleep(long milliseconds);
-		/// Starts an interruptible sleep. Thread will remain suspended
-		/// until (a) the timeout expires or (b) wakeUp() is called.
-		/// The trySleep()/wakeUp() pair of functions should be used with
-		/// understanding that this suspended state is not a true sleep, 
+	bool trySleep(long milliseconds);
+		/// Starts an interruptible sleep. When trySleep() is called,
+		/// the thread will remain suspended until:
+		///   - the timeout expires or 
+		///   - wakeUp() is called
+		/// 
+		/// Function returns true if sleep attempt was completed, false
+		/// if sleep was interrupted by a wakeUp() call.
+		/// A frequent scenario where trySleep()/wakeUp() pair of functions
+		/// is useful is with threads spending most of the time idle,
+		/// with periodic activity between the idle times; trying to sleep
+		/// (as opposed to sleeping) allows immediate ending of idle thread
+		/// from the outside.
+		/// 
+		/// The trySleep() and wakeUp() calls should be used with 
+		/// understanding that the suspended state is not a true sleep, 
 		/// but rather a state of waiting for an event, with timeout 
-		/// expiration. This in essence means that calling wakeUp() 
-		/// before calling  trySleep() will prevent the next trySleep() 
-		/// call to actually suspend the thread (which, in some scenarios,
-		/// may be desirable behavior).
+		/// expiration. This makes order of calls significantant; calling 
+		/// wakeUp()  before calling trySleep() will prevent the next  
+		/// trySleep() call to actually suspend the thread (which, in 
+		/// some scenarios, may be desirable behavior).
 
 	void wakeUp();
 		/// Wakes up the thread which is in the state of interruptible

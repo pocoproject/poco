@@ -57,9 +57,9 @@ void Runnable::sleep(long milliseconds)
 }
 
 
-void Runnable::trySleep(long milliseconds)
+bool Runnable::trySleep(long milliseconds)
 {
-	Thread::current()->trySleep(milliseconds);
+	return Thread::current()->trySleep(milliseconds);
 }
 
 

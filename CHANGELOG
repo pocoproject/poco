@@ -33,10 +33,27 @@ Release 1.5.3 (2014-05-xx)
 - fixed GH #380: SecureSocket+DialogSocket crashes with SIGSEGV when timeout occours
 - Improve RSADigestEngine, using Poco::Crypto::DigestEngine to calculate hash before signing
 - added Poco::PBKDF2Engine
+- Fixed GH #380: SecureSocket+DialogSocket crashes with SIGSEGV when timeout occours
 - added support for a 'Priority' attribute on cookies.
 - GH #386: fixed bug in MailMessage without content-transfer-encoding header
 - GH #384: ew hash algorithms support for RSADigestEngine
-
+- fixed Clock overflow bug on Windows
+- Poco::ByteOrder now uses intrinsics, if available
+- CMake: added /bigobj option for msvc
+- Fix typo to restore Net/TestSuite_x64_vs120 build
+- correct path for CONFIGURE_FILE in CMakeLists.txt
+- Building Poco 1.5.2 for Synology RS812+ (Intel Atom) (honor POCO_NO_INOTIFY)
+- added WEC2013 support to buildwin.cmd and buildwin.ps1
+- HTMLForm: in URL encoding, percent-encode more characters
+- Fixed #include <linux/if.h> conflict with other libraries 
+- Poco::Net::X509Certificate::verify() no longer uses DNS reverse lookups to validate host names
+- cert hostname validation is case insensitive and stricter for wildcard certificates
+- TCPServer: do not reduce the capacity of the default ThreadPool
+- added POCO_LOG_DEBUG flag
+- Zip: fixed a crash caused by an I/O error
+- added runtest script for windows
+- added SQlite Full Text Search support
+- added Thread::trySleep() and Thread::wakeUp()
 
 Release 1.5.2 (2013-09-16)
 ==========================

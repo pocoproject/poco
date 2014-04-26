@@ -62,7 +62,7 @@ public:
 protected:
 	void sleep(long milliseconds);
 
-	void trySleep(long milliseconds);
+	bool trySleep(long milliseconds);
 };
 
 
