@@ -190,7 +190,7 @@ public:
 	void trySleep(long milliseconds);
 		/// Starts an interruptible sleep. Thread will remain suspended
 		/// until (a) the timeout expires or (b) wakeUp() is called.
-		/// The trySleep()/wakeUp() pair of fnctions should be used with
+		/// The trySleep()/wakeUp() pair of functions should be used with
 		/// understanding that this suspended state is not a true sleep, 
 		/// but rather a state of waiting for an event, with timeout 
 		/// expiration. This in essence means that calling wakeUp() 
