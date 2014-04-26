@@ -62,6 +62,7 @@ Thread::Thread():
 	_name(makeName()), 
 	_pTLS(0)
 {
+	_event.reset();
 }
 
 
@@ -70,6 +71,7 @@ Thread::Thread(const std::string& name):
 	_name(name), 
 	_pTLS(0)
 {
+	_event.reset();
 }
 
 
@@ -119,6 +121,18 @@ void Thread::join(long milliseconds)
 bool Thread::tryJoin(long milliseconds)
 {
 	return joinImpl(milliseconds);
+}
+
+
+void Thread::trySleep(long milliseconds)
+{
+	_event.tryWait(milliseconds);
+	_event.reset();
+}
+
+void Thread::wakeUp()
+{
+	_event.set();
 }
 
 

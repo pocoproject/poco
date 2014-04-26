@@ -68,7 +68,7 @@ public:
 protected:
 	MessageHeader _header;
 
-	void messageLength(std::size_t length);
+	void messageLength(Poco::Int32 length);
 		/// Sets the message length in the message header
 };
 
@@ -79,8 +79,9 @@ inline MessageHeader& Message::header()
 }
 
 
-inline void Message::messageLength(std::size_t length)
+inline void Message::messageLength(Poco::Int32 length)
 {
+	poco_assert(length > 0);
 	_header.setMessageLength(length);
 }
 

@@ -64,8 +64,12 @@ function Add-Env-Var([string] $lib, [string] $var)
 {
   if ((${Env:$var} -eq $null) -or (-not ${Env:$var}.Contains(${Env:$lib_$var"})))
   {
-    ${Env:$var} = ${Env:$lib_$var;$Env:$var}
+    $libvar = "$lib" + "_" + "$var"
+    $envvar = [Environment]::GetEnvironmentVariable($libvar, "Process")
+    [Environment]::SetEnvironmentVariable($var, $envvar, "Process")
+    $envvar = [Environment]::GetEnvironmentVariable($var, "Process")
   }
+  
 }
 
 
@@ -88,17 +92,20 @@ function Set-Environment
     }
   }
 
+  if (-Not $Env:PATH.Contains("$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;")) 
+  { $Env:PATH = "$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;$Env:PATH" }
+
   if ($openssl_base -eq '')
   {
     if ($platform -eq 'x64') { $script:openssl_base = 'C:\OpenSSL-Win64' }
     else                     { $script:openssl_base = 'C:\OpenSSL-Win32' }
   }
-
+  
   $Env:OPENSSL_DIR     = "$openssl_base"
   $Env:OPENSSL_INCLUDE = "$Env:OPENSSL_DIR\include"
   $Env:OPENSSL_LIB     = "$Env:OPENSSL_DIR\lib;$Env:OPENSSL_DIR\lib\VC"
-  Add-Env-Var "OPENSSL", "INCLUDE"
-  Add-Env-Var "OPENSSL", "LIB"
+  Add-Env-Var "OPENSSL" "INCLUDE"
+  Add-Env-Var "OPENSSL" "LIB"
 
   if ($mysql_base -ne '')
   {
@@ -108,9 +115,6 @@ function Set-Environment
     Add-Env-Var "MYSQL", "INCLUDE"
     Add-Env-Var "MYSQL", "LIB"
   }
-
-  if (-Not $Env:PATH.Contains("$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;")) 
-  { $Env:PATH = "$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;$Env:PATH" }
 
   $vsct = "VS$($vs_version)COMNTOOLS"
   $vsdir = (Get-Item Env:$vsct).Value

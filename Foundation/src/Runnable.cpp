@@ -35,6 +35,7 @@
 
 
 #include "Poco/Runnable.h"
+#include "Poco/Thread.h"
 
 
 namespace Poco {
@@ -47,6 +48,18 @@ Runnable::Runnable()
 
 Runnable::~Runnable()
 {
+}
+
+
+void Runnable::sleep(long milliseconds)
+{
+	Thread::sleep(milliseconds);
+}
+
+
+void Runnable::trySleep(long milliseconds)
+{
+	Thread::current()->trySleep(milliseconds);
 }
 
 

@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Event.h"
 #include "Poco/Mutex.h"
 
 
@@ -186,6 +187,23 @@ public:
 	bool isRunning() const;
 		/// Returns true if the thread is running.
 
+	void trySleep(long milliseconds);
+		/// Starts an interruptible sleep. Thread will remain suspended
+		/// until (a) the timeout expires or (b) wakeUp() is called.
+		/// The trySleep()/wakeUp() pair of fnctions should be used with
+		/// understanding that this suspended state is not a true sleep, 
+		/// but rather a state of waiting for an event, with timeout 
+		/// expiration. This in essence means that calling wakeUp() 
+		/// before calling  trySleep() will prevent the next trySleep() 
+		/// call to actually suspend the thread (which, in some scenarios,
+		/// may be desirable behavior).
+
+	void wakeUp();
+		/// Wakes up the thread which is in the state of interruptible
+		/// sleep. For threads that are not suspended, calling this
+		/// function has the effect of preventing the subsequent
+		/// trySleep() call to put thread in a suspended state.
+
 	static void sleep(long milliseconds);
 		/// Suspends the current thread for the specified
 		/// amount of time.
@@ -220,6 +238,7 @@ private:
 	int                 _id;
 	std::string         _name;
 	ThreadLocalStorage* _pTLS;
+	Event               _event;
 	mutable FastMutex   _mutex;
 
 	friend class ThreadLocalStorage;
