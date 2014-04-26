@@ -58,11 +58,6 @@ public:
 	virtual void run() = 0;
 		/// Do whatever the thread needs to do. Must
 		/// be overridden by subclasses.
-
-protected:
-	void sleep(long milliseconds);
-
-	bool trySleep(long milliseconds);
 };
 
 

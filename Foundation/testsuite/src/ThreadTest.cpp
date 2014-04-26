@@ -143,11 +143,11 @@ public:
 
 	void run()
 	{
-		_sleepy = !trySleep(300000);
+		_sleepy = !Thread::trySleep(300000);
 		++_counter;
-		_sleepy = !trySleep(300000);
+		_sleepy = !Thread::trySleep(300000);
 		++_counter;
-		_sleepy = !trySleep(10);
+		_sleepy = !Thread::trySleep(10);
 		++_counter;
 	}
 

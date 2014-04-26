@@ -126,8 +126,11 @@ bool Thread::tryJoin(long milliseconds)
 
 bool Thread::trySleep(long milliseconds)
 {
-	return !_event.tryWait(milliseconds);
+	Thread* pT = Thread::current();
+	poco_check_ptr(pT);
+	return !(pT->_event.tryWait(milliseconds));
 }
+
 
 void Thread::wakeUp()
 {

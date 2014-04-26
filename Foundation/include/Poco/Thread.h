@@ -187,7 +187,7 @@ public:
 	bool isRunning() const;
 		/// Returns true if the thread is running.
 
-	bool trySleep(long milliseconds);
+	static bool trySleep(long milliseconds);
 		/// Starts an interruptible sleep. When trySleep() is called,
 		/// the thread will remain suspended until:
 		///   - the timeout expires or 

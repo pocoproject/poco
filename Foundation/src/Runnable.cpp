@@ -51,16 +51,4 @@ Runnable::~Runnable()
 }
 
 
-void Runnable::sleep(long milliseconds)
-{
-	Thread::sleep(milliseconds);
-}
-
-
-bool Runnable::trySleep(long milliseconds)
-{
-	return Thread::current()->trySleep(milliseconds);
-}
-
-
 } // namespace Poco
