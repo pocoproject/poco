@@ -110,6 +110,8 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	char sign = 1;
 	if ((base == 10) && (*pStr == '-'))
 	{
+		// Unsigned types can't be negative so abort parsing
+		if (std::numeric_limits<I>::min() >= 0) return false;
 		sign = -1;
 		++pStr;
 	}
