@@ -274,6 +274,12 @@ void NumberParserTest::testParseError()
 
 	try
 	{
+		NumberParser::parseUnsigned("-123");
+		failmsg("must throw SyntaxException");
+	} catch (SyntaxException&) { }
+
+	try
+	{
 		NumberParser::parseHex("z23");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
