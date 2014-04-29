@@ -65,6 +65,7 @@ set( BASE_SRCS
   src/NullPartHandler.cpp
   src/PartHandler.cpp
   src/PartSource.cpp
+  src/PartStore.cpp
   src/POP3ClientSession.cpp
   src/QuotedPrintableDecoder.cpp
   src/QuotedPrintableEncoder.cpp

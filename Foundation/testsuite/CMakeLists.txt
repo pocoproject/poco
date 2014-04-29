@@ -52,6 +52,7 @@ src/HexBinaryTest.cpp
 src/LRUCacheTest.cpp
 src/LineEndingConverterTest.cpp
 src/LinearHashTableTest.cpp
+src/ListMapTest.cpp
 src/LocalDateTimeTest.cpp
 src/LogStreamTest.cpp
 src/LoggerTest.cpp
