@@ -147,7 +147,7 @@ public:
 		++_counter;
 		_sleepy = !Thread::trySleep(300000);
 		++_counter;
-		_sleepy = !Thread::trySleep(10);
+		_sleepy = !Thread::trySleep(100);
 		++_counter;
 	}
 
@@ -319,7 +319,7 @@ void ThreadTest::testTrySleep()
 	thread.wakeUp(); Thread::sleep(10);
 	assert(r.counter() == 2);
 	assert(r.isSleepy());
-	Thread::sleep(100);
+	Thread::sleep(200);
 	assert(r.counter() == 3);
 	assert(!r.isSleepy());
 	assert(!thread.isRunning());
