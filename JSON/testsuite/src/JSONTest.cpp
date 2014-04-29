@@ -1215,12 +1215,13 @@ void JSONTest::testPrintHandler()
 
 void JSONTest::testStringify()
 {
-	Poco::JSON::Object obj;
-	obj.set("one","two");
-	obj.stringify(std::cout,4);  //this works 
-	obj.stringify(std::cout,1);  //this never returns
-	std::cout << std::endl;
-
+	Object jObj(false);
+	jObj.set("foo", 0);
+	jObj.set("bar", 0);
+	jObj.set("baz", 0);
+	std::stringstream ss;
+	jObj.stringify(ss);
+	assert(ss.str() == "{\"bar\":0,\"baz\":0,\"foo\":0}");
 
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
 						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
@@ -1348,6 +1349,14 @@ void JSONTest::testStringify()
 
 void JSONTest::testStringifyPreserveOrder()
 {
+	Object jObj(true);
+	jObj.set("foo", 0);
+	jObj.set("bar", 0);
+	jObj.set("baz", 0);
+	std::stringstream ss;
+	jObj.stringify(ss);
+	assert(ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");
+
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
 						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
 						"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", \"town\" : \"Springfield\" } } }";

@@ -54,6 +54,7 @@ Release 1.5.3 (2014-05-xx)
 - added runtest script for windows
 - added SQlite Full Text Search support
 - added Thread::trySleep() and Thread::wakeUp()
+- fixed GH #410: Bug in JSON::Object.stringify() in 1.5.2
 
 Release 1.5.2 (2013-09-16)
 ==========================

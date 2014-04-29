@@ -246,7 +246,7 @@ private:
 
 			Stringifier::stringify(getValue(it), out, indent + step, step);
 
-			if ( ++it != container.end() ) out << ',';
+			if (++it != container.end()) out << ',';
 
 			if (step > 0) out << std::endl;
 		}
