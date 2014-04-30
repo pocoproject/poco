@@ -2192,10 +2192,18 @@ void VarTest::testJSONDeserializeString()
 	assert (b.convert<std::string>() == "test");
 
 	Var c('c');
-	std::string tst2 = Var::toString(c);
-	Var b2 = Var::parse(tst2);
+	tst = Var::toString(c);
+	Var b2 = Var::parse(tst);
 	char cc = b2.convert<char>();
 	assert (cc == 'c');
+
+	tst = "{ \"a\" : 1, \"b\" : 2 \n}";
+	a = Var::parse(tst);
+	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
+
+	tst = "{ \"a\" : 1, \"b\" : 2\n}";
+	a = Var::parse(tst);
+	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 }
 
 

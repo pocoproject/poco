@@ -485,7 +485,7 @@ Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 std::string Var::parseString(const std::string& val, std::string::size_type& pos)
 {
 	static const std::string STR_STOP("\"");
-	static const std::string OTHER_STOP(" ,]}"); // we stop at space, ',', ']' or '}'
+	static const std::string OTHER_STOP("\n ,]}");
 
 	bool inString = false;
 	//skip optional ' "

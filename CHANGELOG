@@ -55,6 +55,9 @@ Release 1.5.3 (2014-05-xx)
 - added SQlite Full Text Search support
 - added Thread::trySleep() and Thread::wakeUp()
 - fixed GH #410: Bug in JSON::Object.stringify() in 1.5.2
+- fixed GH #362: Defect in Var::parseString when there is no space between value and newline
+- fixed GH #314: JSON parsing bug
+- added GH #313: MetaColumn additions for Data::ODBC and Data::SQLite
 
 Release 1.5.2 (2013-09-16)
 ==========================
