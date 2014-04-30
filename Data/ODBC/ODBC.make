@@ -38,20 +38,13 @@ ifeq ($(POCO_CONFIG),MinGW)
 CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
 
 ##
-## Cygwin
-##
-else ifeq ($(POCO_CONFIG),CYGWIN)
-# -DODBCVER=0x0300: SQLHandle declaration issue
-# -DNOMINMAX      : MIN/MAX macros defined in windows conflict with libstdc++
-CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
-# CYGWIN platform has its own ODBC library in /lib/w32api 
-SYSLIBS += -L/lib/w32api -lodbc32 -lodbccp32
-
-##
 ## unixODBC
 ##
 else ifeq (0, $(shell test -e $(POCO_ODBC_LIB)/libodbc$(LIBLINKEXT); echo $$?))
-SYSLIBS += -lodbc -lodbcinst
+SYSLIBS += -lodbc
+ifeq (0, $(shell test -e $(POCO_ODBC_LIB)/libodbcinst$(LIBLINKEXT); echo $$?))
+SYSLIBS += -lodbcinst
+endif
 COMMONFLAGS += -DPOCO_UNIXODBC
 
 ##

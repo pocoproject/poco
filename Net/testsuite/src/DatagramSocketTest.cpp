@@ -46,7 +46,9 @@ using Poco::Net::Socket;
 using Poco::Net::DatagramSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::IPAddress;
-using Poco::Net::NetworkInterface;
+#ifdef POCO_NET_HAS_INTERFACE
+	using Poco::Net::NetworkInterface;
+#endif
 using Poco::Timespan;
 using Poco::Stopwatch;
 using Poco::TimeoutException;
@@ -101,11 +103,11 @@ void DatagramSocketTest::testBroadcast()
 	UDPEchoServer echoServer;
 	DatagramSocket ss(IPAddress::IPv4);
 
-#if (POCO_OS != POCO_OS_FREE_BSD)
-	SocketAddress sa("255.255.255.255", echoServer.port());
-#else
+#if defined(POCO_NET_HAS_INTERFACE) && (POCO_OS == POCO_OS_FREE_BSD)
 	NetworkInterface ni = NetworkInterface::forName("em0");
 	SocketAddress sa(ni.broadcastAddress(1), echoServer.port());
+#else
+	SocketAddress sa("255.255.255.255", echoServer.port());
 #endif
 	// not all socket implementations fail if broadcast option is not set
 /*
