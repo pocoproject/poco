@@ -89,7 +89,7 @@ void Time::assign(int hour, int minute, int second)
 }
 
 
-bool Time::operator < (const Time& time)
+bool Time::operator < (const Time& time) const
 {
 	int hour = time.hour();
 

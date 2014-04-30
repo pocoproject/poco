@@ -58,6 +58,7 @@ Release 1.5.3 (2014-05-xx)
 - fixed GH #362: Defect in Var::parseString when there is no space between value and newline
 - fixed GH #314: JSON parsing bug
 - added GH #313: MetaColumn additions for Data::ODBC and Data::SQLite
+- fixed GH #346: Make Poco::Data::Date and Poco::Data::Time compare functions const.
 
 Release 1.5.2 (2013-09-16)
 ==========================
