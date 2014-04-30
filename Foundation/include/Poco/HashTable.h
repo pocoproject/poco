@@ -130,8 +130,7 @@ public:
 			return;
 		for (UInt32 i = 0; i < _maxCapacity; ++i)
 		{
-			if (_entries[i])
-				delete _entries[i];
+			delete _entries[i];
 		}
 		delete[] _entries;
 		_entries     = 0;
