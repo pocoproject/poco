@@ -60,6 +60,7 @@ Release 1.5.3 (2014-05-xx)
 - added GH #313: MetaColumn additions for Data::ODBC and Data::SQLite
 - fixed GH #346: Make Poco::Data::Date and Poco::Data::Time compare functions const.
 - fixed GH #341: Compiling poco-1.5.2 for Cygwin
+- fixed GH #305: There are bugs in Buffer.h
 
 Release 1.5.2 (2013-09-16)
 ==========================
