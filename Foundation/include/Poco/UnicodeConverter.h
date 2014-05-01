@@ -129,7 +129,7 @@ public:
 	}
 
 	template <typename T>
-	static size_t UTFStrlen(const T* ptr)
+	static std::size_t UTFStrlen(const T* ptr)
 		/// Returns the length (in characters) of a zero-terminated UTF string.
 	{
 		if (ptr == 0) return 0;

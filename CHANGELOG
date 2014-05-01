@@ -61,6 +61,7 @@ Release 1.5.3 (2014-05-xx)
 - fixed GH #346: Make Poco::Data::Date and Poco::Data::Time compare functions const.
 - fixed GH #341: Compiling poco-1.5.2 for Cygwin
 - fixed GH #305: There are bugs in Buffer.h
+- fixed GH #321: trivial build fixes (BB QNX build)
 
 Release 1.5.2 (2013-09-16)
 ==========================

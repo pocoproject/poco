@@ -109,4 +109,12 @@
 #endif // __GNUC__
 
 
+//
+// No syslog.h on QNX/BB10
+//
+#if defined(__QNXNTO__)
+	#define POCO_NO_SYSLOGCHANNEL
+#endif
+
+
 #endif // Foundation_Platform_POSIX_INCLUDED
