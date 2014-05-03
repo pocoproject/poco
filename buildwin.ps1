@@ -67,7 +67,6 @@ function Add-Env-Var([string] $lib, [string] $var)
     $libvar = "$lib" + "_" + "$var"
     $envvar = [Environment]::GetEnvironmentVariable($libvar, "Process")
     [Environment]::SetEnvironmentVariable($var, $envvar, "Process")
-    $envvar = [Environment]::GetEnvironmentVariable($var, "Process")
   }
   
 }
