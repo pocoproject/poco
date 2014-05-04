@@ -79,16 +79,16 @@ public:
 	Date& operator = (const Poco::Dynamic::Var& var);
 		/// Assignment operator for Var.
 
-	bool operator == (const Date& date);
+	bool operator == (const Date& date) const;
 		/// Equality operator.
 
-	bool operator != (const Date& date);
+	bool operator != (const Date& date) const;
 		/// Inequality operator.
 
-	bool operator < (const Date& date);
+	bool operator < (const Date& date) const;
 		/// Less then operator.
 
-	bool operator > (const Date& date);
+	bool operator > (const Date& date) const;
 		/// Greater then operator.
 
 private:
@@ -133,7 +133,7 @@ inline Date& Date::operator = (const DateTime& dt)
 }
 
 
-inline bool Date::operator == (const Date& date)
+inline bool Date::operator == (const Date& date) const
 {
 	return _year == date.year() &&
 		_month == date.month() &&
@@ -141,13 +141,13 @@ inline bool Date::operator == (const Date& date)
 }
 
 
-inline bool Date::operator != (const Date& date)
+inline bool Date::operator != (const Date& date) const
 {
 	return !(*this == date);
 }
 
 
-inline bool Date::operator > (const Date& date)
+inline bool Date::operator > (const Date& date) const
 {
 	return !(*this == date) && !(*this < date);
 }

@@ -17,7 +17,7 @@
 #include <cstdlib>
 
 
-int _tmain(int argc, wchar_t* argv[])
+int wmain(int argc, wchar_t* argv[])
 {
 	std::vector<std::string> args;
 	for (int i = 0; i < argc; ++i)

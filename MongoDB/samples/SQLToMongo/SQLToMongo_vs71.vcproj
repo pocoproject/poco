@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="7.10"
 	Name="SQLToMongo"
-	ProjectGUID="{D0381ECF-E750-32DA-8EEF-92D56B172D15}"
+	Version="7.10"
+	ProjectType="Visual C++"
+	ProjectGUID="{638D0833-8E84-3A67-BD00-4611F99E65AF}"
 	RootNamespace="SQLToMongo"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -44,7 +44,7 @@
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\SQLToMongod.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\SQLToMongod.pdb"
 				SubSystem="1"
@@ -106,7 +106,7 @@
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\SQLToMongo.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
 				GenerateDebugInformation="FALSE"
 				ProgramDatabaseFile=""
 				SubSystem="1"
@@ -167,7 +167,7 @@
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_mt\SQLToMongod.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\static_mt\SQLToMongod.pdb"
 				SubSystem="1"
@@ -229,7 +229,7 @@
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_mt\SQLToMongo.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
 				GenerateDebugInformation="FALSE"
 				ProgramDatabaseFile=""
 				SubSystem="1"
@@ -290,7 +290,7 @@
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_md\SQLToMongod.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\static_md\SQLToMongod.pdb"
 				SubSystem="1"
@@ -352,7 +352,7 @@
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_md\SQLToMongo.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
 				GenerateDebugInformation="FALSE"
 				ProgramDatabaseFile=""
 				SubSystem="1"
@@ -381,19 +381,15 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
+	<References/>
 	<Files>
 		<Filter
-			Name="Header Files">
-		</Filter>
+			Name="Header Files"/>
 		<Filter
 			Name="Source Files">
 			<File
-				RelativePath=".\src\SQLToMongo.cpp">
-			</File>
+				RelativePath=".\src\SQLToMongo.cpp"/>
 		</Filter>
 	</Files>
-	<Globals>
-	</Globals>
+	<Globals/>
 </VisualStudioProject>

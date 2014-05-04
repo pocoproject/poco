@@ -72,7 +72,7 @@ void Date::assign(int year, int month, int day)
 }
 
 
-bool Date::operator < (const Date& date)
+bool Date::operator < (const Date& date) const
 {
 	int year = date.year();
 

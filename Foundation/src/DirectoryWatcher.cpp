@@ -15,6 +15,11 @@
 
 
 #include "Poco/DirectoryWatcher.h"
+
+
+#ifndef POCO_NO_INOTIFY
+
+
 #include "Poco/Path.h"
 #include "Poco/Glob.h"
 #include "Poco/DirectoryIterator.h"
@@ -596,3 +601,6 @@ bool DirectoryWatcher::supportsMoveEvents() const
 
 
 } // namespace Poco
+
+
+#endif // POCO_NO_INOTIFY

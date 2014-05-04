@@ -33,75 +33,75 @@
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
   <ImportGroup Label="ExtensionSettings"/>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">..\bin\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">true</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">..\bin\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">false</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">..\lib\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">..\lib\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">..\lib\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">..\lib\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">PocoZipd</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">PocoZipmdd</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">PocoZipmtd</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">PocoZip</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">PocoZipmd</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">PocoZipmt</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">..\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">obj\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">..\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">obj\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">..\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">obj\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">..\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">obj\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">..\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">obj\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">..\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">obj\$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoZipd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoZipmdd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoZipmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoZip</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoZipmd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoZipmt</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -132,7 +132,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -166,7 +166,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -190,7 +190,7 @@
       <OutputFile>..\lib\PocoZipmtd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -215,7 +215,7 @@
       <OutputFile>..\lib\PocoZipmt.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -239,7 +239,7 @@
       <OutputFile>..\lib\PocoZipmdd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -317,10 +317,10 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>

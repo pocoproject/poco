@@ -42,7 +42,7 @@ void RequestMessage::send(std::ostream& ostr)
 	buildRequest(requestWriter);
 	requestWriter.flush();
 
-	messageLength(static_cast<std::size_t>(ss.tellp()));
+	messageLength(static_cast<Poco::Int32>(ss.tellp()));
 
 	BinaryWriter socketWriter(ostr, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 	_header.write(socketWriter);

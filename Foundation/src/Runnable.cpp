@@ -15,6 +15,7 @@
 
 
 #include "Poco/Runnable.h"
+#include "Poco/Thread.h"
 
 
 namespace Poco {

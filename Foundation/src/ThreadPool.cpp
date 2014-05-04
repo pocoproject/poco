@@ -22,7 +22,7 @@
 #include "Poco/ErrorHandler.h"
 #include <sstream>
 #include <ctime>
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 #include "wce_time.h"
 #endif
 
@@ -69,7 +69,7 @@ PooledThread::PooledThread(const std::string& name, int stackSize):
 {
 	poco_assert_dbg (stackSize >= 0);
 	_thread.setStackSize(stackSize);
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 	_idleTime = wceex_time(NULL);
 #else
 	_idleTime = std::time(NULL);
@@ -136,7 +136,7 @@ int PooledThread::idleTime()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 	return (int) (wceex_time(NULL) - _idleTime);
 #else
 	return (int) (time(NULL) - _idleTime);
@@ -212,7 +212,7 @@ void PooledThread::run()
 			}
 			FastMutex::ScopedLock lock(_mutex);
 			_pTarget  = 0;
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 			_idleTime = wceex_time(NULL);
 #else
 			_idleTime = time(NULL);

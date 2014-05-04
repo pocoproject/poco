@@ -28,6 +28,7 @@ public:
 
 	void testNewKeys();
 	void testSign();
+	void testSignSha256();
 	void testSignManipulated();
 	void testRSACipher();
 	void testRSACipherLarge();

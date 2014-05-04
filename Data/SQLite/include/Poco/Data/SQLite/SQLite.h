@@ -4,7 +4,7 @@
 // $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/SQLite.h#3 $
 //
 // Library: SQLite
-// Package: SQLIte
+// Package: SQLite
 // Module:  SQLite
 //
 // Basic definitions for the Poco SQLite library.
@@ -58,17 +58,6 @@
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(SQLite_EXPORTS)
 		#pragma comment(lib, "PocoDataSQLite" POCO_LIB_SUFFIX)
 	#endif
-#endif
-
-
-//
-// Thread safety mode defaults to "serialized".
-// See http://www.sqlite.org/threadsafe.html for details.
-// Threading mode may significantly affect performance 
-// (see TestSuite::benchmarkThreadModesTiming)
-//
-#ifndef SQLITE_THREADSAFE
-	#define SQLITE_THREADSAFE 1
 #endif
 
 

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{fa603f5d-5164-4fdc-85f8-a467f7ff2ec9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configuration Files">
+      <UniqueIdentifier>{cba56c99-3cb0-4d6b-b201-f05e116f8a9b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\TimeServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TimeServer.properties">
+      <Filter>Configuration Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

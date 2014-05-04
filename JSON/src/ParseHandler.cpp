@@ -76,7 +76,7 @@ void ParseHandler::startObject()
 
 void ParseHandler::endObject()
 {
-	_stack.pop();
+	if (!_stack.empty()) _stack.pop();
 }
 
 
@@ -112,7 +112,7 @@ void ParseHandler::startArray()
 
 void ParseHandler::endArray()
 {
-	_stack.pop();
+	if (!_stack.empty()) _stack.pop();
 }
 
 

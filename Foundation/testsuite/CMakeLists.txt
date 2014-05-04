@@ -14,6 +14,7 @@ src/ByteOrderTest.cpp
 src/CacheTestSuite.cpp
 src/ChannelTest.cpp
 src/ClassLoaderTest.cpp
+src/ClockTest.cpp
 src/ConditionTest.cpp
 src/CoreTest.cpp
 src/CoreTestSuite.cpp
@@ -52,6 +53,7 @@ src/HexBinaryTest.cpp
 src/LRUCacheTest.cpp
 src/LineEndingConverterTest.cpp
 src/LinearHashTableTest.cpp
+src/ListMapTest.cpp
 src/LocalDateTimeTest.cpp
 src/LogStreamTest.cpp
 src/LoggerTest.cpp
@@ -78,6 +80,7 @@ src/NumberFormatterTest.cpp
 src/NumberParserTest.cpp
 src/PathTest.cpp
 src/PatternFormatterTest.cpp
+src/PBKDF2EngineTest.cpp
 src/PriorityEventTest.cpp
 src/ProcessTest.cpp
 src/ProcessesTestSuite.cpp

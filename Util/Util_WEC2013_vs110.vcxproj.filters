@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Application">
+      <UniqueIdentifier>{9ca7c308-47a8-4acf-99bf-7b4e15dda4ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application\Header Files">
+      <UniqueIdentifier>{d12121b5-b60a-44ee-9830-caa502195086}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application\Source Files">
+      <UniqueIdentifier>{2b910781-4062-4037-a50c-a5f6fe1126fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configuration">
+      <UniqueIdentifier>{5c519b11-f9e9-469b-a850-2b5a2a36fa81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configuration\Header Files">
+      <UniqueIdentifier>{83caab94-22b8-4ecc-8b10-848f309734ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configuration\Source Files">
+      <UniqueIdentifier>{d155a648-1d2e-41d3-96c3-a0d5431ecd5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Options">
+      <UniqueIdentifier>{b2d4ec3d-e66c-4b20-93e8-a80c91cf1920}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Options\Header Files">
+      <UniqueIdentifier>{bb08579f-4977-45c8-ba0c-8950bcca9d76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Options\Source Files">
+      <UniqueIdentifier>{98533849-34b1-4243-838b-9490268df13a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{0849ea06-0e39-4a8c-a744-c9d6cee23eae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows\Header Files">
+      <UniqueIdentifier>{86e4d16e-19bb-4a12-94a0-c4bed7361875}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows\Source Files">
+      <UniqueIdentifier>{4a030fd4-f140-4c96-b564-4a313252c94b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{10694634-f876-47ec-ac45-56d5ccc80013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\Header Files">
+      <UniqueIdentifier>{a861e4e1-b4e5-47fc-9572-a3de990a1337}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\Source Files">
+      <UniqueIdentifier>{36ae6d11-e01e-4be0-9b9c-15c41260fda9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer">
+      <UniqueIdentifier>{d9ff0131-412e-4f97-804b-aac9c7ea1001}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer\Header Files">
+      <UniqueIdentifier>{1f02df3b-bdfa-4b41-bdf3-45357f18deaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer\Source Files">
+      <UniqueIdentifier>{06ee9132-593c-415e-b64b-4b348faa5a61}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\Util\Application.h">
+      <Filter>Application\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\LoggingSubsystem.h">
+      <Filter>Application\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\ServerApplication.h">
+      <Filter>Application\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\Subsystem.h">
+      <Filter>Application\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\AbstractConfiguration.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\ConfigurationMapper.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\ConfigurationView.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\FilesystemConfiguration.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\IniFileConfiguration.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\JSONConfiguration.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\LayeredConfiguration.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\LoggingConfigurator.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\MapConfiguration.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\PropertyFileConfiguration.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\SystemConfiguration.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\XMLConfiguration.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\HelpFormatter.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\IntValidator.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\Option.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\OptionCallback.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\OptionException.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\OptionProcessor.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\OptionSet.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\RegExpValidator.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\Validator.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\WinRegistryConfiguration.h">
+      <Filter>Windows\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\WinRegistryKey.h">
+      <Filter>Windows\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\WinService.h">
+      <Filter>Windows\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\Util.h">
+      <Filter>Util\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\Timer.h">
+      <Filter>Timer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\TimerTask.h">
+      <Filter>Timer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Util\TimerTaskAdapter.h">
+      <Filter>Timer\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>Application\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LoggingSubsystem.cpp">
+      <Filter>Application\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ServerApplication.cpp">
+      <Filter>Application\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Subsystem.cpp">
+      <Filter>Application\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AbstractConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConfigurationMapper.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConfigurationView.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FilesystemConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IniFileConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LayeredConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LoggingConfigurator.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyFileConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SystemConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XMLConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HelpFormatter.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntValidator.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Option.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionCallback.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionException.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionProcessor.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionSet.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RegExpValidator.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Validator.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinRegistryConfiguration.cpp">
+      <Filter>Windows\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinRegistryKey.cpp">
+      <Filter>Windows\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinService.cpp">
+      <Filter>Windows\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Timer.cpp">
+      <Filter>Timer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimerTask.cpp">
+      <Filter>Timer\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
+  </ItemGroup>
+</Project>

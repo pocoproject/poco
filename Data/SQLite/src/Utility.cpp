@@ -90,6 +90,9 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("INT64", MetaColumn::FDT_INT64));
 		_types.insert(TypeMap::value_type("LONG", MetaColumn::FDT_INT64));
 		_types.insert(TypeMap::value_type("INTEGER64", MetaColumn::FDT_INT64));
+		_types.insert(TypeMap::value_type("TINYINT", MetaColumn::FDT_INT8));
+		_types.insert(TypeMap::value_type("SMALLINT", MetaColumn::FDT_INT16));
+		_types.insert(TypeMap::value_type("BIGINT", MetaColumn::FDT_INT64));
 		_types.insert(TypeMap::value_type("COUNTER", MetaColumn::FDT_UINT64));
 		_types.insert(TypeMap::value_type("AUTOINCREMENT", MetaColumn::FDT_UINT64));
 		_types.insert(TypeMap::value_type("REAL", MetaColumn::FDT_DOUBLE));

@@ -56,7 +56,7 @@ public:
 	void write(BinaryWriter& writer);
 		/// Writes the header
 
-	std::size_t getMessageLength() const;
+	Int32 getMessageLength() const;
 		/// Returns the message length
 
 	OpCode opCode() const;
@@ -75,13 +75,13 @@ private:
 	MessageHeader(OpCode opcode);
 		/// Constructor.
 
-	void setMessageLength(std::size_t length);
+	void setMessageLength(Int32 length);
 		/// Sets the message length
 
-	std::size_t _messageLength;
-	Int32       _requestID;
-	Int32       _responseTo;
-	OpCode      _opCode;
+	Int32 _messageLength;
+	Int32 _requestID;
+	Int32 _responseTo;
+	OpCode _opCode;
 
 	friend class Message;
 };
@@ -93,14 +93,15 @@ inline MessageHeader::OpCode MessageHeader::opCode() const
 }
 
 
-inline std::size_t MessageHeader::getMessageLength() const
+inline Int32 MessageHeader::getMessageLength() const
 {
 	return _messageLength;
 }
 
 
-inline void MessageHeader::setMessageLength(std::size_t length)
+inline void MessageHeader::setMessageLength(Int32 length)
 {
+	poco_assert (_messageLength >= 0);
 	_messageLength = MSG_HEADER_SIZE + length;
 }
 

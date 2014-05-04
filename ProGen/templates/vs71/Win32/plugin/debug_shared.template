@@ -24,7 +24,8 @@
 		Detect64BitPortabilityProblems="FALSE"
 		DebugInformationFormat="4"
 		CompileAs="0"
-		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"/>
+		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"/>
 	<Tool
 		Name="VCCustomBuildTool"/>
 	<Tool
@@ -37,7 +38,8 @@
 		ProgramDatabaseFile="${project.outdir}\bin\${project.target}d.pdb"
 		AdditionalLibraryDirectories="${project.pocobase}\lib"
 		SubSystem="1"
-		TargetMachine="1"/>
+		TargetMachine="1"
+		AdditionalOptions="${configuration.linker.additionalOptions}"/>
 	<Tool
 		Name="VCMIDLTool"/>
 	<Tool

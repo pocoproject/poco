@@ -364,10 +364,7 @@ Template::Template()
 
 Template::~Template()
 {
-	if ( _parts != NULL )
-	{
-		delete _parts;
-	}
+	delete _parts;
 }
 
 

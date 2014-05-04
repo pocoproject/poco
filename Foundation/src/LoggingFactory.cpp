@@ -22,7 +22,7 @@
 #include "Poco/FormattingChannel.h"
 #include "Poco/SplitterChannel.h"
 #include "Poco/NullChannel.h"
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_SYSLOGCHANNEL)
 #include "Poco/SyslogChannel.h"
 #endif
 #if defined(POCO_OS_FAMILY_VMS)

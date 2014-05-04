@@ -58,6 +58,22 @@ void DigestEngineTest::testMD5()
 	assert (DigestEngine::digestToHex(engine.digest()) == "57edf4a22be3c955ac49da2e2107b67a");
 }
 
+void DigestEngineTest::testSHA1()
+{
+	DigestEngine engine("SHA1");
+
+	// test vectors from FIPS 180-1
+
+	engine.update("abc");
+	assert (DigestEngine::digestToHex(engine.digest()) == "a9993e364706816aba3e25717850c26c9cd0d89d");
+
+	engine.update("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
+	assert (DigestEngine::digestToHex(engine.digest()) == "84983e441c3bd26ebaae4aa1f95129e5e54670f1");
+
+	for (int i = 0; i < 1000000; ++i)
+		engine.update('a');
+	assert (DigestEngine::digestToHex(engine.digest()) == "34aa973cd4c4daa4f61eeb2bdbad27316534016f");
+}
 
 void DigestEngineTest::setUp()
 {
@@ -74,6 +90,7 @@ CppUnit::Test* DigestEngineTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DigestEngineTest");
 
 	CppUnit_addTest(pSuite, DigestEngineTest, testMD5);
+	CppUnit_addTest(pSuite, DigestEngineTest, testSHA1);
 
 	return pSuite;
 }

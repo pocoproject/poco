@@ -328,9 +328,9 @@ void HTMLForm::writeUrl(std::ostream& ostr)
 	{
 		if (it != begin()) ostr << "&";
 		std::string name;
-		URI::encode(it->first, "=&+;", name);
+		URI::encode(it->first, "!?#/'\",;:$&()[]*+=@", name);
 		std::string value;
-		URI::encode(it->second, "=&+;", value);
+		URI::encode(it->second, "!?#/'\",;:$&()[]*+=@", value);
 		ostr << name << "=" << value;
 	}
 }

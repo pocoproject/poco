@@ -92,7 +92,7 @@ void Object::getNames(std::vector<std::string>& names) const
 
 void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 {
-	if (step == -1) step = indent;
+	if (step < 0) step = indent;
 
 	if(!_preserveInsOrder)
 		doStringify(_values, out, indent, step);
@@ -107,7 +107,7 @@ const std::string& Object::getKey(KeyPtrList::const_iterator& iter) const
 	ValueMap::const_iterator end = _values.end();
 	for (; it != end; ++it)
 	{
-		if (it->second == **iter) return it->first;
+		if (&it->second == *iter) return it->first;
 	}
 
 	throw NotFoundException((*iter)->convert<std::string>());

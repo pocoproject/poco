@@ -180,7 +180,8 @@ public:
 		try
 		{
 			return _nulls.at(row);
-		}catch (std::out_of_range& ex)
+		}
+		catch (std::out_of_range& ex)
 		{ 
 			throw RangeException(ex.what()); 
 		}
@@ -198,6 +199,11 @@ public:
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
+	}
+
+	void reset()
+	{
+		_nulls.clear();
 	}
 
 protected:
@@ -264,7 +270,8 @@ public:
 		try
 		{
 			return _nulls.at(row);
-		}catch (std::out_of_range& ex)
+		}
+		catch (std::out_of_range& ex)
 		{ 
 			throw RangeException(ex.what()); 
 		}
@@ -284,6 +291,11 @@ public:
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<bool>(pPrep, pos, _default);
+	}
+
+	void reset()
+	{
+		_nulls.clear();
 	}
 
 protected:
@@ -350,7 +362,8 @@ public:
 		try
 		{
 			return _nulls.at(row);
-		}catch (std::out_of_range& ex)
+		}
+		catch (std::out_of_range& ex)
 		{ 
 			throw RangeException(ex.what()); 
 		}
@@ -368,6 +381,11 @@ public:
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
+	}
+
+	void reset()
+	{
+		_nulls.clear();
 	}
 
 protected:
@@ -434,7 +452,8 @@ public:
 		try
 		{
 			return _nulls.at(row);
-		}catch (std::out_of_range& ex)
+		}
+		catch (std::out_of_range& ex)
 		{ 
 			throw RangeException(ex.what()); 
 		}
@@ -452,6 +471,11 @@ public:
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
 	{
 		return new Preparation<T>(pPrep, pos, _default);
+	}
+
+	void reset()
+	{
+		_nulls.clear();
 	}
 
 protected:
@@ -502,6 +526,7 @@ public:
 
 	void reset()
 	{
+		Extraction<C>::reset();
 		_pColumn->reset();
 	}	
 

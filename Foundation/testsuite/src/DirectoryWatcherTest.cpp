@@ -11,6 +11,11 @@
 
 
 #include "DirectoryWatcherTest.h"
+
+
+#ifndef POCO_NO_INOTIFY
+
+
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/DirectoryWatcher.h"
@@ -292,3 +297,6 @@ CppUnit::Test* DirectoryWatcherTest::suite()
 
 	return pSuite;
 }
+
+
+#endif // POCO_NO_INOTIFY

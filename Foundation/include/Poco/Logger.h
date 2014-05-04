@@ -575,7 +575,7 @@ private:
 #define poco_information_f4(logger, fmt, arg1, arg2, arg3, arg4) \
 	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) || defined(POCO_LOG_DEBUG)
 	#define poco_debug(logger, msg) \
 		if ((logger).debug()) (logger).debug(msg, __FILE__, __LINE__); else (void) 0
 

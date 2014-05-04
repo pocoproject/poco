@@ -98,7 +98,7 @@ public:
 	template <typename T>
 	Session get(const std::string& name, const T& value)
 		/// Returns a Session with requested property set.
-		/// The property can be diferent from the default pool
+		/// The property can be different from the default pool
 		/// value, in which case it is reset back to the pool 
 		/// value when the session is reclaimed by the pool.
 	{
@@ -112,7 +112,7 @@ public:
 
 	Session get(const std::string& name, bool value);
 		/// Returns a Session with requested feature set.
-		/// The feature can be diferent from the default pool
+		/// The feature can be different from the default pool
 		/// value, in which case it is reset back to the pool 
 		/// value when the session is reclaimed by the pool.
 
@@ -154,6 +154,10 @@ public:
 		/// Returns the requested property.
 
 	void shutdown();
+		/// Shuts down the session pool.
+
+	bool isActive() const;
+		/// Returns true if session pool is active (not shut down).
 
 protected:
 	typedef Poco::AutoPtr<PooledSessionHolder>    PooledSessionHolderPtr;
@@ -210,6 +214,12 @@ inline std::string SessionPool::name(const std::string& connector,
 inline std::string SessionPool::name() const
 {
 	return name(_connector, _connectionString);
+}
+
+
+inline bool SessionPool::isActive() const
+{
+	return !_shutdown;
 }
 
 

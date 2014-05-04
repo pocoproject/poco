@@ -1843,22 +1843,22 @@ void VarTest::testIsArray()
 
 	assert (!d0.isArray());
 	assert (!d1.isArray());
-	assert (d2.isArray());
-	assert (d3.isArray());
-	assert (d4.isArray());
-	assert (d5.isArray());
-	assert (d6.isArray());
-	assert (d7.isArray());
-	assert (d8.isArray());
-	assert (d9.isArray());
-	assert (d10.isArray());
-	assert (d11.isArray());
-	assert (d12.isArray());
-	assert (d13.isArray());
-	assert (d14.isArray());
-	assert (d15.isArray());
+	assert (!d2.isArray());
+	assert (!d3.isArray());
+	assert (!d4.isArray());
+	assert (!d5.isArray());
+	assert (!d6.isArray());
+	assert (!d7.isArray());
+	assert (!d8.isArray());
+	assert (!d9.isArray());
+	assert (!d10.isArray());
+	assert (!d11.isArray());
+	assert (!d12.isArray());
+	assert (!d13.isArray());
+	assert (!d14.isArray());
+	assert (!d15.isArray());
 	assert (d16.isArray());
-	assert (d17.isArray());
+	assert (!d17.isArray());
 }
 
 
@@ -2172,10 +2172,18 @@ void VarTest::testJSONDeserializeString()
 	assert (b.convert<std::string>() == "test");
 
 	Var c('c');
-	std::string tst2 = Var::toString(c);
-	Var b2 = Var::parse(tst2);
+	tst = Var::toString(c);
+	Var b2 = Var::parse(tst);
 	char cc = b2.convert<char>();
 	assert (cc == 'c');
+
+	tst = "{ \"a\" : 1, \"b\" : 2 \n}";
+	a = Var::parse(tst);
+	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
+
+	tst = "{ \"a\" : 1, \"b\" : 2\n}";
+	a = Var::parse(tst);
+	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 }
 
 

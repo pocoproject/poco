@@ -34,6 +34,7 @@ public:
 	void testNotJoin();
 	void testNotRun();
 	void testNotRunJoin();
+	void testTrySleep();
 	void testThreadTarget();
 	void testThreadFunction();
 	void testThreadStackSize();

@@ -892,6 +892,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\PBKDF2EngineTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\RandomStreamTest.cpp"
 					>
 				</File>
@@ -925,6 +929,10 @@
 				</File>
 				<File
 					RelativePath=".\src\MD5EngineTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PBKDF2EngineTest.h"
 					>
 				</File>
 				<File

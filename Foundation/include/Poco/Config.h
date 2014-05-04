@@ -100,6 +100,11 @@
 #endif
 
 
+// Define to disable compilation of DirectoryWatcher
+// on platforms with no inotify.
+// #define POCO_NO_INOTIFY
+
+
 // Following are options to remove certain features
 // to reduce library/executable size for smaller
 // embedded platforms. By enabling these options,
@@ -156,5 +161,9 @@
 	#define POCO_NO_LOCALE
 #endif
 
+// Enable the poco_debug_* and poco_trace_* macros
+// even if the _DEBUG variable is not set.
+// This allows the use of these macros in a release version.
+// #define POCO_LOG_DEBUG
 
 #endif // Foundation_Config_INCLUDED

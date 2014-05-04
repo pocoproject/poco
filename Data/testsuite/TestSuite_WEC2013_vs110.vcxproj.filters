@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="DataCore">
+      <UniqueIdentifier>{5b0099da-249e-4211-b45d-df49eb446bfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataCore\Header Files">
+      <UniqueIdentifier>{d6dc14da-b3f4-4cb7-89c3-682d72233325}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataCore\Source Files">
+      <UniqueIdentifier>{15ef7064-eb19-4737-abe1-8bd630d0a93f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite">
+      <UniqueIdentifier>{35e6d8e7-382f-47bc-8e5d-08bc9cb9832b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Header Files">
+      <UniqueIdentifier>{754bcd57-bf11-4df2-913c-a471b3519f87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Source Files">
+      <UniqueIdentifier>{bc0c8940-6638-4de4-b478-a0a15fc09bb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver">
+      <UniqueIdentifier>{a103532d-9b22-4609-9e74-4359f60b71a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver\Source Files">
+      <UniqueIdentifier>{3209bcff-6e69-481a-bb01-435ca880a731}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TestSession">
+      <UniqueIdentifier>{26a30626-8a1e-4cf9-a602-9fb737017ae2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TestSession\Header Files">
+      <UniqueIdentifier>{13561c1b-2ef1-422a-864e-a6887843a1b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TestSession\Source Files">
+      <UniqueIdentifier>{41a7a3d4-c3ce-49ba-8187-b48ad97e2b77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SessionPooling">
+      <UniqueIdentifier>{6bdeda54-b31a-4e36-bae6-c8cb6d9b84d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SessionPooling\Header Files">
+      <UniqueIdentifier>{bafc879e-fc20-46c9-bad5-6a9bc75f826f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SessionPooling\Source Files">
+      <UniqueIdentifier>{00d4642b-c0f9-469b-ab9a-43f7c94a0ca7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\DataTest.h">
+      <Filter>DataCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DataTestSuite.h">
+      <Filter>_Suite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Binder.h">
+      <Filter>TestSession\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Connector.h">
+      <Filter>TestSession\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Extractor.h">
+      <Filter>TestSession\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Preparator.h">
+      <Filter>TestSession\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SessionImpl.h">
+      <Filter>TestSession\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestStatementImpl.h">
+      <Filter>TestSession\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SessionPoolTest.h">
+      <Filter>SessionPooling\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\DataTest.cpp">
+      <Filter>DataCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataTestSuite.cpp">
+      <Filter>_Suite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinCEDriver.cpp">
+      <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Binder.cpp">
+      <Filter>TestSession\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Connector.cpp">
+      <Filter>TestSession\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Extractor.cpp">
+      <Filter>TestSession\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Preparator.cpp">
+      <Filter>TestSession\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionImpl.cpp">
+      <Filter>TestSession\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestStatementImpl.cpp">
+      <Filter>TestSession\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionPoolTest.cpp">
+      <Filter>SessionPooling\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

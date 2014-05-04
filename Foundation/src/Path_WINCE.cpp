@@ -50,6 +50,12 @@ std::string PathImpl::nullImpl()
 }
 
 
+std::string PathImpl::tempImpl()
+{
+	return "\\Temp\\";
+}
+
+
 std::string PathImpl::expandImpl(const std::string& path)
 {
 	std::string result;

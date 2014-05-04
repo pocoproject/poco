@@ -197,7 +197,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* sender, TArgs& arguments)
+	bool notify(const void* /*sender*/, TArgs& arguments)
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverMethod)
@@ -407,7 +407,7 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* sender)
+	bool notify(const void* /*sender*/)
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverMethod)

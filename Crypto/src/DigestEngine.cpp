@@ -37,6 +37,10 @@ DigestEngine::~DigestEngine()
 	EVP_MD_CTX_destroy(_ctx);
 }
 
+int DigestEngine::nid() const
+{
+	return EVP_MD_nid(_ctx->digest);
+}
 
 std::size_t DigestEngine::digestLength() const
 {

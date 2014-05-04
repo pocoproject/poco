@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Archive">
+      <UniqueIdentifier>{408ad738-7969-41fe-ad9d-698769081d0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archive\Header Files">
+      <UniqueIdentifier>{6c423ca9-bf4b-4050-8fca-6ab5fc416c88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archive\Source Files">
+      <UniqueIdentifier>{fe263f95-196d-4204-8436-1cd39902cd74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LZMA SDK">
+      <UniqueIdentifier>{2743b4ce-826a-4d15-bf40-7c5e30274539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LZMA SDK\Header Files">
+      <UniqueIdentifier>{90677a9a-c34d-4d09-bdab-58b0d7af7abb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LZMA SDK\Source Files">
+      <UniqueIdentifier>{96f13c25-dc41-4704-a17a-ab8d9f41ca54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SevenZip">
+      <UniqueIdentifier>{c3b82ef9-8b18-4d70-8611-496c89819e07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SevenZip\Header Files">
+      <UniqueIdentifier>{bdbcf3ea-6f7e-438c-b878-cc691624a027}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SevenZip\Source Files">
+      <UniqueIdentifier>{174bb444-d999-4d5e-89c7-e8200fb8b74b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\SevenZip\Archive.h">
+      <Filter>Archive\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\SevenZip\ArchiveEntry.h">
+      <Filter>Archive\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\7z.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\7zBuf.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\7zCrc.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\7zFile.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\7zVersion.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bcj2.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bra.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CpuArch.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Lzma2Dec.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LzmaDec.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Ppmd.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Ppmd7.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\SevenZip\SevenZip.h">
+      <Filter>SevenZip\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Archive.cpp">
+      <Filter>Archive\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArchiveEntry.cpp">
+      <Filter>Archive\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\7zAlloc.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\7zBuf.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\7zBuf2.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\7zCrc.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\7zCrcOpt.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\7zDec.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\7zFile.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\7zIn.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\7zStream.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bcj2.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bra.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bra86.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuArch.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lzma2Dec.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LzmaDec.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ppmd7.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ppmd7Dec.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
+  </ItemGroup>
+</Project>

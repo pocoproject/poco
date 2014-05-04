@@ -27,6 +27,7 @@ public:
 	~DigestEngineTest();
 
 	void testMD5();
+	void testSHA1();
 
 	void setUp();
 	void tearDown();

@@ -14,7 +14,7 @@
 #include <iostream>
 
 
-int _tmain(int argc, wchar_t* argv[])
+int wmain(int argc, wchar_t* argv[])
 {
 	if (argc > 1)
 	{

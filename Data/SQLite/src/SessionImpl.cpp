@@ -47,7 +47,7 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 {
 	open();
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
-	setProperty("handle", _pDB);
+	setProperty("handle", static_cast<void*>(_pDB));
 	addFeature("autoCommit", 
 		&SessionImpl::autoCommit, 
 		&SessionImpl::isAutoCommit);

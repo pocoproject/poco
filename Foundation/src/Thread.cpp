@@ -40,7 +40,8 @@ namespace Poco {
 Thread::Thread(): 
 	_id(uniqueId()), 
 	_name(makeName()), 
-	_pTLS(0)
+	_pTLS(0),
+	_event(true)
 {
 }
 
@@ -48,7 +49,8 @@ Thread::Thread():
 Thread::Thread(const std::string& name): 
 	_id(uniqueId()), 
 	_name(name), 
-	_pTLS(0)
+	_pTLS(0),
+	_event(true)
 {
 }
 
@@ -99,6 +101,20 @@ void Thread::join(long milliseconds)
 bool Thread::tryJoin(long milliseconds)
 {
 	return joinImpl(milliseconds);
+}
+
+
+bool Thread::trySleep(long milliseconds)
+{
+	Thread* pT = Thread::current();
+	poco_check_ptr(pT);
+	return !(pT->_event.tryWait(milliseconds));
+}
+
+
+void Thread::wakeUp()
+{
+	_event.set();
 }
 
 

@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Application">
+      <UniqueIdentifier>{be2d865c-3c64-46d7-97ad-97776ca8ad45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application\Header Files">
+      <UniqueIdentifier>{a25955a5-0ab4-429c-89ef-0b30ded85214}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application\Source Files">
+      <UniqueIdentifier>{65f8fb60-db36-4b32-8e93-b65029ff3633}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite">
+      <UniqueIdentifier>{b4e15bb6-16e2-47fd-ba15-4b1652e3dbd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Header Files">
+      <UniqueIdentifier>{f2c49467-8ede-4598-a7c5-1e04570fa3c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Source Files">
+      <UniqueIdentifier>{61112306-50e2-4be8-be76-c44fb15f6614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver">
+      <UniqueIdentifier>{e1e61883-1845-40c3-b783-7d4366c94618}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver\Source Files">
+      <UniqueIdentifier>{17936256-9422-4083-a054-9cc87e2710b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configuration">
+      <UniqueIdentifier>{e460a092-f188-4607-bfe0-221c80a6ad87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configuration\Header Files">
+      <UniqueIdentifier>{be799bd5-fed1-4c41-8152-df8e5831173b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configuration\Source Files">
+      <UniqueIdentifier>{f1c77111-a361-485a-813b-015febafd193}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Options">
+      <UniqueIdentifier>{51445f35-39a6-4d46-b857-ba2ace86df24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Options\Header Files">
+      <UniqueIdentifier>{9044cd39-794b-48db-b5f8-78665ef11e74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Options\Source Files">
+      <UniqueIdentifier>{c49e1ed9-e42c-4167-aa70-27a0bdf6cdd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{fcab84c4-206d-4447-b789-12ccf8a45232}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows\Header Files">
+      <UniqueIdentifier>{372338f1-6826-4b39-81b6-ff38b4bcabf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows\Source Files">
+      <UniqueIdentifier>{b14f5e12-15e6-4102-930c-11f62fdbe194}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer">
+      <UniqueIdentifier>{8a94833e-d619-4cf3-b40e-a2e7ac9f3f66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer\Header Files">
+      <UniqueIdentifier>{ac517692-d9d7-4ed2-961a-028d26214ee3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer\Source Files">
+      <UniqueIdentifier>{fe8ac6e4-93b9-47a3-8adf-3f33762af484}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\UtilTestSuite.h">
+      <Filter>_Suite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AbstractConfigurationTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConfigurationMapperTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConfigurationTestSuite.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConfigurationViewTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FilesystemConfigurationTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IniFileConfigurationTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\JSONConfigurationTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LayeredConfigurationTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LoggingConfiguratorTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapConfigurationTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PropertyFileConfigurationTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SystemConfigurationTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XMLConfigurationTest.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HelpFormatterTest.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OptionProcessorTest.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OptionSetTest.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OptionsTestSuite.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OptionTest.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ValidatorTest.h">
+      <Filter>Options\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WinConfigurationTest.h">
+      <Filter>Windows\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WindowsTestSuite.h">
+      <Filter>Windows\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WinRegistryTest.h">
+      <Filter>Windows\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TimerTest.h">
+      <Filter>Timer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TimerTestSuite.h">
+      <Filter>Timer\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\UtilTestSuite.cpp">
+      <Filter>_Suite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinCEDriver.cpp">
+      <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AbstractConfigurationTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConfigurationMapperTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConfigurationTestSuite.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConfigurationViewTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FilesystemConfigurationTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IniFileConfigurationTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONConfigurationTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LayeredConfigurationTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LoggingConfiguratorTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapConfigurationTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyFileConfigurationTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SystemConfigurationTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XMLConfigurationTest.cpp">
+      <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HelpFormatterTest.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionProcessorTest.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionSetTest.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionsTestSuite.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OptionTest.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ValidatorTest.cpp">
+      <Filter>Options\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinConfigurationTest.cpp">
+      <Filter>Windows\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WindowsTestSuite.cpp">
+      <Filter>Windows\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinRegistryTest.cpp">
+      <Filter>Windows\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimerTest.cpp">
+      <Filter>Timer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimerTestSuite.cpp">
+      <Filter>Timer\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="SQLite">
+      <UniqueIdentifier>{3535331d-a727-4c3c-952d-6c605c46e299}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLite\Header Files">
+      <UniqueIdentifier>{8b77cd93-bc3d-4fe2-aa58-3a71019fc652}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLite\Source Files">
+      <UniqueIdentifier>{59485ed4-205f-477f-a092-4299eb657993}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite">
+      <UniqueIdentifier>{c602ea06-1f70-4b19-bbe7-a11360ee2653}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Header Files">
+      <UniqueIdentifier>{60dab515-4e7f-4bc5-995b-9f9eea556050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Source Files">
+      <UniqueIdentifier>{b9e3336d-4256-460d-a57d-55ebbbab1c0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver">
+      <UniqueIdentifier>{a63f2894-4a05-4703-8e95-b951ff5768ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver\Source Files">
+      <UniqueIdentifier>{8b1baeea-9332-466e-ba91-008bad096fa9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\SQLiteTest.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SQLiteTestSuite.h">
+      <Filter>_Suite\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\SQLiteTest.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SQLiteTestSuite.cpp">
+      <Filter>_Suite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinCEDriver.cpp">
+      <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

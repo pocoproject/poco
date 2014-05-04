@@ -150,9 +150,9 @@ const Font& Document::loadFont(const std::string& name, const std::string& encod
 const Font& Document::font(const std::string& name, const std::string& encoding)
 {
 	FontContainer::iterator it = _fonts.find(name);
-	if (_fonts.end() == it)	return loadFont(name, encoding);
-
-	throw IllegalStateException("Could not create font.");
+	if (_fonts.end() != it) return it->second;
+		
+	return loadFont(name, encoding);
 }
 
 

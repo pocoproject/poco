@@ -39,6 +39,7 @@ set( BASE_SRCS
   src/ByteOrder.cpp
   src/Channel.cpp
   src/Checksum.cpp
+  src/Clock.cpp
   src/Condition.cpp
   src/Configurable.cpp
   src/ConsoleChannel.cpp
@@ -52,6 +53,7 @@ set( BASE_SRCS
   src/DigestEngine.cpp
   src/DigestStream.cpp
   src/DirectoryIterator.cpp
+  src/DirectoryIteratorStrategy.cpp
   src/DirectoryWatcher.cpp
   src/Environment.cpp
   src/Error.cpp
@@ -204,7 +206,7 @@ set(WIN_SRCS
 )
 
 if (WIN32)
-  set(RES_SRCS ${CMAKE_SOURCE_DIR}/Foundation/include/Poco/pocomsg.h)
+  set(RES_SRCS ${CMAKE_SOURCE_DIR}/Foundation/src/pocomsg.h)
   set_source_files_properties(${RES_SRCS} PROPERTIES GENERATED true)
   add_custom_command(
     OUTPUT ${RES_SRCS}

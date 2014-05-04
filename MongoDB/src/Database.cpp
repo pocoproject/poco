@@ -52,7 +52,7 @@ double Database::count(Connection& connection, const std::string& collectionName
 Poco::MongoDB::Document::Ptr Database::ensureIndex(Connection& connection, const std::string& collection, const std::string& indexName, Poco::MongoDB::Document::Ptr keys, bool unique, bool background, int version, int ttl)
 {
 	Poco::MongoDB::Document::Ptr index = new Poco::MongoDB::Document();
-	index->add("ns", _dbname + ".players");
+	index->add("ns", _dbname + "." + collection);
 	index->add("name", indexName);
 	index->add("key", keys);
 

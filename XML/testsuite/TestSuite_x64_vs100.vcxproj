@@ -33,85 +33,85 @@
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
   <ImportGroup Label="ExtensionSettings"/>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">bin64\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">true</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">bin64\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">false</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">bin64\static_mt\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">true</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">bin64\static_mt\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">false</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">bin64\static_md\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">true</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">bin64\static_md\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">false</LinkIncremental>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">TestSuited</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">TestSuited</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">TestSuited</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">TestSuite</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">TestSuite</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">TestSuite</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">bin64\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">obj64\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">bin64\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">obj64\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">bin64\static_mt\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">obj64\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">bin64\static_mt\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">obj64\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">bin64\static_md\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">obj64\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">bin64\static_md\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">obj64\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">false</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">TestSuited</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">TestSuited</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">TestSuited</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">TestSuite</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">TestSuite</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">TestSuite</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|x64&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -141,7 +141,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|x64&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -173,7 +173,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|x64&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -204,7 +204,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|x64&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -237,7 +237,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|x64&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -267,7 +267,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|x64&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>

@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|x64">
       <Configuration>debug_shared</Configuration>
@@ -32,7 +32,7 @@
     <RootNamespace>Crypto</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
@@ -63,43 +63,29 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings"/>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">..\bin64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">..\bin64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">obj64\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">..\lib64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">obj64\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">..\lib64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">obj64\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">..\lib64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">obj64\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">..\lib64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">obj64\$(Configuration)\</IntDir>
+    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoCrypto64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoCryptomdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoCryptomtd</TargetName>
@@ -107,29 +93,31 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">PocoCryptomd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">PocoCryptomt</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
-    <IncludePath>C:\OpenSSL-Win64\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>C:\OpenSSL-Win64\lib\VC\static;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
-    <IncludePath>C:\OpenSSL-Win64\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>C:\OpenSSL-Win64\lib\VC;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
-    <IncludePath>C:\OpenSSL-Win64\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>C:\OpenSSL-Win64\lib\VC;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
-    <IncludePath>C:\OpenSSL-Win64\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>C:\OpenSSL-Win64\lib\VC\static;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
+    <OutDir>..\bin64\</OutDir>
+    <IntDir>obj64\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
-    <IncludePath>C:\OpenSSL-Win64\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>C:\OpenSSL-Win64\lib\VC;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
+    <OutDir>..\bin64\</OutDir>
+    <IntDir>obj64\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
-    <IncludePath>C:\OpenSSL-Win64\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>C:\OpenSSL-Win64\lib\VC;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
+    <OutDir>..\lib64\</OutDir>
+    <IntDir>obj64\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
+    <OutDir>..\lib64\</OutDir>
+    <IntDir>obj64\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
+    <OutDir>..\lib64\</OutDir>
+    <IntDir>obj64\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
+    <OutDir>..\lib64\</OutDir>
+    <IntDir>obj64\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
     <ClCompile>
@@ -144,14 +132,13 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;libeay32MDd.lib;ssleay32MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\bin64\PocoCrypto64d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -177,14 +164,13 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat />
+      <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;libeay32MD.lib;ssleay32MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\bin64\PocoCrypto64.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -209,12 +195,11 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib64\PocoCryptomtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoCryptomtd.lib</OutputFile>
@@ -235,11 +220,10 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat />
+      <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoCryptomt.lib</OutputFile>
@@ -258,12 +242,11 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib64\PocoCryptomdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoCryptomdd.lib</OutputFile>
@@ -284,48 +267,47 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat />
+      <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoCryptomd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Poco\Crypto\Cipher.h" />
-    <ClInclude Include="include\Poco\Crypto\CipherFactory.h" />
-    <ClInclude Include="include\Poco\Crypto\CipherImpl.h" />
-    <ClInclude Include="include\Poco\Crypto\CipherKey.h" />
-    <ClInclude Include="include\Poco\Crypto\CipherKeyImpl.h" />
-    <ClInclude Include="include\Poco\Crypto\CryptoStream.h" />
-    <ClInclude Include="include\Poco\Crypto\CryptoTransform.h" />
-    <ClInclude Include="include\Poco\Crypto\RSACipherImpl.h" />
-    <ClInclude Include="include\Poco\Crypto\RSADigestEngine.h" />
-    <ClInclude Include="include\Poco\Crypto\RSAKey.h" />
-    <ClInclude Include="include\Poco\Crypto\RSAKeyImpl.h" />
-    <ClInclude Include="include\Poco\Crypto\X509Certificate.h" />
-    <ClInclude Include="include\Poco\Crypto\Crypto.h" />
-    <ClInclude Include="include\Poco\Crypto\OpenSSLInitializer.h" />
-    <ClInclude Include="include\Poco\Crypto\DigestEngine.h" />
+    <ClInclude Include="include\Poco\Crypto\Cipher.h"/>
+    <ClInclude Include="include\Poco\Crypto\CipherFactory.h"/>
+    <ClInclude Include="include\Poco\Crypto\CipherImpl.h"/>
+    <ClInclude Include="include\Poco\Crypto\CipherKey.h"/>
+    <ClInclude Include="include\Poco\Crypto\CipherKeyImpl.h"/>
+    <ClInclude Include="include\Poco\Crypto\CryptoStream.h"/>
+    <ClInclude Include="include\Poco\Crypto\CryptoTransform.h"/>
+    <ClInclude Include="include\Poco\Crypto\RSACipherImpl.h"/>
+    <ClInclude Include="include\Poco\Crypto\RSADigestEngine.h"/>
+    <ClInclude Include="include\Poco\Crypto\RSAKey.h"/>
+    <ClInclude Include="include\Poco\Crypto\RSAKeyImpl.h"/>
+    <ClInclude Include="include\Poco\Crypto\X509Certificate.h"/>
+    <ClInclude Include="include\Poco\Crypto\Crypto.h"/>
+    <ClInclude Include="include\Poco\Crypto\OpenSSLInitializer.h"/>
+    <ClInclude Include="include\Poco\Crypto\DigestEngine.h"/>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Cipher.cpp" />
-    <ClCompile Include="src\CipherFactory.cpp" />
-    <ClCompile Include="src\CipherImpl.cpp" />
-    <ClCompile Include="src\CipherKey.cpp" />
-    <ClCompile Include="src\CipherKeyImpl.cpp" />
-    <ClCompile Include="src\CryptoStream.cpp" />
-    <ClCompile Include="src\CryptoTransform.cpp" />
-    <ClCompile Include="src\RSACipherImpl.cpp" />
-    <ClCompile Include="src\RSADigestEngine.cpp" />
-    <ClCompile Include="src\RSAKey.cpp" />
-    <ClCompile Include="src\RSAKeyImpl.cpp" />
-    <ClCompile Include="src\X509Certificate.cpp" />
-    <ClCompile Include="src\OpenSSLInitializer.cpp" />
-    <ClCompile Include="src\DigestEngine.cpp" />
+    <ClCompile Include="src\Cipher.cpp"/>
+    <ClCompile Include="src\CipherFactory.cpp"/>
+    <ClCompile Include="src\CipherImpl.cpp"/>
+    <ClCompile Include="src\CipherKey.cpp"/>
+    <ClCompile Include="src\CipherKeyImpl.cpp"/>
+    <ClCompile Include="src\CryptoStream.cpp"/>
+    <ClCompile Include="src\CryptoTransform.cpp"/>
+    <ClCompile Include="src\RSACipherImpl.cpp"/>
+    <ClCompile Include="src\RSADigestEngine.cpp"/>
+    <ClCompile Include="src\RSAKey.cpp"/>
+    <ClCompile Include="src\RSAKeyImpl.cpp"/>
+    <ClCompile Include="src\X509Certificate.cpp"/>
+    <ClCompile Include="src\OpenSSLInitializer.cpp"/>
+    <ClCompile Include="src\DigestEngine.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">
@@ -335,6 +317,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <ImportGroup Label="ExtensionTargets"/>
 </Project>

@@ -79,16 +79,16 @@ public:
 	Time& operator = (const Poco::Dynamic::Var& var);
 		/// Assignment operator for Var.
 
-	bool operator == (const Time& time);
+	bool operator == (const Time& time) const;
 		/// Equality operator.
 
-	bool operator != (const Time& time);
+	bool operator != (const Time& time) const;
 		/// Inequality operator.
 
-	bool operator < (const Time& time);
+	bool operator < (const Time& time) const;
 		/// Less then operator.
 
-	bool operator > (const Time& time);
+	bool operator > (const Time& time) const;
 		/// Greater then operator.
 
 private:
@@ -133,7 +133,7 @@ inline Time& Time::operator = (const DateTime& dt)
 }
 
 
-inline bool Time::operator == (const Time& time)
+inline bool Time::operator == (const Time& time) const
 {
 	return _hour == time.hour() &&
 		_minute == time.minute() &&
@@ -141,13 +141,13 @@ inline bool Time::operator == (const Time& time)
 }
 
 
-inline bool Time::operator != (const Time& time)
+inline bool Time::operator != (const Time& time) const
 {
 	return !(*this == time);
 }
 
 
-inline bool Time::operator > (const Time& time)
+inline bool Time::operator > (const Time& time) const
 {
 	return !(*this == time) && !(*this < time);
 }

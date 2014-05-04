@@ -62,7 +62,7 @@ Poco::Path SharedMemoryTest::findDataFile(const std::string& afile)
 	while (!Poco::Path::find(root.toString(), "data", result))
 	{
 		root.makeParent();
-		if (root.toString().empty() || root.toString() == "/")
+		if (root.toString().empty() || root.toString() == "/" || root.toString() == "\\")
 			throw Poco::FileNotFoundException("Didn't find data subdir");
 	}
 	result.makeDirectory();

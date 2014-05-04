@@ -32,19 +32,32 @@ namespace Net {
 
 TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 portNumber, TCPServerParams::Ptr pParams):
 	_socket(ServerSocket(portNumber)),
-	_pDispatcher(new TCPServerDispatcher(pFactory, Poco::ThreadPool::defaultPool(), pParams)),
 	_thread(threadName(_socket)),
 	_stopped(true)
-{
+{	
+	Poco::ThreadPool& pool = Poco::ThreadPool::defaultPool();
+	if (pParams)
+	{
+		int toAdd = pParams->getMaxThreads() - pool.capacity();
+		if (toAdd > 0) pool.addCapacity(toAdd);
+	}
+	_pDispatcher = new TCPServerDispatcher(pFactory, pool, pParams);
+	
 }
 
 
 TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams):
 	_socket(socket),
-	_pDispatcher(new TCPServerDispatcher(pFactory, Poco::ThreadPool::defaultPool(), pParams)),
 	_thread(threadName(socket)),
 	_stopped(true)
 {
+	Poco::ThreadPool& pool = Poco::ThreadPool::defaultPool();
+	if (pParams)
+	{
+		int toAdd = pParams->getMaxThreads() - pool.capacity();
+		if (toAdd > 0) pool.addCapacity(toAdd);
+	}
+	_pDispatcher = new TCPServerDispatcher(pFactory, pool, pParams);
 }
 
 
@@ -124,6 +137,11 @@ void TCPServer::run()
 int TCPServer::currentThreads() const
 {
 	return _pDispatcher->currentThreads();
+}
+
+int TCPServer::maxThreads() const
+{
+	return _pDispatcher->maxThreads();
 }
 
 	

@@ -72,41 +72,41 @@ void Stringifier::formatString(const std::string& value, std::ostream& out)
 	out << '"';
 	for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
 	{
-		switch (*it)
-		{
-		case '"':
+		if (*it == 0x20 ||
+			*it == 0x21 ||
+			(*it >= 0x23 && *it <= 0x2E) ||
+			(*it >= 0x30 && *it <= 0x5B) ||
+			(*it >= 0x5D && *it <= 0xFF))
+			out << *it;
+		else if (*it == '"')
 			out << "\\\"";
-			break;
-		case '\\':
+		else if (*it == '\\')
 			out << "\\\\";
-			break;
-		case '\b':
+		else if (*it == '\b')
 			out << "\\b";
-			break;
-		case '\f':
+		else if (*it == '\f')
 			out << "\\f";
-			break;
-		case '\n':
+		else if (*it == '\n')
 			out << "\\n";
-			break;
-		case '\r':
+		else if (*it == '\r')
 			out << "\\r";
-			break;
-		case '\t':
+		else if (*it == '\t')
 			out << "\\t";
-			break;
-		default:
+		else if ( *it == '\0' )
+			out << "\\u0000";
+		else
 		{
-			if ( *it > 0 && *it <= 0x1F )
-			{
-				out << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(*it);
-			}
-			else
-			{
-				out << *it;
-			}
-			break;
-		}
+			const char *hexdigits = "0123456789ABCDEF";
+			unsigned long u = (std::min)(static_cast<unsigned long>(static_cast<unsigned char>(*it)), 0xFFFFul);
+			int d1 = u / 4096; u -= d1 * 4096;
+			int d2 = u / 256; u -= d2 * 256;
+			int d3 = u / 16; u -= d3 * 16;
+			int d4 = u;
+			out << "\\u";
+			out << hexdigits[d1];
+			out << hexdigits[d2];
+			out << hexdigits[d3];
+			out << hexdigits[d4];
 		}
 	}
 	out << '"';

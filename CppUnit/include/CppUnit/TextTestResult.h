@@ -11,6 +11,7 @@
 
 #include "CppUnit/CppUnit.h"
 #include "CppUnit/TestResult.h"
+#include <set>
 #include <ostream>
 
 
@@ -33,9 +34,11 @@ public:
 	
 protected:
 	std::string shortName(const std::string& testName);
-	
+	void setup();
+
 private:
 	std::ostream& _ostr;
+	std::set<std::string> _ignored;
 };
 
 

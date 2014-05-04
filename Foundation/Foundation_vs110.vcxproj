@@ -1036,6 +1036,7 @@
     <ClInclude Include="include\Poco\NumericString.h" />
     <ClInclude Include="include\Poco\ObjectPool.h" />
     <ClInclude Include="include\Poco\Optional.h" />
+    <ClInclude Include="include\Poco\PBKDF2Engine.h" />
     <ClInclude Include="include\Poco\Platform.h" />
     <ClInclude Include="include\Poco\Platform_POSIX.h" />
     <ClInclude Include="include\Poco\Platform_VMS.h" />

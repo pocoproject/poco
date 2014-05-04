@@ -114,6 +114,39 @@ private:
 };
 
 
+class TrySleepRunnable : public Runnable
+{
+public:
+	TrySleepRunnable() : _counter(0), _sleepy(true)
+	{
+	}
+
+	void run()
+	{
+		_sleepy = !Thread::trySleep(300000);
+		++_counter;
+		_sleepy = !Thread::trySleep(300000);
+		++_counter;
+		_sleepy = !Thread::trySleep(100);
+		++_counter;
+	}
+
+	int counter() const
+	{
+		return _counter;
+	}
+
+	bool isSleepy() const
+	{
+		return _sleepy;
+	}
+
+private:
+	int _counter;
+	bool _sleepy;
+};
+
+
 ThreadTest::ThreadTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -244,6 +277,37 @@ void ThreadTest::testNotJoin()
 }
 
 
+void ThreadTest::testTrySleep()
+{
+	Thread thread;
+	TrySleepRunnable r;
+	assert(r.isSleepy());
+	assert(!thread.isRunning());
+	assert(r.counter() == 0);
+	thread.start(r);
+	assert(thread.isRunning());
+	assert(r.counter() == 0);
+	assert(r.isSleepy());
+	Thread::sleep(100);
+	assert(r.counter() == 0);
+	assert(r.isSleepy());
+	thread.wakeUp(); Thread::sleep(10);
+	assert(r.counter() == 1);
+	assert(r.isSleepy());
+	Thread::sleep(100);
+	assert(r.counter() == 1);
+	thread.wakeUp(); Thread::sleep(10);
+	assert(r.counter() == 2);
+	assert(r.isSleepy());
+	Thread::sleep(200);
+	assert(r.counter() == 3);
+	assert(!r.isSleepy());
+	assert(!thread.isRunning());
+	thread.wakeUp();
+	assert(!thread.isRunning());
+}
+
+
 void ThreadTest::testNotRun()
 {
 	Thread thread;
@@ -369,6 +433,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testNotJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testNotRun);
 	CppUnit_addTest(pSuite, ThreadTest, testNotRunJoin);
+	CppUnit_addTest(pSuite, ThreadTest, testTrySleep);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadTarget);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadFunction);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);

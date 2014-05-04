@@ -22,7 +22,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include <ctime>
 #include <iostream>
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 #include "wce_time.h"
 #endif
 

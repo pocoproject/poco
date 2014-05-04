@@ -11,6 +11,8 @@
 #include "CppUnit/estring.h"
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
+#include <cctype>
 
 
 namespace CppUnit {
@@ -19,26 +21,63 @@ namespace CppUnit {
 TextTestResult::TextTestResult():
 	_ostr(std::cout)
 {
+	setup();
 }
 
 
 TextTestResult::TextTestResult(std::ostream& ostr):
 	_ostr(ostr)
 {
+	setup();
+}
+
+
+void TextTestResult::setup()
+{
+#if !defined(_WIN32_WCE)
+	const char* env = std::getenv("CPPUNIT_IGNORE");
+	if (env)
+	{
+		std::string ignored = env;
+		std::string::const_iterator it = ignored.begin();
+		std::string::const_iterator end = ignored.end();
+		while (it != end)
+		{
+			while (it != end && std::isspace(*it)) ++it;
+			std::string test;
+			while (it != end && !std::isspace(*it)) test += *it++;
+			if (!test.empty()) _ignored.insert(test);
+		}
+	}
+#endif
 }
 
 
 void TextTestResult::addError(Test* test, CppUnitException* e)
 {
-	TestResult::addError(test, e);
-	_ostr << "ERROR" << std::flush;
+	if (_ignored.find(test->toString()) == _ignored.end())
+	{
+		TestResult::addError(test, e);
+		_ostr << "ERROR" << std::flush;
+	}
+	else
+	{
+		_ostr << "ERROR (ignored)" << std::flush;
+	}
 }
 
 
 void TextTestResult::addFailure(Test* test, CppUnitException* e)
 {
-	TestResult::addFailure(test, e);
-	_ostr << "FAILURE" << std::flush;
+	if (_ignored.find(test->toString()) == _ignored.end())
+	{
+		TestResult::addFailure(test, e);
+		_ostr << "FAILURE" << std::flush;
+	}
+	else
+	{
+		_ostr << "FAILURE (ignored)" << std::flush;
+	}
 }
 
 

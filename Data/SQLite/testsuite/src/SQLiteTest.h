@@ -132,6 +132,8 @@ public:
 	void testTransaction();
 	void testTransactor();
 
+	void testFTS3();
+
 	void setUp();
 	void tearDown();
 

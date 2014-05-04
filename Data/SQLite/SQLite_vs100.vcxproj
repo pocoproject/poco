@@ -33,79 +33,79 @@
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
   <ImportGroup Label="ExtensionSettings"/>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;" Label="PropertySheets">
-    <Import Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'" Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">..\..\bin\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">true</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">..\..\bin\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">false</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">..\..\lib\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">..\..\lib\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">..\..\lib\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">..\..\lib\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">PocoDataSQLited</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">PocoDataSQLitemdd</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">PocoDataSQLitemtd</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">PocoDataSQLite</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">PocoDataSQLitemd</TargetName>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">PocoDataSQLitemt</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">..\..\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">obj\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">..\..\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">obj\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">..\..\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">obj\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">..\..\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">obj\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">..\..\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">obj\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">..\..\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">obj\$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoDataSQLited</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoDataSQLitemdd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoDataSQLitemtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoDataSQLite</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoDataSQLitemd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoDataSQLitemt</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -132,7 +132,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -140,7 +140,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;SQLite_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -166,11 +166,11 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -190,7 +190,7 @@
       <OutputFile>..\..\lib\PocoDataSQLitemtd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -198,7 +198,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -215,11 +215,11 @@
       <OutputFile>..\..\lib\PocoDataSQLitemt.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -239,7 +239,7 @@
       <OutputFile>..\..\lib\PocoDataSQLitemdd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -247,7 +247,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;SQLITE_THREADSAFE=1;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_OMIT_UTF16;SQLITE_OMIT_PROGRESS_CALLBACK;SQLITE_OMIT_COMPLETE;SQLITE_OMIT_TCL_VARIABLE;SQLITE_OMIT_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
