@@ -1,4 +1,4 @@
-POCO C++ Libraries
+POCO C++ Libraries [![Build Status](https://travis-ci.org/pocoproject/poco.png?branch=develop)](https://travis-ci.org/pocoproject/poco)
 ==================
 
 POrtable COmponents C++ Libraries are:

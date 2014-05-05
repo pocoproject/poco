@@ -532,10 +532,10 @@ protected:
 		{
 			(*it)->parentNode()->removeChild(*it);
 		}
-		Poco::AutoPtr<Poco::XML::NodeList> pOutDirList = pProjectDoc->getElementsByTagName("OutDir");
-		if (pOutDirList->length() > 0)
+		Poco::AutoPtr<Poco::XML::NodeList> pProjectFileVersionList = pProjectDoc->getElementsByTagName("_ProjectFileVersion");
+		if (pProjectFileVersionList->length() > 0)
 		{
-			Poco::XML::Element* pPropertyGroup = static_cast<Poco::XML::Element*>(pOutDirList->item(0)->parentNode());
+			Poco::XML::Element* pPropertyGroup = static_cast<Poco::XML::Element*>(pProjectFileVersionList->item(0)->parentNode());
 			for (std::set<std::string>::const_iterator it = configSet.begin(); it != configSet.end(); ++it)
 			{
 				Poco::AutoPtr<Poco::XML::Element> pTargetName = pProjectDoc->createElement("TargetName");
@@ -564,6 +564,46 @@ protected:
 		}
 	}
 
+	void fixWEC2013Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
+	{
+		fix2010Project(pProjectDoc, configSet, platform, projectProps, templateProps);
+		Poco::AutoPtr<Poco::XML::NodeList> pConfigurationTypeList = pProjectDoc->getElementsByTagName("ConfigurationType");
+		for (unsigned long i = 0; i < pConfigurationTypeList->length(); i++)
+		{
+			Poco::XML::Element* pConfigurationTypeElem = static_cast<Poco::XML::Element*>(pConfigurationTypeList->item(i));
+			removeElement(pConfigurationTypeElem->parentNode(), "PlatformToolset");
+			appendElement(pConfigurationTypeElem->parentNode(), "PlatformToolset", "CE800");
+		}
+		Poco::XML::Node* pGlobals = pProjectDoc->getNodeByPath("//PropertyGroup[@Label='Globals']");
+		if (pGlobals)
+		{
+			removeElement(pGlobals, "RootNamespace");
+			removeElement(pGlobals, "Keyword");
+			appendElement(pGlobals, "DefaultLanguage", "en-US");
+			appendElement(pGlobals, "MinimumVisualStudioVersion", "11.0");
+			appendElement(pGlobals, "EnableRedirectPlatform", "true");
+			appendElement(pGlobals, "RedirectPlatformValue", platform);
+			appendElement(pGlobals, "PlatformToolset", "CE800");
+		}
+		Poco::AutoPtr<Poco::XML::NodeList> pLinkList = pProjectDoc->getElementsByTagName("Link");
+		for (int i = 0; i < pLinkList->length(); i++)
+		{
+			Poco::XML::Element* pLink = static_cast<Poco::XML::Element*>(pLinkList->item(i));
+			removeElement(pLink, "SubSystem");
+			removeElement(pLink, "TargetMachine");
+			removeElement(pLink, "StackReserveSize");
+			removeElement(pLink, "StackCommitSize");
+			removeElement(pLink, "RandomizedBaseAddress");
+			appendElement(pLink, "SubSystem", "WindowsCE");
+			std::string entry = projectProps.getString("configuration.linker.entry", "");
+			if (!entry.empty())
+			{
+				removeElement(pLink, "EntryPointSymbol");
+				appendElement(pLink, "EntryPointSymbol", entry);
+			}
+		}
+	}
+
 	void fix2013Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
 	{
 		fix2010Project(pProjectDoc, configSet, platform, projectProps, templateProps);
@@ -576,6 +616,23 @@ protected:
 			Poco::AutoPtr<Poco::XML::Text> pText = pProjectDoc->createTextNode("v120");
 			pPlatformToolsetElem->appendChild(pText);
 			pPropertyGroupElem->appendChild(pPlatformToolsetElem);
+		}
+	}
+
+	void appendElement(Poco::XML::Node* pParentNode, const std::string& elemName, const std::string& text)
+	{
+		Poco::AutoPtr<Poco::XML::Element> pElement = pParentNode->ownerDocument()->createElement(elemName);
+		Poco::AutoPtr<Poco::XML::Text> pText = pParentNode->ownerDocument()->createTextNode(text);
+		pElement->appendChild(pText);
+		pParentNode->appendChild(pElement);
+	}
+
+	void removeElement(Poco::XML::Node* pParentNode, const std::string& elemName)
+	{
+		Poco::XML::Node* pNode = pParentNode->getNodeByPath(elemName);
+		if (pNode)
+		{
+			pParentNode->removeChild(pNode);
 		}
 	}
 	
@@ -651,6 +708,7 @@ protected:
 					setProperty(*pProps, "configuration.compiler.disableWarnings", projectConfig, "vc.project.compiler.disableWarnings", platform, config);
 					setProperty(*pProps, "configuration.linker.dependencies", projectConfig, "vc.project.linker.dependencies", platform, config, " ");
 					setProperty(*pProps, "configuration.linker.libraries", projectConfig, "vc.project.linker.libraries", platform, config);
+					setProperty(*pProps, "configuration.linker.entry", projectConfig, "vc.project.linker.entry", platform, config);
 					setProperty(*pProps, "configuration.postbuild", projectConfig, "vc.project.postbuild", platform, config);
 					std::string libSuffix = this->config().getString("progen.libsuffix." + config, "");
 					Poco::StringTokenizer rawDependencies(pProps->getString("configuration.linker.dependencies"), " ", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
@@ -768,6 +826,16 @@ protected:
 								logger().information("Fixing Visual Studio 2012 project file: " + vcxprojPath.toString());
 								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
 								fix2012Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
+								writeProject(pProjectDoc, vcxprojPath.toString());
+							}
+						}
+						if (config().getBool("progen.postprocess." + postprocess + ".fixWEC2013ProjectFile", false))
+						{
+							if (projectFile.exists())
+							{
+								logger().information("Fixing Visual Studio 2012 (WEC2013) project file: " + vcxprojPath.toString());
+								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
+								fixWEC2013Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
 								writeProject(pProjectDoc, vcxprojPath.toString());
 							}
 						}
