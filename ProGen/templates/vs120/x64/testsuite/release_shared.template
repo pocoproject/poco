@@ -3,7 +3,6 @@
 	OutputDirectory="bin64\"
 	IntermediateDirectory="obj64\$(ConfigurationName)"
 	ConfigurationType="1"
-	UseOfMFC="2"
 	CharacterSet="2"
 	>
 	<Tool
@@ -42,6 +41,7 @@
 		DebugInformationFormat="0"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -54,15 +54,16 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="CppUnit.lib WinTestRunner.lib ${configuration.linker.dependencies}"
+		AdditionalDependencies="CppUnit.lib ${configuration.linker.dependencies}"
 		OutputFile="bin64\${project.target}.exe"
 		LinkIncremental="1"
 		AdditionalLibraryDirectories="${project.pocobase}\lib64"
 		GenerateDebugInformation="false"
-		SubSystem="2"
+		SubSystem="1"
 		OptimizeReferences="2"
 		EnableCOMDATFolding="2"
 		TargetMachine="17"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

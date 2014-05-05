@@ -32,6 +32,7 @@
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		CompileForArchitecture="2"
 		InterworkCalls="false"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -44,7 +45,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions=""
 		AdditionalDependencies="iphlpapi.lib ${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\static_md\${project.target}d.exe"
 		LinkIncremental="2"
@@ -55,6 +55,7 @@
 		RandomizedBaseAddress="1"
 		TargetMachine="0"
 		EntryPointSymbol="mainCRTStartup"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

@@ -30,6 +30,7 @@
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		CompileForArchitecture="2"
 		InterworkCalls="false"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -42,7 +43,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions=""
 		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="${project.outdir}\bin\$(PlatformName)\${project.target}d.dll"
 		LinkIncremental="2"
@@ -57,6 +57,7 @@
 		EnableCOMDATFolding="0"
 		RandomizedBaseAddress="1"
 		TargetMachine="0"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

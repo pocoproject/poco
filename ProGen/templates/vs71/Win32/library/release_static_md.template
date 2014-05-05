@@ -27,7 +27,8 @@
 		Detect64BitPortabilityProblems="FALSE"
 		DebugInformationFormat="0"
 		CompileAs="0"
-		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"/>
+		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"/>
 	<Tool
 		Name="VCLibrarianTool"
 		OutputFile="${project.outdir}\lib\${project.target}md.lib"/>

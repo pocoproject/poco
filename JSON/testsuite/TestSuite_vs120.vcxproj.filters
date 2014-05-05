@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{37a8e419-2bfa-4348-9bda-4e36426a1859}</UniqueIdentifier>
+      <UniqueIdentifier>{ec43aabe-0497-4737-a5e9-2755a2e57597}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{eca3dd44-b857-4ec2-b903-90ec10fd9b05}</UniqueIdentifier>
+      <UniqueIdentifier>{56bd69b9-ec88-4325-8cdf-b0d3d1ef86d0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -15,7 +15,7 @@
     <ClCompile Include="src\JSONTestSuite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Driver.cpp">
+    <ClCompile Include="src\WinDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

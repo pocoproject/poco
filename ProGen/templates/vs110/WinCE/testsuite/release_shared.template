@@ -39,6 +39,7 @@
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
 		CompileForArchitecture="2"
 		InterworkCalls="false"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -51,7 +52,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions=""
 		AdditionalDependencies="CppUnit.lib ${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\shared\${project.target}.exe"
 		LinkIncremental="1"
@@ -63,6 +63,7 @@
 		EnableCOMDATFolding="2"
 		TargetMachine="0"
 		EntryPointSymbol="wmainCRTStartup"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

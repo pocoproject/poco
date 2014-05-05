@@ -41,6 +41,7 @@
 		DebugInformationFormat="0"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -64,6 +65,7 @@
 		EnableCOMDATFolding="2"
 		ImportLibrary="${project.outdir}\lib\${project.target}.lib"
 		TargetMachine="1"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

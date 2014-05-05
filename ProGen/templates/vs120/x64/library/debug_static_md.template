@@ -40,6 +40,7 @@
 		DebugInformationFormat="3"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"

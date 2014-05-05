@@ -3,7 +3,6 @@
 	OutputDirectory="bin64\static_md\"
 	IntermediateDirectory="obj64\$(ConfigurationName)"
 	ConfigurationType="1"
-	UseOfMFC="2"
 	CharacterSet="2"
 	>
 	<Tool
@@ -40,6 +39,7 @@
 		DebugInformationFormat="3"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -52,15 +52,16 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="CppUnitmdd.lib WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res ${configuration.linker.dependencies}"
+		AdditionalDependencies="CppUnitmdd.lib iphlpapi.lib winmm.lib ${configuration.linker.dependencies}"
 		OutputFile="bin64\static_md\${project.target}d.exe"
 		LinkIncremental="2"
 		AdditionalLibraryDirectories="${project.pocobase}\lib64"
 		SuppressStartupBanner="true"
 		GenerateDebugInformation="true"
 		ProgramDatabaseFile="bin64\static_md\${project.target}d.pdb"
-		SubSystem="2"
+		SubSystem="1"
 		TargetMachine="17"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

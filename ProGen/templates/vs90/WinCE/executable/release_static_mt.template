@@ -42,6 +42,7 @@
 		DisableSpecificWarnings="4800"
 		CompileForArchitecture="2"
 		InterworkCalls="false"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -54,7 +55,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions="/FORCE:MULTIPLE"
+		AdditionalOptions="/FORCE:MULTIPLE ${configuration.linker.additionalOptions}"
 		AdditionalDependencies="iphlpapi.lib ${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\static_mt\${project.target}.exe"
 		LinkIncremental="1"

@@ -41,6 +41,7 @@
 		DebugInformationFormat="0"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -65,6 +66,7 @@
 		OptimizeForWindows98="0"
 		ImportLibrary="${project.outdir}\lib64\${project.target}.lib"
 		TargetMachine="17"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"
