@@ -1,6 +1,8 @@
 //
 // ODBCMySQLTest.h
 //
+// $Id: //poco/1.4/Data/MySQL/testsuite/src/ODBCMySQLTest.h#1 $
+//
 // Definition of the MySQLTest class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -25,11 +27,15 @@ class MySQLTest: public CppUnit::TestCase
 	/// MySQL test class
 	/// Tested:
 	/// 
-	/// Driver			|	DB						| OS
+	/// Driver          |            DB             | OS
 	/// ----------------+---------------------------+------------------------------------------
-	/// 03.51.12.00		| MySQL 5.0.27-community-nt	| MS Windows XP Professional x64 v.2003/SP1
-	///
-
+	/// 03.51.12.00     | MySQL 5.0.27-community-nt	| MS Windows XP Professional x64 v.2003/SP1
+	///                 |                           |
+	///                 | Ver 14.14 Distrib 5.5.37, | Linux debian 3.2.0-4-amd64 #1
+	///                 | for debian-linux-gnu      | SMP Debian 3.2.57-3 x86_64 GNU/Linux
+	///                 | (x86_64) using readline   |
+	///                 | 6.2                       |
+	///                 |                           |
 {
 public:
 	MySQLTest(const std::string& name);
@@ -91,7 +97,7 @@ public:
 	void testNullableInt();
 	void testNullableString();
 	void testTupleWithNullable();
-	
+
 	void testSessionTransaction();
 	void testTransaction();
 
