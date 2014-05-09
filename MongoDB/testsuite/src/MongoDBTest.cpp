@@ -417,7 +417,7 @@ void MongoDBTest::testObjectID()
 	str.append(1, (char) 0x02);
 
 	ObjectId oid(str);
-	std::string str2 = oid.toString("%02x");
+	std::string str2 = oid.toString();
 	assert(str2 == "536aeebba081de6815000002");
 }
 

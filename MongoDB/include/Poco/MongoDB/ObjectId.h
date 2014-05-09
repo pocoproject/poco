@@ -55,7 +55,7 @@ public:
 	Timestamp timestamp() const;
 		/// Returns the timestamp which is stored in the first four bytes of the id
 
-	std::string toString(const std::string& fmt = "%x") const;
+	std::string toString(const std::string& fmt = "%02x") const;
 		/// Returns the id in string format. The fmt parameter
 		/// specifies the formatting used for individual members 
 		/// of the ID char array.
