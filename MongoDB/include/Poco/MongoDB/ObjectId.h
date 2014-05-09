@@ -46,7 +46,7 @@ class MongoDB_API ObjectId
 public:
 	typedef SharedPtr<ObjectId> Ptr;
 
-	ObjectId();
+	ObjectId(const std::string& id = "");
 		/// Constructor
 
 	virtual ~ObjectId();
@@ -55,8 +55,10 @@ public:
 	Timestamp timestamp() const;
 		/// Returns the timestamp which is stored in the first four bytes of the id
 
-	std::string toString() const;
-		/// Returns the id in string format
+	std::string toString(const std::string& fmt = "%x") const;
+		/// Returns the id in string format. The fmt parameter
+		/// specifies the formatting used for individual members 
+		/// of the ID char array.
 
 private:
 	unsigned char _id[12];
@@ -85,9 +87,11 @@ struct ElementTraits<ObjectId::Ptr>
 {
 	enum { TypeId = 0x07 };
 
-	static std::string toString(const ObjectId::Ptr& id, int indent = 0)
+	static std::string toString(const ObjectId::Ptr& id,
+		int indent = 0,
+		const std::string& fmt = "%x")
 	{
-		return id->toString();
+		return id->toString(fmt);
 	}
 };
 

@@ -30,50 +30,28 @@ public:
 
 	virtual ~MongoDBTest();
 
-
 	void testInsertRequest();
-
-
 	void testQueryRequest();
-
-
 	void testDBQueryRequest();
-
-
 	void testCountCommand();
-
-
 	void testDBCountCommand();
-
-
 	void testDBCount2Command();
-
-
 	void testDeleteRequest();
-
-
 	void testBuildInfo();
-
-
 	void testConnectionPool();
-
-
 	void testCursorRequest();
-
-
+	void testObjectID();
 	void setUp();
-
-
 	void tearDown();
-
 
 	static CppUnit::Test* suite();
 
 private:
 
-	bool _connected;
-
-	Poco::MongoDB::Connection _mongo;
+	std::string _host;
+	unsigned    _port;
+	static bool _connected;
+	static Poco::MongoDB::Connection _mongo;
 
 };
 

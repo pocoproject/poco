@@ -62,6 +62,8 @@ Release 1.5.3 (2014-05-xx)
 - fixed GH #341: Compiling poco-1.5.2 for Cygwin
 - fixed GH #305: There are bugs in Buffer.h
 - fixed GH #321: trivial build fixes (BB QNX build)
+- fixed GH #440: MongoDB ObjectId string formatting
+- added SevenZip library (Guenter Obiltschnig)
 
 Release 1.5.2 (2013-09-16)
 ==========================

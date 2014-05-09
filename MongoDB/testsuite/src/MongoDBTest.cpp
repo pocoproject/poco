@@ -20,6 +20,7 @@
 #include "Poco/MongoDB/PoolableConnectionFactory.h"
 #include "Poco/MongoDB/Database.h"
 #include "Poco/MongoDB/Cursor.h"
+#include "Poco/MongoDB/ObjectId.h"
 
 #include "Poco/Net/NetException.h"
 
@@ -30,46 +31,58 @@
 using namespace Poco::MongoDB;
 
 
-MongoDBTest::MongoDBTest(const std::string& name)
-	: CppUnit::TestCase("MongoDB")
-	, _connected(false)
+bool MongoDBTest::_connected = false;
+Poco::MongoDB::Connection MongoDBTest::_mongo;
+
+
+MongoDBTest::MongoDBTest(const std::string& name): 
+	CppUnit::TestCase("MongoDB"),
+	_host("localhost"),
+	_port(27017)
 {
+	if (!_connected)
+	{
+		try
+		{
+			_mongo.connect(_host, _port);
+			_connected = true;
+			std::cout << "Connected to [" << _host << ':' << _port << ']' << std::endl;
+		}
+		catch (Poco::Net::ConnectionRefusedException& e)
+		{
+			std::cout << "Couldn't connect to " << e.message() << ". " << std::endl;
+		}
+	}
 }
 
 
 MongoDBTest::~MongoDBTest()
 {
+	if (_connected)
+	{
+		_mongo.disconnect();
+		_connected = false;
+		std::cout << "Disconnected from [" << _host << ':' << _port << ']' << std::endl;
+	}
 }
 
 
 void MongoDBTest::setUp()
 {
-	try
-	{
-		_mongo.connect("localhost", 27017);
-		_connected = true;
-	}
-	catch(Poco::Net::ConnectionRefusedException& e)
-	{
-		std::cout << "Couldn't connect to " << e.message() << ". ";
-	}
+	
 }
 
 
 void MongoDBTest::tearDown()
 {
-	if ( _connected )
-	{
-		_mongo.disconnect();
-	}
 }
 
 
 void MongoDBTest::testInsertRequest()
 {
-	if ( ! _connected )
+	if (!_connected)
 	{
-		std::cout << "test skipped." << std::endl;
+		std::cout << "Not connected, test skipped." << std::endl;
 		return;
 	}
 
@@ -97,9 +110,9 @@ void MongoDBTest::testInsertRequest()
 
 void MongoDBTest::testQueryRequest()
 {
-	if ( ! _connected )
+	if (!_connected)
 	{
-		std::cout << "test skipped." << std::endl;
+		std::cout << "Not connected, test skipped." << std::endl;
 		return;
 	}
 
@@ -145,9 +158,9 @@ void MongoDBTest::testQueryRequest()
 
 void MongoDBTest::testDBQueryRequest()
 {
-	if ( ! _connected )
+	if (!_connected)
 	{
-		std::cout << "test skipped." << std::endl;
+		std::cout << "Not connected, test skipped." << std::endl;
 		return;
 	}
 
@@ -191,9 +204,9 @@ void MongoDBTest::testDBQueryRequest()
 
 void MongoDBTest::testCountCommand()
 {
-	if ( ! _connected )
+	if (!_connected)
 	{
-		std::cout << "test skipped." << std::endl;
+		std::cout << "Not connected, test skipped." << std::endl;
 		return;
 	}
 
@@ -220,9 +233,9 @@ void MongoDBTest::testCountCommand()
 
 void MongoDBTest::testDBCountCommand()
 {
-	if ( ! _connected )
+	if (!_connected)
 	{
-		std::cout << "test skipped." << std::endl;
+		std::cout << "Not connected, test skipped." << std::endl;
 		return;
 	}
 
@@ -247,9 +260,9 @@ void MongoDBTest::testDBCountCommand()
 
 void MongoDBTest::testDBCount2Command()
 {
-	if ( ! _connected )
+	if (!_connected)
 	{
-		std::cout << "test skipped." << std::endl;
+		std::cout << "Not connected, test skipped." << std::endl;
 		return;
 	}
 
@@ -261,9 +274,9 @@ void MongoDBTest::testDBCount2Command()
 
 void MongoDBTest::testDeleteRequest()
 {
-	if ( ! _connected )
+	if (!_connected)
 	{
-		std::cout << "test skipped." << std::endl;
+		std::cout << "Not connected, test skipped." << std::endl;
 		return;
 	}
 
@@ -276,9 +289,9 @@ void MongoDBTest::testDeleteRequest()
 
 void MongoDBTest::testCursorRequest()
 {
-	if ( ! _connected )
+	if (!_connected)
 	{
-		std::cout << "test skipped." << std::endl;
+		std::cout << "Not connected, test skipped." << std::endl;
 		return;
 	}
 
@@ -325,9 +338,9 @@ void MongoDBTest::testCursorRequest()
 
 void MongoDBTest::testBuildInfo()
 {
-	if ( ! _connected )
+	if (!_connected)
 	{
-		std::cout << "test skipped." << std::endl;
+		std::cout << "Not connected, test skipped." << std::endl;
 		return;
 	}
 
@@ -361,7 +374,8 @@ void MongoDBTest::testBuildInfo()
 
 void MongoDBTest::testConnectionPool()
 {
-	Poco::PoolableObjectFactory<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> factory("localhost:27017");
+	Poco::Net::SocketAddress sa(_host, _port);
+	Poco::PoolableObjectFactory<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> factory(sa);
 	Poco::ObjectPool<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> pool(factory, 10, 15);
 
 	Poco::MongoDB::PooledConnection pooledConnection(pool);
@@ -385,6 +399,29 @@ void MongoDBTest::testConnectionPool()
 	}
 }
 
+
+void MongoDBTest::testObjectID()
+{
+	std::string str;
+	str.append(1, (char) 0x53);
+	str.append(1, (char) 0x6A);
+	str.append(1, (char) 0xEE);
+	str.append(1, (char) 0xBB);
+	str.append(1, (char) 0xA0);
+	str.append(1, (char) 0x81);
+	str.append(1, (char) 0xDE);
+	str.append(1, (char) 0x68);
+	str.append(1, (char) 0x15);
+	str.append(1, (char) 0x00);
+	str.append(1, (char) 0x00);
+	str.append(1, (char) 0x02);
+
+	ObjectId oid(str);
+	std::string str2 = oid.toString("%02x");
+	assert(str2 == "536aeebba081de6815000002");
+}
+
+
 CppUnit::Test* MongoDBTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTest");
@@ -399,6 +436,7 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testDeleteRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
 	CppUnit_addTest(pSuite, MongoDBTest, testCursorRequest);
+	CppUnit_addTest(pSuite, MongoDBTest, testObjectID);
 
 	return pSuite;
 }
