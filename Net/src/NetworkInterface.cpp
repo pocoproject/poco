@@ -940,7 +940,7 @@ IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr,
 		IPAddress mask(pPrefix->Next->Address);
 		if ((ipPrefix & mask) == (ipPrefix & addr))
 		{
-			if (pprefix) *pprefix = pPrefix->Length;
+			if (pprefix) *pprefix = pPrefix->PrefixLength;
 			return IPAddress(pPrefix->Next->Address);
 		}
 	}
@@ -1085,7 +1085,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
 						// if previous call did not do it, make last-ditch attempt for prefix and broadcast
 						if (prefixLength == 0 && pAddress->FirstPrefix)
-							prefixLength = pAddress->FirstPrefix->Length;
+							prefixLength = pAddress->FirstPrefix->PrefixLength;
 						poco_assert (prefixLength <= 32);
 						if (broadcastAddress.isWildcard())
 						{
