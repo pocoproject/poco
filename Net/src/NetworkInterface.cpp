@@ -966,11 +966,66 @@ NetworkInterface::Type fromNative(DWORD type)
 	}
 }
 
+
+IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
+{
+	if (isLoopback)
+	{
+		return IPAddress::parse("255.0.0.0");
+	}
+	else
+	{
+		std::string subKey("SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\");
+		subKey += name;
+		std::string netmask;
+		HKEY hKey;
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+		std::wstring usubKey;
+		Poco::UnicodeConverter::toUTF16(subKey, usubKey);
+		if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, usubKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+			return IPAddress();
+		wchar_t unetmask[16];
+		DWORD size = sizeof(unetmask);
+		if (RegQueryValueExW(hKey, L"DhcpSubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
+		{
+			if (RegQueryValueExW(hKey, L"SubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
+			{
+				RegCloseKey(hKey);
+				return IPAddress();
+			}
+		}
+		Poco::UnicodeConverter::toUTF8(unetmask, netmask);
+#else
+		if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, subKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+			return IPAddress();
+		char unetmask[16];
+		DWORD size = sizeof(unetmask);
+		if (RegQueryValueExA(hKey, "DhcpSubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
+		{
+			if (RegQueryValueExA(hKey, "SubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
+			{
+				RegCloseKey(hKey);
+				return IPAddress();
+			}
+		}
+		netmask = unetmask;
+#endif
+		RegCloseKey(hKey);
+		return IPAddress::parse(netmask);
+	}
+}
+
+
 } /// namespace
 
 
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
+	OSVERSIONINFO osvi;
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+
 	FastMutex::ScopedLock lock(_mutex);
 	Map result;
 	ULONG outBufLen = 16384;
@@ -1010,15 +1065,32 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		unsigned ifIndex = 0;
 
 #if defined(POCO_HAVE_IPv6)
-	#if (_WIN32_WINNT >= 0x600) && defined (IP_ADAPTER_IPV6_ENABLED)
-		if (pAddress->Flags & IP_ADAPTER_IPV6_ENABLED) ifIndex = pAddress->Ipv6IfIndex;
-	#else
-		ifIndex = pAddress->Ipv6IfIndex;
-	#endif
-#endif
-#if (_WIN32_WINNT >= 0x600) && defined (IP_ADAPTER_IPV4_ENABLED)
-		if (pAddress->Flags & IP_ADAPTER_IPV4_ENABLED) ifIndex = pAddress->IfIndex;
-#else
+	#if (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
+		#if defined (IP_ADAPTER_IPV6_ENABLED) // Vista
+			if ((pAddress->Flags & IP_ADAPTER_IPV6_ENABLED) && 
+				(osvi.dwMajorVersion >= 5) && 
+				(osvi.dwMinorVersion >= 1) && 
+				(osvi.dwBuildNumber >=1))
+			{
+				ifIndex = pAddress->Ipv6IfIndex;
+			}
+		#else // !defined(IP_ADAPTER_IPV6_ENABLED)
+			if ((osvi.dwMajorVersion >= 5) && 
+				(osvi.dwMinorVersion >= 1) &&
+				(osvi.dwBuildNumber >= 0))
+			{
+				ifIndex = pAddress->Ipv6IfIndex;
+			}
+		#endif // defined(IP_ADAPTER_IPV6_ENABLED)
+	#endif // (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100)
+#endif // POCO_HAVE_IPv6
+
+#if defined (IP_ADAPTER_IPV4_ENABLED)
+		if (pAddress->Flags & IP_ADAPTER_IPV4_ENABLED)
+		{
+			ifIndex = pAddress->IfIndex;
+		}
+#else // !IP_ADAPTER_IPV4_ENABLED
 		ifIndex = pAddress->IfIndex;
 #endif	
 		if (ifIndex == 0) continue;
@@ -1054,7 +1126,12 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			ifIt->second.impl().setMTU(pAddress->Mtu);
 			ifIt->second.impl().setUp(pAddress->OperStatus == IfOperStatusUp);
 #if (_WIN32_WINNT >= 0x0600) // Vista and newer only
-			ifIt->second.impl().setRunning(pAddress->ReceiveLinkSpeed > 0 || pAddress->TransmitLinkSpeed > 0);
+			if ((osvi.dwMajorVersion >= 6) &&
+				(osvi.dwMinorVersion >= 0) &&
+				(osvi.dwBuildNumber >= 0))
+			{
+				ifIt->second.impl().setRunning(pAddress->ReceiveLinkSpeed > 0 || pAddress->TransmitLinkSpeed > 0);
+			}
 #endif
 			ifIt->second.impl().setType(fromNative(pAddress->IfType));
 			if (pAddress->PhysicalAddressLength)
@@ -1077,10 +1154,11 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						// On Windows, a valid broadcast address will be all 1's (== address | ~subnetMask); additionaly, on pre-Vista versions of
 						// OS, master address structure does not contain member for prefix length; we go an extra mile here in order to make sure
 						// we reflect the actual values held by system and protect against misconfiguration (e.g. bad DHCP config entry)
-#if (_WIN32_WINNT >= 0x0600) // Vista and newer
+#if (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
+	#if (_WIN32_WINNT >= 0x0600) // Vista and newer
 						UINT8 prefixLength = pUniAddr->OnLinkPrefixLength;
 						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
-#else
+	#else // _WIN32_WINNT < 0x0600
 						ULONG prefixLength = 0;
 						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
 						// if previous call did not do it, make last-ditch attempt for prefix and broadcast
@@ -1093,8 +1171,22 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 							IPAddress host(mask & address);
 							broadcastAddress = host | ~mask;
 						}
-#endif
-						subnetMask = prefixLength ? IPAddress(prefixLength, IPAddress::IPv4) : IPAddress();
+	#endif // _WIN32_WINNT >= 0x0600
+#endif // (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100)
+						if (prefixLength)
+						{
+							subnetMask = IPAddress(prefixLength, IPAddress::IPv4);
+						}
+						else // if all of the above fails, look up the subnet mask in the registry
+						{
+							address = IPAddress(&reinterpret_cast<struct sockaddr_in*>(pUniAddr->Address.lpSockaddr)->sin_addr, sizeof(in_addr));
+							subnetMask = subnetMaskForInterface(name, address.isLoopback());
+							if (!address.isLoopback())
+							{
+								broadcastAddress = address;
+								broadcastAddress.mask(subnetMask, IPAddress::broadcast());
+							}
+						}
 						ifIt->second.addAddress(address, subnetMask, broadcastAddress);
 					}
 					else

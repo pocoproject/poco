@@ -49,6 +49,16 @@ class Net_API NetworkInterface
 	/// The class also provides static member functions for
 	/// enumerating or searching network interfaces and their
 	/// respective configuration values.
+	///
+	/// On Windows, detection capabilities vary depending on the
+	/// OS version/service pack. Although the best effort is made
+	/// not to attempt access to non-existent features through a 
+	/// combination of compile/runtime checks, when running binaries
+	/// compiled on a newer version of the OS on an older one
+	/// problems may occur; if possible, it is best to run
+	/// binaries on the OS version where they were compiled.
+	/// This particularly applies to OS versions older than Vista
+	/// and XP.
 {
 public:
 	typedef std::vector<NetworkInterface>                List;
