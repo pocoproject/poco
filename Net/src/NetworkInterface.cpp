@@ -1077,7 +1077,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		#else // !defined(IP_ADAPTER_IPV6_ENABLED)
 			if ((osvi.dwMajorVersion >= 5) && 
 				(osvi.dwMinorVersion >= 1) &&
-				(osvi.dwBuildNumber >= 0))
+				(osvi.dwBuildNumber >= 1))
 			{
 				ifIndex = pAddress->Ipv6IfIndex;
 			}
