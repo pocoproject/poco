@@ -23,62 +23,63 @@
 
 #include "Poco/UnWindows.h"
 
-
-// determine the real version
-#if defined(_WIN32_WINNT_WIN8)
-	//Windows 8	_WIN32_WINNT_WIN8 (0x0602)
-	#ifdef _WIN32_WINNT
-		#undef _WIN32_WINNT
+#if !defined(_WIN32_WINNT) || !defined(POCO_PRESERVE_WINVER)
+	// determine the highest compatible windows version
+	#if defined(_WIN32_WINNT_WIN8)
+		//Windows 8	_WIN32_WINNT_WIN8 (0x0602)
+		#ifdef _WIN32_WINNT
+			#undef _WIN32_WINNT
+		#endif
+		#define _WIN32_WINNT _WIN32_WINNT_WIN8
+	#elif defined(_WIN32_WINNT_WIN7)
+		//Windows 7	_WIN32_WINNT_WIN7 (0x0601)
+		#ifdef _WIN32_WINNT
+			#undef _WIN32_WINNT
+		#endif
+		#define _WIN32_WINNT _WIN32_WINNT_WIN7
+	#elif defined (_WIN32_WINNT_WS08)
+		//Windows Server 2008 _WIN32_WINNT_WS08 (0x0600)
+		#ifdef _WIN32_WINNT
+			#undef _WIN32_WINNT
+		#endif
+		#define _WIN32_WINNT _WIN32_WINNT_WS08
+	#elif defined (_WIN32_WINNT_VISTA)
+		//Windows Vista	_WIN32_WINNT_VISTA (0x0600)
+		#ifdef _WIN32_WINNT
+			#undef _WIN32_WINNT
+		#endif
+		#define _WIN32_WINNT _WIN32_WINNT_VISTA
+	#elif defined (_WIN32_WINNT_LONGHORN)
+		//Windows Vista	and server 2008 Development _WIN32_WINNT_LONGHORN (0x0600)
+		#ifdef _WIN32_WINNT
+			#undef _WIN32_WINNT
+		#endif
+		#define _WIN32_WINNT _WIN32_WINNT_LONGHORN
+	#elif defined (_WIN32_WINNT_WS03)
+		//Windows Server 2003 with SP1,
+		//Windows XP with SP2 _WIN32_WINNT_WS03 (0x0502)
+		#ifdef _WIN32_WINNT
+			#undef _WIN32_WINNT
+		#endif
+		#define _WIN32_WINNT _WIN32_WINNT_WS03
+	#elif defined (_WIN32_WINNT_WINXP)
+		//Windows Server 2003, Windows XP _WIN32_WINNT_WINXP (0x0501)
+		#ifdef _WIN32_WINNT
+			#undef _WIN32_WINNT
+		#endif
+		#define _WIN32_WINNT _WIN32_WINNT_WINXP
+	#elif defined (_WIN32_WINNT_WIN2K)
+		//Windows 2000 _WIN32_WINNT_WIN2K (0x0500)
+		#ifdef _WIN32_WINNT
+			#undef _WIN32_WINNT
+		#endif
+		#define _WIN32_WINNT _WIN32_WINNT_WIN2K
+	#elif defined (WINVER)
+		#ifdef _WIN32_WINNT
+			#undef _WIN32_WINNT
+		#endif
+		#define _WIN32_WINNT WINVER
 	#endif
-	#define _WIN32_WINNT _WIN32_WINNT_WIN8
-#elif defined(_WIN32_WINNT_WIN7)
-	//Windows 7	_WIN32_WINNT_WIN7 (0x0601)
-	#ifdef _WIN32_WINNT
-		#undef _WIN32_WINNT
-	#endif
-	#define _WIN32_WINNT _WIN32_WINNT_WIN7
-#elif defined (_WIN32_WINNT_WS08)
-	//Windows Server 2008 _WIN32_WINNT_WS08 (0x0600)
-	#ifdef _WIN32_WINNT
-		#undef _WIN32_WINNT
-	#endif
-	#define _WIN32_WINNT _WIN32_WINNT_WS08
-#elif defined (_WIN32_WINNT_VISTA)
-	//Windows Vista	_WIN32_WINNT_VISTA (0x0600)
-	#ifdef _WIN32_WINNT
-		#undef _WIN32_WINNT
-	#endif
-	#define _WIN32_WINNT _WIN32_WINNT_VISTA
-#elif defined (_WIN32_WINNT_LONGHORN)
-	//Windows Vista	and server 2008 Development _WIN32_WINNT_LONGHORN (0x0600)
-	#ifdef _WIN32_WINNT
-		#undef _WIN32_WINNT
-	#endif
-	#define _WIN32_WINNT _WIN32_WINNT_LONGHORN
-#elif defined (_WIN32_WINNT_WS03)
-	//Windows Server 2003 with SP1,
-	//Windows XP with SP2 _WIN32_WINNT_WS03 (0x0502)
-	#ifdef _WIN32_WINNT
-		#undef _WIN32_WINNT
-	#endif
-	#define _WIN32_WINNT _WIN32_WINNT_WS03
-#elif defined (_WIN32_WINNT_WINXP)
-	//Windows Server 2003, Windows XP _WIN32_WINNT_WINXP (0x0501)
-	#ifdef _WIN32_WINNT
-		#undef _WIN32_WINNT
-	#endif
-	#define _WIN32_WINNT _WIN32_WINNT_WINXP
-#elif defined (_WIN32_WINNT_WIN2K)
-	//Windows 2000 _WIN32_WINNT_WIN2K (0x0500)
-	#ifdef _WIN32_WINNT
-		#undef _WIN32_WINNT
-	#endif
-	#define _WIN32_WINNT _WIN32_WINNT_WIN2K
-#elif defined (WINVER)
-	#ifdef _WIN32_WINNT
-		#undef _WIN32_WINNT
-	#endif
-	#define _WIN32_WINNT WINVER
 #endif
 
 
