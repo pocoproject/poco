@@ -52,33 +52,40 @@
 		#undef _WIN32_WINNT
 	#endif
 	#define _WIN32_WINNT _WIN32_WINNT_WIN7
-	#ifndef NTDDI_VERSION
-		#define NTDDI_VERSION NTDDI_WIN7
+	#ifdef NTDDI_VERSION
+		#undef NTDDI_VERSION
 	#endif
+	#define NTDDI_VERSION NTDDI_WIN7
 #elif defined (_WIN32_WINNT_WS08)
 	//Windows Server 2008 _WIN32_WINNT_WS08 (0x0600)
 	#ifdef _WIN32_WINNT
 		#undef _WIN32_WINNT
 	#endif
 	#define _WIN32_WINNT _WIN32_WINNT_WS08
-	#ifndef NTDDI_VERSION
-		#define NTDDI_VERSION NTDDI_WS08
+	#ifdef NTDDI_VERSION
+		#undef NTDDI_VERSION
 	#endif
+	#define NTDDI_VERSION NTDDI_WS08
 #elif defined (_WIN32_WINNT_VISTA)
 	//Windows Vista	_WIN32_WINNT_VISTA (0x0600)
 	#ifdef _WIN32_WINNT
 		#undef _WIN32_WINNT
 	#endif
 	#define _WIN32_WINNT _WIN32_WINNT_VISTA
-	#ifndef NTDDI_VERSION
-		#define NTDDI_VERSION NTDDI_VISTA
+	#ifdef NTDDI_VERSION
+		#undef NTDDI_VERSION
 	#endif
+	#define NTDDI_VERSION NTDDI_VISTA
 #elif defined (_WIN32_WINNT_LONGHORN)
 	//Windows Vista	and server 2008 Development _WIN32_WINNT_LONGHORN (0x0600)
 	#ifdef _WIN32_WINNT
 		#undef _WIN32_WINNT
 	#endif
 	#define _WIN32_WINNT _WIN32_WINNT_LONGHORN
+	#ifdef NTDDI_VERSION
+		#undef NTDDI_VERSION
+	#endif
+	#define NTDDI_VERSION 0x06000000 // hardcoded, VS90 can't find NTDDI_* macros
 #elif defined (_WIN32_WINNT_WS03)
 	//Windows Server 2003 with SP1,
 	//Windows XP with SP2 _WIN32_WINNT_WS03 (0x0502)
@@ -86,18 +93,20 @@
 		#undef _WIN32_WINNT
 	#endif
 	#define _WIN32_WINNT _WIN32_WINNT_WS03
-	#ifndef NTDDI_VERSION
-		#define NTDDI_VERSION NTDDI_WS03
+	#ifdef NTDDI_VERSION
+		#undef NTDDI_VERSION
 	#endif
+	#define NTDDI_VERSION NTDDI_WS03
 #elif defined (_WIN32_WINNT_WINXP)
 	//Windows Server 2003, Windows XP _WIN32_WINNT_WINXP (0x0501)
 	#ifdef _WIN32_WINNT
 		#undef _WIN32_WINNT
 	#endif
 	#define _WIN32_WINNT _WIN32_WINNT_WINXP
-	#ifndef NTDDI_VERSION
-		#define NTDDI_VERSION NTDDI_WINXP
+	#ifdef NTDDI_VERSION
+		#undef NTDDI_VERSION
 	#endif
+	#define NTDDI_VERSION NTDDI_WINXP
 #elif defined (_WIN32_WINNT_WIN2K)
 	//Windows 2000 _WIN32_WINNT_WIN2K (0x0500)
 	#ifdef _WIN32_WINNT
