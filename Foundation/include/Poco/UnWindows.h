@@ -57,10 +57,14 @@
 // the header file that contains the definition for conditional 
 // definitions.) For more information, see SdkDdkVer.h.
 
-#if defined(_WIN32_WINNT) && (_WIN32_WINNT < 0x0501)
-	#error Unsupported Windows version.
-#elif defined(NTDDI_VERSION) && (NTDDI_VERSION < 0x05010100)
-	#error Unsupported Windows version.
+#if defined(_WIN32_WINNT)
+	#if (_WIN32_WINNT < 0x0501)
+		#error Unsupported Windows version.
+	#endif
+#elif defined(NTDDI_VERSION)
+	#if (NTDDI_VERSION < 0x05010100)
+		#error Unsupported Windows version.
+	#endif
 #elif !defined(_WIN32_WINNT)
 	// Define minimum supported version.
 	// This can be changed, if needed.
