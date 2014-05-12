@@ -1376,6 +1376,29 @@ void SQLiteTest::testCLOB()
 
 	tmp << "SELECT Image FROM Person WHERE LastName == :ln", bind("lastname"), into(res), now;
 	poco_assert (res == img);
+
+	tmp << "DROP TABLE IF EXISTS BlobTest", now;
+	std::vector<CLOB> resVec;
+	const int arrSize = 10;
+	char val[arrSize];
+	for (int i = 0; i < arrSize; ++i)
+	{
+		val[i] = (char) (0x30 + i);
+	}
+
+	for (int i = 0; i < arrSize; ++i)
+	{
+		tmp << "CREATE TABLE IF NOT EXISTS BlobTest (idx INTEGER(2), Image BLOB)", now;
+		val[0] = (char) (0x30 + i);
+		img.assignRaw(val, arrSize);
+		tmp << "INSERT INTO BlobTest VALUES(?, ?)", use(i), use(img), now;
+	}
+	tmp << "SELECT Image FROM BlobTest", into(resVec), now;
+	poco_assert(resVec.size() == arrSize);
+	for (int i = 0; i < arrSize; ++i)
+	{
+		poco_assert(*resVec[i].begin() == (char) (0x30 + i));
+	}
 }
 
 
