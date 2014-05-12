@@ -31,7 +31,8 @@ SecureSMTPClientSession::SecureSMTPClientSession(const StreamSocket& socket):
 
 
 SecureSMTPClientSession::SecureSMTPClientSession(const std::string& host, Poco::UInt16 port):
-	SMTPClientSession(host, port)
+	SMTPClientSession(host, port),
+	_host(host)
 {
 }
 
@@ -55,7 +56,7 @@ bool SecureSMTPClientSession::startTLS(Context::Ptr pContext)
 	status = sendCommand("STARTTLS", response);
 	if (!isPositiveCompletion(status)) return false;
 
-	SecureStreamSocket sss(SecureStreamSocket::attach(socket(), pContext));
+	SecureStreamSocket sss(SecureStreamSocket::attach(socket(), _host, pContext));
 	socket() = sss;
 	
 	return true;
