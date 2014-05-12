@@ -104,6 +104,8 @@ namespace
 		case MYSQL_TYPE_FLOAT:    
 			return Poco::Data::MetaColumn::FDT_FLOAT;
 
+		case MYSQL_TYPE_DECIMAL:
+		case MYSQL_TYPE_NEWDECIMAL:
 		case MYSQL_TYPE_DOUBLE:   
 			return Poco::Data::MetaColumn::FDT_DOUBLE;
 
