@@ -209,7 +209,7 @@ protected:
 	void fixupExtraction();
 		/// Sets the AbstractExtractor at the extractors.
 
-	std::size_t getExtractionLimit();
+	Limit::SizeT getExtractionLimit();
 		/// Returns the extraction limit value.
 
 	const Limit& extractionLimit() const;
@@ -552,7 +552,7 @@ inline std::size_t StatementImpl::currentDataSet() const
 }
 
 
-inline std::size_t StatementImpl::getExtractionLimit()
+inline Limit::SizeT StatementImpl::getExtractionLimit()
 {
 	return _extrLimit.value();
 }

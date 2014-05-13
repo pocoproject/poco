@@ -38,10 +38,18 @@ using Poco::DateTime;
 #ifdef POCO_ODBC_USE_MAMMOTH_NG
 	#define POSTGRESQL_ODBC_DRIVER "Mammoth ODBCng Beta"
 #elif defined (POCO_ODBC_UNICODE)
-	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ODBC Driver(UNICODE)"
+	#ifdef POCO_PTR_IS_64_BIT
+		#define POSTGRESQL_ODBC_DRIVER "PostgreSQL Unicode(x64)"
+	#else
+		#define POSTGRESQL_ODBC_DRIVER "PostgreSQL Unicode"
+	#endif
 	#define POSTGRESQL_DSN "PocoDataPgSQLTestW"
 #else
-	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ODBC Driver(ANSI)"
+	#ifdef POCO_PTR_IS_64_BIT
+		#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ANSI(x64)"
+	#else
+		#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ANSI"
+	#endif
 	#define POSTGRESQL_DSN "PocoDataPgSQLTest"
 #endif
 
@@ -50,7 +58,7 @@ using Poco::DateTime;
 #define POSTGRESQL_DB      "postgres"
 #define POSTGRESQL_UID     "postgres"
 #define POSTGRESQL_PWD     "postgres"
-#define POSTGRESQL_VERSION "9.2"
+#define POSTGRESQL_VERSION "9.3"
 
 #ifdef POCO_OS_FAMILY_WINDOWS
 const std::string ODBCPostgreSQLTest::_libDir = "C:\\\\Program Files\\\\PostgreSQL\\\\" POSTGRESQL_VERSION "\\\\lib\\\\";

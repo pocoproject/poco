@@ -610,7 +610,7 @@ private:
 		for (; lIt != lEnd; ++lIt, ++cIt) 
 		{
 			SQLLEN sz = static_cast<SQLLEN>(cIt->size());
-			if (sz > size) size = sz;
+			if (sz > size) size = static_cast<SQLINTEGER>(sz);
 			*lIt = sz;
 		}
 

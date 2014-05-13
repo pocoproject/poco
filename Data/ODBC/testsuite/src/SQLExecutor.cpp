@@ -350,7 +350,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 		rc = SQLFetch(hstmt);
 		assert (SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
 
-		SQLINTEGER dateTimeColSize = 0;
+		SQLULEN dateTimeColSize = 0;
 		SQLSMALLINT dateTimeDecDigits = 0;
 		if (SQL_SUCCEEDED(rc))
 		{
@@ -611,7 +611,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 
 			if (SQLExecutor::DE_MANUAL == extractMode)
 			{
-				SQLINTEGER len = lengths[0] = 0;
+				SQLLEN len = lengths[0] = 0;
 				while (SQL_SUCCESS_WITH_INFO == (rc = SQLGetData(hstmt, 
 					(SQLUSMALLINT) 1, 
 					SQL_C_CHAR, 
@@ -1463,7 +1463,7 @@ void SQLExecutor::insertSingleBulk()
 
 	for (x = 0; x < 100; ++x)
 	{
-		int i = stmt.execute();
+		std::size_t i = stmt.execute();
 		assert (1 == i);
 	}
 	int count = 0;

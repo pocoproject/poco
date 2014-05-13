@@ -160,7 +160,7 @@ void SQLiteStatementImpl::bindImpl()
 		return;
 	}
 
-	int availableCount = 0;
+	std::size_t availableCount = 0;
 	Bindings::difference_type bindCount = 0;
 	Bindings::iterator it = _bindBegin;
 	for (; it != bindEnd; ++it)
