@@ -1065,7 +1065,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		unsigned ifIndex = 0;
 
 #if defined(POCO_HAVE_IPv6)
-	#if (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
+	#if defined(_WIN32_WCE)
+		ifIndex = pAddress->Ipv6IfIndex;
+	#elif (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
 		#if defined (IP_ADAPTER_IPV6_ENABLED) // Vista
 			if ((pAddress->Flags & IP_ADAPTER_IPV6_ENABLED) && 
 				(osvi.dwMajorVersion >= 5) && 
@@ -1154,7 +1156,20 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						// On Windows, a valid broadcast address will be all 1's (== address | ~subnetMask); additionaly, on pre-Vista versions of
 						// OS, master address structure does not contain member for prefix length; we go an extra mile here in order to make sure
 						// we reflect the actual values held by system and protect against misconfiguration (e.g. bad DHCP config entry)
-#if (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
+#if defined(_WIN32_WCE)
+						ULONG prefixLength = 0;
+						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
+						// if previous call did not do it, make last-ditch attempt for prefix and broadcast
+						if (prefixLength == 0 && pAddress->FirstPrefix)
+							prefixLength = pAddress->FirstPrefix->PrefixLength;
+						poco_assert (prefixLength <= 32);
+						if (broadcastAddress.isWildcard())
+						{
+							IPAddress mask ((unsigned) prefixLength, IPAddress::IPv4);
+							IPAddress host(mask & address);
+							broadcastAddress = host | ~mask;
+						}
+#elif (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
 	#if (_WIN32_WINNT >= 0x0600) // Vista and newer
 						UINT8 prefixLength = pUniAddr->OnLinkPrefixLength;
 						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
