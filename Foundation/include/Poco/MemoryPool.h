@@ -78,13 +78,21 @@ private:
 		BLOCK_RESERVE = 128
 	};
 	
-	typedef std::vector<char*> BlockVec;
+	struct _MemoryChunk {
+		struct _MemoryChunk *nextChunk;
+		char start[1];
+	};
+
+	_MemoryChunk* AllocateNewChunk(void);
 	
-	std::size_t _blockSize;
-	int         _maxAlloc;
-	int         _allocated;
-	BlockVec    _blocks;
-	FastMutex   _mutex;
+	std::size_t   _blockSize;
+	int           _maxAlloc;
+	int           _allocated;
+	int           _avaliable;
+	_MemoryChunk* _chunk;
+	int           _blocksPerChunk;
+	void*         _freeBlock;
+	FastMutex     _mutex;
 };
 
 
@@ -105,7 +113,7 @@ inline int MemoryPool::allocated() const
 
 inline int MemoryPool::available() const
 {
-	return (int) _blocks.size();
+	return _avaliable;
 }
 
 
