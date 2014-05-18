@@ -81,7 +81,7 @@ void* MemoryPool::get()
 	FastMutex::ScopedLock lock(_mutex);
 	void *ptr;
 
-	if (_freeBlock != NULL)
+	if (_freeBlock == NULL)
 	{
 		if (_maxAlloc == 0 || _allocated < _maxAlloc)
 		{
