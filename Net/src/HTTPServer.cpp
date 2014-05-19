@@ -50,8 +50,8 @@ HTTPServer::~HTTPServer()
 
 void HTTPServer::stopAll(bool abortCurrent)
 {
-	_pFactory->serverStopped(this, abortCurrent);
 	stop();
+	_pFactory->serverStopped(this, abortCurrent);
 }
 
 
