@@ -120,11 +120,13 @@ public:
 	}
 
 	SharedPtr(C* ptr)
-	try :
-		_pCounter(new RC), _ptr(ptr)
+	try:
+		_pCounter(new RC), 
+		_ptr(ptr)
 	{
 	}
-	catch (...) {
+	catch (...) 
+	{
 		delete ptr;
 	}
 
