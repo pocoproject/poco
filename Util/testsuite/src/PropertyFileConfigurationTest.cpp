@@ -96,12 +96,14 @@ void PropertyFileConfigurationTest::testSave()
 	
 	pConf->setString("prop1", "value1");
 	pConf->setInt("prop2", 42);
+	pConf->setString("prop3", "value\\1\txxx");
 	
 	std::ostringstream ostr;
 	pConf->save(ostr);
 	std::string propFile = ostr.str();
 	assert (propFile == "prop1: value1\n"
-	                    "prop2: 42\n");
+	                    "prop2: 42\n"
+	                    "prop3: value\\\\1\\txxx\n");
 }
 
 
