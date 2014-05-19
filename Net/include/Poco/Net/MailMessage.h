@@ -135,6 +135,10 @@ public:
 		///
 		/// The message will be sent as a single-part
 		/// message.
+		///
+		/// Note that single CR or LF characters as line delimiters must
+		/// not be used. Content lines always should be terminated with a 
+		/// proper CRLF sequence.
 	
 	const std::string& getContent() const;
 		/// Returns the content of the mail message.
