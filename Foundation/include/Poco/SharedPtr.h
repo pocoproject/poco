@@ -119,8 +119,13 @@ public:
 	{
 	}
 
-	SharedPtr(C* ptr): _pCounter(new RC), _ptr(ptr)
+	SharedPtr(C* ptr)
+	try :
+		_pCounter(new RC), _ptr(ptr)
 	{
+	}
+	catch (...) {
+		delete ptr;
 	}
 
 	template <class Other, class OtherRP> 
@@ -143,10 +148,8 @@ public:
 	{
 		if (get() != ptr)
 		{
-			RC* pTmp = new RC;
-			release();
-			_pCounter = pTmp;
-			_ptr = ptr;
+			SharedPtr tmp(ptr);
+			swap(tmp);
 		}
 		return *this;
 	}
