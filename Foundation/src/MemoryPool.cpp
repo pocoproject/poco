@@ -45,22 +45,22 @@ MemoryPool::MemoryPool(std::size_t blockSize, int preAlloc, int maxAlloc):
 
 MemoryPool::_MemoryChunk* MemoryPool::AllocateNewChunk(void)
 {
-	std::size_t blksz = std::max(_blockSize, sizeof(void *));
-	std::size_t chunkSize = _blocksPerChunk * blksz + sizeof(_MemoryChunk);
+	std::size_t blockSize = std::max(_blockSize, sizeof(void *));
+	std::size_t chunkSize = _blocksPerChunk * blockSize + sizeof(_MemoryChunk);
 
 	// allocate memory for this new chunk
-	_MemoryChunk *chunk = (_MemoryChunk *) (new char[chunkSize]);
+	_MemoryChunk* chunk = (_MemoryChunk *) (new char[chunkSize]);
 	chunk->nextChunk = NULL;
 
 	// link all blocks in this chunk into a freelist
-	char **curblk = (char **) chunk->start;
+	char** curBlock = (char **) chunk->start;
 	for (std::size_t i = 0; i < _blocksPerChunk - 1; i++)
 	{
-		char *nextblk = ((char *) curblk) + blksz;
-		*curblk = nextblk;
-		curblk = (char **) nextblk;
+		char* nextBlock = ((char *) curBlock) + blockSize;
+		*curBlock = nextBlock;
+		curBlock = (char **) nextBlock;
 	}
-	*curblk = NULL;
+	*curBlock = NULL;
 
 	return chunk;				// done
 }
