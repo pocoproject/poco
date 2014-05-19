@@ -87,7 +87,7 @@ void* MemoryPool::get()
 		{
 			// allocate a new chunk
 			_MemoryChunk *newChunk = AllocateNewChunk();
-			_chunk->nextChunk = newChunk;
+			newChunk->nextChunk = _chunk;
 			_chunk = newChunk;
 			_avaliable += _blocksPerChunk;
 			_allocated += _blocksPerChunk;
