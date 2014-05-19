@@ -157,7 +157,7 @@ public:
 	
 	CountingOutputStream(std::ostream& ostr);
 		/// Creates the CountingOutputStream and connects it
-		/// to the given input stream.
+		/// to the given output stream.
 
 	~CountingOutputStream();
 		/// Destroys the CountingOutputStream.
