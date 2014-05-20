@@ -127,7 +127,7 @@ public:
 	}
 	catch (...) 
 	{
-		delete ptr;
+		RP::release(ptr);
 	}
 
 	template <class Other, class OtherRP> 
