@@ -233,7 +233,8 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 	std::size_t totalSize = 0;
 	
 	SQLLEN len;
-	Poco::Buffer<char> apChar(CHUNK_SIZE);
+	const int bufSize = CHUNK_SIZE;
+	Poco::Buffer<char> apChar(bufSize);
 	char* pChar = apChar.begin();
 	SQLRETURN rc = 0;
 	
@@ -242,13 +243,13 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 
 	do
 	{
-		std::memset(pChar, 0, CHUNK_SIZE);
+		std::memset(pChar, 0, bufSize);
 		len = 0;
 		rc = SQLGetData(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			cType, //C data type
 			pChar, //returned value
-			CHUNK_SIZE, //buffer length
+			bufSize, //buffer length
 			&len); //length indicator
 
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
@@ -289,7 +290,8 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 	std::size_t totalSize = 0;
 
 	SQLLEN len;
-	Poco::Buffer<char> apChar(CHUNK_SIZE);
+	const int bufSize = CHUNK_SIZE;
+	Poco::Buffer<char> apChar(bufSize);
 	char* pChar = apChar.begin();
 	SQLRETURN rc = 0;
 	
@@ -298,13 +300,13 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 
 	do
 	{
-		std::memset(pChar, 0, CHUNK_SIZE);
+		std::memset(pChar, 0, bufSize);
 		len = 0;
 		rc = SQLGetData(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			cType, //C data type
 			pChar, //returned value
-			CHUNK_SIZE, //buffer length
+			bufSize, //buffer length
 			&len); //length indicator
 		
 		_lengths[pos] += len;

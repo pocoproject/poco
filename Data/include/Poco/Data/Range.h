@@ -32,7 +32,7 @@ class Data_API Range
 	/// Range stores information how many rows a query should return.
 {
 public:
-	Range(Poco::UInt32 lowValue, Poco::UInt32 upValue, bool hardLimit);
+	Range(Limit::SizeT lowValue, Limit::SizeT upValue, bool hardLimit);
 		/// Creates the Range. lowValue must be smaller equal than upValue
 
 	~Range();
@@ -72,7 +72,7 @@ template <typename T>
 Limit limit(T lim, bool hard = false)
 	/// Creates an upperLimit
 {
-	return Limit(static_cast<Poco::UInt32>(lim), hard, false);
+	return Limit(static_cast<Limit::SizeT>(lim), hard, false);
 }
 
 
@@ -86,14 +86,14 @@ Limit upperLimit(T lim, bool hard = false)
 template <typename T> 
 Limit lowerLimit(T lim)
 {
-	return Limit(static_cast<Poco::UInt32>(lim), true, true);
+	return Limit(static_cast<Limit::SizeT>(lim), true, true);
 }
 
 
 template <typename T> 
 Range range(T low, T upp, bool hard = false)
 {
-	return Range(static_cast<Poco::UInt32>(low), static_cast<Poco::UInt32>(upp), hard);
+	return Range(static_cast<Limit::SizeT>(low), static_cast<Limit::SizeT>(upp), hard);
 }
 
 

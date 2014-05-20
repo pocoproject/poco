@@ -33,6 +33,10 @@ namespace Poco {
 class Foundation_API NumberParser
 	/// The NumberParser class provides static methods
 	/// for parsing numbers out of strings.
+	///
+	/// Note that leading or trailing whitespace is not allowed
+	/// in the string. Poco::trim() or Poco::trimInPlace()
+	/// can be used to remove leading or trailing whitespace.
 {
 public:
 	static const unsigned short NUM_BASE_OCT = 010;

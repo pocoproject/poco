@@ -111,8 +111,8 @@ function Set-Environment
     $Env:MYSQL_DIR     = "$mysql_base"
     $Env:MYSQL_INCLUDE = "$Env:MYSQL_DIR\include"
     $Env:MYSQL_LIB     = "$Env:MYSQL_DIR\lib"
-    Add-Env-Var "MYSQL", "INCLUDE"
-    Add-Env-Var "MYSQL", "LIB"
+    Add-Env-Var "MYSQL" "INCLUDE"
+    Add-Env-Var "MYSQL" "LIB"
   }
 
   $vsct = "VS$($vs_version)COMNTOOLS"

@@ -46,7 +46,7 @@ const std::string StatementImpl::UNKNOWN = "unknown";
 
 StatementImpl::StatementImpl(SessionImpl& rSession):
 	_state(ST_INITIALIZED),
-	_extrLimit(upperLimit((std::size_t) Limit::LIMIT_UNLIMITED, false)),
+	_extrLimit(upperLimit(Limit::LIMIT_UNLIMITED, false)),
 	_lowerLimit(0),
 	_rSession(rSession),
 	_storage(STORAGE_UNKNOWN_IMPL),
@@ -221,7 +221,7 @@ void StatementImpl::setExtractionLimit(const Limit& extrLimit)
 
 void StatementImpl::setBulkExtraction(const Bulk& b)
 {
-	std::size_t limit = getExtractionLimit();
+	Limit::SizeT limit = getExtractionLimit();
 	if (Limit::LIMIT_UNLIMITED != limit && b.size() != limit)
 		throw InvalidArgumentException("Can not set limit for statement.");
 

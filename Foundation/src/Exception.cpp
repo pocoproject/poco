@@ -65,9 +65,10 @@ Exception& Exception::operator = (const Exception& exc)
 {
 	if (&exc != this)
 	{
+		Exception* newPNested = exc._pNested ? exc._pNested->clone() : 0;
 		delete _pNested;
 		_msg     = exc._msg;
-		_pNested = exc._pNested ? exc._pNested->clone() : 0;
+		_pNested = newPNested;
 		_code    = exc._code;
 	}
 	return *this;

@@ -21,7 +21,7 @@ namespace Poco {
 namespace Data {
 
 
-Limit::Limit(Poco::UInt32 value, bool hardLimit, bool isLowerLimit):
+Limit::Limit(SizeT value, bool hardLimit, bool isLowerLimit) :
 	_value(value),
 	_hardLimit(hardLimit),
 	_isLowerLimit(isLowerLimit)

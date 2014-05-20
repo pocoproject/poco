@@ -48,20 +48,20 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 #define MYSQL_PWD  "poco"
 #define MYSQL_HOST "localhost"
 #define MYSQL_PORT 3306
-#define MYSQL_DB   "test"
+#define MYSQL_DB   "pocotestdb"
 
 //
 // Connection string
 std::string MySQLTest::_dbConnString = "host=" MYSQL_HOST
 	";user=" MYSQL_USER
-	";password=" MYSQL_PWD 
-	";db=" MYSQL_DB 
+	";password=" MYSQL_PWD
+	";db=" MYSQL_DB
 	";compress=true"
 	";auto-reconnect=true"
 	";secure-auth=true";
 
 
-MySQLTest::MySQLTest(const std::string& name): 
+MySQLTest::MySQLTest(const std::string& name):
 	CppUnit::TestCase(name)
 {
 	MySQL::Connector::registerConnector();
@@ -76,25 +76,25 @@ MySQLTest::~MySQLTest()
 
 void MySQLTest::dbInfo(Session& session)
 {
-	
-		std::cout << "Server Info: " << Utility::serverInfo(session) << std::endl;
-		std::cout << "Server Version: " << Utility::serverVersion(session) << std::endl;
-		std::cout << "Host Info: " << Utility::hostInfo(session) << std::endl;
+	std::cout << "Server Info: " << Utility::serverInfo(session) << std::endl;
+	std::cout << "Server Version: " << Utility::serverVersion(session) << std::endl;
+	std::cout << "Host Info: " << Utility::hostInfo(session) << std::endl;
 }
 
 
-void MySQLTest::testConnectNoDB()
+void MySQLTest::connectNoDB()
 {
 	std::string dbConnString = "host=" MYSQL_HOST
 		";user=" MYSQL_USER
 		";password=" MYSQL_PWD
 		";compress=true;auto-reconnect=true";
-	
+
 	try
 	{
 		Session session(MySQL::Connector::KEY, dbConnString);
 		std::cout << "Connected to [" << "MySQL" << "] without database." << std::endl;
 		dbInfo(session);
+		session << "CREATE DATABASE IF NOT EXISTS " MYSQL_DB ";", now;
 		std::cout << "Disconnecting ..." << std::endl;
 		session.close();
 		std::cout << "Disconnected." << std::endl;
@@ -104,8 +104,8 @@ void MySQLTest::testConnectNoDB()
 		std::cout << ex.displayText() << std::endl;
 	}
 }
-	
-	
+
+
 void MySQLTest::testBareboneMySQL()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -217,7 +217,6 @@ void MySQLTest::testLimitOnce()
 
 	recreateIntsTable();
 	_pExecutor->limitOnce();
-	
 }
 
 
@@ -428,7 +427,7 @@ void MySQLTest::testDateTime()
 void MySQLTest::testBLOB()
 {
 	if (!_pSession) fail ("Test not available.");
-	
+
 	recreatePersonBLOBTable();
 	_pExecutor->blob();
 
@@ -441,7 +440,7 @@ void MySQLTest::testBLOB()
 		_pExecutor->blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&) 
+	catch (DataException&)
 	{
 		_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -648,7 +647,7 @@ void MySQLTest::testTupleWithNullable()
 
 	Info info(0, std::string("Address"), 10);
 	*_pSession << "INSERT INTO NullableStringTest VALUES(?, ?, ?)", use(info), now;
-	
+
 	info.set<0>(info.get<0>()++);
 	info.set<1>(null);
 	*_pSession << "INSERT INTO NullableStringTest VALUES(?, ?, ?)", use(info), now;
@@ -692,7 +691,6 @@ void MySQLTest::testTupleWithNullable()
 
 void MySQLTest::dropTable(const std::string& tableName)
 {
-	
 	try { *_pSession << format("DROP TABLE IF EXISTS %s", tableName), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("dropTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("dropTable()"); }
@@ -795,7 +793,7 @@ void MySQLTest::recreateTuplesTable()
 void MySQLTest::recreateNullableIntTable()
 {
 	dropTable("NullableIntTest");
-	try { 
+	try {
 		*_pSession << "CREATE TABLE NullableIntTest (Id INTEGER(10), Value INTEGER(10))", now;
 	}
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateNullableIntTable()"); }
@@ -806,7 +804,7 @@ void MySQLTest::recreateNullableIntTable()
 void MySQLTest::recreateNullableStringTable()
 {
 	dropTable("NullableStringTest");
-	try { 
+	try {
 		*_pSession << "CREATE TABLE NullableStringTest (Id INTEGER(10), Address VARCHAR(30), Age INTEGER(10))", now;
 	}
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateNullableStringTable()"); }
@@ -846,7 +844,17 @@ CppUnit::Test* MySQLTest::suite()
 	catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
-		return 0;
+		std::cout << "Trying to connect without DB and create one ..." << std::endl;
+		connectNoDB();
+		try
+		{
+			_pSession = new Session(MySQL::Connector::KEY, _dbConnString);
+		}
+		catch (ConnectionFailedException& ex)
+		{
+			std::cout << ex.displayText() << std::endl;
+			return 0;
+		}
 	}
 
 	std::cout << "*** Connected to [" << "MySQL" << "] test database." << std::endl;
@@ -856,7 +864,6 @@ CppUnit::Test* MySQLTest::suite()
 
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MySQLTest");
 
-	CppUnit_addTest(pSuite, MySQLTest, testConnectNoDB);
 	CppUnit_addTest(pSuite, MySQLTest, testBareboneMySQL);
 	CppUnit_addTest(pSuite, MySQLTest, testSimpleAccess);
 	CppUnit_addTest(pSuite, MySQLTest, testComplexType);

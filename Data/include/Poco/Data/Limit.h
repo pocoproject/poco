@@ -31,12 +31,14 @@ class Data_API Limit
 	/// Limit stores information how many rows a query should return.
 {
 public:
+	typedef Poco::UInt32 SizeT;
+
 	enum Type
 	{
-		LIMIT_UNLIMITED = 0xffffffffu
+		LIMIT_UNLIMITED = ~((SizeT) 0)
 	};
 	
-	Limit(Poco::UInt32 value, bool hardLimit = false, bool isLowerLimit = false);
+	Limit(SizeT value, bool hardLimit = false, bool isLowerLimit = false);
 		/// Creates the Limit. 
 		///
 		/// Value contains the upper row hint, if hardLimit is set to true, the limit acts as a hard
@@ -48,7 +50,7 @@ public:
 	~Limit();
 		/// Destroys the Limit.
 
-	Poco::UInt32 value() const;
+	SizeT value() const;
 		/// Returns the value of the limit
 
 	bool isHardLimit() const;
@@ -64,9 +66,9 @@ public:
 		/// Inequality operator.
 
 private:
-	Poco::UInt32 _value;
-	bool         _hardLimit;
-	bool         _isLowerLimit;
+	SizeT _value;
+	bool  _hardLimit;
+	bool  _isLowerLimit;
 };
 
 
