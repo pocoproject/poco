@@ -39,15 +39,4 @@ AbstractExtraction::~AbstractExtraction()
 }
 
 
-bool AbstractExtraction::isValueNull(const std::string& str, bool deflt)
-{
-	if (getForceEmptyString()) return false;
-
-	if (getEmptyStringIsNull() && str.empty())
-		return true;
-
-	return deflt;
-}
-
-
 } } // namespace Poco::Data

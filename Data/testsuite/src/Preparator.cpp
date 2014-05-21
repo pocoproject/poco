@@ -107,6 +107,11 @@ void Preparator::prepare(std::size_t pos, const std::string&)
 }
 
 
+void Preparator::prepare(std::size_t pos, const Poco::UTF16String&)
+{
+}
+
+
 void Preparator::prepare(std::size_t pos, const Poco::Data::BLOB&)
 {
 }

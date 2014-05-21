@@ -72,6 +72,10 @@ void Preparator::freeMemory() const
 				deleteCachedArray<char>(it->first);
 				break;
 
+			case DT_WCHAR:
+				deleteCachedArray<UTF16String>(it->first);
+				break;
+
 			case DT_UCHAR:
 				deleteCachedArray<unsigned char>(it->first);
 				break;
@@ -79,6 +83,13 @@ void Preparator::freeMemory() const
 			case DT_CHAR_ARRAY:
 			{
 				char** pc = AnyCast<char*>(&_values[it->first]);
+				if (pc) std::free(*pc);
+				break;
+			}
+
+			case DT_WCHAR_ARRAY:
+			{
+				UTF16String::value_type** pc = AnyCast<UTF16String::value_type*>(&_values[it->first]);
 				if (pc) std::free(*pc);
 				break;
 			}

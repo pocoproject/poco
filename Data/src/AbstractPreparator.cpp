@@ -287,6 +287,24 @@ void AbstractPreparator::prepare(std::size_t pos, const std::list<std::string>& 
 }
 
 
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<UTF16String>& val)
+{
+	throw NotImplementedException("std::vector preparator must be implemented.");
+}
+
+
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<UTF16String>& val)
+{
+	throw NotImplementedException("std::deque preparator must be implemented.");
+}
+
+
+void AbstractPreparator::prepare(std::size_t pos, const std::list<UTF16String>& val)
+{
+	throw NotImplementedException("std::list preparator must be implemented.");
+}
+
+
 void AbstractPreparator::prepare(std::size_t pos, const std::vector<BLOB>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");

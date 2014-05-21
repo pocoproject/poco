@@ -83,14 +83,16 @@ void ODBCMetaColumn::init()
 	{
 	case SQL_BIT:
 		setType(MetaColumn::FDT_BOOL); break;
-	
+
 	case SQL_CHAR:
 	case SQL_VARCHAR:
 	case SQL_LONGVARCHAR:
-	case -8:// PostgreSQL CHAR (with size specified - psqlODBC)
-	case -9:// SQL Server NVARCHAR
-	case -10:// PostgreSQL VARCHAR (without size specified)
 		setType(MetaColumn::FDT_STRING); break;
+
+	case SQL_WCHAR:
+	case SQL_WVARCHAR:
+	case SQL_WLONGVARCHAR:
+		setType(MetaColumn::FDT_WSTRING); break;
 	
 	case SQL_TINYINT:
 		setType(MetaColumn::FDT_INT8); break;

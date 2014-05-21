@@ -31,6 +31,7 @@
 #include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/UTFString.h"
 #include <vector>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
@@ -87,8 +88,10 @@ public:
 		DT_BOOL,
 		DT_BOOL_ARRAY,
 		DT_CHAR,
+		DT_WCHAR,
 		DT_UCHAR,
 		DT_CHAR_ARRAY,
+		DT_WCHAR_ARRAY,
 		DT_UCHAR_ARRAY,
 		DT_DATE,
 		DT_TIME,
@@ -279,6 +282,18 @@ public:
 
 	void prepare(std::size_t pos, const std::list<std::string>& val);
 		/// Prepares a string list.
+
+	void prepare(std::size_t pos, const UTF16String& val);
+	/// Prepares a string.
+
+	void prepare(std::size_t pos, const std::vector<UTF16String>& val);
+	/// Prepares a string vector.
+
+	void prepare(std::size_t pos, const std::deque<UTF16String>& val);
+	/// Prepares a string deque.
+
+	void prepare(std::size_t pos, const std::list<UTF16String>& val);
+	/// Prepares a string list.
 
 	void prepare(std::size_t pos, const Poco::Data::BLOB& val);
 		/// Prepares a BLOB.
@@ -489,6 +504,15 @@ private:
 					return prepareCharArray<char, DT_CHAR_ARRAY>(pos, SQL_C_CHAR, maxDataSize(pos), pVal->size());
 				else
 					return prepareVariableLen<char>(pos, SQL_C_CHAR, maxDataSize(pos), DT_CHAR);
+
+			case MetaColumn::FDT_WSTRING:
+			{
+				typedef UTF16String::value_type CharType;
+				if (pVal)
+					return prepareCharArray<CharType, DT_WCHAR_ARRAY>(pos, SQL_C_WCHAR, maxDataSize(pos), pVal->size());
+				else
+					return prepareVariableLen<CharType>(pos, SQL_C_WCHAR, maxDataSize(pos), DT_WCHAR);
+			}
 
 			case MetaColumn::FDT_BLOB:
 			{
@@ -1004,6 +1028,30 @@ inline void Preparator::prepare(std::size_t pos, const std::deque<std::string>& 
 inline void Preparator::prepare(std::size_t pos, const std::list<std::string>& val)
 {
 	prepareCharArray<char, DT_CHAR_ARRAY>(pos, SQL_C_CHAR, maxDataSize(pos), val.size());
+}
+
+
+inline void Preparator::prepare(std::size_t pos, const UTF16String&)
+{
+	prepareVariableLen<UTF16String::value_type>(pos, SQL_C_WCHAR, maxDataSize(pos), DT_CHAR);
+}
+
+
+inline void Preparator::prepare(std::size_t pos, const std::vector<UTF16String>& val)
+{
+	prepareCharArray<UTF16String::value_type, DT_WCHAR_ARRAY>(pos, SQL_C_WCHAR, maxDataSize(pos), val.size());
+}
+
+
+inline void Preparator::prepare(std::size_t pos, const std::deque<UTF16String>& val)
+{
+	prepareCharArray<UTF16String::value_type, DT_WCHAR_ARRAY>(pos, SQL_C_WCHAR, maxDataSize(pos), val.size());
+}
+
+
+inline void Preparator::prepare(std::size_t pos, const std::list<UTF16String>& val)
+{
+	prepareCharArray<UTF16String::value_type, DT_WCHAR_ARRAY>(pos, SQL_C_WCHAR, maxDataSize(pos), val.size());
 }
 
 

@@ -969,7 +969,11 @@ void ODBCTest::testInternalBulkExtraction()
 	recreatePersonTable();
 	_pSession->setFeature("autoBind", true);
 	_pSession->setFeature("autoExtract", true);
+#ifdef POCO_ODBC_UNICODE
+	_pExecutor->internalBulkExtractionUTF16();
+#else
 	_pExecutor->internalBulkExtraction();
+#endif
 }
 
 
@@ -1199,6 +1203,25 @@ void ODBCTest::testNullable()
 }
 
 
+void ODBCTest::testUnicode()
+{
+#if defined (POCO_ODBC_UNICODE)
+	if (!_pSession) fail("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateUnicodeTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i + 1));
+		_pExecutor->unicode(_rConnectString);
+		i += 2;
+	}
+#else
+	std::cout << "Not an UNICODE build, skipping." << std::endl;
+#endif
+}
+
+
 void ODBCTest::testReconnect()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1296,7 +1319,7 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	try
 	{
 		std::cout << "Conecting to [" << dbConnString << ']' << std::endl;
-		return new Session(Poco::Data::ODBC::Connector::KEY, dbConnString);
+		return new Session(Poco::Data::ODBC::Connector::KEY, dbConnString, 5);
 	}catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;

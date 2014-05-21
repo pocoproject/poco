@@ -175,7 +175,7 @@ void TextConverterTest::testLatin1toUTF8()
 	int errors = converter.convert(latin1Text, result0);
 	assert (result0 == utf8Text);
 	assert (errors == 0);
-	assertEqual (result0.size(), 7);
+	assertEqual((long) result0.size(), 7);
 	
 	std::string result1;
 	errors = converter.convert(latin1Chars, 6, result1);
@@ -200,13 +200,13 @@ void TextConverterTest::testLatin2toUTF8()
 	int errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
-	assertEqual (result0.size(), 49);
+	assertEqual((long) result0.size(), 49);
 
 	std::string result1;
 	errors = converter.convert(latinChars, 25, result1);
 	assertEqual (result1, utf8Text);
 	assertEqual (errors, 0);
-	assertEqual (result1.size(), 49);
+	assertEqual((long) result1.size(), 49);
 }
 
 
@@ -226,13 +226,13 @@ void TextConverterTest::testLatin9toUTF8()
 	int errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
-	assertEqual (result0.size(), 43);
+	assertEqual((long) result0.size(), 43);
 
 	std::string result1;
 	errors = converter.convert(latinChars, 25, result1);
-	assertEqual (result1, utf8Text);
-	assertEqual (errors, 0);
-	assertEqual (result1.size(), 43);
+	assertEqual(result1, utf8Text);
+	assertEqual((long) errors, 0);
+	assertEqual((long) result1.size(), 43);
 }
 
 
@@ -252,13 +252,13 @@ void TextConverterTest::testCP1250toUTF8()
 	int errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
-	assertEqual (result0.size(), 49);
+	assertEqual((long) result0.size(), 49);
 
 	std::string result1;
 	errors = converter.convert(latinChars, 25, result1);
-	assertEqual (result1, utf8Text);
-	assertEqual (errors, 0);
-	assertEqual (result1.size(), 49);
+	assertEqual(result1, utf8Text);
+	assertEqual((long) errors, 0);
+	assertEqual((long) result1.size(), 49);
 }
 
 
@@ -277,13 +277,13 @@ void TextConverterTest::testCP1251toUTF8()
 	int errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
-	assertEqual (result0.size(), 62);
+	assertEqual((long) result0.size(), 62);
 
 	std::string result1;
 	errors = converter.convert(latinChars, 31, result1);
 	assertEqual (result1, utf8Text);
 	assertEqual (errors, 0);
-	assertEqual (result1.size(), 62);
+	assertEqual((long) result1.size(), 62);
 }
 
 
@@ -301,15 +301,15 @@ void TextConverterTest::testCP1252toUTF8()
 
 	std::string result0;
 	int errors = converter.convert(latinText, result0);
-	assertEqual (result0, utf8Text);
-	assertEqual (errors, 0);
-	assertEqual (result0.size(), 43);
+	assertEqual(result0, utf8Text);
+	assertEqual(errors, 0);
+	assertEqual((long) result0.size(), 43);
 
 	std::string result1;
 	errors = converter.convert(latinChars, 25, result1);
-	assertEqual (result1, utf8Text);
-	assertEqual (errors, 0);
-	assertEqual (result1.size(), 43);
+	assertEqual(result1, utf8Text);
+	assertEqual(errors, 0);
+	assertEqual((long) result1.size(), 43);
 }
 
 

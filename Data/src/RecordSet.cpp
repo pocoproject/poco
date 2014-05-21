@@ -20,10 +20,12 @@
 #include "Poco/Data/Time.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTime.h"
+#include "Poco/UTFString.h"
 
 
 using namespace Poco::Data::Keywords;
 using Poco::DateTime;
+using Poco::UTF16String;
 
 
 namespace Poco {
@@ -104,6 +106,7 @@ Poco::Dynamic::Var RecordSet::value(std::size_t col, std::size_t row, bool useFi
 		case MetaColumn::FDT_FLOAT:     return value<float>(col, row, useFilter);
 		case MetaColumn::FDT_DOUBLE:    return value<double>(col, row, useFilter);
 		case MetaColumn::FDT_STRING:    return value<std::string>(col, row, useFilter);
+		case MetaColumn::FDT_WSTRING:   return value<UTF16String>(col, row, useFilter);
 		case MetaColumn::FDT_BLOB:      return value<BLOB>(col, row, useFilter);
 		case MetaColumn::FDT_CLOB:      return value<CLOB>(col, row, useFilter);
 		case MetaColumn::FDT_DATE:      return value<Date>(col, row, useFilter);
@@ -136,6 +139,7 @@ Poco::Dynamic::Var RecordSet::value(const std::string& name, std::size_t row, bo
 		case MetaColumn::FDT_FLOAT:     return value<float>(name, row, useFilter);
 		case MetaColumn::FDT_DOUBLE:    return value<double>(name, row, useFilter);
 		case MetaColumn::FDT_STRING:    return value<std::string>(name, row, useFilter);
+		case MetaColumn::FDT_WSTRING:   return value<UTF16String>(name, row, useFilter);
 		case MetaColumn::FDT_BLOB:      return value<BLOB>(name, row, useFilter);
 		case MetaColumn::FDT_DATE:      return value<Date>(name, row, useFilter);
 		case MetaColumn::FDT_TIME:      return value<Time>(name, row, useFilter);

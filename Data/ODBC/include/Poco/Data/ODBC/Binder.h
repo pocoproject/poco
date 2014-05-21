@@ -252,6 +252,18 @@ public:
 	void bind(std::size_t pos, const std::list<std::string>& val, Direction dir);
 		/// Binds a string list.
 
+	void bind(std::size_t pos, const UTF16String& val, Direction dir);
+		/// Binds a string.
+
+	void bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir);
+		/// Binds a string vector.
+
+	void bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir);
+		/// Binds a string deque.
+
+	void bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir);
+		/// Binds a string list.
+
 	void bind(std::size_t pos, const BLOB& val, Direction dir);
 		/// Binds a BLOB. In-bound only.
 
@@ -341,18 +353,20 @@ public:
 		/// Clears the cached storage.
 
 private:
-	typedef std::vector<SQLLEN*>                            LengthVec;
-	typedef std::vector<std::vector<SQLLEN> >               LengthVecVec;
-	typedef std::vector<char*>                              CharPtrVec;
-	typedef std::vector<bool*>                              BoolPtrVec;
-	typedef std::vector<std::vector<SQL_DATE_STRUCT> >      DateVec;
-	typedef std::vector<std::vector<SQL_TIME_STRUCT> >      TimeVec;
-	typedef std::vector<std::vector<SQL_TIMESTAMP_STRUCT> > DateTimeVec;
-	typedef std::vector<std::vector<Poco::Any> >            AnyVec;
-	typedef std::map<char*, std::string*>                   StringMap;
-	typedef std::map<SQL_DATE_STRUCT*, Date*>               DateMap;
-	typedef std::map<SQL_TIME_STRUCT*, Time*>               TimeMap;
-	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*>      TimestampMap;
+	typedef std::vector<SQLLEN*>                             LengthVec;
+	typedef std::vector<std::vector<SQLLEN> >                LengthVecVec;
+	typedef std::vector<char*>                               CharPtrVec;
+	typedef std::vector<UTF16Char*>                          UTF16CharPtrVec;
+	typedef std::vector<bool*>                               BoolPtrVec;
+	typedef std::vector<std::vector<SQL_DATE_STRUCT> >       DateVec;
+	typedef std::vector<std::vector<SQL_TIME_STRUCT> >       TimeVec;
+	typedef std::vector<std::vector<SQL_TIMESTAMP_STRUCT> >  DateTimeVec;
+	typedef std::vector<std::vector<Poco::Any> >             AnyVec;
+	typedef std::map<char*, std::string*>                    StringMap;
+	typedef std::map<UTF16String::value_type*, UTF16String*> UTF16StringMap;
+	typedef std::map<SQL_DATE_STRUCT*, Date*>                DateMap;
+	typedef std::map<SQL_TIME_STRUCT*, Time*>                TimeMap;
+	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*>       TimestampMap;
 
 	void describeParameter(std::size_t pos);
 		/// Sets the description field for the parameter, if needed.
@@ -578,6 +592,71 @@ private:
 			&_vecLengthIndicator[pos][0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(std::vector<std::string>)");
+		}
+	}
+
+	template <typename C>
+	void bindImplContainerUTF16String(std::size_t pos, const C& val, Direction dir)
+		/// Utility function to bind containers of strings.
+	{
+		if (isOutBound(dir) || !isInBound(dir))
+			throw NotImplementedException("String container parameter type can only be inbound.");
+
+		if (PB_IMMEDIATE != _paramBinding)
+			throw InvalidAccessException("Containers can only be bound immediately.");
+
+		if (0 == val.size())
+			throw InvalidArgumentException("Empty container not allowed.");
+
+		setParamSetSize(val.size());
+
+		SQLINTEGER size = 0;
+		getColumnOrParameterSize(pos, size);
+		poco_assert(size > 0);
+
+		if (size == _maxFieldSize)
+		{
+			getMinValueSize(val, size);
+			// accomodate for terminating zero
+			if (size != _maxFieldSize) size += sizeof(UTF16Char);
+		}
+
+		if (_vecLengthIndicator.size() <= pos)
+		{
+			_vecLengthIndicator.resize(pos + 1);
+			_vecLengthIndicator[pos].resize(val.size(), SQL_NTS);
+		}
+
+		if (_utf16CharPtrs.size() <= pos)
+			_utf16CharPtrs.resize(pos + 1, 0);
+
+		_utf16CharPtrs[pos] = (UTF16Char*)std::calloc(val.size() * size, sizeof(UTF16Char));
+
+		std::size_t strSize;
+		std::size_t offset = 0;
+		typename C::const_iterator it = val.begin();
+		typename C::const_iterator end = val.end();
+		for (; it != end; ++it)
+		{
+			strSize = it->size() * sizeof(UTF16Char);
+			if (strSize > size)
+				throw LengthExceededException("SQLBindParameter(std::vector<UTF16String>)");
+			std::memcpy(_utf16CharPtrs[pos] + offset, it->data(), strSize);
+			offset += (size / sizeof(UTF16Char));
+		}
+
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT)pos + 1,
+			toODBCDirection(dir),
+			SQL_C_WCHAR,
+			SQL_WLONGVARCHAR,
+			(SQLUINTEGER)size - 1,
+			0,
+			_utf16CharPtrs[pos],
+			(SQLINTEGER)size,
+			&_vecLengthIndicator[pos][0])))
+		{
+			throw StatementException(_rStmt, "SQLBindParameter(std::vector<UTF16String>)");
 		}
 	}
 
@@ -859,7 +938,7 @@ private:
 		typename T::const_iterator end = val.end();
 		for (; it != end; ++it)
 		{
-			std::size_t sz = it->size();
+			std::size_t sz = it->size() * sizeof(T);
 			if (sz > _maxFieldSize)
 				throw LengthExceededException();
 
@@ -888,11 +967,13 @@ private:
 	TimeMap          _times;
 	TimestampMap     _timestamps;
 	StringMap        _strings;
+	UTF16StringMap   _utf16Strings;
 
 	DateVec          _dateVec;
 	TimeVec          _timeVec;
 	DateTimeVec      _dateTimeVec;
 	CharPtrVec       _charPtrs;
+	UTF16CharPtrVec  _utf16CharPtrs;
 	BoolPtrVec       _boolPtrs;
 	const TypeInfo*  _pTypeInfo;
 	SQLINTEGER       _paramSetSize;
@@ -1239,6 +1320,24 @@ inline void Binder::bind(std::size_t pos, const std::deque<std::string>& val, Di
 inline void Binder::bind(std::size_t pos, const std::list<std::string>& val, Direction dir)
 {
 	bindImplContainerString(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir)
+{
+	bindImplContainerUTF16String(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir)
+{
+	bindImplContainerUTF16String(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir)
+{
+	bindImplContainerUTF16String(pos, val, dir);
 }
 
 inline void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)

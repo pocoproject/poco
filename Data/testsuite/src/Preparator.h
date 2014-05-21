@@ -36,72 +36,75 @@ public:
 		/// Destroys the Preparator.
 
 	void prepare(std::size_t pos, const Poco::Int8&);
-		/// Preparations an Int8.
+		/// Prepares an Int8.
 
 	void prepare(std::size_t pos, const Poco::UInt8&);
-		/// Preparations an UInt8.
+		/// Prepares an UInt8.
 
 	void prepare(std::size_t pos, const Poco::Int16&);
-		/// Preparations an Int16.
+		/// Prepares an Int16.
 
 	void prepare(std::size_t pos, const Poco::UInt16&);
-		/// Preparations an UInt16.
+		/// Prepares an UInt16.
 
 	void prepare(std::size_t pos, const Poco::Int32&);
-		/// Preparations an Int32.
+		/// Prepares an Int32.
 
 	void prepare(std::size_t pos, const Poco::UInt32&);
-		/// Preparations an UInt32.
+		/// Prepares an UInt32.
 
 	void prepare(std::size_t pos, const Poco::Int64&);
-		/// Preparations an Int64.
+		/// Prepares an Int64.
 
 	void prepare(std::size_t pos, const Poco::UInt64&);
-		/// Preparations an UInt64.
+		/// Prepares an UInt64.
 
 #ifndef POCO_LONG_IS_64_BIT
 	void prepare(std::size_t pos, const long&);
-		/// Preparations a long.
+		/// Prepares a long.
 
 	void prepare(std::size_t pos, const unsigned long&);
-		/// Preparations an unsigned long.
+		/// Prepares an unsigned long.
 #endif
 
 	void prepare(std::size_t pos, const bool&);
-		/// Preparations a boolean.
+		/// Prepares a boolean.
 
 	void prepare(std::size_t pos, const float&);
-		/// Preparations a float.
+		/// Prepares a float.
 
 	void prepare(std::size_t pos, const double&);
-		/// Preparations a double.
+		/// Prepares a double.
 
 	void prepare(std::size_t pos, const char&);
-		/// Preparations a single character.
+		/// Prepares a single character.
 
 	void prepare(std::size_t pos, const std::string&);
-		/// Preparations a string.
+		/// Prepares a string.
+
+	void prepare(std::size_t pos, const Poco::UTF16String&);
+		/// Prepares a UTF16String.
 
 	void prepare(std::size_t pos, const Poco::Data::BLOB&);
-		/// Preparations a BLOB.
+		/// Prepares a BLOB.
 
 	void prepare(std::size_t pos, const Poco::Data::CLOB&);
-		/// Preparations a CLOB.
+		/// Prepares a CLOB.
 
 	void prepare(std::size_t pos, const Poco::Data::Date&);
-		/// Preparations a Date.
+		/// Prepares a Date.
 
 	void prepare(std::size_t pos, const Poco::Data::Time&);
-		/// Preparations a Time.
+		/// Prepares a Time.
 
 	void prepare(std::size_t pos, const Poco::DateTime&);
-		/// Preparations a DateTime.
+		/// Prepares a DateTime.
 
 	void prepare(std::size_t pos, const Poco::Any&);
-		/// Preparations an Any.
+		/// Prepares an Any.
 
 	void prepare(std::size_t pos, const Poco::Dynamic::Var&);
-		/// Preparations a Var.
+		/// Prepares a Var.
 };
 
 

@@ -149,6 +149,8 @@ public:
 	virtual void testTransactor();
 	virtual void testNullable();
 
+	virtual void testUnicode();
+
 	virtual void testReconnect();
 
 protected:
@@ -172,6 +174,7 @@ protected:
 	virtual void recreateBoolTable();
 	virtual void recreateMiscTable();
 	virtual void recreateLogTable();
+	virtual void recreateUnicodeTable();
 
 	static SessionPtr init(const std::string& driver,
 		std::string& dsn,
@@ -354,6 +357,12 @@ inline void ODBCTest::recreateMiscTable()
 inline void ODBCTest::recreateLogTable()
 { 
 	throw Poco::NotImplementedException("ODBCTest::recreateLogTable()");
+}
+
+
+inline void ODBCTest::recreateUnicodeTable()
+{
+	throw Poco::NotImplementedException("ODBCTest::recreateUnicodeTable()");
 }
 
 

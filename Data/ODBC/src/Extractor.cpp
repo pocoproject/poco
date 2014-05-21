@@ -65,6 +65,22 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 
 
 template<>
+bool Extractor::extractBoundImpl<UTF16String>(std::size_t pos, UTF16String& val)
+{
+	typedef UTF16String::value_type CharT;
+	if (isNull(pos)) return false;
+	std::size_t dataSize = _pPreparator->actualDataSize(pos);
+	CharT* sp = AnyCast<CharT*>(_pPreparator->at(pos));
+	std::size_t len = Poco::UnicodeConverter::UTFStrlen(sp);
+	if (len < dataSize) dataSize = len;
+	checkDataSize(dataSize);
+	val.assign(sp, dataSize);
+
+	return true;
+}
+
+
+template<>
 bool Extractor::extractBoundImpl<Poco::Data::Date>(std::size_t pos, Poco::Data::Date& val)
 {
 	if (isNull(pos)) return false;
@@ -275,6 +291,61 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 		else 
 			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
 	}while (true);
+
+	return true;
+}
+
+
+template<>
+bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val, SQLSMALLINT cType)
+{
+	std::size_t maxSize = _pPreparator->getMaxFieldSize();
+	std::size_t fetchedSize = 0;
+	std::size_t totalSize = 0;
+
+	SQLLEN len;
+	const int bufSize = CHUNK_SIZE;
+	Poco::Buffer<UTF16String::value_type> apChar(bufSize);
+	UTF16String::value_type* pChar = apChar.begin();
+	SQLRETURN rc = 0;
+
+	val.clear();
+	resizeLengths(pos);
+
+	do
+	{
+		std::memset(pChar, 0, bufSize);
+		len = 0;
+		rc = SQLGetData(_rStmt,
+			(SQLUSMALLINT)pos + 1,
+			cType, //C data type
+			pChar, //returned value
+			bufSize, //buffer length
+			&len); //length indicator
+
+		if (SQL_NO_DATA != rc && Utility::isError(rc))
+			throw StatementException(_rStmt, "SQLGetData()");
+
+		if (SQL_NO_TOTAL == len)//unknown length, throw
+			throw UnknownDataLengthException("Could not determine returned data length.");
+
+		if (isNullLengthIndicator(len))
+		{
+			_lengths[pos] = len;
+			return false;
+		}
+
+		if (SQL_NO_DATA == rc || !len)
+			break;
+
+		_lengths[pos] += len;
+		fetchedSize = _lengths[pos] > CHUNK_SIZE ? CHUNK_SIZE : _lengths[pos];
+		totalSize += fetchedSize;
+		if (totalSize <= maxSize)
+			val.append(pChar, fetchedSize / sizeof(UTF16Char));
+		else
+			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
+	} while (true);
 
 	return true;
 }
@@ -600,6 +671,42 @@ bool Extractor::extract(std::size_t pos, std::deque<std::string>& val)
 
 
 bool Extractor::extract(std::size_t pos, std::list<std::string>& val)
+{
+	if (Preparator::DE_BOUND == _dataExtraction)
+		return extractBoundImplContainer(pos, val);
+	else
+		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+
+
+bool Extractor::extract(std::size_t pos, UTF16String& val)
+{
+	if (Preparator::DE_MANUAL == _dataExtraction)
+		return extractManualImpl(pos, val, SQL_C_WCHAR);
+	else
+		return extractBoundImpl(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<UTF16String>& val)
+{
+	if (Preparator::DE_BOUND == _dataExtraction)
+		return extractBoundImplContainer(pos, val);
+	else
+		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<UTF16String>& val)
+{
+	if (Preparator::DE_BOUND == _dataExtraction)
+		return extractBoundImplContainer(pos, val);
+	else
+		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<UTF16String>& val)
 {
 	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);

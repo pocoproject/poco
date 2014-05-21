@@ -23,6 +23,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/UTFString.h"
 #include <vector>
 #include <deque>
 #include <list>
@@ -237,6 +238,18 @@ public:
 		/// Prepares a string deque.
 
 	virtual void prepare(std::size_t pos, const std::list<std::string>& val);
+	/// Prepares a character list.
+
+	virtual void prepare(std::size_t pos, const UTF16String&) = 0;
+	/// Prepares a string.
+
+	virtual void prepare(std::size_t pos, const std::vector<UTF16String>& val);
+	/// Prepares a string vector.
+
+	virtual void prepare(std::size_t pos, const std::deque<UTF16String>& val);
+	/// Prepares a string deque.
+
+	virtual void prepare(std::size_t pos, const std::list<UTF16String>& val);
 		/// Prepares a string list.
 
 	virtual void prepare(std::size_t pos, const BLOB&) = 0;
