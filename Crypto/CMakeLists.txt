@@ -23,7 +23,9 @@ install(
     
 install(
     TARGETS ${LIBNAME}
-    DESTINATION lib
+    LIBRARY DESTINATION lib${LIB_SUFFIX}
+    ARCHIVE DESTINATION lib${LIB_SUFFIX}
+    RUNTIME DESTINATION bin
     )
 
 if (ENABLE_TESTS)
