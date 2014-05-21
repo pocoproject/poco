@@ -1216,6 +1216,20 @@ void ODBCTest::testReconnect()
 }
 
 
+void ODBCTest::testUnicode()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateUnicodeTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->unicodeSelect(_rConnectString);
+	}
+}
+
+
 bool ODBCTest::canConnect(const std::string& driver,
 	std::string& dsn,
 	std::string& uid,

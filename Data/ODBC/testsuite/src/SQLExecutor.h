@@ -432,6 +432,7 @@ public:
 	void ranges();
 	void illegalRange();
 	void singleSelect();
+	void unicodeSelect(const std::string& dbConnString);
 	void emptyDB();
 
 	void blob(int bigSize = 1024, const std::string& blobPlaceholder = "?");

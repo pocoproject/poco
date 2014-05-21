@@ -558,6 +558,13 @@ void ODBCPostgreSQLTest::recreateLogTable()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
 }
 
+void ODBCPostgreSQLTest::recreateUnicodeTable()
+{
+	dropObject("TABLE", "UnicodeTable");
+	try { session() << "CREATE TABLE UnicodeTable (str NVARCHAR)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateUnicodeTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateUnicodeTable()"); }
+}
 
 CppUnit::Test* ODBCPostgreSQLTest::suite()
 {
