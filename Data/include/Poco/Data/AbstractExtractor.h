@@ -234,17 +234,17 @@ public:
 	virtual bool extract(std::size_t pos, std::list<std::string>& val);
 		/// Extracts a string list.
 
-	virtual bool extract(std::size_t pos, UTF16String& val) = 0;
-	/// Extracts a string. Returns false if null was received.
+	virtual bool extract(std::size_t pos, UTF16String& val);
+		/// Extracts a UTF16String. Returns false if null was received.
 
 	virtual bool extract(std::size_t pos, std::vector<UTF16String>& val);
-	/// Extracts a string vector.
+		/// Extracts a UTF16String vector.
 
 	virtual bool extract(std::size_t pos, std::deque<UTF16String>& val);
-	/// Extracts a string deque.
+		/// Extracts a UTF16String deque.
 
 	virtual bool extract(std::size_t pos, std::list<UTF16String>& val);
-	/// Extracts a string list.
+		/// Extracts a UTF16String list.
 
 	virtual bool extract(std::size_t pos, BLOB& val) = 0;
 		/// Extracts a BLOB. Returns false if null was received.

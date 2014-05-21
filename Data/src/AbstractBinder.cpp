@@ -292,6 +292,12 @@ void AbstractBinder::bind(std::size_t pos, const std::list<std::string>& val, Di
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const UTF16String& val, Direction dir)
+{
+	throw NotImplementedException("UTF16String binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");

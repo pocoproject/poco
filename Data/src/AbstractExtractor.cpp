@@ -286,21 +286,27 @@ bool AbstractExtractor::extract(std::size_t pos, std::list<std::string>& val)
 }
 
 
+bool AbstractExtractor::extract(std::size_t pos, UTF16String& val)
+{
+	throw NotImplementedException("UTF16String extractor must be implemented.");
+}
+
+
 bool AbstractExtractor::extract(std::size_t pos, std::vector<UTF16String>& val)
 {
-	throw NotImplementedException("std::vector extractor must be implemented.");
+	throw NotImplementedException("std::vector<UTF16String> extractor must be implemented.");
 }
 
 
 bool AbstractExtractor::extract(std::size_t pos, std::deque<UTF16String>& val)
 {
-	throw NotImplementedException("std::deque extractor must be implemented.");
+	throw NotImplementedException("std::deque<UTF16String> extractor must be implemented.");
 }
 
 
 bool AbstractExtractor::extract(std::size_t pos, std::list<UTF16String>& val)
 {
-	throw NotImplementedException("std::list extractor must be implemented.");
+	throw NotImplementedException("std::list<UTF16String> extractor must be implemented.");
 }
 
 

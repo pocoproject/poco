@@ -57,6 +57,7 @@
 // the header file that contains the definition for conditional 
 // definitions.) For more information, see SdkDdkVer.h.
 
+
 #if defined(_WIN32_WINNT)
 	#if (_WIN32_WINNT < 0x0501)
 		#error Unsupported Windows version.
@@ -68,13 +69,20 @@
 #elif !defined(_WIN32_WINNT)
 	// Define minimum supported version.
 	// This can be changed, if needed.
-	// Otherwise, the Platform_WIN32.h will do
-	// its best to determine the appropriate values
+	// If allowed (see POCO_MIN_WINDOWS_OS_SUPPORT
+	// below), Platform_WIN32.h will do its
+	// best to determine the appropriate values
 	// and may redefine these. See Platform_WIN32.h
 	// for details.
 	#define _WIN32_WINNT 0x0501
 	#define NTDDI_VERSION 0x05010100
 #endif
+
+
+// To prevent Platform_WIN32.h to modify version defines,
+// uncomment this, otherwise versions will be automatically
+// discovered in Platform_WIN32.h.
+// #define POCO_FORCE_MIN_WINDOWS_OS_SUPPORT
 
 
 #include <windows.h>
