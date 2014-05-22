@@ -348,6 +348,11 @@ public:
 		return false;
 	}
 	
+	const Data::BLOB& value() const
+	{
+		return _val;
+	}	
+	
 private:
 	Data::BLOB _val;
 };
