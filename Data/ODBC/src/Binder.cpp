@@ -73,6 +73,10 @@ void Binder::freeMemory()
 	CharPtrVec::iterator endChr = _charPtrs.end();
 	for (; itChr != endChr; ++itChr) std::free(*itChr);
 
+	UTF16CharPtrVec::iterator itUTF16Chr = _utf16CharPtrs.begin();
+	UTF16CharPtrVec::iterator endUTF16Chr = _utf16CharPtrs.end();
+	for (; itUTF16Chr != endUTF16Chr; ++itUTF16Chr) std::free(*itUTF16Chr);
+
 	BoolPtrVec::iterator itBool = _boolPtrs.begin();
 	BoolPtrVec::iterator endBool = _boolPtrs.end();
 	for (; itBool != endBool; ++itBool) delete [] *itBool;
@@ -120,6 +124,58 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		0,
 		pVal, 
 		(SQLINTEGER) size, 
+		_lengthIndicator.back())))
+	{
+		throw StatementException(_rStmt, "SQLBindParameter(std::string)");
+	}
+}
+
+
+void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
+{
+	typedef UTF16String::value_type CharT;
+
+	SQLPOINTER pVal = 0;
+	SQLINTEGER size = (SQLINTEGER)(val.size() * sizeof(CharT));
+
+	if (isOutBound(dir))
+	{
+		getColumnOrParameterSize(pos, size);
+		CharT* pChar = (CharT*)std::calloc(size, 1);
+		pVal = (SQLPOINTER)pChar;
+		_outParams.insert(ParamMap::value_type(pVal, size));
+		_utf16Strings.insert(UTF16StringMap::value_type(pChar, const_cast<UTF16String*>(&val)));
+	}
+	else if (isInBound(dir))
+	{
+		pVal = (SQLPOINTER)val.c_str();
+		_inParams.insert(ParamMap::value_type(pVal, size));
+	}
+	else
+		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
+
+	SQLLEN* pLenIn = new SQLLEN;
+	SQLINTEGER colSize = 0;
+	SQLSMALLINT decDigits = 0;
+	getColSizeAndPrecision(pos, SQL_C_WCHAR, colSize, decDigits);
+	*pLenIn = SQL_NTS;
+
+	if (PB_AT_EXEC == _paramBinding)
+	{
+		*pLenIn = SQL_LEN_DATA_AT_EXEC(size);
+	}
+
+	_lengthIndicator.push_back(pLenIn);
+
+	if (Utility::isError(SQLBindParameter(_rStmt,
+		(SQLUSMALLINT)pos + 1,
+		toODBCDirection(dir),
+		SQL_C_WCHAR,
+		SQL_WLONGVARCHAR,
+		(SQLUINTEGER)colSize,
+		0,
+		pVal,
+		(SQLINTEGER)size,
 		_lengthIndicator.back())))
 	{
 		throw StatementException(_rStmt, "SQLBindParameter(std::string)");

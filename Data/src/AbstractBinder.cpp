@@ -292,6 +292,30 @@ void AbstractBinder::bind(std::size_t pos, const std::list<std::string>& val, Di
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const UTF16String& val, Direction dir)
+{
+	throw NotImplementedException("UTF16String binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
@@ -408,6 +432,8 @@ void AbstractBinder::bind(std::size_t pos, const Any& val, Direction dir)
 		bind(pos, RefAnyCast<Int32>(val), dir);
 	else if(type == typeid(std::string))
 		bind(pos, RefAnyCast<std::string>(val), dir);
+	else if (type == typeid(Poco::UTF16String))
+		bind(pos, RefAnyCast<Poco::UTF16String>(val), dir);
 	else if (type == typeid(bool))
 		bind(pos, RefAnyCast<bool>(val), dir);
 	else if(type == typeid(char))
@@ -457,6 +483,8 @@ void AbstractBinder::bind(std::size_t pos, const Poco::Dynamic::Var& val, Direct
 		bind(pos, val.extract<Int32>(), dir);
 	else if(type == typeid(std::string))
 		bind(pos, val.extract<std::string>(), dir);
+	else if (type == typeid(Poco::UTF16String))
+		bind(pos, val.extract<Poco::UTF16String>(), dir);
 	else if (type == typeid(bool))
 		bind(pos, val.extract<bool>(), dir);
 	else if(type == typeid(char))

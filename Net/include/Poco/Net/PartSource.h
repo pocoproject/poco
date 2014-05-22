@@ -57,9 +57,15 @@ public:
 		/// Returns a MessageHeader containing additional header
 		/// fields for the part.
 
+	virtual std::streamsize getContentLength() const;
+		/// Returns the content length for this part
+		/// which may be UNKNOWN_CONTENT_LENGTH if
+		/// not available.
+
 	virtual ~PartSource();
 		/// Destroys the PartSource.
 	
+	static const int         UNKNOWN_CONTENT_LENGTH;
 protected:
 	PartSource();
 		/// Creates the PartSource, using

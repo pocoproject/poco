@@ -1060,6 +1060,7 @@
     <ClInclude Include="include\Poco\Types.h" />
     <ClInclude Include="include\Poco\UnWindows.h" />
     <ClInclude Include="include\Poco\UTF32Encoding.h" />
+    <ClInclude Include="include\Poco\UTFString.h" />
     <ClInclude Include="include\Poco\Version.h" />
     <ClInclude Include="include\Poco\Void.h" />
     <ClInclude Include="include\Poco\Base32Decoder.h" />

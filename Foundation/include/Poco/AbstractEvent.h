@@ -223,6 +223,10 @@ public:
 		strategy.notify(pSender, args);
 	}
 
+	bool hasDelegates() const {
+		return !(_strategy.empty());
+	}
+
 	ActiveResult<TArgs> notifyAsync(const void* pSender, const TArgs& args)
 		/// Sends a notification to all registered delegates. The order is 
 		/// determined by the TStrategy. This method is not blocking and will

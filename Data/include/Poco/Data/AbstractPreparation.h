@@ -44,7 +44,7 @@ public:
 		/// Destroys the AbstractPreparation.
 
 	virtual void prepare() = 0;
-		/// Preparations data.
+		/// Prepares data.
 
 protected:
 	AbstractPreparation();

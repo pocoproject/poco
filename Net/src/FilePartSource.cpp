@@ -16,6 +16,7 @@
 
 #include "Poco/Net/FilePartSource.h"
 #include "Poco/Path.h"
+#include "Poco/File.h"
 #include "Poco/Exception.h"
 
 
@@ -28,7 +29,7 @@ namespace Net {
 
 
 FilePartSource::FilePartSource(const std::string& path):
-	_istr(path)
+	_path(path), _istr(path)
 {
 	Path p(path);
 	_filename = p.getFileName();
@@ -39,6 +40,7 @@ FilePartSource::FilePartSource(const std::string& path):
 
 FilePartSource::FilePartSource(const std::string& path, const std::string& mediaType):
 	PartSource(mediaType),
+	_path(path),
 	_istr(path)
 {
 	Path p(path);
@@ -50,6 +52,7 @@ FilePartSource::FilePartSource(const std::string& path, const std::string& media
 
 FilePartSource::FilePartSource(const std::string& path, const std::string& filename, const std::string& mediaType):
 	PartSource(mediaType),
+	_path(path),
 	_filename(filename),
 	_istr(path)
 {
@@ -73,6 +76,13 @@ std::istream& FilePartSource::stream()
 const std::string& FilePartSource::filename() const
 {
 	return _filename;
+}
+
+
+std::streamsize FilePartSource::getContentLength() const
+{
+	Poco::File p(_path);
+	return p.getSize();
 }
 
 

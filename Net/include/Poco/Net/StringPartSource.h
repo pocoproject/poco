@@ -55,6 +55,9 @@ public:
 	const std::string& filename() const;
 		/// Returns the filename portion of the path.
 
+	std::streamsize getContentLength() const;
+		/// Returns the string size.
+
 private:
 	std::istringstream _istr;
 	std::string        _filename;

@@ -134,6 +134,10 @@ std::string TemporaryFile::tempName(const std::string& tempDir)
 	unsigned long n = count++;
 	mutex.unlock();
 	name << (tempDir.empty() ? Path::temp() : tempDir);
+	if (name.str().at(name.str().size() - 1) != Path::separator())
+	{
+		name << Path::separator();
+	}
 #if defined(POCO_VXWORKS)
 	name << "tmp";
 #else

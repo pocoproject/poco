@@ -2027,6 +2027,22 @@ inline bool operator != (const std::string& other, const Var& da)
 }
 
 
+inline bool operator == (const UTF16String& other, const Var& da)
+	/// Equality operator for comparing Var with UTF16String
+{
+	if (da.isEmpty()) return false;
+	return other == da.convert<UTF16String>();
+}
+
+
+inline bool operator != (const UTF16String& other, const Var& da)
+	/// Inequality operator for comparing Var with UTF16String
+{
+	if (da.isEmpty()) return true;
+	return other != da.convert<UTF16String>();
+}
+
+
 inline bool operator == (const char* other, const Var& da)
 	/// Equality operator for comparing Var with const char*
 {

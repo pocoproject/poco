@@ -109,6 +109,23 @@ public:
 	}
 
 	template <typename T>
+	static T to(const char* pChar)
+	{
+		T utfStr;
+		Poco::UnicodeConverter::convert(pChar, utfStr);
+		return utfStr;
+	}
+
+
+	template <typename T>
+	static T to(const std::string& str)
+	{
+		T utfStr;
+		Poco::UnicodeConverter::convert(str, utfStr);
+		return utfStr;
+	}
+
+	template <typename T>
 	static std::size_t UTFStrlen(const T* ptr)
 		/// Returns the length (in characters) of a zero-terminated UTF string.
 	{

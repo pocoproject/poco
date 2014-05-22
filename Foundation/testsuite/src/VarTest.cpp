@@ -1115,7 +1115,7 @@ void VarTest::testString()
 	Poco::UInt64 s9;
 	float s10;
 	double s11;
-	bool s12;
+	bool s12 = false;
 	char s13;
 	a1.convert(s1);
 	a1.convert(s2);

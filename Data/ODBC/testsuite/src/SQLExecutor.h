@@ -479,6 +479,7 @@ public:
 		const std::string& intFldName = "int0");
 
 	void internalBulkExtraction();
+	void internalBulkExtractionUTF16();
 	void internalStorageType();
 	void nulls();
 	void notNulls(const std::string& sqlState = "23502");
@@ -502,6 +503,8 @@ public:
 	void transaction(const std::string& connect);
 	void transactor();
 	void nullable();
+
+	void unicode(const std::string& dbConnString);
 
 	void reconnect();
 

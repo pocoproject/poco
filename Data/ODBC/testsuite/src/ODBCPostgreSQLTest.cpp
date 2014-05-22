@@ -53,6 +53,10 @@ using Poco::DateTime;
 	#define POSTGRESQL_DSN "PocoDataPgSQLTest"
 #endif
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	#pragma message ("Using " POSTGRESQL_ODBC_DRIVER " driver.")
+#endif
+
 #define POSTGRESQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define POSTGRESQL_PORT    "5432"
 #define POSTGRESQL_DB      "postgres"
@@ -559,6 +563,17 @@ void ODBCPostgreSQLTest::recreateLogTable()
 }
 
 
+void ODBCPostgreSQLTest::recreateUnicodeTable()
+{
+#if defined (POCO_ODBC_UNICODE)
+	dropObject("TABLE", "UnicodeTable");
+	try { session() << "CREATE TABLE UnicodeTable (str TEXT)", now; }
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateUnicodeTable()"); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateUnicodeTable()"); }
+#endif
+}
+
+
 CppUnit::Test* ODBCPostgreSQLTest::suite()
 {
 	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString)))
@@ -659,6 +674,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNullable);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testUnicode);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testReconnect);
 
 		return pSuite;

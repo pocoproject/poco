@@ -67,6 +67,9 @@ Release 1.5.3 (2014-05-xx)
 - fixed GH #442: Use correct prefix length field of Windows IP_ADAPTER_PREFIX structure
 - improved GH #328: NetworkInterface on Windows XP
 - fixed GH #154 Add support for MYSQL_TYPE_NEWDECIMAL to Poco::Data::MySQL
+- fixed GH #290: Unicode support
+- fixed GH #318: Logger local time doesn't automatically account for DST
+- fixed GH #363: DateTimeParser tryParse/parse
 
 Release 1.5.2 (2013-09-16)
 ==========================
