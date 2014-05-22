@@ -250,9 +250,7 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 	KeyValue kv(key, sValue);
 	
 	if (eventsEnabled())
-	
 	{
-
 		propertyChanging(this, kv);
 	}
 	
@@ -299,9 +297,7 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 	}
 
 	if (eventsEnabled())
-
 	{
-
 		propertyChanged(this, kv);
 	}
 }

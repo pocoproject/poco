@@ -154,7 +154,7 @@ public:
 	void add(const Dynamic::Var& value);
 		/// Add the given value to the array
 
-	void set(unsigned int index, const Dynamic::Var &value);
+	void set(unsigned int index, const Dynamic::Var& value);
 		/// Update the element on the given index to specified value
 
 	void stringify(std::ostream& out, unsigned int indent = 0, int step = -1) const;
@@ -224,7 +224,7 @@ inline void Array::add(const Dynamic::Var& value)
 }
 
 
-inline void Array::set(unsigned int index, const Dynamic::Var &value)
+inline void Array::set(unsigned int index, const Dynamic::Var& value)
 {
 	if (index >= _values.size()) _values.resize(index + 1);
 	_values[index] = value;
