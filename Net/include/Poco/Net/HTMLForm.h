@@ -153,7 +153,14 @@ public:
 		/// Otherwise, if the request's HTTP version is HTTP/1.1:
 		///    - the request's persistent connection state is left unchanged
 		///    - the content transfer encoding is set to chunked
-		
+
+
+	std::streamsize calculateContentLength();
+		/// Calculate the content length for the form.
+		/// May be UNKNOWN_CONTENT_LENGTH if not possible
+		/// to calculate
+
+
 	void write(std::ostream& ostr, const std::string& boundary);
 		/// Writes the form data to the given output stream,
 		/// using the specified encoding.
@@ -183,6 +190,7 @@ public:
 	static const std::string ENCODING_URL;       /// "application/x-www-form-urlencoded"
 	static const std::string ENCODING_MULTIPART; /// "multipart/form-data"
 
+	static const int         UNKNOWN_CONTENT_LENGTH;
 protected:
 	void readUrl(std::istream& istr);
 	void readMultipart(std::istream& istr, PartHandler& handler);
