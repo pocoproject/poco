@@ -71,7 +71,8 @@ AAAIntroduction
   - fixed GH #154 Add support for MYSQL_TYPE_NEWDECIMAL to Poco::Data::MySQL
   - fixed GH #290: Unicode support
   - fixed GH #318: Logger local time doesn't automatically account for DST
-
+  - fixed GH #363: DateTimeParser tryParse/parse
+  
 !!Incompatible Changes and Possible Transition Issues
 
   - Data::ODBC: UTF-16 Unicode is now directly mapped and recognized as type by ODBC.

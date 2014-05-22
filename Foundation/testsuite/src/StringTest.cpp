@@ -969,7 +969,7 @@ void StringTest::testIntToString()
 	{
 		char pResult[POCO_MAX_INT_STRING_LEN];
 		std::size_t sz = POCO_MAX_INT_STRING_LEN;
-		intToStr(0, 10, pResult, sz, false, sz + 1, ' ');
+		intToStr(0, 10, pResult, sz, false, (int) sz + 1, ' ');
 		fail ("must throw RangeException");
 	} catch (RangeException&) { }
 }
