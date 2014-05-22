@@ -206,16 +206,8 @@ namespace
 					}
 					break;
 				case 's':
-				{
-					const Any& val = *itVal++;
-					if (val.type() == typeid(char*))
-						str << AnyCast<char*>(val);
-					else if (val.type() == typeid(const char*))
-						str << AnyCast<const char*>(val);
-					else
-						str << RefAnyCast<std::string>(val);
+					str << RefAnyCast<std::string>(*itVal++);
 					break;
-				}
 				case 'z':
 					str << AnyCast<std::size_t>(*itVal++); 
 					break;
