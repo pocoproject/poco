@@ -295,7 +295,7 @@ void JSONConfiguration::setValue(const std::string& key, const Poco::DynamicAny&
 			}
 			arr = nextArray;
 		}
-		arr->add(value);
+		arr->set(indexes.back(), value);
 	}
 
 	if (eventsEnabled())
