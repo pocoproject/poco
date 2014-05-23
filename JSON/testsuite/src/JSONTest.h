@@ -53,6 +53,7 @@ public:
 	void testStringElement();
 	void testEmptyObjectElement();
 	void testDoubleElement();
+	void testSetArrayElement();
 	void testOptValue();
 	void testQuery();
 	void testComment();

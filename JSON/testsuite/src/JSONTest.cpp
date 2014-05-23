@@ -991,6 +991,34 @@ void JSONTest::testDoubleElement()
 }
 
 
+void JSONTest::testSetArrayElement()
+{
+	std::string json = "[]";
+	Parser parser;
+	Var result = parser.parse(json);
+	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
+
+	// array[0] = 7
+	array->set(0, 7);
+	assert(array->size() == 1);
+	assert(array->getElement<int>(0) == 7);
+
+	// array[2] = "foo"
+	array->set(2, std::string("foo"));
+	assert(array->size() == 3);
+	assert(array->getElement<int>(0) == 7);
+	assert(array->isNull(1));
+	assert(array->getElement<std::string>(2) == "foo");
+
+	// array[1] = 13
+	array->set(1, 13);
+	assert(array->size() == 3);
+	assert(array->getElement<int>(0) == 7);
+	assert(array->getElement<int>(1) == 13);
+	assert(array->getElement<std::string>(2) == "foo");
+}
+
+
 void JSONTest::testOptValue()
 {
 	std::string json = "{ }";
@@ -1717,6 +1745,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testStringElement);
 	CppUnit_addTest(pSuite, JSONTest, testEmptyObjectElement);
 	CppUnit_addTest(pSuite, JSONTest, testDoubleElement);
+	CppUnit_addTest(pSuite, JSONTest, testSetArrayElement);
 	CppUnit_addTest(pSuite, JSONTest, testOptValue);
 	CppUnit_addTest(pSuite, JSONTest, testQuery);
 	CppUnit_addTest(pSuite, JSONTest, testComment);
