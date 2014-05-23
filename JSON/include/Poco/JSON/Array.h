@@ -154,6 +154,9 @@ public:
 	void add(const Dynamic::Var& value);
 		/// Add the given value to the array
 
+	void set(unsigned int index, const Dynamic::Var& value);
+		/// Update the element on the given index to specified value
+
 	void stringify(std::ostream& out, unsigned int indent = 0, int step = -1) const;
 		/// Prints the array to out. When indent has zero value,
 		/// the array will be printed without newline breaks and spaces between elements.
@@ -218,6 +221,13 @@ inline bool Array::isArray(ConstIterator& it) const
 inline void Array::add(const Dynamic::Var& value)
 {
 	_values.push_back(value);
+}
+
+
+inline void Array::set(unsigned int index, const Dynamic::Var& value)
+{
+	if (index >= _values.size()) _values.resize(index + 1);
+	_values[index] = value;
 }
 
 

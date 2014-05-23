@@ -86,6 +86,36 @@ void JSONConfigurationTest::testLoad()
 }
 
 
+void JSONConfigurationTest::testSetArrayElement()
+{
+	JSONConfiguration config;
+
+	std::string json = "{ \"config\" : "
+							" { \"prop1\" : \"value1\", "
+							" \"prop2\" : 10, "
+							" \"prop3\" : [ \"element1\", \"element2\" ], "
+							" \"prop4\" : { \"prop5\" : false, "
+											" \"prop6\" : null } "
+							" }"
+						"}";
+
+	std::istringstream iss(json);
+	config.load(iss);
+
+	// config.prop3[0] = "foo"
+	config.setString("config.prop3[0]", "foo");
+	assert(config.getString("config.prop3[0]") == "foo");
+
+	// config.prop3[1] = "bar"
+	config.setString("config.prop3[1]", "bar");
+	assert(config.getString("config.prop3[1]") == "bar");
+
+	// config.prop3[3] = "baz"
+	config.setString("config.prop3[3]", "baz");
+	assert(config.getString("config.prop3[3]") == "baz");
+}
+
+
 AbstractConfiguration* JSONConfigurationTest::allocConfiguration() const
 {
 	return new JSONConfiguration;
@@ -108,6 +138,7 @@ CppUnit::Test* JSONConfigurationTest::suite()
 
 	AbstractConfigurationTest_addTests(pSuite, JSONConfigurationTest);
 	CppUnit_addTest(pSuite, JSONConfigurationTest, testLoad);
+	CppUnit_addTest(pSuite, JSONConfigurationTest, testSetArrayElement);
 
 	return pSuite;
 }
