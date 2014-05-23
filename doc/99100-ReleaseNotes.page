@@ -72,6 +72,12 @@ AAAIntroduction
   - fixed GH #290: Unicode support
   - fixed GH #318: Logger local time doesn't automatically account for DST
   - fixed GH #363: DateTimeParser tryParse/parse
+  - added HTMLForm Content-Length calculation (Rangel Reale)
+  - Make TemporaryFile append a slash to tempDir
+  - Make TemporaryFile append a slash to tempDir
+  - fixed GH #319 android build with cmake
+  - added hasDelegates() method to AbstractEvent
+  - fixed GH #230: Poco::Timer problem
   
 !!Incompatible Changes and Possible Transition Issues
 

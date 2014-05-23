@@ -70,6 +70,11 @@ Release 1.5.3 (2014-05-xx)
 - fixed GH #290: Unicode support
 - fixed GH #318: Logger local time doesn't automatically account for DST
 - fixed GH #363: DateTimeParser tryParse/parse
+- added HTMLForm Content-Length calculation (Rangel Reale)
+- Make TemporaryFile append a slash to tempDir
+- fixed GH #319 android build with cmake
+- added hasDelegates() method to AbstractEvent
+- fixed GH #230: Poco::Timer problem
 
 Release 1.5.2 (2013-09-16)
 ==========================
