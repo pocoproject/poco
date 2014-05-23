@@ -122,9 +122,10 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 	poco_assert (std::memcmp(_rawHeader, HEADER, ZipCommon::HEADER_SIZE) == 0);
 	// read the rest of the header
 	inp.read(_rawHeader + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
-	poco_assert (_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED);
-	poco_assert (getMajorVersionNumber() <= 2);
-	poco_assert (ZipUtil::get16BitValue(_rawHeader, COMPR_METHOD_POS) < ZipCommon::CM_UNUSED);
+	if (!(_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED))
+		throw Poco::DataFormatException("bad ZIP file header", "invalid version");
+	if (ZipUtil::get16BitValue(_rawHeader, COMPR_METHOD_POS) >= ZipCommon::CM_UNUSED)
+		throw Poco::DataFormatException("bad ZIP file header", "invalid compression method");
 	parseDateTime();
 	Poco::UInt16 len = getFileNameLength();
 	Poco::Buffer<char> buf(len);
