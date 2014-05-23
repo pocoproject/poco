@@ -27,6 +27,7 @@ public:
 	virtual ~JSONConfigurationTest();
 
 	void testLoad();
+	void testSetArrayElement();
 
 	void setUp();
 	void tearDown();
