@@ -78,6 +78,8 @@ AAAIntroduction
   - fixed GH #319 android build with cmake
   - added hasDelegates() method to AbstractEvent
   - fixed GH #230: Poco::Timer problem
+  - fixed GH #317: Poco::Zip does not support newer Zip file versions.
+  
   
 !!Incompatible Changes and Possible Transition Issues
 
