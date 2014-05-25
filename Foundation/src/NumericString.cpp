@@ -13,7 +13,13 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
+#include "Poco/Bugcheck.h"
+
+
 // +++ double conversion +++
+#define UNREACHABLE poco_bugcheck
+#define UNIMPLEMENTED poco_bugcheck
 #include "diy-fp.cc"
 #include "cached-powers.cc"
 #include "bignum-dtoa.cc"
