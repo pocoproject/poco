@@ -1224,12 +1224,14 @@ void JSONTest::testPrintHandler()
 void JSONTest::testStringify()
 {
 	Object jObj(false);
-	jObj.set("foo", 0);
-	jObj.set("bar", 0);
+	jObj.set("foo\\", 0);
+	jObj.set("bar/", 0);
 	jObj.set("baz", 0);
+	jObj.set("q\"uote\"d", 0);
 	std::stringstream ss;
 	jObj.stringify(ss);
-	assert(ss.str() == "{\"bar\":0,\"baz\":0,\"foo\":0}");
+
+	assert(ss.str() == "{\"bar/\":0,\"baz\":0,\"foo\\\\\":0,\"q\\\"uote\\\"d\":0}");
 
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
 						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
@@ -1269,6 +1271,7 @@ void JSONTest::testStringify()
 						"\"wife\":{"
 						"\"age\":36,\"name\":\"Marge\""
 						"}}}";
+
 	assert (ostr.str() == str);
 
 	ostr.str("");
@@ -1653,16 +1656,9 @@ void JSONTest::testUnicode()
 	Parser parser;
 
 	Var result;
-	try
-	{
-		parser.parse(json);
-		result = parser.asVar();
-	}
-	catch(JSONException& jsone)
-	{
-		std::cout << jsone.message() << std::endl;
-		assert(false);
-	}
+	parser.parse(json);
+	result = parser.asVar();
+
 	assert(result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
@@ -1675,6 +1671,54 @@ void JSONTest::testUnicode()
 	converter.convert(text, original);
 
 	assert(test.convert<std::string>() == original);
+
+	parser.reset();
+	std::ostringstream os;
+	os << '[' << (char) 0x92 << ']';
+	try
+	{
+		parser.parse(os.str());
+		fail("Invalid Unicode sequence, must fail.");
+	}
+	catch (JSONException&) {}
+
+	parser.reset();
+	os.str("");
+	os << '[' << (char)0xC2 << (char)0x92 << ']';
+	result = parser.parse(os.str());
+	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+
+	parser.reset();
+	os.str("");
+	os << '[' << (char)0xAC << ']';
+	try
+	{
+		parser.parse(os.str());
+		fail("Invalid Unicode sequence, must fail.");
+	}
+	catch (JSONException&) {}
+
+	parser.reset();
+	os.str("");
+	os << '[' << (char)0xE2 << (char)0x82 << (char)0xAC << ']';
+	result = parser.parse(os.str());
+	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+
+	parser.reset();
+	os.str("");
+	os << '[' << (char)0xA2 << ']';
+	try
+	{
+		parser.parse(os.str());
+		fail("Invalid Unicode sequence, must fail.");
+	}
+	catch (JSONException&){}
+
+	parser.reset();
+	os.str("");
+	os << '[' << (char)0xF0 << (char)0xA4 << (char)0xAD << (char)0xAD << ']';
+	result = parser.parse(os.str());
+	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
 }
 
 

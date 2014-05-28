@@ -602,6 +602,10 @@ private:
 	static const int _stateTransitionTable[NR_STATES][NR_CLASSES];
 	static const int xx = -1;
 
+	bool isHighSurrogate(unsigned uc);
+	bool isLowSurrogate(unsigned uc);
+	unsigned decodeSurrogatePair(unsigned hi, unsigned lo);
+
 	Handler::Ptr   _pHandler;
 	signed char    _state;
 	signed char    _beforeCommentState;
@@ -710,6 +714,24 @@ inline void Parser::assertNonContainer()
 inline void Parser::growBuffer()
 {
 	_parseBuffer.setCapacity(_parseBuffer.size() * 2, true);
+}
+
+
+inline bool Parser::isHighSurrogate(unsigned uc)
+{
+	return (uc & 0xFC00) == 0xD800;
+}
+
+
+inline bool Parser::isLowSurrogate(unsigned uc)
+{
+	return (uc & 0xFC00) == 0xDC00;
+}
+
+
+inline unsigned Parser::decodeSurrogatePair(unsigned hi, unsigned lo)
+{
+	return ((hi & 0x3FF) << 10) + (lo & 0x3FF) + 0x10000;
 }
 
 
