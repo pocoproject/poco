@@ -349,6 +349,9 @@ void FormatTest::testIndex()
 
 	s = format("%%%[1]d%%%[2]d%%%d", 1, 2, 3);
 	assert(s == "%2%3%1");
+
+	s = format("%%%d%%%d%%%[0]d", 1, 2);
+	assert(s == "%1%2%1");
 }
 
 

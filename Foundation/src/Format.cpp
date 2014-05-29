@@ -350,7 +350,7 @@ void format(std::string& result, const std::string& fmt, const std::vector<Any>&
 		{
 		case '%':
 			++itFmt;
-			if (itFmt != endFmt && itVal != endVal)
+			if (itFmt != endFmt && (itVal != endVal || *itFmt == '['))
 			{
 				if (*itFmt == '[')
 				{
