@@ -70,9 +70,13 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 void Stringifier::formatString(const std::string& value, std::ostream& out)
 {
 	out << '"';
-	for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+	for (std::string::const_iterator it = value.begin(),
+		 end = value.end(); it != end; ++it)
 	{
-		if (*it <= 0x1F || *it == '"' || *it == '\\') out << '\\';
+		if (*it <= 0x1F || *it == '"' || *it == '\\' || *it == '/')
+		{
+			out << '\\';
+		}
 		out << *it;
 	}
 	out << '"';

@@ -1231,7 +1231,7 @@ void JSONTest::testStringify()
 	std::stringstream ss;
 	jObj.stringify(ss);
 
-	assert(ss.str() == "{\"bar/\":0,\"baz\":0,\"foo\\\\\":0,\"q\\\"uote\\\"d\":0}");
+	assert(ss.str() == "{\"bar\\/\":0,\"baz\":0,\"foo\\\\\":0,\"q\\\"uote\\\"d\":0}");
 
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
 						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
