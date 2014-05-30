@@ -114,6 +114,10 @@ public:
 
 	void leaveGroup(const IPAddress& groupAddress, const NetworkInterface& interfc);
 		/// Leaves the specified multicast group at the given interface.
+
+private:
+	static NetworkInterface findFirstInterface(const IPAddress& groupAddress);
+		/// Returns first multicast-eligible network interface.
 };
 
 
