@@ -48,7 +48,7 @@ NTPClientTest::~NTPClientTest()
 
 void NTPClientTest::testTimeSync()
 {
-	assert(_ntpClient.request("pool.ntp.br") > 0);
+	assert(_ntpClient.request("pool.ntp.org") > 0);
 }
 
 
