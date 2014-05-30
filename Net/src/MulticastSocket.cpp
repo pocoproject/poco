@@ -193,8 +193,7 @@ unsigned MulticastSocket::getTimeToLive() const
 	
 void MulticastSocket::joinGroup(const IPAddress& groupAddress)
 {
-	NetworkInterface intf;
-	joinGroup(groupAddress, intf);
+	joinGroup(groupAddress, findFirstInterface(groupAddress));
 }
 
 	
@@ -216,6 +215,42 @@ void MulticastSocket::joinGroup(const IPAddress& groupAddress, const NetworkInte
 		impl()->setRawOption(IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mr, sizeof(mr));
 #endif
 	}
+}
+
+
+NetworkInterface MulticastSocket::findFirstInterface(const IPAddress& groupAddress)
+{
+	NetworkInterface::Map m = NetworkInterface::map();
+	if (groupAddress.family() == IPAddress::IPv4)
+	{
+		for (NetworkInterface::Map::const_iterator it = m.begin(); it != m.end(); ++it)
+		{
+			if (it->second.supportsIPv4() &&
+				it->second.firstAddress(IPAddress::IPv4).isUnicast() &&
+				!it->second.isLoopback() &&
+				!it->second.isPointToPoint())
+			{
+				return it->second;
+			}
+		}
+	}
+#ifdef POCO_HAVE_IPv6
+	else if (groupAddress.family() == IPAddress::IPv6)
+	{
+		for (NetworkInterface::Map::const_iterator it = m.begin(); it != m.end(); ++it)
+		{
+			if (it->second.supportsIPv6() &&
+				it->second.firstAddress(IPAddress::IPv6).isUnicast() &&
+				!it->second.isLoopback() &&
+				!it->second.isPointToPoint())
+			{
+				return it->second;
+			}
+		}
+	}
+#endif // POCO_HAVE_IPv6
+
+	throw NotFoundException("No multicast-eligible network interface found.");
 }
 
 	

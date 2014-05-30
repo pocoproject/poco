@@ -118,7 +118,8 @@ void PrintHandler::key(const std::string& k)
 		comma();
 		_value = false;
 	}
-	_out << _tab << '"' << k << '"';
+	_out << _tab;
+	Stringifier::formatString(k, _out);
 	if (!printFlat()) _out << ' ';
 	_out << ':';
 	if (!printFlat()) _out << ' ';

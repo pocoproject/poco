@@ -70,46 +70,17 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 void Stringifier::formatString(const std::string& value, std::ostream& out)
 {
 	out << '"';
-	for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+	for (std::string::const_iterator it = value.begin(),
+		 end = value.end(); it != end; ++it)
 	{
-		if (*it == 0x20 ||
-			*it == 0x21 ||
-			(*it >= 0x23 && *it <= 0x2E) ||
-			(*it >= 0x30 && *it <= 0x5B) ||
-			(*it >= 0x5D && *it <= 0xFF))
-			out << *it;
-		else if (*it == '"')
-			out << "\\\"";
-		else if (*it == '\\')
-			out << "\\\\";
-		else if (*it == '\b')
-			out << "\\b";
-		else if (*it == '\f')
-			out << "\\f";
-		else if (*it == '\n')
-			out << "\\n";
-		else if (*it == '\r')
-			out << "\\r";
-		else if (*it == '\t')
-			out << "\\t";
-		else if ( *it == '\0' )
-			out << "\\u0000";
-		else
+		if (*it <= 0x1F || *it == '"' || *it == '\\' || *it == '/')
 		{
-			const char *hexdigits = "0123456789ABCDEF";
-			unsigned long u = (std::min)(static_cast<unsigned long>(static_cast<unsigned char>(*it)), 0xFFFFul);
-			int d1 = u / 4096; u -= d1 * 4096;
-			int d2 = u / 256; u -= d2 * 256;
-			int d3 = u / 16; u -= d3 * 16;
-			int d4 = u;
-			out << "\\u";
-			out << hexdigits[d1];
-			out << hexdigits[d2];
-			out << hexdigits[d3];
-			out << hexdigits[d4];
+			out << '\\';
 		}
+		out << *it;
 	}
 	out << '"';
 }
+
 
 } }  // Namespace Poco::JSON
