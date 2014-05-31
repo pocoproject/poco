@@ -40,6 +40,8 @@ public:
 	FTPStreamBuf(std::istream& istr):
 		_istr(istr)
 	{
+		// make sure exceptions from underlying string propagate
+		_istr.exceptions(std::ios::badbit);
 	}
 	
 	~FTPStreamBuf()
