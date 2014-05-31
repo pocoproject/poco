@@ -14,9 +14,6 @@
 //
 
 
-#ifndef POCO_NO_WSTRING
-
-
 #include "Poco/UnicodeConverter.h"
 #include "Poco/TextConverter.h"
 #include "Poco/TextIterator.h"
@@ -164,6 +161,3 @@ void UnicodeConverter::convert(const UTF32Char* utf32String, std::string& utf8St
 
 
 } // namespace Poco
-
-
-#endif // POCO_NO_WSTRING
