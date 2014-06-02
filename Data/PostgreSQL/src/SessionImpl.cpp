@@ -78,8 +78,7 @@ namespace Data {
 namespace PostgreSQL {
 
 SessionImpl::SessionImpl(const std::string & aConnectionString, std::size_t aLoginTimeout )
-    : Poco::Data::AbstractSessionImpl< SessionImpl >( aConnectionString, aLoginTimeout ),
-	  _inTransaction( false )
+    : Poco::Data::AbstractSessionImpl< SessionImpl >( aConnectionString, aLoginTimeout )
 {
 	setProperty( "handle", static_cast< SessionHandle* >( &_sessionHandle ) );
 	setConnectionTimeout( CONNECTION_TIMEOUT_DEFAULT );
@@ -194,18 +193,25 @@ SessionImpl::createStatementImpl()
 	return dynamic_cast< Poco::Data::StatementImpl* > ( new PostgreSQLStatementImpl ( *this ) );
 //	return new PostgreSQLStatementImpl( *this );
 }
+    
 
+bool
+SessionImpl::isTransaction()
+{
+    return _sessionHandle.isTransaction();
+}
 
+    
 void
 SessionImpl::begin()
 {
-	if ( _inTransaction )
+	if ( isTransaction() )
     {
 		throw Poco::InvalidAccessException( "Already in transaction." );
     }
     
 	_sessionHandle.startTransaction();
-	_inTransaction = true;
+
 }
 
 
@@ -214,15 +220,14 @@ SessionImpl::commit()
 {
     // Not an error to issue a COMMIT without a preceeding BEGIN
 	_sessionHandle.commit();
-	_inTransaction = false;
 }
 	
 
 void
 SessionImpl::rollback()
 {
+    // Not an error to issue a ROLLBACK without a preceeding BEGIN
 	_sessionHandle.rollback();
-	_inTransaction = false;
 }
 
 
@@ -230,7 +235,6 @@ void
 SessionImpl::setAutoCommit( const std::string &, bool aValue )
 {
 	_sessionHandle.setAutoCommit( aValue );
-    _inTransaction = ! aValue;
 }
 
 

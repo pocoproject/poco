@@ -59,7 +59,7 @@ class StatementExecutor
 public:
 	enum State
 	{
-		STMT_INITED,
+        STMT_INITED,
 		STMT_COMPILED,
 		STMT_EXECUTED
 	};

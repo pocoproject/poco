@@ -54,6 +54,11 @@
 
 
 namespace Poco {
+
+//namespace Dynamic {
+//	class Var;
+//}
+
 namespace Data {
 namespace PostgreSQL {
 
@@ -366,6 +371,7 @@ private:
         {
             val = tempString;
         }
+       
         
 		return returnValue;
 	}
