@@ -146,13 +146,17 @@ std::string Thread::makeName()
 
 namespace
 {
-	static FastMutex uniqueIdMutex;
+	FastMutex& getUniqueIdMutex()
+	{
+		static FastMutex uniqueIdMutex;
+		return uniqueIdMutex;
+	}
 }
 
 
 int Thread::uniqueId()
 {
-	FastMutex::ScopedLock lock(uniqueIdMutex);
+	FastMutex::ScopedLock lock(getUniqueIdMutex());
 
 	static unsigned count = 0;
 	++count;
