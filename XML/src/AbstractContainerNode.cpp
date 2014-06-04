@@ -22,6 +22,7 @@
 #include "Poco/DOM/ElementsByTagNameList.h"
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/NumberParser.h"
+#include "Poco/UnicodeConverter.h"
 
 
 namespace Poco {
@@ -417,7 +418,13 @@ const Node* AbstractContainerNode::findNode(XMLString::const_iterator& it, const
 				XMLString index;
 				while (it != end && *it != ']') index += *it++;
 				if (it != end) ++it;
+#ifdef XML_UNICODE_WCHAR_T
+				std::string idx;
+				Poco::UnicodeConverter::convert(index, idx);
+				return findNode(it, end, findElement(Poco::NumberParser::parse(idx), pNode, pNSMap), pNSMap);
+#else
 				return findNode(it, end, findElement(Poco::NumberParser::parse(index), pNode, pNSMap), pNSMap);
+#endif
 			}
 		}
 		else
