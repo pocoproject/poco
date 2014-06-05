@@ -19,6 +19,7 @@
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
 #include "Poco/UnicodeConverter.h"
+#include "Poco/UTFString.h"
 #include <cstring>
 
 
@@ -46,11 +47,16 @@ private:
 		// Convert from UTF-8 to wide
 		T wtext, wtext2, wtext3;
 		Poco::UnicodeConverter::convert(text, wtext);
+		if (sizeof(T) == 2)
+			assert(Poco::UnicodeConverter::UTFStrlen(wtext.data()) == 8);
+		else if (sizeof(T) == 4)
+			assert(Poco::UnicodeConverter::UTFStrlen(wtext.data()) == 5);
 		Poco::UnicodeConverter::convert((const char*) supp, strlen((const char*) supp), wtext2);
-		Poco::UnicodeConverter::convert((const char*) supp, wtext3);
+		Poco::UnicodeConverter::convert((const char*)supp, wtext3);
+		assert(wtext == wtext2);
+		assert(wtext == wtext3);
 
 		std::string text2, text3, text4;
-	
 		assert (text != text2);
 		assert (text != text3);
 		assert (text != text4);

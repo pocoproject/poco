@@ -33,6 +33,7 @@
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Nullable.h"
+#include "Poco/UTFString.h"
 #include "Poco/Exception.h"
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -232,6 +233,19 @@ public:
 
 	bool extract(std::size_t pos, std::list<std::string>& val);
 		/// Extracts a string list.
+		/// Extracts a single character list.
+
+	bool extract(std::size_t pos, UTF16String& val);
+	/// Extracts a string.
+
+	bool extract(std::size_t pos, std::vector<UTF16String>& val);
+	/// Extracts a string vector.
+
+	bool extract(std::size_t pos, std::deque<UTF16String>& val);
+	/// Extracts a string deque.
+
+	bool extract(std::size_t pos, std::list<UTF16String>& val);
+	/// Extracts a string list.
 
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
@@ -372,7 +386,10 @@ private:
 
 	bool extractBoundImplContainer(std::size_t pos, std::vector<std::string>& values);
 	bool extractBoundImplContainer(std::size_t pos, std::deque<std::string>& values);
-	bool extractBoundImplContainer(std::size_t pos, std::list<std::string>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::list<std::string>& values); 
+	bool extractBoundImplContainer(std::size_t pos, std::vector<Poco::UTF16String>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::deque<Poco::UTF16String>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::list<Poco::UTF16String>& values);
 	bool extractBoundImplContainer(std::size_t pos, std::vector<Poco::Data::CLOB>& values);
 	bool extractBoundImplContainer(std::size_t pos, std::deque<Poco::Data::CLOB>& values);
 	bool extractBoundImplContainer(std::size_t pos, std::list<Poco::Data::CLOB>& values);
@@ -394,7 +411,19 @@ private:
 		ItType it = values.begin();
 		ItType end = values.end();
 		for (int row = 0; it != end; ++it, ++row)
-			it->assign(*pc + row * colWidth, _pPreparator->actualDataSize(pos, row));
+		{
+			it->assign(*pc + row * colWidth / sizeof(CharType), _pPreparator->actualDataSize(pos, row));
+			// clean up superfluous null chars returned by some drivers
+			typename StringType::size_type trimLen = 0;
+			typename StringType::reverse_iterator sIt = it->rbegin();
+			typename StringType::reverse_iterator sEnd = it->rend();
+			for (; sIt != sEnd; ++sIt)
+			{
+				if (*sIt == '\0') ++trimLen;
+				else break;
+			}
+			if (trimLen) it->assign(it->begin(), it->begin() + it->length() - trimLen);
+		}
 
 		return true;
 	}
@@ -522,6 +551,9 @@ private:
 			case MetaColumn::FDT_STRING:
 			{ return extAny<T, std::string>(pos, val); }
 
+			case MetaColumn::FDT_WSTRING:
+			{ return extAny<T, Poco::UTF16String>(pos, val); }
+
 			case MetaColumn::FDT_BLOB:
 			{ return extAny<T, Poco::Data::BLOB>(pos, val); }
 
@@ -587,6 +619,24 @@ inline bool Extractor::extractBoundImplContainer(std::size_t pos, std::deque<std
 
 
 inline bool Extractor::extractBoundImplContainer(std::size_t pos, std::list<std::string>& values)
+{
+	return extractBoundImplContainerString(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, std::vector<Poco::UTF16String>& values)
+{
+	return extractBoundImplContainerString(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, std::deque<Poco::UTF16String>& values)
+{
+	return extractBoundImplContainerString(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, std::list<Poco::UTF16String>& values)
 {
 	return extractBoundImplContainerString(pos, values);
 }

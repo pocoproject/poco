@@ -46,6 +46,9 @@ namespace Poco {
 
 void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential)
 {
+	if (fmt.empty() || str.empty())
+		throw SyntaxException("Empty string.");
+
 	int year   = 0;
 	int month  = 0;
 	int day    = 0;

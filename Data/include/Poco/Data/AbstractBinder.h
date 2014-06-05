@@ -28,6 +28,7 @@
 #include "Poco/Nullable.h"
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
+#include "Poco/UTFString.h"
 #include <vector>
 #include <deque>
 #include <list>
@@ -245,6 +246,18 @@ public:
 
 	virtual void bind(std::size_t pos, const std::list<std::string>& val, Direction dir = PD_IN);
 		/// Binds a string list.
+
+	virtual void bind(std::size_t pos, const UTF16String& val, Direction dir = PD_IN);
+		/// Binds a UTF-16 Unicode string.
+
+	virtual void bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir = PD_IN);
+		/// Binds a UTF-16 Unicode string vector.
+
+	virtual void bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir = PD_IN);
+		/// Binds a UTF-16 Unicode string deque.
+
+	virtual void bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir = PD_IN);
+		/// Binds a UTF-16 Unicode string list.
 
 	virtual void bind(std::size_t pos, const BLOB& val, Direction dir = PD_IN) = 0;
 		/// Binds a BLOB.

@@ -25,6 +25,7 @@
 #include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Data/Limit.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/UTFString.h"
 #include "Poco/AutoPtr.h"
 #include <vector>
 #include <deque>
@@ -144,7 +145,26 @@ public:
 		/// - string is empty 
 		/// - getEmptyStringIsNull() returns true
 
+	bool isValueNull(const Poco::UTF16String& str, bool deflt);
+		/// Overload for const reference to UTF16String.
+		///
+		/// Returns true when folowing conditions are met:
+		///
+		/// - string is empty 
+		/// - getEmptyStringIsNull() returns true
+
 private:
+	template <typename S>
+	bool isStringNull(const S& str, bool deflt)
+	{
+		if (getForceEmptyString()) return false;
+
+		if (getEmptyStringIsNull() && str.empty())
+			return true;
+
+		return deflt;
+	}
+
 	ExtractorPtr _pExtractor;
 	Poco::UInt32 _limit;
 	Poco::UInt32 _position;
@@ -239,6 +259,18 @@ inline void AbstractExtraction::setForceEmptyString(bool forceEmptyString)
 inline bool AbstractExtraction::getForceEmptyString() const
 {
 	return _forceEmptyString;
+}
+
+
+inline bool AbstractExtraction::isValueNull(const std::string& str, bool deflt)
+{
+	return isStringNull(str, deflt);
+}
+
+
+inline bool AbstractExtraction::isValueNull(const Poco::UTF16String& str, bool deflt)
+{
+	return isStringNull(str, deflt);
 }
 
 

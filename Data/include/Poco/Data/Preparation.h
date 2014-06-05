@@ -50,7 +50,7 @@ public:
 	}
 
 	void prepare()
-		/// Preparations data.
+		/// Prepares data.
 	{
 		TypeHandler<T>::prepare(_pos, _val, preparation());
 	}
@@ -82,7 +82,7 @@ public:
 	}
 
 	void prepare()
-		/// Preparations data.
+		/// Prepares data.
 	{
 		TypeHandler<std::vector<T> >::prepare(_pos, _val, preparation());
 	}
@@ -114,7 +114,7 @@ public:
 	}
 
 	void prepare()
-		/// Preparations data.
+		/// Prepares data.
 	{
 		TypeHandler<std::deque<T> >::prepare(_pos, _val, preparation());
 	}
@@ -146,7 +146,7 @@ public:
 	}
 
 	void prepare()
-		/// Preparations data.
+		/// Prepares data.
 	{
 		TypeHandler<std::list<T> >::prepare(_pos, _val, preparation());
 	}

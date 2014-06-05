@@ -30,17 +30,7 @@ namespace Poco {
 namespace JSON {
 
 
-#ifndef IS_HIGH_SURROGATE
-	#define IS_HIGH_SURROGATE(uc) (((uc) & 0xFC00) == 0xD800)
-#endif
-#ifndef IS_LOW_SURROGATE
-	#define IS_LOW_SURROGATE(uc)  (((uc) & 0xFC00) == 0xDC00)
-#endif
-#ifndef DECODE_SURROGATE_PAIR
-	#define DECODE_SURROGATE_PAIR(hi,lo) ((((hi) & 0x3FF) << 10) + ((lo) & 0x3FF) + 0x10000)
-#endif
-#define COUNTOF(x) (sizeof(x)/sizeof(x[0])) 
-static unsigned char utf8_lead_bits[4] = { 0x00, 0xC0, 0xE0, 0xF0 };
+static const unsigned char UTF8_LEAD_BITS[4] = { 0x00, 0xC0, 0xE0, 0xF0 };
 
 
 const int Parser::_asciiClass[] = {
@@ -245,6 +235,7 @@ void Parser::addEscapedCharToParseBuffer(CharIntType nextChar)
 	_escaped = 0;
 	// remove the backslash
 	parseBufferPopBackChar();
+
 	switch(nextChar)
 	{
 	case 'b':
@@ -304,44 +295,38 @@ Parser::CharIntType Parser::decodeUnicodeChar()
 	int i;
 	unsigned uc = 0;
 	char* p;
-	int trail_bytes;
+	int trailBytes;
 
 	poco_assert(_parseBuffer.size() >= 6);
 	p = &_parseBuffer[_parseBuffer.size() - 4];
 
-	for (i = 12; i >= 0; i -= 4, ++p) {
+	for (i = 12; i >= 0; i -= 4, ++p)
+	{
 		unsigned x = *p;
 
-		if (x >= 'a') {
-			x -= ('a' - 10);
-		} else if (x >= 'A') {
-			x -= ('A' - 10);
-		} else {
-			x &= ~0x30u;
-		}
+		if (x >= 'a')      x -= ('a' - 10);
+		else if (x >= 'A') x -= ('A' - 10);
+		else               x &= ~0x30u;
 
 		poco_assert(x < 16);
-
 		uc |= x << i;
 	}
 
-	if ( !_allowNullByte && uc == 0 ) return 0; // Null byte not allowed
+	if ( !_allowNullByte && uc == 0 ) return 0; 
 
 	// clear UTF-16 char from buffer
 	_parseBuffer.resize(_parseBuffer.size() - 6);
 
-	// attempt decoding 
 	if (_utf16HighSurrogate)
 	{
-		if (IS_LOW_SURROGATE(uc))
+		if (isLowSurrogate(uc))
 		{
-			uc = DECODE_SURROGATE_PAIR(_utf16HighSurrogate, uc);
-			trail_bytes = 3;
+			uc = decodeSurrogatePair(_utf16HighSurrogate, uc);
+			trailBytes = 3;
 			_utf16HighSurrogate = 0;
 		}
-		else
+		else // high surrogate without a following low surrogate
 		{
-			// high surrogate without a following low surrogate
 			return 0;
 		}
 	}
@@ -349,32 +334,32 @@ Parser::CharIntType Parser::decodeUnicodeChar()
 	{
 		if (uc < 0x80)
 		{
-			trail_bytes = 0;
+			trailBytes = 0;
 		}
 		else if (uc < 0x800)
 		{
-			trail_bytes = 1;
+			trailBytes = 1;
 		}
-		else if (IS_HIGH_SURROGATE(uc))
+		else if (isHighSurrogate(uc))
 		{
 			// save the high surrogate and wait for the low surrogate
 			_utf16HighSurrogate = uc;
 			return 1;
 		}
-		else if (IS_LOW_SURROGATE(uc))
+		else if (isLowSurrogate(uc))
 		{
 			// low surrogate without a preceding high surrogate 
 			return 0;
 		}
 		else
 		{
-			trail_bytes = 2;
+			trailBytes = 2;
 		}
 	}
 
-	_parseBuffer.append((char) ((uc >> (trail_bytes * 6)) | utf8_lead_bits[trail_bytes]));
+	_parseBuffer.append((char) ((uc >> (trailBytes * 6)) | UTF8_LEAD_BITS[trailBytes]));
 
-	for (i = trail_bytes * 6 - 6; i >= 0; i -= 6)
+	for (i = trailBytes * 6 - 6; i >= 0; i -= 6)
 	{
 		_parseBuffer.append((char) (((uc >> i) & 0x3F) | 0x80));
 	}

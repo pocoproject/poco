@@ -221,7 +221,7 @@ private:
 		{
 			for(unsigned int i = 0; i < indent; i++) out << ' ';
 
-			out << '"' << getKey(it) << '"';
+			Stringifier::stringify(getKey(it), out);
 			out << ((indent > 0) ? " : " : ":");
 
 			Stringifier::stringify(getValue(it), out, indent + step, step);

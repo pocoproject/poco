@@ -834,6 +834,17 @@ void ODBCOracleTest::recreateLogTable()
 }
 
 
+void ODBCOracleTest::recreateUnicodeTable()
+{
+#if defined (POCO_ODBC_UNICODE)
+	dropObject("TABLE", "UnicodeTable");
+	try { session() << "CREATE TABLE UnicodeTable (str NVARCHAR2(30))", now; }
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateUnicodeTable()"); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateUnicodeTable()"); }
+#endif
+}
+
+
 CppUnit::Test* ODBCOracleTest::suite()
 {
 	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString)))
@@ -923,6 +934,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testNullable);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testUnicode);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testReconnect);
 
 		return pSuite;

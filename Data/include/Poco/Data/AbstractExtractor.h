@@ -23,6 +23,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Constants.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/UTFString.h"
 #include <vector>
 #include <deque>
 #include <list>
@@ -232,6 +233,18 @@ public:
 
 	virtual bool extract(std::size_t pos, std::list<std::string>& val);
 		/// Extracts a string list.
+
+	virtual bool extract(std::size_t pos, UTF16String& val);
+		/// Extracts a UTF16String. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<UTF16String>& val);
+		/// Extracts a UTF16String vector.
+
+	virtual bool extract(std::size_t pos, std::deque<UTF16String>& val);
+		/// Extracts a UTF16String deque.
+
+	virtual bool extract(std::size_t pos, std::list<UTF16String>& val);
+		/// Extracts a UTF16String list.
 
 	virtual bool extract(std::size_t pos, BLOB& val) = 0;
 		/// Extracts a BLOB. Returns false if null was received.

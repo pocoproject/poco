@@ -84,6 +84,9 @@ public:
 	void bind(std::size_t pos, const std::string& val, Direction dir);
 		/// Binds a string.
 
+	void bind(std::size_t pos, const Poco::UTF16String& val, Direction dir);
+		/// Binds a UTF16String.
+
 	void bind(std::size_t pos, const BLOB& val, Direction dir);
 		/// Binds a BLOB.
 

@@ -327,6 +327,8 @@ void StatementImpl::makeExtractors(std::size_t count)
 				addInternalExtract<double>(mc); break;
 			case MetaColumn::FDT_STRING: 
 				addInternalExtract<std::string>(mc); break;
+			case MetaColumn::FDT_WSTRING:
+				addInternalExtract<Poco::UTF16String>(mc); break;
 			case MetaColumn::FDT_BLOB:   
 				addInternalExtract<BLOB>(mc); break;
 			case MetaColumn::FDT_DATE:

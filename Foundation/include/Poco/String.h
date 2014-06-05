@@ -23,7 +23,6 @@
 #include "Poco/Foundation.h"
 #include "Poco/Ascii.h"
 #include <cstring>
-#include <locale>
 #include <algorithm>
 
 

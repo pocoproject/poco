@@ -61,14 +61,27 @@ void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority
 {
 	Clock nextInvocation;
 	nextInvocation += static_cast<Clock::ClockVal>(_startInterval)*1000;
-
-	poco_assert (!_pCallback);
-
+	
 	FastMutex::ScopedLock lock(_mutex);	
+
+	if (_pCallback)
+	{
+		throw Poco::IllegalStateException("Timer already running");
+	}
+
 	_nextInvocation = nextInvocation;
 	_pCallback = method.clone();
 	_wakeUp.reset();
-	threadPool.startWithPriority(priority, *this);
+	try
+	{
+		threadPool.startWithPriority(priority, *this);
+	}
+	catch (...)
+	{
+		delete _pCallback;
+		_pCallback = 0;
+		throw;
+	}
 }
 
 
@@ -164,7 +177,7 @@ void Timer::run()
 		}
 		while (sleep < 0);
 
-		if (_wakeUp.tryWait(sleep))
+		if (_wakeUp.tryWait(sleep > _periodicInterval ? _periodicInterval : sleep))
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
 			_nextInvocation.update();

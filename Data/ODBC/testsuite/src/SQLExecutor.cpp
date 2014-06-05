@@ -46,6 +46,8 @@
 #include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
+#include "Poco/UnicodeConverter.h"
+#include "Poco/UTFString.h"
 #include <sqltypes.h>
 #include <iostream>
 #include <sstream>
@@ -94,7 +96,9 @@ using Poco::NotImplementedException;
 using Poco::BadCastException;
 using Poco::RangeException;
 using Poco::TimeoutException;
-
+using Poco::UnicodeConverter;
+using Poco::UTF16String;
+using Poco::UTF32String;
 
 struct Person
 {
@@ -2441,24 +2445,24 @@ void SQLExecutor::dateTime()
 	DateTime born(1965, 6, 18, 5, 35, 1);
 	int count = 0;
 	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(born), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 1);
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
+	assert(count == 1);
 
 	DateTime res;
 	try { session() << "SELECT Born FROM Person", into(res), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (res == born);
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
+	assert(res == born);
 
 	Statement stmt = (session() << "SELECT Born FROM Person", now);
 	RecordSet rset(stmt);
 
 	res = rset["Born"].convert<DateTime>();
-	assert (res == born);
+	assert(res == born);
 }
 
 
@@ -2619,7 +2623,7 @@ void SQLExecutor::internalExtraction()
 		rset.moveFirst();
 		assert (rset["str0"] == "3");
 		rset.moveLast();
-		assert (rset["str0"] == "6");
+		assert(rset["str0"] == "6");
 
 		RecordSet rset2(rset);
 		assert (3 == rset2.columnCount());
@@ -2645,8 +2649,17 @@ void SQLExecutor::internalExtraction()
 			assert (2.5 == f);
 		}
 
-		s = rset.value<std::string>(2,2);
-		assert ("5" == s);
+		try
+		{
+			s = rset.value<std::string>(2, 2);
+		}
+		catch (BadCastException&)
+		{
+			UTF16String us = rset.value<Poco::UTF16String>(2, 2);
+			Poco::UnicodeConverter::convert(us, s);
+		}
+		assert("5" == s);
+
 		i = rset.value("str0", 2);
 		assert (5 == i);
 		
@@ -2815,8 +2828,11 @@ void SQLExecutor::internalBulkExtraction()
 		Statement stmt = (session() << "SELECT * FROM Person", bulk(size), now);
 		RecordSet rset(stmt); 
 		assert (size == rset.rowCount());
-		assert ("LN0" == rset["LastName"]);
+		assert("LN0" == rset["LastName"]);
 		assert (0 == rset["Age"]);
+		rset.moveNext();
+		assert("LN1" == rset["LastName"]);
+		assert(1 == rset["Age"]);
 		rset.moveLast();
 		assert (std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
 		assert (size - 1 == rset["Age"]);
@@ -2837,6 +2853,68 @@ void SQLExecutor::internalBulkExtraction()
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+}
+
+
+void SQLExecutor::internalBulkExtractionUTF16()
+{
+	std::string funct = "internalBulkExtraction()";
+	int size = 100;
+	std::vector<UTF16String> lastName(size);
+	std::vector<UTF16String> firstName(size);
+	std::vector<UTF16String> address(size);
+	std::vector<int> age(size);
+
+	for (int i = 0; i < size; ++i)
+	{
+		lastName[i] = Poco::UnicodeConverter::to<UTF16String>("LN" + NumberFormatter::format(i));
+		firstName[i] = Poco::UnicodeConverter::to<UTF16String>("FN" + NumberFormatter::format(i));
+		address[i] = Poco::UnicodeConverter::to<UTF16String>("Addr" + NumberFormatter::format(i));
+		age[i] = i;
+	}
+
+	try
+	{
+		session() << "INSERT INTO Person VALUES (?,?,?,?)",
+			use(lastName, bulk),
+			use(firstName, bulk),
+			use(address, bulk),
+			use(age, bulk),
+			now;
+	}
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
+
+	try
+	{
+		Statement stmt = (session() << "SELECT * FROM Person", bulk(size), now);
+		RecordSet rset(stmt);
+		assert(size == rset.rowCount());
+		assert(Poco::UnicodeConverter::to<UTF16String>("LN0") == rset["LastName"]);
+		assert(0 == rset["Age"]);
+		rset.moveNext();
+		assert(Poco::UnicodeConverter::to<UTF16String>("LN1") == rset["LastName"]);
+		assert(1 == rset["Age"]);
+		rset.moveLast();
+		assert(std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
+		assert(size - 1 == rset["Age"]);
+	}
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
+
+	try
+	{
+		Statement stmt = (session() << "SELECT * FROM Person", limit(size), bulk, now);
+		RecordSet rset(stmt);
+		assert(size == rset.rowCount());
+		assert("LN0" == rset["LastName"]);
+		assert(0 == rset["Age"]);
+		rset.moveLast();
+		assert(std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
+		assert(size - 1 == rset["Age"]);
+	}
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
 }
 
 
@@ -3247,8 +3325,13 @@ void SQLExecutor::any()
 {
 	Any i = 42;
 	Any f = 42.5;
-	Any s = std::string("42");
-
+	std::string ss("42");
+	Any s = ss;
+#ifdef POCO_ODBC_UNICODE
+	UTF16String us;
+	Poco::UnicodeConverter::convert(ss, us);
+	s = us;
+#endif
 	Session tmp = session();
 
 	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
@@ -3263,7 +3346,19 @@ void SQLExecutor::any()
 	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
 	assert (AnyCast<int>(i) == 42);
 	assert (AnyCast<double>(f) == 42.5);
+#ifdef POCO_ODBC_UNICODE
+	// drivers may behave differently here
+	try
+	{
+		assert(AnyCast<UTF16String>(s) == us);
+	}
+	catch (BadCastException&)
+	{
+		assert (AnyCast<std::string>(s) == "42");
+	}
+#else
 	assert (AnyCast<std::string>(s) == "42");
+#endif
 }
 
 
@@ -3830,7 +3925,7 @@ void SQLExecutor::nullable()
 	assert (rs.isNull("EmptyInteger"));
 	assert (rs.isNull("EmptyFloat"));
 	assert (rs.isNull("EmptyDateTime"));
-
+	
 	Var di = 1;
 	Var df = 1.5;
 	Var ds = "abc";
@@ -3840,8 +3935,8 @@ void SQLExecutor::nullable()
 	assert (!df.isEmpty());
 	assert (!ds.isEmpty());
 	assert (!dd.isEmpty());
-
-	session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(di), into(df), into(ds), into(dd), now;
+	
+	Statement stmt = (session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(ds), into(di), into(df), into(dd), now);
 
 	assert (di.isEmpty());
 	assert (df.isEmpty());
@@ -3888,4 +3983,20 @@ void SQLExecutor::reconnect()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == age);
 	assert (session().isConnected());
+}
+
+
+void SQLExecutor::unicode(const std::string& dbConnString)
+{
+	const unsigned char supp[] = { 0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00 };
+	std::string text((const char*) supp);
+
+	UTF16String wtext;
+	Poco::UnicodeConverter::convert(text, wtext);
+	session() << "INSERT INTO UnicodeTable VALUES (?)", use(wtext), now;
+	wtext.clear();
+	text.clear();
+	session() << "SELECT str FROM UnicodeTable", into(wtext), now;
+	Poco::UnicodeConverter::convert(wtext, text);
+	assert(text == std::string((const char*)supp));
 }

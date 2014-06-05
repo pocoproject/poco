@@ -705,10 +705,10 @@ void SQLiteTest::testInsertSingleBulk()
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
-	int x = 0;
+	std::size_t x = 0;
 	Statement stmt((tmp << "INSERT INTO Strings VALUES(:str)", use(x)));
 
-	for (int i = 0; x < 100; ++x)
+	for (std::size_t i = 0; x < 100; ++x)
 	{
 		i = stmt.execute();
 		assert (1 == i);
@@ -835,7 +835,7 @@ void SQLiteTest::testLimitPrepare()
 	Statement stmt = (tmp << "SELECT * FROM Strings", into(retData), limit(50));
 	assert (retData.size() == 0);
 	assert (!stmt.done());
-	Poco::UInt32 rows = stmt.execute();
+	std::size_t rows = stmt.execute();
 	assert (50 == rows);
 	assert (!stmt.done());
 	assert (retData.size() == 50);
@@ -2049,7 +2049,7 @@ void SQLiteTest::testNullable()
 }
 
 
-void SQLiteTest::testNull()
+void SQLiteTest::testNulls()
 {
 	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	ses << "DROP TABLE IF EXISTS NullTest", now;
@@ -2067,13 +2067,19 @@ void SQLiteTest::testNull()
 
 	ses << "INSERT INTO NullTest VALUES(:i, :r, :v)", use(null), use(null), use(null), now;
 	
-	RecordSet rs(ses, "SELECT * FROM NullTest");
+	RecordSet rs(ses, "SELECT i, r, v, null as e FROM NullTest");
 	rs.moveFirst();
 	assert (rs.isNull("i"));
 	assert (rs["i"].isEmpty());
 	assert (rs.isNull("r"));
 	assert (rs.isNull("v"));
 	assert (rs["v"].isEmpty());
+	assert (rs["e"].isEmpty());
+
+	assert (rs[0].isEmpty());
+	assert (rs[1].isEmpty());
+	assert (rs[2].isEmpty());
+	assert (rs[3].isEmpty());
 
 	ses << "DROP TABLE IF EXISTS NullTest", now;
 	ses << "CREATE TABLE NullTest (i INTEGER, r REAL, v VARCHAR)", now;
@@ -2265,13 +2271,15 @@ void SQLiteTest::testDynamicAny()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Anys", now;
-	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR, empty INTEGER)", now;
 
 	DynamicAny i = Int32(42);
 	DynamicAny f = double(42.5);
 	DynamicAny s = std::string("42");
+	DynamicAny e;
+	assert (e.isEmpty());
 
-	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
+	tmp << "INSERT INTO Anys VALUES (?, ?, ?, null)", use(i), use(f), use(s), now;
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
@@ -2280,10 +2288,13 @@ void SQLiteTest::testDynamicAny()
 	i = 0;
 	f = 0.0;
 	s = std::string("");
-	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
+	e = 1;
+	assert (!e.isEmpty());
+	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), into(e), now;
 	assert (42 == i);
 	assert (42.5 == f);
 	assert ("42" == s);
+	assert (e.isEmpty());
 }
 
 
@@ -2585,7 +2596,7 @@ void SQLiteTest::testThreadModes()
 	assert (Utility::isThreadSafe());
 	assert (Utility::getThreadMode() == Utility::THREAD_MODE_SERIAL);
 
-	const int datasize = 1000;
+	const int datasize = 100;
 	ModeVec mode;
 	mode.push_back(Utility::THREAD_MODE_SINGLE);
 	mode.push_back(Utility::THREAD_MODE_MULTI);
@@ -3413,7 +3424,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);
 	CppUnit_addTest(pSuite, SQLiteTest, testNullable);
-	CppUnit_addTest(pSuite, SQLiteTest, testNull);
+	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
 	CppUnit_addTest(pSuite, SQLiteTest, testAny);

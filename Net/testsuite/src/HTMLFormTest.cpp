@@ -147,6 +147,7 @@ void HTMLFormTest::testWriteMultipart()
 		"This is another attachment\r\n"
 		"--MIME_boundary_0123456789--\r\n"
 	);
+	assert(s.length() == form.calculateContentLength());
 }
 
 

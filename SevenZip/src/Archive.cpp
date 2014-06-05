@@ -20,6 +20,7 @@
 #include "Poco/TextConverter.h"
 #include "Poco/UTF8Encoding.h"
 #include "Poco/UTF16Encoding.h"
+#include "Poco/UnicodeConverter.h"
 #include "Poco/FileStream.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
@@ -156,11 +157,20 @@ protected:
 	{
 		checkFile();
 
+#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+		std::wstring wpath;
+		Poco::UnicodeConverter::toUTF16(_path, wpath);
+		if (InFile_OpenW(&_archiveStream.file, wpath.c_str()) != SZ_OK)
+		{
+			throw Poco::OpenFileException(_path);
+		}
+#else
 		if (InFile_Open(&_archiveStream.file, _path.c_str()) != SZ_OK)
 		{
 			throw Poco::OpenFileException(_path);
 		}
-		
+#endif
+	
 		_lookStream.realStream = &_archiveStream.s;
 		LookToRead_Init(&_lookStream);
 

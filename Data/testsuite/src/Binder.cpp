@@ -112,6 +112,11 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 }
 
 
+void Binder::bind(std::size_t pos, const Poco::UTF16String& val, Direction dir)
+{
+}
+
+
 void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
 {
 }

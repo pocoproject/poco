@@ -505,6 +505,37 @@ void DateTimeParserTest::testCustom()
 	assert (dt.hour() == 12);
 	assert (dt.minute() == 30);
 	assert (dt.second() == 0);
+
+	assert (!DateTimeParser::tryParse("%h:%M %a", "", dt, tzd));
+	assert (!DateTimeParser::tryParse("", "12:30 PM", dt, tzd));
+	assert (!DateTimeParser::tryParse("", "", dt, tzd));
+
+	try
+	{
+		DateTimeParser::parse("%h:%M %a", "", tzd);
+		fail ("must fail");
+	}
+	catch (SyntaxException&)
+	{
+	}
+
+	try
+	{
+		DateTimeParser::parse("", "12:30 PM", tzd);
+		fail ("must fail");
+	}
+	catch (SyntaxException&)
+	{
+	}
+
+	try
+	{
+		DateTimeParser::parse("", "", tzd);
+		fail ("must fail");
+	}
+	catch (SyntaxException&)
+	{
+	}
 }
 
 

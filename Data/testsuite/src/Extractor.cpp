@@ -137,6 +137,14 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 }
 
 
+bool Extractor::extract(std::size_t pos, Poco::UTF16String& val)
+{
+	std::string str("");
+	Poco::UnicodeConverter::convert(str, val);
+	return true;
+}
+
+
 bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 {
 	return true;

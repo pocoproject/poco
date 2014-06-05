@@ -30,6 +30,9 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/String.h"
+#include "Poco/UnicodeConverter.h"
+#include "Poco/UTFString.h"
+#include "Poco/UTF8String.h"
 #include "Poco/Any.h"
 #include "Poco/Exception.h"
 #include <vector>
@@ -106,7 +109,7 @@ class Foundation_API VarHolder
 	/// Only data types for which VarHolder specialization exists are supported.
 	/// 
 	/// Provided are specializations for all C++ built-in types with addition of 
-	/// std::string, DateTime, LocalDateTime, Timestamp, std::vector<Var> and DynamicStruct.
+	/// std::string, Poco::UTF16String, DateTime, LocalDateTime, Timestamp, std::vector<Var> and DynamicStruct.
 	///
 	/// Additional types can be supported by adding specializations. When implementing specializations,
 	/// the only condition is that they reside in Poco namespace and implement the pure virtual functions
@@ -207,6 +210,10 @@ public:
 	virtual void convert(std::string& val) const;
 		/// Throws BadCastException. Must be overriden in a type
 		/// specialization in order to suport the conversion.
+
+	virtual void convert(Poco::UTF16String& val) const;
+	/// Throws BadCastException. Must be overriden in a type
+	/// specialization in order to suport the conversion.
 
 	virtual bool isArray() const;
 		/// Returns true.
@@ -534,6 +541,12 @@ inline void VarHolder::convert(std::string& /*val*/) const
 }
 
 
+inline void VarHolder::convert(Poco::UTF16String& /*val*/) const
+{
+	throw BadCastException("Can not convert to Poco::UTF16String");
+}
+
+
 inline bool VarHolder::isArray() const
 {
 	return true;
@@ -728,6 +741,12 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(Poco::UTF16String& val) const
+	{
+		std::string str = NumberFormatter::format(_val);
+		Poco::UnicodeConverter::convert(str, val);
+	}
+
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
 		return cloneHolder(pVarHolder, _val);
@@ -859,6 +878,12 @@ public:
 	void convert(std::string& val) const
 	{
 		val = NumberFormatter::format(_val);
+	}
+
+	void convert(Poco::UTF16String& val) const
+	{
+		std::string str = NumberFormatter::format(_val);
+		Poco::UnicodeConverter::convert(str, val);
 	}
 
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
@@ -2280,15 +2305,15 @@ private:
 };
 
 
-template <typename T>
-class VarHolderImpl<std::basic_string<T> >: public VarHolder
+template <>
+class VarHolderImpl<std::string>: public VarHolder
 {
 public:
 	VarHolderImpl(const char* pVal): _val(pVal)
 	{
 	}
 
-	VarHolderImpl(const std::string& val): _val(val)
+	VarHolderImpl(const std::string& val) : _val(val)
 	{
 	}
 
@@ -2347,16 +2372,16 @@ public:
 
 	void convert(bool& val) const
 	{
-		static const std::string VAL_FALSE("false");
-		static const std::string VAL_INT_FALSE("0");
-
-		if (_val.empty() ||
-			_val == VAL_INT_FALSE ||
-			(icompare(_val, VAL_FALSE) == 0))
+		if (_val.empty())
 		{
 			val = false;
+			return;
 		}
-		else val = true;
+
+		static const std::string VAL_FALSE("false");
+		static const std::string VAL_INT_FALSE("0");
+		val = (_val != VAL_INT_FALSE &&
+			(icompare(_val, VAL_FALSE) != 0));
 	}
 
 	void convert(float& val) const
@@ -2381,6 +2406,11 @@ public:
 	void convert(std::string& val) const
 	{
 		val = _val;
+	}
+
+	void convert(Poco::UTF16String& val) const
+	{
+		Poco::UnicodeConverter::convert(_val, val);
 	}
 
 	void convert(DateTime& val) const
@@ -2415,7 +2445,7 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
-	const std::string& value() const
+	const std:: string& value() const
 	{
 		return _val;
 	}
@@ -2430,14 +2460,14 @@ public:
 		return _val.length();
 	}
 
-	T& operator[](std::string::size_type n)
+	char& operator[](std::string::size_type n)
 	{
 		if (n < size()) return _val.operator[](n);
 
 		throw RangeException("String index out of range");
 	}
 
-	const T& operator[](std::string::size_type n) const
+	const char& operator[](std::string::size_type n) const
 	{
 		if (n < size()) return _val.operator[](n);
 
@@ -2449,7 +2479,195 @@ private:
 	VarHolderImpl(const VarHolderImpl&);
 	VarHolderImpl& operator = (const VarHolderImpl&);
 
-	std::basic_string<T> _val;
+	std::string _val;
+};
+
+
+template <>
+class VarHolderImpl<UTF16String>: public VarHolder
+{
+public:
+	VarHolderImpl(const char* pVal) : _val(Poco::UnicodeConverter::to<UTF16String>(pVal))
+	{
+	}
+
+	VarHolderImpl(const Poco::UTF16String& val) : _val(val)
+	{
+	}
+
+	~VarHolderImpl()
+	{
+	}
+
+	const std::type_info& type() const
+	{
+		return typeid(Poco::UTF16String);
+	}
+
+	void convert(Int8& val) const
+	{
+		int v = NumberParser::parse(toStdString());
+		convertToSmaller(v, val);
+	}
+
+	void convert(Int16& val) const
+	{
+		int v = NumberParser::parse(toStdString());
+		convertToSmaller(v, val);
+	}
+
+	void convert(Int32& val) const
+	{
+		val = NumberParser::parse(toStdString());
+	}
+
+	void convert(Int64& val) const
+	{
+		val = NumberParser::parse64(toStdString());
+	}
+
+	void convert(UInt8& val) const
+	{
+		unsigned int v = NumberParser::parseUnsigned(toStdString());
+		convertToSmallerUnsigned(v, val);
+	}
+
+	void convert(UInt16& val) const
+	{
+		unsigned int v = NumberParser::parseUnsigned(toStdString());
+		convertToSmallerUnsigned(v, val);
+	}
+
+	void convert(UInt32& val) const
+	{
+		val = NumberParser::parseUnsigned(toStdString());
+	}
+
+	void convert(UInt64& val) const
+	{
+		val = NumberParser::parseUnsigned64(toStdString());
+	}
+
+	void convert(bool& val) const
+	{
+		static const std::string VAL_FALSE("false");
+		static const std::string VAL_INT_FALSE("0");
+
+		if (_val.empty()) val = false;
+
+		std::string str;
+		UnicodeConverter::convert(_val, str);
+		val = (str != VAL_INT_FALSE &&
+			(icompare(str, VAL_FALSE) != 0));
+	}
+
+	void convert(float& val) const
+	{
+		double v = NumberParser::parseFloat(toStdString());
+		convertToSmaller(v, val);
+	}
+
+	void convert(double& val) const
+	{
+		val = NumberParser::parseFloat(toStdString());
+	}
+
+	void convert(char& val) const
+	{
+		if (_val.empty())
+			val = '\0';
+		else
+		{
+			std::string s;
+			UnicodeConverter::convert(_val, s);
+			val = s[0];
+		}
+	}
+
+	void convert(Poco::UTF16String& val) const
+	{
+		val = _val;
+	}
+
+	void convert(std::string& val) const
+	{
+		UnicodeConverter::convert(_val, val);
+	}
+
+	void convert(DateTime& val) const
+	{
+		int tzd = 0;
+		if (!DateTimeParser::tryParse(DateTimeFormat::ISO8601_FORMAT, toStdString(), val, tzd))
+			throw BadCastException("string -> DateTime");
+	}
+
+	void convert(LocalDateTime& ldt) const
+	{
+		int tzd = 0;
+		DateTime tmp;
+		if (!DateTimeParser::tryParse(DateTimeFormat::ISO8601_FORMAT, toStdString(), tmp, tzd))
+			throw BadCastException("string -> LocalDateTime");
+
+		ldt = LocalDateTime(tzd, tmp, false);
+	}
+
+	void convert(Timestamp& ts) const
+	{
+		int tzd = 0;
+		DateTime tmp;
+		if (!DateTimeParser::tryParse(DateTimeFormat::ISO8601_FORMAT, toStdString(), tmp, tzd))
+			throw BadCastException("string -> Timestamp");
+
+		ts = tmp.timestamp();
+	}
+
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	{
+		return cloneHolder(pVarHolder, _val);
+	}
+
+	const Poco::UTF16String& value() const
+	{
+		return _val;
+	}
+
+	bool isString() const
+	{
+		return true;
+	}
+
+	std::size_t size() const
+	{
+		return _val.length();
+	}
+
+	UTF16Char& operator[](Poco::UTF16String::size_type n)
+	{
+		if (n < size()) return _val.operator[](n);
+
+		throw RangeException("String index out of range");
+	}
+
+	const UTF16Char& operator[](Poco::UTF16String::size_type n) const
+	{
+		if (n < size()) return _val.operator[](n);
+
+		throw RangeException("String index out of range");
+	}
+
+private:
+	VarHolderImpl();
+	VarHolderImpl(const VarHolderImpl&);
+	VarHolderImpl& operator = (const VarHolderImpl&);
+
+	std::string toStdString() const
+	{
+		std::string str;
+		UnicodeConverter::convert(_val, str);
+		return str;
+	}
+
+	Poco::UTF16String _val;
 };
 
 

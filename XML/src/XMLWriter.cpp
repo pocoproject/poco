@@ -872,7 +872,7 @@ XMLString XMLWriter::uniquePrefix()
 }
 
 
-bool XMLWriter::isNamespaceMapped(const std::string& namespc) const
+bool XMLWriter::isNamespaceMapped(const XMLString& namespc) const
 {
 	return _namespaces.isMapped(namespc);
 }

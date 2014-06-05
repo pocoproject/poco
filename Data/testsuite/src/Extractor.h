@@ -87,6 +87,9 @@ public:
 	bool extract(std::size_t pos, std::string& val);
 		/// Extracts a string.
 
+	bool extract(std::size_t pos, Poco::UTF16String& val);
+		/// Extracts a UTF16String.
+
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
 
