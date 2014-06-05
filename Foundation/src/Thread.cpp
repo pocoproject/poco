@@ -18,6 +18,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Exception.h"
 #include "Poco/ThreadLocal.h"
+#include "Poco/AtomicCounter.h"
 #include <sstream>
 
 
@@ -144,23 +145,10 @@ std::string Thread::makeName()
 }
 
 
-namespace
-{
-	FastMutex& getUniqueIdMutex()
-	{
-		static FastMutex uniqueIdMutex;
-		return uniqueIdMutex;
-	}
-}
-
-
 int Thread::uniqueId()
 {
-	FastMutex::ScopedLock lock(getUniqueIdMutex());
-
-	static unsigned count = 0;
-	++count;
-	return count;
+	static Poco::AtomicCounter counter;
+	return ++counter;
 }
 
 
