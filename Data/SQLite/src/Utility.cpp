@@ -25,7 +25,7 @@
 #if defined(POCO_UNBUNDLED)
 #include <sqlite3.h>
 #else
-#include "sqlite3.h"
+#include "Poco/Data/SQLite/sqlite3.h"
 #endif
 
 

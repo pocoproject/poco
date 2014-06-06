@@ -25,7 +25,11 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
+#if defined(POCO_UNBUNDLED)
+#include <sqlite3.h>
+#else
 #include "sqlite3.h"
+#endif
 
 
 namespace Poco {
