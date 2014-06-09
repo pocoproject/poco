@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.3 (2014-05-xx)
+Release 1.5.3 (2014-06-xx)
 ==========================
 
 - fixed GH# 316: Poco::DateTimeFormatter::append() gives wrong result for 
@@ -76,6 +76,9 @@ Release 1.5.3 (2014-05-xx)
 - added hasDelegates() method to AbstractEvent
 - fixed GH #230: Poco::Timer problem
 - fixed GH #317: Poco::Zip does not support newer Zip file versions.
+- fixed GH #176: Poco::JSON::Stringifier UTF encoding
+- fixed GH #458: Broadcast address and subnet mask for IEEE802.11 network interface
+- fixed GH #456: poco: library install dirs per RUNTIME/LIBRARY/ARCHIVE
 
 
 Release 1.5.2 (2013-09-16)
