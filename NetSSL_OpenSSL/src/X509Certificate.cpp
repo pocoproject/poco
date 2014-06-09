@@ -124,6 +124,9 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 					}
 				}
 			}
+			catch (NoAddressFoundException&)
+			{
+			}
 			catch (HostNotFoundException&)
 			{
 			}
