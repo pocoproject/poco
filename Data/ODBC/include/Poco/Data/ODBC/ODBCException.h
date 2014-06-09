@@ -86,7 +86,8 @@ public:
 	HandleException& operator = (const HandleException& exc)
 		/// Assignment operator
 	{
-		HandleException::operator = (exc);
+		if (&exc != this) _error = exc._error;
+
 		return *this;
 	}
 
