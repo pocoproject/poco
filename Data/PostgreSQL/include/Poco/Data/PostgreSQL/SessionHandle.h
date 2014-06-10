@@ -41,8 +41,9 @@
 #include "Poco/Mutex.h"
 #include "Poco/Types.h"
 
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
 
 #include <libpq-fe.h>
 
@@ -128,7 +129,10 @@ public:
 
 	void startTransaction();
 		/// Start transaction
-
+    
+	bool isTransaction();
+        /// Returns true iff a transaction is a transaction is in progress, false otherwise.
+   
 	void commit();
 		/// Commit transaction
 
@@ -148,7 +152,7 @@ public:
         /// is the connection in Asynchronous commit mode?
     
     void cancel();
-        /// Attempts to cancel in process statements
+        /// Attempts to cancel in-process statements
 
 	void setTransactionIsolation( Poco::UInt32 aTI );
 		/// Sets the transaction isolation level.
@@ -159,6 +163,8 @@ public:
 	bool hasTransactionIsolation( Poco::UInt32 aTI );
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
+    
+    void deallocatePreparedStatement( const std::string & aPreparedStatementToDeAllocate );
 
     int serverVersion() const;
         /// remote server version
@@ -194,17 +200,25 @@ public:
 private:
     static SessionParametersMap setConnectionInfoParameters( PQconninfoOption * aConnectionInfoOptionsPtr );
 
+    void deallocateStoredPreparedStatements();
+
+    bool isConnectedNoLock() const;
+    std::string lastErrorNoLock() const;
+
+
 	SessionHandle            ( const SessionHandle & );
 	SessionHandle& operator= ( const SessionHandle & );
     
 private:
 
-	mutable Poco::FastMutex _sessionMutex;
-	PGconn *                _pConnection;
-    std::string             _connectionString;
-    bool                    _isAutoCommit;
-    bool                    _isAsynchronousCommit;
-    Poco::UInt32            _tranactionIsolationLevel;
+	mutable Poco::FastMutex     _sessionMutex;
+	PGconn *                    _pConnection;
+    std::string                 _connectionString;
+    bool                        _inTransaction;
+    bool                        _isAutoCommit;
+    bool                        _isAsynchronousCommit;
+    Poco::UInt32                _tranactionIsolationLevel;
+    std::vector < std::string > _preparedStatementsToBeDeallocated;
 
 //	static const std::string POSTGRESQL_READ_UNCOMMITTED;  // NOT SUPPORTED
 	static const std::string POSTGRESQL_READ_COMMITTED;
@@ -320,6 +334,13 @@ std::string
 SessionHandle::connectionString() const
 {
     return _connectionString;
+}
+
+inline
+bool
+SessionHandle::isTransaction()
+{
+    return _inTransaction;
 }
     
 inline

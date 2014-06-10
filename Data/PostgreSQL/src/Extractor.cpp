@@ -42,7 +42,6 @@
 #include "Poco/NumberParser.h"
 #include "Poco/DateTimeParser.h"
 
-#include <cstdint>
 #include <limits>
 
 namespace Poco {
@@ -59,29 +58,23 @@ Extractor::Extractor(StatementExecutor& st /*, ResultMetadata& md */ )
 Extractor::~Extractor()
 {
 }
-
+    
 
 bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 {
     
     OutputParameter outputParameter = extractPreamble( pos );
     
-    if ( isColumnNull( outputParameter ) )
-    {
-        return false;
-    }
-
-    int tempInt = -1;
-   
-    if (    ! Poco::NumberParser::tryParse( outputParameter.pData(), tempInt )
-         || tempInt > INT8_MAX
-         || tempInt < INT8_MIN
+    int tempVal;
+    
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParse( outputParameter.pData(), tempVal )
        )
     {
         return false;
     }
-
-    val = tempInt;
+    
+    val = tempVal;
 
     return true;
 }
@@ -90,22 +83,17 @@ bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 {
     OutputParameter outputParameter = extractPreamble( pos );
-
-    if ( isColumnNull( outputParameter ) )
-    {
-        return false;
-    }
-
-    unsigned int tempUInt = -1;
     
-    if (   ! Poco::NumberParser::tryParseUnsigned( outputParameter.pData(), tempUInt )
-        || tempUInt > UINT8_MAX
+    unsigned int tempVal;
+
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParseUnsigned( outputParameter.pData(), tempVal )
        )
     {
         return false;
     }
-    
-    val = tempUInt;
+   
+    val = tempVal;
     
     return true;
 }
@@ -115,23 +103,17 @@ bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 {
     OutputParameter outputParameter = extractPreamble( pos );
 
-    if ( isColumnNull( outputParameter ) )
-    {
-        return false;
-    }
+    int tempVal;
     
-    int tempInt = -1;
-    
-    if (   ! Poco::NumberParser::tryParse( outputParameter.pData(), tempInt )
-        || tempInt > INT16_MAX
-        || tempInt < INT16_MIN
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParse( outputParameter.pData(), tempVal )
        )
     {
         return false;
     }
+ 
+    val = tempVal;
     
-    val = tempInt;
-
     return true;
 }
 
@@ -139,23 +121,18 @@ bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 {
     OutputParameter outputParameter = extractPreamble( pos );
+    
+    unsigned int tempVal;
 
-    if ( isColumnNull( outputParameter ) )
-    {
-        return false;
-    }
-    
-    unsigned int tempUInt = -1;
-    
-    if (   ! Poco::NumberParser::tryParseUnsigned( outputParameter.pData(), tempUInt )
-        || tempUInt > UINT16_MAX
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParseUnsigned( outputParameter.pData(), tempVal )
        )
     {
         return false;
     }
+ 
+    val = tempVal;
     
-    val = tempUInt;
-
     return true;
 }
 
@@ -164,22 +141,12 @@ bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 {
     OutputParameter outputParameter = extractPreamble( pos );
     
-    if ( isColumnNull( outputParameter ) )
-    {
-        return false;
-    }
-
-    int tempInt = -1;
-    
-    if (   ! Poco::NumberParser::tryParse( outputParameter.pData(), tempInt )
-        || tempInt > INT32_MAX  // useless here - size issues
-        || tempInt < INT32_MIN  // useless here - size issues
+    if (     isColumnNull( outputParameter )
+        || ! Poco::NumberParser::tryParse( outputParameter.pData(), val )
        )
     {
         return false;
     }
-    
-    val = tempInt;
 
     return true;
 }
@@ -189,22 +156,13 @@ bool Extractor::extract(std::size_t pos, Poco::UInt32& val)
 {
     OutputParameter outputParameter = extractPreamble( pos );
 
-    if ( isColumnNull( outputParameter ) )
-    {
-        return false;
-    }
-    
-    unsigned int tempUInt = -1;
-    
-    if (    ! Poco::NumberParser::tryParseUnsigned( outputParameter.pData(), tempUInt )
-        || tempUInt > UINT32_MAX  // useless here - size issues
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParseUnsigned( outputParameter.pData(), val )
        )
     {
         return false;
     }
     
-    val = tempUInt;
-
     return true;
 }
 
@@ -213,22 +171,12 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 {
     OutputParameter outputParameter = extractPreamble( pos );
     
-    if ( isColumnNull( outputParameter ) )
-    {
-        return false;
-    }
-
-    Poco::Int64 tempInt = -1;
-    
-    if (   ! Poco::NumberParser::tryParse64( outputParameter.pData(), tempInt )
-        || tempInt > INT64_MAX  // useless here - size issues
-        || tempInt < INT64_MIN  // useless here - size issues
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParse64( outputParameter.pData(), val )
        )
     {
         return false;
     }
-    
-    val = tempInt;
 
     return true;
 }
@@ -238,21 +186,12 @@ bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 {
     OutputParameter outputParameter = extractPreamble( pos );
     
-    if ( isColumnNull( outputParameter ) )
-    {
-        return false;
-    }
-
-    Poco::UInt64 tempUInt = -1;
-    
-    if (   ! Poco::NumberParser::tryParseUnsigned64( outputParameter.pData(), tempUInt )
-        || tempUInt > UINT64_MAX  // useless here - size issues
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParseUnsigned64( outputParameter.pData(), val )
        )
     {
         return false;
     }
-    
-    val = tempUInt;
 
     return true;
 }
@@ -263,22 +202,12 @@ bool Extractor::extract(std::size_t pos, long& val)
 {
     OutputParameter outputParameter = extractPreamble( pos );
     
-    if ( isColumnNull( outputParameter ) )
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParse64( outputParameter.pData(), val )
+       )
     {
         return false;
     }
-
-    Poco::Int64 tempInt = -1;
-    
-    if (   ! Poco::NumberParser::tryParse64( outputParameter.pData(), tempInt )
-        || tempInt > INT64_MAX  // useless here - size issues
-        || tempInt < INT64_MIN  // useless here - size issues
-        )
-    {
-        return false;
-    }
-    
-    val = tempInt;
 
     return true;
 }
@@ -288,21 +217,12 @@ bool Extractor::extract(std::size_t pos, unsigned long& val)
 {
     OutputParameter outputParameter = extractPreamble( pos );
     
-    if ( isColumnNull( outputParameter ) )
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParseUnsigned64( outputParameter.pData(), val )
+       )
     {
         return false;
     }
-
-    Poco::UInt64 tempUInt = -1;
-    
-    if (   ! Poco::NumberParser::tryParseUnsigned64( outputParameter.pData(), tempUInt )
-        || tempUInt > UINT64_MAX  // useless here - size issues
-        )
-    {
-        return false;
-    }
-    
-    val = tempUInt;
 
     return true;
 }
@@ -333,21 +253,18 @@ bool Extractor::extract(std::size_t pos, bool& val)
 bool Extractor::extract(std::size_t pos, float& val )
 {
     OutputParameter outputParameter = extractPreamble( pos );
+    
+    double tempVal;
 
-    if ( isColumnNull( outputParameter ) )
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParseFloat( outputParameter.pData(), tempVal )
+       )
     {
         return false;
     }
 
-    double tempDouble = std::numeric_limits<double>::quiet_NaN();
+    val = tempVal;
     
-    if ( ! Poco::NumberParser::tryParseFloat( outputParameter.pData(), tempDouble ) )
-    {
-        return false;
-    }
-    
-    val = tempDouble;
-
     return true;
 }
 
@@ -356,19 +273,12 @@ bool Extractor::extract(std::size_t pos, double& val )
 {
     OutputParameter outputParameter = extractPreamble( pos );
     
-    if ( isColumnNull( outputParameter ) )
+    if (      isColumnNull( outputParameter )
+         || ! Poco::NumberParser::tryParseFloat( outputParameter.pData(), val )
+        )
     {
         return false;
     }
-
-    double tempDouble = std::numeric_limits<double>::quiet_NaN();
-    
-    if ( ! Poco::NumberParser::tryParseFloat( outputParameter.pData(), tempDouble ) )
-    {
-        return false;
-    }
-    
-    val = tempDouble;
 
     return true;
 }
@@ -581,8 +491,8 @@ Extractor::extractPreamble( std::size_t aPosition ) const
 bool
 Extractor::isColumnNull ( const OutputParameter & anOutputParameter ) const
 {
-    return   anOutputParameter.isNull()
-          || 0 == anOutputParameter.pData();
+    return    anOutputParameter.isNull()
+           || 0 == anOutputParameter.pData();
 }
 
 

@@ -141,7 +141,6 @@ private:
 	std::string     _connectorName;
 	SessionHandle   _sessionHandle;
 
-	bool            _inTransaction;
 	std::size_t     _timeout;
 };
 
@@ -167,12 +166,6 @@ inline const std::string& SessionImpl::connectorName() const
 }
 
 
-inline bool SessionImpl::isTransaction()
-{
-	return _inTransaction;
-}
-
-
 inline bool SessionImpl::isTransactionIsolation( Poco::UInt32 aTI )
 {
 	return getTransactionIsolation() == aTI;
@@ -183,29 +176,6 @@ inline std::size_t SessionImpl::getConnectionTimeout()
 {
 	return _timeout;
 }
-
-/*
-inline
-void
-SessionImpl::setInsertId( const std::string &, const Poco::Any & )
-{
-}
-
-
-inline
-Poco::Any
-SessionImpl::getInsertId( const std::string & )
-{
-	return Poco::Any(Poco::UInt64(postgresql_insert_id(_sessionHandle)));
-}
-
-template <>
-inline std::string& SessionImpl::getValue(POSTGRESQL_BIND* pResult, std::string& val)
-{
-	val.assign((char*) pResult->buffer, pResult->buffer_length);
-	return val;
-}
-*/
 
 
 } } } // namespace Poco::Data::PostgreSQL

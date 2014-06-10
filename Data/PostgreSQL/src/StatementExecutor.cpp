@@ -42,8 +42,10 @@
 #include "Poco/UUIDGenerator.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberParser.h"
+#include "Poco/RegularExpression.h"  // TODO: remove after C++ 11 implementation
 
-#include <regex>
+//#include <regex> // saved for C++ 11 implementation
+#include <algorithm>
 #include <set>
 
 namespace
@@ -53,12 +55,50 @@ namespace
     
         // Find unique placeholders.
         // Unique placeholders allow the same placeholder to be used multiple times in the same statement.
+        
+        // NON C++11 implementation
+        
+//        if ( aSQLStatement.empty() )
+//        {
+//            return 0;
+//        }
+        
+        // set to hold the unique placeholders ($1, $2, $3, etc.).
+        // A set is used because the same placeholder can be used muliple times
+        std::set< std::string > placeholderSet;
+
+        Poco::RegularExpression placeholderRE( "[$][0-9]+" );
+        Poco::RegularExpression::Match match = { 0 , 0 }; // Match is a struct, not a class :-(
+        
+        std::size_t startingPosition = 0;
+        
+        while ( match.offset != std::string::npos )
+        {
+            try
+            {
+                if ( placeholderRE.match( aSQLStatement, startingPosition, match ) )
+                {
+                    placeholderSet.insert( aSQLStatement.substr( match.offset, match.length ) );
+                    startingPosition = match.offset + match.length;
+                }
+            }
+            catch ( Poco::RegularExpressionException & )
+            {
+                break;
+            }
+
+        }
+        
+        
+/*      C++ 11 implementation
 
         std::regex const expression( "[$][0-9]+" );  // match literal dollar signs followed directly by one or more digits
 
         std::sregex_iterator itr( aSQLStatement.begin(), aSQLStatement.end(), expression );
         std::sregex_iterator eItr;
         
+        // set to hold the unique placeholders ($1, $2, $3, etc.).
+        // A set is used because the same placeholder can be used muliple times
         std::set< std::string > placeholderSet;
 
         while ( itr != eItr )
@@ -66,7 +106,7 @@ namespace
             placeholderSet.insert( itr->str() );
             ++itr;
         }
-
+*/
         return placeholderSet.size();
 	}
 }
@@ -91,6 +131,14 @@ StatementExecutor::~StatementExecutor()
 {
     try
     {
+        // remove the prepared statement from the session
+        if (    _sessionHandle.isConnected()
+             && _state >= STMT_COMPILED
+           )
+        {
+            _sessionHandle.deallocatePreparedStatement( _preparedStatementName );
+        }
+        
         PQResultClear resultClearer( _pResultHandle );
     }
     catch (...)
@@ -114,7 +162,6 @@ void StatementExecutor::prepare( const std::string & aSQLStatement )
 	
     if ( _state >= STMT_COMPILED )
 	{
-		_state = STMT_COMPILED;
 		return;
 	}
 
@@ -134,6 +181,8 @@ void StatementExecutor::prepare( const std::string & aSQLStatement )
     Poco::UUIDGenerator & generator = Poco::UUIDGenerator::defaultGenerator();
     Poco::UUID uuid( generator.create() ); // time based
     std::string statementName = uuid.toString();
+    statementName.insert( 0, 1, 'p' ); // prepared statement names can't start with a number
+    std::replace( statementName.begin(), statementName.end(), '-', 'p' );  // PostgreSQL doesn't like dashes in prepared statement names
     const char* pStatementName = statementName.c_str();
     
     PGresult * ptrPGResult = 0;
@@ -192,7 +241,7 @@ void StatementExecutor::prepare( const std::string & aSQLStatement )
     
         for ( int i = 0; i < fieldCount; ++i )
         {
-            int columnLength    = PQfsize( ptrPGResult, i );
+            int columnLength    = PQfsize( ptrPGResult, i ); // TODO: Verify this is correct for all the returned types
             int columnPrecision = PQfmod( ptrPGResult, i );
             
             if (    columnLength    < 0   // PostgreSQL confusion correction
