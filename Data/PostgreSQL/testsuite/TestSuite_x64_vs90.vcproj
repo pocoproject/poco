@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="TestSuite"
-	Version="9.00"
 	ProjectType="Visual C++"
+	Version="9.00"
+	Name="TestSuite"
 	ProjectGUID="{4D6E42AE-EB6A-47EB-A186-B8A183FABCF7}"
 	RootNamespace="TestSuite"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
+	>
 	<Platforms>
 		<Platform
-			Name="x64"/>
+			Name="x64"
+		/>
 	</Platforms>
-	<ToolFiles/>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|x64"
@@ -18,17 +22,23 @@
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
@@ -47,38 +57,50 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitd.lib WinTestRunnerd.lib libPostgreSQL.lib"
+				AdditionalDependencies="CppUnitd.lib WinTestRunnerd.lib libpq.lib"
 				OutputFile="bin64\TestSuited.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib64"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin64\TestSuited.pdb"
 				SubSystem="2"
-				TargetMachine="17"/>
+				TargetMachine="17"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|x64"
@@ -86,17 +108,23 @@
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
@@ -117,16 +145,20 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnit.lib WinTestRunner.lib libPostgreSQL.lib"
+				AdditionalDependencies="CppUnit.lib WinTestRunner.lib libpq.lib"
 				OutputFile="bin64\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -134,21 +166,29 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="17"/>
+				TargetMachine="17"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|x64"
@@ -156,17 +196,23 @@
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="1"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
@@ -185,39 +231,51 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib iphlpapi.lib winmm.lib nafxcwd.lib libcmtd.lib WinTestRunner.res libPostgreSQL.lib"
+				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib iphlpapi.lib winmm.lib nafxcwd.lib libcmtd.lib WinTestRunner.res libpq.lib"
 				OutputFile="bin64\static_mt\TestSuited.exe"
 				LinkIncremental="2"
+				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\lib64"
 				IgnoreDefaultLibraryNames="nafxcwd.lib;libcmtd.lib"
-				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin64\static_mt\TestSuited.pdb"
 				SubSystem="2"
-				TargetMachine="17"/>
+				TargetMachine="17"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|x64"
@@ -225,17 +283,23 @@
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="1"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
@@ -256,16 +320,20 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib iphlpapi.lib winmm.lib nafxcw.lib libcmt.lib WinTestRunner.res libPostgreSQL.lib"
+				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib iphlpapi.lib winmm.lib nafxcw.lib libcmt.lib WinTestRunner.res libpq.lib"
 				OutputFile="bin64\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -274,21 +342,29 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="17"/>
+				TargetMachine="17"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|x64"
@@ -296,17 +372,23 @@
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
@@ -325,38 +407,50 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmdd.lib WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res libPostgreSQL.lib"
+				AdditionalDependencies="CppUnitmdd.lib WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res libpq.lib"
 				OutputFile="bin64\static_md\TestSuited.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib64"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin64\static_md\TestSuited.pdb"
 				SubSystem="2"
-				TargetMachine="17"/>
+				TargetMachine="17"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_md|x64"
@@ -364,17 +458,23 @@
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
@@ -395,16 +495,20 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res libPostgreSQL.lib"
+				AdditionalDependencies="CppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res libpq.lib"
 				OutputFile="bin64\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -412,63 +516,95 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="17"/>
+				TargetMachine="17"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
-	<References/>
+	<References>
+	</References>
 	<Files>
 		<Filter
-			Name="PostgreSQL">
+			Name="PostgreSQL"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\src\PostgreSQLTest.h"/>
+					RelativePath=".\src\PostgreSQLTest.h"
+					>
+				</File>
 				<File
-					RelativePath=".\src\SQLExecutor.h"/>
+					RelativePath=".\src\SQLExecutor.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\PostgreSQLTest.cpp"/>
+					RelativePath=".\src\PostgreSQLTest.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\SQLExecutor.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="_Suite">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\src\PostgreSQLTestSuite.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\PostgreSQLTestSuite.cpp"/>
+					RelativePath=".\src\SQLExecutor.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="_Driver">
+			Name="_Suite"
+			>
 			<Filter
-				Name="Source Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\src\WinDriver.cpp"/>
+					RelativePath=".\src\PostgreSQLTestSuite.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\PostgreSQLTestSuite.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="_Driver"
+			>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\WinDriver.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>
-	<Globals/>
+	<Globals>
+	</Globals>
 </VisualStudioProject>
