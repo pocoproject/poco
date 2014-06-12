@@ -44,7 +44,6 @@
 #include "Poco/Data/PostgreSQL/Binder.h"
 #include "Poco/Data/PostgreSQL/Extractor.h"
 #include "Poco/Data/PostgreSQL/StatementExecutor.h"
-// #include "Poco/Data/PostgreSQL/ResultMetadata.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Format.h"
@@ -61,10 +60,10 @@ class PostgreSQL_API PostgreSQLStatementImpl: public Poco::Data::StatementImpl
 public:
 	PostgreSQLStatementImpl( SessionImpl & aSessionImpl );
 		/// Creates the PostgreSQLStatementImpl.
-		
+
 	~PostgreSQLStatementImpl();
 		/// Destroys the PostgreSQLStatementImpl.
-		
+
 protected:
 
 	virtual std::size_t columnsReturned() const;
@@ -73,32 +72,32 @@ protected:
 	virtual std::size_t affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
-	
+
 	virtual const MetaColumn& metaColumn( std::size_t aPosition ) const;
 		/// Returns column meta data.
-		
+
 	virtual bool hasNext();
 		/// Returns true if a call to next() will return data.
-		
+
 	virtual std::size_t next();
 		/// Retrieves the next row from the resultset.
 		/// Will throw, if the resultset is empty.
-	
+
 	virtual bool canBind() const;
 		/// Returns true if a valid statement is set and we can bind.
 
 	virtual bool canCompile() const;
 		/// Returns true if another compile is possible.
-		
+
 	virtual void compileImpl();
 		/// Compiles the statement, doesn't bind yet
-		
+
 	virtual void bindImpl();
 		/// Binds parameters
-		
+
 	virtual Poco::Data::AbstractExtractor::Ptr extractor();
 		/// Returns the concrete extractor used by the statement.
-		
+
 	virtual Poco::Data::AbstractBinder::Ptr binder();
 		/// Returns the concrete binder used by the statement.
 
@@ -110,10 +109,10 @@ private:
 		NEXT_FALSE
 	};
 
-	StatementExecutor _statementExecutor;
-	Binder::Ptr       _pBinder;
-	Extractor::Ptr    _pExtractor;
-	NextState         _hasNext;
+	StatementExecutor	_statementExecutor;
+	Binder::Ptr			_pBinder;
+	Extractor::Ptr		_pExtractor;
+	NextState			_hasNext;
 };
 
 

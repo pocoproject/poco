@@ -65,7 +65,7 @@ public:
 
 	Connector();
 		/// Creates the Connector.
-	
+
 	virtual ~Connector();
 		/// Destroys the Connector.
 
@@ -73,7 +73,7 @@ public:
 		/// Returns the name associated with this connector.
 
 	virtual Poco::AutoPtr<Poco::Data::SessionImpl> createSession( const std::string &  aConnectionString,
-                                                                  std::size_t aTimeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT );
+																  std::size_t aTimeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT );
 		/// Creates a PostgreSQL SessionImpl object and initializes it with the given connectionString.
 
 	static void registerConnector();

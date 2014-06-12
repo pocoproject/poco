@@ -48,14 +48,14 @@ namespace PostgreSQL {
 std::string
 Utility::serverInfo( SessionHandle* aHandlePtr )
 {
-    std::string srvrInfo = "Process ID: ";
-    
-    srvrInfo.append( Poco::NumberFormatter::format( aHandlePtr->serverProcessID() ) );
-    
-    srvrInfo.append( " Protocol Version: ");
-    
-    srvrInfo.append( Poco::NumberFormatter::format( aHandlePtr->protocoVersion() ) );
-    
+	std::string srvrInfo = "Process ID: ";
+
+	srvrInfo.append( Poco::NumberFormatter::format( aHandlePtr->serverProcessID() ) );
+
+	srvrInfo.append( " Protocol Version: ");
+
+	srvrInfo.append( Poco::NumberFormatter::format( aHandlePtr->protocoVersion() ) );
+
 	return srvrInfo;
 }
 
@@ -77,44 +77,44 @@ Utility::serverVersion( SessionHandle* aHandlePtr )
 int
 Utility::serverVersion( Session& aSession )
 {
-    return serverVersion( handle( aSession ) );
+	return serverVersion( handle( aSession ) );
 }
 
 
 std::string
 Utility::hostInfo( SessionHandle* aHandlePtr )
 {
-    SessionParametersMap parametersMap = aHandlePtr->connectionParameters();
-    
-    SessionParametersMap::const_iterator cItr = parametersMap.find( "host" );
-    
-    if ( parametersMap.end() == cItr )
-    {
-        return std::string();
-    }
-    
-    return cItr->second.currentValue();
+	SessionParametersMap parametersMap = aHandlePtr->connectionParameters();
+
+	SessionParametersMap::const_iterator cItr = parametersMap.find( "host" );
+
+	if ( parametersMap.end() == cItr )
+	{
+		return std::string();
+	}
+
+	return cItr->second.currentValue();
 }
 
 
 std::string
 Utility::hostInfo( Session& aSession )
 {
-    return hostInfo( handle( aSession )  );
+	return hostInfo( handle( aSession )  );
 }
 
 
 std::string
 Utility::sessionEncoding( SessionHandle* aHandlePtr )
 {
-    return aHandlePtr->clientEncoding();
+	return aHandlePtr->clientEncoding();
 }
 
 
 std::string
 Utility::sessionEncoding( Poco::Data::Session& aSession )
 {
-    return sessionEncoding( handle( aSession )  );
+	return sessionEncoding( handle( aSession )  );
 }
 
 

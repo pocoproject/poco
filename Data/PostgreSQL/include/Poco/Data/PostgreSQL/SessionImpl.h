@@ -57,48 +57,48 @@ class PostgreSQL_API SessionImpl: public Poco::Data::AbstractSessionImpl< Sessio
 {
 public:
 
-	SessionImpl( const std::string & aConnectionString,
-		         std::size_t         aLoginTimeout = LOGIN_TIMEOUT_DEFAULT );
+	SessionImpl(const std::string & aConnectionString,
+				std::size_t aLoginTimeout = LOGIN_TIMEOUT_DEFAULT );
 		/// Creates the SessionImpl. Opens a connection to the database
 		///
 		/// Connection string format:
-		///     <str> == <assignment> | <assignment> ' ' <str>
-		///     <assignment> == <name> '=' <value>
-		///     <name> == 'host' | 'port' | 'user' | 'password' | 'dbname' | 'connect_timeout'
-		///     <value> == [~;]*
+		/// <str> == <assignment> | <assignment> ' ' <str>
+		/// <assignment> == <name> '=' <value>
+		/// <name> == 'host' | 'port' | 'user' | 'password' | 'dbname' | 'connect_timeout'
+		/// <value> == [~;]*
 		///
 		/// consult postgres documentation for other parameters
-		
+
 	~SessionImpl();
 		/// Destroys the SessionImpl.
-		
+
 	void setConnectionTimeout( std::size_t aTimeout );
-        /// Sets the session connection timeout value.
+		/// Sets the session connection timeout value.
 
 	std::size_t getConnectionTimeout();
-        /// Returns the session connection timeout value.
+		/// Returns the session connection timeout value.
 
 	void open( const std::string & aConnectionString = std::string() );
 		/// Opens a connection to the database.
 
 	void close();
 		/// Closes the connection.
-		
+
 	bool isConnected();
 		/// Returns true if connected, false otherwise.
 
 	Poco::Data::StatementImpl* createStatementImpl();
-        /// Returns an PostgreSQL StatementImpl
-    
+		/// Returns an PostgreSQL StatementImpl
+
 	void begin();
 		/// Starts a transaction
-	
+
 	void commit();
 		/// Commits and ends a transaction		
 
 	void rollback();
 		/// Aborts a transaction
-		
+
 	bool canTransact();
 		/// Returns true if session has transaction capabilities.
 
@@ -118,18 +118,18 @@ public:
 	bool isTransactionIsolation( Poco::UInt32 aTI );
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
-		
+
 	void setAutoCommit( const std::string &, bool aValue );
 		/// Sets autocommit property for the session.
 
 	bool isAutoCommit( const std::string & aName = std::string() );
 		/// Returns autocommit property value.
 
-    void setAsynchronousCommit( const std::string &, bool aValue );
-        /// Sets asynchronousCommit property for the session.
+	void setAsynchronousCommit( const std::string &, bool aValue );
+		/// Sets asynchronousCommit property for the session.
 
-    bool isAsynchronousCommit( const std::string & aName = std::string() );
-        /// is the connection in Asynchronous commit mode?
+	bool isAsynchronousCommit( const std::string & aName = std::string() );
+		/// is the connection in Asynchronous commit mode?
 
 	SessionHandle & handle();
 		/// Get handle
@@ -138,10 +138,10 @@ public:
 		/// Returns the name of the connector.
 
 private:
-	std::string     _connectorName;
-	SessionHandle   _sessionHandle;
+	std::string		_connectorName;
+	SessionHandle	_sessionHandle;
 
-	std::size_t     _timeout;
+	std::size_t		_timeout;
 };
 
 

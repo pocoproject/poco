@@ -118,12 +118,12 @@ public:
     
     ~OutputParameter();
     
-    void                            setValues( PostgreSQLSupportedFieldTypes aFieldType,
-                                               Oid                           anInternalFieldType,
-                                               std::size_t                   aRowNumber,
-                                               const char *                  aDataPtr,
-                                               std::size_t                   theSize,
-                                               bool                          anIsNull);
+    void setValues( PostgreSQLSupportedFieldTypes aFieldType,
+					Oid                           anInternalFieldType,
+					std::size_t                   aRowNumber,
+					const char *                  aDataPtr,
+					std::size_t                   theSize,
+					bool                          anIsNull);
     
     PostgreSQLSupportedFieldTypes   fieldType() const;
     Oid                             internalFieldType() const;
