@@ -69,7 +69,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libPostgreSQL.lib"
+				AdditionalDependencies="libpq.lib"
 				OutputFile="..\..\bin\PocoDataPostgreSQLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -157,7 +157,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libPostgreSQL.lib"
+				AdditionalDependencies="libpq.lib"
 				OutputFile="..\..\bin\PocoDataPostgreSQL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
