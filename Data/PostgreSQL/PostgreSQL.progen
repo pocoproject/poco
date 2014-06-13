@@ -12,6 +12,6 @@ vc.project.compiler.defines =
 vc.project.compiler.defines.shared = ${vc.project.name}_EXPORTS
 vc.project.compiler.defines.debug_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.defines.release_shared = ${vc.project.compiler.defines.shared}
-vc.project.linker.dependencies = libPostgreSQL.lib
+vc.project.linker.dependencies = libpq.lib
 vc.solution.create = true
 vc.solution.include = testsuite\\TestSuite

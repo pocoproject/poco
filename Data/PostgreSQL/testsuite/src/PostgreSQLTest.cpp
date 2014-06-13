@@ -76,7 +76,7 @@ std::string PostgreSQLTest::_dbConnString = "host=" POSTGRESQL_HOST
 	" user=" POSTGRESQL_USER
 	" password=" POSTGRESQL_PWD
 	" dbname=" POSTGRESQL_DB
-    " port=" POSTGRESQL_PORT;
+" port=" POSTGRESQL_PORT;
 
 
 PostgreSQLTest::PostgreSQLTest(const std::string& name): 
@@ -94,10 +94,10 @@ PostgreSQLTest::~PostgreSQLTest()
 
 void PostgreSQLTest::dbInfo(Session& session)
 {
-    std::cout << "Server Info: "      << Utility::serverInfo(session)      << std::endl;
-    std::cout << "Server Version: "   << Utility::serverVersion(session)   << std::endl;
-    std::cout << "Host Info: "        << Utility::hostInfo(session)        << std::endl;
-    std::cout << "Session Encoding: " << Utility::sessionEncoding(session) << std::endl;
+	std::cout << "Server Info: "  << Utility::serverInfo(session)  << std::endl;
+	std::cout << "Server Version: "   << Utility::serverVersion(session)   << std::endl;
+	std::cout << "Host Info: "<< Utility::hostInfo(session)<< std::endl;
+	std::cout << "Session Encoding: " << Utility::sessionEncoding(session) << std::endl;
 }
 
 
@@ -485,7 +485,7 @@ void PostgreSQLTest::testBLOB()
 void PostgreSQLTest::testCLOBStmt()
 {
 	if (!_pSession) fail ("Test not available.");
-    
+
 	recreatePersonCLOBTable();
 	_pExecutor->clobStmt();
 }
@@ -929,7 +929,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testEmptyDB);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testDateTime);
 	//CppUnit_addTest(pSuite, PostgreSQLTest, testBLOB);
-    CppUnit_addTest(pSuite, PostgreSQLTest, testCLOBStmt);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testCLOBStmt);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testBLOBStmt);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testUnsignedInts);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testFloat);

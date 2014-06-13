@@ -118,12 +118,12 @@ public:
     
     ~OutputParameter();
     
-    void                            setValues( PostgreSQLSupportedFieldTypes aFieldType,
-                                               Oid                           anInternalFieldType,
-                                               std::size_t                   aRowNumber,
-                                               const char *                  aDataPtr,
-                                               std::size_t                   theSize,
-                                               bool                          anIsNull);
+    void setValues( PostgreSQLSupportedFieldTypes aFieldType,
+					Oid                           anInternalFieldType,
+					std::size_t                   aRowNumber,
+					const char *                  aDataPtr,
+					std::size_t                   theSize,
+					bool                          anIsNull);
     
     PostgreSQLSupportedFieldTypes   fieldType() const;
     Oid                             internalFieldType() const;
@@ -164,7 +164,7 @@ class PQResultClear
 {
 public:
     explicit PQResultClear( PGresult * aPQResultPtr );
-    PQResultClear();
+    ~PQResultClear();
         
 private:
     PQResultClear             ( const PQResultClear & );
@@ -180,7 +180,7 @@ class PGCancelFree
 {
 public:
     explicit PGCancelFree( PGcancel * aStatementCancelPtr );
-    PGCancelFree();
+    ~PGCancelFree();
         
 private:
     PGCancelFree             ( const PGCancelFree & );
@@ -437,7 +437,7 @@ PQResultClear::PQResultClear( PGresult * aPQResultPtr  )
 }
 
 inline
-PQResultClear::PQResultClear()
+PQResultClear::~PQResultClear()
 {
     if ( _pPQResult )
     {
@@ -455,7 +455,7 @@ PGCancelFree::PGCancelFree( PGcancel * aStatementCancelPtr  )
 }
 
 inline
-PGCancelFree::PGCancelFree()
+PGCancelFree::~PGCancelFree()
 {
     if ( _pPGCancel )
     {

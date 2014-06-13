@@ -73,10 +73,10 @@ public:
 		/// Returns host info.
 
 	static std::string sessionEncoding( SessionHandle* aHandlePtr );
-        /// Returns session encoding.
-    
+		/// Returns session encoding.
+
 	static std::string sessionEncoding( Poco::Data::Session& aSession );
-        /// Returns session encoding.
+		/// Returns session encoding.
 
 	static bool hasMicrosecond() { return true; }
 		/// Rturns true if microseconds are suported.

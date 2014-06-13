@@ -8,8 +8,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
-SYSLIBS += -L$(POSTGRESQL_BASE)/lib -lpq
-INCLUDE += -I$(POSTGRESQL_BASE)/include
+SYSLIBS += -L/usr/local/lib$(LIB64SUFFIX)/postgresql/9.3/lib -L/usr/lib$(LIB64SUFFIX)/postgresql/9.3/lib -L$(POSTGRESQL_BASE)/lib -lpq
+INCLUDE += -I/usr/local/include/postgresql/ -I/usr/include/postgresql/ -I$(POSTGRESQL_BASE)/include
 SYSFLAGS += -DTHREADSAFE -DNO_TCL
 
 objects = Extractor Binder SessionImpl Connector \

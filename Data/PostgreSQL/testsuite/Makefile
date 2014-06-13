@@ -8,10 +8,10 @@
 
 include $(POCO_BASE)/build/rules/global
 
-INCLUDE += -I./../include -I$(POSTGRESQL_BASE)/include
+INCLUDE += -I./../include -I/usr/local/include/postgresql/ -I/usr/include/postgresql/ -I$(POSTGRESQL_BASE)/include
 
 # Note: linking order is important, do not change it.
-SYSLIBS += -L$(POSTGRESQL_BASE)/lib -lpq -lz -lpthread -ldl
+SYSLIBS += -L/usr/local/lib$(LIB64SUFFIX)/postgresql/9.3/lib -L/usr/lib$(LIB64SUFFIX)/postgresql/9.3/lib -L$(POSTGRESQL_BASE)/lib -lpq -lz -lpthread -ldl
 
 objects = PostgreSQLTestSuite Driver PostgreSQLTest SQLExecutor
 

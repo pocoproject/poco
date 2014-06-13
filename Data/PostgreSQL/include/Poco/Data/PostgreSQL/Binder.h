@@ -47,7 +47,6 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Types.h"
 
-
 #include <libpq-fe.h>
 
 namespace Poco {
@@ -57,7 +56,7 @@ namespace PostgreSQL {
 
 class PostgreSQL_API Binder: public Poco::Data::AbstractBinder
 	/// Binds INPUT (only) placeholders in the sql query to the provided values.
-    /// Allows data type mapping at statement execution time.
+	/// Allows data type mapping at statement execution time.
 {
 public:
 	typedef SharedPtr< Binder > Ptr;
@@ -255,9 +254,9 @@ public:
 
 	InputParameterVector bindVector() const;
 		/// Return the vector of bound parameters.
-    
-    void updateBindVectorToCurrentValues();
-        /// obtain the current version of the bound data and update the internal representation
+
+	void updateBindVectorToCurrentValues();
+		/// obtain the current version of the bound data and update the internal representation
 
 private:
 	Binder( const Binder& );
@@ -275,7 +274,7 @@ private:
 
 private:
 
-	InputParameterVector             _bindVector;
+	InputParameterVector _bindVector;
 };
 
 
