@@ -6,13 +6,16 @@ if (WIN32)
     # this path is only present for 2008+, but we currently require PATH to
     # be set up anyway
     get_filename_component(sdk_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" REALPATH)
+    get_filename_component(kit_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot]" REALPATH)
     if (X64)
       set(sdk_bindir "${sdk_dir}/bin/x64")
+      set(kit_bindir "${kit_dir}/bin/x64")
     else (X64)
       set(sdk_bindir "${sdk_dir}/bin")
+      set(kit_bindir "${kit_dir}/bin/x86")
     endif (X64)
   endif ()
-  find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" 
+  find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}"
     DOC "path to message compiler")
   if (NOT CMAKE_MC_COMPILER)
     message(FATAL_ERROR "message compiler not found: required to build")
