@@ -79,17 +79,23 @@ AAAIntroduction
   - added hasDelegates() method to AbstractEvent
   - fixed GH #230: Poco::Timer problem
   - fixed GH #317: Poco::Zip does not support newer Zip file versions.
+  - fixed GH #176: Poco::JSON::Stringifier UTF encoding
+  - fixed GH #458: Broadcast address and subnet mask for IEEE802.11 network interface
+  - fixed GH #456: poco: library install dirs per RUNTIME/LIBRARY/ARCHIVE
   
   
 !!Incompatible Changes and Possible Transition Issues
 
   - Data::ODBC: UTF-16 Unicode is now directly mapped and recognized as type by ODBC.
     This may cause behavior different from previosu versions, especially with Any and 
-	Dynamic::Var bindings.
-	In this release, UTF-16 binding is only available for ODBC back end; although other 
-	back ends will compile with UTF-16 strings bound, such binding will throw 
-	NotImplementedException at runtime. 
- 
+    Dynamic::Var bindings.
+    In this release, UTF-16 binding is only available for ODBC back end; although other 
+    back ends will compile with UTF-16 strings bound, such binding attempt will throw 
+    NotImplementedException at runtime. 
+  - Please note that 1.5.x releases are development releases and not considered stable. Interfaces may
+    change, and backwards compatibility with the stable 1.4 release series
+    is not guaranteed. There may also be some rough edges. 
+    The next stable release incorporating 1.5 features will be 1.6. 
  
 !!!Release 1.5.2
 

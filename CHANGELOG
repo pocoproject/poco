@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.5.3 (2014-06-xx)
+Release 1.5.3 (2014-06-30)
 ==========================
 
 - fixed GH# 316: Poco::DateTimeFormatter::append() gives wrong result for 
