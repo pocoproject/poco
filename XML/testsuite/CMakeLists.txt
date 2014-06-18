@@ -31,6 +31,7 @@ src/WinDriver.cpp
 set(TESTUNIT "${LIBNAME}-testrunner")
 
 add_executable( ${TESTUNIT} ${TEST_SRCS} )
+add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
 #set_target_properties( ${TESTUNIT} PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} )
 target_link_libraries( ${TESTUNIT} PocoXML PocoFoundation CppUnit)
 
