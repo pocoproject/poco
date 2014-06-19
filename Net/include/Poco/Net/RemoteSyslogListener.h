@@ -36,7 +36,7 @@ class SyslogParser;
 
 
 class Net_API RemoteSyslogListener: public Poco::SplitterChannel
-	/// RemoteSyslogListener implents listening for syslog messages
+	/// RemoteSyslogListener implements listening for syslog messages
 	/// sent over UDP, according to RFC 5424 "The Syslog Protocol" 
 	/// and RFC 5426 "Transmission of syslog messages over UDP".
 	///
