@@ -148,9 +148,9 @@ if not "%ACTION%"=="build" (
 if not "%ACTION%"=="rebuild" (
 if not "%ACTION%"=="clean" goto usage))
 
-rem LINKMODE [static|shared|both]
+rem LINKMODE [static_mt|static_md|shared|all]
 set LINK_MODE=%3
-if "%LINK_MODE%"=="" (set LINK_MODE=shared)
+if "%LINK_MODE%"=="" (set LINK_MODE=all)
 if not "%LINK_MODE%"=="static_mt" (
 if not "%LINK_MODE%"=="static_md" (
 if not "%LINK_MODE%"=="shared" (
@@ -158,7 +158,7 @@ if not "%LINK_MODE%"=="all" goto usage)))
 
 rem CONFIGURATION [release|debug|both]
 set CONFIGURATION=%4
-if "%CONFIGURATION%"=="" (set CONFIGURATION=release)
+if "%CONFIGURATION%"=="" (set CONFIGURATION=both)
 if not "%CONFIGURATION%"=="release" (
 if not "%CONFIGURATION%"=="debug" (
 if not "%CONFIGURATION%"=="both" goto usage))
