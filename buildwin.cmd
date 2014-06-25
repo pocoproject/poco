@@ -51,6 +51,14 @@ if "%1"=="" goto usage
 set VS_VERSION=vs%1
 set VS_64_BIT_ENV=VC\bin\x86_amd64\vcvarsx86_amd64.bat
 
+rem PLATFORM [Win32|x64|WinCE|WEC2013]
+set PLATFORM=%5
+if "%PLATFORM%"=="" (set PLATFORM=Win32)
+if not "%PLATFORM%"=="Win32" (
+if not "%PLATFORM%"=="x64" (
+if not "%PLATFORM%"=="WinCE" (
+if not "%PLATFORM%"=="WEC2013" goto usage)))
+
 if not defined VCINSTALLDIR (
   if %VS_VERSION%==vs71 (
     call "%VS71COMNTOOLS%vsvars32.bat"
@@ -59,28 +67,28 @@ if not defined VCINSTALLDIR (
       call "%VS80COMNTOOLS%vsvars32.bat"
     ) else (
       if %VS_VERSION%==vs90 (
-        if %5==x64 (
+        if %PLATFORM%==x64 (
           call "%VS90COMNTOOLS%..\..\%VS_64_BIT_ENV%"
         ) else (
           call "%VS90COMNTOOLS%vsvars32.bat"
         )
       ) else (
         if %VS_VERSION%==vs100 (
-          if %5==x64 (
+          if %PLATFORM%==x64 (
             call "%VS100COMNTOOLS%..\..\%VS_64_BIT_ENV%"
           ) else (
             call "%VS100COMNTOOLS%vsvars32.bat"
           )
         ) else (
           if %VS_VERSION%==vs110 (
-            if %5==x64 (
+            if %PLATFORM%==x64 (
               call "%VS110COMNTOOLS%..\..\%VS_64_BIT_ENV%"
             ) else (
               call "%VS110COMNTOOLS%vsvars32.bat"
             ) 
           ) else (
             if %VS_VERSION%==vs120 (
-              if %5==x64 (
+              if %PLATFORM%==x64 (
                 call "%VS120COMNTOOLS%..\..\%VS_64_BIT_ENV%"
               ) else (
                 call "%VS120COMNTOOLS%vsvars32.bat
@@ -135,42 +143,30 @@ if "%BUILD_TOOL%"=="msbuild" (
 
 rem ACTION [build|rebuild|clean]
 set ACTION=%2
+if "%ACTION%"=="" (set ACTION=build)
 if not "%ACTION%"=="build" (
 if not "%ACTION%"=="rebuild" (
-if not "%ACTION%"=="" (
-if not "%ACTION%"=="clean" goto usage)))
-
-if "%ACTION%"=="" (set ACTION="build")
+if not "%ACTION%"=="clean" goto usage))
 
 rem LINKMODE [static|shared|both]
 set LINK_MODE=%3
+if "%LINK_MODE%"=="" (set LINK_MODE=shared)
 if not "%LINK_MODE%"=="static_mt" (
 if not "%LINK_MODE%"=="static_md" (
 if not "%LINK_MODE%"=="shared" (
-if not "%LINK_MODE%"=="" (
-if not "%LINK_MODE%"=="all" goto usage))))
+if not "%LINK_MODE%"=="all" goto usage)))
 
 rem CONFIGURATION [release|debug|both]
 set CONFIGURATION=%4
+if "%CONFIGURATION%"=="" (set CONFIGURATION=release)
 if not "%CONFIGURATION%"=="release" (
 if not "%CONFIGURATION%"=="debug" (
-if not "%CONFIGURATION%"=="" (
-if not "%CONFIGURATION%"=="both" goto usage)))
+if not "%CONFIGURATION%"=="both" goto usage))
 
-rem PLATFORM [Win32|x64|WinCE|WEC2013]
-set PLATFORM=%5
-
-if not "%PLATFORM%"=="" (
-if not "%PLATFORM%"=="Win32" (
-if not "%PLATFORM%"=="x64" (
-if not "%PLATFORM%"=="WinCE" (
-if not "%PLATFORM%"=="WEC2013" goto usage))))
-
-if "%PLATFORM%"=="" (set PLATFORM_SUFFIX=) else (
 if "%PLATFORM%"=="Win32" (set PLATFORM_SUFFIX=) else (
 if "%PLATFORM%"=="x64" (set PLATFORM_SUFFIX=_x64) else (
 if "%PLATFORM%"=="WinCE" (set PLATFORM_SUFFIX=_CE) else (
-if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013)))))
+if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013))))
 
 if "%PLATFORM%"=="WEC2013" (
 if "%WEC2013_PLATFORM%"=="" (
