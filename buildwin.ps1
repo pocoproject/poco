@@ -233,7 +233,7 @@ function Build-MSBuild([string] $vsProject)
       foreach ($cfg in $configArr)
       {
         $projectConfig = "$cfg"
-        $projectConfig += "_$mode"
+        $projectConfig += "_$linkmode"
         Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
     }
@@ -281,7 +281,7 @@ function Build-Devenv([string] $vsProject)
       foreach ($cfg in $configArr)
       {
         $projectConfig = "$cfg"
-        $projectConfig += "_$mode"
+        $projectConfig += "_$linkmode"
         Invoke-Expression "devenv /useenv /$action $projectConfig $vsProject"
       }
     }
