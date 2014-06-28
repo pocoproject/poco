@@ -28,7 +28,7 @@ BEGIN
             VALUE "FileDescription", "This file is part of the POCO C++ Libraries."
             VALUE "FileVersion", POCO_VERSION_STR
             VALUE "InternalName", "POCO"
-            VALUE "LegalCopyright", "Copyright (C) 2004-2013, Applied Informatics Software Engineering GmbH and Contributors."
+            VALUE "LegalCopyright", "Copyright (C) 2004-2014, Applied Informatics Software Engineering GmbH and Contributors."
             VALUE "ProductName", "POCO C++ Libraries - http://pocoproject.org"
             VALUE "ProductVersion", POCO_VERSION_STR
         END
