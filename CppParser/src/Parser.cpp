@@ -181,6 +181,7 @@ const Token* Parser::parseFile(const Token* pNext)
 			break;
 		case IdentifierToken::KW_STRUCT:
 		case IdentifierToken::KW_CLASS:
+		case IdentifierToken::KW_UNION:
 			pNext = parseClass(pNext);
 			break;
 		case IdentifierToken::KW_TEMPLATE:
@@ -228,6 +229,7 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 				break;
 			case IdentifierToken::KW_STRUCT:
 			case IdentifierToken::KW_CLASS:
+			case IdentifierToken::KW_UNION:
 				pNext = parseClass(pNext);
 				break;
 			case IdentifierToken::KW_TEMPLATE:
@@ -264,7 +266,7 @@ const Token* Parser::parseClass(const Token* pNext)
 
 const Token* Parser::parseClass(const Token* pNext, std::string& decl)
 {
-	poco_assert (isKeyword(pNext, IdentifierToken::KW_CLASS) || isKeyword(pNext, IdentifierToken::KW_STRUCT));
+	poco_assert (isKeyword(pNext, IdentifierToken::KW_CLASS) || isKeyword(pNext, IdentifierToken::KW_STRUCT) || isKeyword(pNext, IdentifierToken::KW_UNION));
 
 	_pCurrentSymbol = 0;
 	bool isClass = isKeyword(pNext, IdentifierToken::KW_CLASS);
@@ -384,6 +386,7 @@ const Token* Parser::parseClassMembers(const Token* pNext, Struct* pClass)
 			break;
 		case IdentifierToken::KW_STRUCT:
 		case IdentifierToken::KW_CLASS:
+		case IdentifierToken::KW_UNION:
 			pNext = parseClass(pNext);
 			break;
 		case IdentifierToken::KW_TEMPLATE:
@@ -436,7 +439,7 @@ const Token* Parser::parseTemplate(const Token* pNext)
 	pNext = next();
 	expectOperator(pNext, OperatorToken::OP_LT, "<");
 	pNext = parseTemplateArgs(pNext, decl);
-	if (isKeyword(pNext, IdentifierToken::KW_CLASS) || isKeyword(pNext, IdentifierToken::KW_STRUCT))
+	if (isKeyword(pNext, IdentifierToken::KW_CLASS) || isKeyword(pNext, IdentifierToken::KW_STRUCT) || isKeyword(pNext, IdentifierToken::KW_UNION))
 		return parseClass(pNext, decl);
 	else
 		return parseVarFunc(pNext, decl);
@@ -649,6 +652,10 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 			if (pFunc) pFunc->makeFinal();
 			pNext = next();
 		}
+		else if (isKeyword(pNext, IdentifierToken::KW_TRY))
+		{
+			break; // handled below
+		}
 	}
 	if (isOperator(pNext, OperatorToken::OP_ASSIGN))
 	{
@@ -673,6 +680,32 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 			pFunc = dynamic_cast<Function*>(currentNameSpace()->lookup(name));
 		if (pFunc)
 			pFunc->makeInline();
+	}
+	else if (isKeyword(pNext, IdentifierToken::KW_TRY))
+	{
+		pNext = next();
+		if (isOperator(pNext, OperatorToken::OP_OPENBRACE) || isOperator(pNext, OperatorToken::OP_COLON))
+		{
+			while (!isOperator(pNext, OperatorToken::OP_OPENBRACE) && !isEOF(pNext))
+				pNext = next();
+
+			pNext = parseBlock(pNext);
+			
+			if (isKeyword(pNext, IdentifierToken::KW_CATCH))
+			{
+				while (!isOperator(pNext, OperatorToken::OP_OPENBRACE) && !isEOF(pNext))
+					pNext = next();
+	
+				pNext = parseBlock(pNext);
+			}
+			else syntaxError("expected catch block");
+			
+			if (!pFunc)
+				pFunc = dynamic_cast<Function*>(currentNameSpace()->lookup(name));
+			if (pFunc)
+				pFunc->makeInline();
+		}
+		else syntaxError("expected member initialization or block");
 	}
 	else
 	{
