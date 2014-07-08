@@ -298,6 +298,9 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 		}
 	}
 
+	if (state == STATE_VALUE)
+		add(token, value);
+
 	if (!(state & STATE_FINAL))
 		throw SyntaxException("Invalid authentication information");
 }
