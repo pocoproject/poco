@@ -1,6 +1,18 @@
 set(LIBNAME "PocoJSON")
 
-aux_source_directory(src SRCS)
+set(SRCS
+    src/Array.cpp
+    src/Handler.cpp
+    src/JSONException.cpp
+    src/Object.cpp
+    src/ParseHandler.cpp
+    src/Parser.cpp
+    src/PrintHandler.cpp
+    src/Query.cpp
+    src/Stringifier.cpp
+    src/TemplateCache.cpp
+    src/Template.cpp
+)
 
 if (NOT POCO_STATIC)
   add_definitions(-DJSON_EXPORTS)
