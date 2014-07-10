@@ -1546,7 +1546,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				ifIt = result.find(ifIndex);
 				intf = NetworkInterface(ifIndex);
 				setInterfaceParams(iface, intf.impl());
-					
+
 				if ((ifIt == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
 					ifIt = result.insert(Map::value_type(ifIndex, intf)).first;
 
@@ -1559,7 +1559,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 					broadcastAddress = IPAddress(*(iface->ifa_dstaddr));
 				else
 					broadcastAddress = IPAddress();
-			
+
 				break;
 #if defined(POCO_HAVE_IPv6)
 			case AF_INET6:
@@ -1567,20 +1567,20 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				ifIt = result.find(ifIndex);
 				intf = NetworkInterface(ifIndex);
 				setInterfaceParams(iface, intf.impl());
-					
+
 				if ((ifIt == result.end()) && ((upOnly && intf.isUp()) || !upOnly))
-					result.insert(Map::value_type(ifIndex, intf)).first;
+					result.insert(Map::value_type(ifIndex, intf));
 
 				address = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(iface->ifa_addr)->sin6_addr, sizeof(struct in6_addr), ifIndex);
 				subnetMask = IPAddress(*(iface->ifa_netmask));
 				broadcastAddress = IPAddress();
-					
+
 				break;
 #endif
 			default:
 				continue;
 			}
-			
+
 			if (family == AF_INET
 #ifdef POCO_HAVE_IPv6
 			|| family == AF_INET6
