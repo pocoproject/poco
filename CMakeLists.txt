@@ -7,7 +7,7 @@ project(Poco)
 
 cmake_minimum_required(VERSION 2.8.0)
 
-set(SHARED_LIBRARY_VERSION "22")
+file(STRINGS "${CMAKE_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
 
 # Read the version information from the VERSION file
 file (STRINGS "${CMAKE_SOURCE_DIR}/VERSION" PACKAGE_VERSION )
