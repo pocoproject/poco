@@ -1,13 +1,35 @@
 set(LIBNAME "PocoMongoDB")
 
-aux_source_directory(src SRCS)
+set(SRCS
+    src/Array.cpp
+    src/Binary.cpp
+    src/Connection.cpp
+    src/Cursor.cpp
+    src/Database.cpp
+    src/DeleteRequest.cpp
+    src/Document.cpp
+    src/Element.cpp
+    src/GetMoreRequest.cpp
+    src/InsertRequest.cpp
+    src/JavaScriptCode.cpp
+    src/KillCursorsRequest.cpp
+    src/Message.cpp
+    src/MessageHeader.cpp
+    src/ObjectId.cpp
+    src/QueryRequest.cpp
+    src/RegularExpression.cpp
+    src/ReplicaSet.cpp
+    src/RequestMessage.cpp
+    src/ResponseMessage.cpp
+    src/UpdateRequest.cpp
+)
 
 if (NOT POCO_STATIC)
   add_definitions(-DMongoDB_EXPORTS)
 endif (NOT POCO_STATIC)
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAME} 
+set_target_properties( ${LIBNAME}
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
 target_link_libraries( ${LIBNAME} PocoNet PocoFoundation)
@@ -17,7 +39,7 @@ install(
     DESTINATION include
     PATTERN ".svn" EXCLUDE
     )
-    
+
 install(
     TARGETS ${LIBNAME}
     LIBRARY DESTINATION lib${LIB_SUFFIX}

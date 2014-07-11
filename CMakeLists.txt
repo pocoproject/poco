@@ -3,18 +3,22 @@
 # POCO_UNBUNDLED
 # POCO_NO_LOCALE
 
-PROJECT(Poco)
+project(Poco)
 
 cmake_minimum_required(VERSION 2.8.0)
 
-set(SHARED_LIBRARY_VERSION "22")
+file(STRINGS "${CMAKE_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
 
-set(CPACK_PACKAGE_VERSION_MAJOR "1")
-set(CPACK_PACKAGE_VERSION_MINOR "5")
-set(CPACK_PACKAGE_VERSION_PATCH "2")
-SET(COMPLETE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-SET(RELEASE_NAME "Unstable-trunk")
-SET(PROJECT_VERSION ${COMPLETE_VERSION})
+# Read the version information from the VERSION file
+file (STRINGS "${CMAKE_SOURCE_DIR}/VERSION" PACKAGE_VERSION )
+message(STATUS "Poco package version: ${PACKAGE_VERSION}")
+string(REGEX REPLACE "([0-9]+)\\.[0-9]+\\.[0-9]+" "\\1" CPACK_PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION})
+string(REGEX REPLACE "[0-9]+\\.([0-9])+\\.[0-9]+" "\\1" CPACK_PACKAGE_VERSION_MINOR ${PACKAGE_VERSION})
+string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+)" "\\1" CPACK_PACKAGE_VERSION_PATCH ${PACKAGE_VERSION})
+
+set(COMPLETE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+set(RELEASE_NAME "Unstable-trunk")
+set(PROJECT_VERSION ${COMPLETE_VERSION})
 
 # Put the libaries and binaries that get built into directories at the
 # top of the build tree rather than in hard-to-find leaf
@@ -43,14 +47,14 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
 endif ()
 
 # http://www.cmake.org/Wiki/CMake_Useful_Variables :
-# CMAKE_BUILD_TYPE 
-#    Choose the type of build. CMake has default flags for these: 
+# CMAKE_BUILD_TYPE
+#    Choose the type of build. CMake has default flags for these:
 #
 #    * None (CMAKE_C_FLAGS or CMAKE_CXX_FLAGS used)
 #    * Debug (CMAKE_C_FLAGS_DEBUG or CMAKE_CXX_FLAGS_DEBUG)
 #    * Release (CMAKE_C_FLAGS_RELEASE or CMAKE_CXX_FLAGS_RELEASE)
 #    * RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
-#    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL) 
+#    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL)
 
 # For Debug build types, append a "d" to the library names.
 set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set debug library postfix" FORCE)
@@ -66,7 +70,7 @@ option(POCO_UNBUNDLED
 
 # Uncomment from next two lines to force statitc or dynamic library, default is autodetection
 if(POCO_STATIC)
-    add_definitions( -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)    
+    add_definitions( -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)
     set( LIB_MODE STATIC )
     message(STATUS "Building static libraries")
 else(POCO_STATIC)
@@ -74,40 +78,35 @@ else(POCO_STATIC)
     message(STATUS "Building dynamic libraries")
 endif(POCO_STATIC)
 
-IF (ENABLE_TESTS)
+if (ENABLE_TESTS)
   include(CTest)
-  ENABLE_TESTING()
+  enable_testing()
   message(STATUS "Building with unittests & samples")
-ELSE ()
+else ()
   message(STATUS "Building without tests & samples")
-ENDIF ()
+endif ()
 
-IF (POCO_UNBUNDLED)
+if (POCO_UNBUNDLED)
   add_definitions( -DPOCO_UNBUNDLED)
   message(STATUS "Build with using external sqlite, libz, pcre, expat ...")
-ELSE ()
+else ()
   message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
-ENDIF ()
+endif ()
 
 # Set local include path
 include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include Crypto/include Web/include JSON/include MongoDB/include PDF/include)
 
 include(CheckTypeSize)
-include(FindCygwin)
-include(FindOpenSSL)
+find_package(Cygwin)
+
 #include(CMakeDetermineCompilerId)
-
-include(FindMySQL)
-
-#include(FindAPR)
-#include(FindApache2)
 
 # OS Detection
 if(CMAKE_SYSTEM MATCHES "Windows")
- 
+
  add_definitions( -DPOCO_OS_FAMILY_WINDOWS)
  set(SYSLIBS iphlpapi gdi32 odbc32)
- 
+
  if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
         message(STATUS "XXX: MS Visual Compiler detected")
  endif (CMAKE_C_COMPILER_ID MATCHES "MSVC")
@@ -154,9 +153,9 @@ if (ANDROID)
   add_definitions( -DPOCO_ANDROID -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SHAREDMEMORY )
 endif()
 
-IF (ENABLE_TESTS)
+if (ENABLE_TESTS)
    add_subdirectory(CppUnit)
-ENDIF ()
+endif ()
 
 add_subdirectory(Foundation)
 add_subdirectory(XML)
@@ -165,9 +164,9 @@ add_subdirectory(MongoDB)
 add_subdirectory(PDF)
 add_subdirectory(Util)
 add_subdirectory(Net)
-#add_subdirectory(Web)
 
 # OPENSSL_SSL_LIBRARY
+find_package(OpenSSL)
 if(OPENSSL_FOUND)
     include_directories(${OPENSSL_INCLUDE_DIR})
     add_subdirectory(NetSSL_OpenSSL)
@@ -175,35 +174,37 @@ if(OPENSSL_FOUND)
 endif(OPENSSL_FOUND)
 
 add_subdirectory(Data)
-#add_subdirectory(WebWidgets)
+add_subdirectory(SevenZip)
 add_subdirectory(Zip)
 
+#find_package(ARP)
+#find_package(Apache2)
 if(APRUTIL_FOUND AND APACHE_FOUND)
     add_subdirectory(ApacheConnector)
 endif(APRUTIL_FOUND AND APACHE_FOUND)
 
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ
-CONFIGURE_FILE(
+configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
   IMMEDIATE @ONLY)
 
-ADD_CUSTOM_TARGET(uninstall
+add_custom_target(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
 #############################################################
 # Enable packaging
 
-INCLUDE(InstallRequiredSystemLibraries)
+include(InstallRequiredSystemLibraries)
 
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Poco Libraries")
-SET(CPACK_PACKAGE_VENDOR "Applied Informatics Software Engineering GmbH")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Poco Libraries")
+set(CPACK_PACKAGE_VENDOR "Applied Informatics Software Engineering GmbH")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
 
-INCLUDE(CPack)
+include(CPack)
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
 message(STATUS "Installation target path: ${CMAKE_INSTALL_PREFIX}")
