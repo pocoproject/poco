@@ -15,8 +15,10 @@
 
 
 #include "Poco/SharedMemory_WIN32.h"
+#include "Poco/Error.h"
 #include "Poco/Exception.h"
 #include "Poco/File.h"
+#include "Poco/Format.h"
 #if defined (POCO_WIN32_UTF8)
 #include "Poco/UnicodeConverter.h"
 #endif
@@ -46,7 +48,23 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 #endif
 
 	if (!_memHandle)
-		throw SystemException("Cannot create shared memory object", _name);
+	{
+		DWORD dwRetVal = GetLastError();
+		if (_mode != PAGE_READONLY || dwRetVal != 5)
+			throw SystemException(format("Cannot create shared memory object %s [Error %d: %s]", _name, (int)dwRetVal, Error::getMessage(dwRetVal)));
+
+#if defined (POCO_WIN32_UTF8)
+		_memHandle = OpenFileMappingW(PAGE_READONLY, FALSE, utf16name.c_str());
+#else
+		_memHandle = OpenFileMappingA(PAGE_READONLY, FALSE, _name.c_str());
+#endif
+
+		if (!_memHandle)
+		{
+			dwRetVal = GetLastError();
+			throw SystemException(format("Cannot open shared memory object %s [Error %d: %s]", _name, (int)dwRetVal, Error::getMessage(dwRetVal)));
+		}
+	}
 
 	map();
 }
@@ -88,9 +106,10 @@ SharedMemoryImpl::SharedMemoryImpl(const Poco::File& file, SharedMemory::AccessM
 	_memHandle = CreateFileMapping(_fileHandle, NULL, _mode, 0, 0, NULL);
 	if (!_memHandle)
 	{
+		DWORD dwRetVal = GetLastError();
 		CloseHandle(_fileHandle);
 		_fileHandle = INVALID_HANDLE_VALUE;
-		throw SystemException("Cannot map file into shared memory", _name);
+		throw SystemException(format("Cannot map file into shared memory %s [Error %d: %s]", _name, (int)dwRetVal, Error::getMessage(dwRetVal)));
 	}
 	map();
 }
@@ -110,7 +129,10 @@ void SharedMemoryImpl::map()
 		access = FILE_MAP_WRITE;
 	LPVOID addr = MapViewOfFile(_memHandle, access, 0, 0, _size);
 	if (!addr)
-		throw SystemException("Cannot map shared memory object", _name);
+	{
+		DWORD dwRetVal = GetLastError();
+		throw SystemException(format("Cannot map shared memory object %s [Error %d: %s]", _name, (int)dwRetVal, Error::getMessage(dwRetVal)));
+	}
 
 	_address = static_cast<char*>(addr);
 }
