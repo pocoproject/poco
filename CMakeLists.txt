@@ -96,7 +96,7 @@ else ()
 endif ()
 
 # Set local include path
-include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include Crypto/include Web/include JSON/include MongoDB/include PDF/include)
+include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include Data/MySQL/include Data/SQLite/include Data/ODBC/include Zip/include Crypto/include Web/include JSON/include MongoDB/include PDF/include SevenZip/include)
 
 include(CheckTypeSize)
 find_package(Cygwin)
