@@ -31,7 +31,7 @@ namespace Poco {
 namespace Zip {
 
 
-class ZipUtil
+class Zip_API ZipUtil
 	/// A utility class used for parsing header information inside of zip files
 {
 public:
