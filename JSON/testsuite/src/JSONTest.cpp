@@ -13,7 +13,6 @@
 #include "JSONTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Query.h"
@@ -22,7 +21,6 @@
 #include "Poco/JSON/ParseHandler.h"
 #include "Poco/JSON/PrintHandler.h"
 #include "Poco/JSON/Template.h"
-
 #include "Poco/Path.h"
 #include "Poco/Environment.h"
 #include "Poco/File.h"
@@ -32,10 +30,10 @@
 #include "Poco/Latin1Encoding.h"
 #include "Poco/TextConverter.h"
 #include "Poco/Nullable.h"
-
 #include "Poco/Dynamic/Struct.h"
-
 #include <set>
+#include <iostream>
+
 
 using namespace Poco::JSON;
 using namespace Poco::Dynamic;
@@ -1231,9 +1229,9 @@ void JSONTest::testStringify()
 	std::ostringstream oss1, oss2;
 	Poco::JSON::Stringifier::stringify(obj1, oss1);
 	Poco::JSON::Stringifier::stringify(obj2, oss2);
-	assert(oss1.str() == "{\"payload\":\"\\\r\"}");
+	assert(oss1.str() == "{\"payload\":\"\\r\"}");
 	std::cout << "\"" << oss1.str() << "\"" << std::endl;
-	assert(oss2.str() == "{\"payload\":\"\\\n\"}");
+	assert(oss2.str() == "{\"payload\":\"\\n\"}");
 
 	Object jObj(false);
 	jObj.set("foo\\", 0);
@@ -1247,8 +1245,8 @@ void JSONTest::testStringify()
 	std::stringstream ss;
 	jObj.stringify(ss);
 
-	assert(ss.str() == "{\"backspace\":\"bs\\\b\",\"bar\\/\":0,\"baz\":0,\"foo\\\\\":0,"
-		"\"newline\":\"nl\\\n\",\"q\\\"uote\\\"d\":0,\"tab\":\"tb\\\t\"}");
+	assert(ss.str() == "{\"backspace\":\"bs\\b\",\"bar\\/\":0,\"baz\":0,\"foo\\\\\":0,"
+		"\"newline\":\"nl\\n\",\"q\\\"uote\\\"d\":0,\"tab\":\"tb\\t\"}");
 
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
 						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
