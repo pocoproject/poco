@@ -177,7 +177,7 @@ private:
 
 	Poco::UInt32 getDefaultTransactionIsolation();
 
-	Poco::UInt32 transactionIsolation(SQLUINTEGER isolation);
+	Poco::UInt32 transactionIsolation(SQLULEN isolation);
 
 	std::string            _connector;
 	const ConnectionHandle _db;
