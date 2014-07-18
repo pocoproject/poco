@@ -4,7 +4,7 @@
 // $Id: //poco/1.4/Crypto/src/OpenSSLInitializer.cpp#3 $
 //
 // Library: Crypto
-// Package: CryotpCore
+// Package: CryptoCore
 // Module:  OpenSSLInitializer
 //
 // Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
