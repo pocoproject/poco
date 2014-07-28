@@ -37,6 +37,7 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 	const X509* pCert = cert.certificate();
 	EVP_PKEY* pKey = X509_get_pubkey(const_cast<X509*>(pCert));
 	_pRSA = EVP_PKEY_get1_RSA(pKey);
+	EVP_PKEY_free(pKey);
 }
 
 
