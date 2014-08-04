@@ -24,7 +24,6 @@
 #include "Poco/String.h"
 #include "Poco/Mutex.h"
 #include "Poco/Data/DataException.h"
-#include "Poco/NumberParser.h"
 #include "sqlite3.h"
 #include <cstdlib>
 
