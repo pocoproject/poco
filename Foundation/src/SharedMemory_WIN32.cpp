@@ -50,22 +50,24 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 	if (!_memHandle)
 	{
 		DWORD dwRetVal = GetLastError();
+#if defined (_WIN32_WCE)
+		throw SystemException(format("Cannot create shared memory object %s [Error %d: %s]", _name, static_cast<int>(dwRetVal), Error::getMessage(dwRetVal)));
+#else
 		if (_mode != PAGE_READONLY || dwRetVal != 5)
-			throw SystemException(format("Cannot create shared memory object %s [Error %d: %s]", _name, (int)dwRetVal, Error::getMessage(dwRetVal)));
+			throw SystemException(format("Cannot create shared memory object %s [Error %d: %s]", _name, static_cast<int>(dwRetVal), Error::getMessage(dwRetVal)));
 
 #if defined (POCO_WIN32_UTF8)
 		_memHandle = OpenFileMappingW(PAGE_READONLY, FALSE, utf16name.c_str());
 #else
 		_memHandle = OpenFileMappingA(PAGE_READONLY, FALSE, _name.c_str());
 #endif
-
 		if (!_memHandle)
 		{
 			dwRetVal = GetLastError();
-			throw SystemException(format("Cannot open shared memory object %s [Error %d: %s]", _name, (int)dwRetVal, Error::getMessage(dwRetVal)));
+			throw SystemException(format("Cannot open shared memory object %s [Error %d: %s]", _name, static_cast<int>(dwRetVal), Error::getMessage(dwRetVal)));
 		}
+#endif 
 	}
-
 	map();
 }
 
