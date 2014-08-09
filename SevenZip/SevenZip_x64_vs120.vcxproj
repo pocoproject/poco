@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|x64">
       <Configuration>debug_shared</Configuration>
@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoSevenZip64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoSevenZipmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoSevenZipmtd</TargetName>
@@ -283,6 +283,7 @@
   <ItemGroup>
     <ClInclude Include="include\Poco\SevenZip\Archive.h"/>
     <ClInclude Include="include\Poco\SevenZip\ArchiveEntry.h"/>
+    <ClInclude Include="include\Poco\SevenZip\SevenZip.h"/>
     <ClInclude Include="src\7z.h"/>
     <ClInclude Include="src\7zBuf.h"/>
     <ClInclude Include="src\7zCrc.h"/>
@@ -295,11 +296,8 @@
     <ClInclude Include="src\LzmaDec.h"/>
     <ClInclude Include="src\Ppmd.h"/>
     <ClInclude Include="src\Ppmd7.h"/>
-    <ClInclude Include="include\Poco\SevenZip\SevenZip.h"/>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Archive.cpp"/>
-    <ClCompile Include="src\ArchiveEntry.cpp"/>
     <ClCompile Include="src\7zAlloc.c"/>
     <ClCompile Include="src\7zBuf.c"/>
     <ClCompile Include="src\7zBuf2.c"/>
@@ -309,6 +307,8 @@
     <ClCompile Include="src\7zFile.c"/>
     <ClCompile Include="src\7zIn.c"/>
     <ClCompile Include="src\7zStream.c"/>
+    <ClCompile Include="src\Archive.cpp"/>
+    <ClCompile Include="src\ArchiveEntry.cpp"/>
     <ClCompile Include="src\Bcj2.c"/>
     <ClCompile Include="src\Bra.c"/>
     <ClCompile Include="src\Bra86.c"/>
