@@ -191,6 +191,14 @@ void Process::kill(PID pid)
 	killImpl(pid);
 }
 
+bool Process::isRunning(const ProcessHandle& handle)
+{
+	return isRunningImpl(*handle._pImpl);
+}
+bool Process::isRunning(PID pid)
+{
+	return isRunningImpl(pid);
+}
 
 void Process::requestTermination(PID pid)
 {

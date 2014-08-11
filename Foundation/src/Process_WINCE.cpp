@@ -186,6 +186,28 @@ void ProcessImpl::killImpl(PIDImpl pid)
 	}
 }
 
+bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle) 
+{
+	BOOL fRC = true;
+	DWORD exit_code;
+
+	GetExitCodeProcess(handle.process(), &exit_code);
+	if (exit_code != STILL_ACTIVE) fRC = false;
+
+	return fRC;
+}
+bool ProcessImpl::isRunningImpl(PIDImpl pid) 
+{
+	HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+	BOOL fRC = true;
+	DWORD exit_code;
+
+	GetExitCodeProcess(hProc, &exit_code);
+	if (exit_code != STILL_ACTIVE) fRC = false;
+
+	return fRC;
+}
+
 
 void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 {
