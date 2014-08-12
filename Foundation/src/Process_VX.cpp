@@ -80,10 +80,13 @@ void ProcessImpl::killImpl(PIDImpl pid)
 	throw Poco::NotImplementedException("Process::kill()");
 }
 
+
 bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle) 
 {
 	throw Poco::NotImplementedException("Process::is_running()");
 }
+
+
 bool ProcessImpl::isRunningImpl(PIDImpl pid) 
 {
 	throw Poco::NotImplementedException("Process::is_running()");
