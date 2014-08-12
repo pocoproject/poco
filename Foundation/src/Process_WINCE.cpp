@@ -186,6 +186,7 @@ void ProcessImpl::killImpl(PIDImpl pid)
 	}
 }
 
+
 bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle) 
 {
 	BOOL fRC = true;
@@ -196,6 +197,8 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 
 	return fRC;
 }
+
+
 bool ProcessImpl::isRunningImpl(PIDImpl pid) 
 {
 	HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
