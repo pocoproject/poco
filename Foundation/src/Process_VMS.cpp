@@ -139,14 +139,18 @@ void ProcessImpl::killImpl(PIDImpl pid)
 	}
 }
 
+
 bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle) 
 {
 	throw Poco::NotImplementedException("Process::is_running()");
 }
+
+
 bool ProcessImpl::isRunningImpl(PIDImpl pid) 
 {
 	throw Poco::NotImplementedException("Process::is_running()");
 }
+
 
 void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 {
