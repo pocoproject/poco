@@ -30,6 +30,7 @@ public:
 	void testLaunchRedirectIn();
 	void testLaunchRedirectOut();
 	void testLaunchEnv();
+	void testIsRunning();
 
 	void setUp();
 	void tearDown();
