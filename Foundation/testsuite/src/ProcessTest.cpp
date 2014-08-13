@@ -92,6 +92,7 @@ void ProcessTest::testLaunchRedirectIn()
 #endif // !defined(_WIN32_WCE)
 }
 
+
 void ProcessTest::testIsRunning()
 {
 	std::string name("TestApp");
@@ -121,6 +122,7 @@ void ProcessTest::testIsRunning()
 	assert (!Process::isRunning(ph));
 	assert (!Process::isRunning(id));
 }
+
 
 void ProcessTest::testLaunchRedirectOut()
 {
