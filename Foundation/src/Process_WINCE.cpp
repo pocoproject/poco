@@ -189,26 +189,26 @@ void ProcessImpl::killImpl(PIDImpl pid)
 
 bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle) 
 {
-	BOOL fRC = true;
-	DWORD exit_code;
+	bool result = true;
+	DWORD exitCode;
 
-	GetExitCodeProcess(handle.process(), &exit_code);
-	if (exit_code != STILL_ACTIVE) fRC = false;
+	GetExitCodeProcess(handle.process(), &exitCode);
+	if (exitCode != STILL_ACTIVE) result = false;
 
-	return fRC;
+	return result;
 }
 
 
 bool ProcessImpl::isRunningImpl(PIDImpl pid) 
 {
 	HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
-	BOOL fRC = true;
-	DWORD exit_code;
+	bool result = true;
+	DWORD exitCode;
 
-	GetExitCodeProcess(hProc, &exit_code);
-	if (exit_code != STILL_ACTIVE) fRC = false;
+	GetExitCodeProcess(hProc, &exitCode);
+	if (exitCode != STILL_ACTIVE) result = false;
 
-	return fRC;
+	return result;
 }
 
 
