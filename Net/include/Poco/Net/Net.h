@@ -33,7 +33,7 @@
 // Net_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && defined(POCO_DLL)
+#if (defined(_WIN32) || defined(_WIN64)) && defined(POCO_DLL)
 	#if defined(Net_EXPORTS)
 		#define Net_API __declspec(dllexport)
 	#else
@@ -90,7 +90,7 @@ inline void Net_API uninitializeNetwork();
 // Automate network initialization (only relevant on Windows).
 //
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT) && !defined(__GNUC__)
 
 extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
 

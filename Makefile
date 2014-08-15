@@ -9,7 +9,7 @@ sinclude config.build
 
 ifndef POCO_BASE
 $(warning WARNING: POCO_BASE is not defined. Assuming current directory.)
-export POCO_BASE=$(shell pwd)
+export POCO_BASE=$(CURDIR)
 endif
 
 ifndef POCO_PREFIX

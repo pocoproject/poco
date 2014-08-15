@@ -16,20 +16,13 @@
 
 #include "Poco/NumberFormatter.h"
 #include "Poco/MemoryStream.h"
+#include <ios>
+#include <sstream>
 #include <iomanip>
 #if !defined(POCO_NO_LOCALE)
 #include <locale>
 #endif
 #include <cstdio>
-
-
-#if defined(_MSC_VER) || defined(__MINGW32__)
-	#define I64_FMT "I64"
-#elif defined(__APPLE__) 
-	#define I64_FMT "q"
-#else
-	#define I64_FMT "ll"
-#endif
 
 
 namespace Poco {
@@ -364,17 +357,15 @@ void NumberFormatter::append(std::string& str, double value, int width, int prec
 
 void NumberFormatter::append(std::string& str, const void* ptr)
 {
-	char buffer[24];
-#if defined(POCO_PTR_IS_64_BIT)
-	#if defined(POCO_LONG_IS_64_BIT)
-		std::sprintf(buffer, "%016lX", (UIntPtr) ptr);
-	#else
-		std::sprintf(buffer, "%016" I64_FMT "X", (UIntPtr) ptr);
-	#endif
-#else
-	std::sprintf(buffer, "%08lX", (UIntPtr) ptr);
-#endif
-	str.append(buffer);
+	std::ostringstream os;
+
+	os	<< std::hex
+		<< std::setw(sizeof(ptr) * 2)
+		<< std::setfill('0')
+		<< setiosflags(std::ios::uppercase)
+		<< ptr;
+
+	str.append(os.str());
 }
 
 

@@ -49,6 +49,9 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	poco_assert_dbg (precision > 0);
 	poco_assert_dbg (str.length());
 
+	std::string::size_type _precision = static_cast<std::string::size_type>(precision);
+	std::string::size_type _width = static_cast<std::string::size_type>(width);
+	
 	std::string::size_type decSepPos = str.find(decSep);
 	if (decSepPos == std::string::npos)
 	{
@@ -67,17 +70,17 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 		str = str.substr(0, str.length() - eStr->length());
 	}
 
-	if (frac != precision)
+	if (frac != _precision)
 	{
-		if (frac < precision)
-			str.append(precision - frac, '0');
-		else if ((frac > precision) && (decSepPos != std::string::npos)) 
-			str = str.substr(0, decSepPos + 1 + precision);
+		if (frac < _precision)
+			str.append(_precision - frac, '0');
+		else if ((frac > _precision) && (decSepPos != std::string::npos)) 
+			str = str.substr(0, decSepPos + 1 + _precision);
 	}
 
 	if (eStr.get()) str += *eStr;
 
-	if (width && (str.length() < width)) str.insert(str.begin(), width - str.length(), prefix);
+	if (_width && (str.length() < _width)) str.insert(str.begin(), _width - str.length(), prefix);
 }
 
 

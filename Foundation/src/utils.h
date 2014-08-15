@@ -35,6 +35,11 @@
 #ifndef ASSERT
 #define ASSERT(condition)      (assert(condition))
 #endif
+#if __cplusplus >= 201103L
+#define STATIC_ASSERT(b, str) static_assert(b, str)
+#else
+#define STATIC_ASSERT(b, str) typedef char __StaticAssertCheck[b ? 1 : -1]
+#endif
 #ifndef UNIMPLEMENTED
 #define UNIMPLEMENTED() (abort())
 #endif
@@ -299,7 +304,7 @@ template <class Dest, class Source>
 inline Dest BitCast(const Source& source) {
   // Compile time assertion: sizeof(Dest) == sizeof(Source)
   // A compile error here means your Dest and Source have different sizes.
-  typedef char VerifySizesAreEqual[sizeof(Dest) == sizeof(Source) ? 1 : -1];
+  STATIC_ASSERT(sizeof(Dest) == sizeof(Source), "Dest and Source must have the same size");
 
   Dest dest;
   memmove(&dest, &source, sizeof(dest));

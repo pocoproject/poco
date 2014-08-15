@@ -113,6 +113,12 @@ Options:
     depends upon target. Can be specified together
     with --static to build both.
 
+  --basedir=<path>
+    Set the sources path. Default: `cd dirname $0;pwd`
+
+  --builddir=<path>
+    Set the building path. Default: `pwd`
+
 ENDHELP
 }
 
@@ -204,6 +210,12 @@ while [ $# -ge 1 ]; do
 
 	--shared)
 		shared=1 ;;
+
+	--basedir=*)
+		base="`echo ${1} | awk '{print substr($0,11)}'`" ;;
+
+	--builddir=*)
+		build="`echo ${1} | awk '{print substr($0,12)}'`" ;;
 
 	--help)
  		showhelp
