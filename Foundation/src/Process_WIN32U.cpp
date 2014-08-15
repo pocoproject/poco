@@ -266,23 +266,19 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 {
 	bool result = true;
 	DWORD exitCode;
-
-	GetExitCodeProcess(handle.process(), &exitCode);
-	if (exitCode != STILL_ACTIVE) result = false;
-
+	BOOL rc = GetExitCodeProcess(handle.process(), &exitCode);
+	if (!rc || exitCode != STILL_ACTIVE) result = false;
 	return result;
 }
 
 
 bool ProcessImpl::isRunningImpl(PIDImpl pid) 
 {
-	HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+	HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	bool result = true;
 	DWORD exitCode;
-
-	GetExitCodeProcess(hProc, &exitCode);
-	if (exitCode != STILL_ACTIVE) result = false;
-
+	BOOL rc = GetExitCodeProcess(hProc, &exitCode);
+	if (!rc || exitCode != STILL_ACTIVE) result = false;
 	return result;
 }
 
