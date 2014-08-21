@@ -73,12 +73,12 @@ namespace Poco {
 namespace Net {
 
 
-inline void Net_API initializeNetwork();
+void Net_API initializeNetwork();
 	/// Initialize the network subsystem.
 	/// (Windows only, no-op elsewhere)
 
 
-inline void Net_API uninitializeNetwork();
+void Net_API uninitializeNetwork();
 	/// Uninitialize the network subsystem.
 	/// (Windows only, no-op elsewhere)
 
