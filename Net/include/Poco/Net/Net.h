@@ -90,7 +90,7 @@ inline void Net_API uninitializeNetwork();
 // Automate network initialization (only relevant on Windows).
 //
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT) && !defined(__GNUC__)
 
 extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
 
