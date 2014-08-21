@@ -28,8 +28,8 @@
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#if defined(POCO_WIN32_UTF8)
 		#include "Poco/UnicodeConverter.h"
-		#include "Poco/Error.h"
 	#endif
+	#include "Poco/Error.h"
 	#include <iphlpapi.h>
 	#include <ipifcons.h>
 #endif
@@ -1105,10 +1105,10 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		Poco::UnicodeConverter::toUTF8(pAddress->Description, displayName);
 #else
 		char nameBuffer[1024];
-		rc = WideCharToMultiByte(CP_ACP, 0, pAddress->FriendlyName, -1, nameBuffer, sizeof(nameBuffer), NULL, NULL);
+		int rc = WideCharToMultiByte(CP_ACP, 0, pAddress->FriendlyName, -1, nameBuffer, sizeof(nameBuffer), NULL, NULL);
 		if (rc) name = nameBuffer;
 		char displayNameBuffer[1024];
-		int rc = WideCharToMultiByte(CP_ACP, 0, pAddress->Description, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
+		rc = WideCharToMultiByte(CP_ACP, 0, pAddress->Description, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
 		if (rc) displayName = displayNameBuffer;
 #endif
 
