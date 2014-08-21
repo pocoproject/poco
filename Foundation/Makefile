@@ -59,4 +59,8 @@ target         = PocoFoundation
 target_version = $(LIBVERSION)
 target_libs    =
 
+ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
+    $(shell cd src; windmc pocomsg.mc)
+endif
+
 include $(POCO_BASE)/build/rules/lib
