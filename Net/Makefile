@@ -11,7 +11,7 @@ include $(POCO_BASE)/build/rules/global
 SHAREDOPT_CXX += -DNet_EXPORTS
 
 objects = \
-	DNS HTTPResponse HostEntry Socket \
+	Net DNS HTTPResponse HostEntry Socket \
 	DatagramSocket HTTPServer IPAddress IPAddressImpl SocketAddress SocketAddressImpl \
 	HTTPBasicCredentials HTTPCookie HTMLForm MediaType DialogSocket \
 	DatagramSocketImpl FilePartSource HTTPServerConnection MessageHeader \

@@ -102,7 +102,7 @@ struct ODBC_API ODBCConnectorRegistrator
 
 
 #if !defined(POCO_NO_AUTOMATIC_LIB_INIT)
-	#if defined(POCO_OS_FAMILY_WINDOWS)
+	#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(__GNUC__)
 		extern "C" const struct ODBC_API ODBCConnectorRegistrator pocoODBCConnectorRegistrator;
 		#if defined(ODBC_EXPORTS)
 			#if defined(_WIN64)

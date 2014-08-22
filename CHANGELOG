@@ -1,5 +1,12 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.6.0 (2014-10-??)
+==========================
+
+- fixed GH #326: compile Net lib 1.5.2 without UTF8 support enabled
+- fixed GH #518: NetworkInterface.cpp compile error w/ POCO_NO_WSTRING (1.5.3)
+
+
 Release 1.5.3 (2014-06-30)
 ==========================
 
