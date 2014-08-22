@@ -1,39 +1,28 @@
-set( TEST_SRCS
-src/AbstractConfigurationTest.cpp
-src/JSONConfigurationTest.cpp
-src/ConfigurationMapperTest.cpp
-src/ConfigurationTestSuite.cpp
-src/ConfigurationViewTest.cpp
-src/Driver.cpp
-src/FilesystemConfigurationTest.cpp
-src/HelpFormatterTest.cpp
-src/IniFileConfigurationTest.cpp
-src/LayeredConfigurationTest.cpp
-src/LoggingConfiguratorTest.cpp
-src/MapConfigurationTest.cpp
-src/OptionProcessorTest.cpp
-src/OptionSetTest.cpp
-src/OptionTest.cpp
-src/OptionsTestSuite.cpp
-src/PropertyFileConfigurationTest.cpp
-src/SystemConfigurationTest.cpp
-src/UtilTestSuite.cpp
-src/ValidatorTest.cpp
-src/XMLConfigurationTest.cpp
-src/TimerTestSuite.cpp
-src/TimerTest.cpp
-)
-
-set( WIN_TEST_SRCS
-src/WinConfigurationTest.cpp
-src/WinDriver.cpp
-src/WinRegistryTest.cpp
-src/WindowsTestSuite.cpp
-)
-
 set(TESTUNIT "${LIBNAME}-testrunner")
+
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( TEST_SRCS ${SRCS_G})
+
+# Headers
+file(GLOB_RECURSE HDRS_G "src/*.h" )
+POCO_HEADERS_AUTO( TEST_SRCS ${HDRS_G})
+
+POCO_SOURCES_AUTO_PLAT( TEST_SRCS WIN32
+    src/WinDriver.cpp
+    src/WinConfigurationTest.cpp
+    src/WinRegistryTest.cpp
+    src/WindowsTestSuite.cpp
+)
+
+POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
+    src/WinCEDriver.cpp
+)
 
 add_executable( ${TESTUNIT} ${TEST_SRCS} )
 add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
-#set_target_properties( ${TESTUNIT} PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} )
 target_link_libraries( ${TESTUNIT} PocoUtil PocoJSON PocoXML PocoFoundation CppUnit)
+if( WIN32)
+    add_definitions("-D_AFXDLL")
+    target_link_libraries( ${TESTUNIT} WinTestRunner)
+endif(WIN32)
