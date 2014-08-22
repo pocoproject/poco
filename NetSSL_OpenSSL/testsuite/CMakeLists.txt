@@ -1,33 +1,33 @@
-set( TEST_SRCS
-src/Driver.cpp
-src/HTTPSClientSessionTest.cpp
-src/HTTPSClientTestSuite.cpp
-src/HTTPSServerTest.cpp
-src/HTTPSServerTestSuite.cpp
-src/HTTPSStreamFactoryTest.cpp
-src/HTTPSTestServer.cpp
-src/NetSSLTestSuite.cpp
-src/TCPServerTest.cpp
-src/TCPServerTestSuite.cpp
-)
-
-#include_directories()
-
-set( WIN_TEST_SRCS
-src/WinDriver.cpp
-)
-
 set(TESTUNIT "${LIBNAME}-testrunner")
 
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( TEST_SRCS ${SRCS_G})
+
+# Headers
+file(GLOB_RECURSE HDRS_G "src/*.h" )
+POCO_HEADERS_AUTO( TEST_SRCS ${HDRS_G})
+
+POCO_SOURCES_AUTO_PLAT( TEST_SRCS WIN32
+    src/WinDriver.cpp
+)
+
+POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
+    src/WinCEDriver.cpp
+)
+
 add_executable( ${TESTUNIT} ${TEST_SRCS} )
-add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
-#set_target_properties( ${TESTUNIT} PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} )
+add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND ${TESTUNIT} -all)
 target_link_libraries( ${TESTUNIT} PocoNetSSL PocoCrypto PocoNet PocoUtil PocoXML PocoFoundation CppUnit)
+if( WIN32)
+    add_definitions("-D_AFXDLL")
+    target_link_libraries( ${TESTUNIT} WinTestRunner)
+endif(WIN32)
 
 # The test is run in the build directory. So the test data is copied there too
 add_custom_command(TARGET ${TESTUNIT} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/any.pem ${CMAKE_CURRENT_BINARY_DIR}
-                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/rootcert.pem ${CMAKE_CURRENT_BINARY_DIR}
-                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_CURRENT_BINARY_DIR}/${TESTUNIT}.xml
+                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/any.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/rootcert.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTUNIT}.xml
                    )
 

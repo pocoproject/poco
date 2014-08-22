@@ -2,6 +2,9 @@
 # POCO_STATIC
 # POCO_UNBUNDLED
 # POCO_NO_LOCALE
+#
+# ENABLE_{COMPONENT}
+# ENABLE_TESTS
 
 project(Poco)
 
@@ -61,6 +64,23 @@ endif ()
 # For Debug build types, append a "d" to the library names.
 set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set debug library postfix" FORCE)
 
+# Include some common macros to simpilfy the Poco CMake files
+include(PocoMacros)
+
+# Allow enabling and disabling components
+option(ENABLE_XML "Enable the XML" ON)
+option(ENABLE_JSON "Enable the JSON" ON)
+option(ENABLE_MONGODB "Enable MongoDB" ON)
+option(ENABLE_PDF "Enable PDF" ON)
+option(ENABLE_UTIL "Enable Util" ON)
+option(ENABLE_NET "Enable Net" ON)
+option(ENABLE_NETSSL "Enable NetSSL" ON)
+option(ENABLE_CRYPTO "Enable Crypto" ON)
+option(ENABLE_DATA "Enable Data" ON)
+option(ENABLE_SEVENZIP "Enable SevenZip" ON)
+option(ENABLE_ZIP "Enable Zip" ON)
+option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
+
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
 
@@ -96,7 +116,7 @@ else ()
 endif ()
 
 # Set local include path
-include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include Data/MySQL/include Data/SQLite/include Data/ODBC/include Zip/include Crypto/include Web/include JSON/include MongoDB/include PDF/include SevenZip/include)
+include_directories( CppUnit/include CppUnit/WinTestRunner/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include Data/MySQL/include Data/SQLite/include Data/ODBC/include Zip/include Crypto/include Web/include JSON/include MongoDB/include PDF/include SevenZip/include)
 
 include(CheckTypeSize)
 find_package(Cygwin)
@@ -160,29 +180,54 @@ if (ENABLE_TESTS)
 endif ()
 
 add_subdirectory(Foundation)
+if(ENABLE_XML)
 add_subdirectory(XML)
+endif()
+if(ENABLE_JSON)
 add_subdirectory(JSON)
+endif()
+if(ENABLE_MONGODB)
 add_subdirectory(MongoDB)
+endif()
+if(ENABLE_PDF)
 add_subdirectory(PDF)
+endif()
+if(ENABLE_UTIL)
 add_subdirectory(Util)
+endif()
+if(ENABLE_NET)
 add_subdirectory(Net)
+endif()
 
 # OPENSSL_SSL_LIBRARY
 find_package(OpenSSL)
 if(OPENSSL_FOUND)
-    include_directories(${OPENSSL_INCLUDE_DIR})
+    include_directories("${OPENSSL_INCLUDE_DIR}")
+    if(ENABLE_NETSSL)
     add_subdirectory(NetSSL_OpenSSL)
+    endif()
+    if(ENABLE_CRYPTO)
     add_subdirectory(Crypto)
+    endif()
 endif(OPENSSL_FOUND)
 
+if(ENABLE_DATA)
 add_subdirectory(Data)
+endif()
+if(ENABLE_SEVENZIP)
 add_subdirectory(SevenZip)
+endif()
+if(ENABLE_ZIP)
 add_subdirectory(Zip)
+endif()
 
-#find_package(ARP)
-#find_package(Apache2)
+find_package(APR)
+find_package(Apache2)
 if(APRUTIL_FOUND AND APACHE_FOUND)
+    include_directories( "${APACHE_INCLUDE_DIR}" "${APRUTIL_INCLUDE_DIR}" )
+    if(ENABLE_APACHECONNECTOR)
     add_subdirectory(ApacheConnector)
+    endif()
 endif(APRUTIL_FOUND AND APACHE_FOUND)
 
 #############################################################
