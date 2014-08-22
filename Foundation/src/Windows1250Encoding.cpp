@@ -23,7 +23,9 @@ namespace Poco {
 
 const char* Windows1250Encoding::_names[] =
 {
+	"windows-1250",
 	"Windows-1250",
+	"cp1250",
 	"CP1250",
 	NULL
 };
