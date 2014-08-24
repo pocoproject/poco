@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|x64">
       <Configuration>debug_shared</Configuration>
@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">TestSuited</TargetName>
@@ -311,10 +311,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CompressTest.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\PartialStreamTest.cpp"/>
     <ClCompile Include="src\ZipTest.cpp"/>
     <ClCompile Include="src\ZipTestSuite.cpp"/>
-    <ClCompile Include="src\Driver.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

@@ -1,17 +1,22 @@
 set(LIBNAME "PocoDataMySQL")
 
-set(SRCS "")
-aux_source_directory(src SRCS)
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( MYSQL_SRCS ${SRCS_G})
+
+# Headers
+file(GLOB_RECURSE HDRS_G "include/*.h" )
+POCO_HEADERS_AUTO( MYSQL_SRCS ${HDRS_G})
 
 add_definitions(-DTHREADSAFE -DNO_TCL)
 
-include_directories( include ${MYSQL_INCLUDE_DIR})
-#link_directories( )
+include_directories( "include" )
 
-add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
+add_library( ${LIBNAME} ${LIB_MODE} ${MYSQL_SRCS} )
 set_target_properties( ${LIBNAME} 
-	PROPERTIES
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
+    PROPERTIES
+    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+    DEFINE_SYMBOL MySQL_EXPORTS)
 target_link_libraries( ${LIBNAME} PocoData PocoFoundation ${MYSQL_LIB})
 
 install(
@@ -19,7 +24,7 @@ install(
     DESTINATION include
     PATTERN ".svn" EXCLUDE
     )
-    
+
 install(
     TARGETS ${LIBNAME}
     LIBRARY DESTINATION lib${LIB_SUFFIX}
@@ -28,5 +33,5 @@ install(
     )
 
 if (ENABLE_TESTS)
-  add_subdirectory(testsuite)
+    add_subdirectory(testsuite)
 endif ()

@@ -1,26 +1,27 @@
-set( TEST_SRCS
-src/Binder.cpp
-src/Connector.cpp
-src/DataTest.cpp
-src/Driver.cpp
-src/DataTestSuite.cpp
-src/Extractor.cpp
-src/Preparator.cpp
-src/SessionImpl.cpp
-src/SessionPoolTest.cpp
-src/TestStatementImpl.cpp
-)
-
-#include_directories()
-
-set( WIN_TEST_SRCS
-src/WinDriver.cpp
-)
-
 set(TESTUNIT "${LIBNAME}-testrunner")
+
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( TEST_SRCS ${SRCS_G})
+
+# Headers
+file(GLOB_RECURSE HDRS_G "src/*.h" )
+POCO_HEADERS_AUTO( TEST_SRCS ${HDRS_G})
+
+POCO_SOURCES_AUTO_PLAT( TEST_SRCS WIN32
+    src/WinDriver.cpp
+)
+
+#TODO: Why is this file there? It doesn't compile if it is include in the sources
+POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
+    src/StatementImpl.cpp
+)
 
 add_executable( ${TESTUNIT} ${TEST_SRCS} )
 add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
-#set_target_properties( ${TESTUNIT} PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} )
 target_link_libraries( ${TESTUNIT} PocoData PocoUtil PocoXML PocoFoundation CppUnit)
-
+if( WIN32)
+    #TODO: Is this flag always required?
+    add_definitions("-D_AFXDLL")
+    target_link_libraries( ${TESTUNIT} WinTestRunner)
+endif(WIN32)

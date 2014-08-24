@@ -23,7 +23,9 @@ namespace Poco {
 
 const char* Windows1251Encoding::_names[] =
 {
+	"windows-1251",
 	"Windows-1251",
+	"cp1251",
 	"CP1251",
 	NULL
 };
@@ -212,6 +214,7 @@ int Windows1251Encoding::convert(int ch, unsigned char* bytes, int length) const
 	case 0x044c: if (bytes && length >= 1) *bytes = 0xfc; return 1;
 	case 0x044d: if (bytes && length >= 1) *bytes = 0xfd; return 1;
 	case 0x044e: if (bytes && length >= 1) *bytes = 0xfe; return 1;
+	case 0x044f: if (bytes && length >= 1) *bytes = 0xff; return 1;
 	default: return 0;
 	}
 }

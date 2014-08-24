@@ -26,7 +26,7 @@ namespace Poco {
 namespace Dynamic {
 
 
-const int VarIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
+const std::size_t VarIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
 VarIterator::VarIterator(Var* pVar, bool positionEnd): 

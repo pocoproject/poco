@@ -51,13 +51,13 @@ void TextEncodingTest::testTextEncoding()
 	assert (std::string("ISO-8859-15") == latin9.canonicalName());
 
 	TextEncoding& cp1250 = TextEncoding::byName("CP1250");
-	assert (std::string("Windows-1250") == cp1250.canonicalName());
+	assert (std::string("windows-1250") == cp1250.canonicalName());
 
 	TextEncoding& cp1251 = TextEncoding::byName("CP1251");
-	assert (std::string("Windows-1251") == cp1251.canonicalName());
+	assert (std::string("windows-1251") == cp1251.canonicalName());
 
 	TextEncoding& cp1252 = TextEncoding::byName("CP1252");
-	assert (std::string("Windows-1252") == cp1252.canonicalName());
+	assert (std::string("windows-1252") == cp1252.canonicalName());
 
 
 	TextEncoding& glob = TextEncoding::global();
@@ -77,15 +77,15 @@ void TextEncodingTest::testTextEncoding()
 
 	TextEncoding::global(new Windows1250Encoding);
 	TextEncoding& glob5 = TextEncoding::global();
-	assert (std::string("Windows-1250") == glob5.canonicalName());
+	assert (std::string("windows-1250") == glob5.canonicalName());
 
 	TextEncoding::global(new Windows1251Encoding);
 	TextEncoding& glob6 = TextEncoding::global();
-	assert (std::string("Windows-1251") == glob6.canonicalName());
+	assert (std::string("windows-1251") == glob6.canonicalName());
 
 	TextEncoding::global(new Windows1252Encoding);
 	TextEncoding& glob7 = TextEncoding::global();
-	assert (std::string("Windows-1252") == glob7.canonicalName());
+	assert (std::string("windows-1252") == glob7.canonicalName());
 
 	TextEncoding::global(new UTF8Encoding);
 	TextEncoding& glob8 = TextEncoding::global();

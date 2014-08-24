@@ -221,6 +221,25 @@ void ProcessImpl::killImpl(PIDImpl pid)
 }
 
 
+bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
+{
+	return isRunningImpl(handle.id());
+}
+
+
+bool ProcessImpl::isRunningImpl(PIDImpl pid)  
+{
+	if (kill(pid, 0) == 0) 
+	{
+		return true;
+	} 
+	else 
+	{
+		return false;
+	}
+}
+
+				
 void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 {
 	if (kill(pid, SIGINT) != 0)

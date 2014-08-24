@@ -1,15 +1,18 @@
 set(LIBNAME "PocoZip")
 
-aux_source_directory(src SRCS)
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 
-if (NOT POCO_STATIC)
-  add_definitions(-DZip_EXPORTS)
-endif (NOT POCO_STATIC)
+# Headers
+file(GLOB_RECURSE HDRS_G "include/*.h" )
+POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
-	PROPERTIES
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
+    PROPERTIES
+    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+    DEFINE_SYMBOL Zip_EXPORTS)
 target_link_libraries( ${LIBNAME} PocoUtil PocoXML PocoFoundation)
 
 install(
@@ -17,7 +20,7 @@ install(
     DESTINATION include
     PATTERN ".svn" EXCLUDE
     )
-    
+
 install(
     TARGETS ${LIBNAME}
     LIBRARY DESTINATION lib${LIB_SUFFIX}

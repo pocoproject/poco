@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|Win32">
       <Configuration>debug_shared</Configuration>
@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoPDFd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoPDFmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoPDFmtd</TargetName>
@@ -276,45 +276,15 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Destination.cpp"/>
-    <ClCompile Include="src\Document.cpp"/>
-    <ClCompile Include="src\Encoder.cpp"/>
-    <ClCompile Include="src\Font.cpp"/>
-    <ClCompile Include="src\Image.cpp"/>
-    <ClCompile Include="src\LinkAnnotation.cpp"/>
-    <ClCompile Include="src\Outline.cpp"/>
-    <ClCompile Include="src\Page.cpp"/>
-    <ClCompile Include="src\PDFException.cpp"/>
-    <ClCompile Include="src\TextAnnotation.cpp"/>
-    <ClCompile Include="src\png.c"/>
-    <ClCompile Include="src\pngerror.c"/>
-    <ClCompile Include="src\pnggccrd.c"/>
-    <ClCompile Include="src\pngget.c"/>
-    <ClCompile Include="src\pngmem.c"/>
-    <ClCompile Include="src\pngpread.c"/>
-    <ClCompile Include="src\pngread.c"/>
-    <ClCompile Include="src\pngrio.c"/>
-    <ClCompile Include="src\pngrtran.c"/>
-    <ClCompile Include="src\pngrutil.c"/>
-    <ClCompile Include="src\pngset.c"/>
-    <ClCompile Include="src\pngtest.c"/>
-    <ClCompile Include="src\pngtrans.c"/>
-    <ClCompile Include="src\pngvcrd.c"/>
-    <ClCompile Include="src\pngwio.c"/>
-    <ClCompile Include="src\pngwrite.c"/>
-    <ClCompile Include="src\pngwtran.c"/>
-    <ClCompile Include="src\pngwutil.c"/>
     <ClCompile Include="src\adler32.c"/>
     <ClCompile Include="src\compress.c"/>
     <ClCompile Include="src\crc32.c"/>
     <ClCompile Include="src\deflate.c"/>
+    <ClCompile Include="src\Destination.cpp"/>
+    <ClCompile Include="src\Document.cpp"/>
+    <ClCompile Include="src\Encoder.cpp"/>
+    <ClCompile Include="src\Font.cpp"/>
     <ClCompile Include="src\gzio.c"/>
-    <ClCompile Include="src\infback.c"/>
-    <ClCompile Include="src\inffast.c"/>
-    <ClCompile Include="src\inflate.c"/>
-    <ClCompile Include="src\inftrees.c"/>
-    <ClCompile Include="src\trees.c"/>
-    <ClCompile Include="src\zutil.c"/>
     <ClCompile Include="src\hpdf_annotation.c"/>
     <ClCompile Include="src\hpdf_array.c"/>
     <ClCompile Include="src\hpdf_binary.c"/>
@@ -334,9 +304,6 @@
     <ClCompile Include="src\hpdf_error.c"/>
     <ClCompile Include="src\hpdf_ext_gstate.c"/>
     <ClCompile Include="src\hpdf_font.c"/>
-    <ClCompile Include="src\hpdf_font_cid.c"/>
-    <ClCompile Include="src\hpdf_font_tt.c"/>
-    <ClCompile Include="src\hpdf_font_type1.c"/>
     <ClCompile Include="src\hpdf_fontdef.c"/>
     <ClCompile Include="src\hpdf_fontdef_base14.c"/>
     <ClCompile Include="src\hpdf_fontdef_cid.c"/>
@@ -346,6 +313,9 @@
     <ClCompile Include="src\hpdf_fontdef_kr.c"/>
     <ClCompile Include="src\hpdf_fontdef_tt.c"/>
     <ClCompile Include="src\hpdf_fontdef_type1.c"/>
+    <ClCompile Include="src\hpdf_font_cid.c"/>
+    <ClCompile Include="src\hpdf_font_tt.c"/>
+    <ClCompile Include="src\hpdf_font_type1.c"/>
     <ClCompile Include="src\hpdf_gstate.c"/>
     <ClCompile Include="src\hpdf_image.c"/>
     <ClCompile Include="src\hpdf_image_png.c"/>
@@ -357,40 +327,52 @@
     <ClCompile Include="src\hpdf_number.c"/>
     <ClCompile Include="src\hpdf_objects.c"/>
     <ClCompile Include="src\hpdf_outline.c"/>
+    <ClCompile Include="src\hpdf_pages.c"/>
     <ClCompile Include="src\hpdf_page_label.c"/>
     <ClCompile Include="src\hpdf_page_operator.c"/>
-    <ClCompile Include="src\hpdf_pages.c"/>
     <ClCompile Include="src\hpdf_real.c"/>
     <ClCompile Include="src\hpdf_streams.c"/>
     <ClCompile Include="src\hpdf_string.c"/>
     <ClCompile Include="src\hpdf_utils.c"/>
     <ClCompile Include="src\hpdf_xref.c"/>
+    <ClCompile Include="src\Image.cpp"/>
+    <ClCompile Include="src\infback.c"/>
+    <ClCompile Include="src\inffast.c"/>
+    <ClCompile Include="src\inflate.c"/>
+    <ClCompile Include="src\inftrees.c"/>
+    <ClCompile Include="src\LinkAnnotation.cpp"/>
+    <ClCompile Include="src\Outline.cpp"/>
+    <ClCompile Include="src\Page.cpp"/>
+    <ClCompile Include="src\PDFException.cpp"/>
+    <ClCompile Include="src\png.c"/>
+    <ClCompile Include="src\pngerror.c"/>
+    <ClCompile Include="src\pnggccrd.c"/>
+    <ClCompile Include="src\pngget.c"/>
+    <ClCompile Include="src\pngmem.c"/>
+    <ClCompile Include="src\pngpread.c"/>
+    <ClCompile Include="src\pngread.c"/>
+    <ClCompile Include="src\pngrio.c"/>
+    <ClCompile Include="src\pngrtran.c"/>
+    <ClCompile Include="src\pngrutil.c"/>
+    <ClCompile Include="src\pngset.c"/>
+    <ClCompile Include="src\pngtest.c"/>
+    <ClCompile Include="src\pngtrans.c"/>
+    <ClCompile Include="src\pngvcrd.c"/>
+    <ClCompile Include="src\pngwio.c"/>
+    <ClCompile Include="src\pngwrite.c"/>
+    <ClCompile Include="src\pngwtran.c"/>
+    <ClCompile Include="src\pngwutil.c"/>
+    <ClCompile Include="src\TextAnnotation.cpp"/>
+    <ClCompile Include="src\trees.c"/>
+    <ClCompile Include="src\zutil.c"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Poco\PDF\crc32.h"/>
+    <ClInclude Include="include\Poco\PDF\deflate.h"/>
     <ClInclude Include="include\Poco\PDF\Destination.h"/>
     <ClInclude Include="include\Poco\PDF\Document.h"/>
     <ClInclude Include="include\Poco\PDF\Encoder.h"/>
     <ClInclude Include="include\Poco\PDF\Font.h"/>
-    <ClInclude Include="include\Poco\PDF\Image.h"/>
-    <ClInclude Include="include\Poco\PDF\LinkAnnotation.h"/>
-    <ClInclude Include="include\Poco\PDF\Outline.h"/>
-    <ClInclude Include="include\Poco\PDF\Page.h"/>
-    <ClInclude Include="include\Poco\PDF\PDF.h"/>
-    <ClInclude Include="include\Poco\PDF\PDFException.h"/>
-    <ClInclude Include="include\Poco\PDF\Resource.h"/>
-    <ClInclude Include="include\Poco\PDF\TextAnnotation.h"/>
-    <ClInclude Include="include\Poco\PDF\png.h"/>
-    <ClInclude Include="include\Poco\PDF\pngconf.h"/>
-    <ClInclude Include="include\Poco\PDF\crc32.h"/>
-    <ClInclude Include="include\Poco\PDF\deflate.h"/>
-    <ClInclude Include="include\Poco\PDF\inffast.h"/>
-    <ClInclude Include="include\Poco\PDF\inffixed.h"/>
-    <ClInclude Include="include\Poco\PDF\inflate.h"/>
-    <ClInclude Include="include\Poco\PDF\inftrees.h"/>
-    <ClInclude Include="include\Poco\PDF\trees.h"/>
-    <ClInclude Include="include\Poco\PDF\zconf.h"/>
-    <ClInclude Include="include\Poco\PDF\zlib.h"/>
-    <ClInclude Include="include\Poco\PDF\zutil.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_annotation.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_catalog.h"/>
@@ -412,11 +394,29 @@
     <ClInclude Include="include\Poco\PDF\hpdf_mmgr.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_objects.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_outline.h"/>
-    <ClInclude Include="include\Poco\PDF\hpdf_page_label.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_pages.h"/>
+    <ClInclude Include="include\Poco\PDF\hpdf_page_label.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_streams.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_types.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_utils.h"/>
+    <ClInclude Include="include\Poco\PDF\Image.h"/>
+    <ClInclude Include="include\Poco\PDF\inffast.h"/>
+    <ClInclude Include="include\Poco\PDF\inffixed.h"/>
+    <ClInclude Include="include\Poco\PDF\inflate.h"/>
+    <ClInclude Include="include\Poco\PDF\inftrees.h"/>
+    <ClInclude Include="include\Poco\PDF\LinkAnnotation.h"/>
+    <ClInclude Include="include\Poco\PDF\Outline.h"/>
+    <ClInclude Include="include\Poco\PDF\Page.h"/>
+    <ClInclude Include="include\Poco\PDF\PDF.h"/>
+    <ClInclude Include="include\Poco\PDF\PDFException.h"/>
+    <ClInclude Include="include\Poco\PDF\png.h"/>
+    <ClInclude Include="include\Poco\PDF\pngconf.h"/>
+    <ClInclude Include="include\Poco\PDF\Resource.h"/>
+    <ClInclude Include="include\Poco\PDF\TextAnnotation.h"/>
+    <ClInclude Include="include\Poco\PDF\trees.h"/>
+    <ClInclude Include="include\Poco\PDF\zconf.h"/>
+    <ClInclude Include="include\Poco\PDF\zlib.h"/>
+    <ClInclude Include="include\Poco\PDF\zutil.h"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

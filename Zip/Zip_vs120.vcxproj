@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|Win32">
       <Configuration>debug_shared</Configuration>
@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoZipd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoZipmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoZipmtd</TargetName>
@@ -285,11 +285,16 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\Poco\Zip\Add.h"/>
     <ClInclude Include="include\Poco\Zip\AutoDetectStream.h"/>
     <ClInclude Include="include\Poco\Zip\Compress.h"/>
     <ClInclude Include="include\Poco\Zip\Decompress.h"/>
+    <ClInclude Include="include\Poco\Zip\Delete.h"/>
+    <ClInclude Include="include\Poco\Zip\Keep.h"/>
     <ClInclude Include="include\Poco\Zip\ParseCallback.h"/>
     <ClInclude Include="include\Poco\Zip\PartialStream.h"/>
+    <ClInclude Include="include\Poco\Zip\Rename.h"/>
+    <ClInclude Include="include\Poco\Zip\Replace.h"/>
     <ClInclude Include="include\Poco\Zip\SkipCallback.h"/>
     <ClInclude Include="include\Poco\Zip\Zip.h"/>
     <ClInclude Include="include\Poco\Zip\ZipArchive.h"/>
@@ -299,22 +304,22 @@
     <ClInclude Include="include\Poco\Zip\ZipException.h"/>
     <ClInclude Include="include\Poco\Zip\ZipFileInfo.h"/>
     <ClInclude Include="include\Poco\Zip\ZipLocalFileHeader.h"/>
-    <ClInclude Include="include\Poco\Zip\ZipStream.h"/>
-    <ClInclude Include="include\Poco\Zip\ZipUtil.h"/>
-    <ClInclude Include="include\Poco\Zip\Add.h"/>
-    <ClInclude Include="include\Poco\Zip\Delete.h"/>
-    <ClInclude Include="include\Poco\Zip\Keep.h"/>
-    <ClInclude Include="include\Poco\Zip\Rename.h"/>
-    <ClInclude Include="include\Poco\Zip\Replace.h"/>
     <ClInclude Include="include\Poco\Zip\ZipManipulator.h"/>
     <ClInclude Include="include\Poco\Zip\ZipOperation.h"/>
+    <ClInclude Include="include\Poco\Zip\ZipStream.h"/>
+    <ClInclude Include="include\Poco\Zip\ZipUtil.h"/>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Add.cpp"/>
     <ClCompile Include="src\AutoDetectStream.cpp"/>
     <ClCompile Include="src\Compress.cpp"/>
     <ClCompile Include="src\Decompress.cpp"/>
+    <ClCompile Include="src\Delete.cpp"/>
+    <ClCompile Include="src\Keep.cpp"/>
     <ClCompile Include="src\ParseCallback.cpp"/>
     <ClCompile Include="src\PartialStream.cpp"/>
+    <ClCompile Include="src\Rename.cpp"/>
+    <ClCompile Include="src\Replace.cpp"/>
     <ClCompile Include="src\SkipCallback.cpp"/>
     <ClCompile Include="src\ZipArchive.cpp"/>
     <ClCompile Include="src\ZipArchiveInfo.cpp"/>
@@ -323,15 +328,10 @@
     <ClCompile Include="src\ZipException.cpp"/>
     <ClCompile Include="src\ZipFileInfo.cpp"/>
     <ClCompile Include="src\ZipLocalFileHeader.cpp"/>
-    <ClCompile Include="src\ZipStream.cpp"/>
-    <ClCompile Include="src\ZipUtil.cpp"/>
-    <ClCompile Include="src\Add.cpp"/>
-    <ClCompile Include="src\Delete.cpp"/>
-    <ClCompile Include="src\Keep.cpp"/>
-    <ClCompile Include="src\Rename.cpp"/>
-    <ClCompile Include="src\Replace.cpp"/>
     <ClCompile Include="src\ZipManipulator.cpp"/>
     <ClCompile Include="src\ZipOperation.cpp"/>
+    <ClCompile Include="src\ZipStream.cpp"/>
+    <ClCompile Include="src\ZipUtil.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">

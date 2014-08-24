@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|x64">
       <Configuration>debug_shared</Configuration>
@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoXML64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoXMLmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoXMLmtd</TargetName>
@@ -275,35 +275,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Poco\XML\Name.h"/>
-    <ClInclude Include="include\Poco\Xml\NamePool.h"/>
-    <ClInclude Include="include\Poco\Xml\NamespaceStrategy.h"/>
-    <ClInclude Include="include\Poco\Xml\ParserEngine.h"/>
-    <ClInclude Include="include\Poco\Xml\XML.h"/>
-    <ClInclude Include="include\Poco\Xml\XMLException.h"/>
-    <ClInclude Include="include\Poco\Xml\XMLStream.h"/>
-    <ClInclude Include="include\Poco\Xml\XMLString.h"/>
-    <ClInclude Include="include\Poco\Xml\XMLWriter.h"/>
-    <ClInclude Include="include\Poco\SAX\Attributes.h"/>
-    <ClInclude Include="include\Poco\SAX\AttributesImpl.h"/>
-    <ClInclude Include="include\Poco\SAX\ContentHandler.h"/>
-    <ClInclude Include="include\Poco\SAX\DeclHandler.h"/>
-    <ClInclude Include="include\Poco\SAX\DefaultHandler.h"/>
-    <ClInclude Include="include\Poco\SAX\DTDHandler.h"/>
-    <ClInclude Include="include\Poco\SAX\EntityResolver.h"/>
-    <ClInclude Include="include\Poco\Sax\EntityResolverImpl.h"/>
-    <ClInclude Include="include\Poco\SAX\ErrorHandler.h"/>
-    <ClInclude Include="include\Poco\SAX\InputSource.h"/>
-    <ClInclude Include="include\Poco\SAX\LexicalHandler.h"/>
-    <ClInclude Include="include\Poco\SAX\Locator.h"/>
-    <ClInclude Include="include\Poco\Sax\LocatorImpl.h"/>
-    <ClInclude Include="include\Poco\SAX\NamespaceSupport.h"/>
-    <ClInclude Include="include\Poco\SAX\SAXException.h"/>
-    <ClInclude Include="include\Poco\Sax\SAXParser.h"/>
-    <ClInclude Include="include\Poco\Sax\WhitespaceFilter.h"/>
-    <ClInclude Include="include\Poco\Sax\XMLFilter.h"/>
-    <ClInclude Include="include\Poco\Sax\XMLFilterImpl.h"/>
-    <ClInclude Include="include\Poco\SAX\XMLReader.h"/>
     <ClInclude Include="include\Poco\Dom\AbstractContainerNode.h"/>
     <ClInclude Include="include\Poco\Dom\AbstractNode.h"/>
     <ClInclude Include="include\Poco\DOM\Attr.h"/>
@@ -345,8 +316,37 @@
     <ClInclude Include="include\Poco\DOM\ProcessingInstruction.h"/>
     <ClInclude Include="include\Poco\DOM\Text.h"/>
     <ClInclude Include="include\Poco\Dom\TreeWalker.h"/>
+    <ClInclude Include="include\Poco\SAX\Attributes.h"/>
+    <ClInclude Include="include\Poco\SAX\AttributesImpl.h"/>
+    <ClInclude Include="include\Poco\SAX\ContentHandler.h"/>
+    <ClInclude Include="include\Poco\SAX\DeclHandler.h"/>
+    <ClInclude Include="include\Poco\SAX\DefaultHandler.h"/>
+    <ClInclude Include="include\Poco\SAX\DTDHandler.h"/>
+    <ClInclude Include="include\Poco\SAX\EntityResolver.h"/>
+    <ClInclude Include="include\Poco\Sax\EntityResolverImpl.h"/>
+    <ClInclude Include="include\Poco\SAX\ErrorHandler.h"/>
+    <ClInclude Include="include\Poco\SAX\InputSource.h"/>
+    <ClInclude Include="include\Poco\SAX\LexicalHandler.h"/>
+    <ClInclude Include="include\Poco\SAX\Locator.h"/>
+    <ClInclude Include="include\Poco\Sax\LocatorImpl.h"/>
+    <ClInclude Include="include\Poco\SAX\NamespaceSupport.h"/>
+    <ClInclude Include="include\Poco\SAX\SAXException.h"/>
+    <ClInclude Include="include\Poco\Sax\SAXParser.h"/>
+    <ClInclude Include="include\Poco\Sax\WhitespaceFilter.h"/>
+    <ClInclude Include="include\Poco\Sax\XMLFilter.h"/>
+    <ClInclude Include="include\Poco\Sax\XMLFilterImpl.h"/>
+    <ClInclude Include="include\Poco\SAX\XMLReader.h"/>
     <ClInclude Include="include\Poco\Xml\expat.h"/>
     <ClInclude Include="include\Poco\Xml\expat_external.h"/>
+    <ClInclude Include="include\Poco\XML\Name.h"/>
+    <ClInclude Include="include\Poco\Xml\NamePool.h"/>
+    <ClInclude Include="include\Poco\Xml\NamespaceStrategy.h"/>
+    <ClInclude Include="include\Poco\Xml\ParserEngine.h"/>
+    <ClInclude Include="include\Poco\Xml\XML.h"/>
+    <ClInclude Include="include\Poco\Xml\XMLException.h"/>
+    <ClInclude Include="include\Poco\Xml\XMLStream.h"/>
+    <ClInclude Include="include\Poco\Xml\XMLString.h"/>
+    <ClInclude Include="include\Poco\Xml\XMLWriter.h"/>
     <ClInclude Include="src\ascii.h"/>
     <ClInclude Include="src\asciitab.h"/>
     <ClInclude Include="src\expat_config.h"/>
@@ -360,41 +360,19 @@
     <ClInclude Include="src\xmltok_impl.h"/>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Name.cpp"/>
-    <ClCompile Include="src\NamePool.cpp"/>
-    <ClCompile Include="src\NamespaceStrategy.cpp"/>
-    <ClCompile Include="src\ParserEngine.cpp"/>
-    <ClCompile Include="src\XMLException.cpp"/>
-    <ClCompile Include="src\XMLString.cpp"/>
-    <ClCompile Include="src\XMLWriter.cpp"/>
-    <ClCompile Include="src\Attributes.cpp"/>
-    <ClCompile Include="src\AttributesImpl.cpp"/>
-    <ClCompile Include="src\ContentHandler.cpp"/>
-    <ClCompile Include="src\DeclHandler.cpp"/>
-    <ClCompile Include="src\DefaultHandler.cpp"/>
-    <ClCompile Include="src\DTDHandler.cpp"/>
-    <ClCompile Include="src\EntityResolver.cpp"/>
-    <ClCompile Include="src\EntityResolverImpl.cpp"/>
-    <ClCompile Include="src\ErrorHandler.cpp"/>
-    <ClCompile Include="src\InputSource.cpp"/>
-    <ClCompile Include="src\LexicalHandler.cpp"/>
-    <ClCompile Include="src\Locator.cpp"/>
-    <ClCompile Include="src\LocatorImpl.cpp"/>
-    <ClCompile Include="src\NamespaceSupport.cpp"/>
-    <ClCompile Include="src\SAXException.cpp"/>
-    <ClCompile Include="src\SAXParser.cpp"/>
-    <ClCompile Include="src\WhitespaceFilter.cpp"/>
-    <ClCompile Include="src\XMLFilter.cpp"/>
-    <ClCompile Include="src\XMLFilterImpl.cpp"/>
-    <ClCompile Include="src\XMLReader.cpp"/>
     <ClCompile Include="src\AbstractContainerNode.cpp"/>
     <ClCompile Include="src\AbstractNode.cpp"/>
     <ClCompile Include="src\Attr.cpp"/>
+    <ClCompile Include="src\Attributes.cpp"/>
+    <ClCompile Include="src\AttributesImpl.cpp"/>
     <ClCompile Include="src\AttrMap.cpp"/>
     <ClCompile Include="src\CDATASection.cpp"/>
     <ClCompile Include="src\CharacterData.cpp"/>
     <ClCompile Include="src\ChildNodesList.cpp"/>
     <ClCompile Include="src\Comment.cpp"/>
+    <ClCompile Include="src\ContentHandler.cpp"/>
+    <ClCompile Include="src\DeclHandler.cpp"/>
+    <ClCompile Include="src\DefaultHandler.cpp"/>
     <ClCompile Include="src\Document.cpp"/>
     <ClCompile Include="src\DocumentEvent.cpp"/>
     <ClCompile Include="src\DocumentFragment.cpp"/>
@@ -406,29 +384,50 @@
     <ClCompile Include="src\DOMParser.cpp"/>
     <ClCompile Include="src\DOMSerializer.cpp"/>
     <ClCompile Include="src\DOMWriter.cpp"/>
+    <ClCompile Include="src\DTDHandler.cpp"/>
     <ClCompile Include="src\DTDMap.cpp"/>
     <ClCompile Include="src\Element.cpp"/>
     <ClCompile Include="src\ElementsByTagNameList.cpp"/>
     <ClCompile Include="src\Entity.cpp"/>
     <ClCompile Include="src\EntityReference.cpp"/>
+    <ClCompile Include="src\EntityResolver.cpp"/>
+    <ClCompile Include="src\EntityResolverImpl.cpp"/>
+    <ClCompile Include="src\ErrorHandler.cpp"/>
     <ClCompile Include="src\Event.cpp"/>
     <ClCompile Include="src\EventDispatcher.cpp"/>
     <ClCompile Include="src\EventException.cpp"/>
     <ClCompile Include="src\EventListener.cpp"/>
     <ClCompile Include="src\EventTarget.cpp"/>
+    <ClCompile Include="src\InputSource.cpp"/>
+    <ClCompile Include="src\LexicalHandler.cpp"/>
+    <ClCompile Include="src\Locator.cpp"/>
+    <ClCompile Include="src\LocatorImpl.cpp"/>
     <ClCompile Include="src\MutationEvent.cpp"/>
+    <ClCompile Include="src\Name.cpp"/>
     <ClCompile Include="src\NamedNodeMap.cpp"/>
+    <ClCompile Include="src\NamePool.cpp"/>
+    <ClCompile Include="src\NamespaceStrategy.cpp"/>
+    <ClCompile Include="src\NamespaceSupport.cpp"/>
     <ClCompile Include="src\Node.cpp"/>
     <ClCompile Include="src\NodeAppender.cpp"/>
     <ClCompile Include="src\NodeFilter.cpp"/>
     <ClCompile Include="src\NodeIterator.cpp"/>
     <ClCompile Include="src\NodeList.cpp"/>
     <ClCompile Include="src\Notation.cpp"/>
+    <ClCompile Include="src\ParserEngine.cpp"/>
     <ClCompile Include="src\ProcessingInstruction.cpp"/>
+    <ClCompile Include="src\SAXException.cpp"/>
+    <ClCompile Include="src\SAXParser.cpp"/>
     <ClCompile Include="src\Text.cpp"/>
     <ClCompile Include="src\TreeWalker.cpp"/>
+    <ClCompile Include="src\WhitespaceFilter.cpp"/>
+    <ClCompile Include="src\XMLException.cpp"/>
+    <ClCompile Include="src\XMLFilter.cpp"/>
+    <ClCompile Include="src\XMLFilterImpl.cpp"/>
     <ClCompile Include="src\xmlparse.cpp"/>
+    <ClCompile Include="src\XMLReader.cpp"/>
     <ClCompile Include="src\xmlrole.c"/>
+    <ClCompile Include="src\XMLString.cpp"/>
     <ClCompile Include="src\xmltok.c"/>
     <ClCompile Include="src\xmltok_impl.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>
@@ -446,6 +445,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\XMLWriter.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">

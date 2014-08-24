@@ -73,11 +73,18 @@ void Stringifier::formatString(const std::string& value, std::ostream& out)
 	for (std::string::const_iterator it = value.begin(),
 		 end = value.end(); it != end; ++it)
 	{
-		if (*it <= 0x1F || *it == '"' || *it == '\\' || *it == '/')
+		switch (*it)
 		{
-			out << '\\';
+			case '\\': out << "\\\\"; break;
+			case '"': out << "\\\""; break;
+			case '/': out << "\\/"; break;
+			case '\b': out << "\\b"; break;
+			case '\f': out << "\\f"; break;
+			case '\n': out << "\\n"; break;
+			case '\r': out << "\\r"; break;
+			case '\t': out << "\\t"; break;
+			default: out << *it; break;
 		}
-		out << *it;
 	}
 	out << '"';
 }

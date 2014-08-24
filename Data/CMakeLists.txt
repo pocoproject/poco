@@ -1,11 +1,15 @@
 set(LIBNAME "PocoData")
 
-set(SRCS "")
-aux_source_directory(src SRCS)
-include_directories( SQLite/include )
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( SRCS ${SRCS_G})
+
+# Headers
+file(GLOB_RECURSE HDRS_G "include/*.h" )
+POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
 if (NOT POCO_STATIC)
-  add_definitions(-DData_EXPORTS -DTHREADSAFE -DODBC_EXPORTS -DMySQL_EXPORTS -DSQLite_EXPORTS)
+    add_definitions(-DTHREADSAFE)
 endif (NOT POCO_STATIC)
 
 if(MSVC AND NOT(MSVC_VERSION LESS 1400))
@@ -14,9 +18,10 @@ if(MSVC AND NOT(MSVC_VERSION LESS 1400))
 endif()
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAME} 
-	PROPERTIES
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
+set_target_properties( ${LIBNAME}
+    PROPERTIES
+    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+    DEFINE_SYMBOL Data_EXPORTS)
 target_link_libraries( ${LIBNAME} PocoFoundation)
 
 install(
@@ -24,7 +29,7 @@ install(
     DESTINATION include
     PATTERN ".svn" EXCLUDE
     )
-    
+
 install(
     TARGETS ${LIBNAME}
     LIBRARY DESTINATION lib${LIB_SUFFIX}
@@ -32,27 +37,34 @@ install(
     RUNTIME DESTINATION bin
     )
 
+# SQlite3 is built in any case
 add_subdirectory( SQLite )
 
+find_package(MySQL)
 if(MYSQL_FOUND)
+    include_directories("${MYSQL_INCLUDE_DIR}")
+    message(STATUS "MySQL Support Enabled")
     add_subdirectory( MySQL )
+else()
+    message(STATUS "MySQL Support Disabled - no MySQL library")
 endif(MYSQL_FOUND)
 
-include(FindODBC)
-
+find_package(ODBC)
 if(CMAKE_SYSTEM MATCHES "Windows")
-	message(STATUS "Windows native ODBC Support Enabled")
-	add_subdirectory( ODBC )
+    set(ODBC_LIBRARIES "")
+    message(STATUS "Windows native ODBC Support Enabled")
+    add_subdirectory( ODBC )
 else ()
-	if ( ${UNIX_ODBC_CONFIG} STREQUAL UNIX_ODBC_CONFIG-NOTFOUND AND ${IODBC_CONFIG} STREQUAL IODBC_CONFIG-NOTFOUND)
-		message(STATUS "ODBC Support Disabled - no ODBC runtime")
-	else ()
-		message(STATUS "ODBC Support Enabled")
-		add_subdirectory( ODBC )
-	endif ()
+    if (ODBC_FOUND)
+        include_directories("${ODBC_INCLUDE_DIRECTORIES}")
+        message(STATUS "ODBC Support Enabled")
+        add_subdirectory( ODBC )
+    else ()
+        message(STATUS "ODBC Support Disabled - no ODBC runtime")
+    endif ()
 endif()
 
 if (ENABLE_TESTS)
-  add_subdirectory(samples)
-  add_subdirectory(testsuite)
+    add_subdirectory(samples)
+    add_subdirectory(testsuite)
 endif ()

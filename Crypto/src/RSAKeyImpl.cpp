@@ -37,6 +37,7 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 	const X509* pCert = cert.certificate();
 	EVP_PKEY* pKey = X509_get_pubkey(const_cast<X509*>(pCert));
 	_pRSA = EVP_PKEY_get1_RSA(pKey);
+	EVP_PKEY_free(pKey);
 }
 
 
@@ -86,7 +87,9 @@ RSAKeyImpl::RSAKeyImpl(
 			RSA* pubKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, 0, 0);
 			if (!pubKey)
 			{
-				int rc = BIO_seek(bio, 0);
+				int rc = BIO_reset(bio);
+				// BIO_reset() normally returns 1 for success and 0 or -1 for failure. 
+				// File BIOs are an exception, they return 0 for success and -1 for failure.
 				if (rc != 0) throw Poco::FileException("Failed to load public key", publicKeyFile);
 				pubKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, 0, 0);
 			}
@@ -147,8 +150,10 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 		RSA* publicKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, 0, 0);
 		if (!publicKey)
 		{
-			int rc = BIO_seek(bio, 0);
-			if (rc != 0) throw Poco::FileException("Failed to load public key");
+			int rc = BIO_reset(bio);
+			// BIO_reset() normally returns 1 for success and 0 or -1 for failure. 
+			// File BIOs are an exception, they return 0 for success and -1 for failure.
+			if (rc != 1) throw Poco::FileException("Failed to load public key");
 			publicKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, 0, 0);
 		}
 		BIO_free(bio);
