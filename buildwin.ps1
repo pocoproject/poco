@@ -337,6 +337,19 @@ function Build
     if ($omitArray -NotContains $component)
     {
       $vsProject = "$poco_base\$componentDir\$componentName$($platformName)$($suffix).$($extension)"
+      
+      if (!(Test-Path -Path $vsProject)) # when VS project name is not same as directory name
+      {
+        $vsProject = "$poco_base\$componentDir$($platformName)$($suffix).$($extension)"
+        if (!(Test-Path -Path $vsProject)) # not found
+        {
+          Write-Host "+------------------------------------------------------------------"
+          Write-Host "| VS project $vsProject not found, skipping."
+          Write-Host "+------------------------------------------------------------------"
+          Return # since Foreach-Object is a function, this is actually loop "continue"
+        }
+      }
+      
       Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
       Write-Host "| Building $vsProject"
       Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"

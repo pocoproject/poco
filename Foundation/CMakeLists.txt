@@ -1,182 +1,32 @@
 set(LIBNAME "PocoFoundation")
 
-if (WIN32)
-  # cmake has CMAKE_RC_COMPILER, but no message compiler
-  if ("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-    # this path is only present for 2008+, but we currently require PATH to
-    # be set up anyway
-    get_filename_component(sdk_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" REALPATH)
-    get_filename_component(kit_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot]" REALPATH)
-    if (X64)
-      set(sdk_bindir "${sdk_dir}/bin/x64")
-      set(kit_bindir "${kit_dir}/bin/x64")
-    else (X64)
-      set(sdk_bindir "${sdk_dir}/bin")
-      set(kit_bindir "${kit_dir}/bin/x86")
-    endif (X64)
-  endif ()
-  find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}"
-    DOC "path to message compiler")
-  if (NOT CMAKE_MC_COMPILER)
-    message(FATAL_ERROR "message compiler not found: required to build")
-  endif (NOT CMAKE_MC_COMPILER)
-  message(STATUS "Found message compiler: ${CMAKE_MC_COMPILER}")
-  mark_as_advanced(CMAKE_MC_COMPILER)
-endif(WIN32)
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 
-set( BASE_SRCS
-  src/ASCIIEncoding.cpp
-  src/Ascii.cpp
-  src/AtomicCounter.cpp
-  src/AbstractObserver.cpp
-  src/ActiveDispatcher.cpp
-  src/ArchiveStrategy.cpp
-  src/AsyncChannel.cpp
-  src/Base64Decoder.cpp
-  src/Base64Encoder.cpp
-  src/Base32Decoder.cpp
-  src/Base32Encoder.cpp
-  src/BinaryReader.cpp
-  src/BinaryWriter.cpp
-  src/Bugcheck.cpp
-  src/ByteOrder.cpp
-  src/Channel.cpp
-  src/Checksum.cpp
-  src/Clock.cpp
-  src/Condition.cpp
-  src/Configurable.cpp
-  src/ConsoleChannel.cpp
-  src/CountingStream.cpp
-  src/DateTime.cpp
-  src/DateTimeFormat.cpp
-  src/DateTimeFormatter.cpp
-  src/DateTimeParser.cpp
-  src/Debugger.cpp
-  src/DeflatingStream.cpp
-  src/DigestEngine.cpp
-  src/DigestStream.cpp
-  src/DirectoryIterator.cpp
-  src/DirectoryIteratorStrategy.cpp
-  src/DirectoryWatcher.cpp
-  src/Environment.cpp
-  src/Error.cpp
-  src/ErrorHandler.cpp
-  src/Event.cpp
-  src/EventArgs.cpp
-  src/Exception.cpp
-  src/FPEnvironment.cpp
-  src/File.cpp
-  src/FIFOBufferStream.cpp
-  src/FileChannel.cpp
-  src/FileStream.cpp
-  src/FileStreamFactory.cpp
-  src/Format.cpp
-  src/Formatter.cpp
-  src/FormattingChannel.cpp
-  src/Glob.cpp
-  src/Hash.cpp
-  src/HashStatistic.cpp
-  src/HexBinaryDecoder.cpp
-  src/HexBinaryEncoder.cpp
-  src/InflatingStream.cpp
-  src/Latin1Encoding.cpp
-  src/Latin2Encoding.cpp
-  src/Latin9Encoding.cpp
-  src/LineEndingConverter.cpp
-  src/LocalDateTime.cpp
-  src/LogFile.cpp
-  src/LogStream.cpp
-  src/Logger.cpp
-  src/LoggingFactory.cpp
-  src/LoggingRegistry.cpp
-  src/MD4Engine.cpp
-  src/MD5Engine.cpp
-  src/Manifest.cpp
-  src/MemoryPool.cpp
-  src/MemoryStream.cpp
-  src/Message.cpp
-  src/Mutex.cpp
-  src/NamedEvent.cpp
-  src/NamedMutex.cpp
-  src/NestedDiagnosticContext.cpp
-  src/Notification.cpp
-  src/NotificationCenter.cpp
-  src/NotificationQueue.cpp
-  src/TimedNotificationQueue.cpp
-  src/PriorityNotificationQueue.cpp
-  src/NullChannel.cpp
-  src/NullStream.cpp
-  src/NumberFormatter.cpp
-  src/NumberParser.cpp
-  src/NumericString.cpp
-  src/Path.cpp
-  src/PatternFormatter.cpp
-  src/Pipe.cpp
-  src/PipeImpl.cpp
-  src/PipeStream.cpp
-  src/Process.cpp
-  src/PurgeStrategy.cpp
-  src/RWLock.cpp
-  src/Random.cpp
-  src/RandomStream.cpp
-  src/RefCountedObject.cpp
-  src/RegularExpression.cpp
-  src/RotateStrategy.cpp
-  src/Runnable.cpp
-  src/SHA1Engine.cpp
-  src/Semaphore.cpp
-  src/SharedLibrary.cpp
-  src/SharedMemory.cpp
-  src/SignalHandler.cpp
-  src/SimpleFileChannel.cpp
-  src/SortedDirectoryIterator.cpp
-  src/SplitterChannel.cpp
-  src/Stopwatch.cpp
-  src/StreamChannel.cpp
-  src/StreamConverter.cpp
-  src/StreamCopier.cpp
-  src/StreamTokenizer.cpp
-  src/String.cpp
-  src/NumericString.cpp
-  src/StringTokenizer.cpp
-  src/SynchronizedObject.cpp
-  src/Task.cpp
-  src/TaskManager.cpp
-  src/TaskNotification.cpp
-  src/TeeStream.cpp
-  src/TemporaryFile.cpp
-  src/TextConverter.cpp
-  src/TextEncoding.cpp
-  src/TextIterator.cpp
-  src/TextBufferIterator.cpp
-  src/Thread.cpp
-  src/ThreadTarget.cpp
-  src/ThreadLocal.cpp
-  src/ThreadPool.cpp
-  src/Timer.cpp
-  src/Timespan.cpp
-  src/Timestamp.cpp
-  src/Timezone.cpp
-  src/Token.cpp
-  src/URI.cpp
-  src/URIStreamFactory.cpp
-  src/URIStreamOpener.cpp
-  src/UTF16Encoding.cpp
-  src/UTF32Encoding.cpp
-  src/UTF8Encoding.cpp
-  src/UTF8String.cpp
-  src/UUID.cpp
-  src/UUIDGenerator.cpp
-  src/Unicode.cpp
-  src/UnicodeConverter.cpp
-  src/Var.cpp
-  src/VarHolder.cpp
-  src/VarIterator.cpp
-  src/Void.cpp
-  src/Windows1250Encoding.cpp
-  src/Windows1251Encoding.cpp
-  src/Windows1252Encoding.cpp
-)
+# Headers
+file(GLOB_RECURSE HDRS_G "include/*.h" )
+POCO_HEADERS_AUTO( SRCS ${HDRS_G})
+
+# Platform Specific
+POCO_SOURCES_AUTO_PLAT( SRCS OPENVMS src/OpcomChannel.cpp )
+POCO_HEADERS_AUTO( SRCS include/Poco/OpcomChannel.h )
+
+POCO_SOURCES_AUTO_PLAT( SRCS UNIX src/SyslogChannel.cpp )
+POCO_HEADERS_AUTO( SRCS include/Poco/SyslogChannel.h )
+
+POCO_SOURCES_AUTO_PLAT( SRCS WIN32
+    src/WindowsConsoleChannel.cpp
+    src/EventLogChannel.cpp
+    )
+
+POCO_HEADERS_AUTO( SRCS
+    include/Poco/WindowsConsoleChannel.h
+    include/Poco/EventLogChannel.h
+    )
+
+# Messages
+POCO_MESSAGES( SRCS Logging src/pocomsg.mc)
 
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
@@ -186,7 +36,7 @@ if (POCO_UNBUNDLED)
     include_directories(${PCRE_INCLUDE_DIRS})
 
     #HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
-    list(APPEND BASE_SRCS
+    POCO_SOURCES( SRCS RegExp
         src/pcre_ucd.c
         src/pcre_tables.c
     )
@@ -195,8 +45,8 @@ if (POCO_UNBUNDLED)
     set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
     include_directories(${ZLIB_INCLUDE_DIRS})
 else()
-    # PCRE
-    list(APPEND BASE_SRCS
+    # pcre
+    POCO_SOURCES( SRCS pcre
         src/pcre_chartables.c
         src/pcre_compile.c
         src/pcre_exec.c
@@ -213,8 +63,13 @@ else()
         src/pcre_xclass.c
     )
 
-    # ZLIB
-    list(APPEND BASE_SRCS
+    # zlib
+    POCO_HEADERS( SRCS zlib
+        include/Poco/zconf.h
+        include/Poco/zlib.h
+        )
+
+    POCO_SOURCES( SRCS zlib
         src/adler32.c
         src/compress.c
         src/crc32.c
@@ -228,47 +83,18 @@ else()
     )
 endif (POCO_UNBUNDLED)
 
-set(WIN_SRCS
-  src/EventLogChannel.cpp
-  src/WindowsConsoleChannel.cpp
-)
-
-if (WIN32)
-    set(RES_SRCS ${CMAKE_SOURCE_DIR}/Foundation/src/pocomsg.h)
-    set_source_files_properties(${RES_SRCS} PROPERTIES GENERATED true)
-    add_custom_command(
-        OUTPUT ${RES_SRCS}
-        DEPENDS ${CMAKE_SOURCE_DIR}/Foundation/src/pocomsg.mc
-        COMMAND ${CMAKE_MC_COMPILER}
-        ARGS
-            -h ${CMAKE_SOURCE_DIR}/Foundation/src
-            -r ${CMAKE_SOURCE_DIR}/Foundation/src
-            ${CMAKE_SOURCE_DIR}/Foundation/src/pocomsg.mc
-        VERBATIM # recommended: p260
-    )
-    list(APPEND WIN_SRCS ${RES_SRCS})
-endif (WIN32)
-
-set(LIN_SRCS
-  src/SyslogChannel.cpp
-)
-
-# TODO: Use this sources somewhere if built on OpenVMS
-set(OPENVMS_SRCS
-  src/OpcomChannel.cpp
-)
-
 if(CMAKE_SYSTEM MATCHES "Windows")
-    set(SRCS ${BASE_SRCS} ${WIN_SRCS})
-    add_definitions( -DPCRE_STATIC -DFoundation_EXPORTS)
+    add_definitions( -DPCRE_STATIC)
     set(SYSLIBS ${SYSLIBS} iphlpapi)
 else (CMAKE_SYSTEM MATCHES "Windows")
-    set(SRCS ${BASE_SRCS} ${LIN_SRCS})
     add_definitions( -DPCRE_STATIC)
 endif(CMAKE_SYSTEM MATCHES "Windows")
 
-add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAME} PROPERTIES VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
+add_library( ${LIBNAME} ${LIB_MODE} ${SRCS}) 
+set_target_properties( ${LIBNAME} 
+    PROPERTIES
+    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+    DEFINE_SYMBOL Foundation_EXPORTS)
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
     set_target_properties( ${LIBNAME} PROPERTIES LINK_FLAGS "-library=stlport4")
 endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")

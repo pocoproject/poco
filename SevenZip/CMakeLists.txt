@@ -1,13 +1,16 @@
 set(LIBNAME "PocoSevenZip")
 
-set(SRCS
-    src/Archive.cpp
-    src/ArchiveEntry.cpp
-)
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( SRCS ${SRCS_G})
+
+# Headers
+file(GLOB_RECURSE HDRS_G "include/*.h" )
+POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
 # TODO: Currently only bundled is supported, in future this should also be possible
 # with an unbundled version of 7z
-list(APPEND SRCS
+POCO_SOURCES( SRCS 7z
     src/7zAlloc.c
     src/7zBuf2.c
     src/7zBuf.c
@@ -17,7 +20,7 @@ list(APPEND SRCS
     src/7zFile.c
     src/7zIn.c
     src/7zStream.c
-#    src/Alloc.c
+    src/Alloc.c
     src/Bcj2.c
     src/Bra86.c
     src/Bra.c
@@ -46,16 +49,13 @@ list(APPEND SRCS
 #    src/XzIn.c
 )
 
-include_directories( "include" )
-
-if (NOT POCO_STATIC)
-  add_definitions(-DSevenZip_EXPORTS)
-endif (NOT POCO_STATIC)
+include_directories( include )
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME}
-	PROPERTIES
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
+    PROPERTIES
+    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+    DEFINE_SYMBOL SevenZip_EXPORTS)
 target_link_libraries( ${LIBNAME} PocoUtil PocoXML PocoFoundation)
 
 install(
@@ -72,8 +72,7 @@ install(
     )
 
 if (ENABLE_TESTS)
-  # TODO: Enable CMake for samples
-  #add_subdirectory(samples)
+  add_subdirectory(samples)
   # TODO: Add tests
   #add_subdirectory(testsuite)
 endif ()

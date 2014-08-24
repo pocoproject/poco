@@ -1,38 +1,18 @@
 set(LIBNAME "PocoZip")
 
-set(SRCS
-    src/Add.cpp
-    src/AutoDetectStream.cpp
-    src/Compress.cpp
-    src/Decompress.cpp
-    src/Delete.cpp
-    src/Keep.cpp
-    src/ParseCallback.cpp
-    src/PartialStream.cpp
-    src/Rename.cpp
-    src/Replace.cpp
-    src/SkipCallback.cpp
-    src/ZipArchive.cpp
-    src/ZipArchiveInfo.cpp
-    src/ZipCommon.cpp
-    src/ZipDataInfo.cpp
-    src/ZipException.cpp
-    src/ZipFileInfo.cpp
-    src/ZipLocalFileHeader.cpp
-    src/ZipManipulator.cpp
-    src/ZipOperation.cpp
-    src/ZipStream.cpp
-    src/ZipUtil.cpp
-)
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 
-if (NOT POCO_STATIC)
-  add_definitions(-DZip_EXPORTS)
-endif (NOT POCO_STATIC)
+# Headers
+file(GLOB_RECURSE HDRS_G "include/*.h" )
+POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAME}
-	PROPERTIES
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
+set_target_properties( ${LIBNAME} 
+    PROPERTIES
+    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+    DEFINE_SYMBOL Zip_EXPORTS)
 target_link_libraries( ${LIBNAME} PocoUtil PocoXML PocoFoundation)
 
 install(

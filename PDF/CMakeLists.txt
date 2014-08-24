@@ -1,17 +1,12 @@
 set(LIBNAME "PocoPDF")
 
-set(SRCS
-    src/Destination.cpp
-    src/Document.cpp
-    src/Encoder.cpp
-    src/Font.cpp
-    src/Image.cpp
-    src/LinkAnnotation.cpp
-    src/Outline.cpp
-    src/Page.cpp
-    src/PDFException.cpp
-    src/TextAnnotation.cpp
-)
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( SRCS ${SRCS_G})
+
+# Headers
+file(GLOB_RECURSE HDRS_G "include/*.h" )
+POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
@@ -20,8 +15,8 @@ if (POCO_UNBUNDLED)
     set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
     include_directories(${ZLIB_INCLUDE_DIRS})
 else()
-    # ZLIB
-    list(APPEND SRCS
+    # zlib
+    POCO_SOURCES( SRCS zlib
         src/adler32.c
         src/compress.c
         src/crc32.c
@@ -38,8 +33,8 @@ endif (POCO_UNBUNDLED)
 
 # TODO: Currently only bundled is supported, in future this should also be possible
 # with an unbundled version of hpdf
-# HPDF
-list(APPEND SRCS
+# hpdf
+POCO_SOURCES( SRCS hpdf
     src/hpdf_annotation.c
     src/hpdf_array.c
     src/hpdf_binary.c
@@ -94,7 +89,7 @@ list(APPEND SRCS
 
 # TODO: Currently only bundled is supported, in future this should also be possible
 # with an unbundled version of libpng
-list(APPEND SRCS
+POCO_SOURCES( SRCS libpng
     src/png.c
     src/pngerror.c
     src/pnggccrd.c
@@ -115,16 +110,13 @@ list(APPEND SRCS
     src/pngwutil.c
 )
 
-include_directories(include/Poco/PDF) # zip src
-
-if (NOT POCO_STATIC)
-  add_definitions(-DPDF_EXPORTS)
-endif (NOT POCO_STATIC)
+include_directories( "include/Poco/PDF" ) # zip src
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME}
-	PROPERTIES
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
+    PROPERTIES
+    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+    DEFINE_SYMBOL PDF_EXPORTS)
 target_link_libraries( ${LIBNAME} ${SYSLIBS} PocoFoundation )
 
 install(
