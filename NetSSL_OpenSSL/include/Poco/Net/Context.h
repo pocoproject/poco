@@ -52,7 +52,7 @@ public:
 		CLIENT_USE, 	  /// Context is used by a client.
 		SERVER_USE,       /// Context is used by a server.
 		TLSV1_CLIENT_USE, /// Context is used by a client requiring TLSv1.
-		TLSV1_SERVER_USE  /// Context is used by a server requiring TLSv2.
+		TLSV1_SERVER_USE  /// Context is used by a server requiring TLSv1.
 	};
 	
 	enum VerificationMode 
