@@ -163,7 +163,7 @@ public:
 			app.logger().information(it->first + ": " + it->second);
 		}
 		
-		if (request.getURI() == "/ws")
+		if(request.find("Upgrade") != request.end() && request["Upgrade"] == "websocket")
 			return new WebSocketRequestHandler;
 		else
 			return new PageRequestHandler;
