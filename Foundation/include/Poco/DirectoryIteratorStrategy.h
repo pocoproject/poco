@@ -66,11 +66,15 @@ class TraverseErrorCallback: public AbstractTraverseErrorCallback
 public:
 	typedef void (C::*Callback)(const std::string& path);
 
-	TraverseErrorCallback(C& object, Callback method): _pObject(&object), _method(method)
+	TraverseErrorCallback(C& object, Callback method)
+        : _pObject(&object), 
+          _method(method)
 	{
 	}
 
-	TraverseErrorCallback(const TraverseErrorCallback& callback): _pObject(callback._pObject), _method(callback._method)
+	TraverseErrorCallback(const TraverseErrorCallback& callback)
+        : _pObject(callback._pObject), 
+          _method(callback._method)
 	{
 	}
 
@@ -119,14 +123,14 @@ public:
 
 	TraverseBase(DepthFunPtr depthDeterminer, UInt16 maxDepth = D_INFINITE);
 
-        TraverseBase& setOnError(const AbstractTraverseErrorCallback& cb);
-        	/// Binds the option to the given method.
-        	///
-        	/// The callback method will be called if the Traverse class fails
-		/// to read a directory. 
-        	///
-        	/// Usage:
-        	///     onError(TraverseErrorCallback<MyClass>(this, &MyClass::myCallback));
+    TraverseBase& setOnError(const AbstractTraverseErrorCallback& cb);
+        /// Binds the option to the given method.
+        ///
+        /// The callback method will be called if the Traverse class fails
+        /// to read a directory. 
+        ///
+        /// Usage:
+        ///     onError(TraverseErrorCallback<MyClass>(this, &MyClass::myCallback));
 
 protected:
 	bool isFiniteDepth();

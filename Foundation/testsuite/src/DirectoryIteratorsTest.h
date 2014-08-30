@@ -30,8 +30,9 @@ public:
 	void testDirectoryIterator();
 	void testSortedDirectoryIterator();
 	void testSimpleRecursiveDirectoryIterator();
+	void testSimpleRecursiveDirectoryIteratorOnError();
 	void testSiblingsFirstRecursiveDirectoryIterator();
-	
+	void testSiblingsFirstRecursiveDirectoryIteratorOnError();
 	void setUp();
 	void tearDown();
 
@@ -40,6 +41,8 @@ public:
 protected:
 	Poco::Path path() const;
 	void createSubdir(Poco::Path& p);
+	void onError(const std::string& path);
+	std::string _onErrorPath;
 
 private:
 };

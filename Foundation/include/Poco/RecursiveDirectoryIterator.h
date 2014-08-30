@@ -135,14 +135,14 @@ public:
 		return _pImpl->maxDepth();
 	}
 
-        RecursiveDirectoryIterator& setOnError(const AbstractTraverseErrorCallback& cb)
-        	/// Binds the option to the given method.
-        	///
-        	/// The callback method will be called if the Traverse class fails
-		/// to read a directory. 
-        	///
-        	/// Usage:
-        	///     onError(TraverseErrorCallback<MyClass>(this, &MyClass::myCallback));
+    RecursiveDirectoryIterator& setOnError(const AbstractTraverseErrorCallback& cb)
+        /// Binds the option to the given method.
+        ///
+        /// The callback method will be called if the Traverse class fails
+        /// to read a directory. 
+        ///
+        /// Usage:
+        ///     onError(TraverseErrorCallback<MyClass>(this, &MyClass::myCallback));
 	{
 		_pImpl->setOnError(cb);
 		return *this;
