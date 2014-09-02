@@ -340,7 +340,7 @@ void Context::createSSLContext()
 			break;
 #endif
 		default:
-			throw Poco::InvalidArgumentException("Invalid usage");
+			throw Poco::InvalidArgumentException("Invalid or unsupported usage");
 		}
 	}
 	if (!_pSSLContext) 
