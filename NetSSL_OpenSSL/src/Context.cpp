@@ -272,7 +272,7 @@ void Context::setSessionTimeout(long seconds)
 
 long Context::getSessionTimeout() const
 {
-	poco_assert (_usage == SERVER_USE);
+	poco_assert (isForServerUse());
 
 	return SSL_CTX_get_timeout(_pSSLContext);
 }
@@ -280,7 +280,7 @@ long Context::getSessionTimeout() const
 
 void Context::flushSessionCache() 
 {
-	poco_assert (_usage == SERVER_USE);
+	poco_assert (isForServerUse());
 
 	Poco::Timestamp now;
 	SSL_CTX_flush_sessions(_pSSLContext, static_cast<long>(now.epochTime()));
@@ -323,6 +323,22 @@ void Context::createSSLContext()
 		case TLSV1_SERVER_USE:
 			_pSSLContext = SSL_CTX_new(TLSv1_server_method());
 			break;
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+		case TLSV1_1_CLIENT_USE:
+			_pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
+			break;
+		case TLSV1_1_SERVER_USE:
+			_pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
+			break;
+#endif
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
+		case TLSV1_2_CLIENT_USE:
+			_pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
+			break;
+		case TLSV1_2_SERVER_USE:
+			_pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
+			break;
+#endif
 		default:
 			throw Poco::InvalidArgumentException("Invalid usage");
 		}
