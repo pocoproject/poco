@@ -267,6 +267,7 @@ void SSLManager::initDefaultContext(bool server)
 			usage = Context::TLSV1_SERVER_USE;
 		else
 			usage = Context::SERVER_USE;
+		_ptrDefaultServerContext = new Context(usage, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
 	}
 	else
 	{
@@ -278,9 +279,9 @@ void SSLManager::initDefaultContext(bool server)
 			usage = Context::TLSV1_CLIENT_USE;
 		else
 			usage = Context::CLIENT_USE;
+		_ptrDefaultClientContext = new Context(usage, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
 	}
 	
-	_ptrDefaultClientContext = new Context(usage, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
 		
 	bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 	if (server)
