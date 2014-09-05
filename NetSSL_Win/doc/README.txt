@@ -8,7 +8,7 @@ on NetSSL_OpenSSL can be easily ported to use NetSSL_Win. Just a few
 minor code changes are required, due to differences in the API. 
 These are discussed below:
 
-  - Context: the Context constructor uses different arguments. While
+  - Context: The Context constructor uses different arguments. While
     the first argument is the same, all others are different.
     Instead of a certificate file name, a certificate subject name is
     specified. Certificates are always loaded from a Windows
@@ -22,13 +22,16 @@ These are discussed below:
     setSessionCacheSize(), setSessionTimeout(), sslContext(),
     useCertificate(), usePrivateKey().
 
-  - SSLManager: the configuration properties used to configure the SSLManager
+  - SSLManager: The configuration properties used to configure the SSLManager
     are different from the ones used in NetSSL_OpenSSL. Please see the
     SSLManager header file for more information. 
     Furthermore, PrivateKeyPassphraseHandler's are not supported. The
     initializeClient() and initializeServer() methods therefore do not
     have the PrivateKeyPassphraseHandler argument.
     The isFIPSEnabled() method is not available.
+
+  - X509Certificate: Loading a certificate from a file or stream, as well as saving
+    a certificate is not supported.
 
 
 Certificate and Certificate Stores
@@ -61,8 +64,6 @@ Windows Embedded Compact
 
 Windows Embedded Compact does not support the following Schannel
 features: 
-  - certificate revocation checking
-  - TLS 1.1 and 1.2
-  - disabling weak security algorithms
-  
- 
+  - certificate revocation checking (Context::OPT_PERFORM_REVOCATION_CHECK)
+  - TLS 1.1 and 1.2 (Context::TLSV1_1_CLIENT_USE, etc.)
+  - disabling weak security algorithms (Context::OPT_USE_STRONG_CRYPTO)
