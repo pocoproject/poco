@@ -87,7 +87,13 @@ public:
 	virtual ~ParallelSocketAcceptor()
 		/// Destroys the ParallelSocketAcceptor.
 	{
-		unregisterAcceptor();
+		try
+		{
+			unregisterAcceptor();
+		}
+		catch (...)
+		{
+		}
 	}
 	
 	virtual void registerAcceptor(SocketReactor& reactor)

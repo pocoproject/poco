@@ -80,7 +80,13 @@ public:
 	~HashTable()
 		/// Destroys the HashTable.
 	{
-		clear();
+		try
+		{
+			clear();
+		}
+		catch (...)
+		{
+		}
 	}
 
 	HashTable& operator = (const HashTable& ht)

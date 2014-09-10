@@ -56,7 +56,7 @@ FilePartStore::~FilePartStore()
 		_fstr.close();
 		File(_path).remove();
 	}
-	catch (Exception&)
+	catch (...)
 	{
 	}
 }

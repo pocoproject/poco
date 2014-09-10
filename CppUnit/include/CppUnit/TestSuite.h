@@ -67,7 +67,13 @@ inline TestSuite::TestSuite(const std::string& name): _name(name)
 // Destructor
 inline TestSuite::~TestSuite()
 {
-	deleteContents();
+	try
+	{
+		deleteContents();
+	}
+	catch (...)
+	{
+	}
 }
 
 

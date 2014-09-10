@@ -35,7 +35,13 @@ Timer::Timer(long startInterval, long periodicInterval):
 
 Timer::~Timer()
 {
-	stop();
+	try
+	{
+		stop();
+	}
+	catch (...)
+	{
+	}
 }
 
 

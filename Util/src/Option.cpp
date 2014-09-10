@@ -104,9 +104,15 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 
 Option::~Option()
 {
-	if (_pValidator) _pValidator->release();
-	if (_pConfig) _pConfig->release();
-	delete _pCallback;
+	try
+	{
+		if (_pValidator) _pValidator->release();
+		if (_pConfig) _pConfig->release();
+		delete _pCallback;
+	}
+	catch (...)
+	{
+	}
 }
 
 

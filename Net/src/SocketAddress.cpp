@@ -135,7 +135,13 @@ SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t len
 
 SocketAddress::~SocketAddress()
 {
-	destruct();
+	try
+	{
+		destruct();
+	}
+	catch (...)
+	{
+	}
 }
 
 

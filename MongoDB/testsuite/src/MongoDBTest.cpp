@@ -58,11 +58,17 @@ MongoDBTest::MongoDBTest(const std::string& name):
 
 MongoDBTest::~MongoDBTest()
 {
-	if (_connected)
+	try
 	{
-		_mongo.disconnect();
-		_connected = false;
-		std::cout << "Disconnected from [" << _host << ':' << _port << ']' << std::endl;
+		if (_connected)
+		{
+			_mongo.disconnect();
+			_connected = false;
+			std::cout << "Disconnected from [" << _host << ':' << _port << ']' << std::endl;
+		}
+	}
+	catch (...)
+	{
 	}
 }
 

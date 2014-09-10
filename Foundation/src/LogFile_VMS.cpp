@@ -35,7 +35,13 @@ LogFileImpl::LogFileImpl(const std::string& path): _path(path)
 
 LogFileImpl::~LogFileImpl()
 {
-	fclose(_file);
+	try
+	{
+		fclose(_file);
+	}
+	catch (...)
+	{
+	}
 }
 
 

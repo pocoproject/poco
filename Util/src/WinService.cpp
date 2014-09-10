@@ -52,8 +52,14 @@ WinService::WinService(const std::string& name):
 
 WinService::~WinService()
 {
-	close();
-	CloseServiceHandle(_scmHandle);
+	try
+	{
+		close();
+		CloseServiceHandle(_scmHandle);
+	}
+	catch (...)
+	{
+	}
 }
 
 

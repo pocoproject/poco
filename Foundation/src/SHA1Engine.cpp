@@ -40,7 +40,13 @@ SHA1Engine::SHA1Engine()
 
 SHA1Engine::~SHA1Engine()
 {
-	reset();
+	try
+	{
+		reset();
+	}
+	catch (...)
+	{
+	}
 }
 
 

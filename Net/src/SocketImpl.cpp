@@ -59,7 +59,13 @@ SocketImpl::SocketImpl(poco_socket_t sockfd):
 
 SocketImpl::~SocketImpl()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+	}
 }
 
 	

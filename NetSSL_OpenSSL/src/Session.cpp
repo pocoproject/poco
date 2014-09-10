@@ -35,7 +35,13 @@ Session::Session(SSL_SESSION* pSession):
 
 Session::~Session()
 {
-	SSL_SESSION_free(_pSession);
+	try
+	{
+		SSL_SESSION_free(_pSession);
+	}
+	catch (...)
+	{
+	}
 }
 
 

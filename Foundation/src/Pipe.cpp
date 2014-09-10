@@ -35,7 +35,13 @@ Pipe::Pipe(const Pipe& pipe):
 
 Pipe::~Pipe()
 {
-	_pImpl->release();
+	try
+	{
+		_pImpl->release();
+	}
+	catch (...)
+	{
+	}
 }
 
 

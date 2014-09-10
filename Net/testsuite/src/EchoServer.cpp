@@ -34,8 +34,14 @@ EchoServer::EchoServer():
 
 EchoServer::~EchoServer()
 {
-	_stop = true;
-	_thread.join();
+	try
+	{
+		_stop = true;
+		_thread.join();
+	}
+	catch (...)
+	{
+	}
 }
 
 

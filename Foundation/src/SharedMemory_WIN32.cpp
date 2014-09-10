@@ -98,8 +98,14 @@ SharedMemoryImpl::SharedMemoryImpl(const Poco::File& file, SharedMemory::AccessM
 
 SharedMemoryImpl::~SharedMemoryImpl()
 {
-	unmap();
-	close();
+	try
+	{
+		unmap();
+		close();
+	}
+	catch (...)
+	{
+	}
 }
 
 

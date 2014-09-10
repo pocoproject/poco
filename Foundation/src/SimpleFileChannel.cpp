@@ -52,7 +52,13 @@ SimpleFileChannel::SimpleFileChannel(const std::string& path):
 
 SimpleFileChannel::~SimpleFileChannel()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+	}
 }
 
 

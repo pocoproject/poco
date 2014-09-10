@@ -131,7 +131,13 @@ MultipartIOS::MultipartIOS(std::istream& istr, const std::string& boundary):
 
 MultipartIOS::~MultipartIOS()
 {
-	_buf.sync();
+	try
+	{
+		_buf.sync();
+	}
+	catch (...)
+	{
+	}
 }
 
 

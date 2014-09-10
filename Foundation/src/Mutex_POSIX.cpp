@@ -90,7 +90,13 @@ MutexImpl::MutexImpl(bool fast)
 
 MutexImpl::~MutexImpl()
 {
-	pthread_mutex_destroy(&_mutex);
+	try
+	{
+		pthread_mutex_destroy(&_mutex);
+	}
+	catch (...)
+	{
+	}
 }
 
 

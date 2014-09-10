@@ -59,8 +59,14 @@ Document::Document(Poco::UInt32 pageCount,
 
 Document::~Document()
 {
-	HPDF_Free(_pdf);
-	delete _pRawData;
+	try
+	{
+		HPDF_Free(_pdf);
+		delete _pRawData;
+	}
+	catch (...)
+	{
+	}
 }
 
 

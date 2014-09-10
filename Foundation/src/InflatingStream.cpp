@@ -129,13 +129,19 @@ InflatingStreamBuf::~InflatingStreamBuf()
 {
 	try
 	{
-		close();
+		try
+		{
+			close();
+		}
+		catch (...)
+		{
+		}
+		delete [] _buffer;
+		inflateEnd(&_zstr);
 	}
 	catch (...)
 	{
 	}
-	delete [] _buffer;
-	inflateEnd(&_zstr);
 }
 
 

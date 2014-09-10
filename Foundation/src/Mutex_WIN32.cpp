@@ -31,7 +31,13 @@ MutexImpl::MutexImpl()
 
 MutexImpl::~MutexImpl()
 {
-	DeleteCriticalSection(&_cs);
+	try
+	{
+		DeleteCriticalSection(&_cs);
+	}
+	catch (...)
+	{
+	}
 }
 
 

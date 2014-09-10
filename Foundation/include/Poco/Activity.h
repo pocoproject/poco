@@ -94,8 +94,14 @@ public:
 	~Activity()
 		/// Stops and destroys the activity.
 	{
-		stop();
-		wait();
+		try
+		{
+			stop();
+			wait();
+		}
+		catch (...)
+		{
+		}
 	}
 	
 	void start()

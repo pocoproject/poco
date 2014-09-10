@@ -38,8 +38,14 @@ DialogServer::DialogServer(bool acceptCommands):
 
 DialogServer::~DialogServer()
 {
-	_stop = true;
-	_thread.join();
+	try
+	{
+		_stop = true;
+		_thread.join();
+	}
+	catch (...)
+	{
+	}
 }
 
 

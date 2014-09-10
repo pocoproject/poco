@@ -134,8 +134,14 @@ BOOL TestRunnerDlg::OnInitDialog()
 
 TestRunnerDlg::~TestRunnerDlg ()
 {
+	try
+	{
     freeState ();
     delete _testsProgress;
+	}
+	catch (...)
+	{
+	}
 }
 
 

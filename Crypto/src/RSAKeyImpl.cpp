@@ -182,7 +182,13 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 
 RSAKeyImpl::~RSAKeyImpl()
 {
-	freeRSA();
+	try
+	{
+		freeRSA();
+	}
+	catch (...)
+	{
+	}
 }
 
 

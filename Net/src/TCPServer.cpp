@@ -72,8 +72,14 @@ TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool&
 
 TCPServer::~TCPServer()
 {
-	stop();
-	_pDispatcher->release();
+	try
+	{
+		stop();
+		_pDispatcher->release();
+	}
+	catch (...)
+	{
+	}
 }
 
 

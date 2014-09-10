@@ -46,8 +46,14 @@ SemaphoreImpl::SemaphoreImpl(int n, int max): _n(n), _max(max)
 
 SemaphoreImpl::~SemaphoreImpl()
 {
-	pthread_cond_destroy(&_cond);
-	pthread_mutex_destroy(&_mutex);
+	try
+	{
+		pthread_cond_destroy(&_cond);
+		pthread_mutex_destroy(&_mutex);
+	}
+	catch (...)
+	{
+	}
 }
 
 

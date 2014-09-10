@@ -37,7 +37,13 @@ NamedMutexImpl::NamedMutexImpl(const std::string& name):
 
 NamedMutexImpl::~NamedMutexImpl()
 {
-	sys$deq(m_lksb[1], 0, 0, 0);
+	try
+	{
+		sys$deq(m_lksb[1], 0, 0, 0);
+	}
+	catch (...)
+	{
+	}
 }
 
 

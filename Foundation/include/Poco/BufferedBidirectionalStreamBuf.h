@@ -67,8 +67,14 @@ public:
 
 	~BasicBufferedBidirectionalStreamBuf()
 	{
-		Allocator::deallocate(_pReadBuffer, _bufsize);
-		Allocator::deallocate(_pWriteBuffer, _bufsize);
+		try
+		{
+			Allocator::deallocate(_pReadBuffer, _bufsize);
+			Allocator::deallocate(_pWriteBuffer, _bufsize);
+		}
+		catch (...)
+		{
+		}
 	}
 	
 	virtual int_type overflow(int_type c)
