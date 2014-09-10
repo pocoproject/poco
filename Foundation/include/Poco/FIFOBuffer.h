@@ -83,7 +83,7 @@ public:
 	{
 	}
 
-	explicit BasicFIFOBuffer(T* pBuffer, std::size_t size, bool notify = false):
+	BasicFIFOBuffer(T* pBuffer, std::size_t size, bool notify = false):
 		_buffer(pBuffer, size),
 		_begin(0),
 		_used(0),
@@ -94,7 +94,7 @@ public:
 	{
 	}
 
-	explicit BasicFIFOBuffer(const T* pBuffer, std::size_t size, bool notify = false):
+	BasicFIFOBuffer(const T* pBuffer, std::size_t size, bool notify = false):
 		_buffer(pBuffer, size),
 		_begin(0),
 		_used(size),

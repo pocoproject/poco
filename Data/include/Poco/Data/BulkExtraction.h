@@ -153,7 +153,7 @@ public:
 	typedef InternalBulkExtraction<ValType> Type;
 	typedef SharedPtr<Type>                 Ptr;
 
-	explicit InternalBulkExtraction(C& result,
+	InternalBulkExtraction(C& result,
 		Column<C>* pColumn,
 		Poco::UInt32 limit,
 		const Position& pos = Position(0)): 

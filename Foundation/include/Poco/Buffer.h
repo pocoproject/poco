@@ -47,7 +47,7 @@ public:
 	{
 	}
 
-	explicit Buffer(T* pMem, std::size_t length):
+	Buffer(T* pMem, std::size_t length):
 		_capacity(length),
 		_used(length),
 		_ptr(pMem),
@@ -61,7 +61,7 @@ public:
 	{
 	}
 
-	explicit Buffer(const T* pMem, std::size_t length):
+	Buffer(const T* pMem, std::size_t length):
 		_capacity(length),
 		_used(length),
 		_ptr(new T[length]),
@@ -86,7 +86,7 @@ public:
 			std::memcpy(_ptr, other._ptr, _used * sizeof(T));
 	}
 
-	Buffer& operator =(const Buffer& other)
+	Buffer& operator = (const Buffer& other)
 		/// Assignment operator.
 	{
 		if (this != &other)

@@ -511,7 +511,7 @@ public:
 	typedef SharedPtr<Type>        Ptr;
 
 
-	explicit InternalExtraction(C& result, Column<C>* pColumn, const Position& pos = Position(0)): 
+	InternalExtraction(C& result, Column<C>* pColumn, const Position& pos = Position(0)): 
 		Extraction<C>(result, ValType(), pos), 
 		_pColumn(pColumn)
 		/// Creates InternalExtraction.

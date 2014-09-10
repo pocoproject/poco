@@ -41,7 +41,7 @@ class BulkBinding: public AbstractBinding
 	/// Bulk binding support is provided only for std::vector.
 {
 public:
-	explicit BulkBinding(const T& val, Poco::UInt32 bulkSize, const std::string& name = "", Direction direction = PD_IN): 
+	BulkBinding(const T& val, Poco::UInt32 bulkSize, const std::string& name = "", Direction direction = PD_IN): 
 		AbstractBinding(name, direction, bulkSize), 
 		_val(val), 
 		_bound(false)

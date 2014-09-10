@@ -82,12 +82,12 @@ public:
 		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
-	explicit RecordSet(Session& rSession, 
+	RecordSet(Session& rSession, 
 		const std::string& query,
 		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
-	explicit RecordSet(Session& rSession, 
+	RecordSet(Session& rSession, 
 		const std::string& query,
 		const RowFormatter& rowFormatter);
 		/// Creates the RecordSet.
