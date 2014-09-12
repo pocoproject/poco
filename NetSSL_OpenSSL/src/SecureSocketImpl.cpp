@@ -358,7 +358,7 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
 	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled() ||
-	    (isLocalHost(hostName) && mode != Context::VERIFY_STRICT))
+	    (mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
 	{
 		return X509_V_OK;
 	}
