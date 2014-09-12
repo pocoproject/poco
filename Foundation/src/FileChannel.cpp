@@ -71,10 +71,16 @@ FileChannel::FileChannel(const std::string& path):
 
 FileChannel::~FileChannel()
 {
-	close();
-	delete _pRotateStrategy;
-	delete _pArchiveStrategy;
-	delete _pPurgeStrategy;
+	try
+	{
+		close();
+		delete _pRotateStrategy;
+		delete _pArchiveStrategy;
+		delete _pPurgeStrategy;
+	}
+	catch (...)
+	{
+	}
 }
 
 

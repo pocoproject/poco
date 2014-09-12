@@ -89,9 +89,15 @@ ThreadImpl::ThreadImpl():
 
 ThreadImpl::~ThreadImpl()
 {
-	if (_pData->started && !_pData->joined)
+	try
 	{
-		pthread_detach(_pData->thread);
+		if (_pData->started && !_pData->joined)
+		{
+			pthread_detach(_pData->thread);
+		}
+	}
+	catch (...)
+	{
 	}
 }
 

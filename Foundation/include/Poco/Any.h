@@ -192,12 +192,18 @@ public:
 		/// Destructor. If Any is locally held, calls ValueHolder destructor;
 		/// otherwise, deletes the placeholder from the heap.
 	{
-		if(!empty())
+		try
 		{
-			if(_valueHolder.isLocal())
-				destruct();
-			else
-				delete content();
+			if(!empty())
+			{
+				if(_valueHolder.isLocal())
+					destruct();
+				else
+					delete content();
+			}
+		}
+		catch (...)
+		{
 		}
 	}
 

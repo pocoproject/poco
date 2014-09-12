@@ -42,8 +42,14 @@ WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, bool mustMaskP
 
 WebSocketImpl::~WebSocketImpl()
 {
-	_pStreamSocketImpl->release();
-	reset();
+	try
+	{
+		_pStreamSocketImpl->release();
+		reset();
+	}
+	catch (...)
+	{
+	}
 }
 
 	

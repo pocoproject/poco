@@ -63,8 +63,14 @@ public:
 	
 	~ParallelSocketReactor()
 	{
-		this->stop();
-		_thread.join();
+		try
+		{
+			this->stop();
+			_thread.join();
+		}
+		catch (...)
+		{
+		}
 	}
 	
 protected:

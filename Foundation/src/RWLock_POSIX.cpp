@@ -29,7 +29,13 @@ RWLockImpl::RWLockImpl()
 
 RWLockImpl::~RWLockImpl()
 {
-	pthread_rwlock_destroy(&_rwl);
+	try
+	{
+		pthread_rwlock_destroy(&_rwl);
+	}
+	catch (...)
+	{
+	}
 }
 
 

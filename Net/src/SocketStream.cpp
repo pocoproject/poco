@@ -45,7 +45,13 @@ SocketStreamBuf::SocketStreamBuf(const Socket& socket):
 
 SocketStreamBuf::~SocketStreamBuf()
 {
-	_pImpl->release();
+	try
+	{
+		_pImpl->release();
+	}
+	catch (...)
+	{
+	}
 }
 
 

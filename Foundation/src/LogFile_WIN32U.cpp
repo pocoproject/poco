@@ -38,7 +38,13 @@ LogFileImpl::LogFileImpl(const std::string& path): _path(path), _hFile(INVALID_H
 
 LogFileImpl::~LogFileImpl()
 {
-	CloseHandle(_hFile);
+	try
+	{
+		CloseHandle(_hFile);
+	}
+	catch (...)
+	{
+	}
 }
 
 

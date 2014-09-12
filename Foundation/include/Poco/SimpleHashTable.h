@@ -80,7 +80,13 @@ public:
 	~SimpleHashTable()
 		/// Destroys the SimpleHashTable.
 	{
-		clear();
+		try
+		{
+			clear();
+		}
+		catch (...)
+		{
+		}
 	}
 
 	SimpleHashTable& operator = (const SimpleHashTable& ht)

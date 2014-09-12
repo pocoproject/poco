@@ -42,9 +42,15 @@ MulticastEchoServer::MulticastEchoServer():
 
 MulticastEchoServer::~MulticastEchoServer()
 {
-	_stop = true;
-	_thread.join();
-	_socket.leaveGroup(_group.host(), _if);
+	try
+	{
+		_stop = true;
+		_thread.join();
+		_socket.leaveGroup(_group.host(), _if);
+	}
+	catch (...)
+	{
+	}
 }
 
 

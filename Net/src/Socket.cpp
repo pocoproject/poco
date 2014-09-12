@@ -70,7 +70,13 @@ Socket& Socket::operator = (const Socket& socket)
 
 Socket::~Socket()
 {
-	_pImpl->release();
+	try
+	{
+		_pImpl->release();
+	}
+	catch (...)
+	{
+	}
 }
 
 

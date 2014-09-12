@@ -38,7 +38,13 @@ Logger::Logger(const std::string& name, Channel* pChannel, int level): _name(nam
 
 Logger::~Logger()
 {
-	if (_pChannel) _pChannel->release();
+	try
+	{
+		if (_pChannel) _pChannel->release();
+	}
+	catch (...)
+	{
+	}
 }
 
 
@@ -444,7 +450,13 @@ public:
 	}
 	~AutoLoggerShutdown()
 	{
-		Logger::shutdown();
+		try
+		{
+			Logger::shutdown();
+		}
+		catch (...)
+		{
+		}
 	}
 };
 

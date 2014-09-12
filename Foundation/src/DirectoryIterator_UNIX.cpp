@@ -44,7 +44,13 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _pDir(0),
 
 DirectoryIteratorImpl::~DirectoryIteratorImpl()
 {
-	if (_pDir) closedir(_pDir);
+	try
+	{
+		if (_pDir) closedir(_pDir);
+	}
+	catch (...)
+	{
+	}
 }
 
 

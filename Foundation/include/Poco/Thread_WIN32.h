@@ -114,7 +114,13 @@ private:
 		}
 		~CurrentThreadHolder()
 		{
-			TlsFree(_slot);
+			try
+			{
+				TlsFree(_slot);
+			}
+			catch (...)
+			{
+			}
 		}
 		ThreadImpl* get() const
 		{

@@ -56,17 +56,23 @@ FPEnvironmentImpl::FPEnvironmentImpl(const FPEnvironmentImpl& env)
 
 FPEnvironmentImpl::~FPEnvironmentImpl()
 {
+	try
+	{
 #if defined(__VMS)
-	#pragma pointer_size save
-	#pragma pointer_size 32
-	struct _ieee mask;
-	mask.ieee$q_flags = 0xFFFFFFFFFFFFFFFF;
-	struct _ieee env = _env;
-	sys$ieee_set_fp_control(&mask, &env, 0);
-	#pragma pointer_size restore
+		#pragma pointer_size save
+		#pragma pointer_size 32
+		struct _ieee mask;
+		mask.ieee$q_flags = 0xFFFFFFFFFFFFFFFF;
+		struct _ieee env = _env;
+		sys$ieee_set_fp_control(&mask, &env, 0);
+		#pragma pointer_size restore
 #else
-	ieee_set_fp_control(_env);
+		ieee_set_fp_control(_env);
 #endif
+	}
+	catch (...)
+	{
+	}
 }
 
 

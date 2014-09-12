@@ -53,7 +53,13 @@ MD4Engine::MD4Engine()
 
 MD4Engine::~MD4Engine()
 {
-	reset();
+	try
+	{
+		reset();
+	}
+	catch (...)
+	{
+	}
 }
 
 	

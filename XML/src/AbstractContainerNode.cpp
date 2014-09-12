@@ -45,14 +45,20 @@ AbstractContainerNode::AbstractContainerNode(Document* pOwnerDocument, const Abs
 
 AbstractContainerNode::~AbstractContainerNode()
 {
-	AbstractNode* pChild = static_cast<AbstractNode*>(_pFirstChild);
-	while (pChild)
+	try
 	{
-		AbstractNode* pDelNode = pChild;
-		pChild = pChild->_pNext;
-		pDelNode->_pNext   = 0;
-		pDelNode->_pParent = 0;
-		pDelNode->release();
+		AbstractNode* pChild = static_cast<AbstractNode*>(_pFirstChild);
+		while (pChild)
+		{
+			AbstractNode* pDelNode = pChild;
+			pChild = pChild->_pNext;
+			pDelNode->_pNext   = 0;
+			pDelNode->_pParent = 0;
+			pDelNode->release();
+		}
+	}
+	catch (...)
+	{
 	}
 }
 

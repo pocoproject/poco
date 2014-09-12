@@ -37,7 +37,13 @@ ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const st
 
 ConfigurationMapper::~ConfigurationMapper()
 {
-	_pConfig->release();
+	try
+	{
+		_pConfig->release();
+	}
+	catch (...)
+	{
+	}
 }
 
 

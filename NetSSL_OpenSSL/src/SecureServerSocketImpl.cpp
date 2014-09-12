@@ -29,7 +29,13 @@ SecureServerSocketImpl::SecureServerSocketImpl(Context::Ptr pContext):
 
 SecureServerSocketImpl::~SecureServerSocketImpl()
 {
-	reset();
+	try
+	{
+		reset();
+	}
+	catch (...)
+	{
+	}
 }
 
 

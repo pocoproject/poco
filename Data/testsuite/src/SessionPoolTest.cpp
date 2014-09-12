@@ -42,7 +42,13 @@ SessionPoolTest::SessionPoolTest(const std::string& name): CppUnit::TestCase(nam
 
 SessionPoolTest::~SessionPoolTest()
 {
-	Poco::Data::Test::Connector::removeFromFactory();
+	try
+	{
+		Poco::Data::Test::Connector::removeFromFactory();
+	}
+	catch (...)
+	{
+	}
 }
 
 

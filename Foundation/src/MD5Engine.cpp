@@ -53,7 +53,13 @@ MD5Engine::MD5Engine()
 
 MD5Engine::~MD5Engine()
 {
-	reset();
+	try
+	{
+		reset();
+	}
+	catch (...)
+	{
+	}
 }
 
 	

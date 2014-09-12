@@ -33,7 +33,13 @@ TextAnnotation::TextAnnotation(HPDF_Doc* pPDF,
 
 TextAnnotation::~TextAnnotation()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+	}
 }
 
 

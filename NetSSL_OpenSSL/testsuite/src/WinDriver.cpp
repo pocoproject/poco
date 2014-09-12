@@ -31,7 +31,13 @@ public:
 
 	~NetSSLApp()
 	{
-		Poco::Net::uninitializeSSL();
+		try
+		{
+			Poco::Net::uninitializeSSL();
+		}
+		catch (...)
+		{
+		}
 	}
 
 	int main(const std::vector<std::string>& args)

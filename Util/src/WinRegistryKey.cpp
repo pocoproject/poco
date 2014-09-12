@@ -45,7 +45,13 @@ namespace
 		
 		~AutoHandle()
 		{
-			FreeLibrary(_h);
+			try
+			{
+				FreeLibrary(_h);
+			}
+			catch (...)
+			{
+			}
 		}
 		
 		HMODULE handle()
@@ -87,7 +93,13 @@ WinRegistryKey::WinRegistryKey(HKEY hRootKey, const std::string& subKey, bool re
 
 WinRegistryKey::~WinRegistryKey()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+	}
 }
 
 

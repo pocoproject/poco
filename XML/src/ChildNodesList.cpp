@@ -34,7 +34,13 @@ ChildNodesList::ChildNodesList(const Node* pParent):
 
 ChildNodesList::~ChildNodesList()
 {
-	_pParent->release();
+	try
+	{
+		_pParent->release();
+	}
+	catch (...)
+	{
+	}
 }
 
 

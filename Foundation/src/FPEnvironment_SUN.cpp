@@ -37,8 +37,14 @@ FPEnvironmentImpl::FPEnvironmentImpl(const FPEnvironmentImpl& env)
 
 FPEnvironmentImpl::~FPEnvironmentImpl()
 {
-	fpsetround(_rnd);
-	fpsetmask(_exc);
+	try
+	{
+		fpsetround(_rnd);
+		fpsetmask(_exc);
+	}
+	catch (...)
+	{
+	}
 }
 
 

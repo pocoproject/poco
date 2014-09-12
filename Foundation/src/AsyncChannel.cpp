@@ -59,8 +59,14 @@ AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio):
 
 AsyncChannel::~AsyncChannel()
 {
-	close();
-	if (_pChannel) _pChannel->release();
+	try
+	{
+		close();
+		if (_pChannel) _pChannel->release();
+	}
+	catch (...)
+	{
+	}
 }
 
 

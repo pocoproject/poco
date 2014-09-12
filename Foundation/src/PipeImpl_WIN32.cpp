@@ -35,8 +35,14 @@ PipeImpl::PipeImpl()
 
 PipeImpl::~PipeImpl()
 {
-	closeRead();
-	closeWrite();
+	try
+	{
+		closeRead();
+		closeWrite();
+	}
+	catch (...)
+	{
+	}
 }
 
 

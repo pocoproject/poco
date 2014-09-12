@@ -107,8 +107,14 @@ public:
 	~RecursiveDirectoryIterator()
 		/// Destroys the DirectoryIterator.
 	{
-		if (_pImpl)
-			_pImpl->release();
+		try
+		{
+			if (_pImpl)
+				_pImpl->release();
+		}
+		catch (...)
+		{
+		}
 	}
 
 	const std::string& name() const
