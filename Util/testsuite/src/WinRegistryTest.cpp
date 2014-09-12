@@ -19,10 +19,17 @@
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Environment.h"
 #include "Poco/Exception.h"
+#undef min
+#undef max
+#include <limits>
 
+#if defined(POCO_HAVE_INT64)
+using Poco::Int64;
+#endif
 
 using Poco::Util::WinRegistryKey;
 using Poco::Environment;
+
 
 
 WinRegistryTest::WinRegistryTest(const std::string& name): CppUnit::TestCase(name)
@@ -81,6 +88,26 @@ void WinRegistryTest::testRegistry()
 	regKey.deleteValue("name4");
 	assert (!regKey.exists("name4"));
 	
+#if defined(POCO_HAVE_INT64)
+	regKey.setInt64("name5", std::numeric_limits<Int64>::max());
+	assert (regKey.getInt64("name5") == std::numeric_limits<Int64>::max());
+
+	assert (regKey.exists("name5"));
+	regKey.deleteValue("name5");
+	assert (!regKey.exists("name5"));
+#endif
+
+	const int dataSize = 127;
+	std::vector<char> data(dataSize);
+	for (int i = 0; i < dataSize; ++i)
+		data[i] = rand() % 256;
+	regKey.setBinary("binary", data);
+	assert (regKey.getBinary("binary") == data);
+
+	assert (regKey.exists("binary"));
+	regKey.deleteValue("binary");
+	assert (!regKey.exists("binary"));
+
 	regKey.deleteKey();
 	assert (!regKey.exists());
 }

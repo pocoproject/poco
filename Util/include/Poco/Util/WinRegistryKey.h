@@ -97,11 +97,11 @@ public:
 		///
 		/// Throws a NotFoundException if the value does not exist.
 
-	void setBinary(const std::string& name, const std::string& value); 
+	void setBinary(const std::string& name, const std::vector<char>& value); 
 		/// Sets the string value (REG_BINARY) with the given name.
 		/// An empty name denotes the default value.
 
-	std::string getBinary(const std::string& name);
+	std::vector<char> getBinary(const std::string& name);
 		/// Returns the string value (REG_BINARY) with the given name.
 		/// An empty name denotes the default value.
 		///
