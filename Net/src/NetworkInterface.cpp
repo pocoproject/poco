@@ -151,13 +151,20 @@ private:
 
 	NetworkInterface::MACAddress _macAddress;
 
-	friend NetworkInterface::Map NetworkInterface::map(bool, bool);
+	friend class NetworkInterface;
 };
 
 
 NetworkInterfaceImpl::NetworkInterfaceImpl(unsigned index):
 	_index(index),
-	_mtu(0)
+	_broadcast(false),
+	_loopback(false),
+	_multicast(false),
+	_pointToPoint(false),
+	_up(false),
+	_running(false),
+	_mtu(0),
+	_type(NetworkInterface::NI_TYPE_OTHER)
 {
 }
 
@@ -173,7 +180,8 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_pointToPoint(false),
 	_up(false),
 	_running(false),
-	_mtu(0)
+	_mtu(0),
+	_type(NetworkInterface::NI_TYPE_OTHER)
 {
 	_addressList.push_back(AddressTuple(address, IPAddress(), IPAddress()));
 	setPhyParams();
@@ -192,7 +200,8 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_pointToPoint(false),
 	_up(false),
 	_running(false),
-	_mtu(0)
+	_mtu(0),
+	_type(NetworkInterface::NI_TYPE_OTHER)
 {
 	setPhyParams();
 	if (pMACAddress) setMACAddress(*pMACAddress);
@@ -430,6 +439,7 @@ inline bool NetworkInterfaceImpl::up() const
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 
+
 void NetworkInterfaceImpl::setFlags(DWORD flags, DWORD iftype)
 {
 	_running = _up = false;
@@ -453,12 +463,15 @@ void NetworkInterfaceImpl::setFlags(DWORD flags, DWORD iftype)
 		_multicast = true;
 }
 
+
 void NetworkInterfaceImpl::setRunning(bool running)
 {
 	_running = running;
 }
 
+
 #else
+
 
 void NetworkInterfaceImpl::setFlags(short flags)
 {
@@ -471,6 +484,7 @@ void NetworkInterfaceImpl::setFlags(short flags)
 	_up = ((flags & IFF_UP) != 0);
 #endif
 }
+
 
 #endif
 
@@ -525,8 +539,6 @@ inline void NetworkInterfaceImpl::addAddress(const IPAddress& addr)
 
 inline void NetworkInterfaceImpl::setMACAddress(const NetworkInterface::MACAddress& addr)
 {
-
-
 	_macAddress = addr;
 }
 
@@ -534,8 +546,7 @@ inline void NetworkInterfaceImpl::setMACAddress(const NetworkInterface::MACAddre
 inline void NetworkInterfaceImpl::setMACAddress(const void *addr, std::size_t len)
 {
 	_macAddress.clear();
-	for (unsigned i = 0; i < len; ++i)
-		_macAddress.push_back(((unsigned char *)addr)[i]);
+	_macAddress.insert(_macAddress.end(), static_cast<const unsigned char*>(addr), static_cast<const unsigned char*>(addr) + len);
 }
 
 
@@ -719,10 +730,12 @@ unsigned NetworkInterface::mtu() const
 	return _pImpl->mtu();
 }
 
+
 NetworkInterface::Type NetworkInterface::type() const
 {
 	return _pImpl->type();
 }
+
 
 bool NetworkInterface::supportsIP() const
 {
@@ -758,7 +771,6 @@ bool NetworkInterface::isLoopback() const
 {
 	return _pImpl->loopback();
 }
-
 
 
 bool NetworkInterface::isPointToPoint() const
@@ -874,12 +886,23 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 			IPAddress mask = ipIt->get<NetworkInterface::SUBNET_MASK>();
 			NetworkInterface ni;
 			if (mask.isWildcard())
+			{
 				ni = NetworkInterface(name, displayName, adapterName, addr, index, &mac);
+			}
 			else
 			{
 				IPAddress broadcast = ipIt->get<NetworkInterface::BROADCAST_ADDRESS>();
 				ni = NetworkInterface(name, displayName, adapterName, addr, mask, broadcast, index, &mac);
 			}
+
+			ni._pImpl->_broadcast    = it->second._pImpl->_broadcast;
+			ni._pImpl->_loopback     = it->second._pImpl->_loopback;
+			ni._pImpl->_multicast    = it->second._pImpl->_multicast;
+			ni._pImpl->_pointToPoint = it->second._pImpl->_pointToPoint;
+			ni._pImpl->_up           = it->second._pImpl->_up;
+			ni._pImpl->_running      = it->second._pImpl->_running;
+			ni._pImpl->_mtu          = it->second._pImpl->_mtu;
+			ni._pImpl->_type         = it->second._pImpl->_type;
 
 			list.push_back(ni);
 		}
@@ -975,6 +998,7 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 	}
 	else
 	{
+#if !defined(_WIN32_WCE)
 		std::string subKey("SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\");
 		subKey += name;
 		std::string netmask;
@@ -1012,6 +1036,9 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 #endif
 		RegCloseKey(hKey);
 		return IPAddress::parse(netmask);
+#else
+		return IPAddress();
+#endif // !defined(_WIN32_WCE)
 	}
 }
 
@@ -1054,7 +1081,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", Error::getMessage(dwRetVal)));
 		else
 			break;
-	} while ((ERROR_BUFFER_OVERFLOW == dwRetVal) && (++iterations <= 2));
+	} 
+	while ((ERROR_BUFFER_OVERFLOW == dwRetVal) && (++iterations <= 2));
 
 	poco_assert (NO_ERROR == dwRetVal);
 	for (; pAddress; pAddress = pAddress->Next)
@@ -1158,36 +1186,41 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						// we reflect the actual values held by system and protect against misconfiguration (e.g. bad DHCP config entry)
 #if defined(_WIN32_WCE)
 						ULONG prefixLength = 0;
+	#if _WIN32_WCE >= 0x0800
+						prefixLength = pUniAddr->OnLinkPrefixLength;
+						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
+	#else
 						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
+	#endif
 						// if previous call did not do it, make last-ditch attempt for prefix and broadcast
 						if (prefixLength == 0 && pAddress->FirstPrefix)
 							prefixLength = pAddress->FirstPrefix->PrefixLength;
 						poco_assert (prefixLength <= 32);
 						if (broadcastAddress.isWildcard())
 						{
-							IPAddress mask ((unsigned) prefixLength, IPAddress::IPv4);
+							IPAddress mask(static_cast<unsigned>(prefixLength), IPAddress::IPv4);
 							IPAddress host(mask & address);
 							broadcastAddress = host | ~mask;
 						}
 #elif (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
-	#if (_WIN32_WINNT >= 0x0600) // Vista and newer
-						UINT8 prefixLength = pUniAddr->OnLinkPrefixLength;
-						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
-	#else // _WIN32_WINNT < 0x0600
 						ULONG prefixLength = 0;
+	#if (_WIN32_WINNT >= 0x0600) // Vista and newer
+						prefixLength = pUniAddr->OnLinkPrefixLength;
+						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
+	#else
 						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
+	#endif
 						poco_assert (prefixLength <= 32);
 						if (broadcastAddress.isWildcard())
 						{
-							IPAddress mask ((unsigned) prefixLength, IPAddress::IPv4);
+							IPAddress mask(static_cast<unsigned>(prefixLength), IPAddress::IPv4);
 							IPAddress host(mask & address);
 							broadcastAddress = host | ~mask;
 						}
-	#endif // _WIN32_WINNT >= 0x0600
 #endif // (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100)
 						if (prefixLength)
 						{
-							subnetMask = IPAddress(prefixLength, IPAddress::IPv4);
+							subnetMask = IPAddress(static_cast<unsigned>(prefixLength), IPAddress::IPv4);
 						}
 						else // if all of the above fails, look up the subnet mask in the registry
 						{
@@ -1202,8 +1235,11 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						ifIt->second.addAddress(address, subnetMask, broadcastAddress);
 					}
 					else
+					{
 						ifIt->second.addAddress(address);
-				} break;
+					}
+				} 
+				break;
 #if defined(POCO_HAVE_IPv6)
 				case AF_INET6:
 					ifIt->second.addAddress(address);

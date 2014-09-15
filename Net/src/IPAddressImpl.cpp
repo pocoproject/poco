@@ -56,6 +56,7 @@ namespace Poco {
 namespace Net {
 namespace Impl {
 
+
 //
 // IPAddressImpl
 //
@@ -74,6 +75,7 @@ IPAddressImpl::~IPAddressImpl()
 //
 // IPv4AddressImpl
 //
+
 
 IPv4AddressImpl::IPv4AddressImpl()
 {
@@ -348,10 +350,12 @@ IPv6AddressImpl::IPv6AddressImpl(): _scope(0)
 	std::memset(&_addr, 0, sizeof(_addr));
 }
 
+
 IPv6AddressImpl::IPv6AddressImpl(const void* addr): _scope(0)
 {
 	std::memcpy(&_addr, addr, sizeof(_addr));
 }
+
 
 IPv6AddressImpl::IPv6AddressImpl(const void* addr, Poco::UInt32 scope): _scope(scope)
 {
@@ -396,10 +400,11 @@ IPv6AddressImpl::IPv6AddressImpl(unsigned prefix):
 #endif
 }
 
+
 std::string IPv6AddressImpl::toString() const
 {
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
-	if (isIPv4Compatible() || isIPv4Mapped())
+	if ((isIPv4Compatible() && !isLoopback()) || isIPv4Mapped())
 	{
 		std::string result;
 		result.reserve(24);
@@ -460,25 +465,30 @@ std::string IPv6AddressImpl::toString() const
 	}
 }
 
+
 poco_socklen_t IPv6AddressImpl::length() const
 {
 	return sizeof(_addr);
 }
+
 
 const void* IPv6AddressImpl::addr() const
 {
 	return &_addr;
 }
 
+
 IPAddressImpl::Family IPv6AddressImpl::family() const
 {
 	return IPAddressImpl::IPv6;
 }
 
+
 int IPv6AddressImpl::af() const
 {
 	return AF_INET6;
 }
+
 
 unsigned IPv6AddressImpl::prefixLength() const
 {
@@ -510,6 +520,7 @@ Poco::UInt32 IPv6AddressImpl::scope() const
 	return _scope;
 }
 
+
 bool IPv6AddressImpl::isWildcard() const
 {
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
@@ -517,10 +528,12 @@ bool IPv6AddressImpl::isWildcard() const
 		words[4] == 0 && words[5] == 0 && words[6] == 0 && words[7] == 0;
 }
 
+
 bool IPv6AddressImpl::isBroadcast() const
 {
 	return false;
 }
+
 
 bool IPv6AddressImpl::isLoopback() const
 {
@@ -529,17 +542,20 @@ bool IPv6AddressImpl::isLoopback() const
 		words[4] == 0 && words[5] == 0 && words[6] == 0 && ntohs(words[7]) == 0x0001;
 }
 
+
 bool IPv6AddressImpl::isMulticast() const
 {
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 	return (ntohs(words[0]) & 0xFFE0) == 0xFF00;
 }
-	
+
+
 bool IPv6AddressImpl::isLinkLocal() const
 {
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 	return (ntohs(words[0]) & 0xFFE0) == 0xFE80;
 }
+
 
 bool IPv6AddressImpl::isSiteLocal() const
 {
@@ -547,11 +563,13 @@ bool IPv6AddressImpl::isSiteLocal() const
 	return ((ntohs(words[0]) & 0xFFE0) == 0xFEC0) || ((ntohs(words[0]) & 0xFF00) == 0xFC00);
 }
 
+
 bool IPv6AddressImpl::isIPv4Compatible() const
 {
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 	return words[0] == 0 && words[1] == 0 && words[2] == 0 && words[3] == 0 && words[4] == 0 && words[5] == 0;
 }
+
 
 bool IPv6AddressImpl::isIPv4Mapped() const
 {
@@ -559,11 +577,13 @@ bool IPv6AddressImpl::isIPv4Mapped() const
 	return words[0] == 0 && words[1] == 0 && words[2] == 0 && words[3] == 0 && words[4] == 0 && ntohs(words[5]) == 0xFFFF;
 }
 
+
 bool IPv6AddressImpl::isWellKnownMC() const
 {
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 	return (ntohs(words[0]) & 0xFFF0) == 0xFF00;
 }
+
 
 bool IPv6AddressImpl::isNodeLocalMC() const
 {
@@ -571,11 +591,13 @@ bool IPv6AddressImpl::isNodeLocalMC() const
 	return (ntohs(words[0]) & 0xFFEF) == 0xFF01;
 }
 
+
 bool IPv6AddressImpl::isLinkLocalMC() const
 {
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 	return (ntohs(words[0]) & 0xFFEF) == 0xFF02;
 }
+
 
 bool IPv6AddressImpl::isSiteLocalMC() const
 {
@@ -583,17 +605,20 @@ bool IPv6AddressImpl::isSiteLocalMC() const
 	return (ntohs(words[0]) & 0xFFEF) == 0xFF05;
 }
 
+
 bool IPv6AddressImpl::isOrgLocalMC() const
 {
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 	return (ntohs(words[0]) & 0xFFEF) == 0xFF08;
 }
 
+
 bool IPv6AddressImpl::isGlobalMC() const
 {
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 	return (ntohs(words[0]) & 0xFFEF) == 0xFF0F;
 }
+
 
 IPv6AddressImpl IPv6AddressImpl::parse(const std::string& addr)
 {
@@ -637,15 +662,18 @@ IPv6AddressImpl IPv6AddressImpl::parse(const std::string& addr)
 #endif
 }
 
+
 void IPv6AddressImpl::mask(const IPAddressImpl* pMask, const IPAddressImpl* pSet)
 {
 	throw Poco::NotImplementedException("mask() is only supported for IPv4 addresses");
 }
 
+
 IPAddressImpl* IPv6AddressImpl::clone() const
 {
 	return new IPv6AddressImpl(&_addr, _scope);
 }
+
 
 IPv6AddressImpl IPv6AddressImpl::operator & (const IPv6AddressImpl& addr) const
 {
@@ -668,6 +696,7 @@ IPv6AddressImpl IPv6AddressImpl::operator & (const IPv6AddressImpl& addr) const
 	return result;
 }
 
+
 IPv6AddressImpl IPv6AddressImpl::operator | (const IPv6AddressImpl& addr) const
 {
 	IPv6AddressImpl result(&_addr);
@@ -689,6 +718,7 @@ IPv6AddressImpl IPv6AddressImpl::operator | (const IPv6AddressImpl& addr) const
 	return result;
 }
 
+
 IPv6AddressImpl IPv6AddressImpl::operator ^ (const IPv6AddressImpl& addr) const
 {
 	IPv6AddressImpl result(&_addr);
@@ -709,6 +739,7 @@ IPv6AddressImpl IPv6AddressImpl::operator ^ (const IPv6AddressImpl& addr) const
 #endif
 	return result;
 }
+
 
 IPv6AddressImpl IPv6AddressImpl::operator ~ () const
 {

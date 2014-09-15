@@ -58,6 +58,10 @@ void IPAddressTest::testStringConv()
 void IPAddressTest::testStringConv6()
 {
 #ifdef POCO_HAVE_IPv6
+	IPAddress ia0("::1");
+	assert (ia0.family() == IPAddress::IPv6);
+	assert (ia0.toString() == "::1");
+
 	IPAddress ia1("1080:0:0:0:8:600:200a:425c");
 	assert (ia1.family() == IPAddress::IPv6);
 	assert (ia1.toString() == "1080::8:600:200a:425c");
