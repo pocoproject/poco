@@ -207,21 +207,21 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.totalConnections() == 5);
 
 	ss2.close();
-	Thread::sleep(1000);
+	Thread::sleep(2000);
 	assert (srv.currentConnections() == 4);
 	assert (srv.currentThreads() == 4);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 6);
 	
 	ss3.close();
-	Thread::sleep(1000);
+	Thread::sleep(2000);
 	assert (srv.currentConnections() == 3);
 	assert (srv.currentThreads() == 3);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 6);
 
 	ss4.close();
-	Thread::sleep(1000);
+	Thread::sleep(2000);
 	assert (srv.currentConnections() == 2);
 	assert (srv.currentThreads() == 2);
 	assert (srv.queuedConnections() == 0);
