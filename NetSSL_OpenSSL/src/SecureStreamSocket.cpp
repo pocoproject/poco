@@ -154,9 +154,9 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket)
 	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), SSLManager::instance().defaultClientContext());
 	SecureStreamSocket result(pImpl);
 	if (pImpl->context()->isForServerUse())
-      pImpl->acceptSSL();
+		pImpl->acceptSSL();
 	else
-      pImpl->connectSSL();
+		pImpl->connectSSL();
 	return result;
 }
 
@@ -166,9 +166,9 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), pContext);
 	SecureStreamSocket result(pImpl);
 	if (pImpl->context()->isForServerUse())
-      pImpl->acceptSSL();
+		pImpl->acceptSSL();
 	else
-      pImpl->connectSSL();
+		pImpl->connectSSL();
 	return result;
 }
 
@@ -179,9 +179,9 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 	SecureStreamSocket result(pImpl);
 	result.useSession(pSession);
 	if (pImpl->context()->isForServerUse())
-      pImpl->acceptSSL();
+		pImpl->acceptSSL();
 	else
-      pImpl->connectSSL();
+		pImpl->connectSSL();
 	return result;
 }
 
@@ -192,9 +192,9 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 	SecureStreamSocket result(pImpl);
 	result.setPeerHostName(peerHostName);
 	if (pImpl->context()->isForServerUse())
-      pImpl->acceptSSL();
+		pImpl->acceptSSL();
 	else
-      pImpl->connectSSL();
+		pImpl->connectSSL();
 	return result;
 }
 
@@ -205,9 +205,9 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 	SecureStreamSocket result(pImpl);
 	result.setPeerHostName(peerHostName);
 	if (pImpl->context()->isForServerUse())
-      pImpl->acceptSSL();
+		pImpl->acceptSSL();
 	else
-      pImpl->connectSSL();
+		pImpl->connectSSL();
 	return result;
 }
 
@@ -219,9 +219,9 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 	result.setPeerHostName(peerHostName);
 	result.useSession(pSession);
 	if (pImpl->context()->isForServerUse())
-      pImpl->acceptSSL();
+		pImpl->acceptSSL();
 	else
-      pImpl->connectSSL();
+		pImpl->connectSSL();
 	return result;
 }
 
