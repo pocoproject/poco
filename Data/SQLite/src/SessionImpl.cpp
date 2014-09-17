@@ -51,6 +51,7 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	addFeature("autoCommit", 
 		&SessionImpl::autoCommit, 
 		&SessionImpl::isAutoCommit);
+	addProperty("connectionTimeout", &SessionImpl::setConnectionTimeout, &SessionImpl::getConnectionTimeout);
 }
 
 
@@ -209,6 +210,18 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 	int rc = sqlite3_busy_timeout(_pDB, tout);
 	if (rc != 0) Utility::throwException(rc);
 	_timeout = tout;
+}
+
+
+void SessionImpl::setConnectionTimeout(const std::string& prop, const Poco::Any& value)
+{
+	setConnectionTimeout(Poco::RefAnyCast<std::size_t>(value));
+}
+
+
+Poco::Any SessionImpl::getConnectionTimeout(const std::string& prop)
+{
+	return Poco::Any(_timeout/1000);
 }
 
 
