@@ -19,9 +19,8 @@
 
 CppUnit::Test* NetSSLTestSuite::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("OpenSSLTestSuite");
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NetSSLTestSuite");
 
-	
 	pSuite->addTest(HTTPSClientTestSuite::suite());
 	pSuite->addTest(TCPServerTestSuite::suite());
 	pSuite->addTest(HTTPSServerTestSuite::suite());

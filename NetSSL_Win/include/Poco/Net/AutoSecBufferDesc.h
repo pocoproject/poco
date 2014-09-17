@@ -73,7 +73,7 @@ public:
 		const_cast<AutoSecBufferDesc*>(&desc)->initBuffers();
 	}
 
-	AutoSecBufferDesc& operator=(const AutoSecBufferDesc& desc)
+	AutoSecBufferDesc& operator = (const AutoSecBufferDesc& desc)
 	{
 		if (&desc != this)
 		{
@@ -97,12 +97,21 @@ public:
 	~AutoSecBufferDesc()
 		/// Destroys the AutoSecBufferDesc
 	{
+		release();
+	}
+
+	void release()
+	{
 		if (_autoRelease)
 		{
 			for (int i = 0; i < numBufs; ++i)
 			{
-				_pSec->FreeContextBuffer(_buffers[i].pvBuffer);
+				if (_buffers[i].pvBuffer)
+				{
+					_pSec->FreeContextBuffer(_buffers[i].pvBuffer);
+				}
 			}
+			_autoRelease = false;
 		}
 	}
 

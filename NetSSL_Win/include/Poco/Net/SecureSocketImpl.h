@@ -241,8 +241,7 @@ private:
 	DWORD      _clientFlags;
 	DWORD      _serverFlags;
 
-	HMODULE _hSecurityModule;
-	SecurityFunctionTableW _securityFunctions;
+	SecurityFunctionTableW& _securityFunctions;
 
 	BYTE* _pReceiveBuffer;
 	DWORD _receiveBufferSize;

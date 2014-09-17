@@ -18,6 +18,7 @@
 #include "Poco/Net/HTTPStreamFactory.h"
 #include "Poco/Net/HTTPSStreamFactory.h"
 #include <cstdlib>
+#include <iostream>
 
 
 class NetSSLApp: public Poco::Util::Application

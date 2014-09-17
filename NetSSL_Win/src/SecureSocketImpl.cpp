@@ -84,8 +84,7 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_hContext(),
 	_clientFlags(0),
 	_serverFlags(0),
-	_hSecurityModule(0),
-	_securityFunctions(),
+	_securityFunctions(SSLManager::instance().securityFunctions()),
 	_pReceiveBuffer(0),
 	_receiveBufferSize(0),
 	_pIOBuffer(0),
@@ -122,8 +121,6 @@ SecureSocketImpl::~SecureSocketImpl()
 
 void SecureSocketImpl::initCommon()
 {
-	loadSecurityLibrary();
-
 	DWORD commonFlags = ISC_REQ_SEQUENCE_DETECT
 	             | ISC_REQ_REPLAY_DETECT
 	             | ISC_REQ_CONFIDENTIALITY
@@ -188,11 +185,9 @@ void SecureSocketImpl::cleanup()
 		_hCertificateStore = 0;
 	}
 
-	if (_hSecurityModule)
-	{
-		FreeLibrary(_hSecurityModule);
-		_hSecurityModule = 0;
-	}
+	// must release buffers before unloading library
+	_outSecBuffer.release();
+	_inSecBuffer.release();
 
 	delete [] _pReceiveBuffer;
 	_pReceiveBuffer = 0;
@@ -664,6 +659,9 @@ void SecureSocketImpl::setPeerHostName(const std::string& peerHostName)
 
 PCCERT_CONTEXT SecureSocketImpl::loadCertificate(const std::string& certStore, const std::string& certName, bool useMachineStore, bool mustFindCertificate)
 {
+	if (mustFindCertificate && certName.empty())
+		throw SSLException("Certificate required, but no certificate name provided");
+
 	PCCERT_CONTEXT pCert = 0;
 
 	std::wstring wcertStore;
@@ -768,81 +766,8 @@ void SecureSocketImpl::acquireSchannelContext(Mode mode, PCCERT_CONTEXT pCertCon
 
 	if (status != SEC_E_OK)
 	{
-		cleanup();
 		throw SSLException("Failed to acquire Schannel credentials", Utility::formatError(status));
 	}
-}
-
-
-bool SecureSocketImpl::loadSecurityLibrary()
-{
-	if (_hSecurityModule) return true;
-
-	OSVERSIONINFO VerInfo;
-	std::wstring dllPath;
-
-	// Find out which security DLL to use, depending on
-	// whether we are on Win2k, NT or Win9x
-
-	VerInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	if (!GetVersionEx(&VerInfo))
-	{
-		return false;
-	}
-
-#if defined(_WIN32_WCE)
-	dllPath = L"Secur32.dll";
-#else
-	if (VerInfo.dwPlatformId == VER_PLATFORM_WIN32_NT 
-		&& VerInfo.dwMajorVersion == 4)
-	{
-		dllPath = L"Security.dll";
-	}
-	else if (VerInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS ||
-		VerInfo.dwPlatformId == VER_PLATFORM_WIN32_NT )
-	{
-		dllPath = L"Secur32.dll";
-	}
-	else
-	{
-		return false;
-	}
-#endif
-
-	//
-	//  Load Security DLL
-	//
-
-	_hSecurityModule = LoadLibraryW(dllPath.c_str());
-	if(_hSecurityModule == 0)
-	{
-		return false;
-	}
-
-#if defined(_WIN32_WCE)
-	INIT_SECURITY_INTERFACE pInitSecurityInterface = (INIT_SECURITY_INTERFACE)GetProcAddressW( _hSecurityModule, L"InitSecurityInterfaceW");
-#else
-	INIT_SECURITY_INTERFACE pInitSecurityInterface = (INIT_SECURITY_INTERFACE)GetProcAddress( _hSecurityModule, "InitSecurityInterfaceW");
-#endif
-
-	if (!pInitSecurityInterface)
-	{
-		FreeLibrary(_hSecurityModule);
-		_hSecurityModule = 0;
-		return false;
-	}
-
-	PSecurityFunctionTable pSecurityFunc = pInitSecurityInterface();
-	if (!pSecurityFunc)
-	{
-		FreeLibrary(_hSecurityModule);
-		_hSecurityModule = 0;
-		return false;
-	}
-
-	CopyMemory(&_securityFunctions, pSecurityFunc, sizeof(_securityFunctions));
-
-	return true;
 }
 
 
@@ -1012,7 +937,6 @@ SECURITY_STATUS SecureSocketImpl::performClientHandshakeLoop()
 }
 
 
-
 void SecureSocketImpl::performClientHandshakeLoopExtError()
 {
 	poco_assert_dbg (FAILED(_securityStatus));
@@ -1030,6 +954,7 @@ void SecureSocketImpl::performClientHandshakeLoopError()
 	throw SSLException("Error during handshake", Utility::formatError(_securityStatus));
 }
 
+
 void SecureSocketImpl::performClientHandshakeSendOutBuffer()
 {
 	if (_outSecBuffer[0].cbBuffer != 0 && _outSecBuffer[0].pvBuffer != NULL) 
@@ -1038,7 +963,6 @@ void SecureSocketImpl::performClientHandshakeSendOutBuffer()
 
 		if (numBytes != _outSecBuffer[0].cbBuffer)
 		{
-			cleanup();
 			throw SSLException("Socket error during handshake");
 		}
 		_bytesReadSum = 0;
@@ -1347,7 +1271,6 @@ void SecureSocketImpl::clientVerifyCertificate(PCCERT_CONTEXT pServerCert, const
 
 	verifyCertificateChainClient(pServerCert, pChainContext);	
 }
-
 
 
 void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert, PCCERT_CHAIN_CONTEXT pChainContext)

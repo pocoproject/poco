@@ -51,19 +51,16 @@ const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
 
 
-SSLManager::SSLManager()
+SSLManager::SSLManager():
+	_hSecurityModule(0)
 {
+	loadSecurityLibrary();
 }
 
 
 SSLManager::~SSLManager()
 {
-	ClientVerificationError.clear();
-	ServerVerificationError.clear();
-	_ptrServerCertificateHandler = 0;
-	_ptrDefaultServerContext     = 0;
-	_ptrClientCertificateHandler = 0;
-	_ptrDefaultClientContext     = 0;
+	shutdown();
 }
 
 
@@ -237,8 +234,90 @@ void SSLManager::shutdown()
 {
 	ClientVerificationError.clear();
 	ServerVerificationError.clear();
-	_ptrDefaultServerContext = 0;
-	_ptrDefaultClientContext = 0;
+	_ptrServerCertificateHandler = 0;
+	_ptrDefaultServerContext     = 0;
+	_ptrClientCertificateHandler = 0;
+	_ptrDefaultClientContext     = 0;
+
+	unloadSecurityLibrary();
+}
+
+
+void SSLManager::loadSecurityLibrary()
+{
+	if (_hSecurityModule) return;
+
+	OSVERSIONINFO VerInfo;
+	std::wstring dllPath;
+
+	// Find out which security DLL to use, depending on
+	// whether we are on Win2k, NT or Win9x
+
+	VerInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	if (!GetVersionEx(&VerInfo))
+		throw Poco::SystemException("Cannot determine OS version");
+
+#if defined(_WIN32_WCE)
+	dllPath = L"Secur32.dll";
+#else
+	if (VerInfo.dwPlatformId == VER_PLATFORM_WIN32_NT 
+		&& VerInfo.dwMajorVersion == 4)
+	{
+		dllPath = L"Security.dll";
+	}
+	else if (VerInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS ||
+		VerInfo.dwPlatformId == VER_PLATFORM_WIN32_NT )
+	{
+		dllPath = L"Secur32.dll";
+	}
+	else
+	{
+		throw Poco::SystemException("Cannot determine which security DLL to use");
+	}
+#endif
+
+	//
+	//  Load Security DLL
+	//
+
+	_hSecurityModule = LoadLibraryW(dllPath.c_str());
+	if(_hSecurityModule == 0)
+	{
+		throw Poco::SystemException("Failed to load security DLL");
+	}
+
+#if defined(_WIN32_WCE)
+	INIT_SECURITY_INTERFACE pInitSecurityInterface = (INIT_SECURITY_INTERFACE)GetProcAddressW( _hSecurityModule, L"InitSecurityInterfaceW");
+#else
+	INIT_SECURITY_INTERFACE pInitSecurityInterface = (INIT_SECURITY_INTERFACE)GetProcAddress( _hSecurityModule, "InitSecurityInterfaceW");
+#endif
+
+	if (!pInitSecurityInterface)
+	{
+		FreeLibrary(_hSecurityModule);
+		_hSecurityModule = 0;
+		throw Poco::SystemException("Failed to initialize security DLL (no init function)");
+	}
+
+	PSecurityFunctionTable pSecurityFunc = pInitSecurityInterface();
+	if (!pSecurityFunc)
+	{
+		FreeLibrary(_hSecurityModule);
+		_hSecurityModule = 0;
+		throw Poco::SystemException("Failed to initialize security DLL (no function table)");
+	}
+
+	CopyMemory(&_securityFunctions, pSecurityFunc, sizeof(_securityFunctions));
+}
+
+
+void SSLManager::unloadSecurityLibrary()
+{
+	if (_hSecurityModule)
+	{
+		FreeLibrary(_hSecurityModule);
+		_hSecurityModule = 0;
+	}
 }
 
 

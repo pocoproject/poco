@@ -27,6 +27,13 @@
 #include "Poco/Net/InvalidCertificateHandler.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/SharedPtr.h"
+#include <wincrypt.h>
+#include <schannel.h>
+#ifndef SECURITY_WIN32
+#define SECURITY_WIN32
+#endif
+#include <security.h>
+#include <sspi.h>
 
 
 namespace Poco {
@@ -184,6 +191,9 @@ public:
 	static const std::string CFG_SERVER_PREFIX;
 	static const std::string CFG_CLIENT_PREFIX;
 
+protected:
+	SecurityFunctionTableW& securityFunctions();
+
 private:
 	SSLManager();
 		/// Creates the SSLManager.
@@ -199,6 +209,15 @@ private:
 
 	void initCertificateHandler(bool server);
 		/// Inits the certificate handler.
+
+	void loadSecurityLibrary();
+		/// Loads the Windows security DLL.
+
+	void unloadSecurityLibrary();
+		/// Unloads the Windows security DLL.
+
+	HMODULE _hSecurityModule;
+	SecurityFunctionTableW _securityFunctions;
 
 	CertificateHandlerFactoryMgr   _certHandlerFactoryMgr;
 	Context::Ptr                   _ptrDefaultServerContext;
@@ -232,6 +251,7 @@ private:
 	static const std::string CFG_REQUIRE_TLSV1_2;
 
 	friend class Poco::SingletonHolder<SSLManager>;
+	friend class SecureSocketImpl;
 };
 
 
@@ -241,6 +261,12 @@ private:
 inline CertificateHandlerFactoryMgr& SSLManager::certificateHandlerFactoryMgr()
 {
 	return _certHandlerFactoryMgr;
+}
+
+
+inline SecurityFunctionTableW& SSLManager::securityFunctions()
+{
+	return _securityFunctions;
 }
 
 
