@@ -217,18 +217,21 @@ bool SQLiteStatementImpl::hasNext()
 	for (int i = 0; i <= _maxRetryAttempts; i++)
 	{
 		_nextResponse = sqlite3_step(_pStmt);
-		switch (_nextResponse)
+			switch (_nextResponse)
 		{
-			// Notes: When we get SQLITE_BUSY, we do not need to reset the statement 
-			// to try again.
-			// When we get SQLITE_LOCKED, we must reset the statement before trying
+			// When we get SQLITE_BUSY or SQLITE_LOCKED, we must reset the statement before trying
 			// again. SQLITE_LOCKED is only returned for the first call to sqlite3_step,
 			// so resetting and retrying is safe.
 		case SQLITE_LOCKED:
 		case SQLITE_LOCKED_SHAREDCACHE:
-			sqlite3_reset(_pStmt);
-			// fallthrough
 		case SQLITE_BUSY:	
+#ifdef SQLITE_BUSY_RECOVERY
+		case SQLITE_BUSY_RECOVERY:
+#endif
+#ifdef SQLITE_BUSY_SNAPSHOT
+		case SQLITE_BUSY_SNAPSHOT:
+#endif
+			sqlite3_reset(_pStmt);
 			if (i < _maxRetryAttempts)
 			{
 				sleep();
@@ -238,7 +241,7 @@ bool SQLiteStatementImpl::hasNext()
 		default:
 			break;
 		}
-		break;
+
 	}
 
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
