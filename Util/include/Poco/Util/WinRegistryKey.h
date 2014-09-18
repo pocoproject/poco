@@ -44,6 +44,7 @@ public:
 		REGT_NONE = 0, 
 		REGT_STRING = 1, 
 		REGT_STRING_EXPAND = 2, 
+		REGT_BINARY = 3,
 		REGT_DWORD = 4, 
 		REGT_QWORD = 11
 	};
@@ -96,6 +97,16 @@ public:
 		///
 		/// Throws a NotFoundException if the value does not exist.
 
+	void setBinary(const std::string& name, const std::vector<char>& value); 
+		/// Sets the string value (REG_BINARY) with the given name.
+		/// An empty name denotes the default value.
+
+	std::vector<char> getBinary(const std::string& name);
+		/// Returns the string value (REG_BINARY) with the given name.
+		/// An empty name denotes the default value.
+		///
+		/// Throws a NotFoundException if the value does not exist.
+
 	void setInt(const std::string& name, int value);
 		/// Sets the numeric (REG_DWORD) value with the given name.
 		/// An empty name denotes the default value.
@@ -107,6 +118,10 @@ public:
 		/// Throws a NotFoundException if the value does not exist.
 
 #if defined(POCO_HAVE_INT64)
+
+	void setInt64(const std::string& name, Poco::Int64 value);
+		/// Sets the numeric (REG_QWORD) value with the given name.
+		/// An empty name denotes the default value.
 
 	Poco::Int64 getInt64(const std::string& name);
 		/// Returns the numeric value (REG_QWORD) with the given name.
