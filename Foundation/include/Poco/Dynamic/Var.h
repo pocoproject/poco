@@ -495,6 +495,10 @@ public:
 		/// Returns true if stored value is numeric.
 		/// Returns false for numeric strings (e.g. "123" is string, not number)
 
+	bool isBoolean() const;
+		/// Returns true if stored value is boolean.
+		/// Returns false for boolean strings (e.g. "true" is string, not number)
+
 	bool isString() const;
 		/// Returns true if stored value is std::string.
 
@@ -822,6 +826,13 @@ inline bool Var::isNumeric() const
 {
 	VarHolder* pHolder = content();
 	return pHolder ? pHolder->isNumeric() : false;
+}
+
+
+inline bool Var::isBoolean() const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isBoolean() : false;
 }
 
 
