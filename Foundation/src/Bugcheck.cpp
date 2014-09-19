@@ -62,7 +62,7 @@ void Bugcheck::unexpected(const char* file, int line)
 #ifdef _DEBUG
 	try
 	{
-		std::string msg("Caught exception in destructor: ");
+		std::string msg("Unexpected exception in noexcept function or destructor: ");
 		try
 		{
 			throw;
