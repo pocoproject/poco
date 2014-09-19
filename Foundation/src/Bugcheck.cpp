@@ -59,6 +59,7 @@ void Bugcheck::bugcheck(const char* msg, const char* file, int line)
 
 void Bugcheck::unexpected(const char* file, int line)
 {
+#ifdef _DEBUG
 	try
 	{
 		std::string msg("Caught exception in destructor: ");
@@ -82,7 +83,8 @@ void Bugcheck::unexpected(const char* file, int line)
 	}
 	catch (...)
 	{
-	}	
+	}
+#endif	
 }
 
 
