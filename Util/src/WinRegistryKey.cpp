@@ -218,10 +218,10 @@ void WinRegistryKey::setBinary( const std::string& name, const std::vector<char>
 #if defined(POCO_WIN32_UTF8)
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(name, uname);
-	if (RegSetValueExW(_hKey, uname.c_str(), 0, REG_BINARY, (CONST BYTE*) value.data(), (DWORD) value.size()) != ERROR_SUCCESS)
+	if (RegSetValueExW(_hKey, uname.c_str(), 0, REG_BINARY, (CONST BYTE*) &value[0], (DWORD) value.size()) != ERROR_SUCCESS)
 		handleSetError(name); 
 #else
-	if (RegSetValueExA(_hKey,  name.c_str(), 0, REG_BINARY, (CONST BYTE*) value.data(), (DWORD) value.size()) != ERROR_SUCCESS)
+	if (RegSetValueExA(_hKey,  name.c_str(), 0, REG_BINARY, (CONST BYTE*) &value[0], (DWORD) value.size()) != ERROR_SUCCESS)
 		handleSetError(name); 
 #endif
 }
@@ -242,7 +242,7 @@ std::vector<char> WinRegistryKey::getBinary( const std::string& name )
 	if (size > 0)
 	{
 		result.resize(size);
-		RegQueryValueExW(_hKey, uname.c_str(), NULL, NULL, (BYTE*) result.data(), &size);
+		RegQueryValueExW(_hKey, uname.c_str(), NULL, NULL, (BYTE*) &result[0], &size);
 	}
 #else
 	if (RegQueryValueExA(_hKey, name.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_BINARY)
@@ -250,7 +250,7 @@ std::vector<char> WinRegistryKey::getBinary( const std::string& name )
 	if (size > 0)
 	{
 		result.resize(size);
-		RegQueryValueExA(_hKey, name.c_str(), NULL, NULL, (BYTE*) result.data(), &size);
+		RegQueryValueExA(_hKey, name.c_str(), NULL, NULL, (BYTE*) &result[0], &size);
 	}
 #endif
 	return result;
