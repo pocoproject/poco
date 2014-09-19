@@ -57,6 +57,35 @@ void Bugcheck::bugcheck(const char* msg, const char* file, int line)
 }
 
 
+void Bugcheck::unexpected(const char* file, int line)
+{
+	try
+	{
+		std::string msg("Caught exception in destructor: ");
+		try
+		{
+			throw;
+		}
+		catch (Poco::Exception& exc)
+		{
+			msg += exc.displayText();
+		}
+		catch (std::exception& exc)
+		{
+			msg += exc.what();
+		}
+		catch (...)
+		{
+			msg += "unknown exception";
+		}
+		Debugger::enter(msg, file, line);
+	}
+	catch (...)
+	{
+	}	
+}
+
+
 void Bugcheck::debugger(const char* file, int line)
 {
 	Debugger::enter(file, line);
@@ -76,8 +105,6 @@ std::string Bugcheck::what(const char* msg, const char* file, int line)
 	str << "in file \"" << file << "\", line " << line;
 	return str.str();
 }
-
-
 
 
 } // namespace Poco
