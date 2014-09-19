@@ -45,7 +45,14 @@ Notifier::Notifier(const Session& session, const Any& value, EnabledEventType en
 
 Notifier::~Notifier()
 {
-	disableAll();
+	try
+	{
+		disableAll();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

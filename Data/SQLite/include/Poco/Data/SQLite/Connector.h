@@ -104,7 +104,14 @@ struct SQLite_API SQLiteConnectorRegistrator
 	~SQLiteConnectorRegistrator()
 		/// Calls Poco::Data::SQLite::unregisterConnector();
 	{
-		Poco::Data::SQLite::Connector::unregisterConnector();
+		try
+		{
+			Poco::Data::SQLite::Connector::unregisterConnector();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 };
 

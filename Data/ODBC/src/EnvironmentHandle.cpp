@@ -41,8 +41,15 @@ EnvironmentHandle::EnvironmentHandle(): _henv(SQL_NULL_HENV)
 
 EnvironmentHandle::~EnvironmentHandle()
 {
-	SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_ENV, _henv);
-	poco_assert (!Utility::isError(rc));
+	try
+	{
+		SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_ENV, _henv);
+		poco_assert (!Utility::isError(rc));
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

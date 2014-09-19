@@ -70,14 +70,20 @@ SessionImpl::SessionImpl(const std::string& connect,
 
 SessionImpl::~SessionImpl()
 {
-	if (isTransaction() && !getFeature("autoCommit"))
+	try
 	{
-		try { rollback(); }
-		catch (...) { }
-	}
+		if (isTransaction() && !getFeature("autoCommit"))
+		{
+			try { rollback(); }
+			catch (...) { }
+		}
 
-	try { close(); }
-	catch (...) { }
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

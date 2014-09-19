@@ -57,7 +57,14 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 
 SessionImpl::~SessionImpl()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

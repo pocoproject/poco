@@ -52,7 +52,14 @@ Preparator::Preparator(const Preparator& other):
 
 Preparator::~Preparator()
 {
-	freeMemory();
+	try
+	{
+		freeMemory();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
