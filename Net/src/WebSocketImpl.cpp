@@ -23,7 +23,7 @@
 #include "Poco/MemoryStream.h"
 #include "Poco/Format.h"
 #include <cstring>
-#include <iostream>
+
 
 namespace Poco {
 namespace Net {
@@ -42,8 +42,15 @@ WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, bool mustMaskP
 
 WebSocketImpl::~WebSocketImpl()
 {
-	_pStreamSocketImpl->release();
-	reset();
+	try
+	{
+		_pStreamSocketImpl->release();
+		reset();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 	

@@ -592,7 +592,7 @@ private:
 
 	void destruct()
 	{
-		if(!isEmpty()) delete content();
+		if (!isEmpty()) delete content();
 	}
 
 	VarHolder* _pHolder;
@@ -636,7 +636,7 @@ private:
 
 	void construct(const Var& other)
 	{
-		if(!other.isEmpty())
+		if (!other.isEmpty())
 			other.content()->clone(&_placeholder);
 		else
 			_placeholder.erase();
@@ -644,9 +644,9 @@ private:
 
 	void destruct()
 	{
-		if(!isEmpty())
+		if (!isEmpty())
 		{
-			if(_placeholder.isLocal())
+			if (_placeholder.isLocal())
 				content()->~VarHolder();
 			else
 				delete content();

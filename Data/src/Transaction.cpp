@@ -40,20 +40,27 @@ Transaction::Transaction(Poco::Data::Session& rSession, bool start):
 	
 Transaction::~Transaction()
 {
-	if (_rSession.isTransaction())
+	try
 	{
-		try
+		if (_rSession.isTransaction())
 		{
-			if (_pLogger) 
-				_pLogger->debug("Rolling back transaction.");
+			try
+			{
+				if (_pLogger) 
+					_pLogger->debug("Rolling back transaction.");
 
-			_rSession.rollback();
+				_rSession.rollback();
+			}
+			catch (...)
+			{
+				if (_pLogger) 
+					_pLogger->error("Error while rolling back database transaction.");
+			}
 		}
-		catch (...)
-		{
-			if (_pLogger) 
-				_pLogger->error("Error while rolling back database transaction.");
-		}
+	}
+	catch (...)
+	{
+		poco_unexpected();
 	}
 }
 

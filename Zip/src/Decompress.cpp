@@ -54,7 +54,14 @@ Decompress::Decompress(std::istream& in, const Poco::Path& outputDir, bool flatt
 
 Decompress::~Decompress()
 {
-	EOk -= Poco::Delegate<Decompress, std::pair<const ZipLocalFileHeader, const Poco::Path> >(this, &Decompress::onOk);
+	try
+	{
+		EOk -= Poco::Delegate<Decompress, std::pair<const ZipLocalFileHeader, const Poco::Path> >(this, &Decompress::onOk);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

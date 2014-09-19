@@ -121,7 +121,14 @@ void* HTTPInputStream::operator new(std::size_t size)
 
 void HTTPInputStream::operator delete(void* ptr)
 {
-	_pool.release(ptr);
+	try
+	{
+		_pool.release(ptr);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -153,7 +160,14 @@ void* HTTPOutputStream::operator new(std::size_t size)
 
 void HTTPOutputStream::operator delete(void* ptr)
 {
-	_pool.release(ptr);
+	try
+	{
+		_pool.release(ptr);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

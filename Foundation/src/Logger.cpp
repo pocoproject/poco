@@ -444,7 +444,14 @@ public:
 	}
 	~AutoLoggerShutdown()
 	{
-		Logger::shutdown();
+		try
+		{
+			Logger::shutdown();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 };
 

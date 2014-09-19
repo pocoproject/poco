@@ -167,7 +167,7 @@ private:
 
 
 template <typename T>
-class BasicMemoryBinaryWriter : public BinaryWriter
+class BasicMemoryBinaryWriter: public BinaryWriter
 	/// A convenient wrapper for using Buffer and MemoryStream with BinarWriter.
 {
 public:
@@ -187,7 +187,14 @@ public:
 
 	~BasicMemoryBinaryWriter()
 	{
-		flush();
+		try
+		{
+			flush();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 	Buffer<T>& data()

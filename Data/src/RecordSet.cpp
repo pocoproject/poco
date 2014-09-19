@@ -75,13 +75,20 @@ RecordSet::RecordSet(const RecordSet& other):
 
 RecordSet::~RecordSet()
 {
-	delete _pBegin;
-	delete _pEnd;
-	if(_pFilter) _pFilter->release();
+	try
+	{
+		delete _pBegin;
+		delete _pEnd;
+		if(_pFilter) _pFilter->release();
 
-	RowMap::iterator it = _rowMap.begin();
-	RowMap::iterator end = _rowMap.end();
-	for (; it != end; ++it) delete it->second;
+		RowMap::iterator it = _rowMap.begin();
+		RowMap::iterator end = _rowMap.end();
+		for (; it != end; ++it) delete it->second;
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

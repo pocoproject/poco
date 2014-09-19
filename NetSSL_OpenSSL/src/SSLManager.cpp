@@ -69,7 +69,14 @@ SSLManager::SSLManager()
 
 SSLManager::~SSLManager()
 {
-	shutdown();
+	try
+	{
+		shutdown();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

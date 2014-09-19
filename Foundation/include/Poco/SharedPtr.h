@@ -143,7 +143,14 @@ public:
 
 	~SharedPtr()
 	{
-		release();
+		try
+		{
+			release();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 	SharedPtr& assign(C* ptr)

@@ -168,9 +168,15 @@ Context::Context(
 
 Context::~Context()
 {
-	SSL_CTX_free(_pSSLContext);
-	
-	Poco::Crypto::OpenSSLInitializer::uninitialize();
+	try
+	{
+		SSL_CTX_free(_pSSLContext);
+		Poco::Crypto::OpenSSLInitializer::uninitialize();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

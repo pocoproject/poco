@@ -41,7 +41,14 @@ SecureStreamSocketImpl::SecureStreamSocketImpl(StreamSocketImpl* pStreamSocket, 
 
 SecureStreamSocketImpl::~SecureStreamSocketImpl()
 {
-	reset();
+	try
+	{
+		reset();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
