@@ -23,15 +23,17 @@ namespace Poco {
 namespace Data {
 
 
-SimpleRowFormatter::SimpleRowFormatter(std::streamsize columnWidth):
-	_colWidth(columnWidth), _rowCount(0)
+SimpleRowFormatter::SimpleRowFormatter(std::streamsize columnWidth, std::streamsize spacing):
+	_colWidth(columnWidth), _spacing(spacing), _rowCount(0)
 {
 }
 
 
 SimpleRowFormatter::SimpleRowFormatter(const SimpleRowFormatter& other):
 	RowFormatter(other.prefix(), other.postfix()),
-	_colWidth(other._colWidth)
+	_colWidth(other._colWidth),
+	_spacing(other._spacing),
+	_rowCount(0)
 {
 }
 
@@ -56,6 +58,7 @@ void SimpleRowFormatter::swap(SimpleRowFormatter& other)
 	setPrefix(other.prefix());
 	setPostfix(other.postfix());
 	swap(_colWidth, other._colWidth);
+	swap(_spacing, other._spacing);
 }
 
 
@@ -64,12 +67,13 @@ std::string& SimpleRowFormatter::formatNames(const NameVecPtr pNames, std::strin
 	_rowCount = 0;
 
 	std::ostringstream str;
-	std::string line(std::string::size_type(pNames->size() * _colWidth), '-');
-
+	std::string line(std::string::size_type(pNames->size()*_colWidth + (pNames->size() - 1)*_spacing), '-');
+	std::string space(_spacing, ' ');
 	NameVec::const_iterator it = pNames->begin();
 	NameVec::const_iterator end = pNames->end();
 	for (; it != end; ++it)
 	{
+		if (it != pNames->begin()) str << space;
 		str << std::left << std::setw(_colWidth) << *it;
 	}
 	str << std::endl << line << std::endl;
@@ -81,11 +85,12 @@ std::string& SimpleRowFormatter::formatNames(const NameVecPtr pNames, std::strin
 std::string& SimpleRowFormatter::formatValues(const ValueVec& vals, std::string& formattedValues)
 {
 	std::ostringstream str;
-
+	std::string space(_spacing, ' ');
 	ValueVec::const_iterator it = vals.begin();
 	ValueVec::const_iterator end = vals.end();
 	for (; it != end; ++it)
 	{
+		if (it != vals.begin()) str << space;
 		if (it->isNumeric())
 		{
 			str << std::right 
