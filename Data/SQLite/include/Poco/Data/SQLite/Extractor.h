@@ -32,9 +32,13 @@
 #include "Poco/Data/Time.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
-#include "sqlite3.h"
 #include <vector>
 #include <utility>
+#if defined(POCO_UNBUNDLED)
+#include <sqlite3.h>
+#else
+#include "sqlite3.h"
+#endif
 
 
 namespace Poco {

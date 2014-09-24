@@ -24,8 +24,12 @@
 #include "Poco/String.h"
 #include "Poco/Mutex.h"
 #include "Poco/Data/DataException.h"
-#include "sqlite3.h"
 #include <cstdlib>
+#if defined(POCO_UNBUNDLED)
+#include <sqlite3.h>
+#else
+#include "Poco/Data/SQLite/sqlite3.h"
+#endif
 
 
 namespace Poco {
