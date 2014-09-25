@@ -113,6 +113,14 @@ void HTTPServerConnection::run()
 		{
 			sendErrorResponse(session, HTTPResponse::HTTP_BAD_REQUEST);
 		}
+		catch (Poco::Exception&)
+		{
+			if (session.networkException())
+			{
+				session.networkException()->rethrow();
+			}
+			else throw;
+		}
 	}
 }
 
