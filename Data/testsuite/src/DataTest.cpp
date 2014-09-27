@@ -1177,22 +1177,34 @@ void DataTest::testRowFormat()
 
 	SimpleRowFormatter rf;
 	std::streamsize sz = rf.getColumnWidth();
+	std::streamsize sp = rf.getSpacing();
 
-	std::string line(std::string::size_type(sz * 5), '-');
+	std::string line(std::string::size_type(sz * 5 + sp * 4), '-');
+	std::string spacer(sp, ' ');
 	std::ostringstream os;
-	os << std::left << std::setw(sz) << "field0"
+	os << std::left 
+		<< std::setw(sz) << "field0"
+		<< spacer
 		<< std::setw(sz) << "field1"
+		<< spacer
 		<< std::setw(sz) << "field2"
+		<< spacer
 		<< std::setw(sz) << "field3"
+		<< spacer
 		<< std::setw(sz) << "field4" << std::endl 
 		<< line << std::endl;
 	assert (row1.namesToString() == os.str());
 
 	os.str("");
-	os << std::right << std::setw(sz) << "0"
+	os << std::right 
+		<< std::setw(sz) << "0"
+		<< spacer
 		<< std::setw(sz) << "1"
+		<< spacer
 		<< std::setw(sz) << "2"
+		<< spacer
 		<< std::setw(sz) << "3"
+		<< spacer
 		<< std::setw(sz) << "4" << std::endl;
 	assert (row1.valuesToString() == os.str());
 }
