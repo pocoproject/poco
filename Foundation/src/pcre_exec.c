@@ -87,7 +87,7 @@ static const char rep_max[] = { 0, 0, 0, 0, 1, 1 };
 
 
 
-#ifdef DEBUG
+#ifdef _DEBUG
 /*************************************************
 *        Debugging function to print chars       *
 *************************************************/
@@ -139,7 +139,7 @@ match_ref(int offset, register USPTR eptr, int length, match_data *md,
 {
 USPTR p = md->start_subject + md->offset_vector[offset];
 
-#ifdef DEBUG
+#ifdef _DEBUG
 if (eptr >= md->end_subject)
   printf("matching subject <null>");
 else
@@ -252,7 +252,7 @@ actuall used in this definition. */
 #ifndef NO_RECURSE
 #define REGISTER register
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define RMATCH(ra,rb,rc,rd,re,rf,rg,rw) \
   { \
   printf("match() called in line %d\n", __LINE__); \
@@ -691,7 +691,7 @@ for (;;)
     number = GET2(ecode, 1+LINK_SIZE);
     offset = number << 1;
 
-#ifdef DEBUG
+#ifdef _DEBUG
     printf("start bracket %d\n", number);
     printf("subject=");
     pchars(eptr, 16, TRUE, md);
@@ -1248,7 +1248,7 @@ for (;;)
       number = GET2(prev, 1+LINK_SIZE);
       offset = number << 1;
 
-#ifdef DEBUG
+#ifdef _DEBUG
       printf("end bracket %d", number);
       printf("\n");
 #endif
@@ -4771,7 +4771,7 @@ for(;;)
 
   end_subject = save_end_subject;
 
-#ifdef DEBUG  /* Sigh. Some compilers never learn. */
+#ifdef _DEBUG  /* Sigh. Some compilers never learn. */
   printf(">>>> Match against: ");
   pchars(start_match, end_subject - start_match, TRUE, md);
   printf("\n");

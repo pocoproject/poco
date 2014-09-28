@@ -50,15 +50,6 @@ supporting internal functions that are not used by other modules. */
 
 #include "pcre_internal.h"
 
-
-/* When DEBUG is defined, we need the pcre_printint() function, which is also
-used by pcretest. DEBUG is not defined when building a production library. */
-
-#if defined(DEBUG)
-#include "pcre_printint.src"
-#endif
-
-
 /* Macro for setting individual bits in class bitmaps. */
 
 #define SETBIT(a,b) a[b/8] |= (1 << (b%8))
@@ -2438,7 +2429,7 @@ BOOL utf8 = FALSE;
 uschar *utf8_char = NULL;
 #endif
 
-#ifdef DEBUG
+#ifdef _DEBUG
 if (lengthptr != NULL) DPRINTF((">> start branch\n"));
 #endif
 
@@ -2497,7 +2488,7 @@ for (;; ptr++)
 
   if (lengthptr != NULL)
     {
-#ifdef DEBUG
+#ifdef _DEBUG
     if (code > cd->hwm) cd->hwm = code;                 /* High water info */
 #endif
     if (code > cd->start_workspace + COMPILE_WORK_SIZE) /* Check for overrun */
@@ -6251,7 +6242,7 @@ if debugging, leave the test till after things are printed out. */
 
 *code++ = OP_END;
 
-#ifndef DEBUG
+#ifndef _DEBUG
 if (code - codestart > length) errorcode = ERR23;
 #endif
 
@@ -6334,7 +6325,7 @@ if (reqbyte >= 0 &&
 /* Print out the compiled data if debugging is enabled. This is never the
 case when building a production library. */
 
-#ifdef DEBUG
+#ifdef _DEBUG
 
 printf("Length = %d top_bracket = %d top_backref = %d\n",
   length, re->top_bracket, re->top_backref);
@@ -6358,8 +6349,6 @@ if ((re->flags & PCRE_REQCHSET) != 0)
   if (isprint(ch)) printf("Req char = %c%s\n", ch, caseless);
     else printf("Req char = \\x%02x%s\n", ch, caseless);
   }
-
-pcre_printint(re, stdout, TRUE);
 
 /* This check is done here in the debugging case so that the code that
 was compiled can be seen. */
