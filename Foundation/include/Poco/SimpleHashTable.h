@@ -369,7 +369,7 @@ public:
 				UInt32 size = 1;
 				if (details)
 					detailedEntriesPerHash.push_back(size);
-	#ifdef PCRE_DEBUG
+	#ifdef _DEBUG
 				totalSize += size;
 	#endif
 			}
