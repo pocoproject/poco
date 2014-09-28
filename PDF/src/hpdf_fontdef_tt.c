@@ -1796,7 +1796,7 @@ RecreateGLYF  (HPDF_FontDef   fontdef,
 
     new_offsets[attr->num_glyphs] = save_offset;
 
-#ifdef DEBUG
+#ifdef _DEBUG
     for (i = 0; i <= attr->num_glyphs; i++) {
         HPDF_PTRACE((" RecreateGLYF[%u] offset=%u\n", i, new_offsets[i]));
     }
