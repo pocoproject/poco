@@ -6350,8 +6350,6 @@ if ((re->flags & PCRE_REQCHSET) != 0)
     else printf("Req char = \\x%02x%s\n", ch, caseless);
   }
 
-pcre_printint(re, stdout, TRUE);
-
 /* This check is done here in the debugging case so that the code that
 was compiled can be seen. */
 
