@@ -29,7 +29,14 @@ SplitterChannel::SplitterChannel()
 
 SplitterChannel::~SplitterChannel()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

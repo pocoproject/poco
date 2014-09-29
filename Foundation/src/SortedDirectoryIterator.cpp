@@ -62,6 +62,7 @@ SortedDirectoryIterator::~SortedDirectoryIterator()
 {
 }
 
+
 SortedDirectoryIterator& SortedDirectoryIterator::operator ++()
 {
 	if (!_is_finished)

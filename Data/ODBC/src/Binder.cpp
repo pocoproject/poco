@@ -51,23 +51,23 @@ void Binder::freeMemory()
 {
 	LengthVec::iterator itLen = _lengthIndicator.begin();
 	LengthVec::iterator itLenEnd = _lengthIndicator.end();
-	for(; itLen != itLenEnd; ++itLen) delete *itLen;
+	for (; itLen != itLenEnd; ++itLen) delete *itLen;
 
 	TimeMap::iterator itT = _times.begin();
 	TimeMap::iterator itTEnd = _times.end();
-	for(; itT != itTEnd; ++itT) delete itT->first;
+	for (; itT != itTEnd; ++itT) delete itT->first;
 
 	DateMap::iterator itD = _dates.begin();
 	DateMap::iterator itDEnd = _dates.end();
-	for(; itD != itDEnd; ++itD) delete itD->first;
+	for (; itD != itDEnd; ++itD) delete itD->first;
 
 	TimestampMap::iterator itTS = _timestamps.begin();
 	TimestampMap::iterator itTSEnd = _timestamps.end();
-	for(; itTS != itTSEnd; ++itTS) delete itTS->first;
+	for (; itTS != itTSEnd; ++itTS) delete itTS->first;
 
 	StringMap::iterator itStr = _strings.begin();
 	StringMap::iterator itStrEnd = _strings.end();
-	for(; itStr != itStrEnd; ++itStr) std::free(itStr->first);
+	for (; itStr != itStrEnd; ++itStr) std::free(itStr->first);
 
 	CharPtrVec::iterator itChr = _charPtrs.begin();
 	CharPtrVec::iterator endChr = _charPtrs.end();

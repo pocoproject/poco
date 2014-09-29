@@ -64,28 +64,33 @@ FTPClientSession::FTPClientSession(const std::string& host,
 	Poco::UInt16 port,
 	const std::string& username,
 	const std::string& password):
-		_host(host),
-		_port(port),
-		_pControlSocket(new DialogSocket(SocketAddress(host, port))),
-		_pDataStream(0),
-		_passiveMode(true),
-		_fileType(TYPE_BINARY),
-		_supports1738(true),
-		_serverReady(false),
-		_isLoggedIn(false),
-		_timeout(DEFAULT_TIMEOUT)
-	{
+	_host(host),
+	_port(port),
+	_pControlSocket(new DialogSocket(SocketAddress(host, port))),
+	_pDataStream(0),
+	_passiveMode(true),
+	_fileType(TYPE_BINARY),
+	_supports1738(true),
+	_serverReady(false),
+	_isLoggedIn(false),
+	_timeout(DEFAULT_TIMEOUT)
+{
 	if (!username.empty())
 		login(username, password);
 	else
 		_pControlSocket->setReceiveTimeout(_timeout);
-	}
+}
 
 
 FTPClientSession::~FTPClientSession()
+{
+	try
 	{
-	try     { close(); }
-	catch (...) { }
+		close();
+	}
+	catch (...) 
+	{
+	}
 }
 
 
@@ -126,7 +131,9 @@ void FTPClientSession::open(const std::string& host,
 	_host = host;
 	_port = port;
 	if (!username.empty())
+	{
 		login(username, password);
+	}
 	else
 	{
 		_pControlSocket = new DialogSocket(SocketAddress(_host, _port));
@@ -168,12 +175,12 @@ void FTPClientSession::login(const std::string& username, const std::string& pas
 
 
 void FTPClientSession::logout()
-		{
+{
 	if (!isOpen())
 		throw FTPException("Connection is closed.");
 
 	if (_isLoggedIn)
-		{
+	{
 		try { endTransfer(); }
 		catch (...) { }
 		std::string response;

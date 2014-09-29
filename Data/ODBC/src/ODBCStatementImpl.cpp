@@ -64,11 +64,11 @@ ODBCStatementImpl::~ODBCStatementImpl()
 {
 	ColumnPtrVecVec::iterator it = _columnPtrs.begin();
 	ColumnPtrVecVec::iterator end = _columnPtrs.end();
-	for(; it != end; ++it)
+	for (; it != end; ++it)
 	{
 		ColumnPtrVec::iterator itC = it->begin();
 		ColumnPtrVec::iterator endC = it->end();
-		for(; itC != endC; ++itC) delete *itC;
+		for (; itC != endC; ++itC) delete *itC;
 	}
 }
 
