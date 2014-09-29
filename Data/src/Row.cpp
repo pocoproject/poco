@@ -86,7 +86,8 @@ Poco::Dynamic::Var& Row::get(std::size_t col)
 	try
 	{
 		return _values.at(col);
-	}catch (std::out_of_range& re)
+	}
+	catch (std::out_of_range& re)
 	{
 		throw RangeException(re.what());
 	}

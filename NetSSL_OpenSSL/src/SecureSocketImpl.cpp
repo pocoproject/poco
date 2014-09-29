@@ -66,6 +66,7 @@ SecureSocketImpl::~SecureSocketImpl()
 	}
 	catch (...)
 	{
+		poco_unexpected();
 	}
 }
 

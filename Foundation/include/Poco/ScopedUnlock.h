@@ -41,7 +41,14 @@ public:
 	}
 	inline ~ScopedUnlock()
 	{
-		_mutex.lock();
+		try
+		{
+			_mutex.lock();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 private:

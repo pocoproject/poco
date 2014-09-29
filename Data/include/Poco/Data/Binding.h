@@ -140,7 +140,7 @@ public:
 	}
 
 	~CopyBinding()
-		/// Destroys the Binding.
+		/// Destroys the CopyBinding.
 	{
 	}
 
@@ -264,7 +264,7 @@ public:
 	}
 
 	~CopyBinding()
-		/// Destroys the Binding.
+		/// Destroys the CopyBinding.
 	{
 	}
 
@@ -396,7 +396,7 @@ public:
 	}
 
 	~CopyBinding()
-		/// Destroys the Binding.
+		/// Destroys the CopyBinding.
 	{
 	}
 
@@ -559,7 +559,7 @@ public:
 	}
 
 	~CopyBinding()
-		/// Destroys the Binding.
+		/// Destroys the CopyBinding.
 	{
 	}
 
@@ -689,7 +689,7 @@ public:
 	}
 
 	~CopyBinding()
-		/// Destroys the Binding.
+		/// Destroys the CopyBinding.
 	{
 	}
 
@@ -819,7 +819,7 @@ public:
 	}
 
 	~CopyBinding()
-		/// Destroys the Binding.
+		/// Destroys the CopyBinding.
 	{
 	}
 
@@ -949,7 +949,7 @@ public:
 	}
 
 	~CopyBinding()
-		/// Destroys the Binding.
+		/// Destroys the CopyBinding.
 	{
 	}
 
@@ -1079,7 +1079,7 @@ public:
 	}
 
 	~CopyBinding()
-		/// Destroys the Binding.
+		/// Destroys the CopyBinding.
 	{
 	}
 
@@ -1209,7 +1209,7 @@ public:
 	}
 
 	~CopyBinding()
-		/// Destroys the Binding.
+		/// Destroys the CopyBinding.
 	{
 	}
 
@@ -1339,7 +1339,7 @@ public:
 	}
 
 	~CopyBinding()
-		/// Destroys the Binding.
+		/// Destroys the CopyBinding.
 	{
 	}
 
