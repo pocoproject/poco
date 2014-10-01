@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#5 $
+// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#6 $
 //
 // Library: Net
 // Package: HTTP
@@ -229,6 +229,7 @@ void HTTPRequest::read(std::istream& istr)
 	uri.reserve(64);
 	version.reserve(16);
 	int ch = istr.get();
+	if (istr.bad()) throw NetException("Error reading HTTP request header");
 	if (ch == eof) throw NoMessageException();
 	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
 	if (ch == eof) throw MessageException("No HTTP request header");

@@ -1,7 +1,7 @@
 //
 // PriorityNotificationQueue.cpp
 //
-// $Id: //poco/1.4/Foundation/src/PriorityNotificationQueue.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/PriorityNotificationQueue.cpp#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -50,7 +50,14 @@ PriorityNotificationQueue::PriorityNotificationQueue()
 
 PriorityNotificationQueue::~PriorityNotificationQueue()
 {
-	clear();
+	try
+	{
+		clear();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

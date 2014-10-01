@@ -1,7 +1,7 @@
 //
 // HTTPCookie.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPCookie.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPCookie.h#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -139,9 +139,15 @@ public:
 
 	void setPath(const std::string& path);
 		/// Sets the path for the cookie.
+
+	void setPriority(const std::string& priority);
+		/// Sets the priority for the cookie.
 		
 	const std::string& getPath() const;
 		/// Returns the path for the cookie.
+
+	const std::string& getPriority() const;
+		/// Returns the priority for the cookie.
 
 	void setSecure(bool secure);
 		/// Sets the value of the secure flag for
@@ -210,6 +216,7 @@ private:
 	std::string _comment;
 	std::string _domain;
 	std::string _path;
+	std::string _priority;
 	bool        _secure;
 	int         _maxAge;
 	bool        _httpOnly;
@@ -252,6 +259,12 @@ inline const std::string& HTTPCookie::getDomain() const
 inline const std::string& HTTPCookie::getPath() const
 {
 	return _path;
+}
+
+
+inline const std::string& HTTPCookie::getPriority() const
+{
+	return _priority;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // ScopedUnlock.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ScopedUnlock.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/ScopedUnlock.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -61,7 +61,14 @@ public:
 	}
 	inline ~ScopedUnlock()
 	{
-		_mutex.lock();
+		try
+		{
+			_mutex.lock();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 private:

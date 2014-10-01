@@ -1,7 +1,7 @@
 //
 // Timezone_WINCE.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timezone_WINCE.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Timezone_WINCE.cpp#2 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -39,7 +39,11 @@
 #include "Poco/Exception.h"
 #include "Poco/UnWindows.h"
 #include <ctime>
+#if _WIN32_WCE >= 0x800
+#include "time.h"
+#else
 #include "wce_time.h"
+#endif
 
 
 namespace Poco {
@@ -64,7 +68,11 @@ int Timezone::dst()
 bool Timezone::isDst(const Timestamp& timestamp)
 {
 	std::time_t time = timestamp.epochTime();
+#if _WIN32_WCE >= 0x800
+	struct std::tm* tms = localtime(&time);
+#else
 	struct std::tm* tms = wceex_localtime(&time);
+#endif
 	if (!tms) throw SystemException("cannot get local time DST flag");
 	return tms->tm_isdst > 0;
 }

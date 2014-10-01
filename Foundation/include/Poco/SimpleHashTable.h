@@ -1,7 +1,7 @@
 //
 // SimpleHashTable.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SimpleHashTable.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/SimpleHashTable.h#2 $
 //
 // Library: Foundation
 // Package: Hashing
@@ -389,7 +389,7 @@ public:
 				UInt32 size = 1;
 				if (details)
 					detailedEntriesPerHash.push_back(size);
-	#ifdef DEBUG
+	#ifdef _DEBUG
 				totalSize += size;
 	#endif
 			}
@@ -400,8 +400,9 @@ public:
 					detailedEntriesPerHash.push_back(0);
 			}
 		}
+	#ifdef _DEBUG
 		poco_assert_dbg(totalSize == numberOfEntries);
-
+	#endif
 		return HashStatistic(_capacity, numberOfEntries, numZeroEntries, maxEntriesPerHash, detailedEntriesPerHash);
 	}
 

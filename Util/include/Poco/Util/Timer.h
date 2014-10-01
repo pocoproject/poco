@@ -1,7 +1,7 @@
 //
 // Timer.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/Timer.h#1 $
+// $Id: //poco/1.4/Util/include/Poco/Util/Timer.h#2 $
 //
 // Library: Util
 // Package: Timer
@@ -93,6 +93,19 @@ public:
 		///
 		/// If the time lies in the past, the task is executed
 		/// immediately.
+		///
+		/// Note: the relative time the task will be executed
+		/// won't change if the system's time changes. If the
+		/// given time is 10 seconds in the future at the point
+		/// schedule() is called, the task will be executed 10
+		/// seconds later, even if the system time changes in
+		/// between.
+
+	void schedule(TimerTask::Ptr pTask, Poco::Clock clock);
+		/// Schedules a task for execution at the specified time.
+		///
+		/// If the time lies in the past, the task is executed
+		/// immediately.
 		
 	void schedule(TimerTask::Ptr pTask, long delay, long interval);
 		/// Schedules a task for periodic execution.
@@ -102,6 +115,20 @@ public:
 		/// the given interval in milliseconds between invocations.
 
 	void schedule(TimerTask::Ptr pTask, Poco::Timestamp time, long interval);
+		/// Schedules a task for periodic execution.
+		///
+		/// The task is first executed at the given time.
+		/// Subsequently, the task is executed periodically with
+		/// the given interval in milliseconds between invocations.
+		///
+		/// Note: the relative time the task will be executed
+		/// won't change if the system's time changes. If the
+		/// given time is 10 seconds in the future at the point
+		/// schedule() is called, the task will be executed 10
+		/// seconds later, even if the system time changes in
+		/// between.
+
+	void schedule(TimerTask::Ptr pTask, Poco::Clock clock, long interval);
 		/// Schedules a task for periodic execution.
 		///
 		/// The task is first executed at the given time.
@@ -119,6 +146,23 @@ public:
 		/// further executions are delayed.
 
 	void scheduleAtFixedRate(TimerTask::Ptr pTask, Poco::Timestamp time, long interval);
+		/// Schedules a task for periodic execution at a fixed rate.
+		///
+		/// The task is first executed at the given time.
+		/// Subsequently, the task is executed periodically 
+		/// every number of milliseconds specified by interval.
+		///
+		/// If task execution takes longer than the given interval,
+		/// further executions are delayed.
+		///
+		/// Note: the relative time the task will be executed
+		/// won't change if the system's time changes. If the
+		/// given time is 10 seconds in the future at the point
+		/// scheduleAtFixedRate() is called, the task will be executed 10
+		/// seconds later, even if the system time changes in
+		/// between.
+
+	void scheduleAtFixedRate(TimerTask::Ptr pTask, Poco::Clock clock, long interval);
 		/// Schedules a task for periodic execution at a fixed rate.
 		///
 		/// The task is first executed at the given time.

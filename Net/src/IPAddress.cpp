@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.4/Net/src/IPAddress.cpp#5 $
+// $Id: //poco/1.4/Net/src/IPAddress.cpp#6 $
 //
 // Library: Net
 // Package: NetCore
@@ -96,7 +96,14 @@ protected:
 	virtual ~IPAddressImpl()
 	{
 #if defined(_WIN32)
-		Poco::Net::uninitializeNetwork();
+		try
+		{
+			Poco::Net::uninitializeNetwork();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 #endif
 	}
 

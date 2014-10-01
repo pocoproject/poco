@@ -1,7 +1,7 @@
 //
 // SharedMemoryTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SharedMemoryTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/SharedMemoryTest.cpp#2 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -82,7 +82,7 @@ Poco::Path SharedMemoryTest::findDataFile(const std::string& afile)
 	while (!Poco::Path::find(root.toString(), "data", result))
 	{
 		root.makeParent();
-		if (root.toString().empty() || root.toString() == "/")
+		if (root.toString().empty() || root.toString() == "/" || root.toString() == "\\")
 			throw Poco::FileNotFoundException("Didn't find data subdir");
 	}
 	result.makeDirectory();

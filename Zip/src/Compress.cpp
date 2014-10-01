@@ -1,7 +1,7 @@
 //
 // Compress.cpp
 //
-// $Id: //poco/1.4/Zip/src/Compress.cpp#2 $
+// $Id: //poco/1.4/Zip/src/Compress.cpp#3 $
 //
 // Library: Zip
 // Package: Zip
@@ -43,6 +43,7 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
@@ -57,6 +58,10 @@ Compress::Compress(std::ostream& out, bool seekableOut):
 	_dirs(),
 	_offset(0)
 {
+	_storeExtensions.insert("gif");
+	_storeExtensions.insert("png");
+	_storeExtensions.insert("jpg");
+	_storeExtensions.insert("jpeg");
 }
 
 
@@ -67,6 +72,15 @@ Compress::~Compress()
 
 void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, const Poco::Path& fileName, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl)
 {
+	if (cm == ZipCommon::CM_AUTO)
+	{
+		std::string ext = Poco::toLower(fileName.getExtension());
+		if (_storeExtensions.find(ext) != _storeExtensions.end())
+			cm = ZipCommon::CM_STORE;
+		else
+			cm = ZipCommon::CM_DEFLATE;
+	}
+	
 	std::string fn = ZipUtil::validZipEntryFileName(fileName);
 
 	if (_files.size() >= 65535)
@@ -317,6 +331,16 @@ ZipArchive Compress::close()
 	_out.flush();
 	_dirs.insert(std::make_pair(0, central));
 	return ZipArchive(_files, _infos, _dirs);
+}
+
+
+void Compress::setStoreExtensions(const std::set<std::string>& extensions)
+{
+	_storeExtensions.clear();
+	for (std::set<std::string>::const_iterator it = extensions.begin(); it != extensions.end(); ++it)
+	{
+		_storeExtensions.insert(Poco::toLower(*it));
+	}
 }
 
 

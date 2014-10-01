@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timer.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Timer.cpp#5 $
 //
 // Library: Foundation
 // Package: Threading
@@ -55,7 +55,14 @@ Timer::Timer(long startInterval, long periodicInterval):
 
 Timer::~Timer()
 {
-	stop();
+	try
+	{
+		stop();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -79,16 +86,29 @@ void Timer::start(const AbstractTimerCallback& method, ThreadPool& threadPool)
 
 void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority, ThreadPool& threadPool)
 {
-	Timestamp nextInvocation;
-	nextInvocation += static_cast<Timestamp::TimeVal>(_startInterval)*1000;
-
-	poco_assert (!_pCallback);
-
+	Clock nextInvocation;
+	nextInvocation += static_cast<Clock::ClockVal>(_startInterval)*1000;
+	
 	FastMutex::ScopedLock lock(_mutex);	
+
+	if (_pCallback)
+	{
+		throw Poco::IllegalStateException("Timer already running");
+	}
+
 	_nextInvocation = nextInvocation;
 	_pCallback = method.clone();
 	_wakeUp.reset();
-	threadPool.startWithPriority(priority, *this);
+	try
+	{
+		threadPool.startWithPriority(priority, *this);
+	}
+	catch (...)
+	{
+		delete _pCallback;
+		_pCallback = 0;
+		throw;
+	}
 }
 
 
@@ -162,7 +182,7 @@ void Timer::setPeriodicInterval(long milliseconds)
 
 void Timer::run()
 {
-	Poco::Timestamp now;
+	Poco::Clock now;
 	long interval(0);
 	do
 	{
@@ -178,7 +198,7 @@ void Timer::run()
 					sleep = 0;
 					break;
 				}
-				_nextInvocation += static_cast<Timestamp::TimeVal>(interval)*1000;
+				_nextInvocation += static_cast<Clock::ClockVal>(interval)*1000;
 				++_skipped;
 			}
 		}
@@ -210,7 +230,7 @@ void Timer::run()
 			}
 			interval = _periodicInterval;
 		}
-		_nextInvocation += static_cast<Timestamp::TimeVal>(interval)*1000;
+		_nextInvocation += static_cast<Clock::ClockVal>(interval)*1000;
 		_skipped = 0;
 	}
 	while (interval > 0);

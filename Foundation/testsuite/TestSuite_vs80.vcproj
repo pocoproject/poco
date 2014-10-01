@@ -880,6 +880,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\PBKDF2EngineTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\RandomStreamTest.cpp"
 					>
 				</File>
@@ -913,6 +917,10 @@
 				</File>
 				<File
 					RelativePath=".\src\MD5EngineTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PBKDF2EngineTest.h"
 					>
 				</File>
 				<File
@@ -1320,6 +1328,10 @@
 				Name="Source Files"
 				>
 				<File
+					RelativePath=".\src\ClockTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\DateTimeFormatterTest.cpp"
 					>
 				</File>
@@ -1359,6 +1371,10 @@
 			<Filter
 				Name="Header Files"
 				>
+				<File
+					RelativePath=".\src\ClockTest.h"
+					>
+				</File>
 				<File
 					RelativePath=".\src\DateTimeFormatterTest.h"
 					>

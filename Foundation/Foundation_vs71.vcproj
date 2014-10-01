@@ -1887,6 +1887,9 @@
 					RelativePath=".\include\Poco\MD5Engine.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\PBKDF2Engine.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Random.h">
 				</File>
 				<File
@@ -4134,6 +4137,9 @@
 				Name="Source Files"
 				Filter="">
 				<File
+					RelativePath=".\src\Clock.cpp">
+				</File>
+				<File
 					RelativePath=".\src\DateTime.cpp">
 				</File>
 				<File
@@ -4243,6 +4249,9 @@
 				Name="Header Files"
 				Filter="">
 				<File
+					RelativePath=".\include\Poco\Clock.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\DateTime.h">
 				</File>
 				<File
@@ -4284,6 +4293,9 @@
 					RelativePath=".\src\Latin1Encoding.cpp">
 				</File>
 				<File
+					RelativePath=".\src\Latin2Encoding.cpp">
+				</File>
+				<File
 					RelativePath=".\src\Latin9Encoding.cpp">
 				</File>
 				<File
@@ -4317,6 +4329,12 @@
 					RelativePath=".\src\UTF8String.cpp">
 				</File>
 				<File
+					RelativePath=".\src\Windows1250Encoding.cpp">
+				</File>
+				<File
+					RelativePath=".\src\Windows1251Encoding.cpp">
+				</File>
+				<File
 					RelativePath=".\src\Windows1252Encoding.cpp">
 				</File>
 			</Filter>
@@ -4328,6 +4346,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Latin1Encoding.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Latin2Encoding.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Latin9Encoding.h">
@@ -4361,6 +4382,12 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\UTF8String.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows1250Encoding.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Windows1251Encoding.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Windows1252Encoding.h">

@@ -1,7 +1,7 @@
 //
 // AbstractCache.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AbstractCache.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/AbstractCache.h#2 $
 //
 // Library: Foundation
 // Package: Cache
@@ -84,7 +84,14 @@ public:
 
 	virtual ~AbstractCache()
 	{
-		uninitialize();
+		try
+		{
+			uninitialize();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 	void add(const TKey& key, const TValue& val)

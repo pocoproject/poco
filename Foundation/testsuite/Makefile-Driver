@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/testsuite/Makefile-Driver#4 $
+# $Id: //poco/1.4/Foundation/testsuite/Makefile-Driver#6 $
 #
 # Makefile for Poco Foundation testsuite
 #
@@ -11,7 +11,7 @@ include $(POCO_BASE)/build/rules/global
 objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	AutoPtrTest SharedPtrTest AutoReleasePoolTest Base64Test \
 	BinaryReaderWriterTest LineEndingConverterTest \
-	ByteOrderTest ChannelTest ClassLoaderTest CoreTest CoreTestSuite \
+	ByteOrderTest ChannelTest ClassLoaderTest ClockTest CoreTest CoreTestSuite \
 	CountingStreamTest CryptTestSuite DateTimeFormatterTest \
 	DateTimeParserTest DateTimeTest LocalDateTimeTest DateTimeTestSuite DigestStreamTest \
 	Driver DynamicFactoryTest FPETest FileChannelTest FileTest GlobTest FilesystemTestSuite \
@@ -22,7 +22,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	NDCTest NotificationCenterTest NotificationQueueTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
-	NumberParserTest PathTest PatternFormatterTest RWLockTest \
+	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
 	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest \
 	SemaphoreTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
 	SimpleFileChannelTest StopwatchTest \

@@ -1,7 +1,7 @@
 //
 // SessionPool.cpp
 //
-// $Id: //poco/1.4/Data/src/SessionPool.cpp#1 $
+// $Id: //poco/1.4/Data/src/SessionPool.cpp#2 $
 //
 // Library: Data
 // Package: SessionPooling
@@ -60,7 +60,14 @@ SessionPool::SessionPool(const std::string& sessionKey, const std::string& conne
 
 SessionPool::~SessionPool()
 {
-	if (_idleTime > 0) _janitorTimer.stop();
+	try
+	{
+		if (_idleTime > 0) _janitorTimer.stop();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

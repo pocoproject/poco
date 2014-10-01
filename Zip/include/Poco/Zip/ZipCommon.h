@@ -1,7 +1,7 @@
 //
 // ZipCommon.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipCommon.h#1 $
+// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipCommon.h#2 $
 //
 // Library: Zip
 // Package: Zip
@@ -69,7 +69,8 @@ public:
 		CM_DEFLATE = 8,
 		CM_ENHANCEDDEFLATE = 9,
 		CM_DATECOMPRIMPLODING = 10,
-		CM_UNUSED = 11
+		CM_UNUSED = 11,
+		CM_AUTO = 255 /// automatically select DM_DEFLATE or CM_STORE based on file type (extension)
 	};
 
 	enum CompressionLevel

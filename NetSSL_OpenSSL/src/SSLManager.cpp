@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SSLManager.cpp#3 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SSLManager.cpp#4 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -87,7 +87,14 @@ SSLManager::SSLManager()
 
 SSLManager::~SSLManager()
 {
-	shutdown();
+	try
+	{
+		shutdown();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

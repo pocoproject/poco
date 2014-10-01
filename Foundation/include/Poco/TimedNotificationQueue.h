@@ -1,7 +1,7 @@
 //
 // TimedNotificationQueue.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/TimedNotificationQueue.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/TimedNotificationQueue.h#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -45,6 +45,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Event.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Clock.h"
 #include <map>
 
 
@@ -83,6 +84,17 @@ public:
 		/// Enqueues the given notification by adding it to
 		/// the queue according to the given timestamp.
 		/// Lower timestamp values are inserted before higher ones.
+		/// The queue takes ownership of the notification, thus
+		/// a call like
+		///     notificationQueue.enqueueNotification(new MyNotification, someTime);
+		/// does not result in a memory leak.
+		///
+		/// The Timestamp is converted to an equivalent Clock value.
+
+	void enqueueNotification(Notification::Ptr pNotification, Clock clock);
+		/// Enqueues the given notification by adding it to
+		/// the queue according to the given clock value.
+		/// Lower clock values are inserted before higher ones.
 		/// The queue takes ownership of the notification, thus
 		/// a call like
 		///     notificationQueue.enqueueNotification(new MyNotification, someTime);
@@ -136,9 +148,9 @@ public:
 		/// behavior.
 
 protected:
-	typedef std::multimap<Timestamp, Notification::Ptr> NfQueue;
+	typedef std::multimap<Clock, Notification::Ptr> NfQueue;
 	Notification::Ptr dequeueOne(NfQueue::iterator& it);
-	bool wait(Timestamp::TimeDiff interval);
+	bool wait(Clock::ClockDiff interval);
 	
 private:
 	NfQueue _nfQueue;

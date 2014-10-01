@@ -1,5 +1,50 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.4.7 (2014-10-06)
+============================
+
+- fixed GH #398: PropertyFileConfiguration: input != output
+- fixed GH #368: Build failure of Poco 1.4.6p2 on FreeBSD 9.2
+- fixed GH #318: Logger local time doesn't automatically account for DST
+- fixed GH #317: Poco::Zip does not support newer Zip file versions.
+- fixed GH #454: Fix: handle unhandled exceptions
+- fixed GH #463: XML does not compile with XML_UNICODE_WCHAR_T
+- fixed GH #282: Using Thread in a global can cause crash on Windows
+- fixed GH #424: Poco::Timer deadlock
+- fixed GH #465 - Fix result enum type XML_Error -> XML_Status
+- fixed GH #510: Incorrect RSAKey construction from istream
+- fixed GH# 332: POCO::ConsoleChannnel::initColors() assigns no color to 
+  PRIO_TRACE and wrong color to PRIO_FATAL
+- Poco::Data::MySQL: added SQLite thread cleanup handler
+- Poco::Net::X509Certificate: improved and fixed domain name verification for 
+  wildcard domains
+- fixed a crash in Foundation testsuite with Visual C++ 2012
+- improved and fixed domain name verification for wildcard domains in
+  Poco::Net::X509Certificate
+- updated TwitterClient sample to use new 1.1 API and OAuth
+- added Poco::Clock class, which uses a system-provided monotonic clock
+  (if available) and is thus not affected by system realtime clock changes.
+  Monotonic Clock is available on Windows, Linux, OS X and on POSIX platforms
+  supporting clock_gettime() and CLOCK_MONOTONIC.	  
+- Poco::Timer, Poco::Stopwatch, Poco::TimedNotificationQueue and Poco::Util::Timer
+  have been changed to use Poco::Clock instead of Poco::Timestamp and are now
+  unaffected by system realtime clock changes.
+- added Poco::PBKDF2Engine class template
+- Poco::Net::HTTPCookie: added support for Priority attribute (backport from develop)
+- fixed makedepend.* scripts to work in paths containing '.o*'
+  (contributed by Per-Erik Bjorkstad, Hakan Bengtsen)
+- Upgraded bundled SQLite to 3.8.6
+- Support for Windows Embedded Compact 2013 (Visual Studio 2012)
+- Project and solution files for Visual Studio 2013
+- Changes for C++11 compatibility.
+- fixed an issue with receiving empty web socket frames (such as ping)
+- improved error handling in secure socket classes
+- Poco::ByteOrder now uses intrinsics if available
+- added new text encoding classes: Latin2Encoding, Windows1250Encoding, Windows1251Encoding
+- Zip: Added CM_AUTO, which automatically selects CM_STORE or CM_DEFLATE based on file extension. 
+  Used to avoid double-compression of already compressed file formats such as images.
+
+
 Release 1.4.6p4 (2014-04-18)
 ============================
 
@@ -8,8 +53,8 @@ Release 1.4.6p4 (2014-04-18)
 - HTMLForm: in URL encoding, percent-encode more special characters
 - fixed thread priority issues on POSIX platforms with non-standard scheduling policy
 - XMLWriter no longer escapes apostrophe character
-- fixed GH# 316: Poco::DateTimeFormatter::append() gives wrong result for Poco::LocalDateTime
-- fixed GH# 305 (memcpy in Poco::Buffer uses wrong size if type != char)
+- fixed GH #316: Poco::DateTimeFormatter::append() gives wrong result for Poco::LocalDateTime
+- fixed GH #305 (memcpy in Poco::Buffer uses wrong size if type != char)
 - Zip: fixed a crash caused by an I/O error (e.g., full disk) while creating a Zip archive
 
 
@@ -1878,4 +1923,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#94 $
+$Id: //poco/1.4/dist/CHANGELOG#98 $

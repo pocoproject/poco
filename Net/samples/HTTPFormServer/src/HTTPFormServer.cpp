@@ -309,7 +309,9 @@ protected:
 			// wait for CTRL-C or kill
 			waitForTerminationRequest();
 			// Stop the HTTPServer
-			srv.stop();
+			srv.stopAll(true);
+			// Wait for threads to complete
+			Poco::ThreadPool::defaultPool().joinAll();
 		}
 		return Application::EXIT_OK;
 	}

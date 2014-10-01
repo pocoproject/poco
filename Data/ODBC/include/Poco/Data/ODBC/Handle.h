@@ -1,7 +1,7 @@
 //
 // Handle.h
 //
-// $Id: //poco/1.4/Data/ODBC/include/Poco/Data/ODBC/Handle.h#1 $
+// $Id: //poco/1.4/Data/ODBC/include/Poco/Data/ODBC/Handle.h#2 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -77,8 +77,14 @@ public:
 	~Handle()
 		/// Destroys the Handle.
 	{
-		SQLRETURN rc = SQLFreeHandle(handleType, _handle);
-		poco_assert (!Utility::isError(rc));
+		try
+		{
+			SQLRETURN rc = SQLFreeHandle(handleType, _handle);
+			poco_assert (!Utility::isError(rc));
+		}
+		catch (...)
+		{
+		}
 	}
 
 	operator const H& () const

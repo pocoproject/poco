@@ -1,7 +1,7 @@
 //
 // ActiveDispatcher.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ActiveDispatcher.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/ActiveDispatcher.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -55,7 +55,7 @@ class Foundation_API ActiveDispatcher: protected Runnable
 	/// This class is used to implement an active object
 	/// with strictly serialized method execution.
 	///
-	/// An active object, with is an ordinary object
+	/// An active object, which is an ordinary object
 	/// containing ActiveMethod members, executes all
 	/// active methods in their own thread. 
 	/// This behavior does not fit the "classic"

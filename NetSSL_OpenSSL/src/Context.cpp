@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/Context.cpp#2 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/Context.cpp#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -189,8 +189,14 @@ Context::Context(
 Context::~Context()
 {
 	SSL_CTX_free(_pSSLContext);
-	
-	Poco::Crypto::OpenSSLInitializer::uninitialize();
+	try
+	{
+		Poco::Crypto::OpenSSLInitializer::uninitialize();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

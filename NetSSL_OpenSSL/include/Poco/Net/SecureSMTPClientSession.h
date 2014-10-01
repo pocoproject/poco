@@ -1,7 +1,7 @@
 //
 // SecureSMTPClientSession.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureSMTPClientSession.h#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureSMTPClientSession.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: Mail
@@ -106,6 +106,9 @@ public:
 		///
 		/// Returns true if the STARTTLS command was successful,
 		/// false otherwise.
+		
+private:
+	std::string _host;
 };
 
 

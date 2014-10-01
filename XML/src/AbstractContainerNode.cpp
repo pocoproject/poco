@@ -1,7 +1,7 @@
 //
 // AbstractContainerNode.cpp
 //
-// $Id: //poco/1.4/XML/src/AbstractContainerNode.cpp#2 $
+// $Id: //poco/1.4/XML/src/AbstractContainerNode.cpp#3 $
 //
 // Library: XML
 // Package: DOM
@@ -42,6 +42,9 @@
 #include "Poco/DOM/ElementsByTagNameList.h"
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/NumberParser.h"
+#ifdef XML_UNICODE_WCHAR_T
+#include "Poco/UnicodeConverter.h"
+#endif
 
 
 namespace Poco {
@@ -437,7 +440,13 @@ const Node* AbstractContainerNode::findNode(XMLString::const_iterator& it, const
 				XMLString index;
 				while (it != end && *it != ']') index += *it++;
 				if (it != end) ++it;
+#ifdef XML_UNICODE_WCHAR_T
+				std::string utf8Index;
+				Poco::UnicodeConverter::convert(index, utf8Index);
+				return findNode(it, end, findElement(Poco::NumberParser::parse(utf8Index), pNode, pNSMap), pNSMap);
+#else
 				return findNode(it, end, findElement(Poco::NumberParser::parse(index), pNode, pNSMap), pNSMap);
+#endif
 			}
 		}
 		else

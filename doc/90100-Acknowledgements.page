@@ -7,7 +7,7 @@ Portions of the POCO C++ Libraries utilize the
 following copyrighted material, the use of which is hereby acknowledged.
 
 
-!!!Expat XML Parser Toolkit 2.0
+!!!Expat XML Parser Toolkit 2.1
 
     Copyright (c) 1998, 1999, 2000 Thai Open Source Software Center Ltd
                                    and Clark Cooper
@@ -112,7 +112,7 @@ following copyrighted material, the use of which is hereby acknowledged.
 ----
 
 
-!!!Perl Compatible Regular Expressions (PCRE) 7.1
+!!!Perl Compatible Regular Expressions (PCRE) 7.8
 
     PCRE is a library of functions to support regular expressions whose syntax
     and semantics are as close as possible to those of the Perl 5 language.
@@ -157,9 +157,9 @@ following copyrighted material, the use of which is hereby acknowledged.
 ----    
 
 
-!!!zlib 1.2.5
+!!!zlib 1.2.8
 
-    Copyright (C) 1995-2004 Jean-loup Gailly and Mark Adler
+    Copyright (C) 1995-2012 Jean-loup Gailly and Mark Adler
     
     This software is provided 'as-is', without any express or implied
     warranty.  In no event will the authors be held liable for any damages
@@ -182,7 +182,7 @@ following copyrighted material, the use of which is hereby acknowledged.
 ----
 
 
-!!!SQlite 3.7.14
+!!!SQlite 3.8.6
 
 The original author of SQLite has dedicated the code to the 
 public domain (http://www.sqlite.org/copyright.html). 

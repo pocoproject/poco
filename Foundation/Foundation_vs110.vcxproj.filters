@@ -753,6 +753,9 @@
     <ClCompile Include="src\UUIDGenerator.cpp">
       <Filter>UUID\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Clock.cpp">
+      <Filter>DateTime\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\DateTime.cpp">
       <Filter>DateTime\Source Files</Filter>
     </ClCompile>
@@ -860,6 +863,15 @@
     </ClCompile>
     <ClCompile Include="src\DirectoryWatcher.cpp">
       <Filter>Filesystem\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Latin2Encoding.cpp">
+      <Filter>Text\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Windows1250Encoding.cpp">
+      <Filter>Text\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Windows1251Encoding.cpp">
+      <Filter>Text\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1535,6 +1547,9 @@
     <ClInclude Include="include\Poco\UUIDGenerator.h">
       <Filter>UUID\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Clock.h">
+      <Filter>DateTime\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\DateTime.h">
       <Filter>DateTime\Header Files</Filter>
     </ClInclude>
@@ -1771,6 +1786,18 @@
     </ClInclude>
     <ClInclude Include="include\Poco\Optional.h">
       <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\PBKDF2Engine.h">
+      <Filter>Crypt\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Latin2Encoding.h">
+      <Filter>Text\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Windows1250Encoding.h">
+      <Filter>Text\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Windows1251Encoding.h">
+      <Filter>Text\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

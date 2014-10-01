@@ -1,7 +1,7 @@
 //
 // WinCEDriver.cpp
 //
-// $Id: //poco/1.4/Zip/testsuite/src/WinCEDriver.cpp#1 $
+// $Id: //poco/1.4/Zip/testsuite/src/WinCEDriver.cpp#2 $
 //
 // Console-based test driver for Windows CE.
 //
@@ -37,7 +37,7 @@
 #include <cstdlib>
 
 
-int _tmain(int argc, wchar_t* argv[])
+int wmain(int argc, wchar_t* argv[])
 {
 	std::vector<std::string> args;
 	for (int i = 0; i < argc; ++i)

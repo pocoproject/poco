@@ -1,7 +1,7 @@
 //
 // BufferedBidirectionalStreamBuf.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/BufferedBidirectionalStreamBuf.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/BufferedBidirectionalStreamBuf.h#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -153,12 +153,12 @@ protected:
 	}
 
 private:
-	virtual int readFromDevice(char_type* buffer, std::streamsize length)
+	virtual int readFromDevice(char_type* /*buffer*/, std::streamsize /*length*/)
 	{
 		return 0;
 	}
 
-	virtual int writeToDevice(const char_type* buffer, std::streamsize length)
+	virtual int writeToDevice(const char_type* /*buffer*/, std::streamsize /*length*/)
 	{
 		return 0;
 	}

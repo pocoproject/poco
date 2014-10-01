@@ -1,7 +1,7 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Logger.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/Logger.cpp#5 $
 //
 // Library: Foundation
 // Package: Logging
@@ -464,7 +464,14 @@ public:
 	}
 	~AutoLoggerShutdown()
 	{
-		Logger::shutdown();
+		try
+		{
+			Logger::shutdown();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 };
 

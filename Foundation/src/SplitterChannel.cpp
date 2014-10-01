@@ -1,7 +1,7 @@
 //
 // SplitterChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SplitterChannel.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/SplitterChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -49,7 +49,14 @@ SplitterChannel::SplitterChannel()
 
 SplitterChannel::~SplitterChannel()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

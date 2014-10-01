@@ -1,7 +1,7 @@
 //
 // LocalDateTime.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LocalDateTime.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/LocalDateTime.cpp#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -40,7 +40,7 @@
 #include "Poco/Exception.h"
 #include <algorithm>
 #include <ctime>
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 #include "wce_time.h"
 #endif
 
@@ -283,7 +283,7 @@ void LocalDateTime::determineTzd(bool adjust)
 	{
 		std::time_t epochTime = _dateTime.timestamp().epochTime();
 #if defined(_WIN32) || defined(POCO_NO_POSIX_TSF)
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 		std::tm* broken = wceex_localtime(&epochTime);
 #else
 		std::tm* broken = std::localtime(&epochTime);
@@ -324,7 +324,7 @@ std::time_t LocalDateTime::dstOffset(int& dstOffset) const
 	broken.tm_min   = _dateTime.minute();
 	broken.tm_sec   = _dateTime.second();
 	broken.tm_isdst = -1;
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 	local = wceex_mktime(&broken);
 #else
 	local = std::mktime(&broken);

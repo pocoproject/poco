@@ -1,7 +1,7 @@
 //
 // Compress.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/Compress.h#2 $
+// $Id: //poco/1.4/Zip/include/Poco/Zip/Compress.h#3 $
 //
 // Library: Zip
 // Package: Zip
@@ -45,6 +45,7 @@
 #include "Poco/FIFOEvent.h"
 #include <istream>
 #include <ostream>
+#include <set>
 
 
 namespace Poco {
@@ -88,6 +89,25 @@ public:
 		
 	ZipArchive close();
 		/// Finalizes the ZipArchive, closes it.
+		
+	void setStoreExtensions(const std::set<std::string>& extensions);
+		/// Sets the file extensions for which the CM_STORE compression method
+		/// is used if CM_AUTO is specified in addFile() or addRecursive().
+		/// For all other extensions, CM_DEFLATE is used. This is used to avoid
+		/// double compression of already compressed file formats, which usually
+		/// leads to worse results. Extensions will be converted to lower case.
+		///
+		/// The default extensions are:
+		///   - gif
+		///   - jpg
+		///   - jpeg
+		///   - png
+		
+	const std::set<std::string>& getStoreExtensions() const;
+		/// Returns the file extensions for which the CM_STORE compression method
+		/// is used if CM_AUTO is specified in addFile() or addRecursive().
+		///
+		/// See setStoreExtensions() for more information.
 
 private:
 	enum
@@ -106,6 +126,7 @@ private:
 		/// copys an already compressed ZipEntry from in
 
 private:
+	std::set<std::string>      _storeExtensions;
 	std::ostream&              _out;
 	bool                       _seekableOut;
 	ZipArchive::FileHeaders    _files;
@@ -131,6 +152,12 @@ inline void Compress::setZipComment(const std::string& comment)
 inline const std::string& Compress::getZipComment() const
 {
 	return _comment;
+}
+
+
+inline const std::set<std::string>& Compress::getStoreExtensions() const
+{
+	return _storeExtensions;
 }
 
 

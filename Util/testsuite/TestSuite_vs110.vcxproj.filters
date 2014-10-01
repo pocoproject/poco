@@ -2,64 +2,64 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Application">
-      <UniqueIdentifier>{97419157-f05a-4b9d-ace7-093c3cdc9dd2}</UniqueIdentifier>
+      <UniqueIdentifier>{6531caac-fc38-421d-879c-cb79220ce830}</UniqueIdentifier>
     </Filter>
     <Filter Include="Application\Header Files">
-      <UniqueIdentifier>{236c128f-1bcb-44fb-800e-67c189cad02d}</UniqueIdentifier>
+      <UniqueIdentifier>{894b30fc-534a-4ef2-92ad-2bc9dd6ec62d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Application\Source Files">
-      <UniqueIdentifier>{e1a7af82-96f9-4f38-b6fa-22a46f82ee5d}</UniqueIdentifier>
+      <UniqueIdentifier>{5036d1bd-3d36-4e6a-8a94-325687fe3fee}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{9570682d-da99-4fb2-ac7a-f6f7370b7f88}</UniqueIdentifier>
+      <UniqueIdentifier>{d4b31e1e-9317-436f-a393-7abceb9e4f77}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{000bdad4-f846-4d37-a5de-3f6b86ba486f}</UniqueIdentifier>
+      <UniqueIdentifier>{c2dbc625-6e9e-401d-b8b8-6555f8b41678}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{f80d0323-647a-4be0-af6f-b2cb6aca1247}</UniqueIdentifier>
+      <UniqueIdentifier>{2e0e3d9b-cb59-4a65-ad06-65c23afdf031}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{351bf02e-e548-4cc1-a48f-0100903aeb5c}</UniqueIdentifier>
+      <UniqueIdentifier>{80ef3532-33ba-4db5-859d-4b68c1a2a7ef}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{ad29e64a-eca9-4103-811a-0fca92528a63}</UniqueIdentifier>
+      <UniqueIdentifier>{38457933-99d6-416d-8041-76daf51da1b3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Configuration">
-      <UniqueIdentifier>{b16af72f-7740-4145-9ec4-2cdee7a564fa}</UniqueIdentifier>
+      <UniqueIdentifier>{1d70f040-d46f-4367-95a1-5a2a17547ab5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Configuration\Header Files">
-      <UniqueIdentifier>{505460c5-4cb9-4354-ad37-d57b1ec011f8}</UniqueIdentifier>
+      <UniqueIdentifier>{886a0b57-f793-4207-9eec-20675f135d2a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Configuration\Source Files">
-      <UniqueIdentifier>{f459352d-d97e-4d41-9583-1567a90200d1}</UniqueIdentifier>
+      <UniqueIdentifier>{a31a1e11-f9f6-4a75-bd23-e49b6a548e3f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Options">
-      <UniqueIdentifier>{e4210d9f-aca2-4906-9afc-8403367ebb02}</UniqueIdentifier>
+      <UniqueIdentifier>{afed628e-c48f-408c-99c6-e9f5766dd161}</UniqueIdentifier>
     </Filter>
     <Filter Include="Options\Header Files">
-      <UniqueIdentifier>{5cd268d3-85a5-4cb8-9986-dd0c87fdf687}</UniqueIdentifier>
+      <UniqueIdentifier>{0db942b0-d62e-4c51-9a03-4bdaf99a0bf6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Options\Source Files">
-      <UniqueIdentifier>{9b63bfe7-e592-4167-bbe7-c7c9ace9e187}</UniqueIdentifier>
+      <UniqueIdentifier>{a9856f5c-8bee-48c6-a1d0-a945e013e413}</UniqueIdentifier>
     </Filter>
     <Filter Include="Windows">
-      <UniqueIdentifier>{248c30c3-2f0b-4dcd-b37a-72bc5dea7285}</UniqueIdentifier>
+      <UniqueIdentifier>{63779e78-1309-4487-9cfd-96c65c2920b0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Windows\Header Files">
-      <UniqueIdentifier>{62391538-2bde-4b10-b613-7f359034b359}</UniqueIdentifier>
+      <UniqueIdentifier>{23faa519-5913-451a-9a7f-2e56566ddfc2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Windows\Source Files">
-      <UniqueIdentifier>{02d9b632-a6fb-4fc0-a351-bfa77e739a28}</UniqueIdentifier>
+      <UniqueIdentifier>{e1a5eb53-e892-4743-b29d-e0d0e59acda5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Timer">
-      <UniqueIdentifier>{4e6aa106-5f25-4c6f-bd47-78821cedb0e7}</UniqueIdentifier>
+      <UniqueIdentifier>{52567f93-73b1-4fd7-a8e8-a2d181c8af12}</UniqueIdentifier>
     </Filter>
     <Filter Include="Timer\Header Files">
-      <UniqueIdentifier>{c62cbe2e-f3b4-43f4-8244-c5806d649d47}</UniqueIdentifier>
+      <UniqueIdentifier>{2ebe121c-8c72-4fbd-83b3-26ae7820f1e3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Timer\Source Files">
-      <UniqueIdentifier>{577cd320-c162-48b7-9c89-008070860993}</UniqueIdentifier>
+      <UniqueIdentifier>{93f2ad05-5656-4970-9d9d-eba1eb9e9f3d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 //
 // Thread.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Thread.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -38,6 +38,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Exception.h"
 #include "Poco/ThreadLocal.h"
+#include "Poco/AtomicCounter.h"
 #include <sstream>
 
 
@@ -156,11 +157,8 @@ namespace
 
 int Thread::uniqueId()
 {
-	FastMutex::ScopedLock lock(uniqueIdMutex);
-
-	static unsigned count = 0;
-	++count;
-	return count;
+	static Poco::AtomicCounter counter;
+	return ++counter;
 }
 
 

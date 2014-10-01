@@ -1,7 +1,7 @@
 //
 // TextEncoding.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TextEncoding.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/TextEncoding.cpp#2 $
 //
 // Library: Foundation
 // Package: Text
@@ -39,6 +39,9 @@
 #include "Poco/String.h"
 #include "Poco/ASCIIEncoding.h"
 #include "Poco/Latin1Encoding.h"
+#include "Poco/Latin2Encoding.h"
+#include "Poco/Windows1250Encoding.h"
+#include "Poco/Windows1251Encoding.h"
 #include "Poco/Latin9Encoding.h"
 #include "Poco/UTF16Encoding.h"
 #include "Poco/UTF8Encoding.h"
@@ -66,10 +69,13 @@ public:
 
 		add(new ASCIIEncoding);
 		add(new Latin1Encoding);
+        add(new Latin2Encoding);
 		add(new Latin9Encoding);
+        add(new Windows1250Encoding);
+        add(new Windows1251Encoding);
+		add(new Windows1252Encoding);
 		add(pUtf8Encoding);
 		add(new UTF16Encoding);
-		add(new Windows1252Encoding);
 	}
 	
 	~TextEncodingManager()

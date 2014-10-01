@@ -1,7 +1,7 @@
 //
 // Timezone_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timezone_UNIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Timezone_UNIX.cpp#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -36,6 +36,7 @@
 
 #include "Poco/Timezone.h"
 #include "Poco/Exception.h"
+#include "Poco/Mutex.h"
 #include <ctime>
 
 
@@ -52,23 +53,33 @@ public:
 	
 	int timeZone()
 	{
-	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined(POCO_ANDROID) // no timezone global var
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined (__OpenBSD__) || defined(POCO_ANDROID) // no timezone global var
 		std::time_t now = std::time(NULL);
 		struct std::tm t;
 		gmtime_r(&now, &t);
 		std::time_t utc = std::mktime(&t);
 		return now - utc;
 	#elif defined(__CYGWIN__)
+		tzset();
 		return -_timezone;
 	#else
+		tzset();
 		return -timezone;
 	#endif
 	}
 	
 	const char* name(bool dst)
 	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		tzset();		
 		return tzname[dst ? 1 : 0];
 	}
+		
+private:
+	Poco::FastMutex _mutex;
 };
 
 

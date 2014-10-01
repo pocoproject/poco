@@ -1,7 +1,7 @@
 //
 // Bugcheck.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Bugcheck.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Bugcheck.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -74,6 +74,37 @@ void Bugcheck::bugcheck(const char* msg, const char* file, int line)
 	}
 	Debugger::enter(m, file, line);
 	throw BugcheckException(what(msg, file, line));
+}
+
+
+void Bugcheck::unexpected(const char* file, int line)
+{
+#ifdef _DEBUG
+	try
+	{
+		std::string msg("Unexpected exception in noexcept function or destructor: ");
+		try
+		{
+			throw;
+		}
+		catch (Poco::Exception& exc)
+		{
+			msg += exc.displayText();
+		}
+		catch (std::exception& exc)
+		{
+			msg += exc.what();
+		}
+		catch (...)
+		{
+			msg += "unknown exception";
+		}
+		Debugger::enter(msg, file, line);
+	}
+	catch (...)
+	{
+	}
+#endif	
 }
 
 

@@ -1,7 +1,7 @@
 //
 // XMLWriter.h
 //
-// $Id: //poco/1.4/XML/include/Poco/XML/XMLWriter.h#4 $
+// $Id: //poco/1.4/XML/include/Poco/XML/XMLWriter.h#5 $
 //
 // Library: XML
 // Package: XML
@@ -284,7 +284,7 @@ public:
 		/// Creates and returns a unique namespace prefix that
 		/// can be used with startPrefixMapping().
 
-	bool isNamespaceMapped(const std::string& namespc) const;
+	bool isNamespaceMapped(const XMLString& namespc) const;
 		/// Returns true if the given namespace has been mapped
 		/// to a prefix in the current element or its ancestors.
 		

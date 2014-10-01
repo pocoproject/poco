@@ -1,7 +1,7 @@
 //
 // CountingStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/CountingStream.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/CountingStream.h#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -177,7 +177,7 @@ public:
 	
 	CountingOutputStream(std::ostream& ostr);
 		/// Creates the CountingOutputStream and connects it
-		/// to the given input stream.
+		/// to the given output stream.
 
 	~CountingOutputStream();
 		/// Destroys the CountingOutputStream.

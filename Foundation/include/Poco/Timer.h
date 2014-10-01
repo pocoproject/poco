@@ -1,7 +1,7 @@
 //
 // Timer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Timer.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Timer.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -45,7 +45,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Event.h"
 #include "Poco/Thread.h"
-#include "Poco/Timestamp.h"
+#include "Poco/Clock.h"
 
 
 namespace Poco {
@@ -169,7 +169,7 @@ private:
 	Event         _done;
 	long          _skipped;
 	AbstractTimerCallback* _pCallback;
-	Timestamp              _nextInvocation;
+	Clock                  _nextInvocation;
 	mutable FastMutex      _mutex;
 	
 	Timer(const Timer&);

@@ -1,7 +1,7 @@
 //
 // OSPCodeWriter.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/OSPCodeWriter.cpp#3 $
+// $Id: //poco/1.4/PageCompiler/src/OSPCodeWriter.cpp#4 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -70,6 +70,11 @@ void OSPCodeWriter::writeHandlerMembers(std::ostream& ostr)
 		ostr << "\n";
 		ostr << "protected:\n";
 		ostr << "\tPoco::OSP::BundleContext::Ptr context() const\n";
+		ostr << "\t{\n";
+		ostr << "\t\treturn _pContext;\n";
+		ostr << "\t}\n";
+		ostr << "\n";
+		ostr << "\tPoco::OSP::BundleContext::Ptr c() const\n";
 		ostr << "\t{\n";
 		ostr << "\t\treturn _pContext;\n";
 		ostr << "\t}\n";

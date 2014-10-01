@@ -1,7 +1,7 @@
 //
 // SimpleFileChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SimpleFileChannel.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/SimpleFileChannel.cpp#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -72,7 +72,14 @@ SimpleFileChannel::SimpleFileChannel(const std::string& path):
 
 SimpleFileChannel::~SimpleFileChannel()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Bugcheck.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Bugcheck.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Bugcheck.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -76,6 +76,12 @@ public:
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
+	static void unexpected(const char* file, int line);
+		/// An exception was caught in a destructor. Break into debugger,
+		/// if possible and report exception. Must only be called from
+		/// within a catch () block as it rethrows the exception to
+		/// determine its class.
+
 	static void debugger(const char* file, int line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible.
@@ -117,6 +123,10 @@ protected:
 
 #define poco_bugcheck_msg(msg) \
 	Poco::Bugcheck::bugcheck(msg, __FILE__, __LINE__)
+
+
+#define poco_unexpected() \
+	Poco::Bugcheck::unexpected(__FILE__, __LINE__);
 
 
 #define poco_debugger() \

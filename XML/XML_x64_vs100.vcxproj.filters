@@ -2,40 +2,40 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="XML">
-      <UniqueIdentifier>{7603b3ab-dac2-4149-b3e1-ce77e254fd01}</UniqueIdentifier>
+      <UniqueIdentifier>{a4764bb2-7bb4-4c93-955e-635438ec2e8b}</UniqueIdentifier>
     </Filter>
     <Filter Include="XML\Header Files">
-      <UniqueIdentifier>{be98e2dd-6541-4cb9-b581-9bb402c0e7fd}</UniqueIdentifier>
+      <UniqueIdentifier>{0ac5df80-b6b1-4d29-b9b7-430d2237de78}</UniqueIdentifier>
     </Filter>
     <Filter Include="XML\Source Files">
-      <UniqueIdentifier>{085bca45-9494-482e-951f-00dbf482203f}</UniqueIdentifier>
+      <UniqueIdentifier>{88ec5dae-6fb1-47db-9db8-d10b1c59d84e}</UniqueIdentifier>
     </Filter>
     <Filter Include="SAX">
-      <UniqueIdentifier>{c31f6771-b9fc-43d5-b2e5-f1ee728e11e0}</UniqueIdentifier>
+      <UniqueIdentifier>{c54e0810-9f94-4f6c-a9df-096ea6a74f17}</UniqueIdentifier>
     </Filter>
     <Filter Include="SAX\Header Files">
-      <UniqueIdentifier>{a4eb162b-572b-49da-9fbc-85a44f806d18}</UniqueIdentifier>
+      <UniqueIdentifier>{cb9f6950-7601-4e9f-9adc-fc342766c15a}</UniqueIdentifier>
     </Filter>
     <Filter Include="SAX\Source Files">
-      <UniqueIdentifier>{5552a8f1-95d4-4ee3-9a8a-30612460713f}</UniqueIdentifier>
+      <UniqueIdentifier>{db399910-1c2c-45c9-976c-1eb7cd443c03}</UniqueIdentifier>
     </Filter>
     <Filter Include="DOM">
-      <UniqueIdentifier>{b672d4fd-4cc5-44aa-b624-cb59e22172f7}</UniqueIdentifier>
+      <UniqueIdentifier>{a5147198-9fa4-45e0-b414-4d34c581dbf1}</UniqueIdentifier>
     </Filter>
     <Filter Include="DOM\Header Files">
-      <UniqueIdentifier>{d63c406a-d638-4b88-a232-9fcbbe5f72ed}</UniqueIdentifier>
+      <UniqueIdentifier>{4a436773-5446-4593-ae50-8780d4d30427}</UniqueIdentifier>
     </Filter>
     <Filter Include="DOM\Source Files">
-      <UniqueIdentifier>{20e1f85f-a4a2-4ba6-860a-3be7d5236fd9}</UniqueIdentifier>
+      <UniqueIdentifier>{ff3c64bd-c018-4ca0-a400-240e7813b5fb}</UniqueIdentifier>
     </Filter>
     <Filter Include="Expat">
-      <UniqueIdentifier>{578336e9-fcfb-429c-af8c-52ae3025d77c}</UniqueIdentifier>
+      <UniqueIdentifier>{3dace8da-5f39-4d0e-a274-2a835dd859d5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Expat\Header Files">
-      <UniqueIdentifier>{f37dbe19-fbea-4180-9bc7-3182e149daac}</UniqueIdentifier>
+      <UniqueIdentifier>{3fcfd045-b537-4264-9902-db86ac8fc684}</UniqueIdentifier>
     </Filter>
     <Filter Include="Expat\Source Files">
-      <UniqueIdentifier>{1c13baba-e77c-4281-9c24-dda4dfa37a3d}</UniqueIdentifier>
+      <UniqueIdentifier>{317b8d77-984e-4a05-93c3-86869ee96903}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

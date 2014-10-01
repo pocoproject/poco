@@ -1,7 +1,7 @@
 //
 // AsyncChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/AsyncChannel.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/AsyncChannel.cpp#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -79,8 +79,15 @@ AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio):
 
 AsyncChannel::~AsyncChannel()
 {
-	close();
-	if (_pChannel) _pChannel->release();
+	try
+	{
+		close();
+		if (_pChannel) _pChannel->release();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

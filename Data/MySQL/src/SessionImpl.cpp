@@ -1,7 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/SessionImpl.cpp#2 $
+// $Id: //poco/1.4/Data/MySQL/src/SessionImpl.cpp#3 $
 //
 // Library: Data/MySQL
 // Package: MySQL
@@ -173,7 +173,14 @@ SessionImpl::SessionImpl(const std::string& connectionString) : _mysql(0), _conn
 
 SessionImpl::~SessionImpl()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 	
 

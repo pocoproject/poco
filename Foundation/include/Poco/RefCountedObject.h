@@ -1,7 +1,7 @@
 //
 // RefCountedObject.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/RefCountedObject.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/RefCountedObject.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -62,7 +62,7 @@ public:
 	void duplicate() const;
 		/// Increments the object's reference count.
 		
-	void release() const;
+	void release() const throw();
 		/// Decrements the object's reference count
 		/// and deletes the object if the count
 		/// reaches zero.
@@ -97,7 +97,7 @@ inline void RefCountedObject::duplicate() const
 }
 
 
-inline void RefCountedObject::release() const
+inline void RefCountedObject::release() const throw()
 {
 	if (--_counter == 0) delete this;
 }

@@ -1,7 +1,7 @@
 //
 // HTTPTimeServer.cpp
 //
-// $Id: //poco/1.4/Net/samples/HTTPTimeServer/src/HTTPTimeServer.cpp#1 $
+// $Id: //poco/1.4/Net/samples/HTTPTimeServer/src/HTTPTimeServer.cpp#2 $
 //
 // This sample demonstrates the HTTPServer and related classes.
 //
@@ -219,7 +219,9 @@ protected:
 			// wait for CTRL-C or kill
 			waitForTerminationRequest();
 			// Stop the HTTPServer
-			srv.stop();
+			srv.stopAll(true);
+			// Wait for server threads to stop
+			ThreadPool::defaultPool().joinAll();
 		}
 		return Application::EXIT_OK;
 	}

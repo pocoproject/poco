@@ -1,7 +1,7 @@
 //
 // PartialStream.cpp
 //
-// $Id: //poco/1.4/Zip/src/PartialStream.cpp#1 $
+// $Id: //poco/1.4/Zip/src/PartialStream.cpp#2 $
 //
 // Library: Zip
 // Package: Zip
@@ -262,7 +262,14 @@ PartialOutputStream::PartialOutputStream(std::ostream& ostr, std::size_t start, 
 
 PartialOutputStream::~PartialOutputStream()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

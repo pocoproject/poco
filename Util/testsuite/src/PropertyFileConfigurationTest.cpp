@@ -1,7 +1,7 @@
 //
 // PropertyFileConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/PropertyFileConfigurationTest.cpp#1 $
+// $Id: //poco/1.4/Util/testsuite/src/PropertyFileConfigurationTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -116,12 +116,14 @@ void PropertyFileConfigurationTest::testSave()
 	
 	pConf->setString("prop1", "value1");
 	pConf->setInt("prop2", 42);
+	pConf->setString("prop3", "value\\1\txxx");
 	
 	std::ostringstream ostr;
 	pConf->save(ostr);
 	std::string propFile = ostr.str();
 	assert (propFile == "prop1: value1\n"
-	                    "prop2: 42\n");
+	                    "prop2: 42\n"
+	                    "prop3: value\\\\1\\txxx\n");
 }
 
 

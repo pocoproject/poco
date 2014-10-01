@@ -1,7 +1,7 @@
 //
 // LocalDateTimeTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/LocalDateTimeTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/LocalDateTimeTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -42,7 +42,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include <ctime>
 #include <iostream>
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 #include "wce_time.h"
 #endif
 
@@ -396,23 +396,22 @@ void LocalDateTimeTest::testTimezone()
 	if (then.tm_isdst >= 0)
 	{
 		std::string tzNow, tzThen;
-		char tzBuf[12];
-		int iterations = 0;
-		std::strftime(&tzBuf[0], sizeof(tzBuf), "%z", &then);
+		char tzBuf[48] = {0};
+		if (0 == std::strftime(&tzBuf[0], sizeof(tzBuf), "%Z", &then))
+			fail ("Insufficient character array length.");
+
 		tzNow = tzThen = tzBuf;
+		int iterations = 0;
 		while (iterations < 14)
 		{
 			// Add one month until the timezone changes or we roll
 			// over 13 months.
 			t += tINCREMENT;
 			then = *std::localtime(&t);
-			std::strftime(&tzBuf[0], sizeof(tzBuf), "%z", &then);
+			std::strftime(&tzBuf[0], sizeof(tzBuf), "%Z", &then);
 			tzThen = tzBuf;
 			foundDST = (tzNow == tzThen);
-			if (foundDST)
-			{
-				break;
-			}
+			if (foundDST) break;
 			++iterations;
 		}
 		if (foundDST)

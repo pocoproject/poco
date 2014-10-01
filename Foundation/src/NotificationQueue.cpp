@@ -1,7 +1,7 @@
 //
 // NotificationQueue.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NotificationQueue.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/NotificationQueue.cpp#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -50,7 +50,14 @@ NotificationQueue::NotificationQueue()
 
 NotificationQueue::~NotificationQueue()
 {
-	clear();
+	try
+	{
+		clear();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

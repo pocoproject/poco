@@ -1,7 +1,7 @@
 //
 // DirectoryWatcher.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#9 $
+// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#10 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -556,8 +556,15 @@ DirectoryWatcher::DirectoryWatcher(const Poco::File& directory, int eventMask, i
 
 DirectoryWatcher::~DirectoryWatcher()
 {
-	stop();
-	delete _pStrategy;
+	try
+	{
+		stop();
+		delete _pStrategy;
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 	

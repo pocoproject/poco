@@ -1,7 +1,7 @@
 //
 // TCPServer.cpp
 //
-// $Id: //poco/1.4/Net/src/TCPServer.cpp#1 $
+// $Id: //poco/1.4/Net/src/TCPServer.cpp#2 $
 //
 // Library: Net
 // Package: TCPServer
@@ -70,8 +70,15 @@ TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool&
 
 TCPServer::~TCPServer()
 {
-	stop();
-	_pDispatcher->release();
+	try
+	{
+		stop();
+		_pDispatcher->release();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

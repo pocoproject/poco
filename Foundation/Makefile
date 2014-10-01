@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/Makefile#6 $
+# $Id: //poco/1.4/Foundation/Makefile#8 $
 #
 # Makefile for Poco Foundation
 #
@@ -9,7 +9,7 @@
 include $(POCO_BASE)/build/rules/global
 
 objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder \
-	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Configurable ConsoleChannel \
+	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Clock Configurable ConsoleChannel \
 	CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator DirectoryWatcher \
 	Environment Event EventArgs ErrorHandler Exception FPEnvironment File Glob \
@@ -31,7 +31,8 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel Base64Decoder Base64E
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1252Encoding \
 	UTF8Encoding UnicodeConverter UUID UUIDGenerator Void Format \
 	Pipe PipeImpl PipeStream DynamicAny DynamicAnyHolder SharedMemory \
-	MemoryStream FileStream Unicode UTF8String AtomicCounter
+	MemoryStream FileStream Unicode UTF8String AtomicCounter \
+	Latin2Encoding Windows1250Encoding Windows1251Encoding
 
 zlib_objects = adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil

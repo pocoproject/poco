@@ -1,7 +1,7 @@
 //
 // Activity.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Activity.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Activity.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -114,8 +114,15 @@ public:
 	~Activity()
 		/// Stops and destroys the activity.
 	{
-		stop();
-		wait();
+		try
+		{
+			stop();
+			wait();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 	
 	void start()

@@ -1,7 +1,7 @@
 //
 // WebSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#9 $
+// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#11 $
 //
 // Library: Net
 // Package: WebSocket
@@ -43,7 +43,7 @@
 #include "Poco/MemoryStream.h"
 #include "Poco/Format.h"
 #include <cstring>
-
+#include <iostream>
 
 namespace Poco {
 namespace Net {
@@ -62,8 +62,15 @@ WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, bool mustMaskP
 
 WebSocketImpl::~WebSocketImpl()
 {
-	_pStreamSocketImpl->release();
-	reset();
+	try
+	{
+		_pStreamSocketImpl->release();
+		reset();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 	
@@ -130,18 +137,19 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 	int maskOffset = 0;
 	if (lengthByte & FRAME_FLAG_MASK) maskOffset += 4;
 	lengthByte &= 0x7f;
-	if (lengthByte + 2 + maskOffset < MAX_HEADER_LENGTH)
+	if (lengthByte > 0 || maskOffset > 0)
 	{
-		n = receiveNBytes(header + 2, lengthByte + maskOffset);
+		if (lengthByte + 2 + maskOffset < MAX_HEADER_LENGTH)
+		{
+			n = receiveNBytes(header + 2, lengthByte + maskOffset);
+		}
+		else
+		{
+			n = receiveNBytes(header + 2, MAX_HEADER_LENGTH - 2);
+		}
+		if (n <= 0) throw WebSocketException("Incomplete header received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
+		n += 2;
 	}
-	else
-	{
-		n = receiveNBytes(header + 2, MAX_HEADER_LENGTH - 2);
-	}
-
-	if (n <= 0) throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
-
-	n += 2;
 	Poco::MemoryInputStream istr(header, n);
 	Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 	Poco::UInt8 flags;

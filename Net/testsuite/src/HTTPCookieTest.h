@@ -1,7 +1,7 @@
 //
 // HTTPCookieTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPCookieTest.h#1 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPCookieTest.h#2 $
 //
 // Definition of the HTTPCookieTest class.
 //
@@ -37,6 +37,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/DateTime.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -49,6 +50,9 @@ public:
 	void testCookie();
 	void testEscape();
 	void testUnescape();
+	void testExpiryFuture();
+	void testExpiryPast();
+	void testCookieExpiry(Poco::DateTime expiryTime);
 
 	void setUp();
 	void tearDown();

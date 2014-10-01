@@ -1,7 +1,7 @@
 //
 // RemoteSyslogChannel.cpp
 //
-// $Id: //poco/1.4/Net/src/RemoteSyslogChannel.cpp#2 $
+// $Id: //poco/1.4/Net/src/RemoteSyslogChannel.cpp#3 $
 //
 // Library: Net
 // Package: Logging
@@ -81,7 +81,14 @@ RemoteSyslogChannel::RemoteSyslogChannel(const std::string& address, const std::
 
 RemoteSyslogChannel::~RemoteSyslogChannel()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

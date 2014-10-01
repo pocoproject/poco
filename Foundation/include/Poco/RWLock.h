@@ -1,7 +1,7 @@
 //
 // RWLock.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/RWLock.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/RWLock.h#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -188,7 +188,14 @@ inline ScopedRWLock::ScopedRWLock(RWLock& rwl, bool write): _rwl(rwl)
 
 inline ScopedRWLock::~ScopedRWLock()
 {
-	_rwl.unlock();
+	try
+	{
+		_rwl.unlock();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

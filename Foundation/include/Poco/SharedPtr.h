@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SharedPtr.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/SharedPtr.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -156,7 +156,14 @@ public:
 
 	~SharedPtr()
 	{
-		release();
+		try
+		{
+			release();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 	SharedPtr& assign(C* ptr)

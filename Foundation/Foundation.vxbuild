@@ -1,7 +1,7 @@
 #
 # Foundation.vxbuild
 #
-# $Id: //poco/1.4/Foundation/Foundation.vxbuild#6 $
+# $Id: //poco/1.4/Foundation/Foundation.vxbuild#7 $
 #
 TARGET=pocoFoundation
 SOURCES="
@@ -20,6 +20,7 @@ SOURCES="
 	ByteOrder.cpp 
 	Channel.cpp 
 	Checksum.cpp 
+	Clock.cpp
 	Condition.cpp 
 	Configurable.cpp 
 	ConsoleChannel.cpp 

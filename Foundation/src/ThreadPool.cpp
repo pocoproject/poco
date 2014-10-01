@@ -1,7 +1,7 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/1.4/Foundation/src/ThreadPool.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/ThreadPool.cpp#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -42,7 +42,7 @@
 #include "Poco/ErrorHandler.h"
 #include <sstream>
 #include <ctime>
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 #include "wce_time.h"
 #endif
 
@@ -89,7 +89,7 @@ PooledThread::PooledThread(const std::string& name, int stackSize):
 {
 	poco_assert_dbg (stackSize >= 0);
 	_thread.setStackSize(stackSize);
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 	_idleTime = wceex_time(NULL);
 #else
 	_idleTime = std::time(NULL);
@@ -156,7 +156,7 @@ int PooledThread::idleTime()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 	return (int) (wceex_time(NULL) - _idleTime);
 #else
 	return (int) (time(NULL) - _idleTime);
@@ -228,7 +228,7 @@ void PooledThread::run()
 			}
 			FastMutex::ScopedLock lock(_mutex);
 			_pTarget  = 0;
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 			_idleTime = wceex_time(NULL);
 #else
 			_idleTime = time(NULL);
@@ -296,7 +296,14 @@ ThreadPool::ThreadPool(const std::string& name,
 
 ThreadPool::~ThreadPool()
 {
-	stopAll();
+	try
+	{
+		stopAll();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
