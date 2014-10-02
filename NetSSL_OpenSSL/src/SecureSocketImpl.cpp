@@ -433,7 +433,15 @@ int SecureSocketImpl::handleError(int rc)
 			long lastError = ERR_get_error();
 			if (lastError == 0)
 			{
-				if (rc == 0 || rc == -1)
+				if (rc == 0)
+				{
+					// Most web browsers do this, don't report an error
+					if (_pContext->isForServerUse())
+						return 0;
+					else
+						throw SSLConnectionUnexpectedlyClosedException();
+				}
+				else if (rc == -1)
 				{
 					throw SSLConnectionUnexpectedlyClosedException();
 				}
