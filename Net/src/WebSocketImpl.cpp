@@ -61,6 +61,7 @@ int WebSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::NETWORK_BYTE_ORDER);
 	
 	if (flags == 0) flags = WebSocket::FRAME_BINARY;
+	flags &= 0xff;
 	writer << static_cast<Poco::UInt8>(flags);
 	Poco::UInt8 lengthByte(0);
 	if (_mustMaskPayload)
