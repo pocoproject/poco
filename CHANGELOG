@@ -11,10 +11,11 @@ Release 1.4.7 (2014-10-06)
 - fixed GH #463: XML does not compile with XML_UNICODE_WCHAR_T
 - fixed GH #282: Using Thread in a global can cause crash on Windows
 - fixed GH #424: Poco::Timer deadlock
-- fixed GH #465 - Fix result enum type XML_Error -> XML_Status
+- fixed GH #465: Fix result enum type XML_Error -> XML_Status
 - fixed GH #510: Incorrect RSAKey construction from istream
-- fixed GH# 332: POCO::ConsoleChannnel::initColors() assigns no color to 
+- fixed GH #332: POCO::ConsoleChannnel::initColors() assigns no color to 
   PRIO_TRACE and wrong color to PRIO_FATAL
+- fixed GH #550: WebSocket fragmented message problem
 - Poco::Data::MySQL: added SQLite thread cleanup handler
 - Poco::Net::X509Certificate: improved and fixed domain name verification for 
   wildcard domains
@@ -1923,4 +1924,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#98 $
+$Id: //poco/1.4/dist/CHANGELOG#99 $

@@ -1,7 +1,7 @@
 //
 // HTTPSession.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPSession.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPSession.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -184,6 +184,9 @@ protected:
 		
 	void setException(const Poco::Exception& exc);
 		/// Stores a clone of the exception.
+		
+	void clearException();
+		/// Clears the stored exception.
 	
 private:
 	enum

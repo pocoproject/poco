@@ -1,7 +1,7 @@
 //
 // WebSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocket.h#4 $
+// $Id: //poco/1.4/Net/include/Poco/Net/WebSocket.h#5 $
 //
 // Library: Net
 // Package: WebSocket
@@ -96,7 +96,8 @@ public:
 		FRAME_OP_CLOSE   = 0x08, /// Close connection.
 		FRAME_OP_PING    = 0x09, /// Ping frame.
 		FRAME_OP_PONG    = 0x0a, /// Pong frame.
-		FRAME_OP_BITMASK = 0x0f  /// Bit mask for opcodes. 
+		FRAME_OP_BITMASK = 0x0f, /// Bit mask for opcodes. 
+		FRAME_OP_SETRAW  = 0x100 /// Set raw flags (for use with sendBytes() and FRAME_OP_CONT).
 	};
 	
 	enum SendFlags

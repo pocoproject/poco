@@ -1,7 +1,7 @@
 //
 // WebSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocket.cpp#8 $
+// $Id: //poco/1.4/Net/src/WebSocket.cpp#9 $
 //
 // Library: Net
 // Package: WebSocket
@@ -121,6 +121,7 @@ void WebSocket::shutdown(Poco::UInt16 statusCode, const std::string& statusMessa
 
 int WebSocket::sendFrame(const void* buffer, int length, int flags)
 {
+	flags |= FRAME_OP_SETRAW;
 	return static_cast<WebSocketImpl*>(impl())->sendBytes(buffer, length, flags);
 }
 

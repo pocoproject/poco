@@ -1,7 +1,7 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPSession.cpp#3 $
+// $Id: //poco/1.4/Net/src/HTTPSession.cpp#4 $
 //
 // Library: Net
 // Package: HTTP
@@ -220,6 +220,13 @@ void HTTPSession::setException(const Poco::Exception& exc)
 {
 	delete _pException;
 	_pException = exc.clone();
+}
+
+
+void HTTPSession::clearException()
+{
+	delete _pException;
+	_pException = 0;
 }
 
 
