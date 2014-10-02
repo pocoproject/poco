@@ -164,7 +164,10 @@ protected:
 		
 	void setException(const Poco::Exception& exc);
 		/// Stores a clone of the exception.
-	
+
+	void clearException();
+		/// Clears the stored exception.
+
 private:
 	enum
 	{

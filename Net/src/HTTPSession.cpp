@@ -210,6 +210,13 @@ void HTTPSession::setException(const Poco::Exception& exc)
 }
 
 
+void HTTPSession::clearException()
+{
+	delete _pException;
+	_pException = 0;
+}
+
+
 StreamSocket HTTPSession::detachSocket()
 {
 	StreamSocket oldSocket(_socket);
