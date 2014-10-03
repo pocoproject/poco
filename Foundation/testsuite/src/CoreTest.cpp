@@ -695,6 +695,7 @@ void CoreTest::testFIFOBufferChar()
 	try
 	{
 		f.copy(&arr[0], 8);
+		fail("must fail");
 	} catch (InvalidAccessException&) { }
 
 	f.copy(&arr[0], 3);
@@ -707,7 +708,6 @@ void CoreTest::testFIFOBufferChar()
 	assert (6 == f.used());
 	assert (4 == f.available());
 
-	const char d[4] = {'7', '8', '9', '0' };
 	f.copy(&arr[0], 4);
 	assert(7 == _notToReadable);
 	assert(6 == _readableToNot);
@@ -722,6 +722,7 @@ void CoreTest::testFIFOBufferChar()
 	try
 	{
 		f.copy(&arr[0], 1);
+		fail("must fail");
 	} catch (InvalidAccessException&) { }
 
 	f.drain(1);
@@ -730,6 +731,33 @@ void CoreTest::testFIFOBufferChar()
 	assert(2 == _notToWritable);
 	assert(2 == _writableToNot);
 
+	f.drain(9);
+	assert (10 == f.size());
+	assert (0 == f.used());
+	assert (10 == f.available());
+
+	const char e[10] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
+	f.copy(&e[0], 10);
+	assert (10 == f.size());
+	assert (10 == f.used());
+	assert (0 == f.available());
+	f.drain(1);
+	f.write(e, 1);
+	assert (10 == f.size());
+	assert (10 == f.used());
+	assert (0 == f.available());
+	
+	assert(f[0] == '2');
+	assert(f[1] == '3');
+	assert(f[2] == '4');
+	assert(f[3] == '5');
+	assert(f[4] == '6');
+	assert(f[5] == '7');
+	assert(f[6] == '8');
+	assert(f[7] == '9');
+	assert(f[8] == '0');
+	assert(f[9] == '1');
+
 	f.readable -= delegate(this, &CoreTest::onReadable);
 	f.writable -= delegate(this, &CoreTest::onReadable);
 }
@@ -737,7 +765,7 @@ void CoreTest::testFIFOBufferChar()
 
 void CoreTest::testFIFOBufferInt()
 {
-	typedef char T;
+	typedef int T;
 
 	BasicFIFOBuffer<T> f(20);
 	Buffer<T> b(10);
@@ -842,7 +870,34 @@ void CoreTest::testFIFOBufferInt()
 	assert (16 == f[1]);
 	assert (17 == f[2]);
 	assert (18 == f[3]);
-	assert (19 == f[4]);
+	assert(19 == f[4]);
+
+	f.drain(9);
+	assert(10 == f.size());
+	assert(0 == f.used());
+	assert(10 == f.available());
+
+	const int e[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
+	f.copy(&e[0], 10);
+	assert(10 == f.size());
+	assert(10 == f.used());
+	assert(0 == f.available());
+	f.drain(1);
+	f.write(e, 1);
+	assert(10 == f.size());
+	assert(10 == f.used());
+	assert(0 == f.available());
+
+	assert(f[0] == 2);
+	assert(f[1] == 3);
+	assert(f[2] == 4);
+	assert(f[3] == 5);
+	assert(f[4] == 6);
+	assert(f[5] == 7);
+	assert(f[6] == 8);
+	assert(f[7] == 9);
+	assert(f[8] == 0);
+	assert(f[9] == 1);
 
 	f.resize(3, false);
 	assert (3 == f.size());
