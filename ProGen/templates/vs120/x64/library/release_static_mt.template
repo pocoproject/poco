@@ -1,7 +1,7 @@
 <Configuration
 	Name="release_static_mt|x64"
 	OutputDirectory="${project.outdir}\lib64\"
-	IntermediateDirectory="obj64\$(ConfigurationName)"
+	IntermediateDirectory="obj64\${project.name}\$(ConfigurationName)"
 	ConfigurationType="4"
 	CharacterSet="2"
 	>

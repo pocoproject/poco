@@ -1,7 +1,7 @@
 <Configuration
 	Name="debug_static_mt|Win32"
 	OutputDirectory="bin\static_mt\"
-	IntermediateDirectory="obj\$(ConfigurationName)"
+	IntermediateDirectory="obj\${project.name}\$(ConfigurationName)"
 	ConfigurationType="1"
 	CharacterSet="2"
 	>

@@ -1,7 +1,7 @@
 <Configuration
 	Name="debug_static_mt|${project.platform}"
 	OutputDirectory="bin\$(PlatformName)\static_mt"
-	IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+	IntermediateDirectory="obj\${project.name}\$(PlatformName)\$(ConfigurationName)"
 	ConfigurationType="1"
 	CharacterSet="1"
 	>
