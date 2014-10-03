@@ -33,8 +33,8 @@
 //
 extern "C"
 {
-	struct real_pcre;
-	typedef struct real_pcre pcre;
+	struct real_pcre8_or_16;                 /* declaration; the definition is private  */
+	typedef struct real_pcre8_or_16 pcre;
 	struct pcre_extra;
 }
 

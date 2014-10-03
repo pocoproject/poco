@@ -20,7 +20,7 @@
 #if defined(POCO_UNBUNDLED)
 #include <pcre.h>
 #else
-#include "pcre_config.h"
+#include "config.h"
 #include "pcre.h"
 #endif
 

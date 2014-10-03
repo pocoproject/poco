@@ -2234,7 +2234,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\pcre_config.h"
+					RelativePath=".\src\config.h"
 					>
 				</File>
 				<File
@@ -2306,7 +2306,35 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\pcre_try_flipped.c"
+					RelativePath=".\src\pcre_byte_order.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_config.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_dfa_exec.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_get.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_jit_compile.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_version.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_refcount.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_string_utils.c"
 					>
 				</File>
 				<File

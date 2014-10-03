@@ -19,7 +19,7 @@
 
 extern "C"
 {
-#include "pcre_config.h"
+#include "config.h"
 GCC_DIAG_OFF(unused-function) // pcre_memmove unused function warning
 #include "pcre_internal.h"
 }
