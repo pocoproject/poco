@@ -67,19 +67,20 @@ HTTPSession::~HTTPSession()
 	try
 	{
 		if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
-		try
-		{
-			close();
-		}
-		catch (...)
-		{
-		}
-		delete _pException;
 	}
 	catch (...)
 	{
 		poco_unexpected();
 	}
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
+	delete _pException;
 }
 
 
