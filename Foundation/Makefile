@@ -37,9 +37,10 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 zlib_objects = adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil
 
-pcre_objects = pcre_chartables pcre_compile pcre_globals pcre_maketables \
-	pcre_study pcre_try_flipped pcre_valid_utf8 \
-	pcre_exec pcre_ord2utf8 pcre_newline pcre_fullinfo pcre_xclass
+pcre_objects = pcre_config pcre_chartables pcre_compile pcre_globals pcre_maketables \
+	pcre_study pcre_byte_order pcre_valid_utf8 pcre_dfa_exec pcre_get pcre_jit_compile\
+	pcre_exec pcre_ord2utf8 pcre_newline pcre_fullinfo pcre_xclass pcre_refcount pcre_string_utils \
+	pcre_version
 
 pcre_utf8_objects = pcre_ucd pcre_tables
 

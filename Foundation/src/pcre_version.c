@@ -37,56 +37,58 @@ POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------------
 */
 
-#pragma warning( disable : 4244)  // conversion from 'int' to 'unsigned short', possible loss of data
 
-/* This file contains a private PCRE function that converts an ordinal
-character value into a UTF8 string. */
+/* This module contains the external function pcre_version(), which returns a
+string that identifies the PCRE version that is in use. */
 
 #include "config.h"
-#define COMPILE_PCRE8
-
 #include "pcre_internal.h"
 
+
 /*************************************************
-*       Convert character value to UTF-8         *
+*          Return version string                 *
 *************************************************/
 
-/* This function takes an integer value in the range 0 - 0x10ffff
-and encodes it as a UTF-8 character in 1 to 4 pcre_uchars.
+/* These macros are the standard way of turning unquoted text into C strings.
+They allow macros like PCRE_MAJOR to be defined without quotes, which is
+convenient for user programs that want to test its value. */
 
-Arguments:
-  cvalue     the character value
-  buffer     pointer to buffer for result - at least 6 pcre_uchars long
+#define STRING(a)  # a
+#define XSTRING(s) STRING(s)
 
-Returns:     number of characters placed in the buffer
-*/
+/* A problem turned up with PCRE_PRERELEASE, which is defined empty for
+production releases. Originally, it was used naively in this code:
 
-unsigned
-int
-PRIV(ord2utf)(pcre_uint32 cvalue, pcre_uchar *buffer)
-{
-#ifdef SUPPORT_UTF
+  return XSTRING(PCRE_MAJOR)
+         "." XSTRING(PCRE_MINOR)
+             XSTRING(PCRE_PRERELEASE)
+         " " XSTRING(PCRE_DATE);
 
-register int i, j;
+However, when PCRE_PRERELEASE is empty, this leads to an attempted expansion of
+STRING(). The C standard states: "If (before argument substitution) any
+argument consists of no preprocessing tokens, the behavior is undefined." It
+turns out the gcc treats this case as a single empty string - which is what we
+really want - but Visual C grumbles about the lack of an argument for the
+macro. Unfortunately, both are within their rights. To cope with both ways of
+handling this, I had resort to some messy hackery that does a test at run time.
+I could find no way of detecting that a macro is defined as an empty string at
+pre-processor time. This hack uses a standard trick for avoiding calling
+the STRING macro with an empty argument when doing the test. */
 
-for (i = 0; i < PRIV(utf8_table1_size); i++)
-  if ((int)cvalue <= PRIV(utf8_table1)[i]) break;
-buffer += i;
-for (j = i; j > 0; j--)
- {
- *buffer-- = 0x80 | (cvalue & 0x3f);
- cvalue >>= 6;
- }
-*buffer = PRIV(utf8_table2)[i] | cvalue;
-return i + 1;
-
-#else
-
-(void)(cvalue);  /* Keep compiler happy; this function won't ever be */
-(void)(buffer);  /* called when SUPPORT_UTF is not defined. */
-return 0;
-
+#if defined COMPILE_PCRE8
+PCRE_EXP_DEFN const char * PCRE_CALL_CONVENTION
+pcre_version(void)
+#elif defined COMPILE_PCRE16
+PCRE_EXP_DEFN const char * PCRE_CALL_CONVENTION
+pcre16_version(void)
+#elif defined COMPILE_PCRE32
+PCRE_EXP_DEFN const char * PCRE_CALL_CONVENTION
+pcre32_version(void)
 #endif
+{
+return (XSTRING(Z PCRE_PRERELEASE)[1] == 0)?
+  XSTRING(PCRE_MAJOR.PCRE_MINOR PCRE_DATE) :
+  XSTRING(PCRE_MAJOR.PCRE_MINOR) XSTRING(PCRE_PRERELEASE PCRE_DATE);
 }
 
-/* End of pcre_ord2utf8.c */
+/* End of pcre_version.c */
