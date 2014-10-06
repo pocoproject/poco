@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			OutputDirectory="obj64\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj64\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -99,8 +99,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			OutputDirectory="obj64\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj64\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -185,8 +185,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_md|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			OutputDirectory="obj64\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj64\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -271,8 +271,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			OutputDirectory="obj64\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj64\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -352,8 +352,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			OutputDirectory="obj64\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj64\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -433,8 +433,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			OutputDirectory="obj64\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj64\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"

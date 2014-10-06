@@ -36,7 +36,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -44,11 +45,12 @@
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\SQLToMongod.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\SQLToMongod.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -98,7 +100,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -106,13 +109,14 @@
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\SQLToMongo.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="FALSE"
 				ProgramDatabaseFile=""
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -159,7 +163,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -167,11 +172,12 @@
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_mt\SQLToMongod.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\static_mt\SQLToMongod.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -221,7 +227,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -229,13 +236,14 @@
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_mt\SQLToMongo.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="FALSE"
 				ProgramDatabaseFile=""
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -282,7 +290,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -290,11 +299,12 @@
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_md\SQLToMongod.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\static_md\SQLToMongod.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -344,7 +354,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -352,13 +363,14 @@
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\static_md\SQLToMongo.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib;${configuration.linker.libraries}"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="FALSE"
 				ProgramDatabaseFile=""
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

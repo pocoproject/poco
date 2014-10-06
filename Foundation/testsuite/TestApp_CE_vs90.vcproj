@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -108,8 +108,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -200,8 +200,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -292,8 +292,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -383,8 +383,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -474,8 +474,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
