@@ -327,7 +327,7 @@ public:
 		UInt32 numZeroEntries = 0;
 		UInt32 maxEntriesPerHash = 0;
 		std::vector<UInt32> detailedEntriesPerHash;
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		UInt32 totalSize = 0;
 	#endif
 		for (UInt32 i = 0; i < _maxCapacity; ++i)
@@ -340,7 +340,7 @@ public:
 					maxEntriesPerHash = size;
 				if (details)
 					detailedEntriesPerHash.push_back(size);
-	#ifdef DEBUG
+	#ifdef _DEBUG
 				totalSize += size;
 	#endif
 			}
@@ -351,7 +351,7 @@ public:
 					detailedEntriesPerHash.push_back(0);
 			}
 		}
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		poco_assert_dbg(totalSize == numberOfEntries);
 	#endif
 		return HashStatistic(_maxCapacity, numberOfEntries, numZeroEntries, maxEntriesPerHash, detailedEntriesPerHash);
