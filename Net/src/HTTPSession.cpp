@@ -1,7 +1,7 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPSession.cpp#4 $
+// $Id: //poco/1.4/Net/src/HTTPSession.cpp#5 $
 //
 // Library: Net
 // Package: HTTP
@@ -84,13 +84,21 @@ HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 
 HTTPSession::~HTTPSession()
 {
-	if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
+	try
+	{
+		if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 	try
 	{
 		close();
 	}
 	catch (...)
 	{
+		poco_unexpected();
 	}
 	delete _pException;
 }
