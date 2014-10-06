@@ -44,7 +44,7 @@ PCRE code modules. The tables are also #included by the pcretest program, which
 uses macros to change their names from _pcre_xxx to xxxx, thereby avoiding name
 clashes with the library. */
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 #endif /* PCRE_INCLUDED */

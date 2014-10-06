@@ -42,7 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* This file contains a private PCRE function that converts an ordinal
 character value into a UTF8 string. */
 
-#include "config.h"
+#include "pcre_config.h"
 #define COMPILE_PCRE8
 
 #include "pcre_internal.h"

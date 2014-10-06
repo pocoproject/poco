@@ -46,7 +46,7 @@ compilation of dftables.c, in which case the macro DFTABLES is defined. */
 #pragma warning( disable : 4244)  // conversion from 'int' to 'unsigned short', possible loss of data
 
 #ifndef DFTABLES
-#  include "config.h"
+#  include "pcre_config.h"
 #  include "pcre_internal.h"
 #endif
 

@@ -46,7 +46,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* This module contains the external function pcre_compile(), along with
 supporting internal functions that are not used by other modules. */
 
-#include "config.h"
+#include "pcre_config.h"
 
 #define NLBLOCK cd             /* Block containing newline information */
 #define PSSTART start_pattern  /* Field containing processed string start */

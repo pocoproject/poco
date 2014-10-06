@@ -10,7 +10,7 @@ needed. */
 
 #ifndef PCRE_INCLUDED
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 #endif /* PCRE_INCLUDED */

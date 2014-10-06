@@ -2270,7 +2270,7 @@
 					RelativePath=".\src\pcre.h">
 				</File>
 				<File
-					RelativePath=".\src\config.h">
+					RelativePath=".\src\pcre_config.h">
 				</File>
 				<File
 					RelativePath=".\src\pcre_internal.h">

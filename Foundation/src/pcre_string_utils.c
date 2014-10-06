@@ -41,7 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* This module contains internal functions for comparing and finding the length
 of strings for different data item sizes. */
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 #ifndef COMPILE_PCRE8

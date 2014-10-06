@@ -41,7 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* This module contains the external function pcre_version(), which returns a
 string that identifies the PCRE version that is in use. */
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 

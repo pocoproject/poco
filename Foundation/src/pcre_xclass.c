@@ -41,7 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* This module contains an internal function that is used to match an extended
 class. It is used by both pcre_exec() and pcre_def_exec(). */
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 

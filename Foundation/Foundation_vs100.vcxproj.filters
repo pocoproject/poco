@@ -1346,7 +1346,7 @@
     <ClInclude Include="src\pcre.h">
       <Filter>RegularExpression\PCRE Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\config.h">
+    <ClInclude Include="src\pcre_config.h">
       <Filter>RegularExpression\PCRE Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\pcre_internal.h">

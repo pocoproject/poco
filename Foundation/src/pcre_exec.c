@@ -44,7 +44,7 @@ possible. There are also some static supporting functions. */
 #pragma warning( disable : 4127)  // conditional expression is constant
 #pragma warning( disable : 4244)  // conversion from 'int' to 'unsigned short', possible loss of data
 
-#include "config.h"
+#include "pcre_config.h"
 
 #define NLBLOCK md             /* Block containing newline information */
 #define PSSTART start_subject  /* Field containing processed string start */

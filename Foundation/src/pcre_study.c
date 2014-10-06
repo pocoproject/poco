@@ -42,7 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* This module contains the external function pcre_study(), along with local
 supporting functions. */
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 #define SET_BIT(c) start_bits[c/8] |= (1 << (c&7))

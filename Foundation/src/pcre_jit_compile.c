@@ -40,7 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------------
 */
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 #if defined SUPPORT_JIT

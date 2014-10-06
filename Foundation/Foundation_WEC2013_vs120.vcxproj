@@ -1168,7 +1168,7 @@
     <ClInclude Include="include\Poco\SharedLibrary_WIN32.h" />
     <ClInclude Include="include\Poco\SharedLibrary_WIN32U.h" />
     <ClInclude Include="src\pcre.h" />
-    <ClInclude Include="src\config.h" />
+    <ClInclude Include="src\pcre_config.h" />
     <ClInclude Include="src\pcre_internal.h" />
     <ClInclude Include="src\ucp.h" />
     <ClInclude Include="include\Poco\RegularExpression.h" />

@@ -42,7 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 information about a compiled pattern. */
 
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 

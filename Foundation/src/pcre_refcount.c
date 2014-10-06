@@ -45,7 +45,7 @@ pattern data block. This might be helpful in applications where the block is
 shared by different users. */
 
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 

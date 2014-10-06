@@ -42,7 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 strings. */
 
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 

@@ -40,7 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* This module contains the external function pcre_config(). */
 
-#include "config.h"
+#include "pcre_config.h"
 
 /* Keep the original link size. */
 static int real_link_size = LINK_SIZE;

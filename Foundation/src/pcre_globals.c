@@ -52,7 +52,7 @@ a local function is used.
 Also, when compiling for Virtual Pascal, things are done differently, and
 global variables are not used. */
 
-#include "config.h"
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 #if defined _MSC_VER || defined  __SYMBIAN32__
