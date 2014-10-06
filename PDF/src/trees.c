@@ -39,7 +39,7 @@
 
 #include "deflate.h"
 
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
 #  include <ctype.h>
 #endif
 
@@ -167,7 +167,7 @@ local void copy_block     OF((deflate_state *s, charf *buf, unsigned len,
 local void gen_trees_header OF((void));
 #endif
 
-#ifndef DEBUG
+#ifndef ZLIB_DEBUG
 #  define send_code(s, c, tree) send_bits(s, tree[c].Code, tree[c].Len)
    /* Send a code of the given tree. c and tree must not have side effects */
 
@@ -190,7 +190,7 @@ local void gen_trees_header OF((void));
  * Send a value on a given number of bits.
  * IN assertion: length <= 16 and value fits in length bits.
  */
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
 local void send_bits      OF((deflate_state *s, int value, int length));
 
 local void send_bits(s, value, length)
@@ -400,7 +400,7 @@ void _tr_init(s)
     s->bi_buf = 0;
     s->bi_valid = 0;
     s->last_eob_len = 8; /* enough lookahead for inflate */
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
     s->compressed_len = 0L;
     s->bits_sent = 0L;
 #endif
@@ -875,7 +875,7 @@ void _tr_stored_block(s, buf, stored_len, eof)
     int eof;          /* true if this is the last block for a file */
 {
     send_bits(s, (STORED_BLOCK<<1)+eof, 3);  /* send block type */
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
     s->compressed_len = (s->compressed_len + 3 + 7) & (ulg)~7L;
     s->compressed_len += (stored_len + 4) << 3;
 #endif
@@ -898,7 +898,7 @@ void _tr_align(s)
 {
     send_bits(s, STATIC_TREES<<1, 3);
     send_code(s, END_BLOCK, static_ltree);
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
     s->compressed_len += 10L; /* 3 for block type, 7 for EOB */
 #endif
     bi_flush(s);
@@ -910,7 +910,7 @@ void _tr_align(s)
     if (1 + s->last_eob_len + 10 - s->bi_valid < 9) {
         send_bits(s, STATIC_TREES<<1, 3);
         send_code(s, END_BLOCK, static_ltree);
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
         s->compressed_len += 10L;
 #endif
         bi_flush(s);
@@ -991,7 +991,7 @@ void _tr_flush_block(s, buf, stored_len, eof)
 #endif
         send_bits(s, (STATIC_TREES<<1)+eof, 3);
         compress_block(s, (ct_data *)static_ltree, (ct_data *)static_dtree);
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
         s->compressed_len += 3 + s->static_len;
 #endif
     } else {
@@ -999,7 +999,7 @@ void _tr_flush_block(s, buf, stored_len, eof)
         send_all_trees(s, s->l_desc.max_code+1, s->d_desc.max_code+1,
                        max_blindex+1);
         compress_block(s, (ct_data *)s->dyn_ltree, (ct_data *)s->dyn_dtree);
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
         s->compressed_len += 3 + s->opt_len;
 #endif
     }
@@ -1011,7 +1011,7 @@ void _tr_flush_block(s, buf, stored_len, eof)
 
     if (eof) {
         bi_windup(s);
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
         s->compressed_len += 7;  /* align on byte boundary */
 #endif
     }
@@ -1189,7 +1189,7 @@ local void bi_windup(s)
     }
     s->bi_buf = 0;
     s->bi_valid = 0;
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
     s->bits_sent = (s->bits_sent+7) & ~7;
 #endif
 }
@@ -1210,11 +1210,11 @@ local void copy_block(s, buf, len, header)
     if (header) {
         put_short(s, (ush)len);
         put_short(s, (ush)~len);
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
         s->bits_sent += 2*16;
 #endif
     }
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
     s->bits_sent += (ulg)len<<3;
 #endif
     while (len--) {
