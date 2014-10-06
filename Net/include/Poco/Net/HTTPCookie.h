@@ -1,7 +1,7 @@
 //
 // HTTPCookie.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPCookie.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPCookie.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -161,8 +161,10 @@ public:
 		/// Sets the maximum age in seconds for
 		/// the cookie.
 		///
-		/// A value of -1 causes the cookie to
-		/// never expire on the client.
+		/// A value of -1 (default) causes the cookie 
+		/// to become a session cookie, which will
+		/// be deleted when the browser window
+		/// is closed.
 		///
 		/// A value of 0 deletes the cookie on
 		/// the client.
