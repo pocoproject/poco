@@ -95,29 +95,29 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
     <OutDir>..\bin64\</OutDir>
-    <IntDir>obj64\$(Configuration)\</IntDir>
+    <IntDir>obj64\Util\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
     <OutDir>..\bin64\</OutDir>
-    <IntDir>obj64\$(Configuration)\</IntDir>
+    <IntDir>obj64\Util\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
     <OutDir>..\lib64\</OutDir>
-    <IntDir>obj64\$(Configuration)\</IntDir>
+    <IntDir>obj64\Util\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
     <OutDir>..\lib64\</OutDir>
-    <IntDir>obj64\$(Configuration)\</IntDir>
+    <IntDir>obj64\Util\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
     <OutDir>..\lib64\</OutDir>
-    <IntDir>obj64\$(Configuration)\</IntDir>
+    <IntDir>obj64\Util\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
     <OutDir>..\lib64\</OutDir>
-    <IntDir>obj64\$(Configuration)\</IntDir>
+    <IntDir>obj64\Util\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
     <ClCompile>

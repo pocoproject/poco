@@ -37,7 +37,8 @@
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -51,7 +52,8 @@
 				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
 				ImportLibrary="..\lib\mod_pocod.lib"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -102,7 +104,8 @@
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -117,7 +120,8 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\lib\mod_poco.lib"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

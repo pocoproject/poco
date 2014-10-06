@@ -3,7 +3,7 @@
 	Name="WebNotifier"
 	Version="9.00"
 	ProjectType="Visual C++"
-	ProjectGUID="{0F0DF069-83D1-378D-A949-8DF9A883B627}"
+	ProjectGUID="{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}"
 	RootNamespace="WebNotifier"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -33,7 +33,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -46,7 +46,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -55,7 +56,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\shared\WebNotifierd.exe"
 				LinkIncremental="2"
@@ -105,7 +106,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -118,7 +119,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -127,7 +129,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\shared\WebNotifier.exe"
 				LinkIncremental="1"
@@ -178,7 +180,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -191,7 +193,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -200,7 +203,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="iphlpapi.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\WebNotifierd.exe"
 				LinkIncremental="2"
@@ -253,7 +256,7 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -266,7 +269,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -275,7 +279,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="iphlpapi.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\WebNotifier.exe"
 				LinkIncremental="1"
@@ -326,7 +330,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -339,7 +343,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -348,7 +353,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="iphlpapi.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\WebNotifierd.exe"
 				LinkIncremental="2"
@@ -401,7 +406,7 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -414,7 +419,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -423,7 +429,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="iphlpapi.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\WebNotifier.exe"
 				LinkIncremental="1"

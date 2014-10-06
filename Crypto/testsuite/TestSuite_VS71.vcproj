@@ -37,7 +37,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -49,7 +50,8 @@
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\TestSuited.pdb"
 				SubSystem="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -100,7 +102,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -114,7 +117,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -162,7 +166,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -175,7 +180,8 @@
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\static_mt\TestSuited.pdb"
 				SubSystem="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -226,7 +232,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -241,7 +248,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -289,19 +297,21 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmdd.lib WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32mdd.lib ssleay32mdd.lib Crypt32.lib"
+				AdditionalDependencies="CppUnitmdd.lib WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
 				OutputFile="bin\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\static_md\TestSuited.pdb"
 				SubSystem="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -352,12 +362,13 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32md.lib ssleay32md.lib Crypt32.lib"
+				AdditionalDependencies="CppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
 				OutputFile="bin\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -366,7 +377,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

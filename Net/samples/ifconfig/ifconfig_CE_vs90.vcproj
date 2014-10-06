@@ -3,7 +3,7 @@
 	Name="ifconfig"
 	Version="9.00"
 	ProjectType="Visual C++"
-	ProjectGUID="{D853F3D6-0D6F-3E8E-82C7-4216D7A21C4D}"
+	ProjectGUID="{BD3A18C6-22B6-3B10-913B-7A84D1845CA3}"
 	RootNamespace="ifconfig"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -46,7 +46,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -55,13 +56,13 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="ws2.lib iphlpapi.lib"
-				OutputFile="bin\$(PlatformName)\shared\downloadd.exe"
+				OutputFile="bin\$(PlatformName)\shared\ifconfigd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\$(PlatformName)\shared\downloadd.pdb"
+				ProgramDatabaseFile="bin\$(PlatformName)\shared\ifconfigd.pdb"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
 				TargetMachine="0"/>
@@ -118,7 +119,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -127,7 +129,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\shared\ifconfig.exe"
 				LinkIncremental="1"
@@ -191,7 +193,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -200,13 +203,13 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="iphlpapi.lib ws2.lib iphlpapi.lib"
-				OutputFile="bin\$(PlatformName)\static_mt\downloadd.exe"
+				OutputFile="bin\$(PlatformName)\static_mt\ifconfigd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\$(PlatformName)\static_mt\downloadd.pdb"
+				ProgramDatabaseFile="bin\$(PlatformName)\static_mt\ifconfigd.pdb"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
 				TargetMachine="0"/>
@@ -266,7 +269,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -275,7 +279,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="iphlpapi.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\ifconfig.exe"
 				LinkIncremental="1"
@@ -339,7 +343,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -348,13 +353,13 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="iphlpapi.lib ws2.lib iphlpapi.lib"
-				OutputFile="bin\$(PlatformName)\static_md\downloadd.exe"
+				OutputFile="bin\$(PlatformName)\static_md\ifconfigd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\$(PlatformName)\static_md\downloadd.pdb"
+				ProgramDatabaseFile="bin\$(PlatformName)\static_md\ifconfigd.pdb"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
 				TargetMachine="0"/>
@@ -414,7 +419,8 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -423,7 +429,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalOptions="/FORCE:MULTIPLE "
 				AdditionalDependencies="iphlpapi.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\ifconfig.exe"
 				LinkIncremental="1"

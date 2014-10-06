@@ -6,7 +6,7 @@
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{a73d0147-dda8-4fa6-9cb9-90d4d6d3f3c6}</UniqueIdentifier>
+      <UniqueIdentifier>{af72e47f-b1f4-48c9-ab45-4dd532f35f96}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

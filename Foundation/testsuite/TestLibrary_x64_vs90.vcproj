@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			OutputDirectory="obj64\TestLibrary\$(ConfigurationName)"
+			IntermediateDirectory="obj64\TestLibrary\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -100,8 +100,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			OutputDirectory="obj64\TestLibrary\$(ConfigurationName)"
+			IntermediateDirectory="obj64\TestLibrary\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
