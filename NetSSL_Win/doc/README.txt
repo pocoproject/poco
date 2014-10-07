@@ -11,8 +11,11 @@ These are discussed below:
   - Context: The Context constructor uses different arguments. While
     the first argument is the same, all others are different.
     Instead of a certificate file name, a certificate subject name is
-    specified. Certificates are always loaded from a Windows
-    certificate store, not from the filesystem.
+    specified. Certificates can be loaded from a Windows
+    certificate store, or from PKCS #12 files (.pfx, .p12) containing
+    certificate and private key pairs, if the OPT_LOAD_CERT_FROM_FILE
+    is specified. In the latter case, a private key passphrase handler
+    must be setup.
     Please refer to the header file documentation for more information.
     Furthermore, the following Context methods are not available in NetSSL_Win:
     addChainCertificate(), disableStatelessSessionResumption(), 
@@ -25,21 +28,19 @@ These are discussed below:
   - SSLManager: The configuration properties used to configure the SSLManager
     are different from the ones used in NetSSL_OpenSSL. Please see the
     SSLManager header file for more information. 
-    Furthermore, PrivateKeyPassphraseHandler's are not supported. The
-    initializeClient() and initializeServer() methods therefore do not
-    have the PrivateKeyPassphraseHandler argument.
     The isFIPSEnabled() method is not available.
 
-  - X509Certificate: Loading a certificate from a file or stream, as well as saving
-    a certificate is not supported.
+  - X509Certificate: Saving a certificate is not supported.
 
 
 Certificate and Certificate Stores
 ----------------------------------
 
-The test suite and samples expect a certificate with a subject name
-same as the host name to be available from the user's personal certificate
-store. A suitable self-signed certificate can be created using the Windows 
+The test suite and samples expect a certificate/private key file named
+any.pem, located in the current working directory. This can be changed
+by editing the testrunner.xml/TestSuite.xml configuration files.
+Alternatively, a certificate from the Windows certificate store can be used.
+A suitable self-signed certificate can be created using the Windows 
 IIS administration console, then exported to a file, and re-imported into 
 the user's personal store.
 
