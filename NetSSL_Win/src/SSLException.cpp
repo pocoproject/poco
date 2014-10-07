@@ -1,7 +1,7 @@
 //
 // SSLException.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/src/SSLException.cpp#1 $
+// $Id$
 //
 // Library: NetSSL_Win
 // Package: SSLCore
@@ -24,8 +24,10 @@ namespace Net {
 
 POCO_IMPLEMENT_EXCEPTION(SSLException, NetException, "SSL Exception")
 POCO_IMPLEMENT_EXCEPTION(SSLContextException, SSLException, "SSL context exception")
-POCO_IMPLEMENT_EXCEPTION(InvalidCertificateException, SSLException, "Invalid certficate")
-POCO_IMPLEMENT_EXCEPTION(CertificateValidationException, SSLException, "Certificate validation error")
+POCO_IMPLEMENT_EXCEPTION(CertificateException, SSLException, "Certificate exception")
+POCO_IMPLEMENT_EXCEPTION(NoCertificateException, CertificateException, "No certificate")
+POCO_IMPLEMENT_EXCEPTION(InvalidCertificateException, CertificateException, "Invalid certficate")
+POCO_IMPLEMENT_EXCEPTION(CertificateValidationException, CertificateException, "Certificate validation error")
 POCO_IMPLEMENT_EXCEPTION(SSLConnectionUnexpectedlyClosedException, SSLException, "SSL connection unexpectedly closed")
 
 

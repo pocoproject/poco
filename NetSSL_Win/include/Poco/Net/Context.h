@@ -1,9 +1,9 @@
 //
 // Context.h
 //
-// $Id: //poco/1.4/NetSSL_Schannel/include/Poco/Net/Context.h#1 $
+// $Id$
 //
-// Library: NetSSL_Schannel
+// Library: NetSSL_Win
 // Package: SSLCore
 // Module:  Context
 //
@@ -29,6 +29,11 @@
 #include <windows.h>
 #include <wincrypt.h>
 #include <schannel.h>
+#ifndef SECURITY_WIN32
+#define SECURITY_WIN32
+#endif
+#include <security.h>
+#include <sspi.h>
 
 
 namespace Poco {
@@ -108,11 +113,14 @@ public:
 		OPT_USE_STRONG_CRYPTO           = 0x08,
 			/// Disable known weak cryptographic algorithms, cipher suites, and 
 			/// SSL/TLS protocol versions that may be otherwise enabled for better interoperability. 
+		OPT_LOAD_CERT_FROM_FILE         = 0x10,
+			/// Load certificate and private key from a PKCS #12 (.pfx) file, 
+			/// and not from the certificate store.
 		OPT_DEFAULTS                    = OPT_PERFORM_REVOCATION_CHECK | OPT_TRUST_ROOTS_WIN_CERT_STORE | OPT_USE_STRONG_CRYPTO
 	};
 
 	Context(Usage usage,
-		const std::string& certificateName, 
+		const std::string& certificateNameOrPath, 
 		VerificationMode verMode = VERIFY_RELAXED,
 		int options = OPT_DEFAULTS,
 		const std::string& certificateStoreName = CERT_STORE_MY);
@@ -120,16 +128,21 @@ public:
 			/// 
 			///   * usage specifies whether the context is used by a client or server,
 			///     as well as which protocol to use.
-			///   * certificateName specifies the subject name of the certificate to use.
+			///   * certificateNameOrPath specifies either the subject name of the certificate to use,
+			///     or the path of a PKCS #12 file containing the certificate and corresponding private key.
+			///     If a subject name is specified, the certificate must be located in the certificate 
+			///     store specified by certificateStoreName. If a path is given, the OPT_LOAD_CERT_FROM_FILE
+			///     option must be set.
+			///   * verificationMode specifies whether and how peer certificates are validated.
 			///   * options is a combination of Option flags.
 			///   * certificateStoreName specifies the name of the Windows certificate store
-			///   * to use for loading the certificate. You can use predefined constants
-			///     CERT_STORE_MY, CERT_STORE_ROOT, etc.
-			///   * verificationMode specifies whether and how peer certificates are validated.
+			///     to use for loading the certificate. Predefined constants
+			///     CERT_STORE_MY, CERT_STORE_ROOT, etc. can be used.
 			///
-			/// Note: If the private key is protected by a passphrase, a PrivateKeyPassphraseHandler
-			/// must have been setup with the SSLManager, or the SSLManager's PrivateKeyPassphraseRequired
-			/// event must be handled.
+			/// Note: you can use OpenSSL to convert a certificate and private key in PEM format
+			/// into PKCS #12 format required to import into the Context:
+			///
+			///     openssl pkcs12 -export -inkey cert.key -in cert.crt -out cert.pfx 
 
 	~Context();
 		/// Destroys the Context.
@@ -150,17 +163,23 @@ public:
 	int options() const;
 		/// Returns the options flags.
 
-	const std::string& certificateName() const;
-		/// Returns the name of the certificate to use.
-
-	const std::string& certificateStoreName() const;
-		/// Returns the name of the certificate store to use.
-
 	void addTrustedCert(const Poco::Net::X509Certificate& cert);
 		/// Adds the certificate to the trusted certs. Takes ownership of pCert.
 
+	Poco::Net::X509Certificate certificate();
+		/// Loads or imports and returns the certificate specified in the constructor.
+		///
+		/// Throws a NoCertificateException if the certificate cannot
+		/// be found or no certificate name has been provided in the constructor.
+		///
+		/// May also throw a filesystem-related exception if the certificate file
+		/// cannot be found.
+
 	HCERTSTORE certificateStore() const;
 		/// Returns a handle to the certificate store.
+
+	CredHandle& credentials();
+		/// Returns a reference to the Schannel credentials for this Context.
 
 	static const std::string CERT_STORE_MY;
 	static const std::string CERT_STORE_ROOT;
@@ -168,19 +187,31 @@ public:
 	static const std::string CERT_STORE_CA;
 	static const std::string CERT_STORE_USERDS;
 
+protected:
+	void init();
+	void loadCertificate();
+	void importCertificate();
+	void importCertificate(const char* pBuffer, std::size_t size);
+	void acquireSchannelCredentials(CredHandle& credHandle) const;
+	DWORD proto() const;
+
 private:
 	Context(const Context&);
-	Context& operator=(const Context&);
+	Context& operator = (const Context&);
 
 	Usage                      _usage;
 	Context::VerificationMode  _mode;
 	int                        _options;
-	std::string                _certificateName;
-	std::string                _certificateStoreName;
+	std::string                _certNameOrPath;
+	std::string                _certStoreName;
 	HCERTSTORE                 _hMemCertStore;
 	HCERTSTORE                 _hCollectionCertStore;
 	HCERTSTORE                 _hRootCertStore;
-	Poco::FastMutex            _mutex;
+	HCERTSTORE                 _hCertStore;
+	PCCERT_CONTEXT             _pCert;
+	CredHandle                 _hCreds;
+	SecurityFunctionTableW&    _securityFunctions;
+	mutable Poco::FastMutex    _mutex;
 };
 
 
@@ -217,18 +248,6 @@ inline bool Context::isForServerUse() const
 inline bool Context::sessionCacheEnabled() const
 {
 	return false;
-}
-
-
-inline const std::string& Context::certificateName() const
-{
-	return _certificateName;
-}
-
-
-inline const std::string& Context::certificateStoreName() const
-{
-	return _certificateStoreName;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // SSLException.h
 //
-// $Id: //poco/1.4/NetSSL_Win/include/Poco/Net/SSLException.h#1 $
+// $Id$
 //
 // Library: NetSSL_Win
 // Package: SSLCore
@@ -30,8 +30,10 @@ namespace Net {
 
 POCO_DECLARE_EXCEPTION(NetSSL_Win_API, SSLException, NetException)
 POCO_DECLARE_EXCEPTION(NetSSL_Win_API, SSLContextException, SSLException)
-POCO_DECLARE_EXCEPTION(NetSSL_Win_API, InvalidCertificateException, SSLException)
-POCO_DECLARE_EXCEPTION(NetSSL_Win_API, CertificateValidationException, SSLException)
+POCO_DECLARE_EXCEPTION(NetSSL_Win_API, CertificateException, SSLException)
+POCO_DECLARE_EXCEPTION(NetSSL_Win_API, NoCertificateException, CertificateException)
+POCO_DECLARE_EXCEPTION(NetSSL_Win_API, InvalidCertificateException, CertificateException)
+POCO_DECLARE_EXCEPTION(NetSSL_Win_API, CertificateValidationException, CertificateException)
 POCO_DECLARE_EXCEPTION(NetSSL_Win_API, SSLConnectionUnexpectedlyClosedException, SSLException)
 
 

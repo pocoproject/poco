@@ -2,40 +2,40 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="SSLCore">
-      <UniqueIdentifier>{0de4c045-244a-4f3d-bbe0-6752e514e24e}</UniqueIdentifier>
+      <UniqueIdentifier>{878fcba1-5071-4bbc-9808-ba399e5f47b2}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLCore\Header Files">
-      <UniqueIdentifier>{ada49bc2-53fc-485b-af4b-d949b6ab27b6}</UniqueIdentifier>
+      <UniqueIdentifier>{64ad3706-6090-4f59-a7d2-3ad8116fcbba}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLCore\Source Files">
-      <UniqueIdentifier>{737631db-8e42-4fc8-b5a1-cb271ceb3ef1}</UniqueIdentifier>
+      <UniqueIdentifier>{42c9b776-e1b4-4c74-87d5-b16a75951435}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient">
-      <UniqueIdentifier>{199d6a83-c25e-4398-9f16-16957df1ec5c}</UniqueIdentifier>
+      <UniqueIdentifier>{4235c012-9e23-4d54-b8c6-1b08aa3a6a3d}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Header Files">
-      <UniqueIdentifier>{ccfb091f-6c84-4b22-b938-2f6b32e12a87}</UniqueIdentifier>
+      <UniqueIdentifier>{530dbfdf-75df-4fe4-88d9-85d9655dae95}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Source Files">
-      <UniqueIdentifier>{57f513f0-beb5-4f2b-aed9-1f598a8dcc19}</UniqueIdentifier>
+      <UniqueIdentifier>{547c4e14-71d8-4eed-bbf1-ee5322e24d9f}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets">
-      <UniqueIdentifier>{cf0e79e4-80cf-4bf1-af31-e2b85653dfa4}</UniqueIdentifier>
+      <UniqueIdentifier>{70849ccf-117c-4166-beb2-653e442f8c44}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets\Header Files">
-      <UniqueIdentifier>{b0cd62ad-d71b-453a-a44f-3574bd25e1b8}</UniqueIdentifier>
+      <UniqueIdentifier>{797700db-19bc-4dc9-9418-93ab59a55c59}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets\Source Files">
-      <UniqueIdentifier>{c46f75d0-ef5c-4dab-8cc6-5d85eb75868c}</UniqueIdentifier>
+      <UniqueIdentifier>{edb78030-e579-4746-adc6-017d0b853fb2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail">
-      <UniqueIdentifier>{9d2f9d58-7cd4-4d21-b242-99a586ecbb8c}</UniqueIdentifier>
+      <UniqueIdentifier>{78be0b04-6d64-4145-a996-bed7680652df}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail\Header Files">
-      <UniqueIdentifier>{96ed50c7-25e8-488d-a74a-23010163ecb9}</UniqueIdentifier>
+      <UniqueIdentifier>{c6454dbf-ff4f-458e-924f-a47ee413f36f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail\Source Files">
-      <UniqueIdentifier>{eb75171e-737a-49a4-b3ef-4912a3ff35fc}</UniqueIdentifier>
+      <UniqueIdentifier>{6408e594-6faf-4cad-a766-49898fc6bd8b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,7 +60,22 @@
     <ClInclude Include="include\Poco\Net\InvalidCertificateHandler.h">
       <Filter>SSLCore\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\KeyConsoleHandler.h">
+      <Filter>SSLCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\KeyFileHandler.h">
+      <Filter>SSLCore\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Net\NetSSL.h">
+      <Filter>SSLCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\PrivateKeyFactory.h">
+      <Filter>SSLCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\PrivateKeyFactoryMgr.h">
+      <Filter>SSLCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\PrivateKeyPassphraseHandler.h">
       <Filter>SSLCore\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Net\RejectCertificateHandler.h">
@@ -129,6 +144,21 @@
       <Filter>SSLCore\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\InvalidCertificateHandler.cpp">
+      <Filter>SSLCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\KeyConsoleHandler.cpp">
+      <Filter>SSLCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\KeyFileHandler.cpp">
+      <Filter>SSLCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PrivateKeyFactory.cpp">
+      <Filter>SSLCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PrivateKeyFactoryMgr.cpp">
+      <Filter>SSLCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PrivateKeyPassphraseHandler.cpp">
       <Filter>SSLCore\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RejectCertificateHandler.cpp">

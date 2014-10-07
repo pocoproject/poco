@@ -1,9 +1,9 @@
 //
 // SSLManager.h
 //
-// $Id: //poco/1.4/NetSSL_Schannel/include/Poco/Net/SSLManager.h#1 $
+// $Id$
 //
-// Library: NetSSL_Schannel
+// Library: NetSSL_Win
 // Package: SSLCore
 // Module:  SSLManager
 //
@@ -23,8 +23,10 @@
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/VerificationErrorArgs.h"
 #include "Poco/Net/Context.h"
+#include "Poco/Net/PrivateKeyFactoryMgr.h"
 #include "Poco/Net/CertificateHandlerFactoryMgr.h"
 #include "Poco/Net/InvalidCertificateHandler.h"
+#include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/SharedPtr.h"
 #include <wincrypt.h>
@@ -77,6 +79,12 @@ class NetSSL_Win_API SSLManager
 	///            <trustRoots>true|false</trustRoots>
 	///            <useMachineStore>true|false</useMachineStore>
 	///            <useStrongCrypto>true|false</useStrongCrypto>
+	///            <privateKeyPassphraseHandler>
+	///                <name>KeyFileHandler</name>
+	///                <options>
+	///                    <password>s3cr3t</password>
+	///                </options>
+	///            </privateKeyPassphraseHandler>
 	///            <invalidCertificateHandler>
 	///                 <name>ConsoleCertificateHandler</name>
 	///                 <options>
@@ -93,8 +101,9 @@ class NetSSL_Win_API SSLManager
 	/// be prefixed with openSSL.server or openSSL.client. Some properties are only supported
 	/// for servers.
 	/// 
-	///    - certificateName (string): The subject name of the certificate to use. The certificate myst
+	///    - certificateName (string): The subject name of the certificate to use. The certificate must
 	///      be available in the Windows user or machine certificate store.  
+	///    - certificatePath (string): The path of a certificate and private key file in PKCS #12 format.
 	///    - certificateStore (string): The certificate store location to use. 
 	///      Valid values are "MY", "Root", "Trust" or "CA". Defaults to "MY".
 	///    - verificationMode (string): Specifies whether and how peer certificates are validated (see
@@ -107,6 +116,9 @@ class NetSSL_Win_API SSLManager
 	///    - useStrongCrypto (boolean): Disable known weak cryptographic algorithms, cipher suites, and 
 	///      SSL/TLS protocol versions that may be otherwise enabled for better interoperability. 
 	///      Defaults to true.
+	///    - privateKeyPassphraseHandler.name (string): The name of the class (subclass of PrivateKeyPassphraseHandler)
+	///      used for obtaining the passphrase for accessing the private key.
+	///    - privateKeyPassphraseHandler.options.password (string): The password to be used by KeyFileHandler.
 	///    - invalidCertificateHandler.name: The name of the class (subclass of CertificateHandler)
 	///      used for confirming invalid certificates.
 	///    - requireTLSv1 (boolean): Require a TLSv1 connection. 
@@ -114,6 +126,7 @@ class NetSSL_Win_API SSLManager
 	///    - requireTLSv1_2 (boolean): Require a TLSv1.2 connection. Not supported on Windows Embedded Compact.
 {
 public:
+	typedef Poco::SharedPtr<PrivateKeyPassphraseHandler> PrivateKeyPassphraseHandlerPtr;
 	typedef Poco::SharedPtr<InvalidCertificateHandler> InvalidCertificateHandlerPtr;
 
 	Poco::BasicEvent<VerificationErrorArgs>  ServerVerificationError;
@@ -122,10 +135,14 @@ public:
 	Poco::BasicEvent<VerificationErrorArgs>  ClientVerificationError;
 		/// Fired whenever a certificate verification error is detected by the client during a handshake.
 
+	Poco::BasicEvent<std::string> PrivateKeyPassphraseRequired;
+		/// Fired when a encrypted certificate is loaded. Not setting the password
+		/// in the event parameter will result in a failure to load the certificate.
+
 	static SSLManager& instance();
 		/// Returns the instance of the SSLManager singleton.
 
-	void initializeServer(InvalidCertificateHandlerPtr& pCertificateHandler, Context::Ptr pContext);
+	void initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr pCertificateHandler, Context::Ptr pContext);
 		/// Initializes the server side of the SSLManager with a default invalid certificate handler and a default context. If this method
 		/// is never called the SSLmanager will try to initialize its members from an application configuration.
 		///
@@ -140,7 +157,7 @@ public:
 		///     Context::Ptr pContext = new Context(Context::SERVER_USE, "mycert");
 		///     SSLManager::instance().initializeServer(pInvalidCertHandler, pContext);
 
-	void initializeClient(InvalidCertificateHandlerPtr& pCertificateHandler, Context::Ptr ptrContext);
+	void initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr pCertificateHandler, Context::Ptr ptrContext);
 		/// Initializes the client side of the SSLManager with  a default invalid certificate handler and a default context. If this method
 		/// is never called the SSLmanager will try to initialize its members from an application configuration.
 		///
@@ -167,13 +184,25 @@ public:
 		/// Unless initializeClient() has been called, the first call to this method initializes the default Context
 		/// from the application configuration.
 
+	PrivateKeyPassphraseHandlerPtr serverPassphraseHandler();
+		/// Returns the configured passphrase handler of the server. If none is set, the method will create a default one
+		/// from an application configuration.
+
 	InvalidCertificateHandlerPtr serverCertificateHandler();
 		/// Returns an initialized certificate handler (used by the server to verify client cert) which determines how invalid certificates are treated.
 		/// If none is set, it will try to auto-initialize one from an application configuration.
 
+	PrivateKeyPassphraseHandlerPtr clientPassphraseHandler();
+		/// Returns the configured passphrase handler of the client. If none is set, the method will create a default one
+		/// from an application configuration.
+
 	InvalidCertificateHandlerPtr clientCertificateHandler();
 		/// Returns an initialized certificate handler (used by the client to verify server cert) which determines how invalid certificates are treated.
 		/// If none is set, it will try to auto-initialize one from an application configuration.
+
+	PrivateKeyFactoryMgr& privateKeyFactoryMgr();
+		/// Returns the private key factory manager which stores the 
+		/// factories for the different registered passphrase handlers for private keys.
 
 	CertificateHandlerFactoryMgr& certificateHandlerFactoryMgr();
 		/// Returns the CertificateHandlerFactoryMgr which stores the 
@@ -207,6 +236,9 @@ private:
 	void initEvents(bool server);
 		/// Registers delegates at the events according to the configuration.
 
+	void initPassphraseHandler(bool server);
+		/// Inits the passphrase handler.
+
 	void initCertificateHandler(bool server);
 		/// Inits the certificate handler.
 
@@ -216,18 +248,29 @@ private:
 	void unloadSecurityLibrary();
 		/// Unloads the Windows security DLL.
 
+	static Poco::Util::AbstractConfiguration& appConfig();
+		/// Returns the application configuration.
+		///
+		/// Throws a InvalidStateException if not application instance
+		/// is available.
+
 	HMODULE _hSecurityModule;
 	SecurityFunctionTableW _securityFunctions;
 
+	PrivateKeyFactoryMgr           _factoryMgr;
 	CertificateHandlerFactoryMgr   _certHandlerFactoryMgr;
 	Context::Ptr                   _ptrDefaultServerContext;
+	PrivateKeyPassphraseHandlerPtr _ptrServerPassphraseHandler;
 	InvalidCertificateHandlerPtr   _ptrServerCertificateHandler;
 	Context::Ptr                   _ptrDefaultClientContext;
+	PrivateKeyPassphraseHandlerPtr _ptrClientPassphraseHandler;
 	InvalidCertificateHandlerPtr   _ptrClientCertificateHandler;
 	Poco::FastMutex _mutex;
 
 	static const std::string CFG_CERT_NAME;
 	static const std::string VAL_CERT_NAME;
+	static const std::string CFG_CERT_PATH;
+	static const std::string VAL_CERT_PATH;
 	static const std::string CFG_CERT_STORE;
 	static const std::string VAL_CERT_STORE;
 	static const std::string CFG_VER_MODE;
@@ -252,12 +295,19 @@ private:
 
 	friend class Poco::SingletonHolder<SSLManager>;
 	friend class SecureSocketImpl;
+	friend class Context;
 };
 
 
 //
 // inlines
 //
+inline PrivateKeyFactoryMgr& SSLManager::privateKeyFactoryMgr()
+{
+	return _factoryMgr;
+}
+
+
 inline CertificateHandlerFactoryMgr& SSLManager::certificateHandlerFactoryMgr()
 {
 	return _certHandlerFactoryMgr;

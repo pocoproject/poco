@@ -1,9 +1,9 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.4/NetSSL_Schannel/src/Utility.cpp#1 $
+// $Id$
 //
-// Library: NetSSL_Schannel
+// Library: NetSSL_Win
 // Package: SSLCore
 // Module:  Utility
 //

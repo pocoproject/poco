@@ -1,7 +1,7 @@
 //
 // AcceptCertificateHandler.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/src/AcceptCertificateHandler.cpp#1 $
+// $Id$
 //
 // Library: NetSSL_Win
 // Package: SSLCore

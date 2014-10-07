@@ -1,9 +1,15 @@
 <AppConfig>
 	<schannel>
 		<server>
-			<certificateName>${system.nodeName}</certificateName>
+			<certificatePath>any.pfx</certificatePath>
 			<verificationMode>none</verificationMode>
 			<useMachineStore>false</useMachineStore>
+			<privateKeyPassphraseHandler>
+				<name>KeyFileHandler</name>
+				<options>
+					<password>secret</password>
+				</options>
+			</privateKeyPassphraseHandler>
 			<invalidCertificateHandler>
 				<name>AcceptCertificateHandler</name>
 				<options>
@@ -13,6 +19,12 @@
 		<client>
 			<verificationMode>relaxed</verificationMode>
 			<useMachineStore>false</useMachineStore>
+			<privateKeyPassphraseHandler>
+				<name>KeyFileHandler</name>
+				<options>
+					<password>secret</password>
+				</options>
+			</privateKeyPassphraseHandler>
 			<invalidCertificateHandler>
 				<name>AcceptCertificateHandler</name>
 				<options>

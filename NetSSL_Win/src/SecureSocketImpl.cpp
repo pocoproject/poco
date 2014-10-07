@@ -1,9 +1,9 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_Schannel/src/SecureSocketImpl.cpp#1 $
+// $Id$
 //
-// Library: NetSSL_Schannel
+// Library: NetSSL_Win
 // Package: SSLSockets
 // Module:  SecureSocketImpl
 //
@@ -75,9 +75,7 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_pSocket(pSocketImpl),
 	_pContext(pContext),
 	_mode(pContext->isForServerUse() ? MODE_SERVER : MODE_CLIENT),
-	_useMachineStore((pContext->options() & Context::OPT_USE_MACHINE_STORE) != 0),
 	_clientAuthRequired(pContext->verificationMode() >= Context::VERIFY_STRICT),
-	_hCertificateStore(0),
 	_pServerCertificate(0),
 	_pPeerCertificate(0),
 	_hCreds(),
@@ -155,7 +153,6 @@ void SecureSocketImpl::cleanup()
 
 	if (_hCreds.dwLower != 0 && _hCreds.dwUpper != 0)
 	{
-		_securityFunctions.FreeCredentialsHandle(&_hCreds);
 		_hCreds.dwLower = 0;
 		_hCreds.dwUpper = 0;
 	}
@@ -177,12 +174,6 @@ void SecureSocketImpl::cleanup()
 	{
 		CertFreeCertificateContext(_pPeerCertificate);
 		_pPeerCertificate = 0;
-	}
-
-	if (_hCertificateStore)
-	{
-		CertCloseStore(_hCertificateStore, 0);
-		_hCertificateStore = 0;
 	}
 
 	// must release buffers before unloading library
@@ -657,116 +648,22 @@ void SecureSocketImpl::setPeerHostName(const std::string& peerHostName)
 }
 
 
-PCCERT_CONTEXT SecureSocketImpl::loadCertificate(const std::string& certStore, const std::string& certName, bool useMachineStore, bool mustFindCertificate)
+PCCERT_CONTEXT SecureSocketImpl::loadCertificate(bool mustFindCertificate)
 {
-	if (mustFindCertificate && certName.empty())
-		throw SSLException("Certificate required, but no certificate name provided");
-
-	PCCERT_CONTEXT pCert = 0;
-
-	std::wstring wcertStore;
-	Poco::UnicodeConverter::convert(certStore, wcertStore);
-	if (!_hCertificateStore)
+	try
 	{
-		if (useMachineStore)
-			_hCertificateStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, certStore.c_str());
+		Poco::Net::X509Certificate cert = _pContext->certificate();
+		PCCERT_CONTEXT pCert = cert.system();
+		// TODO: avoid use of PCCERT_CONTEXT
+		CertDuplicateCertificateContext(pCert);
+		return pCert;
+	}
+	catch (...)
+	{
+		if (mustFindCertificate)
+			throw;
 		else
-			_hCertificateStore = CertOpenSystemStoreW(0, wcertStore.c_str());
-	}
-	if (!_hCertificateStore)
-	{
-		throw SSLException("Failed to open certificate store", certStore, GetLastError());
-	}
-	if (!certName.empty())
-	{
-		CERT_RDN_ATTR cert_rdn_attr;
-		cert_rdn_attr.pszObjId = szOID_COMMON_NAME;
-		cert_rdn_attr.dwValueType = CERT_RDN_ANY_TYPE;
-		cert_rdn_attr.Value.cbData = (DWORD) certName.size();
-		cert_rdn_attr.Value.pbData = (BYTE *) certName.c_str();
-
-		CERT_RDN cert_rdn;
-		cert_rdn.cRDNAttr = 1;
-		cert_rdn.rgRDNAttr = &cert_rdn_attr;
-
-		pCert = CertFindCertificateInStore(_hCertificateStore, X509_ASN_ENCODING, 0, CERT_FIND_SUBJECT_ATTR, &cert_rdn, NULL);
-		if (!pCert)
-		{
-			// we throw independently of mustFind. If a name is specified we consider it an error
-			// if we don't find the given certificate
-			throw SSLException(Poco::format("Failed to find certificate %s in store %s", certName, certStore));
-		}
-	}
-
-	if (mustFindCertificate && !pCert)
-		throw SSLException(Poco::format("Failed to find certificate %s in store %s", certName, certStore));
-
-	return pCert;
-}
-
-
-void SecureSocketImpl::acquireSchannelContext(Mode mode, PCCERT_CONTEXT pCertContext, CredHandle& outHandle)
-{
-	SCHANNEL_CRED schannelCred;
-	ZeroMemory(&schannelCred, sizeof(schannelCred));
-	schannelCred.dwVersion  = SCHANNEL_CRED_VERSION;
-
-	if (pCertContext != 0)
-	{
-		schannelCred.cCreds = 1; // how many cred are stored in &pCertContext
-		schannelCred.paCred = &pCertContext;
-	}
-
-	schannelCred.grbitEnabledProtocols = proto();
-
-	// Windows NT and Windows Me/98/95: revocation checking not supported via flags
-	if (_pContext->options() & Context::OPT_PERFORM_REVOCATION_CHECK)
-		schannelCred.dwFlags |= SCH_CRED_REVOCATION_CHECK_CHAIN;
-	else
-		schannelCred.dwFlags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK | SCH_CRED_IGNORE_REVOCATION_OFFLINE;
-
-	if (mode == MODE_SERVER)
-	{
-		if (_pContext->verificationMode() == Context::VERIFY_STRICT)
-			schannelCred.dwFlags |= SCH_CRED_NO_SYSTEM_MAPPER;
-
-		if (_pContext->verificationMode() == Context::VERIFY_NONE)
-			schannelCred.dwFlags |= SCH_CRED_MANUAL_CRED_VALIDATION;
-	}
-	else
-	{
-		if (_pContext->verificationMode() == Context::VERIFY_STRICT)
-			schannelCred.dwFlags |= SCH_CRED_NO_DEFAULT_CREDS;
-		else
-			schannelCred.dwFlags |= SCH_CRED_USE_DEFAULT_CREDS;
-
-		if (_pContext->verificationMode() == Context::VERIFY_NONE)
-			schannelCred.dwFlags |= SCH_CRED_MANUAL_CRED_VALIDATION | SCH_CRED_NO_SERVERNAME_CHECK;
-	}
-	
-#if defined(SCH_USE_STRONG_CRYPTO)
-	if (_pContext->options() & Context::OPT_USE_STRONG_CRYPTO)
-		schannelCred.dwFlags |= SCH_USE_STRONG_CRYPTO;
-#endif
-
-	schannelCred.hRootStore = _pContext->certificateStore();
-
-	TimeStamp tsExpiry;
-	tsExpiry.LowPart = tsExpiry.HighPart = 0;
-	SECURITY_STATUS status = _securityFunctions.AcquireCredentialsHandleW(
-										NULL,
-										UNISP_NAME_W,
-										mode == MODE_SERVER ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND, 
-										NULL,
-										&schannelCred,
-										NULL,
-										NULL,
-										&outHandle,
-										&tsExpiry);
-
-	if (status != SEC_E_OK)
-	{
-		throw SSLException("Failed to acquire Schannel credentials", Utility::formatError(status));
+			return 0;
 	}
 }
 
@@ -818,8 +715,8 @@ void SecureSocketImpl::clientConnectVerify()
 
 void SecureSocketImpl::initClientContext()
 {
-	_pServerCertificate = loadCertificate(_pContext->certificateStoreName(), _pContext->certificateName(), _useMachineStore, false);
-	acquireSchannelContext(MODE_CLIENT, _pServerCertificate, _hCreds);
+	_pServerCertificate = loadCertificate(false);
+	_hCreds = _pContext->credentials();
 }
 
 
@@ -1104,8 +1001,8 @@ void SecureSocketImpl::performClientHandshakeLoopIncompleteMessage()
 
 void SecureSocketImpl::initServerContext()
 {
-	_pServerCertificate = loadCertificate(_pContext->certificateStoreName(), _pContext->certificateName(), _useMachineStore, true);
-	acquireSchannelContext(MODE_SERVER, _pServerCertificate, _hCreds);
+	_pServerCertificate = loadCertificate(true);
+	_hCreds = _pContext->credentials();
 }
 
 
@@ -1590,36 +1487,6 @@ LONG SecureSocketImpl::serverDisconnect(PCredHandle phCreds, CtxtHandle *phConte
 	}
 
 	return status;
-}
-
-
-DWORD SecureSocketImpl::proto() const
-{
-	switch (_pContext->usage())
-	{
-	case Context::CLIENT_USE:
-		return SP_PROT_SSL3_CLIENT | SP_PROT_TLS1_CLIENT;
-	case Context::SERVER_USE:
-		return SP_PROT_SSL3_SERVER | SP_PROT_TLS1_SERVER;
-	case Context::TLSV1_CLIENT_USE:
-		return SP_PROT_TLS1_CLIENT;
-	case Context::TLSV1_SERVER_USE:
-		return SP_PROT_TLS1_SERVER;
-#if defined(SP_PROT_TLS1_1)
-	case Context::TLSV1_1_CLIENT_USE:
-		return SP_PROT_TLS1_1_CLIENT;
-	case Context::TLSV1_1_SERVER_USE:
-		return SP_PROT_TLS1_1_SERVER;
-#endif
-#if defined(SP_PROT_TLS1_2)
-	case Context::TLSV1_2_CLIENT_USE:
-		return SP_PROT_TLS1_2_CLIENT;
-	case Context::TLSV1_2_SERVER_USE:
-		return SP_PROT_TLS1_2_SERVER;
-#endif
-	default:
-		throw Poco::InvalidArgumentException("Unsupported SSL/TLS protocol version");
-	}
 }
 
 

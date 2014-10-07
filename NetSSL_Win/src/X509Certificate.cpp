@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.4/Crypto/src/X509Certificate.cpp#1 $
+// $Id$
 //
 // Library: Crypto
 // Package: Certificate
@@ -15,13 +15,18 @@
 
 
 #include "Poco/Net/X509Certificate.h"
+#include "Poco/Net/SSLException.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/String.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/Base64Decoder.h"
+#include "Poco/File.h"
 #include "Poco/FileStream.h"
+#include "Poco/MemoryStream.h"
+#include "Poco/Buffer.h"
 #include "Poco/UnicodeConverter.h"
+#include "Poco/Format.h"
 #include <sstream>
 
 
@@ -29,17 +34,17 @@ namespace Poco {
 namespace Net {
 
 
-X509Certificate::X509Certificate(std::istream& istr):
-	_pCert(0)
-{	
-	load(istr);
-}
-
-
 X509Certificate::X509Certificate(const std::string& path):
 	_pCert(0)
 {
-	load(path);
+	importCertificate(path);
+}
+
+
+X509Certificate::X509Certificate(const std::string& certName, const std::string& certStoreName, bool useMachineStore):
+	_pCert(0)
+{
+	loadCertificate(certName, certStoreName, useMachineStore);
 }
 
 
@@ -95,36 +100,6 @@ void X509Certificate::swap(X509Certificate& cert)
 X509Certificate::~X509Certificate()
 {
 	CertFreeCertificateContext(_pCert);
-}
-
-
-void X509Certificate::load(std::istream& istr)
-{
-	poco_assert (!_pCert);
-		
-	// TODO
-
-	init();
-}
-
-
-void X509Certificate::load(const std::string& path)
-{
-	Poco::FileInputStream istr(path);
-	load(istr);
-}
-
-
-void X509Certificate::save(std::ostream& stream) const
-{
-	// TODO
-}
-
-
-void X509Certificate::save(const std::string& path) const
-{
-	Poco::FileOutputStream ostr(path);
-	save(ostr);
 }
 
 
@@ -250,6 +225,99 @@ void* X509Certificate::nid2oid(NID nid)
 		break;
 	}
 	return const_cast<char*>(result);
+}
+
+
+void X509Certificate::loadCertificate(const std::string& certName, const std::string& certStoreName, bool useMachineStore)
+{
+	std::wstring wcertStore;
+	Poco::UnicodeConverter::convert(certStoreName, wcertStore);
+	HCERTSTORE hCertStore;
+	if (useMachineStore)
+		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, certStoreName.c_str());
+	else
+		hCertStore = CertOpenSystemStoreW(0, wcertStore.c_str());
+
+	if (!hCertStore) throw CertificateException("Failed to open certificate store", certStoreName, GetLastError());
+
+	CERT_RDN_ATTR cert_rdn_attr;
+	cert_rdn_attr.pszObjId = szOID_COMMON_NAME;
+	cert_rdn_attr.dwValueType = CERT_RDN_ANY_TYPE;
+	cert_rdn_attr.Value.cbData = (DWORD) certName.size();
+	cert_rdn_attr.Value.pbData = (BYTE *) certName.c_str();
+
+	CERT_RDN cert_rdn;
+	cert_rdn.cRDNAttr = 1;
+	cert_rdn.rgRDNAttr = &cert_rdn_attr;
+
+	_pCert = CertFindCertificateInStore(hCertStore, X509_ASN_ENCODING, 0, CERT_FIND_SUBJECT_ATTR, &cert_rdn, NULL);
+	if (!_pCert) 
+	{
+		CertCloseStore(hCertStore, 0);
+		throw NoCertificateException(Poco::format("Failed to find certificate %s in store %s", certName, certStoreName));
+	}
+	CertCloseStore(hCertStore, 0);
+}
+
+
+void X509Certificate::importCertificate(const std::string& certPath)
+{
+	Poco::File certFile(certPath);
+	if (!certFile.exists()) throw Poco::FileNotFoundException(certPath);
+	Poco::File::FileSize size = certFile.getSize();
+	if (size > 4096) throw Poco::DataFormatException("certificate file too large", certPath);
+	if (size < 32) throw Poco::DataFormatException("certificate file too small", certPath);
+	Poco::Buffer<char> buffer(static_cast<std::size_t>(size));
+	Poco::FileInputStream istr(certPath);
+	istr.read(buffer.begin(), buffer.size());
+	if (istr.gcount() != size) throw Poco::IOException("error reading certificate file");
+	importCertificate(buffer.begin(), buffer.size());
+}
+
+
+void X509Certificate::importCertificate(const char* pBuffer, std::size_t size)
+{
+	if (std::memcmp(pBuffer, "-----BEGIN CERTIFICATE-----", 27) == 0)
+		importPEMCertificate(pBuffer + 27, size - 27);
+	else
+		importDERCertificate(pBuffer, size);
+}
+
+
+void X509Certificate::importPEMCertificate(const char* pBuffer, std::size_t size)
+{
+	Poco::Buffer<char> derBuffer(size);
+	std::size_t derSize = 0;
+
+	const char* pemBegin = pBuffer;
+	const char* pemEnd = pemBegin + (size - 25);
+	while (pemEnd > pemBegin && std::memcmp(pemEnd, "-----END CERTIFICATE-----", 25) != 0) --pemEnd;
+	if (pemEnd == pemBegin) throw Poco::DataFormatException("Not a valid PEM file - end marker missing");
+
+	Poco::MemoryInputStream istr(pemBegin, pemEnd - pemBegin);
+	Poco::Base64Decoder dec(istr);
+
+	char* derBegin = derBuffer.begin();
+	char* derEnd = derBegin;
+
+	int ch = dec.get();
+	while (ch != -1) 
+	{
+		*derEnd++ = static_cast<char>(ch);
+		ch = dec.get();
+	}
+
+	importDERCertificate(derBegin, derEnd - derBegin);
+}
+
+
+void X509Certificate::importDERCertificate(const char* pBuffer, std::size_t size)
+{
+	_pCert = CertCreateCertificateContext(X509_ASN_ENCODING, reinterpret_cast<const BYTE*>(pBuffer), static_cast<DWORD>(size));
+	if (!_pCert)
+	{
+		throw Poco::DataFormatException("Failed to load certificate from file", GetLastError());
+	}
 }
 
 

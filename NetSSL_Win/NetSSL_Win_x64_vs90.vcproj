@@ -412,7 +412,17 @@
 				<File
 					RelativePath=".\include\Poco\Net\InvalidCertificateHandler.h"/>
 				<File
+					RelativePath=".\include\Poco\Net\KeyConsoleHandler.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\KeyFileHandler.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\NetSSL.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\PrivateKeyFactory.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\PrivateKeyFactoryMgr.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\PrivateKeyPassphraseHandler.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\RejectCertificateHandler.h"/>
 				<File
@@ -442,6 +452,16 @@
 					RelativePath=".\src\Context.cpp"/>
 				<File
 					RelativePath=".\src\InvalidCertificateHandler.cpp"/>
+				<File
+					RelativePath=".\src\KeyConsoleHandler.cpp"/>
+				<File
+					RelativePath=".\src\KeyFileHandler.cpp"/>
+				<File
+					RelativePath=".\src\PrivateKeyFactory.cpp"/>
+				<File
+					RelativePath=".\src\PrivateKeyFactoryMgr.cpp"/>
+				<File
+					RelativePath=".\src\PrivateKeyPassphraseHandler.cpp"/>
 				<File
 					RelativePath=".\src\RejectCertificateHandler.cpp"/>
 				<File

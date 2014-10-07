@@ -1,9 +1,9 @@
 //
 // SecureSocketImpl.h
 //
-// $Id: //poco/1.4/NetSSL_Schannel/include/Poco/Net/SecureSocketImpl.h#1 $
+// $Id$
 //
-// Library: NetSSL_Schannel
+// Library: NetSSL_Win
 // Package: SSLSockets
 // Module:  SecureSocketImpl
 //
@@ -194,8 +194,7 @@ protected:
 	bool loadSecurityLibrary();
 	void initClientContext();
 	void initServerContext();
-	PCCERT_CONTEXT loadCertificate(const std::string& certStore, const std::string& certName, bool useMachineStore, bool mustFindCertificate);
-	void acquireSchannelContext(Mode mode, PCCERT_CONTEXT pCertContext, CredHandle& outHandle);
+	PCCERT_CONTEXT loadCertificate(bool mustFindCertificate);
 	void initCommon();
 	void cleanup();
 	void performClientHandshake();
@@ -217,7 +216,6 @@ protected:
 	void stateConnected();
 	void acceptSSL();
 	void connectSSL(bool completeHandshake);
-	DWORD proto() const;
 	static int lastError();
 	void stateMachine();
 	void setState(State st);
@@ -232,7 +230,6 @@ private:
 	std::string    _peerHostName;
 	bool           _useMachineStore;
 	bool           _clientAuthRequired;
-	HCERTSTORE     _hCertificateStore;
 	PCCERT_CONTEXT _pServerCertificate;
 	PCCERT_CONTEXT _pPeerCertificate;
 

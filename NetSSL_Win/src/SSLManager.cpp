@@ -1,9 +1,9 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.4/NetSSL_Schannel/src/SSLManager.cpp#1 $
+// $Id$
 //
-// Library: NetSSL_Schannel
+// Library: NetSSL_Win
 // Package: SSLCore
 // Module:  SSLManager
 //
@@ -17,11 +17,11 @@
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/Utility.h"
+#include "Poco/Net/PrivateKeyPassphraseHandler.h"
 #include "Poco/SingletonHolder.h"
 #include "Poco/Delegate.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
-#include "Poco/Util/LayeredConfiguration.h"
 
 
 namespace Poco {
@@ -30,6 +30,8 @@ namespace Net {
 
 const std::string SSLManager::CFG_CERT_NAME("certificateName");
 const std::string SSLManager::VAL_CERT_NAME("");
+const std::string SSLManager::CFG_CERT_PATH("certificatePath");
+const std::string SSLManager::VAL_CERT_PATH("");
 const std::string SSLManager::CFG_CERT_STORE("certificateStore");
 const std::string SSLManager::VAL_CERT_STORE("MY");
 const std::string SSLManager::CFG_VER_MODE("verificationMode");
@@ -42,6 +44,8 @@ const std::string SSLManager::CFG_USE_MACHINE_STORE("useMachineStore");
 const bool SSLManager::VAL_USE_MACHINE_STORE(false);
 const std::string SSLManager::CFG_USE_STRONG_CRYPTO("useStrongCrypto");
 const bool SSLManager::VAL_USE_STRONG_CRYPTO(true);
+const std::string SSLManager::CFG_DELEGATE_HANDLER("privateKeyPassphraseHandler.name");
+const std::string SSLManager::VAL_DELEGATE_HANDLER("KeyConsoleHandler");
 const std::string SSLManager::CFG_CERTIFICATE_HANDLER("invalidCertificateHandler.name");
 const std::string SSLManager::VAL_CERTIFICATE_HANDLER("ConsoleCertificateHandler");
 const std::string SSLManager::CFG_SERVER_PREFIX("schannel.server.");
@@ -60,7 +64,15 @@ SSLManager::SSLManager():
 
 SSLManager::~SSLManager()
 {
-	shutdown();
+	try
+	{
+		shutdown();
+
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -76,17 +88,19 @@ SSLManager& SSLManager::instance()
 }
 
 
-void SSLManager::initializeServer(InvalidCertificateHandlerPtr& ptrHandler, Context::Ptr ptrContext)
+void SSLManager::initializeServer(PrivateKeyPassphraseHandlerPtr pPassphraseHandler, InvalidCertificateHandlerPtr pCertHandler, Context::Ptr pContext)
 {
-	_ptrServerCertificateHandler = ptrHandler;
-	_ptrDefaultServerContext     = ptrContext;
+	_ptrServerPassphraseHandler  = pPassphraseHandler;
+	_ptrServerCertificateHandler = pCertHandler;
+	_ptrDefaultServerContext     = pContext;
 }
 
 
-void SSLManager::initializeClient(InvalidCertificateHandlerPtr& ptrHandler, Context::Ptr ptrContext)
+void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr pPassphraseHandler, InvalidCertificateHandlerPtr pCertHandler, Context::Ptr pContext)
 {
-	_ptrClientCertificateHandler = ptrHandler;
-	_ptrDefaultClientContext     = ptrContext;
+	_ptrClientPassphraseHandler  = pPassphraseHandler;
+	_ptrClientCertificateHandler = pCertHandler;
+	_ptrDefaultClientContext     = pContext;
 }
 
 
@@ -109,6 +123,28 @@ Context::Ptr SSLManager::defaultClientContext()
 		initDefaultContext(false);
 
 	return _ptrDefaultClientContext;
+}
+
+
+SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::serverPassphraseHandler()
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
+	if (!_ptrServerPassphraseHandler)
+		initPassphraseHandler(true);
+
+	return _ptrServerPassphraseHandler;
+}
+
+
+SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::clientPassphraseHandler()
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
+	if (!_ptrClientPassphraseHandler)
+		initPassphraseHandler(false);
+
+	return _ptrClientPassphraseHandler;
 }
 
 
@@ -142,8 +178,9 @@ void SSLManager::initDefaultContext(bool server)
 	initEvents(server);
 
 	const std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
-	Poco::Util::LayeredConfiguration& config = Poco::Util::Application::instance().config();
+	Poco::Util::AbstractConfiguration& config = appConfig();
 	std::string certName = config.getString(prefix + CFG_CERT_NAME, VAL_CERT_NAME);
+	std::string certPath = config.getString(prefix + CFG_CERT_PATH, VAL_CERT_PATH);
 	std::string certStore = config.getString(prefix + CFG_CERT_STORE, VAL_CERT_STORE);
 
 	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
@@ -168,6 +205,11 @@ void SSLManager::initDefaultContext(bool server)
 	if (trustRoots) options |= Context::OPT_TRUST_ROOTS_WIN_CERT_STORE;
 	if (useMachineStore) options |= Context::OPT_USE_MACHINE_STORE;
 	if (useStrongCrypto) options |= Context::OPT_USE_STRONG_CRYPTO;
+	if (!certPath.empty()) 
+	{
+		options |= Context::OPT_LOAD_CERT_FROM_FILE;
+		certName = certPath;
+	}
 
 	Context::Usage usage;
 	if (server)
@@ -199,7 +241,35 @@ void SSLManager::initDefaultContext(bool server)
 
 void SSLManager::initEvents(bool server)
 {
+	initPassphraseHandler(server);
 	initCertificateHandler(server);
+}
+
+
+void SSLManager::initPassphraseHandler(bool server)
+{
+	if (server && _ptrServerPassphraseHandler) return;
+	if (!server && _ptrClientPassphraseHandler) return;
+	
+	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
+	Poco::Util::AbstractConfiguration& config = appConfig();
+
+	std::string className(config.getString(prefix + CFG_DELEGATE_HANDLER, VAL_DELEGATE_HANDLER));
+
+	const PrivateKeyFactory* pFactory = 0;
+	if (privateKeyFactoryMgr().hasFactory(className))
+	{
+		pFactory = privateKeyFactoryMgr().getFactory(className);
+	}
+
+	if (pFactory)
+	{
+		if (server)
+			_ptrServerPassphraseHandler = pFactory->create(server);
+		else
+			_ptrClientPassphraseHandler = pFactory->create(server);
+	}
+	else throw Poco::Util::UnknownOptionException(std::string("No passphrase handler known with the name ") + className);
 }
 
 
@@ -209,7 +279,7 @@ void SSLManager::initCertificateHandler(bool server)
 	if (!server && _ptrClientCertificateHandler) return;
 
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
-	Poco::Util::LayeredConfiguration& config = Poco::Util::Application::instance().config();
+	Poco::Util::AbstractConfiguration& config = appConfig();
 
 	std::string className(config.getString(prefix + CFG_CERTIFICATE_HANDLER, VAL_CERTIFICATE_HANDLER));
 
@@ -234,8 +304,10 @@ void SSLManager::shutdown()
 {
 	ClientVerificationError.clear();
 	ServerVerificationError.clear();
+	_ptrServerPassphraseHandler  = 0;
 	_ptrServerCertificateHandler = 0;
 	_ptrDefaultServerContext     = 0;
+	_ptrClientPassphraseHandler  = 0;
 	_ptrClientCertificateHandler = 0;
 	_ptrDefaultClientContext     = 0;
 
@@ -317,6 +389,22 @@ void SSLManager::unloadSecurityLibrary()
 	{
 		FreeLibrary(_hSecurityModule);
 		_hSecurityModule = 0;
+	}
+}
+
+
+Poco::Util::AbstractConfiguration& SSLManager::appConfig()
+{
+	try
+	{
+		return Poco::Util::Application::instance().config();
+	}
+	catch (Poco::NullPointerException&)
+	{
+		throw Poco::IllegalStateException(
+			"An application configuration is required to initialize the Poco::Net::SSLManager, "
+			"but no Poco::Util::Application instance is available."
+		);
 	}
 }
 

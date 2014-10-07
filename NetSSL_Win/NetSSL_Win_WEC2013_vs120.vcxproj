@@ -269,7 +269,12 @@
     <ClInclude Include="include\Poco\Net\HTTPSSessionInstantiator.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSStreamFactory.h"/>
     <ClInclude Include="include\Poco\Net\InvalidCertificateHandler.h"/>
+    <ClInclude Include="include\Poco\Net\KeyConsoleHandler.h"/>
+    <ClInclude Include="include\Poco\Net\KeyFileHandler.h"/>
     <ClInclude Include="include\Poco\Net\NetSSL.h"/>
+    <ClInclude Include="include\Poco\Net\PrivateKeyFactory.h"/>
+    <ClInclude Include="include\Poco\Net\PrivateKeyFactoryMgr.h"/>
+    <ClInclude Include="include\Poco\Net\PrivateKeyPassphraseHandler.h"/>
     <ClInclude Include="include\Poco\Net\RejectCertificateHandler.h"/>
     <ClInclude Include="include\Poco\Net\SecureServerSocket.h"/>
     <ClInclude Include="include\Poco\Net\SecureServerSocketImpl.h"/>
@@ -294,6 +299,11 @@
     <ClCompile Include="src\HTTPSSessionInstantiator.cpp"/>
     <ClCompile Include="src\HTTPSStreamFactory.cpp"/>
     <ClCompile Include="src\InvalidCertificateHandler.cpp"/>
+    <ClCompile Include="src\KeyConsoleHandler.cpp"/>
+    <ClCompile Include="src\KeyFileHandler.cpp"/>
+    <ClCompile Include="src\PrivateKeyFactory.cpp"/>
+    <ClCompile Include="src\PrivateKeyFactoryMgr.cpp"/>
+    <ClCompile Include="src\PrivateKeyPassphraseHandler.cpp"/>
     <ClCompile Include="src\RejectCertificateHandler.cpp"/>
     <ClCompile Include="src\SecureServerSocket.cpp"/>
     <ClCompile Include="src\SecureServerSocketImpl.cpp"/>

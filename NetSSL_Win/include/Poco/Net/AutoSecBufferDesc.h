@@ -1,9 +1,9 @@
 //
 // AutoSecBufferDesc.h
 //
-// $Id: //poco/1.4/NetSSL_Schannel/include/Poco/Net/AutoSecBufferDesc.h#1 $
+// $Id$
 //
-// Library: NetSSL_Schannel
+// Library: NetSSL_Win
 // Package: SSLCore
 // Module:  AutoSecBufferDesc
 //

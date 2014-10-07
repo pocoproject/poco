@@ -282,7 +282,12 @@
     <ClInclude Include="include\Poco\Net\ConsoleCertificateHandler.h"/>
     <ClInclude Include="include\Poco\Net\Context.h"/>
     <ClInclude Include="include\Poco\Net\InvalidCertificateHandler.h"/>
+    <ClInclude Include="include\Poco\Net\KeyConsoleHandler.h"/>
+    <ClInclude Include="include\Poco\Net\KeyFileHandler.h"/>
     <ClInclude Include="include\Poco\Net\NetSSL.h"/>
+    <ClInclude Include="include\Poco\Net\PrivateKeyFactory.h"/>
+    <ClInclude Include="include\Poco\Net\PrivateKeyFactoryMgr.h"/>
+    <ClInclude Include="include\Poco\Net\PrivateKeyPassphraseHandler.h"/>
     <ClInclude Include="include\Poco\Net\RejectCertificateHandler.h"/>
     <ClInclude Include="include\Poco\Net\Session.h"/>
     <ClInclude Include="include\Poco\Net\SSLException.h"/>
@@ -307,6 +312,11 @@
     <ClCompile Include="src\ConsoleCertificateHandler.cpp"/>
     <ClCompile Include="src\Context.cpp"/>
     <ClCompile Include="src\InvalidCertificateHandler.cpp"/>
+    <ClCompile Include="src\KeyConsoleHandler.cpp"/>
+    <ClCompile Include="src\KeyFileHandler.cpp"/>
+    <ClCompile Include="src\PrivateKeyFactory.cpp"/>
+    <ClCompile Include="src\PrivateKeyFactoryMgr.cpp"/>
+    <ClCompile Include="src\PrivateKeyPassphraseHandler.cpp"/>
     <ClCompile Include="src\RejectCertificateHandler.cpp"/>
     <ClCompile Include="src\Session.cpp"/>
     <ClCompile Include="src\SSLException.cpp"/>
