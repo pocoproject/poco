@@ -86,20 +86,16 @@ void insertThousandSep(std::string& str, char thSep, char decSep = '.')
 	/// Used only internally.
 {
 	poco_assert (decSep != thSep);
+	if (str.size() == 0) return;
 
 	std::string::size_type exPos = str.find('e');
+	if (exPos == std::string::npos) exPos = str.find('E');
 	std::string::size_type decPos = str.find(decSep);
 	// there's no rinsert, using forward iterator to go backwards
 	std::string::iterator it = str.end();
 	std::string::iterator begin = str.begin();
-	if (exPos != std::string::npos)
-	{
-		while (it != begin)
-		{
-			--it;
-			if ((*it == 'e') || (*it == 'E')) break;
-		}
-	}
+	if (exPos != std::string::npos) it -= str.size() - exPos;
+
 	if (decPos != std::string::npos)
 	{
 		while (it != begin)
@@ -109,14 +105,19 @@ void insertThousandSep(std::string& str, char thSep, char decSep = '.')
 		}
 	}
 	int thCount = 0;
-	for (; it != begin; --it)
+	if (it == str.end()) --it;
+	for (; it != begin;)
 	{
-		if (!std::isdigit(*it)) continue;
-		if (++thCount == 3)
-		{
-			it = str.insert(it, thSep);
-			thCount = 0;
-		}
+		std::string::iterator pos = it;
+		std::string::value_type chr = *it;
+		std::string::value_type prevChr = *--it;
+
+		if (!std::isdigit(chr)) continue;
+
+		if (++thCount == 3 && std::isdigit(prevChr))
+			it = str.insert(pos, thSep);
+
+		if (thCount == 3) thCount = 0;
 	}
 }
 
