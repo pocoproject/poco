@@ -107,8 +107,10 @@ public:
 		/// Returns true iff the given interval has passed
 		/// since the time denoted by the timestamp.
 
-   TimeVal raw() const;
-      /// Returns the raw time value.
+	TimeVal raw() const;
+		/// Returns the raw time value.
+		///
+		/// Same as epochMicroseconds().
 	
 	static Timestamp fromEpochTime(std::time_t t);
 		/// Creates a timestamp from a std::time_t.
@@ -246,9 +248,10 @@ inline void swap(Timestamp& s1, Timestamp& s2)
 	s1.swap(s2);
 }
 
+
 inline Timestamp::TimeVal Timestamp::raw() const
 {
-   return _ts;
+	return _ts;
 }
 
 
