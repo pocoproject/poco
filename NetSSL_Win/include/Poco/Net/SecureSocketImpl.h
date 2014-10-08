@@ -48,7 +48,7 @@ class NetSSL_Win_API SecureSocketImpl
 public:
 	enum
 	{
-		IO_BUFFER_SIZE = 65536,
+		IO_BUFFER_SIZE    = 65536,
 		TIMEOUT_MILLISECS = 200
 	};
 
@@ -184,13 +184,13 @@ protected:
 
 	void clientConnectVerify();
 	void sendInitialTokenOutBuffer();
-	void serverConnect();
-	bool serverHandshakeLoop(PCtxtHandle phContext, PCredHandle phCred, BOOL requireClientAuth, BOOL fDoInitialRead, BOOL NewContext);
+	void performServerHandshake();
+	bool serverHandshakeLoop(PCtxtHandle phContext, PCredHandle phCred, bool requireClientAuth, bool doInitialRead, bool newContext);
 	void clientVerifyCertificate(PCCERT_CONTEXT pServerCert, const std::string& serverName, DWORD dwCertFlags);
 	void verifyCertificateChainClient(PCCERT_CONTEXT pServerCert, PCCERT_CHAIN_CONTEXT pChainContext);
 	void serverVerifyCertificate(PCCERT_CONTEXT pPeerCert, DWORD dwCertFlags);
-	LONG serverDisconnect(PCredHandle phCreds, CtxtHandle *phContext);
-	LONG clientDisconnect(PCredHandle phCreds, CtxtHandle *phContext);
+	LONG serverDisconnect(PCredHandle phCreds, CtxtHandle* phContext);
+	LONG clientDisconnect(PCredHandle phCreds, CtxtHandle* phContext);
 	bool loadSecurityLibrary();
 	void initClientContext();
 	void initServerContext();
@@ -216,6 +216,7 @@ protected:
 	void stateConnected();
 	void acceptSSL();
 	void connectSSL(bool completeHandshake);
+	void completeHandshake();
 	static int lastError();
 	void stateMachine();
 	void setState(State st);
@@ -250,16 +251,15 @@ private:
 	SecPkgContext_StreamSizes _streamSizes;
 	AutoSecBufferDesc<1> _outSecBuffer;
 	AutoSecBufferDesc<2> _inSecBuffer;
-	Poco::Buffer<UCHAR> _ioCharBuffer;
 	Poco::SharedPtr<Poco::Buffer<BYTE> > _pSendBuffer;
 	SecBuffer _extraSecBuffer;
 	bool _doReadFirst;
 	DWORD _bytesRead;
-	DWORD _bytesReadSum;
 	SECURITY_STATUS _securityStatus;
 	State _state;
 	DWORD _outFlags;
 	std::string _hostName;
+	bool _needHandshake;
 
 	friend class SecureStreamSocketImpl;
 	friend class StateMachine;
