@@ -293,13 +293,21 @@ void HTTPSClientSessionTest::testInterop()
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/public/poco/NetSSL.txt");
 	s.sendRequest(request);
 	Poco::Net::X509Certificate cert = s.serverCertificate();
+
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
 	assert (str == "This is a test file for NetSSL.\n");
-	assert (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
+
+	std::string commonName;
+	std::set<std::string> domainNames;
+	cert.extractNames(commonName, domainNames);
+
+	assert (commonName == "secure.appinf.com" || commonName == "*.appinf.com");
+	assert (domainNames.find("appinf.com") != domainNames.end() 
+		 || domainNames.find("*.appinf.com") != domainNames.end());
 }
 
 

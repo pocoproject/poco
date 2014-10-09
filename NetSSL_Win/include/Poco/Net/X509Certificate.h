@@ -123,6 +123,25 @@ public:
 		/// Returns true if verification against the issuer certificate
 		/// was successful, false otherwise.
 
+	bool verify(const std::string& hostName) const;
+		/// Verifies the validity of the certificate against the host name.
+		///
+		/// For this check to be successful, the certificate must contain
+		/// a domain name that matches the domain name
+		/// of the host.
+		/// 
+		/// Returns true if verification succeeded, or false otherwise.
+		
+	static bool verify(const Poco::Net::X509Certificate& cert, const std::string& hostName);
+		/// Verifies the validity of the certificate against the host name.
+		///
+		/// For this check to be successful, the certificate must contain
+		/// a domain name that matches the domain name
+		/// of the host.
+		///
+		/// Returns true if verification succeeded, or false otherwise.
+		
+
 	const PCCERT_CONTEXT system() const;
 		/// Returns the underlying WinCrypt certificate.
 
@@ -138,6 +157,9 @@ protected:
 	void importCertificate(const char* pBuffer, std::size_t size);
 	void importPEMCertificate(const char* pBuffer, std::size_t size);
 	void importDERCertificate(const char* pBuffer, std::size_t size);
+
+	static bool containsWildcards(const std::string& commonName);
+	static bool matchWildcard(const std::string& alias, const std::string& hostName);
 
 private:
 	enum

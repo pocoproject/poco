@@ -27,7 +27,8 @@
 #include "Poco/Buffer.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Format.h"
-#include <sstream>
+#include "Poco/RegularExpression.h"
+#include "Poco/Net/DNS.h"
 
 
 namespace Poco {
@@ -142,8 +143,53 @@ std::string X509Certificate::subjectName(NID nid) const
 void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
 {
 	domainNames.clear(); 
-	// TODO: extract subject alternative names 
 	cmnName = commonName();
+	PCERT_EXTENSION pExt = _pCert->pCertInfo->rgExtension;
+	for (int i = 0; i < _pCert->pCertInfo->cExtension; i++, pExt++)
+	{
+		if (std::strcmp(pExt->pszObjId, szOID_SUBJECT_ALT_NAME2) == 0)
+		{
+			DWORD flags(0);
+#if defined(CRYPT_DECODE_ENABLE_PUNYCODE_FLAG)
+			flags |= CRYPT_DECODE_ENABLE_PUNYCODE_FLAG;
+#endif
+			Poco::Buffer<char> buffer(256);
+			DWORD bufferSize = buffer.sizeBytes();
+			BOOL rc = CryptDecodeObjectEx(
+					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 
+					pExt->pszObjId,
+					pExt->Value.pbData,
+					pExt->Value.cbData,
+					flags,
+					0,
+					buffer.begin(),
+					&bufferSize);
+			if (!rc && GetLastError() == ERROR_MORE_DATA)
+			{
+				buffer.resize(bufferSize);
+				rc = CryptDecodeObjectEx(
+					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 
+					pExt->pszObjId,
+					pExt->Value.pbData,
+					pExt->Value.cbData,
+					flags,
+					0,
+					buffer.begin(),
+					&bufferSize);
+			}
+			if (rc)
+			{
+				PCERT_ALT_NAME_INFO pNameInfo = reinterpret_cast<PCERT_ALT_NAME_INFO>(buffer.begin());
+				for (int i = 0; i < pNameInfo->cAltEntry; i++)
+				{
+					std::wstring waltName(pNameInfo->rgAltEntry->pwszDNSName);
+					std::string altName;
+					Poco::UnicodeConverter::toUTF8(waltName, altName);
+					domainNames.insert(altName);
+				}
+			}
+		}
+	}
 	if (!cmnName.empty() && domainNames.empty())
 	{
 		domainNames.insert(cmnName);
@@ -167,32 +213,69 @@ Poco::DateTime X509Certificate::expiresOn() const
 
 bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 {
-	HCERTSTORE hCertStore = CertOpenSystemStoreW(NULL, L"CA");
-	if (!hCertStore) throw Poco::SystemException("Cannot open CA store");
-	// TODO
-	try
+	class CertStoreHandle
 	{
-		PCCERT_CONTEXT pIssuer = 0;
-		do
+	public:
+		CertStoreHandle(HCERTSTORE hStore):
+			_hStore(hStore)
 		{
-			DWORD flags = CERT_STORE_REVOCATION_FLAG | CERT_STORE_SIGNATURE_FLAG | CERT_STORE_TIME_VALIDITY_FLAG;
-			pIssuer = CertGetIssuerCertificateFromStore(hCertStore, _pCert, 0, &flags);
-			if (pIssuer)
-			{
-				X509Certificate issuer(pIssuer);
-				if (flags & CERT_STORE_NO_CRL_FLAG)
-					flags &= ~(CERT_STORE_NO_CRL_FLAG | CERT_STORE_REVOCATION_FLAG);
-				if (flags) 
-					break;
-			}
-			else break;
-		} 
-		while (pIssuer);
-	}
-	catch (...)
+		}
+
+		~CertStoreHandle()
+		{
+			if (_hStore) CertCloseStore(_hStore, 0);
+		}
+
+		HCERTSTORE handle() const
+		{
+			return _hStore;
+		}
+
+	private:
+		HCERTSTORE _hStore;
+	};
+
+	CertStoreHandle caStore(CertOpenSystemStoreW(0, L"CA"));
+	CertStoreHandle rootStore(CertOpenSystemStoreW(0, L"ROOT"));
+
+	bool result = false;
+	PCCERT_CONTEXT pIssuer;
+	PCCERT_CONTEXT pIssued = _pCert;
+	do
 	{
-	}
-	return false;
+		DWORD flags = CERT_STORE_REVOCATION_FLAG | CERT_STORE_SIGNATURE_FLAG | CERT_STORE_TIME_VALIDITY_FLAG;
+		pIssuer = 0;
+		if (caStore.handle())
+		{
+			pIssuer = CertGetIssuerCertificateFromStore(caStore.handle(), pIssued, 0, &flags);
+		}
+		if (!pIssuer && rootStore.handle())
+		{
+			pIssuer = CertGetIssuerCertificateFromStore(rootStore.handle(), pIssued, 0, &flags);
+		}
+		if (pIssuer)
+		{
+			X509Certificate issuer(pIssuer);
+			if (flags & CERT_STORE_NO_CRL_FLAG)
+				flags &= ~(CERT_STORE_NO_CRL_FLAG | CERT_STORE_REVOCATION_FLAG);
+			if (flags) 
+				break;
+			if (CertCompareCertificate(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, issuerCertificate.system()->pCertInfo, issuer.system()->pCertInfo))
+			{
+				result = true;
+				break;
+			}
+			if (CertCompareCertificate(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, pIssuer->pCertInfo, pIssued->pCertInfo))
+			{
+				// reached self-signed certificate
+				break;
+			}
+		}
+		else break;
+	} 
+	while (pIssuer);
+
+	return result;
 }
 
 
@@ -318,6 +401,88 @@ void X509Certificate::importDERCertificate(const char* pBuffer, std::size_t size
 	{
 		throw Poco::DataFormatException("Failed to load certificate from file", GetLastError());
 	}
+}
+
+
+bool X509Certificate::verify(const std::string& hostName) const
+{
+	return verify(*this, hostName);
+}
+
+
+bool X509Certificate::verify(const Poco::Net::X509Certificate& certificate, const std::string& hostName)
+{		
+	std::string commonName;
+	std::set<std::string> dnsNames;
+	certificate.extractNames(commonName, dnsNames);
+	if (!commonName.empty()) dnsNames.insert(commonName);
+	bool ok = (dnsNames.find(hostName) != dnsNames.end());
+	if (!ok)
+	{
+		for (std::set<std::string>::const_iterator it = dnsNames.begin(); !ok && it != dnsNames.end(); ++it)
+		{
+			try
+			{
+				// two cases: strData contains wildcards or not
+				if (containsWildcards(*it))
+				{
+					// a compare by IPAddress is not possible with wildcards
+					// only allow compare by name
+					ok = matchWildcard(*it, hostName);
+				}
+				else
+				{
+					// it depends on hostName if we compare by IP or by alias
+					IPAddress ip;
+					if (IPAddress::tryParse(hostName, ip))
+					{
+						// compare by IP
+						const HostEntry& heData = DNS::resolve(*it);
+						const HostEntry::AddressList& addr = heData.addresses();
+						HostEntry::AddressList::const_iterator it = addr.begin();
+						HostEntry::AddressList::const_iterator itEnd = addr.end();
+						for (; it != itEnd && !ok; ++it)
+						{
+							ok = (*it == ip);
+						}
+					}
+					else
+					{
+						ok = Poco::icompare(*it, hostName) == 0;
+					}
+				}
+			}
+			catch (NoAddressFoundException&)
+			{
+			}
+			catch (HostNotFoundException&)
+			{
+			}
+		}
+	}
+	return ok;
+}
+
+
+bool X509Certificate::containsWildcards(const std::string& commonName)
+{
+	return (commonName.find('*') != std::string::npos || commonName.find('?') != std::string::npos);
+}
+
+
+bool X509Certificate::matchWildcard(const std::string& wildcard, const std::string& hostName)
+{
+	// fix wildcards
+	std::string wildcardExpr("^");
+	wildcardExpr += Poco::replace(wildcard, ".", "\\.");
+	Poco::replaceInPlace(wildcardExpr, "*", ".*");
+	Poco::replaceInPlace(wildcardExpr, "..*", ".*");
+	Poco::replaceInPlace(wildcardExpr, "?", ".?");
+	Poco::replaceInPlace(wildcardExpr, "..?", ".?");
+	wildcardExpr += "$";
+
+	Poco::RegularExpression expr(wildcardExpr, Poco::RegularExpression::RE_CASELESS);
+	return expr.match(hostName);
 }
 
 

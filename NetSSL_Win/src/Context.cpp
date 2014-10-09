@@ -48,6 +48,7 @@ Context::Context(Usage usage,
 	_usage(usage),
 	_mode(verMode),
 	_options(options),
+	_extendedCertificateVerification(true),
 	_certNameOrPath(certNameOrPath),
 	_certStoreName(certStore),
 	_hMemCertStore(0),
@@ -123,6 +124,12 @@ void Context::init()
 		if (!CertAddStoreToCollection(_hCollectionCertStore, _hRootCertStore, CERT_PHYSICAL_STORE_ADD_ENABLE_FLAG, 1))
 			throw SSLException("Failed to add root certificate store to collection store", GetLastError());
 	}
+}
+
+
+void Context::enableExtendedCertificateVerification(bool flag)
+{
+	_extendedCertificateVerification = flag;
 }
 
 
@@ -278,7 +285,7 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 
 	if (isForServerUse())
 	{
-		if (_mode == Context::VERIFY_STRICT)
+		if (_mode >= Context::VERIFY_STRICT)
 			schannelCred.dwFlags |= SCH_CRED_NO_SYSTEM_MAPPER;
 
 		if (_mode == Context::VERIFY_NONE)
@@ -286,13 +293,16 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 	}
 	else
 	{
-		if (_mode == Context::VERIFY_STRICT)
+		if (_mode >= Context::VERIFY_STRICT)
 			schannelCred.dwFlags |= SCH_CRED_NO_DEFAULT_CREDS;
 		else
 			schannelCred.dwFlags |= SCH_CRED_USE_DEFAULT_CREDS;
 
 		if (_mode == Context::VERIFY_NONE)
 			schannelCred.dwFlags |= SCH_CRED_MANUAL_CRED_VALIDATION | SCH_CRED_NO_SERVERNAME_CHECK;
+
+		if (!_extendedCertificateVerification)
+			schannelCred.dwFlags |= SCH_CRED_NO_SERVERNAME_CHECK;
 	}
 	
 #if defined(SCH_USE_STRONG_CRYPTO)

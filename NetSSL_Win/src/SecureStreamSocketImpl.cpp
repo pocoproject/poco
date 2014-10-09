@@ -142,7 +142,7 @@ void SecureStreamSocketImpl::sendUrgent(unsigned char data)
 
 int SecureStreamSocketImpl::available()
 {
-	return 0; // TODO _impl.available();
+	return _impl.available();
 }
 
 
@@ -198,22 +198,19 @@ bool SecureStreamSocketImpl::getLazyHandshake() const
 
 void SecureStreamSocketImpl::verifyPeerCertificate()
 {
-	// TODO
-	// _impl.verifyPeerCertificate();
+	_impl.verifyPeerCertificate();
 }
 
 
 void SecureStreamSocketImpl::verifyPeerCertificate(const std::string& hostName)
 {
-	// TODO
-	// _impl.verifyPeerCertificate(hostName);
+	_impl.verifyPeerCertificate(hostName);
 }
 
 
 int SecureStreamSocketImpl::completeHandshake()
 {
-	// TODO
-	// return _impl.completeHandshake();
+	_impl.completeHandshake();
 	return 0;
 }
 

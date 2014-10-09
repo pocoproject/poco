@@ -204,7 +204,8 @@ void HTTPSServerTest::testIdentityRequestKeepAlive()
 	assert (response.getContentLength() == body.size());
 	assert (response.getContentType() == "text/plain");
 	assert (!response.getKeepAlive());
-	assert (rbody == body);}
+	assert (rbody == body);
+}
 
 
 void HTTPSServerTest::testChunkedRequestKeepAlive()

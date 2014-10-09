@@ -25,7 +25,6 @@
 #include "Poco/Net/Context.h"
 #include "Poco/Net/AutoSecBufferDesc.h"
 #include "Poco/Net/X509Certificate.h"
-#include "Poco/SharedPtr.h"
 #include "Poco/Buffer.h"
 #include <winsock2.h>
 #include <windows.h>
@@ -46,31 +45,10 @@ class NetSSL_Win_API SecureSocketImpl
 	/// The SocketImpl for SecureStreamSocket.
 {
 public:
-	enum
-	{
-		IO_BUFFER_SIZE    = 65536,
-		TIMEOUT_MILLISECS = 200
-	};
-
 	enum Mode
 	{
 		MODE_CLIENT,
 		MODE_SERVER
-	};
-	
-	enum State
-	{
-		ST_INITIAL = 0,
-		ST_CONNECTING,
-		ST_CLIENTHANDSHAKESTART,
-		ST_CLIENTHANDSHAKECONDREAD,
-		ST_CLIENTHANDSHAKEINCOMPLETE,
-		ST_CLIENTHANDSHAKEOK,
-		ST_CLIENTHANDSHAKEEXTERROR,
-		ST_CLIENTHANDSHAKECONTINUE,
-		ST_VERIFY,
-		ST_DONE,
-		ST_ERROR
 	};
 
 	SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext);
@@ -160,8 +138,14 @@ public:
 	const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
 
-	State getState() const;
-		/// Returns the state of the socket
+	void verifyPeerCertificate();
+		/// Performs post-connect (or post-accept) peer certificate validation,
+		/// using the peer host name set with setPeerHostName(), or the peer's
+		/// IP address string if no peer host name has been set.
+
+	void verifyPeerCertificate(const std::string& hostName);
+		/// Performs post-connect (or post-accept) peer certificate validation
+		/// using the given peer host name.
 
 	Context::Ptr context() const;
 		/// Returns the Context.
@@ -172,23 +156,40 @@ public:
 	poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.
 
+	int available() const;
+		/// Returns the number of bytes available in the buffer.
+
 protected:
+	enum
+	{
+		IO_BUFFER_SIZE    = 32768,
+		TIMEOUT_MILLISECS = 200
+	};
+
+	enum State
+	{
+		ST_INITIAL = 0,
+		ST_CONNECTING,
+		ST_CLIENTHANDSHAKESTART,
+		ST_CLIENTHANDSHAKECONDREAD,
+		ST_CLIENTHANDSHAKEINCOMPLETE,
+		ST_CLIENTHANDSHAKEOK,
+		ST_CLIENTHANDSHAKEEXTERROR,
+		ST_CLIENTHANDSHAKECONTINUE,
+		ST_VERIFY,
+		ST_DONE,
+		ST_ERROR
+	};
+
 	int sendRawBytes(const void* buffer, int length, int flags = 0);
-		/// Sends the data in clearText
-
 	int receiveRawBytes(void* buffer, int length, int flags = 0);
-		/// Receives raw data from the socket and stores it
-		/// in buffer. Up to length bytes are received.
-		///
-		/// Returns the number of bytes received.
-
 	void clientConnectVerify();
 	void sendInitialTokenOutBuffer();
 	void performServerHandshake();
 	bool serverHandshakeLoop(PCtxtHandle phContext, PCredHandle phCred, bool requireClientAuth, bool doInitialRead, bool newContext);
-	void clientVerifyCertificate(PCCERT_CONTEXT pServerCert, const std::string& serverName, DWORD dwCertFlags);
+	void clientVerifyCertificate(const std::string& hostName);
 	void verifyCertificateChainClient(PCCERT_CONTEXT pServerCert, PCCERT_CHAIN_CONTEXT pChainContext);
-	void serverVerifyCertificate(PCCERT_CONTEXT pPeerCert, DWORD dwCertFlags);
+	void serverVerifyCertificate();
 	LONG serverDisconnect(PCredHandle phCreds, CtxtHandle* phContext);
 	LONG clientDisconnect(PCredHandle phCreds, CtxtHandle* phContext);
 	bool loadSecurityLibrary();
@@ -201,8 +202,8 @@ protected:
 	void performInitialClientHandshake();
 	SECURITY_STATUS performClientHandshakeLoop();
 	void performClientHandshakeLoopIncompleteMessage();
-	void performClientHandshakeLoopCondRead();
-	void performClientHandshakeLoopRead();
+	void performClientHandshakeLoopCondReceive();
+	void performClientHandshakeLoopReceive();
 	void performClientHandshakeLoopOK();
 	void performClientHandshakeLoopInit();
 	void performClientHandshakeExtraBuffer();
@@ -219,7 +220,9 @@ protected:
 	void completeHandshake();
 	static int lastError();
 	void stateMachine();
+	State getState() const;
 	void setState(State st);
+	static bool isLocalHost(const std::string& hostName);
 
 private:
 	SecureSocketImpl(const SecureSocketImpl&);
@@ -231,34 +234,30 @@ private:
 	std::string    _peerHostName;
 	bool           _useMachineStore;
 	bool           _clientAuthRequired;
-	PCCERT_CONTEXT _pServerCertificate;
+
+	SecurityFunctionTableW& _securityFunctions;
+
+	PCCERT_CONTEXT _pOwnCertificate;
 	PCCERT_CONTEXT _pPeerCertificate;
 
 	CredHandle _hCreds;
 	CtxtHandle _hContext;
-	DWORD      _clientFlags;
-	DWORD      _serverFlags;
+	DWORD      _contextFlags;
 
-	SecurityFunctionTableW& _securityFunctions;
-
-	BYTE* _pReceiveBuffer;
-	DWORD _receiveBufferSize;
-
-	BYTE* _pIOBuffer;
-	DWORD _ioBufferOffset;
+	Poco::Buffer<BYTE> _overflowBuffer;
+	Poco::Buffer<BYTE> _sendBuffer;
+	Poco::Buffer<BYTE> _recvBuffer;
+	DWORD _recvBufferOffset;
 	DWORD _ioBufferSize;
 
 	SecPkgContext_StreamSizes _streamSizes;
 	AutoSecBufferDesc<1> _outSecBuffer;
 	AutoSecBufferDesc<2> _inSecBuffer;
-	Poco::SharedPtr<Poco::Buffer<BYTE> > _pSendBuffer;
 	SecBuffer _extraSecBuffer;
-	bool _doReadFirst;
-	DWORD _bytesRead;
 	SECURITY_STATUS _securityStatus;
 	State _state;
 	DWORD _outFlags;
-	std::string _hostName;
+	bool _needData;
 	bool _needHandshake;
 
 	friend class SecureStreamSocketImpl;

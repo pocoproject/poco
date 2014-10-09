@@ -93,12 +93,9 @@ public:
 			///
 			/// Client: Same as VERIFY_RELAXED. 
 
-		VERIFY_ONCE    = 3
-			/// Server: Only request a client certificate on the initial 
-			/// TLS/SSL handshake. Do not ask for a client certificate 
-			/// again in case of a renegotiation.
-			///
-			/// Client: Same as VERIFY_RELAXED.	
+		VERIFY_ONCE    = 1
+			/// Same as VERIFY_RELAXED (provided for interface compatibility with 
+			/// the OpenSSL implementation.
 	};
 
 	enum Options
@@ -160,6 +157,16 @@ public:
 	bool sessionCacheEnabled() const;
 		/// Returns true iff the session cache is enabled.
 
+	void enableExtendedCertificateVerification(bool flag = true);
+		/// Enable or disable the automatic post-connection
+		/// extended certificate verification.
+		///
+		/// See X509Certificate::verify() for more information.
+		
+	bool extendedCertificateVerificationEnabled() const;
+		/// Returns true iff automatic extended certificate 
+		/// verification is enabled.
+
 	int options() const;
 		/// Returns the options flags.
 
@@ -202,6 +209,7 @@ private:
 	Usage                      _usage;
 	Context::VerificationMode  _mode;
 	int                        _options;
+	bool                       _extendedCertificateVerification;
 	std::string                _certNameOrPath;
 	std::string                _certStoreName;
 	HCERTSTORE                 _hMemCertStore;
@@ -245,9 +253,16 @@ inline bool Context::isForServerUse() const
 }
 
 
+inline bool Context::extendedCertificateVerificationEnabled() const
+{
+	return _extendedCertificateVerification;
+}
+
+
 inline bool Context::sessionCacheEnabled() const
 {
-	return false;
+	return true;
+		/// Session cache is always enabled with Schannel.
 }
 
 
