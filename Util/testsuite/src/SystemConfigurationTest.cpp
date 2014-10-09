@@ -84,7 +84,7 @@ void SystemConfigurationTest::testKeys()
 #if defined(POCO_VXWORKS)
 	assert (keys.size() == 10);
 #else
-	assert (keys.size() == 11);
+	assert (keys.size() == 16);
 #endif
 	assert (std::find(keys.begin(), keys.end(), "osName") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "osVersion") != keys.end());

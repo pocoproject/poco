@@ -569,9 +569,39 @@ std::string Path::home()
 }
 
 
+std::string Path::configHome()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	return PathImpl::configHomeImpl();
+#else
+	return PathImpl::homeImpl();
+#endif
+}
+
+	
+std::string Path::dataHome()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	return PathImpl::dataHomeImpl();
+#else
+	return PathImpl::homeImpl();
+#endif
+}
+
+	
+std::string Path::tempHome()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	return PathImpl::tempHomeImpl();
+#else
+	return PathImpl::tempImpl();
+#endif
+}
+
+	
 std::string Path::cacheHome()
 {
-#if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_UNIX)
 	return PathImpl::cacheHomeImpl();
 #else
 	return PathImpl::homeImpl();
@@ -584,6 +614,15 @@ std::string Path::temp()
 	return PathImpl::tempImpl();
 }
 
+
+std::string Path::config()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	return PathImpl::configImpl();
+#else
+	return PathImpl::currentImpl();
+#endif
+}
 
 std::string Path::null()
 {

@@ -80,7 +80,9 @@ private:
 	static const std::string CONFIGHOMEDIR;
 	static const std::string CACHEHOMEDIR;
 	static const std::string DATAHOMEDIR;
+	static const std::string TEMPHOMEDIR;
 	static const std::string TEMPDIR;
+	static const std::string CONFIGDIR;
 	static const std::string DATETIME;
 #if !defined(POCO_VXWORKS)
 	static const std::string PID;
