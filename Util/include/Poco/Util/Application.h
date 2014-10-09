@@ -369,7 +369,6 @@ private:
 	void getApplicationPath(Poco::Path& path) const;
 	void processOptions();
 	bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
-	bool findAppConfigFile(const Path& basePath,const std::string& appName, const std::string& extension, Poco::Path& path) const;
 
 	typedef Poco::AutoPtr<LayeredConfiguration> ConfigPtr;
 
