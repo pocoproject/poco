@@ -76,6 +76,58 @@ std::string PathImpl::homeImpl()
 }
 
 
+std::string PathImpl::configHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::homeImpl();
+#else
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') path.append(".config/");
+	return path;
+#endif
+}
+
+
+std::string PathImpl::dataHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::homeImpl();
+#else
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') path.append(".local/share/");
+	return path;
+#endif
+}
+
+
+std::string PathImpl::cacheHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::tempImpl();
+#else
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') path.append(".cache/");
+	return path;
+#endif
+}
+
+
+std::string PathImpl::tempHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::tempImpl();
+#else
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') path.append(".local/tmp/");
+	return path;
+#endif
+}
+
+
 std::string PathImpl::tempImpl()
 {
 	std::string path;
@@ -90,6 +142,14 @@ std::string PathImpl::tempImpl()
 	{
 		path = "/tmp/";
 	}
+	return path;
+}
+
+
+std::string PathImpl::configImpl()
+{
+	std::string path;
+	path = "/etc/";
 	return path;
 }
 
