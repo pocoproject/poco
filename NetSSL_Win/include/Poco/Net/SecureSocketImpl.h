@@ -188,7 +188,7 @@ protected:
 	void performServerHandshake();
 	bool serverHandshakeLoop(PCtxtHandle phContext, PCredHandle phCred, bool requireClientAuth, bool doInitialRead, bool newContext);
 	void clientVerifyCertificate(const std::string& hostName);
-	void verifyCertificateChainClient(PCCERT_CONTEXT pServerCert, PCCERT_CHAIN_CONTEXT pChainContext);
+	void verifyCertificateChainClient(PCCERT_CONTEXT pServerCert);
 	void serverVerifyCertificate();
 	LONG serverDisconnect(PCredHandle phCreds, CtxtHandle* phContext);
 	LONG clientDisconnect(PCredHandle phCreds, CtxtHandle* phContext);

@@ -78,7 +78,6 @@ HTTPSession::~HTTPSession()
 	}
 	catch (...)
 	{
-		poco_unexpected();
 	}
 	delete _pException;
 }

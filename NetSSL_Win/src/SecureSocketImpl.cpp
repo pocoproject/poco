@@ -1175,14 +1175,23 @@ void SecureSocketImpl::clientVerifyCertificate(const std::string& hostName)
 		if (!args.getIgnoreError())
 			throw InvalidCertificateException("Host name verification failed");
 	}
-	int iRc = CertVerifyTimeValidity(NULL, _pPeerCertificate->pCertInfo);
-	if (iRc != 0) 
+
+	LONG rc = CertVerifyTimeValidity(0, _pPeerCertificate->pCertInfo);
+	if (rc != 0) 
 	{
-		VerificationErrorArgs args(cert, 0, SEC_E_CERT_EXPIRED, "The certificate is expired");
+		VerificationErrorArgs args(cert, 0, SEC_E_CERT_EXPIRED, "The certificate is not yet, or no longer valid");
 		SSLManager::instance().ClientVerificationError(this, args);
 		if (!args.getIgnoreError())
 			throw InvalidCertificateException("Expired certificate");
 	}
+
+	verifyCertificateChainClient(_pPeerCertificate);	
+}
+
+
+void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert)
+{
+	X509Certificate cert(pServerCert, true);
 
 	CERT_CHAIN_PARA chainPara;
 	PCCERT_CHAIN_CONTEXT pChainContext = NULL;
@@ -1199,24 +1208,15 @@ void SecureSocketImpl::clientVerifyCertificate(const std::string& hostName)
 							NULL,
 							&pChainContext))
 	{
-		CertFreeCertificateChain(pChainContext);
-		throw SSLException("Failed to get certificate chain", GetLastError());
+		throw SSLException("Cannot get certificate chain", GetLastError());
 	}
-
-	verifyCertificateChainClient(_pPeerCertificate, pChainContext);	
-}
-
-
-void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert, PCCERT_CHAIN_CONTEXT pChainContext)
-{
-	X509Certificate cert(pServerCert, true);
 
 	HTTPSPolicyCallbackData polHttps; 
 	std::memset(&polHttps, 0, sizeof(HTTPSPolicyCallbackData));
 	polHttps.cbStruct = sizeof(HTTPSPolicyCallbackData);
 	polHttps.dwAuthType = AUTHTYPE_SERVER;
-	polHttps.fdwChecks = SECURITY_FLAG_IGNORE_UNKNOWN_CA; // we do our own CA verification!
-	polHttps.pwszServerName = 0;// not supported on Win98, ME! but ignored on client side anyway
+	polHttps.fdwChecks = SECURITY_FLAG_IGNORE_UNKNOWN_CA; // we do our own check later on
+	polHttps.pwszServerName = 0;
 
 	CERT_CHAIN_POLICY_PARA polPara;
 	std::memset(&polPara, 0, sizeof(polPara));
@@ -1238,12 +1238,11 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert, 
 		if (!args.getIgnoreError())
 		{
 			CertFreeCertificateChain(pChainContext);
-			throw SSLException("Failed to verify certificate chain");
+			throw SSLException("Cannot verify certificate chain");
 		}
 		else return;
 	}
-
-	if (polStatus.dwError)
+	else if (polStatus.dwError)
 	{
 		VerificationErrorArgs args(cert, polStatus.lElementIndex, polStatus.dwError, Utility::formatError(polStatus.dwError));
 		SSLManager::instance().ClientVerificationError(this, args);
@@ -1257,13 +1256,15 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert, 
 
 	// now verify CA's
 	HCERTSTORE trustedCerts = _pContext->certificateStore();
-	Poco::Buffer<PCERT_CONTEXT> certs(pChainContext->cChain);
 	for (DWORD i = 0; i < pChainContext->cChain; i++)
 	{
-		certs[i] = (PCERT_CONTEXT)(pChainContext->rgpChain[i]->rgpElement[0]->pCertContext);
-		// each issuer of the pCert must be a member of the trustedCerts store
-		PCCERT_CONTEXT pResult = CertFindCertificateInStore(trustedCerts, certs[i]->dwCertEncodingType, 0, CERT_FIND_ISSUER_OF, certs[i], 0);
-
+		std::vector<PCCERT_CONTEXT> certs;
+		for (DWORD k = 0; k < pChainContext->rgpChain[i]->cElement; k++)
+		{
+			certs.push_back(pChainContext->rgpChain[i]->rgpElement[k]->pCertContext);
+		}
+		// verify that the root of the chain can be found in the trusted store
+		PCCERT_CONTEXT pResult = CertFindCertificateInStore(trustedCerts, certs.back()->dwCertEncodingType, 0, CERT_FIND_ISSUER_OF, certs.back(), 0);
 		if (!pResult)
 		{
 			poco_assert_dbg (GetLastError() == CRYPT_E_NOT_FOUND);
@@ -1276,34 +1277,36 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert, 
 				return;
 		}
 		CertFreeCertificateContext(pResult);
-	}
 
 #if !defined(_WIN32_WCE)
-	// check if cert is revoked
-	if (_pContext->options() & Context::OPT_PERFORM_REVOCATION_CHECK)
-	{
-		CERT_REVOCATION_STATUS revStat;
-		revStat.cbSize = sizeof(CERT_REVOCATION_STATUS);
-
-		PCERT_CONTEXT* pCerts = certs.begin();
-		BOOL rc = CertVerifyRevocation(
-				X509_ASN_ENCODING,
-				CERT_CONTEXT_REVOCATION_TYPE,
-				pChainContext->cChain,
-				(void **)pCerts,
-				CERT_VERIFY_REV_CHAIN_FLAG,
-				NULL,
-				&revStat);
-
-		if (!rc)
+		// check if cert is revoked
+		if (_pContext->options() & Context::OPT_PERFORM_REVOCATION_CHECK)
 		{
-			VerificationErrorArgs args(cert, revStat.dwIndex, revStat.dwReason, Utility::formatError(revStat.dwError));
-			SSLManager::instance().ClientVerificationError(this, args);
-			if (!args.getIgnoreError())
+			CERT_REVOCATION_STATUS revStat;
+			revStat.cbSize = sizeof(CERT_REVOCATION_STATUS);
+
+			BOOL ok = CertVerifyRevocation(
+					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+					CERT_CONTEXT_REVOCATION_TYPE,
+					certs.size(),
+					(void**) &certs[0],
+					CERT_VERIFY_REV_CHAIN_FLAG,
+					NULL,
+					&revStat);
+
+			// Revocation check of the root certificate may fail due to missing CRL points, etc.
+			// We ignore all errors checking the root certificate except CRYPT_E_REVOKED.
+			if (!ok && (revStat.dwIndex < certs.size() - 1 || revStat.dwError == CRYPT_E_REVOKED))
 			{
-				CertFreeCertificateChain(pChainContext);
-				throw SSLException("Failed to verify revoked certificate chain");
+				VerificationErrorArgs args(cert, revStat.dwIndex, revStat.dwReason, Utility::formatError(revStat.dwError));
+				SSLManager::instance().ClientVerificationError(this, args);
+				if (!args.getIgnoreError())
+				{
+					CertFreeCertificateChain(pChainContext);
+					throw SSLException("Failed to verify revoked certificate chain");
+				}
 			}
+			else break;
 		}
 	}
 #endif
@@ -1321,10 +1324,10 @@ void SecureSocketImpl::serverVerifyCertificate()
 	DWORD status = SEC_E_OK;
 	X509Certificate cert(_pPeerCertificate, true);
 	
-	int iRc = CertVerifyTimeValidity(NULL, _pPeerCertificate->pCertInfo);
-	if (iRc != 0)
+	LONG rc = CertVerifyTimeValidity(0, _pPeerCertificate->pCertInfo);
+	if (rc != 0)
 	{
-		VerificationErrorArgs args(cert, 0, SEC_E_CERT_EXPIRED, "The certificate is expired");
+		VerificationErrorArgs args(cert, 0, SEC_E_CERT_EXPIRED, "The certificate is not yet, or no longer valid");
 		SSLManager::instance().ServerVerificationError(this, args);
 		
 		if (!args.getIgnoreError())
@@ -1348,14 +1351,7 @@ void SecureSocketImpl::serverVerifyCertificate()
 							NULL,
 							&pChainContext)) 
 	{
-		VerificationErrorArgs args(cert, 0, GetLastError(), "The certificate chain is expired");
-		SSLManager::instance().ServerVerificationError(this, args);
-		if (pChainContext) CertFreeCertificateChain(pChainContext);
-		if (!args.getIgnoreError())
-		{
-			throw SSLException("The certificate chain is expired");
-		}
-		else return;
+		throw SSLException("Cannot get certificate chain", GetLastError());
 	}
 
 	HTTPSPolicyCallbackData polHttps;
@@ -1363,7 +1359,7 @@ void SecureSocketImpl::serverVerifyCertificate()
 	polHttps.cbStruct       = sizeof(HTTPSPolicyCallbackData);
 	polHttps.dwAuthType     = AUTHTYPE_CLIENT;
 	polHttps.fdwChecks      = 0;
-	polHttps.pwszServerName = NULL;
+	polHttps.pwszServerName = 0;
 
 	CERT_CHAIN_POLICY_PARA policyPara;
 	std::memset(&policyPara, 0, sizeof(policyPara));
@@ -1378,18 +1374,17 @@ void SecureSocketImpl::serverVerifyCertificate()
 	{
 		VerificationErrorArgs args(cert, 0, GetLastError(), "Failed to verify certificate chain");
 		SSLManager::instance().ServerVerificationError(this, args);
-		if (pChainContext) CertFreeCertificateChain(pChainContext);
+		CertFreeCertificateChain(pChainContext);
 		if (!args.getIgnoreError()) 
-			throw SSLException("Failed to verify certificate chain");
+			throw SSLException("Cannot verify certificate chain");
 		else
 			return;
 	}
-
-	if (policyStatus.dwError) 
+	else if (policyStatus.dwError) 
 	{
 		VerificationErrorArgs args(cert, policyStatus.lElementIndex, status, Utility::formatError(policyStatus.dwError));
 		SSLManager::instance().ServerVerificationError(this, args);
-		if (pChainContext) CertFreeCertificateChain(pChainContext);
+		CertFreeCertificateChain(pChainContext);
 		if (!args.getIgnoreError())
 			throw SSLException("Failed to verify certificate chain");
 		else 
@@ -1397,36 +1392,37 @@ void SecureSocketImpl::serverVerifyCertificate()
 	}
 
 #if !defined(_WIN32_WCE)
-	PCERT_CONTEXT *pCerts = new PCERT_CONTEXT[pChainContext->cChain];
+	// perform revocation checking
 	for (DWORD i = 0; i < pChainContext->cChain; i++) 
 	{
-		pCerts[i] = (PCERT_CONTEXT)(pChainContext->rgpChain[i]->rgpElement[0]->pCertContext);
-	}
-	
-	CERT_REVOCATION_STATUS revStat;
-	revStat.cbSize = sizeof(CERT_REVOCATION_STATUS);
-
-	BOOL bRc = CertVerifyRevocation(
-					X509_ASN_ENCODING,
-					CERT_CONTEXT_REVOCATION_TYPE,
-					pChainContext->cChain,
-					(void **)pCerts,
-					CERT_VERIFY_REV_CHAIN_FLAG,
-					NULL,
-					&revStat);
-	if (!bRc) 
-	{
-		VerificationErrorArgs args(cert, revStat.dwIndex, revStat.dwReason, Utility::formatError(revStat.dwReason));
-		SSLManager::instance().ServerVerificationError(this, args);
-		if (!args.getIgnoreError())
+		std::vector<PCCERT_CONTEXT> certs;
+		for (DWORD k = 0; k < pChainContext->rgpChain[i]->cElement; k++)
 		{
-			CertFreeCertificateChain(pChainContext);
-			delete [] pCerts;
-			throw SSLException("Failed to verify certificate chain");
+			certs.push_back(pChainContext->rgpChain[i]->rgpElement[k]->pCertContext);
+		}
+	
+		CERT_REVOCATION_STATUS revStat;
+		revStat.cbSize = sizeof(CERT_REVOCATION_STATUS);
+
+		BOOL ok = CertVerifyRevocation(
+						X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+						CERT_CONTEXT_REVOCATION_TYPE,
+						certs.size(),
+						(void**) &certs[0],
+						CERT_VERIFY_REV_CHAIN_FLAG,
+						NULL,
+						&revStat);
+		if (!ok && (revStat.dwIndex < certs.size() - 1 || revStat.dwError == CRYPT_E_REVOKED))
+		{
+			VerificationErrorArgs args(cert, revStat.dwIndex, revStat.dwReason, Utility::formatError(revStat.dwReason));
+			SSLManager::instance().ServerVerificationError(this, args);
+			if (!args.getIgnoreError())
+			{
+				CertFreeCertificateChain(pChainContext);
+				throw SSLException("Failed to verify certificate chain");
+			}
 		}
 	}
-
-	delete [] pCerts;
 #endif
 	if (pChainContext) 
 	{
@@ -1439,8 +1435,6 @@ LONG SecureSocketImpl::clientDisconnect(PCredHandle phCreds, CtxtHandle* phConte
 {
 	if (phContext->dwLower == 0 && phContext->dwUpper == 0)
 	{
-		// handshake has never been done
-		poco_assert_dbg (_needHandshake);
 		return SEC_E_OK;
 	}
 
