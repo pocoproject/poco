@@ -1,4 +1,4 @@
-set(SAMPLE_NAME "Mail-ssl")
+set(SAMPLE_NAME "Mail-ssl-win")
 
 set(LOCAL_SRCS "")
 aux_source_directory(src LOCAL_SRCS)
