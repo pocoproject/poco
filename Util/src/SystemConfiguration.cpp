@@ -24,7 +24,6 @@
 #endif
 #include "Poco/Exception.h"
 #include <cstdio>
-#include "../../Foundation/include/Poco/Path.h"
 
 
 using Poco::Environment;
