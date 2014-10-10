@@ -39,6 +39,7 @@ X509Certificate::X509Certificate(const std::string& path):
 	_pCert(0)
 {
 	importCertificate(path);
+	init();
 }
 
 
@@ -46,6 +47,7 @@ X509Certificate::X509Certificate(std::istream& istr):
 	_pCert(0)
 {
 	importCertificate(istr);
+	init();
 }
 
 
@@ -53,6 +55,7 @@ X509Certificate::X509Certificate(const std::string& certName, const std::string&
 	_pCert(0)
 {
 	loadCertificate(certName, certStoreName, useMachineStore);
+	init();
 }
 
 
@@ -125,10 +128,22 @@ void X509Certificate::init()
 		_issuerName += "/ST=";
 		_issuerName += name;
 	}
+	name = issuerName(NID_LOCALITY_NAME);
+	if (!name.empty())
+	{
+		_issuerName += "/L=";
+		_issuerName += name;
+	}
 	name = issuerName(NID_ORGANIZATION_NAME);
 	if (!name.empty())
 	{
 		_issuerName += "/O=";
+		_issuerName += name;
+	}
+	name = issuerName(NID_ORGANIZATION_UNIT_NAME);
+	if (!name.empty())
+	{
+		_issuerName += "/OU=";
 		_issuerName += name;
 	}
 	name = issuerName(NID_COMMON_NAME);
@@ -150,10 +165,22 @@ void X509Certificate::init()
 		_subjectName += "/ST=";
 		_subjectName += name;
 	}
+	name = subjectName(NID_LOCALITY_NAME);
+	if (!name.empty())
+	{
+		_subjectName += "/L=";
+		_subjectName += name;
+	}
 	name = subjectName(NID_ORGANIZATION_NAME);
 	if (!name.empty())
 	{
 		_subjectName += "/O=";
+		_subjectName += name;
+	}
+	name = subjectName(NID_ORGANIZATION_UNIT_NAME);
+	if (!name.empty())
+	{
+		_subjectName += "/OU=";
 		_subjectName += name;
 	}
 	name = subjectName(NID_COMMON_NAME);
@@ -161,8 +188,7 @@ void X509Certificate::init()
 	{
 		_subjectName += "/CN=";
 		_subjectName += name;
-	}
-}
+	}}
 
 
 std::string X509Certificate::commonName() const
