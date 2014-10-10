@@ -19,9 +19,8 @@ These are discussed below:
     Please refer to the header file documentation for more information.
     Furthermore, the following Context methods are not available in NetSSL_Win:
     addChainCertificate(), disableStatelessSessionResumption(), 
-    enableExtendedCertificateVerification(), enableSessionCache(),
-    extendedCertificateVerificationEnabled(), flushSessionCache(),
-    getSessionCacheSize(), getSessionTimeout(), sessionCacheEnabled(),
+    enableSessionCache(),flushSessionCache(),
+    getSessionCacheSize(), getSessionTimeout(),
     setSessionCacheSize(), setSessionTimeout(), sslContext(),
     useCertificate(), usePrivateKey().
 
@@ -37,7 +36,7 @@ Certificate and Certificate Stores
 ----------------------------------
 
 The test suite and samples expect a certificate/private key file named
-any.pem, located in the current working directory. This can be changed
+any.pfx, located in the current working directory. This can be changed
 by editing the testrunner.xml/TestSuite.xml configuration files.
 Alternatively, a certificate from the Windows certificate store can be used.
 A suitable self-signed certificate can be created using the Windows 
