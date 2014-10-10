@@ -18,6 +18,7 @@
 #include "Poco/Net/StringPartSource.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/ConsoleCertificateHandler.h"
+#include "Poco/Net/PrivateKeyPassphraseHandler.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Path.h"
 #include "Poco/Exception.h"
@@ -83,7 +84,7 @@ int main(int argc, char** argv)
 		// Note: we must create the passphrase handler prior Context 
 		SharedPtr<InvalidCertificateHandler> pCert = new ConsoleCertificateHandler(false); // ask the user via console
 		Context::Ptr pContext = new Context(Context::CLIENT_USE, "");
-		SSLManager::instance().initializeClient(pCert, pContext);
+		SSLManager::instance().initializeClient(0, pCert, pContext);
 
 		MailMessage message;
 		message.setSender(sender);

@@ -3,7 +3,7 @@
 //
 // $Id$
 //
-// Library: Crypto
+// Library: NetSSL_Win
 // Package: Certificate
 // Module:  X509Certificate
 //
@@ -22,8 +22,8 @@
 
 #include "Poco/Net/NetSSL.h"
 #include "Poco/DateTime.h"
-#include "Poco/SharedPtr.h"
 #include <set>
+#include <istream>
 #include <wincrypt.h>
 
 
@@ -50,6 +50,10 @@ public:
 	explicit X509Certificate(const std::string& certPath);
 		/// Creates the X509Certificate object by reading
 		/// a certificate in PEM or DER format from a file.
+
+	explicit X509Certificate(std::istream& istr);
+		/// Creates the X509Certificate object by reading
+		/// a certificate in PEM or DER format from a stream.
 
 	X509Certificate(const std::string& certName, const std::string& certStoreName, bool useMachineStore = false);
 		/// Creates the X509Certificate object by loading
@@ -116,9 +120,8 @@ public:
 		/// the issuer given by issuerCertificate. This can be
 		/// used to validate a certificate chain.
 		///
-		/// Verifies if the certificate has been signed with the
-		/// issuer's private key, using the public key from the issuer
-		/// certificate.
+		/// Verifies that the given certificate is contained in the
+		/// certificate's issuer certificate chain.
 		///
 		/// Returns true if verification against the issuer certificate
 		/// was successful, false otherwise.
@@ -140,7 +143,6 @@ public:
 		/// of the host.
 		///
 		/// Returns true if verification succeeded, or false otherwise.
-		
 
 	const PCCERT_CONTEXT system() const;
 		/// Returns the underlying WinCrypt certificate.
@@ -154,6 +156,7 @@ protected:
 
 	void loadCertificate(const std::string& certName, const std::string& certStoreName, bool useMachineStore);
 	void importCertificate(const std::string& certPath);
+	void importCertificate(std::istream& istr);
 	void importCertificate(const char* pBuffer, std::size_t size);
 	void importPEMCertificate(const char* pBuffer, std::size_t size);
 	void importDERCertificate(const char* pBuffer, std::size_t size);
@@ -162,11 +165,6 @@ protected:
 	static bool matchWildcard(const std::string& alias, const std::string& hostName);
 
 private:
-	enum
-	{
-		NAME_BUFFER_SIZE = 256
-	};
-	
 	std::string _issuerName;
 	std::string _subjectName;
 	PCCERT_CONTEXT _pCert;

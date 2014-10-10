@@ -23,6 +23,7 @@
 #include "Poco/Net/FTPStreamFactory.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/ConsoleCertificateHandler.h"
+#include "Poco/Net/PrivateKeyPassphraseHandler.h"
 #include <memory>
 #include <iostream>
 
@@ -75,7 +76,7 @@ int main(int argc, char** argv)
 
 	SharedPtr<InvalidCertificateHandler> pCertHandler = new ConsoleCertificateHandler(false); // ask the user via console
 	Context::Ptr pContext = new Context(Context::CLIENT_USE, "");
-	SSLManager::instance().initializeClient(pCertHandler, pContext);
+	SSLManager::instance().initializeClient(0, pCertHandler, pContext);
 
 	try
 	{
