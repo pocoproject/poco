@@ -23,6 +23,7 @@
 #include "Poco/Net/FTPStreamFactory.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/ConsoleCertificateHandler.h"
+#include "Poco/Net/PrivateKeyPassphraseHandler.h"
 #include <memory>
 #include <iostream>
 

@@ -3,7 +3,7 @@
 //
 // $Id$
 //
-// Library: Crypto
+// Library: NetSSL_Win
 // Package: Certificate
 // Module:  X509Certificate
 //
@@ -39,6 +39,13 @@ X509Certificate::X509Certificate(const std::string& path):
 	_pCert(0)
 {
 	importCertificate(path);
+}
+
+
+X509Certificate::X509Certificate(std::istream& istr):
+	_pCert(0)
+{
+	importCertificate(istr);
 }
 
 
@@ -106,11 +113,55 @@ X509Certificate::~X509Certificate()
 
 void X509Certificate::init()
 {
-	wchar_t data[256];
-	CertGetNameStringW(_pCert, CERT_NAME_SIMPLE_DISPLAY_TYPE, CERT_NAME_ISSUER_FLAG, NULL, data, 256);
-	Poco::UnicodeConverter::convert(data, _issuerName);
-	CertGetNameStringW(_pCert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, data, 256);
-	Poco::UnicodeConverter::convert(data, _subjectName);
+	std::string name = issuerName(NID_COUNTRY);
+	if (!name.empty())
+	{
+		_issuerName += "/C=";
+		_issuerName += name;
+	}
+	name = issuerName(NID_STATE_OR_PROVINCE);
+	if (!name.empty())
+	{
+		_issuerName += "/ST=";
+		_issuerName += name;
+	}
+	name = issuerName(NID_ORGANIZATION_NAME);
+	if (!name.empty())
+	{
+		_issuerName += "/O=";
+		_issuerName += name;
+	}
+	name = issuerName(NID_COMMON_NAME);
+	if (!name.empty())
+	{
+		_issuerName += "/CN=";
+		_issuerName += name;
+	}
+
+	name = subjectName(NID_COUNTRY);
+	if (!name.empty())
+	{
+		_subjectName += "/C=";
+		_subjectName += name;
+	}
+	name = subjectName(NID_STATE_OR_PROVINCE);
+	if (!name.empty())
+	{
+		_subjectName += "/ST=";
+		_subjectName += name;
+	}
+	name = subjectName(NID_ORGANIZATION_NAME);
+	if (!name.empty())
+	{
+		_subjectName += "/O=";
+		_subjectName += name;
+	}
+	name = subjectName(NID_COMMON_NAME);
+	if (!name.empty())
+	{
+		_subjectName += "/CN=";
+		_subjectName += name;
+	}
 }
 
 
@@ -123,9 +174,10 @@ std::string X509Certificate::commonName() const
 std::string X509Certificate::issuerName(NID nid) const
 {
 	std::string result;
-	wchar_t data[256];
-	CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, CERT_NAME_ISSUER_FLAG, nid2oid(nid), data, 256);
-	Poco::UnicodeConverter::convert(data, result);
+	DWORD size = CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, CERT_NAME_ISSUER_FLAG, nid2oid(nid), 0, 0);
+	Poco::Buffer<wchar_t> data(size);
+	CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, CERT_NAME_ISSUER_FLAG, nid2oid(nid), data.begin(), size);
+	Poco::UnicodeConverter::convert(data.begin(), result);
 	return result;
 }
 
@@ -133,9 +185,10 @@ std::string X509Certificate::issuerName(NID nid) const
 std::string X509Certificate::subjectName(NID nid) const
 {
 	std::string result;
-	wchar_t data[256];
-	CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, 0, nid2oid(nid), data, 256);
-	Poco::UnicodeConverter::convert(data, result);
+	DWORD size = CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, 0, nid2oid(nid), 0, 0);
+	Poco::Buffer<wchar_t> data(size);
+	CertGetNameStringW(_pCert, CERT_NAME_ATTR_TYPE, 0, nid2oid(nid), data.begin(), size);
+	Poco::UnicodeConverter::convert(data.begin(), result);
 	return result;
 }
 
@@ -182,7 +235,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 				PCERT_ALT_NAME_INFO pNameInfo = reinterpret_cast<PCERT_ALT_NAME_INFO>(buffer.begin());
 				for (int i = 0; i < pNameInfo->cAltEntry; i++)
 				{
-					std::wstring waltName(pNameInfo->rgAltEntry->pwszDNSName);
+					std::wstring waltName(pNameInfo->rgAltEntry[i].pwszDNSName);
 					std::string altName;
 					Poco::UnicodeConverter::toUTF8(waltName, altName);
 					domainNames.insert(altName);
@@ -213,68 +266,40 @@ Poco::DateTime X509Certificate::expiresOn() const
 
 bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 {
-	class CertStoreHandle
+	CERT_CHAIN_PARA chainPara;
+	PCCERT_CHAIN_CONTEXT pChainContext = 0;
+	std::memset(&chainPara, 0, sizeof(chainPara));
+	chainPara.cbSize = sizeof(chainPara);
+
+	if (!CertGetCertificateChain(
+							NULL,
+							_pCert,
+							NULL,
+							NULL,
+							&chainPara,
+							0,
+							NULL,
+							&pChainContext))
 	{
-	public:
-		CertStoreHandle(HCERTSTORE hStore):
-			_hStore(hStore)
-		{
-		}
-
-		~CertStoreHandle()
-		{
-			if (_hStore) CertCloseStore(_hStore, 0);
-		}
-
-		HCERTSTORE handle() const
-		{
-			return _hStore;
-		}
-
-	private:
-		HCERTSTORE _hStore;
-	};
-
-	CertStoreHandle caStore(CertOpenSystemStoreW(0, L"CA"));
-	CertStoreHandle rootStore(CertOpenSystemStoreW(0, L"ROOT"));
+		throw SSLException("Cannot get certificate chain", subjectName(), GetLastError());
+	}
 
 	bool result = false;
-	PCCERT_CONTEXT pIssuer;
-	PCCERT_CONTEXT pIssued = _pCert;
-	do
+	for (DWORD i = 0; i < pChainContext->cChain && !result; i++)
 	{
-		DWORD flags = CERT_STORE_REVOCATION_FLAG | CERT_STORE_SIGNATURE_FLAG | CERT_STORE_TIME_VALIDITY_FLAG;
-		pIssuer = 0;
-		if (caStore.handle())
+		for (DWORD k = 0; k < pChainContext->rgpChain[i]->cElement && !result; k++)
 		{
-			pIssuer = CertGetIssuerCertificateFromStore(caStore.handle(), pIssued, 0, &flags);
-		}
-		if (!pIssuer && rootStore.handle())
-		{
-			pIssuer = CertGetIssuerCertificateFromStore(rootStore.handle(), pIssued, 0, &flags);
-		}
-		if (pIssuer)
-		{
-			X509Certificate issuer(pIssuer);
-			if (flags & CERT_STORE_NO_CRL_FLAG)
-				flags &= ~(CERT_STORE_NO_CRL_FLAG | CERT_STORE_REVOCATION_FLAG);
-			if (flags) 
-				break;
-			if (CertCompareCertificate(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, issuerCertificate.system()->pCertInfo, issuer.system()->pCertInfo))
+			PCCERT_CONTEXT pChainCert = pChainContext->rgpChain[i]->rgpElement[k]->pCertContext;
+			if (CertCompareCertificate(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, issuerCertificate.system()->pCertInfo, pChainCert->pCertInfo))
 			{
-				result = true;
-				break;
-			}
-			if (CertCompareCertificate(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, pIssuer->pCertInfo, pIssued->pCertInfo))
-			{
-				// reached self-signed certificate
-				break;
+				if (CertComparePublicKeyInfo(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &issuerCertificate.system()->pCertInfo->SubjectPublicKeyInfo, &pChainCert->pCertInfo->SubjectPublicKeyInfo))
+				{
+					result = true;
+				}
 			}
 		}
-		else break;
-	} 
-	while (pIssuer);
-
+	}
+	CertFreeCertificateChain(pChainContext);
 	return result;
 }
 
@@ -326,8 +351,8 @@ void X509Certificate::loadCertificate(const std::string& certName, const std::st
 	CERT_RDN_ATTR cert_rdn_attr;
 	cert_rdn_attr.pszObjId = szOID_COMMON_NAME;
 	cert_rdn_attr.dwValueType = CERT_RDN_ANY_TYPE;
-	cert_rdn_attr.Value.cbData = (DWORD) certName.size();
-	cert_rdn_attr.Value.pbData = (BYTE *) certName.c_str();
+	cert_rdn_attr.Value.cbData = static_cast<DWORD>(certName.size());
+	cert_rdn_attr.Value.pbData = reinterpret_cast<BYTE*>(const_cast<char*>(certName.c_str()));
 
 	CERT_RDN cert_rdn;
 	cert_rdn.cRDNAttr = 1;
@@ -355,6 +380,18 @@ void X509Certificate::importCertificate(const std::string& certPath)
 	istr.read(buffer.begin(), buffer.size());
 	if (istr.gcount() != size) throw Poco::IOException("error reading certificate file");
 	importCertificate(buffer.begin(), buffer.size());
+}
+
+
+void X509Certificate::importCertificate(std::istream& istr)
+{
+	std::string data;
+	Poco::StreamCopier::copyToString(istr, data);
+	if (!data.empty())
+	{
+		importCertificate(data.data(), data.size());
+	}
+	else throw Poco::IOException("failed to read certificate from stream");
 }
 
 
