@@ -1308,8 +1308,8 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert)
 			}
 			else break;
 		}
-	}
 #endif
+	}
 	CertFreeCertificateChain(pChainContext);
 }
 
