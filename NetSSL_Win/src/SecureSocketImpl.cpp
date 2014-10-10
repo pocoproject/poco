@@ -864,6 +864,10 @@ SECURITY_STATUS SecureSocketImpl::performClientHandshakeLoop()
 		{
 			performClientHandshakeLoopContinueNeeded();
 		}
+		else if (_securityStatus == SEC_E_INCOMPLETE_MESSAGE)
+		{
+			performClientHandshakeLoopIncompleteMessage();
+		}
 		else if (FAILED(_securityStatus))
 		{
 			if (_outFlags & ISC_RET_EXTENDED_ERROR)
@@ -1176,15 +1180,6 @@ void SecureSocketImpl::clientVerifyCertificate(const std::string& hostName)
 			throw InvalidCertificateException("Host name verification failed");
 	}
 
-	LONG rc = CertVerifyTimeValidity(0, _pPeerCertificate->pCertInfo);
-	if (rc != 0) 
-	{
-		VerificationErrorArgs args(cert, 0, SEC_E_CERT_EXPIRED, "The certificate is not yet, or no longer valid");
-		SSLManager::instance().ClientVerificationError(this, args);
-		if (!args.getIgnoreError())
-			throw InvalidCertificateException("Expired certificate");
-	}
-
 	verifyCertificateChainClient(_pPeerCertificate);	
 }
 
@@ -1323,18 +1318,6 @@ void SecureSocketImpl::serverVerifyCertificate()
 
 	DWORD status = SEC_E_OK;
 	X509Certificate cert(_pPeerCertificate, true);
-	
-	LONG rc = CertVerifyTimeValidity(0, _pPeerCertificate->pCertInfo);
-	if (rc != 0)
-	{
-		VerificationErrorArgs args(cert, 0, SEC_E_CERT_EXPIRED, "The certificate is not yet, or no longer valid");
-		SSLManager::instance().ServerVerificationError(this, args);
-		
-		if (!args.getIgnoreError())
-			throw SSLException("Expired certificate");
-		else
-			return;
-	}
 	
 	PCCERT_CHAIN_CONTEXT pChainContext = NULL;
 	CERT_CHAIN_PARA chainPara;
