@@ -38,7 +38,7 @@ Release 1.5.4 (2014-10-13)
 - HTTPCookie: fix documentation for max age
 - added Timestamp::raw() and Clock::raw()
 - Poco::Buffer properly handles zero-sized buffers
-
+- GH #512: Poco:Data:ODBC:Binder.h causes a crash
 
 Release 1.5.3 (2014-06-30)
 ==========================
