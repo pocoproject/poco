@@ -40,7 +40,7 @@ class Foundation_API Bugcheck
 	/// automatically provide useful context information.
 {
 public:
-	static void assertion(const char* cond, const char* file, int line);
+	static void assertion(const char* cond, const char* file, int line, const char* text = NULL);
 		/// An assertion failed. Break into the debugger, if
 		/// possible, then throw an AssertionViolationException.
 		
@@ -71,7 +71,7 @@ public:
 		/// possible.
 
 protected:
-	static std::string what(const char* msg, const char* file, int line);
+	static std::string what(const char* msg, const char* file, int line, const char* text = NULL);
 };
 
 
@@ -84,7 +84,11 @@ protected:
 #if defined(_DEBUG)
 	#define poco_assert_dbg(cond) \
 		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) 0
+
+   #define poco_massert_dbg(cond, text) \
+		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__, text); else (void) 0
 #else
+   #define poco_massert_dbg(cond, text)
 	#define poco_assert_dbg(cond)
 #endif
 
@@ -92,6 +96,8 @@ protected:
 #define poco_assert(cond) \
 	if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) 0
 
+#define poco_massert(cond, text) \
+	if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__, text); else (void) 0
 
 #define poco_check_ptr(ptr) \
 	if (!(ptr)) Poco::Bugcheck::nullPointer(#ptr, __FILE__, __LINE__); else (void) 0
