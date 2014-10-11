@@ -76,6 +76,44 @@ public:
 
 private:
 	std::string getTestFilesPath(const std::string& type);
+
+	template <typename T>
+	void testNumber(T number)
+	{
+		std::ostringstream os;
+		os << "{ \"test\" : " << number << " }";
+		std::string json = os.str();
+		Parser parser;
+		Var result;
+
+		try
+		{
+			result = parser.parse(json);
+		}
+		catch (JSONException& jsone)
+		{
+			std::cout << jsone.message() << std::endl;
+			assert(false);
+		}
+
+		assert(result.type() == typeid(Object::Ptr));
+
+		Object::Ptr object = result.extract<Object::Ptr>();
+		Var test = object->get("test");
+		assert(test.isNumeric());
+		T value = test;
+		assert(value == number);
+
+		DynamicStruct ds = *object;
+		assert(!ds["test"].isEmpty());
+		assert(ds["test"].isNumeric());
+		assert(ds["test"] == number);
+
+		const DynamicStruct& rds = *object;
+		assert(!rds["test"].isEmpty());
+		assert(rds["test"].isNumeric());
+		assert(rds["test"] == number);
+	}
 };
 
 
