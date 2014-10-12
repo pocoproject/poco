@@ -260,6 +260,8 @@ Timestamp& Timestamp::operator -= (const Timespan& span)
 	return *this -= span.totalMicroseconds();
 }
 
+const Timestamp::TimeVal Timestamp::Min = std::numeric_limits<Timestamp::TimeVal>::min();
+const Timestamp::TimeVal Timestamp::Max = std::numeric_limits<Timestamp::TimeVal>::max();
 
 #if defined(_WIN32)
 
