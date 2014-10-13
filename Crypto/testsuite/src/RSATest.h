@@ -27,6 +27,7 @@ public:
 	~RSATest();
 
 	void testNewKeys();
+	void testNewKeysNoPassphrase();
 	void testSign();
 	void testSignSha256();
 	void testSignManipulated();

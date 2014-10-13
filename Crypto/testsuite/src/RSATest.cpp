@@ -108,6 +108,29 @@ void RSATest::testNewKeys()
 }
 
 
+void RSATest::testNewKeysNoPassphrase()
+{
+	RSAKey key(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+	std::ostringstream strPub;
+	std::ostringstream strPriv;
+	key.save(&strPub, &strPriv);
+	std::string pubKey = strPub.str();
+	std::string privKey = strPriv.str();
+
+	// now do the round trip
+	std::istringstream iPub(pubKey);
+	std::istringstream iPriv(privKey);
+	RSAKey key2(&iPub, &iPriv);
+
+	std::istringstream iPriv2(privKey);
+	RSAKey key3(0, &iPriv2);
+	std::ostringstream strPub3;
+	key3.save(&strPub3);
+	std::string pubFromPrivate = strPub3.str();
+	assert (pubFromPrivate == pubKey);
+}
+
+
 void RSATest::testSign()
 {
 	std::string msg("Test this sign message");
@@ -244,6 +267,7 @@ CppUnit::Test* RSATest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("RSATest");
 
 	CppUnit_addTest(pSuite, RSATest, testNewKeys);
+	CppUnit_addTest(pSuite, RSATest, testNewKeysNoPassphrase);
 	CppUnit_addTest(pSuite, RSATest, testSign);
 	CppUnit_addTest(pSuite, RSATest, testSignSha256);
 	CppUnit_addTest(pSuite, RSATest, testSignManipulated);
