@@ -1107,7 +1107,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 					ifIndex = pAddress->Ipv6IfIndex;
 				}
 			}
-			else if ((osvi.dwMajorVersion >= 5) &&
+			else
+			{
+				if ((osvi.dwMajorVersion >= 5) &&
 					(osvi.dwMinorVersion >= 1) &&
 					(osvi.dwBuildNumber >= 1))
 				{
