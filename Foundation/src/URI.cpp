@@ -26,7 +26,7 @@ namespace Poco {
 
 
 const std::string URI::RESERVED_PATH     = "?#";
-const std::string URI::RESERVED_QUERY    = "#";
+const std::string URI::RESERVED_QUERY    = "#/";
 const std::string URI::RESERVED_FRAGMENT = "";
 const std::string URI::ILLEGAL           = "%<>{}|\\\"^`";
 
