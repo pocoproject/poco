@@ -1,7 +1,7 @@
 //
 // URI.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/URI.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/URI.h#2 $
 //
 // Library: Foundation
 // Package: URI
@@ -45,6 +45,9 @@
 
 
 namespace Poco {
+
+
+class Path;
 
 
 class Foundation_API URI
@@ -91,6 +94,12 @@ public:
 	URI(const URI& baseURI, const std::string& relativeURI);
 		/// Creates an URI from a base URI and a relative URI, according to
 		/// the algorithm in section 5.2 of RFC 3986.
+		
+	explicit URI(const Path& path);
+		/// Creates a URI from a path.
+		///
+		/// The path will be made absolute, and a file:// URI
+		/// will be built from it.
 
 	~URI();
 		/// Destroys the URI.

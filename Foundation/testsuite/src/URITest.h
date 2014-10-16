@@ -1,7 +1,7 @@
 //
 // URITest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/URITest.h#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/URITest.h#3 $
 //
 // Definition of the URITest class.
 //
@@ -54,6 +54,7 @@ public:
 	void testResolve();
 	void testSwap();
 	void testOther();
+	void testFromPath();
 
 	void setUp();
 	void tearDown();
