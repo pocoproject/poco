@@ -14,4 +14,5 @@ vc.solution.include = \
 	TimeServer\\TimeServer;\
 	TwitterClient\\TwitterClient;\
 	WebSocketServer\\WebSocketServer;\
-	SMTPLogger\\SMTPLogger
+	SMTPLogger\\SMTPLogger;\
+	ifconfig\\ifconfig

@@ -1203,8 +1203,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						// On Windows, a valid broadcast address will be all 1's (== address | ~subnetMask); additionaly, on pre-Vista versions of
 						// OS, master address structure does not contain member for prefix length; we go an extra mile here in order to make sure
 						// we reflect the actual values held by system and protect against misconfiguration (e.g. bad DHCP config entry)
-#if defined(_WIN32_WCE)
 						ULONG prefixLength = 0;
+#if defined(_WIN32_WCE)
 	#if _WIN32_WCE >= 0x0800
 						prefixLength = pUniAddr->OnLinkPrefixLength;
 						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
@@ -1222,7 +1222,6 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 							broadcastAddress = host | ~mask;
 						}
 #elif (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
-						ULONG prefixLength = 0;
 	#if (_WIN32_WINNT >= 0x0600) // Vista and newer
 						if (osvi.dwMajorVersion >= 6)
 						{
