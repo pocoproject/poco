@@ -135,10 +135,10 @@ std::string WinRegistryKey::getString(const std::string& name)
 		throw NotFoundException(key(name));
 	if (size > 0)
 	{
-		Poco::Buffer<char> buffer(new char[size + 1]);
+		Poco::Buffer<char> buffer(size + 1);
 		RegQueryValueExA(_hKey, name.c_str(), NULL, NULL, (BYTE*) buffer.begin(), &size);
 		buffer[size] = 0;
-		std::string result(buffer);
+		std::string result(buffer.begin());
 		return result;
 	}
 #endif
