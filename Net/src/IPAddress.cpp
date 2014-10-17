@@ -97,7 +97,7 @@ IPAddress::IPAddress(const std::string& addr)
 	IPv6AddressImpl addr6(IPv6AddressImpl::parse(addr));
 	if (addr6 != IPv6AddressImpl())
 	{
-		newIPv6(addr6.addr());
+		newIPv6(addr6.addr(), addr6.scope());
 		return;
 	}
 #endif
