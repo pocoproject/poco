@@ -330,6 +330,9 @@
     <ClCompile Include="src\ConditionTest.cpp">
       <Filter>Threading\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\MutexTest.cpp">
+      <Filter>Threading\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\RWLockTest.cpp">
       <Filter>Threading\Source Files</Filter>
     </ClCompile>
@@ -738,6 +741,9 @@
       <Filter>Threading\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ConditionTest.h">
+      <Filter>Threading\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MutexTest.h">
       <Filter>Threading\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RWLockTest.h">

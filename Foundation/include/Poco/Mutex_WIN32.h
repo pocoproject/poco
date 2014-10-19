@@ -43,7 +43,20 @@ private:
 };
 
 
-typedef MutexImpl FastMutexImpl;
+class Foundation_API FastMutexImpl
+{
+protected:
+	FastMutexImpl();
+	~FastMutexImpl();
+	void lockImpl();
+	bool tryLockImpl();
+	bool tryLockImpl(long milliseconds);
+	void unlockImpl();
+	
+private:
+	CRITICAL_SECTION _cs;
+	int _lockCount;
+};
 
 
 //
@@ -77,6 +90,13 @@ inline bool MutexImpl::tryLockImpl()
 
 inline void MutexImpl::unlockImpl()
 {
+	LeaveCriticalSection(&_cs);
+}
+
+
+inline void FastMutexImpl::unlockImpl()
+{
+	--_lockCount;
 	LeaveCriticalSection(&_cs);
 }
 
