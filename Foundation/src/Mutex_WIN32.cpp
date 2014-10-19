@@ -128,19 +128,8 @@ bool FastMutexImpl::tryLockImpl(long milliseconds)
 	{
 		try
 		{
-			if (TryEnterCriticalSection(&_cs) == TRUE)
-			{
-				if (_lockCount == 0)
-				{
-					++_lockCount;
-					return true;
-				}
-
-				// We're trying to go recursive
-				LeaveCriticalSection(&_cs);
-				Sleep(milliseconds);
-				return false;
-			}
+			if (tryLockImpl())
+				return true;
 		}
 		catch (...)
 		{
