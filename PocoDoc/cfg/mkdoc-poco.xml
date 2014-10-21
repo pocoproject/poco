@@ -22,9 +22,9 @@
 		</pages>
 		<resources>
 			${PocoBase}/PocoDoc/resources/css,
+			${PocoBase}/PocoDoc/resources/js,
 			${PocoBase}/PocoDoc/resources/images,
-			${PocoBase}/PocoDoc/resources/index.html,
-			${PocoBase}/PocoDoc/resources/welcome.thtml,
+			${PocoBase}/PocoDoc/resources/index.thtml,
 			${PocoBuild}/*/doc/images
 		</resources>
 		<compiler>
