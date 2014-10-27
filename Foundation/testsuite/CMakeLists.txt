@@ -2,11 +2,12 @@ set(TESTUNIT "${LIBNAME}-testrunner")
 
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
-file(GLOB SRCS_G_REMOVE 
+file(GLOB SRCS_G_REMOVE
     src/TestApp.cpp
     src/TestApp_WINCE.cpp
     src/TestLibrary.cpp
     src/TestPlugin.cpp
+    src/WinDriver.cpp
 )
 list(REMOVE_ITEM SRCS_G ${SRCS_G_REMOVE})
 POCO_SOURCES_AUTO( TEST_SRCS ${SRCS_G})
@@ -15,9 +16,11 @@ POCO_SOURCES_AUTO( TEST_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h" )
 POCO_HEADERS_AUTO( TEST_SRCS ${HDRS_G})
 
-POCO_SOURCES_AUTO_PLAT( TEST_SRCS WIN32
-    src/WinDriver.cpp
-)
+if(ENABLE_WINTESTRUNNER)
+    POCO_SOURCES_AUTO_PLAT( TEST_SRCS WIN32
+        src/WinDriver.cpp
+    )
+endif(ENABLE_WINTESTRUNNER)
 
 POCO_SOURCES_PLAT( TEST_SRCS FoundationTest WINCE
     src/WinCEDriver.cpp
@@ -29,8 +32,10 @@ set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=.") # Th
 #set_target_properties( ${TESTUNIT} PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} )
 target_link_libraries( ${TESTUNIT} PocoFoundation CppUnit )
 if( WIN32)
-    add_definitions("-D_AFXDLL")
-    target_link_libraries( ${TESTUNIT} WinTestRunner)
+    if(ENABLE_WINTESTRUNNER)
+        add_definitions("-D_AFXDLL")
+        target_link_libraries( ${TESTUNIT} WinTestRunner)
+    endif(ENABLE_WINTESTRUNNER)
 else()
     target_link_libraries( ${TESTUNIT} pthread)
 endif(WIN32)

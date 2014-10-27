@@ -16,5 +16,7 @@ set_target_properties( ${LIBNAME}
 target_link_libraries( ${LIBNAME} )
 
 if(WIN32)
-    add_subdirectory(WinTestRunner)
+    if(ENABLE_WINTESTRUNNER)
+        add_subdirectory(WinTestRunner)
+    endif(ENABLE_WINTESTRUNNER)
 endif(WIN32)

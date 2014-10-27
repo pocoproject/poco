@@ -80,6 +80,7 @@ option(ENABLE_DATA "Enable Data" ON)
 option(ENABLE_SEVENZIP "Enable SevenZip" ON)
 option(ENABLE_ZIP "Enable Zip" ON)
 option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
+option(ENABLE_WINTESTRUNNER "Enable GUI test runner for WIN32 platforms" ON)
 
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
