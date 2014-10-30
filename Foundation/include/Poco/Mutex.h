@@ -45,16 +45,13 @@ class Foundation_API Mutex: private MutexImpl
 	/// A Mutex (mutual exclusion) is a synchronization 
 	/// mechanism used to control access to a shared resource
 	/// in a concurrent (multithreaded) scenario.
-	/// Mutexes are recursive, that is, the same mutex can be 
-	/// locked multiple times by the same thread (but, of course,
-	/// not by other threads).
 	/// Using the ScopedLock class is the preferred way to automatically
 	/// lock and unlock a mutex.
 {
 public:
 	typedef Poco::ScopedLock<Mutex> ScopedLock;
 	
-	Mutex();
+	explicit Mutex(bool recursive = true);
 		/// creates the Mutex.
 		
 	~Mutex();

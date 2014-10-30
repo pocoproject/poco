@@ -21,23 +21,15 @@
 namespace Poco {
 
 
-MutexImpl::MutexImpl()
+MutexImpl::MutexImpl(bool recursive)
 {
-	_sem = semMCreate(SEM_INVERSION_SAFE | SEM_Q_PRIORITY);
-	if (_sem == 0)
-		throw Poco::SystemException("cannot create mutex");
-}
-
-
-MutexImpl::MutexImpl(bool fast)
-{
-	if (fast)
+	if (recursive)
 	{
-		_sem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+		_sem = semMCreate(SEM_INVERSION_SAFE | SEM_Q_PRIORITY);
 	}
 	else
 	{
-		_sem = semMCreate(SEM_INVERSION_SAFE | SEM_Q_PRIORITY);
+		_sem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 	}
 	if (_sem == 0)
 		throw Poco::SystemException("cannot create mutex");
@@ -57,7 +49,7 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 }
 
 
-FastMutexImpl::FastMutexImpl(): MutexImpl(true)
+FastMutexImpl::FastMutexImpl(): MutexImpl(false)
 {
 }
 

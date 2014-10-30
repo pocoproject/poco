@@ -32,8 +32,7 @@ namespace Poco {
 class Foundation_API MutexImpl
 {
 protected:
-	MutexImpl();
-	MutexImpl(bool fast);
+	MutexImpl(bool recursive);
 	~MutexImpl();
 	void lockImpl();
 	bool tryLockImpl();
