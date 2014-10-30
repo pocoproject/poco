@@ -20,7 +20,7 @@
 #include "Poco/Timestamp.h"
 
 
-using Poco::FastMutex;
+using Poco::Mutex;
 using Poco::Runnable;
 using Poco::SystemException;
 using Poco::Thread;
@@ -40,7 +40,7 @@ namespace
 		{
 			try
 			{
-				FastMutex mtx;
+				Mutex mtx(false);
 				mtx.lock();
 				mtx.lock();
 			}
@@ -72,9 +72,9 @@ MutexTest::~MutexTest()
 }
 
 
-void MutexTest::testFastMutexRecursion()
+void MutexTest::testMutexRecursion()
 {
-	FastMutex mtx;
+	Mutex mtx(false);
 	mtx.lock();
 	
 	bool success = mtx.tryLock();
@@ -102,6 +102,26 @@ void MutexTest::testFastMutexRecursion()
 }
 
 
+void MutexTest::testRecursiveMutexRecursion()
+{
+	Mutex mtx;
+	mtx.lock();
+	
+	bool success = mtx.tryLock();
+	assert (success);
+	
+	Timestamp mark;
+	success = mtx.tryLock(2000); // Wait 2 seconds
+	assert (success);
+
+	// Test that we completed almost immediately
+	Timestamp::TimeDiff elapsed = mark.elapsed();
+	assert (elapsed < 100000);
+	
+	success = mtx.tryLock(0);
+	assert (success);
+}
+
 void MutexTest::setUp()
 {
 }
@@ -116,7 +136,8 @@ CppUnit::Test* MutexTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MutexTest");
 
-	CppUnit_addTest(pSuite, MutexTest, testFastMutexRecursion);
+	CppUnit_addTest(pSuite, MutexTest, testMutexRecursion);
+	CppUnit_addTest(pSuite, MutexTest, testRecursiveMutexRecursion);
 
 	return pSuite;
 }

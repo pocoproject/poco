@@ -26,7 +26,8 @@ public:
 	MutexTest(const std::string& name);
 	~MutexTest();
 
-	void testFastMutexRecursion();
+	void testMutexRecursion();
+	void testRecursiveMutexRecursion();
 
 	void setUp();
 	void tearDown();
