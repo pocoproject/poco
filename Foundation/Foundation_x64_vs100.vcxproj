@@ -379,6 +379,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\Latin2Encoding.cpp" />
     <ClCompile Include="src\MemoryPool.cpp" />
     <ClCompile Include="src\NestedDiagnosticContext.cpp" />
     <ClCompile Include="src\NumberFormatter.cpp" />
@@ -429,6 +430,8 @@
     <ClCompile Include="src\inflate.c" />
     <ClCompile Include="src\inftrees.c" />
     <ClCompile Include="src\trees.c" />
+    <ClCompile Include="src\Windows1250Encoding.cpp" />
+    <ClCompile Include="src\Windows1251Encoding.cpp" />
     <ClCompile Include="src\zutil.c" />
     <ClCompile Include="src\ActiveDispatcher.cpp" />
     <ClCompile Include="src\Condition.cpp" />
@@ -1002,6 +1005,7 @@
     <ClInclude Include="include\Poco\FPEnvironment_SUN.h" />
     <ClInclude Include="include\Poco\FPEnvironment_WIN32.h" />
     <ClInclude Include="include\Poco\Instantiator.h" />
+    <ClInclude Include="include\Poco\Latin2Encoding.h" />
     <ClInclude Include="include\Poco\MemoryPool.h" />
     <ClInclude Include="include\Poco\MetaProgramming.h" />
     <ClInclude Include="include\Poco\NamedTuple.h" />
@@ -1053,6 +1057,8 @@
     <ClInclude Include="include\Poco\TeeStream.h" />
     <ClInclude Include="include\Poco\Token.h" />
     <ClInclude Include="include\Poco\UnbufferedStreamBuf.h" />
+    <ClInclude Include="include\Poco\Windows1250Encoding.h" />
+    <ClInclude Include="include\Poco\Windows1251Encoding.h" />
     <ClInclude Include="src\crc32.h" />
     <ClInclude Include="src\deflate.h" />
     <ClInclude Include="src\inffast.h" />
