@@ -42,6 +42,10 @@ private:
 	CRITICAL_SECTION _cs;
 	int _lockCount;
 	const bool _recursive;
+
+private:
+	MutexImpl(const MutexImpl&);
+	MutexImpl& operator = (const MutexImpl&);
 };
 
 
