@@ -96,10 +96,11 @@ private:
 
 class Foundation_API FastMutex: private FastMutexImpl
 	/// A FastMutex (mutual exclusion) is similar to a Mutex.
-	/// Unlike a Mutex, however, a FastMutex is not recursive,
-	/// which means that a deadlock will occur if the same
-	/// thread tries to lock a mutex it has already locked again.
-	/// Locking a FastMutex is faster than locking a recursive Mutex.
+	/// Locking a FastMutex is guaranteed to be at least as
+	/// fast as locking a Mutex.  However, a FastMutex is not
+	/// guaranteed to be either recursive or non-recursive.
+	/// It is best suited to thread safe components like pools,
+	/// caches and queues where locking is internal to the component.
 	/// Using the ScopedLock class is the preferred way to automatically
 	/// lock and unlock a mutex.
 {
