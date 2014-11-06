@@ -80,7 +80,7 @@ public:
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
 		///
-		/// Calls to connect cannot come before callst to bind.
+		/// Calls to connect cannot come before calls to bind.
 
 	int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through
