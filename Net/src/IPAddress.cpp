@@ -128,7 +128,7 @@ IPAddress::IPAddress(const std::string& addr, Family family)
 
 IPAddress::IPAddress(const void* addr, poco_socklen_t length)
 #ifndef POCO_HAVE_ALIGNMENT
-: _pImpl(0)
+	: _pImpl(0)
 #endif
 {
 	if (length == sizeof(struct in_addr))
@@ -178,7 +178,7 @@ IPAddress::IPAddress(unsigned prefix, Family family)
 #if defined(_WIN32)
 IPAddress::IPAddress(const SOCKET_ADDRESS& socket_address)
 #ifndef POCO_HAVE_ALIGNMENT
-: _pImpl(0)
+	: _pImpl(0)
 #endif
 {
 	ADDRESS_FAMILY family = socket_address.lpSockaddr->sa_family;
@@ -187,7 +187,7 @@ IPAddress::IPAddress(const SOCKET_ADDRESS& socket_address)
 #if defined(POCO_HAVE_IPv6)
 	else if (family == AF_INET6)
 		newIPv6(&reinterpret_cast<const struct sockaddr_in6*>(socket_address.lpSockaddr)->sin6_addr,
-                                        reinterpret_cast<const struct sockaddr_in6*>(socket_address.lpSockaddr)->sin6_scope_id);
+			reinterpret_cast<const struct sockaddr_in6*>(socket_address.lpSockaddr)->sin6_scope_id);
 #endif
 	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
@@ -202,7 +202,7 @@ IPAddress::IPAddress(const struct sockaddr& sockaddr)
 #if defined(POCO_HAVE_IPv6)
 	else if (family == AF_INET6)
 		newIPv6(&reinterpret_cast<const struct sockaddr_in6*>(&sockaddr)->sin6_addr,
-										 reinterpret_cast<const struct sockaddr_in6*>(&sockaddr)->sin6_scope_id);
+			reinterpret_cast<const struct sockaddr_in6*>(&sockaddr)->sin6_scope_id);
 #endif
 	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
@@ -348,8 +348,7 @@ bool IPAddress::operator == (const IPAddress& a) const
 #endif
 		return std::memcmp(addr(), a.addr(), l1) == 0;
     }
-	else
-		return false;
+	else return false;
 }
 
 
@@ -371,8 +370,7 @@ bool IPAddress::operator < (const IPAddress& a) const
 #endif
 		return std::memcmp(addr(), a.addr(), l1) < 0;
     }
-	else
-		return l1 < l2;
+	else return l1 < l2;
 }
 
 
@@ -413,11 +411,9 @@ IPAddress IPAddress::operator & (const IPAddress& other) const
 			return IPAddress(r.addr(), r.scope(), sizeof(struct in6_addr));
 		}
 #endif
-		else
-			throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+		else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 	}
-	else
-		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 
 
@@ -440,11 +436,9 @@ IPAddress IPAddress::operator | (const IPAddress& other) const
 			return IPAddress(r.addr(), r.scope(), sizeof(struct in6_addr));
 		}
 #endif
-		else
-			throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+		else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 	}
-	else
-		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 
 
@@ -467,11 +461,9 @@ IPAddress IPAddress::operator ^ (const IPAddress& other) const
 			return IPAddress(r.addr(), r.scope(), sizeof(struct in6_addr));
 		}
 #endif
-		else
-			throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+		else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 	}
-	else
-		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 
 
@@ -490,8 +482,7 @@ IPAddress IPAddress::operator ~ () const
 		return IPAddress(r.addr(), sizeof(struct in6_addr), r.scope());
 	}
 #endif
-	else
-		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 
 
@@ -525,7 +516,7 @@ IPAddress IPAddress::parse(const std::string& addr)
 }
 
 
- bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
+bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 {
 	IPv4AddressImpl impl4(IPv4AddressImpl::parse(addr));
 	if (impl4 != IPv4AddressImpl() || trim(addr) == "0.0.0.0")
@@ -541,7 +532,7 @@ IPAddress IPAddress::parse(const std::string& addr)
 		return true;
 	}
 #endif
-	 return false;
+	return false;
 }
 
 
