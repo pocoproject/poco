@@ -22,7 +22,7 @@
 
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Mutex.h"
-#include <openssl/opensslconf.h>
+#include <openssl/crypto.h>
 #ifdef OPENSSL_FIPS
 #include <openssl/fips.h>
 #endif
@@ -108,6 +108,7 @@ inline void OpenSSLInitializer::enableFIPSMode(bool /*enabled*/)
 {
 }
 #endif
+
 
 } } // namespace Poco::Crypto
 
