@@ -53,7 +53,7 @@ IPAddress::IPAddress(const IPAddress& addr)
 	if (addr.family() == IPv4)
 		newIPv4(addr.addr());
 	else
-		newIPv6(addr.addr());
+		newIPv6(addr.addr(), addr.scope());
 }
 
 
@@ -118,7 +118,7 @@ IPAddress::IPAddress(const std::string& addr, Family family)
 	else if (family == IPv6)
 	{
 		IPv6AddressImpl addr6(IPv6AddressImpl::parse(addr));
-		newIPv6(addr6.addr());
+		newIPv6(addr6.addr(), addr6.scope());
 		return;
 	}
 #endif
@@ -222,7 +222,7 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 		if (addr.family() == IPAddress::IPv4)
 			newIPv4(addr.addr());
 		else
-			newIPv6(addr.addr());
+			newIPv6(addr.addr(), addr.scope());
 	}
 	return *this;
 }
@@ -341,7 +341,13 @@ bool IPAddress::operator == (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
+    {
+#if defined(POCO_HAVE_IPv6)
+        if ( scope() != a.scope() )
+            return false;
+#endif
 		return std::memcmp(addr(), a.addr(), l1) == 0;
+    }
 	else
 		return false;
 }
@@ -349,12 +355,7 @@ bool IPAddress::operator == (const IPAddress& a) const
 
 bool IPAddress::operator != (const IPAddress& a) const
 {
-	poco_socklen_t l1 = length();
-	poco_socklen_t l2 = a.length();
-	if (l1 == l2)
-		return std::memcmp(addr(), a.addr(), l1) != 0;
-	else
-		return true;
+    return !(*this == a);
 }
 
 
@@ -363,7 +364,13 @@ bool IPAddress::operator < (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
+    {
+#if defined(POCO_HAVE_IPv6)
+        if ( scope() != a.scope() )
+            return scope() < a.scope();
+#endif
 		return std::memcmp(addr(), a.addr(), l1) < 0;
+    }
 	else
 		return l1 < l2;
 }
@@ -371,34 +378,19 @@ bool IPAddress::operator < (const IPAddress& a) const
 
 bool IPAddress::operator <= (const IPAddress& a) const
 {
-	poco_socklen_t l1 = length();
-	poco_socklen_t l2 = a.length();
-	if (l1 == l2)
-		return std::memcmp(addr(), a.addr(), l1) <= 0;
-	else
-		return l1 < l2;
+    return !(a < *this);
 }
 
 
 bool IPAddress::operator > (const IPAddress& a) const
 {
-	poco_socklen_t l1 = length();
-	poco_socklen_t l2 = a.length();
-	if (l1 == l2)
-		return std::memcmp(addr(), a.addr(), l1) > 0;
-	else
-		return l1 > l2;
+    return a < *this;
 }
 
 
 bool IPAddress::operator >= (const IPAddress& a) const
 {
-	poco_socklen_t l1 = length();
-	poco_socklen_t l2 = a.length();
-	if (l1 == l2)
-		return std::memcmp(addr(), a.addr(), l1) >= 0;
-	else
-		return l1 > l2;
+    return !(*this < a);
 }
 
 
@@ -415,9 +407,10 @@ IPAddress IPAddress::operator & (const IPAddress& other) const
 #if defined(POCO_HAVE_IPv6)
 		else if (family() == IPv6)
 		{
-			IPv6AddressImpl t(pImpl()->addr());
-			IPv6AddressImpl o(other.pImpl()->addr());
-			return IPAddress((t & o).addr(), sizeof(struct in6_addr));
+			const IPv6AddressImpl t(pImpl()->addr(), pImpl()->scope());
+			const IPv6AddressImpl o(other.pImpl()->addr(), other.pImpl()->scope());
+            const IPv6AddressImpl r = t & o;
+			return IPAddress(r.addr(), r.scope(), sizeof(struct in6_addr));
 		}
 #endif
 		else
@@ -441,9 +434,10 @@ IPAddress IPAddress::operator | (const IPAddress& other) const
 #if defined(POCO_HAVE_IPv6)
 		else if (family() == IPv6)
 		{
-			IPv6AddressImpl t(pImpl()->addr());
-			IPv6AddressImpl o(other.pImpl()->addr());
-			return IPAddress((t | o).addr(), sizeof(struct in6_addr));
+			const IPv6AddressImpl t(pImpl()->addr(), pImpl()->scope());
+			const IPv6AddressImpl o(other.pImpl()->addr(), other.pImpl()->scope());
+            const IPv6AddressImpl r = t | o;
+			return IPAddress(r.addr(), r.scope(), sizeof(struct in6_addr));
 		}
 #endif
 		else
@@ -467,9 +461,10 @@ IPAddress IPAddress::operator ^ (const IPAddress& other) const
 #if defined(POCO_HAVE_IPv6)
 		else if (family() == IPv6)
 		{
-			IPv6AddressImpl t(pImpl()->addr());
-			IPv6AddressImpl o(other.pImpl()->addr());
-			return IPAddress((t ^ o).addr(), sizeof(struct in6_addr));
+			const IPv6AddressImpl t(pImpl()->addr(), pImpl()->scope());
+			const IPv6AddressImpl o(other.pImpl()->addr(), other.pImpl()->scope());
+            const IPv6AddressImpl r = t ^ o;
+			return IPAddress(r.addr(), r.scope(), sizeof(struct in6_addr));
 		}
 #endif
 		else
@@ -490,8 +485,9 @@ IPAddress IPAddress::operator ~ () const
 #if defined(POCO_HAVE_IPv6)
 	else if (family() == IPv6)
 	{
-		IPv6AddressImpl self(this->pImpl()->addr());
-		return IPAddress((~self).addr(), sizeof(struct in6_addr));
+		const IPv6AddressImpl self(pImpl()->addr(), pImpl()->scope());
+        const IPv6AddressImpl r = ~self;
+		return IPAddress(r.addr(), sizeof(struct in6_addr), r.scope());
 	}
 #endif
 	else
@@ -541,7 +537,7 @@ IPAddress IPAddress::parse(const std::string& addr)
 	IPv6AddressImpl impl6(IPv6AddressImpl::parse(addr));
 	if (impl6 != IPv6AddressImpl())
 	{
-		result.newIPv6(impl6.addr());
+		result.newIPv6(impl6.addr(), impl6.scope());
 		return true;
 	}
 #endif

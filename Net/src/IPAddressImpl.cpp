@@ -104,6 +104,9 @@ IPv4AddressImpl::IPv4AddressImpl(const IPv4AddressImpl& addr)
 
 IPv4AddressImpl& IPv4AddressImpl::operator = (const IPv4AddressImpl& addr)
 {
+    if (this == &addr)
+        return *this;
+
 	std::memcpy(&_addr, &addr._addr, sizeof(_addr));
 	return *this;
 }
@@ -371,6 +374,9 @@ IPv6AddressImpl::IPv6AddressImpl(const IPv6AddressImpl& addr): _scope(addr._scop
 
 IPv6AddressImpl& IPv6AddressImpl::operator = (const IPv6AddressImpl& addr)
 {
+    if (this == &addr)
+        return *this;
+
 	_scope = addr._scope;
 	std::memcpy(&_addr, &addr._addr, sizeof(_addr));
 	return *this;
@@ -671,13 +677,18 @@ void IPv6AddressImpl::mask(const IPAddressImpl* pMask, const IPAddressImpl* pSet
 
 IPAddressImpl* IPv6AddressImpl::clone() const
 {
-	return new IPv6AddressImpl(&_addr, _scope);
+	return new IPv6AddressImpl(*this);
 }
 
 
 IPv6AddressImpl IPv6AddressImpl::operator & (const IPv6AddressImpl& addr) const
 {
-	IPv6AddressImpl result(&_addr);
+    if (_scope != addr._scope) {
+        throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match "
+                                             "with the source one.");
+    }
+
+	IPv6AddressImpl result(*this);
 #ifdef POCO_OS_FAMILY_WINDOWS
 	result._addr.s6_addr16[0] &= addr._addr.s6_addr16[0];
 	result._addr.s6_addr16[1] &= addr._addr.s6_addr16[1];
@@ -699,7 +710,12 @@ IPv6AddressImpl IPv6AddressImpl::operator & (const IPv6AddressImpl& addr) const
 
 IPv6AddressImpl IPv6AddressImpl::operator | (const IPv6AddressImpl& addr) const
 {
-	IPv6AddressImpl result(&_addr);
+    if (_scope != addr._scope) {
+        throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match "
+                                             "with the source one.");
+    }
+    
+	IPv6AddressImpl result(*this);
 #ifdef POCO_OS_FAMILY_WINDOWS
 	result._addr.s6_addr16[0] |= addr._addr.s6_addr16[0];
 	result._addr.s6_addr16[1] |= addr._addr.s6_addr16[1];
@@ -721,7 +737,13 @@ IPv6AddressImpl IPv6AddressImpl::operator | (const IPv6AddressImpl& addr) const
 
 IPv6AddressImpl IPv6AddressImpl::operator ^ (const IPv6AddressImpl& addr) const
 {
-	IPv6AddressImpl result(&_addr);
+    if (_scope != addr._scope) {
+        throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match "
+                                             "with the source one.");
+    }
+    
+	IPv6AddressImpl result(*this);
+
 #ifdef POCO_OS_FAMILY_WINDOWS
 	result._addr.s6_addr16[0] ^= addr._addr.s6_addr16[0];
 	result._addr.s6_addr16[1] ^= addr._addr.s6_addr16[1];
@@ -743,7 +765,7 @@ IPv6AddressImpl IPv6AddressImpl::operator ^ (const IPv6AddressImpl& addr) const
 
 IPv6AddressImpl IPv6AddressImpl::operator ~ () const
 {
-	IPv6AddressImpl result(&_addr);
+	IPv6AddressImpl result(*this);
 #ifdef POCO_OS_FAMILY_WINDOWS
 	result._addr.s6_addr16[0] ^= 0xffff;
 	result._addr.s6_addr16[1] ^= 0xffff;
@@ -765,7 +787,7 @@ IPv6AddressImpl IPv6AddressImpl::operator ~ () const
 
 bool IPv6AddressImpl::operator == (const IPv6AddressImpl& addr) const
 {
-	return 0 == std::memcmp(&addr._addr, &_addr, sizeof(_addr));
+	return _scope == addr._scope && 0 == std::memcmp(&addr._addr, &_addr, sizeof(_addr));
 }
 
 
