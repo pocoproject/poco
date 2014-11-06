@@ -25,7 +25,15 @@ namespace Poco {
 
 void Bugcheck::assertion(const char* cond, const char* file, int line, const char* text)
 {
-	Debugger::enter(std::string("Assertion violation: ") + cond + (text != NULL ? (std::string(" (") + text + std::string(")")) : ""), file, line);
+	std::string message("Assertion violation: ");
+	message += cond;
+	if (text)
+	{
+		message += " (";
+		message += text;
+		message += ")";
+	}
+	Debugger::enter(message, file, line);
 	throw AssertionViolationException(what(cond, file, line, text));
 }
 

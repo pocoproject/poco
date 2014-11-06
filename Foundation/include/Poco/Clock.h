@@ -48,6 +48,9 @@ public:
 	typedef Int64 ClockVal;    /// monotonic clock value in microsecond resolution
 	typedef Int64 ClockDiff;   /// difference between two clock values in microseconds
 
+	static const ClockVal CLOCKVAL_MIN;  /// minimum clock value
+	static const ClockVal CLOCKVAL_MAX;  /// maximum clock value
+
 	Clock();
 		/// Creates a Clock with the current system clock value.
 		

@@ -19,10 +19,10 @@
 #include "Poco/Exception.h"
 #include <algorithm>
 #ifdef min
-   #undef min
+	#undef min
 #endif
 #ifdef max
-   #undef max
+	#undef max
 #endif
 #include <limits>
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -148,6 +148,10 @@ void GetSystemTimeAsFileTimeWithMillisecondResolution(FILETIME* pFT)
 namespace Poco {
 
 
+const Timestamp::TimeVal Timestamp::TIMEVAL_MIN = std::numeric_limits<Timestamp::TimeVal>::min();
+const Timestamp::TimeVal Timestamp::TIMEVAL_MAX = std::numeric_limits<Timestamp::TimeVal>::max();
+
+
 Timestamp::Timestamp()
 {
 	update();
@@ -267,8 +271,6 @@ Timestamp& Timestamp::operator -= (const Timespan& span)
 	return *this -= span.totalMicroseconds();
 }
 
-const Timestamp::TimeVal Timestamp::Min = std::numeric_limits<Timestamp::TimeVal>::min();
-const Timestamp::TimeVal Timestamp::Max = std::numeric_limits<Timestamp::TimeVal>::max();
 
 #if defined(_WIN32)
 

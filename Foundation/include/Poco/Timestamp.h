@@ -28,6 +28,7 @@ namespace Poco {
 
 class Timespan;
 
+
 class Foundation_API Timestamp
 	/// A Timestamp stores a monotonic* time value
 	/// with (theoretical) microseconds resolution.
@@ -47,8 +48,8 @@ public:
 	typedef Int64 UtcTimeVal; /// monotonic UTC time value in 100 nanosecond resolution
 	typedef Int64 TimeDiff;   /// difference between two timestamps in microseconds
 
-   static const TimeVal Min;
-   static const TimeVal Max;
+	static const TimeVal TIMEVAL_MIN; /// minimum timestamp value
+	static const TimeVal TIMEVAL_MAX; /// maximum timestamp value
 
 	Timestamp();
 		/// Creates a timestamp with the current time.
