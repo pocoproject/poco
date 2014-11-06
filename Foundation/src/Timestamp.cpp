@@ -18,6 +18,13 @@
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#ifdef min
+   #undef min
+#endif
+#ifdef max
+   #undef max
+#endif
+#include <limits>
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <time.h>
 #include <unistd.h>
@@ -260,6 +267,8 @@ Timestamp& Timestamp::operator -= (const Timespan& span)
 	return *this -= span.totalMicroseconds();
 }
 
+const Timestamp::TimeVal Timestamp::Min = std::numeric_limits<Timestamp::TimeVal>::min();
+const Timestamp::TimeVal Timestamp::Max = std::numeric_limits<Timestamp::TimeVal>::max();
 
 #if defined(_WIN32)
 

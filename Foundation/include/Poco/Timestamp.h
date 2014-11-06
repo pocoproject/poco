@@ -47,6 +47,9 @@ public:
 	typedef Int64 UtcTimeVal; /// monotonic UTC time value in 100 nanosecond resolution
 	typedef Int64 TimeDiff;   /// difference between two timestamps in microseconds
 
+   static const TimeVal Min;
+   static const TimeVal Max;
+
 	Timestamp();
 		/// Creates a timestamp with the current time.
 		
