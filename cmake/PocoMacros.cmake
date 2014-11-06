@@ -86,7 +86,7 @@ endif(WIN32)
 macro(POCO_SOURCES_PLAT out name platform)
     source_group("${name}\\Source Files" FILES ${ARGN})
     list(APPEND ${out} ${ARGN})
-    if(NOT ${platform})
+    if(NOT (${platform}))
         set_source_files_properties(${ARGN} PROPERTIES HEADER_FILE_ONLY TRUE)
     endif()
 endmacro()
@@ -181,4 +181,52 @@ macro(POCO_MESSAGES out name)
         list(APPEND ${out} ${ARGN})
 
     endif (WIN32)
+endmacro()
+
+
+#===============================================================================
+# Macros for Package generation
+#
+#TODO: Document this!
+#  POCO_GENERATE_PACKAGE - Generates *Config.cmake
+#    Usage: POCO_SOURCES_PLAT( out name platform sources)
+#      INPUT:
+#           out             the variable the sources are added to
+#           name:           the name of the components
+#           platform:       the platform this sources are for (ON = All, OFF = None, WIN32, UNIX ...)
+#           sources:        a list of files to add to ${out}
+#    Example: POCO_SOURCES_PLAT( SRCS Foundation ON src/Foundation.cpp )
+macro(POCO_GENERATE_PACKAGE target_name export_name package_destination)
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/Poco${target_name}ConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY AnyNewerVersion
+)
+export(EXPORT "${export_name}"
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/Poco${target_name}Targets.cmake"
+  NAMESPACE "Poco::"
+)
+configure_file(cmake/Poco${target_name}Config.cmake
+  "${CMAKE_CURRENT_BINARY_DIR}/Poco${target_name}Config.cmake"
+  @ONLY
+)
+
+set(ConfigPackageLocation "${package_destination}")
+
+install(
+    EXPORT "${export_name}"
+    FILE "Poco${target_name}Targets.cmake"
+    NAMESPACE "Poco::"
+    DESTINATION ${package_destination}
+    )
+
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/Poco${target_name}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/Poco${target_name}ConfigVersion.cmake"
+    DESTINATION ${package_destination}
+    COMPONENT Devel
+    )
+
 endmacro()

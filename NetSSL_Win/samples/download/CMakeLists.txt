@@ -1,4 +1,4 @@
-set(SAMPLE_NAME "download-ssl")
+set(SAMPLE_NAME "download-ssl-win")
 
 set(LOCAL_SRCS "")
 aux_source_directory(src LOCAL_SRCS)

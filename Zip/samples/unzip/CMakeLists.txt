@@ -1,4 +1,4 @@
-set(SAMPLE_NAME "unzip")
+set(SAMPLE_NAME "sample-unzip")
 
 set(LOCAL_SRCS "")
 aux_source_directory(src LOCAL_SRCS)

@@ -8,7 +8,7 @@
 
 project(Poco)
 
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 3.0.0)
 
 file(STRINGS "${CMAKE_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
 
@@ -75,11 +75,17 @@ option(ENABLE_PDF "Enable PDF" ON)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
 option(ENABLE_NETSSL "Enable NetSSL" ON)
+option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" ON)
 option(ENABLE_CRYPTO "Enable Crypto" ON)
 option(ENABLE_DATA "Enable Data" ON)
+option(ENABLE_DATA_SQLITE "Enable Data SQlite" ON)
+option(ENABLE_DATA_MYSQL "Enable Data MySQL" ON)
+option(ENABLE_DATA_ODBC "Enable Data ODBC" ON)
 option(ENABLE_SEVENZIP "Enable SevenZip" ON)
 option(ENABLE_ZIP "Enable Zip" ON)
 option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
+
+option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
 
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
@@ -115,32 +121,21 @@ else ()
   message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
 endif ()
 
-# Set local include path
-include_directories( CppUnit/include CppUnit/WinTestRunner/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include Data/MySQL/include Data/SQLite/include Data/ODBC/include Zip/include Crypto/include Web/include JSON/include MongoDB/include PDF/include SevenZip/include)
-
 include(CheckTypeSize)
 find_package(Cygwin)
 
-#include(CMakeDetermineCompilerId)
-
 # OS Detection
-if(CMAKE_SYSTEM MATCHES "Windows")
+if(WIN32)
+  add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DUNICODE -D_UNICODE)
+  #set(SYSLIBS iphlpapi gdi32 odbc32)
+endif(WIN32)
 
- add_definitions( -DPOCO_OS_FAMILY_WINDOWS)
- set(SYSLIBS iphlpapi gdi32 odbc32)
-
- if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
-        message(STATUS "XXX: MS Visual Compiler detected")
- endif (CMAKE_C_COMPILER_ID MATCHES "MSVC")
-
-endif(CMAKE_SYSTEM MATCHES "Windows")
-
-if (CMAKE_SYSTEM MATCHES "Linux" AND NOT ANDROID )
+if (UNIX AND NOT ANDROID )
   add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
   add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64)
   set(SYSLIBS  pthread dl rt)
-endif(CMAKE_SYSTEM MATCHES "Linux" AND NOT ANDROID )
+endif(UNIX AND NOT ANDROID )
 
 if (CMAKE_SYSTEM MATCHES "SunOS")
   add_definitions( -DPOCO_OS_FAMILY_UNIX )
@@ -150,15 +145,15 @@ if (CMAKE_SYSTEM MATCHES "SunOS")
 endif(CMAKE_SYSTEM MATCHES "SunOS")
 
 if (CMAKE_COMPILER_IS_MINGW)
-    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
-    add_definitions(-mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED )
+  add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
+  add_definitions(-mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED )
   link_directories(/usr/local/lib /usr/lib)
   include_directories(/usr/local/include /usr/include)
 endif (CMAKE_COMPILER_IS_MINGW)
 
-if (CMAKE_COMPILER_IS_CYGWIN)
+if (CYGWIN)
 #    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
-endif (CMAKE_COMPILER_IS_CYGWIN)
+endif (CYGWIN)
 
 # SunPro C++
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
@@ -170,10 +165,14 @@ if (IOS)
   add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_STAT64 -DPOCO_NO_SHAREDLIBS -DPOCO_NO_NET_IFTYPES )
 endif(IOS)
 
-#ANDROID
+#Android
 if (ANDROID)
   add_definitions( -DPOCO_ANDROID -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SHAREDMEMORY )
-endif()
+endif(ANDROID)
+
+
+# Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
+set(Poco_COMPONENTS "")
 
 if (ENABLE_TESTS)
    add_subdirectory(CppUnit)
@@ -182,43 +181,62 @@ endif ()
 add_subdirectory(Foundation)
 if(ENABLE_XML)
 add_subdirectory(XML)
+list(APPEND Poco_COMPONENTS "XML")
 endif()
 if(ENABLE_JSON)
 add_subdirectory(JSON)
+list(APPEND Poco_COMPONENTS "JSON")
 endif()
 if(ENABLE_MONGODB)
 add_subdirectory(MongoDB)
+list(APPEND Poco_COMPONENTS "MongoDB")
 endif()
 if(ENABLE_PDF)
 add_subdirectory(PDF)
+list(APPEND Poco_COMPONENTS "PDF")
 endif()
 if(ENABLE_UTIL)
 add_subdirectory(Util)
+list(APPEND Poco_COMPONENTS "Util")
 endif()
 if(ENABLE_NET)
 add_subdirectory(Net)
+list(APPEND Poco_COMPONENTS "Net")
 endif()
 
-# OPENSSL_SSL_LIBRARY
+
+#NetSSL
+
+
+if(WIN32 AND ENABLE_NETSSL_WIN)
+    add_subdirectory(NetSSL_Win)
+    list(APPEND Poco_COMPONENTS "NetSSL_Win")
+endif(WIN32 AND ENABLE_NETSSL_WIN)
+
 find_package(OpenSSL)
 if(OPENSSL_FOUND)
     include_directories("${OPENSSL_INCLUDE_DIR}")
     if(ENABLE_NETSSL)
     add_subdirectory(NetSSL_OpenSSL)
+    list(APPEND Poco_COMPONENTS "NetSSL_OpenSSL")
     endif()
     if(ENABLE_CRYPTO)
     add_subdirectory(Crypto)
+    list(APPEND Poco_COMPONENTS "Crypto")
     endif()
 endif(OPENSSL_FOUND)
 
 if(ENABLE_DATA)
 add_subdirectory(Data)
+list(APPEND Poco_COMPONENTS "Data")
 endif()
 if(ENABLE_SEVENZIP)
 add_subdirectory(SevenZip)
+list(APPEND Poco_COMPONENTS "SevenZip")
 endif()
 if(ENABLE_ZIP)
 add_subdirectory(Zip)
+list(APPEND Poco_COMPONENTS "Zip")
 endif()
 
 find_package(APR)
@@ -227,6 +245,7 @@ if(APRUTIL_FOUND AND APACHE_FOUND)
     include_directories( "${APACHE_INCLUDE_DIR}" "${APRUTIL_INCLUDE_DIR}" )
     if(ENABLE_APACHECONNECTOR)
     add_subdirectory(ApacheConnector)
+    list(APPEND Poco_COMPONENTS "ApacheConnector")
     endif()
 endif(APRUTIL_FOUND AND APACHE_FOUND)
 
@@ -253,9 +272,38 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
 
 include(CPack)
 
+#############################################################
+# cmake config files 
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY AnyNewerVersion
+)
+
+configure_file(cmake/${PROJECT_NAME}Config.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake" @ONLY)
+install(
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION
+        "lib/cmake/${PROJECT_NAME}"
+    COMPONENT
+        Devel
+)
+
+# in tree build settings
+#configure_file(PocoBuildTreeSettings.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/PocoBuildTreeSettings.cmake @ONLY)
+
+
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
 message(STATUS "Installation target path: ${CMAKE_INSTALL_PREFIX}")
 
 message(STATUS "C_FLAGS:  =${CMAKE_C_FLAGS}")
 message(STATUS "CXX_FLAGS:=${CMAKE_CXX_FLAGS}")
+
+foreach(component ${Poco_COMPONENTS})
+message(STATUS "Building: ${component}")
+endforeach()
 
