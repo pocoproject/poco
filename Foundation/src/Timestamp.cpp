@@ -18,12 +18,8 @@
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include <algorithm>
-#ifdef min
-	#undef min
-#endif
-#ifdef max
-	#undef max
-#endif
+#undef min
+#undef max
 #include <limits>
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <time.h>

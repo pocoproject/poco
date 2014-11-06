@@ -28,6 +28,8 @@
 #include "Poco/UnWindows.h"
 #endif
 #include <algorithm>
+#undef min
+#undef max
 #include <limits>
 
 
