@@ -23,12 +23,7 @@ void Benchmark(Mtx& mtx, std::string const& label)
 	Poco::Stopwatch sw;
 	sw.start();
 
-	const int LOOP_COUNT = 100000000;
-	for (int i = 0 ; i < LOOP_COUNT ; ++i)
-	{
-		mtx.lock();
-		mtx.unlock();
-	}
+	const int LOOP_COUNT = 1000000000;
 
 	mtx.lock();
 
