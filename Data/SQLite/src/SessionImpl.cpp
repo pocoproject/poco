@@ -28,6 +28,11 @@
 #include <cstdlib>
 
 
+#ifndef SQLITE_OPEN_URI
+#define SQLITE_OPEN_URI 0
+#endif
+
+
 namespace Poco {
 namespace Data {
 namespace SQLite {
@@ -150,7 +155,7 @@ private:
 
 	inline int connectImpl()
 	{
-		return sqlite3_open(_connectString.c_str(), _ppDB);
+		return sqlite3_open_v2(_connectString.c_str(), _ppDB, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, NULL);
 	}
 
 	std::string _connectString;
@@ -184,7 +189,8 @@ void SessionImpl::open(const std::string& connect)
 			close();
 			Utility::throwException(rc);
 		}
-	} catch (SQLiteException& ex)
+	} 
+	catch (SQLiteException& ex)
 	{
 		throw ConnectionFailedException(ex.displayText());
 	}
