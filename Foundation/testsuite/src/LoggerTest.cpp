@@ -199,6 +199,18 @@ void LoggerTest::testFormatAny()
 
 	root.error("%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6);
 	assert (pChannel->getLastMessage().getText() == "123456");
+
+	root.error("%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7);
+	assert(pChannel->getLastMessage().getText() == "1234567");
+
+	root.error("%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8);
+	assert(pChannel->getLastMessage().getText() == "12345678");
+
+	root.error("%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+	assert(pChannel->getLastMessage().getText() == "123456789");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+	assert(pChannel->getLastMessage().getText() == "12345678910");
 }
 
 
