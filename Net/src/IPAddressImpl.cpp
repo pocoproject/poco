@@ -397,7 +397,7 @@ IPv6AddressImpl::IPv6AddressImpl(unsigned prefix):
 	}
 	if (prefix > 0)
 	{
-		_addr.s6_addr16[i++] = ByteOrder::toNetwork(~(0xffff >> prefix));
+		_addr.s6_addr16[i++] = ByteOrder::toNetwork(static_cast<Poco::UInt16>(~(0xffff >> prefix)));
 	}
 	while (i < 8)
 	{
