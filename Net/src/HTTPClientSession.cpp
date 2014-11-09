@@ -37,9 +37,12 @@ namespace Poco {
 namespace Net {
 
 
+HTTPClientSession::ProxyConfig HTTPClientSession::_globalProxyConfig;
+
+
 HTTPClientSession::HTTPClientSession():
 	_port(HTTPSession::HTTP_PORT),
-	_proxyPort(HTTPSession::HTTP_PORT),
+	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
@@ -51,7 +54,7 @@ HTTPClientSession::HTTPClientSession():
 HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	HTTPSession(socket),
 	_port(HTTPSession::HTTP_PORT),
-	_proxyPort(HTTPSession::HTTP_PORT),
+	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
@@ -63,7 +66,7 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_host(address.host().toString()),
 	_port(address.port()),
-	_proxyPort(HTTPSession::HTTP_PORT),
+	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
@@ -75,7 +78,7 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port):
 	_host(host),
 	_port(port),
-	_proxyPort(HTTPSession::HTTP_PORT),
+	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
@@ -111,8 +114,8 @@ void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port)
 {
 	if (!connected())
 	{
-		_proxyHost = host;
-		_proxyPort = port;
+		_proxyConfig.host = host;
+		_proxyConfig.port = port;
 	}
 	else throw IllegalStateException("Cannot set the proxy host and port for an already connected session");
 }
@@ -121,7 +124,7 @@ void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port)
 void HTTPClientSession::setProxyHost(const std::string& host)
 {
 	if (!connected())
-		_proxyHost = host;
+		_proxyConfig.host = host;
 	else
 		throw IllegalStateException("Cannot set the proxy host for an already connected session");
 }
@@ -130,7 +133,7 @@ void HTTPClientSession::setProxyHost(const std::string& host)
 void HTTPClientSession::setProxyPort(Poco::UInt16 port)
 {
 	if (!connected())
-		_proxyPort = port;
+		_proxyConfig.port = port;
 	else
 		throw IllegalStateException("Cannot set the proxy port number for an already connected session");
 }
@@ -138,23 +141,35 @@ void HTTPClientSession::setProxyPort(Poco::UInt16 port)
 
 void HTTPClientSession::setProxyCredentials(const std::string& username, const std::string& password)
 {
-	_proxyUsername = username;
-	_proxyPassword = password;
+	_proxyConfig.username = username;
+	_proxyConfig.password = password;
 }
 
 
 void HTTPClientSession::setProxyUsername(const std::string& username)
 {
-	_proxyUsername = username;
+	_proxyConfig.username = username;
 }
 	
 
 void HTTPClientSession::setProxyPassword(const std::string& password)
 {
-	_proxyPassword = password;
+	_proxyConfig.password = password;
 }
 
-	
+
+void HTTPClientSession::setProxyConfig(const ProxyConfig& config)
+{
+	_proxyConfig = config;
+}
+
+
+void HTTPClientSession::setGlobalProxyConfig(const ProxyConfig& config)
+{
+	_globalProxyConfig = config;
+}
+
+
 void HTTPClientSession::setKeepAliveTimeout(const Poco::Timespan& timeout)
 {
 	_keepAliveTimeout = timeout;
@@ -180,7 +195,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 			request.setKeepAlive(false);
 		if (!request.has(HTTPRequest::HOST))
 			request.setHost(_host, _port);
-		if (!_proxyHost.empty())
+		if (!_proxyConfig.host.empty())
 		{
 			request.setURI(proxyRequestPrefix() + request.getURI());
 			proxyAuthenticate(request);
@@ -312,14 +327,14 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 
 void HTTPClientSession::reconnect()
 {
-	if (_proxyHost.empty())
+	if (_proxyConfig.host.empty())
 	{
 		SocketAddress addr(_host, _port);
 		connect(addr);
 	}
 	else
 	{
-		SocketAddress addr(_proxyHost, _proxyPort);
+		SocketAddress addr(_proxyConfig.host, _proxyConfig.port);
 		connect(addr);
 	}
 }
@@ -354,9 +369,9 @@ void HTTPClientSession::proxyAuthenticate(HTTPRequest& request)
 
 void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request)
 {
-	if (!_proxyUsername.empty())
+	if (!_proxyConfig.username.empty())
 	{
-		HTTPBasicCredentials creds(_proxyUsername, _proxyPassword);
+		HTTPBasicCredentials creds(_proxyConfig.username, _proxyConfig.password);
 		creds.proxyAuthenticate(request);
 	}
 }

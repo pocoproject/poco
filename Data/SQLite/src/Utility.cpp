@@ -29,6 +29,11 @@
 #endif
 
 
+#ifndef SQLITE_OPEN_URI
+#define SQLITE_OPEN_URI 0
+#endif
+
+
 namespace Poco {
 namespace Data {
 namespace SQLite {
@@ -54,6 +59,7 @@ const std::string Utility::SQLITE_DATE_FORMAT = "%Y-%m-%d";
 const std::string Utility::SQLITE_TIME_FORMAT = "%H:%M:%S";
 Utility::TypeMap Utility::_types;
 Poco::Mutex Utility::_mutex;
+
 
 Utility::Utility()
 {
@@ -217,7 +223,7 @@ bool Utility::fileToMemory(sqlite3* pInMemory, const std::string& fileName)
 	sqlite3* pFile;
 	sqlite3_backup* pBackup;
 
-	rc = sqlite3_open(fileName.c_str(), &pFile);
+	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READONLY | SQLITE_OPEN_URI, NULL);
 	if(rc == SQLITE_OK )
 	{
 		pBackup = sqlite3_backup_init(pInMemory, "main", pFile, "main");
@@ -240,7 +246,7 @@ bool Utility::memoryToFile(const std::string& fileName, sqlite3* pInMemory)
 	sqlite3* pFile;
 	sqlite3_backup* pBackup;
 
-	rc = sqlite3_open(fileName.c_str(), &pFile);
+	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, NULL);
 	if(rc == SQLITE_OK )
 	{
 		pBackup = sqlite3_backup_init(pFile, "main", pInMemory, "main");
@@ -304,8 +310,6 @@ void* Utility::eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, 
 {
 	return sqlite3_rollback_hook(pDB, callbackFn, pParam);
 }
-
-
 
 
 } } } // namespace Poco::Data::SQLite
