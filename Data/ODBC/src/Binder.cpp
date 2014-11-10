@@ -36,8 +36,21 @@ Binder::Binder(const StatementHandle& rStmt,
 	_paramBinding(dataBinding),
 	_pTypeInfo(pDataTypes),
 	_paramSetSize(0),
-	_maxFieldSize(maxFieldSize)
+	_maxFieldSize(maxFieldSize),
+	_maxCharColLength(1024),
+	_maxVarBinColSize(1024),
+	_maxWCharColLength(1024)
 {
+	const std::string NM("COLUMN_SIZE");
+	Poco::DynamicAny r;
+	if (_pTypeInfo->tryGetInfo(SQL_WVARCHAR, NM, r))
+		_maxWCharColLength = r.convert<std::size_t>();
+
+	if (_pTypeInfo->tryGetInfo(SQL_VARCHAR, NM, r))
+		_maxCharColLength = r.convert<std::size_t>();
+
+	if (_pTypeInfo->tryGetInfo(SQL_VARBINARY, NM, r))
+		_maxVarBinColSize = r.convert<std::size_t>();
 }
 
 
@@ -104,6 +117,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER) val.size();
 
+    	SQLSMALLINT sqType = SQL_LONGVARCHAR;
 	if (isOutBound(dir))
 	{
 		getColumnOrParameterSize(pos, size);
@@ -111,11 +125,13 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		pVal = (SQLPOINTER) pChar;
 		_outParams.insert(ParamMap::value_type(pVal, size));
 		_strings.insert(StringMap::value_type(pChar, const_cast<std::string*>(&val)));
+        	if (size < _maxCharColLength) sqType = SQL_VARCHAR;
 	}
 	else if (isInBound(dir))
 	{
 		pVal = (SQLPOINTER) val.c_str();
 		_inParams.insert(ParamMap::value_type(pVal, size));
+        	if (size < _maxCharColLength) sqType = SQL_VARCHAR;
 	}
 	else
 		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
@@ -135,7 +151,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		(SQLUSMALLINT) pos + 1, 
 		toODBCDirection(dir), 
 		SQL_C_CHAR, 
-		SQL_LONGVARCHAR, 
+        	sqType,
 		(SQLUINTEGER) colSize,
 		0,
 		pVal, 
@@ -153,7 +169,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 
 	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER)(val.size() * sizeof(CharT));
-
+    	SQLSMALLINT sqType = (val.size() < _maxWCharColLength) ? SQL_WVARCHAR : SQL_WLONGVARCHAR;
 	if (isOutBound(dir))
 	{
 		getColumnOrParameterSize(pos, size);
@@ -187,7 +203,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 		(SQLUSMALLINT)pos + 1,
 		toODBCDirection(dir),
 		SQL_C_WCHAR,
-		SQL_WLONGVARCHAR,
+		sqType,
 		(SQLUINTEGER)colSize,
 		0,
 		pVal,
