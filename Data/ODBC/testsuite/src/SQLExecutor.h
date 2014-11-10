@@ -475,8 +475,8 @@ public:
 
 	void internalExtraction();
 	void filter(const std::string& query = 
-		"SELECT * FROM Vectors ORDER BY int0 ASC",
-		const std::string& intFldName = "int0");
+		"SELECT * FROM Vectors ORDER BY i0 ASC",
+		const std::string& intFldName = "i0");
 
 	void internalBulkExtraction();
 	void internalBulkExtractionUTF16();
