@@ -165,33 +165,35 @@ void ODBCDB2Test::testStoredProcedure()
 {
 	if (! &session()) fail ("Test not available.");
 
+	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
+	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
+	dropObject("PROCEDURE", "storedProcedure(VARCHAR(1000), VARCHAR(1000))");
+
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
 		session().setFeature("autoExtract", bindValue(k+1));
 
-		dropObject("PROCEDURE", "storedProcedure");
 		session() << "CREATE PROCEDURE storedProcedure(OUT outParam INTEGER) "
 			"BEGIN "
 			" SET outParam = -1; "
 			"END" , now;
 
 		int i = 0;
-		session() << "{call storedProcedure(?)}", out(i), now;
+        	session() << "{call " DB2_DB ".storedProcedure(?)}", out(i), now;
+        	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
 		assert(-1 == i);
-		dropObject("PROCEDURE", "storedProcedure");
 
 		session() << "CREATE PROCEDURE storedProcedure(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "
 			" SET outParam = inParam*inParam; "
 			"END" , now;
 		
-
 		i = 2;
 		int j = 0;
-		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+        	session() << "{call " DB2_DB ".storedProcedure(?, ?)}", in(i), out(j), now;
+        	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
 		assert(4 == j);
-		dropObject("PROCEDURE", "storedProcedure");
 	
 		session() << "CREATE PROCEDURE storedProcedure(INOUT ioParam INTEGER) "
 			"BEGIN "
@@ -199,9 +201,9 @@ void ODBCDB2Test::testStoredProcedure()
 			"END" , now;
 
 		i = 2;
-		session() << "{call storedProcedure(?)}", io(i), now;
+        	session() << "{call " DB2_DB ".storedProcedure(?)}", io(i), now;
+        	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
 		assert(4 == i);
-		dropObject("PROCEDURE", "storedProcedure");
 
 		//TIMESTAMP is not supported as stored procedure parameter in DB2
 		//(SQL0182N An expression with a datetime value or a labeled duration is not valid.)
@@ -222,9 +224,9 @@ void ODBCDB2Test::testStoredProcedure()
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
 		std::string outParam;
-		session() << "{call storedProcedure(?,?)}", in(inParam), out(outParam), now;
+        	session() << "{call " DB2_DB ".storedProcedure(?,?)}", in(inParam), out(outParam), now;
+        	dropObject("PROCEDURE", "storedProcedure(VARCHAR(1000), VARCHAR(1000))");
 		assert(inParam == outParam);
-		dropObject("PROCEDURE", "storedProcedure");
 
 		k += 2;
 	}
@@ -235,6 +237,8 @@ void ODBCDB2Test::testStoredProcedureAny()
 {
 	if (! &session()) fail ("Test not available.");
 
+	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
+	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
@@ -248,9 +252,9 @@ void ODBCDB2Test::testStoredProcedureAny()
 			" SET outParam = inParam*inParam; "
 			"END" , now;
 
-		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+        	session() << "{call " DB2_DB ".storedProcedure(?, ?)}", in(i), out(j), now;
+        	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
 		assert(4 == AnyCast<int>(j));
-		session() << "DROP PROCEDURE storedProcedure;", now;
 
 		session() << "CREATE PROCEDURE storedProcedure(INOUT ioParam INTEGER) "
 			"BEGIN "
@@ -258,10 +262,10 @@ void ODBCDB2Test::testStoredProcedureAny()
 			"END" , now;
 
 		i = 2;
-		session() << "{call storedProcedure(?)}", io(i), now;
+        	session() << "{call " DB2_DB ".storedProcedure(?)}", io(i), now;
+        	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
 		assert(4 == AnyCast<int>(i));
-		dropObject("PROCEDURE", "storedProcedure");
-
+		
 		k += 2;
 	}
 }
@@ -271,6 +275,8 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 {
 	if (! &session()) fail ("Test not available.");
 
+    	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
+    	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
@@ -283,9 +289,9 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 			" SET outParam = inParam*inParam; "
 			"END" , now;
 
-		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+        	session() << "{call " DB2_DB ".storedProcedure(?, ?)}", in(i), out(j), now;
+        	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
 		assert(4 == j);
-		session() << "DROP PROCEDURE storedProcedure;", now;
 
 		session() << "CREATE PROCEDURE storedProcedure(INOUT ioParam INTEGER) "
 			"BEGIN "
@@ -293,9 +299,9 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 			"END" , now;
 
 		i = 2;
-		session() << "{call storedProcedure(?)}", io(i), now;
+        	session() << "{call " DB2_DB ".storedProcedure(?)}", io(i), now;
+        	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
 		assert(4 == i);
-		dropObject("PROCEDURE", "storedProcedure");
 
 		k += 2;
 	}
@@ -306,21 +312,25 @@ void ODBCDB2Test::testStoredFunction()
 {
 	if (! &session()) fail ("Test not available.");
 
-	for (int k = 0; k < 8;)
+    	dropObject("PROCEDURE", "storedFunction()");
+    	dropObject("PROCEDURE", "storedFunction(INTEGER)");
+    	dropObject("PROCEDURE", "storedFunction(INTEGER, INTEGER)");
+    	dropObject("PROCEDURE", "storedFunction(VARCHAR(10), VARCHAR(10))");
+
+    	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
 		session().setFeature("autoExtract", bindValue(k+1));
 
-		dropObject("PROCEDURE", "storedFunction");
 		session() << "CREATE PROCEDURE storedFunction() "
 			"BEGIN "
 			"  RETURN -1; "
 			"END" , now;
 
 		int i = 0;
-		session() << "{? = call storedFunction()}", out(i), now;
+        	session() << "{? = call " DB2_DB ".storedFunction()}", out(i), now;
+        	dropObject("PROCEDURE", "storedFunction()");
 		assert(-1 == i);
-		dropObject("PROCEDURE", "storedFunction");
 		
 		session() << "CREATE PROCEDURE storedFunction(inParam INTEGER) "
 			"BEGIN "
@@ -329,9 +339,9 @@ void ODBCDB2Test::testStoredFunction()
 		
 		i = 2;
 		int result = 0;
-		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
+        	session() << "{? = call " DB2_DB ".storedFunction(?)}", out(result), in(i), now;
+        	dropObject("PROCEDURE", "storedFunction(INTEGER)");
 		assert(4 == result);
-		dropObject("PROCEDURE", "storedFunction");
 
 		session() << "CREATE PROCEDURE storedFunction(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "
@@ -342,10 +352,10 @@ void ODBCDB2Test::testStoredFunction()
 		i = 2;
 		int j = 0;
 		result = 0;
-		session() << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
+        	session() << "{? = call " DB2_DB ".storedFunction(?, ?)}", out(result), in(i), out(j), now;
+        	dropObject("PROCEDURE", "storedFunction(INTEGER, INTEGER)");
 		assert(4 == j);
 		assert(j == result); 
-		dropObject("PROCEDURE", "storedFunction");
 
 		session() << "CREATE PROCEDURE storedFunction(INOUT param1 INTEGER, INOUT param2 INTEGER) "
 			"BEGIN "
@@ -359,7 +369,7 @@ void ODBCDB2Test::testStoredFunction()
 		i = 1;
 		j = 2;
 		result = 0;
-		session() << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
+        	session() << "{? = call " DB2_DB ".storedFunction(?, ?)}", out(result), io(i), io(j), now;
 		assert(1 == j);
 		assert(2 == i);
 		assert(3 == result); 
@@ -368,12 +378,11 @@ void ODBCDB2Test::testStoredFunction()
 		assert(1 == params.get<0>());
 		assert(2 == params.get<1>());
 		result = 0;
-		session() << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
+        	session() << "{? = call " DB2_DB ".storedFunction(?, ?)}", out(result), io(params), now;
+        	dropObject("PROCEDURE", "storedFunction(INTEGER, INTEGER)");
 		assert(1 == params.get<1>());
 		assert(2 == params.get<0>());
 		assert(3 == result); 
-
-		dropObject("PROCEDURE", "storedFunction");
 
 		session().setFeature("autoBind", true);
 
@@ -386,10 +395,10 @@ void ODBCDB2Test::testStoredFunction()
 		std::string inParam = "123456789";
 		std::string outParam;
 		int ret;
-		session() << "{? = call storedFunction(?,?)}", out(ret), in(inParam), out(outParam), now;
+        	session() << "{? = call " DB2_DB ".storedFunction(?,?)}", out(ret), in(inParam), out(outParam), now;
+        	dropObject("PROCEDURE", "storedFunction(VARCHAR(10), VARCHAR(10))");
 		assert(inParam == outParam);
 		assert(ret == inParam.size());
-		dropObject("PROCEDURE", "storedFunction");
 
 		k += 2;
 	}
@@ -408,8 +417,9 @@ void ODBCDB2Test::dropObject(const std::string& type, const std::string& name)
 		const StatementDiagnostics::FieldVec& flds = ex.diagnostics().fields();
 		StatementDiagnostics::Iterator it = flds.begin();
 		for (; it != flds.end(); ++it)
-		{
-			if (-204 == it->_nativeError)//(table does not exist)
+		{ 
+            		//(table does not exist)        // procedure not found
+            		if (-204 == it->_nativeError || (-458 == it->_nativeError) )
 			{
 				ignoreError = true;
 				break;
