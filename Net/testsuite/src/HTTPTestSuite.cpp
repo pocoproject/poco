@@ -15,6 +15,7 @@
 #include "HTTPResponseTest.h"
 #include "HTTPCookieTest.h"
 #include "HTTPCredentialsTest.h"
+#include "OAuth10CredentialsTest.h"
 
 
 CppUnit::Test* HTTPTestSuite::suite()
@@ -25,6 +26,7 @@ CppUnit::Test* HTTPTestSuite::suite()
 	pSuite->addTest(HTTPResponseTest::suite());
 	pSuite->addTest(HTTPCookieTest::suite());
 	pSuite->addTest(HTTPCredentialsTest::suite());
+	pSuite->addTest(OAuth10CredentialsTest::suite());
 
 	return pSuite;
 }

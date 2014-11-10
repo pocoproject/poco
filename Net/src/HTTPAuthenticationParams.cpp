@@ -203,7 +203,7 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 		switch (state) 
 		{
 		case STATE_SPACE:
-			if (Ascii::isAlphaNumeric(*it)) 
+			if (Ascii::isAlphaNumeric(*it) || *it == '_') 
 			{
 				token += *it;
 				state = STATE_TOKEN;
@@ -220,7 +220,7 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 			{
 				state = STATE_EQUALS;
 			} 
-			else if (Ascii::isAlphaNumeric(*it)) 
+			else if (Ascii::isAlphaNumeric(*it) || *it == '_') 
 			{
 				token += *it;
 			} 
@@ -228,7 +228,7 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 			break;
 
 		case STATE_EQUALS:
-			if (Ascii::isAlphaNumeric(*it)) 
+			if (Ascii::isAlphaNumeric(*it) || *it == '_') 
 			{
 				value += *it;
 				state = STATE_VALUE;

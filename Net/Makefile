@@ -32,7 +32,8 @@ objects = \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
 	NTPClient NTPEventArgs NTPPacket \
 	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
-	WebSocket WebSocketImpl
+	WebSocket WebSocketImpl \
+	OAuth10Credentials
 
 target         = PocoNet
 target_version = $(LIBVERSION)

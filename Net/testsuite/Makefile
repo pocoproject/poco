@@ -27,7 +27,8 @@ objects = \
 	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
 	NTPClientTest NTPClientTestSuite \
 	WebSocketTest WebSocketTestSuite \
-	SyslogTest
+	SyslogTest \
+	OAuth10CredentialsTest
 
 target         = testrunner
 target_version = 1
