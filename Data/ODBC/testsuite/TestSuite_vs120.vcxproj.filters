@@ -54,8 +54,11 @@
     <ClInclude Include="src\SQLExecutor.h">
       <Filter>ODBC\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ODBCSybaseTest.h">
+      <Filter>ODBC\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\ODBCTestSuite.h">
-      <Filter>_Suite\Header Files</Filter>
+      <Filter>ODBC\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -86,11 +89,14 @@
     <ClCompile Include="src\SQLExecutor.cpp">
       <Filter>ODBC\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ODBCTestSuite.cpp">
-      <Filter>_Suite\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Driver.cpp">
       <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCTestSuite.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCSybaseTest.cpp">
+      <Filter>ODBC\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
