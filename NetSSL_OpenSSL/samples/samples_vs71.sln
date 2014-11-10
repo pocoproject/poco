@@ -11,6 +11,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mail", "Mail\Mail_vs71.vcpr
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwitterClient", "TwitterClient\TwitterClient_vs71.vcproj", "{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		debug_shared = debug_shared
@@ -57,6 +61,18 @@ Global
 		{BF75C029-EFC9-3A0F-A8F2-8001C11D1FBA}.debug_static_md.Build.0 = debug_static_md|Win32
 		{BF75C029-EFC9-3A0F-A8F2-8001C11D1FBA}.release_static_md.ActiveCfg = release_static_md|Win32
 		{BF75C029-EFC9-3A0F-A8F2-8001C11D1FBA}.release_static_md.Build.0 = release_static_md|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_shared.ActiveCfg = debug_shared|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_shared.Build.0 = debug_shared|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_shared.ActiveCfg = release_shared|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_shared.Build.0 = release_shared|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_static_mt.ActiveCfg = debug_static_mt|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_static_mt.Build.0 = debug_static_mt|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_mt.ActiveCfg = release_static_mt|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_mt.Build.0 = release_static_mt|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_static_md.ActiveCfg = debug_static_md|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_static_md.Build.0 = debug_static_md|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_md.ActiveCfg = release_static_md|Win32
+		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_md.Build.0 = release_static_md|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

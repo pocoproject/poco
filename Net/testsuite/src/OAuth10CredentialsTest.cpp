@@ -1,7 +1,7 @@
 //
 // OAuth10CredentialsTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPCredentialsTest.cpp#3 $
+// $Id$
 //
 // Copyright (c) 2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.

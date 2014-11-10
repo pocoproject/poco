@@ -28,7 +28,7 @@ objects = \
 	NTPClientTest NTPClientTestSuite \
 	WebSocketTest WebSocketTestSuite \
 	SyslogTest \
-	OAuth10CredentialsTest
+	OAuth10CredentialsTest OAuthTestSuite
 
 target         = testrunner
 target_version = 1

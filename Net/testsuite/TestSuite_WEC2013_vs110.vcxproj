@@ -364,6 +364,8 @@
     <ClInclude Include="src\SyslogTest.h"/>
     <ClInclude Include="src\WebSocketTest.h"/>
     <ClInclude Include="src\WebSocketTestSuite.h"/>
+    <ClInclude Include="src\OAuth10CredentialsTest.h"/>
+    <ClInclude Include="src\OAuthTestSuite.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNSTest.cpp"/>
@@ -424,6 +426,8 @@
     <ClCompile Include="src\SyslogTest.cpp"/>
     <ClCompile Include="src\WebSocketTest.cpp"/>
     <ClCompile Include="src\WebSocketTestSuite.cpp"/>
+    <ClCompile Include="src\OAuth10CredentialsTest.cpp"/>
+    <ClCompile Include="src\OAuthTestSuite.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

@@ -820,9 +820,11 @@
 			<Filter
 				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Net\SocketAcceptor.h"/>
-				<File
 					RelativePath=".\include\Poco\Net\ParallelSocketAcceptor.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\ParallelSocketReactor.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SocketAcceptor.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\SocketConnector.h"/>
 				<File
@@ -831,8 +833,6 @@
 					RelativePath=".\include\Poco\Net\SocketNotifier.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\SocketReactor.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\ParallelSocketReactor.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">
@@ -967,6 +967,19 @@
 					RelativePath=".\src\WebSocket.cpp"/>
 				<File
 					RelativePath=".\src\WebSocketImpl.cpp"/>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="OAuth">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\include\Poco\Net\OAuth10Credentials.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\OAuth10Credentials.cpp"/>
 			</Filter>
 		</Filter>
 		<File

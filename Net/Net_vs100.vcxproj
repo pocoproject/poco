@@ -351,13 +351,13 @@
     <ClInclude Include="include\Poco\Net\HTMLForm.h"/>
     <ClInclude Include="include\Poco\Net\FTPClientSession.h"/>
     <ClInclude Include="include\Poco\Net\FTPStreamFactory.h"/>
-    <ClInclude Include="include\Poco\Net\SocketAcceptor.h"/>
     <ClInclude Include="include\Poco\Net\ParallelSocketAcceptor.h"/>
+    <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h"/>
+    <ClInclude Include="include\Poco\Net\SocketAcceptor.h"/>
     <ClInclude Include="include\Poco\Net\SocketConnector.h"/>
     <ClInclude Include="include\Poco\Net\SocketNotification.h"/>
     <ClInclude Include="include\Poco\Net\SocketNotifier.h"/>
     <ClInclude Include="include\Poco\Net\SocketReactor.h"/>
-    <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h"/>
     <ClInclude Include="include\Poco\Net\MailMessage.h"/>
     <ClInclude Include="include\Poco\Net\MailRecipient.h"/>
     <ClInclude Include="include\Poco\Net\MailStream.h"/>
@@ -378,6 +378,7 @@
     <ClInclude Include="include\Poco\Net\SMTPChannel.h"/>
     <ClInclude Include="include\Poco\Net\WebSocket.h"/>
     <ClInclude Include="include\Poco\Net\WebSocketImpl.h"/>
+    <ClInclude Include="include\Poco\Net\OAuth10Credentials.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNS.cpp"/>
@@ -477,6 +478,7 @@
     <ClCompile Include="src\SMTPChannel.cpp"/>
     <ClCompile Include="src\WebSocket.cpp"/>
     <ClCompile Include="src\WebSocketImpl.cpp"/>
+    <ClCompile Include="src\OAuth10Credentials.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">
