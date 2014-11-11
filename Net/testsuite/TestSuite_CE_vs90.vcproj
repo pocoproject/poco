@@ -849,12 +849,16 @@
 				<File
 					RelativePath=".\src\OAuth10CredentialsTest.h"/>
 				<File
+					RelativePath=".\src\OAuth20CredentialsTest.h"/>
+				<File
 					RelativePath=".\src\OAuthTestSuite.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">
 				<File
 					RelativePath=".\src\OAuth10CredentialsTest.cpp"/>
+				<File
+					RelativePath=".\src\OAuth20CredentialsTest.cpp"/>
 				<File
 					RelativePath=".\src\OAuthTestSuite.cpp"/>
 			</Filter>

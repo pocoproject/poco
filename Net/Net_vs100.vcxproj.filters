@@ -2,148 +2,148 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="NetCore">
-      <UniqueIdentifier>{2b2a88f3-4368-463e-ab34-96407acb2825}</UniqueIdentifier>
+      <UniqueIdentifier>{8992cc5d-dce8-4cbd-9f79-d83fcacbceff}</UniqueIdentifier>
     </Filter>
     <Filter Include="NetCore\Header Files">
-      <UniqueIdentifier>{9468aec7-1a8c-40bd-900b-1c9364b735bc}</UniqueIdentifier>
+      <UniqueIdentifier>{ef0bc40b-4dea-4d70-baf2-411c917a2a04}</UniqueIdentifier>
     </Filter>
     <Filter Include="NetCore\Source Files">
-      <UniqueIdentifier>{6cfaa67c-3d19-4d66-a2c2-c7d7b869b6e0}</UniqueIdentifier>
+      <UniqueIdentifier>{972a588d-e448-43e1-977b-2d63e3aed8a5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sockets">
-      <UniqueIdentifier>{e398b8e0-5ffe-4b6e-bc42-d637e017a03e}</UniqueIdentifier>
+      <UniqueIdentifier>{807bfc62-24fe-472d-89b1-0e4c2001d03a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sockets\Header Files">
-      <UniqueIdentifier>{c9d97d77-7a87-428f-a013-62b04a263135}</UniqueIdentifier>
+      <UniqueIdentifier>{4bb17e12-2ce2-4949-b304-6eb8af2d6289}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sockets\Source Files">
-      <UniqueIdentifier>{3deddc14-0945-47d0-83a3-4cbfcaba0649}</UniqueIdentifier>
+      <UniqueIdentifier>{33353466-e67b-44ff-85ca-5de84aede57c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Messages">
-      <UniqueIdentifier>{c7c09f82-97cf-4433-9d9b-3aa11b3fd245}</UniqueIdentifier>
+      <UniqueIdentifier>{83cd1254-3b0c-4ed8-a35d-a1f121268c6b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Messages\Header Files">
-      <UniqueIdentifier>{95e3babf-494c-4048-a28f-e038df256e7d}</UniqueIdentifier>
+      <UniqueIdentifier>{d9a30f35-503d-42ab-8682-89ad8d72d681}</UniqueIdentifier>
     </Filter>
     <Filter Include="Messages\Source Files">
-      <UniqueIdentifier>{c9f5da7c-0caf-4d7a-af52-f0fd81f7f046}</UniqueIdentifier>
+      <UniqueIdentifier>{c218d8e8-f8fa-42d7-87e9-06795ba738dc}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTP">
-      <UniqueIdentifier>{a3af2f3a-d067-4f45-bce0-4550ca2458b8}</UniqueIdentifier>
+      <UniqueIdentifier>{361cfb55-d05a-468f-a94a-7a51ded1e1f0}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTP\Header Files">
-      <UniqueIdentifier>{7f0afce5-ae8e-4bf7-a8c2-140c7eed5f91}</UniqueIdentifier>
+      <UniqueIdentifier>{52e86aa3-1941-4e71-9678-04dfec6655d1}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTP\Source Files">
-      <UniqueIdentifier>{73facb9d-f2bc-406f-b50b-8d41959562ff}</UniqueIdentifier>
+      <UniqueIdentifier>{307e34da-d304-456e-beaf-1f892ba64f8c}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer">
-      <UniqueIdentifier>{f501fcb0-2f19-487d-88fb-a71ddc4b4499}</UniqueIdentifier>
+      <UniqueIdentifier>{5b66a17e-614b-4d1f-928d-72786f663402}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer\Header Files">
-      <UniqueIdentifier>{974bea69-1708-4307-ad02-637909c54c8f}</UniqueIdentifier>
+      <UniqueIdentifier>{0a9e0188-c6a0-4c89-8042-d013eb9c5582}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer\Source Files">
-      <UniqueIdentifier>{a5176b07-aeb3-4e97-bcc6-9ed76e821a97}</UniqueIdentifier>
+      <UniqueIdentifier>{0783991c-f479-4684-af60-39de190a4691}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPServer">
-      <UniqueIdentifier>{e4cfb853-e005-45f0-b5b1-1786d4eb7197}</UniqueIdentifier>
+      <UniqueIdentifier>{7d4e934f-eb6d-4da3-907e-5d191756da92}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPServer\Header Files">
-      <UniqueIdentifier>{4bb90b71-f6eb-464e-abdd-573908ee51c0}</UniqueIdentifier>
+      <UniqueIdentifier>{cd2fcefe-9696-475b-ab37-4c08b6e47299}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPServer\Source Files">
-      <UniqueIdentifier>{9abd7b45-9979-41d5-a0e8-354e69670b43}</UniqueIdentifier>
+      <UniqueIdentifier>{e14cc478-986c-4cf1-b016-f759f59a4df8}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPClient">
-      <UniqueIdentifier>{d9003844-6367-49da-bca3-ca693cc2010a}</UniqueIdentifier>
+      <UniqueIdentifier>{fddc7781-3120-4b2e-bd72-24fab8eb2876}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPClient\Header Files">
-      <UniqueIdentifier>{499b78cc-9632-4516-85d1-22988f9db8d6}</UniqueIdentifier>
+      <UniqueIdentifier>{3bf05b5b-843d-4a24-bc81-ee0ab271abc6}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPClient\Source Files">
-      <UniqueIdentifier>{08809b09-4d95-4c0c-87ac-5400bd7887a3}</UniqueIdentifier>
+      <UniqueIdentifier>{0df32b72-7869-427c-be84-7d93fd01d2f9}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTML">
-      <UniqueIdentifier>{790078c3-858f-40fc-811f-52434e9265a6}</UniqueIdentifier>
+      <UniqueIdentifier>{fc5a3893-7a92-4c7f-aa18-0deff8fb7ec3}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTML\Header Files">
-      <UniqueIdentifier>{45e9d972-574a-45d8-8f7e-1070d07bb7cf}</UniqueIdentifier>
+      <UniqueIdentifier>{725a3534-81c8-4692-93fa-d19dcf94df05}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTML\Source Files">
-      <UniqueIdentifier>{c886f1d6-c9b6-4578-a338-96b70d2deeec}</UniqueIdentifier>
+      <UniqueIdentifier>{e60b3912-17e3-4da8-a18c-28bafb03bf29}</UniqueIdentifier>
     </Filter>
     <Filter Include="FTPClient">
-      <UniqueIdentifier>{bc81ba1c-4df8-42de-8f3d-3b93280d6693}</UniqueIdentifier>
+      <UniqueIdentifier>{d2bdc7f6-562f-421a-979e-017c1477f2b4}</UniqueIdentifier>
     </Filter>
     <Filter Include="FTPClient\Header Files">
-      <UniqueIdentifier>{e325b2e0-861d-467b-a55e-9dcf779b039d}</UniqueIdentifier>
+      <UniqueIdentifier>{58d9e32b-6474-436f-90b9-0e03a72b52c7}</UniqueIdentifier>
     </Filter>
     <Filter Include="FTPClient\Source Files">
-      <UniqueIdentifier>{3c90407f-25f2-4e45-985e-425028a73234}</UniqueIdentifier>
+      <UniqueIdentifier>{1700f029-1e81-4577-8ad4-e23c88db3407}</UniqueIdentifier>
     </Filter>
     <Filter Include="Reactor">
-      <UniqueIdentifier>{eb1b7654-94b9-49a4-b3f6-f6072413ee1a}</UniqueIdentifier>
+      <UniqueIdentifier>{dcdfdb7a-f57c-4cb5-a472-2159b221f3fa}</UniqueIdentifier>
     </Filter>
     <Filter Include="Reactor\Header Files">
-      <UniqueIdentifier>{563a0117-06e1-47c8-bc59-9d5a01b6fb76}</UniqueIdentifier>
+      <UniqueIdentifier>{3966019b-9d88-4e47-aa4b-a9764c36b158}</UniqueIdentifier>
     </Filter>
     <Filter Include="Reactor\Source Files">
-      <UniqueIdentifier>{38add6b1-30fb-44c4-9475-be57fcf7f819}</UniqueIdentifier>
+      <UniqueIdentifier>{da8b4987-f460-4766-b89b-51b7397e856a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail">
-      <UniqueIdentifier>{a230b005-5d12-44f9-9b3a-2c44af346766}</UniqueIdentifier>
+      <UniqueIdentifier>{90149743-2979-4a92-a410-e7775624aece}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail\Header Files">
-      <UniqueIdentifier>{e6a1b232-e12a-4f6a-9aee-8776a1aefd20}</UniqueIdentifier>
+      <UniqueIdentifier>{36354d0b-458f-4014-a56b-108d266f6127}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail\Source Files">
-      <UniqueIdentifier>{f695b55f-eda0-4989-8159-6f2b4e09f86a}</UniqueIdentifier>
+      <UniqueIdentifier>{c904ae66-5ce7-4384-9a92-deb8c947fb32}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP">
-      <UniqueIdentifier>{f1518516-4f7e-4b85-a250-080e71675921}</UniqueIdentifier>
+      <UniqueIdentifier>{6aa80d93-797b-4ada-a0b0-e90c4a2e8cb0}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Header Files">
-      <UniqueIdentifier>{43f50c7f-169f-47ab-964e-cd7ea5e44fe0}</UniqueIdentifier>
+      <UniqueIdentifier>{f9ad26ae-23e1-4479-a1a9-2db396440980}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Source Files">
-      <UniqueIdentifier>{5d6cc878-f1e4-42ab-a650-2a9d1a6bb13a}</UniqueIdentifier>
+      <UniqueIdentifier>{12c80174-c81f-4242-879a-984805cdc37f}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP">
-      <UniqueIdentifier>{ea1392aa-6667-4284-ab45-74b955b5ad42}</UniqueIdentifier>
+      <UniqueIdentifier>{514d9218-2747-4a62-ae56-ba9e790a97a8}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Header Files">
-      <UniqueIdentifier>{14501e0c-ba3d-4d55-8f7c-95589a626770}</UniqueIdentifier>
+      <UniqueIdentifier>{a1ab3ec6-6365-42c1-af1f-e59b49a254de}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Source Files">
-      <UniqueIdentifier>{dd708823-56ba-44e7-ba88-36624af908eb}</UniqueIdentifier>
+      <UniqueIdentifier>{70c708ce-dab0-47a9-8f46-bb65c1b1107b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging">
-      <UniqueIdentifier>{0756168b-7460-483b-a628-cec8c716123a}</UniqueIdentifier>
+      <UniqueIdentifier>{a3911999-71b8-4ece-8acc-8b30308c52da}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Header Files">
-      <UniqueIdentifier>{74ad6d42-be86-4aa7-bb57-cb7a30031a50}</UniqueIdentifier>
+      <UniqueIdentifier>{539e0da2-26b1-4758-b63e-476076a75cf2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Source Files">
-      <UniqueIdentifier>{0885e382-5de3-4772-8080-ef99c21f6ab5}</UniqueIdentifier>
+      <UniqueIdentifier>{bb000f13-92eb-44b9-ae49-25da40be51f7}</UniqueIdentifier>
     </Filter>
     <Filter Include="WebSocket">
-      <UniqueIdentifier>{d6604794-0ffb-4d99-bb18-59451161ecdf}</UniqueIdentifier>
+      <UniqueIdentifier>{54061de0-20ef-4ece-954f-dc72228fa3b7}</UniqueIdentifier>
     </Filter>
     <Filter Include="WebSocket\Header Files">
-      <UniqueIdentifier>{28c125a9-3272-4623-8ebf-ebfac1be151c}</UniqueIdentifier>
+      <UniqueIdentifier>{c047f946-6d85-4d95-9067-c16e842224d8}</UniqueIdentifier>
     </Filter>
     <Filter Include="WebSocket\Source Files">
-      <UniqueIdentifier>{db81f9d7-ac30-4cba-bddf-d24685f300ca}</UniqueIdentifier>
+      <UniqueIdentifier>{ef6a40c2-9208-43ab-987a-18a3794723af}</UniqueIdentifier>
     </Filter>
     <Filter Include="OAuth">
-      <UniqueIdentifier>{e9d370ae-902c-4177-a295-c857d0393d8d}</UniqueIdentifier>
+      <UniqueIdentifier>{6b7dfa9b-da58-456b-a01e-29dc2eb48247}</UniqueIdentifier>
     </Filter>
     <Filter Include="OAuth\Header Files">
-      <UniqueIdentifier>{74aa58f6-3fc9-4c66-889b-1e528eaa4a57}</UniqueIdentifier>
+      <UniqueIdentifier>{af21120c-95b2-44a1-939b-e69e55b1ab5f}</UniqueIdentifier>
     </Filter>
     <Filter Include="OAuth\Source Files">
-      <UniqueIdentifier>{1f16e252-758e-4400-8691-56c6915e3eca}</UniqueIdentifier>
+      <UniqueIdentifier>{4841abc5-52fe-4c7d-9f47-ed3080b09345}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -459,6 +459,9 @@
     <ClInclude Include="include\Poco\Net\OAuth10Credentials.h">
       <Filter>OAuth\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\OAuth20Credentials.h">
+      <Filter>OAuth\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNS.cpp">
@@ -753,6 +756,9 @@
       <Filter>WebSocket\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OAuth10Credentials.cpp">
+      <Filter>OAuth\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OAuth20Credentials.cpp">
       <Filter>OAuth\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

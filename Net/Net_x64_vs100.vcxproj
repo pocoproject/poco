@@ -377,6 +377,7 @@
     <ClInclude Include="include\Poco\Net\WebSocket.h"/>
     <ClInclude Include="include\Poco\Net\WebSocketImpl.h"/>
     <ClInclude Include="include\Poco\Net\OAuth10Credentials.h"/>
+    <ClInclude Include="include\Poco\Net\OAuth20Credentials.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNS.cpp"/>
@@ -477,6 +478,7 @@
     <ClCompile Include="src\WebSocket.cpp"/>
     <ClCompile Include="src\WebSocketImpl.cpp"/>
     <ClCompile Include="src\OAuth10Credentials.cpp"/>
+    <ClCompile Include="src\OAuth20Credentials.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">

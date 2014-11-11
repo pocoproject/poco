@@ -326,6 +326,7 @@
     <ClInclude Include="include\Poco\Net\NTPPacket.h"/>
     <ClInclude Include="include\Poco\Net\NullPartHandler.h"/>
     <ClInclude Include="include\Poco\Net\OAuth10Credentials.h"/>
+    <ClInclude Include="include\Poco\Net\OAuth20Credentials.h"/>
     <ClInclude Include="include\Poco\Net\ParallelSocketAcceptor.h"/>
     <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h"/>
     <ClInclude Include="include\Poco\Net\PartHandler.h"/>
@@ -431,6 +432,7 @@
     <ClCompile Include="src\NTPPacket.cpp"/>
     <ClCompile Include="src\NullPartHandler.cpp"/>
     <ClCompile Include="src\OAuth10Credentials.cpp"/>
+    <ClCompile Include="src\OAuth20Credentials.cpp"/>
     <ClCompile Include="src\PartHandler.cpp"/>
     <ClCompile Include="src\PartSource.cpp"/>
     <ClCompile Include="src\PartStore.cpp"/>

@@ -909,11 +909,15 @@
 				Name="Header Files">
 				<File
 					RelativePath=".\include\Poco\Net\OAuth10Credentials.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\OAuth20Credentials.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">
 				<File
 					RelativePath=".\src\OAuth10Credentials.cpp"/>
+				<File
+					RelativePath=".\src\OAuth20Credentials.cpp"/>
 			</Filter>
 		</Filter>
 		<File
