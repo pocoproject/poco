@@ -34,6 +34,19 @@ class Net_API OAuth20Credentials
 	/// This class implements OAuth 2.0 authentication for HTTP requests,
 	/// via Bearer tokens in the Authorization header, 
 	/// according to RFC 6749 and RFC 6750.
+	///
+	/// To add an Authorization header containing a bearer token
+	/// to a HTTPRequest object, create an OAuth20Credentials object
+	/// with the bearer token and call authenticate().
+	///
+	/// The bearer token can also be extracted from a HTTPRequest
+	/// by creating the OAuth20Credentials object with a HTTPRequest
+	/// object containing a "Bearer" Authorization header and
+	/// calling getBearerToken().
+	///
+	/// The authorization header scheme can be changed from 
+	/// "Bearer" to a custom value. For example, GitHub uses
+	/// the "token" scheme.
 {
 public:
 	OAuth20Credentials();
