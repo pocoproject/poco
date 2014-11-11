@@ -21,7 +21,8 @@ include $(POCO_BASE)/Data/ODBC/ODBC.make
 #  Do not change linking order or move this line up, these libs have to be linked in this order. #
 ##################################################################################################
 ifneq ($(OSNAME),Darwin)
-SYSLIBS += -lltdl
+# how to fix this???
+#SYSLIBS += -lltdl
 endif
 ifneq ($(OSNAME),FreeBSD)
 SYSLIBS += -ldl
