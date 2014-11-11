@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPClientSession.h#5 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPClientSession.h#7 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -72,10 +72,18 @@ public:
 		{
 		}
 
-		std::string  host;     /// Proxy server host name or IP address.
-		Poco::UInt16 port;     /// Proxy server TCP port.
-		std::string  username; /// Proxy server username.
-		std::string  password; /// Proxy server password.
+		std::string  host;
+			/// Proxy server host name or IP address.
+		Poco::UInt16 port;
+			/// Proxy server TCP port.
+		std::string  username;
+			/// Proxy server username.
+		std::string  password;
+			/// Proxy server password.
+		std::string  nonProxyHosts;
+			/// A regular expression defining hosts for which the proxy should be bypassed,
+			/// e.g. "localhost|127\.0\.0\.1|192\.168\.0\.\d+". Can also be an empty
+			/// string to disable proxy bypassing.
 	};
 
 	HTTPClientSession();
@@ -231,6 +239,10 @@ public:
 	virtual bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
 		/// or false otherwise.
+		
+	bool bypassProxy() const;
+		/// Returns true if the proxy should be bypassed
+		/// for the current host.
 
 protected:
 	enum

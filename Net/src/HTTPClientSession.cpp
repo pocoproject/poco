@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#11 $
+// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#14 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -25,7 +25,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/CountingStream.h"
-#include "Poco/Base64Encoder.h"
+#include "Poco/RegularExpression.h"
 #include <sstream>
 
 
@@ -195,7 +195,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 			request.setKeepAlive(false);
 		if (!request.has(HTTPRequest::HOST))
 			request.setHost(_host, _port);
-		if (!_proxyConfig.host.empty())
+		if (!_proxyConfig.host.empty() && !bypassProxy())
 		{
 			request.setURI(proxyRequestPrefix() + request.getURI());
 			proxyAuthenticate(request);
@@ -327,7 +327,7 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 
 void HTTPClientSession::reconnect()
 {
-	if (_proxyConfig.host.empty())
+	if (_proxyConfig.host.empty() || bypassProxy())
 	{
 		SocketAddress addr(_host, _port);
 		connect(addr);
@@ -402,6 +402,16 @@ void HTTPClientSession::proxyTunnel()
 {
 	StreamSocket ss = proxyConnect();
 	attachSocket(ss);
+}
+
+
+bool HTTPClientSession::bypassProxy() const
+{
+	if (!_proxyConfig.nonProxyHosts.empty())
+	{
+		return RegularExpression::match(_host, _proxyConfig.nonProxyHosts, RegularExpression::RE_CASELESS | RegularExpression::RE_ANCHORED);
+	}
+	else return false;
 }
 
 
