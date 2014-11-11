@@ -490,6 +490,7 @@ private:
 
 		std::vector<Type>& cont = RefAnyCast<std::vector<Type> >(_containers[pos].back());
 		cont.assign(val.begin(), val.end());
+		//TODO: FIXME: we'are passing in a container which can be destroyed if more containers are added!
 		bindImplVec(pos, cont, cDataType, dir);
 	}
 
@@ -1007,9 +1008,9 @@ private:
 	SQLINTEGER       _paramSetSize;
 	std::size_t      _maxFieldSize;
 	AnyVecVec        _containers;
-    	std::size_t      _maxCharColLength;
-    	std::size_t      _maxWCharColLength;
-    	std::size_t      _maxVarBinColSize;
+	std::size_t      _maxCharColLength;
+	std::size_t      _maxWCharColLength;
+	std::size_t      _maxVarBinColSize;
 };
 
 
