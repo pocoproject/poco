@@ -43,7 +43,7 @@ using Poco::AnyCast;
 using Poco::DynamicAny;
 using Poco::NotFoundException;
 
-
+#if 0
 #define DB2_ODBC_DRIVER "IBM DB2 ODBC DRIVER - DB2COPY1"
 #define DB2_DSN "PocoDataDB2Test"
 #define DB2_SERVER POCO_ODBC_TEST_DATABASE_SERVER
@@ -51,7 +51,19 @@ using Poco::NotFoundException;
 #define DB2_DB "POCOTEST"
 #define DB2_UID "db2admin"
 #define DB2_PWD "db2admin"
+#else
+# ifdef _MSC_VER
+#   define DB2_ODBC_DRIVER "IBM DB2 ODBC DRIVER"
+# else
+#   define DB2_ODBC_DRIVER "/ms/dist/ibmdb2/PROJ/sqllib/9.7.2/.exec/x86_64.linux.2.6.glibc.2.5/sqllib/lib/libdb2o.so"
+# endif
 
+#define DB2_DSN ""
+#define DB2_ALIAS "NT043005"
+#define DB2_DB "TEMPDB"
+#define DB2_UID ""
+#define DB2_PWD ""
+#endif
 
 ODBCTest::SessionPtr ODBCDB2Test::_pSession;
 ODBCTest::ExecPtr    ODBCDB2Test::_pExecutor;
@@ -59,6 +71,7 @@ std::string          ODBCDB2Test::_driver = DB2_ODBC_DRIVER;
 std::string          ODBCDB2Test::_dsn = DB2_DSN;
 std::string          ODBCDB2Test::_uid = DB2_UID;
 std::string          ODBCDB2Test::_pwd = DB2_PWD;
+#if 0
 std::string          ODBCDB2Test::_connectString = "Driver=" DB2_ODBC_DRIVER ";"
 	"Database=" DB2_DB ";"
 	"Hostname=" DB2_SERVER ";"
@@ -66,7 +79,15 @@ std::string          ODBCDB2Test::_connectString = "Driver=" DB2_ODBC_DRIVER ";"
 	"Protocol=TCPIP;"
 	"Uid=" DB2_UID ";"
 	"Pwd=" DB2_PWD ";";
-
+#else
+std::string          ODBCDB2Test::_connectString = "Driver=" DB2_ODBC_DRIVER
+//";" "DSN=" DB2_DSN
+";" "DBALIAS=" DB2_ALIAS
+";" "CurrentSchema=" "TEMPDB"
+";" "Uid=" DB2_UID 
+";" "Pwd=" DB2_PWD
+;
+#endif
 
 ODBCDB2Test::ODBCDB2Test(const std::string& name): 
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
