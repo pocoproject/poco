@@ -597,7 +597,7 @@ std::string Path::home()
 	
 std::string Path::configHome()
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
 	return PathImpl::configHomeImpl();
 #else
 	return PathImpl::homeImpl();
@@ -607,7 +607,7 @@ std::string Path::configHome()
 	
 std::string Path::dataHome()
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
 	return PathImpl::dataHomeImpl();
 #else
 	return PathImpl::homeImpl();
@@ -617,7 +617,7 @@ std::string Path::dataHome()
 	
 std::string Path::tempHome()
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
 	return PathImpl::tempHomeImpl();
 #else
 	return PathImpl::tempImpl();
@@ -627,7 +627,7 @@ std::string Path::tempHome()
 	
 std::string Path::cacheHome()
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
 	return PathImpl::cacheHomeImpl();
 #else
 	return PathImpl::homeImpl();
@@ -643,7 +643,7 @@ std::string Path::temp()
 	
 std::string Path::config()
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
 	return PathImpl::configImpl();
 #else
 	return PathImpl::currentImpl();
