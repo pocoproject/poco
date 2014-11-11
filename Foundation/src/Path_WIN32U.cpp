@@ -132,6 +132,14 @@ std::string PathImpl::cacheHomeImpl()
 }
 
 
+<<<<<<< HEAD
+=======
+std::string PathImpl::tempHomeImpl()
+{
+	return tempImpl();
+}
+
+>>>>>>> 06e59cb... add Windows compliant implementation of XDG Base Directory Specification
 std::string PathImpl::tempImpl()
 {
 	Buffer<wchar_t> buffer(MAX_PATH_LEN);
@@ -149,6 +157,26 @@ std::string PathImpl::tempImpl()
 	throw SystemException("Cannot get temporary directory path");
 }
 
+
+std::string PathImpl::configImpl()
+{
+	std::string result;
+
+	// if PROGRAMDATA environment variable not exist, return system directory instead
+	try
+	{
+		result = EnvironmentImpl::getImpl("PROGRAMDATA");
+	}
+	catch (NotFoundException&)
+	{
+		result = systemImpl();
+	}
+
+	std::string::size_type n = result.size();
+	if (n > 0 && result[n - 1] != '\\')
+		result.append("\\");
+	return result;
+}
 
 std::string PathImpl::nullImpl()
 {

@@ -122,6 +122,12 @@ std::string PathImpl::cacheHomeImpl()
 }
 
 
+std::string PathImpl::tempHomeImpl()
+{
+	return tempImpl();
+}
+
+
 std::string PathImpl::tempImpl()
 {
 	char buffer[MAX_PATH];
@@ -138,6 +144,26 @@ std::string PathImpl::tempImpl()
 	else throw SystemException("Cannot get temporary directory");
 }
 
+
+std::string PathImpl::configImpl()
+{
+	std::string result;
+
+	// if PROGRAMDATA environment variable not exist, return system directory instead
+	try
+	{
+		result = EnvironmentImpl::getImpl("PROGRAMDATA");
+	}
+	catch (NotFoundException&)
+	{
+		result = systemImpl();
+	}
+
+	std::string::size_type n = result.size();
+	if (n > 0 && result[n - 1] != '\\')
+		result.append("\\");
+	return result;
+}
 
 std::string PathImpl::nullImpl()
 {
