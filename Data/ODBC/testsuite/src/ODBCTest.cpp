@@ -1259,7 +1259,7 @@ bool ODBCTest::canConnect(const std::string& driver,
 		}
 	}
 
-	if (_drivers.end() == itDrv && (driver[0] != '/')) 
+	if ((_drivers.end() == itDrv) && (driver.length() != 0) && (driver[0] != '/')) 
 	{
 		dsn = "";
 		uid = "";
