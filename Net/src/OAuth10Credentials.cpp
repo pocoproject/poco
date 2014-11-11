@@ -16,7 +16,6 @@
 
 #include "Poco/Net/OAuth10Credentials.h"
 #include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/HTTPAuthenticationParams.h"
@@ -28,12 +27,16 @@
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Format.h"
+#include "Poco/String.h"
 #include <map>
 #include <sstream>
 
 
 namespace Poco {
 namespace Net {
+
+
+const std::string OAuth10Credentials::SCHEME = "OAuth";
 
 
 OAuth10Credentials::OAuth10Credentials()
@@ -64,7 +67,7 @@ OAuth10Credentials::OAuth10Credentials(const Poco::Net::HTTPRequest& request)
 		std::string authScheme;
 		std::string authParams;
 		request.getCredentials(authScheme, authParams);
-		if (authScheme == "OAuth")
+		if (icompare(authScheme, SCHEME) == 0)
 		{
 			HTTPAuthenticationParams params(authParams);
 			std::string consumerKey = params.get("oauth_consumer_key", "");
@@ -158,7 +161,7 @@ bool OAuth10Credentials::verify(const HTTPRequest& request, const Poco::URI& uri
 		std::string authScheme;
 		std::string authParams;
 		request.getCredentials(authScheme, authParams);
-		if (authScheme == "OAuth")
+		if (icompare(authScheme, SCHEME) == 0)
 		{
 			HTTPAuthenticationParams oauthParams(authParams);
 
@@ -190,13 +193,13 @@ bool OAuth10Credentials::verify(const HTTPRequest& request, const Poco::URI& uri
 			URI::decode(signatureEnc, signature);
 
 			std::string refSignature;
-			if (method == "PLAINTEXT")
+			if (icompare(method, "PLAINTEXT") == 0)
 			{
 				refSignature = percentEncode(_consumerSecret);
 				refSignature += '&';
 				refSignature += percentEncode(_tokenSecret);
 			}
-			else if (method == "HMAC-SHA1")
+			else if (icompare(method, "HMAC-SHA1") == 0)
 			{
 				URI uriWithoutQuery(uri);
 				uriWithoutQuery.setQuery("");
@@ -226,7 +229,7 @@ void OAuth10Credentials::signPlaintext(Poco::Net::HTTPRequest& request) const
 	signature += '&';
 	signature += percentEncode(_tokenSecret);
 	
-	std::string authorization("OAuth");
+	std::string authorization(SCHEME);
 	if (!_realm.empty())
 	{
 		Poco::format(authorization, " realm=\"%s\",", _realm);
@@ -244,7 +247,7 @@ void OAuth10Credentials::signPlaintext(Poco::Net::HTTPRequest& request) const
 	}
 	authorization += ", oauth_version=\"1.0\"";
 
-	request.set("Authorization", authorization);
+	request.set(HTTPRequest::AUTHORIZATION, authorization);
 }
 
 
@@ -262,7 +265,7 @@ void OAuth10Credentials::signHMACSHA1(Poco::Net::HTTPRequest& request, const std
 	}
 	std::string signature(createSignature(request, uri, params, nonce, timestamp));
 
-	std::string authorization("OAuth");
+	std::string authorization(SCHEME);
 	if (!_realm.empty())
 	{
 		Poco::format(authorization, " realm=\"%s\",", _realm);
@@ -282,7 +285,7 @@ void OAuth10Credentials::signHMACSHA1(Poco::Net::HTTPRequest& request, const std
 	}
 	authorization += ", oauth_version=\"1.0\"";
 
-	request.set("Authorization", authorization);
+	request.set(HTTPRequest::AUTHORIZATION, authorization);
 }
 
 

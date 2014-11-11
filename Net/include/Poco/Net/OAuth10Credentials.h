@@ -102,12 +102,12 @@ public:
 		/// Creates an empty OAuth10Credentials object.
 
 	OAuth10Credentials(const std::string& consumerKey, const std::string& consumerSecret);
-		/// Creates an HTTPCredentials object with the given consumer key and consumer secret.
+		/// Creates an OAuth10Credentials object with the given consumer key and consumer secret.
 		///
 		/// The token and tokenSecret will be left empty.
 
 	OAuth10Credentials(const std::string& consumerKey, const std::string& consumerSecret, const std::string& token, const std::string& tokenSecret);
-		/// Creates an HTTPCredentials object with the given consumer key and 
+		/// Creates an OAuth10Credentials object with the given consumer key and 
 		/// consumer secret, as well as token and token secret.
 
 	explicit OAuth10Credentials(const HTTPRequest& request);
@@ -119,7 +119,7 @@ public:
 		/// not contain OAuth 1.0 credentials.
 
 	~OAuth10Credentials();
-		/// Destroys the HTTPCredentials.
+		/// Destroys the OAuth10Credentials.
 
 	void setConsumerKey(const std::string& consumerKey);
 		/// Sets the consumer key.
@@ -194,6 +194,8 @@ public:
 		/// In normal operation, the nonce is a random value
 		/// computed by createNonce() and the timestamp is taken
 		/// from the system time.
+
+	static const std::string SCHEME;
 
 protected:
 	void signPlaintext(Poco::Net::HTTPRequest& request) const;
