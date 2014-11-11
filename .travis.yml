@@ -33,7 +33,7 @@ matrix:
 
     - env:    TEST_NAME="arm-linux-gnueabi- (make)"
       script:
-        - export CROSS_COMPILE=arm-linux-gnueabi-g++
+        - export CROSS_COMPILE=arm-linux-gnueabi
         - ./configure --omit=Data/ODBC,Data/MySQL,Crypto,NetSSL && make -s -j2
 
     - env:    TEST_NAME="gcc (CMake)"
