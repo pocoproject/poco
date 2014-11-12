@@ -3457,7 +3457,7 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 	vals.push_back(Poco::Dynamic::Var(Lisa));
 	vals.push_back(Poco::Dynamic::Var(Homer));
 
-	std::vector<Poco::Dynamic::Var>::const_iterator valIt = vals.cbegin();
+	std::vector<Poco::Dynamic::Var>::const_iterator valIt = vals.begin();
 	for (size_t dsNo = 0; dsNo < stmt.dataSetCount(); dsNo = stmt.nextDataSet())
 	{
 		Poco::Data::RecordSet rs(stmt);
@@ -3476,7 +3476,7 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 		if (!stmt.hasMoreDataSets())
 			break;
 	}
-	assert(vals.cend() == valIt);
+	assert(vals.end() == valIt);
 }
 
 
