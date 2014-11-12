@@ -28,6 +28,7 @@
 #include "Poco/URI.h"
 #include "Poco/String.h"
 #include "Poco/CountingStream.h"
+#include "Poco/UTF8String.h"
 #include <sstream>
 
 
@@ -42,20 +43,31 @@ namespace Poco {
 namespace Net {
 
 
-const std::string HTMLForm::ENCODING_URL				= "application/x-www-form-urlencoded";
-const std::string HTMLForm::ENCODING_MULTIPART			= "multipart/form-data";
-const int         HTMLForm::UNKNOWN_CONTENT_LENGTH		= -1;
+const std::string HTMLForm::ENCODING_URL           = "application/x-www-form-urlencoded";
+const std::string HTMLForm::ENCODING_MULTIPART     = "multipart/form-data";
+const int         HTMLForm::UNKNOWN_CONTENT_LENGTH = -1;
 
 
-class HTMLFormCountingOutputStream : public CountingOutputStream
+class HTMLFormCountingOutputStream: public CountingOutputStream
 {
 public:
-	HTMLFormCountingOutputStream() : _isvalid(true)  {}
+	HTMLFormCountingOutputStream():
+		_valid(true)
+	{
+	}
 
-	bool getIsValid() const { return _isvalid; }
-	void setIsValid(bool v) { _isvalid = v; }
+	bool isValid() const 
+	{
+		return _valid;
+	}
+	
+	void setValid(bool v)
+	{
+		_valid = v;
+	}
+
 private:
-	bool _isvalid;
+	bool _valid;
 };
 
 
@@ -238,7 +250,7 @@ std::streamsize HTMLForm::calculateContentLength()
 
 	HTMLFormCountingOutputStream c;
 	write(c);
-	if (c.getIsValid())
+	if (c.isValid())
 		return c.chars();
 	else
 		return UNKNOWN_CONTENT_LENGTH;
@@ -274,6 +286,7 @@ void HTMLForm::readUrl(std::istream& istr)
 
 	int fields = 0;
 	int ch = istr.get();
+	bool isFirst = true;
 	while (ch != eof)
 	{
 		if (_fieldLimit > 0 && fields == _fieldLimit)
@@ -296,6 +309,11 @@ void HTMLForm::readUrl(std::istream& istr)
 				ch = istr.get();
 			}
 		}
+		// remove UTF-8 byte order mark from first name, if present
+		if (isFirst)
+		{
+			UTF8::removeBOM(name);
+		}
 		std::string decodedName;
 		std::string decodedValue;
 		URI::decode(name, decodedName);
@@ -303,6 +321,7 @@ void HTMLForm::readUrl(std::istream& istr)
 		add(decodedName, decodedValue);
 		++fields;
 		if (ch == '&') ch = istr.get();
+		isFirst = false;
 	}
 }
 
@@ -402,7 +421,7 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 			if (partlen != PartSource::UNKNOWN_CONTENT_LENGTH)
 				costr->addChars(static_cast<int>(partlen));
 			else
-				costr->setIsValid(false);
+				costr->setValid(false);
 		}
 		else
 			StreamCopier::copyStream(ita->pSource->stream(), ostr);
