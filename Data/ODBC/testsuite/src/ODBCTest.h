@@ -140,6 +140,7 @@ public:
 	virtual void testDynamicAny();
 
 	virtual void testMultipleResults();
+	virtual void testMultipleResultsNoProj();
 
 	virtual void testSQLChannel();
 	virtual void testSQLLogger();

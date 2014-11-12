@@ -298,45 +298,50 @@ void StatementImpl::setStorage(const std::string& storage)
 
 void StatementImpl::makeExtractors(std::size_t count)
 {
+	makeExtractors(count, currentDataSet());
+}
+
+void StatementImpl::makeExtractors(std::size_t count, const Position& position)
+{
 	for (int i = 0; i < count; ++i)
 	{
-		const MetaColumn& mc = metaColumn(i);
+		const MetaColumn& mc = metaColumn(i, size_t(position.value()));
 		switch (mc.type())
 		{
 			case MetaColumn::FDT_BOOL:
-				addInternalExtract<bool>(mc); break;
+				addInternalExtract<bool>(mc, position.value()); break;
 			case MetaColumn::FDT_INT8:  
-				addInternalExtract<Int8>(mc); break;
+				addInternalExtract<Int8>(mc, position.value()); break;
 			case MetaColumn::FDT_UINT8:  
-				addInternalExtract<UInt8>(mc); break;
+				addInternalExtract<UInt8>(mc, position.value()); break;
 			case MetaColumn::FDT_INT16:  
-				addInternalExtract<Int16>(mc); break;
+				addInternalExtract<Int16>(mc, position.value()); break;
 			case MetaColumn::FDT_UINT16: 
-				addInternalExtract<UInt16>(mc); break;
+				addInternalExtract<UInt16>(mc, position.value()); break;
 			case MetaColumn::FDT_INT32:  
-				addInternalExtract<Int32>(mc); break;
+				addInternalExtract<Int32>(mc, position.value()); break;
 			case MetaColumn::FDT_UINT32: 
-				addInternalExtract<UInt32>(mc); break;
+				addInternalExtract<UInt32>(mc, position.value()); break;
 			case MetaColumn::FDT_INT64:  
-				addInternalExtract<Int64>(mc); break;
+				addInternalExtract<Int64>(mc, position.value()); break;
 			case MetaColumn::FDT_UINT64: 
-				addInternalExtract<UInt64>(mc); break;
+				addInternalExtract<UInt64>(mc, position.value()); break;
 			case MetaColumn::FDT_FLOAT:  
-				addInternalExtract<float>(mc); break;
+				addInternalExtract<float>(mc, position.value()); break;
 			case MetaColumn::FDT_DOUBLE: 
-				addInternalExtract<double>(mc); break;
+				addInternalExtract<double>(mc, position.value()); break;
 			case MetaColumn::FDT_STRING: 
-				addInternalExtract<std::string>(mc); break;
+				addInternalExtract<std::string>(mc, position.value()); break;
 			case MetaColumn::FDT_WSTRING:
-				addInternalExtract<Poco::UTF16String>(mc); break;
+				addInternalExtract<Poco::UTF16String>(mc, position.value()); break;
 			case MetaColumn::FDT_BLOB:   
-				addInternalExtract<BLOB>(mc); break;
+				addInternalExtract<BLOB>(mc, position.value()); break;
 			case MetaColumn::FDT_DATE:
-				addInternalExtract<Date>(mc); break;
+				addInternalExtract<Date>(mc, position.value()); break;
 			case MetaColumn::FDT_TIME:
-				addInternalExtract<Time>(mc); break;
+				addInternalExtract<Time>(mc, position.value()); break;
 			case MetaColumn::FDT_TIMESTAMP:
-				addInternalExtract<DateTime>(mc); break;
+				addInternalExtract<DateTime>(mc, position.value()); break;
 			default:
 				throw Poco::InvalidArgumentException("Data type not supported.");
 		}
@@ -349,7 +354,7 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 	std::size_t cols = columnsReturned();
 	for (std::size_t i = 0; i < cols; ++i)
 	{
-		const MetaColumn& column = metaColumn(i);
+		const MetaColumn& column = metaColumn(i, currentDataSet());
 		if (0 == icompare(column.name(), name)) return column;
 	}
 

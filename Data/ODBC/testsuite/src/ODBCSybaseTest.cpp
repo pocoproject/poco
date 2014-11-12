@@ -606,7 +606,7 @@ CppUnit::Test* SybaseODBC::suite()
         CppUnit_addTest(pSuite, SybaseODBC, testAny);
         CppUnit_addTest(pSuite, SybaseODBC, testDynamicAny);
         CppUnit_addTest(pSuite, SybaseODBC, testMultipleResults);
-        //CppUnit_addTest(pSuite, SybaseODBC, testMultipleResultsNoProj);
+        CppUnit_addTest(pSuite, SybaseODBC, testMultipleResultsNoProj);
         CppUnit_addTest(pSuite, SybaseODBC, testSQLChannel);
         CppUnit_addTest(pSuite, SybaseODBC, testSQLLogger);
         CppUnit_addTest(pSuite, SybaseODBC, testSessionTransaction);

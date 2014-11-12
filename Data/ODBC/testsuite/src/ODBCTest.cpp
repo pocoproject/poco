@@ -22,6 +22,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -1109,6 +1110,20 @@ void ODBCTest::testMultipleResults()
 		_pExecutor->multipleResults();
 
 		i += 2;
+	}
+}
+
+void ODBCTest::testMultipleResultsNoProj()
+{
+	if (! &session()) fail("Test not available.");
+	session().setFeature("autoBind", true); // DB2 fails without that
+	for (int autoE = 0; autoE < 2; ++autoE)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoExtract", autoE != 0);
+		_pExecutor->multipleResultsNoProj("SELECT * FROM Person WHERE Age = ?; "
+		"SELECT Age FROM Person WHERE FirstName = ?; "
+		"SELECT * FROM Person WHERE Age = ? OR Age = ? ORDER BY Age;");
 	}
 }
 

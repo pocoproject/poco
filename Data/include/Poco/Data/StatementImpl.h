@@ -165,7 +165,7 @@ protected:
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 
-	virtual const MetaColumn& metaColumn(std::size_t pos) const = 0;
+	virtual const MetaColumn& metaColumn(std::size_t pos, size_t dataSet) const = 0;
 		/// Returns column meta data.
 
 	const MetaColumn& metaColumn(const std::string& name) const;
@@ -248,6 +248,9 @@ protected:
 		/// - std::vector
 		/// - std::list
 
+	void makeExtractors(std::size_t count, const Position& position);
+		/// Create extractors for the specified dataset
+
 	SessionImpl& session();
 		/// Rteurns session associated with this statement.
 
@@ -294,6 +297,9 @@ protected:
 	bool hasMoreDataSets() const;
 		/// Returns true if there are data sets not activated yet.
 
+    void firstDataSet();
+        /// Activate first data set
+
 private:
 	void compile();
 		/// Compiles the statement.
@@ -315,26 +321,26 @@ private:
 		/// Resets extraction so it can be reused again.
 
 	template <class C>
-	SharedPtr<InternalExtraction<C> > createExtract(const MetaColumn& mc)
+	SharedPtr<InternalExtraction<C> > createExtract(const MetaColumn& mc, size_t position)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
-		return new InternalExtraction<C>(*pData, pCol, Poco::UInt32(currentDataSet()));
+        return new InternalExtraction<C>(*pData, pCol, Poco::UInt32(position));
 	}
 
 	template <class C>
-	SharedPtr<InternalBulkExtraction<C> > createBulkExtract(const MetaColumn& mc)
+    SharedPtr<InternalBulkExtraction<C> > createBulkExtract(const MetaColumn& mc, size_t position)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
 		return new InternalBulkExtraction<C>(*pData,
 			pCol,
 			static_cast<Poco::UInt32>(getExtractionLimit()),
-			Position(static_cast<Poco::UInt32>(currentDataSet())));
+			Position(static_cast<Poco::UInt32>(position)));
 	}
 
 	template <class T>
-	void addInternalExtract(const MetaColumn& mc)
+	void addInternalExtract(const MetaColumn& mc, size_t position)
 		/// Creates and adds the internal extraction.
 		///
 		/// The decision about internal extraction container is done 
@@ -366,23 +372,23 @@ private:
 		if (0 == icompare(DEQUE, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::deque<T> >(mc));
+				addExtract(createExtract<std::deque<T> >(mc, position));
 			else
-				addExtract(createBulkExtract<std::deque<T> >(mc));
+				addExtract(createBulkExtract<std::deque<T> >(mc, position));
 		}
 		else if (0 == icompare(VECTOR, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::vector<T> >(mc));
+				addExtract(createExtract<std::vector<T> >(mc, position));
 			else
-				addExtract(createBulkExtract<std::vector<T> >(mc));
+				addExtract(createBulkExtract<std::vector<T> >(mc, position));
 		}
 		else if (0 == icompare(LIST, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::list<T> >(mc));
+				addExtract(createExtract<std::list<T> >(mc, position));
 			else
-				addExtract(createBulkExtract<std::list<T> >(mc));
+				addExtract(createBulkExtract<std::list<T> >(mc, position));
 		}
 	}
 
@@ -622,6 +628,10 @@ inline bool StatementImpl::hasMoreDataSets() const
 	return currentDataSet() + 1 < dataSetCount();
 }
 
+inline void StatementImpl::firstDataSet()
+{
+	_curDataSet = 0;
+}
 
 } } // namespace Poco::Data
 

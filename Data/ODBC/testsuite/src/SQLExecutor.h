@@ -496,6 +496,8 @@ public:
 		"SELECT Age FROM Person WHERE FirstName = 'Bart'; "
 		"SELECT * FROM Person WHERE Age = ? OR Age = ? ORDER BY Age;");
 
+	void multipleResultsNoProj(const std::string& sql);
+
 	void sqlChannel(const std::string& connect);
 	void sqlLogger(const std::string& connect);
 

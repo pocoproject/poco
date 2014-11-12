@@ -696,6 +696,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testAny);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testDynamicAny);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testMultipleResults);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testMultipleResultsNoProj);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSQLLogger);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSessionTransaction);
