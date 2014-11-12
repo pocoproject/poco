@@ -3419,64 +3419,64 @@ void SQLExecutor::multipleResults(const std::string& sql)
 
 void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 {
-    typedef Tuple<std::string, std::string, std::string, Poco::UInt32> Person;
-    struct ReadPerson {
-        static Person rd(Poco::Data::RecordSet& rs, size_t rowNo) {
-            Person pHomer;
-            pHomer.set<0>(rs.value(0, rowNo));
-            pHomer.set<1>(rs.value(1, rowNo));
-            pHomer.set<2>(rs.value(2, rowNo));
-            pHomer.set<3>(rs.value(3, rowNo));
-            return pHomer;
-        }
-    };
+	typedef Tuple<std::string, std::string, std::string, Poco::UInt32> Person;
+	struct ReadPerson {
+		static Person rd(Poco::Data::RecordSet& rs, size_t rowNo) {
+			Person pHomer;
+			pHomer.set<0>(rs.value(0, rowNo));
+			pHomer.set<1>(rs.value(1, rowNo));
+			pHomer.set<2>(rs.value(2, rowNo));
+			pHomer.set<3>(rs.value(3, rowNo));
+			return pHomer;
+		}
+	};
 
-    std::vector<Person> people;
-    auto const Homer = Person("Simpson", "Homer", "Springfield", 42);
-    const int BartAge = 10;
-    const int HomerAge = 42;
-    const int LisaAge = 8;
-    people.push_back(Homer);
-    people.push_back(Person("Simpson", "Marge", "Springfield", 38));
-    auto const BartName = std::string("Bart");
-    people.push_back(Person("Simpson", BartName, "Springfield", BartAge));
-    auto const Lisa = Person("Simpson", "Lisa", "Springfield", LisaAge);
-    people.push_back(Lisa);
-    people.push_back(Person("Simpson", "Maggie", "Springfield", 3));
-    session() << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+	std::vector<Person> people;
+	const Person Homer("Simpson", "Homer", "Springfield", 42);
+	const int BartAge = 10;
+	const int HomerAge = 42;
+	const int LisaAge = 8;
+	people.push_back(Homer);
+	people.push_back(Person("Simpson", "Marge", "Springfield", 38));
+	const std::string BartName("Bart");
+	people.push_back(Person("Simpson", BartName, "Springfield", BartAge));
+	const Person Lisa = Person("Simpson", "Lisa", "Springfield", LisaAge);
+	people.push_back(Lisa);
+	people.push_back(Person("Simpson", "Maggie", "Springfield", 3));
+	session() << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
 
-    Poco::Data::Statement stmt(session());
-    stmt << sql, useRef(HomerAge), useRef(BartName), useRef(LisaAge), useRef(HomerAge);
+	Poco::Data::Statement stmt(session());
+	stmt << sql, useRef(HomerAge), useRef(BartName), useRef(LisaAge), useRef(HomerAge);
 
-    stmt.execute();
-    assert(3 == stmt.dataSetCount());
-    stmt.firstDataSet();
-    auto vals = std::vector<Poco::Dynamic::Var>();
-    vals.push_back(Poco::Dynamic::Var(Homer));
-    vals.push_back(Poco::Dynamic::Var(BartAge));
-    vals.push_back(Poco::Dynamic::Var(Lisa));
-    vals.push_back(Poco::Dynamic::Var(Homer));
+	stmt.execute();
+	assert(3 == stmt.dataSetCount());
+	stmt.firstDataSet();
+	std::vector<Poco::Dynamic::Var> vals;
+	vals.push_back(Poco::Dynamic::Var(Homer));
+	vals.push_back(Poco::Dynamic::Var(BartAge));
+	vals.push_back(Poco::Dynamic::Var(Lisa));
+	vals.push_back(Poco::Dynamic::Var(Homer));
 
-    auto valIt = vals.cbegin();
-    for (size_t dsNo = 0; dsNo < stmt.dataSetCount(); dsNo = stmt.nextDataSet())
-    {
-        Poco::Data::RecordSet rs(stmt);
-        bool r = rs.moveFirst();
-        for (size_t rowNo = 0; r; ++rowNo, r = rs.moveNext(), ++valIt) {
+	std::vector<Poco::Dynamic::Var>::const_iterator valIt = vals.cbegin();
+	for (size_t dsNo = 0; dsNo < stmt.dataSetCount(); dsNo = stmt.nextDataSet())
+	{
+		Poco::Data::RecordSet rs(stmt);
+		bool r = rs.moveFirst();
+		for (size_t rowNo = 0; r; ++rowNo, r = rs.moveNext(), ++valIt) {
 
-            if (valIt->type() == typeid(Person)) {
-                auto p = ReadPerson::rd(rs, rowNo);
-                assert(p == valIt->extract<Person>());
-            }
-            else {
-                auto val = rs.value(0, rowNo);
-                assert(*valIt == val);
-            }
-        }
-        if (!stmt.hasMoreDataSets())
-            break;
-    }
-    assert(vals.cend() == valIt);
+			if (valIt->type() == typeid(Person)) {
+				const Person p = ReadPerson::rd(rs, rowNo);
+				assert(p == valIt->extract<Person>());
+			}
+			else {
+				const Poco::Dynamic::Var val = rs.value(0, rowNo);
+				assert(*valIt == val);
+			}
+		}
+		if (!stmt.hasMoreDataSets())
+			break;
+	}
+	assert(vals.cend() == valIt);
 }
 
 
