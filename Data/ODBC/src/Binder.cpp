@@ -38,8 +38,8 @@ Binder::Binder(const StatementHandle& rStmt,
 	_paramSetSize(0),
 	_maxFieldSize(maxFieldSize),
 	_maxCharColLength(1024),
-	_maxVarBinColSize(1024),
-	_maxWCharColLength(1024)
+	_maxWCharColLength(1024),
+	_maxVarBinColSize(1024)
 {
 	const std::string NM("COLUMN_SIZE");
 	Poco::DynamicAny r;

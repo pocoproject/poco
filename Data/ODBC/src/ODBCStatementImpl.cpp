@@ -436,14 +436,14 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 
 void ODBCStatementImpl::fillColumns(size_t dataSetPos)
 {
-    poco_assert_dbg(dataSetPos < _preparations.size());
-    poco_assert_dbg(_preparations[dataSetPos]);
-    std::size_t colCount = static_cast<std::size_t>(_preparations[dataSetPos]->columns());
-    if (dataSetPos >= _columnPtrs.size())
-        _columnPtrs.resize(dataSetPos + 1);
+	poco_assert_dbg(dataSetPos < _preparations.size());
+	poco_assert_dbg(_preparations[dataSetPos]);
+	std::size_t colCount = static_cast<std::size_t>(_preparations[dataSetPos]->columns());
+	if (dataSetPos >= _columnPtrs.size())
+		_columnPtrs.resize(dataSetPos + 1);
 
 	for (int i = 0; i < colCount; ++i)
-        _columnPtrs[dataSetPos].push_back(new ODBCMetaColumn(_stmt, i));
+		_columnPtrs[dataSetPos].push_back(new ODBCMetaColumn(_stmt, i));
 }
 
 
@@ -458,14 +458,14 @@ bool ODBCStatementImpl::isStoredProcedure() const
 
 const MetaColumn& ODBCStatementImpl::metaColumn(std::size_t pos, size_t dataSet) const
 {
-    poco_assert_dbg(dataSet < _columnPtrs.size());
+	poco_assert_dbg(dataSet < _columnPtrs.size());
 
-    std::size_t sz = _columnPtrs[dataSet].size();
+	std::size_t sz = _columnPtrs[dataSet].size();
 
 	if (0 == sz || pos > sz - 1)
 		throw InvalidAccessException(format("Invalid column number: %u", pos));
 
-    return *_columnPtrs[dataSet][pos];
+	return *_columnPtrs[dataSet][pos];
 }
 
 
