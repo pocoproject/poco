@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#14 $
+// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#15 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -79,6 +79,18 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 	_host(host),
 	_port(port),
 	_proxyConfig(_globalProxyConfig),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
+	_reconnect(false),
+	_mustReconnect(false),
+	_expectResponseBody(false)
+{
+}
+
+
+HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig):
+	_host(host),
+	_port(port),
+	_proxyConfig(proxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
@@ -379,7 +391,8 @@ void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request)
 
 StreamSocket HTTPClientSession::proxyConnect()
 {
-	HTTPClientSession proxySession(getProxyHost(), getProxyPort());
+	ProxyConfig emptyProxyConfig;
+	HTTPClientSession proxySession(getProxyHost(), getProxyPort(), emptyProxyConfig);
 	proxySession.setTimeout(getTimeout());
 	std::string targetAddress(_host);
 	targetAddress.append(":");
