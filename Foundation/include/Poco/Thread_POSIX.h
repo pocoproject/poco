@@ -85,7 +85,6 @@ public:
 
 protected:
 	static void* runnableEntry(void* pThread);
-	static void* callableEntry(void* pThread);
 	static int mapPrio(int prio, int policy = SCHED_OTHER);
 	static int reverseMapPrio(int osPrio, int policy = SCHED_OTHER);
 
@@ -172,8 +171,7 @@ inline int ThreadImpl::getOSPriorityImpl() const
 
 inline bool ThreadImpl::isRunningImpl() const
 {
-	return _pData->pRunnableTarget != 0 ||
-		(_pData->pCallbackTarget.get() != 0 && _pData->pCallbackTarget->callback != 0);
+	return !_pData->pRunnableTarget.isNull();
 }
 
 

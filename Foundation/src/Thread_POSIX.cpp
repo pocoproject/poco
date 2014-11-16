@@ -120,7 +120,7 @@ void ThreadImpl::setOSPriorityImpl(int prio, int policy)
 {
 	if (prio != _pData->osPrio || policy != _pData->policy)
 	{
-		if (_pData->pRunnableTarget || _pData->pCallbackTarget)
+		if (_pData->pRunnableTarget)
 		{
 			struct sched_param par;
 			par.sched_priority = prio;
@@ -357,48 +357,6 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	}
 
 	pData->pRunnableTarget = 0;
-	pData->done.set();
-	return 0;
-}
-
-
-void* ThreadImpl::callableEntry(void* pThread)
-{
-	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	sigset_t sset;
-	sigemptyset(&sset);
-	sigaddset(&sset, SIGQUIT);
-	sigaddset(&sset, SIGTERM);
-	sigaddset(&sset, SIGPIPE); 
-	pthread_sigmask(SIG_BLOCK, &sset, 0);
-#endif
-
-	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName().c_str());
-#endif
-	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
-	try
-	{
-		pData->pCallbackTarget->callback(pData->pCallbackTarget->pData);
-	}
-	catch (Exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (std::exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (...)
-	{
-		ErrorHandler::handle();
-	}
-
-	pData->pCallbackTarget->callback = 0;
-	pData->pCallbackTarget->pData = 0;
 	pData->done.set();
 	return 0;
 }
