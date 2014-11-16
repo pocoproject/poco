@@ -363,16 +363,17 @@ void ThreadTest::testThreadFunction()
 }
 
 
+struct Functor
+{
+	void operator () ()
+	{
+		++MyRunnable::_staticVar;
+	}
+};
+
+
 void ThreadTest::testThreadFunctor()
 {
-	struct Functor
-	{
-		void operator () ()
-		{
-			++MyRunnable::_staticVar;
-		}
-	};
-
 	Thread thread;
 
 	assert (!thread.isRunning());
