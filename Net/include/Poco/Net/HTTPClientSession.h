@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPClientSession.h#7 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPClientSession.h#8 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -99,6 +99,9 @@ public:
 
 	HTTPClientSession(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
 		/// Creates a HTTPClientSession using the given host and port.
+
+	HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig);
+		/// Creates a HTTPClientSession using the given host, port and proxy configuration.
 
 	virtual ~HTTPClientSession();
 		/// Destroys the HTTPClientSession and closes

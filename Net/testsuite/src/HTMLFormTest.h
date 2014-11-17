@@ -31,6 +31,7 @@ public:
 	void testReadUrlGET();
 	void testReadUrlPOST();
 	void testReadUrlPUT();
+	void testReadUrlBOM();
 	void testReadMultipart();
 	void testSubmit1();
 	void testSubmit2();
