@@ -124,6 +124,10 @@ int HelpFormatter::calcIndent() const
 	int indent = 0;
 	for (const auto& opt: _options)
 	{
+        if (opt.hidden())
+        {
+            continue;
+        }
 		auto shortLen = opt.shortName().length();
 		auto fullLen  = opt.fullName().length();
 		std::size_t n = 0;
@@ -153,6 +157,10 @@ void HelpFormatter::formatOptions(std::ostream& ostr) const
 	int optWidth = calcIndent();
 	for (const auto& opt: _options)
 	{
+        if (opt.hidden())
+        {
+            continue;
+        }
 		formatOption(ostr, opt, optWidth);
 		if (_indent < optWidth)
 		{
