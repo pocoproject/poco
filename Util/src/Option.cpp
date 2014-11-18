@@ -35,7 +35,8 @@ Option::Option():
 	_argRequired(false),
 	_pValidator(0),
 	_pCallback(0),
-	_pConfig(0)
+	_pConfig(0),
+	_hidden(false)
 {
 }
 
@@ -53,6 +54,7 @@ Option::Option(const Option& option):
 	_pValidator(option._pValidator),
 	_pCallback(option._pCallback),
 	_pConfig(option._pConfig)
+	_hidden(option._hidden)
 {
 	if (_pValidator) _pValidator->duplicate();
 	if (_pCallback) _pCallback = _pCallback->clone();
@@ -68,7 +70,8 @@ Option::Option(const std::string& fullName, const std::string& shortName):
 	_argRequired(false),
 	_pValidator(0),
 	_pCallback(0),
-	_pConfig(0)
+	_pConfig(0),
+	_hidden(false)
 {
 }
 
@@ -82,7 +85,8 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 	_argRequired(false),
 	_pValidator(0),
 	_pCallback(0),
-	_pConfig(0)
+	_pConfig(0),
+	_hidden(false)
 {
 }
 
@@ -97,7 +101,8 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 	_argRequired(argRequired),
 	_pValidator(0),
 	_pCallback(0),
-	_pConfig(0)
+	_pConfig(0),
+	_hidden(false)
 {
 }
 
@@ -135,6 +140,7 @@ void Option::swap(Option& option)
 	std::swap(_pValidator, option._pValidator);
 	std::swap(_pCallback, option._pCallback);
 	std::swap(_pConfig, option._pConfig);
+	std::swap(_hidden, option._hidden);
 }
 
 	
@@ -223,6 +229,13 @@ Option& Option::validator(Validator* pValidator)
 {
 	if (_pValidator) _pValidator->release();
 	_pValidator = pValidator;
+	return *this;
+}
+
+
+Option& Option::hidden(bool hide)
+{
+    _hidden = hide;
 	return *this;
 }
 

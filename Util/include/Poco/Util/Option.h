@@ -149,6 +149,9 @@ public:
 		/// The Option takes ownership of the Validator and
 		/// deletes it when it's no longer needed.
 
+    Option& hidden(bool hide);
+        /// Should the option be displayed to the user?
+
 	const std::string& shortName() const;
 		/// Returns the short name of the option.
 		
@@ -194,6 +197,9 @@ public:
 	AbstractConfiguration* config() const;
 		/// Returns the configuration, if specified, or NULL otherwise.
 		
+    bool hidden() const;
+        /// Return whether the option is displayed to the user on help
+
 	bool matchesShort(const std::string& option) const;
 		/// Returns true if the given option string matches the
 		/// short name.
@@ -242,6 +248,7 @@ private:
 	Validator*  _pValidator;
 	AbstractOptionCallback* _pCallback;
 	AbstractConfiguration*  _pConfig;
+    bool _hidden;
 };
 
 
@@ -325,6 +332,12 @@ inline Validator* Option::validator() const
 inline AbstractConfiguration* Option::config() const
 {
 	return _pConfig;
+}
+
+
+inline bool Option::hidden() const
+{
+	return _hidden;
 }
 
 
