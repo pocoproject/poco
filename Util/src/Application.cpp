@@ -219,39 +219,39 @@ int Application::loadConfiguration(int priority)
 	int n = 0;
 	Path appPath;
 	getApplicationPath(appPath);
-	Path cfgPath;
-	if (findAppConfigFile(appPath.getBaseName(), "properties", cfgPath))
+	Path confPath;
+	if (findAppConfigFile(appPath.getBaseName(), "properties", confPath))
 	{
-		_pConfig->add(new PropertyFileConfiguration(cfgPath.toString()), priority, false, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
-	if (findAppConfigFile(appPath.getBaseName(), "ini", cfgPath))
+	if (findAppConfigFile(appPath.getBaseName(), "ini", confPath))
 	{
-		_pConfig->add(new IniFileConfiguration(cfgPath.toString()), priority, false, false);
+		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false, false);
 		++n;
 	}
 #endif
 #ifndef POCO_UTIL_NO_JSONCONFIGURATION
-	if (findAppConfigFile(appPath.getBaseName(), "json", cfgPath))
+	if (findAppConfigFile(appPath.getBaseName(), "json", confPath))
 	{
-		_pConfig->add(new JSONConfiguration(cfgPath.toString()), priority, false, false);
+		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false, false);
 		++n;
 	}
 #endif
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
-	if (findAppConfigFile(appPath.getBaseName(), "xml", cfgPath))
+	if (findAppConfigFile(appPath.getBaseName(), "xml", confPath))
 	{
-		_pConfig->add(new XMLConfiguration(cfgPath.toString()), priority, false, false);
+		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false, false);
 		++n;
 	}
 #endif
 	if (n > 0)
 	{
-		if (!cfgPath.isAbsolute())
-			_pConfig->setString("application.configDir", cfgPath.absolute().parent().toString());
+		if (!confPath.isAbsolute())
+			_pConfig->setString("application.configDir", confPath.absolute().parent().toString());
 		else
-			_pConfig->setString("application.configDir", cfgPath.parent().toString());
+			_pConfig->setString("application.configDir", confPath.parent().toString());
 	}
 	return n;
 }
@@ -259,24 +259,44 @@ int Application::loadConfiguration(int priority)
 
 void Application::loadConfiguration(const std::string& path, int priority)
 {
+	int n = 0;
 	Path confPath(path);
 	std::string ext = confPath.getExtension();
 	if (icompare(ext, "properties") == 0)
+	{
 		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false, false);
+		++n;
+	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 	else if (icompare(ext, "ini") == 0)
+	{
 		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false, false);
+		++n;
+	}
 #endif
 #ifndef POCO_UTIL_NO_JSONCONFIGURATION
 	else if (icompare(ext, "json") == 0)
+	{
 		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false, false);
+		++n;
+	}
 #endif
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	else if (icompare(ext, "xml") == 0)
+	{
 		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false, false);
+		++n;
+	}
 #endif
-	else
-		throw Poco::InvalidArgumentException("Unsupported configuration file type", ext);
+	else throw Poco::InvalidArgumentException("Unsupported configuration file type", ext);
+
+	if (n > 0 && !_pConfig->has("application.configDir"))
+	{
+		if (!confPath.isAbsolute())
+			_pConfig->setString("application.configDir", confPath.absolute().parent().toString());
+		else
+			_pConfig->setString("application.configDir", confPath.parent().toString());
+	}
 }
 
 
