@@ -259,5 +259,4 @@ void HTTPRequest::setCredentials(const std::string& header, const std::string& s
 }
 
 
-
 } } // namespace Poco::Net
