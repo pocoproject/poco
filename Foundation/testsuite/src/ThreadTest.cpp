@@ -363,6 +363,45 @@ void ThreadTest::testThreadFunction()
 }
 
 
+struct Functor
+{
+	void operator () ()
+	{
+		++MyRunnable::_staticVar;
+	}
+};
+
+
+void ThreadTest::testThreadFunctor()
+{
+	Thread thread;
+
+	assert (!thread.isRunning());
+
+	MyRunnable::_staticVar = 0;
+	thread.startFunc(Functor());
+	thread.join();
+	assert (1 == MyRunnable::_staticVar);
+
+	assert (!thread.isRunning());
+
+#if __cplusplus >= 201103L
+
+	Thread thread2;
+
+	assert (!thread2.isRunning());
+
+	MyRunnable::_staticVar = 0;
+	thread.startFunc([] () {MyRunnable::_staticVar++;});
+	thread.join();
+	assert (1 == MyRunnable::_staticVar);
+
+	assert (!thread2.isRunning());
+
+#endif
+}
+
+
 void ThreadTest::testThreadStackSize()
 {
 	int stackSize = 50000000;
@@ -436,6 +475,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testTrySleep);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadTarget);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadFunction);
+	CppUnit_addTest(pSuite, ThreadTest, testThreadFunctor);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
 	CppUnit_addTest(pSuite, ThreadTest, testSleep);
 

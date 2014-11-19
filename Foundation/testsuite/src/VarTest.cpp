@@ -2089,6 +2089,20 @@ void VarTest::testArrayToString()
 }
 
 
+void VarTest::testArrayToStringEscape()
+{
+	std::string s1("\"quoted string\"");
+	Poco::Int8 s2(23);
+	std::vector<Var> s16;
+	s16.push_back(s1);
+	s16.push_back(s2);
+	Var a1(s16);
+	std::string res = a1.convert<std::string>();
+	std::string expected("[ \"\\\"quoted string\\\"\", 23 ]");
+	assert (res == expected);
+}
+
+
 void VarTest::testStructToString()
 {
 	DynamicStruct aStruct;
@@ -2098,6 +2112,18 @@ void VarTest::testStructToString()
 	Var a1(aStruct);
 	std::string res = a1.convert<std::string>();
 	std::string expected = "{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }";
+	assert (res == expected);
+	assert (aStruct.toString() == res);
+}
+
+
+void VarTest::testStructToStringEscape()
+{
+	DynamicStruct aStruct;
+	aStruct["Value"] = "Value with \" and \n";
+	Var a1(aStruct);
+	std::string res = a1.convert<std::string>();
+	std::string expected = "{ \"Value\" : \"Value with \\\" and \\n\" }";
 	assert (res == expected);
 	assert (aStruct.toString() == res);
 }
@@ -2592,7 +2618,9 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructInt);
 	CppUnit_addTest(pSuite, VarTest, testArrayToString);
+	CppUnit_addTest(pSuite, VarTest, testArrayToStringEscape);
 	CppUnit_addTest(pSuite, VarTest, testStructToString);
+	CppUnit_addTest(pSuite, VarTest, testStructToStringEscape);
 	CppUnit_addTest(pSuite, VarTest, testArrayOfStructsToString);
 	CppUnit_addTest(pSuite, VarTest, testStructWithArraysToString);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeString);

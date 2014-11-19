@@ -18,7 +18,9 @@
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 
+
 GCC_DIAG_OFF(unused-variable)
+
 
 using Poco::Timestamp;
 using Poco::DateTime;
@@ -443,6 +445,28 @@ void DateTimeTest::testArithmetics()
 		loop_1_assert(line, data[di].month2 == X.month());
 		loop_1_assert(line, data[di].day2 == X.day());
 	}
+
+	DateTime edgeTime(2014, 9, 16, 0, 0, 0, 0, 10);
+	edgeTime -= Poco::Timespan(11);
+	assert (edgeTime.year() == 2014);
+	assert (edgeTime.month() == 9);
+	assert (edgeTime.day() == 15);
+	assert (edgeTime.hour() == 23);
+	assert (edgeTime.minute() == 59);
+	assert (edgeTime.second() == 59);
+	assert (edgeTime.millisecond() == 999);
+	assert (edgeTime.microsecond() == 999);
+
+	edgeTime.assign(2014, 9, 15, 23, 59, 59, 999, 968);
+	edgeTime += Poco::Timespan(11);
+	assert (edgeTime.year() == 2014);
+	assert (edgeTime.month() == 9);
+	assert (edgeTime.day() == 15);
+	assert (edgeTime.hour() == 23);
+	assert (edgeTime.minute() == 59);
+	assert (edgeTime.second() == 59);
+	assert (edgeTime.millisecond() == 999);
+	assert (edgeTime.microsecond() == 979);
 }
 
 void DateTimeTest::testIncrementDecrement()

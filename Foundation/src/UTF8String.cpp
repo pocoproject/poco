@@ -160,4 +160,16 @@ std::string& UTF8::toLowerInPlace(std::string& str)
 }
 
 
+void UTF8::removeBOM(std::string& str)
+{
+	if (str.size() >= 3 
+		&& static_cast<unsigned char>(str[0]) == 0xEF 
+		&& static_cast<unsigned char>(str[1]) == 0xBB 
+		&& static_cast<unsigned char>(str[2]) == 0xBF)
+	{
+		str.erase(0, 3);
+	}
+}
+
+
 } // namespace Poco

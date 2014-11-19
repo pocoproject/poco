@@ -19,12 +19,18 @@
 #include "Poco/Error.h"
 #include <string>
 #include <string.h>
+#include <errno.h>
 
 
 namespace Poco {
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
+	DWORD Error::last()
+	{
+		return GetLastError();
+	}
+
 
 	std::string Error::getMessage(DWORD errorCode)
 	{
@@ -44,6 +50,11 @@ namespace Poco {
 	}
 
 #else
+	int Error::last()
+	{
+		return errno;
+	}
+
 
 	std::string Error::getMessage(int errorCode)
 	{

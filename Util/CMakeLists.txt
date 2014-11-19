@@ -1,4 +1,5 @@
-set(LIBNAME "PocoUtil")
+set(LIBNAME "Util")
+set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
@@ -14,27 +15,39 @@ POCO_SOURCES_AUTO_PLAT( SRCS WIN32
     src/WinService.cpp
 )
 
-include_directories( "include" )
-
-add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAME}
+add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
+set_target_properties( "${LIBNAME}"
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    DEFINE_SYMBOL Util_EXPORTS)
-target_link_libraries( ${LIBNAME} PocoJSON PocoXML PocoFoundation)
+    OUTPUT_NAME ${POCO_LIBNAME}
+    DEFINE_SYMBOL Util_EXPORTS
+    )
+
+target_link_libraries( "${LIBNAME}" JSON XML Foundation)
+target_include_directories( "${LIBNAME}"
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
 
 install(
     DIRECTORY include/Poco
     DESTINATION include
+    COMPONENT Devel
     PATTERN ".svn" EXCLUDE
     )
 
 install(
-    TARGETS ${LIBNAME}
+    TARGETS "${LIBNAME}" EXPORT "${LIBNAME}Targets"
     LIBRARY DESTINATION lib${LIB_SUFFIX}
     ARCHIVE DESTINATION lib${LIB_SUFFIX}
     RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
     )
+
+POCO_GENERATE_PACKAGE("${LIBNAME}" "${LIBNAME}Targets" "lib/cmake/${PROJECT_NAME}")
 
 if (ENABLE_TESTS)
     add_subdirectory(samples)

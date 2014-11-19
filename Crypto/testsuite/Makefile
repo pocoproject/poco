@@ -13,9 +13,6 @@ ifeq ($(POCO_CONFIG),FreeBSD)
 SYSLIBS += -lssl -lcrypto -lz
 else
 SYSLIBS += -lssl -lcrypto -lz -ldl
-  ifeq ($(POCO_CONFIG),Linux)
-  SYSLIBS += -lkrb5
-  endif
 endif
 
 objects = CryptoTestSuite Driver \

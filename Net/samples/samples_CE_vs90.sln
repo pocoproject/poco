@@ -20,8 +20,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ping", "Ping\Ping_CE_vs90.v
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TimeServer", "TimeServer\TimeServer_CE_vs90.vcproj", "{59EDFD20-9968-30F7-9532-44C08DA58C6E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwitterClient", "TwitterClient\TwitterClient_CE_vs90.vcproj", "{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebSocketServer", "WebSocketServer\WebSocketServer_CE_vs90.vcproj", "{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SMTPLogger", "SMTPLogger\SMTPLogger_CE_vs90.vcproj", "{83E96E4E-A7E8-340B-B6D2-31B4D40D99AF}"
@@ -218,24 +216,6 @@ Global
 		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.release_static_md|Digi JumpStart (ARMV4I).ActiveCfg = release_static_md|Digi JumpStart (ARMV4I)
 		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.release_static_md|Digi JumpStart (ARMV4I).Build.0 = release_static_md|Digi JumpStart (ARMV4I)
 		{59EDFD20-9968-30F7-9532-44C08DA58C6E}.release_static_md|Digi JumpStart (ARMV4I).Deploy.0 = release_static_md|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_shared|Digi JumpStart (ARMV4I).ActiveCfg = debug_shared|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_shared|Digi JumpStart (ARMV4I).Build.0 = debug_shared|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_shared|Digi JumpStart (ARMV4I).Deploy.0 = debug_shared|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_shared|Digi JumpStart (ARMV4I).ActiveCfg = release_shared|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_shared|Digi JumpStart (ARMV4I).Build.0 = release_shared|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_shared|Digi JumpStart (ARMV4I).Deploy.0 = release_shared|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_static_mt|Digi JumpStart (ARMV4I).ActiveCfg = debug_static_mt|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_static_mt|Digi JumpStart (ARMV4I).Build.0 = debug_static_mt|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_static_mt|Digi JumpStart (ARMV4I).Deploy.0 = debug_static_mt|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_mt|Digi JumpStart (ARMV4I).ActiveCfg = release_static_mt|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_mt|Digi JumpStart (ARMV4I).Build.0 = release_static_mt|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_mt|Digi JumpStart (ARMV4I).Deploy.0 = release_static_mt|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_static_md|Digi JumpStart (ARMV4I).ActiveCfg = debug_static_md|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_static_md|Digi JumpStart (ARMV4I).Build.0 = debug_static_md|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.debug_static_md|Digi JumpStart (ARMV4I).Deploy.0 = debug_static_md|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_md|Digi JumpStart (ARMV4I).ActiveCfg = release_static_md|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_md|Digi JumpStart (ARMV4I).Build.0 = release_static_md|Digi JumpStart (ARMV4I)
-		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_md|Digi JumpStart (ARMV4I).Deploy.0 = release_static_md|Digi JumpStart (ARMV4I)
 		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_shared|Digi JumpStart (ARMV4I).ActiveCfg = debug_shared|Digi JumpStart (ARMV4I)
 		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_shared|Digi JumpStart (ARMV4I).Build.0 = debug_shared|Digi JumpStart (ARMV4I)
 		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_shared|Digi JumpStart (ARMV4I).Deploy.0 = debug_shared|Digi JumpStart (ARMV4I)

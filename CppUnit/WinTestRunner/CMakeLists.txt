@@ -13,15 +13,21 @@ POCO_HEADERS_AUTO( WIN_SRCS ${HDRS_G})
 
 # TODO: Is this flag always required?
 add_definitions("-D_AFXDLL")
+#TODO: Use instead of the flag above: find_package(MFC)
 
-include_directories( "src" )
-
-add_library( ${LIBNAME} ${LIB_MODE} ${WIN_SRCS} )
-set_target_properties( ${LIBNAME}
+add_library( "${LIBNAME}" ${LIB_MODE} ${WIN_SRCS} )
+set_target_properties( "${LIBNAME}"
     PROPERTIES
     VERSION "1" SOVERSION "1"
     DEFINE_SYMBOL WinTestRunner_EXPORTS)
-target_link_libraries( ${LIBNAME} CppUnit )
+target_link_libraries( "${LIBNAME}" CppUnit )
+target_include_directories( "${LIBNAME}"
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
+
 if(WIN32)
     target_link_libraries( ${LIBNAME} winmm )
 endif(WIN32)

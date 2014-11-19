@@ -90,10 +90,21 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 				else
 					pSession = new HTTPClientSession(resolvedURI.getHost(), resolvedURI.getPort());
 				if (proxyUri.empty())
-					pSession->setProxy(_proxyHost, _proxyPort);
+				{
+					if (!_proxyHost.empty())
+					{
+						pSession->setProxy(_proxyHost, _proxyPort);
+						pSession->setProxyCredentials(_proxyUsername, _proxyPassword);
+					}
+				}
 				else
+				{
 					pSession->setProxy(proxyUri.getHost(), proxyUri.getPort());
-				pSession->setProxyCredentials(_proxyUsername, _proxyPassword);
+					if (!_proxyUsername.empty())
+					{
+						pSession->setProxyCredentials(_proxyUsername, _proxyPassword);
+					}
+				}
 			}
 			std::string path = resolvedURI.getPathAndQuery();
 			if (path.empty()) path = "/";
@@ -120,7 +131,8 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 					resolvedURI.setUserInfo(username + ":" + password);
 					authorize = false;
 				}
-				delete pSession; pSession = 0;
+				delete pSession; 
+				pSession = 0;
 				++redirects;
 				retry = true;
 			}

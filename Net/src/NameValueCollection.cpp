@@ -134,9 +134,9 @@ bool NameValueCollection::empty() const
 }
 
 
-int NameValueCollection::size() const
+std::size_t NameValueCollection::size() const
 {
-	return (int) _map.size();
+	return _map.size();
 }
 
 

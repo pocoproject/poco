@@ -1,4 +1,5 @@
-set(LIBNAME "PocoData")
+set(LIBNAME "Data")
+set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
@@ -17,29 +18,45 @@ if(MSVC AND NOT(MSVC_VERSION LESS 1400))
         PROPERTIES COMPILE_FLAGS "/bigobj")
 endif()
 
-add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAME}
+add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
+set_target_properties( "${LIBNAME}"
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    DEFINE_SYMBOL Data_EXPORTS)
-target_link_libraries( ${LIBNAME} PocoFoundation)
+    OUTPUT_NAME ${POCO_LIBNAME}
+    DEFINE_SYMBOL Data_EXPORTS
+    )
 
+target_link_libraries( "${LIBNAME}" Foundation)
+target_include_directories( "${LIBNAME}"
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
 install(
     DIRECTORY include/Poco
     DESTINATION include
+    COMPONENT Devel
     PATTERN ".svn" EXCLUDE
     )
 
 install(
-    TARGETS ${LIBNAME}
+    TARGETS "${LIBNAME}" EXPORT "${LIBNAME}Targets"
     LIBRARY DESTINATION lib${LIB_SUFFIX}
     ARCHIVE DESTINATION lib${LIB_SUFFIX}
     RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
     )
 
+POCO_GENERATE_PACKAGE("${LIBNAME}" "${LIBNAME}Targets" "lib/cmake/${PROJECT_NAME}")
+
+if(ENABLE_DATA_SQLITE)
 # SQlite3 is built in any case
 add_subdirectory( SQLite )
+endif(ENABLE_DATA_SQLITE)
 
+if(ENABLE_DATA_MYSQL)
 find_package(MySQL)
 if(MYSQL_FOUND)
     include_directories("${MYSQL_INCLUDE_DIR}")
@@ -48,21 +65,24 @@ if(MYSQL_FOUND)
 else()
     message(STATUS "MySQL Support Disabled - no MySQL library")
 endif(MYSQL_FOUND)
+endif(ENABLE_DATA_MYSQL)
 
+if(ENABLE_DATA_ODBC)
 find_package(ODBC)
-if(CMAKE_SYSTEM MATCHES "Windows")
-    set(ODBC_LIBRARIES "")
+if(WIN32 AND NOT WINCE)
+    set(ODBC_LIBRARIES "odbc32" "odbccp32")
     message(STATUS "Windows native ODBC Support Enabled")
     add_subdirectory( ODBC )
-else ()
-    if (ODBC_FOUND)
+else(WIN32 AND NOT WINCE)
+    if(ODBC_FOUND)
         include_directories("${ODBC_INCLUDE_DIRECTORIES}")
         message(STATUS "ODBC Support Enabled")
         add_subdirectory( ODBC )
-    else ()
+    else()
         message(STATUS "ODBC Support Disabled - no ODBC runtime")
-    endif ()
-endif()
+    endif()
+endif(WIN32 AND NOT WINCE)
+endif(ENABLE_DATA_ODBC)
 
 if (ENABLE_TESTS)
     add_subdirectory(samples)

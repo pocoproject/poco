@@ -28,9 +28,16 @@
 #include "Poco/UnWindows.h"
 #endif
 #include <algorithm>
+#undef min
+#undef max
+#include <limits>
 
 
 namespace Poco {
+
+
+const Clock::ClockVal Clock::CLOCKVAL_MIN = std::numeric_limits<Clock::ClockVal>::min();
+const Clock::ClockVal Clock::CLOCKVAL_MAX = std::numeric_limits<Clock::ClockVal>::max();
 
 
 Clock::Clock()

@@ -37,6 +37,7 @@ public:
 	void testTrySleep();
 	void testThreadTarget();
 	void testThreadFunction();
+	void testThreadFunctor();
 	void testThreadStackSize();
 	void testSleep();
 

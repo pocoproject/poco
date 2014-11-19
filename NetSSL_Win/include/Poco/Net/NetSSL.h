@@ -52,6 +52,12 @@
 
 
 //
+// Allow detection of NetSSL_Win at compile time
+//
+#define POCO_NETSSL_WIN 1
+
+
+//
 // Automatically link NetSSL library.
 //
 #if defined(_MSC_VER)

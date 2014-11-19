@@ -1,7 +1,7 @@
 //
 // HTTPClientSessionTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPClientSessionTest.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPClientSessionTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -279,6 +279,27 @@ void HTTPClientSessionTest::testProxyAuth()
 }
 
 
+void HTTPClientSessionTest::testBypassProxy()
+{
+	HTTPClientSession::ProxyConfig proxyConfig;
+	proxyConfig.host = "proxy.domain.com";
+	proxyConfig.port = 80;
+	proxyConfig.nonProxyHosts = "localhost|127\\.0\\.0\\.1";
+	
+	HTTPClientSession s1("localhost", 80);
+	s1.setProxyConfig(proxyConfig);
+	assert (s1.bypassProxy());
+	
+	HTTPClientSession s2("127.0.0.1", 80);
+	s2.setProxyConfig(proxyConfig);
+	assert (s2.bypassProxy());
+	
+	HTTPClientSession s3("www.appinf.com", 80);
+	s3.setProxyConfig(proxyConfig);
+	assert (!s3.bypassProxy());
+}
+
+
 void HTTPClientSessionTest::setUp()
 {
 }
@@ -305,6 +326,7 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testKeepAlive);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyAuth);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testBypassProxy);
 
 	return pSuite;
 }

@@ -18,6 +18,9 @@
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#undef min
+#undef max
+#include <limits>
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <time.h>
 #include <unistd.h>
@@ -139,6 +142,10 @@ void GetSystemTimeAsFileTimeWithMillisecondResolution(FILETIME* pFT)
 
 
 namespace Poco {
+
+
+const Timestamp::TimeVal Timestamp::TIMEVAL_MIN = std::numeric_limits<Timestamp::TimeVal>::min();
+const Timestamp::TimeVal Timestamp::TIMEVAL_MAX = std::numeric_limits<Timestamp::TimeVal>::max();
 
 
 Timestamp::Timestamp()

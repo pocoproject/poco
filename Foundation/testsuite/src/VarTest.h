@@ -59,7 +59,9 @@ public:
 	void testDynamicStructString();
 	void testDynamicStructInt();
 	void testArrayToString();
+	void testArrayToStringEscape();
 	void testStructToString();
+	void testStructToStringEscape();
 	void testArrayOfStructsToString();
 	void testStructWithArraysToString();
 	void testJSONDeserializeString();
