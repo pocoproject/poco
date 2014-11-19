@@ -109,6 +109,8 @@ void OpenSSLInitializer::uninitialize()
 		CRYPTO_set_id_callback(0);
 #endif
 		delete [] _mutexes;
+		
+		CONF_modules_free();
 	}
 }
 

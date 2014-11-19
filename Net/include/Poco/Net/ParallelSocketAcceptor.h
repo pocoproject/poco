@@ -129,6 +129,7 @@ public:
 	{
 		pNotification->release();
 		StreamSocket sock = _socket.acceptConnection();
+		_pReactor->wakeUp();
 		createServiceHandler(sock);
 	}
 
@@ -140,6 +141,7 @@ protected:
 	{
 		std::size_t next = _next++;
 		if (_next == _reactors.size()) _next = 0;
+		_reactors[next]->wakeUp();
 		return new ServiceHandler(socket, *_reactors[next]);
 	}
 
@@ -167,9 +169,27 @@ protected:
 			_reactors.push_back(new ParallelReactor);
 	}
 
-private:
 	typedef std::vector<typename ParallelReactor::Ptr> ReactorVec;
 
+	ReactorVec& reactors()
+		/// Returns reference to vector of reactors.
+	{
+		return _reactors;
+	}
+
+	SocketReactor* reactor(std::size_t idx)
+		/// Returns reference to the reactor at position idx.
+	{
+		return _reactors.at(idx).get();
+	}
+
+	std::size_t& next()
+		/// Returns reference to the next reactor index.
+	{
+		return _next;
+	}
+
+private:
 	ParallelSocketAcceptor();
 	ParallelSocketAcceptor(const ParallelSocketAcceptor&);
 	ParallelSocketAcceptor& operator = (const ParallelSocketAcceptor&);
