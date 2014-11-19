@@ -392,7 +392,38 @@ void DateTime::computeGregorian(double julianDay)
 void DateTime::computeDaytime()
 {
 	Timespan span(_utcTime/10);
-	_hour        = span.hours();
+	int hour = span.hours();
+	// Due to double rounding issues, the previous call to computeGregorian()
+	// may have crossed into the next or previous day. We need to correct that.
+	if (hour == 23 && _hour == 0)
+	{
+		_day--;
+		if (_day == 0)
+		{
+			_month--;
+			if (_month == 0)
+			{
+				_month = 12;
+				_year--;
+			}
+			_day = daysOfMonth(_year, _month);
+		}
+	}
+	else if (hour == 0 && _hour == 23)
+	{
+		_day++;
+		if (_day > daysOfMonth(_year, _month))
+		{
+			_month++;
+			if (_month > 12)
+			{
+				_month = 1;
+				_year++;
+			}
+			_day = 1;
+		}
+	}
+	_hour        = hour;
 	_minute      = span.minutes();
 	_second      = span.seconds();
 	_millisecond = span.milliseconds();
