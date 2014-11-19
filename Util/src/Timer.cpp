@@ -232,8 +232,15 @@ Timer::Timer(Poco::Thread::Priority priority)
 
 Timer::~Timer()
 {
-	_queue.enqueueNotification(new StopNotification(_queue), Poco::Clock(0));
-	_thread.join();
+	try
+	{
+		_queue.enqueueNotification(new StopNotification(_queue), Poco::Clock(0));
+		_thread.join();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 	

@@ -57,13 +57,20 @@ public:
 	~Handle()
 		/// Destroys the Handle.
 	{
+		try
+		{
 #if defined(_DEBUG)
-		SQLRETURN rc = 
+			SQLRETURN rc = 
 #endif
-		SQLFreeHandle(handleType, _handle);
-		// N.B. Destructors should not throw, but neither do we want to
-		// leak resources. So, we throw here in debug mode if things go bad.
-		poco_assert_dbg (!Utility::isError(rc));
+			SQLFreeHandle(handleType, _handle);
+			// N.B. Destructors should not throw, but neither do we want to
+			// leak resources. So, we throw here in debug mode if things go bad.
+			poco_assert_dbg (!Utility::isError(rc));
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 	operator const H& () const

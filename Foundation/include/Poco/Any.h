@@ -58,7 +58,6 @@ union Placeholder
 	/// where the object was allocated (0 => heap, 1 => local).
 {
 public:
-
 	struct Size
 	{
 		static const unsigned int value = SizeV;
@@ -86,7 +85,7 @@ public:
 
 	PlaceholderT* content() const
 	{
-		if(isLocal())
+		if (isLocal())
 			return reinterpret_cast<PlaceholderT*>(holder);
 		else
 			return pHolder;
@@ -192,9 +191,9 @@ public:
 		/// Destructor. If Any is locally held, calls ValueHolder destructor;
 		/// otherwise, deletes the placeholder from the heap.
 	{
-		if(!empty())
+		if (!empty())
 		{
-			if(_valueHolder.isLocal())
+			if (_valueHolder.isLocal())
 				destruct();
 			else
 				delete content();
@@ -341,7 +340,7 @@ private:
 
 	void construct(const Any& other)
 	{
-		if(!other.empty())
+		if (!other.empty())
 			other.content()->clone(&_valueHolder);
 		else
 			_valueHolder.erase();

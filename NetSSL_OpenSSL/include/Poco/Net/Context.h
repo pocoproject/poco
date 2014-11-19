@@ -49,10 +49,14 @@ public:
 	
 	enum Usage
 	{
-		CLIENT_USE, 	  /// Context is used by a client.
-		SERVER_USE,       /// Context is used by a server.
-		TLSV1_CLIENT_USE, /// Context is used by a client requiring TLSv1.
-		TLSV1_SERVER_USE  /// Context is used by a server requiring TLSv2.
+		CLIENT_USE, 	    /// Context is used by a client.
+		SERVER_USE,         /// Context is used by a server.
+		TLSV1_CLIENT_USE,   /// Context is used by a client requiring TLSv1.
+		TLSV1_SERVER_USE,   /// Context is used by a server requiring TLSv1.
+		TLSV1_1_CLIENT_USE, /// Context is used by a client requiring TLSv1.1 (OpenSSL 1.0.0 or newer).
+		TLSV1_1_SERVER_USE, /// Context is used by a server requiring TLSv1.1 (OpenSSL 1.0.0 or newer).
+		TLSV1_2_CLIENT_USE, /// Context is used by a client requiring TLSv1.2 (OpenSSL 1.0.1 or newer).
+		TLSV1_2_SERVER_USE  /// Context is used by a server requiring TLSv1.2 (OpenSSL 1.0.1 or newer).
 	};
 	
 	enum VerificationMode 
@@ -284,7 +288,10 @@ inline Context::Usage Context::usage() const
 
 inline bool Context::isForServerUse() const
 {
-	return _usage == SERVER_USE || _usage == TLSV1_SERVER_USE;
+	return _usage == SERVER_USE
+		|| _usage == TLSV1_SERVER_USE
+		|| _usage == TLSV1_1_SERVER_USE
+		|| _usage == TLSV1_2_SERVER_USE;
 }
 
 

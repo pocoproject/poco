@@ -21,6 +21,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/DigestEngine.h"
 #include <openssl/evp.h>
 
@@ -62,6 +63,7 @@ private:
 	std::string _name;
 	EVP_MD_CTX* _ctx;
 	Poco::DigestEngine::Digest _digest;
+	OpenSSLInitializer _openSSLInitializer;
 };
 
 

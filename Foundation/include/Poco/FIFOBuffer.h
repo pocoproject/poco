@@ -38,6 +38,11 @@ class BasicFIFOBuffer
 	/// empty/non-empty/full (i.e. writable/readable) transition
 	/// notifications. Buffer can be flagged with end-of-file and
 	/// error flags, which renders it un-readable/writable.
+	///
+	/// Critical portions of code are protected by a recursive mutex.
+	/// However, to achieve thread-safety in cases where multiple
+	/// member function calls are involved and have to be atomic,
+	/// the mutex must be locked externally.
 	/// 
 	/// Buffer size, as well as amount of unread data and
 	/// available space introspections are supported as well.
@@ -83,7 +88,7 @@ public:
 	{
 	}
 
-	explicit BasicFIFOBuffer(T* pBuffer, std::size_t size, bool notify = false):
+	BasicFIFOBuffer(T* pBuffer, std::size_t size, bool notify = false):
 		_buffer(pBuffer, size),
 		_begin(0),
 		_used(0),
@@ -94,7 +99,7 @@ public:
 	{
 	}
 
-	explicit BasicFIFOBuffer(const T* pBuffer, std::size_t size, bool notify = false):
+	BasicFIFOBuffer(const T* pBuffer, std::size_t size, bool notify = false):
 		_buffer(pBuffer, size),
 		_begin(0),
 		_used(size),
@@ -232,7 +237,7 @@ public:
 		
 		if (_buffer.size() - (_begin + _used) < length)
 		{
-			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used);
+			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used * sizeof(T));
 			_begin = 0;
 		}
 
@@ -258,14 +263,10 @@ public:
 		/// 
 		/// Returns the length of data written.
 	{
-		std::size_t len = length;
+		if (length == 0 || length > buffer.size())
+			length = buffer.size();
 
-		if (len == 0)
-			len = buffer.size();
-		else if (len > buffer.size())
-			len = buffer.size();
-
-		return write(buffer.begin(), len);
+		return write(buffer.begin(), length);
 	}
 
 	std::size_t size() const
@@ -301,7 +302,10 @@ public:
 			_used = 0;
 		}
 		else
+		{
+			_begin += length;
 			_used -= length;
+		}
 
 		if (_notify) notify(usedBefore);
 	}
@@ -321,7 +325,7 @@ public:
 		if (!isWritable())
 			throw Poco::InvalidAccessException("Buffer not writable.");
 
-		std::memcpy(&_buffer[_used], ptr, length);
+		std::memcpy(&_buffer[_used], ptr, length * sizeof(T));
 		std::size_t usedBefore = _used;
 		_used += length;
 		if (_notify) notify(usedBefore);
@@ -492,6 +496,12 @@ public:
 		/// Returns true if notifications are enabled, false otherwise.
 	{
 		return _notify;
+	}
+
+	Mutex& mutex()
+		/// Returns reference to mutex.
+	{
+		return _mutex;
 	}
 
 private:

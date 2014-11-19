@@ -85,7 +85,7 @@ const Var Var::operator + (const Var& other) const
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return add<Poco::Int64>(other);
 		else
 			return add<Poco::UInt64>(other);
@@ -103,7 +103,7 @@ Var& Var::operator += (const Var& other)
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return *this = add<Poco::Int64>(other);
 		else
 			return *this = add<Poco::UInt64>(other);
@@ -121,7 +121,7 @@ const Var Var::operator - (const Var& other) const
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return subtract<Poco::Int64>(other);
 		else
 			return subtract<Poco::UInt64>(other);
@@ -137,7 +137,7 @@ Var& Var::operator -= (const Var& other)
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return *this = subtract<Poco::Int64>(other);
 		else
 			return *this = subtract<Poco::UInt64>(other);
@@ -153,7 +153,7 @@ const Var Var::operator * (const Var& other) const
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return multiply<Poco::Int64>(other);
 		else
 			return multiply<Poco::UInt64>(other);
@@ -169,7 +169,7 @@ Var& Var::operator *= (const Var& other)
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return *this = multiply<Poco::Int64>(other);
 		else
 			return *this = multiply<Poco::UInt64>(other);
@@ -185,7 +185,7 @@ const Var Var::operator / (const Var& other) const
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return divide<Poco::Int64>(other);
 		else
 			return divide<Poco::UInt64>(other);
@@ -201,7 +201,7 @@ Var& Var::operator /= (const Var& other)
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return *this = divide<Poco::Int64>(other);
 		else
 			return *this = divide<Poco::UInt64>(other);

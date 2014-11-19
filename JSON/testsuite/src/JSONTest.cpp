@@ -13,14 +13,6 @@
 #include "JSONTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Poco/JSON/Object.h"
-#include "Poco/JSON/Parser.h"
-#include "Poco/JSON/Query.h"
-#include "Poco/JSON/JSONException.h"
-#include "Poco/JSON/Stringifier.h"
-#include "Poco/JSON/ParseHandler.h"
-#include "Poco/JSON/PrintHandler.h"
-#include "Poco/JSON/Template.h"
 #include "Poco/Path.h"
 #include "Poco/Environment.h"
 #include "Poco/File.h"
@@ -165,37 +157,10 @@ void JSONTest::testFalseProperty()
 
 void JSONTest::testNumberProperty()
 {
-	std::string json = "{ \"test\" : 1969 }";
-	Parser parser;
-	Var result;
-
-	try
-	{
-		result = parser.parse(json);
-	}
-	catch(JSONException& jsone)
-	{
-		std::cout << jsone.message() << std::endl;
-		assert(false);
-	}
-
-	assert(result.type() == typeid(Object::Ptr));
-
-	Object::Ptr object = result.extract<Object::Ptr>();
-	Var test = object->get("test");
-	assert(test.isInteger());
-	int value = test;
-	assert(value == 1969);
-
-	DynamicStruct ds = *object;
-	assert (!ds["test"].isEmpty());
-	assert (ds["test"].isNumeric());
-	assert (ds["test"] == 1969);
-
-	const DynamicStruct& rds = *object;
-	assert (!rds["test"].isEmpty());
-	assert (rds["test"].isNumeric());
-	assert (rds["test"] == 1969);
+	testNumber(1969);
+	testNumber(-1969);
+	testNumber(1969.5);
+	testNumber(-1969.5);
 }
 
 

@@ -97,7 +97,7 @@ void TCPServerTest::testOneConnection()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 1);
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(1000);
 	assert (srv.currentConnections() == 0);
 }
 
@@ -132,14 +132,14 @@ void TCPServerTest::testTwoConnections()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 2);
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(1000);
 	assert (srv.currentConnections() == 1);
 	assert (srv.currentThreads() == 1);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 2);
 	ss2.close();
 
-	Thread::sleep(300);
+	Thread::sleep(1000);
 	assert (srv.currentConnections() == 0);
 }
 
@@ -200,28 +200,28 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.queuedConnections() == 2);
 	
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(2000);
 	assert (srv.currentConnections() == 4);
 	assert (srv.currentThreads() == 4);
 	assert (srv.queuedConnections() == 1);
 	assert (srv.totalConnections() == 5);
 
 	ss2.close();
-	Thread::sleep(300);
+	Thread::sleep(2000);
 	assert (srv.currentConnections() == 4);
 	assert (srv.currentThreads() == 4);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 6);
 	
 	ss3.close();
-	Thread::sleep(300);
+	Thread::sleep(2000);
 	assert (srv.currentConnections() == 3);
 	assert (srv.currentThreads() == 3);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 6);
 
 	ss4.close();
-	Thread::sleep(300);
+	Thread::sleep(2000);
 	assert (srv.currentConnections() == 2);
 	assert (srv.currentThreads() == 2);
 	assert (srv.queuedConnections() == 0);
@@ -229,7 +229,7 @@ void TCPServerTest::testMultiConnections()
 
 	ss5.close();
 	ss6.close();
-	Thread::sleep(300);
+	Thread::sleep(1000);
 	assert (srv.currentConnections() == 0);
 }
 

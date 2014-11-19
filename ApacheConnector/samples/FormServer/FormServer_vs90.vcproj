@@ -46,7 +46,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -63,7 +64,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin\FormServerd.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -115,7 +117,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -132,7 +135,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool

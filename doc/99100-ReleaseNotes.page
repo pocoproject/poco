@@ -1,6 +1,52 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.5.4
+
+!!Summary of Changes
+
+  - fixed GH #326: compile Net lib 1.5.2 without UTF8 support enabled
+  - fixed GH #518: NetworkInterface.cpp compile error w/ POCO_NO_WSTRING (1.5.3)
+  - Fixed MSVC 2010 warnings on large alignment 
+  - make HTTPAuthenticationParams::parse() add value on end of string
+  - fixed GH #482: Poco::JSON::Stringifier::stringify bad behaviour
+  - fixed GH #508: Can't compile for arm64 architecture
+  - fixed GH #510: Incorrect RSAKey construction from istream
+  - fix SharedMemory for WinCE/WEC2013
+  - Add NIOS2 double conversion detection, fixes compile errors
+  - added VS2013 project/solution files for Windows Embedded Compact 2013
+  - added Process::isRunning()
+  - NetSSL: Fix typo in documentation
+  - NetSSL_OpenSSL: support for TLS 1.1 and 1.2
+  - Zip: Added CM_AUTO, which automatically selects CM_STORE or CM_DEFLATE based
+    on file extension. Used to avoid double-compression of already compressed file 
+    formats such as images.
+  - added %L modifier to PatternFormatter to switch to local time
+  - removed unnecessary explicit in some multi-arg constructors
+  - Allow SecureStreamSocket::attach() to be used in server connections 
+  - added Var::isBoolean() and fixed JSON stringifier
+  - added poco_unexpected() macro invoking Bugcheck::unexpected() to deal
+    with unexpected exceptions in destructors
+  - fixed GH #538 prevent destructors from throwing exceptions
+  - improved HTTP server handling of errors while reading header
+  - fixed GH #545: use short for sign
+  - upgraded SQLite to 3.8.6
+  - fixed GH #550 WebSocket fragmented message problem
+  - improved HTTPClientSession handling of network errors while sending the request
+  - updated bundled PCRE to 8.35.0
+  - fixed GH #552: FIFOBuffer drain() problem
+  - fixed GH #402: StreamSocket::receiveBytes(FIFOBuffer&) and sendBytes(FIFOBuffer&) are
+    not thread safe
+  - HTTPCookie: fix documentation for max age
+  - added Timestamp::raw() and Clock::raw()
+  - Poco::Buffer properly handles zero-sized buffers
+  - GH #512: Poco:Data:ODBC:Binder.h causes a crash
+  - Added Crypto_Win and NetSSL_Win libraries which are re-implementations of existing
+    Crypto and NetSSL_OpenSSL libraries based on WinCrypt/Schannel. The new libraries 
+    can be used as an almost drop-in replacement for the OpenSSL based libraries on
+    Windows and Windows Embedded Compact platforms. Only available from GitHub for now.
+
+
 !!!Release 1.5.3
 
 !!Summary of Changes
@@ -82,8 +128,7 @@ AAAIntroduction
   - fixed GH #176: Poco::JSON::Stringifier UTF encoding
   - fixed GH #458: Broadcast address and subnet mask for IEEE802.11 network interface
   - fixed GH #456: poco: library install dirs per RUNTIME/LIBRARY/ARCHIVE
-  
-  
+
 !!Incompatible Changes and Possible Transition Issues
 
   - Data::ODBC: UTF-16 Unicode is now directly mapped and recognized as type by ODBC.
@@ -96,7 +141,8 @@ AAAIntroduction
     change, and backwards compatibility with the stable 1.4 release series
     is not guaranteed. There may also be some rough edges. 
     The next stable release incorporating 1.5 features will be 1.6. 
- 
+
+
 !!!Release 1.5.2
 
 !!Summary of Changes

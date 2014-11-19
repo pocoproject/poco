@@ -97,7 +97,7 @@ IPAddress::IPAddress(const std::string& addr)
 	IPv6AddressImpl addr6(IPv6AddressImpl::parse(addr));
 	if (addr6 != IPv6AddressImpl())
 	{
-		newIPv6(addr6.addr());
+		newIPv6(addr6.addr(), addr6.scope());
 		return;
 	}
 #endif
@@ -159,16 +159,19 @@ IPAddress::IPAddress(unsigned prefix, Family family)
 	{
 		if (prefix <= 32)
 			newIPv4(prefix);
+		else
+			throw Poco::InvalidArgumentException("Invalid prefix length passed to IPAddress()");
 	}
 #if defined(POCO_HAVE_IPv6)
 	else if (family == IPv6)
 	{
 		if (prefix <= 128)
 			newIPv6(prefix);
+		else
+			throw Poco::InvalidArgumentException("Invalid prefix length passed to IPAddress()");
 	}
 #endif
 	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
-	if (!pImpl()) throw Poco::InvalidArgumentException("Invalid prefix length passed to IPAddress()");
 }
 
 

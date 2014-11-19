@@ -85,7 +85,14 @@ struct MySQL_API MySQLConnectorRegistrator
 	~MySQLConnectorRegistrator()
 		/// Calls Poco::Data::MySQL::unregisterConnector();
 	{
-		Poco::Data::MySQL::Connector::unregisterConnector();
+		try
+		{
+			Poco::Data::MySQL::Connector::unregisterConnector();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 };
 

@@ -242,7 +242,14 @@ PartialOutputStream::PartialOutputStream(std::ostream& ostr, std::size_t start, 
 
 PartialOutputStream::~PartialOutputStream()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

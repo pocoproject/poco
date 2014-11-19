@@ -47,7 +47,14 @@ OpenSSLInitializer::OpenSSLInitializer()
 
 OpenSSLInitializer::~OpenSSLInitializer()
 {
-	uninitialize();
+	try
+	{
+		uninitialize();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

@@ -54,6 +54,8 @@ const std::string SSLManager::CFG_SESSION_CACHE_SIZE("sessionCacheSize");
 const std::string SSLManager::CFG_SESSION_TIMEOUT("sessionTimeout");
 const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
 const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
+const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
+const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
 #ifdef OPENSSL_FIPS
 const std::string SSLManager::CFG_FIPS_MODE("openSSL.fips");
 const bool        SSLManager::VAL_FIPS_MODE(false);
@@ -67,7 +69,14 @@ SSLManager::SSLManager()
 
 SSLManager::~SSLManager()
 {
-	shutdown();
+	try
+	{
+		shutdown();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -251,10 +260,35 @@ void SSLManager::initDefaultContext(bool server)
 	std::string cipherList = config.getString(prefix + CFG_CIPHER_LIST, VAL_CIPHER_LIST);
 	cipherList = config.getString(prefix + CFG_CYPHER_LIST, cipherList); // for backwards compatibility
 	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
+	bool requireTLSv1_1 = config.getBool(prefix + CFG_REQUIRE_TLSV1_1, false);
+	bool requireTLSv1_2 = config.getBool(prefix + CFG_REQUIRE_TLSV1_2, false);
+	Context::Usage usage;
+	
 	if (server)
-		_ptrDefaultServerContext = new Context(requireTLSv1 ? Context::TLSV1_SERVER_USE : Context::SERVER_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
+	{
+		if (requireTLSv1_2)
+			usage = Context::TLSV1_2_SERVER_USE;
+		else if (requireTLSv1_1)
+			usage = Context::TLSV1_1_SERVER_USE;
+		else if (requireTLSv1)
+			usage = Context::TLSV1_SERVER_USE;
+		else
+			usage = Context::SERVER_USE;
+		_ptrDefaultServerContext = new Context(usage, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
+	}
 	else
-		_ptrDefaultClientContext = new Context(requireTLSv1 ? Context::TLSV1_CLIENT_USE : Context::CLIENT_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
+	{
+		if (requireTLSv1_2)
+			usage = Context::TLSV1_2_CLIENT_USE;
+		else if (requireTLSv1_1)
+			usage = Context::TLSV1_1_CLIENT_USE;
+		else if (requireTLSv1)
+			usage = Context::TLSV1_CLIENT_USE;
+		else
+			usage = Context::CLIENT_USE;
+		_ptrDefaultClientContext = new Context(usage, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
+	}
+	
 		
 	bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 	if (server)

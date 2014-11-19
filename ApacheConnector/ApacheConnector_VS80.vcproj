@@ -46,7 +46,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -64,7 +65,8 @@
 				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
 				ImportLibrary="..\lib\mod_pocod.lib"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -116,7 +118,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -136,7 +139,8 @@
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="0"
 				ImportLibrary="..\lib\mod_poco.lib"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool

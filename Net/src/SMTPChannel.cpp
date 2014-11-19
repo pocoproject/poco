@@ -69,7 +69,14 @@ SMTPChannel::SMTPChannel(const std::string& mailhost, const std::string& sender,
 
 SMTPChannel::~SMTPChannel()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

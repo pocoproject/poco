@@ -594,6 +594,10 @@ void StringTest::testStringToDouble()
 			assert(strToDouble(format("12%c3456789012345678901234567890", ds), result, ds, ts));
 			assertEqualDelta(12.34, result, 0.01);
 
+			assert(strToDouble("1234345", result, ds, ts));
+			assertEqualDelta(1234345, result, 0.00000001);
+			assert(strToDouble(format("1%c234%c345", ts, ts), result, ds, ts));
+			assertEqualDelta(1234345, result, 0.00000001);
 			assert(strToDouble(format("1%c234%c3456789012345678901234567890", ts, ds), result, ds, ts));
 			assertEqualDelta(1234.3456789, result, 0.00000001);
 			assert(strToDouble(format("12%c345%c3456789012345678901234567890", ts, ds), result, ds, ts));
@@ -992,6 +996,11 @@ void StringTest::testFloatToString()
 	assert (doubleToStr(str, val, 2, 22, ',') == "-10,372,157,551,632.90");
 	assert (doubleToStr(str, val, 2, 22, '.', ',') == "-10.372.157.551.632,90");
 	assert (doubleToStr(str, val, 2, 22, ' ', ',') == "-10 372 157 551 632,90");
+
+	int ival = 1234567890;
+	assert(doubleToStr(str, ival, 1, 15, ',') == "1,234,567,890.0");
+	ival = -123456789;
+	assert(doubleToStr(str, ival, 1, 14, ',') == "-123,456,789.0");
 }
 
 

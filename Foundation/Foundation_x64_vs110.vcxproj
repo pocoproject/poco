@@ -90,19 +90,19 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">..\bin64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">obj64\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">obj64\Foundation\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">..\bin64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">obj64\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">obj64\Foundation\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">..\lib64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">obj64\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">obj64\Foundation\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">..\lib64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">obj64\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">obj64\Foundation\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">..\lib64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">obj64\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">obj64\Foundation\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">..\lib64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">obj64\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">obj64\Foundation\$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoFoundation64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoFoundationmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoFoundationmtd</TargetName>
@@ -593,8 +593,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\RegularExpression.cpp" />
+    <ClCompile Include="src\pcre_version.c" />
+    <ClCompile Include="src\pcre_byte_order.c" />
     <ClCompile Include="src\pcre_chartables.c" />
+    <ClCompile Include="src\pcre_config.c" />
     <ClCompile Include="src\pcre_compile.c" />
+    <ClCompile Include="src\pcre_get.c" />
+    <ClCompile Include="src\pcre_jit_compile.c" />
+    <ClCompile Include="src\pcre_refcount.c" />
+    <ClCompile Include="src\pcre_string_utils.c" />
+    <ClCompile Include="src\pcre_dfa_exec.c" />
     <ClCompile Include="src\pcre_exec.c" />
     <ClCompile Include="src\pcre_fullinfo.c" />
     <ClCompile Include="src\pcre_globals.c" />
@@ -603,7 +611,6 @@
     <ClCompile Include="src\pcre_ord2utf8.c" />
     <ClCompile Include="src\pcre_study.c" />
     <ClCompile Include="src\pcre_tables.c" />
-    <ClCompile Include="src\pcre_try_flipped.c" />
     <ClCompile Include="src\pcre_ucd.c" />
     <ClCompile Include="src\pcre_valid_utf8.c" />
     <ClCompile Include="src\pcre_xclass.c" />

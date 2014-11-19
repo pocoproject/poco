@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="2"
@@ -102,8 +102,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="2"
@@ -191,8 +191,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="2"
@@ -280,8 +280,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="2"
@@ -365,8 +365,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="2"
@@ -450,8 +450,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestApp\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestApp\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="2"

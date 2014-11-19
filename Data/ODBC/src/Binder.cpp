@@ -49,9 +49,13 @@ Binder::~Binder()
 
 void Binder::freeMemory()
 {
-	LengthVec::iterator itLen = _lengthIndicator.begin();
-	LengthVec::iterator itLenEnd = _lengthIndicator.end();
+	LengthPtrVec::iterator itLen = _lengthIndicator.begin();
+	LengthPtrVec::iterator itLenEnd = _lengthIndicator.end();
 	for(; itLen != itLenEnd; ++itLen) delete *itLen;
+
+	LengthVecVec::iterator itVecLen = _vecLengthIndicator.begin();
+	LengthVecVec::iterator itVecLenEnd = _vecLengthIndicator.end();
+	for (; itVecLen != itVecLenEnd; ++itVecLen) delete *itVecLen;
 
 	TimeMap::iterator itT = _times.begin();
 	TimeMap::iterator itTEnd = _times.end();
@@ -80,6 +84,18 @@ void Binder::freeMemory()
 	BoolPtrVec::iterator itBool = _boolPtrs.begin();
 	BoolPtrVec::iterator endBool = _boolPtrs.end();
 	for (; itBool != endBool; ++itBool) delete [] *itBool;
+
+	DateVecVec::iterator itDateVec = _dateVecVec.begin();
+	DateVecVec::iterator itDateVecEnd = _dateVecVec.end();
+	for (; itDateVec != itDateVecEnd; ++itDateVec) delete *itDateVec;
+
+	TimeVecVec::iterator itTimeVec = _timeVecVec.begin();
+	TimeVecVec::iterator itTimeVecEnd = _timeVecVec.end();
+	for (; itTimeVec != itTimeVecEnd; ++itTimeVec) delete *itTimeVec;
+
+	DateTimeVecVec::iterator itDateTimeVec = _dateTimeVecVec.begin();
+	DateTimeVecVec::iterator itDateTimeVecEnd = _dateTimeVecVec.end();
+	for (; itDateTimeVec != itDateTimeVecEnd; ++itDateTimeVec) delete *itDateTimeVec;
 }
 
 
@@ -385,16 +401,16 @@ void Binder::synchronize()
 void Binder::reset()
 {
 	freeMemory();
-	LengthVec().swap(_lengthIndicator);
+	LengthPtrVec().swap(_lengthIndicator);
 	_inParams.clear();
 	_outParams.clear();
 	_dates.clear();
 	_times.clear();
 	_timestamps.clear();
 	_strings.clear();
-	_dateVec.clear();
-	_timeVec.clear();
-	_dateTimeVec.clear();
+	_dateVecVec.clear();
+	_timeVecVec.clear();
+	_dateTimeVecVec.clear();
 	_charPtrs.clear();
 	_boolPtrs.clear();
 	_containers.clear();

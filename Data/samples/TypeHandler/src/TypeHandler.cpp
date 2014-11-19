@@ -49,7 +49,7 @@ class TypeHandler<Person>
 public:
 	static std::size_t size()
 	{
-		return 3;
+		return 4;
 	}
 	
 	static void bind(std::size_t pos, const Person& person, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)

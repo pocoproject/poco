@@ -91,22 +91,22 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V310'">bin\$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V310'">obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V310'">obj\TestSuite\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V310'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V310'">bin\$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V310'">obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V310'">obj\TestSuite\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V310'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V310'">bin\$(Platform)\static_md\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V310'">obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V310'">obj\TestSuite\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V310'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V310'">bin\$(Platform)\static_md\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V310'">obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V310'">obj\TestSuite\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V310'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V310'">bin\$(Platform)\static_mt\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V310'">obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V310'">obj\TestSuite\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V310'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">bin\$(Platform)\static_mt\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">obj\TestSuite\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">false</LinkIncremental>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V310'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V310'">TestSuited</TargetName>
@@ -114,6 +114,9 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V310'">TestSuite</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V310'">TestSuite</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">TestSuite</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V310'">
+    <RemoteDirectory>Storage_Card\</RemoteDirectory>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V310'">
     <ClCompile>

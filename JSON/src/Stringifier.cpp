@@ -55,14 +55,14 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 	{
 		out << "null";
 	}
-	else if ( any.isString() )
+	else if ( any.isNumeric() || any.isBoolean() )
 	{
-		std::string value = any.convert<std::string>();
-		formatString(value, out);
+		out << any.convert<std::string>();
 	}
 	else
 	{
-		out << any.convert<std::string>();
+		std::string value = any.convert<std::string>();
+		formatString(value, out);
 	}
 }
 

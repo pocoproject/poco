@@ -46,7 +46,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -64,7 +65,8 @@
 				AdditionalLibraryDirectories="..\..\lib"
 				SubSystem="1"
 				ImportLibrary="..\..\lib\PocoDataMySQLd.lib"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -116,7 +118,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -135,7 +138,8 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\..\lib\PocoDataMySQL.lib"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -186,7 +190,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -243,7 +248,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -299,7 +305,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -356,7 +363,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool

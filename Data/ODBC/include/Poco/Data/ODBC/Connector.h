@@ -96,7 +96,14 @@ struct ODBC_API ODBCConnectorRegistrator
 	~ODBCConnectorRegistrator()
 		/// Calls Poco::Data::ODBC::unregisterConnector();
 	{
-		Poco::Data::ODBC::Connector::unregisterConnector();
+		try
+		{
+			Poco::Data::ODBC::Connector::unregisterConnector();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 };
 

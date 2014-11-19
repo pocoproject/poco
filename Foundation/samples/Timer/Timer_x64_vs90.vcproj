@@ -46,7 +46,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -63,7 +64,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin64\Timerd.pdb"
 				SubSystem="1"
-				TargetMachine="17"/>
+				TargetMachine="17"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -115,7 +117,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -132,7 +135,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="17"/>
+				TargetMachine="17"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -182,7 +186,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -199,7 +204,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin64\static_mt\Timerd.pdb"
 				SubSystem="1"
-				TargetMachine="17"/>
+				TargetMachine="17"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -251,7 +257,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -268,7 +275,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="17"/>
+				TargetMachine="17"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -318,7 +326,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -335,7 +344,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin64\static_md\Timerd.pdb"
 				SubSystem="1"
-				TargetMachine="17"/>
+				TargetMachine="17"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -387,7 +397,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -404,7 +415,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="17"/>
+				TargetMachine="17"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool

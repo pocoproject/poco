@@ -246,6 +246,10 @@ public:
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to suport the diagnostic.
 
+	virtual bool isBoolean() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
 	virtual bool isString() const;
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to suport the diagnostic.
@@ -594,6 +598,12 @@ inline bool VarHolder::isNumeric() const
 }
 
 
+inline bool VarHolder::isBoolean() const
+{
+	return false;
+}
+
+
 inline bool VarHolder::isString() const
 {
 	return false;
@@ -782,6 +792,11 @@ public:
 		return std::numeric_limits<Int8>::is_specialized;
 	}
 
+	bool isBoolean() const
+	{
+		return false;
+	}
+
 	bool isString() const
 	{
 		return false;
@@ -921,6 +936,7 @@ public:
 		return std::numeric_limits<Int16>::is_specialized;
 	}
 
+
 	bool isString() const
 	{
 		return false;
@@ -1052,6 +1068,11 @@ public:
 	bool isNumeric() const
 	{
 		return std::numeric_limits<Int32>::is_specialized;
+	}
+
+	bool isBoolean() const
+	{
+		return false;
 	}
 
 	bool isString() const
@@ -1202,6 +1223,11 @@ public:
 		return std::numeric_limits<Int64>::is_specialized;
 	}
 
+	bool isBoolean() const
+	{
+		return false;
+	}
+
 	bool isString() const
 	{
 		return false;
@@ -1333,6 +1359,11 @@ public:
 	bool isNumeric() const
 	{
 		return std::numeric_limits<UInt8>::is_specialized;
+	}
+
+	bool isBoolean() const
+	{
+		return false;
 	}
 
 	bool isString() const
@@ -1468,6 +1499,11 @@ public:
 		return std::numeric_limits<UInt16>::is_specialized;
 	}
 
+	bool isBoolean() const
+	{
+		return false;
+	}
+
 	bool isString() const
 	{
 		return false;
@@ -1599,6 +1635,11 @@ public:
 	bool isNumeric() const
 	{
 		return std::numeric_limits<UInt32>::is_specialized;
+	}
+
+	bool isBoolean() const
+	{
+		return false;
 	}
 
 	bool isString() const
@@ -1755,6 +1796,11 @@ public:
 		return std::numeric_limits<UInt64>::is_specialized;
 	}
 
+	bool isBoolean() const
+	{
+		return false;
+	}
+
 	bool isString() const
 	{
 		return false;
@@ -1884,6 +1930,11 @@ public:
 	bool isNumeric() const
 	{
 		return std::numeric_limits<bool>::is_specialized;
+	}
+
+	bool isBoolean() const
+	{
+		return true;
 	}
 
 	bool isString() const
@@ -2018,6 +2069,11 @@ public:
 	bool isNumeric() const
 	{
 		return std::numeric_limits<float>::is_specialized;
+	}
+
+	bool isBoolean() const
+	{
+		return false;
 	}
 
 	bool isString() const
@@ -2160,6 +2216,11 @@ public:
 		return std::numeric_limits<double>::is_specialized;
 	}
 
+	bool isBoolean() const
+	{
+		return false;
+	}
+
 	bool isString() const
 	{
 		return false;
@@ -2289,6 +2350,11 @@ public:
 	bool isNumeric() const
 	{
 		return std::numeric_limits<char>::is_specialized;
+	}
+
+	bool isBoolean() const
+	{
+		return false;
 	}
 
 	bool isString() const
@@ -2793,6 +2859,11 @@ public:
 		return std::numeric_limits<long>::is_specialized;
 	}
 
+	bool isBoolean() const
+	{
+		return false;
+	}
+
 	bool isString() const
 	{
 		return false;
@@ -2924,6 +2995,11 @@ public:
 	bool isNumeric() const
 	{
 		return std::numeric_limits<unsigned long>::is_specialized;
+	}
+
+	bool isBoolean() const
+	{
+		return false;
 	}
 
 	bool isString() const
@@ -3245,6 +3321,11 @@ public:
 		return false;
 	}
 
+	bool isBoolean() const
+	{
+		return false;
+	}
+
 	bool isString() const
 	{
 		return false;
@@ -3341,6 +3422,11 @@ public:
 		return false;
 	}
 
+	bool isBoolean() const
+	{
+		return false;
+	}
+
 	bool isString() const
 	{
 		return false;
@@ -3433,6 +3519,11 @@ public:
 	}
 
 	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isBoolean() const
 	{
 		return false;
 	}

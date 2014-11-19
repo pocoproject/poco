@@ -93,7 +93,7 @@ local uInt longest_match  OF((deflate_state *s, IPos cur_match));
 #endif
 local uInt longest_match_fast OF((deflate_state *s, IPos cur_match));
 
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
 local  void check_match OF((deflate_state *s, IPos start, IPos match,
                             int length));
 #endif
@@ -1225,7 +1225,7 @@ local uInt longest_match_fast(s, cur_match)
     return (uInt)len <= s->lookahead ? (uInt)len : s->lookahead;
 }
 
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
 /* ===========================================================================
  * Check that the match at match_start is indeed a match.
  */

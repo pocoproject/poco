@@ -43,12 +43,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
     <OutDir>..\bin64\</OutDir>
-    <IntDir>obj64\$(Configuration)\</IntDir>
+    <IntDir>obj64\ApacheConnector\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
     <OutDir>..\bin64\</OutDir>
-    <IntDir>obj64\$(Configuration)\</IntDir>
+    <IntDir>obj64\ApacheConnector\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">

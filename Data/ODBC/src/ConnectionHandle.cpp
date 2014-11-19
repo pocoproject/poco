@@ -40,12 +40,19 @@ ConnectionHandle::ConnectionHandle(EnvironmentHandle* pEnvironment):
 
 ConnectionHandle::~ConnectionHandle()
 {
-	SQLDisconnect(_hdbc);
-	SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_DBC, _hdbc);
+	try
+	{
+		SQLDisconnect(_hdbc);
+		SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_DBC, _hdbc);
 
-	if (_ownsEnvironment) delete _pEnvironment;
+		if (_ownsEnvironment) delete _pEnvironment;
 
-	poco_assert (!Utility::isError(rc));
+		poco_assert (!Utility::isError(rc));
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

@@ -92,6 +92,8 @@ class NetSSL_API SSLManager
 	///            <sessionTimeout>0..n</sessionTimeout>           <!-- server only -->
 	///            <extendedVerification>true|false</extendedVerification>
 	///            <requireTLSv1>true|false</requireTLSv1>
+	///            <requireTLSv1_1>true|false</requireTLSv1_1>
+	///            <requireTLSv1_2>true|false</requireTLSv1_2>
 	///          </server|client>
 	///          <fips>false</fips>
 	///       </openSSL>
@@ -133,6 +135,8 @@ class NetSSL_API SSLManager
 	///    - extendedVerification (boolean): Enable or disable the automatic post-connection
 	///      extended certificate verification.
 	///    - requireTLSv1 (boolean): Require a TLSv1 connection.
+	///    - requireTLSv1_1 (boolean): Require a TLSv1.1 connection.
+	///    - requireTLSv1_2 (boolean): Require a TLSv1.2 connection.
 	///    - fips: Enable or disable OpenSSL FIPS mode. Only supported if the OpenSSL version 
 	///      that this library is built against supports FIPS mode.
 {
@@ -255,7 +259,8 @@ protected:
 	static Poco::Util::AbstractConfiguration& appConfig();
 		/// Returns the application configuration.
 		///
-		/// Throws a 
+		/// Throws a InvalidStateException if not application instance
+		/// is available.
 
 private:
 	SSLManager();
@@ -313,6 +318,8 @@ private:
 	static const std::string CFG_SESSION_TIMEOUT;
 	static const std::string CFG_EXTENDED_VERIFICATION;
 	static const std::string CFG_REQUIRE_TLSV1;
+	static const std::string CFG_REQUIRE_TLSV1_1;
+	static const std::string CFG_REQUIRE_TLSV1_2;
 
 #ifdef OPENSSL_FIPS
 	static const std::string CFG_FIPS_MODE;

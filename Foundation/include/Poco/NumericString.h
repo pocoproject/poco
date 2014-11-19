@@ -87,7 +87,7 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	if (!pStr) return false;
 	while (isspace(*pStr)) ++pStr;
 	if (*pStr == '\0') return false;
-	char sign = 1;
+	short sign = 1;
 	if ((base == 10) && (*pStr == '-'))
 	{
 		// Unsigned types can't be negative so abort parsing

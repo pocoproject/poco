@@ -62,7 +62,22 @@ void WinConfigurationTest::testConfiguration()
 	assert (pReg->getUInt64("name2") == std::numeric_limits<UInt64>::max());
 	pReg->setInt64("name2", std::numeric_limits<Int64>::min()); 
 	assert (pReg->getInt64("name2") == std::numeric_limits<Int64>::min());
+
+	/// write real int64 value type
+	regKey.setInt64("name3", std::numeric_limits<Int64>::max());
+	assert (pReg->getInt64("name3") == std::numeric_limits<Int64>::max());
 #endif
+
+	/// create fake binary data
+	const int dataSize = 127;
+	std::vector<char> data(dataSize);
+	for (int i = 0; i < dataSize; ++i)
+		data[i] = rand() % 256;
+
+	regKey.setBinary("name4", data);
+	assert (pReg->getString("name4") == std::string(data.begin(), data.end()));
+
+
 	assert (pReg->hasProperty("name1"));
 	assert (pReg->hasProperty("name2"));
 	
@@ -82,9 +97,11 @@ void WinConfigurationTest::testConfiguration()
 
 	Poco::Util::AbstractConfiguration::Keys keys;
 	pReg->keys(keys);
-	assert (keys.size() == 3);
+	assert (keys.size() == 5);
 	assert (std::find(keys.begin(), keys.end(), "name1") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "name2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "name3") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "name4") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "config") != keys.end());
 
 	pReg->keys("config", keys);
@@ -105,9 +122,11 @@ void WinConfigurationTest::testConfiguration()
 	assert (std::find(keys.begin(), keys.end(), "HKEY_USERS") != keys.end());
 
 	pRootReg->keys("HKEY_CURRENT_USER.Software.Applied Informatics.Test", keys);
-	assert (keys.size() == 3);
+	assert (keys.size() == 5);
 	assert (std::find(keys.begin(), keys.end(), "name1") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "name2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "name3") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "name4") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "config") != keys.end());
 }
 

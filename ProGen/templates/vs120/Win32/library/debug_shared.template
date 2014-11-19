@@ -1,7 +1,7 @@
 <Configuration
 	Name="debug_shared|Win32"
 	OutputDirectory="${project.outdir}\bin\"
-	IntermediateDirectory="obj\$(ConfigurationName)"
+	IntermediateDirectory="obj\${project.name}\$(ConfigurationName)"
 	ConfigurationType="2"
 	CharacterSet="2"
 	>

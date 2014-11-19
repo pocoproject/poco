@@ -92,7 +92,7 @@ local int read_buf        OF((z_streamp strm, Bytef *buf, unsigned size));
 local uInt longest_match  OF((deflate_state *s, IPos cur_match));
 #endif
 
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
 local  void check_match OF((deflate_state *s, IPos start, IPos match,
                             int length));
 #endif
@@ -1349,7 +1349,7 @@ local uInt longest_match(s, cur_match)
 
 #endif /* FASTEST */
 
-#ifdef DEBUG
+#ifdef ZLIB_DEBUG
 /* ===========================================================================
  * Check that the match at match_start is indeed a match.
  */

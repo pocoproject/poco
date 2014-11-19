@@ -124,7 +124,8 @@ void FTPClientSessionTest::testLogin2()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	FTPClientSession session("localhost", server.port(), "user", "password");
+	Poco::UInt16 serverPort = server.port();
+	FTPClientSession session("localhost", serverPort, "user", "password");
 	assert (session.isOpen());
 	assert (session.isLoggedIn());
 	server.addResponse("221 Good Bye");
@@ -138,7 +139,7 @@ void FTPClientSessionTest::testLogin2()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	session.open("localhost", server.port(), "user", "password");
+	session.open("localhost", serverPort, "user", "password");
 	assert (session.isOpen());
 	assert (session.isLoggedIn());
 	server.addResponse("221 Good Bye");
@@ -451,9 +452,10 @@ void FTPClientSessionTest::testDownloadPASV()
 	server.addResponse("500 EPSV not understood");
 
 	DialogServer dataServer(false);
+	Poco::UInt16 dataServerPort = dataServer.port();
 	dataServer.addResponse("This is some data");
 	std::ostringstream pasv;
-	pasv << "227 Entering Passive Mode (127,0,0,1," << (dataServer.port()/256) << "," << (dataServer.port() % 256) << ")";
+	pasv << "227 Entering Passive Mode (127,0,0,1," << (dataServerPort/256) << "," << (dataServerPort % 256) << ")";
 	server.addResponse(pasv.str());
 	server.addResponse("150 sending data\r\n226 Transfer complete");
 

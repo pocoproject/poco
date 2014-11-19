@@ -93,37 +93,6 @@ void ProcessTest::testLaunchRedirectIn()
 }
 
 
-void ProcessTest::testIsRunning()
-{
-	std::string name("TestApp");
-	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
-	cmd += name;
-#else
-	cmd = name;
-#endif
-
-	std::vector<std::string> args;
-	args.push_back("-count");
-	Pipe inPipe;
-	ProcessHandle ph = Process::launch(cmd, args, &inPipe, 0, 0);
-	Process::PID id = ph.id();
-	assert (Process::isRunning(ph));
-	assert (Process::isRunning(id));
-	PipeOutputStream ostr(inPipe);
-	ostr << std::string(100, 'x');
-	ostr.close();
-	int rc = ph.wait();
-	assert (!Process::isRunning(ph));
-	assert (!Process::isRunning(id));
-}
-
-
 void ProcessTest::testLaunchRedirectOut()
 {
 #if !defined(_WIN32_WCE)
@@ -184,6 +153,39 @@ void ProcessTest::testLaunchEnv()
 	assert (s == "test");
 	int rc = ph.wait();
 	assert (rc == 0);
+#endif // !defined(_WIN32_WCE)
+}
+
+
+void ProcessTest::testIsRunning()
+{
+#if !defined(_WIN32_WCE)
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd = "./";
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	std::vector<std::string> args;
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(cmd, args, &inPipe, 0, 0);
+	Process::PID id = ph.id();
+	assert (Process::isRunning(ph));
+	assert (Process::isRunning(id));
+	PipeOutputStream ostr(inPipe);
+	ostr << std::string(100, 'x');
+	ostr.close();
+	int rc = ph.wait();
+	assert (!Process::isRunning(ph));
+	assert (!Process::isRunning(id));
 #endif // !defined(_WIN32_WCE)
 }
 

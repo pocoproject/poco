@@ -19,6 +19,7 @@
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/CryptoStream.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Base64Encoder.h"
 #include <sstream>
 
 
@@ -73,7 +74,7 @@ void CryptoTest::testEncryptDecrypt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_NONE);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -81,7 +82,7 @@ void CryptoTest::testEncryptDecrypt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BASE64);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -89,7 +90,7 @@ void CryptoTest::testEncryptDecrypt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BINHEX);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 }
 
@@ -104,7 +105,7 @@ void CryptoTest::testEncryptDecryptWithSalt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_NONE);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -112,7 +113,7 @@ void CryptoTest::testEncryptDecryptWithSalt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_BASE64);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -120,7 +121,7 @@ void CryptoTest::testEncryptDecryptWithSalt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_BINHEX);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 }
 
@@ -134,7 +135,7 @@ void CryptoTest::testEncryptDecryptDESECB()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_NONE);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -142,7 +143,7 @@ void CryptoTest::testEncryptDecryptDESECB()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BASE64);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -150,8 +151,43 @@ void CryptoTest::testEncryptDecryptDESECB()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BINHEX);
-		poco_assert (in == result);
+		assert (in == result);
 	}
+}
+
+
+void CryptoTest::testPassword()
+{
+	CipherKey key("aes256", "password", "salt");
+	
+	std::ostringstream keyStream;
+	Poco::Base64Encoder base64KeyEnc(keyStream);
+	base64KeyEnc.write(reinterpret_cast<const char*>(&key.getKey()[0]), key.keySize());
+	base64KeyEnc.close();
+	std::string base64Key = keyStream.str();
+	assert (base64Key == "hIzxBt58GDd7/6mRp88bewKk42lM4QwaF78ek0FkVoA=");
+}
+
+
+void CryptoTest::testEncryptInterop()
+{
+	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256", "password", "salt"));
+
+	const std::string plainText  = "This is a secret message.";
+	const std::string expectedCipherText = "9HITTPaU3A/LaZzldbdnRZ109DKlshouKren/n8BsHc=";
+	std::string cipherText = pCipher->encryptString(plainText, Cipher::ENC_BASE64);
+	assert (cipherText == expectedCipherText);
+}
+
+
+void CryptoTest::testDecryptInterop()
+{
+	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256", "password", "salt"));
+
+	const std::string expectedPlainText  = "This is a secret message.";
+	const std::string cipherText = "9HITTPaU3A/LaZzldbdnRZ109DKlshouKren/n8BsHc=";
+	std::string plainText = pCipher->decryptString(cipherText, Cipher::ENC_BASE64);
+	assert (plainText == expectedPlainText);
 }
 
 
@@ -229,6 +265,9 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecrypt);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptWithSalt);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptDESECB);
+	CppUnit_addTest(pSuite, CryptoTest, testPassword);
+	CppUnit_addTest(pSuite, CryptoTest, testEncryptInterop);
+	CppUnit_addTest(pSuite, CryptoTest, testDecryptInterop);
 	CppUnit_addTest(pSuite, CryptoTest, testStreams);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 

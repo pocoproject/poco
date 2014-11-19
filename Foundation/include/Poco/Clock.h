@@ -86,6 +86,13 @@ public:
 		/// Returns the clock value expressed in microseconds
 		/// since the system-specific epoch time (usually system
 		/// startup).
+
+	ClockVal raw() const;
+		/// Returns the clock value expressed in microseconds
+		/// since the system-specific epoch time (usually system
+		/// startup).
+		///
+		/// Same as microseconds().
 	
 	ClockDiff elapsed() const;
 		/// Returns the time elapsed since the time denoted by
@@ -212,6 +219,12 @@ inline Clock::ClockVal Clock::resolution()
 inline void swap(Clock& s1, Clock& s2)
 {
 	s1.swap(s2);
+}
+
+
+inline Clock::ClockVal Clock::raw() const
+{
+	return _clock;
 }
 
 

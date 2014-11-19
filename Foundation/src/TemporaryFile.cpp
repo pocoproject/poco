@@ -37,17 +37,24 @@ public:
 
 	~TempFileCollector()
 	{
-		for (std::set<std::string>::iterator it = _files.begin(); it != _files.end(); ++it)
+		try
 		{
-			try
+			for (std::set<std::string>::iterator it = _files.begin(); it != _files.end(); ++it)
 			{
-				File f(*it);
-				if (f.exists())
-					f.remove(true);
+				try
+				{
+					File f(*it);
+					if (f.exists())
+						f.remove(true);
+				}
+				catch (Exception&)
+				{
+				}
 			}
-			catch (Exception&)
-			{
-			}
+		}
+		catch (...)
+		{
+			poco_unexpected();
 		}
 	}
 
@@ -81,16 +88,23 @@ TemporaryFile::TemporaryFile(const std::string& tempDir):
 
 TemporaryFile::~TemporaryFile()
 {
-	if (!_keep)
+	try
 	{
-		try
+		if (!_keep)
 		{
-			if (exists())
-				remove(true);
+			try
+			{
+				if (exists())
+					remove(true);
+			}
+			catch (Exception&)
+			{
+			}
 		}
-		catch (Exception&)
-		{
-		}
+	}
+	catch (...)
+	{
+		poco_unexpected();
 	}
 }
 

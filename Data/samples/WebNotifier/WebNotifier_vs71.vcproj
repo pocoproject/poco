@@ -3,7 +3,7 @@
 	Name="WebNotifier"
 	Version="7.10"
 	ProjectType="Visual C++"
-	ProjectGUID="{0F0DF069-83D1-378D-A949-8DF9A883B627}"
+	ProjectGUID="{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}"
 	RootNamespace="WebNotifier"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
@@ -36,7 +36,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -48,7 +49,8 @@
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\WebNotifierd.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -84,7 +86,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -98,7 +100,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -112,7 +115,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -143,7 +147,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
@@ -159,7 +163,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -171,7 +176,8 @@
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\static_mt\WebNotifierd.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -207,7 +213,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
@@ -221,7 +227,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -235,7 +242,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -266,7 +274,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
@@ -282,7 +290,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -294,7 +303,8 @@
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin\static_md\WebNotifierd.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -330,7 +340,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Net\include;..\..\..\Data\include;..\..\..\Data\SQLite\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Data\include;..\..\..\Data\SQLite\include;..\..\..\Net\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -344,7 +354,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				DisableSpecificWarnings="4800;"/>
+				DisableSpecificWarnings="4800;"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -358,7 +369,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

@@ -19,13 +19,14 @@
 #include "Poco/Exception.h"
 #include "Poco/String.h"
 #include "Poco/NumberParser.h"
+#include "Poco/Path.h"
 
 
 namespace Poco {
 
 
 const std::string URI::RESERVED_PATH     = "?#";
-const std::string URI::RESERVED_QUERY    = "#";
+const std::string URI::RESERVED_QUERY    = "#/";
 const std::string URI::RESERVED_FRAGMENT = "";
 const std::string URI::ILLEGAL           = "%<>{}|\\\"^`";
 
@@ -122,6 +123,16 @@ URI::URI(const URI& baseURI, const std::string& relativeURI):
 	_fragment(baseURI._fragment)
 {
 	resolve(relativeURI);
+}
+
+
+URI::URI(const Path& path):
+	_scheme("file"),
+	_port(0)
+{
+	Path absolutePath(path);
+	absolutePath.makeAbsolute();
+	_path = absolutePath.toString(Path::PATH_UNIX);
 }
 
 

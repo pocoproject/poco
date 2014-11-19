@@ -33,8 +33,8 @@ namespace Poco {
 class Foundation_API Bugcheck
 	/// This class provides some static methods that are
 	/// used by the
-	/// poco_assert_dbg(), poco_assert(), poco_check_ptr() 
-	/// and poco_bugcheck() macros. 
+	/// poco_assert_dbg(), poco_assert(), poco_check_ptr(), 
+	/// poco_bugcheck() and poco_unexpected() macros. 
 	/// You should not invoke these methods
 	/// directly. Use the macros instead, as they
 	/// automatically provide useful context information.
@@ -55,6 +55,12 @@ public:
 	static void bugcheck(const char* msg, const char* file, int line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
+
+	static void unexpected(const char* file, int line);
+		/// An exception was caught in a destructor. Break into debugger,
+		/// if possible and report exception. Must only be called from
+		/// within a catch () block as it rethrows the exception to
+		/// determine its class.
 
 	static void debugger(const char* file, int line);
 		/// An internal error was encountered. Break into the debugger, if
@@ -97,6 +103,10 @@ protected:
 
 #define poco_bugcheck_msg(msg) \
 	Poco::Bugcheck::bugcheck(msg, __FILE__, __LINE__)
+	
+	
+#define poco_unexpected() \
+	Poco::Bugcheck::unexpected(__FILE__, __LINE__);
 
 
 #define poco_debugger() \

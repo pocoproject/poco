@@ -50,7 +50,7 @@ void NetworkInterfaceTest::testMap()
 		std::cout << "Index:       " << it->second.index() << std::endl;
 		std::cout << "Name:        " << it->second.name() << std::endl;
 		std::cout << "DisplayName: " << it->second.displayName() << std::endl;
-		std::cout << "Status: " << (it->second.isUp() ? "Up" : "Down") << std::endl;
+		std::cout << "Status:      " << (it->second.isUp() ? "Up" : "Down") << std::endl;
 
 		NetworkInterface::MACAddress mac(it->second.macAddress());
 		if (!mac.empty() && (it->second.type() != NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK))
@@ -88,7 +88,7 @@ void NetworkInterfaceTest::testList()
 		std::cout << "Index:       " << it->index() << std::endl;
 		std::cout << "Name:        " << it->name() << std::endl;
 		std::cout << "DisplayName: " << it->displayName() << std::endl;
-		std::cout << "Status: " << (it->isUp() ? "Up" : "Down") << std::endl;
+		std::cout << "Status:      " << (it->isUp() ? "Up" : "Down") << std::endl;
 
 		NetworkInterface::MACAddress mac(it->macAddress());
 		if (!mac.empty() && (it->type() != NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK))

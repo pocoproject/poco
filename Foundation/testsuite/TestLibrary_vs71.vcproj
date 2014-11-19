@@ -12,8 +12,8 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestLibrary\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestLibrary\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -72,8 +72,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestLibrary\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestLibrary\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool

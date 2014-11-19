@@ -66,6 +66,7 @@ SecureSocketImpl::~SecureSocketImpl()
 	}
 	catch (...)
 	{
+		poco_unexpected();
 	}
 }
 
@@ -358,7 +359,7 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
 	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled() ||
-	    (isLocalHost(hostName) && mode != Context::VERIFY_STRICT))
+	    (mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
 	{
 		return X509_V_OK;
 	}
@@ -432,7 +433,15 @@ int SecureSocketImpl::handleError(int rc)
 			long lastError = ERR_get_error();
 			if (lastError == 0)
 			{
-				if (rc == 0 || rc == -1)
+				if (rc == 0)
+				{
+					// Most web browsers do this, don't report an error
+					if (_pContext->isForServerUse())
+						return 0;
+					else
+						throw SSLConnectionUnexpectedlyClosedException();
+				}
+				else if (rc == -1)
 				{
 					throw SSLConnectionUnexpectedlyClosedException();
 				}

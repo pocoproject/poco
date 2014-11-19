@@ -1,7 +1,7 @@
 <Configuration
 	Name="debug_shared|${project.platform}"
 	OutputDirectory="${project.pocobase}\bin\$(PlatformName)"
-	IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+	IntermediateDirectory="obj\${project.name}\$(PlatformName)\$(ConfigurationName)"
 	ConfigurationType="2"
 	CharacterSet="1"
 	>

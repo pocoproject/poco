@@ -46,7 +46,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -55,7 +56,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib"
 				OutputFile="bin\RecordSetd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -63,7 +64,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin\RecordSetd.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -115,7 +117,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -124,7 +127,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib"
 				OutputFile="bin\RecordSet.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -132,7 +135,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -182,7 +186,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -191,7 +196,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib iphlpapi.lib"
 				OutputFile="bin\static_mt\RecordSetd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -199,7 +204,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin\static_mt\RecordSetd.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -251,7 +257,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -260,7 +267,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib iphlpapi.lib"
 				OutputFile="bin\static_mt\RecordSet.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -268,7 +275,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -318,7 +326,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -327,7 +336,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib iphlpapi.lib"
 				OutputFile="bin\static_md\RecordSetd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -335,7 +344,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin\static_md\RecordSetd.pdb"
 				SubSystem="1"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -387,7 +397,8 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings=""/>
+				DisableSpecificWarnings=""
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -396,7 +407,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib iphlpapi.lib"
 				OutputFile="bin\static_md\RecordSet.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
@@ -404,7 +415,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool

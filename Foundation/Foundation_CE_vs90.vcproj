@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			>
@@ -113,8 +113,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			>
@@ -209,8 +209,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			>
@@ -292,8 +292,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			>
@@ -377,8 +377,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			>
@@ -460,8 +460,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			>
@@ -2306,7 +2306,35 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\pcre_try_flipped.c"
+					RelativePath=".\src\pcre_byte_order.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_config.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_dfa_exec.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_get.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_jit_compile.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_version.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_refcount.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_string_utils.c"
 					>
 				</File>
 				<File

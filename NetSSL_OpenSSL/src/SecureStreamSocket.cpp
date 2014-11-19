@@ -153,7 +153,10 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket)
 {
 	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), SSLManager::instance().defaultClientContext());
 	SecureStreamSocket result(pImpl);
-	pImpl->connectSSL();
+	if (pImpl->context()->isForServerUse())
+		pImpl->acceptSSL();
+	else
+		pImpl->connectSSL();
 	return result;
 }
 
@@ -162,7 +165,10 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 {
 	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), pContext);
 	SecureStreamSocket result(pImpl);
-	pImpl->connectSSL();
+	if (pImpl->context()->isForServerUse())
+		pImpl->acceptSSL();
+	else
+		pImpl->connectSSL();
 	return result;
 }
 
@@ -172,7 +178,10 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), pContext);
 	SecureStreamSocket result(pImpl);
 	result.useSession(pSession);
-	pImpl->connectSSL();
+	if (pImpl->context()->isForServerUse())
+		pImpl->acceptSSL();
+	else
+		pImpl->connectSSL();
 	return result;
 }
 
@@ -182,7 +191,10 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), SSLManager::instance().defaultClientContext());
 	SecureStreamSocket result(pImpl);
 	result.setPeerHostName(peerHostName);
-	pImpl->connectSSL();
+	if (pImpl->context()->isForServerUse())
+		pImpl->acceptSSL();
+	else
+		pImpl->connectSSL();
 	return result;
 }
 
@@ -192,7 +204,10 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), pContext);
 	SecureStreamSocket result(pImpl);
 	result.setPeerHostName(peerHostName);
-	pImpl->connectSSL();
+	if (pImpl->context()->isForServerUse())
+		pImpl->acceptSSL();
+	else
+		pImpl->connectSSL();
 	return result;
 }
 
@@ -203,7 +218,10 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 	SecureStreamSocket result(pImpl);
 	result.setPeerHostName(peerHostName);
 	result.useSession(pSession);
-	pImpl->connectSSL();
+	if (pImpl->context()->isForServerUse())
+		pImpl->acceptSSL();
+	else
+		pImpl->connectSSL();
 	return result;
 }
 

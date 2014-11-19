@@ -34,7 +34,14 @@ PrivateKeyPassphraseHandler::PrivateKeyPassphraseHandler(bool onServerSide): _se
 
 PrivateKeyPassphraseHandler::~PrivateKeyPassphraseHandler()
 {
-	SSLManager::instance().PrivateKeyPassphraseRequired -= Delegate<PrivateKeyPassphraseHandler, std::string>(this, &PrivateKeyPassphraseHandler::onPrivateKeyRequested);
+	try
+	{
+		SSLManager::instance().PrivateKeyPassphraseRequired -= Delegate<PrivateKeyPassphraseHandler, std::string>(this, &PrivateKeyPassphraseHandler::onPrivateKeyRequested);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

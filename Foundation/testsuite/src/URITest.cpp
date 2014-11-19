@@ -14,9 +14,11 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/URI.h"
+#include "Poco/Path.h"
 
 
 using Poco::URI;
+using Poco::Path;
 
 
 URITest::URITest(const std::string& name): CppUnit::TestCase(name)
@@ -774,6 +776,22 @@ void URITest::testEncodeDecode()
 }
 
 
+void URITest::testFromPath()
+{
+	Path path1("/var/www/site/index.html", Path::PATH_UNIX);
+	URI uri1(path1);
+	assert (uri1.toString() == "file:///var/www/site/index.html");
+
+	Path path2("/var/www/site/with space.html", Path::PATH_UNIX);
+	URI uri2(path2);
+	assert (uri2.toString() == "file:///var/www/site/with%20space.html");
+	
+	Path path3("c:\\www\\index.html", Path::PATH_WINDOWS);
+	URI uri3(path3);
+	assert (uri3.toString() == "file:///c:/www/index.html");
+}
+
+
 void URITest::setUp()
 {
 }
@@ -797,6 +815,7 @@ CppUnit::Test* URITest::suite()
 	CppUnit_addTest(pSuite, URITest, testSwap);
 	CppUnit_addTest(pSuite, URITest, testEncodeDecode);
 	CppUnit_addTest(pSuite, URITest, testOther);
+	CppUnit_addTest(pSuite, URITest, testFromPath);
 
 	return pSuite;
 }

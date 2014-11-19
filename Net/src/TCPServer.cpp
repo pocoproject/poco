@@ -72,8 +72,15 @@ TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool&
 
 TCPServer::~TCPServer()
 {
-	stop();
-	_pDispatcher->release();
+	try
+	{
+		stop();
+		_pDispatcher->release();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -177,9 +184,18 @@ int TCPServer::refusedConnections() const
 
 std::string TCPServer::threadName(const ServerSocket& socket)
 {
+#if _WIN32_WCE == 0x0800
+	// Workaround for WEC2013: only the first call to getsockname()
+	// succeeds. To mitigate the impact of this bug, do not call
+	// socket.address(), which calls getsockname(), here.
+	std::string name("TCPServer");
+	#pragma message("Using WEC2013 getsockname() workaround in TCPServer::threadName(). Remove when no longer needed.")
+#else
 	std::string name("TCPServer: ");
 	name.append(socket.address().toString());
+#endif
 	return name;
+
 }
 
 

@@ -541,8 +541,15 @@ DirectoryWatcher::DirectoryWatcher(const Poco::File& directory, int eventMask, i
 
 DirectoryWatcher::~DirectoryWatcher()
 {
-	stop();
-	delete _pStrategy;
+	try
+	{
+		stop();
+		delete _pStrategy;
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 	

@@ -58,6 +58,7 @@
 // definitions.) For more information, see SdkDdkVer.h.
 
 
+#if !defined(_WIN32_WCE)
 #if defined(_WIN32_WINNT)
 	#if (_WIN32_WINNT < 0x0501)
 		#error Unsupported Windows version.
@@ -76,6 +77,7 @@
 	// for details.
 	#define _WIN32_WINNT 0x0501
 	#define NTDDI_VERSION 0x05010100
+#endif
 #endif
 
 

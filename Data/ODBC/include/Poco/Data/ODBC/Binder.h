@@ -353,15 +353,20 @@ public:
 		/// Clears the cached storage.
 
 private:
-	typedef std::vector<SQLLEN*>                             LengthVec;
-	typedef std::vector<std::vector<SQLLEN> >                LengthVecVec;
+	typedef std::vector<SQLLEN*>                             LengthPtrVec;
+	typedef std::vector<SQLLEN>                              LengthVec;
+	typedef std::vector<LengthVec*>                          LengthVecVec;
 	typedef std::vector<char*>                               CharPtrVec;
 	typedef std::vector<UTF16Char*>                          UTF16CharPtrVec;
 	typedef std::vector<bool*>                               BoolPtrVec;
-	typedef std::vector<std::vector<SQL_DATE_STRUCT> >       DateVec;
-	typedef std::vector<std::vector<SQL_TIME_STRUCT> >       TimeVec;
-	typedef std::vector<std::vector<SQL_TIMESTAMP_STRUCT> >  DateTimeVec;
-	typedef std::vector<std::vector<Poco::Any> >             AnyVec;
+	typedef std::vector<SQL_DATE_STRUCT>                     DateVec;
+	typedef std::vector<DateVec*>                            DateVecVec;
+	typedef std::vector<SQL_TIME_STRUCT>                     TimeVec;
+	typedef std::vector<TimeVec*>                            TimeVecVec;
+	typedef std::vector<SQL_TIMESTAMP_STRUCT>                DateTimeVec;
+	typedef std::vector<DateTimeVec*>                        DateTimeVecVec;
+	typedef std::vector<Poco::Any>                           AnyVec;
+	typedef std::vector<AnyVec>                              AnyVecVec;
 	typedef std::map<char*, std::string*>                    StringMap;
 	typedef std::map<UTF16String::value_type*, UTF16String*> UTF16StringMap;
 	typedef std::map<SQL_DATE_STRUCT*, Date*>                DateMap;
@@ -450,8 +455,8 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1);
-			_vecLengthIndicator[pos].resize(length, sizeof(T));
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length);
 		}
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
@@ -463,7 +468,7 @@ private:
 			decDigits,
 			(SQLPOINTER) &val[0], 
 			0, 
-			&_vecLengthIndicator[pos][0])))
+			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
 		}
@@ -502,8 +507,8 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1);
-			_vecLengthIndicator[pos].resize(length, sizeof(bool));
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length);
 		}
 
 		if (_boolPtrs.size() <= pos)
@@ -524,7 +529,7 @@ private:
 			decDigits,
 			(SQLPOINTER) &_boolPtrs[pos][0], 
 			0, 
-			&_vecLengthIndicator[pos][0])))
+			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
 		}
@@ -540,10 +545,12 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		if (0 == val.size())
+		std::size_t length = val.size();
+
+		if (0 == length)
 			throw InvalidArgumentException("Empty container not allowed.");
 
-		setParamSetSize(val.size());
+		setParamSetSize(length);
 
 		SQLINTEGER size = 0;
 		getColumnOrParameterSize(pos, size);
@@ -558,8 +565,8 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1);
-			_vecLengthIndicator[pos].resize(val.size(), SQL_NTS);
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
 		}
 
 		if (_charPtrs.size() <= pos)
@@ -589,7 +596,7 @@ private:
 			0,
 			_charPtrs[pos], 
 			(SQLINTEGER) size, 
-			&_vecLengthIndicator[pos][0])))
+			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(std::vector<std::string>)");
 		}
@@ -605,7 +612,8 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		if (0 == val.size())
+		std::size_t length = val.size();
+		if (0 == length)
 			throw InvalidArgumentException("Empty container not allowed.");
 
 		setParamSetSize(val.size());
@@ -623,8 +631,8 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1);
-			_vecLengthIndicator[pos].resize(val.size(), SQL_NTS);
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
 		}
 
 		if (_utf16CharPtrs.size() <= pos)
@@ -654,7 +662,7 @@ private:
 			0,
 			_utf16CharPtrs[pos],
 			(SQLINTEGER)size,
-			&_vecLengthIndicator[pos][0])))
+			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(std::vector<UTF16String>)");
 		}
@@ -672,19 +680,22 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		if (0 == val.size())
+		std::size_t length = val.size();
+		if (0 == length)
 			throw InvalidArgumentException("Empty container not allowed.");
 
-		setParamSetSize(val.size());
+		setParamSetSize(length);
 
 		SQLINTEGER size = 0;
 
 		if (_vecLengthIndicator.size() <= pos)
-			_vecLengthIndicator.resize(pos + 1);
-			
-		_vecLengthIndicator[pos].resize(val.size());
-		std::vector<SQLLEN>::iterator lIt = _vecLengthIndicator[pos].begin();
-		std::vector<SQLLEN>::iterator lEnd = _vecLengthIndicator[pos].end();
+		{
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
+		}
+
+		std::vector<SQLLEN>::iterator lIt = _vecLengthIndicator[pos]->begin();
+		std::vector<SQLLEN>::iterator lEnd = _vecLengthIndicator[pos]->end();
 		typename C::const_iterator cIt = val.begin();
 		for (; lIt != lEnd; ++lIt, ++cIt) 
 		{
@@ -721,7 +732,7 @@ private:
 			0,
 			_charPtrs[pos], 
 			(SQLINTEGER) size, 
-			&_vecLengthIndicator[pos][0])))
+			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(std::vector<BLOB>)");
 		}
@@ -736,21 +747,28 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("std::vector can only be bound immediately.");
 
-		if (0 == val.size())
+		std::size_t length = val.size();
+
+		if (0 == length)
 			throw InvalidArgumentException("Empty vector not allowed.");
 
-		setParamSetSize(val.size());
+		setParamSetSize(length);
 
 		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_DATE_STRUCT);
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1);
-			_vecLengthIndicator[pos].resize(val.size(), size);
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
-		if (_dateVec.size() <= pos) _dateVec.resize(pos + 1);
-		Utility::dateSync(_dateVec[pos], val);
+		if (_dateVecVec.size() <= pos)
+		{
+			_dateVecVec.resize(pos + 1, 0);
+			_dateVecVec[pos] = new DateVec(length ? length : 1);
+		}
+
+		Utility::dateSync(*_dateVecVec[pos], val);
 
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
@@ -763,9 +781,9 @@ private:
 			SQL_TYPE_DATE, 
 			colSize,
 			decDigits,
-			(SQLPOINTER) &_dateVec[pos][0], 
+			(SQLPOINTER) &(*_dateVecVec[pos])[0], 
 			0, 
-			&_vecLengthIndicator[pos][0])))
+			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(Date[])");
 		}
@@ -780,7 +798,8 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		if (0 == val.size())
+		std::size_t length = val.size();
+		if (0 == length)
 			throw InvalidArgumentException("Empty container not allowed.");
 
 		setParamSetSize(val.size());
@@ -789,12 +808,17 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1);
-			_vecLengthIndicator[pos].resize(val.size(), size);
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
-		if (_timeVec.size() <= pos)	_timeVec.resize(pos + 1);
-		Utility::timeSync(_timeVec[pos], val);
+		if (_timeVecVec.size() <= pos)
+		{
+			_timeVecVec.resize(pos + 1, 0);
+			_timeVecVec[pos] = new TimeVec(length ? length : 1);
+		}
+
+		Utility::timeSync(*_timeVecVec[pos], val);
 
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
@@ -807,9 +831,9 @@ private:
 			SQL_TYPE_TIME, 
 			colSize,
 			decDigits,
-			(SQLPOINTER) &_timeVec[pos][0], 
+			(SQLPOINTER) &(*_timeVecVec[pos])[0], 
 			0, 
-			&_vecLengthIndicator[pos][0])))
+			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(Time[])");
 		}
@@ -824,21 +848,28 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		if (0 == val.size())
+		std::size_t length = val.size();
+
+		if (0 == length)
 			throw InvalidArgumentException("Empty Containers not allowed.");
 
-		setParamSetSize(val.size());
+		setParamSetSize(length);
 
 		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1);
-			_vecLengthIndicator[pos].resize(val.size(), size);
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
-		if (_dateTimeVec.size() <= pos)	_dateTimeVec.resize(pos + 1);
-		Utility::dateTimeSync(_dateTimeVec[pos], val);
+		if (_dateTimeVecVec.size() <= pos)
+		{
+			_dateTimeVecVec.resize(pos + 1, 0);
+			_dateTimeVecVec[pos] = new DateTimeVec(length ? length : 1);
+		}
+
+		Utility::dateTimeSync(*_dateTimeVecVec[pos], val);
 
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
@@ -851,9 +882,9 @@ private:
 			SQL_TYPE_TIMESTAMP, 
 			colSize,
 			decDigits,
-			(SQLPOINTER) &_dateTimeVec[pos][0], 
+			(SQLPOINTER) &(*_dateTimeVecVec[pos])[0], 
 			0, 
-			&_vecLengthIndicator[pos][0])))
+			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(Time[])");
 		}
@@ -868,17 +899,19 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Container can only be bound immediately.");
 
-		if (0 == val.size())
+		std::size_t length = val.size();
+
+		if (0 == length)
 			throw InvalidArgumentException("Empty container not allowed.");
 
-		setParamSetSize(val.size());
+		setParamSetSize(length);
 
 		SQLINTEGER size = SQL_NULL_DATA;
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1);
-			_vecLengthIndicator[pos].resize(val.size(), size);
+			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		SQLINTEGER colSize = 0;
@@ -894,7 +927,7 @@ private:
 			decDigits,
 			0, 
 			0, 
-			&_vecLengthIndicator[pos][0])))
+			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
 		}
@@ -956,7 +989,7 @@ private:
 
 	const StatementHandle& _rStmt;
 
-	LengthVec        _lengthIndicator;
+	LengthPtrVec     _lengthIndicator;
 	LengthVecVec     _vecLengthIndicator;
 
 	ParamMap         _inParams;
@@ -969,16 +1002,16 @@ private:
 	StringMap        _strings;
 	UTF16StringMap   _utf16Strings;
 
-	DateVec          _dateVec;
-	TimeVec          _timeVec;
-	DateTimeVec      _dateTimeVec;
+	DateVecVec       _dateVecVec;
+	TimeVecVec       _timeVecVec;
+	DateTimeVecVec   _dateTimeVecVec;
 	CharPtrVec       _charPtrs;
 	UTF16CharPtrVec  _utf16CharPtrs;
 	BoolPtrVec       _boolPtrs;
 	const TypeInfo*  _pTypeInfo;
 	SQLINTEGER       _paramSetSize;
 	std::size_t      _maxFieldSize;
-	AnyVec           _containers;
+	AnyVecVec        _containers;
 };
 
 

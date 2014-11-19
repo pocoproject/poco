@@ -42,7 +42,7 @@ public:
 	void duplicate() const;
 		/// Increments the object's reference count.
 		
-	void release() const;
+	void release() const throw();
 		/// Decrements the object's reference count
 		/// and deletes the object if the count
 		/// reaches zero.
@@ -77,9 +77,16 @@ inline void RefCountedObject::duplicate() const
 }
 
 
-inline void RefCountedObject::release() const
+inline void RefCountedObject::release() const throw()
 {
-	if (--_counter == 0) delete this;
+	try
+	{
+		if (--_counter == 0) delete this;
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

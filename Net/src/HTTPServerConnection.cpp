@@ -45,7 +45,14 @@ HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServe
 
 HTTPServerConnection::~HTTPServerConnection()
 {
-	_pFactory->serverStopped -= Poco::delegate(this, &HTTPServerConnection::onServerStopped);
+	try
+	{
+		_pFactory->serverStopped -= Poco::delegate(this, &HTTPServerConnection::onServerStopped);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -105,6 +112,14 @@ void HTTPServerConnection::run()
 		catch (MessageException&)
 		{
 			sendErrorResponse(session, HTTPResponse::HTTP_BAD_REQUEST);
+		}
+		catch (Poco::Exception&)
+		{
+			if (session.networkException())
+			{
+				session.networkException()->rethrow();
+			}
+			else throw;
 		}
 	}
 }

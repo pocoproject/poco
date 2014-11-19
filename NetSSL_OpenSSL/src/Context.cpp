@@ -50,64 +50,68 @@ Context::Context(
 	
 	createSSLContext();
 
-	int errCode = 0;
-	if (!caLocation.empty())
+	try
 	{
-		Poco::File aFile(caLocation);
-		if (aFile.isDirectory())
-			errCode = SSL_CTX_load_verify_locations(_pSSLContext, 0, Poco::Path::transcode(caLocation).c_str());
+		int errCode = 0;
+		if (!caLocation.empty())
+		{
+			Poco::File aFile(caLocation);
+			if (aFile.isDirectory())
+				errCode = SSL_CTX_load_verify_locations(_pSSLContext, 0, Poco::Path::transcode(caLocation).c_str());
+			else
+				errCode = SSL_CTX_load_verify_locations(_pSSLContext, Poco::Path::transcode(caLocation).c_str(), 0);
+			if (errCode != 1)
+			{
+				std::string msg = Utility::getLastError();
+				throw SSLContextException(std::string("Cannot load CA file/directory at ") + caLocation, msg);
+			}
+		}
+
+		if (loadDefaultCAs)
+		{
+			errCode = SSL_CTX_set_default_verify_paths(_pSSLContext);
+			if (errCode != 1)
+			{
+				std::string msg = Utility::getLastError();
+				throw SSLContextException("Cannot load default CA certificates", msg);
+			}
+		}
+
+		if (!privateKeyFile.empty())
+		{
+			errCode = SSL_CTX_use_PrivateKey_file(_pSSLContext, Poco::Path::transcode(privateKeyFile).c_str(), SSL_FILETYPE_PEM);
+			if (errCode != 1)
+			{
+				std::string msg = Utility::getLastError();
+				throw SSLContextException(std::string("Error loading private key from file ") + privateKeyFile, msg);
+			}
+		}
+
+		if (!certificateFile.empty())
+		{
+			errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, Poco::Path::transcode(certificateFile).c_str());
+			if (errCode != 1)
+			{
+				std::string errMsg = Utility::getLastError();
+				throw SSLContextException(std::string("Error loading certificate from file ") + certificateFile, errMsg);
+			}
+		}
+
+		if (isForServerUse())
+			SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyServerCallback);
 		else
-			errCode = SSL_CTX_load_verify_locations(_pSSLContext, Poco::Path::transcode(caLocation).c_str(), 0);
-		if (errCode != 1)
-		{
-			std::string msg = Utility::getLastError();
-			SSL_CTX_free(_pSSLContext);
-			throw SSLContextException(std::string("Cannot load CA file/directory at ") + caLocation, msg);
-		}
-	}
+			SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyClientCallback);
 
-	if (loadDefaultCAs)
+		SSL_CTX_set_cipher_list(_pSSLContext, cipherList.c_str());
+		SSL_CTX_set_verify_depth(_pSSLContext, verificationDepth);
+		SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
+		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
+	}
+	catch (...)
 	{
-		errCode = SSL_CTX_set_default_verify_paths(_pSSLContext);
-		if (errCode != 1)
-		{
-			std::string msg = Utility::getLastError();
-			SSL_CTX_free(_pSSLContext);
-			throw SSLContextException("Cannot load default CA certificates", msg);
-		}
+		SSL_CTX_free(_pSSLContext);
+		throw;
 	}
-
-	if (!privateKeyFile.empty())
-	{
-		errCode = SSL_CTX_use_PrivateKey_file(_pSSLContext, Poco::Path::transcode(privateKeyFile).c_str(), SSL_FILETYPE_PEM);
-		if (errCode != 1)
-		{
-			std::string msg = Utility::getLastError();
-			SSL_CTX_free(_pSSLContext);
-			throw SSLContextException(std::string("Error loading private key from file ") + privateKeyFile, msg);
-		}
-	}
-
-	if (!certificateFile.empty())
-	{
-		errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, Poco::Path::transcode(certificateFile).c_str());
-		if (errCode != 1)
-		{
-			std::string errMsg = Utility::getLastError();
-			SSL_CTX_free(_pSSLContext);
-			throw SSLContextException(std::string("Error loading certificate from file ") + certificateFile, errMsg);
-		}
-	}
-
-	if (isForServerUse())
-		SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyServerCallback);
-	else
-		SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyClientCallback);
-
-	SSL_CTX_set_cipher_list(_pSSLContext, cipherList.c_str());
-	SSL_CTX_set_verify_depth(_pSSLContext, verificationDepth);
-	SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
-	SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
 }
 
 
@@ -127,50 +131,62 @@ Context::Context(
 	
 	createSSLContext();
 
-	int errCode = 0;
-	if (!caLocation.empty())
+	try
 	{
-		Poco::File aFile(caLocation);
-		if (aFile.isDirectory())
-			errCode = SSL_CTX_load_verify_locations(_pSSLContext, 0, Poco::Path::transcode(caLocation).c_str());
+		int errCode = 0;
+		if (!caLocation.empty())
+		{
+			Poco::File aFile(caLocation);
+			if (aFile.isDirectory())
+				errCode = SSL_CTX_load_verify_locations(_pSSLContext, 0, Poco::Path::transcode(caLocation).c_str());
+			else
+				errCode = SSL_CTX_load_verify_locations(_pSSLContext, Poco::Path::transcode(caLocation).c_str(), 0);
+			if (errCode != 1)
+			{
+				std::string msg = Utility::getLastError();
+				throw SSLContextException(std::string("Cannot load CA file/directory at ") + caLocation, msg);
+			}
+		}
+
+		if (loadDefaultCAs)
+		{
+			errCode = SSL_CTX_set_default_verify_paths(_pSSLContext);
+			if (errCode != 1)
+			{
+				std::string msg = Utility::getLastError();
+				throw SSLContextException("Cannot load default CA certificates", msg);
+			}
+		}
+
+		if (isForServerUse())
+			SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyServerCallback);
 		else
-			errCode = SSL_CTX_load_verify_locations(_pSSLContext, Poco::Path::transcode(caLocation).c_str(), 0);
-		if (errCode != 1)
-		{
-			std::string msg = Utility::getLastError();
-			SSL_CTX_free(_pSSLContext);
-			throw SSLContextException(std::string("Cannot load CA file/directory at ") + caLocation, msg);
-		}
-	}
+			SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyClientCallback);
 
-	if (loadDefaultCAs)
+		SSL_CTX_set_cipher_list(_pSSLContext, cipherList.c_str());
+		SSL_CTX_set_verify_depth(_pSSLContext, verificationDepth);
+		SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
+		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
+	}
+	catch (...)
 	{
-		errCode = SSL_CTX_set_default_verify_paths(_pSSLContext);
-		if (errCode != 1)
-		{
-			std::string msg = Utility::getLastError();
-			SSL_CTX_free(_pSSLContext);
-			throw SSLContextException("Cannot load default CA certificates", msg);
-		}
+		SSL_CTX_free(_pSSLContext);
+		throw;
 	}
-
-	if (isForServerUse())
-		SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyServerCallback);
-	else
-		SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyClientCallback);
-
-	SSL_CTX_set_cipher_list(_pSSLContext, cipherList.c_str());
-	SSL_CTX_set_verify_depth(_pSSLContext, verificationDepth);
-	SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
-	SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
 }
 
 
 Context::~Context()
 {
-	SSL_CTX_free(_pSSLContext);
-	
-	Poco::Crypto::OpenSSLInitializer::uninitialize();
+	try
+	{
+		SSL_CTX_free(_pSSLContext);
+		Poco::Crypto::OpenSSLInitializer::uninitialize();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -272,7 +288,7 @@ void Context::setSessionTimeout(long seconds)
 
 long Context::getSessionTimeout() const
 {
-	poco_assert (_usage == SERVER_USE);
+	poco_assert (isForServerUse());
 
 	return SSL_CTX_get_timeout(_pSSLContext);
 }
@@ -280,7 +296,7 @@ long Context::getSessionTimeout() const
 
 void Context::flushSessionCache() 
 {
-	poco_assert (_usage == SERVER_USE);
+	poco_assert (isForServerUse());
 
 	Poco::Timestamp now;
 	SSL_CTX_flush_sessions(_pSSLContext, static_cast<long>(now.epochTime()));
@@ -323,8 +339,24 @@ void Context::createSSLContext()
 		case TLSV1_SERVER_USE:
 			_pSSLContext = SSL_CTX_new(TLSv1_server_method());
 			break;
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+		case TLSV1_1_CLIENT_USE:
+			_pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
+			break;
+		case TLSV1_1_SERVER_USE:
+			_pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
+			break;
+#endif
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
+		case TLSV1_2_CLIENT_USE:
+			_pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
+			break;
+		case TLSV1_2_SERVER_USE:
+			_pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
+			break;
+#endif
 		default:
-			throw Poco::InvalidArgumentException("Invalid usage");
+			throw Poco::InvalidArgumentException("Invalid or unsupported usage");
 		}
 	}
 	if (!_pSSLContext) 

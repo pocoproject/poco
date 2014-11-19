@@ -52,7 +52,14 @@ SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqli
 
 SQLiteStatementImpl::~SQLiteStatementImpl()
 {
-	clear();
+	try
+	{
+		clear();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

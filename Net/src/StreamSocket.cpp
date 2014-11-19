@@ -17,10 +17,13 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/FIFOBuffer.h"
+#include "Poco/Mutex.h"
 #include "Poco/Exception.h"
 
 
 using Poco::InvalidArgumentException;
+using Poco::Mutex;
+using Poco::ScopedLock;
 
 
 namespace Poco {
@@ -116,7 +119,9 @@ int StreamSocket::sendBytes(const void* buffer, int length, int flags)
 
 int StreamSocket::sendBytes(FIFOBuffer& fifoBuf)
 {
-	int ret = impl()->sendBytes(&fifoBuf.buffer()[0], (int) fifoBuf.used());
+	ScopedLock<Mutex> l(fifoBuf.mutex());
+
+	int ret = impl()->sendBytes(fifoBuf.begin(), (int) fifoBuf.used());
 	if (ret > 0) fifoBuf.drain(ret);
 	return ret;
 }
@@ -130,7 +135,9 @@ int StreamSocket::receiveBytes(void* buffer, int length, int flags)
 
 int StreamSocket::receiveBytes(FIFOBuffer& fifoBuf)
 {
-	int ret = impl()->receiveBytes(fifoBuf.next(), (int) fifoBuf.available());
+	ScopedLock<Mutex> l(fifoBuf.mutex());
+
+	int ret = impl()->receiveBytes(fifoBuf.next(), (int)fifoBuf.available());
 	if (ret > 0) fifoBuf.advance(ret);
 	return ret;
 }

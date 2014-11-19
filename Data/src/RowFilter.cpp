@@ -60,9 +60,16 @@ void RowFilter::init()
 
 RowFilter::~RowFilter()
 {
-	release();
-	if (_pRecordSet) _pRecordSet->filter(0);
-	if (_pParent.get()) _pParent->removeFilter(this);
+	try
+	{
+		release();
+		if (_pRecordSet) _pRecordSet->filter(0);
+		if (_pParent.get()) _pParent->removeFilter(this);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

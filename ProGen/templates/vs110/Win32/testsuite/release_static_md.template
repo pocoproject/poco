@@ -1,7 +1,7 @@
 <Configuration
 	Name="release_static_md|Win32"
 	OutputDirectory="bin\static_md\"
-	IntermediateDirectory="obj\$(ConfigurationName)"
+	IntermediateDirectory="obj\${project.name}\$(ConfigurationName)"
 	ConfigurationType="1"
 	UseOfMFC="2"
 	CharacterSet="2"

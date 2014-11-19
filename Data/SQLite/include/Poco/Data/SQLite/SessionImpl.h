@@ -117,6 +117,10 @@ public:
 	const std::string& connectorName() const;
 		/// Returns the name of the connector.
 
+protected:
+	void setConnectionTimeout(const std::string& prop, const Poco::Any& value);
+	Poco::Any getConnectionTimeout(const std::string& prop);
+
 private:
 	std::string _connector;
 	sqlite3*    _pDB;
