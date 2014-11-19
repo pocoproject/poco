@@ -232,7 +232,7 @@ void FileImpl::setLastModifiedImpl(const Timestamp& ts)
 	FILETIME ft;
 	ft.dwLowDateTime  = low;
 	ft.dwHighDateTime = high;
-	FileHandle fh(_path, _upath, FILE_ALL_ACCESS, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING);
+	FileHandle fh(_path, _upath, FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING);
 	if (SetFileTime(fh.get(), 0, &ft, &ft) == 0)
 		handleLastErrorImpl(_path);
 }
