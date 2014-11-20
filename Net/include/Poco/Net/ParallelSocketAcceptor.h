@@ -108,8 +108,9 @@ public:
 		/// Sets the reactor for this acceptor.
 	{
 		_pReactor = &reactor;
-		if (!_pReactor->hasEventHandler(_socket, Poco::Observer<SocketAcceptor,
-			ReadableNotification>(*this, &SocketAcceptor::onAccept)))
+		if (!_pReactor->hasEventHandler(_socket, 
+			Poco::Observer<ParallelSocketAcceptor,
+			ReadableNotification>(*this, &ParallelSocketAcceptor::onAccept)))
 		{
 			registerAcceptor(reactor);
 		}
