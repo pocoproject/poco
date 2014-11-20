@@ -36,7 +36,7 @@
 				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				DisableSpecificWarnings="4800;"
 				AdditionalOptions=""/>
 			<Tool
@@ -165,7 +165,7 @@
 				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				DisableSpecificWarnings="4800;"
 				AdditionalOptions=""/>
 			<Tool
@@ -296,7 +296,7 @@
 				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				DisableSpecificWarnings="4800;"
 				AdditionalOptions=""/>
 			<Tool

@@ -35,7 +35,7 @@
 				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4800;4244;4267"
 				AdditionalOptions=""/>
@@ -167,7 +167,7 @@
 				ProgramDataBaseFileName="..\lib\PocoZipmtd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4800;4244;4267"
 				AdditionalOptions=""/>
@@ -278,7 +278,7 @@
 				ProgramDataBaseFileName="..\lib\PocoZipmdd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4800;4244;4267"
 				AdditionalOptions=""/>

@@ -35,7 +35,7 @@
 				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				AdditionalOptions=""/>
@@ -167,7 +167,7 @@
 				ProgramDataBaseFileName="..\lib\PocoXMLmtd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				AdditionalOptions=""/>
@@ -278,7 +278,7 @@
 				ProgramDataBaseFileName="..\lib\PocoXMLmdd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				AdditionalOptions=""/>
@@ -404,7 +404,44 @@
 				<File
 					RelativePath=".\src\XMLException.cpp"/>
 				<File
-					RelativePath=".\src\XMLString.cpp"/>
+					RelativePath=".\src\XMLString.cpp">
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_mt|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_mt|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
+				</File>
 				<File
 					RelativePath=".\src\XMLWriter.cpp"/>
 			</Filter>
@@ -791,12 +828,14 @@
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
-				Name="debug_shared|Win32">
+				Name="debug_shared|Win32"
+				ExcludedFromBuild="TRUE">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="release_shared|Win32">
+				Name="release_shared|Win32"
+				ExcludedFromBuild="TRUE">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>

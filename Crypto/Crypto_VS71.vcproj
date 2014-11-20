@@ -35,7 +35,7 @@
 				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				AdditionalOptions=""/>
@@ -167,7 +167,7 @@
 				ProgramDataBaseFileName="..\lib\PocoCryptomtd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				AdditionalOptions=""/>
@@ -278,7 +278,7 @@
 				ProgramDataBaseFileName="..\lib\PocoCryptomdd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				AdditionalOptions=""/>

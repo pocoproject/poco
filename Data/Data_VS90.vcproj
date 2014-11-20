@@ -44,7 +44,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
 				AdditionalOptions=""/>
@@ -188,7 +188,7 @@
 				ProgramDataBaseFileName="..\lib\PocoDatamtd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
 				AdditionalOptions=""/>
@@ -303,7 +303,7 @@
 				ProgramDataBaseFileName="..\lib\PocoDatamdd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
 				AdditionalOptions=""/>
