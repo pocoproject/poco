@@ -104,6 +104,13 @@ HTTPDigestCredentials::~HTTPDigestCredentials()
 }
 
 
+void HTTPDigestCredentials::reset()
+{
+	_requestAuthParams.clear();
+	_nc.clear();
+}
+
+
 void HTTPDigestCredentials::setUsername(const std::string& username)
 {
 	_username = username;
@@ -138,7 +145,7 @@ void HTTPDigestCredentials::updateAuthInfo(HTTPRequest& request)
 
 void HTTPDigestCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPResponse& response)
 {
-	proxyAuthenticate(request, HTTPAuthenticationParams(response));
+	proxyAuthenticate(request, HTTPAuthenticationParams(response, HTTPAuthenticationParams::PROXY_AUTHENTICATE));
 }
 
 

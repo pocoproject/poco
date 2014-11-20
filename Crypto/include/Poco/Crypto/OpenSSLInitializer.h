@@ -22,6 +22,7 @@
 
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Mutex.h"
+#include "Poco/AtomicCounter.h"
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 #if defined(OPENSSL_FIPS) && OPENSSL_VERSION_NUMBER < 0x010001000L
@@ -82,8 +83,7 @@ protected:
 
 private:
 	static Poco::FastMutex* _mutexes;
-	static Poco::FastMutex _mutex;
-	static int _rc;
+	static Poco::AtomicCounter _rc;
 };
 
 

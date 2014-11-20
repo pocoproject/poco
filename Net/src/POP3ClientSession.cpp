@@ -196,7 +196,7 @@ void POP3ClientSession::retrieveMessage(int id, MailMessage& message)
 {
 	std::string response;
 	sendCommand("RETR", NumberFormatter::format(id), response);
-	if (!isPositive(response)) throw POP3Exception("Cannot get message list", response);
+	if (!isPositive(response)) throw POP3Exception("Cannot retrieve message", response);
 	DialogInputStream sis(_socket);
 	MailInputStream mis(sis);
 	message.read(mis);
@@ -208,7 +208,7 @@ void POP3ClientSession::retrieveMessage(int id, MailMessage& message, PartHandle
 {
 	std::string response;
 	sendCommand("RETR", NumberFormatter::format(id), response);
-	if (!isPositive(response)) throw POP3Exception("Cannot get message list", response);
+	if (!isPositive(response)) throw POP3Exception("Cannot retrieve message", response);
 	DialogInputStream sis(_socket);
 	MailInputStream mis(sis);
 	message.read(mis, handler);
@@ -220,7 +220,7 @@ void POP3ClientSession::retrieveMessage(int id, std::ostream& ostr)
 {
 	std::string response;
 	sendCommand("RETR", NumberFormatter::format(id), response);
-	if (!isPositive(response)) throw POP3Exception("Cannot get message list", response);
+	if (!isPositive(response)) throw POP3Exception("Cannot retrieve message", response);
 	DialogInputStream sis(_socket);
 	MailInputStream mis(sis);
 	StreamCopier::copyStream(mis, ostr);
@@ -231,7 +231,7 @@ void POP3ClientSession::retrieveHeader(int id, MessageHeader& header)
 {
 	std::string response;
 	sendCommand("TOP", NumberFormatter::format(id), "0", response);
-	if (!isPositive(response)) throw POP3Exception("Cannot get message list", response);
+	if (!isPositive(response)) throw POP3Exception("Cannot retrieve header", response);
 	DialogInputStream sis(_socket);
 	MailInputStream mis(sis);
 	header.read(mis);

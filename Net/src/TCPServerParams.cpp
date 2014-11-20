@@ -51,7 +51,7 @@ void TCPServerParams::setMaxThreads(int count)
 
 void TCPServerParams::setMaxQueued(int count)
 {
-	poco_assert (count > 0);
+	poco_assert (count >= 0);
 
 	_maxQueued = count;
 }

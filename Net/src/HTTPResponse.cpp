@@ -208,6 +208,7 @@ void HTTPResponse::read(std::istream& istr)
 	std::string reason;
 	
 	int ch =  istr.get();
+	if (istr.bad()) throw NetException("Error reading HTTP response header");
 	if (ch == eof) throw NoMessageException();
 	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
 	if (ch == eof) throw MessageException("No HTTP response header");

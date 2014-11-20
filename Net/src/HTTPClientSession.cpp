@@ -267,17 +267,13 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 		{
 			response.read(his);
 		}
-		catch (MessageException&)
+		catch (Exception&)
 		{
 			close();
 			if (networkException())
 				networkException()->rethrow();
 			else
 				throw;
-		}
-		catch (Exception&)
-		{
-			close();
 			throw;
 		}
 	}
