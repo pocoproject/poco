@@ -19,6 +19,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TypeHandler", "TypeHandler\
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebNotifier", "WebNotifier\WebNotifier_vs71.vcproj", "{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		debug_shared = debug_shared
@@ -89,6 +93,18 @@ Global
 		{65A12348-CA20-324E-9F5E-7F82753C2C65}.debug_static_md.Build.0 = debug_static_md|Win32
 		{65A12348-CA20-324E-9F5E-7F82753C2C65}.release_static_md.ActiveCfg = release_static_md|Win32
 		{65A12348-CA20-324E-9F5E-7F82753C2C65}.release_static_md.Build.0 = release_static_md|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_shared.ActiveCfg = debug_shared|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_shared.Build.0 = debug_shared|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_shared.ActiveCfg = release_shared|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_shared.Build.0 = release_shared|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_static_mt.ActiveCfg = debug_static_mt|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_static_mt.Build.0 = debug_static_mt|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_static_mt.ActiveCfg = release_static_mt|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_static_mt.Build.0 = release_static_mt|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_static_md.ActiveCfg = debug_static_md|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_static_md.Build.0 = debug_static_md|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_static_md.ActiveCfg = release_static_md|Win32
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_static_md.Build.0 = release_static_md|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
