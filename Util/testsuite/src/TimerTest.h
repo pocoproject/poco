@@ -31,6 +31,7 @@ public:
 	void testSchedule();
 	void testScheduleInterval();
 	void testScheduleAtFixedRate();
+	void testCancel();
 
 	void setUp();
 	void tearDown();

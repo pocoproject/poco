@@ -109,6 +109,36 @@ void TimerTest::testScheduleAtFixedRate()
 }
 
 
+void TimerTest::testCancel()
+{
+	Timer timer;
+	
+	Timestamp time;
+	
+	TimerTask::Ptr pTask = new TimerTaskAdapter<TimerTest>(*this, &TimerTest::onTimer);
+	
+	assert (pTask->lastExecution() == 0);
+	
+	timer.scheduleAtFixedRate(pTask, 5000, 5000);
+
+	pTask->cancel();
+	assert (pTask->isCancelled());
+	
+	try
+	{
+		timer.scheduleAtFixedRate(pTask, 5000, 5000);
+		fail("must not reschedule a cancelled task");
+	}
+	catch (Poco::IllegalStateException&)
+	{
+	}
+	catch (Poco::Exception&)
+	{
+		fail("bad exception thrown");
+	}
+}
+
+
 void TimerTest::setUp()
 {
 }
@@ -133,6 +163,7 @@ CppUnit::Test* TimerTest::suite()
 	CppUnit_addTest(pSuite, TimerTest, testSchedule);
 	CppUnit_addTest(pSuite, TimerTest, testScheduleInterval);
 	CppUnit_addTest(pSuite, TimerTest, testScheduleAtFixedRate);
+	CppUnit_addTest(pSuite, TimerTest, testCancel);
 
 	return pSuite;
 }
