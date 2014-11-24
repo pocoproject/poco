@@ -257,12 +257,14 @@ void Timer::cancel(bool wait)
 
 void Timer::schedule(TimerTask::Ptr pTask, Poco::Timestamp time)
 {
+	validateTask(pTask);
 	_queue.enqueueNotification(new TaskNotification(_queue, pTask), time);
 }
 
 
 void Timer::schedule(TimerTask::Ptr pTask, Poco::Clock clock)
 {
+	validateTask(pTask);
 	_queue.enqueueNotification(new TaskNotification(_queue, pTask), clock);
 }
 
@@ -277,12 +279,14 @@ void Timer::schedule(TimerTask::Ptr pTask, long delay, long interval)
 
 void Timer::schedule(TimerTask::Ptr pTask, Poco::Timestamp time, long interval)
 {
+	validateTask(pTask);
 	_queue.enqueueNotification(new PeriodicTaskNotification(_queue, pTask, interval), time);
 }
 
 
 void Timer::schedule(TimerTask::Ptr pTask, Poco::Clock clock, long interval)
 {
+	validateTask(pTask);
 	_queue.enqueueNotification(new PeriodicTaskNotification(_queue, pTask, interval), clock);
 }
 
@@ -297,6 +301,7 @@ void Timer::scheduleAtFixedRate(TimerTask::Ptr pTask, long delay, long interval)
 
 void Timer::scheduleAtFixedRate(TimerTask::Ptr pTask, Poco::Timestamp time, long interval)
 {
+	validateTask(pTask);
 	Poco::Timestamp tsNow;
 	Poco::Clock clock;
 	Poco::Timestamp::TimeDiff diff = time - tsNow;
@@ -307,6 +312,7 @@ void Timer::scheduleAtFixedRate(TimerTask::Ptr pTask, Poco::Timestamp time, long
 
 void Timer::scheduleAtFixedRate(TimerTask::Ptr pTask, Poco::Clock clock, long interval)
 {
+	validateTask(pTask);
 	_queue.enqueueNotification(new FixedRateTaskNotification(_queue, pTask, interval, clock), clock);
 }
 
@@ -318,6 +324,15 @@ void Timer::run()
 	{
 		Poco::AutoPtr<TimerNotification> pNf = static_cast<TimerNotification*>(_queue.waitDequeueNotification());
 		cont = pNf->execute();
+	}
+}
+
+
+void Timer::validateTask(const TimerTask::Ptr& pTask)
+{
+	if (pTask->isCancelled())
+	{
+		throw Poco::IllegalStateException("A cancelled task must not be rescheduled");
 	}
 }
 
