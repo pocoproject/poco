@@ -1,7 +1,7 @@
 //
 // WebSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#12 $
+// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#13 $
 //
 // Library: Net
 // Package: WebSocket
@@ -43,7 +43,7 @@
 #include "Poco/MemoryStream.h"
 #include "Poco/Format.h"
 #include <cstring>
-#include <iostream>
+
 
 namespace Poco {
 namespace Net {

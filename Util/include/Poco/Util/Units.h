@@ -1,7 +1,7 @@
 //
 // Units.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/Units.h#1 $
+// $Id: //poco/1.4/Util/include/Poco/Util/Units.h#2 $
 //
 // Library: Util
 // Package: Units
@@ -328,10 +328,6 @@ Value<V, Power<U, Num, Den> > raise(const Value<V, U>& a)
 
 namespace Internal
 {
-	template <bool> struct static_assert;
-	template <> struct static_assert<true> { };
-		/// Ensures (at compile-time) that the template argument is true.
-
 	template <typename T1, typename T2>
 	struct Convertible;
 
@@ -374,8 +370,8 @@ namespace Internal
 		/// specialize this template.
 		/// The default implementation falls through to Convert2.
 	{
-		static_assert<Convertible<T1,T2>::Value> checkConvertible;
-			/// If this fails, then T1 is not Convertible to T2:
+		/// If this fails, then T1 is not Convertible to T2:
+		poco_static_assert ((Convertible<T1,T2>::Value));
 
 		template <typename V>
 		static V fn(const V& v)
@@ -1322,3 +1318,4 @@ V tan(const Value<V, U>& angle)
 
 
 #endif // Util_Units_INCLUDED
+

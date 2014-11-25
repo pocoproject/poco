@@ -1,7 +1,7 @@
 //
 // WinCEDriver.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/WinCEDriver.cpp#2 $
+// $Id: //poco/1.4/Util/testsuite/src/WinCEDriver.cpp#3 $
 //
 // Console-based test driver for Windows CE.
 //

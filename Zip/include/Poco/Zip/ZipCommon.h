@@ -1,7 +1,7 @@
 //
 // ZipCommon.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipCommon.h#2 $
+// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipCommon.h#3 $
 //
 // Library: Zip
 // Package: Zip
@@ -110,7 +110,9 @@ public:
 		FT_ASCII = 1
 	};
 
-	static const std::string ILLEGAL_PATH;
+	static bool isValidPath(const std::string& path);
+		/// Checks whether the given path is valid (does
+		/// not contain ".." path segments).
 };
 
 

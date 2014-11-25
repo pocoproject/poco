@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/X509Certificate.cpp#4 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/X509Certificate.cpp#5 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -115,7 +115,7 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 		{
 			try
 			{
-				// two cases: strData contains wildcards or not
+				// two cases: name contains wildcards or not
 				if (containsWildcards(*it))
 				{
 					// a compare by IPAddress is not possible with wildcards
@@ -124,7 +124,7 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 				}
 				else
 				{
-					// it depends on hostName if we compare by IP or by alias
+					// it depends on hostName whether we compare by IP or by alias
 					IPAddress ip;
 					if (IPAddress::tryParse(hostName, ip))
 					{

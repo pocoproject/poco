@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Configuration Files">
-      <UniqueIdentifier>{f02ef6f8-1ddc-4229-8322-019ab18ca5b3}</UniqueIdentifier>
+      <UniqueIdentifier>{0fbedc94-5195-4174-8e95-6675ed0dab17}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{32d23c8b-2866-4fab-9b17-0125b21358d3}</UniqueIdentifier>
+      <UniqueIdentifier>{0f1d6dc9-310f-4084-a0f1-6c8ee9ff585a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

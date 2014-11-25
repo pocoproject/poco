@@ -2,22 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="DataCore">
-      <UniqueIdentifier>{610fd2db-000b-4947-9619-e14af5b1d9a1}</UniqueIdentifier>
+      <UniqueIdentifier>{2acc1f13-a62f-4fb2-a420-56c33eaff32c}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Header Files">
-      <UniqueIdentifier>{eec56207-4943-4e6f-8cbe-612c43b2b9d7}</UniqueIdentifier>
+      <UniqueIdentifier>{47e3c07c-d438-4c71-8e8a-f66ad763ac46}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Source Files">
-      <UniqueIdentifier>{8aacb1a0-80f9-4284-8acf-8f3fb19aff60}</UniqueIdentifier>
+      <UniqueIdentifier>{437de01b-3aee-415f-b5d1-0f3b4e717532}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling">
-      <UniqueIdentifier>{4bf3401e-e2b8-4087-be53-212e60cf1d26}</UniqueIdentifier>
+      <UniqueIdentifier>{f7c02937-6db2-4c9b-849c-f9d21b276bea}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Header Files">
-      <UniqueIdentifier>{e33d215e-bdc8-4931-9115-2ba17d4cc22b}</UniqueIdentifier>
+      <UniqueIdentifier>{af26fb5d-adcb-496e-9371-e4953d317541}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Source Files">
-      <UniqueIdentifier>{996de410-c975-47c1-a27e-eb82f5213c20}</UniqueIdentifier>
+      <UniqueIdentifier>{e3438a25-552e-4362-aa32-beee8b8e0ee5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 //
 // ZipUtil.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipUtil.cpp#1 $
+// $Id: //poco/1.4/Zip/src/ZipUtil.cpp#2 $
 //
 // Library: Zip
 // Package: Zip
@@ -196,8 +196,8 @@ void ZipUtil::verifyZipEntryFileName(const std::string& fn)
 		throw ZipException("Illegal entry name /");
 	if (fn.empty())
 		throw ZipException("Illegal empty entry name");
-	if (fn.find(ZipCommon::ILLEGAL_PATH) != std::string::npos)
-		throw ZipException("Illegal entry name " + fn + " containing " + ZipCommon::ILLEGAL_PATH);
+	if (!ZipCommon::isValidPath(fn))
+		throw ZipException("Illegal entry name " + fn + " containing parent directory reference");
 }
 
 

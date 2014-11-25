@@ -1,6 +1,20 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.4.7p1
+
+  - Fixed Visual C++ 2010-2013 project files. Release builds now have optimization enabled.
+  - Poco::URI: added constructor to create URI from Path.
+  - fixed GH #618: OS X 10.10 defines PAGE_SIZE macro, conflicts with PAGE_SIZE in Thread_POSIX.cpp
+  - Poco::Net::HTTPClientSession: added support for global proxy configuration
+  - fixed GH #331: Poco::Zip does not support files with .. in the name.
+  - fixed a memory leak in Poco::Net::Context constructor when it fails to load the certificate
+    or private key files.
+  - upgraded bundled SQLite to 3.8.7.2
+  - fixed GH #229: added missing value() function
+  - fixed GH #69: MySQL empty text/blob
+
+
 !!!Release 1.4.7
 
 !!Summary of Changes

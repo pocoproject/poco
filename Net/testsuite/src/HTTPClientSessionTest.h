@@ -1,7 +1,7 @@
 //
 // HTTPClientSessionTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPClientSessionTest.h#1 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPClientSessionTest.h#2 $
 //
 // Definition of the HTTPClientSessionTest class.
 //
@@ -58,6 +58,7 @@ public:
 	void testKeepAlive();
 	void testProxy();
 	void testProxyAuth();
+	void testBypassProxy();
 
 	void setUp();
 	void tearDown();

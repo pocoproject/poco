@@ -1,7 +1,7 @@
 //
 // AtomicCounter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/AtomicCounter.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/AtomicCounter.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
