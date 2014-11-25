@@ -3,6 +3,8 @@ AAAIntroduction
 
 !!!Release 1.4.7p1
 
+!!Summary of Changes
+
   - Fixed Visual C++ 2010-2013 project files. Release builds now have optimization enabled.
   - Poco::URI: added constructor to create URI from Path.
   - fixed GH #618: OS X 10.10 defines PAGE_SIZE macro, conflicts with PAGE_SIZE in Thread_POSIX.cpp
