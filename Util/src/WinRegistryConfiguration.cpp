@@ -99,15 +99,15 @@ void WinRegistryConfiguration::enumerate(const std::string& key, Keys& range) co
 		// return all root level keys
 #if defined(_WIN32_WCE)
 		range.push_back("HKEY_CLASSES_ROOT");
+		range.push_back("HKEY_CURRENT_USER");
+		range.push_back("HKEY_LOCAL_MACHINE");
+		range.push_back("HKEY_USERS");
+#else
+		range.push_back("HKEY_CLASSES_ROOT");
 		range.push_back("HKEY_CURRENT_CONFIG");
 		range.push_back("HKEY_CURRENT_USER");
 		range.push_back("HKEY_LOCAL_MACHINE");
 		range.push_back("HKEY_PERFORMANCE_DATA");
-		range.push_back("HKEY_USERS");
-#else
-		range.push_back("HKEY_CLASSES_ROOT");
-		range.push_back("HKEY_CURRENT_USER");
-		range.push_back("HKEY_LOCAL_MACHINE");
 		range.push_back("HKEY_USERS");
 #endif
 	}
