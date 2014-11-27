@@ -80,9 +80,6 @@ Poco::MongoDB::Document::Ptr Database::ensureIndex(Connection& connection, const
 	insertRequest->documents().push_back(index);
 	connection.sendRequest(*insertRequest);
 
-	insertRequest->documents().push_back(index);
-	connection.sendRequest(*insertRequest);
-
 	return getLastErrorDoc(connection);
 }
 
