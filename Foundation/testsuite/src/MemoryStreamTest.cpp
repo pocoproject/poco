@@ -13,6 +13,7 @@
 #include "MemoryStreamTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Buffer.h"
 #include "Poco/MemoryStream.h"
 
 
@@ -87,6 +88,31 @@ void MemoryStreamTest::testOutput()
 }
 
 
+void MemoryStreamTest::testTell()
+{
+	Poco::Buffer<char> buffer(1024);
+	Poco::MemoryOutputStream ostr(buffer.begin(), buffer.size());
+	ostr << 'H' << 'e' << 'l' << 'l' << 'o' << '\0';
+	std::streamoff np = ostr.tellp();
+	assert (np == 6);
+
+	Poco::MemoryInputStream istr(buffer.begin(), buffer.size());
+
+	char c;
+	istr >> c;
+	assert (c == 'H');
+
+	istr >> c;
+	assert (c == 'e');
+
+	istr >> c;
+	assert (c == 'l');
+
+	std::streamoff ng = istr.tellg();
+	assert (ng == 3);
+}
+
+
 void MemoryStreamTest::setUp()
 {
 }
@@ -103,6 +129,7 @@ CppUnit::Test* MemoryStreamTest::suite()
 
 	CppUnit_addTest(pSuite, MemoryStreamTest, testInput);
 	CppUnit_addTest(pSuite, MemoryStreamTest, testOutput);
+	CppUnit_addTest(pSuite, MemoryStreamTest, testTell);
 
 	return pSuite;
 }

@@ -28,6 +28,7 @@ public:
 
 	void testInput();
 	void testOutput();
+	void testTell();
 
 	void setUp();
 	void tearDown();
