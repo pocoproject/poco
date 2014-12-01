@@ -305,7 +305,7 @@ void StatementImpl::makeExtractors(std::size_t count, const Position& position)
 {
 	for (int i = 0; i < count; ++i)
 	{
-		const MetaColumn& mc = metaColumn(i, size_t(position.value()));
+		const MetaColumn& mc = metaColumn(i, position.value());
 		switch (mc.type())
 		{
 			case MetaColumn::FDT_BOOL:
