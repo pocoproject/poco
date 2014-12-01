@@ -109,6 +109,15 @@ void Binder::freeMemory()
 	DateTimeVecVec::iterator itDateTimeVec = _dateTimeVecVec.begin();
 	DateTimeVecVec::iterator itDateTimeVecEnd = _dateTimeVecVec.end();
 	for (; itDateTimeVec != itDateTimeVecEnd; ++itDateTimeVec) delete *itDateTimeVec;
+
+	AnyPtrVecVec::iterator itAnyVec = _containers.begin();
+	AnyPtrVecVec::iterator itAnyVecEnd = _containers.end();
+	for (; itAnyVec != itAnyVecEnd; ++itAnyVec)
+	{
+	  AnyPtrVec::iterator b = itAnyVec->begin();
+	  AnyPtrVec::iterator e = itAnyVec->end();
+	  for (; b != e; ++b) delete *b;
+	}
 }
 
 
