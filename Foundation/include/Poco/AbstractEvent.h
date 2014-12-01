@@ -54,7 +54,7 @@ class AbstractEvent
 	/// only.
 	///
 	/// BasicEvent works with a standard delegate. They allow one object to register
-	/// onr or more delegates with an event. In contrast, a PriorityDelegate comes with an attached priority value
+	/// one or more delegates with an event. In contrast, a PriorityDelegate comes with an attached priority value
 	/// and allows one object to register for one priority value one or more delegates. Note that PriorityDelegates
 	/// only work with PriorityEvents:
 	///
