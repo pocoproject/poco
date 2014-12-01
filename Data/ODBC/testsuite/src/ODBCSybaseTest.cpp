@@ -45,9 +45,9 @@ std::string SybaseODBC::_connectString = "driver={Adaptive Server Enterprise};"
 "uid=" SYBASE_UID ";"
 "pwd=" SYBASE_PWD ";"
 #else
-//"AuthenticationClient=mitkerberos;"
-//"ServerPrincipal=sybase/visadb532;"
-//"UID=ignored;"
+"AuthenticationClient=mitkerberos;"
+"ServerPrincipal=sybase/visadb532;"
+"UID=ignored;"
 #endif
 "DynamicPrepare=1;"
 ;
@@ -56,8 +56,14 @@ std::string SybaseODBC::_connectString = "Driver=/ms/dist/syb/PROJ/oc/15.7.0.04/
 "Server=visadb532;"
 "Port=11670;"
 "db=" SYBASE_DB ";"
+#if 0
 "uid=" SYBASE_UID ";"
 "pwd=" SYBASE_PWD ";"
+#else
+"AuthenticationClient=mitkerberos;"
+"ServerPrincipal=sybase/visadb532;"
+"UID=ignored;"
+#endif
 "CS=iso_1;"
 "DynamicPrepare=1;";
 # endif
