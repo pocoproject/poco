@@ -253,6 +253,14 @@ int InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 }
 
 
+int InflatingStreamBuf::sync()
+{
+	int n = BufferedStreamBuf::sync();
+	if (!n && _pOstr) _pOstr->flush();
+	return n;
+}
+
+
 InflatingIOS::InflatingIOS(std::ostream& ostr, InflatingStreamBuf::StreamType type):
 	_buf(ostr, type)
 {
