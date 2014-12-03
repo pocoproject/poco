@@ -41,7 +41,9 @@ CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
 ## unixODBC
 ##
 else ifeq (0, $(shell test -e $(POCO_ODBC_LIB)/libodbc$(LIBLINKEXT); echo $$?))
+ifneq ($(POCO_ODBC_LINK),STATIC)
 SYSLIBS += -lodbc
+endif
 ifeq (0, $(shell test -e $(POCO_ODBC_LIB)/libodbcinst$(LIBLINKEXT); echo $$?))
 SYSLIBS += -lodbcinst
 endif
