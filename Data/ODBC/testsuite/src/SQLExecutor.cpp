@@ -3714,6 +3714,8 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (session().isTransaction());
 
+	//TODO: this looks to be wrong - if a DB is fast it'd manage to execute this before another session commit is done
+	// so assert below WILL fail
 	Statement stmt1 = (local << "SELECT COUNT(*) FROM " << ExecUtil::person(), into(locCount), async, now);
 
 	session().commit();
