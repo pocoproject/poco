@@ -26,6 +26,7 @@
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
+#include "Poco/Environment.h"
 #include <sqltypes.h>
 #include <iostream>
 
@@ -52,11 +53,15 @@ using Poco::NotFoundException;
 #define DB2_UID "db2admin"
 #define DB2_PWD "db2admin"
 #else
+static std::string db2Driver()
+{
 # ifdef _MSC_VER
-#   define DB2_ODBC_DRIVER "IBM DB2 ODBC DRIVER"
+	return "IBM DB2 ODBC DRIVER";
 # else
-#   define DB2_ODBC_DRIVER "/ms/dist/ibmdb2/PROJ/sqllib/9.7.2/.exec/x86_64.linux.2.6.glibc.2.5/sqllib/lib/libdb2o.so"
+	return Poco::Environment::get("POCO_TEST_DB2_DRIVER", 
+		"/ms/dist/ibmdb2/PROJ/sqllib/9.7.2/.exec/x86_64.linux.2.6.glibc.2.5/sqllib/lib/libdb2o.so");
 # endif
+}
 
 #define DB2_DSN ""
 #define DB2_ALIAS "NT043005"
@@ -67,7 +72,7 @@ using Poco::NotFoundException;
 
 ODBCTest::SessionPtr ODBCDB2Test::_pSession;
 ODBCTest::ExecPtr    ODBCDB2Test::_pExecutor;
-std::string          ODBCDB2Test::_driver = DB2_ODBC_DRIVER;
+std::string          ODBCDB2Test::_driver = db2Driver();
 std::string          ODBCDB2Test::_dsn = DB2_DSN;
 std::string          ODBCDB2Test::_uid = DB2_UID;
 std::string          ODBCDB2Test::_pwd = DB2_PWD;
@@ -80,8 +85,7 @@ std::string          ODBCDB2Test::_connectString = "Driver=" DB2_ODBC_DRIVER ";"
 	"Uid=" DB2_UID ";"
 	"Pwd=" DB2_PWD ";";
 #else
-std::string          ODBCDB2Test::_connectString = "Driver=" DB2_ODBC_DRIVER
-//";" "DSN=" DB2_DSN
+std::string          ODBCDB2Test::_connectString = "Driver=" + db2Driver() +
 ";" "DBALIAS=" DB2_ALIAS
 ";" "CurrentSchema=" "TEMPDB"
 ";" "Uid=" DB2_UID 
@@ -104,7 +108,7 @@ void ODBCDB2Test::testBareboneODBC()
 {
 	if (! &session()) fail ("Test not available.");
 
-	std::string tableCreateString = "CREATE TABLE Test "
+	std::string tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
 		"Third BLOB,"
@@ -118,7 +122,7 @@ void ODBCDB2Test::testBareboneODBC()
 	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
 
-	tableCreateString = "CREATE TABLE Test "
+	tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second INTEGER,"
 		"Third FLOAT)";
@@ -176,7 +180,7 @@ void ODBCDB2Test::testFilter()
 		recreateVectorsTable();
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i+1));
-		executor().filter("SELECT * FROM Vectors ORDER BY i0 ASC", "i0");
+		executor().filter("SELECT * FROM " + ExecUtil::vectors() + " ORDER BY i0 ASC", "i0");
 		i += 2;
 	}
 }
@@ -186,50 +190,52 @@ void ODBCDB2Test::testStoredProcedure()
 {
 	if (! &session()) fail ("Test not available.");
 
-	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
-	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
-	dropObject("PROCEDURE", "storedProcedure(VARCHAR(1000), VARCHAR(1000))");
+	const std::string nm = ExecUtil::stored_proc();
+
+	dropObject("PROCEDURE", nm + "(INTEGER)");
+	dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
+	dropObject("PROCEDURE", nm + "(VARCHAR(1000), VARCHAR(1000))");
 
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
 		session().setFeature("autoExtract", bindValue(k+1));
 
-		session() << "CREATE PROCEDURE storedProcedure(OUT outParam INTEGER) "
+		session() << "CREATE PROCEDURE " << nm << "(OUT outParam INTEGER) "
 			"BEGIN "
 			" SET outParam = -1; "
 			"END" , now;
 
 		int i = 0;
-        	session() << "{call " DB2_DB ".storedProcedure(?)}", out(i), now;
-        	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
+        	session() << "{call " DB2_DB "." << nm << "(?)}", out(i), now;
+			dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(-1 == i);
 
-		session() << "CREATE PROCEDURE storedProcedure(inParam INTEGER, OUT outParam INTEGER) "
+		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "
 			" SET outParam = inParam*inParam; "
 			"END" , now;
 		
 		i = 2;
 		int j = 0;
-        	session() << "{call " DB2_DB ".storedProcedure(?, ?)}", in(i), out(j), now;
-        	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
+        	session() << "{call " DB2_DB "." << nm << "(?, ?)}", in(i), out(j), now;
+			dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == j);
 	
-		session() << "CREATE PROCEDURE storedProcedure(INOUT ioParam INTEGER) "
+		session() << "CREATE PROCEDURE " << nm << "(INOUT ioParam INTEGER) "
 			"BEGIN "
 			" SET ioParam = ioParam*ioParam; "
 			"END" , now;
 
 		i = 2;
-        	session() << "{call " DB2_DB ".storedProcedure(?)}", io(i), now;
-        	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
+        	session() << "{call " DB2_DB "." << nm << "(?)}", io(i), now;
+			dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(4 == i);
 
 		//TIMESTAMP is not supported as stored procedure parameter in DB2
 		//(SQL0182N An expression with a datetime value or a labeled duration is not valid.)
 
-		session() << "CREATE PROCEDURE storedProcedure(inParam VARCHAR(1000), OUT outParam VARCHAR(1000)) "
+		session() << "CREATE PROCEDURE " << nm << "(inParam VARCHAR(1000), OUT outParam VARCHAR(1000)) "
 			"BEGIN "
 			" SET outParam = inParam; "
 			"END" , now;
@@ -245,8 +251,8 @@ void ODBCDB2Test::testStoredProcedure()
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
 		std::string outParam;
-        	session() << "{call " DB2_DB ".storedProcedure(?,?)}", in(inParam), out(outParam), now;
-        	dropObject("PROCEDURE", "storedProcedure(VARCHAR(1000), VARCHAR(1000))");
+		session() << "{call " DB2_DB "." << nm << "(?,?)}", in(inParam), out(outParam), now;
+		dropObject("PROCEDURE", nm + "(VARCHAR(1000), VARCHAR(1000))");
 		assert(inParam == outParam);
 
 		k += 2;
@@ -258,8 +264,10 @@ void ODBCDB2Test::testStoredProcedureAny()
 {
 	if (! &session()) fail ("Test not available.");
 
-	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
-	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
+	const std::string nm = ExecUtil::stored_proc();
+
+	dropObject("PROCEDURE", nm + "(INTEGER)");
+	dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
@@ -268,23 +276,23 @@ void ODBCDB2Test::testStoredProcedureAny()
 		Any i = 2;
 		Any j = 0;
 
-		session() << "CREATE PROCEDURE storedProcedure(inParam INTEGER, OUT outParam INTEGER) "
+		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "
 			" SET outParam = inParam*inParam; "
 			"END" , now;
 
-        	session() << "{call " DB2_DB ".storedProcedure(?, ?)}", in(i), out(j), now;
-        	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
+		session() << "{call " DB2_DB "." << nm << "(?, ?)}", in(i), out(j), now;
+		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == AnyCast<int>(j));
 
-		session() << "CREATE PROCEDURE storedProcedure(INOUT ioParam INTEGER) "
+		session() << "CREATE PROCEDURE " << nm << "(INOUT ioParam INTEGER) "
 			"BEGIN "
 			" SET ioParam = ioParam*ioParam; "
 			"END" , now;
 
 		i = 2;
-        	session() << "{call " DB2_DB ".storedProcedure(?)}", io(i), now;
-        	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
+		session() << "{call " DB2_DB "." << nm << "(?)}", io(i), now;
+		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(4 == AnyCast<int>(i));
 		
 		k += 2;
@@ -296,8 +304,10 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 {
 	if (! &session()) fail ("Test not available.");
 
-    	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
-    	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
+	const std::string nm = ExecUtil::stored_proc();
+
+	dropObject("PROCEDURE", nm + "(INTEGER)");
+	dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
@@ -305,23 +315,23 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 		DynamicAny i = 2;
 		DynamicAny j = 0;
 
-		session() << "CREATE PROCEDURE storedProcedure(inParam INTEGER, OUT outParam INTEGER) "
+		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "
 			" SET outParam = inParam*inParam; "
 			"END" , now;
 
-        	session() << "{call " DB2_DB ".storedProcedure(?, ?)}", in(i), out(j), now;
-        	dropObject("PROCEDURE", "storedProcedure(INTEGER, INTEGER)");
+		session() << "{call " DB2_DB "." << nm << "(?, ?)}", in(i), out(j), now;
+		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == j);
 
-		session() << "CREATE PROCEDURE storedProcedure(INOUT ioParam INTEGER) "
+		session() << "CREATE PROCEDURE " << nm << "(INOUT ioParam INTEGER) "
 			"BEGIN "
 			" SET ioParam = ioParam*ioParam; "
 			"END" , now;
 
 		i = 2;
-        	session() << "{call " DB2_DB ".storedProcedure(?)}", io(i), now;
-        	dropObject("PROCEDURE", "storedProcedure(INTEGER)");
+		session() << "{call " DB2_DB "." << nm << "(?)}", io(i), now;
+		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(4 == i);
 
 		k += 2;
@@ -331,40 +341,41 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 
 void ODBCDB2Test::testStoredFunction()
 {
+	const std::string nm = ExecUtil::stored_func();
 	if (! &session()) fail ("Test not available.");
 
-    	dropObject("PROCEDURE", "storedFunction()");
-    	dropObject("PROCEDURE", "storedFunction(INTEGER)");
-    	dropObject("PROCEDURE", "storedFunction(INTEGER, INTEGER)");
-    	dropObject("PROCEDURE", "storedFunction(VARCHAR(10), VARCHAR(10))");
+	dropObject("PROCEDURE", nm + "()");
+	dropObject("PROCEDURE", nm + "(INTEGER)");
+	dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
+	dropObject("PROCEDURE", nm + "(VARCHAR(10), VARCHAR(10))");
 
-    	for (int k = 0; k < 8;)
+	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
 		session().setFeature("autoExtract", bindValue(k+1));
 
-		session() << "CREATE PROCEDURE storedFunction() "
+		session() << "CREATE PROCEDURE " << nm << "() "
 			"BEGIN "
 			"  RETURN -1; "
 			"END" , now;
 
 		int i = 0;
-        	session() << "{? = call " DB2_DB ".storedFunction()}", out(i), now;
-        	dropObject("PROCEDURE", "storedFunction()");
+		session() << "{? = call " DB2_DB "." << nm << "()}", out(i), now;
+		dropObject("PROCEDURE", nm + "()");
 		assert(-1 == i);
 		
-		session() << "CREATE PROCEDURE storedFunction(inParam INTEGER) "
+		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER) "
 			"BEGIN "
 			" RETURN inParam*inParam; "
 			"END" , now;
 		
 		i = 2;
 		int result = 0;
-        	session() << "{? = call " DB2_DB ".storedFunction(?)}", out(result), in(i), now;
-        	dropObject("PROCEDURE", "storedFunction(INTEGER)");
+		session() << "{? = call " DB2_DB "." << nm << "(?)}", out(result), in(i), now;
+		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(4 == result);
 
-		session() << "CREATE PROCEDURE storedFunction(inParam INTEGER, OUT outParam INTEGER) "
+		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "
 			" SET outParam = inParam*inParam; "
 			" RETURN outParam; "
@@ -373,12 +384,12 @@ void ODBCDB2Test::testStoredFunction()
 		i = 2;
 		int j = 0;
 		result = 0;
-        	session() << "{? = call " DB2_DB ".storedFunction(?, ?)}", out(result), in(i), out(j), now;
-        	dropObject("PROCEDURE", "storedFunction(INTEGER, INTEGER)");
+		session() << "{? = call " DB2_DB "." << nm << "(?, ?)}", out(result), in(i), out(j), now;
+		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == j);
 		assert(j == result); 
 
-		session() << "CREATE PROCEDURE storedFunction(INOUT param1 INTEGER, INOUT param2 INTEGER) "
+		session() << "CREATE PROCEDURE " << nm << "(INOUT param1 INTEGER, INOUT param2 INTEGER) "
 			"BEGIN "
 			" DECLARE temp INTEGER;"
 			" SET temp = param1; "
@@ -390,7 +401,7 @@ void ODBCDB2Test::testStoredFunction()
 		i = 1;
 		j = 2;
 		result = 0;
-        	session() << "{? = call " DB2_DB ".storedFunction(?, ?)}", out(result), io(i), io(j), now;
+		session() << "{? = call " DB2_DB "." << nm << "(?, ?)}", out(result), io(i), io(j), now;
 		assert(1 == j);
 		assert(2 == i);
 		assert(3 == result); 
@@ -399,15 +410,15 @@ void ODBCDB2Test::testStoredFunction()
 		assert(1 == params.get<0>());
 		assert(2 == params.get<1>());
 		result = 0;
-        	session() << "{? = call " DB2_DB ".storedFunction(?, ?)}", out(result), io(params), now;
-        	dropObject("PROCEDURE", "storedFunction(INTEGER, INTEGER)");
+		session() << "{? = call " DB2_DB "." << nm << "(?, ?)}", out(result), io(params), now;
+		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(1 == params.get<1>());
 		assert(2 == params.get<0>());
 		assert(3 == result); 
 
 		session().setFeature("autoBind", true);
 
-		session() << "CREATE PROCEDURE storedFunction(inParam VARCHAR(10), OUT outParam VARCHAR(10)) "
+		session() << "CREATE PROCEDURE " << nm << "(inParam VARCHAR(10), OUT outParam VARCHAR(10)) "
 			"BEGIN "
 			" SET outParam = inParam; "
 			" RETURN LENGTH(outParam);"//DB2 allows only integer as return type
@@ -416,8 +427,8 @@ void ODBCDB2Test::testStoredFunction()
 		std::string inParam = "123456789";
 		std::string outParam;
 		int ret;
-        	session() << "{? = call " DB2_DB ".storedFunction(?,?)}", out(ret), in(inParam), out(outParam), now;
-        	dropObject("PROCEDURE", "storedFunction(VARCHAR(10), VARCHAR(10))");
+		session() << "{? = call " DB2_DB "." << nm << "(?,?)}", out(ret), in(inParam), out(outParam), now;
+		dropObject("PROCEDURE", nm + "(VARCHAR(10), VARCHAR(10))");
 		assert(inParam == outParam);
 		assert(ret == inParam.size());
 
@@ -454,8 +465,8 @@ void ODBCDB2Test::dropObject(const std::string& type, const std::string& name)
 
 void ODBCDB2Test::recreateNullableTable()
 {
-	dropObject("TABLE", "NullableTest");
-	try { session() << "CREATE TABLE NullableTest (EmptyString VARCHAR(30), EmptyInteger INTEGER , EmptyFloat FLOAT , EmptyDateTime TIMESTAMP)", now; }
+	dropObject("TABLE", ExecUtil::nullabletest());
+	try { session() << "CREATE TABLE " << ExecUtil::nullabletest() << " (EmptyString VARCHAR(30), EmptyInteger INTEGER , EmptyFloat FLOAT , EmptyDateTime TIMESTAMP)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -463,8 +474,8 @@ void ODBCDB2Test::recreateNullableTable()
 
 void ODBCDB2Test::recreatePersonTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() <<" (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -472,8 +483,8 @@ void ODBCDB2Test::recreatePersonTable()
 
 void ODBCDB2Test::recreatePersonBLOBTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() <<" (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
@@ -481,8 +492,8 @@ void ODBCDB2Test::recreatePersonBLOBTable()
 
 void ODBCDB2Test::recreatePersonDateTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() <<" (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTable()"); }
 }
@@ -490,8 +501,8 @@ void ODBCDB2Test::recreatePersonDateTable()
 
 void ODBCDB2Test::recreatePersonTimeTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() <<" (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
 }
@@ -499,8 +510,8 @@ void ODBCDB2Test::recreatePersonTimeTable()
 
 void ODBCDB2Test::recreatePersonDateTimeTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born TIMESTAMP)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() <<" (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born TIMESTAMP)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -508,8 +519,8 @@ void ODBCDB2Test::recreatePersonDateTimeTable()
 
 void ODBCDB2Test::recreateIntsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { session() << "CREATE TABLE Strings (str INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { session() << "CREATE TABLE " << ExecUtil::strings() << " (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -517,8 +528,8 @@ void ODBCDB2Test::recreateIntsTable()
 
 void ODBCDB2Test::recreateStringsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { session() << "CREATE TABLE Strings (str VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { session() << "CREATE TABLE " << ExecUtil::strings() << " (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
 }
@@ -526,8 +537,8 @@ void ODBCDB2Test::recreateStringsTable()
 
 void ODBCDB2Test::recreateFloatsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { session() << "CREATE TABLE Strings (str FLOAT)", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { session() << "CREATE TABLE " << ExecUtil::strings() << " (str FLOAT)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
 }
@@ -535,8 +546,8 @@ void ODBCDB2Test::recreateFloatsTable()
 
 void ODBCDB2Test::recreateTuplesTable()
 {
-	dropObject("TABLE", "Tuples");
-	try { session() << "CREATE TABLE Tuples "
+	dropObject("TABLE", ExecUtil::tuples());
+	try { session() << "CREATE TABLE " << ExecUtil::tuples() << 
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
 		"int7 INTEGER, int8 INTEGER, int9 INTEGER, int10 INTEGER, int11 INTEGER, int12 INTEGER, int13 INTEGER,"
 		"int14 INTEGER, int15 INTEGER, int16 INTEGER, int17 INTEGER, int18 INTEGER, int19 INTEGER)", now; }
@@ -547,8 +558,8 @@ void ODBCDB2Test::recreateTuplesTable()
 
 void ODBCDB2Test::recreateVectorsTable()
 {
-	dropObject("TABLE", "Vectors");
-	try { session() << "CREATE TABLE Vectors (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::vectors());
+	try { session() << "CREATE TABLE " << ExecUtil::vectors() << " (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
 }
@@ -556,8 +567,8 @@ void ODBCDB2Test::recreateVectorsTable()
 
 void ODBCDB2Test::recreateAnysTable()
 {
-	dropObject("TABLE", "Anys");
-	try { session() << "CREATE TABLE Anys (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::anys() );
+	try { session() << "CREATE TABLE " << ExecUtil::anys() << " (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
@@ -565,8 +576,8 @@ void ODBCDB2Test::recreateAnysTable()
 
 void ODBCDB2Test::recreateNullsTable(const std::string& notNull)
 {
-	dropObject("TABLE", "NullTest");
-	try { session() << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
+	dropObject("TABLE", ExecUtil::nulltest());
+	try { session() << format("CREATE TABLE %s (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)", ExecUtil::nulltest(),
 		notNull,
 		notNull,
 		notNull), now; }
@@ -577,10 +588,10 @@ void ODBCDB2Test::recreateNullsTable(const std::string& notNull)
 
 void ODBCDB2Test::recreateMiscTable()
 {
-	dropObject("TABLE", "MiscTest");
+	dropObject("TABLE", ExecUtil::misctest());
 	try 
 	{ 
-		session() << "CREATE TABLE MiscTest "
+		session() << "CREATE TABLE " << ExecUtil::misctest() <<
 			"(First VARCHAR(30),"
 			"Second BLOB,"
 			"Third INTEGER,"
@@ -593,8 +604,8 @@ void ODBCDB2Test::recreateMiscTable()
 
 void ODBCDB2Test::recreateLogTable()
 {
-	dropObject("TABLE", "T_POCO_LOG");
-	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
+	dropObject("TABLE", ExecUtil::pocolog());;
+	dropObject("TABLE", ExecUtil::pocolog_a());;
 
 	try 
 	{ 
@@ -608,8 +619,8 @@ void ODBCDB2Test::recreateLogTable()
 			"Text VARCHAR(100),"
 			"DateTime TIMESTAMP)"; 
 
-		session() << sql, "T_POCO_LOG", now; 
-		session() << sql, "T_POCO_LOG_ARCHIVE", now;
+		session() << sql, ExecUtil::pocolog(), now; 
+		session() << sql, ExecUtil::pocolog_a(), now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }

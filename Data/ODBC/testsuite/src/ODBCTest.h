@@ -176,6 +176,7 @@ protected:
 	virtual void recreateMiscTable();
 	virtual void recreateLogTable();
 	virtual void recreateUnicodeTable();
+	virtual bool emptyStringIsSpace() { return false; }
 
 	static SessionPtr init(const std::string& driver,
 		std::string& dsn,

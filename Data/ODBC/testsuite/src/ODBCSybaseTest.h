@@ -34,6 +34,8 @@ private:
     void testStoredProcedureAny();
     void testTransaction();
 
+	bool emptyStringIsSpace() { return true; }
+
     void doMiscTable(bool haveSecCol);
     void doPersonTable(const std::string& lnAttr = "");
 

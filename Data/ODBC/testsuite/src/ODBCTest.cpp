@@ -1013,7 +1013,7 @@ void ODBCTest::testNull()
 		recreateNullsTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->nulls();
+		_pExecutor->nulls(emptyStringIsSpace());
 		i += 2;
 	}
 }
@@ -1119,9 +1119,9 @@ void ODBCTest::testMultipleResultsNoProj()
 	{
 		recreatePersonTable();
 		_pSession->setFeature("autoExtract", autoE != 0);
-		_pExecutor->multipleResultsNoProj("SELECT * FROM Person WHERE Age = ?; "
-		"SELECT Age FROM Person WHERE FirstName = ?; "
-		"SELECT * FROM Person WHERE Age = ? OR Age = ? ORDER BY Age;");
+		_pExecutor->multipleResultsNoProj("SELECT * FROM " + ExecUtil::person() + " WHERE Age = ?; "
+		  "SELECT Age FROM " + ExecUtil::person() + " WHERE FirstName = ?; "
+		  "SELECT * FROM " + ExecUtil::person() + " WHERE Age = ? OR Age = ? ORDER BY Age;");
 	}
 }
 

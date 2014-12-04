@@ -115,8 +115,8 @@ void SybaseODBC::dropObject(const std::string& type, const std::string& name)
 
 void SybaseODBC::recreateNullableTable()
 {
-    dropObject("TABLE", "NullableTest");
-    try { session() << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime DATETIME NULL)", now; }
+    dropObject("TABLE", ExecUtil::nullabletest());
+    try { session() << "CREATE TABLE " << ExecUtil::nullabletest() << " (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime DATETIME NULL)", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreatePersonTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreatePersonTable()"); }
 }
@@ -129,8 +129,8 @@ void SybaseODBC::recreatePersonTable()
 
 void SybaseODBC::doPersonTable(const std::string& lnAttr)
 {
-    dropObject("TABLE", "Person");
-    try { session() << "CREATE TABLE Person (LastName VARCHAR(30)" << lnAttr << ", FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
+    dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30)" << lnAttr << ", FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreatePersonTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreatePersonTable()"); }
 }
@@ -138,8 +138,8 @@ void SybaseODBC::doPersonTable(const std::string& lnAttr)
 
 void SybaseODBC::recreatePersonBLOBTable()
 {
-    dropObject("TABLE", "Person");
-    try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image VARBINARY(10240))", now; }
+    dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image VARBINARY(10240))", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreatePersonBLOBTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreatePersonBLOBTable()"); }
 }
@@ -147,8 +147,8 @@ void SybaseODBC::recreatePersonBLOBTable()
 
 void SybaseODBC::recreatePersonDateTable()
 {
-    dropObject("TABLE", "Person");
-    try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
+    dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreatePersonDateTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreatePersonDateTable()"); }
 }
@@ -156,8 +156,8 @@ void SybaseODBC::recreatePersonDateTable()
 
 void SybaseODBC::recreatePersonTimeTable()
 {
-    dropObject("TABLE", "Person");
-    try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
+    dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreatePersonTimeTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreatePersonTimeTable()"); }
 }
@@ -165,8 +165,8 @@ void SybaseODBC::recreatePersonTimeTable()
 
 void SybaseODBC::recreatePersonDateTimeTable()
 {
-    dropObject("TABLE", "Person");
-    try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATETIME)", now; }
+    dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATETIME)", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreatePersonDateTimeTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreatePersonDateTimeTable()"); }
 }
@@ -174,8 +174,8 @@ void SybaseODBC::recreatePersonDateTimeTable()
 
 void SybaseODBC::recreateIntsTable()
 {
-    dropObject("TABLE", "Strings");
-    try { session() << "CREATE TABLE Strings (str INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::strings());
+    try { session() << "CREATE TABLE " << ExecUtil::strings() <<" (str INTEGER)", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateIntsTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateIntsTable()"); }
 }
@@ -183,8 +183,8 @@ void SybaseODBC::recreateIntsTable()
 
 void SybaseODBC::recreateStringsTable()
 {
-    dropObject("TABLE", "Strings");
-    try { session() << "CREATE TABLE Strings (str VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::strings());
+    try { session() << "CREATE TABLE " << ExecUtil::strings() <<" (str VARCHAR(30))", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateStringsTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateStringsTable()"); }
 }
@@ -192,8 +192,8 @@ void SybaseODBC::recreateStringsTable()
 
 void SybaseODBC::recreateFloatsTable()
 {
-    dropObject("TABLE", "Strings");
-    try { session() << "CREATE TABLE Strings (str FLOAT)", now; }
+    dropObject("TABLE", ExecUtil::strings());
+    try { session() << "CREATE TABLE " << ExecUtil::strings() <<" (str FLOAT)", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateFloatsTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateFloatsTable()"); }
 }
@@ -201,9 +201,9 @@ void SybaseODBC::recreateFloatsTable()
 
 void SybaseODBC::recreateTuplesTable()
 {
-    dropObject("TABLE", "Tuples");
+    dropObject("TABLE", ExecUtil::tuples());
     try {
-        session() << "CREATE TABLE Tuples "
+        session() << "CREATE TABLE " << ExecUtil::tuples() <<
             "(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
             "int7 INTEGER, int8 INTEGER, int9 INTEGER, int10 INTEGER, int11 INTEGER, int12 INTEGER, int13 INTEGER,"
             "int14 INTEGER, int15 INTEGER, int16 INTEGER, int17 INTEGER, int18 INTEGER, int19 INTEGER)", now;
@@ -215,8 +215,8 @@ void SybaseODBC::recreateTuplesTable()
 
 void SybaseODBC::recreateVectorsTable()
 {
-    dropObject("TABLE", "Vectors");
-    try { session() << "CREATE TABLE Vectors (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+    dropObject("TABLE", ExecUtil::vectors());
+	try { session() << "CREATE TABLE " << ExecUtil::vectors() << " (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateVectorsTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateVectorsTable()"); }
 }
@@ -224,8 +224,8 @@ void SybaseODBC::recreateVectorsTable()
 
 void SybaseODBC::recreateAnysTable()
 {
-    dropObject("TABLE", "Anys");
-    try { session() << "CREATE TABLE Anys (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+    dropObject("TABLE", ExecUtil::anys() );
+    try { session() << "CREATE TABLE " << ExecUtil::anys() << " (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateAnysTable()"); }
     catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateAnysTable()"); }
 }
@@ -233,10 +233,10 @@ void SybaseODBC::recreateAnysTable()
 
 void SybaseODBC::recreateNullsTable(const std::string& notNull)
 {
-    dropObject("TABLE", "NullTest");
+    dropObject("TABLE", ExecUtil::nulltest());
     std::string nl = (notNull.empty() ? " NULL " : notNull);
     try {
-        session() << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
+        session() << format("CREATE TABLE %s (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)", ExecUtil::nulltest(),
             nl,
             nl,
             nl), now;
@@ -247,10 +247,10 @@ void SybaseODBC::recreateNullsTable(const std::string& notNull)
 
 void SybaseODBC::doMiscTable(bool haveSecCol)
 {
-    dropObject("TABLE", "MiscTest");
+    dropObject("TABLE", ExecUtil::misctest());
     try
     {
-        session() << "CREATE TABLE MiscTest "
+        session() << "CREATE TABLE "<< ExecUtil::misctest() <<
             "(First VARCHAR(30),"
             << (haveSecCol ? "Second VARBINARY(10240)," : "") <<
             "Third INTEGER,"
@@ -278,8 +278,8 @@ void SybaseODBC::recreateMiscTable()
 
 void SybaseODBC::recreateLogTable()
 {
-    dropObject("TABLE", "T_POCO_LOG");
-    dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
+    dropObject("TABLE", ExecUtil::pocolog());
+    dropObject("TABLE", ExecUtil::pocolog_a());;
 
     try
     {
@@ -293,8 +293,8 @@ void SybaseODBC::recreateLogTable()
             "Text VARCHAR(100),"
             "DateTime DATETIME)";
 
-        session() << sql, "T_POCO_LOG", now;
-        session() << sql, "T_POCO_LOG_ARCHIVE", now;
+        session() << sql, ExecUtil::pocolog(), now;
+        session() << sql, ExecUtil::pocolog_a(), now;
 
     }
     catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateLogTable()"); }
@@ -303,141 +303,144 @@ void SybaseODBC::recreateLogTable()
 
 void SybaseODBC::testStoredProcedure()
 {
-    dropObject("procedure", "storedProcedure");
+	const std::string nm(ExecUtil::stored_proc());
+	dropObject("procedure", nm);
 
-    for (int k = 0; k < 8;)
-    {
-        session().setFeature("autoBind", bindValue(k));
-        session().setFeature("autoExtract", bindValue(k + 1));
+	for (int k = 0; k < 8;)
+	{
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k + 1));
 
-        session() << "create procedure storedProcedure "
-            "@outParam int output "
-            "as "
-            "select @outParam = -1", now;
+		session() << "create procedure " + nm + " "
+			"@outParam int output "
+			"as "
+			"select @outParam = -1", now;
 
-        int i = 0;
-        session() << "{ call storedProcedure(?) }", out(i), now;
-        dropObject("procedure", "storedProcedure");
-        assert(-1 == i);
+		int i = 0;
+		session() << "{ call " << nm << "(?) }", out(i), now;
+		dropObject("procedure", nm);
+		assert(-1 == i);
 
-        session() << "create procedure storedProcedure "
-            "@inParam int, @outParam int output "
-            "as "
-            "select @outParam = @inParam * @inParam"
-            , now;
+		session() << "create procedure " + nm + " "
+			"@inParam int, @outParam int output "
+			"as "
+			"select @outParam = @inParam * @inParam"
+			, now;
 
-        i = 2;
-        int j = 0;
-        session() << "{ call storedProcedure(?, ?)} ", in(i), out(j), now;
-        dropObject("procedure", "storedProcedure");
-        assert(4 == j);
+		i = 2;
+		int j = 0;
+		session() << "{ call " << nm << "(?, ?)} ", in(i), out(j), now;
+		dropObject("procedure", nm);
+		assert(4 == j);
 
-        session() << "create procedure storedProcedure "
-            "@ioParam int output "
-            "as "
-            "select @ioParam = @ioParam * @ioParam"
-            , now;
+		session() << "create procedure " + nm + " "
+			"@ioParam int output "
+			"as "
+			"select @ioParam = @ioParam * @ioParam"
+			, now;
 
-        i = 2;
-        session() << "{ call storedProcedure(?) }", io(i), now;
-        dropObject("procedure", "storedProcedure");
-        assert(4 == i);
+		i = 2;
+		session() << "{ call " << nm << "(?) }", io(i), now;
+		dropObject("procedure", nm);
+		assert(4 == i);
 
-        session() << "create procedure storedProcedure "
-            "@inParam varchar(1000), @outParam varchar(1000) output "
-            "as "
-            "select @outParam = @inParam"
-            , now;
+		session() << "create procedure " + nm + " "
+			"@inParam varchar(1000), @outParam varchar(1000) output "
+			"as "
+			"select @outParam = @inParam"
+			, now;
 
-        std::string inParam =
-            "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
-            "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
-            "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
-            "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
-            "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
-            "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
-            "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
-            "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
-            "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
-        std::string outParam;
-        session() << "{ call storedProcedure(?,?) }", in(inParam), out(outParam), now;
-        dropObject("procedure", "storedProcedure");
-        assert(inParam == outParam);
+		std::string inParam =
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+		std::string outParam;
+		session() << "{ call " << nm << "(?,?) }", in(inParam), out(outParam), now;
+		dropObject("procedure", nm);
+		assert(inParam == outParam);
 
-        k += 2;
-    }
+		k += 2;
+  }
 }
 
 void SybaseODBC::testStoredProcedureDynamicAny()
 {
-    dropObject("procedure", "storedProcedure");
+	const std::string nm(ExecUtil::stored_proc());
+	dropObject("procedure", nm);
 
-    for (int k = 0; k < 8;)
-    {
-        session().setFeature("autoBind", bindValue(k));
+	for (int k = 0; k < 8;)
+	{
+		session().setFeature("autoBind", bindValue(k));
 
-        DynamicAny i = 2;
-        DynamicAny j = 0;
+		DynamicAny i = 2;
+		DynamicAny j = 0;
 
-        session() << "create procedure storedProcedure "
-            "@inParam int, @outParam int output "
-            "as "
-            "select @outParam = @inParam * @inParam"
-            , now;
+		session() << "create procedure " << nm << " "
+			"@inParam int, @outParam int output "
+			"as "
+			"select @outParam = @inParam * @inParam"
+			, now;
 
-        session() << "{ call storedProcedure(?, ?) }", in(i), out(j), now;
-        dropObject("procedure", "storedProcedure");
-        assert(4 == j);
+		session() << "{ call " << nm << "(?, ?) }", in(i), out(j), now;
+		dropObject("procedure", nm);
+		assert(4 == j);
 
-        session() << "create procedure storedProcedure @outParam int output "
-            "as "
-            "select @outParam = @outParam * @outParam"
-            , now;
+		session() << "create procedure " << nm << " @outParam int output "
+			"as "
+			"select @outParam = @outParam * @outParam"
+			, now;
 
-        i = 2;
-        session() << "{ call storedProcedure(?) }", io(i), now;
-        dropObject("procedure", "storedProcedure");
-        assert(4 == i);
+		i = 2;
+		session() << "{ call " << nm << "(?) }", io(i), now;
+		dropObject("procedure", nm);
+		assert(4 == i);
 
-        k += 2;
-    }
+		k += 2;
+	}
 }
 
 void SybaseODBC::testStoredProcedureAny()
 {
-    dropObject("procedure", "storedProcedure");
+	const std::string nm(ExecUtil::stored_proc());
+	dropObject("procedure", nm);
 
-    for (int k = 0; k < 8;)
-    {
-        session().setFeature("autoBind", bindValue(k));
-        session().setFeature("autoExtract", bindValue(k + 1));
+	for (int k = 0; k < 8;)
+	{
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k + 1));
 
-        Any i = 2;
-        Any j = 0;
+		Any i = 2;
+		Any j = 0;
 
-        session() << "create procedure storedProcedure "
-            "@inParam int, @outParam int output "
-            "as "
-            "select @outParam = @inParam * @inParam"
-            , now;
+		session() << "create procedure " << nm << " "
+			"@inParam int, @outParam int output "
+			"as "
+			"select @outParam = @inParam * @inParam"
+			, now;
 
-        session() << "{ call storedProcedure(?, ?) }", in(i), out(j), now;
+		session() << "{ call " << nm << "(?, ?) }", in(i), out(j), now;
 
-        dropObject("procedure", "storedProcedure");
-        assert(4 == AnyCast<int>(j));
+		dropObject("procedure", nm);
+		assert(4 == AnyCast<int>(j));
 
-        session() << "create procedure storedProcedure @outParam int output "
-            "as "
-            "select @outParam = @outParam * @outParam"
-            , now;
+		session() << "create procedure " << nm << " @outParam int output "
+			"as "
+			"select @outParam = @outParam * @outParam"
+			, now;
 
-        i = 2;
-        session() << "{ call storedProcedure(?) }", io(i), now;
-        dropObject("procedure", "storedProcedure");
-        assert(4 == AnyCast<int>(i));
+		i = 2;
+		session() << "{ call " << nm << "(?) }", io(i), now;
+		dropObject("procedure", nm);
+		assert(4 == AnyCast<int>(i));
 
-        k += 2;
-    }
+		k += 2;
+	}
 }
 
 
@@ -454,83 +457,6 @@ void SybaseODBC::testTransaction()
         i += 2;
     }
 }
-
-#if 0
-void SybaseODBC::testMultipleResults()
-{
-    typedef Tuple<std::string, std::string, std::string, Poco::UInt32> Person;
-    struct ReadPerson {
-        static Person rd(Poco::Data::RecordSet& rs, size_t rowNo) {
-            Person pHomer;
-            pHomer.set<0>(rs.value(0, rowNo));
-            pHomer.set<1>(rs.value(1, rowNo));
-            pHomer.set<2>(rs.value(2, rowNo));
-            pHomer.set<3>(rs.value(3, rowNo));
-            return pHomer;
-        }
-    };
-
-    for (int i = 0; i < 8;)
-    {
-        //recreatePersonTable();
-        session().setFeature("autoBind", bindValue(i));
-        session().setFeature("autoExtract", false || bindValue(i + 1));
-        std::string sql = "SELECT * FROM Person WHERE Age = ? ;"
-            "SELECT Age FROM Person WHERE FirstName = ? ;"
-            "SELECT * FROM Person WHERE Age = ? OR Age = ? ORDER BY Age"
-            ;
-
-        std::vector<Person> people;
-        auto const Homer = Person("Simpson", "Homer", "Springfield", 42);
-        const int BartAge = 10;
-        const int HomerAge = 42;
-        const int LisaAge = 8;
-        people.push_back(Homer);
-        people.push_back(Person("Simpson", "Marge", "Springfield", 38));
-        auto const BartName = std::string("Bart");
-        people.push_back(Person("Simpson", BartName, "Springfield", BartAge));
-        auto const Lisa = Person("Simpson", "Lisa", "Springfield", LisaAge);
-        people.push_back(Lisa);
-        people.push_back(Person("Simpson", "Maggie", "Springfield", 3));
-        //session() << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
-
-        Poco::Data::Statement stmt(session());
-        stmt << sql, useRef(HomerAge), useRef(BartName), useRef(LisaAge), useRef(HomerAge);
-
-        stmt.execute();
-        assert(3 == stmt.dataSetCount());
-        stmt.firstDataSet();
-        auto vals = std::vector<Poco::Dynamic::Var>();
-        vals.push_back(Poco::Dynamic::Var(Homer));
-        vals.push_back(Poco::Dynamic::Var(BartAge));
-        vals.push_back(Poco::Dynamic::Var(Lisa));
-        vals.push_back(Poco::Dynamic::Var(Homer));
-
-        auto valIt = vals.cbegin();
-        for (size_t dsNo = 0; dsNo < stmt.dataSetCount(); dsNo = stmt.nextDataSet())
-        {
-            Poco::Data::RecordSet rs(stmt);
-            bool r = rs.moveFirst();
-            for (size_t rowNo = 0; r; ++rowNo, r = rs.moveNext(), ++valIt) {
-
-                if (valIt->type() == typeid(Person)) {
-                    auto p = ReadPerson::rd(rs, rowNo);
-                    assert(p == valIt->extract<Person>());
-                }
-                else {
-                    auto val = rs.value(0, rowNo);
-                    assert(*valIt == val);
-                }
-            }
-            if (!stmt.hasMoreDataSets())
-                break;
-        }
-        assert(vals.cend() == valIt);
-
-        i += 2;
-    }
-}
-#endif
 
 /*static*/
 CppUnit::Test* SybaseODBC::suite()
@@ -613,7 +539,7 @@ CppUnit::Test* SybaseODBC::suite()
         CppUnit_addTest(pSuite, SybaseODBC, testDynamicAny);
         CppUnit_addTest(pSuite, SybaseODBC, testMultipleResults);
         CppUnit_addTest(pSuite, SybaseODBC, testMultipleResultsNoProj);
-        CppUnit_addTest(pSuite, SybaseODBC, testSQLChannel);
+        CppUnit_addTest(pSuite, SybaseODBC, testSQLChannel); // this test may suffer from race conditions
         CppUnit_addTest(pSuite, SybaseODBC, testSQLLogger);
         CppUnit_addTest(pSuite, SybaseODBC, testSessionTransaction);
         CppUnit_addTest(pSuite, SybaseODBC, testTransaction);
