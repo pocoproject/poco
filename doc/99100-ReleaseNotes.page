@@ -1,6 +1,71 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.6.0
+
+!!Summary of Changes
+
+  - fixed GH #625: MongoDB ensureIndex double insert?
+  - fixed GH #622: Crypto: RSATest::testSign() should verify with public key only
+  - fixed GH #620: Data documentation sample code outdated  
+  - fixed GH #618: OS X 10.10 defines PAGE_SIZE macro, conflicts with PAGE_SIZE in Thread_POSIX.cpp
+  - fixed GH #616: Visual Studio warning C4244
+  - fixed GH #612: OpenSSLInitializer calls OPENSSL_config but not CONF_modules_free
+  - fixed GH #608: (Parallel)SocketAcceptor ctor/dtor call virtual functions  
+  - fixed GH #607: Idle Reactor high CPU usage
+  - fixed GH #606: HTMLForm constructor read application/x-www-form-urlencoded UTF-8 request 
+    body first parameter with BOM in name
+  - fixed GH #596: For OpenSSL 1.0.1, include openssl/crypto.h not openssl/fips.h
+  - fixed GH #592: Incorrect format string in Poco::Dynamic::Struct
+  - fixed GH #590: Poco::Data::SQlite doesn't support URI filenames
+  - fixed GH #564: URI::encode
+  - fixed GH #560: DateTime class calculates a wrong day
+  - fixed GH #549: Memory allocation is not safe between fork() and execve()
+  - fixed GH #500: SSLManager causes a crash
+  - fixed GH #490: 2 byte frame with payload length of 0 throws "Incomplete Frame Received" exception
+  - fixed GH #483: multiple cases for sqlite_busy
+  - fixed GH #482: Poco::JSON::Stringifier::stringify bad behaviour
+  - fixed GH #478: HTTPCredentials not according to HTTP spec
+  - fixed GH #471: vs2010 release builds have optimization disabled ?  
+  - fixed GH #468: HTTPClientSession/HTTPResponse not forwarding exceptions
+  - fixed GH #438: Poco::File::setLastModified() doesn't work 
+  - fixed GH #402: StreamSocket::receiveBytes(FIFOBuffer&) and sendBytes(FIFOBuffer&) are 
+    not thread safe
+  - fixed GH #345: Linker warning LNK4221 in Foundation for SignalHandler.obj, String.obj 
+    and ByteOrder.obj
+  - fixed GH #331: Poco::Zip does not support files with ".." in the name.
+  - fixed GH #318: Logger local time doesn't automatically account for DST
+  - fixed GH #294: Poco::Net::TCPServerParams::setMaxThreads(int count) will not accept count == 0.
+  - fixed GH #215: develop WinCE build broken
+  - fixed GH #63: Net::NameValueCollection::size() returns int  
+  - Poco::Logger: formatting methods now support up to 10 arguments.
+  - added Poco::Timestamp::raw()
+  - Poco::DeflatingOutputStream and Poco::InflatingOutputStreams also flush underlying stream
+    on flush()/sync().
+  - Poco::Util::Timer: prevent re-schedule of cancelled TimerTask
+  - enabled WinRegistryKey and WinRegistryConfiguration for WinCE
+  - Poco::BasicEvent improvements and preparations for future support of lambdas/std::function
+  - upgraded bundled sqlite to 3.8.7.2
+  - Poco::Thread: added support for starting functors/lambdas
+  - Poco::Net::HTTPClientSession: added support for global proxy configuration
+  - added support for OAuth 1.0/2.0 via Poco::Net::OAuth10Credentials and 
+    Poco::Net::OAuth20Credentials classes.
+  - Poco::Net::IPAddress: fixed IPv6 prefix handling issue on Windows
+  - added Poco::Timestamp::TIMEVAL_MIN and Poco::Timestamp::TIMEVAL_MAX
+  - added Poco::Clock::CLOCKVAL_MIN and Poco::Clock::CLOCKVAL_MAX
+  - added poco_assert_msg() and poco_assert_msg_dbg() macros
+  - Poco::Net::Context: fixed a memory leak if the CA file was not found while creating the 
+    Context object (the underlying OpenSSL context would leak)
+  - Poco::URI: added new constructor to create URI from Path
+  - Various documentation and style fixes
+
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - Compiling POCO on Windows without #define POCO_WIN32_UTF8 is deprecated and will
+    lead to diagnostic messages while compiling.
+
+
 !!!Release 1.5.4
 
 !!Summary of Changes
