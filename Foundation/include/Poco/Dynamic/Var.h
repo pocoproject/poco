@@ -105,6 +105,22 @@ public:
 	Var(const Var& other);
 		/// Copy constructor.
 
+#if __cplusplus >= 201103L
+	Var(Var&& val) nothrow
+		/// Creates the Var from the given rvalue.
+		: _pHolder(std::move(val._pHolder))
+	{
+		val._pHolder = nullptr;
+	}
+
+	Var& operator = (Var&& other)
+	{
+		_pHolder = std::move(other._pHolder);
+		other._pHolder = nullptr;
+		return *this;
+	}
+#endif
+
 	~Var();
 		/// Destroys the Var.
 
