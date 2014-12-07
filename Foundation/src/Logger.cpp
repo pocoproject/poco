@@ -19,6 +19,7 @@
 #include "Poco/LoggingRegistry.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
 #include "Poco/String.h"
 
 
@@ -432,7 +433,18 @@ int Logger::parseLevel(const std::string& level)
 	else if (icompare(level, "trace") == 0)
 		return Message::PRIO_TRACE;
 	else
-		throw InvalidArgumentException("Not a valid log level", level);
+	{
+		int numLevel;
+		if (Poco::NumberParser::tryParse(level, numLevel))
+		{
+			if (numLevel > 0 && numLevel < 9)
+				return numLevel;
+			else
+				throw InvalidArgumentException("Log level out of range ", level);
+		}
+		else
+			throw InvalidArgumentException("Not a valid log level", level);
+	}
 }
 
 
