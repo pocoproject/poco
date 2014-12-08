@@ -86,6 +86,11 @@ public:
 	Var();
 		/// Creates an empty Var.
 
+	explicit Var(VarHolder* ptr)
+	{
+		_pHolder = ptr;
+	}
+	
 	template <typename T> 
 	Var(const T& val)
 		/// Creates the Var from the given value.

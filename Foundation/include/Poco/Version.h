@@ -37,4 +37,10 @@
 #define POCO_VERSION 0x010600D1
 
 
+//
+// Monotonically incremented for any API change/addition
+//
+#define POCO_API_VERSION    4
+
+
 #endif // Foundation_Version_INCLUDED
