@@ -77,6 +77,8 @@ class Foundation_API Var
 	/// 
 	/// A Var can be created from and converted to a value of any type for which a specialization of 
 	/// VarHolderImpl is available. For supported types, see VarHolder documentation.
+	///
+	/// Class is Movable and supports r-value constructor.
 {
 public:
 	typedef SharedPtr<Var>             Ptr;
@@ -106,19 +108,11 @@ public:
 		/// Copy constructor.
 
 #if __cplusplus >= 201103L
-	Var(Var&& val) nothrow
+	Var(Var&& val) noexcept;
 		/// Creates the Var from the given rvalue.
-		: _pHolder(std::move(val._pHolder))
-	{
-		val._pHolder = nullptr;
-	}
 
-	Var& operator = (Var&& other)
-	{
-		_pHolder = std::move(other._pHolder);
-		other._pHolder = nullptr;
-		return *this;
-	}
+	Var& operator = (Var&& other);
+		/// Move assignment operator.
 #endif
 
 	~Var();
