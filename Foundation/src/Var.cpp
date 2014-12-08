@@ -68,7 +68,7 @@ Var::Var(Var&& val) noexcept
 }
 
 
-Var& Var::operator = (Var&& other)
+Var& Var::operator = (Var&& other) noexcept
 {
 	_pHolder = std::move(other._pHolder);
 	other._pHolder = nullptr;

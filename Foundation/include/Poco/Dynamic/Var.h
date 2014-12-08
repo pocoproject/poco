@@ -111,7 +111,7 @@ public:
 	Var(Var&& val) noexcept;
 		/// Creates the Var from the given rvalue.
 
-	Var& operator = (Var&& other);
+	Var& operator = (Var&& other) noexcept;
 		/// Move assignment operator.
 #endif
 
