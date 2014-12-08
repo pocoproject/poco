@@ -108,6 +108,36 @@ public:
 		return *this;
 	}
 
+#if __cplusplus >= 201103L
+	Buffer(Buffer&& other) noexcept :
+		/// Copy constructor.
+		_capacity(other._capacity),
+		_used(other._used),
+		_ptr(other._ptr),
+		_ownMem(other._ownMem) 
+	{
+		other._ownMem = false;
+		other._ptr = nullptr;
+	}
+
+	Buffer& operator =(Buffer&& other) noexcept
+		/// Assignment operator.
+	{
+		if (this != &other)
+		{
+			_capacity = other._capacity;
+			_used = other._used;
+			_ptr = other._ptr;
+			_ownMem = other._ownMem;
+
+			other._ownMem = false;
+			other._ptr = nullptr;
+		}
+
+		return *this;
+	}
+#endif
+
 	~Buffer()
 		/// Destroys the Buffer.
 	{
