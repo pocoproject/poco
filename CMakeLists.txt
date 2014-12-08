@@ -83,7 +83,7 @@ option(ENABLE_DATA_MYSQL "Enable Data MySQL" ON)
 option(ENABLE_DATA_ODBC "Enable Data ODBC" ON)
 option(ENABLE_SEVENZIP "Enable SevenZip" ON)
 option(ENABLE_ZIP "Enable Zip" ON)
-option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
+option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
 
 option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
 
@@ -117,9 +117,22 @@ endif ()
 if (POCO_UNBUNDLED)
   add_definitions( -DPOCO_UNBUNDLED)
   message(STATUS "Build with using external sqlite, libz, pcre, expat ...")
-else ()
-  message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
-endif ()
+ELSE ()
+ENDIF ()
+
+# Set local include path
+include_directories( 
+    CppUnit/include CppUnit/WinTestRunner/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include Data/MySQL/include Data/SQLite/include Data/ODBC/include Zip/include Crypto/include Web/include JSON/include MongoDB/include PDF/include SevenZip/include
+    
+    CppParser/include
+    CodeGeneration/include
+    XSD/Parser/include
+    XSD/Types/include
+    RemotingNG/include
+    RemotingNG/SOAP/include
+    RemotingNG/TCP/include
+    RemotingNG/JSONRPC/include
+    )
 
 include(CheckTypeSize)
 find_package(Cygwin)
@@ -165,6 +178,13 @@ if (IOS)
   add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_STAT64 -DPOCO_NO_SHAREDLIBS -DPOCO_NO_NET_IFTYPES )
 endif(IOS)
 
+#IF (POCO_ENABLE_CPP11)
+    IF ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "4.7.2")
+        SET ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
+        message(STATUS "Enabling C++11 standard by default")
+    ENDIF()
+#ENDIF()
+
 #Android
 if (ANDROID)
   add_definitions( -DPOCO_ANDROID -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SHAREDMEMORY )
@@ -204,6 +224,19 @@ add_subdirectory(Net)
 list(APPEND Poco_COMPONENTS "Net")
 endif()
 
+add_subdirectory(CppParser)
+
+IF (REMOTING)
+    add_subdirectory(CodeGeneration)
+    add_subdirectory(XSD/Parser)
+    add_subdirectory(XSD/Types)
+    add_subdirectory(XSD/CodeGen)
+    add_subdirectory(RemotingNG)
+    add_subdirectory(RemotingNG/SOAP)
+    add_subdirectory(RemotingNG/TCP)
+    add_subdirectory(RemotingNG/JSONRPC)
+    add_subdirectory(RemotingNG/RemoteGen)
+ENDIF (REMOTING)
 
 #NetSSL
 

@@ -25,6 +25,14 @@
 #include <algorithm>
 
 
+#ifndef POCO_PTR_CHECKING
+	#ifdef _DEBUG
+		#define POCO_PTR_CHECKING 0
+	#else
+		#define POCO_PTR_CHECKING 1
+	#endif
+#endif
+
 namespace Poco {
 
 
@@ -80,6 +88,13 @@ public:
 	{
 		if (_ptr) _ptr->duplicate();
 	}
+
+#if __cplusplus >= 201103L
+	AutoPtr(AutoPtr&& ptr): _ptr(std::move(ptr._ptr))
+	{
+		ptr._ptr = nullptr;
+	}
+#endif
 
 	template <class Other> 
 	AutoPtr(const AutoPtr<Other>& ptr): _ptr(const_cast<Other*>(ptr.get()))
@@ -152,6 +167,15 @@ public:
 		return assign<Other>(ptr);
 	}
 
+#if __cplusplus >= 201103L
+	AutoPtr& operator = (AutoPtr&& ptr)
+	{
+		swap(ptr);
+		return *this;
+
+	}
+#endif
+
 	void swap(AutoPtr& ptr)
 	{
 		std::swap(_ptr, ptr._ptr);
@@ -182,36 +206,52 @@ public:
 		return AutoPtr<Other>(pOther, true);
 	}
 
-	C* operator -> ()
+	inline C* operator -> ()
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return _ptr;
 		else
 			throw NullPointerException();
+#else
+		return _ptr;
+#endif
 	}
 
-	const C* operator -> () const
+	inline const C* operator -> () const
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return _ptr;
 		else
 			throw NullPointerException();
+#else
+		return _ptr;
+#endif
 	}
 
-	C& operator * ()
+	inline C& operator * ()
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return *_ptr;
 		else
 			throw NullPointerException();
+#else
+		return *_ptr;
+#endif
 	}
 
-	const C& operator * () const
+	inline const C& operator * () const
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return *_ptr;
 		else
 			throw NullPointerException();
+#else
+		return *_ptr;
+#endif
 	}
 
 	C* get()
