@@ -40,7 +40,7 @@ class ReferenceCounter
 	/// Simple ReferenceCounter object, does not delete itself when count reaches 0.
 {
 public:
-	ReferenceCounter(): _cnt(1)
+	ReferenceCounter() : _cnt(1)
 	{
 	}
 
@@ -149,7 +149,7 @@ public:
 	}
 
 #if __cplusplus >= 201103L
-	SharedPtr(SharedPtr&& ptr): _pCounter(std::move(ptr._pCounter)), _ptr(std::move(ptr._ptr))
+	SharedPtr(SharedPtr&& ptr) noexcept : _pCounter(std::move(ptr._pCounter)), _ptr(std::move(ptr._ptr))
 	{
 		ptr._ptr = nullptr;
 		ptr._pCounter = nullptr;
@@ -210,7 +210,7 @@ public:
 	}
 
 #if __cplusplus >= 201103L
-	SharedPtr& operator = (SharedPtr&& ptr)
+	SharedPtr& operator = (SharedPtr&& ptr) noexcept 
 	{
 		swap(ptr);
 		return *this;
@@ -428,17 +428,15 @@ private:
 
 	void release()
 	{
-		if (_pCounter)
+		poco_assert_dbg (_pCounter);
+		int i = _pCounter->release();
+		if (i == 0)
 		{
-			int i = _pCounter->release();
-			if (i == 0)
-			{
-				RP::release(_ptr);
-				_ptr = 0;
+			RP::release(_ptr);
+			_ptr = 0;
 
-				delete _pCounter;
-				_pCounter = 0;
-			}
+			delete _pCounter;
+			_pCounter = 0;
 		}
 	}
 
