@@ -13,6 +13,8 @@
 *.la
 *.a
 *.d
+*.vsp
+*.psess
 
 # Make #
 ########
