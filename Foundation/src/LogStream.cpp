@@ -47,9 +47,12 @@ int LogStreamBuf::writeToDevice(char c)
 {
 	if (c == '\n' || c == '\r')
 	{
-		Message msg(_logger.name(), _message, _priority);
-		_message.clear();
-		_logger.log(msg);
+		if (_message.find_first_not_of("\r\n") != std::string::npos)
+		{
+			Message msg(_logger.name(), _message, _priority);
+			_message.clear();
+			_logger.log(msg);
+		}
 	}
 	else _message += c;
 	return c;
