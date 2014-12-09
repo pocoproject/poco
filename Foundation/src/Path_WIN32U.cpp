@@ -65,14 +65,16 @@ std::string PathImpl::systemImpl()
 std::string PathImpl::homeImpl()
 {
 	std::string result;
-	
-	// windows service has no home dir, return system directory instead
-	try
+	if (EnvironmentImpl::hasImpl("HOMEDRIVE") && EnvironmentImpl::hasImpl("HOMEPATH"))
 	{
 		result = EnvironmentImpl::getImpl("HOMEDRIVE");
 		result.append(EnvironmentImpl::getImpl("HOMEPATH"));
 	}
-	catch (NotFoundException&) 
+	else if (EnvironmentImpl::hasImpl("USERPROFILE"))
+	{
+		result = EnvironmentImpl::getImpl("USERPROFILE");
+	}
+	else
 	{
 		result = systemImpl();
 	}
