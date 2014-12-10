@@ -90,7 +90,7 @@ public:
 	}
 
 #if __cplusplus >= 201103L
-	AutoPtr(AutoPtr&& ptr): _ptr(std::move(ptr._ptr))
+	AutoPtr(AutoPtr&& ptr) noexcept : _ptr(std::move(ptr._ptr))
 	{
 		ptr._ptr = nullptr;
 	}
@@ -168,7 +168,7 @@ public:
 	}
 
 #if __cplusplus >= 201103L
-	AutoPtr& operator = (AutoPtr&& ptr)
+	AutoPtr& operator = (AutoPtr&& ptr) noexcept
 	{
 		swap(ptr);
 		return *this;
@@ -176,7 +176,7 @@ public:
 	}
 #endif
 
-	void swap(AutoPtr& ptr)
+	inline void swap(AutoPtr& ptr)
 	{
 		std::swap(_ptr, ptr._ptr);
 	}
@@ -254,128 +254,128 @@ public:
 #endif
 	}
 
-	C* get()
+	inline C* get()
 	{
 		return _ptr;
 	}
 
-	const C* get() const
+	inline const C* get() const
 	{
 		return _ptr;
 	}
 
-	operator C* ()
+	inline operator C* ()
 	{
 		return _ptr;
 	}
 	
-	operator const C* () const
+	inline operator const C* () const
 	{
 		return _ptr;
 	}
 	
-	bool operator ! () const
+	inline bool operator ! () const
 	{
 		return _ptr == 0;
 	}
 
-	bool isNull() const
+	inline bool isNull() const
 	{
 		return _ptr == 0;
 	}
 	
-	C* duplicate()
+	inline C* duplicate()
 	{
 		if (_ptr) _ptr->duplicate();
 		return _ptr;
 	}
 
-	bool operator == (const AutoPtr& ptr) const
+	inline bool operator == (const AutoPtr& ptr) const
 	{
 		return _ptr == ptr._ptr;
 	}
 
-	bool operator == (const C* ptr) const
+	inline bool operator == (const C* ptr) const
 	{
 		return _ptr == ptr;
 	}
 
-	bool operator == (C* ptr) const
+	inline bool operator == (C* ptr) const
 	{
 		return _ptr == ptr;
 	}
 
-	bool operator != (const AutoPtr& ptr) const
+	inline bool operator != (const AutoPtr& ptr) const
 	{
 		return _ptr != ptr._ptr;
 	}
 
-	bool operator != (const C* ptr) const
+	inline bool operator != (const C* ptr) const
 	{
 		return _ptr != ptr;
 	}
 
-	bool operator != (C* ptr) const
+	inline bool operator != (C* ptr) const
 	{
 		return _ptr != ptr;
 	}
 
-	bool operator < (const AutoPtr& ptr) const
+	inline bool operator < (const AutoPtr& ptr) const
 	{
 		return _ptr < ptr._ptr;
 	}
 
-	bool operator < (const C* ptr) const
+	inline bool operator < (const C* ptr) const
 	{
 		return _ptr < ptr;
 	}
 
-	bool operator < (C* ptr) const
+	inline bool operator < (C* ptr) const
 	{
 		return _ptr < ptr;
 	}
 
-	bool operator <= (const AutoPtr& ptr) const
+	inline bool operator <= (const AutoPtr& ptr) const
 	{
 		return _ptr <= ptr._ptr;
 	}
 
-	bool operator <= (const C* ptr) const
+	inline bool operator <= (const C* ptr) const
 	{
 		return _ptr <= ptr;
 	}
 
-	bool operator <= (C* ptr) const
+	inline bool operator <= (C* ptr) const
 	{
 		return _ptr <= ptr;
 	}
 
-	bool operator > (const AutoPtr& ptr) const
+	inline bool operator > (const AutoPtr& ptr) const
 	{
 		return _ptr > ptr._ptr;
 	}
 
-	bool operator > (const C* ptr) const
+	inline bool operator > (const C* ptr) const
 	{
 		return _ptr > ptr;
 	}
 
-	bool operator > (C* ptr) const
+	inline bool operator > (C* ptr) const
 	{
 		return _ptr > ptr;
 	}
 
-	bool operator >= (const AutoPtr& ptr) const
+	inline bool operator >= (const AutoPtr& ptr) const
 	{
 		return _ptr >= ptr._ptr;
 	}
 
-	bool operator >= (const C* ptr) const
+	inline bool operator >= (const C* ptr) const
 	{
 		return _ptr >= ptr;
 	}
 
-	bool operator >= (C* ptr) const
+	inline bool operator >= (C* ptr) const
 	{
 		return _ptr >= ptr;
 	}
