@@ -20,7 +20,7 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
     src/WinDriver.cpp
 )
 
-POCO_SOURCES_PLAT( TEST_SRCS FoundationTest WINCE
+POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
     src/WinCEDriver.cpp
 )
 
@@ -38,11 +38,15 @@ add_custom_command(TARGET ${TESTUNIT} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data )
 
 # TestApp
+if(WINCE)
+add_executable( TestApp src/TestApp_WINCE.cpp )
+set_target_properties(TestApp PROPERTIES LINK_FLAGS "/ENTRY:wmainCRTStartup")
+else()
 add_executable( TestApp src/TestApp.cpp )
+endif()
 # The test is run in the runtime directory. So the TestApp is built there too because it is used by the tests
 set_target_properties( TestApp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
 target_link_libraries( TestApp PocoFoundation )
-# TODO: Add TestApp_WINCE
 
 if(NOT POCO_STATIC)
 # TestLibrary
