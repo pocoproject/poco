@@ -15,7 +15,8 @@ POCO_SOURCES_AUTO( TEST_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h" )
 POCO_HEADERS_AUTO( TEST_SRCS ${HDRS_G})
 
-POCO_SOURCES_AUTO_PLAT( TEST_SRCS WIN32
+# WinDriver depends on WinTestRunner which depends on MFC, and we don't want that
+POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
     src/WinDriver.cpp
 )
 
@@ -26,14 +27,11 @@ POCO_SOURCES_PLAT( TEST_SRCS FoundationTest WINCE
 add_executable( ${TESTUNIT} ${TEST_SRCS} )
 add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND ${TESTUNIT} -all)
 set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=.") # The SharedLibaryTest has to look for shared libraries in the working directory
-#set_target_properties( ${TESTUNIT} PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} )
+
 target_link_libraries( ${TESTUNIT} PocoFoundation CppUnit )
-if( WIN32)
-    add_definitions("-D_AFXDLL")
-    target_link_libraries( ${TESTUNIT} WinTestRunner)
-else()
+if(UNIX)
     target_link_libraries( ${TESTUNIT} pthread)
-endif(WIN32)
+endif(UNIX)
 
 # The test is run in the runtime directory. So the test data is copied there too
 add_custom_command(TARGET ${TESTUNIT} POST_BUILD
