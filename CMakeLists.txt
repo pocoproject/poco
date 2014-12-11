@@ -85,6 +85,7 @@ option(ENABLE_SEVENZIP "Enable SevenZip" ON)
 option(ENABLE_ZIP "Enable Zip" ON)
 option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
 option(ENABLE_CPPPARSER "Enable C++ parser" ON)
+option(ENABLE_POCODOC "Enable Poco Documentation Generator" ON)
 
 option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
 
@@ -253,6 +254,11 @@ endif(APRUTIL_FOUND AND APACHE_FOUND)
 if(ENABLE_CPPPARSER)
 add_subdirectory(CppParser)
 list(APPEND Poco_COMPONENTS "CppParser")
+endif()
+
+if(ENABLE_POCODOC)
+add_subdirectory(PocoDoc)
+list(APPEND Poco_COMPONENTS "PocoDoc")
 endif()
 
 #############################################################
