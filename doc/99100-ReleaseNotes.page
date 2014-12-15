@@ -58,6 +58,7 @@ AAAIntroduction
     Context object (the underlying OpenSSL context would leak)
   - Poco::URI: added new constructor to create URI from Path
   - Various documentation and style fixes
+  - Removed support (project/solution files) for Visual Studio.NET 2003 and Visual Studio 2005.
 
 
 !!Incompatible Changes and Possible Transition Issues
