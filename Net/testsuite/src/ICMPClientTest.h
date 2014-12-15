@@ -29,6 +29,7 @@ public:
 	~ICMPClientTest();
 
 	void testPing();
+	void testPingNonRaw();
 
 	void setUp();
 	void tearDown();
