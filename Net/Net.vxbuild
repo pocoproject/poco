@@ -47,6 +47,7 @@ SOURCES="
 	HTTPStreamFactory.cpp
 	HostEntry.cpp
 	ICMPClient.cpp
+	ICMPClientRaw.cpp
 	ICMPEventArgs.cpp
 	ICMPPacket.cpp
 	ICMPPacketImpl.cpp

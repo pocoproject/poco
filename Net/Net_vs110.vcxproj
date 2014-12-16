@@ -368,6 +368,8 @@
     <ClInclude Include="include\Poco\Net\POP3ClientSession.h"/>
     <ClInclude Include="include\Poco\Net\SMTPClientSession.h"/>
     <ClInclude Include="include\Poco\Net\ICMPClient.h"/>
+    <ClInclude Include="include\Poco\Net\ICMPClientImpl.h"/>
+    <ClInclude Include="include\Poco\Net\ICMPClientRaw.h"/>
     <ClInclude Include="include\Poco\Net\ICMPEventArgs.h"/>
     <ClInclude Include="include\Poco\Net\ICMPPacket.h"/>
     <ClInclude Include="include\Poco\Net\ICMPPacketImpl.h"/>
@@ -469,6 +471,7 @@
     <ClCompile Include="src\POP3ClientSession.cpp"/>
     <ClCompile Include="src\SMTPClientSession.cpp"/>
     <ClCompile Include="src\ICMPClient.cpp"/>
+    <ClCompile Include="src\ICMPClientRaw.cpp"/>
     <ClCompile Include="src\ICMPEventArgs.cpp"/>
     <ClCompile Include="src\ICMPPacket.cpp"/>
     <ClCompile Include="src\ICMPPacketImpl.cpp"/>

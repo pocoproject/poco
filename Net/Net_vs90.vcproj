@@ -834,6 +834,10 @@
 				<File
 					RelativePath=".\include\Poco\Net\ICMPClient.h"/>
 				<File
+					RelativePath=".\include\Poco\Net\ICMPClientImpl.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPClientRaw.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\ICMPEventArgs.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\ICMPPacket.h"/>
@@ -850,6 +854,8 @@
 				Name="Source Files">
 				<File
 					RelativePath=".\src\ICMPClient.cpp"/>
+				<File
+					RelativePath=".\src\ICMPClientRaw.cpp"/>
 				<File
 					RelativePath=".\src\ICMPEventArgs.cpp"/>
 				<File
