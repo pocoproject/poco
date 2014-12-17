@@ -63,8 +63,6 @@ Poco::Mutex Utility::_mutex;
 
 Utility::Utility()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
-
 	if (_types.empty())
 	{
 		_types.insert(TypeMap::value_type("", MetaColumn::FDT_STRING));
@@ -135,7 +133,11 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 {
 	poco_assert_dbg (pStmt);
 
-	static Utility u;
+	// Ensure statics are initialized
+	{
+		Poco::Mutex::ScopedLock lock(_mutex);
+		static Utility u;
+	}
 	
 	const char* pc = sqlite3_column_decltype(pStmt, (int) pos);
 	std::string sqliteType = pc ? pc : "";
@@ -312,6 +314,12 @@ void* Utility::eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, 
 {
 	return sqlite3_rollback_hook(pDB, callbackFn, pParam);
 }
+
+
+// NOTE: Utility::dbHandle() has been moved to SessionImpl.cpp,
+// as a workaround for a failing AnyCast with Clang.
+// See <https://github.com/pocoproject/poco/issues/578>
+// for a discussion.
 
 
 } } } // namespace Poco::Data::SQLite

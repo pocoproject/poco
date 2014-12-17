@@ -28,8 +28,11 @@
 #include "Poco/SharedPtr.h"
 
 
-struct sqlite3;
-struct sqlite3_stmt;
+extern "C"
+{
+	typedef struct sqlite3 sqlite3;
+	typedef struct sqlite3_stmt sqlite3_stmt;
+}
 
 
 namespace Poco {
