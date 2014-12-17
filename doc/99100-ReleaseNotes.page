@@ -65,6 +65,8 @@ AAAIntroduction
 
   - Compiling POCO on Windows without #define POCO_WIN32_UTF8 is deprecated and will
     lead to diagnostic messages while compiling.
+  - Support (project and solution files) for MS Visual Studio 2003 and 2005 has been
+    removed; the oldest officially supported VS version is 2008 (MSVC version 9.0).
 
 
 !!!Release 1.5.4
