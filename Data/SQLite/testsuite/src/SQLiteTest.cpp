@@ -295,6 +295,16 @@ void SQLiteTest::testBinding()
 }
 
 
+void SQLiteTest::testZeroRows()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS ZeroTest", now;
+	tmp << "CREATE TABLE IF NOT EXISTS ZeroTest (zt INTEGER(3))", now;
+	Statement stmt = (tmp << "SELECT * FROM ZeroTest");
+	assert(0 == stmt.execute());
+}
+
+
 void SQLiteTest::testSimpleAccess()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -3361,6 +3371,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SQLiteTest");
 
 	CppUnit_addTest(pSuite, SQLiteTest, testBinding);
+	CppUnit_addTest(pSuite, SQLiteTest, testZeroRows);
 	CppUnit_addTest(pSuite, SQLiteTest, testSimpleAccess);
 	CppUnit_addTest(pSuite, SQLiteTest, testInMemory);
 	CppUnit_addTest(pSuite, SQLiteTest, testNullCharPointer);

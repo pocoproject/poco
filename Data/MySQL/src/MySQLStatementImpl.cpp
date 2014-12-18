@@ -42,7 +42,7 @@ std::size_t MySQLStatementImpl::columnsReturned() const
 }
 
 
-std::size_t MySQLStatementImpl::affectedRowCount() const
+int MySQLStatementImpl::affectedRowCount() const
 {
 	return _stmt.getAffectedRowCount();
 }

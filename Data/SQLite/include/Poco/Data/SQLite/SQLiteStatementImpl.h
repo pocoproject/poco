@@ -54,7 +54,7 @@ protected:
 	std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.
 
-	std::size_t affectedRowCount() const;
+	int affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT. 
@@ -113,14 +113,14 @@ private:
 	BinderPtr        _pBinder;
 	ExtractorPtr     _pExtractor;
 	MetaColumnVecVec _columns;
-	std::size_t      _affectedRowCount;
+	int              _affectedRowCount;
 	StrPtr           _pLeftover;
 	BindIt           _bindBegin;
 	bool             _canBind;
 	bool             _isExtracted;
 	bool             _canCompile;
 
-	static const std::size_t POCO_SQLITE_INV_ROW_CNT;
+	static const int POCO_SQLITE_INV_ROW_CNT;
 };
 
 

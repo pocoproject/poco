@@ -32,7 +32,7 @@ namespace Data {
 namespace SQLite {
 
 
-const std::size_t SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = std::numeric_limits<std::size_t>::max();
+const int SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = std::numeric_limits<std::size_t>::max();
 
 
 SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB):
@@ -302,7 +302,7 @@ const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
 }
 
 
-std::size_t SQLiteStatementImpl::affectedRowCount() const
+int SQLiteStatementImpl::affectedRowCount() const
 {
 	if (_affectedRowCount != POCO_SQLITE_INV_ROW_CNT) return _affectedRowCount;
 	return _pStmt == 0 || sqlite3_stmt_readonly(_pStmt) ? 0 : sqlite3_changes(_pDB);
