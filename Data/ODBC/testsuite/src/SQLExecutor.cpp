@@ -107,20 +107,24 @@ using Poco::UTF32String;
 static
 std::string idGen()
 {
-	const std::string host = Poco::Environment::nodeName();
-	if (host.length() > 12) //Sybase has got 32 char length limit
+	std::string host = Poco::Environment::nodeName();
+	if (host.length() > 12) //Sybase has got 30 char length limit
 	{
 	  Poco::Checksum crc;
 	  crc.update(host);
-	  return Poco::format("%s%X", host.substr(0, 4), crc.checksum());
+    host = Poco::format("%s%X", host.substr(0, 4), crc.checksum());
 	}
-	else return host;
+  std::replace(host.begin(), host.end(), '.', '_');
+  std::replace(host.begin(), host.end(), '-', '_');
+	return host;
 }
 
 std::string ExecUtil::mangleTable(const std::string& name)
 {
 	static std::string id = idGen();
-	return "pt_" + name + id;
+  const std::string nm = "pt_" + name + id;
+  poco_assert_dbg(nm.length() <= 30);
+  return nm;
 }
 
 struct Person
