@@ -32,7 +32,7 @@ namespace Data {
 namespace SQLite {
 
 
-const int SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = std::numeric_limits<std::size_t>::max();
+const int SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = -1;
 
 
 SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB):
