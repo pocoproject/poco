@@ -5785,6 +5785,22 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ASN1Codec.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ASN1FactoryDefault.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ASN1.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ASN1Types.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Latin1Encoding.cpp"
 					>
 				</File>
@@ -5858,6 +5874,22 @@
 				>
 				<File
 					RelativePath=".\include\Poco\ASCIIEncoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\ASN1Codec.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\ASN1FactoryDefault.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\ASN1.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\ASN1Types.h"
 					>
 				</File>
 				<File

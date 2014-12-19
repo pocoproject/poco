@@ -31,6 +31,8 @@ objects = \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
 	NTPClient NTPEventArgs NTPPacket \
+	SNMPClient SNMPClientRaw SNMPClientRawFactory SNMPClientRawTypes \
+	SNMPClientTypes SNMPEventArgs SNMPRawEventArgs \
 	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
 	WebSocket WebSocketImpl \
 	OAuth10Credentials OAuth20Credentials

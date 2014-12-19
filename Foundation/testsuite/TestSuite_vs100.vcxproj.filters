@@ -579,6 +579,9 @@
     <ClCompile Include="src\Base32Test.cpp">
       <Filter>Streams\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ASN1Test.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\ListMapTest.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
@@ -984,6 +987,9 @@
       <Filter>Core\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Base32Test.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ASN1Test.h">
       <Filter>Streams\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ListMapTest.h">

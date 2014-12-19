@@ -32,7 +32,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF32Encoding UTF16Encoding UTF8Encoding UTF8String \
 	Unicode UnicodeConverter Windows1250Encoding Windows1251Encoding Windows1252Encoding \
 	UUID UUIDGenerator Void Var VarHolder VarIterator Format Pipe PipeImpl PipeStream SharedMemory \
-	MemoryStream FileStream AtomicCounter 
+	MemoryStream FileStream AtomicCounter ASN1 ASN1Codec ASN1FactoryDefault ASN1Types
 
 zlib_objects = adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil

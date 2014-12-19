@@ -870,6 +870,45 @@
 			</Filter>
 		</Filter>
 		<Filter
+			Name="SNMP">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\include\Poco\Net\SNMPCore.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPClientRaw.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPClientRawTypes.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPClientRawFactory.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPRawEventArgs.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPClient.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPClientTypes.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPEventArgs.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\SNMPClientRaw.cpp"/>
+				<File
+					RelativePath=".\src\SNMPClientRawTypes.cpp"/>
+				<File
+					RelativePath=".\src\SNMPClientRawFactory.cpp"/>
+				<File
+					RelativePath=".\src\SNMPRawEventArgs.cpp"/>
+				<File
+					RelativePath=".\src\SNMPClient.cpp"/>
+				<File
+					RelativePath=".\src\SNMPClientTypes.cpp"/>
+				<File
+					RelativePath=".\src\SNMPEventArgs.cpp"/>
+			</Filter>
+		</Filter>
+		<Filter
 			Name="NTP">
 			<Filter
 				Name="Header Files">

@@ -328,6 +328,8 @@
     <ClInclude Include="src\ICMPClientTest.h"/>
     <ClInclude Include="src\ICMPClientTestSuite.h"/>
     <ClInclude Include="src\ICMPSocketTest.h"/>
+    <ClInclude Include="src\SNMPClientTest.h"/>
+    <ClInclude Include="src\SNMPClientTestSuite.h"/>
     <ClInclude Include="src\IPAddressTest.h"/>
     <ClInclude Include="src\MailMessageTest.h"/>
     <ClInclude Include="src\MailStreamTest.h"/>
@@ -391,6 +393,8 @@
     <ClCompile Include="src\ICMPClientTest.cpp"/>
     <ClCompile Include="src\ICMPClientTestSuite.cpp"/>
     <ClCompile Include="src\ICMPSocketTest.cpp"/>
+    <ClCompile Include="src\SNMPClientTest.cpp"/>
+    <ClCompile Include="src\SNMPClientTestSuite.cpp"/>
     <ClCompile Include="src\IPAddressTest.cpp"/>
     <ClCompile Include="src\MailMessageTest.cpp"/>
     <ClCompile Include="src\MailStreamTest.cpp"/>

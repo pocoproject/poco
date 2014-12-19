@@ -189,6 +189,9 @@
     <ClCompile Include="src\AutoReleasePoolTest.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ASN1Test.cpp">
+      <Filter>Core\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\ByteOrderTest.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
@@ -597,6 +600,9 @@
       <Filter>Core\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\AutoReleasePoolTest.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ASN1Test.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ByteOrderTest.h">

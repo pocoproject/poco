@@ -124,6 +124,15 @@
     <Filter Include="ICMP\Source Files">
       <UniqueIdentifier>{f9da6f89-6d6b-4057-8e28-23079661b4d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SNMP">
+      <UniqueIdentifier>{9cc21a92-1390-4a54-841e-bb694bf794e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP\Header Files">
+      <UniqueIdentifier>{080cffcb-c2cc-4225-baac-6bac79e5c809}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP\Source Files">
+      <UniqueIdentifier>{cbb3f682-d1f7-4f45-a3ee-8eb9983f41e9}</UniqueIdentifier>
+    </Filter>
     <Filter Include="NTP">
       <UniqueIdentifier>{b0548cbb-3338-46ce-8ddc-a178c8bb935e}</UniqueIdentifier>
     </Filter>
@@ -318,6 +327,12 @@
     <ClInclude Include="src\ICMPSocketTest.h">
       <Filter>ICMP\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\SNMPClientTest.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SNMPClientTestSuite.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\NTPClientTest.h">
       <Filter>NTP\Header Files</Filter>
     </ClInclude>
@@ -502,6 +517,12 @@
     </ClCompile>
     <ClCompile Include="src\ICMPSocketTest.cpp">
       <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientTest.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientTestSuite.cpp">
+      <Filter>SNMP\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\NTPClientTest.cpp">
       <Filter>NTP\Source Files</Filter>

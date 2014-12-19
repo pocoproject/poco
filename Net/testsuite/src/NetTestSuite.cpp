@@ -23,6 +23,7 @@
 #include "FTPClientTestSuite.h"
 #include "MailTestSuite.h"
 #include "ICMPClientTestSuite.h"
+#include "SNMPClientTestSuite.h"
 #include "NTPClientTestSuite.h"
 #include "WebSocketTestSuite.h"
 #include "OAuthTestSuite.h"
@@ -45,6 +46,7 @@ CppUnit::Test* NetTestSuite::suite()
 	pSuite->addTest(FTPClientTestSuite::suite());
 	pSuite->addTest(MailTestSuite::suite());
 	pSuite->addTest(ICMPClientTestSuite::suite());
+	pSuite->addTest(SNMPClientTestSuite::suite());
 	pSuite->addTest(NTPClientTestSuite::suite());
 	pSuite->addTest(WebSocketTestSuite::suite());
 	pSuite->addTest(OAuthTestSuite::suite());

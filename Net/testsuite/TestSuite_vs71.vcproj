@@ -737,6 +737,23 @@
 			</Filter>
 		</Filter>
 		<Filter
+			Name="SNMP">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\src\SNMPClientTest.h"/>
+				<File
+					RelativePath=".\src\SNMPClientTestSuite.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\SNMPClientTest.cpp"/>
+				<File
+					RelativePath=".\src\SNMPClientTestSuite.cpp"/>
+			</Filter>
+		</Filter>
+		<Filter
 			Name="NTP">
 			<Filter
 				Name="Header Files">

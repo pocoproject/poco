@@ -293,6 +293,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Ascii.cpp" />
+    <ClCompile Include="src\ASN1Codec.cpp" />
+    <ClCompile Include="src\ASN1FactoryDefault.cpp" />
+    <ClCompile Include="src\ASN1.cpp" />
+    <ClCompile Include="src\ASN1Types.cpp" />
     <ClCompile Include="src\AtomicCounter.cpp" />
     <ClCompile Include="src\Base32Decoder.cpp" />
     <ClCompile Include="src\Base32Encoder.cpp" />
@@ -1013,6 +1017,10 @@
     <ClInclude Include="include\Poco\Any.h" />
     <ClInclude Include="include\Poco\Array.h" />
     <ClInclude Include="include\Poco\Ascii.h" />
+    <ClInclude Include="include\Poco\ASN1Codec.h" />
+    <ClInclude Include="include\Poco\ASN1FactoryDefault.h" />
+    <ClInclude Include="include\Poco\ASN1.h" />
+    <ClInclude Include="include\Poco\ASN1Types.h" />
     <ClInclude Include="include\Poco\AtomicCounter.h" />
     <ClInclude Include="include\Poco\AutoPtr.h" />
     <ClInclude Include="include\Poco\AutoReleasePool.h" />

@@ -51,6 +51,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ifconfig", "ifconfig\ifconf
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SNMP", "SNMP\SNMP_vs71.vcproj", "{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		debug_shared = debug_shared
@@ -217,6 +221,18 @@ Global
 		{BD3A18C6-22B6-3B10-913B-7A84D1845CA3}.debug_static_md.Build.0 = debug_static_md|Win32
 		{BD3A18C6-22B6-3B10-913B-7A84D1845CA3}.release_static_md.ActiveCfg = release_static_md|Win32
 		{BD3A18C6-22B6-3B10-913B-7A84D1845CA3}.release_static_md.Build.0 = release_static_md|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.debug_shared.ActiveCfg = debug_shared|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.debug_shared.Build.0 = debug_shared|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.release_shared.ActiveCfg = release_shared|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.release_shared.Build.0 = release_shared|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.debug_static_mt.ActiveCfg = debug_static_mt|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.debug_static_mt.Build.0 = debug_static_mt|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.release_static_mt.ActiveCfg = release_static_mt|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.release_static_mt.Build.0 = release_static_mt|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.debug_static_md.ActiveCfg = debug_static_md|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.debug_static_md.Build.0 = debug_static_md|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.release_static_md.ActiveCfg = release_static_md|Win32
+		{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}.release_static_md.Build.0 = release_static_md|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

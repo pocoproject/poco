@@ -13,6 +13,7 @@
 #include "StreamsTestSuite.h"
 #include "Base32Test.h"
 #include "Base64Test.h"
+#include "ASN1Test.h"
 #include "HexBinaryTest.h"
 #include "StreamCopierTest.h"
 #include "CountingStreamTest.h"
@@ -33,6 +34,7 @@ CppUnit::Test* StreamsTestSuite::suite()
 
 	pSuite->addTest(Base32Test::suite());
 	pSuite->addTest(Base64Test::suite());
+	pSuite->addTest(ASN1Test::suite());
 	pSuite->addTest(HexBinaryTest::suite());
 	pSuite->addTest(StreamCopierTest::suite());
 	pSuite->addTest(CountingStreamTest::suite());

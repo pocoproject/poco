@@ -78,6 +78,13 @@ SOURCES="
 	SMTPClientSession.cpp
 	ServerSocket.cpp
 	ServerSocketImpl.cpp
+  SNMPClientRaw.cpp
+  SNMPClientRawTypes.cpp
+  SNMPClientRawFactory.cpp
+  SNMPRawEventArgs.cpp
+  SNMPClient.cpp
+  SNMPClientTypes.cpp
+  SNMPEventArgs.cpp
 	Socket.cpp
 	SocketAddress.cpp
 	SocketImpl.cpp

@@ -332,6 +332,7 @@
     <ClCompile Include="src\ArrayTest.cpp" />
     <ClCompile Include="src\AutoPtrTest.cpp" />
     <ClCompile Include="src\AutoReleasePoolTest.cpp" />
+    <ClCompile Include="src\ASN1Test.cpp" />
     <ClCompile Include="src\ByteOrderTest.cpp" />
     <ClCompile Include="src\CoreTest.cpp" />
     <ClCompile Include="src\CoreTestSuite.cpp" />
@@ -470,6 +471,7 @@
     <ClInclude Include="src\ArrayTest.h" />
     <ClInclude Include="src\AutoPtrTest.h" />
     <ClInclude Include="src\AutoReleasePoolTest.h" />
+    <ClInclude Include="src\ASN1Test.h" />
     <ClInclude Include="src\ByteOrderTest.h" />
     <ClInclude Include="src\CoreTest.h" />
     <ClInclude Include="src\CoreTestSuite.h" />

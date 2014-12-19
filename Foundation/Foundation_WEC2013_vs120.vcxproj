@@ -997,6 +997,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\ASCIIEncoding.cpp" />
+    <ClCompile Include="src\ASN1Codec.cpp" />
+    <ClCompile Include="src\ASN1FactoryDefault.cpp" />
+    <ClCompile Include="src\ASN1.cpp" />
+    <ClCompile Include="src\ASN1Types.cpp" />
     <ClCompile Include="src\Latin1Encoding.cpp" />
     <ClCompile Include="src\Latin9Encoding.cpp" />
     <ClCompile Include="src\StreamConverter.cpp" />
@@ -1286,6 +1290,10 @@
     <ClInclude Include="include\Poco\Timestamp.h" />
     <ClInclude Include="include\Poco\Timezone.h" />
     <ClInclude Include="include\Poco\ASCIIEncoding.h" />
+    <ClInclude Include="include\Poco\ASN1Codec.h" />
+    <ClInclude Include="include\Poco\ASN1FactoryDefault.h" />
+    <ClInclude Include="include\Poco\ASN1.h" />
+    <ClInclude Include="include\Poco\ASN1Types.h" />
     <ClInclude Include="include\Poco\Latin1Encoding.h" />
     <ClInclude Include="include\Poco\Latin9Encoding.h" />
     <ClInclude Include="include\Poco\StreamConverter.h" />

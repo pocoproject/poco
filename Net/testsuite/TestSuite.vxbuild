@@ -35,6 +35,8 @@ SOURCES="
 	ICMPClientTest.cpp
 	ICMPClientTestSuite.cpp
 	ICMPSocketTest.cpp
+	SNMPClientTest.cpp
+	SNMPClientTestSuite.cpp
 	IPAddressTest.cpp
 	MailMessageTest.cpp
 	MailStreamTest.cpp
