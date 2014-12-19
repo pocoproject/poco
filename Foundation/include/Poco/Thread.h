@@ -191,8 +191,8 @@ public:
 		/// The trySleep() and wakeUp() calls should be used with 
 		/// understanding that the suspended state is not a true sleep, 
 		/// but rather a state of waiting for an event, with timeout 
-		/// expiration. This makes order of calls significantant; calling 
-		/// wakeUp()  before calling trySleep() will prevent the next  
+		/// expiration. This makes order of calls significant; calling 
+		/// wakeUp() before calling trySleep() will prevent the next  
 		/// trySleep() call to actually suspend the thread (which, in 
 		/// some scenarios, may be desirable behavior).
 
