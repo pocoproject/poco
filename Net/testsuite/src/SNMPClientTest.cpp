@@ -34,7 +34,7 @@ using Poco::AutoPtr;
 
 SNMPClientTest::SNMPClientTest(const std::string& name): 
 	CppUnit::TestCase(name),
-	_SNMPClient()
+	_snmpClient()
 {
 }
 
@@ -46,29 +46,29 @@ SNMPClientTest::~SNMPClientTest()
 
 void SNMPClientTest::testQuery()
 {
-	_SNMPClient.get("localhost", "1.3.6.1.2.1.1.1.0");
+	_snmpClient.get("localhost", "1.3.6.1.2.1.1.1.0");
 
 	// warning: may fail depending on the existence of the addresses at test site
 	// if so, adjust accordingly (i.e. specify non-existent or unreachable IP addresses)
-	_SNMPClient.get("192.168.243.1", "1.3.6.1.2.1.1.1.0");
-	_SNMPClient.get("10.11.12.13", "1.3.6.1.2.1.1.1.0");
+	_snmpClient.get("192.168.243.1", "1.3.6.1.2.1.1.1.0");
+	_snmpClient.get("10.11.12.13", "1.3.6.1.2.1.1.1.0");
 }
 
 void SNMPClientTest::setUp()
 {
-	_SNMPClient.snmpBegin += Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onBegin);
-	_SNMPClient.snmpReply += Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onReply);
-	_SNMPClient.snmpError += Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onError);
-	_SNMPClient.snmpEnd   += Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onEnd);
+	_snmpClient.snmpBegin += Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onBegin);
+	_snmpClient.snmpReply += Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onReply);
+	_snmpClient.snmpError += Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onError);
+	_snmpClient.snmpEnd   += Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onEnd);
 }
 
 
 void SNMPClientTest::tearDown()
 {
-	_SNMPClient.snmpBegin -= Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onBegin);
-	_SNMPClient.snmpReply -= Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onReply);
-	_SNMPClient.snmpError -= Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onError);
-	_SNMPClient.snmpEnd   -= Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onEnd);
+	_snmpClient.snmpBegin -= Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onBegin);
+	_snmpClient.snmpReply -= Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onReply);
+	_snmpClient.snmpError -= Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onError);
+	_snmpClient.snmpEnd   -= Delegate<SNMPClientTest, SNMPEventArgs>(this, &SNMPClientTest::onEnd);
 }
 
 

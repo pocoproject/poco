@@ -53,7 +53,7 @@ public:
 
 protected:
 	Poco::UInt32 getDataLength() const;
-    void encodeData(Poco::BinaryWriter &stream) const;
+	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
 private:
 	std::string _value;
@@ -74,7 +74,7 @@ public:
 
 protected:
 	Poco::UInt32 getDataLength() const;
-    void encodeData(Poco::BinaryWriter &stream) const;
+	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
 };
 
@@ -98,7 +98,7 @@ public:
 
 protected:
 	Poco::UInt32 getDataLength() const;
-    void encodeData(Poco::BinaryWriter &stream) const;
+	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
 private:
 	bool _value;
@@ -126,7 +126,7 @@ public:
 
 protected:
 	Poco::UInt32 getDataLength() const;
-    void encodeData(Poco::BinaryWriter &stream) const;
+	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
 private:
 	Poco::UInt32 _value;
@@ -155,7 +155,7 @@ public:
 
 protected:
 	Poco::UInt32 getDataLength() const;
-    void encodeData(Poco::BinaryWriter &stream) const;
+	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
 private:
 	Poco::UInt64 _value;
@@ -184,7 +184,7 @@ public:
 
 protected:
 	Poco::UInt32 getDataLength() const;
-    void encodeData(Poco::BinaryWriter &stream) const;
+	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
 private:
 	std::string _value;
@@ -208,7 +208,7 @@ public:
 
 protected:
 	Poco::UInt32 getDataLength() const;
-    void encodeData(Poco::BinaryWriter &stream) const;
+	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
 private:
 	std::vector<Poco::UInt32> _value;
@@ -246,7 +246,7 @@ public:
 protected:
 	ASN1::Ptr getDataType(int pos) const;
 	Poco::UInt32 getDataLength() const;
-    void encodeData(Poco::BinaryWriter &stream) const;
+	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
 
 	SequenceData _value;

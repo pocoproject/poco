@@ -33,21 +33,21 @@ namespace ASN1Types {
 
 struct Whitespace
 {
-    Whitespace(int n)
-        : n(n)
-    {
-    }
-    int n;
+	Whitespace(int n)
+		: n(n)
+	{
+	}
+	int n;
 };
 
 
 std::ostream& operator<<(std::ostream& stream, const Whitespace &ws)
 {
-    for(int i = 0; i < ws.n; i++)
-    {
-        stream << "   ";
-    }
-    return stream;
+	for(int i = 0; i < ws.n; i++)
+	{
+		stream << "   ";
+	}
+	return stream;
 }
 
 
@@ -210,7 +210,7 @@ void Boolean::encodeData(Poco::BinaryWriter &stream) const
 
 void Boolean::decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length)
 {
-    Poco::UInt8 byte = 0;
+	Poco::UInt8 byte = 0;
 	if (length > 0)
 		stream >> byte;
 	_value = byte != 0;
@@ -270,44 +270,47 @@ std::string Integer::typeName() const
 
 Poco::UInt32 Integer::getDataLength() const
 {
-    int value = _value;
-    int valueSize = 0;
+	int value = _value;
+	int valueSize = 0;
 
-    do {
-        value >>= 7;
-        valueSize++;
-    } while (value != 0);
+	do 
+	{
+		value >>= 7;
+		valueSize++;
+	} while (value != 0);
 
-    return valueSize;
+	return valueSize;
 }
 
 
 void Integer::encodeData(Poco::BinaryWriter &stream) const
 {
-    int integer = _value;
-    int mask;
-    int intsize = 4;
+	int integer = _value;
+	int mask;
+	int intsize = 4;
 
-    /*
-     * Truncate "unnecessary" bytes off of the most significant end of this
-     * 2's complement integer.  There should be no sequence of 9
-     * consecutive 1's or 0's at the most significant end of the
-     * integer.
-     */
-    mask = 0x1FF << ((8 * 3) - 1);
-    /* mask is 0xFF800000 on a big-endian machine */
-    while ((((integer & mask) == 0) || ((integer & mask) == mask))
-          && intsize > 1){
-        intsize--;
-        integer <<= 8;
-    }
-    //encodeHeader(os, type, intsize);
-    mask = 0xFF << (8 * 3);
-    /* mask is 0xFF000000 on a big-endian machine */
-    while ((intsize--) > 0){
+	/*
+	 * Truncate "unnecessary" bytes off of the most significant end of this
+	 * 2's complement integer.  There should be no sequence of 9
+	 * consecutive 1's or 0's at the most significant end of the
+	 * integer.
+	 */
+	mask = 0x1FF << ((8 * 3) - 1);
+	/* mask is 0xFF800000 on a big-endian machine */
+	while ((((integer & mask) == 0) || ((integer & mask) == mask))
+		&& intsize > 1)
+	{
+		intsize--;
+		integer <<= 8;
+	}
+	//encodeHeader(os, type, intsize);
+	mask = 0xFF << (8 * 3);
+	/* mask is 0xFF000000 on a big-endian machine */
+	while ((intsize--) > 0)
+	{
 		stream << (char)( ((integer & mask) >> (8 * 3)) );
-        integer <<= 8;
-    }
+		integer <<= 8;
+	}
 }
 
 
@@ -315,22 +318,23 @@ void Integer::decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReade
 {
 	Poco::UInt8 bytesRead = 0;
 
-    Poco::UInt8 byte = 0;
-    stream >> byte;
-    bytesRead++;
+	Poco::UInt8 byte = 0;
+	stream >> byte;
+	bytesRead++;
 
-    _value = (byte & HIGH_BIT) == 0 ? 0 : -1;
+	_value = (byte & HIGH_BIT) == 0 ? 0 : -1;
 
-    for (;;) {
-        _value <<= 8;
-        _value |= byte;
+	for (;;) 
+	{
+		_value <<= 8;
+		_value |= byte;
 
-        if (bytesRead >= length)
-            break;
+		if (bytesRead >= length)
+			break;
 
-        stream >> byte;
-        bytesRead++;
-    }
+		stream >> byte;
+		bytesRead++;
+	}
 }
 
 
@@ -390,12 +394,13 @@ std::string Integer64::typeName() const
 Poco::UInt32 Integer64::getDataLength() const
 {
 	Poco::Int64 value = _value;
-    int valueSize = 0;
+	int valueSize = 0;
 
-    do {
-        value >>= 7;
-        valueSize++;
-    } while (value != 0);
+	do 
+	{
+		value >>= 7;
+		valueSize++;
+	} while (value != 0);
 
     return valueSize;
 }
@@ -404,29 +409,31 @@ Poco::UInt32 Integer64::getDataLength() const
 void Integer64::encodeData(Poco::BinaryWriter &stream) const
 {
 	Poco::UInt64 integer = _value;
-    int mask;
-    int intsize = 4;
+	int mask;
+	int intsize = 4;
 
-    /*
-     * Truncate "unnecessary" bytes off of the most significant end of this
-     * 2's complement integer.  There should be no sequence of 9
-     * consecutive 1's or 0's at the most significant end of the
-     * integer.
-     */
-    mask = 0x1FF << ((8 * 3) - 1);
-    /* mask is 0xFF800000 on a big-endian machine */
-    while ((((integer & mask) == 0) || ((integer & mask) == mask))
-          && intsize > 1){
-        intsize--;
-        integer <<= 8;
-    }
-    //encodeHeader(os, type, intsize);
-    mask = 0xFF << (8 * 3);
-    /* mask is 0xFF000000 on a big-endian machine */
-    while ((intsize--) > 0){
+	/*
+	 * Truncate "unnecessary" bytes off of the most significant end of this
+	 * 2's complement integer.  There should be no sequence of 9
+	 * consecutive 1's or 0's at the most significant end of the
+	 * integer.
+	 */
+	mask = 0x1FF << ((8 * 3) - 1);
+	/* mask is 0xFF800000 on a big-endian machine */
+	while ((((integer & mask) == 0) || ((integer & mask) == mask))
+		&& intsize > 1)
+	{
+		intsize--;
+		integer <<= 8;
+	}
+	//encodeHeader(os, type, intsize);
+	mask = 0xFF << (8 * 3);
+	/* mask is 0xFF000000 on a big-endian machine */
+	while ((intsize--) > 0)
+	{
 		stream << (char)( ((integer & mask) >> (8 * 3)) );
-        integer <<= 8;
-    }
+		integer <<= 8;
+	}
 }
 
 
@@ -434,22 +441,23 @@ void Integer64::decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryRea
 {
 	Poco::UInt8 bytesRead = 0;
 
-    Poco::UInt8 byte = 0;
-    stream >> byte;
-    bytesRead++;
+	Poco::UInt8 byte = 0;
+	stream >> byte;
+	bytesRead++;
 
-    _value = (byte & HIGH_BIT) == 0 ? 0 : -1;
+	_value = (byte & HIGH_BIT) == 0 ? 0 : -1;
 
-    for (;;) {
-        _value <<= 8;
-        _value |= byte;
+	for (;;) 
+	{
+		_value <<= 8;
+		_value |= byte;
 
-        if (bytesRead >= length)
-            break;
+		if (bytesRead >= length)
+			break;
 
-        stream >> byte;
-        bytesRead++;
-    }
+		stream >> byte;
+		bytesRead++;
+	}
 }
 
 
@@ -575,94 +583,109 @@ Poco::UInt32 ObjectIdentifier::getDataLength() const
 {
 	Poco::UInt32 totalLength = 1;
 
-    for (int i = 2; i < _value.size(); ++i) {
+	for (int i = 2; i < _value.size(); ++i) 
+	{
 		Poco::UInt32 value = _value.at(i);
-		do {
+		do 
+		{
 			value >>= 7;
 			totalLength++;
 		} while (value != 0);
-    }
+	}
 
-    return totalLength;
+	return totalLength;
 }
 
 
 void ObjectIdentifier::encodeData(Poco::BinaryWriter &stream) const
 {
-    if (_value.size() < 2)
-        throw DataException("Invalid Object Identifier");
+	if (_value.size() < 2)
+		throw DataException("Invalid Object Identifier");
 
 	stream << (Poco::UInt8)(_value.at(0) * 40 + _value.at(1));
 
-    for (int i = 2; i < _value.size(); ++i) {
-        std::string result;
-        std::string tmp;
+	for (int i = 2; i < _value.size(); ++i) 
+	{
+		std::string result;
+		std::string tmp;
 		Poco::UInt32 value = _value.at(i);
 
-        if (value < 128) {
-            result.push_back((char)value);
-        } else {
-            Poco::UInt32 val = value;
+		if (value < 128) 
+		{
+			result.push_back((char)value);
+		} 
+		else 
+		{
+			Poco::UInt32 val = value;
 
-            while (val != 0) {
-                Poco::UInt8 bval = (Poco::UInt8)(val & 0xFF);
-                if ((bval & HIGH_BIT) != 0) {
-                    bval = (Poco::UInt8)(bval & ~HIGH_BIT);
-                }
+			while (val != 0) 
+			{
+				Poco::UInt8 bval = (Poco::UInt8)(val & 0xFF);
+				if ((bval & HIGH_BIT) != 0) 
+				{
+					bval = (Poco::UInt8)(bval & ~HIGH_BIT);
+				}
 
-                val >>= 7;
+				val >>= 7;
 				tmp.push_back(bval);
-            }
+			}
 
-            // Now we need to reverse the bytes for the final encoding
-            for (int i = tmp.length() - 1; i >= 0; i--) {
-                if (i > 0)
+			// Now we need to reverse the bytes for the final encoding
+			for (int i = tmp.length() - 1; i >= 0; i--) 
+			{
+				if (i > 0)
 					result.push_back(tmp[i] | HIGH_BIT);
-                else
+				else
 					result.push_back(tmp[i]);
-            }
-        }
+			}
+		}
 
 		stream.writeRaw(result);
-    }
+	}
 }
 
 
 void ObjectIdentifier::decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length)
 {
 	Poco::UInt8 byte = 0;
-    stream >> byte;
+	stream >> byte;
 
-    _value.push_back(byte / 40);
-    _value.push_back(byte % 40);
+	_value.push_back(byte / 40);
+	_value.push_back(byte % 40);
 
 	Poco::UInt8 bytesRead = 1;
-    while (bytesRead++ < length) {
-        Poco::UInt8 buffer = 0;
-        Poco::UInt32 value = 0;
-        stream >> buffer;
+	while (bytesRead++ < length) 
+	{
+		Poco::UInt8 buffer = 0;
+		Poco::UInt32 value = 0;
+		stream >> buffer;
 
-        if ((buffer & HIGH_BIT) == 0) {
-            value = buffer;
-        } else {
-            std::string tmp;
-            for (;;) {
+		if ((buffer & HIGH_BIT) == 0) 
+		{
+			value = buffer;
+		} 
+		else 
+		{
+			std::string tmp;
+			for (;;) 
+			{
 				tmp.push_back(buffer & ~HIGH_BIT);
-                if ((buffer & HIGH_BIT) == 0)
-                    break;
+				if ((buffer & HIGH_BIT) == 0)
+					break;
 
-                stream >> buffer;
-                bytesRead++;
-            }
+				stream >> buffer;
+				bytesRead++;
+			}
 
-            for (int i = 0; i < tmp.size(); i++) {
-                value <<= 7;
-                value |= tmp[i];
-            }
-        }
+			for (int i = 0; i < tmp.size(); i++) 
+			{
+				value <<= 7;
+				value |= tmp[i];
+			}
+		}
 
-        _value.push_back(value);
-    }
+		_value.push_back(value);
+	}
 }
 
 
@@ -762,8 +785,8 @@ void Sequence::encodeData(Poco::BinaryWriter &stream) const
 void Sequence::decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length)
 {
 	Poco::UInt32 bytesRead = 0;
-	while (!stream.eof() && bytesRead < length) {
-
+	while (!stream.eof() && bytesRead < length) 
+	{
 		ASN1Type tp;
 		Poco::UInt8 typelen = tp.decodeData(stream);
 		bytesRead += typelen;
@@ -772,8 +795,8 @@ void Sequence::decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryRead
 		Poco::UInt32 curBytesRead = asnType->decode(factory, stream);
 		bytesRead += curBytesRead;
 
-        _value.push_back(asnType);
-    }
+		_value.push_back(asnType);
+	}
 }
 
 

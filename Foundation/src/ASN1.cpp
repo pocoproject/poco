@@ -203,9 +203,9 @@ void ASN1::encode(Poco::BinaryWriter &stream) const
 Poco::UInt32 ASN1::decode(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream)
 {
 	Poco::UInt32 length = 0;
-    Poco::UInt8 dataLength = 0;
+	Poco::UInt8 dataLength = 0;
 	Poco::UInt8 lengthSize = 1;
-    stream >> dataLength;
+	stream >> dataLength;
 
 	if ((dataLength & 0x80) == 0)
 	{
@@ -271,21 +271,21 @@ std::string ASN1::typeName() const
 
 struct Whitespace
 {
-    Whitespace(int n)
-        : n(n)
-    {
-    }
-    int n;
+	Whitespace(int n)
+		: n(n)
+	{
+	}
+	int n;
 };
 
 
 std::ostream& operator<<(std::ostream& stream, const Whitespace &ws)
 {
-    for(int i = 0; i < ws.n; i++)
-    {
-        stream << "   ";
-    }
-    return stream;
+	for(int i = 0; i < ws.n; i++)
+	{
+		stream << "   ";
+	}
+	return stream;
 }
 
 

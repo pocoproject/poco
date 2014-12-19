@@ -41,7 +41,7 @@ public:
 	void onEnd(const void* pSender, Poco::Net::SNMPEventArgs& args);
 
 private:
-	Poco::Net::SNMPClient _SNMPClient;
+	Poco::Net::SNMPClient _snmpClient;
 };
 
 

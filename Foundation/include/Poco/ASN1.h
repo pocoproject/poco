@@ -90,7 +90,7 @@ public:
 	Poco::UInt32 getDataLength() const;
 		/// Returns the length in bytes of the type.
 
-    void encodeData(Poco::BinaryWriter &stream) const;
+	void encodeData(Poco::BinaryWriter &stream) const;
 		/// Encodes the type to the stream.
 
 	Poco::UInt8 decodeData(Poco::BinaryReader &stream);
@@ -121,10 +121,10 @@ public:
 	const ASN1Type &getType() const;
 		/// Returns the ASN1 type passed on the constructor.
 
-    void encode(Poco::BinaryWriter &stream) const;
+	void encode(Poco::BinaryWriter &stream) const;
 		/// Encode the data to the stream.
 
-    Poco::UInt32 decode(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream);
+	Poco::UInt32 decode(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream);
 		/// Decode the data from the stream.
 		///
 		///	Returns the length of the data, including the length header itself.
@@ -155,7 +155,7 @@ protected:
 	virtual Poco::UInt32 getDataLength() const = 0;
 		/// Returns the length of the data, excluding type and length headers.
 
-    virtual void encodeData(Poco::BinaryWriter &stream) const = 0;
+	virtual void encodeData(Poco::BinaryWriter &stream) const = 0;
 		/// Encodes the data to the stream.
 
 	virtual void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length) = 0;
