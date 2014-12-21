@@ -86,6 +86,8 @@ option(ENABLE_ZIP "Enable Zip" ON)
 option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
 option(ENABLE_CPPPARSER "Enable C++ parser" ON)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" ON)
+option(ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
+option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
 
 option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
 
@@ -259,6 +261,16 @@ endif()
 if(ENABLE_POCODOC)
 add_subdirectory(PocoDoc)
 list(APPEND Poco_COMPONENTS "PocoDoc")
+endif()
+
+if(ENABLE_PAGECOMPILER)
+add_subdirectory(PageCompiler)
+list(APPEND Poco_COMPONENTS "PageCompiler")
+endif()
+
+if(ENABLE_PAGECOMPILER_FILE2PAGE)
+add_subdirectory(PageCompiler/File2Page)
+list(APPEND Poco_COMPONENTS "File2Page")
 endif()
 
 #############################################################
