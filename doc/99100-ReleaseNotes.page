@@ -59,6 +59,7 @@ AAAIntroduction
   - Poco::URI: added new constructor to create URI from Path
   - Various documentation and style fixes
   - Removed support (project/solution files) for Visual Studio.NET 2003 and Visual Studio 2005.
+  - Improved CMake support
 
 
 !!Incompatible Changes and Possible Transition Issues
@@ -67,6 +68,8 @@ AAAIntroduction
     lead to diagnostic messages while compiling.
   - Support (project and solution files) for MS Visual Studio 2003 and 2005 has been
     removed; the oldest officially supported VS version is 2008 (MSVC version 9.0).
+  - MongoDB: The ObjectId class has a new constructor taking a std::string containing a 
+    hexadecimal representation of the object ID.
 
 
 !!!Release 1.5.4

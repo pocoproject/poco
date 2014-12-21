@@ -57,6 +57,7 @@ Release 1.6.0 (2014-12-22)
 - Poco::URI: added new constructor to create URI from Path
 - Various documentation and style fixes
 - Removed support (project/solution files) for Visual Studio.NET 2003 and Visual Studio 2005.
+- Improved CMake support
 
 
 Release 1.5.4 (2014-10-14)
