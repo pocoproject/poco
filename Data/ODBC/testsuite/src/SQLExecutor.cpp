@@ -942,6 +942,13 @@ void SQLExecutor::execute(const std::string& sql)
 }
 
 
+void SQLExecutor::zeroRows()
+{
+	Statement stmt = (session() << "SELECT * FROM Person WHERE 0 = 1");
+	assert(0 == stmt.execute());
+}
+
+
 void SQLExecutor::simpleAccess()
 {
 	std::string funct = "simpleAccess()";

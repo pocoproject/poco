@@ -5,7 +5,7 @@ rem
 rem buildwin.cmd
 rem
 rem POCO C++ Libraries command-line build script 
-rem for MS Visual Studio 2003 to 2013
+rem for MS Visual Studio 2008 to 2013
 rem
 rem $Id: //poco/1.4/dist/buildwin.cmd#2 $
 rem
@@ -18,7 +18,7 @@ rem
 rem Usage:
 rem ------
 rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
-rem VS_VERSION:    71|80|90|100|110|120
+rem VS_VERSION:    90|100|110|120
 rem ACTION:        build|rebuild|clean
 rem LINKMODE:      static_mt|static_md|shared|all
 rem CONFIGURATION: release|debug|both
@@ -46,7 +46,7 @@ set LIB=%LIB%;%MYSQL_LIB%
 set POCO_BASE=%CD%
 set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 
-rem VS_VERSION {71 | 80 | 90 | 100 | 110 | 120}
+rem VS_VERSION {90 | 100 | 110 | 120}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
 set VS_64_BIT_ENV=VC\bin\x86_amd64\vcvarsx86_amd64.bat
@@ -60,41 +60,33 @@ if not "%PLATFORM%"=="WinCE" (
 if not "%PLATFORM%"=="WEC2013" goto usage)))
 
 if not defined VCINSTALLDIR (
-  if %VS_VERSION%==vs71 (
-    call "%VS71COMNTOOLS%vsvars32.bat"
-  ) else (
-    if %VS_VERSION%==vs80 (
-      call "%VS80COMNTOOLS%vsvars32.bat"
+  if %VS_VERSION%==vs90 (
+    if %PLATFORM%==x64 (
+      call "%VS90COMNTOOLS%..\..\%VS_64_BIT_ENV%"
     ) else (
-      if %VS_VERSION%==vs90 (
-        if %PLATFORM%==x64 (
-          call "%VS90COMNTOOLS%..\..\%VS_64_BIT_ENV%"
-        ) else (
-          call "%VS90COMNTOOLS%vsvars32.bat"
-        )
+      call "%VS90COMNTOOLS%vsvars32.bat"
+    )
+  ) else (
+    if %VS_VERSION%==vs100 (
+      if %PLATFORM%==x64 (
+        call "%VS100COMNTOOLS%..\..\%VS_64_BIT_ENV%"
       ) else (
-        if %VS_VERSION%==vs100 (
-          if %PLATFORM%==x64 (
-            call "%VS100COMNTOOLS%..\..\%VS_64_BIT_ENV%"
-          ) else (
-            call "%VS100COMNTOOLS%vsvars32.bat"
-          )
+        call "%VS100COMNTOOLS%vsvars32.bat"
+      )
+    ) else (
+      if %VS_VERSION%==vs110 (
+        if %PLATFORM%==x64 (
+          call "%VS110COMNTOOLS%..\..\%VS_64_BIT_ENV%"
         ) else (
-          if %VS_VERSION%==vs110 (
-            if %PLATFORM%==x64 (
-              call "%VS110COMNTOOLS%..\..\%VS_64_BIT_ENV%"
-            ) else (
-              call "%VS110COMNTOOLS%vsvars32.bat"
-            ) 
+          call "%VS110COMNTOOLS%vsvars32.bat"
+        ) 
+      ) else (
+        if %VS_VERSION%==vs120 (
+          if %PLATFORM%==x64 (
+            call "%VS120COMNTOOLS%..\..\%VS_64_BIT_ENV%"
           ) else (
-            if %VS_VERSION%==vs120 (
-              if %PLATFORM%==x64 (
-                call "%VS120COMNTOOLS%..\..\%VS_64_BIT_ENV%"
-              ) else (
-                call "%VS120COMNTOOLS%vsvars32.bat
-              )     
-            ) 
-          ) 
+            call "%VS120COMNTOOLS%vsvars32.bat
+          )     
         ) 
       ) 
     ) 
@@ -514,7 +506,7 @@ exit /b 1
 echo Usage:
 echo ------
 echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
-echo VS_VERSION:    "71|80|90|100|110|120"
+echo VS_VERSION:    "90|100|110|120"
 echo ACTION:        "build|rebuild|clean"
 echo LINKMODE:      "static_mt|static_md|shared|all"
 echo CONFIGURATION: "release|debug|both"

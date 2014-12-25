@@ -25,16 +25,16 @@
 #include "Poco/Data/SQLite/Binder.h"
 #include "Poco/Data/AbstractSessionImpl.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Mutex.h"
 
 
-struct sqlite3;
-struct sqlite3_stmt;
+extern "C"
+{
+	typedef struct sqlite3 sqlite3;
+}
 
 
 namespace Poco {
-
-class Mutex;
-
 namespace Data {
 namespace SQLite {
 
@@ -127,7 +127,8 @@ private:
 	bool        _connected;
 	bool        _isTransaction;
 	int         _timeout;
-	Mutex       _mutex;
+	Poco::Mutex _mutex;
+
 	static const std::string DEFERRED_BEGIN_TRANSACTION;
 	static const std::string COMMIT_TRANSACTION;
 	static const std::string ABORT_TRANSACTION;
