@@ -142,6 +142,28 @@ void LoggerTest::testLogger()
 	pChannel->list().clear();
 	root.fatal("fatal");
 	assert (pChannel->list().begin()->getPriority() == Message::PRIO_FATAL);
+	
+	root.setLevel("1");
+	assert (root.getLevel() == Message::PRIO_FATAL);
+	root.setLevel("8");
+	assert (root.getLevel() == Message::PRIO_TRACE);
+	try
+	{
+		root.setLevel("0");
+		assert(0);
+	}
+	catch(Poco::InvalidArgumentException&)
+	{
+	}
+	try
+	{
+		root.setLevel("9");
+		assert(0);
+	}
+	catch(Poco::InvalidArgumentException&)
+	{
+	}
+
 }
 
 
