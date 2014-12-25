@@ -29,11 +29,6 @@ POCO_SOURCES_AUTO_PLAT( SRCS WIN32
     )
 endif()
 
-POCO_HEADERS_AUTO( SRCS
-    include/Poco/WindowsConsoleChannel.h
-    include/Poco/EventLogChannel.h
-    )
-
 # Messages
 POCO_MESSAGES( SRCS Logging src/pocomsg.mc)
 

@@ -416,7 +416,7 @@ private:
 	Mutex               _mutex;
 	AsyncExecMethodPtr  _pAsyncExec;
 	std::vector<Any>    _arguments;
-	RowFormatter::Ptr     _pRowFormatter;
+	RowFormatter::Ptr   _pRowFormatter;
 	mutable std::string _stmtString;
 };
 

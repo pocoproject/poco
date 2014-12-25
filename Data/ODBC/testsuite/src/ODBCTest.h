@@ -49,6 +49,7 @@ public:
 
 	virtual void testBareboneODBC() = 0;
 
+	virtual void testZeroRows();
 	virtual void testSimpleAccess();
 	virtual void testComplexType();
 	virtual void testComplexTypeTuple();
