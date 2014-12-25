@@ -121,8 +121,9 @@ endif ()
 if (POCO_UNBUNDLED)
   add_definitions( -DPOCO_UNBUNDLED)
   message(STATUS "Build with using external sqlite, libz, pcre, expat ...")
-ELSE ()
-ENDIF ()
+else ()
+  message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
+endif ()
 
 # Set local include path
 include_directories( 
@@ -233,19 +234,6 @@ add_subdirectory(Net)
 list(APPEND Poco_COMPONENTS "Net")
 endif()
 
-add_subdirectory(CppParser)
-
-IF (REMOTING)
-    add_subdirectory(CodeGeneration)
-    add_subdirectory(XSD/Parser)
-    add_subdirectory(XSD/Types)
-    add_subdirectory(XSD/CodeGen)
-    add_subdirectory(RemotingNG)
-    add_subdirectory(RemotingNG/SOAP)
-    add_subdirectory(RemotingNG/TCP)
-    add_subdirectory(RemotingNG/JSONRPC)
-    add_subdirectory(RemotingNG/RemoteGen)
-ENDIF (REMOTING)
 
 #NetSSL
 
@@ -310,6 +298,18 @@ if(ENABLE_PAGECOMPILER_FILE2PAGE)
 add_subdirectory(PageCompiler/File2Page)
 list(APPEND Poco_COMPONENTS "File2Page")
 endif()
+
+IF (REMOTING)
+    add_subdirectory(CodeGeneration)
+    add_subdirectory(XSD/Parser)
+    add_subdirectory(XSD/Types)
+    add_subdirectory(XSD/CodeGen)
+    add_subdirectory(RemotingNG)
+    add_subdirectory(RemotingNG/SOAP)
+    add_subdirectory(RemotingNG/TCP)
+    add_subdirectory(RemotingNG/JSONRPC)
+    add_subdirectory(RemotingNG/RemoteGen)
+ENDIF (REMOTING)
 
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ
