@@ -402,21 +402,7 @@ void MongoDBTest::testConnectionPool()
 
 void MongoDBTest::testObjectID()
 {
-	std::string str;
-	str.append(1, (char) 0x53);
-	str.append(1, (char) 0x6A);
-	str.append(1, (char) 0xEE);
-	str.append(1, (char) 0xBB);
-	str.append(1, (char) 0xA0);
-	str.append(1, (char) 0x81);
-	str.append(1, (char) 0xDE);
-	str.append(1, (char) 0x68);
-	str.append(1, (char) 0x15);
-	str.append(1, (char) 0x00);
-	str.append(1, (char) 0x00);
-	str.append(1, (char) 0x02);
-
-	ObjectId oid(str);
+	ObjectId oid("536aeebba081de6815000002");
 	std::string str2 = oid.toString();
 	assert(str2 == "536aeebba081de6815000002");
 }

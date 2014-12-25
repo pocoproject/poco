@@ -13,6 +13,8 @@
 *.la
 *.a
 *.d
+*.vsp
+*.psess
 
 # Make #
 ########
@@ -27,6 +29,7 @@ CMakeFiles
 CMakeCache.txt
 CPackConfig.cmake
 CPackSourceConfig.cmake
+cmake_*
 
 # Packages #
 ############
@@ -110,3 +113,7 @@ cmake-build/
 # Temporary files #
 ###################
 *.bak
+
+XSD
+CodeGeneration
+RemotingNG
