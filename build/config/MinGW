@@ -29,6 +29,7 @@ SHELL   = sh
 RM      = rm -rf
 CP      = cp
 MKDIR   = mkdir -p
+WINDMC  = windmc
 
 #
 # Extension for Shared Libraries
