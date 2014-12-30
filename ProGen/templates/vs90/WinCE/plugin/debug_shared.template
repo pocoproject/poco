@@ -37,6 +37,7 @@
 		DisableSpecificWarnings="4800;${configuration.compiler.disableWarnings}"
 		CompileForArchitecture="2"
 		InterworkCalls="false"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -49,7 +50,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalOptions="/FORCE:MULTIPLE"
+		AdditionalOptions="/FORCE:MULTIPLE ${configuration.linker.additionalOptions}"
 		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="${project.outdir}\bin\$(PlatformName)\${project.target}d.dll"
 		LinkIncremental="2"

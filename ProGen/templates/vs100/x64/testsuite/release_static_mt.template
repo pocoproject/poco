@@ -1,7 +1,7 @@
 <Configuration
 	Name="release_static_mt|x64"
 	OutputDirectory="bin64\static_mt\"
-	IntermediateDirectory="obj64\$(ConfigurationName)"
+	IntermediateDirectory="obj64\${project.name}\$(ConfigurationName)"
 	ConfigurationType="1"
 	UseOfMFC="1"
 	CharacterSet="2"
@@ -23,7 +23,7 @@
 	/>
 	<Tool
 		Name="VCCLCompilerTool"
-		Optimization="4"
+		Optimization="2"
 		InlineFunctionExpansion="1"
 		EnableIntrinsicFunctions="true"
 		FavorSizeOrSpeed="1"
@@ -42,6 +42,7 @@
 		DebugInformationFormat="0"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -64,6 +65,7 @@
 		OptimizeReferences="2"
 		EnableCOMDATFolding="2"
 		TargetMachine="17"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

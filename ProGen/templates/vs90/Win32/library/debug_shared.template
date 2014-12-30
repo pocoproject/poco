@@ -36,9 +36,10 @@
 		UsePrecompiledHeader="0"
 		WarningLevel="3"
 		Detect64BitPortabilityProblems="false"
-		DebugInformationFormat="4"
+		DebugInformationFormat="3"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -61,6 +62,7 @@
 		SubSystem="1"
 		ImportLibrary="${project.outdir}\lib\${project.target}d.lib"
 		TargetMachine="1"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

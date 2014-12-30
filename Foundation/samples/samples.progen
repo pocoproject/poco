@@ -13,6 +13,7 @@ vc.solution.include = \
 	grep\\grep;\
 	hmacmd5\\hmacmd5;\
 	inflate\\inflate;\
+	LineEndingConverter\\LineEndingConverter;\
 	Logger\\Logger;\
 	LogRotation\\LogRotation;\
 	md5\\md5;\

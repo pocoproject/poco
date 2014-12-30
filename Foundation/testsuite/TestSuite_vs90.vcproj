@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestSuite\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestSuite\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			CharacterSet="2"
@@ -53,7 +53,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -99,8 +99,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestSuite\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestSuite\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			CharacterSet="2"
@@ -186,8 +186,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestSuite\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestSuite\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			CharacterSet="2"
@@ -274,8 +274,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestSuite\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestSuite\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			CharacterSet="2"
@@ -310,7 +310,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -356,8 +356,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestSuite\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestSuite\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="1"
 			CharacterSet="2"
@@ -392,7 +392,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -439,8 +439,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\TestSuite\$(ConfigurationName)"
+			IntermediateDirectory="obj\TestSuite\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="1"
 			CharacterSet="2"
@@ -898,6 +898,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\PBKDF2EngineTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\RandomStreamTest.cpp"
 					>
 				</File>
@@ -931,6 +935,10 @@
 				</File>
 				<File
 					RelativePath=".\src\MD5EngineTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PBKDF2EngineTest.h"
 					>
 				</File>
 				<File

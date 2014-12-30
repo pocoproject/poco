@@ -1,43 +1,49 @@
-set(LIBNAME "PocoDataODBC")
+set(LIBNAME "DataODBC")
+set(POCO_LIBNAME "Poco${LIBNAME}")
 
-set(SRCS 
-src/Binder.cpp
-src/ConnectionHandle.cpp
-src/Connector.cpp
-src/EnvironmentHandle.cpp
-src/Extractor.cpp
-src/ODBCException.cpp
-src/ODBCMetaColumn.cpp
-src/ODBCStatementImpl.cpp
-src/Parameter.cpp
-src/Preparator.cpp
-src/SessionImpl.cpp
-src/TypeInfo.cpp
-src/Unicode.cpp
-src/Utility.cpp
-)
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO( ODBC_SRCS ${SRCS_G})
 
-add_definitions( ${ODBC_CFLAGS} )
+# Headers
+file(GLOB_RECURSE HDRS_G "include/*.h" )
+POCO_HEADERS_AUTO( ODBC_SRCS ${HDRS_G})
 
-include_directories( include )
+add_definitions( ${ODBC_CFLAGS} -DTHREADSAFE)
 
-add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAME} 
-	PROPERTIES
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-target_link_libraries( ${LIBNAME} PocoData PocoFoundation ${ODBC_LINK_FLAGS})
+add_library( "${LIBNAME}" ${LIB_MODE} ${ODBC_SRCS} )
+add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
+set_target_properties( "${LIBNAME}"
+    PROPERTIES
+    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+    OUTPUT_NAME ${POCO_LIBNAME}
+    DEFINE_SYMBOL ODBC_EXPORTS
+    )
 
+target_link_libraries( "${LIBNAME}" Foundation Data ${ODBC_LIBRARIES})
+target_include_directories( "${LIBNAME}"
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
 install(
     DIRECTORY include/Poco
     DESTINATION include
+    COMPONENT Devel
     PATTERN ".svn" EXCLUDE
     )
-    
+
 install(
-    TARGETS ${LIBNAME}
-    DESTINATION lib
+    TARGETS "${LIBNAME}" EXPORT "${LIBNAME}Targets"
+    LIBRARY DESTINATION lib${LIB_SUFFIX}
+    ARCHIVE DESTINATION lib${LIB_SUFFIX}
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
     )
 
+POCO_GENERATE_PACKAGE("${LIBNAME}" "${LIBNAME}Targets" "lib/cmake/${PROJECT_NAME}")
+
 if (ENABLE_TESTS)
-  add_subdirectory(testsuite)
+    add_subdirectory(testsuite)
 endif ()

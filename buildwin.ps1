@@ -4,11 +4,11 @@
 # Usage:
 # ------
 # buildwin.ps1 [-poco_base    dir]
-#              [-vs_version   120 | 110 | 100 | 90 | 80 | 71]
+#              [-vs_version   120 | 110 | 100 | 90]
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
-#              [-platform     Win32 | x64 | WinCE]
+#              [-platform     Win32 | x64 | WinCE | WEC2013]
 #              [-samples]
 #              [-tests]
 #              [-omit         "Lib1X;LibY;LibZ;..."]
@@ -23,7 +23,7 @@ Param
   [string] $poco_base,
 
   [Parameter()]
-  [ValidateSet(71, 80, 90, 100, 110, 120)]
+  [ValidateSet(90, 100, 110, 120)]
   [int] $vs_version,
 
   [Parameter()]
@@ -39,7 +39,7 @@ Param
   [string] $config = 'release',
 
   [Parameter()]
-  [ValidateSet('Win32', 'x64', 'WinCE')]
+  [ValidateSet('Win32', 'x64', 'WinCE', 'WEC2013')]
   [string] $platform = 'x64',
   
   [switch] $tests = $false,
@@ -60,7 +60,16 @@ Param
 )
 
 
-$omitArray = @()
+function Add-Env-Var([string] $lib, [string] $var)
+{
+  if ((${Env:$var} -eq $null) -or (-not ${Env:$var}.Contains(${Env:$lib_$var"})))
+  {
+    $libvar = "$lib" + "_" + "$var"
+    $envvar = [Environment]::GetEnvironmentVariable($libvar, "Process")
+    [Environment]::SetEnvironmentVariable($var, $envvar, "Process")
+  }
+  
+}
 
 
 function Set-Environment
@@ -73,8 +82,6 @@ function Set-Environment
     elseif ($Env:VS110COMNTOOLS -ne '') { $script:vs_version = 110 }
     elseif ($Env:VS100COMNTOOLS -ne '') { $script:vs_version = 100 }
     elseif ($Env:VS90COMNTOOLS  -ne '') { $script:vs_version = 90 }
-    elseif ($Env:VS80COMNTOOLS  -ne '') { $script:vs_version = 80 }
-    elseif ($Env:VS71COMNTOOLS  -ne '') { $script:vs_version = 71 }
     else
     {
       Write-Host 'Visual Studio not found, exiting.'
@@ -82,53 +89,51 @@ function Set-Environment
     }
   }
 
-  if ($Env:POCO_BUILD_ENVIRONMENT_SET -ne "TRUE")
+  if (-Not $Env:PATH.Contains("$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;")) 
+  { $Env:PATH = "$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;$Env:PATH" }
+
+  if ($openssl_base -eq '')
   {
+    if ($platform -eq 'x64') { $script:openssl_base = 'C:\OpenSSL-Win64' }
+    else                     { $script:openssl_base = 'C:\OpenSSL-Win32' }
+  }
+  
+  $Env:OPENSSL_DIR     = "$openssl_base"
+  $Env:OPENSSL_INCLUDE = "$Env:OPENSSL_DIR\include"
+  $Env:OPENSSL_LIB     = "$Env:OPENSSL_DIR\lib;$Env:OPENSSL_DIR\lib\VC"
+  Add-Env-Var "OPENSSL" "INCLUDE"
+  Add-Env-Var "OPENSSL" "LIB"
 
-    if ($openssl_base -eq '')
-    {
-      if ($platform -eq 'x64') { $openssl_base = 'C:\OpenSSL-Win64' }
-      else                     { $openssl_base = 'C:\OpenSSL-Win32' }
-    }
-
-    $Env:OPENSSL_DIR     = "$openssl_base"
-    $Env:OPENSSL_INCLUDE = "$Env:OPENSSL_DIR\include"
-    $Env:OPENSSL_LIB     = "$Env:OPENSSL_DIR\lib;$Env:OPENSSL_DIR\lib\VC"
-    $Env:INCLUDE         = "$Env:INCLUDE;$Env:OPENSSL_INCLUDE"
-    $Env:LIB             = "$Env:LIB;$Env:OPENSSL_LIB"
-
+  if ($mysql_base -ne '')
+  {
     $Env:MYSQL_DIR     = "$mysql_base"
     $Env:MYSQL_INCLUDE = "$Env:MYSQL_DIR\include"
     $Env:MYSQL_LIB     = "$Env:MYSQL_DIR\lib"
-    $Env:INCLUDE       = "$Env:INCLUDE;$Env:MYSQL_INCLUDE"
-    $Env:LIB           = "$Env:LIB;$Env:MYSQL_LIB"
-
-    $Env:PATH = "$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;$Env:PATH"
-  
-    $vsct = "VS$($vs_version)COMNTOOLS"
-    $vsdir = (Get-Item Env:$vsct).Value
-    $Command = ''
-    if ($platform -eq 'x64')
-    {
-      $Command = "$($vsdir)..\..\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
-    }
-    else
-    {
-      $Command = "$($vsdir)vsvars32.bat"
-    }
-
-    $tempFile = [IO.Path]::GetTempFileName()
-    cmd /c " `"$Command`" && set > `"$tempFile`" "
-    Get-Content $tempFile | Foreach-Object {
-      if($_ -match "^(.*?)=(.*)$")
-      {
-        Set-Content "Env:$($matches[1])" $matches[2]
-      }
-    }
-    Remove-Item $tempFile
-
-    $Env:POCO_BUILD_ENVIRONMENT_SET = "TRUE"
+    Add-Env-Var "MYSQL" "INCLUDE"
+    Add-Env-Var "MYSQL" "LIB"
   }
+
+  $vsct = "VS$($vs_version)COMNTOOLS"
+  $vsdir = (Get-Item Env:$vsct).Value
+  $Command = ''
+  if ($platform -eq 'x64')
+  {
+    $Command = "$($vsdir)..\..\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
+  }
+  else
+  {
+    $Command = "$($vsdir)vsvars32.bat"
+  }
+
+  $tempFile = [IO.Path]::GetTempFileName()
+  cmd /c " `"$Command`" && set > `"$tempFile`" "
+  Get-Content $tempFile | Foreach-Object {
+    if($_ -match "^(.*?)=(.*)$")
+    {
+      Set-Content "Env:$($matches[1])" $matches[2]
+    }
+  }
+  Remove-Item $tempFile
 }
 
 
@@ -139,11 +144,11 @@ function Process-Input
     Write-Host 'Usage:'
     Write-Host '------'
     Write-Host 'buildwin.ps1 [-poco_base    dir]'
-    Write-Host '             [-vs_version   120 | 110 | 100 | 90 | 80 | 71]'
+    Write-Host '             [-vs_version   120 | 110 | 100 | 90]'
     Write-Host '             [-action       build | rebuild | clean]'
     Write-Host '             [-linkmode     shared | static_mt | static_md | all]'
     Write-Host '             [-config       release | debug | both]'
-    Write-Host '             [-platform     Win32 | x64 | WinCE]'
+    Write-Host '             [-platform     Win32 | x64 | WinCE | WEC2013]'
     Write-Host '             [-samples]'
     Write-Host '             [-tests]'
     Write-Host '             [-omit         "Lib1X;LibY;LibZ;..."]'
@@ -157,8 +162,8 @@ function Process-Input
   { 
     Set-Environment
 
-    Write-Host "Building:"
-    Write-Host "------"
+    Write-Host "Build configuration:"
+    Write-Host "--------------------"
     Write-Host "Poco Base:     $poco_base"
     Write-Host "Version:       $vs_version"
     Write-Host "Action:        $action"
@@ -172,10 +177,6 @@ function Process-Input
     if ($omit -ne '')
     {
       Write-Host "Omit:          $omit"
-    
-      $omit.Split(',;') | ForEach {
-        $omitArray += "$_"
-      }
     }
 
     if ($openssl_base -ne '')
@@ -188,6 +189,9 @@ function Process-Input
       Write-Host "MySQL:         $mysql_base"
     }
 
+    # NB: this won't work in PowerShell ISE
+    Write-Host "Press Ctrl-C to exit or any other key to continue ..."
+    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
   }
 }
 
@@ -208,14 +212,14 @@ function Build-MSBuild([string] $vsProject)
         {
           $projectConfig = "$cfg"
           $projectConfig += "_$mode"
-          Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+          Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
         }
       }
       else #config
       {
         $projectConfig = "$config"
         $projectConfig += "_$mode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
     }
   }
@@ -227,15 +231,15 @@ function Build-MSBuild([string] $vsProject)
       foreach ($cfg in $configArr)
       {
         $projectConfig = "$cfg"
-        $projectConfig += "_$mode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+        $projectConfig += "_$linkmode"
+        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
     }
     else #config
     {
       $projectConfig = "$config"
       $projectConfig += "_$linkmode"
-      Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig"
+      Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
     }
   }
 }
@@ -275,7 +279,7 @@ function Build-Devenv([string] $vsProject)
       foreach ($cfg in $configArr)
       {
         $projectConfig = "$cfg"
-        $projectConfig += "_$mode"
+        $projectConfig += "_$linkmode"
         Invoke-Expression "devenv /useenv /$action $projectConfig $vsProject"
       }
     }
@@ -322,10 +326,28 @@ function Build
     $componentArr = $_.split('/')
     $componentName = $componentArr[$componentArr.Length - 1]
     $suffix = "_vs$vs_version"
+    
+    $omitArray = @()
+    $omit.Split(',;') | ForEach {
+        $omitArray += "$_"
+    }
 
     if ($omitArray -NotContains $component)
     {
       $vsProject = "$poco_base\$componentDir\$componentName$($platformName)$($suffix).$($extension)"
+      
+      if (!(Test-Path -Path $vsProject)) # when VS project name is not same as directory name
+      {
+        $vsProject = "$poco_base\$componentDir$($platformName)$($suffix).$($extension)"
+        if (!(Test-Path -Path $vsProject)) # not found
+        {
+          Write-Host "+------------------------------------------------------------------"
+          Write-Host "| VS project $vsProject not found, skipping."
+          Write-Host "+------------------------------------------------------------------"
+          Return # since Foreach-Object is a function, this is actually loop "continue"
+        }
+      }
+      
       Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
       Write-Host "| Building $vsProject"
       Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"

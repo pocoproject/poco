@@ -1,0 +1,6 @@
+include(CMakeFindDependencyMacro)
+set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR})
+find_dependency(PocoFoundation)
+find_dependency(PocoUtil)
+find_dependency(PocoXML)
+include("${CMAKE_CURRENT_LIST_DIR}/PocoZipTargets.cmake")

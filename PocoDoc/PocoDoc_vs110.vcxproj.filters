@@ -2,22 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="App">
-      <UniqueIdentifier>{771853f0-e680-4f7b-b5ea-ea5d471ce1e3}</UniqueIdentifier>
+      <UniqueIdentifier>{bc60f583-7668-4598-9bba-b7cfe3af8403}</UniqueIdentifier>
     </Filter>
     <Filter Include="App\Header Files">
-      <UniqueIdentifier>{8b7445d5-ed16-472a-9066-11ee333bb379}</UniqueIdentifier>
+      <UniqueIdentifier>{6ddd9167-7414-4b35-b2eb-69e3b3d35ac7}</UniqueIdentifier>
     </Filter>
     <Filter Include="App\Source Files">
-      <UniqueIdentifier>{83109a19-82b5-4f39-bfc4-47914f1c7272}</UniqueIdentifier>
+      <UniqueIdentifier>{01d9d535-0188-44ba-a48e-b3ba85ffbcce}</UniqueIdentifier>
     </Filter>
     <Filter Include="DocWriter">
-      <UniqueIdentifier>{6596ce33-e8e8-4e9c-971b-9b8d0866d091}</UniqueIdentifier>
+      <UniqueIdentifier>{264225c8-5e0e-4e0b-b286-205036358393}</UniqueIdentifier>
     </Filter>
     <Filter Include="DocWriter\Header Files">
-      <UniqueIdentifier>{b85175f9-c1a7-4a44-8857-bb26f177c703}</UniqueIdentifier>
+      <UniqueIdentifier>{64bc407f-4604-4e92-8fda-10a97c49d1e7}</UniqueIdentifier>
     </Filter>
     <Filter Include="DocWriter\Source Files">
-      <UniqueIdentifier>{47b18104-e867-4a72-83e2-7442a5ec21b0}</UniqueIdentifier>
+      <UniqueIdentifier>{4bdc66ee-0b6d-428d-99f6-55e0afb0caca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

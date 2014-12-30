@@ -11,7 +11,7 @@ include $(POCO_BASE)/build/rules/global
 SHAREDOPT_CXX += -DNet_EXPORTS
 
 objects = \
-	DNS HTTPResponse HostEntry Socket \
+	Net DNS HTTPResponse HostEntry Socket \
 	DatagramSocket HTTPServer IPAddress IPAddressImpl SocketAddress SocketAddressImpl \
 	HTTPBasicCredentials HTTPCookie HTMLForm MediaType DialogSocket \
 	DatagramSocketImpl FilePartSource HTTPServerConnection MessageHeader \
@@ -32,7 +32,8 @@ objects = \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
 	NTPClient NTPEventArgs NTPPacket \
 	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
-	WebSocket WebSocketImpl
+	WebSocket WebSocketImpl \
+	OAuth10Credentials OAuth20Credentials
 
 target         = PocoNet
 target_version = $(LIBVERSION)

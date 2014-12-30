@@ -36,9 +36,10 @@
 		UsePrecompiledHeader="0"
 		WarningLevel="3"
 		Detect64BitPortabilityProblems="false"
-		DebugInformationFormat="4"
+		DebugInformationFormat="3"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -60,6 +61,7 @@
 		AdditionalLibraryDirectories="${project.pocobase}\lib"
 		SubSystem="1"
 		TargetMachine="1"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

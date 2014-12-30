@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -54,7 +54,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
 			<Tool
@@ -102,8 +102,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -192,8 +192,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -267,8 +267,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -304,7 +304,7 @@
 				ProgramDataBaseFileName="..\lib\PocoFoundationmdd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
 			<Tool
@@ -339,8 +339,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -377,7 +377,7 @@
 				ProgramDataBaseFileName="..\lib\PocoFoundationmtd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
 			<Tool
@@ -412,8 +412,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			OutputDirectory="obj\Foundation\$(ConfigurationName)"
+			IntermediateDirectory="obj\Foundation\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -511,6 +511,54 @@
 				<File
 					RelativePath=".\src\ByteOrder.cpp"
 					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_mt|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_mt|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\src\Checksum.cpp"
@@ -518,6 +566,10 @@
 				</File>
 				<File
 					RelativePath=".\src\Debugger.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\DirectoryIteratorStrategy.cpp"
 					>
 				</File>
 				<File
@@ -1025,6 +1077,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\NumericString.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\RefCountedObject.cpp"
 					>
 				</File>
@@ -1035,14 +1091,54 @@
 				<File
 					RelativePath=".\src\String.cpp"
 					>
-				</File>
-				<File
-					RelativePath=".\src\NumericString.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\DirectoryIteratorStrategy.cpp"
-					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_mt|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_mt|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\src\StringTokenizer.cpp"
@@ -2131,6 +2227,54 @@
 				<File
 					RelativePath=".\src\SignalHandler.cpp"
 					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_mt|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_mt|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\src\SynchronizedObject.cpp"
@@ -2454,6 +2598,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\MD5Engine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\PBKDF2Engine.h"
 					>
 				</File>
 				<File
@@ -2833,11 +2981,23 @@
 				Name="PCRE Source Files"
 				>
 				<File
+					RelativePath=".\src\pcre_byte_order.c"
+					>
+				</File>
+				<File
 					RelativePath=".\src\pcre_chartables.c"
 					>
 				</File>
 				<File
 					RelativePath=".\src\pcre_compile.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_config.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_dfa_exec.c"
 					>
 				</File>
 				<File
@@ -2849,7 +3009,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\pcre_get.c"
+					>
+				</File>
+				<File
 					RelativePath=".\src\pcre_globals.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_jit_compile.c"
 					>
 				</File>
 				<File
@@ -2865,6 +3033,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\pcre_refcount.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_string_utils.c"
+					>
+				</File>
+				<File
 					RelativePath=".\src\pcre_study.c"
 					>
 				</File>
@@ -2873,15 +3049,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\pcre_try_flipped.c"
-					>
-				</File>
-				<File
 					RelativePath=".\src\pcre_ucd.c"
 					>
 				</File>
 				<File
 					RelativePath=".\src\pcre_valid_utf8.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_version.c"
 					>
 				</File>
 				<File
@@ -5691,11 +5867,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\ListMap.h"
+					RelativePath=".\include\Poco\Latin9Encoding.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Latin9Encoding.h"
+					RelativePath=".\include\Poco\ListMap.h"
 					>
 				</File>
 				<File
@@ -5867,6 +6043,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\DirectoryIteratorStrategy.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\EventArgs.h"
 					>
 				</File>
@@ -5916,10 +6096,6 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\RecursiveDirectoryIteratorImpl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\DirectoryIteratorStrategy.h"
 					>
 				</File>
 			</Filter>

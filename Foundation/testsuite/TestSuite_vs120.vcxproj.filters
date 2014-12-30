@@ -585,6 +585,7 @@
     <ClCompile Include="src\Driver.cpp">
       <Filter>_Driver\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PBKDF2EngineTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AnyTest.h">
@@ -989,5 +990,6 @@
     <ClInclude Include="src\FIFOBufferStreamTest.h">
       <Filter>Streams\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\PBKDF2EngineTest.h" />
   </ItemGroup>
 </Project>

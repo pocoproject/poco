@@ -1,7 +1,7 @@
 <Configuration
 	Name="debug_static_md|Win32"
 	OutputDirectory="bin\static_md\"
-	IntermediateDirectory="obj\$(ConfigurationName)"
+	IntermediateDirectory="obj\${project.name}\$(ConfigurationName)"
 	ConfigurationType="1"
 	UseOfMFC="2"
 	CharacterSet="2"
@@ -37,9 +37,10 @@
 		UsePrecompiledHeader="0"
 		WarningLevel="3"
 		Detect64BitPortabilityProblems="false"
-		DebugInformationFormat="4"
+		DebugInformationFormat="3"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"
@@ -61,6 +62,7 @@
 		ProgramDatabaseFile="bin\static_md\${project.target}d.pdb"
 		SubSystem="2"
 		TargetMachine="1"
+		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>
 	<Tool
 		Name="VCALinkTool"

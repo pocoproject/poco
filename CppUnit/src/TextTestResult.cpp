@@ -34,6 +34,7 @@ TextTestResult::TextTestResult(std::ostream& ostr):
 
 void TextTestResult::setup()
 {
+#if !defined(_WIN32_WCE)
 	const char* env = std::getenv("CPPUNIT_IGNORE");
 	if (env)
 	{
@@ -48,6 +49,7 @@ void TextTestResult::setup()
 			if (!test.empty()) _ignored.insert(test);
 		}
 	}
+#endif
 }
 
 

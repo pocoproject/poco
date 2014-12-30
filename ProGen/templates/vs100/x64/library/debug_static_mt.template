@@ -1,7 +1,7 @@
 <Configuration
 	Name="debug_static_mt|x64"
 	OutputDirectory="${project.outdir}\lib64\"
-	IntermediateDirectory="obj64\$(ConfigurationName)"
+	IntermediateDirectory="obj64\${project.name}\$(ConfigurationName)"
 	ConfigurationType="4"
 	CharacterSet="2"
 	>
@@ -40,6 +40,7 @@
 		DebugInformationFormat="3"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"

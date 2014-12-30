@@ -3,7 +3,7 @@
 #
 # MinGW32
 #
-# Make settings for MinGW on WinXP
+# Make settings for MinGW32
 #
 
 #
@@ -11,7 +11,7 @@
 #
 LINKMODE = STATIC
 POCO_TARGET_OSNAME = MinGW
-POCO_TARGET_OSARCH = ia32
+POCO_TARGET_OSARCH = i686
 
 #
 # Define Tools
@@ -66,9 +66,9 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_WIN32 -DMINGW32 -DWINVER=0x500 -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED -I/usr/local/include -I/usr/include
+SYSFLAGS = -D_WIN32 -DMINGW32 -DWINVER=0x501 -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC -DPOCO_THREAD_STACK_SIZE -I/usr/local/include -I/usr/include
 
 #
 # System Specific Libraries
 #
-SYSLIBS  = -L/usr/local/lib -L/usr/lib -liphlpapi -lws2_32 -lssl -lcrypto -lws2_32 -lgdi32
+SYSLIBS  = -L/usr/local/lib -L/usr/lib -liphlpapi -lssl -lcrypto -lws2_32

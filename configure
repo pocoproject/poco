@@ -63,6 +63,18 @@ Options:
     Compile with -DPOCO_NET_NO_IPv6.
     For systems that don't support IPv6.
 
+  --sqlite-fts=<path>
+    Compile with -DPOCO_DATA_SQLITE_FTS.
+    Compile SQLite with Full Text Search support.
+
+  --sqlite-thread-safe=<value>
+    Compile with -DSQLITE_THREADSAFE=<value>.
+    Valid values are:
+		- 0 single-thread, no thread safety
+		- 1 serial access, highest thread safety
+		- 2 multi-threaded, without session sharing support  
+	
+
   --omit=<component>{,<component>}
     Do not build the specified component(s).
     Example: --omit=Data/MySQL,Data/ODBC,Zip
@@ -172,6 +184,12 @@ while [ $# -ge 1 ]; do
 
 	--no-ipv6)
 		flags="$flags -DPOCO_NET_NO_IPv6" ;;
+
+	--sqlite-thread-safe=*)
+		flags="$flags -DSQLITE_THREADSAFE=`echo ${1} | awk '{print substr($0,22)}'`" ;;
+		
+	--sqlite-fts)
+		flags="$flags -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS" ;;
 
 	--poquito)
 		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_JSONCONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION" ;;

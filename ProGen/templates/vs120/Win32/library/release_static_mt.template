@@ -1,7 +1,7 @@
 <Configuration
 	Name="release_static_mt|Win32"
 	OutputDirectory="${project.outdir}\lib\"
-	IntermediateDirectory="obj\$(ConfigurationName)"
+	IntermediateDirectory="obj\${project.name}\$(ConfigurationName)"
 	ConfigurationType="4"
 	CharacterSet="2"
 	>
@@ -22,7 +22,7 @@
 	/>
 	<Tool
 		Name="VCCLCompilerTool"
-		Optimization="4"
+		Optimization="2"
 		InlineFunctionExpansion="1"
 		EnableIntrinsicFunctions="true"
 		FavorSizeOrSpeed="1"
@@ -41,6 +41,7 @@
 		DebugInformationFormat="0"
 		CompileAs="0"
 		DisableSpecificWarnings="${configuration.compiler.disableWarnings}"
+		AdditionalOptions="${configuration.compiler.additionalOptions}"
 	/>
 	<Tool
 		Name="VCManagedResourceCompilerTool"

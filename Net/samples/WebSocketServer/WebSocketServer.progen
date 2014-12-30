@@ -10,3 +10,4 @@ vc.project.compiler.include = ..\\..\\..\\Foundation\\include;..\\..\\..\\XML\\i
 vc.project.linker.dependencies.Win32 = ws2_32.lib iphlpapi.lib
 vc.project.linker.dependencies.x64 = ws2_32.lib iphlpapi.lib
 vc.project.linker.dependencies.WinCE = ws2.lib iphlpapi.lib
+vc.project.linker.entry.WinCE = wmainCRTStartup
