@@ -34,7 +34,7 @@ FPEnvironmentImpl::FPEnvironmentImpl(const FPEnvironmentImpl& env)
 
 FPEnvironmentImpl::~FPEnvironmentImpl()
 {
-	_controlfp(_env, MCW_RC);
+	_controlfp(_env, _MCW_RC);
 }
 
 
@@ -65,13 +65,13 @@ bool FPEnvironmentImpl::isFlagImpl(FlagImpl flag)
 
 void FPEnvironmentImpl::setRoundingModeImpl(RoundingModeImpl mode)
 {
-	_controlfp(mode, MCW_RC);
+	_controlfp(mode, _MCW_RC);
 }
 
 
 FPEnvironmentImpl::RoundingModeImpl FPEnvironmentImpl::getRoundingModeImpl()
 {
-	return RoundingModeImpl(_controlfp(0, 0) & MCW_RC);
+	return RoundingModeImpl(_controlfp(0, 0) & _MCW_RC);
 }
 
 
