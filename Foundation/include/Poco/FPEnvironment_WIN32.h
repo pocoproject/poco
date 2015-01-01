@@ -25,22 +25,22 @@
 #include <math.h>
 
 #ifndef _SW_INEXACT
- #define _SW_INEXACT 0x00000001 /* inexact (precision) */
+#	define _SW_INEXACT 0x00000001 // inexact (precision)
 #endif
 #ifndef _SW_UNDERFLOW
- #define _SW_UNDERFLOW 0x00000002 /* underflow */
+#	define _SW_UNDERFLOW 0x00000002 // underflow
 #endif
 #ifndef _SW_OVERFLOW
- #define _SW_OVERFLOW 0x00000004 /* overflow */
+#	define _SW_OVERFLOW 0x00000004 // overflow
 #endif
 #ifndef _SW_ZERODIVIDE
- #define _SW_ZERODIVIDE 0x00000008 /* zero divide */
+#	define _SW_ZERODIVIDE 0x00000008 // zero divide
 #endif
 #ifndef _SW_INVALID
- #define _SW_INVALID 0x00000010 /* invalid */
+#	define _SW_INVALID 0x00000010 // invalid
 #endif
 #ifndef _SW_DENORMAL
- #define _SW_DENORMAL 0x00080000 /* denormal status bit */
+#	define _SW_DENORMAL 0x00080000 // denormal status bit
 #endif
 
 
@@ -69,7 +69,7 @@ protected:
 	FPEnvironmentImpl(const FPEnvironmentImpl& env);
 	~FPEnvironmentImpl();
 	FPEnvironmentImpl& operator = (const FPEnvironmentImpl& env);
-	void keepCurrentImpl();		
+	void keepCurrentImpl();
 	static void clearFlagsImpl();
 	static bool isFlagImpl(FlagImpl flag);	
 	static void setRoundingModeImpl(RoundingModeImpl mode);
