@@ -148,7 +148,9 @@ protected:
 //
 
 
-GCC_DIAG_OFF(unused-local-typedefs) // supress numerous gcc warnings
+#if defined(GNUC) && (GNUC > 4) && (GNUC_MINOR > 6)
+	GCC_DIAG_OFF(unused-local-typedefs) // supress numerous gcc warnings
+#endif // (GNUC) && (GNUC > 4) && (GNUC_MINOR > 6)
 
 
 template <bool x>
