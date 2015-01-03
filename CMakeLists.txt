@@ -155,9 +155,7 @@ endif(CMAKE_SYSTEM MATCHES "SunOS")
 
 if (CMAKE_COMPILER_IS_MINGW)
   add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
-  add_definitions(-mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED )
-  link_directories(/usr/local/lib /usr/lib)
-  include_directories(/usr/local/include /usr/include)
+  add_definitions(-D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE)
 endif (CMAKE_COMPILER_IS_MINGW)
 
 if (CYGWIN)
