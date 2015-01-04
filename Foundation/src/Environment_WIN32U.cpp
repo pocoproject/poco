@@ -21,6 +21,8 @@
 #include <sstream>
 #include <cstring>
 #include "Poco/UnWindows.h"
+#include <winsock2.h>
+#include <wincrypt.h>
 #include <iphlpapi.h>
 
 
