@@ -1401,7 +1401,7 @@ void SQLExecutor::dateTime()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assert (bd == birthday);
 	
-//	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
+	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
 }
 
 
@@ -1429,7 +1429,7 @@ void SQLExecutor::date()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assert (bd == birthday);
 	
-//	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
+	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
 }
 
 
@@ -1457,7 +1457,7 @@ void SQLExecutor::time()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assert (bd == birthday);
 	
-//	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
+	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
 }
 
 
@@ -1613,116 +1613,70 @@ void SQLExecutor::tupleVector()
 
 
 void SQLExecutor::internalExtraction()
-{
-	/*std::string funct = "internalExtraction()";
+{/*
+	typedef Poco::Int32 IntType;
+
+	*_pSession << "DROP TABLE IF EXISTS Vectors", now;
+	*_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+
 	std::vector<Tuple<int, double, std::string> > v;
-	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
-	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
-	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
-	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
+	v.push_back(Tuple<int, double, std::string>(1, 1.5, "3"));
+	v.push_back(Tuple<int, double, std::string>(2, 2.5, "4"));
+	v.push_back(Tuple<int, double, std::string>(3, 3.5, "5"));
+	v.push_back(Tuple<int, double, std::string>(4, 4.5, "6"));
 
-	try { *_pSession << "INSERT INTO Vectors VALUES ($1,$2,$3)", use(v), now; }
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	*_pSession << "INSERT INTO Vectors VALUES ($1,$2,$3)", use(v), now;
 
-	try 
-	{ 
-		Statement stmt = (*_pSession << "SELECT * FROM Vectors", now);
-		RecordSet rset(stmt);
+	Statement stmt = (*_pSession << "SELECT * FROM Vectors", now);
+	RecordSet rset(stmt);
+	assert(3 == rset.columnCount());
+	assert(4 == rset.rowCount());
 
-		assert (3 == rset.columnCount());
-		assert (4 == rset.rowCount());
+	RecordSet rset2(rset);
+	assert(3 == rset2.columnCount());
+	assert(4 == rset2.rowCount());
 
-		int curVal = 3;
-		do
-		{
-			assert (rset["str0"] == curVal);
-			++curVal;
-		} while (rset.moveNext());
+	IntType a = rset.value<IntType>(0, 2);
+	assert(3 == a);
 
-		rset.moveFirst();
-		assert (rset["str0"] == "3");
-		rset.moveLast();
-		assert (rset["str0"] == "6");
+	int c = rset2.value(0);
+	assert(1 == c);
 
-		RecordSet rset2(rset);
-		assert (3 == rset2.columnCount());
-		assert (4 == rset2.rowCount());
+	IntType b = rset2.value<IntType>("int0", 2);
+	assert(3 == b);
 
-		int i = rset.value<int>(0,0);
-		assert (1 == i);
+	double d = rset.value<double>(1, 0);
+	assert(1.5 == d);
 
-		std::string s = rset.value(0,0);
-		assert ("1" == s);
+	std::string s = rset.value<std::string>(2, 1);
+	assert("4" == s);
 
-		int a = rset.value<int>(0,2);
-		assert (3 == a);
+	typedef std::deque<IntType> IntDeq;
 
-		try
-		{
-			double d = rset.value<double>(1,1);
-			assert (2.5 == d);
-		}
-		catch (BadCastException&)
-		{
-			float f = rset.value<float>(1,1);
-			assert (2.5 == f);
-		}
+	const Column<IntDeq>& col = rset.column<IntDeq>(0);
+	assert(col[0] == 1);
 
-		s = rset.value<std::string>(2,2);
-		assert ("5" == s);
-		i = rset.value("str0", 2);
-		assert (5 == i);
-		
-		const Column<int>& col = rset.column<int>(0);
-		Column<int>::Iterator it = col.begin();
-		Column<int>::Iterator end = col.end();
-		for (int i = 1; it != end; ++it, ++i)
-			assert (*it == i);
+	try { rset.column<IntDeq>(100); fail("must fail"); }
+	catch (RangeException&) {}
 
-		rset = (*_pSession << "SELECT COUNT(*) AS cnt FROM Vectors", now);
+	const Column<IntDeq>& col1 = rset.column<IntDeq>(0);
+	assert("int0" == col1.name());
+	Column<IntDeq>::Iterator it = col1.begin();
+	Column<IntDeq>::Iterator itEnd = col1.end();
+	int counter = 1;
+	for (; it != itEnd; ++it, ++counter)
+		assert(counter == *it);
 
-		//various results for COUNT(*) are received from different drivers
-		try
-		{
-			//this is what most drivers will return
-			int i = rset.value<int>(0,0);
-			assert (4 == i);
-		}
-		catch(BadCastException&)
-		{
-			try
-			{
-				//this is for Oracle
-				double i = rset.value<double>(0,0);
-				assert (4 == int(i));
-			}
-			catch(BadCastException&)
-			{
-				//this is for PostgreSQL
-				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
-				assert (4 == big);
-			}
-		}
+	rset = (*_pSession << "SELECT COUNT(*) FROM Vectors", now);
+	s = rset.value<std::string>(0, 0);
+	assert("4" == s);
 
-		s = rset.value("cnt", 0).convert<std::string>();
-		assert ("4" == s);
+	stmt = (*_pSession << "DELETE FROM Vectors", now);
+	rset = stmt;
 
-		try { const Column<int>& col1 = rset.column<int>(100); fail ("must fail"); }
-		catch (RangeException&) { }
-
-		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
-		catch (BadCastException&) {	}
-		
-		stmt = (*_pSession << "DELETE FROM Vectors", now);
-		rset = stmt;
-
-		try { const Column<int>& col1 = rset.column<int>(0); fail ("must fail"); }
-		catch (RangeException&) { }
-	}
-	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-*/
+	try { rset.column<IntDeq>(0); fail("must fail"); }
+	catch (RangeException&) {}
+	*/
 }
 
 

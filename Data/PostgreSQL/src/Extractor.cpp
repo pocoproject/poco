@@ -473,10 +473,10 @@ bool Extractor::isNull(std::size_t col, std::size_t row)
 
 	if ( isColumnNull( outputParameter ) )
 	{
-		return false;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 

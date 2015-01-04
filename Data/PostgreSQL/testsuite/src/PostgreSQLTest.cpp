@@ -76,7 +76,7 @@ std::string PostgreSQLTest::_dbConnString = "host=" POSTGRESQL_HOST
 	" user=" POSTGRESQL_USER
 	" password=" POSTGRESQL_PWD
 	" dbname=" POSTGRESQL_DB
-" port=" POSTGRESQL_PORT;
+	" port=" POSTGRESQL_PORT;
 
 
 PostgreSQLTest::PostgreSQLTest(const std::string& name): 
@@ -109,9 +109,9 @@ void PostgreSQLTest::testConnectNoDB()
 	
 	try
 	{
-		std::cout << "Attempting to Connect to [" << "PostgreSQL" << "] without database: " << std::endl;
+		std::cout << "Attempting to Connect to [" << dbConnString << "] without database: " << std::endl;
 		Session session(PostgreSQL::Connector::KEY, dbConnString);
-		std::cout << "Connected to [" << "PostgreSQL" << "] without database." << std::endl;
+		std::cout << "Connected to [" << dbConnString << "] without database." << std::endl;
 		dbInfo(session);
 		std::cout << "Disconnecting ..." << std::endl;
 		session.close();
@@ -721,7 +721,6 @@ void PostgreSQLTest::testTupleWithNullable()
 
 void PostgreSQLTest::dropTable(const std::string& tableName)
 {
-//	try { *_pSession << format("DROP TABLE %s", tableName), now; }
 	try { *_pSession << format("DROP TABLE IF EXISTS %s", tableName), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("dropTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("dropTable()"); }
