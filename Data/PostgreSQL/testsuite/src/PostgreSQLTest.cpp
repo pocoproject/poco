@@ -801,7 +801,7 @@ void PostgreSQLTest::recreateStringsTable()
 void PostgreSQLTest::recreateUnsignedIntsTable()
 {
 	dropTable("Strings");
-	try { *_pSession << "CREATE TABLE Strings (str BIGINT )", now; } // UNSIGNED QULIFIER NOT SUPPORTED BY POSTGRES
+	try { *_pSession << "CREATE TABLE Strings (str BIGINT)", now; } // UNSIGNED QULIFIER NOT SUPPORTED BY POSTGRES
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateUnsignedIntegersTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateUnsignedIntegersTable()"); }
 }

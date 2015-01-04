@@ -55,56 +55,56 @@ Binder::~Binder()
 void Binder::bind(std::size_t pos, const Poco::Int8& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_INT8, &val, sizeof( Poco::Int8 ) );
+	realBind(pos, POSTGRESQL_TYPE_INT8, &val, sizeof(Poco::Int8));
 }
 
 
 void Binder::bind(std::size_t pos, const Poco::UInt8& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_UINT8, &val, sizeof( Poco::UInt8 ) );
+	realBind(pos, POSTGRESQL_TYPE_UINT8, &val, sizeof(Poco::UInt8));
 }
 
 
 void Binder::bind(std::size_t pos, const Poco::Int16& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_INT16, &val, sizeof( Poco::Int16 ) );
+	realBind(pos, POSTGRESQL_TYPE_INT16, &val, sizeof(Poco::Int16));
 }
 
 
 void Binder::bind(std::size_t pos, const Poco::UInt16& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_UINT16, &val, sizeof( Poco::UInt16 ) );
+	realBind(pos, POSTGRESQL_TYPE_UINT16, &val, sizeof(Poco::UInt16));
 }
 
 
 void Binder::bind(std::size_t pos, const Poco::Int32& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_INT32, &val, sizeof( Poco::Int32 ) );
+	realBind(pos, POSTGRESQL_TYPE_INT32, &val, sizeof(Poco::Int32));
 }
 
 
 void Binder::bind(std::size_t pos, const Poco::UInt32& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_UINT32, &val, sizeof( Poco::UInt32 ) );
+	realBind(pos, POSTGRESQL_TYPE_UINT32, &val, sizeof(Poco::UInt32));
 }
 
 
 void Binder::bind(std::size_t pos, const Poco::Int64& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_INT64, &val, sizeof( Poco::Int64 ) );
+	realBind(pos, POSTGRESQL_TYPE_INT64, &val, sizeof(Poco::Int64));
 }
 
 
 void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_UINT64, &val, sizeof( Poco::UInt64 ) );
+	realBind(pos, POSTGRESQL_TYPE_UINT64, &val, sizeof(Poco::UInt64));
 }
 
 
@@ -113,14 +113,14 @@ void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir)
 void Binder::bind(std::size_t pos, const long& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_INT64, &val, sizeof( Poco::Int64 ) );
+	realBind(pos, POSTGRESQL_TYPE_INT64, &val, sizeof(Poco::Int64));
 }
 
 
 void Binder::bind(std::size_t pos, const unsigned long& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_UINT64, &val, sizeof( Poco::UInt64 ) );
+	realBind(pos, POSTGRESQL_TYPE_UINT64, &val, sizeof(Poco::UInt64));
 }
 
 #endif // POCO_LONG_IS_64_BIT
@@ -129,28 +129,28 @@ void Binder::bind(std::size_t pos, const unsigned long& val, Direction dir)
 void Binder::bind(std::size_t pos, const bool& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_BOOLEAN, &val, sizeof( bool ) );
+	realBind(pos, POSTGRESQL_TYPE_BOOLEAN, &val, sizeof(bool));
 }
 
 	
 void Binder::bind(std::size_t pos, const float& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_FLOAT, &val, sizeof( float ) );
+	realBind(pos, POSTGRESQL_TYPE_FLOAT, &val, sizeof(float));
 }
 
 
 void Binder::bind(std::size_t pos, const double& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_DOUBLE, &val, sizeof( double ) );
+	realBind(pos, POSTGRESQL_TYPE_DOUBLE, &val, sizeof(double));
 }
 
 
 void Binder::bind(std::size_t pos, const char& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_CHAR, &val, sizeof( char ) );
+	realBind(pos, POSTGRESQL_TYPE_CHAR, &val, sizeof(char));
 }
 
 // complex types
@@ -158,7 +158,7 @@ void Binder::bind(std::size_t pos, const char& val, Direction dir)
 void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_STRING, &val, static_cast<int>( val.size() ) );
+	realBind(pos, POSTGRESQL_TYPE_STRING, &val, static_cast<int>(val.size()));
 }
 
 
@@ -179,34 +179,34 @@ void Binder::bind(std::size_t pos, const Poco::Data::CLOB& val, Direction dir)
 void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_DATETIME, &val, sizeof( Poco::DateTime ) );
+	realBind(pos, POSTGRESQL_TYPE_DATETIME, &val, sizeof(Poco::DateTime));
 }
 
 
 void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_DATE, &val, sizeof( Date ) );
+	realBind(pos, POSTGRESQL_TYPE_DATE, &val, sizeof(Date));
 }
 
 
 void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, POSTGRESQL_TYPE_TIME, &val, sizeof( Time ) );
+	realBind(pos, POSTGRESQL_TYPE_TIME, &val, sizeof(Time));
 }
 
 
 void Binder::bind(std::size_t pos, const NullData&, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind( pos, POSTGRESQL_TYPE_NULL, 0, 0 );
+	realBind(pos, POSTGRESQL_TYPE_NULL, 0, 0);
 }
 
 
 std::size_t Binder::size() const
 {
-	return static_cast<std::size_t>( _bindVector.size() );
+	return static_cast<std::size_t>(_bindVector.size());
 }
 
 
@@ -222,98 +222,98 @@ Binder::updateBindVectorToCurrentValues()
 	InputParameterVector::iterator itr		= _bindVector.begin();
 	InputParameterVector::iterator itrEnd	= _bindVector.end();
 
-	for ( ; itr != itrEnd; ++itr )
+	for (; itr != itrEnd; ++itr)
 	{
-		switch ( itr->fieldType() )
+		switch (itr->fieldType())
 		{
 			case POSTGRESQL_TYPE_INT8:
-				itr->setStringVersionRepresentation( Poco::NumberFormatter::format( * static_cast< const Poco::Int8 * >( itr->pData() ) ) );
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::Int8 * >(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_UINT8:
-				itr->setStringVersionRepresentation( Poco::NumberFormatter::format( * static_cast< const Poco::UInt8 * >( itr->pData() ) ) );
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::UInt8 * >(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_INT16:
-				itr->setStringVersionRepresentation( Poco::NumberFormatter::format( * static_cast< const Poco::Int16 * >( itr->pData() ) ) );
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::Int16 * >(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_UINT16:
-				itr->setStringVersionRepresentation( Poco::NumberFormatter::format( * static_cast< const Poco::UInt16 * >( itr->pData() ) ) );
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::UInt16 * >(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_INT32:
-				itr->setStringVersionRepresentation( Poco::NumberFormatter::format( * static_cast< const Poco::Int32 * >( itr->pData() ) ) );
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::Int32 * >(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_UINT32:
-				itr->setStringVersionRepresentation( Poco::NumberFormatter::format( * static_cast< const Poco::UInt32 * >( itr->pData() ) ) );
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::UInt32 * >(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_INT64:
-				itr->setStringVersionRepresentation( Poco::NumberFormatter::format( * static_cast< const Poco::Int64 * >( itr->pData() ) ) );
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::Int64 * >(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_UINT64:
-				itr->setStringVersionRepresentation( Poco::NumberFormatter::format( * static_cast< const Poco::UInt64 * >( itr->pData() ) ) );
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::UInt64 * >(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_BOOLEAN:
 				{
-					const bool currentBoolValue = * static_cast< const bool * >( itr->pData() );
-					itr->setStringVersionRepresentation( currentBoolValue ? "TRUE" : "FALSE" );
+					const bool currentBoolValue = * static_cast< const bool * >(itr->pData());
+					itr->setStringVersionRepresentation(currentBoolValue ? "TRUE" : "FALSE");
 				}
 
 				break;
 
 			case POSTGRESQL_TYPE_FLOAT:
-				itr->setStringVersionRepresentation( Poco::NumberFormatter::format( * static_cast< const float * >( itr->pData() ) ) );
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const float * >(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_DOUBLE:
-				itr->setStringVersionRepresentation( Poco::NumberFormatter::format( * static_cast< const double * >( itr->pData() ) ) );
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const double * >(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_CHAR:
-				itr->setStringVersionRepresentation( std::string( static_cast< const char * >( itr->pData() ), 1 ) );  // single character string
+				itr->setStringVersionRepresentation(std::string(static_cast< const char * >(itr->pData()), 1));  // single character string
 				break;
 
 			case POSTGRESQL_TYPE_STRING:
-				itr->setStringVersionRepresentation( * static_cast< const std::string * >( itr->pData() ) );
+				itr->setStringVersionRepresentation(* static_cast< const std::string * >(itr->pData()));
 				break;
 
 			case POSTGRESQL_TYPE_DATETIME:
 				{
-					const Poco::DateTime & dateTime = * static_cast< const Poco::DateTime  * >( itr->pData() );
-					itr->setStringVersionRepresentation( DateTimeFormatter::format( dateTime, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT) );
+					const Poco::DateTime & dateTime = * static_cast< const Poco::DateTime  * >(itr->pData());
+					itr->setStringVersionRepresentation(DateTimeFormatter::format(dateTime, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT));
 				}
 				break;
 
 			case POSTGRESQL_TYPE_DATE:
 				{
-					const Poco::Data::Date & date = * static_cast< const Poco::Data::Date  * >( itr->pData() );
-					itr->setStringVersionRepresentation( DateTimeFormatter::format( Poco::DateTime(date.year(), date.month(), date.day() ), "%Y-%m-%d") );
+					const Poco::Data::Date & date = * static_cast< const Poco::Data::Date  * >(itr->pData());
+					itr->setStringVersionRepresentation(DateTimeFormatter::format(Poco::DateTime(date.year(), date.month(), date.day()), "%Y-%m-%d"));
 				}
 				break;
 
 			case POSTGRESQL_TYPE_TIME:
 				{
-					const Poco::Data::Time & time = * static_cast< const Poco::Data::Time  * >( itr->pData() );
-					itr->setStringVersionRepresentation( DateTimeFormatter::format( Poco::DateTime( 0, 1, 1, time.hour(), time.minute(), time.second() ), "%H:%M:%s%z" ) );
+					const Poco::Data::Time & time = * static_cast< const Poco::Data::Time  * >(itr->pData());
+					itr->setStringVersionRepresentation(DateTimeFormatter::format(Poco::DateTime(0, 1, 1, time.hour(), time.minute(), time.second()), "%H:%M:%s%z"));
 				}
 				break;
 
 			case POSTGRESQL_TYPE_BLOB:
 				{
-					const Poco::Data::BLOB & blob = * static_cast< const Poco::Data::BLOB  * >( itr->pData() );
-					itr->setNonStringVersionRepresentation( static_cast< const void * > ( blob.rawContent() ), blob.size() );
+					const Poco::Data::BLOB & blob = * static_cast< const Poco::Data::BLOB  * >(itr->pData());
+					itr->setNonStringVersionRepresentation(static_cast< const void * > (blob.rawContent()), blob.size());
 				}
 				break;
 
 			case POSTGRESQL_TYPE_CLOB:
 				{
-					const Poco::Data::CLOB & clob = * static_cast< const Poco::Data::CLOB  * >( itr->pData() );
-					itr->setNonStringVersionRepresentation( static_cast< const void * > ( clob.rawContent() ), clob.size() );
+					const Poco::Data::CLOB & clob = * static_cast< const Poco::Data::CLOB  * >(itr->pData());
+					itr->setNonStringVersionRepresentation(static_cast< const void * > (clob.rawContent()), clob.size());
 				}
 
 			case POSTGRESQL_TYPE_NONE:
@@ -330,23 +330,23 @@ Binder::updateBindVectorToCurrentValues()
 //
 ///////////////////
 
-void Binder::realBind( std::size_t aPosition, PostgreSQLSupportedFieldTypes aFieldType, const void* aBufferPtr, std::size_t aLength )
+void Binder::realBind(std::size_t aPosition, PostgreSQLSupportedFieldTypes aFieldType, const void* aBufferPtr, std::size_t aLength)
 {
 
 	try
 	{
-		if ( aPosition >= _bindVector.size() )
+		if (aPosition >= _bindVector.size())
 		{
-			_bindVector.resize( aPosition + 1 );
+			_bindVector.resize(aPosition + 1);
 		}
 
-		InputParameter inputParameter( aFieldType, aBufferPtr, aLength );
+		InputParameter inputParameter(aFieldType, aBufferPtr, aLength);
 
 		_bindVector[ aPosition ] = inputParameter;
 	}
-	catch ( std::bad_alloc& )
+	catch (std::bad_alloc&)
 	{
-		PostgreSQLException( "Memory allocation error which binding" );
+		PostgreSQLException("Memory allocation error which binding");
 	}
 }
 

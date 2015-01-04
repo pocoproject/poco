@@ -67,7 +67,7 @@ public:
 						const std::string & aCurrentValue,
 						const std::string & aDisplayLabel,
 						const std::string & aHowToDisplay,
-						int aDisplaySize );
+						int aDisplaySize);
 
 	~SessionParameters();
 
@@ -103,17 +103,17 @@ public:
 	~SessionHandle();
 		/// Destroy handle, close connection
 
-	void connect ( const std::string & aConnectionString );
+	void connect (const std::string & aConnectionString);
 		/// Connect to server
 
-	void connect ( const char* aConnectionString );
+	void connect (const char* aConnectionString);
 
 	void connect (	const char* aHost,
 					const char* aUser,
 					const char* aPassword,
 					const char* aDatabase,
 					unsigned short aPort,
-					unsigned int aConnectionTimeout );
+					unsigned int aConnectionTimeout);
 
 	bool isConnected() const;
 		/// is a connection established?
@@ -142,29 +142,29 @@ public:
 	bool isAutoCommit();
 		/// is the connection in auto commit mode?
 
-	void setAutoCommit( bool aShouldAutoCommit = true );
+	void setAutoCommit(bool aShouldAutoCommit = true);
 		/// is the connection in auto commit mode?
 
 	bool isAsynchronousCommit();
 		/// is the connection in Asynchronous commit mode?
 
-	void setAsynchronousCommit( bool aShouldAsynchronousCommit = true );
+	void setAsynchronousCommit(bool aShouldAsynchronousCommit = true);
 		/// is the connection in Asynchronous commit mode?
 
 	void cancel();
 		/// Attempts to cancel in-process statements
 
-	void setTransactionIsolation( Poco::UInt32 aTI );
+	void setTransactionIsolation(Poco::UInt32 aTI);
 		/// Sets the transaction isolation level.
 
 	Poco::UInt32 transactionIsolation();
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation( Poco::UInt32 aTI );
+	bool hasTransactionIsolation(Poco::UInt32 aTI);
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	void deallocatePreparedStatement( const std::string & aPreparedStatementToDeAllocate );
+	void deallocatePreparedStatement(const std::string & aPreparedStatementToDeAllocate);
 		/// deallocates a previously prepared statement
 	
 	int serverVersion() const;
@@ -198,17 +198,17 @@ public:
 		/// Get the sessionHandle mutex to protect the connection pointer
 
 private:
-	static SessionParametersMap setConnectionInfoParameters( PQconninfoOption * aConnectionInfoOptionsPtr );
+	static SessionParametersMap setConnectionInfoParameters(PQconninfoOption * aConnectionInfoOptionsPtr);
 
 	void deallocateStoredPreparedStatements();
 
-	void deallocatePreparedStatementNoLock( const std::string & aPreparedStatementToDeAllocate );
+	void deallocatePreparedStatementNoLock(const std::string & aPreparedStatementToDeAllocate);
 	bool isConnectedNoLock() const;
 	std::string lastErrorNoLock() const;
 
 
-	SessionHandle( const SessionHandle & );
-	SessionHandle& operator= ( const SessionHandle & );
+	SessionHandle(const SessionHandle &);
+	SessionHandle& operator= (const SessionHandle &);
 
 private:
 
@@ -241,21 +241,21 @@ SessionParameters::SessionParameters(	const std::string & aKeyword,
 										const std::string & aCurrentValue,
 										const std::string & aDisplayLabel,
 										const std::string & aHowToDisplay,
-										int aDisplaySize )
-:	_keyword				( aKeyword ),
-	_environmentVariable	( anEnvironmentVariable ),
-	_compiledDefault		( aCompiledDefault ),
-	_currentValue			( aCurrentValue ),
-	_displayLabel			( aDisplayLabel ),
-	_howToDisplay			( HTD_ASIS ),
-	_displaySize			( aDisplaySize )
+										int aDisplaySize)
+:	_keyword				(aKeyword),
+	_environmentVariable	(anEnvironmentVariable),
+	_compiledDefault		(aCompiledDefault),
+	_currentValue			(aCurrentValue),
+	_displayLabel			(aDisplayLabel),
+	_howToDisplay			(HTD_ASIS),
+	_displaySize			(aDisplaySize)
 {
-	if ( aHowToDisplay == "*" )
+	if (aHowToDisplay == "*")
 	{
 		_howToDisplay = HTD_HIDE;
 	}
 
-	if ( aHowToDisplay == "D" )
+	if (aHowToDisplay == "D")
 	{
 		_howToDisplay = HID_DEBUG;
 	}

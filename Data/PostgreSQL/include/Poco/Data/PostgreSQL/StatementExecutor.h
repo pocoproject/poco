@@ -64,7 +64,7 @@ public:
 		STMT_EXECUTED
 	};
 
-	explicit StatementExecutor( SessionHandle & aSessionHandle );
+	explicit StatementExecutor(SessionHandle & aSessionHandle);
 		/// Creates the StatementExecutor.
 
 	~StatementExecutor();
@@ -73,10 +73,10 @@ public:
 	State state() const;
 		/// Returns the current state.
 
-	void prepare( const std::string& aSQLStatement );
+	void prepare(const std::string& aSQLStatement);
 		/// Prepares the statement for execution.
 
-	void bindParams( const InputParameterVector & anInputParameterVector );
+	void bindParams(const InputParameterVector & anInputParameterVector);
 		/// Binds the params - REQUIRED if the statment has input parameters/placeholders
 		/// Pointer and list elements must stay valid for the lifetime of the StatementExecutor!
 
@@ -92,10 +92,10 @@ public:
 	std::size_t columnsReturned() const;
 		/// get the count of columns returned by the statement
 
-	const MetaColumn& metaColumn( std::size_t aPosition ) const;
+	const MetaColumn& metaColumn(std::size_t aPosition) const;
 		/// Returns the reference to the specified metacolumn - 0 based
 
-	const OutputParameter& resultColumn( std::size_t aPosition ) const;
+	const OutputParameter& resultColumn(std::size_t aPosition) const;
 		/// Returns the reference to the specified result - 0 based
 
 	operator PGresult* ();
@@ -105,8 +105,8 @@ private:
 
 	void clearResults();
 
-	StatementExecutor( const StatementExecutor & );
-	StatementExecutor& operator= ( const StatementExecutor & );
+	StatementExecutor(const StatementExecutor &);
+	StatementExecutor& operator= (const StatementExecutor &);
 
 private:
 	SessionHandle &				_sessionHandle;

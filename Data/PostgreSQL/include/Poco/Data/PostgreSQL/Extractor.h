@@ -70,7 +70,7 @@ class PostgreSQL_API Extractor: public Poco::Data::AbstractExtractor
 public:
 	typedef SharedPtr<Extractor> Ptr;
 
-	Extractor( StatementExecutor& st );
+	Extractor(StatementExecutor& st);
 		/// Creates the Extractor.
 
 	virtual ~Extractor();
@@ -348,26 +348,26 @@ public:
 	
 private:
 
-	const OutputParameter & extractPreamble( std::size_t aPosition ) const;
+	const OutputParameter & extractPreamble(std::size_t aPosition) const;
 
-	bool isColumnNull( const OutputParameter & anOutputParameter ) const;
+	bool isColumnNull(const OutputParameter & anOutputParameter) const;
 
 	template <typename T>
 	bool extractStringImpl(std::size_t pos, T& val)
 	/// Utility function for extraction of Any and DynamicAny.
 	{
-		OutputParameter outputParameter = extractPreamble( pos );
+		OutputParameter outputParameter = extractPreamble(pos);
 
-		if ( isColumnNull( outputParameter ) )
+		if (isColumnNull(outputParameter))
 		{
 			return false;
 		}
 
 		std::string tempString;  // since the postgreSQL API in use is all about strings...
 
-		bool returnValue = extract( pos, tempString );
+		bool returnValue = extract(pos, tempString);
 
-		if ( returnValue )
+		if (returnValue)
 		{
 			val = tempString;
 		}
@@ -377,7 +377,7 @@ private:
 
 
 	// Prevent VC8 warning "operator= could not be generated"
-	Extractor& operator=( const Extractor & );
+	Extractor& operator=(const Extractor &);
 
 private:
 

@@ -74,9 +74,9 @@ class InputParameter
 	/// PostgreSQL class to record values for input parameters to SQL statements
 {
 public:
-    explicit InputParameter( PostgreSQLSupportedFieldTypes aFieldType,
+    explicit InputParameter(PostgreSQLSupportedFieldTypes aFieldType,
                              const void *                  aDataPtr,
-                             std::size_t                   theDataLength );
+                             std::size_t                   theDataLength);
     explicit InputParameter();
     
     ~InputParameter();
@@ -86,8 +86,8 @@ public:
     std::size_t                     size() const;
     bool                            isBinary() const;
     
-    void                            setStringVersionRepresentation( const std::string & aString );
-    void                            setNonStringVersionRepresentation( const void * aPtr, std::size_t theSize );
+    void                            setStringVersionRepresentation(const std::string & aString);
+    void                            setNonStringVersionRepresentation(const void * aPtr, std::size_t theSize);
     
     const void *                    pInternalRepresentation() const;
 
@@ -107,18 +107,18 @@ class OutputParameter
 	/// PostgreSQL class to record values for output parameters to capture the results
 {
 public:
-    explicit OutputParameter( PostgreSQLSupportedFieldTypes aFieldType,
+    explicit OutputParameter(PostgreSQLSupportedFieldTypes aFieldType,
                               Oid                           anInternalFieldType,
                               std::size_t                   aRowNumber,
                               const char *                  aDataPtr,
                               std::size_t                   theSize,
-                              bool                          anIsNull );
+                              bool                          anIsNull);
     
     explicit OutputParameter();
     
     ~OutputParameter();
     
-    void setValues( PostgreSQLSupportedFieldTypes aFieldType,
+    void setValues(PostgreSQLSupportedFieldTypes aFieldType,
 					Oid                           anInternalFieldType,
 					std::size_t                   aRowNumber,
 					const char *                  aDataPtr,
@@ -148,12 +148,12 @@ class PQConnectionInfoOptionsFree
 	/// PostgreSQL connection Info Options free (RAII)
 {
 public:
-    explicit PQConnectionInfoOptionsFree( PQconninfoOption * aConnectionInfoOptionPtr );
+    explicit PQConnectionInfoOptionsFree(PQconninfoOption * aConnectionInfoOptionPtr);
     ~PQConnectionInfoOptionsFree();
         
 private:
-    PQConnectionInfoOptionsFree             ( const PQConnectionInfoOptionsFree & );
-    PQConnectionInfoOptionsFree & operator= ( const PQConnectionInfoOptionsFree & );
+    PQConnectionInfoOptionsFree             (const PQConnectionInfoOptionsFree &);
+    PQConnectionInfoOptionsFree & operator= (const PQConnectionInfoOptionsFree &);
         
 private:
     PQconninfoOption * _pConnectionInfoOption;
@@ -163,12 +163,12 @@ class PQResultClear
 	/// PostgreSQL statement result free (RAII)
 {
 public:
-    explicit PQResultClear( PGresult * aPQResultPtr );
+    explicit PQResultClear(PGresult * aPQResultPtr);
     ~PQResultClear();
         
 private:
-    PQResultClear             ( const PQResultClear & );
-    PQResultClear & operator= ( const PQResultClear & );
+    PQResultClear             (const PQResultClear &);
+    PQResultClear & operator= (const PQResultClear &);
         
 private:
     PGresult * _pPQResult;
@@ -179,12 +179,12 @@ class PGCancelFree
 	/// PostgreSQL Cancel Info Options free (RAII)
 {
 public:
-    explicit PGCancelFree( PGcancel * aStatementCancelPtr );
+    explicit PGCancelFree(PGcancel * aStatementCancelPtr);
     ~PGCancelFree();
         
 private:
-    PGCancelFree             ( const PGCancelFree & );
-    PGCancelFree & operator= ( const PGCancelFree & );
+    PGCancelFree             (const PGCancelFree &);
+    PGCancelFree & operator= (const PGCancelFree &);
         
 private:
     PGcancel * _pPGCancel;
@@ -198,16 +198,16 @@ private:
 // InputParameter
 
 inline
-InputParameter::InputParameter( PostgreSQLSupportedFieldTypes aFieldType,
+InputParameter::InputParameter(PostgreSQLSupportedFieldTypes aFieldType,
                                 const void *                  aDataPtr,
-                                std::size_t                   theSize )
-    : _fieldType                       ( aFieldType ),
-      _pData                           ( aDataPtr ),
-      _size                            ( theSize ),
-      _isBinary                        ( false ),
-      _pNonStringVersionRepresentation ( 0 )
+                                std::size_t                   theSize)
+    : _fieldType                       (aFieldType),
+      _pData                           (aDataPtr),
+      _size                            (theSize),
+      _isBinary                        (false),
+      _pNonStringVersionRepresentation (0)
 {
-    if (    POSTGRESQL_TYPE_BLOB == _fieldType
+    if (POSTGRESQL_TYPE_BLOB == _fieldType
          || POSTGRESQL_TYPE_CLOB == _fieldType) {
         _isBinary = true;
     }
@@ -216,11 +216,11 @@ InputParameter::InputParameter( PostgreSQLSupportedFieldTypes aFieldType,
 
 inline
 InputParameter::InputParameter()
-    : _fieldType                      ( POSTGRESQL_TYPE_NONE ),
-      _pData                          ( 0 ),
-      _size                           ( 0 ),
-      _isBinary                       ( false ),
-     _pNonStringVersionRepresentation ( 0 )
+    : _fieldType                      (POSTGRESQL_TYPE_NONE),
+      _pData                          (0),
+      _size                           (0),
+      _isBinary                       (false),
+     _pNonStringVersionRepresentation (0)
 {
 }
 
@@ -264,7 +264,7 @@ InputParameter::isBinary() const
 
 inline
 void
-InputParameter::setStringVersionRepresentation( const std::string & aString )
+InputParameter::setStringVersionRepresentation(const std::string & aString)
 {
     _pNonStringVersionRepresentation = 0;
     
@@ -274,11 +274,11 @@ InputParameter::setStringVersionRepresentation( const std::string & aString )
 
 inline
 void
-InputParameter::setNonStringVersionRepresentation( const void * aPtr, std::size_t theDataLength )
+InputParameter::setNonStringVersionRepresentation(const void * aPtr, std::size_t theDataLength)
 {
     _stringVersionRepresentation = std::string();
     
-    _pNonStringVersionRepresentation = const_cast< void * > ( aPtr );
+    _pNonStringVersionRepresentation = const_cast< void * > (aPtr);
     _size = theDataLength;
 }
 
@@ -287,7 +287,7 @@ inline
 const void *
 InputParameter::pInternalRepresentation() const
 {
-    switch ( _fieldType ) {
+    switch (_fieldType) {
         case POSTGRESQL_TYPE_INT8:
         case POSTGRESQL_TYPE_UINT8:
         case POSTGRESQL_TYPE_INT16:
@@ -319,45 +319,45 @@ InputParameter::pInternalRepresentation() const
 
 // OutputParameter
 inline
-OutputParameter::OutputParameter( PostgreSQLSupportedFieldTypes aFieldType,
+OutputParameter::OutputParameter(PostgreSQLSupportedFieldTypes aFieldType,
                                   Oid                           anInternalFieldType,
                                   std::size_t                   aRowNumber,
                                   const char *                  aDataPtr,
                                   std::size_t                   theSize,
-                                  bool                          anIsNull )
-    : _fieldType         ( aFieldType ),
-      _internalFieldType ( anInternalFieldType ),
-      _rowNumber         ( aRowNumber ),
-      _pData             ( aDataPtr ),
-      _size              ( theSize ),
-      _isNull            ( anIsNull )
+                                  bool                          anIsNull)
+    : _fieldType         (aFieldType),
+      _internalFieldType (anInternalFieldType),
+      _rowNumber         (aRowNumber),
+      _pData             (aDataPtr),
+      _size              (theSize),
+      _isNull            (anIsNull)
 {
 }
 
 inline
-OutputParameter::OutputParameter( )
-    : _fieldType         ( POSTGRESQL_TYPE_NONE ),
-      _internalFieldType ( -1 ),
-      _rowNumber         ( 0 ),
-      _pData             ( 0 ),
-      _size              ( 0 ),
-      _isNull            ( true )
+OutputParameter::OutputParameter()
+    : _fieldType         (POSTGRESQL_TYPE_NONE),
+      _internalFieldType (-1),
+      _rowNumber         (0),
+      _pData             (0),
+      _size              (0),
+      _isNull            (true)
 {
 }
 
 inline
-OutputParameter::~OutputParameter( )
+OutputParameter::~OutputParameter()
 {
 }
 
 inline
 void
-OutputParameter::setValues( PostgreSQLSupportedFieldTypes aFieldType,
+OutputParameter::setValues(PostgreSQLSupportedFieldTypes aFieldType,
                             Oid                           anInternalFieldType,
                             std::size_t                   aRowNumber,
                             const char *                  aDataPtr,
                             std::size_t                   theSize,
-                            bool                          anIsNull )
+                            bool                          anIsNull)
 {
     _fieldType         = aFieldType;
     _internalFieldType = anInternalFieldType;
@@ -413,17 +413,17 @@ OutputParameter::isNull() const
 // PQConnectionInfoOptionsFree
 
 inline
-PQConnectionInfoOptionsFree::PQConnectionInfoOptionsFree( PQconninfoOption * aConnectionInfoOptionPtr )
-    : _pConnectionInfoOption( aConnectionInfoOptionPtr )
+PQConnectionInfoOptionsFree::PQConnectionInfoOptionsFree(PQconninfoOption * aConnectionInfoOptionPtr)
+    : _pConnectionInfoOption(aConnectionInfoOptionPtr)
 {
 }
 
 inline
 PQConnectionInfoOptionsFree::~PQConnectionInfoOptionsFree()
 {
-    if ( _pConnectionInfoOption )
+    if (_pConnectionInfoOption)
     {
-        PQconninfoFree( _pConnectionInfoOption );
+        PQconninfoFree(_pConnectionInfoOption);
         _pConnectionInfoOption = 0;
     }
 }
@@ -431,17 +431,17 @@ PQConnectionInfoOptionsFree::~PQConnectionInfoOptionsFree()
 // PQResultClear
 
 inline
-PQResultClear::PQResultClear( PGresult * aPQResultPtr  )
-    : _pPQResult( aPQResultPtr )
+PQResultClear::PQResultClear(PGresult * aPQResultPtr)
+    : _pPQResult(aPQResultPtr)
 {
 }
 
 inline
 PQResultClear::~PQResultClear()
 {
-    if ( _pPQResult )
+    if (_pPQResult)
     {
-        PQclear( _pPQResult );
+        PQclear(_pPQResult);
         _pPQResult = 0;
     }
 }
@@ -449,17 +449,17 @@ PQResultClear::~PQResultClear()
 // PGCancelFree
 
 inline
-PGCancelFree::PGCancelFree( PGcancel * aStatementCancelPtr  )
-    : _pPGCancel( aStatementCancelPtr )
+PGCancelFree::PGCancelFree(PGcancel * aStatementCancelPtr)
+    : _pPGCancel(aStatementCancelPtr)
 {
 }
 
 inline
 PGCancelFree::~PGCancelFree()
 {
-    if ( _pPGCancel )
+    if (_pPGCancel)
     {
-        PQfreeCancel( _pPGCancel );
+        PQfreeCancel(_pPGCancel);
         _pPGCancel = 0;
     }
 }

@@ -41,12 +41,12 @@ namespace Data {
 namespace PostgreSQL {
 
 
-PostgreSQLStatementImpl::PostgreSQLStatementImpl( SessionImpl & aSessionImpl )
-:	Poco::Data::StatementImpl	( aSessionImpl ),
-	_statementExecutor			( aSessionImpl.handle() ),
-	_pBinder					( new Binder ),
-	_pExtractor					( new Extractor ( _statementExecutor ) ),
-	_hasNext					( NEXT_DONTKNOW )
+PostgreSQLStatementImpl::PostgreSQLStatementImpl(SessionImpl & aSessionImpl)
+:	Poco::Data::StatementImpl	(aSessionImpl),
+	_statementExecutor			(aSessionImpl.handle()),
+	_pBinder					(new Binder),
+	_pExtractor					(new Extractor (_statementExecutor)),
+	_hasNext					(NEXT_DONTKNOW)
 {
 }
 
@@ -71,23 +71,23 @@ PostgreSQLStatementImpl::affectedRowCount() const
 
 
 const MetaColumn&
-PostgreSQLStatementImpl::metaColumn( std::size_t aPosition ) const
+PostgreSQLStatementImpl::metaColumn(std::size_t aPosition) const
 {
-	return _statementExecutor.metaColumn( aPosition );
+	return _statementExecutor.metaColumn(aPosition);
 }
 
 
 bool
 PostgreSQLStatementImpl::hasNext()
 {
-	if ( NEXT_DONTKNOW == _hasNext )
+	if (NEXT_DONTKNOW == _hasNext)
 	{
-		if ( columnsReturned() == 0 )
+		if (columnsReturned() == 0)
 		{
 			return false;
 		}
 
-		if ( _statementExecutor.fetch() )
+		if (_statementExecutor.fetch())
 		{
 			_hasNext = NEXT_TRUE;
 			return true;
@@ -97,7 +97,7 @@ PostgreSQLStatementImpl::hasNext()
 		return false;
 	}
 	else
-		if ( NEXT_TRUE == _hasNext )
+		if (NEXT_TRUE == _hasNext)
 		{
 			return true;
 		}
@@ -109,9 +109,9 @@ PostgreSQLStatementImpl::hasNext()
 std::size_t
 PostgreSQLStatementImpl::next()
 {
-	if ( ! hasNext() )
+	if (! hasNext())
 	{
-		throw StatementException( "No data received" );
+		throw StatementException("No data received");
 	}
 
 	Poco::Data::AbstractExtractionVec::iterator it= extractions().begin();
@@ -121,7 +121,7 @@ PostgreSQLStatementImpl::next()
 
 	for (; it != itEnd; ++it)
 	{
-		(*it)->extract( position );
+		(*it)->extract(position);
 		position += (*it)->numOfColumnsHandled();
 	}
 
@@ -136,10 +136,10 @@ PostgreSQLStatementImpl::canBind() const
 {
 	bool ret = false;
 
-	if ( (_statementExecutor.state() >= StatementExecutor::STMT_COMPILED )
-		 && ! bindings().empty() )
+	if ((_statementExecutor.state() >= StatementExecutor::STMT_COMPILED)
+		 && ! bindings().empty())
 	{
-		ret = ( *bindings().begin() )->canBind();
+		ret = (*bindings().begin())->canBind();
 	}
 
 	return ret;
@@ -149,14 +149,14 @@ PostgreSQLStatementImpl::canBind() const
 bool
 PostgreSQLStatementImpl::canCompile() const
 {
-	return ( _statementExecutor.state() < StatementExecutor::STMT_COMPILED );
+	return (_statementExecutor.state() < StatementExecutor::STMT_COMPILED);
 }
 
 
 void
 PostgreSQLStatementImpl::compileImpl()
 {
-	_statementExecutor.prepare( toString() );
+	_statementExecutor.prepare(toString());
 }
 
 
@@ -171,13 +171,13 @@ PostgreSQLStatementImpl::bindImpl()
 
 	for (; it != itEnd && (*it)->canBind(); ++it)
 	{
-		(*it)->bind( position );
+		(*it)->bind(position);
 		position += (*it)->numOfColumnsHandled();
 	}
 
 	_pBinder->updateBindVectorToCurrentValues();
 
-	_statementExecutor.bindParams( _pBinder->bindVector() );
+	_statementExecutor.bindParams(_pBinder->bindVector());
 
 	_statementExecutor.execute();
 

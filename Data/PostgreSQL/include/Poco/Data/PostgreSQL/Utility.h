@@ -54,34 +54,34 @@ class PostgreSQL_API Utility
 {
 public:
 
-	static std::string serverInfo( SessionHandle* aHandlePtr );
+	static std::string serverInfo(SessionHandle* aHandlePtr);
 		/// Returns server info.
 
-	static std::string serverInfo( Poco::Data::Session& aSession );
+	static std::string serverInfo(Poco::Data::Session& aSession);
 		/// Returns server info.
 
-	static int serverVersion( SessionHandle* aHandlePtr );
+	static int serverVersion(SessionHandle* aHandlePtr);
 		/// Returns server version.
 
-	static int serverVersion( Poco::Data::Session& aSession );
+	static int serverVersion(Poco::Data::Session& aSession);
 		/// Returns server version.
 
-	static std::string hostInfo( SessionHandle* aHandlePtr );
+	static std::string hostInfo(SessionHandle* aHandlePtr);
 		/// Returns host info.
 
-	static std::string hostInfo( Poco::Data::Session& aSession );
+	static std::string hostInfo(Poco::Data::Session& aSession);
 		/// Returns host info.
 
-	static std::string sessionEncoding( SessionHandle* aHandlePtr );
+	static std::string sessionEncoding(SessionHandle* aHandlePtr);
 		/// Returns session encoding.
 
-	static std::string sessionEncoding( Poco::Data::Session& aSession );
+	static std::string sessionEncoding(Poco::Data::Session& aSession);
 		/// Returns session encoding.
 
 	static bool hasMicrosecond() { return true; }
 		/// Rturns true if microseconds are suported.
 
-	static SessionHandle* handle( Poco::Data::Session& aSession );
+	static SessionHandle* handle(Poco::Data::Session& aSession);
 		/// Returns native PostgreSQL handle for the session.
 };
 
@@ -91,9 +91,9 @@ public:
 //
 
 
-inline SessionHandle* Utility::handle( Session& aSession )
+inline SessionHandle* Utility::handle(Session& aSession)
 {
-	return Poco::AnyCast< SessionHandle* >( aSession.getProperty("handle") );
+	return Poco::AnyCast< SessionHandle* >(aSession.getProperty("handle"));
 }
 
 

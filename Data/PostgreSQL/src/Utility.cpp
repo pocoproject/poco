@@ -46,49 +46,49 @@ namespace PostgreSQL {
 
 
 std::string
-Utility::serverInfo( SessionHandle* aHandlePtr )
+Utility::serverInfo(SessionHandle* aHandlePtr)
 {
 	std::string srvrInfo = "Process ID: ";
 
-	srvrInfo.append( Poco::NumberFormatter::format( aHandlePtr->serverProcessID() ) );
+	srvrInfo.append(Poco::NumberFormatter::format(aHandlePtr->serverProcessID()));
 
-	srvrInfo.append( " Protocol Version: ");
+	srvrInfo.append(" Protocol Version: ");
 
-	srvrInfo.append( Poco::NumberFormatter::format( aHandlePtr->protocoVersion() ) );
+	srvrInfo.append(Poco::NumberFormatter::format(aHandlePtr->protocoVersion()));
 
 	return srvrInfo;
 }
 
 
 std::string
-Utility::serverInfo( Session& aSession )
+Utility::serverInfo(Session& aSession)
 {
-	return serverInfo( handle( aSession ) );
+	return serverInfo(handle(aSession));
 }
 
 
 int
-Utility::serverVersion( SessionHandle* aHandlePtr )
+Utility::serverVersion(SessionHandle* aHandlePtr)
 {
 	return aHandlePtr->serverVersion();
 }
 
 
 int
-Utility::serverVersion( Session& aSession )
+Utility::serverVersion(Session& aSession)
 {
-	return serverVersion( handle( aSession ) );
+	return serverVersion(handle(aSession));
 }
 
 
 std::string
-Utility::hostInfo( SessionHandle* aHandlePtr )
+Utility::hostInfo(SessionHandle* aHandlePtr)
 {
 	SessionParametersMap parametersMap = aHandlePtr->connectionParameters();
 
-	SessionParametersMap::const_iterator cItr = parametersMap.find( "host" );
+	SessionParametersMap::const_iterator cItr = parametersMap.find("host");
 
-	if ( parametersMap.end() == cItr )
+	if (parametersMap.end() == cItr)
 	{
 		return std::string();
 	}
@@ -98,23 +98,23 @@ Utility::hostInfo( SessionHandle* aHandlePtr )
 
 
 std::string
-Utility::hostInfo( Session& aSession )
+Utility::hostInfo(Session& aSession)
 {
-	return hostInfo( handle( aSession )  );
+	return hostInfo(handle(aSession));
 }
 
 
 std::string
-Utility::sessionEncoding( SessionHandle* aHandlePtr )
+Utility::sessionEncoding(SessionHandle* aHandlePtr)
 {
 	return aHandlePtr->clientEncoding();
 }
 
 
 std::string
-Utility::sessionEncoding( Poco::Data::Session& aSession )
+Utility::sessionEncoding(Poco::Data::Session& aSession)
 {
-	return sessionEncoding( handle( aSession )  );
+	return sessionEncoding(handle(aSession));
 }
 
 

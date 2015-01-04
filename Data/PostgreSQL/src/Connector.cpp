@@ -65,19 +65,19 @@ Connector::name() const
 
 Poco::AutoPtr<Poco::Data::SessionImpl>
 Connector::createSession(const std::string & aConnectionString,
-						 std::size_t aTimeout )
+						 std::size_t aTimeout)
 {
-	return Poco::AutoPtr<Poco::Data::SessionImpl>( new SessionImpl( aConnectionString, aTimeout ) );
+	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(aConnectionString, aTimeout));
 }
 
 void Connector::registerConnector()
 {
-	Poco::Data::SessionFactory::instance().add( new Connector() );
+	Poco::Data::SessionFactory::instance().add(new Connector());
 }
 
 void Connector::unregisterConnector()
 {
-	Poco::Data::SessionFactory::instance().remove( POCO_DATA_POSTGRESQL_CONNECTOR_NAME );
+	Poco::Data::SessionFactory::instance().remove(POCO_DATA_POSTGRESQL_CONNECTOR_NAME);
 }
 
 

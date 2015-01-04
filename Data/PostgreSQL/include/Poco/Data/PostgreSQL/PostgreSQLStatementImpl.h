@@ -58,7 +58,7 @@ class PostgreSQL_API PostgreSQLStatementImpl: public Poco::Data::StatementImpl
 	/// Implements statement functionality needed for PostgreSQL
 {
 public:
-	PostgreSQLStatementImpl( SessionImpl & aSessionImpl );
+	PostgreSQLStatementImpl(SessionImpl & aSessionImpl);
 		/// Creates the PostgreSQLStatementImpl.
 
 	~PostgreSQLStatementImpl();
@@ -73,7 +73,7 @@ protected:
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 
-	virtual const MetaColumn& metaColumn( std::size_t aPosition ) const;
+	virtual const MetaColumn& metaColumn(std::size_t aPosition) const;
 		/// Returns column meta data.
 
 	virtual bool hasNext();

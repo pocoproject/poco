@@ -259,17 +259,17 @@ public:
 		/// obtain the current version of the bound data and update the internal representation
 
 private:
-	Binder( const Binder& );
+	Binder(const Binder&);
 		/// Don't copy the binder
 
-	virtual void bind( std::size_t, const char* const&, Direction )
+	virtual void bind(std::size_t, const char* const&, Direction)
 		/// Binds a const char ptr. 
 		/// This is a private no-op in this implementation
 		/// due to security risk.
 	{
 	}
 	
-	void realBind( std::size_t aPosition, PostgreSQLSupportedFieldTypes aFieldType, const void* aBufferPtr, std::size_t aLength );
+	void realBind(std::size_t aPosition, PostgreSQLSupportedFieldTypes aFieldType, const void* aBufferPtr, std::size_t aLength);
 		/// Common bind implementation
 
 private:

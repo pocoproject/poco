@@ -183,63 +183,63 @@ void SQLExecutor::barebonePostgreSQLTest(const char* host, const char* user, con
 {
 	std::string connectionString;
 
-	connectionString.append( "host=" );
-	connectionString.append( host );
-	connectionString.append( " ");
+	connectionString.append("host=");
+	connectionString.append(host);
+	connectionString.append(" ");
 
-	connectionString.append( "user=" );
-	connectionString.append( user );
-	connectionString.append( " ");
+	connectionString.append("user=");
+	connectionString.append(user);
+	connectionString.append(" ");
 
-	connectionString.append( "password=" );
-	connectionString.append( pwd );
-	connectionString.append( " ");
+	connectionString.append("password=");
+	connectionString.append(pwd);
+	connectionString.append(" ");
 
-	connectionString.append( "dbname=" );
-	connectionString.append( db );
-	connectionString.append( " ");
+	connectionString.append("dbname=");
+	connectionString.append(db);
+	connectionString.append(" ");
 
-	connectionString.append( "port=" );
-	connectionString.append( port );
+	connectionString.append("port=");
+	connectionString.append(port);
 
 	PGconn *  pConnection = 0;
 
-	pConnection = PQconnectdb( connectionString.c_str() );
+	pConnection = PQconnectdb(connectionString.c_str());
 
-	assert( PQstatus(pConnection) == CONNECTION_OK);
+	assert(PQstatus(pConnection) == CONNECTION_OK);
 	
 	PGresult * pResult = 0;
 	std::string sql = "DROP TABLE IF EXISTS Test";
 
-	pResult = PQexec( pConnection, sql.c_str() );
+	pResult = PQexec(pConnection, sql.c_str());
 
-	std::cout << "Drop Table Test Result: " <<  PQresStatus( PQresultStatus( pResult ) ) << " statement: "<< sql.c_str() << std::endl;
+	std::cout << "Drop Table Test Result: " <<  PQresStatus(PQresultStatus(pResult)) << " statement: "<< sql.c_str() << std::endl;
 
-	assert(	PQresultStatus( pResult ) == PGRES_COMMAND_OK
-			|| PQresultStatus( pResult ) == PGRES_FATAL_ERROR );
+	assert(	PQresultStatus(pResult) == PGRES_COMMAND_OK
+			|| PQresultStatus(pResult) == PGRES_FATAL_ERROR);
 
-	PQclear( pResult );
+	PQclear(pResult);
 
 	sql = tableCreateString;
-	pResult = PQexec( pConnection, sql.c_str() );
+	pResult = PQexec(pConnection, sql.c_str());
 
-	std::cout << "create Table Test Result: " <<  PQresStatus( PQresultStatus( pResult ) ) << " statement: "<< sql.c_str() << std::endl;
+	std::cout << "create Table Test Result: " <<  PQresStatus(PQresultStatus(pResult)) << " statement: "<< sql.c_str() << std::endl;
 
-	assert( PQresultStatus( pResult ) == PGRES_COMMAND_OK);
-	PQclear( pResult );
+	assert(PQresultStatus(pResult) == PGRES_COMMAND_OK);
+	PQclear(pResult);
 
 	sql = "INSERT INTO Test VALUES ($1,$2,$3,$4::int4,$5::float)";
 	std::string insertStatementName = "Insert Statement";
 
-	pResult = PQprepare( pConnection,
+	pResult = PQprepare(pConnection,
 						insertStatementName.c_str(),
 						sql.c_str(),
 						5,
 						0
 						);
 
-	assert( PQresultStatus( pResult ) == PGRES_COMMAND_OK);
-	PQclear( pResult );
+	assert(PQresultStatus(pResult) == PGRES_COMMAND_OK);
+	PQclear(pResult);
 
 	std::string str[3] = { "111", "222", "333" };
 	int fourth = htonl((Poco::UInt32) 4);
@@ -270,7 +270,7 @@ void SQLExecutor::barebonePostgreSQLTest(const char* host, const char* user, con
 	paramLengths[4] = sizeof(fifth);
 	paramLengths[4] = 1;  // binary
 
-	pResult = PQexecPrepared( pConnection,
+	pResult = PQexecPrepared(pConnection,
 								insertStatementName.c_str(),
 								5,
 								paramValues,
@@ -279,94 +279,94 @@ void SQLExecutor::barebonePostgreSQLTest(const char* host, const char* user, con
 								1 // ask for binary resilts
 							);
 
-	std::cout << "exec prepared Test Result: " <<  PQresStatus( PQresultStatus( pResult ) ) << " statement: "<< sql.c_str() << std::endl;
+	std::cout << "exec prepared Test Result: " <<  PQresStatus(PQresultStatus(pResult)) << " statement: "<< sql.c_str() << std::endl;
 
-	assert( PQresultStatus( pResult ) == PGRES_COMMAND_OK);
-	PQclear( pResult );
+	assert(PQresultStatus(pResult) == PGRES_COMMAND_OK);
+	PQclear(pResult);
 
 	sql = "SELECT * FROM Test";
-	pResult = PQexec(pConnection, sql.c_str() );
+	pResult = PQexec(pConnection, sql.c_str());
 
-	std::cout << "select * Test Result: " <<  PQresStatus( PQresultStatus( pResult ) ) << " statement: "<< sql.c_str() << std::endl;
+	std::cout << "select * Test Result: " <<  PQresStatus(PQresultStatus(pResult)) << " statement: "<< sql.c_str() << std::endl;
 
-	assert( PQresultStatus( pResult ) == PGRES_TUPLES_OK);
+	assert(PQresultStatus(pResult) == PGRES_TUPLES_OK);
 
-	assert( PQntuples( pResult ) == 1 );
+	assert(PQntuples(pResult) == 1);
 
 	char* pSelectResult[5] = { 0 };
 	int pResultLengths[5] = { 0 };
 
 	// column 0
-	pSelectResult[ 0 ] = PQgetvalue( pResult,
+	pSelectResult[ 0 ] = PQgetvalue(pResult,
 										0,
 										0
 									);
 
-	pResultLengths[ 0 ] = PQgetlength( pResult,
+	pResultLengths[ 0 ] = PQgetlength(pResult,
 										0,
 										0
 									);
-	assert( pSelectResult[ 0 ] != 0 );
-	assert( pResultLengths[ 0 ] != 0 );
+	assert(pSelectResult[ 0 ] != 0);
+	assert(pResultLengths[ 0 ] != 0);
 
 	// column 1
-	pSelectResult[ 1 ] = PQgetvalue( pResult,
+	pSelectResult[ 1 ] = PQgetvalue(pResult,
 										0,
 										1
 									);
 
-	pResultLengths[ 1 ] = PQgetlength( pResult,
+	pResultLengths[ 1 ] = PQgetlength(pResult,
 										0,
 										1
 									);
-	assert( pSelectResult[ 1 ] != 0 );
-	assert( pResultLengths[ 1 ] != 0 );
+	assert(pSelectResult[ 1 ] != 0);
+	assert(pResultLengths[ 1 ] != 0);
 
 	// column 2
-	pSelectResult[ 2 ] = PQgetvalue( pResult,
+	pSelectResult[ 2 ] = PQgetvalue(pResult,
 										0,
 										2
 									);
 
-	pResultLengths[ 2 ] = PQgetlength( pResult,
+	pResultLengths[ 2 ] = PQgetlength(pResult,
 										0,
 										2
 									);
-	assert( pSelectResult[ 2 ] != 0 );
-	assert( pResultLengths[ 2 ] != 0 );
+	assert(pSelectResult[ 2 ] != 0);
+	assert(pResultLengths[ 2 ] != 0);
 
 // column 3
-	pSelectResult[ 3 ] = PQgetvalue( pResult,
+	pSelectResult[ 3 ] = PQgetvalue(pResult,
 										0,
 										3
 									);
 
-	pResultLengths[ 3 ] = PQgetlength( pResult,
+	pResultLengths[ 3 ] = PQgetlength(pResult,
 											0,
 											3
 									);
-	assert( pSelectResult[ 3 ] != 0 );
-	assert( pResultLengths[ 3 ] != 0 );
+	assert(pSelectResult[ 3 ] != 0);
+	assert(pResultLengths[ 3 ] != 0);
 
 	// column 4
-	pSelectResult[ 4 ] = PQgetvalue( pResult,
+	pSelectResult[ 4 ] = PQgetvalue(pResult,
 										0,
 										4
 									);
 
-	pResultLengths[ 4 ] = PQgetlength( pResult,
+	pResultLengths[ 4 ] = PQgetlength(pResult,
 										0,
 										4
 									);
-	assert( pSelectResult[ 4 ] != 0 );
-	assert( pResultLengths[ 4 ] != 0 );
+	assert(pSelectResult[ 4 ] != 0);
+	assert(pResultLengths[ 4 ] != 0);
 
 /*
  * The binary representation of INT4 is in network byte order, which
  * we'd better coerce to the local byte order.
 */
 
-	fourth = ntohl( *((Poco::UInt32 *) pSelectResult[ 3 ]) );
+	fourth = ntohl(*((Poco::UInt32 *) pSelectResult[ 3 ]));
 	fifth = *((float *) pSelectResult[ 4 ]);
 
 	assert (0 == std::strncmp("111", pSelectResult[0], 3));
@@ -375,16 +375,16 @@ void SQLExecutor::barebonePostgreSQLTest(const char* host, const char* user, con
 	assert (4 == fourth);
 	assert (1.5 == fifth);
 
-	PQclear( pResult );
+	PQclear(pResult);
 
 	sql = "DROP TABLE Test";
 
-	pResult = PQexec(pConnection, sql.c_str() );
+	pResult = PQexec(pConnection, sql.c_str());
 
-	assert( PQresultStatus( pResult ) == PGRES_COMMAND_OK);
-	PQclear( pResult );
+	assert(PQresultStatus(pResult) == PGRES_COMMAND_OK);
+	PQclear(pResult);
 
-	PQfinish( pConnection );
+	PQfinish(pConnection);
 }
 
 
@@ -1470,7 +1470,7 @@ void SQLExecutor::blob(unsigned int bigSize)
 
 	// Poco::Data::BLOB img("0123456789", 10);
 unsigned char BLOBData[ 10 ] = { 254,253,252,251,4,5,6,7,14,15 };
-	Poco::Data::BLOB img( BLOBData, 10);
+	Poco::Data::BLOB img(BLOBData, 10);
 
 	int count = 0;
 	try { *_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastName), use(firstName), use(address), use(img), now; }
@@ -1515,7 +1515,7 @@ void SQLExecutor::clobStmt()
 	std::string lastName("lastname");
 	std::string firstName("firstname");
 	std::string address("Address");
-	Poco::Data::CLOB clob( "0123456789", 10);
+	Poco::Data::CLOB clob("0123456789", 10);
 
 	int count = 0;
 	Statement ins = (*_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastName), use(firstName), use(address), use(clob));
@@ -1542,7 +1542,7 @@ void SQLExecutor::blobStmt()
 	std::string firstName("firstname");
 	std::string address("Address");
 unsigned char BLOBData[ 10 ] = { 0,1,2,3,4,5,6,7,14,15 };
-	Poco::Data::BLOB blob( BLOBData, 10);
+	Poco::Data::BLOB blob(BLOBData, 10);
 
 	int count = 0;
 	Statement ins = (*_pSession << "INSERT INTO Person VALUES ($1,$2,$3,$4)", use(lastName), use(firstName), use(address), use(blob));

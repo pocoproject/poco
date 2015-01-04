@@ -46,7 +46,7 @@
 
 namespace
 {
-	std::string copyStripped(std::string::const_iterator aFromStringCItr, std::string::const_iterator aToStringCItr )
+	std::string copyStripped(std::string::const_iterator aFromStringCItr, std::string::const_iterator aToStringCItr)
 	{
 		// skip leading spaces
 		while ((aFromStringCItr != aToStringCItr) && isspace(*aFromStringCItr)) aFromStringCItr++;
@@ -56,16 +56,16 @@ namespace
 		return std::string(aFromStringCItr, aToStringCItr);
 	}
 
-	std::string createConnectionStringFromOptionsMap( const std::map < std::string, std::string > anOptionsMap  )
+	std::string createConnectionStringFromOptionsMap(const std::map < std::string, std::string > anOptionsMap)
 	{
 		std::string connectionString;
 
-		for ( std::map< std::string, std::string >::const_iterator citr = anOptionsMap.begin(); citr != anOptionsMap.end(); ++citr )
+		for (std::map< std::string, std::string >::const_iterator citr = anOptionsMap.begin(); citr != anOptionsMap.end(); ++citr)
 		{
-			connectionString.append( citr->first );
-			connectionString.append( "=" );
-			connectionString.append( citr->second );
-			connectionString.append( " " );
+			connectionString.append(citr->first);
+			connectionString.append("=");
+			connectionString.append(citr->second);
+			connectionString.append(" ");
 		}
 
 		return connectionString;
@@ -77,11 +77,11 @@ namespace Poco {
 namespace Data {
 namespace PostgreSQL {
 
-SessionImpl::SessionImpl(const std::string & aConnectionString, std::size_t aLoginTimeout )
-	: Poco::Data::AbstractSessionImpl< SessionImpl >( aConnectionString, aLoginTimeout )
+SessionImpl::SessionImpl(const std::string & aConnectionString, std::size_t aLoginTimeout)
+	: Poco::Data::AbstractSessionImpl< SessionImpl >(aConnectionString, aLoginTimeout)
 {
-	setProperty( "handle", static_cast< SessionHandle* >( &_sessionHandle ) );
-	setConnectionTimeout( CONNECTION_TIMEOUT_DEFAULT );
+	setProperty("handle", static_cast< SessionHandle* >(&_sessionHandle));
+	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 	open();
 }
 
@@ -98,31 +98,31 @@ SessionImpl::~SessionImpl()
 
 
 void
-SessionImpl::setConnectionTimeout( std::size_t aTimeout )
+SessionImpl::setConnectionTimeout(std::size_t aTimeout)
 {
 	_timeout = aTimeout;
 }
 
 
 void
-SessionImpl::open( const std::string & aConnectionString )
+SessionImpl::open(const std::string & aConnectionString)
 {
-	if ( connectionString() != aConnectionString )
+	if (connectionString() != aConnectionString)
 	{
-		if ( isConnected() )
+		if (isConnected())
 		{
-			throw ConnectionException( "Session already connected" );
+			throw ConnectionException("Session already connected");
 		}
 
-		if ( ! aConnectionString.empty() )
+		if (! aConnectionString.empty())
 		{
-			setConnectionString( aConnectionString );
+			setConnectionString(aConnectionString);
 		}
 	}
 
-	poco_assert_dbg ( ! connectionString().empty() );
+	poco_assert_dbg (! connectionString().empty());
 	
-	unsigned int timeout = static_cast< unsigned int >( getLoginTimeout() );
+	unsigned int timeout = static_cast< unsigned int >(getLoginTimeout());
 
 	// PostgreSQL connections can use environment variables for connection parameters.
 	// As such it is not an error if they are not part of the connection string
@@ -130,26 +130,26 @@ SessionImpl::open( const std::string & aConnectionString )
 	std::map < std::string, std::string > optionsMap;
 
 	// Default values
-	optionsMap[ "connect_timeout" ] = Poco::NumberFormatter::format( timeout );
+	optionsMap[ "connect_timeout" ] = Poco::NumberFormatter::format(timeout);
 
 	const std::string & connString = connectionString();
 
-	for ( std::string::const_iterator start = connString.begin();
+	for (std::string::const_iterator start = connString.begin();
 			;
 		)
 	{
-		std::string::const_iterator finish = std::find( start, connString.end(), ' ' ); // space is the separator between keyword=value pairs
-		std::string::const_iterator middle = std::find( start, finish, '=' );
+		std::string::const_iterator finish = std::find(start, connString.end(), ' '); // space is the separator between keyword=value pairs
+		std::string::const_iterator middle = std::find(start, finish, '=');
 
-		if ( middle == finish )
+		if (middle == finish)
 		{
-			throw PostgreSQLException( "create session: bad connection string format, cannot find '='" );
+			throw PostgreSQLException("create session: bad connection string format, cannot find '='");
 		}
 
-		optionsMap[ copyStripped( start, middle ) ] = copyStripped( middle + 1, finish );
+		optionsMap[ copyStripped(start, middle) ] = copyStripped(middle + 1, finish);
 
-		if	(   ( finish == connString.end() )
-			 || ( finish + 1 == connString.end() )
+		if	((finish == connString.end())
+			 || (finish + 1 == connString.end())
 			)
 		{
 		break;
@@ -159,22 +159,22 @@ SessionImpl::open( const std::string & aConnectionString )
 	}
 
 	// Real connect
-	_sessionHandle.connect( createConnectionStringFromOptionsMap( optionsMap ) );
+	_sessionHandle.connect(createConnectionStringFromOptionsMap(optionsMap));
 
-	addFeature( "autoCommit",
+	addFeature("autoCommit",
 		&SessionImpl::setAutoCommit,
-		&SessionImpl::isAutoCommit );
+		&SessionImpl::isAutoCommit);
 
-	addFeature( "asynchronousCommit",
+	addFeature("asynchronousCommit",
 		&SessionImpl::setAutoCommit,
-		&SessionImpl::isAutoCommit );
+		&SessionImpl::isAutoCommit);
 }
 
 
 void
 SessionImpl::close()
 {
-	if ( isConnected() )
+	if (isConnected())
 	{
 		_sessionHandle.disconnect();
 	}
@@ -191,8 +191,8 @@ SessionImpl::isConnected()
 Poco::Data::StatementImpl*
 SessionImpl::createStatementImpl()
 {
-	return dynamic_cast< Poco::Data::StatementImpl* > ( new PostgreSQLStatementImpl ( *this ) );
-//	return new PostgreSQLStatementImpl( *this );
+	return dynamic_cast< Poco::Data::StatementImpl* > (new PostgreSQLStatementImpl (*this));
+//	return new PostgreSQLStatementImpl(*this);
 }
 
 
@@ -206,9 +206,9 @@ SessionImpl::isTransaction()
 void
 SessionImpl::begin()
 {
-	if ( isTransaction() )
+	if (isTransaction())
 	{
-		throw Poco::InvalidAccessException( "Already in transaction." );
+		throw Poco::InvalidAccessException("Already in transaction.");
 	}
 
 	_sessionHandle.startTransaction();
@@ -233,37 +233,37 @@ SessionImpl::rollback()
 
 
 void
-SessionImpl::setAutoCommit( const std::string &, bool aValue )
+SessionImpl::setAutoCommit(const std::string &, bool aValue)
 {
-	_sessionHandle.setAutoCommit( aValue );
+	_sessionHandle.setAutoCommit(aValue);
 }
 
 
 bool
-SessionImpl::isAutoCommit( const std::string & )
+SessionImpl::isAutoCommit(const std::string &)
 {
 	return _sessionHandle.isAutoCommit();
 }
 
    
 void
-SessionImpl::setAsynchronousCommit( const std::string &,  bool aValue )
+SessionImpl::setAsynchronousCommit(const std::string &,  bool aValue)
 {
-	_sessionHandle.setAsynchronousCommit( aValue );
+	_sessionHandle.setAsynchronousCommit(aValue);
 }
 
 
 bool
-SessionImpl::isAsynchronousCommit( const std::string & )
+SessionImpl::isAsynchronousCommit(const std::string &)
 {
 	return _sessionHandle.isAsynchronousCommit();
 }
 
 
 void
-SessionImpl::setTransactionIsolation( Poco::UInt32 aTI )
+SessionImpl::setTransactionIsolation(Poco::UInt32 aTI)
 {
-	return _sessionHandle.setTransactionIsolation( aTI );
+	return _sessionHandle.setTransactionIsolation(aTI);
 }
 
 
@@ -275,9 +275,9 @@ SessionImpl::getTransactionIsolation()
 
 
 bool
-SessionImpl::hasTransactionIsolation( Poco::UInt32 aTI )
+SessionImpl::hasTransactionIsolation(Poco::UInt32 aTI)
 {
-	return _sessionHandle.hasTransactionIsolation( aTI );
+	return _sessionHandle.hasTransactionIsolation(aTI);
 }
 
 
