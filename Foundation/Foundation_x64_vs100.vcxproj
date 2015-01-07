@@ -137,7 +137,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -177,7 +177,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -263,7 +263,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -297,7 +297,14 @@
     <ClCompile Include="src\Ascii.cpp" />
     <ClCompile Include="src\AtomicCounter.cpp" />
     <ClCompile Include="src\Bugcheck.cpp" />
-    <ClCompile Include="src\ByteOrder.cpp" />
+    <ClCompile Include="src\ByteOrder.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Checksum.cpp" />
     <ClCompile Include="src\Debugger.cpp" />
     <ClCompile Include="src\DirectoryWatcher.cpp" />
@@ -386,7 +393,14 @@
     <ClCompile Include="src\NumberParser.cpp" />
     <ClCompile Include="src\RefCountedObject.cpp" />
     <ClCompile Include="src\SortedDirectoryIterator.cpp" />
-    <ClCompile Include="src\String.cpp" />
+    <ClCompile Include="src\String.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\NumericString.cpp" />
     <ClCompile Include="src\DirectoryIteratorStrategy.cpp" />
     <ClCompile Include="src\StringTokenizer.cpp" />
@@ -514,7 +528,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\SignalHandler.cpp" />
+    <ClCompile Include="src\SignalHandler.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\SynchronizedObject.cpp" />
     <ClCompile Include="src\Thread.cpp" />
     <ClCompile Include="src\Thread_POSIX.cpp">

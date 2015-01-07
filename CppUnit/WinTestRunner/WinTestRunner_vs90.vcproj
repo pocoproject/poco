@@ -164,7 +164,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				ShowIncludes="false"
 			/>
@@ -266,7 +266,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				ShowIncludes="false"
 			/>
@@ -439,7 +439,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				ShowIncludes="false"
 			/>

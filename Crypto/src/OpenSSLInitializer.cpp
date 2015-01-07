@@ -35,8 +35,7 @@ namespace Crypto {
 
 
 Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
-Poco::FastMutex OpenSSLInitializer::_mutex;
-int OpenSSLInitializer::_rc(0);
+Poco::AtomicCounter OpenSSLInitializer::_rc;
 
 
 OpenSSLInitializer::OpenSSLInitializer()
@@ -60,8 +59,6 @@ OpenSSLInitializer::~OpenSSLInitializer()
 
 void OpenSSLInitializer::initialize()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
-	
 	if (++_rc == 1)
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x0907000L
@@ -98,8 +95,6 @@ void OpenSSLInitializer::initialize()
 
 void OpenSSLInitializer::uninitialize()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
-
 	if (--_rc == 0)
 	{
 		EVP_cleanup();

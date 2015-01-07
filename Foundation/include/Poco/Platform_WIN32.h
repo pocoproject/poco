@@ -148,7 +148,7 @@
 #endif
 
 
-#if (_MSC_VER >= 1300) && (_MSC_VER < 1400) // Visual Studio 2003, MSVC++ 7.1
+#if (_MSC_VER >= 1300) && (_MSC_VER < 1400)   // Visual Studio 2003, MSVC++ 7.1
 	#define POCO_MSVS_VERSION 2003
 	#define POCO_MSVC_VERSION 71
 #elif (_MSC_VER >= 1400) && (_MSC_VER < 1500) // Visual Studio 2005, MSVC++ 8.0
@@ -163,12 +163,20 @@
 #elif (_MSC_VER >= 1700) && (_MSC_VER < 1800) // Visual Studio 2012, MSVC++ 11.0
 	#define POCO_MSVS_VERSION 2012
 	#define POCO_MSVC_VERSION 110
+#elif (_MSC_VER >= 1800) && (_MSC_VER < 1900) // Visual Studio 2013, MSVC++ 12.0
+	#define POCO_MSVS_VERSION 2013
+	#define POCO_MSVC_VERSION 120
 #endif
 
 
 // Unicode Support
 #if defined(UNICODE) && !defined(POCO_WIN32_UTF8)
 	#define POCO_WIN32_UTF8
+#endif
+
+
+#if !defined(POCO_WIN32_UTF8)
+	#pragma message("Compiling POCO on Windows without #define POCO_WIN32_UTF8 is deprecated.")
 #endif
 
 

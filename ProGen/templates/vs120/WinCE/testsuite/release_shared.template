@@ -24,7 +24,7 @@
 	<Tool
 		Name="VCCLCompilerTool"
 		ExecutionBucket="7"
-		Optimization="4"
+		Optimization="2"
 		EnableIntrinsicFunctions="true"
 		FavorSizeOrSpeed="1"
 		AdditionalIncludeDirectories="..\include;${project.pocobase}\CppUnit\include;${configuration.compiler.includes}"

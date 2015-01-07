@@ -28,8 +28,11 @@
 #include <map>
 
 
-struct sqlite3;
-struct sqlite3_stmt;
+extern "C"
+{
+	typedef struct sqlite3 sqlite3;
+	typedef struct sqlite3_stmt sqlite3_stmt;
+}
 
 
 namespace Poco {
@@ -200,13 +203,6 @@ private:
 //
 // inlines
 //
-
-inline sqlite3* Utility::dbHandle(const Session& session)
-{
-	return reinterpret_cast<sqlite3*>(AnyCast<void*>(session.getProperty("handle")));
-}
-
-
 inline std::string Utility::lastError(const Session& session)
 {
 	poco_assert_dbg ((0 == icompare(session.connector(), 0, 6, "sqlite")));

@@ -57,7 +57,7 @@ void HTTPCredentials::fromUserInfo(const std::string& userInfo)
 	extractCredentials(userInfo, username, password);
 	setUsername(username);
 	setPassword(password);
-	// TODO: Reset digest state?
+	_digest.reset();
 }
 
 
@@ -69,13 +69,13 @@ void HTTPCredentials::fromURI(const URI& uri)
 	extractCredentials(uri, username, password);
 	setUsername(username);
 	setPassword(password);
-	// TODO: Reset digest state?
+	_digest.reset();
 }
 
 
 void HTTPCredentials::authenticate(HTTPRequest& request, const HTTPResponse& response)
 {
-	for (HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate"); iter != response.end(); ++iter)
+	for (HTTPResponse::ConstIterator iter = response.find(HTTPAuthenticationParams::WWW_AUTHENTICATE); iter != response.end(); ++iter)
 	{
 		if (isBasicCredentials(iter->second)) 
 		{
@@ -111,7 +111,7 @@ void HTTPCredentials::updateAuthInfo(HTTPRequest& request)
 
 void HTTPCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPResponse& response)
 {
-	for (HTTPResponse::ConstIterator iter = response.find("Proxy-Authenticate"); iter != response.end(); ++iter)
+	for (HTTPResponse::ConstIterator iter = response.find(HTTPAuthenticationParams::PROXY_AUTHENTICATE); iter != response.end(); ++iter)
 	{
 		if (isBasicCredentials(iter->second)) 
 		{

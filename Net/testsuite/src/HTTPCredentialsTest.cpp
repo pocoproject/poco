@@ -145,6 +145,19 @@ void HTTPCredentialsTest::testAuthenticationParams()
 }
 
 
+void HTTPCredentialsTest::testAuthenticationParamsMultipleHeaders()
+{
+	HTTPResponse response;
+	response.add("WWW-Authenticate", "Unsupported realm=\"TestUnsupported\"");	
+	response.add("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
+	HTTPAuthenticationParams params(response);
+	
+	assert (params["realm"] == "TestDigest");
+	assert (params["nonce"] == "212573bb90170538efad012978ab811f%lu");
+	assert (params.size() == 2);
+}
+
+
 void HTTPCredentialsTest::testDigestCredentials()
 {
 	HTTPDigestCredentials creds("user", "s3cr3t");
@@ -231,6 +244,19 @@ void HTTPCredentialsTest::testCredentialsDigest()
 }
 
 
+void HTTPCredentialsTest::testCredentialsDigestMultipleHeaders()
+{
+	HTTPCredentials creds("user", "s3cr3t");
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
+	HTTPResponse response;
+	response.add("WWW-Authenticate", "Unsupported realm=\"TestUnsupported\"");	
+	response.add("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
+	creds.authenticate(request, response);
+	std::string auth = request.get("Authorization");
+	assert (auth == "Digest username=\"user\", nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", uri=\"/digest/\", response=\"40e4889cfbd0e561f71e3107a2863bc4\"");
+}
+
+
 void HTTPCredentialsTest::testProxyCredentialsDigest()
 {
 	HTTPCredentials creds("user", "s3cr3t");
@@ -299,11 +325,13 @@ CppUnit::Test* HTTPCredentialsTest::suite()
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testProxyBasicCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testBadCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testAuthenticationParams);
+	CppUnit_addTest(pSuite, HTTPCredentialsTest, testAuthenticationParamsMultipleHeaders);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testDigestCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testDigestCredentialsQoP);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testCredentialsBasic);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testProxyCredentialsBasic);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testCredentialsDigest);
+	CppUnit_addTest(pSuite, HTTPCredentialsTest, testCredentialsDigestMultipleHeaders);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testProxyCredentialsDigest);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testExtractCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testVerifyAuthInfo);

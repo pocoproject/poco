@@ -1913,6 +1913,7 @@
     <ClInclude Include="include\Poco\Alignment.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\PBKDF2Engine.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\pocomsg.rc">

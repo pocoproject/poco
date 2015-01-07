@@ -10,9 +10,6 @@
 //
 
 
-#if !defined(_WIN32_WCE)
-
-
 #include "WinConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
@@ -113,6 +110,13 @@ void WinConfigurationTest::testConfiguration()
 	assert (pRootReg->getInt("HKEY_CURRENT_USER.Software.Applied Informatics.Test.name1") == 1);
 
 	pRootReg->keys(keys);
+#if defined(_WIN32_WCE)
+	assert (keys.size() == 4);
+	assert (std::find(keys.begin(), keys.end(), "HKEY_CLASSES_ROOT") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "HKEY_CURRENT_USER") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "HKEY_LOCAL_MACHINE") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "HKEY_USERS") != keys.end());
+#else
 	assert (keys.size() == 6);
 	assert (std::find(keys.begin(), keys.end(), "HKEY_CLASSES_ROOT") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "HKEY_CURRENT_CONFIG") != keys.end());
@@ -120,6 +124,7 @@ void WinConfigurationTest::testConfiguration()
 	assert (std::find(keys.begin(), keys.end(), "HKEY_LOCAL_MACHINE") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "HKEY_PERFORMANCE_DATA") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "HKEY_USERS") != keys.end());
+#endif
 
 	pRootReg->keys("HKEY_CURRENT_USER.Software.Applied Informatics.Test", keys);
 	assert (keys.size() == 5);
@@ -149,6 +154,3 @@ CppUnit::Test* WinConfigurationTest::suite()
 
 	return pSuite;
 }
-
-
-#endif // _WIN32_WCE

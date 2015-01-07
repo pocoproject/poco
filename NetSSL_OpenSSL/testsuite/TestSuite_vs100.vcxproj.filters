@@ -2,55 +2,55 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="HTTPS">
-      <UniqueIdentifier>{c2a0e245-c574-4a90-b4a0-8001581693be}</UniqueIdentifier>
+      <UniqueIdentifier>{17969387-e1c8-4ca8-b56c-ed74398a47c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPS\Header Files">
-      <UniqueIdentifier>{366122cf-e805-4773-ac50-3f5a601d0638}</UniqueIdentifier>
+      <UniqueIdentifier>{e939f34f-e3e4-4ce9-9dcd-fd246d947e6d}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPS\Source Files">
-      <UniqueIdentifier>{9e2401f1-c5ec-4284-abc4-9d88be1cdbfe}</UniqueIdentifier>
+      <UniqueIdentifier>{7367322c-b946-42f0-824b-479a59e8cf62}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{bc3b3dd5-5fca-444f-87b5-d7bf2162c794}</UniqueIdentifier>
+      <UniqueIdentifier>{f92cca1e-3ec0-47e8-b60c-ac9a626aecd6}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{c3a77eaf-70aa-48d2-b1ed-efe7406d1e95}</UniqueIdentifier>
+      <UniqueIdentifier>{2d739fef-bfb0-4f5e-81d9-668a420b33bf}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{b0a28d5e-28ab-4ea8-b5e1-714482773f30}</UniqueIdentifier>
+      <UniqueIdentifier>{bf3e15dc-58b9-495b-beca-6f21b4f8d503}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{f92ef7f9-fe01-4f92-b2ee-4c79e4b377c9}</UniqueIdentifier>
+      <UniqueIdentifier>{34c100e3-0695-45e9-a742-87917d5a8201}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{0678039c-4649-4851-b175-0e1ba4501c68}</UniqueIdentifier>
+      <UniqueIdentifier>{cdfbae39-5127-478b-b442-ba4cb8fe1dda}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer">
-      <UniqueIdentifier>{a49a7185-852b-4885-819e-33892dd2a887}</UniqueIdentifier>
+      <UniqueIdentifier>{ae219834-9613-4178-88f7-c26560a04b73}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer\Header Files">
-      <UniqueIdentifier>{1cf6c9c0-4c75-4402-9c78-489427e03980}</UniqueIdentifier>
+      <UniqueIdentifier>{8c26c474-414a-474b-bc3f-4dca00d18def}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer\Source Files">
-      <UniqueIdentifier>{f1c90f50-fb6c-4368-aa20-f0f31b943eb8}</UniqueIdentifier>
+      <UniqueIdentifier>{ba418e81-d3da-4501-ab92-1dc95eedeeb8}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSServer">
-      <UniqueIdentifier>{9e03fe19-e653-4a44-80ac-801a37e2d38a}</UniqueIdentifier>
+      <UniqueIdentifier>{c725c10f-16b1-4bef-9cfd-06f28b1f630a}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSServer\Header Files">
-      <UniqueIdentifier>{7b208910-a19e-4550-8a6b-85a185d17208}</UniqueIdentifier>
+      <UniqueIdentifier>{20ee7be5-f3da-46d1-9318-709942f28e5e}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSServer\Source Files">
-      <UniqueIdentifier>{ad2958bf-1475-43c3-9719-484040e9a6e2}</UniqueIdentifier>
+      <UniqueIdentifier>{98eb13c3-39d6-42bf-837c-17ed2a483421}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient">
-      <UniqueIdentifier>{3abc9187-7f79-4a34-9f23-658c26d34a0c}</UniqueIdentifier>
+      <UniqueIdentifier>{f0c294e6-f951-444f-98b8-de682b4b9a57}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Header Files">
-      <UniqueIdentifier>{b15b4df9-d6dc-4ff8-9d18-940f58d91404}</UniqueIdentifier>
+      <UniqueIdentifier>{4f6f82c2-2842-418a-bd5c-eb25926cc4ec}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Source Files">
-      <UniqueIdentifier>{fb990f2a-e76c-41c7-ae05-2213455b1441}</UniqueIdentifier>
+      <UniqueIdentifier>{45e4aa39-27c9-4f44-a5e0-b6fcd987f96a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

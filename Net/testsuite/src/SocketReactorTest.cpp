@@ -327,6 +327,26 @@ void SocketReactorTest::testSocketReactor()
 }
 
 
+void SocketReactorTest::testSetSocketReactor()
+{
+	SocketAddress ssa;
+	ServerSocket ss(ssa);
+	SocketReactor reactor;
+	SocketAcceptor<EchoServiceHandler> acceptor(ss);
+	acceptor.setReactor(reactor);
+	SocketAddress sa("localhost", ss.address().port());
+	SocketConnector<ClientServiceHandler> connector(sa, reactor);
+	ClientServiceHandler::setOnce(true);
+	ClientServiceHandler::resetData();
+	reactor.run();
+	std::string data(ClientServiceHandler::data());
+	assert(data.size() == 1024);
+	assert(!ClientServiceHandler::readableError());
+	assert(!ClientServiceHandler::writableError());
+	assert(!ClientServiceHandler::timeoutError());
+}
+
+
 void SocketReactorTest::testParallelSocketReactor()
 {
 	SocketAddress ssa;

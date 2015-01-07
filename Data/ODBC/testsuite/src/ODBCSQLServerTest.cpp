@@ -737,6 +737,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLServerTest");
 
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexType);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccessVector);

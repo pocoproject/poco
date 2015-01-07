@@ -135,7 +135,7 @@ void Clock::update()
 }
 
 
-Clock::ClockVal Clock::accuracy()
+Clock::ClockDiff Clock::accuracy()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
 

@@ -856,6 +856,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCOracleTest");
 
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexType);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeTuple);

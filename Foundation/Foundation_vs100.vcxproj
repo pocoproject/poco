@@ -120,7 +120,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
@@ -136,7 +136,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -175,7 +175,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -202,6 +202,7 @@
       <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\lib\PocoFoundationmd.lib</OutputFile>
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX86</TargetMachine>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
@@ -220,7 +221,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>..\lib\PocoFoundationmdd.pdb</ProgramDataBaseFileName>
     </ClCompile>
@@ -228,6 +229,7 @@
       <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\lib\PocoFoundationmdd.lib</OutputFile>
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX86</TargetMachine>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
@@ -246,7 +248,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <ProgramDataBaseFileName>..\lib\PocoFoundationmtd.pdb</ProgramDataBaseFileName>
     </ClCompile>
@@ -254,11 +256,12 @@
       <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\lib\PocoFoundationmtd.lib</OutputFile>
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX86</TargetMachine>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -285,6 +288,7 @@
     <Lib>
       <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\lib\PocoFoundationmt.lib</OutputFile>
+      <TargetMachine>MachineX86</TargetMachine>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -293,7 +297,14 @@
     <ClCompile Include="src\Base32Decoder.cpp" />
     <ClCompile Include="src\Base32Encoder.cpp" />
     <ClCompile Include="src\Bugcheck.cpp" />
-    <ClCompile Include="src\ByteOrder.cpp" />
+    <ClCompile Include="src\ByteOrder.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Checksum.cpp" />
     <ClCompile Include="src\Debugger.cpp" />
     <ClCompile Include="src\DirectoryWatcher.cpp" />
@@ -384,7 +395,14 @@
     <ClCompile Include="src\DirectoryIteratorStrategy.cpp" />
     <ClCompile Include="src\RefCountedObject.cpp" />
     <ClCompile Include="src\SortedDirectoryIterator.cpp" />
-    <ClCompile Include="src\String.cpp" />
+    <ClCompile Include="src\String.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\StringTokenizer.cpp" />
     <ClCompile Include="src\UTF32Encoding.cpp" />
     <ClCompile Include="src\Var.cpp" />
@@ -508,7 +526,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\SignalHandler.cpp" />
+    <ClCompile Include="src\SignalHandler.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\SynchronizedObject.cpp" />
     <ClCompile Include="src\Thread.cpp" />
     <ClCompile Include="src\Thread_POSIX.cpp">

@@ -61,7 +61,7 @@ target_version = $(LIBVERSION)
 target_libs    =
 
 ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
-    $(shell cd src; windmc pocomsg.mc)
+    $(shell cd src; $(WINDMC) pocomsg.mc)
 endif
 
 include $(POCO_BASE)/build/rules/lib

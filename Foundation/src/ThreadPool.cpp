@@ -128,6 +128,7 @@ void PooledThread::start(Thread::Priority priority, Runnable& target, const std:
 
 inline bool PooledThread::idle()
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _idle;
 }
 

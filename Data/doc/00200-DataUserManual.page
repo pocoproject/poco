@@ -963,14 +963,14 @@ The template specialization must implement the following methods:
     class TypeHandler<class Person>
     {
     public:
-        static void bind(std::size_t pos, const Person&amp; obj, AbstractBinder::Ptr pBinder)
+        static void bind(std::size_t pos, const Person&amp; obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
         {
             poco_assert_dbg (!pBinder.isNull());
             // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))
             // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
-            TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder);
-            TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder);
-            TypeHandler<Poco::UInt64>::bind(pos++, obj.getSocialSecNr(), pBinder);
+            TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder, dir);
+            TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder, dir);
+            TypeHandler<Poco::UInt64>::bind(pos++, obj.getSocialSecNr(), pBinder, dir);
         }
     
         static std::size_t size()
@@ -978,7 +978,7 @@ The template specialization must implement the following methods:
             return 3; // we handle three columns of the Table!
         }
     
-        static void prepare(std::size_t pos, const Person&amp; obj, AbstractPreparation::Ptr pPrepare)
+        static void prepare(std::size_t pos, const Person&amp; obj, AbstractPreparator::Ptr pPrepare)
         {
             poco_assert_dbg (!pPrepare.isNull());
             // the table is defined as Person (FirstName VARCHAR(30), lastName VARCHAR, SocialSecNr INTEGER(3))

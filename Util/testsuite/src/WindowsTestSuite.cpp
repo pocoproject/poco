@@ -11,20 +11,16 @@
 
 
 #include "WindowsTestSuite.h"
-#ifndef _WIN32_WCE
 #include "WinRegistryTest.h"
 #include "WinConfigurationTest.h"
-#endif
 
 
 CppUnit::Test* WindowsTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("WindowsTestSuite");
 
-#ifndef _WIN32_WCE
 	pSuite->addTest(WinRegistryTest::suite());
 	pSuite->addTest(WinConfigurationTest::suite());
-#endif
 
 	return pSuite;
 }

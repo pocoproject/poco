@@ -288,13 +288,38 @@ available:
     $ ./configure --omit=NetSSL_OpenSSL,Crypto,Data/ODBC,Data/MySQL
 ----
 
+!!Building using CMake
+
+As an alternative to the platform specific Makefiles and Solutions, CMake can be used
+to do build Poco. CMake is a cross platform Makefile generator that also supports 
+Microsoft Visual Studio and Apple Xcode.
+Poco requires CMake 3.0 or higher. Static binaries for many platforms can be downloaded from http://www.cmake.org/
+
+CMake supports out of source builds and this is the recommended way to build Poco using CMake.
+
+Assuming you are currently in the Poco source directory on a Unix machine
+and you like to build Poco with the generated Makefiles just type the following commands.
+
+    $ mkdir cmake_build
+    $ cd cmake_build
+    $ cmake ..
+    $ make
+
+This will build Poco in a subdirectory <*cmake_build*>. All files produced during build are located in this directory.
+
+CMake allows you to set some build time options. As an example: to disable the SevenZip support
+type the following command:
+
+    $ cmake -DENABLE_SEVENZIP=OFF ..
+
+Similar options are available for other components (see: CMakeLists.txt).
+
 
 !!!Tutorials And Sample Code
 
 Introductory documentation consisting of various documents and tutorials
 in the form of slide decks can be found at the
-[[http://pocoproject.org/documentation/ POCO C++ Libraries
-Documentation]] page.
+[[http://pocoproject.org/documentation/ POCO C++ Libraries Documentation]] page.
 
 Sample applications demonstrating the various features of the POCO C++
 Libraries are delivered with the source code. Every library's source
