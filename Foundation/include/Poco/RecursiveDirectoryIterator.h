@@ -76,8 +76,11 @@ public:
 	{
 	}
 
-	RecursiveDirectoryIterator(const std::string& path, UInt16 maxDepth = D_INFINITE);
+	RecursiveDirectoryIterator(const std::string& path, UInt16 maxDepth = D_INFINITE)
 		/// Creates a recursive directory iterator for the given path.
+		: _pImpl(new ImplType(path, maxDepth)), _path(Path(_pImpl->get())), _file(_path)
+	{
+	}
 
 	RecursiveDirectoryIterator(const MyType& iterator)
 		/// Creates a copy of another recursive directory iterator.
