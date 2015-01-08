@@ -94,12 +94,12 @@ Application::~Application()
 void Application::setup()
 {
 	poco_assert (_pInstance == 0);
-	
+
 	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false, false);
 	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true, false);
-	
+
 	addSubsystem(new LoggingSubsystem);
-	
+
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	_workingDirAtLaunch = Path::current();
 
@@ -177,21 +177,51 @@ void Application::initialize(Application& self)
 {
 	for (SubsystemVec::iterator it = _subsystems.begin(); it != _subsystems.end(); ++it)
 	{
-		_pLogger->debug(std::string("Initializing subsystem: ") + (*it)->name());
-		(*it)->initialize(self);
+		try
+		{
+			_pLogger->debug(std::string("Initializing subsystem: ") + (*it)->name());
+			(*it)->initialize(self);
+		}
+		catch (Poco::Exception& exc)
+		{
+			logger().log(exc);
+		}
+		catch (std::exception& exc)
+		{
+			logger().error(exc.what());
+		}
+		catch (...)
+		{
+			logger().fatal("system exception");
+		}
 	}
 	_initialized = true;
 }
 
-	
+
 void Application::uninitialize()
 {
 	if (_initialized)
 	{
 		for (SubsystemVec::reverse_iterator it = _subsystems.rbegin(); it != _subsystems.rend(); ++it)
 		{
-			_pLogger->debug(std::string("Uninitializing subsystem: ") + (*it)->name());
-			(*it)->uninitialize();
+			try
+			{
+				_pLogger->debug(std::string("Uninitializing subsystem: ") + (*it)->name());
+				(*it)->uninitialize();
+			}
+			catch (Poco::Exception& exc)
+			{
+				logger().log(exc);
+			}
+			catch (std::exception& exc)
+			{
+				logger().error(exc.what());
+			}
+			catch (...)
+			{
+				logger().fatal("system exception");
+			}
 		}
 		_initialized = false;
 	}
@@ -370,7 +400,7 @@ void Application::setArgs(int argc, char* argv[])
 void Application::setArgs(const ArgVec& args)
 {
 	poco_assert (!args.empty());
-	
+
 	_command = args[0];
 	_pConfig->setInt("application.argc", (int) args.size());
 	_unprocessedArgs = args;
@@ -459,7 +489,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 bool Application::findFile(Poco::Path& path) const
 {
 	if (path.isAbsolute()) return true;
-	
+
 	Path appPath;
 	getApplicationPath(appPath);
 	Path base = appPath.parent();
