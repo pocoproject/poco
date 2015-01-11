@@ -30,11 +30,13 @@ public:
 	void testProxyBasicCredentials();
 	void testBadCredentials();
 	void testAuthenticationParams();
+	void testAuthenticationParamsMultipleHeaders();
 	void testDigestCredentials();
 	void testDigestCredentialsQoP();
 	void testCredentialsBasic();
 	void testProxyCredentialsBasic();
 	void testCredentialsDigest();
+	void testCredentialsDigestMultipleHeaders();
 	void testProxyCredentialsDigest();
 	void testExtractCredentials();
 	void testVerifyAuthInfo();

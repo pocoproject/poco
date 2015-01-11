@@ -79,6 +79,23 @@ ODBCTest::~ODBCTest()
 }
 
 
+void ODBCTest::testZeroRows()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	std::string tableName("Person");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->zeroRows();
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testSimpleAccess()
 {
 	if (!_pSession) fail ("Test not available.");

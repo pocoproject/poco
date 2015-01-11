@@ -61,26 +61,14 @@ void ThreadImpl::setOSPriorityImpl(int prio, int /* policy */)
 }
 
 
-void ThreadImpl::startImpl(Runnable& target)
+void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {
 	if (isRunningImpl())
 		throw SystemException("thread already running");
 
-	_pRunnableTarget = &target;
+	_pRunnableTarget = pTarget;
 
 	createImpl(runnableEntry, this);
-}
-
-
-void ThreadImpl::startImpl(Callable target, void* pData)
-{
-	if (isRunningImpl())
-		throw SystemException("thread already running");
-
-	_callbackTarget.callback = target;
-	_callbackTarget.pData = pData;
-
-	createImpl(callableEntry, this);
 }
 
 
@@ -163,30 +151,6 @@ DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
 	try
 	{
 		reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();
-	}
-	catch (Exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (std::exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (...)
-	{
-		ErrorHandler::handle();
-	}
-	return 0;
-}
-
-
-DWORD WINAPI ThreadImpl::callableEntry(LPVOID pThread)
-{
-	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
-	try
-	{
-		ThreadImpl* pTI = reinterpret_cast<ThreadImpl*>(pThread);
-		pTI->_callbackTarget.callback(pTI->_callbackTarget.pData);
 	}
 	catch (Exception& exc)
 	{

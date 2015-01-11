@@ -35,6 +35,7 @@ public:
 	~SQLiteTest();
 
 	void testBinding();
+	void testZeroRows();
 	void testSimpleAccess();
 	void testInMemory();
 	void testNullCharPointer();

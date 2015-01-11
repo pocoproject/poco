@@ -20,6 +20,7 @@
 #include "Poco/Pipe.h"
 #include <errno.h>
 #include <signal.h>
+#include <stdlib.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/resource.h>
@@ -149,6 +150,20 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
+	// We must not allocated memory after fork(),
+	// therefore allocate all required buffers first.
+	std::vector<char> envChars = getEnvironmentVariablesBuffer(env);
+	std::vector<char*> argv(args.size() + 2);
+	int i = 0;
+	argv[i++] = const_cast<char*>(command.c_str());
+	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
+	{
+		argv[i++] = const_cast<char*>(it->c_str());
+	}
+	argv[i] = NULL;
+	
+	const char* pInitialDirectory = initialDirectory.empty() ? 0 : initialDirectory.c_str();
+
 	int pid = fork();
 	if (pid < 0)
 	{
@@ -156,15 +171,22 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	}
 	else if (pid == 0)
 	{
-		if (!initialDirectory.empty())
+		if (pInitialDirectory)
 		{
-			if (chdir(initialDirectory.c_str()) != 0)
+			if (chdir(pInitialDirectory) != 0)
 			{
 				_exit(72);
 			}
 		}
 
-		setEnvironmentVariables(env);
+		// set environment variables
+		char* p = &envChars[0];
+		while (*p)
+		{
+			putenv(p);
+			while (*p) ++p;
+			++p;
+		}
 
 		// setup redirection
 		if (inPipe)
@@ -179,15 +201,11 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
 		// close all open file descriptors other than stdin, stdout, stderr
 		for (int i = 3; i < getdtablesize(); ++i)
+		{
 			close(i);
+		}
 
-		char** argv = new char*[args.size() + 2];
-		int i = 0;
-		argv[i++] = const_cast<char*>(command.c_str());
-		for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
-			argv[i++] = const_cast<char*>(it->c_str());
-		argv[i] = NULL;
-		execvp(command.c_str(), argv);
+		execvp(argv[0], &argv[0]);
 		_exit(72);
 	}
 

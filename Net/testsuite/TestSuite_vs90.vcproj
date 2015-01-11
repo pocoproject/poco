@@ -45,7 +45,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
 				AdditionalOptions=""/>
@@ -187,7 +187,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
 				AdditionalOptions=""/>
@@ -331,7 +331,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
 				AdditionalOptions=""/>
@@ -821,6 +821,27 @@
 					RelativePath=".\src\WebSocketTest.cpp"/>
 				<File
 					RelativePath=".\src\WebSocketTestSuite.cpp"/>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="OAuth">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\src\OAuth10CredentialsTest.h"/>
+				<File
+					RelativePath=".\src\OAuth20CredentialsTest.h"/>
+				<File
+					RelativePath=".\src\OAuthTestSuite.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\OAuth10CredentialsTest.cpp"/>
+				<File
+					RelativePath=".\src\OAuth20CredentialsTest.cpp"/>
+				<File
+					RelativePath=".\src\OAuthTestSuite.cpp"/>
 			</Filter>
 		</Filter>
 	</Files>

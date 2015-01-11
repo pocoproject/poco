@@ -29,6 +29,11 @@
 #endif
 
 
+#ifndef SQLITE_OPEN_URI
+#define SQLITE_OPEN_URI 0
+#endif
+
+
 namespace Poco {
 namespace Data {
 namespace SQLite {
@@ -55,10 +60,9 @@ const std::string Utility::SQLITE_TIME_FORMAT = "%H:%M:%S";
 Utility::TypeMap Utility::_types;
 Poco::Mutex Utility::_mutex;
 
+
 Utility::Utility()
 {
-	Poco::Mutex::ScopedLock l(_mutex);
-
 	if (_types.empty())
 	{
 		_types.insert(TypeMap::value_type("", MetaColumn::FDT_STRING));
@@ -129,7 +133,11 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 {
 	poco_assert_dbg (pStmt);
 
-	static Utility u;
+	// Ensure statics are initialized
+	{
+		Poco::Mutex::ScopedLock lock(_mutex);
+		static Utility u;
+	}
 	
 	const char* pc = sqlite3_column_decltype(pStmt, (int) pos);
 	std::string sqliteType = pc ? pc : "";
@@ -158,6 +166,8 @@ void Utility::throwException(int rc, const std::string& addErrMsg)
 	case SQLITE_ABORT:
 		throw ExecutionAbortedException(std::string("Callback routine requested an abort"), addErrMsg);
 	case SQLITE_BUSY:
+	case SQLITE_BUSY_RECOVERY:
+	case SQLITE_BUSY_SNAPSHOT:
 		throw DBLockedException(std::string("The database file is locked"), addErrMsg);
 	case SQLITE_LOCKED:
 		throw TableLockedException(std::string("A table in the database is locked"), addErrMsg);
@@ -217,7 +227,7 @@ bool Utility::fileToMemory(sqlite3* pInMemory, const std::string& fileName)
 	sqlite3* pFile;
 	sqlite3_backup* pBackup;
 
-	rc = sqlite3_open(fileName.c_str(), &pFile);
+	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READONLY | SQLITE_OPEN_URI, NULL);
 	if(rc == SQLITE_OK )
 	{
 		pBackup = sqlite3_backup_init(pInMemory, "main", pFile, "main");
@@ -240,7 +250,7 @@ bool Utility::memoryToFile(const std::string& fileName, sqlite3* pInMemory)
 	sqlite3* pFile;
 	sqlite3_backup* pBackup;
 
-	rc = sqlite3_open(fileName.c_str(), &pFile);
+	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, NULL);
 	if(rc == SQLITE_OK )
 	{
 		pBackup = sqlite3_backup_init(pFile, "main", pInMemory, "main");
@@ -306,6 +316,10 @@ void* Utility::eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, 
 }
 
 
+// NOTE: Utility::dbHandle() has been moved to SessionImpl.cpp,
+// as a workaround for a failing AnyCast with Clang.
+// See <https://github.com/pocoproject/poco/issues/578>
+// for a discussion.
 
 
 } } } // namespace Poco::Data::SQLite

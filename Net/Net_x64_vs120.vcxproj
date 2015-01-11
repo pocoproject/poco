@@ -151,7 +151,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -207,7 +207,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -254,7 +254,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -343,6 +343,8 @@
     <ClInclude Include="include\Poco\Net\NTPEventArgs.h"/>
     <ClInclude Include="include\Poco\Net\NTPPacket.h"/>
     <ClInclude Include="include\Poco\Net\NullPartHandler.h"/>
+    <ClInclude Include="include\Poco\Net\OAuth10Credentials.h"/>
+    <ClInclude Include="include\Poco\Net\OAuth20Credentials.h"/>
     <ClInclude Include="include\Poco\Net\ParallelSocketAcceptor.h"/>
     <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h"/>
     <ClInclude Include="include\Poco\Net\PartHandler.h"/>
@@ -447,6 +449,8 @@
     <ClCompile Include="src\NTPEventArgs.cpp"/>
     <ClCompile Include="src\NTPPacket.cpp"/>
     <ClCompile Include="src\NullPartHandler.cpp"/>
+    <ClCompile Include="src\OAuth10Credentials.cpp"/>
+    <ClCompile Include="src\OAuth20Credentials.cpp"/>
     <ClCompile Include="src\PartHandler.cpp"/>
     <ClCompile Include="src\PartSource.cpp"/>
     <ClCompile Include="src\PartStore.cpp"/>

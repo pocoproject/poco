@@ -25,6 +25,7 @@
 #include "ICMPClientTestSuite.h"
 #include "NTPClientTestSuite.h"
 #include "WebSocketTestSuite.h"
+#include "OAuthTestSuite.h"
 #include "SyslogTest.h"
 
 
@@ -46,6 +47,7 @@ CppUnit::Test* NetTestSuite::suite()
 	pSuite->addTest(ICMPClientTestSuite::suite());
 	pSuite->addTest(NTPClientTestSuite::suite());
 	pSuite->addTest(WebSocketTestSuite::suite());
+	pSuite->addTest(OAuthTestSuite::suite());
 	pSuite->addTest(SyslogTest::suite());
 
 	return pSuite;

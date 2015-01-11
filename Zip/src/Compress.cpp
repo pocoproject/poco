@@ -192,8 +192,8 @@ void Compress::addDirectory(const Poco::Path& entryName, const Poco::DateTime& l
 		throw ZipException("Illegal entry name /");
 	if (fileStr.empty())
 		throw ZipException("Illegal empty entry name");
-	if (fileStr.find(ZipCommon::ILLEGAL_PATH) != std::string::npos)
-		throw ZipException("Illegal entry name " + fileStr + " containing " + ZipCommon::ILLEGAL_PATH);
+	if (!ZipCommon::isValidPath(fileStr))
+		throw ZipException("Illegal entry name " + fileStr + " containing parent directory reference");
 
 	if (entryName.depth() > 1)
 	{

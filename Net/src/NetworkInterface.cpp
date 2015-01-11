@@ -30,13 +30,13 @@
 		#include "Poco/UnicodeConverter.h"
 	#endif
 	#include "Poco/Error.h"
+	#include <wincrypt.h>
 	#include <iphlpapi.h>
 	#include <ipifcons.h>
 #endif
 #include <cstring>
 #include <iostream>
 #include <iomanip>
-
 
 using Poco::NumberFormatter;
 using Poco::FastMutex;

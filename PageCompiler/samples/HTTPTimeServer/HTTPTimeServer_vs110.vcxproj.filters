@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Page Files">
-      <UniqueIdentifier>{d4d02f1d-d682-40c3-b331-867721915922}</UniqueIdentifier>
+      <UniqueIdentifier>{2bd253e9-636f-4f25-992e-041d3ae049ff}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{6a9982d8-8e95-4763-89f9-9fc4f0769c9b}</UniqueIdentifier>
+      <UniqueIdentifier>{335aa28d-0f52-4f99-94ab-4e2f141c1b32}</UniqueIdentifier>
     </Filter>
     <Filter Include="Generated Files">
-      <UniqueIdentifier>{97cd0e37-01bd-41fc-b217-f84dd958d392}</UniqueIdentifier>
+      <UniqueIdentifier>{ffb9868e-5b78-416a-b09d-4fce42c8c926}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

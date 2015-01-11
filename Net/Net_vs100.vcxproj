@@ -116,7 +116,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
@@ -136,7 +136,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -186,7 +186,7 @@
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib\PocoNetmtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
@@ -197,7 +197,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -237,7 +237,7 @@
       <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\lib\PocoNetmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
@@ -248,7 +248,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -351,13 +351,13 @@
     <ClInclude Include="include\Poco\Net\HTMLForm.h"/>
     <ClInclude Include="include\Poco\Net\FTPClientSession.h"/>
     <ClInclude Include="include\Poco\Net\FTPStreamFactory.h"/>
-    <ClInclude Include="include\Poco\Net\SocketAcceptor.h"/>
     <ClInclude Include="include\Poco\Net\ParallelSocketAcceptor.h"/>
+    <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h"/>
+    <ClInclude Include="include\Poco\Net\SocketAcceptor.h"/>
     <ClInclude Include="include\Poco\Net\SocketConnector.h"/>
     <ClInclude Include="include\Poco\Net\SocketNotification.h"/>
     <ClInclude Include="include\Poco\Net\SocketNotifier.h"/>
     <ClInclude Include="include\Poco\Net\SocketReactor.h"/>
-    <ClInclude Include="include\Poco\Net\ParallelSocketReactor.h"/>
     <ClInclude Include="include\Poco\Net\MailMessage.h"/>
     <ClInclude Include="include\Poco\Net\MailRecipient.h"/>
     <ClInclude Include="include\Poco\Net\MailStream.h"/>
@@ -378,6 +378,8 @@
     <ClInclude Include="include\Poco\Net\SMTPChannel.h"/>
     <ClInclude Include="include\Poco\Net\WebSocket.h"/>
     <ClInclude Include="include\Poco\Net\WebSocketImpl.h"/>
+    <ClInclude Include="include\Poco\Net\OAuth10Credentials.h"/>
+    <ClInclude Include="include\Poco\Net\OAuth20Credentials.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNS.cpp"/>
@@ -477,6 +479,8 @@
     <ClCompile Include="src\SMTPChannel.cpp"/>
     <ClCompile Include="src\WebSocket.cpp"/>
     <ClCompile Include="src\WebSocketImpl.cpp"/>
+    <ClCompile Include="src\OAuth10Credentials.cpp"/>
+    <ClCompile Include="src\OAuth20Credentials.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">

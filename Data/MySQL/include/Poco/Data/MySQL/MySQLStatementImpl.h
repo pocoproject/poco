@@ -50,7 +50,7 @@ protected:
 	virtual std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.
 
-	virtual std::size_t affectedRowCount() const;
+	virtual int affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 	

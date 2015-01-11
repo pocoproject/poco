@@ -124,6 +124,7 @@ inline const RSA* RSAKeyImpl::getRSA() const
 	return _pRSA;
 }
 
+
 } } // namespace Poco::Crypto
 
 

@@ -1,4 +1,5 @@
-set(LIBNAME "PocoFoundation")
+set(LIBNAME "Foundation")
+set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
@@ -15,15 +16,18 @@ POCO_HEADERS_AUTO( SRCS include/Poco/OpcomChannel.h )
 POCO_SOURCES_AUTO_PLAT( SRCS UNIX src/SyslogChannel.cpp )
 POCO_HEADERS_AUTO( SRCS include/Poco/SyslogChannel.h )
 
+# For Windows CE we need to disable these
+if(WINCE)
+POCO_SOURCES_AUTO_PLAT( SRCS OFF
+    src/WindowsConsoleChannel.cpp
+    src/EventLogChannel.cpp
+    )
+else()
 POCO_SOURCES_AUTO_PLAT( SRCS WIN32
     src/WindowsConsoleChannel.cpp
     src/EventLogChannel.cpp
     )
-
-POCO_HEADERS_AUTO( SRCS
-    include/Poco/WindowsConsoleChannel.h
-    include/Poco/EventLogChannel.h
-    )
+endif()
 
 # Messages
 POCO_MESSAGES( SRCS Logging src/pocomsg.mc)
@@ -90,35 +94,49 @@ else()
     )
 endif (POCO_UNBUNDLED)
 
-if(CMAKE_SYSTEM MATCHES "Windows")
-    add_definitions( -DPCRE_STATIC)
+if(WIN32)
     set(SYSLIBS ${SYSLIBS} iphlpapi)
-else (CMAKE_SYSTEM MATCHES "Windows")
-    add_definitions( -DPCRE_STATIC)
-endif(CMAKE_SYSTEM MATCHES "Windows")
-
-add_library( ${LIBNAME} ${LIB_MODE} ${SRCS}) 
-set_target_properties( ${LIBNAME} 
-    PROPERTIES
-    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    DEFINE_SYMBOL Foundation_EXPORTS)
+endif(WIN32)
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-    set_target_properties( ${LIBNAME} PROPERTIES LINK_FLAGS "-library=stlport4")
+    set_target_properties( "${LIBNAME}" PROPERTIES LINK_FLAGS "-library=stlport4")
 endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-target_link_libraries( ${LIBNAME} ${SYSLIBS})
+
+# TODO: Why is this here?
+add_definitions( -DPCRE_STATIC)
+
+add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS})
+add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
+set_target_properties( "${LIBNAME}"
+    PROPERTIES
+    VERSION ${PROJECT_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+    OUTPUT_NAME ${POCO_LIBNAME}
+    DEFINE_SYMBOL Foundation_EXPORTS
+    )
+
+target_link_libraries( "${LIBNAME}" ${SYSLIBS})
+target_include_directories( "${LIBNAME}"
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
 
 install(
     DIRECTORY include/Poco
     DESTINATION include
+    COMPONENT Devel
     PATTERN ".svn" EXCLUDE
     )
 
 install(
-    TARGETS ${LIBNAME}
+    TARGETS "${LIBNAME}" EXPORT "${LIBNAME}Targets"
     LIBRARY DESTINATION lib${LIB_SUFFIX}
     ARCHIVE DESTINATION lib${LIB_SUFFIX}
     RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
     )
+
+POCO_GENERATE_PACKAGE("${LIBNAME}" "${LIBNAME}Targets" "lib/cmake/${PROJECT_NAME}")
 
 if (ENABLE_TESTS)
     add_subdirectory( samples )

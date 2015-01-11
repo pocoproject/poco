@@ -159,7 +159,7 @@ private:
 	enum Limits
 	{
 		MAX_METHOD_LENGTH  = 32,
-		MAX_URI_LENGTH     = 4096,
+		MAX_URI_LENGTH     = 16384,
 		MAX_VERSION_LENGTH = 8
 	};
 	

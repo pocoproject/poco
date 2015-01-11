@@ -39,7 +39,8 @@ SocketReactor::SocketReactor():
 	_pErrorNotification(new ErrorNotification(this)),
 	_pTimeoutNotification(new TimeoutNotification(this)),
 	_pIdleNotification(new IdleNotification(this)),
-	_pShutdownNotification(new ShutdownNotification(this))
+	_pShutdownNotification(new ShutdownNotification(this)),
+	_pThread(0)
 {
 }
 
@@ -52,7 +53,8 @@ SocketReactor::SocketReactor(const Poco::Timespan& timeout):
 	_pErrorNotification(new ErrorNotification(this)),
 	_pTimeoutNotification(new TimeoutNotification(this)),
 	_pIdleNotification(new IdleNotification(this)),
-	_pShutdownNotification(new ShutdownNotification(this))
+	_pShutdownNotification(new ShutdownNotification(this)),
+	_pThread(0)
 {
 }
 
@@ -64,6 +66,8 @@ SocketReactor::~SocketReactor()
 
 void SocketReactor::run()
 {
+	_pThread = Thread::current();
+
 	Socket::SocketList readable;
 	Socket::SocketList writable;
 	Socket::SocketList except;
@@ -100,6 +104,7 @@ void SocketReactor::run()
 			if (nSockets == 0)
 			{
 				onIdle();
+				Thread::trySleep(_timeout.milliseconds());
 			}
 			else if (Socket::select(readable, writable, except, _timeout))
 			{
@@ -130,10 +135,16 @@ void SocketReactor::run()
 	onShutdown();
 }
 
-	
+
 void SocketReactor::stop()
 {
 	_stop = true;
+}
+
+
+void SocketReactor::wakeUp()
+{
+	if (_pThread) _pThread->wakeUp();
 }
 
 
@@ -142,7 +153,7 @@ void SocketReactor::setTimeout(const Poco::Timespan& timeout)
 	_timeout = timeout;
 }
 
-	
+
 const Poco::Timespan& SocketReactor::getTimeout() const
 {
 	return _timeout;

@@ -104,7 +104,10 @@ void ThreadImpl::setPriorityImpl(int prio)
 		_pData->policy = SCHED_OTHER;
 		if (isRunningImpl())
 		{
-			struct sched_param par;
+			struct sched_param par; struct MyStruct
+			{
+
+			};
 			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
 			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
 				throw SystemException("cannot set thread priority");
@@ -117,7 +120,7 @@ void ThreadImpl::setOSPriorityImpl(int prio, int policy)
 {
 	if (prio != _pData->osPrio || policy != _pData->policy)
 	{
-		if (_pData->pRunnableTarget || _pData->pCallbackTarget)
+		if (_pData->pRunnableTarget)
 		{
 			struct sched_param par;
 			par.sched_priority = prio;
@@ -164,8 +167,8 @@ void ThreadImpl::setStackSizeImpl(int size)
 	{
 #if defined(POCO_OS_FAMILY_BSD)
 		// we must round up to a multiple of the memory page size
-		const int PAGE_SIZE = 4096;
-		size = ((size + PAGE_SIZE - 1)/PAGE_SIZE)*PAGE_SIZE;
+		const int STACK_PAGE_SIZE = 4096;
+		size = ((size + STACK_PAGE_SIZE - 1)/STACK_PAGE_SIZE)*STACK_PAGE_SIZE;
 #endif
 #if !defined(POCO_ANDROID)
  		if (size < PTHREAD_STACK_MIN)
@@ -177,7 +180,7 @@ void ThreadImpl::setStackSizeImpl(int size)
 }
 
 
-void ThreadImpl::startImpl(Runnable& target)
+void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {
 	if (_pData->pRunnableTarget)
 		throw SystemException("thread already running");
@@ -194,7 +197,7 @@ void ThreadImpl::startImpl(Runnable& target)
 		}
 	}
 
-	_pData->pRunnableTarget = &target;
+	_pData->pRunnableTarget = pTarget;
 	if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
 	{
 		_pData->pRunnableTarget = 0;
@@ -204,56 +207,6 @@ void ThreadImpl::startImpl(Runnable& target)
 	_pData->started = true;
 	pthread_attr_destroy(&attributes);
 
-	if (_pData->policy == SCHED_OTHER)
-	{
-		if (_pData->prio != PRIO_NORMAL_IMPL)
-		{
-			struct sched_param par;
-			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
-			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
-				throw SystemException("cannot set thread priority");
-		}
-	}
-	else
-	{
-		struct sched_param par;
-		par.sched_priority = _pData->osPrio;
-		if (pthread_setschedparam(_pData->thread, _pData->policy, &par))
-			throw SystemException("cannot set thread priority");
-	}
-}
-
-
-void ThreadImpl::startImpl(Callable target, void* pData)
-{
-	if (_pData->pCallbackTarget && _pData->pCallbackTarget->callback)
-		throw SystemException("thread already running");
-
-	pthread_attr_t attributes;
-	pthread_attr_init(&attributes);
-
-	if (_pData->stackSize != 0)
-	{
-		if (0 != pthread_attr_setstacksize(&attributes, _pData->stackSize))
-			throw SystemException("can not set thread stack size");
-	}
-
-	if (0 == _pData->pCallbackTarget.get())
-		_pData->pCallbackTarget = new CallbackData;
-
-	_pData->pCallbackTarget->callback = target;
-	_pData->pCallbackTarget->pData = pData;
-
-	if (pthread_create(&_pData->thread, &attributes, callableEntry, this))
-	{
-		_pData->pCallbackTarget->callback = 0;
-		_pData->pCallbackTarget->pData = 0;
-		pthread_attr_destroy(&attributes);
-		throw SystemException("cannot start thread");
-	}
-	_pData->started = true;
-	pthread_attr_destroy(&attributes);
-	
 	if (_pData->policy == SCHED_OTHER)
 	{
 		if (_pData->prio != PRIO_NORMAL_IMPL)
@@ -404,48 +357,6 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	}
 
 	pData->pRunnableTarget = 0;
-	pData->done.set();
-	return 0;
-}
-
-
-void* ThreadImpl::callableEntry(void* pThread)
-{
-	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	sigset_t sset;
-	sigemptyset(&sset);
-	sigaddset(&sset, SIGQUIT);
-	sigaddset(&sset, SIGTERM);
-	sigaddset(&sset, SIGPIPE); 
-	pthread_sigmask(SIG_BLOCK, &sset, 0);
-#endif
-
-	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName().c_str());
-#endif
-	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
-	try
-	{
-		pData->pCallbackTarget->callback(pData->pCallbackTarget->pData);
-	}
-	catch (Exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (std::exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (...)
-	{
-		ErrorHandler::handle();
-	}
-
-	pData->pCallbackTarget->callback = 0;
-	pData->pCallbackTarget->pData = 0;
 	pData->done.set();
 	return 0;
 }

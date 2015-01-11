@@ -10,6 +10,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tuple", "Tuple\Tuple_x64_vs
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TypeHandler", "TypeHandler\TypeHandler_x64_vs100.vcxproj", "{65A12348-CA20-324E-9F5E-7F82753C2C65}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebNotifier", "WebNotifier\WebNotifier_x64_vs100.vcxproj", "{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_shared|x64 = debug_shared|x64
@@ -110,6 +112,24 @@ Global
 		{65A12348-CA20-324E-9F5E-7F82753C2C65}.release_static_md|x64.ActiveCfg = release_static_md|x64
 		{65A12348-CA20-324E-9F5E-7F82753C2C65}.release_static_md|x64.Build.0 = release_static_md|x64
 		{65A12348-CA20-324E-9F5E-7F82753C2C65}.release_static_md|x64.Deploy.0 = release_static_md|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_shared|x64.Build.0 = debug_shared|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_shared|x64.Deploy.0 = debug_shared|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_shared|x64.ActiveCfg = release_shared|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_shared|x64.Build.0 = release_shared|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_shared|x64.Deploy.0 = release_shared|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_static_mt|x64.ActiveCfg = debug_static_mt|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_static_mt|x64.Build.0 = debug_static_mt|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_static_mt|x64.Deploy.0 = debug_static_mt|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_static_mt|x64.ActiveCfg = release_static_mt|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_static_mt|x64.Build.0 = release_static_mt|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_static_mt|x64.Deploy.0 = release_static_mt|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_static_md|x64.ActiveCfg = debug_static_md|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_static_md|x64.Build.0 = debug_static_md|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.debug_static_md|x64.Deploy.0 = debug_static_md|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_static_md|x64.ActiveCfg = release_static_md|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_static_md|x64.Build.0 = release_static_md|x64
+		{BACF8377-AD61-3B07-9BD5-6AEFCB0EC754}.release_static_md|x64.Deploy.0 = release_static_md|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

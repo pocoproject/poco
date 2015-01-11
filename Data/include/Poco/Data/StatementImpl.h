@@ -161,9 +161,13 @@ protected:
 	virtual std::size_t columnsReturned() const = 0;
 		/// Returns number of columns returned by query. 
 
-	virtual std::size_t affectedRowCount() const = 0;
+	virtual int affectedRowCount() const = 0;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
+		/// 
+		/// Some back-ends may return a negative number in certain circumstances (e.g.
+		/// some ODBC drivers when this function is called after a select statement
+		/// execution).
 
 	virtual const MetaColumn& metaColumn(std::size_t pos) const = 0;
 		/// Returns column meta data.
