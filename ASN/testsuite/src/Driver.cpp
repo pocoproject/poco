@@ -13,7 +13,7 @@
 
 
 #include "CppUnit/TestRunner.h"
-#include "JSONTestSuite.h"
+#include "ASNTestSuite.h"
 
 
-CppUnitMain(JSONTestSuite)
+CppUnitMain(ASNTestSuite)
