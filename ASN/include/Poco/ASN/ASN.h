@@ -22,7 +22,7 @@
 #define ASN_ASN_INCLUDED
 
 
-#include "Poco/ASN/ASN.h"
+#include "Poco/Foundation.h"
 
 
 //
