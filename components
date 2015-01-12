@@ -3,6 +3,7 @@ CppUnit/WinTestRunner
 Foundation
 XML
 JSON
+ASN
 Util
 Net
 Crypto
