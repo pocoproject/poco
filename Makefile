@@ -27,7 +27,7 @@ poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation XML JSON ASN Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL MongoDB Zip PageCompiler PageCompiler/File2Page CppParser PDF
+COMPONENTS = Foundation XML JSON ASN Util Net NetEx Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL MongoDB Zip PageCompiler PageCompiler/File2Page CppParser PDF
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
@@ -50,10 +50,10 @@ install: libexecs
 	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
 	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
-libexecs =  Foundation-libexec XML-libexec JSON-libexec ASN-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec MongoDB-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec
-tests    =  Foundation-tests XML-tests JSON-tests ASN-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests MongoDB-tests Zip-tests CppParser-tests PDF-tests
-samples  =  Foundation-samples XML-samples JSON-samples ASN-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples MongoDB-samples Zip-samples PageCompiler-samples PDF-samples
-cleans   =  Foundation-clean XML-clean JSON-clean ASN-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean Data-clean Data/SQLite-clean Data/ODBC-clean Data/MySQL-clean MongoDB-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean PDF-clean
+libexecs =  Foundation-libexec XML-libexec JSON-libexec ASN-libexec Util-libexec Net-libexec NetEx-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec MongoDB-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec
+tests    =  Foundation-tests XML-tests JSON-tests ASN-tests Util-tests Net-tests NetEx-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests MongoDB-tests Zip-tests CppParser-tests PDF-tests
+samples  =  Foundation-samples XML-samples JSON-samples ASN-samples Util-samples Net-samples NetEx-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples MongoDB-samples Zip-samples PageCompiler-samples PDF-samples
+cleans   =  Foundation-clean XML-clean JSON-clean ASN-clean Util-clean Net-clean NetEx-clean Crypto-clean NetSSL_OpenSSL-clean Data-clean Data/SQLite-clean Data/ODBC-clean Data/MySQL-clean MongoDB-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean PDF-clean
 
 .PHONY: $(libexecs)
 .PHONY: $(tests)
@@ -148,6 +148,20 @@ Net-clean:
 	$(MAKE) -C $(POCO_BASE)/Net clean
 	$(MAKE) -C $(POCO_BASE)/Net/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Net/samples clean
+
+NetEx-libexec:  Foundation-libexec
+	$(MAKE) -C $(POCO_BASE)/NetEx
+
+NetEx-tests: NetEx-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/NetEx/testsuite
+	
+NetEx-samples: NetEx-libexec  Foundation-libexec Net-libexec XML-libexec Util-libexec
+	$(MAKE) -C $(POCO_BASE)/NetEx/samples
+
+NetEx-clean:
+	$(MAKE) -C $(POCO_BASE)/NetEx clean
+	$(MAKE) -C $(POCO_BASE)/NetEx/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/NetEx/samples clean
 
 Crypto-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Crypto
