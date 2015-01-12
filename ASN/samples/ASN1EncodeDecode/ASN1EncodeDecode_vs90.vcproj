@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="Benchmark"
+	Name="ASN1EncodeDecode"
 	Version="9.00"
 	ProjectType="Visual C++"
 	ProjectGUID="{D0381ECF-E750-32DA-8EEF-92D56B172D15}"
-	RootNamespace="Benchmark"
+	RootNamespace="ASN1EncodeDecode"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -31,7 +31,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\JSON\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -57,12 +57,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\Benchmarkd.exe"
+				OutputFile="bin\d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\Benchmarkd.pdb"
+				ProgramDatabaseFile="bin\ASN1EncodeDecoded.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 				AdditionalOptions=""/>
@@ -104,7 +104,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\JSON\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -128,7 +128,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\Benchmark.exe"
+				OutputFile="bin\ASN1EncodeDecode.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="false"
@@ -171,7 +171,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\JSON\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -197,12 +197,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\static_mt\Benchmarkd.exe"
+				OutputFile="bin\static_mt\ASN1EncodeDecoded.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\static_mt\Benchmarkd.pdb"
+				ProgramDatabaseFile="bin\static_mt\ASN1EncodeDecoded.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 				AdditionalOptions=""/>
@@ -244,7 +244,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\JSON\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -268,7 +268,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\static_mt\Benchmark.exe"
+				OutputFile="bin\static_mt\ASN1EncodeDecode.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="false"
@@ -311,7 +311,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\JSON\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -337,12 +337,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\static_md\Benchmarkd.exe"
+				OutputFile="bin\static_md\ASN1EncodeDecoded.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\static_md\Benchmarkd.pdb"
+				ProgramDatabaseFile="bin\static_md\ASN1EncodeDecoded.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 				AdditionalOptions=""/>
@@ -384,7 +384,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\JSON\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -408,7 +408,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin\static_md\Benchmark.exe"
+				OutputFile="bin\static_md\ASN1EncodeDecode.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="false"
@@ -440,7 +440,7 @@
 		<Filter
 			Name="Source Files">
 			<File
-				RelativePath=".\src\Benchmark.cpp"/>
+				RelativePath=".\src\ASN1EncodeDecode.cpp"/>
 		</Filter>
 	</Files>
 	<Globals/>

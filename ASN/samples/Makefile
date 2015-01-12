@@ -3,11 +3,11 @@
 #
 # $Id$
 #
-# Makefile for Poco JSON Samples
+# Makefile for Poco ASN Samples
 #
 
 .PHONY: projects
 clean all: projects
 projects:
-	$(MAKE) -C Benchmark $(MAKECMDGOALS)
+	$(MAKE) -C ASN1EncodeDecode $(MAKECMDGOALS)
 
