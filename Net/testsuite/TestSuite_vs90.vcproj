@@ -756,44 +756,6 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="ICMP">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\src\ICMPClientTest.h"/>
-				<File
-					RelativePath=".\src\ICMPClientTestSuite.h"/>
-				<File
-					RelativePath=".\src\ICMPSocketTest.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\ICMPClientTest.cpp"/>
-				<File
-					RelativePath=".\src\ICMPClientTestSuite.cpp"/>
-				<File
-					RelativePath=".\src\ICMPSocketTest.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="NTP">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\src\NTPClientTest.h"/>
-				<File
-					RelativePath=".\src\NTPClientTestSuite.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\NTPClientTest.cpp"/>
-				<File
-					RelativePath=".\src\NTPClientTestSuite.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
 			Name="Logging">
 			<Filter
 				Name="Header Files">

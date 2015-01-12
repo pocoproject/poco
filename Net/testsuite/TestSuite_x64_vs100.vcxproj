@@ -361,11 +361,6 @@
     <ClInclude Include="src\MailTestSuite.h"/>
     <ClInclude Include="src\POP3ClientSessionTest.h"/>
     <ClInclude Include="src\SMTPClientSessionTest.h"/>
-    <ClInclude Include="src\ICMPClientTest.h"/>
-    <ClInclude Include="src\ICMPClientTestSuite.h"/>
-    <ClInclude Include="src\ICMPSocketTest.h"/>
-    <ClInclude Include="src\NTPClientTest.h"/>
-    <ClInclude Include="src\NTPClientTestSuite.h"/>
     <ClInclude Include="src\SyslogTest.h"/>
     <ClInclude Include="src\WebSocketTest.h"/>
     <ClInclude Include="src\WebSocketTestSuite.h"/>
@@ -424,11 +419,6 @@
     <ClCompile Include="src\MailTestSuite.cpp"/>
     <ClCompile Include="src\POP3ClientSessionTest.cpp"/>
     <ClCompile Include="src\SMTPClientSessionTest.cpp"/>
-    <ClCompile Include="src\ICMPClientTest.cpp"/>
-    <ClCompile Include="src\ICMPClientTestSuite.cpp"/>
-    <ClCompile Include="src\ICMPSocketTest.cpp"/>
-    <ClCompile Include="src\NTPClientTest.cpp"/>
-    <ClCompile Include="src\NTPClientTestSuite.cpp"/>
     <ClCompile Include="src\SyslogTest.cpp"/>
     <ClCompile Include="src\WebSocketTest.cpp"/>
     <ClCompile Include="src\WebSocketTestSuite.cpp"/>

@@ -10,7 +10,6 @@ vc.solution.include = \
 	HTTPLoadTest\\HTTPLoadTest;\
 	HTTPTimeServer\\HTTPTimeServer;\
 	Mail\\Mail;\
-	Ping\\Ping;\
 	TimeServer\\TimeServer;\
 	WebSocketServer\\WebSocketServer;\
 	SMTPLogger\\SMTPLogger;\

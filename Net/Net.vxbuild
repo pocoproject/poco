@@ -46,13 +46,6 @@ SOURCES="
 	HTTPStream.cpp
 	HTTPStreamFactory.cpp
 	HostEntry.cpp
-	ICMPClient.cpp
-	ICMPEventArgs.cpp
-	ICMPPacket.cpp
-	ICMPPacketImpl.cpp
-	ICMPSocket.cpp
-	ICMPSocketImpl.cpp
-	ICMPv4PacketImpl.cpp
 	IPAddress.cpp
 	MailMessage.cpp
 	MailRecipient.cpp
