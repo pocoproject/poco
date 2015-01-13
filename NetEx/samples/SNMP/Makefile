@@ -12,7 +12,7 @@ objects = SNMP
 
 target         = SNMP
 target_version = 1
-target_libs    = PocoUtil PocoJSON PocoASN PocoNet PocoNetEx PocoXML PocoFoundation
+target_libs    = PocoUtil PocoJSON PocoNetEx PocoNet PocoASN PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
 

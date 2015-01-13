@@ -12,7 +12,8 @@ objects = \
 	Driver \
 	NetExTestSuite \
 	ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
-	NTPClientTest NTPClientTestSuite
+	NTPClientTest NTPClientTestSuite \
+	SNMPClientTest SNMPClientTestSuite
 
 target         = testrunner
 target_version = 1
