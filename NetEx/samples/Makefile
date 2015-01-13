@@ -10,3 +10,4 @@
 clean all: projects
 projects:
 	$(MAKE) -C Ping $(MAKECMDGOALS)
+	$(MAKE) -C SNMP $(MAKECMDGOALS)

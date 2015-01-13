@@ -1,8 +1,8 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ping", "Ping\Ping_vs90.vcproj", "{154EC2E2-A1CC-3F3E-9BAA-8134DF82B0B5}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ping", "Ping\Ping_vs100.vcxproj", "{154EC2E2-A1CC-3F3E-9BAA-8134DF82B0B5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SNMP", "SNMP\SNMP_vs90.vcproj", "{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SNMP", "SNMP\SNMP_vs100.vcxproj", "{51A26B75-BE4E-3BAB-B4FA-AABE52D35885}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

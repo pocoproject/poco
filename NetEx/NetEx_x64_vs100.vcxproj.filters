@@ -2,22 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ICMP">
-      <UniqueIdentifier>{bb35f940-774b-4ec6-a93e-5b62e96f6743}</UniqueIdentifier>
+      <UniqueIdentifier>{35870109-4055-4fa8-bac9-5508d0e48b95}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Header Files">
-      <UniqueIdentifier>{c6fb8c09-ebca-477b-8a99-0698acbfc5ee}</UniqueIdentifier>
+      <UniqueIdentifier>{128b5e02-de7f-4760-ae3a-42ee1ee53e06}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Source Files">
-      <UniqueIdentifier>{7f411a13-e30b-4d14-b03f-10b591f51db0}</UniqueIdentifier>
+      <UniqueIdentifier>{11021645-5a98-4751-b2ed-07067c1a92cc}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP">
-      <UniqueIdentifier>{34f5565b-37ac-49ee-8f23-1eba1aa5feb9}</UniqueIdentifier>
+      <UniqueIdentifier>{de3d5488-8f37-4a01-95bb-eed106f0bfac}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Header Files">
-      <UniqueIdentifier>{15f77d3f-7672-4fb5-9062-8c9f0a2ccbc0}</UniqueIdentifier>
+      <UniqueIdentifier>{e1e2a4f7-6c7d-4ea9-b303-c5e21ba95271}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Source Files">
-      <UniqueIdentifier>{d6503bc7-f0da-4c92-9080-d4b2a7e25403}</UniqueIdentifier>
+      <UniqueIdentifier>{da657449-7a6f-4cc2-afe4-923a59cf7932}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP">
+      <UniqueIdentifier>{b56692c0-d290-4ef8-8e97-11bfea21af38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP\Header Files">
+      <UniqueIdentifier>{36f60f2a-4934-4a74-9592-32c84024d59e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP\Source Files">
+      <UniqueIdentifier>{ee99f304-fa59-4756-83f3-3d9d15e2b8ae}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +60,30 @@
     <ClInclude Include="include\Poco\Net\NTPPacket.h">
       <Filter>NTP\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPCore.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPClientRaw.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPClientRawTypes.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPClientRawFactory.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPRawEventArgs.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPClient.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPClientTypes.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPEventArgs.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ICMPClient.cpp">
@@ -82,6 +115,27 @@
     </ClCompile>
     <ClCompile Include="src\NTPPacket.cpp">
       <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientRaw.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientRawTypes.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientRawFactory.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPRawEventArgs.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClient.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientTypes.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPEventArgs.cpp">
+      <Filter>SNMP\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

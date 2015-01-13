@@ -13,6 +13,7 @@
 #include "NetExTestSuite.h"
 #include "ICMPClientTestSuite.h"
 #include "NTPClientTestSuite.h"
+#include "SNMPClientTestSuite.h"
 
 
 CppUnit::Test* NetExTestSuite::suite()
@@ -21,6 +22,7 @@ CppUnit::Test* NetExTestSuite::suite()
 
 	pSuite->addTest(ICMPClientTestSuite::suite());
 	pSuite->addTest(NTPClientTestSuite::suite());
+	pSuite->addTest(SNMPClientTestSuite::suite());
 
 	return pSuite;
 }

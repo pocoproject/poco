@@ -31,7 +31,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\ASN\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NetEx_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -105,7 +105,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\ASN\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NetEx_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -174,7 +174,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\ASN\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -235,7 +235,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\ASN\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -289,7 +289,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\ASN\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -350,7 +350,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\ASN\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -444,6 +444,45 @@
 					RelativePath=".\src\NTPEventArgs.cpp"/>
 				<File
 					RelativePath=".\src\NTPPacket.cpp"/>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="SNMP">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\include\Poco\Net\SNMPCore.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPClientRaw.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPClientRawTypes.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPClientRawFactory.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPRawEventArgs.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPClient.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPClientTypes.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SNMPEventArgs.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\SNMPClientRaw.cpp"/>
+				<File
+					RelativePath=".\src\SNMPClientRawTypes.cpp"/>
+				<File
+					RelativePath=".\src\SNMPClientRawFactory.cpp"/>
+				<File
+					RelativePath=".\src\SNMPRawEventArgs.cpp"/>
+				<File
+					RelativePath=".\src\SNMPClient.cpp"/>
+				<File
+					RelativePath=".\src\SNMPClientTypes.cpp"/>
+				<File
+					RelativePath=".\src\SNMPEventArgs.cpp"/>
 			</Filter>
 		</Filter>
 		<File

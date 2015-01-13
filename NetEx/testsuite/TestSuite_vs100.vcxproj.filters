@@ -2,37 +2,46 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{5ed6dbeb-bf2c-47c1-a0fb-62c505ad28ef}</UniqueIdentifier>
+      <UniqueIdentifier>{ed99893a-a174-417a-8813-850c15bfef94}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{90b87230-120f-44d1-a78c-816a5a62e8a6}</UniqueIdentifier>
+      <UniqueIdentifier>{a4f143cc-c57f-4eca-8bfc-6f3f558ed46c}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{be7e0706-3551-4957-88bd-6d2fccb84ade}</UniqueIdentifier>
+      <UniqueIdentifier>{29f67f51-e179-4a35-90d0-d827cfaaf193}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{fe466c43-5584-4de5-b5a0-c52faed2ed0d}</UniqueIdentifier>
+      <UniqueIdentifier>{2d07e676-4dd8-4020-90d6-0b986245311c}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{fe224030-0f5b-4a01-968d-56e74d1798d7}</UniqueIdentifier>
+      <UniqueIdentifier>{1a077684-fcf0-4ada-a763-3973804a6fe3}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP">
-      <UniqueIdentifier>{3a8a325e-9665-4938-98c0-d42bea9b1182}</UniqueIdentifier>
+      <UniqueIdentifier>{4625bf2d-f946-4c5f-aadf-42e6b3e434a7}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Header Files">
-      <UniqueIdentifier>{7dde8a28-cebd-4996-bb6e-89eac1e03fb8}</UniqueIdentifier>
+      <UniqueIdentifier>{7d0e2a6e-1929-4321-a0f1-951eb3170a78}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Source Files">
-      <UniqueIdentifier>{69d9a90a-8ce1-4d1c-ab5a-8f2e30324105}</UniqueIdentifier>
+      <UniqueIdentifier>{ba73bcd7-1028-4e83-a1ae-2c3046001c5b}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP">
-      <UniqueIdentifier>{16fd9586-3daf-4adc-9adf-fbbef03c00b7}</UniqueIdentifier>
+      <UniqueIdentifier>{79bc703e-546c-4a18-8447-06f04bac2209}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Header Files">
-      <UniqueIdentifier>{3a6959aa-a55b-4eb2-8330-3048d100e332}</UniqueIdentifier>
+      <UniqueIdentifier>{5d00ce60-72db-4dd3-91cb-2c5f1ac65d25}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Source Files">
-      <UniqueIdentifier>{f2ccf8ab-9e52-454e-bc0e-5cf3c7471555}</UniqueIdentifier>
+      <UniqueIdentifier>{982d0379-6843-4bc6-97e0-4ff7b02ce732}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP">
+      <UniqueIdentifier>{c917a581-d3c6-4bb8-a247-d45d645397a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP\Header Files">
+      <UniqueIdentifier>{3111e4ea-9ee8-49f4-ac6c-a9803b91086f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP\Source Files">
+      <UniqueIdentifier>{91157f87-e620-47f8-ba17-b58d273c040d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +62,12 @@
     </ClInclude>
     <ClInclude Include="src\NTPClientTestSuite.h">
       <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SNMPClientTest.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SNMPClientTestSuite.h">
+      <Filter>SNMP\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +91,12 @@
     </ClCompile>
     <ClCompile Include="src\NTPClientTestSuite.cpp">
       <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientTest.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientTestSuite.cpp">
+      <Filter>SNMP\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

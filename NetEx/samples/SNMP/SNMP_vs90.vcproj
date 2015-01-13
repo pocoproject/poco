@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="Ping"
+	Name="SNMP"
 	Version="9.00"
 	ProjectType="Visual C++"
 	ProjectGUID="{154EC2E2-A1CC-3F3E-9BAA-8134DF82B0B5}"
-	RootNamespace="Ping"
+	RootNamespace="SNMP"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
-			Name="x64"/>
+			Name="Win32"/>
 	</Platforms>
 	<ToolFiles/>
 	<Configurations>
 		<Configuration
-			Name="debug_shared|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			Name="debug_shared|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -31,7 +31,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetEx\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -57,14 +57,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
-				OutputFile="bin64\Pingd.exe"
+				OutputFile="bin\SNMPd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib64"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin64\Pingd.pdb"
+				ProgramDatabaseFile="bin\SNMPd.pdb"
 				SubSystem="1"
-				TargetMachine="17"
+				TargetMachine="1"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -82,9 +82,9 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_shared|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			Name="release_shared|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -104,7 +104,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetEx\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -128,14 +128,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
-				OutputFile="bin64\Ping.exe"
+				OutputFile="bin\SNMP.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib64"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="17"
+				TargetMachine="1"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -153,9 +153,9 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static_mt|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			Name="debug_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -171,7 +171,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetEx\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -197,14 +197,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin64\static_mt\Pingd.exe"
+				OutputFile="bin\static_mt\SNMPd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib64"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin64\static_mt\Pingd.pdb"
+				ProgramDatabaseFile="bin\static_mt\SNMPd.pdb"
 				SubSystem="1"
-				TargetMachine="17"
+				TargetMachine="1"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -222,9 +222,9 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static_mt|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			Name="release_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -244,7 +244,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetEx\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -268,14 +268,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin64\static_mt\Ping.exe"
+				OutputFile="bin\static_mt\SNMP.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib64"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="17"
+				TargetMachine="1"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -293,9 +293,9 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static_md|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			Name="debug_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -311,7 +311,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetEx\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -337,14 +337,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin64\static_md\Pingd.exe"
+				OutputFile="bin\static_md\SNMPd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib64"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin64\static_md\Pingd.pdb"
+				ProgramDatabaseFile="bin\static_md\SNMPd.pdb"
 				SubSystem="1"
-				TargetMachine="17"
+				TargetMachine="1"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -362,9 +362,9 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static_md|x64"
-			OutputDirectory="obj64\$(ConfigurationName)"
-			IntermediateDirectory="obj64\$(ConfigurationName)"
+			Name="release_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -384,7 +384,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetEx\include;..\..\..\ASN\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -408,14 +408,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="bin64\static_md\Ping.exe"
+				OutputFile="bin\static_md\SNMP.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib64"
+				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="17"
+				TargetMachine="1"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -438,12 +438,12 @@
 		<Filter
 			Name="Configuration Files">
 			<File
-				RelativePath=".\ping.properties"/>
+				RelativePath=".\snmp.properties"/>
 		</Filter>
 		<Filter
 			Name="Source Files">
 			<File
-				RelativePath=".\src\Ping.cpp"/>
+				RelativePath=".\src\SNMP.cpp"/>
 		</Filter>
 	</Files>
 	<Globals/>

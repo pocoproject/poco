@@ -318,6 +318,8 @@
     <ClInclude Include="src\ICMPSocketTest.h"/>
     <ClInclude Include="src\NTPClientTest.h"/>
     <ClInclude Include="src\NTPClientTestSuite.h"/>
+    <ClInclude Include="src\SNMPClientTest.h"/>
+    <ClInclude Include="src\SNMPClientTestSuite.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NetExTestSuite.cpp"/>
@@ -327,6 +329,8 @@
     <ClCompile Include="src\ICMPSocketTest.cpp"/>
     <ClCompile Include="src\NTPClientTest.cpp"/>
     <ClCompile Include="src\NTPClientTestSuite.cpp"/>
+    <ClCompile Include="src\SNMPClientTest.cpp"/>
+    <ClCompile Include="src\SNMPClientTestSuite.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>
