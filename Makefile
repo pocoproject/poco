@@ -149,7 +149,7 @@ Net-clean:
 	$(MAKE) -C $(POCO_BASE)/Net/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Net/samples clean
 
-NetEx-libexec:  Foundation-libexec
+NetEx-libexec:  Foundation-libexec Net-libexec
 	$(MAKE) -C $(POCO_BASE)/NetEx
 
 NetEx-tests: NetEx-libexec cppunit
