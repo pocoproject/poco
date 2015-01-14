@@ -2,35 +2,41 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ICMP">
-      <UniqueIdentifier>{35870109-4055-4fa8-bac9-5508d0e48b95}</UniqueIdentifier>
+      <UniqueIdentifier>{f969741a-ca54-461a-a99e-38d0a6dd2a79}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Header Files">
-      <UniqueIdentifier>{128b5e02-de7f-4760-ae3a-42ee1ee53e06}</UniqueIdentifier>
+      <UniqueIdentifier>{839b8e3a-25c9-4dca-95a3-fa452e599764}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Source Files">
-      <UniqueIdentifier>{11021645-5a98-4751-b2ed-07067c1a92cc}</UniqueIdentifier>
+      <UniqueIdentifier>{a34ff554-541c-4e9c-9d1f-4feca84896c8}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP">
-      <UniqueIdentifier>{de3d5488-8f37-4a01-95bb-eed106f0bfac}</UniqueIdentifier>
+      <UniqueIdentifier>{00766347-7dd7-4098-b220-c19a765fd490}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Header Files">
-      <UniqueIdentifier>{e1e2a4f7-6c7d-4ea9-b303-c5e21ba95271}</UniqueIdentifier>
+      <UniqueIdentifier>{e6611d60-3eb3-4447-b368-4f2f4c9eb221}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Source Files">
-      <UniqueIdentifier>{da657449-7a6f-4cc2-afe4-923a59cf7932}</UniqueIdentifier>
+      <UniqueIdentifier>{5ac261dc-1d81-4402-8f82-37cfdea2d0b5}</UniqueIdentifier>
     </Filter>
     <Filter Include="SNMP">
-      <UniqueIdentifier>{b56692c0-d290-4ef8-8e97-11bfea21af38}</UniqueIdentifier>
+      <UniqueIdentifier>{cb9d325b-1884-44ce-8f77-e0ce1299e3fe}</UniqueIdentifier>
     </Filter>
     <Filter Include="SNMP\Header Files">
-      <UniqueIdentifier>{36f60f2a-4934-4a74-9592-32c84024d59e}</UniqueIdentifier>
+      <UniqueIdentifier>{6dac130e-8933-4c2a-bf70-1192c796d214}</UniqueIdentifier>
     </Filter>
     <Filter Include="SNMP\Source Files">
-      <UniqueIdentifier>{ee99f304-fa59-4756-83f3-3d9d15e2b8ae}</UniqueIdentifier>
+      <UniqueIdentifier>{e4f240f1-c4e1-44fd-9258-f7a1f2a3aab3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Net\ICMPClient.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPClientImpl.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPClientRaw.h">
       <Filter>ICMP\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Net\ICMPEventArgs.h">
@@ -87,6 +93,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ICMPClient.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPClientRaw.cpp">
       <Filter>ICMP\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ICMPEventArgs.cpp">

@@ -60,6 +60,33 @@ void ICMPClientTest::testPing()
 }
 
 
+void ICMPClientTest::testPingNonRaw()
+{
+	try
+	{
+		ICMPClient icmpClient(IPAddress::IPv4, false);
+		icmpClient.pingBegin += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
+		icmpClient.pingReply += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onReply);
+		icmpClient.pingError += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onError);
+		icmpClient.pingEnd += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onEnd);
+
+		assert(ICMPClient::pingIPv4("localhost", 1, false) > 0);
+
+		assert(icmpClient.ping("localhost") > 0);
+		assert(icmpClient.ping("www.appinf.com", 4) > 0);
+
+		// warning: may fail depending on the existence of the addresses at test site
+		// if so, adjust accordingly (i.e. specify non-existent or unreachable IP addresses)
+		assert(0 == icmpClient.ping("192.168.243.1"));
+		assert(0 == icmpClient.ping("10.11.12.13"));
+	}
+	catch (Poco::NotImplementedException &)
+	{
+		// ignore if not implemented
+	}
+}
+
+
 void ICMPClientTest::setUp()
 {
 	_icmpClient.pingBegin += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
@@ -127,6 +154,7 @@ CppUnit::Test* ICMPClientTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ICMPClientTest");
 
 	CppUnit_addTest(pSuite, ICMPClientTest, testPing);
+	CppUnit_addTest(pSuite, ICMPClientTest, testPingNonRaw);
 
 	return pSuite;
 }
