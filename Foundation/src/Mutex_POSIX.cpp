@@ -119,7 +119,7 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 }
 
 
-FastMutexImpl::FastMutexImpl(): MutexImpl(false)
+FastMutexImpl::FastMutexImpl(): MutexImpl(MUTEX_NONRECURSIVE_IMPL)
 {
 }
 
