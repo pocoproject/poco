@@ -49,12 +49,12 @@ int main(int argc, char** argv)
 	}
 
 	{
-		Poco::Mutex mtx(true);
+		Poco::Mutex mtx(Poco::Mutex::MUTEX_RECURSIVE);
 		Benchmark(mtx, "Mutex(true)");
 	}
 
 	{
-		Poco::Mutex mtx(false);
+		Poco::Mutex mtx(Poco::Mutex::MUTEX_NONRECURSIVE);
 		Benchmark(mtx, "Mutex(false)");
 	}
 

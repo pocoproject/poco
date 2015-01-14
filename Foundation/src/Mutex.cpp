@@ -33,8 +33,8 @@
 namespace Poco {
 
 
-Mutex::Mutex(bool recursive)
-	: MutexImpl(recursive)
+Mutex::Mutex(MutexType type)
+	: MutexImpl((MutexTypeImpl) type)
 {
 }
 

@@ -21,15 +21,16 @@
 namespace Poco {
 
 
-MutexImpl::MutexImpl(bool recursive)
+MutexImpl::MutexImpl(MutexTypeImpl type)
 {
-	if (recursive)
+	switch (type)
 	{
+	case MUTEX_RECURSIVE_IMPL:
 		_sem = semMCreate(SEM_INVERSION_SAFE | SEM_Q_PRIORITY);
-	}
-	else
-	{
+		break;
+	case MUTEX_NONRECURSIVE_IMPL:
 		_sem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+		break;
 	}
 	if (_sem == 0)
 		throw Poco::SystemException("cannot create mutex");

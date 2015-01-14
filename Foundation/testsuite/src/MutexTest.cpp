@@ -40,7 +40,7 @@ namespace
 		{
 			try
 			{
-				Mutex mtx(false);
+				Mutex mtx(Mutex::MUTEX_NONRECURSIVE);
 				mtx.lock();
 				mtx.lock();
 			}
@@ -74,7 +74,7 @@ MutexTest::~MutexTest()
 
 void MutexTest::testMutexRecursion()
 {
-	Mutex mtx(false);
+	Mutex mtx(Mutex::MUTEX_NONRECURSIVE);
 	mtx.lock();
 	
 	bool success = mtx.tryLock();

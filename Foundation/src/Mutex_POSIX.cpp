@@ -38,7 +38,7 @@
 namespace Poco {
 
 
-MutexImpl::MutexImpl(bool recursive)
+MutexImpl::MutexImpl(MutexTypeImpl type)
 {
 #if defined(POCO_VXWORKS)
 	// This workaround is for VxWorks 5.x where
@@ -50,9 +50,9 @@ MutexImpl::MutexImpl(bool recursive)
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 #if defined(PTHREAD_MUTEX_RECURSIVE_NP)
-	pthread_mutexattr_settype_np(&attr, recursive ? PTHREAD_MUTEX_RECURSIVE_NP : PTHREAD_MUTEX_NORMAL_NP);
+	pthread_mutexattr_settype_np(&attr, type == MUTEX_RECURSIVE_IMPL ? PTHREAD_MUTEX_RECURSIVE_NP : PTHREAD_MUTEX_NORMAL_NP);
 #elif !defined(POCO_VXWORKS)
-	pthread_mutexattr_settype(&attr, recursive ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_NORMAL);
+	pthread_mutexattr_settype(&attr, type == MUTEX_RECURSIVE_IMPL ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_NORMAL);
 #endif
 	if (pthread_mutex_init(&_mutex, &attr))
 	{
