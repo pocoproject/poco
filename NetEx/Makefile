@@ -11,7 +11,7 @@ include $(POCO_BASE)/build/rules/global
 SHAREDOPT_CXX += -DNetEx_EXPORTS
 
 objects = \
-	ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
+	ICMPClient ICMPClientRaw ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
 	NTPClient NTPEventArgs NTPPacket \
 	SNMPClient SNMPClientRawFactory SNMPClientTypes SNMPRawEventArgs \

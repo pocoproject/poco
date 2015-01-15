@@ -105,6 +105,8 @@ private:
 	std::vector<std::string> _errors;
 
 	friend class ICMPClient;
+	friend class ICMPClientRaw;
+	friend class ICMPClientUserImpl;
 };
 
 
