@@ -46,11 +46,23 @@ class Foundation_API Event: private EventImpl
 	/// for an event to become signalled.
 {
 public:
-	Event(bool autoReset = true);
+	enum EventType
+	{
+		EVENT_MANUALRESET = EVENT_MANUALRESET_IMPL, /// Manual reset event
+		EVENT_AUTORESET = EVENT_AUTORESET_IMPL,     /// Auto-reset event
+	};
+
+	Event(EventType type = EVENT_AUTORESET);
+		/// Creates the event. If type is EVENT_AUTORESET,
+		/// the event is automatically reset after
+		/// a wait() successfully returns.
+
+	Event(bool autoReset);
+		//@ deprecated
 		/// Creates the event. If autoReset is true,
 		/// the event is automatically reset after
 		/// a wait() successfully returns.
-		
+
 	~Event();
 		/// Destroys the event.
 

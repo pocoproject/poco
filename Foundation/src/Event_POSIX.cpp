@@ -26,7 +26,7 @@
 namespace Poco {
 
 
-EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
+EventImpl::EventImpl(EventTypeImpl type): _auto(type == EVENT_AUTORESET_IMPL), _state(false)
 {
 #if defined(POCO_VXWORKS)
 	// This workaround is for VxWorks 5.x where
