@@ -52,13 +52,13 @@ public:
 		EVENT_AUTORESET = EVENT_AUTORESET_IMPL,     /// Auto-reset event
 	};
 
-	Event(EventType type = EVENT_AUTORESET);
+	explicit Event(EventType type = EVENT_AUTORESET);
 		/// Creates the event. If type is EVENT_AUTORESET,
 		/// the event is automatically reset after
 		/// a wait() successfully returns.
 
 	//@ deprecated
-	Event(bool autoReset);
+	explicit Event(bool autoReset);
 		/// Please use Event::Event(EventType) instead.
 
 	~Event();
