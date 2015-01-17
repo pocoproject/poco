@@ -59,10 +59,10 @@ public:
 	typedef Poco::ScopedLock<Mutex> ScopedLock;
 	
 	explicit Mutex(MutexType type = MUTEX_RECURSIVE);
-		/// creates the Mutex.
+		/// Creates the Mutex.
 		
 	~Mutex();
-		/// destroys the Mutex.
+		/// Destroys the Mutex.
 
 	void lock();
 		/// Locks the mutex. Blocks if the mutex

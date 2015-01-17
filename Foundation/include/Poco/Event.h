@@ -57,11 +57,9 @@ public:
 		/// the event is automatically reset after
 		/// a wait() successfully returns.
 
+	//@ deprecated
 	Event(bool autoReset);
-		//@ deprecated
-		/// Creates the event. If autoReset is true,
-		/// the event is automatically reset after
-		/// a wait() successfully returns.
+		/// Please use Event::Event(EventType) instead.
 
 	~Event();
 		/// Destroys the event.
