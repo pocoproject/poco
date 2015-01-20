@@ -292,10 +292,12 @@
     <ClInclude Include="include\Poco\Net\HTTPBasicStreamBuf.h" />
     <ClInclude Include="include\Poco\Net\HTTPBufferAllocator.h" />
     <ClInclude Include="include\Poco\Net\HTTPChunkedStream.h" />
+    <ClInclude Include="include\Poco\Net\HTTPClient.h" />
     <ClInclude Include="include\Poco\Net\HTTPClientSession.h" />
     <ClInclude Include="include\Poco\Net\HTTPCookie.h" />
     <ClInclude Include="include\Poco\Net\HTTPCredentials.h" />
     <ClInclude Include="include\Poco\Net\HTTPDigestCredentials.h" />
+    <ClInclude Include="include\Poco\Net\HTTPResponseEventArgs.h" />
     <ClInclude Include="include\Poco\Net\HTTPFixedLengthStream.h" />
     <ClInclude Include="include\Poco\Net\HTTPHeaderStream.h" />
     <ClInclude Include="include\Poco\Net\HTTPIOStream.h" />
@@ -388,10 +390,12 @@
     <ClCompile Include="src\HTTPBasicCredentials.cpp" />
     <ClCompile Include="src\HTTPBufferAllocator.cpp" />
     <ClCompile Include="src\HTTPChunkedStream.cpp" />
+    <ClCompile Include="src\HTTPClient.cpp" />
     <ClCompile Include="src\HTTPClientSession.cpp" />
     <ClCompile Include="src\HTTPCookie.cpp" />
     <ClCompile Include="src\HTTPCredentials.cpp" />
     <ClCompile Include="src\HTTPDigestCredentials.cpp" />
+    <ClCompile Include="src\HTTPResponseEventArgs.cpp" />
     <ClCompile Include="src\HTTPFixedLengthStream.cpp" />
     <ClCompile Include="src\HTTPHeaderStream.cpp" />
     <ClCompile Include="src\HTTPIOStream.cpp" />
