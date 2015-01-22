@@ -39,17 +39,22 @@ class ASN_API Unknown : public ASN1
 {
 public:
 	Unknown(ASN1Type type);
+		/// Construct using the passed type.
 
 	Unknown(ASN1Type type, const std::string &value);
+		/// Construct using the passed type and value.
 
 	std::string toString() const;
+		/// Returns an user-friendly string representation of the data.
 
 	std::string typeName() const;
+		/// Returns a string representation of the type name.
 
 	const std::string &getValue() const;
 		/// Returns the raw value as a string.
 
 	void dump(std::ostream &stream, int ident) const;
+		/// Dumps the data in indented format.
 
 protected:
 	Poco::UInt32 getDataLength() const;
@@ -66,12 +71,16 @@ class ASN_API Null : public ASN1
 {
 public:
 	Null();
+		/// Default constructor.
 
 	std::string toString() const;
+		/// Returns an user-friendly string representation of the data.
 
 	std::string typeName() const;
+		/// Returns a string representation of the type name.
 
 	void dump(std::ostream &stream, int ident) const;
+		/// Dumps the data in indented format.
 
 protected:
 	Poco::UInt32 getDataLength() const;
@@ -85,16 +94,22 @@ class ASN_API Boolean : public ASN1
 {
 public:
 	Boolean();
+		/// Default constructor.
 
 	Boolean(bool value);
+		/// Construct using the passed value.
 
 	bool getValue() const;
+		/// Returns the contained value.
 
 	std::string toString() const;
+		/// Returns an user-friendly string representation of the data.
 
 	std::string typeName() const;
+		/// Returns a string representation of the type name.
 
 	void dump(std::ostream &stream, int ident) const;
+		/// Dumps the data in indented format.
 
 protected:
 	Poco::UInt32 getDataLength() const;
@@ -111,18 +126,25 @@ class ASN_API Integer : public ASN1
 {
 public:
 	Integer();
+		/// Default constructor.
 
 	Integer(Poco::UInt32 value);
+		/// Construct using the passed value.
 
 	Integer(ASN1Type type, Poco::UInt32 value);
+		/// Construct using the passed type and value.
 
 	Poco::UInt32 getValue() const;
+		/// Returns the contained value.
 
 	std::string toString() const;
+		/// Returns an user-friendly string representation of the data.
 
 	std::string typeName() const;
+		/// Returns a string representation of the type name.
 
 	void dump(std::ostream &stream, int ident) const;
+		/// Dumps the data in indented format.
 
 protected:
 	Poco::UInt32 getDataLength() const;
@@ -140,18 +162,25 @@ class ASN_API Integer64 : public ASN1
 {
 public:
 	Integer64();
+		/// Default constructor.
 
 	Integer64(Poco::UInt64 value);
+		/// Construct using the passed value.
 
 	Integer64(ASN1Type type, Poco::UInt64 value);
+		/// Construct using the passed type and value.
 
 	Poco::UInt64 getValue() const;
+		/// Returns the contained value.
 
 	std::string toString() const;
+		/// Returns an user-friendly string representation of the data.
 
 	std::string typeName() const;
+		/// Returns a string representation of the type name.
 
 	void dump(std::ostream &stream, int ident) const;
+		/// Dumps the data in indented format.
 
 protected:
 	Poco::UInt32 getDataLength() const;
@@ -169,18 +198,25 @@ class ASN_API OctetString : public ASN1
 {
 public:
 	OctetString();
+		/// Default constructor.
 
 	OctetString(const std::string &value);
+		/// Construct using the passed value.
 
 	OctetString(ASN1Type type, const std::string &value = "");
+		/// Construct using the passed type and value.
 
 	std::string getValue() const;
+		/// Returns the contained value.
 
 	std::string toString() const;
+		/// Returns an user-friendly string representation of the data.
 
 	std::string typeName() const;
+		/// Returns a string representation of the type name.
 
 	void dump(std::ostream &stream, int ident) const;
+		/// Dumps the data in indented format.
 
 protected:
 	Poco::UInt32 getDataLength() const;
@@ -196,16 +232,20 @@ class ASN_API ObjectIdentifier : public ASN1
 	/// ASN1 Object Identifier Universal value.
 {
 public:
-
 	ObjectIdentifier();
+		/// Default constructor.
 
 	ObjectIdentifier(const std::string &value);
+		/// Construct using the passed value.
 
 	std::string toString() const;
+		/// Returns an user-friendly string representation of the data.
 
 	std::string typeName() const;
+		/// Returns a string representation of the type name.
 
 	void dump(std::ostream &stream, int ident) const;
+		/// Dumps the data in indented format.
 
 protected:
 	Poco::UInt32 getDataLength() const;
@@ -222,7 +262,11 @@ class ASN_API SequenceData : public std::vector<ASN1::Ptr>
 {
 public:
 	SequenceData();
+		/// Default constructor.
+
 	SequenceData(ASN1::Ptr v1, ASN1::Ptr v2 = NULL, ASN1::Ptr v3 = NULL);
+		/// Construct adding 3 values.
+
 };
 
 
@@ -231,18 +275,25 @@ class ASN_API Sequence : public ASN1
 {
 public:
 	Sequence();
+		/// Default constructor.
 
 	Sequence(ASN1Type type);
+		/// Construct using the passed type.
 
 	Sequence(const SequenceData &value);
+		/// Construct using the passed value.
 
 	Sequence(ASN1Type type, const SequenceData &value);
+		/// Construct using the passed type and value.
 
 	const SequenceData &getSequenceData() const;
+		/// Returns the contained value.
 
 	std::string typeName() const;
+		/// Returns a string representation of the type name.
 
 	void dump(std::ostream &stream, int ident) const;
+		/// Dumps the data in indented format.
 
 protected:
 	ASN1::Ptr getDataType(int pos) const;
