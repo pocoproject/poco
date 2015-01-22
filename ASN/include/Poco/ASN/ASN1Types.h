@@ -33,12 +33,11 @@ namespace ASN1Types {
 
 
 class ASN_API Unknown : public ASN1
-	/// Unknow ASN1 type.
+	/// Unknown ASN1 type.
 	///
 	/// Stores the raw value read from the stream.
 {
 public:
-
 	Unknown(ASN1Type type);
 
 	Unknown(ASN1Type type, const std::string &value);
@@ -56,6 +55,7 @@ protected:
 	Poco::UInt32 getDataLength() const;
 	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
+
 private:
 	std::string _value;
 };
@@ -84,7 +84,6 @@ class ASN_API Boolean : public ASN1
 	/// ASN1 Boolean Universal value.
 {
 public:
-
 	Boolean();
 
 	Boolean(bool value);
@@ -101,6 +100,7 @@ protected:
 	Poco::UInt32 getDataLength() const;
 	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
+
 private:
 	bool _value;
 };
@@ -110,7 +110,6 @@ class ASN_API Integer : public ASN1
 	/// ASN1 Integer Universal value.
 {
 public:
-
 	Integer();
 
 	Integer(Poco::UInt32 value);
@@ -137,10 +136,9 @@ private:
 #ifdef POCO_HAVE_INT64
 
 class ASN_API Integer64 : public ASN1
-{
 	/// ASN1 Integer Universal value.
+{
 public:
-
 	Integer64();
 
 	Integer64(Poco::UInt64 value);
@@ -159,6 +157,7 @@ protected:
 	Poco::UInt32 getDataLength() const;
 	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
+
 private:
 	Poco::UInt64 _value;
 };
@@ -169,7 +168,6 @@ class ASN_API OctetString : public ASN1
 	/// ASN1 OctetString Universal value.
 {
 public:
-
 	OctetString();
 
 	OctetString(const std::string &value);
@@ -188,6 +186,7 @@ protected:
 	Poco::UInt32 getDataLength() const;
 	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
+
 private:
 	std::string _value;
 };
@@ -212,14 +211,15 @@ protected:
 	Poco::UInt32 getDataLength() const;
 	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
+
 private:
 	std::vector<Poco::UInt32> _value;
 };
 
 
 class ASN_API SequenceData : public std::vector<ASN1::Ptr>
-{
 	/// Data for the Sequence type.
+{
 public:
 	SequenceData();
 	SequenceData(ASN1::Ptr v1, ASN1::Ptr v2 = NULL, ASN1::Ptr v3 = NULL);
@@ -230,7 +230,6 @@ class ASN_API Sequence : public ASN1
 	/// ASN1 Sequence Universal value.
 {
 public:
-
 	Sequence();
 
 	Sequence(ASN1Type type);
@@ -251,6 +250,7 @@ protected:
 	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
 
+private:
 	SequenceData _value;
 };
 
