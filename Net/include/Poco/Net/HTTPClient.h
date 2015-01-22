@@ -22,11 +22,12 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/HTTPResponseEventArgs.h"
+#include "Poco/Net/HTTPEventArgs.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPMessage.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Activity.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #include <deque>
 #include <map>
@@ -69,8 +70,8 @@ class Net_API HTTPClient
 {
 public:
 
-	mutable Poco::BasicEvent<HTTPResponseEventArgs> httpResponse;
-	mutable Poco::BasicEvent<HTTPResponseEventArgs> httpError;
+	mutable Poco::BasicEvent<HTTPEventArgs> httpResponse;
+	mutable Poco::BasicEvent<HTTPEventArgs> httpError;
 
 	explicit HTTPClient(const StreamSocket& socket);
 		/// Creates a HTTPClient using the given socket.
@@ -142,12 +143,32 @@ public:
 	const HTTPClientSession::ProxyConfig& getProxyConfig() const;
 		/// Returns the proxy configuration.
 
+	void setKeepAlive(bool keepAlive);
+		/// Sets the keep-alive flag.
+		///
+		/// If the keep-alive flag is enabled, persistent
+		/// HTTP/1.1 connections are supported.
+
+	bool getKeepAlive() const;
+		/// Returns the value of the keep-alive flag.
+
+	void setTimeout(const Poco::Timespan& timeout);
+		/// Sets the timeout.
+
+	Poco::Timespan getTimeout() const;
+		/// Returns the timeout.
+
 	void setKeepAliveTimeout(const Poco::Timespan& timeout);
 		/// Sets the connection timeout for HTTP connections.
 		
 	const Poco::Timespan& getKeepAliveTimeout() const;
 		/// Returns the connection timeout for HTTP connections.
-		
+	
+	void sendRequest(SharedPtr<HTTPRequest> request,
+		const std::string& body = "");
+		/// Sends the header for the given HTTP request to
+		/// the server.
+
 	void sendRequest(const std::string& method,
 		const std::string& uri,
 		const std::string& body = "",
@@ -222,11 +243,12 @@ protected:
 	void runActivity();
 
 private:
-	typedef std::deque<HTTPRequest*> RequestQueue;
-	typedef std::map<HTTPRequest*, std::string> RequestBodyMap;
+	typedef std::deque<SharedPtr<HTTPRequest> > RequestQueue;
+	typedef std::map<SharedPtr<HTTPRequest>, std::string> RequestBodyMap;
 
 	HTTPClient();
 
+	void addRequest(SharedPtr<HTTPRequest> request, const std::string& body = "");
 	void wakeUp();
 	void clearQueue();
 
@@ -234,14 +256,23 @@ private:
 	RequestQueue         _requestQueue;
 	RequestBodyMap       _requestBodyMap;
 	Activity<HTTPClient> _activity;
-	mutable Mutex        _mutex;
+	Mutex                _mutex;
+	Mutex                _exchangeMutex;
 	Thread*              _pThread;
+	int                  _requestsInProcess;
 };
 
 
 //
 // inlines
 //
+
+inline void HTTPClient::sendRequest(SharedPtr<HTTPRequest> request,
+	const std::string& body)
+{
+	addRequest(request, body);
+}
+
 
 inline void HTTPClient::sendGet(const std::string& uri,
 	const std::string& body,
@@ -348,6 +379,18 @@ inline const HTTPClientSession::ProxyConfig& HTTPClient::getProxyConfig() const
 }
 
 
+inline bool HTTPClient::getKeepAlive() const
+{
+	return _session.getKeepAlive();
+}
+
+
+inline Poco::Timespan HTTPClient::getTimeout() const
+{
+	return _session.getTimeout();
+}
+
+
 inline const Poco::Timespan& HTTPClient::getKeepAliveTimeout() const
 {
 	return _session.getKeepAliveTimeout();
@@ -368,7 +411,7 @@ inline bool HTTPClient::bypassProxy() const
 
 inline int HTTPClient::requests() const
 {
-	return static_cast<int>(_requestQueue.size());
+	return _requestsInProcess + static_cast<int>(_requestQueue.size());
 }
 
 

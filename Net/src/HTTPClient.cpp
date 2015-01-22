@@ -16,11 +16,12 @@
 
 #include "Poco/Net/HTTPClient.h"
 #include "Poco/Net/HTTPResponse.h"
-#include "Poco/Net/HTTPResponseEventArgs.h"
+#include "Poco/Net/HTTPEventArgs.h"
 #include "Poco/Net/HTTPHeaderStream.h"
 #include "Poco/Net/HTTPStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Thread.h"
+#include "Poco/ScopedLock.h"
 #include <sstream>
 
 
@@ -30,34 +31,49 @@ namespace Net {
 
 HTTPClient::HTTPClient(const StreamSocket& socket):
 	_session(socket),
-	_activity(this, &HTTPClient::runActivity)
+	_activity(this, &HTTPClient::runActivity),
+	_pThread(0),
+	_requestsInProcess(0)
 {
+	_activity.start();
 }
 
 
 HTTPClient::HTTPClient(const SocketAddress& address):
 	_session(address),
-	_activity(this, &HTTPClient::runActivity)
+	_activity(this, &HTTPClient::runActivity),
+	_pThread(0),
+	_requestsInProcess(0)
 {
+	_activity.start();
 }
 
 
 HTTPClient::HTTPClient(const std::string& host, Poco::UInt16 port):
 	_session(host, port),
-	_activity(this, &HTTPClient::runActivity)
+	_activity(this, &HTTPClient::runActivity),
+	_pThread(0),
+	_requestsInProcess(0)
 {
+	_activity.start();
 }
 
 
 HTTPClient::HTTPClient(const std::string& host, Poco::UInt16 port, const HTTPClientSession::ProxyConfig& proxyConfig) :
 	_session(host, port, proxyConfig),
-	_activity(this, &HTTPClient::runActivity)
+	_activity(this, &HTTPClient::runActivity),
+	_pThread(0),
+	_requestsInProcess(0)
 {
+	_activity.start();
 }
 
 
 HTTPClient::~HTTPClient()
 {
+	_activity.stop();
+	wakeUp();
+	_activity.wait();
 	clearQueue();
 }
 
@@ -69,7 +85,7 @@ void HTTPClient::runActivity()
 		RequestQueue   requestQueue;
 		RequestBodyMap requestBodyMap;
 		{
-			Mutex::ScopedLock l(_mutex);
+			Mutex::ScopedLock l(_exchangeMutex);
 			if (_requestQueue.size())
 			{
 				requestQueue.assign(_requestQueue.begin(), _requestQueue.end());
@@ -83,31 +99,37 @@ void HTTPClient::runActivity()
 			}
 		}
 
+		_requestsInProcess = static_cast<int>(requestQueue.size());
+
 		for (RequestQueue::iterator it = requestQueue.begin(),
 			end = requestQueue.end(); it != end; ++it)
 		{
 			HTTPRequest& req = **it;
+			HTTPResponse response;
 
 			try
 			{
+				ScopedLockWithUnlock<Mutex> l(_mutex);
 				std::ostream& os = _session.sendRequest(req);
-				if (_requestBodyMap.find(*it) != _requestBodyMap.end())
+				if (requestBodyMap.find(*it) != requestBodyMap.end())
 				{
-					os << _requestBodyMap[*it];
+					os << requestBodyMap[*it];
 				}
 
-				HTTPResponse response;
 				std::ostringstream ostr;
 				std::istream& rs = _session.receiveResponse(response);
+				l.unlock();
 				StreamCopier::copyStream(rs, ostr);
-				HTTPResponseEventArgs args(req.getURI(), ostr.str());
+				HTTPEventArgs args(req.getURI(), response, ostr.str());
 				httpResponse.notify(this, args);
 			}
 			catch (Poco::Exception& ex)
 			{
-				HTTPResponseEventArgs args(req.getURI(), "", ex.displayText());
+				HTTPEventArgs args(req.getURI(), response, "", ex.displayText());
 				httpError.notify(this, args);
 			}
+
+			--_requestsInProcess;
 		}
 
 		Thread::trySleep(100);
@@ -123,13 +145,9 @@ void HTTPClient::wakeUp()
 
 void HTTPClient::clearQueue()
 {
+	Mutex::ScopedLock l(_exchangeMutex);
 	_requestBodyMap.clear();
-
-	for (RequestQueue::iterator it = _requestQueue.begin(),
-		end = _requestQueue.end(); it != end; ++it)
-	{
-		delete *it;
-	}
+	_requestQueue.clear();
 }
 
 
@@ -146,13 +164,26 @@ void HTTPClient::sendRequest(const std::string& method,
 	const std::string& body,
 	const std::string& version)
 {
-	HTTPRequest* pReq = new HTTPRequest(method, uri, version);
+	SharedPtr<HTTPRequest> request = new HTTPRequest(method, uri, version);
+	addRequest(request, body);
+}
+
+
+void HTTPClient::addRequest(SharedPtr<HTTPRequest> pReq,
+	const std::string& body)
+{
 	try
 	{
-		Mutex::ScopedLock l(_mutex);
+		Mutex::ScopedLock l(_exchangeMutex);
 		if (body.size())
 		{
-			pReq->setContentLength(static_cast<int>(body.length()));
+			if (pReq->getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH &&
+				!pReq->getChunkedTransferEncoding() &&
+				(body.find("\r\n\r\n") != std::string::npos ||
+				body.find("\r\n0\r\n") != std::string::npos))
+			{
+				pReq->setContentLength(static_cast<int>(body.length()));
+			}
 			_requestBodyMap.insert(RequestBodyMap::value_type(pReq, body));
 		}
 		_requestQueue.push_back(pReq);
@@ -160,14 +191,13 @@ void HTTPClient::sendRequest(const std::string& method,
 	catch (...)
 	{
 		{
-			Mutex::ScopedLock l(_mutex);
+			Mutex::ScopedLock l(_exchangeMutex);
 			RequestBodyMap::iterator it = _requestBodyMap.find(pReq);
 			if (it != _requestBodyMap.end())
 			{
 				_requestBodyMap.erase(it);
 			}
 		}
-		delete pReq;
 		throw;
 	}
 
@@ -222,46 +252,49 @@ void HTTPClient::setProxyPort(Poco::UInt16 port)
 
 void HTTPClient::setProxyCredentials(const std::string& username, const std::string& password)
 {
-	Mutex::ScopedLock l(_mutex);
-	reset();
 	_session.setProxyCredentials(username, password);
-	_session.reconnect();
 }
 
 
 void HTTPClient::setProxyUsername(const std::string& username)
 {
 	Mutex::ScopedLock l(_mutex);
-	reset();
 	_session.setProxyUsername(username);
-	_session.reconnect();
 }
 
 
 void HTTPClient::setProxyPassword(const std::string& password)
 {
 	Mutex::ScopedLock l(_mutex);
-	reset();
 	_session.setProxyPassword(password);
-	_session.reconnect();
 }
 
 
 void HTTPClient::setProxyConfig(const HTTPClientSession::ProxyConfig& config)
 {
 	Mutex::ScopedLock l(_mutex);
-	reset();
 	_session.setProxyConfig(config);
-	_session.reconnect();
+}
+
+
+void HTTPClient::setKeepAlive(bool keepAlive)
+{
+	Mutex::ScopedLock l(_mutex);
+	_session.setKeepAlive(keepAlive);
+}
+
+
+void HTTPClient::setTimeout(const Poco::Timespan& timeout)
+{
+	Mutex::ScopedLock l(_mutex);
+	_session.setTimeout(timeout);
 }
 
 
 void HTTPClient::setKeepAliveTimeout(const Poco::Timespan& timeout)
 {
 	Mutex::ScopedLock l(_mutex);
-	reset();
 	_session.setKeepAliveTimeout(timeout);
-	_session.reconnect();
 }
 
 

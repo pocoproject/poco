@@ -12,7 +12,7 @@ objects = \
 	DNSTest HTTPServerTestSuite MulticastSocketTest SocketStreamTest \
 	DatagramSocketTest HTTPStreamFactoryTest MultipartReaderTest SocketTest \
 	Driver HTTPTestServer MultipartWriterTest SocketsTestSuite \
-	EchoServer HTTPTestSuite NameValueCollectionTest TCPServerTest \
+	EchoServer HTTPTestSuite NameValueCollectionTest TCPServerTest HTTPClientTest \
 	HTTPClientSessionTest IPAddressTest NetCoreTestSuite TCPServerTestSuite \
 	HTTPRequestTest MessageHeaderTest NetTestSuite UDPEchoServer \
 	HTTPResponseTest MessagesTestSuite NetworkInterfaceTest \

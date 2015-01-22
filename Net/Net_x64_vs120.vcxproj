@@ -297,7 +297,7 @@
     <ClInclude Include="include\Poco\Net\HTTPCookie.h" />
     <ClInclude Include="include\Poco\Net\HTTPCredentials.h" />
     <ClInclude Include="include\Poco\Net\HTTPDigestCredentials.h" />
-    <ClInclude Include="include\Poco\Net\HTTPResponseEventArgs.h" />
+    <ClInclude Include="include\Poco\Net\HTTPEventArgs.h" />
     <ClInclude Include="include\Poco\Net\HTTPFixedLengthStream.h" />
     <ClInclude Include="include\Poco\Net\HTTPHeaderStream.h" />
     <ClInclude Include="include\Poco\Net\HTTPIOStream.h" />
@@ -395,7 +395,7 @@
     <ClCompile Include="src\HTTPCookie.cpp" />
     <ClCompile Include="src\HTTPCredentials.cpp" />
     <ClCompile Include="src\HTTPDigestCredentials.cpp" />
-    <ClCompile Include="src\HTTPResponseEventArgs.cpp" />
+    <ClCompile Include="src\HTTPEventArgs.cpp" />
     <ClCompile Include="src\HTTPFixedLengthStream.cpp" />
     <ClCompile Include="src\HTTPHeaderStream.cpp" />
     <ClCompile Include="src\HTTPIOStream.cpp" />

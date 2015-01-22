@@ -315,6 +315,7 @@
     <ClInclude Include="src\HTMLFormTest.h" />
     <ClInclude Include="src\HTMLTestSuite.h" />
     <ClInclude Include="src\HTTPClientSessionTest.h" />
+    <ClInclude Include="src\HTTPClientTest.h" />
     <ClInclude Include="src\HTTPClientTestSuite.h" />
     <ClInclude Include="src\HTTPCookieTest.h" />
     <ClInclude Include="src\HTTPCredentialsTest.h" />
@@ -373,6 +374,7 @@
     <ClCompile Include="src\HTMLFormTest.cpp" />
     <ClCompile Include="src\HTMLTestSuite.cpp" />
     <ClCompile Include="src\HTTPClientSessionTest.cpp" />
+    <ClCompile Include="src\HTTPClientTest.cpp" />
     <ClCompile Include="src\HTTPClientTestSuite.cpp" />
     <ClCompile Include="src\HTTPCookieTest.cpp" />
     <ClCompile Include="src\HTTPCredentialsTest.cpp" />

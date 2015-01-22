@@ -15,8 +15,8 @@ objects = \
 	DatagramSocket HTTPServer IPAddress IPAddressImpl SocketAddress SocketAddressImpl \
 	HTTPBasicCredentials HTTPCookie HTMLForm MediaType DialogSocket \
 	DatagramSocketImpl FilePartSource HTTPServerConnection MessageHeader \
-	HTTPChunkedStream HTTPServerConnectionFactory MulticastSocket SocketStream \
-	HTTPClientSession HTTPServerParams MultipartReader StreamSocket SocketImpl \
+	HTTPChunkedStream HTTPServerConnectionFactory MulticastSocket SocketStream HTTPClient \
+	HTTPEventArgs HTTPClientSession HTTPServerParams MultipartReader StreamSocket SocketImpl \
 	HTTPFixedLengthStream HTTPServerRequest HTTPServerRequestImpl MultipartWriter StreamSocketImpl \
 	HTTPHeaderStream HTTPServerResponse HTTPServerResponseImpl NameValueCollection TCPServer \
 	HTTPMessage HTTPServerSession NetException TCPServerConnection HTTPBufferAllocator \
