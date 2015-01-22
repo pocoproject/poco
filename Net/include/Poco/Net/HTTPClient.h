@@ -71,6 +71,7 @@ class Net_API HTTPClient
 public:
 
 	mutable Poco::BasicEvent<HTTPEventArgs> httpResponse;
+	mutable Poco::BasicEvent<HTTPEventArgs> httpException;
 	mutable Poco::BasicEvent<HTTPEventArgs> httpError;
 
 	explicit HTTPClient(const StreamSocket& socket);

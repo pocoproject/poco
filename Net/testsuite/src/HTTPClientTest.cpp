@@ -57,7 +57,7 @@ void HTTPClientTest::onResponse(const void* pSender, HTTPEventArgs& args)
 
 void HTTPClientTest::onError(const void* pSender, HTTPEventArgs& args)
 {
-	_error = args.error();
+	_error = args.response().getStatus();
 	_done = true;
 }
 
@@ -312,6 +312,17 @@ void HTTPClientTest::testBypassProxy()
 }
 
 
+void HTTPClientTest::testNotFound()
+{
+	HTTPTestServer srv;
+	HTTPClient s("localhost", srv.port());
+	s.httpError += Delegate<HTTPClientTest, HTTPEventArgs>(this, &HTTPClientTest::onError);
+	s.sendGet("/notfound");
+	while (!_done) Thread::sleep(10);
+	assert(_error == HTTPResponse::HTTP_NOT_FOUND);
+}
+
+
 void HTTPClientTest::setUp()
 {
 	_contentType.clear();
@@ -319,7 +330,7 @@ void HTTPClientTest::setUp()
 	_chunked = false;
 	_keepAlive = false;
 	_body.clear();
-	_error.clear();
+	_error = HTTPResponse::HTTP_OK;
 	_done = false;
 }
 
@@ -346,6 +357,7 @@ CppUnit::Test* HTTPClientTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPClientTest, testProxyAuth);
 	CppUnit_addTest(pSuite, HTTPClientTest, testBypassProxy);
+	CppUnit_addTest(pSuite, HTTPClientTest, testNotFound);
 
 	return pSuite;
 }

@@ -38,7 +38,7 @@ public:
 	HTTPEventArgs(const std::string& uri,
 		const HTTPResponse& response,
 		const std::string& body,
-		const std::string& error = "");
+		const std::string& exception = "");
 		/// Creates HTTPEventArgs.
 
 	virtual ~HTTPEventArgs();
@@ -53,8 +53,8 @@ public:
 	std::string body() const;
 		/// Returns the response body.
 
-	std::string error() const;
-		/// Returns the error string for the request.
+	std::string exception() const;
+	/// Returns the exception string for the request.
 
 private:
 	HTTPEventArgs();
@@ -62,7 +62,7 @@ private:
 	std::string         _uri;
 	const HTTPResponse& _response;
 	std::string         _body;
-	std::string         _error;
+	std::string         _exception;
 };
 
 
@@ -88,9 +88,9 @@ inline std::string HTTPEventArgs::body() const
 }
 
 
-inline std::string HTTPEventArgs::error() const
+inline std::string HTTPEventArgs::exception() const
 {
-	return _error;
+	return _exception;
 }
 
 

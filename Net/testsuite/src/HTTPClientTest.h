@@ -40,6 +40,7 @@ public:
 	void testProxy();
 	void testProxyAuth();
 	void testBypassProxy();
+	void testNotFound();
 
 	void setUp();
 	void tearDown();
@@ -50,12 +51,14 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	typedef Poco::Net::HTTPResponse::HTTPStatus Status;
+
 	std::string _body;
 	std::string _contentType;
 	int         _contentLength;
 	bool        _chunked;
 	bool        _keepAlive;
-	std::string _error;
+	Status      _error;
 	bool        _done;
 };
 

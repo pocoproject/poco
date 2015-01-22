@@ -121,12 +121,15 @@ void HTTPClient::runActivity()
 				l.unlock();
 				StreamCopier::copyStream(rs, ostr);
 				HTTPEventArgs args(req.getURI(), response, ostr.str());
-				httpResponse.notify(this, args);
+				if (response.getStatus() >= HTTPResponse::HTTP_BAD_REQUEST)
+					httpError.notify(this, args);
+				else
+					httpResponse.notify(this, args);
 			}
 			catch (Poco::Exception& ex)
 			{
 				HTTPEventArgs args(req.getURI(), response, "", ex.displayText());
-				httpError.notify(this, args);
+				httpException.notify(this, args);
 			}
 
 			--_requestsInProcess;

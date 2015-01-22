@@ -25,13 +25,13 @@ namespace Poco {
 namespace Net {
 
 
-	HTTPEventArgs::HTTPEventArgs(const std::string& uri,
-		const HTTPResponse& response,
-		const std::string& body,
-		const std::string& error) : _uri(uri),
-		_response(response),
-		_body(body),
-		_error(error)
+HTTPEventArgs::HTTPEventArgs(const std::string& uri,
+	const HTTPResponse& response,
+	const std::string& body,
+	const std::string& exception) : _uri(uri),
+	_response(response),
+	_body(body),
+	_exception(exception)
 {
 }
 
