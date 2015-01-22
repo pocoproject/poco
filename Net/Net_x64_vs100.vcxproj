@@ -79,7 +79,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">..\bin64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">obj64\Net\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</LinkIncremental>
@@ -341,7 +341,9 @@
     <ClInclude Include="include\Poco\Net\HTTPServerResponse.h"/>
     <ClInclude Include="include\Poco\Net\HTTPServerResponseImpl.h"/>
     <ClInclude Include="include\Poco\Net\HTTPServerSession.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPClient.h"/>
     <ClInclude Include="include\Poco\Net\HTTPClientSession.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPEventArgs.h"/>
     <ClInclude Include="include\Poco\Net\HTTPIOStream.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSessionFactory.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSessionInstantiator.h"/>
@@ -436,7 +438,9 @@
     <ClCompile Include="src\HTTPServerResponse.cpp"/>
     <ClCompile Include="src\HTTPServerResponseImpl.cpp"/>
     <ClCompile Include="src\HTTPServerSession.cpp"/>
+    <ClCompile Include="src\HTTPClient.cpp"/>
     <ClCompile Include="src\HTTPClientSession.cpp"/>
+    <ClCompile Include="src\HTTPEventArgs.cpp"/>
     <ClCompile Include="src\HTTPIOStream.cpp"/>
     <ClCompile Include="src\HTTPSessionFactory.cpp"/>
     <ClCompile Include="src\HTTPSessionInstantiator.cpp"/>

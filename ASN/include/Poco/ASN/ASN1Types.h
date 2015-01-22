@@ -107,8 +107,8 @@ private:
 
 
 class ASN_API Integer : public ASN1
-{
 	/// ASN1 Integer Universal value.
+{
 public:
 
 	Integer();
@@ -129,6 +129,7 @@ protected:
 	Poco::UInt32 getDataLength() const;
 	void encodeData(Poco::BinaryWriter &stream) const;
 	void decodeData(Poco::SharedPtr<ASN1Factory> factory, Poco::BinaryReader &stream, Poco::UInt32 length);
+
 private:
 	Poco::UInt32 _value;
 };
@@ -216,7 +217,7 @@ private:
 };
 
 
-class SequenceData : public std::vector<ASN1::Ptr>
+class ASN_API SequenceData : public std::vector<ASN1::Ptr>
 {
 	/// Data for the Sequence type.
 public:
@@ -225,7 +226,7 @@ public:
 };
 
 
-class Sequence : public ASN1
+class ASN_API Sequence : public ASN1
 	/// ASN1 Sequence Universal value.
 {
 public:

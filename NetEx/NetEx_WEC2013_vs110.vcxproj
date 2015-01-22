@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ClInclude Include="include\Poco\Net\ICMPClient.h"/>
+    <ClInclude Include="include\Poco\Net\ICMPClientImpl.h"/>
+    <ClInclude Include="include\Poco\Net\ICMPClientRaw.h"/>
+    <ClInclude Include="include\Poco\Net\ICMPEventArgs.h"/>
+    <ClInclude Include="include\Poco\Net\ICMPPacket.h"/>
+    <ClInclude Include="include\Poco\Net\ICMPPacketImpl.h"/>
+    <ClInclude Include="include\Poco\Net\ICMPSocket.h"/>
+    <ClInclude Include="include\Poco\Net\ICMPSocketImpl.h"/>
+    <ClInclude Include="include\Poco\Net\ICMPv4PacketImpl.h"/>
+    <ClInclude Include="include\Poco\Net\NTPClient.h"/>
+    <ClInclude Include="include\Poco\Net\NTPEventArgs.h"/>
+    <ClInclude Include="include\Poco\Net\NTPPacket.h"/>
+    <ClInclude Include="include\Poco\Net\SNMPCore.h"/>
+    <ClInclude Include="include\Poco\Net\SNMPClientRaw.h"/>
+    <ClInclude Include="include\Poco\Net\SNMPClientRawTypes.h"/>
+    <ClInclude Include="include\Poco\Net\SNMPClientRawFactory.h"/>
+    <ClInclude Include="include\Poco\Net\SNMPRawEventArgs.h"/>
+    <ClInclude Include="include\Poco\Net\SNMPClient.h"/>
+    <ClInclude Include="include\Poco\Net\SNMPClientTypes.h"/>
+    <ClInclude Include="include\Poco\Net\SNMPEventArgs.h"/>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>NetEx</ProjectName>
+    <ProjectGuid>{B057A1FE-09F7-465E-B8B5-E1B659051D76}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <EnableRedirectPlatform>true</EnableRedirectPlatform>
+    <RedirectPlatformValue>SDK_AM335X_SK_WEC2013_V300</RedirectPlatformValue>
+    <PlatformToolset>CE800</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings"/>
+  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V300'">PocoNetExd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V300'">PocoNetExmdd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V300'">PocoNetExmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V300'">PocoNetEx</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V300'">PocoNetExmd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V300'">PocoNetExmt</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup/>
+  <ItemGroup>
+    <ClCompile Include="src\ICMPClient.cpp"/>
+    <ClCompile Include="src\ICMPClientRaw.cpp"/>
+    <ClCompile Include="src\ICMPEventArgs.cpp"/>
+    <ClCompile Include="src\ICMPPacket.cpp"/>
+    <ClCompile Include="src\ICMPPacketImpl.cpp"/>
+    <ClCompile Include="src\ICMPSocket.cpp"/>
+    <ClCompile Include="src\ICMPSocketImpl.cpp"/>
+    <ClCompile Include="src\ICMPv4PacketImpl.cpp"/>
+    <ClCompile Include="src\NTPClient.cpp"/>
+    <ClCompile Include="src\NTPEventArgs.cpp"/>
+    <ClCompile Include="src\NTPPacket.cpp"/>
+    <ClCompile Include="src\SNMPClientRaw.cpp"/>
+    <ClCompile Include="src\SNMPClientRawTypes.cpp"/>
+    <ClCompile Include="src\SNMPClientRawFactory.cpp"/>
+    <ClCompile Include="src\SNMPRawEventArgs.cpp"/>
+    <ClCompile Include="src\SNMPClient.cpp"/>
+    <ClCompile Include="src\SNMPClientTypes.cpp"/>
+    <ClCompile Include="src\SNMPEventArgs.cpp"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc"/>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <ImportGroup Label="ExtensionTargets"/>
+</Project>

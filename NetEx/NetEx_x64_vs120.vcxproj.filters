@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ICMP">
-      <UniqueIdentifier>{091cd9e1-79b4-44e8-8b66-b17635b998b9}</UniqueIdentifier>
+      <UniqueIdentifier>{afd6d540-760a-4e03-9f97-c1e89b0e3442}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Header Files">
-      <UniqueIdentifier>{4e8f1ba6-b20e-4478-9df2-4b349d059ea9}</UniqueIdentifier>
+      <UniqueIdentifier>{c40506e9-1c57-43e1-a202-9a3b9266cc5d}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Source Files">
-      <UniqueIdentifier>{fb4b2b49-fd48-4414-baee-f6c5f0686802}</UniqueIdentifier>
+      <UniqueIdentifier>{fcb8a984-7d55-4936-b0f8-f35aedff658e}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP">
-      <UniqueIdentifier>{4db23ca8-88f9-4cca-aa3e-8c0a6f903885}</UniqueIdentifier>
+      <UniqueIdentifier>{6852489a-d015-4841-aaa4-fb4e37db28da}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Header Files">
-      <UniqueIdentifier>{6be2c680-0c9c-4023-b1a4-3b3916d08558}</UniqueIdentifier>
+      <UniqueIdentifier>{6e3f48e0-5339-47bc-8a03-553533bc47d3}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Source Files">
-      <UniqueIdentifier>{54ba9125-3fa6-4850-9d1c-509f7f970c4b}</UniqueIdentifier>
+      <UniqueIdentifier>{ea55eec7-3630-4492-9dec-dd80f23b764d}</UniqueIdentifier>
     </Filter>
     <Filter Include="SNMP">
-      <UniqueIdentifier>{b46adead-ad17-402d-b7cd-e915ab3ee43c}</UniqueIdentifier>
+      <UniqueIdentifier>{5aed4b69-e312-4909-a32f-5fd5df7de6f9}</UniqueIdentifier>
     </Filter>
     <Filter Include="SNMP\Header Files">
-      <UniqueIdentifier>{d8f8c85f-be91-4b99-825d-7e8e10f26c4e}</UniqueIdentifier>
+      <UniqueIdentifier>{f67b7be3-67a9-4910-a278-1e27ca03a6b4}</UniqueIdentifier>
     </Filter>
     <Filter Include="SNMP\Source Files">
-      <UniqueIdentifier>{149b7924-e63a-4390-88e8-61636098c740}</UniqueIdentifier>
+      <UniqueIdentifier>{4a5b88e7-c120-4b6a-b161-a536d1af7e41}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
