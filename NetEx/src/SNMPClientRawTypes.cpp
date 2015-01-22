@@ -163,7 +163,7 @@ std::string Counter64::typeName() const
 }
 
 
-#endif POCO_HAVE_INT64
+#endif // POCO_HAVE_INT64
 
 
 ///
