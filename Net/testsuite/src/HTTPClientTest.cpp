@@ -47,7 +47,7 @@ HTTPClientTest::HTTPClientTest(const std::string& name): CppUnit::TestCase(name)
 void HTTPClientTest::onResponse(const void* pSender, HTTPEventArgs& args)
 {
 	_contentType = args.response().getContentType();
-	_contentLength = args.response().getContentLength();
+	_contentLength = static_cast<int>(args.response().getContentLength());
 	_chunked = args.response().getChunkedTransferEncoding();
 	_keepAlive = args.response().getKeepAlive();
 	_body = args.body();
