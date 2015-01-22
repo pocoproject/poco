@@ -2,46 +2,46 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{92432b7c-0ee2-4882-9980-a7305ce8d97a}</UniqueIdentifier>
+      <UniqueIdentifier>{5f30e285-335d-4039-8f9b-dcc890088523}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{ee2138ea-03ce-4b7f-b516-d825c9ba560d}</UniqueIdentifier>
+      <UniqueIdentifier>{b030b755-5b69-4646-add3-77cc32c85ad5}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{2f4ab831-c5b9-47ae-bc0d-2340af8e53c9}</UniqueIdentifier>
+      <UniqueIdentifier>{edff1bb6-86f2-4f35-8c9f-fe88d1f94080}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{8344f155-0970-4585-8150-1d9e4ec70b07}</UniqueIdentifier>
+      <UniqueIdentifier>{788af5f0-3b7b-47e6-a018-6c23ecea297a}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{37c3448b-7736-41da-a09a-701e109725da}</UniqueIdentifier>
+      <UniqueIdentifier>{9cfd0a1a-a74e-4697-8537-373e9a284cac}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP">
-      <UniqueIdentifier>{06ba8dac-199f-49ef-b302-a56c61dd4c83}</UniqueIdentifier>
+      <UniqueIdentifier>{42a956dc-3184-499e-917e-83c5337bbcd6}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Header Files">
-      <UniqueIdentifier>{cbc0b335-13b1-4e61-9509-0b5bc779c7f5}</UniqueIdentifier>
+      <UniqueIdentifier>{affb78db-4fc9-4243-843e-ab063874b9ae}</UniqueIdentifier>
     </Filter>
     <Filter Include="ICMP\Source Files">
-      <UniqueIdentifier>{61811b24-9ffa-423e-83fa-c4396d4d96be}</UniqueIdentifier>
+      <UniqueIdentifier>{8ba82a2b-4099-494b-b1d3-f543b9cba09d}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP">
-      <UniqueIdentifier>{c483e6e7-04f3-4c3a-8df9-14e49ab9bd9a}</UniqueIdentifier>
+      <UniqueIdentifier>{f4f6a244-f202-4936-859c-c8d09810f20b}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Header Files">
-      <UniqueIdentifier>{1a52653d-3976-45c7-952b-e7143910861a}</UniqueIdentifier>
+      <UniqueIdentifier>{b1d218f8-5c7d-4be3-8084-43c9722be88f}</UniqueIdentifier>
     </Filter>
     <Filter Include="NTP\Source Files">
-      <UniqueIdentifier>{8222a367-2330-4906-9565-1fa410908ebd}</UniqueIdentifier>
+      <UniqueIdentifier>{c2815ac3-f46c-427f-af56-74b05f072838}</UniqueIdentifier>
     </Filter>
     <Filter Include="SNMP">
-      <UniqueIdentifier>{9d290ac8-6910-4e64-8c22-8161b45cf37a}</UniqueIdentifier>
+      <UniqueIdentifier>{98be18b4-c635-4aea-8060-aca15430b6fa}</UniqueIdentifier>
     </Filter>
     <Filter Include="SNMP\Header Files">
-      <UniqueIdentifier>{3f4d4db4-d639-4deb-93ec-845c44172c4f}</UniqueIdentifier>
+      <UniqueIdentifier>{630670f1-b583-47dd-8fc6-f274e80908ba}</UniqueIdentifier>
     </Filter>
     <Filter Include="SNMP\Source Files">
-      <UniqueIdentifier>{09abece6-ad1f-4f8e-aed5-d12060d230ad}</UniqueIdentifier>
+      <UniqueIdentifier>{fbcf7592-8bf2-438b-8296-7d2bb5d10f5c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -74,7 +74,7 @@
     <ClCompile Include="src\NetExTestSuite.cpp">
       <Filter>_Suite\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WinDriver.cpp">
+    <ClCompile Include="src\WinCEDriver.cpp">
       <Filter>_Driver\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ICMPClientTest.cpp">
