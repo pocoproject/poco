@@ -44,8 +44,8 @@ public:
 	void setUp();
 	void tearDown();
 
-	void HTTPClientTest::onResponse(const void* pSender, Poco::Net::HTTPEventArgs& args);
-	void HTTPClientTest::onError(const void* pSender, Poco::Net::HTTPEventArgs& args);
+	void onResponse(const void* pSender, Poco::Net::HTTPEventArgs& args);
+	void onError(const void* pSender, Poco::Net::HTTPEventArgs& args);
 
 	static CppUnit::Test* suite();
 
