@@ -48,6 +48,8 @@ ICMPClientTest::~ICMPClientTest()
 
 void ICMPClientTest::testPing()
 {
+	// In order to succeed, this test case must be run
+	// by user with permissions to acess raw sockets.
 	assert(ICMPClient::pingIPv4("localhost") > 0);
 
 	assert(_icmpClient.ping("localhost") > 0);
