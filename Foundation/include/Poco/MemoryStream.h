@@ -32,8 +32,8 @@
 namespace Poco {
 
 
-template <typename ch, typename tr> 
-class BasicMemoryStreamBuf: public std::basic_streambuf<ch, tr>
+template <typename charT, typename traits>
+class BasicMemoryStreamBuf: public std::basic_streambuf<charT, traits>
 	/// BasicMemoryStreamBuf is a simple implementation of a 
 	/// stream buffer for reading and writing from a memory area.
 	///
@@ -43,13 +43,11 @@ class BasicMemoryStreamBuf: public std::basic_streambuf<ch, tr>
 	/// ostream, but not for an iostream.
 {
 protected:
-	typedef std::basic_streambuf<ch, tr> Base;
-	typedef std::basic_ios<ch, tr> IOS;
-	typedef ch char_type;
-	typedef tr char_traits;
-	typedef typename Base::int_type int_type;
-	typedef typename Base::pos_type pos_type;
-	typedef typename Base::off_type off_type;
+	typedef charT char_type;
+	typedef typename traits::int_type int_type;
+	typedef typename traits::pos_type pos_type;
+	typedef typename traits::off_type off_type;
+	typedef traits traits_type;
 
 public:
 	BasicMemoryStreamBuf(char_type* pBuffer, std::streamsize bufferSize):
@@ -66,12 +64,74 @@ public:
 
 	virtual int_type overflow(int_type /*c*/)
 	{
-		return char_traits::eof();
+		return traits_type::eof();
 	}
 
 	virtual int_type underflow()
 	{
-		return char_traits::eof();
+		return traits_type::eof();
+	}
+
+	virtual pos_type seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out)
+	{
+		const pos_type fail = off_type(-1);
+		off_type newoff = off_type(-1);
+
+		if ((which & std::ios_base::in) != 0)
+		{
+			// Position the input sequence
+
+			if (gptr() == 0)
+				return fail;
+
+			switch (way)
+			{
+			case std::ios_base::beg:
+				newoff = 0;
+				break;
+			case std::ios_base::cur:
+				// cur is not valid if both in and out are specified (Condition 3)
+				if ((which & std::ios_base::out) != 0)
+					return fail;
+				newoff = gptr() - eback();
+				break;
+			case std::ios_base::end:
+				newoff = egptr() - eback();
+				break;
+			}
+
+			if ((newoff + off) < 0 || (egptr() - eback()) < (newoff + off))
+				return fail;
+			this->setg(eback(), eback() + newoff + off, egptr());
+		}
+
+		if ((which & std::ios_base::out) != 0)
+		{
+			if (pptr() == 0)
+				return fail;
+
+			switch (way)
+			{
+			case std::ios_base::beg:
+				newoff = 0;
+				break;
+			case std::ios_base::cur:
+				// cur is not valid if both in and out are specified (Condition 3)
+				if ((which & std::ios_base::in) != 0)
+					return fail;
+				newoff = pptr() - pbase();
+				break;
+			case std::ios_base::end:
+				newoff = epptr() - pbase();
+				break;
+			}
+
+			if (newoff + off < 0 || (epptr() - pbase()) < newoff + off)
+				return fail;
+			this->pbump((int)(newoff + off - (pptr() - pbase())));
+		}
+
+		return newoff;
 	}
 
 	virtual int sync()

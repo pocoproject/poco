@@ -29,6 +29,10 @@ public:
 	void testInput();
 	void testOutput();
 	void testTell();
+	void testInputSeek();
+	void testInputSeekVsStringStream();
+	void testOutputSeek();
+	void testOutputSeekVsStringStream();
 
 	void setUp();
 	void tearDown();
