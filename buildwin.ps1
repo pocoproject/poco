@@ -4,7 +4,7 @@
 # Usage:
 # ------
 # buildwin.ps1 [-poco_base    dir]
-#              [-vs_version   120 | 110 | 100 | 90 | 80 | 71]
+#              [-vs_version   120 | 110 | 100 | 90]
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
@@ -23,7 +23,7 @@ Param
   [string] $poco_base,
 
   [Parameter()]
-  [ValidateSet(71, 80, 90, 100, 110, 120)]
+  [ValidateSet(90, 100, 110, 120)]
   [int] $vs_version,
 
   [Parameter()]
@@ -82,8 +82,6 @@ function Set-Environment
     elseif ($Env:VS110COMNTOOLS -ne '') { $script:vs_version = 110 }
     elseif ($Env:VS100COMNTOOLS -ne '') { $script:vs_version = 100 }
     elseif ($Env:VS90COMNTOOLS  -ne '') { $script:vs_version = 90 }
-    elseif ($Env:VS80COMNTOOLS  -ne '') { $script:vs_version = 80 }
-    elseif ($Env:VS71COMNTOOLS  -ne '') { $script:vs_version = 71 }
     else
     {
       Write-Host 'Visual Studio not found, exiting.'
@@ -146,7 +144,7 @@ function Process-Input
     Write-Host 'Usage:'
     Write-Host '------'
     Write-Host 'buildwin.ps1 [-poco_base    dir]'
-    Write-Host '             [-vs_version   120 | 110 | 100 | 90 | 80 | 71]'
+    Write-Host '             [-vs_version   120 | 110 | 100 | 90]'
     Write-Host '             [-action       build | rebuild | clean]'
     Write-Host '             [-linkmode     shared | static_mt | static_md | all]'
     Write-Host '             [-config       release | debug | both]'

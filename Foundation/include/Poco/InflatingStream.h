@@ -85,6 +85,7 @@ public:
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
 	int writeToDevice(const char* buffer, std::streamsize length);
+	int sync();
 
 private:
 	enum 

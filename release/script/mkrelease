@@ -79,6 +79,7 @@ mkdir -p ${target}
 mkdir -p ${target}/doc
 mkdir -p ${target}/contrib
 mkdir -p ${target}/patches
+mkdir -p ${target}/cmake
 
 
 #
@@ -98,6 +99,9 @@ cp ${POCO_BASE}/doc/*.page ${target}/doc
 cp -R ${POCO_BASE}/contrib/* ${target}/contrib
 cp -R ${POCO_BASE}/patches/* ${target}/patches
 
+cp -R ${POCO_BASE}/cmake/* ${target}/cmake
+cp ${POCO_BASE}/CMakeLists.txt ${target}
+
 
 #
 # build system
@@ -116,10 +120,8 @@ cp ${POCO_BASE}/build/script/makeldpath ${target}/build/script
 cp ${POCO_BASE}/build/script/shlibln ${target}/build/script
 cp ${POCO_BASE}/build/script/projname ${target}/build/script
 cp ${POCO_BASE}/build/script/vxprogen ${target}/build/script
-cp ${POCO_BASE}/build/vms/* ${target}/build/vms
 cp ${POCO_BASE}/buildwin.cmd ${target}
 cp ${POCO_BASE}/configure ${target}
-cp ${POCO_BASE}/buildvms.com ${target}
 cp ${POCO_BASE}/libversion ${target}
 
 if [ $internal = 1 ] ; then
@@ -140,28 +142,28 @@ mkdir -p ${target}/CppUnit/WinTestRunner/include/WinTestRunner
 mkdir -p ${target}/CppUnit/WinTestRunner/src
 mkdir -p ${target}/CppUnit/WinTestRunner/res
 
-cp ${POCO_BASE}/CppUnit/doc/* ${target}/CppUnit/doc
-cp ${POCO_BASE}/CppUnit/include/CppUnit/* ${target}/CppUnit/include/CppUnit
-cp ${POCO_BASE}/CppUnit/src/* ${target}/CppUnit/src
-cp ${POCO_BASE}/CppUnit/*.sln ${target}/CppUnit
-cp ${POCO_BASE}/CppUnit/*.vcproj ${target}/CppUnit
-cp ${POCO_BASE}/CppUnit/*.vcxproj ${target}/CppUnit
-cp ${POCO_BASE}/CppUnit/*.vcxproj.filters ${target}/CppUnit
-cp ${POCO_BASE}/CppUnit/*.vcxproj.user ${target}/CppUnit
-cp ${POCO_BASE}/CppUnit/Makefile ${target}/CppUnit
-cp ${POCO_BASE}/CppUnit/*.vmsbuild ${target}/CppUnit
-cp ${POCO_BASE}/CppUnit/*.vxbuild ${target}/CppUnit
-cp ${POCO_BASE}/CppUnit/*.progen ${target}/CppUnit
+cp ${POCO_BASE}/CppUnit/doc/* ${target}/CppUnit/doc >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/include/CppUnit/* ${target}/CppUnit/include/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/src/* ${target}/CppUnit/src >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/*.sln ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/*.vcproj ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/*.vcxproj ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/*.vcxproj.filters ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/*.vcxproj.user ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/Makefile ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/*.vmsbuild ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/*.vxbuild ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/*.progen ${target}/CppUnit >/dev/null 2>&1
 
-cp ${POCO_BASE}/CppUnit/WinTestRunner/include/WinTestRunner/* ${target}/CppUnit/WinTestRunner/include/WinTestRunner
-cp ${POCO_BASE}/CppUnit/WinTestRunner/src/* ${target}/CppUnit/WinTestRunner/src
-cp ${POCO_BASE}/CppUnit/WinTestRunner/res/WinTestRunner.rc ${target}/CppUnit/WinTestRunner/res
-cp ${POCO_BASE}/CppUnit/WinTestRunner/res/Resource.h ${target}/CppUnit/WinTestRunner/res
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcproj ${target}/CppUnit/WinTestRunner
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj ${target}/CppUnit/WinTestRunner
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.filters ${target}/CppUnit/WinTestRunner
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.user ${target}/CppUnit/WinTestRunner
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.progen ${target}/CppUnit/WinTestRunner
+cp ${POCO_BASE}/CppUnit/WinTestRunner/include/WinTestRunner/* ${target}/CppUnit/WinTestRunner/include/WinTestRunner >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/WinTestRunner/src/* ${target}/CppUnit/WinTestRunner/src >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/WinTestRunner/res/WinTestRunner.rc ${target}/CppUnit/WinTestRunner/res >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/WinTestRunner/res/Resource.h ${target}/CppUnit/WinTestRunner/res >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcproj ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.filters ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.user ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/WinTestRunner/*.progen ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
 
 
 #
@@ -361,28 +363,6 @@ ENDOFSCRIPT
 
 
 #
-# Create Visual Studio 7.1 build script
-#
-cat >${target}/build_vs71.cmd <<'ENDOFSCRIPT'
-@echo off
-if defined VS71COMNTOOLS (
-call "%VS71COMNTOOLS%\vsvars32.bat")
-buildwin 71 build shared both Win32 samples
-ENDOFSCRIPT
-
-
-#
-# Create Visual Studio 8 build script
-#
-cat >${target}/build_vs80.cmd <<'ENDOFSCRIPT'
-@echo off
-if defined VS80COMNTOOLS (
-call "%VS80COMNTOOLS%\vsvars32.bat")
-buildwin 80 build shared both Win32 samples
-ENDOFSCRIPT
-
-
-#
 # Create Visual Studio 9 build script
 #
 cat >${target}/build_vs90.cmd <<'ENDOFSCRIPT'
@@ -401,6 +381,28 @@ cat >${target}/build_vs100.cmd <<'ENDOFSCRIPT'
 if defined VS100COMNTOOLS (
 call "%VS100COMNTOOLS%\vsvars32.bat")
 buildwin 100 build shared both Win32 samples
+ENDOFSCRIPT
+
+
+#
+# Create Visual Studio 11 build script
+#
+cat >${target}/build_vs110.cmd <<'ENDOFSCRIPT'
+@echo off
+if defined VS110COMNTOOLS (
+call "%VS110COMNTOOLS%\vsvars32.bat")
+buildwin 110 build shared both Win32 samples
+ENDOFSCRIPT
+
+
+#
+# Create Visual Studio 12 build script
+#
+cat >${target}/build_vs120.cmd <<'ENDOFSCRIPT'
+@echo off
+if defined VS120COMNTOOLS (
+call "%VS120COMNTOOLS%\vsvars32.bat")
+buildwin 120 build shared both Win32 samples
 ENDOFSCRIPT
 
 

@@ -40,17 +40,17 @@ namespace
 			_h(h)
 		{
 		}
-		
+
 		~AutoHandle()
 		{
 			FreeLibrary(_h);
 		}
-		
+
 		HMODULE handle()
 		{
 			return _h;
 		}
-		
+
 	private:
 		HMODULE _h;
 	};
@@ -98,10 +98,10 @@ void WinRegistryKey::setString(const std::string& name, const std::string& value
 	std::wstring uvalue;
 	Poco::UnicodeConverter::toUTF16(value, uvalue);
 	if (RegSetValueExW(_hKey, uname.c_str(), 0, REG_SZ, (CONST BYTE*) uvalue.c_str(), (DWORD) (uvalue.size() + 1)*sizeof(wchar_t)) != ERROR_SUCCESS)
-		handleSetError(name); 
+		handleSetError(name);
 #else
 	if (RegSetValueExA(_hKey, name.c_str(), 0, REG_SZ, (CONST BYTE*) value.c_str(), (DWORD) value.size() + 1) != ERROR_SUCCESS)
-		handleSetError(name); 
+		handleSetError(name);
 #endif
 }
 
@@ -114,7 +114,7 @@ std::string WinRegistryKey::getString(const std::string& name)
 #if defined(POCO_WIN32_UTF8)
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(name, uname);
-	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_SZ && type != REG_EXPAND_SZ)
+	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || (type != REG_SZ && type != REG_EXPAND_SZ && type != REG_LINK))
 		throw NotFoundException(key(name));
 	if (size > 0)
 	{
@@ -128,7 +128,7 @@ std::string WinRegistryKey::getString(const std::string& name)
 		return result;
 	}
 #else
-	if (RegQueryValueExA(_hKey, name.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_SZ && type != REG_EXPAND_SZ)
+	if (RegQueryValueExA(_hKey, name.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || (type != REG_SZ && type != REG_EXPAND_SZ && type != REG_LINK))
 		throw NotFoundException(key(name));
 	if (size > 0)
 	{
@@ -152,10 +152,10 @@ void WinRegistryKey::setStringExpand(const std::string& name, const std::string&
 	std::wstring uvalue;
 	Poco::UnicodeConverter::toUTF16(value, uvalue);
 	if (RegSetValueExW(_hKey, uname.c_str(), 0, REG_EXPAND_SZ, (CONST BYTE*) uvalue.c_str(), (DWORD) (uvalue.size() + 1)*sizeof(wchar_t)) != ERROR_SUCCESS)
-		handleSetError(name); 
+		handleSetError(name);
 #else
 	if (RegSetValueExA(_hKey, name.c_str(), 0, REG_EXPAND_SZ, (CONST BYTE*) value.c_str(), (DWORD) value.size() + 1) != ERROR_SUCCESS)
-		handleSetError(name); 
+		handleSetError(name);
 #endif
 }
 
@@ -168,7 +168,7 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 #if defined(POCO_WIN32_UTF8)
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(name, uname);
-	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_SZ && type != REG_EXPAND_SZ)
+	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || (type != REG_SZ && type != REG_EXPAND_SZ && type != REG_LINK))
 		throw NotFoundException(key(name));
 	if (size > 0)
 	{
@@ -178,7 +178,7 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 		buffer[len] = 0;
 #if !defined(_WIN32_WCE)
 		wchar_t temp;
-		DWORD expSize = ExpandEnvironmentStringsW(buffer.begin(), &temp, 1);	
+		DWORD expSize = ExpandEnvironmentStringsW(buffer.begin(), &temp, 1);
 		Poco::Buffer<wchar_t> expBuffer(expSize);
 		ExpandEnvironmentStringsW(buffer.begin(), expBuffer.begin(), expSize);
 		std::string result;
@@ -190,7 +190,7 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 		return result;
 	}
 #else
-	if (RegQueryValueExA(_hKey, name.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_SZ && type != REG_EXPAND_SZ)
+	if (RegQueryValueExA(_hKey, name.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || (type != REG_SZ && type != REG_EXPAND_SZ && type != REG_LINK))
 		throw NotFoundException(key(name));
 	if (size > 0)
 	{
@@ -198,7 +198,7 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 		RegQueryValueExA(_hKey, name.c_str(), NULL, NULL, (BYTE*) Buffer.begin(), &size);
 		buffer[size] = 0;
 		char temp;
-		DWORD expSize = ExpandEnvironmentStringsA(buffer, &temp, 1);	
+		DWORD expSize = ExpandEnvironmentStringsA(buffer, &temp, 1);
 		Poco::Buffer<char> expBuffer(expSize);
 		ExpandEnvironmentStringsA(Buffer.begin(), expBuffer.begin(), expSize);
 		std::string result(expBuffer.begin());
@@ -217,10 +217,10 @@ void WinRegistryKey::setBinary( const std::string& name, const std::vector<char>
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(name, uname);
 	if (RegSetValueExW(_hKey, uname.c_str(), 0, REG_BINARY, (CONST BYTE*) &value[0], (DWORD) value.size()) != ERROR_SUCCESS)
-		handleSetError(name); 
+		handleSetError(name);
 #else
 	if (RegSetValueExA(_hKey,  name.c_str(), 0, REG_BINARY, (CONST BYTE*) &value[0], (DWORD) value.size()) != ERROR_SUCCESS)
-		handleSetError(name); 
+		handleSetError(name);
 #endif
 }
 
@@ -263,10 +263,10 @@ void WinRegistryKey::setInt(const std::string& name, int value)
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(name, uname);
 	if (RegSetValueExW(_hKey, uname.c_str(), 0, REG_DWORD, (CONST BYTE*) &data, sizeof(data)) != ERROR_SUCCESS)
-		handleSetError(name); 
+		handleSetError(name);
 #else
 	if (RegSetValueExA(_hKey, name.c_str(), 0, REG_DWORD, (CONST BYTE*) &data, sizeof(data)) != ERROR_SUCCESS)
-		handleSetError(name); 
+		handleSetError(name);
 #endif
 }
 
@@ -280,10 +280,10 @@ int WinRegistryKey::getInt(const std::string& name)
 #if defined(POCO_WIN32_UTF8)
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(name, uname);
-	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, (BYTE*) &data, &size) != ERROR_SUCCESS || type != REG_DWORD)
+	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, (BYTE*) &data, &size) != ERROR_SUCCESS || (type != REG_DWORD && type != REG_DWORD_BIG_ENDIAN))
 		throw NotFoundException(key(name));
 #else
-	if (RegQueryValueExA(_hKey, name.c_str(), NULL, &type, (BYTE*) &data, &size) != ERROR_SUCCESS || type != REG_DWORD)
+	if (RegQueryValueExA(_hKey, name.c_str(), NULL, &type, (BYTE*) &data, &size) != ERROR_SUCCESS || (type != REG_DWORD && type != REG_DWORD_BIG_ENDIAN))
 		throw NotFoundException(key(name));
 #endif
 	return data;
@@ -300,10 +300,10 @@ void WinRegistryKey::setInt64(const std::string& name, Poco::Int64 value)
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(name, uname);
 	if (RegSetValueExW(_hKey, uname.c_str(), 0, REG_QWORD, (CONST BYTE*) &value, sizeof(value)) != ERROR_SUCCESS)
-		handleSetError(name); 
+		handleSetError(name);
 #else
 	if (RegSetValueExA(_hKey, name.c_str(), 0, REG_QWORD, (CONST BYTE*) &value, sizeof(value)) != ERROR_SUCCESS)
-		handleSetError(name); 
+		handleSetError(name);
 #endif
 }
 
@@ -365,7 +365,7 @@ void WinRegistryKey::deleteKey()
 #if defined(POCO_WIN32_UTF8)
 	std::wstring usubKey;
 	Poco::UnicodeConverter::toUTF16(_subKey, usubKey);
-	
+
 #if !defined(_WIN32_WCE)
 	typedef LONG (WINAPI *RegDeleteKeyExWFunc)(HKEY hKey, const wchar_t* lpSubKey, REGSAM samDesired, DWORD Reserved);
 	if (_extraSam != 0)
@@ -443,8 +443,6 @@ WinRegistryKey::Type WinRegistryKey::type(const std::string& name)
 	if (RegQueryValueExA(_hKey, name.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS)
 		throw NotFoundException(key(name));
 #endif
-	if (type != REG_SZ && type != REG_EXPAND_SZ && type != REG_DWORD && type != REG_QWORD && type != REG_BINARY)
-		throw NotFoundException(key(name)+": type not supported");
 
 	Type aType = (Type)type;
 	return aType;
@@ -558,6 +556,13 @@ std::string WinRegistryKey::key(const std::string& valueName) const
 }
 
 
+HKEY WinRegistryKey::handle()
+{
+	open();
+	return _hKey;
+}
+
+
 HKEY WinRegistryKey::handleFor(const std::string& rootKey)
 {
 	if (rootKey == "HKEY_CLASSES_ROOT")
@@ -594,7 +599,7 @@ void WinRegistryKey::subKeys(WinRegistryKey::Keys& keys)
 
 	DWORD subKeyCount = 0;
 	DWORD valueCount = 0;
-	
+
 	if (RegQueryInfoKey(_hKey, NULL, NULL, NULL, &subKeyCount, NULL, NULL, &valueCount, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
 		return;
 
@@ -633,7 +638,7 @@ void WinRegistryKey::values(WinRegistryKey::Values& vals)
 	open();
 
 	DWORD valueCount = 0;
-	
+
 	if (RegQueryInfoKey(_hKey, NULL, NULL, NULL, NULL, NULL, NULL, &valueCount, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
 		return ;
 

@@ -43,7 +43,7 @@ public:
 	static void assertion(const char* cond, const char* file, int line, const char* text = 0);
 		/// An assertion failed. Break into the debugger, if
 		/// possible, then throw an AssertionViolationException.
-		
+
 	static void nullPointer(const char* ptr, const char* file, int line);
 		/// An null pointer was encountered. Break into the debugger, if
 		/// possible, then throw an NullPointerException.
@@ -111,8 +111,8 @@ protected:
 
 #define poco_bugcheck_msg(msg) \
 	Poco::Bugcheck::bugcheck(msg, __FILE__, __LINE__)
-	
-	
+
+
 #define poco_unexpected() \
 	Poco::Bugcheck::unexpected(__FILE__, __LINE__);
 
@@ -143,22 +143,27 @@ protected:
 
 //
 // poco_static_assert
-// 
+//
 // The following was ported from <boost/static_assert.hpp>
 //
+
+
+#if defined(POCO_COMPILER_GCC) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
+	GCC_DIAG_OFF(unused-local-typedefs) // supress numerous gcc warnings
+#endif // POCO_COMPILER_GCC && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 
 
 template <bool x>
 struct POCO_STATIC_ASSERTION_FAILURE;
 
 
-template <> 
-struct POCO_STATIC_ASSERTION_FAILURE<true> 
+template <>
+struct POCO_STATIC_ASSERTION_FAILURE<true>
 {
-	enum 
-	{ 
-		value = 1 
-	}; 
+	enum
+	{
+		value = 1
+	};
 };
 
 

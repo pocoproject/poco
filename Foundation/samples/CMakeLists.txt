@@ -16,5 +16,4 @@ add_subdirectory(grep)
 add_subdirectory(hmacmd5)
 add_subdirectory(inflate)
 add_subdirectory(md5)
-add_subdirectory(uuidgen
-)
+add_subdirectory(uuidgen)
