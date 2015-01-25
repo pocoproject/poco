@@ -133,7 +133,7 @@ void MemoryStreamTest::testInputSeek()
 	istr >> c;							// now that makes 7
 	assert (c == '7');
 
-	istr.seekg(-7, std::ios_base::end);	// so that puts us at 2
+	istr.seekg(-7, std::ios_base::end);	// so that puts us at 9-7=2
 	istr >> c;							// now 3
 	assert (c == '3');
 
@@ -266,8 +266,8 @@ void MemoryStreamTest::testOutputSeek()
 	ostr << 'b';						// and this makes 8 (zero index 7)
 	assert (buffer[7] == 'b');
 
-	ostr.seekp(-3, std::ios_base::end);	// 10-7 from the beginning
-	ostr << 'c';						// and this makes 4 (zero index 3)
+	ostr.seekp(-3, std::ios_base::end);	// 9-3=6 from the beginning
+	ostr << 'c';						// and this makes 7 (zero index 6)
 	assert (buffer[6] == 'c');
 
 
