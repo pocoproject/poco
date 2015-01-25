@@ -136,6 +136,82 @@ void MemoryStreamTest::testInputSeek()
 	istr.seekg(-7, std::ios_base::end);	// so that puts us at 2
 	istr >> c;							// now 3
 	assert (c == '3');
+
+
+	istr.seekg(9, std::ios_base::beg);
+	assert (istr.good());
+
+	{
+		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
+		istr2.seekg(10, std::ios_base::beg);
+		assert (istr2.fail());
+	}
+
+
+	istr.seekg(-9, std::ios_base::end);
+	assert (istr.good());
+
+	{
+		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
+		istr2.seekg(-10, std::ios_base::end);
+		assert (istr2.fail());
+	}
+
+
+	istr.seekg(0, std::ios_base::beg);
+	assert (istr.good());
+
+	{
+		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
+		istr2.seekg(-1, std::ios_base::beg);
+		assert (istr2.fail());
+	}
+
+
+	istr.seekg(0, std::ios_base::end);
+	assert (istr.good());
+
+	{
+		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
+		istr2.seekg(1, std::ios_base::end);
+		assert (istr2.fail());
+	}
+
+
+	istr.seekg(3, std::ios_base::beg);
+	istr.seekg(6, std::ios_base::cur);
+	assert (istr.good());
+
+	{
+		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
+		istr2.seekg(4, std::ios_base::beg);
+		istr2.seekg(6, std::ios_base::cur);
+		assert (istr2.fail());
+	}
+
+
+	istr.seekg(-4, std::ios_base::end);
+	istr.seekg(4, std::ios_base::cur);
+	assert (istr.good());
+
+	{
+		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
+		istr2.seekg(-4, std::ios_base::end);
+		istr2.seekg(5, std::ios_base::cur);
+		assert (istr2.fail());
+	}
+
+
+	istr.seekg(4, std::ios_base::beg);
+	istr.seekg(-4, std::ios_base::cur);
+	assert (istr.good());
+
+	{
+		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
+		istr2.seekg(4, std::ios_base::beg);
+		istr2.seekg(-5, std::ios_base::cur);
+		assert (istr2.fail());
+	}
 }
 
 
@@ -193,6 +269,82 @@ void MemoryStreamTest::testOutputSeek()
 	ostr.seekp(-3, std::ios_base::end);	// 10-7 from the beginning
 	ostr << 'c';						// and this makes 4 (zero index 3)
 	assert (buffer[6] == 'c');
+
+
+	ostr.seekp(9, std::ios_base::beg);
+	assert (ostr.good());
+
+	{
+		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
+		ostr2.seekp(10, std::ios_base::beg);
+		assert (ostr2.fail());
+	}
+
+
+	ostr.seekp(-9, std::ios_base::end);
+	assert (ostr.good());
+
+	{
+		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
+		ostr2.seekp(-10, std::ios_base::end);
+		assert (ostr2.fail());
+	}
+
+
+	ostr.seekp(0, std::ios_base::beg);
+	assert (ostr.good());
+
+	{
+		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
+		ostr2.seekp(-1, std::ios_base::beg);
+		assert (ostr2.fail());
+	}
+
+
+	ostr.seekp(0, std::ios_base::end);
+	assert (ostr.good());
+
+	{
+		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
+		ostr2.seekp(1, std::ios_base::end);
+		assert (ostr2.fail());
+	}
+
+
+	ostr.seekp(3, std::ios_base::beg);
+	ostr.seekp(6, std::ios_base::cur);
+	assert (ostr.good());
+
+	{
+		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
+		ostr2.seekp(4, std::ios_base::beg);
+		ostr2.seekp(6, std::ios_base::cur);
+		assert (ostr2.fail());
+	}
+
+
+	ostr.seekp(-4, std::ios_base::end);
+	ostr.seekp(4, std::ios_base::cur);
+	assert (ostr.good());
+
+	{
+		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
+		ostr2.seekp(-4, std::ios_base::end);
+		ostr2.seekp(5, std::ios_base::cur);
+		assert (ostr2.fail());
+	}
+
+
+	ostr.seekp(4, std::ios_base::beg);
+	ostr.seekp(-4, std::ios_base::cur);
+	assert (ostr.good());
+
+	{
+		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
+		ostr2.seekp(4, std::ios_base::beg);
+		ostr2.seekp(-5, std::ios_base::cur);
+		assert (ostr2.fail());
+	}
 }
 
 
