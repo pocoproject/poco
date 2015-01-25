@@ -127,19 +127,23 @@ void MemoryStreamTest::testInputSeek()
 
 	istr.seekg(3, std::ios_base::beg);	// 3 from beginning
 	istr >> c;							// now that makes 4
+	assert (istr.tellg() == 4);
 	assert (c == '4');
 
 	istr.seekg(2, std::ios_base::cur);	// now that makes 6
 	istr >> c;							// now that makes 7
+	assert (istr.tellg() == 7);
 	assert (c == '7');
 
 	istr.seekg(-7, std::ios_base::end);	// so that puts us at 9-7=2
 	istr >> c;							// now 3
+	assert (istr.tellg() == 3);
 	assert (c == '3');
 
 
 	istr.seekg(9, std::ios_base::beg);
 	assert (istr.good());
+	assert (istr.tellg() == 9);
 
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
@@ -150,6 +154,7 @@ void MemoryStreamTest::testInputSeek()
 
 	istr.seekg(-9, std::ios_base::end);
 	assert (istr.good());
+	assert (istr.tellg() == 0);
 
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
@@ -160,6 +165,7 @@ void MemoryStreamTest::testInputSeek()
 
 	istr.seekg(0, std::ios_base::beg);
 	assert (istr.good());
+	assert (istr.tellg() == 0);
 
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
@@ -170,6 +176,7 @@ void MemoryStreamTest::testInputSeek()
 
 	istr.seekg(0, std::ios_base::end);
 	assert (istr.good());
+	assert (istr.tellg() == 9);
 
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
@@ -179,8 +186,11 @@ void MemoryStreamTest::testInputSeek()
 
 
 	istr.seekg(3, std::ios_base::beg);
+	assert (istr.good());
+	assert (istr.tellg() == 3);
 	istr.seekg(6, std::ios_base::cur);
 	assert (istr.good());
+	assert (istr.tellg() == 9);
 
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
@@ -191,8 +201,11 @@ void MemoryStreamTest::testInputSeek()
 
 
 	istr.seekg(-4, std::ios_base::end);
+	assert (istr.good());
+	assert (istr.tellg() == 5);
 	istr.seekg(4, std::ios_base::cur);
 	assert (istr.good());
+	assert (istr.tellg() == 9);
 
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
@@ -203,8 +216,11 @@ void MemoryStreamTest::testInputSeek()
 
 
 	istr.seekg(4, std::ios_base::beg);
+	assert (istr.good());
+	assert (istr.tellg() == 4);
 	istr.seekg(-4, std::ios_base::cur);
 	assert (istr.good());
+	assert (istr.tellg() == 0);
 
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
@@ -237,18 +253,21 @@ void MemoryStreamTest::testInputSeekVsStringStream()
 	sss >> x;
 	mis >> y;
 	assert (x == y);
+	assert (sss.tellg() == mis.tellg());
 
 	sss.seekg(2, std::ios_base::cur);
 	mis.seekg(2, std::ios_base::cur);
 	sss >> x;
 	mis >> y;
 	assert (x == y);
+	assert (sss.tellg() == mis.tellg());
 
 	sss.seekg(-7, std::ios_base::end);
 	mis.seekg(-7, std::ios_base::end);
 	sss >> x;
 	mis >> y;
 	assert (x == y);
+	assert (sss.tellg() == mis.tellg());
 }
 
 
@@ -260,19 +279,23 @@ void MemoryStreamTest::testOutputSeek()
 
 	ostr.seekp(4, std::ios_base::beg);	// 4 from beginning
 	ostr << 'a';						// and that makes 5 (zero index 4)
+	assert (ostr.tellp() == 5);
 	assert (buffer[4] == 'a');
 
 	ostr.seekp(2, std::ios_base::cur);	// and this makes 7
 	ostr << 'b';						// and this makes 8 (zero index 7)
+	assert (ostr.tellp() == 8);
 	assert (buffer[7] == 'b');
 
 	ostr.seekp(-3, std::ios_base::end);	// 9-3=6 from the beginning
 	ostr << 'c';						// and this makes 7 (zero index 6)
+	assert (ostr.tellp() == 7);
 	assert (buffer[6] == 'c');
 
 
 	ostr.seekp(9, std::ios_base::beg);
 	assert (ostr.good());
+	assert (ostr.tellp() == 9);
 
 	{
 		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
@@ -283,6 +306,7 @@ void MemoryStreamTest::testOutputSeek()
 
 	ostr.seekp(-9, std::ios_base::end);
 	assert (ostr.good());
+	assert (ostr.tellp() == 0);
 
 	{
 		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
@@ -293,6 +317,7 @@ void MemoryStreamTest::testOutputSeek()
 
 	ostr.seekp(0, std::ios_base::beg);
 	assert (ostr.good());
+	assert (ostr.tellp() == 0);
 
 	{
 		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
@@ -303,6 +328,7 @@ void MemoryStreamTest::testOutputSeek()
 
 	ostr.seekp(0, std::ios_base::end);
 	assert (ostr.good());
+	assert (ostr.tellp() == 9);
 
 	{
 		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
@@ -312,8 +338,11 @@ void MemoryStreamTest::testOutputSeek()
 
 
 	ostr.seekp(3, std::ios_base::beg);
+	assert (ostr.good());
+	assert (ostr.tellp() == 3);
 	ostr.seekp(6, std::ios_base::cur);
 	assert (ostr.good());
+	assert (ostr.tellp() == 9);
 
 	{
 		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
@@ -324,8 +353,11 @@ void MemoryStreamTest::testOutputSeek()
 
 
 	ostr.seekp(-4, std::ios_base::end);
+	assert (ostr.good());
+	assert (ostr.tellp() == 5);
 	ostr.seekp(4, std::ios_base::cur);
 	assert (ostr.good());
+	assert (ostr.tellp() == 9);
 
 	{
 		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
@@ -336,8 +368,11 @@ void MemoryStreamTest::testOutputSeek()
 
 
 	ostr.seekp(4, std::ios_base::beg);
+	assert (ostr.good());
+	assert (ostr.tellp() == 4);
 	ostr.seekp(-4, std::ios_base::cur);
 	assert (ostr.good());
+	assert (ostr.tellp() == 0);
 
 	{
 		Poco::MemoryOutputStream ostr2(buffer.begin(), buffer.size());
@@ -363,6 +398,7 @@ void MemoryStreamTest::testOutputSeekVsStringStream()
 	oss << 'a';
 	assert (oss.str()[4] == 'a');
 	assert (buffer[4] == oss.str()[4]);
+	assert (oss.tellp() == mos.tellp());
 
 	mos.seekp(2, std::ios_base::cur);
 	oss.seekp(2, std::ios_base::cur);
@@ -370,6 +406,7 @@ void MemoryStreamTest::testOutputSeekVsStringStream()
 	oss << 'b';
 	assert (oss.str()[7] == 'b');
 	assert (buffer[7] == oss.str()[7]);
+	assert (oss.tellp() == mos.tellp());
 
 	mos.seekp(-3, std::ios_base::end);
 	oss.seekp(-3, std::ios_base::end);
@@ -377,6 +414,7 @@ void MemoryStreamTest::testOutputSeekVsStringStream()
 	oss << 'c';
 	assert (oss.str()[6] == 'c');
 	assert (buffer[6] == oss.str()[6]);
+	assert (oss.tellp() == mos.tellp());
 
 	mos.seekp(-2, std::ios_base::cur);
 	oss.seekp(-2, std::ios_base::cur);
@@ -384,6 +422,7 @@ void MemoryStreamTest::testOutputSeekVsStringStream()
 	oss << 'd';
 	assert (oss.str()[5] == 'd');
 	assert (buffer[5] == oss.str()[5]);
+	assert (oss.tellp() == mos.tellp());
 }
 
 
