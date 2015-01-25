@@ -81,8 +81,6 @@ public:
 
 		if ((which & std::ios_base::in) != 0)
 		{
-			// Position the input sequence
-
 			if (this->gptr() == 0)
 				return fail;
 
