@@ -79,7 +79,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">..\bin64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">obj64\Net\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</LinkIncremental>
@@ -341,7 +341,9 @@
     <ClInclude Include="include\Poco\Net\HTTPServerResponse.h"/>
     <ClInclude Include="include\Poco\Net\HTTPServerResponseImpl.h"/>
     <ClInclude Include="include\Poco\Net\HTTPServerSession.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPClient.h"/>
     <ClInclude Include="include\Poco\Net\HTTPClientSession.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPEventArgs.h"/>
     <ClInclude Include="include\Poco\Net\HTTPIOStream.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSessionFactory.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSessionInstantiator.h"/>
@@ -361,16 +363,6 @@
     <ClInclude Include="include\Poco\Net\MailStream.h"/>
     <ClInclude Include="include\Poco\Net\POP3ClientSession.h"/>
     <ClInclude Include="include\Poco\Net\SMTPClientSession.h"/>
-    <ClInclude Include="include\Poco\Net\ICMPClient.h"/>
-    <ClInclude Include="include\Poco\Net\ICMPEventArgs.h"/>
-    <ClInclude Include="include\Poco\Net\ICMPPacket.h"/>
-    <ClInclude Include="include\Poco\Net\ICMPPacketImpl.h"/>
-    <ClInclude Include="include\Poco\Net\ICMPSocket.h"/>
-    <ClInclude Include="include\Poco\Net\ICMPSocketImpl.h"/>
-    <ClInclude Include="include\Poco\Net\ICMPv4PacketImpl.h"/>
-    <ClInclude Include="include\Poco\Net\NTPClient.h"/>
-    <ClInclude Include="include\Poco\Net\NTPEventArgs.h"/>
-    <ClInclude Include="include\Poco\Net\NTPPacket.h"/>
     <ClInclude Include="include\Poco\Net\RemoteSyslogChannel.h"/>
     <ClInclude Include="include\Poco\Net\RemoteSyslogListener.h"/>
     <ClInclude Include="include\Poco\Net\SMTPChannel.h"/>
@@ -446,7 +438,9 @@
     <ClCompile Include="src\HTTPServerResponse.cpp"/>
     <ClCompile Include="src\HTTPServerResponseImpl.cpp"/>
     <ClCompile Include="src\HTTPServerSession.cpp"/>
+    <ClCompile Include="src\HTTPClient.cpp"/>
     <ClCompile Include="src\HTTPClientSession.cpp"/>
+    <ClCompile Include="src\HTTPEventArgs.cpp"/>
     <ClCompile Include="src\HTTPIOStream.cpp"/>
     <ClCompile Include="src\HTTPSessionFactory.cpp"/>
     <ClCompile Include="src\HTTPSessionInstantiator.cpp"/>
@@ -462,16 +456,6 @@
     <ClCompile Include="src\MailStream.cpp"/>
     <ClCompile Include="src\POP3ClientSession.cpp"/>
     <ClCompile Include="src\SMTPClientSession.cpp"/>
-    <ClCompile Include="src\ICMPClient.cpp"/>
-    <ClCompile Include="src\ICMPEventArgs.cpp"/>
-    <ClCompile Include="src\ICMPPacket.cpp"/>
-    <ClCompile Include="src\ICMPPacketImpl.cpp"/>
-    <ClCompile Include="src\ICMPSocket.cpp"/>
-    <ClCompile Include="src\ICMPSocketImpl.cpp"/>
-    <ClCompile Include="src\ICMPv4PacketImpl.cpp"/>
-    <ClCompile Include="src\NTPClient.cpp"/>
-    <ClCompile Include="src\NTPEventArgs.cpp"/>
-    <ClCompile Include="src\NTPPacket.cpp"/>
     <ClCompile Include="src\RemoteSyslogChannel.cpp"/>
     <ClCompile Include="src\RemoteSyslogListener.cpp"/>
     <ClCompile Include="src\SMTPChannel.cpp"/>

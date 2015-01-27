@@ -159,8 +159,8 @@ protected:
 		/// Destroys the HTTPMessage.
 	
 private:
-	HTTPMessage(const HTTPMessage&);
-	HTTPMessage& operator = (const HTTPMessage&);
+	//HTTPMessage(const HTTPMessage&);
+	//HTTPMessage& operator = (const HTTPMessage&);
 	
 	std::string _version;
 };

@@ -45,7 +45,7 @@ void FileTest::testFileAttributes1()
 {
 	File f("testfile.dat");
 	assert (!f.exists());
-	
+
 	try
 	{
 		bool flag = f.canRead();
@@ -201,7 +201,7 @@ void FileTest::testFileAttributes2()
 	bool created = f.createFile();
 	Timestamp ts;
 	assert (created);
-	
+
 	assert (f.exists());
 	assert (f.canRead());
 	assert (f.canWrite());
@@ -211,15 +211,15 @@ void FileTest::testFileAttributes2()
 	Timestamp tsm = f.getLastModified();
 	assert (tsc - ts >= -2000000 && tsc - ts <= 2000000);
 	assert (tsm - ts >= -2000000 && tsm - ts <= 2000000);
-	
+
 	f.setWriteable(false);
 	assert (!f.canWrite());
 	assert (f.canRead());
 
-	f.setReadOnly(false);	
+	f.setReadOnly(false);
 	assert (f.canWrite());
 	assert (f.canRead());
-	
+
 	ts = Timestamp::fromEpochTime(1000000);
 	f.setLastModified(ts);
 	assert (f.getLastModified() == ts);
@@ -247,7 +247,7 @@ void FileTest::testCompare()
 	File f1("abc.txt");
 	File f2("def.txt");
 	File f3("abc.txt");
-	
+
 	assert (f1 == f3);
 	assert (!(f1 == f2));
 	assert (f1 != f2);
@@ -261,7 +261,7 @@ void FileTest::testCompare()
 	assert (f2 >= f1);
 	assert (!(f1 > f2));
 	assert (!(f1 >= f2));
-	
+
 	assert (f1 <= f3);
 	assert (f1 >= f3);
 }
@@ -325,7 +325,7 @@ void FileTest::testDirectory()
 	{
 	}
 	TemporaryFile::registerForDeletion("testdir");
-	
+
 	bool created = d.createDirectory();
 	assert (created);
 	assert (d.isDirectory());
@@ -333,23 +333,23 @@ void FileTest::testDirectory()
 	std::vector<std::string> files;
 	d.list(files);
 	assert (files.empty());
-	
+
 	File f = Path("testdir/file1", Path::PATH_UNIX);
 	f.createFile();
 	f = Path("testdir/file2", Path::PATH_UNIX);
 	f.createFile();
 	f = Path("testdir/file3", Path::PATH_UNIX);
 	f.createFile();
-	
+
 	d.list(files);
 	assert (files.size() == 3);
-	
+
 	std::set<std::string> fs;
 	fs.insert(files.begin(), files.end());
 	assert (fs.find("file1") != fs.end());
 	assert (fs.find("file2") != fs.end());
 	assert (fs.find("file3") != fs.end());
-	
+
 	File dd(Path("testdir/testdir2/testdir3", Path::PATH_UNIX));
 	dd.createDirectories();
 	assert (dd.exists());
@@ -359,7 +359,7 @@ void FileTest::testDirectory()
 	ddd.createDirectories();
 	assert (ddd.exists());
 	assert (ddd.isDirectory());
-	
+
 	d.remove(true);
 }
 
@@ -372,9 +372,11 @@ void FileTest::testCopy()
 
 	File f1("testfile.dat");
 	TemporaryFile f2;
-	f1.copyTo(f2.path());
+	f1.setReadOnly().copyTo(f2.path());
 	assert (f2.exists());
+	assert (!f2.canWrite());
 	assert (f1.getSize() == f2.getSize());
+	f1.setWriteable().remove();
 }
 
 
@@ -422,9 +424,9 @@ void FileTest::testCopyDirectory()
 	std::ofstream ostr3(pf3.toString().c_str());
 	ostr3 << "Hello, world!" << std::endl;
 	ostr3.close();
-	
+
 	File fd3("testdir2");
-	
+
 	try
 	{
 		fd3.remove(true);
@@ -432,19 +434,19 @@ void FileTest::testCopyDirectory()
 	catch (...)
 	{
 	}
-	
+
 	fd1.copyTo("testdir2");
-	
+
 	Path pd1t("testdir2");
 	File fd1t(pd1t);
 	assert (fd1t.exists());
 	assert (fd1t.isDirectory());
-	
+
 	Path pd2t(pd1t, "subdir");
 	File fd2t(pd2t);
 	assert (fd2t.exists());
 	assert (fd2t.isDirectory());
-	
+
 	Path pf1t(pd1t, "testfile1.dat");
 	File ff1t(pf1t);
 	assert (ff1t.exists());
@@ -459,7 +461,7 @@ void FileTest::testCopyDirectory()
 	File ff3t(pf3t);
 	assert (ff3t.exists());
 	assert (ff3t.isFile());
-	
+
 	fd1.remove(true);
 	fd3.remove(true);
 }
@@ -478,7 +480,7 @@ void FileTest::testRename()
 	assert (f2.exists());
 	assert (f1.exists());
 	assert (f1 == f2);
-	
+
 	f2.remove();
 }
 

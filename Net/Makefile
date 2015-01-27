@@ -15,8 +15,8 @@ objects = \
 	DatagramSocket HTTPServer IPAddress IPAddressImpl SocketAddress SocketAddressImpl \
 	HTTPBasicCredentials HTTPCookie HTMLForm MediaType DialogSocket \
 	DatagramSocketImpl FilePartSource HTTPServerConnection MessageHeader \
-	HTTPChunkedStream HTTPServerConnectionFactory MulticastSocket SocketStream \
-	HTTPClientSession HTTPServerParams MultipartReader StreamSocket SocketImpl \
+	HTTPChunkedStream HTTPServerConnectionFactory MulticastSocket SocketStream HTTPClient \
+	HTTPEventArgs HTTPClientSession HTTPServerParams MultipartReader StreamSocket SocketImpl \
 	HTTPFixedLengthStream HTTPServerRequest HTTPServerRequestImpl MultipartWriter StreamSocketImpl \
 	HTTPHeaderStream HTTPServerResponse HTTPServerResponseImpl NameValueCollection TCPServer \
 	HTTPMessage HTTPServerSession NetException TCPServerConnection HTTPBufferAllocator \
@@ -28,9 +28,7 @@ objects = \
 	FTPClientSession FTPStreamFactory PartHandler PartSource PartStore NullPartHandler \
 	SocketReactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
 	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
-	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
-	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
-	NTPClient NTPEventArgs NTPPacket \
+	RawSocket RawSocketImpl \
 	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
 	WebSocket WebSocketImpl \
 	OAuth10Credentials OAuth20Credentials

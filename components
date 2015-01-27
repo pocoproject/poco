@@ -3,8 +3,10 @@ CppUnit/WinTestRunner
 Foundation
 XML
 JSON
+ASN
 Util
 Net
+NetEx
 Crypto
 NetSSL_OpenSSL
 Data
