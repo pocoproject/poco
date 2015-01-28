@@ -41,7 +41,12 @@ class Util_API SystemConfiguration: public AbstractConfiguration
 	///     of the first Ethernet adapter found on the system.
 	///   - system.currentDir: the current working directory
 	///   - system.homeDir: the user's home directory
+	///   - system.configHomeDir: the base directory relative to which user specific configuration files should be stored
+	///   - system.cacheHomeDir: the base directory relative to which user specific non-essential data files should be stored
+	///   - system.dataHomeDir: the base directory relative to which user specific data files should be stored
+	///   - system.tempHomeDir: the base directory relative to which user-specific temporary files and other file objects should be placed
 	///   - system.tempDir: the system's temporary directory
+	///   - system.configDir: the system's configuration directory
 	///   - system.dateTime: the current UTC date and time, formatted in ISO 8601 format.
 	///   - system.pid: the current process ID.
 	///   - system.env.<NAME>: the environment variable with the given <NAME>.
