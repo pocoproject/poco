@@ -34,54 +34,41 @@ target_include_directories( "${LIBNAME}"
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-install(
-    DIRECTORY include/Poco
-    DESTINATION include
-    COMPONENT Devel
-    PATTERN ".svn" EXCLUDE
-    )
 
-install(
-    TARGETS "${LIBNAME}" EXPORT "${LIBNAME}Targets"
-    LIBRARY DESTINATION lib${LIB_SUFFIX}
-    ARCHIVE DESTINATION lib${LIB_SUFFIX}
-    RUNTIME DESTINATION bin
-    INCLUDES DESTINATION include
-    )
-
-POCO_GENERATE_PACKAGE("${LIBNAME}" "${LIBNAME}Targets" "lib/cmake/${PROJECT_NAME}")
+POCO_INSTALL("${LIBNAME}")
+POCO_GENERATE_PACKAGE("${LIBNAME}")
 
 if(ENABLE_DATA_SQLITE)
-# SQlite3 is built in any case
-add_subdirectory( SQLite )
+    # SQlite3 is built in any case
+    add_subdirectory( SQLite )
 endif(ENABLE_DATA_SQLITE)
 
 if(ENABLE_DATA_MYSQL)
-find_package(MySQL)
-if(MYSQL_FOUND)
-    include_directories("${MYSQL_INCLUDE_DIR}")
-    message(STATUS "MySQL Support Enabled")
-    add_subdirectory( MySQL )
-else()
-    message(STATUS "MySQL Support Disabled - no MySQL library")
-endif(MYSQL_FOUND)
+    find_package(MySQL)
+    if(MYSQL_FOUND)
+        include_directories("${MYSQL_INCLUDE_DIR}")
+        message(STATUS "MySQL Support Enabled")
+        add_subdirectory( MySQL )
+    else()
+        message(STATUS "MySQL Support Disabled - no MySQL library")
+    endif(MYSQL_FOUND)
 endif(ENABLE_DATA_MYSQL)
 
 if(ENABLE_DATA_ODBC)
-find_package(ODBC)
-if(WIN32 AND NOT WINCE)
-    set(ODBC_LIBRARIES "odbc32" "odbccp32")
-    message(STATUS "Windows native ODBC Support Enabled")
-    add_subdirectory( ODBC )
-else(WIN32 AND NOT WINCE)
-    if(ODBC_FOUND)
-        include_directories("${ODBC_INCLUDE_DIRECTORIES}")
-        message(STATUS "ODBC Support Enabled")
+    find_package(ODBC)
+    if(WIN32 AND NOT WINCE)
+        set(ODBC_LIBRARIES "odbc32" "odbccp32")
+        message(STATUS "Windows native ODBC Support Enabled")
         add_subdirectory( ODBC )
-    else()
-        message(STATUS "ODBC Support Disabled - no ODBC runtime")
-    endif()
-endif(WIN32 AND NOT WINCE)
+    else(WIN32 AND NOT WINCE)
+        if(ODBC_FOUND)
+            include_directories("${ODBC_INCLUDE_DIRECTORIES}")
+            message(STATUS "ODBC Support Enabled")
+            add_subdirectory( ODBC )
+        else()
+            message(STATUS "ODBC Support Disabled - no ODBC runtime")
+        endif()
+    endif(WIN32 AND NOT WINCE)
 endif(ENABLE_DATA_ODBC)
 
 if (ENABLE_TESTS)

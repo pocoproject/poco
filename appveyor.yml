@@ -1,0 +1,11 @@
+version: '{build}'
+
+install:
+  - cinst cmake
+
+build_script:
+  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
+  - mkdir cmake-build
+  - cd cmake-build
+  - cmake ..
+  - cmake --build .

@@ -148,9 +148,9 @@ protected:
 //
 
 
-#if defined(GNUC) && (GNUC > 4) && (GNUC_MINOR > 6)
+#if defined(POCO_COMPILER_GCC) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 	GCC_DIAG_OFF(unused-local-typedefs) // supress numerous gcc warnings
-#endif // (GNUC) && (GNUC > 4) && (GNUC_MINOR > 6)
+#endif // POCO_COMPILER_GCC && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 
 
 template <bool x>
