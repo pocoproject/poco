@@ -227,93 +227,93 @@ Binder::updateBindVectorToCurrentValues()
 		switch (itr->fieldType())
 		{
 			case POSTGRESQL_TYPE_INT8:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::Int8 * >(itr->pData())));
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int8*>(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_UINT8:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::UInt8 * >(itr->pData())));
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt8*>(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_INT16:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::Int16 * >(itr->pData())));
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int16*>(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_UINT16:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::UInt16 * >(itr->pData())));
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt16*>(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_INT32:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::Int32 * >(itr->pData())));
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int32*>(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_UINT32:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::UInt32 * >(itr->pData())));
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt32*>(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_INT64:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::Int64 * >(itr->pData())));
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int64*>(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_UINT64:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const Poco::UInt64 * >(itr->pData())));
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt64*>(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_BOOLEAN:
 				{
-					const bool currentBoolValue = * static_cast< const bool * >(itr->pData());
+					const bool currentBoolValue = * static_cast<const bool*>(itr->pData());
 					itr->setStringVersionRepresentation(currentBoolValue ? "TRUE" : "FALSE");
 				}
 
 				break;
 
 			case POSTGRESQL_TYPE_FLOAT:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const float * >(itr->pData())));
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const float*>(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_DOUBLE:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast< const double * >(itr->pData())));
+				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const double*>(itr->pData())));
 				break;
 
 			case POSTGRESQL_TYPE_CHAR:
-				itr->setStringVersionRepresentation(std::string(static_cast< const char * >(itr->pData()), 1));  // single character string
+				itr->setStringVersionRepresentation(std::string(static_cast<const char*>(itr->pData()), 1));  // single character string
 				break;
 
 			case POSTGRESQL_TYPE_STRING:
-				itr->setStringVersionRepresentation(* static_cast< const std::string * >(itr->pData()));
+				itr->setStringVersionRepresentation(* static_cast<const std::string*>(itr->pData()));
 				break;
 
 			case POSTGRESQL_TYPE_DATETIME:
 				{
-					const Poco::DateTime & dateTime = * static_cast< const Poco::DateTime  * >(itr->pData());
+					const Poco::DateTime& dateTime = * static_cast<const Poco::DateTime*>(itr->pData());
 					itr->setStringVersionRepresentation(DateTimeFormatter::format(dateTime, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT));
 				}
 				break;
 
 			case POSTGRESQL_TYPE_DATE:
 				{
-					const Poco::Data::Date & date = * static_cast< const Poco::Data::Date  * >(itr->pData());
+					const Poco::Data::Date& date = * static_cast<const Poco::Data::Date*>(itr->pData());
 					itr->setStringVersionRepresentation(DateTimeFormatter::format(Poco::DateTime(date.year(), date.month(), date.day()), "%Y-%m-%d"));
 				}
 				break;
 
 			case POSTGRESQL_TYPE_TIME:
 				{
-					const Poco::Data::Time & time = * static_cast< const Poco::Data::Time  * >(itr->pData());
+					const Poco::Data::Time& time = * static_cast<const Poco::Data::Time*>(itr->pData());
 					itr->setStringVersionRepresentation(DateTimeFormatter::format(Poco::DateTime(0, 1, 1, time.hour(), time.minute(), time.second()), "%H:%M:%s%z"));
 				}
 				break;
 
 			case POSTGRESQL_TYPE_BLOB:
 				{
-					const Poco::Data::BLOB & blob = * static_cast< const Poco::Data::BLOB  * >(itr->pData());
-					itr->setNonStringVersionRepresentation(static_cast< const void * > (blob.rawContent()), blob.size());
+					const Poco::Data::BLOB& blob = * static_cast<const Poco::Data::BLOB*>(itr->pData());
+					itr->setNonStringVersionRepresentation(static_cast<const void*> (blob.rawContent()), blob.size());
 				}
 				break;
 
 			case POSTGRESQL_TYPE_CLOB:
 				{
-					const Poco::Data::CLOB & clob = * static_cast< const Poco::Data::CLOB  * >(itr->pData());
-					itr->setNonStringVersionRepresentation(static_cast< const void * > (clob.rawContent()), clob.size());
+					const Poco::Data::CLOB& clob = * static_cast<const Poco::Data::CLOB*>(itr->pData());
+					itr->setNonStringVersionRepresentation(static_cast<const void*> (clob.rawContent()), clob.size());
 				}
 
 			case POSTGRESQL_TYPE_NONE:
@@ -342,7 +342,7 @@ void Binder::realBind(std::size_t aPosition, PostgreSQLSupportedFieldTypes aFiel
 
 		InputParameter inputParameter(aFieldType, aBufferPtr, aLength);
 
-		_bindVector[ aPosition ] = inputParameter;
+		_bindVector[aPosition] = inputParameter;
 	}
 	catch (std::bad_alloc&)
 	{

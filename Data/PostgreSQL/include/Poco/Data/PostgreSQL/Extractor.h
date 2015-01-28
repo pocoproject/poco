@@ -348,9 +348,9 @@ public:
 	
 private:
 
-	const OutputParameter & extractPreamble(std::size_t aPosition) const;
+	const OutputParameter& extractPreamble(std::size_t aPosition) const;
 
-	bool isColumnNull(const OutputParameter & anOutputParameter) const;
+	bool isColumnNull(const OutputParameter& anOutputParameter) const;
 
 	template <typename T>
 	bool extractStringImpl(std::size_t pos, T& val)
@@ -377,7 +377,7 @@ private:
 
 
 	// Prevent VC8 warning "operator= could not be generated"
-	Extractor& operator=(const Extractor &);
+	Extractor& operator=(const Extractor&);
 
 private:
 

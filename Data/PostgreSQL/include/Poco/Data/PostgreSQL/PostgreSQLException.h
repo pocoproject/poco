@@ -57,16 +57,16 @@ class PostgreSQL_API PostgreSQLException: public Poco::Data::DataException
 {
 public:
 
-	PostgreSQLException(const std::string & aMessage);
+	PostgreSQLException(const std::string& aMessage);
 		/// Creates PostgreSQLException.
 
-	PostgreSQLException(const PostgreSQLException & exc);
+	PostgreSQLException(const PostgreSQLException& exc);
 		/// Creates PostgreSQLException.
 
 	~PostgreSQLException() throw();
 		/// Destroys PostgreSQLexception.
 
-	PostgreSQLException& operator=(const PostgreSQLException & exc);
+	PostgreSQLException& operator=(const PostgreSQLException& exc);
 		/// Assignment operator.
 
 	const char* name() const throw();
@@ -95,7 +95,7 @@ class ConnectionException : public PostgreSQLException
 {
 public:
 
-	ConnectionException(const std::string & aMessage);
+	ConnectionException(const std::string& aMessage);
 		/// Creates ConnectionException from string.
 
 };

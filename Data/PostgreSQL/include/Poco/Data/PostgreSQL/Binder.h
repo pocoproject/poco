@@ -59,7 +59,7 @@ class PostgreSQL_API Binder: public Poco::Data::AbstractBinder
 	/// Allows data type mapping at statement execution time.
 {
 public:
-	typedef SharedPtr< Binder > Ptr;
+	typedef SharedPtr<Binder> Ptr;
 
 	Binder();
 		/// Creates the Binder.

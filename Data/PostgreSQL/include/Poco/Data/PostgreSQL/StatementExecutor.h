@@ -64,7 +64,7 @@ public:
 		STMT_EXECUTED
 	};
 
-	explicit StatementExecutor(SessionHandle & aSessionHandle);
+	explicit StatementExecutor(SessionHandle& aSessionHandle);
 		/// Creates the StatementExecutor.
 
 	~StatementExecutor();
@@ -76,7 +76,7 @@ public:
 	void prepare(const std::string& aSQLStatement);
 		/// Prepares the statement for execution.
 
-	void bindParams(const InputParameterVector & anInputParameterVector);
+	void bindParams(const InputParameterVector& anInputParameterVector);
 		/// Binds the params - REQUIRED if the statment has input parameters/placeholders
 		/// Pointer and list elements must stay valid for the lifetime of the StatementExecutor!
 
@@ -105,18 +105,18 @@ private:
 
 	void clearResults();
 
-	StatementExecutor(const StatementExecutor &);
-	StatementExecutor& operator= (const StatementExecutor &);
+	StatementExecutor(const StatementExecutor&);
+	StatementExecutor& operator= (const StatementExecutor&);
 
 private:
-	SessionHandle &				_sessionHandle;
+	SessionHandle&				_sessionHandle;
 	State						_state;
 
-	PGresult *					_pResultHandle;
+	PGresult*					_pResultHandle;
 	std::string					_SQLStatement;
 	std::string					_preparedStatementName;	// UUID based to allow multiple prepared statements per transaction.
 	std::size_t					_countPlaceholdersInSQLStatement;
-	std::vector< MetaColumn >	_resultColumns;
+	std::vector<MetaColumn>		_resultColumns;
 
 	InputParameterVector		_inputParameterVector;
 	OutputParameterVector		_outputParameterVector;

@@ -98,7 +98,7 @@ SessionHandle::isConnectedNoLock() const
 
 
 void
-SessionHandle::connect (const std::string & aConnectionString)
+SessionHandle::connect (const std::string& aConnectionString)
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -232,7 +232,7 @@ void SessionHandle::startTransaction()
 		return; // NO-OP
 	}
 
-	PGresult * pPQResult = PQexec(_pConnection, "BEGIN");
+	PGresult* pPQResult = PQexec(_pConnection, "BEGIN");
 
 	PQResultClear resultClearer(pPQResult);
 
@@ -254,7 +254,7 @@ void SessionHandle::commit()
 		throw NotConnectedException();
 	}
 
-	PGresult * pPQResult = PQexec(_pConnection, "COMMIT");
+	PGresult* pPQResult = PQexec(_pConnection, "COMMIT");
 
 	PQResultClear resultClearer(pPQResult);
 
@@ -278,7 +278,7 @@ void SessionHandle::rollback()
 		throw NotConnectedException();
 	}
 
-	PGresult * pPQResult = PQexec(_pConnection, "ROLLBACK");
+	PGresult* pPQResult = PQexec(_pConnection, "ROLLBACK");
 
 	PQResultClear resultClearer(pPQResult);
 
@@ -327,7 +327,7 @@ SessionHandle::setAsynchronousCommit(bool aShouldAsynchronousCommit)
 		return;
 	}
 
-	PGresult * pPQResult = PQexec(_pConnection, aShouldAsynchronousCommit ? "SET SYNCHRONOUS COMMIT TO OFF" : "SET SYNCHRONOUS COMMIT TO ON");
+	PGresult* pPQResult = PQexec(_pConnection, aShouldAsynchronousCommit ? "SET SYNCHRONOUS COMMIT TO OFF" : "SET SYNCHRONOUS COMMIT TO ON");
 
 	PQResultClear resultClearer(pPQResult);
 
@@ -349,7 +349,7 @@ SessionHandle::cancel()
 		throw NotConnectedException();
 	}
 
-	PGcancel * ptrPGCancel = PQgetCancel(_pConnection);
+	PGcancel* ptrPGCancel = PQgetCancel(_pConnection);
 
 	PGCancelFree cancelFreer(ptrPGCancel);
 
@@ -388,7 +388,7 @@ SessionHandle::setTransactionIsolation(Poco::UInt32 aTI)
 			isolationLevel = POSTGRESQL_SERIALIZABLE; break;
 	}
 
-	PGresult * pPQResult = PQexec(_pConnection, Poco::format("SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL %s", isolationLevel).c_str());
+	PGresult* pPQResult = PQexec(_pConnection, Poco::format("SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL %s", isolationLevel).c_str());
 
 	PQResultClear resultClearer(pPQResult);
 
@@ -417,7 +417,7 @@ SessionHandle::hasTransactionIsolation(Poco::UInt32 aTI)
 }
 
 void
-SessionHandle::deallocatePreparedStatement(const std::string & aPreparedStatementToDeAllocate)
+SessionHandle::deallocatePreparedStatement(const std::string& aPreparedStatementToDeAllocate)
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -436,16 +436,16 @@ SessionHandle::deallocatePreparedStatement(const std::string & aPreparedStatemen
 		{
 			_preparedStatementsToBeDeallocated.push_back(aPreparedStatementToDeAllocate);
 		}
-		catch (std::bad_alloc &)
+		catch (std::bad_alloc&)
 		{
 		}
 	}
 }
 
 void
-SessionHandle::deallocatePreparedStatementNoLock(const std::string & aPreparedStatementToDeAllocate)
+SessionHandle::deallocatePreparedStatementNoLock(const std::string& aPreparedStatementToDeAllocate)
 {
-	PGresult * pPQResult = PQexec(_pConnection, (std::string("DEALLOCATE ") + aPreparedStatementToDeAllocate).c_str());
+	PGresult* pPQResult = PQexec(_pConnection, (std::string("DEALLOCATE ") + aPreparedStatementToDeAllocate).c_str());
 	
 	PQResultClear resultClearer(pPQResult);
 	
@@ -529,7 +529,7 @@ SessionHandle::libpqVersion() const
 
 
 SessionParametersMap
-SessionHandle::setConnectionInfoParameters(PQconninfoOption * aConnectionInfoOptionsPtr)
+SessionHandle::setConnectionInfoParameters(PQconninfoOption* aConnectionInfoOptionsPtr)
 {
 	SessionParametersMap sessionParametersMap;
 
@@ -556,7 +556,7 @@ SessionHandle::setConnectionInfoParameters(PQconninfoOption * aConnectionInfoOpt
 
 			sessionParametersMap.insert(SessionParametersMap::value_type(connectionParameters.keyword(), connectionParameters));
 		}
-		catch (std::bad_alloc &)
+		catch (std::bad_alloc&)
 		{
 		}
 

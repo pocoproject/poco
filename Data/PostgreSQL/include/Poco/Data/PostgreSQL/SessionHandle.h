@@ -61,12 +61,12 @@ public:
 		HID_DEBUG   // debug use only
 	};
 
-	SessionParameters(	const std::string & aKeyword,
-						const std::string & anEnvironmentVariable,
-						const std::string & aCompiledDefault,
-						const std::string & aCurrentValue,
-						const std::string & aDisplayLabel,
-						const std::string & aHowToDisplay,
+	SessionParameters(	const std::string& aKeyword,
+						const std::string& anEnvironmentVariable,
+						const std::string& aCompiledDefault,
+						const std::string& aCurrentValue,
+						const std::string& aDisplayLabel,
+						const std::string& aHowToDisplay,
 						int aDisplaySize);
 
 	~SessionParameters();
@@ -89,7 +89,7 @@ private:
 	int				_displaySize;// Field size in characters for connect dialog
 };
   
-typedef std::map< std::string, SessionParameters > SessionParametersMap;
+typedef std::map<std::string, SessionParameters> SessionParametersMap;
 
 
 class SessionHandle
@@ -103,7 +103,7 @@ public:
 	~SessionHandle();
 		/// Destroy handle, close connection
 
-	void connect (const std::string & aConnectionString);
+	void connect (const std::string& aConnectionString);
 		/// Connect to server
 
 	void connect (const char* aConnectionString);
@@ -164,7 +164,7 @@ public:
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	void deallocatePreparedStatement(const std::string & aPreparedStatementToDeAllocate);
+	void deallocatePreparedStatement(const std::string& aPreparedStatementToDeAllocate);
 		/// deallocates a previously prepared statement
 	
 	int serverVersion() const;
@@ -194,32 +194,32 @@ public:
 	operator PGconn* ();
 		/// Get the PostgreSQL connection pointer
 
-	Poco::FastMutex & mutex();
+	Poco::FastMutex& mutex();
 		/// Get the sessionHandle mutex to protect the connection pointer
 
 private:
-	static SessionParametersMap setConnectionInfoParameters(PQconninfoOption * aConnectionInfoOptionsPtr);
+	static SessionParametersMap setConnectionInfoParameters(PQconninfoOption* aConnectionInfoOptionsPtr);
 
 	void deallocateStoredPreparedStatements();
 
-	void deallocatePreparedStatementNoLock(const std::string & aPreparedStatementToDeAllocate);
+	void deallocatePreparedStatementNoLock(const std::string& aPreparedStatementToDeAllocate);
 	bool isConnectedNoLock() const;
 	std::string lastErrorNoLock() const;
 
 
-	SessionHandle(const SessionHandle &);
-	SessionHandle& operator= (const SessionHandle &);
+	SessionHandle(const SessionHandle&);
+	SessionHandle& operator= (const SessionHandle&);
 
 private:
 
 	mutable Poco::FastMutex		_sessionMutex;
-	PGconn *					_pConnection;
+	PGconn*						_pConnection;
 	std::string					_connectionString;
 	bool						_inTransaction;
 	bool						_isAutoCommit;
 	bool						_isAsynchronousCommit;
 	Poco::UInt32				_tranactionIsolationLevel;
-	std::vector < std::string >	_preparedStatementsToBeDeallocated;
+	std::vector <std::string>	_preparedStatementsToBeDeallocated;
 
 //	static const std::string POSTGRESQL_READ_UNCOMMITTED;  // NOT SUPPORTED
 	static const std::string POSTGRESQL_READ_COMMITTED;
@@ -235,12 +235,12 @@ private:
 // SessionParameters
 
 inline
-SessionParameters::SessionParameters(	const std::string & aKeyword,
-										const std::string & anEnvironmentVariable,
-										const std::string & aCompiledDefault,
-										const std::string & aCurrentValue,
-										const std::string & aDisplayLabel,
-										const std::string & aHowToDisplay,
+SessionParameters::SessionParameters(	const std::string& aKeyword,
+										const std::string& anEnvironmentVariable,
+										const std::string& aCompiledDefault,
+										const std::string& aCurrentValue,
+										const std::string& aDisplayLabel,
+										const std::string& aHowToDisplay,
 										int aDisplaySize)
 :	_keyword				(aKeyword),
 	_environmentVariable	(anEnvironmentVariable),
@@ -324,7 +324,7 @@ SessionHandle::operator PGconn * ()
 }
 
 inline
-Poco::FastMutex &
+Poco::FastMutex&
 SessionHandle::mutex()
 {
 	return _sessionMutex;

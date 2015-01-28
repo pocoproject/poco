@@ -41,7 +41,7 @@ namespace Data {
 namespace PostgreSQL {
 
 
-PostgreSQLStatementImpl::PostgreSQLStatementImpl(SessionImpl & aSessionImpl)
+PostgreSQLStatementImpl::PostgreSQLStatementImpl(SessionImpl& aSessionImpl)
 :	Poco::Data::StatementImpl	(aSessionImpl),
 	_statementExecutor			(aSessionImpl.handle()),
 	_pBinder					(new Binder),

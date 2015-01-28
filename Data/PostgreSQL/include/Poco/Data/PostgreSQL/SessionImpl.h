@@ -52,12 +52,12 @@ namespace Data {
 namespace PostgreSQL {
 
 
-class PostgreSQL_API SessionImpl: public Poco::Data::AbstractSessionImpl< SessionImpl >
+class PostgreSQL_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 	/// Implements SessionImpl interface
 {
 public:
 
-	SessionImpl(const std::string & aConnectionString,
+	SessionImpl(const std::string& aConnectionString,
 				std::size_t aLoginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl. Opens a connection to the database
 		///
@@ -78,7 +78,7 @@ public:
 	std::size_t getConnectionTimeout();
 		/// Returns the session connection timeout value.
 
-	void open(const std::string & aConnectionString = std::string());
+	void open(const std::string& aConnectionString = std::string());
 		/// Opens a connection to the database.
 
 	void close();
@@ -119,19 +119,19 @@ public:
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
-	void setAutoCommit(const std::string &, bool aValue);
+	void setAutoCommit(const std::string&, bool aValue);
 		/// Sets autocommit property for the session.
 
-	bool isAutoCommit(const std::string & aName = std::string());
+	bool isAutoCommit(const std::string& aName = std::string());
 		/// Returns autocommit property value.
 
-	void setAsynchronousCommit(const std::string &, bool aValue);
+	void setAsynchronousCommit(const std::string&, bool aValue);
 		/// Sets asynchronousCommit property for the session.
 
-	bool isAsynchronousCommit(const std::string & aName = std::string());
+	bool isAsynchronousCommit(const std::string& aName = std::string());
 		/// is the connection in Asynchronous commit mode?
 
-	SessionHandle & handle();
+	SessionHandle& handle();
 		/// Get handle
 
 	const std::string& connectorName() const;
@@ -155,7 +155,7 @@ SessionImpl::canTransact()
 	return true;
 }
 
-inline SessionHandle & SessionImpl::handle()
+inline SessionHandle& SessionImpl::handle()
 {
 	return _sessionHandle;
 }

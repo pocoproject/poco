@@ -56,11 +56,11 @@ namespace
 		return std::string(aFromStringCItr, aToStringCItr);
 	}
 
-	std::string createConnectionStringFromOptionsMap(const std::map < std::string, std::string > anOptionsMap)
+	std::string createConnectionStringFromOptionsMap(const std::map <std::string, std::string> anOptionsMap)
 	{
 		std::string connectionString;
 
-		for (std::map< std::string, std::string >::const_iterator citr = anOptionsMap.begin(); citr != anOptionsMap.end(); ++citr)
+		for (std::map<std::string, std::string>::const_iterator citr = anOptionsMap.begin(); citr != anOptionsMap.end(); ++citr)
 		{
 			connectionString.append(citr->first);
 			connectionString.append("=");
@@ -77,10 +77,10 @@ namespace Poco {
 namespace Data {
 namespace PostgreSQL {
 
-SessionImpl::SessionImpl(const std::string & aConnectionString, std::size_t aLoginTimeout)
-	: Poco::Data::AbstractSessionImpl< SessionImpl >(aConnectionString, aLoginTimeout)
+SessionImpl::SessionImpl(const std::string& aConnectionString, std::size_t aLoginTimeout)
+	: Poco::Data::AbstractSessionImpl<SessionImpl>(aConnectionString, aLoginTimeout)
 {
-	setProperty("handle", static_cast< SessionHandle* >(&_sessionHandle));
+	setProperty("handle", static_cast<SessionHandle*>(&_sessionHandle));
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 	open();
 }
@@ -105,7 +105,7 @@ SessionImpl::setConnectionTimeout(std::size_t aTimeout)
 
 
 void
-SessionImpl::open(const std::string & aConnectionString)
+SessionImpl::open(const std::string& aConnectionString)
 {
 	if (connectionString() != aConnectionString)
 	{
@@ -122,17 +122,17 @@ SessionImpl::open(const std::string & aConnectionString)
 
 	poco_assert_dbg (! connectionString().empty());
 	
-	unsigned int timeout = static_cast< unsigned int >(getLoginTimeout());
+	unsigned int timeout = static_cast<unsigned int>(getLoginTimeout());
 
 	// PostgreSQL connections can use environment variables for connection parameters.
 	// As such it is not an error if they are not part of the connection string
 
-	std::map < std::string, std::string > optionsMap;
+	std::map <std::string, std::string> optionsMap;
 
 	// Default values
 	optionsMap[ "connect_timeout" ] = Poco::NumberFormatter::format(timeout);
 
-	const std::string & connString = connectionString();
+	const std::string& connString = connectionString();
 
 	for (std::string::const_iterator start = connString.begin();
 			;
@@ -191,7 +191,7 @@ SessionImpl::isConnected()
 Poco::Data::StatementImpl*
 SessionImpl::createStatementImpl()
 {
-	return dynamic_cast< Poco::Data::StatementImpl* > (new PostgreSQLStatementImpl (*this));
+	return dynamic_cast<Poco::Data::StatementImpl*> (new PostgreSQLStatementImpl (*this));
 //	return new PostgreSQLStatementImpl(*this);
 }
 
@@ -233,28 +233,28 @@ SessionImpl::rollback()
 
 
 void
-SessionImpl::setAutoCommit(const std::string &, bool aValue)
+SessionImpl::setAutoCommit(const std::string&, bool aValue)
 {
 	_sessionHandle.setAutoCommit(aValue);
 }
 
 
 bool
-SessionImpl::isAutoCommit(const std::string &)
+SessionImpl::isAutoCommit(const std::string&)
 {
 	return _sessionHandle.isAutoCommit();
 }
 
    
 void
-SessionImpl::setAsynchronousCommit(const std::string &,  bool aValue)
+SessionImpl::setAsynchronousCommit(const std::string&,  bool aValue)
 {
 	_sessionHandle.setAsynchronousCommit(aValue);
 }
 
 
 bool
-SessionImpl::isAsynchronousCommit(const std::string &)
+SessionImpl::isAsynchronousCommit(const std::string&)
 {
 	return _sessionHandle.isAsynchronousCommit();
 }

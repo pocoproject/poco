@@ -340,11 +340,11 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 	//  attempt.
 	//
 
-	const char * pBLOB = reinterpret_cast< const char * >(outputParameter.pData());
+	const char * pBLOB = reinterpret_cast<const char*>(outputParameter.pData());
 	std::size_t BLOBSize  = outputParameter.size();
 
-	if	(	'\\' == pBLOB[ 0 ]
-		 && 'x'  == pBLOB[ 1 ]	// preamble to BYTEA data format in text form is \x
+	if	(	'\\' == pBLOB[0]
+		 && 'x'  == pBLOB[1]	// preamble to BYTEA data format in text form is \x
 		)
 	{
 		BLOBSize -= 2;  // lose the preamble
@@ -352,7 +352,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 
 		for (int i = 0; i < BLOBSize * 2; i += 2)
 		{
-			std::string buffer(&pBLOB[ i + 2 ], 2);
+			std::string buffer(&pBLOB[i + 2], 2);
 			unsigned int binaryBuffer = 0;
 			if (Poco::NumberParser::tryParseHex(buffer, binaryBuffer))
 			{
@@ -486,7 +486,7 @@ void Extractor::reset()
 }
 
 
-const OutputParameter &
+const OutputParameter&
 Extractor::extractPreamble(std::size_t aPosition) const
 {
 	if (_statementExecutor.columnsReturned() <= aPosition)
@@ -499,7 +499,7 @@ Extractor::extractPreamble(std::size_t aPosition) const
 
 
 bool
-Extractor::isColumnNull (const OutputParameter & anOutputParameter) const
+Extractor::isColumnNull (const OutputParameter& anOutputParameter) const
 {
 	return anOutputParameter.isNull()
 		|| 0 == anOutputParameter.pData();

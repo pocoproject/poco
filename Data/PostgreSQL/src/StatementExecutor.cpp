@@ -50,7 +50,7 @@
 
 namespace
 {
-	std::size_t countOfPlaceHoldersInSQLStatement(const std::string & aSQLStatement)
+	std::size_t countOfPlaceHoldersInSQLStatement(const std::string& aSQLStatement)
 	{
 
 	// Find unique placeholders.
@@ -65,7 +65,7 @@ namespace
 
 	// set to hold the unique placeholders ($1, $2, $3, etc.).
 	// A set is used because the same placeholder can be used muliple times
-	std::set< std::string > placeholderSet;
+	std::set<std::string> placeholderSet;
 
 	Poco::RegularExpression placeholderRE("[$][0-9]+");
 	Poco::RegularExpression::Match match = { 0 , 0 }; // Match is a struct, not a class :-(
@@ -99,7 +99,7 @@ namespace
 
 	// set to hold the unique placeholders ($1, $2, $3, etc.).
 	// A set is used because the same placeholder can be used muliple times
-	std::set< std::string > placeholderSet;
+	std::set<std::string> placeholderSet;
 
 	while (itr != eItr)
 	{
@@ -116,7 +116,7 @@ namespace Data {
 namespace PostgreSQL {
 
 
-StatementExecutor::StatementExecutor(SessionHandle & aSessionHandle)
+StatementExecutor::StatementExecutor(SessionHandle& aSessionHandle)
 :	_sessionHandle						(aSessionHandle),
 	_state								(STMT_INITED),
 	_pResultHandle						(0),
@@ -153,7 +153,7 @@ StatementExecutor::state() const
 	return _state;
 }
 
-void StatementExecutor::prepare(const std::string & aSQLStatement)
+void StatementExecutor::prepare(const std::string& aSQLStatement)
 {
 	if (! _sessionHandle.isConnected())
 	{
@@ -178,14 +178,14 @@ void StatementExecutor::prepare(const std::string & aSQLStatement)
 	const char* ptrCSQLStatement = aSQLStatement.c_str();
 	std::size_t countPlaceholdersInSQLStatement = countOfPlaceHoldersInSQLStatement(aSQLStatement);
 
-	Poco::UUIDGenerator & generator = Poco::UUIDGenerator::defaultGenerator();
+	Poco::UUIDGenerator& generator = Poco::UUIDGenerator::defaultGenerator();
 	Poco::UUID uuid(generator.create()); // time based
 	std::string statementName = uuid.toString();
 	statementName.insert(0, 1, 'p'); // prepared statement names can't start with a number
 	std::replace(statementName.begin(), statementName.end(), '-', 'p');  // PostgreSQL doesn't like dashes in prepared statement names
 	const char* pStatementName = statementName.c_str();
 
-	PGresult * ptrPGResult = 0;
+	PGresult* ptrPGResult = 0;
 
 	{
 		// lock the session
@@ -275,7 +275,7 @@ void StatementExecutor::prepare(const std::string & aSQLStatement)
 }
 
 
-void StatementExecutor::bindParams(const InputParameterVector & anInputParameterVector)
+void StatementExecutor::bindParams(const InputParameterVector& anInputParameterVector)
 {
 	if (! _sessionHandle.isConnected())
 	{
@@ -323,9 +323,9 @@ void StatementExecutor::execute()
 		int paramFormats[1];
 	*/
 
-	std::vector< const char * > pParameterVector;
-	std::vector< int >  parameterLengthVector;
-	std::vector< int >  parameterFormatVector;
+	std::vector<const char *> pParameterVector;
+	std::vector<int>  parameterLengthVector;
+	std::vector<int>  parameterFormatVector;
 
 	InputParameterVector::const_iterator cItr		= _inputParameterVector.begin();
 	InputParameterVector::const_iterator cItrEnd	= _inputParameterVector.end();
@@ -334,7 +334,7 @@ void StatementExecutor::execute()
 	{
 		try
 		{
-			pParameterVector.push_back  (static_cast< const char * >(cItr->pInternalRepresentation()));
+			pParameterVector.push_back  (static_cast<const char*>(cItr->pInternalRepresentation()));
 			parameterLengthVector.push_back(cItr->size());
 			parameterFormatVector.push_back(cItr->isBinary() ? 1 : 0);
 		}
@@ -347,7 +347,7 @@ void StatementExecutor::execute()
 	// clear out any result data.  One way or another it is now obsolete.
 	clearResults();
 
-	PGresult * ptrPGResult = 0;
+	PGresult* ptrPGResult = 0;
 
 	{
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
@@ -414,7 +414,7 @@ void StatementExecutor::execute()
 
 		if (affectedRowCount >= 0)
 		{
-			_affectedRowCount = static_cast< std::size_t >(affectedRowCount);
+			_affectedRowCount = static_cast<std::size_t>(affectedRowCount);
 		}
 	}
 	else
@@ -427,7 +427,7 @@ void StatementExecutor::execute()
 				 && affectedRowCount >= 0
 				)
 			{
-				_affectedRowCount = static_cast< std::size_t >(affectedRowCount);
+				_affectedRowCount = static_cast<std::size_t>(affectedRowCount);
 				_currentRow = _affectedRowCount;  // no fetching on these statements!
 			}
 		}
@@ -474,7 +474,7 @@ StatementExecutor::fetch()
 
 	for (std::size_t i = 0; i < countColumns; ++i)
 	{
-		int fieldLength = PQgetlength(_pResultHandle, static_cast< int > (_currentRow), static_cast< int > (i));
+		int fieldLength = PQgetlength(_pResultHandle, static_cast<int> (_currentRow), static_cast<int> (i));
 
 		_outputParameterVector.at(i).setValues(POSTGRESQL_TYPE_STRING,   // TODO - set based on Oid
 													PQftype(_pResultHandle, i), // Oid of column
@@ -501,7 +501,7 @@ StatementExecutor::getAffectedRowCount() const
 std::size_t
 StatementExecutor::columnsReturned() const
 {
-	return static_cast< std::size_t > (_resultColumns.size());
+	return static_cast<std::size_t> (_resultColumns.size());
 }
 
 const MetaColumn&

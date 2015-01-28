@@ -58,7 +58,7 @@ class PostgreSQL_API PostgreSQLStatementImpl: public Poco::Data::StatementImpl
 	/// Implements statement functionality needed for PostgreSQL
 {
 public:
-	PostgreSQLStatementImpl(SessionImpl & aSessionImpl);
+	PostgreSQLStatementImpl(SessionImpl& aSessionImpl);
 		/// Creates the PostgreSQLStatementImpl.
 
 	~PostgreSQLStatementImpl();
