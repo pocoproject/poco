@@ -19,5 +19,3 @@ install(
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
     )
-
-#POCO_GENERATE_PACKAGE("${LIBNAME}" "${LIBNAME}Targets" "lib/cmake/${PROJECT_NAME}")

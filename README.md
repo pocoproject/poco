@@ -1,5 +1,12 @@
-POCO C++ Libraries [![Build Status](https://travis-ci.org/pocoproject/poco.png?branch=develop)](https://travis-ci.org/pocoproject/poco)
+POCO C++ Libraries
 ==================
+
+Build Status
+------------
+
+- Travis: [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=develop)](https://travis-ci.org/pocoproject/poco)
+- AppVeyor: [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae)](https://ci.appveyor.com/project/obiltschnig/poco)
+
 
 POrtable COmponents C++ Libraries are:
 --------------------------------------
