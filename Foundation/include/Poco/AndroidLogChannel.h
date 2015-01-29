@@ -27,7 +27,7 @@
 namespace Poco {
 
 
-class AndroidLogChannel: public Poco::Channel
+class Foundation_API AndroidLogChannel: public Poco::Channel
 	/// A channel that writes to the Android log subsystem.
 	///
 	/// Only the message's text is written, followed
