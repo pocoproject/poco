@@ -56,6 +56,10 @@ else
 	objects += SyslogChannel
 endif
 
+ifeq ($(findstring Android, $(POCO_CONFIG)), Android)
+	objects += AndroidLogChannel
+endif
+
 target         = PocoFoundation
 target_version = $(LIBVERSION)
 target_libs    =
