@@ -5,7 +5,7 @@
 ---
 If you think you've found a bug or would like to see a feature in one of the [upcoming releases](https://github.com/pocoproject/poco/milestones), file an [issue](https://github.com/pocoproject/poco/issues). Please make sure that your explanations are clear and coherent; do the homework of understanding the problem and searching for existing solutions before posting.
 
-If you're in a hurry, the fastest way to have bugs fixed or features added are code contributions.
+If you're in a hurry, the fastest way to have bugs fixed or features added are code contributions. Good code contributions, to be precise; if you want to contribute, read on ...
 
 ---
 
@@ -14,7 +14,7 @@ If you're in a hurry, the fastest way to have bugs fixed or features added are c
 ---
 Before writing any code, please read the
 
-* [C++ Coding Style Guide]((http://www.appinf.com/download/CppCodingStyleGuide.pdf) and
+* [C++ Coding Style Guide](http://www.appinf.com/download/CppCodingStyleGuide.pdf) and
 * [Git branching model](http://nvie.com/posts/a-successful-git-branching-model/)
 
 [Pull requests](https://help.github.com/articles/using-pull-requests/) are our favorite channel for code contributions and the quickest way to get your fix or feature upstreamed and released. Here's a quick guide.
