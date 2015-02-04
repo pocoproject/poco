@@ -195,7 +195,7 @@ endmacro()
 macro(POCO_GENERATE_PACKAGE target_name)
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/Poco${target_name}ConfigVersion.cmake"
+  "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
   VERSION ${PROJECT_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
