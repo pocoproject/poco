@@ -81,7 +81,7 @@ protected:
 
 private:
 	TestMethod             _test;
-	std::auto_ptr<Fixture> _fixture;
+	std::unique_ptr<Fixture> _fixture;
 };
 
 

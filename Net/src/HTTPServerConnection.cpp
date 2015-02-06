@@ -78,7 +78,7 @@ void HTTPServerConnection::run()
 					response.set("Server", server);
 				try
 				{
-					std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
+					std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
 					if (pHandler.get())
 					{
 						if (request.expectContinue())

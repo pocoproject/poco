@@ -263,7 +263,7 @@ protected:
 	void parse(const std::string& file)
 	{
 		logger().information("Preprocessing " + file);
-		std::auto_ptr<Preprocessor> pPreProc(preprocess(file));
+		std::unique_ptr<Preprocessor> pPreProc(preprocess(file));
 		
 		logger().information("Parsing " + file);
 		if (pPreProc->stream().good())
