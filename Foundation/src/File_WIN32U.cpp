@@ -35,17 +35,17 @@ public:
 			FileImpl::handleLastErrorImpl(path);
 		}
 	}
-	
+
 	~FileHandle()
 	{
 		if (_h != INVALID_HANDLE_VALUE) CloseHandle(_h);
 	}
-	
+
 	HANDLE get() const
 	{
 		return _h;
 	}
-	
+
 private:
 	HANDLE _h;
 };
@@ -96,7 +96,7 @@ bool FileImpl::existsImpl() const
 	poco_assert (!_path.empty());
 
 	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
+	if (attr == INVALID_FILE_ATTRIBUTES)
 	{
 		switch (GetLastError())
 		{
@@ -116,9 +116,9 @@ bool FileImpl::existsImpl() const
 bool FileImpl::canReadImpl() const
 {
 	poco_assert (!_path.empty());
-	
+
 	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
+	if (attr == INVALID_FILE_ATTRIBUTES)
 	{
 		switch (GetLastError())
 		{
@@ -135,9 +135,9 @@ bool FileImpl::canReadImpl() const
 bool FileImpl::canWriteImpl() const
 {
 	poco_assert (!_path.empty());
-	
+
 	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
+	if (attr == INVALID_FILE_ATTRIBUTES)
 		handleLastErrorImpl(_path);
 	return (attr & FILE_ATTRIBUTE_READONLY) == 0;
 }
@@ -161,7 +161,7 @@ bool FileImpl::isDirectoryImpl() const
 	poco_assert (!_path.empty());
 
 	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
+	if (attr == INVALID_FILE_ATTRIBUTES)
 		handleLastErrorImpl(_path);
 	return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
@@ -194,7 +194,7 @@ bool FileImpl::isHiddenImpl() const
 	poco_assert (!_path.empty());
 
 	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
+	if (attr == INVALID_FILE_ATTRIBUTES)
 		handleLastErrorImpl(_path);
 	return (attr & FILE_ATTRIBUTE_HIDDEN) != 0;
 }
@@ -205,7 +205,7 @@ Timestamp FileImpl::createdImpl() const
 	poco_assert (!_path.empty());
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
-	if (GetFileAttributesExW(_upath.c_str(), GetFileExInfoStandard, &fad) == 0) 
+	if (GetFileAttributesExW(_upath.c_str(), GetFileExInfoStandard, &fad) == 0)
 		handleLastErrorImpl(_path);
 	return Timestamp::fromFileTimeNP(fad.ftCreationTime.dwLowDateTime, fad.ftCreationTime.dwHighDateTime);
 }
@@ -216,7 +216,7 @@ Timestamp FileImpl::getLastModifiedImpl() const
 	poco_assert (!_path.empty());
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
-	if (GetFileAttributesExW(_upath.c_str(), GetFileExInfoStandard, &fad) == 0) 
+	if (GetFileAttributesExW(_upath.c_str(), GetFileExInfoStandard, &fad) == 0)
 		handleLastErrorImpl(_path);
 	return Timestamp::fromFileTimeNP(fad.ftLastWriteTime.dwLowDateTime, fad.ftLastWriteTime.dwHighDateTime);
 }
@@ -243,7 +243,7 @@ FileImpl::FileSizeImpl FileImpl::getSizeImpl() const
 	poco_assert (!_path.empty());
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
-	if (GetFileAttributesExW(_upath.c_str(), GetFileExInfoStandard, &fad) == 0) 
+	if (GetFileAttributesExW(_upath.c_str(), GetFileExInfoStandard, &fad) == 0)
 		handleLastErrorImpl(_path);
 	LARGE_INTEGER li;
 	li.LowPart  = fad.nFileSizeLow;
@@ -259,14 +259,14 @@ void FileImpl::setSizeImpl(FileSizeImpl size)
 	FileHandle fh(_path, _upath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING);
 	LARGE_INTEGER li;
 	li.QuadPart = size;
-	if (SetFilePointer(fh.get(), li.LowPart, &li.HighPart, FILE_BEGIN) == -1)
+	if (SetFilePointer(fh.get(), li.LowPart, &li.HighPart, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
 		handleLastErrorImpl(_path);
-	if (SetEndOfFile(fh.get()) == 0) 
+	if (SetEndOfFile(fh.get()) == 0)
 		handleLastErrorImpl(_path);
 }
 
 
-void FileImpl::setWriteableImpl(bool flag)		
+void FileImpl::setWriteableImpl(bool flag)
 {
 	poco_assert (!_path.empty());
 
@@ -294,12 +294,8 @@ void FileImpl::copyToImpl(const std::string& path) const
 
 	std::wstring upath;
 	UnicodeConverter::toUTF16(path, upath);
-	if (CopyFileW(_upath.c_str(), upath.c_str(), FALSE) != 0)
-	{
-		FileImpl copy(path);
-		copy.setWriteableImpl(true);
-	}
-	else handleLastErrorImpl(_path);
+	if (CopyFileW(_upath.c_str(), upath.c_str(), FALSE) == 0)
+		handleLastErrorImpl(_path);
 }
 
 
@@ -309,7 +305,7 @@ void FileImpl::renameToImpl(const std::string& path)
 
 	std::wstring upath;
 	UnicodeConverter::toUTF16(path, upath);
-	if (MoveFileW(_upath.c_str(), upath.c_str()) == 0) 
+	if (MoveFileW(_upath.c_str(), upath.c_str()) == 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -320,7 +316,7 @@ void FileImpl::removeImpl()
 
 	if (isDirectoryImpl())
 	{
-		if (RemoveDirectoryW(_upath.c_str()) == 0) 
+		if (RemoveDirectoryW(_upath.c_str()) == 0)
 			handleLastErrorImpl(_path);
 	}
 	else
@@ -352,7 +348,7 @@ bool FileImpl::createFileImpl()
 bool FileImpl::createDirectoryImpl()
 {
 	poco_assert (!_path.empty());
-	
+
 	if (existsImpl() && isDirectoryImpl())
 		return false;
 	if (CreateDirectoryW(_upath.c_str(), 0) == 0)

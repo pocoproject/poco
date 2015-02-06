@@ -21,6 +21,10 @@ get_filename_component(_Poco_install_prefix "${CMAKE_CURRENT_LIST_DIR}" ABSOLUTE
 
 set(_Poco_NOTFOUND_MESSAGE)
 
+# Let components find each other, but don't overwrite CMAKE_PREFIX_PATH
+set(_Poco_CMAKE_PREFIX_PATH_old ${CMAKE_PREFIX_PATH})
+set(CMAKE_PREFIX_PATH ${_Poco_install_prefix})
+
 foreach(module ${Poco_FIND_COMPONENTS})
     find_package(Poco${module}
         ${_Poco_FIND_PARTS_QUIET}
@@ -38,6 +42,9 @@ foreach(module ${Poco_FIND_COMPONENTS})
     # For backward compatibility set the LIBRARIES variable
     list(APPEND Poco_LIBRARIES "Poco::${module}")
 endforeach()
+
+# Restore the original CMAKE_PREFIX_PATH value
+set(CMAKE_PREFIX_PATH ${_Poco_CMAKE_PREFIX_PATH_old})
 
 if (_Poco_NOTFOUND_MESSAGE)
     set(Poco_NOT_FOUND_MESSAGE "${_Poco_NOTFOUND_MESSAGE}")
