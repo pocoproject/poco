@@ -30,9 +30,8 @@ In regards to Boost, in spite of some functional overlapping,
 POCO is best thought of as a Boost complement (rather than replacement).
 Side-by-side use of Boost and POCO is a very common occurence.
 
-When contributing to POCO, please adhere to our [coding styleguide](http://www.appinf.com/download/CppCodingStyleGuide.pdf).
+When contributing to POCO, please adhere to our [guidelines](https://github.com/pocoproject/poco/blob/develop/CONTRIBUTING.md).
 
-We use the branching model described [here](http://nvie.com/posts/a-successful-git-branching-model/).
 
 All text file line endings in the repository must be Unix-style (LF).
 This includes Visual Studio project and solution files (.sln, .vcproj, .vcxproj, .vcxproj.filters).

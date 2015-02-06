@@ -19,8 +19,12 @@
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/Util/IniFileConfiguration.h"
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
 #include "Poco/Util/XMLConfiguration.h"
+#endif
+#ifndef POCO_UTIL_NO_JSONCONFIGURATION
 #include "Poco/Util/JSONConfiguration.h"
+#endif
 #include "Poco/Util/LoggingSubsystem.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionProcessor.h"

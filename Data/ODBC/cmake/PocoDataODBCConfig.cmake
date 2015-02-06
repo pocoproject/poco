@@ -1,5 +1,4 @@
 include(CMakeFindDependencyMacro)
-set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR})
 find_dependency(PocoFoundation)
 find_dependency(PocoData)
 include("${CMAKE_CURRENT_LIST_DIR}/PocoDataODBCTargets.cmake")
