@@ -39,13 +39,13 @@ std::string toJSON(char c)
 
 void toJSON(const std::string& value, std::ostream& out, bool wrap)
 {
-	if (wrap) out << '"';
+	if (wrap) out << std::string(1, '"');
 	for (std::string::const_iterator it = value.begin(),
 		end = value.end(); it != end; ++it)
 	{
 		out << toJSON(*it);
 	}
-	if (wrap) out << '"';
+	if (wrap) out << std::string(1, '"');
 }
 
 
