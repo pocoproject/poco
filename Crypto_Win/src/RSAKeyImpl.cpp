@@ -36,7 +36,7 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 	_hPrivateKey(0),
 	_hPublicKey(0)
 {
-	DWORD rc = CryptImportPublicKeyInfo(_sp.handle(), X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &cert.system().pCertInfo->SubjectPublicKeyInfo, &_hPublicKey);
+	DWORD rc = CryptImportPublicKeyInfo(_sp.handle(), X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &cert.system()->pCertInfo->SubjectPublicKeyInfo, &_hPublicKey);
 	if (!rc) throw Poco::SystemException("Cannot import public key from certificate");
 }
 
@@ -110,9 +110,9 @@ RSAKeyImpl::~RSAKeyImpl()
 
 int RSAKeyImpl::size() const
 {
-	DWORD keyLength;
+	BYTE keyLength;
 	DWORD size = sizeof(keyLength);
-	if (!CryptGetKeyParam(_hKey, KP_KEYLEN, &keyLength, &size, 0))
+	if (!CryptGetKeyParam(_hPrivateKey, KP_KEYLEN, &keyLength, &size, 0))
 		throw Poco::SystemException("Cannot obtain key length");
 	return static_cast<int>(keyLength);
 }

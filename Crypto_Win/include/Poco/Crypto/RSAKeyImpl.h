@@ -28,12 +28,12 @@
 #include <ostream>
 #include <vector>
 
-
+/*
 struct bignum_st;
 struct rsa_st;
 typedef struct bignum_st BIGNUM;
 typedef struct rsa_st RSA;
-
+*/
 
 namespace Poco {
 namespace Crypto {
@@ -90,6 +90,8 @@ public:
 		/// Returns the underlying Windows-specific handle for the public key.
 
 protected:
+	const ServiceProvider& serviceProvider() const;
+
 	void loadPrivateKey(std::istream& istr);
 	void loadPublicKey(std::istream& istr);
 	void savePrivateKey(std::ostream& ostr);
@@ -99,19 +101,28 @@ private:
 	ServiceProvider _sp;
 	HCRYPTKEY _hPrivateKey;
 	HCRYPTKEY _hPublicKey;
+
+	friend class RSACipherImpl;
 };
 
 
 //
 // inlines
 //
-HCRYPTKEY RSAKeyImpl::privateKey() const
+
+inline const ServiceProvider& RSAKeyImpl::serviceProvider() const
+{
+	return _sp;
+}
+
+
+inline HCRYPTKEY RSAKeyImpl::privateKey() const
 {
 	return _hPrivateKey;
 }
 
 
-HCRYPTKEY RSAKeyImpl::publicKey() const
+inline HCRYPTKEY RSAKeyImpl::publicKey() const
 {
 	return _hPublicKey;
 }

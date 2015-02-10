@@ -17,9 +17,9 @@
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/CipherKey.h"
-//#include "Poco/Crypto/RSAKey.h"
+#include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/CipherImpl.h"
-//#include "Poco/Crypto/RSACipherImpl.h"
+#include "Poco/Crypto/RSACipherImpl.h"
 #include "Poco/Exception.h"
 #include "Poco/SingletonHolder.h"
 
@@ -55,12 +55,11 @@ Cipher* CipherFactory::createCipher(const CipherKey& key)
 	return new CipherImpl(key);
 }
 
-// TODO RSA
-/*
+
 Cipher* CipherFactory::createCipher(const RSAKey& key, RSAPaddingMode paddingMode)
 {
 	return new RSACipherImpl(key, paddingMode);
 }
-*/
+
 
 } } // namespace Poco::Crypto

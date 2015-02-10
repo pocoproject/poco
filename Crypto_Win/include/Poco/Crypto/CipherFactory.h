@@ -48,7 +48,7 @@ public:
 	Cipher* createCipher(const CipherKey& key);
 		/// Creates a Cipher object for the given CipherKey.
 
-	//Cipher* createCipher(const RSAKey& key, RSAPaddingMode paddingMode = RSA_PADDING_PKCS1);
+	Cipher* createCipher(const RSAKey& key, RSAPaddingMode paddingMode = RSA_PADDING_PKCS1);
 		/// Creates a RSACipher using the given RSA key and padding mode
 		/// for public key encryption/private key decryption.
 	

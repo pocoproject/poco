@@ -61,7 +61,7 @@ public:
 	~RSADigestEngine();
 		/// Destroys the RSADigestEngine.
 
-	unsigned digestLength() const;
+	std::size_t digestLength() const;
 		/// Returns the length of the digest in bytes.
 
 	void reset();
@@ -88,16 +88,16 @@ public:
 		/// Returns true if the signature can be verified, false otherwise.
 
 protected:
-	void updateImpl(const void* data, unsigned length);
+	void updateImpl(const void* data, std::size_t length);
 
 private:
-	RSAKey _key;
-	Poco::DigestEngine& _engine;
-	int _type;
+	RSAKey                     _key;
+	Poco::DigestEngine&        _engine;
+	LPSTR                      _type;
 	Poco::DigestEngine::Digest _digest;
 	Poco::DigestEngine::Digest _signature;
-	Poco::MD5Engine _md5Engine;
-	Poco::SHA1Engine _sha1Engine;
+	Poco::MD5Engine            _md5Engine;
+	Poco::SHA1Engine           _sha1Engine;
 };
 
 

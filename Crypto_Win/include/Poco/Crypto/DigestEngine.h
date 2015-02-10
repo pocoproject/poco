@@ -57,12 +57,12 @@ public:
 		/// Returns the name of the digest algorithm.
 	
 	// DigestEngine
-	unsigned digestLength() const;
+	std::size_t digestLength() const;
 	void reset();
 	const Poco::DigestEngine::Digest& digest();
 
 protected:
-	void updateImpl(const void* data, unsigned length);
+	void updateImpl(const void* data, std::size_t length);
 	
 private:
 	ServiceProvider _sp;

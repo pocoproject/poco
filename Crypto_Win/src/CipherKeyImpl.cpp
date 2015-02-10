@@ -580,7 +580,7 @@ void CipherKeyImpl::generateKey(
 	int keySz = keySize();
 	int ivSz  = ivSize();
 	int requiredSz = keySz + ivSz;
-	int availableSz = d.size();
+	int availableSz = static_cast<int>(d.size());
 	int k = 1;
 	Poco::DigestEngine::Digest extraD(d);
 	while (availableSz < requiredSz)
@@ -596,7 +596,7 @@ void CipherKeyImpl::generateKey(
 			md5.update(&extraD[0], extraD.size());
 			extraD = md5.digest();
 		}
-		availableSz += extraD.size();
+		availableSz += static_cast<int>(extraD.size());
 		d.insert(d.end(), extraD.begin(), extraD.end());
 	}
 
@@ -686,7 +686,7 @@ void CipherKeyImpl::importKey()
 	HCRYPTKEY hPubPrivKey = 0;
 	BOOL rc = CreatePrivateExponentOneKey(_sp.handle(), AT_KEYEXCHANGE, &hPubPrivKey);
 	if (!rc) throw Poco::SystemException("cannot create private key for importing key", GetLastError());
-	rc = ImportPlainSessionBlob(_sp.handle(), hPubPrivKey, _id, &_key[0], _key.size(), &_hKey);
+	rc = ImportPlainSessionBlob(_sp.handle(), hPubPrivKey, _id, &_key[0], static_cast<DWORD>(_key.size()), &_hKey);
 	CryptDestroyKey(hPubPrivKey);
 	if (!rc) throw Poco::SystemException("cannot import key", GetLastError());
 }

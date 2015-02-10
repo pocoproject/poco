@@ -14,10 +14,11 @@
 //
 
 
-#include "
-
-
-// TODO: this is still OpenSSL code
+#include "Poco/Crypto/RSADigestEngine.h"
+#include "Poco/Format.h"
+#include "Poco/Error.h"
+#include "Poco/Base64Encoder.h"
+#include <sstream>
 
 
 namespace Poco {
@@ -27,7 +28,7 @@ namespace Crypto {
 RSADigestEngine::RSADigestEngine(const RSAKey& key, DigestType digestType):
 	_key(key),
 	_engine(digestType == DIGEST_MD5 ? static_cast<Poco::DigestEngine&>(_md5Engine) : static_cast<Poco::DigestEngine&>(_sha1Engine)),
-	_type(digestType == DIGEST_MD5 ? NID_md5 : NID_sha1)
+	_type(digestType == DIGEST_MD5 ? szOID_RSA_MD5 : szOID_ECDSA_SHA1)
 {
 }
 
@@ -37,7 +38,7 @@ RSADigestEngine::~RSADigestEngine()
 }
 
 
-unsigned RSADigestEngine::digestLength() const
+std::size_t RSADigestEngine::digestLength() const
 {
 	return _engine.digestLength();
 }
@@ -66,27 +67,70 @@ const DigestEngine::Digest& RSADigestEngine::signature()
 	if (_signature.empty())
 	{
 		digest();
-		_signature.resize(_key.size());
-		unsigned sigLen = static_cast<unsigned>(_signature.size());
-		RSA_sign(_type, &_digest[0], static_cast<unsigned>(_digest.size()), &_signature[0], &sigLen, _key.impl()->getRSA());
-		// truncate _sig to sigLen
-		if (sigLen < _signature.size())
-			_signature.resize(sigLen);
+
+		std::string begin = "-----BEGIN RSA PUBLIC KEY-----\n";
+		//TODO: base64 encode data and pass to CryptImportKey API
+		std::string sig(_digest.begin(), _digest.end());
+		std::string end = "\n-----END RSA PUBLIC KEY-----";
+
+		std::ostringstream ostr;
+		Base64Encoder encoder(ostr);
+		encoder << sig;
+		encoder.close();
+
+		begin.append(ostr.str()).append(end);
+		_signature.assign(begin.begin(), begin.end());
 	}
-    return _signature;
+
+	return _signature;
 }
 
 	
 bool RSADigestEngine::verify(const DigestEngine::Digest& sig)
 {
 	digest();
-	DigestEngine::Digest sigCpy = sig; // copy becausse RSA_verify can modify sigCpy
-	int ret = RSA_verify(_type, &_digest[0], static_cast<unsigned>(_digest.size()), &sigCpy[0], static_cast<unsigned>(sigCpy.size()), _key.impl()->getRSA());
-	return ret != 0;
+
+	DWORD cbData = 0;
+	BYTE* pbData = NULL;
+
+	if (CryptExportKey(_key.impl()->privateKey(), 0, PRIVATEKEYBLOB, 0/*???*/,
+		NULL, &cbData))
+	{
+		std::vector<BYTE> pkData(cbData);
+		pbData = &pkData[0];
+
+		if (CryptExportKey(_key.impl()->publicKey(), 0, PRIVATEKEYBLOB, 0/*???*/,
+			pbData, &cbData))
+		{
+			// TODO: base64-decode pbData
+		}
+		else // !CryptExportKey
+		{
+			DWORD err = Error::last();
+			std::string errStr = Error::getMessage(err);
+			switch (err)
+			{
+			case ERROR_INVALID_HANDLE: case ERROR_INVALID_PARAMETER:
+			case NTE_BAD_DATA:         case NTE_BAD_FLAGS:
+			case NTE_BAD_KEY:          case NTE_BAD_KEY_STATE:
+			case NTE_BAD_PUBLIC_KEY:   case NTE_BAD_TYPE:
+			case NTE_BAD_UID:          case NTE_NO_KEY:
+				throw Poco::InvalidArgumentException(errStr);
+			default:
+				throw  Poco::SystemException("Cannot export public key.");
+			}
+		}
+	}
+	else // !CryptExportKey length
+	{
+		throw  Poco::SystemException("Cannot obtain key export length.");
+	}
+
+	return false;
 }
 
 
-void RSADigestEngine::updateImpl(const void* data, unsigned length)
+void RSADigestEngine::updateImpl(const void* data, std::size_t length)
 {
 	_engine.update(data, length);
 }
