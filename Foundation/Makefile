@@ -15,8 +15,8 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator DirectoryWatcher \
 	Environment Event Error EventArgs ErrorHandler Exception FIFOBufferStream FPEnvironment File \
 	FileChannel Formatter FormattingChannel Glob HexBinaryDecoder LineEndingConverter \
-	HexBinaryEncoder InflatingStream Latin1Encoding Latin2Encoding Latin9Encoding LogFile \
-	Logger LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
+	HexBinaryEncoder InflatingStream JSONString Latin1Encoding Latin2Encoding Latin9Encoding \
+	LogFile Logger LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
 	MemoryPool MD4Engine MD5Engine Manifest Message Mutex \
 	NestedDiagnosticContext Notification NotificationCenter \
 	NotificationQueue PriorityNotificationQueue TimedNotificationQueue \
