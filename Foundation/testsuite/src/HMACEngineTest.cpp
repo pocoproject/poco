@@ -50,8 +50,8 @@ void HMACEngineTest::testHMAC()
 	digest = DigestEngine::digestToHex(hmac2.digest());
 	assert (digest == "750c783e6ab0b503eaa86e310a5db738");
 	
-	key  = std::string(16, 0xaa);
-	data = std::string(50, 0xdd);
+	key  = std::string(16, char(0xaa));
+	data = std::string(50, char(0xdd));
 	HMACEngine<MD5Engine> hmac3(key);
 	hmac3.update(data);
 	digest = DigestEngine::digestToHex(hmac3.digest());
