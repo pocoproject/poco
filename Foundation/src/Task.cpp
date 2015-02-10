@@ -27,7 +27,7 @@ Task::Task(const std::string& name):
 	_pOwner(0),
 	_progress(0),
 	_state(TASK_IDLE),
-	_cancelEvent(false)
+	_cancelEvent(Event::EVENT_MANUALRESET)
 {
 }
 
