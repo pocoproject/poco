@@ -64,8 +64,11 @@ namespace Data {
 			if (!it->isEmpty())
 			{
 				if (it->isString())
-					str << '"' << *nIt << "\":" <<
-					toJSON(trimInPlace(it->convert<std::string>()));
+				{
+					std::string val = it->convert<std::string>();
+					trimInPlace(val);
+					str << '"' << *nIt << "\":" <<  toJSON(val);
+				}
 				else
 					str << '"' << *nIt << "\":" << it->convert<std::string>();
 			}
