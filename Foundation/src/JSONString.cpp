@@ -15,6 +15,7 @@
 
 
 #include "Poco/JSONString.h"
+#include <ostream>
 
 
 namespace Poco {
@@ -39,13 +40,13 @@ std::string toJSON(char c)
 
 void toJSON(const std::string& value, std::ostream& out, bool wrap)
 {
-	if (wrap) out << std::string(1, '"');
+	if (wrap) out << '"';
 	for (std::string::const_iterator it = value.begin(),
 		end = value.end(); it != end; ++it)
 	{
 		out << toJSON(*it);
 	}
-	if (wrap) out << std::string(1, '"');
+	if (wrap) out << '"';
 }
 
 
