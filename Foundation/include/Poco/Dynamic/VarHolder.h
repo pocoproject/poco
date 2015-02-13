@@ -254,6 +254,18 @@ public:
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to suport the diagnostic.
 
+	virtual bool isDate() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
+	virtual bool isTime() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
+	virtual bool isDateTime() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
 	virtual std::size_t size() const;
 		/// Returns 1 iff Var is not empty or this function overriden.
 
@@ -605,6 +617,24 @@ inline bool VarHolder::isBoolean() const
 
 
 inline bool VarHolder::isString() const
+{
+	return false;
+}
+
+
+inline bool VarHolder::isDate() const
+{
+	return false;
+}
+
+
+inline bool VarHolder::isTime() const
+{
+	return false;
+}
+
+
+inline bool VarHolder::isDateTime() const
 {
 	return false;
 }
@@ -3331,6 +3361,21 @@ public:
 		return false;
 	}
 
+	bool isDate() const
+	{
+		return true;
+	}
+
+	bool isTime() const
+	{
+		return true;
+	}
+
+	bool isDateTime() const
+	{
+		return true;
+	}
+
 private:
 	VarHolderImpl();
 	VarHolderImpl(const VarHolderImpl&);
@@ -3432,6 +3477,21 @@ public:
 		return false;
 	}
 
+	bool isDate() const
+	{
+		return true;
+	}
+
+	bool isTime() const
+	{
+		return true;
+	}
+
+	bool isDateTime() const
+	{
+		return true;
+	}
+
 private:
 	VarHolderImpl();
 	VarHolderImpl(const VarHolderImpl&);
@@ -3531,6 +3591,21 @@ public:
 	bool isString() const
 	{
 		return false;
+	}
+
+	bool isDate() const
+	{
+		return true;
+	}
+
+	bool isTime() const
+	{
+		return true;
+	}
+
+	bool isDateTime() const
+	{
+		return true;
 	}
 
 private:

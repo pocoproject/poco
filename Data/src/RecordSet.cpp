@@ -311,6 +311,8 @@ void RecordSet::setRowFormatter(RowFormatter::Ptr pRowFormatter)
 
 std::ostream& RecordSet::copyNames(std::ostream& os) const
 {
+	if (begin() == end()) return os;
+
 	std::string names = (*_pBegin)->namesToString();
 	if (!names.empty()) os << names;
 	return os;
@@ -319,6 +321,8 @@ std::ostream& RecordSet::copyNames(std::ostream& os) const
 
 std::ostream& RecordSet::copyValues(std::ostream& os, std::size_t offset, std::size_t length) const
 {
+	if (begin() == end()) return os;
+
 	RowIterator it = *_pBegin + offset;
 	RowIterator end = (RowIterator::POSITION_END != length) ? it + length : *_pEnd;
 	std::copy(it, end, std::ostream_iterator<Row>(os));
@@ -328,6 +332,8 @@ std::ostream& RecordSet::copyValues(std::ostream& os, std::size_t offset, std::s
 
 void RecordSet::formatValues(std::size_t offset, std::size_t length) const
 {
+	if (begin() == end()) return;
+
 	RowIterator it = *_pBegin + offset;
 	RowIterator end = (RowIterator::POSITION_END != length) ? it + length : *_pEnd;
 	std::string val;
@@ -337,6 +343,8 @@ void RecordSet::formatValues(std::size_t offset, std::size_t length) const
 
 std::ostream& RecordSet::copy(std::ostream& os, std::size_t offset, std::size_t length) const
 {
+	if (begin() == end()) return os;
+
 	RowFormatter& rf = const_cast<RowFormatter&>((*_pBegin)->getFormatter());
 	rf.setTotalRowCount(static_cast<int>(getTotalRowCount()));
 	if (RowFormatter::FORMAT_PROGRESSIVE == rf.getMode())

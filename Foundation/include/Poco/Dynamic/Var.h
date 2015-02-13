@@ -502,6 +502,15 @@ public:
 	bool isString() const;
 		/// Returns true if stored value is std::string.
 
+	bool isDate() const;
+		/// Returns true if stored value represents a date.
+
+	bool isTime() const;
+		/// Returns true if stored value represents time or date/time.
+
+	bool isDateTime() const;
+		/// Returns true if stored value represents a date/time.
+
 	std::size_t size() const;
 		/// Returns the size of this Var.
 		/// This function returns 0 when Var is empty, 1 for POD or the size (i.e. length)
@@ -841,6 +850,27 @@ inline bool Var::isString() const
 {
 	VarHolder* pHolder = content();
 	return pHolder ? pHolder->isString() : false;
+}
+
+
+inline bool Var::isDate() const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isDate() : false;
+}
+
+
+inline bool Var::isTime() const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isTime() : false;
+}
+
+
+inline bool Var::isDateTime() const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isDateTime() : false;
 }
 
 
