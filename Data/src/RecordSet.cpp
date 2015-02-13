@@ -301,11 +301,18 @@ bool RecordSet::moveLast()
 
 void RecordSet::setRowFormatter(RowFormatter::Ptr pRowFormatter)
 {
-	pRowFormatter->setTotalRowCount(static_cast<int>(getTotalRowCount()));
-	Statement::setRowFormatter(pRowFormatter);
-	RowMap::iterator it = _rowMap.begin();
-	RowMap::iterator end = _rowMap.end();
-	for (; it != end; ++it) it->second->setFormatter(getRowFormatter());
+	if (pRowFormatter)
+	{
+		if (pRowFormatter->getTotalRowCount() == RowFormatter::INVALID_ROW_COUNT)
+			pRowFormatter->setTotalRowCount(static_cast<int>(getTotalRowCount()));
+
+		Statement::setRowFormatter(pRowFormatter);
+		RowMap::iterator it = _rowMap.begin();
+		RowMap::iterator end = _rowMap.end();
+		for (; it != end; ++it) it->second->setFormatter(getRowFormatter());
+	}
+	else
+		throw NullPointerException("Null RowFormatter in RecordSet.");
 }
 
 

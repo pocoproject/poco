@@ -29,6 +29,51 @@ namespace Data {
 
 class Data_API JSONRowFormatter: public Poco::Data::RowFormatter
 	/// Class for JSON formatting of data rows.
+	///
+	/// Formatter can be configured to operate in four modes (and
+	/// certain combinations thereof) :
+	///
+	///    - small (condensed mode, only array of values)
+	///
+	///      Example:
+	///      {
+	///       [["Simpson", "Bart", "Springfield", 12],
+	///       ["Simpson", "Lisa", "Springfield", 10]]
+	///      }
+	///
+	///    - row count (total row count provided)
+	///
+	///      Example:
+	///      {
+	///       "count":2,
+	///       [["Simpson", "Bart", "Springfield", 12],
+	///        ["Simpson", "Lisa", "Springfield", 10]]
+	///      }
+	///
+	///    - column names (column names provided as a string array)
+	///
+	///      Example:
+	///      {
+	///       "names":["LastName", "FirstName", "Address", "Age"],
+	///       [["Simpson", "Bart", "Springfield", 12],
+	///       ["Simpson", "Lisa", "Springfield", 10]]
+	///      }
+	///
+	///    - full (total row count, column names provided in every row of data)
+	///
+	///      Example:
+	///      {
+	///       "count":2,
+	///        [
+	///         {"LastName": "Simpson", "FirstName": "Bart", "Address": "Springfield", "Age": 12},
+	///         {"LastName": "Simpson", "FirstName": "Lisa", "Address": "Springfield", "Age": 10}
+	///        ]
+	///      }
+	///
+	/// Total row count will be specified by the Poco::DataRecordSet. Note, however, that this is
+	/// not possible to do accurately in case of result set paging. For those cases, there is
+	/// setTotalRowCount() member function, which allows to explicitly set the total row count.
+	/// If the total row count is preset on the formatter, the Data framework shall not interfere.
 {
 public:
 	static const int JSON_FMT_MODE_SMALL        = 1;

@@ -1232,7 +1232,6 @@ void DataTest::testJSONRowFormatter()
 	row1.setFormatter(new JSONRowFormatter(JSONRowFormatter::JSON_FMT_MODE_SMALL));
 	assert(row1.getFormatter().getMode() == RowFormatter::FORMAT_PROGRESSIVE);
 	assert(row1.namesToString() == "");
-	//std::cout << row1.valuesToString() << std::endl;
 	assert(row1.valuesToString() == "[[0,\"1\",\"2007-03-13T08:12:15Z\",null,4]");
 	assert(row1.valuesToString() == ",[0,\"1\",\"2007-03-13T08:12:15Z\",null,4]");
 
@@ -1240,7 +1239,6 @@ void DataTest::testJSONRowFormatter()
 	assert(row1.getFormatter().prefix() == "{\"count\":0,[");
 	assert(row1.getFormatter().postfix() == "]}");
 	assert(row1.getFormatter().getMode() == RowFormatter::FORMAT_PROGRESSIVE);
-	std::cout << row1.namesToString() << std::endl;
 	assert(row1.namesToString() == "");
 	assert(row1.valuesToString() == "{\"field0\":0,\"field1\":\"1\",\"field2\":\"2007-03-13T08:12:15Z\",\"field3\":null,\"field4\":4}");
 	assert(row1.valuesToString() == ",{\"field0\":0,\"field1\":\"1\",\"field2\":\"2007-03-13T08:12:15Z\",\"field3\":null,\"field4\":4}");

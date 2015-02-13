@@ -29,6 +29,12 @@ namespace Poco {
 namespace Data {
 
 
+const int JSONRowFormatter::JSON_FMT_MODE_SMALL;
+const int JSONRowFormatter::JSON_FMT_MODE_ROW_COUNT;
+const int JSONRowFormatter::JSON_FMT_MODE_COLUMN_NAMES;
+const int JSONRowFormatter::JSON_FMT_MODE_FULL;
+
+
 JSONRowFormatter::JSONRowFormatter(int mode) : RowFormatter("{", "]}"),
 	_firstTime(true)
 {
