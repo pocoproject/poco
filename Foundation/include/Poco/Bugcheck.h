@@ -148,7 +148,7 @@ protected:
 //
 
 
-#if defined(POCO_COMPILER_GCC) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
+#if defined(POCO_COMPILER_GCC) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) && !defined(POCO_ANDROID)
 	GCC_DIAG_OFF(unused-local-typedefs) // supress numerous gcc warnings
 #endif // POCO_COMPILER_GCC && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 

@@ -93,7 +93,7 @@ Thread::Thread():
 	_id(uniqueId()), 
 	_name(makeName()), 
 	_pTLS(0),
-	_event(true)
+	_event()
 {
 }
 
@@ -102,7 +102,7 @@ Thread::Thread(const std::string& name):
 	_id(uniqueId()), 
 	_name(name), 
 	_pTLS(0),
-	_event(true)
+	_event()
 {
 }
 

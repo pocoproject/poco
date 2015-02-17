@@ -24,7 +24,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
 	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
 	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest \
-	SemaphoreTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
+	SemaphoreTest MutexTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
 	SimpleFileChannelTest StopwatchTest \
 	StreamConverterTest StreamCopierTest StreamTokenizerTest \
 	StreamsTestSuite StringTest StringTokenizerTest TaskTestSuite TaskTest \

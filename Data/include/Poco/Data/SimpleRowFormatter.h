@@ -32,9 +32,6 @@ class Data_API SimpleRowFormatter: public RowFormatter
 	/// A simple row formatting class.
 {
 public:
-	//typedef RowFormatter::NameVec    NameVec;
-	//typedef RowFormatter::NameVecPtr NameVecPtr;
-	//typedef RowFormatter::ValueVec   ValueVec;
 
 	static const int DEFAULT_COLUMN_WIDTH = 16;
 	static const int DEFAULT_SPACING = 1;
