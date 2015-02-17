@@ -22,6 +22,7 @@
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/Data/SimpleRowFormatter.h"
+#include "Poco/Data/JSONRowFormatter.h"
 #include "Poco/Data/DataException.h"
 #include "Connector.h"
 #include "Poco/BinaryReader.h"
@@ -64,7 +65,9 @@ using Poco::Data::CLOBOutputStream;
 using Poco::Data::MetaColumn;
 using Poco::Data::Column;
 using Poco::Data::Row;
+using Poco::Data::RowFormatter;
 using Poco::Data::SimpleRowFormatter;
+using Poco::Data::JSONRowFormatter;
 using Poco::Data::Date;
 using Poco::Data::Time;
 using Poco::Data::AbstractExtraction;
@@ -1166,7 +1169,7 @@ void DataTest::testRowStrictWeak(const Row& row1, const Row& row2, const Row& ro
 }
 
 
-void DataTest::testRowFormat()
+void DataTest::testSimpleRowFormatter()
 {
 	Row row1;
 	row1.append("field0", 0);
@@ -1207,6 +1210,38 @@ void DataTest::testRowFormat()
 		<< spacer
 		<< std::setw(sz) << "4" << std::endl;
 	assert (row1.valuesToString() == os.str());
+}
+
+
+void DataTest::testJSONRowFormatter()
+{
+	Row row1;
+	row1.append("field0", 0);
+	row1.append("field1", "1");
+	row1.append("field2", DateTime(2007, 3, 13, 8, 12, 15));
+	row1.append("field3", Var());
+	row1.append("field4", 4);
+	row1.setFormatter(new JSONRowFormatter);
+	
+	assert(row1.getFormatter().prefix() == "{");
+	assert(row1.getFormatter().postfix() == "]}");
+	assert(row1.getFormatter().getMode() == RowFormatter::FORMAT_PROGRESSIVE);
+	assert(row1.namesToString() == "\"names\":[\"field0\",\"field1\",\"field2\",\"field3\",\"field4\"]");
+	assert(row1.valuesToString() == ",\"values\":[[0,\"1\",\"2007-03-13T08:12:15Z\",null,4]");
+
+	row1.setFormatter(new JSONRowFormatter(JSONRowFormatter::JSON_FMT_MODE_SMALL));
+	assert(row1.getFormatter().getMode() == RowFormatter::FORMAT_PROGRESSIVE);
+	assert(row1.namesToString() == "");
+	assert(row1.valuesToString() == "[[0,\"1\",\"2007-03-13T08:12:15Z\",null,4]");
+	assert(row1.valuesToString() == ",[0,\"1\",\"2007-03-13T08:12:15Z\",null,4]");
+
+	row1.setFormatter(new JSONRowFormatter(JSONRowFormatter::JSON_FMT_MODE_FULL));
+	assert(row1.getFormatter().prefix() == "{\"count\":0,[");
+	assert(row1.getFormatter().postfix() == "]}");
+	assert(row1.getFormatter().getMode() == RowFormatter::FORMAT_PROGRESSIVE);
+	assert(row1.namesToString() == "");
+	assert(row1.valuesToString() == "{\"field0\":0,\"field1\":\"1\",\"field2\":\"2007-03-13T08:12:15Z\",\"field3\":null,\"field4\":4}");
+	assert(row1.valuesToString() == ",{\"field0\":0,\"field1\":\"1\",\"field2\":\"2007-03-13T08:12:15Z\",\"field3\":null,\"field4\":4}");
 }
 
 
@@ -1399,7 +1434,8 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testColumnList);
 	CppUnit_addTest(pSuite, DataTest, testRow);
 	CppUnit_addTest(pSuite, DataTest, testRowSort);
-	CppUnit_addTest(pSuite, DataTest, testRowFormat);
+	CppUnit_addTest(pSuite, DataTest, testSimpleRowFormatter);
+	CppUnit_addTest(pSuite, DataTest, testJSONRowFormatter);
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
 

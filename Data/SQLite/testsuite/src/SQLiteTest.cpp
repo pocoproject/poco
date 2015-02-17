@@ -18,6 +18,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/JSONRowFormatter.h"
 #include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/SQLite/Connector.h"
@@ -49,6 +50,7 @@ using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
+using Poco::Data::JSONRowFormatter;
 using Poco::Data::Column;
 using Poco::Data::Row;
 using Poco::Data::SQLChannel;
@@ -3356,6 +3358,85 @@ void SQLiteTest::testFTS3()
 }
 
 
+void SQLiteTest::testJSONRowFormatter()
+{
+	Session tmp(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert(tmp.isConnected());
+	std::string lastName("Simpson");
+	std::string firstName("Bart");
+	std::string address("Springfield");
+	int age = 12;
+
+	tmp << "DROP TABLE IF EXISTS Simpsons", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Simpsons (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	checkJSON("SELECT * FROM Simpsons", "");
+
+	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", use(lastName), use(firstName), use(address), use(age), now;
+
+	checkJSON("SELECT * FROM Simpsons",
+		"{"
+			"\"names\":[\"LastName\",\"FirstName\",\"Address\",\"Age\"],"
+			"\"values\":[[\"Simpson\",\"Bart\",\"Springfield\",12]]"
+		"}");
+
+	lastName = "Simpson";
+	firstName ="Lisa";
+	address ="Springfield";
+	age = 10;
+	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", use(lastName), use(firstName), use(address), use(age), now;
+
+	checkJSON("SELECT * FROM Simpsons",
+		"{"
+			"\"names\":[\"LastName\",\"FirstName\",\"Address\",\"Age\"],"
+			"\"values\":[[\"Simpson\",\"Bart\",\"Springfield\",12],"
+			            "[\"Simpson\",\"Lisa\",\"Springfield\",10]]"
+		"}");
+
+	checkJSON("SELECT * FROM Simpsons",
+		"{"
+			"[[\"Simpson\",\"Bart\",\"Springfield\",12],"
+			 "[\"Simpson\",\"Lisa\",\"Springfield\",10]]"
+		"}", JSONRowFormatter::JSON_FMT_MODE_SMALL);
+
+	checkJSON("SELECT * FROM Simpsons",
+		"{\"count\":2,"
+			"[[\"Simpson\",\"Bart\",\"Springfield\",12],"
+			 "[\"Simpson\",\"Lisa\",\"Springfield\",10]]"
+		"}", JSONRowFormatter::JSON_FMT_MODE_ROW_COUNT);
+
+	checkJSON("SELECT * FROM Simpsons",
+		"{"
+			"\"names\":[\"LastName\",\"FirstName\",\"Address\",\"Age\"],"
+			"\"values\":[[\"Simpson\",\"Bart\",\"Springfield\",12],"
+						"[\"Simpson\",\"Lisa\",\"Springfield\",10]]"
+		"}", JSONRowFormatter::JSON_FMT_MODE_COLUMN_NAMES);
+
+	checkJSON("SELECT * FROM Simpsons",
+	"{\"count\":2,"
+		"[{\"LastName\":\"Simpson\",\"FirstName\":\"Bart\",\"Address\":\"Springfield\",\"Age\":12},"
+		 "{\"LastName\":\"Simpson\",\"FirstName\":\"Lisa\",\"Address\":\"Springfield\",\"Age\":10}]"
+	"}", JSONRowFormatter::JSON_FMT_MODE_FULL);
+		
+}
+
+
+void SQLiteTest::checkJSON(const std::string& sql, const std::string& json, int mode)
+{
+	Session tmp(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+
+	JSONRowFormatter jf;
+	if (mode > 0)
+		jf.setJSONMode(mode);
+
+	Statement stmt = (tmp << sql, format(jf), now);
+	RecordSet rs(stmt);
+	std::ostringstream ostr;
+	ostr << rs;
+	assert(ostr.str() == json);
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -3456,6 +3537,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTransaction);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);
 	CppUnit_addTest(pSuite, SQLiteTest, testFTS3);
+	CppUnit_addTest(pSuite, SQLiteTest, testJSONRowFormatter);
 
 	return pSuite;
 }
