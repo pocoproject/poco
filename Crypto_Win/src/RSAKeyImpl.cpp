@@ -96,6 +96,7 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 	if (pPrivateKeyStream)
 	{
 		loadPrivateKey(*pPrivateKeyStream, privateKeyPassphrase);
+		// TODO: load public from private when pPublicKeyStream is null
 	}
 
 	if (pPublicKeyStream)
@@ -215,7 +216,7 @@ void RSAKeyImpl::loadPrivateKey(std::istream& istr, const std::string& privateKe
 	}
 
 	if (!CryptImportKey(_sp.handle(), reinterpret_cast<LPBYTE>(keyBuffer.begin()),
-		static_cast<DWORD>(keyBuffer.size()), _hPublicKey, CRYPT_EXPORTABLE, &_hPrivateKey/*&_hPublicKey*/))
+		static_cast<DWORD>(keyBuffer.size()), 0, CRYPT_EXPORTABLE, &_hPrivateKey))
 	{
 		error("Cannot load private key");
 	}
