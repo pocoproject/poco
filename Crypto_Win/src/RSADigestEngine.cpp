@@ -15,10 +15,9 @@
 
 
 #include "Poco/Crypto/RSADigestEngine.h"
+#include "Poco/Buffer.h"
 #include "Poco/Format.h"
 #include "Poco/Error.h"
-#include "Poco/Base64Encoder.h"
-#include <sstream>
 
 
 namespace Poco {
@@ -27,8 +26,10 @@ namespace Crypto {
 
 RSADigestEngine::RSADigestEngine(const RSAKey& key, DigestType digestType):
 	_key(key),
-	_engine(digestType == DIGEST_MD5 ? static_cast<Poco::DigestEngine&>(_md5Engine) : static_cast<Poco::DigestEngine&>(_sha1Engine)),
-	_type(digestType == DIGEST_MD5 ? szOID_RSA_MD5 : szOID_ECDSA_SHA1)
+	_engine(digestType == DIGEST_MD5 ?
+		static_cast<Poco::DigestEngine&>(_md5Engine) :
+		static_cast<Poco::DigestEngine&>(_sha1Engine)),
+	_type(digestType == DIGEST_MD5 ? szOID_RSA_MD5RSA : szOID_RSA_SHA1RSA)
 {
 }
 
@@ -67,21 +68,8 @@ const DigestEngine::Digest& RSADigestEngine::signature()
 	if (_signature.empty())
 	{
 		digest();
-
-		std::string begin = "-----BEGIN RSA PUBLIC KEY-----\n";
-		//TODO: base64 encode data and pass to CryptImportKey API
-		std::string sig(_digest.begin(), _digest.end());
-		std::string end = "\n-----END RSA PUBLIC KEY-----";
-
-		std::ostringstream ostr;
-		Base64Encoder encoder(ostr);
-		encoder << sig;
-		encoder.close();
-
-		begin.append(ostr.str()).append(end);
-		_signature.assign(begin.begin(), begin.end());
+		sign();
 	}
-
 	return _signature;
 }
 
@@ -90,49 +78,106 @@ bool RSADigestEngine::verify(const DigestEngine::Digest& sig)
 {
 	digest();
 
-	DWORD cbData = 0;
-	BYTE* pbData = NULL;
+	DWORD cbDecoded = 0;
+	Poco::Buffer<BYTE> decodedBuf;
+	CRYPT_VERIFY_MESSAGE_PARA verifyParams;
+	verifyParams.cbSize = sizeof(CRYPT_VERIFY_MESSAGE_PARA);
+	verifyParams.dwMsgAndCertEncodingType = PKCS_7_ASN_ENCODING | X509_ASN_ENCODING;
+	verifyParams.hCryptProv = 0;
+	verifyParams.pfnGetSignerCertificate = NULL;
+	verifyParams.pvGetArg = NULL;
 
-	if (CryptExportKey(_key.impl()->privateKey(), 0, PRIVATEKEYBLOB, 0/*???*/,
-		NULL, &cbData))
+	DWORD rc = CryptVerifyMessageSignature(&verifyParams,
+		0, &sig[0], static_cast<DWORD>(sig.size()),
+		NULL, &cbDecoded, NULL);
+	if (rc)
 	{
-		std::vector<BYTE> pkData(cbData);
-		pbData = &pkData[0];
-
-		if (CryptExportKey(_key.impl()->publicKey(), 0, PRIVATEKEYBLOB, 0/*???*/,
-			pbData, &cbData))
-		{
-			// TODO: base64-decode pbData
-		}
-		else // !CryptExportKey
-		{
-			DWORD err = Error::last();
-			std::string errStr = Error::getMessage(err);
-			switch (err)
-			{
-			case ERROR_INVALID_HANDLE: case ERROR_INVALID_PARAMETER:
-			case NTE_BAD_DATA:         case NTE_BAD_FLAGS:
-			case NTE_BAD_KEY:          case NTE_BAD_KEY_STATE:
-			case NTE_BAD_PUBLIC_KEY:   case NTE_BAD_TYPE:
-			case NTE_BAD_UID:          case NTE_NO_KEY:
-				throw Poco::InvalidArgumentException(errStr);
-			default:
-				throw  Poco::SystemException("Cannot export public key.");
-			}
-		}
-	}
-	else // !CryptExportKey length
-	{
-		throw  Poco::SystemException("Cannot obtain key export length.");
+		decodedBuf.resize(cbDecoded);
+		rc = CryptVerifyMessageSignature(&verifyParams,
+			0, &sig[0], static_cast<DWORD>(sig.size()),
+			decodedBuf.begin(), &cbDecoded, NULL);
 	}
 
-	return false;
+	if (!rc)
+	{
+		error("Verification message failed. \n");
+	}
+
+	return (cbDecoded == _digest.size()) &&
+		(std::memcmp(decodedBuf.begin(), &_digest[0], cbDecoded) == 0);
 }
 
 
 void RSADigestEngine::updateImpl(const void* data, std::size_t length)
 {
 	_engine.update(data, length);
+}
+
+
+void RSADigestEngine::sign()
+{
+	HCERTSTORE hCertStore = NULL;
+	hCertStore = CertOpenSystemStore(0, "MY");
+	if (!hCertStore)
+	{
+		error("The certificate store could not be opened.");
+	}
+
+	PCCERT_CONTEXT pSignerCert = NULL;
+	pSignerCert = CertFindCertificateInStore(hCertStore,
+		PKCS_7_ASN_ENCODING | X509_ASN_ENCODING, 0,
+		/*???*/CERT_FIND_ANY, /*???*/NULL, NULL);
+
+	if (!pSignerCert)
+	{
+		error("Signer certificate not found.");
+	}
+
+	CRYPT_SIGN_MESSAGE_PARA  sigParams;
+	sigParams.cbSize = sizeof(CRYPT_SIGN_MESSAGE_PARA);
+	sigParams.dwMsgEncodingType = PKCS_7_ASN_ENCODING | X509_ASN_ENCODING;
+	sigParams.pSigningCert = pSignerCert;
+	sigParams.HashAlgorithm.pszObjId = _type;
+	sigParams.HashAlgorithm.Parameters.cbData = NULL;
+	sigParams.cMsgCert = 1;
+	sigParams.rgpMsgCert = &pSignerCert;
+	sigParams.cAuthAttr = 0;
+	sigParams.dwInnerContentType = 0;
+	sigParams.cMsgCrl = 0;
+	sigParams.cUnauthAttr = 0;
+	sigParams.dwFlags = 0;
+	sigParams.pvHashAuxInfo = NULL;
+	sigParams.rgAuthAttr = NULL;
+
+	const BYTE* messageArray[1] = { &_digest[0] };
+	DWORD messageSizeArray[1] = { static_cast<DWORD>(_digest.size()) };
+	DWORD cbSignedMessageBlob = 0;
+	if (CryptSignMessage(&sigParams,
+		FALSE, 1, messageArray, messageSizeArray,
+		NULL, &cbSignedMessageBlob))
+	{
+		if (cbSignedMessageBlob != _signature.size() && cbSignedMessageBlob > 0)
+			_signature.resize(cbSignedMessageBlob, false);
+		else if (cbSignedMessageBlob == 0)
+			error("Cannot obtain size of the signed message BLOB");
+
+		if (!CryptSignMessage(&sigParams,
+			FALSE, 1, messageArray, messageSizeArray,
+			&_signature[0], &cbSignedMessageBlob))
+		{
+			error("Cannot get signed BLOB");
+		}
+	}
+	else
+	{
+		error("Getting signed BLOB size failed");
+	}
+
+	if (pSignerCert)
+		CertFreeCertificateContext(pSignerCert);
+
+	if (hCertStore)
+		CertCloseStore(hCertStore, CERT_CLOSE_STORE_CHECK_FLAG);
 }
 
 

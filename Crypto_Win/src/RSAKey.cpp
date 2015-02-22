@@ -17,9 +17,6 @@
 #include "Poco/Crypto/RSAKey.h"
 
 
-// TODO: this is still OpenSSL code
-
-
 namespace Poco {
 namespace Crypto {
 

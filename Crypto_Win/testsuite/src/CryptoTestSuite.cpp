@@ -12,7 +12,7 @@
 
 #include "CryptoTestSuite.h"
 #include "CryptoTest.h"
-//#include "RSATest.h"
+#include "RSATest.h"
 #include "DigestEngineTest.h"
 
 
@@ -21,7 +21,7 @@ CppUnit::Test* CryptoTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("CryptoTestSuite");
 
 	pSuite->addTest(CryptoTest::suite());
-//	pSuite->addTest(RSATest::suite());
+	pSuite->addTest(RSATest::suite());
 	pSuite->addTest(DigestEngineTest::suite());
 
 	return pSuite;

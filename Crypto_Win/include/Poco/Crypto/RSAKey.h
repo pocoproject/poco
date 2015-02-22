@@ -58,7 +58,7 @@ public:
 	explicit RSAKey(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
 
-	RSAKey(KeyLength keyLength, Exponent exp);
+	RSAKey(KeyLength keyLength, Exponent exp = EXP_SMALL);
 		/// Creates the RSAKey. Creates a new public/private key pair using the given parameters.
 		/// Can be used to sign data and verify signatures.
 		///

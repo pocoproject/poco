@@ -30,20 +30,17 @@
     <ClInclude Include="src\CryptoTest.h">
       <Filter>Crypto\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DigestEngineTest.h">
-      <Filter>Crypto\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\RSATest.h">
       <Filter>Crypto\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\CryptoTestSuite.h">
       <Filter>_Suite\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DigestEngineTest.h">
+      <Filter>Crypto\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\DigestEngineTest.cpp">
-      <Filter>Crypto\Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\CryptoTest.cpp">
       <Filter>Crypto\Source Files</Filter>
     </ClCompile>
@@ -55,6 +52,9 @@
     </ClCompile>
     <ClCompile Include="src\Driver.cpp">
       <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DigestEngineTest.cpp">
+      <Filter>Crypto\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

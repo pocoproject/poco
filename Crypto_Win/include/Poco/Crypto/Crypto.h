@@ -23,6 +23,12 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Error.h"
+#include "Poco/Format.h"
+
+
+namespace Poco {
+namespace Crypto {
 
 
 enum RSAPaddingMode
@@ -30,20 +36,31 @@ enum RSAPaddingMode
 {
 	RSA_PADDING_PKCS1,
 		/// PKCS #1 v1.5 padding. This currently is the most widely used mode. 
-		
+
 	RSA_PADDING_PKCS1_OAEP,
 		/// EME-OAEP as defined in PKCS #1 v2.0 with SHA-1, MGF1 and an empty 
 		/// encoding parameter. This mode is recommended for all new applications.
-		
+
 	RSA_PADDING_SSLV23,
 		/// PKCS #1 v1.5 padding with an SSL-specific modification that denotes 
 		/// that the server is SSL3 capable. 
-		
+
 	RSA_PADDING_NONE
 		/// Raw RSA encryption. This mode should only be used to implement cryptographically 
 		/// sound padding modes in the application code. Encrypting user data directly with RSA 
 		/// is insecure. 
 };
+
+
+inline void error(const char* msg)
+	/// Formats the error message and throws SystemException.
+{
+	DWORD err = Poco::Error::last();
+	throw Poco::SystemException(Poco::format("%s: [%s]", std::string(msg), Error::getMessage(err)));
+}
+
+
+} }
 
 
 //

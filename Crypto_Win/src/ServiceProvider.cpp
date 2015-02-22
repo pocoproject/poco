@@ -24,16 +24,13 @@ namespace Crypto {
 
 ServiceProvider::ServiceProvider()
 {
-	BOOL ok = CryptAcquireContext(
-		&_handle,
+	if(!CryptAcquireContext(&_handle,
 		NULL,
 		MS_ENH_RSA_AES_PROV,
 		PROV_RSA_AES,
-		CRYPT_VERIFYCONTEXT | CRYPT_SILENT);
-	if (!ok)
+		CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
 	{
-		DWORD err = GetLastError();
-		throw Poco::SystemException("Cannot acquire crypt context", err);
+		error("Cannot acquire crypt context");
 	}
 }
 

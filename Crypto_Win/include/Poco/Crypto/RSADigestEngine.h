@@ -91,6 +91,8 @@ protected:
 	void updateImpl(const void* data, std::size_t length);
 
 private:
+	void sign();
+
 	RSAKey                     _key;
 	Poco::DigestEngine&        _engine;
 	LPSTR                      _type;

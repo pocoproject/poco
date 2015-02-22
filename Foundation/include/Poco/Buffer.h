@@ -38,7 +38,7 @@ class Buffer
 	/// is needed.
 {
 public:
-	Buffer(std::size_t capacity):
+	Buffer(std::size_t capacity = 0):
 		_capacity(capacity),
 		_used(capacity),
 		_ptr(0),
@@ -316,8 +316,6 @@ public:
 	}
 
 private:
-	Buffer();
-
 	std::size_t _capacity;
 	std::size_t _used;
 	T*          _ptr;

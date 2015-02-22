@@ -24,16 +24,11 @@
 #include "Poco/Crypto/ServiceProvider.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Buffer.h"
 #include <istream>
 #include <ostream>
 #include <vector>
 
-/*
-struct bignum_st;
-struct rsa_st;
-typedef struct bignum_st BIGNUM;
-typedef struct rsa_st RSA;
-*/
 
 namespace Poco {
 namespace Crypto {
@@ -54,6 +49,7 @@ public:
 	RSAKeyImpl(int keyLength, unsigned long exponent);
 		/// Creates the RSAKey. Creates a new public/private keypair using the given parameters.
 		/// Can be used to sign data and verify signatures.
+		/// The exponent argument is only for OpenSSL compatibility and not used.
 
 	RSAKeyImpl(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase);
 		/// Creates the RSAKey, by reading public and private key from the given files and
@@ -62,8 +58,8 @@ public:
 
 	RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase);
 		/// Creates the RSAKey. Can only by used for signing if pPrivKey
-		/// is not null. If a private key file is specified, you don't need to
-		/// specify a public key file. OpenSSL will auto-create it from the private key.
+		/// is not null. If a private key file is specified, public key file
+		/// does not need to be specified, it will be auto-created from the private key.
 
 	~RSAKeyImpl();
 		/// Destroys the RSAKeyImpl.
@@ -71,13 +67,17 @@ public:
 	int size() const;
 		/// Returns the RSA modulus size.
 
-	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
+	void save(const std::string& publicKeyFile,
+		const std::string& privateKeyFile = "",
+		const std::string& privateKeyPassphrase = "");
 		/// Exports the public and private keys to the given files. 
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
 
-	void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
+	void save(std::ostream* pPublicKeyStream,
+		std::ostream* pPrivateKeyStream = 0,
+		const std::string& privateKeyPassphrase = "");
 		/// Exports the public and private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding
@@ -90,17 +90,43 @@ public:
 		/// Returns the underlying Windows-specific handle for the public key.
 
 protected:
+	enum CryptDirection
+	{
+		CRYPT_DIR_ENCRYPT,
+		CRYPT_DIR_DECRYPT,
+	};
+
 	const ServiceProvider& serviceProvider() const;
 
-	void loadPrivateKey(std::istream& istr);
+	void exportKey(HCRYPTKEY hKey, int type, Poco::Buffer<char>& keyBuffer);
+
+	void extractPublicKey();
+
+	void importPublicKey(Poco::Buffer<char>& keyBuffer);
+
+	void loadPrivateKey(std::istream& istr,
+		const std::string& privateKeyPassphrase = "");
+
 	void loadPublicKey(std::istream& istr);
-	void savePrivateKey(std::ostream& ostr);
+
+	void savePrivateKey(std::ostream& ostr,
+		const std::string& privateKeyPassphrase = "");
+
 	void savePublicKey(std::ostream& ostr);
 
+	void crypt(Poco::Buffer<char>& data,
+		const std::string& privateKeyPassphrase,
+		CryptDirection dir);
+
 private:
+	static const char* BEGIN_RSA_PRIVATE;
+	static const char* END_RSA_PRIVATE;
+	static const char* BEGIN_RSA_PUBLIC;
+	static const char* END_RSA_PUBLIC;
+
 	ServiceProvider _sp;
-	HCRYPTKEY _hPrivateKey;
-	HCRYPTKEY _hPublicKey;
+	HCRYPTKEY       _hPrivateKey;
+	HCRYPTKEY       _hPublicKey;
 
 	friend class RSACipherImpl;
 };
