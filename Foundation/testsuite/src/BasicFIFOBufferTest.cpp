@@ -14,6 +14,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/FIFOBuffer.h"
+#include <iostream>
 #include <memory>
 #include <cstring>
 
@@ -38,6 +39,7 @@ void BasicFIFOBufferTest::testNextWrite()
 	BasicFIFOBuffer<char> buffer(128);
 	buffer.write(text.data(), text.size());
 	char c_buffer[buffer.size()];
+	std::memset(c_buffer, 0, buffer.size());
 	
 	buffer.read(c_buffer, 4);
 
