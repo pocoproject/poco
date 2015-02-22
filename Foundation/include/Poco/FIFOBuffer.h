@@ -352,6 +352,11 @@ public:
 	T* begin()
 		/// Returns the pointer to the beginning of the buffer.
 	{
+		if (_begin != 0)
+		{
+			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used * sizeof(T));
+			_begin = 0;
+		}
 		return _buffer.begin();
 	}
 
@@ -360,6 +365,12 @@ public:
 	{
 		if (available() == 0)
 			throw InvalidAccessException("Buffer is full.");
+
+		if (_begin != 0)
+		{
+			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used * sizeof(T));
+			_begin = 0;
+		}
 
 		return _buffer.begin() + _used;
 	}
