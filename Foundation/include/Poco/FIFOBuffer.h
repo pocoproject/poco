@@ -344,6 +344,12 @@ public:
 		if (!isWritable())
 			throw Poco::InvalidAccessException("Buffer not writable.");
 
+		if (_buffer.size() - (_begin + _used) < length)
+		{
+			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used * sizeof(T));
+			_begin = 0;
+		}
+
 		std::size_t usedBefore = _used;
 		_used += length;
 		if (_notify) notify(usedBefore);
@@ -352,6 +358,7 @@ public:
 	T* begin()
 		/// Returns the pointer to the beginning of the buffer.
 	{
+		Mutex::ScopedLock lock(_mutex);
 		if (_begin != 0)
 		{
 			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used * sizeof(T));
@@ -363,6 +370,7 @@ public:
 	T* next()
 		/// Returns the pointer to the next available position in the buffer.
 	{
+		Mutex::ScopedLock lock(_mutex);
 		if (available() == 0)
 			throw InvalidAccessException("Buffer is full.");
 
