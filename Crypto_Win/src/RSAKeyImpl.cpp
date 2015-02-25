@@ -209,8 +209,7 @@ void RSAKeyImpl::loadPrivateKey(std::istream& istr, const std::string& privateKe
 	Poco::Buffer<char> keyBuffer(size);
 	if (!CryptDecodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY,
 		reinterpret_cast<LPBYTE>(const_cast<char*>(der.data())),
-		static_cast<DWORD>(der.size()),
-		0, NULL, keyBuffer.begin(), &size))
+		static_cast<DWORD>(der.size()), 0, NULL, keyBuffer.begin(), &size))
 	{
 		error("Failed to decode private key");
 	}
@@ -258,10 +257,14 @@ void RSAKeyImpl::loadPublicKey(std::istream& istr)
 	Poco::Buffer<char> keyBuffer(size);
 	if (!CryptDecodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, RSA_CSP_PUBLICKEYBLOB,
 		reinterpret_cast<LPBYTE>(const_cast<char*>(der.data())),
-		static_cast<DWORD>(der.size()),
-		0, NULL, keyBuffer.begin(), &size))
+		static_cast<DWORD>(der.size()), 0, NULL, keyBuffer.begin(), &size))
 	{
 		error("Failed to decode public key");
+	}
+
+	if (!_hPublicKey && _hPrivateKey)
+	{
+		exportKey(_hPrivateKey, PUBLICKEYBLOB, keyBuffer);
 	}
 
 	if (!CryptImportKey(_sp.handle(), reinterpret_cast<LPBYTE>(keyBuffer.begin()),
@@ -369,35 +372,35 @@ void RSAKeyImpl::savePrivateKey(std::ostream& ostr, const std::string& privateKe
 
 void RSAKeyImpl::savePublicKey(std::ostream& ostr)
 {
+	Poco::Buffer<char> keyBuffer;
 	if (_hPublicKey)
-	{
-		Poco::Buffer<char> keyBuffer;
 		exportKey(_hPublicKey, PUBLICKEYBLOB, keyBuffer);
-
-		DWORD size = 0;
-		if (!CryptEncodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-			RSA_CSP_PUBLICKEYBLOB, keyBuffer.begin(), 0, NULL, NULL, &size))
-		{
-			error("Failed to obtain length of data needed to encode public key");
-		}
-
-		Poco::Buffer<char> derBuffer(size);
-		if (!CryptEncodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-			RSA_CSP_PUBLICKEYBLOB, keyBuffer.begin(), 0, NULL, derBuffer.begin(), &size))
-		{
-			error("Failed to encode public key");
-		}
-
-		ostr << BEGIN_RSA_PUBLIC;
-		std::ostringstream os;
-		Poco::Base64Encoder enc(os);
-		enc.rdbuf()->setLineLength(64);
-		enc << std::string(derBuffer.begin(), derBuffer.size());
-		enc.close();
-		ostr << os.str() << END_RSA_PUBLIC << std::flush;
-	}
+	else if (_hPrivateKey)
+		exportKey(_hPrivateKey, PUBLICKEYBLOB, keyBuffer);
 	else
-		throw Poco::IllegalStateException("No public key.");
+	throw Poco::IllegalStateException("No public key.");
+
+	DWORD size = 0;
+	if (!CryptEncodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+		RSA_CSP_PUBLICKEYBLOB, keyBuffer.begin(), 0, NULL, NULL, &size))
+	{
+		error("Failed to obtain length of data needed to encode public key");
+	}
+
+	Poco::Buffer<char> derBuffer(size);
+	if (!CryptEncodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+		RSA_CSP_PUBLICKEYBLOB, keyBuffer.begin(), 0, NULL, derBuffer.begin(), &size))
+	{
+		error("Failed to encode public key");
+	}
+
+	ostr << BEGIN_RSA_PUBLIC;
+	std::ostringstream os;
+	Poco::Base64Encoder enc(os);
+	enc.rdbuf()->setLineLength(64);
+	enc << std::string(derBuffer.begin(), derBuffer.size());
+	enc.close();
+	ostr << os.str() << END_RSA_PUBLIC << std::flush;
 }
 
 
@@ -425,23 +428,23 @@ void RSAKeyImpl::crypt(Poco::Buffer<char>& data, const std::string& privateKeyPa
 
 				if (rc)
 				{
+					DWORD size = static_cast<DWORD>(data.size());
+
 					if (dir == CRYPT_DIR_ENCRYPT)
 					{
-						DWORD encSize = static_cast<DWORD>(data.size());
 						rc = CryptEncrypt(hSecretKey, NULL, TRUE, 0,
-							reinterpret_cast<LPBYTE>(data.begin()), &encSize,
+							reinterpret_cast<LPBYTE>(data.begin()), &size,
 							static_cast<DWORD>(data.size()));
-						poco_assert_dbg(encSize <= data.size());
 					}
 					else if (dir == CRYPT_DIR_DECRYPT)
 					{
-						DWORD decSize = static_cast<DWORD>(data.size());
 						rc = CryptDecrypt(hSecretKey, NULL, TRUE, 0,
-							reinterpret_cast<LPBYTE>(data.begin()), &decSize);
-						poco_assert_dbg(decSize <= data.size());
+							reinterpret_cast<LPBYTE>(data.begin()), &size);
 					}
 					else
 						throw Poco::InvalidAccessException("Bad crypt direction");
+
+					poco_assert_dbg(size <= data.size());
 				}
 			}
 		}

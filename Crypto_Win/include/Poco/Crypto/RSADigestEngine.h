@@ -100,6 +100,7 @@ private:
 	Poco::DigestEngine::Digest _signature;
 	Poco::MD5Engine            _md5Engine;
 	Poco::SHA1Engine           _sha1Engine;
+	HCERTSTORE                 _hCertStore;
 };
 
 

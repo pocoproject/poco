@@ -29,13 +29,20 @@ RSADigestEngine::RSADigestEngine(const RSAKey& key, DigestType digestType):
 	_engine(digestType == DIGEST_MD5 ?
 		static_cast<Poco::DigestEngine&>(_md5Engine) :
 		static_cast<Poco::DigestEngine&>(_sha1Engine)),
-	_type(digestType == DIGEST_MD5 ? szOID_RSA_MD5RSA : szOID_RSA_SHA1RSA)
+	_type(digestType == DIGEST_MD5 ? szOID_RSA_MD5RSA : szOID_RSA_SHA1RSA),
+	_hCertStore(CertOpenSystemStore(0, "MY"))
 {
+	if (!_hCertStore)
+	{
+		error("The \"MY\" certificate store could not be opened.");
+	}
 }
 
 
 RSADigestEngine::~RSADigestEngine()
 {
+	if (_hCertStore)
+		CertCloseStore(_hCertStore, CERT_CLOSE_STORE_CHECK_FLAG);
 }
 
 
@@ -116,15 +123,8 @@ void RSADigestEngine::updateImpl(const void* data, std::size_t length)
 
 void RSADigestEngine::sign()
 {
-	HCERTSTORE hCertStore = NULL;
-	hCertStore = CertOpenSystemStore(0, "MY");
-	if (!hCertStore)
-	{
-		error("The certificate store could not be opened.");
-	}
-
 	PCCERT_CONTEXT pSignerCert = NULL;
-	pSignerCert = CertFindCertificateInStore(hCertStore,
+	pSignerCert = CertFindCertificateInStore(_hCertStore,
 		PKCS_7_ASN_ENCODING | X509_ASN_ENCODING, 0,
 		/*???*/CERT_FIND_ANY, /*???*/NULL, NULL);
 
@@ -170,14 +170,14 @@ void RSADigestEngine::sign()
 	}
 	else
 	{
+		if (pSignerCert)
+			CertFreeCertificateContext(pSignerCert);
+
 		error("Getting signed BLOB size failed");
 	}
 
 	if (pSignerCert)
 		CertFreeCertificateContext(pSignerCert);
-
-	if (hCertStore)
-		CertCloseStore(hCertStore, CERT_CLOSE_STORE_CHECK_FLAG);
 }
 
 

@@ -28,13 +28,6 @@ namespace Crypto {
 
 namespace
 {
-	void throwError()
-	{
-		DWORD err = Error::last();
-		std::string errStr = Error::getMessage(err);
-		throw Poco::IOException(errStr);
-	}
-
 	/*
 	int mapPaddingMode(RSAPaddingMode paddingMode)
 	{
@@ -61,48 +54,25 @@ namespace
 	}
 	*/
 
-	std::size_t rsaBlockSize(const ServiceProvider& rsa)
+	std::size_t rsaBlockSize(RSAKeyImpl::Ptr pKey)
 	{
-		BYTE* pbData = NULL;
-		DWORD dwDataLen = 0;
-		// ??? (from documentation) "This function must not be used on a thread of a multithreaded program." ???
-		if (CryptGetProvParam(rsa.handle(), PP_SESSION_KEYSIZE, NULL, &dwDataLen, 0))
-		{
-			std::vector<BYTE> data(dwDataLen);
-			pbData = &data[0];
-			if (CryptGetProvParam(rsa.handle(), PP_SESSION_KEYSIZE, pbData, &dwDataLen, 0))
-			{
-				// ??? what is in pbData? DWORD? BYTE? TODO: check at runtime
-			}
-			else // !CryptGetProvParam
-			{
-				DWORD err = Error::last();
-				std::string errStr = "[RSAEncryptImpl::blockSize()]: ";
-				errStr += Error::getMessage(err);
-				switch (err)
-				{
-				case ERROR_INVALID_HANDLE: case ERROR_INVALID_PARAMETER:
-				case ERROR_MORE_DATA:      case NTE_BAD_FLAGS:
-				case NTE_BAD_TYPE:         case NTE_BAD_UID:
-					throw Poco::InvalidArgumentException(errStr);
-				default:
-					throw  Poco::SystemException(errStr);
-				}
-			}
-		} // !CryptGetProvParam length
-		else
-		{
-			throw  Poco::SystemException("Cannot obtain length for block size value.");
-		}
+		DWORD blockLen = 0;
+		DWORD dataLen = sizeof(DWORD);
 
-		return static_cast<std::size_t>(dwDataLen);
+		if (!CryptGetKeyParam(pKey->privateKey(), KP_BLOCKLEN, reinterpret_cast<LPBYTE>(&blockLen), &dataLen, 0))
+		{
+			error("Cannot obtain RSA block length");
+		}
+		poco_assert_dbg(dataLen = blockLen);
+
+		return static_cast<std::size_t>(blockLen / 8);
 	}
 
 
 	class RSAEncryptImpl: public CryptoTransform
 	{
 	public:
-		RSAEncryptImpl(const ServiceProvider& rsa, RSAPaddingMode paddingMode);
+		RSAEncryptImpl(const ServiceProvider& sp, RSAKeyImpl::Ptr pKey, RSAPaddingMode paddingMode);
 		~RSAEncryptImpl();
 		
 		std::size_t blockSize() const;
@@ -119,15 +89,18 @@ namespace
 	private:
 		DWORD encrypt(unsigned char* output, std::streamsize outputLength, BOOL isFinal);
 
-		const ServiceProvider& _rsa;
+
+		RSAKeyImpl::Ptr        _pKey;
+		const ServiceProvider& _sp;
 		RSAPaddingMode         _paddingMode;
 		std::streamsize        _pos;
 		unsigned char*         _pBuf;
 	};
 
 
-	RSAEncryptImpl::RSAEncryptImpl(const ServiceProvider& rsa, RSAPaddingMode paddingMode) :
-			_rsa(rsa),
+	RSAEncryptImpl::RSAEncryptImpl(const ServiceProvider& sp, RSAKeyImpl::Ptr pKey, RSAPaddingMode paddingMode) :
+			_pKey(pKey),
+			_sp(sp),
 			_paddingMode(paddingMode),
 			_pos(0),
 			_pBuf(0)
@@ -144,13 +117,12 @@ namespace
 
 	std::size_t RSAEncryptImpl::blockSize() const
 	{
-		return rsaBlockSize(_rsa);
+		return rsaBlockSize(_pKey);
 	}
 
 
 	std::size_t RSAEncryptImpl::maxDataSize() const
 	{
-		// ??? same as openssl?
 		std::size_t size = blockSize();
 		switch (_paddingMode)
 		{
@@ -170,15 +142,15 @@ namespace
 	DWORD RSAEncryptImpl::encrypt(unsigned char* output, std::streamsize outputLength, BOOL isFinal)
 	{
 		DWORD n = static_cast<DWORD>(_pos + 1);
-		if (!CryptEncrypt(_rsa.handle(), NULL, isFinal, 0, NULL, &n, 0))
-			throwError();
+		if (!CryptEncrypt(_pKey->publicKey(), NULL, isFinal, 0, NULL, &n, 0))
+			error("RSACipher cannot obtain length of encrypted data");
 		poco_assert(n > _pos);
 		poco_assert_dbg(n <= maxDataSize());
 		std::vector<BYTE> data(n);
 		n = static_cast<DWORD>(_pos + 1);
 		std::memcpy(&data[0], _pBuf, n);
-		if (!CryptEncrypt(_rsa.handle(), NULL, isFinal, 0, &data[0], &n, n))
-			throwError();
+		if (!CryptEncrypt(_sp.handle(), NULL, isFinal, 0, &data[0], &n, data.size()))
+			error("RSACipher cannot encrypt data");
 		poco_assert(n <= outputLength);
 		std::memcpy(output, &data[0], n);
 		return n;
@@ -244,13 +216,12 @@ namespace
 	class RSADecryptImpl: public CryptoTransform
 	{
 	public:
-		RSADecryptImpl(const ServiceProvider& rsa, RSAPaddingMode paddingMode);
+		RSADecryptImpl(const ServiceProvider& sp, RSAKeyImpl::Ptr pKey, RSAPaddingMode paddingMode);
 		~RSADecryptImpl();
 		
 		std::size_t blockSize() const;
 
-		std::streamsize transform(
-			const unsigned char* input,
+		std::streamsize transform(const unsigned char* input,
 			std::streamsize		 inputLength,
 			unsigned char*		 output,
 			std::streamsize		 outputLength);
@@ -262,15 +233,17 @@ namespace
 	private:
 		DWORD decrypt(unsigned char* output, std::streamsize outputLength, BOOL isFinal);
 
-		const ServiceProvider& _rsa;
+		const ServiceProvider& _sp;
+		RSAKeyImpl::Ptr        _pKey;
 		RSAPaddingMode         _paddingMode;
 		std::streamsize        _pos;
 		unsigned char*         _pBuf;
 	};
 
 
-	RSADecryptImpl::RSADecryptImpl(const ServiceProvider& rsa, RSAPaddingMode paddingMode) :
-			_rsa(rsa),
+	RSADecryptImpl::RSADecryptImpl(const ServiceProvider& sp, RSAKeyImpl::Ptr pKey, RSAPaddingMode paddingMode) :
+			_pKey(pKey),
+			_sp(sp),
 			_paddingMode(paddingMode),
 			_pos(0),
 			_pBuf(0)
@@ -287,29 +260,28 @@ namespace
 
 	std::size_t RSADecryptImpl::blockSize() const
 	{
-		return rsaBlockSize(_rsa);
+		return rsaBlockSize(_pKey);
 	}
 
 	DWORD RSADecryptImpl::decrypt(unsigned char* output, std::streamsize outputLength, BOOL isFinal)
 	{
 		DWORD n = static_cast<DWORD>(_pos + 1);
-		if (!CryptDecrypt(_rsa.handle(), NULL, isFinal, 0, NULL, &n))
-			throwError();
+		if (!CryptDecrypt(_sp.handle(), NULL, isFinal, 0, NULL, &n))
+			error("RSACipher cannot obtain length of decrypted data");
 		poco_assert(n > _pos);
 		//poco_assert_dbg(n <= maxDataSize());
 		std::vector<BYTE> data(n);
 		n = static_cast<DWORD>(_pos + 1);
 		std::memcpy(&data[0], _pBuf, n);
-		if (!CryptDecrypt(_rsa.handle(), NULL, isFinal, 0, &data[0], &n))
-			throwError();
+		if (!CryptDecrypt(_sp.handle(), NULL, isFinal, 0, &data[0], &n))
+			error("RSACipher cannot decrypt data");
 		poco_assert(n <= outputLength);
 		std::memcpy(output, &data[0], n);
 		return n;
 	}
 
 
-	std::streamsize RSADecryptImpl::transform(
-		const unsigned char* input,
+	std::streamsize RSADecryptImpl::transform(const unsigned char* input,
 		std::streamsize		 inputLength,
 		unsigned char*		 output,
 		std::streamsize		 outputLength)
@@ -329,8 +301,7 @@ namespace
 			{
 				//int tmp = RSA_private_decrypt(static_cast<int>(rsaSize), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 				DWORD tmp = decrypt(output, outputLength, FALSE);
-				if (tmp == -1)
-					throwError();
+				if (tmp == -1) error("RSACipher cannot transform data");
 				rc += tmp;
 				output += tmp;
 				outputLength -= tmp;
@@ -360,8 +331,7 @@ namespace
 		{
 			//rc = RSA_private_decrypt(static_cast<int>(_pos), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 			rc = decrypt(output, length, TRUE);
-			if (rc == -1)
-				throwError();
+			if (rc == -1) error("RSACipher cannot transform data");
 		}
 		return rc;
 	}
@@ -382,13 +352,13 @@ RSACipherImpl::~RSACipherImpl()
 
 CryptoTransform* RSACipherImpl::createEncryptor()
 {
-	return new RSAEncryptImpl(_key.impl()->serviceProvider(), _paddingMode);
+	return new RSAEncryptImpl(_key.impl()->serviceProvider(), _key.impl(), _paddingMode);
 }
 
 
 CryptoTransform* RSACipherImpl::createDecryptor()
 {
-	return new RSADecryptImpl(_key.impl()->serviceProvider(), _paddingMode);
+	return new RSADecryptImpl(_key.impl()->serviceProvider(), _key.impl(), _paddingMode);
 }
 
 
