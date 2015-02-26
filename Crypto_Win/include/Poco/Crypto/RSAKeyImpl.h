@@ -124,9 +124,10 @@ private:
 	static const char* BEGIN_RSA_PUBLIC;
 	static const char* END_RSA_PUBLIC;
 
-	ServiceProvider _sp;
-	HCRYPTKEY       _hPrivateKey;
-	HCRYPTKEY       _hPublicKey;
+	ServiceProvider    _sp;
+	HCRYPTKEY          _hPrivateKey;
+	HCRYPTKEY          _hPublicKey;
+	//Poco::Buffer<BYTE> _bufInitVector;
 
 	friend class RSACipherImpl;
 };

@@ -174,6 +174,7 @@ void RSAKeyImpl::loadPrivateKey(std::istream& istr, const std::string& privateKe
 	std::string der;
 	std::size_t beginLen = std::strlen(BEGIN_RSA_PRIVATE);
 	std::size_t endLen = std::strlen(END_RSA_PRIVATE);
+	Poco::Buffer<char> derBuffer(der.data(), der.size());
 
 	Poco::StreamCopier::copyToString(istr, pem);
 	
@@ -187,29 +188,29 @@ void RSAKeyImpl::loadPrivateKey(std::istream& istr, const std::string& privateKe
 		if (pemEnd == pemBegin)
 			throw Poco::DataFormatException("Not a valid PEM file - end marker missing");
 
-		Poco::Buffer<char> pemBuffer(pemBegin, pemEnd - pemBegin);
-		if (!privateKeyPassphrase.empty())
-		{
-			crypt(pemBuffer, privateKeyPassphrase, CRYPT_DIR_DECRYPT);
-		}
-
-		Poco::MemoryInputStream mis(pemBuffer.begin(), pemBuffer.size());
+		Poco::MemoryInputStream mis(pemBegin, pemEnd - pemBegin);
 		Poco::Base64Decoder dec(mis);
 		Poco::StreamCopier::copyToString(dec, der);
+
+		derBuffer.assign(der.data(), der.size());
+		if (!privateKeyPassphrase.empty())
+		{
+			crypt(derBuffer, privateKeyPassphrase, CRYPT_DIR_DECRYPT);
+		}
 	}
 
 	DWORD size = 0;
 	if (!CryptDecodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY,
-		reinterpret_cast<LPBYTE>(const_cast<char*>(der.data())),
-		static_cast<DWORD>(der.size()), 0, NULL, NULL, &size))
+		reinterpret_cast<LPBYTE>(const_cast<char*>(derBuffer.begin())),
+		static_cast<DWORD>(derBuffer.size()), 0, NULL, NULL, &size))
 	{
 		error("Failed to obtain length of data needed to decode private key");
 	}
 
 	Poco::Buffer<char> keyBuffer(size);
 	if (!CryptDecodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY,
-		reinterpret_cast<LPBYTE>(const_cast<char*>(der.data())),
-		static_cast<DWORD>(der.size()), 0, NULL, keyBuffer.begin(), &size))
+		reinterpret_cast<LPBYTE>(const_cast<char*>(derBuffer.begin())),
+		static_cast<DWORD>(derBuffer.size()), 0, NULL, keyBuffer.begin(), &size))
 	{
 		error("Failed to decode private key");
 	}
@@ -344,6 +345,11 @@ void RSAKeyImpl::savePrivateKey(std::ostream& ostr, const std::string& privateKe
 			error("Failed to encode private key");
 		}
 
+		if (!privateKeyPassphrase.empty())
+		{
+			crypt(derBuffer, privateKeyPassphrase, CRYPT_DIR_ENCRYPT);
+		}
+
 		ostr << BEGIN_RSA_PRIVATE;
 		std::ostringstream os;
 		Poco::Base64Encoder enc(os);
@@ -351,19 +357,7 @@ void RSAKeyImpl::savePrivateKey(std::ostream& ostr, const std::string& privateKe
 		enc << std::string(derBuffer.begin(), derBuffer.size()) << std::flush;
 		enc.close();
 
-		if (!privateKeyPassphrase.empty())
-		{
-			std::string encPEM(os.str());
-			keyBuffer.assign(encPEM.c_str(), encPEM.size());
-			crypt(keyBuffer, privateKeyPassphrase, CRYPT_DIR_ENCRYPT);
-			ostr.write(keyBuffer.begin(), keyBuffer.size());
-		}
-		else
-		{
-			ostr << os.str();
-		}
-
-		ostr << END_RSA_PRIVATE << std::flush;
+		ostr << os.str() << END_RSA_PRIVATE << std::flush;
 	}
 	else
 		throw Poco::IllegalStateException("No private key.");
@@ -404,6 +398,24 @@ void RSAKeyImpl::savePublicKey(std::ostream& ostr)
 }
 
 
+BOOL setIV(HCRYPTPROV hProvider, HCRYPTKEY hKey)
+{
+	BOOL  bResult;
+	BYTE  *pbTemp;
+	DWORD dwBlockLen, dwDataLen;
+
+	dwDataLen = sizeof(dwBlockLen);
+	if (!CryptGetKeyParam(hKey, KP_BLOCKLEN, (BYTE *)&dwBlockLen, &dwDataLen, 0))
+		return FALSE;
+	dwBlockLen /= 8;
+	if (!(pbTemp = (BYTE *)LocalAlloc(LMEM_FIXED, dwBlockLen))) return FALSE;
+	bResult = CryptGenRandom(hProvider, dwBlockLen, pbTemp);
+	if (bResult)
+		bResult = CryptSetKeyParam(hKey, KP_IV, pbTemp, 0);
+	LocalFree(pbTemp);
+	return bResult;
+}
+
 void RSAKeyImpl::crypt(Poco::Buffer<char>& data, const std::string& privateKeyPassphrase, CryptDirection dir)
 {
 	if (privateKeyPassphrase.empty())
@@ -413,7 +425,7 @@ void RSAKeyImpl::crypt(Poco::Buffer<char>& data, const std::string& privateKeyPa
 	HCRYPTHASH hHash = 0;
 	try
 	{
-		DWORD rc = CryptCreateHash(_sp.handle(), CALG_MD5, 0, 0, &hHash);
+		BOOL rc = CryptCreateHash(_sp.handle(), CALG_SHA1, 0, 0, &hHash);
 
 		if (rc)
 		{
@@ -423,28 +435,45 @@ void RSAKeyImpl::crypt(Poco::Buffer<char>& data, const std::string& privateKeyPa
 
 			if (rc)
 			{
-				rc = CryptDeriveKey(_sp.handle(), CALG_RC4,
-					hHash, 0x00800000, &hSecretKey);
-
+				rc = CryptDeriveKey(_sp.handle(), CALG_3DES,
+					hHash, 0, &hSecretKey);
 				if (rc)
 				{
-					DWORD size = static_cast<DWORD>(data.size());
-
-					if (dir == CRYPT_DIR_ENCRYPT)
+					DWORD dwMode = CRYPT_MODE_CBC;
+					rc = CryptSetKeyParam(hSecretKey, KP_MODE, reinterpret_cast<LPBYTE>(&dwMode), 0);
+					if (rc)
 					{
-						rc = CryptEncrypt(hSecretKey, NULL, TRUE, 0,
-							reinterpret_cast<LPBYTE>(data.begin()), &size,
-							static_cast<DWORD>(data.size()));
-					}
-					else if (dir == CRYPT_DIR_DECRYPT)
-					{
-						rc = CryptDecrypt(hSecretKey, NULL, TRUE, 0,
-							reinterpret_cast<LPBYTE>(data.begin()), &size);
-					}
-					else
-						throw Poco::InvalidAccessException("Bad crypt direction");
+						//TODO: do we need IV (and PEM header)?
+						//rc = setIV(_sp.handle(), hSecretKey);
+						//if (rc)
+						{
+							DWORD size = static_cast<DWORD>(data.size());
 
-					poco_assert_dbg(size <= data.size());
+							if (dir == CRYPT_DIR_ENCRYPT)
+							{
+								rc = CryptEncrypt(hSecretKey, NULL, TRUE, 0,
+									NULL, &size, 0);
+
+								if (rc)
+								{
+									DWORD plainSize = static_cast<DWORD>(data.size());
+									if (size != data.size()) data.resize(size, true);
+									rc = CryptEncrypt(hSecretKey, NULL, TRUE, 0,
+										reinterpret_cast<LPBYTE>(data.begin()), &plainSize,
+										static_cast<DWORD>(data.size()));
+								}
+							}
+							else if (dir == CRYPT_DIR_DECRYPT)
+							{
+								rc = CryptDecrypt(hSecretKey, NULL, TRUE, 0,
+									reinterpret_cast<LPBYTE>(data.begin()), &size);
+								if (size != data.size()) data.resize(size, true);
+							}
+							else
+								throw Poco::InvalidAccessException("Bad crypt direction");
+
+						}
+					}
 				}
 			}
 		}
