@@ -16,6 +16,9 @@ POCO_HEADERS_AUTO( SRCS include/Poco/OpcomChannel.h )
 POCO_SOURCES_AUTO_PLAT( SRCS UNIX src/SyslogChannel.cpp )
 POCO_HEADERS_AUTO( SRCS include/Poco/SyslogChannel.h )
 
+POCO_SOURCES_AUTO_PLAT( SRCS ANDROID src/AndroidLogChannel.cpp )
+POCO_HEADERS_AUTO( SRCS include/Poco/AndroidLogChannel.h )
+
 # For Windows CE we need to disable these
 if(WINCE)
 POCO_SOURCES_AUTO_PLAT( SRCS OFF
@@ -121,22 +124,8 @@ target_include_directories( "${LIBNAME}"
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 
-install(
-    DIRECTORY include/Poco
-    DESTINATION include
-    COMPONENT Devel
-    PATTERN ".svn" EXCLUDE
-    )
-
-install(
-    TARGETS "${LIBNAME}" EXPORT "${LIBNAME}Targets"
-    LIBRARY DESTINATION lib${LIB_SUFFIX}
-    ARCHIVE DESTINATION lib${LIB_SUFFIX}
-    RUNTIME DESTINATION bin
-    INCLUDES DESTINATION include
-    )
-
-POCO_GENERATE_PACKAGE("${LIBNAME}" "${LIBNAME}Targets" "lib/cmake/${PROJECT_NAME}")
+POCO_INSTALL("${LIBNAME}")
+POCO_GENERATE_PACKAGE("${LIBNAME}")
 
 if (ENABLE_TESTS)
     add_subdirectory( samples )

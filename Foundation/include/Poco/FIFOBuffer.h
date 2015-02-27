@@ -284,7 +284,7 @@ public:
 	std::size_t available() const
 		/// Returns the size of the available portion of the buffer.
 	{
-		return _buffer.size() - _used;
+		return size() - _used;
 	}
 
 	void drain(std::size_t length = 0)
@@ -344,6 +344,12 @@ public:
 		if (!isWritable())
 			throw Poco::InvalidAccessException("Buffer not writable.");
 
+		if (_buffer.size() - (_begin + _used) < length)
+		{
+			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used * sizeof(T));
+			_begin = 0;
+		}
+
 		std::size_t usedBefore = _used;
 		_used += length;
 		if (_notify) notify(usedBefore);
@@ -352,16 +358,23 @@ public:
 	T* begin()
 		/// Returns the pointer to the beginning of the buffer.
 	{
+		Mutex::ScopedLock lock(_mutex);
+		if (_begin != 0)
+		{
+			// Move the data to the start of the buffer so begin() and next()
+			// always return consistent pointers with each other and allow writing
+			// to the end of the buffer.
+			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used * sizeof(T));
+			_begin = 0;
+		}
 		return _buffer.begin();
 	}
 
 	T* next()
 		/// Returns the pointer to the next available position in the buffer.
 	{
-		if (available() == 0)
-			throw InvalidAccessException("Buffer is full.");
-
-		return _buffer.begin() + _used;
+		Mutex::ScopedLock lock(_mutex);
+		return begin() + _used;
 	}
 
 	T& operator [] (std::size_t index)

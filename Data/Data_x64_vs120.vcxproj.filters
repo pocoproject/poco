@@ -177,6 +177,9 @@
     <ClInclude Include="include\Poco\Data\SQLChannel.h">
       <Filter>Logging\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Data\JSONRowFormatter.h">
+      <Filter>DataCore\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AbstractBinder.cpp">
@@ -283,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="src\SQLChannel.cpp">
       <Filter>Logging\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONRowFormatter.cpp">
+      <Filter>DataCore\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

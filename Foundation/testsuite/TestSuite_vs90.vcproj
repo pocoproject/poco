@@ -1030,6 +1030,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\MutexTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\RWLockTest.cpp"
 					>
 				</File>
@@ -1075,6 +1079,10 @@
 				</File>
 				<File
 					RelativePath=".\src\ConditionTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MutexTest.h"
 					>
 				</File>
 				<File

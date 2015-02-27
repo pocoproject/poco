@@ -19,8 +19,12 @@
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/Util/IniFileConfiguration.h"
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
 #include "Poco/Util/XMLConfiguration.h"
+#endif
+#ifndef POCO_UTIL_NO_JSONCONFIGURATION
 #include "Poco/Util/JSONConfiguration.h"
+#endif
 #include "Poco/Util/LoggingSubsystem.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionProcessor.h"
@@ -162,7 +166,10 @@ void Application::init()
 	_pConfig->setString("application.name", appPath.getFileName());
 	_pConfig->setString("application.baseName", appPath.getBaseName());
 	_pConfig->setString("application.dir", appPath.parent().toString());
-	_pConfig->setString("application.configDir", appPath.parent().toString());
+	_pConfig->setString("application.configDir", Path::configHome() + appPath.getBaseName() + Path::separator());
+	_pConfig->setString("application.cacheDir", Path::cacheHome() + appPath.getBaseName() + Path::separator());
+	_pConfig->setString("application.tempDir", Path::tempHome() + appPath.getBaseName() + Path::separator());
+	_pConfig->setString("application.dataDir", Path::dataHome() + appPath.getBaseName() + Path::separator());
 	processOptions();
 }
 
@@ -484,6 +491,29 @@ bool Application::findAppConfigFile(const std::string& appName, const std::strin
 	poco_assert (!appName.empty());
 
 	Path p(appName);
+	p.setExtension(extension);
+	bool found = findFile(p);
+	if (!found)
+	{
+#if defined(_DEBUG)
+		if (appName[appName.length() - 1] == 'd')
+		{
+			p.setBaseName(appName.substr(0, appName.length() - 1));
+			found = findFile(p);
+		}
+#endif
+	}
+	if (found)
+		path = p;
+	return found;
+}
+
+
+bool Application::findAppConfigFile(const Path& basePath, const std::string& appName, const std::string& extension, Path& path) const
+{
+	poco_assert (!appName.empty());
+	
+	Path p(basePath,appName);
 	p.setExtension(extension);
 	bool found = findFile(p);
 	if (!found)
