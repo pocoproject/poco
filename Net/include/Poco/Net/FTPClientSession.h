@@ -227,7 +227,7 @@ public:
 	std::ostream& beginUpload(const std::string& path);
 		/// Starts uploading the file with the given name.
 		/// After all data has been written to the returned stream,
-		/// endUpload() must be called to finish the download.
+		/// endUpload() must be called to finish the upload.
 		///
 		/// A stream for reading the file's content is returned.
 		/// The stream is valid until endUpload() is called.
