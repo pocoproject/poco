@@ -58,6 +58,7 @@ public:
 	~PostgreSQLTest();
 
 	void testConnectNoDB();
+	void testPostgreSQLOIDs();
 	void testBarebonePostgreSQL();
 
 	void testSimpleAccess();

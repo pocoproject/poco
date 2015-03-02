@@ -243,24 +243,13 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 
 		for (int i = 0; i < fieldCount; ++i)
 		{
-			int columnLength	= PQfsize(ptrPGResult, i); // TODO: Verify this is correct for all the returned types
-			int columnPrecision	= PQfmod(ptrPGResult, i);
-
-			if	(	columnLength < 0		// PostgreSQL confusion correction
-				 && columnPrecision > 0
-				)
-			{
-				columnLength	= columnPrecision;
-				columnPrecision	= -1;
-			}
-
 			_resultColumns.push_back(
-				MetaColumn(i,   // position
-							PQfname(ptrPGResult, i),   // name
-							Poco::Data::MetaColumn::FDT_STRING,  // type - TODO: Map from OIDS to Metacolumn types
-							(-1 == columnLength ? 0 : columnLength), // length - NOT CORRECT WHEN RESULTS ARE IN TEXT FORMAT AND DATATYPE IS NOT TEXT
-							(-1 == columnPrecision ? 0 : columnPrecision),   // precision
-							true // nullable? - no easy way to tell, so assume yes
+				MetaColumn(i,												// position
+						   PQfname(ptrPGResult, i),							// name
+						   oidToColumnDataType(PQftype(ptrPGResult, i)),	// Poco::Data::MetaColumn type
+						   0,												// column data lengths are not correct as returned by PQfsize() for the various column types
+						   0,												// column precisions are not correct as returned by PQfmod() for the various column types
+						   true												// nullable? - no efficient way to tell at this point, so assume yes
 						)
 			);
 		}
@@ -475,14 +464,16 @@ StatementExecutor::fetch()
 	for (std::size_t i = 0; i < countColumns; ++i)
 	{
 		int fieldLength = PQgetlength(_pResultHandle, static_cast<int> (_currentRow), static_cast<int> (i));
+		
+		Oid columnInternalDataType = PQftype(_pResultHandle, i);  // Oid of column
 
-		_outputParameterVector.at(i).setValues(POSTGRESQL_TYPE_STRING,   // TODO - set based on Oid
-													PQftype(_pResultHandle, i), // Oid of column
-													_currentRow,  // the row number of the result
-													PQgetvalue(_pResultHandle, _currentRow, i), // a pointer to the data
-													(-1 == fieldLength ? 0 : fieldLength),  // the length of the data returned
-													PQgetisnull(_pResultHandle, _currentRow, i) == 1 ? true : false // is the column null
-												);
+		_outputParameterVector.at(i).setValues(oidToColumnDataType(columnInternalDataType),						// Poco::Data::MetaData version of the Column Data Type
+											   columnInternalDataType,											// Postegres Version
+											   _currentRow,														// the row number of the result
+											   PQgetvalue(_pResultHandle, _currentRow, i),						// a pointer to the data
+											   (-1 == fieldLength ? 0 : fieldLength),							// the length of the data returned
+											   PQgetisnull(_pResultHandle, _currentRow, i) == 1 ? true : false	// is the column value null?
+											   );
 	}
 
 	// advance to next row

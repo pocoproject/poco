@@ -44,6 +44,7 @@
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
 
 #include "Poco/Data/AbstractBinder.h"
+#include "Poco/Data/MetaColumn.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Types.h"
 
@@ -269,7 +270,7 @@ private:
 	{
 	}
 	
-	void realBind(std::size_t aPosition, PostgreSQLSupportedFieldTypes aFieldType, const void* aBufferPtr, std::size_t aLength);
+	void realBind(std::size_t aPosition, Poco::Data::MetaColumn::ColumnDataType aFieldType, const void* aBufferPtr, std::size_t aLength);
 		/// Common bind implementation
 
 private:

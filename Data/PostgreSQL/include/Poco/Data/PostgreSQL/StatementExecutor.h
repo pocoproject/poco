@@ -53,6 +53,7 @@ namespace Poco {
 namespace Data {
 namespace PostgreSQL {
 
+
 class StatementExecutor
 	/// PostgreSQL statement executor.
 {
@@ -102,9 +103,9 @@ public:
 		/// Cast operator to native result handle type.
 
 private:
-
+	
 	void clearResults();
-
+	
 	StatementExecutor(const StatementExecutor&);
 	StatementExecutor& operator= (const StatementExecutor&);
 
@@ -133,8 +134,7 @@ inline StatementExecutor::operator PGresult* ()
 {
 	return _pResultHandle;
 }
-
-
+	
 }}}
 
 #endif // Data_PostgreSQL_StatementHandle_INCLUDED

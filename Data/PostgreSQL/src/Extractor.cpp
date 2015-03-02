@@ -297,7 +297,7 @@ bool Extractor::extract(std::size_t pos, char& val)
 {
 	OutputParameter outputParameter = extractPreamble(pos);
 
-	if	(	isColumnNull(outputParameter))
+	if	(isColumnNull(outputParameter))
 	{
 		return false;
 	}
@@ -491,7 +491,7 @@ Extractor::extractPreamble(std::size_t aPosition) const
 {
 	if (_statementExecutor.columnsReturned() <= aPosition)
 	{
-		throw PostgreSQLException("Extractor: attempt to extract more parameters, than query result contains");
+		throw PostgreSQLException("Extractor: attempt to extract more parameters than query result contains");
 	}
 
 	return _statementExecutor.resultColumn(aPosition);

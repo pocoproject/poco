@@ -29,13 +29,12 @@ LIBLINKEXT = $(SHAREDLIBLINKEXT)
 endif
 
 INCLUDE += -I$(POCO_POSTGRESQL_INCLUDE)
-SYSLIBS += -L$(POCO_POSTGRESQL_LIB)
 
-SYSLIBS += -lpq
+SYSLIBS += -L$(POCO_POSTGRESQL_LIB) -lpq
 
 objects = Extractor Binder SessionImpl Connector \
 	PostgreSQLStatementImpl PostgreSQLException \
-	SessionHandle StatementExecutor Utility
+	SessionHandle StatementExecutor PostgreSQLTypes Utility
 
 target         = PocoDataPostgreSQL
 target_version = $(LIBVERSION)

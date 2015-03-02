@@ -8,10 +8,33 @@
 
 include $(POCO_BASE)/build/rules/global
 
-INCLUDE += -I./../include -I/usr/local/include/postgresql/ -I/usr/include/postgresql/ -I$(POSTGRESQL_BASE)/include
+ifndef POCO_POSTGRESQL_INCLUDE
+POCO_POSTGRESQL_INCLUDE = /usr/include/postgresql
+endif
+
+ifndef POCO_POSTGRESQL_LIB
+ifeq (0, $(shell test -d /usr/lib/$(OSARCH)-linux-gnu; echo $$?))
+POCO_POSTGRESQL_LIB = /usr/lib/$(OSARCH)-linux-gnu
+else ifeq (0, $(shell test -d /usr/lib64; echo $$?))
+POCO_POSTGRESQL_LIB = /usr/lib64
+else
+POCO_POSTGRESQL_LIB = /usr/lib
+endif
+endif
+
+ifeq ($(LINKMODE),STATIC)
+LIBLINKEXT = .a
+else
+LIBLINKEXT = $(SHAREDLIBLINKEXT)
+endif
+
+INCLUDE += -I./../include
+INCLUDE += -I$(POCO_POSTGRESQL_INCLUDE)
+
+SYSLIBS += -L$(POCO_POSTGRESQL_LIB) -lpq
 
 # Note: linking order is important, do not change it.
-SYSLIBS += -L/usr/local/lib$(LIB64SUFFIX)/postgresql/9.3/lib -L/usr/lib$(LIB64SUFFIX)/postgresql/9.3/lib -L$(POSTGRESQL_BASE)/lib -lpq -lz -lpthread -ldl
+SYSLIBS += -lz -lpthread -ldl
 
 objects = PostgreSQLTestSuite Driver PostgreSQLTest SQLExecutor
 

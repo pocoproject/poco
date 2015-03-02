@@ -39,6 +39,7 @@
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/Session.h"
 
+#include <libpq-fe.h>
 
 class SQLExecutor: public CppUnit::TestCase
 {
@@ -58,6 +59,9 @@ public:
 	SQLExecutor(const std::string& name, Poco::Data::Session* _pSession);
 	~SQLExecutor();
 
+	void oidPostgreSQLTest(const char* host, const char* user, const char* pwd, const char* db, const char* port, const char* tableCreateString, const Oid anOIDArray[]);
+		/// This function verifies the PostgreSQL Column type OIDs are consistent between releases
+	
 	void barebonePostgreSQLTest(const char* host, const char* user, const char* pwd, const char* db, const char* port, const char* tableCreateString);
 		/// This function uses "bare bone"  API calls (i.e. calls are not 
 		/// "wrapped" in PocoData framework structures).

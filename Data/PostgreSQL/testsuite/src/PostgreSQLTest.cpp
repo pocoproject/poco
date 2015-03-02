@@ -127,7 +127,159 @@ void PostgreSQLTest::testConnectNoDB()
 	}
 }
 	
+void PostgreSQLTest::testPostgreSQLOIDs()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	std::string tableCreateString = "CREATE TABLE Test ("
+		"charcol			char,"
+		"bigintcol          bigint,"
+		"int8col            int8,"
+		"bigserialcol       bigserial,"
+		"serial8col         serial8,"
+		"bit1col			bit(1),"
+		"bit4col			bit(4),"
+		"bit6col			bit(6),"
+		"bit8col			bit(8),"
+		"bit9col			bit(9),"
+		"bitv1col			bit varying(1),"
+		"bitv4col			bit varying(4),"
+		"bitv6col			bit varying(6),"
+		"bitv8col			bit varying(8),"
+		"bitv9col			bit varying(9),"
+		"booleancol			boolean,"
+		"boolcol			bool,"
+		"boxcol				box,"
+		"byteacol			bytea,"
+		"char1col			char(1),"
+		"char4col			char(4),"
+		"char6col			char(6),"
+		"char8col			char(8),"
+		"char9col			char(9),"
+		"char12col			char(12),"
+		"char256col			char(256),"
+		"charv1col			char varying(1),"
+		"charv4col			char varying(4),"
+		"charv6col			char varying(6),"
+		"charv8col			char varying(8),"
+		"charv9col			char varying(9),"
+		"charv12col			char varying(12),"
+		"charv256col		char varying(256),"
+		"cidrcol			cidr,"
+		"circlecol			circle,"
+		"datecol			date,"
+		"doubleprecol		double precision,"
+		"float8col			float8,"
+		"inetcol			inet,"
+		"integercol			integer,"
+		"intcol				int,"
+		"int4col			int4,"
+		"jsoncol			json,"
+		"jsonbcol			jsonb,"
+		"linecol			line,"
+		"lsegcol			lseg,"
+		"macaddrcol			macaddr,"
+		"moneycol			money,"
+		"numericcol			numeric(12,3),"
+		"decimalcol			decimal(12,4),"
+		"pathcol			path,"
+		"pglencol			pg_lsn,"
+		"pointcol			point,"
+		"polygoncol			polygon,"
+		"realcol			real,"
+		"float4col			float4,"
+		"smallintcol		smallint,"
+		"int2col			int2,"
+		"smallserialcol		smallserial,"
+		"serial2col			serial2,"
+		"serialcol			serial,"
+		"serial4col			serial4,"
+		"textcol			text,"
+		"timewtzcol			time(6) without time zone,"
+		"tsquerycol			tsquery,"
+		"tsvectorcol		tsvector,"
+		"txidsnapshotcol	txid_snapshot,"
+		"uuidcol			uuid,"
+		"xmlcol				xml"
+		")";
 	
+	Oid OIDArray[] = {
+		1042,
+		20,
+		20,
+		20,
+		20,
+		1560,
+		1560,
+		1560,
+		1560,
+		1560,
+		1562,
+		1562,
+		1562,
+		1562,
+		1562,
+		16,
+		16,
+		603,
+		17,
+		1042,
+		1042,
+		1042,
+		1042,
+		1042,
+		1042,
+		1042,
+		1043,
+		1043,
+		1043,
+		1043,
+		1043,
+		1043,
+		1043,
+		650,
+		718,
+		1082,
+		701,
+		701,
+		869,
+		23,
+		23,
+		23,
+		114,
+		3802,
+		628,
+		601,
+		829,
+		790,
+		1700,
+		1700,
+		602,
+		3220,
+		600,
+		604,
+		700,
+		700,
+		21,
+		21,
+		21,
+		21,
+		23,
+		23,
+		25,
+		1083,
+		3615,
+		3614,
+		2970,
+		2950,
+		142
+	};
+	
+	 _pExecutor->oidPostgreSQLTest(POSTGRESQL_HOST, POSTGRESQL_USER, POSTGRESQL_PWD, POSTGRESQL_DB, POSTGRESQL_PORT, tableCreateString.c_str(), OIDArray);
+
+}
+
+
 void PostgreSQLTest::testBarebonePostgreSQL()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -893,6 +1045,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("PostgreSQLTest");
 
 	CppUnit_addTest(pSuite, PostgreSQLTest, testConnectNoDB);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testPostgreSQLOIDs);
 	//CppUnit_addTest(pSuite, PostgreSQLTest, testBarebonePostgreSQL);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSimpleAccess);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testComplexType);

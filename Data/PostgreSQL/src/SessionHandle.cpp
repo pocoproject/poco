@@ -98,7 +98,7 @@ SessionHandle::isConnectedNoLock() const
 
 
 void
-SessionHandle::connect (const std::string& aConnectionString)
+SessionHandle::connect(const std::string& aConnectionString)
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -120,7 +120,7 @@ SessionHandle::connect (const std::string& aConnectionString)
 
 
 void
-SessionHandle::connect (const char* aConnectionString)
+SessionHandle::connect(const char* aConnectionString)
 {
 	connect(std::string(aConnectionString));
 }

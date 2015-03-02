@@ -54,14 +54,13 @@
 #include <arpa/inet.h>
 #endif 
 
-#include <libpq-fe.h>
-
 #include <iostream>
 #include <limits>
 
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
+using Poco::Data::PostgreSQL::PostgreSQLException;
 using Poco::Data::PostgreSQL::ConnectionException;
 using Poco::Data::PostgreSQL::StatementException;
 using Poco::format;
@@ -176,6 +175,109 @@ SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession)
 
 SQLExecutor::~SQLExecutor()
 {
+}
+
+void SQLExecutor::oidPostgreSQLTest(const char* host, const char* user, const char* pwd, const char* db, const char* port, const char* tableCreateString, const Oid anOIDArray[])
+{
+	std::string connectionString;
+	
+	connectionString.append("host=");
+	connectionString.append(host);
+	connectionString.append(" ");
+	
+	connectionString.append("user=");
+	connectionString.append(user);
+	connectionString.append(" ");
+	
+	connectionString.append("password=");
+	connectionString.append(pwd);
+	connectionString.append(" ");
+	
+	connectionString.append("dbname=");
+	connectionString.append(db);
+	connectionString.append(" ");
+	
+	connectionString.append("port=");
+	connectionString.append(port);
+	
+	PGconn *  pConnection = 0;
+	
+	pConnection = PQconnectdb(connectionString.c_str());
+	
+	assert(PQstatus(pConnection) == CONNECTION_OK);
+	
+	PGresult * pResult = 0;
+	std::string sql = "DROP TABLE IF EXISTS Test";
+	
+	pResult = PQexec(pConnection, sql.c_str());
+	
+	std::cout << "Drop Table Test Result: " <<  PQresStatus(PQresultStatus(pResult)) << " statement: "<< sql.c_str() << std::endl;
+	
+	assert(	PQresultStatus(pResult) == PGRES_COMMAND_OK
+		   || PQresultStatus(pResult) == PGRES_FATAL_ERROR);
+	
+	PQclear(pResult);
+	
+	sql = tableCreateString;
+	pResult = PQexec(pConnection, sql.c_str());
+	
+	std::cout << "Create Table Test Result: " <<  PQresStatus(PQresultStatus(pResult)) << " statement: "<< sql.c_str() << std::endl;
+	
+	assert(PQresultStatus(pResult) == PGRES_COMMAND_OK);
+	PQclear(pResult);
+
+	sql = "SELECT * FROM Test";
+	std::string selectStatementName = "SELECT Statement";
+	
+	pResult = PQprepare(pConnection,
+						selectStatementName.c_str(),
+						sql.c_str(),
+						0,
+						0
+						);
+
+	assert(PQresultStatus(pResult) == PGRES_COMMAND_OK);
+	PQclear(pResult);
+
+	pResult = PQdescribePrepared(pConnection,
+								 selectStatementName.c_str());
+
+	assert(PQresultStatus(pResult) == PGRES_COMMAND_OK);
+	
+	int fieldCount = PQnfields(pResult);
+	assert(fieldCount >= 0);
+	
+	bool wasErrorEncountered = false;
+	
+	for (int i = 0; i < fieldCount; ++i)
+	{
+		char* columnFieldName	= PQfname(pResult, i);
+		Oid columnFieldType		= PQftype(pResult, i);
+		int columnLength		= PQfsize(pResult, i); // TODO: Verify this is correct for all the returned types
+		int columnPrecision		= PQfmod(pResult, i);
+		
+		if (columnFieldType != anOIDArray[i]) {
+			// the binary API has changed - sadness!
+			wasErrorEncountered = true;
+			break;
+		}
+		
+	}
+
+	PQclear(pResult);
+	
+	sql = "DROP TABLE Test";
+	
+	pResult = PQexec(pConnection, sql.c_str());
+	
+	assert(PQresultStatus(pResult) == PGRES_COMMAND_OK);
+	PQclear(pResult);
+	
+	PQfinish(pConnection);
+
+	if (wasErrorEncountered) {
+		throw PostgreSQLException("PostgreSQL binary Data type values have changed in this release.  Major breakage!");
+	}
 }
 
 
@@ -1613,8 +1715,9 @@ void SQLExecutor::tupleVector()
 
 
 void SQLExecutor::internalExtraction()
-{/*
+{
 	typedef Poco::Int32 IntType;
+	std::string funct = "internalExtraction()";
 
 	*_pSession << "DROP TABLE IF EXISTS Vectors", now;
 	*_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
@@ -1635,8 +1738,11 @@ void SQLExecutor::internalExtraction()
 	RecordSet rset2(rset);
 	assert(3 == rset2.columnCount());
 	assert(4 == rset2.rowCount());
-
-	IntType a = rset.value<IntType>(0, 2);
+		
+	IntType a;
+	try { a = rset.value<IntType>(0, 2); }
+	catch (Poco::BadCastException& bce) { std::cout << bce.displayText() << std::endl; fail (funct); }
+	
 	assert(3 == a);
 
 	int c = rset2.value(0);
@@ -1645,10 +1751,16 @@ void SQLExecutor::internalExtraction()
 	IntType b = rset2.value<IntType>("int0", 2);
 	assert(3 == b);
 
-	double d = rset.value<double>(1, 0);
+	double d;
+	try { d = rset.value<double>(1, 0); }
+	catch (Poco::BadCastException& bce) { std::cout << bce.displayText() << std::endl; fail (funct); }
+	
 	assert(1.5 == d);
 
-	std::string s = rset.value<std::string>(2, 1);
+	std::string s;
+	try { s = rset.value<std::string>(2, 1); }
+	catch (Poco::BadCastException& bce) { std::cout << bce.displayText() << std::endl; fail (funct); }
+	
 	assert("4" == s);
 
 	typedef std::deque<IntType> IntDeq;
@@ -1657,7 +1769,7 @@ void SQLExecutor::internalExtraction()
 	assert(col[0] == 1);
 
 	try { rset.column<IntDeq>(100); fail("must fail"); }
-	catch (RangeException&) {}
+	catch (Poco::RangeException&) {}
 
 	const Column<IntDeq>& col1 = rset.column<IntDeq>(0);
 	assert("int0" == col1.name());
@@ -1667,8 +1779,15 @@ void SQLExecutor::internalExtraction()
 	for (; it != itEnd; ++it, ++counter)
 		assert(counter == *it);
 
-	rset = (*_pSession << "SELECT COUNT(*) FROM Vectors", now);
-	s = rset.value<std::string>(0, 0);
+	rset = (*_pSession << "SELECT COUNT(*) AS cnt FROM Vectors", now);
+	
+	Poco::Int64 big;
+	try { big = rset.value<Poco::Int64>(0,0);}
+	catch (Poco::BadCastException& bce) { std::cout << bce.displayText() << std::endl; fail (funct); }
+
+	assert (4 == big);
+	
+	s = rset.value("cnt", 0).convert<std::string>();
 	assert("4" == s);
 
 	stmt = (*_pSession << "DELETE FROM Vectors", now);
@@ -1676,7 +1795,6 @@ void SQLExecutor::internalExtraction()
 
 	try { rset.column<IntDeq>(0); fail("must fail"); }
 	catch (RangeException&) {}
-	*/
 }
 
 
