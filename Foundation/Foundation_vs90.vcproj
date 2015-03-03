@@ -1061,6 +1061,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\src\JSONString.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\MemoryPool.cpp"
 					>
 				</File>
@@ -1274,6 +1278,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Instantiator.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\JSONString.h"
 					>
 				</File>
 				<File
