@@ -1,5 +1,5 @@
 vc.project.guid = B01196CC-B693-4548-8464-2FF60499E73F
-vc.project.name = Net
+vc.project.name = Foundation
 vc.project.target = Poco${vc.project.name}
 vc.project.type = library
 vc.project.pocobase = ..
