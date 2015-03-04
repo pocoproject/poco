@@ -29,7 +29,11 @@
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
 #	include <time.h>
 #endif
-
+#if POCO_OS == POCO_OS_MAC_OS_X
+#   include <mach/mach.h>
+#   include <mach/task.h>
+#   include <mach/thread_policy.h>
+#endif
 //
 // Block SIGPIPE in main thread.
 //
@@ -179,6 +183,40 @@ void ThreadImpl::setStackSizeImpl(int size)
 #endif
 }
 
+void ThreadImpl::setAffinityImpl(unsigned int cpu) 
+{
+#if defined (POCO_OS_FAMILY_UNIX) && POCO_OS != POCO_OS_MAC_OS_X
+#ifdef HAVE_PTHREAD_SETAFFINITY_NP
+  cpu_set_t cpuset;
+  CPU_ZERO(&cpuset);
+  CPU_SET(cpu, &cpuset);
+#ifdef HAVE_THREE_PARAM_SCHED_SETAFFINITY
+  if (pthread_setaffinity_np(_pData->thread, sizeof(cpuset), &cpuset) != 0)
+    throw SystemException("Failed to set affinity");
+#else
+  if (pthread_setaffinity_np(_pData->thread, &cpuset) != 0)
+    throw SystemException("Failed to set affinity");
+#endif
+#else
+  poco_bugcheck_msg("Thread affinity not supported on this system");
+#endif
+#endif // defined unix & !defined mac os x
+
+#if POCO_OS == POCO_OS_MAC_OS_X
+  kern_return_t                 ret;
+  thread_affinity_policy        policy;
+  policy.affinity_tag = cpu;
+
+  ret = thread_policy_set(pthread_mach_thread_np(_pData->thread),
+                          THREAD_AFFINITY_POLICY,
+                          (thread_policy_t) &policy,
+                          THREAD_AFFINITY_POLICY_COUNT);
+  if (ret != KERN_SUCCESS) {
+    throw SystemException("Failed to set affinity");
+  }
+#endif
+  yieldImpl();
+}
 
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {

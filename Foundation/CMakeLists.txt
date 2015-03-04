@@ -107,6 +107,44 @@ endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 # TODO: Why is this here?
 add_definitions( -DPCRE_STATIC)
 
+# For SetAffinity
+if(UNIX)
+    INCLUDE (CheckFunctionExists)
+    INCLUDE (CheckCXXSourceCompiles)
+    CHECK_FUNCTION_EXISTS(pthread_setaffinity_np HAVE_PTHREAD_SETAFFINITY_NP)
+    if(HAVE_PTHREAD_SETAFFINITY_NP)
+        message(STATUS "Platform has PTHREAD_SETAFFINITY_NP")
+        add_definitions(-DHAVE_PTHREAD_SETAFFINITY_NP)
+    else(HAVE_PTHREAD_SETAFFINITY_NP)
+        CHECK_CXX_SOURCE_COMPILES("
+        #include <sched.h>
+        int main() {
+            cpu_set_t cpumask;
+            sched_setaffinity( 0, sizeof(cpumask), &cpumask );
+            return 0;
+        }" HAVE_THREE_PARAM_SCHED_SETAFFINITY)
+
+        if(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
+            message(STATUS "Platform has THREE PARAM at PTHREAD_SETAFFINITY_NP")
+            add_definitions(-DHAVE_THREE_PARAM_SCHED_SETAFFINITY)
+        else(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
+            CHECK_CXX_SOURCE_COMPILES("
+            #include <sched.h>
+            int main() {
+                cpu_set_t cpumask;
+                sched_setaffinity( 0, &cpumask );
+                return 0;
+            }" HAVE_TWO_PARAM_SCHED_SETAFFINITY)
+
+            if(HAVE_TWO_PARAM_SCHED_SETAFFINITY)
+                message(STATUS "Platform has TWO PARAM at PTHREAD_SETAFFINITY_NP")
+                add_definitions(-DHAVE_TWO_PARAM_SCHED_SETAFFINITY)
+            endif(HAVE_TWO_PARAM_SCHED_SETAFFINITY)
+
+        endif(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
+    endif(HAVE_PTHREAD_SETAFFINITY_NP)
+endif(UNIX)
+
 add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS})
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"

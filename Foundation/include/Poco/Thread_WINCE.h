@@ -67,6 +67,7 @@ public:
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
+	void setAffinityImpl(unsigned int cpu);
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
@@ -144,6 +145,11 @@ inline int ThreadImpl::getMaxOSPriorityImpl(int /* policy */)
 	return PRIO_HIGHEST_IMPL;
 }
 
+inline void ThreadImpl::setAffinityImpl(unsigned int cpu)
+{
+	// TODO : create implementation
+	(void)cpu;
+}
 
 inline void ThreadImpl::sleepImpl(long milliseconds)
 {

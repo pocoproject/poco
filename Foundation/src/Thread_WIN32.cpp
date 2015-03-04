@@ -103,6 +103,14 @@ void ThreadImpl::setOSPriorityImpl(int prio, int /* policy */)
 	setPriorityImpl(prio);
 }
 
+void ThreadImpl::setAffinityImpl(unsigned int cpu) 
+{
+  DWORD mask = 1;
+  mask <<= cpu;
+  if (SetThreadAffinityMask(_thread, mask) == 0) {
+    throw SystemException("Failed to set affinity");
+  }
+}
 
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {

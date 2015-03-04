@@ -66,6 +66,7 @@ public:
 	static int getMinOSPriorityImpl(int policy);
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
+	void setAffinityImpl(unsigned int cpu);
 	int getStackSizeImpl() const;
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();

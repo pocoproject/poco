@@ -80,6 +80,7 @@ public:
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
+	void setAffinityImpl(unsigned int cpu);
 	void startImpl(Runnable& target);
 	void startImpl(Callable target, void* pData = 0);
 
@@ -139,6 +140,11 @@ inline int ThreadImpl::getOSPriorityImpl() const
 	return _pData->osPrio;
 }
 
+inline void ThreadImpl::setAffinityImpl(unsigned int cpu)
+{
+	// TODO : create implementation
+	(void)cpu;
+}
 
 inline bool ThreadImpl::isRunningImpl() const
 {
