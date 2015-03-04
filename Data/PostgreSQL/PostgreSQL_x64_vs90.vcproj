@@ -512,10 +512,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\PostgreSQLTypes.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\SessionHandle.cpp"
 				>
 			</File>
