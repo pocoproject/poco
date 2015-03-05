@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ClInclude Include="src\NetExTestSuite.h"/>
+    <ClInclude Include="src\ICMPClientTest.h"/>
+    <ClInclude Include="src\ICMPClientTestSuite.h"/>
+    <ClInclude Include="src\ICMPSocketTest.h"/>
+    <ClInclude Include="src\NTPClientTest.h"/>
+    <ClInclude Include="src\NTPClientTestSuite.h"/>
+    <ClInclude Include="src\SNMPClientTest.h"/>
+    <ClInclude Include="src\SNMPClientTestSuite.h"/>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>TestSuite</ProjectName>
+    <ProjectGuid>{D5EFBF27-B934-4B8D-8AE5-6EC00374819C}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <EnableRedirectPlatform>true</EnableRedirectPlatform>
+    <RedirectPlatformValue>SDK_AM335X_SK_WEC2013_V300</RedirectPlatformValue>
+    <PlatformToolset>CE800</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings"/>
+  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V300'">TestSuited</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V300'">TestSuited</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V300'">TestSuited</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V300'">TestSuite</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V300'">TestSuite</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V300'">TestSuite</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup/>
+  <ItemGroup>
+    <ClCompile Include="src\NetExTestSuite.cpp"/>
+    <ClCompile Include="src\WinCEDriver.cpp"/>
+    <ClCompile Include="src\ICMPClientTest.cpp"/>
+    <ClCompile Include="src\ICMPClientTestSuite.cpp"/>
+    <ClCompile Include="src\ICMPSocketTest.cpp"/>
+    <ClCompile Include="src\NTPClientTest.cpp"/>
+    <ClCompile Include="src\NTPClientTestSuite.cpp"/>
+    <ClCompile Include="src\SNMPClientTest.cpp"/>
+    <ClCompile Include="src\SNMPClientTestSuite.cpp"/>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <ImportGroup Label="ExtensionTargets"/>
+</Project>

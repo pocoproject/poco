@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="_Suite">
+      <UniqueIdentifier>{5f30e285-335d-4039-8f9b-dcc890088523}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Header Files">
+      <UniqueIdentifier>{b030b755-5b69-4646-add3-77cc32c85ad5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Source Files">
+      <UniqueIdentifier>{edff1bb6-86f2-4f35-8c9f-fe88d1f94080}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver">
+      <UniqueIdentifier>{788af5f0-3b7b-47e6-a018-6c23ecea297a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver\Source Files">
+      <UniqueIdentifier>{9cfd0a1a-a74e-4697-8537-373e9a284cac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ICMP">
+      <UniqueIdentifier>{42a956dc-3184-499e-917e-83c5337bbcd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ICMP\Header Files">
+      <UniqueIdentifier>{affb78db-4fc9-4243-843e-ab063874b9ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ICMP\Source Files">
+      <UniqueIdentifier>{8ba82a2b-4099-494b-b1d3-f543b9cba09d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP">
+      <UniqueIdentifier>{f4f6a244-f202-4936-859c-c8d09810f20b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP\Header Files">
+      <UniqueIdentifier>{b1d218f8-5c7d-4be3-8084-43c9722be88f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP\Source Files">
+      <UniqueIdentifier>{c2815ac3-f46c-427f-af56-74b05f072838}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP">
+      <UniqueIdentifier>{98be18b4-c635-4aea-8060-aca15430b6fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP\Header Files">
+      <UniqueIdentifier>{630670f1-b583-47dd-8fc6-f274e80908ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP\Source Files">
+      <UniqueIdentifier>{fbcf7592-8bf2-438b-8296-7d2bb5d10f5c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\NetExTestSuite.h">
+      <Filter>_Suite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ICMPClientTest.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ICMPClientTestSuite.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ICMPSocketTest.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NTPClientTest.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NTPClientTestSuite.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SNMPClientTest.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SNMPClientTestSuite.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\NetExTestSuite.cpp">
+      <Filter>_Suite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinCEDriver.cpp">
+      <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPClientTest.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPClientTestSuite.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPSocketTest.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPClientTest.cpp">
+      <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPClientTestSuite.cpp">
+      <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientTest.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientTestSuite.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

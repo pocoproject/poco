@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ICMP">
+      <UniqueIdentifier>{3d8c1b46-25e2-4189-b6bd-b56494c08b51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ICMP\Header Files">
+      <UniqueIdentifier>{923664d4-b0af-491c-85e5-b2c0cd9dcb2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ICMP\Source Files">
+      <UniqueIdentifier>{ca538818-a617-4fc8-b642-68f3bb77241c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP">
+      <UniqueIdentifier>{5114a5ea-2713-43d9-a6af-e5510ca527e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP\Header Files">
+      <UniqueIdentifier>{ccd73a71-8fa4-4174-9f1c-cc868427f439}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTP\Source Files">
+      <UniqueIdentifier>{3fde51be-6c70-49c6-80ac-86fcf971d77e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP">
+      <UniqueIdentifier>{e2afefa6-b20b-449f-93dd-c38b0c996a8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP\Header Files">
+      <UniqueIdentifier>{5e41cedb-5e25-4d69-8b9d-49fee7adeaa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SNMP\Source Files">
+      <UniqueIdentifier>{86223268-2999-4588-ab65-a01560a63a33}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\Net\ICMPClient.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPClientImpl.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPClientRaw.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPEventArgs.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPPacket.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPPacketImpl.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPSocket.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPSocketImpl.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\ICMPv4PacketImpl.h">
+      <Filter>ICMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTPClient.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTPEventArgs.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTPPacket.h">
+      <Filter>NTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPCore.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPClientRaw.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPClientRawTypes.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPClientRawFactory.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPRawEventArgs.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPClient.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPClientTypes.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SNMPEventArgs.h">
+      <Filter>SNMP\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ICMPClient.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPClientRaw.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPEventArgs.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPPacket.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPPacketImpl.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPSocket.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPSocketImpl.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICMPv4PacketImpl.cpp">
+      <Filter>ICMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPClient.cpp">
+      <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPEventArgs.cpp">
+      <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTPPacket.cpp">
+      <Filter>NTP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientRaw.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientRawTypes.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientRawFactory.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPRawEventArgs.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClient.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPClientTypes.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SNMPEventArgs.cpp">
+      <Filter>SNMP\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
+  </ItemGroup>
+</Project>

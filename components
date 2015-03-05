@@ -3,14 +3,17 @@ CppUnit/WinTestRunner
 Foundation
 XML
 JSON
+ASN
 Util
 Net
+NetEx
 Crypto
 NetSSL_OpenSSL
 Data
 Data/SQLite
 Data/ODBC
 Data/MySQL
+Data/PostgreSQL
 Zip
 PageCompiler
 PageCompiler/File2Page

@@ -91,7 +91,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">TestSuited</TargetName>
@@ -349,6 +349,7 @@
     <ClInclude Include="src\HTMLFormTest.h"/>
     <ClInclude Include="src\HTMLTestSuite.h"/>
     <ClInclude Include="src\HTTPClientSessionTest.h"/>
+    <ClInclude Include="src\HTTPClientTest.h"/>
     <ClInclude Include="src\HTTPClientTestSuite.h"/>
     <ClInclude Include="src\HTTPStreamFactoryTest.h"/>
     <ClInclude Include="src\FTPClientSessionTest.h"/>
@@ -361,11 +362,6 @@
     <ClInclude Include="src\MailTestSuite.h"/>
     <ClInclude Include="src\POP3ClientSessionTest.h"/>
     <ClInclude Include="src\SMTPClientSessionTest.h"/>
-    <ClInclude Include="src\ICMPClientTest.h"/>
-    <ClInclude Include="src\ICMPClientTestSuite.h"/>
-    <ClInclude Include="src\ICMPSocketTest.h"/>
-    <ClInclude Include="src\NTPClientTest.h"/>
-    <ClInclude Include="src\NTPClientTestSuite.h"/>
     <ClInclude Include="src\SyslogTest.h"/>
     <ClInclude Include="src\WebSocketTest.h"/>
     <ClInclude Include="src\WebSocketTestSuite.h"/>
@@ -412,6 +408,7 @@
     <ClCompile Include="src\HTMLFormTest.cpp"/>
     <ClCompile Include="src\HTMLTestSuite.cpp"/>
     <ClCompile Include="src\HTTPClientSessionTest.cpp"/>
+    <ClCompile Include="src\HTTPClientTest.cpp"/>
     <ClCompile Include="src\HTTPClientTestSuite.cpp"/>
     <ClCompile Include="src\HTTPStreamFactoryTest.cpp"/>
     <ClCompile Include="src\FTPClientSessionTest.cpp"/>
@@ -424,11 +421,6 @@
     <ClCompile Include="src\MailTestSuite.cpp"/>
     <ClCompile Include="src\POP3ClientSessionTest.cpp"/>
     <ClCompile Include="src\SMTPClientSessionTest.cpp"/>
-    <ClCompile Include="src\ICMPClientTest.cpp"/>
-    <ClCompile Include="src\ICMPClientTestSuite.cpp"/>
-    <ClCompile Include="src\ICMPSocketTest.cpp"/>
-    <ClCompile Include="src\NTPClientTest.cpp"/>
-    <ClCompile Include="src\NTPClientTestSuite.cpp"/>
     <ClCompile Include="src\SyslogTest.cpp"/>
     <ClCompile Include="src\WebSocketTest.cpp"/>
     <ClCompile Include="src\WebSocketTestSuite.cpp"/>

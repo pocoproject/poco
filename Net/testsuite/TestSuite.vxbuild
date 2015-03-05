@@ -32,9 +32,6 @@ SOURCES="
 	HTTPStreamFactoryTest.cpp
 	HTTPTestServer.cpp
 	HTTPTestSuite.cpp
-	ICMPClientTest.cpp
-	ICMPClientTestSuite.cpp
-	ICMPSocketTest.cpp
 	IPAddressTest.cpp
 	MailMessageTest.cpp
 	MailStreamTest.cpp

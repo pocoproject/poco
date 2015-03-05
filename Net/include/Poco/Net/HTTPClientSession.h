@@ -299,6 +299,7 @@ private:
 	HTTPClientSession(const HTTPClientSession&);
 	HTTPClientSession& operator = (const HTTPClientSession&);
 
+	friend class HTTPClient;
 	friend class WebSocket;
 };
 

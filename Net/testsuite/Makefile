@@ -12,7 +12,7 @@ objects = \
 	DNSTest HTTPServerTestSuite MulticastSocketTest SocketStreamTest \
 	DatagramSocketTest HTTPStreamFactoryTest MultipartReaderTest SocketTest \
 	Driver HTTPTestServer MultipartWriterTest SocketsTestSuite \
-	EchoServer HTTPTestSuite NameValueCollectionTest TCPServerTest \
+	EchoServer HTTPTestSuite NameValueCollectionTest TCPServerTest HTTPClientTest \
 	HTTPClientSessionTest IPAddressTest NetCoreTestSuite TCPServerTestSuite \
 	HTTPRequestTest MessageHeaderTest NetTestSuite UDPEchoServer \
 	HTTPResponseTest MessagesTestSuite NetworkInterfaceTest \
@@ -24,8 +24,7 @@ objects = \
 	SocketReactorTest ReactorTestSuite \
 	MailTestSuite MailMessageTest MailStreamTest \
 	SMTPClientSessionTest POP3ClientSessionTest \
-	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
-	NTPClientTest NTPClientTestSuite \
+	RawSocketTest \
 	WebSocketTest WebSocketTestSuite \
 	SyslogTest \
 	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite

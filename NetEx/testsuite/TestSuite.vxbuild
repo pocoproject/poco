@@ -1,0 +1,20 @@
+#
+# TestSuite.vxbuild
+#
+# $Id$
+#
+TARGET=NetTestSuite
+CFLAGS="-I../../../../Foundation/include \\
+	-I../../../../Net/include \\
+	-I../../../../NetEx/include \\
+	-I../../../../ASN/include \\
+	-I../../../../CppUnit/include"
+SOURCES="
+	Driver.cpp
+	ICMPClientTest.cpp
+	ICMPClientTestSuite.cpp
+	ICMPSocketTest.cpp
+	NetExTestSuite.cpp
+	NTPClientTest.cpp
+	NTPClientTestSuite.cpp
+"
