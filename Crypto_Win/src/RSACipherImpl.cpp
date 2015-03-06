@@ -145,7 +145,7 @@ namespace
 		if (!CryptEncrypt(_pKey->publicKey(), NULL, isFinal, 0, NULL, &n, 0))
 			error("RSACipher cannot obtain length of encrypted data");
 		poco_assert(n > _pos);
-		poco_assert_dbg(n <= maxDataSize());
+		//poco_assert_dbg(n <= maxDataSize());
 		std::vector<BYTE> data(n);
 		n = static_cast<DWORD>(_pos + 1);
 		std::memcpy(&data[0], _pBuf, n);

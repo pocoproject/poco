@@ -37,6 +37,8 @@ public:
 	void setUp();
 	void tearDown();
 
+	void testCryptoAPI();
+
 	static CppUnit::Test* suite();
 
 private:

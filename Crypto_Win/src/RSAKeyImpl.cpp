@@ -23,6 +23,8 @@
 #include "Poco/Base64Encoder.h"
 #include "Poco/Format.h"
 #include "Poco/String.h"
+#include "Poco/NumericString.h"
+#include "Poco/StringTokenizer.h"
 #include <sstream>
 
 
@@ -180,6 +182,68 @@ void RSAKeyImpl::loadPrivateKey(std::istream& istr, const std::string& privateKe
 	
 	if (pem.compare(0, beginLen, BEGIN_RSA_PRIVATE) == 0)
 	{
+		if (!privateKeyPassphrase.empty())
+		{
+			std::istringstream istr(pem);
+			std::string line;
+			while (std::getline(istr, line, '\n'))
+			{
+				if (line.substr(0, beginLen) == BEGIN_RSA_PRIVATE) continue;
+				else if (line.substr(0, 10) == "Proc-Type:")
+				{
+					StringTokenizer st(line, ":,\r\n",
+						StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+					if (st[1] != "4" || st[2] != "ENCRYPTED") break;
+					beginLen += line.size();
+					if (line.find('\r') != std::string::npos) // \r\n
+					{
+						beginLen += std::count(line.begin(), line.end(), '\r');
+						++beginLen;
+					}
+					else // \n
+						++beginLen;
+				}
+				else if (line.substr(0, 9) == "DEK-Info:")
+				{
+					StringTokenizer st(line, ":,\r\n",
+						StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+					poco_assert(st[2].size() >= 3);
+					if (st[1] != "DES-EDE3-CBC")
+					{
+						throw Poco::InvalidArgumentException(
+							Poco::format("%s encryption not supported.", st[1]));
+					}
+					// initialization vector
+					poco_assert(st[2].size() % 2 == 0);
+					for (std::string::size_type i = 0; i < st[2].size(); i += 2)
+					{
+						BYTE num;
+						Poco::strToInt(st[2].substr(i, 2), num, 0x10);
+						_initVector.append(num);
+					}
+					beginLen += line.size();
+					if (line.find('\r') != std::string::npos)
+					{
+						beginLen += std::count(line.begin(), line.end(), '\r');
+						++beginLen;
+					}
+					else
+						++beginLen;
+				}
+				else if (line == "\r") // "\r\n" empty line
+				{
+					beginLen += std::count(line.begin(), line.end(), '\r');
+					++beginLen;
+					break;
+				}
+				else if (line.empty()) // "\n" empty line
+				{
+					++beginLen;
+					break;
+				}
+				else break;
+			}
+		}
 		const char* pemBegin = pem.data() + beginLen;
 		const char* pemEnd = pem.data() + pem.size() - endLen;
 		while (pemEnd > pemBegin && std::memcmp(pemEnd, END_RSA_PRIVATE, endLen) != 0)
@@ -198,6 +262,8 @@ void RSAKeyImpl::loadPrivateKey(std::istream& istr, const std::string& privateKe
 			crypt(derBuffer, privateKeyPassphrase, CRYPT_DIR_DECRYPT);
 		}
 	}
+	else
+		throw Poco::DataFormatException("Private key beginning string not found");
 
 	DWORD size = 0;
 	if (!CryptDecodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY,
@@ -348,16 +414,40 @@ void RSAKeyImpl::savePrivateKey(std::ostream& ostr, const std::string& privateKe
 		if (!privateKeyPassphrase.empty())
 		{
 			crypt(derBuffer, privateKeyPassphrase, CRYPT_DIR_ENCRYPT);
+			if (_initVector.size() == 0)
+			{
+				throw Poco::IllegalStateException(
+					"Cannot encrypt private key without initialization vector.");
+			}
+
+			ostr << BEGIN_RSA_PRIVATE << "\r\n";
+			ostr << "Proc-Type: 4,ENCRYPTED\r\n";
+			std::string initVec;
+			std::string chr;
+			for (std::size_t i = 0; i < _initVector.size(); ++i)
+			{
+				Poco::uIntToStr(_initVector[i], 0x10, chr, false, 2, '0');
+				initVec.append(chr);
+			}
+			ostr << "DEK-Info: DES-EDE3-CBC," << initVec << "\r\n";
+			ostr << "\r\n";
+			std::ostringstream os;
+			Poco::Base64Encoder enc(os);
+			enc.rdbuf()->setLineLength(64);
+			enc << std::string(derBuffer.begin(), derBuffer.size()) << std::flush;
+			enc.close();
+			ostr << os.str() << "\r\n" << END_RSA_PRIVATE << std::flush;
 		}
-
-		ostr << BEGIN_RSA_PRIVATE;
-		std::ostringstream os;
-		Poco::Base64Encoder enc(os);
-		enc.rdbuf()->setLineLength(64);
-		enc << std::string(derBuffer.begin(), derBuffer.size()) << std::flush;
-		enc.close();
-
-		ostr << os.str() << END_RSA_PRIVATE << std::flush;
+		else
+		{
+			ostr << BEGIN_RSA_PRIVATE << "\r\n";
+			std::ostringstream os;
+			Poco::Base64Encoder enc(os);
+			enc.rdbuf()->setLineLength(64);
+			enc << std::string(derBuffer.begin(), derBuffer.size()) << std::flush;
+			enc.close();
+			ostr << os.str() << "\r\n" << END_RSA_PRIVATE << std::flush;
+		}
 	}
 	else
 		throw Poco::IllegalStateException("No private key.");
@@ -398,28 +488,30 @@ void RSAKeyImpl::savePublicKey(std::ostream& ostr)
 }
 
 
-BOOL setIV(HCRYPTPROV hProvider, HCRYPTKEY hKey)
+void RSAKeyImpl::makeIV(HCRYPTKEY hKey)
 {
-	BOOL  bResult;
-	BYTE  *pbTemp;
-	DWORD dwBlockLen, dwDataLen;
+	DWORD dwBlockLen = 0;
+	DWORD dwDataLen = sizeof(dwBlockLen);
 
-	dwDataLen = sizeof(dwBlockLen);
-	if (!CryptGetKeyParam(hKey, KP_BLOCKLEN, (BYTE *)&dwBlockLen, &dwDataLen, 0))
-		return FALSE;
+	if (!CryptGetKeyParam(hKey, KP_BLOCKLEN, reinterpret_cast<LPBYTE>(&dwBlockLen), &dwDataLen, 0))
+	{
+		error("Cannot assign block length parameter to key");
+	}
+
 	dwBlockLen /= 8;
-	if (!(pbTemp = (BYTE *)LocalAlloc(LMEM_FIXED, dwBlockLen))) return FALSE;
-	bResult = CryptGenRandom(hProvider, dwBlockLen, pbTemp);
-	if (bResult)
-		bResult = CryptSetKeyParam(hKey, KP_IV, pbTemp, 0);
-	LocalFree(pbTemp);
-	return bResult;
+	_initVector.resize(dwBlockLen, false);
+
+	if (!CryptGenRandom(_sp.handle(), dwBlockLen, _initVector.begin()))
+	{
+		error("Cannot assign block length parameter to key");
+	}
 }
+
 
 void RSAKeyImpl::crypt(Poco::Buffer<char>& data, const std::string& privateKeyPassphrase, CryptDirection dir)
 {
 	if (privateKeyPassphrase.empty())
-		throw Poco::InvalidAccessException("Cannot encrypt with empty password");
+		throw Poco::InvalidAccessException("Cannot encrypt private key with empty password");
 
 	HCRYPTKEY  hSecretKey = 0;
 	HCRYPTHASH hHash = 0;
@@ -443,17 +535,16 @@ void RSAKeyImpl::crypt(Poco::Buffer<char>& data, const std::string& privateKeyPa
 					rc = CryptSetKeyParam(hSecretKey, KP_MODE, reinterpret_cast<LPBYTE>(&dwMode), 0);
 					if (rc)
 					{
-						//TODO: do we need IV (and PEM header)?
-						//rc = setIV(_sp.handle(), hSecretKey);
-						//if (rc)
+						DWORD size = static_cast<DWORD>(data.size());
+
+						if (dir == CRYPT_DIR_ENCRYPT)
 						{
-							DWORD size = static_cast<DWORD>(data.size());
+							if (_initVector.size() == 0) makeIV(hSecretKey);
 
-							if (dir == CRYPT_DIR_ENCRYPT)
+							rc = CryptSetKeyParam(hSecretKey, KP_IV, _initVector.begin(), 0);
+							if (rc)
 							{
-								rc = CryptEncrypt(hSecretKey, NULL, TRUE, 0,
-									NULL, &size, 0);
-
+								rc = CryptEncrypt(hSecretKey, NULL, TRUE, 0, NULL, &size, 0);
 								if (rc)
 								{
 									DWORD plainSize = static_cast<DWORD>(data.size());
@@ -463,16 +554,25 @@ void RSAKeyImpl::crypt(Poco::Buffer<char>& data, const std::string& privateKeyPa
 										static_cast<DWORD>(data.size()));
 								}
 							}
-							else if (dir == CRYPT_DIR_DECRYPT)
+						}
+						else if (dir == CRYPT_DIR_DECRYPT)
+						{
+							if (!_initVector.size())
+							{
+								throw Poco::IllegalStateException(
+									"Cannot decrypt private key without initialization vector.");
+							}
+
+							rc = CryptSetKeyParam(hSecretKey, KP_IV, _initVector.begin(), 0);
+							if (rc)
 							{
 								rc = CryptDecrypt(hSecretKey, NULL, TRUE, 0,
-									reinterpret_cast<LPBYTE>(data.begin()), &size);
+								reinterpret_cast<LPBYTE>(data.begin()), &size);
 								if (size != data.size()) data.resize(size, true);
 							}
-							else
-								throw Poco::InvalidAccessException("Bad crypt direction");
-
 						}
+						else
+							throw Poco::InvalidAccessException("Bad crypt direction");
 					}
 				}
 			}
