@@ -29,6 +29,7 @@
 #include "Poco/String.h"
 #include "Poco/Random.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Buffer.h"
 #include <sstream>
 
 
@@ -114,6 +115,14 @@ int WebSocket::receiveFrame(void* buffer, int length, int& flags)
 }
 
 	
+int WebSocket::receiveFrame(Poco::Buffer<char>& buffer, int& flags)
+{
+	int n = static_cast<WebSocketImpl*>(impl())->receiveBytes(buffer, 0);
+	flags = static_cast<WebSocketImpl*>(impl())->frameFlags();
+	return n;
+}
+
+
 WebSocket::Mode WebSocket::mode() const
 {
 	return static_cast<WebSocketImpl*>(impl())->mustMaskPayload() ? WS_CLIENT : WS_SERVER;

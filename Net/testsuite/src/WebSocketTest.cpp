@@ -141,6 +141,13 @@ void WebSocketTest::testWebSocket()
 		assert (n == payload.size());
 		assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
 		assert (flags == WebSocket::FRAME_TEXT);
+
+		ws.sendFrame(payload.data(), (int) payload.size());
+		Poco::Buffer<char> pocobuffer(0);
+		n = ws.receiveFrame(pocobuffer, flags);
+		assert (n == payload.size());
+		assert (payload.compare(0, payload.size(), pocobuffer.begin(), 0, n) == 0);
+		assert (flags == WebSocket::FRAME_TEXT);
 	}
 
 	for (int i = 125; i < 129; i++)
@@ -150,6 +157,13 @@ void WebSocketTest::testWebSocket()
 		n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 		assert (n == payload.size());
 		assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+		assert (flags == WebSocket::FRAME_TEXT);
+
+		ws.sendFrame(payload.data(), (int) payload.size());
+		Poco::Buffer<char> pocobuffer(0);
+		n = ws.receiveFrame(pocobuffer, flags);
+		assert (n == payload.size());
+		assert (payload.compare(0, payload.size(), pocobuffer.begin(), 0, n) == 0);
 		assert (flags == WebSocket::FRAME_TEXT);
 	}
 
@@ -210,6 +224,49 @@ void WebSocketTest::testWebSocketLarge()
 }
 
 
+void WebSocketTest::testOneLargeFrame(int msgSize)
+{
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory(msgSize), ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	Poco::Thread::sleep(200);
+
+	HTTPClientSession cs("localhost", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
+	HTTPResponse response;
+	WebSocket ws(cs, request, response);
+	ws.setSendBufferSize(msgSize);
+	ws.setReceiveBufferSize(msgSize);
+	std::string payload(msgSize, 'x');
+
+	ws.sendFrame(payload.data(), msgSize);
+
+	char buffer[msgSize];
+	int flags;
+	int n;
+
+	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+	assert (n == payload.size());
+	assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+
+	ws.sendFrame(payload.data(), msgSize);
+
+	Poco::Buffer<char> pocobuffer(0);
+
+	n = ws.receiveFrame(pocobuffer, flags);
+	assert (n == payload.size());
+	assert (payload.compare(0, payload.size(), pocobuffer.begin(), 0, n) == 0);
+}
+
+
+void WebSocketTest::testWebSocketLargeInOneFrame()
+{
+	testOneLargeFrame(64000);
+	testOneLargeFrame(70000);
+}
+
+
 void WebSocketTest::setUp()
 {
 }
@@ -226,6 +283,7 @@ CppUnit::Test* WebSocketTest::suite()
 
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocket);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLarge);
+	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLargeInOneFrame);
 
 	return pSuite;
 }
