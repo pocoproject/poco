@@ -199,7 +199,7 @@ void ThreadImpl::setAffinityImpl(unsigned cpu)
     throw SystemException("Failed to set affinity");
 #endif
 #else
-  poco_bugcheck_msg("Thread affinity not supported on this system");
+  throw Poco::NotImplementedException("Thread affinity not supported on this system");
 #endif
 #endif // defined unix & !defined mac os x
 
@@ -229,10 +229,10 @@ unsigned cpuCount = Environment::processorCount();
   CPU_ZERO(&cpuset);
 #ifdef HAVE_THREE_PARAM_SCHED_SETAFFINITY
   if (pthread_getaffinity_np(_pData->thread, sizeof(cpuset), &cpuset) != 0)
-    throw SystemException("Failed to get affinity");
+    throw SystemException("Failed to get affinity", errno);
 #else
   if (pthread_getaffinity_np(_pData->thread, &cpuset) != 0)
-    throw SystemException("Failed to get affinity");
+    throw SystemException("Failed to get affinity", errno);
 #endif
   for (unsigned i = 0; i < cpuCount; i++) {
     if (CPU_ISSET(i, &cpuset)) {
@@ -256,9 +256,9 @@ unsigned cpuCount = Environment::processorCount();
                           &count,
                           &get_default);
   if (ret != KERN_SUCCESS) {
-    throw SystemException("Failed to get affinity");
+    throw SystemException("Failed to get affinity", errno);
   }
-  cpuSet = policy.affinity_tag - 1;
+  cpuSet = policy.affinity_tag;
   if (cpuSet >= cpuCount)
     cpuSet = 0;
 

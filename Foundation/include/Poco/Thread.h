@@ -135,10 +135,13 @@ public:
     /// Typically, the real stack size is rounded up to the nearest
     /// page size multiple.
 
-    void setAffinity(unsigned int cpu);
+  void setAffinity(unsigned int cpu);
     /// Limit specified thread to run only on the processors "cpu"
     /// cpu - processor (core) number
     /// Method would Throw SystemException if affinity did not setted
+
+  unsigned getAffinity() const;
+    /// Returns using cpu (core) number
 
   int getStackSize() const;
     /// Returns the thread's stack size in bytes.
@@ -355,8 +358,14 @@ inline void Thread::setStackSize(int size)
   setStackSizeImpl(size);
 }
 
-inline void Thread::setAffinity(unsigned int cpu) {
+inline void Thread::setAffinity(unsigned int cpu) 
+{
   setAffinityImpl(cpu);
+}
+
+inline unsigned Thread::getAffinity() const
+{
+  return getAffinityImpl();
 }
 
 inline int Thread::getStackSize() const

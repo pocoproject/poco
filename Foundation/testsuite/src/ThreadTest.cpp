@@ -19,12 +19,14 @@
 #include "Poco/Event.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
+#include "Poco/Environment.h"
 //#include <iostream>
 #if defined(__sun) && defined(__SVR4) && !defined(__EXTENSIONS__)
 #define __EXTENSIONS__
 #endif
 #include <climits>
-
+#include <vector>
+#include <sstream>
 
 using Poco::Thread;
 using Poco::Runnable;
@@ -449,6 +451,67 @@ void ThreadTest::testSleep()
 	assert (elapsed.totalMilliseconds() >= 190 && elapsed.totalMilliseconds() < 250);
 }
 
+void ThreadTest::testAffinity()
+{
+	std::stringstream ss;
+	unsigned cpuCount = Poco::Environment::processorCount();
+	unsigned usedCpu = 0;
+	bool notImplemented = false;
+	std::vector<Thread *> threadList;
+	Thread *thread = NULL;
+	std::vector<MyRunnable *> runnableList;
+	MyRunnable *runbl = NULL;
+
+	for (unsigned i = 0; i < cpuCount; i++) 
+	{
+		ss.str("");
+		ss << "Thread" << i;
+		thread = new Thread(ss.str());
+		threadList.push_back(thread);
+		runbl = new MyRunnable();
+		runnableList.push_back(runbl);
+	}
+
+	for (int i = 0; i < cpuCount; i++)
+	{
+		assert (!threadList[i]->isRunning());
+	}
+	
+	for (int i = 0; i < cpuCount; i++)
+	{
+		threadList[i]->start(*runnableList[i]);
+		try 
+		{
+			threadList[i]->setAffinity(i);
+		}
+		catch (Poco::NotImplementedException &niex) 
+		{
+			notImplemented = true;
+		}
+		Thread::sleep(100);
+		try 
+		{
+			usedCpu = threadList[i]->getAffinity();
+		}
+		catch (Poco::NotImplementedException &niex) 
+		{
+			notImplemented = true;
+		}
+		if (!notImplemented)
+		{
+			assert (usedCpu == i);
+		}
+	}
+
+	for (int i = 0; i < cpuCount; i++)
+	{
+		runnableList[i]->notify();
+		threadList[i]->join();
+		delete runnableList[i];
+		delete threadList[i];
+	}
+}
+
 
 void ThreadTest::setUp()
 {
@@ -478,6 +541,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testThreadFunctor);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
 	CppUnit_addTest(pSuite, ThreadTest, testSleep);
+	CppUnit_addTest(pSuite, ThreadTest, testAffinity);
 
 	return pSuite;
 }

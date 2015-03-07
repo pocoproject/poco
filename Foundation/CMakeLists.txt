@@ -108,7 +108,7 @@ endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 add_definitions( -DPCRE_STATIC)
 
 # For SetAffinity
-if(UNIX)
+if(UNIX AND NOT APPLE)
     INCLUDE (CheckFunctionExists)
     INCLUDE (CheckCXXSourceCompiles)
     CHECK_FUNCTION_EXISTS(pthread_setaffinity_np HAVE_PTHREAD_SETAFFINITY_NP)
@@ -143,7 +143,7 @@ if(UNIX)
 
         endif(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
     endif(HAVE_PTHREAD_SETAFFINITY_NP)
-endif(UNIX)
+endif(UNIX AND NOT APPLE)
 
 add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS})
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
