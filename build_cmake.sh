@@ -8,15 +8,15 @@ rm -rf cmake-build
 mkdir cmake-build
 cd cmake-build
 
-cmake ../. -DCMAKE_BUILD_TYPE=Debug  $1 $2 $3 $4 $5
-make -j3
-make install
+cmake ../. -DCMAKE_INSTALL_PREFIX=/opt/devel -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTS=ON -G "Sublime Text 2 - Unix Makefiles"  $1 $2 $3 $4 $5
+make -j8
+sudo make install
 
-rm -rf CMakeCache.txt
+#rm -rf CMakeCache.txt
 
-cmake ../. -DCMAKE_BUILD_TYPE=Release $1 $2 $3 $4 $5
-make -j3
-make install
+#cmake ../. -DCMAKE_INSTALL_PREFIX=/opt/devel -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS=ON $1 $2 $3 $4 $5
+#make -j8
+#sudo make install
 
 
 cd ..

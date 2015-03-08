@@ -26,116 +26,116 @@ ThreadImpl::CurrentThreadHolder ThreadImpl::_currentThreadHolder;
 
 
 ThreadImpl::ThreadImpl():
-	_pRunnableTarget(0),
-	_thread(0),
-	_threadId(0),
-	_prio(PRIO_NORMAL_IMPL),
-	_stackSize(POCO_THREAD_STACK_SIZE)
+    _pRunnableTarget(0),
+    _thread(0),
+    _threadId(0),
+    _prio(PRIO_NORMAL_IMPL),
+    _stackSize(POCO_THREAD_STACK_SIZE)
 {
 }
 
-			
+
 ThreadImpl::~ThreadImpl()
 {
-	if (_thread) CloseHandle(_thread);
+    if (_thread) CloseHandle(_thread);
 }
 
 
 void ThreadImpl::setPriorityImpl(int prio)
 {
-	if (prio != _prio)
-	{
-		_prio = prio;
-		if (_thread)
-		{
-			if (SetThreadPriority(_thread, _prio) == 0)
-				throw SystemException("cannot set thread priority");
-		}
-	}
+    if (prio != _prio)
+    {
+        _prio = prio;
+        if (_thread)
+        {
+            if (SetThreadPriority(_thread, _prio) == 0)
+                throw SystemException("cannot set thread priority");
+        }
+    }
 }
 
 
 void ThreadImpl::setOSPriorityImpl(int prio, int /* policy */)
 {
-	setPriorityImpl(prio);
+    setPriorityImpl(prio);
 }
 
 
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {
-	if (isRunningImpl())
-		throw SystemException("thread already running");
+    if (isRunningImpl())
+        throw SystemException("thread already running");
 
-	_pRunnableTarget = pTarget;
+    _pRunnableTarget = pTarget;
 
-	createImpl(runnableEntry, this);
+    createImpl(runnableEntry, this);
 }
 
 
 void ThreadImpl::createImpl(Entry ent, void* pData)
 {
-	_thread = CreateThread(NULL, _stackSize, ent, pData, 0, &_threadId);
+    _thread = CreateThread(NULL, _stackSize, ent, pData, 0, &_threadId);
 
-	if (!_thread)
-		throw SystemException("cannot create thread");
-	if (_prio != PRIO_NORMAL_IMPL && !SetThreadPriority(_thread, _prio))
-		throw SystemException("cannot set thread priority");
+    if (!_thread)
+        throw SystemException("cannot create thread");
+    if (_prio != PRIO_NORMAL_IMPL && !SetThreadPriority(_thread, _prio))
+        throw SystemException("cannot set thread priority");
 }
 
 
 void ThreadImpl::joinImpl()
 {
-	if (!_thread) return;
+    if (!_thread) return;
 
-	switch (WaitForSingleObject(_thread, INFINITE))
-	{
-	case WAIT_OBJECT_0:
-		threadCleanup();
-		return;
-	default:
-		throw SystemException("cannot join thread");
-	}
+    switch (WaitForSingleObject(_thread, INFINITE))
+    {
+    case WAIT_OBJECT_0:
+        threadCleanup();
+        return;
+    default:
+        throw SystemException("cannot join thread");
+    }
 }
 
 
 bool ThreadImpl::joinImpl(long milliseconds)
 {
-	if (!_thread) return true;
+    if (!_thread) return true;
 
-	switch (WaitForSingleObject(_thread, milliseconds + 1))
-	{
-	case WAIT_TIMEOUT:
-		return false;
-	case WAIT_OBJECT_0:
-		threadCleanup();
-		return true;
-	default:
-		throw SystemException("cannot join thread");
-	}
+    switch (WaitForSingleObject(_thread, milliseconds + 1))
+    {
+    case WAIT_TIMEOUT:
+        return false;
+    case WAIT_OBJECT_0:
+        threadCleanup();
+        return true;
+    default:
+        throw SystemException("cannot join thread");
+    }
 }
 
 
 bool ThreadImpl::isRunningImpl() const
 {
-	if (_thread)
-	{
-		DWORD ec = 0;
-		return GetExitCodeThread(_thread, &ec) && ec == STILL_ACTIVE;
-	}
-	return false;
+    if (_thread)
+    {
+        DWORD ec = 0;
+        return GetExitCodeThread(_thread, &ec) && ec == STILL_ACTIVE;
+    }
+    return false;
 }
 
 
 void ThreadImpl::threadCleanup()
 {
-	if (!_thread) return;
-	if (CloseHandle(_thread)) _thread = 0;
+    if (!_thread) return;
+    if (CloseHandle(_thread)) _thread = 0;
 }
 
 
 ThreadImpl* ThreadImpl::currentImpl()
 {
-	return _currentThreadHolder.get();
+    return _currentThreadHolder.get();
 }
 
 
@@ -147,24 +147,24 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 
 DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
 {
-	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
-	try
-	{
-		reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();
-	}
-	catch (Exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (std::exception& exc)
-	{
-		ErrorHandler::handle(exc);
-	}
-	catch (...)
-	{
-		ErrorHandler::handle();
-	}
-	return 0;
+    _currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
+    try
+    {
+        reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();
+    }
+    catch (Exception& exc)
+    {
+        ErrorHandler::handle(exc);
+    }
+    catch (std::exception& exc)
+    {
+        ErrorHandler::handle(exc);
+    }
+    catch (...)
+    {
+        ErrorHandler::handle();
+    }
+    return 0;
 }
 
 
