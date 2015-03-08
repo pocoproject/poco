@@ -23,40 +23,39 @@
 #if defined(POCO_WIN32_DEBUGGER_THREAD_NAMES)
 
 
-namespace
-{
-	/// See <http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx> 
-	/// and <http://blogs.msdn.com/b/stevejs/archive/2005/12/19/505815.aspx> for
-	/// more information on the code below.
+namespace {
+/// See <http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx>
+/// and <http://blogs.msdn.com/b/stevejs/archive/2005/12/19/505815.aspx> for
+/// more information on the code below.
 
-	const DWORD MS_VC_EXCEPTION = 0x406D1388;
-	
-	#pragma pack(push,8)
-	typedef struct tagTHREADNAME_INFO
+const DWORD MS_VC_EXCEPTION = 0x406D1388;
+
+#pragma pack(push,8)
+typedef struct tagTHREADNAME_INFO
+{
+	DWORD dwType;     // Must be 0x1000.
+	LPCSTR szName;    // Pointer to name (in user addr space).
+	DWORD dwThreadID; // Thread ID (-1=caller thread).
+	DWORD dwFlags;    // Reserved for future use, must be zero.
+} THREADNAME_INFO;
+#pragma pack(pop)
+
+void setThreadName(DWORD dwThreadID, const char* threadName)
+{
+	THREADNAME_INFO info;
+	info.dwType     = 0x1000;
+	info.szName     = threadName;
+	info.dwThreadID = dwThreadID;
+	info.dwFlags    = 0;
+
+	__try
 	{
-		DWORD dwType;     // Must be 0x1000.
-		LPCSTR szName;    // Pointer to name (in user addr space).
-		DWORD dwThreadID; // Thread ID (-1=caller thread).
-		DWORD dwFlags;    // Reserved for future use, must be zero.
-	} THREADNAME_INFO;
-	#pragma pack(pop)
-	
-	void setThreadName(DWORD dwThreadID, const char* threadName)
-	{
-        THREADNAME_INFO info;
-        info.dwType     = 0x1000;
-        info.szName     = threadName;
-        info.dwThreadID = dwThreadID;
-        info.dwFlags    = 0;
-    
-        __try
-        {
-            RaiseException(MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info);
-        }
-        __except (EXCEPTION_CONTINUE_EXECUTION)
-        {
-        }
+		RaiseException(MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info);
 	}
+	__except (EXCEPTION_CONTINUE_EXECUTION)
+	{
+	}
+}
 }
 
 
@@ -103,6 +102,20 @@ void ThreadImpl::setOSPriorityImpl(int prio, int /* policy */)
 	setPriorityImpl(prio);
 }
 
+void ThreadImpl::setAffinityImpl(unsigned cpu)
+{
+	DWORD mask = 1;
+	mask <<= cpu;
+	if (SetThreadAffinityMask(_thread, mask) == 0)
+	{
+		throw SystemException("Failed to set affinity");
+	}
+}
+
+unsigned ThreadImpl::getAffinityImpl() const
+{
+	throw Poco::NotImplementedException("Get thread affinity not supported on this system");
+}
 
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {

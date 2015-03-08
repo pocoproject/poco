@@ -36,10 +36,10 @@ namespace Poco {
 
 class Foundation_API ThreadImpl
 {
-public:	
-    typedef DWORD TIDImpl;
+public:
+	typedef DWORD TIDImpl;
 	typedef void (*Callable)(void*);
-	typedef DWORD (WINAPI *Entry)(LPVOID);
+	typedef DWORD (WINAPI* Entry)(LPVOID);
 
 	enum Priority
 	{
@@ -55,7 +55,7 @@ public:
 		POLICY_DEFAULT_IMPL = 0
 	};
 
-	ThreadImpl();				
+	ThreadImpl();
 	~ThreadImpl();
 
 	TIDImpl tidImpl() const;
@@ -67,6 +67,8 @@ public:
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
+	void setAffinityImpl(unsigned cpu);
+	unsigned getAffinityImpl() const;
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
@@ -103,7 +105,7 @@ private:
 		{
 			TlsSetValue(_slot, pThread);
 		}
-	
+
 	private:
 		DWORD _slot;
 	};
@@ -144,6 +146,16 @@ inline int ThreadImpl::getMaxOSPriorityImpl(int /* policy */)
 	return PRIO_HIGHEST_IMPL;
 }
 
+inline void ThreadImpl::setAffinityImpl(unsigned cpu)
+{
+	(void)cpu;
+	throw Poco::NotImplementedException("Thread affinity not supported on this system");
+}
+
+inline unsigned ThreadImpl::getAffinityImpl()
+{
+	throw Poco::NotImplementedException("Thread affinity not supported on this system");
+}
 
 inline void ThreadImpl::sleepImpl(long milliseconds)
 {
