@@ -37,86 +37,86 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:
-    typedef DWORD TIDImpl;
-    typedef void (*Callable)(void*);
-    typedef DWORD (WINAPI* Entry)(LPVOID);
+	typedef DWORD TIDImpl;
+	typedef void (*Callable)(void*);
+	typedef DWORD (WINAPI* Entry)(LPVOID);
 
-    enum Priority
-    {
-        PRIO_LOWEST_IMPL  = THREAD_PRIORITY_LOWEST,
-        PRIO_LOW_IMPL     = THREAD_PRIORITY_BELOW_NORMAL,
-        PRIO_NORMAL_IMPL  = THREAD_PRIORITY_NORMAL,
-        PRIO_HIGH_IMPL    = THREAD_PRIORITY_ABOVE_NORMAL,
-        PRIO_HIGHEST_IMPL = THREAD_PRIORITY_HIGHEST
-    };
+	enum Priority
+	{
+		PRIO_LOWEST_IMPL  = THREAD_PRIORITY_LOWEST,
+		PRIO_LOW_IMPL     = THREAD_PRIORITY_BELOW_NORMAL,
+		PRIO_NORMAL_IMPL  = THREAD_PRIORITY_NORMAL,
+		PRIO_HIGH_IMPL    = THREAD_PRIORITY_ABOVE_NORMAL,
+		PRIO_HIGHEST_IMPL = THREAD_PRIORITY_HIGHEST
+	};
 
-    enum Policy
-    {
-        POLICY_DEFAULT_IMPL = 0
-    };
+	enum Policy
+	{
+		POLICY_DEFAULT_IMPL = 0
+	};
 
-    ThreadImpl();
-    ~ThreadImpl();
+	ThreadImpl();
+	~ThreadImpl();
 
-    TIDImpl tidImpl() const;
-    void setPriorityImpl(int prio);
-    int getPriorityImpl() const;
-    void setOSPriorityImpl(int prio, int policy = 0);
-    int getOSPriorityImpl() const;
-    static int getMinOSPriorityImpl(int policy);
-    static int getMaxOSPriorityImpl(int policy);
-    void setStackSizeImpl(int size);
-    int getStackSizeImpl() const;
-    void setAffinityImpl(unsigned cpu);
-    unsigned getAffinityImpl() const;
-    void startImpl(SharedPtr<Runnable> pTarget);
-    void joinImpl();
-    bool joinImpl(long milliseconds);
-    bool isRunningImpl() const;
-    static void sleepImpl(long milliseconds);
-    static void yieldImpl();
-    static ThreadImpl* currentImpl();
-    static TIDImpl currentTidImpl();
+	TIDImpl tidImpl() const;
+	void setPriorityImpl(int prio);
+	int getPriorityImpl() const;
+	void setOSPriorityImpl(int prio, int policy = 0);
+	int getOSPriorityImpl() const;
+	static int getMinOSPriorityImpl(int policy);
+	static int getMaxOSPriorityImpl(int policy);
+	void setStackSizeImpl(int size);
+	int getStackSizeImpl() const;
+	void setAffinityImpl(unsigned cpu);
+	unsigned getAffinityImpl() const;
+	void startImpl(SharedPtr<Runnable> pTarget);
+	void joinImpl();
+	bool joinImpl(long milliseconds);
+	bool isRunningImpl() const;
+	static void sleepImpl(long milliseconds);
+	static void yieldImpl();
+	static ThreadImpl* currentImpl();
+	static TIDImpl currentTidImpl();
 
 protected:
-    static DWORD WINAPI runnableEntry(LPVOID pThread);
+	static DWORD WINAPI runnableEntry(LPVOID pThread);
 
-    void createImpl(Entry ent, void* pData);
-    void threadCleanup();
+	void createImpl(Entry ent, void* pData);
+	void threadCleanup();
 
 private:
-    class CurrentThreadHolder
-    {
-    public:
-        CurrentThreadHolder(): _slot(TlsAlloc())
-        {
-            if (_slot == TLS_OUT_OF_INDEXES)
-                throw SystemException("cannot allocate thread context key");
-        }
-        ~CurrentThreadHolder()
-        {
-            TlsFree(_slot);
-        }
-        ThreadImpl* get() const
-        {
-            return reinterpret_cast<ThreadImpl*>(TlsGetValue(_slot));
-        }
-        void set(ThreadImpl* pThread)
-        {
-            TlsSetValue(_slot, pThread);
-        }
+	class CurrentThreadHolder
+	{
+	public:
+		CurrentThreadHolder(): _slot(TlsAlloc())
+		{
+			if (_slot == TLS_OUT_OF_INDEXES)
+				throw SystemException("cannot allocate thread context key");
+		}
+		~CurrentThreadHolder()
+		{
+			TlsFree(_slot);
+		}
+		ThreadImpl* get() const
+		{
+			return reinterpret_cast<ThreadImpl*>(TlsGetValue(_slot));
+		}
+		void set(ThreadImpl* pThread)
+		{
+			TlsSetValue(_slot, pThread);
+		}
 
-    private:
-        DWORD _slot;
-    };
+	private:
+		DWORD _slot;
+	};
 
-    SharedPtr<Runnable> _pRunnableTarget;
-    HANDLE       _thread;
-    DWORD        _threadId;
-    int          _prio;
-    int          _stackSize;
+	SharedPtr<Runnable> _pRunnableTarget;
+	HANDLE       _thread;
+	DWORD        _threadId;
+	int          _prio;
+	int          _stackSize;
 
-    static CurrentThreadHolder _currentThreadHolder;
+	static CurrentThreadHolder _currentThreadHolder;
 };
 
 
@@ -125,65 +125,65 @@ private:
 //
 inline int ThreadImpl::getPriorityImpl() const
 {
-    return _prio;
+	return _prio;
 }
 
 
 inline int ThreadImpl::getOSPriorityImpl() const
 {
-    return _prio;
+	return _prio;
 }
 
 
 inline int ThreadImpl::getMinOSPriorityImpl(int /* policy */)
 {
-    return PRIO_LOWEST_IMPL;
+	return PRIO_LOWEST_IMPL;
 }
 
 
 inline int ThreadImpl::getMaxOSPriorityImpl(int /* policy */)
 {
-    return PRIO_HIGHEST_IMPL;
+	return PRIO_HIGHEST_IMPL;
 }
 
 inline void ThreadImpl::setAffinityImpl(unsigned cpu)
 {
-    (void)cpu;
-    throw Poco::NotImplementedException("Thread affinity not supported on this system");
+	(void)cpu;
+	throw Poco::NotImplementedException("Thread affinity not supported on this system");
 }
 
 inline unsigned ThreadImpl::getAffinityImpl()
 {
-    throw Poco::NotImplementedException("Thread affinity not supported on this system");
+	throw Poco::NotImplementedException("Thread affinity not supported on this system");
 }
 
 inline void ThreadImpl::sleepImpl(long milliseconds)
 {
-    Sleep(DWORD(milliseconds));
+	Sleep(DWORD(milliseconds));
 }
 
 
 inline void ThreadImpl::yieldImpl()
 {
-    Sleep(0);
+	Sleep(0);
 }
 
 
 inline void ThreadImpl::setStackSizeImpl(int size)
 {
-    _stackSize = size;
+	_stackSize = size;
 }
 
 
 inline int ThreadImpl::getStackSizeImpl() const
 {
-    return _stackSize;
+	return _stackSize;
 }
 
 
 inline ThreadImpl::TIDImpl ThreadImpl::tidImpl() const
 {
-    return _threadId;
+	return _threadId;
 }
 
 
