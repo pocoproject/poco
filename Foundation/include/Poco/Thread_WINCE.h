@@ -152,7 +152,7 @@ inline void ThreadImpl::setAffinityImpl(unsigned cpu)
 	throw Poco::NotImplementedException("Thread affinity not supported on this system");
 }
 
-inline unsigned ThreadImpl::getAffinityImpl()
+inline unsigned ThreadImpl::getAffinityImpl() const
 {
 	throw Poco::NotImplementedException("Thread affinity not supported on this system");
 }
