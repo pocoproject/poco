@@ -151,7 +151,7 @@ void MemoryStreamTest::testInputSeek()
 #ifdef __APPLE__
 		// workaround for clang libstdc++, which does not
 		// set failbit if seek returns -1
-		assert (istr2.tellg() == std::streampos(0));
+		assert (istr2.fail() || istr2.tellg() == std::streampos(0));
 #else
 		assert (istr2.fail());
 #endif
@@ -168,7 +168,7 @@ void MemoryStreamTest::testInputSeek()
 #ifdef __APPLE__
 		// workaround for clang libstdc++, which does not
 		// set failbit if seek returns -1
-		assert (istr2.tellg() == std::streampos(0));
+		assert (istr2.fail() || istr2.tellg() == std::streampos(0));
 #else
 		assert (istr2.fail());
 #endif
@@ -185,7 +185,7 @@ void MemoryStreamTest::testInputSeek()
 #ifdef __APPLE__
 		// workaround for clang libstdc++, which does not
 		// set failbit if seek returns -1
-		assert (istr2.tellg() == std::streampos(0));
+		assert (istr2.fail() || istr2.tellg() == std::streampos(0));
 #else
 		assert (istr2.fail());
 #endif
@@ -202,7 +202,7 @@ void MemoryStreamTest::testInputSeek()
 #ifdef __APPLE__
 		// workaround for clang libstdc++, which does not
 		// set failbit if seek returns -1
-		assert (istr2.tellg() == std::streampos(0));
+		assert (istr2.fail() || istr2.tellg() == std::streampos(0));
 #else
 		assert (istr2.fail());
 #endif
@@ -223,7 +223,7 @@ void MemoryStreamTest::testInputSeek()
 #ifdef __APPLE__
 		// workaround for clang libstdc++, which does not
 		// set failbit if seek returns -1
-		assert (istr2.tellg() == std::streampos(4));
+		assert (istr2.fail() || istr2.tellg() == std::streampos(4));
 #else
 		assert (istr2.fail());
 #endif
@@ -244,7 +244,7 @@ void MemoryStreamTest::testInputSeek()
 #ifdef __APPLE__
 		// workaround for clang libstdc++, which does not
 		// set failbit if seek returns -1
-		assert (istr2.tellg() == std::streampos(5));
+		assert (istr2.fail() || istr2.tellg() == std::streampos(5));
 #else
 		assert (istr2.fail());
 #endif
@@ -265,7 +265,7 @@ void MemoryStreamTest::testInputSeek()
 #ifdef __APPLE__
 		// workaround for clang libstdc++, which does not
 		// set failbit if seek returns -1
-		assert (istr2.tellg() == std::streampos(4));
+		assert (istr2.fail() || istr2.tellg() == std::streampos(4));
 #else
 		assert (istr2.fail());
 #endif
