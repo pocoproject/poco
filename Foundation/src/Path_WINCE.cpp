@@ -31,12 +31,35 @@ std::string PathImpl::currentImpl()
 	return("\\");
 }
 
-
 std::string PathImpl::homeImpl()
 {
 	return("\\");
 }
 
+std::string PathImpl::configHomeImpl()
+{
+  return homeImpl();
+}
+
+std::string PathImpl::dataHomeImpl()
+{
+  return homeImpl();
+}
+
+std::string PathImpl::cacheHomeImpl()
+{
+  return homeImpl();
+}
+
+std::string PathImpl::tempHomeImpl()
+{
+  return tempImpl();
+}
+
+std::string PathImpl::configImpl()
+{
+  return("\\");
+}
 
 std::string PathImpl::systemImpl()
 {
