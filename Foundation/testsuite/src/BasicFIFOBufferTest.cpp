@@ -21,6 +21,7 @@
 #include <memory>
 #include <cstring>
 
+
 // NOTE: using for certain namespace
 using Poco::BasicFIFOBuffer;
 using Poco::FIFOBuffer;
@@ -29,7 +30,13 @@ using Poco::InvalidAccessException;
 using Poco::delegate;
 using std::memcpy;
 
-BasicFIFOBufferTest::BasicFIFOBufferTest(const std::string& name): CppUnit::TestCase(name)
+
+BasicFIFOBufferTest::BasicFIFOBufferTest(const std::string& name): 
+	CppUnit::TestCase(name),
+	_notToReadable(0),
+	_notToWritable(0),
+	_readableToNot(0),
+	_writableToNot(0)
 {
 }
 
@@ -666,6 +673,7 @@ void BasicFIFOBufferTest::testInt()
 
 void BasicFIFOBufferTest::setUp()
 {
+	
 }
 
 
