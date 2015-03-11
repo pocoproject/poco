@@ -27,13 +27,24 @@ public:
 	~BasicFIFOBufferTest();
 
 	void testNextWrite();
+	void testChar();
+	void testInt();
+	void testEOFAndError();
 
 	void setUp();
 	void tearDown();
 
 	static CppUnit::Test* suite();
 
+protected:
+	void onReadable(bool& b);
+	void onWritable(bool& b);
+
 private:
+	int _notToReadable;
+	int _notToWritable;
+	int _readableToNot;
+	int _writableToNot;
 };
 
 
