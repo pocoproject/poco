@@ -36,9 +36,9 @@ public:
 	PooledThread(const std::string& name, int stackSize = POCO_THREAD_STACK_SIZE);
 	~PooledThread();
 
-	void start();
-	void start(Thread::Priority priority, Runnable& target);
-	void start(Thread::Priority priority, Runnable& target, const std::string& name);
+	void start(int cpu = -1);
+	void start(Thread::Priority priority, Runnable& target, int cpu = -1);
+	void start(Thread::Priority priority, Runnable& target, const std::string& name, int cpu = -1);
 	bool idle();
 	int idleTime();
 	void join();
@@ -85,14 +85,17 @@ PooledThread::~PooledThread()
 }
 
 
-void PooledThread::start()
+void PooledThread::start(int cpu)
 {
 	_thread.start(*this);
 	_started.wait();
+	if (cpu >= 0) {
+		_thread.setAffinity(static_cast<unsigned>(cpu));
+	}
 }
 
 
-void PooledThread::start(Thread::Priority priority, Runnable& target)
+void PooledThread::start(Thread::Priority priority, Runnable& target, int cpu)
 {
 	FastMutex::ScopedLock lock(_mutex);
 	
@@ -101,10 +104,13 @@ void PooledThread::start(Thread::Priority priority, Runnable& target)
 	_pTarget = &target;
 	_thread.setPriority(priority);
 	_targetReady.set();
+	if (cpu >= 0) {
+		_thread.setAffinity(static_cast<unsigned>(cpu));
+	}
 }
 
 
-void PooledThread::start(Thread::Priority priority, Runnable& target, const std::string& name)
+void PooledThread::start(Thread::Priority priority, Runnable& target, const std::string& name, int cpu)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
@@ -126,6 +132,9 @@ void PooledThread::start(Thread::Priority priority, Runnable& target, const std:
 
 	_pTarget = &target;
 	_targetReady.set();
+	if (cpu >= 0) {
+		_thread.setAffinity(static_cast<unsigned>(cpu));
+	}
 }
 
 
@@ -239,21 +248,31 @@ void PooledThread::run()
 ThreadPool::ThreadPool(int minCapacity,
 	int maxCapacity,
 	int idleTime,
-	int stackSize): 
+	int stackSize,
+	ThreadAffinityPolicy affinityPolicy):
 	_minCapacity(minCapacity), 
 	_maxCapacity(maxCapacity), 
 	_idleTime(idleTime),
 	_serial(0),
 	_age(0),
-	_stackSize(stackSize)
+	_stackSize(stackSize),
+	_affinityPolicy(affinityPolicy),
+	_lastCpu(0)
 {
 	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
 
+	int cpu = -1;
+	int cpuCount = Poco::Environment::processorCount();
+	
 	for (int i = 0; i < _minCapacity; i++)
 	{
+		if (_affinityPolicy == UNIFORM_DISTRIBUTION) {
+			cpu = _lastCpu.value() % cpuCount;
+			_lastCpu++;
+		}
 		PooledThread* pThread = createThread();
 		_threads.push_back(pThread);
-		pThread->start();
+		pThread->start(cpu);
 	}
 }
 
@@ -262,22 +281,31 @@ ThreadPool::ThreadPool(const std::string& name,
 	int minCapacity,
 	int maxCapacity,
 	int idleTime,
-	int stackSize):
+	int stackSize,
+	ThreadAffinityPolicy affinityPolicy):
 	_name(name),
 	_minCapacity(minCapacity), 
 	_maxCapacity(maxCapacity), 
 	_idleTime(idleTime),
 	_serial(0),
 	_age(0),
-	_stackSize(stackSize)
+	_stackSize(stackSize),
+	_affinityPolicy(affinityPolicy),
+	_lastCpu(0)
 {
 	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
 
+	int cpu = -1;
+	int cpuCount = Poco::Environment::processorCount();
 	for (int i = 0; i < _minCapacity; i++)
 	{
+		if (_affinityPolicy == UNIFORM_DISTRIBUTION) {
+			cpu = _lastCpu.value() % cpuCount;
+			_lastCpu++;
+		}
 		PooledThread* pThread = createThread();
 		_threads.push_back(pThread);
-		pThread->start();
+		pThread->start(cpu);
 	}
 }
 
@@ -346,27 +374,52 @@ int ThreadPool::allocated() const
 }
 
 
-void ThreadPool::start(Runnable& target)
+int ThreadPool::getCorrectCpu(int cpu)
 {
-	getThread()->start(Thread::PRIO_NORMAL, target);
+	switch (static_cast<int>(_affinityPolicy)) {
+		case UNIFORM_DISTRIBUTION:
+		{
+			cpu = _lastCpu.value() % Environment::processorCount();
+			_lastCpu++;
+		}
+		break;
+		case OS_DEFAULT:
+		{
+			cpu = -1;
+		}
+		break;
+		case CUSTOM:
+		{
+			if ((cpu < -1) || (cpu >= Environment::processorCount())) {
+				throw InvalidArgumentException("cpu argument is invalid");
+			}
+		}
+		break;
+	}
+	return cpu;
+}
+
+void ThreadPool::start(Runnable& target, int cpu)
+{
+	getThread()->start(Thread::PRIO_NORMAL, target, getCorrectCpu(cpu));
 }
 
 
-void ThreadPool::start(Runnable& target, const std::string& name)
+void ThreadPool::start(Runnable& target, const std::string& name, int cpu)
 {
-	getThread()->start(Thread::PRIO_NORMAL, target, name);
+	getThread()->start(Thread::PRIO_NORMAL, target, name, getCorrectCpu(cpu));
 }
 
 
-void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target)
+void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, int cpu)
 {
-	getThread()->start(priority, target);
+	getThread()->start(priority, target, getCorrectCpu(cpu));
 }
 
 
-void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, const std::string& name)
+void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, const std::string& name, int cpu)
 {
-	getThread()->start(priority, target, name);
+	getThread()->start(priority, target, name, getCorrectCpu(cpu));
 }
 
 
