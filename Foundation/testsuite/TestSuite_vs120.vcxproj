@@ -28,7 +28,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>TestSuite</ProjectName>
-    <ProjectGuid>{F1EE93DF-347F-4CB3-B191-C4E63F38E972}</ProjectGuid>
+    <ProjectGuid>{C812E0B9-69A9-4FA1-A1D4-161CF677BD10}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -332,6 +332,8 @@
     <ClCompile Include="src\ArrayTest.cpp" />
     <ClCompile Include="src\AutoPtrTest.cpp" />
     <ClCompile Include="src\AutoReleasePoolTest.cpp" />
+    <ClCompile Include="src\BasicFIFOBufferTest.cpp" />
+    <ClCompile Include="src\BufferTestSuite.cpp" />
     <ClCompile Include="src\ByteOrderTest.cpp" />
     <ClCompile Include="src\CoreTest.cpp" />
     <ClCompile Include="src\CoreTestSuite.cpp" />
@@ -471,6 +473,8 @@
     <ClInclude Include="src\ArrayTest.h" />
     <ClInclude Include="src\AutoPtrTest.h" />
     <ClInclude Include="src\AutoReleasePoolTest.h" />
+    <ClInclude Include="src\BasicFIFOBufferTest.h" />
+    <ClInclude Include="src\BufferTestSuite.h" />
     <ClInclude Include="src\ByteOrderTest.h" />
     <ClInclude Include="src\CoreTest.h" />
     <ClInclude Include="src\CoreTestSuite.h" />

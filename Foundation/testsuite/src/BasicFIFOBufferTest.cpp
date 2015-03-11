@@ -54,26 +54,27 @@ void BasicFIFOBufferTest::onWritable(bool& b)
 void BasicFIFOBufferTest::testNextWrite()
 {
 	// String length is 88 characters.
+	const int BUFFER_SIZE = 128;
 	std::string text("The Quick Brown Dog Jumps Over The Lazy Fox.");
-	BasicFIFOBuffer<char> buffer(128);
+	BasicFIFOBuffer<char> buffer(BUFFER_SIZE);
 	buffer.write(text.data(), text.size());
-	char c_buffer[buffer.size()];
-	std::memset(c_buffer, 0, buffer.size());
+	char cbuffer[BUFFER_SIZE];
+	std::memset(cbuffer, 0, buffer.size());
 	
-	buffer.read(c_buffer, 4);
+	buffer.read(cbuffer, 4);
 
-	assert(std::string(c_buffer, 4) == std::string("The "));
+	assert(std::string(cbuffer, 4) == std::string("The "));
 	
-	buffer.peek(c_buffer, buffer.used());
-	assert(std::string(c_buffer, buffer.used()) ==
+	buffer.peek(cbuffer, buffer.used());
+	assert(std::string(cbuffer, buffer.used()) ==
 			std::string("Quick Brown Dog Jumps Over The Lazy Fox."));
 
 	memcpy(buffer.next(), "The ", 4);
 	buffer.advance(4);
 
-	buffer.peek(c_buffer, buffer.used());
+	buffer.peek(cbuffer, buffer.used());
 
-	assert(std::string("Quick Brown Dog Jumps Over The Lazy Fox.The ") == std::string(c_buffer, buffer.used()));
+	assert(std::string("Quick Brown Dog Jumps Over The Lazy Fox.The ") == std::string(cbuffer, buffer.used()));
 }
 
 

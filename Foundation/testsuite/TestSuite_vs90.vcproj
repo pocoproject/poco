@@ -554,6 +554,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\BasicFIFOBufferTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BufferTestSuite.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ByteOrderTest.cpp"
 					>
 				</File>
@@ -651,6 +659,14 @@
 				</File>
 				<File
 					RelativePath=".\src\AutoReleasePoolTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BasicFIFOBufferTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BufferTestSuite.h"
 					>
 				</File>
 				<File
