@@ -26,6 +26,7 @@
 
 namespace Poco {
 
+
 class Timespan;
 
 
