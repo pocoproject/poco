@@ -242,13 +242,13 @@ void WebSocketTest::testOneLargeFrame(int msgSize)
 
 	ws.sendFrame(payload.data(), msgSize);
 
-	char buffer[msgSize];
+	Poco::Buffer<char> buffer(msgSize);
 	int flags;
 	int n;
 
-	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+	n = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
 	assert (n == payload.size());
-	assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+	assert (payload.compare(0, payload.size(), buffer.begin(), 0, n) == 0);
 
 	ws.sendFrame(payload.data(), msgSize);
 
