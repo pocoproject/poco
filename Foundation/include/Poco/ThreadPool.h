@@ -100,6 +100,12 @@ public:
 	int getStackSize() const;
 		/// Returns the stack size used to create new threads.
 
+	void setAffinityPolicy(ThreadAffinityPolicy affinityPolicy);
+		/// Sets the thread affinity policy for newly created threads
+
+	ThreadAffinityPolicy getAffinityPolicy();
+		/// Returns the thread affinity policy used to create new thread
+
 	int used() const;
 		/// Returns the number of currently used threads.
 
@@ -165,7 +171,7 @@ public:
 		/// or an empty string if no name has been
 		/// specified in the constructor.
 
-	static ThreadPool& defaultPool();
+	static ThreadPool& defaultPool(ThreadAffinityPolicy affinityPolicy = OS_DEFAULT);
 		/// Returns a reference to the default
 		/// thread pool.
 
@@ -209,6 +215,15 @@ inline int ThreadPool::getStackSize() const
 	return _stackSize;
 }
 
+inline void ThreadPool::setAffinityPolicy(ThreadPool::ThreadAffinityPolicy affinityPolicy)
+{
+	_affinityPolicy = affinityPolicy;
+}
+
+inline ThreadPool::ThreadAffinityPolicy ThreadPool::getAffinityPolicy()
+{
+	return _affinityPolicy;
+}
 
 inline const std::string& ThreadPool::name() const
 {

@@ -550,13 +550,14 @@ public:
 	{
 		delete _pPool;
 	}
-	ThreadPool* pool()
+	ThreadPool* pool(ThreadPool::ThreadAffinityPolicy affinityPolicy = ThreadPool::OS_DEFAULT)
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		
 		if (!_pPool)
 		{
 			_pPool = new ThreadPool("default");
+			_pPool->setAffinityPolicy(affinityPolicy);
 			if (POCO_THREAD_STACK_SIZE > 0)
 				_pPool->setStackSize(POCO_THREAD_STACK_SIZE);
 		}
@@ -575,9 +576,9 @@ namespace
 }
 
 
-ThreadPool& ThreadPool::defaultPool()
+ThreadPool& ThreadPool::defaultPool(ThreadAffinityPolicy affinityPolicy)
 {
-	return *sh.pool();
+	return *sh.pool(affinityPolicy);
 }
 
 
