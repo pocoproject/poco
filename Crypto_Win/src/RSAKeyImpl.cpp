@@ -56,7 +56,7 @@ RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long):
 {
 	DWORD flags = keyLength << 16;
 	flags |= CRYPT_EXPORTABLE;
-	if (!CryptGenKey(_sp.handle(), AT_SIGNATURE, flags, &_hPrivateKey))
+	if (!CryptGenKey(_sp.handle(), AT_KEYEXCHANGE, flags, &_hPrivateKey))
 	{
 		error("Cannot generate RSA key pair");
 	}
@@ -121,13 +121,13 @@ void RSAKeyImpl::extractPublicKey()
 
 	DWORD size = 0;
 	DWORD rc = CryptExportPublicKeyInfo(_sp.handle(),
-		AT_SIGNATURE, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+		AT_KEYEXCHANGE, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
 		NULL, &size);
 	if (rc)
 	{
 		keyBuffer.resize(size);
 		rc = CryptExportPublicKeyInfo(_sp.handle(),
-			AT_SIGNATURE, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+			AT_KEYEXCHANGE, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
 			reinterpret_cast<PCERT_PUBLIC_KEY_INFO>(keyBuffer.begin()), &size);
 		if (rc)
 		{

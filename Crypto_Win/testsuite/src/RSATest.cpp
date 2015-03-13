@@ -185,7 +185,7 @@ void RSATest::testSignManipulated()
 
 
 void RSATest::testRSACipher()
-{/*
+{
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(RSAKey(RSAKey::KL_1024));
 	for (std::size_t n = 1; n <= 1200; n++)
 	{
@@ -193,13 +193,12 @@ void RSATest::testRSACipher()
 		std::string enc = pCipher->encryptString(val);
 		std::string dec = pCipher->decryptString(enc);
 		assert (dec == val);
-	}*/
+	}
 }
 
 
 void RSATest::testRSACipherLarge()
 {
-	/*TODO
 	std::vector<std::size_t> sizes;
 	sizes.push_back (2047);
 	sizes.push_back (2048);
@@ -222,7 +221,6 @@ void RSATest::testRSACipherLarge()
 		std::string dec = pCipher->decryptString(enc);
 		assert (dec == val);
 	}
-	*/
 }
 
 
@@ -266,13 +264,14 @@ CppUnit::Test* RSATest::suite()
 	CppUnit_addTest(pSuite, RSATest, testRSACipher);
 	CppUnit_addTest(pSuite, RSATest, testRSACipherLarge);
 	CppUnit_addTest(pSuite, RSATest, testCertificate);
-	CppUnit_addTest(pSuite, RSATest, testCryptoAPI);
+	//CppUnit_addTest(pSuite, RSATest, testCAPIEncryptDecrypt);
+	//CppUnit_addTest(pSuite, RSATest, testCAPIKeys);
 
 	return pSuite;
 }
 
 
-void RSATest::testCryptoAPI()
+void RSATest::testCAPIKeys()
 {
 	HCRYPTPROV hProv = 0;
 	BOOL rc = FALSE;
@@ -309,21 +308,15 @@ void RSATest::testCryptoAPI()
 	rc = CryptGenKey(hProv, AT_SIGNATURE, flags, &hPrivateKey);
 	if (!rc) goto bad;
 
-	/* extract public key */
-	rc = CryptExportPublicKeyInfo(hProv,
-		AT_SIGNATURE, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-		NULL, &size);
+	/* extport public key */
+	rc = CryptExportKey(hPrivateKey, NULL, PUBLICKEYBLOB, 0, NULL, &size);
 	if (!rc) goto bad;
 
-	pKeyInfo = (PCERT_PUBLIC_KEY_INFO)LocalAlloc(0, size);
-	rc = CryptExportPublicKeyInfo(hProv,
-		AT_SIGNATURE, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-		pKeyInfo, &size);
+	pPubKeyBLOB = (LPBYTE)LocalAlloc(0, size);
+	rc = CryptExportKey(hPrivateKey, NULL, PUBLICKEYBLOB, 0, pPubKeyBLOB, &size);
 	if (!rc) goto bad;
 
-	rc = CryptImportPublicKeyInfo(hProv,
-		X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-		pKeyInfo, &hPublicKey);
+	rc = CryptImportKey(hProv, pPubKeyBLOB, size, 0, CRYPT_EXPORTABLE, &hPublicKey);
 	if (!rc) goto bad;
 
 	/* export private key */
@@ -397,7 +390,6 @@ void RSATest::testCryptoAPI()
 	rc = CryptBinaryToStringA(pDER, encSize,
 		CRYPT_STRING_BASE64HEADER, pPEM, &pemSize);
 	if (!rc) goto bad;
-	printf("\r\n%s\r\n", pPEM);
 
 	/*************************************************************/
 	/* start fresh and import both keys from the private key PEM */
@@ -473,25 +465,23 @@ void RSATest::testCryptoAPI()
 	if (!rc) goto bad;
 
 	/* import public key */
-	/* Error: "Key does not exist"
 	rc = CryptExportPublicKeyInfo(hProv,
-	AT_SIGNATURE, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-	NULL, &size);
+		AT_KEYEXCHANGE, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+		NULL, &size);
 	if (!rc) goto bad;
 
 	LocalFree(pKeyInfo);
 	pKeyInfo = (PCERT_PUBLIC_KEY_INFO)LocalAlloc(0, size);
 	rc = CryptExportPublicKeyInfo(hProv,
-	AT_SIGNATURE, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-	pKeyInfo, &size);
+		AT_KEYEXCHANGE, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+		pKeyInfo, &size);
 	if (!rc) goto bad;
 
 	hPublicKey = 0;
 	rc = CryptImportPublicKeyInfo(hProv,
-	X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-	pKeyInfo, &hPublicKey);
+		X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+		pKeyInfo, &hPublicKey);
 	if (!rc) goto bad;
-	*/
 
 	/* clean up */
 	if (hPublicKey) CryptDestroyKey(hPublicKey);
@@ -528,4 +518,97 @@ bad:
 	LocalFree(pPubKeyBLOB);
 	LocalFree(pKeyInfo);
 	LocalFree(pIV);
+}
+
+
+void RSATest::testCAPIEncryptDecrypt()
+{
+	HCRYPTPROV hProv = 0;
+	BOOL rc = FALSE;
+	LPBYTE pPrivKeyBLOB = 0;
+	LPBYTE pPubKeyBLOB = 0;
+	HCRYPTKEY hSessionKey = 0;
+	HCRYPTKEY hPrivateKey = 0;
+	DWORD flags = 0;
+	DWORD size = 0;
+	PCERT_PUBLIC_KEY_INFO pKeyInfo = 0;
+	HCRYPTKEY hPublicKey = 0;
+
+	Poco::Buffer<BYTE> data(1);
+	data[0] = 'x';
+
+	/* get provider */
+	rc = CryptAcquireContext(&hProv,
+		NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES,
+		CRYPT_VERIFYCONTEXT | CRYPT_SILENT);
+	if (!rc) goto bad;
+
+	/* generate private key */
+	flags = 1024 /*key length*/ << 16;
+	flags |= CRYPT_EXPORTABLE;
+	rc = CryptGenKey(hProv, AT_KEYEXCHANGE/*AT_SIGNATURE*/, flags, &hSessionKey);
+	if (!rc) goto bad;
+
+	/* extract public key */
+	rc = CryptExportKey(hSessionKey, NULL, PUBLICKEYBLOB, 0, NULL, &size);
+	if (!rc) goto bad;
+
+	pPubKeyBLOB = (LPBYTE)LocalAlloc(0, size);
+	rc = CryptExportKey(hSessionKey, NULL, PUBLICKEYBLOB, 0, pPubKeyBLOB, &size);
+	if (!rc) goto bad;
+
+	rc = CryptImportKey(hProv, pPubKeyBLOB, size, 0, CRYPT_EXPORTABLE, &hPublicKey);
+	if (!rc) goto bad;
+
+	/* extract private key */
+	rc = CryptExportKey(hSessionKey, NULL, PRIVATEKEYBLOB, 0, NULL, &size);
+	if (!rc) goto bad;
+
+	pPrivKeyBLOB = (LPBYTE)LocalAlloc(0, size);
+	rc = CryptExportKey(hSessionKey, NULL, PRIVATEKEYBLOB, 0, pPrivKeyBLOB, &size);
+	if (!rc) goto bad;
+
+	rc = CryptImportKey(hProv, pPrivKeyBLOB, size, 0, CRYPT_EXPORTABLE, &hPrivateKey);
+	if (!rc) goto bad;
+
+	DWORD dataSize = static_cast<DWORD>(data.size());
+	DWORD n = dataSize;
+	rc = CryptEncrypt(hPublicKey, NULL, TRUE, 0, NULL, &n, 0);
+	if (!rc) goto bad;
+
+	data.resize(n, true);
+	n = dataSize;
+	rc = CryptEncrypt(hPublicKey, NULL, TRUE, 0, data.begin(), &n, static_cast<DWORD>(data.size()));
+	if (!rc) goto bad;
+
+	n = static_cast<DWORD>(data.size());
+	rc = CryptDecrypt(hPrivateKey, NULL, TRUE, 0, data.begin(), &n);
+	if (!rc) goto bad;
+
+	CryptDestroyKey(hPublicKey);
+	CryptDestroyKey(hPrivateKey);
+	CryptReleaseContext(hProv, 0);
+
+	LocalFree(pPubKeyBLOB);
+	LocalFree(pPrivKeyBLOB);
+
+	return;
+
+bad:
+	DWORD errorCode = GetLastError();
+	DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS;
+	LPTSTR lpMsgBuf = 0;
+	FormatMessageA(dwFlg, 0, errorCode, 0, (LPTSTR)& lpMsgBuf, 0, NULL);
+	printf("%s", lpMsgBuf);
+	LocalFree(lpMsgBuf);
+
+	if (hPublicKey) CryptDestroyKey(hPublicKey);
+	if (hPrivateKey) CryptDestroyKey(hPrivateKey);
+	if (hProv) CryptReleaseContext(hProv, 0);
+
+	LocalFree(pPubKeyBLOB);
+	LocalFree(pPrivKeyBLOB);
+
+	return;
 }
