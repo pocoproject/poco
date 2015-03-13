@@ -132,8 +132,23 @@ BOOL ServerApplication::ConsoleCtrlHandler(DWORD ctrlType)
 }
 
 
-void ServerApplication::ServiceControlHandler(DWORD control)
+HDEVNOTIFY ServerApplication::registerServiceDeviceNotification(LPVOID filter, DWORD flags)
 {
+	return RegisterDeviceNotification(_serviceStatusHandle, filter, flags);
+}
+
+
+DWORD ServerApplication::handleDeviceEvent(DWORD /*event_type*/, LPVOID /*event_data*/)
+{
+	return ERROR_CALL_NOT_IMPLEMENTED;
+}
+
+
+DWORD ServerApplication::ServiceControlHandler(DWORD control, DWORD event_type, LPVOID event_data, LPVOID context)
+{
+	DWORD result = NO_ERROR;
+	auto instance = reinterpret_cast<ServerApplication*>(context);
+
 	switch (control) 
 	{ 
 	case SERVICE_CONTROL_STOP:
@@ -142,9 +157,16 @@ void ServerApplication::ServiceControlHandler(DWORD control)
 		_serviceStatus.dwCurrentState = SERVICE_STOP_PENDING;
 		break;
 	case SERVICE_CONTROL_INTERROGATE: 
-		break; 
+		break;
+	case SERVICE_CONTROL_DEVICEEVENT:
+		if (instance)
+		{
+			result = instance->handleDeviceEvent(event_type, event_data);
+		}
+		break;
 	} 
 	SetServiceStatus(_serviceStatusHandle,  &_serviceStatus);
+	return result;
 }
 
 
@@ -159,9 +181,9 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 	app.config().setBool("application.runAsService", true);
 
 #if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
-	_serviceStatusHandle = RegisterServiceCtrlHandlerW(L"", ServiceControlHandler);
+	_serviceStatusHandle = RegisterServiceCtrlHandlerExW(L"", ServiceControlHandler, &app);
 #else
-	_serviceStatusHandle = RegisterServiceCtrlHandlerA("", ServiceControlHandler);
+	_serviceStatusHandle = RegisterServiceCtrlHandlerExA("", ServiceControlHandler, &app);
 #endif
 	if (!_serviceStatusHandle)
 		throw SystemException("cannot register service control handler");
