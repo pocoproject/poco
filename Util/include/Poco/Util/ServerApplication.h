@@ -168,15 +168,15 @@ protected:
 	void defineOptions(OptionSet& options);
 #endif
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
 	static HDEVNOTIFY registerServiceDeviceNotification(LPVOID filter, DWORD flags);
 		/// Registers the ServerApplication to receive SERVICE_CONTROL_DEVICEEVENT
-		/// events.
+		/// events via handleDeviceEvent().
 
 	virtual DWORD handleDeviceEvent(DWORD event_type, LPVOID event_data);
 		/// Handles the SERVICE_CONTROL_DEVICEEVENT event. The default
 		/// implementation does nothing and returns ERROR_CALL_NOT_IMPLEMENTED.
-#endif // if defined(POCO_OS_FAMILY_WINDOWS)
+#endif
 
 private:
 #if defined(POCO_VXWORKS)

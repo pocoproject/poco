@@ -147,7 +147,7 @@ DWORD ServerApplication::handleDeviceEvent(DWORD /*event_type*/, LPVOID /*event_
 DWORD ServerApplication::ServiceControlHandler(DWORD control, DWORD event_type, LPVOID event_data, LPVOID context)
 {
 	DWORD result = NO_ERROR;
-	auto instance = reinterpret_cast<ServerApplication*>(context);
+	ServerApplication* pThis = reinterpret_cast<ServerApplication*>(context);
 
 	switch (control) 
 	{ 
@@ -159,9 +159,9 @@ DWORD ServerApplication::ServiceControlHandler(DWORD control, DWORD event_type, 
 	case SERVICE_CONTROL_INTERROGATE: 
 		break;
 	case SERVICE_CONTROL_DEVICEEVENT:
-		if (instance)
+		if (pThis)
 		{
-			result = instance->handleDeviceEvent(event_type, event_data);
+			result = pThis->handleDeviceEvent(event_type, event_data);
 		}
 		break;
 	} 
