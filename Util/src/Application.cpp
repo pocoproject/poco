@@ -71,7 +71,8 @@ Application::Application():
 	_initialized(false),
 	_unixOptions(true),
 	_pLogger(&Logger::get("ApplicationStartup")),
-	_stopOptionsProcessing(false)
+	_stopOptionsProcessing(false),
+	_loadedConfigs(0)
 {
 	setup();
 }
@@ -82,7 +83,8 @@ Application::Application(int argc, char* argv[]):
 	_initialized(false),
 	_unixOptions(true),
 	_pLogger(&Logger::get("ApplicationStartup")),
-	_stopOptionsProcessing(false)
+	_stopOptionsProcessing(false),
+	_loadedConfigs(0)
 {
 	setup();
 	init(argc, argv);
@@ -253,13 +255,14 @@ int Application::loadConfiguration(int priority)
 		++n;
 	}
 #endif
-	if (n > 0)
+	if (n > 0 && _loadedConfigs == 0)
 	{
 		if (!confPath.isAbsolute())
 			_pConfig->setString("application.configDir", confPath.absolute().parent().toString());
 		else
 			_pConfig->setString("application.configDir", confPath.parent().toString());
 	}
+	_loadedConfigs += n;
 	return n;
 }
 
@@ -297,13 +300,14 @@ void Application::loadConfiguration(const std::string& path, int priority)
 #endif
 	else throw Poco::InvalidArgumentException("Unsupported configuration file type", ext);
 
-	if (n > 0 && !_pConfig->has("application.configDir"))
+	if (n > 0 && _loadedConfigs == 0)
 	{
 		if (!confPath.isAbsolute())
 			_pConfig->setString("application.configDir", confPath.absolute().parent().toString());
 		else
 			_pConfig->setString("application.configDir", confPath.parent().toString());
 	}
+	_loadedConfigs += n;
 }
 
 
