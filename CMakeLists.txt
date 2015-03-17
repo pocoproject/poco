@@ -10,10 +10,10 @@ project(Poco)
 
 cmake_minimum_required(VERSION 3.0.0)
 
-file(STRINGS "${CMAKE_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
+file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
 
 # Read the version information from the VERSION file
-file (STRINGS "${CMAKE_SOURCE_DIR}/VERSION" PACKAGE_VERSION )
+file (STRINGS "${PROJECT_SOURCE_DIR}/VERSION" PACKAGE_VERSION )
 message(STATUS "Poco package version: ${PACKAGE_VERSION}")
 string(REGEX REPLACE "([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" CPACK_PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION})
 string(REGEX REPLACE "[0-9]+\\.([0-9])+\\.[0-9]+.*" "\\1" CPACK_PACKAGE_VERSION_MINOR ${PACKAGE_VERSION})
