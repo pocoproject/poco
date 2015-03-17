@@ -48,12 +48,12 @@ class Foundation_API ThreadPool
 	/// from the pool.
 {
 public:
-	typedef enum _ThreadAffinityPolicy
+	enum _ThreadAffinityPolicy
 	{
 		OS_DEFAULT = 0,
 		UNIFORM_DISTRIBUTION,
 		CUSTOM
-	} ThreadAffinityPolicy;
+	};
 	
 	ThreadPool(int minCapacity = 2,
 		int maxCapacity = 16,
