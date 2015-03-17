@@ -48,7 +48,7 @@ class Foundation_API ThreadPool
 	/// from the pool.
 {
 public:
-	enum _ThreadAffinityPolicy
+	enum ThreadAffinityPolicy
 	{
 		OS_DEFAULT = 0,
 		UNIFORM_DISTRIBUTION,
