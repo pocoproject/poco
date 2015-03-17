@@ -29,7 +29,9 @@ public:
 	~ThreadPoolTest();
 
 	void testThreadPool();
-
+	void testThreadPoolUniformDistribution();
+	void testThreadPoolCustomDistribution();
+	
 	void setUp();
 	void tearDown();
 
@@ -39,6 +41,7 @@ protected:
 	void count();
 
 private:
+	void startThreadPoolTest(int affinityPolicy);
 	Poco::FastMutex _mutex;
 	Poco::Event _event;
 	int   _count;
