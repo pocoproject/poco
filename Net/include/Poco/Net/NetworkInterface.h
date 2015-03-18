@@ -343,6 +343,7 @@ inline bool NetworkInterface::operator == (const NetworkInterface& other) const
 
 
 Net_API std::ostream& operator<<(std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac);
+Net_API std::ostream& operator<<(std::ostream& os, const Poco::Net::IPAddress& ipAddress);
 
 
 #endif // POCO_NET_HAS_INTERFACE

@@ -56,6 +56,13 @@ std::ostream& operator<<(std::ostream& os, const Poco::Net::NetworkInterface::MA
 	return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const Poco::Net::IPAddress& ipAddress)
+{
+    os << ipAddress.toString();
+
+    return os;
+}
+
 
 namespace Poco {
 namespace Net {
