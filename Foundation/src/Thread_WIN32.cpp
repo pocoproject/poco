@@ -72,7 +72,8 @@ ThreadImpl::ThreadImpl():
 	_thread(0),
 	_threadId(0),
 	_prio(PRIO_NORMAL_IMPL),
-	_stackSize(POCO_THREAD_STACK_SIZE)
+	_stackSize(POCO_THREAD_STACK_SIZE),
+	_cpu(-1)
 {
 }
 
@@ -102,7 +103,8 @@ void ThreadImpl::setOSPriorityImpl(int prio, int /* policy */)
 	setPriorityImpl(prio);
 }
 
-void ThreadImpl::setAffinityImpl(unsigned cpu)
+
+void ThreadImpl::setAffinityImpl(int cpu)
 {
 	DWORD mask = 1;
 	mask <<= cpu;
@@ -110,12 +112,15 @@ void ThreadImpl::setAffinityImpl(unsigned cpu)
 	{
 		throw SystemException("Failed to set affinity");
 	}
+	_cpu = cpu;
 }
 
-unsigned ThreadImpl::getAffinityImpl() const
+
+int ThreadImpl::getAffinityImpl() const
 {
-	throw Poco::NotImplementedException("Get thread affinity not supported on this system");
+	return _cpu;
 }
+
 
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {

@@ -66,8 +66,8 @@ public:
 	static int getMinOSPriorityImpl(int policy);
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
-	void setAffinityImpl(unsigned cpu);
-	unsigned getAffinityImpl() const;
+	void setAffinityImpl(int cpu);
+	int getAffinityImpl() const;
 	int getStackSizeImpl() const;
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
@@ -119,6 +119,7 @@ private:
 	DWORD _threadId;
 	int _prio;
 	int _stackSize;
+	int _cpu;
 
 	static CurrentThreadHolder _currentThreadHolder;
 };

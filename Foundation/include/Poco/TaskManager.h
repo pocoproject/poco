@@ -52,7 +52,7 @@ public:
 	typedef AutoPtr<Task>      TaskPtr;
 	typedef std::list<TaskPtr> TaskList;
 
-	TaskManager(ThreadPool::ThreadAffinityPolicy affinityPolicy = ThreadPool::OS_DEFAULT);
+	TaskManager(ThreadPool::ThreadAffinityPolicy affinityPolicy = ThreadPool::TAP_DEFAULT);
 		/// Creates the TaskManager, using the
 		/// default ThreadPool.
 

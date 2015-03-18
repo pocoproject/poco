@@ -50,37 +50,37 @@ class Foundation_API ThreadPool
 public:
 	enum ThreadAffinityPolicy
 	{
-		OS_DEFAULT = 0,
-		UNIFORM_DISTRIBUTION,
-		CUSTOM
+		TAP_DEFAULT = 0,
+		TAP_UNIFORM_DISTRIBUTION,
+		TAP_CUSTOM
 	};
 	
 	ThreadPool(int minCapacity = 2,
 		int maxCapacity = 16,
 		int idleTime = 60,
 		int stackSize = POCO_THREAD_STACK_SIZE,
-		ThreadAffinityPolicy affinityPolicy = OS_DEFAULT);
+		ThreadAffinityPolicy affinityPolicy = TAP_DEFAULT);
 		/// Creates a thread pool with minCapacity threads.
 		/// If required, up to maxCapacity threads are created
 		/// a NoThreadAvailableException exception is thrown.
 		/// If a thread is running idle for more than idleTime seconds,
 		/// and more than minCapacity threads are running, the thread
 		/// is killed. Threads are created with given stack size.
-		/// Threads are created with given affinity Policy
+		/// Threads are created with given affinity policy.
 
 	ThreadPool(const std::string& name,
 		int minCapacity = 2,
 		int maxCapacity = 16,
 		int idleTime = 60,
 		int stackSize = POCO_THREAD_STACK_SIZE,
-		ThreadAffinityPolicy affinityPolicy = OS_DEFAULT);
+		ThreadAffinityPolicy affinityPolicy = TAP_DEFAULT);
 		/// Creates a thread pool with the given name and minCapacity threads.
 		/// If required, up to maxCapacity threads are created
 		/// a NoThreadAvailableException exception is thrown.
 		/// If a thread is running idle for more than idleTime seconds,
 		/// and more than minCapacity threads are running, the thread
 		/// is killed. Threads are created with given stack size.
-		/// Threads are created with given affinity Policy
+		/// Threads are created with given affinity policy.
 
 	~ThreadPool();
 		/// Currently running threads will remain active
@@ -101,10 +101,10 @@ public:
 		/// Returns the stack size used to create new threads.
 
 	void setAffinityPolicy(ThreadAffinityPolicy affinityPolicy);
-		/// Sets the thread affinity policy for newly created threads
+		/// Sets the thread affinity policy for newly created threads.
 
 	ThreadAffinityPolicy getAffinityPolicy();
-		/// Returns the thread affinity policy used to create new thread
+		/// Returns the thread affinity policy used to create new threads.
 
 	int used() const;
 		/// Returns the number of currently used threads.
@@ -171,7 +171,7 @@ public:
 		/// or an empty string if no name has been
 		/// specified in the constructor.
 
-	static ThreadPool& defaultPool(ThreadAffinityPolicy affinityPolicy = OS_DEFAULT);
+	static ThreadPool& defaultPool(ThreadAffinityPolicy affinityPolicy = TAP_DEFAULT);
 		/// Returns a reference to the default
 		/// thread pool.
 
@@ -180,11 +180,12 @@ protected:
 	PooledThread* createThread();
 
 	void housekeep();
+	int affinity(int cpu);
 
 private:
 	ThreadPool(const ThreadPool& pool);
 	ThreadPool& operator = (const ThreadPool& pool);
-	int getCorrectCpu(int cpu);
+
 	typedef std::vector<PooledThread*> ThreadVec;
 
 	std::string _name;
@@ -215,15 +216,18 @@ inline int ThreadPool::getStackSize() const
 	return _stackSize;
 }
 
+
 inline void ThreadPool::setAffinityPolicy(ThreadPool::ThreadAffinityPolicy affinityPolicy)
 {
 	_affinityPolicy = affinityPolicy;
 }
 
+
 inline ThreadPool::ThreadAffinityPolicy ThreadPool::getAffinityPolicy()
 {
 	return _affinityPolicy;
 }
+
 
 inline const std::string& ThreadPool::name() const
 {

@@ -38,9 +38,11 @@ ThreadPoolTest::~ThreadPoolTest()
 void ThreadPoolTest::startThreadPoolTest(int affinityPolicy)
 {
 	int cpu = -1;
-	if (affinityPolicy == static_cast<int>(ThreadPool::CUSTOM)) {
+	if (affinityPolicy == static_cast<int>(ThreadPool::TAP_CUSTOM)) 
+	{
 		cpu = 0;
 	}
+
 	ThreadPool pool(2, 3, 3, POCO_THREAD_STACK_SIZE, static_cast<ThreadPool::ThreadAffinityPolicy>(affinityPolicy));
 	pool.setStackSize(1);
 
@@ -134,20 +136,24 @@ void ThreadPoolTest::startThreadPoolTest(int affinityPolicy)
 	assert (pool.available() == 4);	
 }
 
+
 void ThreadPoolTest::testThreadPool()
 {
-	startThreadPoolTest(Poco::ThreadPool::OS_DEFAULT);
+	startThreadPoolTest(Poco::ThreadPool::TAP_DEFAULT);
 }
+
 
 void ThreadPoolTest::testThreadPoolUniformDistribution()
 {
-	startThreadPoolTest(Poco::ThreadPool::UNIFORM_DISTRIBUTION);
+	startThreadPoolTest(Poco::ThreadPool::TAP_UNIFORM_DISTRIBUTION);
 }
+
 
 void ThreadPoolTest::testThreadPoolCustomDistribution()
 {
-	startThreadPoolTest(Poco::ThreadPool::CUSTOM);
+	startThreadPoolTest(Poco::ThreadPool::TAP_CUSTOM);
 }
+
 
 void ThreadPoolTest::setUp()
 {

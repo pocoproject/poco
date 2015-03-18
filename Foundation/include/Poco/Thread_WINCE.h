@@ -67,8 +67,8 @@ public:
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
-	void setAffinityImpl(unsigned cpu);
-	unsigned getAffinityImpl() const;
+	void setAffinityImpl(int cpu);
+	int getAffinityImpl() const;
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
@@ -146,16 +146,18 @@ inline int ThreadImpl::getMaxOSPriorityImpl(int /* policy */)
 	return PRIO_HIGHEST_IMPL;
 }
 
-inline void ThreadImpl::setAffinityImpl(unsigned cpu)
+
+inline void ThreadImpl::setAffinityImpl(int)
 {
-	(void)cpu;
-	throw Poco::NotImplementedException("Thread affinity not supported on this system");
+	// not supported
 }
 
-inline unsigned ThreadImpl::getAffinityImpl() const
+
+inline int ThreadImpl::getAffinityImpl() const
 {
-	throw Poco::NotImplementedException("Thread affinity not supported on this system");
+	return -1;
 }
+
 
 inline void ThreadImpl::sleepImpl(long milliseconds)
 {

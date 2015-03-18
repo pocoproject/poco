@@ -89,7 +89,8 @@ void PooledThread::start(int cpu)
 {
 	_thread.start(*this);
 	_started.wait();
-	if (cpu >= 0) {
+	if (cpu >= 0) 
+	{
 		_thread.setAffinity(static_cast<unsigned>(cpu));
 	}
 }
@@ -104,7 +105,8 @@ void PooledThread::start(Thread::Priority priority, Runnable& target, int cpu)
 	_pTarget = &target;
 	_thread.setPriority(priority);
 	_targetReady.set();
-	if (cpu >= 0) {
+	if (cpu >= 0) 
+	{
 		_thread.setAffinity(static_cast<unsigned>(cpu));
 	}
 }
@@ -132,7 +134,8 @@ void PooledThread::start(Thread::Priority priority, Runnable& target, const std:
 
 	_pTarget = &target;
 	_targetReady.set();
-	if (cpu >= 0) {
+	if (cpu >= 0) 
+	{
 		_thread.setAffinity(static_cast<unsigned>(cpu));
 	}
 }
@@ -267,7 +270,8 @@ ThreadPool::ThreadPool(int minCapacity,
 	
 	for (int i = 0; i < _minCapacity; i++)
 	{
-		if (_affinityPolicy == UNIFORM_DISTRIBUTION) {
+		if (_affinityPolicy == TAP_UNIFORM_DISTRIBUTION) 
+		{
 			cpu = _lastCpu.value() % cpuCount;
 			_lastCpu++;
 		}
@@ -300,7 +304,8 @@ ThreadPool::ThreadPool(const std::string& name,
 	int cpuCount = Poco::Environment::processorCount();
 	for (int i = 0; i < _minCapacity; i++)
 	{
-		if (_affinityPolicy == UNIFORM_DISTRIBUTION) {
+		if (_affinityPolicy == TAP_UNIFORM_DISTRIBUTION) 
+		{
 			cpu = _lastCpu.value() % cpuCount;
 			_lastCpu++;
 		}
@@ -375,23 +380,25 @@ int ThreadPool::allocated() const
 }
 
 
-int ThreadPool::getCorrectCpu(int cpu)
+int ThreadPool::affinity(int cpu)
 {
-	switch (static_cast<int>(_affinityPolicy)) {
-		case UNIFORM_DISTRIBUTION:
+	switch (static_cast<int>(_affinityPolicy)) 
+	{
+		case TAP_UNIFORM_DISTRIBUTION:
 		{
 			cpu = _lastCpu.value() % Environment::processorCount();
 			_lastCpu++;
 		}
 		break;
-		case OS_DEFAULT:
+		case TAP_DEFAULT:
 		{
 			cpu = -1;
 		}
 		break;
-		case CUSTOM:
+		case TAP_CUSTOM:
 		{
-			if ((cpu < -1) || (cpu >= Environment::processorCount())) {
+			if ((cpu < -1) || (cpu >= Environment::processorCount())) 
+			{
 				throw InvalidArgumentException("cpu argument is invalid");
 			}
 		}
@@ -400,27 +407,28 @@ int ThreadPool::getCorrectCpu(int cpu)
 	return cpu;
 }
 
+
 void ThreadPool::start(Runnable& target, int cpu)
 {
-	getThread()->start(Thread::PRIO_NORMAL, target, getCorrectCpu(cpu));
+	getThread()->start(Thread::PRIO_NORMAL, target, affinity(cpu));
 }
 
 
 void ThreadPool::start(Runnable& target, const std::string& name, int cpu)
 {
-	getThread()->start(Thread::PRIO_NORMAL, target, name, getCorrectCpu(cpu));
+	getThread()->start(Thread::PRIO_NORMAL, target, name, affinity(cpu));
 }
 
 
 void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, int cpu)
 {
-	getThread()->start(priority, target, getCorrectCpu(cpu));
+	getThread()->start(priority, target, affinity(cpu));
 }
 
 
 void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, const std::string& name, int cpu)
 {
-	getThread()->start(priority, target, name, getCorrectCpu(cpu));
+	getThread()->start(priority, target, name, affinity(cpu));
 }
 
 
@@ -518,14 +526,14 @@ PooledThread* ThreadPool::getThread()
 			{
 				pThread->start();
 				_threads.push_back(pThread);
-			} catch (...)
+			} 
+			catch (...)
 			{
 				delete pThread;
 				throw;
 			}
 		}
-		else
-			throw NoThreadAvailableException();
+		else throw NoThreadAvailableException();
 	}
 	pThread->activate();
 	return pThread;
@@ -547,11 +555,13 @@ public:
 	{
 		_pPool = 0;
 	}
+
 	~ThreadPoolSingletonHolder()
 	{
 		delete _pPool;
 	}
-	ThreadPool* pool(ThreadPool::ThreadAffinityPolicy affinityPolicy = ThreadPool::OS_DEFAULT)
+
+	ThreadPool* pool(ThreadPool::ThreadAffinityPolicy affinityPolicy = ThreadPool::TAP_DEFAULT)
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		

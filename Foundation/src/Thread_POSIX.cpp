@@ -35,6 +35,8 @@
 #   include <mach/task.h>
 #   include <mach/thread_policy.h>
 #endif
+
+
 //
 // Block SIGPIPE in main thread.
 //
@@ -54,6 +56,7 @@ public:
 	{
 	}
 };
+
 
 static SignalBlocker signalBlocker;
 }
@@ -183,7 +186,8 @@ void ThreadImpl::setStackSizeImpl(int size)
 #endif
 }
 
-void ThreadImpl::setAffinityImpl(unsigned cpu)
+
+void ThreadImpl::setAffinityImpl(int cpu)
 {
 #if defined (POCO_OS_FAMILY_UNIX) && POCO_OS != POCO_OS_MAC_OS_X
 #ifdef HAVE_PTHREAD_SETAFFINITY_NP
@@ -203,8 +207,8 @@ void ThreadImpl::setAffinityImpl(unsigned cpu)
 #endif // defined unix & !defined mac os x
 
 #if POCO_OS == POCO_OS_MAC_OS_X
-	kern_return_t                 ret;
-	thread_affinity_policy        policy;
+	kern_return_t ret;
+	thread_affinity_policy policy;
 	policy.affinity_tag = cpu;
 
 	ret = thread_policy_set(pthread_mach_thread_np(_pData->thread),
@@ -219,10 +223,11 @@ void ThreadImpl::setAffinityImpl(unsigned cpu)
 	yieldImpl();
 }
 
-unsigned ThreadImpl::getAffinityImpl() const
+
+int ThreadImpl::getAffinityImpl() const
 {
-	unsigned cpuSet = 0;
-	unsigned cpuCount = Environment::processorCount();
+	int cpuSet = -1;
+	int cpuCount = Environment::processorCount();
 #if defined (POCO_OS_FAMILY_UNIX) && POCO_OS != POCO_OS_MAC_OS_X
 #ifdef HAVE_PTHREAD_SETAFFINITY_NP
 	cpu_set_t cpuset;
@@ -234,7 +239,7 @@ unsigned ThreadImpl::getAffinityImpl() const
 	if (pthread_getaffinity_np(_pData->thread, &cpuset) != 0)
 		throw SystemException("Failed to get affinity", errno);
 #endif
-	for (unsigned i = 0; i < cpuCount; i++)
+	for (int i = 0; i < cpuCount; i++)
 	{
 		if (CPU_ISSET(i, &cpuset))
 		{
@@ -248,10 +253,10 @@ unsigned ThreadImpl::getAffinityImpl() const
 #endif // defined unix & !defined mac os x
 
 #if POCO_OS == POCO_OS_MAC_OS_X
-	kern_return_t                 ret;
-	thread_affinity_policy        policy;
+	kern_return_t ret;
+	thread_affinity_policy policy;
 	mach_msg_type_number_t count = THREAD_AFFINITY_POLICY_COUNT;
-	boolean_t get_default = FALSE;
+	boolean_t get_default = false;
 	ret = thread_policy_get(pthread_mach_thread_np(_pData->thread),
 				THREAD_AFFINITY_POLICY,
 				(thread_policy_t)&policy,
@@ -263,11 +268,12 @@ unsigned ThreadImpl::getAffinityImpl() const
 	}
 	cpuSet = policy.affinity_tag;
 	if (cpuSet >= cpuCount)
-		cpuSet = 0;
+		cpuSet = -1;
 
 #endif
 	return cpuSet;
 }
+
 
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {

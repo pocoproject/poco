@@ -74,8 +74,8 @@ public:
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
-	void setAffinityImpl(unsigned cpu);
-	unsigned getAffinityImpl() const;
+	void setAffinityImpl(int cpu);
+	int getAffinityImpl() const;
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
