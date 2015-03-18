@@ -343,7 +343,7 @@ inline bool NetworkInterface::operator == (const NetworkInterface& other) const
 } } // namespace Poco::Net
 
 
-std::ostream& Net_API operator << (std::ostream& ostr, const Poco::Net::NetworkInterface::MACAddress& addr);
+Net_API std::ostream& operator << (std::ostream& ostr, const Poco::Net::NetworkInterface::MACAddress& addr);
 
 
 #endif // POCO_NET_HAS_INTERFACE

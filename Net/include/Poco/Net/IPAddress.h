@@ -519,9 +519,9 @@ inline char* IPAddress::storage()
 } } // namespace Poco::Net
 
 
-Poco::BinaryWriter& Net_API operator << (Poco::BinaryWriter& writer, const Poco::Net::IPAddress& value);
-Poco::BinaryReader& Net_API operator >> (Poco::BinaryReader& reader, Poco::Net::IPAddress& value);
-std::ostream& Net_API operator << (std::ostream& ostr, const Poco::Net::IPAddress& addr);
+Net_API Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::IPAddress& value);
+Net_API Poco::BinaryReader& operator >> (Poco::BinaryReader& reader, Poco::Net::IPAddress& value);
+Net_API std::ostream& operator << (std::ostream& ostr, const Poco::Net::IPAddress& addr);
 
 
 #endif // Net_IPAddress_INCLUDED
