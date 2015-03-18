@@ -21,6 +21,8 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
 #include <algorithm>
 #include <cstring>
 
@@ -268,3 +270,29 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 
 
 } } // namespace Poco::Net
+
+
+Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::SocketAddress& value)
+{
+	writer << value.host();
+	writer << value.port();
+	return writer;
+}
+
+
+Poco::BinaryReader& operator >> (Poco::BinaryReader& reader, Poco::Net::SocketAddress& value)
+{
+	Poco::Net::IPAddress host;
+	reader >> host;
+	Poco::UInt16 port;
+	reader >> port;
+	value = Poco::Net::SocketAddress(host, port);
+	return reader;
+}
+
+
+inline std::ostream& operator << (std::ostream& ostr, const Poco::Net::SocketAddress& address)
+{
+	ostr << address.toString();
+	return ostr;
+}

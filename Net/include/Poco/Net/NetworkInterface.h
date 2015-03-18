@@ -30,6 +30,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Tuple.h"
 #include <map>
+#include <ostream>
 
 
 namespace Poco {
@@ -342,8 +343,7 @@ inline bool NetworkInterface::operator == (const NetworkInterface& other) const
 } } // namespace Poco::Net
 
 
-Net_API std::ostream& operator<<(std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac);
-Net_API std::ostream& operator<<(std::ostream& os, const Poco::Net::IPAddress& ipAddress);
+std::ostream& Net_API operator << (std::ostream& ostr, const Poco::Net::NetworkInterface::MACAddress& addr);
 
 
 #endif // POCO_NET_HAS_INTERFACE

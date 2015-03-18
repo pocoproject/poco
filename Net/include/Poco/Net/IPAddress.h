@@ -26,6 +26,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include <vector>
+#include <ostream>
 
 
 namespace Poco {
@@ -413,6 +414,11 @@ private:
 };
 
 
+//
+// inlines
+//
+
+
 inline void IPAddress::destruct()
 {
 #ifdef POCO_HAVE_ALIGNMENT
@@ -510,11 +516,12 @@ inline char* IPAddress::storage()
 #endif
 
 
-BinaryWriter& operator << (BinaryWriter& writer, const IPAddress& value);
-BinaryReader& operator >> (BinaryReader& reader, IPAddress& value);
-
-
 } } // namespace Poco::Net
+
+
+Poco::BinaryWriter& Net_API operator << (Poco::BinaryWriter& writer, const Poco::Net::IPAddress& value);
+Poco::BinaryReader& Net_API operator >> (Poco::BinaryReader& reader, Poco::Net::IPAddress& value);
+std::ostream& Net_API operator << (std::ostream& ostr, const Poco::Net::IPAddress& addr);
 
 
 #endif // Net_IPAddress_INCLUDED

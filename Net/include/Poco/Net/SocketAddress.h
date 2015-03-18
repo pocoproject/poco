@@ -22,9 +22,14 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketAddressImpl.h"
+#include <ostream>
 
 
 namespace Poco {
+
+class BinaryReader;
+class BinaryWriter;
+
 namespace Net {
 
 
@@ -274,6 +279,11 @@ inline bool SocketAddress::operator != (const SocketAddress& socketAddress) cons
 
 
 } } // namespace Poco::Net
+
+
+Poco::BinaryWriter& Net_API operator << (Poco::BinaryWriter& writer, const Poco::Net::SocketAddress& value);
+Poco::BinaryReader& Net_API operator >> (Poco::BinaryReader& reader, Poco::Net::SocketAddress& value);
+std::ostream& Net_API operator << (std::ostream& ostr, const Poco::Net::SocketAddress& address);
 
 
 #endif // Net_SocketAddress_INCLUDED
