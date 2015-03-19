@@ -201,8 +201,6 @@ void ThreadImpl::setAffinityImpl(int cpu)
 	if (pthread_setaffinity_np(_pData->thread, &cpuset) != 0)
 		throw SystemException("Failed to set affinity");
 #endif
-#else
-	throw Poco::NotImplementedException("Thread affinity not supported on this system");
 #endif
 #endif // defined unix & !defined mac os x
 
@@ -247,8 +245,6 @@ int ThreadImpl::getAffinityImpl() const
 			break;
 		}
 	}
-#else
-	throw Poco::NotImplementedException("Thread affinity not supported on this system");
 #endif
 #endif // defined unix & !defined mac os x
 
