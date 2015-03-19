@@ -281,9 +281,9 @@ inline bool SocketAddress::operator != (const SocketAddress& socketAddress) cons
 } } // namespace Poco::Net
 
 
-Poco::BinaryWriter& Net_API operator << (Poco::BinaryWriter& writer, const Poco::Net::SocketAddress& value);
-Poco::BinaryReader& Net_API operator >> (Poco::BinaryReader& reader, Poco::Net::SocketAddress& value);
-std::ostream& Net_API operator << (std::ostream& ostr, const Poco::Net::SocketAddress& address);
+Net_API Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::SocketAddress& value);
+Net_API Poco::BinaryReader& operator >> (Poco::BinaryReader& reader, Poco::Net::SocketAddress& value);
+Net_API std::ostream& operator << (std::ostream& ostr, const Poco::Net::SocketAddress& address);
 
 
 #endif // Net_SocketAddress_INCLUDED
