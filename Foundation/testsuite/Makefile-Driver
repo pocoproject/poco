@@ -40,7 +40,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
 	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest \
-	DirectoryIteratorsTest BufferTestSuite BasicFIFOBufferTest
+	DirectoryIteratorsTest FIFOBufferTestSuite FIFOBufferTest
 
 target         = testrunner
 target_version = 1
