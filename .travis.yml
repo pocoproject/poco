@@ -7,7 +7,7 @@ before_install:
   # we need a recent version of CMake
   - sudo add-apt-repository -y ppa:andykimpe/cmake3
   - sudo apt-get update -qq
-  - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev g++-arm-linux-gnueabi g++-arm-linux-gnueabihf sloccount cppcheck
+  - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 sloccount cppcheck 
 
 services:
   - mongodb
@@ -24,6 +24,16 @@ matrix:
       compiler: gcc
       script:
         - ./configure && make -s -j2
+        - export POCO_BASE=`pwd`
+        - export CPPUNIT_IGNORE="\
+        - N7CppUnit10TestCallerI8PathTestEE.testExpand \
+        - N7CppUnit10TestCallerI13RawSocketTestEE.testEchoIPv4 \
+        - N7CppUnit10TestCallerI13RawSocketTestEE.testSendToReceiveFromIPv4 \
+        - N7CppUnit10TestCallerI14ICMPClientTestEE.testPing"
+        - export EXCLUDE_TESTS="Data/MySQL Data/ODBC MongoDB PDF"
+        - export PATH=$PATH:.
+        - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.
+        - build/script/runtests.sh
 
 # TODO add this as soon as Linux-clang config is ready
 #    - env:    TEST_NAME="clang (make)"
