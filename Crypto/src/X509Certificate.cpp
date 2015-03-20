@@ -276,7 +276,7 @@ bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 	if (!pIssuerPublicKey) throw Poco::InvalidArgumentException("Issuer certificate has no public key");
 	int rc = X509_verify(pCert, pIssuerPublicKey);
 	EVP_PKEY_free(pIssuerPublicKey);
-	return rc != 0;
+	return rc == 1;
 }
 
 

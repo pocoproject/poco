@@ -23,9 +23,6 @@ matrix:
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
       script:
-        - sudo ifconfig -a
-        - sudo ifconfig venet0 multicast
-        - sudo ifconfig -a
         - ./configure && make -s -j2
         - ./travis/runtests.sh
     
