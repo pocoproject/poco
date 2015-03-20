@@ -51,7 +51,7 @@ do
 				runs=`expr $runs + 1`
 				sh -c "cd $POCO_BASE/$comp/testsuite/$BINDIR && $TESTRUNNER $TESTRUNNERARGS"
 				if [ $? -ne 0 ] ; then
-					failues=`expr $failures + 1`
+					failures=`expr $failures + 1`
 					failedTests="$failedTests $comp"
 					status=1
 				fi
