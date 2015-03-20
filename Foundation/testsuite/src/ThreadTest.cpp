@@ -488,7 +488,7 @@ void ThreadTest::testAffinity()
 		{
 			threadList[i]->setAffinity(i);
 		}
-		catch (Poco::NotImplementedException& niex)
+		catch (Poco::NotImplementedException&)
 		{
 			notImplemented = true;
 		}
@@ -497,7 +497,7 @@ void ThreadTest::testAffinity()
 		{
 			usedCpu = threadList[i]->getAffinity();
 		}
-		catch (Poco::NotImplementedException& niex)
+		catch (Poco::NotImplementedException&)
 		{
 			notImplemented = true;
 		}

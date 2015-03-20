@@ -1,7 +1,7 @@
 //
-// BasicFIFOBufferTest.cpp
+// FIFOBufferTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/BasicFIFOBufferTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/FIFOBufferTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -10,7 +10,7 @@
 //
 
 
-#include "BasicFIFOBufferTest.h"
+#include "FIFOBufferTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Buffer.h"
@@ -31,7 +31,7 @@ using Poco::delegate;
 using std::memcpy;
 
 
-BasicFIFOBufferTest::BasicFIFOBufferTest(const std::string& name): 
+FIFOBufferTest::FIFOBufferTest(const std::string& name): 
 	CppUnit::TestCase(name),
 	_notToReadable(0),
 	_notToWritable(0),
@@ -41,24 +41,24 @@ BasicFIFOBufferTest::BasicFIFOBufferTest(const std::string& name):
 }
 
 
-BasicFIFOBufferTest::~BasicFIFOBufferTest()
+FIFOBufferTest::~FIFOBufferTest()
 {
 }
 
-void BasicFIFOBufferTest::onReadable(bool& b)
+void FIFOBufferTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
 	else ++_readableToNot;
 };
 
 
-void BasicFIFOBufferTest::onWritable(bool& b)
+void FIFOBufferTest::onWritable(bool& b)
 {
 	if (b) ++_notToWritable;
 	else ++_writableToNot;
 }
 
-void BasicFIFOBufferTest::testNextWrite()
+void FIFOBufferTest::testNextWrite()
 {
 	// String length is 88 characters.
 	const int BUFFER_SIZE = 128;
@@ -85,7 +85,7 @@ void BasicFIFOBufferTest::testNextWrite()
 }
 
 
-void BasicFIFOBufferTest::testEOFAndError()
+void FIFOBufferTest::testEOFAndError()
 {
 	typedef FIFOBuffer::Type T;
 
@@ -97,8 +97,8 @@ void BasicFIFOBufferTest::testEOFAndError()
 	Buffer<T> b(10);
 	std::vector<T> v;
 
-	f.readable += delegate(this, &BasicFIFOBufferTest::onReadable);
-	f.writable += delegate(this, &BasicFIFOBufferTest::onWritable);
+	f.readable += delegate(this, &FIFOBufferTest::onReadable);
+	f.writable += delegate(this, &FIFOBufferTest::onWritable);
 
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
@@ -191,7 +191,7 @@ void BasicFIFOBufferTest::testEOFAndError()
 }
 
 
-void BasicFIFOBufferTest::testChar()
+void FIFOBufferTest::testChar()
 {
 	typedef FIFOBuffer::Type T;
 
@@ -203,8 +203,8 @@ void BasicFIFOBufferTest::testChar()
 	Buffer<T> b(10);
 	std::vector<T> v;
 
-	f.readable += delegate(this, &BasicFIFOBufferTest::onReadable);
-	f.writable += delegate(this, &BasicFIFOBufferTest::onWritable);
+	f.readable += delegate(this, &FIFOBufferTest::onReadable);
+	f.writable += delegate(this, &FIFOBufferTest::onWritable);
 
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
@@ -524,12 +524,12 @@ void BasicFIFOBufferTest::testChar()
 	assert(f[8] == '0');
 	assert(f[9] == '1');
 
-	f.readable -= delegate(this, &BasicFIFOBufferTest::onReadable);
-	f.writable -= delegate(this, &BasicFIFOBufferTest::onReadable);
+	f.readable -= delegate(this, &FIFOBufferTest::onReadable);
+	f.writable -= delegate(this, &FIFOBufferTest::onReadable);
 }
 
 
-void BasicFIFOBufferTest::testInt()
+void FIFOBufferTest::testInt()
 {
 	typedef int T;
 
@@ -671,25 +671,28 @@ void BasicFIFOBufferTest::testInt()
 	assert (f.isEmpty());
 }
 
-void BasicFIFOBufferTest::setUp()
+void FIFOBufferTest::setUp()
 {
-	
+	_notToReadable = 0;
+	_notToWritable = 0;
+	_readableToNot = 0;
+	_writableToNot = 0;
 }
 
 
-void BasicFIFOBufferTest::tearDown()
+void FIFOBufferTest::tearDown()
 {
 }
 
 
-CppUnit::Test* BasicFIFOBufferTest::suite()
+CppUnit::Test* FIFOBufferTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("BasicFIFOBufferTest");
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FIFOBufferTest");
 
-	CppUnit_addTest(pSuite, BasicFIFOBufferTest, testNextWrite);
-	CppUnit_addTest(pSuite, BasicFIFOBufferTest, testChar);
-	CppUnit_addTest(pSuite, BasicFIFOBufferTest, testInt);
-	CppUnit_addTest(pSuite, BasicFIFOBufferTest, testEOFAndError);
+	CppUnit_addTest(pSuite, FIFOBufferTest, testNextWrite);
+	CppUnit_addTest(pSuite, FIFOBufferTest, testChar);
+	CppUnit_addTest(pSuite, FIFOBufferTest, testInt);
+	CppUnit_addTest(pSuite, FIFOBufferTest, testEOFAndError);
 
 	return pSuite;
 }
