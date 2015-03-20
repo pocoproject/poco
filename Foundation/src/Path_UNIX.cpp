@@ -67,7 +67,8 @@ std::string PathImpl::homeImpl()
 		if (pwd)
 			path = pwd->pw_dir;
 		else
-			path = EnvironmentImpl::getImpl("HOME");
+			if (EnvironmentImpl::hasImpl("HOME"))
+				path = EnvironmentImpl::getImpl("HOME");
 	}
 	std::string::size_type n = path.size();
 	if (n > 0 && path[n - 1] != '/') path.append("/");
