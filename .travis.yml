@@ -23,9 +23,10 @@ matrix:
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
       script:
+        -  sudo ifconfig -a
         - ./configure && make -s -j2
         - ./travis/runtests.sh
-
+    
 # TODO add this as soon as Linux-clang config is ready
 #    - env:    TEST_NAME="clang (make)"
 #      compiler: clang
