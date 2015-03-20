@@ -438,7 +438,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 	}
 	else
 	{
-		if (!Path::find(Environment::get("PATH"), _command, appPath))
+		if (!Environment::has("PATH") || !Path::find(Environment::get("PATH"), _command, appPath))
 			appPath = Path(_workingDirAtLaunch, _command);
 		appPath.makeAbsolute();
 	}
