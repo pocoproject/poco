@@ -11,13 +11,12 @@
 # General Settings
 #
 LINKMODE ?= SHARED
-CLANG_VERSION ?= 3.5
 
 #
 # Define Tools
 #
-CC      = clang-$(CLANG_VERSION)
-CXX     = clang++-$(CLANG_VERSION)
+CC      = clang$(CLANG_VERSION)
+CXX     = clang++$(CLANG_VERSION)
 LINK    = $(CXX)
 LIB     = ${CROSS_COMPILE}ar -cr
 RANLIB  = ${CROSS_COMPILE}ranlib
