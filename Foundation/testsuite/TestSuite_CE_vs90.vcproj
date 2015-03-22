@@ -607,7 +607,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\BufferTestSuite.cpp"
+					RelativePath=".\src\FIFOBufferTestSuite.cpp"
 					>
 				</File>
 				<File
