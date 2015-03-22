@@ -548,7 +548,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\BasicFIFOBufferTest.cpp"
+					RelativePath=".\src\FIFOBufferTest.cpp"
 					>
 				</File>
 				<File
@@ -656,7 +656,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\BasicFIFOBufferTest.h"
+					RelativePath=".\src\FIFOBufferTest.h"
 					>
 				</File>
 				<File
