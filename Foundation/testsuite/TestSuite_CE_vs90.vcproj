@@ -603,6 +603,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\FIFOBufferTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FIFOBufferTestSuite.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ByteOrderTest.cpp"
 					>
 				</File>

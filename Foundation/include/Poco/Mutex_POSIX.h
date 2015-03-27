@@ -35,7 +35,7 @@ public:
 	enum MutexTypeImpl
 	{
 		MUTEX_RECURSIVE_IMPL,
-		MUTEX_NONRECURSIVE_IMPL,
+		MUTEX_NONRECURSIVE_IMPL
 	};
 
 protected:

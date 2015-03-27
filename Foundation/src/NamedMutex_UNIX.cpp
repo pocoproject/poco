@@ -33,7 +33,7 @@
 namespace Poco {
 
 
-#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_CYGWIN) || (POCO_OS == POCO_OS_FREE_BSD)
+#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_CYGWIN) || (POCO_OS == POCO_OS_FREE_BSD) || (POCO_OS == POCO_OS_NACL)
 	union semun
 	{
 		int                 val;

@@ -285,7 +285,9 @@ STRIPCMD = $(STRIP) $@$(BINEXT)
 endif
 
 #
-# Make CC and CXX environment vars
+# Make CC, CXX and LINK environment vars
 #
 export CC
 export CXX
+export LINK
+

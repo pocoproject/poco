@@ -389,6 +389,7 @@ private:
 	Poco::Logger*   _pLogger;
 	Poco::Timestamp _startTime;
 	bool            _stopOptionsProcessing;
+	int             _loadedConfigs;
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	std::string _workingDirAtLaunch;
