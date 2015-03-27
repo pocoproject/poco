@@ -112,10 +112,11 @@
 #endif
 
 
-#ifndef POCO_OS_FAMILY_UNIX
+#ifndef __GNUC__
 	#define GCC_DIAG_OFF(x)
 	#define GCC_DIAG_ON(x)
 #endif
+
 
 //
 // Hardware Architecture and Byte Order
