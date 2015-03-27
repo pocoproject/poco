@@ -297,6 +297,7 @@
     <ClInclude Include="include\Poco\Data\DynamicDateTime.h"/>
     <ClInclude Include="include\Poco\Data\DynamicLOB.h"/>
     <ClInclude Include="include\Poco\Data\Extraction.h"/>
+    <ClInclude Include="include\Poco\Data\JSONRowFormatter.h"/>
     <ClInclude Include="include\Poco\Data\Limit.h"/>
     <ClInclude Include="include\Poco\Data\LOB.h"/>
     <ClInclude Include="include\Poco\Data\LOBStream.h"/>
@@ -338,6 +339,7 @@
     <ClCompile Include="src\DataException.cpp"/>
     <ClCompile Include="src\Date.cpp"/>
     <ClCompile Include="src\DynamicLOB.cpp"/>
+    <ClCompile Include="src\JSONRowFormatter.cpp"/>
     <ClCompile Include="src\Limit.cpp"/>
     <ClCompile Include="src\MetaColumn.cpp"/>
     <ClCompile Include="src\Position.cpp"/>

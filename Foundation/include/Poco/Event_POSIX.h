@@ -35,7 +35,7 @@ public:
 	enum EventTypeImpl
 	{
 		EVENT_MANUALRESET_IMPL,
-		EVENT_AUTORESET_IMPL,
+		EVENT_AUTORESET_IMPL
 	};
 
 protected:

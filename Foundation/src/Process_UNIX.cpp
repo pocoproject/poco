@@ -200,7 +200,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
 		if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
 		// close all open file descriptors other than stdin, stdout, stderr
-		for (int i = 3; i < getdtablesize(); ++i)
+		for (int i = 3; i < sysconf(_SC_OPEN_MAX); ++i)
 		{
 			close(i);
 		}

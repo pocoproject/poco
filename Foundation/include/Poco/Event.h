@@ -49,7 +49,7 @@ public:
 	enum EventType
 	{
 		EVENT_MANUALRESET = EVENT_MANUALRESET_IMPL, /// Manual reset event
-		EVENT_AUTORESET = EVENT_AUTORESET_IMPL,     /// Auto-reset event
+		EVENT_AUTORESET = EVENT_AUTORESET_IMPL      /// Auto-reset event
 	};
 
 	explicit Event(EventType type = EVENT_AUTORESET);

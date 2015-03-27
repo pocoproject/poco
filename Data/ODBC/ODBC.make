@@ -58,6 +58,6 @@ COMMONFLAGS += -DPOCO_IODBC -I/usr/include/iodbc
 COMMONFLAGS += -Wno-deprecated-declarations
 
 else
-$(error No ODBC library found. Please install unixODBC or iODBC or specify POCO_ODBC_LIB and try again)
+$(error No ODBC library found. Please install unixODBC or iODBC or specify POCO_ODBC_LIB or set the correct libodbc library path by using --odbc-lib as option to 'configure' script and try again)
 endif
 
