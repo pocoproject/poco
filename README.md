@@ -6,6 +6,7 @@ Build Status
 
 - Travis: [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=develop)](https://travis-ci.org/pocoproject/poco)
 - AppVeyor: [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae)](https://ci.appveyor.com/project/obiltschnig/poco)
+- biicode: [![Build Status](https://webapi.biicode.com/v1/badges/fenix/fenix/poco/develop)](https://www.biicode.com/fenix/fenix/poco/develop)
 
 ![alt text][logo]
 
