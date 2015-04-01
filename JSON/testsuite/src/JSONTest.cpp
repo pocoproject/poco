@@ -1181,6 +1181,45 @@ void JSONTest::testPrintHandler()
 		"    ]\n"
 		"}"
 	);
+
+	json = 
+		"{"
+			"\"array\":"
+			"["
+				"{"
+					"\"key1\":"
+					"["
+						"1,2,3,"
+						"{"
+							"\"subkey\":"
+							"\"test\""
+						"}"
+					"]"
+				"},"
+				"{"
+					"\"key2\":"
+					"{"
+						"\"anotherSubKey\":"
+						"["
+							"1,"
+							"{"
+								"\"subSubKey\":"
+								"["
+									"4,5,6"
+								"]"
+							"}"
+						"]"
+					"}"
+				"}"
+			"]"
+		"}";
+
+
+	ostr.str("");
+	pHandler->setIndent(0);
+	parser.reset();
+	parser.parse(json);
+	assert (json == ostr.str());
 }
 
 
