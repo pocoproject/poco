@@ -33,6 +33,13 @@ public:
 	void testMatch4();
 	void testMatch5();
 	void testMatch6();
+	void testMatchAll();
+	void testMatchAllCapture();
+	void testMatchAllUtf8();
+	void testMatchAllPcreTest4();
+	void testMatchAllPcreTest2();
+	void testMatchAllPcreTest8();
+	void testMatchAllPcreTest1();
 	void testExtract();
 	void testSplit1();
 	void testSplit2();

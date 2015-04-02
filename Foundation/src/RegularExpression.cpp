@@ -16,6 +16,7 @@
 
 #include "Poco/RegularExpression.h"
 #include "Poco/Exception.h"
+#include "Poco/UTF8Encoding.h"
 #include <sstream>
 #if defined(POCO_UNBUNDLED)
 #include <pcre.h>
@@ -30,7 +31,26 @@ namespace Poco {
 const int RegularExpression::OVEC_SIZE = 64;
 
 
-RegularExpression::RegularExpression(const std::string& pattern, int options, bool study): _pcre(0), _extra(0)
+static void copyOvecToMatchVec(int count, int ovec[], GroupMap const& groups, RegularExpression::MatchVec& mv)
+{
+	mv.clear();
+	mv.reserve(count);
+	for (int i = 0; i < count; ++i)
+	{
+		RegularExpression::Match m;
+		m.offset = ovec[i*2] < 0 ? std::string::npos : ovec[i*2] ;
+		m.length = ovec[i*2 + 1] - m.offset;
+		GroupMap::const_iterator it = groups.find(i);
+		if (it != groups.end())
+		{
+			m.name = it->second;
+		}
+		mv.push_back(m);
+	}
+}
+
+
+RegularExpression::RegularExpression(const std::string& pattern, int options, bool study): _pcre(0), _extra(0), _compileOptions(options)
 {
 	const char* error;
 	int offs;
@@ -101,6 +121,62 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 }
 
 
+int RegularExpression::matchAll(const std::string& subject, std::string::size_type offset, MatchVec& matches, int options) const
+{
+	matches.clear();
+	options = options & 0xFFFF;
+
+	int ovec[OVEC_SIZE];
+	UTF8Encoding utf8;
+	MatchVec mv;
+	int rc = match(subject, offset, mv, options);
+	while (rc > 0)
+	{
+		if (rc > 1)
+		{
+			matches.push_back(mv[1]);
+		}
+		else
+		{
+			matches.push_back(mv[0]);
+		}
+		offset = mv[0].offset;
+		if (mv[0].length == 0)
+		{
+			if (subject.length() <= offset)
+				return int(matches.size());
+			// First try an anchored non-empty match
+			rc = pcre_exec(_pcre, _extra, subject.c_str(), int(subject.size()), int(offset), options|PCRE_ANCHORED|PCRE_NOTEMPTY_ATSTART, ovec, OVEC_SIZE);
+			if (rc > 0)
+			{
+				copyOvecToMatchVec(rc, ovec, mv);
+			}
+			else
+			{
+				int incr = 1;
+				if (matchMultiByteNewLine() && subject[offset] == '\r' && subject[offset+1] == '\n')
+				{
+					incr = 2;
+				}
+				else if ((_compileOptions & RE_UTF8) != 0)
+				{
+					incr = utf8.sequenceLength((unsigned char*) subject.c_str() + offset, int(subject.length() - offset));
+					if (incr <= 0 || subject.length() < offset + incr)
+						throw RegularExpressionException("bad UTF-8 string");
+				}
+				rc = match(subject, offset + incr, mv, options);
+			}
+		}
+		else
+		{
+			rc = match(subject, offset + mv[0].length, mv, options);
+		}
+	}
+
+	return int(matches.size());
+}
+
+
 int RegularExpression::match(const std::string& subject, std::string::size_type offset, MatchVec& matches, int options) const
 {
 	poco_assert (offset <= subject.length());
@@ -127,24 +203,57 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 		msg << "PCRE error " << rc;
 		throw RegularExpressionException(msg.str());
 	}
-	matches.reserve(rc);
-	for (int i = 0; i < rc; ++i)
-	{
-		Match m;
-		GroupMap::const_iterator it;
-
-		m.offset = ovec[i*2] < 0 ? std::string::npos : ovec[i*2] ;
-		m.length = ovec[i*2 + 1] - m.offset;
-
-		it = _groups.find(i);
-		if (it != _groups.end())
-		{
-			m.name = (*it).second;
-		}
-
-		matches.push_back(m);
-	}
+	copyOvecToMatchVec(rc, ovec, matches);
 	return rc;
+}
+
+
+int RegularExpression::matchAll(const std::string& subject, std::string::size_type offset, std::vector<MatchVec>& matches, int options) const
+{
+	matches.clear();
+	options = options & 0xFFFF;
+
+	int ovec[OVEC_SIZE];
+	UTF8Encoding utf8;
+	MatchVec mtch;
+	int rc = match(subject, offset, mtch, options);
+	while (rc > 0)
+	{
+		matches.push_back(mtch);
+		offset = mtch[0].offset;
+		if (mtch[0].length == 0)
+		{
+			if (subject.length() <= offset)
+				return int(matches.size());
+			// First try an anchored non-empty match
+			rc = pcre_exec(_pcre, _extra, subject.c_str(), int(subject.size()), int(offset), options|PCRE_ANCHORED|PCRE_NOTEMPTY_ATSTART, ovec, OVEC_SIZE);
+			if (rc > 0)
+			{
+				copyOvecToMatchVec(rc, ovec, mtch);
+			}
+			else
+			{
+				int incr = 1;
+				if (matchMultiByteNewLine() && subject[offset] == '\r' && subject[offset+1] == '\n')
+				{
+					incr = 2;
+				}
+				else if ((_compileOptions & RE_UTF8) != 0)
+				{
+					incr = utf8.sequenceLength((unsigned char*) subject.c_str() + offset, int(subject.length() - offset));
+					if (incr <= 0 || subject.length() < offset + incr)
+						throw RegularExpressionException("bad UTF-8 string");
+				}
+				rc = match(subject, offset + incr, mtch, options);
+			}
+		}
+		else
+		{
+			rc = match(subject, offset + mtch[0].length, mtch, options);
+		}
+	}
+
+	return int(matches.size());
 }
 
 
@@ -222,6 +331,19 @@ int RegularExpression::subst(std::string& subject, std::string::size_type offset
 	{
 		return substOne(subject, offset, replacement, options) != std::string::npos ? 1 : 0;
 	}
+}
+
+
+bool RegularExpression::matchMultiByteNewLine() const
+{
+	const int newLineOptions = RE_NEWLINE_CR | RE_NEWLINE_LF | RE_NEWLINE_CRLF | RE_NEWLINE_ANY | RE_NEWLINE_ANYCRLF;
+	if ((_compileOptions & newLineOptions) == RE_NEWLINE_ANY)
+		return true;
+	if ((_compileOptions & newLineOptions) == RE_NEWLINE_CRLF)
+		return true;
+	if ((_compileOptions & newLineOptions) == RE_NEWLINE_ANYCRLF)
+		return true;
+	return false;
 }
 
 

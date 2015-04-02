@@ -123,11 +123,34 @@ public:
 		/// Throws a RegularExpressionException in case of an error.
 		/// Returns the number of matches.
 
+	int matchAll(const std::string& subject, MatchVec& matches, int options = 0) const;
+		/// Matches all non-overlapping occurances of the subject string against the pattern. 
+		/// If the pattern contains groups, returns the position of the first subgroup for each occurance of the match.
+		/// Otherwise returns the position of the matched string for each occurance of the match.
+		/// If no part of the subject matches the pattern, matches is empty.
+		/// Throws a RegularExpressionException in case of an error.
+		/// Returns the number of matches.
+
+	int matchAll(const std::string& subject, std::string::size_type offset, MatchVec& matches, int options = 0) const;
+		/// Matches all the non-overlapping occurances of the subject string, starting at offset, against the pattern. 
+		/// If the pattern contains groups, returns the position of the first subgroup for each occurance of the match.
+		/// Otherwise returns the position of the matched string for each occurance of the match.
+		/// If no part of the subject matches the pattern, matches is empty.
+		/// Throws a RegularExpressionException in case of an error.
+		/// Returns the number of matches.
+
 	int match(const std::string& subject, std::string::size_type offset, MatchVec& matches, int options = 0) const;
 		/// Matches the given subject string against the pattern. 
 		/// The first entry in matches contains the position of the captured substring.
 		/// The following entries identify matching subpatterns. See the PCRE documentation
 		/// for a more detailed explanation.
+		/// If no part of the subject matches the pattern, matches is empty.
+		/// Throws a RegularExpressionException in case of an error.
+		/// Returns the number of matches.
+
+	int matchAll(const std::string& subject, std::string::size_type offset, std::vector<MatchVec>& matches, int options = 0) const;
+		/// Matches all the non-overlapping occurances of the subject string, starting at offset, against the pattern. 
+		/// For each match it returns the captured text for each subexpression in matches[i].
 		/// If no part of the subject matches the pattern, matches is empty.
 		/// Throws a RegularExpressionException in case of an error.
 		/// Returns the number of matches.
@@ -210,10 +233,12 @@ public:
 
 protected:
 	std::string::size_type substOne(std::string& subject, std::string::size_type offset, const std::string& replacement, int options) const;
+	bool matchMultiByteNewLine() const;
 
 private:
 	pcre*       _pcre;
 	pcre_extra* _extra;
+	const int   _compileOptions;
 	
 	GroupMap _groups;
 
@@ -231,6 +256,12 @@ private:
 inline int RegularExpression::match(const std::string& subject, Match& mtch, int options) const
 {
 	return match(subject, 0, mtch, options);
+}
+
+
+inline int RegularExpression::matchAll(const std::string& subject, MatchVec& matches, int options) const
+{
+	return matchAll(subject, 0, matches, options);
 }
 
 
