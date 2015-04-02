@@ -141,6 +141,7 @@ public:
 	virtual void testDynamicAny();
 
 	virtual void testMultipleResults();
+	virtual void testMultipleResultsNoProj();
 
 	virtual void testSQLChannel();
 	virtual void testSQLLogger();
@@ -176,6 +177,7 @@ protected:
 	virtual void recreateMiscTable();
 	virtual void recreateLogTable();
 	virtual void recreateUnicodeTable();
+	virtual bool emptyStringIsSpace() { return false; }
 
 	static SessionPtr init(const std::string& driver,
 		std::string& dsn,

@@ -22,6 +22,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -1029,7 +1030,7 @@ void ODBCTest::testNull()
 		recreateNullsTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->nulls();
+		_pExecutor->nulls(emptyStringIsSpace());
 		i += 2;
 	}
 }
@@ -1124,6 +1125,20 @@ void ODBCTest::testMultipleResults()
 		_pExecutor->multipleResults();
 
 		i += 2;
+	}
+}
+
+void ODBCTest::testMultipleResultsNoProj()
+{
+	if (! &session()) fail("Test not available.");
+	session().setFeature("autoBind", true); // DB2 fails without that
+	for (int autoE = 0; autoE < 2; ++autoE)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoExtract", autoE != 0);
+		_pExecutor->multipleResultsNoProj("SELECT * FROM " + ExecUtil::person() + " WHERE Age = ?; "
+		  "SELECT Age FROM " + ExecUtil::person() + " WHERE FirstName = ?; "
+		  "SELECT * FROM " + ExecUtil::person() + " WHERE Age = ? OR Age = ? ORDER BY Age;");
 	}
 }
 
@@ -1274,7 +1289,7 @@ bool ODBCTest::canConnect(const std::string& driver,
 		}
 	}
 
-	if (_drivers.end() == itDrv) 
+	if ((_drivers.end() == itDrv) && (driver.length() != 0) && (driver[0] != '/')) 
 	{
 		dsn = "";
 		uid = "";

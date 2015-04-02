@@ -59,7 +59,7 @@ PROJECT_BASE = $(POCO_BASE)
 else
 ifneq ($(inproj),0)
 else
-$(error Current working directory not under $$PROJECT_BASE)
+# $(error Current working directory not under $$PROJECT_BASE)
 endif
 endif
 

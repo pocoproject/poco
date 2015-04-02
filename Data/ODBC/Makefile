@@ -8,6 +8,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
+SHLIBFLAGS += $(POCO_ODBC_LINK_EXTRA)
+
 include ODBC.make
 
 objects = Binder ConnectionHandle Connector EnvironmentHandle \
