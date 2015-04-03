@@ -255,7 +255,7 @@ const Var Var::operator -- (int)
 
 bool Var::operator == (const Var& other) const
 {
-	if (isEmpty() && !other.isEmpty()) return false;
+	if (isEmpty() != other.isEmpty()) return false;
 	if (isEmpty() && other.isEmpty()) return true;
 	return convert<std::string>() == other.convert<std::string>();
 }

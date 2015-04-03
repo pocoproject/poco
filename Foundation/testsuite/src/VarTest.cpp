@@ -2473,6 +2473,11 @@ void VarTest::testEmpty()
 	assert (da == da);
 	assert (!(da != da));
 
+	assert (da != Var(1));
+	assert (!(da == Var(1)));
+	assert (Var(1) != da);
+	assert (!(Var(1) == da));
+
 	assert (da != "");
 	assert ("" != da);
 	assert (!(da == ""));
