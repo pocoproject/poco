@@ -28,16 +28,17 @@ namespace Net {
 HTTPEventArgs::HTTPEventArgs(const std::string& uri,
 	const HTTPResponse& response,
 	const std::string& body,
-	const std::string& exception) : _uri(uri),
+	const Poco::Exception* pException) : _uri(uri),
 	_response(response),
 	_body(body),
-	_exception(exception)
+	_pException(pException ? pException->clone() : 0)
 {
 }
 
 
 HTTPEventArgs::~HTTPEventArgs()
 {
+	delete _pException;
 }
 
 

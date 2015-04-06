@@ -22,6 +22,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
@@ -38,7 +39,7 @@ public:
 	HTTPEventArgs(const std::string& uri,
 		const HTTPResponse& response,
 		const std::string& body,
-		const std::string& exception = "");
+		const Poco::Exception* pException = 0);
 		/// Creates HTTPEventArgs.
 
 	virtual ~HTTPEventArgs();
@@ -53,8 +54,12 @@ public:
 	std::string body() const;
 		/// Returns the response body.
 
-	std::string exception() const;
-	/// Returns the exception string for the request.
+	std::string error() const;
+		/// Returns the error string for the request.
+
+	const Poco::Exception* exception() const;
+		/// Returns the exception if any, otherwise
+		/// it returns null pointer.
 
 private:
 	HTTPEventArgs();
@@ -62,7 +67,7 @@ private:
 	std::string         _uri;
 	const HTTPResponse& _response;
 	std::string         _body;
-	std::string         _exception;
+	Poco::Exception*    _pException;
 };
 
 
@@ -88,9 +93,15 @@ inline std::string HTTPEventArgs::body() const
 }
 
 
-inline std::string HTTPEventArgs::exception() const
+inline std::string HTTPEventArgs::error() const
 {
-	return _exception;
+	return _pException ? _pException->displayText() : std::string();
+}
+
+
+inline const Poco::Exception* HTTPEventArgs::exception() const
+{
+	return _pException;
 }
 
 

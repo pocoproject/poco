@@ -23,9 +23,12 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPEventArgs.h"
+#include "Poco/Net/HTTPSessionFactory.h"
+#include "Poco/Net/HTTPSessionInstantiator.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPMessage.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/URI.h"
 #include "Poco/Activity.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
@@ -74,10 +77,8 @@ public:
 	mutable Poco::BasicEvent<HTTPEventArgs> httpException;
 	mutable Poco::BasicEvent<HTTPEventArgs> httpError;
 
-	explicit HTTPClient(const StreamSocket& socket);
-		/// Creates a HTTPClient using the given socket.
-		/// The socket must not be connected. The session
-		/// takes ownership of the socket.
+	explicit HTTPClient(const URI& uri);
+		/// Creates a HTTPClient using the given URI.
 
 	explicit HTTPClient(const SocketAddress& address);
 		/// Creates a HTTPClient using the given address.
@@ -173,7 +174,7 @@ public:
 	void sendRequest(const std::string& method,
 		const std::string& uri,
 		const std::string& body = "",
-		const std::string& version = HTTPMessage::HTTP_1_0);
+		const std::string& version = HTTPMessage::HTTP_1_1);
 		/// Sends the header for the given HTTP request to
 		/// the server.
 		///
@@ -182,42 +183,42 @@ public:
 	
 	void sendGet(const std::string& uri,
 		const std::string& body = "",
-		const std::string& version = HTTPMessage::HTTP_1_0);
+		const std::string& version = HTTPMessage::HTTP_1_1);
 		/// Sends GET request to the server.
 	
 	void sendHead(const std::string& uri,
 		const std::string& body = "",
-		const std::string& version = HTTPMessage::HTTP_1_0);
+		const std::string& version = HTTPMessage::HTTP_1_1);
 		/// Sends HEAD request to the server.
 	
 	void sendPost(const std::string& uri,
 		const std::string& body = "",
-		const std::string& version = HTTPMessage::HTTP_1_0);
+		const std::string& version = HTTPMessage::HTTP_1_1);
 		/// Sends POST request to the server.
 	
 	void sendPut(const std::string& uri,
 		const std::string& body = "",
-		const std::string& version = HTTPMessage::HTTP_1_0);
+		const std::string& version = HTTPMessage::HTTP_1_1);
 		/// Sends PUT request to the server.
 	
 	void sendDelete(const std::string& uri,
 		const std::string& body = "",
-		const std::string& version = HTTPMessage::HTTP_1_0);
+		const std::string& version = HTTPMessage::HTTP_1_1);
 		/// Sends DELETE request to the server.
 	
 	void sendConnect(const std::string& uri,
 		const std::string& body = "",
-		const std::string& version = HTTPMessage::HTTP_1_0);
+		const std::string& version = HTTPMessage::HTTP_1_1);
 		/// Sends CONNECT request to the server.
 	
 	void sendOptions(const std::string& uri,
 		const std::string& body = "",
-		const std::string& version = HTTPMessage::HTTP_1_0);
+		const std::string& version = HTTPMessage::HTTP_1_1);
 		/// Sends OPTIONS request to the server.
 	
 	void sendTrace(const std::string& uri,
 		const std::string& body = "",
-		const std::string& version = HTTPMessage::HTTP_1_0);
+		const std::string& version = HTTPMessage::HTTP_1_1);
 		/// Sends TRACE request to the server.
 
 	void reset();
@@ -253,14 +254,16 @@ private:
 	void wakeUp();
 	void clearQueue();
 
-	HTTPClientSession    _session;
-	RequestQueue         _requestQueue;
-	RequestBodyMap       _requestBodyMap;
-	Activity<HTTPClient> _activity;
-	Mutex                _mutex;
-	Mutex                _exchangeMutex;
-	Thread*              _pThread;
-	int                  _requestsInProcess;
+	HTTPSessionFactory       _factory;
+	HTTPSessionInstantiator* _pInstantiator;
+	HTTPClientSession*       _pSession;
+	RequestQueue             _requestQueue;
+	RequestBodyMap           _requestBodyMap;
+	Activity<HTTPClient>     _activity;
+	Mutex                    _mutex;
+	Mutex                    _exchangeMutex;
+	Thread*                  _pThread;
+	int                      _requestsInProcess;
 };
 
 
@@ -340,73 +343,73 @@ inline void HTTPClient::sendTrace(const std::string& uri,
 
 inline const std::string& HTTPClient::getHost() const
 {
-	return _session.getHost();
+	return _pSession->getHost();
 }
 
 
 inline Poco::UInt16 HTTPClient::getPort() const
 {
-	return _session.getPort();
+	return _pSession->getPort();
 }
 
 
 inline const std::string& HTTPClient::getProxyHost() const
 {
-	return _session.getProxyHost();
+	return _pSession->getProxyHost();
 }
 
 
 inline Poco::UInt16 HTTPClient::getProxyPort() const
 {
-	return _session.getProxyPort();
+	return _pSession->getProxyPort();
 }
 
 
 inline const std::string& HTTPClient::getProxyUsername() const
 {
-	return _session.getProxyUsername();
+	return _pSession->getProxyUsername();
 }
 
 
 inline const std::string& HTTPClient::getProxyPassword() const
 {
-	return _session.getProxyPassword();
+	return _pSession->getProxyPassword();
 }
 
 
 inline const HTTPClientSession::ProxyConfig& HTTPClient::getProxyConfig() const
 {
-	return _session.getProxyConfig();
+	return _pSession->getProxyConfig();
 }
 
 
 inline bool HTTPClient::getKeepAlive() const
 {
-	return _session.getKeepAlive();
+	return _pSession->getKeepAlive();
 }
 
 
 inline Poco::Timespan HTTPClient::getTimeout() const
 {
-	return _session.getTimeout();
+	return _pSession->getTimeout();
 }
 
 
 inline const Poco::Timespan& HTTPClient::getKeepAliveTimeout() const
 {
-	return _session.getKeepAliveTimeout();
+	return _pSession->getKeepAliveTimeout();
 }
 
 
 inline bool HTTPClient::secure() const
 {
-	return _session.secure();
+	return _pSession->secure();
 }
 
 
 inline bool HTTPClient::bypassProxy() const
 {
-	return _session.bypassProxy();
+	return _pSession->bypassProxy();
 }
 
 

@@ -20,8 +20,10 @@
 #include "Poco/Net/HTTPHeaderStream.h"
 #include "Poco/Net/HTTPStream.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/URI.h"
 #include "Poco/Thread.h"
 #include "Poco/ScopedLock.h"
+#include "Poco/NumberFormatter.h"
 #include <sstream>
 
 
@@ -29,42 +31,68 @@ namespace Poco {
 namespace Net {
 
 
-HTTPClient::HTTPClient(const StreamSocket& socket):
-	_session(socket),
+HTTPClient::HTTPClient(const URI& uri):
+	_pInstantiator(0),
+	_pSession(0),
 	_activity(this, &HTTPClient::runActivity),
 	_pThread(0),
 	_requestsInProcess(0)
 {
+	_pInstantiator = new HTTPSessionInstantiator;
+	_factory.registerProtocol("http", _pInstantiator);
+	_pSession = _factory.createClientSession(uri);
+	poco_check_ptr(_pSession);
 	_activity.start();
 }
 
 
 HTTPClient::HTTPClient(const SocketAddress& address):
-	_session(address),
+	_pInstantiator(0),
+	_pSession(0),
 	_activity(this, &HTTPClient::runActivity),
 	_pThread(0),
 	_requestsInProcess(0)
 {
+	_pInstantiator = new HTTPSessionInstantiator;
+	_factory.registerProtocol("http", _pInstantiator);
+	URI uri(std::string("http://").append(address.toString()));
+	_pSession = _factory.createClientSession(uri);
+	poco_check_ptr(_pSession);
 	_activity.start();
 }
 
 
 HTTPClient::HTTPClient(const std::string& host, Poco::UInt16 port):
-	_session(host, port),
+	_pInstantiator(0),
+	_pSession(0),
 	_activity(this, &HTTPClient::runActivity),
 	_pThread(0),
 	_requestsInProcess(0)
 {
+	_pInstantiator = new HTTPSessionInstantiator;
+	_factory.registerProtocol("http", _pInstantiator);
+	URI uri(std::string("http://").append(host).append(1, ':').append(NumberFormatter::format(port)));
+	_pSession = _factory.createClientSession(uri);
+	poco_check_ptr(_pSession);
 	_activity.start();
 }
 
 
 HTTPClient::HTTPClient(const std::string& host, Poco::UInt16 port, const HTTPClientSession::ProxyConfig& proxyConfig) :
-	_session(host, port, proxyConfig),
+	_pInstantiator(0),
+	_pSession(0),
 	_activity(this, &HTTPClient::runActivity),
 	_pThread(0),
 	_requestsInProcess(0)
 {
+	_pInstantiator = new HTTPSessionInstantiator;
+	_factory.registerProtocol("http", _pInstantiator);
+	URI uri(std::string("http://").append(host).append(1, ':').append(NumberFormatter::format(port)));
+	_factory.setProxy(proxyConfig.host, proxyConfig.port);
+	if (!proxyConfig.username.empty())
+		_factory.setProxyCredentials(proxyConfig.username, proxyConfig.password);
+	_pSession = _factory.createClientSession(uri);
+	poco_check_ptr(_pSession);
 	_activity.start();
 }
 
@@ -75,6 +103,11 @@ HTTPClient::~HTTPClient()
 	wakeUp();
 	_activity.wait();
 	clearQueue();
+	if (_pInstantiator)
+	{
+		_factory.unregisterProtocol("http");
+		delete _pSession;
+	}
 }
 
 
@@ -110,16 +143,45 @@ void HTTPClient::runActivity()
 			try
 			{
 				ScopedLockWithUnlock<Mutex> l(_mutex);
-				std::ostream& os = _session.sendRequest(req);
-				if (requestBodyMap.find(*it) != requestBodyMap.end())
-				{
-					os << requestBodyMap[*it];
-				}
-
 				std::ostringstream ostr;
-				std::istream& rs = _session.receiveResponse(response);
+				std::istream* pRS = 0;
+				do
+				{
+					HTTPResponse::HTTPStatus status = response.getStatus();
+					if (status == HTTPResponse::HTTP_MOVED_PERMANENTLY ||
+						status == HTTPResponse::HTTP_FOUND ||
+						status == HTTPResponse::HTTP_TEMPORARY_REDIRECT ||
+						status == HTTPResponse::HTTP_SEE_OTHER)
+					{
+						URI newURI(response.get("Location"));
+						if (newURI.getScheme() == "http")
+						{
+							req.setURI(newURI.toString());
+							if (status == HTTPResponse::HTTP_SEE_OTHER &&
+								req.getMethod() != HTTPRequest::HTTP_GET)
+							{
+								req.setMethod(HTTPRequest::HTTP_GET);
+							}
+						}
+						else if (newURI.getScheme() == "https")
+						{
+							//TODO
+						}
+					}
+
+					std::ostream& os = _pSession->sendRequest(req);
+					if (requestBodyMap.find(*it) != requestBodyMap.end())
+					{
+						os << requestBodyMap[*it];
+					}
+
+					std::istream& rs = _pSession->receiveResponse(response);
+					pRS = &rs;
+				}
+				while (response.getStatus() == HTTPResponse::HTTP_FOUND);
+
 				l.unlock();
-				StreamCopier::copyStream(rs, ostr);
+				StreamCopier::copyStream(*pRS, ostr);
 				HTTPEventArgs args(req.getURI(), response, ostr.str());
 				if (response.getStatus() >= HTTPResponse::HTTP_BAD_REQUEST)
 					httpError.notify(this, args);
@@ -128,7 +190,7 @@ void HTTPClient::runActivity()
 			}
 			catch (Poco::Exception& ex)
 			{
-				HTTPEventArgs args(req.getURI(), response, "", ex.displayText());
+				HTTPEventArgs args(req.getURI(), response, "", &ex);
 				httpException.notify(this, args);
 			}
 
@@ -157,7 +219,7 @@ void HTTPClient::clearQueue()
 void HTTPClient::reset()
 {
 	Mutex::ScopedLock l(_mutex);
-	_session.reset();
+	_pSession->reset();
 	clearQueue();
 }
 
@@ -212,8 +274,8 @@ void HTTPClient::setHost(const std::string& host)
 {
 	Mutex::ScopedLock l(_mutex);
 	reset();
-	_session.setHost(host);
-	_session.reconnect();
+	_pSession->setHost(host);
+	_pSession->reconnect();
 }
 
 
@@ -221,8 +283,8 @@ void HTTPClient::setPort(Poco::UInt16 port)
 {
 	Mutex::ScopedLock l(_mutex);
 	reset();
-	_session.setPort(port);
-	_session.reconnect();
+	_pSession->setPort(port);
+	_pSession->reconnect();
 }
 
 
@@ -230,8 +292,8 @@ void HTTPClient::setProxy(const std::string& host, Poco::UInt16 port)
 {
 	Mutex::ScopedLock l(_mutex);
 	reset();
-	_session.setProxy(host, port);
-	_session.reconnect();
+	_pSession->setProxy(host, port);
+	_pSession->reconnect();
 }
 
 
@@ -239,8 +301,8 @@ void HTTPClient::setProxyHost(const std::string& host)
 {
 	Mutex::ScopedLock l(_mutex);
 	reset();
-	_session.setProxyHost(host);
-	_session.reconnect();
+	_pSession->setProxyHost(host);
+	_pSession->reconnect();
 }
 
 
@@ -248,56 +310,56 @@ void HTTPClient::setProxyPort(Poco::UInt16 port)
 {
 	Mutex::ScopedLock l(_mutex);
 	reset();
-	_session.setProxyPort(port);
-	_session.reconnect();
+	_pSession->setProxyPort(port);
+	_pSession->reconnect();
 }
 
 
 void HTTPClient::setProxyCredentials(const std::string& username, const std::string& password)
 {
-	_session.setProxyCredentials(username, password);
+	_pSession->setProxyCredentials(username, password);
 }
 
 
 void HTTPClient::setProxyUsername(const std::string& username)
 {
 	Mutex::ScopedLock l(_mutex);
-	_session.setProxyUsername(username);
+	_pSession->setProxyUsername(username);
 }
 
 
 void HTTPClient::setProxyPassword(const std::string& password)
 {
 	Mutex::ScopedLock l(_mutex);
-	_session.setProxyPassword(password);
+	_pSession->setProxyPassword(password);
 }
 
 
 void HTTPClient::setProxyConfig(const HTTPClientSession::ProxyConfig& config)
 {
 	Mutex::ScopedLock l(_mutex);
-	_session.setProxyConfig(config);
+	_pSession->setProxyConfig(config);
 }
 
 
 void HTTPClient::setKeepAlive(bool keepAlive)
 {
 	Mutex::ScopedLock l(_mutex);
-	_session.setKeepAlive(keepAlive);
+	_pSession->setKeepAlive(keepAlive);
 }
 
 
 void HTTPClient::setTimeout(const Poco::Timespan& timeout)
 {
 	Mutex::ScopedLock l(_mutex);
-	_session.setTimeout(timeout);
+	_pSession->setTimeout(timeout);
 }
 
 
 void HTTPClient::setKeepAliveTimeout(const Poco::Timespan& timeout)
 {
 	Mutex::ScopedLock l(_mutex);
-	_session.setKeepAliveTimeout(timeout);
+	_pSession->setKeepAliveTimeout(timeout);
 }
 
 
