@@ -51,7 +51,7 @@ class Data_API RowFormatter
 	/// Statement always has the ownership of the row formatter and shares
 	/// it with rows through RecordSet.
 	///
-	/// To accomodate for various formatting needs, a formatter can operate in two modes:
+	/// To accommodate for various formatting needs, a formatter can operate in two modes:
 	/// 
 	///	  - progressive: formatted individual row strings are gemerated and returned from each 
 	///     call to formatValues;

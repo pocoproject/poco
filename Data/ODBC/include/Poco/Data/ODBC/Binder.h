@@ -559,7 +559,7 @@ private:
 		if (size == _maxFieldSize)
 		{
 			getMinValueSize(val, size);
-			// accomodate for terminating zero
+			// accommodate for terminating zero
 			if (size != _maxFieldSize) ++size;
 		}
 
@@ -625,7 +625,7 @@ private:
 		if (size == _maxFieldSize)
 		{
 			getMinValueSize(val, size);
-			// accomodate for terminating zero
+			// accommodate for terminating zero
 			if (size != _maxFieldSize) size += sizeof(UTF16Char);
 		}
 

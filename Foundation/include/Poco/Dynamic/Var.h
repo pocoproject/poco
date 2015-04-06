@@ -46,7 +46,7 @@ class Foundation_API Var
 	///
 	/// Loss of signedness is not allowed for numeric values. This means that if an attempt is made to convert 
 	/// the internal value which is a negative signed integer to an unsigned integer type storage, a RangeException is thrown. 
-	/// Overflow is not allowed, so if the internal value is a larger number than the target numeric type size can accomodate, 
+	/// Overflow is not allowed, so if the internal value is a larger number than the target numeric type size can accommodate, 
 	/// a RangeException is thrown.
 	///
 	/// Precision loss, such as in conversion from floating-point types to integers or from double to float on platforms

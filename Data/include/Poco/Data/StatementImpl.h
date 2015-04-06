@@ -131,7 +131,7 @@ public:
 		/// affected for all other statements (insert, update, delete).
 		/// If reset is true (default), the underlying bound storage is
 		/// reset and reused. In case of containers, this means they are
-		/// cleared and resized to accomodate the number of rows returned by
+		/// cleared and resized to accommodate the number of rows returned by
 		/// this execution step. When reset is false, data is appended to the
 		/// bound containers during multiple execute calls.
 
