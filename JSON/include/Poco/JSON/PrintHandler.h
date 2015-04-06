@@ -53,14 +53,14 @@ public:
 
 	void startObject();
 		/// The parser has read a '{'; a new object is started.
-		/// If indent is greater than zero, a newline will be apended.
+		/// If indent is greater than zero, a newline will be appended.
 
 	void endObject();
 		/// The parser has read a '}'; the object is closed.
 
 	void startArray();
 		/// The parser has read a [; a new array will be started.
-		/// If indent is greater than zero, a newline will be apended.
+		/// If indent is greater than zero, a newline will be appended.
 
 	void endArray();
 		/// The parser has read a ]; the array is closed.

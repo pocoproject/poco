@@ -37,7 +37,7 @@ class ListMap
 	/// ordering of elements is not desirable. Naturally, this container will
 	/// have inferior data retrieval performance and it is not recommended for
 	/// use with large datasets. The main purpose within POCO is for Internet
-	/// messages (email message, http headers etc), to prevent autmomatic 
+	/// messages (email message, http headers etc), to prevent automatic 
 	/// header entry reordering.
 {
 public:

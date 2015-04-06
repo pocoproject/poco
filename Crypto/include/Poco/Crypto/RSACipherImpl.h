@@ -33,7 +33,7 @@ namespace Crypto {
 
 class RSACipherImpl: public Cipher
 	/// An implementation of the Cipher class for 
-	/// assymetric (public-private key) encryption
+	/// asymmetric (public-private key) encryption
 	/// based on the the RSA algorithm in OpenSSL's 
 	/// crypto library.
 	///

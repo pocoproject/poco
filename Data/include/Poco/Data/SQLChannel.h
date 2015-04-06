@@ -105,7 +105,7 @@ public:
 		///                  set this property to empty string.
 		///
 		///     * async:     Indicates asynchronous execution. When excuting asynchronously,
-		///                  messages are sent to the target using asyncronous execution.
+		///                  messages are sent to the target using asynchronous execution.
 		///                  However, prior to the next message being processed and sent to
 		///                  the target, the previous operation must have been either completed 
 		///                  or timed out (see timeout and throw properties for details on

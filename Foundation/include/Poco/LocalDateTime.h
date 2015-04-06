@@ -39,7 +39,7 @@ class Foundation_API LocalDateTime
 	/// i.e. UTC = local time - time zone differential.
 	///
 	/// Although LocalDateTime supports relational and arithmetic
-	/// operators, all date/time comparisons and date/time arithmetics
+	/// operators, all date/time comparisons and date/time arithmetic
 	/// should be done in UTC, using the DateTime or Timestamp
 	/// class for better performance. The relational operators
 	/// normalize the dates/times involved to UTC before carrying out
