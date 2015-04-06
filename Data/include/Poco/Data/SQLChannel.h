@@ -109,7 +109,7 @@ public:
 		///                  However, prior to the next message being processed and sent to
 		///                  the target, the previous operation must have been either completed 
 		///                  or timed out (see timeout and throw properties for details on
-		///                  how abnormal conditos are handled).
+		///                  how abnormal conditions are handled).
 		///
 		///     * timeout:   Timeout (ms) to wait for previous log operation completion.
 		///                  Values "0" and "" mean no timeout. Only valid when logging
@@ -125,7 +125,7 @@ public:
 
 	std::size_t wait();
 		/// Waits for the completion of the previous operation and returns
-		/// the result. If chanel is in synchronous mode, returns 0 immediately.
+		/// the result. If channel is in synchronous mode, returns 0 immediately.
 
 	static void registerChannel();
 		/// Registers the channel with the global LoggingFactory.

@@ -71,7 +71,7 @@ public:
 		/// Returns true if the given name is one of the names of this encoding.
 		/// For example, the "ISO-8859-1" encoding is also known as "Latin-1".
 		///
-		/// Encoding name comparision are be case insensitive.
+		/// Encoding name comparisons are case insensitive.
 			
 	virtual const CharacterMap& characterMap() const = 0;
 		/// Returns the CharacterMap for the encoding.

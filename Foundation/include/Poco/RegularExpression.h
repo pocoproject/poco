@@ -49,7 +49,7 @@ class Foundation_API RegularExpression
 	/// (see http://www.pcre.org).
 {
 public:
-	enum Options // These must match the corresponsing options in pcre.h!
+	enum Options // These must match the corresponding options in pcre.h!
 		/// Some of the following options can only be passed to the constructor;
 		/// some can be passed only to matching functions, and some can be used
 		/// everywhere.

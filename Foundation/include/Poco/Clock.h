@@ -110,7 +110,7 @@ public:
 	
 	static ClockDiff resolution();
 		/// Returns the resolution in units per second.
-		/// Since the Clock clas has microsecond resolution,
+		/// Since the Clock class has microsecond resolution,
 		/// the returned value is always 1000000.
 		
 	static ClockDiff accuracy();

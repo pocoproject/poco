@@ -134,7 +134,7 @@ public:
 	void setFileType(FileType type);
 		/// Sets the file type for transferring files.
 		///
-		/// Sends a TYPE command with a corresponsing argument to the
+		/// Sends a TYPE command with a corresponding argument to the
 		/// server.
 		///
 		/// Throws a FTPException in case of a FTP-specific error, or a
