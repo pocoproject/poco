@@ -111,7 +111,7 @@ namespace std
 	template<>
 	inline void swap<Poco::Data::SimpleRowFormatter>(Poco::Data::SimpleRowFormatter& s1, 
 		Poco::Data::SimpleRowFormatter& s2)
-		/// Full template specalization of std:::swap for SimpleRowFormatter
+		/// Full template specialization of std:::swap for SimpleRowFormatter
 	{
 		s1.swap(s2);
 	}

@@ -404,7 +404,7 @@ void LocalDateTimeTest::testTimezone()
 			// iterations. Do this with both a LocalDateTime object and
 			// a ANSI C time_t. Then create a LocalDateTime based on the
 			// time_t and verify that the time_t calculated value is equal
-			// to the LocalDateTime value. The comparision operator
+			// to the LocalDateTime value. The comparison operator
 			// verifies the _dateTime and _tzd members.
 			LocalDateTime dt2;
 			t = std::time(NULL);

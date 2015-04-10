@@ -51,9 +51,9 @@ class Data_API RowFormatter
 	/// Statement always has the ownership of the row formatter and shares
 	/// it with rows through RecordSet.
 	///
-	/// To accomodate for various formatting needs, a formatter can operate in two modes:
+	/// To accommodate for various formatting needs, a formatter can operate in two modes:
 	/// 
-	///	  - progressive: formatted individual row strings are gemerated and returned from each 
+	///	  - progressive: formatted individual row strings are generated and returned from each 
 	///     call to formatValues;
 	///     std::string& formatNames(const NameVecPtr, std::string&) and
 	///     std::string& formatValues(const ValueVec&, std::string&) member calls should be
@@ -65,7 +65,7 @@ class Data_API RowFormatter
 	///     void formatValues(const ValueVec&) member calls should be used in this case
 	///
 	/// When formatter is used in conjunction with Row/RecordSet, the formatting members corresponding
-	/// to the formater mode are expected to be implemented. If a call is propagated to this parent
+	/// to the formatter mode are expected to be implemented. If a call is propagated to this parent
 	/// class, the functions do nothing or silently return empty string respectively.
 	///
 {
@@ -134,10 +134,10 @@ public:
 		/// to empty strings and row count to INVALID_ROW_COUNT.
 
 	Mode getMode() const;
-		/// Returns the formater mode.
+		/// Returns the formatter mode.
 
 	void setMode(Mode mode);
-		/// Sets the fromatter mode.
+		/// Sets the formatter mode.
 
 protected:
 

@@ -103,7 +103,7 @@ private:
 		/// for directories.
 
 	void addFileRaw(std::istream& in, const ZipLocalFileHeader& hdr, const Poco::Path& fileName);
-		/// copys an already compressed ZipEntry from in
+		/// Copies an already compressed ZipEntry from in
 
 private:
 	std::set<std::string>      _storeExtensions;
