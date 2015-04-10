@@ -516,7 +516,7 @@ ValueType AnyCast(Any& operand)
 	/// Example Usage: 
 	///	 MyType tmp = AnyCast<MyType>(anAny).
 	/// Will throw a BadCastException if the cast fails.
-	/// Dont use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& tmp = ...
+	/// Do not use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& tmp = ...
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
@@ -535,7 +535,7 @@ ValueType AnyCast(const Any& operand)
 	/// Example Usage: 
 	///	 MyType tmp = AnyCast<MyType>(anAny).
 	/// Will throw a BadCastException if the cast fails.
-	/// Dont use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& = ...
+	/// Do not use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& = ...
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {

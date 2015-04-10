@@ -321,7 +321,7 @@ public:
 		/// Draws an arc.
 
 	void ellipse(float x, float y, float xRadius, float yRadius);
-		/// Draws an ellips.
+		/// Draws an ellipse.
 
 	void stroke();
 		/// Paints the current path.

@@ -107,7 +107,7 @@ public:
 		/// Returns the name of the Cipher.
 
 	virtual CryptoTransform* createEncryptor() = 0;
-		/// Creates an encrytor object to be used with a CryptoStream.
+		/// Creates an encryptor object to be used with a CryptoStream.
 
 	virtual CryptoTransform* createDecryptor() = 0;
 		/// Creates a decryptor object to be used with a CryptoStream.

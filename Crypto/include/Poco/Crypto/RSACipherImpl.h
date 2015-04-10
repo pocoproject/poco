@@ -52,10 +52,10 @@ public:
 		/// Returns the name of the Cipher.
 	
 	CryptoTransform* createEncryptor();
-		/// Creates an encrytor object.
+		/// Creates an encryptor object.
 
 	CryptoTransform* createDecryptor();
-		/// Creates a decrytor object.
+		/// Creates a decryptor object.
 
 private:
 	RSAKey _key;

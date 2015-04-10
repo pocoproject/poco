@@ -104,7 +104,7 @@ public:
 		///                  Table must exist in the target database. To disable archiving,
 		///                  set this property to empty string.
 		///
-		///     * async:     Indicates asynchronous execution. When excuting asynchronously,
+		///     * async:     Indicates asynchronous execution. When executing asynchronously,
 		///                  messages are sent to the target using asynchronous execution.
 		///                  However, prior to the next message being processed and sent to
 		///                  the target, the previous operation must have been either completed 
