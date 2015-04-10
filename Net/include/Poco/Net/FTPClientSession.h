@@ -160,7 +160,7 @@ public:
 		
 	void cdup();
 		/// Moves one directory up from the current working directory
-		/// on teh server.
+		/// on the server.
 		///
 		/// Sends a CDUP command to the server.
 		///

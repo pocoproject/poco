@@ -31,7 +31,7 @@ std::string Foundation_API toJSON(char c);
 
 
 void Foundation_API toJSON(const std::string& value, std::ostream& out, bool wrap = true);
-	/// Formats string value into the suplied output stream by 
+	/// Formats string value into the supplied output stream by 
 	/// escaping control characters.
 	/// If wrap is true, the resulting string is enclosed in double quotes
 

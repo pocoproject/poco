@@ -78,7 +78,7 @@ protected:
 
 	void compileImpl();
 		/// Compiles the statement, doesn't bind yet.
-		/// Returns true if the statement was succesfully compiled.
+		/// Returns true if the statement was successfully compiled.
 		/// The way SQLite handles batches of statements is by compiling
 		/// one at a time and returning a pointer to the next one.
 		/// The remainder of the statement is kept in a string

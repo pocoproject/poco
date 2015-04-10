@@ -112,7 +112,7 @@ class NetSSL_API SSLManager
 	///      the Context class for details). Valid values are none, relaxed, strict, once.
 	///    - verificationDepth (integer, 1-9): Sets the upper limit for verification chain sizes. Verification
 	///      will fail if a certificate chain larger than this is encountered.
-	///    - loadDefaultCAFile (boolean): Specifies wheter the builtin CA certificates from OpenSSL are used.
+	///    - loadDefaultCAFile (boolean): Specifies whether the builtin CA certificates from OpenSSL are used.
 	///    - cipherList (string): Specifies the supported ciphers in OpenSSL notation
 	///      (e.g. "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH").
 	///    - privateKeyPassphraseHandler.name (string): The name of the class (subclass of PrivateKeyPassphraseHandler)

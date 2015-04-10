@@ -202,7 +202,7 @@ public:
 		/// reconnect a disconnected session.
 		/// If the connection is not established, 
 		/// a ConnectionFailedException is thrown. 
-		/// Zero timout means indefinite
+		/// Zero timeout means indefinite
 
 	void close();
 		/// Closes the session.
@@ -262,7 +262,7 @@ public:
 
 	static std::string uri(const std::string& connector,
 		const std::string& connectionString);
-		/// Utility function that teturns the URI formatted from supplied 
+		/// Utility function that returns the URI formatted from supplied 
 		/// arguments as "connector:///connectionString".
 
 	void setFeature(const std::string& name, bool state);

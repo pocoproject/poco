@@ -424,7 +424,7 @@ public:
 		/// Returns current dash mode.
 
 	void setDashMode(const PatternVec& pattern, int paramNo, int phase) const;
-		/// Sets teh dash mode.
+		/// Sets the dash mode.
 
 	float getFlatness() const;
 		/// Returns the current flatness.

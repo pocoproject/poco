@@ -111,7 +111,7 @@ public:
 
 	void execute(const std::vector<std::string>& sql);
 		/// Executes all the SQL statements supplied in the vector and, after the last
-		/// one is sucesfully executed, commits the transaction.
+		/// one is successfully executed, commits the transaction.
 		/// If an error occurs during execution, transaction is rolled back.
 		/// Passing true value for commit disables rollback during destruction
 		/// of this Transaction object.
