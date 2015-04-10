@@ -60,10 +60,10 @@ public:
 		/// Returns native DB handle.
 
 	static std::string lastError(sqlite3* pDb);
-		/// Retreives the last error code from sqlite and converts it to a string.
+		/// Retrieves the last error code from sqlite and converts it to a string.
 
 	static std::string lastError(const Session& session);
-		/// Retreives the last error code from sqlite and converts it to a string.
+		/// Retrieves the last error code from sqlite and converts it to a string.
 
 	static void throwException(int rc, const std::string& addErrMsg = std::string());
 		/// Throws for an error code the appropriate exception

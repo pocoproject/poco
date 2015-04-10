@@ -281,7 +281,7 @@ protected:
 		/// pre-allocated buffer inside the holder).
 		/// 
 		/// Called from clone() member function of the implementation when
-		/// smal object optimization is enabled.
+		/// small object optimization is enabled.
 	{
 #ifdef POCO_NO_SOO
 		(void)pVarHolder;

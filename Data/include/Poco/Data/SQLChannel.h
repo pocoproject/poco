@@ -51,10 +51,10 @@ class Data_API SQLChannel: public Poco::Channel
 	///		DateTime DATE)"
 	///
 	/// The table name is configurable through "table" property. 
-	/// Other than DateTime filed name used for optiona time-based archiving purposes, currently the 
-	/// field names are not mandated. However, it is recomended to use names as specified above.
+	/// Other than DateTime filed name used for optional time-based archiving purposes, currently the 
+	/// field names are not mandated. However, it is recommended to use names as specified above.
 	/// 
-	/// To provide as non-intrusive operation as possbile, the log entries are cached and 
+	/// To provide as non-intrusive operation as possible, the log entries are cached and 
 	/// inserted into the target database asynchronously by default . The blocking, however, will occur 
 	/// before the next entry insertion with default timeout of 1 second. The default settings can be 
 	/// overriden (see async, timeout and throw properties for details).
@@ -150,15 +150,15 @@ private:
 	typedef Poco::SharedPtr<ArchiveStrategy> StrategyPtr;
 
 	void initLogStatement();
-		/// Initiallizes the log statement.
+		/// Initializes the log statement.
 
 	void initArchiveStatements();
-	/// Initiallizes the archive statement.
+		/// Initializes the archive statement.
 
 	void logAsync(const Message& msg);
 		/// Waits for previous operation completion and
 		/// calls logSync(). If the previous operation times out,
-		/// and _throw is true, TimeoutException is thrown, oterwise
+		/// and _throw is true, TimeoutException is thrown, otherwise
 		/// the timeout is ignored and log entry is lost.
 
 	void logSync(const Message& msg);

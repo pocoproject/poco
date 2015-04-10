@@ -803,7 +803,7 @@ namespace std
 	template<>
 	inline void swap<Poco::Data::Statement>(Poco::Data::Statement& s1, 
 		Poco::Data::Statement& s2)
-		/// Full template specalization of std:::swap for Statement
+		/// Full template specialization of std:::swap for Statement
 	{
 		s1.swap(s2);
 	}

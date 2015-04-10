@@ -258,7 +258,7 @@ public:
 		/// The stream is valid until endList() is called.
 		///
 		/// Optionally, a path to a directory or file can be specified.
-		/// According to the FTP prototol, if a path to a filename is
+		/// According to the FTP protocol, if a path to a filename is
 		/// given, only information for the specific file is returned.
 		/// If a path to a directory is given, a listing of that directory
 		/// is returned. If no path is given, a listing of the current

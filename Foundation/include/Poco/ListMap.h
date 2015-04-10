@@ -103,7 +103,7 @@ public:
 	}
 	
 	ConstIterator find(const KeyType& key) const
-		/// Finds the first occurence of the key and
+		/// Finds the first occurrence of the key and
 		/// returns iterator pointing to the found entry
 		/// or iterator pointing to the end if entry is
 		/// not found.
@@ -118,7 +118,7 @@ public:
 	}
 
 	Iterator find(const KeyType& key)
-		/// Finds the first occurence of the key and
+		/// Finds the first occurrence of the key and
 		/// returns iterator pointing to the found entry
 		/// or iterator pointing to the end if entry is
 		/// not found.

@@ -226,29 +226,29 @@ public:
 		///
 		/// Specifying a size of 0 will set an unlimited cache size.
 		///
-		/// This method may only be called on SERVER_USE Context objets.
+		/// This method may only be called on SERVER_USE Context objects.
 		
 	std::size_t getSessionCacheSize() const;
 		/// Returns the current maximum size of the server session cache.
 		///
-		/// This method may only be called on SERVER_USE Context objets.
+		/// This method may only be called on SERVER_USE Context objects.
 		
 	void setSessionTimeout(long seconds);
 		/// Sets the timeout (in seconds) of cached sessions on the server.
 		/// A cached session will be removed from the cache if it has
 		/// not been used for the given number of seconds.
 		///
-		/// This method may only be called on SERVER_USE Context objets.
+		/// This method may only be called on SERVER_USE Context objects.
 
 	long getSessionTimeout() const;
 		/// Returns the timeout (in seconds) of cached sessions on the server.
 		///
-		/// This method may only be called on SERVER_USE Context objets.
+		/// This method may only be called on SERVER_USE Context objects.
 
 	void flushSessionCache();
 		/// Flushes the SSL session cache on the server.
 		///
-		/// This method may only be called on SERVER_USE Context objets.
+		/// This method may only be called on SERVER_USE Context objects.
 				
 	void enableExtendedCertificateVerification(bool flag = true);
 		/// Enable or disable the automatic post-connection

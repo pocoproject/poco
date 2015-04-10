@@ -51,11 +51,11 @@ class NetSSL_API SSLManager
 	/// Proper initialization of SSLManager is critical.
 	///
 	/// SSLManager can be initialized manually, by calling initializeServer()
-	/// and/or initializeClient(), or intialization can be automatic. In the latter
+	/// and/or initializeClient(), or initialization can be automatic. In the latter
 	/// case, a Poco::Util::Application instance must be available and the required
 	/// configuration properties must be set (see below).
 	///
-	/// Note that manual intialization must happen very early in the application,
+	/// Note that manual initialization must happen very early in the application,
 	/// before defaultClientContext() or defaultServerContext() are called.
 	///
 	/// If defaultClientContext() and defaultServerContext() are never called

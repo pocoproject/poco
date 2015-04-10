@@ -171,7 +171,7 @@ public:
 		/// on a Saturday, week 1 will be the week starting on Monday, January 3.
 		/// January 1 and 2 will fall within week 0 (or the last week of the previous year).
 		///
-		/// For 2007, which starts on a Monday, week 1 will be the week startung on Monday, January 1.
+		/// For 2007, which starts on a Monday, week 1 will be the week starting on Monday, January 1.
 		/// There will be no week 0 in 2007.
 	
 	int day() const;
@@ -210,7 +210,7 @@ public:
 		/// Returns the microsecond (0 to 999)
 	
 	double julianDay() const;
-		/// Returns the julian day for the date.
+		/// Returns the Julian day for the date.
 
 	int tzd() const;
 		/// Returns the time zone differential.

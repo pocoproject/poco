@@ -89,7 +89,7 @@ public:
 #endif
 
 	void value(const std::string& value);
-		/// A string value is read; it will be fromatted and written to the output.
+		/// A string value is read; it will be formatted and written to the output.
 
 	void value(double d);
 		/// A double value is read; it will be written to the output.

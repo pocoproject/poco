@@ -184,7 +184,7 @@ protected:
 
 	virtual std::size_t next() = 0;
 		/// Retrieves the next row or set of rows from the resultset and
-		/// returns the number of rows retreved.
+		/// returns the number of rows retrieved.
 		///
 		/// Will throw, if the resultset is empty.
 		/// Expects the statement to be compiled and bound.
@@ -253,7 +253,7 @@ protected:
 		/// - std::list
 
 	SessionImpl& session();
-		/// Rteurns session associated with this statement.
+		/// Returns session associated with this statement.
 
 	virtual AbstractBinding::BinderPtr binder() = 0;
 		/// Returns the concrete binder used by the statement.

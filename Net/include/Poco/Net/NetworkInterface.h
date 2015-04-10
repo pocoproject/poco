@@ -123,7 +123,7 @@ public:
 		/// Assigns another NetworkInterface.
 	
 	bool operator < (const NetworkInterface& other) const;
-		/// Operatorr less-than.
+		/// Operator less-than.
 	
 	bool operator == (const NetworkInterface& other) const;
 		/// Operator equal. Compares interface indices.
