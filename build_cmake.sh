@@ -8,7 +8,7 @@ rm -rf cmake-build
 mkdir cmake-build
 cd cmake-build
 
-cmake ../. -DCMAKE_BUILD_TYPE=Debug  $1 $2 $3 $4 $5
+cmake ../. -DCMAKE_BUILD_TYPE=Debug $1 $2 $3 $4 $5
 make -j3
 make install
 

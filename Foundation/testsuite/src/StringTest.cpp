@@ -14,11 +14,13 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/String.h"
+#include "Poco/JSONString.h"
 #include "Poco/Format.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Exception.h"
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 #include <cstdio>
 #include <map>
@@ -55,6 +57,7 @@ using Poco::doubleToStr;
 using Poco::thousandSeparator;
 using Poco::decimalSeparator;
 using Poco::format;
+using Poco::toJSON;
 using Poco::CILess;
 using Poco::MemoryInputStream;
 using Poco::Stopwatch;
@@ -1081,6 +1084,56 @@ void StringTest::benchmarkFloatToStr()
 }
 
 
+void StringTest::testJSONString()
+{
+	assert (toJSON('\\') == "\\\\");
+	assert (toJSON('"') == "\\\"");
+	assert (toJSON('/') == "\\/");
+	assert (toJSON('\b') == "\\b");
+	assert (toJSON('\f') == "\\f");
+	assert (toJSON('\n') == "\\n");
+	assert (toJSON('\r') == "\\r");
+	assert (toJSON('\t') == "\\t");
+	assert (toJSON('a') == "a");
+
+	// ??? on MSVC, the assert macro expansion 
+	// fails to compile when this string is inline ???
+	std::string str = "\"foo\\\\\"";
+	assert (toJSON("foo\\") == str);
+
+	assert (toJSON("bar/") == "\"bar\\/\"");
+	assert (toJSON("baz") == "\"baz\"");
+	assert (toJSON("q\"uote\"d") == "\"q\\\"uote\\\"d\"");
+	assert (toJSON("bs\b") == "\"bs\\b\"");
+	assert (toJSON("nl\n") == "\"nl\\n\"");
+	assert (toJSON("tb\t") == "\"tb\\t\"");
+
+	std::ostringstream ostr;
+	toJSON("foo\\", ostr);
+	assert(ostr.str() == str);
+	ostr.str("");
+
+	toJSON("foo\\", ostr);
+	assert(toJSON("bar/") == "\"bar\\/\"");
+	ostr.str("");
+	toJSON("baz", ostr);
+	assert(ostr.str() == "\"baz\"");
+	ostr.str("");
+	toJSON("q\"uote\"d", ostr);
+	assert(ostr.str() == "\"q\\\"uote\\\"d\"");
+	ostr.str("");
+	toJSON("bs\b", ostr);
+	assert(ostr.str() == "\"bs\\b\"");
+	ostr.str("");
+	toJSON("nl\n", ostr);
+	assert(ostr.str() == "\"nl\\n\"");
+	ostr.str("");
+	toJSON("tb\t", ostr);
+	assert(ostr.str() == "\"tb\\t\"");
+	ostr.str("");
+}
+
+
 void StringTest::setUp()
 {
 }
@@ -1121,6 +1174,7 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testIntToString);
 	CppUnit_addTest(pSuite, StringTest, testFloatToString);
 	//CppUnit_addTest(pSuite, StringTest, benchmarkFloatToStr);
+	CppUnit_addTest(pSuite, StringTest, testJSONString);
 
 	return pSuite;
 }

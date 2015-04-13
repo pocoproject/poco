@@ -91,7 +91,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">TestSuited</TargetName>
@@ -321,6 +321,8 @@
     <ClInclude Include="src\HTTPSClientSessionTest.h"/>
     <ClInclude Include="src\HTTPSClientTestSuite.h"/>
     <ClInclude Include="src\HTTPSStreamFactoryTest.h"/>
+    <ClInclude Include="src\WebSocketTest.h"/>
+    <ClInclude Include="src\WebSocketTestSuite.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HTTPSTestServer.cpp"/>
@@ -333,6 +335,8 @@
     <ClCompile Include="src\HTTPSClientSessionTest.cpp"/>
     <ClCompile Include="src\HTTPSClientTestSuite.cpp"/>
     <ClCompile Include="src\HTTPSStreamFactoryTest.cpp"/>
+    <ClCompile Include="src\WebSocketTest.cpp"/>
+    <ClCompile Include="src\WebSocketTestSuite.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

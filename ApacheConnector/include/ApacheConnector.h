@@ -33,7 +33,7 @@ public:
 
 	int readRequest(char* buffer, int length);
 		/// Read up to length bytes from request body into buffer.
-		/// Returns the number of bytes read, 0 if eof or -1 if an error occured.
+		/// Returns the number of bytes read, 0 if eof or -1 if an error occurred.
 
 	void writeResponse(const char* buffer, int length);
 		/// Writes the given characters as response to the given request_rec.

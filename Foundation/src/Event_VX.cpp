@@ -21,7 +21,7 @@
 namespace Poco {
 
 
-EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
+EventImpl::EventImpl(EventTypeImpl type): _auto(type == EVENT_AUTORESET_IMPL), _state(false)
 {
 	_sem = semCCreate(SEM_Q_PRIORITY, 0);
 	if (_sem == 0)

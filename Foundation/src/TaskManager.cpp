@@ -16,7 +16,6 @@
 
 #include "Poco/TaskManager.h"
 #include "Poco/TaskNotification.h"
-#include "Poco/ThreadPool.h"
 
 
 namespace Poco {
@@ -25,8 +24,8 @@ namespace Poco {
 const int TaskManager::MIN_PROGRESS_NOTIFICATION_INTERVAL = 100000; // 100 milliseconds
 
 
-TaskManager::TaskManager():
-	_threadPool(ThreadPool::defaultPool())
+TaskManager::TaskManager(ThreadPool::ThreadAffinityPolicy affinityPolicy):
+	_threadPool(ThreadPool::defaultPool(affinityPolicy))
 {
 }
 
@@ -42,7 +41,7 @@ TaskManager::~TaskManager()
 }
 
 
-void TaskManager::start(Task* pTask)
+void TaskManager::start(Task* pTask, int cpu)
 {
 	TaskPtr pAutoTask(pTask); // take ownership immediately
 	FastMutex::ScopedLock lock(_mutex);
@@ -52,7 +51,7 @@ void TaskManager::start(Task* pTask)
 	_taskList.push_back(pAutoTask);
 	try
 	{
-		_threadPool.start(*pAutoTask, pAutoTask->name());
+		_threadPool.start(*pAutoTask, pAutoTask->name(), cpu);
 	}
 	catch (...)
 	{

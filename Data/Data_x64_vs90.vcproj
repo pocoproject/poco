@@ -440,6 +440,8 @@
 				<File
 					RelativePath=".\include\Poco\Data\Extraction.h"/>
 				<File
+					RelativePath=".\include\Poco\Data\JSONRowFormatter.h"/>
+				<File
 					RelativePath=".\include\Poco\Data\Limit.h"/>
 				<File
 					RelativePath=".\include\Poco\Data\LOB.h"/>
@@ -508,6 +510,8 @@
 					RelativePath=".\src\Date.cpp"/>
 				<File
 					RelativePath=".\src\DynamicLOB.cpp"/>
+				<File
+					RelativePath=".\src\JSONRowFormatter.cpp"/>
 				<File
 					RelativePath=".\src\Limit.cpp"/>
 				<File

@@ -76,7 +76,10 @@ class Util_API Application: public Subsystem
 	///   - application.name: the file name of the application executable
 	///   - application.baseName: the file name (excluding extension) of the application executable
 	///   - application.dir: the path to the directory where the application executable resides
-	///   - application.configDir: the path to the directory where the last configuration file loaded with loadConfiguration() was found.
+	///   - application.configDir: the path to the directory where user specific configuration files of the application should be stored.
+	///   - application.cacheDir: the path to the directory where user specific non-essential data files of the application should be stored.
+	///   - application.dataDir: the path to the directory where user specific data files of the application should be stored.
+	///   - application.tempDir: the path to the directory where user specific temporary files and other file objects of the application should be stored.
 	///
 	/// If loadConfiguration() has never been called, application.configDir will be equal to application.dir.
 	///
@@ -186,7 +189,7 @@ public:
 		/// by the .ini file and the .xml file.
 		///
 		/// If the application is built in debug mode (the _DEBUG preprocessor
-		/// macro is defined) and the base name of the appication executable
+		/// macro is defined) and the base name of the application executable
 		/// ends with a 'd', a config file without the 'd' ending its base name is
 		/// also found.
 		///
@@ -371,6 +374,7 @@ private:
 	void getApplicationPath(Poco::Path& path) const;
 	void processOptions();
 	bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
+	bool findAppConfigFile(const Path& basePath, const std::string& appName, const std::string& extension, Poco::Path& path) const;
 
 	typedef Poco::AutoPtr<LayeredConfiguration> ConfigPtr;
 
@@ -385,6 +389,7 @@ private:
 	Poco::Logger*   _pLogger;
 	Poco::Timestamp _startTime;
 	bool            _stopOptionsProcessing;
+	int             _loadedConfigs;
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	std::string _workingDirAtLaunch;

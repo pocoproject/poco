@@ -2392,8 +2392,17 @@ void VarTest::testDate()
 	Poco::Timestamp tsNow = dtNow.timestamp();
 	Poco::LocalDateTime ldtNow(dtNow.timestamp());
 	Var dt(dtNow);
+	assert(dt.isDate());
+	assert(dt.isTime());
+	assert(dt.isDateTime());
 	Var ts(tsNow);
+	assert(ts.isDate());
+	assert(ts.isTime());
+	assert(ts.isDateTime());
 	Var ldt(ldtNow);
+	assert(ldt.isDate());
+	assert(ldt.isTime());
+	assert(ldt.isDateTime());
 	Var dtStr(dt.convert<std::string>());
 	Var tsStr(ts.convert<std::string>());
 	Var ldtStr(ldt.convert<std::string>());
@@ -2455,6 +2464,11 @@ void VarTest::testEmpty()
 	assert (!da.isString());
 	assert (da == da);
 	assert (!(da != da));
+
+	assert (da != Var(1));
+	assert (!(da == Var(1)));
+	assert (Var(1) != da);
+	assert (!(Var(1) == da));
 
 	da = "123";
 	int i = da.convert<int>();

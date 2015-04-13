@@ -24,7 +24,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
 	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
 	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest \
-	SemaphoreTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
+	SemaphoreTest MutexTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
 	SimpleFileChannelTest StopwatchTest \
 	StreamConverterTest StreamCopierTest StreamTokenizerTest \
 	StreamsTestSuite StringTest StringTokenizerTest TaskTestSuite TaskTest \
@@ -39,7 +39,8 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	HashSetTest HashMapTest SharedMemoryTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
-	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest
+	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest \
+	DirectoryIteratorsTest FIFOBufferTestSuite FIFOBufferTest
 
 target         = testrunner
 target_version = 1
