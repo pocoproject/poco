@@ -19,6 +19,6 @@ objects = Mail
 
 target         = Mail
 target_version = 1
-target_libs    = PocoNetSSL PocoNet PocoCrypto PocoUtil PocoXML PocoFoundation
+target_libs    = PocoNetSSL PocoNet PocoCrypto PocoUtil PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

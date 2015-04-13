@@ -24,9 +24,6 @@
 #elif defined(POCO_HAVE_FD_POLL)
 #include "Poco/SharedPtr.h"
 #include <poll.h>
-typedef Poco::SharedPtr<pollfd, 
-	Poco::ReferenceCounter, 
-	Poco::ReleaseArrayPolicy<pollfd> > SharedPollArray;
 #endif
 
 
@@ -213,6 +210,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	return readList.size() + writeList.size() + exceptList.size();
 
 #elif defined(POCO_HAVE_FD_POLL)
+	typedef Poco::SharedPtr<pollfd, Poco::ReferenceCounter, Poco::ReleaseArrayPolicy<pollfd> > SharedPollArray;
 
 	nfds_t nfd = readList.size() + writeList.size() + exceptList.size();
 	if (0 == nfd) return 0;

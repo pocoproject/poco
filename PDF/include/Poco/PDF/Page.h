@@ -321,7 +321,7 @@ public:
 		/// Draws an arc.
 
 	void ellipse(float x, float y, float xRadius, float yRadius);
-		/// Draws an ellips.
+		/// Draws an ellipse.
 
 	void stroke();
 		/// Paints the current path.
@@ -424,7 +424,7 @@ public:
 		/// Returns current dash mode.
 
 	void setDashMode(const PatternVec& pattern, int paramNo, int phase) const;
-		/// Sets teh dash mode.
+		/// Sets the dash mode.
 
 	float getFlatness() const;
 		/// Returns the current flatness.

@@ -189,8 +189,6 @@ int DeflatingStreamBuf::sync()
 		_zstr.next_out  = (unsigned char*) _buffer;
 		_zstr.avail_out = DEFLATE_BUFFER_SIZE;
 	}
-	_pOstr->flush();
-
 	return 0;
 }
 

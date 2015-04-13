@@ -93,7 +93,7 @@ private:
 
 
 class TransactionException : public ConnectionException
-	/// TrabsactionException
+	/// TransactionException
 {
 public:
 
