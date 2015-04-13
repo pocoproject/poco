@@ -80,7 +80,7 @@ public:
 protected:
 	ICMPSocket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.
-		/// The socket takes owership of the SocketImpl.
+		/// The socket takes ownership of the SocketImpl.
 		///
 		/// The SocketImpl must be a ICMPSocketImpl, otherwise
 		/// an InvalidArgumentException will be thrown.

@@ -195,7 +195,7 @@ bool ODBCAccessTest::init(const std::string& driver, const std::string& dsn)
 		return false;
 	}
 
-	//N.B. Access driver does not suport check for connection.
+	//N.B. Access driver does not support check for connection.
 	std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
 
 	return true;

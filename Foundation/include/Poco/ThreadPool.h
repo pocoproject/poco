@@ -42,7 +42,7 @@ class Foundation_API ThreadPool
 	/// Threads in a thread pool are re-used once they become
 	/// available again.
 	/// The thread pool always keeps a minimum number of threads
-	/// running. If the demans for threads increases, additional
+	/// running. If the demand for threads increases, additional
 	/// threads are created. Once the demand for threads sinks
 	/// again, no-longer used threads are stopped and removed
 	/// from the pool.

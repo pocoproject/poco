@@ -134,7 +134,7 @@ public:
 	void setFileType(FileType type);
 		/// Sets the file type for transferring files.
 		///
-		/// Sends a TYPE command with a corresponsing argument to the
+		/// Sends a TYPE command with a corresponding argument to the
 		/// server.
 		///
 		/// Throws a FTPException in case of a FTP-specific error, or a
@@ -160,7 +160,7 @@ public:
 		
 	void cdup();
 		/// Moves one directory up from the current working directory
-		/// on teh server.
+		/// on the server.
 		///
 		/// Sends a CDUP command to the server.
 		///
@@ -258,7 +258,7 @@ public:
 		/// The stream is valid until endList() is called.
 		///
 		/// Optionally, a path to a directory or file can be specified.
-		/// According to the FTP prototol, if a path to a filename is
+		/// According to the FTP protocol, if a path to a filename is
 		/// given, only information for the specific file is returned.
 		/// If a path to a directory is given, a listing of that directory
 		/// is returned. If no path is given, a listing of the current
