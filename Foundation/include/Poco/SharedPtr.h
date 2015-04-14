@@ -142,7 +142,7 @@ public:
 	}
 
 #ifdef POCO_ENABLE_CPP11
-	SharedPtr(SharedPtr&& ptr) noexcept : _pCounter(std::move(ptr._pCounter)), _ptr(std::move(ptr._ptr))
+	SharedPtr(SharedPtr&& ptr)  : _pCounter(std::move(ptr._pCounter)), _ptr(std::move(ptr._ptr))
 	{
 		ptr._ptr = nullptr;
 		ptr._pCounter = nullptr;
@@ -203,7 +203,7 @@ public:
 	}
 
 #ifdef POCO_ENABLE_CPP11
-	SharedPtr& operator = (SharedPtr&& ptr) noexcept 
+	SharedPtr& operator = (SharedPtr&& ptr) 
 	{
 		swap(ptr);
 		return *this;

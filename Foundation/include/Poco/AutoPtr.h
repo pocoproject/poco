@@ -82,7 +82,7 @@ public:
 	}
 
 #ifdef POCO_ENABLE_CPP11
-	AutoPtr(AutoPtr&& ptr) noexcept : _ptr(std::move(ptr._ptr))
+	AutoPtr(AutoPtr&& ptr) : _ptr(std::move(ptr._ptr))
 	{
 		ptr._ptr = nullptr;
 	}
@@ -160,7 +160,7 @@ public:
 	}
 
 #ifdef POCO_ENABLE_CPP11
-	AutoPtr& operator = (AutoPtr&& ptr) noexcept
+	AutoPtr& operator = (AutoPtr&& ptr)
 	{
 		swap(ptr);
 		return *this;
