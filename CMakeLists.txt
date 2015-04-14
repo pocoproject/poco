@@ -41,6 +41,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Setup C/C++ compiler options
 #################################################################################
 
+include(cmake/CXX11.cmake)
+check_for_cxx11_compiler(CXX11_COMPILER)
+
+# If a C++11 compiler is available, then set the appropriate flags
+if(CXX11_COMPILER)
+    enable_cxx11()
+    add_definitions(-DPOCO_ENABLE_CPP11)
+endif()
+
 if(NOT MSVC_IDE)
   if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING

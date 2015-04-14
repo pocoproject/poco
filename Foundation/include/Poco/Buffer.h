@@ -108,7 +108,7 @@ public:
 		return *this;
 	}
 
-#if __cplusplus >= 201103L
+#ifdef POCO_ENABLE_CPP11
 	Buffer(Buffer&& other) noexcept :
 		/// Copy constructor.
 		_capacity(other._capacity),
