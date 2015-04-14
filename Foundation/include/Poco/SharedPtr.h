@@ -141,6 +141,14 @@ public:
 		_pCounter->duplicate();
 	}
 
+#ifdef POCO_ENABLE_CPP11
+	SharedPtr(SharedPtr&& ptr) noexcept : _pCounter(std::move(ptr._pCounter)), _ptr(std::move(ptr._ptr))
+	{
+		ptr._ptr = nullptr;
+		ptr._pCounter = nullptr;
+	}
+#endif
+
 	~SharedPtr()
 	{
 		try
@@ -193,6 +201,14 @@ public:
 	{
 		return assign(ptr);
 	}
+
+#ifdef POCO_ENABLE_CPP11
+	SharedPtr& operator = (SharedPtr&& ptr) noexcept 
+	{
+		swap(ptr);
+		return *this;
+	}
+#endif
 
 	template <class Other, class OtherRP>
 	SharedPtr& operator = (const SharedPtr<Other, RC, OtherRP>& ptr)

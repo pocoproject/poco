@@ -81,6 +81,13 @@ public:
 		if (_ptr) _ptr->duplicate();
 	}
 
+#ifdef POCO_ENABLE_CPP11
+	AutoPtr(AutoPtr&& ptr) noexcept : _ptr(std::move(ptr._ptr))
+	{
+		ptr._ptr = nullptr;
+	}
+#endif
+
 	template <class Other> 
 	AutoPtr(const AutoPtr<Other>& ptr): _ptr(const_cast<Other*>(ptr.get()))
 	{
@@ -152,7 +159,15 @@ public:
 		return assign<Other>(ptr);
 	}
 
-	void swap(AutoPtr& ptr)
+#ifdef POCO_ENABLE_CPP11
+	AutoPtr& operator = (AutoPtr&& ptr) noexcept
+	{
+		swap(ptr);
+		return *this;
+	}
+#endif
+
+	inline void swap(AutoPtr& ptr)
 	{
 		std::swap(_ptr, ptr._ptr);
 	}
