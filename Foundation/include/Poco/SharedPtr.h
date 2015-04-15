@@ -401,15 +401,17 @@ private:
 
 	void release()
 	{
-		poco_assert_dbg (_pCounter);
-		int i = _pCounter->release();
-		if (i == 0)
+		if (_pCounter)
 		{
-			RP::release(_ptr);
-			_ptr = 0;
+			int i = _pCounter->release();
+			if (i == 0)
+			{
+				RP::release(_ptr);
+				_ptr = 0;
 
-			delete _pCounter;
-			_pCounter = 0;
+				delete _pCounter;
+				_pCounter = 0;
+			}
 		}
 	}
 
