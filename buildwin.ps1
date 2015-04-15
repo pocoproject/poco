@@ -47,7 +47,7 @@ Param
   [string] $omit,
   
   [Parameter()]
-  [ValidateSet('msbuild', 'devenv', 'vcexpress', 'wdexpress')]
+  [ValidateSet('msbuild', 'devenv')]
   [string] $tool = 'msbuild',
 
   [Parameter()]
