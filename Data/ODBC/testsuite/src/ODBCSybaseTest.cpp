@@ -324,17 +324,6 @@ void SybaseODBC::testStoredProcedure()
 		session().setFeature("autoExtract", bindValue(k + 1));
 
 		{
-			// create an sp which returns nothing
-			session() << "create procedure " + nm + " "
-				"@outParam int output "
-				"as "
-				"select @outParam = -1 where 1 = 2", now;
-			int z = -3;
-			session() << "{ call " << nm << "(?) }", out(z), now;
-			dropObject("procedure", nm);
-			assert(-3 == z);
-		}
-		{
 			session() << "create procedure " + nm + " "
 				"as "
 				"select -1 where 1 = 2 ", now;

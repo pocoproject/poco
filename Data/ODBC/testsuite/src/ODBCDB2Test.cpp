@@ -358,12 +358,10 @@ void ODBCDB2Test::testStoredFunction()
 		{
 			session() << "CREATE PROCEDURE " << nm << "() "
 				"BEGIN "
-				"  RETURN select 1 where 1 = 2;"
+				" DECLARE C1 CURSOR FOR select * from sysibm.sysdummy1 where 1=2;"
+				" OPEN C1;"
+				"  RETURN;"
 				"END", now;
-
-			int i = -5;
-			session() << "{? = call " DB2_DB "." << nm << "()}", out(i), now;
-			assert(-5 == i);
 
 			Poco::Data::Statement stat(session());
 			stat << "{ call " DB2_DB "." << nm << "()}", now;
@@ -383,7 +381,7 @@ void ODBCDB2Test::testStoredFunction()
 		dropObject("PROCEDURE", nm + "()");
 		assert(-1 == i);
 
-		
+
 		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER) "
 			"BEGIN "
 			" RETURN inParam*inParam; "
