@@ -35,9 +35,15 @@ ThreadPoolTest::~ThreadPoolTest()
 }
 
 
-void ThreadPoolTest::testThreadPool()
+void ThreadPoolTest::startThreadPoolTest(int affinityPolicy)
 {
-	ThreadPool pool(2, 3, 3);
+	int cpu = -1;
+	if (affinityPolicy == static_cast<int>(ThreadPool::TAP_CUSTOM)) 
+	{
+		cpu = 0;
+	}
+
+	ThreadPool pool(2, 3, 3, POCO_THREAD_STACK_SIZE, static_cast<ThreadPool::ThreadAffinityPolicy>(affinityPolicy));
 	pool.setStackSize(1);
 
 	assert (pool.allocated() == 2);
@@ -51,25 +57,25 @@ void ThreadPoolTest::testThreadPool()
 	assert (pool.available() == 4);
 
 	RunnableAdapter<ThreadPoolTest> ra(*this, &ThreadPoolTest::count);
-	pool.start(ra);
+	pool.start(ra, cpu);
 	assert (pool.allocated() == 2);
 	assert (pool.used() == 1);
 	assert (pool.capacity() == 4);
 	assert (pool.available() == 3);
 
-	pool.start(ra);
+	pool.start(ra, cpu);
 	assert (pool.allocated() == 2);
 	assert (pool.used() == 2);
 	assert (pool.capacity() == 4);
 	assert (pool.available() == 2);
 
-	pool.start(ra);
+	pool.start(ra, cpu);
 	assert (pool.allocated() == 3);
 	assert (pool.used() == 3);
 	assert (pool.capacity() == 4);
 	assert (pool.available() == 1);
 
-	pool.start(ra);
+	pool.start(ra, cpu);
 	assert (pool.allocated() == 4);
 	assert (pool.used() == 4);
 	assert (pool.capacity() == 4);
@@ -77,7 +83,7 @@ void ThreadPoolTest::testThreadPool()
 
 	try
 	{
-		pool.start(ra);
+		pool.start(ra, cpu);
 		failmsg("thread pool exhausted - must throw exception");
 	}	
 	catch (Poco::NoThreadAvailableException&)
@@ -108,13 +114,13 @@ void ThreadPoolTest::testThreadPool()
 	
 	_count = 0;
 	_event.reset();
-	pool.start(ra);
+	pool.start(ra, cpu);
 	assert (pool.allocated() == 2);
 	assert (pool.used() == 1);
 	assert (pool.capacity() == 4);
 	assert (pool.available() == 3);
 
-	pool.start(ra);
+	pool.start(ra, cpu);
 	assert (pool.allocated() == 2);
 	assert (pool.used() == 2);
 	assert (pool.capacity() == 4);
@@ -127,7 +133,25 @@ void ThreadPoolTest::testThreadPool()
 	assert (pool.allocated() == 2);
 	assert (pool.used() == 0);
 	assert (pool.capacity() == 4);
-	assert (pool.available() == 4);
+	assert (pool.available() == 4);	
+}
+
+
+void ThreadPoolTest::testThreadPool()
+{
+	startThreadPoolTest(Poco::ThreadPool::TAP_DEFAULT);
+}
+
+
+void ThreadPoolTest::testThreadPoolUniformDistribution()
+{
+	startThreadPoolTest(Poco::ThreadPool::TAP_UNIFORM_DISTRIBUTION);
+}
+
+
+void ThreadPoolTest::testThreadPoolCustomDistribution()
+{
+	startThreadPoolTest(Poco::ThreadPool::TAP_CUSTOM);
 }
 
 
@@ -160,6 +184,8 @@ CppUnit::Test* ThreadPoolTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ThreadPoolTest");
 
 	CppUnit_addTest(pSuite, ThreadPoolTest, testThreadPool);
+	CppUnit_addTest(pSuite, ThreadPoolTest, testThreadPoolUniformDistribution);
+	CppUnit_addTest(pSuite, ThreadPoolTest, testThreadPoolCustomDistribution);
 
 	return pSuite;
 }

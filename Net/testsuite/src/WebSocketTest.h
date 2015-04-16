@@ -28,6 +28,7 @@ public:
 
 	void testWebSocket();
 	void testWebSocketLarge();
+	void testWebSocketLargeInOneFrame();
 
 	void setUp();
 	void tearDown();
@@ -35,6 +36,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void testOneLargeFrame(int msgSize);
 };
 
 

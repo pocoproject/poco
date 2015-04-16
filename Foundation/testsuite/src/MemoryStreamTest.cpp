@@ -15,8 +15,8 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Buffer.h"
 #include "Poco/MemoryStream.h"
-
 #include <sstream>
+
 
 using Poco::MemoryInputStream;
 using Poco::MemoryOutputStream;
@@ -148,7 +148,13 @@ void MemoryStreamTest::testInputSeek()
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
 		istr2.seekg(10, std::ios_base::beg);
+#ifdef __APPLE__
+		// workaround for clang libstdc++, which does not
+		// set failbit if seek returns -1
+		assert (istr2.fail() || istr2.tellg() == std::streampos(0));
+#else
 		assert (istr2.fail());
+#endif
 	}
 
 
@@ -159,7 +165,13 @@ void MemoryStreamTest::testInputSeek()
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
 		istr2.seekg(-10, std::ios_base::end);
+#ifdef __APPLE__
+		// workaround for clang libstdc++, which does not
+		// set failbit if seek returns -1
+		assert (istr2.fail() || istr2.tellg() == std::streampos(0));
+#else
 		assert (istr2.fail());
+#endif
 	}
 
 
@@ -170,7 +182,13 @@ void MemoryStreamTest::testInputSeek()
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
 		istr2.seekg(-1, std::ios_base::beg);
+#ifdef __APPLE__
+		// workaround for clang libstdc++, which does not
+		// set failbit if seek returns -1
+		assert (istr2.fail() || istr2.tellg() == std::streampos(0));
+#else
 		assert (istr2.fail());
+#endif
 	}
 
 
@@ -181,7 +199,13 @@ void MemoryStreamTest::testInputSeek()
 	{
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
 		istr2.seekg(1, std::ios_base::end);
+#ifdef __APPLE__
+		// workaround for clang libstdc++, which does not
+		// set failbit if seek returns -1
+		assert (istr2.fail() || istr2.tellg() == std::streampos(0));
+#else
 		assert (istr2.fail());
+#endif
 	}
 
 
@@ -196,7 +220,13 @@ void MemoryStreamTest::testInputSeek()
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
 		istr2.seekg(4, std::ios_base::beg);
 		istr2.seekg(6, std::ios_base::cur);
+#ifdef __APPLE__
+		// workaround for clang libstdc++, which does not
+		// set failbit if seek returns -1
+		assert (istr2.fail() || istr2.tellg() == std::streampos(4));
+#else
 		assert (istr2.fail());
+#endif
 	}
 
 
@@ -211,7 +241,13 @@ void MemoryStreamTest::testInputSeek()
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
 		istr2.seekg(-4, std::ios_base::end);
 		istr2.seekg(5, std::ios_base::cur);
+#ifdef __APPLE__
+		// workaround for clang libstdc++, which does not
+		// set failbit if seek returns -1
+		assert (istr2.fail() || istr2.tellg() == std::streampos(5));
+#else
 		assert (istr2.fail());
+#endif
 	}
 
 
@@ -226,7 +262,13 @@ void MemoryStreamTest::testInputSeek()
 		Poco::MemoryInputStream istr2(buffer.begin(), buffer.size());
 		istr2.seekg(4, std::ios_base::beg);
 		istr2.seekg(-5, std::ios_base::cur);
+#ifdef __APPLE__
+		// workaround for clang libstdc++, which does not
+		// set failbit if seek returns -1
+		assert (istr2.fail() || istr2.tellg() == std::streampos(4));
+#else
 		assert (istr2.fail());
+#endif
 	}
 }
 

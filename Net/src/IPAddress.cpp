@@ -563,19 +563,30 @@ IPAddress IPAddress::broadcast()
 }
 
 
-BinaryWriter& operator << (BinaryWriter& writer, const IPAddress& value)
+} } // namespace Poco::Net
+
+
+Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::IPAddress& value)
 {
-	writer.stream().write((const char*) value.addr(), value.length());
+	writer << static_cast<Poco::UInt8>(value.length());
+	writer.writeRaw(reinterpret_cast<const char*>(value.addr()), value.length());
 	return writer;
 }
 
-BinaryReader& operator >> (BinaryReader& reader, IPAddress& value)
+
+Poco::BinaryReader& operator >> (Poco::BinaryReader& reader, Poco::Net::IPAddress& value)
 {
 	char buf[sizeof(struct in6_addr)];
-	reader.stream().read(buf, value.length());
-	value = IPAddress(buf, value.length());
+	Poco::UInt8 length;
+	reader >> length;
+	reader.readRaw(buf, length);
+	value = Poco::Net::IPAddress(buf, length);
 	return reader;
 }
 
 
-} } // namespace Poco::Net
+std::ostream& operator << (std::ostream& ostr, const Poco::Net::IPAddress& addr)
+{
+	ostr << addr.toString();
+	return ostr;
+}

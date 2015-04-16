@@ -65,11 +65,11 @@ void NetworkInterfaceTest::testMap()
 			std::cout << std::endl << "----------" << std::endl;
 			std::cout << "Address " << counter << std::endl;
 			std::cout << "----------" << std::endl;
-			std::cout << "Address:     " << ipIt->get<NetworkInterface::IP_ADDRESS>().toString() << std::endl;
+			std::cout << "Address:     " << ipIt->get<NetworkInterface::IP_ADDRESS>() << std::endl;
 			IPAddress addr = ipIt->get<NetworkInterface::SUBNET_MASK>();
-			if (!addr.isWildcard()) std::cout << "Subnet:      " << addr.toString() << " (/" << addr.prefixLength() << ")" << std::endl;
+			if (!addr.isWildcard()) std::cout << "Subnet:      " << addr << " (/" << addr.prefixLength() << ")" << std::endl;
 			addr = ipIt->get<NetworkInterface::BROADCAST_ADDRESS>();
-			if (!addr.isWildcard()) std::cout << "Broadcast:   " << addr.toString() << std::endl;
+			if (!addr.isWildcard()) std::cout << "Broadcast:   " << addr << std::endl;
 		}
 
 		std::cout << "=============" << std::endl << std::endl;
@@ -100,11 +100,11 @@ void NetworkInterfaceTest::testList()
 		List::const_iterator ipEnd = ipList.end();
 		for (int counter = 0; ipIt != ipEnd; ++ipIt, ++counter)
 		{
-			std::cout << "IP Address:  " << ipIt->get<NetworkInterface::IP_ADDRESS>().toString() << std::endl;
+			std::cout << "IP Address:  " << ipIt->get<NetworkInterface::IP_ADDRESS>() << std::endl;
 			IPAddress addr = ipIt->get<NetworkInterface::SUBNET_MASK>();
-			if (!addr.isWildcard()) std::cout << "Subnet:      " << ipIt->get<NetworkInterface::SUBNET_MASK>().toString() << " (/" << ipIt->get<NetworkInterface::SUBNET_MASK>().prefixLength() << ")" << std::endl;
+			if (!addr.isWildcard()) std::cout << "Subnet:      " << ipIt->get<NetworkInterface::SUBNET_MASK>() << " (/" << ipIt->get<NetworkInterface::SUBNET_MASK>().prefixLength() << ")" << std::endl;
 			addr = ipIt->get<NetworkInterface::BROADCAST_ADDRESS>();
-			if (!addr.isWildcard()) std::cout << "Broadcast:   " << ipIt->get<NetworkInterface::BROADCAST_ADDRESS>().toString() << std::endl;
+			if (!addr.isWildcard()) std::cout << "Broadcast:   " << ipIt->get<NetworkInterface::BROADCAST_ADDRESS>() << std::endl;
 		}
 
 		std::cout << "==============" << std::endl << std::endl;
@@ -180,7 +180,7 @@ void NetworkInterfaceTest::testMapIpOnly()
 	{
 		assert(it->second.supportsIPv4() || it->second.supportsIPv6());
 		std::cout << "Interface: (" << it->second.index() << ")" << std::endl;
-		std::cout << "Address:    " << it->second.address().toString() << std::endl;
+		std::cout << "Address:    " << it->second.address() << std::endl;
 		NetworkInterface::MACAddress mac(it->second.macAddress());
 		if (!mac.empty() && (it->second.type() != NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK))
 			std::cout << "MAC Address:" << mac << std::endl;

@@ -17,10 +17,11 @@ endif
 
 objects = NetSSLTestSuite Driver \
 	HTTPSClientSessionTest HTTPSClientTestSuite HTTPSServerTest HTTPSServerTestSuite \
-	HTTPSStreamFactoryTest HTTPSTestServer TCPServerTest TCPServerTestSuite
+	HTTPSStreamFactoryTest HTTPSTestServer TCPServerTest TCPServerTestSuite \
+	WebSocketTest WebSocketTestSuite
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoNetSSL PocoNet PocoCrypto PocoUtil PocoXML PocoFoundation CppUnit
+target_libs    = PocoNetSSL PocoNet PocoCrypto PocoUtil PocoJSON PocoXML PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec

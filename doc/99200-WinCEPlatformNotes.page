@@ -58,10 +58,17 @@ similar features. In this case, the calls to the wceex_* functions need to be re
 the wcecompat counterparts. The affected files are Random.cpp, LocalDateTime.cpp,
 Timezone_WINCE.cpp and ThreadPool.cpp.
 
+Starting with Windows Embedded Compact 2013 (Windows CE 8), WCELIBCEX or wcecompat
+are no longer required, as the C/C++ runtime libraries have all necessary features.
+
 To obtain the current date and time with millisecond resolution,
 the hack described in <http://community.opennetcf.com/articles/cf/archive/2007/11/20/getting-a-millisecond-resolution-datetime-under-windows-ce.aspx>
 is used. This means there will be a one second delay when starting up
 the application.
+
+In POCO version 1.6.1 or later, this hack is no longer enabled automatically. If
+required, it can be enabled by building the Foundation library with the
+POCO_WINCE_TIMESTAMP_HACK macro defined.
 
 
 !!Poco::Path

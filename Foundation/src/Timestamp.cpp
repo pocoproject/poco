@@ -38,7 +38,7 @@
 #endif
 
 
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && defined(POCO_WINCE_TIMESTAMP_HACK)
 
 
 //
@@ -138,7 +138,7 @@ void GetSystemTimeAsFileTimeWithMillisecondResolution(FILETIME* pFT)
 } // namespace
 
 
-#endif // defined(_WIN32_WCE)
+#endif // defined(_WIN32_WCE) && defined(POCO_WINCE_TIMESTAMP_HACK)
 
 
 namespace Poco {
@@ -210,7 +210,7 @@ void Timestamp::update()
 #if defined(POCO_OS_FAMILY_WINDOWS)
 
 	FILETIME ft;
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) && defined(POCO_WINCE_TIMESTAMP_HACK)
 	GetSystemTimeAsFileTimeWithMillisecondResolution(&ft);
 #else
 	GetSystemTimeAsFileTime(&ft);

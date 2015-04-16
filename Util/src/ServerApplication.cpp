@@ -64,7 +64,7 @@ SERVICE_STATUS        ServerApplication::_serviceStatus;
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0; 
 #endif
 #endif
-#if defined(POCO_VXWORKS) || defined(POCO_ANDROID)
+#if defined(POCO_VXWORKS) || defined(POCO_ANDROID) || defined(__NACL__)
 Poco::Event ServerApplication::_terminate;
 #endif
 
@@ -102,7 +102,7 @@ void ServerApplication::terminate()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	_terminate.set();
-#elif defined(POCO_VXWORKS) || defined(POCO_ANDROID)
+#elif defined(POCO_VXWORKS) || defined(POCO_ANDROID) || defined(__NACL__)
 	_terminate.set();
 #else
 	Poco::Process::requestTermination(Process::id());
@@ -132,8 +132,23 @@ BOOL ServerApplication::ConsoleCtrlHandler(DWORD ctrlType)
 }
 
 
-void ServerApplication::ServiceControlHandler(DWORD control)
+HDEVNOTIFY ServerApplication::registerServiceDeviceNotification(LPVOID filter, DWORD flags)
 {
+	return RegisterDeviceNotification(_serviceStatusHandle, filter, flags);
+}
+
+
+DWORD ServerApplication::handleDeviceEvent(DWORD /*event_type*/, LPVOID /*event_data*/)
+{
+	return ERROR_CALL_NOT_IMPLEMENTED;
+}
+
+
+DWORD ServerApplication::ServiceControlHandler(DWORD control, DWORD event_type, LPVOID event_data, LPVOID context)
+{
+	DWORD result = NO_ERROR;
+	ServerApplication* pThis = reinterpret_cast<ServerApplication*>(context);
+
 	switch (control) 
 	{ 
 	case SERVICE_CONTROL_STOP:
@@ -142,9 +157,16 @@ void ServerApplication::ServiceControlHandler(DWORD control)
 		_serviceStatus.dwCurrentState = SERVICE_STOP_PENDING;
 		break;
 	case SERVICE_CONTROL_INTERROGATE: 
-		break; 
+		break;
+	case SERVICE_CONTROL_DEVICEEVENT:
+		if (pThis)
+		{
+			result = pThis->handleDeviceEvent(event_type, event_data);
+		}
+		break;
 	} 
 	SetServiceStatus(_serviceStatusHandle,  &_serviceStatus);
+	return result;
 }
 
 
@@ -159,9 +181,9 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 	app.config().setBool("application.runAsService", true);
 
 #if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
-	_serviceStatusHandle = RegisterServiceCtrlHandlerW(L"", ServiceControlHandler);
+	_serviceStatusHandle = RegisterServiceCtrlHandlerExW(L"", ServiceControlHandler, &app);
 #else
-	_serviceStatusHandle = RegisterServiceCtrlHandlerA("", ServiceControlHandler);
+	_serviceStatusHandle = RegisterServiceCtrlHandlerExA("", ServiceControlHandler, &app);
 #endif
 	if (!_serviceStatusHandle)
 		throw SystemException("cannot register service control handler");
@@ -570,7 +592,7 @@ void ServerApplication::defineOptions(OptionSet& options)
 //
 void ServerApplication::waitForTerminationRequest()
 {
-#ifndef POCO_ANDROID
+#if !defined(POCO_ANDROID) && !defined(__NACL__)
 	sigset_t sset;
 	sigemptyset(&sset);
 	if (!std::getenv("POCO_ENABLE_DEBUGGER"))
@@ -582,7 +604,7 @@ void ServerApplication::waitForTerminationRequest()
 	sigprocmask(SIG_BLOCK, &sset, NULL);
 	int sig;
 	sigwait(&sset, &sig);
-#else // POCO_ANDROID
+#else // POCO_ANDROID || __NACL__
 	_terminate.wait();
 #endif
 }

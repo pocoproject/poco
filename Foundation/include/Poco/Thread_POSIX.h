@@ -44,7 +44,7 @@ namespace Poco {
 
 class Foundation_API ThreadImpl
 {
-public:	
+public:
 	typedef pthread_t TIDImpl;
 	typedef void (*Callable)(void*);
 
@@ -56,12 +56,12 @@ public:
 		PRIO_HIGH_IMPL,
 		PRIO_HIGHEST_IMPL
 	};
-	
+
 	enum Policy
 	{
 		POLICY_DEFAULT_IMPL = SCHED_OTHER
 	};
-	
+
 	ThreadImpl();
 	~ThreadImpl();
 
@@ -74,6 +74,8 @@ public:
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
+	void setAffinityImpl(int cpu);
+	int getAffinityImpl() const;
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
@@ -109,7 +111,7 @@ private:
 		{
 			pthread_setspecific(_key, pThread);
 		}
-	
+
 	private:
 		pthread_key_t _key;
 	};
@@ -125,11 +127,11 @@ private:
 			started(false),
 			joined(false)
 		{
-		#if defined(POCO_VXWORKS)
+#if defined(POCO_VXWORKS)
 			// This workaround is for VxWorks 5.x where
 			// pthread_init() won't properly initialize the thread.
 			std::memset(&thread, 0, sizeof(thread));
-		#endif
+#endif
 		}
 
 		SharedPtr<Runnable> pRunnableTarget;
@@ -146,7 +148,7 @@ private:
 	AutoPtr<ThreadData> _pData;
 
 	static CurrentThreadHolder _currentThreadHolder;
-	
+
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	SignalHandler::JumpBufferVec _jumpBufferVec;
 	friend class SignalHandler;

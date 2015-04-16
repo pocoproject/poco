@@ -574,6 +574,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\FIFOBufferTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FIFOBufferTestSuite.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\FormatTest.cpp"
 					>
 				</File>
@@ -675,6 +683,14 @@
 				</File>
 				<File
 					RelativePath=".\src\DynamicFactoryTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FIFOBufferTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FIFOBufferTestSuite.h"
 					>
 				</File>
 				<File

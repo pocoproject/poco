@@ -293,7 +293,7 @@ public:
 		/// Sets the document info.
  
 	void setInfo(Info info, const LocalDateTime& dt);
-		/// Sets the document creation or moidification date.
+		/// Sets the document creation or modification date.
 
 	std::string getInfo(Info info);
 		/// Returns the document info.

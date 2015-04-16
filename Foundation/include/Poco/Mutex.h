@@ -52,8 +52,8 @@ public:
 	enum MutexType
 		/// The type of a mutex.
 	{
-		MUTEX_RECURSIVE = MUTEX_RECURSIVE_IMPL,			/// A recursive mutex
-		MUTEX_NONRECURSIVE = MUTEX_NONRECURSIVE_IMPL,	/// A non-recursive mutex
+		MUTEX_RECURSIVE = MUTEX_RECURSIVE_IMPL,      /// A recursive mutex
+		MUTEX_NONRECURSIVE = MUTEX_NONRECURSIVE_IMPL /// A non-recursive mutex
 	};
 
 	typedef Poco::ScopedLock<Mutex> ScopedLock;
