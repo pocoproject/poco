@@ -31,7 +31,8 @@ namespace ODBC {
 Binder::Binder(const StatementHandle& rStmt,
 	std::size_t maxFieldSize,
 	Binder::ParameterBinding dataBinding,
-	TypeInfo* pDataTypes):
+	TypeInfo* pDataTypes,
+  bool numericToString) :
 	_rStmt(rStmt),
 	_paramBinding(dataBinding),
 	_pTypeInfo(pDataTypes),
@@ -39,7 +40,8 @@ Binder::Binder(const StatementHandle& rStmt,
 	_maxFieldSize(maxFieldSize),
 	_maxCharColLength(1024),
 	_maxWCharColLength(1024),
-	_maxVarBinColSize(1024)
+	_maxVarBinColSize(1024),
+	_numericToString(numericToString)
 {
 	const std::string NM("COLUMN_SIZE");
 	Poco::DynamicAny r;
@@ -474,7 +476,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 
 	try
 	{
-		ODBCMetaColumn c(_rStmt, pos);
+		ODBCMetaColumn c(_rStmt, pos, _numericToString);
 		colSize = (SQLINTEGER) c.length();
 		decDigits = (SQLSMALLINT) c.precision();
 		return;
@@ -495,7 +497,7 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 
 	try
 	{
-		ODBCMetaColumn col(_rStmt, pos);
+		ODBCMetaColumn col(_rStmt, pos, _numericToString);
 		colSize = col.length();
 	}
 	catch (StatementException&) { }

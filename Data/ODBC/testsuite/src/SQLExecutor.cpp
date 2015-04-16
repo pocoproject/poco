@@ -1723,6 +1723,50 @@ void SQLExecutor::prepare()
 	assert (count == 0);
 }
 
+void SQLExecutor::numericTypes(const std::vector<std::string>& vals)
+{
+	std::string funct = "numericTypes()";
+	try {
+
+		session().setFeature(Poco::Data::ODBC::SessionImpl::NUMERIC_TO_STRING_FEATURE, false);
+
+		{
+			Statement stat(session());
+			stat << "SELECT * FROM " << ExecUtil::numeric_tbl(), now;
+			RecordSet rs(stat);
+
+			assert(vals.size() + 1 == rs.columnCount());
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(0));
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(1));
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(2));
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT64 == rs.columnType(3));
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_STRING == rs.columnType(4));
+			for (size_t i = 0; i < vals.size(); ++i)
+			{
+				std::string v = rs.value(i + 1).convert<std::string>();
+				assert(vals[i] == v);
+			}
+		}
+
+		session().setFeature(Poco::Data::ODBC::SessionImpl::NUMERIC_TO_STRING_FEATURE, true);
+		{
+			Statement stat(session());
+			stat << "SELECT * FROM " << ExecUtil::numeric_tbl(), now;
+			RecordSet rs(stat);
+
+			assert(vals.size() + 1 == rs.columnCount());
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(0));
+			for (size_t i = 0; i < vals.size(); ++i)
+			{
+				assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_STRING == rs.columnType(i + 1));
+				std::string v = rs.value<std::string>(i + 1);
+				assert(vals[i] == v);
+			}
+		}
+	}
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
+}
 
 void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 {

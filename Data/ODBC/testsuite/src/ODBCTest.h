@@ -153,6 +153,7 @@ public:
 	virtual void testUnicode();
 
 	virtual void testReconnect();
+	virtual void testNumeric();
 
 protected:
 	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;
@@ -176,7 +177,9 @@ protected:
 	virtual void recreateMiscTable();
 	virtual void recreateLogTable();
 	virtual void recreateUnicodeTable();
+	virtual void recreateNumericTable();
 	virtual bool emptyStringIsSpace() { return false; }
+	virtual std::string str2NumExpr(const std::string& num, unsigned len, unsigned dec) { return num; }
 
 	static SessionPtr init(const std::string& driver,
 		std::string& dsn,
@@ -263,6 +266,11 @@ inline void ODBCTest::dropObject(const std::string& type, const std::string& nam
 inline void ODBCTest::recreateNullableTable()
 { 
 	throw Poco::NotImplementedException("ODBCTest::recreateNullableTable()");
+}
+
+inline void ODBCTest::recreateNumericTable()
+{
+	throw Poco::NotImplementedException("ODBCTest::recreateNumericTable()");
 }
 
 

@@ -298,7 +298,7 @@ void StatementImpl::setStorage(const std::string& storage)
 
 void StatementImpl::makeExtractors(std::size_t count)
 {
-	makeExtractors(count, currentDataSet());
+	makeExtractors(count, static_cast<Position::Position_Type>(currentDataSet()));
 }
 
 void StatementImpl::makeExtractors(std::size_t count, const Position& position)

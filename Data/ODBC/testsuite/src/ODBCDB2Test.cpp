@@ -21,6 +21,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -207,8 +208,8 @@ void ODBCDB2Test::testStoredProcedure()
 			"END" , now;
 
 		int i = 0;
-        	session() << "{call " DB2_DB "." << nm << "(?)}", out(i), now;
-			dropObject("PROCEDURE", nm + "(INTEGER)");
+		session() << "{call " DB2_DB "." << nm << "(?)}", out(i), now;
+		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(-1 == i);
 
 		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER, OUT outParam INTEGER) "
@@ -218,8 +219,8 @@ void ODBCDB2Test::testStoredProcedure()
 		
 		i = 2;
 		int j = 0;
-        	session() << "{call " DB2_DB "." << nm << "(?, ?)}", in(i), out(j), now;
-			dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
+		session() << "{call " DB2_DB "." << nm << "(?, ?)}", in(i), out(j), now;
+		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == j);
 	
 		session() << "CREATE PROCEDURE " << nm << "(INOUT ioParam INTEGER) "
@@ -228,8 +229,8 @@ void ODBCDB2Test::testStoredProcedure()
 			"END" , now;
 
 		i = 2;
-        	session() << "{call " DB2_DB "." << nm << "(?)}", io(i), now;
-			dropObject("PROCEDURE", nm + "(INTEGER)");
+		session() << "{call " DB2_DB "." << nm << "(?)}", io(i), now;
+		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(4 == i);
 
 		//TIMESTAMP is not supported as stored procedure parameter in DB2
@@ -352,7 +353,25 @@ void ODBCDB2Test::testStoredFunction()
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
-		session().setFeature("autoExtract", bindValue(k+1));
+		session().setFeature("autoExtract", bindValue(k + 1));
+
+		{
+			session() << "CREATE PROCEDURE " << nm << "() "
+				"BEGIN "
+				"  RETURN select 1 where 1 = 2;"
+				"END", now;
+
+			int i = -5;
+			session() << "{? = call " DB2_DB "." << nm << "()}", out(i), now;
+			assert(-5 == i);
+
+			Poco::Data::Statement stat(session());
+			stat << "{ call " DB2_DB "." << nm << "()}", now;
+			Poco::Data::RecordSet rs(stat);
+
+			assert(0 == rs.rowCount());
+			dropObject("PROCEDURE", nm + "()");
+		}
 
 		session() << "CREATE PROCEDURE " << nm << "() "
 			"BEGIN "
@@ -363,6 +382,7 @@ void ODBCDB2Test::testStoredFunction()
 		session() << "{? = call " DB2_DB "." << nm << "()}", out(i), now;
 		dropObject("PROCEDURE", nm + "()");
 		assert(-1 == i);
+
 		
 		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER) "
 			"BEGIN "
@@ -469,6 +489,17 @@ void ODBCDB2Test::recreateNullableTable()
 	try { session() << "CREATE TABLE " << ExecUtil::nullabletest() << " (EmptyString VARCHAR(30), EmptyInteger INTEGER , EmptyFloat FLOAT , EmptyDateTime TIMESTAMP)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
+}
+
+void ODBCDB2Test::recreateNumericTable()
+{
+	dropObject("TABLE", ExecUtil::numeric_tbl());
+	try {
+		session() << "CREATE TABLE " << ExecUtil::numeric_tbl() <<
+			" (id integer, num8 NUMERIC(8), num16_3 NUMERIC(16,3), num18 NUMERIC(18), num22 NUMERIC(22))", now;
+	}
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateNumericTable()"); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateNumericTable()"); }
 }
 
 
@@ -715,6 +746,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTransactor);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNullable);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testReconnect);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testNumeric);
 
 		ODBCDB2Test::_pExecutor = 0;
 		ODBCDB2Test::_pSession = 0;
