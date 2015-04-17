@@ -333,6 +333,16 @@ void SybaseODBC::testStoredProcedure()
 			dropObject("procedure", nm);
 			assert(0 == rs.rowCount());
 		}
+		{
+			Poco::Data::Statement stat(session());
+			stat << "{ exec  -- @exType='mdExch', @exList='TRAD' }", Poco::Data::Keywords::limit(1);
+			while (!stat.done())
+			{
+				stat.execute();
+				Poco::Data::RecordSet rs(stat);
+				assert(0 == rs.rowCount());
+			}
+		}
 
 		session() << "create procedure " + nm + " "
 			"@outParam int output "

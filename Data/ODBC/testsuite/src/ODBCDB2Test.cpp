@@ -64,9 +64,10 @@ static std::string db2Driver()
 # endif
 }
 
-#define DB2_DSN ""
-#define DB2_ALIAS "NT043005"
-#define DB2_DB "TEMPDB"
+# define DB2_SERVER "visadb28"
+# define DB2_DBINST "v10schm4"
+# define DB2_DB "MSTK_TEST"
+# define DB2_PORT "7395"
 #define DB2_UID ""
 #define DB2_PWD ""
 #endif
@@ -74,21 +75,23 @@ static std::string db2Driver()
 ODBCTest::SessionPtr ODBCDB2Test::_pSession;
 ODBCTest::ExecPtr    ODBCDB2Test::_pExecutor;
 std::string          ODBCDB2Test::_driver = db2Driver();
-std::string          ODBCDB2Test::_dsn = DB2_DSN;
+std::string          ODBCDB2Test::_dsn = "nytd_mstktest_v95_v10";
 std::string          ODBCDB2Test::_uid = DB2_UID;
 std::string          ODBCDB2Test::_pwd = DB2_PWD;
-#if 0
-std::string          ODBCDB2Test::_connectString = "Driver=" DB2_ODBC_DRIVER ";"
-	"Database=" DB2_DB ";"
+#if 1
+std::string          ODBCDB2Test::_connectString = "Driver=" + db2Driver() + ";"
+	"Database=" DB2_DBINST ";"
 	"Hostname=" DB2_SERVER ";"
 	"Port=" DB2_PORT ";"
+	"CurrentSchema=" DB2_DB ";"
 	"Protocol=TCPIP;"
 	"Uid=" DB2_UID ";"
 	"Pwd=" DB2_PWD ";";
 #else
 std::string          ODBCDB2Test::_connectString = "Driver=" + db2Driver() +
+";" "DSN=" DB2_DSN
 ";" "DBALIAS=" DB2_ALIAS
-";" "CurrentSchema=" "TEMPDB"
+";" "CurrentSchema=" DB2_DB
 ";" "Uid=" DB2_UID 
 ";" "Pwd=" DB2_PWD
 ;
