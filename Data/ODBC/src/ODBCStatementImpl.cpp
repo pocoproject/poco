@@ -94,17 +94,17 @@ void ODBCStatementImpl::compileImpl()
 	{
 		Poco::Any dti = session().getProperty("dataTypeInfo");
 		pDT = AnyCast<TypeInfo*>(dti);
-	} catch (NotSupportedException&) { }
+	}catch (NotSupportedException&) { }
 
 	const std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 	const bool numericToString = dynamic_cast<SessionImpl&>(session()).numericToString();
 	
-  _pBinder = new Binder(_stmt, maxFieldSize, bind, pDT, numericToString);
+	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT, numericToString);
 	
 	makeInternalExtractors();
 	doPrepare();
 
-	 _canCompile = false;
+	_canCompile = false;
 }
 
 
