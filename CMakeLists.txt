@@ -6,9 +6,14 @@
 # ENABLE_{COMPONENT}
 # ENABLE_TESTS
 
-project(Poco)
-
 cmake_minimum_required(VERSION 3.0.0)
+
+set(CMAKE_USER_MAKE_RULES_OVERRIDE
+   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/c_flag_overrides.cmake)
+set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
+   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cxx_flag_overrides.cmake)
+
+project(Poco)
 
 file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
 
@@ -41,6 +46,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Setup C/C++ compiler options
 #################################################################################
 
+#include(cmake/CXX11.cmake)   ???
+#check_for_cxx11_compiler(CXX11_COMPILER)
+
+# If a C++11 compiler is available, then set the appropriate flags
+#if(CXX11_COMPILER)
+#    enable_cxx11()
+    add_definitions(-DPOCO_ENABLE_CPP11)
+#endif()
+
 if(NOT MSVC_IDE)
   if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
@@ -51,20 +65,7 @@ endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "")
     set( CMAKE_BUILD_TYPE "RelWithDebInfo" )
-endif ()
-
-# http://www.cmake.org/Wiki/CMake_Useful_Variables :
-# CMAKE_BUILD_TYPE
-#    Choose the type of build. CMake has default flags for these:
-#
-#    * None (CMAKE_C_FLAGS or CMAKE_CXX_FLAGS used)
-#    * Debug (CMAKE_C_FLAGS_DEBUG or CMAKE_CXX_FLAGS_DEBUG)
-#    * Release (CMAKE_C_FLAGS_RELEASE or CMAKE_CXX_FLAGS_RELEASE)
-#    * RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
-#    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL)
-
-# For Debug build types, append a "d" to the library names.
-set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set debug library postfix" FORCE)
+endif()
 
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
@@ -96,12 +97,31 @@ option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
 
+if(WIN32)
+	option(POCO_MT
+		"Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
+	option(POCO_MD
+		"Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" ON)
+endif()
+
 option(POCO_STATIC
   "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
 
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
 
+
+  
+# http://www.cmake.org/Wiki/CMake_Useful_Variables :
+# CMAKE_BUILD_TYPE
+#    Choose the type of build. CMake has default flags for these:
+#
+#    * None (CMAKE_C_FLAGS or CMAKE_CXX_FLAGS used)
+#    * Debug (CMAKE_C_FLAGS_DEBUG or CMAKE_CXX_FLAGS_DEBUG)
+#    * Release (CMAKE_C_FLAGS_RELEASE or CMAKE_CXX_FLAGS_RELEASE)
+#    * RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
+#    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL)
+ 
 # Uncomment from next two lines to force statitc or dynamic library, default is autodetection
 if(POCO_STATIC)
     add_definitions( -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)
@@ -111,6 +131,46 @@ else(POCO_STATIC)
     set( LIB_MODE SHARED )
     message(STATUS "Building dynamic libraries")
 endif(POCO_STATIC)
+
+# Setting CXX Flag /MD or /MT and POSTFIX values i.e MDd / MD / MTd / MT / d
+if(WIN32)
+	if(POCO_MT)
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+		set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /MT")
+		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MTd")
+
+		if(POCO_STATIC)
+			set(CMAKE_DEBUG_POSTFIX "mtd" CACHE STRING "Set Debug library postfix" FORCE)	
+			set(CMAKE_RELEASE_POSTFIX "mt" CACHE STRING "Set Release library postfix" FORCE)
+			set(CMAKE_MINSIZEREL_POSTFIX "mt" CACHE STRING "Set MinSizeRel library postfix" FORCE)
+			set(CMAKE_RELWITHDEBINFO_POSTFIX "mtd" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
+		else(POCO_STATIC)
+			set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set Debug library postfix" FORCE)	
+			set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Set Release library postfix" FORCE)
+			set(CMAKE_MINSIZEREL_POSTFIX "" CACHE STRING "Set MinSizeRel library postfix" FORCE)
+			set(CMAKE_RELWITHDEBINFO_POSTFIX "d" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
+		endif()
+	elseif(POCO_MD)
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+		set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /MD")
+		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MDd")
+
+		if(POCO_STATIC)
+			set(CMAKE_DEBUG_POSTFIX "mdd" CACHE STRING "Set Debug library postfix" FORCE)	
+			set(CMAKE_RELEASE_POSTFIX "md" CACHE STRING "Set Release library postfix" FORCE)
+			set(CMAKE_MINSIZEREL_POSTFIX "md" CACHE STRING "Set MinSizeRel library postfix" FORCE)
+			set(CMAKE_RELWITHDEBINFO_POSTFIX "mdd" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
+		else(POCO_STATIC)
+			set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set Debug library postfix" FORCE)	
+			set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Set Release library postfix" FORCE)
+			set(CMAKE_MINSIZEREL_POSTFIX "" CACHE STRING "Set MinSizeRel library postfix" FORCE)
+			set(CMAKE_RELWITHDEBINFO_POSTFIX "d" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
+		endif(POCO_STATIC)
+	endif()
+endif(WIN32)
+
 
 if (ENABLE_TESTS)
   include(CTest)
@@ -133,7 +193,10 @@ find_package(Cygwin)
 # OS Detection
 if(WIN32)
   add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DUNICODE -D_UNICODE)
-  #set(SYSLIBS iphlpapi gdi32 odbc32)
+  set(SYSLIBS ${SYSLIBS} Iphlpapi.lib gdi32.lib)
+  if(ENABLE_DATA_ODBC)
+	set(SYSLIBS ${SYSLIBS} odbc32.lib)
+  endif(ENABLE_DATA_ODBC)
 endif(WIN32)
 
 if (UNIX AND NOT ANDROID )
@@ -215,8 +278,6 @@ endif()
 
 
 #NetSSL
-
-
 if(WIN32 AND ENABLE_NETSSL_WIN)
     add_subdirectory(NetSSL_Win)
     list(APPEND Poco_COMPONENTS "NetSSL_Win")
@@ -330,7 +391,17 @@ message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} u
 message(STATUS "Installation target path: ${CMAKE_INSTALL_PREFIX}")
 
 message(STATUS "C_FLAGS:  =${CMAKE_C_FLAGS}")
+message(STATUS "CMAKE_C_FLAGS_DEBUG:=${CMAKE_C_FLAGS_DEBUG}")
+message(STATUS "CMAKE_C_FLAGS_RELEASE:=${CMAKE_C_FLAGS_RELEASE}")
+message(STATUS "CMAKE_C_FLAGS_MINSIZEREL:=${CMAKE_C_FLAGS_MINSIZEREL}")
+message(STATUS "CMAKE_C_FLAGS_RELWITHDEBINFO:=${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+message(STATUS "")
+message(STATUS "")
 message(STATUS "CXX_FLAGS:=${CMAKE_CXX_FLAGS}")
+message(STATUS "CMAKE_CXX_FLAGS_DEBUG:=${CMAKE_CXX_FLAGS_DEBUG}")
+message(STATUS "CMAKE_CXX_FLAGS_RELEASE:=${CMAKE_CXX_FLAGS_RELEASE}")
+message(STATUS "CMAKE_CXX_FLAGS_MINSIZEREL:=${CMAKE_CXX_FLAGS_MINSIZEREL}")
+message(STATUS "CMAKE_CXX_FLAGS_RELWITHDEBINFO:=${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 
 foreach(component ${Poco_COMPONENTS})
 message(STATUS "Building: ${component}")
