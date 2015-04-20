@@ -1220,6 +1220,21 @@ void JSONTest::testPrintHandler()
 	parser.reset();
 	parser.parse(json);
 	assert (json == ostr.str());
+
+	json="[[\"a\"],[\"b\"],[[\"c\"],[\"d\"]]]";
+	ostr.str("");
+	pHandler->setIndent(0);
+	parser.reset();
+	parser.parse(json);
+	assert (json == ostr.str());
+
+	json="[{\"1\":\"one\",\"0\":[\"zero\",\"nil\"]}]";
+	ostr.str("");
+	pHandler->setIndent(0);
+	parser.reset();
+	parser.parse(json);
+	assert (json == ostr.str());
+
 }
 
 
