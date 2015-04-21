@@ -1,5 +1,5 @@
-#ifndef Foundation_Diagnostics_INCLUDED
-#define Foundation_Diagnostics_INCLUDED
+#ifndef Foundation_Compiler_GCC_INCLUDED
+#define Foundation_Compiler_GCC_INCLUDED
 
 
 // 
@@ -34,4 +34,4 @@
 #endif // __GNUC__
 
 
-#endif // Foundation_Diagnostics_INCLUDED
+#endif // Foundation_Compiler_GCC_INCLUDED
