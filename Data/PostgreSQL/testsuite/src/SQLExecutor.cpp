@@ -211,7 +211,7 @@ void SQLExecutor::oidPostgreSQLTest(const char* host, const char* user, const ch
 	
 	pResult = PQexec(pConnection, sql.c_str());
 	
-	std::cout << "Drop Table Test Result: " <<  PQresStatus(PQresultStatus(pResult)) << " statement: "<< sql.c_str() << std::endl;
+	std::cout << "Drop Table Test Result: " <<  PQresStatus(PQresultStatus(pResult)) /* << " statement: "<< sql.c_str() */ << std::endl;
 	
 	assert(	PQresultStatus(pResult) == PGRES_COMMAND_OK
 		   || PQresultStatus(pResult) == PGRES_FATAL_ERROR);
@@ -221,7 +221,7 @@ void SQLExecutor::oidPostgreSQLTest(const char* host, const char* user, const ch
 	sql = tableCreateString;
 	pResult = PQexec(pConnection, sql.c_str());
 	
-	std::cout << "Create Table Test Result: " <<  PQresStatus(PQresultStatus(pResult)) << " statement: "<< sql.c_str() << std::endl;
+	std::cout << "Create Table Test Result: " <<  PQresStatus(PQresultStatus(pResult)) /* << " statement: "<< sql.c_str() */ << std::endl;
 	
 	assert(PQresultStatus(pResult) == PGRES_COMMAND_OK);
 	PQclear(pResult);
