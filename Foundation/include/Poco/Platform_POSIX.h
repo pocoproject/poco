@@ -21,9 +21,6 @@
 #define Foundation_Platform_POSIX_INCLUDED
 
 
-#include "Poco/Diagnostics.h"
-
-
 //
 // PA-RISC based HP-UX platforms have some issues...
 //
