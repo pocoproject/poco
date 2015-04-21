@@ -139,7 +139,7 @@ void CompressTest::testSetZipComment()
 
 void CompressTest::createDataFile(const std::string& path, Poco::UInt64 size) 
 {
-	std::ofstream out(path, std::ios::binary | std::ios::trunc);
+	std::ofstream out(path.c_str(), std::ios::binary | std::ios::trunc);
 	assert( ! out.fail() );
 	Poco::Buffer<char> buffer(MB);
 	for(int i = 0; size != 0; i++) {
