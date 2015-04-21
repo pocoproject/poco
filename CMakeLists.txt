@@ -52,7 +52,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # If a C++11 compiler is available, then set the appropriate flags
 #if(CXX11_COMPILER)
 #    enable_cxx11()
-    add_definitions(-DPOCO_ENABLE_CPP11)
+#    add_definitions(-DPOCO_ENABLE_CPP11)
 #endif()
 
 if(NOT MSVC_IDE)
@@ -110,18 +110,6 @@ option(POCO_STATIC
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
 
-
-  
-# http://www.cmake.org/Wiki/CMake_Useful_Variables :
-# CMAKE_BUILD_TYPE
-#    Choose the type of build. CMake has default flags for these:
-#
-#    * None (CMAKE_C_FLAGS or CMAKE_CXX_FLAGS used)
-#    * Debug (CMAKE_C_FLAGS_DEBUG or CMAKE_CXX_FLAGS_DEBUG)
-#    * Release (CMAKE_C_FLAGS_RELEASE or CMAKE_CXX_FLAGS_RELEASE)
-#    * RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
-#    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL)
- 
 # Uncomment from next two lines to force statitc or dynamic library, default is autodetection
 if(POCO_STATIC)
     add_definitions( -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)
@@ -131,46 +119,6 @@ else(POCO_STATIC)
     set( LIB_MODE SHARED )
     message(STATUS "Building dynamic libraries")
 endif(POCO_STATIC)
-
-# Setting CXX Flag /MD or /MT and POSTFIX values i.e MDd / MD / MTd / MT / d
-if(WIN32)
-	if(POCO_MT)
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-		set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /MT")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MTd")
-
-		if(POCO_STATIC)
-			set(CMAKE_DEBUG_POSTFIX "mtd" CACHE STRING "Set Debug library postfix" FORCE)	
-			set(CMAKE_RELEASE_POSTFIX "mt" CACHE STRING "Set Release library postfix" FORCE)
-			set(CMAKE_MINSIZEREL_POSTFIX "mt" CACHE STRING "Set MinSizeRel library postfix" FORCE)
-			set(CMAKE_RELWITHDEBINFO_POSTFIX "mtd" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
-		else(POCO_STATIC)
-			set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set Debug library postfix" FORCE)	
-			set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Set Release library postfix" FORCE)
-			set(CMAKE_MINSIZEREL_POSTFIX "" CACHE STRING "Set MinSizeRel library postfix" FORCE)
-			set(CMAKE_RELWITHDEBINFO_POSTFIX "d" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
-		endif()
-	elseif(POCO_MD)
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
-		set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /MD")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MDd")
-
-		if(POCO_STATIC)
-			set(CMAKE_DEBUG_POSTFIX "mdd" CACHE STRING "Set Debug library postfix" FORCE)	
-			set(CMAKE_RELEASE_POSTFIX "md" CACHE STRING "Set Release library postfix" FORCE)
-			set(CMAKE_MINSIZEREL_POSTFIX "md" CACHE STRING "Set MinSizeRel library postfix" FORCE)
-			set(CMAKE_RELWITHDEBINFO_POSTFIX "mdd" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
-		else(POCO_STATIC)
-			set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set Debug library postfix" FORCE)	
-			set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Set Release library postfix" FORCE)
-			set(CMAKE_MINSIZEREL_POSTFIX "" CACHE STRING "Set MinSizeRel library postfix" FORCE)
-			set(CMAKE_RELWITHDEBINFO_POSTFIX "d" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
-		endif(POCO_STATIC)
-	endif()
-endif(WIN32)
-
 
 if (ENABLE_TESTS)
   include(CTest)
@@ -187,61 +135,7 @@ else ()
   message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
 endif ()
 
-include(CheckTypeSize)
-find_package(Cygwin)
-
-# OS Detection
-if(WIN32)
-  add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DUNICODE -D_UNICODE)
-  set(SYSLIBS ${SYSLIBS} Iphlpapi.lib gdi32.lib)
-  if(ENABLE_DATA_ODBC)
-	set(SYSLIBS ${SYSLIBS} odbc32.lib)
-  endif(ENABLE_DATA_ODBC)
-endif(WIN32)
-
-if (UNIX AND NOT ANDROID )
-  add_definitions( -DPOCO_OS_FAMILY_UNIX )
-  # Standard 'must be' defines
-  if (APPLE)
-    add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64)
-    set(SYSLIBS  dl)
-  else (APPLE)
-    add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64)
-    set(SYSLIBS  pthread dl rt)
-  endif (APPLE)
-endif(UNIX AND NOT ANDROID )
-
-if (CMAKE_SYSTEM MATCHES "SunOS")
-  add_definitions( -DPOCO_OS_FAMILY_UNIX )
-  # Standard 'must be' defines
-  add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
-  set(SYSLIBS  pthread socket xnet nsl resolv rt dl)
-endif(CMAKE_SYSTEM MATCHES "SunOS")
-
-if (CMAKE_COMPILER_IS_MINGW)
-  add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
-  add_definitions(-D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE)
-endif (CMAKE_COMPILER_IS_MINGW)
-
-if (CYGWIN)
-#    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
-endif (CYGWIN)
-
-# SunPro C++
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-  add_definitions( -D_BSD_SOURCE -library=stlport4)
-endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-
-# iOS
-if (IOS)
-  add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_STAT64 -DPOCO_NO_SHAREDLIBS -DPOCO_NO_NET_IFTYPES )
-endif(IOS)
-
-#Android
-if (ANDROID)
-  add_definitions( -DPOCO_ANDROID -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SHAREDMEMORY )
-endif(ANDROID)
-
+include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
@@ -283,7 +177,7 @@ if(WIN32 AND ENABLE_NETSSL_WIN)
     list(APPEND Poco_COMPONENTS "NetSSL_Win")
 endif(WIN32 AND ENABLE_NETSSL_WIN)
 
-find_package(OpenSSL)
+find_package(OpenSSL)		#TODO: Offical CMake Find OpenSSL only gets MD versions of library.
 if(OPENSSL_FOUND)
     include_directories("${OPENSSL_INCLUDE_DIR}")
     if(ENABLE_NETSSL)
