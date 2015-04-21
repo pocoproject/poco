@@ -21,6 +21,7 @@
 #define Foundation_Platform_WIN32_INCLUDED
 
 
+#include "Poco/Diagnostics.h"
 #include "Poco/UnWindows.h"
 
 
