@@ -912,9 +912,16 @@ protected:
 						templatePath.pushDirectory(tool);
 						templatePath.pushDirectory(platform);
 						templatePath.pushDirectory(projectType);
-						if (platform == "Win32") pProjectConfig->setString("vc.project.platform.bits", "32");
-						else if (platform == "x64") pProjectConfig->setString("vc.project.platform.bits", "64");
-						else if (platform == "WinCE") pProjectConfig->setString("vc.project.platform.bits", "32");
+						if ((platform == "Win32") || (platform == "WinCE"))
+						{
+							pProjectConfig->setString("vc.project.platform.bits", "32");
+							pProjectConfig->setString("vc.project.platform.bindir.suffix", "");
+						}
+						else if (platform == "x64")
+						{
+							pProjectConfig->setString("vc.project.platform.bits", "64");
+							pProjectConfig->setString("vc.project.platform.bindir.suffix", "64");
+						}
 						else throw Poco::NotFoundException(Poco::format("Unknown platform: %s", platform));
 						generateProject(*pProjectConfig, projectPath, templatePath, platform, tool);
 					}
