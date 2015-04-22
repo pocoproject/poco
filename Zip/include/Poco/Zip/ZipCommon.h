@@ -33,8 +33,12 @@ class Zip_API ZipCommon
 public:
 	enum
 	{
-		HEADER_SIZE = 4
-	};
+		HEADER_SIZE = 4,
+    };
+
+    static const Poco::UInt16 ZIP64_EXTRA_ID    = 0x1;        // Extra data id tag for Zip64 data (in extension for ZipLocalFileHeader and ZipFileInfo)
+    static const Poco::UInt16 ZIP64_MAGIC_SHORT = 0xFFFF;
+    static const Poco::UInt32 ZIP64_MAGIC       = 0xFFFFFFFF;
 
 	enum CompressionMethod
 	{
