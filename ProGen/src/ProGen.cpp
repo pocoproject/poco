@@ -685,6 +685,7 @@ protected:
 					setProperty(*pProps, "configuration.linker.libraries", projectConfig, "vc.project.linker.libraries", platform, config);
 					setProperty(*pProps, "configuration.linker.entry", projectConfig, "vc.project.linker.entry", platform, config);
 					setProperty(*pProps, "configuration.linker.additionalOptions", projectConfig, "vc.project.linker.additionalOptions", platform, config);
+					setProperty(*pProps, "configuration.prebuild", projectConfig, "vc.project.prebuild", platform, config);
 					setProperty(*pProps, "configuration.postbuild", projectConfig, "vc.project.postbuild", platform, config);
 					std::string libSuffix = this->config().getString("progen.libsuffix." + config, "");
 					Poco::StringTokenizer rawDependencies(pProps->getString("configuration.linker.dependencies"), " ", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
@@ -706,6 +707,16 @@ protected:
 					configPath.setExtension("template");
 					Poco::AutoPtr<Poco::XML::Document> pConfigDoc = domParser.parse(configPath.toString());
 					Poco::XML::Element* pConfigElem = pConfigDoc->documentElement();
+
+					std::string prebuild = pProps->getString("configuration.prebuild", "");
+					if (!prebuild.empty())
+					{
+						Poco::XML::Node* pPreBuildNode = pConfigElem->getNodeByPath("Tool[@Name=VCPreBuildEventTool]");
+						if (pPreBuildNode)
+						{
+							static_cast<Poco::XML::Element*>(pPreBuildNode)->setAttribute("CommandLine", prebuild);
+						}
+					}
 					
 					std::string postbuild = pProps->getString("configuration.postbuild", "");
 					if (!postbuild.empty())
@@ -901,6 +912,10 @@ protected:
 						templatePath.pushDirectory(tool);
 						templatePath.pushDirectory(platform);
 						templatePath.pushDirectory(projectType);
+						if (platform == "Win32") pProjectConfig->setString("vc.project.platform.bits", "32");
+						else if (platform == "x64") pProjectConfig->setString("vc.project.platform.bits", "64");
+						else if (platform == "WinCE") pProjectConfig->setString("vc.project.platform.bits", "32");
+						else throw Poco::NotFoundException(Poco::format("Unknown platform: %s", platform));
 						generateProject(*pProjectConfig, projectPath, templatePath, platform, tool);
 					}
 				}
