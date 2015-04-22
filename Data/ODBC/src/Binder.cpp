@@ -27,6 +27,18 @@ namespace Poco {
 namespace Data {
 namespace ODBC {
 
+static void getProp(const TypeInfo& dataTypes, size_t& val)
+{
+	const std::string NM("COLUMN_SIZE");
+	Poco::DynamicAny r;
+	if (dataTypes.tryGetInfo(SQL_WVARCHAR, NM, r))
+	{
+		long sz = r.convert<std::size_t>();
+		// Postgres driver returns SQL_NO_TOTAL(-4) in some cases
+		if (sz >= 0)
+			val = static_cast<size_t>(sz);
+	}
+}
 
 Binder::Binder(const StatementHandle& rStmt,
 	std::size_t maxFieldSize,
@@ -43,16 +55,9 @@ Binder::Binder(const StatementHandle& rStmt,
 	_maxVarBinColSize(1024),
 	_numericToString(numericToString)
 {
-	const std::string NM("COLUMN_SIZE");
-	Poco::DynamicAny r;
-	if (_pTypeInfo->tryGetInfo(SQL_WVARCHAR, NM, r))
-		_maxWCharColLength = r.convert<std::size_t>();
-
-	if (_pTypeInfo->tryGetInfo(SQL_VARCHAR, NM, r))
-		_maxCharColLength = r.convert<std::size_t>();
-
-	if (_pTypeInfo->tryGetInfo(SQL_VARBINARY, NM, r))
-		_maxVarBinColSize = r.convert<std::size_t>();
+	getProp(*_pTypeInfo, _maxWCharColLength);
+	getProp(*_pTypeInfo, _maxCharColLength);
+	getProp(*_pTypeInfo, _maxVarBinColSize);
 }
 
 
