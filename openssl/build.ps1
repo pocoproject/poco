@@ -325,30 +325,6 @@ function Compile-OpenSSL {
     # Run nmake install
     nmake -f ms\nt$lib.mak install
 
-    <#
-    if ($library -eq "shared") {
-        if ($configuration -eq "debug") {
-            Replace-String "ms\ntdll.mak" "`$(TMP_D)/lib" "`$(TMP_D)/openssl$b$l$d"
-        }
-        #Replace-String "ms\ntdll.mak" "`/out:`$(O_CRYPTO) /def:ms/LIBEAY32.def @<<" "/out:`$(O_CRYPTO) /PDB:`$(LIB_D)\`$(CRYPTO).pdb /def:ms/LIBEAY32.def @<<"
-        # Run nmake
-        nmake -f ms\ntdll.mak
-
-        # Run nmake install
-        nmake -f ms\ntdll.mak install
-    }
-    elseif ($library -eq "static") {
-        if ($configuration -eq "debug") {
-            Replace-String "ms\nt.mak" "`$(TMP_D)/lib" "`$(TMP_D)/openssl$b$l$d"
-        }
-        #Replace-String "ms\ntdll.mak" "/out:`$(O_CRYPTO) /def:ms/LIBEAY32.def @<<" "/out:`$(O_CRYPTO) /PDB:`$(LIB_D)\`$(CRYPTO).pdb /def:ms/LIBEAY32.def @<<"
-        # Run nmake
-        nmake -f ms\nt.mak
-
-        # Run nmake install
-        nmake -f ms\nt.mak install
-    }
-    #>
     popd
 }
 
