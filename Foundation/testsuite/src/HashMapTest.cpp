@@ -17,7 +17,6 @@
 #include "Poco/Exception.h"
 #include <map>
 
-GCC_DIAG_OFF(unused-variable)
 
 using Poco::HashMap;
 
