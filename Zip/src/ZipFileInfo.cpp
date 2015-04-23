@@ -54,7 +54,7 @@ ZipFileInfo::ZipFileInfo(const ZipLocalFileHeader& header):
 	if (getHostSystem() == ZipCommon::HS_UNIX)
 		setUnixAttributes();
 
-	_rawInfo[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.	   ZipFileInfo::ZipFileInfo(const ZipLocalFileHeader& header):
+	_rawInfo[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.	   
 }
 
 

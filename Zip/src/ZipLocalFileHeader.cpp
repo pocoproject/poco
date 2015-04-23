@@ -10,7 +10,7 @@
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// SPDX-License-Identifier:	BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 //
 
 
@@ -243,7 +243,8 @@ void ZipLocalFileHeader::init(const Poco::Path& fName, ZipCommon::CompressionMet
         setCompressionMethod(ZipCommon::CM_STORE);
     if (_forceZip64)
         setZip64Data();
-     _rawHeader[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.
+    
+    _rawHeader[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.
 }
 
 
