@@ -35,6 +35,10 @@ public:
 
 	void testDecompressFlat();
 
+    static const Poco::UInt64 MB = (1024*1024);
+    void verifyDataFile(const std::string& path, Poco::UInt64 size);
+    void testDecompressZip64();
+
 	void setUp();
 	void tearDown();
 

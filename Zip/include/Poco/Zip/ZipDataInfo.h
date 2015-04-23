@@ -134,7 +134,110 @@ inline Poco::UInt32 ZipDataInfo::getFullHeaderSize()
 }
 
 
-} } // namespace Poco::Zip
+class Zip_API ZipDataInfo64
+	/// A ZipDataInfo64 stores a Zip data descriptor for a Zip64 file
+{
+public:
+	static const char HEADER[ZipCommon::HEADER_SIZE];
 
+	ZipDataInfo64();
+	/// Creates a header with all fields (except the header field) set to 0
+
+	ZipDataInfo64(std::istream& in, bool assumeHeaderRead);
+		/// Creates the ZipDataInfo64.
+
+	~ZipDataInfo64();
+		/// Destroys the ZipDataInfo64.
+
+	bool isValid() const;
+
+	Poco::UInt32 getCRC32() const;
+
+	void setCRC32(Poco::UInt32 crc);
+
+	Poco::UInt64 getCompressedSize() const;
+
+	void setCompressedSize(Poco::UInt64 size);
+
+	Poco::UInt64 getUncompressedSize() const;
+
+	void setUncompressedSize(Poco::UInt64 size);
+
+	static Poco::UInt32 getFullHeaderSize();
+
+	const char* getRawHeader() const;
+
+private:
+	enum
+	{
+		HEADER_POS = 0,
+		CRC32_POS  = HEADER_POS + ZipCommon::HEADER_SIZE,
+		CRC32_SIZE = 4,
+		COMPRESSED_POS = CRC32_POS + CRC32_SIZE,
+		COMPRESSED_SIZE = 8,
+		UNCOMPRESSED_POS = COMPRESSED_POS + COMPRESSED_SIZE,
+		UNCOMPRESSED_SIZE = 8,
+		FULLHEADER_SIZE = UNCOMPRESSED_POS + UNCOMPRESSED_SIZE
+	};
+
+	char _rawInfo[FULLHEADER_SIZE];
+	bool _valid;
+};
+
+
+inline const char* ZipDataInfo64::getRawHeader() const
+{
+	return _rawInfo;
+}
+
+
+inline bool ZipDataInfo64::isValid() const
+{
+	return _valid;
+}
+
+
+inline Poco::UInt32 ZipDataInfo64::getCRC32() const
+{
+	return ZipUtil::get32BitValue(_rawInfo, CRC32_POS);
+}
+
+
+inline void ZipDataInfo64::setCRC32(Poco::UInt32 crc)
+{
+	return ZipUtil::set32BitValue(crc, _rawInfo, CRC32_POS);
+}
+
+
+inline Poco::UInt64 ZipDataInfo64::getCompressedSize() const
+{
+	return ZipUtil::get64BitValue(_rawInfo, COMPRESSED_POS);
+}
+
+
+inline void ZipDataInfo64::setCompressedSize(Poco::UInt64 size)
+{
+	return ZipUtil::set64BitValue(size, _rawInfo, COMPRESSED_POS);
+}
+
+
+inline Poco::UInt64 ZipDataInfo64::getUncompressedSize() const
+{
+	return ZipUtil::get64BitValue(_rawInfo, UNCOMPRESSED_POS);
+}
+
+
+inline void ZipDataInfo64::setUncompressedSize(Poco::UInt64 size)
+{
+	return ZipUtil::set64BitValue(size, _rawInfo, UNCOMPRESSED_POS);
+}
+
+
+inline Poco::UInt32 ZipDataInfo64::getFullHeaderSize()
+{
+	return FULLHEADER_SIZE;
+}
+
+} } // namespace Poco::Zip
 
 #endif // Zip_ZipDataInfo_INCLUDED

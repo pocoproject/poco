@@ -12,14 +12,19 @@
 
 #include "CompressTest.h"
 #include "ZipTest.h"
+
+#include "Poco/Buffer.h"
 #include "Poco/Zip/Compress.h"
 #include "Poco/Zip/ZipManipulator.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
+
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include <fstream>
 
+#undef min
+#include <algorithm>
 
 using namespace Poco::Zip;
 
@@ -133,6 +138,50 @@ void CompressTest::testSetZipComment()
 	assert(a.getZipComment() == comment);
 }
 
+void CompressTest::createDataFile(const std::string& path, Poco::UInt64 size) {
+    std::ofstream out(path, std::ios::binary | std::ios::trunc);
+    assert( ! out.fail() );
+    Poco::Buffer<char> buffer(MB);
+    for(int i = 0; size != 0; i++) {
+        std::memset(buffer.begin(), i, buffer.size());
+        Poco::UInt64 bytesToWrite = std::min(size, buffer.size());
+        out.write(buffer.begin(), bytesToWrite);
+        assert( ! out.fail() );
+        size -= bytesToWrite;
+    }
+    out.flush();
+    assert( ! out.fail() );
+    out.close();
+    assert( ! out.fail() );
+}
+
+void CompressTest::testZip64()
+{
+    std::map<std::string, Poco::UInt64> files;
+    files["data1.bin"] = static_cast<Poco::UInt64>(MB)*4096+1;
+    files["data2.bin"] = static_cast<Poco::UInt64>(MB)*16;
+    files["data3.bin"] = static_cast<Poco::UInt64>(MB)*4096-1;
+    
+    for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) {
+        createDataFile(it->first, it->second);
+    }
+	std::ofstream out("zip64.zip", std::ios::binary | std::ios::trunc);
+    Compress c(out, true, true);
+    for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) {
+        const std::string& path = it->first;
+    	c.addFile(path, path, ZipCommon::CM_STORE);
+    }
+    ZipArchive a(c.close());
+    for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) {
+        const std::string& path = it->first;
+        Poco::UInt64 size = it->second;
+        ZipArchive::FileHeaders::const_iterator it2 = a.findHeader(path);
+	    assert (it2 != a.headerEnd());
+        const Poco::Zip::ZipLocalFileHeader& file = it2->second;
+        assert(file.getUncompressedSize() == size);
+        assert(file.getCompressedSize() == size);
+    }
+}
 
 void CompressTest::setUp()
 {
@@ -154,6 +203,7 @@ CppUnit::Test* CompressTest::suite()
 	CppUnit_addTest(pSuite, CompressTest, testManipulatorDel);
 	CppUnit_addTest(pSuite, CompressTest, testManipulatorReplace);
 	CppUnit_addTest(pSuite, CompressTest, testSetZipComment);
+	CppUnit_addTest(pSuite, CompressTest, testZip64);
 
 	return pSuite;
 }
