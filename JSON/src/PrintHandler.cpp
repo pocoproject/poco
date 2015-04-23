@@ -26,8 +26,9 @@ namespace JSON {
 PrintHandler::PrintHandler(unsigned indent):
 	_out(std::cout),
 	_indent(indent),
-	_array(false),
-	_value(false)
+	_array(0),
+	_value(false),
+	_objStart(false)
 {
 }
 
@@ -35,8 +36,9 @@ PrintHandler::PrintHandler(unsigned indent):
 PrintHandler::PrintHandler(std::ostream& out, unsigned indent):
 	_out(out),
 	_indent(indent),
-	_array(false),
-	_value(false)
+	_array(0),
+	_value(false),
+	_objStart(false)
 {
 }
 
@@ -50,7 +52,7 @@ void PrintHandler::reset()
 {
 	_out.flush();
 	_tab = "";
-	_array = false;
+	_array = 0;
 	_value = false;
 }
 
@@ -78,9 +80,11 @@ unsigned PrintHandler::indent()
 
 void PrintHandler::startObject()
 {
+	arrayValue();
 	_out << '{';
 	_out << endLine();
 	_tab.append(indent(), ' ');
+	_objStart = true;
 }
 
 
@@ -90,6 +94,7 @@ void PrintHandler::endObject()
 		_tab.erase(_tab.length() - indent());
 
 	_out << endLine() << _tab << '}';
+	if (array()) _value = true;
 }
 
 
@@ -97,7 +102,7 @@ void PrintHandler::startArray()
 {
 	_out << '[' << endLine();
 	_tab.append(indent(), ' ');
-	_array = true;
+	++_array;
 	_value = false;
 }
 
@@ -106,7 +111,8 @@ void PrintHandler::endArray()
 {
 	_tab.erase(_tab.length() - indent());
 	_out << endLine() << _tab << ']';
-	_array = false;
+	--_array;
+	poco_assert (_array >= 0);
 	_value = false;
 }
 
@@ -115,9 +121,10 @@ void PrintHandler::key(const std::string& k)
 {
 	if (_value)
 	{
-		comma();
+		if (!_objStart) comma();
 		_value = false;
 	}
+	_objStart = false;
 	_out << _tab;
 	Stringifier::formatString(k, _out);
 	if (!printFlat()) _out << ' ';
@@ -201,7 +208,7 @@ void PrintHandler::comma()
 
 void PrintHandler::arrayValue()
 {
-	if (_array)
+	if (array())
 	{
 		if (_value) comma();
 		_out << _tab;
