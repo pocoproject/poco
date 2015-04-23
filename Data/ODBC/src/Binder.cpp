@@ -33,7 +33,7 @@ static void getProp(const TypeInfo& dataTypes, size_t& val)
 	Poco::DynamicAny r;
 	if (dataTypes.tryGetInfo(SQL_WVARCHAR, NM, r))
 	{
-		long sz = r.convert<std::size_t>();
+		long sz = r.convert<long>();
 		// Postgres driver returns SQL_NO_TOTAL(-4) in some cases
 		if (sz >= 0)
 			val = static_cast<size_t>(sz);
