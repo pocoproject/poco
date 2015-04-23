@@ -135,7 +135,7 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 		else throw Poco::NotImplementedException("Unsupported compression method");
 
 		// now write the header to the ostr!
-        if(fileEntry.needsZip64())
+        if (fileEntry.needsZip64())
             fileEntry.setZip64Data();
 		std::string header = fileEntry.createHeader();
 		ostr.write(header.c_str(), static_cast<std::streamsize>(header.size()));
@@ -220,14 +220,17 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 		// or fix the crc entries
 		if (_pHeader->searchCRCAndSizesAfterData())
 		{
-            if(_pHeader->needsZip64()) {
+            if (_pHeader->needsZip64()) 
+            {
 			    ZipDataInfo64 info;
 			    info.setCRC32(_crc32.checksum());
 			    info.setUncompressedSize(_bytesWritten);
 			    info.setCompressedSize(_ptrOHelper->bytesWritten());
                 extraDataSize = info.getFullHeaderSize();
 			    _pOstr->write(info.getRawHeader(), static_cast<std::streamsize>(extraDataSize));
-            } else {
+            } 
+            else 
+            {
  			    ZipDataInfo info;
 			    info.setCRC32(_crc32.checksum());
 			    info.setUncompressedSize(static_cast<Poco::UInt32>(_bytesWritten));
@@ -245,7 +248,7 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 			_pOstr->seekp(_pHeader->getStartPos(), std::ios_base::beg);
 			poco_assert (*_pOstr);
 	        _pHeader->setStartPos(_pHeader->getStartPos()); // This resets EndPos now that compressed Size is known
-            if(_pHeader->hasExtraField())   // Update sizes in header extension.
+            if (_pHeader->hasExtraField())   // Update sizes in header extension.
                 _pHeader->setZip64Data();
 			std::string header = _pHeader->createHeader();
 			_pOstr->write(header.c_str(), static_cast<std::streamsize>(header.size()));

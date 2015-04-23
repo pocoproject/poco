@@ -5,14 +5,14 @@
 //
 // Library: Zip
 // Package: Zip
-// Module:  ZipUtil
+// Module:	ZipUtil
 //
 // Definition of the ZipUtil class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// SPDX-License-Identifier:	BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 //
 
 
@@ -41,7 +41,7 @@ public:
 
 	static Poco::UInt64 get64BitValue(const char* pVal, const Poco::UInt32 pos);
 	
-    static void set16BitValue(const Poco::UInt16 val, char* pVal, const Poco::UInt32 pos);
+	static void set16BitValue(const Poco::UInt16 val, char* pVal, const Poco::UInt32 pos);
 
 	static void set32BitValue(const Poco::UInt32 val, char* pVal, const Poco::UInt32 pos);
 
@@ -81,12 +81,14 @@ inline Poco::UInt32 ZipUtil::get32BitValue(const char* pVal, const Poco::UInt32 
 		(static_cast<Poco::UInt32>((unsigned char)pVal[pos+2]) << 16) + (static_cast<Poco::UInt32>((unsigned char)pVal[pos+3]) << 24);
 }
 
+
 inline Poco::UInt64 ZipUtil::get64BitValue(const char* pVal, const Poco::UInt32 pos)
 {
 	Poco::UInt64 val = ZipUtil::get32BitValue(pVal, pos+4);
-    val = (val << 32) | ZipUtil::get32BitValue(pVal, pos);
-    return val;
+	val = (val << 32) | ZipUtil::get32BitValue(pVal, pos);
+	return val;
 }
+
 
 inline void ZipUtil::set16BitValue(const Poco::UInt16 val, char* pVal, const Poco::UInt32 pos)
 {
@@ -103,6 +105,7 @@ inline void ZipUtil::set32BitValue(const Poco::UInt32 val, char* pVal, const Poc
 	pVal[pos+3] = static_cast<char>(val>>24);
 }
 
+
 inline void ZipUtil::set64BitValue(const Poco::UInt64 val, char* pVal, const Poco::UInt32 pos)
 {
 	pVal[pos] = static_cast<char>(val);
@@ -114,6 +117,7 @@ inline void ZipUtil::set64BitValue(const Poco::UInt64 val, char* pVal, const Poc
 	pVal[pos+6] = static_cast<char>(val>>48);
 	pVal[pos+7] = static_cast<char>(val>>56);
 }
+
 
 } } // namespace Poco::Zip
 

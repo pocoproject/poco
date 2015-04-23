@@ -5,14 +5,14 @@
 //
 // Library: Zip
 // Package: Zip
-// Module:  ZipLocalFileHeader
+// Module:	ZipLocalFileHeader
 //
 // Definition of the ZipLocalFileHeader class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// SPDX-License-Identifier:	BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 //
 
 
@@ -83,7 +83,7 @@ public:
 	ZipCommon::CompressionMethod getCompressionMethod() const;
 
 	ZipCommon::CompressionLevel getCompressionLevel() const;
-	/// Returns the compression level used. Only valid when the compression method is CM_DEFLATE
+		/// Returns the compression level used. Only valid when the compression method is CM_DEFLATE
 
 	bool isEncrypted() const;
 
@@ -119,9 +119,9 @@ public:
 
 	void setFileName(const std::string& fileName, bool isDirectory);
 
-    bool needsZip64() const;
+	bool needsZip64() const;
 
-    void setZip64Data();
+	void setZip64Data();
 
 	std::string createHeader() const;
 		/// Creates a header
@@ -185,23 +185,23 @@ private:
 		EXTRA_FIELD_POS = FILE_LENGTH_POS + FILE_LENGTH_SIZE,
 		FULLHEADER_SIZE = 30,
 
-        EXTRA_DATA_TAG_SIZE = 2,
-        EXTRA_DATA_TAG_POS = 0,
-        EXTRA_DATA_SIZE_SIZE = 2,
-        EXTRA_DATA_SIZE_POS = EXTRA_DATA_TAG_POS + EXTRA_DATA_TAG_SIZE,
-        EXTRA_DATA_POS = EXTRA_DATA_SIZE_POS + EXTRA_DATA_SIZE_SIZE,
-        EXTRA_DATA_UNCOMPRESSED_SIZE_SIZE = 8,
-        EXTRA_DATA_COMPRESSED_SIZE_SIZE = 8,
-        FULLEXTRA_DATA_SIZE = 20
+		EXTRA_DATA_TAG_SIZE = 2,
+		EXTRA_DATA_TAG_POS = 0,
+		EXTRA_DATA_SIZE_SIZE = 2,
+		EXTRA_DATA_SIZE_POS = EXTRA_DATA_TAG_POS + EXTRA_DATA_TAG_SIZE,
+		EXTRA_DATA_POS = EXTRA_DATA_SIZE_POS + EXTRA_DATA_SIZE_SIZE,
+		EXTRA_DATA_UNCOMPRESSED_SIZE_SIZE = 8,
+		EXTRA_DATA_COMPRESSED_SIZE_SIZE = 8,
+		FULLEXTRA_DATA_SIZE = 20
 	};
 
-    bool           _forceZip64;
-	char           _rawHeader[FULLHEADER_SIZE];
+	bool		   _forceZip64;
+	char		   _rawHeader[FULLHEADER_SIZE];
 	std::streamoff _startPos;
 	std::streamoff _endPos;
-	std::string    _fileName;
+	std::string	   _fileName;
 	Poco::DateTime _lastModifiedAt;
-	std::string    _extraField;
+	std::string	   _extraField;
 	Poco::UInt32   _crc32;
 	Poco::UInt64   _compressedSize;
 	Poco::UInt64   _uncompressedSize;
@@ -250,23 +250,28 @@ inline void ZipLocalFileHeader::getRequiredVersion(int& major, int& minor)
 	minor = getMinorVersionNumber();
 }
 
-inline bool ZipLocalFileHeader::needsZip64() const {
-    return _forceZip64 || _startPos >= ZipCommon::ZIP64_MAGIC || _compressedSize >= ZipCommon::ZIP64_MAGIC || _uncompressedSize >= ZipCommon::ZIP64_MAGIC;
+
+inline bool ZipLocalFileHeader::needsZip64() const 
+{
+	return _forceZip64 || _startPos >= ZipCommon::ZIP64_MAGIC || _compressedSize >= ZipCommon::ZIP64_MAGIC || _uncompressedSize >= ZipCommon::ZIP64_MAGIC;
 }
 
-inline void ZipLocalFileHeader::setZip64Data() {
-    setRequiredVersion(4, 5);
-    char data[FULLEXTRA_DATA_SIZE];
-    ZipUtil::set16BitValue(ZipCommon::ZIP64_EXTRA_ID, data, EXTRA_DATA_TAG_POS);
-    Poco::UInt16 pos = EXTRA_DATA_POS;
-    ZipUtil::set64BitValue(_uncompressedSize, data, pos); pos += 8;
+
+inline void ZipLocalFileHeader::setZip64Data() 
+{
+	setRequiredVersion(4, 5);
+	char data[FULLEXTRA_DATA_SIZE];
+	ZipUtil::set16BitValue(ZipCommon::ZIP64_EXTRA_ID, data, EXTRA_DATA_TAG_POS);
+	Poco::UInt16 pos = EXTRA_DATA_POS;
+	ZipUtil::set64BitValue(_uncompressedSize, data, pos); pos += 8;
 	ZipUtil::set32BitValue(ZipCommon::ZIP64_MAGIC, _rawHeader, UNCOMPRESSED_SIZE_POS);
-    ZipUtil::set64BitValue(_compressedSize, data, pos); pos += 8;
+	ZipUtil::set64BitValue(_compressedSize, data, pos); pos += 8;
 	ZipUtil::set32BitValue(ZipCommon::ZIP64_MAGIC, _rawHeader, COMPRESSED_SIZE_POS);
-    ZipUtil::set16BitValue(pos - EXTRA_DATA_POS, data, EXTRA_DATA_SIZE_POS);
-    _extraField = std::string(data, pos);
-    ZipUtil::set16BitValue(pos, _rawHeader, EXTRA_FIELD_POS);
+	ZipUtil::set16BitValue(pos - EXTRA_DATA_POS, data, EXTRA_DATA_SIZE_POS);
+	_extraField = std::string(data, pos);
+	ZipUtil::set16BitValue(pos, _rawHeader, EXTRA_FIELD_POS);
 }
+
 
 inline void ZipLocalFileHeader::setRequiredVersion(int major, int minor)
 {

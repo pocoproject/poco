@@ -5,14 +5,14 @@
 //
 // Library: Zip
 // Package: Zip
-// Module:  ZipFileInfo
+// Module:	ZipFileInfo
 //
 // Definition of the ZipFileInfo class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// SPDX-License-Identifier:	BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 //
 
 
@@ -96,15 +96,15 @@ public:
 
 	void setOffset(Poco::UInt64 val);
 
-    bool needsZip64() const;
+	bool needsZip64() const;
 
-    void setZip64Data();
+	void setZip64Data();
 
 private:
 
 	void setCRC(Poco::UInt32 val);
 
-    void setCompressedSize(Poco::UInt64 val);
+	void setCompressedSize(Poco::UInt64 val);
 
 	void setUncompressedSize(Poco::UInt64 val);
 
@@ -186,15 +186,15 @@ private:
 		RELATIVEOFFSETLOCALHEADER_SIZE = 4,
 		FULLHEADER_SIZE = 46,
 
-        EXTRA_DATA_TAG_SIZE = 2,
-        EXTRA_DATA_TAG_POS = 0,
-        EXTRA_DATA_SIZE_SIZE = 2,
-        EXTRA_DATA_SIZE_POS = EXTRA_DATA_TAG_POS + EXTRA_DATA_TAG_SIZE,
-        EXTRA_DATA_POS = EXTRA_DATA_SIZE_POS + EXTRA_DATA_SIZE_SIZE,
-        EXTRA_DATA_UNCOMPRESSED_SIZE_SIZE = 8,
-        EXTRA_DATA_COMPRESSED_SIZE_SIZE = 8,
-        EXTRA_DATA_OFFSET_SIZE = 8,
-        FULLEXTRA_DATA_SIZE = 28
+		EXTRA_DATA_TAG_SIZE = 2,
+		EXTRA_DATA_TAG_POS = 0,
+		EXTRA_DATA_SIZE_SIZE = 2,
+		EXTRA_DATA_SIZE_POS = EXTRA_DATA_TAG_POS + EXTRA_DATA_TAG_SIZE,
+		EXTRA_DATA_POS = EXTRA_DATA_SIZE_POS + EXTRA_DATA_SIZE_SIZE,
+		EXTRA_DATA_UNCOMPRESSED_SIZE_SIZE = 8,
+		EXTRA_DATA_COMPRESSED_SIZE_SIZE = 8,
+		EXTRA_DATA_OFFSET_SIZE = 8,
+		FULLEXTRA_DATA_SIZE = 28
 	};
 	
 	enum 
@@ -203,15 +203,15 @@ private:
 		DEFAULT_UNIX_DIR_MODE  = 0755
 	};
 
-	char           _rawInfo[FULLHEADER_SIZE];
+	char		   _rawInfo[FULLHEADER_SIZE];
 	Poco::UInt32   _crc32;
 	Poco::UInt64   _compressedSize;
 	Poco::UInt64   _uncompressedSize;
 	Poco::UInt64   _localHeaderOffset;
-	std::string    _fileName;
+	std::string	   _fileName;
 	Poco::DateTime _lastModifiedAt;
-	std::string    _extraField;
-	std::string    _fileComment;
+	std::string	   _extraField;
+	std::string	   _fileComment;
 };
 
 
@@ -263,10 +263,12 @@ inline const Poco::DateTime& ZipFileInfo::lastModifiedAt() const
 	return _lastModifiedAt;
 }
 
+
 inline Poco::UInt64 ZipFileInfo::getOffset() const
 {
 	return _localHeaderOffset;
 }
+
 
 inline Poco::UInt32 ZipFileInfo::getCRC() const
 {
@@ -384,30 +386,39 @@ inline Poco::UInt32 ZipFileInfo::getHeaderSize() const
 	return FULLHEADER_SIZE + getFileNameLength() + getExtraFieldLength() + getFileCommentLength();
 }
 
-inline bool ZipFileInfo::needsZip64() const {
-    return _localHeaderOffset >= ZipCommon::ZIP64_MAGIC || _compressedSize >= ZipCommon::ZIP64_MAGIC || _uncompressedSize >= ZipCommon::ZIP64_MAGIC;
+
+inline bool ZipFileInfo::needsZip64() const 
+{
+	return _localHeaderOffset >= ZipCommon::ZIP64_MAGIC || _compressedSize >= ZipCommon::ZIP64_MAGIC || _uncompressedSize >= ZipCommon::ZIP64_MAGIC;
 }
 
-inline void ZipFileInfo::setZip64Data() {
-    if(needsZip64()) {
-        setRequiredVersion(4, 5);
-        char data[FULLEXTRA_DATA_SIZE];
-        ZipUtil::set16BitValue(ZipCommon::ZIP64_EXTRA_ID, data, EXTRA_DATA_TAG_POS);
-        Poco::UInt16 pos = EXTRA_DATA_POS;
-        if(_uncompressedSize >= ZipCommon::ZIP64_MAGIC) {
-            ZipUtil::set64BitValue(_uncompressedSize, data, pos); pos += 8;
-        }
-        if(_compressedSize >= ZipCommon::ZIP64_MAGIC) {
-            ZipUtil::set64BitValue(_compressedSize, data, pos); pos += 8;
-        }
-        if(_localHeaderOffset >= ZipCommon::ZIP64_MAGIC) {
-            ZipUtil::set64BitValue(_localHeaderOffset, data, pos); pos += 8;
-        }
-        ZipUtil::set16BitValue(pos - EXTRA_DATA_POS, data, EXTRA_DATA_SIZE_POS);
-        _extraField = std::string(data, pos);
-        ZipUtil::set16BitValue(pos, _rawInfo, EXTRAFIELD_LENGTH_POS);
-    }  
+
+inline void ZipFileInfo::setZip64Data() 
+{
+	if (needsZip64()) 
+	{
+		setRequiredVersion(4, 5);
+		char data[FULLEXTRA_DATA_SIZE];
+		ZipUtil::set16BitValue(ZipCommon::ZIP64_EXTRA_ID, data, EXTRA_DATA_TAG_POS);
+		Poco::UInt16 pos = EXTRA_DATA_POS;
+		if (_uncompressedSize >= ZipCommon::ZIP64_MAGIC) 
+		{
+			ZipUtil::set64BitValue(_uncompressedSize, data, pos); pos += 8;
+		}
+		if (_compressedSize >= ZipCommon::ZIP64_MAGIC) 
+		{
+			ZipUtil::set64BitValue(_compressedSize, data, pos); pos += 8;
+		}
+		if (_localHeaderOffset >= ZipCommon::ZIP64_MAGIC) 
+		{
+			ZipUtil::set64BitValue(_localHeaderOffset, data, pos); pos += 8;
+		}
+		ZipUtil::set16BitValue(pos - EXTRA_DATA_POS, data, EXTRA_DATA_SIZE_POS);
+		_extraField = std::string(data, pos);
+		ZipUtil::set16BitValue(pos, _rawInfo, EXTRAFIELD_LENGTH_POS);
+	}  
 }
+
 
 inline void ZipFileInfo::setCRC(Poco::UInt32 val)
 {
@@ -418,7 +429,7 @@ inline void ZipFileInfo::setCRC(Poco::UInt32 val)
 
 inline void ZipFileInfo::setOffset(Poco::UInt64 val)
 {
-    _localHeaderOffset = val;
+	_localHeaderOffset = val;
 	ZipUtil::set32BitValue(val >= ZipCommon::ZIP64_MAGIC ? ZipCommon::ZIP64_MAGIC : static_cast<Poco::UInt32>(val), _rawInfo, RELATIVEOFFSETLOCALHEADER_POS);
 }
 

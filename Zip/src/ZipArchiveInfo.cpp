@@ -5,12 +5,12 @@
 //
 // Library: Zip
 // Package: Zip
-// Module:  ZipArchiveInfo
+// Module:	ZipArchiveInfo
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// SPDX-License-Identifier:	BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 //
 
 
@@ -37,6 +37,7 @@ ZipArchiveInfo::ZipArchiveInfo(std::istream& in, bool assumeHeaderRead):
 		_startPos -= ZipCommon::HEADER_SIZE;
 	parse(in, assumeHeaderRead);
 }
+
 
 ZipArchiveInfo::ZipArchiveInfo():
 	_rawInfo(),
@@ -111,16 +112,17 @@ ZipArchiveInfo64::ZipArchiveInfo64(std::istream& in, bool assumeHeaderRead):
 	parse(in, assumeHeaderRead);
 }
 
+
 ZipArchiveInfo64::ZipArchiveInfo64():
 	_rawInfo(),
 	_startPos(0)
 {
 	std::memset(_rawInfo, 0, FULL_HEADER_SIZE);
 	std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
-    ZipUtil::set64BitValue(FULL_HEADER_SIZE - (RECORDSIZE_POS + RECORDSIZE_SIZE), _rawInfo, RECORDSIZE_POS);
+	ZipUtil::set64BitValue(FULL_HEADER_SIZE - (RECORDSIZE_POS + RECORDSIZE_SIZE), _rawInfo, RECORDSIZE_POS);
 	std::memset(_locInfo, 0, FULL_LOCATOR_SIZE);
 	std::memcpy(_locInfo, LOCATOR_HEADER, ZipCommon::HEADER_SIZE);
-    setRequiredVersion(4, 5);
+	setRequiredVersion(4, 5);
 }
 
 
@@ -143,21 +145,24 @@ void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)
 	std::memset(_rawInfo + ZipCommon::HEADER_SIZE, 0, FULL_HEADER_SIZE - ZipCommon::HEADER_SIZE);
 
 	// read the rest of the header
-    Poco::UInt64 offset = RECORDSIZE_POS;
+	Poco::UInt64 offset = RECORDSIZE_POS;
 	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, RECORDSIZE_SIZE);
-    offset += RECORDSIZE_SIZE;
-    Poco::UInt64 len = ZipUtil::get64BitValue(_rawInfo, RECORDSIZE_POS);
-    if(len <= FULL_HEADER_SIZE - offset) {
-	    inp.read(_rawInfo + offset, len);
-        ZipUtil::set64BitValue(FULL_HEADER_SIZE - offset, _rawInfo, RECORDSIZE_POS);
-    } else {
-	    inp.read(_rawInfo + offset, FULL_HEADER_SIZE - offset);
-        len -= (FULL_HEADER_SIZE - offset);
-	    Poco::Buffer<char> xtra(len);
-	    inp.read(xtra.begin(), len);
-	    _extraField = std::string(xtra.begin(), len);
-        ZipUtil::set64BitValue(FULL_HEADER_SIZE + len - offset, _rawInfo, RECORDSIZE_POS);
-    }
+	offset += RECORDSIZE_SIZE;
+	Poco::UInt64 len = ZipUtil::get64BitValue(_rawInfo, RECORDSIZE_POS);
+	if (len <= FULL_HEADER_SIZE - offset) 
+	{
+		inp.read(_rawInfo + offset, len);
+		ZipUtil::set64BitValue(FULL_HEADER_SIZE - offset, _rawInfo, RECORDSIZE_POS);
+	} 
+	else 
+	{
+		inp.read(_rawInfo + offset, FULL_HEADER_SIZE - offset);
+		len -= (FULL_HEADER_SIZE - offset);
+		Poco::Buffer<char> xtra(len);
+		inp.read(xtra.begin(), len);
+		_extraField = std::string(xtra.begin(), len);
+		ZipUtil::set64BitValue(FULL_HEADER_SIZE + len - offset, _rawInfo, RECORDSIZE_POS);
+	}
 	inp.read(_locInfo, FULL_LOCATOR_SIZE);
 	poco_assert (std::memcmp(_locInfo, LOCATOR_HEADER, ZipCommon::HEADER_SIZE) == 0);
 }
@@ -170,5 +175,6 @@ std::string ZipArchiveInfo64::createHeader() const
 	result.append(_locInfo, FULL_LOCATOR_SIZE);
 	return result;
 }
+
 
 } } // namespace Poco::Zip
