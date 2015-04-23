@@ -168,7 +168,7 @@ void ZipTest::testDecompressFlat()
 
 void ZipTest::verifyDataFile(const std::string& path, Poco::UInt64 size) 
 {
-	std::ifstream in(path, std::ios::binary);
+	std::ifstream in(path.c_str(), std::ios::binary);
 	assert( ! in.fail() );
 	Poco::Buffer<char> buffer1(MB);
 	Poco::Buffer<char> buffer2(MB);
