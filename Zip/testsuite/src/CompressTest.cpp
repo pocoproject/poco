@@ -144,7 +144,7 @@ void CompressTest::createDataFile(const std::string& path, Poco::UInt64 size)
 	Poco::Buffer<char> buffer(MB);
 	for(int i = 0; size != 0; i++) {
 		std::memset(buffer.begin(), i, buffer.size());
-		Poco::UInt64 bytesToWrite = std::min(size, buffer.size());
+		Poco::UInt64 bytesToWrite = std::min(size, static_cast<Poco::UInt64>(buffer.size()));
 		out.write(buffer.begin(), bytesToWrite);
 		assert( ! out.fail() );
 		size -= bytesToWrite;

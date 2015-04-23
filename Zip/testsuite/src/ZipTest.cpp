@@ -176,10 +176,10 @@ void ZipTest::verifyDataFile(const std::string& path, Poco::UInt64 size)
 	{
 		std::memset(buffer1.begin(), i, buffer1.size());
 		std::memset(buffer2.begin(), 0, buffer2.size());
-		Poco::UInt64 bytesToRead = std::min(size, buffer2.size());
+		Poco::UInt64 bytesToRead = std::min(size, static_cast<Poco::UInt64>(buffer2.size()));
 		in.read(buffer2.begin(), bytesToRead);
 		assert(!in.fail() );
-		assert(std::memcmp(buffer1.begin(), buffer2.begin(), bytesToRead) == 0);
+		assert(std::memcmp(buffer1.begin(), buffer2.begin(), static_cast<std::size_t>(bytesToRead)) == 0);
 		size -= bytesToRead;
 	}
 	char c;
