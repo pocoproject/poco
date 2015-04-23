@@ -200,6 +200,8 @@ Row& RecordSet::row(std::size_t pos)
 
 std::size_t RecordSet::rowCount() const
 {
+	if (0 == extractions().size() && 0 == columnsExtracted())
+		return 0;
 	poco_assert (extractions().size());
 	std::size_t rc = subTotalRowCount();
 	if (!isFiltered()) return rc;

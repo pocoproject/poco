@@ -21,6 +21,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -63,9 +64,10 @@ static std::string db2Driver()
 # endif
 }
 
-#define DB2_DSN ""
-#define DB2_ALIAS "NT043005"
-#define DB2_DB "TEMPDB"
+# define DB2_SERVER "visadb28"
+# define DB2_DBINST "v10schm4"
+# define DB2_DB "MSTK_TEST"
+# define DB2_PORT "7395"
 #define DB2_UID ""
 #define DB2_PWD ""
 #endif
@@ -73,21 +75,23 @@ static std::string db2Driver()
 ODBCTest::SessionPtr ODBCDB2Test::_pSession;
 ODBCTest::ExecPtr    ODBCDB2Test::_pExecutor;
 std::string          ODBCDB2Test::_driver = db2Driver();
-std::string          ODBCDB2Test::_dsn = DB2_DSN;
+std::string          ODBCDB2Test::_dsn = "nytd_mstktest_v95_v10";
 std::string          ODBCDB2Test::_uid = DB2_UID;
 std::string          ODBCDB2Test::_pwd = DB2_PWD;
-#if 0
-std::string          ODBCDB2Test::_connectString = "Driver=" DB2_ODBC_DRIVER ";"
-	"Database=" DB2_DB ";"
+#if 1
+std::string          ODBCDB2Test::_connectString = "Driver=" + db2Driver() + ";"
+	"Database=" DB2_DBINST ";"
 	"Hostname=" DB2_SERVER ";"
 	"Port=" DB2_PORT ";"
+	"CurrentSchema=" DB2_DB ";"
 	"Protocol=TCPIP;"
 	"Uid=" DB2_UID ";"
 	"Pwd=" DB2_PWD ";";
 #else
 std::string          ODBCDB2Test::_connectString = "Driver=" + db2Driver() +
+";" "DSN=" DB2_DSN
 ";" "DBALIAS=" DB2_ALIAS
-";" "CurrentSchema=" "TEMPDB"
+";" "CurrentSchema=" DB2_DB
 ";" "Uid=" DB2_UID 
 ";" "Pwd=" DB2_PWD
 ;
@@ -207,8 +211,8 @@ void ODBCDB2Test::testStoredProcedure()
 			"END" , now;
 
 		int i = 0;
-        	session() << "{call " DB2_DB "." << nm << "(?)}", out(i), now;
-			dropObject("PROCEDURE", nm + "(INTEGER)");
+		session() << "{call " DB2_DB "." << nm << "(?)}", out(i), now;
+		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(-1 == i);
 
 		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER, OUT outParam INTEGER) "
@@ -218,8 +222,8 @@ void ODBCDB2Test::testStoredProcedure()
 		
 		i = 2;
 		int j = 0;
-        	session() << "{call " DB2_DB "." << nm << "(?, ?)}", in(i), out(j), now;
-			dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
+		session() << "{call " DB2_DB "." << nm << "(?, ?)}", in(i), out(j), now;
+		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == j);
 	
 		session() << "CREATE PROCEDURE " << nm << "(INOUT ioParam INTEGER) "
@@ -228,8 +232,8 @@ void ODBCDB2Test::testStoredProcedure()
 			"END" , now;
 
 		i = 2;
-        	session() << "{call " DB2_DB "." << nm << "(?)}", io(i), now;
-			dropObject("PROCEDURE", nm + "(INTEGER)");
+		session() << "{call " DB2_DB "." << nm << "(?)}", io(i), now;
+		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(4 == i);
 
 		//TIMESTAMP is not supported as stored procedure parameter in DB2
@@ -352,7 +356,23 @@ void ODBCDB2Test::testStoredFunction()
 	for (int k = 0; k < 8;)
 	{
 		session().setFeature("autoBind", bindValue(k));
-		session().setFeature("autoExtract", bindValue(k+1));
+		session().setFeature("autoExtract", bindValue(k + 1));
+
+		{
+			session() << "CREATE PROCEDURE " << nm << "() "
+				"BEGIN "
+				" DECLARE C1 CURSOR FOR select * from sysibm.sysdummy1 where 1=2;"
+				" OPEN C1;"
+				"  RETURN;"
+				"END", now;
+
+			Poco::Data::Statement stat(session());
+			stat << "{ call " DB2_DB "." << nm << "()}", now;
+			Poco::Data::RecordSet rs(stat);
+
+			assert(0 == rs.rowCount());
+			dropObject("PROCEDURE", nm + "()");
+		}
 
 		session() << "CREATE PROCEDURE " << nm << "() "
 			"BEGIN "
@@ -363,7 +383,8 @@ void ODBCDB2Test::testStoredFunction()
 		session() << "{? = call " DB2_DB "." << nm << "()}", out(i), now;
 		dropObject("PROCEDURE", nm + "()");
 		assert(-1 == i);
-		
+
+
 		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER) "
 			"BEGIN "
 			" RETURN inParam*inParam; "
@@ -469,6 +490,17 @@ void ODBCDB2Test::recreateNullableTable()
 	try { session() << "CREATE TABLE " << ExecUtil::nullabletest() << " (EmptyString VARCHAR(30), EmptyInteger INTEGER , EmptyFloat FLOAT , EmptyDateTime TIMESTAMP)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
+}
+
+void ODBCDB2Test::recreateNumericTable()
+{
+	dropObject("TABLE", ExecUtil::numeric_tbl());
+	try {
+		session() << "CREATE TABLE " << ExecUtil::numeric_tbl() <<
+			" (id integer, num8 NUMERIC(8), num16_3 NUMERIC(16,3), num18 NUMERIC(18), num22 NUMERIC(22))", now;
+	}
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateNumericTable()"); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateNumericTable()"); }
 }
 
 
@@ -715,6 +747,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTransactor);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNullable);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testReconnect);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testNumeric);
 
 		ODBCDB2Test::_pExecutor = 0;
 		ODBCDB2Test::_pSession = 0;

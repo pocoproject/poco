@@ -141,6 +141,11 @@ struct ExecUtil
   {
 	return mangleTable("Test");
   }
+
+	static std::string numeric_tbl()
+	{
+		return mangleTable("numer_t");
+	}
 };
 
 
@@ -216,6 +221,7 @@ public:
 	void limitPrepare();
 	void limitZero();
 	void prepare();
+	void numericTypes(const std::vector<std::string>& vals);
 
 	template <typename C1, typename C2, typename C3, typename C4, typename C5, typename C6>
 	void doBulkWithBool(Poco::UInt32 size, const std::string& blobPlaceholder="?")

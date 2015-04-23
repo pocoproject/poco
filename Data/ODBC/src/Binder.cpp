@@ -27,11 +27,24 @@ namespace Poco {
 namespace Data {
 namespace ODBC {
 
+static void getProp(const TypeInfo& dataTypes, size_t& val)
+{
+	const std::string NM("COLUMN_SIZE");
+	Poco::DynamicAny r;
+	if (dataTypes.tryGetInfo(SQL_WVARCHAR, NM, r))
+	{
+		long sz = r.convert<long>();
+		// Postgres driver returns SQL_NO_TOTAL(-4) in some cases
+		if (sz >= 0)
+			val = static_cast<size_t>(sz);
+	}
+}
 
 Binder::Binder(const StatementHandle& rStmt,
 	std::size_t maxFieldSize,
 	Binder::ParameterBinding dataBinding,
-	TypeInfo* pDataTypes):
+	TypeInfo* pDataTypes,
+  bool numericToString) :
 	_rStmt(rStmt),
 	_paramBinding(dataBinding),
 	_pTypeInfo(pDataTypes),
@@ -39,18 +52,12 @@ Binder::Binder(const StatementHandle& rStmt,
 	_maxFieldSize(maxFieldSize),
 	_maxCharColLength(1024),
 	_maxWCharColLength(1024),
-	_maxVarBinColSize(1024)
+	_maxVarBinColSize(1024),
+	_numericToString(numericToString)
 {
-	const std::string NM("COLUMN_SIZE");
-	Poco::DynamicAny r;
-	if (_pTypeInfo->tryGetInfo(SQL_WVARCHAR, NM, r))
-		_maxWCharColLength = r.convert<std::size_t>();
-
-	if (_pTypeInfo->tryGetInfo(SQL_VARCHAR, NM, r))
-		_maxCharColLength = r.convert<std::size_t>();
-
-	if (_pTypeInfo->tryGetInfo(SQL_VARBINARY, NM, r))
-		_maxVarBinColSize = r.convert<std::size_t>();
+	getProp(*_pTypeInfo, _maxWCharColLength);
+	getProp(*_pTypeInfo, _maxCharColLength);
+	getProp(*_pTypeInfo, _maxVarBinColSize);
 }
 
 
@@ -474,7 +481,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 
 	try
 	{
-		ODBCMetaColumn c(_rStmt, pos);
+		ODBCMetaColumn c(_rStmt, pos, _numericToString);
 		colSize = (SQLINTEGER) c.length();
 		decDigits = (SQLSMALLINT) c.precision();
 		return;
@@ -495,7 +502,7 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 
 	try
 	{
-		ODBCMetaColumn col(_rStmt, pos);
+		ODBCMetaColumn col(_rStmt, pos, _numericToString);
 		colSize = col.length();
 	}
 	catch (StatementException&) { }
