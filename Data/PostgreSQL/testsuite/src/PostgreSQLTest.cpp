@@ -175,7 +175,7 @@ void PostgreSQLTest::testPostgreSQLOIDs()
 		"intcol				int,"
 		"int4col			int4,"
 		"jsoncol			json,"
-		"jsonbcol			jsonb,"
+//		"jsonbcol			jsonb,"  // requires 9.4
 		"linecol			line,"
 		"lsegcol			lseg,"
 		"macaddrcol			macaddr,"
@@ -183,7 +183,7 @@ void PostgreSQLTest::testPostgreSQLOIDs()
 		"numericcol			numeric(12,3),"
 		"decimalcol			decimal(12,4),"
 		"pathcol			path,"
-		"pglencol			pg_lsn,"
+//		"pglencol			pg_lsn,"  // requires 9.4
 		"pointcol			point,"
 		"polygoncol			polygon,"
 		"realcol			real,"
@@ -247,7 +247,7 @@ void PostgreSQLTest::testPostgreSQLOIDs()
 		23,
 		23,
 		114,
-		3802,
+//		3802,   // requires 9.4
 		628,
 		601,
 		829,
@@ -255,7 +255,7 @@ void PostgreSQLTest::testPostgreSQLOIDs()
 		1700,
 		1700,
 		602,
-		3220,
+//		3220,
 		600,
 		604,
 		700,
