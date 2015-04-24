@@ -83,6 +83,12 @@ void HTTPSessionFactory::unregisterProtocol(const std::string& protocol)
 }
 
 
+bool HTTPSessionFactory::isRegistered(const std::string& protocol)
+{
+	return _instantiators.find(protocol) != _instantiators.end();
+}
+
+
 bool HTTPSessionFactory::supportsProtocol(const std::string& protocol)
 {
 	FastMutex::ScopedLock lock(_mutex);

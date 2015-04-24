@@ -72,22 +72,36 @@ class Net_API HTTPClient
 	/// set up a session through a proxy.
 {
 public:
+	// TODO: make this SharedPtr and either (a) disable owning in 
+	// HTTPSessionFactory or (b) convert the HTTPSessionFactory interface 
+	// and internals to SharedPtr as well
+	typedef HTTPSessionInstantiator* InstantiatorPtr;
 
 	mutable Poco::BasicEvent<HTTPEventArgs> httpResponse;
 	mutable Poco::BasicEvent<HTTPEventArgs> httpException;
 	mutable Poco::BasicEvent<HTTPEventArgs> httpError;
 
-	explicit HTTPClient(const URI& uri);
+	explicit HTTPClient(const URI& uri,
+		InstantiatorPtr pInstantiator = new HTTPSessionInstantiator,
+		bool redirect = true);
 		/// Creates a HTTPClient using the given URI.
 
-	explicit HTTPClient(const SocketAddress& address);
+	explicit HTTPClient(const SocketAddress& address,
+		InstantiatorPtr pInstantiator = new HTTPSessionInstantiator,
+		bool redirect = true);
 		/// Creates a HTTPClient using the given address.
 
-	HTTPClient(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
+	HTTPClient(const std::string& host,
+		Poco::UInt16 port = HTTPSession::HTTP_PORT,
+		InstantiatorPtr pInstantiator = new HTTPSessionInstantiator,
+		bool redirect = true);
 		/// Creates a HTTPClient using the given host and port.
 
 	HTTPClient(const std::string& host,
-		Poco::UInt16 port, const HTTPClientSession::ProxyConfig& proxyConfig);
+		Poco::UInt16 port,
+		const HTTPClientSession::ProxyConfig& proxyConfig,
+		InstantiatorPtr pInstantiator = new HTTPSessionInstantiator,
+		bool redirect = true);
 		/// Creates a HTTPClient using the given host, port and proxy configuration.
 
 	~HTTPClient();
@@ -243,6 +257,15 @@ public:
 
 protected:
 	void runActivity();
+	void redirect(HTTPRequest& req,
+		const std::string& newURI, HTTPResponse::HTTPStatus status);
+
+	HTTPSessionFactory _factory;
+	InstantiatorPtr    _pInstantiator;
+	InstantiatorPtr    _pSecureInstantiator;
+	HTTPClientSession* _pSession;
+	bool               _redirect;
+	bool               _redirectHTTPS;
 
 private:
 	typedef std::deque<SharedPtr<HTTPRequest> > RequestQueue;
@@ -254,9 +277,6 @@ private:
 	void wakeUp();
 	void clearQueue();
 
-	HTTPSessionFactory       _factory;
-	HTTPSessionInstantiator* _pInstantiator;
-	HTTPClientSession*       _pSession;
 	RequestQueue             _requestQueue;
 	RequestBodyMap           _requestBodyMap;
 	Activity<HTTPClient>     _activity;

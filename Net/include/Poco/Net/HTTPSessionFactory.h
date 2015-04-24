@@ -72,6 +72,9 @@ public:
 		/// Throws a NotFoundException if no instantiator has been registered
 		/// for the given protocol.
 
+	bool isRegistered(const std::string& protocol);
+		/// Returns true if protocol is registered, false otherwise.
+
 	bool supportsProtocol(const std::string& protocol);
 		/// Returns true if a session instantiator for the given protocol has been registered.
 

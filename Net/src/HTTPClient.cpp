@@ -31,14 +31,18 @@ namespace Poco {
 namespace Net {
 
 
-HTTPClient::HTTPClient(const URI& uri):
-	_pInstantiator(0),
-	_pSession(0),
-	_activity(this, &HTTPClient::runActivity),
-	_pThread(0),
-	_requestsInProcess(0)
+HTTPClient::HTTPClient(const URI& uri,
+	InstantiatorPtr pInstantiator,
+	bool redirect):
+		_pInstantiator(pInstantiator),
+		_pSecureInstantiator(0),
+		_pSession(0),
+		_redirect(redirect),
+		_redirectHTTPS(false),
+		_activity(this, &HTTPClient::runActivity),
+		_pThread(0),
+		_requestsInProcess(0)
 {
-	_pInstantiator = new HTTPSessionInstantiator;
 	_factory.registerProtocol("http", _pInstantiator);
 	_pSession = _factory.createClientSession(uri);
 	poco_check_ptr(_pSession);
@@ -46,14 +50,18 @@ HTTPClient::HTTPClient(const URI& uri):
 }
 
 
-HTTPClient::HTTPClient(const SocketAddress& address):
-	_pInstantiator(0),
-	_pSession(0),
-	_activity(this, &HTTPClient::runActivity),
-	_pThread(0),
-	_requestsInProcess(0)
+HTTPClient::HTTPClient(const SocketAddress& address,
+	InstantiatorPtr pInstantiator,
+	bool redirect):
+		_pInstantiator(pInstantiator),
+		_pSecureInstantiator(0),
+		_pSession(0),
+		_redirect(redirect),
+		_redirectHTTPS(false),
+		_activity(this, &HTTPClient::runActivity),
+		_pThread(0),
+		_requestsInProcess(0)
 {
-	_pInstantiator = new HTTPSessionInstantiator;
 	_factory.registerProtocol("http", _pInstantiator);
 	URI uri(std::string("http://").append(address.toString()));
 	_pSession = _factory.createClientSession(uri);
@@ -62,14 +70,19 @@ HTTPClient::HTTPClient(const SocketAddress& address):
 }
 
 
-HTTPClient::HTTPClient(const std::string& host, Poco::UInt16 port):
-	_pInstantiator(0),
-	_pSession(0),
-	_activity(this, &HTTPClient::runActivity),
-	_pThread(0),
-	_requestsInProcess(0)
+HTTPClient::HTTPClient(const std::string& host,
+	Poco::UInt16 port,
+	InstantiatorPtr pInstantiator,
+	bool redirect):
+		_pInstantiator(pInstantiator),
+		_pSecureInstantiator(0),
+		_pSession(0),
+		_redirect(redirect),
+		_redirectHTTPS(false),
+		_activity(this, &HTTPClient::runActivity),
+		_pThread(0),
+		_requestsInProcess(0)
 {
-	_pInstantiator = new HTTPSessionInstantiator;
 	_factory.registerProtocol("http", _pInstantiator);
 	URI uri(std::string("http://").append(host).append(1, ':').append(NumberFormatter::format(port)));
 	_pSession = _factory.createClientSession(uri);
@@ -78,14 +91,20 @@ HTTPClient::HTTPClient(const std::string& host, Poco::UInt16 port):
 }
 
 
-HTTPClient::HTTPClient(const std::string& host, Poco::UInt16 port, const HTTPClientSession::ProxyConfig& proxyConfig) :
-	_pInstantiator(0),
-	_pSession(0),
-	_activity(this, &HTTPClient::runActivity),
-	_pThread(0),
-	_requestsInProcess(0)
+HTTPClient::HTTPClient(const std::string& host,
+	Poco::UInt16 port,
+	const HTTPClientSession::ProxyConfig& proxyConfig,
+	InstantiatorPtr pInstantiator,
+	bool redirect) :
+		_pInstantiator(pInstantiator),
+		_pSecureInstantiator(0),
+		_pSession(0),
+		_redirect(redirect),
+		_redirectHTTPS(false),
+		_activity(this, &HTTPClient::runActivity),
+		_pThread(0),
+		_requestsInProcess(0)
 {
-	_pInstantiator = new HTTPSessionInstantiator;
 	_factory.registerProtocol("http", _pInstantiator);
 	URI uri(std::string("http://").append(host).append(1, ':').append(NumberFormatter::format(port)));
 	_factory.setProxy(proxyConfig.host, proxyConfig.port);
@@ -154,19 +173,35 @@ void HTTPClient::runActivity()
 						status == HTTPResponse::HTTP_SEE_OTHER)
 					{
 						URI newURI(response.get("Location"));
-						if (newURI.getScheme() == "http")
+						std::string scheme = newURI.getScheme();
+						if (((scheme == "http") && _pSession->secure()) ||
+							((scheme == "https") && !_pSession->secure()))
 						{
-							req.setURI(newURI.toString());
-							if (status == HTTPResponse::HTTP_SEE_OTHER &&
-								req.getMethod() != HTTPRequest::HTTP_GET)
+							if (!_factory.isRegistered(scheme))
 							{
-								req.setMethod(HTTPRequest::HTTP_GET);
+								if (scheme == "http")
+								{
+									if (!_factory.isRegistered(scheme))
+										_factory.registerProtocol(scheme, _pInstantiator);
+								}
+								else if (scheme == "https")
+								{
+									if (_pSecureInstantiator)
+									{
+										if (!_factory.isRegistered(scheme))
+											_factory.registerProtocol(scheme, _pSecureInstantiator);
+									}
+									else
+										throw NullPointerException("Unable to redirect to https, "
+											"instantiator not available.");
+								}
 							}
+
+							delete _pSession;
+							_pSession = _factory.createClientSession(newURI);
+							poco_check_ptr(_pSession);
 						}
-						else if (newURI.getScheme() == "https")
-						{
-							//TODO
-						}
+						redirect(req, newURI.toString(), status);
 					}
 
 					std::ostream& os = _pSession->sendRequest(req);
@@ -178,7 +213,7 @@ void HTTPClient::runActivity()
 					std::istream& rs = _pSession->receiveResponse(response);
 					pRS = &rs;
 				}
-				while (response.getStatus() == HTTPResponse::HTTP_FOUND);
+				while (_redirect && response.getStatus() == HTTPResponse::HTTP_FOUND);
 
 				l.unlock();
 				StreamCopier::copyStream(*pRS, ostr);
@@ -199,6 +234,18 @@ void HTTPClient::runActivity()
 
 		Thread::trySleep(100);
     }
+}
+
+
+void HTTPClient::redirect(HTTPRequest& req,
+	const std::string& newURI, HTTPResponse::HTTPStatus status)
+{
+	req.setURI(newURI);
+	if (status == HTTPResponse::HTTP_SEE_OTHER &&
+		req.getMethod() != HTTPRequest::HTTP_GET)
+	{
+		req.setMethod(HTTPRequest::HTTP_GET);
+	}
 }
 
 
