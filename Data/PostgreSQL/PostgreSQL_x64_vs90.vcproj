@@ -562,6 +562,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Poco\Data\PostgreSQL\PostgreSQLTypes.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Poco\Data\PostgreSQL\SessionHandle.h"
 				>
 			</File>
