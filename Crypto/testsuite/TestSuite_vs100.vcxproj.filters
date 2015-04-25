@@ -2,28 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Crypto">
-      <UniqueIdentifier>{a69f4db9-5c44-40a1-8c7a-0efcf8213fe3}</UniqueIdentifier>
+      <UniqueIdentifier>{4229c8b4-dab3-456a-b65d-24bad02d9ed2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Crypto\Header Files">
-      <UniqueIdentifier>{4d07af33-7e00-40c8-8890-babbbe03cbdb}</UniqueIdentifier>
+      <UniqueIdentifier>{8c74d7a3-9105-4ab6-af78-302b8d8f005c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Crypto\Source Files">
-      <UniqueIdentifier>{c8ea5a73-ef67-479b-9e07-1b1a30c945a9}</UniqueIdentifier>
+      <UniqueIdentifier>{0718e8c5-31b8-4551-8e1c-4250b10883f6}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{00cf1dde-1f72-4ee5-95fc-a23958af8311}</UniqueIdentifier>
+      <UniqueIdentifier>{3eabc9db-5a2a-4d32-97e5-7b75ba34e117}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{93153940-b3b2-40c5-9fb5-65b999c9575f}</UniqueIdentifier>
+      <UniqueIdentifier>{d451dc3b-6dff-47fe-8ffb-2f3a05e62e1e}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{8e155842-0d99-44a6-97dd-05ac49fe1fd9}</UniqueIdentifier>
+      <UniqueIdentifier>{daf5f21f-3f73-47d5-b000-47e516f81fdc}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{a12ce711-17aa-4532-a939-e5f942993f4b}</UniqueIdentifier>
+      <UniqueIdentifier>{10723048-e5aa-4fc6-9b8e-09bf0e87ba90}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{57ce58c2-b1bd-4e83-a45d-b12fc2ddf6cd}</UniqueIdentifier>
+      <UniqueIdentifier>{58811e7b-34b0-46d4-9030-659a02bcc03d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

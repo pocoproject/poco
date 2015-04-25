@@ -102,10 +102,6 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">PocoNetSSLmt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win64\bin\debug\*64MDd.dll ..\bin64\*
-xcopy /y ..\openssl\win64\bin\debug\*64MDd.lib ..\lib64\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -139,10 +135,6 @@ xcopy /y ..\openssl\win64\bin\debug\*64MDd.lib ..\lib64\*</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win64\bin\release\*64MD.dll ..\bin64\*
-xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -179,10 +171,6 @@ xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win64\lib\debug\*64MTd.lib ..\lib64\*
-xcopy /y ..\openssl\win64\lib\debug\*64MTd.pdb ..\lib64\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -208,9 +196,6 @@ xcopy /y ..\openssl\win64\lib\debug\*64MTd.pdb ..\lib64\*</Command>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win64\lib\release\*64MT.lib ..\lib64\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -237,10 +222,6 @@ xcopy /y ..\openssl\win64\lib\debug\*64MTd.pdb ..\lib64\*</Command>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win64\bin\debug\*64MDd.dll ..\bin64\*
-xcopy /y ..\openssl\win64\bin\debug\*64MDd.lib ..\lib64\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -266,10 +247,6 @@ xcopy /y ..\openssl\win64\bin\debug\*64MDd.lib ..\lib64\*</Command>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win64\bin\release\*64MD.dll ..\bin64\*
-xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>

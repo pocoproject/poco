@@ -102,10 +102,6 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoNetSSLmt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\bin\debug\*32MDd.dll ..\bin\*
-xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -139,10 +135,6 @@ xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\bin\release\*32MD.dll ..\bin\*
-xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -179,10 +171,6 @@ xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\lib\debug\*32MTd.lib ..\lib\*
-xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -208,9 +196,6 @@ xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*</Command>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\lib\release\*32MT.lib ..\lib\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -237,10 +222,6 @@ xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*</Command>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\bin\debug\*32MDd.dll ..\bin\*
-xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -266,10 +247,6 @@ xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
-    <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\bin\release\*32MD.dll ..\bin\*
-xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
-    </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>

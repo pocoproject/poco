@@ -19,8 +19,7 @@
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\win64\bin\debug\*64MDd.dll ..\bin64\*&#xA;xcopy /y ..\openssl\win64\bin\debug\*64MDd.lib ..\lib64\*"/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -90,8 +89,7 @@
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\win64\bin\release\*64MD.dll ..\bin64\*&#xA;xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*"/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -165,8 +163,7 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\win64\lib\debug\*64MTd.lib ..\lib64\*&#xA;xcopy /y ..\openssl\win64\lib\debug\*64MTd.pdb ..\lib64\*"/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -224,8 +221,7 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\win64\lib\release\*64MT.lib ..\lib64\*"/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -284,8 +280,7 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\win64\bin\debug\*64MDd.dll ..\bin64\*&#xA;xcopy /y ..\openssl\win64\bin\debug\*64MDd.lib ..\lib64\*"/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -343,8 +338,7 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\win64\bin\release\*64MD.dll ..\bin64\*&#xA;xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*"/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool

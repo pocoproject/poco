@@ -121,8 +121,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win64\debug\*64MDd.dll ..64\*
-xcopy /y ..\openssl\win64\debug\*64MDd.lib ..\lib64\*</Command>
+      <Command>xcopy /y ..\openssl\win64\bin\debug\*64MDd.dll ..\bin64\*
+xcopy /y ..\openssl\win64\bin\debug\*64MDd.lib ..\lib64\*</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -155,8 +155,8 @@ xcopy /y ..\openssl\win64\debug\*64MDd.lib ..\lib64\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win64\release\*64MD.dll ..64\*
-xcopy /y ..\openssl\win64\release\*64MD.lib ..\lib64\*</Command>
+      <Command>xcopy /y ..\openssl\win64\bin\release\*64MD.dll ..\bin64\*
+xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
@@ -246,8 +246,8 @@ xcopy /y ..\openssl\win64\lib\debug\*64MTd.pdb ..\lib64\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win64\debug\*64MDd.dll ..64\*
-xcopy /y ..\openssl\win64\debug\*64MDd.lib ..\lib64\*</Command>
+      <Command>xcopy /y ..\openssl\win64\bin\debug\*64MDd.dll ..\bin64\*
+xcopy /y ..\openssl\win64\bin\debug\*64MDd.lib ..\lib64\*</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -273,8 +273,8 @@ xcopy /y ..\openssl\win64\debug\*64MDd.lib ..\lib64\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win64\release\*64MD.dll ..64\*
-xcopy /y ..\openssl\win64\release\*64MD.lib ..\lib64\*</Command>
+      <Command>xcopy /y ..\openssl\win64\bin\release\*64MD.dll ..\bin64\*
+xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>

@@ -121,8 +121,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\debug\*32MDd.dll ..\*
-xcopy /y ..\openssl\win32\debug\*32MDd.lib ..\lib\*</Command>
+      <Command>xcopy /y ..\openssl\win32\bin\debug\*32MDd.dll ..\bin\*
+xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -155,8 +155,8 @@ xcopy /y ..\openssl\win32\debug\*32MDd.lib ..\lib\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\release\*32MD.dll ..\*
-xcopy /y ..\openssl\win32\release\*32MD.lib ..\lib\*</Command>
+      <Command>xcopy /y ..\openssl\win32\bin\release\*32MD.dll ..\bin\*
+xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
@@ -246,8 +246,8 @@ xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\debug\*32MDd.dll ..\*
-xcopy /y ..\openssl\win32\debug\*32MDd.lib ..\lib\*</Command>
+      <Command>xcopy /y ..\openssl\win32\bin\debug\*32MDd.dll ..\bin\*
+xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -273,8 +273,8 @@ xcopy /y ..\openssl\win32\debug\*32MDd.lib ..\lib\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\release\*32MD.dll ..\*
-xcopy /y ..\openssl\win32\release\*32MD.lib ..\lib\*</Command>
+      <Command>xcopy /y ..\openssl\win32\bin\release\*32MD.dll ..\bin\*
+xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
