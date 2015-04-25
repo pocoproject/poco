@@ -11,8 +11,8 @@ include $(POCO_BASE)/build/rules/global
 SYSLIBS += -lssl -lcrypto
 
 objects = AcceptCertificateHandler RejectCertificateHandler ConsoleCertificateHandler \
-	CertificateHandlerFactory CertificateHandlerFactoryMgr \
-	Context HTTPSClientSession HTTPSStreamFactory HTTPSSessionInstantiator \
+	CertificateHandlerFactory CertificateHandlerFactoryMgr Context \
+	HTTPSClient HTTPSClientSession HTTPSStreamFactory HTTPSSessionInstantiator \
 	InvalidCertificateHandler KeyConsoleHandler \
 	KeyFileHandler PrivateKeyFactory PrivateKeyFactoryMgr \
 	PrivateKeyPassphraseHandler SecureServerSocket SecureServerSocketImpl \

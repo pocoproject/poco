@@ -16,8 +16,9 @@ SYSLIBS += -lssl -lcrypto -lz -ldl
 endif
 
 objects = NetSSLTestSuite Driver \
-	HTTPSClientSessionTest HTTPSClientTestSuite HTTPSServerTest HTTPSServerTestSuite \
-	HTTPSStreamFactoryTest HTTPSTestServer TCPServerTest TCPServerTestSuite
+	HTTPSClientTest HTTPSClientSessionTest HTTPSClientTestSuite HTTPSServerTest \
+	HTTPSServerTestSuite HTTPSStreamFactoryTest HTTPSTestServer \
+	TCPServerTest TCPServerTestSuite
 
 target         = testrunner
 target_version = 1
