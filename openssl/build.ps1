@@ -375,9 +375,7 @@ function Output-OpenSSL {
         Rename-Item -path "$t\$lib\$configuration\ssleay32.lib" -newname "ssleay$b$l$d.lib" -force
     }
 
-    #if (!(Test-Path "$OUTPUT_BIN_DIRECTORY\include\openssl\ssl.h")) {
-        xcopy /y bin\$winplatform\$configuration\include\* "$OUTPUT_INC_DIRECTORY\*" /E
-    #}
+    xcopy /y bin\$winplatform\$configuration\include\* "$OUTPUT_INC_DIRECTORY\*" /E
 
     popd
 }
