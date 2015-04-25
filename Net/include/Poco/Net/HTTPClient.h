@@ -87,12 +87,14 @@ public:
 		/// Creates a HTTPClient using the given URI.
 
 	explicit HTTPClient(const SocketAddress& address,
+		const std::string& scheme = "http",
 		InstantiatorPtr pInstantiator = new HTTPSessionInstantiator,
 		bool redirect = true);
 		/// Creates a HTTPClient using the given address.
 
 	HTTPClient(const std::string& host,
 		Poco::UInt16 port = HTTPSession::HTTP_PORT,
+		const std::string& scheme = "http",
 		InstantiatorPtr pInstantiator = new HTTPSessionInstantiator,
 		bool redirect = true);
 		/// Creates a HTTPClient using the given host and port.
@@ -100,6 +102,7 @@ public:
 	HTTPClient(const std::string& host,
 		Poco::UInt16 port,
 		const HTTPClientSession::ProxyConfig& proxyConfig,
+		const std::string& scheme = "http",
 		InstantiatorPtr pInstantiator = new HTTPSessionInstantiator,
 		bool redirect = true);
 		/// Creates a HTTPClient using the given host, port and proxy configuration.
@@ -244,7 +247,7 @@ public:
 		/// This should be called whenever something went
 		/// wrong while sending a request.
 		
-	bool secure() const;
+	virtual bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
 		/// or false otherwise.
 		

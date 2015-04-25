@@ -43,7 +43,7 @@ HTTPClient::HTTPClient(const URI& uri,
 		_pThread(0),
 		_requestsInProcess(0)
 {
-	_factory.registerProtocol("http", _pInstantiator);
+	_factory.registerProtocol(uri.getScheme(), _pInstantiator);
 	_pSession = _factory.createClientSession(uri);
 	poco_check_ptr(_pSession);
 	_activity.start();
@@ -51,6 +51,7 @@ HTTPClient::HTTPClient(const URI& uri,
 
 
 HTTPClient::HTTPClient(const SocketAddress& address,
+	const std::string& scheme,
 	InstantiatorPtr pInstantiator,
 	bool redirect):
 		_pInstantiator(pInstantiator),
@@ -62,8 +63,9 @@ HTTPClient::HTTPClient(const SocketAddress& address,
 		_pThread(0),
 		_requestsInProcess(0)
 {
-	_factory.registerProtocol("http", _pInstantiator);
-	URI uri(std::string("http://").append(address.toString()));
+	_factory.registerProtocol(scheme, _pInstantiator);
+	std::string uriStr = scheme;
+	URI uri(uriStr.append("://").append(address.toString()));
 	_pSession = _factory.createClientSession(uri);
 	poco_check_ptr(_pSession);
 	_activity.start();
@@ -72,6 +74,7 @@ HTTPClient::HTTPClient(const SocketAddress& address,
 
 HTTPClient::HTTPClient(const std::string& host,
 	Poco::UInt16 port,
+	const std::string& scheme,
 	InstantiatorPtr pInstantiator,
 	bool redirect):
 		_pInstantiator(pInstantiator),
@@ -83,8 +86,9 @@ HTTPClient::HTTPClient(const std::string& host,
 		_pThread(0),
 		_requestsInProcess(0)
 {
-	_factory.registerProtocol("http", _pInstantiator);
-	URI uri(std::string("http://").append(host).append(1, ':').append(NumberFormatter::format(port)));
+	_factory.registerProtocol(scheme, _pInstantiator);
+	std::string uriStr = scheme;
+	URI uri(uriStr.append("://").append(host).append(1, ':').append(NumberFormatter::format(port)));
 	_pSession = _factory.createClientSession(uri);
 	poco_check_ptr(_pSession);
 	_activity.start();
@@ -94,6 +98,7 @@ HTTPClient::HTTPClient(const std::string& host,
 HTTPClient::HTTPClient(const std::string& host,
 	Poco::UInt16 port,
 	const HTTPClientSession::ProxyConfig& proxyConfig,
+	const std::string& scheme,
 	InstantiatorPtr pInstantiator,
 	bool redirect) :
 		_pInstantiator(pInstantiator),
@@ -105,8 +110,9 @@ HTTPClient::HTTPClient(const std::string& host,
 		_pThread(0),
 		_requestsInProcess(0)
 {
-	_factory.registerProtocol("http", _pInstantiator);
-	URI uri(std::string("http://").append(host).append(1, ':').append(NumberFormatter::format(port)));
+	_factory.registerProtocol(scheme, _pInstantiator);
+	std::string uriStr = scheme;
+	URI uri(uriStr.append("://").append(host).append(1, ':').append(NumberFormatter::format(port)));
 	_factory.setProxy(proxyConfig.host, proxyConfig.port);
 	if (!proxyConfig.username.empty())
 		_factory.setProxyCredentials(proxyConfig.username, proxyConfig.password);
@@ -124,7 +130,12 @@ HTTPClient::~HTTPClient()
 	clearQueue();
 	if (_pInstantiator)
 	{
-		_factory.unregisterProtocol("http");
+		if (_factory.isRegistered("http"))
+			_factory.unregisterProtocol("http");
+
+		if (_factory.isRegistered("https"))
+			_factory.unregisterProtocol("https");
+
 		delete _pSession;
 	}
 }

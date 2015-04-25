@@ -12,6 +12,7 @@
 
 #include "HTTPSClientTestSuite.h"
 #include "HTTPSClientSessionTest.h"
+#include "HTTPSClientTest.h"
 #include "HTTPSStreamFactoryTest.h"
 
 
@@ -20,6 +21,7 @@ CppUnit::Test* HTTPSClientTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPSClientTestSuite");
 
 	pSuite->addTest(HTTPSClientSessionTest::suite());
+	pSuite->addTest(HTTPSClientTest::suite());
 	pSuite->addTest(HTTPSStreamFactoryTest::suite());
 
 	return pSuite;
