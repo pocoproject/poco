@@ -34,9 +34,10 @@ Param
   [string] $library = 'shared'
 )
 
-$PACKAGES_DIRECTORY = Join-Path $PSScriptRoot "packages"
-$OUTPUT_DIRECTORY   = Join-Path $PSScriptRoot "out"
-$VERSION            = "0.0.0"
+$PACKAGES_DIRECTORY   = Join-Path $PSScriptRoot "packages"
+$OUTPUT_BIN_DIRECTORY = $PSScriptRoot
+$OUTPUT_INC_DIRECTORY = Join-Path $PSScriptRoot "..\Crypto\include" -resolve
+$VERSION              = "0.0.0"
 
 if (Test-Path Env:\APPVEYOR_BUILD_VERSION) {
     $VERSION = $env:APPVEYOR_BUILD_VERSION
@@ -68,12 +69,6 @@ $OPENSSL_CLEAN_DIRECTORY = Join-Path $PACKAGES_DIRECTORY "openssl-$OPENSSL_VERSI
 $OPENSSL_PACKAGE_FILE    = "openssl-$OPENSSL_VERSION.tar.gz"
 $OPENSSL_DOWNLOAD_URL    = "https://www.openssl.org/source/$OPENSSL_PACKAGE_FILE"
 
-if ($nuget) {
-    # Nuget configuration section
-    $NUGET_FILE         = "nuget.exe"
-    $NUGET_TOOL         = Join-Path $PACKAGES_DIRECTORY $NUGET_FILE
-    $NUGET_DOWNLOAD_URL = "https://nuget.org/$NUGET_FILE"
-}
 
 function Download-File {
     param (
@@ -164,14 +159,6 @@ if (!(Test-Path (Join-Path $PACKAGES_DIRECTORY $PERL_PACKAGE_FILE))) {
 if (!(Test-Path (Join-Path $PACKAGES_DIRECTORY $OPENSSL_PACKAGE_FILE))) {
     Write-Host "Downloading $OPENSSL_PACKAGE_FILE"
     Download-File $OPENSSL_DOWNLOAD_URL (Join-Path $PACKAGES_DIRECTORY $OPENSSL_PACKAGE_FILE)
-}
-
-if ($nuget) {
-    # Download Nuget
-    if (!(Test-Path $NUGET_TOOL)) {
-        Write-Host "Downloading $NUGET_FILE"
-        Download-File $NUGET_DOWNLOAD_URL $NUGET_TOOL
-    }
 }
 
 # Unpack 7zip
@@ -337,7 +324,7 @@ function Output-OpenSSL {
 
     pushd $OPENSSL_DIRECTORY
     
-    $t = Join-Path $OUTPUT_DIRECTORY "$winplatform"
+    $t = Join-Path $OUTPUT_BIN_DIRECTORY "$winplatform"
     $lib = "lib"
 
     $d = ""
@@ -388,9 +375,9 @@ function Output-OpenSSL {
         Rename-Item -path "$t\$lib\$configuration\ssleay32.lib" -newname "ssleay$b$l$d.lib" -force
     }
 
-    if (!(Test-Path "$OUTPUT_DIRECTORY\include\openssl\ssl.h")) {
-        xcopy /y bin\$winplatform\$configuration\include\* "$OUTPUT_DIRECTORY\include\*" /E
-    }
+    #if (!(Test-Path "$OUTPUT_BIN_DIRECTORY\include\openssl\ssl.h")) {
+        xcopy /y bin\$winplatform\$configuration\include\* "$OUTPUT_INC_DIRECTORY\*" /E
+    #}
 
     popd
 }

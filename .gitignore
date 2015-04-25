@@ -117,18 +117,18 @@ cmake-build/
 # openssl binaries #
 ####################
 
-!openssl/out/win32/bin/debug/*.dll
-!openssl/out/win32/bin/debug/*.lib
-!openssl/out/win32/bin/release/*.dll
-!openssl/out/win32/bin/release/*.lib
-!openssl/out/win64/bin/debug/*.dll
-!openssl/out/win64/bin/debug/*.lib
-!openssl/out/win64/bin/release/*.dll
-!openssl/out/win64/bin/release/*.lib
+!openssl/win32/bin/debug/*.dll
+!openssl/win32/bin/debug/*.lib
+!openssl/win32/bin/release/*.dll
+!openssl/win32/bin/release/*.lib
+!openssl/win64/bin/debug/*.dll
+!openssl/win64/bin/debug/*.lib
+!openssl/win64/bin/release/*.dll
+!openssl/win64/bin/release/*.lib
 
-!openssl/out/win32/lib/debug/*.lib
-!openssl/out/win32/lib/debug/*.pdb
-!openssl/out/win32/lib/release/*.lib
-!openssl/out/win64/lib/debug/*.lib
-!openssl/out/win64/lib/debug/*.pdb
-!openssl/out/win64/lib/release/*.lib
+!openssl/win32/lib/debug/*.lib
+!openssl/win32/lib/debug/*.pdb
+!openssl/win32/lib/release/*.lib
+!openssl/win64/lib/debug/*.lib
+!openssl/win64/lib/debug/*.pdb
+!openssl/win64/lib/release/*.lib
