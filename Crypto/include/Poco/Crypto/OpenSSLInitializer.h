@@ -87,7 +87,6 @@ private:
 	static Poco::FastMutex* _mutexes;
 	static Poco::AtomicCounter _rc;
     static bool _disableSSLInitialization;
-    static bool _setupMultiThreadSupport;
 };
 
 
