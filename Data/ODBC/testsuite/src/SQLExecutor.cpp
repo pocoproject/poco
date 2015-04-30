@@ -3496,39 +3496,96 @@ void SQLExecutor::multipleResults(const std::string& sql)
 	assert (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
 }
 
+#define assertTU(tu, condition) \
+	(tu->assertImpl((condition), (#condition), __LINE__, __FILE__))
+
+typedef Tuple<std::string, std::string, std::string, Poco::UInt32> PersonMRT;
+
+struct ReadPerson 
+{
+
+	template <typename T>
+	static PersonMRT rd(T& rs)
+	{
+		PersonMRT pHomer;
+		pHomer.set<0>(rs.value(0));
+		pHomer.set<1>(rs.value(1));
+		pHomer.set<2>(rs.value(2));
+		pHomer.set<3>(rs.value(3));
+		return pHomer;
+	}
+
+	template <typename Rdr>
+	static void compare(SQLExecutor* tc, const Poco::Dynamic::Var& val, Rdr& rdr)
+	{
+		if (val.type() == typeid(PersonMRT)) 
+		{
+			const PersonMRT p = rd(rdr);
+			assertTU(tc, p == val.extract<PersonMRT>());
+		}
+		else 
+		{
+			const Poco::Dynamic::Var val1 = rdr.value(0);
+			assertTU(tc, val == val1);
+		}
+	}
+
+};
 
 void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 {
-	typedef Tuple<std::string, std::string, std::string, Poco::UInt32> Person;
-	struct ReadPerson {
-		static Person rd(Poco::Data::RecordSet& rs, size_t rowNo) {
-			Person pHomer;
-			pHomer.set<0>(rs.value(0, rowNo));
-			pHomer.set<1>(rs.value(1, rowNo));
-			pHomer.set<2>(rs.value(2, rowNo));
-			pHomer.set<3>(rs.value(3, rowNo));
-			return pHomer;
+	struct RSReader
+	{
+		RSReader(RecordSet& rs, size_t rowNo) :_rs(rs), _rowNo(rowNo)
+		{}
+		RecordSet& _rs;
+		size_t _rowNo;
+		Var value(size_t col)
+		{
+			return _rs.value(col, _rowNo);
 		}
 	};
 
-	std::vector<Person> people;
-	const Person Homer("Simpson", "Homer", "Springfield", 42);
+	struct ITReader
+	{
+		ITReader(const RowIterator& it) :_it(it)
+		{}
+		const RowIterator& _it;
+		Var value(size_t col)
+		{
+			return (*_it)[col];
+		}
+	};
+
+	struct RSReaderCur
+	{
+		RSReaderCur(RecordSet& rs) :_rs(rs)
+		{}
+		RecordSet& _rs;
+		Var value(size_t col)
+		{
+			return _rs.value(col);
+		}
+	};
+
+	std::vector<PersonMRT> people;
+	const PersonMRT Homer("Simpson", "Homer", "Springfield", 42);
 	const int BartAge = 10;
 	const int HomerAge = 42;
 	const int LisaAge = 8;
 	people.push_back(Homer);
-	people.push_back(Person("Simpson", "Marge", "Springfield", 38));
+	people.push_back(PersonMRT("Simpson", "Marge", "Springfield", 38));
 	const std::string BartName("Bart");
-	people.push_back(Person("Simpson", BartName, "Springfield", BartAge));
-	const Person Lisa = Person("Simpson", "Lisa", "Springfield", LisaAge);
+	people.push_back(PersonMRT("Simpson", BartName, "Springfield", BartAge));
+	const PersonMRT Lisa = PersonMRT("Simpson", "Lisa", "Springfield", LisaAge);
 	people.push_back(Lisa);
-	people.push_back(Person("Simpson", "Maggie", "Springfield", 3));
+	people.push_back(PersonMRT("Simpson", "Maggie", "Springfield", 3));
 	session() << "INSERT INTO " << ExecUtil::person() <<" VALUES (?, ?, ?, ?)", use(people), now;
 
 	Poco::Data::Statement stmt(session());
 	stmt << sql, useRef(HomerAge), useRef(BartName), useRef(LisaAge), useRef(HomerAge);
 
-	stmt.execute();
+	const size_t rowsToGet = stmt.execute();
 	assert(3 == stmt.dataSetCount());
 	stmt.firstDataSet();
 	std::vector<Poco::Dynamic::Var> vals;
@@ -3538,25 +3595,54 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 	vals.push_back(Poco::Dynamic::Var(Homer));
 
 	std::vector<Poco::Dynamic::Var>::const_iterator valIt = vals.begin();
+	size_t rowCnt = 0;
 	for (size_t dsNo = 0; dsNo < stmt.dataSetCount(); dsNo = stmt.nextDataSet())
 	{
 		Poco::Data::RecordSet rs(stmt);
 		bool r = rs.moveFirst();
-		for (size_t rowNo = 0; r; ++rowNo, r = rs.moveNext(), ++valIt) {
-
-			if (valIt->type() == typeid(Person)) {
-				const Person p = ReadPerson::rd(rs, rowNo);
-				assert(p == valIt->extract<Person>());
-			}
-			else {
-				const Poco::Dynamic::Var val = rs.value(0, rowNo);
-				assert(*valIt == val);
-			}
+		RowIterator rowIt = rs.begin();
+		for (size_t rowNo = 0; r; ++rowNo, r = rs.moveNext(), ++valIt, ++rowIt, ++rowCnt)
+		{
+			ReadPerson::compare(this, *valIt, RSReader(rs, rowNo));
+			ReadPerson::compare(this, *valIt, ITReader(rowIt));
+			ReadPerson::compare(this, *valIt, RSReaderCur(rs));
 		}
+		assert(rowIt == rs.end());
 		if (!stmt.hasMoreDataSets())
 			break;
 	}
+	assert(rowCnt == rowsToGet);
 	assert(vals.end() == valIt);
+	//// now check that limit() works as well
+	for (size_t lim = 1; lim <= vals.size(); ++lim)
+	{
+		Poco::Data::Statement stmt(session());
+		stmt << sql, useRef(HomerAge), useRef(BartName), useRef(LisaAge), useRef(HomerAge), limit(lim);
+		std::vector<Poco::Dynamic::Var>::const_iterator valIt = vals.begin();
+
+		while (!stmt.done())
+		{
+			stmt.execute();
+			for (bool doId = true; doId;)
+			{
+				Poco::Data::RecordSet rs(stmt);
+
+				RowIterator rIt = rs.begin();
+				bool mf = rs.moveFirst();
+				for (size_t row = 0; row < rs.rowCount(); ++row, ++rIt, mf = rs.moveNext(), ++valIt)
+				{
+					assert(mf);
+					ReadPerson::compare(this, *valIt, RSReader(rs, row));
+					ReadPerson::compare(this, *valIt, ITReader(rIt));
+					ReadPerson::compare(this, *valIt, RSReaderCur(rs));
+				}
+				assert(rIt == rs.end());
+
+				doId = rs.rowCount() < lim && stmt.hasMoreDataSets() && stmt.nextDataSet() > 0;
+			}
+		}
+	}
+
 }
 
 

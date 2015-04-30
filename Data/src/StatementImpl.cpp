@@ -84,7 +84,8 @@ std::size_t StatementImpl::execute(const bool& reset)
 	if (_lowerLimit > _extrLimit.value())
 		throw LimitException("Illegal Statement state. Upper limit must not be smaller than the lower limit.");
 
-	while (_pendingDSNo > currentDataSet()) activateNextDataSet();
+	size_t pds = _pendingDSNo;
+	while (pds > currentDataSet()) activateNextDataSet();
 
 	const size_t savedDs = currentDataSet();
 	do
@@ -97,8 +98,9 @@ std::size_t StatementImpl::execute(const bool& reset)
 	} while (canCompile());
 
 	// rewind ds back here!!!!
-	_pendingDSNo = currentDataSet();
+	pds = currentDataSet();
 	while (savedDs < currentDataSet()) activatePreviousDataSet();
+	_pendingDSNo = pds;
 
 	if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
 		_state = ST_DONE;

@@ -510,6 +510,11 @@ public:
 	void singleSelect();
 	void emptyDB();
 
+	void assertImpl(bool condition, const std::string& conditionExpression, long lineNumber, const std::string& fileName)
+	{
+		assertImplementation(condition, conditionExpression, lineNumber, fileName);
+	}
+
 	void blob(int bigSize = 1024, const std::string& blobPlaceholder = "?");
 
 	template <typename C1, typename C2>
