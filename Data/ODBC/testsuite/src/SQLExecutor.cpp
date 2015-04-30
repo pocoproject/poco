@@ -3505,7 +3505,7 @@ struct ReadPerson
 {
 
 	template <typename T>
-	static PersonMRT rd(T& rs)
+	static PersonMRT rd(const T& rs)
 	{
 		PersonMRT pHomer;
 		pHomer.set<0>(rs.value(0));
@@ -3516,7 +3516,7 @@ struct ReadPerson
 	}
 
 	template <typename Rdr>
-	static void compare(SQLExecutor* tc, const Poco::Dynamic::Var& val, Rdr& rdr)
+	static void compare(SQLExecutor* tc, const Poco::Dynamic::Var& val,const Rdr& rdr)
 	{
 		if (val.type() == typeid(PersonMRT)) 
 		{
@@ -3540,7 +3540,7 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 		{}
 		RecordSet& _rs;
 		size_t _rowNo;
-		Var value(size_t col)
+		Var value(size_t col) const
 		{
 			return _rs.value(col, _rowNo);
 		}
@@ -3551,7 +3551,7 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 		ITReader(const RowIterator& it) :_it(it)
 		{}
 		const RowIterator& _it;
-		Var value(size_t col)
+		Var value(size_t col) const
 		{
 			return (*_it)[col];
 		}
@@ -3562,7 +3562,7 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 		RSReaderCur(RecordSet& rs) :_rs(rs)
 		{}
 		RecordSet& _rs;
-		Var value(size_t col)
+		Var value(size_t col) const
 		{
 			return _rs.value(col);
 		}
