@@ -44,6 +44,8 @@ namespace Poco {
 namespace Data {
 
 
+class RecordSet;
+
 class Data_API StatementImpl
 	/// StatementImpl interface that subclasses must implement to define database dependent query execution.
 	///
@@ -294,13 +296,14 @@ protected:
 		/// Returns the previous data set index, or throws NoDataException if the last 
 		/// data set was reached.
 
+	void firstDataSet();
+	/// Activate first data set
+
 	bool hasMoreDataSets() const;
 		/// Returns true if there are data sets not activated yet.
 
-    void firstDataSet();
-        /// Activate first data set
-
 private:
+
 	void compile();
 		/// Compiles the statement.
 
@@ -429,7 +432,7 @@ private:
 	void formatSQL(std::vector<Any>& arguments);
 		/// Formats the SQL string by filling in placeholders with values from supplied vector.
 
-	void assignSubTotal(bool reset);
+	void assignSubTotal(bool reset, size_t firstDs);
 
 	StatementImpl(const StatementImpl& stmt);
 	StatementImpl& operator = (const StatementImpl& stmt);
@@ -446,11 +449,13 @@ private:
 	AbstractBindingVec       _bindings;
 	AbstractExtractionVecVec _extractors;
 	std::size_t              _curDataSet;
+	std::size_t              _pendingDSNo;
 	BulkType                 _bulkBinding;
 	BulkType                 _bulkExtraction;
 	CountVec                 _subTotalRowCount;
 
 	friend class Statement; 
+	friend class RecordSet;
 };
 
 
@@ -628,10 +633,13 @@ inline bool StatementImpl::hasMoreDataSets() const
 	return currentDataSet() + 1 < dataSetCount();
 }
 
+
 inline void StatementImpl::firstDataSet()
 {
 	_curDataSet = 0;
+	_pendingDSNo = 0;
 }
+
 
 } } // namespace Poco::Data
 

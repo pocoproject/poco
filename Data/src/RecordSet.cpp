@@ -203,7 +203,7 @@ std::size_t RecordSet::rowCount() const
 	if (0 == extractions().size() && 0 == columnsExtracted())
 		return 0;
 	poco_assert (extractions().size());
-	std::size_t rc = subTotalRowCount();
+	std::size_t rc = storageRowCount();
 	if (!isFiltered()) return rc;
 
 	std::size_t counter = 0;
@@ -225,7 +225,8 @@ bool RecordSet::isAllowed(std::size_t row) const
 
 bool RecordSet::moveFirst()
 {
-	if (subTotalRowCount() > 0)
+	const size_t rc = storageRowCount();
+	if (rc > 0)
 	{
 		if (!isFiltered())
 		{
@@ -237,7 +238,7 @@ bool RecordSet::moveFirst()
 		currentRow = 0;
 		while (!isAllowed(currentRow))
 		{
-			if (currentRow >= subTotalRowCount() - 1) return false;
+			if (currentRow >= rc - 1) return false;
 			++currentRow;
 		}
 
@@ -253,7 +254,7 @@ bool RecordSet::moveNext()
 	std::size_t currentRow = _currentRow;
 	do
 	{
-		if (currentRow >= subTotalRowCount() - 1) return false;
+		if (currentRow >= storageRowCount() -1) return false;
 		++currentRow;
 	} while (isFiltered() && !isAllowed(currentRow));
 
@@ -278,10 +279,10 @@ bool RecordSet::movePrevious()
 
 bool RecordSet::moveLast()
 {
-	if (subTotalRowCount() > 0)
+	if (storageRowCount() > 0)
 	{
 		std::size_t currentRow = _currentRow;
-		currentRow = subTotalRowCount() - 1;
+		currentRow = storageRowCount() - 1;
 		if (!isFiltered())
 		{
 			_currentRow = currentRow;
