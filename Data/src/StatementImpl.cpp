@@ -52,6 +52,7 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 	_storage(STORAGE_UNKNOWN_IMPL),
 	_ostr(),
 	_curDataSet(0),
+	_pendingDSNo(0),
 	_bulkBinding(BULK_UNDEFINED),
 	_bulkExtraction(BULK_UNDEFINED)
 {
@@ -83,6 +84,10 @@ std::size_t StatementImpl::execute(const bool& reset)
 	if (_lowerLimit > _extrLimit.value())
 		throw LimitException("Illegal Statement state. Upper limit must not be smaller than the lower limit.");
 
+	size_t pds = _pendingDSNo;
+	while (pds > currentDataSet()) activateNextDataSet();
+
+	const size_t savedDs = currentDataSet();
 	do
 	{
 		compile();
@@ -92,25 +97,30 @@ std::size_t StatementImpl::execute(const bool& reset)
 			lim += executeWithLimit();
 	} while (canCompile());
 
+	// rewind ds back here!!!!
+	pds = currentDataSet();
+	while (savedDs < currentDataSet()) activatePreviousDataSet();
+	_pendingDSNo = pds;
+
 	if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
 		_state = ST_DONE;
 
+	assignSubTotal(reset, savedDs);
+
 	if (lim < _lowerLimit)
 		throw LimitException("Did not receive enough data.");
-
-	assignSubTotal(reset);
 
 	return lim;
 }
 
 
-void StatementImpl::assignSubTotal(bool reset)
+void StatementImpl::assignSubTotal(bool reset, size_t firstDs)
 {
 	if (_extractors.size() == _subTotalRowCount.size())
 	{
-		CountVec::iterator it  = _subTotalRowCount.begin();
+		CountVec::iterator it = _subTotalRowCount.begin() + firstDs;
 		CountVec::iterator end = _subTotalRowCount.end();
-		for (int counter = 0; it != end; ++it, ++counter)
+		for (size_t counter = firstDs; it != end; ++it, ++counter)
 		{
 			if (_extractors[counter].size())
 			{
@@ -137,9 +147,9 @@ std::size_t StatementImpl::executeWithLimit()
 			count += next();
 	} while (count < limit && canBind());
 
-	if (!canBind() && (!hasNext() || limit == 0)) 
+	if (!canBind() && (!hasNext() || limit == 0))
 		_state = ST_DONE;
-	else if (hasNext() && limit == count && _extrLimit.isHardLimit())
+	else if (limit == count && _extrLimit.isHardLimit() && hasNext())
 		throw LimitException("HardLimit reached (retrieved more data than requested).");
 	else 
 		_state = ST_PAUSED;
@@ -246,10 +256,6 @@ void StatementImpl::setBulkExtraction(const Bulk& b)
 
 void StatementImpl::fixupExtraction()
 {
-	CountVec::iterator sIt  = _subTotalRowCount.begin();
-	CountVec::iterator sEnd = _subTotalRowCount.end();
-	for (; sIt != sEnd; ++sIt) *sIt = 0;
-
 	if (_curDataSet >= _columnsExtracted.size())
 	{
 		_columnsExtracted.resize(_curDataSet + 1, 0);
@@ -312,7 +318,8 @@ void StatementImpl::setStorage(const std::string& storage)
 
 void StatementImpl::makeExtractors(std::size_t count)
 {
-	makeExtractors(count, currentDataSet());
+  // type cast is needed when size_t is 64 bit
+	makeExtractors(count, static_cast<Position::Position_Type>(currentDataSet()));
 }
 
 void StatementImpl::makeExtractors(std::size_t count, const Position& position)
@@ -379,7 +386,10 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 std::size_t StatementImpl::activateNextDataSet()
 {
 	if (_curDataSet + 1 < dataSetCount())
-		return ++_curDataSet;
+	{
+		_pendingDSNo = ++_curDataSet;
+		return _curDataSet;
+	}
 	else
 		throw NoDataException("End of data sets reached.");
 }
@@ -388,7 +398,10 @@ std::size_t StatementImpl::activateNextDataSet()
 std::size_t StatementImpl::activatePreviousDataSet()
 {
 	if (_curDataSet > 0)
-		return --_curDataSet;
+	{
+		_pendingDSNo = --_curDataSet;
+		return _curDataSet;
+	}
 	else
 		throw NoDataException("Beginning of data sets reached.");
 }

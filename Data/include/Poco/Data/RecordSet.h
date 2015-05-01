@@ -464,6 +464,8 @@ private:
 		}
 	}
 
+	size_t storageRowCount() const;
+
 	bool isAllowed(std::size_t row) const;
 		/// Returns true if the specified row is allowed by the
 		/// currently active filter.
@@ -655,6 +657,11 @@ inline void RecordSet::formatNames() const
 	(*_pBegin)->formatNames();
 }
 
+
+inline size_t RecordSet::storageRowCount() const
+{
+	return impl()->rowsExtracted();
+}
 
 /* TODO
 namespace Keywords {

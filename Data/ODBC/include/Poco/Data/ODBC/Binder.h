@@ -72,8 +72,9 @@ public:
 
 	Binder(const StatementHandle& rStmt,
 		std::size_t maxFieldSize,
-		ParameterBinding dataBinding = PB_IMMEDIATE,
-		TypeInfo* pDataTypes = 0);
+		ParameterBinding dataBinding,
+		TypeInfo* pDataTypes,
+		bool numericToString);
 		/// Creates the Binder.
 
 	~Binder();
@@ -1010,6 +1011,7 @@ private:
 	std::size_t      _maxCharColLength;
 	std::size_t      _maxWCharColLength;
 	std::size_t      _maxVarBinColSize;
+	bool             _numericToString;
 };
 
 

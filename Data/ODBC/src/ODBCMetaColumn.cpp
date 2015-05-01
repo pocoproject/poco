@@ -23,9 +23,10 @@ namespace Data {
 namespace ODBC {
 
 
-ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position) : 
+ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position, bool numericToString) :
 	MetaColumn(position),
-	_rStmt(rStmt)
+	_rStmt(rStmt),
+	_numericToString(numericToString)
 {
 	init();
 }
@@ -112,12 +113,35 @@ void ODBCMetaColumn::init()
 	
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
-		if (0 == _columnDesc.decimalDigits)
-			setType(MetaColumn::FDT_INT32);
-		else
-			setType(MetaColumn::FDT_DOUBLE);
-		
-		break;
+	{
+		bool toString = _numericToString;
+		if (!toString && 0 == _columnDesc.decimalDigits)
+		{
+			if (_columnDesc.size <= 9)
+				setType(MetaColumn::FDT_INT32);
+			else if (_columnDesc.size <= 18)
+				setType(MetaColumn::FDT_INT64);
+			else
+				toString = true;
+		}
+		else if (!toString)
+		{
+			if (_columnDesc.size > 16) // we can't have more than 16 digits in double
+				toString = true;
+			else
+				setType(MetaColumn::FDT_DOUBLE);
+		}
+		if (toString)
+		{
+			setLength(_columnDesc.size + 4);
+#if defined(UNICODE)
+			setType(MetaColumn::FDT_WSTRING);
+#else
+			setType(MetaColumn::FDT_STRING);
+#endif
+		}
+	}
+	break;
 	
 	case SQL_REAL:
 		setType(MetaColumn::FDT_FLOAT); break;
