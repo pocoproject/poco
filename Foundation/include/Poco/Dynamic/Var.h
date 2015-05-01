@@ -2211,13 +2211,6 @@ inline bool operator >= (const long& other, const Var& da)
 #endif // POCO_LONG_IS_64_BIT
 
 
-template<typename T>
-T unsafeConvert(const Var& v)
-{
-	if (typeid(T) == v.type()) return v.extract<T>();
-	return static_cast<T>(v.convert<double>());
-}
-
 } // namespace Dynamic
 
 

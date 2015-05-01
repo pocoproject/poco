@@ -19,7 +19,6 @@
 #ifndef Foundation_Config_INCLUDED
 #define Foundation_Config_INCLUDED
 
-#include "Poco/Cfg.h"
 
 // Define to enable Windows Unicode (UTF-8) support
 // NOTE: As of POCO C++ Libraries release 1.6.0, compiling POCO

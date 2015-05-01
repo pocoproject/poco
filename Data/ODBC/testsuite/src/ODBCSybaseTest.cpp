@@ -59,40 +59,40 @@ using Poco::NotFoundException;
 
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+
 #define SYBASE_DSN ""
-#define SYBASE_UID "mstkdev"
-#define SYBASE_PWD "mstkdev"
+#define SYBASE_UID ""
+#define SYBASE_PWD ""
 #define SYBASE_DB "mstk"
-# ifdef _MSC_VER
-std::string SybaseODBC::_connectString = "driver={Adaptive Server Enterprise};"
-"DSURL=file://\\\\ms\\dist\\syb\\PROJ\\config\\incr\\common\\dba\\files\\sql.ini?NYT_MSTK;"
-"db=" SYBASE_DB ";"
-#if 1
-"uid=" SYBASE_UID ";"
-"pwd=" SYBASE_PWD ";"
+
+static std::string sybaseDriver()
+{
+	return Poco::Environment::get("POCO_TEST_SYBASE_DRIVER", 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	"{Adaptive Server Enterprise}";
 #else
-"AuthenticationClient=mitkerberos;"
-"ServerPrincipal=sybase/visadb532;"
-"UID=ignored;"
+	"libsybdrvodb-sqllen8.so"
 #endif
-"DynamicPrepare=1;"
-;
-# else
-std::string SybaseODBC::_connectString = "Driver=/ms/dist/syb/PROJ/oc/15.7.0.04/DataAccess64/ODBC/lib/libsybdrvodb-sqllen8.so;"
-"Server=visadb532;"
-"Port=11670;"
-"db=" SYBASE_DB ";"
-#if 0
-"uid=" SYBASE_UID ";"
-"pwd=" SYBASE_PWD ";"
-#else
-"AuthenticationClient=mitkerberos;"
-"ServerPrincipal=sybase/visadb532;"
-"UID=ignored;"
+	);
+}
+
+static std::string sybaseExtra()
+{
+	std::string e = Poco::Environment::get("POCO_TEST_SYBASE_EXTRA", "");
+	return (e.empty() ? "" : e + ";");
+}
+
+std::string SybaseODBC::_connectString = 
+	"driver=" + sybaseDriver() + ";" +
+	sybaseExtra() +
+	"db=" SYBASE_DB ";"
+	"uid=" SYBASE_UID ";"
+	"pwd=" SYBASE_PWD ";"
+	"DynamicPrepare=1;"
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+	"CS=iso_1;"
 #endif
-"CS=iso_1;"
-"DynamicPrepare=1;";
-# endif
+	;
 
 ODBCTest::SessionPtr SybaseODBC::_pSession;
 ODBCTest::ExecPtr    SybaseODBC::_pExecutor;
