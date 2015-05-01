@@ -30,10 +30,12 @@ namespace ODBC {
 Preparator::Preparator(const StatementHandle& rStmt, 
 	const std::string& statement, 
 	std::size_t maxFieldSize,
-	DataExtraction dataExtraction): 
+	DataExtraction dataExtraction,
+	bool numericToString) :
 	_rStmt(rStmt),
 	_maxFieldSize(maxFieldSize),
-	_dataExtraction(dataExtraction)
+	_dataExtraction(dataExtraction),
+	_numericToString(numericToString)
 {
 	SQLCHAR* pStr = (SQLCHAR*) statement.c_str();
 	if (Utility::isError(Poco::Data::ODBC::SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
@@ -44,7 +46,8 @@ Preparator::Preparator(const StatementHandle& rStmt,
 Preparator::Preparator(const Preparator& other): 
 	_rStmt(other._rStmt),
 	_maxFieldSize(other._maxFieldSize),
-	_dataExtraction(other._dataExtraction)
+	_dataExtraction(other._dataExtraction),
+	_numericToString(other._numericToString)
 {
 	resize();
 }
@@ -155,7 +158,7 @@ std::size_t Preparator::maxDataSize(std::size_t pos) const
 
 	try 
 	{
-		ODBCMetaColumn mc(_rStmt, pos);
+		ODBCMetaColumn mc(_rStmt, pos, _numericToString);
 		sz = mc.length();
 
 		// accommodate for terminating zero (non-bulk only!)

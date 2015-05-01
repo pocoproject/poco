@@ -72,8 +72,9 @@ public:
 
 	Binder(const StatementHandle& rStmt,
 		std::size_t maxFieldSize,
-		ParameterBinding dataBinding = PB_IMMEDIATE,
-		TypeInfo* pDataTypes = 0);
+		ParameterBinding dataBinding,
+		TypeInfo* pDataTypes,
+		bool numericToString);
 		/// Creates the Binder.
 
 	~Binder();
@@ -365,8 +366,8 @@ private:
 	typedef std::vector<TimeVec*>                            TimeVecVec;
 	typedef std::vector<SQL_TIMESTAMP_STRUCT>                DateTimeVec;
 	typedef std::vector<DateTimeVec*>                        DateTimeVecVec;
-	typedef std::vector<Poco::Any>                           AnyVec;
-	typedef std::vector<AnyVec>                              AnyVecVec;
+	typedef std::vector<Poco::Any*>                          AnyPtrVec;
+	typedef std::vector<AnyPtrVec>                           AnyPtrVecVec;
 	typedef std::map<char*, std::string*>                    StringMap;
 	typedef std::map<UTF16String::value_type*, UTF16String*> UTF16StringMap;
 	typedef std::map<SQL_DATE_STRUCT*, Date*>                DateMap;
@@ -425,12 +426,13 @@ private:
 			*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
 
 		_lengthIndicator.push_back(pLenIn);
+		SQLSMALLINT sqlType = (isInBound(dir) && size <= _maxVarBinColSize) ? SQL_VARBINARY : SQL_LONGVARBINARY;
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			SQL_PARAM_INPUT, 
 			SQL_C_BINARY, 
-			SQL_LONGVARBINARY, 
+			sqlType,
 			(SQLUINTEGER) size,
 			0,
 			pVal,
@@ -485,9 +487,9 @@ private:
 		if (_containers.size() <= pos)
 			_containers.resize(pos + 1);
 
-		_containers[pos].push_back(std::vector<Type>());
+		_containers[pos].push_back( new Any(std::vector<Type>()) );
 
-		std::vector<Type>& cont = RefAnyCast<std::vector<Type> >(_containers[pos].back());
+		std::vector<Type>& cont = RefAnyCast<std::vector<Type> >( *_containers[pos].back() );
 		cont.assign(val.begin(), val.end());
 		bindImplVec(pos, cont, cDataType, dir);
 	}
@@ -586,12 +588,13 @@ private:
 			std::memcpy(_charPtrs[pos] + offset, it->c_str(), strSize);
 			offset += size;
 		}
+        	SQLSMALLINT sqlType = (isInBound(dir) && size < _maxCharColLength) ? SQL_VARCHAR : SQL_LONGVARCHAR;
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			toODBCDirection(dir), 
 			SQL_C_CHAR, 
-			SQL_LONGVARCHAR, 
+            		sqlType,
 			(SQLUINTEGER) size - 1,
 			0,
 			_charPtrs[pos], 
@@ -652,12 +655,12 @@ private:
 			std::memcpy(_utf16CharPtrs[pos] + offset, it->data(), strSize);
 			offset += (size / sizeof(UTF16Char));
 		}
-
+        	SQLSMALLINT sqlType = (isInBound(dir) && size < _maxWCharColLength) ? SQL_WVARCHAR : SQL_WLONGVARCHAR;
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT)pos + 1,
 			toODBCDirection(dir),
 			SQL_C_WCHAR,
-			SQL_WLONGVARCHAR,
+            		sqlType,
 			(SQLUINTEGER)size - 1,
 			0,
 			_utf16CharPtrs[pos],
@@ -722,12 +725,13 @@ private:
 			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize * sizeof(CharType));
 			offset += size;
 		}
+        	SQLSMALLINT sqlType = (isInBound(dir) && size <= _maxVarBinColSize) ? SQL_VARBINARY : SQL_LONGVARBINARY;
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			SQL_PARAM_INPUT, 
 			SQL_C_BINARY, 
-			SQL_LONGVARBINARY, 
+            		sqlType,
 			(SQLUINTEGER) size,
 			0,
 			_charPtrs[pos], 
@@ -753,8 +757,6 @@ private:
 			throw InvalidArgumentException("Empty vector not allowed.");
 
 		setParamSetSize(length);
-
-		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_DATE_STRUCT);
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
@@ -803,8 +805,6 @@ private:
 			throw InvalidArgumentException("Empty container not allowed.");
 
 		setParamSetSize(val.size());
-
-		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIME_STRUCT);
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
@@ -855,8 +855,6 @@ private:
 
 		setParamSetSize(length);
 
-		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
-
 		if (_vecLengthIndicator.size() <= pos)
 		{
 			_vecLengthIndicator.resize(pos + 1, 0);
@@ -905,8 +903,6 @@ private:
 			throw InvalidArgumentException("Empty container not allowed.");
 
 		setParamSetSize(length);
-
-		SQLINTEGER size = SQL_NULL_DATA;
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
@@ -1011,7 +1007,11 @@ private:
 	const TypeInfo*  _pTypeInfo;
 	SQLINTEGER       _paramSetSize;
 	std::size_t      _maxFieldSize;
-	AnyVecVec        _containers;
+	AnyPtrVecVec      _containers;
+	std::size_t      _maxCharColLength;
+	std::size_t      _maxWCharColLength;
+	std::size_t      _maxVarBinColSize;
+	bool             _numericToString;
 };
 
 

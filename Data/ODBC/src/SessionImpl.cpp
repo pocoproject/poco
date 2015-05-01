@@ -29,6 +29,8 @@ namespace Data {
 namespace ODBC {
 
 
+const char* const SessionImpl::NUMERIC_TO_STRING_FEATURE = "numericToString";
+
 SessionImpl::SessionImpl(const std::string& connect,
 	std::size_t loginTimeout,
 	std::size_t maxFieldSize,
@@ -39,13 +41,12 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_maxFieldSize(maxFieldSize),
 		_autoBind(autoBind),
 		_autoExtract(autoExtract),
+		_numericToString(false),
 		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
 		_inTransaction(false),
 		_queryTimeout(-1)
 {
-	setFeature("bulk", true);
-	open();
-	setProperty("handle", _db.handle());
+	init();
 }
 
 
@@ -62,6 +63,15 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_inTransaction(false),
 		_queryTimeout(-1)
 {
+	init();
+}
+
+
+void SessionImpl::init()
+{
+	addFeature(NUMERIC_TO_STRING_FEATURE,
+		&SessionImpl::setNumericToString,
+		&SessionImpl::numericToString);
 	setFeature("bulk", true);
 	open();
 	setProperty("handle", _db.handle());

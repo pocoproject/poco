@@ -19,6 +19,7 @@
 #ifndef Foundation_Config_INCLUDED
 #define Foundation_Config_INCLUDED
 
+#include "Poco/Cfg.h"
 
 // Define to enable Windows Unicode (UTF-8) support
 // NOTE: As of POCO C++ Libraries release 1.6.0, compiling POCO
@@ -90,7 +91,9 @@
 // !!! for std::aligned_storage.                           !!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // 
+#if !(defined(POCO_USE_SOO) && defined(POCO_ENABLE_CPP11))
 #define POCO_NO_SOO
+#endif
 
 
 // Small object size in bytes. When assigned to Any or Var,
