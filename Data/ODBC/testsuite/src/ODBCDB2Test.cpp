@@ -61,6 +61,11 @@ static std::string db2Uid()
 	return Poco::Environment::get("POCO_TEST_DB2_UID", "db2admin");
 }
 
+static std::string db2Db()
+{
+	return Poco::Environment::get("POCO_TEST_DB2_DB", "POCOTEST");
+}
+
 static std::string db2Pwd()
 {
 	return Poco::Environment::get("POCO_TEST_DB2_PWD", "db2admin");
@@ -75,7 +80,6 @@ static std::string db2Extra()
 #define DB2_DSN "PocoDataDB2Test"
 #define DB2_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define DB2_PORT "50000"
-#define DB2_DB "POCOTEST"
 
 
 ODBCTest::SessionPtr ODBCDB2Test::_pSession;
@@ -86,7 +90,7 @@ std::string          ODBCDB2Test::_uid = db2Uid();
 std::string          ODBCDB2Test::_pwd = db2Pwd();
 std::string          ODBCDB2Test::_connectString = "Driver=" + db2Driver() + ";"
 	+ db2Extra() +
-	"Database=" DB2_DB ";"
+	"Database=" + db2Db() + ";"
 	"Hostname=" DB2_SERVER ";"
 	"Port=" DB2_PORT ";"
 	"Protocol=TCPIP;"
@@ -209,7 +213,7 @@ void ODBCDB2Test::testStoredProcedure()
 			"END" , now;
 
 		int i = 0;
-		session() << "{call " DB2_DB "." << nm << "(?)}", out(i), now;
+		session() << "{call " + db2Db() + "." << nm << "(?)}", out(i), now;
 		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(-1 == i);
 
@@ -220,7 +224,7 @@ void ODBCDB2Test::testStoredProcedure()
 		
 		i = 2;
 		int j = 0;
-		session() << "{call " DB2_DB "." << nm << "(?, ?)}", in(i), out(j), now;
+		session() << "{call " + db2Db() + "." << nm << "(?, ?)}", in(i), out(j), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == j);
 	
@@ -230,7 +234,7 @@ void ODBCDB2Test::testStoredProcedure()
 			"END" , now;
 
 		i = 2;
-		session() << "{call " DB2_DB "." << nm << "(?)}", io(i), now;
+		session() << "{call " + db2Db() + "." << nm << "(?)}", io(i), now;
 		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(4 == i);
 
@@ -253,7 +257,7 @@ void ODBCDB2Test::testStoredProcedure()
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
 		std::string outParam;
-		session() << "{call " DB2_DB "." << nm << "(?,?)}", in(inParam), out(outParam), now;
+		session() << "{call " + db2Db() + "." << nm << "(?,?)}", in(inParam), out(outParam), now;
 		dropObject("PROCEDURE", nm + "(VARCHAR(1000), VARCHAR(1000))");
 		assert(inParam == outParam);
 
@@ -283,7 +287,7 @@ void ODBCDB2Test::testStoredProcedureAny()
 			" SET outParam = inParam*inParam; "
 			"END" , now;
 
-		session() << "{call " DB2_DB "." << nm << "(?, ?)}", in(i), out(j), now;
+		session() << "{call " + db2Db() + "." << nm << "(?, ?)}", in(i), out(j), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == AnyCast<int>(j));
 
@@ -293,7 +297,7 @@ void ODBCDB2Test::testStoredProcedureAny()
 			"END" , now;
 
 		i = 2;
-		session() << "{call " DB2_DB "." << nm << "(?)}", io(i), now;
+		session() << "{call " + db2Db() + "." << nm << "(?)}", io(i), now;
 		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(4 == AnyCast<int>(i));
 		
@@ -322,7 +326,7 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 			" SET outParam = inParam*inParam; "
 			"END" , now;
 
-		session() << "{call " DB2_DB "." << nm << "(?, ?)}", in(i), out(j), now;
+		session() << "{call " + db2Db() + "." << nm << "(?, ?)}", in(i), out(j), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == j);
 
@@ -332,7 +336,7 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 			"END" , now;
 
 		i = 2;
-		session() << "{call " DB2_DB "." << nm << "(?)}", io(i), now;
+		session() << "{call " + db2Db() + "." << nm << "(?)}", io(i), now;
 		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(4 == i);
 
@@ -365,7 +369,7 @@ void ODBCDB2Test::testStoredFunction()
 				"END", now;
 
 			Poco::Data::Statement stat(session());
-			stat << "{ call " DB2_DB "." << nm << "()}", now;
+			stat << "{ call " + db2Db() + "." << nm << "()}", now;
 			Poco::Data::RecordSet rs(stat);
 
 			assert(0 == rs.rowCount());
@@ -378,7 +382,7 @@ void ODBCDB2Test::testStoredFunction()
 			"END" , now;
 
 		int i = 0;
-		session() << "{? = call " DB2_DB "." << nm << "()}", out(i), now;
+		session() << "{? = call " + db2Db() + "." << nm << "()}", out(i), now;
 		dropObject("PROCEDURE", nm + "()");
 		assert(-1 == i);
 
@@ -390,7 +394,7 @@ void ODBCDB2Test::testStoredFunction()
 		
 		i = 2;
 		int result = 0;
-		session() << "{? = call " DB2_DB "." << nm << "(?)}", out(result), in(i), now;
+		session() << "{? = call " + db2Db() + "." << nm << "(?)}", out(result), in(i), now;
 		dropObject("PROCEDURE", nm + "(INTEGER)");
 		assert(4 == result);
 
@@ -403,7 +407,7 @@ void ODBCDB2Test::testStoredFunction()
 		i = 2;
 		int j = 0;
 		result = 0;
-		session() << "{? = call " DB2_DB "." << nm << "(?, ?)}", out(result), in(i), out(j), now;
+		session() << "{? = call " + db2Db() + "." << nm << "(?, ?)}", out(result), in(i), out(j), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == j);
 		assert(j == result); 
@@ -420,7 +424,7 @@ void ODBCDB2Test::testStoredFunction()
 		i = 1;
 		j = 2;
 		result = 0;
-		session() << "{? = call " DB2_DB "." << nm << "(?, ?)}", out(result), io(i), io(j), now;
+		session() << "{? = call " + db2Db() + "." << nm << "(?, ?)}", out(result), io(i), io(j), now;
 		assert(1 == j);
 		assert(2 == i);
 		assert(3 == result); 
@@ -429,7 +433,7 @@ void ODBCDB2Test::testStoredFunction()
 		assert(1 == params.get<0>());
 		assert(2 == params.get<1>());
 		result = 0;
-		session() << "{? = call " DB2_DB "." << nm << "(?, ?)}", out(result), io(params), now;
+		session() << "{? = call " + db2Db() + "." << nm << "(?, ?)}", out(result), io(params), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(1 == params.get<1>());
 		assert(2 == params.get<0>());
@@ -446,7 +450,7 @@ void ODBCDB2Test::testStoredFunction()
 		std::string inParam = "123456789";
 		std::string outParam;
 		int ret;
-		session() << "{? = call " DB2_DB "." << nm << "(?,?)}", out(ret), in(inParam), out(outParam), now;
+		session() << "{? = call " + db2Db() + "." << nm << "(?,?)}", out(ret), in(inParam), out(outParam), now;
 		dropObject("PROCEDURE", nm + "(VARCHAR(10), VARCHAR(10))");
 		assert(inParam == outParam);
 		assert(ret == inParam.size());
