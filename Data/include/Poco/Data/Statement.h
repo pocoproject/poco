@@ -365,6 +365,9 @@ public:
 		/// Returns false if the current data set index points to the last
 		/// data set. Otherwise, it returns true.
 
+	std::size_t firstDataSet();
+	/// Activates the first data set
+
 	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Sets the row formatter for this statement.
 		/// Statement takes the ownership of the formatter.
@@ -670,7 +673,7 @@ inline const AbstractExtractionVec& Statement::extractions() const
 
 inline const MetaColumn& Statement::metaColumn(std::size_t pos) const
 {
-	return _pImpl->metaColumn(pos);
+	return _pImpl->metaColumn(pos, _pImpl->currentDataSet());
 }
 
 
@@ -767,6 +770,12 @@ inline bool Statement::isNull(std::size_t col, std::size_t row) const
 inline bool Statement::isBulkExtraction() const
 {
 	return _pImpl->isBulkExtraction();
+}
+
+inline std::size_t Statement::firstDataSet()
+{
+	_pImpl->firstDataSet();
+	return 0;
 }
 
 

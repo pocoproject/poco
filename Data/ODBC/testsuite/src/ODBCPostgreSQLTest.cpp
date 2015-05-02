@@ -129,7 +129,7 @@ ODBCPostgreSQLTest::~ODBCPostgreSQLTest()
 
 void ODBCPostgreSQLTest::testBareboneODBC()
 {
-	std::string tableCreateString = "CREATE TABLE Test "
+	std::string tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
 		"Third BYTEA,"
@@ -142,7 +142,7 @@ void ODBCPostgreSQLTest::testBareboneODBC()
 	executor().bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
 	executor().bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
-	tableCreateString = "CREATE TABLE Test "
+	tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
 		"Third BYTEA,"
@@ -157,7 +157,7 @@ void ODBCPostgreSQLTest::testBareboneODBC()
 
 //neither pSQL ODBC nor Mammoth drivers support multiple results properly
 /*
-	tableCreateString = "CREATE TABLE Test "
+	tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second INTEGER,"
 		"Third FLOAT)";
@@ -390,8 +390,8 @@ void ODBCPostgreSQLTest::dropObject(const std::string& type, const std::string& 
 
 void ODBCPostgreSQLTest::recreateNullableTable()
 {
-	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	dropObject("TABLE", ExecUtil::nullabletest());
+	try { *_pSession << "CREATE TABLE "<< ExecUtil::nullabletest() << " (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime TIMESTAMP NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -399,8 +399,8 @@ void ODBCPostgreSQLTest::recreateNullableTable()
 
 void ODBCPostgreSQLTest::recreatePersonTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -408,8 +408,8 @@ void ODBCPostgreSQLTest::recreatePersonTable()
 
 void ODBCPostgreSQLTest::recreatePersonBLOBTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BYTEA)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BYTEA)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
@@ -418,8 +418,8 @@ void ODBCPostgreSQLTest::recreatePersonBLOBTable()
 
 void ODBCPostgreSQLTest::recreatePersonDateTimeTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born TIMESTAMP)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born TIMESTAMP)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -427,8 +427,8 @@ void ODBCPostgreSQLTest::recreatePersonDateTimeTable()
 
 void ODBCPostgreSQLTest::recreatePersonDateTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTable()"); }
 }
@@ -436,8 +436,8 @@ void ODBCPostgreSQLTest::recreatePersonDateTable()
 
 void ODBCPostgreSQLTest::recreatePersonTimeTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
 }
@@ -445,8 +445,8 @@ void ODBCPostgreSQLTest::recreatePersonTimeTable()
 
 void ODBCPostgreSQLTest::recreateIntsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { session() << "CREATE TABLE Strings (str INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { session() << "CREATE TABLE " << ExecUtil::strings() <<" (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -454,8 +454,8 @@ void ODBCPostgreSQLTest::recreateIntsTable()
 
 void ODBCPostgreSQLTest::recreateStringsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { session() << "CREATE TABLE Strings (str VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { session() << "CREATE TABLE " << ExecUtil::strings() <<" (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
 }
@@ -463,8 +463,8 @@ void ODBCPostgreSQLTest::recreateStringsTable()
 
 void ODBCPostgreSQLTest::recreateFloatsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { session() << "CREATE TABLE Strings (str FLOAT)", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { session() << "CREATE TABLE " << ExecUtil::strings() <<" (str FLOAT)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
 }
@@ -472,8 +472,8 @@ void ODBCPostgreSQLTest::recreateFloatsTable()
 
 void ODBCPostgreSQLTest::recreateTuplesTable()
 {
-	dropObject("TABLE", "Tuples");
-	try { session() << "CREATE TABLE Tuples "
+	dropObject("TABLE", ExecUtil::tuples());
+	try { session() << "CREATE TABLE " <<  ExecUtil::tuples() <<
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
 		"int7 INTEGER, int8 INTEGER, int9 INTEGER, int10 INTEGER, int11 INTEGER, int12 INTEGER, int13 INTEGER,"
 		"int14 INTEGER, int15 INTEGER, int16 INTEGER, int17 INTEGER, int18 INTEGER, int19 INTEGER)", now; }
@@ -484,8 +484,8 @@ void ODBCPostgreSQLTest::recreateTuplesTable()
 
 void ODBCPostgreSQLTest::recreateVectorsTable()
 {
-	dropObject("TABLE", "Vectors");
-	try { session() << "CREATE TABLE Vectors (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::vectors());
+	try { session() << "CREATE TABLE " << ExecUtil::vectors() << " (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
 }
@@ -493,8 +493,8 @@ void ODBCPostgreSQLTest::recreateVectorsTable()
 
 void ODBCPostgreSQLTest::recreateAnysTable()
 {
-	dropObject("TABLE", "Anys");
-	try { session() << "CREATE TABLE Anys (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::anys() );
+	try { session() << "CREATE TABLE " << ExecUtil::anys() << " (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
@@ -502,8 +502,8 @@ void ODBCPostgreSQLTest::recreateAnysTable()
 
 void ODBCPostgreSQLTest::recreateNullsTable(const std::string& notNull)
 {
-	dropObject("TABLE", "NullTest");
-	try { session() << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
+	dropObject("TABLE", ExecUtil::nulltest());
+	try { session() << format("CREATE TABLE %s (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",ExecUtil::nulltest(),
 		notNull,
 		notNull,
 		notNull), now; }
@@ -523,11 +523,11 @@ void ODBCPostgreSQLTest::recreateBoolTable()
 
 void ODBCPostgreSQLTest::recreateMiscTable()
 {
-	dropObject("TABLE", "MiscTest");
+	dropObject("TABLE", ExecUtil::misctest());
 	try 
 	{ 
 		// Mammoth does not bind columns properly
-		session() << "CREATE TABLE MiscTest "
+		session() << "CREATE TABLE "<< ExecUtil::misctest() <<
 			"(First VARCHAR(30),"
 			"Second BYTEA,"
 			"Third INTEGER,"
@@ -540,8 +540,8 @@ void ODBCPostgreSQLTest::recreateMiscTable()
 
 void ODBCPostgreSQLTest::recreateLogTable()
 {
-	dropObject("TABLE", "T_POCO_LOG");
-	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
+	dropObject("TABLE", ExecUtil::pocolog());;
+	dropObject("TABLE", ExecUtil::pocolog_a());;
 
 	try 
 	{ 
@@ -555,8 +555,8 @@ void ODBCPostgreSQLTest::recreateLogTable()
 			"Text VARCHAR,"
 			"DateTime TIMESTAMP)"; 
 
-		session() << sql, "T_POCO_LOG", now; 
-		session() << sql, "T_POCO_LOG_ARCHIVE", now; 
+		session() << sql, ExecUtil::pocolog(), now; 
+		session() << sql, ExecUtil::pocolog_a(), now; 
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
