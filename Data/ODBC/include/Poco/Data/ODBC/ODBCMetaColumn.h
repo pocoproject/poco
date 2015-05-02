@@ -39,7 +39,7 @@ namespace ODBC {
 class ODBC_API ODBCMetaColumn: public MetaColumn
 {
 public:
-	explicit ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position);
+	ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position, bool numericToString);
 		/// Creates the ODBCMetaColumn.
 		
 	~ODBCMetaColumn();
@@ -73,6 +73,7 @@ private:
 	SQLLEN                 _dataLength;
 	const StatementHandle& _rStmt;
 	ColumnDescription      _columnDesc;
+	bool                   _numericToString;
 };
 
 

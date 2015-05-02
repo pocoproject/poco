@@ -322,6 +322,7 @@
     <ClInclude Include="src\ODBCTest.h"/>
     <ClInclude Include="src\SQLExecutor.h"/>
     <ClInclude Include="src\ODBCTestSuite.h"/>
+		<ClInclude Include="src\ODBCSybaseTest.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ODBCAccessTest.cpp"/>
@@ -334,6 +335,7 @@
     <ClCompile Include="src\ODBCTest.cpp"/>
     <ClCompile Include="src\SQLExecutor.cpp"/>
     <ClCompile Include="src\ODBCTestSuite.cpp"/>
+		<ClCompile Include="src\/ODBCSybaseTest.cpp"/>
     <ClCompile Include="src\WinDriver.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>

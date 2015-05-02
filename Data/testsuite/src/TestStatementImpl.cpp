@@ -72,7 +72,7 @@ std::size_t TestStatementImpl::columnsReturned() const
 }
 
 
-const MetaColumn& TestStatementImpl::metaColumn(std::size_t pos) const
+const MetaColumn& TestStatementImpl::metaColumn(std::size_t pos, std::size_t /*rsPos*/) const
 {
 	static MetaColumn c(pos, "", MetaColumn::FDT_BOOL, 0);
 	return c;

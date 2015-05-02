@@ -90,7 +90,9 @@
 // !!! for std::aligned_storage.                           !!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // 
+#if !(defined(POCO_USE_SOO) && defined(POCO_ENABLE_CPP11))
 #define POCO_NO_SOO
+#endif
 
 
 // Small object size in bytes. When assigned to Any or Var,
