@@ -32,28 +32,28 @@ class Data_API Position
 	/// indicate the recordset position in batch SQL statements.
 {
 public:
-	typedef Poco::UInt32 Position_Type;
+	typedef Poco::UInt32 PositionType;
 
-	Position(Position_Type value);
+	Position(PositionType value);
 		/// Creates the Position.
 
 	~Position();
 		/// Destroys the Position.
 
-	Position_Type value() const;
+	PositionType value() const;
 		/// Returns the position value.
 	
 private:
 	Position();
 
-	Position_Type _value;
+	PositionType _value;
 };
 
 
 ///
 /// inlines
 ///
-inline Position::Position_Type Position::value() const
+inline Position::PositionType Position::value() const
 { 
 	return _value; 
 }

@@ -328,7 +328,7 @@ bool ODBCStatementImpl::hasNext()
 					if (nextResultSet()) {
 						addPreparator();
 						fillColumns(currentDataSet() + 1);
-						makeExtractors(_preparations.back()->columns(), static_cast<Position::Position_Type>(currentDataSet() + 1));
+						makeExtractors(_preparations.back()->columns(), static_cast<Position::PositionType>(currentDataSet() + 1));
 						activateNextDataSet();
 					}
 					else return false;
