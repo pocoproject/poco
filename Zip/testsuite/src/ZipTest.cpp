@@ -6,7 +6,7 @@
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// SPDX-License-Identifier:	BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 //
 
 
@@ -25,6 +25,8 @@
 #include "Poco/StreamCopier.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#undef min
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 
@@ -58,8 +60,8 @@ void ZipTest::testSkipSingleFile()
 	ZipCommon::CompressionMethod cm = hdr.getCompressionMethod();
 	assert (!hdr.isEncrypted());
 	Poco::DateTime aDate = hdr.lastModifiedAt();
-	Poco::UInt32 cS = hdr.getCompressedSize();
-	Poco::UInt32 uS = hdr.getUncompressedSize();
+	Poco::UInt64 cS = hdr.getCompressedSize();
+	Poco::UInt64 uS = hdr.getUncompressedSize();
 	const std::string& fileName = hdr.getFileName();
 }
 
@@ -164,6 +166,51 @@ void ZipTest::testDecompressFlat()
 }
 
 
+void ZipTest::verifyDataFile(const std::string& path, Poco::UInt64 size) 
+{
+	std::ifstream in(path.c_str(), std::ios::binary);
+	assert( ! in.fail() );
+	Poco::Buffer<char> buffer1(MB);
+	Poco::Buffer<char> buffer2(MB);
+	for (int i = 0; size != 0; i++) 
+	{
+		std::memset(buffer1.begin(), i, buffer1.size());
+		std::memset(buffer2.begin(), 0, buffer2.size());
+		Poco::UInt64 bytesToRead = std::min(size, static_cast<Poco::UInt64>(buffer2.size()));
+		in.read(buffer2.begin(), bytesToRead);
+		assert(!in.fail() );
+		assert(std::memcmp(buffer1.begin(), buffer2.begin(), static_cast<std::size_t>(bytesToRead)) == 0);
+		size -= bytesToRead;
+	}
+	char c;
+	in.read(&c, 1);
+	assert ( in.eof() );
+}
+
+
+void ZipTest::testDecompressZip64()
+{
+	std::map<std::string, Poco::UInt64> files;
+	files["data1.bin"] = static_cast<Poco::UInt64>(MB)*4096+1;
+	files["data2.bin"] = static_cast<Poco::UInt64>(MB)*16;
+	files["data3.bin"] = static_cast<Poco::UInt64>(MB)*4096-1;
+	
+	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) 
+	{
+		Poco::File file(it->first);
+		if(file.exists())
+			file.remove();
+	}
+	std::ifstream in("zip64.zip", std::ios::binary);
+	Decompress c(in, ".");
+	c.decompressAllFiles();
+	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) 
+	{
+		verifyDataFile(it->first, it->second);
+	}
+}
+
+
 void ZipTest::onDecompressError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info)
 {
 	++_errCnt;
@@ -191,5 +238,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testDecompressFlat);
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterData);
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterDataWithArchive);
+	CppUnit_addTest(pSuite, ZipTest, testDecompressZip64);
+
 	return pSuite;
 }

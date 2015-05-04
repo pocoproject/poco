@@ -31,7 +31,6 @@
 #include <vector>
 #include <cstring>
 
-GCC_DIAG_OFF(unused-variable)
 
 using Poco::Bugcheck;
 using Poco::Exception;
