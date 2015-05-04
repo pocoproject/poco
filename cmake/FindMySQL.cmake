@@ -1,3 +1,6 @@
+SET(BINDIR32_ENV_NAME "ProgramFiles(x86)")
+SET(BINDIR32 $ENV{${BINDIR32_ENV_NAME}})
+
 find_path(MYSQL_INCLUDE_DIR mysql.h
 		/usr/include/mysql
 		/usr/local/include/mysql
@@ -8,6 +11,7 @@ find_path(MYSQL_INCLUDE_DIR mysql.h
 		$ENV{MYSQL_INCLUDE_DIR}
 		$ENV{MYSQL_DIR}/include
 		$ENV{ProgramFiles}/MySQL/*/include
+		${BINDIR32}/MySQL/include
 		$ENV{SystemDrive}/MySQL/*/include)
 
 if (WIN32)
@@ -26,6 +30,7 @@ if (WIN32)
 				 $ENV{MYSQL_DIR}/libmysql/${libsuffixBuild}
 				 $ENV{MYSQL_DIR}/client/${libsuffixBuild}
 				 $ENV{ProgramFiles}/MySQL/*/lib/${libsuffixDist}
+				 ${BINDIR32}/MySQL/lib
 				 $ENV{SystemDrive}/MySQL/*/lib/${libsuffixDist})
 else (WIN32)
 	find_library(MYSQL_LIB NAMES mysqlclient_r

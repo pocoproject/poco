@@ -135,6 +135,8 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 		else throw Poco::NotImplementedException("Unsupported compression method");
 
 		// now write the header to the ostr!
+        if (fileEntry.needsZip64())
+            fileEntry.setZip64Data();
 		std::string header = fileEntry.createHeader();
 		ostr.write(header.c_str(), static_cast<std::streamsize>(header.size()));
 	}
@@ -198,8 +200,9 @@ int ZipStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 }
 
 
-void ZipStreamBuf::close()
+void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 {
+    extraDataSize = 0;
 	if (_ptrOBuf && _pHeader)
 	{
 		_ptrOBuf->flush();
@@ -217,20 +220,36 @@ void ZipStreamBuf::close()
 		// or fix the crc entries
 		if (_pHeader->searchCRCAndSizesAfterData())
 		{
-			ZipDataInfo info;
-			info.setCRC32(_crc32.checksum());
-			info.setUncompressedSize(_bytesWritten);
-			info.setCompressedSize(static_cast<Poco::UInt32>(_ptrOHelper->bytesWritten()));
-			_pOstr->write(info.getRawHeader(), static_cast<std::streamsize>(info.getFullHeaderSize()));
+            if (_pHeader->needsZip64()) 
+            {
+			    ZipDataInfo64 info;
+			    info.setCRC32(_crc32.checksum());
+			    info.setUncompressedSize(_bytesWritten);
+			    info.setCompressedSize(_ptrOHelper->bytesWritten());
+                extraDataSize = info.getFullHeaderSize();
+			    _pOstr->write(info.getRawHeader(), static_cast<std::streamsize>(extraDataSize));
+            } 
+            else 
+            {
+ 			    ZipDataInfo info;
+			    info.setCRC32(_crc32.checksum());
+			    info.setUncompressedSize(static_cast<Poco::UInt32>(_bytesWritten));
+			    info.setCompressedSize(static_cast<Poco::UInt32>(_ptrOHelper->bytesWritten()));
+                extraDataSize = info.getFullHeaderSize();
+			    _pOstr->write(info.getRawHeader(), static_cast<std::streamsize>(extraDataSize));
+           }
 		}
 		else
 		{
 			poco_check_ptr (_pHeader);
 			_pHeader->setCRC(_crc32.checksum());
 			_pHeader->setUncompressedSize(_bytesWritten);
-			_pHeader->setCompressedSize(static_cast<Poco::UInt32>(_ptrOHelper->bytesWritten()));
+			_pHeader->setCompressedSize(_ptrOHelper->bytesWritten());
 			_pOstr->seekp(_pHeader->getStartPos(), std::ios_base::beg);
 			poco_assert (*_pOstr);
+	        _pHeader->setStartPos(_pHeader->getStartPos()); // This resets EndPos now that compressed Size is known
+            if (_pHeader->hasExtraField())   // Update sizes in header extension.
+                _pHeader->setZip64Data();
 			std::string header = _pHeader->createHeader();
 			_pOstr->write(header.c_str(), static_cast<std::streamsize>(header.size()));
 			_pOstr->seekp(0, std::ios_base::end);
@@ -297,10 +316,10 @@ ZipOutputStream::~ZipOutputStream()
 }
 
 
-void ZipOutputStream::close()
+void ZipOutputStream::close(Poco::UInt64& extraDataSize)
 {
 	flush();
-	_buf.close();
+	_buf.close(extraDataSize);
 }
 
 
