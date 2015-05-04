@@ -112,12 +112,6 @@
 #endif
 
 
-#ifndef __GNUC__
-	#define GCC_DIAG_OFF(x)
-	#define GCC_DIAG_ON(x)
-#endif
-
-
 //
 // Hardware Architecture and Byte Order
 //
@@ -255,6 +249,13 @@
 #elif defined (__IBMCPP__) && defined(__COMPILER_VER__)
 	#define POCO_COMPILER_IBM_XLC_ZOS // IBM z/OS C++
 #endif
+
+
+#ifdef __GNUC__
+#define POCO_UNUSED __attribute__((unused))
+#else
+#define POCO_UNUSED
+#endif // __GNUC__
 
 
 #if !defined(POCO_ARCH)

@@ -225,7 +225,6 @@ void ThreadImpl::setAffinityImpl(int cpu)
 int ThreadImpl::getAffinityImpl() const
 {
 	int cpuSet = -1;
-	int cpuCount = Environment::processorCount();
 #if defined (POCO_OS_FAMILY_UNIX) && POCO_OS != POCO_OS_MAC_OS_X
 #ifdef HAVE_PTHREAD_SETAFFINITY_NP
 	cpu_set_t cpuset;
@@ -237,6 +236,7 @@ int ThreadImpl::getAffinityImpl() const
 	if (pthread_getaffinity_np(_pData->thread, &cpuset) != 0)
 		throw SystemException("Failed to get affinity", errno);
 #endif
+	int cpuCount = Environment::processorCount();
 	for (int i = 0; i < cpuCount; i++)
 	{
 		if (CPU_ISSET(i, &cpuset))
@@ -263,6 +263,7 @@ int ThreadImpl::getAffinityImpl() const
 		throw SystemException("Failed to get affinity", errno);
 	}
 	cpuSet = policy.affinity_tag;
+	int cpuCount = Environment::processorCount();
 	if (cpuSet >= cpuCount)
 		cpuSet = -1;
 

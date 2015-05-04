@@ -115,7 +115,6 @@ private:
 	unsigned      _indent;
 	std::string   _tab;
 	int           _array;
-	bool          _value;
 	bool          _objStart;
 };
 
