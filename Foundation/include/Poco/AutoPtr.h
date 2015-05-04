@@ -89,12 +89,10 @@ public:
 		if (_ptr) _ptr->duplicate();
 	}
 
-#if __cplusplus >= 201103L
-	AutoPtr(AutoPtr&& ptr) noexcept : _ptr(std::move(ptr._ptr))
+	AutoPtr(AutoPtr&& ptr) : _ptr(std::move(ptr._ptr))
 	{
 		ptr._ptr = nullptr;
 	}
-#endif
 
 	template <class Other> 
 	AutoPtr(const AutoPtr<Other>& ptr): _ptr(const_cast<Other*>(ptr.get()))
@@ -167,14 +165,11 @@ public:
 		return assign<Other>(ptr);
 	}
 
-#if __cplusplus >= 201103L
-	AutoPtr& operator = (AutoPtr&& ptr) noexcept
+	AutoPtr& operator = (AutoPtr&& ptr)
 	{
 		swap(ptr);
 		return *this;
-
 	}
-#endif
 
 	inline void swap(AutoPtr& ptr)
 	{
