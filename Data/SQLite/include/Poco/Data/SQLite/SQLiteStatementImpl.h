@@ -60,7 +60,7 @@ protected:
 		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT. 
 		/// Changes associated with creating and dropping tables are not counted.
 
-	const MetaColumn& metaColumn(std::size_t pos) const;
+	const MetaColumn& metaColumn(std::size_t pos, std::size_t dataSet) const;
 		/// Returns column meta data.
 
 	bool hasNext();
