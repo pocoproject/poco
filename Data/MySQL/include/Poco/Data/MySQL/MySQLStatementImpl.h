@@ -54,7 +54,7 @@ protected:
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 	
-	virtual const MetaColumn& metaColumn(std::size_t pos) const;
+	virtual const MetaColumn& metaColumn(std::size_t pos, std::size_t dataSet) const;
 		/// Returns column meta data.
 		
 	virtual bool hasNext();
