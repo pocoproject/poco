@@ -117,7 +117,7 @@ public:
 		/// of this Transaction object.
 
 	template <typename T>
-	void transact(T& t)
+	void transact(const T& t)
 		/// Executes the transactor and, unless transactor throws an exception, 
 		/// commits the transaction.
 	{
