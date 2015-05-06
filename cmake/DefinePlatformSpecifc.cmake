@@ -61,7 +61,6 @@ find_package(Cygwin)
 
 if(WIN32)
   add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DUNICODE -D_UNICODE -D__LCC__)  #__LCC__ define used by MySQL.h
-  set(SYSLIBS ${SYSLIBS} gdi32)
   if(ENABLE_DATA_ODBC)
 	set(SYSLIBS ${SYSLIBS} odbc32)
   endif(ENABLE_DATA_ODBC)
