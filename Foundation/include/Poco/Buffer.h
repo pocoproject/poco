@@ -108,8 +108,7 @@ public:
 		return *this;
 	}
 
-#if __cplusplus >= 201103L
-	Buffer(Buffer&& other) noexcept :
+	Buffer(Buffer&& other) :
 		/// Copy constructor.
 		_capacity(other._capacity),
 		_used(other._used),
@@ -120,7 +119,7 @@ public:
 		other._ptr = nullptr;
 	}
 
-	Buffer& operator =(Buffer&& other) noexcept
+	Buffer& operator =(Buffer&& other)
 		/// Assignment operator.
 	{
 		if (this != &other)
@@ -136,7 +135,6 @@ public:
 
 		return *this;
 	}
-#endif
 
 	~Buffer()
 		/// Destroys the Buffer.

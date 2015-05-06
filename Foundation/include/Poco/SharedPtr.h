@@ -148,13 +148,11 @@ public:
 		_pCounter->duplicate();
 	}
 
-#if __cplusplus >= 201103L
-	SharedPtr(SharedPtr&& ptr) noexcept : _pCounter(std::move(ptr._pCounter)), _ptr(std::move(ptr._ptr))
+	SharedPtr(SharedPtr&& ptr)  : _pCounter(std::move(ptr._pCounter)), _ptr(std::move(ptr._ptr))
 	{
 		ptr._ptr = nullptr;
 		ptr._pCounter = nullptr;
 	}
-#endif
 
 	~SharedPtr()
 	{
@@ -209,13 +207,11 @@ public:
 		return assign(ptr);
 	}
 
-#if __cplusplus >= 201103L
-	SharedPtr& operator = (SharedPtr&& ptr) noexcept 
+	SharedPtr& operator = (SharedPtr&& ptr) 
 	{
 		swap(ptr);
 		return *this;
 	}
-#endif
 
 	template <class Other, class OtherRP>
 	SharedPtr& operator = (const SharedPtr<Other, RC, OtherRP>& ptr)

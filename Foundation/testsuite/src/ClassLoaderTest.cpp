@@ -18,7 +18,6 @@
 #include "Poco/Exception.h"
 #include "TestPlugin.h"
 
-GCC_DIAG_OFF(unused-variable)
 
 using Poco::ClassLoader;
 using Poco::Manifest;

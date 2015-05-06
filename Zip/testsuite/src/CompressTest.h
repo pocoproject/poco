@@ -8,7 +8,7 @@
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// SPDX-License-Identifier:	BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 //
 
 
@@ -32,6 +32,10 @@ public:
 	void testManipulatorDel();
 	void testManipulatorReplace();
 	void testSetZipComment();
+
+	static const Poco::UInt64 MB = (1024*1024);
+	void createDataFile(const std::string& path, Poco::UInt64 size);
+	void testZip64();
 
 	void setUp();
 	void tearDown();
