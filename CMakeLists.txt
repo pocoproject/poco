@@ -53,6 +53,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
     set( CMAKE_BUILD_TYPE "RelWithDebInfo" )
 endif()
 
+# For Debug build types, append a "d" to the library names.
+set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set debug library postfix" FORCE)
+
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
