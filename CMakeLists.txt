@@ -62,6 +62,19 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
     set( CMAKE_BUILD_TYPE "RelWithDebInfo" )
 endif()
 
+# http://www.cmake.org/Wiki/CMake_Useful_Variables :
+# CMAKE_BUILD_TYPE
+#    Choose the type of build. CMake has default flags for these:
+#
+#    * None (CMAKE_C_FLAGS or CMAKE_CXX_FLAGS used)
+#    * Debug (CMAKE_C_FLAGS_DEBUG or CMAKE_CXX_FLAGS_DEBUG)
+#    * Release (CMAKE_C_FLAGS_RELEASE or CMAKE_CXX_FLAGS_RELEASE)
+#    * RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
+#    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL)
+
+# For Debug build types, append a "d" to the library names.
+set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set debug library postfix" FORCE)
+
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
