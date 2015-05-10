@@ -71,8 +71,11 @@ PostgreSQLStatementImpl::affectedRowCount() const
 
 
 const MetaColumn&
-PostgreSQLStatementImpl::metaColumn(std::size_t aPosition) const
+PostgreSQLStatementImpl::metaColumn(std::size_t aPosition, std::size_t aDataset) const
 {
+	// PostgreSql doesn't support multiple result sets
+	poco_assert_dbg(aDataset == 0);
+	
 	return _statementExecutor.metaColumn(aPosition);
 }
 
