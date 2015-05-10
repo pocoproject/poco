@@ -73,7 +73,7 @@ protected:
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 
-	virtual const MetaColumn& metaColumn(std::size_t aPosition) const;
+	virtual const MetaColumn& metaColumn(std::size_t aPosition, std::size_t aDataset) const;
 		/// Returns column meta data.
 
 	virtual bool hasNext();
