@@ -3892,7 +3892,7 @@ void SQLExecutor::transaction(const std::string& connect)
 
 	Session local("odbc", connect);
 	local.setFeature("autoCommit", true);
-	local << _connInitSql, now;
+	if (!_connInitSql.empty()) local << _connInitSql, now;
 
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 	if (local.hasTransactionIsolation(Session::TRANSACTION_READ_UNCOMMITTED))
