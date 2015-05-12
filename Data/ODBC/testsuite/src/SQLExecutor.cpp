@@ -325,9 +325,11 @@ const std::string SQLExecutor::MULTI_SELECT =
 	"SELECT * FROM " +ExecUtil::test_tbl() + " WHERE First = '5';";
 
 
-SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession): 
+SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, const std::string& connInitSql, const std::string& schemaName) :
 	CppUnit::TestCase(name),
-	_pSession(pSession)
+	_pSession(pSession),
+	_connInitSql(connInitSql),
+	_schemaName(schemaName)
 {
 }
 
@@ -398,6 +400,14 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 
 		rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 		poco_odbc_check_stmt (rc, hstmt);
+
+		if (!_connInitSql.empty())
+		{
+			rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+			poco_odbc_check_stmt(rc, hstmt);
+			SQLCHAR* pStr = (SQLCHAR*)_connInitSql.c_str();
+			SQLExecDirect(hstmt, pStr, (SQLINTEGER)_connInitSql.length());
+		}
 
 			// Statement begin
 			rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
@@ -3318,6 +3328,7 @@ void SQLExecutor::stdVectorBool()
 void SQLExecutor::asynchronous(int rowCount)
 {
 	Session tmp = session();
+	if (!_connInitSql.empty()) tmp << _connInitSql, now;
 
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO " << ExecUtil::strings() << " VALUES(?)", use(data));
@@ -3413,6 +3424,7 @@ void SQLExecutor::any()
 	s = us;
 #endif
 	Session tmp = session();
+	if (!_connInitSql.empty()) tmp << _connInitSql, now;
 
 	tmp << "INSERT INTO " << ExecUtil::anys() << " VALUES (?, ?, ?)", use(i), use(f), use(s), now;
 
@@ -3449,6 +3461,8 @@ void SQLExecutor::dynamicAny()
 	Var s = "42";
 
 	Session tmp = session();
+	if (!_connInitSql.empty()) tmp << _connInitSql, now;
+
 	tmp << "INSERT INTO " << ExecUtil::anys() << " VALUES (?, ?, ?)", use(i), use(f), use(s), now;
 
 	int count = 0;
@@ -3651,8 +3665,8 @@ void SQLExecutor::sqlChannel(const std::string& connect)
 	try
 	{
 		AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::Data::ODBC::Connector::KEY, connect, "TestSQLChannel");
-		pChannel->setProperty("table", ExecUtil::pocolog()); // has to be the first, as otherwise "table" won't take effect
-		pChannel->setProperty("archive", ExecUtil::pocolog_a());
+		pChannel->setProperty("table", schemaTable(ExecUtil::pocolog())); // has to be the first, as otherwise "table" won't take effect
+		pChannel->setProperty("archive", schemaTable(ExecUtil::pocolog_a()));
 		pChannel->setProperty("keep", "2 seconds");
 
 		Message msgInf("InformationSource", "a Informational async message", Message::PRIO_INFORMATION);
@@ -3713,7 +3727,7 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 	{
 		Logger& root = Logger::root();
 		SQLChannel* ch = new SQLChannel(Poco::Data::ODBC::Connector::KEY, connect, "TestSQLChannel");
-		ch->setProperty("table", ExecUtil::pocolog());
+		ch->setProperty("table", schemaTable(ExecUtil::pocolog()));
 		root.setChannel(ch);
 		root.setLevel(Message::PRIO_INFORMATION);
 		
@@ -3784,6 +3798,7 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	}
 
 	Session local("odbc", connect);
+	if (!_connInitSql.empty()) local << _connInitSql, now;
 	local.setFeature("autoCommit", true);
 
 	std::string funct = "transaction()";
@@ -3877,6 +3892,7 @@ void SQLExecutor::transaction(const std::string& connect)
 
 	Session local("odbc", connect);
 	local.setFeature("autoCommit", true);
+	if (!_connInitSql.empty()) local << _connInitSql, now;
 
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 	if (local.hasTransactionIsolation(Session::TRANSACTION_READ_UNCOMMITTED))
@@ -4212,6 +4228,7 @@ void SQLExecutor::reconnect()
 	assert (!session().isConnected());
 
 	session().open();
+	if (!_connInitSql.empty()) session() << _connInitSql, now;
 	assert (session().isConnected());
 	try { session() << "SELECT Age FROM " << ExecUtil::person(), into(count), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
