@@ -120,7 +120,7 @@ void Document::read(BinaryReader& reader)
 		}
 
 		element->read(reader);
-		_elements.insert(element);
+		_elements.push_back(element);
 
 		reader >> type;
 	}
