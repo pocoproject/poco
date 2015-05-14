@@ -41,6 +41,7 @@ public:
 	void testConnectionPool();
 	void testCursorRequest();
 	void testObjectID();
+	void testCommand();
 	void setUp();
 	void tearDown();
 

@@ -410,6 +410,29 @@ void MongoDBTest::testObjectID()
 }
 
 
+void MongoDBTest::testCommand() {
+	Poco::MongoDB::Database db("team");
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> command = db.createCommand();
+	command->selector().add("create", "fixCol")
+		.add("capped", true)
+		.add("max", 1024*1024)
+		.add("size", 1024);
+
+	Poco::MongoDB::ResponseMessage response;
+	_mongo.sendRequest(*command, response);
+	if ( response.documents().size() > 0 )
+	{
+		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+		std::cout << doc->toString(2);
+	}
+	else
+	{
+		Poco::MongoDB::Document::Ptr lastError = db.getLastErrorDoc(_mongo);
+		std::cout << "LastError: " << lastError->toString(2) << std::endl;
+		fail("Didn't get a response from the  command");
+	}
+}
+
 CppUnit::Test* MongoDBTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTest");
@@ -425,6 +448,7 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
 	CppUnit_addTest(pSuite, MongoDBTest, testCursorRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testObjectID);
+	CppUnit_addTest(pSuite, MongoDBTest, testCommand);
 
 	return pSuite;
 }

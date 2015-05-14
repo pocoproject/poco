@@ -234,7 +234,7 @@ void sample5(Poco::MongoDB::Connection& connection)
 
 	// When orderby is needed, use 2 separate documents in the query selector
 	cursor.query().selector().addNewDocument("$query").add("birthyear", 1987);
-	cursor.query().selector().addNewDocument("$orderby").add("lastname", 0);
+	cursor.query().selector().addNewDocument("$orderby").add("lastname", -1);
 
 	Poco::MongoDB::ResponseMessage& response = cursor.next(connection);
 	while(1)
@@ -410,7 +410,7 @@ void sample11(Poco::MongoDB::Connection& connection)
 
 	if ( response.hasDocuments() )
 	{
-		std::cout << "Count: " << response.documents()[0]->get<double>("n") << std::endl;
+		std::cout << "Count: " << response.documents()[0]->get<int>("n") << std::endl;
 	}
 }
 
