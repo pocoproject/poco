@@ -157,6 +157,7 @@ private:
 	mutable std::size_t   _affectedRowCount;
 	bool                  _canCompile;
 	bool                  _numericToString;
+	bool                  _isPostgres;
 };
 
 
