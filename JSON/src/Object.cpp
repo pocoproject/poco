@@ -107,7 +107,7 @@ const std::string& Object::getKey(KeyPtrList::const_iterator& iter) const
 	ValueMap::const_iterator end = _values.end();
 	for (; it != end; ++it)
 	{
-		if (&it->second == *iter) return it->first;
+		if (it->second == **iter) return it->first;
 	}
 
 	throw NotFoundException((*iter)->convert<std::string>());
