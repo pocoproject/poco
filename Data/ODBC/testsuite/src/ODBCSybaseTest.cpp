@@ -503,6 +503,7 @@ CppUnit::Test* SybaseODBC::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SybaseODBC");
 
 		CppUnit_addTest(pSuite, SybaseODBC, testBareboneODBC);
+		CppUnit_addTest(pSuite, SybaseODBC, testSyntaxError);
 		CppUnit_addTest(pSuite, SybaseODBC, testSimpleAccess);
 		CppUnit_addTest(pSuite, SybaseODBC, testComplexType);
 		CppUnit_addTest(pSuite, SybaseODBC, testSimpleAccessVector);

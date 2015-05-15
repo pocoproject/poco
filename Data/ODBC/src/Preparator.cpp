@@ -31,7 +31,8 @@ Preparator::Preparator(const StatementHandle& rStmt,
 	const std::string& statement, 
 	std::size_t maxFieldSize,
 	DataExtraction dataExtraction,
-	bool numericToString) :
+	bool numericToString,
+	bool isPostgres) :
 	_rStmt(rStmt),
 	_maxFieldSize(maxFieldSize),
 	_dataExtraction(dataExtraction),
@@ -40,6 +41,16 @@ Preparator::Preparator(const StatementHandle& rStmt,
 	SQLCHAR* pStr = (SQLCHAR*) statement.c_str();
 	if (Utility::isError(Poco::Data::ODBC::SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
 		throw StatementException(_rStmt);
+	// PostgreSQL error swallowing workaround:
+	// Postgres may execute a statement with sintax error fine,
+	// but would return error once num of columns requested!
+	if (isPostgres)
+	{
+		SQLSMALLINT t = 0;
+		SQLRETURN r = SQLNumResultCols(rStmt, &t);
+		if (r != SQL_NO_DATA && Utility::isError(r))
+			throw StatementException(rStmt, "Failed to get number of columns");
+	}
 }
 
 
