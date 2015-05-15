@@ -47,7 +47,8 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_prepared(false),
 	_affectedRowCount(0),
 	_canCompile(true),
-	_numericToString(rSession.numericToString())
+	_numericToString(rSession.numericToString()),
+	_isPostgres(false)
 {
 	int queryTimeout = rSession.queryTimeout();
 	if (queryTimeout >= 0)
@@ -57,6 +58,15 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 			SQL_ATTR_QUERY_TIMEOUT,
 			(SQLPOINTER) uqt,
 			0);
+	}
+	SQLSMALLINT t;
+	SQLRETURN r = SQLGetInfo(_rConnection, SQL_DRIVER_NAME, NULL, 0, &t);
+	if (!Utility::isError(r) && t > 0)
+	{
+		std::string serverString;
+		serverString.resize(static_cast<std::size_t>(t) + 2);
+		r = SQLGetInfo(_rConnection, SQL_DRIVER_NAME, &serverString[0], SQLSMALLINT((serverString.length() - 1) * sizeof(serverString[0])), &t);
+		_isPostgres = (!Utility::isError(r) && Poco::toUpperInPlace(serverString).find("PSQLODBC") == 0);
 	}
 }
 
@@ -140,7 +150,7 @@ void ODBCStatementImpl::addPreparator()
 
 		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 
-		_preparations.push_back(new Preparator(_stmt, statement, maxFieldSize, ext, _numericToString));
+		_preparations.push_back(new Preparator(_stmt, statement, maxFieldSize, ext, _numericToString, _isPostgres));
 	}
 	else
 		_preparations.push_back(new Preparator(*_preparations[0]));
