@@ -37,7 +37,8 @@ public:
 	void setUp();
 	void tearDown();
 
-	void testCryptoAPI();
+	void testCAPIKeys();
+	void testCAPIEncryptDecrypt();
 
 	static CppUnit::Test* suite();
 

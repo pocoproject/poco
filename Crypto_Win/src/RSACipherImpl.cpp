@@ -114,15 +114,14 @@ namespace
 	DWORD RSAEncryptImpl::encrypt(unsigned char* output, std::streamsize outputLength, BOOL isFinal)
 	{
 		DWORD flags = _paddingMode == RSA_PADDING_PKCS1_OAEP ? CRYPT_OAEP : 0;
-		DWORD n = static_cast<DWORD>(_pos + 1);
+		DWORD n = static_cast<DWORD>(_pos);
 		if (!CryptEncrypt(_pKey->publicKey(), NULL, isFinal, flags, NULL, &n, 0))
 			error("RSACipher cannot obtain length of encrypted data");
 		poco_assert(n > _pos);
-		//poco_assert_dbg(n <= maxDataSize());
 		std::vector<BYTE> data(n);
-		n = static_cast<DWORD>(_pos + 1);
+		n = static_cast<DWORD>(_pos /*+ 1*/);
 		std::memcpy(&data[0], _pBuf, n);
-		if (!CryptEncrypt(_pKey->publicKey(), NULL, isFinal, flags, &data[0], &n, data.size()))
+		if (!CryptEncrypt(_pKey->publicKey(), NULL, isFinal, flags, &data[0], &n, static_cast<DWORD>(data.size())))
 			error("RSACipher cannot encrypt data");
 		poco_assert(n <= outputLength);
 		std::memcpy(output, &data[0], n);
@@ -235,7 +234,7 @@ namespace
 
 	DWORD RSADecryptImpl::decrypt(unsigned char* output, std::streamsize outputLength, BOOL isFinal)
 	{
-		DWORD n = static_cast<DWORD>(_pos + 1);
+		DWORD n = static_cast<DWORD>(_pos);
 		DWORD flags = _paddingMode == RSA_PADDING_PKCS1_OAEP ? CRYPT_OAEP : 0;
 		std::vector<BYTE> data(n);
 		std::memcpy(&data[0], _pBuf, n);
