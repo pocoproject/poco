@@ -25,8 +25,6 @@
 
 namespace
 {
-	// TODO: Not sure if we need this. May be useful for importing PEM private/public keys. Delete if not needed
-
 	// Following code taken and adapted from http://support.microsoft.com/kb/228786.
 	//
 	// Sometimes it is convenient to export and import plain text session keys. 

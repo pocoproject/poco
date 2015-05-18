@@ -20,40 +20,12 @@
 #include "Poco/Exception.h"
 
 
-// TODO: this is still OpenSSL code
-
 namespace Poco {
 namespace Crypto {
 
 
 namespace
 {
-	/*
-	int mapPaddingMode(RSAPaddingMode paddingMode)
-	{
-		switch (paddingMode)
-		{
-		case RSA_PADDING_PKCS1:
-			return BCRYPT_PAD_PKCS1;
-		case RSA_PADDING_PKCS1_OAEP:
-			return BCRYPT_PAD_OAEP;
-		//case RSA_PADDING_SSLV23: ???
-		//	return RSA_SSLV23_PADDING;
-		case RSA_PADDING_NONE:
-			return BCRYPT_PAD_NONE;
-		default:
-			poco_bugcheck();
-			return BCRYPT_PAD_NONE;
-		// BCRYPT_PAD_PSS ???
-		//
-		// ???
-		// #if (NTDDI_VERSION >= NTDDI_WINBLUE)
-		// #define BCRYPT_PAD_PKCS1_OPTIONAL_HASH_OID  0x00000010   //BCryptVerifySignature
-		// #endif
-		}
-	}
-	*/
-
 	std::size_t rsaBlockSize(RSAKeyImpl::Ptr pKey)
 	{
 		DWORD blockLen = 0;
@@ -141,15 +113,16 @@ namespace
 
 	DWORD RSAEncryptImpl::encrypt(unsigned char* output, std::streamsize outputLength, BOOL isFinal)
 	{
+		DWORD flags = _paddingMode == RSA_PADDING_PKCS1_OAEP ? CRYPT_OAEP : 0;
 		DWORD n = static_cast<DWORD>(_pos + 1);
-		if (!CryptEncrypt(_pKey->publicKey(), NULL, isFinal, 0, NULL, &n, 0))
+		if (!CryptEncrypt(_pKey->publicKey(), NULL, isFinal, flags, NULL, &n, 0))
 			error("RSACipher cannot obtain length of encrypted data");
 		poco_assert(n > _pos);
 		//poco_assert_dbg(n <= maxDataSize());
 		std::vector<BYTE> data(n);
 		n = static_cast<DWORD>(_pos + 1);
 		std::memcpy(&data[0], _pBuf, n);
-		if (!CryptEncrypt(_sp.handle(), NULL, isFinal, 0, &data[0], &n, data.size()))
+		if (!CryptEncrypt(_pKey->publicKey(), NULL, isFinal, flags, &data[0], &n, data.size()))
 			error("RSACipher cannot encrypt data");
 		poco_assert(n <= outputLength);
 		std::memcpy(output, &data[0], n);
@@ -175,8 +148,6 @@ namespace
 			if (missing == 0)
 			{
 				poco_assert (outputLength >= rsaSize);
-				//int n = 0;
-				//int n = RSA_public_encrypt(static_cast<int>(maxSize), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 				DWORD n = encrypt(output, outputLength, FALSE);
 				rc += n;
 				output += n;
@@ -205,8 +176,6 @@ namespace
 		int rc = 0;
 		if (_pos > 0)
 		{
-			//rc = RSA_public_encrypt(static_cast<int>(_pos), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
-			//if (rc == -1) throwError();
 			rc = encrypt(output, length, TRUE);
 		}
 		return rc;
@@ -263,17 +232,14 @@ namespace
 		return rsaBlockSize(_pKey);
 	}
 
+
 	DWORD RSADecryptImpl::decrypt(unsigned char* output, std::streamsize outputLength, BOOL isFinal)
 	{
 		DWORD n = static_cast<DWORD>(_pos + 1);
-		if (!CryptDecrypt(_sp.handle(), NULL, isFinal, 0, NULL, &n))
-			error("RSACipher cannot obtain length of decrypted data");
-		poco_assert(n > _pos);
-		//poco_assert_dbg(n <= maxDataSize());
+		DWORD flags = _paddingMode == RSA_PADDING_PKCS1_OAEP ? CRYPT_OAEP : 0;
 		std::vector<BYTE> data(n);
-		n = static_cast<DWORD>(_pos + 1);
 		std::memcpy(&data[0], _pBuf, n);
-		if (!CryptDecrypt(_sp.handle(), NULL, isFinal, 0, &data[0], &n))
+		if (!CryptDecrypt(_pKey->privateKey(), NULL, isFinal, flags, &data[0], &n))
 			error("RSACipher cannot decrypt data");
 		poco_assert(n <= outputLength);
 		std::memcpy(output, &data[0], n);
@@ -299,7 +265,6 @@ namespace
 			std::streamsize missing = rsaSize - _pos;
 			if (missing == 0)
 			{
-				//int tmp = RSA_private_decrypt(static_cast<int>(rsaSize), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 				DWORD tmp = decrypt(output, outputLength, FALSE);
 				if (tmp == -1) error("RSACipher cannot transform data");
 				rc += tmp;
@@ -329,7 +294,6 @@ namespace
 		int rc = 0;
 		if (_pos > 0)
 		{
-			//rc = RSA_private_decrypt(static_cast<int>(_pos), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 			rc = decrypt(output, length, TRUE);
 			if (rc == -1) error("RSACipher cannot transform data");
 		}

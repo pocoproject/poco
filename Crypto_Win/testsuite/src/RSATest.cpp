@@ -185,7 +185,7 @@ void RSATest::testSignManipulated()
 
 
 void RSATest::testRSACipher()
-{/*
+{
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(RSAKey(RSAKey::KL_1024));
 	for (std::size_t n = 1; n <= 1200; n++)
 	{
@@ -193,7 +193,7 @@ void RSATest::testRSACipher()
 		std::string enc = pCipher->encryptString(val);
 		std::string dec = pCipher->decryptString(enc);
 		assert (dec == val);
-	}*/
+	}
 }
 
 
@@ -228,7 +228,6 @@ void RSATest::testRSACipherLarge()
 
 void RSATest::testCertificate()
 {
-	/*TODO
 	std::istringstream str(anyPem);
 	Poco::Crypto::X509Certificate cert(str);
 	RSAKey publicKey(cert);
@@ -241,7 +240,6 @@ void RSATest::testCertificate()
 	std::string enc = pCipher->encryptString(val);
 	std::string dec = pCipher2->decryptString(enc);
 	assert (dec == val);
-	*/
 }
 
 
