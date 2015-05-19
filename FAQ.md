@@ -17,7 +17,7 @@
  
   - We are not here to teach you about basics of networking, XML or JSON parsing, C++ language etc.; there are many other resources to learn about those topics. Keep in mind our primary incentive (improving POCO by fixing bugs, improving usability or adding features).
   
-  - If nobody steps up to help or someone starts but chooses to stop helping you at any point, please do not get upset and/or verbally abusive; remember - we have lives and obligations and we do this free of charge, therefore owe you nothing unless you choose to enter into a contractual relationship with us to obtain needed help; we do such arrangements and you can contact us individually should you need one. Consider also that you demeanor may have caused the person helping to you to stop.
+  - If nobody steps up to help or someone starts but chooses to stop helping you at any point, please do not get upset and/or verbally abusive; remember - we have lives and obligations and we do this free of charge, therefore owe you nothing unless you choose to enter into a contractual relationship with us to obtain needed help; we do such arrangements and you can contact us individually should you need one. Consider also that your demeanor may have caused the person helping to you to stop.
   
   - Please spend some time studying the answers we provide; do not come back without thoroughly understanding and trying the proposed solution
 
@@ -28,7 +28,7 @@
 - [How to create a Minimal, Complete, and Verifiable example](http://stackoverflow.com/help/mcve)
 
 --
-**Q:** How do I do contribute to POCO?
+**Q:** How do I contribute to POCO?
 
 **A:** See [Contributing](https://github.com/pocoproject/poco/blob/develop/CONTRIBUTING.md)
 
