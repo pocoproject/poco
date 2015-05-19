@@ -41,4 +41,9 @@
 --
 **Q:** Is there a coding style guide?
 
-**A:** [Yes](http://www.appinf.com/download/CppCodingStyleGuide.pdf)
+**A:** [Yes](http://www.appinf.com/download/CppCodingStyleGuide.pdf).
+
+--
+**Q:** Where can I find examples of POCO usage?
+
+**A:** Every POCO library comes with a set of small, fully-functional, example applications; the samples are located in the "samples" directory of each POCO library; additionally, the knowledge on usage of POCO can also be gained by studying and running unit tests, located under "testsuite" directory for each POCO library.
