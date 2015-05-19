@@ -422,6 +422,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBareboneODBC);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testZeroRows);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSyntaxError);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexType);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccessVector);

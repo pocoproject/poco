@@ -155,6 +155,7 @@ public:
 
 	virtual void testReconnect();
 	virtual void testNumeric();
+	virtual void testSyntaxError();
 
 protected:
 	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;
