@@ -3551,44 +3551,44 @@ struct ReadPerson
 		}
 	}
 
+  struct RSReader
+  {
+    RSReader(RecordSet& rs, size_t rowNo) :_rs(rs), _rowNo(rowNo)
+    {}
+    RecordSet& _rs;
+    size_t _rowNo;
+    Var value(size_t col) const
+    {
+      return _rs.value(col, _rowNo);
+    }
+  };
+
+  struct ITReader
+  {
+    ITReader(const RowIterator& it) :_it(it)
+    {}
+    const RowIterator& _it;
+    Var value(size_t col) const
+    {
+      return (*_it)[col];
+    }
+  };
+
+  struct RSReaderCur
+  {
+    RSReaderCur(RecordSet& rs) :_rs(rs)
+    {}
+    RecordSet& _rs;
+    Var value(size_t col) const
+    {
+      return _rs.value(col);
+    }
+  };
+
 };
 
 void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 {
-	struct RSReader
-	{
-		RSReader(RecordSet& rs, size_t rowNo) :_rs(rs), _rowNo(rowNo)
-		{}
-		RecordSet& _rs;
-		size_t _rowNo;
-		Var value(size_t col) const
-		{
-			return _rs.value(col, _rowNo);
-		}
-	};
-
-	struct ITReader
-	{
-		ITReader(const RowIterator& it) :_it(it)
-		{}
-		const RowIterator& _it;
-		Var value(size_t col) const
-		{
-			return (*_it)[col];
-		}
-	};
-
-	struct RSReaderCur
-	{
-		RSReaderCur(RecordSet& rs) :_rs(rs)
-		{}
-		RecordSet& _rs;
-		Var value(size_t col) const
-		{
-			return _rs.value(col);
-		}
-	};
-
 	std::vector<PersonMRT> people;
 	const PersonMRT Homer("Simpson", "Homer", "Springfield", 42);
 	const int BartAge = 10;
@@ -3624,9 +3624,9 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 		RowIterator rowIt = rs.begin();
 		for (size_t rowNo = 0; r; ++rowNo, r = rs.moveNext(), ++valIt, ++rowIt, ++rowCnt)
 		{
-			ReadPerson::compare(this, *valIt, RSReader(rs, rowNo));
-			ReadPerson::compare(this, *valIt, ITReader(rowIt));
-			ReadPerson::compare(this, *valIt, RSReaderCur(rs));
+      ReadPerson::compare(this, *valIt, ReadPerson::RSReader(rs, rowNo));
+      ReadPerson::compare(this, *valIt, ReadPerson::ITReader(rowIt));
+      ReadPerson::compare(this, *valIt, ReadPerson::RSReaderCur(rs));
 		}
 		assert(rowIt == rs.end());
 		if (!stmt.hasMoreDataSets())
@@ -3653,9 +3653,9 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 				for (size_t row = 0; row < rs.rowCount(); ++row, ++rIt, mf = rs.moveNext(), ++valIt)
 				{
 					assert(mf);
-					ReadPerson::compare(this, *valIt, RSReader(rs, row));
-					ReadPerson::compare(this, *valIt, ITReader(rIt));
-					ReadPerson::compare(this, *valIt, RSReaderCur(rs));
+          ReadPerson::compare(this, *valIt, ReadPerson::RSReader(rs, row));
+          ReadPerson::compare(this, *valIt, ReadPerson::ITReader(rIt));
+          ReadPerson::compare(this, *valIt, ReadPerson::RSReaderCur(rs));
 				}
 				assert(rIt == rs.end());
 
