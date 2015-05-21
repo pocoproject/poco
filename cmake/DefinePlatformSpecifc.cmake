@@ -40,19 +40,23 @@ if(MSVC)
     else(POCO_MT)
         set(STATIC_POSTFIX "md" CACHE STRING "Set static library postfix" FORCE)
     endif(POCO_MT)
-
-    if(POCO_STATIC)
-            set(CMAKE_DEBUG_POSTFIX "${STATIC_POSTFIX}d" CACHE STRING "Set Debug library postfix" FORCE)
-            set(CMAKE_RELEASE_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set Release library postfix" FORCE)
-            set(CMAKE_MINSIZEREL_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set MinSizeRel library postfix" FORCE)
-            set(CMAKE_RELWITHDEBINFO_POSTFIX "${STATIC_POSTFIX}d" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
-    else(POCO_STATIC)
-            set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set Debug library postfix" FORCE)
-            set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Set Release library postfix" FORCE)
-            set(CMAKE_MINSIZEREL_POSTFIX "" CACHE STRING "Set MinSizeRel library postfix" FORCE)
-            set(CMAKE_RELWITHDEBINFO_POSTFIX "d" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
-    endif()
+else(MSVC)
+    # Other compilers then MSVC don't have a static STATIC_POSTFIX at the moment
+    set(STATIC_POSTFIX "" CACHE STRING "Set static library postfix" FORCE)
 endif(MSVC)
+
+# Add a d postfix to the debug libraries
+if(POCO_STATIC)
+        set(CMAKE_DEBUG_POSTFIX "${STATIC_POSTFIX}d" CACHE STRING "Set Debug library postfix" FORCE)
+        set(CMAKE_RELEASE_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set Release library postfix" FORCE)
+        set(CMAKE_MINSIZEREL_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set MinSizeRel library postfix" FORCE)
+        set(CMAKE_RELWITHDEBINFO_POSTFIX "${STATIC_POSTFIX}d" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
+else(POCO_STATIC)
+        set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set Debug library postfix" FORCE)
+        set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Set Release library postfix" FORCE)
+        set(CMAKE_MINSIZEREL_POSTFIX "" CACHE STRING "Set MinSizeRel library postfix" FORCE)
+        set(CMAKE_RELWITHDEBINFO_POSTFIX "d" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
+endif()
 
 
 # OS Detection
@@ -61,10 +65,6 @@ find_package(Cygwin)
 
 if(WIN32)
   add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DUNICODE -D_UNICODE -D__LCC__)  #__LCC__ define used by MySQL.h
-  set(SYSLIBS ${SYSLIBS} gdi32)
-  if(ENABLE_DATA_ODBC)
-	set(SYSLIBS ${SYSLIBS} odbc32)
-  endif(ENABLE_DATA_ODBC)
 endif(WIN32)
 
 if (UNIX AND NOT ANDROID )
