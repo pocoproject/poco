@@ -24,7 +24,18 @@ set_target_properties( "${LIBNAME}"
     DEFINE_SYMBOL Util_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" JSON XML Foundation)
+target_link_libraries( "${LIBNAME}" Foundation)
+if (ENABLE_XML)
+	target_link_libraries( "${LIBNAME}" XML)
+else ()
+	add_definitions( -DPOCO_UTIL_NO_XMLCONFIGURATION )
+endif()
+if (ENABLE_JSON)
+	target_link_libraries( "${LIBNAME}" JSON)
+else ()
+	add_definitions( -DPOCO_UTIL_NO_JSONCONFIGURATION )
+endif()
+
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
