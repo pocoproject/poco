@@ -20,9 +20,9 @@ CppUnit::Test* ZipTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ZipTestSuite");
 
+	pSuite->addTest(CompressTest::suite());
 	pSuite->addTest(ZipTest::suite());
 	pSuite->addTest(PartialStreamTest::suite());
-	pSuite->addTest(CompressTest::suite());
 
 	return pSuite;
 }

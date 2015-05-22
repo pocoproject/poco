@@ -56,4 +56,38 @@ ZipDataInfo::~ZipDataInfo()
 }
 
 
+
+const char ZipDataInfo64::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x07', '\x08'};
+
+
+ZipDataInfo64::ZipDataInfo64():
+	_rawInfo(),
+	_valid(true)
+{
+	std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
+	std::memset(_rawInfo+ZipCommon::HEADER_SIZE, 0, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+	_valid = true;
+}
+
+
+ZipDataInfo64::ZipDataInfo64(std::istream& in, bool assumeHeaderRead):
+	_rawInfo(),
+	_valid(false)
+{
+	if (assumeHeaderRead)
+		std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
+	else
+		in.read(_rawInfo, ZipCommon::HEADER_SIZE);
+	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
+	// now copy the rest of the header
+	in.read(_rawInfo+ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+	_valid = (!in.eof() && in.good());
+}
+
+
+ZipDataInfo64::~ZipDataInfo64()
+{
+}
+
+
 } } // namespace Poco::Zip

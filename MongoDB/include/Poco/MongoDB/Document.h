@@ -185,7 +185,7 @@ protected:
 
 inline Document& Document::addElement(Element::Ptr element)
 {
-	_elements.insert(element);
+	_elements.push_back(element);
 	return *this;
 }
 
