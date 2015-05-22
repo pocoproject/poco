@@ -36,7 +36,7 @@ Param
 
 $PACKAGES_DIRECTORY   = Join-Path $PSScriptRoot "packages"
 $OUTPUT_BIN_DIRECTORY = $PSScriptRoot
-$OUTPUT_INC_DIRECTORY = Join-Path $PSScriptRoot "..\Crypto\include" -resolve
+$OUTPUT_INC_DIRECTORY = Join-Path $PSScriptRoot "include"
 $VERSION              = "0.0.0"
 
 if (Test-Path Env:\APPVEYOR_BUILD_VERSION) {
@@ -375,7 +375,9 @@ function Output-OpenSSL {
         Rename-Item -path "$t\$lib\$configuration\ssleay32.lib" -newname "ssleay$b$l$d.lib" -force
     }
 
-    xcopy /y bin\$winplatform\$configuration\include\* "$OUTPUT_INC_DIRECTORY\*" /E
+    if (!(Test-Path -Path "$OUTPUT_INC_DIRECTORY")) {
+        xcopy /y bin\$winplatform\$configuration\include\* "$OUTPUT_INC_DIRECTORY\*" /E
+    }
 
     popd
 }

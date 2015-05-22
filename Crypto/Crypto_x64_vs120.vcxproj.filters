@@ -2,49 +2,49 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Cipher">
-      <UniqueIdentifier>{eebc94f8-9dad-4ba4-a4d7-dcbbe56ed94a}</UniqueIdentifier>
+      <UniqueIdentifier>{65ef65eb-ec48-45cb-a330-ae2779d227da}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cipher\Header Files">
-      <UniqueIdentifier>{01ec68df-f6a1-456f-8ad5-b4fa9bf9cc81}</UniqueIdentifier>
+      <UniqueIdentifier>{06cdc651-2fcb-433e-82f5-2bdb49237f13}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cipher\Source Files">
-      <UniqueIdentifier>{596249d9-699b-43a4-b141-a38e89d300cf}</UniqueIdentifier>
+      <UniqueIdentifier>{f654da94-a804-47fa-b93a-8fccdfb42be1}</UniqueIdentifier>
     </Filter>
     <Filter Include="RSA">
-      <UniqueIdentifier>{c3af850f-7094-4a50-8a7f-bee3181690e5}</UniqueIdentifier>
+      <UniqueIdentifier>{2f1def32-deb5-482c-9f1e-31860011b28d}</UniqueIdentifier>
     </Filter>
     <Filter Include="RSA\Header Files">
-      <UniqueIdentifier>{cd9adf3c-9aea-4e6d-99e3-9b02cbade8f5}</UniqueIdentifier>
+      <UniqueIdentifier>{4935aae5-b543-4105-964e-b548eb61b9a8}</UniqueIdentifier>
     </Filter>
     <Filter Include="RSA\Source Files">
-      <UniqueIdentifier>{04c7157f-3d89-4f4b-848b-16fd6e08aeb0}</UniqueIdentifier>
+      <UniqueIdentifier>{7a697800-573a-4801-9ca2-80e53272ad2d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Certificate">
-      <UniqueIdentifier>{6ae96e9e-2e10-4f94-bd4f-6ea32a751b47}</UniqueIdentifier>
+      <UniqueIdentifier>{ebc274a5-9f93-4f3b-be39-2853ca910126}</UniqueIdentifier>
     </Filter>
     <Filter Include="Certificate\Header Files">
-      <UniqueIdentifier>{706ae15b-ae84-421d-9154-6dc76bb3ec3c}</UniqueIdentifier>
+      <UniqueIdentifier>{435277b5-d999-44c9-8658-d33d35f69fc3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Certificate\Source Files">
-      <UniqueIdentifier>{5fce3764-e8ca-4481-804d-331f98a93fcd}</UniqueIdentifier>
+      <UniqueIdentifier>{db8496e9-f92a-4c93-8354-8b312d1cc290}</UniqueIdentifier>
     </Filter>
     <Filter Include="CryptoCore">
-      <UniqueIdentifier>{37111a2b-be75-4ca9-926e-8957c114461f}</UniqueIdentifier>
+      <UniqueIdentifier>{9d394cd1-a31b-4d04-a1d8-8eea90cec27c}</UniqueIdentifier>
     </Filter>
     <Filter Include="CryptoCore\Header Files">
-      <UniqueIdentifier>{883ceb92-a33e-44e7-bd67-c61f6a814a59}</UniqueIdentifier>
+      <UniqueIdentifier>{c0eafe70-4e30-469f-a4be-a69b94a1553e}</UniqueIdentifier>
     </Filter>
     <Filter Include="CryptoCore\Source Files">
-      <UniqueIdentifier>{6515d780-95e2-491b-88d6-2429d5281c06}</UniqueIdentifier>
+      <UniqueIdentifier>{f3f00574-9953-451e-99f3-b838fcf834b6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Digest">
-      <UniqueIdentifier>{ca982896-7bb3-4a1a-8872-632143007ea8}</UniqueIdentifier>
+      <UniqueIdentifier>{f6cfc2ff-995e-414d-acd8-1f287ca975d8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Digest\Header Files">
-      <UniqueIdentifier>{6627ff69-9563-488f-b29f-717c48b7ad3d}</UniqueIdentifier>
+      <UniqueIdentifier>{23e6a55f-787b-4750-a31c-69a873e0c2b3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Digest\Source Files">
-      <UniqueIdentifier>{60069c88-3063-459a-816b-64ef70f47ae4}</UniqueIdentifier>
+      <UniqueIdentifier>{080a5b7a-71b3-4850-af39-a28ab2e81ff5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
