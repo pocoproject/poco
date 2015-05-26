@@ -22,9 +22,13 @@
 namespace Poco {
 namespace MongoDB {
 
+// Workaround for issue with MS C++ compiler
+// https://connect.microsoft.com/VisualStudio/feedback/details/786583/in-class-static-const-member-initialization-and-lnk2005
+#ifndef _MSC_EXTENSIONS
 const Poco::Int32    UUID::uuidSize;
 const unsigned char  UUID::uuidSubtypeOld;
 const unsigned char  UUID::uuidSubtype;
+#endif
 
 UUID::UUID()
 {
