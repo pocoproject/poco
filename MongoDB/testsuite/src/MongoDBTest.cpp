@@ -148,9 +148,9 @@ void MongoDBTest::testQueryRequest()
 			bool active = doc->get<bool>("active");
 			assert(!active);
 
-            assert(doc->isType<UUID::Ptr>("an_uuid"));
-            UUID::Ptr dbUuid = doc->get<UUID::Ptr>("an_uuid");
-            assert(dbUuid->uuid() == uuid);
+			assert(doc->isType<UUID::Ptr>("an_uuid"));
+			UUID::Ptr dbUuid = doc->get<UUID::Ptr>("an_uuid");
+			assert(dbUuid->uuid() == uuid);
 
 			std::string id = doc->get("_id")->toString();
 			std::cout << id << std::endl;
@@ -229,8 +229,8 @@ void MongoDBTest::testDBAggregateCommand()
 		.add("_id", "$lastname")
 		.addNewDocument("total_hits").add("$sum", "$hits");
 
-	pipeline->add("step0", match);
-	pipeline->add("step1", group);
+	pipeline->add("0", match);
+	pipeline->add("1", group);
 
 	Database db("team");
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = db.createCommand();
