@@ -673,6 +673,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 
 		CppUnit_addTest(pSuite, ODBCDB2Test, testBareboneODBC);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testZeroRows);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testSyntaxError);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testComplexType);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSimpleAccessVector);

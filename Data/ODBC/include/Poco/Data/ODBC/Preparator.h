@@ -102,7 +102,8 @@ public:
 		const std::string& statement, 
 		std::size_t maxFieldSize,
 		DataExtraction dataExtraction,
-		bool numericToString
+		bool numericToString,
+		bool isPostgres
 		);
 		/// Creates the Preparator.
 

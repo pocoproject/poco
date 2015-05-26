@@ -42,6 +42,7 @@ using Poco::Data::ODBC::ODBCException;
 using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::StatementDiagnostics;
+using Poco::Data::Statement;
 using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
@@ -1291,6 +1292,28 @@ void ODBCTest::testReconnect()
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->reconnect();
 		i += 2;
+	}
+}
+
+
+void ODBCTest::testSyntaxError()
+{
+	try {
+		session() << "select fro oops", now;
+		fail("Expected syntax error exception");
+	}
+	catch (const StatementException&)
+	{
+	}
+
+	try {
+		Statement stat(session());
+		stat << "select fro oops";
+		stat.execute();
+		fail("Expected syntax error exception");
+	}
+	catch (const StatementException&)
+	{
 	}
 }
 

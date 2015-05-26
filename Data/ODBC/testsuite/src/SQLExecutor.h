@@ -164,7 +164,7 @@ public:
 		DE_BOUND
 	};
 
-	SQLExecutor(const std::string& name, Poco::Data::Session* _pSession);
+	SQLExecutor(const std::string& name, Poco::Data::Session* _pSession, const std::string& connInitSql = std::string(), const std::string& schemaName = std::string());
 	~SQLExecutor();
 
 	void execute(const std::string& sql);
@@ -597,9 +597,12 @@ private:
 	static const std::string MULTI_SELECT;
 
 	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);
+	std::string schemaTable(const std::string& tblName) const;
 
 	Poco::Data::Session& session();
 	Poco::Data::Session* _pSession;
+	std::string _connInitSql;
+	std::string _schemaName;
 };
 
 
@@ -607,6 +610,12 @@ inline Poco::Data::Session& SQLExecutor::session()
 {
 	poco_check_ptr (_pSession);
 	return *_pSession;
+}
+
+
+inline std::string SQLExecutor::schemaTable(const std::string& tblName) const
+{
+	return _schemaName.empty() ? tblName : _schemaName + "." + tblName;
 }
 
 
