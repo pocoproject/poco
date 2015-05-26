@@ -33,9 +33,9 @@ class MongoDB_API UUID
 public:
 	typedef SharedPtr<UUID> Ptr;
 
-	static const Poco::Int32    uuidSize;
-	static const unsigned char  uuidSubtypeOld;
-	static const unsigned char  uuidSubtype;
+	static const Poco::Int32    uuidSize = (128/8);
+	static const unsigned char  uuidSubtypeOld = 0x03;
+	static const unsigned char  uuidSubtype = 0x04;
 
 	UUID();
 		/// Constructor

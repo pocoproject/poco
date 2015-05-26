@@ -22,9 +22,9 @@
 namespace Poco {
 namespace MongoDB {
 
-const Poco::Int32    UUID::uuidSize = 128/8;
-const unsigned char  UUID::uuidSubtypeOld = 0x03;
-const unsigned char  UUID::uuidSubtype = 0x04;
+const Poco::Int32    UUID::uuidSize;
+const unsigned char  UUID::uuidSubtypeOld;
+const unsigned char  UUID::uuidSubtype;
 
 UUID::UUID()
 {
