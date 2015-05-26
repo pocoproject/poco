@@ -79,18 +79,24 @@ struct ElementTraits<UUID::Ptr>
 template<>
 inline void BSONReader::read<UUID::Ptr>(UUID::Ptr& to)
 {
-	Poco::Int32 size;
-	_reader >> size;
+	// Size and subtype are read in Document when distinguishing UUID and other binary types.
+	// TODO: Is it necessary to add some kind of detection if these attributes were already
+	//       taken into account?
 
-	// TODO: Verify that size is UUID::uuidSize!
+	if (0) {
+		Poco::Int32 size;
+		_reader >> size;
 
-	unsigned char subtype;
-	_reader >> subtype;
-	
-	// TODO: Verify that subtype is UUID::uuidSubtype or UUID::uuidSubtypeOld!
+		// TODO: Verify that size is UUID::uuidSize!
+
+		unsigned char subtype;
+		_reader >> subtype;
+
+		// TODO: Verify that subtype is UUID::uuidSubtype or UUID::uuidSubtypeOld!
+	}
 
 	char uuidBuf[UUID::uuidSize];
-	_reader.readRaw(uuidBuf, size);
+	_reader.readRaw(uuidBuf, UUID::uuidSize);
 	to->uuid().copyFrom(uuidBuf);
 }
 
