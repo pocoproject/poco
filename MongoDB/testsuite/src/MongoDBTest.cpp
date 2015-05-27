@@ -406,7 +406,7 @@ void MongoDBTest::testCursorRequest()
 	}
 	_mongo.sendRequest(*insertRequest);
 
-	Int64 count = db.count(_mongo, "numbers");
+	Poco::Int64 count = db.count(_mongo, "numbers");
 	std::cout << "count= " << count << std::endl;
 	assert(count == 10000);
 
