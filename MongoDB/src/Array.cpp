@@ -59,7 +59,7 @@ std::string Array::toString(int indent) const
 
 		for(int i = 0; i < indent; ++i) oss << ' ';
 
-		oss << (*it)->toString();
+		oss << (*it)->toString(indent > 0 ? indent + 2 : 0);
 	}
 
 	if ( indent > 0 )
