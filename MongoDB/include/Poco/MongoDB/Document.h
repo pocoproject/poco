@@ -96,7 +96,7 @@ public:
 	bool empty() const;
 		/// Returns true when the document doesn't contain any documents.
 
-	bool exists(const std::string& name);
+	bool exists(const std::string& name) const;
 		/// Returns true when the document has an element with the given name
 
 	template<typename T>
@@ -175,8 +175,8 @@ public:
 	virtual std::string toString(int indent = 0) const;
 		/// Returns a String representation of the document.
 
-	void write(BinaryWriter& writer);
-		/// Writes a document to the reader
+	void write(BinaryWriter& writer) const;
+		/// Writes a document to the writer
 
 protected:
 	ElementSet _elements;
@@ -219,7 +219,7 @@ inline void Document::elementNames(std::vector<std::string>& keys) const
 }
 
 
-inline bool Document::exists(const std::string& name)
+inline bool Document::exists(const std::string& name) const
 {
 	return std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name)) != _elements.end();
 }

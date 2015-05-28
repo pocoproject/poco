@@ -185,7 +185,7 @@ std::string Document::toString(int indent) const
 }
 
 
-void Document::write(BinaryWriter& writer)
+void Document::write(BinaryWriter& writer) const
 {
 	if ( _elements.empty() )
 	{
@@ -195,7 +195,7 @@ void Document::write(BinaryWriter& writer)
 	{
 		std::stringstream sstream;
 		Poco::BinaryWriter tempWriter(sstream);
-		for(ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
+		for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
 		{
 			tempWriter << static_cast<unsigned char>((*it)->type());
 			BSONWriter(tempWriter).writeCString((*it)->name());
