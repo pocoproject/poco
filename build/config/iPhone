@@ -30,7 +30,7 @@ IPHONE_SDK_VERSION_MIN ?= $(patsubst %.sdk,%,$(patsubst $(IPHONE_SDK_ROOT_DIR)%,
 
 POCO_TARGET_OSNAME     ?= $(IPHONE_SDK)
 POCO_TARGET_OSARCH     ?= armv6
-TOOL_PREFIX            ?= /Developer/Platforms/$(IPHONE_SDK).platform/Developer/usr/bin
+TOOL_PREFIX            ?= $(shell xcode-select -print-path)/Platforms/$(IPHONE_SDK).platform/Developer/usr/bin
 OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) -mthumb -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN)
 
 #
@@ -39,8 +39,8 @@ OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BAS
 # If GCC_VER is defined then use it.
 # Otherwise select the latest version
 #
-CC		= $(shell ls $(TOOL_PREFIX)/llvm-gcc-$(GCC_VER)* | tail -1)
-CXX		= $(shell ls $(TOOL_PREFIX)/llvm-g++-$(GCC_VER)* | tail -1)
+CC		= $(shell xcrun -find clang)
+CXX		= $(shell xcrun -find clang++)
 
 LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
