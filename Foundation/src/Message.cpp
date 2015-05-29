@@ -19,6 +19,11 @@
 #if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
 #endif
+#if POCO_OS == POCO_OS_LINUX
+#include <sys/syscall.h>
+#elif POCO_OS == POCO_OS_MAC_OS_X
+#include <pthread.h>
+#endif
 #include "Poco/Thread.h"
 #include <algorithm>
 
@@ -29,6 +34,7 @@ namespace Poco {
 Message::Message(): 
 	_prio(PRIO_FATAL), 
 	_tid(0), 
+	_ostid(0), 
 	_pid(0),
 	_file(0),
 	_line(0),
@@ -43,6 +49,7 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 	_text(text), 
 	_prio(prio), 
 	_tid(0),
+	_ostid(0),
 	_pid(0),
 	_file(0),
 	_line(0),
@@ -57,6 +64,7 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 	_text(text), 
 	_prio(prio), 
 	_tid(0),
+	_ostid(0),
 	_pid(0),
 	_file(file),
 	_line(line),
@@ -72,6 +80,7 @@ Message::Message(const Message& msg):
 	_prio(msg._prio),
 	_time(msg._time),
 	_tid(msg._tid),
+	_ostid(msg._ostid),
 	_thread(msg._thread),
 	_pid(msg._pid),
 	_file(msg._file),
@@ -90,6 +99,7 @@ Message::Message(const Message& msg, const std::string& text):
 	_prio(msg._prio),
 	_time(msg._time),
 	_tid(msg._tid),
+	_ostid(msg._ostid),
 	_thread(msg._thread),
 	_pid(msg._pid),
 	_file(msg._file),
@@ -112,6 +122,15 @@ void Message::init()
 {
 #if !defined(POCO_VXWORKS)
 	_pid = Process::id();
+#endif
+#if POCO_OS == POCO_OS_LINUX
+	_ostid = static_cast<pid_t>( syscall (SYS_gettid) );
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	_ostid = pthread_mach_thread_np(pthread_self());
+	//_ostid = ::syscall(SYSCALL_GET_THREAD_ID)
+#elif POCO_OS_FAMILY_WINDOWS
+	//_ostid = GetCurrentThreadId();
+//#else ??
 #endif
 	Thread* pThread = Thread::current();
 	if (pThread)
