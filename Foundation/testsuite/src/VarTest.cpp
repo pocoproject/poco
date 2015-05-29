@@ -22,7 +22,7 @@
 #include <utility>
 
 
-GCC_DIAG_OFF(unused-variable)
+
 #if defined(_MSC_VER) && _MSC_VER < 1400
 	#pragma warning(disable:4800)//forcing value to bool 'true' or 'false'
 #endif
@@ -2464,6 +2464,11 @@ void VarTest::testEmpty()
 	assert (!da.isString());
 	assert (da == da);
 	assert (!(da != da));
+
+	assert (da != Var(1));
+	assert (!(da == Var(1)));
+	assert (Var(1) != da);
+	assert (!(Var(1) == da));
 
 	da = "123";
 	int i = da.convert<int>();

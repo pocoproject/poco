@@ -12,7 +12,7 @@
 #              [-samples]
 #              [-tests]
 #              [-omit         "Lib1X;LibY;LibZ;..."]
-#              [-tool         msbuild | devenv | vcexpress | wdexpress]
+#              [-tool         msbuild | devenv]
 #              [-openssl_base dir]
 #              [-mysql_base   dir]
 
@@ -47,7 +47,7 @@ Param
   [string] $omit,
   
   [Parameter()]
-  [ValidateSet('msbuild', 'devenv', 'vcexpress', 'wdexpress')]
+  [ValidateSet('msbuild', 'devenv')]
   [string] $tool = 'msbuild',
 
   [Parameter()]

@@ -45,6 +45,7 @@ class ODBC_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 {
 public:
 	static const std::size_t ODBC_MAX_FIELD_SIZE = 1024u;
+	static const char* const NUMERIC_TO_STRING_FEATURE;
 
 	enum TransactionCapability
 	{
@@ -59,7 +60,7 @@ public:
 		bool autoBind = true,
 		bool autoExtract = true);
 		/// Creates the SessionImpl. Opens a connection to the database.
-		/// Throws NotConnectedException if connection was not succesful.
+		/// Throws NotConnectedException if connection was not successful.
 
 	//@ deprecated
 	SessionImpl(const std::string& connect, 
@@ -167,9 +168,23 @@ public:
 	Poco::Any dataTypeInfo(const std::string& rName="");
 		/// Returns the data types information.
 
+	bool numericToString() const;
+	/// Tells if NUMERIC values to be always
+	/// converted to string
+
+	void setNumericToString(bool value);
+	/// Sets flag to tell if NUMERIC values are always returned as 
+	/// string
+
 private:
 	void setDataTypeInfo(const std::string& rName, const Poco::Any& rValue);
 		/// No-op. Throws InvalidAccessException.
+
+	void setNumericToString(const std::string&, bool rValue);
+
+	bool numericToString(const std::string& nm);
+
+	void init();
 
 	static const int FUNCTIONS = SQL_API_ODBC3_ALL_FUNCTIONS_SIZE;
 
@@ -184,6 +199,7 @@ private:
 	Poco::Any              _maxFieldSize;
 	bool                   _autoBind;
 	bool                   _autoExtract;
+	bool                   _numericToString;
 	TypeInfo               _dataTypes;
 	char                   _canTransact;
 	bool                   _inTransaction;
@@ -283,6 +299,30 @@ inline Poco::Any SessionImpl::getQueryTimeout(const std::string&)
 inline int SessionImpl::queryTimeout() const
 {
 	return _queryTimeout;
+}
+
+
+inline bool SessionImpl::numericToString() const
+{
+	return _numericToString;
+}
+
+
+inline bool SessionImpl::numericToString(const std::string&)
+{
+	return numericToString();
+}
+
+
+inline void SessionImpl::setNumericToString(bool value)
+{
+	_numericToString = value;
+}
+
+
+inline void SessionImpl::setNumericToString(const std::string&, bool rValue)
+{
+	setNumericToString(rValue);
 }
 
 

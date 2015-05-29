@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|Win32">
@@ -314,6 +314,7 @@
     <ClInclude Include="src\ODBCTest.h"/>
     <ClInclude Include="src\ODBCTestSuite.h"/>
     <ClInclude Include="src\SQLExecutor.h"/>
+    <ClInclude Include="src\ODBCSybaseTest.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Driver.cpp"/>
@@ -327,6 +328,7 @@
     <ClCompile Include="src\ODBCTest.cpp"/>
     <ClCompile Include="src\ODBCTestSuite.cpp"/>
     <ClCompile Include="src\SQLExecutor.cpp"/>
+    <ClCompile Include="src\ODBCSybaseTest.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

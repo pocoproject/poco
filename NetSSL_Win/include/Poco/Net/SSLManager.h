@@ -53,7 +53,7 @@ class NetSSL_Win_API SSLManager
 	/// Proper initialization of SSLManager is critical.
 	///
 	/// SSLManager can be initialized manually, by calling initializeServer()
-	/// and/or initializeClient(), or intialization can be automatic. In the latter
+	/// and/or initializeClient(), or initialization can be automatic. In the latter
 	/// case, a Poco::Util::Application instance must be available and the required
 	/// configuration properties must be set (see below).
 	///

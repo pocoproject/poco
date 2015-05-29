@@ -123,7 +123,7 @@ public:
 		/// Assigns another NetworkInterface.
 	
 	bool operator < (const NetworkInterface& other) const;
-		/// Operatorr less-than.
+		/// Operator less-than.
 	
 	bool operator == (const NetworkInterface& other) const;
 		/// Operator equal. Compares interface indices.
@@ -150,7 +150,7 @@ public:
 		/// Returns the interface adapter name.
 		///
 		/// On Windows platforms, this is the network adapter LUID.
-		/// The adapter name is used by some Windows Net APIs like Dhcp. 
+		/// The adapter name is used by some Windows Net APIs like DHCP. 
 		///
 		/// On other platforms this is the same as name().
 
@@ -183,7 +183,7 @@ public:
 		/// Returns the broadcast address for this network interface.
 
 	const IPAddress& destAddress(unsigned index = 0) const;
-		/// Returns the IPv4 point-to-point destiation address for this network interface.
+		/// Returns the IPv4 point-to-point destination address for this network interface.
 
 	const MACAddress& macAddress() const;
 		/// Returns MAC (Media Access Control) address for the interface.

@@ -331,6 +331,10 @@ AAAIntroduction
 
   - Dynamic::Var: comparison of two empty objects now returns true
   - WinCE does not build in this release; this will be fixed in a later release
+  - JSON::DefaultHandler was renamed to a more appropriate name - ParseHandler;
+    ParseHandler does not have to be passed to the Parser, it will be used by default;
+    handlers are now passed into Parser as smart pointers, so passing in addresses of
+    stack objects will cause undefined behavior
   - Please note that 1.5.x releases are development releases and not considered stable.
     Interfaces may change, and backwards compatibility with the stable 1.4 release
     series is not guaranteed. There may also be some rough edges. 

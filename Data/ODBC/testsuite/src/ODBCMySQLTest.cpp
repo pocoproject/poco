@@ -77,7 +77,7 @@ void ODBCMySQLTest::testBareboneODBC()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	std::string tableCreateString = "CREATE TABLE Test "
+	std::string tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
 		"Third VARBINARY(30),"
@@ -97,7 +97,7 @@ has different SQL syntax for it and behaves differently
 compared to other DBMS systems in regards to SQLMoreResults.
 So, we skip this test.
 
-	tableCreateString = "CREATE TABLE Test "
+	tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second INTEGER,"
 		"Third FLOAT)";
@@ -236,7 +236,7 @@ void ODBCMySQLTest::testFilter()
 		recreateVectorsTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->filter("SELECT * FROM Vectors ORDER BY i0 ASC", "i0");
+		_pExecutor->filter("SELECT * FROM " + ExecUtil::vectors() + " ORDER BY i0 ASC", "i0");
 		i += 2;
 	}
 }
@@ -250,8 +250,8 @@ void ODBCMySQLTest::dropObject(const std::string& type, const std::string& name)
 
 void ODBCMySQLTest::recreateNullableTable()
 {
-	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	dropObject("TABLE", ExecUtil::nullabletest());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::nullabletest() << " (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime TIMESTAMP NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -259,8 +259,8 @@ void ODBCMySQLTest::recreateNullableTable()
 
 void ODBCMySQLTest::recreatePersonTable()
 {
-	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -268,8 +268,8 @@ void ODBCMySQLTest::recreatePersonTable()
 
 void ODBCMySQLTest::recreatePersonBLOBTable()
 {
-	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB)", now; }
+  dropObject("TABLE", ExecUtil::person());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
@@ -277,8 +277,8 @@ void ODBCMySQLTest::recreatePersonBLOBTable()
 
 void ODBCMySQLTest::recreatePersonDateTable()
 {
-	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTable()"); }
 }
@@ -286,8 +286,8 @@ void ODBCMySQLTest::recreatePersonDateTable()
 
 void ODBCMySQLTest::recreatePersonTimeTable()
 {
-	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
 }
@@ -295,8 +295,8 @@ void ODBCMySQLTest::recreatePersonTimeTable()
 
 void ODBCMySQLTest::recreatePersonDateTimeTable()
 {
-	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATETIME)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATETIME)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -304,8 +304,8 @@ void ODBCMySQLTest::recreatePersonDateTimeTable()
 
 void ODBCMySQLTest::recreateIntsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::strings() << " (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -313,8 +313,8 @@ void ODBCMySQLTest::recreateIntsTable()
 
 void ODBCMySQLTest::recreateStringsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::strings() << " (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
 }
@@ -322,8 +322,8 @@ void ODBCMySQLTest::recreateStringsTable()
 
 void ODBCMySQLTest::recreateFloatsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str FLOAT)", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (str FLOAT)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
 }
@@ -331,8 +331,8 @@ void ODBCMySQLTest::recreateFloatsTable()
 
 void ODBCMySQLTest::recreateTuplesTable()
 {
-	dropObject("TABLE", "Tuples");
-	try { *_pSession << "CREATE TABLE Tuples "
+	dropObject("TABLE", ExecUtil::tuples());
+	try { *_pSession << "CREATE TABLE " <<  ExecUtil::tuples()  <<
 		"(i0 INTEGER, i1 INTEGER, i2 INTEGER, i3 INTEGER, i4 INTEGER, i5 INTEGER, i6 INTEGER, "
 		"i7 INTEGER, i8 INTEGER, i9 INTEGER, i10 INTEGER, i11 INTEGER, i12 INTEGER, i13 INTEGER,"
 		"i14 INTEGER, i15 INTEGER, i16 INTEGER, i17 INTEGER, i18 INTEGER, i19 INTEGER)", now; }
@@ -343,8 +343,8 @@ void ODBCMySQLTest::recreateTuplesTable()
 
 void ODBCMySQLTest::recreateVectorsTable()
 {
-	dropObject("TABLE", "Vectors");
-	try { *_pSession << "CREATE TABLE Vectors (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::vectors() );
+	try { *_pSession << "CREATE TABLE " << ExecUtil::vectors() << " (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
 }
@@ -352,8 +352,8 @@ void ODBCMySQLTest::recreateVectorsTable()
 
 void ODBCMySQLTest::recreateAnysTable()
 {
-	dropObject("TABLE", "Anys");
-	try { *_pSession << "CREATE TABLE Anys (i0 INTEGER, flt0 DOUBLE, str0 VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::anys() );
+	try { *_pSession << "CREATE TABLE " << ExecUtil::anys() << " (i0 INTEGER, flt0 DOUBLE, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
@@ -361,8 +361,8 @@ void ODBCMySQLTest::recreateAnysTable()
 
 void ODBCMySQLTest::recreateNullsTable(const std::string& notNull)
 {
-	dropObject("TABLE", "NullTest");
-	try { *_pSession << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
+	dropObject("TABLE", ExecUtil::nulltest());
+	try { *_pSession << format("CREATE TABLE %s (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)", ExecUtil::nulltest(),
 		notNull,
 		notNull,
 		notNull), now; }
@@ -373,8 +373,8 @@ void ODBCMySQLTest::recreateNullsTable(const std::string& notNull)
 
 void ODBCMySQLTest::recreateMiscTable()
 {
-	dropObject("TABLE", "MiscTest");
-	try { *_pSession << "CREATE TABLE MiscTest "
+	dropObject("TABLE", ExecUtil::misctest());
+	try { *_pSession << "CREATE TABLE "<< ExecUtil::misctest() <<
 		"(First VARCHAR(30),"
 		"Second VARBINARY(30),"
 		"Third INTEGER,"
@@ -387,8 +387,8 @@ void ODBCMySQLTest::recreateMiscTable()
 
 void ODBCMySQLTest::recreateLogTable()
 {
-	dropObject("TABLE", "T_POCO_LOG");
-	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
+	dropObject("TABLE", ExecUtil::pocolog());;
+	dropObject("TABLE", ExecUtil::pocolog_a());;
 
 	try 
 	{ 
@@ -402,8 +402,8 @@ void ODBCMySQLTest::recreateLogTable()
 			"Text VARCHAR(100),"
 			"DateTime DATETIME)"; 
 
-		session() << sql, "T_POCO_LOG", now; 
-		session() << sql, "T_POCO_LOG_ARCHIVE", now;
+		session() << sql, ExecUtil::pocolog(), now; 
+		session() << sql, ExecUtil::pocolog_a(), now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
@@ -422,6 +422,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBareboneODBC);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testZeroRows);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSyntaxError);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexType);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccessVector);
