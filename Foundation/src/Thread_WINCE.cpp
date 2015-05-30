@@ -139,12 +139,7 @@ ThreadImpl* ThreadImpl::currentImpl()
 }
 
 
-static TIDImpl ThreadImpl::currentTidImpl()
-{
-	return GetCurrentThreadId();
-}
-
-static unsigned long ThreadImpl::currentOsTidImpl()
+ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 {
 	return GetCurrentThreadId();
 }

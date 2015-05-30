@@ -209,12 +209,6 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 	return GetCurrentThreadId();
 }
 
-static unsigned long ThreadImpl::currentOsTidImpl()
-{
-	return GetCurrentThreadId();
-}
-
-
 
 #if defined(_DLL)
 DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
