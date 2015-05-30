@@ -237,14 +237,14 @@ public:
 		
 		if (_buffer.size() - (_begin + _used) < length)
 		{
-			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used * sizeof(T));
+			std::memmove(_buffer.begin(), begin(), _used * sizeof(T));
 			_begin = 0;
 		}
 
 		std::size_t usedBefore = _used;
 		std::size_t available =  _buffer.size() - _used - _begin;
 		std::size_t len = length > available ? available : length;
-		std::memcpy(_buffer.begin() + _begin + _used, pBuffer, len * sizeof(T));
+		std::memcpy(begin() + _used, pBuffer, len * sizeof(T));
 		_used += len;
 		poco_assert (_used <= _buffer.size());
 		if (_notify) notify(usedBefore);
@@ -346,7 +346,7 @@ public:
 
 		if (_buffer.size() - (_begin + _used) < length)
 		{
-			std::memmove(_buffer.begin(), _buffer.begin() + _begin, _used * sizeof(T));
+			std::memmove(_buffer.begin(), begin(), _used * sizeof(T));
 			_begin = 0;
 		}
 

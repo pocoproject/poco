@@ -1,0 +1,1 @@
+target_link_libraries(${BII_BLOCK_TARGET} INTERFACE Crypt32.lib)

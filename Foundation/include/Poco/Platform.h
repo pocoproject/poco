@@ -39,6 +39,7 @@
 #define POCO_OS_QNX           0x000b
 #define POCO_OS_VXWORKS       0x000c
 #define POCO_OS_CYGWIN        0x000d
+#define POCO_OS_NACL	      0x000e
 #define POCO_OS_UNKNOWN_UNIX  0x00ff
 #define POCO_OS_WINDOWS_NT    0x1001
 #define POCO_OS_WINDOWS_CE    0x1011
@@ -58,6 +59,9 @@
 #elif defined(__digital__) || defined(__osf__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_TRU64
+#elif defined(__NACL__)
+	#define POCO_OS_FAMILY_UNIX 1
+	#define POCO_OS POCO_OS_NACL
 #elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__TOS_LINUX__) || defined(EMSCRIPTEN)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_LINUX
@@ -107,11 +111,6 @@
 	#error "Unknown Platform."
 #endif
 
-
-#ifndef POCO_OS_FAMILY_UNIX
-	#define GCC_DIAG_OFF(x)
-	#define GCC_DIAG_ON(x)
-#endif
 
 //
 // Hardware Architecture and Byte Order
@@ -250,6 +249,13 @@
 #elif defined (__IBMCPP__) && defined(__COMPILER_VER__)
 	#define POCO_COMPILER_IBM_XLC_ZOS // IBM z/OS C++
 #endif
+
+
+#ifdef __GNUC__
+#define POCO_UNUSED __attribute__((unused))
+#else
+#define POCO_UNUSED
+#endif // __GNUC__
 
 
 #if !defined(POCO_ARCH)

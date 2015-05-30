@@ -18,10 +18,11 @@
 #include "Poco/Bugcheck.h"
 #include <vector>
 
-GCC_DIAG_OFF(unused-but-set-variable)
+
 #if defined(_MSC_VER) && _MSC_VER < 1400
 	#pragma warning(disable:4800)//forcing value to bool 'true' or 'false'
 #endif
+
 
 using namespace Poco;
 

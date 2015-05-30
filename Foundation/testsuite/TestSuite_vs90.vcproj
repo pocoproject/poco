@@ -554,14 +554,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\BasicFIFOBufferTest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\BufferTestSuite.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\ByteOrderTest.cpp"
 					>
 				</File>
@@ -579,6 +571,14 @@
 				</File>
 				<File
 					RelativePath=".\src\DynamicFactoryTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FIFOBufferTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FIFOBufferTestSuite.cpp"
 					>
 				</File>
 				<File
@@ -662,14 +662,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\BasicFIFOBufferTest.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\BufferTestSuite.h"
-					>
-				</File>
-				<File
 					RelativePath=".\src\ByteOrderTest.h"
 					>
 				</File>
@@ -691,6 +683,14 @@
 				</File>
 				<File
 					RelativePath=".\src\DynamicFactoryTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FIFOBufferTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FIFOBufferTestSuite.h"
 					>
 				</File>
 				<File

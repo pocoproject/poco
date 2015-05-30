@@ -114,8 +114,8 @@ void ODBCAccessTest::dropTable(const std::string& tableName)
 
 void ODBCAccessTest::recreatePersonTable()
 {
-	dropTable("Person");
-	*_pSession << "CREATE TABLE Person (LastName TEXT(30), FirstName TEXT(30), Address TEXT(30), Age INTEGER)", now;
+	dropTable(ExecUtil::person());
+	*_pSession << "CREATE TABLE " << ExecUtil::person() << " (LastName TEXT(30), FirstName TEXT(30), Address TEXT(30), Age INTEGER)", now;
 }
 
 
@@ -176,7 +176,7 @@ void ODBCAccessTest::setUp()
 
 void ODBCAccessTest::tearDown()
 {
-	dropTable("Person");
+	dropTable(ExecUtil::person());
 }
 
 
@@ -195,7 +195,7 @@ bool ODBCAccessTest::init(const std::string& driver, const std::string& dsn)
 		return false;
 	}
 
-	//N.B. Access driver does not suport check for connection.
+	//N.B. Access driver does not support check for connection.
 	std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
 
 	return true;

@@ -5,12 +5,12 @@
 //
 // Library: Zip
 // Package: Zip
-// Module:  ZipFileInfo
+// Module:	ZipFileInfo
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// SPDX-License-Identifier:	BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 //
 
 
@@ -33,6 +33,7 @@ ZipFileInfo::ZipFileInfo(const ZipLocalFileHeader& header):
 	_crc32(0),
 	_compressedSize(0),
 	_uncompressedSize(0),
+	_localHeaderOffset(0),
 	_fileName(),
 	_lastModifiedAt(),
 	_extraField()
@@ -52,6 +53,8 @@ ZipFileInfo::ZipFileInfo(const ZipLocalFileHeader& header):
 
 	if (getHostSystem() == ZipCommon::HS_UNIX)
 		setUnixAttributes();
+
+	_rawInfo[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.	   
 }
 
 
@@ -60,6 +63,7 @@ ZipFileInfo::ZipFileInfo(std::istream& in, bool assumeHeaderRead):
 	_crc32(0),
 	_compressedSize(0),
 	_uncompressedSize(0),
+	_localHeaderOffset(0),
 	_fileName(),
 	_lastModifiedAt(),
 	_extraField()
@@ -102,6 +106,25 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 		Poco::Buffer<char> xtra(len);
 		inp.read(xtra.begin(), len);
 		_extraField = std::string(xtra.begin(), len);
+		char* ptr = xtra.begin();
+		while(ptr <= xtra.begin() + len - 4) {
+			Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0); ptr +=2;
+			Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0); ptr += 2;
+			if(id == ZipCommon::ZIP64_EXTRA_ID) {
+				poco_assert(size >= 8);
+				if(getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) {
+					setUncompressedSize(ZipUtil::get64BitValue(ptr, 0)); size -= 8; ptr += 8;
+				}
+				if(size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) {
+					setCompressedSize(ZipUtil::get64BitValue(ptr, 0)); size -= 8; ptr += 8;
+				}
+				if(size >= 8 && getOffsetFromHeader() == ZipCommon::ZIP64_MAGIC) {
+					setOffset(ZipUtil::get64BitValue(ptr, 0)); size -= 8; ptr += 8;
+				}
+			} else {
+				ptr += size;
+			}
+		}
 	}
 	len = getFileCommentLength();
 	if (len > 0)

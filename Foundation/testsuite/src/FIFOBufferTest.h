@@ -1,9 +1,9 @@
 //
-// BasicFIFOBufferTest.h
+// FIFOBufferTest.h
 //
-// $Id: //poco/1.6/Foundation/testsuite/src/BasicFIFOBufferTest.h#1 $
+// $Id: //poco/1.6/Foundation/testsuite/src/FIFOBufferTest.h#1 $
 //
-// Definition of the BasicFIFOBufferTest class.
+// Definition of the FIFOBufferTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -12,19 +12,19 @@
 //
 
 
-#ifndef BasicFIFOBufferTest_INCLUDED
-#define BasicFIFOBufferTest_INCLUDED
+#ifndef FIFOBufferTest_INCLUDED
+#define FIFOBufferTest_INCLUDED
 
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
 
 
-class BasicFIFOBufferTest: public CppUnit::TestCase
+class FIFOBufferTest: public CppUnit::TestCase
 {
 public:
-	BasicFIFOBufferTest(const std::string& name);
-	~BasicFIFOBufferTest();
+	FIFOBufferTest(const std::string& name);
+	~FIFOBufferTest();
 
 	void testNextWrite();
 	void testChar();
@@ -48,4 +48,4 @@ private:
 };
 
 
-#endif // BasicFIFOBufferTest_INCLUDED
+#endif // FIFOBufferTest_INCLUDED

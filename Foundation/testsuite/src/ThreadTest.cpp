@@ -460,7 +460,6 @@ void ThreadTest::testAffinity()
 	std::stringstream ss;
 	unsigned cpuCount = Poco::Environment::processorCount();
 	unsigned usedCpu = 0;
-	bool notImplemented = false;
 	std::vector<Thread*> threadList;
 	Thread* thread = NULL;
 	std::vector<MyRunnable*> runnableList;
@@ -484,27 +483,10 @@ void ThreadTest::testAffinity()
 	for (int i = 0; i < cpuCount; i++)
 	{
 		threadList[i]->start(*runnableList[i]);
-		try
-		{
-			threadList[i]->setAffinity(i);
-		}
-		catch (Poco::NotImplementedException& niex)
-		{
-			notImplemented = true;
-		}
+		threadList[i]->setAffinity(i);
 		Thread::sleep(100);
-		try
-		{
-			usedCpu = threadList[i]->getAffinity();
-		}
-		catch (Poco::NotImplementedException& niex)
-		{
-			notImplemented = true;
-		}
-		if (!notImplemented)
-		{
-			assert (usedCpu == i);
-		}
+		usedCpu = threadList[i]->getAffinity();
+		assert (usedCpu == i || usedCpu == -1);
 	}
 
 	for (int i = 0; i < cpuCount; i++)
