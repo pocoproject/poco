@@ -69,7 +69,7 @@ static std::string sybaseDriver()
 {
 	return Poco::Environment::get("POCO_TEST_SYBASE_DRIVER", 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	"{Adaptive Server Enterprise}";
+	"{Adaptive Server Enterprise}"
 #else
 	"libsybdrvodb-sqllen8.so"
 #endif

@@ -462,6 +462,8 @@
 				<File
 					RelativePath=".\src\ODBCSQLServerTest.h"/>
 				<File
+					RelativePath=".\src\ODBCSybaseTest.h"/>
+				<File
 					RelativePath=".\src\ODBCTest.h"/>
 				<File
 					RelativePath=".\src\SQLExecutor.h"/>
@@ -482,6 +484,8 @@
 					RelativePath=".\src\ODBCSQLiteTest.cpp"/>
 				<File
 					RelativePath=".\src\ODBCSQLServerTest.cpp"/>
+				<File
+					RelativePath=".\src\ODBCSybaseTest.cpp"/>
 				<File
 					RelativePath=".\src\ODBCTest.cpp"/>
 				<File
