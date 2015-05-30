@@ -19,11 +19,6 @@
 #if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
 #endif
-#if POCO_OS == POCO_OS_LINUX
-#include <sys/syscall.h>
-#elif POCO_OS == POCO_OS_MAC_OS_X
-#include <pthread.h>
-#endif
 #include "Poco/Thread.h"
 #include <algorithm>
 
@@ -123,15 +118,7 @@ void Message::init()
 #if !defined(POCO_VXWORKS)
 	_pid = Process::id();
 #endif
-#if POCO_OS == POCO_OS_LINUX
-	_ostid = static_cast<pid_t>( syscall (SYS_gettid) );
-#elif POCO_OS == POCO_OS_MAC_OS_X
-	_ostid = pthread_mach_thread_np(pthread_self());
-	//_ostid = ::syscall(SYSCALL_GET_THREAD_ID)
-#elif POCO_OS_FAMILY_WINDOWS
-	//_ostid = GetCurrentThreadId();
-//#else ??
-#endif
+	_ostid = Thread::currentOsTid();
 	Thread* pThread = Thread::current();
 	if (pThread)
 	{

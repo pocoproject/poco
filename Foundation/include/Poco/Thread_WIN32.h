@@ -77,6 +77,7 @@ public:
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
+	static unsigned long currentOsTidImpl();
 
 protected:
 #if defined(_DLL)

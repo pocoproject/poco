@@ -147,6 +147,12 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 }
 
 
+ThreadImpl::TIDImpl ThreadImpl::currentOsTidImpl()
+{
+	return taskIdSelf();
+}
+
+
 void ThreadImpl::sleepImpl(long milliseconds)
 {
 	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));

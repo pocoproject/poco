@@ -228,6 +228,9 @@ public:
 	static TID currentTid();
 		/// Returns the native thread ID for the current thread.
 
+	static unsigned long currentOsTid();
+		/// Returns the OS-specific numeric thread ID for the current thread.
+
 protected:
 	ThreadLocalStorage& tls();
 		/// Returns a reference to the thread's local storage.
@@ -384,6 +387,12 @@ inline int Thread::getStackSize() const
 inline Thread::TID Thread::currentTid()
 {
 	return currentTidImpl();
+}
+
+
+inline unsigned long Thread::currentOsTid()
+{
+	return currentOsTidImpl();
 }
 
 

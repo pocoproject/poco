@@ -28,14 +28,16 @@
 #endif
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
 #	include <time.h>
-# include <unistd.h>
+#	include <unistd.h>
 #endif
 #if POCO_OS == POCO_OS_MAC_OS_X
 #   include <mach/mach.h>
 #   include <mach/task.h>
 #   include <mach/thread_policy.h>
 #endif
-
+#if POCO_OS == POCO_OS_LINUX
+#include <sys/syscall.h>
+#endif
 
 //
 // Block SIGPIPE in main thread.
@@ -354,6 +356,20 @@ ThreadImpl* ThreadImpl::currentImpl()
 ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 {
 	return pthread_self();
+}
+
+
+unsigned long ThreadImpl::currentOsTidImpl()
+{
+#if POCO_OS == POCO_OS_LINUX
+	return static_cast<unsigned long>( syscall (SYS_gettid) );
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	return static_cast<unsigned long>( pthread_mach_thread_np(pthread_self()) );
+	// or ::syscall(SYSCALL_GET_THREAD_ID) ?
+#else
+	// Fallback to pthread id
+	return currentTidImpl();
+#endif
 }
 
 
