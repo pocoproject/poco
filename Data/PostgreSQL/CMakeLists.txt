@@ -18,7 +18,7 @@ set_target_properties( "${LIBNAME}"
     DEFINE_SYMBOL PostgreSQL_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" Foundation Data ${MYSQL_LIB})
+target_link_libraries( "${LIBNAME}" Foundation Data ${POSTGRESQL_LIBRARY})
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
