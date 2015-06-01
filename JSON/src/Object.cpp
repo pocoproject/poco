@@ -107,16 +107,16 @@ const std::string& Object::getKey(KeyPtrList::const_iterator& iter) const
 	ValueMap::const_iterator end = _values.end();
 	for (; it != end; ++it)
 	{
-		if (it->second == **iter) return it->first;
+		if (it->first == **iter) return it->first;
 	}
 
-	throw NotFoundException((*iter)->convert<std::string>());
+	throw NotFoundException(**iter);
 }
 
 
 void Object::set(const std::string& key, const Dynamic::Var& value)
 {
-	_values[key] = value;
+	std::pair<ValueMap::iterator, bool> ret = _values.insert(ValueMap::value_type(key, value));
 	if (_preserveInsOrder)
 	{
 		KeyPtrList::iterator it = _keys.begin();
@@ -125,7 +125,7 @@ void Object::set(const std::string& key, const Dynamic::Var& value)
 		{
 			if (key == **it) return;
 		}
-		_keys.push_back(&_values[key]);
+		_keys.push_back(&ret.first->first);
 	}
 }
 

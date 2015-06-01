@@ -1394,13 +1394,27 @@ void JSONTest::testStringify()
 
 void JSONTest::testStringifyPreserveOrder()
 {
-	Object jObj(true);
-	jObj.set("foo", 0);
-	jObj.set("bar", 0);
-	jObj.set("baz", 0);
+	Object presObj(true);
+	presObj.set("foo", 0);
+	presObj.set("bar", 0);
+	presObj.set("baz", 0);
 	std::stringstream ss;
-	jObj.stringify(ss);
+	presObj.stringify(ss);
 	assert(ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");
+	ss.str("");
+	Stringifier::stringify(presObj, ss);
+	assert(ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");
+
+	Object noPresObj;
+	noPresObj.set("foo", 0);
+	noPresObj.set("bar", 0);
+	noPresObj.set("baz", 0);
+	ss.str("");
+	noPresObj.stringify(ss);
+	assert(ss.str() == "{\"bar\":0,\"baz\":0,\"foo\":0}");
+	ss.str("");
+	Stringifier::stringify(noPresObj, ss);
+	assert(ss.str() == "{\"bar\":0,\"baz\":0,\"foo\":0}");
 
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
 						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "

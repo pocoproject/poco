@@ -45,7 +45,18 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:
+
+#if POCO_OS == POCO_OS_LINUX
+	// OS kernel thread ID
+	typedef pid_t TIDImpl;
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	// OS kernel thread ID
+	typedef mach_port_t TIDImpl;
+#else
+	// Default: pthread id
 	typedef pthread_t TIDImpl;
+#endif
+
 	typedef void (*Callable)(void*);
 
 	enum Priority
@@ -136,6 +147,7 @@ private:
 
 		SharedPtr<Runnable> pRunnableTarget;
 		pthread_t     thread;
+		TIDImpl       tid;
 		int           prio;
 		int           osPrio;
 		int           policy;
@@ -191,7 +203,7 @@ inline int ThreadImpl::getStackSizeImpl() const
 
 inline ThreadImpl::TIDImpl ThreadImpl::tidImpl() const
 {
-	return _pData->thread;
+	return _pData->tid;
 }
 
 
