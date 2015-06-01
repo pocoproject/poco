@@ -28,14 +28,16 @@
 #endif
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
 #	include <time.h>
-# include <unistd.h>
+#	include <unistd.h>
 #endif
 #if POCO_OS == POCO_OS_MAC_OS_X
 #   include <mach/mach.h>
 #   include <mach/task.h>
 #   include <mach/thread_policy.h>
 #endif
-
+#if POCO_OS == POCO_OS_LINUX
+#include <sys/syscall.h>
+#endif
 
 //
 // Block SIGPIPE in main thread.
@@ -296,6 +298,15 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 		pthread_attr_destroy(&attributes);
 		throw SystemException("cannot start thread");
 	}
+#if POCO_OS == POCO_OS_LINUX
+	// On Linux the TID is acquired from the running thread using syscall
+	_pData->tid = 0;
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	_pData->tid = static_cast<TIDImpl>( pthread_mach_thread_np(_pData->thread) );
+#else
+	_pData->tid = _pData->thread;
+#endif
+
 	_pData->started = true;
 	pthread_attr_destroy(&attributes);
 
@@ -353,7 +364,13 @@ ThreadImpl* ThreadImpl::currentImpl()
 
 ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 {
+#if POCO_OS == POCO_OS_LINUX
+	return static_cast<TIDImpl>( syscall (SYS_gettid) );
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	return static_cast<TIDImpl>( pthread_mach_thread_np(pthread_self()) );
+#else
 	return pthread_self();
+#endif
 }
 
 
@@ -430,7 +447,12 @@ void* ThreadImpl::runnableEntry(void* pThread)
 #if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
 	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName().c_str());
 #endif
+#if POCO_OS == POCO_OS_LINUX
+	pThreadImpl->_pData->tid = static_cast<TIDImpl>( syscall (SYS_gettid) );
+#endif
+
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
+
 	try
 	{
 		pData->pRunnableTarget->run();
