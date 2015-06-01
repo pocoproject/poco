@@ -239,16 +239,16 @@ private:
 		out << '}';
 	}
 
-	typedef std::deque<Dynamic::Var*>                   KeyPtrList;
-	typedef Poco::DynamicStruct::Ptr                    StructPtr;
+	typedef std::deque<std::string>  KeyList;
+	typedef Poco::DynamicStruct::Ptr StructPtr;
 
 	const std::string& getKey(ValueMap::const_iterator& it) const;
 	const Dynamic::Var& getValue(ValueMap::const_iterator& it) const;
-	const std::string& getKey(KeyPtrList::const_iterator& it) const;
-	const Dynamic::Var& getValue(KeyPtrList::const_iterator& it) const;
+	const std::string& getKey(KeyList::const_iterator& it) const;
+	const Dynamic::Var& getValue(KeyList::const_iterator& it) const;
 
 	ValueMap          _values;
-	KeyPtrList        _keys;
+	KeyList           _keys;
 	bool              _preserveInsOrder;
 	mutable StructPtr _pStruct;
 };
@@ -318,9 +318,9 @@ inline const Dynamic::Var& Object::getValue(ValueMap::const_iterator& it) const
 }
 
 
-inline const Dynamic::Var& Object::getValue(KeyPtrList::const_iterator& it) const
+inline const Dynamic::Var& Object::getValue(KeyList::const_iterator& it) const
 {
-	return **it;
+	return _values.at(*it);
 }
 
 
