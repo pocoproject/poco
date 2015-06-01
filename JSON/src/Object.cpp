@@ -101,31 +101,31 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 }
 
 
-const std::string& Object::getKey(KeyList::const_iterator& iter) const
+const std::string& Object::getKey(KeyPtrList::const_iterator& iter) const
 {
 	ValueMap::const_iterator it = _values.begin();
 	ValueMap::const_iterator end = _values.end();
 	for (; it != end; ++it)
 	{
-		if (it->first == *iter) return it->first;
+		if (it->first == **iter) return it->first;
 	}
 
-	throw NotFoundException(*iter);
+	throw NotFoundException(**iter);
 }
 
 
 void Object::set(const std::string& key, const Dynamic::Var& value)
 {
-	_values[key] = value;
+	std::pair<ValueMap::iterator, bool> ret = _values.insert(ValueMap::value_type(key, value));
 	if (_preserveInsOrder)
 	{
-		KeyList::iterator it = _keys.begin();
-		KeyList::iterator end = _keys.end();
+		KeyPtrList::iterator it = _keys.begin();
+		KeyPtrList::iterator end = _keys.end();
 		for (; it != end; ++it)
 		{
-			if (key == *it) return;
+			if (key == **it) return;
 		}
-		_keys.push_back(key);
+		_keys.push_back(&ret.first->first);
 	}
 }
 
