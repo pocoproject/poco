@@ -20,7 +20,6 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/NetException.h"
-#include "Poco/Buffer.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/NullStream.h"
 #include "Poco/BinaryWriter.h"
@@ -29,7 +28,6 @@
 #include "Poco/String.h"
 #include "Poco/Random.h"
 #include "Poco/StreamCopier.h"
-#include "Poco/Buffer.h"
 #include <sstream>
 
 
