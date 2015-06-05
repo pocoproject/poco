@@ -251,8 +251,10 @@ install(
     INCLUDES DESTINATION include
     )
 
+if (MSVC)
 # install the targets pdb
-POCO_INSTALL_PDB(${target_name})
+  POCO_INSTALL_PDB(${target_name})
+endif()
   
 endmacro()
 
@@ -264,9 +266,6 @@ endmacro()
 #
 #    This is an internal macro meant only to be used by POCO_INSTALL.
 macro(POCO_INSTALL_PDB target_name)
-    if (NOT MSVC)
-        return()
-    endif()
 
     get_property(type TARGET ${target_name} PROPERTY TYPE)
     if ("${type}" STREQUAL "SHARED_LIBRARY" OR "${type}" STREQUAL "EXECUTABLE")
