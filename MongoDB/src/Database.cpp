@@ -23,7 +23,7 @@ namespace Poco {
 namespace MongoDB {
 
 
-Database::Database( const std::string& db) : _dbname(db)
+Database::Database(const std::string& db) : _dbname(db)
 {
 }
 
