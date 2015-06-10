@@ -27,8 +27,7 @@ PrintHandler::PrintHandler(unsigned indent):
 	_out(std::cout),
 	_indent(indent),
 	_array(0),
-	_value(false),
-	_objStart(false)
+	_objStart(true)
 {
 }
 
@@ -37,8 +36,7 @@ PrintHandler::PrintHandler(std::ostream& out, unsigned indent):
 	_out(out),
 	_indent(indent),
 	_array(0),
-	_value(false),
-	_objStart(false)
+	_objStart(true)
 {
 }
 
@@ -53,7 +51,7 @@ void PrintHandler::reset()
 	_out.flush();
 	_tab = "";
 	_array = 0;
-	_value = false;
+	_objStart = true;
 }
 
 
@@ -94,16 +92,17 @@ void PrintHandler::endObject()
 		_tab.erase(_tab.length() - indent());
 
 	_out << endLine() << _tab << '}';
-	if (array()) _value = true;
+	_objStart = false;
 }
 
 
 void PrintHandler::startArray()
 {
+	arrayValue();
 	_out << '[' << endLine();
 	_tab.append(indent(), ' ');
 	++_array;
-	_value = false;
+	_objStart = true;
 }
 
 
@@ -113,18 +112,16 @@ void PrintHandler::endArray()
 	_out << endLine() << _tab << ']';
 	--_array;
 	poco_assert (_array >= 0);
-	_value = false;
+	_objStart = false;
 }
 
 
 void PrintHandler::key(const std::string& k)
 {
-	if (_value)
-	{
-		if (!_objStart) comma();
-		_value = false;
-	}
-	_objStart = false;
+	if (!_objStart) comma();
+
+	_objStart = true;
+
 	_out << _tab;
 	Stringifier::formatString(k, _out);
 	if (!printFlat()) _out << ' ';
@@ -137,7 +134,8 @@ void PrintHandler::null()
 {
 	arrayValue();
 	_out << "null";
-	_value = true;
+
+	_objStart = false;
 }
 
 
@@ -145,7 +143,7 @@ void PrintHandler::value(int v)
 {
 	arrayValue();
 	_out << v;
-	_value = true;
+	_objStart = false;
 }
 
 
@@ -153,7 +151,7 @@ void PrintHandler::value(unsigned v)
 {
 	arrayValue();
 	_out << v;
-	_value = true;
+	_objStart = false;
 }
 
 
@@ -162,7 +160,7 @@ void PrintHandler::value(Int64 v)
 {
 	arrayValue();
 	_out << v;
-	_value = true;
+	_objStart = false;
 }
 
 
@@ -170,7 +168,7 @@ void PrintHandler::value(UInt64 v)
 {
 	arrayValue();
 	_out << v;
-	_value = true;
+	_objStart = false;
 }
 #endif
 
@@ -179,7 +177,7 @@ void PrintHandler::value(const std::string& value)
 {
 	arrayValue();
 	Stringifier::formatString(value, _out);
-	_value = true;
+	_objStart = false;
 }
 
 
@@ -188,7 +186,7 @@ void PrintHandler::value(double d)
 {
 	arrayValue();
 	_out << d;
-	_value = true;
+	_objStart = false;
 }
 
 
@@ -196,7 +194,7 @@ void PrintHandler::value(bool b)
 {
 	arrayValue();
 	_out << b;
-	_value = true;
+	_objStart = false;
 }
 
 
@@ -208,9 +206,8 @@ void PrintHandler::comma()
 
 void PrintHandler::arrayValue()
 {
-	if (array())
-	{
-		if (_value) comma();
+	if (!_objStart) comma();
+	if (array()) {
 		_out << _tab;
 	}
 }

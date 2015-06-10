@@ -1,5 +1,12 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.6.0 (2015-06-??)
+==========================
+
+- fixed GH #782: Poco::JSON::PrintHandler not working for nested arrays
+- fixed GH #819: JSON Stringifier fails with preserve insert order
+
+
 Release 1.6.0 (2014-12-22)
 ==========================
 
