@@ -1,6 +1,30 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.7.0
+
+!!Summary of Changes
+
+  - JSON Stringifier fails with preserve insert order #819
+
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - Modified JSON::Stringifier interface (removed preserve order flag which had no effect)
+
+  
+!!!Release 1.6.1
+
+!!Summary of Changes
+
+  - 
+
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - 
+
+  
 !!!Release 1.6.0
 
 !!Summary of Changes

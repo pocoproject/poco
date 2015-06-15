@@ -33,7 +33,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;..\openssl\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;$(ProjectName)_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;NetSSL_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -56,7 +56,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="libeay32.lib ssleay32.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="ws2.lib iphlpapi.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoNetSSLd.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -113,7 +113,7 @@
 				Optimization="4"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;..\openssl\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;$(ProjectName)_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;NetSSL_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -136,7 +136,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="libeay32.lib ssleay32.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="ws2.lib iphlpapi.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoNetSSL.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -190,7 +190,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;..\openssl\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -257,7 +257,7 @@
 				Optimization="4"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;..\openssl\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -321,7 +321,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;..\openssl\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -388,7 +388,7 @@
 				Optimization="4"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;..\openssl\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -583,12 +583,14 @@
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
-				Name="debug_shared|Digi JumpStart (ARMV4I)">
+				Name="debug_shared|Digi JumpStart (ARMV4I)"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="release_shared|Digi JumpStart (ARMV4I)">
+				Name="release_shared|Digi JumpStart (ARMV4I)"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>

@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">obj\TestSuite\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</LinkIncremental>
@@ -114,7 +114,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;..\..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -132,7 +132,7 @@
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitd.lib;WinTestRunnerd.lib;libeay32.lib;ssleay32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitd.lib;WinTestRunnerd.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin\TestSuited.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -150,7 +150,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;..\..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -166,7 +166,7 @@
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnit.lib;WinTestRunner.lib;libeay32.lib;ssleay32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnit.lib;WinTestRunner.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin\TestSuite.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -180,7 +180,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;..\..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0600;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -198,7 +198,7 @@
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitmtd.lib;WinTestRunnermtd.lib;iphlpapi.lib;winmm.lib;nafxcwd.lib;libcmtd.lib;WinTestRunner.res;libeay32mtd.lib;ssleay32mtd.lib;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmtd.lib;WinTestRunnermtd.lib;iphlpapi.lib;winmm.lib;nafxcwd.lib;libcmtd.lib;WinTestRunner.res;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin\static_mt\TestSuited.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>nafxcwd.lib;libcmtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -217,7 +217,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;..\..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0600;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -233,7 +233,7 @@
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitmt.lib;WinTestRunnermt.lib;iphlpapi.lib;winmm.lib;nafxcw.lib;libcmt.lib;WinTestRunner.res;libeay32mt.lib;ssleay32mt.lib;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmt.lib;WinTestRunnermt.lib;iphlpapi.lib;winmm.lib;nafxcw.lib;libcmt.lib;WinTestRunner.res;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin\static_mt\TestSuite.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>nafxcw.lib;libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -248,7 +248,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;..\..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0600;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -266,7 +266,7 @@
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitmdd.lib;WinTestRunnermdd.lib;iphlpapi.lib;winmm.lib;WinTestRunner.res;libeay32mdd.lib;ssleay32mdd.lib;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmdd.lib;WinTestRunnermdd.lib;iphlpapi.lib;winmm.lib;WinTestRunner.res;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin\static_md\TestSuited.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -284,7 +284,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;..\..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0600;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -300,7 +300,7 @@
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitmd.lib;WinTestRunnermd.lib;iphlpapi.lib;winmm.lib;WinTestRunner.res;libeay32md.lib;ssleay32md.lib;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmd.lib;WinTestRunnermd.lib;iphlpapi.lib;winmm.lib;WinTestRunner.res;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin\static_md\TestSuite.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>

@@ -71,6 +71,12 @@ public:
 
 	virtual HTTPServerResponse& response() const = 0;
 		/// Returns a reference to the associated response.
+		
+	virtual bool secure() const = 0;
+		/// Returns true if the request is using a secure
+		/// connection. Returns false if no secure connection
+		/// is used, or if it is not known whether a secure
+		/// connection is used.
 };
 
 
