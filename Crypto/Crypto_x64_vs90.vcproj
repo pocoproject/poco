@@ -19,7 +19,8 @@
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win64\bin\debug\*64MDd.dll ..\bin64\*&#xA;xcopy /y ..\openssl\win64\bin\debug\*64MDd.lib ..\lib64\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -31,7 +32,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;Crypto_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -56,7 +57,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin64\PocoCrypto64d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -89,7 +90,8 @@
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win64\bin\release\*64MD.dll ..\bin64\*&#xA;xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -105,7 +107,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;Crypto_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -128,7 +130,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin64\PocoCrypto64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -163,7 +165,8 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win64\lib\debug\*64MTd.lib ..\lib64\*&#xA;xcopy /y ..\openssl\win64\lib\debug\*64MTd.pdb ..\lib64\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -175,7 +178,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -221,7 +224,8 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win64\lib\release\*64MT.lib ..\lib64\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -237,7 +241,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -280,7 +284,8 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win64\bin\debug\*64MDd.dll ..\bin64\*&#xA;xcopy /y ..\openssl\win64\bin\debug\*64MDd.lib ..\lib64\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -292,7 +297,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -338,7 +343,8 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win64\bin\release\*64MD.dll ..\bin64\*&#xA;xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -354,7 +360,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -499,12 +505,14 @@
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
-				Name="debug_shared|x64">
+				Name="debug_shared|x64"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="release_shared|x64">
+				Name="release_shared|x64"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>

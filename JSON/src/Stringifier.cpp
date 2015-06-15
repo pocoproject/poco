@@ -28,7 +28,7 @@ namespace Poco {
 namespace JSON {
 
 
-void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step, bool preserveInsertionOrder)
+void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step)
 {
 	if (step == -1) step = indent;
 

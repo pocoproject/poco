@@ -75,6 +75,12 @@ public:
 	HTTPServerResponse& response() const;
 		/// Returns a reference to the associated response.
 		
+	bool secure() const;
+		/// Returns true if the request is using a secure
+		/// connection. Returns false if no secure connection
+		/// is used, or if it is not known whether a secure
+		/// connection is used.		
+		
 	StreamSocket& socket();
 		/// Returns a reference to the underlying socket.
 		

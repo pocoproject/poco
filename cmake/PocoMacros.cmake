@@ -250,4 +250,30 @@ install(
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
     )
+
+if (MSVC)
+# install the targets pdb
+  POCO_INSTALL_PDB(${target_name})
+endif()
+  
+endmacro()
+
+#  POCO_INSTALL_PDB - Install the given target's companion pdb file (if present)
+#    Usage: POCO_INSTALL_PDB(target_name)
+#      INPUT:
+#           target_name             the name of the target. e.g. Foundation for PocoFoundation
+#    Example: POCO_INSTALL_PDB(Foundation)
+#
+#    This is an internal macro meant only to be used by POCO_INSTALL.
+macro(POCO_INSTALL_PDB target_name)
+
+    get_property(type TARGET ${target_name} PROPERTY TYPE)
+    if ("${type}" STREQUAL "SHARED_LIBRARY" OR "${type}" STREQUAL "EXECUTABLE")
+        install(
+            FILES $<TARGET_PDB_FILE:${target_name}>
+            DESTINATION bin
+            COMPONENT Devel
+            OPTIONAL
+            )
+    endif()
 endmacro()
