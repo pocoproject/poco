@@ -22,6 +22,7 @@
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/String.h"
 
 
@@ -68,6 +69,12 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, H
 HTTPServerRequestImpl::~HTTPServerRequestImpl()
 {
 	delete _pStream;
+}
+
+
+bool HTTPServerRequestImpl::secure() const
+{
+	return _session.socket().secure();
 }
 
 

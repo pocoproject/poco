@@ -268,7 +268,7 @@ void MongoDBTest::testDBCount2Command()
 	}
 
 	Poco::MongoDB::Database db("team");
-	int count = db.count(_mongo, "players");
+	Poco::Int64 count = db.count(_mongo, "players");
 	assert(count == 1);
 }
 
@@ -306,7 +306,7 @@ void MongoDBTest::testCursorRequest()
 	}
 	_mongo.sendRequest(*insertRequest);
 
-	int count = db.count(_mongo, "numbers");
+	Poco::Int64 count = db.count(_mongo, "numbers");
 	std::cout << "count= " << count << std::endl;
 	assert(count == 10000);
 

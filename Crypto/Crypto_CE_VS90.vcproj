@@ -19,7 +19,8 @@
 			ConfigurationType="2"
 			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win32\bin\debug\*32MDd.dll ..\bin\*&#xA;xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -33,7 +34,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;$(ProjectName)_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;Crypto_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -56,7 +57,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoCryptod.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -97,7 +98,8 @@
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win32\bin\release\*32MD.dll ..\bin\*&#xA;xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -113,7 +115,7 @@
 				Optimization="4"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;$(ProjectName)_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;Crypto_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -136,7 +138,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoCrypto.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -176,7 +178,8 @@
 			ConfigurationType="4"
 			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win32\lib\debug\*32MTd.lib ..\lib\*&#xA;xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -190,7 +193,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -241,7 +244,8 @@
 			ConfigurationType="4"
 			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win32\lib\release\*32MT.lib ..\lib\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -257,7 +261,7 @@
 				Optimization="4"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -307,7 +311,8 @@
 			ConfigurationType="4"
 			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win32\bin\debug\*32MDd.dll ..\bin\*&#xA;xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -321,7 +326,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -372,7 +377,8 @@
 			ConfigurationType="4"
 			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\win32\bin\release\*32MD.dll ..\bin\*&#xA;xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -388,7 +394,7 @@
 				Optimization="4"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\openssl\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -540,12 +546,14 @@
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
-				Name="debug_shared|Digi JumpStart (ARMV4I)">
+				Name="debug_shared|Digi JumpStart (ARMV4I)"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="release_shared|Digi JumpStart (ARMV4I)">
+				Name="release_shared|Digi JumpStart (ARMV4I)"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
