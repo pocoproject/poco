@@ -82,7 +82,7 @@ SessionImpl::~SessionImpl()
 {
 	try
 	{
-		if (static_cast<bool>(_db) && isTransaction() && !getFeature("autoCommit"))
+		if (isTransaction() && !getFeature("autoCommit"))
 		{
 			try { rollback(); }
 			catch (...) { }
@@ -180,7 +180,7 @@ bool SessionImpl::isConnected()
 {
 	SQLULEN value = 0;
 
-	if (!static_cast<bool>(_db) || Utility::isError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
+	if (Utility::isError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
 		SQL_ATTR_CONNECTION_DEAD,
 		&value,
 		0,
@@ -404,6 +404,7 @@ void SessionImpl::close()
 		commit();
 	}catch (ConnectionException&) { }
 
+	SQLDisconnect(_db);
 }
 
 
