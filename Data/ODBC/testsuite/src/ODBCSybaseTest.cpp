@@ -35,39 +35,23 @@ using Poco::NotFoundException;
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #define SYBASE_DSN ""
-#define SYBASE_UID "mstkdev"
-#define SYBASE_PWD "mstkdev"
+#define SYBASE_UID "unused"
+#define SYBASE_PWD ""
 #define SYBASE_DB "mstk"
-# ifdef _MSC_VER
-std::string SybaseODBC::_connectString = "driver={Adaptive Server Enterprise};"
+std::string SybaseODBC::_connectString = 
+#ifdef _MSC_VER
+"driver={Adaptive Server Enterprise};"
 "DSURL=file://\\\\ms\\dist\\syb\\PROJ\\config\\incr\\common\\dba\\files\\sql.ini?NYT_MSTK;"
-"db=" SYBASE_DB ";"
-#if 1
-"uid=" SYBASE_UID ";"
-"pwd=" SYBASE_PWD ";"
 #else
-"AuthenticationClient=mitkerberos;"
-"ServerPrincipal=sybase/visadb532;"
-"UID=ignored;"
-#endif
-"DynamicPrepare=1;"
-;
-# else
-std::string SybaseODBC::_connectString = "Driver=/ms/dist/syb/PROJ/oc/15.7.0.04/DataAccess64/ODBC/lib/libsybdrvodb-sqllen8.so;"
-"Server=visadb532;"
-"Port=11670;"
-"db=" SYBASE_DB ";"
-#if 0
-"uid=" SYBASE_UID ";"
-"pwd=" SYBASE_PWD ";"
-#else
-"AuthenticationClient=mitkerberos;"
-"ServerPrincipal=sybase/visadb532;"
-"UID=ignored;"
-#endif
+"Driver=/ms/dist/syb/PROJ/oc/15.7.0.04/DataAccess64/ODBC/lib/libsybdrvodb-sqllen8.so;"
 "CS=iso_1;"
+"DSURL=file:///ms/dist/syb/PROJ/oc/15.7.0.04/dba/files/sql.ini?NYT_MSTK;"
+#endif
+"uid=" SYBASE_UID ";"
+"AuthenticationClient=mitkerberos;"
+"ServerPrincipal=sybase/visadb596;"
 "DynamicPrepare=1;";
-# endif
+
 
 ODBCTest::SessionPtr SybaseODBC::_pSession;
 ODBCTest::ExecPtr    SybaseODBC::_pExecutor;
