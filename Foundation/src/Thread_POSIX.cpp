@@ -365,6 +365,9 @@ ThreadImpl* ThreadImpl::currentImpl()
 ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 {
 #if POCO_OS == POCO_OS_LINUX
+#ifndef SYS_gettid
+#define SYS_gettid __NR_gettid
+#endif
 	return static_cast<TIDImpl>( syscall (SYS_gettid) );
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	return static_cast<TIDImpl>( pthread_mach_thread_np(pthread_self()) );
