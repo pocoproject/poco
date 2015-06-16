@@ -102,7 +102,7 @@ void TypeInfo::fillTypeInfo(SQLHDBC pHDBC)
 		if (!SQL_SUCCEEDED(rc))
 			throw StatementException(hstmt, "SQLGetData()");
 
-		rc = SQLGetTypeInfo(hstmt, SQL_ALL_TYPES);
+		rc = Poco::Data::ODBC::SQLGetTypeInfo(hstmt, SQL_ALL_TYPES);
 		if (SQL_SUCCEEDED(rc))
 		{
 			while (SQLFetch(hstmt) != SQL_NO_DATA_FOUND)
