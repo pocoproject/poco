@@ -398,6 +398,7 @@ void SessionImpl::close()
 		commit();
 	}catch (ConnectionException&) { }
 
+	SQLDisconnect(_db);
 }
 
 
