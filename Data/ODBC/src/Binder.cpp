@@ -518,10 +518,10 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 //On Linux, PostgreSQL driver segfaults on SQLGetDescField, so this is disabled for now
 #ifdef POCO_OS_FAMILY_WINDOWS
 		SQLHDESC hIPD = 0;
-		if (!Utility::isError(SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, SQL_IS_POINTER, 0)))
+		if (!Utility::isError(Poco::Data::ODBC::SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, SQL_IS_POINTER, 0)))
 		{
 			SQLUINTEGER sz = 0;
-			if (!Utility::isError(SQLGetDescField(hIPD, (SQLSMALLINT) pos + 1, SQL_DESC_LENGTH, &sz, SQL_IS_UINTEGER, 0)) && 
+			if (!Utility::isError(Poco::Data::ODBC::SQLGetDescField(hIPD, (SQLSMALLINT)pos + 1, SQL_DESC_LENGTH, &sz, SQL_IS_UINTEGER, 0)) &&
 				sz > 0)
 			{
 				size = sz;

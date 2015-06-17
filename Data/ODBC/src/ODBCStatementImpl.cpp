@@ -60,12 +60,12 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 			0);
 	}
 	SQLSMALLINT t;
-	SQLRETURN r = SQLGetInfo(_rConnection, SQL_DRIVER_NAME, NULL, 0, &t);
+	SQLRETURN r = Poco::Data::ODBC::SQLGetInfo(_rConnection, SQL_DRIVER_NAME, NULL, 0, &t);
 	if (!Utility::isError(r) && t > 0)
 	{
 		std::string serverString;
 		serverString.resize(static_cast<std::size_t>(t) + 2);
-		r = SQLGetInfo(_rConnection, SQL_DRIVER_NAME, &serverString[0], SQLSMALLINT((serverString.length() - 1) * sizeof(serverString[0])), &t);
+		r = Poco::Data::ODBC::SQLGetInfo(_rConnection, SQL_DRIVER_NAME, &serverString[0], SQLSMALLINT((serverString.length() - 1) * sizeof(serverString[0])), &t);
 		_isPostgres = (!Utility::isError(r) && Poco::toUpperInPlace(serverString).find("PSQLODBC") == 0);
 	}
 }
