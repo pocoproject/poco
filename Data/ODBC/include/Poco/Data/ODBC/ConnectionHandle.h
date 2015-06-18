@@ -19,7 +19,6 @@
 #ifndef Data_ODBC_ConnectionHandle_INCLUDED
 #define Data_ODBC_ConnectionHandle_INCLUDED
 
-#include "Poco/AutoPtr.h"
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/ODBC/EnvironmentHandle.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
