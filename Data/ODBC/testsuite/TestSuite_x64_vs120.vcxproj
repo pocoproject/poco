@@ -320,6 +320,7 @@
     <ClInclude Include="src\ODBCTest.h" />
     <ClInclude Include="src\ODBCTestSuite.h" />
     <ClInclude Include="src\SQLExecutor.h" />
+		<ClCompile Include="src\ODBCSybaseTest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Driver.cpp" />
@@ -333,6 +334,7 @@
     <ClCompile Include="src\ODBCTest.cpp" />
     <ClCompile Include="src\ODBCTestSuite.cpp" />
     <ClCompile Include="src\SQLExecutor.cpp" />
+		<ClCompile Include="src\ODBCSybaseTest.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
