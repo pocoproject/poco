@@ -175,9 +175,9 @@ public:
 	
 	std::size_t read(T* pBuffer, std::size_t length)
 		/// Copies the data currently in the FIFO
-		/// into the supplied buffer.
-		/// Resizes the supplied buffer to the size of
-		/// data written to it.
+		/// into the supplied buffer, which must be
+		/// preallocated to at least the length size
+		/// before calling this function.
 		/// 
 		/// Returns the reference to the buffer.
 	{
