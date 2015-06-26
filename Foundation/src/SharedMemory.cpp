@@ -58,14 +58,8 @@ SharedMemory::SharedMemory(const SharedMemory& other):
 
 SharedMemory::~SharedMemory()
 {
-	try
-	{
-		if (_pImpl)
-			_pImpl->release();
-	}
-	catch (...)
-	{
-	}
+	if (_pImpl)
+		_pImpl->release();
 }
 
 

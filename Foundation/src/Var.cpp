@@ -62,13 +62,7 @@ Var::Var(const Var& other)
 
 Var::~Var()
 {
-	try
-	{
-		destruct();
-	}
-	catch (...)
-	{
-	}
+	destruct();
 }
 
 

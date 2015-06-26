@@ -39,13 +39,7 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 
 NamedEventImpl::~NamedEventImpl()
 {
-	try
-	{
-		sys$dassgn(_mbxChan);
-	}
-	catch (...)
-	{
-	}
+	sys$dassgn(_mbxChan);
 }
 
 

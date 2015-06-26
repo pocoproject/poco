@@ -67,13 +67,7 @@ SSLManager::SSLManager()
 
 SSLManager::~SSLManager()
 {
-	try
-	{
-		shutdown();
-	}
-	catch (...)
-	{
-	}
+	shutdown();
 }
 
 

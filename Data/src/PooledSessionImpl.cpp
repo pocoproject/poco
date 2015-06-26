@@ -33,13 +33,7 @@ PooledSessionImpl::PooledSessionImpl(PooledSessionHolder* pHolder):
 
 PooledSessionImpl::~PooledSessionImpl()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+	close();
 }
 
 

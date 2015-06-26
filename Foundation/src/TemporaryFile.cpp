@@ -81,22 +81,16 @@ TemporaryFile::TemporaryFile(const std::string& tempDir):
 
 TemporaryFile::~TemporaryFile()
 {
-	try
+	if (!_keep)
 	{
-		if (!_keep)
+		try
 		{
-			try
-			{
-				if (exists())
-					remove(true);
-			}
-			catch (Exception&)
-			{
-			}
+			if (exists())
+				remove(true);
 		}
-	}
-	catch (...)
-	{
+		catch (Exception&)
+		{
+		}
 	}
 }
 

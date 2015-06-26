@@ -54,14 +54,8 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVAL
 
 DirectoryIteratorImpl::~DirectoryIteratorImpl()
 {
-	try
-	{
-		if (_fh != INVALID_HANDLE_VALUE)
-			FindClose(_fh);
-	}
-	catch (...)
-	{
-	}
+	if (_fh != INVALID_HANDLE_VALUE)
+		FindClose(_fh);
 }
 
 

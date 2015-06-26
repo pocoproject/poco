@@ -44,14 +44,8 @@ UDPEchoServer::UDPEchoServer(const SocketAddress& sa):
 
 UDPEchoServer::~UDPEchoServer()
 {
-	try
-	{
-		_stop = true;
-		_thread.join();
-	}
-	catch (...)
-	{
-	}
+	_stop = true;
+	_thread.join();
 }
 
 

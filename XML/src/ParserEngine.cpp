@@ -126,16 +126,10 @@ ParserEngine::ParserEngine(const XMLString& encoding):
 
 ParserEngine::~ParserEngine()
 {
-	try
-	{
-		resetContext();
-		if (_parser) XML_ParserFree(_parser);
-		delete [] _pBuffer;
-		delete _pNamespaceStrategy;
-	}
-	catch (...)
-	{
-	}
+	resetContext();
+	if (_parser) XML_ParserFree(_parser);
+	delete [] _pBuffer;
+	delete _pNamespaceStrategy;
 }
 
 

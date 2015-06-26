@@ -49,14 +49,8 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 
 RegularExpression::~RegularExpression()
 {
-	try
-	{
-		if (_pcre)  pcre_free(_pcre);
-		if (_extra) pcre_free(_extra);
-	}
-	catch (...)
-	{
-	}
+	if (_pcre)  pcre_free(_pcre);
+	if (_extra) pcre_free(_extra);
 }
 
 

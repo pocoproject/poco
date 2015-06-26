@@ -36,13 +36,7 @@ FileStreamBuf::FileStreamBuf():
 
 FileStreamBuf::~FileStreamBuf()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+	close();
 }
 
 

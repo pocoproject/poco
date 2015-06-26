@@ -88,13 +88,7 @@ public:
 	virtual ~SocketAcceptor()
 		/// Destroys the SocketAcceptor.
 	{
-		try
-		{
-			unregisterAcceptor();
-		}
-		catch (...)
-		{
-		}
+		unregisterAcceptor();
 	}
 	
 	virtual void registerAcceptor(SocketReactor& reactor)

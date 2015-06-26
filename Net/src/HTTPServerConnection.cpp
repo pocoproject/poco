@@ -45,13 +45,7 @@ HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServe
 
 HTTPServerConnection::~HTTPServerConnection()
 {
-	try
-	{
-		_pFactory->serverStopped -= Poco::delegate(this, &HTTPServerConnection::onServerStopped);
-	}
-	catch (...)
-	{
-	}
+	_pFactory->serverStopped -= Poco::delegate(this, &HTTPServerConnection::onServerStopped);
 }
 
 

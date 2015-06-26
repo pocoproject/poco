@@ -34,13 +34,7 @@ FPEnvironmentImpl::FPEnvironmentImpl(const FPEnvironmentImpl& env)
 
 FPEnvironmentImpl::~FPEnvironmentImpl()
 {
-	try
-	{
-		_controlfp(_env, MCW_RC);
-	}
-	catch (...)
-	{
-	}
+	_controlfp(_env, MCW_RC);
 }
 
 

@@ -37,13 +37,7 @@ public:
 	
 	~FileHandle()
 	{
-		try
-		{
-			if (_h != INVALID_HANDLE_VALUE) CloseHandle(_h);
-		}
-		catch (...)
-		{
-		}
+		if (_h != INVALID_HANDLE_VALUE) CloseHandle(_h);
 	}
 	
 	HANDLE get() const

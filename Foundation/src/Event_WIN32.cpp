@@ -30,13 +30,7 @@ EventImpl::EventImpl(bool autoReset)
 
 EventImpl::~EventImpl()
 {
-	try
-	{
-		CloseHandle(_event);
-	}
-	catch (...)
-	{
-	}
+	CloseHandle(_event);
 }
 
 

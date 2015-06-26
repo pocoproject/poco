@@ -41,14 +41,8 @@ HTTPTestServer::HTTPTestServer():
 
 HTTPTestServer::~HTTPTestServer()
 {
-	try
-	{
-		_stop = true;
-		_thread.join();
-	}
-	catch (...)
-	{
-	}
+	_stop = true;
+	_thread.join();
 }
 
 

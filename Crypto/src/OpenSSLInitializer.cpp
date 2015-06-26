@@ -47,13 +47,7 @@ OpenSSLInitializer::OpenSSLInitializer()
 
 OpenSSLInitializer::~OpenSSLInitializer()
 {
-	try
-	{
-		uninitialize();
-	}
-	catch (...)
-	{
-	}
+	uninitialize();
 }
 
 

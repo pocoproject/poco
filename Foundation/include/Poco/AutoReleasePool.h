@@ -53,13 +53,7 @@ public:
 		/// Destroys the AutoReleasePool and releases
 		/// all objects it currently holds.
 	{
-		try
-		{
-			release();
-		}
-		catch (...)
-		{
-		}
+		release();
 	}
 	
 	void add(C* pObject)

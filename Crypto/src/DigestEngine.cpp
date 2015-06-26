@@ -34,13 +34,7 @@ DigestEngine::DigestEngine(const std::string& name):
 	
 DigestEngine::~DigestEngine()
 {
-	try
-	{
-		EVP_MD_CTX_destroy(_ctx);
-	}
-	catch (...)
-	{
-	}
+	EVP_MD_CTX_destroy(_ctx);
 }
 
 int DigestEngine::nid() const

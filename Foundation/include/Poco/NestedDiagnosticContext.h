@@ -151,13 +151,7 @@ inline NDCScope::NDCScope(const std::string& info, int line, const char* filenam
 
 inline NDCScope::~NDCScope()
 {
-	try
-	{
-		NestedDiagnosticContext::current().pop();
-	}
-	catch (...)
-	{
-	}
+	NestedDiagnosticContext::current().pop();
 }
 
 

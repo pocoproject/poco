@@ -111,13 +111,7 @@ private:
 		}
 		~CurrentThreadHolder()
 		{
-			try
-			{
-				pthread_key_delete(_key);
-			}
-			catch (...)
-			{
-			}
+			pthread_key_delete(_key);
 		}
 		ThreadImpl* get() const
 		{

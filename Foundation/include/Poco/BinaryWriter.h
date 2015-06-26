@@ -187,13 +187,7 @@ public:
 
 	~BasicMemoryBinaryWriter()
 	{
-		try
-		{
-			flush();
-		}
-		catch (...)
-		{
-		}
+		flush();
 	}
 
 	Buffer<T>& data()

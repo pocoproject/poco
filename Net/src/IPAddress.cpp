@@ -207,13 +207,7 @@ IPAddress::IPAddress(const struct sockaddr& sockaddr)
 
 IPAddress::~IPAddress()
 {
-	try
-	{
-		destruct();
-	}
-	catch (...)
-	{
-	}
+	destruct();
 }
 
 

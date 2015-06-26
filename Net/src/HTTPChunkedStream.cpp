@@ -161,13 +161,7 @@ void* HTTPChunkedInputStream::operator new(std::size_t size)
 
 void HTTPChunkedInputStream::operator delete(void* ptr)
 {
-	try
-	{
-		_pool.release(ptr);
-	}
-	catch (...)
-	{
-	}
+	_pool.release(ptr);
 }
 
 
@@ -199,13 +193,7 @@ void* HTTPChunkedOutputStream::operator new(std::size_t size)
 
 void HTTPChunkedOutputStream::operator delete(void* ptr)
 {
-	try
-	{
-		_pool.release(ptr);
-	}
-	catch (...)
-	{
-	}
+	_pool.release(ptr);
 }
 
 

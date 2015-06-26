@@ -29,13 +29,7 @@ TaskNotification::TaskNotification(Task* pTask):
 
 TaskNotification::~TaskNotification()
 {
-	try
-	{
-		if (_pTask) _pTask->release();
-	}
-	catch (...)
-	{
-	}
+	if (_pTask) _pTask->release();
 }
 
 

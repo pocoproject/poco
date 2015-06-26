@@ -56,14 +56,8 @@ HTTPSTestServer::HTTPSTestServer(Poco::Net::Context::Ptr pContext):
 
 HTTPSTestServer::~HTTPSTestServer()
 {
-	try
-	{
-		_stop = true;
-		_thread.join();
-	}
-	catch (...)
-	{
-	}
+	_stop = true;
+	_thread.join();
 }
 
 

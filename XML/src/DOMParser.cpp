@@ -41,13 +41,7 @@ DOMParser::DOMParser(NamePool* pNamePool):
 
 DOMParser::~DOMParser()
 {
-	try
-	{
-		if (_pNamePool) _pNamePool->release();
-	}
-	catch (...)
-	{
-	}
+	if (_pNamePool) _pNamePool->release();
 }
 
 

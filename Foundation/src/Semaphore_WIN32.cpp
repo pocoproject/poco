@@ -34,13 +34,7 @@ SemaphoreImpl::SemaphoreImpl(int n, int max)
 
 SemaphoreImpl::~SemaphoreImpl()
 {
-	try
-	{
-		CloseHandle(_sema);
-	}
-	catch (...)
-	{
-	}
+	CloseHandle(_sema);
 }
 
 

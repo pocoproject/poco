@@ -34,13 +34,7 @@ FPEnvironmentImpl::FPEnvironmentImpl(const FPEnvironmentImpl& env)
 
 FPEnvironmentImpl::~FPEnvironmentImpl()
 {
-	try
-	{
-		fesetenv(&_env);
-	}
-	catch (...)
-	{
-	}
+	fesetenv(&_env);
 }
 
 

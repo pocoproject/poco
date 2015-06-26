@@ -56,13 +56,7 @@ namespace
 		
 		~EchoServiceHandler()
 		{
-			try
-			{
-				_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
-			}
-			catch (...)
-			{
-			}
+			_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
 		}
 		
 		void onReadable(ReadableNotification* pNf)

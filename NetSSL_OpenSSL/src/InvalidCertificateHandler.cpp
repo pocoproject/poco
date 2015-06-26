@@ -37,16 +37,10 @@ InvalidCertificateHandler::InvalidCertificateHandler(bool handleErrorsOnServerSi
 
 InvalidCertificateHandler::~InvalidCertificateHandler()
 {
-	try
-	{
-		if (_handleErrorsOnServerSide)
-			SSLManager::instance().ServerVerificationError -= Delegate<InvalidCertificateHandler, VerificationErrorArgs>(this, &InvalidCertificateHandler::onInvalidCertificate);
-		else
-			SSLManager::instance().ClientVerificationError -= Delegate<InvalidCertificateHandler, VerificationErrorArgs>(this, &InvalidCertificateHandler::onInvalidCertificate);
-	}
-	catch (...)
-	{
-	}
+	if (_handleErrorsOnServerSide)
+		SSLManager::instance().ServerVerificationError -= Delegate<InvalidCertificateHandler, VerificationErrorArgs>(this, &InvalidCertificateHandler::onInvalidCertificate);
+	else
+		SSLManager::instance().ClientVerificationError -= Delegate<InvalidCertificateHandler, VerificationErrorArgs>(this, &InvalidCertificateHandler::onInvalidCertificate);
 }
 
 

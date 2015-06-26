@@ -34,13 +34,7 @@ NamedMutexImpl::NamedMutexImpl(const std::string& name):
 
 NamedMutexImpl::~NamedMutexImpl()
 {
-	try
-	{
-		CloseHandle(_mutex);
-	}
-	catch (...)
-	{
-	}
+	CloseHandle(_mutex);
 }
 
 

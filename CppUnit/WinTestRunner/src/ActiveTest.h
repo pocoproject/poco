@@ -62,14 +62,8 @@ inline ActiveTest::ActiveTest(Test *test): TestDecorator(test)
 // Pend until the test has completed
 inline ActiveTest::~ActiveTest()
 {
-	try
-	{
-		CSingleLock(&_runCompleted, TRUE); 
-		CloseHandle(_threadHandle);
-	}
-	catch (...)
-	{
-	}
+	CSingleLock(&_runCompleted, TRUE); 
+	CloseHandle(_threadHandle);
 }
 
 

@@ -29,13 +29,7 @@ TimedNotificationQueue::TimedNotificationQueue()
 
 TimedNotificationQueue::~TimedNotificationQueue()
 {
-	try
-	{
-		clear();
-	}
-	catch (...)
-	{
-	}
+	clear();
 }
 
 

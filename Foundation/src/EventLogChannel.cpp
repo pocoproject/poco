@@ -81,13 +81,7 @@ EventLogChannel::EventLogChannel(const std::string& name, const std::string& hos
 
 EventLogChannel::~EventLogChannel()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+	close();
 }
 
 

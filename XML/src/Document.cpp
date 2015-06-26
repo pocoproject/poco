@@ -81,14 +81,8 @@ Document::Document(DocumentType* pDocumentType, NamePool* pNamePool):
 
 Document::~Document()
 {
-	try
-	{
-		if (_pDocumentType) _pDocumentType->release();
-		_pNamePool->release();
-	}
-	catch (...)
-	{
-	}
+	if (_pDocumentType) _pDocumentType->release();
+	_pNamePool->release();
 }
 
 

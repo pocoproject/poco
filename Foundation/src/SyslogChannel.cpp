@@ -47,13 +47,7 @@ SyslogChannel::SyslogChannel(const std::string& name, int options, int facility)
 
 SyslogChannel::~SyslogChannel()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+	close();
 }
 
 

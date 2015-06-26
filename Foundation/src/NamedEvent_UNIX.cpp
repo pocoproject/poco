@@ -86,15 +86,9 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 
 NamedEventImpl::~NamedEventImpl()
 {
-	try
-	{
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
-		sem_close(_sem);
+	sem_close(_sem);
 #endif
-	}
-	catch (...)
-	{
-	}
 }
 
 

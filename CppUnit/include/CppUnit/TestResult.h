@@ -95,13 +95,7 @@ public:
 
 		~ExclusiveZone()
 		{
-			try
-			{
-				m_syncObject->unlock();
-			}
-			catch (...)
-			{
-			}
+			m_syncObject->unlock();
 		}
 	};
 

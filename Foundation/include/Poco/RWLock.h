@@ -168,13 +168,7 @@ inline ScopedRWLock::ScopedRWLock(RWLock& rwl, bool write): _rwl(rwl)
 
 inline ScopedRWLock::~ScopedRWLock()
 {
-	try
-	{
-		_rwl.unlock();
-	}
-	catch (...)
-	{
-	}
+	_rwl.unlock();
 }
 
 

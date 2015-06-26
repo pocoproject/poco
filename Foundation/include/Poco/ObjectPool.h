@@ -194,15 +194,9 @@ public:
 	~ObjectPool()
 		/// Destroys the ObjectPool.
 	{
-		try
+		for (typename std::vector<P>::iterator it = _pool.begin(); it != _pool.end(); ++it)
 		{
-			for (typename std::vector<P>::iterator it = _pool.begin(); it != _pool.end(); ++it)
-			{
-				_factory.destroyObject(*it);
-			}
-		}
-		catch (...)
-		{
+			_factory.destroyObject(*it);
 		}
 	}
 		

@@ -84,13 +84,7 @@ public:
 
 	virtual ~PooledConnection()
 	{
-		try
-		{
-			_pool.returnObject(_connection);
-		}
-		catch (...)
-		{
-		}
+		_pool.returnObject(_connection);
 	}
 
 	operator Connection::Ptr ()

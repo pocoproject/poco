@@ -49,14 +49,8 @@ FormattingChannel::FormattingChannel(Formatter* pFormatter, Channel* pChannel):
 
 FormattingChannel::~FormattingChannel()
 {
-	try
-	{
-		if (_pChannel)   _pChannel->release();
-		if (_pFormatter) _pFormatter->release();
-	}
-	catch (...)
-	{
-	}
+	if (_pChannel)   _pChannel->release();
+	if (_pFormatter) _pFormatter->release();
 }
 
 

@@ -47,13 +47,7 @@ public:
 	
 	~ScopedLock()
 	{
-		try
-		{
-			_mutex.unlock();
-		}
-		catch (...)
-		{
-		}
+		_mutex.unlock();
 	}
 
 private:
@@ -88,13 +82,7 @@ public:
 	
 	~ScopedLockWithUnlock()
 	{
-		try
-		{
-			unlock();
-		}
-		catch (...)
-		{
-		}
+		unlock();
 	}
 	
 	void unlock()

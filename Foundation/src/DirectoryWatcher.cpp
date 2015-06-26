@@ -171,13 +171,7 @@ public:
 	
 	~WindowsDirectoryWatcherStrategy()
 	{
-		try
-		{
-			CloseHandle(_hStopped);
-		}
-		catch (...)
-		{
-		}
+		CloseHandle(_hStopped);
 	}
 	
 	void run()
@@ -280,13 +274,7 @@ public:
 	
 	~LinuxDirectoryWatcherStrategy()
 	{
-		try
-		{
-			close(_fd);
-		}
-		catch (...)
-		{
-		}
+		close(_fd);
 	}
 	
 	void run()
@@ -421,14 +409,8 @@ public:
 
 	~BSDDirectoryWatcherStrategy()
 	{
-		try
-		{
-			close(_dirFD);
-			close(_queueFD);
-		}
-		catch (...)
-		{
-		}
+		close(_dirFD);
+		close(_queueFD);
 	}
 
 	void run()
@@ -559,14 +541,8 @@ DirectoryWatcher::DirectoryWatcher(const Poco::File& directory, int eventMask, i
 
 DirectoryWatcher::~DirectoryWatcher()
 {
-	try
-	{
-		stop();
-		delete _pStrategy;
-	}
-	catch (...)
-	{
-	}
+	stop();
+	delete _pStrategy;
 }
 
 	

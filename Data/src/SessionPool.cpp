@@ -41,13 +41,7 @@ SessionPool::SessionPool(const std::string& connector, const std::string& connec
 
 SessionPool::~SessionPool()
 {
-	try
-	{
-		shutdown();
-	}
-	catch (...)
-	{
-	}
+	shutdown();
 }
 
 

@@ -30,13 +30,7 @@ NotificationQueue::NotificationQueue()
 
 NotificationQueue::~NotificationQueue()
 {
-	try
-	{
-		clear();
-	}
-	catch (...)
-	{
-	}
+	clear();
 }
 
 

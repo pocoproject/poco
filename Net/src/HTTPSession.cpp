@@ -64,21 +64,15 @@ HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 
 HTTPSession::~HTTPSession()
 {
+	if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
 	try
 	{
-		if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
-		try
-		{
-			close();
-		}
-		catch (...)
-		{
-		}
-		delete _pException;
+		close();
 	}
 	catch (...)
 	{
 	}
+	delete _pException;
 }
 
 

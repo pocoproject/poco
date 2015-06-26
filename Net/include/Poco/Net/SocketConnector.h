@@ -92,13 +92,7 @@ public:
 	virtual ~SocketConnector()
 		/// Destroys the SocketConnector.
 	{
-		try
-		{
-			unregisterConnector();
-		}
-		catch (...)
-		{
-		}
+		unregisterConnector();
 	}
 	
 	virtual void registerConnector(SocketReactor& reactor)

@@ -32,13 +32,7 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 
 NamedEventImpl::~NamedEventImpl()
 {
-	try
-	{
-		CloseHandle(_event);
-	}
-	catch (...)
-	{
-	}
+	CloseHandle(_event);
 }
 
 

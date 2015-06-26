@@ -103,13 +103,7 @@ namespace
 
 	CryptoTransformImpl::~CryptoTransformImpl()
 	{
-		try
-		{
-			EVP_CIPHER_CTX_cleanup(&_ctx);
-		}
-		catch (...)
-		{
-		}
+		EVP_CIPHER_CTX_cleanup(&_ctx);
 	}
 
 

@@ -47,13 +47,7 @@ public:
 	
 	~ArchiveImpl()
 	{
-		try
-		{
-			close();
-		}
-		catch (...)
-		{
-		}
+		close();
 	}
 	
 	const std::string& path() const

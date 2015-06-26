@@ -69,13 +69,7 @@ SMTPChannel::SMTPChannel(const std::string& mailhost, const std::string& sender,
 
 SMTPChannel::~SMTPChannel()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+	close();
 }
 
 

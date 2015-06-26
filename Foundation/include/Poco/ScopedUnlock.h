@@ -41,13 +41,7 @@ public:
 	}
 	inline ~ScopedUnlock()
 	{
-		try
-		{
-			_mutex.lock();
-		}
-		catch (...)
-		{
-		}
+		_mutex.lock();
 	}
 
 private:

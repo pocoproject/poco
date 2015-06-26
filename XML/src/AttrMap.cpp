@@ -36,13 +36,7 @@ AttrMap::AttrMap(Element* pElement):
 
 AttrMap::~AttrMap()
 {
-	try
-	{
-		_pElement->release();
-	}
-	catch (...)
-	{
-	}
+	_pElement->release();
 }
 
 

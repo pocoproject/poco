@@ -86,26 +86,20 @@ public:
 	
 	~Preprocessor()
 	{
-		try
+		int c = _pStream->get();
+		while (c != -1) c = _pStream->get();
+		delete _pStream;
+		_proc.wait();
+		if (!_file.empty())
 		{
-			int c = _pStream->get();
-			while (c != -1) c = _pStream->get();
-			delete _pStream;
-			_proc.wait();
-			if (!_file.empty())
+			try
 			{
-				try
-				{
-					File f(_file);
-					f.remove();
-				}
-				catch (Exception&)
-				{
-				}
+				File f(_file);
+				f.remove();
 			}
-		}
-		catch (...)
-		{
+			catch (Exception&)
+			{
+			}
 		}
 	}
 	

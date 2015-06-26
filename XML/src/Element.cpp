@@ -53,13 +53,7 @@ Element::Element(Document* pOwnerDocument, const Element& element):
 
 Element::~Element()
 {
-	try
-	{
-		if (_pFirstAttr) _pFirstAttr->release();
-	}
-	catch (...)
-	{
-	}
+	if (_pFirstAttr) _pFirstAttr->release();
 }
 
 

@@ -115,13 +115,7 @@ public:
 	virtual ~Manifest()
 		/// Destroys the Manifest.
 	{
-		try
-		{
-			clear();
-		}
-		catch (...)
-		{
-		}
+		clear();
 	}
 
 	Iterator find(const std::string& className) const

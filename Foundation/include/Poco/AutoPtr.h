@@ -89,13 +89,7 @@ public:
 
 	~AutoPtr()
 	{
-		try
-		{
-			if (_ptr) _ptr->release();
-		}
-		catch (...)
-		{
-		}
+		if (_ptr) _ptr->release();
 	}
 	
 	AutoPtr& assign(C* ptr)

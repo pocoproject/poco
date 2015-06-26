@@ -125,19 +125,13 @@ DeflatingStreamBuf::~DeflatingStreamBuf()
 {
 	try
 	{
-		try
-		{
-			close();
-		}
-		catch (...)
-		{
-		}
-		delete [] _buffer;
-		deflateEnd(&_zstr);
+		close();
 	}
 	catch (...)
 	{
 	}
+	delete [] _buffer;
+	deflateEnd(&_zstr);
 }
 
 

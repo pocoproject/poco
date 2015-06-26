@@ -54,14 +54,8 @@ AbstractNode::AbstractNode(Document* pOwnerDocument, const AbstractNode& node):
 
 AbstractNode::~AbstractNode()
 {
-	try
-	{
-		delete _pEventDispatcher;
-		if (_pNext) _pNext->release();
-	}
-	catch (...)
-	{
-	}
+	delete _pEventDispatcher;
+	if (_pNext) _pNext->release();
 }
 
 

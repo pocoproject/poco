@@ -72,13 +72,7 @@ DirectoryIterator::DirectoryIterator(const Path& path): _path(path), _pImpl(new 
 
 DirectoryIterator::~DirectoryIterator()
 {
-	try
-	{
-		if (_pImpl) _pImpl->release();
-	}
-	catch (...)
-	{
-	}
+	if (_pImpl) _pImpl->release();
 }
 
 

@@ -30,13 +30,7 @@ PriorityNotificationQueue::PriorityNotificationQueue()
 
 PriorityNotificationQueue::~PriorityNotificationQueue()
 {
-	try
-	{
-		clear();
-	}
-	catch (...)
-	{
-	}
+	clear();
 }
 
 

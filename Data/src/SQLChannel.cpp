@@ -69,13 +69,7 @@ SQLChannel::SQLChannel(const std::string& connector,
 
 SQLChannel::~SQLChannel()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+	close();
 }
 
 

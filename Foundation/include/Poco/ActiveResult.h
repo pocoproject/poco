@@ -260,13 +260,7 @@ public:
 	~ActiveResult()
 		/// Destroys the result.
 	{
-		try
-		{
-			_pHolder->release();
-		}
-		catch (...)
-		{
-		}
+		_pHolder->release();
 	}
 	
 	ActiveResult& operator = (const ActiveResult& result)
@@ -404,13 +398,7 @@ public:
 	~ActiveResult()
 		/// Destroys the result.
 	{
-		try
-		{
-			_pHolder->release();
-		}
-		catch (...)
-		{
-		}
+		_pHolder->release();
 	}
 	
 	ActiveResult& operator = (const ActiveResult& result)

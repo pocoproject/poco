@@ -81,13 +81,7 @@ ThreadImpl::ThreadImpl():
 
 ThreadImpl::~ThreadImpl()
 {
-	try
-	{
-		if (_thread) CloseHandle(_thread);
-	}
-	catch (...)
-	{
-	}
+	if (_thread) CloseHandle(_thread);
 }
 
 

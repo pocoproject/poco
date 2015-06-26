@@ -27,13 +27,7 @@ public:
 	
 	~CryptoInitializer()
 	{
-		try
-		{
-			Poco::Crypto::uninitializeCrypto();
-		}
-		catch (...)
-		{
-		}
+		Poco::Crypto::uninitializeCrypto();
 	}
 };
 

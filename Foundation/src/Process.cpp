@@ -89,13 +89,7 @@ ProcessHandle::ProcessHandle(const ProcessHandle& handle):
 	
 ProcessHandle::~ProcessHandle()
 {
-	try
-	{
-		_pImpl->release();
-	}
-	catch (...)
-	{
-	}
+	_pImpl->release();
 }
 
 

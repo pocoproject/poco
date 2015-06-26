@@ -44,14 +44,8 @@ EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
 
 EventImpl::~EventImpl()
 {
-	try
-	{
-		pthread_cond_destroy(&_cond);
-		pthread_mutex_destroy(&_mutex);
-	}
-	catch (...)
-	{
-	}
+	pthread_cond_destroy(&_cond);
+	pthread_mutex_destroy(&_mutex);
 }
 
 

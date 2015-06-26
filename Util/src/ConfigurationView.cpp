@@ -33,13 +33,7 @@ ConfigurationView::ConfigurationView(const std::string& prefix, AbstractConfigur
 
 ConfigurationView::~ConfigurationView()
 {
-	try
-	{
-		_pConfig->release();
-	}
-	catch (...)
-	{
-	}
+	_pConfig->release();
 }
 
 

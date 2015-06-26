@@ -604,13 +604,7 @@ NetworkInterface::NetworkInterface(const std::string& name,
 
 NetworkInterface::~NetworkInterface()
 {
-	try
-	{
-		_pImpl->release();
-	}
-	catch (...)
-	{
-	}
+	_pImpl->release();
 }
 
 

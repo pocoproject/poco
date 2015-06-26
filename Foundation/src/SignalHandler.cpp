@@ -43,13 +43,7 @@ SignalHandler::SignalHandler()
 
 SignalHandler::~SignalHandler()
 {
-	try
-	{
-		jumpBufferVec().pop_back();
-	}
-	catch (...)
-	{
-	}
+	jumpBufferVec().pop_back();
 }
 
 

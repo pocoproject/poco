@@ -58,13 +58,7 @@ DOMBuilder::DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool):
 
 DOMBuilder::~DOMBuilder()
 {
-	try
-	{
-		if (_pNamePool) _pNamePool->release();
-	}
-	catch (...)
-	{
-	}
+	if (_pNamePool) _pNamePool->release();
 }
 
 

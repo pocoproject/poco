@@ -64,13 +64,7 @@ public:
 
 	virtual ~AbstractCache()
 	{
-		try
-		{
-			uninitialize();
-		}
-		catch (...)
-		{
-		}
+		uninitialize();
 	}
 
 	void add(const TKey& key, const TValue& val)

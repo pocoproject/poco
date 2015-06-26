@@ -38,15 +38,9 @@ RWLockImpl::RWLockImpl(): _readers(0), _writersWaiting(0), _writers(0)
 
 RWLockImpl::~RWLockImpl()
 {
-	try
-	{
-		CloseHandle(_mutex);
-		CloseHandle(_readEvent);
-		CloseHandle(_writeEvent);
-	}
-	catch (...)
-	{
-	}
+	CloseHandle(_mutex);
+	CloseHandle(_readEvent);
+	CloseHandle(_writeEvent);
 }
 
 

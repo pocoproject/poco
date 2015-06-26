@@ -61,13 +61,7 @@ RemoteSyslogChannel::RemoteSyslogChannel(const std::string& address, const std::
 
 RemoteSyslogChannel::~RemoteSyslogChannel()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+	close();
 }
 
 

@@ -37,13 +37,7 @@ ProcessHandleImpl::ProcessHandleImpl(HANDLE hProcess, UInt32 pid):
 
 ProcessHandleImpl::~ProcessHandleImpl()
 {
-	try
-	{
-		closeHandle();
-	}
-	catch (...)
-	{
-	}
+	closeHandle();
 }
 
 void ProcessHandleImpl::closeHandle()

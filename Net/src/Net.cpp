@@ -62,13 +62,7 @@ void Net_API uninitializeNetwork()
 		~NetworkInitializer()
 			/// Calls Poco::Net::uninitializeNetwork();
 		{
-			try
-			{
-				Poco::Net::uninitializeNetwork();
-			}
-			catch (...)
-			{
-			}
+			Poco::Net::uninitializeNetwork();
 		}
 	};
 

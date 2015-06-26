@@ -94,13 +94,7 @@ void X509Certificate::swap(X509Certificate& cert)
 
 X509Certificate::~X509Certificate()
 {
-	try
-	{
-		X509_free(_pCert);
-	}
-	catch (...)
-	{
-	}
+	X509_free(_pCert);
 }
 
 

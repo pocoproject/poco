@@ -280,13 +280,7 @@ ThreadPool::ThreadPool(const std::string& name,
 
 ThreadPool::~ThreadPool()
 {
-	try
-	{
-		stopAll();
-	}
-	catch (...)
-	{
-	}
+	stopAll();
 }
 
 

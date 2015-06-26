@@ -37,13 +37,7 @@ ElementsByTagNameList::ElementsByTagNameList(const Node* pParent, const XMLStrin
 
 ElementsByTagNameList::~ElementsByTagNameList()
 {
-	try
-	{
-		_pParent->release();
-	}
-	catch (...)
-	{
-	}
+	_pParent->release();
 }
 
 
@@ -110,13 +104,7 @@ ElementsByTagNameListNS::ElementsByTagNameListNS(const Node* pParent, const XMLS
 
 ElementsByTagNameListNS::~ElementsByTagNameListNS()
 {
-	try
-	{
-		_pParent->release();
-	}
-	catch (...)
-	{
-	}
+	_pParent->release();
 }
 
 

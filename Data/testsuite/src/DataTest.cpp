@@ -83,13 +83,7 @@ DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)
 
 DataTest::~DataTest()
 {
-	try
-	{
-		Poco::Data::Test::Connector::removeFromFactory();
-	}
-	catch (...)
-	{
-	}
+	Poco::Data::Test::Connector::removeFromFactory();
 }
 
 
