@@ -23,10 +23,10 @@ namespace Data {
 namespace ODBC {
 
 
-ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position, bool numericToString) :
+	ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position, NumericConversion numericConversion) :
 	MetaColumn(position),
 	_rStmt(rStmt),
-	_numericToString(numericToString)
+	_numericConversion(numericConversion)
 {
 	init();
 }
@@ -114,22 +114,33 @@ void ODBCMetaColumn::init()
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
 	{
-		bool toString = _numericToString;
-		if (!toString && 0 == _columnDesc.decimalDigits)
+		bool toString = false;
+		switch (_numericConversion)
 		{
-			if (_columnDesc.size <= 9)
-				setType(MetaColumn::FDT_INT32);
-			else if (_columnDesc.size <= 18)
-				setType(MetaColumn::FDT_INT64);
+		case NC_BEST_FIT:
+		case NC_BEST_FIT_DBL_LIMIT:
+			if (0 == _columnDesc.decimalDigits)
+			{
+				if (_columnDesc.size <= 9)
+					setType(MetaColumn::FDT_INT32);
+				else if (_columnDesc.size <= 18)
+					setType(MetaColumn::FDT_INT64);
+				else if (_numericConversion != NC_BEST_FIT_DBL_LIMIT)
+					toString = true;
+				else
+					setType(MetaColumn::FDT_DOUBLE);
+			} 
 			else
-				toString = true;
-		}
-		else if (!toString)
-		{
-			if (_columnDesc.size > 16) // we can't have more than 16 digits in double
-				toString = true;
-			else
-				setType(MetaColumn::FDT_DOUBLE);
+			{
+				// we can't have more than 16 digits in double, but we may be asked to
+				if (_columnDesc.size > 16 && _numericConversion != NC_BEST_FIT_DBL_LIMIT) 
+					toString = true;
+				else
+					setType(MetaColumn::FDT_DOUBLE);
+			}
+			break;
+		case NC_FORCE_STRING:
+			toString = true;
 		}
 		if (toString)
 		{

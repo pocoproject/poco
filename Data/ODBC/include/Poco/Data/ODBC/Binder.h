@@ -74,7 +74,7 @@ public:
 		std::size_t maxFieldSize,
 		ParameterBinding dataBinding,
 		TypeInfo* pDataTypes,
-		bool numericToString);
+		ODBCMetaColumn::NumericConversion numericConversion);
 		/// Creates the Binder.
 
 	~Binder();
@@ -1011,7 +1011,7 @@ private:
 	std::size_t      _maxCharColLength;
 	std::size_t      _maxWCharColLength;
 	std::size_t      _maxVarBinColSize;
-	bool             _numericToString;
+	ODBCMetaColumn::NumericConversion _numericConversion;
 };
 
 
