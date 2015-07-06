@@ -31,12 +31,12 @@ Preparator::Preparator(const StatementHandle& rStmt,
 	const std::string& statement, 
 	std::size_t maxFieldSize,
 	DataExtraction dataExtraction,
-	bool numericToString,
+	ODBCMetaColumn::NumericConversion numericConversion,
 	bool isPostgres) :
 	_rStmt(rStmt),
 	_maxFieldSize(maxFieldSize),
 	_dataExtraction(dataExtraction),
-	_numericToString(numericToString)
+	_numericConversion(numericConversion)
 {
 	SQLCHAR* pStr = (SQLCHAR*) statement.c_str();
 	if (Utility::isError(Poco::Data::ODBC::SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
@@ -58,7 +58,7 @@ Preparator::Preparator(const Preparator& other):
 	_rStmt(other._rStmt),
 	_maxFieldSize(other._maxFieldSize),
 	_dataExtraction(other._dataExtraction),
-	_numericToString(other._numericToString)
+	_numericConversion(other._numericConversion)
 {
 	resize();
 }
@@ -169,7 +169,7 @@ std::size_t Preparator::maxDataSize(std::size_t pos) const
 
 	try 
 	{
-		ODBCMetaColumn mc(_rStmt, pos, _numericToString);
+		ODBCMetaColumn mc(_rStmt, pos, _numericConversion);
 		sz = mc.length();
 
 		// accomodate for terminating zero (non-bulk only!)

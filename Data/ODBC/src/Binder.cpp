@@ -44,7 +44,7 @@ Binder::Binder(const StatementHandle& rStmt,
 	std::size_t maxFieldSize,
 	Binder::ParameterBinding dataBinding,
 	TypeInfo* pDataTypes,
-  bool numericToString) :
+	ODBCMetaColumn::NumericConversion numericConversion) :
 	_rStmt(rStmt),
 	_paramBinding(dataBinding),
 	_pTypeInfo(pDataTypes),
@@ -53,7 +53,7 @@ Binder::Binder(const StatementHandle& rStmt,
 	_maxCharColLength(1024),
 	_maxWCharColLength(1024),
 	_maxVarBinColSize(1024),
-	_numericToString(numericToString)
+	_numericConversion(numericConversion)
 {
 	getProp(*_pTypeInfo, SQL_WVARCHAR, _maxWCharColLength);
 	getProp(*_pTypeInfo, SQL_VARCHAR, _maxCharColLength);
@@ -481,7 +481,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 
 	try
 	{
-		ODBCMetaColumn c(_rStmt, pos, _numericToString);
+		ODBCMetaColumn c(_rStmt, pos, _numericConversion);
 		colSize = (SQLINTEGER) c.length();
 		decDigits = (SQLSMALLINT) c.precision();
 		return;
@@ -502,7 +502,7 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 
 	try
 	{
-		ODBCMetaColumn col(_rStmt, pos, _numericToString);
+		ODBCMetaColumn col(_rStmt, pos, _numericConversion);
 		colSize = col.length();
 	}
 	catch (StatementException&) { }

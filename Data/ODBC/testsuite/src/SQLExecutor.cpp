@@ -1738,7 +1738,7 @@ void SQLExecutor::numericTypes(const std::vector<std::string>& vals)
 	std::string funct = "numericTypes()";
 	try {
 
-		session().setFeature(Poco::Data::ODBC::SessionImpl::NUMERIC_TO_STRING_FEATURE, false);
+		session().setProperty(Poco::Data::ODBC::SessionImpl::NUMERIC_CONVERSION_PROPERTY, Poco::Data::ODBC::ODBCMetaColumn::NC_BEST_FIT);
 
 		{
 			Statement stat(session());
@@ -1751,6 +1751,7 @@ void SQLExecutor::numericTypes(const std::vector<std::string>& vals)
 			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(2));
 			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT64 == rs.columnType(3));
 			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_STRING == rs.columnType(4));
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_STRING == rs.columnType(5));
 			for (size_t i = 0; i < vals.size(); ++i)
 			{
 				std::string v = rs.value(i + 1).convert<std::string>();
@@ -1758,7 +1759,7 @@ void SQLExecutor::numericTypes(const std::vector<std::string>& vals)
 			}
 		}
 
-		session().setFeature(Poco::Data::ODBC::SessionImpl::NUMERIC_TO_STRING_FEATURE, true);
+		session().setProperty(Poco::Data::ODBC::SessionImpl::NUMERIC_CONVERSION_PROPERTY, Poco::Data::ODBC::ODBCMetaColumn::NC_FORCE_STRING);
 		{
 			Statement stat(session());
 			stat << "SELECT * FROM " << ExecUtil::numeric_tbl(), now;
@@ -1773,6 +1774,28 @@ void SQLExecutor::numericTypes(const std::vector<std::string>& vals)
 				assert(vals[i] == v);
 			}
 		}
+
+		session().setProperty(Poco::Data::ODBC::SessionImpl::NUMERIC_CONVERSION_PROPERTY, Poco::Data::ODBC::ODBCMetaColumn::NC_BEST_FIT_DBL_LIMIT);
+		{
+			Statement stat(session());
+			stat << "SELECT * FROM " << ExecUtil::numeric_tbl(), now;
+			RecordSet rs(stat);
+
+			assert(vals.size() + 1 == rs.columnCount());
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(0));
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(1));
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(2));
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT64 == rs.columnType(3));
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(4)); //conversion would be done with precision loss
+			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(5)); //conversion would be done with precision loss
+			for (size_t i = 0; i < vals.size(); ++i)
+			{
+				std::string v = rs.value(i + 1).convert<std::string>();
+				if (i < 3) // we've lost precision, so can't compare values
+					assert(vals[i] == v);
+			}
+		}
+
 	}
 	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
 	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }

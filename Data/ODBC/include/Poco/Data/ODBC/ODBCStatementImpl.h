@@ -156,7 +156,7 @@ private:
 	bool                  _prepared;
 	mutable std::size_t   _affectedRowCount;
 	bool                  _canCompile;
-	bool                  _numericToString;
+	ODBCMetaColumn::NumericConversion _numericConversion;
 	bool                  _isPostgres;
 };
 
