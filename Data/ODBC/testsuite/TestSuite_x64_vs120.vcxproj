@@ -320,7 +320,7 @@
     <ClInclude Include="src\ODBCTest.h" />
     <ClInclude Include="src\ODBCTestSuite.h" />
     <ClInclude Include="src\SQLExecutor.h" />
-		<ClCompile Include="src\ODBCSybaseTest.h" />
+		<ClInclude Include="src\ODBCSybaseTest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Driver.cpp" />
