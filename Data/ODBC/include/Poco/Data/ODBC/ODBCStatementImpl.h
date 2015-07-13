@@ -140,7 +140,7 @@ private:
 
 	void getData();
 
-	void addPreparator();
+	bool addPreparator(bool addAlways = true);
 	void fillColumns(size_t dataSetPos);
 	void checkError(SQLRETURN rc, const std::string& msg="");
 	bool nextResultSet();

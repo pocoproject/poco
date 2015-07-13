@@ -137,25 +137,34 @@ void ODBCStatementImpl::makeInternalExtractors()
 }
 
 
-void ODBCStatementImpl::addPreparator()
+bool ODBCStatementImpl::addPreparator(bool addAlways)
 {
+	Preparator* prep = 0;
 	if (0 == _preparations.size())
 	{
 		std::string statement(toString());
 		if (statement.empty())
 			throw ODBCException("Empty statements are illegal");
 
-		Preparator::DataExtraction ext = session().getFeature("autoExtract") ? 
+		Preparator::DataExtraction ext = session().getFeature("autoExtract") ?
 			Preparator::DE_BOUND : Preparator::DE_MANUAL;
 
 		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 
-		_preparations.push_back(new Preparator(_stmt, statement, maxFieldSize, ext, _numericConversion, _isPostgres));
+		prep = new Preparator(_stmt, statement, maxFieldSize, ext, _numericConversion, _isPostgres);
 	}
 	else
-		_preparations.push_back(new Preparator(*_preparations[0]));
+		prep = new Preparator(*_preparations[0]);
+	if (addAlways || prep->columns() > 0)
+	{
+		_preparations.push_back(prep);
+		_extractors.push_back(new Extractor(_stmt, _preparations.back()));
 
-	_extractors.push_back(new Extractor(_stmt, _preparations.back()));
+		return true;
+	}
+
+	delete prep;
+	return false;
 }
 
 
@@ -336,7 +345,8 @@ bool ODBCStatementImpl::hasNext()
 				}
 				else {
 					if (nextResultSet()) {
-						addPreparator();
+						if (!addPreparator(false)) // skip the result set if it has no columns
+							continue;
 						fillColumns(currentDataSet() + 1);
 						makeExtractors(_preparations.back()->columns(), static_cast<Position::Position_Type>(currentDataSet() + 1));
 						activateNextDataSet();
