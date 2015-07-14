@@ -424,7 +424,7 @@ private:
 	Poco::Timespan _recvTimeout;
 	Poco::Timespan _sndTimeout;
 	bool          _blocking;
-	bool          _isbrokentimeout;
+	bool          _isBrokenTimeout;
 	
 	friend class Socket;
 	friend class SecureSocketImpl;

@@ -49,7 +49,7 @@ namespace Poco {
 namespace Net {
 
 
-bool CheckIsBrokenTimeout()
+bool checkIsBrokenTimeout()
 {
 #if defined(POCO_BROKEN_TIMEOUTS)
 	return true;
@@ -68,7 +68,7 @@ bool CheckIsBrokenTimeout()
 SocketImpl::SocketImpl():
 	_sockfd(POCO_INVALID_SOCKET),
 	_blocking(true), 
-	_isbrokentimeout(CheckIsBrokenTimeout())
+	_isBrokenTimeout(checkIsBrokenTimeout())
 {
 }
 
@@ -76,7 +76,7 @@ SocketImpl::SocketImpl():
 SocketImpl::SocketImpl(poco_socket_t sockfd):
 	_sockfd(sockfd),
 	_blocking(true),
-	_isbrokentimeout(CheckIsBrokenTimeout())
+	_isBrokenTimeout(checkIsBrokenTimeout())
 {
 }
 
@@ -285,7 +285,7 @@ void SocketImpl::shutdown()
 
 int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
-	if (_isbrokentimeout)
+	if (_isBrokenTimeout)
 	{
 		if (_sndTimeout.totalMicroseconds() != 0)
 		{
@@ -308,7 +308,7 @@ int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 
 int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 {
-	if (_isbrokentimeout)
+	if (_isBrokenTimeout)
 	{
 		if (_recvTimeout.totalMicroseconds() != 0)
 		{
@@ -358,7 +358,7 @@ int SocketImpl::sendTo(const void* buffer, int length, const SocketAddress& addr
 
 int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, int flags)
 {
-	if (_isbrokentimeout)
+	if (_isBrokenTimeout)
 	{
 		if (_recvTimeout.totalMicroseconds() != 0)
 		{
@@ -590,7 +590,7 @@ void SocketImpl::setSendTimeout(const Poco::Timespan& timeout)
 #elif !defined(POCO_BROKEN_TIMEOUTS)
 	setOption(SOL_SOCKET, SO_SNDTIMEO, timeout);
 #endif
-	if (_isbrokentimeout)
+	if (_isBrokenTimeout)
 		_sndTimeout = timeout;
 }
 
@@ -605,7 +605,7 @@ Poco::Timespan SocketImpl::getSendTimeout()
 #elif !defined(POCO_BROKEN_TIMEOUTS)
 	getOption(SOL_SOCKET, SO_SNDTIMEO, result);
 #endif
-	if (_isbrokentimeout)
+	if (_isBrokenTimeout)
 		result = _sndTimeout;
 	return result;
 }
@@ -621,7 +621,7 @@ void SocketImpl::setReceiveTimeout(const Poco::Timespan& timeout)
 	setOption(SOL_SOCKET, SO_RCVTIMEO, timeout);
 #endif
 #endif
-	if (_isbrokentimeout)
+	if (_isBrokenTimeout)
 		_recvTimeout = timeout;
 }
 
@@ -636,7 +636,7 @@ Poco::Timespan SocketImpl::getReceiveTimeout()
 #elif !defined(POCO_BROKEN_TIMEOUTS)
 	getOption(SOL_SOCKET, SO_RCVTIMEO, result);
 #endif
-	if (_isbrokentimeout)
+	if (_isBrokenTimeout)
 		result = _recvTimeout;
 	return result;
 }
