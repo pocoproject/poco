@@ -102,7 +102,7 @@ public:
 		const std::string& statement, 
 		std::size_t maxFieldSize,
 		DataExtraction dataExtraction,
-		bool numericToString,
+		ODBCMetaColumn::NumericConversion numericConversion ,
 		bool isPostgres
 		);
 		/// Creates the Preparator.
@@ -419,7 +419,7 @@ public:
 	DataExtraction getDataExtraction() const;
 		/// Returns data extraction mode.
 
-	bool numericToString() const;
+	ODBCMetaColumn::NumericConversion numericConversion() const;
 		/// Tells if numeric values are always converted to string
 
 private:
@@ -435,7 +435,7 @@ private:
 	void prepareImpl(std::size_t pos, const C* pVal = 0)
 		/// Utility function to prepare Any and DynamicAny.
 	{
-		ODBCMetaColumn col(_rStmt, pos, _numericToString);
+		ODBCMetaColumn col(_rStmt, pos, _numericConversion);
 
 		switch (col.type())
 		{
@@ -687,7 +687,7 @@ private:
 	mutable IndexMap        _varLengthArrays;
 	std::size_t             _maxFieldSize;
 	DataExtraction          _dataExtraction;
-	bool                    _numericToString;
+	ODBCMetaColumn::NumericConversion _numericConversion;
 };
 
 
@@ -1274,9 +1274,9 @@ inline Poco::Any& Preparator::at(std::size_t pos)
 }
 
 
-inline bool Preparator::numericToString() const
+inline ODBCMetaColumn::NumericConversion Preparator::numericConversion() const
 {
-	return _numericToString;
+	return _numericConversion;
 }
 
 

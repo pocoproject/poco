@@ -194,8 +194,8 @@ function Process-Input
     }
 
     # NB: this won't work in PowerShell ISE
-    Write-Host "Press Ctrl-C to exit or any other key to continue ..."
-    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
+    # Write-Host "Press Ctrl-C to exit or any other key to continue ..."
+    # $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
   }
 }
 
@@ -216,14 +216,14 @@ function Build-MSBuild([string] $vsProject)
         {
           $projectConfig = "$cfg"
           $projectConfig += "_$mode"
-          Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+          Invoke-Expression "msbuild $vsProject /m /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
         }
       }
       else #config
       {
         $projectConfig = "$config"
         $projectConfig += "_$mode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+        Invoke-Expression "msbuild $vsProject /m /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
     }
   }
@@ -236,14 +236,14 @@ function Build-MSBuild([string] $vsProject)
       {
         $projectConfig = "$cfg"
         $projectConfig += "_$linkmode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+        Invoke-Expression "msbuild $vsProject /m /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
     }
     else #config
     {
       $projectConfig = "$config"
       $projectConfig += "_$linkmode"
-      Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+      Invoke-Expression "msbuild $vsProject /m /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
     }
   }
 }

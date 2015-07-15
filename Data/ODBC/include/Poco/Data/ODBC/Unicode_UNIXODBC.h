@@ -40,13 +40,6 @@ void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, SQLINTEGER length, SQLPOINTER pTar
 	/// Utility function for conversion from UTF-16 to UTF-8.
 
 
-inline void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLSMALLINT targetLength)
-	/// Utility function for conversion from UTF-16 to UTF-8.
-{
-	makeUTF8(buffer, length, pTarget, (SQLINTEGER) targetLength);
-}
-
-
 } } } // namespace Poco::Data::ODBC
 
 
