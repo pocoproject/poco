@@ -95,6 +95,7 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	_crc32 = getCRCFromHeader();
 	_compressedSize = getCompressedSizeFromHeader();
 	_uncompressedSize = getUncompressedSizeFromHeader();
+	_localHeaderOffset = getOffsetFromHeader();
 	parseDateTime();
 	Poco::UInt16 len = getFileNameLength();
 	Poco::Buffer<char> buf(len);

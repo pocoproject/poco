@@ -234,7 +234,7 @@ void sample5(Poco::MongoDB::Connection& connection)
 
 	// When orderby is needed, use 2 separate documents in the query selector
 	cursor.query().selector().addNewDocument("$query").add("birthyear", 1987);
-	cursor.query().selector().addNewDocument("$orderby").add("lastname", 0);
+	cursor.query().selector().addNewDocument("$orderby").add("lastname", -1);
 
 	Poco::MongoDB::ResponseMessage& response = cursor.next(connection);
 	while(1)
@@ -410,7 +410,7 @@ void sample11(Poco::MongoDB::Connection& connection)
 
 	if ( response.hasDocuments() )
 	{
-		std::cout << "Count: " << response.documents()[0]->get<double>("n") << std::endl;
+		std::cout << "Count: " << response.documents()[0]->get<int>("n") << std::endl;
 	}
 }
 
@@ -448,6 +448,35 @@ void sample13(Poco::MongoDB::Connection& connection)
 	std::cout << "LastError: " << lastError->toString(2) << std::endl;
 }
 
+//SELECT players WHERE birthyear IN (1982, 1983)
+void sample14(Poco::MongoDB::Connection& connection)
+{
+	std::cout << "*** SAMPLE 14 ***" << std::endl;
+
+	Poco::MongoDB::Cursor cursor("sample", "players");
+	Poco::MongoDB::Array::Ptr years = new Poco::MongoDB::Array();
+	years->add("0", 1982);
+	years->add("1", 1983);
+	cursor.query().selector().addNewDocument("birthyear").add("$in", years);
+
+	Poco::MongoDB::ResponseMessage& response = cursor.next(connection);
+	while(1)
+	{
+		for(Poco::MongoDB::Document::Vector::const_iterator it = response.documents().begin(); it != response.documents().end(); ++it)
+		{
+			std::cout << (*it)->get<std::string>("lastname") << ' ' << (*it)->get<std::string>("firstname") << " (" << (*it)->get<int>("birthyear") << ')' << std::endl;
+		}
+
+		// When the cursorID is 0, there are no documents left, so break out ...
+		if ( response.cursorID() == 0 )
+		{
+			break;
+		}
+
+		// Get the next bunch of documents
+		response = cursor.next(connection);
+	};
+}
 
 int main(int argc, char** argv)
 {
@@ -466,6 +495,7 @@ int main(int argc, char** argv)
 	sample11(connection);
 	sample12(connection);
 	sample13(connection);
+	sample14(connection);
 
 	return 0;
 }
