@@ -140,7 +140,7 @@ private:
 
 	void getData();
 
-	void addPreparator();
+	bool addPreparator(bool addAlways = true);
 	void fillColumns(size_t dataSetPos);
 	void checkError(SQLRETURN rc, const std::string& msg="");
 	bool nextResultSet();
@@ -156,7 +156,7 @@ private:
 	bool                  _prepared;
 	mutable std::size_t   _affectedRowCount;
 	bool                  _canCompile;
-	bool                  _numericToString;
+	ODBCMetaColumn::NumericConversion _numericConversion;
 	bool                  _isPostgres;
 };
 

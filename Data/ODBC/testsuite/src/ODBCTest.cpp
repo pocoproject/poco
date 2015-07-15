@@ -1244,10 +1244,12 @@ void ODBCTest::testNumeric()
 	vals.push_back("12345678");
 	vals.push_back("123456789012.123");
 	vals.push_back("123456789012345678");
+	vals.push_back("1234567890.12345678");
 	vals.push_back("1234567890123456789012");
 
 	const std::string sqlStr = std::string("INSERT INTO ") + ExecUtil::numeric_tbl() +
-		"(id, num8, num16_3, num18, num22) VALUES (1, " + str2NumExpr(vals[0],8,0) + " , " + str2NumExpr(vals[1],16,3) + ", " + str2NumExpr(vals[2], 18,0)  + " , " + str2NumExpr(vals[3],22,0) + ")";
+		"(id, num8, num16_3, num18, num18_8, num22) VALUES (1, " + str2NumExpr(vals[0],8,0) + " , " + str2NumExpr(vals[1],16,3) + ", " + str2NumExpr(vals[2], 18,0)  
+		+ " , " + str2NumExpr(vals[3], 18, 8) + " , " + str2NumExpr(vals[4], 22, 0) + ")";
 	
 	session() << sqlStr, now;
 

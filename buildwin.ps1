@@ -51,7 +51,7 @@ Param
   [string] $tool = 'msbuild',
 
   [Parameter()]
-  [string] $openssl_base,
+  [string] $openssl_base = 'default_openssl',
 
   [Parameter()]
   [string] $mysql_base,
@@ -92,17 +92,17 @@ function Set-Environment
   if (-Not $Env:PATH.Contains("$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;")) 
   { $Env:PATH = "$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;$Env:PATH" }
 
-  if ($openssl_base -eq '')
+  if ($openssl_base -ne 'default_openssl')
   {
     if ($platform -eq 'x64') { $script:openssl_base = 'C:\OpenSSL-Win64' }
     else                     { $script:openssl_base = 'C:\OpenSSL-Win32' }
-  }
   
-  $Env:OPENSSL_DIR     = "$openssl_base"
-  $Env:OPENSSL_INCLUDE = "$Env:OPENSSL_DIR\include"
-  $Env:OPENSSL_LIB     = "$Env:OPENSSL_DIR\lib;$Env:OPENSSL_DIR\lib\VC"
-  Add-Env-Var "OPENSSL" "INCLUDE"
-  Add-Env-Var "OPENSSL" "LIB"
+    $Env:OPENSSL_DIR     = "$openssl_base"
+    $Env:OPENSSL_INCLUDE = "$Env:OPENSSL_DIR\include"
+    $Env:OPENSSL_LIB     = "$Env:OPENSSL_DIR\lib;$Env:OPENSSL_DIR\lib\VC"
+    Add-Env-Var "OPENSSL" "INCLUDE"
+    Add-Env-Var "OPENSSL" "LIB"
+  }
 
   if ($mysql_base -ne '')
   {
@@ -179,9 +179,13 @@ function Process-Input
       Write-Host "Omit:          $omit"
     }
 
-    if ($openssl_base -ne '')
+    if ($openssl_base -ne 'default_openssl')
     {
       Write-Host "OpenSSL:       $openssl_base"
+    }
+	else
+    {
+      Write-Host "OpenSSL:       default (built-in)"
     }
   
     if ($mysql_base -ne '')
@@ -190,8 +194,8 @@ function Process-Input
     }
 
     # NB: this won't work in PowerShell ISE
-    Write-Host "Press Ctrl-C to exit or any other key to continue ..."
-    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
+    # Write-Host "Press Ctrl-C to exit or any other key to continue ..."
+    # $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
   }
 }
 
@@ -212,14 +216,14 @@ function Build-MSBuild([string] $vsProject)
         {
           $projectConfig = "$cfg"
           $projectConfig += "_$mode"
-          Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+          Invoke-Expression "msbuild $vsProject /m /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
         }
       }
       else #config
       {
         $projectConfig = "$config"
         $projectConfig += "_$mode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+        Invoke-Expression "msbuild $vsProject /m /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
     }
   }
@@ -232,14 +236,14 @@ function Build-MSBuild([string] $vsProject)
       {
         $projectConfig = "$cfg"
         $projectConfig += "_$linkmode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+        Invoke-Expression "msbuild $vsProject /m /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
     }
     else #config
     {
       $projectConfig = "$config"
       $projectConfig += "_$linkmode"
-      Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+      Invoke-Expression "msbuild $vsProject /m /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
     }
   }
 }

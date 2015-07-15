@@ -29,6 +29,7 @@ public:
 
 	void testSkipSingleFile();
 	void testDecompressSingleFile();
+	void testDecompressSingleFileInDir();
 	void testDecompress();
 	void testCrcAndSizeAfterData();
 	void testCrcAndSizeAfterDataWithArchive();

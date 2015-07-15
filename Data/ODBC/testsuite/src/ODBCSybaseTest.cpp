@@ -60,21 +60,23 @@ using Poco::NotFoundException;
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 
-#define SYBASE_DSN ""
+#define SYBASE_DSN "" 
 #define SYBASE_UID ""
 #define SYBASE_PWD ""
 #define SYBASE_DB "mstk"
 
+
 static std::string sybaseDriver()
 {
-	return Poco::Environment::get("POCO_TEST_SYBASE_DRIVER", 
+	return Poco::Environment::get("POCO_TEST_SYBASE_DRIVER",
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	"{Adaptive Server Enterprise}";
+	"{Adaptive Server Enterprise}"
 #else
 	"libsybdrvodb-sqllen8.so"
 #endif
 	);
 }
+
 
 static std::string sybaseExtra()
 {
@@ -82,7 +84,8 @@ static std::string sybaseExtra()
 	return (e.empty() ? "" : e + ";");
 }
 
-std::string SybaseODBC::_connectString = 
+
+std::string SybaseODBC::_connectString =
 	"driver=" + sybaseDriver() + ";" +
 	sybaseExtra() +
 	"db=" SYBASE_DB ";"
@@ -92,7 +95,9 @@ std::string SybaseODBC::_connectString =
 #if !defined(POCO_OS_FAMILY_WINDOWS)
 	"CS=iso_1;"
 #endif
-	;
+;
+
+
 
 ODBCTest::SessionPtr SybaseODBC::_pSession;
 ODBCTest::ExecPtr    SybaseODBC::_pExecutor;
@@ -153,7 +158,7 @@ void SybaseODBC::recreateNumericTable()
 	dropObject("TABLE", ExecUtil::numeric_tbl());
 	try {
 		session() << "CREATE TABLE " << ExecUtil::numeric_tbl() <<
-			" (id integer, num8 NUMERIC(8), num16_3 NUMERIC(16,3), num18 NUMERIC(18), num22 NUMERIC(22))", now;
+			" (id integer, num8 NUMERIC(8), num16_3 NUMERIC(16,3), num18 NUMERIC(18), num18_8 NUMERIC(18,8), num22 NUMERIC(22))", now;
 	}
 	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateNumericTable()"); }
 	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateNumericTable()"); }

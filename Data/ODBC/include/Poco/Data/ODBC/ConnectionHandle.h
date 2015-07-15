@@ -19,7 +19,6 @@
 #ifndef Data_ODBC_ConnectionHandle_INCLUDED
 #define Data_ODBC_ConnectionHandle_INCLUDED
 
-
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/ODBC/EnvironmentHandle.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -49,6 +48,9 @@ public:
 	const SQLHDBC& handle() const;
 		/// Returns const reference to handle;
 
+	operator bool() const;
+		/// Returns true if the handle is valid
+
 private:
 	operator SQLHDBC& ();
 		/// Conversion operator into reference to native type.
@@ -59,9 +61,8 @@ private:
 	ConnectionHandle(const ConnectionHandle&);
 	const ConnectionHandle& operator=(const ConnectionHandle&);
 
-	const EnvironmentHandle* _pEnvironment;
+	const EnvironmentHandle _environment;
 	SQLHDBC                  _hdbc;
-	bool                     _ownsEnvironment;
 };
 
 
@@ -91,6 +92,11 @@ inline SQLHDBC& ConnectionHandle::handle()
 	return _hdbc;
 }
 
+
+inline ConnectionHandle::operator bool () const
+{
+	return _hdbc != SQL_NULL_HDBC;
+}
 
 } } } // namespace Poco::Data::ODBC
 

@@ -268,7 +268,7 @@ void MongoDBTest::testDBCount2Command()
 	}
 
 	Poco::MongoDB::Database db("team");
-	int count = db.count(_mongo, "players");
+	Poco::Int64 count = db.count(_mongo, "players");
 	assert(count == 1);
 }
 
@@ -306,7 +306,7 @@ void MongoDBTest::testCursorRequest()
 	}
 	_mongo.sendRequest(*insertRequest);
 
-	int count = db.count(_mongo, "numbers");
+	Poco::Int64 count = db.count(_mongo, "numbers");
 	std::cout << "count= " << count << std::endl;
 	assert(count == 10000);
 
@@ -410,6 +410,29 @@ void MongoDBTest::testObjectID()
 }
 
 
+void MongoDBTest::testCommand() {
+	Poco::MongoDB::Database db("team");
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> command = db.createCommand();
+	command->selector().add("create", "fixCol")
+		.add("capped", true)
+		.add("max", 1024*1024)
+		.add("size", 1024);
+
+	Poco::MongoDB::ResponseMessage response;
+	_mongo.sendRequest(*command, response);
+	if ( response.documents().size() > 0 )
+	{
+		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+		std::cout << doc->toString(2);
+	}
+	else
+	{
+		Poco::MongoDB::Document::Ptr lastError = db.getLastErrorDoc(_mongo);
+		std::cout << "LastError: " << lastError->toString(2) << std::endl;
+		fail("Didn't get a response from the  command");
+	}
+}
+
 CppUnit::Test* MongoDBTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTest");
@@ -425,6 +448,7 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
 	CppUnit_addTest(pSuite, MongoDBTest, testCursorRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testObjectID);
+	CppUnit_addTest(pSuite, MongoDBTest, testCommand);
 
 	return pSuite;
 }

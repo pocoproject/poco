@@ -45,7 +45,7 @@ class ODBC_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 {
 public:
 	static const std::size_t ODBC_MAX_FIELD_SIZE = 1024u;
-	static const char* const NUMERIC_TO_STRING_FEATURE;
+	static const char* const NUMERIC_CONVERSION_PROPERTY;
 
 	enum TransactionCapability
 	{
@@ -168,11 +168,11 @@ public:
 	Poco::Any dataTypeInfo(const std::string& rName="");
 		/// Returns the data types information.
 
-	bool numericToString() const;
+	ODBCMetaColumn::NumericConversion numericConversion() const;
 	/// Tells if NUMERIC values to be always
 	/// converted to string
 
-	void setNumericToString(bool value);
+	void setNumericConversion(ODBCMetaColumn::NumericConversion value);
 	/// Sets flag to tell if NUMERIC values are always returned as 
 	/// string
 
@@ -180,9 +180,9 @@ private:
 	void setDataTypeInfo(const std::string& rName, const Poco::Any& rValue);
 		/// No-op. Throws InvalidAccessException.
 
-	void setNumericToString(const std::string&, bool rValue);
+	void setNumericConversion(const std::string&, const Poco::Any& rValue);
 
-	bool numericToString(const std::string& nm);
+	Poco::Any numericConversion(const std::string& nm);
 
 	void init();
 
@@ -199,7 +199,7 @@ private:
 	Poco::Any              _maxFieldSize;
 	bool                   _autoBind;
 	bool                   _autoExtract;
-	bool                   _numericToString;
+	ODBCMetaColumn::NumericConversion _numericConversion;
 	TypeInfo               _dataTypes;
 	char                   _canTransact;
 	bool                   _inTransaction;
@@ -302,27 +302,27 @@ inline int SessionImpl::queryTimeout() const
 }
 
 
-inline bool SessionImpl::numericToString() const
+inline ODBCMetaColumn::NumericConversion SessionImpl::numericConversion() const
 {
-	return _numericToString;
+	return _numericConversion;
 }
 
 
-inline bool SessionImpl::numericToString(const std::string&)
+inline Poco::Any SessionImpl::numericConversion(const std::string&)
 {
-	return numericToString();
+	return numericConversion();
 }
 
 
-inline void SessionImpl::setNumericToString(bool value)
+inline void SessionImpl::setNumericConversion(ODBCMetaColumn::NumericConversion value)
 {
-	_numericToString = value;
+	_numericConversion = value;
 }
 
 
-inline void SessionImpl::setNumericToString(const std::string&, bool rValue)
+inline void SessionImpl::setNumericConversion(const std::string&, const Poco::Any& rValue)
 {
-	setNumericToString(rValue);
+	setNumericConversion( Poco::AnyCast<ODBCMetaColumn::NumericConversion>(rValue) );
 }
 
 

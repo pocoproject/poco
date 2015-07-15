@@ -44,7 +44,7 @@ Binder::Binder(const StatementHandle& rStmt,
 	std::size_t maxFieldSize,
 	Binder::ParameterBinding dataBinding,
 	TypeInfo* pDataTypes,
-  bool numericToString) :
+	ODBCMetaColumn::NumericConversion numericConversion) :
 	_rStmt(rStmt),
 	_paramBinding(dataBinding),
 	_pTypeInfo(pDataTypes),
@@ -53,7 +53,7 @@ Binder::Binder(const StatementHandle& rStmt,
 	_maxCharColLength(1024),
 	_maxWCharColLength(1024),
 	_maxVarBinColSize(1024),
-	_numericToString(numericToString)
+	_numericConversion(numericConversion)
 {
 	getProp(*_pTypeInfo, SQL_WVARCHAR, _maxWCharColLength);
 	getProp(*_pTypeInfo, SQL_VARCHAR, _maxCharColLength);
@@ -481,7 +481,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 
 	try
 	{
-		ODBCMetaColumn c(_rStmt, pos, _numericToString);
+		ODBCMetaColumn c(_rStmt, pos, _numericConversion);
 		colSize = (SQLINTEGER) c.length();
 		decDigits = (SQLSMALLINT) c.precision();
 		return;
@@ -502,7 +502,7 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 
 	try
 	{
-		ODBCMetaColumn col(_rStmt, pos, _numericToString);
+		ODBCMetaColumn col(_rStmt, pos, _numericConversion);
 		colSize = col.length();
 	}
 	catch (StatementException&) { }
@@ -518,10 +518,10 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 //On Linux, PostgreSQL driver segfaults on SQLGetDescField, so this is disabled for now
 #ifdef POCO_OS_FAMILY_WINDOWS
 		SQLHDESC hIPD = 0;
-		if (!Utility::isError(SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, SQL_IS_POINTER, 0)))
+		if (!Utility::isError(Poco::Data::ODBC::SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, SQL_IS_POINTER, 0)))
 		{
 			SQLUINTEGER sz = 0;
-			if (!Utility::isError(SQLGetDescField(hIPD, (SQLSMALLINT) pos + 1, SQL_DESC_LENGTH, &sz, SQL_IS_UINTEGER, 0)) && 
+			if (!Utility::isError(Poco::Data::ODBC::SQLGetDescField(hIPD, (SQLSMALLINT)pos + 1, SQL_DESC_LENGTH, &sz, SQL_IS_UINTEGER, 0)) &&
 				sz > 0)
 			{
 				size = sz;
