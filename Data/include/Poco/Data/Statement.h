@@ -368,6 +368,9 @@ public:
 	std::size_t firstDataSet();
 	/// Activates the first data set
 
+	std::size_t currentDataSet() const;
+	/// Returns the current data set.
+
 	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Sets the row formatter for this statement.
 		/// Statement takes the ownership of the formatter.
@@ -772,10 +775,17 @@ inline bool Statement::isBulkExtraction() const
 	return _pImpl->isBulkExtraction();
 }
 
+
 inline std::size_t Statement::firstDataSet()
 {
 	_pImpl->firstDataSet();
 	return 0;
+}
+
+
+inline std::size_t Statement::currentDataSet() const
+{
+	return _pImpl->currentDataSet();
 }
 
 
