@@ -159,6 +159,9 @@ public:
 	std::size_t dataSetCount() const;
 		/// Returns the number of data sets associated with the statement.
 		
+	std::size_t currentDataSet() const;
+		/// Returns the current data set.
+
 protected:
 	virtual std::size_t columnsReturned() const = 0;
 		/// Returns number of columns returned by query. 
@@ -284,9 +287,6 @@ protected:
 		/// At the Data framework level, this function always returns false.
 		/// When connector-specific behavior is desired, it should be overriden 
 		/// by the statement implementation.
-
-	std::size_t currentDataSet() const;
-		/// Returns the current data set.
 
 	std::size_t activateNextDataSet();
 		/// Returns the next data set index, or throws NoDataException if the last 
