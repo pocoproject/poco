@@ -81,6 +81,21 @@ void ZipTest::testDecompressSingleFile()
 }
 
 
+void ZipTest::testDecompressSingleFileInDir()
+{
+	std::string testFile = getTestFile("test.zip");
+	std::ifstream inp(testFile.c_str(), std::ios::binary);
+	assert (inp.good());
+	ZipArchive arch(inp);
+	ZipArchive::FileHeaders::const_iterator it = arch.findHeader("testdir/testfile.txt");
+	assert (it != arch.headerEnd());
+	ZipInputStream zipin (inp, it->second);
+	std::ostringstream out(std::ios::binary);
+	Poco::StreamCopier::copyStream(zipin, out);
+	assert(!out.str().empty());
+}
+
+
 void ZipTest::testCrcAndSizeAfterData()
 {
 	std::string testFile = getTestFile("data.zip");
@@ -234,6 +249,7 @@ CppUnit::Test* ZipTest::suite()
 
 	CppUnit_addTest(pSuite, ZipTest, testSkipSingleFile);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressSingleFile);
+	CppUnit_addTest(pSuite, ZipTest, testDecompressSingleFileInDir);
 	CppUnit_addTest(pSuite, ZipTest, testDecompress);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressFlat);
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterData);

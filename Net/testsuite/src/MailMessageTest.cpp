@@ -431,6 +431,42 @@ void MailMessageTest::testReadMultiPart()
 }
 
 
+void MailMessageTest::testReadMultiPartWithAttachmentNames()
+{
+	std::istringstream istr(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"Subject: Test Message\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: inline\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"Hello World!\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=sample.dat\r\n"
+		"Content-Transfer-Encoding: base64\r\n"
+		"Content-Type: application/octet-stream; name=sample\r\n"
+		"\r\n"
+		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+	
+	MailMessage message;
+	message.read(istr);
+	
+	assert (message.parts().size() == 2);
+	assert (message.parts()[1].name == "sample");
+	assert (message.parts()[1].pSource->filename() == "sample.dat");
+}
+
+
 void MailMessageTest::testReadMultiPartDefaultTransferEncoding()
 {
 	std::istringstream istr(
