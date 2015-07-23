@@ -66,7 +66,7 @@ void SocketAddressTest::testSocketAddress()
 	}
 
 	SocketAddress sa4("www.appinf.com", 80);
-	assert (sa4.host().toString() == "50.57.108.29");
+	assert (sa4.host().toString() == "162.209.7.4");
 	assert (sa4.port() == 80);
 
 	try
