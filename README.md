@@ -30,7 +30,7 @@ Answers to POCO-related questions can also be found on [Stack Overflow](http://s
 ----
 In regards to Boost, in spite of some functional overlapping,
 POCO is best thought of as a Boost complement (rather than replacement).
-Side-by-side use of Boost and POCO is a very common occurence.
+Side-by-side use of Boost and POCO is a very common occurrence.
 
 When contributing to POCO, please adhere to our [guidelines](https://github.com/pocoproject/poco/blob/develop/CONTRIBUTING.md).
 
