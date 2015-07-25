@@ -37,6 +37,7 @@ public:
 	void testReadQP();
 	void testRead8Bit();
 	void testReadMultiPart();
+	void testReadMultiPartWithAttachmentNames();
 	void testReadMultiPartDefaultTransferEncoding();
 	void testEncodeWord();
 
