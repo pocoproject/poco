@@ -86,6 +86,7 @@ if not defined VCINSTALLDIR (
               call "%VS140COMNTOOLS%..\..\%VS_64_BIT_ENV%"
             ) else (
               call "%VS140COMNTOOLS%vsvars32.bat
+            )
           )     
         )
       ) 
