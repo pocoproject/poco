@@ -153,10 +153,10 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Libraries Visual Studio Project File Generator.\n"
-			"Copyright (c) 2010 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2010-2015 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program generates project and solution files "
-			"for Visual Studio .NET 2003, 2005, 2008 and 2010 from "
+			"for Visual Studio .NET 2003, 2005, 2008 and 2010, 2012, 2013 and 2015 from "
 			"global project templates and project-specific property files."
 		);
 		helpFormatter.setFooter(
@@ -328,6 +328,11 @@ protected:
 		else if (tool == "vs120")
 		{
 			solutionStream << "Microsoft Visual Studio Solution File, Format Version 12.00\r\n# Visual Studio 2013\r\n";
+			generateSolution80(solutionStream, solutionPath, solutionGUID, projectConfig, templateProps, platform, tool);
+		}
+		else if (tool == "vs140")
+		{
+			solutionStream << "Microsoft Visual Studio Solution File, Format Version 14.00\r\n# Visual Studio 2015\r\n";
 			generateSolution80(solutionStream, solutionPath, solutionGUID, projectConfig, templateProps, platform, tool);
 		}
 	}
@@ -593,6 +598,18 @@ protected:
 		}
 	}
 
+	void fix2015Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
+	{
+		fix2010Project(pProjectDoc, configSet, platform, projectProps, templateProps);
+		Poco::AutoPtr<Poco::XML::NodeList> pConfigurationTypeList = pProjectDoc->getElementsByTagName("ConfigurationType");
+		for (unsigned long i = 0; i < pConfigurationTypeList->length(); i++)
+		{
+			Poco::XML::Element* pConfigurationTypeElem = static_cast<Poco::XML::Element*>(pConfigurationTypeList->item(i));
+			removeElement(pConfigurationTypeElem->parentNode(), "PlatformToolset");
+			appendElement(pConfigurationTypeElem->parentNode(), "PlatformToolset", "v140");
+		}
+	}
+
 	void appendElement(Poco::XML::Node* pParentNode, const std::string& elemName, const std::string& text)
 	{
 		Poco::AutoPtr<Poco::XML::Element> pElement = pParentNode->ownerDocument()->createElement(elemName);
@@ -822,6 +839,16 @@ protected:
 								logger().information("Fixing Visual Studio 2013 project file: " + vcxprojPath.toString());
 								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
 								fix2013Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
+								writeProject(pProjectDoc, vcxprojPath.toString());
+							}
+						}
+						if (config().getBool("progen.postprocess." + postprocess + ".fix2015ProjectFile", false))
+						{
+							if (projectFile.exists())
+							{
+								logger().information("Fixing Visual Studio 2015 project file: " + vcxprojPath.toString());
+								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
+								fix2015Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
 								writeProject(pProjectDoc, vcxprojPath.toString());
 							}
 						}
