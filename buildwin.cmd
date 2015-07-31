@@ -18,7 +18,7 @@ rem
 rem Usage:
 rem ------
 rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
-rem VS_VERSION:    90|100|110|120
+rem VS_VERSION:    90|100|110|120|140
 rem ACTION:        build|rebuild|clean
 rem LINKMODE:      static_mt|static_md|shared|all
 rem CONFIGURATION: release|debug|both
@@ -46,7 +46,7 @@ set LIB=%LIB%;%MYSQL_LIB%
 set POCO_BASE=%CD%
 set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 
-rem VS_VERSION {90 | 100 | 110 | 120}
+rem VS_VERSION {90 | 100 | 110 | 120 | 140}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
 set VS_64_BIT_ENV=VC\bin\x86_amd64\vcvarsx86_amd64.bat
@@ -87,7 +87,15 @@ if not defined VCINSTALLDIR (
           ) else (
             call "%VS120COMNTOOLS%vsvars32.bat
           )     
-        ) 
+        ) else (
+          if %VS_VERSION%==vs140 (
+            if %PLATFORM%==x64 (
+              call "%VS140COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+            ) else (
+              call "%VS140COMNTOOLS%vsvars32.bat
+            )
+          )     
+        )
       ) 
     ) 
   ) 
@@ -104,6 +112,7 @@ set VCPROJ_EXT=vcproj
 if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs120 (set VCPROJ_EXT=vcxproj)
+if %VS_VERSION%==vs140 (set VCPROJ_EXT=vcxproj)
 
 if "%8"=="" goto use_devenv
 set BUILD_TOOL=%8
@@ -113,6 +122,7 @@ set BUILD_TOOL=devenv
 if "%VS_VERSION%"=="vs100" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs110" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs120" (set BUILD_TOOL=msbuild)
+if "%VS_VERSION%"=="vs140" (set BUILD_TOOL=msbuild)
 :use_custom
 if not "%BUILD_TOOL%"=="msbuild" (set USEENV=/useenv)
 if "%BUILD_TOOL%"=="msbuild" (
@@ -127,6 +137,7 @@ if not "%BUILD_TOOL%"=="msbuild" (
 if "%VS_VERSION%"=="vs100" (goto msbuildok)
 if "%VS_VERSION%"=="vs110" (goto msbuildok)
 if "%VS_VERSION%"=="vs120" (goto msbuildok)
+if "%VS_VERSION%"=="vs140" (goto msbuildok)
 if "%BUILD_TOOL%"=="msbuild" (
   echo "Cannot use msbuild with Visual Studio 2008 or earlier."
   exit /b 2
@@ -169,6 +180,7 @@ set PLATFORMSW=/p:Platform=%WEC2013_PLATFORM%
 set USEENV=
 if %VS_VERSION%==vs110 (set EXTRASW=/m /p:VisualStudioVersion=11.0)
 if %VS_VERSION%==vs120 (set EXTRASW=/m /p:VisualStudioVersion=12.0)
+if %VS_VERSION%==vs140 (set EXTRASW=/m /p:VisualStudioVersion=14.0)
 )
 
 rem SAMPLES [samples|nosamples]
@@ -506,7 +518,7 @@ exit /b 1
 echo Usage:
 echo ------
 echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
-echo VS_VERSION:    "90|100|110|120"
+echo VS_VERSION:    "90|100|110|120|140"
 echo ACTION:        "build|rebuild|clean"
 echo LINKMODE:      "static_mt|static_md|shared|all"
 echo CONFIGURATION: "release|debug|both"
