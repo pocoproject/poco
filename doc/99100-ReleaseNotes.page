@@ -1,6 +1,32 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.6.1
+
+!!Summary of Changes
+
+  - added project and solution files for Visual Studio 2015
+  - upgraded bundled SQLite to 3.8.11.1
+  - fixed GH #782: Poco::JSON::PrintHandler not working for nested arrays
+  - fixed GH #819: JSON Stringifier fails with preserve insert order
+  - fixed GH #878: UUID tryParse
+  - fixed GH #869: FIFOBuffer::read(T*, std::size_t) documentation inaccurate
+  - fixed GH #861: Var BadCastException
+  - fixed GH #779: BUG in 1.6.0 Zip code
+  - fixed GH #769: Poco::Var operator== throws exception 
+  - fixed GH #766: Poco::JSON::PrintHandler not working for objects in array
+  - fixed GH #763: Unable to build static with NetSSL_OpenSSL for OS X 
+  - fixed GH #750: BsonWriter::write<Binary::Ptr> missing size ?
+  - fixed GH #741: Timestamp anomaly in Poco::Logger on WindowsCE 
+  - fixed GH #735: WEC2013 build fails due to missing Poco::Path methods. 
+  - fixed GH #722: poco-1.6.0: Unicode Converter Test confuses string and char types
+  - fixed GH #719: StreamSocket::receiveBytes and FIFOBuffer issue in 1.6
+  - fixed GH #706: POCO1.6 Sample EchoServer BUG 
+  - fixed GH #646: Prevent possible data race in access to Timer::_periodicInerval
+  - DeflatingStream: do not flush underlying stream on sync() as these can cause 
+    corrupted files in Zip archives
+
+
 !!!Release 1.6.0
 
 !!Summary of Changes
