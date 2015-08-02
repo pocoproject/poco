@@ -4,6 +4,7 @@ Release 1.6.1 (2015-08-03)
 ==========================
 
 - added project and solution files for Visual Studio 2015
+- upgraded bundled SQLite to 3.8.11.1
 - fixed GH #782: Poco::JSON::PrintHandler not working for nested arrays
 - fixed GH #819: JSON Stringifier fails with preserve insert order
 - fixed GH #878: UUID tryParse
