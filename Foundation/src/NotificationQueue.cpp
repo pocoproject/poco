@@ -179,6 +179,19 @@ void NotificationQueue::clear()
 }
 
 
+bool NotificationQueue::remove(Notification::Ptr pNotification)
+{
+	FastMutex::ScopedLock lock(_mutex);
+	NfQueue::iterator it = std::find(_nfQueue.begin(), _nfQueue.end(), pNotification);
+	if (it == _nfQueue.end())
+	{
+		return false;
+	}
+	_nfQueue.erase(it);
+	return true;
+}
+
+
 bool NotificationQueue::hasIdleThreads() const
 {
 	FastMutex::ScopedLock lock(_mutex);
