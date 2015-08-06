@@ -318,6 +318,17 @@ void SybaseODBC::testStoredProcedure()
 			assert(0 == rs.rowCount());
 		}
 		{
+			session() << "create procedure " << nm << " @c char(8) AS select @c", now;
+			Poco::Nullable<std::string> ns;
+			Poco::Data::Statement stat(session());
+			stat << "{ call " << nm << "(?) }", use(ns), now;
+			dropObject("procedure", nm);
+			Poco::Data::RecordSet rs(stat);
+			assert(1 == rs.rowCount());
+			bool nl = rs.isNull(size_t(0), 0);
+			assert( nl );
+		}
+		{
 			Poco::Data::Statement stat(session());
 			stat << "{ exec  -- @exType='mdExch', @exList='TRAD' }", Poco::Data::Keywords::limit(1);
 			while (!stat.done())

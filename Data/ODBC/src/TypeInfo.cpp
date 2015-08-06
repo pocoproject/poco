@@ -16,6 +16,7 @@
 
 #include "Poco/Data/ODBC/TypeInfo.h"
 #include "Poco/Data/ODBC/ODBCException.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
 #include <iostream>
@@ -30,6 +31,17 @@ TypeInfo::TypeInfo(SQLHDBC* pHDBC): _pHDBC(pHDBC)
 	fillCTypes();
 	fillSQLTypes();
 	if (_pHDBC) fillTypeInfo(*_pHDBC);
+
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(typeid(std::string).hash_code(), SQL_C_CHAR));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(typeid(std::wstring).hash_code(), SQL_C_WCHAR));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(typeid(Poco::UTF16String).hash_code(), SQL_C_WCHAR));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(typeid(Date).hash_code(), SQL_TYPE_DATE));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(typeid(Time).hash_code(), SQL_TYPE_TIME));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(typeid(DateTime).hash_code(), SQL_TYPE_TIMESTAMP));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(typeid(BLOB).hash_code(), SQL_BINARY));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(typeid(float).hash_code(), SQL_REAL));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(typeid(double).hash_code(), SQL_DOUBLE));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(typeid(bool).hash_code(), SQL_BIT));
 }
 
 
@@ -261,6 +273,15 @@ void TypeInfo::print(std::ostream& ostr)
 			<< it->get<17>() << "\t" 
 			<< it->get<18>() << std::endl;
 	}
+}
+
+
+SQLSMALLINT TypeInfo::tryTypeidToCType(const std::type_info& ti, SQLSMALLINT defaultVal) const
+{
+	CppTypeInfoMap::const_iterator res = _cppDataTypes.find(ti.hash_code());
+	if (res == _cppDataTypes.end())
+		return defaultVal;
+	return res->second;
 }
 
 

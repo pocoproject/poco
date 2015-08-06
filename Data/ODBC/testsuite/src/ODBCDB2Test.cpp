@@ -351,6 +351,7 @@ void ODBCDB2Test::testStoredFunction()
 	dropObject("PROCEDURE", nm + "()");
 	dropObject("PROCEDURE", nm + "(INTEGER)");
 	dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
+	dropObject("PROCEDURE", nm + "(VARCHAR(10), DATE)");
 	dropObject("PROCEDURE", nm + "(VARCHAR(10), VARCHAR(10))");
 
 	for (int k = 0; k < 8;)
@@ -372,6 +373,19 @@ void ODBCDB2Test::testStoredFunction()
 
 			assert(0 == rs.rowCount());
 			dropObject("PROCEDURE", nm + "()");
+		}
+		{
+			session() << "CREATE PROCEDURE " << nm << "(inp VARCHAR(10), out dt DATE) "
+				"BEGIN "
+				"  SET dt = null;"
+				"END", now;
+
+			Poco::Data::Statement stat(session());
+			Poco::Nullable<std::string> ns;
+			Poco::Nullable<Poco::Data::Date> nd = Poco::Nullable<Poco::Data::Date>(Poco::Data::Date());
+			stat << "{call " DB2_DB "." << nm << "(?, ?)}", use(ns), out(nd), now;
+			dropObject("PROCEDURE", nm + "(VARCHAR(10))");
+			assert(nd.isNull());
 		}
 
 		session() << "CREATE PROCEDURE " << nm << "() "

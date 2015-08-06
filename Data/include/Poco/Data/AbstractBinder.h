@@ -57,6 +57,20 @@ class Data_API AbstractBinder
 public:
 	typedef SharedPtr<AbstractBinder> Ptr;
 
+	struct WhenNullCb
+	{
+		WhenNullCb() :_func(NULL)
+		{}
+
+		inline void onNull()
+		{
+			if (_func) _func(_data);
+		}
+	protected:
+		void* _data;
+		void (*_func)(void*);
+	};
+
 	enum Direction
 		/// Binding direction for a parameter.
 	{
@@ -235,7 +249,7 @@ public:
 	virtual void bind(std::size_t pos, const char* const& pVal, Direction dir = PD_IN) = 0;
 		/// Binds a const char ptr.
 
-	virtual void bind(std::size_t pos, const std::string& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const std::string& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a string.
 
 	virtual void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir = PD_IN);
@@ -295,7 +309,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<DateTime>& val, Direction dir = PD_IN);
 		/// Binds a DateTime list.
 
-	virtual void bind(std::size_t pos, const Date& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const Date& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a Date.
 
 	virtual void bind(std::size_t pos, const std::vector<Date>& val, Direction dir = PD_IN);
@@ -319,7 +333,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Time>& val, Direction dir = PD_IN);
 		/// Binds a Time list.
 
-	virtual void bind(std::size_t pos, const NullData& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const NullData& val, Direction dir = PD_IN, const std::type_info& bindType = typeid(void)) = 0;
 		/// Binds a null.
 
 	virtual void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir = PD_IN);

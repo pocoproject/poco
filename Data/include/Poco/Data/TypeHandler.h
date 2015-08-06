@@ -254,6 +254,21 @@ template <typename T>
 class TypeHandler<Nullable<T> > 
 	/// Specialization of type handler for Nullable.
 {
+	class NullHandler : public AbstractBinder::WhenNullCb
+	{
+	public:
+		explicit NullHandler(const Nullable<T>& obj)
+		{
+			_data = &const_cast<Nullable<T>&>(obj);
+			_func = handle;
+		}
+	private:
+		static void handle(void* ptr)
+		{
+			reinterpret_cast<Nullable<T>*>(ptr)->clear();
+		}
+	};
+
 public:
 
 	static void bind(std::size_t pos, const Nullable<T>& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir) 
@@ -261,11 +276,13 @@ public:
 		poco_assert_dbg (!pBinder.isNull());
 		if (obj.isNull()) 
 		{
-			pBinder->bind(pos++, Poco::Data::Keywords::null, dir);
+			pBinder->bind(pos++, Poco::Data::Keywords::null, dir, typeid(T));
 		}
 		else 
 		{
-			pBinder->bind(pos++, obj.value(), dir);
+			if (typeid(T) == typeid(std::string)) pBinder->bind(pos++, obj.value(), dir, NullHandler(obj));
+			else if (typeid(T) == typeid(Date)) pBinder->bind(pos++, obj.value(), dir, NullHandler(obj));
+			else pBinder->bind(pos++, obj.value(), dir);
 		}
 	}
 	

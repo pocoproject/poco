@@ -241,7 +241,7 @@ public:
 	void bind(std::size_t pos, const std::list<char>& val, Direction dir);
 		/// Binds a character list.
 
-	void bind(std::size_t pos, const std::string& val, Direction dir);
+	void bind(std::size_t pos, const std::string& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a string.
 
 	void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir);
@@ -289,7 +289,7 @@ public:
 	void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir);
 		/// Binds a CLOB list.
 
-	void bind(std::size_t pos, const Date& val, Direction dir);
+	void bind(std::size_t pos, const Date& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a Date.
 
 	void bind(std::size_t pos, const std::vector<Date>& val, Direction dir);
@@ -325,7 +325,7 @@ public:
 	void bind(std::size_t pos, const std::list<DateTime>& val, Direction dir);
 		/// Binds a DateTime list.
 
-	void bind(std::size_t pos, const NullData& val, Direction dir);
+	void bind(std::size_t pos, const NullData& val, Direction dir, const std::type_info& bindType);
 		/// Binds a null. In-bound only.
 
 	void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir);
@@ -373,6 +373,7 @@ private:
 	typedef std::map<SQL_DATE_STRUCT*, Date*>                DateMap;
 	typedef std::map<SQL_TIME_STRUCT*, Time*>                TimeMap;
 	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*>       TimestampMap;
+	typedef std::map<SQLLEN*, WhenNullCb>                    NullCbMap;
 
 	void describeParameter(std::size_t pos);
 		/// Sets the description field for the parameter, if needed.
@@ -1012,6 +1013,7 @@ private:
 	std::size_t      _maxWCharColLength;
 	std::size_t      _maxVarBinColSize;
 	ODBCMetaColumn::NumericConversion _numericConversion;
+	NullCbMap        _nullCbMap;
 };
 
 
