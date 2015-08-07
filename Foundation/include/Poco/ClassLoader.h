@@ -32,7 +32,11 @@
 namespace Poco {
 
 
+#ifdef POCO_ENABLE_CPP11
+template <class Base, class... Type>
+#else
 template <class Base>
+#endif
 class ClassLoader
 	/// The ClassLoader loads C++ classes from shared libraries
 	/// at runtime. It must be instantiated with a root class
@@ -53,8 +57,13 @@ class ClassLoader
 	/// library.
 {
 public:
+#ifdef POCO_ENABLE_CPP11
+	typedef AbstractMetaObject<Base, Type...> Meta;
+	typedef Manifest<Base, Type...> Manif;
+#else
 	typedef AbstractMetaObject<Base> Meta;
 	typedef Manifest<Base> Manif;
+#endif
 	typedef void (*InitializeLibraryFunc)();
 	typedef void (*UninitializeLibraryFunc)();
 	typedef bool (*BuildManifestFunc)(ManifestBase*);
@@ -269,13 +278,23 @@ public:
 			throw NotFoundException(className);
 	}
 	
+#ifdef POCO_ENABLE_CPP11
+	Base* create(const std::string& className, Type... type) const
+	/// Creates an instance of the given class.
+		/// Throws a NotFoundException if the class
+		/// is not known.
+	{
+		return classFor(className).create(type...);
+	}
+#else
 	Base* create(const std::string& className) const
-		/// Creates an instance of the given class.
+	/// Creates an instance of the given class.
 		/// Throws a NotFoundException if the class
 		/// is not known.
 	{
 		return classFor(className).create();
 	}
+#endif
 	
 	Base& instance(const std::string& className) const
 		/// Returns a reference to the sole instance of

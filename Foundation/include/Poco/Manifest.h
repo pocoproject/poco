@@ -42,7 +42,11 @@ public:
 };
 
 
+#ifdef POCO_ENABLE_CPP11
+template <class B, class... A>
+#else
 template <class B>
+#endif
 class Manifest: public ManifestBase
 	/// A Manifest maintains a list of all classes
 	/// contained in a dynamically loadable class
@@ -52,7 +56,11 @@ class Manifest: public ManifestBase
 	/// iterate over all the classes in a Manifest.
 {
 public:
+#ifdef POCO_ENABLE_CPP11
+	typedef AbstractMetaObject<B, A...> Meta;
+#else
 	typedef AbstractMetaObject<B> Meta;
+#endif
 	typedef std::map<std::string, const Meta*> MetaMap;
 
 	class Iterator

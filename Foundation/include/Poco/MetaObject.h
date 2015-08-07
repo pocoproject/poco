@@ -29,7 +29,11 @@
 namespace Poco {
 
 
+#ifdef POCO_ENABLE_CPP11
+template <class B, typename... A>
+#else
 template <class B>
+#endif
 class AbstractMetaObject
 	/// A MetaObject stores some information
 	/// about a C++ class. The MetaObject class
@@ -57,10 +61,16 @@ public:
 		return _name;
 	}
 
+#ifdef POCO_ENABLE_CPP11
+	virtual B* create(A... a) const = 0;
+		/// Create a new instance of a class.
+		/// Cannot be used for singletons.
+#else
 	virtual B* create() const = 0;
 		/// Create a new instance of a class.
 		/// Cannot be used for singletons.
-		
+#endif
+
 	virtual B& instance() const = 0;
 		/// Returns a reference to the only instance
 		/// of the class. Used for singletons only.
@@ -123,8 +133,13 @@ private:
 };
 
 
+#ifdef POCO_ENABLE_CPP11
+template <class C, class B, class... A>
+class MetaObject: public AbstractMetaObject<B, A...>
+#else
 template <class C, class B>
 class MetaObject: public AbstractMetaObject<B>
+#endif
 	/// A MetaObject stores some information
 	/// about a C++ class. The MetaObject class
 	/// is used by the Manifest class.
@@ -132,7 +147,11 @@ class MetaObject: public AbstractMetaObject<B>
 	/// factory for its class.
 {
 public:
+#ifdef POCO_ENABLE_CPP11
+	MetaObject(const char* name): AbstractMetaObject<B,A...>(name)
+#else
 	MetaObject(const char* name): AbstractMetaObject<B>(name)
+#endif
 	{
 	}
 
@@ -140,10 +159,17 @@ public:
 	{
 	}
 
+#ifdef POCO_ENABLE_CPP11
+	B* create(A... a) const
+	{
+		return new C(a...);
+	}
+#else
 	B* create() const
 	{
 		return new C;
 	}
+#endif
 	
 	B& instance() const
 	{

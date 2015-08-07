@@ -76,13 +76,34 @@ extern "C"	\
 			Poco::Manifest<_Base>* pManifest = static_cast<_Manifest*>(pManifest_);
 
 
+#define POCO_BEGIN_MANIFEST_IMPL_WITH_ONE_ARG(fnName, base, arg1) \
+	bool fnName(Poco::ManifestBase* pManifest_)										\
+	{																				\
+		typedef base _Base;															\
+		typedef Poco::Manifest<_Base, arg1> _Manifest;								\
+		std::string requiredType(typeid(_Manifest).name());							\
+		std::string actualType(pManifest_->className());							\
+		if (requiredType == actualType)												\
+		{																			\
+			Poco::Manifest<_Base, arg1>* pManifest = static_cast<_Manifest*>(pManifest_);
+
+
 #define POCO_BEGIN_MANIFEST(base) \
 	POCO_BEGIN_MANIFEST_IMPL(pocoBuildManifest, base)
+
+
+#define POCO_BEGIN_MANIFEST_WITH_ONE_ARG(base, arg1) \
+	POCO_BEGIN_MANIFEST_IMPL_WITH_ONE_ARG(pocoBuildManifest, base, arg1)
 
 
 #define POCO_BEGIN_NAMED_MANIFEST(name, base)	\
 	POCO_DECLARE_NAMED_MANIFEST(name)			\
 	POCO_BEGIN_MANIFEST_IMPL(POCO_JOIN(pocoBuildManifest, name), base)
+
+
+#define POCO_BEGIN_NAMED_MANIFEST_WITH_ONE_ARG(name, base, arg1)	\
+	POCO_DECLARE_NAMED_MANIFEST(name)			\
+	POCO_BEGIN_MANIFEST_IMPL_WITH_ONE_ARG(POCO_JOIN(pocoBuildManifest, name), base, arg1)
 
 
 #define POCO_END_MANIFEST \
@@ -94,6 +115,17 @@ extern "C"	\
 
 #define POCO_EXPORT_CLASS(cls) \
     pManifest->insert(new Poco::MetaObject<cls, _Base>(#cls));
+
+#define POCO_EXPORT_CLASS_WITH_ONE_ARG(cls, arg1) \
+    pManifest->insert(new Poco::MetaObject<cls, _Base, arg1>(#cls));
+
+
+#define POCO_EXPORT_CLASS_INTERFACE(cls, itf) \
+    pManifest->insert(new Poco::MetaObject<cls, _Base>(itf));
+
+
+#define POCO_EXPORT_CLASS_INTERFACE_WITH_ONE_ARG(cls, itf, arg1) \
+    pManifest->insert(new Poco::MetaObject<cls, _Base, arg1>(itf));
 
 
 #define POCO_EXPORT_SINGLETON(cls) \
