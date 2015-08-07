@@ -71,6 +71,29 @@ public:
 	}
 };
 
+class PluginD: public TestPluginWithOneArg
+{
+public:
+	PluginD(int no) : _no(no)
+	{
+	}
+
+	~PluginD()
+	{
+	}
+
+	std::string name() const
+	{
+		return "PluginD";
+	}
+	int no() const
+	{
+		return _no;
+	}
+private:
+	int _no;
+};
+
 
 POCO_BEGIN_MANIFEST(TestPlugin)
 	POCO_EXPORT_CLASS(PluginA)
@@ -78,6 +101,12 @@ POCO_BEGIN_MANIFEST(TestPlugin)
 	POCO_EXPORT_SINGLETON(PluginC)
 POCO_END_MANIFEST
 
+
+#ifdef POCO_ENABLE_CPP11
+POCO_BEGIN_NAMED_MANIFEST_WITH_ONE_ARG(TestPluginWithOneArg, TestPluginWithOneArg, int)
+	POCO_EXPORT_CLASS_WITH_ONE_ARG(PluginD, int)
+POCO_END_MANIFEST
+#endif
 
 void pocoInitializeLibrary()
 {

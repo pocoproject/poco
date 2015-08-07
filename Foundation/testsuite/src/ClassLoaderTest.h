@@ -29,7 +29,9 @@ public:
 	void testClassLoader1();
 	void testClassLoader2();
 	void testClassLoader3();
-
+#ifdef POCO_ENABLE_CPP11
+	void testClassLoader4();
+#endif
 	void setUp();
 	void tearDown();
 

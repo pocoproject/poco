@@ -21,3 +21,12 @@ TestPlugin::TestPlugin()
 TestPlugin::~TestPlugin()
 {
 }
+
+TestPluginWithOneArg::TestPluginWithOneArg()
+{
+}
+
+
+TestPluginWithOneArg::~TestPluginWithOneArg()
+{
+}

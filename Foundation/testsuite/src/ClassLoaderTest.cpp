@@ -191,6 +191,34 @@ void ClassLoaderTest::testClassLoader3()
 	assertNullPtr (cl.findManifest(path));
 }
 
+#ifdef POCO_ENABLE_CPP11
+void ClassLoaderTest::testClassLoader4()
+{
+	std::string path = "TestLibrary";
+	path.append(SharedLibrary::suffix());
+
+	ClassLoader<TestPluginWithOneArg, int> cl;
+	cl.loadLibrary(path, "TestPluginWithOneArg");
+
+	assert (cl.begin() != cl.end());
+	assertNotNullPtr (cl.findClass("PluginD"));
+	assert (cl.manifestFor(path).size() == 1);
+
+
+	TestPluginWithOneArg* pPluginD;
+	pPluginD = cl.classFor("PluginD").create(2);
+	assert (pPluginD->name() == "PluginD");
+	assert (pPluginD->no() == 2);
+	delete pPluginD;
+
+	pPluginD = cl.create("PluginD", 4);
+	assert (pPluginD->name() == "PluginD");
+	assert (pPluginD->no() == 4);
+	delete pPluginD;
+
+	cl.unloadLibrary(path);
+}
+#endif
 
 void ClassLoaderTest::setUp()
 {
@@ -209,6 +237,8 @@ CppUnit::Test* ClassLoaderTest::suite()
 	CppUnit_addTest(pSuite, ClassLoaderTest, testClassLoader1);
 	CppUnit_addTest(pSuite, ClassLoaderTest, testClassLoader2);
 	CppUnit_addTest(pSuite, ClassLoaderTest, testClassLoader3);
-
+#ifdef POCO_ENABLE_CPP11
+	CppUnit_addTest(pSuite, ClassLoaderTest, testClassLoader4);
+#endif
 	return pSuite;
 }

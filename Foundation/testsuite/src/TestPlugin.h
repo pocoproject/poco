@@ -27,5 +27,15 @@ public:
 	virtual std::string name() const = 0;
 };
 
+#ifdef POCO_ENABLE_CPP11
+class TestPluginWithOneArg
+{
+public:
+	TestPluginWithOneArg();
+	virtual ~TestPluginWithOneArg();
+	virtual std::string name() const = 0;
+	virtual int no() const = 0;
+};
+#endif
 
 #endif // TestPlugin_INCLUDED
