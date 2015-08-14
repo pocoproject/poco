@@ -116,9 +116,10 @@ public:
 
 	static const std::string PROP_PATTERN;
 	static const std::string PROP_TIMES;
+	static const std::string PROP_PRIORITY_NAMES;
 
 protected:
-	static const std::string& getPriorityName(int);
+	const std::string& getPriorityName(int);
 		/// Returns a string for the given priority value.
 	
 private:
@@ -139,9 +140,13 @@ private:
 		/// which contains the message key, any text that needs to be written first
 		/// a property in case of %[] and required length.
 
+	void parsePriorityNames();
+
 	std::vector<PatternAction> _patternActions;
 	bool _localTime;
 	std::string _pattern;
+        std::string _priorityNames;
+        std::string _priorities[9];
 };
 
 
