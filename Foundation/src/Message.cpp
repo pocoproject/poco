@@ -118,7 +118,7 @@ void Message::init()
 #if !defined(POCO_VXWORKS)
 	_pid = Process::id();
 #endif
-	_ostid = reinterpret_cast<IntPtr>(Thread::currentTid());
+	_ostid = static_cast<IntPtr>(Thread::currentTid());
 	Thread* pThread = Thread::current();
 	if (pThread)
 	{
