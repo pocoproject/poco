@@ -199,7 +199,7 @@ private:
 	Priority    _prio;
 	Timestamp   _time;
 	int         _tid;
-	int         _ostid;
+	IntPtr      _ostid;
 	std::string _thread;
 	long        _pid;
 	const char* _file;
@@ -247,7 +247,7 @@ inline long Message::getTid() const
 }
 
 
-inline long Message::getOsTid() const
+inline IntPtr Message::getOsTid() const
 {
 	return _ostid;
 }
