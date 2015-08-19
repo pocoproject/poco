@@ -128,7 +128,7 @@ public:
 	long getTid() const;
 		/// Returns the numeric thread identifier for the message.
 	
-	long getOsTid() const;
+	IntPtr getOsTid() const;
 		/// Returns the numeric OS thread identifier for the message.
 	
 	void setPid(long pid);
