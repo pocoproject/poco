@@ -136,7 +136,8 @@ void SessionImpl::open(const std::string& connect)
 	}
 
 	_dataTypes.fillTypeInfo(_db);
-		addProperty("dataTypeInfo", 
+	
+	addProperty("dataTypeInfo", 
 		&SessionImpl::setDataTypeInfo, 
 		&SessionImpl::dataTypeInfo);
 
