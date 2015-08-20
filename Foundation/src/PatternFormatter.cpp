@@ -24,6 +24,7 @@
 #include "Poco/Timezone.h"
 #include "Poco/Environment.h"
 #include "Poco/NumberParser.h"
+#include "Poco/StringTokenizer.h"
 
 
 namespace Poco {
@@ -31,11 +32,13 @@ namespace Poco {
 
 const std::string PatternFormatter::PROP_PATTERN = "pattern";
 const std::string PatternFormatter::PROP_TIMES   = "times";
+const std::string PatternFormatter::PROP_PRIORITY_NAMES = "priorityNames";
 
 
 PatternFormatter::PatternFormatter():
 	_localTime(false)
 {
+	parsePriorityNames();
 }
 
 
@@ -43,6 +46,7 @@ PatternFormatter::PatternFormatter(const std::string& format):
 	_localTime(false),
 	_pattern(format)
 {
+	parsePriorityNames();
 	parsePattern();
 }
 
@@ -204,6 +208,11 @@ void PatternFormatter::setProperty(const std::string& name, const std::string& v
 	{
 		_localTime = (value == "local");
 	}
+	else if (name == PROP_PRIORITY_NAMES) 
+	{
+		_priorityNames = value;
+		parsePriorityNames();
+	}
 	else 
 	{
 		Formatter::setProperty(name, value);
@@ -217,6 +226,8 @@ std::string PatternFormatter::getProperty(const std::string& name) const
 		return _pattern;
 	else if (name == PROP_TIMES)
 		return _localTime ? "local" : "UTC";
+	else if (name == PROP_PRIORITY_NAMES)
+		return _priorityNames;
 	else
 		return Formatter::getProperty(name);
 }
@@ -238,11 +249,20 @@ namespace
 	};
 }
 
+	void PatternFormatter::parsePriorityNames()
+	{
+		for (int i = 0; i <= 8; i++)
+			_priorities[i] = priorities[i];
+		StringTokenizer st (_priorityNames, ".", StringTokenizer::TOK_TRIM);
+		if (st.count() == 8)
+		for (int i = 1; i <= 8; i++)
+			_priorities[i] = st[i-1];
+	}
 
 const std::string& PatternFormatter::getPriorityName(int prio)
 {
 	poco_assert (1 <= prio && prio <= 8);	
-	return priorities[prio];
+	return _priorities[prio];
 }
 
 
