@@ -249,15 +249,22 @@ namespace
 	};
 }
 
-	void PatternFormatter::parsePriorityNames()
+
+void PatternFormatter::parsePriorityNames()
+{
+	for (int i = 0; i <= 8; i++)
 	{
-		for (int i = 0; i <= 8; i++)
-			_priorities[i] = priorities[i];
-		StringTokenizer st (_priorityNames, ".", StringTokenizer::TOK_TRIM);
-		if (st.count() == 8)
-		for (int i = 1; i <= 8; i++)
-			_priorities[i] = st[i-1];
+		_priorities[i] = priorities[i];
 	}
+	StringTokenizer st(_priorityNames, ",;", StringTokenizer::TOK_TRIM);
+	if (st.count() == 8)
+	{
+		for (int i = 1; i <= 8; i++)
+			_priorities[i] = st[i - 1];
+	}
+	else throw Poco::SyntaxException("priorityNames property must specify a comma-separated list of 8 property names");
+}
+
 
 const std::string& PatternFormatter::getPriorityName(int prio)
 {

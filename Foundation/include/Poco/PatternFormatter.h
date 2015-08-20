@@ -23,8 +23,8 @@
 #include "Poco/Foundation.h"
 #include "Poco/Formatter.h"
 #include "Poco/Message.h"
-
 #include <vector>
+
 
 namespace Poco {
 
@@ -105,6 +105,8 @@ public:
 		///       for details.
 		///     * times: Specifies whether times are adjusted for local time
 		///       or taken as they are in UTC. Supported values are "local" and "UTC".
+		///     * priorityNames: Provide a comma-separated list of custom priority names,
+		///       e.g. "Fatal, Critical, Error, Warning, Notice, Information, Debug, Trace"
 		///
 		/// If any other property name is given, a PropertyNotSupported
 		/// exception is thrown.
@@ -145,8 +147,8 @@ private:
 	std::vector<PatternAction> _patternActions;
 	bool _localTime;
 	std::string _pattern;
-        std::string _priorityNames;
-        std::string _priorities[9];
+	std::string _priorityNames;
+	std::string _priorities[9];
 };
 
 
