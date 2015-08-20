@@ -256,13 +256,18 @@ void PatternFormatter::parsePriorityNames()
 	{
 		_priorities[i] = priorities[i];
 	}
-	StringTokenizer st(_priorityNames, ",;", StringTokenizer::TOK_TRIM);
-	if (st.count() == 8)
+	if (!_priorityNames.empty())
 	{
-		for (int i = 1; i <= 8; i++)
-			_priorities[i] = st[i - 1];
+		StringTokenizer st(_priorityNames, ",;", StringTokenizer::TOK_TRIM);
+		if (st.count() == 8)
+		{
+			for (int i = 1; i <= 8; i++)
+			{
+				_priorities[i] = st[i - 1];
+			}
+		}
+		else throw Poco::SyntaxException("priorityNames property must specify a comma-separated list of 8 property names");
 	}
-	else throw Poco::SyntaxException("priorityNames property must specify a comma-separated list of 8 property names");
 }
 
 
