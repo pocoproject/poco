@@ -18,6 +18,14 @@ components=`cat $POCO_BASE/components`
 
 if [ "$OSNAME" = "" ] ; then
 	OSNAME=`uname`
+        case $OSNAME in
+        CYGWIN*)
+                OSNAME=CYGWIN 
+                TESTRUNNER=$TESTRUNNER.exe
+                ;;
+        MINGW*)
+                OSNAME=MinGW ;;
+        esac
 fi
 if [ "$OSARCH" = "" ] ; then
 	OSARCH=`uname -m | tr ' /' _-`
