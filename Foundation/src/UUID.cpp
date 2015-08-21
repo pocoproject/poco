@@ -127,6 +127,7 @@ void UUID::parse(const std::string& uuid)
 		throw SyntaxException(uuid);
 }	
 
+
 bool UUID::tryParse(const std::string& uuid)
 {
 	if (uuid.size() < 32)
@@ -141,35 +142,50 @@ bool UUID::tryParse(const std::string& uuid)
 			return false;
 	}
 	
+	UUID newUUID;
 	std::string::const_iterator it = uuid.begin();
-	_timeLow = 0;
+	newUUID._timeLow = 0;
 	for (int i = 0; i < 8; ++i)
 	{
-		_timeLow = (_timeLow << 4) | nibble(*it++);
+		Int16 n = nibble(*it++);
+		if (n < 0) return false;
+		newUUID._timeLow = (newUUID._timeLow << 4) | n;
 	}
 	if (haveHyphens) ++it;
-	_timeMid = 0;
+	newUUID._timeMid = 0;
 	for (int i = 0; i < 4; ++i)
 	{
-		_timeMid = (_timeMid << 4) | nibble(*it++);
+		Int16 n = nibble(*it++);
+		if (n < 0) return false;
+		newUUID._timeMid = (newUUID._timeMid << 4) | n;
 	}
 	if (haveHyphens) ++it;
-	_timeHiAndVersion = 0;
+	newUUID._timeHiAndVersion = 0;
 	for (int i = 0; i < 4; ++i)
 	{
-		_timeHiAndVersion = (_timeHiAndVersion << 4) | nibble(*it++);
+		Int16 n = nibble(*it++);
+		if (n < 0) return false;
+		newUUID._timeHiAndVersion = (newUUID._timeHiAndVersion << 4) | n;
 	}
 	if (haveHyphens) ++it;
-	_clockSeq = 0;
+	newUUID._clockSeq = 0;
 	for (int i = 0; i < 4; ++i)
 	{
-		_clockSeq = (_clockSeq << 4) | nibble(*it++);
+		Int16 n = nibble(*it++);
+		if (n < 0) return false;
+		newUUID._clockSeq = (newUUID._clockSeq << 4) | n;
 	}
 	if (haveHyphens) ++it;
 	for (int i = 0; i < 6; ++i)
 	{
-		_node[i] = (nibble(*it++) << 4) | nibble(*it++) ;			
+		Int16 n1 = nibble(*it++);
+		if (n1 < 0) return false;
+		Int16 n2 = nibble(*it++);
+		if (n2 < 0) return false;
+
+		newUUID._node[i] = (n1 << 4) | n2;			
 	}
+	swap(newUUID);
 
 	return true;
 }
@@ -282,16 +298,16 @@ void UUID::appendHex(std::string& str, UInt32 n)
 }
 
 
-UInt8 UUID::nibble(char hex)
+Int16 UUID::nibble(char hex)
 {
 	if (hex >= 'a' && hex <= 'f')
-		return UInt8(hex - 'a' + 10);
+		return hex - 'a' + 10;
 	else if (hex >= 'A' && hex <= 'F')
-		return UInt8(hex - 'A' + 10);
+		return hex - 'A' + 10;
 	else if (hex >= '0' && hex <= '9')
-		return UInt8(hex - '0');
+		return hex - '0';
 	else
-		return UInt8(0);
+		return -1;
 }
 
 

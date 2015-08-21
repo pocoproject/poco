@@ -4,7 +4,7 @@
 # Usage:
 # ------
 # buildwin.ps1 [-poco_base    dir]
-#              [-vs_version   120 | 110 | 100 | 90]
+#              [-vs_version   140 | 120 | 110 | 100 | 90]
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
@@ -23,7 +23,7 @@ Param
   [string] $poco_base,
 
   [Parameter()]
-  [ValidateSet(90, 100, 110, 120)]
+  [ValidateSet(90, 100, 110, 120, 140)]
   [int] $vs_version,
 
   [Parameter()]
@@ -78,7 +78,8 @@ function Set-Environment
 
   if ($vs_version -eq 0)
   {
-    if     ($Env:VS120COMNTOOLS -ne '') { $script:vs_version = 120 }
+    if     ($Env:VS140COMNTOOLS -ne '') { $script:vs_version = 140 }
+    elseif ($Env:VS120COMNTOOLS -ne '') { $script:vs_version = 120 }
     elseif ($Env:VS110COMNTOOLS -ne '') { $script:vs_version = 110 }
     elseif ($Env:VS100COMNTOOLS -ne '') { $script:vs_version = 100 }
     elseif ($Env:VS90COMNTOOLS  -ne '') { $script:vs_version = 90 }
@@ -144,7 +145,7 @@ function Process-Input
     Write-Host 'Usage:'
     Write-Host '------'
     Write-Host 'buildwin.ps1 [-poco_base    dir]'
-    Write-Host '             [-vs_version   120 | 110 | 100 | 90]'
+    Write-Host '             [-vs_version   140 | 120 | 110 | 100 | 90]'
     Write-Host '             [-action       build | rebuild | clean]'
     Write-Host '             [-linkmode     shared | static_mt | static_md | all]'
     Write-Host '             [-config       release | debug | both]'

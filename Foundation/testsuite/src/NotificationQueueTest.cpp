@@ -190,6 +190,29 @@ void NotificationQueueTest::testDefaultQueue()
 }
 
 
+void NotificationQueueTest::testQueueRemove()
+{
+	NotificationQueue queue;
+	Notification::Ptr frontNotification = new QTestNotification("front");
+	Notification::Ptr middleNotification = new QTestNotification("middle");
+	Notification::Ptr backNotification = new QTestNotification("back");
+	queue.enqueueNotification(frontNotification);
+	queue.enqueueNotification(new QTestNotification("dummy"));
+	queue.enqueueNotification(middleNotification);
+	queue.enqueueNotification(new QTestNotification("dummy"));
+	queue.enqueueNotification(backNotification);
+	assert (queue.size() == 5);
+	assert (queue.remove(frontNotification));
+	assert (queue.size() == 4);
+	assert (queue.remove(middleNotification));
+	assert (queue.size() == 3);
+	assert (queue.remove(backNotification));
+	assert (queue.size() == 2);
+	assert (!queue.remove(backNotification));
+	assert (queue.size() == 2);
+}
+
+
 void NotificationQueueTest::setUp()
 {
 	_handled.clear();
@@ -227,6 +250,7 @@ CppUnit::Test* NotificationQueueTest::suite()
 	CppUnit_addTest(pSuite, NotificationQueueTest, testWaitDequeue);
 	CppUnit_addTest(pSuite, NotificationQueueTest, testThreads);
 	CppUnit_addTest(pSuite, NotificationQueueTest, testDefaultQueue);
+	CppUnit_addTest(pSuite, NotificationQueueTest, testQueueRemove);
 
 	return pSuite;
 }

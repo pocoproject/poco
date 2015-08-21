@@ -322,6 +322,11 @@ void JSONTest::testStringProperty()
 	std::string value = test.convert<std::string>();
 	assert(value.compare("value") == 0);
 
+	object.set("test2", 'a');
+	std::ostringstream ostr;
+	object.stringify(ostr);
+	assert(ostr.str() == "{\"test\":\"value\",\"test2\":\"a\"}");
+
 	DynamicStruct ds = object;
 	assert (!ds["test"].isEmpty());
 	assert (ds["test"].isString());
