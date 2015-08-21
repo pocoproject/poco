@@ -238,7 +238,6 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir, const 
 
 void Binder::bind(std::size_t pos, const Date& val, Direction dir, const WhenNullCb& nullCb)
 {
-	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_DATE_STRUCT);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn = SQL_NTS; // microsoft example does that, otherwise no null indicator is returned
 
@@ -272,7 +271,6 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir, const WhenNul
 
 void Binder::bind(std::size_t pos, const Time& val, Direction dir, const WhenNullCb& nullCb)
 {
-	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIME_STRUCT);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = SQL_NTS; // microsoft example does that, otherwise no null indicator is returned
 	if (isOutBound(dir) && nullCb.defined())
@@ -307,7 +305,6 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir, const WhenNul
 
 void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir, const WhenNullCb& nullCb)
 {
-	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn = SQL_NTS; // microsoft example does that, otherwise no null indicator is returned
 	if (isOutBound(dir) && nullCb.defined())
