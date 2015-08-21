@@ -280,9 +280,10 @@ public:
 		}
 		else 
 		{
-			if (typeid(T) == typeid(std::string)) pBinder->bind(pos++, obj.value(), dir, NullHandler(obj));
-			else if (typeid(T) == typeid(Date)) pBinder->bind(pos++, obj.value(), dir, NullHandler(obj));
-			else pBinder->bind(pos++, obj.value(), dir);
+			if (AbstractBinder::isOutBound(dir))
+				pBinder->bind(pos++, obj.value(), dir, NullHandler(obj));
+			else
+				pBinder->bind(pos++, obj.value(), dir);
 		}
 	}
 	

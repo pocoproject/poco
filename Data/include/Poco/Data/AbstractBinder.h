@@ -62,6 +62,11 @@ public:
 		WhenNullCb() :_func(NULL)
 		{}
 
+		inline bool defined() const
+		{
+			return (_func != NULL);
+		}
+
 		inline void onNull()
 		{
 			if (_func) _func(_data);
@@ -85,7 +90,7 @@ public:
 	virtual ~AbstractBinder();
 		/// Destroys the AbstractBinder.
 
-	virtual void bind(std::size_t pos, const Poco::Int8& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int8& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds an Int8.
 
 	virtual void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir = PD_IN);
@@ -97,7 +102,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir = PD_IN);
 		/// Binds an Int8 list.
 
-	virtual void bind(std::size_t pos, const Poco::UInt8& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt8& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds an UInt8.
 
 	virtual void bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir = PD_IN);
@@ -109,7 +114,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir = PD_IN);
 		/// Binds an UInt8 list.
 
-	virtual void bind(std::size_t pos, const Poco::Int16& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int16& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds an Int16.
 
 	virtual void bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir = PD_IN);
@@ -121,7 +126,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir = PD_IN);
 		/// Binds an Int16 list.
 
-	virtual void bind(std::size_t pos, const Poco::UInt16& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt16& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds an UInt16.
 
 	virtual void bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir = PD_IN);
@@ -133,7 +138,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir = PD_IN);
 		/// Binds an UInt16 list.
 
-	virtual void bind(std::size_t pos, const Poco::Int32& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int32& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds an Int32.
 
 	virtual void bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir = PD_IN);
@@ -145,7 +150,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir = PD_IN);
 		/// Binds an Int32 list.
 
-	virtual void bind(std::size_t pos, const Poco::UInt32& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt32& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds an UInt32.
 
 	virtual void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir = PD_IN);
@@ -157,7 +162,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir = PD_IN);
 		/// Binds an UInt32 list.
 		
-	virtual void bind(std::size_t pos, const Poco::Int64& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int64& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds an Int64.
 
 	virtual void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir = PD_IN);
@@ -169,7 +174,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir = PD_IN);
 		/// Binds an Int64 list.
 
-	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds an UInt64.
 
 	virtual void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir = PD_IN);
@@ -182,10 +187,10 @@ public:
 		/// Binds an UInt64 list.
 
 #ifndef POCO_LONG_IS_64_BIT
-	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a long.
 
-	virtual void bind(std::size_t pos, const unsigned long& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const unsigned long& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds an unsiged long.
 
 	virtual void bind(std::size_t pos, const std::vector<long>& val, Direction dir = PD_IN);
@@ -198,7 +203,7 @@ public:
 		/// Binds a long list.
 #endif
 
-	virtual void bind(std::size_t pos, const bool& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const bool& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a boolean.
 
 	virtual void bind(std::size_t pos, const std::vector<bool>& val, Direction dir = PD_IN);
@@ -210,7 +215,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<bool>& val, Direction dir = PD_IN);
 		/// Binds a boolean list.
 
-	virtual void bind(std::size_t pos, const float& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const float& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a float.
 
 	virtual void bind(std::size_t pos, const std::vector<float>& val, Direction dir = PD_IN);
@@ -222,7 +227,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<float>& val, Direction dir = PD_IN);
 		/// Binds a float list.
 
-	virtual void bind(std::size_t pos, const double& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const double& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a double.
 
 	virtual void bind(std::size_t pos, const std::vector<double>& val, Direction dir = PD_IN);
@@ -234,7 +239,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<double>& val, Direction dir = PD_IN);
 		/// Binds a double list.
 
-	virtual void bind(std::size_t pos, const char& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const char& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a single character.
 
 	virtual void bind(std::size_t pos, const std::vector<char>& val, Direction dir = PD_IN);
@@ -246,7 +251,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<char>& val, Direction dir = PD_IN);
 		/// Binds a character list.
 
-	virtual void bind(std::size_t pos, const char* const& pVal, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const char* const& pVal, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a const char ptr.
 
 	virtual void bind(std::size_t pos, const std::string& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
@@ -261,7 +266,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<std::string>& val, Direction dir = PD_IN);
 		/// Binds a string list.
 
-	virtual void bind(std::size_t pos, const UTF16String& val, Direction dir = PD_IN);
+	virtual void bind(std::size_t pos, const UTF16String& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb());
 		/// Binds a UTF-16 Unicode string.
 
 	virtual void bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir = PD_IN);
@@ -273,10 +278,10 @@ public:
 	virtual void bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir = PD_IN);
 		/// Binds a UTF-16 Unicode string list.
 
-	virtual void bind(std::size_t pos, const BLOB& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const BLOB& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a BLOB.
 
-	virtual void bind(std::size_t pos, const CLOB& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const CLOB& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a CLOB.
 
 	virtual void bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir = PD_IN);
@@ -297,7 +302,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir = PD_IN);
 		/// Binds a CLOB list.
 
-	virtual void bind(std::size_t pos, const DateTime& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const DateTime& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a DateTime.
 
 	virtual void bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir = PD_IN);
@@ -321,7 +326,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Date>& val, Direction dir = PD_IN);
 		/// Binds a Date list.
 
-	virtual void bind(std::size_t pos, const Time& val, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const Time& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
 		/// Binds a Time.
 
 	virtual void bind(std::size_t pos, const std::vector<Time>& val, Direction dir = PD_IN);
@@ -336,19 +341,19 @@ public:
 	virtual void bind(std::size_t pos, const NullData& val, Direction dir = PD_IN, const std::type_info& bindType = typeid(void)) = 0;
 		/// Binds a null.
 
-	virtual void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir = PD_IN);
+	virtual void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir = PD_IN, const std::type_info& bindElemType = typeid(void));
 		/// Binds a null vector.
 
-	virtual void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir = PD_IN);
+	virtual void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir = PD_IN, const std::type_info& bindElemType = typeid(void));
 		/// Binds a null deque.
 
-	virtual void bind(std::size_t pos, const std::list<NullData>& val, Direction dir = PD_IN);
+	virtual void bind(std::size_t pos, const std::list<NullData>& val, Direction dir = PD_IN, const std::type_info& bindElemType = typeid(void));
 		/// Binds a null list.
 
-	void bind(std::size_t pos, const Any& val, Direction dir = PD_IN);
+	void bind(std::size_t pos, const Any& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb());
 		/// Binds an Any.
 	
-	void bind(std::size_t pos, const Poco::Dynamic::Var& val, Direction dir = PD_IN);
+	void bind(std::size_t pos, const Poco::Dynamic::Var& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb());
 	/// Binds a Var.
 
 	virtual void reset();

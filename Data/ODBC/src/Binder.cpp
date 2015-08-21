@@ -153,7 +153,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir, const 
 		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
 
 	SQLLEN* pLenIn = new SQLLEN;
-	if (isOutBound(dir))
+	if (isOutBound(dir) && nullCb.defined())
 		_nullCbMap.insert(NullCbMap::value_type( pLenIn, nullCb) );
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
@@ -181,7 +181,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir, const 
 }
 
 
-void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
+void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir, const WhenNullCb& nullCb)
 {
 	typedef UTF16String::value_type CharT;
 
@@ -205,6 +205,9 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
 
 	SQLLEN* pLenIn = new SQLLEN;
+	if (isOutBound(dir) && nullCb.defined())
+		_nullCbMap.insert(NullCbMap::value_type(pLenIn, nullCb));
+
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
 	getColSizeAndPrecision(pos, SQL_C_WCHAR, colSize, decDigits);
@@ -237,10 +240,11 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir, const WhenNul
 {
 	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_DATE_STRUCT);
 	SQLLEN* pLenIn = new SQLLEN;
-	*pLenIn  = size;
+	*pLenIn = SQL_NTS; // microsoft example does that, otherwise no null indicator is returned
 
 	_lengthIndicator.push_back(pLenIn);
-	if (isOutBound(dir)) _nullCbMap.insert(NullCbMap::value_type(pLenIn, nullCb));
+	if (isOutBound(dir) && nullCb.defined()) 
+		_nullCbMap.insert(NullCbMap::value_type(pLenIn, nullCb));
 	SQL_DATE_STRUCT* pDS = new SQL_DATE_STRUCT;
 	Utility::dateSync(*pDS, val);
 	
@@ -266,11 +270,13 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir, const WhenNul
 }
 
 
-void Binder::bind(std::size_t pos, const Time& val, Direction dir)
+void Binder::bind(std::size_t pos, const Time& val, Direction dir, const WhenNullCb& nullCb)
 {
 	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIME_STRUCT);
 	SQLLEN* pLenIn = new SQLLEN;
-	*pLenIn  = size;
+	*pLenIn  = SQL_NTS; // microsoft example does that, otherwise no null indicator is returned
+	if (isOutBound(dir) && nullCb.defined())
+		_nullCbMap.insert(NullCbMap::value_type(pLenIn, nullCb));
 
 	_lengthIndicator.push_back(pLenIn);
 
@@ -298,13 +304,14 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 	}
 }
 
-//TODO: add a call-back like "when null" so as binder would call back to 
-// type handler-provided CB and set nullable to NULL
-void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
+
+void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir, const WhenNullCb& nullCb)
 {
 	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
 	SQLLEN* pLenIn = new SQLLEN;
-	*pLenIn  = size;
+	*pLenIn = SQL_NTS; // microsoft example does that, otherwise no null indicator is returned
+	if (isOutBound(dir) && nullCb.defined())
+		_nullCbMap.insert(NullCbMap::value_type(pLenIn, nullCb));
 
 	_lengthIndicator.push_back(pLenIn);
 
@@ -378,7 +385,7 @@ std::size_t Binder::parameterSize(SQLPOINTER pAddr) const
 }
 
 
-void Binder::bind(std::size_t pos, const char* const &pVal, Direction dir)
+void Binder::bind(std::size_t pos, const char* const &pVal, Direction dir, const WhenNullCb& nullCb)
 {
 	throw NotImplementedException("char* binding not implemented, Use std::string instead.");
 }

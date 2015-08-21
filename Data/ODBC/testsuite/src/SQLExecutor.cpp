@@ -4171,7 +4171,9 @@ void SQLExecutor::transactor()
 
 void SQLExecutor::nullable()
 {
-  try { session() << "INSERT INTO " << ExecUtil::nullabletest() << " VALUES(NULL, NULL, NULL, NULL)", now; }
+  try { session() << "INSERT INTO " << ExecUtil::nullabletest() << 
+		" VALUES(?, ?, ?, ?)", useRef(Nullable<int>()), useRef(Nullable<double>()), useRef(Nullable<std::string>()), useRef(Nullable<DateTime>()), now;
+	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("nullable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("nullable()"); }
 

@@ -351,7 +351,7 @@ void ODBCDB2Test::testStoredFunction()
 	dropObject("PROCEDURE", nm + "()");
 	dropObject("PROCEDURE", nm + "(INTEGER)");
 	dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
-	dropObject("PROCEDURE", nm + "(VARCHAR(10), DATE)");
+	dropObject("PROCEDURE", nm + "(VARCHAR(10), DATE, TIME, TIMESTAMP, INTEGER, SMALLINT, REAL, DOUBLE, VARCHAR(10), INTEGER)");
 	dropObject("PROCEDURE", nm + "(VARCHAR(10), VARCHAR(10))");
 
 	for (int k = 0; k < 8;)
@@ -375,17 +375,34 @@ void ODBCDB2Test::testStoredFunction()
 			dropObject("PROCEDURE", nm + "()");
 		}
 		{
-			session() << "CREATE PROCEDURE " << nm << "(inp VARCHAR(10), out dt DATE) "
+			session() << "CREATE PROCEDURE " << nm << "(inp VARCHAR(10), out dt DATE, out tm TIME, out tms TIMESTAMP, out int32 INTEGER, "
+				"out si SMALLINT, out fl REAL, out dbl DOUBLE, out s2 VARCHAR(10), out an INTEGER)"
 				"BEGIN "
-				"  SET dt = null;"
+				"set dt =null; set tm =null; set tms =null; set int32 =null; set si =null; set fl =null; set dbl =null; set s2 = inp; set an = inp;"
 				"END", now;
 
 			Poco::Data::Statement stat(session());
 			Poco::Nullable<std::string> ns;
 			Poco::Nullable<Poco::Data::Date> nd = Poco::Nullable<Poco::Data::Date>(Poco::Data::Date());
-			stat << "{call " DB2_DB "." << nm << "(?, ?)}", use(ns), out(nd), now;
-			dropObject("PROCEDURE", nm + "(VARCHAR(10))");
+			Poco::Nullable<int> n_i(1);
+			Poco::Nullable<Poco::Data::Time> tm = Poco::Nullable<Poco::Data::Time>(Poco::Data::Time());
+			Poco::Nullable<Poco::DateTime> tms = Poco::Nullable<Poco::DateTime>(Poco::DateTime());
+			Poco::Nullable<Poco::Int16> i16(1);
+			Poco::Nullable<float> flt(1);
+			Poco::Nullable<double> dbl(1);
+			Poco::Nullable<std::string> s2("ddd");
+			Poco::Nullable<Any> an(Any(2));
+			stat << "{call " DB2_DB "." << nm << "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}", useRef(ns), out(nd), out(tm), out(tms), out(n_i), out(i16), out(flt), out(dbl), out(s2), out(an), now;
+			dropObject("PROCEDURE", nm + "(VARCHAR(10), DATE, TIME, TIMESTAMP, INTEGER, SMALLINT, REAL, DOUBLE, VARCHAR(10), INTEGER)");
 			assert(nd.isNull());
+			assert(n_i.isNull());
+			assert(tm.isNull());
+			assert(tms.isNull());
+			assert(i16.isNull());
+			assert(flt.isNull());
+			assert(dbl.isNull());
+			assert(s2.isNull());
+			assert(an.isNull());
 		}
 
 		session() << "CREATE PROCEDURE " << nm << "() "
