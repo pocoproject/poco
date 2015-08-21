@@ -25,6 +25,7 @@
 #include "Poco/DynamicAny.h"
 #include <vector>
 #include <map>
+#include <typeinfo>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
@@ -71,7 +72,17 @@ public:
 		SQLINTEGER,
 		SQLSMALLINT> TypeInfoTup;
 	typedef std::vector<TypeInfoTup> TypeInfoVec;
-	typedef std::map<std::size_t, SQLSMALLINT> CppTypeInfoMap;
+	typedef const std::type_info* TypeInfoPtr;
+
+	struct TypeInfoComp : public std::binary_function<TypeInfoPtr, TypeInfoPtr, bool>
+	{	
+		bool operator()(const TypeInfoPtr& left, const TypeInfoPtr& right) const
+		{	// apply operator< to operands
+			return ( left->before( *right ) );
+		}
+	};
+
+	typedef std::map<TypeInfoPtr, SQLSMALLINT, TypeInfoComp> CppTypeInfoMap;
 
 	explicit TypeInfo(SQLHDBC* pHDBC=0);
 		/// Creates the TypeInfo.
