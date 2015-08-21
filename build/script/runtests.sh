@@ -4,17 +4,31 @@
 #
 # A script for running the POCO testsuites.
 #
-# usage: runtests
+# usage: runtests [component] [test]
 #
 # If the environment variable EXCLUDE_TESTS is set, containing
 # a space-separated list of project names (as found in the
 # components file), these tests will be skipped.
 #
 
-TESTRUNNER=./testrunner
-TESTRUNNERARGS=-all
+if [ "$POCO_BASE" = "" ] ; then
+	POCO_BASE=`pwd`
+fi
 
-components=`cat $POCO_BASE/components`
+TESTRUNNER=./testrunner
+
+if [ "$1" = "" ] ; then
+   components=`cat $POCO_BASE/components`
+else
+   components=$1
+fi
+
+if [ "$2" = "" ] ; then
+    TESTRUNNERARGS=-all
+else
+    TESTRUNNERARGS=$2
+fi
+
 
 if [ "$OSNAME" = "" ] ; then
 	OSNAME=`uname`
