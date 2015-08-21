@@ -294,9 +294,9 @@ std::size_t SQLiteStatementImpl::columnsReturned() const
 }
 
 
-const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
+const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos, std::size_t dataset) const
 {
-	std::size_t curDataSet = currentDataSet();
+	const std::size_t curDataSet = dataset;
 	poco_assert (pos >= 0 && pos <= _columns[curDataSet].size());
 	return _columns[curDataSet][pos];
 }

@@ -48,8 +48,9 @@ std::size_t MySQLStatementImpl::affectedRowCount() const
 }
 
 	
-const MetaColumn& MySQLStatementImpl::metaColumn(std::size_t pos) const
+const MetaColumn& MySQLStatementImpl::metaColumn(std::size_t pos, size_t dataSet) const
 {
+	poco_assert_dbg(0 == dataSet); // we don't support multiple datasets here
 	return _metadata.metaColumn(pos);
 }
 

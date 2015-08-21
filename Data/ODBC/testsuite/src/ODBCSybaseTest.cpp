@@ -318,6 +318,39 @@ void SybaseODBC::testStoredProcedure()
 			assert(0 == rs.rowCount());
 		}
 		{
+			Poco::Nullable<std::string> ins;
+			Poco::Nullable<std::string> os = Poco::Nullable<std::string>("ab");
+			Poco::Nullable<int> oi(12);
+			Poco::Nullable<Poco::Data::Date> od = Poco::Nullable<Poco::Data::Date>(Poco::Data::Date());
+			Poco::Nullable<Poco::DateTime> odtm = Poco::Nullable<Poco::DateTime>(Poco::DateTime());
+			session() << "create procedure " + nm + " @ins varchar(40), @oi integer output, @os varchar(10) output, @od date output, @dtm datetime output "
+				"as "
+				"begin "
+				"select @oi = null;"
+				"select @os = @ins;"
+				"select @od = null;"
+				"select @dtm = null;"
+					" end" 
+				, now;
+			session() << "{ call " << nm << "(?, ?, ?, ?, ?) }", in(ins), out(oi), out(os), out(od), out(odtm), now;
+			dropObject("procedure", nm);
+			assert(oi.isNull());
+			assert(os.isNull());
+			assert(od.isNull());
+			assert(odtm.isNull());
+		}
+		{
+			session() << "create procedure " << nm << " @c char(8) AS select @c", now;
+			Poco::Nullable<std::string> ns;
+			Poco::Data::Statement stat(session());
+			stat << "{ call " << nm << "(?) }", use(ns), now;
+			dropObject("procedure", nm);
+			Poco::Data::RecordSet rs(stat);
+			assert(1 == rs.rowCount());
+			bool nl = rs.isNull(size_t(0), 0);
+			assert( nl );
+		}
+		{
 			Poco::Data::Statement stat(session());
 			stat << "{ exec  -- @exType='mdExch', @exList='TRAD' }", Poco::Data::Keywords::limit(1);
 			while (!stat.done())
