@@ -52,18 +52,21 @@ $(LIB_DEBUG_STATIC): $(foreach o,$(objects),$(OBJPATH_DEBUG_STATIC)/$(o).o)
 	$(LIB) $@ $^
 	$(RANLIB) $@
 	$(postbuild)
+	@echo " "
 
 $(LIB_RELEASE_STATIC): $(foreach o,$(objects),$(OBJPATH_RELEASE_STATIC)/$(o).o)
 	@echo "** Building library (release)" $@
 	$(LIB) $@ $^
 	$(RANLIB) $@
 	$(postbuild)
+	@echo " "
 
 $(LIB_DEBUG_SHARED): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building shared library (debug)" $@
 	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
 	$(SHLIBLN) $(LIB_DEBUG_SHARED) $(LIB_DEBUG_SHARED_LINK)
 	$(postbuild)
+	@echo " "
 
 $(LIB_RELEASE_SHARED): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building shared library (release)" $@
@@ -71,6 +74,7 @@ $(LIB_RELEASE_SHARED): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	$(SHLIBLN) $(LIB_RELEASE_SHARED) $(LIB_RELEASE_SHARED_LINK)
 	$(STRIPCMD)
 	$(postbuild)
+	@echo " "
 
 #
 # Include the automatically generated dependency files
