@@ -10,8 +10,8 @@
 /// All rights reserved.
 ///
 
-#include "XMLStreamParserException.h"
-#include "XMLStreamSerializer.h"
+#include "Poco/XML/XMLStreamParserException.h"
+#include "Poco/XML/XMLStreamSerializer.h"
 
 using namespace std;
 
@@ -20,8 +20,6 @@ namespace Poco
 namespace XML
 {
 
-// XMLStreamSerializerException
-//
 XMLStreamSerializerException::~XMLStreamSerializerException() throw ()
 {
 }
@@ -33,7 +31,7 @@ XMLStreamSerializerException::XMLStreamSerializerException(const string& n, cons
 }
 
 XMLStreamSerializerException::XMLStreamSerializerException(const XMLStreamSerializer& s, const std::string& d)
-		: name_(s.outputName()), description_(d)
+	: name_(s.outputName()), description_(d)
 {
 	init();
 }
@@ -49,6 +47,19 @@ void XMLStreamSerializerException::init()
 	what_ += "error: ";
 	what_ += description_;
 }
+
+
+const char* XMLStreamSerializerException::name() const throw ()
+{
+	return name_.c_str();
+}
+
+
+const std::string& XMLStreamSerializerException::description() const
+{
+	return description_;
+}
+
 
 char const* XMLStreamSerializerException::what() const throw ()
 {

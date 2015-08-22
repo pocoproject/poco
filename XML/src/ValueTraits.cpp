@@ -2,8 +2,8 @@
 // copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
 
-#include "XMLStreamParser.h"
-#include "XMLStreamParserException.h"
+#include "Poco/XML/XMLStreamParser.h"
+#include "Poco/XML/XMLStreamParserException.h"
 
 using namespace std;
 

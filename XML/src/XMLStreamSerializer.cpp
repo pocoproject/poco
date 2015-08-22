@@ -2,8 +2,8 @@
 // copyright : Copyright (c) 2013-2014 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
 
-#include "XMLStreamSerializer.h"
-#include "XMLStreamSerializerException.h"
+#include "Poco/XML/XMLStreamSerializer.h"
+#include "Poco/XML/XMLStreamSerializerException.h"
 
 #include <new>     // std::bad_alloc
 #include <cstring> // std::strlen
@@ -14,8 +14,7 @@ namespace Poco
 {
 namespace XML
 {
-// XMLStreamSerializer
-//
+
 extern "C" genxStatus genx_write(void* p, constUtf8 us)
 {
 	// It would have been easier to throw the exception directly,
@@ -27,6 +26,7 @@ extern "C" genxStatus genx_write(void* p, constUtf8 us)
 	return os->good() ? GENX_SUCCESS : GENX_IO_ERROR;
 }
 
+
 extern "C" genxStatus genx_write_bound(void* p, constUtf8 start, constUtf8 end)
 {
 	ostream* os(static_cast<ostream*>(p));
@@ -36,6 +36,7 @@ extern "C" genxStatus genx_write_bound(void* p, constUtf8 start, constUtf8 end)
 	return os->good() ? GENX_SUCCESS : GENX_IO_ERROR;
 }
 
+
 extern "C" genxStatus genx_flush(void* p)
 {
 	ostream* os(static_cast<ostream*>(p));
@@ -43,11 +44,13 @@ extern "C" genxStatus genx_flush(void* p)
 	return os->good() ? GENX_SUCCESS : GENX_IO_ERROR;
 }
 
+
 XMLStreamSerializer::~XMLStreamSerializer()
 {
 	if (s_ != 0)
 		genxDispose (s_);
 }
+
 
 XMLStreamSerializer::XMLStreamSerializer(ostream& os, const string& oname, unsigned short ind)
 		: os_(os), os_state_(os.exceptions()), oname_(oname), depth_(0)
@@ -81,6 +84,7 @@ XMLStreamSerializer::XMLStreamSerializer(ostream& os, const string& oname, unsig
 	}
 }
 
+
 void XMLStreamSerializer::handleError(genxStatus e)
 {
 	switch (e)
@@ -100,6 +104,7 @@ void XMLStreamSerializer::handleError(genxStatus e)
 	}
 }
 
+
 void XMLStreamSerializer::startElement(const string& ns, const string& name)
 {
 	if (genxStatus e = genxStartElementLiteral(s_, reinterpret_cast<constUtf8>(ns.empty() ? 0 : ns.c_str()), reinterpret_cast<constUtf8>(name.c_str())))
@@ -107,6 +112,7 @@ void XMLStreamSerializer::startElement(const string& ns, const string& name)
 
 	depth_++;
 }
+
 
 void XMLStreamSerializer::endElement()
 {
@@ -126,11 +132,13 @@ void XMLStreamSerializer::endElement()
 	}
 }
 
+
 void XMLStreamSerializer::element(const string& ns, const string& n, const string& v)
 {
 	startElement(ns, n);
 	element(v);
 }
+
 
 void XMLStreamSerializer::startAttribute(const string& ns, const string& name)
 {
@@ -138,11 +146,13 @@ void XMLStreamSerializer::startAttribute(const string& ns, const string& name)
 		handleError(e);
 }
 
+
 void XMLStreamSerializer::endAttribute()
 {
 	if (genxStatus e = genxEndAttribute(s_))
 		handleError(e);
 }
+
 
 void XMLStreamSerializer::attribute(const string& ns, const string& name, const string& value)
 {
@@ -151,11 +161,13 @@ void XMLStreamSerializer::attribute(const string& ns, const string& name, const 
 		handleError(e);
 }
 
+
 void XMLStreamSerializer::characters(const string& value)
 {
 	if (genxStatus e = genxAddCountedText(s_, reinterpret_cast<constUtf8>(value.c_str()), value.size()))
 		handleError(e);
 }
+
 
 void XMLStreamSerializer::namespaceDecl(const string& ns, const string& p)
 {
@@ -166,12 +178,14 @@ void XMLStreamSerializer::namespaceDecl(const string& ns, const string& p)
 		handleError(e);
 }
 
+
 void XMLStreamSerializer::xmlDecl(const string& ver, const string& enc, const string& stl)
 {
 	if (genxStatus e = genxXmlDeclaration(s_, reinterpret_cast<constUtf8>(ver.c_str()), (enc.empty() ? 0 : reinterpret_cast<constUtf8>(enc.c_str())),
 			(stl.empty() ? 0 : reinterpret_cast<constUtf8>(stl.c_str()))))
 		handleError(e);
 }
+
 
 bool XMLStreamSerializer::lookupNamespacePrefix(const string& ns, string& p)
 {
@@ -187,5 +201,6 @@ bool XMLStreamSerializer::lookupNamespacePrefix(const string& ns, string& p)
 	p = reinterpret_cast<const char*>(genxGetNamespacePrefix(gns));
 	return true;
 }
+
 }
 }

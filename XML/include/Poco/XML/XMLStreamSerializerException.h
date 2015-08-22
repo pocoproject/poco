@@ -27,19 +27,10 @@ struct XML_API XMLStreamSerializerException:
 	virtual ~XMLStreamSerializerException() throw ();
 
 	XMLStreamSerializerException(const std::string& name, const std::string& description);
-
 	XMLStreamSerializerException(const XMLStreamSerializer&, const std::string& description);
 
-	const char* name() const throw ()
-	{
-		return name_.c_str();
-	}
-
-	const std::string& description() const
-	{
-		return description_;
-	}
-
+	const char* name() const throw ();
+	const std::string& description() const;
 	virtual const char* what() const throw ();
 
 private:

@@ -2,7 +2,7 @@
 // copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
 
-#include "QName.h"
+#include "Poco/XML/QName.h"
 #include <ostream>
 
 using namespace std;

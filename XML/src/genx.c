@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "genx.h"
+#include "Poco/XML/genx.h"
 
 #define Boolean int
 #define True 1

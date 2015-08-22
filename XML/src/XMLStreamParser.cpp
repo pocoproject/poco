@@ -2,6 +2,7 @@
 // copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
 
+#include "Poco/XML/XMLStreamParser.h"
 #include <new>     // std::bad_alloc
 #include <cassert>
 #include <cstring> // std::strchr
@@ -9,32 +10,80 @@
 #include <ostream>
 #include <sstream>
 
-#include "XMLStreamParser.h"
-
 using namespace std;
 
 namespace Poco
 {
 namespace XML
 {
-// XMLStreamParser::event_type
-//
-static const char* parser_event_str[] =
-{ "start element", "end element", "start attribute", "end attribute", "characters", "start namespace declaration", "end namespace declaration", "end of file" };
 
-ostream&
-operator<<(ostream& os, XMLStreamParser::EventType e)
+
+struct stream_exception_controller
+{
+	~stream_exception_controller()
+	{
+		istream::iostate s = is_.rdstate();
+		s &= ~istream::failbit;
+
+		// If our error state (sans failbit) intersects with the
+		// exception state then that means we have an active
+		// exception and changing error/exception state will
+		// cause another to be thrown.
+		//
+		if (!(old_state_ & s))
+		{
+			// Clear failbit if it was caused by eof.
+			//
+			if (is_.fail() && is_.eof())
+				is_.clear(s);
+
+			is_.exceptions(old_state_);
+		}
+	}
+
+	stream_exception_controller(istream& is)
+		: is_(is), old_state_(is_.exceptions())
+	{
+		is_.exceptions(old_state_ & ~istream::failbit);
+	}
+
+private:
+	stream_exception_controller(const stream_exception_controller&);
+
+	stream_exception_controller&
+	operator=(const stream_exception_controller&);
+
+private:
+	istream& is_;
+	istream::iostate old_state_;
+};
+
+
+static const char* parser_event_str[] =
+{
+	"start element",
+	"end element",
+	"start attribute",
+	"end attribute",
+	"characters",
+	"start namespace declaration",
+	"end namespace declaration",
+	"end of file"
+};
+
+
+ostream& operator<<(ostream& os, XMLStreamParser::EventType e)
 {
 	return os << parser_event_str[e];
 }
 
-// XMLStreamParser
-//
+
 XMLStreamParser::~XMLStreamParser()
 {
 	if (p_ != 0)
-		XML_ParserFree (p_);
+		XML_ParserFree(p_);
 }
+
 
 void XMLStreamParser::init()
 {
@@ -85,9 +134,10 @@ void XMLStreamParser::init()
 		XML_SetNamespaceDeclHandler(p_, &start_namespace_decl_, &end_namespace_decl_);
 }
 
+
 void XMLStreamParser::handle_error()
 {
-	XML_Error e(XML_GetErrorCode (p_));
+	XML_Error e(XML_GetErrorCode(p_));
 
 	if (e == XML_ERROR_ABORTED)
 	{
@@ -109,46 +159,6 @@ void XMLStreamParser::handle_error()
 	else
 		throw XMLStreamParserException(iname_, XML_GetCurrentLineNumber(p_), XML_GetCurrentColumnNumber(p_), XML_ErrorString(e));
 }
-
-struct stream_exception_controller
-{
-	~stream_exception_controller()
-	{
-		istream::iostate s = is_.rdstate();
-		s &= ~istream::failbit;
-
-		// If our error state (sans failbit) intersects with the
-		// exception state then that means we have an active
-		// exception and changing error/exception state will
-		// cause another to be thrown.
-		//
-		if (!(old_state_ & s))
-		{
-			// Clear failbit if it was caused by eof.
-			//
-			if (is_.fail() && is_.eof())
-				is_.clear(s);
-
-			is_.exceptions(old_state_);
-		}
-	}
-
-	stream_exception_controller(istream& is)
-			: is_(is), old_state_(is_.exceptions())
-	{
-		is_.exceptions(old_state_ & ~istream::failbit);
-	}
-
-private:
-	stream_exception_controller(const stream_exception_controller&);
-
-	stream_exception_controller&
-	operator=(const stream_exception_controller&);
-
-private:
-	istream& is_;
-	istream::iostate old_state_;
-};
 
 XMLStreamParser::EventType XMLStreamParser::next()
 {
@@ -183,6 +193,7 @@ XMLStreamParser::EventType XMLStreamParser::next()
 	}
 }
 
+
 const string& XMLStreamParser::attribute(const QName& qn) const
 {
 	if (const ElementEntry* e = getElement())
@@ -202,6 +213,7 @@ const string& XMLStreamParser::attribute(const QName& qn) const
 
 	throw XMLStreamParserException(*this, "attribute '" + qn.string() + "' expected");
 }
+
 
 string XMLStreamParser::attribute(const QName& qn, const string& dv) const
 {
@@ -223,6 +235,7 @@ string XMLStreamParser::attribute(const QName& qn, const string& dv) const
 	return dv;
 }
 
+
 bool XMLStreamParser::attributePresent(const QName& qn) const
 {
 	if (const ElementEntry* e = getElement())
@@ -243,17 +256,20 @@ bool XMLStreamParser::attributePresent(const QName& qn) const
 	return false;
 }
 
+
 void XMLStreamParser::nextExpect(EventType e)
 {
 	if (next() != e)
 		throw XMLStreamParserException(*this, string(parser_event_str[e]) + " expected");
 }
 
+
 void XMLStreamParser::nextExpect(EventType e, const string& ns, const string& n)
 {
 	if (next() != e || namespace_() != ns || name() != n)
 		throw XMLStreamParserException(*this, string(parser_event_str[e]) + " '" + QName(ns, n).string() + "' expected");
 }
+
 
 string XMLStreamParser::element()
 {
@@ -278,6 +294,7 @@ string XMLStreamParser::element()
 	return r;
 }
 
+
 string XMLStreamParser::element(const QName& qn, const string& dv)
 {
 	if (peek() == StartElement && qname() == qn)
@@ -288,6 +305,7 @@ string XMLStreamParser::element(const QName& qn, const string& dv)
 
 	return dv;
 }
+
 
 const XMLStreamParser::ElementEntry* XMLStreamParser::get_element_() const
 {
@@ -310,6 +328,7 @@ const XMLStreamParser::ElementEntry* XMLStreamParser::get_element_() const
 	return r;
 }
 
+
 void XMLStreamParser::pop_element()
 {
 	// Make sure there are no unhandled attributes left.
@@ -329,6 +348,7 @@ void XMLStreamParser::pop_element()
 
 	element_state_.pop_back();
 }
+
 
 XMLStreamParser::EventType XMLStreamParser::next_(bool peek)
 {
@@ -386,6 +406,7 @@ XMLStreamParser::EventType XMLStreamParser::next_(bool peek)
 
 	return e;
 }
+
 
 XMLStreamParser::EventType XMLStreamParser::next_body()
 {
@@ -487,9 +508,9 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			}
 			// Fall through.
 		}
-        // The end namespace declaration comes before the end element
-        // which means it can follow pretty much any other event.
-        //
+			// The end namespace declaration comes before the end element
+			// which means it can follow pretty much any other event.
+			//
 		default:
 		{
 			event_ = EndNamespaceDecl;
@@ -521,51 +542,51 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 
 	switch (ps.parsing)
 	{
-        case XML_INITIALIZED:
-        {
-            // As if we finished the previous chunk.
-            break;
-        }
-        case XML_PARSING:
-        {
-            assert(false);
-            return event_ = Eof;
-        }
-        case XML_FINISHED:
-        {
-            return event_ = Eof;
-        }
-        case XML_SUSPENDED:
-        {
-            switch (XML_ResumeParser(p_))
-            {
-                case XML_STATUS_SUSPENDED:
-                {
-                    // If the XMLStreamParser is again in the suspended state, then
-                    // that means we have the next event.
-                    //
-                    return event_;
-                }
-                case XML_STATUS_OK:
-                {
-                    // Otherwise, we need to get and parse the next chunk of data
-                    // unless this was the last chunk, in which case this is eof.
-                    //
-                    if (ps.finalBuffer)
-                    return event_ = Eof;
+	case XML_INITIALIZED:
+	{
+		// As if we finished the previous chunk.
+		break;
+	}
+	case XML_PARSING:
+	{
+		assert(false);
+		return event_ = Eof;
+	}
+	case XML_FINISHED:
+	{
+		return event_ = Eof;
+	}
+	case XML_SUSPENDED:
+	{
+		switch (XML_ResumeParser(p_))
+		{
+		case XML_STATUS_SUSPENDED:
+		{
+			// If the XMLStreamParser is again in the suspended state, then
+			// that means we have the next event.
+			//
+			return event_;
+		}
+		case XML_STATUS_OK:
+		{
+			// Otherwise, we need to get and parse the next chunk of data
+			// unless this was the last chunk, in which case this is eof.
+			//
+			if (ps.finalBuffer)
+				return event_ = Eof;
 
-                    break;
-                }
-                case XML_STATUS_ERROR:
-                handle_error();
-            }
-            break;
-        }
+			break;
+		}
+		case XML_STATUS_ERROR:
+			handle_error();
+		}
+		break;
+	}
 	}
 
-    // Get and parse the next chunk of data until we get the next event
-    // or reach eof.
-    //
+	// Get and parse the next chunk of data until we get the next event
+	// or reach eof.
+	//
 	if (!accumulate_)
 		event_ = Eof;
 
@@ -619,6 +640,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 	return event_;
 }
 
+
 static void splitName(const XML_Char* s, QName& qn)
 {
 	string& ns(qn.namespace_());
@@ -653,230 +675,236 @@ static void splitName(const XML_Char* s, QName& qn)
 	}
 }
 
+
 void XMLCALL XMLStreamParser::start_element_(void* v, const XML_Char* name, const XML_Char** atts)
 {
-    XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
+	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
-    XML_ParsingStatus ps;
-    XML_GetParsingStatus(p.p_, &ps);
+	XML_ParsingStatus ps;
+	XML_GetParsingStatus(p.p_, &ps);
 
-    // Expat has a (mis)-feature of a possibily calling handlers even
-    // after the non-resumable XML_StopParser call.
-    //
-    if (ps.parsing == XML_FINISHED)
-        return;
+	// Expat has a (mis)-feature of a possibily calling handlers even
+	// after the non-resumable XML_StopParser call.
+	//
+	if (ps.parsing == XML_FINISHED)
+		return;
 
-    // Cannot be a followup event.
-    //
-    assert(ps.parsing == XML_PARSING);
+	// Cannot be a followup event.
+	//
+	assert(ps.parsing == XML_PARSING);
 
-    // When accumulating characters in simple content, we expect to
-    // see more characters or end element. Seeing start element is
-    // possible but means violation of the content model.
-    //
-    if (p.accumulate_)
-    {
-        // It would have been easier to throw the exception directly,
-        // however, the Expat code is most likely not exception safe.
-        //
-        p.line_ = XML_GetCurrentLineNumber(p.p_);
-        p.column_ = XML_GetCurrentColumnNumber(p.p_);
-        XML_StopParser(p.p_, false);
-        return;
-    }
+	// When accumulating characters in simple content, we expect to
+	// see more characters or end element. Seeing start element is
+	// possible but means violation of the content model.
+	//
+	if (p.accumulate_)
+	{
+		// It would have been easier to throw the exception directly,
+		// however, the Expat code is most likely not exception safe.
+		//
+		p.line_ = XML_GetCurrentLineNumber(p.p_);
+		p.column_ = XML_GetCurrentColumnNumber(p.p_);
+		XML_StopParser(p.p_, false);
+		return;
+	}
 
-            p.event_ = StartElement;
-            splitName(name, p.qname_);
+	p.event_ = StartElement;
+	splitName(name, p.qname_);
 
-            p.line_ = XML_GetCurrentLineNumber(p.p_);
-            p.column_ = XML_GetCurrentColumnNumber(p.p_);
+	p.line_ = XML_GetCurrentLineNumber(p.p_);
+	p.column_ = XML_GetCurrentColumnNumber(p.p_);
 
-            // Handle attributes.
-            //
-            if (*atts != 0)
-            {
-                bool am((p.feature_ & RECEIVE_ATTRIBUTE_MAP) != 0);
-                bool ae((p.feature_ & RECEIVE_ATTRIBUTES_EVENT) != 0);
+	// Handle attributes.
+	//
+	if (*atts != 0)
+	{
+		bool am((p.feature_ & RECEIVE_ATTRIBUTE_MAP) != 0);
+		bool ae((p.feature_ & RECEIVE_ATTRIBUTES_EVENT) != 0);
 
-                // Provision an entry for this element.
-                //
-                ElementEntry* pe(0);
-                if (am)
-                {
-                    p.element_state_.push_back(ElementEntry(p.depth_ + 1));
-                    pe = &p.element_state_.back();
-                }
+		// Provision an entry for this element.
+		//
+		ElementEntry* pe(0);
+		if (am)
+		{
+			p.element_state_.push_back(ElementEntry(p.depth_ + 1));
+			pe = &p.element_state_.back();
+		}
 
-                if (am || ae)
-                {
-                    for (; *atts != 0; atts += 2)
-                    {
-                        if (am)
-                        {
-                            QName qn;
-                            splitName(*atts, qn);
-                            AttributeMapType::value_type v(qn, AttributeValueType());
-                            v.second.value = *(atts + 1);
-                            v.second.handled = false;
-                            pe->attr_map_.insert(v);
-                        }
-                        else
-                        {
-                            p.attr_.push_back(attribute_type());
-                            splitName(*atts, p.attr_.back().qname);
-                            p.attr_.back().value = *(atts + 1);
-                        }
-                    }
+		if (am || ae)
+		{
+			for (; *atts != 0; atts += 2)
+			{
+				if (am)
+				{
+					QName qn;
+					splitName(*atts, qn);
+					AttributeMapType::value_type v(qn, AttributeValueType());
+					v.second.value = *(atts + 1);
+					v.second.handled = false;
+					pe->attr_map_.insert(v);
+				}
+				else
+				{
+					p.attr_.push_back(attribute_type());
+					splitName(*atts, p.attr_.back().qname);
+					p.attr_.back().value = *(atts + 1);
+				}
+			}
 
-                    if (am)
-                        pe->attr_unhandled_ = pe->attr_map_.size();
-                }
-            }
+			if (am)
+				pe->attr_unhandled_ = pe->attr_map_.size();
+		}
+	}
 
-            XML_StopParser(p.p_, true);
-        }
+	XML_StopParser(p.p_, true);
+}
+
 
 void XMLCALL XMLStreamParser::end_element_(void* v, const XML_Char* name)
 {
-    XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
+	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
-    XML_ParsingStatus ps;
-    XML_GetParsingStatus(p.p_, &ps);
+	XML_ParsingStatus ps;
+	XML_GetParsingStatus(p.p_, &ps);
 
-    // Expat has a (mis)-feature of a possibily calling handlers even
-    // after the non-resumable XML_StopParser call.
-    //
-    if (ps.parsing == XML_FINISHED)
-        return;
+	// Expat has a (mis)-feature of a possibily calling handlers even
+	// after the non-resumable XML_StopParser call.
+	//
+	if (ps.parsing == XML_FINISHED)
+		return;
 
-    // This can be a followup event for empty elements (<foo/>). In this
-    // case the element name is already set.
-    //
-    if (ps.parsing != XML_PARSING)
-        p.queue_ = EndElement;
-    else
-    {
-        splitName(name, p.qname_);
+	// This can be a followup event for empty elements (<foo/>). In this
+	// case the element name is already set.
+	//
+	if (ps.parsing != XML_PARSING)
+		p.queue_ = EndElement;
+	else
+	{
+		splitName(name, p.qname_);
 
-        // If we are accumulating characters, then queue this event.
-        //
-        if (p.accumulate_)
-            p.queue_ = EndElement;
-        else
-        {
-            p.event_ = EndElement;
+		// If we are accumulating characters, then queue this event.
+		//
+		if (p.accumulate_)
+			p.queue_ = EndElement;
+		else
+		{
+			p.event_ = EndElement;
 
-            p.line_ = XML_GetCurrentLineNumber(p.p_);
-            p.column_ = XML_GetCurrentColumnNumber(p.p_);
-        }
+			p.line_ = XML_GetCurrentLineNumber(p.p_);
+			p.column_ = XML_GetCurrentColumnNumber(p.p_);
+		}
 
-        XML_StopParser(p.p_, true);
-    }
+		XML_StopParser(p.p_, true);
+	}
 }
 
-        void XMLCALL XMLStreamParser::characters_(void* v, const XML_Char* s, int n)
-        {
-            XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
-            XML_ParsingStatus ps;
-            XML_GetParsingStatus(p.p_, &ps);
-
-            // Expat has a (mis)-feature of a possibily calling handlers even
-            // after the non-resumable XML_StopParser call.
-            //
-            if (ps.parsing == XML_FINISHED)
-                return;
-
-            Content cont(p.content());
-
-            // If this is empty or complex content, see if these are whitespaces.
-            //
-            switch (cont)
-            {
-                case Content::Empty:
-                case Content::Complex:
-                {
-                    for (int i(0); i != n; ++i)
-                    {
-                        char c(s[i]);
-                        if (c == 0x20 || c == 0x0A || c == 0x0D || c == 0x09)
-                            continue;
-
-                        // It would have been easier to throw the exception directly,
-                        // however, the Expat code is most likely not exception safe.
-                        //
-                        p.line_ = XML_GetCurrentLineNumber(p.p_);
-                        p.column_ = XML_GetCurrentColumnNumber(p.p_);
-                        XML_StopParser(p.p_, false);
-                        break;
-                    }
-                    return;
-                }
-                default:
-                    break;
-            }
-
-            // Append the characters if we are accumulating. This can also be a
-            // followup event for another character event. In this case also
-            // append the data.
-            //
-            if (p.accumulate_ || ps.parsing != XML_PARSING)
-            {
-                assert(p.event_ == Characters);
-p.value_.append(s, n);
-}
-else
+void XMLCALL XMLStreamParser::characters_(void* v, const XML_Char* s, int n)
 {
-p.event_ = Characters;
-p.value_.assign(s, n);
+	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
-p.line_ = XML_GetCurrentLineNumber(p.p_);
-p.column_ = XML_GetCurrentColumnNumber(p.p_);
+	XML_ParsingStatus ps;
+	XML_GetParsingStatus(p.p_, &ps);
 
-// In simple content we need to accumulate all the characters
-// into a single event. To do this we will let the XMLStreamParser run
-// until we reach the end of the element.
-//
-if (cont == Content::Simple)
-p.accumulate_ = true;
-else
-XML_StopParser(p.p_, true);
+	// Expat has a (mis)-feature of a possibily calling handlers even
+	// after the non-resumable XML_StopParser call.
+	//
+	if (ps.parsing == XML_FINISHED)
+		return;
+
+	Content cont(p.content());
+
+	// If this is empty or complex content, see if these are whitespaces.
+	//
+	switch (cont)
+	{
+	case Content::Empty:
+	case Content::Complex:
+	{
+		for (int i(0); i != n; ++i)
+		{
+			char c(s[i]);
+			if (c == 0x20 || c == 0x0A || c == 0x0D || c == 0x09)
+				continue;
+
+			// It would have been easier to throw the exception directly,
+			// however, the Expat code is most likely not exception safe.
+			//
+			p.line_ = XML_GetCurrentLineNumber(p.p_);
+			p.column_ = XML_GetCurrentColumnNumber(p.p_);
+			XML_StopParser(p.p_, false);
+			break;
+		}
+		return;
+	}
+	default:
+		break;
+	}
+
+	// Append the characters if we are accumulating. This can also be a
+	// followup event for another character event. In this case also
+	// append the data.
+	//
+	if (p.accumulate_ || ps.parsing != XML_PARSING)
+	{
+		assert(p.event_ == Characters);
+		p.value_.append(s, n);
+	}
+	else
+	{
+		p.event_ = Characters;
+		p.value_.assign(s, n);
+
+		p.line_ = XML_GetCurrentLineNumber(p.p_);
+		p.column_ = XML_GetCurrentColumnNumber(p.p_);
+
+		// In simple content we need to accumulate all the characters
+		// into a single event. To do this we will let the XMLStreamParser run
+		// until we reach the end of the element.
+		//
+		if (cont == Content::Simple)
+			p.accumulate_ = true;
+		else
+			XML_StopParser(p.p_, true);
+	}
 }
-}
+
 
 void XMLCALL XMLStreamParser::start_namespace_decl_(void* v, const XML_Char* prefix, const XML_Char* ns)
 {
-XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
+	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
-XML_ParsingStatus ps;
-XML_GetParsingStatus(p.p_, &ps);
+	XML_ParsingStatus ps;
+	XML_GetParsingStatus(p.p_, &ps);
 
-                // Expat has a (mis)-feature of a possibily calling handlers even
-				// after the non-resumable XML_StopParser call.
-				//
-if (ps.parsing == XML_FINISHED)
-return;
+	// Expat has a (mis)-feature of a possibily calling handlers even
+	// after the non-resumable XML_StopParser call.
+	//
+	if (ps.parsing == XML_FINISHED)
+		return;
 
-p.start_ns_.push_back(QName());
-p.start_ns_.back().prefix() = (prefix != 0 ? prefix : "");
-p.start_ns_.back().namespace_() = (ns != 0 ? ns : "");
+	p.start_ns_.push_back(QName());
+	p.start_ns_.back().prefix() = (prefix != 0 ? prefix : "");
+	p.start_ns_.back().namespace_() = (ns != 0 ? ns : "");
 }
+
 
 void XMLCALL XMLStreamParser::end_namespace_decl_(void* v, const XML_Char* prefix)
 {
-XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
+	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
-XML_ParsingStatus ps;
-XML_GetParsingStatus(p.p_, &ps);
+	XML_ParsingStatus ps;
+	XML_GetParsingStatus(p.p_, &ps);
 
-            // Expat has a (mis)-feature of a possibily calling handlers even
-			// after the non-resumable XML_StopParser call.
-			//
-if (ps.parsing == XML_FINISHED)
-return;
+	// Expat has a (mis)-feature of a possibily calling handlers even
+	// after the non-resumable XML_StopParser call.
+	//
+	if (ps.parsing == XML_FINISHED)
+		return;
 
-p.end_ns_.push_back(QName());
-p.end_ns_.back().prefix() = (prefix != 0 ? prefix : "");
+	p.end_ns_.push_back(QName());
+	p.end_ns_.back().prefix() = (prefix != 0 ? prefix : "");
 }
+
 }
 }

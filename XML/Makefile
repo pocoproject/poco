@@ -12,7 +12,7 @@ COMMONFLAGS += -DXML_NS -DXML_DTD -DHAVE_EXPAT_CONFIG_H
 
 objects = AbstractContainerNode AbstractNode Attr AttrMap Attributes \
 	AttributesImpl CDATASection CharacterData ChildNodesList Comment \
-	Content ContentHandler DOMBuilder DOMException DOMImplementation DOMObject \
+	ContentHandler DOMBuilder DOMException DOMImplementation DOMObject \
 	DOMParser DOMSerializer DOMWriter DTDHandler DTDMap DeclHandler \
 	DefaultHandler Document DocumentEvent DocumentFragment DocumentType \
 	Element ElementsByTagNameList Entity EntityReference EntityResolver \
