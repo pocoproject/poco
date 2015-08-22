@@ -12,17 +12,18 @@ COMMONFLAGS += -DXML_NS -DXML_DTD -DHAVE_EXPAT_CONFIG_H
 
 objects = AbstractContainerNode AbstractNode Attr AttrMap Attributes \
 	AttributesImpl CDATASection CharacterData ChildNodesList Comment \
-	ContentHandler DOMBuilder DOMException DOMImplementation DOMObject \
+	Content ContentHandler DOMBuilder DOMException DOMImplementation DOMObject \
 	DOMParser DOMSerializer DOMWriter DTDHandler DTDMap DeclHandler \
 	DefaultHandler Document DocumentEvent DocumentFragment DocumentType \
 	Element ElementsByTagNameList Entity EntityReference EntityResolver \
 	EntityResolverImpl ErrorHandler Event EventDispatcher EventException \
 	EventListener EventTarget InputSource LexicalHandler Locator LocatorImpl \
 	MutationEvent Name NamePool NamedNodeMap NamespaceStrategy \
-	NamespaceSupport Node NodeFilter NodeIterator NodeList Notation \
-	ParserEngine ProcessingInstruction SAXException SAXParser Text \
+	NamespaceSupport NodeAppender Node NodeFilter NodeIterator NodeList Notation \
+	ParserEngine ProcessingInstruction QName SAXException SAXParser Text \
 	TreeWalker WhitespaceFilter XMLException XMLFilter XMLFilterImpl XMLReader \
-	XMLString XMLWriter NodeAppender 
+	XMLString XMLWriter XMLStreamParser XMLStreamParserException XMLStreamSerializer \
+	XMLStreamSerializerException char-props genx
 
 expat_objects = xmlparse xmlrole xmltok
 
