@@ -4,7 +4,7 @@
 #
 # A script for running the POCO testsuites.
 #
-# usage: runtests [component] [test]
+# usage: runtests [component [test] ]
 #
 # If the environment variable EXCLUDE_TESTS is set, containing
 # a space-separated list of project names (as found in the
