@@ -27,14 +27,14 @@ XMLStreamParserException::~XMLStreamParserException() throw ()
 
 
 XMLStreamParserException::XMLStreamParserException(const string& n, Poco::UInt64 l, Poco::UInt64 c, const string& d)
-	: name_(n), line_(l), column_(c), description_(d)
+	: _name(n), _line(l), _column(c), _description(d)
 {
 	init();
 }
 
 
 XMLStreamParserException::XMLStreamParserException(const XMLStreamParser& p, const std::string& d)
-	: name_(p.input_name()), line_(p.line()), column_(p.column()), description_(d)
+	: _name(p.inputName()), _line(p.line()), _column(p.column()), _description(d)
 {
 	init();
 }
@@ -43,16 +43,36 @@ XMLStreamParserException::XMLStreamParserException(const XMLStreamParser& p, con
 void XMLStreamParserException::init()
 {
 	std::ostringstream os;
-	if (!name_.empty())
-		os << name_ << ':';
-	os << line_ << ':' << column_ << ": error: " << description_;
-	what_ = os.str();
+	if (!_name.empty())
+		os << _name << ':';
+	os << _line << ':' << _column << ": error: " << _description;
+	_what = os.str();
 }
 
 
+const char* XMLStreamParserException::name() const throw()
+{
+	return _name.c_str();
+}
+
+Poco::UInt64 XMLStreamParserException::line() const
+{
+	return _line;
+}
+
+Poco::UInt64 XMLStreamParserException::column() const
+{
+	return _column;
+}
+
+const std::string& XMLStreamParserException::description() const
+{
+	return _description;
+}
+
 char const* XMLStreamParserException::what() const throw ()
 {
-	return what_.c_str();
+	return _what.c_str();
 }
 
 

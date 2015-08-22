@@ -31,36 +31,20 @@ public:
 
 	virtual ~XMLStreamParserException() throw ();
 
-	const char* name() const throw()
-	{
-		return name_.c_str();
-	}
-
-	Poco::UInt64 line() const
-	{
-		return line_;
-	}
-
-	Poco::UInt64 column() const
-	{
-		return column_;
-	}
-
-	const std::string& description() const
-	{
-		return description_;
-	}
-
+	const char* name() const throw();
+	Poco::UInt64 line() const;
+	Poco::UInt64 column() const;
+	const std::string& description() const;
 	virtual const char* what() const throw ();
 
 private:
 	void init();
 
-	std::string name_;
-	Poco::UInt64 line_;
-	Poco::UInt64 column_;
-	std::string description_;
-	std::string what_;
+	std::string _name;
+	Poco::UInt64 _line;
+	Poco::UInt64 _column;
+	std::string _description;
+	std::string _what;
 };
 
 }

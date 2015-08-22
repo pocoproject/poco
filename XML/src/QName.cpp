@@ -12,16 +12,42 @@ namespace Poco
 namespace XML
 {
 
+QName::QName()
+{
+}
+
+
+QName::QName(const std::string& name) :
+	_name(name)
+{
+}
+
+
+QName::QName(const std::string& ns, const std::string& name) :
+	_ns(ns),
+	_name(name)
+{
+}
+
+
+QName::QName(const std::string& ns, const std::string& name, const std::string& prefix) :
+	_ns(ns),
+	_name(name),
+	_prefix(prefix)
+{
+}
+
+
 string QName::string() const
 {
 	std::string r;
-	if (!ns_.empty())
+	if (!_ns.empty())
 	{
-		r += ns_;
+		r += _ns;
 		r += '#';
 	}
 
-	r += name_;
+	r += _name;
 	return r;
 }
 

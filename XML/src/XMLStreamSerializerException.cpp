@@ -25,45 +25,45 @@ XMLStreamSerializerException::~XMLStreamSerializerException() throw ()
 }
 
 XMLStreamSerializerException::XMLStreamSerializerException(const string& n, const string& d)
-	: name_(n), description_(d)
+	: _name(n), _description(d)
 {
 	init();
 }
 
 XMLStreamSerializerException::XMLStreamSerializerException(const XMLStreamSerializer& s, const std::string& d)
-	: name_(s.outputName()), description_(d)
+	: _name(s.outputName()), _description(d)
 {
 	init();
 }
 
 void XMLStreamSerializerException::init()
 {
-	if (!name_.empty())
+	if (!_name.empty())
 	{
-		what_ += name_;
-		what_ += ": ";
+		_what += _name;
+		_what += ": ";
 	}
 
-	what_ += "error: ";
-	what_ += description_;
+	_what += "error: ";
+	_what += _description;
 }
 
 
 const char* XMLStreamSerializerException::name() const throw ()
 {
-	return name_.c_str();
+	return _name.c_str();
 }
 
 
 const std::string& XMLStreamSerializerException::description() const
 {
-	return description_;
+	return _description;
 }
 
 
 char const* XMLStreamSerializerException::what() const throw ()
 {
-	return what_.c_str();
+	return _what.c_str();
 }
 
 } /* namespace XML */

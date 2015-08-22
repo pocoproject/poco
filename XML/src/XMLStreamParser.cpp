@@ -17,7 +17,6 @@ namespace Poco
 namespace XML
 {
 
-
 struct stream_exception_controller
 {
 	~stream_exception_controller()
@@ -160,6 +159,7 @@ void XMLStreamParser::handle_error()
 		throw XMLStreamParserException(iname_, XML_GetCurrentLineNumber(p_), XML_GetCurrentColumnNumber(p_), XML_ErrorString(e));
 }
 
+
 XMLStreamParser::EventType XMLStreamParser::next()
 {
 	if (state_ == state_next)
@@ -174,7 +174,7 @@ XMLStreamParser::EventType XMLStreamParser::next()
 		case EndElement:
 		{
 			if (!element_state_.empty() && element_state_.back().depth == depth_)
-				pop_element();
+				popElement();
 
 			depth_--;
 			break;
@@ -329,7 +329,7 @@ const XMLStreamParser::ElementEntry* XMLStreamParser::get_element_() const
 }
 
 
-void XMLStreamParser::pop_element()
+void XMLStreamParser::popElement()
 {
 	// Make sure there are no unhandled attributes left.
 	//
@@ -372,7 +372,7 @@ XMLStreamParser::EventType XMLStreamParser::next_(bool peek)
 		if (!peek)
 		{
 			if (!element_state_.empty() && element_state_.back().depth == depth_)
-				pop_element();
+				popElement();
 
 			depth_--;
 		}

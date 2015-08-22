@@ -2,8 +2,8 @@
 // copyright : Copyright (c) 2013-2014 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
 
-#ifndef POCO_XML_XMLSERIALIZER
-#define POCO_XML_XMLSERIALIZER
+#ifndef POCO_XML_XMLSERIALIZER_H
+#define POCO_XML_XMLSERIALIZER_H
 
 #include "QName.h"
 #include "ValueTraits.h"
@@ -17,7 +17,6 @@ namespace Poco
 {
 namespace XML
 {
-class XMLStreamSerializer;
 
 class XML_API XMLStreamSerializer
 {
@@ -32,13 +31,13 @@ public:
 	// Otherwise, those are reported as the XMLStreamSerializerException exception.
 	//
 	XMLStreamSerializer(std::ostream&, const std::string& output_name, unsigned short indentation = 2);
+	~XMLStreamSerializer();
 
 	const std::string& outputName() const
 	{
-		return oname_;
+		return _oname;
 	}
 
-	~XMLStreamSerializer();
 
 	void startElement(const QName& qname);
 
@@ -128,13 +127,13 @@ private:
 
 	void handleError(genxStatus);
 
-	std::ostream& os_;
-	std::ostream::iostate os_state_;// Original exception state.
-	const std::string oname_;
+	std::ostream& _outputStream;
+	std::ostream::iostate _osState_;// Original exception state.
+	const std::string _oname;
 
-	genxWriter s_;
-	genxSender sender_;
-	std::size_t depth_;
+	genxWriter _writer;
+	genxSender _sender;
+	std::size_t _depth;
 };
 
 inline void XMLStreamSerializer::startElement(const QName& qname)

@@ -36,10 +36,9 @@ struct XML_API XMLStreamSerializerException:
 private:
 	void init();
 
-private:
-	std::string name_;
-	std::string description_;
-	std::string what_;
+	std::string _name;
+	std::string _description;
+	std::string _what;
 };
 
 }

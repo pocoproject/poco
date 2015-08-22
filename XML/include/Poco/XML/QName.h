@@ -23,49 +23,35 @@ namespace XML
 class XML_API QName
 {
 public:
-	QName()
-	{
-	}
-	QName(const std::string& name) :
-		name_(name)
-	{
-	}
-	QName(const std::string& ns, const std::string& name) :
-		ns_(ns),
-		name_(name)
-	{
-	}
-	QName(const std::string& ns, const std::string& name, const std::string& prefix) :
-		ns_(ns),
-		name_(name),
-		prefix_(prefix)
-	{
-	}
+	QName();
+	QName(const std::string& name);
+	QName(const std::string& ns, const std::string& name);
+	QName(const std::string& ns, const std::string& name, const std::string& prefix);
 
 	const std::string& namespace_() const
 	{
-		return ns_;
+		return _ns;
 	}
 	const std::string& name() const
 	{
-		return name_;
+		return _name;
 	}
 	const std::string& prefix() const
 	{
-		return prefix_;
+		return _prefix;
 	}
 
 	std::string& namespace_()
 	{
-		return ns_;
+		return _ns;
 	}
 	std::string& name()
 	{
-		return name_;
+		return _name;
 	}
 	std::string& prefix()
 	{
-		return prefix_;
+		return _prefix;
 	}
 
 	// Printable representation in the [<namespace>#]<name> form.
@@ -77,12 +63,12 @@ public:
 public:
 	friend bool operator<(const QName& x, const QName& y)
 	{
-		return x.ns_ < y.ns_ || (x.ns_ == y.ns_ && x.name_ < y.name_);
+		return x._ns < y._ns || (x._ns == y._ns && x._name < y._name);
 	}
 
 	friend bool operator==(const QName& x, const QName& y)
 	{
-		return x.ns_ == y.ns_ && x.name_ == y.name_;
+		return x._ns == y._ns && x._name == y._name;
 	}
 
 	friend bool operator!=(const QName& x, const QName& y)
@@ -91,9 +77,9 @@ public:
 	}
 
 private:
-	std::string ns_;
-	std::string name_;
-	std::string prefix_;
+	std::string _ns;
+	std::string _name;
+	std::string _prefix;
 };
 
 XML_API std::ostream& operator<<(std::ostream&, const QName&);

@@ -2,8 +2,8 @@
 // copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
 
-#ifndef POCO_XML_PARSER_HXX
-#define POCO_XML_PARSER_HXX
+#ifndef POCO_XML_XMLSTREAMPARSER_H
+#define POCO_XML_XMLSTREAMPARSER_H
 
 // We only support UTF-8 expat.
 //
@@ -31,6 +31,21 @@ namespace XML
 class XML_API XMLStreamParser
 {
 public:
+	/// Parsing events.
+	enum EventType
+	{
+		// If adding new events, also update the stream insertion operator.
+		//
+		StartElement,
+		EndElement,
+		StartAttribute,
+		EndAttribute,
+		Characters,
+		StartNamespaceDecl,
+		EndNamespaceDecl,
+		Eof
+	};
+
 	typedef unsigned short FeatureType;
 
 	// If both receive_attributes_event and receive_attributes_map are
@@ -58,27 +73,7 @@ public:
 	//
 	XMLStreamParser(const void* data, std::size_t size, const std::string& input_name, FeatureType = RECEIVE_DEFAULT);
 
-	const std::string& input_name() const
-	{
-		return iname_;
-	}
-
 	~XMLStreamParser();
-
-	/// Parsing events.
-	enum EventType
-	{
-		// If adding new events, also update the stream insertion operator.
-		//
-		StartElement,
-		EndElement,
-		StartAttribute,
-		EndAttribute,
-		Characters,
-		StartNamespaceDecl,
-		EndNamespaceDecl,
-		Eof
-	};
 
 	EventType next();
 
@@ -101,6 +96,11 @@ public:
 	EventType event()
 	{
 		return event_;
+	}
+
+	const std::string& inputName() const
+	{
+		return iname_;
 	}
 
 	// Event data.
@@ -160,8 +160,7 @@ public:
 	// the map is still valid after peek() that returned end_element until
 	// this end_element event is retrieved with next().
 	//
-	const std::string&
-	attribute(const std::string& name) const;
+	const std::string& attribute(const std::string& name) const;
 
 	template<typename T>
 	T attribute(const std::string& name) const;
@@ -316,7 +315,8 @@ private:
 	{
 		std::istream* is;
 		const void* buf;
-	}data_;
+	}
+	data_;
 
 	std::size_t size_;
 
@@ -329,7 +329,8 @@ private:
 	enum
 	{
 		state_next, state_peek
-	}state_;
+	}
+	state_;
 	EventType event_;
 	EventType queue_;
 
@@ -399,7 +400,7 @@ private:
 
 	const ElementEntry* get_element_() const;
 
-	void pop_element();
+	void popElement();
 };
 
 XML_API std::ostream& operator<<(std::ostream&, XMLStreamParser::EventType);
@@ -608,6 +609,7 @@ T XMLStreamParser::element(const QName& qn, const T& dv)
 
 	return dv;
 }
+
 }
 }
 
