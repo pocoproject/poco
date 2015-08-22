@@ -1,19 +1,36 @@
-// file      : xml/XMLStreamSerializer.cxx
+//
+// XMLStreamSerializer.cpp
+//
+// $Id$
+//
+// Library: XML
+// Package: XML
+// Module:  XMLStreamSerializer
+//
+// Definition of the XMLStreamSerializer class.
+//
+// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
 // copyright : Copyright (c) 2013-2014 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
 
+
 #include "Poco/XML/XMLStreamSerializer.h"
 #include "Poco/XML/XMLStreamSerializerException.h"
-
 #include <new>     // std::bad_alloc
 #include <cstring> // std::strlen
 
+
 using namespace std;
+
 
 namespace Poco
 {
 namespace XML
 {
+
 
 extern "C" genxStatus genx_write(void* p, constUtf8 us)
 {
@@ -52,8 +69,11 @@ XMLStreamSerializer::~XMLStreamSerializer()
 }
 
 
-XMLStreamSerializer::XMLStreamSerializer(ostream& os, const string& oname, unsigned short ind)
-		: _outputStream(os), _osState_(os.exceptions()), _oname(oname), _depth(0)
+XMLStreamSerializer::XMLStreamSerializer(ostream& os, const string& oname, unsigned short ind) :
+		_outputStream(os),
+		_lastStreamState(os.exceptions()),
+		_outputName(oname),
+		_depth(0)
 {
 	// Temporarily disable exceptions on the stream.
 	//
@@ -97,10 +117,10 @@ void XMLStreamSerializer::handleError(genxStatus e)
 		// configure the stream to throw), then fall back to the
 		// serialiation exception.
 		//
-		_outputStream.exceptions(_osState_);
+		_outputStream.exceptions(_lastStreamState);
 		// Fall through.
 	default:
-		throw XMLStreamSerializerException(_oname, genxGetErrorMessage(_writer, e));
+		throw XMLStreamSerializerException(_outputName, genxGetErrorMessage(_writer, e));
 	}
 }
 
@@ -128,7 +148,7 @@ void XMLStreamSerializer::endElement()
 
 		// Also restore the original exception state on the stream.
 		//
-		_outputStream.exceptions(_osState_);
+		_outputStream.exceptions(_lastStreamState);
 	}
 }
 
@@ -149,7 +169,7 @@ void XMLStreamSerializer::startAttribute(const string& ns, const string& name)
 
 const std::string& XMLStreamSerializer::outputName() const
 {
-	return _oname;
+	return _outputName;
 }
 
 
@@ -207,6 +227,7 @@ bool XMLStreamSerializer::lookupNamespacePrefix(const string& ns, string& p)
 	p = reinterpret_cast<const char*>(genxGetNamespacePrefix(gns));
 	return true;
 }
+
 
 }
 }

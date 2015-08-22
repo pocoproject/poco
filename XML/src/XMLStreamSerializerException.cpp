@@ -1,14 +1,21 @@
-///
-/// \package metamodel
-/// \file XMLStreamException.cpp
-///
-/// \author Marian Krivos <marian.krivos@rsys.sk>
-/// \date Aug 21, 2015 - 6:52:24 PM
-/// \brief definicia typu
-///
-/// (C) Copyright 2015 R-SYS,s.r.o
-/// All rights reserved.
-///
+//
+// XMLStreamSerializerException.cpp
+//
+// $Id$
+//
+// Library: XML
+// Package: XML
+// Module:  XMLStreamSerializerException
+//
+// Definition of the XMLStreamSerializerException class.
+//
+// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+// copyright : Copyright (c) 2013-2014 Code Synthesis Tools CC
+// license   : MIT; see accompanying LICENSE file
+
 
 #include "Poco/XML/XMLStreamParserException.h"
 #include "Poco/XML/XMLStreamSerializer.h"

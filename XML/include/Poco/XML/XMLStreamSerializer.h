@@ -1,13 +1,13 @@
 //
-// XMLStreamParser.h
+// XMLStreamSerializer.h
 //
 // $Id$
 //
 // Library: XML
 // Package: XML
-// Module:  XMLStreamParser
+// Module:  XMLStreamSerializer
 //
-// Definition of the XMLStreamParser class.
+// Definition of the XMLStreamSerializer class.
 //
 // Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -17,8 +17,8 @@
 // license   : MIT; see accompanying LICENSE file
 
 
-#ifndef POCO_XML_XMLSERIALIZER_H
-#define POCO_XML_XMLSERIALIZER_H
+#ifndef POCO_XML_XMLSERIALIZER_Included
+#define POCO_XML_XMLSERIALIZER_Included
 
 
 #include "QName.h"
@@ -119,8 +119,8 @@ private:
 	void handleError(genxStatus);
 
 	std::ostream& _outputStream;
-	std::ostream::iostate _osState_;// Original exception state.
-	const std::string _oname;
+	std::ostream::iostate _lastStreamState;// Original exception state.
+	const std::string _outputName;
 
 	genxWriter _writer;
 	genxSender _sender;
