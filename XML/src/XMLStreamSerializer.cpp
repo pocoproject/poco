@@ -147,6 +147,12 @@ void XMLStreamSerializer::startAttribute(const string& ns, const string& name)
 }
 
 
+const std::string& XMLStreamSerializer::outputName() const
+{
+	return _oname;
+}
+
+
 void XMLStreamSerializer::endAttribute()
 {
 	if (genxStatus e = genxEndAttribute(_writer))

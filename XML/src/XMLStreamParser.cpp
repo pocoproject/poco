@@ -1,4 +1,18 @@
-// file      : cutl/xml/XMLStreamParser.cxx
+//
+// XMLStreamParser.cpp
+//
+// $Id$
+//
+// Library: XML
+// Package: XML
+// Module:  XMLStreamParser
+//
+// Definition of the XMLStreamParser class.
+//
+// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
 // copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
 
@@ -74,6 +88,24 @@ static const char* parser_event_str[] =
 ostream& operator<<(ostream& os, XMLStreamParser::EventType e)
 {
 	return os << parser_event_str[e];
+}
+
+
+XMLStreamParser::XMLStreamParser(std::istream& is, const std::string& iname, FeatureType f)
+	: size_(0), iname_(iname), feature_(f)
+{
+	data_.is = &is;
+	init();
+}
+
+
+XMLStreamParser::XMLStreamParser(const void* data, std::size_t size, const std::string& iname, FeatureType f)
+	: size_(size), iname_(iname), feature_(f)
+{
+	assert(data != 0 && size != 0);
+
+	data_.buf = data;
+	init();
 }
 
 
@@ -297,7 +329,7 @@ string XMLStreamParser::element()
 
 string XMLStreamParser::element(const QName& qn, const string& dv)
 {
-	if (peek() == StartElement && qname() == qn)
+	if (peek() == StartElement && getQName() == qn)
 	{
 		next();
 		return element();
@@ -905,6 +937,7 @@ void XMLCALL XMLStreamParser::end_namespace_decl_(void* v, const XML_Char* prefi
 	p.end_ns_.push_back(QName());
 	p.end_ns_.back().prefix() = (prefix != 0 ? prefix : "");
 }
+
 
 }
 }

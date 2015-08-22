@@ -1,9 +1,26 @@
-// file      : XMLStreamParser.hxx
+//
+// XMLStreamParser.h
+//
+// $Id$
+//
+// Library: XML
+// Package: XML
+// Module:  XMLStreamParser
+//
+// Definition of the XMLStreamParser class.
+//
+// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
 // copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
+//
 
-#ifndef POCO_XML_XMLSTREAMPARSER_H
-#define POCO_XML_XMLSTREAMPARSER_H
+
+#ifndef POCO_XML_XMLSTREAMPARSER_INCLUDED
+#define POCO_XML_XMLSTREAMPARSER_INCLUDED
+
 
 // We only support UTF-8 expat.
 //
@@ -15,7 +32,6 @@
 #include "Poco/XML/ValueTraits.h"
 #include "Poco/XML/Content.h"
 #include <Poco/XML/expat.h>
-
 #include <map>
 #include <vector>
 #include <string>
@@ -28,14 +44,61 @@ namespace Poco
 {
 namespace XML
 {
+
+
 class XML_API XMLStreamParser
+	/// The streaming XML pull parser and streaming XML serializer. The parser
+	/// is a conforming, non-validating XML 1.0 implementation (see Implementation Notes
+	/// for details). The application character encoding (that is, the encoding used
+	/// in the application's memory) for both parser and serializer is UTF-8.
+	/// The output encoding of the serializer is UTF-8 as well. The parser supports
+	/// UTF-8, UTF-16, ISO-8859-1, and US-ASCII input encodings.
+	///
+	/// Attribute map:
+	///
+	/// Attribute map lookup. If attribute is not found, then the version
+	/// without the default value throws an appropriate parsing exception
+	/// while the version with the default value returns that value.
+	///
+	/// Note also that there is no attribute(ns,name) version since it
+	/// would conflict with attribute(name,dv) (qualified attributes
+	/// are not very common).
+	///
+	/// Attribute map is valid throughout at the "element level" until
+	/// end_element and not just during startElement. As a special case,
+	/// the map is still valid after peek() that returned end_element until
+	/// this end_element event is retrieved with next().
+	///
+	/// For more information see: http://www.codesynthesis.com/projects/libstudxml/doc/intro.xhtml
+	///
+	/// Using parser:
+	/// @code
+	/// XMLStreamParser p (ifs, argv[1]);
+	/// for (XMLStreamParser::EventType e: p)
+	/// {
+	/// switch (e)
+	/// {
+	/// case XMLStreamParser::startElement:
+	///     cerr << p.line () << ':' << p.column () << ": start " << p.name () << endl; break;
+	/// case XMLStreamParser::endElement:
+	///     cerr << p.line () << ':' << p.column () << ": end " << p.name () << endl; break;
+	/// case XMLStreamParser::startAttribute:
+	///     ...
+	/// case XMLStreamParser::endAttribute:
+	///     ...
+	/// case XMLStreamParser::characters:
+	///     ...
+	///   }
+	/// }
+	/// @endcode
+	///
 {
 public:
+
 	/// Parsing events.
 	enum EventType
 	{
 		// If adding new events, also update the stream insertion operator.
-		//
 		StartElement,
 		EndElement,
 		StartAttribute,
@@ -56,133 +119,7 @@ public:
 	static const FeatureType RECEIVE_ATTRIBUTE_MAP = 0x0004;
 	static const FeatureType RECEIVE_ATTRIBUTES_EVENT = 0x0008;
 	static const FeatureType RECEIVE_NAMESPACE_DECLS = 0x0010;
-
 	static const FeatureType RECEIVE_DEFAULT = RECEIVE_ELEMENTS | RECEIVE_CHARACTERS | RECEIVE_ATTRIBUTE_MAP;
-
-	// Parse std::istream. Input name is used in diagnostics to identify
-	// the document being parsed.
-	//
-	// If stream exceptions are enabled then std::ios_base::failure
-	// exception is used to report io errors (badbit and failbit).
-	// Otherwise, those are reported as the parsing exception.
-	//
-	XMLStreamParser(std::istream&, const std::string& input_name, FeatureType = RECEIVE_DEFAULT);
-
-	// Parse memory buffer that contains the whole document. Input name
-	// is used in diagnostics to identify the document being parsed.
-	//
-	XMLStreamParser(const void* data, std::size_t size, const std::string& input_name, FeatureType = RECEIVE_DEFAULT);
-
-	~XMLStreamParser();
-
-	EventType next();
-
-	// Get the next event and make sure that it's what's expected. If it
-	// is not, then throw an appropriate parsing exception.
-	//
-	void nextExpect(EventType);
-
-	void nextExpect(EventType, const std::string& name);
-
-	void nextExpect(EventType, const QName& qname);
-
-	void nextExpect(EventType, const std::string& ns, const std::string& name);
-
-	EventType peek();
-
-	// Return the even that was last returned by the call to next() or
-	// peek().
-	//
-	EventType event()
-	{
-		return event_;
-	}
-
-	const std::string& inputName() const
-	{
-		return iname_;
-	}
-
-	// Event data.
-	//
-	const QName& qname() const
-	{
-		return *pqname_;
-	}
-
-	const std::string& namespace_() const
-	{
-		return pqname_->namespace_();
-	}
-
-	const std::string& name() const
-	{
-		return pqname_->name();
-	}
-
-	const std::string& prefix() const
-	{
-		return pqname_->prefix();
-	}
-
-	std::string& value()
-	{
-		return *pvalue_;
-	}
-
-	const std::string& value() const
-	{
-		return *pvalue_;
-	}
-
-	template<typename T> T value() const;
-
-	Poco::UInt64 line() const
-	{
-		return line_;
-	}
-
-	Poco::UInt64 column() const
-	{
-		return column_;
-	}
-
-	// Attribute map lookup. If attribute is not found, then the version
-	// without the default value throws an appropriate parsing exception
-	// while the version with the default value returns that value.
-	//
-	// Note also that there is no attribute(ns,name) version since it
-	// would conflict with attribute(name,dv) (qualified attributes
-	// are not very common).
-	//
-	// Attribute map is valid throughout at the "element level" until
-	// end_element and not just during startElement. As a special case,
-	// the map is still valid after peek() that returned end_element until
-	// this end_element event is retrieved with next().
-	//
-	const std::string& attribute(const std::string& name) const;
-
-	template<typename T>
-	T attribute(const std::string& name) const;
-
-	std::string attribute(const std::string& name, const std::string& default_value) const;
-
-	template<typename T>
-	T attribute(const std::string& name, const T& default_value) const;
-
-	const std::string& attribute(const QName& qname) const;
-
-	template<typename T>
-	T attribute(const QName& qname) const;
-
-	std::string attribute(const QName& qname, const std::string& default_value) const;
-
-	template<typename T>
-	T attribute(const QName& qname, const T& default_value) const;
-
-	bool attributePresent(const std::string& name) const;
-
-	bool attributePresent(const QName& qname) const;
 
 	// Low-level attribute map access. Note that this API assumes
 	// all attributes are handled.
@@ -195,57 +132,6 @@ public:
 
 	typedef std::map<QName, AttributeValueType> AttributeMapType;
 
-	const AttributeMapType& attributeMap() const;
-
-	// Optional content processing.
-	//
-
-	// Note that you cannot get/set content while peeking.
-	//
-	void content(Content);
-
-	Content content() const;
-
-	// Versions that also set the content. Event type must be startElement.
-	//
-	void nextExpect(EventType, const std::string& name, Content);
-
-	void nextExpect(EventType, const QName& qname, Content);
-
-	void nextExpect(EventType, const std::string& ns, const std::string& name, Content);
-
-	// Helpers for parsing elements with simple content. The first two
-	// functions assume that startElement has already been parsed. The
-	// rest parse the complete element, from start to end.
-	//
-	// Note also that as with attribute(), there is no (namespace,name)
-	// overload since it would conflicts with (namespace,default_value).
-	//
-	std::string element();
-
-	template<typename T>
-	T element();
-
-	std::string element(const std::string& name);
-
-	std::string element(const QName& qname);
-
-	template<typename T>
-	T element(const std::string& name);
-
-	template<typename T>
-	T element(const QName& qname);
-
-	std::string element(const std::string& name, const std::string& default_value);
-
-	std::string element(const QName& qname, const std::string& default_value);
-
-	template<typename T>
-	T element(const std::string& name, const T& default_value);
-
-	template<typename T>
-	T element(const QName& qname, const T& default_value);
-
 	// C++11 range-based for support. Generally, the iterator interface
 	// doesn't make much sense for the XMLStreamParser so for now we have an
 	// implementation that is just enough to the range-based for.
@@ -255,8 +141,8 @@ public:
 		typedef EventType value_type;
 
 		Iterator(XMLStreamParser* p = 0, EventType e = Eof) :
-		p_(p),
-		e_(e)
+			p_(p),
+			e_(e)
 		{
 		}
 		value_type operator*() const
@@ -293,6 +179,102 @@ public:
 	{
 		return Iterator(this, Eof);
 	}
+
+
+	XMLStreamParser(std::istream&, const std::string& input_name, FeatureType = RECEIVE_DEFAULT);
+		/// The parser constructor takes three arguments: the stream to parse,
+		/// input name that is used in diagnostics to identify the document being
+		/// parsed, and the list of events we want the parser to report.
+		///
+		/// Parse std::istream. Input name is used in diagnostics to identify
+		/// the document being parsed.
+		///
+		/// If stream exceptions are enabled then std::ios_base::failure
+		/// exception is used to report io errors (badbit and failbit).
+		/// Otherwise, those are reported as the parsing exception.
+
+	XMLStreamParser(const void* data, std::size_t size, const std::string& input_name, FeatureType = RECEIVE_DEFAULT);
+		/// Parse memory buffer that contains the whole document. Input name
+		/// is used in diagnostics to identify the document being parsed.
+
+	~XMLStreamParser();
+
+	EventType next();
+		/// Call the next() function when we are ready to handle the next piece of XML.
+
+	void nextExpect(EventType);
+		/// Get the next event and make sure that it's what's expected. If it
+		/// is not, then throw an appropriate parsing exception.
+
+	void nextExpect(EventType, const std::string& name);
+	void nextExpect(EventType, const QName& qname);
+	void nextExpect(EventType, const std::string& ns, const std::string& name);
+
+	EventType peek();
+	EventType event();
+		// Return the even that was last returned by the call to next() or peek().
+
+	const std::string& inputName() const;
+	const QName& getQName() const;
+	const std::string& namespace_() const;
+	const std::string& name() const;
+	const std::string& prefix() const;
+	std::string& value();
+	const std::string& value() const;
+	template<typename T> T value() const;
+	Poco::UInt64 line() const;
+	Poco::UInt64 column() const;
+	const std::string& attribute(const std::string& name) const;
+	template<typename T>
+	T attribute(const std::string& name) const;
+	std::string attribute(const std::string& name, const std::string& default_value) const;
+	template<typename T>
+	T attribute(const std::string& name, const T& default_value) const;
+	const std::string& attribute(const QName& qname) const;
+	template<typename T>
+	T attribute(const QName& qname) const;
+	std::string attribute(const QName& qname, const std::string& default_value) const;
+	template<typename T>
+	T attribute(const QName& qname, const T& default_value) const;
+	bool attributePresent(const std::string& name) const;
+	bool attributePresent(const QName& qname) const;
+
+	const AttributeMapType& attributeMap() const;
+
+	// Note that you cannot get/set content while peeking.
+	//
+	void content(Content);
+	Content content() const;
+
+	// Versions that also set the content. Event type must be startElement.
+	//
+	void nextExpect(EventType, const std::string& name, Content);
+	void nextExpect(EventType, const QName& qname, Content);
+	void nextExpect(EventType, const std::string& ns, const std::string& name, Content);
+
+	// Helpers for parsing elements with simple content. The first two
+	// functions assume that startElement has already been parsed. The
+	// rest parse the complete element, from start to end.
+	//
+	// Note also that as with attribute(), there is no (namespace,name)
+	// overload since it would conflicts with (namespace,default_value).
+	//
+	std::string element();
+
+	template<typename T>
+	T element();
+	std::string element(const std::string& name);
+	std::string element(const QName& qname);
+	template<typename T>
+	T element(const std::string& name);
+	template<typename T>
+	T element(const QName& qname);
+	std::string element(const std::string& name, const std::string& default_value);
+	std::string element(const QName& qname, const std::string& default_value);
+	template<typename T>
+	T element(const std::string& name, const T& default_value);
+	template<typename T>
+	T element(const QName& qname, const T& default_value);
 
 private:
 	XMLStreamParser(const XMLStreamParser&);
@@ -405,20 +387,56 @@ private:
 
 XML_API std::ostream& operator<<(std::ostream&, XMLStreamParser::EventType);
 
-inline XMLStreamParser::XMLStreamParser(std::istream& is, const std::string& iname, FeatureType f)
-	: size_(0), iname_(iname), feature_(f)
+inline XMLStreamParser::EventType XMLStreamParser::event()
+	// Return the even that was last returned by the call to next() or peek().
 {
-	data_.is = &is;
-	init();
+	return event_;
 }
 
-inline XMLStreamParser::XMLStreamParser(const void* data, std::size_t size, const std::string& iname, FeatureType f)
-	: size_(size), iname_(iname), feature_(f)
+inline const std::string& XMLStreamParser::inputName() const
 {
-	assert(data != 0 && size != 0);
+	return iname_;
+}
 
-	data_.buf = data;
-	init();
+inline const QName& XMLStreamParser::getQName() const
+{
+	return *pqname_;
+}
+
+inline const std::string& XMLStreamParser::namespace_() const
+{
+	return pqname_->namespace_();
+}
+
+inline const std::string& XMLStreamParser::name() const
+{
+	return pqname_->name();
+}
+
+inline const std::string& XMLStreamParser::prefix() const
+{
+	return pqname_->prefix();
+}
+
+inline std::string& XMLStreamParser::value()
+{
+	return *pvalue_;
+}
+
+inline const std::string& XMLStreamParser::value() const
+{
+	return *pvalue_;
+}
+
+
+inline Poco::UInt64 XMLStreamParser::line() const
+{
+	return line_;
+}
+
+inline Poco::UInt64 XMLStreamParser::column() const
+{
+	return column_;
 }
 
 inline XMLStreamParser::EventType XMLStreamParser::peek()
@@ -601,7 +619,7 @@ T XMLStreamParser::attribute(const QName& qn, const T& dv) const
 template<typename T>
 T XMLStreamParser::element(const QName& qn, const T& dv)
 {
-	if (peek() == StartElement && qname() == qn)
+	if (peek() == StartElement && getQName() == qn)
 	{
 		next();
 		return element<T>();
@@ -610,7 +628,9 @@ T XMLStreamParser::element(const QName& qn, const T& dv)
 	return dv;
 }
 
+
 }
 }
+
 
 #endif // CUTL_XML_PARSER_HXX
