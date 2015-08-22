@@ -92,19 +92,19 @@ ostream& operator<<(ostream& os, XMLStreamParser::EventType e)
 
 
 XMLStreamParser::XMLStreamParser(std::istream& is, const std::string& iname, FeatureType f)
-	: size_(0), iname_(iname), feature_(f)
+	: _size(0), _inputName(iname), feature_(f)
 {
-	data_.is = &is;
+	_data.is = &is;
 	init();
 }
 
 
 XMLStreamParser::XMLStreamParser(const void* data, std::size_t size, const std::string& iname, FeatureType f)
-	: size_(size), iname_(iname), feature_(f)
+	: _size(size), _inputName(iname), feature_(f)
 {
 	assert(data != 0 && size != 0);
 
-	data_.buf = data;
+	_data.buf = data;
 	init();
 }
 
@@ -119,17 +119,17 @@ XMLStreamParser::~XMLStreamParser()
 void XMLStreamParser::init()
 {
 	depth_ = 0;
-	state_ = state_next;
-	event_ = Eof;
+	_parserState = state_next;
+	_currentEvent = Eof;
 	queue_ = Eof;
 
-	pqname_ = &qname_;
+	_qualifiedName = &qname_;
 	pvalue_ = &value_;
 
-	line_ = 0;
-	column_ = 0;
+	_line = 0;
+	_column = 0;
 
-	attr_i_ = 0;
+	_currentAttributeIndex = 0;
 	start_ns_i_ = 0;
 	end_ns_i_ = 0;
 
@@ -188,24 +188,24 @@ void XMLStreamParser::handle_error()
 		}
 	}
 	else
-		throw XMLStreamParserException(iname_, XML_GetCurrentLineNumber(p_), XML_GetCurrentColumnNumber(p_), XML_ErrorString(e));
+		throw XMLStreamParserException(_inputName, XML_GetCurrentLineNumber(p_), XML_GetCurrentColumnNumber(p_), XML_ErrorString(e));
 }
 
 
 XMLStreamParser::EventType XMLStreamParser::next()
 {
-	if (state_ == state_next)
+	if (_parserState == state_next)
 		return next_(false);
 	else
 	{
 		// If we previously peeked at start/end_element, then adjust
 		// state accordingly.
 		//
-		switch (event_)
+		switch (_currentEvent)
 		{
 		case EndElement:
 		{
-			if (!element_state_.empty() && element_state_.back().depth == depth_)
+			if (!_elementState.empty() && _elementState.back().depth == depth_)
 				popElement();
 
 			depth_--;
@@ -220,8 +220,8 @@ XMLStreamParser::EventType XMLStreamParser::next()
 			break;
 		}
 
-		state_ = state_next;
-		return event_;
+		_parserState = state_next;
+		return _currentEvent;
 	}
 }
 
@@ -237,7 +237,7 @@ const string& XMLStreamParser::attribute(const QName& qn) const
 			if (!i->second.handled)
 			{
 				i->second.handled = true;
-				e->attr_unhandled_--;
+				e->attributesUnhandled_--;
 			}
 			return i->second.value;
 		}
@@ -258,7 +258,7 @@ string XMLStreamParser::attribute(const QName& qn, const string& dv) const
 			if (!i->second.handled)
 			{
 				i->second.handled = true;
-				e->attr_unhandled_--;
+				e->attributesUnhandled_--;
 			}
 			return i->second.value;
 		}
@@ -279,7 +279,7 @@ bool XMLStreamParser::attributePresent(const QName& qn) const
 			if (!i->second.handled)
 			{
 				i->second.handled = true;
-				e->attr_unhandled_--;
+				e->attributesUnhandled_--;
 			}
 			return true;
 		}
@@ -346,15 +346,15 @@ const XMLStreamParser::ElementEntry* XMLStreamParser::get_element_() const
 	// one before it, if any.
 	//
 	const ElementEntry* r(0);
-	ElementState::size_type n(element_state_.size() - 1);
+	ElementState::size_type n(_elementState.size() - 1);
 
-	if (element_state_[n].depth == depth_)
-		r = &element_state_[n];
-	else if (n != 0 && element_state_[n].depth > depth_)
+	if (_elementState[n].depth == depth_)
+		r = &_elementState[n];
+	else if (n != 0 && _elementState[n].depth > depth_)
 	{
 		n--;
-		if (element_state_[n].depth == depth_)
-			r = &element_state_[n];
+		if (_elementState[n].depth == depth_)
+			r = &_elementState[n];
 	}
 
 	return r;
@@ -365,8 +365,8 @@ void XMLStreamParser::popElement()
 {
 	// Make sure there are no unhandled attributes left.
 	//
-	const ElementEntry& e(element_state_.back());
-	if (e.attr_unhandled_ != 0)
+	const ElementEntry& e(_elementState.back());
+	if (e.attributesUnhandled_ != 0)
 	{
 		// Find the first unhandled attribute and report it.
 		//
@@ -378,7 +378,7 @@ void XMLStreamParser::popElement()
 		assert(false);
 	}
 
-	element_state_.pop_back();
+	_elementState.pop_back();
 }
 
 
@@ -403,7 +403,7 @@ XMLStreamParser::EventType XMLStreamParser::next_(bool peek)
 		//
 		if (!peek)
 		{
-			if (!element_state_.empty() && element_state_.back().depth == depth_)
+			if (!_elementState.empty() && _elementState.back().depth == depth_)
 				popElement();
 
 			depth_--;
@@ -448,7 +448,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 	{
 		// Based on the previous event determine what's the next one must be.
 		//
-		switch (event_)
+		switch (_currentEvent)
 		{
 		case StartNamespaceDecl:
 		{
@@ -456,51 +456,51 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			{
 				start_ns_i_ = 0;
 				start_ns_.clear();
-				pqname_ = &qname_;
+				_qualifiedName = &qname_;
 				break; // No more declarations.
 			}
 			// Fall through.
 		}
 		case StartElement:
 		{
-			event_ = StartNamespaceDecl;
-			pqname_ = &start_ns_[start_ns_i_];
-			return event_;
+			_currentEvent = StartNamespaceDecl;
+			_qualifiedName = &start_ns_[start_ns_i_];
+			return _currentEvent;
 		}
 		default:
 		{
 			assert(false);
-			return event_ = Eof;
+			return _currentEvent = Eof;
 		}
 		}
 	}
 
 	// See if we have any attributes we need to return as events.
 	//
-	if (attr_i_ < attr_.size())
+	if (_currentAttributeIndex < _attributes.size())
 	{
 		// Based on the previous event determine what's the next one must be.
 		//
-		switch (event_)
+		switch (_currentEvent)
 		{
 		case StartAttribute:
 		{
-			event_ = Characters;
-			pvalue_ = &attr_[attr_i_].value;
-			return event_;
+			_currentEvent = Characters;
+			pvalue_ = &_attributes[_currentAttributeIndex].value;
+			return _currentEvent;
 		}
 		case Characters:
 		{
-			event_ = EndAttribute; // Name is already set.
-			return event_;
+			_currentEvent = EndAttribute; // Name is already set.
+			return _currentEvent;
 		}
 		case EndAttribute:
 		{
-			if (++attr_i_ == attr_.size())
+			if (++_currentAttributeIndex == _attributes.size())
 			{
-				attr_i_ = 0;
-				attr_.clear();
-				pqname_ = &qname_;
+				_currentAttributeIndex = 0;
+				_attributes.clear();
+				_qualifiedName = &qname_;
 				pvalue_ = &value_;
 				break; // No more attributes.
 			}
@@ -509,14 +509,14 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 		case StartElement:
 		case StartNamespaceDecl:
 		{
-			event_ = StartAttribute;
-			pqname_ = &attr_[attr_i_].qname;
-			return event_;
+			_currentEvent = StartAttribute;
+			_qualifiedName = &_attributes[_currentAttributeIndex].qname;
+			return _currentEvent;
 		}
 		default:
 		{
 			assert(false);
-			return event_ = Eof;
+			return _currentEvent = Eof;
 		}
 		}
 	}
@@ -527,7 +527,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 	{
 		// Based on the previous event determine what's the next one must be.
 		//
-		switch (event_)
+		switch (_currentEvent)
 		{
 		case EndNamespaceDecl:
 		{
@@ -535,7 +535,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			{
 				end_ns_i_ = 0;
 				end_ns_.clear();
-				pqname_ = &qname_;
+				_qualifiedName = &qname_;
 				break; // No more declarations.
 			}
 			// Fall through.
@@ -545,9 +545,9 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			//
 		default:
 		{
-			event_ = EndNamespaceDecl;
-			pqname_ = &end_ns_[end_ns_i_];
-			return event_;
+			_currentEvent = EndNamespaceDecl;
+			_qualifiedName = &end_ns_[end_ns_i_];
+			return _currentEvent;
 		}
 		}
 	}
@@ -556,18 +556,18 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 	//
 	if (queue_ != Eof)
 	{
-		event_ = queue_;
+		_currentEvent = queue_;
 		queue_ = Eof;
 
-		line_ = XML_GetCurrentLineNumber(p_);
-		column_ = XML_GetCurrentColumnNumber(p_);
+		_line = XML_GetCurrentLineNumber(p_);
+		_column = XML_GetCurrentColumnNumber(p_);
 
-		return event_;
+		return _currentEvent;
 	}
 
 	// Reset the character accumulation flag.
 	//
-	accumulate_ = false;
+	_accumulateContent = false;
 
 	XML_ParsingStatus ps;
 	XML_GetParsingStatus(p_, &ps);
@@ -582,11 +582,11 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 	case XML_PARSING:
 	{
 		assert(false);
-		return event_ = Eof;
+		return _currentEvent = Eof;
 	}
 	case XML_FINISHED:
 	{
-		return event_ = Eof;
+		return _currentEvent = Eof;
 	}
 	case XML_SUSPENDED:
 	{
@@ -597,7 +597,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			// If the XMLStreamParser is again in the suspended state, then
 			// that means we have the next event.
 			//
-			return event_;
+			return _currentEvent;
 		}
 		case XML_STATUS_OK:
 		{
@@ -605,7 +605,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			// unless this was the last chunk, in which case this is eof.
 			//
 			if (ps.finalBuffer)
-				return event_ = Eof;
+				return _currentEvent = Eof;
 
 			break;
 		}
@@ -619,15 +619,15 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 	// Get and parse the next chunk of data until we get the next event
 	// or reach eof.
 	//
-	if (!accumulate_)
-		event_ = Eof;
+	if (!_accumulateContent)
+		_currentEvent = Eof;
 
 	XML_Status s;
 	do
 	{
-		if (size_ != 0)
+		if (_size != 0)
 		{
-			s = XML_Parse(p_, static_cast<const char*>(data_.buf), static_cast<int>(size_), true);
+			s = XML_Parse(p_, static_cast<const char*>(_data.buf), static_cast<int>(_size), true);
 
 			if (s == XML_STATUS_ERROR)
 				handle_error();
@@ -645,7 +645,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			// Temporarily unset the exception failbit. Also clear the fail bit
 			// when we reset the old state if it was caused by eof.
 			//
-			istream& is(*data_.is);
+			istream& is(*_data.is);
 			{
 				stream_exception_controller sec(is);
 				is.read(b, static_cast<streamsize>(cap));
@@ -669,7 +669,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 		}
 	} while (s != XML_STATUS_SUSPENDED);
 
-	return event_;
+	return _currentEvent;
 }
 
 
@@ -729,22 +729,22 @@ void XMLCALL XMLStreamParser::start_element_(void* v, const XML_Char* name, cons
 	// see more characters or end element. Seeing start element is
 	// possible but means violation of the content model.
 	//
-	if (p.accumulate_)
+	if (p._accumulateContent)
 	{
 		// It would have been easier to throw the exception directly,
 		// however, the Expat code is most likely not exception safe.
 		//
-		p.line_ = XML_GetCurrentLineNumber(p.p_);
-		p.column_ = XML_GetCurrentColumnNumber(p.p_);
+		p._line = XML_GetCurrentLineNumber(p.p_);
+		p._column = XML_GetCurrentColumnNumber(p.p_);
 		XML_StopParser(p.p_, false);
 		return;
 	}
 
-	p.event_ = StartElement;
+	p._currentEvent = StartElement;
 	splitName(name, p.qname_);
 
-	p.line_ = XML_GetCurrentLineNumber(p.p_);
-	p.column_ = XML_GetCurrentColumnNumber(p.p_);
+	p._line = XML_GetCurrentLineNumber(p.p_);
+	p._column = XML_GetCurrentColumnNumber(p.p_);
 
 	// Handle attributes.
 	//
@@ -758,8 +758,8 @@ void XMLCALL XMLStreamParser::start_element_(void* v, const XML_Char* name, cons
 		ElementEntry* pe(0);
 		if (am)
 		{
-			p.element_state_.push_back(ElementEntry(p.depth_ + 1));
-			pe = &p.element_state_.back();
+			p._elementState.push_back(ElementEntry(p.depth_ + 1));
+			pe = &p._elementState.back();
 		}
 
 		if (am || ae)
@@ -777,14 +777,14 @@ void XMLCALL XMLStreamParser::start_element_(void* v, const XML_Char* name, cons
 				}
 				else
 				{
-					p.attr_.push_back(attribute_type());
-					splitName(*atts, p.attr_.back().qname);
-					p.attr_.back().value = *(atts + 1);
+					p._attributes.push_back(attribute_type());
+					splitName(*atts, p._attributes.back().qname);
+					p._attributes.back().value = *(atts + 1);
 				}
 			}
 
 			if (am)
-				pe->attr_unhandled_ = pe->attr_map_.size();
+				pe->attributesUnhandled_ = pe->attr_map_.size();
 		}
 	}
 
@@ -816,14 +816,14 @@ void XMLCALL XMLStreamParser::end_element_(void* v, const XML_Char* name)
 
 		// If we are accumulating characters, then queue this event.
 		//
-		if (p.accumulate_)
+		if (p._accumulateContent)
 			p.queue_ = EndElement;
 		else
 		{
-			p.event_ = EndElement;
+			p._currentEvent = EndElement;
 
-			p.line_ = XML_GetCurrentLineNumber(p.p_);
-			p.column_ = XML_GetCurrentColumnNumber(p.p_);
+			p._line = XML_GetCurrentLineNumber(p.p_);
+			p._column = XML_GetCurrentColumnNumber(p.p_);
 		}
 
 		XML_StopParser(p.p_, true);
@@ -862,8 +862,8 @@ void XMLCALL XMLStreamParser::characters_(void* v, const XML_Char* s, int n)
 			// It would have been easier to throw the exception directly,
 			// however, the Expat code is most likely not exception safe.
 			//
-			p.line_ = XML_GetCurrentLineNumber(p.p_);
-			p.column_ = XML_GetCurrentColumnNumber(p.p_);
+			p._line = XML_GetCurrentLineNumber(p.p_);
+			p._column = XML_GetCurrentColumnNumber(p.p_);
 			XML_StopParser(p.p_, false);
 			break;
 		}
@@ -877,25 +877,25 @@ void XMLCALL XMLStreamParser::characters_(void* v, const XML_Char* s, int n)
 	// followup event for another character event. In this case also
 	// append the data.
 	//
-	if (p.accumulate_ || ps.parsing != XML_PARSING)
+	if (p._accumulateContent || ps.parsing != XML_PARSING)
 	{
-		assert(p.event_ == Characters);
+		assert(p._currentEvent == Characters);
 		p.value_.append(s, n);
 	}
 	else
 	{
-		p.event_ = Characters;
+		p._currentEvent = Characters;
 		p.value_.assign(s, n);
 
-		p.line_ = XML_GetCurrentLineNumber(p.p_);
-		p.column_ = XML_GetCurrentColumnNumber(p.p_);
+		p._line = XML_GetCurrentLineNumber(p.p_);
+		p._column = XML_GetCurrentColumnNumber(p.p_);
 
 		// In simple content we need to accumulate all the characters
 		// into a single event. To do this we will let the XMLStreamParser run
 		// until we reach the end of the element.
 		//
 		if (cont == Content::Simple)
-			p.accumulate_ = true;
+			p._accumulateContent = true;
 		else
 			XML_StopParser(p.p_, true);
 	}
