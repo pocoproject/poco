@@ -1,24 +1,42 @@
-// file      : cutl/xml/value-traits.hxx
+//
+// ValueTraits.h
+//
+// $Id$
+//
+// Library: XML
+// Package: XML
+// Module:  ValueTraits
+//
+// Definition of the ValueTraits templates.
+//
+// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
 // copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
+
 
 #ifndef POCO_XML_VALUE_TRAITS_HXX
 #define POCO_XML_VALUE_TRAITS_HXX
 
+
+#include "XMLStreamParserException.h"
+#include "XMLStreamSerializerException.h"
 #include <string>
 #include <cstddef> // std::size_t
 #include <iostream>
 #include <sstream>
 
-#include "XMLStreamParserException.h"
-#include "XMLStreamSerializerException.h"
-
 namespace Poco
 {
 namespace XML
 {
+
+
 class XMLStreamParser;
 class XMLStreamSerializer;
+
 
 template<typename T>
 struct default_value_traits
@@ -29,6 +47,7 @@ struct default_value_traits
 	static std::string
 	serialize(const T&, const XMLStreamSerializer&);
 };
+
 
 template<>
 struct XML_API default_value_traits<bool>
@@ -41,6 +60,7 @@ struct XML_API default_value_traits<bool>
 		return v ? "true" : "false";
 	}
 };
+
 
 template<>
 struct XML_API default_value_traits<std::string>
@@ -56,15 +76,18 @@ struct XML_API default_value_traits<std::string>
 	}
 };
 
+
 template<typename T>
 struct ValueTraits: default_value_traits<T>
 {
 };
 
+
 template<typename T, std::size_t N>
 struct ValueTraits<T[N]> : default_value_traits<const T*>
 {
 };
+
 
 template<typename T>
 T default_value_traits<T>::parse(std::string s, const XMLStreamParser& p)
@@ -76,6 +99,7 @@ T default_value_traits<T>::parse(std::string s, const XMLStreamParser& p)
 	return r;
 }
 
+
 template<typename T>
 std::string default_value_traits<T>::serialize(const T& v, const XMLStreamSerializer& s)
 {
@@ -84,6 +108,8 @@ std::string default_value_traits<T>::serialize(const T& v, const XMLStreamSerial
 		throw XMLStreamSerializerException(s, "invalid value");
 	return os.str();
 }
+
+
 }
 }
 

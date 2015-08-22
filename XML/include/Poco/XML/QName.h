@@ -1,4 +1,18 @@
-// file      : cutl/xml/QName.hxx
+//
+// QName.h
+//
+// $Id$
+//
+// Library: XML
+// Package: XML
+// Module:  QName
+//
+// Definition of the QName class.
+//
+// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
 // copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
 
@@ -28,31 +42,12 @@ public:
 	QName(const std::string& ns, const std::string& name);
 	QName(const std::string& ns, const std::string& name, const std::string& prefix);
 
-	const std::string& namespace_() const
-	{
-		return _ns;
-	}
-	const std::string& name() const
-	{
-		return _name;
-	}
-	const std::string& prefix() const
-	{
-		return _prefix;
-	}
-
-	std::string& namespace_()
-	{
-		return _ns;
-	}
-	std::string& name()
-	{
-		return _name;
-	}
-	std::string& prefix()
-	{
-		return _prefix;
-	}
+	const std::string& namespace_() const;
+	const std::string& name() const;
+	const std::string& prefix() const;
+	std::string& namespace_();
+	std::string& name();
+	std::string& prefix();
 
 	// Printable representation in the [<namespace>#]<name> form.
 	//
@@ -82,7 +77,45 @@ private:
 	std::string _prefix;
 };
 
+
+inline const std::string& QName::namespace_() const
+{
+	return _ns;
+}
+
+
+inline const std::string& QName::name() const
+{
+	return _name;
+}
+
+
+inline const std::string& QName::prefix() const
+{
+	return _prefix;
+}
+
+
+inline std::string& QName::namespace_()
+{
+	return _ns;
+}
+
+
+inline std::string& QName::name()
+{
+	return _name;
+}
+
+
+inline std::string& QName::prefix()
+{
+	return _prefix;
+}
+
+
 XML_API std::ostream& operator<<(std::ostream&, const QName&);
+
 }
 }
 

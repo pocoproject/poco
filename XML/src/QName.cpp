@@ -1,4 +1,18 @@
-// file      : cutl/xml/QName.cxx
+//
+// QName.cpp
+//
+// $Id$
+//
+// Library: XML
+// Package: XML
+// Module:  QName
+//
+// Definition of the QName class.
+//
+// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
 // copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
 // license   : MIT; see accompanying LICENSE file
 
