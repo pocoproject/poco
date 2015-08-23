@@ -55,21 +55,25 @@ $(DYLIB_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug, shared)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
 	$(postbuild)
+	@echo " "
 
 $(DYLIB_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building dynamic library (release, shared)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
 	$(postbuild)
+	@echo " "
 
 $(DYLIB_S_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug, static)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
 	$(postbuild)
+	@echo " "
 
 $(DYLIB_S_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building dynamic library (release, static)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
 	$(postbuild)
+	@echo " "
 
 #
 # Include the automatically generated dependency files
