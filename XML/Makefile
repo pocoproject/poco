@@ -19,10 +19,11 @@ objects = AbstractContainerNode AbstractNode Attr AttrMap Attributes \
 	EntityResolverImpl ErrorHandler Event EventDispatcher EventException \
 	EventListener EventTarget InputSource LexicalHandler Locator LocatorImpl \
 	MutationEvent Name NamePool NamedNodeMap NamespaceStrategy \
-	NamespaceSupport Node NodeFilter NodeIterator NodeList Notation \
-	ParserEngine ProcessingInstruction SAXException SAXParser Text \
+	NamespaceSupport NodeAppender Node NodeFilter NodeIterator NodeList Notation \
+	ParserEngine ProcessingInstruction QName SAXException SAXParser Text \
 	TreeWalker WhitespaceFilter XMLException XMLFilter XMLFilterImpl XMLReader \
-	XMLString XMLWriter NodeAppender 
+	XMLString XMLWriter XMLStreamParser XMLStreamParserException XMLStreamSerializer \
+	XMLStreamSerializerException char-props genx
 
 expat_objects = xmlparse xmlrole xmltok
 
