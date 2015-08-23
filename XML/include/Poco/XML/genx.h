@@ -118,6 +118,24 @@ genxStatus genxSetPrettyPrint(genxWriter w, int indentation);
 int genxGetPrettyPrint(genxWriter w);
 
 /*
+ * Suspend/resume pretty-printing. Pretty-printing can be suspended
+ * only inside an element and, unless explicitly resumed, it will
+ * remain suspended until the end of that element. You should only
+ * explicitly resume pretty-printing at the element nesting level
+ * of suspension. If pretty-printing is already suspended at an
+ * outer nesting level, then subsequent calls to suspend/resume
+ * are ignored. The PrettyPrintSuspended() function can be used
+ * to check if pretty-printing is currently suspended. If it is
+ * not, then this function returns 0. Otherwise, it returns the
+ * level at which pretty-printing was suspended, with root element
+ * being level 1.
+ */
+genxStatus genxSuspendPrettyPrint(genxWriter w);
+genxStatus genxResumePrettyPrint(genxWriter w);
+int genxPrettyPrintSuspended(genxWriter w);
+
+
+/*
  * Set/get canonicalization. If true, then output explicit closing
  * tags and sort attributes. Default is false.
  */
@@ -162,7 +180,7 @@ genxNamespace genxDeclareNamespace(genxWriter w,
  * If something failed, returns NULL and sets the status code via statusP
  */
 genxElement genxDeclareElement(genxWriter w,
-			       genxNamespace ns, constUtf8 type,
+			       genxNamespace ns, constUtf8 name,
 			       genxStatus * statusP);
 
 /*
@@ -192,7 +210,7 @@ typedef struct
 genxStatus genxStartDocSender(genxWriter w, genxSender * sender);
 
 /*
- * End a document.  Calls "flush"
+ * End a document.  Calls "flush".
  */
 genxStatus genxEndDocument(genxWriter w);
 
@@ -204,6 +222,19 @@ genxStatus genxXmlDeclaration(genxWriter w,
                               constUtf8 version,
                               constUtf8 encoding,
                               constUtf8 standalone);
+/*
+ * Write DOCTYPE declaration. If public_id is not NULL, then this is
+ * a PUBLIC DOCTYPE declaration, otherwise, if system_id is not NULL,
+ * then this is a SYSTEM DOCTYPE. If both are NULL, then a DOCTYPE
+ * that only contains the root element and, if not NULL, internal
+ * subset is written.
+ */
+genxStatus genxDoctypeDeclaration(genxWriter w,
+                                  constUtf8 root_element,
+                                  constUtf8 public_id,
+                                  constUtf8 system_id,
+                                  constUtf8 internal_subset);
+
 /*
  * Write a comment
  */
@@ -218,7 +249,7 @@ genxStatus genxPI(genxWriter w, constUtf8 target, constUtf8 text);
  * Start an element
  */
 genxStatus genxStartElementLiteral(genxWriter w,
-				   constUtf8 xmlns, constUtf8 type);
+				   constUtf8 xmlns, constUtf8 name);
 
 /*
  * Start a predeclared element
@@ -227,10 +258,23 @@ genxStatus genxStartElementLiteral(genxWriter w,
 genxStatus genxStartElement(genxElement e);
 
 /*
+ * Get current element. The returned values are valid until this
+ * element ceases to be current (i.e., EndElement() is called).
+ * If the element is unqualified, then xmlns is set to NULL.
+ */
+genxStatus genxGetCurrentElement (genxWriter w,
+                                  constUtf8* xmlns, constUtf8* name);
+
+/*
  * Write an attribute
  */
 genxStatus genxAddAttributeLiteral(genxWriter w, constUtf8 xmlns,
 				   constUtf8 name, constUtf8 value);
+
+/*
+ * Write a predeclared attribute
+ */
+genxStatus genxAddAttribute(genxAttribute a, constUtf8 value);
 
 /*
  * Start an attribute
@@ -239,14 +283,17 @@ genxStatus genxStartAttributeLiteral(genxWriter w,
                                      constUtf8 xmlns, constUtf8 name);
 
 /*
- * Write a predeclared attribute
- */
-genxStatus genxAddAttribute(genxAttribute a, constUtf8 value);
-
-/*
  * Start a predeclared attribute
  */
 genxStatus genxStartAttribute(genxAttribute a);
+
+/*
+ * Get current attribute. The returned values are valid until this
+ * attribute ceases to be current (i.e., EndAttribute() is called).
+ * If the attribute is unqualified, then xmlns is set to NULL.
+ */
+genxStatus genxGetCurrentAttribute (genxWriter w,
+                                    constUtf8* xmlns, constUtf8* name);
 
 /*
  * End an attribute

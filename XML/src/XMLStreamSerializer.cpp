@@ -105,7 +105,7 @@ XMLStreamSerializer::XMLStreamSerializer(ostream& os, const string& oname, unsig
 }
 
 
-void XMLStreamSerializer::handleError(genxStatus e)
+void XMLStreamSerializer::handleError(genxStatus e) const
 {
 	switch (e)
 	{
@@ -153,6 +153,21 @@ void XMLStreamSerializer::endElement()
 }
 
 
+void XMLStreamSerializer::endElement (const string& ns, const string& name)
+{
+  constUtf8 cns, cn;
+  genxStatus e;
+  if ((e = genxGetCurrentElement (_writer, &cns, &cn)) ||
+      reinterpret_cast<const char*> (cn) != name ||
+      (cns == 0 ? !ns.empty () : reinterpret_cast<const char*> (cns) != ns))
+  {
+    handleError (e != GENX_SUCCESS ? e : GENX_SEQUENCE_ERROR);
+  }
+
+  endElement ();
+}
+
+
 void XMLStreamSerializer::element(const string& ns, const string& n, const string& v)
 {
 	startElement(ns, n);
@@ -177,6 +192,21 @@ void XMLStreamSerializer::endAttribute()
 {
 	if (genxStatus e = genxEndAttribute(_writer))
 		handleError(e);
+}
+
+
+void XMLStreamSerializer::endAttribute (const string& ns, const string& name)
+{
+  constUtf8 cns, cn;
+  genxStatus e;
+  if ((e = genxGetCurrentAttribute (_writer, &cns, &cn)) ||
+      reinterpret_cast<const char*> (cn) != name ||
+      (cns == 0 ? !ns.empty () : reinterpret_cast<const char*> (cns) != ns))
+  {
+    handleError (e != GENX_SUCCESS ? e : GENX_SEQUENCE_ERROR);
+  }
+
+  endAttribute ();
 }
 
 
@@ -213,7 +243,22 @@ void XMLStreamSerializer::xmlDecl(const string& ver, const string& enc, const st
 }
 
 
-bool XMLStreamSerializer::lookupNamespacePrefix(const string& ns, string& p)
+void XMLStreamSerializer::doctypeDecl (const string& re,
+              const string& pi,
+              const string& si,
+              const string& is)
+{
+  if (genxStatus e = genxDoctypeDeclaration (
+        _writer,
+        reinterpret_cast<constUtf8> (re.c_str ()),
+        (pi.empty () ? 0 : reinterpret_cast<constUtf8> (pi.c_str ())),
+        (si.empty () ? 0 : reinterpret_cast<constUtf8> (si.c_str ())),
+        (is.empty () ? 0 : reinterpret_cast<constUtf8> (is.c_str ()))))
+    handleError (e);
+}
+
+
+bool XMLStreamSerializer::lookupNamespacePrefix(const string& ns, string& p) const
 {
 	// Currently Genx will create a namespace mapping if one doesn't
 	// already exist.
@@ -226,6 +271,46 @@ bool XMLStreamSerializer::lookupNamespacePrefix(const string& ns, string& p)
 
 	p = reinterpret_cast<const char*>(genxGetNamespacePrefix(gns));
 	return true;
+}
+
+
+QName XMLStreamSerializer::currentElement () const
+{
+  constUtf8 ns, n;
+  if (genxStatus e = genxGetCurrentElement (_writer, &ns, &n))
+    handleError (e);
+
+  return QName (ns != 0 ? reinterpret_cast<const char*> (ns) : "", reinterpret_cast<const char*> (n));
+}
+
+
+QName XMLStreamSerializer::currentAttribute () const
+{
+  constUtf8 ns, n;
+  if (genxStatus e = genxGetCurrentAttribute (_writer, &ns, &n))
+    handleError (e);
+
+  return QName (ns != 0 ? reinterpret_cast<const char*> (ns) : "", reinterpret_cast<const char*> (n));
+}
+
+
+void XMLStreamSerializer::suspendIndentation ()
+{
+  if (genxStatus e = genxSuspendPrettyPrint (_writer))
+    handleError (e);
+}
+
+
+void XMLStreamSerializer::resumeIndentation ()
+{
+  if (genxStatus e = genxResumePrettyPrint (_writer))
+    handleError (e);
+}
+
+
+size_t XMLStreamSerializer::indentationSuspended () const
+{
+  return static_cast<size_t> (genxPrettyPrintSuspended (_writer));
 }
 
 

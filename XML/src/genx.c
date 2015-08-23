@@ -80,7 +80,7 @@ struct genxNamespace_rec
 struct genxElement_rec
 {
   genxWriter 	writer;
-  utf8       	type;
+  utf8       	name;
   genxNamespace ns;
 };
 
@@ -131,6 +131,7 @@ struct genxWriter_rec
   /* Pretty-printing state */
   int                      ppIndent;
   int                      ppDepth;
+  int                      ppSuspendDepth; /* Non-0 means we are suspended. */
   Boolean                  ppSimple;
 
   /* Canonicalization. */
@@ -316,7 +317,7 @@ static genxNamespace findNamespace(plist * pl, constUtf8 uri)
   return NULL;
 }
 
-static genxElement findElement(plist * pl, constUtf8 xmlns, constUtf8 type)
+static genxElement findElement(plist * pl, constUtf8 xmlns, constUtf8 name)
 {
   size_t i;
   genxElement * ee = (genxElement *) pl->pointers;
@@ -325,15 +326,15 @@ static genxElement findElement(plist * pl, constUtf8 xmlns, constUtf8 type)
   {
     if (xmlns == NULL)
     {
-      if (ee[i]->ns == NULL && strcmp((const char *) type,
-				      (const char *) ee[i]->type) == 0)
+      if (ee[i]->ns == NULL && strcmp((const char *) name,
+				      (const char *) ee[i]->name) == 0)
 	return ee[i];
     }
     else
     {
       if (ee[i]->ns != NULL &&
 	  strcmp((const char *) xmlns, (const char *) ee[i]->ns->name) == 0 &&
-	  strcmp((const char *) type, (const char *) ee[i]->type) == 0)
+	  strcmp((const char *) name, (const char *) ee[i]->name) == 0)
 	return ee[i];
     }
   }
@@ -693,6 +694,62 @@ int genxGetPrettyPrint(genxWriter w)
 }
 
 /*
+ * Suspend/resume pretty-printing.
+ */
+genxStatus genxSuspendPrettyPrint(genxWriter w)
+{
+  int d = w->ppDepth;
+
+  if (w->ppIndent == 0)
+    return w->status = GENX_SEQUENCE_ERROR;
+
+  switch (w->sequence)
+  {
+  case SEQUENCE_START_TAG:
+  case SEQUENCE_ATTRIBUTES:
+    d++; /* No start tag written, still outer depth. */
+  case SEQUENCE_CONTENT:
+    break;
+  default:
+    return w->status = GENX_SEQUENCE_ERROR;
+  }
+
+  if (w->ppSuspendDepth == 0) /* Ignore nested suspend/resume calls. */
+    w->ppSuspendDepth = d;
+
+  return w->status;
+}
+
+genxStatus genxResumePrettyPrint(genxWriter w)
+{
+  int d = w->ppDepth;
+
+  if (w->ppIndent == 0 || w->ppSuspendDepth == 0)
+    return w->status = GENX_SEQUENCE_ERROR;
+
+  switch (w->sequence)
+  {
+  case SEQUENCE_START_TAG:
+  case SEQUENCE_ATTRIBUTES:
+    d++; /* No start tag written, still outer depth. */
+  case SEQUENCE_CONTENT:
+    break;
+  default:
+    return w->status = GENX_SEQUENCE_ERROR;
+  }
+
+  if (w->ppSuspendDepth == d) /* Ignore nested suspend/resume calls. */
+    w->ppSuspendDepth = 0;
+
+  return w->status;
+}
+
+int genxPrettyPrintSuspended(genxWriter w)
+{
+  return w->ppSuspendDepth;
+}
+
+/*
  * get/set canonicalization.
  */
 genxStatus genxSetCanonical(genxWriter w, int flag)
@@ -752,7 +809,7 @@ void genxDispose(genxWriter w)
 
   for (i = 0; i < w->elements.count; i++)
   {
-    deallocate(w, ee[i]->type);
+    deallocate(w, ee[i]->name);
     deallocate(w, ee[i]);
   }
 
@@ -1009,20 +1066,20 @@ utf8 genxGetNamespacePrefix(genxNamespace ns)
  * DeclareElement - see genx.h for details
  */
 genxElement genxDeclareElement(genxWriter w,
-			       genxNamespace ns, constUtf8 type,
+			       genxNamespace ns, constUtf8 name,
 			       genxStatus * statusP)
 {
   genxElement old;
   genxElement el;
 
-  if ((w->status = checkNCName(w, type)) != GENX_SUCCESS)
+  if ((w->status = checkNCName(w, name)) != GENX_SUCCESS)
   {
     *statusP = w->status;
     return NULL;
   }
 
   /* already declared? */
-  old = findElement(&w->elements, (ns == NULL) ? NULL : ns->name, type);
+  old = findElement(&w->elements, (ns == NULL) ? NULL : ns->name, name);
   if (old)
     return old;
 
@@ -1034,7 +1091,7 @@ genxElement genxDeclareElement(genxWriter w,
 
   el->writer = w;
   el->ns = ns;
-  if ((el->type = copy(w, type)) == NULL)
+  if ((el->name = copy(w, name)) == NULL)
   {
     w->status = *statusP = GENX_ALLOC_FAILED;
     return NULL;
@@ -1217,8 +1274,9 @@ genxStatus genxStartDocSender(genxWriter w, genxSender * sender)
 
   if (w->ppIndent)
   {
-    w->ppSimple = True;
     w->ppDepth = 0;
+    w->ppSuspendDepth = 0;
+    w->ppSimple = True;
   }
 
   return GENX_SUCCESS;
@@ -1292,7 +1350,9 @@ static genxStatus writeStartTag(genxWriter w, Boolean close)
 
   if (w->ppIndent)
   {
-    if (w->ppDepth)
+    if (w->ppDepth &&
+        /* Suspend depth could be at this element's depth (after ++ below). */
+        (w->ppSuspendDepth == 0 || w->ppSuspendDepth > w->ppDepth))
       if (writeIndentation (w) != GENX_SUCCESS)
         return w->status;
 
@@ -1300,6 +1360,15 @@ static genxStatus writeStartTag(genxWriter w, Boolean close)
     {
       w->ppDepth++;
       w->ppSimple = True;
+    }
+    else
+    {
+      /*
+       * Conceptually we incremented/decremented the depth, so check if we
+       * need to resume pretty-printing.
+       */
+      if (w->ppSuspendDepth > w->ppDepth)
+        w->ppSuspendDepth = 0;
     }
   }
 
@@ -1309,7 +1378,7 @@ static genxStatus writeStartTag(genxWriter w, Boolean close)
     SendCheck(w, e->ns->declaration->name + STRLEN_XMLNS_COLON);
     SendCheck(w, ":");
   }
-  SendCheck(w, e->type);
+  SendCheck(w, e->name);
 
   /* If we are canonicalizing, then write sorted attributes. Otherwise
      write them in the order specified. */
@@ -1711,6 +1780,22 @@ genxStatus genxStartAttribute(genxAttribute a)
   return GENX_SUCCESS;
 }
 
+genxStatus genxGetCurrentAttribute (genxWriter w,
+                                    constUtf8* xmlns, constUtf8* name)
+{
+  genxAttribute a;
+
+  if (w->sequence != SEQUENCE_START_ATTR)
+    return w->status = GENX_SEQUENCE_ERROR;
+
+  a = w->nowStartingAttr;
+
+  *xmlns = a->ns ? a->ns->name : NULL;
+  *name = a->name;
+
+  return GENX_SUCCESS;
+}
+
 genxStatus genxEndAttribute(genxWriter w)
 {
   genxAttribute a;
@@ -1740,6 +1825,36 @@ genxStatus genxEndAttribute(genxWriter w)
     else
       w->lastAttribute = w->firstAttribute = a;
   }
+
+  return GENX_SUCCESS;
+}
+
+genxStatus genxGetCurrentElement (genxWriter w,
+                                  constUtf8* xmlns, constUtf8* name)
+{
+  int i;
+  genxElement e;
+
+  switch (w->sequence)
+  {
+  case SEQUENCE_START_TAG:
+  case SEQUENCE_ATTRIBUTES:
+    e = w->nowStarting;
+    break;
+  case SEQUENCE_CONTENT:
+    /* Find the element. The same code as in EndElement() below. */
+    for (i = (int) (w->stack.count) - 1;
+         w->stack.pointers[i] != NULL;
+         i -= 2)
+      ;
+    e = (genxElement) w->stack.pointers[--i];
+    break;
+  default:
+    return w->status = GENX_SEQUENCE_ERROR;
+  }
+
+  *xmlns = e->ns ? e->ns->name : NULL;
+  *name = e->name;
 
   return GENX_SUCCESS;
 }
@@ -1789,9 +1904,12 @@ genxStatus genxEndElement(genxWriter w)
     {
       w->ppDepth--;
 
-      if (!w->ppSimple)
+      if (!w->ppSimple && w->ppSuspendDepth == 0)
         if (writeIndentation (w) != GENX_SUCCESS)
           return w->status;
+
+      if (w->ppSuspendDepth > w->ppDepth)
+        w->ppSuspendDepth = 0; /* Resume pretty-printing. */
     }
 
     SendCheck(w, "</");
@@ -1800,11 +1918,15 @@ genxStatus genxEndElement(genxWriter w)
       SendCheck(w, e->ns->declaration->name + STRLEN_XMLNS_COLON);
       SendCheck(w, ":");
     }
-    SendCheck(w, e->type);
+    SendCheck(w, e->name);
     SendCheck(w, ">");
   }
 
-  if (w->ppIndent)
+  /* If this element is written while pretty-printing is suspended,
+     treat it as simple. As an example, think of an XHTML <b> element
+     for which we suspend pretty-printing before writing the opening
+     tag and resume it after the closing one. */
+  if (w->ppIndent && w->ppSuspendDepth == 0)
     w->ppSimple = False;
 
   /*
@@ -2143,6 +2265,58 @@ genxStatus genxXmlDeclaration(genxWriter w,
   return GENX_SUCCESS;
 }
 
+genxStatus genxDoctypeDeclaration(genxWriter w,
+                                  constUtf8 re,
+                                  constUtf8 pi,
+                                  constUtf8 si,
+                                  constUtf8 is)
+{
+  if (w->sequence != SEQUENCE_PRE_DOC)
+    return w->status = GENX_SEQUENCE_ERROR;
+
+  if ((w->status = genxCheckText(w, re)) != GENX_SUCCESS)
+    return w->status;
+
+  if (pi != NULL && (w->status = genxCheckText(w, pi)) != GENX_SUCCESS)
+    return w->status;
+
+  if (si != NULL && (w->status = genxCheckText(w, si)) != GENX_SUCCESS)
+    return w->status;
+
+  if (is != NULL && (w->status = genxCheckText(w, is)) != GENX_SUCCESS)
+    return w->status;
+
+  SendCheck (w, "<!DOCTYPE ");
+  SendCheck (w, re);
+
+  if (pi != NULL)
+  {
+    SendCheck (w, " PUBLIC\n  \"");
+    SendCheck (w, pi);
+    SendCheck (w, "\"");
+  }
+
+  if (si != NULL)
+  {
+    if (pi == NULL)
+      SendCheck (w, " SYSTEM");
+
+    SendCheck (w, "\n  \"");
+    SendCheck (w, si);
+    SendCheck (w, "\"");
+  }
+
+  if (is != NULL)
+  {
+    SendCheck (w, " [\n");
+    SendCheck (w, is);
+    SendCheck (w, "\n]");
+  }
+
+  SendCheck (w, ">\n");
+  return GENX_SUCCESS;
+}
+
 genxStatus genxComment(genxWriter w, constUtf8 text)
 {
   size_t i;
@@ -2251,7 +2425,7 @@ genxStatus genxPI(genxWriter w, constUtf8 target, constUtf8 text)
  * Literal versions of the writing routines
  */
 genxStatus genxStartElementLiteral(genxWriter w,
-				   constUtf8 xmlns, constUtf8 type)
+				   constUtf8 xmlns, constUtf8 name)
 {
   genxNamespace ns = NULL;
   genxElement e;
@@ -2262,7 +2436,7 @@ genxStatus genxStartElementLiteral(genxWriter w,
     if (ns == NULL || w->status != GENX_SUCCESS)
       return w->status;
   }
-  e = genxDeclareElement(w, ns, type, &w->status);
+  e = genxDeclareElement(w, ns, name, &w->status);
   if (e == NULL || w->status != GENX_SUCCESS)
     return w->status;
 
