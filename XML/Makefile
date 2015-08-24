@@ -22,8 +22,7 @@ objects = AbstractContainerNode AbstractNode Attr AttrMap Attributes \
 	NamespaceSupport NodeAppender Node NodeFilter NodeIterator NodeList Notation \
 	ParserEngine ProcessingInstruction QName SAXException SAXParser Text \
 	TreeWalker WhitespaceFilter XMLException XMLFilter XMLFilterImpl XMLReader \
-	XMLString XMLWriter XMLStreamParser XMLStreamParserException XMLStreamSerializer \
-	XMLStreamSerializerException
+	XMLString XMLWriter XMLStreamParser XMLStreamParserException 
 
 expat_objects = xmlparse xmlrole xmltok
 
