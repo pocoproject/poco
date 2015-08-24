@@ -10,6 +10,17 @@
 # a space-separated list of project names (as found in the
 # components file), these tests will be skipped.
 #
+# Cygwin specific setup.
+# ----------------------
+# On Cygwin, Unix IPC are provided by a separate process daemon 
+# named cygserver, which should be started once before running any
+# test from Foundation.
+# 1/ Open a separate Cygwin terminal with Administrator privilege
+# 2/ run the command: cygserver-configure
+# 3/ Start the cygserver: nohup /usr/sbin/cygserver &
+# 4/ close the separate terminal
+# 5/ run the Foundation tests: build/script/runtests.sh Foundation
+#
 
 if [ "$POCO_BASE" = "" ] ; then
 	POCO_BASE=`pwd`
