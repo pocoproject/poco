@@ -93,6 +93,21 @@ void PatternFormatterTest::testPatternFormatter()
 	fmt.setProperty("pattern", "start %v[8] end");
 	fmt.format(msg, result);
 	assert (result == "start stSource end");
+	
+	result.clear();
+	fmt.setProperty("pattern", "%p");
+	fmt.setProperty("priorityNames", "FAT, CRI, ERR, WRN, NTC, INF, DBG, TRC");
+	fmt.format(msg, result);
+	assert (result == "ERR");
+	
+	try
+	{
+		fmt.setProperty("priorityNames", "FAT, CRI,");
+		fail("invalid value, must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
 }
 
 

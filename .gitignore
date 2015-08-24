@@ -114,6 +114,9 @@ cmake-build/
 # Temporary files #
 ###################
 *.bak
+CodeGeneration
+RemotingNG
+XSD
 
 # openssl binaries #
 ####################

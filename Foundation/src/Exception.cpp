@@ -155,6 +155,13 @@ POCO_IMPLEMENT_EXCEPTION(NoPermissionException, RuntimeException, "No permission
 POCO_IMPLEMENT_EXCEPTION(OutOfMemoryException, RuntimeException, "Out of memory")
 POCO_IMPLEMENT_EXCEPTION(DataException, RuntimeException, "Data error")
 
+POCO_IMPLEMENT_EXCEPTION(InterruptedException, RuntimeException, "Interrupted")
+POCO_IMPLEMENT_EXCEPTION(IndexOutOfBoundsException, RuntimeException, "Index out of bounds")
+POCO_IMPLEMENT_EXCEPTION(UnsupportedOperationException, RuntimeException, "Unsupported operation")
+POCO_IMPLEMENT_EXCEPTION(EmptyStackException, RuntimeException, "Empty stack")
+POCO_IMPLEMENT_EXCEPTION(StackOverflowException, RuntimeException, "Stack overflow")
+POCO_IMPLEMENT_EXCEPTION(ArithmeticException, RuntimeException, "Arithmetic error")
+
 POCO_IMPLEMENT_EXCEPTION(DataFormatException, DataException, "Bad data format")
 POCO_IMPLEMENT_EXCEPTION(SyntaxException, DataException, "Syntax error")
 POCO_IMPLEMENT_EXCEPTION(CircularReferenceException, DataException, "Circular reference")
