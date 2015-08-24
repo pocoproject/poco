@@ -25,12 +25,6 @@ else()
     )
 endif (POCO_UNBUNDLED)
 
-# GENX lib
-POCO_SOURCES( SRCS genx 
-    src/genx.c
-    src/char-props.c
-)
-
 if(WIN32)
 #TODO: Is XML_STATIC only required with Windows? What does it do?
 add_definitions(-DXML_STATIC -DXML_NS -DXML_DTD -DHAVE_EXPAT_CONFIG_H)

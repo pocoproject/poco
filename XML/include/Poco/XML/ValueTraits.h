@@ -22,7 +22,6 @@
 
 
 #include "XMLStreamParserException.h"
-#include "XMLStreamSerializerException.h"
 #include <string>
 #include <cstddef> // std::size_t
 #include <iostream>
@@ -97,16 +96,6 @@ T default_value_traits<T>::parse(std::string s, const XMLStreamParser& p)
 	if (!(is >> r && is.eof()))
 		throw XMLStreamParserException(p, "invalid value '" + s + "'");
 	return r;
-}
-
-
-template<typename T>
-std::string default_value_traits<T>::serialize(const T& v, const XMLStreamSerializer& s)
-{
-	std::ostringstream os;
-	if (!(os << v))
-		throw XMLStreamSerializerException(s, "invalid value");
-	return os.str();
 }
 
 

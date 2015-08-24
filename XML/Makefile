@@ -23,7 +23,7 @@ objects = AbstractContainerNode AbstractNode Attr AttrMap Attributes \
 	ParserEngine ProcessingInstruction QName SAXException SAXParser Text \
 	TreeWalker WhitespaceFilter XMLException XMLFilter XMLFilterImpl XMLReader \
 	XMLString XMLWriter XMLStreamParser XMLStreamParserException XMLStreamSerializer \
-	XMLStreamSerializerException char-props genx
+	XMLStreamSerializerException
 
 expat_objects = xmlparse xmlrole xmltok
 
