@@ -164,9 +164,6 @@ LIB64SUFFIX = $(if $(filter $(OSARCH),x86_64 sparc64 ppc64),64,)
 else ifneq ($(DEBIANISH),)
 LIB64SUFFIX = $(if $(filter $(OSARCH),x86_64 sparc64 ppc64),/x86_64-linux-gnu,)
 endif
-ifeq ($(findstring Cygwin,$(POCO_HOST_OSNAME)),Cygwin)
-LIB64SUFFIX = $(if $(filter $(OSARCH),x86_64),64,)
-endif
 
 # Default static lib extension
 STATICLIBLINKEXT = .a
