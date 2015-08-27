@@ -242,8 +242,8 @@
 	#define POCO_COMPILER_CBUILDER
 #elif defined (__DMC__)
 	#define POCO_COMPILER_DMARS
-#elif defined (__HP_aCC)
-	#define POCO_COMPILER_HP_ACC
+#elif defined (__DECCXX)
+	#define POCO_COMPILER_COMPAC
 #elif (defined (__xlc__) || defined (__xlC__)) && defined(__IBMCPP__)
 	#define POCO_COMPILER_IBM_XLC // IBM XL C++
 #elif defined (__IBMCPP__) && defined(__COMPILER_VER__)
