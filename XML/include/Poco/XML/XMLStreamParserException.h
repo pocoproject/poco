@@ -9,27 +9,28 @@
 //
 // Definition of the XMLStreamParserException class.
 //
-// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
-// copyright : Copyright (c) 2013-2014 Code Synthesis Tools CC
-// license   : MIT; see accompanying LICENSE file
+//
 
 
-#ifndef POCO_XML_XMLSTREAMPARSEREXCEPTION_H_
-#define POCO_XML_XMLSTREAMPARSEREXCEPTION_H_
+#ifndef XML_XMLStreamParserException_INCLUDED
+#define XML_XMLStreamParserException_INCLUDED
 
-#include <Poco/DOM/DOMException.h>
 
-namespace Poco
-{
-namespace XML
-{
+#include <Poco/XML/XMLException.h>
+
+
+namespace Poco {
+namespace XML {
+
+
 class XMLStreamParser;
 
-class XML_API XMLStreamParserException :
-public Poco::XML::XMLException
+
+class XML_API XMLStreamParserException: public Poco::XML::XMLException
 {
 public:
 	XMLStreamParserException(const std::string& name, Poco::UInt64 line, Poco::UInt64 column, const std::string& description);
@@ -52,7 +53,8 @@ private:
 	std::string _what;
 };
 
-}
-/* namespace XML */
-} /* namespace Poco */
-#endif /* POCO_XML_XMLSTREAMPARSEREXCEPTION_H_ */
+
+} } // namespace Poco::XML
+
+
+#endif // XML_XMLStreamParserException_INCLUDED

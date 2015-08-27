@@ -9,28 +9,25 @@
 //
 // Definition of the ValueTraits templates.
 //
-// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
+// Based on libstudxml (http://www.codesynthesis.com/projects/libstudxml/).
+// Copyright (c) 2009-2013 Code Synthesis Tools CC.
+//
 // SPDX-License-Identifier:	BSL-1.0
-// copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
-// license   : MIT; see accompanying LICENSE file
+//
 
 
 #include "Poco/XML/XMLStreamParser.h"
 #include "Poco/XML/XMLStreamParserException.h"
 
 
-using namespace std;
+namespace Poco {
+namespace XML {
 
 
-namespace Poco
-{
-namespace XML
-{
-
-
-bool default_value_traits<bool>::parse(string s, const XMLStreamParser& p)
+bool DefaultValueTraits<bool>::parse(std::string s, const XMLStreamParser& p)
 {
 	if (s == "true" || s == "1" || s == "True" || s == "TRUE")
 		return true;
@@ -41,5 +38,4 @@ bool default_value_traits<bool>::parse(string s, const XMLStreamParser& p)
 }
 
 
-}
-}
+} } // namespace Poco::XML

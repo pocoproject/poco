@@ -12,7 +12,7 @@ objects = AttributesImplTest ChildNodesTest DOMTestSuite DocumentTest \
 	DocumentTypeTest Driver ElementTest EventTest NamePoolTest NameTest \
 	NamespaceSupportTest NodeIteratorTest NodeTest ParserWriterTest \
 	SAXParserTest SAXTestSuite TextTest TreeWalkerTest \
-	XMLTestSuite XMLWriterTest NodeAppenderTest XMLStreamSerializerTestSuite \
+	XMLTestSuite XMLWriterTest NodeAppenderTest \
 	XMLStreamParserTestSuite
 
 target         = testrunner

@@ -9,36 +9,37 @@
 //
 // Definition of the ValueTraits templates.
 //
-// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
+// Based on libstudxml (http://www.codesynthesis.com/projects/libstudxml/).
+// Copyright (c) 2009-2013 Code Synthesis Tools CC.
+//
 // SPDX-License-Identifier:	BSL-1.0
-// copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
-// license   : MIT; see accompanying LICENSE file
+//
 
 
-#ifndef POCO_XML_VALUE_TRAITS_HXX
-#define POCO_XML_VALUE_TRAITS_HXX
+#ifndef XML_ValueTraits_INCLUDED
+#define XML_ValueTraits_INCLUDED
 
 
 #include "XMLStreamParserException.h"
 #include <string>
-#include <cstddef> // std::size_t
+#include <cstddef> 
 #include <iostream>
 #include <sstream>
 
-namespace Poco
-{
-namespace XML
-{
+
+namespace Poco {
+namespace XML {
 
 
 class XMLStreamParser;
 class XMLStreamSerializer;
 
 
-template<typename T>
-struct default_value_traits
+template <typename T>
+struct DefaultValueTraits
 {
 	static T
 	parse(std::string, const XMLStreamParser&);
@@ -48,8 +49,8 @@ struct default_value_traits
 };
 
 
-template<>
-struct XML_API default_value_traits<bool>
+template <>
+struct XML_API DefaultValueTraits<bool>
 {
 	static bool
 	parse(std::string, const XMLStreamParser&);
@@ -61,8 +62,8 @@ struct XML_API default_value_traits<bool>
 };
 
 
-template<>
-struct XML_API default_value_traits<std::string>
+template <>
+struct XML_API DefaultValueTraits<std::string>
 {
 	static std::string parse(std::string s, const XMLStreamParser&)
 	{
@@ -76,20 +77,20 @@ struct XML_API default_value_traits<std::string>
 };
 
 
-template<typename T>
-struct ValueTraits: default_value_traits<T>
+template <typename T>
+struct ValueTraits: DefaultValueTraits<T>
 {
 };
 
 
-template<typename T, std::size_t N>
-struct ValueTraits<T[N]> : default_value_traits<const T*>
+template <typename T, std::size_t N>
+struct ValueTraits<T[N]> : DefaultValueTraits<const T*>
 {
 };
 
 
-template<typename T>
-T default_value_traits<T>::parse(std::string s, const XMLStreamParser& p)
+template <typename T>
+T DefaultValueTraits<T>::parse(std::string s, const XMLStreamParser& p)
 {
 	T r;
 	std::istringstream is(s);
@@ -99,7 +100,7 @@ T default_value_traits<T>::parse(std::string s, const XMLStreamParser& p)
 }
 
 
-}
-}
+} } // namespace Poco::XML
 
-#endif // CUTL_XML_VALUE_TRAITS_HXX
+
+#endif // XML_ValueTraits_INCLUDED

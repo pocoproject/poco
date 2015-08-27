@@ -153,7 +153,7 @@ void XMLStreamParserTestSuite::testParser()
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::StartElement, "root");
 		poco_assert(p.attribute("a") == "a");
-		poco_assert(p.peek() == XMLStreamParser::StartElement && p.name() == "nested");
+		poco_assert(p.peek() == XMLStreamParser::StartElement && p.localName() == "nested");
 		poco_assert(p.attribute("a") == "a");
 		p.nextExpect(XMLStreamParser::StartElement, "nested");
 		poco_assert(p.attribute("a") == "A");

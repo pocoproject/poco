@@ -9,32 +9,35 @@
 //
 // Definition of the QName class.
 //
-// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
+// Based on libstudxml (http://www.codesynthesis.com/projects/libstudxml/).
+// Copyright (c) 2009-2013 Code Synthesis Tools CC.
+//
 // SPDX-License-Identifier:	BSL-1.0
-// copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
-// license   : MIT; see accompanying LICENSE file
+//
 
-#ifndef POCO_XML_QNAME_HXX
-#define POCO_XML_QNAME_HXX
+
+#ifndef XML_QName_INCLUDED
+#define XML_QName_INCLUDED
+
 
 #include "Poco/XML/XML.h"
-
 #include <string>
 #include <iosfwd>
 
 
-namespace Poco
-{
-namespace XML
-{
+namespace Poco {
+namespace XML {
 
-// Note that the optional prefix is just a "syntactic sugar". In
-// particular, it is ignored by the comparison operators and the
-// std::ostream insertion operator.
-//
+
 class XML_API QName
+	/// This class represents a qualified XML name in the stream parser.
+	///
+	/// Note that the optional prefix is just a "syntactic sugar". In
+	/// particular, it is ignored by the comparison operators and the
+	/// std::ostream insertion operator.
 {
 public:
 	QName();
@@ -42,31 +45,41 @@ public:
 	QName(const std::string& ns, const std::string& name);
 	QName(const std::string& ns, const std::string& name, const std::string& prefix);
 
-	const std::string& namespace_() const;
-	const std::string& name() const;
+	const std::string& namespaceURI() const;
+		/// Returns the namespace URI part of the name.
+
+	const std::string& localName() const;
+		/// Returns the local part of the name.
+		
 	const std::string& prefix() const;
-	std::string& namespace_();
-	std::string& name();
+		/// Returns the namespace prefix of the name.
+		
+	std::string& namespaceURI();
+		/// Returns the namespace URI part of the name.
+
+	std::string& localName();
+		/// Returns the local part of the name.
+
 	std::string& prefix();
+		/// Returns the namespace prefix of the name.
 
-	// Printable representation in the [<namespace>#]<name> form.
-	//
 	std::string string() const;
-
+		/// Returns a printable representation in the [<namespace>#]<name> form.
+	
 	// Note that comparison operators
 	//
 public:
-	friend bool operator<(const QName& x, const QName& y)
+	friend bool operator < (const QName& x, const QName& y)
 	{
 		return x._ns < y._ns || (x._ns == y._ns && x._name < y._name);
 	}
 
-	friend bool operator==(const QName& x, const QName& y)
+	friend bool operator == (const QName& x, const QName& y)
 	{
 		return x._ns == y._ns && x._name == y._name;
 	}
 
-	friend bool operator!=(const QName& x, const QName& y)
+	friend bool operator != (const QName& x, const QName& y)
 	{
 		return !(x == y);
 	}
@@ -78,13 +91,16 @@ private:
 };
 
 
-inline const std::string& QName::namespace_() const
+//
+// inlines
+//
+inline const std::string& QName::namespaceURI() const
 {
 	return _ns;
 }
 
 
-inline const std::string& QName::name() const
+inline const std::string& QName::localName() const
 {
 	return _name;
 }
@@ -96,13 +112,13 @@ inline const std::string& QName::prefix() const
 }
 
 
-inline std::string& QName::namespace_()
+inline std::string& QName::namespaceURI()
 {
 	return _ns;
 }
 
 
-inline std::string& QName::name()
+inline std::string& QName::localName()
 {
 	return _name;
 }
@@ -116,7 +132,8 @@ inline std::string& QName::prefix()
 
 XML_API std::ostream& operator<<(std::ostream&, const QName&);
 
-}
-}
 
-#endif // CUTL_XML_QNAME_HXX
+} } // namespace Poco::XML
+ 
+
+#endif // XML_QName_INCLUDED
