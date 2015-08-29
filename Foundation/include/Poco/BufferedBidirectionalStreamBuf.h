@@ -167,6 +167,7 @@ private:
 //
 // We provide an instantiation for char
 //
+template class Foundation_API BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char> >; 
 typedef BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char> > BufferedBidirectionalStreamBuf;
 
 

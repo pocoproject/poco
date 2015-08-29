@@ -165,6 +165,7 @@ private:
 //
 // We provide an instantiation for char
 //
+template class Foundation_API BasicUnbufferedStreamBuf<char, std::char_traits<char> >; 
 typedef BasicUnbufferedStreamBuf<char, std::char_traits<char> > UnbufferedStreamBuf;
 
 
