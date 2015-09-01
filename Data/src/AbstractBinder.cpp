@@ -465,7 +465,7 @@ void AbstractBinder::bind(std::size_t pos, const Any& val, Direction dir, const 
 	else if(type == typeid(BLOB))
 		bind(pos, RefAnyCast<BLOB>(val), dir, nullCb);
 	else if(type == typeid(void))
-		bind(pos, Keywords::null, dir, nullCb);
+		bind(pos, Keywords::null, dir, type);
 #ifndef POCO_LONG_IS_64_BIT
 	else if(type == typeid(long))
 		bind(pos, RefAnyCast<long>(val), dir, nullCb);
@@ -516,7 +516,7 @@ void AbstractBinder::bind(std::size_t pos, const Poco::Dynamic::Var& val, Direct
 	else if(type == typeid(BLOB))
 		bind(pos, val.extract<BLOB>(), dir, nullCb);
 	else if(type == typeid(void))
-		bind(pos, Keywords::null, dir, nullCb);
+		bind(pos, Keywords::null, dir, type);
 #ifndef POCO_LONG_IS_64_BIT
 	else if(type == typeid(long))
 		bind(pos, val.extract<long>(), dir, nullCb);
