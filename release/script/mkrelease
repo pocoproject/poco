@@ -434,6 +434,24 @@ ENDOFSCRIPT
 
 
 #
+# Create Visual C++ Express 2012 build script
+#
+cat >${target}/build_vdexpress2012.cmd <<'ENDOFSCRIPT'
+@echo off
+buildwin 110 build shared both Win32 samples tests vdexpress
+ENDOFSCRIPT
+
+
+#
+# Create Visual C++ Express 2013 build script
+#
+cat >${target}/build_vdexpress2013.cmd <<'ENDOFSCRIPT'
+@echo off
+buildwin 120 build shared both Win32 samples tests vdexpress
+ENDOFSCRIPT
+
+
+#
 # Fix line endings
 #
 if [ "$lineEndConv" != "" ] ; then
@@ -444,6 +462,8 @@ if [ "$lineEndConv" != "" ] ; then
 	$lineEndConv ${target}/build_CE_vs90.cmd
 	$lineEndConv ${target}/build_vcexpress2008.cmd
 	$lineEndConv ${target}/build_vcexpress2010.cmd
+	$lineEndConv ${target}/build_vdexpress2012.cmd
+	$lineEndConv ${target}/build_vdexpress2013.cmd
 	$lineEndConv ${target}/Makefile
 	$lineEndConv ${target}/components
 fi

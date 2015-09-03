@@ -128,7 +128,7 @@ public:
 	long getTid() const;
 		/// Returns the numeric thread identifier for the message.
 	
-	long getOsTid() const;
+	IntPtr getOsTid() const;
 		/// Returns the numeric OS thread identifier for the message.
 	
 	void setPid(long pid);
@@ -199,7 +199,7 @@ private:
 	Priority    _prio;
 	Timestamp   _time;
 	int         _tid;
-	int         _ostid;
+	IntPtr      _ostid;
 	std::string _thread;
 	long        _pid;
 	const char* _file;
@@ -247,7 +247,7 @@ inline long Message::getTid() const
 }
 
 
-inline long Message::getOsTid() const
+inline IntPtr Message::getOsTid() const
 {
 	return _ostid;
 }

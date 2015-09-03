@@ -34,6 +34,7 @@ public:
 	void testWaitDequeue();
 	void testThreads();
 	void testDefaultQueue();
+	void testQueueRemove();
 
 	void setUp();
 	void tearDown();
