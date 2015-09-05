@@ -15,6 +15,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/UUID.h"
+#include "Poco/SHA1Engine.h"
 #include <set>
 
 
@@ -84,6 +85,12 @@ void UUIDGeneratorTest::testNameBased()
 
 	UUID uuid6 = gen.createFromName(UUID::uri(), "http://www.appinf.com/uuid");
 	assert (uuid6 == uuid1);
+
+	Poco::SHA1Engine sha1;
+	UUID uuid7 = gen.createFromName(UUID::uri(), "http://www.appinf.com/uuid", sha1);
+	assert (uuid7.version() == UUID::UUID_NAME_BASED_SHA1);
+	assert (uuid7.variant() == 2);
+	assert (uuid7 != uuid1);
 }
 
 

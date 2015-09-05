@@ -80,7 +80,7 @@ public:
 	~Binder();
 		/// Destroys the Binder.
 
-	void bind(std::size_t pos, const Poco::Int8& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int8& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an Int8.
 
 	void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir);
@@ -92,7 +92,7 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir);
 		/// Binds an Int8 list.
 
-	void bind(std::size_t pos, const Poco::UInt8& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt8& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt8.
 
 	void bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir);
@@ -104,7 +104,7 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir);
 		/// Binds an UInt8 list.
 
-	void bind(std::size_t pos, const Poco::Int16& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int16& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an Int16.
 	
 	void bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir);
@@ -116,7 +116,7 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir);
 		/// Binds an Int16 list.
 
-	void bind(std::size_t pos, const Poco::UInt16& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt16& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt16.
 
 	void bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir);
@@ -128,7 +128,7 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir);
 		/// Binds an UInt16 list.
 
-	void bind(std::size_t pos, const Poco::Int32& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int32& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an Int32.
 
 	void bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir);
@@ -140,7 +140,7 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir);
 		/// Binds an Int32 list.
 
-	void bind(std::size_t pos, const Poco::UInt32& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt32& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt32.
 
 	void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir);
@@ -152,7 +152,7 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir);
 		/// Binds an UInt32 list.
 
-	void bind(std::size_t pos, const Poco::Int64& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int64& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an Int64.
 
 	void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir);
@@ -164,7 +164,7 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir);
 		/// Binds an Int64 list.
 
-	void bind(std::size_t pos, const Poco::UInt64& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt64& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt64.
 
 	void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir);
@@ -177,10 +177,10 @@ public:
 		/// Binds an UInt64 list.
 
 #ifndef POCO_LONG_IS_64_BIT
-	void bind(std::size_t pos, const long& val, Direction dir);
+	void bind(std::size_t pos, const long& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a long.
 
-	void bind(std::size_t pos, const unsigned long& val, Direction dir);
+	void bind(std::size_t pos, const unsigned long& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an unsigned long.
 
 	void bind(std::size_t pos, const std::vector<long>& val, Direction dir);
@@ -193,7 +193,7 @@ public:
 		/// Binds a long list.
 #endif
 
-	void bind(std::size_t pos, const bool& val, Direction dir);
+	void bind(std::size_t pos, const bool& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a boolean.
 
 	void bind(std::size_t pos, const std::vector<bool>& val, Direction dir);
@@ -205,7 +205,7 @@ public:
 	void bind(std::size_t pos, const std::list<bool>& val, Direction dir);
 		/// Binds a boolean list.
 
-	void bind(std::size_t pos, const float& val, Direction dir);
+	void bind(std::size_t pos, const float& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a float.
 
 	void bind(std::size_t pos, const std::vector<float>& val, Direction dir);
@@ -217,7 +217,7 @@ public:
 	void bind(std::size_t pos, const std::list<float>& val, Direction dir);
 		/// Binds a float list.
 
-	void bind(std::size_t pos, const double& val, Direction dir);
+	void bind(std::size_t pos, const double& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a double.
 
 	void bind(std::size_t pos, const std::vector<double>& val, Direction dir);
@@ -229,7 +229,7 @@ public:
 	void bind(std::size_t pos, const std::list<double>& val, Direction dir);
 		/// Binds a double list.
 
-	void bind(std::size_t pos, const char& val, Direction dir);
+	void bind(std::size_t pos, const char& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a single character.
 
 	void bind(std::size_t pos, const std::vector<char>& val, Direction dir);
@@ -241,7 +241,7 @@ public:
 	void bind(std::size_t pos, const std::list<char>& val, Direction dir);
 		/// Binds a character list.
 
-	void bind(std::size_t pos, const std::string& val, Direction dir);
+	void bind(std::size_t pos, const std::string& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a string.
 
 	void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir);
@@ -253,7 +253,7 @@ public:
 	void bind(std::size_t pos, const std::list<std::string>& val, Direction dir);
 		/// Binds a string list.
 
-	void bind(std::size_t pos, const UTF16String& val, Direction dir);
+	void bind(std::size_t pos, const UTF16String& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a string.
 
 	void bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir);
@@ -265,10 +265,10 @@ public:
 	void bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir);
 		/// Binds a string list.
 
-	void bind(std::size_t pos, const BLOB& val, Direction dir);
+	void bind(std::size_t pos, const BLOB& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a BLOB. In-bound only.
 
-	void bind(std::size_t pos, const CLOB& val, Direction dir);
+	void bind(std::size_t pos, const CLOB& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a CLOB. In-bound only.
 
 	void bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir);
@@ -289,7 +289,7 @@ public:
 	void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir);
 		/// Binds a CLOB list.
 
-	void bind(std::size_t pos, const Date& val, Direction dir);
+	void bind(std::size_t pos, const Date& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a Date.
 
 	void bind(std::size_t pos, const std::vector<Date>& val, Direction dir);
@@ -301,7 +301,7 @@ public:
 	void bind(std::size_t pos, const std::list<Date>& val, Direction dir);
 		/// Binds a Date list.
 
-	void bind(std::size_t pos, const Time& val, Direction dir);
+	void bind(std::size_t pos, const Time& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a Time.
 
 	void bind(std::size_t pos, const std::vector<Time>& val, Direction dir);
@@ -313,7 +313,7 @@ public:
 	void bind(std::size_t pos, const std::list<Time>& val, Direction dir);
 		/// Binds a Time list.
 
-	void bind(std::size_t pos, const DateTime& val, Direction dir);
+	void bind(std::size_t pos, const DateTime& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a DateTime.
 
 	void bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir);
@@ -325,16 +325,16 @@ public:
 	void bind(std::size_t pos, const std::list<DateTime>& val, Direction dir);
 		/// Binds a DateTime list.
 
-	void bind(std::size_t pos, const NullData& val, Direction dir);
+	void bind(std::size_t pos, const NullData& val, Direction dir, const std::type_info& bindType);
 		/// Binds a null. In-bound only.
 
-	void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir, const std::type_info& bindType);
 		/// Binds a null vector.
 
-	void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir, const std::type_info& bindType);
 		/// Binds a null deque.
 
-	void bind(std::size_t pos, const std::list<NullData>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<NullData>& val, Direction dir, const std::type_info& bindType);
 		/// Binds a null list.
 
 	void setDataBinding(ParameterBinding binding);
@@ -373,11 +373,12 @@ private:
 	typedef std::map<SQL_DATE_STRUCT*, Date*>                DateMap;
 	typedef std::map<SQL_TIME_STRUCT*, Time*>                TimeMap;
 	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*>       TimestampMap;
+	typedef std::map<SQLLEN*, WhenNullCb>                    NullCbMap;
 
 	void describeParameter(std::size_t pos);
 		/// Sets the description field for the parameter, if needed.
 
-	void bind(std::size_t pos, const char* const& pVal, Direction dir);
+	void bind(std::size_t pos, const char* const& pVal, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a const char ptr. 
 		/// This is a private no-op in this implementation
 		/// due to security risk.
@@ -387,13 +388,19 @@ private:
 		/// specified by user.
 
 	template <typename T>
-	void bindImpl(std::size_t pos, T& val, SQLSMALLINT cDataType, Direction dir)
+	void bindImpl(std::size_t pos, T& val, SQLSMALLINT cDataType, Direction dir, const WhenNullCb& nullCb)
 	{
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
 		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
-
-		_lengthIndicator.push_back(0);
+		SQLLEN* pLenIn = NULL;
+		if (isOutBound(dir) && nullCb.defined())
+		{
+			pLenIn = new SQLLEN;
+			*pLenIn = SQL_NTS; // microsoft example does that, otherwise no null indicator is returned
+			_nullCbMap.insert(NullCbMap::value_type(pLenIn, nullCb));
+		}
+		_lengthIndicator.push_back(pLenIn);
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
@@ -402,14 +409,15 @@ private:
 			Utility::sqlDataType(cDataType), 
 			colSize,
 			decDigits,
-			(SQLPOINTER) &val, 0, 0)))
+			(SQLPOINTER)&val, 0, 
+			_lengthIndicator.back())))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
 		}
 	}
 
 	template <typename L>
-	void bindImplLOB(std::size_t pos, const L& val, Direction dir)
+	void bindImplLOB(std::size_t pos, const L& val, Direction dir, const WhenNullCb& nullCb)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
 			throw NotImplementedException("LOB parameter type can only be inbound.");
@@ -424,6 +432,9 @@ private:
 
 		if (PB_AT_EXEC == _paramBinding)
 			*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
+
+		if (isOutBound(dir) && nullCb.defined())
+			_nullCbMap.insert(NullCbMap::value_type(pLenIn, nullCb));
 
 		_lengthIndicator.push_back(pLenIn);
 		SQLSMALLINT sqlType = (isInBound(dir) && size <= _maxVarBinColSize) ? SQL_VARBINARY : SQL_LONGVARBINARY;
@@ -889,7 +900,7 @@ private:
 	}
 
 	template<typename C>
-	void bindImplNullContainer(std::size_t pos, const C& val, Direction dir)
+	void bindImplNullContainer(std::size_t pos, const C& val, Direction dir, const std::type_info& bindElemType)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
 			throw NotImplementedException("Null container parameter type can only be inbound.");
@@ -912,13 +923,14 @@ private:
 
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
-		getColSizeAndPrecision(pos, SQL_C_STINYINT, colSize, decDigits);
+		SQLSMALLINT colType = _pTypeInfo->tryTypeidToCType(bindElemType, SQL_C_STINYINT);
+		getColSizeAndPrecision(pos, colType, colSize, decDigits);
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			SQL_PARAM_INPUT, 
-			SQL_C_STINYINT, 
-			Utility::sqlDataType(SQL_C_STINYINT), 
+			colType,
+			Utility::sqlDataType(colType),
 			colSize,
 			decDigits,
 			0, 
@@ -1012,15 +1024,16 @@ private:
 	std::size_t      _maxWCharColLength;
 	std::size_t      _maxVarBinColSize;
 	ODBCMetaColumn::NumericConversion _numericConversion;
+	NullCbMap        _nullCbMap;
 };
 
 
 //
 // inlines
 //
-inline void Binder::bind(std::size_t pos, const Poco::Int8& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const Poco::Int8& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_STINYINT, dir);
+	bindImpl(pos, val, SQL_C_STINYINT, dir, nullCb);
 }
 
 
@@ -1042,9 +1055,9 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::Int8>& val, Dire
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::UInt8& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const Poco::UInt8& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_UTINYINT, dir);
+	bindImpl(pos, val, SQL_C_UTINYINT, dir, nullCb);
 }
 
 
@@ -1066,9 +1079,9 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::UInt8>& val, Dir
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::Int16& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const Poco::Int16& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_SSHORT, dir);
+	bindImpl(pos, val, SQL_C_SSHORT, dir, nullCb);
 }
 
 
@@ -1090,9 +1103,9 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::Int16>& val, Dir
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::UInt16& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const Poco::UInt16& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_USHORT, dir);
+	bindImpl(pos, val, SQL_C_USHORT, dir, nullCb);
 }
 
 
@@ -1114,9 +1127,9 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::UInt16>& val, Di
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::Int32& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const Poco::Int32& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_SLONG, dir);
+	bindImpl(pos, val, SQL_C_SLONG, dir, nullCb);
 }
 
 
@@ -1138,9 +1151,9 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::Int32>& val, Dir
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::UInt32& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const Poco::UInt32& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_ULONG, dir);
+	bindImpl(pos, val, SQL_C_ULONG, dir, nullCb);
 }
 
 
@@ -1162,9 +1175,9 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::UInt32>& val, Di
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::Int64& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const Poco::Int64& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_SBIGINT, dir);
+	bindImpl(pos, val, SQL_C_SBIGINT, dir, nullCb);
 }
 
 
@@ -1186,9 +1199,9 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::Int64>& val, Dir
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_UBIGINT, dir);
+	bindImpl(pos, val, SQL_C_UBIGINT, dir, nullCb);
 }
 
 
@@ -1211,15 +1224,15 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::UInt64>& val, Di
 
 
 #ifndef POCO_LONG_IS_64_BIT
-inline void Binder::bind(std::size_t pos, const long& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const long& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_SLONG, dir);
+	bindImpl(pos, val, SQL_C_SLONG, dir, nullCb);
 }
 
 
-inline void Binder::bind(std::size_t pos, const unsigned long& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const unsigned long& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_SLONG, dir);
+	bindImpl(pos, val, SQL_C_SLONG, dir, nullCb);
 }
 
 
@@ -1242,9 +1255,9 @@ inline void Binder::bind(std::size_t pos, const std::list<long>& val, Direction 
 #endif
 
 
-inline void Binder::bind(std::size_t pos, const float& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const float& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_FLOAT, dir);
+	bindImpl(pos, val, SQL_C_FLOAT, dir, nullCb);
 }
 
 
@@ -1266,9 +1279,9 @@ inline void Binder::bind(std::size_t pos, const std::list<float>& val, Direction
 }
 
 
-inline void Binder::bind(std::size_t pos, const double& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const double& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_DOUBLE, dir);
+	bindImpl(pos, val, SQL_C_DOUBLE, dir, nullCb);
 }
 
 
@@ -1290,9 +1303,9 @@ inline void Binder::bind(std::size_t pos, const std::list<double>& val, Directio
 }
 
 
-inline void Binder::bind(std::size_t pos, const bool& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const bool& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_BIT, dir);
+	bindImpl(pos, val, SQL_C_BIT, dir, nullCb);
 }
 
 
@@ -1314,9 +1327,9 @@ inline void Binder::bind(std::size_t pos, const std::list<bool>& val, Direction 
 }
 
 
-inline void Binder::bind(std::size_t pos, const char& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const char& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImpl(pos, val, SQL_C_STINYINT, dir);
+	bindImpl(pos, val, SQL_C_STINYINT, dir, nullCb);
 }
 
 
@@ -1373,15 +1386,15 @@ inline void Binder::bind(std::size_t pos, const std::list<UTF16String>& val, Dir
 	bindImplContainerUTF16String(pos, val, dir);
 }
 
-inline void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const BLOB& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImplLOB<BLOB>(pos, val, dir);
+	bindImplLOB<BLOB>(pos, val, dir, nullCb);
 }
 
 
-inline void Binder::bind(std::size_t pos, const CLOB& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const CLOB& val, Direction dir, const WhenNullCb& nullCb)
 {
-	bindImplLOB<CLOB>(pos, val, dir);
+	bindImplLOB<CLOB>(pos, val, dir, nullCb);
 }
 
 
@@ -1475,21 +1488,21 @@ inline void Binder::bind(std::size_t pos, const std::list<DateTime>& val, Direct
 }
 
 
-inline void Binder::bind(std::size_t pos, const std::vector<NullData>& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const std::vector<NullData>& val, Direction dir, const std::type_info& bindElemType)
 {
-	bindImplNullContainer(pos, val, dir);
+	bindImplNullContainer(pos, val, dir, bindElemType);
 }
 
 
-inline void Binder::bind(std::size_t pos, const std::deque<NullData>& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const std::deque<NullData>& val, Direction dir, const std::type_info& bindElemType)
 {
-	bindImplNullContainer(pos, val, dir);
+	bindImplNullContainer(pos, val, dir, bindElemType);
 }
 
 
-inline void Binder::bind(std::size_t pos, const std::list<NullData>& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const std::list<NullData>& val, Direction dir, const std::type_info& bindElemType)
 {
-	bindImplNullContainer(pos, val, dir);
+	bindImplNullContainer(pos, val, dir, bindElemType);
 }
 
 

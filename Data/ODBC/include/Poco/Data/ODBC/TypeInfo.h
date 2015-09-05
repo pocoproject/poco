@@ -25,6 +25,7 @@
 #include "Poco/DynamicAny.h"
 #include <vector>
 #include <map>
+#include <typeinfo>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
@@ -71,6 +72,17 @@ public:
 		SQLINTEGER,
 		SQLSMALLINT> TypeInfoTup;
 	typedef std::vector<TypeInfoTup> TypeInfoVec;
+	typedef const std::type_info* TypeInfoPtr;
+
+	struct TypeInfoComp : public std::binary_function<TypeInfoPtr, TypeInfoPtr, bool>
+	{	
+		bool operator()(const TypeInfoPtr& left, const TypeInfoPtr& right) const
+		{	// apply operator< to operands
+			return ( left->before( *right ) );
+		}
+	};
+
+	typedef std::map<TypeInfoPtr, SQLSMALLINT, TypeInfoComp> CppTypeInfoMap;
 
 	explicit TypeInfo(SQLHDBC* pHDBC=0);
 		/// Creates the TypeInfo.
@@ -102,6 +114,10 @@ public:
 		/// Prints all the types (as reported by the underlying database)
 		/// to the supplied output stream.
 
+	SQLSMALLINT tryTypeidToCType(const std::type_info& ti, SQLSMALLINT defaultVal = SQL_C_TINYINT) const;
+		/// try to find mapping of the given C++ typeid to the ODBC C-Type Code
+		/// will return the defaultVal if no match is found
+
 private:
 	void fillCTypes();
 	void fillSQLTypes();
@@ -109,6 +125,7 @@ private:
 	DataTypeMap _cDataTypes; 
 	DataTypeMap _sqlDataTypes; 
 	TypeInfoVec _typeInfo;
+	CppTypeInfoMap _cppDataTypes;
 	SQLHDBC*    _pHDBC;
 };
 

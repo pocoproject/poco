@@ -167,6 +167,9 @@ private:
 //
 // We provide an instantiation for char
 //
+#if defined(_WIN32) && defined(POCO_DLL) && !defined(Foundation_EXPORTS) // See #921
+template class Foundation_API BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char> >;
+#endif
 typedef BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char> > BufferedBidirectionalStreamBuf;
 
 
