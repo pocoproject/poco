@@ -228,7 +228,11 @@ void FileTest::testFileAttributes2()
 void FileTest::testFileAttributes3()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
+#if POCO_OS==POCO_OS_CYGWIN
+	File f("/dev/tty");
+#else
 	File f("/dev/console");
+#endif
 #elif defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
 	File f("CON");
 #endif

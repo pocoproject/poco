@@ -89,8 +89,9 @@ CppUnit::Test* SharedMemoryTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SharedMemoryTest");
 
+#if !defined(POCO_NO_SHAREDMEMORY)
 	CppUnit_addTest(pSuite, SharedMemoryTest, testCreate);
 	CppUnit_addTest(pSuite, SharedMemoryTest, testCreateFromFile);
-
+#endif
 	return pSuite;
 }

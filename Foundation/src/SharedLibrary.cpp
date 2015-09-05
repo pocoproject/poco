@@ -104,6 +104,12 @@ const std::string& SharedLibrary::getPath() const
 }
 
 
+std::string SharedLibrary::prefix()
+{
+	return prefixImpl();
+}
+
+
 std::string SharedLibrary::suffix()
 {
 	return suffixImpl();

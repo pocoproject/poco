@@ -118,6 +118,12 @@ public:
 		/// specified in a call to load() or the 
 		/// constructor.
 		
+	static std::string prefix();
+		/// Returns the platform-specific filename prefix
+		/// for shared libraries.
+		/// Most platforms would return an empty string, but
+	    /// on Cygwin, the "cyg" prefix will be returned.
+		
 	static std::string suffix();
 		/// Returns the platform-specific filename suffix
 		/// for shared libraries (including the period).
