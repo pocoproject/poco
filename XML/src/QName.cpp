@@ -7,8 +7,6 @@
 // Package: XML
 // Module:  QName
 //
-// Definition of the QName class.
-//
 // Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -53,7 +51,7 @@ QName::QName(const std::string& ns, const std::string& name, const std::string& 
 }
 
 
-std::string QName::string() const
+std::string QName::toString() const
 {
 	std::string r;
 	if (!_ns.empty())
@@ -67,9 +65,9 @@ std::string QName::string() const
 }
 
 
-std::ostream& operator<<(std::ostream& os, const QName& qn)
+std::ostream& operator << (std::ostream& os, const QName& qn)
 {
-	return os << qn.string();
+	return os << qn.toString();
 }
 
 

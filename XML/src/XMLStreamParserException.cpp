@@ -7,8 +7,6 @@
 // Package: XML
 // Module:  XMLStreamParserException
 //
-// Definition of the XMLStreamParserException class.
-//
 // Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
