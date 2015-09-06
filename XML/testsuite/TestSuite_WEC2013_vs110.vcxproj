@@ -309,6 +309,7 @@
   <ItemGroup>
     <ClInclude Include="src\NamePoolTest.h"/>
     <ClInclude Include="src\NameTest.h"/>
+    <ClInclude Include="src\XMLStreamParserTest.h"/>
     <ClInclude Include="src\XMLWriterTest.h"/>
     <ClInclude Include="src\AttributesImplTest.h"/>
     <ClInclude Include="src\NamespaceSupportTest.h"/>
@@ -331,6 +332,7 @@
   <ItemGroup>
     <ClCompile Include="src\NamePoolTest.cpp"/>
     <ClCompile Include="src\NameTest.cpp"/>
+    <ClCompile Include="src\XMLStreamParserTest.cpp"/>
     <ClCompile Include="src\XMLWriterTest.cpp"/>
     <ClCompile Include="src\AttributesImplTest.cpp"/>
     <ClCompile Include="src\NamespaceSupportTest.cpp"/>

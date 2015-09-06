@@ -337,15 +337,20 @@
     <ClInclude Include="include\Poco\Sax\XMLFilter.h"/>
     <ClInclude Include="include\Poco\Sax\XMLFilterImpl.h"/>
     <ClInclude Include="include\Poco\SAX\XMLReader.h"/>
+    <ClInclude Include="include\Poco\XML\Content.h"/>
     <ClInclude Include="include\Poco\Xml\expat.h"/>
     <ClInclude Include="include\Poco\Xml\expat_external.h"/>
     <ClInclude Include="include\Poco\XML\Name.h"/>
     <ClInclude Include="include\Poco\Xml\NamePool.h"/>
     <ClInclude Include="include\Poco\Xml\NamespaceStrategy.h"/>
     <ClInclude Include="include\Poco\Xml\ParserEngine.h"/>
+    <ClInclude Include="include\Poco\XML\QName.h"/>
+    <ClInclude Include="include\Poco\XML\ValueTraits.h"/>
     <ClInclude Include="include\Poco\Xml\XML.h"/>
     <ClInclude Include="include\Poco\Xml\XMLException.h"/>
     <ClInclude Include="include\Poco\Xml\XMLStream.h"/>
+    <ClInclude Include="include\Poco\XML\XMLStreamParser.h"/>
+    <ClInclude Include="include\Poco\XML\XMLStreamParserException.h"/>
     <ClInclude Include="include\Poco\Xml\XMLString.h"/>
     <ClInclude Include="include\Poco\Xml\XMLWriter.h"/>
     <ClInclude Include="src\ascii.h"/>
@@ -417,10 +422,12 @@
     <ClCompile Include="src\Notation.cpp"/>
     <ClCompile Include="src\ParserEngine.cpp"/>
     <ClCompile Include="src\ProcessingInstruction.cpp"/>
+    <ClCompile Include="src\QName.cpp"/>
     <ClCompile Include="src\SAXException.cpp"/>
     <ClCompile Include="src\SAXParser.cpp"/>
     <ClCompile Include="src\Text.cpp"/>
     <ClCompile Include="src\TreeWalker.cpp"/>
+    <ClCompile Include="src\ValueTraits.cpp"/>
     <ClCompile Include="src\WhitespaceFilter.cpp"/>
     <ClCompile Include="src\XMLException.cpp"/>
     <ClCompile Include="src\XMLFilter.cpp"/>
@@ -428,6 +435,8 @@
     <ClCompile Include="src\xmlparse.cpp"/>
     <ClCompile Include="src\XMLReader.cpp"/>
     <ClCompile Include="src\xmlrole.c"/>
+    <ClCompile Include="src\XMLStreamParser.cpp"/>
+    <ClCompile Include="src\XMLStreamParserException.cpp"/>
     <ClCompile Include="src\XMLString.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
