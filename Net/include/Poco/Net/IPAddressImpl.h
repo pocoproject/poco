@@ -42,9 +42,9 @@ public:
 	enum Family
 		/// Possible address families for IP addresses.
 	{
-		IPv4
+		IPv4,
 #ifdef POCO_HAVE_IPv6
-		,IPv6
+		IPv6
 #endif
 	};
 	
