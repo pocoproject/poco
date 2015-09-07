@@ -212,7 +212,7 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
 {
 #if defined(POCO_HAVE_IPv6)
-	if (address.family() != IPAddress::IPv6)
+	if (address.family() != SocketAddress::IPv6)
 		throw Poco::InvalidArgumentException("SocketAddress must be an IPv6 address");
 		
 	if (_sockfd == POCO_INVALID_SOCKET)

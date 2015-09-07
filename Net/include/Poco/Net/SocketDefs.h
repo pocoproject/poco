@@ -134,6 +134,7 @@
 	#include <errno.h>
 	#include <sys/types.h>
 	#include <sys/socket.h>
+	#include <sys/un.h>
 	#include <fcntl.h>
 	#if POCO_OS != POCO_OS_HPUX
 		#include <sys/select.h>
@@ -271,15 +272,19 @@
 
 
 #if defined(POCO_HAVE_SALEN)
-	#define poco_set_sa_len(pSA, len)  (pSA)->sa_len   = (len)
-	#define poco_set_sin_len(pSA)      (pSA)->sin_len  = sizeof(struct sockaddr_in)
+	#define poco_set_sa_len(pSA, len) (pSA)->sa_len = (len)
+	#define poco_set_sin_len(pSA) (pSA)->sin_len = sizeof(struct sockaddr_in)
 	#if defined(POCO_HAVE_IPv6)
 		#define poco_set_sin6_len(pSA) (pSA)->sin6_len = sizeof(struct sockaddr_in6)
 	#endif
+	#if defined(POCO_OS_FAMILY_UNIX)
+		#define poco_set_sun_len(pSA, len) (pSA)->sun_len = (len)
+	#endif
 #else
-	#define poco_set_sa_len(pSA, len) (void) 0
-	#define poco_set_sin_len(pSA)     (void) 0
-	#define poco_set_sin6_len(pSA)    (void) 0
+	#define poco_set_sa_len(pSA, len)  (void) 0
+	#define poco_set_sin_len(pSA)      (void) 0
+	#define poco_set_sin6_len(pSA)     (void) 0
+	#define poco_set_sun_len(pSA, len) (void) 0
 #endif
 
 

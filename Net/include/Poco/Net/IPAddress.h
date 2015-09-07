@@ -61,9 +61,9 @@ public:
 	enum Family
 		/// Possible address families for IP addresses.
 	{
-		IPv4 = Poco::Net::Impl::IPAddressImpl::IPv4
+		IPv4 = Poco::Net::Impl::IPAddressImpl::IPv4,
 #ifdef POCO_HAVE_IPv6
-		,IPv6 = Poco::Net::Impl::IPAddressImpl::IPv6
+		IPv6 = Poco::Net::Impl::IPAddressImpl::IPv6
 #endif
 	};
 	
