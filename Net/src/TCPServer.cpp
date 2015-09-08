@@ -123,7 +123,12 @@ void TCPServer::run()
 				{
 					StreamSocket ss = _socket.acceptConnection();
 					// enabe nodelay per default: OSX really needs that
-					ss.setNoDelay(true);
+#if defined(POCO_OS_FAMILY_UNIX)
+					if (ss.address().family() != AddressFamily::UNIX_LOCAL)
+#endif
+					{
+						ss.setNoDelay(true);
+					}
 					_pDispatcher->enqueue(ss);
 				}
 				catch (Poco::Exception& exc)
