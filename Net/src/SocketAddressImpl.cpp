@@ -63,6 +63,7 @@ IPv4SocketAddressImpl::IPv4SocketAddressImpl(const void* addr, UInt16 port)
 {
 	std::memset(&_addr, 0, sizeof(_addr));
 	_addr.sin_family = AF_INET;
+	poco_set_sin_len(&_addr);
 	std::memcpy(&_addr.sin_addr, addr, sizeof(_addr.sin_addr));
 	_addr.sin_port = port;
 }
@@ -73,7 +74,7 @@ std::string IPv4SocketAddressImpl::toString() const
 	std::string result;
 	result.append(host().toString());
 	result.append(":");
-	NumberFormatter::append(result, port());
+	NumberFormatter::append(result, ntohs(port()));
 	return result;
 }
 
@@ -120,7 +121,7 @@ std::string IPv6SocketAddressImpl::toString() const
 	result.append(host().toString());
 	result.append("]");
 	result.append(":");
-	NumberFormatter::append(result, port());
+	NumberFormatter::append(result, ntohs(port()));
 	return result;
 }
 

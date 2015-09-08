@@ -42,6 +42,12 @@ namespace Poco {
 namespace Net {
 
 
+const IPAddress::Family IPAddress::IPv4;
+#if defined(POCO_HAVE_IPv6)
+const IPAddress::Family IPAddress::IPv6;
+#endif
+
+
 IPAddress::IPAddress()
 {
 	newIPv4();

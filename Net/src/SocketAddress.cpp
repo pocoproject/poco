@@ -58,6 +58,15 @@ struct AFLT
 //
 
 
+const SocketAddress::Family SocketAddress::IPv4;
+#if defined(POCO_HAVE_IPv6)
+const SocketAddress::Family SocketAddress::IPv6;
+#endif
+#if defined(POCO_OS_FAMILY_UNIX)
+const SocketAddress::Family SocketAddress::UNIX_LOCAL;
+#endif
+
+
 SocketAddress::SocketAddress()
 {
 	newIPv4();
@@ -117,17 +126,17 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 
 SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t length)
 {
-	if (length == sizeof(struct sockaddr_in))
+	if (length == sizeof(struct sockaddr_in) && sockAddr->sa_family == AF_INET)
 		newIPv4(reinterpret_cast<const struct sockaddr_in*>(sockAddr));
 #if defined(POCO_HAVE_IPv6)
-	else if (length == sizeof(struct sockaddr_in6))
+	else if (length == sizeof(struct sockaddr_in6) && sockAddr->sa_family == AF_INET6)
 		newIPv6(reinterpret_cast<const struct sockaddr_in6*>(sockAddr));
 #endif
 #if defined(POCO_OS_FAMILY_UNIX)
 	else if (length > 0 && length <= sizeof(struct sockaddr_un) && sockAddr->sa_family == AF_UNIX)
 		newLocal(reinterpret_cast<const sockaddr_un*>(sockAddr));
 #endif
-	else throw Poco::InvalidArgumentException("Invalid address length passed to SocketAddress()");
+	else throw Poco::InvalidArgumentException("Invalid address length or family passed to SocketAddress()");
 }
 
 
@@ -263,6 +272,8 @@ void SocketAddress::init(Family family, const std::string& address)
 
 void SocketAddress::init(const std::string& hostAndPort)
 {
+	poco_assert (!hostAndPort.empty());
+
 	std::string host;
 	std::string port;
 	std::string::const_iterator it  = hostAndPort.begin();
@@ -332,7 +343,7 @@ Poco::BinaryReader& operator >> (Poco::BinaryReader& reader, Poco::Net::SocketAd
 }
 
 
-inline std::ostream& operator << (std::ostream& ostr, const Poco::Net::SocketAddress& address)
+std::ostream& operator << (std::ostream& ostr, const Poco::Net::SocketAddress& address)
 {
 	ostr << address.toString();
 	return ostr;

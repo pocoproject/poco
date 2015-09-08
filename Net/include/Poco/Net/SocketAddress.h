@@ -43,17 +43,17 @@ class Net_API SocketAddress
 	/// host address and a port number.
 {
 public:
-	enum Family
-		/// Possible address families for socket addresses.
-	{
-		IPv4 = Poco::Net::Impl::SocketAddressImpl::IPv4,
-#ifdef POCO_HAVE_IPv6
-		IPv6 = Poco::Net::Impl::SocketAddressImpl::IPv6,
+	// The following declarations keep the Family type
+	// backwards compatible with the previously used
+	// enum declaration.
+	typedef AddressFamily::Family Family;
+	static const Family IPv4 = AddressFamily::IPv4;
+#if defined(POCO_HAVE_IPv6)
+	static const Family IPv6 = AddressFamily::IPv6;
 #endif
-#ifdef POCO_OS_FAMILY_UNIX
-		UNIX_LOCAL = Poco::Net::Impl::SocketAddressImpl::UNIX_LOCAL
+#if defined(POCO_OS_FAMILY_UNIX)
+	static const Family UNIX_LOCAL = AddressFamily::UNIX_LOCAL;
 #endif
-	};
 
 	SocketAddress();
 		/// Creates a wildcard (all zero) IPv4 SocketAddress.
@@ -316,16 +316,16 @@ inline bool SocketAddress::operator == (const SocketAddress& socketAddress) cons
 {
 #if defined(POCO_OS_FAMILY_UNIX)
 	if (family() == UNIX_LOCAL)
-		return host() == socketAddress.host() && port() == socketAddress.port();
+		return toString() == socketAddress.toString();
 	else
 #endif
-		return toString() == socketAddress.toString();
+		return host() == socketAddress.host() && port() == socketAddress.port();		
 }
 
 
 inline bool SocketAddress::operator != (const SocketAddress& socketAddress) const
 {
-	return !operator == (socketAddress);
+	return !(operator == (socketAddress));
 }
 
 

@@ -32,7 +32,7 @@ RawSocket::RawSocket():
 }
 
 
-RawSocket::RawSocket(IPAddress::Family family, int proto): 
+RawSocket::RawSocket(SocketAddress::Family family, int proto): 
 	Socket(new RawSocketImpl(family, proto))
 {
 }

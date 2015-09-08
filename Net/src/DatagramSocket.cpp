@@ -31,7 +31,7 @@ DatagramSocket::DatagramSocket(): Socket(new DatagramSocketImpl)
 }
 
 
-DatagramSocket::DatagramSocket(IPAddress::Family family): Socket(new DatagramSocketImpl(family))
+DatagramSocket::DatagramSocket(SocketAddress::Family family): Socket(new DatagramSocketImpl(family))
 {
 }
 

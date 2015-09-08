@@ -53,8 +53,12 @@ MulticastSocket::MulticastSocket()
 }
 
 
-MulticastSocket::MulticastSocket(IPAddress::Family family): DatagramSocket(family)
+MulticastSocket::MulticastSocket(SocketAddress::Family family): DatagramSocket(family)
 {
+#if defined(POCO_OS_FAMILY_UNIX)
+	if (family == SocketAddress::UNIX_LOCAL)
+		throw Poco::InvalidArgumentException("Cannot create a MulticastSocket with UNIX_LOCAL socket");
+#endif
 }
 
 
@@ -92,8 +96,7 @@ void MulticastSocket::setInterface(const NetworkInterface& interfc)
 		impl()->setOption(IPPROTO_IPV6, IPV6_MULTICAST_IF, interfc.index());
 	}
 #endif
-	else
-		throw UnsupportedFamilyException("Unknown or unsupported socket family.");
+	else throw UnsupportedFamilyException("Unknown or unsupported socket family.");
 }
 
 	

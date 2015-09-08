@@ -57,15 +57,15 @@ class Net_API IPAddress
 {
 public:
 	typedef std::vector<IPAddress> List;
-
-	enum Family
-		/// Possible address families for IP addresses.
-	{
-		IPv4 = Poco::Net::Impl::IPAddressImpl::IPv4,
-#ifdef POCO_HAVE_IPv6
-		IPv6 = Poco::Net::Impl::IPAddressImpl::IPv6
+	
+	// The following declarations keep the Family type
+	// backwards compatible with the previously used
+	// enum declaration.
+	typedef AddressFamily::Family Family;
+	static const Family IPv4 = AddressFamily::IPv4;
+#if defined(POCO_HAVE_IPv6)
+	static const Family IPv6 = AddressFamily::IPv6;
 #endif
-	};
 	
 	IPAddress();
 		/// Creates a wildcard (zero) IPv4 IPAddress.

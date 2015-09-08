@@ -353,4 +353,32 @@
 #endif
 
 
+namespace Poco {
+namespace Net {
+
+
+struct AddressFamily
+	/// AddressFamily::Family replaces the previously used IPAddress::Family
+	/// enumeration and is now used for IPAddress::Family and SocketAddress::Family.
+{
+	enum Family
+		/// Possible address families for socket addresses.
+	{
+		IPv4,
+			/// IPv4 address family.
+	#if defined(POCO_HAVE_IPv6)
+		IPv6,
+			/// IPv6 address family.
+	#endif
+	#if defined(POCO_OS_FAMILY_UNIX)
+		UNIX_LOCAL
+			/// UNIX domain socket address family. Available on UNIX/POSIX platforms only.
+	#endif
+	};
+};
+
+
+} } // namespace Poco::Net
+
+
 #endif // Net_SocketDefs_INCLUDED
