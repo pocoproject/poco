@@ -160,7 +160,6 @@
 	#else
 		#error "MIPS but neither MIPSEL nor MIPSEB?"
 	#endif
-
 #elif defined(__hppa) || defined(__hppa__)
 	#define POCO_ARCH POCO_ARCH_HPPA
 	#define POCO_ARCH_BIG_ENDIAN 1
