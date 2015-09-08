@@ -257,15 +257,18 @@ void SocketAddress::init(const std::string& hostAddress, Poco::UInt16 portNumber
 }
 
 
-void SocketAddress::init(Family family, const std::string& address)
+void SocketAddress::init(Family fam, const std::string& address)
 {
-	if (family == UNIX_LOCAL)
+#if defined(POCO_OS_FAMILY_UNIX)
+	if (fam == UNIX_LOCAL)
 	{
 		newLocal(address);
 	}
 	else
+#endif
 	{
 		init(address);
+		if (fam != family()) throw Poco::InvalidArgumentException("address does not fit family");
 	}
 }
 
