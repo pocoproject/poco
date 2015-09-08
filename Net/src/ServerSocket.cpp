@@ -96,9 +96,13 @@ void ServerSocket::bind6(const SocketAddress& address, bool reuseAddress, bool i
 
 void ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool ipV6Only)
 {
+#if defined(POCO_HAVE_IPv6)
 	IPAddress wildcardAddr(IPAddress::IPv6);
 	SocketAddress address(wildcardAddr, port);
 	impl()->bind6(address, reuseAddress, ipV6Only);
+#else
+	throw Poco::NotImplementedException("No IPv6 support available");
+#endif // POCO_HAVE_IPv6
 }
 
 	

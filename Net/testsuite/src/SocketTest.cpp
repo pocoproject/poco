@@ -23,6 +23,7 @@
 #include "Poco/Buffer.h"
 #include "Poco/FIFOBuffer.h"
 #include "Poco/Delegate.h"
+#include "Poco/File.h"
 #include <iostream>
 
 
@@ -501,6 +502,28 @@ void SocketTest::testSelect3()
 }
 
 
+void SocketTest::testEchoUnixLocal()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	Poco::File socketFile("/tmp/SocketTest.sock");
+	if (socketFile.exists()) socketFile.remove();
+	SocketAddress localAddr(SocketAddress::UNIX_LOCAL, socketFile.path());
+	EchoServer echoServer(localAddr);
+	StreamSocket ss(SocketAddress::UNIX_LOCAL);
+	ss.connect(localAddr);
+	int n = ss.sendBytes("hello", 5);
+	assert (n == 5);
+	char buffer[256];
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assert (n == 5);
+	assert (std::string(buffer, n) == "hello");
+	ss.close();
+	socketFile.remove();
+#endif
+}
+
+
+
 void SocketTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -549,6 +572,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testSelect);
 	CppUnit_addTest(pSuite, SocketTest, testSelect2);
 	CppUnit_addTest(pSuite, SocketTest, testSelect3);
+	CppUnit_addTest(pSuite, SocketTest, testEchoUnixLocal);
 
 	return pSuite;
 }

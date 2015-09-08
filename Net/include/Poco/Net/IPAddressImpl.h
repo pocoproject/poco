@@ -124,6 +124,9 @@ private:
 };
 
 
+#if defined(POCO_HAVE_IPv6)
+
+
 //
 // IPv6AddressImpl
 //
@@ -172,6 +175,9 @@ private:
 	struct in6_addr _addr;
 	unsigned int    _scope;
 };
+
+
+#endif // POCO_HAVE_IPv6
 
 
 } } } // namespace Poco::Net::Impl

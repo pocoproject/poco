@@ -29,6 +29,9 @@ public:
 	EchoServer();
 		/// Creates the EchoServer.
 
+	EchoServer(const Poco::Net::SocketAddress& address);
+		/// Creates the EchoServer using the given address.
+
 	~EchoServer();
 		/// Destroys the EchoServer.
 
