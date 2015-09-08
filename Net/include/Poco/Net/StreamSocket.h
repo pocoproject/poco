@@ -47,7 +47,7 @@ public:
 		/// Creates a stream socket and connects it to
 		/// the socket specified by address.
 
-	explicit StreamSocket(IPAddress::Family family);
+	explicit StreamSocket(SocketAddress::Family family);
 		/// Creates an unconnected stream socket
 		/// for the given address family.
 		///

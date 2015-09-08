@@ -29,6 +29,7 @@ public:
 	void testSocketAddress();
 	void testSocketRelationals();
 	void testSocketAddress6();
+	void testSocketAddressUnixLocal();
 
 	void setUp();
 	void tearDown();

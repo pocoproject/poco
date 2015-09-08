@@ -31,12 +31,12 @@ RawSocketImpl::RawSocketImpl()
 }
 
 
-RawSocketImpl::RawSocketImpl(IPAddress::Family family, int proto)
+RawSocketImpl::RawSocketImpl(SocketAddress::Family family, int proto)
 {
-	if (family == IPAddress::IPv4)
+	if (family == SocketAddress::IPv4)
 		init2(AF_INET, proto);
 #if defined(POCO_HAVE_IPv6)
-	else if (family == IPAddress::IPv6)
+	else if (family == SocketAddress::IPv6)
 		init2(AF_INET6, proto);
 #endif
 	else throw InvalidArgumentException("Invalid or unsupported address family passed to RawSocketImpl");

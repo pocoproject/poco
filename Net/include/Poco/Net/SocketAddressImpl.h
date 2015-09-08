@@ -27,6 +27,7 @@
 #include "Poco/RefCountedObject.h"
 #endif
 
+
 namespace Poco {
 namespace Net {
 namespace Impl {
@@ -38,17 +39,7 @@ class Net_API SocketAddressImpl
 #endif
 {
 public:
-	enum Family
-		/// Possible address families for socket addresses.
-	{
-		IPv4,
-#ifdef POCO_HAVE_IPv6
-		IPv6,
-#endif
-#ifdef POCO_OS_FAMILY_UNIX
-		UNIX_LOCAL
-#endif
-	};
+	typedef AddressFamily::Family Family;
 
 	virtual ~SocketAddressImpl();
 
@@ -124,7 +115,7 @@ inline int IPv4SocketAddressImpl::af() const
 
 inline SocketAddressImpl::Family IPv4SocketAddressImpl::family() const
 {
-	return SocketAddressImpl::IPv4;
+	return AddressFamily::IPv4;
 }
 
 
@@ -186,7 +177,7 @@ inline int IPv6SocketAddressImpl::af() const
 
 inline SocketAddressImpl::Family IPv6SocketAddressImpl::family() const
 {
-	return SocketAddressImpl::IPv6;
+	return AddressFamily::IPv6;
 }
 
 
@@ -254,7 +245,7 @@ inline int LocalSocketAddressImpl::af() const
 
 inline SocketAddressImpl::Family LocalSocketAddressImpl::family() const
 {
-	return SocketAddressImpl::UNIX_LOCAL;
+	return AddressFamily::UNIX_LOCAL;
 }
 
 
