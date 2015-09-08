@@ -139,7 +139,9 @@ public:
 	enum
 	{
 		MAX_ADDRESS_LENGTH = 
-#if defined(POCO_HAVE_IPv6)
+#if defined(POCO_OS_FAMILY_UNIX)
+			sizeof(struct sockaddr_un)
+#elif defined(POCO_HAVE_IPv6)
 			sizeof(struct sockaddr_in6)
 #else
 			sizeof(struct sockaddr_in)
