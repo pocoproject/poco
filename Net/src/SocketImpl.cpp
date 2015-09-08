@@ -1064,6 +1064,8 @@ void SocketImpl::error(int code, const std::string& arg)
 		throw IOException("Broken pipe", code);
 	case EBADF:
 		throw IOException("Bad socket descriptor", code);
+	case ENOENT:
+		throw IOException("Not found", arg, code);
 #endif
 	default:
 		throw IOException(NumberFormatter::format(code), arg, code);
