@@ -205,7 +205,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 			reconnect();
 		if (!keepAlive)
 			request.setKeepAlive(false);
-		if (!request.has(HTTPRequest::HOST))
+		if (!request.has(HTTPRequest::HOST) && !_host.empty())
 			request.setHost(_host, _port);
 		if (!_proxyConfig.host.empty() && !bypassProxy())
 		{
