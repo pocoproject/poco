@@ -93,7 +93,9 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parse64("-123") == -123);
 	assert(NumberParser::parse64("0123") == 123);
 	assert(NumberParser::parse64("-0123") == -123);
+#if defined(POCO_ENABLE_CPP11)
 	assert(NumberParser::parse64("123456789123456789") == UINT64_C(123456789123456789));
+#endif
 	assert(NumberParser::parseUnsigned64("123") == 123);
 	assert(NumberParser::parseHex64("12AB") == 0x12ab);
 	assert(NumberParser::parseOct64("123") == 0123);
