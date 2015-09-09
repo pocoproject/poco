@@ -22,6 +22,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
+#include <cstdint>
 
 
 using Poco::NumberParser;
@@ -69,20 +70,11 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parse("-123") == -123);
 	assert(NumberParser::parse("0") == 0);
 	assert(NumberParser::parse("000") == 0);
-	assert(NumberParser::parse("  123  ") == 123);
-	assert(NumberParser::parse(" 123") == 123);
-	assert(NumberParser::parse("123 ") == 123);
 	assert(NumberParser::parse("0123") == 123);
 	assert(NumberParser::parse("+0123") == 123);
 	assert(NumberParser::parse("-0123") == -123);
-	assert(NumberParser::parse("-123") == -123);
 	assert(NumberParser::parseUnsigned("123") == 123);
 	assert(NumberParser::parseHex("12AB") == 0x12ab);
-	assert(NumberParser::parseHex("0X12AB") == 0x12ab);
-	assert(NumberParser::parseHex("0x12AB") == 0x12ab);
-	assert(NumberParser::parseHex("0x12aB") == 0x12ab);
-	assert(NumberParser::parseHex("0X98Fe") == 0x98fe);
-	assert(NumberParser::parseHex("0x0") == 0);
 	assert(NumberParser::parseHex("00") == 0);
 	assert(NumberParser::parseOct("123") == 0123);
 	assert(NumberParser::parseOct("0123") == 0123);
@@ -101,9 +93,9 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parse64("-123") == -123);
 	assert(NumberParser::parse64("0123") == 123);
 	assert(NumberParser::parse64("-0123") == -123);
+	assert(NumberParser::parse64("123456789123456789") == UINT64_C(123456789123456789));
 	assert(NumberParser::parseUnsigned64("123") == 123);
 	assert(NumberParser::parseHex64("12AB") == 0x12ab);
-	assert(NumberParser::parseHex64("0x12AB") == 0x12ab);
 	assert(NumberParser::parseOct64("123") == 0123);
 	assert(NumberParser::parseOct64("0123") == 0123);
 #endif
@@ -155,35 +147,26 @@ void NumberParserTest::testParse()
 				assertEqualDelta(d, NumberParser::parseFloat(format("-1%c234e+100", dp), dp, ts), 0.01);
 				assertEqualDelta(d, NumberParser::parseFloat(format("-1%c234E100", dp), dp, ts), 0.01);
 		
-				d = 1.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format(" 1%c234e-100 ", dp), dp, ts), 0.01);
-				assertEqualDelta(d, NumberParser::parseFloat(format(" 1%c234e-100 ", dp), dp, ts), 0.01);
-				assertEqualDelta(d, NumberParser::parseFloat(format("  1%c234e-100 ", dp), dp, ts), 0.01);
-
 				d = 1234.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format(" 1%c234%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("1%c234%c234e-100", ts, dp), dp, ts), 0.01);
 				d = 12345.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format(" 12%c345%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("12%c345%c234e-100", ts, dp), dp, ts), 0.01);
 				d = 123456.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format("  123%c456%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("123%c456%c234e-100", ts, dp), dp, ts), 0.01);
 
 				d = -1234.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format(" -1%c234%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("-1%c234%c234e-100", ts, dp), dp, ts), 0.01);
 				d = -12345.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format(" -12%c345%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("-12%c345%c234e-100", ts, dp), dp, ts), 0.01);
 				d = -123456.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format("  -123%c456%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("-123%c456%c234e-100", ts, dp), dp, ts), 0.01);
 			}
 
 			double d = 12.34e-10;
 			assertEqualDelta(d, NumberParser::parseFloat(format("12%c34e-10", dp), dp, ts), 0.01);
 			assertEqualDelta(-12.34, NumberParser::parseFloat(format("-12%c34", dp), dp, ts), 0.01);
 	
-			assertEqualDelta(12.34, NumberParser::parseFloat(format("   12%c34", dp),dp, ts), 0.01);
-			assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c34   ", dp), dp, ts), 0.01);
-			assertEqualDelta(12.34, NumberParser::parseFloat(format(" 12%c34  ", dp), dp, ts), 0.01);
-
-			assertEqualDelta(12.34, NumberParser::parseFloat(format("\t\n 12%c34  \v\f\r", dp), dp, ts), 0.01);
+			assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c34", dp), dp, ts), 0.01);
 		}
 	}
 #endif // POCO_NO_FPENVIRONMENT
@@ -228,6 +211,13 @@ void NumberParserTest::testParseError()
 	try
 	{
 		NumberParser::parse(" ");
+		NumberParser::parseBool("");
+		failmsg("must throw SyntaxException");
+	} catch (SyntaxException&) { }
+
+	try
+	{
+		NumberParser::parse(" 123");
 		NumberParser::parseBool("");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
