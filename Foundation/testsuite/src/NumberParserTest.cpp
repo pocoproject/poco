@@ -75,6 +75,8 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parse("-0123") == -123);
 	assert(NumberParser::parseUnsigned("123") == 123);
 	assert(NumberParser::parseHex("12AB") == 0x12ab);
+	assert(NumberParser::parseHex("0x12AB") == 0x12ab);
+	assert(NumberParser::parseHex("0X12AB") == 0x12ab);
 	assert(NumberParser::parseHex("00") == 0);
 	assert(NumberParser::parseOct("123") == 0123);
 	assert(NumberParser::parseOct("0123") == 0123);
