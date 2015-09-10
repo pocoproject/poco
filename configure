@@ -224,7 +224,7 @@ if [ "$config" = "" ] ; then
  	config=`uname`
 	case "$config" in
 	CYGWIN*)
-		config=CYGWIN ;;
+		config=Cygwin ;;
 	MINGW*)
 		config=MinGW ;;
 	esac

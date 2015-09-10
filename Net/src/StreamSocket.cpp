@@ -41,7 +41,7 @@ StreamSocket::StreamSocket(const SocketAddress& address): Socket(new StreamSocke
 }
 
 
-StreamSocket::StreamSocket(IPAddress::Family family): Socket(new StreamSocketImpl(family))
+StreamSocket::StreamSocket(SocketAddress::Family family): Socket(new StreamSocketImpl(family))
 {
 }
 

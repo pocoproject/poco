@@ -7,24 +7,23 @@
 // Package: XML
 // Module:  QName
 //
-// Definition of the QName class.
-//
-// Copyright (c) 2004-2015, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
+// Based on libstudxml (http://www.codesynthesis.com/projects/libstudxml/).
+// Copyright (c) 2009-2013 Code Synthesis Tools CC.
+//
 // SPDX-License-Identifier:	BSL-1.0
-// copyright : Copyright (c) 2009-2013 Code Synthesis Tools CC
-// license   : MIT; see accompanying LICENSE file
+//
+
 
 #include "Poco/XML/QName.h"
 #include <ostream>
 
-using namespace std;
 
-namespace Poco
-{
-namespace XML
-{
+namespace Poco {
+namespace XML {
+
 
 QName::QName()
 {
@@ -52,7 +51,7 @@ QName::QName(const std::string& ns, const std::string& name, const std::string& 
 }
 
 
-string QName::string() const
+std::string QName::toString() const
 {
 	std::string r;
 	if (!_ns.empty())
@@ -65,10 +64,11 @@ string QName::string() const
 	return r;
 }
 
-ostream& operator<<(ostream& os, const QName& qn)
+
+std::ostream& operator << (std::ostream& os, const QName& qn)
 {
-	return os << qn.string();
+	return os << qn.toString();
 }
 
-}
-}
+
+} } // namespace Poco::XML

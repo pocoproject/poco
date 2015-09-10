@@ -68,7 +68,10 @@ endif
 #
 POCO_HOST_OSNAME = $(shell uname)
 ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
-POCO_HOST_OSNAME = CYGWIN
+ifeq ($(findstring x86_64,$(POCO_HOST_OSNAME)),x86_64)
+OSARCH_64BITS = 1
+endif
+POCO_HOST_OSNAME = Cygwin
 endif
 
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)

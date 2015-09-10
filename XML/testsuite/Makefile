@@ -12,8 +12,8 @@ objects = AttributesImplTest ChildNodesTest DOMTestSuite DocumentTest \
 	DocumentTypeTest Driver ElementTest EventTest NamePoolTest NameTest \
 	NamespaceSupportTest NodeIteratorTest NodeTest ParserWriterTest \
 	SAXParserTest SAXTestSuite TextTest TreeWalkerTest \
-	XMLTestSuite XMLWriterTest NodeAppenderTest XMLStreamSerializerTestSuite \
-	XMLStreamParserTestSuite
+	XMLTestSuite XMLWriterTest NodeAppenderTest \
+	XMLStreamParserTest
 
 target         = testrunner
 target_version = 1

@@ -43,8 +43,11 @@ void SocketAddressTest::testSocketAddress()
 	assert (wild.port() == 0);
 
 	SocketAddress sa1("192.168.1.100", 100);
+	assert (sa1.af() == AF_INET);
+	assert (sa1.family() == SocketAddress::IPv4);
 	assert (sa1.host().toString() == "192.168.1.100");
 	assert (sa1.port() == 100);
+	assert (sa1.toString() == "192.168.1.100:100");
 
 	SocketAddress sa2("192.168.1.100", "100");
 	assert (sa2.host().toString() == "192.168.1.100");
@@ -135,6 +138,38 @@ void SocketAddressTest::testSocketRelationals()
 void SocketAddressTest::testSocketAddress6()
 {
 #ifdef POCO_HAVE_IPv6
+	SocketAddress sa1("FE80::E6CE:8FFF:FE4A:EDD0", 100);
+	assert (sa1.af() == AF_INET6);
+	assert (sa1.family() == SocketAddress::IPv6);
+	assert (sa1.host().toString() == "fe80::e6ce:8fff:fe4a:edd0");
+	assert (sa1.port() == 100);	
+	assert (sa1.toString() == "[fe80::e6ce:8fff:fe4a:edd0]:100");
+
+	SocketAddress sa2("[FE80::E6CE:8FFF:FE4A:EDD0]:100");
+	assert (sa2.af() == AF_INET6);
+	assert (sa2.family() == SocketAddress::IPv6);
+	assert (sa2.host().toString() == "fe80::e6ce:8fff:fe4a:edd0");
+	assert (sa2.port() == 100);	
+	assert (sa2.toString() == "[fe80::e6ce:8fff:fe4a:edd0]:100");
+#endif
+}
+
+
+void SocketAddressTest::testSocketAddressUnixLocal()
+{
+#ifdef POCO_OS_FAMILY_UNIX
+	SocketAddress sa1(SocketAddress::UNIX_LOCAL, "/tmp/sock1");
+	assert (sa1.af() == AF_UNIX);
+	assert (sa1.family() == SocketAddress::UNIX_LOCAL);
+	assert (sa1.toString() == "/tmp/sock1");
+	
+	SocketAddress sa2(SocketAddress::UNIX_LOCAL, "/tmp/sock2");
+	assert (sa1 != sa2);
+	assert (sa1 < sa2);
+	
+	SocketAddress sa3(SocketAddress::UNIX_LOCAL, "/tmp/sock1");
+	assert (sa1 == sa3);
+	assert (!(sa1 < sa3));
 #endif
 }
 
@@ -156,6 +191,7 @@ CppUnit::Test* SocketAddressTest::suite()
 	CppUnit_addTest(pSuite, SocketAddressTest, testSocketAddress);
 	CppUnit_addTest(pSuite, SocketAddressTest, testSocketRelationals);
 	CppUnit_addTest(pSuite, SocketAddressTest, testSocketAddress6);
+	CppUnit_addTest(pSuite, SocketAddressTest, testSocketAddressUnixLocal);
 
 	return pSuite;
 }

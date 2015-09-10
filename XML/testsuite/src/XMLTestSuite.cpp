@@ -16,8 +16,7 @@
 #include "XMLWriterTest.h"
 #include "SAXTestSuite.h"
 #include "DOMTestSuite.h"
-#include "XMLStreamParserTestSuite.h"
-#include "XMLStreamSerializerTestSuite.h"
+#include "XMLStreamParserTest.h"
 
 CppUnit::Test* XMLTestSuite::suite()
 {
@@ -28,8 +27,7 @@ CppUnit::Test* XMLTestSuite::suite()
 	pSuite->addTest(XMLWriterTest::suite());
 	pSuite->addTest(SAXTestSuite::suite());
 	pSuite->addTest(DOMTestSuite::suite());
-	pSuite->addTest(XMLStreamParserTestSuite::suite());
-	pSuite->addTest(XMLStreamSerializerTestSuite::suite());
+	pSuite->addTest(XMLStreamParserTest::suite());
 
 	return pSuite;
 }

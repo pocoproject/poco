@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include "Poco/XML/XMLStreamParser.h"
-#include "Poco/XML/XMLStreamSerializer.h"
 
 using namespace std;
 using namespace Poco::XML;

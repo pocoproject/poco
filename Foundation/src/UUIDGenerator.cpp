@@ -19,6 +19,7 @@
 #include "Poco/RandomStream.h"
 #include "Poco/DigestEngine.h"
 #include "Poco/MD5Engine.h"
+#include "Poco/SHA1Engine.h"
 #include "Poco/SingletonHolder.h"
 #include <cstring>
 
@@ -63,6 +64,14 @@ UUID UUIDGenerator::createFromName(const UUID& nsid, const std::string& name)
 
 UUID UUIDGenerator::createFromName(const UUID& nsid, const std::string& name, DigestEngine& de)
 {
+	UUID::Version version = UUID::UUID_NAME_BASED;
+	if (dynamic_cast<SHA1Engine*>(&de)) version = UUID::UUID_NAME_BASED_SHA1;
+	return createFromName(nsid, name, de, version);
+}
+
+
+UUID UUIDGenerator::createFromName(const UUID& nsid, const std::string& name, DigestEngine& de, UUID::Version version)
+{
 	poco_assert_dbg (de.digestLength() >= 16);
 
 	UUID netNsid = nsid;
@@ -80,7 +89,7 @@ UUID UUIDGenerator::createFromName(const UUID& nsid, const std::string& name, Di
 	{
 		buffer[i] = d[i];
 	}
-	return UUID(buffer, UUID::UUID_NAME_BASED);
+	return UUID(buffer, version);
 }
 
 	
