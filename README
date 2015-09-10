@@ -153,6 +153,7 @@ message compiler may fail when building the Foundation library.
 
 
 BUILDING FOR WINDOWS CE
+=======================
 
 Building for Windows CE is supported with Microsoft Visual Studio 2008.
 Unless you have the Digi JumpStart Windows CE 6.0 SDK installed, you'll

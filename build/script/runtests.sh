@@ -4,17 +4,42 @@
 #
 # A script for running the POCO testsuites.
 #
-# usage: runtests
+# usage: runtests [component [test] ]
 #
 # If the environment variable EXCLUDE_TESTS is set, containing
 # a space-separated list of project names (as found in the
 # components file), these tests will be skipped.
 #
+# Cygwin specific setup.
+# ----------------------
+# On Cygwin, Unix IPC are provided by a separate process daemon 
+# named cygserver, which should be started once before running any
+# test from Foundation.
+# 1/ Open a separate Cygwin terminal with Administrator privilege
+# 2/ run the command: cygserver-configure
+# 3/ Start the cygserver: nohup /usr/sbin/cygserver &
+# 4/ close the separate terminal
+# 5/ run the Foundation tests: build/script/runtests.sh Foundation
+#
+
+if [ "$POCO_BASE" = "" ] ; then
+	POCO_BASE=`pwd`
+fi
 
 TESTRUNNER=./testrunner
-TESTRUNNERARGS=-all
 
-components=`cat $POCO_BASE/components`
+if [ "$1" = "" ] ; then
+   components=`cat $POCO_BASE/components`
+else
+   components=$1
+fi
+
+if [ "$2" = "" ] ; then
+    TESTRUNNERARGS=-all
+else
+    TESTRUNNERARGS=$2
+fi
+
 
 if [ "$OSNAME" = "" ] ; then
 	OSNAME=`uname`
