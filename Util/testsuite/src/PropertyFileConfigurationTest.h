@@ -27,7 +27,10 @@ public:
 	virtual ~PropertyFileConfigurationTest();
 
 	void testLoad();
+   void testLoadEmpty();
+   void testLoadWithPreserveComment();
 	void testSave();
+   void testLoadSaveWithPreserveComment();
 
 	void setUp();
 	void tearDown();
@@ -36,6 +39,8 @@ public:
 
 private:
 	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
+
+   void testLoad(bool preserveComment);
 };
 
 

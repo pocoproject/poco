@@ -31,20 +31,23 @@ namespace Poco {
 namespace Util {
 
 
-PropertyFileConfiguration::PropertyFileConfiguration()
+PropertyFileConfiguration::PropertyFileConfiguration() : 
+	_preserveComment(false)
 {
 }
 
 
-PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr)
+PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr, bool preserveComment) : 
+	_preserveComment(preserveComment)
 {
-	load(istr);
+	load(istr, preserveComment);
 }
 
 	
-PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path)
+PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path, bool preserveComment) : 
+	_preserveComment(preserveComment)
 {
-	load(path);
+	load(path, preserveComment);
 }
 
 
@@ -53,21 +56,22 @@ PropertyFileConfiguration::~PropertyFileConfiguration()
 }
 
 	
-void PropertyFileConfiguration::load(std::istream& istr)
+void PropertyFileConfiguration::load(std::istream& istr, bool preserveComment)
 {
+	_preserveComment = preserveComment;
 	clear();
-	while (!istr.eof())
-	{
-		parseLine(istr);
-	}
+	_fileContent.clear();
+	_keyFileContentItMap.clear();
+
+	while (!istr.eof()) parseLine(istr);
 }
 
 	
-void PropertyFileConfiguration::load(const std::string& path)
+void PropertyFileConfiguration::load(const std::string& path, bool preserveComment)
 {
 	Poco::FileInputStream istr(path);
 	if (istr.good())
-		load(istr);
+		load(istr, preserveComment);
 	else
 		throw Poco::OpenFileException(path);
 }
@@ -75,37 +79,25 @@ void PropertyFileConfiguration::load(const std::string& path)
 
 void PropertyFileConfiguration::save(std::ostream& ostr) const
 {
-	MapConfiguration::iterator it = begin();
-	MapConfiguration::iterator ed = end();
-	while (it != ed)
+	if (_preserveComment)
 	{
-		ostr << it->first << ": ";
-		for (std::string::const_iterator its = it->second.begin(); its != it->second.end(); ++its)
+		// Check the starting char of each line in _fileContent.
+		// If the char is a comment sign, write the line out directly.
+		// Otherwise, use this line as key to get the value from parent's map and write out.
+		for (FileContent::const_iterator it = _fileContent.begin(); it != _fileContent.end(); ++it)
 		{
-			switch (*its)
-			{
-			case '\t':
-				ostr << "\\t";
-				break;
-			case '\r':
-				ostr << "\\r";
-				break;
-			case '\n':
-				ostr << "\\n";
-				break;
-			case '\f':
-				ostr << "\\f";
-				break;
-			case '\\':
-				ostr << "\\\\";
-				break;
-			default:
-				ostr << *its;
-				break;
-			}
+			if (isComment((*it)[0])) ostr << *it;
+			else outputKeyValue(ostr, *it, getString(*it));
 		}
-		ostr << "\n";
-		++it;
+	} else
+	{
+		MapConfiguration::iterator it = begin();
+		MapConfiguration::iterator ed = end();
+		while (it != ed)
+		{
+			outputKeyValue(ostr, it->first, it->second);
+			++it;
+		}
 	}
 }
 
@@ -127,29 +119,24 @@ void PropertyFileConfiguration::save(const std::string& path) const
 
 void PropertyFileConfiguration::parseLine(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof(); 
+	skipSpace(istr);
 
-	int c = istr.get();
-	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();
-	if (c != eof)
+	if (!istr.eof())
 	{
-		if (c == '#' || c == '!')
+		if (isComment(istr.peek()))
 		{
-			while (c != eof && c != '\n' && c != '\r') c = istr.get();
+			// Save
+			if (_preserveComment) saveComment(istr);
+			else skipLine(istr);
 		}
-		else
-		{
-			std::string key;
-			while (c != eof && c != '=' && c != ':' && c != '\r' && c != '\n') { key += (char) c; c = istr.get(); }
-			std::string value;
-			if (c == '=' || c == ':')
-			{
-				c = readChar(istr);
-				while (c != eof && c) { value += (char) c; c = readChar(istr); }
-			}
-			setRaw(trim(key), trim(value));
-		}
+		else saveKeyValue(istr);
 	}
+}
+
+
+void PropertyFileConfiguration::skipSpace(std::istream& istr) const
+{
+	while (!istr.eof() && Poco::Ascii::isSpace(istr.peek())) istr.get();
 }
 
 
@@ -186,6 +173,129 @@ int PropertyFileConfiguration::readChar(std::istream& istr)
 		else
 			return c;
 	}
+}
+
+
+void PropertyFileConfiguration::setRaw(const std::string& key, const std::string& value)
+{
+	MapConfiguration::setRaw(key, value);
+	// Insert the key to the end of _fileContent and update _keyFileContentItMap.
+	if (_preserveComment) 
+	{
+		FileContent::iterator fit = _fileContent.insert(_fileContent.end(), key);
+		_keyFileContentItMap[key] = fit;		
+	}
+}
+
+
+void PropertyFileConfiguration::removeRaw(const std::string& key)
+{
+	MapConfiguration::removeRaw(key);
+	// remove the key from _fileContent and _keyFileContentItMap.
+	if (_preserveComment)
+	{
+		_fileContent.erase(_keyFileContentItMap[key]);
+		_keyFileContentItMap.erase(key);
+	}
+}
+
+bool PropertyFileConfiguration::isComment(int c) const
+{
+	return c == '#' || c == '!';
+}
+
+
+void PropertyFileConfiguration::saveComment(std::istream& istr)
+{
+	std::string comment;
+
+	int c = istr.get();
+	while (!isNewLine(c))
+	{
+		comment += (char) c;
+		c = istr.get();
+	}
+	comment += (char) c;
+
+	_fileContent.push_back(comment);
+}
+
+
+void PropertyFileConfiguration::skipLine(std::istream& istr) const
+{
+	int c = istr.get();
+	while (!isNewLine(c)) c = istr.get();
+}
+
+
+void PropertyFileConfiguration::saveKeyValue(std::istream& istr)
+{
+	int c = istr.get();
+
+	std::string key;
+	while (!isNewLine(c) && !isKeyValueSeparator(c))
+	{ 
+		key += (char) c;
+		c = istr.get(); 
+	}
+
+	std::string value;
+	if (isKeyValueSeparator(c))
+	{
+		c = readChar(istr);
+		while (!istr.eof() && c)
+		{ 
+			value += (char) c; 
+			c = readChar(istr);
+		}
+	}
+
+	setRaw(trim(key), trim(value));
+}
+
+
+bool PropertyFileConfiguration::isNewLine(int c) const
+{
+	return c == std::char_traits<char>::eof() || c == '\n' || c == '\r';
+}
+
+
+void PropertyFileConfiguration::outputKeyValue(std::ostream& ostr, const std::string& key, const std::string& value) const
+{
+	ostr << key << ": ";
+
+	for (std::string::const_iterator its = value.begin(); its != value.end(); ++its)
+	{
+		switch (*its)
+		{
+		case '\t':
+			ostr << "\\t";
+			break;
+		case '\r':
+			ostr << "\\r";
+			break;
+		case '\n':
+			ostr << "\\n";
+			break;
+		case '\f':
+			ostr << "\\f";
+			break;
+		case '\\':
+			ostr << "\\\\";
+			break;
+		default:
+			ostr << *its;
+			break;
+		}
+	}
+	
+	ostr << "\n";
+}
+
+
+bool PropertyFileConfiguration::isKeyValueSeparator(int c) const
+{
+	return c == '=' || c == ':';
 }
 
 
