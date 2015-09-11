@@ -11,6 +11,9 @@ before_install:
 
 services:
   - mongodb
+  
+notifications:
+  slack: pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
 
 env:
   global: TEST_NAME=""
