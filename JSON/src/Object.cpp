@@ -117,7 +117,7 @@ const std::string& Object::getKey(KeyPtrList::const_iterator& iter) const
 void Object::set(const std::string& key, const Dynamic::Var& value)
 {
 	std::pair<ValueMap::iterator, bool> ret = _values.insert(ValueMap::value_type(key, value));
-	if (!ret.second) _values[key] = value;
+	if (!ret.second) ret.first->second = value;
 	if (_preserveInsOrder)
 	{
 		KeyPtrList::iterator it = _keys.begin();
