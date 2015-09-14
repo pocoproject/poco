@@ -163,7 +163,7 @@ public:
 		/// the user-info, host, port components accordingly.
 		
 	const std::string& getPath() const;
-		/// Returns the path part of the URI.
+		/// Returns the decoded path part of the URI.
 		
 	void setPath(const std::string& path);
 		/// Sets the path part of the URI.
@@ -230,10 +230,10 @@ public:
 		/// Sets the path, query and fragment parts of the URI.
 		
 	std::string getPathEtc() const;
-		/// Returns the path, query and fragment parts of the URI.
+		/// Returns the encoded path, query and fragment parts of the URI.
 		
 	std::string getPathAndQuery() const;
-		/// Returns the path and query parts of the URI.	
+		/// Returns the encoded path and query parts of the URI.	
 		
 	void resolve(const std::string& relativeURI);
 		/// Resolves the given relative URI against the base URI.
