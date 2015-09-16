@@ -499,6 +499,13 @@ void ThreadTest::testAffinity()
 }
 
 
+void ThreadTest::testJoinNotStarted()
+{
+	Thread thread;
+	thread.join();
+}
+
+
 void ThreadTest::setUp()
 {
 }
@@ -528,6 +535,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
 	CppUnit_addTest(pSuite, ThreadTest, testSleep);
 	CppUnit_addTest(pSuite, ThreadTest, testAffinity);
+	CppUnit_addTest(pSuite, ThreadTest, testJoinNotStarted);
 
 	return pSuite;
 }

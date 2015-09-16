@@ -99,11 +99,12 @@ endif()
 
 # Uncomment from next two lines to force static or dynamic library, default is autodetection
 if(POCO_STATIC)
-    add_definitions( -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)
+    set( LIB_MODE_DEFINITIONS -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)
     set( LIB_MODE STATIC )
     message(STATUS "Building static libraries")
 else(POCO_STATIC)
     set( LIB_MODE SHARED )
+    set( LIB_MODE_DEFINITIONS -DPOCO_NO_AUTOMATIC_LIBS)
     message(STATUS "Building dynamic libraries")
 endif(POCO_STATIC)
 
