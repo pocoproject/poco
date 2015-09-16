@@ -81,23 +81,13 @@ void PropertyFileConfiguration::save(std::ostream& ostr) const
 {
 	if (_preserveComment)
 	{
-		// Check the starting char of each line in _fileContent.
-		// If the char is a comment sign, write the line out directly.
-		// Otherwise, use this line as key to get the value from parent's map and write out.
 		for (FileContent::const_iterator it = _fileContent.begin(); it != _fileContent.end(); ++it)
-		{
-			if (isComment((*it)[0])) ostr << *it;
-			else outputKeyValue(ostr, *it, getString(*it));
-		}
-	} else
+			ostr << *it;
+	}
+	else
 	{
-		MapConfiguration::iterator it = begin();
-		MapConfiguration::iterator ed = end();
-		while (it != ed)
-		{
-			outputKeyValue(ostr, it->first, it->second);
-			++it;
-		}
+		for (MapConfiguration::iterator it = begin(); it != end(); ++it)
+			ostr << composeOneLine(it->first, it->second);
 	}
 }
 
@@ -125,7 +115,6 @@ void PropertyFileConfiguration::parseLine(std::istream& istr)
 	{
 		if (isComment(istr.peek()))
 		{
-			// Save
 			if (_preserveComment) saveComment(istr);
 			else skipLine(istr);
 		}
@@ -179,11 +168,20 @@ int PropertyFileConfiguration::readChar(std::istream& istr)
 void PropertyFileConfiguration::setRaw(const std::string& key, const std::string& value)
 {
 	MapConfiguration::setRaw(key, value);
-	// Insert the key to the end of _fileContent and update _keyFileContentItMap.
 	if (_preserveComment) 
 	{
-		FileContent::iterator fit = _fileContent.insert(_fileContent.end(), key);
-		_keyFileContentItMap[key] = fit;		
+		// Insert the key-value to the end of _fileContent and update _keyFileContentItMap.
+		if (_keyFileContentItMap.count(key) == 0)
+		{
+			FileContent::iterator fit = _fileContent.insert(_fileContent.end(), composeOneLine(key, value));
+			_keyFileContentItMap[key] = fit;
+		}
+		// Update the key-value in _fileContent.
+		else
+		{
+			FileContent::iterator fit = _keyFileContentItMap[key];
+			*fit = composeOneLine(key, value);
+		}
 	}
 }
 
@@ -260,36 +258,36 @@ bool PropertyFileConfiguration::isNewLine(int c) const
 }
 
 
-void PropertyFileConfiguration::outputKeyValue(std::ostream& ostr, const std::string& key, const std::string& value) const
+std::string PropertyFileConfiguration::composeOneLine(const std::string& key, const std::string& value) const
 {
-	ostr << key << ": ";
+	std::string result = key + ": ";
 
 	for (std::string::const_iterator its = value.begin(); its != value.end(); ++its)
 	{
 		switch (*its)
 		{
 		case '\t':
-			ostr << "\\t";
+			result += "\\t";
 			break;
 		case '\r':
-			ostr << "\\r";
+			result += "\\r";
 			break;
 		case '\n':
-			ostr << "\\n";
+			result += "\\n";
 			break;
 		case '\f':
-			ostr << "\\f";
+			result += "\\f";
 			break;
 		case '\\':
-			ostr << "\\\\";
+			result += "\\\\";
 			break;
 		default:
-			ostr << *its;
+			result +=  *its;
 			break;
 		}
 	}
-	
-	ostr << "\n";
+
+	return result += "\n";	
 }
 
 

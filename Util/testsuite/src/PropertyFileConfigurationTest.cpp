@@ -140,7 +140,8 @@ void PropertyFileConfigurationTest::testLoadSaveWithPreserveComment()
 		"# comment !\n"
 		"prop2 = value2  \n"
 		"! comment !\n"
-		"prop3:foo";
+		"prop3:foo\n"
+		"prop4";
 		
 	std::istringstream istr(propFile);
 	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(istr, true);
@@ -153,7 +154,8 @@ void PropertyFileConfigurationTest::testLoadSaveWithPreserveComment()
 	             "# comment !\n"
 					 "prop2: value2\n"
 					 "! comment !\n"
-					 "prop3: foo\n",
+					 "prop3: foo\n"
+					 "prop4: \n",
 					 ostr.str());
 
 	pConf->setString("prop4", "value4");
@@ -181,6 +183,19 @@ void PropertyFileConfigurationTest::testLoadSaveWithPreserveComment()
 					 "! comment !\n"
 					 "prop3: foo\n"
 					 "prop4: value4\n",
+					 ostr.str());
+
+	pConf->setString("prop4", "value5");
+	ostr.clear();
+	ostr.str("");
+	pConf->save(ostr);
+	assertEqual ("! comment #\n"
+	             "prop1: value1\n"
+	             "# comment #\n"
+	             "# comment !\n"
+					 "! comment !\n"
+					 "prop3: foo\n"
+					 "prop4: value5\n",
 					 ostr.str());
 }
 
