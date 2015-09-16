@@ -108,7 +108,7 @@ private:
 	void saveKeyValue(std::istream& istr);
 	bool isNewLine(int c) const;
 	bool isKeyValueSeparator(int c) const;
-	void outputKeyValue(std::ostream& ostr, const std::string& key, const std::string& value) const;
+	std::string composeOneLine(const std::string& key, const std::string& value) const;
 
 	bool _preserveComment;
 	FileContent _fileContent;
