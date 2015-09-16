@@ -91,6 +91,10 @@ public:
 		///     192.168.1.10:80
 		///     [::ffff:192.168.1.120]:2040
 		///     www.appinf.com:8080
+		///
+		/// On POSIX platforms supporting UNIX_LOCAL sockets, hostAndPort
+		/// can also be the absolute path of a local socket, starting with a 
+		/// slash, e.g. "/tmp/local.socket".
 
 	SocketAddress(Family family, const std::string& addr);
 		/// Creates a SocketAddress of the given family from a
