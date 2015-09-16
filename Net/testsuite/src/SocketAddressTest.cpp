@@ -170,6 +170,10 @@ void SocketAddressTest::testSocketAddressUnixLocal()
 	SocketAddress sa3(SocketAddress::UNIX_LOCAL, "/tmp/sock1");
 	assert (sa1 == sa3);
 	assert (!(sa1 < sa3));
+
+	SocketAddress sa4("/tmp/sock1");
+	assert (sa1 == sa4);
+	assert (sa4.toString() == "/tmp/sock1");
 #endif
 }
 

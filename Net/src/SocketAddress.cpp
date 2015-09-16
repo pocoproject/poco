@@ -285,6 +285,14 @@ void SocketAddress::init(const std::string& hostAndPort)
 	std::string port;
 	std::string::const_iterator it  = hostAndPort.begin();
 	std::string::const_iterator end = hostAndPort.end();
+	
+#if defined(POCO_OS_FAMILY_UNIX)
+	if (*it == '/')
+	{
+		newLocal(hostAndPort);
+		return;
+	}
+#endif
 	if (*it == '[')
 	{
 		++it;
