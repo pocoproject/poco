@@ -107,6 +107,9 @@ void PropertyFileConfiguration::save(const std::string& path) const
 }
 
 
+// If _preserveComment is true, not only save key-value into map 
+// but also save the entire file into _fileContent.
+// Otherwise, only save key-value into map.
 void PropertyFileConfiguration::parseLine(std::istream& istr)
 {
 	skipSpace(istr);
