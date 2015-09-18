@@ -322,5 +322,11 @@ Poco::Timespan WebSocketImpl::getReceiveTimeout()
 	return _pStreamSocketImpl->getReceiveTimeout();
 }
 
+
+int WebSocketImpl::available()
+{
+	return _pStreamSocketImpl->available();
+}
+
 	
 } } // namespace Poco::Net
