@@ -7,8 +7,6 @@
 #
 include $(POCO_BASE)/build/rules/global
 
-INCLUDE += -I$(POCO_BASE)/openssl/include
-
 SYSLIBS += -lssl -lcrypto
 
 objects = AcceptCertificateHandler RejectCertificateHandler ConsoleCertificateHandler \
