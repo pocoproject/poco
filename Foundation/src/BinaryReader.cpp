@@ -15,7 +15,6 @@
 
 
 #include "Poco/BinaryReader.h"
-#include "Poco/ByteOrder.h"
 #include "Poco/TextEncoding.h"
 #include "Poco/TextConverter.h"
 #include <algorithm>
@@ -56,119 +55,81 @@ BinaryReader::~BinaryReader()
 
 BinaryReader& BinaryReader::operator >> (bool& value)
 {
-	_istr.read((char*) &value, sizeof(value));
-	return *this;
+	return read(value, false);
 }
 
 
 BinaryReader& BinaryReader::operator >> (char& value)
 {
-	_istr.read((char*) &value, sizeof(value));
-	return *this;
+	return read(value, false);
 }
 
 
 BinaryReader& BinaryReader::operator >> (unsigned char& value)
 {
-	_istr.read((char*) &value, sizeof(value));
-	return *this;
+	return read(value, false);
 }
 
 
 BinaryReader& BinaryReader::operator >> (signed char& value)
 {
-	_istr.read((char*) &value, sizeof(value));
-	return *this;
+	return read(value, false);
 }
 
 
 BinaryReader& BinaryReader::operator >> (short& value)
 {
-	_istr.read((char*) &value, sizeof(value));
-	if (_flipBytes) value = ByteOrder::flipBytes(value);
-	return *this;
+	return read(value, _flipBytes);
 }
 
 
 BinaryReader& BinaryReader::operator >> (unsigned short& value)
 {
-	_istr.read((char*) &value, sizeof(value));
-	if (_flipBytes) value = ByteOrder::flipBytes(value);
-	return *this;
+	return read(value, _flipBytes);
 }
 
 
 BinaryReader& BinaryReader::operator >> (int& value)
 {
-	_istr.read((char*) &value, sizeof(value));
-	if (_flipBytes) value = ByteOrder::flipBytes(value);
-	return *this;
+	return read(value, _flipBytes);
 }
 
 
 BinaryReader& BinaryReader::operator >> (unsigned int& value)
 {
-	_istr.read((char*) &value, sizeof(value));
-	if (_flipBytes) value = ByteOrder::flipBytes(value);
-	return *this;
+	return read(value, _flipBytes);
 }
 
 
 BinaryReader& BinaryReader::operator >> (long& value)
 {
-	_istr.read((char*) &value, sizeof(value));
 #if defined(POCO_LONG_IS_64_BIT)
-	if (_flipBytes) value = ByteOrder::flipBytes((Int64) value);
+	return read((Int64&) value, _flipBytes);
 #else
-	if (_flipBytes) value = ByteOrder::flipBytes((Int32) value);
+	return read((Int32&) value, _flipBytes);
 #endif
-	return *this;
 }
 
 
 BinaryReader& BinaryReader::operator >> (unsigned long& value)
 {
-	_istr.read((char*) &value, sizeof(value));
 #if defined(POCO_LONG_IS_64_BIT)
-	if (_flipBytes) value = ByteOrder::flipBytes((UInt64) value);
+	return read((UInt64&) value, _flipBytes);
 #else
-	if (_flipBytes) value = ByteOrder::flipBytes((UInt32) value);
+	return read((UInt32&) value, _flipBytes);
 #endif
-	return *this;
 }
 
 
 BinaryReader& BinaryReader::operator >> (float& value)
 {
-	if (_flipBytes)
-	{
-		char* ptr = (char*) &value;
-		ptr += sizeof(value);
-		for (unsigned i = 0; i < sizeof(value); ++i)
-			_istr.read(--ptr, 1);
-	}
-	else
-	{
-		_istr.read((char*) &value, sizeof(value));
-	}
-	return *this;
+	return read(value, _flipBytes);
 }
 
 
 BinaryReader& BinaryReader::operator >> (double& value)
 {
-	if (_flipBytes)
-	{
-		char* ptr = (char*) &value;
-		ptr += sizeof(value);
-		for (unsigned i = 0; i < sizeof(value); ++i)
-			_istr.read(--ptr, 1);
-	}
-	else
-	{
-		_istr.read((char*) &value, sizeof(value));
-	}
-	return *this;
+	return read(value, _flipBytes);
 }
 
 
@@ -177,17 +138,13 @@ BinaryReader& BinaryReader::operator >> (double& value)
 
 BinaryReader& BinaryReader::operator >> (Int64& value)
 {
-	_istr.read((char*) &value, sizeof(value));
-	if (_flipBytes) value = ByteOrder::flipBytes(value);
-	return *this;
+	return read(value, _flipBytes);
 }
 
 
 BinaryReader& BinaryReader::operator >> (UInt64& value)
 {
-	_istr.read((char*) &value, sizeof(value));
-	if (_flipBytes) value = ByteOrder::flipBytes(value);
-	return *this;
+	return read(value, _flipBytes);
 }
 
 
@@ -196,17 +153,11 @@ BinaryReader& BinaryReader::operator >> (UInt64& value)
 
 BinaryReader& BinaryReader::operator >> (std::string& value)
 {
+	if (!_istr.good()) return *this;
+
 	UInt32 size = 0;
 	read7BitEncoded(size);
-	value.clear();
-	if (!_istr.good()) return *this;
-	value.reserve(size);
-	while (size--)
-	{
-		char c;
-		if (!_istr.read(&c, 1).good()) break;
-		value += c;
-	}
+	readRaw(size, value);
 	if (_pTextConverter)
 	{
 		std::string converted;
@@ -219,19 +170,7 @@ BinaryReader& BinaryReader::operator >> (std::string& value)
 
 void BinaryReader::read7BitEncoded(UInt32& value)
 {
-	char c;
-	value = 0;
-	int s = 0;
-	do
-	{
-		c = 0;
-		_istr.read(&c, 1);
-		UInt32 x = (c & 0x7F);
-		x <<= s;
-		value += x;
-		s += 7;
-	}
-	while (c & 0x80);
+	read7BitEncoded<UInt32>(value);
 }
 
 
@@ -240,19 +179,7 @@ void BinaryReader::read7BitEncoded(UInt32& value)
 
 void BinaryReader::read7BitEncoded(UInt64& value)
 {
-	char c;
-	value = 0;
-	int s = 0;
-	do
-	{
-		c = 0;
-		_istr.read(&c, 1);
-		UInt64 x = (c & 0x7F);
-		x <<= s;
-		value += x;
-		s += 7;
-	}
-	while (c & 0x80);
+	read7BitEncoded<UInt64>(value);
 }
 
 

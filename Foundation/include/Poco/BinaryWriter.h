@@ -23,6 +23,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Buffer.h"
 #include "Poco/MemoryStream.h"
+#include "Poco/ByteOrder.h"
 #include <vector>
 #include <ostream>
 
@@ -160,6 +161,34 @@ public:
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
 
 private:
+	template<typename T>
+	BinaryWriter& write(T value, bool flipBytes)
+	{
+		if (flipBytes)
+		{
+			T fValue = ByteOrder::flipBytes(value);
+			_ostr.write((const char*) &fValue, sizeof(fValue));
+		}
+		else
+		{
+			_ostr.write((const char*) &value, sizeof(value));
+		}
+		return *this;
+	}
+
+	template<typename T>
+	void write7BitEncoded(T value)
+	{
+		do
+		{
+			unsigned char c = (unsigned char) (value & 0x7F);
+			value >>= 7;
+			if (value) c |= 0x80;
+			_ostr.write((const char*) &c, 1);
+		}
+		while (value);
+	}
+
 	std::ostream&  _ostr;
 	bool           _flipBytes;
 	TextConverter* _pTextConverter;
