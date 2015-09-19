@@ -138,13 +138,13 @@ BinaryWriter& BinaryWriter::operator << (double value)
 
 BinaryWriter& BinaryWriter::operator << (Int64 value)
 {
-	write(value, _flipBytes);
+	return write(value, _flipBytes);
 }
 
 
 BinaryWriter& BinaryWriter::operator << (UInt64 value)
 {
-	write(value, _flipBytes);
+	return write(value, _flipBytes);
 }
 
 
