@@ -189,6 +189,8 @@ private:
 		while (value);
 	}
 
+	BinaryWriter& write(const char* value, std::size_t length);
+
 	std::ostream&  _ostr;
 	bool           _flipBytes;
 	TextConverter* _pTextConverter;

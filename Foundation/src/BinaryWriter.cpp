@@ -153,29 +153,13 @@ BinaryWriter& BinaryWriter::operator << (UInt64 value)
 
 BinaryWriter& BinaryWriter::operator << (const std::string& value)
 {
-	return *this << value.c_str();
+	return write(value.c_str(), value.length());
 }
 
 
 BinaryWriter& BinaryWriter::operator << (const char* value)
 {
-	poco_check_ptr (value);
-	
-	if (_pTextConverter)
-	{
-		std::string converted;
-		_pTextConverter->convert(value, static_cast<int>(std::strlen(value)), converted);
-		UInt32 length = (UInt32) converted.size();
-		write7BitEncoded(length);
-		_ostr.write(converted.data(), length);
-	}
-	else
-	{
-		UInt32 length = static_cast<UInt32>(std::strlen(value));
-		write7BitEncoded(length);
-		_ostr.write(value, length);
-	}
-	return *this;
+	return write(value, std::strlen(value));
 }
 
 
@@ -220,6 +204,28 @@ void BinaryWriter::writeBOM()
 void BinaryWriter::flush()
 {
 	_ostr.flush();
+}
+
+
+BinaryWriter& BinaryWriter::write(const char* value, std::size_t length)
+{
+	poco_check_ptr (value);
+	
+	if (_pTextConverter)
+	{
+		std::string converted;
+		_pTextConverter->convert(value, static_cast<int>(length), converted);
+		UInt32 convertedLength = (UInt32) converted.length();
+		write7BitEncoded(convertedLength);
+		_ostr.write(converted.data(), convertedLength);
+	}
+	else
+	{
+		UInt32 lengthUInt32 = static_cast<UInt32>(length);
+		write7BitEncoded(lengthUInt32);
+		_ostr.write(value, lengthUInt32);
+	}
+	return *this;	
 }
 
 
