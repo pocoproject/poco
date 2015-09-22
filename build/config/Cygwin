@@ -1,7 +1,7 @@
 #
 # $Id$
 #
-# CYGWIN
+# Cygwin
 #
 # Make settings for Cygwin on WinXP/gcc 3.4
 #
@@ -42,7 +42,7 @@ SHAREDLIBLINKEXT = .dll
 CFLAGS          = 
 CFLAGS32        =
 CFLAGS64        = 
-CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SHAREDMEMORY -Wa,-mbig-obj
+CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -Wa,-mbig-obj
 CXXFLAGS32      =
 CXXFLAGS64      = 
 LINKFLAGS       =

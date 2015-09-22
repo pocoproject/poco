@@ -20,7 +20,7 @@
 
 
 // Note: cygwin is missing RTLD_LOCAL, set it to 0
-#if defined(__CYGWIN__) && !defined(RTLD_LOCAL)
+#if POCO_OS == POCO_OS_CYGWIN && !defined(RTLD_LOCAL)
 #define RTLD_LOCAL 0
 #endif
 
@@ -99,21 +99,31 @@ const std::string& SharedLibraryImpl::getPathImpl() const
 }
 
 
+std::string SharedLibraryImpl::prefixImpl()
+{
+#if POCO_OS == POCO_OS_CYGWIN
+	return "cyg";
+#else
+	return "lib";
+#endif
+}
+
+
 std::string SharedLibraryImpl::suffixImpl()
 {
-#if defined(__APPLE__)
+#if POCO_OS == POCO_OS_MAC_OS_X
 	#if defined(_DEBUG)
 		return "d.dylib";
 	#else
 		return ".dylib";
 	#endif
-#elif defined(hpux) || defined(_hpux)
+#elif POCO_OS == POCO_OS_HPUX
 	#if defined(_DEBUG)
 		return "d.sl";
 	#else
 		return ".sl";
 	#endif
-#elif defined(__CYGWIN__)
+#elif POCO_OS == POCO_OS_CYGWIN
 	#if defined(_DEBUG)
 		return "d.dll";
 	#else

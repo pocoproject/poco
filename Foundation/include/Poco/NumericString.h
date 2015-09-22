@@ -107,9 +107,6 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	{
 		switch (*pStr)
 		{
-		case 'x': case 'X': 
-			if (base != 0x10) return false;
-
 		case '0': 
 			if (state < STATE_SIGNIFICANT_DIGITS) break;
 
@@ -142,18 +139,11 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 
 		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
 			if (base != 0x10) return false;
-
 			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
 			if (result > limitCheck) return false;
 			result = result * base + (10 + *pStr - 'A');
 
 			break;
-
-		case 'U':
-		case 'u':
-		case 'L':
-		case 'l':
-			goto done;
 
 		case '.':
 			if ((base == 10) && (thSep == '.')) break;
@@ -165,19 +155,13 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 
 		case ' ':
 			if ((base == 10) && (thSep == ' ')) break;
-		case '\t':
-		case '\n':
-		case '\v':
-		case '\f':
-		case '\r':
-			goto done;
+			// fallthrough
 
 		default:
 			return false;
 		}
 	}
 
-done:
 	if ((sign < 0) && (base == 10)) result *= sign;
 
 	return true;

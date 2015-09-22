@@ -136,6 +136,7 @@ public:
 	static const std::string HTTP_DELETE;
 	static const std::string HTTP_TRACE;
 	static const std::string HTTP_CONNECT;
+	static const std::string HTTP_PATCH;
 	
 	static const std::string HOST;
 	static const std::string COOKIE;
