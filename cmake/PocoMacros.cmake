@@ -16,15 +16,18 @@ if (WIN32)
     # be set up anyway
     get_filename_component(sdk_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" REALPATH)
     get_filename_component(kit_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot]" REALPATH)
+    get_filename_component(kit81_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot81]" REALPATH)
     if (X64)
       set(sdk_bindir "${sdk_dir}/bin/x64")
       set(kit_bindir "${kit_dir}/bin/x64")
+      set(kit81_bindir "${kit81_dir}/bin/x64")
     else (X64)
       set(sdk_bindir "${sdk_dir}/bin")
       set(kit_bindir "${kit_dir}/bin/x86")
+      set(kit81_bindir "${kit81_dir}/bin/x86")
     endif (X64)
   endif ()
-  find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}"
+  find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}" "${kit81_bindir}"
     DOC "path to message compiler")
   if (NOT CMAKE_MC_COMPILER)
     message(FATAL_ERROR "message compiler not found: required to build")
@@ -250,4 +253,30 @@ install(
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
     )
+
+if (MSVC)
+# install the targets pdb
+  POCO_INSTALL_PDB(${target_name})
+endif()
+  
+endmacro()
+
+#  POCO_INSTALL_PDB - Install the given target's companion pdb file (if present)
+#    Usage: POCO_INSTALL_PDB(target_name)
+#      INPUT:
+#           target_name             the name of the target. e.g. Foundation for PocoFoundation
+#    Example: POCO_INSTALL_PDB(Foundation)
+#
+#    This is an internal macro meant only to be used by POCO_INSTALL.
+macro(POCO_INSTALL_PDB target_name)
+
+    get_property(type TARGET ${target_name} PROPERTY TYPE)
+    if ("${type}" STREQUAL "SHARED_LIBRARY" OR "${type}" STREQUAL "EXECUTABLE")
+        install(
+            FILES $<TARGET_PDB_FILE:${target_name}>
+            DESTINATION bin
+            COMPONENT Devel
+            OPTIONAL
+            )
+    endif()
 endmacro()
