@@ -59,16 +59,23 @@ namespace
 #if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
 
 
-namespace
+namespace {
+void setThreadName(pthread_t thread, const std::string& threadName)
 {
-    void setThreadName(pthread_t thread, const char* threadName)
-    {
-#   if (POCO_OS == POCO_OS_MAC_OS_X)
-        pthread_setname_np(threadName); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
-#   else
-        pthread_setname_np(thread, threadName);
-#   endif
-    }
+#if (POCO_OS == POCO_OS_MAC_OS_X)
+	pthread_setname_np(threadName.c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
+#else
+	if (pthread_setname_np(thread, threadName.c_str()))
+	{
+		char truncName[16] = {0};
+		std::size_t suffixIndex = threadName.length() - 7;
+		std::memcpy(truncName, &threadName[0], 7);
+		truncName[7] = '~';
+		memcpy(&truncName[8], &threadName[suffixIndex], 7);
+		pthread_setname_np(thread, truncName);
+	}
+#endif
+}
 }
 
 
@@ -336,7 +343,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
 #if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName().c_str());
+	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName());
 #endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
