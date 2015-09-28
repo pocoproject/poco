@@ -114,6 +114,3 @@ cmake-build/
 ###################
 *.bak
 
-buildx64.txt
-
-buildx642.txt
