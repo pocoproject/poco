@@ -91,6 +91,7 @@ libraries) being installed to build properly:
 - Data/ODBC requires ODBC 
   (Microsoft ODBC on Windows, unixODBC or iODBC on Unix/Linux)
 - Data/MySQL requires the MySQL client.
+- Data/PostgreSQL requires the PostgreSQL client.
 
 Most Unix/Linux systems already have OpenSSL preinstalled. If your system 
 does not have OpenSSL, please get it from http://www.openssl.org or 
@@ -110,13 +111,15 @@ to build the ODBC connector (which is the default). On Windows
 platforms, ODBC should be readily available if you have the 
 Windows SDK. On Unix/Linux platforms, you can use iODBC 
 (preinstalled on Mac OS X) or unixODBC. For the MySQL connector, 
-the MySQL client libraries and header files are required.
+the MySQL client libraries and header files are required. For the 
+PostgreSQL connector, the PostgreSQL client libraries and header 
+files are required.
 
-The Data/ODBC and Data/MySQL Makefiles will search for the ODBC 
-and MySQL headers and libraries in various places. Nevertheless, 
-the Makefiles may not be able to find the headers and libraries. 
-In this case, please edit the Makefile in Data/ODBC and/or Data/MySQL 
-accordingly.
+The Data/ODBC, Data/MySQL, DataPostgreSQL Makefiles will search
+for the ODBC, MySQL and PostgreSQL headers and libraries in various
+places. Nevertheless, the Makefiles may not be able to find the
+headers and libraries. In this case, please edit the Makefile 
+in Data/ODBC and/or Data/MySQL and/or Data/PostgreSQL accordingly.
 
 
 BUILDING ON WINDOWS
@@ -200,11 +203,12 @@ to configure --prefix=<path>):
 > sudo gmake -s install
 
 You can omit certain components from the build. For example, you might
-want to omit Data/ODBC or Data/MySQL if you do not have the corresponding
-third-party libraries (iodbc or unixodbc, mysqlclient) installed
-on your system. To do this, use the --omit argument to configure:
+want to omit Data/ODBC or Data/MySQL or Data/PostgreSQL if you do not
+have the corresponding third-party libraries (iodbc, unixodbc,
+mysqlclient or libpq ) installed on your system. To do this, use
+the --omit argument to configure:
 
-> ./configure --omit=Data/ODBC,Data/MySQL
+> ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL
 
 
 To build on Mac OS X 10.3 with GCC 3, do the following:

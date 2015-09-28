@@ -1,63 +1,67 @@
-# - Find libpq
 # Find the native PostgreSQL includes and library
 #
-#  POSTGRESQL_INCLUDE_DIR - where to find libpq-fe.h, etc.
-#  POSTGRESQL_LIBRARIES   - List of libraries when using PostgreSQL.
-#  POSTGRESQL_FOUND  - True if PostgreSQL found.
+#  POSTGRESQL_INCLUDE_DIR - Where to find libpq-fe.h, etc.
+#  POSTGRESQL_LIB_DIR     - Where to find libpq
+#  POSTGRESQL_LIB         - Full path to libpq
+#  POSTGRESQL_FOUND       - True if PostgreSQL found.
 
-MACRO(FIND_POSTGRESQL)
-IF (POSTGRESQL_INCLUDE_DIR)
-  # Already in cache, be silent
-  SET(POSTGRESQL_FIND_QUIETLY TRUE)
-ENDIF (POSTGRESQL_INCLUDE_DIR)
+#
+# On Windows x64 CMake (32-bit) can't seem to find PostgreSQL directories
+# $ENV{ProgramFiles} under C:\Program Files
+#
+find_path(POSTGRESQL_INCLUDE_DIR
+    NAMES libpq-fe.h
+    HINTS
+    $ENV{POSTGRESQL_INCLUDE_DIR}
+    $ENV{POSTGRESQL_INCLUDE_DIR}/include
+    /Applications/Postgres.app/Contents/Versions/*/include
+    $ENV{ProgramFiles}/PostgreSQL/*/include
+    $ENV{SystemDrive}/PostgreSQL/*/include
+    /usr/include/postgresql
+    /usr/local/include/postgresql
+    /usr/local/postgresql/include
+    /usr/local/postgresql/*/include
+    /opt/postgresql/include
+    /opt/postgresql/*/include)
 
-FIND_PATH(POSTGRESQL_INCLUDE_DIR libpq-fe.h
-  $ENV{ProgramFiles}/PostgreSQL/*/include
-  $ENV{SystemDrive}/PostgreSQL/*/include
-  /usr/local/postgresql/include
-  /usr/local/include/postgresql
-  /usr/local/include
-  /usr/include/postgresql
-  /usr/include
-  /usr/postgresql/include
-)
+#
+# NO_DEFAULT_PATH is needed for Mac OSX with the Postgres.app
+# but it is not needed for Linux.  In fact for Linux the lib is in an
+# odd system directory so the default paths must be searched
+#
+# On Windows x64 CMake (32-bit) can't seem to find PostgreSQL directories
+# $ENV{ProgramFiles} under C:\Program Files
+#
 
-SET(POSTGRESQL_NAMES pq libpq)
-SET(POSTGRESQL_SEARCH_LIB_PATHS
-  ${POSTGRESQL_SEARCH_LIB_PATHS}
-  $ENV{ProgramFiles}/PostgreSQL/*/lib
-  $ENV{SystemDrive}/PostgreSQL/*/lib
-  /usr/local/postgresql/lib
-  /usr/local/lib
-  /usr/lib
-  /usr/lib/postgresql/*/lib
-)
-FIND_LIBRARY(POSTGRESQL_LIBRARY
-  NAMES ${POSTGRESQL_NAMES}
-  PATHS ${POSTGRESQL_SEARCH_LIB_PATHS}
-)
+find_library(POSTGRESQL_LIB
+             NAMES pq
+             PATHS
+             $ENV{POSTGRESQL_LIB_DIR}
+             $ENV{POSTGRESQL_LIB_DIR}/lib
+             /Applications/Postgres.app/Contents/Versions/*/lib
+             $ENV{ProgramFiles}/PostgreSQL/*/lib
+             $ENV{SystemDrive}/PostgreSQL/*/lib
+             /usr/lib/postgresql
+             /usr/lib/postgresql/*
+             /usr/lib/postgresql/*/lib
+             /usr/local/lib/postgresql
+             /usr/local/lib/postgresql/*
+             /usr/local/lib/postgresql/*/lib
+             /usr/local/postgresql/lib
+             /usr/local/postgresql/*/lib
+             /opt/postgresql/lib
+             /opt/postgresql/*/lib)
+#             NO_DEFAULT_PATH)
 
-IF (POSTGRESQL_INCLUDE_DIR AND POSTGRESQL_LIBRARY)
-  SET(POSTGRESQL_FOUND TRUE)
-  SET( POSTGRESQL_LIBRARIES ${POSTGRESQL_LIBRARY} )
-ELSE (POSTGRESQL_INCLUDE_DIR AND POSTGRESQL_LIBRARY)
-  SET(POSTGRESQL_FOUND FALSE)
-  SET( POSTGRESQL_LIBRARIES )
-ENDIF (POSTGRESQL_INCLUDE_DIR AND POSTGRESQL_LIBRARY)
+if (POSTGRESQL_LIB)
+    get_filename_component(POSTGRESQL_LIB_DIR ${POSTGRESQL_LIB} PATH)
+endif (POSTGRESQL_LIB)
 
-IF (POSTGRESQL_FOUND)
-  IF (NOT POSTGRESQL_FIND_QUIETLY)
-    MESSAGE(STATUS "Found PostgreSQL: ${POSTGRESQL_LIBRARY}")
-  ENDIF (NOT POSTGRESQL_FIND_QUIETLY)
-ELSE (POSTGRESQL_FOUND)
-  IF (POSTGRESQL_FIND_REQUIRED)
-    MESSAGE(STATUS "Looked for PostgreSQL libraries named ${POSTGRESQL_NAMES}.")
-    MESSAGE(FATAL_ERROR "Could NOT find PostgreSQL library")
-  ENDIF (POSTGRESQL_FIND_REQUIRED)
-ENDIF (POSTGRESQL_FOUND)
-
-MARK_AS_ADVANCED(
-  POSTGRESQL_LIBRARY
-  POSTGRESQL_INCLUDE_DIR
-)
-ENDMACRO(FIND_POSTGRESQL)
+if (POSTGRESQL_INCLUDE_DIR AND POSTGRESQL_LIB_DIR)
+    set(POSTGRESQL_FOUND TRUE)
+    message(STATUS "PostgreSQL Include directory: ${POSTGRESQL_INCLUDE_DIR}  Library directory: ${POSTGRESQL_LIB_DIR}")
+    include_directories(${POSTGRESQL_INCLUDE_DIR})
+    link_directories(${POSTGRESQL_LIB_DIR})
+else (POSTGRESQL_INCLUDE_DIR AND POSTGRESQL_LIB_DIR)
+    message(STATUS "Couldn't find PostgreSQL")
+endif (POSTGRESQL_INCLUDE_DIR AND POSTGRESQL_LIB_DIR)
