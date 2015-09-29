@@ -148,11 +148,6 @@ protected:
 //
 
 
-#if defined(POCO_COMPILER_GCC) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
-	GCC_DIAG_OFF(unused-local-typedefs) // supress numerous gcc warnings
-#endif // POCO_COMPILER_GCC && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
-
-
 template <bool x>
 struct POCO_STATIC_ASSERTION_FAILURE;
 
@@ -180,7 +175,7 @@ struct poco_static_assert_test
 #else
 #define poco_static_assert(B) \
 	typedef poco_static_assert_test<sizeof(POCO_STATIC_ASSERTION_FAILURE<(bool) (B)>)> \
-		POCO_JOIN(poco_static_assert_typedef_, __LINE__)
+		POCO_JOIN(poco_static_assert_typedef_, __LINE__) POCO_UNUSED
 #endif
 
 
