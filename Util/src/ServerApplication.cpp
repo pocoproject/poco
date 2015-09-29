@@ -660,6 +660,7 @@ bool ServerApplication::isDaemon(int argc, char** argv)
 
 void ServerApplication::beDaemon()
 {
+#if !defined(POCO_NO_FORK_EXEC)
 	pid_t pid;
 	if ((pid = fork()) < 0)
 		throw SystemException("cannot fork daemon process");
@@ -679,6 +680,9 @@ void ServerApplication::beDaemon()
 	if (!fout) throw Poco::OpenFileException("Cannot attach stdout to /dev/null");
 	FILE* ferr = freopen("/dev/null", "r+", stderr);
 	if (!ferr) throw Poco::OpenFileException("Cannot attach stderr to /dev/null");
+#else
+	throw Poco::NotImplementedException("platform does not allow fork/exec");
+#endif
 }
 
 
