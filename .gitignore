@@ -29,7 +29,26 @@ CMakeFiles
 CMakeCache.txt
 CPackConfig.cmake
 CPackSourceConfig.cmake
+CTestTestfile.cmake
+DartConfiguration.tcl
+cmake/Makefile
 cmake_*
+cmake/bin/
+cmake/CppUnit/
+cmake/Crypto/
+cmake/Data/
+cmake/Foundation/
+cmake/JSON/
+cmake/lib/
+cmake/MongoDB/
+cmake/Net/
+cmake/NetSSL_OpenSSL/
+cmake/PageCompiler/
+cmake/Poco/
+cmake/Testing/
+cmake/Util/
+cmake/XML/
+cmake/Zip/
 
 # Packages #
 ############
