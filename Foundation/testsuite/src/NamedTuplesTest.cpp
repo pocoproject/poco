@@ -16,7 +16,6 @@
 #include "Poco/NamedTuple.h"
 #include "Poco/Exception.h"
 
-GCC_DIAG_OFF(unused-but-set-variable)
 
 using Poco::NamedTuple;
 using Poco::Int8;

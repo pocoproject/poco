@@ -19,9 +19,6 @@
 #include "Poco/Exception.h"
 
 
-GCC_DIAG_OFF(unused-variable)
-
-
 using Poco::Timestamp;
 using Poco::DateTime;
 using Poco::Timespan;
