@@ -22,7 +22,6 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
-#include <cstdint>
 
 
 using Poco::NumberParser;
@@ -95,7 +94,6 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parse64("-123") == -123);
 	assert(NumberParser::parse64("0123") == 123);
 	assert(NumberParser::parse64("-0123") == -123);
-	assert(NumberParser::parse64("123456789123456789") == UINT64_C(123456789123456789));
 	assert(NumberParser::parseUnsigned64("123") == 123);
 	assert(NumberParser::parseHex64("12AB") == 0x12ab);
 	assert(NumberParser::parseOct64("123") == 0123);
