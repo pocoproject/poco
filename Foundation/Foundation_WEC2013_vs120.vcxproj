@@ -679,6 +679,7 @@
     <ClCompile Include="src\Channel.cpp" />
     <ClCompile Include="src\Configurable.cpp" />
     <ClCompile Include="src\ConsoleChannel.cpp" />
+    <ClCompile Include="src\EventChannel.cpp" />
     <ClCompile Include="src\EventLogChannel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V310'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V310'">true</ExcludedFromBuild>
@@ -1255,6 +1256,7 @@
     <ClInclude Include="include\Poco\Channel.h" />
     <ClInclude Include="include\Poco\Configurable.h" />
     <ClInclude Include="include\Poco\ConsoleChannel.h" />
+    <ClInclude Include="include\Poco\EventChannel.h" />
     <ClInclude Include="include\Poco\EventLogChannel.h" />
     <ClInclude Include="include\Poco\FileChannel.h" />
     <ClInclude Include="include\Poco\Formatter.h" />

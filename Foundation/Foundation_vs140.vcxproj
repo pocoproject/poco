@@ -392,6 +392,7 @@
     <ClCompile Include="src\ErrorHandler.cpp"/>
     <ClCompile Include="src\Event.cpp"/>
     <ClCompile Include="src\EventArgs.cpp"/>
+    <ClCompile Include="src\EventChannel.cpp"/>
     <ClCompile Include="src\EventLogChannel.cpp"/>
     <ClCompile Include="src\Event_POSIX.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
@@ -1079,6 +1080,7 @@
     <ClInclude Include="include\Poco\ErrorHandler.h"/>
     <ClInclude Include="include\Poco\Event.h"/>
     <ClInclude Include="include\Poco\EventArgs.h"/>
+    <ClInclude Include="include\Poco\EventChannel.h"/>
     <ClInclude Include="include\Poco\EventLogChannel.h"/>
     <ClInclude Include="include\Poco\Event_POSIX.h"/>
     <ClInclude Include="include\Poco\Event_WIN32.h"/>
