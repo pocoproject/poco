@@ -25,7 +25,6 @@
 #include <limits>
 #include <clocale>
 #include <istream>
-#include <iostream>
 
 
 namespace Poco {
