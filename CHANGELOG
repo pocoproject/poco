@@ -6,6 +6,7 @@ Release 1.6.2 (2015-10-xx)
 - fixed GH #933: Change in JSON::Object::set(key,value) behavior in 1.6.1
 - fixed GH #921: `BasicUnbufferedStreamBuf` needs to be marked for import/export
 - fixed GH #931: make strToInt() more strict in what it accepts
+- fixed GH #958: Bug while reading X509Certificate subjectName
 
 
 Release 1.6.1 (2015-08-03)
