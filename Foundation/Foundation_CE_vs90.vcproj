@@ -2139,6 +2139,8 @@
 				<File
 					RelativePath=".\src\ConsoleChannel.cpp"/>
 				<File
+					RelativePath=".\src\EventChannel.cpp"/>
+				<File
 					RelativePath=".\src\EventLogChannel.cpp"/>
 				<File
 					RelativePath=".\src\FileChannel.cpp"/>
@@ -2421,6 +2423,8 @@
 					RelativePath=".\include\Poco\Configurable.h"/>
 				<File
 					RelativePath=".\include\Poco\ConsoleChannel.h"/>
+				<File
+					RelativePath=".\include\Poco\EventChannel.h"/>
 				<File
 					RelativePath=".\include\Poco\EventLogChannel.h"/>
 				<File

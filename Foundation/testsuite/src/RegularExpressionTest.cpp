@@ -264,6 +264,16 @@ void RegularExpressionTest::testError()
 	}
 }
 
+void RegularExpressionTest::testGroup()
+{
+	RegularExpression::MatchVec matches;
+	RegularExpression re("(?P<group1>[a-z]+) (?P<group2>[0-9]+)");
+	assert (re.match("abcd 1234", 0, matches) == 3);
+	assert (matches[0].name == "");
+	assert (matches[1].name == "group1");
+	assert (matches[2].name == "group2");
+}
+
 
 void RegularExpressionTest::setUp()
 {
@@ -294,6 +304,7 @@ CppUnit::Test* RegularExpressionTest::suite()
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst3);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst4);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testError);
+	CppUnit_addTest(pSuite, RegularExpressionTest, testGroup);
 
 	return pSuite;
 }

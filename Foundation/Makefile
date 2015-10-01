@@ -13,8 +13,8 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Clock Configurable ConsoleChannel \
 	Condition CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator DirectoryWatcher \
-	Environment Event Error EventArgs ErrorHandler Exception FIFOBufferStream FPEnvironment File \
-	FileChannel Formatter FormattingChannel Glob HexBinaryDecoder LineEndingConverter \
+	Environment Event Error EventArgs EventChannel ErrorHandler Exception FIFOBufferStream FPEnvironment  \
+	File FileChannel Formatter FormattingChannel Glob HexBinaryDecoder LineEndingConverter \
 	HexBinaryEncoder InflatingStream JSONString Latin1Encoding Latin2Encoding Latin9Encoding \
 	LogFile Logger LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
 	MemoryPool MD4Engine MD5Engine Manifest Message Mutex \
