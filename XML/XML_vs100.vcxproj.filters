@@ -2,43 +2,46 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="XML">
-      <UniqueIdentifier>{945aef23-2a80-45dc-8849-17f49c429628}</UniqueIdentifier>
+      <UniqueIdentifier>{65edf253-2918-415f-b844-3dc8476e9220}</UniqueIdentifier>
     </Filter>
     <Filter Include="XML\Header Files">
-      <UniqueIdentifier>{2387b12c-3d91-4a05-ae0a-5fa5f2f053b8}</UniqueIdentifier>
+      <UniqueIdentifier>{9ebb8cab-c404-4260-8645-a4ac53cc60af}</UniqueIdentifier>
     </Filter>
     <Filter Include="XML\Source Files">
-      <UniqueIdentifier>{cc309da4-8a97-4cf0-8a43-335332e5c36a}</UniqueIdentifier>
+      <UniqueIdentifier>{0b9a4efc-33d2-4942-bd02-ed6f65267a43}</UniqueIdentifier>
     </Filter>
     <Filter Include="SAX">
-      <UniqueIdentifier>{59745370-646f-4b63-8a9e-3da50498645a}</UniqueIdentifier>
+      <UniqueIdentifier>{f332bb84-587e-40b0-afe2-db0c29432a43}</UniqueIdentifier>
     </Filter>
     <Filter Include="SAX\Header Files">
-      <UniqueIdentifier>{26ca3b75-75c6-4839-a0ec-cc907bbf7854}</UniqueIdentifier>
+      <UniqueIdentifier>{e4557921-321d-483c-a8a2-334d5db19d18}</UniqueIdentifier>
     </Filter>
     <Filter Include="SAX\Source Files">
-      <UniqueIdentifier>{cefbbfb3-bad1-4a6f-b582-2b86cce8b66b}</UniqueIdentifier>
+      <UniqueIdentifier>{20ed4584-5386-4f5d-8165-e3ec8a7d2b85}</UniqueIdentifier>
     </Filter>
     <Filter Include="DOM">
-      <UniqueIdentifier>{4c1944da-731c-4f58-9075-e02ab859103f}</UniqueIdentifier>
+      <UniqueIdentifier>{1b8ee62a-1051-46a8-b707-a5bec27508d6}</UniqueIdentifier>
     </Filter>
     <Filter Include="DOM\Header Files">
-      <UniqueIdentifier>{34469edc-3620-4681-9ec8-9ec0c8be3af0}</UniqueIdentifier>
+      <UniqueIdentifier>{a898e832-e332-4044-bcc6-7cef571d39a2}</UniqueIdentifier>
     </Filter>
     <Filter Include="DOM\Source Files">
-      <UniqueIdentifier>{66e7d765-fff0-451b-92f1-d0bae40f24d3}</UniqueIdentifier>
+      <UniqueIdentifier>{ee2e1498-4015-48ce-9463-ed5bb37c82d2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Expat">
-      <UniqueIdentifier>{6c219dda-366c-48f6-beb6-fba9249e4870}</UniqueIdentifier>
+      <UniqueIdentifier>{5b5ead3e-11b3-4bb1-92be-88393ddfe15d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Expat\Header Files">
-      <UniqueIdentifier>{e81d5d15-c25d-4b8c-80e5-3c08b0586acc}</UniqueIdentifier>
+      <UniqueIdentifier>{cc161af7-9f27-41b3-a5a4-51c06232a6d7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Expat\Source Files">
-      <UniqueIdentifier>{5a304a8f-2138-4643-a9e1-2e7148e40bf3}</UniqueIdentifier>
+      <UniqueIdentifier>{ab77295e-6e6a-403e-a160-cd4bacbfc722}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Poco\XML\Content.h">
+      <Filter>XML\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\XML\Name.h">
       <Filter>XML\Header Files</Filter>
     </ClInclude>
@@ -51,6 +54,12 @@
     <ClInclude Include="include\Poco\Xml\ParserEngine.h">
       <Filter>XML\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\XML\QName.h">
+      <Filter>XML\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\XML\ValueTraits.h">
+      <Filter>XML\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Xml\XML.h">
       <Filter>XML\Header Files</Filter>
     </ClInclude>
@@ -58,6 +67,12 @@
       <Filter>XML\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Xml\XMLStream.h">
+      <Filter>XML\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\XML\XMLStreamParser.h">
+      <Filter>XML\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\XML\XMLStreamParserException.h">
       <Filter>XML\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Xml\XMLString.h">
@@ -302,7 +317,19 @@
     <ClCompile Include="src\ParserEngine.cpp">
       <Filter>XML\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\QName.cpp">
+      <Filter>XML\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ValueTraits.cpp">
+      <Filter>XML\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\XMLException.cpp">
+      <Filter>XML\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XMLStreamParser.cpp">
+      <Filter>XML\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XMLStreamParserException.cpp">
       <Filter>XML\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\XMLString.cpp">

@@ -61,6 +61,7 @@ public:
 	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 	virtual int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
 	virtual void sendUrgent(unsigned char data);
+	virtual int available();
 	virtual bool secure() const;
 	virtual void setSendTimeout(const Poco::Timespan& timeout); 
 	virtual Poco::Timespan getSendTimeout();

@@ -36,7 +36,7 @@ public:
 	DatagramSocket();
 		/// Creates an unconnected IPv4 datagram socket.
 
-	explicit DatagramSocket(IPAddress::Family family);
+	explicit DatagramSocket(SocketAddress::Family family);
 		/// Creates an unconnected datagram socket.
 		///
 		/// The socket will be created for the

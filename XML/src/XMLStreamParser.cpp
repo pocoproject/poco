@@ -7,8 +7,6 @@
 // Package: XML
 // Module:  XMLStreamParser
 //
-// Definition of the XMLStreamParser class.
-//
 // Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -21,7 +19,6 @@
 
 #include "Poco/XML/XMLStreamParser.h"
 #include <new>
-#include <cassert>
 #include <cstring>
 #include <istream>
 #include <ostream>
@@ -105,7 +102,7 @@ XMLStreamParser::XMLStreamParser(const void* data, std::size_t size, const std::
 	_inputName(iname), 
 	_feature(f)
 {
-	assert(data != 0 && size != 0);
+	poco_assert(data != 0 && size != 0);
 
 	_data.buf = data;
 	init();
@@ -122,8 +119,8 @@ void XMLStreamParser::init()
 {
 	_depth = 0;
 	_parserState = state_next;
-	_currentEvent = Eof;
-	_queue = Eof;
+	_currentEvent = EV_EOF;
+	_queue = EV_EOF;
 
 	_qualifiedName = &_qname;
 	_pvalue = &_value;
@@ -156,26 +153,26 @@ void XMLStreamParser::init()
 
 	if ((_feature & RECEIVE_ELEMENTS) != 0)
 	{
-		XML_SetStartElementHandler(_parser, &start_element_);
-		XML_SetEndElementHandler(_parser, &end_element_);
+		XML_SetStartElementHandler(_parser, &handleStartElement);
+		XML_SetEndElementHandler(_parser, &handleEndElement);
 	}
 
 	if ((_feature & RECEIVE_CHARACTERS) != 0)
-		XML_SetCharacterDataHandler(_parser, &characters_);
+		XML_SetCharacterDataHandler(_parser, &handleCharacters);
 
 	if ((_feature & RECEIVE_NAMESPACE_DECLS) != 0)
-		XML_SetNamespaceDeclHandler(_parser, &start_namespace_decl_, &end_namespace_decl_);
+		XML_SetNamespaceDeclHandler(_parser, &handleStartNamespaceDecl, &handleEndNamespaceDecl);
 }
 
 
-void XMLStreamParser::handle_error()
+void XMLStreamParser::handleError()
 {
 	XML_Error e(XML_GetErrorCode(_parser));
 
 	if (e == XML_ERROR_ABORTED)
 	{
-		// For now we only abort the XMLStreamParser in the characters_() and
-		// start_element_() handlers.
+		// For now we only abort the XMLStreamParser in the handleCharacters() and
+		// handleStartElement() handlers.
 		//
 		switch (content())
 		{
@@ -186,7 +183,7 @@ void XMLStreamParser::handle_error()
 		case Content::Complex:
 			throw XMLStreamParserException(*this, "characters in complex content");
 		default:
-			assert(false);
+			poco_assert(false);
 		}
 	}
 	else
@@ -197,7 +194,7 @@ void XMLStreamParser::handle_error()
 XMLStreamParser::EventType XMLStreamParser::next()
 {
 	if (_parserState == state_next)
-		return next_(false);
+		return nextImpl(false);
 	else
 	{
 		// If we previously peeked at start/end_element, then adjust
@@ -205,7 +202,7 @@ XMLStreamParser::EventType XMLStreamParser::next()
 		//
 		switch (_currentEvent)
 		{
-		case EndElement:
+		case EV_END_ELEMENT:
 		{
 			if (!_elementState.empty() && _elementState.back().depth == _depth)
 				popElement();
@@ -213,7 +210,7 @@ XMLStreamParser::EventType XMLStreamParser::next()
 			_depth--;
 			break;
 		}
-		case StartElement:
+		case EV_START_ELEMENT:
 		{
 			_depth++;
 			break;
@@ -245,7 +242,7 @@ const std::string& XMLStreamParser::attribute(const QName& qn) const
 		}
 	}
 
-	throw XMLStreamParserException(*this, "attribute '" + qn.string() + "' expected");
+	throw XMLStreamParserException(*this, "attribute '" + qn.toString() + "' expected");
 }
 
 
@@ -301,7 +298,7 @@ void XMLStreamParser::nextExpect(EventType e)
 void XMLStreamParser::nextExpect(EventType e, const std::string& ns, const std::string& n)
 {
 	if (next() != e || namespaceURI() != ns || localName() != n)
-		throw XMLStreamParserException(*this, std::string(parserEventStrings[e]) + " '" + QName(ns, n).string() + "' expected");
+		throw XMLStreamParserException(*this, std::string(parserEventStrings[e]) + " '" + QName(ns, n).toString() + "' expected");
 }
 
 
@@ -314,7 +311,7 @@ std::string XMLStreamParser::element()
 	// will be no characters event.
 	//
 	EventType e(next());
-	if (e == Characters)
+	if (e == EV_CHARACTERS)
 	{
 		r.swap(value());
 		e = next();
@@ -323,7 +320,7 @@ std::string XMLStreamParser::element()
 	// We cannot really get anything other than end_element since
 	// the simple content validation won't allow it.
 	//
-	assert(e == EndElement);
+	poco_assert(e == EV_END_ELEMENT);
 
 	return r;
 }
@@ -331,7 +328,7 @@ std::string XMLStreamParser::element()
 
 std::string XMLStreamParser::element(const QName& qn, const std::string& dv)
 {
-	if (peek() == StartElement && getQName() == qn)
+	if (peek() == EV_START_ELEMENT && getQName() == qn)
 	{
 		next();
 		return element();
@@ -343,7 +340,7 @@ std::string XMLStreamParser::element(const QName& qn, const std::string& dv)
 
 const XMLStreamParser::ElementEntry* XMLStreamParser::getElementImpl() const
 {
-	// The start_element_() Expat handler may have already provisioned
+	// The handleStartElement() Expat handler may have already provisioned
 	// an entry in the element stack. In this case, we need to get the
 	// one before it, if any.
 	//
@@ -375,21 +372,21 @@ void XMLStreamParser::popElement()
 		for (AttributeMapType::const_iterator i(e.attributeMap.begin()); i != e.attributeMap.end(); ++i)
 		{
 			if (!i->second.handled)
-				throw XMLStreamParserException(*this, "unexpected attribute '" + i->first.string() + "'");
+				throw XMLStreamParserException(*this, "unexpected attribute '" + i->first.toString() + "'");
 		}
-		assert(false);
+		poco_assert(false);
 	}
 
 	_elementState.pop_back();
 }
 
 
-XMLStreamParser::EventType XMLStreamParser::next_(bool peek)
+XMLStreamParser::EventType XMLStreamParser::nextImpl(bool peek)
 {
-	EventType e(next_body());
+	EventType e(nextBody());
 
 	// Content-specific processing. Note that we handle characters in the
-	// characters_() Expat handler for two reasons. Firstly, it is faster
+	// handleCharacters() Expat handler for two reasons. Firstly, it is faster
 	// to ignore the whitespaces at the source. Secondly, this allows us
 	// to distinguish between element and attribute characters. We can
 	// move this processing to the handler because the characters event
@@ -397,7 +394,7 @@ XMLStreamParser::EventType XMLStreamParser::next_(bool peek)
 	//
 	switch (e)
 	{
-	case EndElement:
+	case EV_END_ELEMENT:
 	{
 		// If this is a peek, then avoid popping the stack just yet.
 		// This way, the attribute map will still be valid until we
@@ -412,7 +409,7 @@ XMLStreamParser::EventType XMLStreamParser::next_(bool peek)
 		}
 		break;
 	}
-	case StartElement:
+	case EV_START_ELEMENT:
 	{
 		if (const ElementEntry* e = getElement())
 		{
@@ -442,7 +439,7 @@ XMLStreamParser::EventType XMLStreamParser::next_(bool peek)
 }
 
 
-XMLStreamParser::EventType XMLStreamParser::next_body()
+XMLStreamParser::EventType XMLStreamParser::nextBody()
 {
 	// See if we have any start namespace declarations we need to return.
 	//
@@ -452,7 +449,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 		//
 		switch (_currentEvent)
 		{
-		case StartNamespaceDecl:
+		case EV_START_NAMESPACE_DECL:
 		{
 			if (++_startNamespaceIndex == _startNamespace.size())
 			{
@@ -463,16 +460,16 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			}
 			// Fall through.
 		}
-		case StartElement:
+		case EV_START_ELEMENT:
 		{
-			_currentEvent = StartNamespaceDecl;
+			_currentEvent = EV_START_NAMESPACE_DECL;
 			_qualifiedName = &_startNamespace[_startNamespaceIndex];
 			return _currentEvent;
 		}
 		default:
 		{
-			assert(false);
-			return _currentEvent = Eof;
+			poco_assert(false);
+			return _currentEvent = EV_EOF;
 		}
 		}
 	}
@@ -485,18 +482,18 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 		//
 		switch (_currentEvent)
 		{
-		case StartAttribute:
+		case EV_START_ATTRIBUTE:
 		{
-			_currentEvent = Characters;
+			_currentEvent = EV_CHARACTERS;
 			_pvalue = &_attributes[_currentAttributeIndex].value;
 			return _currentEvent;
 		}
-		case Characters:
+		case EV_CHARACTERS:
 		{
-			_currentEvent = EndAttribute; // Name is already set.
+			_currentEvent = EV_END_ATTRIBUTE; // Name is already set.
 			return _currentEvent;
 		}
-		case EndAttribute:
+		case EV_END_ATTRIBUTE:
 		{
 			if (++_currentAttributeIndex == _attributes.size())
 			{
@@ -508,17 +505,17 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			}
 			// Fall through.
 		}
-		case StartElement:
-		case StartNamespaceDecl:
+		case EV_START_ELEMENT:
+		case EV_START_NAMESPACE_DECL:
 		{
-			_currentEvent = StartAttribute;
+			_currentEvent = EV_START_ATTRIBUTE;
 			_qualifiedName = &_attributes[_currentAttributeIndex].qname;
 			return _currentEvent;
 		}
 		default:
 		{
-			assert(false);
-			return _currentEvent = Eof;
+			poco_assert(false);
+			return _currentEvent = EV_EOF;
 		}
 		}
 	}
@@ -531,7 +528,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 		//
 		switch (_currentEvent)
 		{
-		case EndNamespaceDecl:
+		case EV_END_NAMESPACE_DECL:
 		{
 			if (++_endNamespaceIndex == _endNamespace.size())
 			{
@@ -547,7 +544,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			//
 		default:
 		{
-			_currentEvent = EndNamespaceDecl;
+			_currentEvent = EV_END_NAMESPACE_DECL;
 			_qualifiedName = &_endNamespace[_endNamespaceIndex];
 			return _currentEvent;
 		}
@@ -556,10 +553,10 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 
 	// Check the queue.
 	//
-	if (_queue != Eof)
+	if (_queue != EV_EOF)
 	{
 		_currentEvent = _queue;
-		_queue = Eof;
+		_queue = EV_EOF;
 
 		_line = XML_GetCurrentLineNumber(_parser);
 		_column = XML_GetCurrentColumnNumber(_parser);
@@ -583,12 +580,12 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 	}
 	case XML_PARSING:
 	{
-		assert(false);
-		return _currentEvent = Eof;
+		poco_assert(false);
+		return _currentEvent = EV_EOF;
 	}
 	case XML_FINISHED:
 	{
-		return _currentEvent = Eof;
+		return _currentEvent = EV_EOF;
 	}
 	case XML_SUSPENDED:
 	{
@@ -607,12 +604,12 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			// unless this was the last chunk, in which case this is eof.
 			//
 			if (ps.finalBuffer)
-				return _currentEvent = Eof;
+				return _currentEvent = EV_EOF;
 
 			break;
 		}
 		case XML_STATUS_ERROR:
-			handle_error();
+			handleError();
 		}
 		break;
 	}
@@ -622,7 +619,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 	// or reach eof.
 	//
 	if (!_accumulateContent)
-		_currentEvent = Eof;
+		_currentEvent = EV_EOF;
 
 	XML_Status s;
 	do
@@ -632,7 +629,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			s = XML_Parse(_parser, static_cast<const char*>(_data.buf), static_cast<int>(_size), true);
 
 			if (s == XML_STATUS_ERROR)
-				handle_error();
+				handleError();
 
 			break;
 		}
@@ -664,7 +661,7 @@ XMLStreamParser::EventType XMLStreamParser::next_body()
 			s = XML_ParseBuffer(_parser, static_cast<int>(is.gcount()), eof);
 
 			if (s == XML_STATUS_ERROR)
-				handle_error();
+				handleError();
 
 			if (eof)
 				break;
@@ -710,7 +707,7 @@ static void splitName(const XML_Char* s, QName& qn)
 }
 
 
-void XMLCALL XMLStreamParser::start_element_(void* v, const XML_Char* name, const XML_Char** atts)
+void XMLCALL XMLStreamParser::handleStartElement(void* v, const XML_Char* name, const XML_Char** atts)
 {
 	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
@@ -725,7 +722,7 @@ void XMLCALL XMLStreamParser::start_element_(void* v, const XML_Char* name, cons
 
 	// Cannot be a followup event.
 	//
-	assert(ps.parsing == XML_PARSING);
+	poco_assert(ps.parsing == XML_PARSING);
 
 	// When accumulating characters in simple content, we expect to
 	// see more characters or end element. Seeing start element is
@@ -742,7 +739,7 @@ void XMLCALL XMLStreamParser::start_element_(void* v, const XML_Char* name, cons
 		return;
 	}
 
-	p._currentEvent = StartElement;
+	p._currentEvent = EV_START_ELEMENT;
 	splitName(name, p._qname);
 
 	p._line = XML_GetCurrentLineNumber(p._parser);
@@ -779,7 +776,7 @@ void XMLCALL XMLStreamParser::start_element_(void* v, const XML_Char* name, cons
 				}
 				else
 				{
-					p._attributes.push_back(attribute_type());
+					p._attributes.push_back(AttributeType());
 					splitName(*atts, p._attributes.back().qname);
 					p._attributes.back().value = *(atts + 1);
 				}
@@ -794,7 +791,7 @@ void XMLCALL XMLStreamParser::start_element_(void* v, const XML_Char* name, cons
 }
 
 
-void XMLCALL XMLStreamParser::end_element_(void* v, const XML_Char* name)
+void XMLCALL XMLStreamParser::handleEndElement(void* v, const XML_Char* name)
 {
 	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
@@ -811,7 +808,7 @@ void XMLCALL XMLStreamParser::end_element_(void* v, const XML_Char* name)
 	// case the element name is already set.
 	//
 	if (ps.parsing != XML_PARSING)
-		p._queue = EndElement;
+		p._queue = EV_END_ELEMENT;
 	else
 	{
 		splitName(name, p._qname);
@@ -819,10 +816,10 @@ void XMLCALL XMLStreamParser::end_element_(void* v, const XML_Char* name)
 		// If we are accumulating characters, then queue this event.
 		//
 		if (p._accumulateContent)
-			p._queue = EndElement;
+			p._queue = EV_END_ELEMENT;
 		else
 		{
-			p._currentEvent = EndElement;
+			p._currentEvent = EV_END_ELEMENT;
 
 			p._line = XML_GetCurrentLineNumber(p._parser);
 			p._column = XML_GetCurrentColumnNumber(p._parser);
@@ -833,7 +830,7 @@ void XMLCALL XMLStreamParser::end_element_(void* v, const XML_Char* name)
 }
 
 
-void XMLCALL XMLStreamParser::characters_(void* v, const XML_Char* s, int n)
+void XMLCALL XMLStreamParser::handleCharacters(void* v, const XML_Char* s, int n)
 {
 	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
@@ -881,12 +878,12 @@ void XMLCALL XMLStreamParser::characters_(void* v, const XML_Char* s, int n)
 	//
 	if (p._accumulateContent || ps.parsing != XML_PARSING)
 	{
-		assert(p._currentEvent == Characters);
+		poco_assert(p._currentEvent == EV_CHARACTERS);
 		p._value.append(s, n);
 	}
 	else
 	{
-		p._currentEvent = Characters;
+		p._currentEvent = EV_CHARACTERS;
 		p._value.assign(s, n);
 
 		p._line = XML_GetCurrentLineNumber(p._parser);
@@ -904,7 +901,7 @@ void XMLCALL XMLStreamParser::characters_(void* v, const XML_Char* s, int n)
 }
 
 
-void XMLCALL XMLStreamParser::start_namespace_decl_(void* v, const XML_Char* prefix, const XML_Char* ns)
+void XMLCALL XMLStreamParser::handleStartNamespaceDecl(void* v, const XML_Char* prefix, const XML_Char* ns)
 {
 	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 
@@ -923,7 +920,7 @@ void XMLCALL XMLStreamParser::start_namespace_decl_(void* v, const XML_Char* pre
 }
 
 
-void XMLCALL XMLStreamParser::end_namespace_decl_(void* v, const XML_Char* prefix)
+void XMLCALL XMLStreamParser::handleEndNamespaceDecl(void* v, const XML_Char* prefix)
 {
 	XMLStreamParser& p(*static_cast<XMLStreamParser*>(v));
 

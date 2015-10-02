@@ -104,10 +104,20 @@ const std::string& SharedLibrary::getPath() const
 }
 
 
+std::string SharedLibrary::prefix()
+{
+	return prefixImpl();
+}
+
+
 std::string SharedLibrary::suffix()
 {
 	return suffixImpl();
 }
 
+std::string SharedLibrary::getOSName(const std::string& name) 
+{
+	return prefix() + name + suffix();
+}
 
 } // namespace Poco

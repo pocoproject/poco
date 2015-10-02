@@ -36,7 +36,7 @@ namespace Poco {
 namespace Net {
 
 
-ICMPClient::ICMPClient(IPAddress::Family family): 
+ICMPClient::ICMPClient(SocketAddress::Family family): 
 	_family(family)
 {
 }

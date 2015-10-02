@@ -41,6 +41,7 @@ public:
     void testThreadStackSize();
     void testSleep();
     void testAffinity();
+    void testJoinNotStarted();
 
     void setUp();
     void tearDown();

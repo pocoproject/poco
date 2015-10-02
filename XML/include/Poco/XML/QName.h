@@ -63,11 +63,9 @@ public:
 	std::string& prefix();
 		/// Returns the namespace prefix of the name.
 
-	std::string string() const;
+	std::string toString() const;
 		/// Returns a printable representation in the [<namespace>#]<name> form.
 	
-	// Note that comparison operators
-	//
 public:
 	friend bool operator < (const QName& x, const QName& y)
 	{
@@ -130,7 +128,7 @@ inline std::string& QName::prefix()
 }
 
 
-XML_API std::ostream& operator<<(std::ostream&, const QName&);
+XML_API std::ostream& operator << (std::ostream&, const QName&);
 
 
 } } // namespace Poco::XML
