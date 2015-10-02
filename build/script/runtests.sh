@@ -45,7 +45,7 @@ if [ "$OSNAME" = "" ] ; then
 	OSNAME=`uname`
         case $OSNAME in
         CYGWIN*)
-                OSNAME=CYGWIN 
+                OSNAME=Cygwin 
                 TESTRUNNER=$TESTRUNNER.exe
                 ;;
         MINGW*)
