@@ -72,6 +72,10 @@ if(WIN32)
   add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DUNICODE -D_UNICODE -D__LCC__)  #__LCC__ define used by MySQL.h
 endif(WIN32)
 
+if (CYGWIN)
+  add_definitions(-DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING)
+  add_definitions(-D_XOPEN_SOURCE=500 -D__BSD_VISIBLE)
+else (CYGWIN)
 if (UNIX AND NOT ANDROID )
   add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
@@ -89,6 +93,7 @@ if (UNIX AND NOT ANDROID )
     endif (QNX)
   endif (APPLE)
 endif(UNIX AND NOT ANDROID )
+endif (CYGWIN)
 
 if (CMAKE_SYSTEM MATCHES "SunOS")
   add_definitions( -DPOCO_OS_FAMILY_UNIX )
@@ -101,10 +106,6 @@ if (CMAKE_COMPILER_IS_MINGW)
   add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
   add_definitions(-D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE)
 endif (CMAKE_COMPILER_IS_MINGW)
-
-if (CYGWIN)
-#    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
-endif (CYGWIN)
 
 # SunPro C++
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
