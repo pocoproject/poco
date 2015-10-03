@@ -16,6 +16,7 @@
 #include "Poco/Process.h"
 #include "Poco/Pipe.h"
 #include "Poco/PipeStream.h"
+#include <csignal>
 
 
 using Poco::Process;
@@ -190,6 +191,27 @@ void ProcessTest::testIsRunning()
 }
 
 
+void ProcessTest::testSignalExitCode()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG)
+	name += "d";
+#endif
+
+	cmd = "./";
+	cmd += name;
+
+	std::vector<std::string> args;
+	args.push_back("-raise-int");
+	ProcessHandle ph = Process::launch(cmd, args, 0, 0, 0);
+	int rc = ph.wait();
+	assert (rc == -SIGINT);
+#endif // defined(POCO_OS_FAMILY_UNIX)
+}
+
+
 void ProcessTest::setUp()
 {
 }
@@ -209,6 +231,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectOut);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchEnv);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunning);
+	CppUnit_addTest(pSuite, ProcessTest, testSignalExitCode);
 
 	return pSuite;
 }
