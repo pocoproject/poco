@@ -82,7 +82,7 @@ do
 				echo ""
 
 				runs=`expr $runs + 1`
-				sh -c "cd $POCO_BASE/$comp/testsuite/$BINDIR && LD_LIBRARY_PATH=. $TESTRUNNER $TESTRUNNERARGS"
+				sh -c "cd $POCO_BASE/$comp/testsuite/$BINDIR && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:. $TESTRUNNER $TESTRUNNERARGS"
 				if [ $? -ne 0 ] ; then
 					failures=`expr $failures + 1`
 					failedTests="$failedTests $comp"
