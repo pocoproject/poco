@@ -18,6 +18,7 @@
 #include <string>
 #include <iostream>
 #include <cstdlib>
+#include <csignal>
 
 
 int main(int argc, char** argv)
@@ -45,6 +46,10 @@ int main(int argc, char** argv)
 				return 0;
 			}
 			else return 1;
+		}
+		else if (arg == "-raise-int")
+		{
+			std::raise(SIGINT);
 		}
 	}
 	return argc - 1;

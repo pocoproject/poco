@@ -205,10 +205,10 @@ std::string X509Certificate::issuerName(NID nid) const
 	if (X509_NAME* issuer = X509_get_issuer_name(_pCert))
     {
 		char buffer[NAME_BUFFER_SIZE];
-		X509_NAME_get_text_by_NID(issuer, nid, buffer, sizeof(buffer));
-		return std::string(buffer);
+		if (X509_NAME_get_text_by_NID(issuer, nid, buffer, sizeof(buffer)) >= 0)
+			return std::string(buffer);
     }
-    else return std::string();
+    return std::string();
 }
 
 
@@ -217,10 +217,10 @@ std::string X509Certificate::subjectName(NID nid) const
 	if (X509_NAME* subj = X509_get_subject_name(_pCert))
     {
 		char buffer[NAME_BUFFER_SIZE];
-		X509_NAME_get_text_by_NID(subj, nid, buffer, sizeof(buffer));
-		return std::string(buffer);
+		if (X509_NAME_get_text_by_NID(subj, nid, buffer, sizeof(buffer)) >= 0)
+			return std::string(buffer);
     }
-    else return std::string();
+    return std::string();
 }
 
 

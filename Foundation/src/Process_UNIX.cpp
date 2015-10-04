@@ -18,6 +18,7 @@
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Pipe.h"
+#include <limits>
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -68,7 +69,12 @@ int ProcessHandleImpl::wait() const
 	while (rc < 0 && errno == EINTR);
 	if (rc != _pid)
 		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
-	return WEXITSTATUS(status);
+	if (WIFEXITED(status))
+		return WEXITSTATUS(status);
+	if (WIFSIGNALED(status))
+		return -WTERMSIG(status);
+	// This line should never be reached.
+	return std::numeric_limits<int>::max();
 }
 
 
@@ -150,6 +156,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
+#if !defined(POCO_NO_FORK_EXEC)
 	// We must not allocated memory after fork(),
 	// therefore allocate all required buffers first.
 	std::vector<char> envChars = getEnvironmentVariablesBuffer(env);
@@ -213,6 +220,9 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
 	if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
 	return new ProcessHandleImpl(pid);
+#else
+	throw Poco::NotImplementedException("platform does not allow fork/exec");
+#endif
 }
 
 

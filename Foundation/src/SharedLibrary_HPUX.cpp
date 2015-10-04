@@ -85,7 +85,7 @@ const std::string& SharedLibraryImpl::getPathImpl() const
 
 std::string SharedLibraryImpl::prefixImpl()
 {
-	return "";
+	return "lib";
 }
 
 
