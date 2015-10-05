@@ -114,6 +114,7 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("NCLOB", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("NTEXT", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("NVARCHAR", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("LONGVARCHAR", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("BLOB", MetaColumn::FDT_BLOB));
 		_types.insert(TypeMap::value_type("DATE", MetaColumn::FDT_DATE));
 		_types.insert(TypeMap::value_type("TIME", MetaColumn::FDT_TIME));
