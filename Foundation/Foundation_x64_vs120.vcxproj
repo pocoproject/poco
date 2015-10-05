@@ -610,6 +610,7 @@
     <ClCompile Include="src\Channel.cpp"/>
     <ClCompile Include="src\Configurable.cpp"/>
     <ClCompile Include="src\ConsoleChannel.cpp"/>
+    <ClCompile Include="src\EventChannel.cpp"/>
     <ClCompile Include="src\EventLogChannel.cpp"/>
     <ClCompile Include="src\FileChannel.cpp"/>
     <ClCompile Include="src\Formatter.cpp"/>
@@ -1153,6 +1154,7 @@
     <ClInclude Include="include\Poco\Channel.h"/>
     <ClInclude Include="include\Poco\Configurable.h"/>
     <ClInclude Include="include\Poco\ConsoleChannel.h"/>
+    <ClInclude Include="include\Poco\EventChannel.h"/>
     <ClInclude Include="include\Poco\EventLogChannel.h"/>
     <ClInclude Include="include\Poco\FileChannel.h"/>
     <ClInclude Include="include\Poco\Formatter.h"/>

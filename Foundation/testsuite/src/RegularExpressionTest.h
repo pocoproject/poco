@@ -41,6 +41,7 @@ public:
 	void testSubst3();
 	void testSubst4();
 	void testError();
+	void testGroup();
 
 	void setUp();
 	void tearDown();

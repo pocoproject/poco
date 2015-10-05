@@ -104,7 +104,7 @@ std::string SharedLibraryImpl::prefixImpl()
 #if POCO_OS == POCO_OS_CYGWIN
 	return "cyg";
 #else
-	return "";
+	return "lib";
 #endif
 }
 

@@ -567,6 +567,9 @@
     <ClCompile Include="src\ConsoleChannel.cpp">
       <Filter>Logging\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\EventChannel.cpp">
+      <Filter>Logging\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\EventLogChannel.cpp">
       <Filter>Logging\Source Files</Filter>
     </ClCompile>
@@ -1416,6 +1419,9 @@
       <Filter>Logging\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\ConsoleChannel.h">
+      <Filter>Logging\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\EventChannel.h">
       <Filter>Logging\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\EventLogChannel.h">

@@ -45,6 +45,7 @@ public:
 	void testCompress();
 	void testPurgeAge();
 	void testPurgeCount();
+	void testWrongPurgeOption();
 
 	void setUp();
 	void tearDown();

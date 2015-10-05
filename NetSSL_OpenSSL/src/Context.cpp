@@ -333,27 +333,33 @@ void Context::createSSLContext()
 		case SERVER_USE:
 			_pSSLContext = SSL_CTX_new(SSLv23_server_method());
 			break;
+#if defined(SSL_OP_NO_TLSv1) && !defined(OPENSSL_NO_TLS1)
 		case TLSV1_CLIENT_USE:
 			_pSSLContext = SSL_CTX_new(TLSv1_client_method());
 			break;
 		case TLSV1_SERVER_USE:
 			_pSSLContext = SSL_CTX_new(TLSv1_server_method());
 			break;
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
-		case TLSV1_1_CLIENT_USE:
-			_pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
-			break;
-		case TLSV1_1_SERVER_USE:
-			_pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
-			break;
 #endif
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
-		case TLSV1_2_CLIENT_USE:
-			_pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
-			break;
-		case TLSV1_2_SERVER_USE:
-			_pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
-			break;
+#if defined(SSL_OP_NO_TLSv1_1) && !defined(OPENSSL_NO_TLS1)
+/* SSL_OP_NO_TLSv1_1 is defined in ssl.h if the library version supports TLSv1.1.
+ * OPENSSL_NO_TLS1 is defined in opensslconf.h or on the compiler command line
+ * if TLS1.x was removed at OpenSSL library build time via Configure options.
+ */
+        case TLSV1_1_CLIENT_USE:
+            _pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
+            break;
+        case TLSV1_1_SERVER_USE:
+            _pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
+            break;
+#endif
+#if defined(SSL_OP_NO_TLSv1_2) && !defined(OPENSSL_NO_TLS1)
+        case TLSV1_2_CLIENT_USE:
+            _pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
+            break;
+        case TLSV1_2_SERVER_USE:
+            _pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
+            break;
 #endif
 		default:
 			throw Poco::InvalidArgumentException("Invalid or unsupported usage");

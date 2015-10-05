@@ -120,7 +120,7 @@ void WebSocketTest::testWebSocket()
 	Poco::Thread::sleep(200);
 	
 	HTTPClientSession cs("localhost", ss.address().port());
-	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
 
@@ -201,7 +201,7 @@ void WebSocketTest::testWebSocketLarge()
 	Poco::Thread::sleep(200);
 	
 	HTTPClientSession cs("localhost", ss.address().port());
-	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
 	ws.setSendBufferSize(msgSize);
@@ -233,7 +233,7 @@ void WebSocketTest::testOneLargeFrame(int msgSize)
 	Poco::Thread::sleep(200);
 
 	HTTPClientSession cs("localhost", ss.address().port());
-	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
 	ws.setSendBufferSize(msgSize);
