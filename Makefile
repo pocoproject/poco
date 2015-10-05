@@ -23,31 +23,31 @@ endif
 #
 # Determine OS
 #
-export POCO_HOST_OSNAME = $(shell uname)
+POCO_HOST_OSNAME = $(shell uname)
 ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
 ifeq ($(findstring x86_64,$(POCO_HOST_OSNAME)),x86_64)
-export OSARCH_64BITS = 1
+OSARCH_64BITS = 1
 endif
-export POCO_HOST_OSNAME = Cygwin
+POCO_HOST_OSNAME = Cygwin
 endif
 
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
-export POCO_HOST_OSNAME = MinGW
+POCO_HOST_OSNAME = MinGW
 endif
-export POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
+POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
 
 #
 # Determine operating system
 #
 ifndef POCO_TARGET_OSNAME
-export OSNAME   := $(POCO_HOST_OSNAME)
+OSNAME   := $(POCO_HOST_OSNAME)
 else
-export OSNAME   := $(POCO_TARGET_OSNAME)
+OSNAME   := $(POCO_TARGET_OSNAME)
 endif
 ifndef POCO_TARGET_OSARCH
-export OSARCH   := $(subst /,-,$(shell uname -m | tr ' ' _))
+OSARCH   := $(POCO_HOST_OSARCH)
 else
-export OSARCH   := $(POCO_TARGET_OSARCH)
+OSARCH   := $(POCO_TARGET_OSARCH)
 endif
 
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
