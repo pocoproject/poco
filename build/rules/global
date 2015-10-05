@@ -289,3 +289,4 @@ endif
 #
 export CC
 export CXX
+export LINK
