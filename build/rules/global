@@ -64,6 +64,19 @@ endif
 endif
 
 #
+# Determine OS
+#
+POCO_HOST_OSNAME = $(shell uname)
+ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
+POCO_HOST_OSNAME = CYGWIN
+endif
+
+ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
+POCO_HOST_OSNAME = MinGW
+endif
+POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
+
+#
 # Begin Sun platforms
 #
 # Pure Solaris or GNU (Nexenta), Sun Forte and Sun Studio compilers supported
@@ -103,6 +116,19 @@ endif
 #
 include $(POCO_BASE)/build/config/$(POCO_CONFIG)
 
+#
+# Determine operating system
+#
+ifndef POCO_TARGET_OSNAME
+OSNAME   := $(POCO_HOST_OSNAME)
+else
+OSNAME   := $(POCO_TARGET_OSNAME)
+endif
+ifndef POCO_TARGET_OSARCH
+OSARCH   := $(subst /,-,$(shell uname -m | tr ' ' _))
+else
+OSARCH   := $(POCO_TARGET_OSARCH)
+endif
 HOSTNAME := $(shell hostname)
 
 #
@@ -259,9 +285,7 @@ STRIPCMD = $(STRIP) $@$(BINEXT)
 endif
 
 #
-# Make CC, CXX and LINK environment vars
+# Make CC and CXX environment vars
 #
 export CC
 export CXX
-export LINK
-
