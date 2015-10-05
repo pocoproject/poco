@@ -85,6 +85,6 @@ release=$version$reltag
 #
 echo "Building release $release"
 
-rm -rf releases/poco-$release.*
+rmm -rf releases/poco-$release.*
 $POCO_BASE/release/script/mkrelease $release $relspec $lnendcvt
 

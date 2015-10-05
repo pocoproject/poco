@@ -68,10 +68,7 @@ endif
 #
 POCO_HOST_OSNAME = $(shell uname)
 ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
-ifeq ($(findstring x86_64,$(POCO_HOST_OSNAME)),x86_64)
-OSARCH_64BITS = 1
-endif
-POCO_HOST_OSNAME = Cygwin
+POCO_HOST_OSNAME = CYGWIN
 endif
 
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
@@ -288,9 +285,7 @@ STRIPCMD = $(STRIP) $@$(BINEXT)
 endif
 
 #
-# Make CC, CXX and LINK environment vars
+# Make CC and CXX environment vars
 #
 export CC
 export CXX
-export LINK
-
