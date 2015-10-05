@@ -33,18 +33,22 @@ MKDIR   = mkdir -p
 # Extension for Shared Libraries
 #
 LIBPREFIX        = cyg
-SHAREDLIBEXT     = .$(target_version).dll
+SHAREDLIBEXT     = -$(target_version).dll
 SHAREDLIBLINKEXT = .dll
+
+IMPPREFIX        = lib
+IMPLIBEXT        = -$(target_version).dll.a
+IMPLIBLINKEXT    = .dll.a
 
 #
 # Compiler and Linker Flags
 #
 CFLAGS          = 
 CFLAGS32        =
-CFLAGS64        = 
-CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -Wa,-mbig-obj
+CFLAGS64        = -Wa,-mbig-obj 
+CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING
 CXXFLAGS32      =
-CXXFLAGS64      = 
+CXXFLAGS64      = -Wa,-mbig-obj 
 LINKFLAGS       =
 LINKFLAGS32     =
 LINKFLAGS64     = 
