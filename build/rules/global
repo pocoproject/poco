@@ -128,7 +128,7 @@ else
 OSNAME   := $(POCO_TARGET_OSNAME)
 endif
 ifndef POCO_TARGET_OSARCH
-OSARCH   := $(subst /,-,$(shell uname -m | tr ' ' _))
+OSARCH   := $(POCO_HOST_OSARCH)
 else
 OSARCH   := $(POCO_TARGET_OSARCH)
 endif
