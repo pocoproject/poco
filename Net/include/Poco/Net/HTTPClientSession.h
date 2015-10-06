@@ -229,10 +229,9 @@ public:
 		
 	virtual bool canContinue(HTTPResponse& response);
 		/// If the request contains a "Expect: 100-continue" header,
-		/// (see HTTPRequest::setExpectContinue()) the method can be 
-		/// used to check whether the server has
-		/// sent a 100 Continue response before continuing with the
-		/// request, i.e. sending the request body.
+		/// (see HTTPRequest::setExpectContinue()) this method can be 
+		/// used to check whether the server has sent a 100 Continue response 
+		/// before continuing with the request, i.e. sending the request body.
 		///
 		/// Returns true if the server has responded with 100 Continue,
 		/// otherwise false. The HTTPResponse object contains the
@@ -241,6 +240,9 @@ public:
 		/// In any case, receiveResponse() must be called as well in
 		/// order to complete the request. The same HTTPResponse object
 		/// passed to canContinue() must also be passed to receiveResponse().
+		///
+		/// This method should only be called if the request contains
+		/// a "Expect: 100-continue" header.
 
 	void reset();
 		/// Resets the session and closes the socket.
