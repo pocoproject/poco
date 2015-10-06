@@ -7,10 +7,13 @@ before_install:
   # we need a recent version of CMake
   - sudo add-apt-repository -y ppa:andykimpe/cmake3
   - sudo apt-get update -qq
-  - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev g++-arm-linux-gnueabi g++-arm-linux-gnueabihf sloccount cppcheck
+  - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 sloccount cppcheck 
 
 services:
   - mongodb
+  
+notifications:
+  slack: pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
 
 env:
   global: TEST_NAME=""
@@ -23,13 +26,14 @@ matrix:
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
       script:
-        - ./configure && make -s -j2
-
-# TODO add this as soon as Linux-clang config is ready
-#    - env:    TEST_NAME="clang (make)"
-#      compiler: clang
-#      script:
-#        - ./configure --config=Linux-clang && make -s -j2
+        - ./configure --everything && make -s -j2
+        - ./travis/runtests.sh
+    
+    - env:    TEST_NAME="clang (make)"
+      compiler: clang
+      script:
+        - ./configure --everything --config=Linux-clang && make -s -j2
+        - ./travis/runtests.sh
 
     - env:    TEST_NAME="arm-linux-gnueabi- (make)"
       script:
