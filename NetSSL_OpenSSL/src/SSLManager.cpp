@@ -18,6 +18,7 @@
 #include "Poco/Net/Context.h"
 #include "Poco/Net/Utility.h"
 #include "Poco/Net/PrivateKeyPassphraseHandler.h"
+#include "Poco/Net/RejectCertificateHandler.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/SingletonHolder.h"
@@ -34,11 +35,11 @@ const std::string SSLManager::CFG_PRIV_KEY_FILE("privateKeyFile");
 const std::string SSLManager::CFG_CERTIFICATE_FILE("certificateFile");
 const std::string SSLManager::CFG_CA_LOCATION("caConfig");
 const std::string SSLManager::CFG_VER_MODE("verificationMode");
-const Context::VerificationMode SSLManager::VAL_VER_MODE(Context::VERIFY_STRICT);
+const Context::VerificationMode SSLManager::VAL_VER_MODE(Context::VERIFY_RELAXED);
 const std::string SSLManager::CFG_VER_DEPTH("verificationDepth");
 const int         SSLManager::VAL_VER_DEPTH(9);
 const std::string SSLManager::CFG_ENABLE_DEFAULT_CA("loadDefaultCAFile");
-const bool        SSLManager::VAL_ENABLE_DEFAULT_CA(false);
+const bool        SSLManager::VAL_ENABLE_DEFAULT_CA(true);
 const std::string SSLManager::CFG_CIPHER_LIST("cipherList");
 const std::string SSLManager::CFG_CYPHER_LIST("cypherList");
 const std::string SSLManager::VAL_CIPHER_LIST("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
@@ -134,8 +135,18 @@ Context::Ptr SSLManager::defaultClientContext()
 	Poco::FastMutex::ScopedLock lock(_mutex);
 
 	if (!_ptrDefaultClientContext)
-		initDefaultContext(false);
-
+	{
+		try
+		{
+			initDefaultContext(false);
+		}
+		catch (Poco::IllegalStateException&)
+		{
+			_ptrClientCertificateHandler = new RejectCertificateHandler(false);
+			_ptrDefaultClientContext = new Context(Context::TLSV1_CLIENT_USE, "", Context::VERIFY_RELAXED, 9, true);
+		}
+	}
+		
 	return _ptrDefaultClientContext;
 }
 
