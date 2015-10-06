@@ -142,8 +142,8 @@ odbcinclude=""
 unbundled=""
 static=""
 shared=""
-omitMinimal="Crypto,NetSSL_OpenSSL,Zip,Data,Data/SQLite,Data/ODBC,Data/MySQL,MongoDB,PDF,CppParser,PageCompiler"
-omitTypical="Data/ODBC,Data/MySQL,MongoDB,PDF,CppParser"
+omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL MongoDB PDF CppParser PageCompiler"
+omitTypical="Data/ODBC Data/MySQL MongoDB PDF CppParser"
 omit=$omitTypical
 # parse arguments
 while [ $# -ge 1 ]; do
