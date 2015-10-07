@@ -491,6 +491,9 @@ private:
 		return true;
 	}
 
+	template<typename T>
+	bool extractManualLOBImpl(std::size_t pos, Poco::Data::LOB<T>& val, SQLSMALLINT cType);
+
 	template <typename T, typename NT>
 	bool extAny(std::size_t pos, T& val)
 	{

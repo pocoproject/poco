@@ -352,8 +352,26 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 
 
 template<>
-bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos, 
-	Poco::Data::CLOB& val, 
+bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
+	Poco::Data::CLOB& val,
+	SQLSMALLINT cType)
+{
+	return extractManualLOBImpl(pos, val, cType);
+}
+
+
+template<>
+bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos,
+	Poco::Data::BLOB& val,
+	SQLSMALLINT cType)
+{
+	return extractManualLOBImpl(pos, val, cType);
+}
+
+
+template<typename T>
+bool Extractor::extractManualLOBImpl(std::size_t pos, 
+	Poco::Data::LOB<T>& val, 
 	SQLSMALLINT cType)
 {
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
@@ -362,8 +380,8 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 
 	SQLLEN len;
 	const int bufSize = CHUNK_SIZE;
-	Poco::Buffer<char> apChar(bufSize);
-	char* pChar = apChar.begin();
+	Poco::Buffer<T> apChar(bufSize);
+	T* pChar = apChar.begin();
 	SQLRETURN rc = 0;
 	
 	val.clear();
