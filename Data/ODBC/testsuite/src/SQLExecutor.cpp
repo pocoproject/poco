@@ -2474,6 +2474,19 @@ void SQLExecutor::emptyDB()
 
 struct LobTester
 {
+
+	template <typename TargetBlb, typename SrcBlb>
+	static TargetBlb convertBlob(const SrcBlb& s)
+	{
+		TargetBlb t;
+		for (typename SrcBlb::Iterator i = s.begin(); i != s.end(); ++i)
+		{
+			typename TargetBlb::ValueType v = static_cast<TargetBlb::ValueType>(*i);
+			t.appendRaw(&v, 1);
+		}
+		return t;
+	}
+
 	template <typename ContType, typename BlobType>
 	static void doTest(SQLExecutor* tc, Session& sess, const std::string& blobPlaceholder, int bigSize, const std::string& funct)
 	{
@@ -2523,11 +2536,24 @@ struct LobTester
 
 		try { 
 			ContType resV2;
-			Statement stat = sess << "SELECT Image FROM " << ExecUtil::person() << " ORDER BY LastName";
+			Statement stat(sess); 
+			stat << "SELECT Image FROM " << ExecUtil::person() << " ORDER BY LastName", now;
 			RecordSet rs(stat);
+			Poco::Data::ODBC::ODBCMetaColumn::ColumnDataType tp = rs.columnType(0);
 			for (bool cont = rs.moveFirst(); cont; cont = rs.moveNext())
 			{
-				resV2.push_back(rs.value<BlobType>(0));
+				switch (tp)
+				{
+				case Poco::Data::ODBC::ODBCMetaColumn::FDT_BLOB:
+					resV2.push_back(convertBlob<BlobType>(rs.value<Poco::Data::BLOB>(0)));
+					break;
+				case Poco::Data::ODBC::ODBCMetaColumn::FDT_CLOB:
+					resV2.push_back(convertBlob<BlobType>(rs.value<Poco::Data::CLOB>(0)));
+					break;
+				default:
+					failTU(tc, funct);
+				}
+				
 			}
 		  bool r = resV2 == blobs;
 			assertTU(tc, r);
