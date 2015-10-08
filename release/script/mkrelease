@@ -218,6 +218,8 @@ ifndef POCO_BUILD
 export POCO_BUILD=$(POCO_BASE)
 endif
 
+LIBPREFIX ?= lib
+
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
 # TESTS and SAMPLES are set in config.make
@@ -249,8 +251,8 @@ install: libexecs
 			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -f {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
-	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib -name "$(LIBPREFIX)Poco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib -name "$(LIBPREFIX)Poco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
 ENDOFSCRIPT
 
