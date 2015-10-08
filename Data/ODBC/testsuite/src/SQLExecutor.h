@@ -516,6 +516,12 @@ public:
 		assertImplementation(condition, conditionExpression, lineNumber, fileName);
 	}
 
+	void failImpl(const std::string& message, long lineNumber, const std::string& fileName)
+	{
+		fail(message, lineNumber, fileName);
+	}
+
+
 	void blob(int bigSize = 1024, const std::string& blobPlaceholder = "?");
 
 	template <typename C1, typename C2>

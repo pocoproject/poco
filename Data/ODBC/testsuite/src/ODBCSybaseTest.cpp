@@ -148,8 +148,8 @@ void SybaseODBC::recreateNullableTable()
 {
 	dropObject("TABLE", ExecUtil::nullabletest());
 	try { session() << "CREATE TABLE " << ExecUtil::nullabletest() << " (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime DATETIME NULL)", now; }
-	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreatePersonTable()"); }
-	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreatePersonTable()"); }
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateNullableTable()"); }
+	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateNullableTable()"); }
 }
 
 
