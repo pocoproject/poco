@@ -200,6 +200,11 @@ private:
 	RefCountedPerson& operator = (const RefCountedPerson&);
 };
 
+#define assertTU(tu, condition) \
+	(tu->assertImpl((condition), (#condition), __LINE__, __FILE__))
+
+#define failTU(tu, message) \
+	(tu->failImpl(message, __LINE__, __FILE__))
 
 namespace Poco {
 namespace Data {
@@ -2467,52 +2472,109 @@ void SQLExecutor::emptyDB()
 }
 
 
+struct LobTester
+{
+	template <typename ContType, typename BlobType>
+	static void doTest(SQLExecutor* tc, Session& sess, const std::string& blobPlaceholder, int bigSize, const std::string& funct)
+	{
+		const std::string lastName("lastname");
+		const std::string firstName("firstname");
+		const std::string address("Address");
+		const std::string tblName(ExecUtil::person());
+
+		sess << "DELETE FROM " << ExecUtil::person(), now;
+		ContType blobs;
+		for (size_t n = 0; n < 2; ++n)
+		{
+			BlobType img;
+			const size_t sz = 10;
+			for (size_t c = 0; c < sz; ++c)
+			{
+				typename BlobType::ValueType v = static_cast<typename BlobType::ValueType>('0' + c + sz * n);
+				img.appendRaw(&v, 1);
+			}
+			blobs.push_back(img);
+		}
+
+		try {
+			for (typename ContType::const_iterator it = blobs.begin(); it != blobs.end(); ++it)
+			{
+				sess << format("INSERT INTO %s VALUES (?,?,?,%s)", tblName, blobPlaceholder),
+					useRef(lastName), useRef(firstName), useRef(address), useRef(*it), now;
+			}
+		}
+		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
+		catch (StatementException& se){ std::cout << se.toString() << std::endl; failTU(tc, funct); }
+
+		int count = 0;
+		try { sess << "SELECT COUNT(*) FROM " << ExecUtil::person(), into(count), now; }
+		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
+		catch (StatementException& se){ std::cout << se.toString() << std::endl; failTU(tc, funct); }
+		assertTU (tc, count == blobs.size());
+
+		ContType resV;
+		assertTU (tc, resV.size() == 0);
+		try { sess << "SELECT Image FROM " << ExecUtil::person(), into(resV), now; }
+		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
+		catch (StatementException& se){ std::cout << se.toString() << std::endl; failTU(tc, funct); }
+		bool r = resV == blobs;
+		assertTU (tc, resV == blobs);
+
+		try { 
+			ContType resV2;
+			Statement stat = sess << "SELECT Image FROM " << ExecUtil::person();
+			RecordSet rs(stat);
+			for (bool cont = rs.moveFirst(); cont; cont = rs.moveNext())
+			{
+				resV2.push_back(rs.value<BlobType>(0));
+			}
+		  bool r = resV2 == blobs;
+			assertTU(tc, resV == blobs);
+		}
+		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
+		catch (StatementException& se){ std::cout << se.toString() << std::endl; failTU(tc, funct); }
+
+		BlobType big;
+		typename BlobType::Container v(bigSize);
+		for (size_t p = 0; p < bigSize; ++p)
+			v[p] = static_cast<typename BlobType::ValueType>(p);
+		big.assignRaw(&v[0], v.size());
+
+		assertTU (tc, big.size() == bigSize);
+
+		try { sess << "DELETE FROM " << ExecUtil::person(), now; }
+		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
+		catch (StatementException& se){ std::cout << se.toString() << std::endl; failTU(tc, funct); }
+
+		try {
+			sess << format("INSERT INTO %s VALUES (?,?,?,%s)", tblName, blobPlaceholder),
+				useRef(lastName), useRef(firstName), bind(address), use(big), now;
+		}
+		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
+		catch (StatementException& se){ std::cout << se.toString() << std::endl; failTU(tc, funct); }
+
+		BlobType res;
+		try { sess << "SELECT Image FROM " << ExecUtil::person(), into(res), now; }
+		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
+		catch (StatementException& se){ std::cout << se.toString() << std::endl; failTU(tc, funct); }
+		assertTU (tc, res == big);
+
+	}
+};
+
+
 void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 {
-	std::string funct = "blob()";
-	std::string lastName("lastname");
-	std::string firstName("firstname");
-	std::string address("Address");
-	const std::string tblName(ExecUtil::person());
+	const std::string funct = "blob()";
 
-	CLOB img("0123456789", 10);
-	int count = 0;
-	try {
-	  session() << format("INSERT INTO %s VALUES (?,?,?,%s)", tblName, blobPlaceholder),
-		use(lastName), use(firstName), use(address), use(img), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::person(), into(count), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 1);
+	LobTester::doTest< std::vector<CLOB>, CLOB>(this, session(), blobPlaceholder, bigSize, funct + "-1");
+	LobTester::doTest< std::vector<Poco::Data::BLOB>, Poco::Data::BLOB>(this, session(), blobPlaceholder, bigSize, funct + "-2");
 
-	CLOB res;
-	assert (res.size() == 0);
-	try { session() << "SELECT Image FROM " << ExecUtil::person(), into(res), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (res == img);
+	LobTester::doTest< std::list<CLOB>, CLOB>(this, session(), blobPlaceholder, bigSize, funct + "-3");
+	LobTester::doTest< std::list<Poco::Data::BLOB>, Poco::Data::BLOB>(this, session(), blobPlaceholder, bigSize, funct + "-4");
 
-	CLOB big;
-	std::vector<char> v(bigSize, 'x');
-	big.assignRaw(&v[0], v.size());
-
-	assert (big.size() == bigSize);
-
-	try { session() << "DELETE FROM " << ExecUtil::person(), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	try { session() << format("INSERT INTO %s VALUES (?,?,?,%s)", tblName, blobPlaceholder), 
-		use(lastName), use(firstName), use(address), use(big), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	try { session() << "SELECT Image FROM " << ExecUtil::person(), into(res), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (res == big);
+	LobTester::doTest< std::deque<CLOB>, CLOB>(this, session(), blobPlaceholder, bigSize, funct + "-5");
+	LobTester::doTest< std::deque<Poco::Data::BLOB>, Poco::Data::BLOB>(this, session(), blobPlaceholder, bigSize, funct + "-6");
 }
 
 
@@ -3533,9 +3595,6 @@ void SQLExecutor::multipleResults(const std::string& sql)
 	assert (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
 }
 
-#define assertTU(tu, condition) \
-	(tu->assertImpl((condition), (#condition), __LINE__, __FILE__))
-
 typedef Tuple<std::string, std::string, std::string, Poco::UInt32> PersonMRT;
 
 struct ReadPerson 
@@ -4171,6 +4230,7 @@ void SQLExecutor::transactor()
 
 void SQLExecutor::nullable()
 {
+  Statement stat(session());
   try { 
 		Nullable<int> nint;
 		session() << "INSERT INTO " << ExecUtil::nullabletest() << 
