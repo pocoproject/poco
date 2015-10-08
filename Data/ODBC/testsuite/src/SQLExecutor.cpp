@@ -2501,7 +2501,7 @@ struct LobTester
 			for (typename ContType::const_iterator it = blobs.begin(); it != blobs.end(); ++it, ++rn)
 			{
 				sess << format("INSERT INTO %s VALUES (?,?,?,%s)", tblName, blobPlaceholder),
-					useRef(lastName + rn), useRef(firstName), useRef(address), useRef(*it), now;
+					bind(lastName + rn), useRef(firstName), useRef(address), useRef(*it), now;
 			}
 		}
 		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
@@ -2519,7 +2519,7 @@ struct LobTester
 		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
 		catch (StatementException& se){ std::cout << se.toString() << std::endl; failTU(tc, funct); }
 		bool r = resV == blobs;
-		assertTU (tc, resV == blobs);
+		assertTU (tc, r);
 
 		try { 
 			ContType resV2;
@@ -2530,7 +2530,7 @@ struct LobTester
 				resV2.push_back(rs.value<BlobType>(0));
 			}
 		  bool r = resV2 == blobs;
-			assertTU(tc, resV == blobs);
+			assertTU(tc, r);
 		}
 		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
 		catch (StatementException& se){ std::cout << se.toString() << std::endl; failTU(tc, funct); }
