@@ -2497,10 +2497,11 @@ struct LobTester
 		}
 
 		try {
-			for (typename ContType::const_iterator it = blobs.begin(); it != blobs.end(); ++it)
+			char rn = '1';
+			for (typename ContType::const_iterator it = blobs.begin(); it != blobs.end(); ++it, ++rn)
 			{
 				sess << format("INSERT INTO %s VALUES (?,?,?,%s)", tblName, blobPlaceholder),
-					useRef(lastName), useRef(firstName), useRef(address), useRef(*it), now;
+					useRef(lastName + rn), useRef(firstName), useRef(address), useRef(*it), now;
 			}
 		}
 		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
@@ -2514,7 +2515,7 @@ struct LobTester
 
 		ContType resV;
 		assertTU (tc, resV.size() == 0);
-		try { sess << "SELECT Image FROM " << ExecUtil::person(), into(resV), now; }
+		try { sess << "SELECT Image FROM " << ExecUtil::person() << " ORDER BY LastName", into(resV), now; }
 		catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; failTU(tc, funct); }
 		catch (StatementException& se){ std::cout << se.toString() << std::endl; failTU(tc, funct); }
 		bool r = resV == blobs;
@@ -2522,7 +2523,7 @@ struct LobTester
 
 		try { 
 			ContType resV2;
-			Statement stat = sess << "SELECT Image FROM " << ExecUtil::person();
+			Statement stat = sess << "SELECT Image FROM " << ExecUtil::person() << " ORDER BY LastName";
 			RecordSet rs(stat);
 			for (bool cont = rs.moveFirst(); cont; cont = rs.moveNext())
 			{
