@@ -2481,7 +2481,7 @@ struct LobTester
 		TargetBlb t;
 		for (typename SrcBlb::Iterator i = s.begin(); i != s.end(); ++i)
 		{
-			typename TargetBlb::ValueType v = static_cast<TargetBlb::ValueType>(*i);
+			typename TargetBlb::ValueType v = static_cast<typename TargetBlb::ValueType>(*i);
 			t.appendRaw(&v, 1);
 		}
 		return t;
