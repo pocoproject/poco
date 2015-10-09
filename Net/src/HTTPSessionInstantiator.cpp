@@ -41,8 +41,11 @@ HTTPClientSession* HTTPSessionInstantiator::createClientSession(const Poco::URI&
 {
 	poco_assert (uri.getScheme() == "http");
 	HTTPClientSession* pSession = new HTTPClientSession(uri.getHost(), uri.getPort());
-	pSession->setProxy(proxyHost(), proxyPort());
-	pSession->setProxyCredentials(proxyUsername(), proxyPassword());
+	if (!proxyHost().empty())
+	{
+		pSession->setProxy(proxyHost(), proxyPort());
+		pSession->setProxyCredentials(proxyUsername(), proxyPassword());
+	}
 	return pSession;
 }
 

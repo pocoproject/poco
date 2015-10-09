@@ -32,6 +32,16 @@ EchoServer::EchoServer():
 }
 
 
+EchoServer::EchoServer(const Poco::Net::SocketAddress& address):
+	_socket(address),
+	_thread("EchoServer"),
+	_stop(false)
+{
+	_thread.start(*this);
+	_ready.wait();
+}
+
+
 EchoServer::~EchoServer()
 {
 	_stop = true;

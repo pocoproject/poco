@@ -194,7 +194,7 @@ void CoreTest::testEnvironment()
 	catch (Exception&)
 	{
 	}
-	
+	std::cout << std::endl;
 	std::cout << "OS Name:         " << Environment::osName() << std::endl;
 	std::cout << "OS Display Name: " << Environment::osDisplayName() << std::endl;
 	std::cout << "OS Version:      " << Environment::osVersion() << std::endl;

@@ -24,7 +24,6 @@
 #include "Poco/DateTime.h"
 #include "Poco/LocalDateTime.h"
 #include "Poco/String.h"
-#include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
 
@@ -314,65 +313,22 @@ void FileChannel::setCompress(const std::string& compress)
 
 void FileChannel::setPurgeAge(const std::string& age)
 {
-	delete _pPurgeStrategy;
-	_pPurgeStrategy = 0;
-	_purgeAge = "none";
+	if (setNoPurge(age)) return;
 
-	if (age.empty() || 0 == icompare(age, "none"))
-		return;
+	std::string::const_iterator nextToDigit;
+	int num = extractDigit(age, &nextToDigit);
+	Timespan::TimeDiff factor = extractFactor(age, nextToDigit);
 
-	std::string::const_iterator it  = age.begin();
-	std::string::const_iterator end = age.end();
-	int n = 0;
-	while (it != end && Ascii::isSpace(*it)) ++it;
-	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
-	if (0 == n)
-		throw InvalidArgumentException("Zero is not valid purge age.");
-	
-	while (it != end && Ascii::isSpace(*it)) ++it;
-
-	std::string unit;
-	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
-	
-	Timespan::TimeDiff factor = Timespan::SECONDS;
-	if (unit == "minutes")
-		factor = Timespan::MINUTES;
-	else if (unit == "hours")
-		factor = Timespan::HOURS;
-	else if (unit == "days")
-		factor = Timespan::DAYS;
-	else if (unit == "weeks")
-		factor = 7*Timespan::DAYS;
-	else if (unit == "months")
-		factor = 30*Timespan::DAYS;
-	else if (unit != "seconds")
-		throw InvalidArgumentException("purgeAge", age);
-
-	_pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor*n));
+	setPurgeStrategy(new PurgeByAgeStrategy(Timespan(num * factor)));
 	_purgeAge = age;
 }
 
 
 void FileChannel::setPurgeCount(const std::string& count)
 {
-	delete _pPurgeStrategy;
-	_pPurgeStrategy = 0;
-	_purgeAge = "none";
+	if (setNoPurge(count)) return;
 
-	if (count.empty() || 0 == icompare(count, "none"))
-		return;
-
-	std::string::const_iterator it  = count.begin();
-	std::string::const_iterator end = count.end();
-	int n = 0;
-	while (it != end && Ascii::isSpace(*it)) ++it;
-	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
-	if (0 == n)
-		throw InvalidArgumentException("Zero is not valid purge count.");
-	while (it != end && Ascii::isSpace(*it)) ++it;
-
-	delete _pPurgeStrategy;
-	_pPurgeStrategy = new PurgeByCountStrategy(n);
+	setPurgeStrategy(new PurgeByCountStrategy(extractDigit(count)));
 	_purgeCount = count;
 }
 
@@ -402,6 +358,73 @@ void FileChannel::purge()
 		}
 	}
 }
+
+
+bool FileChannel::setNoPurge(const std::string& value)
+{
+	if (value.empty() || 0 == icompare(value, "none"))
+	{
+		delete _pPurgeStrategy;
+		_pPurgeStrategy = 0;
+		_purgeAge = "none";
+		return true;
+	}
+	else return false;
+}
+
+
+int FileChannel::extractDigit(const std::string& value, std::string::const_iterator* nextToDigit) const
+{
+	std::string::const_iterator it  = value.begin();
+	std::string::const_iterator end = value.end();
+	int digit 						= 0;
+
+	while (it != end && Ascii::isSpace(*it)) ++it;
+	while (it != end && Ascii::isDigit(*it))
+	{ 
+		digit *= 10;
+		digit += *it++ - '0';
+	}
+
+	if (digit == 0)
+		throw InvalidArgumentException("Zero is not valid purge age.");	
+
+	if (nextToDigit) *nextToDigit = it;
+	return digit;
+}
+
+
+void FileChannel::setPurgeStrategy(PurgeStrategy* strategy)
+{
+	delete _pPurgeStrategy;
+	_pPurgeStrategy = strategy;
+}
+
+
+Timespan::TimeDiff FileChannel::extractFactor(const std::string& value, std::string::const_iterator start) const
+{
+	while (start != value.end() && Ascii::isSpace(*start)) ++start;
+
+	std::string unit;
+	while (start != value.end() && Ascii::isAlpha(*start)) unit += *start++;
+ 
+	if (unit == "seconds")
+		return Timespan::SECONDS;
+	if (unit == "minutes")
+		return Timespan::MINUTES;
+	else if (unit == "hours")
+		return Timespan::HOURS;
+	else if (unit == "days")
+		return Timespan::DAYS;
+	else if (unit == "weeks")
+		return 7 * Timespan::DAYS;
+	else if (unit == "months")
+		return 30 * Timespan::DAYS;
+	else throw InvalidArgumentException("purgeAge", value);
+
+	return Timespan::TimeDiff();
+}
+
 
 
 } // namespace Poco

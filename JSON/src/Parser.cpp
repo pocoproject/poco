@@ -19,6 +19,7 @@
 #include "Poco/Ascii.h"
 #include "Poco/Token.h"
 #include "Poco/UTF8Encoding.h"
+#include "Poco/String.h"
 #undef min
 #undef max
 #include <limits>
@@ -407,9 +408,11 @@ void Parser::parseBuffer()
 			case JSON_T_INTEGER:
 				{
 #if defined(POCO_HAVE_INT64)
+					std::string numStr(_parseBuffer.begin(), _parseBuffer.size());
 					try
 					{
-						Int64 value = NumberParser::parse64(std::string(_parseBuffer.begin(), _parseBuffer.size()));
+						Poco::trimInPlace(numStr);
+						Int64 value = NumberParser::parse64(numStr);
 						// if number is 32-bit, then handle as such
 						if (value > std::numeric_limits<int>::max()
 						 || value < std::numeric_limits<int>::min() )
@@ -424,7 +427,7 @@ void Parser::parseBuffer()
 					// try to handle error as unsigned in case of overflow
 					catch ( const SyntaxException& )
 					{
-						UInt64 value = NumberParser::parseUnsigned64(std::string(_parseBuffer.begin(), _parseBuffer.size()));
+						UInt64 value = NumberParser::parseUnsigned64(numStr);
 						// if number is 32-bit, then handle as such
 						if ( value > std::numeric_limits<unsigned>::max() )
 						{
@@ -438,13 +441,13 @@ void Parser::parseBuffer()
 #else
 					try
 					{
-						int value = NumberParser::parse(std::string(_parseBuffer.begin(), _parseBuffer.size()));
+						int value = NumberParser::parse(numStr);
 						_pHandler->value(value);
 					}
 					// try to handle error as unsigned in case of overflow
 					catch ( const SyntaxException& )
 					{
-						unsigned value = NumberParser::parseUnsigned(std::string(_parseBuffer.begin(), _parseBuffer.size()));
+						unsigned value = NumberParser::parseUnsigned(numStr);
 						_pHandler->value(value);
 					}
 #endif
