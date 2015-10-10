@@ -310,7 +310,7 @@ void HTTPClientSessionTest::testExpectContinue()
 	request.setExpectContinue(true);
 	s.sendRequest(request) << body;
 	HTTPResponse response;
-	assert (s.canContinue(response));
+	assert (s.peekResponse(response));
 	assert (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
 	std::istream& rs = s.receiveResponse(response);
 	assert (response.getStatus() == HTTPResponse::HTTP_OK);
@@ -331,7 +331,7 @@ void HTTPClientSessionTest::testExpectContinueFail()
 	request.setExpectContinue(true);
 	s.sendRequest(request) << body;
 	HTTPResponse response;
-	assert (!s.canContinue(response));
+	assert (!s.peekResponse(response));
 	assert (response.getStatus() == HTTPResponse::HTTP_BAD_REQUEST);
 	std::istream& rs = s.receiveResponse(response);
 	assert (response.getStatus() == HTTPResponse::HTTP_BAD_REQUEST);

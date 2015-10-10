@@ -227,19 +227,20 @@ public:
 		/// to ensure a new connection will be set up
 		/// for the next request.
 		
-	virtual bool canContinue(HTTPResponse& response);
+	virtual bool peekResponse(HTTPResponse& response);
 		/// If the request contains a "Expect: 100-continue" header,
 		/// (see HTTPRequest::setExpectContinue()) this method can be 
 		/// used to check whether the server has sent a 100 Continue response 
-		/// before continuing with the request, i.e. sending the request body.
+		/// before continuing with the request, i.e. sending the request body,
+		/// after calling sendRequest().
 		///
 		/// Returns true if the server has responded with 100 Continue,
 		/// otherwise false. The HTTPResponse object contains the
 		/// response sent by the server. 
 		///
-		/// In any case, receiveResponse() must be called as well in
+		/// In any case, receiveResponse() must be called afterwards as well in
 		/// order to complete the request. The same HTTPResponse object
-		/// passed to canContinue() must also be passed to receiveResponse().
+		/// passed to peekResponse() must also be passed to receiveResponse().
 		///
 		/// This method should only be called if the request contains
 		/// a "Expect: 100-continue" header.

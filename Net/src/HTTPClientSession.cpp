@@ -307,7 +307,7 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 }
 
 
-bool HTTPClientSession::canContinue(HTTPResponse& response)
+bool HTTPClientSession::peekResponse(HTTPResponse& response)
 {
 	poco_assert (!_responseReceived);
 
