@@ -241,7 +241,7 @@ install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
 	mkdir -p $(INSTALLDIR)/lib
 	mkdir -p $(INSTALLDIR)/bin
-	for comp in $(COMPONENTS) ; do \
+	for comp in $(filter-out $(foreach f,$(OMIT),$f%),$(COMPONENTS)) ; do \
 		if [ -d "$(POCO_BASE)/$$comp/include" ] ; then \
 			cp -Rf $(POCO_BASE)/$$comp/include/* $(INSTALLDIR)/include/ ; \
 		fi ; \

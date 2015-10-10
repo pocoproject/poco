@@ -300,6 +300,47 @@ void HTTPClientSessionTest::testBypassProxy()
 }
 
 
+void HTTPClientSessionTest::testExpectContinue()
+{
+	HTTPTestServer srv;
+	HTTPClientSession s("localhost", srv.port());
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/expect");
+	std::string body("this is a random request body\r\n0\r\n");
+	request.setContentLength((int) body.length());
+	request.setExpectContinue(true);
+	s.sendRequest(request) << body;
+	HTTPResponse response;
+	assert (s.peekResponse(response));
+	assert (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
+	std::istream& rs = s.receiveResponse(response);
+	assert (response.getStatus() == HTTPResponse::HTTP_OK);
+	assert (response.getContentLength() == body.length());
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assert (ostr.str() == body);
+}
+
+
+void HTTPClientSessionTest::testExpectContinueFail()
+{
+	HTTPTestServer srv;
+	HTTPClientSession s("localhost", srv.port());
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/fail");
+	std::string body("this is a random request body\r\n0\r\n");
+	request.setContentLength((int) body.length());
+	request.setExpectContinue(true);
+	s.sendRequest(request) << body;
+	HTTPResponse response;
+	assert (!s.peekResponse(response));
+	assert (response.getStatus() == HTTPResponse::HTTP_BAD_REQUEST);
+	std::istream& rs = s.receiveResponse(response);
+	assert (response.getStatus() == HTTPResponse::HTTP_BAD_REQUEST);
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assert (ostr.str().empty());
+}
+
+
 void HTTPClientSessionTest::setUp()
 {
 }
@@ -327,6 +368,8 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyAuth);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testBypassProxy);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testExpectContinue);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testExpectContinueFail);
 
 	return pSuite;
 }

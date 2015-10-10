@@ -297,7 +297,7 @@ void FileImpl::renameToImpl(const std::string& path)
 {
 	poco_assert (!_path.empty());
 
-	if (MoveFileA(_path.c_str(), path.c_str()) == 0)
+	if (MoveFileExA(_path.c_str(), path.c_str(), MOVEFILE_REPLACE_EXISTING) == 0)
 		handleLastErrorImpl(_path);
 }
 

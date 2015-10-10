@@ -142,6 +142,37 @@ std::string HTTPTestServer::handleRequest() const
 		if (_lastRequest.substr(0, 3) == "GET")
 			response.append(body);
 	}
+	else if (_lastRequest.substr(0, 12) == "POST /expect")
+	{
+		std::string::size_type pos = _lastRequest.find("\r\n\r\n");
+		pos += 4;
+		std::string body = _lastRequest.substr(pos);
+		response.append("HTTP/1.1 100 Continue\r\n\r\n");
+		response.append("HTTP/1.1 200 OK\r\n");
+		response.append("Content-Type: text/plain\r\n");
+		if (_lastRequest.find("Content-Length") != std::string::npos)
+		{
+			response.append("Content-Length: "); 
+			response.append(NumberFormatter::format((int) body.size()));
+			response.append("\r\n");
+		}
+		else if (_lastRequest.find("chunked") != std::string::npos)
+		{
+			response.append("Transfer-Encoding: chunked\r\n");
+		}
+		response.append("Connection: Close\r\n");
+		response.append("\r\n");
+		response.append(body);
+	}
+	else if (_lastRequest.substr(0, 10) == "POST /fail")
+	{
+		std::string::size_type pos = _lastRequest.find("\r\n\r\n");
+		pos += 4;
+		std::string body = _lastRequest.substr(pos);
+		response.append("HTTP/1.1 400 Bad Request\r\n");
+		response.append("Connection: Close\r\n");
+		response.append("\r\n");
+	}
 	else if (_lastRequest.substr(0, 4) == "POST")
 	{
 		std::string::size_type pos = _lastRequest.find("\r\n\r\n");

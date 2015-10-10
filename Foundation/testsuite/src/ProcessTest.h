@@ -31,6 +31,7 @@ public:
 	void testLaunchRedirectOut();
 	void testLaunchEnv();
 	void testIsRunning();
+	void testSignalExitCode();
 
 	void setUp();
 	void tearDown();

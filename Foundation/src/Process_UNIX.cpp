@@ -18,6 +18,7 @@
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Pipe.h"
+#include <limits>
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -68,7 +69,12 @@ int ProcessHandleImpl::wait() const
 	while (rc < 0 && errno == EINTR);
 	if (rc != _pid)
 		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
-	return WEXITSTATUS(status);
+	if (WIFEXITED(status))
+		return WEXITSTATUS(status);
+	if (WIFSIGNALED(status))
+		return -WTERMSIG(status);
+	// This line should never be reached.
+	return std::numeric_limits<int>::max();
 }
 
 
