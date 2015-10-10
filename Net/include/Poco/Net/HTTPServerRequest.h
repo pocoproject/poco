@@ -56,10 +56,6 @@ public:
 		/// The stream must be valid until the HTTPServerRequest
 		/// object is destroyed.
 		
-	virtual bool expectContinue() const = 0;
-		/// Returns true if the client expects a
-		/// 100 Continue response.
-		
 	virtual const SocketAddress& clientAddress() const = 0;
 		/// Returns the client's address.
 
