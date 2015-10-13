@@ -20,6 +20,7 @@
 #define Foundation_MemoryStream_INCLUDED
 
 
+#include "Poco/Bugcheck.h"
 #include "Poco/Foundation.h"
 #include "Poco/StreamUtil.h"
 #include <streambuf>
@@ -84,20 +85,24 @@ public:
 			if (this->gptr() == 0)
 				return fail;
 
-			switch (way)
+			if (way == std::ios_base::beg)
 			{
-			case std::ios_base::beg:
 				newoff = 0;
-				break;
-			case std::ios_base::cur:
+			}
+			else if (way == std::ios_base::cur)
+			{
 				// cur is not valid if both in and out are specified (Condition 3)
 				if ((which & std::ios_base::out) != 0)
 					return fail;
 				newoff = this->gptr() - this->eback();
-				break;
-			case std::ios_base::end:
+			}
+			else if (way == std::ios_base::end)
+			{
 				newoff = this->egptr() - this->eback();
-				break;
+			}
+			else
+			{
+				poco_bugcheck();
 			}
 
 			if ((newoff + off) < 0 || (this->egptr() - this->eback()) < (newoff + off))
@@ -110,20 +115,24 @@ public:
 			if (this->pptr() == 0)
 				return fail;
 
-			switch (way)
+			if (way == std::ios_base::beg)
 			{
-			case std::ios_base::beg:
 				newoff = 0;
-				break;
-			case std::ios_base::cur:
+			}
+			else if (way == std::ios_base::cur)
+			{
 				// cur is not valid if both in and out are specified (Condition 3)
 				if ((which & std::ios_base::in) != 0)
 					return fail;
 				newoff = this->pptr() - this->pbase();
-				break;
-			case std::ios_base::end:
+			}
+			else if (way == std::ios_base::end)
+			{
 				newoff = this->epptr() - this->pbase();
-				break;
+			}
+			else
+			{
+				poco_bugcheck();
 			}
 
 			if (newoff + off < 0 || (this->epptr() - this->pbase()) < newoff + off)
