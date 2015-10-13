@@ -69,11 +69,10 @@ include(CheckTypeSize)
 find_package(Cygwin)
 
 if(WIN32)
-  add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DUNICODE -D_UNICODE -D__LCC__)  #__LCC__ define used by MySQL.h
+  add_definitions( -DUNICODE -D_UNICODE -D__LCC__)  #__LCC__ define used by MySQL.h
 endif(WIN32)
 
 if (UNIX AND NOT ANDROID )
-  add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
   if (APPLE)
     add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64)
@@ -91,7 +90,6 @@ if (UNIX AND NOT ANDROID )
 endif(UNIX AND NOT ANDROID )
 
 if (CMAKE_SYSTEM MATCHES "SunOS")
-  add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
   add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
   set(SYSLIBS  pthread socket xnet nsl resolv rt dl)
