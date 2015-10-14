@@ -40,11 +40,11 @@ if(MSVC)
     else(POCO_MT)
         set(STATIC_POSTFIX "md" CACHE STRING "Set static library postfix" FORCE)
     endif(POCO_MT)
-      
+
     if (ENABLE_MSVC_MP)
       add_definitions(/MP)
     endif()
-    
+
 else(MSVC)
     # Other compilers then MSVC don't have a static STATIC_POSTFIX at the moment
     set(STATIC_POSTFIX "" CACHE STRING "Set static library postfix" FORCE)
@@ -55,12 +55,12 @@ if(POCO_STATIC)
         set(CMAKE_DEBUG_POSTFIX "${STATIC_POSTFIX}d" CACHE STRING "Set Debug library postfix" FORCE)
         set(CMAKE_RELEASE_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set Release library postfix" FORCE)
         set(CMAKE_MINSIZEREL_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set MinSizeRel library postfix" FORCE)
-        set(CMAKE_RELWITHDEBINFO_POSTFIX "${STATIC_POSTFIX}d" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
+        set(CMAKE_RELWITHDEBINFO_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
 else(POCO_STATIC)
         set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set Debug library postfix" FORCE)
         set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Set Release library postfix" FORCE)
         set(CMAKE_MINSIZEREL_POSTFIX "" CACHE STRING "Set MinSizeRel library postfix" FORCE)
-        set(CMAKE_RELWITHDEBINFO_POSTFIX "d" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
+        set(CMAKE_RELWITHDEBINFO_POSTFIX "" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
 endif()
 
 
@@ -69,11 +69,10 @@ include(CheckTypeSize)
 find_package(Cygwin)
 
 if(WIN32)
-  add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DUNICODE -D_UNICODE -D__LCC__)  #__LCC__ define used by MySQL.h
+  add_definitions( -DUNICODE -D_UNICODE -D__LCC__)  #__LCC__ define used by MySQL.h
 endif(WIN32)
 
 if (UNIX AND NOT ANDROID )
-  add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
   if (APPLE)
     add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64)
@@ -91,7 +90,6 @@ if (UNIX AND NOT ANDROID )
 endif(UNIX AND NOT ANDROID )
 
 if (CMAKE_SYSTEM MATCHES "SunOS")
-  add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
   add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
   set(SYSLIBS  pthread socket xnet nsl resolv rt dl)
