@@ -28,17 +28,12 @@
 #include <map>
 
 
-//
-// Copy these definitions from pcre.h
-// to avoid pulling in the entire header file
-//
-extern "C"
-{
-	struct real_pcre8_or_16;                 /* declaration; the definition is private  */
-	typedef struct real_pcre8_or_16 pcre;
-	struct pcre_extra;
-}
-
+#if defined(POCO_UNBUNDLED)
+#include <pcre.h>
+#else
+#include "pcre_config.h"
+#include "pcre.h"
+#endif
 
 namespace Poco {
 
