@@ -31,8 +31,14 @@
 #if defined(POCO_UNBUNDLED)
 #include <pcre.h>
 #else
-#include "pcre_config.h"
-#include "pcre.h"
+//
+// include/Poco/pcre_config.h and src/pcre_config.h must be identical
+// include/Poco/pcre.h        and src/pcre.h        must be identical
+// Those Poco/pcre_config.h and Poco/pcre.h are mandatory for compiling JSON Query.cpp
+// as the Foundation/src directory cannot be a include directory.
+//
+#include "Poco/pcre_config.h"
+#include "Poco/pcre.h"
 #endif
 
 namespace Poco {
