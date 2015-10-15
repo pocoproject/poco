@@ -42,15 +42,11 @@ if (POCO_UNBUNDLED)
 	set(SYSLIBS ${SYSLIBS} ${PCRE_LIBRARIES})
 	include_directories(${PCRE_INCLUDE_DIRS})
 
-	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
-	POCO_SOURCES( SRCS RegExp
-		src/pcre_ucd.c
-		src/pcre_tables.c
-	)
-
 	find_package(ZLIB REQUIRED)
 	set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
 	include_directories(${ZLIB_INCLUDE_DIRS})
+
+	add_definitions(-DPOCO_UNBUNDLED)
 else()
 	# pcre
 	POCO_SOURCES( SRCS pcre
