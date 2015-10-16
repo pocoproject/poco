@@ -881,7 +881,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 		const List& ipList = it->second.addressList();
 		List::const_iterator ipIt = ipList.begin();
 		List::const_iterator ipEnd = ipList.end();
-		for (int counter = 0; ipIt != ipEnd; ++ipIt, ++counter)
+		for (; ipIt != ipEnd; ++ipIt)
 		{
 			IPAddress addr = ipIt->get<NetworkInterface::IP_ADDRESS>();
 			IPAddress mask = ipIt->get<NetworkInterface::SUBNET_MASK>();
