@@ -250,8 +250,7 @@ public:
 		/// Returns the NetworkInterface for the given interface index.
 		///
 		/// Throws an InterfaceNotFoundException if an interface
-		/// with the given index does not exist (or IPv6 is not
-		/// available).
+		/// with the given index does not exist.
 		
 	static List list(bool ipOnly = true, bool upOnly = true);
 		/// Returns a list with all network interfaces
