@@ -26,13 +26,13 @@ matrix:
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
       script:
-        - ./configure && make -s -j2
+        - ./configure --everything && make -s -j2
         - ./travis/runtests.sh
     
     - env:    TEST_NAME="clang (make)"
       compiler: clang
       script:
-        - ./configure --config=Linux-clang && make -s -j2
+        - ./configure --everything --config=Linux-clang && make -s -j2
         - ./travis/runtests.sh
 
     - env:    TEST_NAME="arm-linux-gnueabi- (make)"

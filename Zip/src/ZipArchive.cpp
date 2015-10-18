@@ -24,6 +24,9 @@ namespace Poco {
 namespace Zip {
 
 
+const std::string ZipArchive::EMPTY_COMMENT;
+
+
 ZipArchive::ZipArchive(std::istream& in):
 	_entries(),
 	_infos(),
@@ -110,7 +113,18 @@ const std::string& ZipArchive::getZipComment() const
 {
 	// It seems that only the "first" disk is populated (look at Compress::close()), so getting the first ZipArchiveInfo
 	DirectoryInfos::const_iterator it = _disks.begin();
-	return it->second.getZipComment();
+	if (it != _disks.end())
+	{
+		return it->second.getZipComment();
+	}
+	else
+	{
+		DirectoryInfos64::const_iterator it64 = _disks64.begin();
+		if (it64 != _disks64.end())
+			return it->second.getZipComment();
+		else
+			return EMPTY_COMMENT;
+	}
 }
 
 

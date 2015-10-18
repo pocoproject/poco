@@ -218,6 +218,12 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 		poco_assert (*_pOstr);
 		// write an extra datablock if required
 		// or fix the crc entries
+		poco_check_ptr(_pHeader);
+		_pHeader->setCRC(_crc32.checksum());
+		_pHeader->setUncompressedSize(_bytesWritten);
+		_pHeader->setCompressedSize(_ptrOHelper->bytesWritten());
+		_pHeader->setStartPos(_pHeader->getStartPos()); // This resets EndPos now that compressed Size is known
+
 		if (_pHeader->searchCRCAndSizesAfterData())
 		{
             if (_pHeader->needsZip64()) 
@@ -241,13 +247,8 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 		}
 		else
 		{
-			poco_check_ptr (_pHeader);
-			_pHeader->setCRC(_crc32.checksum());
-			_pHeader->setUncompressedSize(_bytesWritten);
-			_pHeader->setCompressedSize(_ptrOHelper->bytesWritten());
 			_pOstr->seekp(_pHeader->getStartPos(), std::ios_base::beg);
 			poco_assert (*_pOstr);
-	        _pHeader->setStartPos(_pHeader->getStartPos()); // This resets EndPos now that compressed Size is known
             if (_pHeader->hasExtraField())   // Update sizes in header extension.
                 _pHeader->setZip64Data();
 			std::string header = _pHeader->createHeader();
