@@ -305,7 +305,7 @@ void FileImpl::renameToImpl(const std::string& path)
 
 	std::wstring upath;
 	UnicodeConverter::toUTF16(path, upath);
-	if (MoveFileW(_upath.c_str(), upath.c_str()) == 0)
+	if (MoveFileExW(_upath.c_str(), upath.c_str(), MOVEFILE_REPLACE_EXISTING) == 0)
 		handleLastErrorImpl(_path);
 }
 

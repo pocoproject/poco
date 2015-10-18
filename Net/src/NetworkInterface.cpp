@@ -794,16 +794,8 @@ bool NetworkInterface::isUp() const
 
 NetworkInterface NetworkInterface::forName(const std::string& name, bool requireIPv6)
 {
-	Map map = NetworkInterface::map(false, false);
-	Map::const_iterator it = map.begin();
-	Map::const_iterator end = map.end();
-
-	for (; it != end; ++it)
-	{
-		if (it->second.name() == name && ((requireIPv6 && it->second.supportsIPv6()) || !requireIPv6))
-			return it->second;
-	}
-	throw InterfaceNotFoundException(name);
+	if (requireIPv6) return forName(name, IPv6_ONLY);
+	else return forName(name, IPv4_OR_IPv6);
 }
 
 
@@ -881,7 +873,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 		const List& ipList = it->second.addressList();
 		List::const_iterator ipIt = ipList.begin();
 		List::const_iterator ipEnd = ipList.end();
-		for (int counter = 0; ipIt != ipEnd; ++ipIt, ++counter)
+		for (; ipIt != ipEnd; ++ipIt)
 		{
 			IPAddress addr = ipIt->get<NetworkInterface::IP_ADDRESS>();
 			IPAddress mask = ipIt->get<NetworkInterface::SUBNET_MASK>();
