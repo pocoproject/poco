@@ -8,30 +8,9 @@
 
 include $(POCO_BASE)/build/rules/global
 
-ifndef POCO_POSTGRESQL_INCLUDE
-POCO_POSTGRESQL_INCLUDE = /usr/include/postgresql
-endif
+INCLUDE += -I/usr/include/postgresql -I/usr/local/include/postgresql -I/usr/local/postgresql/include -I/opt/postgresql/include
 
-ifndef POCO_POSTGRESQL_LIB
-ifeq (0, $(shell test -d /usr/lib/$(OSARCH)-linux-gnu; echo $$?))
-POCO_POSTGRESQL_LIB = /usr/lib/$(OSARCH)-linux-gnu
-else ifeq (0, $(shell test -d /usr/lib64; echo $$?))
-POCO_POSTGRESQL_LIB = /usr/lib64
-else
-POCO_POSTGRESQL_LIB = /usr/lib
-endif
-endif
-
-ifeq ($(LINKMODE),STATIC)
-LIBLINKEXT = .a
-else
-LIBLINKEXT = $(SHAREDLIBLINKEXT)
-endif
-
-INCLUDE += -I./../include
-INCLUDE += -I$(POCO_POSTGRESQL_INCLUDE)
-
-SYSLIBS += -L$(POCO_POSTGRESQL_LIB) -lpq
+SYSLIBS += -L/usr/lib$(LIB64SUFFIX)/postgresql -L/usr/local/lib$(LIB64SUFFIX)/postgresql -L/usr/local/postgresql/lib$(LIB64SUFFIX) -L/opt/postgresql/lib$(LIB64SUFFIX) -lpq
 
 # Note: linking order is important, do not change it.
 SYSLIBS += -lz -lpthread -ldl
