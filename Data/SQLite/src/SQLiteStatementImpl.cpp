@@ -274,7 +274,6 @@ std::size_t SQLiteStatementImpl::next()
 		_stepCalled = false;
 		if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
 
-		//_affectedRowCount += (*extracts.begin())->numOfRowsHandled();
 		if (extracts.size())
 			_affectedRowCount += (*extracts.begin())->numOfRowsHandled();
 		else
