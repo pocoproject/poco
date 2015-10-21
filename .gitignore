@@ -118,10 +118,10 @@ CodeGeneration
 RemotingNG
 XSD
 releases/
+stage/
 
 # openssl binaries #
 ####################
-
 !openssl/win32/bin/debug/*.dll
 !openssl/win32/bin/debug/*.lib
 !openssl/win32/bin/release/*.dll
