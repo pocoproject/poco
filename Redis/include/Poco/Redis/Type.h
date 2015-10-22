@@ -18,6 +18,7 @@
 #ifndef Redis_Type_INCLUDED
 #define Redis_Type_INCLUDED
 
+#include "Poco/LineEndingConverter.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
 #include "Poco/SharedPtr.h"
@@ -30,16 +31,16 @@ namespace Poco {
 namespace Redis {
 
 
-class Redis_API  AbstractType
+class Redis_API  RedisType
 {
 public:
 
-	typedef SharedPtr<AbstractType> Ptr;
+	typedef SharedPtr<RedisType> Ptr;
 
-	AbstractType();
-	virtual ~AbstractType();
+	RedisType();
+	virtual ~RedisType();
 
-	virtual int getType() const = 0;
+	virtual int type() const = 0;
 
 	virtual void read(RedisSocket& socket) = 0;
 
@@ -49,7 +50,8 @@ public:
 		REDIS_INTEGER,
 		REDIS_SIMPLE_STRING,
 		REDIS_BULK_STRING,
-		REDIS_ARRAY
+		REDIS_ARRAY,
+		REDIS_ERROR
 	};
 
 private:
@@ -65,7 +67,9 @@ struct ElementTraits
 template<>
 struct ElementTraits<Poco::Int64>
 {
-	enum { TypeId = AbstractType::REDIS_INTEGER };
+	enum { TypeId = RedisType::REDIS_INTEGER };
+
+	static const char marker = ':';
 
 	static std::string typeName()
 	{
@@ -74,7 +78,7 @@ struct ElementTraits<Poco::Int64>
 
 	static std::string toString(const Poco::Int64& value)
 	{
-		return ":" + NumberFormatter::format(value) + "\r\n";
+		return marker + NumberFormatter::format(value) + "\r\n";
 	}
 };
 
@@ -82,16 +86,18 @@ struct ElementTraits<Poco::Int64>
 template<>
 struct ElementTraits<std::string>
 {
-	enum { TypeId = AbstractType::REDIS_SIMPLE_STRING };
+	enum { TypeId = RedisType::REDIS_SIMPLE_STRING };
 
 	static std::string typeName()
 	{
 		return "Simple String";
 	}
 
+	static const char marker = '+';
+
 	static std::string toString(const std::string& value)
 	{
-		return "+" + value + "\r\n";
+		return marker + value + LineEnding::NEWLINE_CRLF;
 	}
 };
 
@@ -102,28 +108,31 @@ typedef Optional<std::string> BulkString;
 template<>
 struct ElementTraits<BulkString>
 {
-	enum { TypeId = AbstractType::REDIS_BULK_STRING };
+	enum { TypeId = RedisType::REDIS_BULK_STRING };
 
 	static std::string typeName()
 	{
 		return "Bulk String";
 	}
 
+	static const char marker = '$';
+
 	static std::string toString(const BulkString& value)
 	{
-		if ( value.isSpecified() ) {
+		if ( value.isSpecified() )
+		{
 			std::string s = value.value();
-			return "$" + NumberFormatter::format(s.length()) + "\r\n" + s + "\r\n";
+			return marker + NumberFormatter::format(s.length()) + LineEnding::NEWLINE_CRLF + s + LineEnding::NEWLINE_CRLF;
 		}
-		return "$-1\r\n";
+		return marker + std::string("-1") + LineEnding::NEWLINE_CRLF;
 	}
 };
 
 
 template<typename T>
-class Redis_API Type : public AbstractType
+class Redis_API Type : public RedisType
 {
-		public:
+public:
 
 	Type()
 	{
@@ -141,16 +150,15 @@ class Redis_API Type : public AbstractType
 	{
 	}
 
-	int  getType() const
+	int  type() const
 	{
 		return ElementTraits<T>::TypeId;
 	}
 
-	void read(RedisSocket& socket)
-	{
-	}
+	virtual void read(RedisSocket& socket);
 
-	virtual std::string toString() const {
+	virtual std::string toString() const
+	{
 		return ElementTraits<T>::toString(_value);
 	}
 
@@ -175,9 +183,8 @@ void Type<Int64>::read(RedisSocket& socket)
 template<> inline
 void Type<std::string>::read(RedisSocket& socket)
 {
-	std::string s;
-	socket.readLine(s);
-	_value = s;
+	_value.clear();
+	socket.readLine(_value);
 }
 
 template<> inline
@@ -187,16 +194,15 @@ void Type<BulkString>::read(RedisSocket& socket)
 
 	std::string line;
 	socket.readLine(line);
+
 	int length = NumberParser::parse64(line);
+
 	if ( length >= 0 )
 	{
 		std::string s;
 		socket.read(length, s);
 		_value.assign(s);
-		socket.readLine(line);
-	}
-	else // -1
-	{
+
 		socket.readLine(line);
 	}
 }

@@ -25,7 +25,7 @@ using namespace Poco::Redis;
 
 
 bool RedisTest::_connected = false;
-Poco::Redis::Connection RedisTest::_redis;
+Poco::Redis::Client RedisTest::_redis;
 
 
 RedisTest::RedisTest(const std::string& name):
@@ -98,9 +98,45 @@ void RedisTest::testPing()
 	Array command;
 	command.add("PING");
 
-	std::string result;
-	_redis.sendCommand(command, result);
+	RedisType::Ptr result = _redis.sendCommand(command);
 }
+
+void RedisTest::testSet()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array command;
+	command.add("SET");
+	command.add("mykey");
+	command.add("Hello");
+	command.add("NX");
+
+	RedisType::Ptr result = _redis.sendCommand(command);
+}
+
+void RedisTest::testPipelining()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	std::vector<Array> commands;
+
+	Array ping;
+	ping.add("PING");
+	commands.push_back(ping);
+	commands.push_back(ping);
+
+	std::vector<RedisType::Ptr> result;
+	_redis.sendCommands(commands, result);
+}
+
 
 CppUnit::Test* RedisTest::suite()
 {
@@ -108,6 +144,9 @@ CppUnit::Test* RedisTest::suite()
 
 	CppUnit_addTest(pSuite, RedisTest, testEcho);
 	CppUnit_addTest(pSuite, RedisTest, testPing);
+	CppUnit_addTest(pSuite, RedisTest, testSet);
+
+	CppUnit_addTest(pSuite, RedisTest, testPipelining);
 
 	return pSuite;
 }

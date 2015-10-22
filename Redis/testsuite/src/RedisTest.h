@@ -32,6 +32,8 @@ public:
 
 	void testEcho();
 	void testPing();
+	void testSet();
+	void testPipelining();
 
 	void setUp();
 	void tearDown();
@@ -43,7 +45,7 @@ private:
 	std::string _host;
 	unsigned    _port;
 	static bool _connected;
-	static Poco::Redis::Connection _redis;
+	static Poco::Redis::Client _redis;
 
 };
 

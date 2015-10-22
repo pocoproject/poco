@@ -14,7 +14,7 @@
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
-
+#include <iostream>
 #include "Poco/Redis/RedisSocket.h"
 
 namespace Poco {
@@ -82,7 +82,7 @@ void RedisSocket::read(UInt64 length, std::string& data)
 
 int RedisSocket::write(const char* buffer, std::streamsize length)
 {
-	_socket.sendBytes(buffer, (int) length);
+	return _socket.sendBytes(buffer, (int) length);
 }
 
 void RedisSocket::refill()

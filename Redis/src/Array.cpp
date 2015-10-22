@@ -15,8 +15,6 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-#include <sstream>
-
 #include "Poco/Redis/Array.h"
 
 namespace Poco {
@@ -60,13 +58,7 @@ void Array::add()
 
 std::string Array::toString() const 
 {
-	std::stringstream result;
-	result << "*" << _elements.size() << "\r\n";
-	for(std::vector<AbstractType::Ptr>::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
-	{
-		result << (*it)->toString();
-	}
-	return result.str();
+	return ElementTraits<Array>::toString(*this);
 }
 
 } }

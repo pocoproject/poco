@@ -19,6 +19,8 @@
 #define Redis_Array_INCLUDED
 
 #include <vector>
+#include <sstream>
+
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/Type.h"
 #include "Poco/Redis/Exception.h"
@@ -43,9 +45,13 @@ public:
 
 	void add();
 
-	void add(AbstractType::Ptr value);
+	void add(RedisType::Ptr value);
+
+	std::vector<RedisType::Ptr>::const_iterator begin() const;
 
 	void clear();
+
+	std::vector<RedisType::Ptr>::const_iterator end() const;
 	
 	std::string toString() const;
 
@@ -53,14 +59,24 @@ public:
 
 private:
 
-	std::vector<AbstractType::Ptr> _elements;
+	std::vector<RedisType::Ptr> _elements;
 
 	friend class Connection;
 };
 
+inline std::vector<RedisType::Ptr>::const_iterator Array::begin() const
+{
+	return _elements.begin();
+}
+
 inline void Array::clear()
 {
 	_elements.clear();
+}
+
+inline std::vector<RedisType::Ptr>::const_iterator Array::end() const
+{
+	return _elements.end();
 }
 
 inline size_t Array::size() const
@@ -68,7 +84,7 @@ inline size_t Array::size() const
 	return _elements.size();
 }
 
-inline void Array::add(AbstractType::Ptr value)
+inline void Array::add(RedisType::Ptr value)
 {
 	_elements.push_back(value);
 }
@@ -76,7 +92,9 @@ inline void Array::add(AbstractType::Ptr value)
 template<>
 struct ElementTraits<Array>
 {
-	enum { TypeId = AbstractType::REDIS_ARRAY };
+	enum { TypeId = RedisType::REDIS_ARRAY };
+
+	static const char marker = '*';
 
 	static std::string typeName()
 	{
@@ -85,10 +103,15 @@ struct ElementTraits<Array>
 
 	static std::string toString(const Array& value)
 	{
-		return value.toString();
+		std::stringstream result;
+		result <<  marker << value.size() << LineEnding::NEWLINE_CRLF;
+		for(std::vector<RedisType::Ptr>::const_iterator it = value.begin(); it != value.end(); ++it)
+		{
+			result << (*it)->toString();
+		}
+		return result.str();
 	}
 };
-
 
 template<> inline
 void Type<Array>::read(RedisSocket& socket)
@@ -96,28 +119,29 @@ void Type<Array>::read(RedisSocket& socket)
 	std::string line;
 	socket.readLine(line);
 	Int64 length = NumberParser::parse64(line);
+
 	for(int i = 0; i < length; ++i)
 	{
 		char elementType = socket.get();
-		AbstractType::Ptr t;
+		RedisType::Ptr element;
 
 		switch(elementType)
 		{
-			case ':': // Integer
-				t =  new Type<Int64>();
+			case ElementTraits<Int64>::marker :
+				element =  new Type<Int64>();
 				break;
-			case '+' : // Simple String
-				t = new Type<std::string>();
+			case ElementTraits<std::string>::marker :
+				element = new Type<std::string>();
 				break;
-			case '$' : // Bulk String
-				t  = new Type<BulkString>();
+			case ElementTraits<BulkString>::marker :
+				element  = new Type<BulkString>();
 				break;
 		}
 
-		if ( t.isNull() ) throw RedisException("Wrong answer received from Redis server");
+		if ( element.isNull() ) throw RedisException("Wrong answer received from Redis server");
 
-		t->read(socket);
-		_value.add(t);
+		element->read(socket);
+		_value.add(element);
 	}
 }
 
