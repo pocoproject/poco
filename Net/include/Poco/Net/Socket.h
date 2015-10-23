@@ -305,7 +305,6 @@ protected:
 		/// Returns the socket descriptor for this socket.
 
 private:
-
 	SocketImpl* _pImpl;
 };
 
