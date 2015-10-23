@@ -82,7 +82,7 @@ allcomps="Foundation XML JSON Util Net $comps"
 # Clean build directory
 #
 echo "Cleaning build directory: $build"
-rm -rf $build
+#rm -rf $build
 mkdir -p $build
 mkdir -p $dist
 
@@ -111,18 +111,20 @@ if [ $tag ] ; then
 	docVersion="$docVersion-$tag"
 fi
 docPath=$dist/poco-${docVersion}-doc
+echo "docPath=" $docPath
 
 includes=""
 for inc in `find $build -name include -print` ; do
-	includes="$includes,-I$inc"
+	includes="$includes -I$inc"
 done
 
-echo "PocoBuild=$build" >>$build/PocoDoc.ini
+echo "PocoBuild=$build" >$build/PocoDoc.ini
 echo "PocoBase=$POCO_BASE" >>$build/PocoDoc.ini
 echo "PocoDoc.output=$docPath" >>$build/PocoDoc.ini
 echo "PocoDoc.version=$docVersion" >> $build/PocoDoc.ini
 echo "Includes=$includes" >> $build/PocoDoc.ini
 
+echo PocoDoc --config=$docConfig --config=$build/PocoDoc.ini
 PocoDoc --config=$docConfig --config=$build/PocoDoc.ini
 
 cd $dist
