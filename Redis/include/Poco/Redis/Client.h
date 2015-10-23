@@ -32,7 +32,27 @@ namespace Redis {
 
 
 class Redis_API Client
-	/// Represents a connection to a Redis server
+	/// Represents a connection to a Redis server.
+	///
+	/// A command is always made from an Array and a reply can be a signed 64
+	/// bit integer, a simple string, a bulk string, an array or an error. The
+	/// first element of the command array is the Redis command. A simple string
+	/// is a string that cannot contain a CR or LF character. A bulk string is
+	/// implemented as a typedef for Poco::Optional<std::string>. This is
+	/// because a bulk string can represent a Null value. When the optional
+	/// object isn't assigned, you know that a Null value is returned:
+	///
+	///   BulkString bs = client.sendCommand(...);
+	///   if ( bs.isSpecified() )
+	///   {
+	///      // We have a std::string
+	///   }
+	///   else
+	///   {
+	///      // We have a Null value
+	///   }
+	///
+	/// An Array can't contain another Array.
 {
 public:
 	typedef Poco::SharedPtr<Client> Ptr;
@@ -52,14 +72,14 @@ public:
 		/// Constructor which connects to the given Redis host/port.
 
 	virtual ~Client();
-		/// Destructor
+		/// Destructor.
 
 	Net::SocketAddress address() const;
-		/// Returns the address of the Redis connection
+		/// Returns the address of the Redis connection.
 
 	void connect(const std::string& hostAndPort);
-		/// Connects to the given Redis server. The host and port must be separated
-		/// with a colon.
+		/// Connects to the given Redis server. The host and port must be
+		/// separated with a colon.
 
 	void connect(const std::string& host, int port);
 		/// Connects to the given Redis server.
@@ -68,33 +88,51 @@ public:
 		/// Connects to the given Redis server.
 
 	void disconnect();
-		/// Disconnects from the Redis server
+		/// Disconnects from the Redis server.
 
 	RedisType::Ptr sendCommand(const Array& command);
 		/// Sends a Redis command to the server and returns the reply
 
 	template<typename T>
 	void  sendCommand(const Array& command, T& result)
+		/// Sends a Redis command to the server, gets the reply and tries
+		/// to convert that reply to the template type.  When
+		/// the reply is a Redis error, it wil throw a RedisException.
+		/// A BadCastException will be thrown, when the reply is not of the
+		/// given type.
 	{
 		sendCommand(command);
 		readReply(result);
 	}
 
 	RedisType::Ptr readReply();
+		/// Read a reply from the Redis server.
 
 	template<typename T>
 	void readReply(T& result)
+		/// Read a reply from the Redis server and tries to convert that reply
+		/// to the template type. When the reply is a Redis error, it will
+		/// throw a RedisException. A BadCastException will be thrown, when
+		/// the reply is not of the given type.
 	{
 		RedisType::Ptr redisResult = readReply();
+		if ( redisResult->type() == ElementTraits<Error>::TypeId )
+		{
+			throw RedisException(((Error*) redisResult.get())->getMessage());
+		}
 		if ( redisResult->type() == ElementTraits<T>::TypeId )
 			result = ((Type<T>*) redisResult.get())->value();
 		else  throw BadCastException();
 	}
 
-	void sendCommands(const std::vector<Array>& commands, std::vector<RedisType::Ptr>& results);
+	void sendCommands(const std::vector<Array>& commands,
+		std::vector<RedisType::Ptr>& results);
+		/// Sends all commands (pipelining) to the Redis server before
+		/// getting all replies.
 
 	void writeCommand(const Array& command);
-		/// Sends a request to the Redis server
+		/// Sends a request to the Redis server. Use readReply to get the
+		/// answer.
 
 private:
 
@@ -108,6 +146,12 @@ private:
 		/// Connects to the Redis server
 
 	static RedisType::Ptr createRedisType(char marker);
+		/// Create a Redis type based on the marker :
+		/// + : a simple string (std::string)
+		/// - : an error (Error)
+		/// $ : a bulk string (BulkString)
+		/// * : an array (Array)
+		/// : : a signed 64 bit integer (Int64)
 };
 
 
