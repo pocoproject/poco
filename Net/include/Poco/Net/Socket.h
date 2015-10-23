@@ -305,6 +305,12 @@ protected:
 		/// Returns the socket descriptor for this socket.
 
 private:
+	typedef SocketImpl::SocketImplList SocketImplList;
+
+	static void SocketListToSocketImplList(const SocketList& socketList, SocketImplList& socketImplList);
+
+	static void SocketImplListToSocketList(SocketImplList& socketImplList, SocketList& socketList);
+
 	SocketImpl* _pImpl;
 };
 

@@ -64,50 +64,47 @@ Socket::~Socket()
 
 int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout)
 {
-	typedef SocketImpl::SocketImplList sockImpList;
-	sockImpList sockImpReadList;
-	sockImpList sockImpWriteList;
-	sockImpList sockeImpExceptList;
+	SocketImplList socketImpReadList;
+	SocketImplList socketImpWriteList;
+	SocketImplList socketImpExceptList;
 
-	for (SocketList::const_iterator it = readList.begin(); it != readList.end(); ++it)
-	{
-		if (it->sockfd() != POCO_INVALID_SOCKET) sockImpReadList.push_back(it->impl());
-	}
-	for (SocketList::const_iterator it = writeList.begin(); it != writeList.end(); ++it)
-	{
-		if (it->sockfd() != POCO_INVALID_SOCKET) sockImpWriteList.push_back(it->impl());
-	}
-	for (SocketList::const_iterator it = exceptList.begin(); it != exceptList.end(); ++it)
-	{
-		if (it->sockfd() != POCO_INVALID_SOCKET) sockeImpExceptList.push_back(it->impl());
-	}
+	SocketListToSocketImplList(readList,   socketImpReadList);
+	SocketListToSocketImplList(writeList,  socketImpWriteList);
+	SocketListToSocketImplList(exceptList, socketImpExceptList);
 
-	SocketImpl::select(sockImpReadList, sockImpWriteList, sockeImpExceptList, timeout);
+	SocketImpl::select(socketImpReadList, socketImpWriteList, socketImpExceptList, timeout);
 
  	SocketList readyReadList;
 	SocketList readyWriteList;
 	SocketList readyExceptList;
 
-	for (sockImpList::iterator it = sockImpReadList.begin(); it != sockImpReadList.end(); ++it)
-	{
-		readyReadList.push_back(Socket(*it));
-		(*it)->duplicate();
-	}
-	for (sockImpList::iterator it = sockImpWriteList.begin(); it != sockImpWriteList.end(); ++it)
-	{
-		readyWriteList.push_back(Socket(*it));
-		(*it)->duplicate();
-	}
-	for (sockImpList::iterator it = sockeImpExceptList.begin(); it != sockeImpExceptList.end(); ++it)
-	{
-		readyExceptList.push_back(Socket(*it));
-		(*it)->duplicate();
-	}
+	SocketImplListToSocketList(socketImpReadList,   readyReadList);
+	SocketImplListToSocketList(socketImpWriteList,  readyWriteList);
+	SocketImplListToSocketList(socketImpExceptList, readyExceptList);
 
-	std::swap(readList, readyReadList);
-	std::swap(writeList, readyWriteList);
+	std::swap(readList,   readyReadList);
+	std::swap(writeList,  readyWriteList);
 	std::swap(exceptList, readyExceptList);
 	return readList.size() + writeList.size() + exceptList.size();
+}
+
+
+void Socket::SocketListToSocketImplList(const SocketList& socketList, SocketImplList& socketImplList)
+{
+	for (SocketList::const_iterator it = socketList.begin(); it != socketList.end(); ++it)
+	{
+		if (it->sockfd() != POCO_INVALID_SOCKET) socketImplList.push_back(it->impl());
+	}
+}
+
+
+void Socket::SocketImplListToSocketList(SocketImplList& socketImplList, SocketList& socketList)
+{
+	for (SocketImplList::iterator it = socketImplList.begin(); it != socketImplList.end(); ++it)
+	{
+		socketList.push_back(Socket(*it));
+		(*it)->duplicate();
+	}
 }
 
 
