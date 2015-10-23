@@ -748,136 +748,18 @@ int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, Sock
 
 bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 {
-	poco_socket_t sockfd = _sockfd;
-	if (sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-
-#if defined(POCO_HAVE_FD_EPOLL)
-
-	int epollfd = epoll_create(1);
-	if (epollfd < 0)
-	{
-		char buf[1024];
-		strerror_r(errno, buf, sizeof(buf));
-		error(std::string("Can't create epoll queue: ") + buf);
-	}
-
-	struct epoll_event evin;
-	memset(&evin, 0, sizeof(evin));
+	SocketImplList sockImpReadList;
+	SocketImplList sockImpWriteList;
+	SocketImplList sockeImpExceptList;
 
 	if (mode & SELECT_READ)
-		evin.events |= EPOLLIN;
+		sockImpReadList.push_back(this);
 	if (mode & SELECT_WRITE)
-		evin.events |= EPOLLOUT;
+		sockImpWriteList.push_back(this);
 	if (mode & SELECT_ERROR)
-		evin.events |= EPOLLERR;
+		sockeImpExceptList.push_back(this);
 
-	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &evin) < 0)
-	{
-		char buf[1024];
-		strerror_r(errno, buf, sizeof(buf));
-		::close(epollfd);
-		error(std::string("Can't insert socket to epoll queue: ") + buf);
-	}
-
-	Poco::Timespan remainingTime(timeout);
-	int rc;
-	do
-	{
-		struct epoll_event evout;
-		memset(&evout, 0, sizeof(evout));
-
-		Poco::Timestamp start;
-		rc = epoll_wait(epollfd, &evout, 1, remainingTime.totalMilliseconds());
-		if (rc < 0 && lastError() == POCO_EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = end - start;
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (rc < 0 && lastError() == POCO_EINTR);
-
-	::close(epollfd);
-	if (rc < 0) error();
-	return rc > 0; 
-
-#elif defined(POCO_HAVE_FD_POLL)
-
-	pollfd pollBuf;
-
-	memset(&pollBuf, 0, sizeof(pollfd));
-	pollBuf.fd = _sockfd;
-	if (mode & SELECT_READ) pollBuf.events |= POLLIN;
-	if (mode & SELECT_WRITE) pollBuf.events |= POLLOUT;
-
-	Poco::Timespan remainingTime(timeout);
-	int rc;
-	do
-	{
-		Poco::Timestamp start;
-		rc = ::poll(&pollBuf, 1, remainingTime.totalMilliseconds());
-
-		if (rc < 0 && lastError() == POCO_EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = end - start;
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (rc < 0 && lastError() == POCO_EINTR);
-	if (rc < 0) error();
-	return rc > 0; 
-
-#else
-	fd_set fdRead;
-	fd_set fdWrite;
-	fd_set fdExcept;
-	FD_ZERO(&fdRead);
-	FD_ZERO(&fdWrite);
-	FD_ZERO(&fdExcept);
-	if (mode & SELECT_READ)
-	{
-		FD_SET(sockfd, &fdRead);
-	}
-	if (mode & SELECT_WRITE)
-	{
-		FD_SET(sockfd, &fdWrite);
-	}
-	if (mode & SELECT_ERROR)
-	{
-		FD_SET(sockfd, &fdExcept);
-	}
-	Poco::Timespan remainingTime(timeout);
-	int errorCode = POCO_ENOERR;
-	int rc;
-	do
-	{
-		struct timeval tv;
-		tv.tv_sec  = (long) remainingTime.totalSeconds();
-		tv.tv_usec = (long) remainingTime.useconds();
-		Poco::Timestamp start;
-		rc = ::select(int(sockfd) + 1, &fdRead, &fdWrite, &fdExcept, &tv);
-		if (rc < 0 && (errorCode = lastError()) == POCO_EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = end - start;
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (rc < 0 && errorCode == POCO_EINTR);
-	if (rc < 0) error(errorCode);
-	return rc > 0; 
-
-#endif // POCO_HAVE_FD_EPOLL
+	return select(sockImpReadList, sockImpWriteList, sockeImpExceptList, timeout) > 0;
 }
 
 	
