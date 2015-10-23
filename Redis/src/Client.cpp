@@ -14,8 +14,9 @@
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
-#include "Poco/Redis/Client.h"
 
+#include "Poco/Redis/Client.h"
+#include "Poco/Redis/Exception.h"
 
 namespace Poco {
 namespace Redis {
@@ -92,7 +93,7 @@ RedisType::Ptr Client::readReply()
 	RedisType::Ptr result = createRedisType( _socket.get());
 	if ( result.isNull() )
 	{
-		throw IOException("Invalid Redis type returned");
+		throw RedisException("Invalid Redis type returned");
 	}
 
 	result->read(_socket);
