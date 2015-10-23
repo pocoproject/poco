@@ -16,7 +16,6 @@
 
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/StreamSocketImpl.h"
-#include "Poco/Timestamp.h"
 
 
 namespace Poco {
