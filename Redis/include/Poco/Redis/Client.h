@@ -21,7 +21,6 @@
 
 
 #include "Poco/Net/SocketAddress.h"
-#include "Poco/Optional.h"
 
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/Array.h"

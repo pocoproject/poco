@@ -19,7 +19,6 @@
 #define Redis_Error_INCLUDED
 
 #include "Poco/Redis/Type.h"
-#include "Poco/Redis/RedisSocket.h"
 
 namespace Poco {
 namespace Redis {

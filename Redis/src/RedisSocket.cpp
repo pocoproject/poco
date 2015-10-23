@@ -14,7 +14,6 @@
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
-#include <iostream>
 #include "Poco/Redis/RedisSocket.h"
 
 namespace Poco {
