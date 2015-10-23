@@ -23,12 +23,14 @@
 
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/Type.h"
+#include "Poco/Redis/Error.h"
 #include "Poco/Redis/Exception.h"
 
 namespace Poco {
 namespace Redis {
 
 class Redis_API Array
+	/// Represents a Redis Array.
 {
 public:
 	Array();
@@ -123,13 +125,19 @@ void Type<Array>::read(RedisSocket& socket)
 		switch(elementType)
 		{
 			case ElementTraits<Int64>::marker :
-				element =  new Type<Int64>();
+				element = new Type<Int64>();
 				break;
 			case ElementTraits<std::string>::marker :
 				element = new Type<std::string>();
 				break;
 			case ElementTraits<BulkString>::marker :
-				element  = new Type<BulkString>();
+				element = new Type<BulkString>();
+				break;
+			case ElementTraits<Array>::marker :
+				element = new Type<Array>();
+				break;
+			case ElementTraits<Error>::marker :
+				element = new Type<Error>();
 				break;
 		}
 

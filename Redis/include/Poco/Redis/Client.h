@@ -51,8 +51,6 @@ class Redis_API Client
 	///   {
 	///      // We have a Null value
 	///   }
-	///
-	/// An Array can't contain another Array.
 {
 public:
 	typedef Poco::SharedPtr<Client> Ptr;
@@ -152,6 +150,7 @@ private:
 		/// $ : a bulk string (BulkString)
 		/// * : an array (Array)
 		/// : : a signed 64 bit integer (Int64)
+	friend class Array;
 };
 
 
