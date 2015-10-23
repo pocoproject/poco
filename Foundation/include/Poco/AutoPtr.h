@@ -81,6 +81,11 @@ public:
 		if (_ptr) _ptr->duplicate();
 	}
 
+	AutoPtr(AutoPtr&& ptr) : _ptr(std::move(ptr._ptr))
+	{
+		ptr._ptr = nullptr;
+	}
+
 	template <class Other> 
 	AutoPtr(const AutoPtr<Other>& ptr): _ptr(const_cast<Other*>(ptr.get()))
 	{
@@ -152,7 +157,13 @@ public:
 		return assign<Other>(ptr);
 	}
 
-	void swap(AutoPtr& ptr)
+	AutoPtr& operator = (AutoPtr&& ptr)
+	{
+		swap(ptr);
+		return *this;
+	}
+
+	inline void swap(AutoPtr& ptr)
 	{
 		std::swap(_ptr, ptr._ptr);
 	}

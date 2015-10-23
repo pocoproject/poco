@@ -113,7 +113,7 @@ void LoggingFactoryTest::testBuiltins()
 
 void LoggingFactoryTest::testCustom()
 {
-	std::auto_ptr<LoggingFactory> fact(new LoggingFactory);
+	std::unique_ptr<LoggingFactory> fact(new LoggingFactory);
 	
 	fact->registerChannelClass("CustomChannel", new Instantiator<CustomChannel, Channel>);
 	fact->registerFormatterClass("CustomFormatter", new Instantiator<CustomFormatter, Formatter>);
