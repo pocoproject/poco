@@ -71,6 +71,7 @@ public:
 		/// Disconnects from the Redis server
 
 	RedisType::Ptr sendCommand(const Array& command);
+		/// Sends a Redis command to the server and returns the reply
 
 	template<typename T>
 	void  sendCommand(const Array& command, T& result)

@@ -57,11 +57,6 @@ struct ElementTraits<Error>
 
 	static const char marker = '-';
 
-	static std::string typeName()
-	{
-		return "Error";
-	}
-
 	static std::string toString(const Error& value)
 	{
 		return marker + value.getMessage()  + "\r\n";

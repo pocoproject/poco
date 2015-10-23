@@ -96,11 +96,6 @@ struct ElementTraits<Array>
 
 	static const char marker = '*';
 
-	static std::string typeName()
-	{
-		return "Array";
-	}
-
 	static std::string toString(const Array& value)
 	{
 		std::stringstream result;

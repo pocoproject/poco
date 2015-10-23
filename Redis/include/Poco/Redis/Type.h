@@ -71,11 +71,6 @@ struct ElementTraits<Poco::Int64>
 
 	static const char marker = ':';
 
-	static std::string typeName()
-	{
-		return "Integer";
-	}
-
 	static std::string toString(const Poco::Int64& value)
 	{
 		return marker + NumberFormatter::format(value) + "\r\n";
@@ -87,11 +82,6 @@ template<>
 struct ElementTraits<std::string>
 {
 	enum { TypeId = RedisType::REDIS_SIMPLE_STRING };
-
-	static std::string typeName()
-	{
-		return "Simple String";
-	}
 
 	static const char marker = '+';
 
@@ -109,11 +99,6 @@ template<>
 struct ElementTraits<BulkString>
 {
 	enum { TypeId = RedisType::REDIS_BULK_STRING };
-
-	static std::string typeName()
-	{
-		return "Bulk String";
-	}
 
 	static const char marker = '$';
 
