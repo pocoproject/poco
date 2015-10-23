@@ -31,7 +31,7 @@ namespace Poco {
 namespace Redis {
 
 
-class Redis_API  RedisType
+class Redis_API RedisType
 {
 public:
 

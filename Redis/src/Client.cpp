@@ -90,7 +90,7 @@ void Client::writeCommand(const Array& command)
 
 RedisType::Ptr Client::readReply()
 {
-	RedisType::Ptr result = createRedisType( _socket.get());
+	RedisType::Ptr result = createRedisType(_socket.get());
 	if ( result.isNull() )
 	{
 		throw RedisException("Invalid Redis type returned");
