@@ -752,12 +752,9 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	SocketImplList sockImpWriteList;
 	SocketImplList sockeImpExceptList;
 
-	if (mode & SELECT_READ)
-		sockImpReadList.push_back(this);
-	if (mode & SELECT_WRITE)
-		sockImpWriteList.push_back(this);
-	if (mode & SELECT_ERROR)
-		sockeImpExceptList.push_back(this);
+	if (mode & SELECT_READ)  sockImpReadList.push_back(this);
+	if (mode & SELECT_WRITE) sockImpWriteList.push_back(this);
+	if (mode & SELECT_ERROR) sockeImpExceptList.push_back(this);
 
 	return select(sockImpReadList, sockImpWriteList, sockeImpExceptList, timeout) > 0;
 }
