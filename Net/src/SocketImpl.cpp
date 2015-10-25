@@ -650,95 +650,27 @@ int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, Sock
 	fd_set fdRead;
 	fd_set fdWrite;
 	fd_set fdExcept;
-	int nfd = 0;
+	int    nfd = 0;
 	FD_ZERO(&fdRead);
-	for (SocketImplList::const_iterator it = readList.begin(); it != readList.end(); ++it)
-	{
-		poco_socket_t fd = (*it)->sockfd();
-		if (fd != POCO_INVALID_SOCKET)
-		{
-			if (int(fd) > nfd)
-				nfd = int(fd);
-			FD_SET(fd, &fdRead);
-		}
-	}
 	FD_ZERO(&fdWrite);
-	for (SocketImplList::const_iterator it = writeList.begin(); it != writeList.end(); ++it)
-	{
-		poco_socket_t fd = (*it)->sockfd();
-		if (fd != POCO_INVALID_SOCKET)
-		{
-			if (int(fd) > nfd)
-				nfd = int(fd);
-			FD_SET(fd, &fdWrite);
-		}
-	}
 	FD_ZERO(&fdExcept);
-	for (SocketImplList::const_iterator it = exceptList.begin(); it != exceptList.end(); ++it)
-	{
-		poco_socket_t fd = (*it)->sockfd();
-		if (fd != POCO_INVALID_SOCKET)
-		{
-			if (int(fd) > nfd)
-				nfd = int(fd);
-			FD_SET(fd, &fdExcept);
-		}
-	}
+
+	fillFDSet(readList,   &fdRead,   &nfd);
+	fillFDSet(writeList,  &fdWrite,  &nfd);
+	fillFDSet(exceptList, &fdExcept, &nfd);
 	if (nfd == 0) return 0;
-	Poco::Timespan remainingTime(timeout);
-	int rc;
-	do
-	{
-		struct timeval tv;
-		tv.tv_sec  = (long) remainingTime.totalSeconds();
-		tv.tv_usec = (long) remainingTime.useconds();
-		Poco::Timestamp start;
-		rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
-		if (rc < 0 && lastError() == POCO_EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = end - start;
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (rc < 0 && lastError() == POCO_EINTR);
-	if (rc < 0) error();
-	
+
+	int rc = doSelect(&fdRead, &fdWrite, &fdExcept, nfd, timeout);
+
 	SocketImplList readyReadList;
-	for (SocketImplList::const_iterator it = readList.begin(); it != readList.end(); ++it)
-	{
-		poco_socket_t fd = (*it)->sockfd();
-		if (fd != POCO_INVALID_SOCKET)
-		{
-			if (FD_ISSET(fd, &fdRead))
-				readyReadList.push_back(*it);
-		}
-	}
-	std::swap(readList, readyReadList);
 	SocketImplList readyWriteList;
-	for (SocketImplList::const_iterator it = writeList.begin(); it != writeList.end(); ++it)
-	{
-		poco_socket_t fd = (*it)->sockfd();
-		if (fd != POCO_INVALID_SOCKET)
-		{
-			if (FD_ISSET(fd, &fdWrite))
-				readyWriteList.push_back(*it);
-		}
-	}
-	std::swap(writeList, readyWriteList);
 	SocketImplList readyExceptList;
-	for (SocketImplList::const_iterator it = exceptList.begin(); it != exceptList.end(); ++it)
-	{
-		poco_socket_t fd = (*it)->sockfd();
-		if (fd != POCO_INVALID_SOCKET)
-		{
-			if (FD_ISSET(fd, &fdExcept))
-				readyExceptList.push_back(*it);
-		}
-	}
+	collectReadyFd(readList,   &fdRead,   readyReadList);
+	collectReadyFd(writeList,  &fdWrite,  readyWriteList);
+	collectReadyFd(exceptList, &fdExcept, readyExceptList);
+
+	std::swap(readList,   readyReadList);
+	std::swap(writeList,  readyWriteList);
 	std::swap(exceptList, readyExceptList);	
 	return rc; 
 
@@ -1305,6 +1237,67 @@ void SocketImpl::error(int code, const std::string& arg)
 		throw IOException(NumberFormatter::format(code), arg, code);
 	}
 }
+
+
+#if defined(POCO_HAVE_FD_EPOLL)
+
+#elif defined(POCO_HAVE_FD_POLL)
+
+#else
+void SocketImpl::fillFDSet(const SocketImplList& socketImplList, fd_set* fdSet, int* nfd)
+{
+	for (SocketImplList::const_iterator it = socketImplList.begin(); it != socketImplList.end(); ++it)
+	{
+		poco_socket_t fd = (*it)->sockfd();
+		if (fd != POCO_INVALID_SOCKET)
+		{
+			FD_SET(fd, fdSet);
+			*nfd = std::max(int(fd), *nfd);
+		}
+	}
+}
+
+void SocketImpl::collectReadyFd(const SocketImplList& socketImplList, fd_set* fdSet, SocketImplList& readyList)
+{
+	for (SocketImplList::const_iterator it = socketImplList.begin(); it != socketImplList.end(); ++it)
+	{
+		poco_socket_t fd = (*it)->sockfd();
+		if (fd != POCO_INVALID_SOCKET)
+		{
+			if (FD_ISSET(fd, fdSet))
+				readyList.push_back(*it);
+		}
+	}
+}
+
+
+int SocketImpl::doSelect(fd_set* fdRead, fd_set* fdWrite, fd_set* fdExcept, int nfd, const Poco::Timespan& timeout)
+{
+	Poco::Timespan remainingTime(timeout);
+	int rc;
+	do
+	{
+		struct timeval tv;
+		tv.tv_sec  = (long) remainingTime.totalSeconds();
+		tv.tv_usec = (long) remainingTime.useconds();
+		Poco::Timestamp start;
+		rc = ::select(nfd + 1, fdRead, fdWrite, fdExcept, &tv);
+		if (rc < 0 && lastError() == POCO_EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = end - start;
+			if (waited < remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (rc < 0 && lastError() == POCO_EINTR);
+	if (rc < 0) error();
+
+	return rc;	
+}
+#endif
 
 
 } } // namespace Poco::Net

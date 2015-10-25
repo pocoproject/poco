@@ -450,7 +450,9 @@ protected:
 		/// Throws an appropriate exception for the given error code.
 
 private:
-#if defined(POCO_HAVE_FD_POLL)
+#if defined(POCO_HAVE_FD_EPOLL)
+
+#elif defined(POCO_HAVE_FD_POLL)
 class FDCompare
 	/// Utility functor used to compare socket file descriptors.
 	/// Used in poll() member function.
@@ -464,6 +466,12 @@ private:
 	FDCompare();
 	int _fd;
 };
+#else
+	static void fillFDSet(const SocketImplList& socketImplList, fd_set* fdSet, int* nfd);
+
+	static int doSelect(fd_set* fdRead, fd_set* fdWrite, fd_set* fdExcept, int nfd, const Poco::Timespan& timeout);
+
+	static void collectReadyFd(const SocketImplList& socketImplList, fd_set* fdSet, SocketImplList& readyList);
 #endif
 
 	SocketImpl(const SocketImpl&);
