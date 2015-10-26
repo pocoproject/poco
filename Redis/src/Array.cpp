@@ -20,6 +20,9 @@
 namespace Poco {
 namespace Redis {
 
+std::vector<RedisType::Ptr> Array::_empty;
+
+
 Array::Array()
 {
 }
@@ -36,24 +39,32 @@ Array::~Array()
 
 void Array::add(Int64 value)
 {
-	_elements.push_back(new Type<Int64>(value));
+	if ( _elements.isNull() ) _elements.assign(_empty);
+
+	_elements.value().push_back(new Type<Int64>(value));
 }
 
 void Array::add(const std::string& value)
 {
+	if ( _elements.isNull() ) _elements.assign(_empty);
+
 	BulkString rs(value);
-	_elements.push_back(new Type<BulkString>(rs));
+	_elements.value().push_back(new Type<BulkString>(rs));
 }
 
 void Array::add(const BulkString& value)
 {
-	_elements.push_back(new Type<BulkString>(value));
+	if ( _elements.isNull() ) _elements.assign(_empty);
+
+	_elements.value().push_back(new Type<BulkString>(value));
 }
 
 void Array::add()
 {
+	if ( _elements.isNull() ) _elements.assign(_empty);
+
 	BulkString value;
-	_elements.push_back(new Type<BulkString>(value));
+	_elements.value().push_back(new Type<BulkString>(value));
 }
 
 std::string Array::toString() const 
