@@ -62,8 +62,6 @@ public:
 private:
 
 	std::vector<RedisType::Ptr> _elements;
-
-	friend class Connection;
 };
 
 inline std::vector<RedisType::Ptr>::const_iterator Array::begin() const
