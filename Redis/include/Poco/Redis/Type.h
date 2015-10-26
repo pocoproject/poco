@@ -22,7 +22,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/Optional.h"
+#include "Poco/Nullable.h"
 
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/RedisSocket.h"
@@ -92,7 +92,9 @@ struct ElementTraits<std::string>
 };
 
 
-typedef Optional<std::string> BulkString;
+typedef Nullable<std::string> BulkString;
+	/// A bulk string is a string that can contain a NULL value.
+	/// So, BulkString is a typedef for Nullable<std::string>.
 
 
 template<>
@@ -104,12 +106,19 @@ struct ElementTraits<BulkString>
 
 	static std::string toString(const BulkString& value)
 	{
-		if ( value.isSpecified() )
+		if ( value.isNull() )
+		{
+			return marker + std::string("-1") + LineEnding::NEWLINE_CRLF;
+		}
+		else
 		{
 			std::string s = value.value();
-			return marker + NumberFormatter::format(s.length()) + LineEnding::NEWLINE_CRLF + s + LineEnding::NEWLINE_CRLF;
+			return marker
+				+ NumberFormatter::format(s.length())
+				+ LineEnding::NEWLINE_CRLF
+				+ s
+				+ LineEnding::NEWLINE_CRLF;
 		}
-		return marker + std::string("-1") + LineEnding::NEWLINE_CRLF;
 	}
 };
 

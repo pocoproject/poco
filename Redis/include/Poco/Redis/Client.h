@@ -38,18 +38,17 @@ class Redis_API Client
 	/// bit integer, a simple string, a bulk string, an array or an error. The
 	/// first element of the command array is the Redis command. A simple string
 	/// is a string that cannot contain a CR or LF character. A bulk string is
-	/// implemented as a typedef for Poco::Optional<std::string>. This is
-	/// because a bulk string can represent a Null value. When the optional
-	/// object isn't assigned, you know that a Null value is returned:
+	/// implemented as a typedef for Poco::Nullable<std::string>. This is
+	/// because a bulk string can represent a Null value.
 	///
 	///   BulkString bs = client.sendCommand(...);
-	///   if ( bs.isSpecified() )
+	///   if ( bs.isNull() )
 	///   {
-	///      // We have a std::string
+	///      // We have a Null value
 	///   }
 	///   else
 	///   {
-	///      // We have a Null value
+	///      // We have a string value
 	///   }
 {
 public:
@@ -92,9 +91,9 @@ public:
 		/// Sends a Redis command to the server and returns the reply
 
 	template<typename T>
-	void  sendCommand(const Array& command, T& result)
+	void sendCommand(const Array& command, T& result)
 		/// Sends a Redis command to the server, gets the reply and tries
-		/// to convert that reply to the template type.  When
+		/// to convert that reply to the template type. When
 		/// the reply is a Redis error, it wil throw a RedisException.
 		/// A BadCastException will be thrown, when the reply is not of the
 		/// given type.
