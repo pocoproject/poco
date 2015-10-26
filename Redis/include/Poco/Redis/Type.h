@@ -40,6 +40,16 @@ public:
 	RedisType();
 	virtual ~RedisType();
 
+	bool isArray() const;
+
+	bool isBulkString() const;
+
+	bool isError() const;
+
+	bool isInteger() const;
+
+	bool isSimpleString() const;
+
 	virtual int type() const = 0;
 
 	virtual void read(RedisSocket& socket) = 0;
@@ -65,6 +75,31 @@ public:
 private:
 
 };
+
+inline bool RedisType::isArray() const
+{
+	return type() == REDIS_ARRAY;
+}
+
+inline bool RedisType::isBulkString() const
+{
+	return type() == REDIS_BULK_STRING;
+}
+
+inline bool RedisType::isError() const
+{
+	return type() == REDIS_ERROR;
+}
+
+inline bool RedisType::isInteger() const
+{
+	return type() == REDIS_INTEGER;
+}
+
+inline bool RedisType::isSimpleString() const
+{
+	return type() == REDIS_SIMPLE_STRING;
+}
 
 template<typename T>
 struct ElementTraits
