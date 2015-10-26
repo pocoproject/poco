@@ -122,8 +122,7 @@ void SessionImpl::open(const std::string& connect)
 		if (Utility::isError(Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_ATTR_LOGIN_TIMEOUT, &tout, 0, 0)) ||
 				getLoginTimeout() != tout)
 		{
-			ConnectionError e(_db);
-			throw ConnectionFailedException(e.toString());
+			throw ODBCConnectionFailed(_db.handle());
 		}
 	}
 
@@ -139,10 +138,9 @@ void SessionImpl::open(const std::string& connect)
 		, &result
 		, SQL_DRIVER_NOPROMPT)))
 	{
-		ConnectionError err(_db);
-		std::string errStr = err.toString();
+		ODBCConnectionFailed e(_db.handle());
 		close();
-		throw ConnectionFailedException(errStr);
+		throw e;
 	}
 
 	_dataTypes.fillTypeInfo(_db);
