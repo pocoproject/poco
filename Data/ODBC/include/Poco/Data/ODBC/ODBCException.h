@@ -135,6 +135,12 @@ public:
 		return Error<H, handleType>(handle).toString();
 	}
 
+protected:
+	const Error<H, handleType>& error() const
+	{
+		return _error;
+	}
+
 private:
 	Error<H, handleType> _error;
 };
@@ -145,6 +151,23 @@ typedef HandleException<SQLHDBC, SQL_HANDLE_DBC>   ConnectionException;
 typedef HandleException<SQLHSTMT, SQL_HANDLE_STMT> StatementException;
 typedef HandleException<SQLHDESC, SQL_HANDLE_DESC> DescriptorException;
 
+
+class ODBCConnectionFailed : public ConnectionException, public ConnectionFailedException
+{
+public:
+	ODBCConnectionFailed(const SQLHDBC& handle) : ConnectionException(handle), ConnectionFailedException(error().toString())
+	{}
+
+	ODBCConnectionFailed(const ODBCConnectionFailed& e) : ConnectionException(e), ConnectionFailedException(e)
+	{}
+
+	Poco::Exception* clone() const
+		/// Clones the HandleException
+	{
+		return static_cast<ConnectionException*>( new ODBCConnectionFailed(*this) );
+	}
+
+};
 
 } } } // namespace Poco::Data::ODBC
 
