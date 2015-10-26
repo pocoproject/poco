@@ -34,6 +34,9 @@ class Redis_API Array
 	/// value.
 {
 public:
+
+	typedef std::vector<RedisType::Ptr>::const_iterator const_iterator;
+
 	Array();
 		/// Default constructor. As long as there are no elements added,
 		/// the array will contain a Null value.
@@ -44,34 +47,67 @@ public:
 	virtual ~Array();
 		/// Destructor.
 
-	void add(Poco::Int64 value);
+	Array& add(Poco::Int64 value);
 		/// Adds an integer element.
 
-	void add(const std::string& value);
-		/// Adds a simple string element (can't contain a newline!).
+	Array& add(const std::string& value);
+		/// Adds a bulk string element. A bulk string is a string that
+		/// is binary safe (it can contain newlines). If you want a simple
+		/// string use addSimpleString (can't contain a newline!).
 
-	void add(const BulkString& value);
+	Array& add(const BulkString& value);
 		/// Adds a bulk string element.
 
-	void add();
+	Array& add();
 		/// Adds a Null bulk string element.
 
-	void add(RedisType::Ptr value);
+	Array& add(RedisType::Ptr value);
 		/// Adds a Redis element.
 
-	std::vector<RedisType::Ptr>::const_iterator begin() const;
+	Array& add(const Array& array);
+		/// Adds an array.
+
+	Array& addSimpleString(const std::string& value);
+
+	const_iterator begin() const;
 		/// Returns an iterator to the start of the array. Note:
 		/// this can throw a NullValueException when this is a Null array.
 
 	void clear();
+		/// Removes all elements from the array.
 
-	std::vector<RedisType::Ptr>::const_iterator end() const;
+	const_iterator end() const;
 		/// Returns an iterator to the end of the array. Note:
 		/// this can throw a NullValueException when this is a Null array.
 
+	template<typename T>
+	T get(size_t pos) const
+		/// Returns the element on the given position and tries to convert
+		/// to the template type. A BadCastException will be thrown when the
+		/// the conversion fails. An InvalidArgumentException will be thrown
+		/// when the index is out of range. When the array is a Null array
+		/// a NullValueException is thrown.
+	{
+		if ( _elements.isNull() ) throw NullValueException();
+
+		if ( pos >= _elements.value().size() ) throw InvalidArgumentException();
+
+		RedisType::Ptr element = _elements.value().at(pos);
+		if ( ElementTraits<T>::TypeId == element->type() )
+		{
+			Type<T>* concrete = dynamic_cast<Type<T>* >(element.get());
+			if ( concrete != NULL ) return concrete->value();
+		}
+		throw BadCastException();
+	}
+
 	bool isNull() const;
 		/// Returns true when this is a Null array.
-	
+
+	void makeNull();
+		/// Turns the array into a Null array. When the array already has some
+		/// elements, the array will be cleared.
+
 	std::string toString() const;
 		/// Returns the String representation as specified in the
 		/// Redis Protocol specification.
@@ -87,7 +123,38 @@ private:
 	void checkNull();
 };
 
-inline std::vector<RedisType::Ptr>::const_iterator Array::begin() const
+inline Array& Array::add()
+{
+	BulkString value;
+	return add(new Type<BulkString>(value));
+}
+
+inline Array& Array::add(Int64 value)
+{
+	return add(new Type<Int64>(value));
+}
+
+inline Array& Array::add(const std::string& value)
+{
+	return add(new Type<BulkString>(value));
+}
+
+inline Array& Array::add(const BulkString& value)
+{
+	return add(new Type<BulkString>(value));
+}
+
+inline Array& Array::add(const Array& value)
+{
+	return add(new Type<Array>(value));
+}
+
+inline Array& Array::addSimpleString(const std::string& value)
+{
+	return add(new Type<std::string>(value));
+}
+
+inline Array::const_iterator Array::begin() const
 {
 	return _elements.value().begin();
 }
@@ -106,7 +173,7 @@ inline void Array::clear()
 	}
 }
 
-inline std::vector<RedisType::Ptr>::const_iterator Array::end() const
+inline Array::const_iterator Array::end() const
 {
 	return _elements.value().end();
 }
@@ -116,15 +183,18 @@ inline bool Array::isNull() const
 	return _elements.isNull();
 }
 
+inline void Array::makeNull()
+{
+	if ( !_elements.isNull() ) _elements.value().clear();
+
+	_elements.clear();
+}
+
 inline size_t Array::size() const
 {
 	return _elements.value().size();
 }
 
-inline void Array::add(RedisType::Ptr value)
-{
-	_elements.value().push_back(value);
-}
 
 template<>
 struct ElementTraits<Array>

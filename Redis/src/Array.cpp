@@ -35,35 +35,16 @@ Array::~Array()
 {
 }
 
-void Array::add(Int64 value)
+
+Array& Array::add(RedisType::Ptr value)
 {
 	checkNull();
 
-	_elements.value().push_back(new Type<Int64>(value));
+	_elements.value().push_back(value);
+
+	return *this;
 }
 
-void Array::add(const std::string& value)
-{
-	checkNull();
-
-	BulkString rs(value);
-	_elements.value().push_back(new Type<BulkString>(rs));
-}
-
-void Array::add(const BulkString& value)
-{
-	checkNull();
-
-	_elements.value().push_back(new Type<BulkString>(value));
-}
-
-void Array::add()
-{
-	checkNull();
-
-	BulkString value;
-	_elements.value().push_back(new Type<BulkString>(value));
-}
 
 std::string Array::toString() const 
 {
