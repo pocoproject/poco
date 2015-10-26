@@ -30,6 +30,7 @@ public:
 
 	virtual ~RedisTest();
 
+	void testAppend();
 	void testEcho();
 	void testPing();
 	void testSet();

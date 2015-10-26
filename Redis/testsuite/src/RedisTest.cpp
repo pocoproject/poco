@@ -71,6 +71,90 @@ void RedisTest::tearDown()
 }
 
 
+void RedisTest::testAppend()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array delCommand;
+	delCommand.add("DEL")
+		.add("mykey");
+	try
+	{
+		Poco::Int64 result;
+		_redis.sendCommand(delCommand, result);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	Array setCommand;
+	setCommand.add("SET")
+		.add("mykey")
+		.add("Hello");
+	try
+	{
+		std::string result;
+		_redis.sendCommand(setCommand, result);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	Array appendCommand;
+	appendCommand.add("APPEND")
+		.add("mykey")
+		.add(" World");
+	try
+	{
+		Poco::Int64 result;
+		_redis.sendCommand(appendCommand, result);
+
+		assert(result == 11);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	Array getCommand;
+	getCommand.add("GET")
+		.add("mykey");
+	try
+	{
+		BulkString result;
+		_redis.sendCommand(getCommand, result);
+
+		assert(result.value().compare("Hello World") == 0);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testEcho()
 {
 	if (!_connected)
@@ -250,6 +334,7 @@ CppUnit::Test* RedisTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("RedisTest");
 
+	CppUnit_addTest(pSuite, RedisTest, testAppend);
 	CppUnit_addTest(pSuite, RedisTest, testEcho);
 	CppUnit_addTest(pSuite, RedisTest, testPing);
 	CppUnit_addTest(pSuite, RedisTest, testSet);
