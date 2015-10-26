@@ -107,7 +107,7 @@ RedisType::Ptr Client::sendCommand(const Array& command)
 	return readReply();
 }
 
-void Client::sendCommands(const std::vector<Array>& commands, std::vector<RedisType::Ptr>& results)
+void Client::sendCommands(const std::vector<Array>& commands, Array& results)
 {
 	for(std::vector<Array>::const_iterator it = commands.begin(); it != commands.end(); ++it)
 	{
@@ -116,8 +116,7 @@ void Client::sendCommands(const std::vector<Array>& commands, std::vector<RedisT
 
 	for(int i = 0; i < commands.size(); ++i)
 	{
-		RedisType::Ptr result = readReply();
-		results.push_back(result);
+		results.add(readReply());
 	}
 }
 

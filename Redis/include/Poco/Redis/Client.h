@@ -122,14 +122,15 @@ public:
 		else throw BadCastException();
 	}
 
-	void sendCommands(const std::vector<Array>& commands,
-		std::vector<RedisType::Ptr>& results);
+	void sendCommands(const std::vector<Array>& commands, Array& results);
 		/// Sends all commands (pipelining) to the Redis server before
 		/// getting all replies.
 
 	void writeCommand(const Array& command);
 		/// Sends a request to the Redis server. Use readReply to get the
-		/// answer.
+		/// answer. Can also be used for pipelining commands. Make sure you
+		/// call readReply as many times as you called writeCommand, even when
+		/// an error occurred on a command.
 
 private:
 
