@@ -59,7 +59,7 @@ struct ElementTraits<Error>
 
 	static std::string toString(const Error& value)
 	{
-		return marker + value.getMessage()  + "\r\n";
+		return marker + value.getMessage()  + LineEnding::NEWLINE_CRLF;
 	}
 };
 
@@ -69,6 +69,9 @@ void Type<Error>::read(RedisSocket& socket)
 {
 	std::string s;
 	socket.readLine(s);
+
+	std::cout << s << std::endl;
+
 	_value = s;
 }
 
