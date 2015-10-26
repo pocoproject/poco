@@ -199,7 +199,12 @@ public:
 		return ElementTraits<T>::toString(_value);
 	}
 
-	T value() const
+	T& value()
+	{
+		return _value;
+	}
+
+	const T& value() const
 	{
 		return _value;
 	}
