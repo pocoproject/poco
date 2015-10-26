@@ -33,7 +33,8 @@ public:
 	void testEcho();
 	void testPing();
 	void testSet();
-	void testPipelining();
+	void testPipeliningWithSendCommands();
+	void testPipeliningWithWriteCommand();
 
 	void setUp();
 	void tearDown();

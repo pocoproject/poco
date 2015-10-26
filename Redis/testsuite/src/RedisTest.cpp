@@ -80,8 +80,8 @@ void RedisTest::testEcho()
 	}
 
 	Array command;
-	command.add("ECHO");
-	command.add("Hello World");
+	command.add("ECHO")
+		.add("Hello World");
 
 	try
 	{
@@ -147,9 +147,9 @@ void RedisTest::testSet()
 	}
 
 	Array command;
-	command.add("SET");
-	command.add("mykey");
-	command.add("Hello");
+	command.add("SET")
+		.add("mykey")
+		.add("Hello");
 
 	// A set responds with a simple OK string
 	try
@@ -180,7 +180,7 @@ void RedisTest::testSet()
 	}
 }
 
-void RedisTest::testPipelining()
+void RedisTest::testPipeliningWithSendCommands()
 {
 	if (!_connected)
 	{
@@ -195,22 +195,56 @@ void RedisTest::testPipelining()
 	commands.push_back(ping);
 	commands.push_back(ping);
 
-	std::vector<RedisType::Ptr> result;
+	Array result;
 	_redis.sendCommands(commands, result);
 
 	// We expect 2 results
 	assert(result.size() == 2);
 
 	// The 2 results must be simple PONG strings
-	for(std::vector<RedisType::Ptr>::iterator it = result.begin(); it != result.end(); ++it)
+	for(size_t i = 0; i < 2; ++i)
 	{
-		assert((*it)->isSimpleString());
-
-		std::string pong = ((Type<std::string>*) it->get())->value();
-		assert(pong.compare("PONG") == 0);
+		try
+		{
+			std::string pong = result.get<std::string>(i);
+			assert(pong.compare("PONG") == 0);
+		}
+		catch(...)
+		{
+			fail("An exception occurred");
+		}
 	}
 }
 
+void RedisTest::testPipeliningWithWriteCommand()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array ping;
+	ping.add("PING");
+
+	_redis.writeCommand(ping);
+	_redis.writeCommand(ping);
+
+	// We expect 2 results with simple "PONG" strings
+	for(int i = 0; i < 2; ++i)
+	{
+		std::string pong;
+		try
+		{
+			_redis.readReply<std::string>(pong);
+			assert(pong.compare("PONG") == 0);
+		}
+		catch(RedisException& e)
+		{
+			fail(e.message());
+		}
+	}
+}
 
 CppUnit::Test* RedisTest::suite()
 {
@@ -220,7 +254,8 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testPing);
 	CppUnit_addTest(pSuite, RedisTest, testSet);
 
-	CppUnit_addTest(pSuite, RedisTest, testPipelining);
+	CppUnit_addTest(pSuite, RedisTest, testPipeliningWithSendCommands);
+	CppUnit_addTest(pSuite, RedisTest, testPipeliningWithWriteCommand);
 
 	return pSuite;
 }
