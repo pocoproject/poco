@@ -88,12 +88,12 @@ void RedisTest::testEcho()
 		BulkString result;
 		_redis.sendCommand(command, result);
 
-		if ( ! result.isNull() )
-			std::cout << "Result: " << result.value() << std::endl;
+		assert(!result.isNull());
+		assert(result.value().compare("Hello World") == 0);
 	}
 	catch(RedisException &e)
 	{
-		std::cout << e.message() << std::endl;
+		fail(e.message());
 	}
 }
 
@@ -108,7 +108,34 @@ void RedisTest::testPing()
 	Array command;
 	command.add("PING");
 
-	RedisType::Ptr result = _redis.sendCommand(command);
+	// A PING without a custom strings, responds with a simple "PONG" string
+	try
+	{
+		std::string result;
+		_redis.sendCommand(command, result);
+
+		assert(result.compare("PONG") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	// A PING with a custom string responds with a bulk string
+	command.add("Hello");
+	try
+	{
+		BulkString result;
+		_redis.sendCommand(command, result);
+
+		assert(!result.isNull());
+		assert(result.value().compare("Hello") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
 }
 
 void RedisTest::testSet()
@@ -123,9 +150,34 @@ void RedisTest::testSet()
 	command.add("SET");
 	command.add("mykey");
 	command.add("Hello");
-	command.add("NX");
 
-	RedisType::Ptr result = _redis.sendCommand(command);
+	// A set responds with a simple OK string
+	try
+	{
+		std::string result;
+		_redis.sendCommand(command, result);
+
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	command.add("NX");
+	// A set NX responds with a Null bulk string
+	// when the key is already set
+	try
+	{
+		BulkString result;
+		_redis.sendCommand(command, result);
+
+		assert(result.isNull());
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
 }
 
 void RedisTest::testPipelining()
@@ -145,6 +197,18 @@ void RedisTest::testPipelining()
 
 	std::vector<RedisType::Ptr> result;
 	_redis.sendCommands(commands, result);
+
+	// We expect 2 results
+	assert(result.size() == 2);
+
+	// The 2 results must be simple PONG strings
+	for(std::vector<RedisType::Ptr>::iterator it = result.begin(); it != result.end(); ++it)
+	{
+		assert((*it)->isSimpleString());
+
+		std::string pong = ((Type<std::string>*) it->get())->value();
+		assert(pong.compare("PONG") == 0);
+	}
 }
 
 
