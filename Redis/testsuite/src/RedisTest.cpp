@@ -83,8 +83,18 @@ void RedisTest::testEcho()
 	command.add("ECHO");
 	command.add("Hello World");
 
-	BulkString result;
-	_redis.sendCommand(command, result);
+	try
+	{
+		BulkString result;
+		_redis.sendCommand(command, result);
+
+		if ( ! result.isNull() )
+			std::cout << "Result: " << result.value() << std::endl;
+	}
+	catch(RedisException &e)
+	{
+		std::cout << e.message() << std::endl;
+	}
 }
 
 void RedisTest::testPing()
