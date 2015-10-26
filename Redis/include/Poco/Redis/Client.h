@@ -98,7 +98,7 @@ public:
 		/// A BadCastException will be thrown, when the reply is not of the
 		/// given type.
 	{
-		sendCommand(command);
+		writeCommand(command);
 		readReply(result);
 	}
 
@@ -119,7 +119,7 @@ public:
 		}
 		if ( redisResult->type() == ElementTraits<T>::TypeId )
 			result = ((Type<T>*) redisResult.get())->value();
-		else  throw BadCastException();
+		else throw BadCastException();
 	}
 
 	void sendCommands(const std::vector<Array>& commands,
