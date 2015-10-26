@@ -90,7 +90,7 @@ void Client::writeCommand(const Array& command)
 
 RedisType::Ptr Client::readReply()
 {
-	RedisType::Ptr result = createRedisType(_socket.get());
+	RedisType::Ptr result = RedisType::createRedisType(_socket.get());
 	if ( result.isNull() )
 	{
 		throw RedisException("Invalid Redis type returned");
@@ -121,29 +121,5 @@ void Client::sendCommands(const std::vector<Array>& commands, std::vector<RedisT
 	}
 }
 
-RedisType::Ptr Client::createRedisType(char marker)
-{
-	RedisType::Ptr result;
-
-	switch(marker)
-	{
-		case ElementTraits<Int64>::marker :
-			result = new Type<Int64>();
-			break;
-		case ElementTraits<std::string>::marker :
-			result = new Type<std::string>();
-			break;
-		case ElementTraits<BulkString>::marker :
-			result = new Type<BulkString>();
-			break;
-		case ElementTraits<Array>::marker :
-			result = new Type<Array>();
-			break;
-		case ElementTraits<Error>::marker :
-			result = new Type<Error>();
-			break;
-	}
-	return result;
-}
 
 } } // Poco::Redis

@@ -54,6 +54,14 @@ public:
 		REDIS_ERROR
 	};
 
+	static RedisType::Ptr createRedisType(char marker);
+		/// Create a Redis type based on the marker :
+		/// + : a simple string (std::string)
+		/// - : an error (Error)
+		/// $ : a bulk string (BulkString)
+		/// * : an array (Array)
+		/// : : a signed 64 bit integer (Int64)
+
 private:
 
 };
@@ -199,6 +207,7 @@ void Type<BulkString>::read(RedisSocket& socket)
 
 		socket.readLine(line);
 	}
+
 }
 
 
