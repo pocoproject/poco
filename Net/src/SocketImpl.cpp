@@ -426,143 +426,43 @@ int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, Sock
 	int epollSize = readList.size() + writeList.size() + exceptList.size();
 	if (epollSize == 0) return 0;
 
-	int epollfd = -1;
+	EpollEvent eventIn;
+	fillEpollEvent(readList,   EPOLLIN,  eventIn);
+	fillEpollEvent(writeList,  EPOLLOUT, eventIn);
+	fillEpollEvent(exceptList, EPOLLERR, eventIn);
+
+	int epollfd = epoll_create(eventIn.size());
+	if (epollfd < 0)
 	{
-		struct epoll_event eventsIn[epollSize];
-		memset(eventsIn, 0, sizeof(eventsIn));
-		struct epoll_event* eventLast = eventsIn;
-		for (SocketImplList::iterator it = readList.begin(); it != readList.end(); ++it)
-		{
-			poco_check_ptr(*it);
-
-			poco_socket_t sockfd = (*it)->sockfd();
-			if (sockfd != POCO_INVALID_SOCKET)
-			{
-				struct epoll_event* e = eventsIn;
-				for (; e != eventLast; ++e)
-				{
-					if (reinterpret_cast<SocketImpl*>(e->data.ptr)->sockfd() == sockfd)
-						break;
-				}
-				if (e == eventLast)
-				{
-					e->data.ptr = *it;
-					++eventLast;
-				}
-				e->events |= EPOLLIN;
-			}
-		}
-
-		for (SocketImplList::iterator it = writeList.begin(); it != writeList.end(); ++it)
-		{
-			poco_check_ptr(*it);
-
-			poco_socket_t sockfd = (*it)->sockfd();
-			if (sockfd != POCO_INVALID_SOCKET)
-			{
-				struct epoll_event* e = eventsIn;
-				for (; e != eventLast; ++e)
-				{
-					if (reinterpret_cast<SocketImpl*>(e->data.ptr)->sockfd() == sockfd)
-						break;
-				}
-				if (e == eventLast)
-				{
-					e->data.ptr = *it;
-					++eventLast;
-				}
-				e->events |= EPOLLOUT;
-			}
-		}
-
-		for (SocketImplList::iterator it = exceptList.begin(); it != exceptList.end(); ++it)
-		{
-			poco_check_ptr(*it);
-
-			poco_socket_t sockfd = (*it)->sockfd();
-			if (sockfd != POCO_INVALID_SOCKET)
-			{
-				struct epoll_event* e = eventsIn;
-				for (; e != eventLast; ++e)
-				{
-					if (reinterpret_cast<SocketImpl*>(e->data.ptr)->sockfd() == sockfd)
-						break;
-				}
-				if (e == eventLast)
-				{
-					e->data.ptr = *it;
-					++eventLast;
-				}
-				e->events |= EPOLLERR;
-			}
-		}
-
-		epollSize = eventLast - eventsIn;
-		epollfd = epoll_create(epollSize);
-		if (epollfd < 0)
-		{
-			char buf[1024];
-			strerror_r(errno, buf, sizeof(buf));
-			error(std::string("Can't create epoll queue: ") + buf);
-		}
-
-		for (struct epoll_event* e = eventsIn; e != eventLast; ++e)
-		{
-			poco_socket_t sockfd = reinterpret_cast<SocketImpl*>(e->data.ptr)->sockfd();
-			if (sockfd != POCO_INVALID_SOCKET)
-			{
-				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, e) < 0)
-				{
-					char buf[1024];
-					strerror_r(errno, buf, sizeof(buf));
-					::close(epollfd);
-					error(std::string("Can't insert socket to epoll queue: ") + buf);
-				}
-			}
-		}
+		char buf[1024];
+		strerror_r(errno, buf, sizeof(buf));
+		error(std::string("Can't create epoll queue: ") + buf);
 	}
 
-	struct epoll_event eventsOut[epollSize];
-	memset(eventsOut, 0, sizeof(eventsOut));
-
-	Poco::Timespan remainingTime(timeout);
-	int rc;
-	do
+	try
 	{
-		Poco::Timestamp start;
-		rc = epoll_wait(epollfd, eventsOut, epollSize, remainingTime.totalMilliseconds());
-		if (rc < 0 && lastError() == POCO_EINTR)
-		{
- 			Poco::Timestamp end;
-			Poco::Timespan waited = end - start;
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
+		addEpollEventToWatch(eventIn, epollfd);
+
+		epoll_event eventOut[eventIn.size()];
+		memset(eventOut, 0, eventIn.size());
+		int rc = doEpollWait(epollfd, eventOut, eventIn.size(), timeout);
+		::close(epollfd);
+
+		SocketImplList readyReadList;
+		SocketImplList readyWriteList;
+		SocketImplList readyExceptList;
+		epollEventToSocketImplList(eventOut, rc, readyReadList, readyWriteList, readyExceptList);
+
+		std::swap(readList, readyReadList);
+		std::swap(writeList, readyWriteList);
+		std::swap(exceptList, readyExceptList);
+		return readList.size() + writeList.size() + exceptList.size();
 	}
-	while (rc < 0 && lastError() == POCO_EINTR);
-
-	::close(epollfd);
-	if (rc < 0) error();
-
- 	SocketImplList readyReadList;
-	SocketImplList readyWriteList;
-	SocketImplList readyExceptList;
-	for (int n = 0; n < rc; ++n)
+	catch (...)
 	{
-		if (eventsOut[n].events & EPOLLERR)
-			readyExceptList.push_back(reinterpret_cast<SocketImpl*>(eventsOut[n].data.ptr));
-		if (eventsOut[n].events & EPOLLIN)
-			readyReadList.push_back(reinterpret_cast<SocketImpl*>(eventsOut[n].data.ptr));
-		if (eventsOut[n].events & EPOLLOUT)
-			readyWriteList.push_back(reinterpret_cast<SocketImpl*>(eventsOut[n].data.ptr));
+		::close(epollfd);
+		throw;
 	}
-	std::swap(readList, readyReadList);
-	std::swap(writeList, readyWriteList);
-	std::swap(exceptList, readyExceptList);
-	return readList.size() + writeList.size() + exceptList.size();
-
 #elif defined(POCO_HAVE_FD_POLL)
 	typedef Poco::SharedPtr<pollfd, Poco::ReferenceCounter, Poco::ReleaseArrayPolicy<pollfd> > SharedPollArray;
 
@@ -1240,7 +1140,88 @@ void SocketImpl::error(int code, const std::string& arg)
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
+void SocketImpl::fillEpollEvent(SocketImplList& socketImplList, int event, EpollEvent& epollEvent)
+{
+	for (SocketImplList::const_iterator sIt = socketImplList.begin(); sIt != socketImplList.end(); ++sIt)
+	{
+		poco_check_ptr(*sIt);
 
+		poco_socket_t sockfd = (*sIt)->sockfd();
+		if (sockfd == POCO_INVALID_SOCKET) continue;
+
+		EpollEvent::iterator eIt = epollEvent.begin();
+		for (; eIt != epollEvent.end(); ++eIt)
+		{
+			if (reinterpret_cast<SocketImpl*>(eIt->data.ptr)->sockfd() == sockfd)
+				break;
+		}
+
+		if (eIt == epollEvent.end())
+		{
+			struct epoll_event e = { 0 };
+			e.data.ptr = *sIt;
+			e.events |= event;
+			epollEvent.push_back(e);
+		}
+		else eIt->events |= event;
+	}	
+}
+
+void SocketImpl::addEpollEventToWatch(EpollEvent& epollEvent, int fd)
+{
+	for (EpollEvent::iterator it = epollEvent.begin(); it != epollEvent.end(); ++it)
+	{
+		poco_socket_t sockfd = reinterpret_cast<SocketImpl*>(it->data.ptr)->sockfd();
+		if (sockfd != POCO_INVALID_SOCKET)
+		{
+			if (epoll_ctl(fd, EPOLL_CTL_ADD, sockfd, &(*it)) < 0)
+			{
+				char buf[1024];
+				strerror_r(errno, buf, sizeof(buf));
+				error(std::string("Can't insert socket to epoll queue: ") + buf);
+			}
+		}
+	}	
+}
+
+
+int SocketImpl::doEpollWait(int fd, epoll_event* eventsOut, int size, const Poco::Timespan& timeout)
+{
+	Poco::Timespan remainingTime(timeout);
+	int rc;
+	do
+	{
+		Poco::Timestamp start;
+		rc = epoll_wait(fd, eventsOut, size, remainingTime.totalMilliseconds());
+		if (rc < 0 && lastError() == POCO_EINTR)
+		{
+ 			Poco::Timestamp end;
+			Poco::Timespan waited = end - start;
+			if (waited < remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (rc < 0 && lastError() == POCO_EINTR);
+
+	if (rc < 0) error();
+	return rc;
+}
+
+
+void SocketImpl::epollEventToSocketImplList(epoll_event* event, int size, SocketImplList& readList, SocketImplList& writeList, SocketImplList& exceptList)
+{
+	for (int n = 0; n < size; ++n)
+	{
+		if (event[n].events & EPOLLIN)
+			readList.push_back(reinterpret_cast<SocketImpl*>(event[n].data.ptr));
+		if (event[n].events & EPOLLOUT)
+			writeList.push_back(reinterpret_cast<SocketImpl*>(event[n].data.ptr));
+		if (event[n].events & EPOLLERR)
+			exceptList.push_back(reinterpret_cast<SocketImpl*>(event[n].data.ptr));
+	}
+}
 #elif defined(POCO_HAVE_FD_POLL)
 
 #else

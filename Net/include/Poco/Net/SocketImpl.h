@@ -25,6 +25,9 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Timespan.h"
+#if defined(POCO_HAVE_FD_EPOLL)
+#include <sys/epoll.h>
+#endif
 #include <vector>
 
 
@@ -451,7 +454,15 @@ protected:
 
 private:
 #if defined(POCO_HAVE_FD_EPOLL)
+	typedef std::vector<epoll_event> EpollEvent;
 
+	static void fillEpollEvent(SocketImplList& socketImplList, int event, EpollEvent& epollEvent);
+
+	static void addEpollEventToWatch(EpollEvent& epollEvent, int fd);
+
+	static int doEpollWait(int fd, epoll_event* eventsOut, int size, const Poco::Timespan& timeout);
+
+	static void epollEventToSocketImplList(epoll_event* event, int size, SocketImplList& readList, SocketImplList& writeList, SocketImplList& exceptList);
 #elif defined(POCO_HAVE_FD_POLL)
 class FDCompare
 	/// Utility functor used to compare socket file descriptors.
