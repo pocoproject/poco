@@ -43,7 +43,9 @@ template <class H, SQLSMALLINT handleType>
 class HandleException: public ODBCException
 {
 public:
-	HandleException(const H& handle): _error(handle)
+	HandleException(const H& handle, int code = 0) : 
+		ODBCException(code),
+		_error(handle)
 		/// Creates HandleException
 	{
 		message(_error.toString());
@@ -129,6 +131,12 @@ public:
 			_error.toString());
 	}
 
+	std::string errorString() const
+		/// Returns the error diagnostics string
+	{
+		return _error.toString();
+	}
+
 	static std::string errorString(const H& handle)
 		/// Returns the error diagnostics string for the handle.
 	{
@@ -151,23 +159,6 @@ typedef HandleException<SQLHDBC, SQL_HANDLE_DBC>   ConnectionException;
 typedef HandleException<SQLHSTMT, SQL_HANDLE_STMT> StatementException;
 typedef HandleException<SQLHDESC, SQL_HANDLE_DESC> DescriptorException;
 
-
-class ODBCConnectionFailed : public ConnectionException, public ConnectionFailedException
-{
-public:
-	ODBCConnectionFailed(const SQLHDBC& handle) : ConnectionException(handle), ConnectionFailedException(error().toString())
-	{}
-
-	ODBCConnectionFailed(const ODBCConnectionFailed& e) : ConnectionException(e), ConnectionFailedException(e)
-	{}
-
-	Poco::Exception* clone() const
-		/// Clones the HandleException
-	{
-		return static_cast<ConnectionException*>( new ODBCConnectionFailed(*this) );
-	}
-
-};
 
 } } } // namespace Poco::Data::ODBC
 
