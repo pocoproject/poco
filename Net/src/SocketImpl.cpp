@@ -416,9 +416,9 @@ bool SocketImpl::secure() const
 
 int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, SocketImplList& exceptList, const Poco::Timespan& timeout)
 {
-#if defined(POCO_HAVE_FD_EPOLL)
 	if (readList.empty() && writeList.empty() && exceptList.empty()) return 0;
 
+#if defined(POCO_HAVE_FD_EPOLL)
 	EpollEvent eventIn;
 	fillEpollEvent(readList,   EPOLLIN,  eventIn);
 	fillEpollEvent(writeList,  EPOLLOUT, eventIn);
@@ -432,6 +432,9 @@ int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, Sock
 		error(std::string("Can't create epoll queue: ") + buf);
 	}
 
+	SocketImplList readyReadList;
+	SocketImplList readyWriteList;
+	SocketImplList readyExceptList;
 	try
 	{
 		addEpollEventToWatch(eventIn, epollfd);
@@ -441,15 +444,7 @@ int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, Sock
 		int rc = doEpollWait(epollfd, eventOut, eventIn.size(), timeout);
 		::close(epollfd);
 
-		SocketImplList readyReadList;
-		SocketImplList readyWriteList;
-		SocketImplList readyExceptList;
 		epollEventToSocketImplList(eventOut, rc, readyReadList, readyWriteList, readyExceptList);
-
-		std::swap(readList,   readyReadList);
-		std::swap(writeList,  readyWriteList);
-		std::swap(exceptList, readyExceptList);
-		return readList.size() + writeList.size() + exceptList.size();
 	}
 	catch (...)
 	{
@@ -457,9 +452,6 @@ int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, Sock
 		throw;
 	}
 #elif defined(POCO_HAVE_FD_POLL)
-	int epollSize = readList.size() + writeList.size() + exceptList.size();
-	if (0 == epollSize) return 0;
-
 	PollFd pollFd;
 	fillPollFd(readList,   POLLIN,  pollFd);
 	fillPollFd(writeList,  POLLOUT, pollFd);
@@ -472,10 +464,6 @@ int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, Sock
 	SocketImplList readyExceptList;
 
 	collectReadyFd(pollFd, readList, writeList, exceptList, readyReadList, readyWriteList, readyExceptList);
-	std::swap(readList, readyReadList);
-	std::swap(writeList, readyWriteList);
-	std::swap(exceptList, readyExceptList);
-	return readList.size() + writeList.size() + exceptList.size();
 #else
 	fd_set fdRead;
 	fd_set fdWrite;
@@ -490,7 +478,7 @@ int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, Sock
 	fillFDSet(exceptList, &fdExcept, &nfd);
 	if (nfd == 0) return 0;
 
-	int rc = doSelect(&fdRead, &fdWrite, &fdExcept, nfd, timeout);
+	doSelect(&fdRead, &fdWrite, &fdExcept, nfd, timeout);
 
 	SocketImplList readyReadList;
 	SocketImplList readyWriteList;
@@ -498,12 +486,12 @@ int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, Sock
 	collectReadyFd(readList,   &fdRead,   readyReadList);
 	collectReadyFd(writeList,  &fdWrite,  readyWriteList);
 	collectReadyFd(exceptList, &fdExcept, readyExceptList);
-
+#endif // POCO_HAVE_FD_EPOLL
 	std::swap(readList,   readyReadList);
 	std::swap(writeList,  readyWriteList);
 	std::swap(exceptList, readyExceptList);	
-	return rc; 
-#endif // POCO_HAVE_FD_EPOLL
+
+	return readList.size() + writeList.size() + exceptList.size();
 }
 
 
@@ -1147,14 +1135,19 @@ void SocketImpl::epollEventToSocketImplList(epoll_event* event, int size, Socket
 	}
 }
 #elif defined(POCO_HAVE_FD_POLL)
-void SocketImpl::fillPollFd(SocketImplList& socketImplList, int event, PollFd& pollFd)
+void SocketImpl::fillPollFd(const SocketImplList& socketImplList, int event, PollFd& pollFd)
 {
-	for (SocketImplList::iterator it = socketImplList.begin(); it != socketImplList.end(); ++it)
+	for (SocketImplList::const_iterator it = socketImplList.begin(); it != socketImplList.end(); ++it)
 	{
+		poco_check_ptr(*it);
+
+		poco_socket_t sockfd = (*it)->sockfd();
+		if (sockfd == POCO_INVALID_SOCKET) continue;
+
 		PollFd::iterator pIt = pollFd.begin();
 		for (; pIt != pollFd.end(); ++pIt)
 		{
-			if (pIt->fd == int((*it)->sockfd()))
+			if (pIt->fd == sockfd)
 			{
 				break;
 			}
@@ -1162,9 +1155,7 @@ void SocketImpl::fillPollFd(SocketImplList& socketImplList, int event, PollFd& p
 
 		if (pIt == pollFd.end())
 		{
-			struct pollfd pd = { 0 };
-			pd.fd = int((*it)->sockfd());
-			pd.events |= event;
+			struct pollfd pd = { sockfd, event, 0 };
 			pollFd.push_back(pd);
 		}
 		else
@@ -1197,21 +1188,22 @@ void SocketImpl::doPoll(PollFd& pollFd, const Poco::Timespan& timeout)
 
 void SocketImpl::collectReadyFd(const PollFd& pollFd, const SocketImplList& readList, const SocketImplList& writeList, const SocketImplList& exceptList, SocketImplList& readyReadList, SocketImplList& readyWriteList, SocketImplList& readyExceptList)
 {
-	SocketImplList::const_iterator begR = readList.begin();
-	SocketImplList::const_iterator endR = readList.end();	
-	SocketImplList::const_iterator begW = writeList.begin();
-	SocketImplList::const_iterator endW = writeList.end();
-	SocketImplList::const_iterator begE = exceptList.begin();
-	SocketImplList::const_iterator endE = exceptList.end();
+	typedef SocketImplList::const_iterator CIt;
+	CIt begR = readList.begin();
+	CIt endR = readList.end();	
+	CIt begW = writeList.begin();
+	CIt endW = writeList.end();
+	CIt begE = exceptList.begin();
+	CIt endE = exceptList.end();
 
 	for (PollFd::const_iterator it = pollFd.begin(); it < pollFd.end(); ++it)
 	{
-		SocketImplList::const_iterator slIt = std::find_if(begR, endR, FDCompare(it->fd));
-		if (POLLIN & it->revents && slIt != endR) readyReadList.push_back(*slIt);
-		slIt = std::find_if(begW, endW, FDCompare(it->fd));
-		if (POLLOUT & it->revents && slIt != endW) readyWriteList.push_back(*slIt);
-		slIt = std::find_if(begE, endE, FDCompare(it->fd));
-		if (POLLERR & it->revents && slIt != endE) readyExceptList.push_back(*slIt);
+		CIt sIt = std::find_if(begR, endR, FDCompare(it->fd));
+		if (POLLIN & it->revents && sIt != endR) readyReadList.push_back(*sIt);
+		sIt = std::find_if(begW, endW, FDCompare(it->fd));
+		if (POLLOUT & it->revents && sIt != endW) readyWriteList.push_back(*sIt);
+		sIt = std::find_if(begE, endE, FDCompare(it->fd));
+		if (POLLERR & it->revents && sIt != endE) readyExceptList.push_back(*sIt);
 	}
 }
 #else
@@ -1219,6 +1211,8 @@ void SocketImpl::fillFDSet(const SocketImplList& socketImplList, fd_set* fdSet, 
 {
 	for (SocketImplList::const_iterator it = socketImplList.begin(); it != socketImplList.end(); ++it)
 	{
+		poco_check_ptr(*it);
+
 		poco_socket_t fd = (*it)->sockfd();
 		if (fd != POCO_INVALID_SOCKET)
 		{
@@ -1233,16 +1227,12 @@ void SocketImpl::collectReadyFd(const SocketImplList& socketImplList, fd_set* fd
 	for (SocketImplList::const_iterator it = socketImplList.begin(); it != socketImplList.end(); ++it)
 	{
 		poco_socket_t fd = (*it)->sockfd();
-		if (fd != POCO_INVALID_SOCKET)
-		{
-			if (FD_ISSET(fd, fdSet))
-				readyList.push_back(*it);
-		}
+		if (FD_ISSET(fd, fdSet)) readyList.push_back(*it);
 	}
 }
 
 
-int SocketImpl::doSelect(fd_set* fdRead, fd_set* fdWrite, fd_set* fdExcept, int nfd, const Poco::Timespan& timeout)
+void SocketImpl::doSelect(fd_set* fdRead, fd_set* fdWrite, fd_set* fdExcept, int nfd, const Poco::Timespan& timeout)
 {
 	Poco::Timespan remainingTime(timeout);
 	int rc;
@@ -1265,8 +1255,6 @@ int SocketImpl::doSelect(fd_set* fdRead, fd_set* fdWrite, fd_set* fdExcept, int 
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) error();
-
-	return rc;	
 }
 #endif
 

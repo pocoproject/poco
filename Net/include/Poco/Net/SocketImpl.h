@@ -468,7 +468,7 @@ private:
 #elif defined(POCO_HAVE_FD_POLL)
 	typedef std::vector<pollfd> PollFd;
 
-	static void fillPollFd(SocketImplList& socketImplList, int event, PollFd& pollFd);
+	static void fillPollFd(const SocketImplList& socketImplList, int event, PollFd& pollFd);
 
 	static void doPoll(PollFd& pollFd, const Poco::Timespan& timeout);
 
@@ -490,7 +490,7 @@ private:
 #else
 	static void fillFDSet(const SocketImplList& socketImplList, fd_set* fdSet, int* nfd);
 
-	static int doSelect(fd_set* fdRead, fd_set* fdWrite, fd_set* fdExcept, int nfd, const Poco::Timespan& timeout);
+	static void doSelect(fd_set* fdRead, fd_set* fdWrite, fd_set* fdExcept, int nfd, const Poco::Timespan& timeout);
 
 	static void collectReadyFd(const SocketImplList& socketImplList, fd_set* fdSet, SocketImplList& readyList);
 #endif
