@@ -21,11 +21,6 @@
 #include "Poco/Timestamp.h"
 #include <algorithm>
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
-#if defined(POCO_HAVE_FD_EPOLL)
-#include <sys/epoll.h>
-#elif defined(POCO_HAVE_FD_POLL)
-#include <poll.h>
-#endif
 
 
 #if defined(sun) || defined(__sun) || defined(__sun__)
@@ -1075,7 +1070,7 @@ void SocketImpl::error(int code, const std::string& arg)
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
-void SocketImpl::fillEpollEvent(SocketImplList& socketImplList, int event, EpollEvent& epollEvent)
+void SocketImpl::fillEpollEvent(const SocketImplList& socketImplList, int event, EpollEvent& epollEvent)
 {
 	for (SocketImplList::const_iterator sIt = socketImplList.begin(); sIt != socketImplList.end(); ++sIt)
 	{
@@ -1093,9 +1088,7 @@ void SocketImpl::fillEpollEvent(SocketImplList& socketImplList, int event, Epoll
 
 		if (eIt == epollEvent.end())
 		{
-			struct epoll_event e = { 0 };
-			e.data.ptr = *sIt;
-			e.events |= event;
+			struct epoll_event e = { event, *sIt };
 			epollEvent.push_back(e);
 		}
 		else eIt->events |= event;

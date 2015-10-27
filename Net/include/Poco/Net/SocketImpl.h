@@ -458,7 +458,7 @@ private:
 #if defined(POCO_HAVE_FD_EPOLL)
 	typedef std::vector<epoll_event> EpollEvent;
 
-	static void fillEpollEvent(SocketImplList& socketImplList, int event, EpollEvent& epollEvent);
+	static void fillEpollEvent(const SocketImplList& socketImplList, int event, EpollEvent& epollEvent);
 
 	static void addEpollEventToWatch(EpollEvent& epollEvent, int fd);
 
