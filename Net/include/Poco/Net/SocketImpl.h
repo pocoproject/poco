@@ -27,6 +27,8 @@
 #include "Poco/Timespan.h"
 #if defined(POCO_HAVE_FD_EPOLL)
 #include <sys/epoll.h>
+#elif defined(POCO_HAVE_FD_POLL)
+#include <poll.h>
 #endif
 #include <vector>
 
@@ -464,6 +466,14 @@ private:
 
 	static void epollEventToSocketImplList(epoll_event* event, int size, SocketImplList& readList, SocketImplList& writeList, SocketImplList& exceptList);
 #elif defined(POCO_HAVE_FD_POLL)
+	typedef std::vector<pollfd> PollFd;
+
+	static void fillPollFd(SocketImplList& socketImplList, int event, PollFd& pollFd);
+
+	static void doPoll(PollFd& pollFd, const Poco::Timespan& timeout);
+
+	static void collectReadyFd(const PollFd& pollFd, const SocketImplList& readList, const SocketImplList& writeList, const SocketImplList& exceptList, SocketImplList& readyReadList, SocketImplList& readyWriteList, SocketImplList& readyExceptList);
+
 class FDCompare
 	/// Utility functor used to compare socket file descriptors.
 	/// Used in poll() member function.
