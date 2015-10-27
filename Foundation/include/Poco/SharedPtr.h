@@ -233,42 +233,22 @@ public:
 		return SharedPtr<Other, RC, RP>(_pCounter, pOther);
 	}
 
-	C* operator -> ()
+	C* operator -> () const
 	{
 		return deref();
 	}
 
-	const C* operator -> () const
-	{
-		return deref();
-	}
-
-	C& operator * ()
+	C& operator * () const
 	{
 		return *deref();
 	}
 
-	const C& operator * () const
-	{
-		return *deref();
-	}
-
-	C* get()
+	C* get() const
 	{
 		return _ptr;
 	}
 
-	const C* get() const
-	{
-		return _ptr;
-	}
-
-	operator C* ()
-	{
-		return _ptr;
-	}
-	
-	operator const C* () const
+	operator C* () const
 	{
 		return _ptr;
 	}

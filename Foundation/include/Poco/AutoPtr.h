@@ -182,7 +182,7 @@ public:
 		return AutoPtr<Other>(pOther, true);
 	}
 
-	C* operator -> ()
+	C* operator -> () const
 	{
 		if (_ptr)
 			return _ptr;
@@ -190,15 +190,7 @@ public:
 			throw NullPointerException();
 	}
 
-	const C* operator -> () const
-	{
-		if (_ptr)
-			return _ptr;
-		else
-			throw NullPointerException();
-	}
-
-	C& operator * ()
+	C& operator * () const
 	{
 		if (_ptr)
 			return *_ptr;
@@ -206,30 +198,12 @@ public:
 			throw NullPointerException();
 	}
 
-	const C& operator * () const
-	{
-		if (_ptr)
-			return *_ptr;
-		else
-			throw NullPointerException();
-	}
-
-	C* get()
+	C* get() const
 	{
 		return _ptr;
 	}
 
-	const C* get() const
-	{
-		return _ptr;
-	}
-
-	operator C* ()
-	{
-		return _ptr;
-	}
-	
-	operator const C* () const
+	operator C* () const
 	{
 		return _ptr;
 	}
