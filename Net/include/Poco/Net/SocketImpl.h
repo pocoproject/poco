@@ -462,7 +462,7 @@ private:
 
 	static void addEpollEventToWatch(EpollEvent& epollEvent, int fd);
 
-	static int doEpollWait(int fd, epoll_event* eventsOut, int size, const Poco::Timespan& timeout);
+	static int doEpollWait(int fd, epoll_event* eventOut, int size, const Poco::Timespan& timeout);
 
 	static void epollEventToSocketImplList(epoll_event* event, int size, SocketImplList& readList, SocketImplList& writeList, SocketImplList& exceptList);
 #elif defined(POCO_HAVE_FD_POLL)

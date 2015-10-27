@@ -417,8 +417,7 @@ bool SocketImpl::secure() const
 int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, SocketImplList& exceptList, const Poco::Timespan& timeout)
 {
 #if defined(POCO_HAVE_FD_EPOLL)
-	int epollSize = readList.size() + writeList.size() + exceptList.size();
-	if (epollSize == 0) return 0;
+	if (readList.empty() && writeList.empty() && exceptList.empty()) return 0;
 
 	EpollEvent eventIn;
 	fillEpollEvent(readList,   EPOLLIN,  eventIn);
@@ -447,8 +446,8 @@ int SocketImpl::select(SocketImplList& readList, SocketImplList& writeList, Sock
 		SocketImplList readyExceptList;
 		epollEventToSocketImplList(eventOut, rc, readyReadList, readyWriteList, readyExceptList);
 
-		std::swap(readList, readyReadList);
-		std::swap(writeList, readyWriteList);
+		std::swap(readList,   readyReadList);
+		std::swap(writeList,  readyWriteList);
 		std::swap(exceptList, readyExceptList);
 		return readList.size() + writeList.size() + exceptList.size();
 	}
@@ -1100,27 +1099,24 @@ void SocketImpl::addEpollEventToWatch(EpollEvent& epollEvent, int fd)
 	for (EpollEvent::iterator it = epollEvent.begin(); it != epollEvent.end(); ++it)
 	{
 		poco_socket_t sockfd = reinterpret_cast<SocketImpl*>(it->data.ptr)->sockfd();
-		if (sockfd != POCO_INVALID_SOCKET)
+		if (epoll_ctl(fd, EPOLL_CTL_ADD, sockfd, &(*it)) < 0)
 		{
-			if (epoll_ctl(fd, EPOLL_CTL_ADD, sockfd, &(*it)) < 0)
-			{
-				char buf[1024];
-				strerror_r(errno, buf, sizeof(buf));
-				error(std::string("Can't insert socket to epoll queue: ") + buf);
-			}
+			char buf[1024];
+			strerror_r(errno, buf, sizeof(buf));
+			error(std::string("Can't insert socket to epoll queue: ") + buf);
 		}
 	}	
 }
 
 
-int SocketImpl::doEpollWait(int fd, epoll_event* eventsOut, int size, const Poco::Timespan& timeout)
+int SocketImpl::doEpollWait(int fd, epoll_event* eventOut, int size, const Poco::Timespan& timeout)
 {
 	Poco::Timespan remainingTime(timeout);
 	int rc;
 	do
 	{
 		Poco::Timestamp start;
-		rc = epoll_wait(fd, eventsOut, size, remainingTime.totalMilliseconds());
+		rc = epoll_wait(fd, eventOut, size, remainingTime.totalMilliseconds());
 		if (rc < 0 && lastError() == POCO_EINTR)
 		{
  			Poco::Timestamp end;
