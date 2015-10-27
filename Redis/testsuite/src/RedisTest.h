@@ -32,8 +32,15 @@ public:
 
 	void testAppend();
 	void testEcho();
+	void testIncr();
+	void testIncrBy();
 	void testPing();
 	void testSet();
+	void testMSet();
+	void testStrlen();
+	void testRPush();
+	void testLIndex();
+	void testMulti();
 	void testPipeliningWithSendCommands();
 	void testPipeliningWithWriteCommand();
 

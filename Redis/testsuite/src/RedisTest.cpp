@@ -181,6 +181,93 @@ void RedisTest::testEcho()
 	}
 }
 
+void RedisTest::testIncr()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array command;
+	command.add("SET")
+		.add("mykey")
+		.add("10");
+
+	// A set responds with a simple OK string
+	try
+	{
+		std::string result;
+		_redis.sendCommand(command, result);
+
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	command.clear();
+	command.add("INCR")
+		.add("mykey");
+
+	try
+	{
+		Poco::Int64 value;
+		_redis.sendCommand(command, value);
+
+		assert(value == 11);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testIncrBy()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array command;
+	command.add("SET")
+		.add("mykey")
+		.add("10");
+
+	// A set responds with a simple OK string
+	try
+	{
+		std::string result;
+		_redis.sendCommand(command, result);
+
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	command.clear();
+	command.add("INCRBY")
+		.add("mykey")
+		.add("5");
+
+	try
+	{
+		Poco::Int64 value;
+		_redis.sendCommand(command, value);
+
+		assert(value == 15);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testPing()
 {
 	if (!_connected)
@@ -264,6 +351,350 @@ void RedisTest::testSet()
 	}
 }
 
+void RedisTest::testMSet()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array command;
+	command.add("MSET")
+		.add("key1")
+		.add("Hello")
+		.add("key2")
+		.add("World");
+
+	// A MSET responds with a simple OK string
+	try
+	{
+		std::string result;
+		_redis.sendCommand(command, result);
+
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	command.clear();
+	command.add("MGET")
+		.add("key1")
+		.add("key2")
+		.add("nonexisting");
+	try
+	{
+		Array result;
+		_redis.sendCommand(command, result);
+
+		assert(result.size() == 3);
+		BulkString value = result.get<BulkString>(0);
+		assert(value.value().compare("Hello") == 0);
+
+		value = result.get<BulkString>(1);
+		assert(value.value().compare("World") == 0);
+
+		value = result.get<BulkString>(2);
+		assert(value.isNull());
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testStrlen()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array command;
+	command.add("SET")
+		.add("mykey")
+		.add("Hello World");
+
+	// A set responds with a simple OK string
+	try
+	{
+		std::string result;
+		_redis.sendCommand(command, result);
+
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	command.clear();
+	command.add("STRLEN")
+		.add("mykey");
+
+	try
+	{
+		Poco::Int64 result;
+		_redis.sendCommand(command, result);
+
+		assert(result == 11);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testRPush()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	// Make sure the list is not there yet ...
+	Array delCommand;
+	delCommand.add("DEL")
+		.add("mylist");
+	try
+	{
+		Poco::Int64 result;
+		_redis.sendCommand(delCommand, result);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	for(int i = 0; i < 2; ++i)
+	{
+		Array command;
+		command.add("RPUSH")
+			.add("mylist");
+
+		if ( i == 0 ) command.add("Hello");
+		else command.add("World");
+
+		// A RPUSH responds with an integer
+		try
+		{
+			Poco::Int64 result;
+			_redis.sendCommand(command, result);
+
+			assert(result == (i + 1));
+		}
+		catch(RedisException &e)
+		{
+			fail(e.message());
+		}
+	}
+
+	Array command;
+	command.add("LRANGE")
+		.add("mylist")
+		.add("0")
+		.add("-1");
+
+	try
+	{
+		Array result;
+		_redis.sendCommand(command, result);
+
+		assert(result.size() == 2);
+		BulkString value = result.get<BulkString>(0);
+		assert(value.value().compare("Hello") == 0);
+
+		value = result.get<BulkString>(1);
+		assert(value.value().compare("World") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testLIndex()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	// Make sure the list is not there yet ...
+	Array delCommand;
+	delCommand.add("DEL")
+		.add("mylist");
+	try
+	{
+		Poco::Int64 result;
+		_redis.sendCommand(delCommand, result);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	for(int i = 0; i < 2; ++i)
+	{
+		Array command;
+		command.add("LPUSH")
+			.add("mylist");
+
+		if ( i == 0 ) command.add("World");
+		else command.add("Hello");
+
+		// A RPUSH responds with an integer
+		try
+		{
+			Poco::Int64 result;
+			_redis.sendCommand(command, result);
+
+			assert(result == (i + 1));
+		}
+		catch(RedisException &e)
+		{
+			fail(e.message());
+		}
+	}
+
+	Array command;
+	command.add("LINDEX")
+		.add("mylist")
+		.add("0");
+
+	try
+	{
+		BulkString result;
+		_redis.sendCommand(command, result);
+
+		assert(result.value().compare("Hello") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testMulti()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	// Make sure keys are gone from a previous testrun ...
+	Array delCommand;
+	delCommand.add("DEL")
+		.add("foo")
+		.add("bar");
+	try
+	{
+		Poco::Int64 result;
+		_redis.sendCommand(delCommand, result);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	Array command;
+	command.add("MULTI");
+	try
+	{
+		std::string result;
+		_redis.sendCommand(command, result);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	command.clear();
+	command.add("INCR")
+		.add("foo");
+	try
+	{
+		std::string result;
+		_redis.sendCommand(command, result);
+		assert(result.compare("QUEUED") == 0);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	command.clear();
+	command.add("INCR")
+		.add("bar");
+	try
+	{
+		std::string result;
+		_redis.sendCommand(command, result);
+		assert(result.compare("QUEUED") == 0);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	command.clear();
+	command.add("EXEC");
+	try
+	{
+		Array result;
+		_redis.sendCommand(command, result);
+		assert(result.size() == 2);
+
+		Poco::Int64 v = result.get<Poco::Int64>(0);
+		assert(v == 1);
+		v = result.get<Poco::Int64>(1);
+		assert(v == 1);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testPipeliningWithSendCommands()
 {
 	if (!_connected)
@@ -335,9 +766,16 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("RedisTest");
 
 	CppUnit_addTest(pSuite, RedisTest, testAppend);
+	CppUnit_addTest(pSuite, RedisTest, testIncr);
+	CppUnit_addTest(pSuite, RedisTest, testIncrBy);
 	CppUnit_addTest(pSuite, RedisTest, testEcho);
 	CppUnit_addTest(pSuite, RedisTest, testPing);
 	CppUnit_addTest(pSuite, RedisTest, testSet);
+	CppUnit_addTest(pSuite, RedisTest, testMSet);
+	CppUnit_addTest(pSuite, RedisTest, testStrlen);
+	CppUnit_addTest(pSuite, RedisTest, testRPush);
+	CppUnit_addTest(pSuite, RedisTest, testLIndex);
+	CppUnit_addTest(pSuite, RedisTest, testMulti);
 
 	CppUnit_addTest(pSuite, RedisTest, testPipeliningWithSendCommands);
 	CppUnit_addTest(pSuite, RedisTest, testPipeliningWithWriteCommand);
