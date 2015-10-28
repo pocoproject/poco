@@ -375,6 +375,8 @@ public:
 		/// Sets the row formatter for this statement.
 		/// Statement takes the ownership of the formatter.
 
+	void insertHint();
+		/// Tells the statement that it is an sinsert one
 protected:
 	typedef StatementImpl::Ptr ImplPtr;
 
@@ -807,6 +809,11 @@ inline const RowFormatter::Ptr& Statement::getRowFormatter()
 	return _pRowFormatter;
 }
 
+
+inline void Statement::insertHint()
+{
+	_pImpl->insertHint();
+}
 
 inline void swap(Statement& s1, Statement& s2)
 {

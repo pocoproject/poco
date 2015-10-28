@@ -93,6 +93,10 @@ protected:
 	std::string nativeSQL();
 		/// Returns the SQL string as modified by the driver.
 
+protected:
+
+	void execImpl();
+
 private:
 	typedef Poco::Data::AbstractBindingVec    Bindings;
 	typedef Poco::SharedPtr<Binder>           BinderPtr;
