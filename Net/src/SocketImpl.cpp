@@ -1082,6 +1082,7 @@ void SocketImpl::fillEpollEvent(const SocketImplList& socketImplList, int event,
 	}	
 }
 
+
 void SocketImpl::addEpollEventToWatch(EpollEvent& epollEvent, int fd)
 {
 	for (EpollEvent::iterator it = epollEvent.begin(); it != epollEvent.end(); ++it)
@@ -1134,6 +1135,8 @@ void SocketImpl::epollEventToSocketImplList(epoll_event* event, int size, Socket
 			exceptList.push_back(reinterpret_cast<SocketImpl*>(event[n].data.ptr));
 	}
 }
+
+
 #elif defined(POCO_HAVE_FD_POLL)
 void SocketImpl::fillPollFd(const SocketImplList& socketImplList, int event, PollFd& pollFd)
 {
@@ -1164,6 +1167,7 @@ void SocketImpl::fillPollFd(const SocketImplList& socketImplList, int event, Pol
 		}
 	}
 }
+
 
 void SocketImpl::doPoll(PollFd& pollFd, const Poco::Timespan& timeout)
 {
@@ -1206,6 +1210,8 @@ void SocketImpl::collectReadyFd(const PollFd& pollFd, const SocketImplList& read
 		if (POLLERR & it->revents && sIt != endE) readyExceptList.push_back(*sIt);
 	}
 }
+
+
 #else
 void SocketImpl::fillFDSet(const SocketImplList& socketImplList, fd_set* fdSet, int* nfd)
 {
@@ -1221,6 +1227,7 @@ void SocketImpl::fillFDSet(const SocketImplList& socketImplList, fd_set* fdSet, 
 		}
 	}
 }
+
 
 void SocketImpl::collectReadyFd(const SocketImplList& socketImplList, fd_set* fdSet, SocketImplList& readyList)
 {
@@ -1256,6 +1263,8 @@ void SocketImpl::doSelect(fd_set* fdRead, fd_set* fdWrite, fd_set* fdExcept, int
 	while (rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) error();
 }
+
+
 #endif
 
 
