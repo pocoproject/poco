@@ -505,6 +505,7 @@ private:
 	bool          _isBrokenTimeout;
 	
 	friend class Socket;
+	friend class SecureSocketImpl;
 };
 
 
