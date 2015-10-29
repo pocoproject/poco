@@ -82,7 +82,7 @@ allcomps="Foundation XML JSON Util Net $comps"
 # Clean build directory
 #
 echo "Cleaning build directory: $build"
-#rm -rf $build
+rm -rf $build
 mkdir -p $build
 mkdir -p $dist
 

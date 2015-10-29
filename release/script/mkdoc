@@ -66,7 +66,7 @@ release=$version$tag
 echo "Building tools"
 
 tools=$POCO_BASE/stage/tools
-#rm -rf $tools
+rm -rf $tools
 mkdir -p $tools
 mkrelease -o $tools $version CppParser PocoDoc
 
