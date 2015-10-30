@@ -137,6 +137,8 @@ public:
 
 	void testJSONRowFormatter();
 
+	void testIncrementVacuum();
+
 	void setUp();
 	void tearDown();
 

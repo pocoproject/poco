@@ -24,12 +24,11 @@ endif(POCO_STATIC)
 
 # OS Detection
 if(WIN32)
-  target_compile_definitions(${BII_BLOCK_TARGET} INTERFACE  -DPOCO_OS_FAMILY_WINDOWS -DUNICODE -D_UNICODE)
+  target_compile_definitions(${BII_BLOCK_TARGET} INTERFACE  -DUNICODE -D_UNICODE)
   #set(SYSLIBS iphlpapi gdi32 odbc32)
 endif(WIN32)
 
 if (UNIX AND NOT ANDROID )
-  target_compile_definitions(${BII_BLOCK_TARGET} INTERFACE  -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
   if (APPLE)
     target_compile_definitions(${BII_BLOCK_TARGET} INTERFACE  -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64)
