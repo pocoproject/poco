@@ -83,8 +83,15 @@ if [ $osname = "Darwin" ] ; then
 	archpath=`dirname stage/tools/PocoDoc/bin/Darwin/*/PocoDoc`
 	osarch=`basename $archpath`
 fi
+if [ ${osname:0:6} = "CYGWIN" ] ; then
+	osname="Cygwin"
+fi
 
 export PATH=$tools/PocoDoc/bin/$osname/$osarch:$PATH
+if [ $osname = "Cygwin" ] ; then
+	export PATH=$tools/lib/$osname/$osarch:$PATH
+fi
+
 echo PATH=$PATH
 
 echo "Building documentation $release (using $docConfig)"

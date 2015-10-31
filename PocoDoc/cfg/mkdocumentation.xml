@@ -13,6 +13,9 @@
 				expat*.h,
 				zconf.h,
 				zlib.h,
+				Alignment.h,
+				QName.h,
+				XMLStreamParser.h,
 				${PocoBuild}/Util/include/Poco/Util/Units.h
 			</exclude>
 		</files>
@@ -33,6 +36,7 @@
 			<options>
 				${Includes},
 				-I/usr/local/mysql/include,
+				-I/usr/include/mysql,
 				-D_DEBUG,
 				-E,
 				-C,
@@ -93,7 +97,7 @@
 		<loggers>
 			<root>
 				<channel>c1</channel>
-				<level>warning</level>
+				<level>error</level>
 			</root>
 		</loggers>
 		<channels>

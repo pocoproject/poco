@@ -44,10 +44,12 @@ pcre_objects = pcre_config pcre_chartables pcre_compile pcre_globals pcre_maketa
 
 pcre_utf8_objects = pcre_ucd pcre_tables
 
+objects += $(pcre_utf8_objects)
+
 ifdef POCO_UNBUNDLED
 	SYSLIBS += -lpcre -lz
 else
-	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects)
+	objects += $(zlib_objects) $(pcre_objects)
 endif
 
 ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)

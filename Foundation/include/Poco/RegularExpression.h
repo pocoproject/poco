@@ -28,17 +28,18 @@
 #include <map>
 
 
+#if defined(POCO_UNBUNDLED)
+#include <pcre.h>
+#else
 //
-// Copy these definitions from pcre.h
-// to avoid pulling in the entire header file
+// include/Poco/pcre_config.h and src/pcre_config.h must be identical
+// include/Poco/pcre.h        and src/pcre.h        must be identical
+// Those Poco/pcre_config.h and Poco/pcre.h are mandatory for compiling JSON Query.cpp
+// as the Foundation/src directory cannot be a include directory.
 //
-extern "C"
-{
-	struct real_pcre8_or_16;                 /* declaration; the definition is private  */
-	typedef struct real_pcre8_or_16 pcre;
-	struct pcre_extra;
-}
-
+#include "Poco/pcre_config.h"
+#include "Poco/pcre.h"
+#endif
 
 namespace Poco {
 
