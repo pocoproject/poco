@@ -201,8 +201,8 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 	matches.reserve(rc);
 	for (int i = 0; i < rc; ++i)
 	{
-		RegularExpression::Match m;
-		RegularExpression::GroupMap::const_iterator it;
+		Match m;
+		GroupMap::const_iterator it;
 
 		m.offset = ovec[i*2] < 0 ? std::string::npos : ovec[i*2] ;
 		m.length = ovec[i*2 + 1] - m.offset;
@@ -210,7 +210,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 		it = _groups.find(i);
 		if (it != _groups.end())
 		{
-			m.name = it->second;
+			m.name = (*it).second;
 		}
 
 		matches.push_back(m);
