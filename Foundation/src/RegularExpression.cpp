@@ -31,7 +31,7 @@ namespace Poco {
 const int RegularExpression::OVEC_SIZE = 64;
 
 
-static void copyOvecToMatchVec(int count, int ovec[], GroupMap const& groups, RegularExpression::MatchVec& mv)
+static void copyOvecToMatchVec(int count, int ovec[], RegularExpression::MatchVec& mv)
 {
 	mv.clear();
 	mv.reserve(count);
@@ -40,11 +40,6 @@ static void copyOvecToMatchVec(int count, int ovec[], GroupMap const& groups, Re
 		RegularExpression::Match m;
 		m.offset = ovec[i*2] < 0 ? std::string::npos : ovec[i*2] ;
 		m.length = ovec[i*2 + 1] - m.offset;
-		GroupMap::const_iterator it = groups.find(i);
-		if (it != groups.end())
-		{
-			m.name = it->second;
-		}
 		mv.push_back(m);
 	}
 }
@@ -203,7 +198,23 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 		msg << "PCRE error " << rc;
 		throw RegularExpressionException(msg.str());
 	}
-	copyOvecToMatchVec(rc, ovec, matches);
+	matches.reserve(rc);
+	for (int i = 0; i < rc; ++i)
+	{
+		RegularExpression::Match m;
+		RegularExpression::GroupMap::const_iterator it;
+
+		m.offset = ovec[i*2] < 0 ? std::string::npos : ovec[i*2] ;
+		m.length = ovec[i*2 + 1] - m.offset;
+
+		it = _groups.find(i);
+		if (it != _groups.end())
+		{
+			m.name = it->second;
+		}
+
+		matches.push_back(m);
+	}
 	return rc;
 }
 
