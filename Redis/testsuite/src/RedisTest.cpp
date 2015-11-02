@@ -10,13 +10,11 @@
 //
 #include <iostream>
 
-#include "Poco/DateTime.h"
-#include "Poco/ObjectPool.h"
-
 #include "Poco/Net/NetException.h"
+#include "Poco/Delegate.h"
+#include "Poco/Thread.h"
 
 #include "RedisTest.h"
-#include "Poco/Redis/Client.h"
 
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
@@ -25,7 +23,7 @@ using namespace Poco::Redis;
 
 
 bool RedisTest::_connected = false;
-Poco::Redis::Client RedisTest::_redis;
+Poco::Redis::AsyncClient RedisTest::_redis;
 
 
 RedisTest::RedisTest(const std::string& name):
@@ -37,7 +35,8 @@ RedisTest::RedisTest(const std::string& name):
 	{
 		try
 		{
-			_redis.connect(_host, _port);
+			Poco::Timespan t(30, 0); // 30 seconds
+			_redis.connect(_host, _port, t);
 			_connected = true;
 			std::cout << "Connected to [" << _host << ':' << _port << ']' << std::endl;
 		}
@@ -84,8 +83,7 @@ void RedisTest::testAppend()
 		.add("mykey");
 	try
 	{
-		Poco::Int64 result;
-		_redis.sendCommand(delCommand, result);
+		_redis.execute<Poco::Int64>(delCommand);
 	}
 	catch(RedisException& e)
 	{
@@ -102,8 +100,7 @@ void RedisTest::testAppend()
 		.add("Hello");
 	try
 	{
-		std::string result;
-		_redis.sendCommand(setCommand, result);
+		std::string result = _redis.execute<std::string>(setCommand);
 		assert(result.compare("OK") == 0);
 	}
 	catch(RedisException& e)
@@ -121,9 +118,7 @@ void RedisTest::testAppend()
 		.add(" World");
 	try
 	{
-		Poco::Int64 result;
-		_redis.sendCommand(appendCommand, result);
-
+		Poco::Int64 result = _redis.execute<Poco::Int64>(appendCommand);
 		assert(result == 11);
 	}
 	catch(RedisException& e)
@@ -140,9 +135,7 @@ void RedisTest::testAppend()
 		.add("mykey");
 	try
 	{
-		BulkString result;
-		_redis.sendCommand(getCommand, result);
-
+		BulkString result = _redis.execute<BulkString>(getCommand);
 		assert(result.value().compare("Hello World") == 0);
 	}
 	catch(RedisException& e)
@@ -169,9 +162,7 @@ void RedisTest::testEcho()
 
 	try
 	{
-		BulkString result;
-		_redis.sendCommand(command, result);
-
+		BulkString result = _redis.execute<BulkString>(command);
 		assert(!result.isNull());
 		assert(result.value().compare("Hello World") == 0);
 	}
@@ -197,9 +188,7 @@ void RedisTest::testIncr()
 	// A set responds with a simple OK string
 	try
 	{
-		std::string result;
-		_redis.sendCommand(command, result);
-
+		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
 	catch(RedisException &e)
@@ -213,9 +202,7 @@ void RedisTest::testIncr()
 
 	try
 	{
-		Poco::Int64 value;
-		_redis.sendCommand(command, value);
-
+		Poco::Int64 value = _redis.execute<Poco::Int64>(command);
 		assert(value == 11);
 	}
 	catch(RedisException &e)
@@ -240,9 +227,7 @@ void RedisTest::testIncrBy()
 	// A set responds with a simple OK string
 	try
 	{
-		std::string result;
-		_redis.sendCommand(command, result);
-
+		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
 	catch(RedisException &e)
@@ -257,9 +242,7 @@ void RedisTest::testIncrBy()
 
 	try
 	{
-		Poco::Int64 value;
-		_redis.sendCommand(command, value);
-
+		Poco::Int64 value = _redis.execute<Poco::Int64>(command);
 		assert(value == 15);
 	}
 	catch(RedisException &e)
@@ -282,9 +265,7 @@ void RedisTest::testPing()
 	// A PING without a custom strings, responds with a simple "PONG" string
 	try
 	{
-		std::string result;
-		_redis.sendCommand(command, result);
-
+		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("PONG") == 0);
 	}
 	catch(RedisException &e)
@@ -296,9 +277,7 @@ void RedisTest::testPing()
 	command.add("Hello");
 	try
 	{
-		BulkString result;
-		_redis.sendCommand(command, result);
-
+		BulkString result = _redis.execute<BulkString>(command);
 		assert(!result.isNull());
 		assert(result.value().compare("Hello") == 0);
 	}
@@ -325,9 +304,7 @@ void RedisTest::testSet()
 	// A set responds with a simple OK string
 	try
 	{
-		std::string result;
-		_redis.sendCommand(command, result);
-
+		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
 	catch(RedisException &e)
@@ -340,9 +317,7 @@ void RedisTest::testSet()
 	// when the key is already set
 	try
 	{
-		BulkString result;
-		_redis.sendCommand(command, result);
-
+		BulkString result = _redis.execute<BulkString>(command);
 		assert(result.isNull());
 	}
 	catch(RedisException &e)
@@ -369,9 +344,7 @@ void RedisTest::testMSet()
 	// A MSET responds with a simple OK string
 	try
 	{
-		std::string result;
-		_redis.sendCommand(command, result);
-
+		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
 	catch(RedisException &e)
@@ -386,8 +359,7 @@ void RedisTest::testMSet()
 		.add("nonexisting");
 	try
 	{
-		Array result;
-		_redis.sendCommand(command, result);
+		Array result = _redis.execute<Array>(command);
 
 		assert(result.size() == 3);
 		BulkString value = result.get<BulkString>(0);
@@ -425,9 +397,7 @@ void RedisTest::testStrlen()
 	// A set responds with a simple OK string
 	try
 	{
-		std::string result;
-		_redis.sendCommand(command, result);
-
+		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
 	catch(RedisException &e)
@@ -441,8 +411,7 @@ void RedisTest::testStrlen()
 
 	try
 	{
-		Poco::Int64 result;
-		_redis.sendCommand(command, result);
+		Poco::Int64 result = _redis.execute<Poco::Int64>(command);
 
 		assert(result == 11);
 	}
@@ -466,8 +435,7 @@ void RedisTest::testRPush()
 		.add("mylist");
 	try
 	{
-		Poco::Int64 result;
-		_redis.sendCommand(delCommand, result);
+		_redis.execute<Poco::Int64>(delCommand);
 	}
 	catch(RedisException& e)
 	{
@@ -490,9 +458,7 @@ void RedisTest::testRPush()
 		// A RPUSH responds with an integer
 		try
 		{
-			Poco::Int64 result;
-			_redis.sendCommand(command, result);
-
+			Poco::Int64 result = _redis.execute<Poco::Int64>(command);
 			assert(result == (i + 1));
 		}
 		catch(RedisException &e)
@@ -509,8 +475,7 @@ void RedisTest::testRPush()
 
 	try
 	{
-		Array result;
-		_redis.sendCommand(command, result);
+		Array result = _redis.execute<Array>(command);
 
 		assert(result.size() == 2);
 		BulkString value = result.get<BulkString>(0);
@@ -539,8 +504,7 @@ void RedisTest::testLIndex()
 		.add("mylist");
 	try
 	{
-		Poco::Int64 result;
-		_redis.sendCommand(delCommand, result);
+		_redis.execute<Poco::Int64>(delCommand);
 	}
 	catch(RedisException& e)
 	{
@@ -563,9 +527,7 @@ void RedisTest::testLIndex()
 		// A RPUSH responds with an integer
 		try
 		{
-			Poco::Int64 result;
-			_redis.sendCommand(command, result);
-
+			Poco::Int64 result = _redis.execute<Poco::Int64>(command);
 			assert(result == (i + 1));
 		}
 		catch(RedisException &e)
@@ -581,9 +543,7 @@ void RedisTest::testLIndex()
 
 	try
 	{
-		BulkString result;
-		_redis.sendCommand(command, result);
-
+		BulkString result = _redis.execute<BulkString>(command);
 		assert(result.value().compare("Hello") == 0);
 	}
 	catch(RedisException &e)
@@ -607,8 +567,7 @@ void RedisTest::testMulti()
 		.add("bar");
 	try
 	{
-		Poco::Int64 result;
-		_redis.sendCommand(delCommand, result);
+		_redis.execute<Poco::Int64>(delCommand);
 	}
 	catch(RedisException& e)
 	{
@@ -623,8 +582,7 @@ void RedisTest::testMulti()
 	command.add("MULTI");
 	try
 	{
-		std::string result;
-		_redis.sendCommand(command, result);
+		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
 	catch(RedisException& e)
@@ -641,8 +599,7 @@ void RedisTest::testMulti()
 		.add("foo");
 	try
 	{
-		std::string result;
-		_redis.sendCommand(command, result);
+		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("QUEUED") == 0);
 	}
 	catch(RedisException& e)
@@ -659,8 +616,7 @@ void RedisTest::testMulti()
 		.add("bar");
 	try
 	{
-		std::string result;
-		_redis.sendCommand(command, result);
+		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("QUEUED") == 0);
 	}
 	catch(RedisException& e)
@@ -676,8 +632,7 @@ void RedisTest::testMulti()
 	command.add("EXEC");
 	try
 	{
-		Array result;
-		_redis.sendCommand(command, result);
+		Array result = _redis.execute<Array>(command);
 		assert(result.size() == 2);
 
 		Poco::Int64 v = result.get<Poco::Int64>(0);
@@ -710,8 +665,7 @@ void RedisTest::testPipeliningWithSendCommands()
 	commands.push_back(ping);
 	commands.push_back(ping);
 
-	Array result;
-	_redis.sendCommands(commands, result);
+	Array result = _redis.sendCommands(commands); 
 
 	// We expect 2 results
 	assert(result.size() == 2);
@@ -719,7 +673,7 @@ void RedisTest::testPipeliningWithSendCommands()
 	// The 2 results must be simple PONG strings
 	for(size_t i = 0; i < 2; ++i)
 	{
-		try
+		try 
 		{
 			std::string pong = result.get<std::string>(i);
 			assert(pong.compare("PONG") == 0);
@@ -742,14 +696,14 @@ void RedisTest::testPipeliningWithWriteCommand()
 	Array ping;
 	ping.add("PING");
 
-	_redis.writeCommand(ping);
-	_redis.writeCommand(ping);
+	_redis.execute<void>(ping);
+	_redis.execute<void>(ping);
 
 	// We expect 2 results with simple "PONG" strings
 	for(int i = 0; i < 2; ++i)
 	{
 		std::string pong;
-		try
+		try 
 		{
 			_redis.readReply<std::string>(pong);
 			assert(pong.compare("PONG") == 0);
@@ -759,6 +713,41 @@ void RedisTest::testPipeliningWithWriteCommand()
 			fail(e.message());
 		}
 	}
+}
+
+class RedisSubscriber
+{
+public:
+
+	void onMessage(const void* pSender, RedisType::Ptr& message)
+	{
+		std::cout << message->toString() << std::endl;
+	}
+
+};
+
+void RedisTest::testPubSub()
+{
+	RedisSubscriber subscriber;
+
+	Array subscribe;
+	subscribe.add("SUBSCRIBE")
+		.add("test");
+
+	Array subscribeReply = _redis.execute<Array>(subscribe);
+
+	_redis.redisResponse += Poco::delegate(&subscriber, &RedisSubscriber::onMessage);
+	_redis.start();
+
+	Poco::Thread::sleep(30000);
+
+	Array unsubscribe;
+	unsubscribe.add("UNSUBSCRIBE");
+
+	Array unsubscribeReply = _redis.execute<Array>(unsubscribe);
+	std::cout << "SUBS: " << unsubscribeReply.toString() << std::endl;
+
+	_redis.stop();
 }
 
 CppUnit::Test* RedisTest::suite()
@@ -776,6 +765,8 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testRPush);
 	CppUnit_addTest(pSuite, RedisTest, testLIndex);
 	CppUnit_addTest(pSuite, RedisTest, testMulti);
+
+	CppUnit_addTest(pSuite, RedisTest, testPubSub);
 
 	CppUnit_addTest(pSuite, RedisTest, testPipeliningWithSendCommands);
 	CppUnit_addTest(pSuite, RedisTest, testPipeliningWithWriteCommand);

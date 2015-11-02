@@ -55,7 +55,6 @@ void Client::connect()
 	_socket.connect(_address);
 }
 
-
 void Client::connect(const std::string& hostAndPort)
 {
 	_address = Net::SocketAddress(hostAndPort);
@@ -76,6 +75,30 @@ void Client::connect(const Net::SocketAddress& addrs)
 	connect();
 }
 
+void Client::connect(const Timespan& timeout)
+{
+	_socket.connect(_address, timeout);
+}
+
+void Client::connect(const std::string& hostAndPort, const Timespan& timeout)
+{
+	_address = Net::SocketAddress(hostAndPort);
+	connect(timeout);
+}
+
+
+void Client::connect(const std::string& host, int port, const Timespan& timeout)
+{
+	_address = Net::SocketAddress(host, port);
+	connect(timeout);
+}
+
+
+void Client::connect(const Net::SocketAddress& addrs, const Timespan& timeout)
+{
+	_address = addrs;
+	connect(timeout);
+}
 
 void Client::disconnect()
 {
@@ -107,8 +130,10 @@ RedisType::Ptr Client::sendCommand(const Array& command)
 	return readReply();
 }
 
-void Client::sendCommands(const std::vector<Array>& commands, Array& results)
+Array Client::sendCommands(const std::vector<Array>& commands)
 {
+	Array results;
+
 	for(std::vector<Array>::const_iterator it = commands.begin(); it != commands.end(); ++it)
 	{
 		writeCommand(*it);
@@ -118,7 +143,8 @@ void Client::sendCommands(const std::vector<Array>& commands, Array& results)
 	{
 		results.add(readReply());
 	}
-}
 
+	return results;
+}
 
 } } // Poco::Redis

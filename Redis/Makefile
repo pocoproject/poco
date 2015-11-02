@@ -10,7 +10,7 @@ include $(POCO_BASE)/build/rules/global
 
 INCLUDE += -I $(POCO_BASE)/Redis/include/Poco/Redis
 
-objects = Array Client Error Exception RedisSocket Type
+objects = AsyncClient Array Client Error Exception RedisSocket Type
 
 target         = PocoRedis
 target_version = $(LIBVERSION)

@@ -18,6 +18,7 @@
 #ifndef Redis_RedisSocket_INCLUDED
 #define Redis_RedisSocket_INCLUDED
 
+#include "Poco/Timespan.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
 
@@ -37,6 +38,8 @@ public:
 
 	void connect(const Net::SocketAddress& addrs);
 
+	void connect(const Net::SocketAddress& addrs, const Timespan& timeout);
+
 	int get();
 
 	int peek();
@@ -44,8 +47,6 @@ public:
 	void read(UInt64 length, std::string& data);
 
 	int write(const char* buffer, std::streamsize length);
-
-	int buffered();
 
 	void refill();
 
@@ -62,6 +63,7 @@ private:
 	char* _current;
 	char* _end;
 };
+
 
 } }
 

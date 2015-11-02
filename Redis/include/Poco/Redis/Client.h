@@ -16,11 +16,11 @@
 //
 
 
-#ifndef Redis_Connection_INCLUDED
-#define Redis_Connection_INCLUDED
-
+#ifndef Redis_Client_INCLUDED
+#define Redis_Client_INCLUDED
 
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Timespan.h"
 
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/Array.h"
@@ -41,7 +41,7 @@ class Redis_API Client
 	/// implemented as a typedef for Poco::Nullable<std::string>. This is
 	/// because a bulk string can represent a Null value.
 	///
-	///   BulkString bs = client.sendCommand(...);
+	///   BulkString bs = client.execute<BulkString>(...);
 	///   if ( bs.isNull() )
 	///   {
 	///      // We have a Null value
@@ -84,23 +84,40 @@ public:
 	void connect(const Net::SocketAddress& addrs);
 		/// Connects to the given Redis server.
 
+	void connect(const std::string& hostAndPort, const Timespan& timeout);
+		/// Connects to the given Redis server. The host and port must be
+		/// separated with a colon.
+
+	void connect(const std::string& host, int port, const Timespan& timeout);
+		/// Connects to the given Redis server.
+
+	void connect(const Net::SocketAddress& addrs, const Timespan& timeout);
+		/// Connects to the given Redis server.
+
 	void disconnect();
 		/// Disconnects from the Redis server.
 
-	RedisType::Ptr sendCommand(const Array& command);
-		/// Sends a Redis command to the server and returns the reply
-
 	template<typename T>
-	void sendCommand(const Array& command, T& result)
-		/// Sends a Redis command to the server, gets the reply and tries
-		/// to convert that reply to the template type. When
-		/// the reply is a Redis error, it wil throw a RedisException.
-		/// A BadCastException will be thrown, when the reply is not of the
-		/// given type.
+	T execute(const Array& command)
+		/// Sends the Redis Command to the server. It gets the reply
+		/// and tries to convert it to the given template type.
+		/// A specialization exists for type void, which doesn't read
+		/// the reply. If the server sends a reply, it is your
+		/// responsibility to read it ... (Use this for pipelining)
+		/// A BadCastException will be thrown when the reply couldn't be 
+		/// converted. Supported types are Int64, std::string, BulkString, 
+		/// Array and void. When the reply is an Error, it will throw 
+		/// a RedisException.
 	{
+		T result;
 		writeCommand(command);
 		readReply(result);
+		return result;
 	}
+
+	RedisType::Ptr sendCommand(const Array& command);
+		/// Sends a Redis command to the server and returns the reply.
+		/// Use this when the type of the reply isn't known.
 
 	RedisType::Ptr readReply();
 		/// Read a reply from the Redis server.
@@ -122,15 +139,9 @@ public:
 		else throw BadCastException();
 	}
 
-	void sendCommands(const std::vector<Array>& commands, Array& results);
+	Array sendCommands(const std::vector<Array>& commands);
 		/// Sends all commands (pipelining) to the Redis server before
 		/// getting all replies.
-
-	void writeCommand(const Array& command);
-		/// Sends a request to the Redis server. Use readReply to get the
-		/// answer. Can also be used for pipelining commands. Make sure you
-		/// call readReply as many times as you called writeCommand, even when
-		/// an error occurred on a command.
 
 private:
 
@@ -142,6 +153,15 @@ private:
 
 	void connect();
 		/// Connects to the Redis server
+	void connect(const Timespan& timeout);
+		/// Connects to the Redis server and sets a timeout.
+
+	void writeCommand(const Array& command);
+		/// Sends a request to the Redis server. Use readReply to get the
+		/// answer. Can also be used for pipelining commands. Make sure you
+		/// call readReply as many times as you called writeCommand, even when
+		/// an error occurred on a command.
+		
 };
 
 
@@ -150,8 +170,14 @@ inline Net::SocketAddress Client::address() const
 	return _address;
 }
 
+template<> inline
+void Client::execute<void>(const Array& command)
+{
+	writeCommand(command);
+}
+
 
 } } // namespace Poco::Redis
 
 
-#endif //Redis_Connection_INCLUDED
+#endif //Redis_Client_INCLUDED

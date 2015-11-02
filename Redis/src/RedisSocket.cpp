@@ -46,6 +46,12 @@ void RedisSocket::connect(const Net::SocketAddress& addrs)
 	_socket.connect(addrs);
 }
 
+void RedisSocket::connect(const Net::SocketAddress& addrs, const Timespan& timeout)
+{
+	_socket.connect(addrs, timeout);
+}
+
+
 int RedisSocket::get()
 {
 	if ( _current == _end ) refill();
