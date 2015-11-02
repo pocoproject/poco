@@ -104,9 +104,9 @@ public:
 		/// A specialization exists for type void, which doesn't read
 		/// the reply. If the server sends a reply, it is your
 		/// responsibility to read it ... (Use this for pipelining)
-		/// A BadCastException will be thrown when the reply couldn't be 
-		/// converted. Supported types are Int64, std::string, BulkString, 
-		/// Array and void. When the reply is an Error, it will throw 
+		/// A BadCastException will be thrown when the reply couldn't be
+		/// converted. Supported types are Int64, std::string, BulkString,
+		/// Array and void. When the reply is an Error, it will throw
 		/// a RedisException.
 	{
 		T result;
@@ -143,6 +143,8 @@ public:
 		/// Sends all commands (pipelining) to the Redis server before
 		/// getting all replies.
 
+	void setReceiveTimeout(const Timespan& timeout);
+
 private:
 
 	Client(const Client&);
@@ -161,7 +163,7 @@ private:
 		/// answer. Can also be used for pipelining commands. Make sure you
 		/// call readReply as many times as you called writeCommand, even when
 		/// an error occurred on a command.
-		
+
 };
 
 
@@ -174,6 +176,11 @@ template<> inline
 void Client::execute<void>(const Array& command)
 {
 	writeCommand(command);
+}
+
+inline void Client::setReceiveTimeout(const Timespan& timeout)
+{
+	_socket.setReceiveTimeout(timeout);
 }
 
 
