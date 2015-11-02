@@ -17,7 +17,7 @@
 
 
 #include "Poco/Redis/Redis.h"
-#include "Poco/Redis/AsyncClient.h"
+#include "Poco/Redis/Client.h"
 
 #include "CppUnit/TestCase.h"
 
@@ -57,7 +57,7 @@ private:
 	std::string _host;
 	unsigned    _port;
 	static bool _connected;
-	static Poco::Redis::AsyncClient _redis;
+	static Poco::Redis::Client _redis;
 
 };
 

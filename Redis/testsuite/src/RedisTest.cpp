@@ -10,11 +10,12 @@
 //
 #include <iostream>
 
-#include "Poco/Net/NetException.h"
+#include "Poco/Exception.h"
 #include "Poco/Delegate.h"
 #include "Poco/Thread.h"
 
 #include "RedisTest.h"
+#include "Poco/Redis/AsyncReader.h"
 
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
@@ -23,7 +24,7 @@ using namespace Poco::Redis;
 
 
 bool RedisTest::_connected = false;
-Poco::Redis::AsyncClient RedisTest::_redis;
+Poco::Redis::Client RedisTest::_redis;
 
 
 RedisTest::RedisTest(const std::string& name):
@@ -35,14 +36,15 @@ RedisTest::RedisTest(const std::string& name):
 	{
 		try
 		{
-			Poco::Timespan t(30, 0); // 30 seconds
+			Poco::Timespan t(10, 0); // Connect within 10 seconds
 			_redis.connect(_host, _port, t);
+			_redis.setReceiveTimeout(t); // Receive answers within 10 seconds
 			_connected = true;
 			std::cout << "Connected to [" << _host << ':' << _port << ']' << std::endl;
 		}
-		catch (Poco::Net::ConnectionRefusedException& e)
+		catch (Poco::Exception& e)
 		{
-			std::cout << "Couldn't connect to " << e.message() << ". " << std::endl;
+			std::cout << "Couldn't connect to [" << _host << ':' << _port << ']' << e.message() << ". " << std::endl;
 		}
 	}
 }
@@ -665,7 +667,7 @@ void RedisTest::testPipeliningWithSendCommands()
 	commands.push_back(ping);
 	commands.push_back(ping);
 
-	Array result = _redis.sendCommands(commands); 
+	Array result = _redis.sendCommands(commands);
 
 	// We expect 2 results
 	assert(result.size() == 2);
@@ -673,7 +675,7 @@ void RedisTest::testPipeliningWithSendCommands()
 	// The 2 results must be simple PONG strings
 	for(size_t i = 0; i < 2; ++i)
 	{
-		try 
+		try
 		{
 			std::string pong = result.get<std::string>(i);
 			assert(pong.compare("PONG") == 0);
@@ -703,7 +705,7 @@ void RedisTest::testPipeliningWithWriteCommand()
 	for(int i = 0; i < 2; ++i)
 	{
 		std::string pong;
-		try 
+		try
 		{
 			_redis.readReply<std::string>(pong);
 			assert(pong.compare("PONG") == 0);
@@ -728,26 +730,30 @@ public:
 
 void RedisTest::testPubSub()
 {
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
 	RedisSubscriber subscriber;
 
 	Array subscribe;
 	subscribe.add("SUBSCRIBE")
 		.add("test");
 
-	Array subscribeReply = _redis.execute<Array>(subscribe);
+	_redis.execute<void>(subscribe);
 
-	_redis.redisResponse += Poco::delegate(&subscriber, &RedisSubscriber::onMessage);
-	_redis.start();
+	AsyncReader reader(_redis);
+	reader.redisResponse += Poco::delegate(&subscriber, &RedisSubscriber::onMessage);
+	reader.start();
 
 	Poco::Thread::sleep(30000);
 
 	Array unsubscribe;
 	unsubscribe.add("UNSUBSCRIBE");
 
-	Array unsubscribeReply = _redis.execute<Array>(unsubscribe);
-	std::cout << "SUBS: " << unsubscribeReply.toString() << std::endl;
-
-	_redis.stop();
+	_redis.execute<void>(unsubscribe);
 }
 
 CppUnit::Test* RedisTest::suite()
