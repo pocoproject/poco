@@ -40,7 +40,7 @@ SplitterChannel::~SplitterChannel()
 }
 
 
-void SplitterChannel::addChannel(Channel* pChannel)
+void SplitterChannel::addChannel(AutoPtr<Channel> pChannel)
 {
 	poco_check_ptr (pChannel);
 
@@ -51,7 +51,7 @@ void SplitterChannel::addChannel(Channel* pChannel)
 }
 
 
-void SplitterChannel::removeChannel(Channel* pChannel)
+void SplitterChannel::removeChannel(AutoPtr<Channel> pChannel)
 {
 	FastMutex::ScopedLock lock(_mutex);
 

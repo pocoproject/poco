@@ -24,6 +24,7 @@
 #include "Poco/Channel.h"
 #include "Poco/Message.h"
 #include "Poco/Format.h"
+#include "Poco/AutoPtr.h"
 #include <map>
 #include <vector>
 #include <cstddef>
@@ -85,10 +86,10 @@ public:
 		/// Returns the name of the logger, which is set as the
 		/// message source on all messages created by the logger.
 
-	void setChannel(Channel* pChannel);
+	void setChannel(AutoPtr<Channel> pChannel);
 		/// Attaches the given Channel to the Logger.
 		
-	Channel* getChannel() const;
+	AutoPtr<Channel> getChannel() const;
 		/// Returns the Channel attached to the logger.
 		
 	void setLevel(int level);
@@ -416,7 +417,7 @@ public:
 		/// Sets the given log level on all loggers that are
 		/// descendants of the Logger with the given name.
 		
-	static void setChannel(const std::string& name, Channel* pChannel);
+	static void setChannel(const std::string& name, AutoPtr<Channel> pChannel);
 		/// Attaches the given Channel to all loggers that are
 		/// descendants of the Logger with the given name.
 
@@ -439,7 +440,7 @@ public:
 		/// The only time this method should be used is during
 		/// program initialization, when only one thread is running.
 		
-	static Logger& create(const std::string& name, Channel* pChannel, int level = Message::PRIO_INFORMATION);
+	static Logger& create(const std::string& name, AutoPtr<Channel> pChannel, int level = Message::PRIO_INFORMATION);
 		/// Creates and returns a reference to a Logger with the
 		/// given name. The Logger's Channel and log level as set as
 		/// specified.
@@ -489,7 +490,7 @@ public:
 protected:
 	typedef std::map<std::string, Logger*> LoggerMap;
 
-	Logger(const std::string& name, Channel* pChannel, int level);
+	Logger(const std::string& name, AutoPtr<Channel> pChannel, int level);
 	~Logger();
 	
 	void log(const std::string& text, Message::Priority prio);
@@ -506,7 +507,7 @@ private:
 	Logger& operator = (const Logger&);
 	
 	std::string _name;
-	Channel*    _pChannel;
+	AutoPtr<Channel>  _pChannel;
 	int         _level;
 
 	static LoggerMap* _pLoggerMap;

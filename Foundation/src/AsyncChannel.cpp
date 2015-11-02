@@ -48,7 +48,7 @@ private:
 };
 
 
-AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio): 
+AsyncChannel::AsyncChannel(AutoPtr<Channel> pChannel, Thread::Priority prio): 
 	_pChannel(pChannel), 
 	_thread("AsyncChannel")
 {
@@ -71,7 +71,7 @@ AsyncChannel::~AsyncChannel()
 }
 
 
-void AsyncChannel::setChannel(Channel* pChannel)
+void AsyncChannel::setChannel(AutoPtr<Channel> pChannel)
 {
 	FastMutex::ScopedLock lock(_channelMutex);
 	
@@ -81,7 +81,7 @@ void AsyncChannel::setChannel(Channel* pChannel)
 }
 
 
-Channel* AsyncChannel::getChannel() const
+AutoPtr<Channel> AsyncChannel::getChannel() const
 {
 	return _pChannel;
 }

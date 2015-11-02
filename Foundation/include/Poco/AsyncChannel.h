@@ -25,6 +25,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Mutex.h"
 #include "Poco/Runnable.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/NotificationQueue.h"
 
 
@@ -42,15 +43,15 @@ class Foundation_API AsyncChannel: public Channel, public Runnable
 	/// then processed by a separate thread.
 {
 public:
-	AsyncChannel(Channel* pChannel = 0, Thread::Priority prio = Thread::PRIO_NORMAL);
+	AsyncChannel(AutoPtr<Channel> pChannel = 0, Thread::Priority prio = Thread::PRIO_NORMAL);
 		/// Creates the AsyncChannel and connects it to
 		/// the given channel.
 
-	void setChannel(Channel* pChannel);
+	void setChannel(AutoPtr<Channel> pChannel);
 		/// Connects the AsyncChannel to the given target channel.
 		/// All messages will be forwarded to this channel.
 		
-	Channel* getChannel() const;
+	AutoPtr<Channel> getChannel() const;
 		/// Returns the target channel.
 
 	void open();
@@ -88,7 +89,7 @@ protected:
 	void setPriority(const std::string& value);
 		
 private:
-	Channel*  _pChannel;
+	AutoPtr<Channel>  _pChannel;
 	Thread    _thread;
 	FastMutex _threadMutex;
 	FastMutex _channelMutex;

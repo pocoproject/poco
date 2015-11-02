@@ -38,7 +38,7 @@ FormattingChannel::FormattingChannel(Formatter* pFormatter):
 }
 
 
-FormattingChannel::FormattingChannel(Formatter* pFormatter, Channel* pChannel): 
+FormattingChannel::FormattingChannel(Formatter* pFormatter, AutoPtr<Channel> pChannel): 
 	_pFormatter(pFormatter), 
 	_pChannel(pChannel)
 {
@@ -68,7 +68,7 @@ Formatter* FormattingChannel::getFormatter() const
 }
 
 
-void FormattingChannel::setChannel(Channel* pChannel)
+void FormattingChannel::setChannel(AutoPtr<Channel> pChannel)
 {
 	if (_pChannel) _pChannel->release();
 	_pChannel = pChannel;
@@ -76,7 +76,7 @@ void FormattingChannel::setChannel(Channel* pChannel)
 }
 
 
-Channel* FormattingChannel::getChannel() const
+AutoPtr<Channel> FormattingChannel::getChannel() const
 {
 	return _pChannel;
 }

@@ -22,6 +22,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Channel.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -42,7 +43,7 @@ public:
 	FormattingChannel(Formatter* pFormatter);
 		/// Creates a FormattingChannel and attaches a Formatter.
 		
-	FormattingChannel(Formatter* pFormatter, Channel* pChannel);
+	FormattingChannel(Formatter* pFormatter, AutoPtr<Channel> pChannel);
 		/// Creates a FormattingChannel and attaches a Formatter
 		/// and a Channel.
 		
@@ -55,11 +56,11 @@ public:
 		/// Returns the Formatter used to format messages,
 		/// which may be null.
 
-	void setChannel(Channel* pChannel);
+	void setChannel(AutoPtr<Channel> pChannel);
 		/// Sets the destination channel to which the formatted 
 		/// messages are passed on.
 		
-	Channel* getChannel() const;
+	AutoPtr<Channel> getChannel() const;
 		/// Returns the channel to which the formatted
 		/// messages are passed on.
 		
@@ -88,7 +89,7 @@ protected:
 
 private:
 	Formatter* _pFormatter;
-	Channel* _pChannel;
+	AutoPtr<Channel> _pChannel;
 };
 
 
