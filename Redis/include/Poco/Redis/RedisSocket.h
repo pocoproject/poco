@@ -52,6 +52,8 @@ public:
 
 	void readLine(std::string& line);
 
+	void setReceiveTimeout(const Timespan& timeout);
+
 private:
 
 	RedisSocket(RedisSocket& copy);
@@ -64,6 +66,11 @@ private:
 	char* _end;
 };
 
+
+inline void RedisSocket::setReceiveTimeout(const Timespan& timeout)
+{
+	_socket.setReceiveTimeout(timeout);
+}
 
 } }
 
