@@ -25,7 +25,7 @@
 #include "Poco/Nullable.h"
 
 #include "Poco/Redis/Redis.h"
-#include "Poco/Redis/RedisSocket.h"
+#include "Poco/Redis/RedisStream.h"
 
 namespace Poco {
 namespace Redis {
@@ -52,7 +52,7 @@ public:
 
 	virtual int type() const = 0;
 
-	virtual void read(RedisSocket& socket) = 0;
+	virtual void read(RedisInputStream& input) = 0;
 
 	virtual std::string toString() const = 0;
 
@@ -192,7 +192,7 @@ public:
 		return ElementTraits<T>::TypeId;
 	}
 
-	virtual void read(RedisSocket& socket);
+	virtual void read(RedisInputStream& socket);
 
 	virtual std::string toString() const
 	{
@@ -215,37 +215,35 @@ private:
 };
 
 template<> inline
-void Type<Int64>::read(RedisSocket& socket)
+void Type<Int64>::read(RedisInputStream& input)
 {
-	std::string number;
-	socket.readLine(number);
+	std::string number = input.getline();
 	_value = NumberParser::parse64(number);
 }
 
 template<> inline
-void Type<std::string>::read(RedisSocket& socket)
+void Type<std::string>::read(RedisInputStream& input)
 {
 	_value.clear();
-	socket.readLine(_value);
+	_value = input.getline();
 }
 
 template<> inline
-void Type<BulkString>::read(RedisSocket& socket)
+void Type<BulkString>::read(RedisInputStream& input)
 {
 	_value.clear();
 
-	std::string line;
-	socket.readLine(line);
-
+	std::string line = input.getline();
 	int length = NumberParser::parse64(line);
 
 	if ( length >= 0 )
 	{
 		std::string s;
-		socket.read(length, s);
+		s.resize(length, ' ');
+		input.read(&*s.begin(), length);
 		_value.assign(s);
 
-		socket.readLine(line);
+		line = input.getline();
 	}
 
 }

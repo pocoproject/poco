@@ -25,7 +25,7 @@
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/Array.h"
 #include "Poco/Redis/Error.h"
-#include "Poco/Redis/RedisSocket.h"
+#include "Poco/Redis/RedisStream.h"
 
 namespace Poco {
 namespace Redis {
@@ -52,8 +52,6 @@ class Redis_API Client
 	///   }
 {
 public:
-	typedef Poco::SharedPtr<Client> Ptr;
-
 	Client();
 		/// Default constructor. Use this when you want to
 		/// connect later on.
@@ -98,7 +96,7 @@ public:
 		/// Disconnects from the Redis server.
 
 	template<typename T>
-	T execute(const Array& command)
+	T execute(const Array& command, bool flush = true)
 		/// Sends the Redis Command to the server. It gets the reply
 		/// and tries to convert it to the given template type.
 		/// A specialization exists for type void, which doesn't read
@@ -108,12 +106,21 @@ public:
 		/// converted. Supported types are Int64, std::string, BulkString,
 		/// Array and void. When the reply is an Error, it will throw
 		/// a RedisException.
+		///
+		/// The flush argument only makes sense when using for type void.
+		/// When flush is false, the commands are build in a buffer and stays
+		/// there until flush is called or when a command is executed with
+		/// flush set to true.
 	{
 		T result;
-		writeCommand(command);
+		writeCommand(command, true);
 		readReply(result);
 		return result;
 	}
+
+	void flush();
+		/// Flush the output buffer to Redis. Use this when commands
+		/// are stored in the buffer to send them all at once to Redis.
 
 	RedisType::Ptr sendCommand(const Array& command);
 		/// Sends a Redis command to the server and returns the reply.
@@ -151,19 +158,21 @@ private:
 	Client& operator = (const Client&);
 
 	Net::SocketAddress _address;
-	RedisSocket _socket;
+	Net::StreamSocket _socket;
 
 	void connect();
 		/// Connects to the Redis server
 	void connect(const Timespan& timeout);
 		/// Connects to the Redis server and sets a timeout.
 
-	void writeCommand(const Array& command);
+	void writeCommand(const Array& command, bool flush);
 		/// Sends a request to the Redis server. Use readReply to get the
 		/// answer. Can also be used for pipelining commands. Make sure you
 		/// call readReply as many times as you called writeCommand, even when
 		/// an error occurred on a command.
 
+	RedisInputStream* _input;
+	RedisOutputStream* _output;
 };
 
 
@@ -173,9 +182,15 @@ inline Net::SocketAddress Client::address() const
 }
 
 template<> inline
-void Client::execute<void>(const Array& command)
+void Client::execute<void>(const Array& command, bool flush)
 {
-	writeCommand(command);
+	writeCommand(command, flush);
+}
+
+inline void Client::flush()
+{
+	poco_assert(!_output);
+	_output->flush();
 }
 
 inline void Client::setReceiveTimeout(const Timespan& timeout)

@@ -225,23 +225,21 @@ struct ElementTraits<Array>
 };
 
 template<> inline
-void Type<Array>::read(RedisSocket& socket)
+void Type<Array>::read(RedisInputStream& input)
 {
-	std::string line;
-	socket.readLine(line);
-	Int64 length = NumberParser::parse64(line);
+	Int64 length = NumberParser::parse64(input.getline());
 
 	if ( length != -1 )
 	{
 		for(int i = 0; i < length; ++i)
 		{
-			char marker = socket.get();
+			char marker = input.get();
 			RedisType::Ptr element = Type::createRedisType(marker);
 
 			if ( element.isNull() )
 				throw RedisException("Wrong answer received from Redis server");
 
-			element->read(socket);
+			element->read(input);
 			_value.add(element);
 		}
 	}

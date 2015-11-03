@@ -22,24 +22,24 @@ namespace Poco {
 namespace Redis {
 
 
-Client::Client() : _address(), _socket()
+Client::Client() : _address(), _socket(), _input(0), _output(0)
 {
 }
 
 
-Client::Client(const std::string& hostAndPort) : _address(hostAndPort), _socket()
-{
-	connect();
-}
-
-
-Client::Client(const std::string& host, int port) : _address(host, port), _socket()
+Client::Client(const std::string& hostAndPort) : _address(hostAndPort), _socket(), _input(0), _output(0)
 {
 	connect();
 }
 
 
-Client::Client(const Net::SocketAddress& addrs) : _address(addrs), _socket()
+Client::Client(const std::string& host, int port) : _address(host, port), _socket(), _input(0), _output(0)
+{
+	connect();
+}
+
+
+Client::Client(const Net::SocketAddress& addrs) : _address(addrs), _socket(), _input(0), _output(0)
 {
 	connect();
 }
@@ -47,12 +47,19 @@ Client::Client(const Net::SocketAddress& addrs) : _address(addrs), _socket()
 
 Client::~Client()
 {
+	delete _input;
+	delete _output;
 }
 
 
 void Client::connect()
 {
+	poco_assert(! _input);
+	poco_assert(! _output);
+
 	_socket.connect(_address);
+	_input = new RedisInputStream(_socket);
+	_output = new RedisOutputStream(_socket);
 }
 
 void Client::connect(const std::string& hostAndPort)
@@ -77,7 +84,12 @@ void Client::connect(const Net::SocketAddress& addrs)
 
 void Client::connect(const Timespan& timeout)
 {
+	poco_assert(! _input);
+	poco_assert(! _output);
+
 	_socket.connect(_address, timeout);
+	_input = new RedisInputStream(_socket);
+	_output = new RedisOutputStream(_socket);
 }
 
 void Client::connect(const std::string& hostAndPort, const Timespan& timeout)
@@ -102,31 +114,38 @@ void Client::connect(const Net::SocketAddress& addrs, const Timespan& timeout)
 
 void Client::disconnect()
 {
+	delete _input;
+	_input = 0;
+
+	delete _output;
+	_output = 0;
+
 	_socket.close();
 }
 
-void Client::writeCommand(const Array& command)
+void Client::writeCommand(const Array& command, bool flush)
 {
 	std::string commandStr = command.toString();
-	_socket.write(commandStr.c_str(), commandStr.length());
+	_output->write(commandStr.c_str(), commandStr.length());
+	if ( flush ) _output->flush();
 }
 
 RedisType::Ptr Client::readReply()
 {
-	RedisType::Ptr result = RedisType::createRedisType(_socket.get());
+	RedisType::Ptr result = RedisType::createRedisType(_input->get());
 	if ( result.isNull() )
 	{
 		throw RedisException("Invalid Redis type returned");
 	}
 
-	result->read(_socket);
+	result->read(*_input);
 
 	return result;
 }
 
 RedisType::Ptr Client::sendCommand(const Array& command)
 {
-	writeCommand(command);
+	writeCommand(command, true);
 	return readReply();
 }
 
@@ -136,8 +155,9 @@ Array Client::sendCommands(const std::vector<Array>& commands)
 
 	for(std::vector<Array>::const_iterator it = commands.begin(); it != commands.end(); ++it)
 	{
-		writeCommand(*it);
+		writeCommand(*it, false);
 	}
+	_output->flush();
 
 	for(int i = 0; i < commands.size(); ++i)
 	{

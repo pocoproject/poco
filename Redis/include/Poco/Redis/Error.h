@@ -65,14 +65,9 @@ struct ElementTraits<Error>
 
 
 template<> inline
-void Type<Error>::read(RedisSocket& socket)
+void Type<Error>::read(RedisInputStream& input)
 {
-	std::string s;
-	socket.readLine(s);
-
-	std::cout << s << std::endl;
-
-	_value = s;
+	_value = input.getline();
 }
 
 }} // Namespace Poco::Redis
