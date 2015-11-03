@@ -235,7 +235,12 @@ void ODBCStatementImpl::doBind()
 void ODBCStatementImpl::bindImpl()
 {
 	doBind();
+	execImpl();
+}
 
+
+void ODBCStatementImpl::execImpl()
+{
 	SQLRETURN rc = SQLExecute(_stmt);
 
 	if (SQL_NEED_DATA == rc) putData();

@@ -54,7 +54,8 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 	_curDataSet(0),
 	_pendingDSNo(0),
 	_bulkBinding(BULK_UNDEFINED),
-	_bulkExtraction(BULK_UNDEFINED)
+	_bulkExtraction(BULK_UNDEFINED),
+	_insertHint(false)
 {
 	if (!_rSession.isConnected())
 		throw NotConnectedException(_rSession.connectionString());
@@ -103,7 +104,7 @@ std::size_t StatementImpl::execute(const bool& reset)
 	_pendingDSNo = pds;
 
 	if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
-		_state = ST_DONE;
+		_state = _insertHint ? ST_PAUSED : ST_DONE;
 
 	assignSubTotal(reset, savedDs);
 
@@ -209,6 +210,15 @@ void StatementImpl::bind()
 			else _state = ST_DONE;
 		}
 	}
+	else if (_insertHint && _state == ST_PAUSED)
+	{
+		execImpl();
+	}
+}
+
+
+void StatementImpl::execImpl()
+{
 }
 
 
@@ -476,6 +486,12 @@ void StatementImpl::formatSQL(std::vector<Any>& arguments)
 	Poco::format(sql, _ostr.str(), arguments);
 	_ostr.str("");
 	_ostr << sql;
+}
+
+
+void StatementImpl::insertHint()
+{
+	_insertHint = true;
 }
 
 
