@@ -167,7 +167,7 @@ struct ElementTraits<BulkString>
 
 
 template<typename T>
-class Redis_API Type : public RedisType
+class Type : public RedisType
 {
 public:
 
