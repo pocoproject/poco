@@ -76,6 +76,7 @@ Session SessionPool::get()
 		{
 			Session newSession(SessionFactory::instance().create(_connector, _connectionString));
 			applySettings(newSession.impl());
+			customizeSession(newSession);
 
 			PooledSessionHolderPtr pHolder(new PooledSessionHolder(*this, newSession.impl()));
 			_idleSessions.push_front(pHolder);
@@ -218,6 +219,11 @@ void SessionPool::applySettings(SessionImpl* pImpl)
 	PropertyMap::Iterator pmIt = _propertyMap.begin();
 	PropertyMap::Iterator pmEnd = _propertyMap.end();
 	for (; pmIt != pmEnd; ++pmIt) pImpl->setProperty(pmIt->first, pmIt->second);
+}
+
+
+void SessionPool::customizeSession(Session&)
+{
 }
 
 
