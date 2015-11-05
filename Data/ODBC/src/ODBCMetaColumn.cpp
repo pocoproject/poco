@@ -93,6 +93,7 @@ void ODBCMetaColumn::init()
 	case SQL_WCHAR:
 	case SQL_WVARCHAR:
 	case SQL_WLONGVARCHAR:
+	case -350:	// IBM DB2 CLOB, which long unicode string
 		setType(MetaColumn::FDT_WSTRING); break;
 	
 	case SQL_TINYINT:
@@ -161,8 +162,12 @@ void ODBCMetaColumn::init()
 	case SQL_VARBINARY:
 	case SQL_LONGVARBINARY:
 	case -98:// IBM DB2 non-standard type
+	case -370: // IBM DB2 XML, documentation advises to bind it as BLOB, not CLOB
 		setType(MetaColumn::FDT_BLOB); break;
-	
+
+	case -99: // IBM DB2 CLOB
+		setType(MetaColumn::FDT_CLOB); break;
+
 	case SQL_TYPE_DATE:
 		setType(MetaColumn::FDT_DATE); break;
 	
