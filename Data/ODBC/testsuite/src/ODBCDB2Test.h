@@ -41,6 +41,7 @@ public:
 	void testStoredProcedureAny();
 	void testStoredProcedureDynamicAny();
 	void testStoredFunction();
+	void testXMLColumn();
 
 	static CppUnit::Test* suite();
 
