@@ -320,7 +320,11 @@ inline const Dynamic::Var& Object::getValue(ValueMap::const_iterator& it) const
 
 inline const Dynamic::Var& Object::getValue(KeyPtrList::const_iterator& it) const
 {
-	return _values.at(**it);
+	ValueMap::const_iterator itv = _values.find(**it);
+	if (itv != _values.end())
+		return itv->second;
+	else
+		throw Poco::NotFoundException();
 }
 
 
