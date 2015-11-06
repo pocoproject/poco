@@ -39,14 +39,14 @@ SHAREDLIBLINKEXT = .so
 # Compiler and Linker Flags
 #
 CFLAGS          = 
-CFLAGS32        =
-CFLAGS64        =
+CFLAGS32        = -m32
+CFLAGS64        = -m64
 CXXFLAGS        = -Wall -Wno-sign-compare
-CXXFLAGS32      =
-CXXFLAGS64      =
+CXXFLAGS32      = -m32
+CXXFLAGS64      = -m64
 LINKFLAGS       =
-LINKFLAGS32     =
-LINKFLAGS64     =
+LINKFLAGS32     = -m32
+LINKFLAGS64     = -m64
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  = -static
