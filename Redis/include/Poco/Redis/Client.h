@@ -96,7 +96,7 @@ public:
 		/// Disconnects from the Redis server.
 
 	template<typename T>
-	T execute(const Array& command, bool flush = true)
+	T execute(const Array& command)
 		/// Sends the Redis Command to the server. It gets the reply
 		/// and tries to convert it to the given template type.
 		/// A specialization exists for type void, which doesn't read
@@ -106,11 +106,6 @@ public:
 		/// converted. Supported types are Int64, std::string, BulkString,
 		/// Array and void. When the reply is an Error, it will throw
 		/// a RedisException.
-		///
-		/// The flush argument only makes sense when using for type void.
-		/// When flush is false, the commands are build in a buffer and stays
-		/// there until flush is called or when a command is executed with
-		/// flush set to true.
 	{
 		T result;
 		writeCommand(command, true);
@@ -182,14 +177,14 @@ inline Net::SocketAddress Client::address() const
 }
 
 template<> inline
-void Client::execute<void>(const Array& command, bool flush)
+void Client::execute<void>(const Array& command)
 {
-	writeCommand(command, flush);
+	writeCommand(command, false);
 }
 
 inline void Client::flush()
 {
-	poco_assert(!_output);
+	poco_assert(_output);
 	_output->flush();
 }
 

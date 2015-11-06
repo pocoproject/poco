@@ -700,6 +700,7 @@ void RedisTest::testPipeliningWithWriteCommand()
 
 	_redis.execute<void>(ping);
 	_redis.execute<void>(ping);
+	_redis.flush();
 
 	// We expect 2 results with simple "PONG" strings
 	for(int i = 0; i < 2; ++i)
@@ -743,6 +744,7 @@ void RedisTest::testPubSub()
 		.add("test");
 
 	_redis.execute<void>(subscribe);
+	_redis.flush();
 
 	AsyncReader reader(_redis);
 	reader.redisResponse += Poco::delegate(&subscriber, &RedisSubscriber::onMessage);
@@ -754,6 +756,7 @@ void RedisTest::testPubSub()
 	unsubscribe.add("UNSUBSCRIBE");
 
 	_redis.execute<void>(unsubscribe);
+	_redis.flush();
 }
 
 CppUnit::Test* RedisTest::suite()
