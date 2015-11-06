@@ -68,6 +68,7 @@ public:
 		/// Adds an array.
 
 	Array& addSimpleString(const std::string& value);
+		/// Adds a simple string (can't contain newline characters!)
 
 	const_iterator begin() const;
 		/// Returns an iterator to the start of the array. Note:
