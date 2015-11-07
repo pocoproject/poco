@@ -132,12 +132,17 @@ public:
 		/// the reply is not of the given type.
 	{
 		RedisType::Ptr redisResult = readReply();
-		if ( redisResult->type() == ElementTraits<Error>::TypeId )
+		if (redisResult->type() == ElementTraits<Error>::TypeId)
 		{
-			throw RedisException(((Error*) redisResult.get())->getMessage());
+			Type<Error>* error = dynamic_cast<Type<Error>*>(redisResult.get());
+			throw RedisException(error->value().getMessage());
 		}
-		if ( redisResult->type() == ElementTraits<T>::TypeId )
-			result = ((Type<T>*) redisResult.get())->value();
+		
+		if (redisResult->type() == ElementTraits<T>::TypeId)
+		{
+			Type<T>* type = dynamic_cast<Type<T>*>(redisResult.get());
+			if (type != NULL) result = type->value();
+		}
 		else throw BadCastException();
 	}
 
