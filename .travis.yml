@@ -42,14 +42,14 @@ matrix:
     - env:    TEST_NAME="gcc (CMake)"
       compiler: gcc
       script:
-        - sudo apt-get install -qq -y cmake3
+        - sudo apt-get install -qq -y cmake3 --no-check-certificate
         # disable tests, gcc-4.6 gets an internal compiler error
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -j2 && cd ..
 
     - env:    TEST_NAME="gcc-4.8 (CMake)"
       compiler: gcc
       script:
-        - sudo apt-get install -qq -y cmake3
+        - sudo apt-get install -qq -y cmake3 --no-check-certificate
         - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         - sudo apt-get update -qq
         - sudo apt-get install -qq -y g++-4.8
@@ -60,19 +60,19 @@ matrix:
     - env:    TEST_NAME="clang (CMake)"
       compiler: clang
       script:
-        - sudo apt-get install -qq -y cmake3
+        - sudo apt-get install -qq -y cmake3 --no-check-certificate
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
     - env:    TEST_NAME="arm-linux-gnueabi-g++ (CMake)"
       script:
-        - sudo apt-get install -qq -y cmake3
+        - sudo apt-get install -qq -y cmake3 --no-check-certificate
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
     - env:    TEST_NAME="arm-linux-gnueabihf-g++ (CMake)"
       script:
-        - sudo apt-get install -qq -y cmake3
+        - sudo apt-get install -qq -y cmake3 --no-check-certificate
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
