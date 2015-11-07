@@ -22,6 +22,7 @@
 
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/Client.h"
+#include "Poco/Redis/RedisEventArgs.h"
 #include "Poco/Activity.h"
 
 namespace Poco {
@@ -37,8 +38,10 @@ class Redis_API AsyncReader
 {
 public:
 
-	BasicEvent<RedisType::Ptr> redisResponse;
+	BasicEvent<RedisEventArgs> redisResponse;
 		/// Event that is called when a message is received
+	BasicEvent<RedisEventArgs> redisException;
+		/// Event that is called when an error occurred.
 
 	AsyncReader(Client& client);
 		/// Constructor.

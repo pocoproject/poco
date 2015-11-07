@@ -40,16 +40,19 @@ void AsyncReader::runActivity()
 		try
 		{
 			RedisType::Ptr reply = _client.readReply();
-			redisResponse.notify(this, reply);
+
+			RedisEventArgs args(reply);
+			redisResponse.notify(this, args);
+
+			if ( args.isStopped() ) stop();
 		}
-		catch(TimeoutException&)
+		catch(Exception& e)
 		{
-			continue;
-		}
-		catch(Exception &)
-		{
+			RedisEventArgs args(&e);
+			redisException.notify(this, args);
 			stop();
 		}
+		if (!_activity.isStopped()) Thread::trySleep(100);
 	}
 }
 
