@@ -125,14 +125,20 @@ void Client::disconnect()
 
 void Client::writeCommand(const Array& command, bool flush)
 {
+	poco_assert(_output);
+
 	std::string commandStr = command.toString();
+
 	_output->write(commandStr.c_str(), commandStr.length());
 	if ( flush ) _output->flush();
 }
 
 RedisType::Ptr Client::readReply()
 {
-	RedisType::Ptr result = RedisType::createRedisType(_input->get());
+	poco_assert(_input);
+
+	int c = _input->get();
+	RedisType::Ptr result = RedisType::createRedisType(c);
 	if ( result.isNull() )
 	{
 		throw RedisException("Invalid Redis type returned");
