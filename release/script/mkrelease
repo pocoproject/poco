@@ -289,10 +289,11 @@ echo 'cleans: $(filter-out $(foreach f,$(OMIT),$f%),$(cleans))' >>${target}/Make
 
 for comp in $comps ;
 do
-	if [ "`grep -c POCO_LICENSING "${POCO_BASE}/${comp}/Makefile"`" != 0 ] ; then
-		dependencies=$licensingDep
-	else
-		dependencies=""
+	dependencies=""
+	if [ -f "${POCO_BASE}/${comp}/Makefile" ] ; then
+		if [ "`grep -c POCO_LICENSING "${POCO_BASE}/${comp}/Makefile"`" != 0 ] ; then
+			dependencies=$licensingDep
+		fi
 	fi
 	if [ -f "${POCO_BASE}/${comp}/dependencies" ] ; then
 		for dep in `cat "${POCO_BASE}/${comp}/dependencies"` ;
