@@ -12,7 +12,7 @@
 				*_*.h,
 				expat*.h,
 				zconf.h,
-				zlib.h,
+				zlib.h
 			</exclude>
 		</files>
 		<pages>
@@ -32,6 +32,7 @@
 			<options>
 				${Includes},
 				-I/usr/local/mysql/include,
+				-I/usr/include/mysql,
 				-D_DEBUG,
 				-E,
 				-C,

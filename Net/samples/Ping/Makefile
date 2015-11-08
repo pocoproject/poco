@@ -12,7 +12,7 @@ objects = Ping
 
 target         = Ping
 target_version = 1
-target_libs    = PocoUtil PocoJSON PocoNet PocoXML PocoFoundation
+target_libs    = PocoUtil PocoJSON PocoNet PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
 

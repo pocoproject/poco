@@ -84,6 +84,11 @@ if [ $osname = "Darwin" ] ; then
 	osarch=`basename $archpath`
 fi
 
+if [ ${osname:0:6} = "CYGWIN" ] ; then
+	osname="CYGWIN"
+	export PATH=$tools/lib/$osname/$osarch:$PATH
+fi
+
 export PATH=$tools/PocoDoc/bin/$osname/$osarch:$PATH
 echo PATH=$PATH
 
