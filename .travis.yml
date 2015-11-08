@@ -5,9 +5,11 @@ cache:
 
 before_install:
   # we need a recent version of CMake
-  - sudo apt-get purge cmake
+  - sudo apt-get autoremove
+  - sudo apt-get clean
   - sudo add-apt-repository -y ppa:andykimpe/cmake3
   - sudo apt-get update
+  - sudo apt-get install -y cmake
   - sudo apt-get install -y unixodbc-dev libmysqlclient-dev g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 sloccount cppcheck 
 
 services:
@@ -43,9 +45,6 @@ matrix:
     - env:    TEST_NAME="gcc (CMake)"
       compiler: gcc
       script:
-        - sudo apt-get install -y software-properties-common
-        - sudo add-apt-repository -y ppa:george-edison55/cmake-3.x
-        - sudo apt-get update
       # disable tests, gcc-4.6 gets an internal compiler error
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -j2 && cd ..
 
