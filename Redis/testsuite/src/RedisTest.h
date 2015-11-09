@@ -40,6 +40,7 @@ public:
 	void testStrlen();
 	void testRPush();
 	void testLIndex();
+	void testLInsert();
 	void testMulti();
 
 	void testPubSub();
