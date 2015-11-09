@@ -52,6 +52,10 @@ public:
 	void compress(bool flag = true);
 		/// Enables or disables compression of archived files.	
 
+	void setArchivePath(const std::string& archivePath);
+		/// Sets the path for archived files.
+                /// If set to empty string the logfiles directory is used.
+
 protected:
 	void moveFile(const std::string& oldName, const std::string& newName);
 	bool exists(const std::string& name);
@@ -59,8 +63,11 @@ protected:
 private:
 	ArchiveStrategy(const ArchiveStrategy&);
 	ArchiveStrategy& operator = (const ArchiveStrategy&);
+        
+        std::string findFile(const std::string& name);
 	
 	bool _compress;
+	std::string _archivePath;
 	ArchiveCompressor* _pCompressor;
 };
 

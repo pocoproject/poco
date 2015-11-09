@@ -224,6 +224,7 @@ public:
 	static const std::string PROP_PATH;
 	static const std::string PROP_ROTATION;
 	static const std::string PROP_ARCHIVE;
+	static const std::string PROP_ARCHIVE_PATH;
 	static const std::string PROP_TIMES;
 	static const std::string PROP_COMPRESS;
 	static const std::string PROP_PURGEAGE;
@@ -235,6 +236,7 @@ protected:
 	~FileChannel();
 	void setRotation(const std::string& rotation);
 	void setArchive(const std::string& archive);
+	void setArchivePath(const std::string& archivePath);
 	void setCompress(const std::string& compress);
 	void setPurgeAge(const std::string& age);
 	void setPurgeCount(const std::string& count);
@@ -247,6 +249,7 @@ private:
 	std::string      _times;
 	std::string      _rotation;
 	std::string      _archive;
+	std::string      _archivePath;
 	bool             _compress;
 	std::string      _purgeAge;
 	std::string      _purgeCount;

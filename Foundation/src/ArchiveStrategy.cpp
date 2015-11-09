@@ -97,47 +97,94 @@ void ArchiveStrategy::compress(bool flag)
 }
 
 
+void ArchiveStrategy::setArchivePath(const std::string& archivePath = "")
+{
+        _archivePath = archivePath;
+}
+
+
 void ArchiveStrategy::moveFile(const std::string& oldPath, const std::string& newPath)
 {
 	bool compressed = false;
-	Path p(oldPath);
-	File f(oldPath);
-	if (!f.exists())
+	File f(findFile(oldPath));
+        Path p(f.path());
+	if (p.getExtension().compare("gz") == 0)
 	{
-		f = oldPath + ".gz";
-		compressed = true;
+                compressed = true;
 	}
-	std::string mvPath(newPath);
-	if (_compress || compressed)
-		mvPath.append(".gz");
+	std::string mvPath;
+        if (_archivePath.empty())
+        {
+                mvPath = newPath;
+        }
+        else
+        {
+                Path archivePath(_archivePath);
+                Path givenPath(newPath);
+                archivePath.setFileName(givenPath.getFileName());
+                mvPath = archivePath.toString();
+        }
 	if (!_compress || compressed)
 	{
+                if (compressed)
+                        mvPath.append(".gz");
 		f.renameTo(mvPath);
 	}
 	else
 	{
-		f.renameTo(newPath);
+		f.renameTo(mvPath);
 		if (!_pCompressor) _pCompressor = new ArchiveCompressor;
-		_pCompressor->compress(newPath);
+		_pCompressor->compress(mvPath);
 	}
 }
 
 
 bool ArchiveStrategy::exists(const std::string& name)
 {
-	File f(name);
+	if (findFile(name).empty())
+	{
+                return false;
+	}
+        return true;
+}
+
+
+std::string ArchiveStrategy::findFile(const std::string& name)
+{
+        File f(name);
 	if (f.exists())
 	{
-		return true;
+		return f.path();
 	}
 	else if (_compress)
-	{
-		std::string gzName(name);
-		gzName.append(".gz");
-		File gzf(gzName);
-		return gzf.exists();
-	}
-	else return false;
+        {
+                f = name + ".gz";
+                if (f.exists())
+                {
+                        return f.path();
+                }
+        }
+        
+        if (!_archivePath.empty())
+        {
+                Path archivePath(_archivePath);
+                Path givenPath(name);
+                archivePath.setFileName(givenPath.getFileName());
+                f = archivePath;
+                if (f.exists())
+                {
+                        return f.path();
+                }
+                else if (_compress)
+                {
+                        f = f.path() + ".gz";
+                        if (f.exists())
+                        {
+                                return f.path();
+                        }
+                }
+        }
+	return "";
 }
 
 

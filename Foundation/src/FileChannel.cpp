@@ -35,6 +35,7 @@ namespace Poco {
 const std::string FileChannel::PROP_PATH         = "path";
 const std::string FileChannel::PROP_ROTATION     = "rotation";
 const std::string FileChannel::PROP_ARCHIVE      = "archive";
+const std::string FileChannel::PROP_ARCHIVE_PATH = "archivePath";
 const std::string FileChannel::PROP_TIMES        = "times";
 const std::string FileChannel::PROP_COMPRESS     = "compress";
 const std::string FileChannel::PROP_PURGEAGE     = "purgeAge";
@@ -42,7 +43,7 @@ const std::string FileChannel::PROP_PURGECOUNT   = "purgeCount";
 const std::string FileChannel::PROP_FLUSH        = "flush";
 const std::string FileChannel::PROP_ROTATEONOPEN = "rotateOnOpen";
 
-FileChannel::FileChannel(): 
+FileChannel::FileChannel():
 	_times("utc"),
 	_compress(false),
 	_flush(true),
@@ -163,6 +164,8 @@ void FileChannel::setProperty(const std::string& name, const std::string& value)
 		setRotation(value);
 	else if (name == PROP_ARCHIVE)
 		setArchive(value);
+	else if (name == PROP_ARCHIVE_PATH)
+		setArchivePath(value);
 	else if (name == PROP_COMPRESS)
 		setCompress(value);
 	else if (name == PROP_PURGEAGE)
@@ -188,6 +191,8 @@ std::string FileChannel::getProperty(const std::string& name) const
 		return _rotation;
 	else if (name == PROP_ARCHIVE)
 		return _archive;
+	else if (name == PROP_ARCHIVE_PATH)
+                return _archivePath;
 	else if (name == PROP_COMPRESS)
 		return std::string(_compress ? "true" : "false");
 	else if (name == PROP_PURGEAGE)
@@ -299,8 +304,17 @@ void FileChannel::setArchive(const std::string& archive)
 	else throw InvalidArgumentException("archive", archive);
 	delete _pArchiveStrategy;
 	pStrategy->compress(_compress);
+	pStrategy->setArchivePath(_archivePath);
 	_pArchiveStrategy = pStrategy;
 	_archive = archive;
+}
+
+
+void FileChannel::setArchivePath(const std::string& archivePath)
+{
+        _archivePath = archivePath;
+	if (_pArchiveStrategy)
+		_pArchiveStrategy->setArchivePath(_archivePath);
 }
 
 
@@ -395,7 +409,14 @@ void FileChannel::purge()
 	{
 		try
 		{
-			_pPurgeStrategy->purge(_path);
+                        if (_archivePath.empty())
+                        {
+                                _pPurgeStrategy->purge(_path);
+                        }
+                        else
+                        {
+                                _pPurgeStrategy->purge(_archivePath);
+                        }
 		}
 		catch (...)
 		{
