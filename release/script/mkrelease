@@ -218,7 +218,35 @@ ifndef POCO_BUILD
 export POCO_BUILD=$(POCO_BASE)
 endif
 
-LIBPREFIX ?= lib
+#
+# Determine OS
+#
+POCO_HOST_OSNAME = $(shell uname)
+ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
+ifeq ($(findstring x86_64,$(POCO_HOST_OSNAME)),x86_64)
+OSARCH_64BITS = 1
+endif
+POCO_HOST_OSNAME = CYGWIN
+endif
+
+ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
+POCO_HOST_OSNAME = MinGW
+endif
+POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
+
+#
+# Determine operating system
+#
+ifndef POCO_TARGET_OSNAME
+OSNAME   := $(POCO_HOST_OSNAME)
+else
+OSNAME   := $(POCO_TARGET_OSNAME)
+endif
+ifndef POCO_TARGET_OSARCH
+OSARCH   := $(POCO_HOST_OSARCH)
+else
+OSARCH   := $(POCO_TARGET_OSARCH)
+endif
 
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
@@ -237,7 +265,7 @@ cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
 
 CppUnit-clean:
-	\$(MAKE) -C \$(POCO_BASE)/CppUnit clean
+	$(MAKE) -C $(POCO_BASE)/CppUnit clean
 
 install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
@@ -251,8 +279,12 @@ install: libexecs
 			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -f {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-	find $(POCO_BUILD)/lib -name "$(LIBPREFIX)Poco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
-	find $(POCO_BUILD)/lib -name "$(LIBPREFIX)Poco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+ifeq ($(OSNAME), CYGWIN)
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
+endif
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
 ENDOFSCRIPT
 
