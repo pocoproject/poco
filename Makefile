@@ -65,7 +65,7 @@ cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
 
 CppUnit-clean:
-	\$(MAKE) -C \$(POCO_BASE)/CppUnit clean
+	$(MAKE) -C $(POCO_BASE)/CppUnit clean
 
 install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
