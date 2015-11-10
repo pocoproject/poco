@@ -14,13 +14,6 @@
 # usage: mkdoc [-l <perforce-label>] [<specfile>]
 #
 
-osname=`uname -s | tr ' ' '_'`
-osarch=`uname -m | tr ' ' '_'`
-
-if [ ${osname:0:6} = "CYGWIN" ] ; then
-	osname="CYGWIN"
-fi
-
 if [ "$POCO_BASE" = "" ] ; then
   echo "Error: POCO_BASE not set."
   exit 1
@@ -66,14 +59,6 @@ if [ "$version" = "" ] ; then
 fi
 release=$version$tag
 
-if [ ! -f libversion ] ; then
-  echo "Error: No libversion file found."
-  exit 2
-fi
-if [ "$libversion" = "" ] ; then
-	read libversion <$POCO_BASE/libversion
-fi
-
 #
 # Build release
 #
@@ -89,24 +74,15 @@ cd $tools
 ./configure --no-tests --no-samples
 make -s -j8
 
-if [ $osname = "CYGWIN" ] ; then
-    find $tools -type f -name "*.$libversion.dll" > $TMP/dlls
-    rebase -O -T $TMP/dlls
-    rm $TMP/dlls
-fi
-
 cd $POCO_BASE
+
+osname=`uname -s | tr ' ' '_'`
+osarch=`uname -m | tr ' ' '_'`
 
 if [ $osname = "Darwin" ] ; then
 	archpath=`dirname stage/tools/PocoDoc/bin/Darwin/*/PocoDoc`
 	osarch=`basename $archpath`
 fi
-
-if [ $osname = "CYGWIN" ] ; then
-#   Poco dlls must be on PATH for Cygwin
-    export PATH=$tools/lib/$osname/$osarch:$PATH
-fi
-
 
 export PATH=$tools/PocoDoc/bin/$osname/$osarch:$PATH
 echo PATH=$PATH

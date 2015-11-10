@@ -22,36 +22,6 @@ endif
 
 LIBPREFIX ?= lib
 
-#
-# Determine OS
-#
-POCO_HOST_OSNAME = $(shell uname)
-ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
-ifeq ($(findstring x86_64,$(POCO_HOST_OSNAME)),x86_64)
-OSARCH_64BITS = 1
-endif
-POCO_HOST_OSNAME = Cygwin
-endif
-
-ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
-POCO_HOST_OSNAME = MinGW
-endif
-POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
-
-#
-# Determine operating system
-#
-ifndef POCO_TARGET_OSNAME
-OSNAME   := $(POCO_HOST_OSNAME)
-else
-OSNAME   := $(POCO_TARGET_OSNAME)
-endif
-ifndef POCO_TARGET_OSARCH
-OSARCH   := $(POCO_HOST_OSARCH)
-else
-OSARCH   := $(POCO_TARGET_OSARCH)
-endif
-
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
 # TESTS and SAMPLES are set in config.make
@@ -79,12 +49,8 @@ install: libexecs
 			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -f {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-ifeq ($(OSNAME), Cygwin)
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
-endif
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib -name "$(LIBPREFIX)Poco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib -name "$(LIBPREFIX)Poco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
 libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec MongoDB-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec
 tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests MongoDB-tests Zip-tests CppParser-tests PDF-tests
