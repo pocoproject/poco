@@ -46,7 +46,6 @@ matrix:
     - env:    TEST_NAME="gcc (CMake)"
       compiler: gcc
       script:
-        - sudo apt-get install -qq -y cmake3
         # disable tests, gcc-4.6 gets an internal compiler error
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -j2 && cd ..
 
