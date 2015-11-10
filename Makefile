@@ -20,8 +20,6 @@ ifndef POCO_BUILD
 export POCO_BUILD=$(POCO_BASE)
 endif
 
-LIBPREFIX ?= lib
-
 #
 # Determine OS
 #
@@ -30,7 +28,7 @@ ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
 ifeq ($(findstring x86_64,$(POCO_HOST_OSNAME)),x86_64)
 OSARCH_64BITS = 1
 endif
-POCO_HOST_OSNAME = Cygwin
+POCO_HOST_OSNAME = CYGWIN
 endif
 
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
@@ -79,7 +77,7 @@ install: libexecs
 			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -f {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-ifeq ($(OSNAME), Cygwin)
+ifeq ($(OSNAME), CYGWIN)
 	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
 	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
 endif
