@@ -3,7 +3,7 @@
 #
 # CYGWIN
 #
-# Make settings for Cygwin on WinXP/gcc 3.4
+# Make settings for Cygwin
 #
 #
 
@@ -36,15 +36,19 @@ LIBPREFIX        = cyg
 SHAREDLIBEXT     = .$(target_version).dll
 SHAREDLIBLINKEXT = .dll
 
+IMPPREFIX        = lib
+IMPLIBEXT        = -$(target_version).dll.a
+IMPLIBLINKEXT    = .dll.a
+
 #
 # Compiler and Linker Flags
 #
 CFLAGS          = 
-CFLAGS32        =
-CFLAGS64        =
-CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SHAREDMEMORY
+CFLAGS32        = -O2 -pipe -Wimplicit-function-declaration
+CFLAGS64        = -Wa,-mbig-obj
+CXXFLAGS        = -O2 -pipe -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_SHAREDMEMORY
 CXXFLAGS32      =
-CXXFLAGS64      =
+CXXFLAGS64      = -Wa,-mbig-obj
 LINKFLAGS       =
 LINKFLAGS32     =
 LINKFLAGS64     =
@@ -52,8 +56,8 @@ STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  = -static
 SHAREDOPT_CC    = 
-SHAREDOPT_CXX   = 
-SHAREDOPT_LINK  = 
+SHAREDOPT_CXX   = -frepo
+SHAREDOPT_LINK  = -frepo
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
@@ -65,6 +69,11 @@ RELEASEOPT_LINK =
 # System Specific Flags
 #
 SYSFLAGS = -D_XOPEN_SOURCE=500
+
+# give visibility of old BSD typedef like u_short, u_int, u_long...
+# used in some networking system includes, need when using PocoNet
+SYSFLAGS += -D__BSD_VISIBLE
+
 
 #
 # System Specific Libraries

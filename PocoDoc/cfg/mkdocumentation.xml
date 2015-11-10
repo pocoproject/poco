@@ -33,6 +33,7 @@
 			<options>
 				${Includes},
 				-I/usr/local/mysql/include,
+				-I/usr/include/mysql,
 				-D_DEBUG,
 				-E,
 				-C,

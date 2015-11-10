@@ -16,11 +16,13 @@
 #include "Poco/TimedNotificationQueue.h"
 #include "Poco/Notification.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Clock.h"
 
 
 using Poco::TimedNotificationQueue;
 using Poco::Notification;
 using Poco::Timestamp;
+using Poco::Clock;
 
 
 namespace 
@@ -71,13 +73,13 @@ void TimedNotificationQueueTest::testDequeue()
 	assert (queue.size() == 0);
 	pNf->release();
 	
-	Poco::Timestamp ts1;
+	Poco::Clock ts1;
 	ts1 += 100000;
-	Poco::Timestamp ts2;
+	Poco::Clock ts2;
 	ts2 += 200000;
-	Poco::Timestamp ts3;
+	Poco::Clock ts3;
 	ts3 += 300000;
-	Poco::Timestamp ts4;
+	Poco::Clock ts4;
 	ts4 += 400000;
 	
 	queue.enqueueNotification(new QTestNotification("first"), ts1);
