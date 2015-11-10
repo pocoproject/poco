@@ -50,6 +50,17 @@ class Redis_API Client
 	///   {
 	///      // We have a string value
 	///   }
+	///
+	/// To create Redis commands, the factory methods of the Command class can
+	/// be used or the Array class can be used directly.
+	///
+	///   Command llen = Command::llen("list");
+	///
+	/// is the same as
+	///
+	///   Array command;
+	///   command.add("LLEN").add("list");
+	///
 {
 public:
 	Client();
@@ -137,7 +148,7 @@ public:
 			Type<Error>* error = dynamic_cast<Type<Error>*>(redisResult.get());
 			throw RedisException(error->value().getMessage());
 		}
-		
+
 		if (redisResult->type() == ElementTraits<T>::TypeId)
 		{
 			Type<T>* type = dynamic_cast<Type<T>*>(redisResult.get());
