@@ -48,6 +48,9 @@ if (POCO_UNBUNDLED)
 	find_package(ZLIB REQUIRED)
 	set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
 	include_directories(${ZLIB_INCLUDE_DIRS})
+
+	add_definitions(-DPOCO_UNBUNDLED)
+
 else()
 	# pcre
 	POCO_SOURCES( SRCS pcre
