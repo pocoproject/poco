@@ -46,6 +46,7 @@ pcre_utf8_objects = pcre_ucd pcre_tables
 
 ifdef POCO_UNBUNDLED
 	SYSLIBS += -lpcre -lz
+	objects += $(pcre_utf8_objects)
 else
 	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects)
 endif
