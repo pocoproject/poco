@@ -44,9 +44,9 @@ IMPLIBLINKEXT    = .dll.a
 # Compiler and Linker Flags
 #
 CFLAGS          = 
-CFLAGS32        = -O2 -pipe -Wimplicit-function-declaration
+CFLAGS32        = 
 CFLAGS64        = -Wa,-mbig-obj
-CXXFLAGS        = -O2 -pipe -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_SHAREDMEMORY
+CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_SHAREDMEMORY
 CXXFLAGS32      =
 CXXFLAGS64      = -Wa,-mbig-obj
 LINKFLAGS       =
@@ -56,8 +56,8 @@ STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  = -static
 SHAREDOPT_CC    = 
-SHAREDOPT_CXX   = -frepo
-SHAREDOPT_LINK  = -frepo
+SHAREDOPT_CXX   = 
+SHAREDOPT_LINK  = 
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
