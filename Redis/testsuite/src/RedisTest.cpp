@@ -140,6 +140,59 @@ void RedisTest::testAppend()
 	}
 }
 
+void RedisTest::testDecr()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Command set = Command::set("mykey", 10);
+	try
+	{
+		std::string result = _redis.execute<std::string>(set);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+
+	Command decr = Command::decr("mykey");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(decr);
+		assert(result == 9);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+
+	set = Command::set("mykey", "234293482390480948029348230948");
+	try
+	{
+		std::string result = _redis.execute<std::string>(set);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(decr);
+		fail("This must fail");
+	}
+	catch(RedisException& e)
+	{
+		// ERR value is not an integer or out of range
+	}
+
+}
+
 void RedisTest::testEcho()
 {
 	if (!_connected)
@@ -157,6 +210,66 @@ void RedisTest::testEcho()
 		BulkString result = _redis.execute<BulkString>(command);
 		assert(!result.isNull());
 		assert(result.value().compare("Hello World") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testError()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array command;
+	command.add("Wrong Command");
+
+	try
+	{
+		BulkString result = _redis.execute<BulkString>(command);
+		fail("Invalid command must throw RedisException");
+	}
+	catch(RedisException &e)
+	{
+		// Must fail
+	}
+}
+
+void RedisTest::testSet()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array command;
+	command.add("SET")
+		.add("mykey")
+		.add("Hello");
+
+	// A set responds with a simple OK string
+	try
+	{
+		std::string result = _redis.execute<std::string>(command);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	command.add("NX");
+	// A set NX responds with a Null bulk string
+	// when the key is already set
+	try
+	{
+		BulkString result = _redis.execute<BulkString>(command);
+		assert(result.isNull());
 	}
 	catch(RedisException &e)
 	{
@@ -265,44 +378,6 @@ void RedisTest::testPing()
 
 }
 
-void RedisTest::testSet()
-{
-	if (!_connected)
-	{
-		std::cout << "Not connected, test skipped." << std::endl;
-		return;
-	}
-
-	Array command;
-	command.add("SET")
-		.add("mykey")
-		.add("Hello");
-
-	// A set responds with a simple OK string
-	try
-	{
-		std::string result = _redis.execute<std::string>(command);
-		assert(result.compare("OK") == 0);
-	}
-	catch(RedisException &e)
-	{
-		fail(e.message());
-	}
-
-	command.add("NX");
-	// A set NX responds with a Null bulk string
-	// when the key is already set
-	try
-	{
-		BulkString result = _redis.execute<BulkString>(command);
-		assert(result.isNull());
-	}
-	catch(RedisException &e)
-	{
-		fail(e.message());
-	}
-}
-
 void RedisTest::testMSet()
 {
 	if (!_connected)
@@ -357,6 +432,62 @@ void RedisTest::testMSet()
 		fail(e.message());
 	}
 }
+
+void RedisTest::testMSetWithMap()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	std::map<std::string, std::string> keyValuePairs;
+	keyValuePairs.insert(std::make_pair<std::string, std::string>("key1", "Hello"));
+	keyValuePairs.insert(std::make_pair<std::string, std::string>("key2", "World"));
+
+	Command mset = Command::mset(keyValuePairs);
+
+	// A MSET responds with a simple OK string
+	try
+	{
+		std::string result = _redis.execute<std::string>(mset);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	std::vector<std::string> keys;
+	keys.push_back("key1");
+	keys.push_back("key2");
+	keys.push_back("nonexisting");
+
+	Command mget = Command::mget(keys);
+	try
+	{
+		Array result = _redis.execute<Array>(mget);
+
+		assert(result.size() == 3);
+		BulkString value = result.get<BulkString>(0);
+		assert(value.value().compare("Hello") == 0);
+
+		value = result.get<BulkString>(1);
+		assert(value.value().compare("World") == 0);
+
+		value = result.get<BulkString>(2);
+		assert(value.isNull());
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+}
+
 
 void RedisTest::testStrlen()
 {
@@ -561,8 +692,6 @@ void RedisTest::testLInsert()
 		Array range = _redis.execute<Array>(lrange);
 		assert(range.size() == 3);
 
-		std::cout << range.toString() << std::endl;
-
 		assert(range.get<BulkString>(0).value().compare("Hello") == 0);
 		assert(range.get<BulkString>(1).value().compare("There") == 0);
 		assert(range.get<BulkString>(2).value().compare("World") == 0);
@@ -572,6 +701,79 @@ void RedisTest::testLInsert()
 		fail(e.message());
 	}
 	catch(Poco::BadCastException &e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::NullValueException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testLRem()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	// Make sure the list is not there yet ...
+	Command delCommand = Command::del("mylist");
+	try
+	{
+		_redis.execute<Poco::Int64>(delCommand);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	try
+	{
+		std::vector<std::string> list;
+		list.push_back("hello");
+		list.push_back("hello");
+		list.push_back("foo");
+		list.push_back("hello");
+		Command rpush = Command::rpush("mylist", list);
+		Poco::Int64 result = _redis.execute<Poco::Int64>(rpush);
+		assert(result == 4);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command lrem = Command::lrem("mylist", -2, "hello");
+	try
+	{
+		Poco::Int64 n = _redis.execute<Poco::Int64>(lrem);
+		assert(n == 2);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	Command lrange = Command::lrange("mylist");
+	try
+	{
+		Array result = _redis.execute<Array>(lrange);
+
+		assert(result.size() == 2);
+		assert(result.get<BulkString>(0).value().compare("hello") == 0);
+		assert(result.get<BulkString>(1).value().compare("foo") == 0);
+	}
+	catch(RedisException &e)
 	{
 		fail(e.message());
 	}
@@ -827,16 +1029,20 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("RedisTest");
 
 	CppUnit_addTest(pSuite, RedisTest, testAppend);
+	CppUnit_addTest(pSuite, RedisTest, testDecr);
 	CppUnit_addTest(pSuite, RedisTest, testIncr);
 	CppUnit_addTest(pSuite, RedisTest, testIncrBy);
 	CppUnit_addTest(pSuite, RedisTest, testEcho);
+	CppUnit_addTest(pSuite, RedisTest, testError);
 	CppUnit_addTest(pSuite, RedisTest, testPing);
 	CppUnit_addTest(pSuite, RedisTest, testSet);
 	CppUnit_addTest(pSuite, RedisTest, testMSet);
+	CppUnit_addTest(pSuite, RedisTest, testMSetWithMap);
 	CppUnit_addTest(pSuite, RedisTest, testStrlen);
 	CppUnit_addTest(pSuite, RedisTest, testRPush);
 	CppUnit_addTest(pSuite, RedisTest, testLIndex);
 	CppUnit_addTest(pSuite, RedisTest, testLInsert);
+	CppUnit_addTest(pSuite, RedisTest, testLRem);
 	CppUnit_addTest(pSuite, RedisTest, testMulti);
 
 	CppUnit_addTest(pSuite, RedisTest, testPubSub);

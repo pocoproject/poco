@@ -41,6 +41,14 @@ Command Command::append(const std::string& key, const std::string& value)
 	return cmd;
 }
 
+Command Command::decr(const std::string& key, Int64 by)
+{
+	Command cmd(by == 0 ? "DECR" : "DECRBY");
+	cmd.add(key);
+	if ( by > 0 ) cmd.add(NumberFormatter::format(by));
+	return cmd;
+}
+
 Command Command::del(const std::string& key)
 {
 	Command cmd("DEL");
@@ -94,6 +102,13 @@ Command Command::llen(const std::string& list)
 	return cmd;
 }
 
+Command Command::lpop(const std::string& list)
+{
+	Command cmd("LPOP");
+	cmd.add(list);
+	return cmd;
+}
+
 Command Command::lpush(const std::string& list, const std::string& value, bool create)
 {
 	Command cmd(create ? "LPUSH" : "LPUSHX");
@@ -122,6 +137,39 @@ Command Command::lrange(const std::string& list, Int64 start, Int64 stop)
 	return cmd;
 }
 
+Command Command::lrem(const std::string& list, Int64 count, const std::string& value)
+{
+	Command cmd("LREM");
+
+	cmd.add(list).add(NumberFormatter::format(count)).add(value);
+
+	return cmd;
+}
+
+Command Command::mget(const std::vector<std::string>& keys)
+{
+	Command cmd("MGET");
+
+	for(std::vector<std::string>::const_iterator it = keys.begin(); it != keys.end(); ++it)
+	{
+		cmd.add(*it);
+	}
+
+	return cmd;
+}
+
+Command Command::mset(const std::map<std::string, std::string>& keyvalues, bool create)
+{
+	Command cmd(create ? "MSET" : "MSETNX");
+
+	for(std::map<std::string, std::string>::const_iterator it = keyvalues.begin(); it != keyvalues.end(); ++it)
+	{
+		cmd.add(it->first);
+		cmd.add(it->second);
+	}
+
+	return cmd;
+}
 
 Command Command::set(const std::string& key, const std::string& value, bool overwrite, const Poco::Timespan& expireTime, bool create)
 {

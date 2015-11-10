@@ -22,6 +22,7 @@
 #include "Poco/Redis/Array.h"
 
 #include <vector>
+#include <map>
 
 namespace Poco {
 namespace Redis {
@@ -43,6 +44,9 @@ public:
 	static Command append(const std::string& key, const std::string& value);
 		/// Returns an APPEND command
 
+	static Command decr(const std::string& key, Int64 by = 0);
+		/// Returns an DECR or DECRBY command. Calls DECR when by is omitted or zero.
+
 	static Command del(const std::string& key);
 		/// Returns an DEL command
 
@@ -62,7 +66,10 @@ public:
 		/// Returns a LINSERT command
 
 	static Command llen(const std::string& list);
-		/// Returns a LINDEX command
+		/// Returns a LLEN command
+
+	static Command lpop(const std::string& list);
+		/// Returns a LPOP command
 
 	static Command lpush(const std::string& list, const std::string& value, bool create = true);
 		/// Returns a LPUSH or LPUSHX (when create is false) command
@@ -70,8 +77,18 @@ public:
 	static Command lpush(const std::string& list, const std::vector<std::string>& value, bool create = true);
 		/// Returns a LPUSH or LPUSHX (when create is false) command
 
-	static Command lrange(const std::string& list, Int64 start = 0, Int64 stop = 0);
-		/// Returns a LRANGE command
+	static Command lrange(const std::string& list, Int64 start = 0, Int64 stop = -1);
+		/// Returns a LRANGE command. When start and stop is omitted an LRANGE
+		/// command will returned that returns all items of the list.
+
+	static Command lrem(const std::string& list, Int64 count, const std::string& value);
+		/// Returns a LREM command
+
+	static Command mget(const std::vector<std::string>& keys);
+		/// Returns a MGET command
+
+	static Command mset(const std::map<std::string, std::string>& keyvalues, bool create = true);
+		/// Returns a MSET or MSETNX (when create is false) command
 
 	static Command set(const std::string& key, const std::string& value, bool overwrite = true, const Poco::Timespan& expireTime = 0, bool create = true);
 		/// Returns a SET command to set the key with a value

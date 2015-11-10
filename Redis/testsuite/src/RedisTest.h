@@ -31,16 +31,20 @@ public:
 	virtual ~RedisTest();
 
 	void testAppend();
+	void testDecr();
 	void testEcho();
+	void testError();
 	void testIncr();
 	void testIncrBy();
 	void testPing();
 	void testSet();
 	void testMSet();
+	void testMSetWithMap();
 	void testStrlen();
 	void testRPush();
 	void testLIndex();
 	void testLInsert();
+	void testLRem();
 	void testMulti();
 
 	void testPubSub();
