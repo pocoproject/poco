@@ -16,10 +16,7 @@ services:
   - mongodb
   
 notifications:
-  slack: 
-    rooms:
-      - pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
-      - kampbell:v4ARuptk0ETzwUsKDdV6Gspb#general
+  slack: pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
 
 env:
   global: TEST_NAME=""
