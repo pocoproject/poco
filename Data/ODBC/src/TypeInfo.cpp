@@ -285,4 +285,34 @@ SQLSMALLINT TypeInfo::tryTypeidToCType(const std::type_info& ti, SQLSMALLINT def
 }
 
 
+SQLSMALLINT TypeInfo::nullDataType(const NullData val) const
+{
+	switch (val)
+	{
+	case NULL_GENERIC:
+	case DATA_NULL_INTEGER:
+		return SQL_C_TINYINT;
+
+	case DATA_NULL_STRING:
+		return SQL_C_CHAR;
+
+	case DATA_NULL_DATE:
+		return SQL_C_TYPE_DATE;
+
+	case DATA_NULL_TIME:
+		return SQL_C_TYPE_TIME;
+	
+	case DATA_NULL_DATETIME:
+		return SQL_C_TYPE_TIMESTAMP;
+
+	case DATA_NULL_BLOB:
+		return SQL_C_BINARY;
+
+	case DATA_NULL_FLOAT:
+		return SQL_C_FLOAT;
+	}
+
+	return SQL_C_TINYINT;
+}
+
 } } } // namespace Poco::Data::ODBC
