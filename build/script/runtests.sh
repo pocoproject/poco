@@ -40,6 +40,9 @@ else
     TESTRUNNERARGS=$2
 fi
 
+if [ "$OSARCH" = "" ] ; then
+	OSARCH=`uname -m | tr ' /' _-`
+fi
 
 if [ "$OSNAME" = "" ] ; then
 	OSNAME=`uname`
@@ -47,13 +50,11 @@ if [ "$OSNAME" = "" ] ; then
         CYGWIN*)
                 OSNAME=Cygwin 
                 TESTRUNNER=$TESTRUNNER.exe
+                PATH=$POCO_BASE/lib/$OSNAME/$OSARCH:$PATH
                 ;;
         MINGW*)
                 OSNAME=MinGW ;;
         esac
-fi
-if [ "$OSARCH" = "" ] ; then
-	OSARCH=`uname -m | tr ' /' _-`
 fi
 BINDIR="bin/$OSNAME/$OSARCH/"
 
