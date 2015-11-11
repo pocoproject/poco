@@ -351,7 +351,9 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir, const std
 
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
-	SQLSMALLINT colType = _pTypeInfo->tryTypeidToCType(bindType, SQL_C_STINYINT);
+
+	const SQLSMALLINT colType = (bindType == typeid(void) || bindType == typeid(NullData) || bindType == typeid(NullType)) ?
+														_pTypeInfo->nullDataType(val) : _pTypeInfo->tryTypeidToCType(bindType, SQL_C_TINYINT);
 	getColSizeAndPrecision(pos, colType, colSize, decDigits);
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
