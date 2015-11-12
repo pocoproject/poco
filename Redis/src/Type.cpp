@@ -38,19 +38,19 @@ RedisType::Ptr RedisType::createRedisType(char marker)
 
 	switch(marker)
 	{
-		case ElementTraits<Int64>::marker :
+		case RedisTypeTraits<Int64>::marker :
 			result = new Type<Int64>();
 			break;
-		case ElementTraits<std::string>::marker :
+		case RedisTypeTraits<std::string>::marker :
 			result = new Type<std::string>();
 			break;
-		case ElementTraits<BulkString>::marker :
+		case RedisTypeTraits<BulkString>::marker :
 			result = new Type<BulkString>();
 			break;
-		case ElementTraits<Array>::marker :
+		case RedisTypeTraits<Array>::marker :
 			result = new Type<Array>();
 			break;
-		case ElementTraits<Error>::marker :
+		case RedisTypeTraits<Error>::marker :
 			result = new Type<Error>();
 			break;
 	}

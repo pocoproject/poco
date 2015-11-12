@@ -94,7 +94,7 @@ public:
 		if ( pos >= _elements.value().size() ) throw InvalidArgumentException();
 
 		RedisType::Ptr element = _elements.value().at(pos);
-		if ( ElementTraits<T>::TypeId == element->type() )
+		if ( RedisTypeTraits<T>::TypeId == element->type() )
 		{
 			Type<T>* concrete = dynamic_cast<Type<T>* >(element.get());
 			if ( concrete != NULL ) return concrete->value();
@@ -198,7 +198,7 @@ inline size_t Array::size() const
 
 
 template<>
-struct ElementTraits<Array>
+struct RedisTypeTraits<Array>
 {
 	enum { TypeId = RedisType::REDIS_ARRAY };
 
@@ -223,28 +223,29 @@ struct ElementTraits<Array>
 		}
 		return result.str();
 	}
-};
 
-template<> inline
-void Type<Array>::read(RedisInputStream& input)
-{
-	Int64 length = NumberParser::parse64(input.getline());
-
-	if ( length != -1 )
+	static void read(RedisInputStream& input, Array& value)
 	{
-		for(int i = 0; i < length; ++i)
+		value.clear();
+
+		Int64 length = NumberParser::parse64(input.getline());
+
+		if ( length != -1 )
 		{
-			char marker = input.get();
-			RedisType::Ptr element = Type::createRedisType(marker);
+			for(int i = 0; i < length; ++i)
+			{
+				char marker = input.get();
+				RedisType::Ptr element = RedisType::createRedisType(marker);
 
-			if ( element.isNull() )
-				throw RedisException("Wrong answer received from Redis server");
+				if ( element.isNull() )
+					throw RedisException("Wrong answer received from Redis server");
 
-			element->read(input);
-			_value.add(element);
+				element->read(input);
+				value.add(element);
+			}
 		}
 	}
-}
+};
 
 
 }}

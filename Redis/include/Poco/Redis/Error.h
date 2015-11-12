@@ -51,7 +51,7 @@ inline void Error::setMessage(const std::string& message)
 }
 
 template<>
-struct ElementTraits<Error>
+struct RedisTypeTraits<Error>
 {
 	enum { TypeId = RedisType::REDIS_ERROR };
 
@@ -61,14 +61,12 @@ struct ElementTraits<Error>
 	{
 		return marker + value.getMessage()  + LineEnding::NEWLINE_CRLF;
 	}
+
+	static void read(RedisInputStream& input, Error& value)
+	{
+		value.setMessage(input.getline());
+	}
 };
-
-
-template<> inline
-void Type<Error>::read(RedisInputStream& input)
-{
-	_value = input.getline();
-}
 
 }} // Namespace Poco::Redis
 

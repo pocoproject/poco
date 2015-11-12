@@ -46,9 +46,9 @@ Array& Array::add(RedisType::Ptr value)
 }
 
 
-std::string Array::toString() const 
+std::string Array::toString() const
 {
-	return ElementTraits<Array>::toString(*this);
+	return RedisTypeTraits<Array>::toString(*this);
 }
 
 } }

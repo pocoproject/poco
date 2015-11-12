@@ -102,27 +102,34 @@ inline bool RedisType::isSimpleString() const
 }
 
 template<typename T>
-struct ElementTraits
+struct RedisTypeTraits
 {
 };
 
 
 template<>
-struct ElementTraits<Poco::Int64>
+struct RedisTypeTraits<Int64>
 {
 	enum { TypeId = RedisType::REDIS_INTEGER };
 
 	static const char marker = ':';
 
-	static std::string toString(const Poco::Int64& value)
+	static std::string toString(const Int64& value)
 	{
 		return marker + NumberFormatter::format(value) + "\r\n";
 	}
+
+	static void read(RedisInputStream& input, Int64& value)
+	{
+		std::string number = input.getline();
+		value = NumberParser::parse64(number);
+	}
+
 };
 
 
 template<>
-struct ElementTraits<std::string>
+struct RedisTypeTraits<std::string>
 {
 	enum { TypeId = RedisType::REDIS_SIMPLE_STRING };
 
@@ -131,6 +138,11 @@ struct ElementTraits<std::string>
 	static std::string toString(const std::string& value)
 	{
 		return marker + value + LineEnding::NEWLINE_CRLF;
+	}
+
+	static void read(RedisInputStream& input, std::string& value)
+	{
+		value = input.getline();
 	}
 };
 
@@ -141,7 +153,7 @@ typedef Nullable<std::string> BulkString;
 
 
 template<>
-struct ElementTraits<BulkString>
+struct RedisTypeTraits<BulkString>
 {
 	enum { TypeId = RedisType::REDIS_BULK_STRING };
 
@@ -161,6 +173,24 @@ struct ElementTraits<BulkString>
 				+ LineEnding::NEWLINE_CRLF
 				+ s
 				+ LineEnding::NEWLINE_CRLF;
+		}
+	}
+
+	static void read(RedisInputStream& input, BulkString& value)
+	{
+		value.clear();
+
+		std::string line = input.getline();
+		int length = NumberParser::parse64(line);
+
+		if ( length >= 0 )
+		{
+			std::string s;
+			s.resize(length, ' ');
+			input.read(&*s.begin(), length);
+			value.assign(s);
+
+			input.getline(); // Read and ignore /r/n
 		}
 	}
 };
@@ -189,14 +219,17 @@ public:
 
 	int  type() const
 	{
-		return ElementTraits<T>::TypeId;
+		return RedisTypeTraits<T>::TypeId;
 	}
 
-	virtual void read(RedisInputStream& socket);
-
-	virtual std::string toString() const
+	void read(RedisInputStream& socket)
 	{
-		return ElementTraits<T>::toString(_value);
+		RedisTypeTraits<T>::read(socket, _value);
+	}
+
+	std::string toString() const
+	{
+		return RedisTypeTraits<T>::toString(_value);
 	}
 
 	T& value()
@@ -214,41 +247,6 @@ private:
 	T _value;
 };
 
-template<> inline
-void Type<Int64>::read(RedisInputStream& input)
-{
-	std::string number = input.getline();
-	_value = NumberParser::parse64(number);
-}
-
-template<> inline
-void Type<std::string>::read(RedisInputStream& input)
-{
-	_value.clear();
-	_value = input.getline();
-}
-
-template<> inline
-void Type<BulkString>::read(RedisInputStream& input)
-{
-	_value.clear();
-
-	std::string line = input.getline();
-	int length = NumberParser::parse64(line);
-
-	if ( length >= 0 )
-	{
-		std::string s;
-		s.resize(length, ' ');
-		input.read(&*s.begin(), length);
-		_value.assign(s);
-
-		line = input.getline();
-	}
-
-}
-
-
-}}
+}} // Namespace Poco/Redis
 
 #endif // Redis_Type_INCLUDED
