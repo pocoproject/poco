@@ -167,7 +167,7 @@ Array Client::sendCommands(const std::vector<Array>& commands)
 
 	for(int i = 0; i < commands.size(); ++i)
 	{
-		results.add(readReply());
+		results.addRedisType(readReply());
 	}
 
 	return results;

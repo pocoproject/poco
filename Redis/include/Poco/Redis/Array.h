@@ -47,25 +47,33 @@ public:
 	virtual ~Array();
 		/// Destructor.
 
-	Array& add(Poco::Int64 value);
-		/// Adds an integer element.
+	template<typename T>
+	Array& operator<<(const T& arg)
+		/// Adds the argument to the array
+	{
+		addRedisType(new Type<T>(arg));
+		return *this;
+	}
 
-	Array& add(const std::string& value);
-		/// Adds a bulk string element. A bulk string is a string that
-		/// is binary safe (it can contain newlines). If you want a simple
-		/// string use addSimpleString (can't contain a newline!).
-
-	Array& add(const BulkString& value);
-		/// Adds a bulk string element.
+	Array& operator<<(const char* s);
 
 	Array& add();
-		/// Adds a Null bulk string element.
+		/// Adds an Null BulkString
 
-	Array& add(RedisType::Ptr value);
+	template<typename T>
+	Array& add(const T& arg)
+		/// Adds an element to the array.
+		/// Note: the specialization for std::string will add a BulkString!
+		/// If you really need a simple string, call addSimpleString.
+	{
+		addRedisType(new Type<T>(arg));
+		return *this;
+	}
+
+	Array& add(const char* s);
+
+	Array& addRedisType(RedisType::Ptr value);
 		/// Adds a Redis element.
-
-	Array& add(const Array& array);
-		/// Adds an array.
 
 	Array& addSimpleString(const std::string& value);
 		/// Adds a simple string (can't contain newline characters!)
@@ -124,35 +132,34 @@ private:
 	void checkNull();
 };
 
+inline Array& Array::operator<<(const char* s)
+{
+	BulkString value(s);
+	return add(value);
+}
+
 inline Array& Array::add()
 {
 	BulkString value;
-	return add(new Type<BulkString>(value));
+	return add(value);
 }
 
-inline Array& Array::add(Int64 value)
+template<>
+inline Array& Array::add(const std::string& arg)
 {
-	return add(new Type<Int64>(value));
+	BulkString value(arg);
+	return add(value);
 }
 
-inline Array& Array::add(const std::string& value)
+inline Array& Array::add(const char* s)
 {
-	return add(new Type<BulkString>(value));
-}
-
-inline Array& Array::add(const BulkString& value)
-{
-	return add(new Type<BulkString>(value));
-}
-
-inline Array& Array::add(const Array& value)
-{
-	return add(new Type<Array>(value));
+	BulkString value(s);
+	return add(value);
 }
 
 inline Array& Array::addSimpleString(const std::string& value)
 {
-	return add(new Type<std::string>(value));
+	return addRedisType(new Type<std::string>(value));
 }
 
 inline Array::const_iterator Array::begin() const
@@ -241,7 +248,7 @@ struct RedisTypeTraits<Array>
 					throw RedisException("Wrong answer received from Redis server");
 
 				element->read(input);
-				value.add(element);
+				value.addRedisType(element);
 			}
 		}
 	}

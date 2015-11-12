@@ -36,7 +36,7 @@ Array::~Array()
 }
 
 
-Array& Array::add(RedisType::Ptr value)
+Array& Array::addRedisType(RedisType::Ptr value)
 {
 	checkNull();
 
