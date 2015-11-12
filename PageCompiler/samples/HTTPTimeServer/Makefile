@@ -8,10 +8,15 @@
 
 include $(POCO_BASE)/build/rules/global
 
+# Cygwin Poco*.dll should be on PATH
+ifeq ($(OSNAME), CYGWIN)
+PATH          :=$(POCO_BASE)/lib/$(OSNAME)/$(OSARCH):$(PATH)
+endif
+
 # Where to find the PageCompiler executable
 PAGECOMPILER = $(POCO_BASE)/PageCompiler/bin/$(POCO_HOST_OSNAME)/$(POCO_HOST_OSARCH)/cpspc
 
-objects = HTTPTimeServerApp TimeHandler
+objects        = HTTPTimeServerApp TimeHandler
 
 target         = HTTPTimeServer
 target_version = 1
