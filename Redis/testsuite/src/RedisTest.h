@@ -44,6 +44,7 @@ public:
 	void testRPush();
 	void testLIndex();
 	void testLInsert();
+	void testLPop();
 	void testLRem();
 	void testMulti();
 

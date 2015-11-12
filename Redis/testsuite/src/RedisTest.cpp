@@ -378,6 +378,79 @@ void RedisTest::testPing()
 
 }
 
+void RedisTest::testLPop()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	// Make sure the list is not there yet ...
+	Command delCommand = Command::del("mylist");
+	try
+	{
+		_redis.execute<Poco::Int64>(delCommand);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	try
+	{
+		Command rpush = Command::rpush("mylist", "one");
+		Poco::Int64 result = _redis.execute<Poco::Int64>(rpush);
+		assert(result == 1);
+
+		rpush = Command::rpush("mylist", "two");
+		result = _redis.execute<Poco::Int64>(rpush);
+		assert(result == 2);
+
+		rpush = Command::rpush("mylist", "three");
+		result = _redis.execute<Poco::Int64>(rpush);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command lpop = Command::lpop("mylist");
+	try
+	{
+		BulkString result = _redis.execute<BulkString>(lpop);
+		assert(result.value().compare("one") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command lrange = Command::lrange("mylist");
+	try
+	{
+		Array result = _redis.execute<Array>(lrange);
+
+		assert(result.size() == 2);
+		assert(result.get<BulkString>(0).value().compare("two") == 0);
+		assert(result.get<BulkString>(1).value().compare("three") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::NullValueException &e)
+	{
+		fail(e.message());
+	}
+
+}
+
 void RedisTest::testMSet()
 {
 	if (!_connected)
@@ -1043,6 +1116,7 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testLIndex);
 	CppUnit_addTest(pSuite, RedisTest, testLInsert);
 	CppUnit_addTest(pSuite, RedisTest, testLRem);
+	CppUnit_addTest(pSuite, RedisTest, testLPop);
 	CppUnit_addTest(pSuite, RedisTest, testMulti);
 
 	CppUnit_addTest(pSuite, RedisTest, testPubSub);
