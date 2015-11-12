@@ -49,18 +49,18 @@ CFLAGS64        =
 CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING
 CXXFLAGS32      =
 CXXFLAGS64      = -Wa,-mbig-obj
-SHLIBFLAGS      = 
+SHLIBFLAGS      = -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
 SHLIBFLAGS32    = 
 SHLIBFLAGS64    = 
-LINKFLAGS       =
-LINKFLAGS32     =
+LINKFLAGS       = 
+LINKFLAGS32     = 
 LINKFLAGS64     = 
-STATICOPT_CC    =
-STATICOPT_CXX   =
+STATICOPT_CC    = 
+STATICOPT_CXX   = 
 STATICOPT_LINK  = -static
 SHAREDOPT_CC    = 
 SHAREDOPT_CXX   = 
-SHAREDOPT_LINK  = -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
+SHAREDOPT_LINK  = 
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
