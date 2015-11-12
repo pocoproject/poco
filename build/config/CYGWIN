@@ -20,7 +20,7 @@ CXX     = g++
 LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = $(CXX) -shared -o $@ -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
+SHLIB   = $(CXX) -shared -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   =
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
@@ -45,19 +45,22 @@ IMPLIBLINKEXT    = .dll.a
 #
 CFLAGS          = 
 CFLAGS32        = 
-CFLAGS64        = -Wa,-mbig-obj
+CFLAGS64        = 
 CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_SHAREDMEMORY
 CXXFLAGS32      =
 CXXFLAGS64      = -Wa,-mbig-obj
+SHLIBFLAGS      = 
+SHLIBFLAGS32    = 
+SHLIBFLAGS64    = 
 LINKFLAGS       =
 LINKFLAGS32     =
-LINKFLAGS64     =
+LINKFLAGS64     = 
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  = -static
 SHAREDOPT_CC    = 
 SHAREDOPT_CXX   = 
-SHAREDOPT_LINK  = 
+SHAREDOPT_LINK  = -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
@@ -71,7 +74,7 @@ RELEASEOPT_LINK =
 SYSFLAGS = -D_XOPEN_SOURCE=500
 
 # give visibility of old BSD typedef like u_short, u_int, u_long...
-# used in some networking system includes, need when using PocoNet
+# used in some networking system includes, needed when using PocoNet
 SYSFLAGS += -D__BSD_VISIBLE
 
 
@@ -79,3 +82,11 @@ SYSFLAGS += -D__BSD_VISIBLE
 # System Specific Libraries
 #
 SYSLIBS  = 
+
+ifndef OSARCH_64BITS
+    ifeq ($(findstring x86_64,$(shell uname -m)),x86_64)
+        OSARCH_64BITS = 1
+    else
+        OSARCH_64BITS = 0
+    endif
+endif
