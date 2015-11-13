@@ -49,10 +49,12 @@ public:
 
 	template<typename T>
 	Array& operator<<(const T& arg)
-		/// Adds the argument to the array
+		/// Adds the argument to the array.
+		/// Note: a std::string will be added as a BulkString because this
+		/// is commonly used for representing strings in Redis. If you
+		/// really need a simple string, use addSimpleString.
 	{
-		addRedisType(new Type<T>(arg));
-		return *this;
+		return add(arg);
 	}
 
 	Array& operator<<(const char* s);
@@ -65,6 +67,9 @@ public:
 		/// Adds an element to the array.
 		/// Note: the specialization for std::string will add a BulkString!
 		/// If you really need a simple string, call addSimpleString.
+		/// Note: the specialization for std::string will add the string as
+		/// a BulkString because this is commonly used for representing strings
+		/// in Redis. If you really need a simple string, use addSimpleString.
 	{
 		addRedisType(new Type<T>(arg));
 		return *this;
