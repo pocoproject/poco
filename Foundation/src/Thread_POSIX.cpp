@@ -76,7 +76,7 @@ void setThreadName(pthread_t thread, const std::string& threadName)
 #if (POCO_OS == POCO_OS_MAC_OS_X)
 	pthread_setname_np(threadName.c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
 #else
-	if (pthread_setname_np(thread, threadName.c_str()) != 0 && errno == ERANGE && threadName.size() > 15)
+	if (pthread_setname_np(thread, threadName.c_str()) == ERANGE && threadName.size() > 15)
 	{
 		std::string truncName(threadName, 0, 7);
 		truncName.append("~");
