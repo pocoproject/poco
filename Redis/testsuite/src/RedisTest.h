@@ -46,9 +46,12 @@ public:
 	void testLInsert();
 	void testLPop();
 	void testLRem();
+	void testLSet();
+	void testLTrim();
 	void testMulti();
 
 	void testPubSub();
+	void testRPop();
 
 	void testPipeliningWithSendCommands();
 	void testPipeliningWithWriteCommand();
