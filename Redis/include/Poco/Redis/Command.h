@@ -84,6 +84,12 @@ public:
 	static Command lrem(const std::string& list, Int64 count, const std::string& value);
 		/// Returns a LREM command
 
+	static Command lset(const std::string& list, Int64 index, const std::string& value);
+		/// Returns a LSET command
+
+	static Command ltrim(const std::string& list, Int64 start = 0, Int64 stop = -1);
+		/// Returns a LTRIM command
+
 	static Command mget(const std::vector<std::string>& keys);
 		/// Returns a MGET command
 
@@ -95,6 +101,9 @@ public:
 
 	static Command set(const std::string& key, Int64 value, bool overwrite = true, const Poco::Timespan& expireTime = 0, bool create = true);
 		/// Returns a SET command to set the key with a value
+
+	static Command rpop(const std::string& list);
+		/// Returns a RPOP command
 
 	static Command rpush(const std::string& list, const std::string& value, bool create = true);
 		/// Returns a RPUSH or RPUSHX (when create is false) command
