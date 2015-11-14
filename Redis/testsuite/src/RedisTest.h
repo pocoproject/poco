@@ -36,12 +36,6 @@ public:
 	void testError();
 	void testIncr();
 	void testIncrBy();
-	void testPing();
-	void testSet();
-	void testMSet();
-	void testMSetWithMap();
-	void testStrlen();
-	void testRPush();
 	void testLIndex();
 	void testLInsert();
 	void testLPop();
@@ -49,13 +43,17 @@ public:
 	void testLSet();
 	void testLTrim();
 	void testMulti();
-
-	void testPubSub();
-	void testRPop();
-	void testRPoplPush();
-
+	void testMSet();
+	void testMSetWithMap();
+	void testPing();
 	void testPipeliningWithSendCommands();
 	void testPipeliningWithWriteCommand();
+	void testPubSub();
+	void testSet();
+	void testStrlen();
+	void testRPop();
+	void testRPoplPush();
+	void testRPush();
 
 	void setUp();
 	void tearDown();
@@ -63,6 +61,8 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+
+	void delKey(const std::string& key);
 
 	std::string _host;
 	unsigned    _port;
