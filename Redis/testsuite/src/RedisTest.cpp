@@ -128,6 +128,118 @@ void RedisTest::testAppend()
 	}
 }
 
+void RedisTest::testBLpop()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	// Make sure the lists are not there yet ...
+	std::vector<std::string> lists;
+	lists.push_back("list1");
+	lists.push_back("list2");
+	Command delCommand = Command::del(lists);
+	try
+	{
+		_redis.execute<Poco::Int64>(delCommand);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	std::vector<std::string> values;
+	values.push_back("a");
+	values.push_back("b");
+	values.push_back("c");
+
+	try
+	{
+		Command rpush = Command::rpush("list1", values);
+		Poco::Int64 result = _redis.execute<Poco::Int64>(rpush);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command blpop = Command::blpop(lists);
+	try
+	{
+		Array result = _redis.execute<Array>(blpop);
+		assert(result.size() == 2);
+		assert(result.get<BulkString>(0).value().compare("list1") == 0);
+		assert(result.get<BulkString>(1).value().compare("a") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testBRpop()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	// Make sure the lists are not there yet ...
+	std::vector<std::string> lists;
+	lists.push_back("list1");
+	lists.push_back("list2");
+	Command delCommand = Command::del(lists);
+	try
+	{
+		_redis.execute<Poco::Int64>(delCommand);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	std::vector<std::string> values;
+	values.push_back("a");
+	values.push_back("b");
+	values.push_back("c");
+
+	try
+	{
+		Command rpush = Command::rpush("list1", values);
+		Poco::Int64 result = _redis.execute<Poco::Int64>(rpush);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command brpop = Command::brpop(lists);
+	try
+	{
+		Array result = _redis.execute<Array>(brpop);
+		assert(result.size() == 2);
+		assert(result.get<BulkString>(0).value().compare("list1") == 0);
+		assert(result.get<BulkString>(1).value().compare("c") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testDecr()
 {
 	if (!_connected)
@@ -1309,6 +1421,9 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("RedisTest");
 
 	CppUnit_addTest(pSuite, RedisTest, testAppend);
+	CppUnit_addTest(pSuite, RedisTest, testBLpop);
+	CppUnit_addTest(pSuite, RedisTest, testBRpop);
+	CppUnit_addTest(pSuite, RedisTest, testDecr);
 	CppUnit_addTest(pSuite, RedisTest, testDecr);
 	CppUnit_addTest(pSuite, RedisTest, testIncr);
 	CppUnit_addTest(pSuite, RedisTest, testIncrBy);

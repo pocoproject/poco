@@ -44,6 +44,15 @@ public:
 	static Command append(const std::string& key, const std::string& value);
 		/// Returns an APPEND command
 
+	static Command blpop(const std::vector<std::string>& lists, Int64 timeout = 0);
+		/// Returns a BLPOP command
+
+	static Command brpop(const std::vector<std::string>& lists, Int64 timeout = 0);
+		/// Returns a BRPOP command
+
+	static Command brpoplpush(const std::string& sourceList, const std::string& destinationList, Int64 timeout = 0);
+		/// Returns a BRPOPLPUSH command
+
 	static Command decr(const std::string& key, Int64 by = 0);
 		/// Returns an DECR or DECRBY command. Calls DECR when by is omitted or zero.
 

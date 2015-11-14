@@ -31,6 +31,8 @@ public:
 	virtual ~RedisTest();
 
 	void testAppend();
+	void testBLpop();
+	void testBRpop();
 	void testDecr();
 	void testEcho();
 	void testError();

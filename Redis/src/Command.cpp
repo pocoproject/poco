@@ -43,6 +43,41 @@ Command Command::append(const std::string& key, const std::string& value)
 	return cmd;
 }
 
+Command Command::blpop(const std::vector<std::string>& lists, Int64 timeout)
+{
+	Command cmd("BLPOP");
+
+	for(std::vector<std::string>::const_iterator it = lists.begin(); it != lists.end(); ++it)
+	{
+		cmd << *it;
+	}
+	cmd << NumberFormatter::format(timeout);
+
+	return cmd;
+}
+
+Command Command::brpop(const std::vector<std::string>& lists, Int64 timeout)
+{
+	Command cmd("BRPOP");
+
+	for(std::vector<std::string>::const_iterator it = lists.begin(); it != lists.end(); ++it)
+	{
+		cmd << *it;
+	}
+	cmd << NumberFormatter::format(timeout);
+
+	return cmd;
+}
+
+Command Command::brpoplpush(const std::string& sourceList, const std::string& destinationList, Int64 timeout)
+{
+	Command cmd("BRPOPLPUSH");
+
+	cmd << sourceList << destinationList << NumberFormatter::format(timeout);
+
+	return cmd;
+}
+
 Command Command::decr(const std::string& key, Int64 by)
 {
 	Command cmd(by == 0 ? "DECR" : "DECRBY");
