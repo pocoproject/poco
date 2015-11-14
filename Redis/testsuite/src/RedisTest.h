@@ -53,8 +53,14 @@ public:
 	void testPubSub();
 	void testSAdd();
 	void testSCard();
+	void testSDiff();
+	void testSDiffStore();
 	void testSet();
+	void testSInter();
+	void testSInterStore();
 	void testSMembers();
+	void testSUnion();
+	void testSUnionStore();
 	void testStrlen();
 	void testRename();
 	void testRenameNx();

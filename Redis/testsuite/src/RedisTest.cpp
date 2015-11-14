@@ -1198,6 +1198,124 @@ void RedisTest::testSCard()
 	}
 }
 
+void RedisTest::testSDiff()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("key1");
+	delKey("key2");
+
+	std::vector<std::string> values1;
+	values1.push_back("a");
+	values1.push_back("b");
+	values1.push_back("c");
+	Command sadd = Command::sadd("key1", values1);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	std::vector<std::string> values2;
+	values2.push_back("c");
+	values2.push_back("d");
+	values2.push_back("e");
+	sadd = Command::sadd("key2", values2);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command sdiff = Command::sdiff("key1", "key2");
+	try
+	{
+		Array result = _redis.execute<Array>(sdiff);
+		assert(result.size() == 2);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testSDiffStore()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("key");
+	delKey("key1");
+	delKey("key2");
+
+	std::vector<std::string> values1;
+	values1.push_back("a");
+	values1.push_back("b");
+	values1.push_back("c");
+	Command sadd = Command::sadd("key1", values1);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	std::vector<std::string> values2;
+	values2.push_back("c");
+	values2.push_back("d");
+	values2.push_back("e");
+	sadd = Command::sadd("key2", values2);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command sdiffstore = Command::sdiffstore("key", "key1", "key2");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sdiffstore);
+		assert(result == 2);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command smembers = Command::smembers("key");
+	try
+	{
+		Array result = _redis.execute<Array>(smembers);
+		assert(result.size() == 2);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testSet()
 {
 	if (!_connected)
@@ -1227,6 +1345,127 @@ void RedisTest::testSet()
 	{
 		BulkString result = _redis.execute<BulkString>(command);
 		assert(result.isNull());
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+
+void RedisTest::testSInter()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("key1");
+	delKey("key2");
+
+	std::vector<std::string> values1;
+	values1.push_back("a");
+	values1.push_back("b");
+	values1.push_back("c");
+	Command sadd = Command::sadd("key1", values1);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	std::vector<std::string> values2;
+	values2.push_back("c");
+	values2.push_back("d");
+	values2.push_back("e");
+	sadd = Command::sadd("key2", values2);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command sinter = Command::sinter("key1", "key2");
+	try
+	{
+		Array result = _redis.execute<Array>(sinter);
+		assert(result.size() == 1);
+		assert(result.get<BulkString>(0).value().compare("c") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testSInterStore()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("key");
+	delKey("key1");
+	delKey("key2");
+
+	std::vector<std::string> values1;
+	values1.push_back("a");
+	values1.push_back("b");
+	values1.push_back("c");
+	Command sadd = Command::sadd("key1", values1);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	std::vector<std::string> values2;
+	values2.push_back("c");
+	values2.push_back("d");
+	values2.push_back("e");
+	sadd = Command::sadd("key2", values2);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command sinterstore = Command::sinterstore("key", "key1", "key2");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sinterstore);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command smembers = Command::smembers("key");
+	try
+	{
+		Array result = _redis.execute<Array>(smembers);
+		assert(result.size() == 1);
+		assert(result.get<BulkString>(0).value().compare("c") == 0);
 	}
 	catch(RedisException &e)
 	{
@@ -1308,10 +1547,125 @@ void RedisTest::testSMembers()
 	try
 	{
 		Array result = _redis.execute<Array>(smembers);
-
 		assert(result.size() == 2);
-		assert(result.get<BulkString>(0).value().compare("World") == 0);
-		assert(result.get<BulkString>(1).value().compare("Hello") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testSUnion()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("key1");
+	delKey("key2");
+
+	std::vector<std::string> values1;
+	values1.push_back("a");
+	values1.push_back("b");
+	values1.push_back("c");
+	Command sadd = Command::sadd("key1", values1);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	std::vector<std::string> values2;
+	values2.push_back("c");
+	values2.push_back("d");
+	values2.push_back("e");
+	sadd = Command::sadd("key2", values2);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command sunion = Command::sunion("key1", "key2");
+	try
+	{
+		Array result = _redis.execute<Array>(sunion);
+		assert(result.size() == 5);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testSUnionStore()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("key");
+	delKey("key1");
+	delKey("key2");
+
+	std::vector<std::string> values1;
+	values1.push_back("a");
+	values1.push_back("b");
+	values1.push_back("c");
+	Command sadd = Command::sadd("key1", values1);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	std::vector<std::string> values2;
+	values2.push_back("c");
+	values2.push_back("d");
+	values2.push_back("e");
+	sadd = Command::sadd("key2", values2);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command sunionstore = Command::sunionstore("key", "key1", "key2");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sunionstore);
+		assert(result == 5);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command smembers = Command::smembers("key");
+	try
+	{
+		Array result = _redis.execute<Array>(smembers);
+		assert(result.size() == 5);
 	}
 	catch(RedisException &e)
 	{
@@ -1674,9 +2028,15 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testPubSub);
 	CppUnit_addTest(pSuite, RedisTest, testSAdd);
 	CppUnit_addTest(pSuite, RedisTest, testSCard);
+	CppUnit_addTest(pSuite, RedisTest, testSDiff);
+	CppUnit_addTest(pSuite, RedisTest, testSDiffStore);
 	CppUnit_addTest(pSuite, RedisTest, testSet);
+	CppUnit_addTest(pSuite, RedisTest, testSInter);
+	CppUnit_addTest(pSuite, RedisTest, testSInterStore);
 	CppUnit_addTest(pSuite, RedisTest, testSMembers);
 	CppUnit_addTest(pSuite, RedisTest, testStrlen);
+	CppUnit_addTest(pSuite, RedisTest, testSUnion);
+	CppUnit_addTest(pSuite, RedisTest, testSUnionStore);
 	CppUnit_addTest(pSuite, RedisTest, testRename);
 	CppUnit_addTest(pSuite, RedisTest, testRenameNx);
 	CppUnit_addTest(pSuite, RedisTest, testRPop);

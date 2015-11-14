@@ -245,20 +245,20 @@ Command Command::mset(const std::map<std::string, std::string>& keyvalues, bool 
 	return cmd;
 }
 
-Command Command::sadd(const std::string& key, const std::string& value)
+Command Command::sadd(const std::string& set, const std::string& value)
 {
 	Command cmd("SADD");
 
-	cmd << key << value;
+	cmd << set << value;
 
 	return cmd;
 }
 
-Command Command::sadd(const std::string& key, const std::vector<std::string>& values)
+Command Command::sadd(const std::string& set, const std::vector<std::string>& values)
 {
 	Command cmd("SADD");
 
-	cmd << key;
+	cmd << set;
 	for(std::vector<std::string>::const_iterator it = values.begin(); it != values.end(); ++it)
 	{
 		cmd << *it;
@@ -267,20 +267,55 @@ Command Command::sadd(const std::string& key, const std::vector<std::string>& va
 	return cmd;
 }
 
-Command Command::scard(const std::string& key)
+Command Command::scard(const std::string& set)
 {
 	Command cmd("SCARD");
 
-	cmd << key;
+	cmd << set;
 
 	return cmd;
 }
 
-Command Command::smembers(const std::string& key)
+Command Command::sdiff(const std::string& set1, const std::string& set2)
 {
-	Command cmd("SMEMBERS");
+	Command cmd("SDIFF");
 
-	cmd << key;
+	cmd << set1 << set2;
+
+	return cmd;
+}
+
+Command Command::sdiff(const std::string& set, const std::vector<std::string>& sets)
+{
+	Command cmd("SDIFF");
+
+	cmd << set;
+	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	{
+		cmd << *it;
+	}
+
+	return cmd;
+}
+
+Command Command::sdiffstore(const std::string& set, const std::string& set1, const std::string& set2)
+{
+	Command cmd("SDIFFSTORE");
+
+	cmd << set << set1 << set2;
+
+	return cmd;
+}
+
+Command Command::sdiffstore(const std::string& set, const std::vector<std::string>& sets)
+{
+	Command cmd("SDIFFSTORE");
+
+	cmd << set;
+	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	{
+		cmd << *it;
+	}
 
 	return cmd;
 }
@@ -300,6 +335,103 @@ Command Command::set(const std::string& key, const std::string& value, bool over
 Command Command::set(const std::string& key, Int64 value, bool overwrite, const Poco::Timespan& expireTime, bool create)
 {
 	return set(key, NumberFormatter::format(value), overwrite, expireTime, create);
+}
+
+Command Command::sinter(const std::string& set1, const std::string& set2)
+{
+	Command cmd("SINTER");
+
+	cmd << set1 << set2;
+
+	return cmd;
+}
+
+Command Command::sinter(const std::string& set, const std::vector<std::string>& sets)
+{
+	Command cmd("SINTER");
+
+	cmd << set;
+	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	{
+		cmd << *it;
+	}
+
+	return cmd;
+}
+
+Command Command::sinterstore(const std::string& set, const std::string& set1, const std::string& set2)
+{
+	Command cmd("SINTERSTORE");
+
+	cmd << set << set1 << set2;
+
+	return cmd;
+}
+
+Command Command::sinterstore(const std::string& set, const std::vector<std::string>& sets)
+{
+	Command cmd("SINTERSTORE");
+
+	cmd << set;
+	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	{
+		cmd << *it;
+	}
+
+	return cmd;
+}
+
+Command Command::smembers(const std::string& set)
+{
+	Command cmd("SMEMBERS");
+
+	cmd << set;
+
+	return cmd;
+}
+
+Command Command::sunion(const std::string& set1, const std::string& set2)
+{
+	Command cmd("SUNION");
+
+	cmd << set1 << set2;
+
+	return cmd;
+}
+
+Command Command::sunion(const std::string& set, const std::vector<std::string>& sets)
+{
+	Command cmd("SUNION");
+
+	cmd << set;
+	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	{
+		cmd << *it;
+	}
+
+	return cmd;
+}
+
+Command Command::sunionstore(const std::string& set, const std::string& set1, const std::string& set2)
+{
+	Command cmd("SUNIONSTORE");
+
+	cmd << set << set1 << set2;
+
+	return cmd;
+}
+
+Command Command::sunionstore(const std::string& set, const std::vector<std::string>& sets)
+{
+	Command cmd("SUNIONSTORE");
+
+	cmd << set;
+	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	{
+		cmd << *it;
+	}
+
+	return cmd;
 }
 
 Command Command::rename(const std::string& key, const std::string& newName, bool overwrite)

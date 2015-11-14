@@ -109,23 +109,59 @@ public:
 	static Command mset(const std::map<std::string, std::string>& keyvalues, bool create = true);
 		/// Returns a MSET or MSETNX (when create is false) command
 
-	static Command sadd(const std::string& key, const std::string& value);
+	static Command sadd(const std::string& set, const std::string& value);
 		/// Returns a SADD command
 
-	static Command sadd(const std::string& key, const std::vector<std::string>& values);
+	static Command sadd(const std::string& set, const std::vector<std::string>& values);
 		/// Returns a SADD command
 
-	static Command scard(const std::string& key);
+	static Command scard(const std::string& set);
 		/// Returns a SCARD command
 
-	static Command smembers(const std::string& key);
-		/// Returns a SMEMBERS command
+	static Command sdiff(const std::string& set1, const std::string& set2);
+		/// Returns a SDIFF command
+
+	static Command sdiff(const std::string& set, const std::vector<std::string>& sets);
+		/// Returns a SDIFF command
+
+	static Command sdiffstore(const std::string& set, const std::string& set1, const std::string& set2);
+		/// Returns a SDIFFSTORE command
+
+	static Command sdiffstore(const std::string& set, const std::vector<std::string>& sets);
+		/// Returns a SDIFFSTORE command
 
 	static Command set(const std::string& key, const std::string& value, bool overwrite = true, const Poco::Timespan& expireTime = 0, bool create = true);
 		/// Returns a SET command to set the key with a value
 
 	static Command set(const std::string& key, Int64 value, bool overwrite = true, const Poco::Timespan& expireTime = 0, bool create = true);
 		/// Returns a SET command to set the key with a value
+
+	static Command sinter(const std::string& set1, const std::string& set2);
+		/// Returns a SINTER command
+
+	static Command sinter(const std::string& set, const std::vector<std::string>& sets);
+		/// Returns a SINTER command
+
+	static Command sinterstore(const std::string& set, const std::string& set1, const std::string& set2);
+		/// Returns a SINTERSTORE command
+
+	static Command sinterstore(const std::string& set, const std::vector<std::string>& sets);
+		/// Returns a SINTERSTORE command
+
+	static Command smembers(const std::string& set);
+		/// Returns a SMEMBERS command
+
+	static Command sunion(const std::string& set1, const std::string& set2);
+		/// Returns a SUNION command
+
+	static Command sunion(const std::string& set, const std::vector<std::string>& sets);
+		/// Returns a SUNION command
+
+	static Command sunionstore(const std::string& set, const std::string& set1, const std::string& set2);
+		/// Returns a SUNIONSTORE command
+
+	static Command sunionstore(const std::string& set, const std::vector<std::string>& sets);
+		/// Returns a SUNIONSTORE command
 
 	static Command rename(const std::string& key, const std::string& newName, bool overwrite = true);
 		/// Returns a RENAME or RENAMENX when overwrite is false
