@@ -262,6 +262,16 @@ Command Command::set(const std::string& key, Int64 value, bool overwrite, const 
 	return set(key, NumberFormatter::format(value), overwrite, expireTime, create);
 }
 
+Command Command::rename(const std::string& key, const std::string& newName, bool overwrite)
+{
+	Command cmd(overwrite ? "RENAME" : "RENAMENX");
+
+	cmd << key << newName;
+
+	return cmd;
+}
+
+
 Command Command::rpop(const std::string& list)
 {
 	Command cmd("RPOP");

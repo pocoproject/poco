@@ -29,7 +29,7 @@ namespace Redis {
 
 class Redis_API Command : public Array
 	/// Helper class for creating commands. This class contains
-	/// factory methods for common used Redis commands.
+	/// factory methods for commonly used Redis commands.
 {
 public:
 	Command(const std::string& command);
@@ -110,6 +110,9 @@ public:
 
 	static Command set(const std::string& key, Int64 value, bool overwrite = true, const Poco::Timespan& expireTime = 0, bool create = true);
 		/// Returns a SET command to set the key with a value
+
+	static Command rename(const std::string& key, const std::string& newName, bool overwrite = true);
+		/// Returns a RENAME or RENAMENX when overwrite is false
 
 	static Command rpop(const std::string& list);
 		/// Returns a RPOP command

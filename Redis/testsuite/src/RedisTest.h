@@ -53,6 +53,8 @@ public:
 	void testPubSub();
 	void testSet();
 	void testStrlen();
+	void testRename();
+	void testRenameNx();
 	void testRPop();
 	void testRPoplPush();
 	void testRPush();

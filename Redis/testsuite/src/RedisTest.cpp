@@ -1184,6 +1184,101 @@ void RedisTest::testStrlen()
 	}
 }
 
+void RedisTest::testRename()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Command set = Command::set("mykey", "Hello");
+	try
+	{
+		std::string result = _redis.execute<std::string>(set);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command rename = Command::rename("mykey", "myotherkey");
+	try
+	{
+		std::string result = _redis.execute<std::string>(rename);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command get = Command::get("myotherkey");
+	try
+	{
+		BulkString result = _redis.execute<BulkString>(get);
+		assert(result.value().compare("Hello") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testRenameNx()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Command set = Command::set("mykey", "Hello");
+	try
+	{
+		std::string result = _redis.execute<std::string>(set);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	set = Command::set("myotherkey", "World");
+	try
+	{
+		std::string result = _redis.execute<std::string>(set);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command rename = Command::rename("mykey", "myotherkey", false);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(rename);
+		assert(result == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command get = Command::get("myotherkey");
+	try
+	{
+		BulkString result = _redis.execute<BulkString>(get);
+		assert(result.value().compare("World") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testRPop()
 {
 	if (!_connected)
@@ -1444,6 +1539,8 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testPubSub);
 	CppUnit_addTest(pSuite, RedisTest, testSet);
 	CppUnit_addTest(pSuite, RedisTest, testStrlen);
+	CppUnit_addTest(pSuite, RedisTest, testRename);
+	CppUnit_addTest(pSuite, RedisTest, testRenameNx);
 	CppUnit_addTest(pSuite, RedisTest, testRPop);
 	CppUnit_addTest(pSuite, RedisTest, testRPoplPush);
 	CppUnit_addTest(pSuite, RedisTest, testRPush);
