@@ -236,6 +236,14 @@ Command Command::rpop(const std::string& list)
 	return cmd;
 }
 
+Command Command::rpoplpush(const std::string& sourceList, const std::string& destinationList)
+{
+	Command cmd("RPOPLPUSH");
+
+	cmd << sourceList << destinationList;
+
+	return cmd;
+}
 
 Command Command::rpush(const std::string& list, const std::string& value, bool create)
 {

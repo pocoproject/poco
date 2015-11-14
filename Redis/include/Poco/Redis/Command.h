@@ -105,6 +105,9 @@ public:
 	static Command rpop(const std::string& list);
 		/// Returns a RPOP command
 
+	static Command rpoplpush(const std::string& sourceList, const std::string& destinationList);
+		/// Returns a RPOPLPUSH command
+
 	static Command rpush(const std::string& list, const std::string& value, bool create = true);
 		/// Returns a RPUSH or RPUSHX (when create is false) command
 

@@ -827,6 +827,98 @@ void RedisTest::testRPop()
 
 }
 
+void RedisTest::testRPoplPush()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	// Make sure the lists are not there yet ...
+	std::vector<std::string> lists;
+	lists.push_back("mylist");
+	lists.push_back("myotherlist");
+	Command delCommand = Command::del(lists);
+	try
+	{
+		_redis.execute<Poco::Int64>(delCommand);
+	}
+	catch(RedisException& e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::BadCastException& e)
+	{
+		fail(e.message());
+	}
+
+	try
+	{
+		Command rpush = Command::rpush("mylist", "one");
+		Poco::Int64 result = _redis.execute<Poco::Int64>(rpush);
+		assert(result == 1);
+
+		rpush = Command::rpush("mylist", "two");
+		result = _redis.execute<Poco::Int64>(rpush);
+		assert(result == 2);
+
+		rpush = Command::rpush("mylist", "three");
+		result = _redis.execute<Poco::Int64>(rpush);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command rpoplpush = Command::rpoplpush("mylist", "myotherlist");
+	try
+	{
+		BulkString result = _redis.execute<BulkString>(rpoplpush);
+		assert(result.value().compare("three") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command lrange = Command::lrange("mylist");
+	try
+	{
+		Array result = _redis.execute<Array>(lrange);
+
+		assert(result.size() == 2);
+		assert(result.get<BulkString>(0).value().compare("one") == 0);
+		assert(result.get<BulkString>(1).value().compare("two") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::NullValueException &e)
+	{
+		fail(e.message());
+	}
+
+	lrange = Command::lrange("myotherlist");
+	try
+	{
+		Array result = _redis.execute<Array>(lrange);
+
+		assert(result.size() == 1);
+		assert(result.get<BulkString>(0).value().compare("three") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+	catch(Poco::NullValueException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testRPush()
 {
 	if (!_connected)
@@ -1338,6 +1430,7 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testMSetWithMap);
 	CppUnit_addTest(pSuite, RedisTest, testStrlen);
 	CppUnit_addTest(pSuite, RedisTest, testRPush);
+	CppUnit_addTest(pSuite, RedisTest, testRPoplPush);
 	CppUnit_addTest(pSuite, RedisTest, testLIndex);
 	CppUnit_addTest(pSuite, RedisTest, testLInsert);
 	CppUnit_addTest(pSuite, RedisTest, testLRem);

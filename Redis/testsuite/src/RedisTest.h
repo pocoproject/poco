@@ -52,6 +52,7 @@ public:
 
 	void testPubSub();
 	void testRPop();
+	void testRPoplPush();
 
 	void testPipeliningWithSendCommands();
 	void testPipeliningWithWriteCommand();
