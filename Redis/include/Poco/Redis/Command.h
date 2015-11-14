@@ -30,6 +30,10 @@ namespace Redis {
 class Redis_API Command : public Array
 	/// Helper class for creating commands. This class contains
 	/// factory methods for commonly used Redis commands.
+	/// There are two ways of building commands:
+	/// 1. Use this class (which uses option 2 in the factory methods)
+	/// 2. Use the Array class and build the command using the add method
+	///    or << operator.
 {
 public:
 	Command(const std::string& command);
@@ -104,6 +108,18 @@ public:
 
 	static Command mset(const std::map<std::string, std::string>& keyvalues, bool create = true);
 		/// Returns a MSET or MSETNX (when create is false) command
+
+	static Command sadd(const std::string& key, const std::string& value);
+		/// Returns a SADD command
+
+	static Command sadd(const std::string& key, const std::vector<std::string>& values);
+		/// Returns a SADD command
+
+	static Command scard(const std::string& key);
+		/// Returns a SCARD command
+
+	static Command smembers(const std::string& key);
+		/// Returns a SMEMBERS command
 
 	static Command set(const std::string& key, const std::string& value, bool overwrite = true, const Poco::Timespan& expireTime = 0, bool create = true);
 		/// Returns a SET command to set the key with a value

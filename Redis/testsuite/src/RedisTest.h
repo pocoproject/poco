@@ -51,7 +51,10 @@ public:
 	void testPipeliningWithSendCommands();
 	void testPipeliningWithWriteCommand();
 	void testPubSub();
+	void testSAdd();
+	void testSCard();
 	void testSet();
+	void testSMembers();
 	void testStrlen();
 	void testRename();
 	void testRenameNx();

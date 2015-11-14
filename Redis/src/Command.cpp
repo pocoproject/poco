@@ -245,6 +245,46 @@ Command Command::mset(const std::map<std::string, std::string>& keyvalues, bool 
 	return cmd;
 }
 
+Command Command::sadd(const std::string& key, const std::string& value)
+{
+	Command cmd("SADD");
+
+	cmd << key << value;
+
+	return cmd;
+}
+
+Command Command::sadd(const std::string& key, const std::vector<std::string>& values)
+{
+	Command cmd("SADD");
+
+	cmd << key;
+	for(std::vector<std::string>::const_iterator it = values.begin(); it != values.end(); ++it)
+	{
+		cmd << *it;
+	}
+
+	return cmd;
+}
+
+Command Command::scard(const std::string& key)
+{
+	Command cmd("SCARD");
+
+	cmd << key;
+
+	return cmd;
+}
+
+Command Command::smembers(const std::string& key)
+{
+	Command cmd("SMEMBERS");
+
+	cmd << key;
+
+	return cmd;
+}
+
 Command Command::set(const std::string& key, const std::string& value, bool overwrite, const Poco::Timespan& expireTime, bool create)
 {
 	Command cmd("SET");

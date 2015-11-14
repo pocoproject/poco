@@ -1110,6 +1110,94 @@ void RedisTest::testPubSub()
 	_redis.flush();
 }
 
+void RedisTest::testSAdd()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myset");
+
+	Command sadd = Command::sadd("myset", "Hello");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	sadd = Command::sadd("myset", "World");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	sadd = Command::sadd("myset", "World");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testSCard()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myset");
+
+	Command sadd = Command::sadd("myset", "Hello");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	sadd = Command::sadd("myset", "World");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command scard = Command::scard("myset");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(scard);
+		assert(result == 2);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testSet()
 {
 	if (!_connected)
@@ -1177,6 +1265,53 @@ void RedisTest::testStrlen()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(command);
 
 		assert(result == 11);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testSMembers()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myset");
+
+	Command sadd = Command::sadd("myset", "Hello");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	sadd = Command::sadd("myset", "World");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command smembers = Command::smembers("myset");
+	try
+	{
+		Array result = _redis.execute<Array>(smembers);
+
+		assert(result.size() == 2);
+		assert(result.get<BulkString>(0).value().compare("World") == 0);
+		assert(result.get<BulkString>(1).value().compare("Hello") == 0);
 	}
 	catch(RedisException &e)
 	{
@@ -1537,7 +1672,10 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testPipeliningWithSendCommands);
 	CppUnit_addTest(pSuite, RedisTest, testPipeliningWithWriteCommand);
 	CppUnit_addTest(pSuite, RedisTest, testPubSub);
+	CppUnit_addTest(pSuite, RedisTest, testSAdd);
+	CppUnit_addTest(pSuite, RedisTest, testSCard);
 	CppUnit_addTest(pSuite, RedisTest, testSet);
+	CppUnit_addTest(pSuite, RedisTest, testSMembers);
 	CppUnit_addTest(pSuite, RedisTest, testStrlen);
 	CppUnit_addTest(pSuite, RedisTest, testRename);
 	CppUnit_addTest(pSuite, RedisTest, testRenameNx);
