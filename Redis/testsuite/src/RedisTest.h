@@ -60,6 +60,7 @@ public:
 	void testSInterStore();
 	void testSIsmember();
 	void testSMembers();
+	void testSMove();
 	void testSUnion();
 	void testSUnionStore();
 	void testStrlen();

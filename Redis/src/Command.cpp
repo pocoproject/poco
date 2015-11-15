@@ -399,6 +399,15 @@ Command Command::smembers(const std::string& set)
 	return cmd;
 }
 
+Command Command::smove(const std::string& source, const std::string& destination, const std::string& member)
+{
+	Command cmd("SMOVE");
+
+	cmd << source  << destination << member;
+
+	return cmd;
+}
+
 Command Command::sunion(const std::string& set1, const std::string& set2)
 {
 	Command cmd("SUNION");

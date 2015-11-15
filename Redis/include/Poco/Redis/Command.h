@@ -154,6 +154,9 @@ public:
 	static Command smembers(const std::string& set);
 		/// Returns a SMEMBERS command
 
+	static Command smove(const std::string& source, const std::string& destination, const std::string& member);
+		/// Returns a SMOVE command
+
 	static Command sunion(const std::string& set1, const std::string& set2);
 		/// Returns a SUNION command
 

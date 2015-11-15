@@ -1473,7 +1473,6 @@ void RedisTest::testSInterStore()
 	}
 }
 
-
 void RedisTest::testSIsmember()
 {
 	if (!_connected)
@@ -1551,6 +1550,84 @@ void RedisTest::testSMembers()
 	}
 
 	Command smembers = Command::smembers("myset");
+	try
+	{
+		Array result = _redis.execute<Array>(smembers);
+		assert(result.size() == 2);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testSMove()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myset");
+
+	Command sadd = Command::sadd("myset", "one");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	sadd = Command::sadd("myset", "two");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	sadd = Command::sadd("myotherset", "three");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command smove = Command::smove("myset", "myotherset", "two");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(smove);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command smembers = Command::smembers("myset");
+	try
+	{
+		Array result = _redis.execute<Array>(smembers);
+		assert(result.size() == 1);
+		assert(result.get<BulkString>(0).value().compare("one") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	smembers = Command::smembers("myotherset");
 	try
 	{
 		Array result = _redis.execute<Array>(smembers);
@@ -2080,6 +2157,7 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testSInterStore);
 	CppUnit_addTest(pSuite, RedisTest, testSIsmember);
 	CppUnit_addTest(pSuite, RedisTest, testSMembers);
+	CppUnit_addTest(pSuite, RedisTest, testSMove);
 	CppUnit_addTest(pSuite, RedisTest, testStrlen);
 	CppUnit_addTest(pSuite, RedisTest, testSUnion);
 	CppUnit_addTest(pSuite, RedisTest, testSUnionStore);
