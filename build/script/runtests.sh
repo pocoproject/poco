@@ -26,6 +26,10 @@ if [ "$POCO_BASE" = "" ] ; then
 	POCO_BASE=`pwd`
 fi
 
+if [ "$POCO_BUILD" = "" ] ; then
+	POCO_BUILD=$POCO_BASE
+fi
+
 TESTRUNNER=./testrunner
 
 if [ "$1" = "" ] ; then
@@ -50,7 +54,7 @@ if [ "$OSNAME" = "" ] ; then
         CYGWIN*)
                 OSNAME=CYGWIN 
                 TESTRUNNER=$TESTRUNNER.exe
-                PATH=$POCO_BASE/lib/$OSNAME/$OSARCH:$PATH
+                PATH=$POCO_BUILD/lib/$OSNAME/$OSARCH:$PATH
                 ;;
         MINGW*)
                 OSNAME=MinGW ;;
@@ -74,8 +78,8 @@ do
 		fi
 	done
 	if [ $excluded -eq 0 ] ; then
-		if [ -d "$POCO_BASE/$comp/testsuite/$BINDIR" ] ; then
-			if [ -x "$POCO_BASE/$comp/testsuite/$BINDIR/$TESTRUNNER" ] ; then
+		if [ -d "$POCO_BUILD/$comp/testsuite/$BINDIR" ] ; then
+			if [ -x "$POCO_BUILD/$comp/testsuite/$BINDIR/$TESTRUNNER" ] ; then
 				echo ""
 				echo ""
 				echo "****************************************" 
@@ -84,7 +88,7 @@ do
 				echo ""
 
 				runs=`expr $runs + 1`
-				sh -c "cd $POCO_BASE/$comp/testsuite/$BINDIR && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER $TESTRUNNERARGS"
+				sh -c "cd $POCO_BUILD/$comp/testsuite/$BINDIR && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER $TESTRUNNERARGS"
 				if [ $? -ne 0 ] ; then
 					failures=`expr $failures + 1`
 					failedTests="$failedTests $comp"
