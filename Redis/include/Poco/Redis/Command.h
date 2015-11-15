@@ -148,6 +148,9 @@ public:
 	static Command sinterstore(const std::string& set, const std::vector<std::string>& sets);
 		/// Returns a SINTERSTORE command
 
+	static Command sismember(const std::string& set, const std::string& member);
+		/// Returns a SISMEMBER command
+
 	static Command smembers(const std::string& set);
 		/// Returns a SMEMBERS command
 

@@ -381,6 +381,15 @@ Command Command::sinterstore(const std::string& set, const std::vector<std::stri
 	return cmd;
 }
 
+Command Command::sismember(const std::string& set, const std::string& member)
+{
+	Command cmd("SISMEMBER");
+
+	cmd << set << member;
+
+	return cmd;
+}
+
 Command Command::smembers(const std::string& set)
 {
 	Command cmd("SMEMBERS");

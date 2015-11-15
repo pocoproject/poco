@@ -58,6 +58,7 @@ public:
 	void testSet();
 	void testSInter();
 	void testSInterStore();
+	void testSIsmember();
 	void testSMembers();
 	void testSUnion();
 	void testSUnionStore();

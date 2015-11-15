@@ -1473,7 +1473,8 @@ void RedisTest::testSInterStore()
 	}
 }
 
-void RedisTest::testStrlen()
+
+void RedisTest::testSIsmember()
 {
 	if (!_connected)
 	{
@@ -1481,29 +1482,35 @@ void RedisTest::testStrlen()
 		return;
 	}
 
-	Array command;
-	command.add("SET").add("mykey").add("Hello World");
+	delKey("myset");
 
-	// A set responds with a simple OK string
+	Command sadd = Command::sadd("myset", "one");
 	try
 	{
-		std::string result = _redis.execute<std::string>(command);
-		assert(result.compare("OK") == 0);
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
 	}
 	catch(RedisException &e)
 	{
 		fail(e.message());
 	}
 
-	command.clear();
-	command.add("STRLEN")
-		.add("mykey");
-
+	Command sismember = Command::sismember("myset", "one");
 	try
 	{
-		Poco::Int64 result = _redis.execute<Poco::Int64>(command);
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sismember);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
 
-		assert(result == 11);
+	sismember = Command::sismember("myset", "two");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sismember);
+		assert(result == 0);
 	}
 	catch(RedisException &e)
 	{
@@ -1601,6 +1608,44 @@ void RedisTest::testSUnion()
 	{
 		Array result = _redis.execute<Array>(sunion);
 		assert(result.size() == 5);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testStrlen()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array command;
+	command.add("SET").add("mykey").add("Hello World");
+
+	// A set responds with a simple OK string
+	try
+	{
+		std::string result = _redis.execute<std::string>(command);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	command.clear();
+	command.add("STRLEN")
+		.add("mykey");
+
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(command);
+
+		assert(result == 11);
 	}
 	catch(RedisException &e)
 	{
@@ -2033,6 +2078,7 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testSet);
 	CppUnit_addTest(pSuite, RedisTest, testSInter);
 	CppUnit_addTest(pSuite, RedisTest, testSInterStore);
+	CppUnit_addTest(pSuite, RedisTest, testSIsmember);
 	CppUnit_addTest(pSuite, RedisTest, testSMembers);
 	CppUnit_addTest(pSuite, RedisTest, testStrlen);
 	CppUnit_addTest(pSuite, RedisTest, testSUnion);
