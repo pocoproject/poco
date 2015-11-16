@@ -34,6 +34,7 @@ ifndef PROJECT_BASE
 PROJECT_BASE = $(POCO_BASE)
 endif
 export PROJECT_BASE
+$(info PROJECT_BASE  = $(PROJECT_BASE))
 
 #
 # Check for POCO_BUILD
@@ -41,7 +42,11 @@ export PROJECT_BASE
 ifndef POCO_BUILD
 POCO_BUILD = $(PROJECT_BASE)
 endif
+ifeq ($strip $(POCO_BUILD)),)
+POCO_BUILD = $(PROJECT_BASE)
+endif
 export POCO_BUILD
+$(info POCO_BUILD    = $(POCO_BUILD))
 
 #
 # POCO_BASE/POCO_BUILD/cwd sanity checks
