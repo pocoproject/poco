@@ -157,6 +157,12 @@ public:
 	static Command smove(const std::string& source, const std::string& destination, const std::string& member);
 		/// Returns a SMOVE command
 
+	static Command spop(const std::string& set, Int64 count = 0);
+		/// Returns a SPOP command
+
+	static Command srandmember(const std::string& set, Int64 count = 0);
+		/// Returns a SRANDMEMBER command
+
 	static Command srem(const std::string& set, const std::string& member);
 		/// Returns a SREM command
 

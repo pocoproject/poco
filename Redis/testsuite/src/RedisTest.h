@@ -61,6 +61,8 @@ public:
 	void testSIsmember();
 	void testSMembers();
 	void testSMove();
+	void testSPop();
+	void testSRandMember();
 	void testSRem();
 	void testSUnion();
 	void testSUnionStore();

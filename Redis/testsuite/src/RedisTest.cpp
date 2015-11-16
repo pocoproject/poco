@@ -1639,6 +1639,167 @@ void RedisTest::testSMove()
 	}
 }
 
+void RedisTest::testSPop()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myset");
+
+	Command sadd = Command::sadd("myset", "one");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	sadd = Command::sadd("myset", "two");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	sadd = Command::sadd("myset", "three");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command spop = Command::spop("myset");
+	try
+	{
+		BulkString result = _redis.execute<BulkString>(spop);
+		assert(!result.isNull());
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command smembers = Command::smembers("myset");
+	try
+	{
+		Array result = _redis.execute<Array>(smembers);
+		assert(result.size() == 2);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	sadd = Command::sadd("myset", "four");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	sadd = Command::sadd("myset", "five");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+// Redis server 3.0.5 doesn't support this yet ..
+/*
+	spop = Command::spop("myset", 3);
+	try
+	{
+		Array result = _redis.execute<Array>(spop);
+		assert(result.size() == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+*/
+}
+
+void RedisTest::testSRandMember()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myset");
+
+	std::vector<std::string> members;
+	members.push_back("one");
+	members.push_back("two");
+	members.push_back("three");
+
+	Command sadd = Command::sadd("myset", members);
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 3);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command srandmember = Command::srandmember("myset");
+	try
+	{
+		BulkString result = _redis.execute<BulkString>(srandmember);
+		assert(!result.isNull());
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	srandmember = Command::srandmember("myset", 2);
+	try
+	{
+		Array result = _redis.execute<Array>(srandmember);
+		assert(result.size() == 2);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	srandmember = Command::srandmember("myset", -5);
+	try
+	{
+		Array result = _redis.execute<Array>(srandmember);
+		assert(result.size() == 5);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testStrlen()
 {
 	if (!_connected)
@@ -2233,6 +2394,8 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testSIsmember);
 	CppUnit_addTest(pSuite, RedisTest, testSMembers);
 	CppUnit_addTest(pSuite, RedisTest, testSMove);
+	CppUnit_addTest(pSuite, RedisTest, testSPop);
+	CppUnit_addTest(pSuite, RedisTest, testSRandMember);
 	CppUnit_addTest(pSuite, RedisTest, testSRem);
 	CppUnit_addTest(pSuite, RedisTest, testStrlen);
 	CppUnit_addTest(pSuite, RedisTest, testSUnion);

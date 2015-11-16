@@ -408,6 +408,26 @@ Command Command::smove(const std::string& source, const std::string& destination
 	return cmd;
 }
 
+Command Command::spop(const std::string& set, Int64 count)
+{
+	Command cmd("SPOP");
+
+	cmd << set;
+	if( count != 0 ) cmd << NumberFormatter::format(count);
+
+	return cmd;
+}
+
+Command Command::srandmember(const std::string& set, Int64 count)
+{
+	Command cmd("SRANDMEMBER");
+
+	cmd << set;
+	if( count != 0 ) cmd << NumberFormatter::format(count);
+
+	return cmd;
+}
+
 Command Command::srem(const std::string& set1, const std::string& member)
 {
 	Command cmd("SREM");
