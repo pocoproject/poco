@@ -408,6 +408,28 @@ Command Command::smove(const std::string& source, const std::string& destination
 	return cmd;
 }
 
+Command Command::srem(const std::string& set1, const std::string& member)
+{
+	Command cmd("SREM");
+
+	cmd << set1 << member;
+
+	return cmd;
+}
+
+Command Command::srem(const std::string& set, const std::vector<std::string>& members)
+{
+	Command cmd("SREM");
+
+	cmd << set;
+	for(std::vector<std::string>::const_iterator it = members.begin(); it != members.end(); ++it)
+	{
+		cmd << *it;
+	}
+
+	return cmd;
+}
+
 Command Command::sunion(const std::string& set1, const std::string& set2)
 {
 	Command cmd("SUNION");

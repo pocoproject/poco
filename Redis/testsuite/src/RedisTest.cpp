@@ -1639,6 +1639,119 @@ void RedisTest::testSMove()
 	}
 }
 
+void RedisTest::testStrlen()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Array command;
+	command.add("SET").add("mykey").add("Hello World");
+
+	// A set responds with a simple OK string
+	try
+	{
+		std::string result = _redis.execute<std::string>(command);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	command.clear();
+	command.add("STRLEN")
+		.add("mykey");
+
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(command);
+
+		assert(result == 11);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testSRem()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myset");
+
+	Command sadd = Command::sadd("myset", "one");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+	sadd = Command::sadd("myset", "two");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+	sadd = Command::sadd("myset", "three");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command srem = Command::srem("myset", "one");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(srem);
+		assert(result == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	srem = Command::srem("myset", "four");
+	try
+	{
+		Poco::Int64 result = _redis.execute<Poco::Int64>(srem);
+		assert(result == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command smembers = Command::smembers("myset");
+	try
+	{
+		Array result = _redis.execute<Array>(smembers);
+		assert(result.size() == 2);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testSUnion()
 {
 	if (!_connected)
@@ -1685,44 +1798,6 @@ void RedisTest::testSUnion()
 	{
 		Array result = _redis.execute<Array>(sunion);
 		assert(result.size() == 5);
-	}
-	catch(RedisException &e)
-	{
-		fail(e.message());
-	}
-}
-
-void RedisTest::testStrlen()
-{
-	if (!_connected)
-	{
-		std::cout << "Not connected, test skipped." << std::endl;
-		return;
-	}
-
-	Array command;
-	command.add("SET").add("mykey").add("Hello World");
-
-	// A set responds with a simple OK string
-	try
-	{
-		std::string result = _redis.execute<std::string>(command);
-		assert(result.compare("OK") == 0);
-	}
-	catch(RedisException &e)
-	{
-		fail(e.message());
-	}
-
-	command.clear();
-	command.add("STRLEN")
-		.add("mykey");
-
-	try
-	{
-		Poco::Int64 result = _redis.execute<Poco::Int64>(command);
-
-		assert(result == 11);
 	}
 	catch(RedisException &e)
 	{
@@ -2158,6 +2233,7 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testSIsmember);
 	CppUnit_addTest(pSuite, RedisTest, testSMembers);
 	CppUnit_addTest(pSuite, RedisTest, testSMove);
+	CppUnit_addTest(pSuite, RedisTest, testSRem);
 	CppUnit_addTest(pSuite, RedisTest, testStrlen);
 	CppUnit_addTest(pSuite, RedisTest, testSUnion);
 	CppUnit_addTest(pSuite, RedisTest, testSUnionStore);

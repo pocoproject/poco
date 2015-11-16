@@ -61,6 +61,7 @@ public:
 	void testSIsmember();
 	void testSMembers();
 	void testSMove();
+	void testSRem();
 	void testSUnion();
 	void testSUnionStore();
 	void testStrlen();

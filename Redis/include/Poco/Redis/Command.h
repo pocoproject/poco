@@ -157,6 +157,12 @@ public:
 	static Command smove(const std::string& source, const std::string& destination, const std::string& member);
 		/// Returns a SMOVE command
 
+	static Command srem(const std::string& set, const std::string& member);
+		/// Returns a SREM command
+
+	static Command srem(const std::string& set, const std::vector<std::string>& member);
+		/// Returns a SREM command
+
 	static Command sunion(const std::string& set1, const std::string& set2);
 		/// Returns a SUNION command
 
