@@ -620,6 +620,7 @@ CppUnit::Test* SybaseODBC::suite()
 		CppUnit_addTest(pSuite, SybaseODBC, testNullable);
 		CppUnit_addTest(pSuite, SybaseODBC, testReconnect);
 		CppUnit_addTest(pSuite, SybaseODBC, testNumeric);
+		CppUnit_addTest(pSuite, SybaseODBC, testInsertStatReuse);
 
 		_pExecutor = 0;
 		_pSession = 0;

@@ -834,6 +834,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testReconnect);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNumeric);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testXMLColumn);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertStatReuse);
 
 		ODBCDB2Test::_pExecutor = 0;
 		ODBCDB2Test::_pSession = 0;
