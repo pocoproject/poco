@@ -40,10 +40,10 @@ $(info PROJECT_BASE  = $(PROJECT_BASE))
 # Check for POCO_BUILD
 #
 ifndef POCO_BUILD
-POCO_BUILD = $(PROJECT_BASE)
+override POCO_BUILD = $(PROJECT_BASE)
 endif
-ifeq ($strip $(POCO_BUILD)),)
-POCO_BUILD = $(PROJECT_BASE)
+ifeq ($(strip $(POCO_BUILD)),)
+override POCO_BUILD = $(PROJECT_BASE)
 endif
 export POCO_BUILD
 $(info POCO_BUILD    = $(POCO_BUILD))
