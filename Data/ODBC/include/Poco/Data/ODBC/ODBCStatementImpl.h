@@ -95,7 +95,7 @@ protected:
 
 protected:
 
-	void execImpl();
+	virtual void insertHint();
 
 private:
 	typedef Poco::Data::AbstractBindingVec    Bindings;
@@ -162,6 +162,7 @@ private:
 	bool                  _canCompile;
 	ODBCMetaColumn::NumericConversion _numericConversion;
 	bool                  _isPostgres;
+	bool                  _insertHint;
 };
 
 

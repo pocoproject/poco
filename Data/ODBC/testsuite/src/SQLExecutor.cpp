@@ -4371,3 +4371,36 @@ void SQLExecutor::unicode(const std::string& dbConnString)
 	Poco::UnicodeConverter::convert(wtext, text);
 	assert(text == std::string((const char*)supp));
 }
+
+
+void SQLExecutor::insertStatReuse()
+{
+	const std::string funct = "insertStatReuse()";
+	Statement stat(session());
+	try { 
+		Var lastName;
+		std::string firstName("zzz");
+		Any address;
+		Nullable<int> age(0);
+		stat << "INSERT INTO " << ExecUtil::person() << "(LastName, FirstName, Address, Age) VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age);
+		stat.insertHint();
+		for (size_t i = 1; i < 5; ++i)
+		{
+			lastName = Var("Last Name " + NumberFormatter::format(i));
+			firstName = "First Name " + NumberFormatter::format(i);
+			address = "Address" + NumberFormatter::format(i);
+			age = 10 + static_cast<int>(i);
+			stat.execute();
+		}
+		std::vector<int> rowCnt;
+		session() << "SELECT count(*) FROM " << ExecUtil::person() << " AS p "
+			<< " WHERE p.LastName LIKE 'Last%' AND p.FirstName LIKE 'First%' AND p.Address LIKE 'Address%' AND p.Age>10"
+			<< " GROUP BY p.LastName, p.FirstName, p.Address, p.Age", into(rowCnt), now;
+		assert(4 == rowCnt.size());
+		size_t sum = 0;
+		for (size_t i = 0; i < rowCnt.size(); ++i)
+			sum += rowCnt[i];
+		assert(4 == sum);
+	}
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
+}
