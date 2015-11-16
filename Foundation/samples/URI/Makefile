@@ -12,6 +12,6 @@ objects = URI
 
 target         = URI
 target_version = 1
-target_libs    = PocoFoundation
+target_libs    = PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
