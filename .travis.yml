@@ -26,6 +26,7 @@ env:
 
 before_script:
  - echo ${TEST_NAME}
+ - sqlite3 -version
 
 matrix:
   include:
