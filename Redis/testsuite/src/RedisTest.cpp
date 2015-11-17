@@ -339,6 +339,41 @@ void RedisTest::testError()
 	}
 }
 
+void RedisTest::testEval()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Command cmd("EVAL");
+	cmd << "return {1, 2, {3, 'Hello World!'}}" << Poco::NumberFormatter::format(0);
+
+	try
+	{
+		Array value = _redis.execute<Array>(cmd);
+		assert(value.size() == 3);
+
+		Poco::Int64 i = value.get<Poco::Int64>(0);
+		assert(i == 1);
+		i = value.get<Poco::Int64>(1);
+		assert(i == 2);
+
+		Array a = value.get<Array>(2);
+		assert(a.size() == 2);
+		i = a.get<Poco::Int64>(0);
+		assert(i == 3);
+		BulkString s = a.get<BulkString>(1);
+		assert(s.value().compare("Hello World!") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+}
+
 void RedisTest::testIncr()
 {
 	if (!_connected)
@@ -2371,6 +2406,7 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testIncrBy);
 	CppUnit_addTest(pSuite, RedisTest, testEcho);
 	CppUnit_addTest(pSuite, RedisTest, testError);
+	CppUnit_addTest(pSuite, RedisTest, testEval);
 	CppUnit_addTest(pSuite, RedisTest, testLIndex);
 	CppUnit_addTest(pSuite, RedisTest, testLInsert);
 	CppUnit_addTest(pSuite, RedisTest, testLPop);
