@@ -5,7 +5,11 @@ cache:
 
 before_install:
   # we need a recent version of CMake
-  - sudo add-apt-repository -y ppa:andykimpe/cmake3
+  # - sudo add-apt-repository -y ppa:andykimpe/cmake3
+  # linux prereqisite packages
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget --no-check-certificate https://www.cmake.org/files/v3.2/cmake-3.2.3-Linux-x86_64.tar.gz; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then tar -xzvf cmake-3.2.3-Linux-x86_64.tar.gz; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export PATH=$PWD/cmake-3.2.3-Linux-x86_64/bin:$PATH; fi
   - sudo apt-get update -qq
   - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 sloccount cppcheck 
 
@@ -42,14 +46,12 @@ matrix:
     - env:    TEST_NAME="gcc (CMake)"
       compiler: gcc
       script:
-        - sudo apt-get install -qq -y cmake3
         # disable tests, gcc-4.6 gets an internal compiler error
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -j2 && cd ..
 
     - env:    TEST_NAME="gcc-4.8 (CMake)"
       compiler: gcc
       script:
-        - sudo apt-get install -qq -y cmake3
         - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         - sudo apt-get update -qq
         - sudo apt-get install -qq -y g++-4.8
@@ -60,19 +62,16 @@ matrix:
     - env:    TEST_NAME="clang (CMake)"
       compiler: clang
       script:
-        - sudo apt-get install -qq -y cmake3
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
     - env:    TEST_NAME="arm-linux-gnueabi-g++ (CMake)"
       script:
-        - sudo apt-get install -qq -y cmake3
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
     - env:    TEST_NAME="arm-linux-gnueabihf-g++ (CMake)"
       script:
-        - sudo apt-get install -qq -y cmake3
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
