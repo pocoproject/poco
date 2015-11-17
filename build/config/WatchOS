@@ -31,7 +31,7 @@ WATCHOS_SDK_VERSION_MIN ?= $(patsubst %.sdk,%,$(patsubst $(WATCHOS_SDK_ROOT_DIR)
 POCO_TARGET_OSNAME     ?= $(WATCHOS_SDK)
 POCO_TARGET_OSARCH     ?= armv7k
 TOOL_PREFIX            ?= $(shell xcode-select -print-path)/Platforms/$(WATCHOS_SDK).platform/Developer/usr/bin
-OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(WATCHOS_SDK_BASE) -mwatchos-version-min=$(WATCHOS_SDK_VERSION_MIN)
+OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(WATCHOS_SDK_BASE) -mwatchos-version-min=$(WATCHOS_SDK_VERSION_MIN) -fembed-bitcode
 
 #
 # Tools
