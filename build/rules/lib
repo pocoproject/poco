@@ -49,13 +49,13 @@ shared_release: libdirs $(LIB_RELEASE_SHARED)
 
 $(LIB_DEBUG_STATIC): $(foreach o,$(objects),$(OBJPATH_DEBUG_STATIC)/$(o).o)
 	@echo "** Building library (debug)" $@
-	$(LIB) $@ $^
+	$(LIB) $(LIBFLAGS) $@ $^
 	$(RANLIB) $@
 	$(postbuild)
 
 $(LIB_RELEASE_STATIC): $(foreach o,$(objects),$(OBJPATH_RELEASE_STATIC)/$(o).o)
 	@echo "** Building library (release)" $@
-	$(LIB) $@ $^
+	$(LIB) $(LIBFLAGS) $@ $^
 	$(RANLIB) $@
 	$(postbuild)
 
