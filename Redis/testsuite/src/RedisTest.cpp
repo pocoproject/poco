@@ -462,6 +462,105 @@ void RedisTest::testHEXISTS()
 	}
 }
 
+void RedisTest::testHGETALL()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myhash");
+
+	Command hset = Command::hset("myhash", "field1", "Hello");
+	try
+	{
+		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
+		assert(value == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	hset = Command::hset("myhash", "field2", "World");
+	try
+	{
+		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
+		assert(value == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command hgetall = Command::hgetall("myhash");
+	try
+	{
+		Array result = _redis.execute<Array>(hgetall);
+		assert(result.size() == 4);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
+void RedisTest::testHINCRBY()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myhash");
+
+	Command hset = Command::hset("myhash", "field", 5);
+	try
+	{
+		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
+		assert(value == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command hincrby = Command::hincrby("myhash", "field");
+	try
+	{
+		Poco::Int64 n = _redis.execute<Poco::Int64>(hincrby);
+		assert(n == 6);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	hincrby = Command::hincrby("myhash", "field", -1);
+	try
+	{
+		Poco::Int64 n = _redis.execute<Poco::Int64>(hincrby);
+		assert(n == 5);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	hincrby = Command::hincrby("myhash", "field", -10);
+	try
+	{
+		Poco::Int64 n = _redis.execute<Poco::Int64>(hincrby);
+		assert(n == -5);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testHSET()
 {
 	if (!_connected)
@@ -2528,6 +2627,8 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testEVAL);
 	CppUnit_addTest(pSuite, RedisTest, testHDEL);
 	CppUnit_addTest(pSuite, RedisTest, testHEXISTS);
+	CppUnit_addTest(pSuite, RedisTest, testHGETALL);
+	CppUnit_addTest(pSuite, RedisTest, testHINCRBY);
 	CppUnit_addTest(pSuite, RedisTest, testHSET);
 	CppUnit_addTest(pSuite, RedisTest, testINCR);
 	CppUnit_addTest(pSuite, RedisTest, testINCRBY);

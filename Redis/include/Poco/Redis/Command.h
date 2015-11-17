@@ -81,7 +81,16 @@ public:
 	static Command hget(const std::string& hash, const std::string& field);
 		/// Returns an HGET command
 
+	static Command hgetall(const std::string& hash);
+		/// Returns an HGETALL command
+
+	static Command hincrby(const std::string& hash, const std::string& field, Int64 by = 1);
+		/// Returns an HINCRBY command
+
 	static Command hset(const std::string& hash, const std::string& field, const std::string& value, bool create = true);
+		/// Returns an HSET or HSETNX (when create is false) command
+
+	static Command hset(const std::string& hash, const std::string& field, Int64 value, bool create = true);
 		/// Returns an HSET or HSETNX (when create is false) command
 
 	static Command incr(const std::string& key, Int64 by = 0);

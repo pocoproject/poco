@@ -39,6 +39,8 @@ public:
 	void testEVAL();
 	void testHDEL();
 	void testHEXISTS();
+	void testHGETALL();
+	void testHINCRBY();
 	void testHSET();
 	void testINCR();
 	void testINCRBY();

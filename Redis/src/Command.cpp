@@ -158,6 +158,24 @@ Command Command::hget(const std::string& hash, const std::string& field)
 	return cmd;
 }
 
+Command Command::hgetall(const std::string& hash)
+{
+	Command cmd("HGETALL");
+
+	cmd << hash;
+
+	return cmd;
+}
+
+Command Command::hincrby(const std::string& hash, const std::string& field, Int64 by)
+{
+	Command cmd("HINCRBY");
+
+	cmd << hash << field << NumberFormatter::format(by);
+
+	return cmd;
+}
+
 Command Command::hset(const std::string& hash, const std::string& field, const std::string& value, bool create)
 {
 	Command cmd(create ? "HSET" : "HSETNX");
@@ -165,6 +183,11 @@ Command Command::hset(const std::string& hash, const std::string& field, const s
 	cmd << hash << field << value;
 
 	return cmd;
+}
+
+Command Command::hset(const std::string& hash, const std::string& field, Int64 value, bool create)
+{
+	return hset(hash, field, NumberFormatter::format(value), create);
 }
 
 Command Command::incr(const std::string& key, Int64 by)
