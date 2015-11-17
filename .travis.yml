@@ -11,10 +11,11 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then tar -xzvf cmake-3.2.3-Linux-x86_64.tar.gz; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export PATH=$PWD/cmake-3.2.3-Linux-x86_64/bin:$PATH; fi
   - sudo apt-get update -qq
-  - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev libpcre3-dev libssl-dev libsqlite3-dev libexpat1-dev
+  - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev libpcre3-dev libssl-dev libexpat1-dev
   - sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 
   - sudo apt-get install -qq -y sloccount cppcheck 
-  - sudo apt-get install -qq -y sqlite3 libsqlite3-dev
+  - sudo apt-get install -qq -y libsqlite3-dev_3.9.1-2_amd64.deb 
+
 services:
   - mongodb
   
