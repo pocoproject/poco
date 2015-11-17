@@ -374,6 +374,39 @@ void RedisTest::testEval()
 
 }
 
+void RedisTest::testHSet()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myhash");
+
+	Command hset = Command::hset("myhash", "field1", "Hello");
+	try
+	{
+		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
+		assert(value == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command hget = Command::hget("myhash", "field1");
+	try
+	{
+		BulkString s = _redis.execute<BulkString>(hget);
+		assert(s.value().compare("Hello") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testIncr()
 {
 	if (!_connected)
@@ -2402,11 +2435,12 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testBRpop);
 	CppUnit_addTest(pSuite, RedisTest, testDecr);
 	CppUnit_addTest(pSuite, RedisTest, testDecr);
-	CppUnit_addTest(pSuite, RedisTest, testIncr);
-	CppUnit_addTest(pSuite, RedisTest, testIncrBy);
 	CppUnit_addTest(pSuite, RedisTest, testEcho);
 	CppUnit_addTest(pSuite, RedisTest, testError);
 	CppUnit_addTest(pSuite, RedisTest, testEval);
+	CppUnit_addTest(pSuite, RedisTest, testHSet);
+	CppUnit_addTest(pSuite, RedisTest, testIncr);
+	CppUnit_addTest(pSuite, RedisTest, testIncrBy);
 	CppUnit_addTest(pSuite, RedisTest, testLIndex);
 	CppUnit_addTest(pSuite, RedisTest, testLInsert);
 	CppUnit_addTest(pSuite, RedisTest, testLPop);

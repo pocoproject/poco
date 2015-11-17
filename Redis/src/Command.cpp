@@ -118,6 +118,24 @@ Command Command::get(const std::string& key)
 	return cmd;
 }
 
+Command Command::hget(const std::string& hash, const std::string& field)
+{
+	Command cmd("HGET");
+
+	cmd << hash << field;
+
+	return cmd;
+}
+
+Command Command::hset(const std::string& hash, const std::string& field, const std::string& value, bool create)
+{
+	Command cmd(create ? "HSET" : "HSETNX");
+
+	cmd << hash << field << value;
+
+	return cmd;
+}
+
 Command Command::incr(const std::string& key, Int64 by)
 {
 	Command cmd(by == 0 ? "INCR" : "INCRBY");

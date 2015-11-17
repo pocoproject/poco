@@ -69,6 +69,12 @@ public:
 	static Command get(const std::string& key);
 		/// Returns an GET command
 
+	static Command hget(const std::string& hash, const std::string& field);
+		/// Returns an HGET command
+
+	static Command hset(const std::string& hash, const std::string& field, const std::string& value, bool create = true);
+		/// Returns an HSET or HSETNX (when create is false) command
+
 	static Command incr(const std::string& key, Int64 by = 0);
 		/// Returns an INCR or INCRBY command. Calls INCR when by is omitted or zero.
 
