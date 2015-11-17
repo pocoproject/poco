@@ -14,7 +14,7 @@ before_install:
   - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev libpcre3-dev libssl-dev libsqlite3-dev libexpat1-dev
   - sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 
   - sudo apt-get install -qq -y sloccount cppcheck 
-
+  - sudo apt-get install -qq -y sqlite3 libsqlite3-dev
 services:
   - mongodb
   
