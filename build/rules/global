@@ -34,19 +34,16 @@ ifndef PROJECT_BASE
 PROJECT_BASE = $(POCO_BASE)
 endif
 export PROJECT_BASE
-$(info PROJECT_BASE  = $(PROJECT_BASE))
+$(info PROJECT_BASE  	= $(PROJECT_BASE))
 
 #
 # Check for POCO_BUILD
 #
 ifndef POCO_BUILD
-override POCO_BUILD = $(PROJECT_BASE)
-endif
-ifeq ($(strip $(POCO_BUILD)),)
-override POCO_BUILD = $(PROJECT_BASE)
+POCO_BUILD = $(PROJECT_BASE)
 endif
 export POCO_BUILD
-$(info POCO_BUILD    = $(POCO_BUILD))
+$(info POCO_BUILD    	= $(POCO_BUILD))
 
 #
 # POCO_BASE/POCO_BUILD/cwd sanity checks
@@ -79,7 +76,10 @@ endif
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
 POCO_HOST_OSNAME = MinGW
 endif
+$(info POCO_HOST_OSNAME= $(POCO_HOST_OSNAME))
+
 POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
+$(info POCO_HOST_OSARCH= $(POCO_HOST_OSARCH))
 
 #
 # Begin Sun platforms
@@ -115,6 +115,7 @@ endif
 ifndef POCO_CONFIG
 POCO_CONFIG = $(POCO_HOST_OSNAME)
 endif
+$(info POCO_CONFIG   	= $(POCO_CONFIG))
 
 #
 # Include System Specific Settings
@@ -129,11 +130,15 @@ OSNAME   := $(POCO_HOST_OSNAME)
 else
 OSNAME   := $(POCO_TARGET_OSNAME)
 endif
+$(info OSNAME   	= $(OSNAME))
+
 ifndef POCO_TARGET_OSARCH
 OSARCH   := $(subst /,-,$(shell uname -m | tr ' ' _))
 else
 OSARCH   := $(POCO_TARGET_OSARCH)
 endif
+$(info OSARCH   	= $(OSARCH))
+
 HOSTNAME := $(shell hostname)
 
 #
@@ -294,4 +299,3 @@ endif
 #
 export CC
 export CXX
-export LINK
