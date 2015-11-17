@@ -176,6 +176,24 @@ Command Command::hincrby(const std::string& hash, const std::string& field, Int6
 	return cmd;
 }
 
+Command Command::hkeys(const std::string& hash)
+{
+	Command cmd("HKEYS");
+
+	cmd << hash;
+
+	return cmd;
+}
+
+Command Command::hlen(const std::string& hash)
+{
+	Command cmd("HLEN");
+
+	cmd << hash;
+
+	return cmd;
+}
+
 Command Command::hset(const std::string& hash, const std::string& field, const std::string& value, bool create)
 {
 	Command cmd(create ? "HSET" : "HSETNX");

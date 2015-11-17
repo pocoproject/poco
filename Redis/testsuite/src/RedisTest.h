@@ -41,6 +41,7 @@ public:
 	void testHEXISTS();
 	void testHGETALL();
 	void testHINCRBY();
+	void testHKEYS();
 	void testHSET();
 	void testINCR();
 	void testINCRBY();
