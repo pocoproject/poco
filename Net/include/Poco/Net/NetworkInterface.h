@@ -236,6 +236,9 @@ public:
 		/// The ipVersion argument can be used to specify whether
 		/// an IPv4 (IPv4_ONLY) or IPv6 (IPv6_ONLY) interface is required, 
 		/// or whether the caller does not care (IPv4_OR_IPv6).
+		///
+		/// Throws an InterfaceNotFoundException if an interface
+		/// with the give name does not exist.
 		
 	static NetworkInterface forAddress(const IPAddress& address);
 		/// Returns the NetworkInterface for the given IP address.
@@ -247,8 +250,7 @@ public:
 		/// Returns the NetworkInterface for the given interface index.
 		///
 		/// Throws an InterfaceNotFoundException if an interface
-		/// with the given index does not exist (or IPv6 is not
-		/// available).
+		/// with the given index does not exist.
 		
 	static List list(bool ipOnly = true, bool upOnly = true);
 		/// Returns a list with all network interfaces

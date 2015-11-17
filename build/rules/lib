@@ -61,13 +61,13 @@ $(LIB_RELEASE_STATIC): $(foreach o,$(objects),$(OBJPATH_RELEASE_STATIC)/$(o).o)
 
 $(LIB_DEBUG_SHARED): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building shared library (debug)" $@
-	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
+	$(SHLIB) $(LINKFLAGS) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
 	$(SHLIBLN) $(LIB_DEBUG_SHARED) $(LIB_DEBUG_SHARED_LINK)
 	$(postbuild)
 
 $(LIB_RELEASE_SHARED): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building shared library (release)" $@
-	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
+	$(SHLIB) $(LINKFLAGS) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
 	$(SHLIBLN) $(LIB_RELEASE_SHARED) $(LIB_RELEASE_SHARED_LINK)
 	$(STRIPCMD)
 	$(postbuild)

@@ -20,6 +20,8 @@ POCO_TARGET_OSARCH ?= x86_64
 POCO_HOST_OSARCH   := $(POCO_TARGET_OSARCH)
 ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH)
 
+OPENSSL_DIR        ?= /usr/local/opt/openssl/
+
 ifeq ($(POCO_TARGET_OSARCH),i386)
 RORELOCS = -read_only_relocs suppress
 endif
@@ -72,9 +74,9 @@ RELEASEOPT_LINK =
 #
 # System Specific Flags
 #
-SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64
+SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64 -I$(OPENSSL_DIR)/include
 
 #
 # System Specific Libraries
 #
-SYSLIBS  = -ldl
+SYSLIBS  = -L$(OPENSSL_DIR)/lib -ldl

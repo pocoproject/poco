@@ -55,6 +55,9 @@ ZipFileInfo::ZipFileInfo(const ZipLocalFileHeader& header):
 		setUnixAttributes();
 
 	_rawInfo[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.	   
+
+	if (header.searchCRCAndSizesAfterData())
+		_rawInfo[GENERAL_PURPOSE_POS] |= 0x08;
 }
 
 

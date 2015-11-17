@@ -31,7 +31,7 @@ TVOS_SDK_VERSION_MIN ?= $(patsubst %.sdk,%,$(patsubst $(TVOS_SDK_ROOT_DIR)%,%,$(
 POCO_TARGET_OSNAME     ?= $(TVOS_SDK)
 POCO_TARGET_OSARCH     ?= arm64
 TOOL_PREFIX            ?= $(shell xcode-select -print-path)/Platforms/$(TVOS_SDK).platform/Developer/usr/bin
-OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(TVOS_SDK_BASE) -mtvos-version-min=$(TVOS_SDK_VERSION_MIN)
+OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(TVOS_SDK_BASE) -mtvos-version-min=$(TVOS_SDK_VERSION_MIN) -fembed-bitcode
 
 #
 # Tools
