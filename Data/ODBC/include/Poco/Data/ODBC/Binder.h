@@ -58,11 +58,27 @@ namespace ODBC {
 class ODBC_API Binder: public Poco::Data::AbstractBinder
 	/// Binds placeholders in the sql query to the provided values. Performs data types mapping.
 {
+
+	struct ParamDescriptor
+	{
+		ParamDescriptor() : colSize(0), cDataType(0), decDigits(-1)
+		{}
+
+		ParamDescriptor(SQLINTEGER colSize_, SQLSMALLINT cDataType_, SQLSMALLINT decDigits_) : colSize(colSize_), cDataType(cDataType_), decDigits(decDigits_)
+		{}
+
+		bool defined() const { return cDataType != 0; }
+		SQLINTEGER colSize;
+		SQLSMALLINT cDataType;
+		SQLSMALLINT decDigits;
+	};
+
 public:
 	typedef AbstractBinder::Direction Direction;
 	typedef std::map<SQLPOINTER, SQLLEN> ParamMap;
 
 	static const size_t DEFAULT_PARAM_SIZE = 1024;
+
 
 	enum ParameterBinding
 	{
@@ -74,7 +90,8 @@ public:
 		std::size_t maxFieldSize,
 		ParameterBinding dataBinding,
 		TypeInfo* pDataTypes,
-		ODBCMetaColumn::NumericConversion numericConversion);
+		ODBCMetaColumn::NumericConversion numericConversion,
+		bool insertOnly);
 		/// Creates the Binder.
 
 	~Binder();
@@ -354,6 +371,7 @@ public:
 		/// Clears the cached storage.
 
 private:
+	typedef std::vector<ParamDescriptor>                     ParameterInfoVec;
 	typedef std::vector<SQLLEN*>                             LengthPtrVec;
 	typedef std::vector<SQLLEN>                              LengthVec;
 	typedef std::vector<LengthVec*>                          LengthVecVec;
@@ -965,6 +983,7 @@ private:
 	void freeMemory();
 		/// Frees all dynamically allocated memory resources.
 
+
 	template<typename T>
 	void getMinValueSize(T& val, SQLINTEGER& size)
 		/// Some ODBC drivers return DB-wide maximum allowed size for variable size columns,
@@ -1003,6 +1022,7 @@ private:
 	ParamMap         _inParams;
 	ParamMap         _outParams;
 	ParameterBinding _paramBinding;
+	ParameterInfoVec _parameters;
 	
 	DateMap          _dates;
 	TimeMap          _times;
@@ -1025,6 +1045,7 @@ private:
 	std::size_t      _maxVarBinColSize;
 	ODBCMetaColumn::NumericConversion _numericConversion;
 	NullCbMap        _nullCbMap;
+	bool             _insertOnly;
 };
 
 

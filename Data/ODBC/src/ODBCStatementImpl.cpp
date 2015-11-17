@@ -48,7 +48,8 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_affectedRowCount(0),
 	_canCompile(true),
 	_numericConversion(rSession.numericConversion()),
-	_isPostgres(false)
+	_isPostgres(false),
+	_insertHint(false)
 {
 	int queryTimeout = rSession.queryTimeout();
 	if (queryTimeout >= 0)
@@ -109,7 +110,7 @@ void ODBCStatementImpl::compileImpl()
 	const std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 	const ODBCMetaColumn::NumericConversion numericConversion = dynamic_cast<SessionImpl&>(session()).numericConversion();
 	
-	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT, numericConversion);
+	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT, numericConversion, _insertHint);
 	
 	makeInternalExtractors();
 	doPrepare();
@@ -235,7 +236,6 @@ void ODBCStatementImpl::doBind()
 void ODBCStatementImpl::bindImpl()
 {
 	doBind();
-
 	SQLRETURN rc = SQLExecute(_stmt);
 
 	if (SQL_NEED_DATA == rc) putData();
@@ -501,6 +501,12 @@ int ODBCStatementImpl::affectedRowCount() const
 	}
 
 	return _affectedRowCount;
+}
+
+
+void ODBCStatementImpl::insertHint()
+{
+	_insertHint = true;
 }
 
 

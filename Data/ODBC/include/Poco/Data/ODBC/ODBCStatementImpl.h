@@ -93,6 +93,10 @@ protected:
 	std::string nativeSQL();
 		/// Returns the SQL string as modified by the driver.
 
+protected:
+
+	virtual void insertHint();
+
 private:
 	typedef Poco::Data::AbstractBindingVec    Bindings;
 	typedef Poco::SharedPtr<Binder>           BinderPtr;
@@ -158,6 +162,7 @@ private:
 	bool                  _canCompile;
 	ODBCMetaColumn::NumericConversion _numericConversion;
 	bool                  _isPostgres;
+	bool                  _insertHint;
 };
 
 

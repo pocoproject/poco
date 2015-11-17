@@ -39,7 +39,17 @@ namespace Poco {
 namespace Data {
 
 
-typedef NullType NullData;
+enum NullData
+{
+	NULL_GENERIC = Poco::NULL_GENERIC,
+	DATA_NULL_INTEGER = 1,
+	DATA_NULL_STRING = 2,
+	DATA_NULL_DATE = 3,
+	DATA_NULL_TIME = 4,
+	DATA_NULL_DATETIME = 5,
+	DATA_NULL_BLOB = 6,
+	DATA_NULL_FLOAT = 7
+};
 
 
 namespace Keywords {

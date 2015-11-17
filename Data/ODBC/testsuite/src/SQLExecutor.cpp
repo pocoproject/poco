@@ -107,24 +107,29 @@ using Poco::UTF32String;
 static
 std::string idGen()
 {
-	std::string host = Poco::Environment::nodeName();
+	std::string host = Poco::Environment::nodeName() + "_" + 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	Poco::Environment::get("USERNAME");
+#else
+	Poco::Environment::get("USER", "U");
+#endif
 	if (host.length() > 12) //Sybase has got 30 char length limit
 	{
-	  Poco::Checksum crc;
-	  crc.update(host);
-    host = Poco::format("%s%X", host.substr(0, 4), crc.checksum());
+		Poco::Checksum crc;
+		crc.update(host);
+		host = Poco::format("%s%X", host.substr(0, 4), crc.checksum());
 	}
-  std::replace(host.begin(), host.end(), '.', '_');
-  std::replace(host.begin(), host.end(), '-', '_');
+	std::replace(host.begin(), host.end(), '.', '_');
+	std::replace(host.begin(), host.end(), '-', '_');
 	return host;
 }
 
 std::string ExecUtil::mangleTable(const std::string& name)
 {
 	static std::string id = idGen();
-  const std::string nm = "pt_" + name + id;
-  poco_assert_dbg(nm.length() <= 30);
-  return nm;
+	const std::string nm = "pt_" + name + id;
+	poco_assert_dbg(nm.length() <= 30);
+	return nm;
 }
 
 struct Person
@@ -4372,4 +4377,37 @@ void SQLExecutor::unicode(const std::string& dbConnString)
 	session() << "SELECT str FROM UnicodeTable", into(wtext), now;
 	Poco::UnicodeConverter::convert(wtext, text);
 	assert(text == std::string((const char*)supp));
+}
+
+
+void SQLExecutor::insertStatReuse()
+{
+	const std::string funct = "insertStatReuse()";
+	Statement stat(session());
+	try { 
+		Var lastName;
+		std::string firstName("zzz");
+		Any address;
+		Nullable<int> age(0);
+		stat << "INSERT INTO " << ExecUtil::person() << "(LastName, FirstName, Address, Age) VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age);
+		stat.insertHint();
+		for (size_t i = 1; i < 5; ++i)
+		{
+			lastName = Var("Last Name " + NumberFormatter::format(i));
+			firstName = "First Name " + NumberFormatter::format(i);
+			address = "Address" + NumberFormatter::format(i);
+			age = 10 + static_cast<int>(i);
+			stat.execute();
+		}
+		std::vector<int> rowCnt;
+		session() << "SELECT count(*) FROM " << ExecUtil::person() << " AS p "
+			<< " WHERE p.LastName LIKE 'Last%' AND p.FirstName LIKE 'First%' AND p.Address LIKE 'Address%' AND p.Age>10"
+			<< " GROUP BY p.LastName, p.FirstName, p.Address, p.Age", into(rowCnt), now;
+		assert(4 == rowCnt.size());
+		size_t sum = 0;
+		for (size_t i = 0; i < rowCnt.size(); ++i)
+			sum += rowCnt[i];
+		assert(4 == sum);
+	}
+	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
 }

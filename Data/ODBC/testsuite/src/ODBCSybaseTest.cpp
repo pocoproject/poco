@@ -535,6 +535,28 @@ void SybaseODBC::testStoredProcedureAny()
 		dropObject("procedure", nm);
 		assert(4 == AnyCast<int>(i));
 
+		session() << "create procedure " << nm << " "
+			"@i int , @f float , @s1 varchar(10) , @d date , @t time , @dt datetime , @bin binary , @res int output"
+			" as "
+			"select @res = 11 where (@i is null) and (@f is null) and (@s1 is null) and (@d is null) and (@t is null) and (@dt is null) and (@bin is null)"
+			, now;
+		Poco::Dynamic::Var res(0);
+		Poco::Dynamic::Var null;
+		Poco::Data::Statement stat(session());
+		stat << "{ call " << nm << "(?,?,?,?,?,?,?  ?) }";
+		stat.addBind(Poco::Data::Keywords::bind(Poco::Data::DATA_NULL_INTEGER));
+		stat.addBind(Poco::Data::Keywords::bind(Poco::Data::DATA_NULL_FLOAT));
+		stat.addBind(Poco::Data::Keywords::bind(Poco::Data::DATA_NULL_STRING));
+		stat.addBind(Poco::Data::Keywords::bind(Poco::Data::DATA_NULL_DATE));
+		stat.addBind(Poco::Data::Keywords::bind(Poco::Dynamic::Var(Poco::Data::DATA_NULL_TIME)));
+		stat.addBind(Poco::Data::Keywords::bind(Poco::Data::DATA_NULL_DATETIME));
+		stat.addBind(Poco::Data::Keywords::bind(Poco::Dynamic::Var(Poco::Data::DATA_NULL_BLOB)));
+			
+		stat.addBind(Poco::Data::Keywords::out(res));
+		stat.execute();
+		dropObject("procedure", nm);
+		assert(11 == res.extract<int>());
+
 		k += 2;
 	}
 }
@@ -644,6 +666,7 @@ CppUnit::Test* SybaseODBC::suite()
 		CppUnit_addTest(pSuite, SybaseODBC, testNullable);
 		CppUnit_addTest(pSuite, SybaseODBC, testReconnect);
 		CppUnit_addTest(pSuite, SybaseODBC, testNumeric);
+		CppUnit_addTest(pSuite, SybaseODBC, testInsertStatReuse);
 
 		_pExecutor = 0;
 		_pSession = 0;

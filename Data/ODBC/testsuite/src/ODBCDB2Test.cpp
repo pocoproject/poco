@@ -491,6 +491,59 @@ void ODBCDB2Test::testStoredFunction()
 }
 
 
+void ODBCDB2Test::testXMLColumn()
+{
+	const std::string tbl = ExecUtil::mangleTable("xmlColumn");
+	dropObject("TABLE", tbl);
+	try { 
+		const std::string xmlStr = "<a> xml text </a>";
+		Poco::UTF16String uStr;
+		for (unsigned c = 0x400; c < 0x409; ++c) uStr.append(3, Poco::UTF16Char(c) );
+		session() << "CREATE TABLE " << tbl << " (id integer, x XML, cl CLOB, dbcl DBCLOB)", now;
+		session() << "INSERT INTO " << tbl << " (id , x, cl, dbcl)  VALUES(1, '" << xmlStr << "', ?, ?)", bind(xmlStr), bind(uStr), now;
+		Poco::Data::Statement  stat(session());
+		stat << "SELECT id, x,cl, dbcl FROM " << tbl, now;
+		
+		Poco::Data::RecordSet rs(stat);
+		assert(1 == rs.rowCount());
+		assert(4 == rs.columnCount());
+		int id = rs.value<int>(0);
+		assert(1 == id);
+
+		Poco::Data::BLOB xml = rs.value<Poco::Data::BLOB>(1);
+		std::string readStr(reinterpret_cast<const char*>(xml.rawContent()), xml.size());
+		assert(readStr.find(xmlStr) < readStr.length());
+
+		Poco::Data::CLOB cl = rs.value<Poco::Data::CLOB>(2);
+		assert(xmlStr == std::string(cl.rawContent(), cl.size()));
+
+		const Poco::UTF16String us = rs.value<Poco::UTF16String>(3);
+		assert(uStr == us);
+		// check nullables
+		Poco::Nullable<Poco::Data::CLOB> ncl = Poco::Nullable<Poco::Data::CLOB>(Poco::Data::CLOB());
+		assert(false == ncl.isNull());
+		Poco::Nullable<Poco::Data::BLOB> nbl = Poco::Nullable<Poco::Data::BLOB>(Poco::Data::BLOB());
+		assert(false == nbl.isNull());
+		Poco::Nullable<Poco::UTF16String> usn(Poco::UTF16String(2, Poco::UTF16Char('a')));
+		assert(false == usn.isNull());
+		session() << "INSERT INTO " << tbl << " (id) VALUES (99) ", now;
+		session() << "SELECT x,cl, dbcl FROM " << tbl << " WHERE id > 1", into(nbl), into(ncl), into(usn), now;
+
+		assert(true == ncl.isNull());
+		assert(true == nbl.isNull());
+		assert(true == usn.isNull());
+	}
+	catch (const Poco::Exception& e)
+	{
+		dropObject("TABLE", tbl);
+
+		std::cerr << e.message() << std::endl;
+		throw;
+	}
+	dropObject("TABLE", tbl);
+}
+
+
 void ODBCDB2Test::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -783,6 +836,8 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNullable);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testReconnect);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNumeric);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testXMLColumn);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertStatReuse);
 
 		ODBCDB2Test::_pExecutor = 0;
 		ODBCDB2Test::_pSession = 0;

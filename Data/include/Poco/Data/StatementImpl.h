@@ -163,6 +163,9 @@ public:
 		/// Returns the current data set.
 
 protected:
+	virtual void insertHint();
+	/// Hints the implementation that it is an insert statement
+
 	virtual std::size_t columnsReturned() const = 0;
 		/// Returns number of columns returned by query. 
 

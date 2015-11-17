@@ -1262,6 +1262,20 @@ void ODBCTest::testNumeric()
 	}
 }
 
+
+void ODBCTest::testInsertStatReuse()
+{
+	for (int i = 0; i < 8; i += 2)
+	{
+		recreatePersonTable();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i + 1));
+
+		_pExecutor->insertStatReuse();
+	}
+}
+
+
 void ODBCTest::testUnicode()
 {
 #if defined (POCO_ODBC_UNICODE)

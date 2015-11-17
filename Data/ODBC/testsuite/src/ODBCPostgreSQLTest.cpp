@@ -723,6 +723,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNullable);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testUnicode);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testReconnect);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertStatReuse);
 
 		return pSuite;
 	}

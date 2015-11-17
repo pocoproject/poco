@@ -355,8 +355,10 @@ void StatementImpl::makeExtractors(std::size_t count, const Position& position)
 				addInternalExtract<std::string>(mc, position.value()); break;
 			case MetaColumn::FDT_WSTRING:
 				addInternalExtract<Poco::UTF16String>(mc, position.value()); break;
-			case MetaColumn::FDT_BLOB:   
+			case MetaColumn::FDT_BLOB:
 				addInternalExtract<BLOB>(mc, position.value()); break;
+			case MetaColumn::FDT_CLOB:
+				addInternalExtract<CLOB>(mc, position.value()); break;
 			case MetaColumn::FDT_DATE:
 				addInternalExtract<Date>(mc, position.value()); break;
 			case MetaColumn::FDT_TIME:
@@ -492,5 +494,9 @@ void StatementImpl::formatSQL(std::vector<Any>& arguments)
 	_ostr << sql;
 }
 
+
+void StatementImpl::insertHint()
+{
+}
 
 } } // namespace Poco::Data

@@ -23,6 +23,7 @@
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/NamedTuple.h"
 #include "Poco/DynamicAny.h"
+#include "Poco/Data/AbstractBinder.h"
 #include <vector>
 #include <map>
 #include <typeinfo>
@@ -117,6 +118,9 @@ public:
 	SQLSMALLINT tryTypeidToCType(const std::type_info& ti, SQLSMALLINT defaultVal = SQL_C_TINYINT) const;
 		/// try to find mapping of the given C++ typeid to the ODBC C-Type Code
 		/// will return the defaultVal if no match is found
+
+	SQLSMALLINT nullDataType(const NullData val) const;
+		/// Map the null value type to ODBC buffer type
 
 private:
 	void fillCTypes();
