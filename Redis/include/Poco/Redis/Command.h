@@ -71,9 +71,12 @@ public:
 
 	static Command hdel(const std::string& hash, const std::string& field);
 		/// Returns an HDEL command
-	
+
 	static Command hdel(const std::string& hash, const std::vector<std::string>& fields);
 		/// Returns an HDEL command
+
+	static Command hexists(const std::string& hash, const std::string& field);
+		/// Returns an HEXISTS command
 
 	static Command hget(const std::string& hash, const std::string& field);
 		/// Returns an HGET command

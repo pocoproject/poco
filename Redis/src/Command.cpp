@@ -140,6 +140,15 @@ Command Command::hdel(const std::string& hash, const std::vector<std::string>& f
 	return cmd;
 }
 
+Command Command::hexists(const std::string& hash, const std::string& field)
+{
+	Command cmd("HEXISTS");
+
+	cmd << hash << field;
+
+	return cmd;
+}
+
 Command Command::hget(const std::string& hash, const std::string& field)
 {
 	Command cmd("HGET");
