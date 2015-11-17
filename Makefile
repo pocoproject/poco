@@ -11,23 +11,23 @@ ifndef POCO_BASE
 $(warning WARNING: POCO_BASE is not defined. Assuming current directory.)
 export POCO_BASE=$(shell pwd)
 endif
+#$(info POCO_BASE  = $(POCO_BASE))
 
 ifndef POCO_PREFIX
 export POCO_PREFIX=/usr/local
 endif
+#$(info POCO_PREFIX= $(POCO_PREFIX))
 
 ifndef POCO_BUILD
 export POCO_BUILD=$(POCO_BASE)
 endif
+#$(info POCO_BUILD = $(POCO_BUILD))
 
 #
 # Determine OS
 #
 POCO_HOST_OSNAME = $(shell uname)
 ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
-ifeq ($(findstring x86_64,$(POCO_HOST_OSNAME)),x86_64)
-OSARCH_64BITS = 1
-endif
 POCO_HOST_OSNAME = CYGWIN
 endif
 
@@ -37,6 +37,19 @@ endif
 POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
 
 #
+# If POCO_CONFIG is not set, use the OS name as configuration name
+#
+ifndef POCO_CONFIG
+POCO_CONFIG = $(POCO_HOST_OSNAME)
+endif
+#$(info POCO_CONFIG   = $(POCO_CONFIG))
+
+#
+# Include System Specific Settings
+#
+include $(POCO_BASE)/build/config/$(POCO_CONFIG)
+
+#
 # Determine operating system
 #
 ifndef POCO_TARGET_OSNAME
@@ -44,11 +57,14 @@ OSNAME   := $(POCO_HOST_OSNAME)
 else
 OSNAME   := $(POCO_TARGET_OSNAME)
 endif
+#$(info OSNAME     = $(OSNAME))
+
 ifndef POCO_TARGET_OSARCH
 OSARCH   := $(POCO_HOST_OSARCH)
 else
 OSARCH   := $(POCO_TARGET_OSARCH)
 endif
+#$(info OSARCH     = $(OSARCH))
 
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
@@ -151,7 +167,7 @@ Util-samples: Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Util/samples
 
 Util-clean:
-	$(MAKE) -C $(POCO_BASE)/Util clean
+	$(MAKE)  -C $(POCO_BASE)/Util clean
 	$(MAKE) -C $(POCO_BASE)/Util/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Util/samples clean
 
