@@ -72,7 +72,7 @@ void RedisTest::tearDown()
 }
 
 
-void RedisTest::testAppend()
+void RedisTest::testAPPEND()
 {
 	if (!_connected)
 	{
@@ -128,7 +128,7 @@ void RedisTest::testAppend()
 	}
 }
 
-void RedisTest::testBLpop()
+void RedisTest::testBLPOP()
 {
 	if (!_connected)
 	{
@@ -184,7 +184,7 @@ void RedisTest::testBLpop()
 	}
 }
 
-void RedisTest::testBRpop()
+void RedisTest::testBRPOP()
 {
 	if (!_connected)
 	{
@@ -240,7 +240,7 @@ void RedisTest::testBRpop()
 	}
 }
 
-void RedisTest::testDecr()
+void RedisTest::testDECR()
 {
 	if (!_connected)
 	{
@@ -293,7 +293,7 @@ void RedisTest::testDecr()
 
 }
 
-void RedisTest::testEcho()
+void RedisTest::testECHO()
 {
 	if (!_connected)
 	{
@@ -339,7 +339,7 @@ void RedisTest::testError()
 	}
 }
 
-void RedisTest::testEval()
+void RedisTest::testEVAL()
 {
 	if (!_connected)
 	{
@@ -374,7 +374,7 @@ void RedisTest::testEval()
 
 }
 
-void RedisTest::testHDel()
+void RedisTest::testHDEL()
 {
 	if (!_connected)
 	{
@@ -418,7 +418,7 @@ void RedisTest::testHDel()
 	}
 }
 
-void RedisTest::testHSet()
+void RedisTest::testHSET()
 {
 	if (!_connected)
 	{
@@ -451,7 +451,7 @@ void RedisTest::testHSet()
 	}
 }
 
-void RedisTest::testIncr()
+void RedisTest::testINCR()
 {
 	if (!_connected)
 	{
@@ -483,7 +483,7 @@ void RedisTest::testIncr()
 	}
 }
 
-void RedisTest::testIncrBy()
+void RedisTest::testINCRBY()
 {
 	if (!_connected)
 	{
@@ -515,7 +515,7 @@ void RedisTest::testIncrBy()
 	}
 }
 
-void RedisTest::testPing()
+void RedisTest::testPING()
 {
 	if (!_connected)
 	{
@@ -552,7 +552,7 @@ void RedisTest::testPing()
 
 }
 
-void RedisTest::testLPop()
+void RedisTest::testLPOP()
 {
 	if (!_connected)
 	{
@@ -613,7 +613,7 @@ void RedisTest::testLPop()
 
 }
 
-void RedisTest::testLSet()
+void RedisTest::testLSET()
 {
 	if (!_connected)
 	{
@@ -683,7 +683,7 @@ void RedisTest::testLSet()
 	}
 
 }
-void RedisTest::testLIndex()
+void RedisTest::testLINDEX()
 {
 	if (!_connected)
 	{
@@ -721,7 +721,7 @@ void RedisTest::testLIndex()
 	}
 }
 
-void RedisTest::testLInsert()
+void RedisTest::testLINSERT()
 {
 	if (!_connected)
 	{
@@ -768,7 +768,7 @@ void RedisTest::testLInsert()
 	}
 }
 
-void RedisTest::testLRem()
+void RedisTest::testLREM()
 {
 	if (!_connected)
 	{
@@ -829,7 +829,7 @@ void RedisTest::testLRem()
 	}
 }
 
-void RedisTest::testLTrim()
+void RedisTest::testLTRIM()
 {
 	if (!_connected)
 	{
@@ -890,7 +890,7 @@ void RedisTest::testLTrim()
 
 }
 
-void RedisTest::testMSet()
+void RedisTest::testMSET()
 {
 	if (!_connected)
 	{
@@ -941,7 +941,7 @@ void RedisTest::testMSet()
 	}
 }
 
-void RedisTest::testMSetWithMap()
+void RedisTest::testMSETWithMap()
 {
 	if (!_connected)
 	{
@@ -996,7 +996,7 @@ void RedisTest::testMSetWithMap()
 	}
 }
 
-void RedisTest::testMulti()
+void RedisTest::testMULTI()
 {
 	if (!_connected)
 	{
@@ -1222,7 +1222,7 @@ void RedisTest::testPubSub()
 	_redis.flush();
 }
 
-void RedisTest::testSAdd()
+void RedisTest::testSADD()
 {
 	if (!_connected)
 	{
@@ -1266,7 +1266,7 @@ void RedisTest::testSAdd()
 	}
 }
 
-void RedisTest::testSCard()
+void RedisTest::testSCARD()
 {
 	if (!_connected)
 	{
@@ -1310,7 +1310,7 @@ void RedisTest::testSCard()
 	}
 }
 
-void RedisTest::testSDiff()
+void RedisTest::testSDIFF()
 {
 	if (!_connected)
 	{
@@ -1363,7 +1363,7 @@ void RedisTest::testSDiff()
 	}
 }
 
-void RedisTest::testSDiffStore()
+void RedisTest::testSDIFFSTORE()
 {
 	if (!_connected)
 	{
@@ -1428,7 +1428,7 @@ void RedisTest::testSDiffStore()
 	}
 }
 
-void RedisTest::testSet()
+void RedisTest::testSET()
 {
 	if (!_connected)
 	{
@@ -1465,7 +1465,7 @@ void RedisTest::testSet()
 }
 
 
-void RedisTest::testSInter()
+void RedisTest::testSINTER()
 {
 	if (!_connected)
 	{
@@ -1519,7 +1519,7 @@ void RedisTest::testSInter()
 	}
 }
 
-void RedisTest::testSInterStore()
+void RedisTest::testSINTERSTORE()
 {
 	if (!_connected)
 	{
@@ -1585,7 +1585,7 @@ void RedisTest::testSInterStore()
 	}
 }
 
-void RedisTest::testSIsmember()
+void RedisTest::testSISMEMBER()
 {
 	if (!_connected)
 	{
@@ -1629,7 +1629,7 @@ void RedisTest::testSIsmember()
 	}
 }
 
-void RedisTest::testSMembers()
+void RedisTest::testSMEMBERS()
 {
 	if (!_connected)
 	{
@@ -1673,7 +1673,7 @@ void RedisTest::testSMembers()
 	}
 }
 
-void RedisTest::testSMove()
+void RedisTest::testSMOVE()
 {
 	if (!_connected)
 	{
@@ -1751,7 +1751,7 @@ void RedisTest::testSMove()
 	}
 }
 
-void RedisTest::testSPop()
+void RedisTest::testSPOP()
 {
 	if (!_connected)
 	{
@@ -1852,7 +1852,7 @@ void RedisTest::testSPop()
 */
 }
 
-void RedisTest::testSRandMember()
+void RedisTest::testSRANDMEMBER()
 {
 	if (!_connected)
 	{
@@ -1912,7 +1912,7 @@ void RedisTest::testSRandMember()
 	}
 }
 
-void RedisTest::testStrlen()
+void RedisTest::testSTRLEN()
 {
 	if (!_connected)
 	{
@@ -1950,7 +1950,7 @@ void RedisTest::testStrlen()
 	}
 }
 
-void RedisTest::testSRem()
+void RedisTest::testSREM()
 {
 	if (!_connected)
 	{
@@ -2025,7 +2025,7 @@ void RedisTest::testSRem()
 	}
 }
 
-void RedisTest::testSUnion()
+void RedisTest::testSUNION()
 {
 	if (!_connected)
 	{
@@ -2078,7 +2078,7 @@ void RedisTest::testSUnion()
 	}
 }
 
-void RedisTest::testSUnionStore()
+void RedisTest::testSUNIONSTORE()
 {
 	if (!_connected)
 	{
@@ -2143,7 +2143,7 @@ void RedisTest::testSUnionStore()
 	}
 }
 
-void RedisTest::testRename()
+void RedisTest::testRENAME()
 {
 	if (!_connected)
 	{
@@ -2185,7 +2185,7 @@ void RedisTest::testRename()
 	}
 }
 
-void RedisTest::testRenameNx()
+void RedisTest::testRENAMENX()
 {
 	if (!_connected)
 	{
@@ -2238,7 +2238,7 @@ void RedisTest::testRenameNx()
 	}
 }
 
-void RedisTest::testRPop()
+void RedisTest::testRPOP()
 {
 	if (!_connected)
 	{
@@ -2299,7 +2299,7 @@ void RedisTest::testRPop()
 
 }
 
-void RedisTest::testRPoplPush()
+void RedisTest::testRPOPLPUSH()
 {
 	if (!_connected)
 	{
@@ -2391,7 +2391,7 @@ void RedisTest::testRPoplPush()
 	}
 }
 
-void RedisTest::testRPush()
+void RedisTest::testRPUSH()
 {
 	if (!_connected)
 	{
@@ -2474,52 +2474,52 @@ CppUnit::Test* RedisTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("RedisTest");
 
-	CppUnit_addTest(pSuite, RedisTest, testAppend);
-	CppUnit_addTest(pSuite, RedisTest, testBLpop);
-	CppUnit_addTest(pSuite, RedisTest, testBRpop);
-	CppUnit_addTest(pSuite, RedisTest, testDecr);
-	CppUnit_addTest(pSuite, RedisTest, testDecr);
-	CppUnit_addTest(pSuite, RedisTest, testEcho);
+	CppUnit_addTest(pSuite, RedisTest, testAPPEND);
+	CppUnit_addTest(pSuite, RedisTest, testBLPOP);
+	CppUnit_addTest(pSuite, RedisTest, testBRPOP);
+	CppUnit_addTest(pSuite, RedisTest, testDECR);
+	CppUnit_addTest(pSuite, RedisTest, testDECR);
+	CppUnit_addTest(pSuite, RedisTest, testECHO);
 	CppUnit_addTest(pSuite, RedisTest, testError);
-	CppUnit_addTest(pSuite, RedisTest, testEval);
-	CppUnit_addTest(pSuite, RedisTest, testHDel);
-	CppUnit_addTest(pSuite, RedisTest, testHSet);
-	CppUnit_addTest(pSuite, RedisTest, testIncr);
-	CppUnit_addTest(pSuite, RedisTest, testIncrBy);
-	CppUnit_addTest(pSuite, RedisTest, testLIndex);
-	CppUnit_addTest(pSuite, RedisTest, testLInsert);
-	CppUnit_addTest(pSuite, RedisTest, testLPop);
-	CppUnit_addTest(pSuite, RedisTest, testLRem);
-	CppUnit_addTest(pSuite, RedisTest, testLSet);
-	CppUnit_addTest(pSuite, RedisTest, testLTrim);
-	CppUnit_addTest(pSuite, RedisTest, testMSet);
-	CppUnit_addTest(pSuite, RedisTest, testMSetWithMap);
-	CppUnit_addTest(pSuite, RedisTest, testMulti);
-	CppUnit_addTest(pSuite, RedisTest, testPing);
+	CppUnit_addTest(pSuite, RedisTest, testEVAL);
+	CppUnit_addTest(pSuite, RedisTest, testHDEL);
+	CppUnit_addTest(pSuite, RedisTest, testHSET);
+	CppUnit_addTest(pSuite, RedisTest, testINCR);
+	CppUnit_addTest(pSuite, RedisTest, testINCRBY);
+	CppUnit_addTest(pSuite, RedisTest, testLINDEX);
+	CppUnit_addTest(pSuite, RedisTest, testLINSERT);
+	CppUnit_addTest(pSuite, RedisTest, testLPOP);
+	CppUnit_addTest(pSuite, RedisTest, testLREM);
+	CppUnit_addTest(pSuite, RedisTest, testLSET);
+	CppUnit_addTest(pSuite, RedisTest, testLTRIM);
+	CppUnit_addTest(pSuite, RedisTest, testMSET);
+	CppUnit_addTest(pSuite, RedisTest, testMSETWithMap);
+	CppUnit_addTest(pSuite, RedisTest, testMULTI);
+	CppUnit_addTest(pSuite, RedisTest, testPING);
 	CppUnit_addTest(pSuite, RedisTest, testPipeliningWithSendCommands);
 	CppUnit_addTest(pSuite, RedisTest, testPipeliningWithWriteCommand);
 	CppUnit_addTest(pSuite, RedisTest, testPubSub);
-	CppUnit_addTest(pSuite, RedisTest, testSAdd);
-	CppUnit_addTest(pSuite, RedisTest, testSCard);
-	CppUnit_addTest(pSuite, RedisTest, testSDiff);
-	CppUnit_addTest(pSuite, RedisTest, testSDiffStore);
-	CppUnit_addTest(pSuite, RedisTest, testSet);
-	CppUnit_addTest(pSuite, RedisTest, testSInter);
-	CppUnit_addTest(pSuite, RedisTest, testSInterStore);
-	CppUnit_addTest(pSuite, RedisTest, testSIsmember);
-	CppUnit_addTest(pSuite, RedisTest, testSMembers);
-	CppUnit_addTest(pSuite, RedisTest, testSMove);
-	CppUnit_addTest(pSuite, RedisTest, testSPop);
-	CppUnit_addTest(pSuite, RedisTest, testSRandMember);
-	CppUnit_addTest(pSuite, RedisTest, testSRem);
-	CppUnit_addTest(pSuite, RedisTest, testStrlen);
-	CppUnit_addTest(pSuite, RedisTest, testSUnion);
-	CppUnit_addTest(pSuite, RedisTest, testSUnionStore);
-	CppUnit_addTest(pSuite, RedisTest, testRename);
-	CppUnit_addTest(pSuite, RedisTest, testRenameNx);
-	CppUnit_addTest(pSuite, RedisTest, testRPop);
-	CppUnit_addTest(pSuite, RedisTest, testRPoplPush);
-	CppUnit_addTest(pSuite, RedisTest, testRPush);
+	CppUnit_addTest(pSuite, RedisTest, testSADD);
+	CppUnit_addTest(pSuite, RedisTest, testSCARD);
+	CppUnit_addTest(pSuite, RedisTest, testSDIFF);
+	CppUnit_addTest(pSuite, RedisTest, testSDIFFSTORE);
+	CppUnit_addTest(pSuite, RedisTest, testSET);
+	CppUnit_addTest(pSuite, RedisTest, testSINTER);
+	CppUnit_addTest(pSuite, RedisTest, testSINTERSTORE);
+	CppUnit_addTest(pSuite, RedisTest, testSISMEMBER);
+	CppUnit_addTest(pSuite, RedisTest, testSMEMBERS);
+	CppUnit_addTest(pSuite, RedisTest, testSMOVE);
+	CppUnit_addTest(pSuite, RedisTest, testSPOP);
+	CppUnit_addTest(pSuite, RedisTest, testSRANDMEMBER);
+	CppUnit_addTest(pSuite, RedisTest, testSREM);
+	CppUnit_addTest(pSuite, RedisTest, testSTRLEN);
+	CppUnit_addTest(pSuite, RedisTest, testSUNION);
+	CppUnit_addTest(pSuite, RedisTest, testSUNIONSTORE);
+	CppUnit_addTest(pSuite, RedisTest, testRENAME);
+	CppUnit_addTest(pSuite, RedisTest, testRENAMENX);
+	CppUnit_addTest(pSuite, RedisTest, testRPOP);
+	CppUnit_addTest(pSuite, RedisTest, testRPOPLPUSH);
+	CppUnit_addTest(pSuite, RedisTest, testRPUSH);
 
 	return pSuite;
 }
