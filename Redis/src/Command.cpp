@@ -118,6 +118,28 @@ Command Command::get(const std::string& key)
 	return cmd;
 }
 
+Command Command::hdel(const std::string& hash, const std::string& field)
+{
+	Command cmd("HDEL");
+
+	cmd << hash << field;
+
+	return cmd;
+}
+
+Command Command::hdel(const std::string& hash, const std::vector<std::string>& fields)
+{
+	Command cmd("HDEL");
+
+	cmd << hash;
+	for(std::vector<std::string>::const_iterator it = fields.begin(); it != fields.end(); ++it)
+	{
+		cmd << *it;
+	}
+
+	return cmd;
+}
+
 Command Command::hget(const std::string& hash, const std::string& field)
 {
 	Command cmd("HGET");

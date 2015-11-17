@@ -37,6 +37,7 @@ public:
 	void testEcho();
 	void testError();
 	void testEval();
+	void testHDel();
 	void testHSet();
 	void testIncr();
 	void testIncrBy();

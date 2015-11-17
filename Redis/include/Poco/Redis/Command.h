@@ -69,6 +69,12 @@ public:
 	static Command get(const std::string& key);
 		/// Returns an GET command
 
+	static Command hdel(const std::string& hash, const std::string& field);
+		/// Returns an HDEL command
+	
+	static Command hdel(const std::string& hash, const std::vector<std::string>& fields);
+		/// Returns an HDEL command
+
 	static Command hget(const std::string& hash, const std::string& field);
 		/// Returns an HGET command
 
