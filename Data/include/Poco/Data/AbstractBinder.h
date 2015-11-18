@@ -54,10 +54,6 @@ enum NullData
 
 struct NullValue
 {
-	operator Poco::NullType() const
-	{
-		return Poco::NULL_GENERIC;
-	}
 
 	template <typename T>
 	operator Poco::Nullable<T>() const
@@ -70,6 +66,7 @@ struct NullValue
 	{
 		return Data::NULL_GENERIC;
 	}
+
 };
 
 
@@ -81,10 +78,18 @@ static const NullValue null;
 
 
 template <typename T>
-inline bool operator==(const Nullable<T>& n, NullData nv)
+inline bool operator==(const NullValue& nv, const Nullable<T>& n)
 {
 	return n.isNull();
 }
+
+
+template <typename T>
+inline bool operator!=(const NullValue& nv, const Nullable<T>& n)
+{
+	return !n.isNull();
+}
+
 
 class Data_API AbstractBinder
 	/// Interface for Binding data types to placeholders.
@@ -226,7 +231,7 @@ public:
 		/// Binds a long.
 
 	virtual void bind(std::size_t pos, const unsigned long& val, Direction dir = PD_IN, const WhenNullCb& nullCb = WhenNullCb()) = 0;
-		/// Binds an unsigned long.
+		/// Binds an unsiged long.
 
 	virtual void bind(std::size_t pos, const std::vector<long>& val, Direction dir = PD_IN);
 		/// Binds a long vector.
