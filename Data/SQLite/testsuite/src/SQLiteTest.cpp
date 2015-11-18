@@ -3573,4 +3573,5 @@ CppUnit::Test* SQLiteTest::suite()
 //	To be fixed by dimanikulin
 //	CppUnit_addTest(pSuite, SQLiteTest, testIncrementVacuum);
 //
+	return pSuite;
 }
