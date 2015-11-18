@@ -52,14 +52,39 @@ enum NullData
 };
 
 
+struct NullValue
+{
+	operator Poco::NullType() const
+	{
+		return Poco::NULL_GENERIC;
+	}
+
+	template <typename T>
+	operator Poco::Nullable<T>() const
+	{
+		return Poco::Nullable<T>();
+	}
+
+	template <typename T>
+	static NullData nullCode()
+	{
+		return Data::NULL_GENERIC;
+	}
+};
+
+
 namespace Keywords {
 
-
-static const NullData null = NULL_GENERIC;
-
+static const NullValue null;
 
 } // namespace Keywords
 
+
+template <typename T>
+inline bool operator==(const Nullable<T>& n, NullData nv)
+{
+	return n.isNull();
+}
 
 class Data_API AbstractBinder
 	/// Interface for Binding data types to placeholders.
