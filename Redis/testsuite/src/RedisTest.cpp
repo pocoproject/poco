@@ -1934,6 +1934,7 @@ void RedisTest::testSMOVE()
 	}
 
 	delKey("myset");
+	delKey("myotherset");
 
 	Command sadd = Command::sadd("myset", "one");
 	try
