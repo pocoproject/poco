@@ -14,8 +14,6 @@ before_install:
   - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev libpcre3-dev libssl-dev libsqlite3-dev libexpat1-dev
   - sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 
   - sudo apt-get install -qq -y sloccount cppcheck 
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget --no-check-certificate http://ftp.br.debian.org/debian/pool/main/s/sqlite3/libsqlite3-dev_3.9.2-1_amd64.deb; fi
-  - sudo dpkg -i libsqlite3-dev_3.9.1-2_amd64.deb 
 
 services:
   - mongodb
