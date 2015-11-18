@@ -48,9 +48,10 @@ matrix:
         - ./configure --everything --config=Linux-clang && make -s -j2
         - ./travis/runtests.sh
 
-    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
-      script:
-#FIXME  - ./configure --omit=Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
+    #FIXME    the -m64 option bring by the Linux config is not supported by arm-linux-gnueabi-g++ which makes this test failing
+    #FIXME    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
+    #FIXME      script:
+    #FIXME        - ./configure --omit=Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
     - env:    TEST_NAME="gcc (CMake)"
       compiler: gcc
