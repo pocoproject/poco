@@ -27,7 +27,9 @@
 #include <vector>
 #include <map>
 
-
+#if defined(POCO_UNBUNDLED)
+#include <pcre.h>
+#else
 //
 // Copy these definitions from pcre.h
 // to avoid pulling in the entire header file
@@ -38,7 +40,7 @@ extern "C"
 	typedef struct real_pcre8_or_16 pcre;
 	struct pcre_extra;
 }
-
+#endif
 
 namespace Poco {
 
