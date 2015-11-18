@@ -45,6 +45,7 @@ public:
 	void testHMGET();
 	void testHMSET();
 	void testHSET();
+	void testHSTRLEN();
 	void testINCR();
 	void testINCRBY();
 	void testLINDEX();

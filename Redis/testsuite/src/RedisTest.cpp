@@ -752,6 +752,66 @@ void RedisTest::testHMSET()
 
 }
 
+void RedisTest::testHSTRLEN()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myhash");
+
+	std::map<std::string, std::string> fields;
+	fields.insert(std::make_pair<std::string, std::string>("f1", "HelloWorld"));
+	fields.insert(std::make_pair<std::string, std::string>("f2", "99"));
+	fields.insert(std::make_pair<std::string, std::string>("f3", "-256"));
+
+	Command hmset = Command::hmset("myhash", fields);
+	try
+	{
+		std::string result = _redis.execute<std::string>(hmset);
+		assert(result.compare("OK") == 0);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	Command hstrlen = Command::hstrlen("myhash", "f1");
+	try
+	{
+		Poco::Int64 len = _redis.execute<Poco::Int64>(hstrlen);
+		assert(len == 10);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	hstrlen = Command::hstrlen("myhash", "f2");
+	try
+	{
+		Poco::Int64 len = _redis.execute<Poco::Int64>(hstrlen);
+		assert(len == 2);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	hstrlen = Command::hstrlen("myhash", "f3");
+	try
+	{
+		Poco::Int64 len = _redis.execute<Poco::Int64>(hstrlen);
+		assert(len == 4);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testINCR()
 {
 	if (!_connected)
@@ -2792,6 +2852,7 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testHMGET);
 	CppUnit_addTest(pSuite, RedisTest, testHMSET);
 	CppUnit_addTest(pSuite, RedisTest, testHSET);
+	//CppUnit_addTest(pSuite, RedisTest, testHSTRLEN);
 	CppUnit_addTest(pSuite, RedisTest, testINCR);
 	CppUnit_addTest(pSuite, RedisTest, testINCRBY);
 	CppUnit_addTest(pSuite, RedisTest, testLINDEX);

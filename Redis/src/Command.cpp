@@ -215,6 +215,15 @@ Command Command::hset(const std::string& hash, const std::string& field, Int64 v
 	return hset(hash, field, NumberFormatter::format(value), create);
 }
 
+Command Command::hstrlen(const std::string& hash, const std::string& field)
+{
+	Command cmd("HSTRLEN");
+
+	cmd << hash << field;
+
+	return cmd;
+}
+
 Command Command::incr(const std::string& key, Int64 by)
 {
 	Command cmd(by == 0 ? "INCR" : "INCRBY");
