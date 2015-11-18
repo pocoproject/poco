@@ -188,6 +188,19 @@ Command Command::hmget(const std::string& hash, const StringVec& fields)
 	return cmd;
 }
 
+Command Command::hmset(const std::string& hash, std::map<std::string, std::string>& fields)
+{
+	Command cmd("HMSET");
+
+	cmd << hash;
+	for(std::map<std::string, std::string>::const_iterator it = fields.begin(); it != fields.end(); ++it)
+	{
+		cmd << it->first << it->second;
+	}
+
+	return cmd;
+}
+
 Command Command::hset(const std::string& hash, const std::string& field, const std::string& value, bool create)
 {
 	Command cmd(create ? "HSET" : "HSETNX");

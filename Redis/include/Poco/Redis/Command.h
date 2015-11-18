@@ -99,6 +99,9 @@ public:
 	static Command hmget(const std::string& hash, const StringVec& fields);
 		/// Returns an HMGET command
 
+	static Command hmset(const std::string& hash, std::map<std::string, std::string>& fields);
+		/// Returns a HMSET command
+
 	static Command hset(const std::string& hash, const std::string& field, const std::string& value, bool create = true);
 		/// Returns an HSET or HSETNX (when create is false) command
 

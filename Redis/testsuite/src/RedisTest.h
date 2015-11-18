@@ -43,6 +43,7 @@ public:
 	void testHINCRBY();
 	void testHKEYS();
 	void testHMGET();
+	void testHMSET();
 	void testHSET();
 	void testINCR();
 	void testINCRBY();
