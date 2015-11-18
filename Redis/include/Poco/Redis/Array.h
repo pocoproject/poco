@@ -58,6 +58,11 @@ public:
 	}
 
 	Array& operator<<(const char* s);
+		/// Special implementation for const char*
+
+	Array& operator<<(const std::vector<std::string>& strings);
+		/// Special implementation for a vector with strings
+		/// All strings will be added as a BulkString.
 
 	Array& add();
 		/// Adds an Null BulkString
@@ -76,6 +81,11 @@ public:
 	}
 
 	Array& add(const char* s);
+		/// Special implementation for const char*
+
+	Array& add(const std::vector<std::string>& strings);
+		/// Special implementation for a vector with strings
+		/// All strings will be added as a BulkString.
 
 	Array& addRedisType(RedisType::Ptr value);
 		/// Adds a Redis element.
@@ -143,6 +153,11 @@ inline Array& Array::operator<<(const char* s)
 	return add(value);
 }
 
+inline Array& Array::operator<<(const std::vector<std::string>& strings)
+{
+	return add(strings);
+}
+
 inline Array& Array::add()
 {
 	BulkString value;
@@ -160,6 +175,15 @@ inline Array& Array::add(const char* s)
 {
 	BulkString value(s);
 	return add(value);
+}
+
+inline Array& Array::add(const std::vector<std::string>& strings)
+{
+	for(std::vector<std::string>::const_iterator it = strings.begin(); it != strings.end(); ++it)
+	{
+		add(*it);
+	}
+	return *this;
 }
 
 inline Array& Array::addSimpleString(const std::string& value)

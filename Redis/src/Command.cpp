@@ -47,11 +47,7 @@ Command Command::blpop(const StringVec& lists, Int64 timeout)
 {
 	Command cmd("BLPOP");
 
-	for(StringVec::const_iterator it = lists.begin(); it != lists.end(); ++it)
-	{
-		cmd << *it;
-	}
-	cmd << NumberFormatter::format(timeout);
+	cmd << lists << NumberFormatter::format(timeout);
 
 	return cmd;
 }
@@ -60,11 +56,7 @@ Command Command::brpop(const StringVec& lists, Int64 timeout)
 {
 	Command cmd("BRPOP");
 
-	for(StringVec::const_iterator it = lists.begin(); it != lists.end(); ++it)
-	{
-		cmd << *it;
-	}
-	cmd << NumberFormatter::format(timeout);
+	cmd << lists << NumberFormatter::format(timeout);
 
 	return cmd;
 }
@@ -101,10 +93,7 @@ Command Command::del(const StringVec& keys)
 {
 	Command cmd("DEL");
 
-	for(StringVec::const_iterator it = keys.begin(); it != keys.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << keys;
 
 	return cmd;
 }
@@ -131,11 +120,7 @@ Command Command::hdel(const std::string& hash, const StringVec& fields)
 {
 	Command cmd("HDEL");
 
-	cmd << hash;
-	for(StringVec::const_iterator it = fields.begin(); it != fields.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << hash << fields;
 
 	return cmd;
 }
@@ -190,6 +175,15 @@ Command Command::hlen(const std::string& hash)
 	Command cmd("HLEN");
 
 	cmd << hash;
+
+	return cmd;
+}
+
+Command Command::hmget(const std::string& hash, const StringVec& fields)
+{
+	Command cmd("HMGET");
+
+	cmd << hash << fields;
 
 	return cmd;
 }
@@ -266,11 +260,7 @@ Command Command::lpush(const std::string& list, const StringVec& values, bool cr
 {
 	Command cmd(create ? "LPUSH" : "LPUSHX");
 
-	cmd << list;
-	for(StringVec::const_iterator it = values.begin(); it != values.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << list << values;
 
 	return cmd;
 }
@@ -315,10 +305,7 @@ Command Command::mget(const StringVec& keys)
 {
 	Command cmd("MGET");
 
-	for(StringVec::const_iterator it = keys.begin(); it != keys.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << keys;
 
 	return cmd;
 }
@@ -348,11 +335,7 @@ Command Command::sadd(const std::string& set, const StringVec& values)
 {
 	Command cmd("SADD");
 
-	cmd << set;
-	for(StringVec::const_iterator it = values.begin(); it != values.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << set << values;
 
 	return cmd;
 }
@@ -379,11 +362,7 @@ Command Command::sdiff(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SDIFF");
 
-	cmd << set;
-	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << set << sets;
 
 	return cmd;
 }
@@ -401,11 +380,7 @@ Command Command::sdiffstore(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SDIFFSTORE");
 
-	cmd << set;
-	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << set << sets;
 
 	return cmd;
 }
@@ -440,11 +415,7 @@ Command Command::sinter(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SINTER");
 
-	cmd << set;
-	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << set << sets;
 
 	return cmd;
 }
@@ -462,11 +433,7 @@ Command Command::sinterstore(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SINTERSTORE");
 
-	cmd << set;
-	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << set << sets;
 
 	return cmd;
 }
@@ -531,11 +498,7 @@ Command Command::srem(const std::string& set, const StringVec& members)
 {
 	Command cmd("SREM");
 
-	cmd << set;
-	for(StringVec::const_iterator it = members.begin(); it != members.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << set << members;
 
 	return cmd;
 }
@@ -553,11 +516,7 @@ Command Command::sunion(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SUNION");
 
-	cmd << set;
-	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << set << sets;
 
 	return cmd;
 }
@@ -575,11 +534,7 @@ Command Command::sunionstore(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SUNIONSTORE");
 
-	cmd << set;
-	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << set << sets;
 
 	return cmd;
 }
@@ -625,11 +580,7 @@ Command Command::rpush(const std::string& list, const StringVec& values, bool cr
 {
 	Command cmd(create ? "RPUSH" : "RPUSHX");
 
-	cmd << list;
-	for(StringVec::const_iterator it = values.begin(); it != values.end(); ++it)
-	{
-		cmd << *it;
-	}
+	cmd << list << values;
 
 	return cmd;
 }

@@ -96,6 +96,9 @@ public:
 	static Command hlen(const std::string& hash);
 		/// Returns an HLEN command
 
+	static Command hmget(const std::string& hash, const StringVec& fields);
+		/// Returns an HMGET command
+
 	static Command hset(const std::string& hash, const std::string& field, const std::string& value, bool create = true);
 		/// Returns an HSET or HSETNX (when create is false) command
 
