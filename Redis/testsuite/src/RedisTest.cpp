@@ -618,6 +618,58 @@ void RedisTest::testHKEYS()
 	}
 }
 
+void RedisTest::testHMGET()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	delKey("myhash");
+
+	Command hset = Command::hset("myhash", "field1", "Hello");
+	try
+	{
+		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
+		assert(value == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	hset = Command::hset("myhash", "field2", "World");
+	try
+	{
+		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
+		assert(value == 1);
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+
+	std::vector<std::string> fields;
+	fields.push_back("field1");
+	fields.push_back("field2");
+	fields.push_back("field3");
+	Command hmget = Command::hmget("myhash", fields);
+	try
+	{
+		Array result = _redis.execute<Array>(hmget);
+		assert(result.size() == 3);
+
+		assert(result.get<BulkString>(0).value().compare("Hello") == 0);
+		assert(result.get<BulkString>(1).value().compare("World") == 0);
+		assert(result.get<BulkString>(2).isNull());
+	}
+	catch(RedisException &e)
+	{
+		fail(e.message());
+	}
+}
+
 void RedisTest::testHSET()
 {
 	if (!_connected)
@@ -2687,6 +2739,7 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testHGETALL);
 	CppUnit_addTest(pSuite, RedisTest, testHINCRBY);
 	CppUnit_addTest(pSuite, RedisTest, testHKEYS);
+	CppUnit_addTest(pSuite, RedisTest, testHMGET);
 	CppUnit_addTest(pSuite, RedisTest, testHSET);
 	CppUnit_addTest(pSuite, RedisTest, testINCR);
 	CppUnit_addTest(pSuite, RedisTest, testINCRBY);
