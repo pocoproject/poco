@@ -43,11 +43,11 @@ Command Command::append(const std::string& key, const std::string& value)
 	return cmd;
 }
 
-Command Command::blpop(const std::vector<std::string>& lists, Int64 timeout)
+Command Command::blpop(const StringVec& lists, Int64 timeout)
 {
 	Command cmd("BLPOP");
 
-	for(std::vector<std::string>::const_iterator it = lists.begin(); it != lists.end(); ++it)
+	for(StringVec::const_iterator it = lists.begin(); it != lists.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -56,11 +56,11 @@ Command Command::blpop(const std::vector<std::string>& lists, Int64 timeout)
 	return cmd;
 }
 
-Command Command::brpop(const std::vector<std::string>& lists, Int64 timeout)
+Command Command::brpop(const StringVec& lists, Int64 timeout)
 {
 	Command cmd("BRPOP");
 
-	for(std::vector<std::string>::const_iterator it = lists.begin(); it != lists.end(); ++it)
+	for(StringVec::const_iterator it = lists.begin(); it != lists.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -97,11 +97,11 @@ Command Command::del(const std::string& key)
 	return cmd;
 }
 
-Command Command::del(const std::vector<std::string>& keys)
+Command Command::del(const StringVec& keys)
 {
 	Command cmd("DEL");
 
-	for(std::vector<std::string>::const_iterator it = keys.begin(); it != keys.end(); ++it)
+	for(StringVec::const_iterator it = keys.begin(); it != keys.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -127,12 +127,12 @@ Command Command::hdel(const std::string& hash, const std::string& field)
 	return cmd;
 }
 
-Command Command::hdel(const std::string& hash, const std::vector<std::string>& fields)
+Command Command::hdel(const std::string& hash, const StringVec& fields)
 {
 	Command cmd("HDEL");
 
 	cmd << hash;
-	for(std::vector<std::string>::const_iterator it = fields.begin(); it != fields.end(); ++it)
+	for(StringVec::const_iterator it = fields.begin(); it != fields.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -262,12 +262,12 @@ Command Command::lpush(const std::string& list, const std::string& value, bool c
 	return cmd;
 }
 
-Command Command::lpush(const std::string& list, const std::vector<std::string>& values, bool create)
+Command Command::lpush(const std::string& list, const StringVec& values, bool create)
 {
 	Command cmd(create ? "LPUSH" : "LPUSHX");
 
 	cmd << list;
-	for(std::vector<std::string>::const_iterator it = values.begin(); it != values.end(); ++it)
+	for(StringVec::const_iterator it = values.begin(); it != values.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -311,11 +311,11 @@ Command Command::ltrim(const std::__cxx11::string& list, Int64 start, Int64 stop
 	return cmd;
 }
 
-Command Command::mget(const std::vector<std::string>& keys)
+Command Command::mget(const StringVec& keys)
 {
 	Command cmd("MGET");
 
-	for(std::vector<std::string>::const_iterator it = keys.begin(); it != keys.end(); ++it)
+	for(StringVec::const_iterator it = keys.begin(); it != keys.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -344,12 +344,12 @@ Command Command::sadd(const std::string& set, const std::string& value)
 	return cmd;
 }
 
-Command Command::sadd(const std::string& set, const std::vector<std::string>& values)
+Command Command::sadd(const std::string& set, const StringVec& values)
 {
 	Command cmd("SADD");
 
 	cmd << set;
-	for(std::vector<std::string>::const_iterator it = values.begin(); it != values.end(); ++it)
+	for(StringVec::const_iterator it = values.begin(); it != values.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -375,12 +375,12 @@ Command Command::sdiff(const std::string& set1, const std::string& set2)
 	return cmd;
 }
 
-Command Command::sdiff(const std::string& set, const std::vector<std::string>& sets)
+Command Command::sdiff(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SDIFF");
 
 	cmd << set;
-	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -397,12 +397,12 @@ Command Command::sdiffstore(const std::string& set, const std::string& set1, con
 	return cmd;
 }
 
-Command Command::sdiffstore(const std::string& set, const std::vector<std::string>& sets)
+Command Command::sdiffstore(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SDIFFSTORE");
 
 	cmd << set;
-	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -436,12 +436,12 @@ Command Command::sinter(const std::string& set1, const std::string& set2)
 	return cmd;
 }
 
-Command Command::sinter(const std::string& set, const std::vector<std::string>& sets)
+Command Command::sinter(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SINTER");
 
 	cmd << set;
-	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -458,12 +458,12 @@ Command Command::sinterstore(const std::string& set, const std::string& set1, co
 	return cmd;
 }
 
-Command Command::sinterstore(const std::string& set, const std::vector<std::string>& sets)
+Command Command::sinterstore(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SINTERSTORE");
 
 	cmd << set;
-	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -527,12 +527,12 @@ Command Command::srem(const std::string& set1, const std::string& member)
 	return cmd;
 }
 
-Command Command::srem(const std::string& set, const std::vector<std::string>& members)
+Command Command::srem(const std::string& set, const StringVec& members)
 {
 	Command cmd("SREM");
 
 	cmd << set;
-	for(std::vector<std::string>::const_iterator it = members.begin(); it != members.end(); ++it)
+	for(StringVec::const_iterator it = members.begin(); it != members.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -549,12 +549,12 @@ Command Command::sunion(const std::string& set1, const std::string& set2)
 	return cmd;
 }
 
-Command Command::sunion(const std::string& set, const std::vector<std::string>& sets)
+Command Command::sunion(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SUNION");
 
 	cmd << set;
-	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -571,12 +571,12 @@ Command Command::sunionstore(const std::string& set, const std::string& set1, co
 	return cmd;
 }
 
-Command Command::sunionstore(const std::string& set, const std::vector<std::string>& sets)
+Command Command::sunionstore(const std::string& set, const StringVec& sets)
 {
 	Command cmd("SUNIONSTORE");
 
 	cmd << set;
-	for(std::vector<std::string>::const_iterator it = sets.begin(); it != sets.end(); ++it)
+	for(StringVec::const_iterator it = sets.begin(); it != sets.end(); ++it)
 	{
 		cmd << *it;
 	}
@@ -621,12 +621,12 @@ Command Command::rpush(const std::string& list, const std::string& value, bool c
 	return cmd;
 }
 
-Command Command::rpush(const std::string& list, const std::vector<std::string>& values, bool create)
+Command Command::rpush(const std::string& list, const StringVec& values, bool create)
 {
 	Command cmd(create ? "RPUSH" : "RPUSHX");
 
 	cmd << list;
-	for(std::vector<std::string>::const_iterator it = values.begin(); it != values.end(); ++it)
+	for(StringVec::const_iterator it = values.begin(); it != values.end(); ++it)
 	{
 		cmd << *it;
 	}

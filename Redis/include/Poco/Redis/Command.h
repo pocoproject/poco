@@ -36,6 +36,9 @@ class Redis_API Command : public Array
 	///    or << operator.
 {
 public:
+
+	typedef std::vector<std::string> StringVec;
+
 	Command(const std::string& command);
 		/// Constructor
 
@@ -48,10 +51,10 @@ public:
 	static Command append(const std::string& key, const std::string& value);
 		/// Returns an APPEND command
 
-	static Command blpop(const std::vector<std::string>& lists, Int64 timeout = 0);
+	static Command blpop(const StringVec& lists, Int64 timeout = 0);
 		/// Returns a BLPOP command
 
-	static Command brpop(const std::vector<std::string>& lists, Int64 timeout = 0);
+	static Command brpop(const StringVec& lists, Int64 timeout = 0);
 		/// Returns a BRPOP command
 
 	static Command brpoplpush(const std::string& sourceList, const std::string& destinationList, Int64 timeout = 0);
@@ -63,7 +66,7 @@ public:
 	static Command del(const std::string& key);
 		/// Returns an DEL command
 
-	static Command del(const std::vector<std::string>& keys);
+	static Command del(const StringVec& keys);
 		/// Returns an DEL command
 
 	static Command get(const std::string& key);
@@ -72,7 +75,7 @@ public:
 	static Command hdel(const std::string& hash, const std::string& field);
 		/// Returns an HDEL command
 
-	static Command hdel(const std::string& hash, const std::vector<std::string>& fields);
+	static Command hdel(const std::string& hash, const StringVec& fields);
 		/// Returns an HDEL command
 
 	static Command hexists(const std::string& hash, const std::string& field);
@@ -117,7 +120,7 @@ public:
 	static Command lpush(const std::string& list, const std::string& value, bool create = true);
 		/// Returns a LPUSH or LPUSHX (when create is false) command
 
-	static Command lpush(const std::string& list, const std::vector<std::string>& value, bool create = true);
+	static Command lpush(const std::string& list, const StringVec& value, bool create = true);
 		/// Returns a LPUSH or LPUSHX (when create is false) command
 
 	static Command lrange(const std::string& list, Int64 start = 0, Int64 stop = -1);
@@ -133,7 +136,7 @@ public:
 	static Command ltrim(const std::string& list, Int64 start = 0, Int64 stop = -1);
 		/// Returns a LTRIM command
 
-	static Command mget(const std::vector<std::string>& keys);
+	static Command mget(const StringVec& keys);
 		/// Returns a MGET command
 
 	static Command mset(const std::map<std::string, std::string>& keyvalues, bool create = true);
@@ -142,7 +145,7 @@ public:
 	static Command sadd(const std::string& set, const std::string& value);
 		/// Returns a SADD command
 
-	static Command sadd(const std::string& set, const std::vector<std::string>& values);
+	static Command sadd(const std::string& set, const StringVec& values);
 		/// Returns a SADD command
 
 	static Command scard(const std::string& set);
@@ -151,13 +154,13 @@ public:
 	static Command sdiff(const std::string& set1, const std::string& set2);
 		/// Returns a SDIFF command
 
-	static Command sdiff(const std::string& set, const std::vector<std::string>& sets);
+	static Command sdiff(const std::string& set, const StringVec& sets);
 		/// Returns a SDIFF command
 
 	static Command sdiffstore(const std::string& set, const std::string& set1, const std::string& set2);
 		/// Returns a SDIFFSTORE command
 
-	static Command sdiffstore(const std::string& set, const std::vector<std::string>& sets);
+	static Command sdiffstore(const std::string& set, const StringVec& sets);
 		/// Returns a SDIFFSTORE command
 
 	static Command set(const std::string& key, const std::string& value, bool overwrite = true, const Poco::Timespan& expireTime = 0, bool create = true);
@@ -169,13 +172,13 @@ public:
 	static Command sinter(const std::string& set1, const std::string& set2);
 		/// Returns a SINTER command
 
-	static Command sinter(const std::string& set, const std::vector<std::string>& sets);
+	static Command sinter(const std::string& set, const StringVec& sets);
 		/// Returns a SINTER command
 
 	static Command sinterstore(const std::string& set, const std::string& set1, const std::string& set2);
 		/// Returns a SINTERSTORE command
 
-	static Command sinterstore(const std::string& set, const std::vector<std::string>& sets);
+	static Command sinterstore(const std::string& set, const StringVec& sets);
 		/// Returns a SINTERSTORE command
 
 	static Command sismember(const std::string& set, const std::string& member);
@@ -196,19 +199,19 @@ public:
 	static Command srem(const std::string& set, const std::string& member);
 		/// Returns a SREM command
 
-	static Command srem(const std::string& set, const std::vector<std::string>& member);
+	static Command srem(const std::string& set, const StringVec& members);
 		/// Returns a SREM command
 
 	static Command sunion(const std::string& set1, const std::string& set2);
 		/// Returns a SUNION command
 
-	static Command sunion(const std::string& set, const std::vector<std::string>& sets);
+	static Command sunion(const std::string& set, const StringVec& sets);
 		/// Returns a SUNION command
 
 	static Command sunionstore(const std::string& set, const std::string& set1, const std::string& set2);
 		/// Returns a SUNIONSTORE command
 
-	static Command sunionstore(const std::string& set, const std::vector<std::string>& sets);
+	static Command sunionstore(const std::string& set, const StringVec& sets);
 		/// Returns a SUNIONSTORE command
 
 	static Command rename(const std::string& key, const std::string& newName, bool overwrite = true);
@@ -223,7 +226,7 @@ public:
 	static Command rpush(const std::string& list, const std::string& value, bool create = true);
 		/// Returns a RPUSH or RPUSHX (when create is false) command
 
-	static Command rpush(const std::string& list, const std::vector<std::string>& value, bool create = true);
+	static Command rpush(const std::string& list, const StringVec& value, bool create = true);
 		/// Returns a RPUSH or RPUSHX (when create is false) command
 };
 
