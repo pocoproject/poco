@@ -276,7 +276,7 @@ public:
 		poco_assert_dbg (!pBinder.isNull());
 		if (obj.isNull()) 
 		{
-			pBinder->bind(pos++, Poco::Data::Keywords::null, dir, typeid(T));
+			pBinder->bind(pos++, NullValue::nullCode<T>(), dir, typeid(T));
 		}
 		else 
 		{
@@ -292,7 +292,7 @@ public:
 		poco_assert_dbg (!pPreparator.isNull());
 		if (obj.isNull()) 
 		{
-			pPreparator->prepare(pos++, Poco::Data::Keywords::null);
+			pPreparator->prepare(pos++, NullValue::nullCode<T>());
 		}
 		else 
 		{
