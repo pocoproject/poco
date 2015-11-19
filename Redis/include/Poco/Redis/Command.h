@@ -31,9 +31,18 @@ class Redis_API Command : public Array
 	/// Helper class for creating commands. This class contains
 	/// factory methods for commonly used Redis commands.
 	/// There are two ways of building commands:
-	/// 1. Use this class (which uses option 2 in the factory methods)
-	/// 2. Use the Array class and build the command using the add method
-	///    or << operator.
+	/// 1. Use this class and the factory methods
+	/// 2. Use the Array or Command class and build the command using the add
+	///    method or << operator.
+	/// For example:
+	///
+	///    Command cmd = Command::set("mykey", "Hello");
+	///
+	/// is the same as:
+	///
+	///    Array cmd;
+	///    cmd << "SET" << "mykey" << "Hello";
+	///
 {
 public:
 
