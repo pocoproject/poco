@@ -54,13 +54,22 @@ class Redis_API Client
 	/// To create Redis commands, the factory methods of the Command class can
 	/// be used or the Array class can be used directly.
 	///
-	///   Command llen = Command::llen("list");
+	///    Command llen = Command::llen("list");
 	///
 	/// is the same as
 	///
-	///   Array command;
-	///   command.add("LLEN").add("list");
+	///    Array command;
+	///    command.add("LLEN").add("list");
 	///
+	/// or
+	///
+	///    Array command;
+	///    command << "LLEN" << "list";
+	///
+	///	or even
+	///
+	///    Command command("LLEN");
+	///    command << "list";
 {
 public:
 	Client();
@@ -110,9 +119,11 @@ public:
 	T execute(const Array& command)
 		/// Sends the Redis Command to the server. It gets the reply
 		/// and tries to convert it to the given template type.
+		///
 		/// A specialization exists for type void, which doesn't read
 		/// the reply. If the server sends a reply, it is your
 		/// responsibility to read it ... (Use this for pipelining)
+		///
 		/// A BadCastException will be thrown when the reply couldn't be
 		/// converted. Supported types are Int64, std::string, BulkString,
 		/// Array and void. When the reply is an Error, it will throw
@@ -162,6 +173,7 @@ public:
 		/// getting all replies.
 
 	void setReceiveTimeout(const Timespan& timeout);
+		/// Sets a receive timeout.
 
 private:
 
@@ -173,6 +185,7 @@ private:
 
 	void connect();
 		/// Connects to the Redis server
+	
 	void connect(const Timespan& timeout);
 		/// Connects to the Redis server and sets a timeout.
 

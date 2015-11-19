@@ -32,37 +32,50 @@ namespace Redis {
 
 
 class Redis_API RedisType
+	/// Base class for all Redis types. This class makes it possible to store
+	/// element with different types in Array.
 {
 public:
+
+	enum Types {
+		REDIS_INTEGER, // Redis Integer
+		REDIS_SIMPLE_STRING, // Redis Simple String
+		REDIS_BULK_STRING, // Redis Bulkstring
+		REDIS_ARRAY, // Redis Array
+		REDIS_ERROR // Redis Error
+	};
 
 	typedef SharedPtr<RedisType> Ptr;
 
 	RedisType();
+		/// Constructor
+
 	virtual ~RedisType();
+		/// Destructor
 
 	bool isArray() const;
+		/// Returns true when the value is a Redis array.
 
 	bool isBulkString() const;
+		/// Returns true when the value is a Redis bulkstring.
 
 	bool isError() const;
+		/// Returns true when the value is a Redis error.
 
 	bool isInteger() const;
+		/// Returns true when the value is a Redis integer (64 bit integer)
 
 	bool isSimpleString() const;
+		/// Returns true when the value is a simple string.
 
 	virtual int type() const = 0;
+		/// Returns the type of the value.
 
 	virtual void read(RedisInputStream& input) = 0;
+		/// Reads the value from the stream.
 
 	virtual std::string toString() const = 0;
-
-	enum Types {
-		REDIS_INTEGER,
-		REDIS_SIMPLE_STRING,
-		REDIS_BULK_STRING,
-		REDIS_ARRAY,
-		REDIS_ERROR
-	};
+		/// Converts the value to a RESP (REdis Serialization Protocol) string.
 
 	static RedisType::Ptr createRedisType(char marker);
 		/// Create a Redis type based on the marker :
@@ -198,46 +211,57 @@ struct RedisTypeTraits<BulkString>
 
 template<typename T>
 class Type : public RedisType
+	/// Template class for all Redis types. This class will use
+	/// RedisTypeTraits structure for calling the type specific code.
 {
 public:
 
 	Type()
+		/// Constructor
 	{
 	}
 
 	Type(const T& t) : _value(t)
+		/// Constructor
 	{
 	}
 
 	Type(const Type& copy) : _value(copy._value)
+		/// Copy Constructor
 	{
 	}
 
 	virtual ~Type()
+		/// Destructor
 	{
 	}
 
-	int  type() const
+	int type() const
+		/// Returns the type of the value
 	{
 		return RedisTypeTraits<T>::TypeId;
 	}
 
 	void read(RedisInputStream& socket)
+		/// Reads the value from the stream (RESP).
 	{
 		RedisTypeTraits<T>::read(socket, _value);
 	}
 
 	std::string toString() const
+		/// Converts the value to a string based on the RESP protocol.
 	{
 		return RedisTypeTraits<T>::toString(_value);
 	}
 
 	T& value()
+		/// Returns the value
 	{
 		return _value;
 	}
 
 	const T& value() const
+		/// Returns a const value
 	{
 		return _value;
 	}

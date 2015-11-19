@@ -24,16 +24,24 @@ namespace Poco {
 namespace Redis {
 
 class Redis_API Error
+	/// Represent a Redis error
 {
 public:
 
 	Error();
+		/// Constructor
+
 	Error(const std::string& message);
+		/// Constructor
+
 	virtual ~Error();
+		/// Destructor
 
 	std::string  getMessage() const;
+		/// Returns the error message
 
 	void setMessage(const std::string& message);
+		/// Sets the error message
 
 private:
 
