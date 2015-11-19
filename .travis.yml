@@ -39,7 +39,7 @@ matrix:
     - env:    TEST_NAME="gcc (make) unbundled"
       compiler: gcc
       script:
-        - sudo libpcre3-dev libssl-dev libexpat1-dev
+        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - ./configure --everything --unbundled && make -s -j2
         - ./travis/runtests.sh
     
