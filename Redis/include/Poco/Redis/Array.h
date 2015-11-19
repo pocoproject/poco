@@ -125,6 +125,11 @@ public:
 		throw BadCastException();
 	}
 
+	int getType(size_t pos) const;
+		/// Returns the type of the element. This can throw a NullValueException
+		/// when this array is a Null array. An InvalidArgumentException will
+		/// be thrown when the index is out of range.
+
 	bool isNull() const;
 		/// Returns true when this is a Null array.
 
@@ -145,6 +150,7 @@ private:
 	Nullable<std::vector<RedisType::Ptr> > _elements;
 
 	void checkNull();
+		/// Checks for null array and sets a new vector if true.
 };
 
 inline Array& Array::operator<<(const char* s)

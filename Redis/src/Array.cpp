@@ -46,6 +46,17 @@ Array& Array::addRedisType(RedisType::Ptr value)
 }
 
 
+int Array::getType(size_t pos) const
+{
+	if ( _elements.isNull() ) throw NullValueException();
+
+	if ( pos >= _elements.value().size() ) throw InvalidArgumentException();
+
+	RedisType::Ptr element = _elements.value().at(pos);
+	return element->type();
+}
+
+
 std::string Array::toString() const
 {
 	return RedisTypeTraits<Array>::toString(*this);
