@@ -194,7 +194,7 @@ struct RedisTypeTraits<BulkString>
 		value.clear();
 
 		std::string line = input.getline();
-		int length = NumberParser::parse64(line);
+		int length = NumberParser::parse(line);
 
 		if ( length >= 0 )
 		{
