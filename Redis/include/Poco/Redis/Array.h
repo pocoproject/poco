@@ -59,6 +59,8 @@ public:
 
 	Array& operator<<(const char* s);
 		/// Special implementation for const char*
+		/// Note: the specialization creates a BulkString. If you need
+		/// a simple string, call addSimpleString.
 
 	Array& operator<<(const std::vector<std::string>& strings);
 		/// Special implementation for a vector with strings
@@ -72,9 +74,6 @@ public:
 		/// Adds an element to the array.
 		/// Note: the specialization for std::string will add a BulkString!
 		/// If you really need a simple string, call addSimpleString.
-		/// Note: the specialization for std::string will add the string as
-		/// a BulkString because this is commonly used for representing strings
-		/// in Redis. If you really need a simple string, use addSimpleString.
 	{
 		addRedisType(new Type<T>(arg));
 		return *this;
@@ -82,6 +81,8 @@ public:
 
 	Array& add(const char* s);
 		/// Special implementation for const char*
+		/// Note: the specialization creates a BulkString. If you need
+		/// a simple string, call addSimpleString.
 
 	Array& add(const std::vector<std::string>& strings);
 		/// Special implementation for a vector with strings
