@@ -522,6 +522,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\RedisEventArgs.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\RedisStream.cpp"
 				>
 			</File>
@@ -558,7 +562,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\Poco\Redis\PoolableConnectionFactory.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Poco\Redis\Redis.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Poco\Redis\RedisEventArgs.cpp"
 				>
 			</File>
 			<File
