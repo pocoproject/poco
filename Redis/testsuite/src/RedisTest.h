@@ -84,6 +84,8 @@ public:
 	void testRPOPLPUSH();
 	void testRPUSH();
 
+	void testPool();
+
 	void setUp();
 	void tearDown();
 

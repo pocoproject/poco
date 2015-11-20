@@ -17,6 +17,7 @@
 #include "RedisTest.h"
 #include "Poco/Redis/AsyncReader.h"
 #include "Poco/Redis/Command.h"
+#include "Poco/Redis/PoolableConnectionFactory.h"
 
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
@@ -2852,6 +2853,27 @@ void RedisTest::testRPUSH()
 	}
 }
 
+void RedisTest::testPool()
+{
+	Poco::Net::SocketAddress sa(_host, _port);
+	Poco::PoolableObjectFactory<Client, Client::Ptr> factory(sa);
+	Poco::ObjectPool<Client, Client::Ptr> pool(factory, 10, 15);
+
+	delKey("mypoolkey");
+
+	PooledConnection pclient1(pool);
+	PooledConnection pclient2(pool);
+	assert(pool.size() == 2);
+
+	Command set = Command::set("mypoolkey", "Hello");
+	std::string result = ((Client::Ptr) pclient1)->execute<std::string>(set);
+	assert(result.compare("OK") == 0);
+
+	Array get;
+	get << "GET" << "mypoolkey";
+	BulkString keyValue = ((Client::Ptr) pclient2)->execute<BulkString>(get);
+	assert(keyValue.value().compare("Hello") == 0);
+}
 
 void RedisTest::delKey(const std::string& key)
 {
@@ -2929,6 +2951,8 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testRPOP);
 	CppUnit_addTest(pSuite, RedisTest, testRPOPLPUSH);
 	CppUnit_addTest(pSuite, RedisTest, testRPUSH);
+
+	CppUnit_addTest(pSuite, RedisTest, testPool);
 
 	return pSuite;
 }
