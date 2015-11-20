@@ -38,11 +38,11 @@ public:
 		/// Destructor
 
 	std::string readLine();
-		/// Reads a line from Redis (until \r\n is encounterd).
+		/// Reads a line from Redis (until \r\n is encountered).
 
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
-	
+
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
