@@ -72,6 +72,9 @@ class Redis_API Client
 	///    command << "list";
 {
 public:
+
+	typedef SharedPtr<Client> Ptr;
+
 	Client();
 		/// Default constructor. Use this when you want to
 		/// connect later on.
@@ -185,7 +188,7 @@ private:
 
 	void connect();
 		/// Connects to the Redis server
-	
+
 	void connect(const Timespan& timeout);
 		/// Connects to the Redis server and sets a timeout.
 
