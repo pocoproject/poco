@@ -323,7 +323,7 @@ Command Command::lset(const std::string& list, Int64 index, const std::string& v
 	return cmd;
 }
 
-Command Command::ltrim(const std::__cxx11::string& list, Int64 start, Int64 stop)
+Command Command::ltrim(const std::string& list, Int64 start, Int64 stop)
 {
 	Command cmd("LTRIM");
 
