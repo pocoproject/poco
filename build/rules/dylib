@@ -22,13 +22,13 @@ DYLIB      = $(SHLIB)
 DYLIBFLAGS = $(SHLIBFLAGS)
 endif
 
-DYLIB_DEBUG        = $(BINPATH)/$(target)d$(OSARCH_POSTFIX)$(SHL_EXT)
-DYLIB_RELEASE      = $(BINPATH)/$(target)$(OSARCH_POSTFIX)$(SHL_EXT)
-DYLIB_S_DEBUG      = $(BINPATH)/static/$(target)d$(OSARCH_POSTFIX)$(SHL_EXT)
-DYLIB_S_RELEASE    = $(BINPATH)/static/$(target)$(OSARCH_POSTFIX)$(SHL_EXT)
+DYLIB_DEBUG        = $(BINPATH)/$(target)d$(SHL_EXT)
+DYLIB_RELEASE      = $(BINPATH)/$(target)$(SHL_EXT)
+DYLIB_S_DEBUG      = $(BINPATH)/static/$(target)d$(SHL_EXT)
+DYLIB_S_RELEASE    = $(BINPATH)/static/$(target)$(SHL_EXT)
 
-TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d$(OSARCH_POSTFIX))
-TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
+TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d)
+TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l))
 
 #
 # Include the compile rules
