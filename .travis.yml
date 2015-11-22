@@ -17,7 +17,8 @@ before_install:
 
 services:
   - mongodb
-  
+  - redis-server
+
 notifications:
   slack: pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
 
