@@ -31,7 +31,7 @@ Mutex Logger::_mapMtx;
 const std::string Logger::ROOT;
 
 
-Logger::Logger(const std::string& name, Channel* pChannel, int level): _name(name), _pChannel(pChannel), _level(level)
+Logger::Logger(const std::string& name, AutoPtr<Channel> pChannel, int level): _name(name), _pChannel(pChannel), _level(level)
 {
 	if (pChannel) pChannel->duplicate();
 }
@@ -43,7 +43,7 @@ Logger::~Logger()
 }
 
 
-void Logger::setChannel(Channel* pChannel)
+void Logger::setChannel(AutoPtr<Channel> pChannel)
 {
 	if (_pChannel) _pChannel->release();
 	_pChannel = pChannel;
@@ -51,7 +51,7 @@ void Logger::setChannel(Channel* pChannel)
 }
 
 
-Channel* Logger::getChannel() const
+AutoPtr<Channel> Logger::getChannel() const
 {
 	return _pChannel;
 }
@@ -131,7 +131,7 @@ void Logger::setLevel(const std::string& name, int level)
 }
 
 
-void Logger::setChannel(const std::string& name, Channel* pChannel)
+void Logger::setChannel(const std::string& name, AutoPtr<Channel> pChannel)
 {
 	Mutex::ScopedLock lock(_mapMtx);
 
@@ -310,7 +310,7 @@ Logger& Logger::unsafeGet(const std::string& name)
 }
 
 
-Logger& Logger::create(const std::string& name, Channel* pChannel, int level)
+Logger& Logger::create(const std::string& name, AutoPtr<Channel> pChannel, int level)
 {
 	Mutex::ScopedLock lock(_mapMtx);
 

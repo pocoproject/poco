@@ -109,13 +109,13 @@ void LoggerTest::testLogger()
 	
 	AutoPtr<TestChannel> pChannel2 = new TestChannel;
 	Logger::setChannel("Logger2", pChannel2.get());
-	assert (pChannel  == root.getChannel());
-	assert (pChannel  == logger1.getChannel());
-	assert (pChannel  == logger11.getChannel());
-	assert (pChannel  == logger12.getChannel());
-	assert (pChannel2 == logger2.getChannel());
-	assert (pChannel2 == logger21.getChannel());
-	assert (pChannel2 == logger22.getChannel());
+	assert (pChannel  == root.getChannel().get());
+	assert (pChannel  == logger1.getChannel().get());
+	assert (pChannel  == logger11.getChannel().get());
+	assert (pChannel  == logger12.getChannel().get());
+	assert (pChannel2 == logger2.getChannel().get());
+	assert (pChannel2 == logger21.getChannel().get());
+	assert (pChannel2 == logger22.getChannel().get());
 	
 	root.setLevel(Message::PRIO_TRACE);
 	pChannel->list().clear();

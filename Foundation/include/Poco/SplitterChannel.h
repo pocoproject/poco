@@ -23,6 +23,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Channel.h"
 #include "Poco/Mutex.h"
+#include "Poco/AutoPtr.h"
 #include <vector>
 
 
@@ -37,10 +38,10 @@ public:
 	SplitterChannel();
 		/// Creates the SplitterChannel.
 
-	void addChannel(Channel* pChannel);
+	void addChannel(AutoPtr<Channel> pChannel);
 		/// Attaches a channel, which may not be null.
 		
-	void removeChannel(Channel* pChannel);
+	void removeChannel(AutoPtr<Channel> pChannel);
 		/// Removes a channel.
 
 	void log(const Message& msg);
@@ -66,7 +67,7 @@ protected:
 	~SplitterChannel();
 
 private:
-	typedef std::vector<Channel*> ChannelVec;
+	typedef std::vector<AutoPtr<Channel> > ChannelVec;
 	
 	ChannelVec        _channels;
 	mutable FastMutex _mutex;
