@@ -23,7 +23,11 @@ endif
 ifeq ($(LINKMODE),STATIC)
 LIBLINKEXT = .a
 else
+ifeq ($(OSNAME), Cygwin)
+LIBLINKEXT = $(IMPLIBLINKEXT)
+else
 LIBLINKEXT = $(SHAREDLIBLINKEXT)
+endif
 endif
 
 INCLUDE += -I$(POCO_ODBC_INCLUDE)

@@ -33,8 +33,12 @@ MKDIR   = mkdir -p
 # Extension for Shared Libraries
 #
 LIBPREFIX        = cyg
-SHAREDLIBEXT     = .$(target_version).dll
+SHAREDLIBEXT     = -$(target_version).dll
 SHAREDLIBLINKEXT = .dll
+
+IMPPREFIX        = lib
+IMPLIBEXT        = -$(target_version).dll.a
+IMPLIBLINKEXT    = .dll.a
 
 #
 # Compiler and Linker Flags

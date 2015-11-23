@@ -22,11 +22,15 @@
 # 5/ run the Foundation tests: build/script/runtests.sh Foundation
 #
 
+TESTRUNNER=./testrunner
+
 if [ "$POCO_BASE" = "" ] ; then
 	POCO_BASE=`pwd`
 fi
 
-TESTRUNNER=./testrunner
+if [ "$POCO_BUILD" = "" ] ; then
+	POCO_BUILD=$POCO_BASE
+fi
 
 if [ "$1" = "" ] ; then
    components=`cat $POCO_BASE/components`
@@ -40,20 +44,21 @@ else
     TESTRUNNERARGS=$2
 fi
 
+if [ "$OSARCH" = "" ] ; then
+	OSARCH=`uname -m | tr ' /' _-`
+fi
 
 if [ "$OSNAME" = "" ] ; then
 	OSNAME=`uname`
         case $OSNAME in
         CYGWIN*)
-                OSNAME=CYGWIN 
+                OSNAME=Cygwin 
                 TESTRUNNER=$TESTRUNNER.exe
+                PATH=$POCO_BUILD/lib/$OSNAME/$OSARCH:$PATH
                 ;;
         MINGW*)
                 OSNAME=MinGW ;;
         esac
-fi
-if [ "$OSARCH" = "" ] ; then
-	OSARCH=`uname -m | tr ' /' _-`
 fi
 BINDIR="bin/$OSNAME/$OSARCH/"
 
@@ -72,8 +77,8 @@ do
 		fi
 	done
 	if [ $excluded -eq 0 ] ; then
-		if [ -d "$POCO_BASE/$comp/testsuite/$BINDIR" ] ; then
-			if [ -x "$POCO_BASE/$comp/testsuite/$BINDIR/$TESTRUNNER" ] ; then
+		if [ -d "$POCO_BUILD/$comp/testsuite/$BINDIR" ] ; then
+			if [ -x "$POCO_BUILD/$comp/testsuite/$BINDIR/$TESTRUNNER" ] ; then
 				echo ""
 				echo ""
 				echo "****************************************" 
@@ -82,7 +87,7 @@ do
 				echo ""
 
 				runs=`expr $runs + 1`
-				sh -c "cd $POCO_BASE/$comp/testsuite/$BINDIR && $TESTRUNNER $TESTRUNNERARGS"
+				sh -c "cd $POCO_BUILD/$comp/testsuite/$BINDIR && $TESTRUNNER $TESTRUNNERARGS"
 				if [ $? -ne 0 ] ; then
 					failures=`expr $failures + 1`
 					failedTests="$failedTests $comp"
