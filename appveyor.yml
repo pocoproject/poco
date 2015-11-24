@@ -16,5 +16,5 @@ build_script:
   - build_cmake.cmd "-DCMAKE_INSTALL_PREFIX=%CD%\install"
   - set PATH=%CD%\install\bin;%PATH%
 
-test:
+test_script:
   - build/script/runtests2
