@@ -8,14 +8,16 @@ branches:
 install:
   - cinst cmake
 #  - cinst mysql
-#  - cinst jom
+  - cinst jom
+
+before_build:
+  - %comspec% /k ""C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"" x86
+  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
 
 build_script:
-  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
   - mkdir install
-#  - build_cmake.cmd "-DCMAKE_INSTALL_PREFIX=%CD%\install"
-  - build_cmake.cmd
-  - set PATH=%CD%\cmake-build\bin;%PATH%
+  - build_cmake.cmd "-DCMAKE_INSTALL_PREFIX=%CD%\install"
+  - set PATH=%CD%\install\bin;%PATH%
 
 test_script:
   - build/script/runtests2

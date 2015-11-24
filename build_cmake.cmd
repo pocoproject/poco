@@ -7,14 +7,12 @@ cd cmake-build
 
 del CMakeCache.txt
 cmake ../. -DCMAKE_BUILD_TYPE=Debug -G"NMake Makefiles" %1 %2 %3 %4 %5
-cmake --build .
-rem jom /j3
-rem jom install
+jom /j3
+jom install
 
 del CMakeCache.txt
 cmake ../. -DCMAKE_BUILD_TYPE=Release -G"NMake Makefiles" %1 %2 %3 %4 %5
-cmake --build .
-rem jom /j3
-rem jom install
+jom /j3
+jom install
 
 cd ..
