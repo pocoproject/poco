@@ -1,5 +1,10 @@
 version: '{build}'
 
+branches:
+  only:
+  - AppVeyor
+
+
 install:
   - cinst cmake
   - cinst mysql
