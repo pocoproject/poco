@@ -5,13 +5,16 @@ cache:
     - c:\OpenSSL-Win64
     - c:\ProgramData\chocolatey
 
+services:
+  - mongodb
+  
 branches:
   only:
   - AppVeyor
 
 # to add several configurations to build matrix:
 configuration:
-  - Debug
+#  - Debug
   - Release
 
 environment:
@@ -19,7 +22,7 @@ environment:
     - builder: 120
       ssl_arch: Win64
       nuget_arch: x64
-      vc_arch: amd64
+      vc_arch: x86_amd64
       choco_arch:
       target_arch: x86_64
       vs_arch: x64
@@ -27,7 +30,7 @@ environment:
     - builder: 120
       ssl_arch: Win32
       nuget_arch: Win32
-      vc_arch: amd64_x86  # cross-compile from amd64 to x86
+      vc_arch: x86
       choco_arch: --x86
       target_arch: x86
       vs_arch: Win32
@@ -35,7 +38,7 @@ environment:
     - builder: 140
       ssl_arch: Win64
       nuget_arch: x64
-      vc_arch: amd64
+      vc_arch: x86_amd64
       choco_arch:
       target_arch: x86_64
       vs_arch: x64
@@ -43,7 +46,7 @@ environment:
     - builder: 140
       ssl_arch: Win32
       nuget_arch: Win32
-      vc_arch: amd64_x86  # cross-compile from amd64 to x86
+      vc_arch: x86
       choco_arch: --x86
       target_arch: x86
       vs_arch: Win32
