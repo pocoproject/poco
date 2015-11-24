@@ -9,6 +9,11 @@ branches:
   only:
   - AppVeyor
 
+# to add several configurations to build matrix:
+configuration:
+  - Debug
+  - Release
+
 environment:
   matrix:
     - ssl_arch: Win64
@@ -28,7 +33,7 @@ install:
   - cinst cmake
 # - cinst mysql
   - cinst jom
-# - systeminfo
+  - systeminfo
   - c:\cygwin\bin\uname -a
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
@@ -50,7 +55,7 @@ install:
         }
 
 before_build:
-#  - set
+  - set
   - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %vc_arch%
   - set PATH=%ChocolateyInstall%\bin;%PATH%
 # chocolatey brokes jom, here's workaround
