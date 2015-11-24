@@ -20,28 +20,22 @@ configuration:
 environment:
   matrix:
     - builder: 120
-      ssl_arch: Win64
-      nuget_arch: x64
-      vc_arch: x86_amd64
-      choco_arch:
-      target_arch: x86_64
-      vs_arch: x64
-      
+      ssl_arch: Win32
+      nuget_arch: Win32
+      vc_arch: x86
+      choco_arch: --x86
+      target_arch: x86
+      vs_arch: Win32
+      suffix:
+
     - builder: 120
-      ssl_arch: Win32
-      nuget_arch: Win32
-      vc_arch: x86
-      choco_arch: --x86
-      target_arch: x86
-      vs_arch: Win32
-
-    - builder: 140
       ssl_arch: Win64
       nuget_arch: x64
       vc_arch: x86_amd64
       choco_arch:
       target_arch: x86_64
       vs_arch: x64
+      suffix: 64
       
     - builder: 140
       ssl_arch: Win32
@@ -50,7 +44,17 @@ environment:
       choco_arch: --x86
       target_arch: x86
       vs_arch: Win32
+      suffix:
 
+    - builder: 140
+      ssl_arch: Win64
+      nuget_arch: x64
+      vc_arch: x86_amd64
+      choco_arch:
+      target_arch: x86_64
+      vs_arch: x64
+      suffix: 64
+      
     - builder: cmake
       ssl_arch: Win64
       nuget_arch: x64
@@ -101,12 +105,20 @@ before_build:
   - path
 
 build_script:
-  - buildwin.cmd %builder% build all both %vs_arch% samples tests devenv
-  - mkdir install
-  - build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
-  -   
-  
+  - ps: |
+      if ($builder -eq "cmake") {
+         mkdir install
+         build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
+      } else {
+         buildwin.cmd %builder% build all both %vs_arch% samples tests devenv
+      }
 
 test_script:
-  - set PATH=%CD%\install\bin;%PATH%
-  - build\script\runtests2
+  - ps: |
+      if ($builder -eq "cmake") {
+         set PATH=%CD%\install\bin;%PATH%
+      } else {
+         set PATH=%CD%\bin%suffix%;%PATH%
+         build\script\runtests2
+      }
+ 
