@@ -7,14 +7,15 @@ branches:
 
 install:
   - cinst cmake
-  - cinst mysql
-  - cinst jom
+#  - cinst mysql
+#  - cinst jom
 
 build_script:
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
   - mkdir install
-  - build_cmake.cmd "-DCMAKE_INSTALL_PREFIX=%CD%\install"
-  - set PATH=%CD%\install\bin;%PATH%
+#  - build_cmake.cmd "-DCMAKE_INSTALL_PREFIX=%CD%\install"
+  - build_cmake.cmd
+  - set PATH=%CD%\cmake-build\bin;%PATH%
 
 test_script:
   - build/script/runtests2
