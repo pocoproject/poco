@@ -65,7 +65,7 @@ before_build:
 
 build_script:
   - mkdir install
-  - build_cmake.cmd "-DCMAKE_INSTALL_PREFIX=%CD%\install"
+  - build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
   - set PATH=%CD%\install\bin;%PATH%
 
 test_script:
