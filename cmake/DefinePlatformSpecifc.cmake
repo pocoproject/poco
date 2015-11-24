@@ -48,6 +48,8 @@ if(MSVC)
 else(MSVC)
     # Other compilers then MSVC don't have a static STATIC_POSTFIX at the moment
     set(STATIC_POSTFIX "" CACHE STRING "Set static library postfix" FORCE)
+    set(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   -D_DEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 endif(MSVC)
 
 # Add a d postfix to the debug libraries
@@ -72,22 +74,27 @@ if(WIN32)
   add_definitions( -DUNICODE -D_UNICODE -D__LCC__)  #__LCC__ define used by MySQL.h
 endif(WIN32)
 
-if (UNIX AND NOT ANDROID )
-  # Standard 'must be' defines
-  if (APPLE)
-    add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64)
-    set(SYSLIBS  dl)
-  else (APPLE)
-    add_definitions( -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
-    if (QNX)
-      add_definitions( -DPOCO_HAVE_FD_POLL)
-      set(SYSLIBS  m socket)
-    else (QNX)
-      add_definitions( -D_XOPEN_SOURCE=500 -DPOCO_HAVE_FD_EPOLL)
-      set(SYSLIBS  pthread dl rt)
-    endif (QNX)
-  endif (APPLE)
-endif(UNIX AND NOT ANDROID )
+if (CYGWIN)
+  add_definitions(-DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING)
+  add_definitions(-D_XOPEN_SOURCE=500 -D__BSD_VISIBLE)
+else (CYGWIN)
+	if (UNIX AND NOT ANDROID )
+	  # Standard 'must be' defines
+	  if (APPLE)
+	    add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64)
+	    set(SYSLIBS  dl)
+	  else (APPLE)
+	    add_definitions( -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
+	    if (QNX)
+	      add_definitions( -DPOCO_HAVE_FD_POLL)
+	      set(SYSLIBS  m socket)
+	    else (QNX)
+	      add_definitions( -D_XOPEN_SOURCE=500 -DPOCO_HAVE_FD_EPOLL)
+	      set(SYSLIBS  pthread dl rt)
+	    endif (QNX)
+	  endif (APPLE)
+	endif(UNIX AND NOT ANDROID )
+endif (CYGWIN)
 
 if (CMAKE_SYSTEM MATCHES "SunOS")
   # Standard 'must be' defines
@@ -99,10 +106,6 @@ if (CMAKE_COMPILER_IS_MINGW)
   add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
   add_definitions(-D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE)
 endif (CMAKE_COMPILER_IS_MINGW)
-
-if (CYGWIN)
-#    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
-endif (CYGWIN)
 
 # SunPro C++
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
