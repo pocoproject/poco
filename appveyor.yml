@@ -2,10 +2,14 @@ version: '{build}'
 
 install:
   - cinst cmake
+  - cinst mysql
+  - cinst jom
 
 build_script:
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
-  - mkdir cmake-build
-  - cd cmake-build
-  - cmake ..
-  - cmake --build .
+  - mkdir install
+  - build_cmake.cmd "-DCMAKE_INSTALL_PREFIX=%CD%\install"
+  - set PATH=%CD%\install\bin;%PATH%
+
+test:
+  - build/script/runtests2
