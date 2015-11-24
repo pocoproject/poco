@@ -10,25 +10,25 @@ branches:
   - AppVeyor
 
 environment:
-    matrix:
-        - ssl_arch: Win64
-          nuget_arch: x64
-          vc_arch: amd64
-          choco_arch:
-          target_arch: x86_64
-          
-        - ssl_arch: Win32
-          nuget_arch: Win32
-          vc_arch: amd64_x86  # cross-compile from amd64 to x86
-          choco_arch: --x86
-          target_arch: x86
+  matrix:
+    - ssl_arch: Win64
+      nuget_arch: x64
+      vc_arch: amd64
+      choco_arch:
+      target_arch: x86_64
+      
+    - ssl_arch: Win32
+      nuget_arch: Win32
+      vc_arch: amd64_x86  # cross-compile from amd64 to x86
+      choco_arch: --x86
+      target_arch: x86
 
 
 install:
   - cinst cmake
 # - cinst mysql
   - cinst jom
-  - systeminfo
+# - systeminfo
   - c:\cygwin\bin\uname -a
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
@@ -50,8 +50,8 @@ install:
         }
 
 before_build:
-  - set
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
+#  - set
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %vc_arch%
   - set PATH=%ChocolateyInstall%\bin;%PATH%
 # chocolatey brokes jom, here's workaround
 # see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
