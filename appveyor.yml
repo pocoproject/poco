@@ -11,7 +11,6 @@ branches:
 
 environment:
     matrix:
-        fast_finish: true     # set this flag to immediately finish build once one of the jobs fails.
         - ssl_arch: Win64
           nuget_arch: x64
           vc_arch: amd64
