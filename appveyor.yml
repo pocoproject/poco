@@ -14,7 +14,8 @@ before_build:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
 # chocolatey broke jom, here's workaround (see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
-  - set PATH=%ChocolateyInstall%/lib/job/content;%PATH%
+  - dir %ChocolateyInstall%\lib\job\content
+  - set PATH=%ChocolateyInstall%\lib\job\content;%PATH%
   - path
 
 build_script:
