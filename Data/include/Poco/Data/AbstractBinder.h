@@ -55,6 +55,9 @@ enum NullData
 struct NullValue
 {
 
+	NullValue()
+	{}
+  
 	template <typename T>
 	operator Poco::Nullable<T>() const
 	{
