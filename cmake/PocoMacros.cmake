@@ -280,3 +280,27 @@ macro(POCO_INSTALL_PDB target_name)
             )
     endif()
 endmacro()
+
+#===============================================================================
+# Macros for simplified installation
+#
+#  INSTAL - Install the given target
+#    Usage: INSTAL(target_name)
+#      INPUT:
+#           target_name             the name of the target. e.g. Foundation for PocoFoundation
+#    Example: INSTAL(Foundation)
+macro(INSTAL target_name)
+install(
+    DIRECTORY include
+    DESTINATION include
+    COMPONENT Devel
+    PATTERN ".svn" EXCLUDE
+    )
+install(
+    TARGETS "${target_name}" EXPORT "${target_name}Targets"
+    LIBRARY DESTINATION lib${LIB_SUFFIX}
+    ARCHIVE DESTINATION lib${LIB_SUFFIX}
+    RUNTIME DESTINATION bin
+    )
+
+endmacro()

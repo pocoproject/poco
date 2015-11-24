@@ -1,22 +1,62 @@
 version: '{build}'
 
+cache:
+    - c:\OpenSSL-Win32
+    - c:\OpenSSL-Win64
+    - c:\ProgramData\chocolatey
+
 branches:
   only:
   - AppVeyor
 
+environment:
+    matrix:
+        fast_finish: true     # set this flag to immediately finish build once one of the jobs fails.
+        - ssl_arch: Win64
+          nuget_arch: x64
+          vc_arch: amd64
+          choco_arch:
+          target_arch: x86_64
+          
+        - ssl_arch: Win32
+          nuget_arch: Win32
+          vc_arch: amd64_x86  # cross-compile from amd64 to x86
+          choco_arch: --x86
+          target_arch: x86
+
 
 install:
   - cinst cmake
-#  - cinst mysql
+# - cinst mysql
   - cinst jom
+  - systeminfo
+  - c:\cygwin\bin\uname -a
+  - c:\cygwin\bin\cat /proc/cpuinfo
+  - c:\cygwin\bin\cat /proc/meminfo
+  - ps: |
+        if (Test-Path "c:\OpenSSL-$env:ssl_arch") {
+            echo "using openssl from cache"
+        } else {
+            echo "downloading openssl"
+            Invoke-WebRequest "https://slproweb.com/download/$($env:ssl_arch)OpenSSL-1_0_2d.exe" -OutFile c:\openssl-setup.exe
+            echo "installing openssl"
+            Start-Process -Wait -FilePath c:\openssl-setup.exe -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes"
+        }
+  - c:\cygwin\bin\find /cygdrive/c/OpenSSL-%ssl_arch% "-type" f
+  - ps: |
+        if (Test-Path "%ChocolateyInstall%/bin/jom.exe") {
+            echo "using jom from cache"
+        } else {
+            choco install jom
+        }
 
 before_build:
   - set
   - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
-  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
-# chocolatey broke jom, here's workaround (see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
-  - dir C:\ProgramData\chocolatey\lib\jom\content
-  - set PATH=C:\ProgramData\chocolatey\lib\jom\content;%PATH%
+  - set PATH=%ChocolateyInstall%\bin;%PATH%
+# chocolatey brokes jom, here's workaround
+# see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
+  - set PATH=%ChocolateyInstall%\lib\jom\content;%PATH%
   - path
 
 build_script:
@@ -25,4 +65,4 @@ build_script:
   - set PATH=%CD%\install\bin;%PATH%
 
 test_script:
-  - build/script/runtests2
+  - build\script\runtests2
