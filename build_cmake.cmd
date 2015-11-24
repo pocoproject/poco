@@ -1,9 +1,9 @@
 rem usage
 rem build_cmake ( Debug | Release )
 
-rem POCO_STATIC=1 - for static build
-rem POCO_UNBUNDLED - for no built-in version of libs
-rem CMAKE_INSTALL_PREFIX=path - for install path
+rem -DPOCO_STATIC=1 - for static build
+rem -DPOCO_UNBUNDLED - for no built-in version of libs
+rem -DCMAKE_INSTALL_PREFIX=path - for install path
 
 mkdir cmake-build
 cd cmake-build
