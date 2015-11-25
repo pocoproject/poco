@@ -115,17 +115,16 @@ build_script:
       if ($builder -eq "cmake") {
          mkdir install
          & .\build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
-      }
-      if (($builder -ne "cmake") -and ($linkmode -eq "shared")) {    
-         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests devenv
-      }
+       } else {
+          & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests devenv
+       }
 
 test_script:
   - ps: |
       if ($builder -eq "cmake") {
-         set PATH=%CD%\install\bin;%PATH%
-      } else {
-         set PATH=%CD%\bin%suffix%;%PATH%
+      }
+      if (($builder -ne "cmake") -and ($linkmode -eq "shared")) {    
+         set PATH=$env:CD\bin$env:suffix;$env:PATH
          & .\build\script\runtests2 %suffix%
       }
  
