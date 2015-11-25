@@ -122,13 +122,17 @@ before_build:
 
 after_build:
 
+build:
+  verbosity: minimal
+# msbuild "cpp\vs2013\ISO-8583.sln" /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
 build_script:
   - ps: |
       if ($env:builder -eq "cmake") {
          mkdir install
          & .\build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
       } else {
-         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests
+         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests msbuild %verbosity% "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
       }
 
 
