@@ -20,16 +20,16 @@ configuration:
 
 environment:
   matrix:
-    - builder: 120
-      arch_ssl: Win32
-      arch_nuget: Win32
-      arch_vc: x86
-      arch_choco: --x86
-      arch_target: x86
-      platform: Win32
-      linkmode: shared
-      bundling: 
-      suffix:
+#    - builder: 120
+#      arch_ssl: Win32
+#      arch_nuget: Win32
+#      arch_vc: x86
+#      arch_choco: --x86
+#      arch_target: x86
+#      platform: Win32
+#      linkmode: shared
+#      bundling: 
+#      suffix:
 
     - builder: 120
       arch_ssl: Win64
@@ -42,41 +42,41 @@ environment:
       bundling: 
       suffix: 64
       
-    - builder: 140
-      arch_ssl: Win32
-      arch_nuget: Win32
-      arch_vc: x86
-      arch_choco: --x86
-      arch_target: x86
-      platform: Win32
-      linkmode: shared
-      bundling: 
-      suffix:
+#    - builder: 140
+#      arch_ssl: Win32
+#      arch_nuget: Win32
+#      arch_vc: x86
+#      arch_choco: --x86
+#      arch_target: x86
+#      platform: Win32
+#      linkmode: shared
+#      bundling: 
+#      suffix:
 
-    - builder: 140
-      arch_ssl: Win64
-      arch_nuget: x64
-      arch_vc: x86_amd64
-      arch_choco:
-      arch_target: x86_64
-      platform: x64
-      linkmode: shared
-      bundling: 
-      suffix: 64
+#    - builder: 140
+#      arch_ssl: Win64
+#      arch_nuget: x64
+#      arch_vc: x86_amd64
+#      arch_choco:
+#      arch_target: x86_64
+#      platform: x64
+#      linkmode: shared
+#      bundling: 
+#      suffix: 64
       
-    - builder: cmake
-      arch_ssl: Win64
-      arch_nuget: x64
-      arch_vc: amd64
-      arch_choco:
-      arch_target: x86_64
+#    - builder: cmake
+#      arch_ssl: Win64
+#      arch_nuget: x64
+#      arch_vc: amd64
+#      arch_choco:
+#      arch_target: x86_64
       
-    - builder: cmake
-      arch_ssl: Win32
-      arch_nuget: Win32
-      arch_vc: amd64_x86  # cross-compile from amd64 to x86
-      arch_choco: --x86
-      arch_target: x86
+#    - builder: cmake
+#      arch_ssl: Win32
+#      arch_nuget: Win32
+#      arch_vc: amd64_x86  # cross-compile from amd64 to x86
+#      arch_choco: --x86
+#      arch_target: x86
 
 
 install:
@@ -117,6 +117,8 @@ before_build:
 # OpenSSL  
   - set INCLUDE=C:\OpenSSL-%arch_ssl%\include;%INCLUDE%
   - set     LIB=C:\OpenSSL-%arch_ssl%\lib;C:\OpenSSL-%arch_ssl%\lib\VC;C:\OpenSSL-%arch_ssl%\lib\VC\static;%LIB%  
+  - set INCLUDE
+  - set LIB
 
 after_build:
 
@@ -159,8 +161,8 @@ on_finish:
 notifications:
   - provider: Slack
     auth_token:
-      secure: kBl9BlxvRMr9liHmnBs14A==
-    channel: development
+      secure: xoxp-14294014434-14294039984-15168133893-7f226e40a0
+    channel: appveyor
     template: "{message}, {commitId}, ..."
     
  
