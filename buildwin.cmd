@@ -144,6 +144,7 @@ if "%BUILD_TOOL%"=="msbuild" (
 
   if not %LOGGER%X==X (
      set BUILD_TOOL_ARGS=%BUILD_TOOL_ARGS% /logger:%LOGGER%
+     set BUILD_TOOL_ARGS=%BUILD_TOOL_ARGS% /verbosity:%VERBOSITY% /nologo 
   )
 )
 if not "%BUILD_TOOL%"=="msbuild" (

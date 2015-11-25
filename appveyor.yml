@@ -132,7 +132,7 @@ build_script:
          mkdir install
          & .\build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
       } else {
-         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests devenv 
       }
 
 
