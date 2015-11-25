@@ -80,8 +80,7 @@ environment:
 
 
 install:
-  - cinst cmake
-# - cinst mysql
+#  - cinst cmake
   - systeminfo
   - c:\cygwin\bin\uname -a
   - c:\cygwin\bin\cat /proc/cpuinfo
@@ -111,9 +110,13 @@ before_build:
 # chocolatey brokes jom, here's workaround
 # see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
   - set PATH=%ChocolateyInstall%\lib\jom\content;%PATH%
-  - set INCLUDE=C:\Program Files\MySql\MySQL Server 5.6\include;%INCLUDE%
-  - set LIB=C:\Program Files\MySql\MySQL Server 5.6\lib;%LIB%
   - path
+# MySQL
+  - set INCLUDE=C:\Program Files\MySql\MySQL Server 5.6\include;%INCLUDE%
+  - set     LIB=C:\Program Files\MySql\MySQL Server 5.6\lib;%LIB%
+# OpenSSL  
+  - set INCLUDE=C:\OpenSSL-%arch_ssl%\include;%INCLUDE%
+  - set     LIB=C:\OpenSSL-%arch_ssl%\lib;C:\OpenSSL-%arch_ssl%\lib\VC;C:\OpenSSL-%arch_ssl%\lib\VC\static;%LIB%  
 
 after_build:
 
