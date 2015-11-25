@@ -124,7 +124,7 @@ after_build:
 
 build_script:
   - ps: |
-      if ($builder -eq "cmake") {
+      if ($env:builder -eq "cmake") {
          mkdir install
          & .\build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
       } else {
@@ -140,9 +140,9 @@ after_test:
 
 test_script:
   - ps: |
-      if ($builder -eq "cmake") {
+      if ($env:builder -eq "cmake") {
       }
-      if (($builder -ne "cmake") -and ($linkmode -eq "shared")) {    
+      if (($env:builder -ne "cmake") -and ($env:linkmode -eq "shared")) {    
          $env:PATH = $env:CD + "\bin" + $env:suffix + ";" + $env:PATH
          & .\build\script\runtests2 %suffix%
       }
