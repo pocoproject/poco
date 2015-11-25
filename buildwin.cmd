@@ -1,4 +1,4 @@
-@echo off
+rem @echo off
 setlocal enabledelayedexpansion
 
 rem
@@ -142,7 +142,7 @@ if "%BUILD_TOOL%"=="msbuild" (
   set BUILD_TOOL_ARGS=/clp:NoSummary:NoItemAndPropertyList 
   set BUILD_TOOL_ARGS=%BUILD_TOOL_ARGS%  /verbosity:%VERBOSITY% /nologo 
 
-  if not "%LOGGER%"=="" (
+  if not %LOGGER%X==X (
      set BUILD_TOOL_ARGS=%BUILD_TOOL_ARGS% /logger:%LOGGER%
   )
 )
