@@ -15,59 +15,65 @@ branches:
 # to add several configurations to build matrix:
 configuration:
 #  - Debug
-  - Release
+  - release
+#  - static_md
+#  - static_mt
 
 environment:
   matrix:
     - builder: 120
-      ssl_arch: Win32
-      nuget_arch: Win32
-      vc_arch: x86
-      choco_arch: --x86
-      target_arch: x86
-      vs_arch: Win32
+      arch_ssl: Win32
+      arch_nuget: Win32
+      arch_vc: x86
+      arch_choco: --x86
+      arch_target: x86
+      platform: Win32
+      linkmode: shared
       suffix:
 
     - builder: 120
-      ssl_arch: Win64
-      nuget_arch: x64
-      vc_arch: x86_amd64
-      choco_arch:
-      target_arch: x86_64
-      vs_arch: x64
+      arch_ssl: Win64
+      arch_nuget: x64
+      arch_vc: x86_amd64
+      arch_choco:
+      arch_target: x86_64
+      platform: x64
+      linkmode: shared
       suffix: 64
       
     - builder: 140
-      ssl_arch: Win32
-      nuget_arch: Win32
-      vc_arch: x86
-      choco_arch: --x86
-      target_arch: x86
-      vs_arch: Win32
+      arch_ssl: Win32
+      arch_nuget: Win32
+      arch_vc: x86
+      arch_choco: --x86
+      arch_target: x86
+      platform: Win32
+      linkmode: shared
       suffix:
 
     - builder: 140
-      ssl_arch: Win64
-      nuget_arch: x64
-      vc_arch: x86_amd64
-      choco_arch:
-      target_arch: x86_64
-      vs_arch: x64
+      arch_ssl: Win64
+      arch_nuget: x64
+      arch_vc: x86_amd64
+      arch_choco:
+      arch_target: x86_64
+      platform: x64
       suffix: 64
+      linkmode: shared
       
     - builder: cmake
-      ssl_arch: Win64
-      nuget_arch: x64
-      vc_arch: amd64
-      choco_arch:
-      target_arch: x86_64
+      arch_ssl: Win64
+      arch_nuget: x64
+      arch_vc: amd64
+      arch_choco:
+      arch_target: x86_64
       
     - builder: cmake
-      ssl_arch: Win32
-      nuget_arch: Win32
-      vc_arch: amd64_x86  # cross-compile from amd64 to x86
-      choco_arch: --x86
-      target_arch: x86
+      arch_ssl: Win32
+      arch_nuget: Win32
+      arch_vc: amd64_x86  # cross-compile from amd64 to x86
+      arch_choco: --x86
+      arch_target: x86
 
 
 install:
@@ -79,15 +85,15 @@ install:
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
   - ps: |
-        if (Test-Path "c:\OpenSSL-$env:ssl_arch") {
+        if (Test-Path "c:\OpenSSL-$env:arch_ssl") {
             echo "using openssl from cache"
         } else {
             echo "downloading openssl"
-            Invoke-WebRequest "https://slproweb.com/download/$($env:ssl_arch)OpenSSL-1_0_2d.exe" -OutFile c:\openssl-setup.exe
+            Invoke-WebRequest "https://slproweb.com/download/$($env:arch_ssl)OpenSSL-1_0_2d.exe" -OutFile c:\openssl-setup.exe
             echo "installing openssl"
             Start-Process -Wait -FilePath c:\openssl-setup.exe -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes"
         }
-  - c:\cygwin\bin\find /cygdrive/c/OpenSSL-%ssl_arch% "-type" f
+  - c:\cygwin\bin\find /cygdrive/c/OpenSSL-%arch_ssl% "-type" f
   - ps: |
         if (Test-Path "%ChocolateyInstall%/bin/jom.exe") {
             echo "using jom from cache"
@@ -97,7 +103,7 @@ install:
 
 before_build:
   - set
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %vc_arch%
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %arch_vc%
   - set PATH=%ChocolateyInstall%\bin;%PATH%
 # chocolatey brokes jom, here's workaround
 # see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
@@ -109,8 +115,9 @@ build_script:
       if ($builder -eq "cmake") {
          mkdir install
          & .\build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
-      } else {
-         & .\buildwin.cmd %builder% build all both %vs_arch% samples tests devenv
+      }
+      if (($builder -ne "cmake") -and ($linkmode -eq "shared")) {    
+         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests devenv
       }
 
 test_script:
@@ -119,6 +126,6 @@ test_script:
          set PATH=%CD%\install\bin;%PATH%
       } else {
          set PATH=%CD%\bin%suffix%;%PATH%
-         & .\build\script\runtests2
+         & .\build\script\runtests2 %suffix%
       }
  
