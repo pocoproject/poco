@@ -128,7 +128,7 @@ build_script:
          mkdir install
          & .\build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
       } else {
-         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests devenv
+         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests
       }
 
 
@@ -144,6 +144,7 @@ test_script:
       }
       if (($env:builder -ne "cmake") -and ($env:linkmode -eq "shared")) {    
          $env:PATH = $env:CD + "\bin" + $env:suffix + ";" + $env:PATH
+         $env:EXCLUDE_TESTS = "Foundation"
          & .\build\script\runtests2 %suffix%
       }
  
@@ -159,9 +160,15 @@ on_finish:
   
   
 notifications:
+  - provider: Email
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: false
+    
+      
   - provider: Slack
     auth_token:
-      secure: xoxp-14294014434-14294039984-15168133893-7f226e40a0
+      secure: xoOlP1UHshqjvh/INwMcNhZ5UHsTVKLGY5maTSjaxDc0fvRwoWIdYvY/CofQEuy2wOIBQK4eLD+tA0xG78ZgqQ==
     channel: appveyor
     template: "{message}, {commitId}, ..."
     
