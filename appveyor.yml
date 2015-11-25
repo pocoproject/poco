@@ -7,6 +7,7 @@ cache:
 
 services:
   - mongodb
+  - mysql
   
 branches:
   only:
@@ -14,10 +15,8 @@ branches:
 
 # to add several configurations to build matrix:
 configuration:
-#  - Debug
+#  - debug
   - release
-#  - static_md
-#  - static_mt
 
 environment:
   matrix:
@@ -29,6 +28,7 @@ environment:
       arch_target: x86
       platform: Win32
       linkmode: shared
+      bundling: 
       suffix:
 
     - builder: 120
@@ -39,6 +39,7 @@ environment:
       arch_target: x86_64
       platform: x64
       linkmode: shared
+      bundling: 
       suffix: 64
       
     - builder: 140
@@ -49,6 +50,7 @@ environment:
       arch_target: x86
       platform: Win32
       linkmode: shared
+      bundling: 
       suffix:
 
     - builder: 140
@@ -58,8 +60,9 @@ environment:
       arch_choco:
       arch_target: x86_64
       platform: x64
-      suffix: 64
       linkmode: shared
+      bundling: 
+      suffix: 64
       
     - builder: cmake
       arch_ssl: Win64
@@ -79,11 +82,16 @@ environment:
 install:
   - cinst cmake
 # - cinst mysql
-  - cinst jom
   - systeminfo
   - c:\cygwin\bin\uname -a
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
+  - ps: |
+        if (Test-Path "%ChocolateyInstall%/bin/jom.exe") {
+            echo "using jom from cache"
+        } else {
+            choco install jom
+        }
   - ps: |
         if (Test-Path "c:\OpenSSL-$env:arch_ssl") {
             echo "using openssl from cache"
@@ -94,12 +102,7 @@ install:
             Start-Process -Wait -FilePath c:\openssl-setup.exe -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes"
         }
   - c:\cygwin\bin\find /cygdrive/c/OpenSSL-%arch_ssl% "-type" f
-  - ps: |
-        if (Test-Path "%ChocolateyInstall%/bin/jom.exe") {
-            echo "using jom from cache"
-        } else {
-            choco install jom
-        }
+
 
 before_build:
   - set
@@ -108,17 +111,27 @@ before_build:
 # chocolatey brokes jom, here's workaround
 # see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
   - set PATH=%ChocolateyInstall%\lib\jom\content;%PATH%
+  - set INCLUDE=C:\Program Files\MySql\MySQL Server 5.6\include;%INCLUDE%
+  - set LIB=C:\Program Files\MySql\MySQL Server 5.6\lib;%LIB%
   - path
+
+after_build:
 
 build_script:
   - ps: |
-      if ($builder -eq "cmake")
-      {
+      if ($builder -eq "cmake") {
          mkdir install
          & .\build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
       } else {
-          & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests devenv
+         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests devenv
       }
+
+
+before_test:
+  - echo runtests2
+  - ps: Write-Host "runtests2"
+
+after_test:
 
 test_script:
   - ps: |
@@ -128,4 +141,23 @@ test_script:
          $env:PATH = $env:CD\bin$env:suffix;$env:PATH
          & .\build\script\runtests2 %suffix%
       }
+ 
+ 
+on_success:
+  - echo success
+
+on_failure:
+  - echo failure
+
+on_finish:
+  - echo finish
+  
+  
+notifications:
+  - provider: Slack
+    auth_token:
+      secure: kBl9BlxvRMr9liHmnBs14A==
+    channel: development
+    template: "{message}, {commitId}, ..."
+    
  
