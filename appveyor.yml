@@ -38,14 +38,14 @@ environment:
 #      linkmode: shared
 #      suffix:
 
-    - builder: 120
-      arch_ssl: Win64
-      arch_nuget: x64
-      arch_vc: x86_amd64
-      arch_choco:
-      arch_target: x86_64
-      linkmode: shared
-      suffix: 64
+#    - builder: 120
+#      arch_ssl: Win64
+#      arch_nuget: x64
+#      arch_vc: x86_amd64
+#      arch_choco:
+#      arch_target: x86_64
+#      linkmode: shared
+#      suffix: 64
       
 #    - builder: 140
 #      arch_ssl: Win32
@@ -60,7 +60,7 @@ environment:
     - builder: 140
       arch_ssl: Win64
       arch_nuget: x64
-      arch_vc: amd64
+      arch_vc: x86_amd64
       arch_choco:
       arch_target: x86_64
       platform: x64
@@ -89,7 +89,7 @@ install:
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
   - ps: |
-        if (Test-Path "%ChocolateyInstall%/bin/jom.exe") {
+        if (Test-Path "$env:ChocolateyInstall/bin/jom.exe") {
             echo "using jom from cache"
         } else {
             choco install jom
@@ -110,10 +110,10 @@ before_build:
   - set
   - ps: |
       if ($env:builder -eq "120") {
-        & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %arch_vc%
+        & "%VS120COMNTOOLS%\..\..\VC\vcvarsall.bat" %arch_vc%
       }
       if ($env:builder -eq "140") {
-        & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %arch_vc%
+        & "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %arch_vc%
       }
   
   - set PATH=%ChocolateyInstall%\bin;%PATH%
