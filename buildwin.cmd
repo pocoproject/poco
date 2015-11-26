@@ -300,16 +300,7 @@ echo ####
 echo ########################################################################
 echo.
 echo.
-echo VS_VERSION   =%VS_VERSION%
-echo ACTION       =%ACTION%
-echo LINK_MODE    =%LINK_MODE%
-echo CONFIGURATION=%CONFIGURATION%
-echo PLATFORM     =%PLATFORM%
-echo TESTS        =%TESTS%
-echo SAMPLES      =%SAMPLES%
-echo BUILD_TOOL   =%BUILD_TOOL%
-echo VERBOSITY    =%VERBOSITY%
-echo LOGGER       =%LOGGER%
+echo buildwin %VS_VERSION% %ACTION% %LINK_MODE% %CONFIGURATION% %PLATFORM% %SAMPLES% %TESTS% %BUILD_TOOL% %VERBOSITY%
 echo.
 echo The following configurations will be built:
 
@@ -348,8 +339,6 @@ for /f %%G in ('findstr /R "." components') do (
       )
     )
   )
-  echo ERRORLEVEL=%ERRORLEVEL%
-
   cd "%POCO_BASE%"
 )
 

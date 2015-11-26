@@ -6,9 +6,10 @@ cache:
     - c:\ProgramData\chocolatey
     - c:\mysql-5.7.9-win32
 
-services:
-  - mongodb
-  - mysql
+# no need to start services until tests are run.
+#services:
+#  - mongodb
+#  - mysql
   
 branches:
   only:
@@ -133,9 +134,9 @@ install:
                 Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile mysql-5.7.9-win32.zip
                 echo "installing mysql-5.7.9-win32"
                 7z e -y mysql-5.7.9-win32.zip -oc:\
+                c:\cygwin\bin\find /cygdrive/c/mysql-5.7.9-win32 "-type" f
             }
         }
-#  - c:\cygwin\bin\find /cygdrive/c/OpenSSL-%arch_ssl% "-type" f
 
 
 
