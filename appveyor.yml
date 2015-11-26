@@ -4,6 +4,7 @@ cache:
     - c:\OpenSSL-Win32
     - c:\OpenSSL-Win64
     - c:\ProgramData\chocolatey
+    - c:\mysql-5.7.9-win32
 
 services:
   - mongodb
@@ -28,15 +29,15 @@ environment:
   bundling: bundled
     
   matrix:
-#    - builder: 120
-#      arch_ssl: Win32
-#      arch_nuget: Win32
-#      arch_vc: x86
-#      arch_choco: --x86
-#      arch_target: x86
-#      platform: Win32
-#      linkmode: shared
-#      suffix:
+    - builder: 120
+      arch_ssl: Win32
+      arch_nuget: Win32
+      arch_vc: x86
+      arch_choco: --x86
+      arch_target: x86
+      platform: Win32
+      linkmode: shared
+      suffix:
 
 #    - builder: 120
 #      arch_ssl: Win64
@@ -104,12 +105,15 @@ install:
             Start-Process -Wait -FilePath c:\openssl-setup.exe -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes"
         }
   - ps: |
-        if (Test-Path "c:\MySQL-$env:arch_ssl") {
-            echo "using MySQL win32 from cache"
-        } else {
-            echo "downloading MySQL win32"
-            Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile c:\mysql-setup.zip
-            echo "installing openssl"
+        if ($env:builder -eq "120") {
+            if (Test-Path "c:\mysql-5.7.9-win32") {
+                echo "using mysql-5.7.9-win32 from cache"
+            } else {
+                 echo "downloading mysql-5.7.9-win32"
+                 Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile c:\mysql-5.7.9-win32.zip
+                 echo "installing mysql-5.7.9-win32"
+                 & "c:\cygwin\bin\unzip -q c:\mysql-5.7.9-win32.zip
+            }
         }
   - c:\cygwin\bin\find /cygdrive/c/OpenSSL-%arch_ssl% "-type" f
 
@@ -132,8 +136,15 @@ before_build:
   - set PATH=%ChocolateyInstall%\lib\jom\content;%PATH%
   - path
 # MySQL
-  - set INCLUDE=C:\Program Files\MySql\MySQL Server 5.6\include;%INCLUDE%
-  - set     LIB=C:\Program Files\MySql\MySQL Server 5.6\lib;%LIB%
+  - ps: |
+      if ($env:builder -eq "120") {
+          $env:INCLUDE = "C:\mysql-5.7.9-win32\include;" + $env:INCLUDE
+          $env:LIB     = "C:\mysql-5.7.9-win32\lib;" + $env:LIB
+      }
+      if ($env:builder -eq "140") {
+          $env:INCLUDE = "C:\Program Files\MySql\MySQL Server 5.6\include;" + $env:INCLUDE
+          $env:LIB     = "C:\Program Files\MySql\MySQL Server 5.6\lib;" + $env:LIB
+      }
 # OpenSSL  
   - set INCLUDE=C:\OpenSSL-%arch_ssl%\include;%INCLUDE%
   - set     LIB=C:\OpenSSL-%arch_ssl%\lib;C:\OpenSSL-%arch_ssl%\lib\VC;C:\OpenSSL-%arch_ssl%\lib\VC\static;%LIB%  
