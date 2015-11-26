@@ -35,7 +35,6 @@ environment:
       arch_ssl: Win32
       arch_nuget: Win32
       arch_vc: x86
-      arch_choco: --x86
       arch_target: x86
       platform: Win32
       linkmode: shared
@@ -45,7 +44,6 @@ environment:
       arch_ssl: Win32
       arch_nuget: Win32
       arch_vc: x86
-      arch_choco: --x86
       arch_target: x86
       platform: Win32
       linkmode: static_md
@@ -55,7 +53,6 @@ environment:
       arch_ssl: Win32
       arch_nuget: Win32
       arch_vc: x86
-      arch_choco: --x86
       arch_target: x86
       platform: Win32
       linkmode: static_mt
@@ -65,7 +62,6 @@ environment:
       arch_ssl: Win64
       arch_nuget: x64
       arch_vc: x86_amd64
-      arch_choco:
       arch_target: x86_64
       platform: x64
       linkmode: shared
@@ -75,7 +71,6 @@ environment:
       arch_ssl: Win64
       arch_nuget: x64
       arch_vc: x86_amd64
-      arch_choco:
       arch_target: x86_64
       platform: x64
       linkmode: static_md
@@ -85,7 +80,6 @@ environment:
       arch_ssl: Win64
       arch_nuget: x64
       arch_vc: x86_amd64
-      arch_choco:
       arch_target: x86_64
       platform: x64
       linkmode: static_mt
@@ -95,7 +89,6 @@ environment:
       arch_ssl: Win32
       arch_nuget: Win32
       arch_vc: x86
-      arch_choco: --x86
       arch_target: x86
       platform: Win32
       linkmode: shared
@@ -105,7 +98,6 @@ environment:
       arch_ssl: Win32
       arch_nuget: Win32
       arch_vc: x86
-      arch_choco: --x86
       arch_target: x86
       platform: Win32
       linkmode: static_md
@@ -115,7 +107,6 @@ environment:
       arch_ssl: Win32
       arch_nuget: Win32
       arch_vc: x86
-      arch_choco: --x86
       arch_target: x86
       platform: Win32
       linkmode: static_mt
@@ -125,7 +116,6 @@ environment:
       arch_ssl: Win64
       arch_nuget: x64
       arch_vc: x86_amd64
-      arch_choco:
       arch_target: x86_64
       platform: x64
       linkmode: shared
@@ -135,7 +125,6 @@ environment:
       arch_ssl: Win64
       arch_nuget: x64
       arch_vc: x86_amd64
-      arch_choco:
       arch_target: x86_64
       platform: x64
       linkmode: static_md
@@ -145,7 +134,6 @@ environment:
       arch_ssl: Win64
       arch_nuget: x64
       arch_vc: x86_amd64
-      arch_choco:
       arch_target: x86_64
       platform: x64
       linkmode: static_mt
@@ -155,14 +143,12 @@ environment:
 #      arch_ssl: Win64
 #      arch_nuget: x64
 #      arch_vc: amd64
-#      arch_choco:
 #      arch_target: x86_64
       
 #    - builder: cmake
 #      arch_ssl: Win32
 #      arch_nuget: Win32
 #      arch_vc: amd64_x86  # cross-compile from amd64 to x86
-#      arch_choco: --x86
 #      arch_target: x86
 
 
@@ -220,7 +206,7 @@ before_build:
   - path
 # MySQL
   - ps: |
-      if ($env:platform -eq "Win32")) {
+      if ($env:platform -eq "Win32") {
           $env:INCLUDE = "C:\mysql-5.7.9-win32\include;" + $env:INCLUDE
           $env:LIB     = "C:\mysql-5.7.9-win32\lib;" + $env:LIB
       }
