@@ -68,6 +68,26 @@ environment:
       linkmode: shared
       suffix: 64
       
+    - builder: 140
+      arch_ssl: Win64
+      arch_nuget: x64
+      arch_vc: x86_amd64
+      arch_choco:
+      arch_target: x86_64
+      platform: x64
+      linkmode: static_md
+      suffix: 64
+      
+    - builder: 140
+      arch_ssl: Win64
+      arch_nuget: x64
+      arch_vc: x86_amd64
+      arch_choco:
+      arch_target: x86_64
+      platform: x64
+      linkmode: static_mt
+      suffix: 64
+      
 #    - builder: cmake
 #      arch_ssl: Win64
 #      arch_nuget: x64
@@ -112,7 +132,7 @@ install:
                 echo "downloading mysql-5.7.9-win32"
                 Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile c:\mysql-5.7.9-win32.zip
                 echo "installing mysql-5.7.9-win32"
-                c:\cygwin\bin\unzip -q /cygdrive/c/mysql-5.7.9-win32.zip
+                7z -e -y mysql-5.7.9-win32.zip -o c:\
             }
         }
 #  - c:\cygwin\bin\find /cygdrive/c/OpenSSL-%arch_ssl% "-type" f
@@ -163,7 +183,7 @@ build_script:
          mkdir install
          & .\build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
       } else {
-         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests devenv 
+         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests msbuild 
       }
 
 
@@ -206,6 +226,5 @@ notifications:
     auth_token:
       secure: xoOlP1UHshqjvh/INwMcNhZ5UHsTVKLGY5maTSjaxDc0fvRwoWIdYvY/CofQEuy2wOIBQK4eLD+tA0xG78ZgqQ==
     channel: appveyor
-#    template: "{message}, {commitId}, ..."
     
  

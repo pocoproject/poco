@@ -103,17 +103,22 @@ if not defined VSINSTALLDIR (
   echo or run "%%VSnnCOMNTOOLS%%\vsvars32.bat" first.
   goto :EOF
 )
+rem VERBOSITY      quiet|minimal|normal|detailed
+set VERBOSITY=%8
+if "%VERBOSITY%"=="" (set VERBOSITY=minimal)
+if not "%VERBOSITY%"=="quiet" (
+if not "%VERBOSITY%"=="minimal" (
+if not "%VERBOSITY%"=="normal" (
+if not "%VERBOSITY%"=="detailed" (
+if not "%VERBOSITY%"=="diagnostic" goto usage))))
+rem LOGGER         <logger path> see msbuild /?
+set LOGGER=%9
 
 set VCPROJ_EXT=vcproj
 if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs120 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs140 (set VCPROJ_EXT=vcxproj)
-
-rem VERBOSITY      quiet|minimal|normal|detailed
-set VERBOSITY=%8
-rem LOGGER         <logger path> see msbuild /?
-set LOGGER=%9
 
 if "%7"=="" goto use_devenv
 set BUILD_TOOL=%7
@@ -132,19 +137,12 @@ if "%BUILD_TOOL%"=="msbuild" (
   set EXTRASW=/m
   set USEENV=/p:UseEnv=true
 
-  if "%VERBOSITY%"=="" (set VERBOSITY=minimal)
-  if not "%VERBOSITY%"=="quiet" (
-  if not "%VERBOSITY%"=="minimal" (
-  if not "%VERBOSITY%"=="normal" (
-  if not "%VERBOSITY%"=="detailed" (
-  if not "%VERBOSITY%"=="diagnostic" goto usage))))
 
   set BUILD_TOOL_ARGS=/clp:NoSummary:NoItemAndPropertyList 
   set BUILD_TOOL_ARGS=%BUILD_TOOL_ARGS%  /verbosity:%VERBOSITY% /nologo 
 
   if not %LOGGER%X==X (
      set BUILD_TOOL_ARGS=%BUILD_TOOL_ARGS% /logger:%LOGGER%
-     set BUILD_TOOL_ARGS=%BUILD_TOOL_ARGS% /verbosity:%VERBOSITY% /nologo 
   )
 )
 if not "%BUILD_TOOL%"=="msbuild" (
@@ -207,7 +205,6 @@ if "%SAMPLES%"=="" (set SAMPLES=samples)
 rem TESTS [tests|notests]
 set TESTS=%6
 if "%TESTS%"=="" (set TESTS=notests)
-
 
 set DEBUG_SHARED=0
 set RELEASE_SHARED=0
@@ -303,6 +300,17 @@ echo ####
 echo ########################################################################
 echo.
 echo.
+echo VS_VERSION   =%VS_VERSION%
+echo ACTION       =%ACTION%
+echo LINK_MODE    =%LINK_MODE%
+echo CONFIGURATION=%CONFIGURATION%
+echo PLATFORM     =%PLATFORM%
+echo TESTS        =%TESTS%
+echo SAMPLES      =%SAMPLES%
+echo BUILD_TOOL   =%BUILD_TOOL%
+echo VERBOSITY    =%VERBOSITY%
+echo LOGGER       =%LOGGER%
+echo.
 echo The following configurations will be built:
 
 if %DEBUG_SHARED%==1      (echo debug_shared)
@@ -340,6 +348,8 @@ for /f %%G in ('findstr /R "." components') do (
       )
     )
   )
+  echo ERRORLEVEL=%ERRORLEVEL%
+
   cd "%POCO_BASE%"
 )
 
@@ -374,7 +384,7 @@ if %RELEASE_SHARED%==1 (
   !BUILD_TOOL! !BUILD_TOOL_ARGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !PROJECT_FILE! 
   if ERRORLEVEL 1 exit /b 1
   echo. && echo. && echo.
-  if %TESTS%==tests (
+  if !TESTS!==tests (
     if exist !TEST_PROJECT_FILE! (
       !BUILD_TOOL! !BUILD_TOOL_ARGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !TEST_PROJECT_FILE!
       if ERRORLEVEL 1 exit /b 1
