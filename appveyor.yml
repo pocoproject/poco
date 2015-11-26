@@ -109,10 +109,10 @@ install:
             if (Test-Path "c:\mysql-5.7.9-win32") {
                 echo "using mysql-5.7.9-win32 from cache"
             } else {
-                 echo "downloading mysql-5.7.9-win32"
-                 Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile c:\mysql-5.7.9-win32.zip
-                 echo "installing mysql-5.7.9-win32"
-                 & "c:\cygwin\bin\unzip -q c:\mysql-5.7.9-win32.zip"
+                echo "downloading mysql-5.7.9-win32"
+                Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile c:\mysql-5.7.9-win32.zip
+                echo "installing mysql-5.7.9-win32"
+                c:\cygwin\bin\unzip -q /cygdrive/c/mysql-5.7.9-win32.zip
             }
         }
 #  - c:\cygwin\bin\find /cygdrive/c/OpenSSL-%arch_ssl% "-type" f
