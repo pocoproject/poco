@@ -11,8 +11,6 @@ cache:
 #  - mongodb
 #  - mysql
   
-branches:
-
 os: Windows Server 2012
 
 platform:
@@ -280,4 +278,6 @@ notifications:
     auth_token:
       secure: xoOlP1UHshqjvh/INwMcNhZ5UHsTVKLGY5maTSjaxDc0fvRwoWIdYvY/CofQEuy2wOIBQK4eLD+tA0xG78ZgqQ==
     channel: poco
+    on_build_success: false
+    on_build_status_changed: false
  
