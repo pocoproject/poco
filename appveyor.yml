@@ -41,7 +41,6 @@ environment:
 
     - builder: 120
       ssl: Win32
-      arch_nuget: Win32
       vc: x86
       target: x86
       system: Win32

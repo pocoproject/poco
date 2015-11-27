@@ -137,9 +137,8 @@ if "%BUILD_TOOL%"=="msbuild" (
   set EXTRASW=/m
   set USEENV=/p:UseEnv=true
 
-
-  set BUILD_TOOL_ARGS=/clp:NoSummary:NoItemAndPropertyList 
-  set BUILD_TOOL_ARGS=%BUILD_TOOL_ARGS%  /verbosity:%VERBOSITY% /nologo 
+  set BUILD_TOOL_ARGS=/clp:NoSummary
+  set BUILD_TOOL_ARGS=%BUILD_TOOL_ARGS% /nologo /v:%VERBOSITY%
 
   if not %LOGGER%X==X (
      set BUILD_TOOL_ARGS=%BUILD_TOOL_ARGS% /logger:%LOGGER%
@@ -373,7 +372,7 @@ if %RELEASE_SHARED%==1 (
   !BUILD_TOOL! !BUILD_TOOL_ARGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !PROJECT_FILE! 
   if ERRORLEVEL 1 exit /b 1
   echo. && echo. && echo.
-  if !TESTS!==tests (
+  if %TESTS%==tests (
     if exist !TEST_PROJECT_FILE! (
       !BUILD_TOOL! !BUILD_TOOL_ARGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !TEST_PROJECT_FILE!
       if ERRORLEVEL 1 exit /b 1
