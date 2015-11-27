@@ -32,7 +32,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      link: shared
+      linkmode: shared
       suffix:
 
     - builder: 120
@@ -40,7 +40,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      link: static_md
+      linkmode: static_md
       suffix:
 
     - builder: 120
@@ -48,7 +48,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      link: static_mt
+      linkmode: static_mt
       suffix:
 
     - builder: 120
@@ -56,7 +56,7 @@ environment:
       vc: x86_amd64
       target: x86_64
       system: x64
-      link: shared
+      linkmode: shared
       suffix: 64
       sln: x64
       
@@ -65,7 +65,7 @@ environment:
       vc: x86_amd64
       target: x86_64
       system: x64
-      link: static_md
+      linkmode: static_md
       suffix: 64
       sln: x64
       
@@ -74,7 +74,7 @@ environment:
       vc: x86_amd64
       target: x86_64
       system: x64
-      link: static_mt
+      linkmode: static_mt
       suffix: 64
       
     - builder: 140
@@ -82,7 +82,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      link: shared
+      linkmode: shared
       suffix:
 
     - builder: 140
@@ -90,7 +90,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      link: static_md
+      linkmode: static_md
       suffix:
 
     - builder: 140
@@ -98,7 +98,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      link: static_mt
+      linkmode: static_mt
       suffix:
 
     - builder: 140
@@ -106,16 +106,7 @@ environment:
       vc: x86_amd64
       target: x86_64
       system: x64
-      link: shared
-      suffix: 64
-      sln: x64
-      
-    - builder: 140
-      ssl: Win64
-      vc: x86_amd64
-      target: x86_64
-      system: x64
-      link: static_md
+      linkmode: shared
       suffix: 64
       sln: x64
       
@@ -124,7 +115,16 @@ environment:
       vc: x86_amd64
       target: x86_64
       system: x64
-      link: static_mt
+      linkmode: static_md
+      suffix: 64
+      sln: x64
+      
+    - builder: 140
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
+      linkmode: static_mt
       suffix: 64
       sln: x64
       
@@ -145,13 +145,16 @@ install:
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
   - ps: |
-        if (Test-Path "$env:ChocolateyInstall/bin/jom.exe")
+        if ($env:system -eq "cmake")
         {
+          if (Test-Path "$env:ChocolateyInstall/bin/jom.exe")
+          {
             echo "using jom from cache"
-        }
-        else
-        {
+          }
+          else
+          {
             choco install jom
+          }
         }
   - ps: |
         if (Test-Path "c:\OpenSSL-$env:ssl")
@@ -235,7 +238,7 @@ build_script:
       }
       else
       {
-         & .\buildwin.cmd %builder% build %link% %Configuration% %system% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %system% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
       }
 
 
@@ -248,7 +251,7 @@ test_script:
       if ($env:builder -eq "cmake")
       {
       }
-      if (($env:builder -ne "cmake") -and ($env:link -eq "shared"))
+      if (($env:builder -ne "cmake") -and ($env:linkmode -eq "shared"))
       {    
          $env:PATH = $env:CD + "\bin" + $env:suffix + ";" + $env:PATH
          $env:EXCLUDE_TESTS = "Foundation"
