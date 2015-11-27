@@ -17,7 +17,7 @@ branches:
 
 os: Windows Server 2012
 
-p:
+platform:
 #  - x86
 #  - x64
 
