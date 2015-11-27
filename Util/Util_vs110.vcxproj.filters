@@ -153,6 +153,9 @@
     <ClInclude Include="include\Poco\Util\TimerTaskAdapter.h">
       <Filter>Timer\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Util\DBConfiguration.h">
+      <Filter>Configuration\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp">
@@ -244,6 +247,9 @@
     </ClCompile>
     <ClCompile Include="src\TimerTask.cpp">
       <Filter>Timer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DBConfiguration.cpp">
+      <Filter>Configuration\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

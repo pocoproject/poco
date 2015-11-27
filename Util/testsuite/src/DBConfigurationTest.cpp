@@ -1,9 +1,9 @@
 //
-// ConfigurationTestSuite.cpp
+// JSONConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/ConfigurationTestSuite.cpp#1 $
+// $Id$
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,36 +30,64 @@
 //
 
 
-#include "ConfigurationTestSuite.h"
-#include "AbstractConfigurationTest.h"
-#include "ConfigurationViewTest.h"
-#include "ConfigurationMapperTest.h"
-#include "MapConfigurationTest.h"
-#include "LayeredConfigurationTest.h"
-#include "SystemConfigurationTest.h"
-#include "IniFileConfigurationTest.h"
-#include "PropertyFileConfigurationTest.h"
-#include "XMLConfigurationTest.h"
-#include "FilesystemConfigurationTest.h"
-#include "LoggingConfiguratorTest.h"
-#include "JSONConfigurationTest.h"
 #include "DBConfigurationTest.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
+#include "Poco/Util/DBConfiguration.h"
+#include "Poco/Data/SQLite/SQLiteException.h"
 
-CppUnit::Test* ConfigurationTestSuite::suite()
+using Poco::Util::DBConfiguration;
+using Poco::Util::AbstractConfiguration;
+using Poco::AutoPtr;
+using Poco::NotImplementedException;
+using Poco::NotFoundException;
+
+
+
+DBConfigurationTest::DBConfigurationTest(const std::string& name) : AbstractConfigurationTest(name)
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ConfigurationTestSuite");
+}
 
-	pSuite->addTest(ConfigurationViewTest::suite());
-	pSuite->addTest(ConfigurationMapperTest::suite());
-	pSuite->addTest(MapConfigurationTest::suite());
-	pSuite->addTest(LayeredConfigurationTest::suite());
-	pSuite->addTest(SystemConfigurationTest::suite());
-	pSuite->addTest(IniFileConfigurationTest::suite());
-	pSuite->addTest(PropertyFileConfigurationTest::suite());
-	pSuite->addTest(XMLConfigurationTest::suite());
-	pSuite->addTest(FilesystemConfigurationTest::suite());
-	pSuite->addTest(LoggingConfiguratorTest::suite());
-	pSuite->addTest(JSONConfigurationTest::suite());
-	pSuite->addTest(DBConfigurationTest::suite());
+
+DBConfigurationTest::~DBConfigurationTest()
+{
+}
+
+
+void DBConfigurationTest::testLoad()
+{
+	DBConfiguration config("config.db");
+
+	config.setInt("person.age",23);
+	config.setString("person.name","byteman");
+	
+	assert(config.getInt("person.age") == 23);
+
+	assert(config.getString("person.name") == "byteman");
+}
+
+
+AbstractConfiguration* DBConfigurationTest::allocConfiguration() const
+{
+	return new DBConfiguration;
+}
+
+
+void DBConfigurationTest::setUp()
+{
+}
+
+
+void DBConfigurationTest::tearDown()
+{
+}
+
+
+CppUnit::Test* DBConfigurationTest::suite()
+{
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DBConfigurationTest");
+
+	CppUnit_addTest(pSuite, DBConfigurationTest, testLoad);
+
 	return pSuite;
 }

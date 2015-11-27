@@ -1,9 +1,11 @@
 //
-// ConfigurationTestSuite.cpp
+// JSONConfigurationTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/ConfigurationTestSuite.cpp#1 $
+// $Id$
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Definition of the JSONConfigurationTest class.
+//
+// Copyright (c) 2004-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,36 +32,30 @@
 //
 
 
-#include "ConfigurationTestSuite.h"
+#ifndef DBConfigurationTest_INCLUDED
+#define DBConfigurationTest_INCLUDED
+
+
 #include "AbstractConfigurationTest.h"
-#include "ConfigurationViewTest.h"
-#include "ConfigurationMapperTest.h"
-#include "MapConfigurationTest.h"
-#include "LayeredConfigurationTest.h"
-#include "SystemConfigurationTest.h"
-#include "IniFileConfigurationTest.h"
-#include "PropertyFileConfigurationTest.h"
-#include "XMLConfigurationTest.h"
-#include "FilesystemConfigurationTest.h"
-#include "LoggingConfiguratorTest.h"
-#include "JSONConfigurationTest.h"
-#include "DBConfigurationTest.h"
+#include "Poco/Util/Util.h"
 
-CppUnit::Test* ConfigurationTestSuite::suite()
+
+class DBConfigurationTest: public AbstractConfigurationTest
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ConfigurationTestSuite");
+public:
+	DBConfigurationTest(const std::string& name);
+	virtual ~DBConfigurationTest();
 
-	pSuite->addTest(ConfigurationViewTest::suite());
-	pSuite->addTest(ConfigurationMapperTest::suite());
-	pSuite->addTest(MapConfigurationTest::suite());
-	pSuite->addTest(LayeredConfigurationTest::suite());
-	pSuite->addTest(SystemConfigurationTest::suite());
-	pSuite->addTest(IniFileConfigurationTest::suite());
-	pSuite->addTest(PropertyFileConfigurationTest::suite());
-	pSuite->addTest(XMLConfigurationTest::suite());
-	pSuite->addTest(FilesystemConfigurationTest::suite());
-	pSuite->addTest(LoggingConfiguratorTest::suite());
-	pSuite->addTest(JSONConfigurationTest::suite());
-	pSuite->addTest(DBConfigurationTest::suite());
-	return pSuite;
-}
+	void testLoad();
+
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
+private:
+	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
+};
+
+
+#endif // JSONConfigurationTest_INCLUDED
