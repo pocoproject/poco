@@ -17,7 +17,7 @@ branches:
 
 os: Windows Server 2012
 
-platform:
+p:
 #  - x86
 #  - x64
 
@@ -32,128 +32,121 @@ environment:
     
   matrix:
     - builder: 120
-      arch_ssl: Win32
-      arch_nuget: Win32
-      arch_vc: x86
-      arch_target: x86
-      platform: Win32
+      ssl: Win32
+      vc: x86
+      target: x86
+      system: Win32
       linkmode: shared
       suffix:
 
     - builder: 120
-      arch_ssl: Win32
+      ssl: Win32
       arch_nuget: Win32
-      arch_vc: x86
-      arch_target: x86
-      platform: Win32
+      vc: x86
+      target: x86
+      system: Win32
       linkmode: static_md
       suffix:
 
     - builder: 120
-      arch_ssl: Win32
-      arch_nuget: Win32
-      arch_vc: x86
-      arch_target: x86
-      platform: Win32
+      ssl: Win32
+      vc: x86
+      target: x86
+      system: Win32
       linkmode: static_mt
       suffix:
 
     - builder: 120
-      arch_ssl: Win64
-      arch_nuget: x64
-      arch_vc: x86_amd64
-      arch_target: x86_64
-      platform: x64
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
       linkmode: shared
       suffix: 64
+      sln: x64
       
     - builder: 120
-      arch_ssl: Win64
-      arch_nuget: x64
-      arch_vc: x86_amd64
-      arch_target: x86_64
-      platform: x64
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
       linkmode: static_md
       suffix: 64
+      sln: x64
       
     - builder: 120
-      arch_ssl: Win64
-      arch_nuget: x64
-      arch_vc: x86_amd64
-      arch_target: x86_64
-      platform: x64
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
       linkmode: static_mt
       suffix: 64
       
     - builder: 140
-      arch_ssl: Win32
-      arch_nuget: Win32
-      arch_vc: x86
-      arch_target: x86
-      platform: Win32
+      ssl: Win32
+      vc: x86
+      target: x86
+      system: Win32
       linkmode: shared
       suffix:
 
     - builder: 140
-      arch_ssl: Win32
-      arch_nuget: Win32
-      arch_vc: x86
-      arch_target: x86
-      platform: Win32
+      ssl: Win32
+      vc: x86
+      target: x86
+      system: Win32
       linkmode: static_md
       suffix:
 
     - builder: 140
-      arch_ssl: Win32
-      arch_nuget: Win32
-      arch_vc: x86
-      arch_target: x86
-      platform: Win32
+      ssl: Win32
+      vc: x86
+      target: x86
+      system: Win32
       linkmode: static_mt
       suffix:
 
     - builder: 140
-      arch_ssl: Win64
-      arch_nuget: x64
-      arch_vc: x86_amd64
-      arch_target: x86_64
-      platform: x64
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
       linkmode: shared
       suffix: 64
+      sln: x64
       
     - builder: 140
-      arch_ssl: Win64
-      arch_nuget: x64
-      arch_vc: x86_amd64
-      arch_target: x86_64
-      platform: x64
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
       linkmode: static_md
       suffix: 64
+      sln: x64
       
     - builder: 140
-      arch_ssl: Win64
-      arch_nuget: x64
-      arch_vc: x86_amd64
-      arch_target: x86_64
-      platform: x64
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
       linkmode: static_mt
       suffix: 64
+      sln: x64
       
 #    - builder: cmake
-#      arch_ssl: Win64
-#      arch_nuget: x64
-#      arch_vc: amd64
-#      arch_target: x86_64
+#      ssl: Win64
+#      nuget: x64
+#      vc: amd64
+#      target: x86_64
       
 #    - builder: cmake
-#      arch_ssl: Win32
-#      arch_nuget: Win32
-#      arch_vc: amd64_x86  # cross-compile from amd64 to x86
-#      arch_target: x86
+#      ssl: Win32
+#      nuget: Win32
+#      vc: amd64_x86
+#      target: x86
 
 
 install:
-#  - cinst cmake
   - systeminfo
   - c:\cygwin\bin\uname -a
   - c:\cygwin\bin\cat /proc/cpuinfo
@@ -165,16 +158,16 @@ install:
             choco install jom
         }
   - ps: |
-        if (Test-Path "c:\OpenSSL-$env:arch_ssl") {
+        if (Test-Path "c:\OpenSSL-$env:ssl") {
             echo "using openssl from cache"
         } else {
             echo "downloading openssl"
-            Invoke-WebRequest "https://slproweb.com/download/$($env:arch_ssl)OpenSSL-1_0_2d.exe" -OutFile c:\openssl-setup.exe
+            Invoke-WebRequest "https://slproweb.com/download/$($env:ssl)OpenSSL-1_0_2d.exe" -OutFile c:\openssl-setup.exe
             echo "installing openssl"
             Start-Process -Wait -FilePath c:\openssl-setup.exe -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes"
         }
   - ps: |
-        if ($env:platform -eq "Win32") {
+        if ($env:system -eq "Win32") {
             if (Test-Path "c:\mysql-5.7.9-win32") {
                 echo "using mysql-5.7.9-win32 from cache"
             } else {
@@ -193,30 +186,29 @@ before_build:
   - set
   - ps: |
       if ($env:builder -eq "120") {
-        & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %arch_vc%
+        & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %vc%
       }
       if ($env:builder -eq "140") {
-        & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %arch_vc%
+        & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %vc%
       }
   
   - set PATH=%ChocolateyInstall%\bin;%PATH%
 # chocolatey brokes jom, here's workaround
 # see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
   - set PATH=%ChocolateyInstall%\lib\jom\content;%PATH%
-  - path
 # MySQL
   - ps: |
-      if ($env:platform -eq "Win32") {
+      if ($env:system -eq "Win32") {
           $env:INCLUDE = "C:\mysql-5.7.9-win32\include;" + $env:INCLUDE
           $env:LIB     = "C:\mysql-5.7.9-win32\lib;" + $env:LIB
       }
-      if ($env:platform -eq "x64") {
+      if ($env:system -eq "x64") {
           $env:INCLUDE = "C:\Program Files\MySql\MySQL Server 5.6\include;" + $env:INCLUDE
           $env:LIB     = "C:\Program Files\MySql\MySQL Server 5.6\lib;" + $env:LIB
       }
 # OpenSSL  
-  - set INCLUDE=C:\OpenSSL-%arch_ssl%\include;%INCLUDE%
-  - set     LIB=C:\OpenSSL-%arch_ssl%\lib;C:\OpenSSL-%arch_ssl%\lib\VC;C:\OpenSSL-%arch_ssl%\lib\VC\static;%LIB%  
+  - set INCLUDE=C:\OpenSSL-%ssl%\include;%INCLUDE%
+  - set     LIB=C:\OpenSSL-%ssl%\lib;C:\OpenSSL-%ssl%\lib\VC;C:\OpenSSL-%ssl%\lib\VC\static;%LIB%  
   - set INCLUDE
   - set LIB
 
@@ -224,7 +216,7 @@ after_build:
 
 build:
   verbosity: minimal
-# msbuild "cpp\vs2013\ISO-8583.sln" /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+#  msbuild cpp\vs2013\ISO-8583.sln" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 build_script:
   - ps: |
@@ -232,13 +224,11 @@ build_script:
          mkdir install
          & .\build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
       } else {
-         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %platform% samples tests msbuild 
+         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %system% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
       }
 
 
 before_test:
-  - echo runtests2
-  - ps: Write-Host "runtests2"
 
 after_test:
 
