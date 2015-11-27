@@ -36,7 +36,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      linkmode: shared
+      link: shared
       suffix:
 
     - builder: 120
@@ -44,7 +44,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      linkmode: static_md
+      link: static_md
       suffix:
 
     - builder: 120
@@ -52,7 +52,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      linkmode: static_mt
+      link: static_mt
       suffix:
 
     - builder: 120
@@ -60,7 +60,7 @@ environment:
       vc: x86_amd64
       target: x86_64
       system: x64
-      linkmode: shared
+      link: shared
       suffix: 64
       sln: x64
       
@@ -69,7 +69,7 @@ environment:
       vc: x86_amd64
       target: x86_64
       system: x64
-      linkmode: static_md
+      link: static_md
       suffix: 64
       sln: x64
       
@@ -78,7 +78,7 @@ environment:
       vc: x86_amd64
       target: x86_64
       system: x64
-      linkmode: static_mt
+      link: static_mt
       suffix: 64
       
     - builder: 140
@@ -86,7 +86,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      linkmode: shared
+      link: shared
       suffix:
 
     - builder: 140
@@ -94,7 +94,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      linkmode: static_md
+      link: static_md
       suffix:
 
     - builder: 140
@@ -102,7 +102,7 @@ environment:
       vc: x86
       target: x86
       system: Win32
-      linkmode: static_mt
+      link: static_mt
       suffix:
 
     - builder: 140
@@ -110,16 +110,7 @@ environment:
       vc: x86_amd64
       target: x86_64
       system: x64
-      linkmode: shared
-      suffix: 64
-      sln: x64
-      
-    - builder: 140
-      ssl: Win64
-      vc: x86_amd64
-      target: x86_64
-      system: x64
-      linkmode: static_md
+      link: shared
       suffix: 64
       sln: x64
       
@@ -128,7 +119,16 @@ environment:
       vc: x86_amd64
       target: x86_64
       system: x64
-      linkmode: static_mt
+      link: static_md
+      suffix: 64
+      sln: x64
+      
+    - builder: 140
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
+      link: static_mt
       suffix: 64
       sln: x64
       
@@ -239,7 +239,7 @@ build_script:
       }
       else
       {
-         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %system% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+         & .\buildwin.cmd %builder% build %link% %Configuration% %system% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
       }
 
 
@@ -252,7 +252,7 @@ test_script:
       if ($env:builder -eq "cmake")
       {
       }
-      if (($env:builder -ne "cmake") -and ($env:linkmode -eq "shared"))
+      if (($env:builder -ne "cmake") -and ($env:link -eq "shared"))
       {    
          $env:PATH = $env:CD + "\bin" + $env:suffix + ";" + $env:PATH
          $env:EXCLUDE_TESTS = "Foundation"
