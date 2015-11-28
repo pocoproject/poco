@@ -22,5 +22,5 @@ target_include_directories( "${LIBNAME}"
     )
 target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 
-INSTAL("${LIBNAME}")
+SIMPLE_INSTAL("${LIBNAME}")
 

@@ -282,14 +282,14 @@ macro(POCO_INSTALL_PDB target_name)
 endmacro()
 
 #===============================================================================
-# Macros for simplified installation
+# Macros for simplified installation of package not following the Poco standard as CppUnit
 #
-#  INSTAL - Install the given target
-#    Usage: INSTAL(target_name)
+#  SIMPLE_INSTAL - Install the given target
+#    Usage: SIMPLE_INSTAL(target_name)
 #      INPUT:
-#           target_name             the name of the target. e.g. Foundation for PocoFoundation
-#    Example: INSTAL(Foundation)
-macro(INSTAL target_name)
+#           target_name             the name of the target. i.e CppUnit
+#    Example: SIMPLE_INSTAL(CppUnit)
+macro(SIMPLE_INSTAL target_name)
 install(
     DIRECTORY include
     DESTINATION include
