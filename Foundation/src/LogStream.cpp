@@ -27,7 +27,9 @@ namespace Poco {
 
 LogStreamBuf::LogStreamBuf(Logger& logger, Message::Priority priority):
 	_logger(logger),
-	_priority(priority)
+	_priority(priority),
+        _file(""),
+        _line(0)
 {
 }
 
@@ -42,6 +44,15 @@ void LogStreamBuf::setPriority(Message::Priority priority)
 	_priority = priority;
 }
 
+void LogStreamBuf::setSourceFile(const char* file)
+{
+        _file = file;
+}
+        
+void LogStreamBuf::setSourceLine(int line)
+{
+        _line = line;
+}
 
 int LogStreamBuf::writeToDevice(char c)
 {
@@ -49,7 +60,7 @@ int LogStreamBuf::writeToDevice(char c)
 	{
 		if (_message.find_first_not_of("\r\n") != std::string::npos)
 		{
-			Message msg(_logger.name(), _message, _priority);
+			Message msg(_logger.name(), _message, _priority, _file, _line);
 			_message.clear();
 			_logger.log(msg);
 		}
@@ -118,6 +129,13 @@ LogStream& LogStream::fatal(const std::string& message)
 	return priority(Message::PRIO_FATAL);
 }
 
+
+LogStream& LogStream::fatal(const std::string& message, const char* file, int line)
+{
+	_buf.logger().fatal(message);
+	return priority(Message::PRIO_FATAL, file, line);
+}
+
 	
 LogStream& LogStream::critical()
 {
@@ -129,6 +147,13 @@ LogStream& LogStream::critical(const std::string& message)
 {
 	_buf.logger().critical(message);
 	return priority(Message::PRIO_CRITICAL);
+}
+
+
+LogStream& LogStream::critical(const std::string& message, const char* file, int line)
+{
+	_buf.logger().critical(message);
+	return priority(Message::PRIO_CRITICAL, file, line);
 }
 
 
@@ -145,6 +170,13 @@ LogStream& LogStream::error(const std::string& message)
 }
 
 
+LogStream& LogStream::error(const std::string& message, const char* file, int line)
+{
+	_buf.logger().error(message);
+	return priority(Message::PRIO_ERROR, file, line);
+}
+
+
 LogStream& LogStream::warning()
 {
 	return priority(Message::PRIO_WARNING);
@@ -155,6 +187,13 @@ LogStream& LogStream::warning(const std::string& message)
 {
 	_buf.logger().warning(message);
 	return priority(Message::PRIO_WARNING);
+}
+
+
+LogStream& LogStream::warning(const std::string& message, const char* file, int line)
+{
+	_buf.logger().warning(message);
+	return priority(Message::PRIO_WARNING, file, line);
 }
 
 
@@ -171,6 +210,13 @@ LogStream& LogStream::notice(const std::string& message)
 }
 
 
+LogStream& LogStream::notice(const std::string& message, const char* file, int line)
+{
+	_buf.logger().notice(message);
+	return priority(Message::PRIO_NOTICE, file, line);
+}
+
+
 LogStream& LogStream::information()
 {
 	return priority(Message::PRIO_INFORMATION);
@@ -181,6 +227,13 @@ LogStream& LogStream::information(const std::string& message)
 {
 	_buf.logger().information(message);
 	return priority(Message::PRIO_INFORMATION);
+}
+
+
+LogStream& LogStream::information(const std::string& message, const char* file, int line)
+{
+	_buf.logger().information(message);
+	return priority(Message::PRIO_INFORMATION, file, line);
 }
 
 
@@ -197,6 +250,13 @@ LogStream& LogStream::debug(const std::string& message)
 }
 
 
+LogStream& LogStream::debug(const std::string& message, const char* file, int line)
+{
+	_buf.logger().debug(message);
+	return priority(Message::PRIO_DEBUG, file, line);
+}
+
+
 LogStream& LogStream::trace()
 {
 	return priority(Message::PRIO_TRACE);
@@ -210,9 +270,25 @@ LogStream& LogStream::trace(const std::string& message)
 }
 
 
+LogStream& LogStream::trace(const std::string& message, const char* file, int line)
+{
+	_buf.logger().trace(message);
+	return priority(Message::PRIO_TRACE, file, line);
+}
+
+
 LogStream& LogStream::priority(Message::Priority priority)
 {
 	_buf.setPriority(priority);
+	return *this;
+}
+
+
+LogStream& LogStream::priority(Message::Priority priority, const char* file, int line)
+{
+	_buf.setPriority(priority);
+	_buf.setSourceFile(file);
+	_buf.setSourceLine(line);
 	return *this;
 }
 

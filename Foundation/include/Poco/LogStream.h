@@ -48,6 +48,12 @@ public:
 	void setPriority(Message::Priority priority);
 		/// Sets the priority for log messages.
 		
+	void setSourceFile(const char* file);
+		/// Sets the source file for log messages.
+        
+	void setSourceLine(int line);
+		/// Sets the source line for log messages.
+		
 	Message::Priority getPriority() const;
 		/// Returns the priority for log messages.
 
@@ -60,6 +66,8 @@ private:
 private:
 	Logger&           _logger;
 	Message::Priority _priority;
+	const char*       _file;
+	int               _line;
 	std::string       _message;
 };
 
@@ -112,12 +120,22 @@ public:
 		/// Sets the priority for log messages to Message::PRIO_FATAL
 		/// and writes the given message.
 		
+	LogStream& fatal(const std::string& message, const char* file, int line);
+		/// Sets the priority for log messages to Message::PRIO_FATAL
+		/// and writes the given message.
+		/// and file/line like from __FILE__/__LINE__ macro.
+		
 	LogStream& critical();
 		/// Sets the priority for log messages to Message::PRIO_CRITICAL.
 
 	LogStream& critical(const std::string& message);
 		/// Sets the priority for log messages to Message::PRIO_CRITICAL
 		/// and writes the given message.
+
+	LogStream& critical(const std::string& message, const char* file, int line);
+		/// Sets the priority for log messages to Message::PRIO_CRITICAL
+		/// and writes the given message.
+		/// and file/line like from __FILE__/__LINE__ macro.
 
 	LogStream& error();
 		/// Sets the priority for log messages to Message::PRIO_ERROR.
@@ -126,12 +144,22 @@ public:
 		/// Sets the priority for log messages to Message::PRIO_ERROR
 		/// and writes the given message.
 
+	LogStream& error(const std::string& message, const char* file, int line);
+		/// Sets the priority for log messages to Message::PRIO_ERROR
+		/// and writes the given message.
+		/// and file/line like from __FILE__/__LINE__ macro.
+
 	LogStream& warning();
 		/// Sets the priority for log messages to Message::PRIO_WARNING.
 
 	LogStream& warning(const std::string& message);
 		/// Sets the priority for log messages to Message::PRIO_WARNING
 		/// and writes the given message.
+
+	LogStream& warning(const std::string& message, const char* file, int line);
+		/// Sets the priority for log messages to Message::PRIO_WARNING
+		/// and writes the given message.
+		/// and file/line like from __FILE__/__LINE__ macro.
 
 	LogStream& notice();
 		/// Sets the priority for log messages to Message::PRIO_NOTICE.
@@ -140,6 +168,11 @@ public:
 		/// Sets the priority for log messages to Message::PRIO_NOTICE
 		/// and writes the given message.
 
+	LogStream& notice(const std::string& message, const char* file, int line);
+		/// Sets the priority for log messages to Message::PRIO_NOTICE
+		/// and writes the given message.
+		/// and file/line like from __FILE__/__LINE__ macro.
+
 	LogStream& information();
 		/// Sets the priority for log messages to Message::PRIO_INFORMATION.
 
@@ -147,12 +180,22 @@ public:
 		/// Sets the priority for log messages to Message::PRIO_INFORMATION
 		/// and writes the given message.
 
+	LogStream& information(const std::string& message, const char* file, int line);
+		/// Sets the priority for log messages to Message::PRIO_INFORMATION
+		/// and writes the given message.
+		/// and file/line like from __FILE__/__LINE__ macro.
+
 	LogStream& debug();
 		/// Sets the priority for log messages to Message::PRIO_DEBUG.
 
 	LogStream& debug(const std::string& message);
 		/// Sets the priority for log messages to Message::PRIO_DEBUG
 		/// and writes the given message.
+        
+	LogStream& debug(const std::string& message, const char* file, int line);
+		/// Sets the priority for log messages to Message::PRIO_DEBUG
+		/// and writes the given message.
+		/// and file/line like from __FILE__/__LINE__ macro.
 
 	LogStream& trace();
 		/// Sets the priority for log messages to Message::PRIO_TRACE.
@@ -161,8 +204,17 @@ public:
 		/// Sets the priority for log messages to Message::PRIO_TRACE
 		/// and writes the given message.
 
+	LogStream& trace(const std::string& message, const char* file, int line);
+		/// Sets the priority for log messages to Message::PRIO_TRACE
+		/// and writes the given message.
+		/// and file/line like from __FILE__/__LINE__ macro.
+
 	LogStream& priority(Message::Priority priority);
 		/// Sets the priority for log messages.
+        
+	LogStream& priority(Message::Priority priority, const char* file, int line);
+		/// Sets the priority for log messages.
+		/// and file/line like from __FILE__/__LINE__ macro.
 };
 
 
