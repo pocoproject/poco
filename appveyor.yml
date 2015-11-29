@@ -1,4 +1,4 @@
-version: '{build}'
+version: 1.7.0.{build}-{branch}
 
 cache:
     - c:\OpenSSL-Win32
@@ -27,6 +27,8 @@ environment:
   bundling: bundled
     
   matrix:
+    fast_finish: true
+    
     - builder: 120
       ssl: Win32
       vc: x86
