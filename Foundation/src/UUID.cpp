@@ -67,7 +67,7 @@ UUID::UUID(UInt32 timeLow, UInt32 timeMid, UInt32 timeHiAndVersion, UInt16 clock
 }
 
 
-UUID::UUID(const char* bytes, Version version)
+UUID::UUID(const char* bytes, Version uuidVersion)
 {
 	UInt32 i32;
 	UInt16 i16;
@@ -86,7 +86,7 @@ UUID::UUID(const char* bytes, Version version)
 	std::memcpy(_node, bytes, sizeof(_node));
 
 	_timeHiAndVersion &= 0x0FFF;
-	_timeHiAndVersion |= (version << 12);
+	_timeHiAndVersion |= (uuidVersion << 12);
 	_clockSeq &= 0x3FFF;
 	_clockSeq |= 0x8000;
 }

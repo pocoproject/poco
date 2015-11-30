@@ -42,9 +42,9 @@ PatternFormatter::PatternFormatter():
 }
 
 
-PatternFormatter::PatternFormatter(const std::string& format):
+PatternFormatter::PatternFormatter(const std::string& rFormat):
 	_localTime(false),
-	_pattern(format)
+	_pattern(rFormat)
 {
 	parsePriorityNames();
 	parsePattern();

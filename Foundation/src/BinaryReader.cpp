@@ -24,26 +24,26 @@
 namespace Poco {
 
 
-BinaryReader::BinaryReader(std::istream& istr, StreamByteOrder byteOrder):
+BinaryReader::BinaryReader(std::istream& istr, StreamByteOrder order):
 	_istr(istr),
 	_pTextConverter(0)
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
-	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
+	_flipBytes = (order == LITTLE_ENDIAN_BYTE_ORDER);
 #else
-	_flipBytes = (byteOrder == BIG_ENDIAN_BYTE_ORDER);
+	_flipBytes = (order == BIG_ENDIAN_BYTE_ORDER);
 #endif
 }
 
 
-BinaryReader::BinaryReader(std::istream& istr, TextEncoding& encoding, StreamByteOrder byteOrder):
+BinaryReader::BinaryReader(std::istream& istr, TextEncoding& encoding, StreamByteOrder order):
 	_istr(istr),
 	_pTextConverter(new TextConverter(encoding, Poco::TextEncoding::global()))
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
-	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
+	_flipBytes = (order == LITTLE_ENDIAN_BYTE_ORDER);
 #else
-	_flipBytes = (byteOrder == BIG_ENDIAN_BYTE_ORDER);
+	_flipBytes = (order == BIG_ENDIAN_BYTE_ORDER);
 #endif
 }
 

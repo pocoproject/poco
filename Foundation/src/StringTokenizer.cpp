@@ -25,13 +25,13 @@ namespace Poco {
 StringTokenizer::StringTokenizer(const std::string& str, const std::string& separators, int options)
 {
 	std::string::const_iterator it = str.begin();
-	std::string::const_iterator end = str.end();
+	std::string::const_iterator itEnd = str.end();
 	std::string token;
 	bool doTrim = ((options & TOK_TRIM) != 0);
 	bool ignoreEmpty = ((options & TOK_IGNORE_EMPTY) != 0);
 	bool lastToken = false;
 
-	for (;it != end; ++it)
+	for (;it != itEnd; ++it)
 	{
 		if (separators.find(*it) != std::string::npos) 
 		{

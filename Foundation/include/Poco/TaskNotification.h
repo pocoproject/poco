@@ -126,9 +126,9 @@ class TaskCustomNotification: public TaskNotification
 	/// mechanism between the task and its observer(s).
 {
 public:
-	TaskCustomNotification(Task* pTask, const C& custom):
+	TaskCustomNotification(Task* pTask, const C& rCustom):
 		TaskNotification(pTask),
-		_custom(custom)
+		_custom(rCustom)
 	{
 	}
 

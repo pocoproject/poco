@@ -54,8 +54,8 @@ FileChannel::FileChannel():
 }
 
 
-FileChannel::FileChannel(const std::string& path):
-	_path(path),
+FileChannel::FileChannel(const std::string& rPath):
+	_path(rPath),
 	_times("utc"),
 	_compress(false),
 	_flush(true),

@@ -31,7 +31,7 @@ Mutex Logger::_mapMtx;
 const std::string Logger::ROOT;
 
 
-Logger::Logger(const std::string& name, Channel* pChannel, int level): _name(name), _pChannel(pChannel), _level(level)
+Logger::Logger(const std::string& rName, Channel* pChannel, int level): _name(rName), _pChannel(pChannel), _level(level)
 {
 	if (pChannel) pChannel->duplicate();
 }
@@ -69,14 +69,14 @@ void Logger::setLevel(const std::string& level)
 }
 
 
-void Logger::setProperty(const std::string& name, const std::string& value)
+void Logger::setProperty(const std::string& rName, const std::string& rValue)
 {
-	if (name == "channel")
-		setChannel(LoggingRegistry::defaultRegistry().channelForName(value));
-	else if (name == "level")
-		setLevel(value);
+	if (rName == "channel")
+		setChannel(LoggingRegistry::defaultRegistry().channelForName(rValue));
+	else if (rName == "level")
+		setLevel(rValue);
 	else 
-		Channel::setProperty(name, value);
+		Channel::setProperty(rName, rValue);
 }
 
 

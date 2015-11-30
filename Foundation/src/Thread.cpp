@@ -98,9 +98,9 @@ Thread::Thread():
 }
 
 
-Thread::Thread(const std::string& name): 
+Thread::Thread(const std::string& rName): 
 	_id(uniqueId()), 
-	_name(name), 
+	_name(rName), 
 	_pTLS(0),
 	_event()
 {
@@ -190,9 +190,9 @@ void Thread::clearTLS()
 
 std::string Thread::makeName()
 {
-	std::ostringstream name;
-	name << '#' << _id;
-	return name.str();
+	std::ostringstream threadName;
+	threadName << '#' << _id;
+	return threadName.str();
 }
 
 
@@ -203,11 +203,11 @@ int Thread::uniqueId()
 }
 
 
-void Thread::setName(const std::string& name)
+void Thread::setName(const std::string& rName)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	_name = name;
+	_name = rName;
 }
 
 

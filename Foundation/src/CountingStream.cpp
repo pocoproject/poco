@@ -96,21 +96,21 @@ void CountingStreamBuf::setCurrentLineNumber(int line)
 }
 
 
-void CountingStreamBuf::addChars(int chars)
+void CountingStreamBuf::addChars(int charsToAdd)
 {
-	_chars += chars;
+	_chars += charsToAdd;
 }
 
 		
-void CountingStreamBuf::addLines(int lines)
+void CountingStreamBuf::addLines(int linesToAdd)
 {
-	_lines += lines;
+	_lines += linesToAdd;
 }
 
 		
-void CountingStreamBuf::addPos(int pos)
+void CountingStreamBuf::addPos(int posToAdd)
 {
-	_pos += pos;
+	_pos += posToAdd;
 }
 
 
@@ -149,21 +149,21 @@ void CountingIOS::setCurrentLineNumber(int line)
 }
 
 
-void CountingIOS::addChars(int chars)
+void CountingIOS::addChars(int charsToAdd)
 {
-	_buf.addChars(chars);
+	_buf.addChars(charsToAdd);
 }
 
 		
-void CountingIOS::addLines(int lines)
+void CountingIOS::addLines(int linesToAdd)
 {
-	_buf.addLines(lines);
+	_buf.addLines(linesToAdd);
 }
 
 		
-void CountingIOS::addPos(int pos)
+void CountingIOS::addPos(int posToAdd)
 {
-	_buf.addPos(pos);
+	_buf.addPos(posToAdd);
 }
 
 

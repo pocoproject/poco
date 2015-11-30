@@ -38,16 +38,16 @@ class Buffer
 	/// is needed.
 {
 public:
-	Buffer(std::size_t capacity):
-		_capacity(capacity),
-		_used(capacity),
+	Buffer(std::size_t length):
+		_capacity(length),
+		_used(length),
 		_ptr(0),
 		_ownMem(true)
 		/// Creates and allocates the Buffer.
 	{
-		if (capacity > 0)
+		if (length > 0)
 		{
-			_ptr = new T[capacity];
+			_ptr = new T[length];
 		}
 	}
 

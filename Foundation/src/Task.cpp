@@ -22,8 +22,8 @@
 namespace Poco {
 
 
-Task::Task(const std::string& name):
-	_name(name),
+Task::Task(const std::string& rName):
+	_name(rName),
 	_pOwner(0),
 	_progress(0),
 	_state(TASK_IDLE),
@@ -91,11 +91,11 @@ bool Task::sleep(long milliseconds)
 }
 
 
-void Task::setProgress(float progress)
+void Task::setProgress(float taskProgress)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	_progress = progress;
+	_progress = taskProgress;
 	if (_pOwner)
 		_pOwner->taskProgress(this, _progress);
 }
@@ -109,9 +109,9 @@ void Task::setOwner(TaskManager* pOwner)
 }
 
 
-void Task::setState(TaskState state)
+void Task::setState(TaskState taskState)
 {
-	_state = state;
+	_state = taskState;
 }
 
 

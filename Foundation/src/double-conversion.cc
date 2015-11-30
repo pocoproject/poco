@@ -801,9 +801,9 @@ double StringToDoubleConverter::StringToIeee(
         return junk_string_value_;
       }
     }
-    char sign = '+';
+    char currentSign = '+';
     if (*current == '+' || *current == '-') {
-      sign = static_cast<char>(*current);
+      currentSign = static_cast<char>(*current);
       ++current;
       if (current == end) {
         if (allow_trailing_junk) {
@@ -837,7 +837,7 @@ double StringToDoubleConverter::StringToIeee(
       ++current;
     } while (current != end && *current >= '0' && *current <= '9');
 
-    exponent += (sign == '-' ? -num : num);
+    exponent += (currentSign == '-' ? -num : num);
   }
 
   if (!(allow_trailing_spaces || allow_trailing_junk) && (current != end)) {

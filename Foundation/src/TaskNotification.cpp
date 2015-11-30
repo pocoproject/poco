@@ -79,9 +79,9 @@ TaskFailedNotification::~TaskFailedNotification()
 }
 
 
-TaskProgressNotification::TaskProgressNotification(Task* pTask, float progress):
+TaskProgressNotification::TaskProgressNotification(Task* pTask, float taskProgress):
 	TaskNotification(pTask),
-	_progress(progress)
+	_progress(taskProgress)
 {
 }
 
