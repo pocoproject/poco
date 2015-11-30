@@ -23,7 +23,8 @@ namespace Poco {
 //
 // C++11
 //
-AtomicCounter::AtomicCounter()
+AtomicCounter::AtomicCounter(): 
+	std::atomic_int()
 {
 }
 

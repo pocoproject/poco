@@ -150,12 +150,11 @@ inline AtomicCounter::ValueType AtomicCounter::value() const
 }
 
 
-/*
 inline bool AtomicCounter::operator ! () const
 {
+	return load() == 0;
 	return !*this;
 }
-*/
 
 
 #elif POCO_OS == POCO_OS_WINDOWS_NT

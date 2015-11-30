@@ -6,7 +6,7 @@
 # ENABLE_{COMPONENT}
 # ENABLE_TESTS
 
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.1.0)
 
 project(Poco)
 
@@ -40,6 +40,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
+
+include(CXX11)
+check_for_cxx11_compiler(CXX11_COMPILER)
+
+# If a C++11 compiler is available, then set the appropriate flags
+if(CXX11_COMPILER)
+    enable_cxx11()
+    add_definitions(-DPOCO_ENABLE_CPP11)
+endif()
 
 if(NOT MSVC_IDE)
   if(NOT CMAKE_BUILD_TYPE)
