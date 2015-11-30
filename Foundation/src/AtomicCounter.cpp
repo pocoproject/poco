@@ -19,8 +19,46 @@
 
 namespace Poco {
 
+#if defined(POCO_ENABLE_CPP11)
+//
+// C++11
+//
+AtomicCounter::AtomicCounter()
+{
+}
 
-#if POCO_OS == POCO_OS_WINDOWS_NT
+	
+AtomicCounter::AtomicCounter(AtomicCounter::ValueType initialValue):
+	std::atomic_int(initialValue)
+{
+}
+
+
+AtomicCounter::AtomicCounter(const AtomicCounter& counter):
+	std::atomic_int(counter.load())
+{
+}
+
+
+AtomicCounter::~AtomicCounter()
+{
+}
+
+
+AtomicCounter& AtomicCounter::operator = (const AtomicCounter& counter)
+{
+	store(counter.load());
+	return *this;
+}
+
+	
+AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType value)
+{
+	store(value);
+	return *this;
+}
+
+#elif POCO_OS == POCO_OS_WINDOWS_NT
 //
 // Windows
 //
