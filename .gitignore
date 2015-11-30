@@ -119,6 +119,7 @@ RemotingNG
 XSD
 stage/
 releases/
+*/testsuite/TestConfiguration/
 
 # openssl binaries #
 ####################
