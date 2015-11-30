@@ -24,9 +24,15 @@
 #include "Poco/Exception.h"
 #include "Poco/AtomicCounter.h"
 #include <algorithm>
+#if defined(POCO_ENABLE_CPP11)
+#include <memory>
+#endif
 
 
 namespace Poco {
+
+
+#if !defined(POCO_ENABLE_CPP11)
 
 
 class ReferenceCounter
@@ -421,6 +427,161 @@ inline void swap(SharedPtr<C, RC, RP>& p1, SharedPtr<C, RC, RP>& p2)
 {
 	p1.swap(p2);
 }
+
+
+#else //!defined(POCO_ENABLE_CPP11)
+
+
+template <class C>
+class SharedPtr : public std::shared_ptr<C>
+{
+public:
+
+	SharedPtr() : std::shared_ptr<C>()
+	{
+	}
+
+	SharedPtr(C* ptr) : std::shared_ptr<C>(ptr)
+	{
+
+	}
+
+	template <class Other>
+	SharedPtr(const SharedPtr<Other>& ptr) : std::shared_ptr<C>(ptr)
+	{
+		
+	}
+
+	SharedPtr& operator = (C* ptr)
+	{
+		reset(ptr);
+		return *this;
+	}
+
+	template <class Other>
+	SharedPtr<Other> cast() const
+	{
+		Other* pOther = dynamic_cast<Other*>(get());
+		if (pOther)
+			return SharedPtr<Other>(pOther);
+		return SharedPtr<Other>();
+	}
+
+	operator C* ()
+	{
+		return get();
+	}
+
+	operator const C* () const
+	{
+		return get();
+	}
+
+	bool isNull() const
+	{
+		return !operator bool();
+	}
+
+	bool operator == (const SharedPtr& ptr) const
+	{
+		return get() == ptr.get();
+	}
+
+	bool operator == (const C* ptr) const
+	{
+		return get() == ptr;
+	}
+
+	bool operator == (C* ptr) const
+	{
+		return get() == ptr;
+	}
+
+	bool operator != (const SharedPtr& ptr) const
+	{
+		return get() != ptr.get();
+	}
+
+	bool operator != (const C* ptr) const
+	{
+		return get() != ptr;
+	}
+
+	bool operator != (C* ptr) const
+	{
+		return get() != ptr;
+	}
+
+	bool operator < (const SharedPtr& ptr) const
+	{
+		return get() < ptr.get();
+	}
+
+	bool operator < (const C* ptr) const
+	{
+		return get() < ptr;
+	}
+
+	bool operator < (C* ptr) const
+	{
+		return get() < ptr;
+	}
+
+	bool operator <= (const SharedPtr& ptr) const
+	{
+		return get() <= ptr.get();
+	}
+
+	bool operator <= (const C* ptr) const
+	{
+		return get() <= ptr;
+	}
+
+	bool operator <= (C* ptr) const
+	{
+		return get() <= ptr;
+	}
+
+	bool operator > (const SharedPtr& ptr) const
+	{
+		return get() > ptr.get();
+	}
+
+	bool operator > (const C* ptr) const
+	{
+		return get() > ptr;
+	}
+
+	bool operator > (C* ptr) const
+	{
+		return get() > ptr;
+	}
+
+	bool operator >= (const SharedPtr& ptr) const
+	{
+		return get() >= ptr.get();
+	}
+
+	bool operator >= (const C* ptr) const
+	{
+		return get() >= ptr;
+	}
+
+	bool operator >= (C* ptr) const
+	{
+		return get() >= ptr;
+	}
+
+	int referenceCount() const
+	{
+		return use_count();
+	}
+
+
+};
+
+
+#endif
 
 
 } // namespace Poco
