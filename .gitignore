@@ -117,9 +117,12 @@ cmake-build/
 CodeGeneration
 RemotingNG
 XSD
+stage/
+releases/
 
 # openssl binaries #
 ####################
+openssl/packages/
 
 !openssl/win32/bin/debug/*.dll
 !openssl/win32/bin/debug/*.lib
