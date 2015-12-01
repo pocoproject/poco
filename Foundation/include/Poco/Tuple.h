@@ -31,7 +31,12 @@
 namespace Poco {
 
 
-#if defined(POCO_ENABLE_CPP11)
+// TODO: std::tuple doesn't accept partial initialization
+
+//#define POCO_CXX11_TUPLE_FINISHED
+
+
+#if defined(POCO_CXX11_TUPLE_FINISHED) && defined(POCO_ENABLE_CPP11)
 
 template<class ...Types>
 class Tuple : public std::tuple<Types...>
@@ -92,6 +97,7 @@ public:
 
 
 #else
+
 
 #if defined(_MSC_VER) 
 #define POCO_TYPEWRAPPER_DEFAULTVALUE(T) TypeWrapper<T>::TYPE()
