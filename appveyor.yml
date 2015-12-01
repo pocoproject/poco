@@ -25,9 +25,9 @@ configuration:
 
 environment:
   bundling: bundled
+  fast_finish: true
     
   matrix:
-  fast_finish: true
     - builder: 120
       ssl: Win32
       vc: x86
