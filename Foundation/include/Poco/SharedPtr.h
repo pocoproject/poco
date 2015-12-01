@@ -189,6 +189,11 @@ public:
 		: std::shared_ptr<C>(ptr)
 	{
 	}
+
+	SharedPtr(SharedPtr&& ptr) 
+		: std::shared_ptr<C>(ptr)
+	{
+	}
 #endif
 
 #if !defined(POCO_ENABLE_CPP11)
@@ -272,6 +277,12 @@ public:
 	}
 
 #if defined(POCO_ENABLE_CPP11)
+	SharedPtr& operator = (SharedPtr&& ptr)
+	{
+		std::shared_ptr<C>::operator=(ptr);
+		return *this;
+	}
+
 	template <class Other>
 	SharedPtr& operator = (const SharedPtr<Other>& ptr)
 	{

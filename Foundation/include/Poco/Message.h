@@ -80,6 +80,11 @@ public:
 	Message(const Message& msg);
 		/// Creates a Message by copying another one.
 		
+#ifdef POCO_ENABLE_CPP11
+	Message(Message&& msg);
+		/// Creates a Message by copying another one.
+#endif // POCO_ENABLE_CPP11
+
 	Message(const Message& msg, const std::string& text);
 		/// Creates a Message by copying all but the text from another message.
 		
@@ -89,6 +94,11 @@ public:
 	Message& operator = (const Message& msg);
 		/// Assignment operator.
 		
+#ifdef POCO_ENABLE_CPP11
+	Message& operator = (Message&& msg);
+		/// Assignment operator.
+#endif // POCO_ENABLE_CPP11
+
 	void swap(Message& msg);
 		/// Swaps the message with another one.	
 		
