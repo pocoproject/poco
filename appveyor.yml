@@ -146,6 +146,7 @@ install:
   - c:\cygwin\bin\uname -a
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
+  - set
   - ps: |
         if ($env:system -eq "cmake")
         {
@@ -196,7 +197,6 @@ install:
         }
 
 before_build:
-  - set
  
 # msbuild
   - ps: |
