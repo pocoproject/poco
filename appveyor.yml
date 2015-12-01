@@ -25,10 +25,9 @@ configuration:
 
 environment:
   bundling: bundled
-  fast_finish: true
     
   matrix:
-    
+  fast_finish: true
     - builder: 120
       ssl: Win32
       vc: x86
@@ -95,13 +94,14 @@ environment:
       linkmode: static_md
       suffix:
 
-    - builder: 140
-      ssl: Win32
-      vc: x86
-      target: x86
-      system: Win32
-      linkmode: static_mt
-      suffix:
+# commented out until openssl for static link be solved      
+#    - builder: 140
+#      ssl: Win32
+#      vc: x86
+#      target: x86
+#      system: Win32
+#      linkmode: static_mt
+#      suffix:
 
     - builder: 140
       ssl: Win64
@@ -120,15 +120,16 @@ environment:
       linkmode: static_md
       suffix: 64
       sln: x64
-      
-    - builder: 140
-      ssl: Win64
-      vc: x86_amd64
-      target: x86_64
-      system: x64
-      linkmode: static_mt
-      suffix: 64
-      sln: x64
+
+# commented out until openssl for static link be solved      
+#    - builder: 140
+#      ssl: Win64
+#      vc: x86_amd64
+#      target: x86_64
+#      system: x64
+#      linkmode: static_mt
+#      suffix: 64
+#      sln: x64
       
 #    - builder: cmake
 #      ssl: Win64
@@ -146,7 +147,20 @@ install:
   - c:\cygwin\bin\uname -a
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
-  - set
+  - ps: |
+        if ($env:system -eq "cygwin")
+        {
+          if (!(Test-Path "c:/cygwin/bin/gcc.exe"))
+          {
+             & c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P gcc
+             & c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P g++
+          }
+          if (!(Test-Path "c:/cygwin/bin/gcc.exe"))
+          {
+             & c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P gcc
+             & c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P g++
+          }
+        }
   - ps: |
         if ($env:system -eq "cmake")
         {
