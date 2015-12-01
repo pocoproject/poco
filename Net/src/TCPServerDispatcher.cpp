@@ -110,7 +110,11 @@ void TCPServerDispatcher::run()
 			TCPConnectionNotification* pCNf = dynamic_cast<TCPConnectionNotification*>(pNf.get());
 			if (pCNf)
 			{
+#if defined(POCO_ENABLE_CPP11)
+				std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
+#else
 				std::auto_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
+#endif
 				poco_check_ptr(pConnection.get());
 				beginConnection();
 				pConnection->start();
