@@ -1,0 +1,91 @@
+#
+# $Id: //poco/1.4/build/config/Linux#2 $
+#
+# Linux
+#
+# Make settings for Linux 2.6/gcc 3.3
+#
+#
+
+#
+# General Settings
+#
+LINKMODE ?= SHARED
+POCO_TARGET_OSNAME  = Linux
+POCO_TARGET_OSARCH  = i686
+
+#
+# Define Tools
+#
+CC      = ${CROSS_COMPILE}gcc
+CXX     = ${CROSS_COMPILE}g++
+LINK    = $(CXX)
+LIB     = ${CROSS_COMPILE}ar -cr
+RANLIB  = ${CROSS_COMPILE}ranlib
+SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
+SHLIBLN = $(POCO_BASE)/build/script/shlibln
+STRIP   = ${CROSS_COMPILE}strip
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+SHELL   = sh
+RM      = rm -rf
+CP      = cp
+MKDIR   = mkdir -p
+
+#
+# Extension for Shared Libraries
+#
+SHAREDLIBEXT     = .so.$(target_version)
+SHAREDLIBLINKEXT = .so
+
+#
+# Compiler and Linker Flags
+#
+CFLAGS          = 
+CFLAGS32        = 
+CFLAGS64        = -m32
+CXXFLAGS        = -Wall -Wno-sign-compare
+CXXFLAGS32      = 
+CXXFLAGS64      = -m32
+SHLIBFLAGS      = 
+SHLIBFLAGS32    = 
+SHLIBFLAGS64    = -m32
+LIBFLAGS        = 
+LIBFLAGS32      =
+LIBFLAGS64      =
+LINKFLAGS       =
+LINKFLAGS32     = 
+LINKFLAGS64     = -m32
+STATICOPT_CC    =
+STATICOPT_CXX   =
+STATICOPT_LINK  = -static
+SHAREDOPT_CC    = -fPIC
+SHAREDOPT_CXX   = -fPIC
+SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
+DEBUGOPT_CC     = -g -D_DEBUG
+DEBUGOPT_CXX    = -g -D_DEBUG
+DEBUGOPT_LINK   = -g
+RELEASEOPT_CC   = -O2 -DNDEBUG
+RELEASEOPT_CXX  = -O2 -DNDEBUG
+RELEASEOPT_LINK = -O2
+
+#
+# System Specific Flags
+#
+SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -DPOCO_HAVE_FD_EPOLL
+
+#
+# System Specific Libraries
+#
+SYSLIBS  = -lpthread -ldl -lrt
+
+#
+# Auto-detect architecture if not specified
+#
+ifndef OSARCH_64BITS
+  LBITS := $(shell getconf LONG_BIT)
+  ifeq ($(LBITS),64)
+    OSARCH_64BITS = 1
+  else
+    OSARCH_64BITS = 0
+  endif
+endif
