@@ -206,7 +206,7 @@ public:
 	T* c_array(){ 
 		/// Use array as C array (direct read/write access to data)
 #if defined(POCO_ENABLE_CPP11)
-		return data();
+		return this->data();
 #else
 		return elems;
 #endif // !defined(POCO_ENABLE_CPP11)
@@ -216,14 +216,14 @@ public:
 	Array<T,N>& operator= (const Array<Other,N>& rhs)
 		/// Assignment with type conversion 
 	{
-		std::copy(rhs.begin(),rhs.end(), begin());
+		std::copy(rhs.begin(),rhs.end(), this->begin());
 		return *this;
 	}
 
 	void assign (const T& value)
 		/// Assign one value to all elements
 	{
-		std::fill_n(begin(),size(),value);
+		std::fill_n(this->begin(),this->size(),value);
 	}
 
 public:
