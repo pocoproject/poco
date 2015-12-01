@@ -20,20 +20,19 @@
 #define Foundation_Tuple_INCLUDED
 
 
+// TODO: std::tuple doesn't accept partial initialization
+
+//#define POCO_CXX11_TUPLE_FINISHED
+
+
 #include "Poco/Foundation.h"
-#if defined(POCO_ENABLE_CPP11)
+#if defined(POCO_CXX11_TUPLE_FINISHED) && defined(POCO_ENABLE_CPP11)
 #include <tuple>
-#else
 #endif
 #include "Poco/TypeList.h"
 
 
 namespace Poco {
-
-
-// TODO: std::tuple doesn't accept partial initialization
-
-//#define POCO_CXX11_TUPLE_FINISHED
 
 
 #if defined(POCO_CXX11_TUPLE_FINISHED) && defined(POCO_ENABLE_CPP11)
