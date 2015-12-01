@@ -205,30 +205,24 @@ public:
 	}
 #endif
 
+#if !defined(POCO_ENABLE_CPP11)
 	C* get()
 	{
-#if defined(POCO_ENABLE_CPP11)
-		return this->get();
-#else
 		return _ptr;
-#endif
 	}
 
 	const C* get() const
 	{
-#if defined(POCO_ENABLE_CPP11)
-		return this->get();
-#else
 		return _ptr;
-#endif
 	}
+#endif
 
 	SharedPtr& assign(C* ptr)
 	{
-		if (get() != ptr)
+		if (this->get() != ptr)
 		{
 			SharedPtr tmp(ptr);
-			swap(tmp);
+			this->swap(tmp);
 		}
 		return *this;
 	}
@@ -238,7 +232,7 @@ public:
 		if (&ptr != this)
 		{
 			SharedPtr tmp(ptr);
-			swap(tmp);
+			this->swap(tmp);
 		}
 		return *this;
 	}
@@ -247,10 +241,10 @@ public:
 	template <class Other>
 	SharedPtr& assign(const SharedPtr<Other>& ptr)
 	{
-		if (ptr.get() != get())
+		if (ptr.get() != this->get())
 		{
 			SharedPtr tmp(ptr);
-			swap(tmp);
+			this->swap(tmp);
 		}
 		return *this;
 	}
@@ -291,15 +285,13 @@ public:
 	}
 #endif
 
+#if !defined(POCO_ENABLE_CPP11)
 	void swap(SharedPtr& ptr)
 	{
-#if defined(POCO_ENABLE_CPP11)
-		this->swap(ptr);
-#else
 		std::swap(_ptr, ptr._ptr);
 		std::swap(_pCounter, ptr._pCounter);
-#endif
 	}
+#endif
 
 #if defined(POCO_ENABLE_CPP11)
 	template <class Other>
@@ -379,12 +371,12 @@ public:
 
 	operator C* ()
 	{
-		return get();
+		return this->get();
 	}
 	
 	operator const C* () const
 	{
-		return get();
+		return this->get();
 	}
 
 #if !defined(POCO_ENABLE_CPP11)
@@ -396,108 +388,106 @@ public:
 */	
 #endif
 
+#if !defined(POCO_ENABLE_CPP11)
 	operator bool () const
 	{
-#if defined(POCO_ENABLE_CPP11)
-		return this->operator bool();
-#else
 		return _ptr != 0;
-#endif
 	}
+#endif
 
 	bool isNull() const
 	{
-		return get() == 0;
+		return this->get() == 0;
 	}
 
 	bool operator == (const SharedPtr& ptr) const
 	{
-		return get() == ptr.get();
+		return this->get() == ptr.get();
 	}
 
 	bool operator == (const C* ptr) const
 	{
-		return get() == ptr;
+		return this->get() == ptr;
 	}
 
 	bool operator == (C* ptr) const
 	{
-		return get() == ptr;
+		return this->get() == ptr;
 	}
 
 	bool operator != (const SharedPtr& ptr) const
 	{
-		return get() != ptr.get();
+		return this->get() != ptr.get();
 	}
 
 	bool operator != (const C* ptr) const
 	{
-		return get() != ptr;
+		return this->get() != ptr;
 	}
 
 	bool operator != (C* ptr) const
 	{
-		return get() != ptr;
+		return this->get() != ptr;
 	}
 
 	bool operator < (const SharedPtr& ptr) const
 	{
-		return get() < ptr.get();
+		return this->get() < ptr.get();
 	}
 
 	bool operator < (const C* ptr) const
 	{
-		return get() < ptr;
+		return this->get() < ptr;
 	}
 
 	bool operator < (C* ptr) const
 	{
-		return get() < ptr;
+		return this->get() < ptr;
 	}
 
 	bool operator <= (const SharedPtr& ptr) const
 	{
-		return get() <= ptr.get();
+		return this->get() <= ptr.get();
 	}
 
 	bool operator <= (const C* ptr) const
 	{
-		return get() <= ptr;
+		return this->get() <= ptr;
 	}
 
 	bool operator <= (C* ptr) const
 	{
-		return get() <= ptr;
+		return this->get() <= ptr;
 	}
 
 	bool operator > (const SharedPtr& ptr) const
 	{
-		return get() > ptr.get();
+		return this->get() > ptr.get();
 	}
 
 	bool operator > (const C* ptr) const
 	{
-		return get() > ptr;
+		return this->get() > ptr;
 	}
 
 	bool operator > (C* ptr) const
 	{
-		return get() > ptr;
+		return this->get() > ptr;
 	}
 
 	bool operator >= (const SharedPtr& ptr) const
 	{
-		return get() >= ptr.get();
+		return this->get() >= ptr.get();
 	}
 
 	bool operator >= (const C* ptr) const
 	{
-		return get() >= ptr;
+		return this->get() >= ptr;
 	}
 
 	bool operator >= (C* ptr) const
 	{
-		return get() >= ptr;
+		return this->get() >= ptr;
 	}
 	
 	int referenceCount() const
@@ -512,18 +502,18 @@ public:
 private:
 	C* deref()
 	{
-		if (!operator bool())
+		if (!this->operator bool())
 			throw NullPointerException();
 
-		return get();
+		return this->get();
 	}
 
 	const C* deref() const
 	{
-		if (!operator bool())
+		if (!this->operator bool())
 			throw NullPointerException();
 
-		return get();
+		return this->get();
 	}
 	
 #if !defined(POCO_ENABLE_CPP11)
