@@ -205,6 +205,24 @@ public:
 	}
 #endif
 
+	C* get()
+	{
+#if defined(POCO_ENABLE_CPP11)
+		return this->get();
+#else
+		return _ptr;
+#endif
+	}
+
+	const C* get() const
+	{
+#if defined(POCO_ENABLE_CPP11)
+		return this->get();
+#else
+		return _ptr;
+#endif
+	}
+
 	SharedPtr& assign(C* ptr)
 	{
 		if (get() != ptr)
@@ -273,13 +291,15 @@ public:
 	}
 #endif
 
-#if !defined(POCO_ENABLE_CPP11)
 	void swap(SharedPtr& ptr)
 	{
+#if defined(POCO_ENABLE_CPP11)
+		this->swap(ptr);
+#else
 		std::swap(_ptr, ptr._ptr);
 		std::swap(_pCounter, ptr._pCounter);
-	}
 #endif
+	}
 
 #if defined(POCO_ENABLE_CPP11)
 	template <class Other>
@@ -357,18 +377,6 @@ public:
 		return *deref();
 	}
 
-#if !defined(POCO_ENABLE_CPP11)
-	C* get()
-	{
-		return _ptr;
-	}
-
-	const C* get() const
-	{
-		return _ptr;
-	}
-#endif
-
 	operator C* ()
 	{
 		return get();
@@ -380,11 +388,22 @@ public:
 	}
 
 #if !defined(POCO_ENABLE_CPP11)
+/*
 	bool operator ! () const
 	{
 		return _ptr == 0;
 	}
+*/	
 #endif
+
+	operator bool () const
+	{
+#if defined(POCO_ENABLE_CPP11)
+		return this->operator bool();
+#else
+		return _ptr != 0;
+#endif
+	}
 
 	bool isNull() const
 	{
@@ -484,21 +503,29 @@ public:
 	int referenceCount() const
 	{
 #if defined(POCO_ENABLE_CPP11)
-		return use_count();
+		return this->use_count();
 #else
 		return _pCounter->referenceCount();
 #endif
 	}
 
 private:
-	C* deref() const
+	C* deref()
 	{
-		if (! operator bool())
+		if (!operator bool())
 			throw NullPointerException();
 
 		return get();
 	}
 
+	const C* deref() const
+	{
+		if (!operator bool())
+			throw NullPointerException();
+
+		return get();
+	}
+	
 #if !defined(POCO_ENABLE_CPP11)
 	void release()
 	{
