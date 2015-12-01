@@ -146,7 +146,8 @@ Clock::ClockDiff Clock::accuracy()
 {
 #if defined(POCO_ENABLE_CPP11)
 
-	return std::chrono::duration_cast<std::chrono::duration<double, std::micro>>(std::chrono::steady_clock::duration(1)).count() * 1000 * 1000;
+	ClockVal acc = static_cast<ClockVal>(std::chrono::duration_cast<std::chrono::duration<double, std::micro>>(std::chrono::steady_clock::duration(1)).count());
+	return acc > 0 ? acc : 1;
 
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 
