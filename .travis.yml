@@ -38,20 +38,20 @@ matrix:
       compiler: gcc
       script:
         - ./configure --everything && make -s -j2
-        - ./travis/runtests.sh
+        - travis_wait 30 ./travis/runtests.sh
     
     - env:    TEST_NAME="gcc (make) unbundled"
       compiler: gcc
       script:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - ./configure --everything --unbundled && make -s -j2
-        - ./travis/runtests.sh
+        - travis_wait 30 ./travis/runtests.sh
     
     - env:    TEST_NAME="clang (make)"
       compiler: clang
       script:
         - ./configure --everything --config=Linux-clang && make -s -j2
-        - ./travis/runtests.sh
+        - travis_wait 30 ./travis/runtests.sh
 
     #FIXME    the -m64 option bring by the Linux config is not supported by arm-linux-gnueabi-g++ which makes this test failing
     #FIXME    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
