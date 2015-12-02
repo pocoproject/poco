@@ -22,7 +22,9 @@
 #include <sstream>
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_ENABLE_CPP11)
+#include "Thread_STD.cpp"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Thread_WINCE.cpp"
 #else

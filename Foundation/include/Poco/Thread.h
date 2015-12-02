@@ -26,7 +26,9 @@
 #include "Poco/Environment.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_ENABLE_CPP11)
+#include "Poco/Thread_STD.h"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Poco/Thread_WINCE.h"
 #else
