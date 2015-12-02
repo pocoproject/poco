@@ -33,8 +33,11 @@ void SemaphoreImpl::setImpl()
 	try
 	{
 		std::lock_guard<std::mutex> lock{ _mutex };
-		++_count;
-		_cv.notify_one();
+		if (_count < _max)
+		{
+			++_count;
+			_cv.notify_one();
+		}
 	}
 	catch (std::system_error &e) {
 		throw SystemException(e.what());
