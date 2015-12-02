@@ -62,7 +62,6 @@ AsyncChannel::~AsyncChannel()
 	try
 	{
 		close();
-		if (_pChannel) _pChannel->release();
 	}
 	catch (...)
 	{
@@ -91,13 +90,15 @@ void AsyncChannel::open()
 {
 	FastMutex::ScopedLock lock(_threadMutex);
 
-	if (!_thread.isRunning())
+	if (!_thread.isRunning() && _pChannel)
 		_thread.start(*this);
 }
 
 
 void AsyncChannel::close()
 {
+        FastMutex::ScopedLock lock(_threadMutex);
+
 	if (_thread.isRunning())
 	{
 		while (!_queue.empty()) Thread::sleep(100);
@@ -108,6 +109,9 @@ void AsyncChannel::close()
 		}
 		while (!_thread.tryJoin(100));
 	}
+
+        if (_pChannel) _pChannel->release();
+                _pChannel = NULL;
 }
 
 
