@@ -69,6 +69,8 @@ void EventImpl::waitImpl()
 	{
 		std::unique_lock<std::mutex> lock(_mutex);
 		_cond.wait(lock, [this]() {return this->_state.load(); });
+		if (_autoreset)
+			_state = false;
 	}
 	catch (std::system_error &e) {
 		throw SystemException(e.what());
@@ -81,7 +83,10 @@ bool EventImpl::waitImpl(long milliseconds)
 	try
 	{
 		std::unique_lock<std::mutex> lock(_mutex);
-		return _cond.wait_for(lock, std::chrono::milliseconds(milliseconds), [this]() {return this->_state.load(); });
+		bool ret = _cond.wait_for(lock, std::chrono::milliseconds(milliseconds), [this]() {return this->_state.load(); });
+		if (ret && _autoreset)
+			_state = false;
+		return ret;
 	}
 	catch (std::system_error &e) {
 		throw SystemException(e.what());
