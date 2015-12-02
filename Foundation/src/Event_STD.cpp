@@ -22,7 +22,7 @@ namespace Poco {
 
 
 EventImpl::EventImpl(EventTypeImpl type) :
-	_cond(), _mutex(), _lock(_mutex)
+	_cond(), _mutex()
 {
 }
 
@@ -34,15 +34,19 @@ EventImpl::~EventImpl()
 
 void EventImpl::waitImpl()
 {
+	std::unique_lock<std::mutex> lock(_mutex);
+
 	// TODO: must handle spurious unblock?
-	_cond.wait(_lock);
+	_cond.wait(lock);
 }
 
 
 bool EventImpl::waitImpl(long milliseconds)
 {
+	std::unique_lock<std::mutex> lock(_mutex);
+
 	// TODO: must handle spurious unblock?
-	return _cond.wait_for(_lock, std::chrono::milliseconds(milliseconds)) == std::cv_status::no_timeout;
+	return _cond.wait_for(lock, std::chrono::milliseconds(milliseconds)) == std::cv_status::no_timeout;
 }
 
 

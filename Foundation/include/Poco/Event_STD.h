@@ -49,7 +49,6 @@ protected:
 private:
 	std::condition_variable _cond;
 	std::mutex _mutex;
-	std::unique_lock<std::mutex> _lock;
 };
 
 
@@ -58,6 +57,8 @@ private:
 //
 inline void EventImpl::setImpl()
 {
+	std::unique_lock<std::mutex> lock(_mutex);
+
 	_cond.notify_all();
 }
 
