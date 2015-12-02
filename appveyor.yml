@@ -25,7 +25,6 @@ configuration:
 
 environment:
   bundling: bundled
-  fast_finish: true
     
   matrix:
     - builder: 120
@@ -103,23 +102,24 @@ environment:
 #      linkmode: static_mt
 #      suffix:
 
-    - builder: 140
-      ssl: Win64
-      vc: x86_amd64
-      target: x86_64
-      system: x64
-      linkmode: shared
-      suffix: 64
-      sln: x64
+# commented out until VS2015 install be fixed on AppVeyor      
+#    - builder: 140
+#      ssl: Win64
+#      vc: x86_amd64
+#      target: x86_64
+#      system: x64
+#      linkmode: shared
+#      suffix: 64
+#      sln: x64
       
-    - builder: 140
-      ssl: Win64
-      vc: x86_amd64
-      target: x86_64
-      system: x64
-      linkmode: static_md
-      suffix: 64
-      sln: x64
+#    - builder: 140
+#      ssl: Win64
+#      vc: x86_amd64
+#      target: x86_64
+#      system: x64
+#      linkmode: static_md
+#      suffix: 64
+#      sln: x64
 
 # commented out until openssl for static link be solved      
 #    - builder: 140
@@ -140,6 +140,9 @@ environment:
 #      ssl: Win32
 #      vc: amd64_x86
 #      target: x86
+
+matrix:
+  fast_finish: true
 
 
 install:
