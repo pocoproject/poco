@@ -57,10 +57,10 @@ public:
 		LITTLE_ENDIAN_BYTE_ORDER = 3  /// little-endian byte-order
 	};
 	
-	BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
+	BinaryWriter(std::ostream& ostr, StreamByteOrder order = NATIVE_BYTE_ORDER);
 		/// Creates the BinaryWriter.
 
-	BinaryWriter(std::ostream& ostr, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
+	BinaryWriter(std::ostream& ostr, TextEncoding& encoding, StreamByteOrder order = NATIVE_BYTE_ORDER);
 		/// Creates the BinaryWriter using the given TextEncoding.
 		///
 		/// Strings will be converted from the currently set global encoding
@@ -171,17 +171,17 @@ class BasicMemoryBinaryWriter: public BinaryWriter
 	/// A convenient wrapper for using Buffer and MemoryStream with BinarWriter.
 {
 public:
-	BasicMemoryBinaryWriter(Buffer<T>& data, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER): 
-		BinaryWriter(_ostr, byteOrder),
-		_data(data),
-		_ostr(data.begin(), data.capacity())
+	BasicMemoryBinaryWriter(Buffer<T>& dataBuffer, StreamByteOrder order = NATIVE_BYTE_ORDER): 
+		BinaryWriter(_ostr, order),
+		_data(dataBuffer),
+		_ostr(dataBuffer.begin(), dataBuffer.capacity())
 	{
 	}
 
-	BasicMemoryBinaryWriter(Buffer<T>& data, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER): 
-		BinaryWriter(_ostr, encoding, byteOrder),
-		_data(data),
-		_ostr(data.begin(), data.capacity())
+	BasicMemoryBinaryWriter(Buffer<T>& dataBuffer, TextEncoding& encoding, StreamByteOrder order = NATIVE_BYTE_ORDER): 
+		BinaryWriter(_ostr, encoding, order),
+		_data(dataBuffer),
+		_ostr(dataBuffer.begin(), dataBuffer.capacity())
 	{
 	}
 

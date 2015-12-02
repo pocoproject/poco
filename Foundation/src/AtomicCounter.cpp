@@ -136,9 +136,9 @@ AtomicCounter& AtomicCounter::operator = (const AtomicCounter& counter)
 }
 
 	
-AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType value)
+AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType valueType)
 {
-	__sync_lock_test_and_set(&_counter, value);
+	__sync_lock_test_and_set(&_counter, valueType);
 	return *this;
 }
 
