@@ -24,7 +24,9 @@
 #include "Poco/Exception.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_ENABLE_CPP11)
+#include "Poco/Semaphore_STD.h"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Semaphore_WIN32.h"
 #elif defined(POCO_VXWORKS)
 #include "Poco/Semaphore_VX.h"
