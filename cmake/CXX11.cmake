@@ -38,3 +38,24 @@ macro(enable_cxx11)
     set (CMAKE_CXX_STANDARD 11)
     set (CMAKE_CXX_STANDARD_REQUIRED ON)
 endmacro()
+
+# Determines whether or not the compiler supports C++11
+macro(check_for_cxx14_compiler _VAR)
+    message(STATUS "Checking for C++14 compiler")
+    set(${_VAR})
+    if((MSVC AND (MSVC14)) OR
+       (CMAKE_COMPILER_IS_GNUCXX AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.7) OR
+       (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.4) OR
+       (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"))
+        set(${_VAR} 1)
+        message(STATUS "Checking for C++14 compiler - available")
+    else()
+        message(STATUS "Checking for C++14 compiler - unavailable")
+    endif()
+endmacro()
+
+# Sets the appropriate flag to enable C++14 support
+macro(enable_cxx14)
+    set (CMAKE_CXX_STANDARD 14)
+    set (CMAKE_CXX_STANDARD_REQUIRED ON)
+endmacro()

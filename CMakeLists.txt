@@ -41,10 +41,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Setup C/C++ compiler options
 #################################################################################
 
-option(ENABLE_CPP11 "Enable CPP11 is available" ON)
+option(ENABLE_CPP11 "Enable CPP11 if available" ON)
+option(ENABLE_CPP14 "Enable CPP14 if available" ON)
 
 
-if (ENABLE_CPP11)
+if (ENABLE_CPP11 OR ENABLE_CPP14)
   include(CXX11)
   check_for_cxx11_compiler(CXX11_COMPILER)
 
@@ -52,6 +53,16 @@ if (ENABLE_CPP11)
   if(CXX11_COMPILER)
       enable_cxx11()
       add_definitions(-DPOCO_ENABLE_CPP11)
+
+	  if (ENABLE_CPP14)
+		  check_for_cxx14_compiler(CXX14_COMPILER)
+
+		  # If a C++14 compiler is available, then set the appropriate flags
+		  if(CXX14_COMPILER)
+			  enable_cxx14()
+			  add_definitions(-DPOCO_ENABLE_CPP14)
+		  endif()
+	  endif()
   endif()
 endif()
 

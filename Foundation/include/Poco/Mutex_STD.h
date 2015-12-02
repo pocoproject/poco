@@ -22,7 +22,6 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
-//#include "Poco/UnWindows.h"
 #include <mutex>
 #include <chrono>
 #include <memory>

@@ -17,7 +17,9 @@
 #include "Poco/RWLock.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_CXX11_RWLOCK_FINISHED) && defined(POCO_ENABLE_CPP14)
+#include "RWLock_STD.cpp"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "RWLock_WINCE.cpp"
 #else
