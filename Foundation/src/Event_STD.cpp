@@ -16,13 +16,14 @@
 
 #include "Poco/Event_STD.h"
 #include <chrono>
+#include <system_error>
 
 
 namespace Poco {
 
 
 EventImpl::EventImpl(EventTypeImpl type) :
-	_cond(), _mutex()
+	_cond(), _mutex(), _state(false), _autoreset(type == EVENT_AUTORESET_IMPL)
 {
 }
 
@@ -32,21 +33,59 @@ EventImpl::~EventImpl()
 }
 
 
+void EventImpl::setImpl()
+{
+	try
+	{
+		std::unique_lock<std::mutex> lock(_mutex);
+		_state = true;
+		if (_autoreset)
+			_cond.notify_one();
+		else
+			_cond.notify_all();
+	}
+	catch (std::system_error &e) {
+		throw SystemException(e.what());
+	}
+}
+
+
+void EventImpl::resetImpl()
+{
+	try
+	{
+		std::unique_lock<std::mutex> lock(_mutex);
+		_state = false;
+	}
+	catch (std::system_error &e) {
+		throw SystemException(e.what());
+	}
+}
+
+
 void EventImpl::waitImpl()
 {
-	std::unique_lock<std::mutex> lock(_mutex);
-
-	// TODO: must handle spurious unblock?
-	_cond.wait(lock);
+	try
+	{
+		std::unique_lock<std::mutex> lock(_mutex);
+		_cond.wait(lock, [this]() {return this->_state.load(); });
+	}
+	catch (std::system_error &e) {
+		throw SystemException(e.what());
+	}
 }
 
 
 bool EventImpl::waitImpl(long milliseconds)
 {
-	std::unique_lock<std::mutex> lock(_mutex);
-
-	// TODO: must handle spurious unblock?
-	return _cond.wait_for(lock, std::chrono::milliseconds(milliseconds)) == std::cv_status::no_timeout;
+	try
+	{
+		std::unique_lock<std::mutex> lock(_mutex);
+		return _cond.wait_for(lock, std::chrono::milliseconds(milliseconds), [this]() {return this->_state.load(); });
+	}
+	catch (std::system_error &e) {
+		throw SystemException(e.what());
+	}
 }
 
 

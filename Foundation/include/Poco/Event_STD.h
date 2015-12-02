@@ -24,6 +24,7 @@
 #include "Poco/Exception.h"
 #include <condition_variable>
 #include <mutex>
+#include <atomic>
 
 
 namespace Poco {
@@ -49,24 +50,9 @@ protected:
 private:
 	std::condition_variable _cond;
 	std::mutex _mutex;
+	std::atomic_bool _state;
+	bool _autoreset;
 };
-
-
-//
-// inlines
-//
-inline void EventImpl::setImpl()
-{
-	std::unique_lock<std::mutex> lock(_mutex);
-
-	_cond.notify_all();
-}
-
-
-inline void EventImpl::resetImpl()
-{
-	// TODO
-}
 
 
 } // namespace Poco

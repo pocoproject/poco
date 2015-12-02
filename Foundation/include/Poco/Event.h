@@ -24,13 +24,7 @@
 #include "Poco/Exception.h"
 
 
-// TODO: std::condition_variable nas no built-in concept of reset
-// TODO: std::condition_variable may be unblocked spuriously, must handle?
-
-//#define POCO_CXX11_EVENT_FINISHED
-
-
-#if defined(POCO_CXX11_EVENT_FINISHED) && defined(POCO_ENABLE_CPP11)
+#if defined(POCO_ENABLE_CPP11)
 #include "Poco/Event_STD.h"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Event_WIN32.h"
