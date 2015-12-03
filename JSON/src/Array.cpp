@@ -36,6 +36,14 @@ Array::Array(const Array& copy) : _values(copy._values)
 }
 
 
+#ifdef POCO_ENABLE_CPP11
+Array::Array(Array&& other) :
+	_values(std::move(other._values))
+{
+}
+#endif // POCO_ENABLE_CPP11
+
+
 Array::~Array()
 {
 }

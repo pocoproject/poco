@@ -39,6 +39,17 @@ Object::Object(const Object& copy) : _values(copy._values),
 }
 
 
+#ifdef POCO_ENABLE_CPP11
+Object::Object(Object&& other) :
+	_values(std::move(other._values)),
+	_keys(std::move(other._keys)),
+	_preserveInsOrder(other._preserveInsOrder),
+	_pStruct(0)
+{
+}
+#endif // POCO_ENABLE_CPP11
+
+
 Object::~Object()
 {
 }
