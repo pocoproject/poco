@@ -32,6 +32,12 @@
 #include <thread>
 
 
+#ifdef __APPLE__
+#define POCO_THREADIMPL_THREAD_LOCAL __thread
+#else
+#define POCO_THREADIMPL_THREAD_LOCAL thread_local
+#endif
+
 namespace Poco {
 
 
@@ -103,7 +109,7 @@ private:
 		}
 
 	private:
-		static thread_local ThreadImpl* _pThread;
+		static POCO_THREADIMPL_THREAD_LOCAL ThreadImpl* _pThread;
 	};
 
 	struct ThreadData: public RefCountedObject
