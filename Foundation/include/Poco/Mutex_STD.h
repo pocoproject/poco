@@ -124,11 +124,6 @@ inline bool MutexImpl::tryLockImpl()
 	return _mutex->tryLock();
 }
 
-inline bool MutexImpl::tryLockImpl(long milliseconds)
-{
-	return _mutex->tryLock(milliseconds);
-}
-
 inline void MutexImpl::unlockImpl()
 {
 	_mutex->unlock();
@@ -142,11 +137,6 @@ inline void FastMutexImpl::lockImpl()
 inline bool FastMutexImpl::tryLockImpl()
 {
 	return _mutex.try_lock();
-}
-
-inline bool FastMutexImpl::tryLockImpl(long milliseconds)
-{
-	return _mutex.try_lock_for(std::chrono::milliseconds(milliseconds));
 }
 
 inline void FastMutexImpl::unlockImpl()

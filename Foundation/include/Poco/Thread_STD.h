@@ -22,7 +22,9 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Runnable.h"
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
+#endif
 #include "Poco/Event.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
@@ -133,6 +135,10 @@ private:
 
 	static CurrentThreadHolder _currentThreadHolder;
 
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	SignalHandler::JumpBufferVec _jumpBufferVec;
+	friend class SignalHandler;
+#endif	
 };
 
 
