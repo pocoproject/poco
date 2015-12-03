@@ -106,7 +106,7 @@ private:
 };
 
 
-template <class TArgs, bool hasSender = true, bool senderIsConst = true>
+template <class TArgs, bool hasSender, bool senderIsConst>
 std::atomic_int StdFunctionDelegate<TArgs, hasSender, senderIsConst>::id_generator;
 
 
