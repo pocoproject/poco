@@ -47,18 +47,18 @@ TextBufferIterator::TextBufferIterator(const char* begin, std::size_t size, cons
 }
 
 
-TextBufferIterator::TextBufferIterator(const char* begin, const char* end, const TextEncoding& encoding):
+TextBufferIterator::TextBufferIterator(const char* begin, const char* pEnd, const TextEncoding& encoding):
 	_pEncoding(&encoding),
 	_it(begin),
-	_end(end)
+	_end(pEnd)
 {
 }
 
 
-TextBufferIterator::TextBufferIterator(const char* end):
+TextBufferIterator::TextBufferIterator(const char* pEnd):
 	_pEncoding(0),
-	_it(end),
-	_end(end)
+	_it(pEnd),
+	_end(pEnd)
 {
 }
 

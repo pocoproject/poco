@@ -21,8 +21,8 @@
 namespace Poco {
 
 
-MemoryPool::MemoryPool(std::size_t blockSize, int preAlloc, int maxAlloc):
-	_blockSize(blockSize),
+MemoryPool::MemoryPool(std::size_t blockLength, int preAlloc, int maxAlloc):
+	_blockSize(blockLength),
 	_maxAlloc(maxAlloc),
 	_allocated(preAlloc)
 {

@@ -162,17 +162,17 @@ class BasicMemoryBinaryReader : public BinaryReader
 	/// A convenient wrapper for using Buffer and MemoryStream with BinaryReader.
 {
 public:
-	BasicMemoryBinaryReader(const Buffer<T>& data, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
-		BinaryReader(_istr, byteOrder),
-		_data(data),
-		_istr(data.begin(), data.capacity())
+	BasicMemoryBinaryReader(const Buffer<T>& dataBuffer, StreamByteOrder order = NATIVE_BYTE_ORDER):
+		BinaryReader(_istr, order),
+		_data(dataBuffer),
+		_istr(dataBuffer.begin(), dataBuffer.capacity())
 	{
 	}
 
-	BasicMemoryBinaryReader(const Buffer<T>& data, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
-		BinaryReader(_istr, encoding, byteOrder),
-		_data(data),
-		_istr(data.begin(), data.capacity())
+	BasicMemoryBinaryReader(const Buffer<T>& dataBuffer, TextEncoding& encoding, StreamByteOrder order = NATIVE_BYTE_ORDER):
+		BinaryReader(_istr, encoding, order),
+		_data(dataBuffer),
+		_istr(dataBuffer.begin(), dataBuffer.capacity())
 	{
 	}
 

@@ -60,6 +60,7 @@ if [ "$OSNAME" = "" ] ; then
                 OSNAME=MinGW ;;
         esac
 fi
+
 BINDIR="bin/$OSNAME/$OSARCH/"
 
 runs=0
@@ -82,12 +83,12 @@ do
 				echo ""
 				echo ""
 				echo "****************************************" 
-				echo "*** $comp"                                
+				echo "*** $OSNAME $OSARCH $comp"                                
 				echo "****************************************" 
 				echo ""
 
 				runs=`expr $runs + 1`
-				sh -c "cd $POCO_BUILD/$comp/testsuite/$BINDIR && $TESTRUNNER $TESTRUNNERARGS"
+				sh -c "cd $POCO_BUILD/$comp/testsuite/$BINDIR && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER $TESTRUNNERARGS"
 				if [ $? -ne 0 ] ; then
 					failures=`expr $failures + 1`
 					failedTests="$failedTests $comp"
