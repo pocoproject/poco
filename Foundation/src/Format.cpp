@@ -227,6 +227,7 @@ namespace
 }
 
 
+#if !defined(POCO_ENABLE_CPP11)
 std::string format(const std::string& fmt, const Any& value)
 {
 	std::string result;
@@ -430,9 +431,20 @@ void format(std::string& result, const std::string& fmt, const Any& value1, cons
 	args.push_back(value10);
 	format(result, fmt, args);
 }
+#endif // !defined(POCO_ENABLE_CPP11)
 
+
+void Foundation_API format(std::string& result, const char *fmt, const std::vector<Any>& values)
+{
+	formatValues(result, std::string(fmt), values);
+}
 
 void format(std::string& result, const std::string& fmt, const std::vector<Any>& values)
+{
+	formatValues(result, fmt, values);
+}
+
+void formatValues(std::string& result, const std::string& fmt, const std::vector<Any>& values)
 {
 	std::string::const_iterator itFmt  = fmt.begin();
 	std::string::const_iterator endFmt = fmt.end();
