@@ -140,35 +140,31 @@ void Foundation_API format(std::string& result, const std::string& fmt, const st
 	/// Supports a variable number of arguments and is used by
 	/// all other variants of format().
 
-void Foundation_API formatValues(std::string& result, const std::string& fmt, const std::vector<Any>& values);
-	/// Supports a variable number of arguments and is used by
-	/// all other variants of format().
 
 #if defined(POCO_ENABLE_CPP11)
 
 
-template <typename Ref, typename T, typename... Args,
-	typename =  typename std::enable_if<std::is_same<std::string&, Ref>::value>::type >
-void format(Ref result, const std::string &fmt, T arg1, Args... args)
+template <typename T, typename... Args>
+void format(std::string &result, const std::string &fmt, T arg1, Args... args)
 	/// Appends the formatted string to result.
 {
 	std::vector<Any> values;
 	values.push_back(arg1);
 	values.insert(values.end(), { args... });
-	formatValues(result, fmt, values);
-	return result;
+	format(result, fmt, values);
 }
 
 
-template <typename T, typename... Args>
-std::string format(const std::string &fmt, T arg1, Args... args)
+template <typename FMT, typename T, typename... Args,
+	typename std::enable_if< std::is_const< typename std::remove_reference<FMT>::type >::value, int >::type = 0>
+std::string format(FMT &fmt, T arg1, Args... args)
 	/// Returns the formatted string.
 {
 	std::vector<Any> values;
 	values.push_back(arg1);
 	values.insert(values.end(), { args... });
 	std::string result;
-	formatValues(result, fmt, values);
+	format(result, fmt, values);
 	return result;
 }
 
