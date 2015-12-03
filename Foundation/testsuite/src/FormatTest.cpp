@@ -204,6 +204,7 @@ void FormatTest::testAnyInt()
 	assert (s == "42");
 
 	c = 43;
+	s.clear();
 	format(s, "%?i", c);
 	assert(s == "43");
 
