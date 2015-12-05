@@ -118,12 +118,12 @@ public:
 		clear();
 	}
 
-	Iterator find(const std::string& className) const
+	Iterator find(const std::string& rClassName) const
 		/// Returns an iterator pointing to the MetaObject
 		/// for the given class. If the MetaObject cannot
 		/// be found, the iterator points to end().
 	{
-		return Iterator(_metaMap.find(className));
+		return Iterator(_metaMap.find(rClassName));
 	}
 
 	Iterator begin() const

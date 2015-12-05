@@ -45,7 +45,7 @@ public:
 
 	static CppUnit::Test* suite();
 
-	static std::string getTestFile(const std::string& testFile);
+	static std::string getTestFile(const std::string& directory, const std::string& type);
 
 private:
 	void onDecompressError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info);

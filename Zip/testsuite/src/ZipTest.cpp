@@ -27,6 +27,7 @@
 #include "CppUnit/TestSuite.h"
 #undef min
 #include <algorithm>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -46,7 +47,7 @@ ZipTest::~ZipTest()
 
 void ZipTest::testSkipSingleFile()
 {
-	std::string testFile = getTestFile("test.zip");
+	std::string testFile = getTestFile("data", "test.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
 	assert (inp.good());
 	SkipCallback skip;
@@ -68,7 +69,7 @@ void ZipTest::testSkipSingleFile()
 
 void ZipTest::testDecompressSingleFile()
 {
-	std::string testFile = getTestFile("test.zip");
+	std::string testFile = getTestFile("data", "test.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
 	assert (inp.good());
 	ZipArchive arch(inp);
@@ -83,7 +84,7 @@ void ZipTest::testDecompressSingleFile()
 
 void ZipTest::testDecompressSingleFileInDir()
 {
-	std::string testFile = getTestFile("test.zip");
+	std::string testFile = getTestFile("data","test.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
 	assert (inp.good());
 	ZipArchive arch(inp);
@@ -98,7 +99,7 @@ void ZipTest::testDecompressSingleFileInDir()
 
 void ZipTest::testCrcAndSizeAfterData()
 {
-	std::string testFile = getTestFile("data.zip");
+	std::string testFile = getTestFile("data", "data.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
 	assert (inp.good());
 	Decompress dec(inp, Poco::Path());
@@ -112,7 +113,7 @@ void ZipTest::testCrcAndSizeAfterData()
 
 void ZipTest::testCrcAndSizeAfterDataWithArchive()
 {
-	std::string testFile = getTestFile("data.zip");
+	std::string testFile = getTestFile("data", "data.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
 	assert (inp.good());
 	Poco::Zip::ZipArchive zip(inp);
@@ -132,30 +133,34 @@ void ZipTest::testCrcAndSizeAfterDataWithArchive()
 }
 
 
-std::string ZipTest::getTestFile(const std::string& testFile)
+std::string ZipTest::getTestFile(const std::string& directory, const std::string& file)
 {
-	Poco::Path root;
-	root.makeAbsolute();
-	Poco::Path result;
-	while (!Poco::Path::find(root.toString(), "data", result))
+	std::ostringstream ostr;
+	ostr << directory << '/' << file;
+	std::string validDir(ostr.str());
+	Poco::Path pathPattern(validDir);
+	if (Poco::File(pathPattern).exists())
 	{
-		root.makeParent();
-		if (root.toString().empty() || root.toString() == "/")
-			throw Poco::FileNotFoundException("Didn't find data subdir");
+		return validDir;
 	}
-	result.makeDirectory();
-	result.setFileName(testFile);
-	Poco::File aFile(result.toString());
-	if (!aFile.exists() || (aFile.exists() && !aFile.isFile()))
-		throw Poco::FileNotFoundException("Didn't find " + testFile);
-	
-	return result.toString();
+
+	ostr.str("");
+	ostr << "/Zip/testsuite/" << directory << '/' << file;
+	validDir = Poco::Environment::get("POCO_BASE") + ostr.str();
+	pathPattern = validDir;
+
+	if (!Poco::File(pathPattern).exists())
+	{
+		std::cout << "Can't find " << validDir << std::endl;
+		throw Poco::NotFoundException("cannot locate directory containing valid Zip test files");
+	}
+	return validDir;
 }
 
 
 void ZipTest::testDecompress()
 {
-	std::string testFile = getTestFile("test.zip");
+	std::string testFile = getTestFile("data", "test.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
 	assert (inp.good());
 	Decompress dec(inp, Poco::Path());
@@ -169,7 +174,7 @@ void ZipTest::testDecompress()
 
 void ZipTest::testDecompressFlat()
 {
-	std::string testFile = getTestFile("test.zip");
+	std::string testFile = getTestFile("data", "test.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
 	assert (inp.good());
 	Decompress dec(inp, Poco::Path(), true);

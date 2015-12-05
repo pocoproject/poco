@@ -706,21 +706,76 @@ compiling in 32 bit mode.
 compiling in 64 bit mode.
 
 
+!LIBFLAGS
+
+<*LIBFLAGS*> specifies additional flags passed to the linker when building
+a static library.
+
+
+!LIBFLAGS32
+
+<*LIBFLAGS32*> specifies additional flags passed to the linker when building
+a static library if compiling in 32 bit mode.
+
+
+!LIBFLAGS64
+
+<*LIBFLAGS64*> specifies additional flags passed to the linker when building
+a static library if compiling in 64 bit mode.
+
+
+!SHLIBFLAGS
+
+<*SHLIBFLAGS*> specifies additional flags passed to the linker when building
+a shared library.
+
+
+!SHLIBFLAGS32
+
+<*SHLIBFLAGS32*> specifies additional flags passed to the linker when building
+a shared library if compiling in 32 bit mode.
+
+
+!SHLIBFLAGS64
+
+<*SHLIBFLAGS64*> specifies additional flags passed to the linker when building
+a shared library if compiling in 64 bit mode.
+
+
+!DYLIBFLAGS
+
+<*DYLIBFLAGS*> specifies additional flags passed to the linker when building
+a dynamically loadable shared library.
+
+
+!DYLIBFLAGS32
+
+<*DYLIBFLAGS32*> specifies additional flags passed to the linker when building
+a dynamically loadable shared library if compiling in 32 bit mode.
+
+
+!DYLIBFLAGS64
+
+<*DYLIBFLAGS64*> specifies additional flags passed to the linker when building
+a dynamically loadable shared library if compiling in 64 bit mode.
+
+
 !LINKFLAGS
 
-<*LINKFLAGS*> specifies additional flags passed to the linker.
+<*LINKFLAGS*> specifies additional flags passed to the linker when building
+an executable.
 
 
 !LINKFLAGS32
 
-<*LINKFLAGS32*> specifies additional flags passed to the linker if 
-compiling in 32 bit mode.
+<*LINKFLAGS32*> specifies additional flags passed to the linker when building
+an executable if compiling in 32 bit mode.
 
 
 !LINKFLAGS64
 
-<*LINKFLAGS64*> specifies additional flags passed to the linker if 
-compiling in 64 bit mode.
+<*LINKFLAGS64*> specifies additional flags passed to the linker when building
+an executable if compiling in 64 bit mode.
 
 
 !STATICOPT_CC
@@ -743,8 +798,8 @@ static linking.
 
 !SHAREDOPT_CC
 
-<*SHAREDOPT_CC*> specifies additonal flags passed to the C compiler if 
-compiling for dynamic linking.
+<*SHAREDOPT_CC*> specifies additonal flags passed to the C compiler 
+for dynamic linking.
 
 
 !SHAREDOPT_CXX

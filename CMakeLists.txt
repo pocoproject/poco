@@ -77,6 +77,7 @@ option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
 option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
+option(ENABLE_REDIS "Enable Redis" ON)
 
 option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
 
@@ -191,6 +192,10 @@ endif()
 if(ENABLE_ZIP)
 add_subdirectory(Zip)
 list(APPEND Poco_COMPONENTS "Zip")
+endif()
+if(ENABLE_REDIS)
+add_subdirectory(Redis)
+list(APPEND Poco_COMPONENTS "Redis")
 endif()
 
 find_package(APR)

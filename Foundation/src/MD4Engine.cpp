@@ -129,11 +129,11 @@ const DigestEngine::Digest& MD4Engine::digest()
 	/* Append length (before padding) */
 	update(bits, 8);
 
-	/* Store state in digest */
-	unsigned char digest[16];
-	encode(digest, _context.state, 16);
+	/* Store state in digestArray */
+	unsigned char digestArray[16];
+	encode(digestArray, _context.state, 16);
 	_digest.clear();
-	_digest.insert(_digest.begin(), digest, digest + sizeof(digest));
+	_digest.insert(_digest.begin(), digestArray, digestArray + sizeof(digestArray));
 
 	/* Zeroize sensitive information. */
 	std::memset(&_context, 0, sizeof (_context));
