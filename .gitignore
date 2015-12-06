@@ -124,6 +124,11 @@ releases/
 
 # openssl binaries #
 ####################
+openssl/packages/
+
+!openssl/Ionic/zip-v1.9/Release/*.dll
+!openssl/Ionic/zlib-v1.9/Release/*.dll
+
 !openssl/win32/bin/debug/*.dll
 !openssl/win32/bin/debug/*.lib
 !openssl/win32/bin/release/*.dll
