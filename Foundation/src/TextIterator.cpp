@@ -36,10 +36,10 @@ TextIterator::TextIterator(const std::string& str, const TextEncoding& encoding)
 }
 
 
-TextIterator::TextIterator(const std::string::const_iterator& begin, const std::string::const_iterator& end, const TextEncoding& encoding):
+TextIterator::TextIterator(const std::string::const_iterator& begin, const std::string::const_iterator& rEnd, const TextEncoding& encoding):
 	_pEncoding(&encoding),
 	_it(begin),
-	_end(end)
+	_end(rEnd)
 {
 }
 
@@ -52,10 +52,10 @@ TextIterator::TextIterator(const std::string& str):
 }
 
 
-TextIterator::TextIterator(const std::string::const_iterator& end):
+TextIterator::TextIterator(const std::string::const_iterator& rEnd):
 	_pEncoding(0),
-	_it(end),
-	_end(end)
+	_it(rEnd),
+	_end(rEnd)
 {
 }
 

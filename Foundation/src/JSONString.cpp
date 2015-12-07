@@ -13,39 +13,16 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-
 #include "Poco/JSONString.h"
+#include "Poco/UTF8String.h"
 #include <ostream>
 
-
 namespace Poco {
-
-
-std::string toJSON(char c)
-{
-	switch (c)
-	{
-	case '\\': return "\\\\";
-	case '"': return "\\\"";
-	case '/': return "\\/";
-	case '\b': return "\\b";
-	case '\f': return "\\f";
-	case '\n': return "\\n";
-	case '\r': return "\\r";
-	case '\t': return "\\t";
-	default: return std::string(1, c);
-	}
-}
-
 
 void toJSON(const std::string& value, std::ostream& out, bool wrap)
 {
 	if (wrap) out << '"';
-	for (std::string::const_iterator it = value.begin(),
-		end = value.end(); it != end; ++it)
-	{
-		out << toJSON(*it);
-	}
+	out << UTF8::escape(value.begin(), value.end());
 	if (wrap) out << '"';
 }
 
@@ -54,11 +31,7 @@ std::string toJSON(const std::string& value, bool wrap)
 {
 	std::string ret;
 	if (wrap) ret.append(1, '"');
-	for (std::string::const_iterator it = value.begin(),
-		end = value.end(); it != end; ++it)
-	{
-		ret.append(toJSON(*it));
-	}
+	ret.append(UTF8::escape(value.begin(), value.end()));
 	if (wrap) ret.append(1, '"');
 	return ret;
 }
