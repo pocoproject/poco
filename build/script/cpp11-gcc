@@ -7,4 +7,14 @@
 # Detect compatible GCC version and add c++11/14 flags
 #
 
-CXXFLAGS += -std=c++0x
+GCCVERSION := $(subst .,,$(shell gcc --version | grep ^gcc | sed 's/^.* //g'))
+
+# C++11 needs GCC 4.8.1
+ifeq ($(shell test $(GCCVERSION) -gt 480 && echo 1), 1)
+	CXXFLAGS += -std=c++0x
+endif
+
+# C++14 needs GCC 4.9.2
+ifeq ($(shell test $(GCCVERSION) -gt 491 && echo 1), 1)
+	CXXFLAGS += -std=c++14
+endif
