@@ -50,6 +50,21 @@ if (DISABLE_CPP11 OR DISABLE_CPP14)
   if (DISABLE_CPP14)
       add_definitions(-DPOCO_DISABLE_CPP14)
   endif()
+else()
+  # C++11/14 compiler flags
+  include(CXX11)
+  check_for_cxx11_compiler(CXX11_COMPILER)
+
+  # If a C++11 compiler is available, then set the appropriate flags
+  if(CXX11_COMPILER)
+	  enable_cxx11()
+	  check_for_cxx14_compiler(CXX14_COMPILER)
+
+	  # If a C++14 compiler is available, then set the appropriate flags
+	  if(CXX14_COMPILER)
+		  enable_cxx14()
+	  endif()
+  endif()
 endif()
 
 if(NOT MSVC_IDE)
