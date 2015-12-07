@@ -75,3 +75,8 @@ SYSFLAGS = -DPOCO_HAVE_IPv6
 # System Specific Libraries
 #
 SYSLIBS  = -ldl
+
+#
+# C++11/14 detection
+#
+include $(POCO_BASE)/build/script/cpp11-gcc
