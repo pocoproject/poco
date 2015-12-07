@@ -50,7 +50,7 @@ protected:
 private:
 	std::condition_variable _cond;
 	std::mutex _mutex;
-	std::atomic_bool _state;
+	std::atomic<bool> _state;
 	bool _autoreset;
 };
 

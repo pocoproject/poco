@@ -34,6 +34,9 @@
 
 #ifdef __APPLE__
 #define POCO_THREADIMPL_THREAD_LOCAL __thread
+#elif defined(_MSC_VER) && (_MSC_VER <= 1800)
+// VS2013 and earlier uses __declspec(thread)
+#define POCO_THREADIMPL_THREAD_LOCAL __declspec(thread)
 #else
 #define POCO_THREADIMPL_THREAD_LOCAL thread_local
 #endif

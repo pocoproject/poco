@@ -179,10 +179,10 @@ public:
 
 #ifdef POCO_ENABLE_CPP11
 
-	Array &operator =(const Array &other) = default;
+	Array &operator =(const Array &other);
 		// Assignment operator
 
-	Array &operator =(Array &&other) = default;
+	Array &operator =(Array &&other);
 		// Move operator
 
 #endif  // POCO_ENABLE_CPP11

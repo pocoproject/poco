@@ -46,7 +46,7 @@ namespace Poco {
 
 class Foundation_API AtomicCounter
 #if defined(POCO_ENABLE_CPP11)
-	: public std::atomic_int
+	: public std::atomic<int>
 #endif
 	/// This class implements a simple counter, which
 	/// provides atomic operations that are safe to

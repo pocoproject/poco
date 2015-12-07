@@ -24,19 +24,19 @@ namespace Poco {
 // C++11
 //
 AtomicCounter::AtomicCounter(): 
-	std::atomic_int()
+	std::atomic<int>()
 {
 }
 
 	
 AtomicCounter::AtomicCounter(AtomicCounter::ValueType initialValue):
-	std::atomic_int(initialValue)
+	std::atomic<int>(initialValue)
 {
 }
 
 
 AtomicCounter::AtomicCounter(const AtomicCounter& counter):
-	std::atomic_int(counter.load())
+	std::atomic<int>(counter.load())
 {
 }
 

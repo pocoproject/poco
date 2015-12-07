@@ -214,10 +214,10 @@ public:
 
 #ifdef POCO_ENABLE_CPP11
 
-	Object &operator =(const Object &other) = default;
+	Object &operator =(const Object &other);
 		// Assignment operator
 
-	Object &operator =(Object &&other) = default;
+	Object &operator =(Object &&other);
 		// Move operator
 
 #endif // POCO_ENABLE_CPP11

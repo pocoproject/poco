@@ -217,4 +217,32 @@ void Array::clear()
 }
 
 
+#ifdef POCO_ENABLE_CPP11
+
+
+Array &Array::operator =(const Array &other)
+{
+	if (&other != this)
+	{
+		_values = other._values;
+		_pArray = 0;
+	}
+	return *this;
+}
+
+
+Array &Array::operator = (Array &&other)
+{
+	if (&other != this)
+	{
+		_values = std::move(other._values);
+		_pArray = 0;
+	}
+	return *this;
+}
+
+
+#endif // POCO_ENABLE_CPP11
+
+
 } } // namespace Poco::JSON
