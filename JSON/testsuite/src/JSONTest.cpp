@@ -376,7 +376,7 @@ void JSONTest::testEmptyObject()
 
 void JSONTest::testComplexObject()
 {
-	std::string json = 
+	std::string json =
 	"{"
 		"\"id\": 1,"
 		"\"jsonrpc\": \"2.0\","
@@ -430,7 +430,7 @@ void JSONTest::testComplexObject()
 			"}"
 		"]"
 	"}";
-	
+
 	Parser parser;
 	Var result;
 
@@ -599,7 +599,7 @@ void JSONTest::testObjectProperty()
 	}
 
 	assert(result.type() == typeid(Object::Ptr));
-	
+
 	Object::Ptr object = result.extract<Object::Ptr>();
 	assert (object->isObject("test"));
 	assert (!object->isArray("test"));
@@ -1104,7 +1104,7 @@ void JSONTest::testComment()
 	catch(Poco::SyntaxException&)
 	{
 	}
-	
+
 	parser.reset();
 	parser.setAllowComments(true);
 	try
@@ -1187,7 +1187,7 @@ void JSONTest::testPrintHandler()
 		"}"
 	);
 
-	json = 
+	json =
 		"{"
 			"\"array\":"
 			"["
@@ -1453,7 +1453,7 @@ void JSONTest::testStringifyPreserveOrder()
 	assert (ostr.str() == "{\"Simpsons\":{\"husband\":{\"name\":\"Homer\",\"age\":38},\"wife\":{\"name\":\"Marge\",\"age\":36},"
 						"\"children\":[\"Bart\",\"Lisa\",\"Maggie\"],"
 						"\"address\":{\"number\":742,\"street\":\"Evergreen Terrace\",\"town\":\"Springfield\"}}}");
-	
+
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 1);
 	assert (ostr.str() == "{\n"
@@ -1473,7 +1473,7 @@ void JSONTest::testStringifyPreserveOrder()
 						"  ],\n"
 						"  \"address\" : {\n"
 						"   \"number\" : 742,\n"
-						"   \"street\" : \"Evergreen Terrace\",\n" 
+						"   \"street\" : \"Evergreen Terrace\",\n"
 						"   \"town\" : \"Springfield\"\n"
 						"  }\n"
 						" }\n"
@@ -1498,7 +1498,7 @@ void JSONTest::testStringifyPreserveOrder()
 						"    ],\n"
 						"    \"address\" : {\n"
 						"      \"number\" : 742,\n"
-						"      \"street\" : \"Evergreen Terrace\",\n" 
+						"      \"street\" : \"Evergreen Terrace\",\n"
 						"      \"town\" : \"Springfield\"\n"
 						"    }\n"
 						"  }\n"
@@ -1523,7 +1523,7 @@ void JSONTest::testStringifyPreserveOrder()
 						"        ],\n"
 						"        \"address\" : {\n"
 						"            \"number\" : 742,\n"
-						"            \"street\" : \"Evergreen Terrace\",\n" 
+						"            \"street\" : \"Evergreen Terrace\",\n"
 						"            \"town\" : \"Springfield\"\n"
 						"        }\n"
 						"    }\n"
@@ -1534,16 +1534,16 @@ void JSONTest::testStringifyPreserveOrder()
 	assert (ds["Simpsons"]["husband"].isStruct());
 	assert (ds["Simpsons"]["husband"]["name"] == "Homer");
 	assert (ds["Simpsons"]["husband"]["age"] == 38);
-	
+
 	assert (ds["Simpsons"]["wife"].isStruct());
 	assert (ds["Simpsons"]["wife"]["name"] == "Marge");
 	assert (ds["Simpsons"]["wife"]["age"] == 36);
-	
+
 	assert (ds["Simpsons"]["children"].isArray());
 	assert (ds["Simpsons"]["children"][0] == "Bart");
 	assert (ds["Simpsons"]["children"][1] == "Lisa");
 	assert (ds["Simpsons"]["children"][2] == "Maggie");
-	
+
 	assert (ds["Simpsons"]["address"].isStruct());
 	assert (ds["Simpsons"]["address"]["number"] == 742);
 	assert (ds["Simpsons"]["address"]["street"] == "Evergreen Terrace");
@@ -1625,7 +1625,7 @@ void JSONTest::testInvalidJanssonFiles()
 					parser.parse(fis);
 					result = parser.asVar();
 					// We shouldn't get here.
-					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl; 
+					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl;
 					fail(result.convert<std::string>());
 				}
 				catch(JSONException&)
@@ -1668,7 +1668,7 @@ void JSONTest::testInvalidUnicodeJanssonFiles()
 					parser.parse(fis);
 					result = parser.asVar();
 					// We shouldn't get here.
-					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl; 
+					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl;
 					fail(result.convert<std::string>());
 				}
 				catch(JSONException&)
@@ -1782,6 +1782,38 @@ void JSONTest::testSmallBuffer()
 	parser.parse(jsonStr);
 }
 
+void JSONTest::testEscape0()
+{
+	Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+
+	std::string nullString("B\0b", 3);
+	json->set("name", nullString);
+
+	std::stringstream ss;
+	json->stringify(ss);
+
+	assert(ss.str().compare("{\"name\":\"B\\u0000b\"}") == 0);
+}
+
+void JSONTest::testEscapeUnicode()
+{
+	Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+	std::string chinese("{ \"name\" : \"\\u4e2d\" }");
+	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
+	Var result = parser.parse(chinese);
+
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+
+	std::stringstream ss;
+	object->stringify(ss);
+
+	//assert(ss.str().compare("{\"name\":\"B\\u0000b\"}") == 0);
+
+	std::cout << ss.str() << std::endl;
+}
+
 
 std::string JSONTest::getTestFilesPath(const std::string& type)
 {
@@ -1798,6 +1830,7 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 	ostr.str("");
 	ostr << "/JSON/testsuite/data/" << type << '/';
 	validDir = Poco::Environment::get("POCO_BASE") + ostr.str();
+	std::cout << validDir << std::endl;
 	pathPattern = validDir;
 
 	if (Poco::File(pathPattern).exists())
@@ -1855,6 +1888,8 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testTemplate);
 	CppUnit_addTest(pSuite, JSONTest, testUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testSmallBuffer);
+	CppUnit_addTest(pSuite, JSONTest, testEscape0);
+	CppUnit_addTest(pSuite, JSONTest, testEscapeUnicode);
 
 	return pSuite;
 }
