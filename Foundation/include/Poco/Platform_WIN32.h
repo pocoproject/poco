@@ -195,10 +195,23 @@
 #endif
 
 
-// Enable C++11 support for VS 2010 and newer
-//#if defined(_MSC_VER) && (_MSC_VER >= 1700) && !defined(POCO_ENABLE_CPP11)
-//	#define POCO_ENABLE_CPP11
-//#endif
+//
+// C++11/14 support
+//
+
+// Enable C++11 support for VS 2013 and newer
+#if defined(_MSC_VER) && (_MSC_VER >= 1800) && !defined(POCO_ENABLE_CPP11) && !defined(POCO_DISABLE_CPP11)
+	#define POCO_ENABLE_CPP11
+#endif
+
+#if defined(POCO_ENABLE_CPP11)
+
+// Enable C++14 support for VS 2013 and newer
+#if defined(_MSC_VER) && (_MSC_VER >= 1800) && !defined(POCO_ENABLE_CPP14) && !defined(POCO_DISABLE_CPP14)
+	#define POCO_ENABLE_CPP14
+#endif
+
+#endif // defined(POCO_ENABLE_CPP11)
 
 
 #if defined(__INTEL_COMPILER)
