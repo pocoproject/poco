@@ -120,6 +120,7 @@ RemotingNG
 XSD
 stage/
 releases/
+Zip/testsuite/data*.bin
 
 
 # openssl binaries #
