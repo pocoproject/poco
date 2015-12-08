@@ -12,8 +12,8 @@ find_path(MYSQL_INCLUDE_DIR mysql.h
 		$ENV{MYSQL_DIR}/include
 		$ENV{ProgramFiles}/MySQL/*/include
 		${BINDIR32}/MySQL/include
-        ${BINDIR32}/MySQL/*/include
-        $ENV{SystemDrive}/MySQL/*/include)
+        	${BINDIR32}/MySQL/*/include
+        	$ENV{SystemDrive}/MySQL/*/include)
 
 if (WIN32)
 	if (CMAKE_BUILD_TYPE STREQUAL Debug)
