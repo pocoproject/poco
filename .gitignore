@@ -103,6 +103,7 @@ lib/*
 lib64/*
 pocomsg.h
 */testsuite/bin/*
+Util/testsuite/TestConfiguration/
 
 # Eclipse generated files #
 ######################
@@ -124,6 +125,9 @@ releases/
 # openssl binaries #
 ####################
 openssl/packages/
+
+!openssl/Ionic/zip-v1.9/Release/*.dll
+!openssl/Ionic/zlib-v1.9/Release/*.dll
 
 !openssl/win32/bin/debug/*.dll
 !openssl/win32/bin/debug/*.lib

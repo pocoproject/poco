@@ -282,13 +282,13 @@ ThreadPool::ThreadPool(int minCapacity,
 }
 
 
-ThreadPool::ThreadPool(const std::string& name,
+ThreadPool::ThreadPool(const std::string& rName,
 	int minCapacity,
 	int maxCapacity,
 	int idleTime,
 	int stackSize,
 	ThreadAffinityPolicy affinityPolicy):
-	_name(name),
+	_name(rName),
 	_minCapacity(minCapacity), 
 	_maxCapacity(maxCapacity), 
 	_idleTime(idleTime),
@@ -414,9 +414,9 @@ void ThreadPool::start(Runnable& target, int cpu)
 }
 
 
-void ThreadPool::start(Runnable& target, const std::string& name, int cpu)
+void ThreadPool::start(Runnable& target, const std::string& rName, int cpu)
 {
-	getThread()->start(Thread::PRIO_NORMAL, target, name, affinity(cpu));
+	getThread()->start(Thread::PRIO_NORMAL, target, rName, affinity(cpu));
 }
 
 
@@ -426,9 +426,9 @@ void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, 
 }
 
 
-void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, const std::string& name, int cpu)
+void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, const std::string& rName, int cpu)
 {
-	getThread()->start(priority, target, name, affinity(cpu));
+	getThread()->start(priority, target, rName, affinity(cpu));
 }
 
 
@@ -542,9 +542,9 @@ PooledThread* ThreadPool::getThread()
 
 PooledThread* ThreadPool::createThread()
 {
-	std::ostringstream name;
-	name << _name << "[#" << ++_serial << "]";
-	return new PooledThread(name.str(), _stackSize);
+	std::ostringstream threadName;
+	threadName << _name << "[#" << ++_serial << "]";
+	return new PooledThread(threadName.str(), _stackSize);
 }
 
 

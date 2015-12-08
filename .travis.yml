@@ -11,7 +11,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then tar -xzvf cmake-3.2.3-Linux-x86_64.tar.gz; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export PATH=$PWD/cmake-3.2.3-Linux-x86_64/bin:$PATH; fi
   - sudo apt-get update -qq
-  - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev libsqlite3-dev
+  - sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev libsqlite3-dev 
   - sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 
   - sudo apt-get install -qq -y sloccount cppcheck 
 
@@ -20,7 +20,10 @@ services:
   - redis-server
 
 notifications:
-  slack: pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
+  slack: 
+    rooms:
+      - pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
+      - kampbell:v4ARuptk0ETzwUsKDdV6Gspb#travis
 
 env:
   global: TEST_NAME=""
@@ -35,20 +38,20 @@ matrix:
       compiler: gcc
       script:
         - ./configure --everything && make -s -j2
-        - ./travis/runtests.sh
+        - travis_wait 30 ./travis/runtests.sh
     
     - env:    TEST_NAME="gcc (make) unbundled"
       compiler: gcc
       script:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - ./configure --everything --unbundled && make -s -j2
-        - ./travis/runtests.sh
+        - travis_wait 30 ./travis/runtests.sh
     
     - env:    TEST_NAME="clang (make)"
       compiler: clang
       script:
         - ./configure --everything --config=Linux-clang && make -s -j2
-        - ./travis/runtests.sh
+        - travis_wait 30 ./travis/runtests.sh
 
     #FIXME    the -m64 option bring by the Linux config is not supported by arm-linux-gnueabi-g++ which makes this test failing
     #FIXME    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
@@ -99,6 +102,12 @@ matrix:
     #    - sudo -E build/script/runtests.sh
 
     # QA jobs for code analytics and metrics
+    # build documentation and release
+    - env:    TEST_NAME="documentation & release"
+      compiler: gcc
+      script:
+        - . env.sh && mkdoc all && mkrel all
+
     # static code analysis with cppcheck (we can add --enable=all later)
     - env:    TEST_NAME="cppcheck"
       script: cppcheck --force --quiet --inline-suppr -j2 -iData/SQLite/src/sqlite3.c .

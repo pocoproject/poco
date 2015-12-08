@@ -48,7 +48,7 @@ Path::Path(): _absolute(false)
 }
 
 
-Path::Path(bool absolute): _absolute(absolute)
+Path::Path(bool absolutePath): _absolute(absolutePath)
 {
 }
 
@@ -90,39 +90,39 @@ Path::Path(const Path& path):
 }
 
 
-Path::Path(const Path& parent, const std::string& fileName):
-	_node(parent._node), 
-	_device(parent._device),
-	_name(parent._name),
-	_version(parent._version),
-	_dirs(parent._dirs),
-	_absolute(parent._absolute)
+Path::Path(const Path& rParent, const std::string& fileName):
+	_node(rParent._node), 
+	_device(rParent._device),
+	_name(rParent._name),
+	_version(rParent._version),
+	_dirs(rParent._dirs),
+	_absolute(rParent._absolute)
 {	
 	makeDirectory();
 	_name = fileName;
 }
 
 
-Path::Path(const Path& parent, const char* fileName):
-	_node(parent._node), 
-	_device(parent._device),
-	_name(parent._name),
-	_version(parent._version),
-	_dirs(parent._dirs),
-	_absolute(parent._absolute)
+Path::Path(const Path& rParent, const char* fileName):
+	_node(rParent._node), 
+	_device(rParent._device),
+	_name(rParent._name),
+	_version(rParent._version),
+	_dirs(rParent._dirs),
+	_absolute(rParent._absolute)
 {	
 	makeDirectory();
 	_name = fileName;
 }
 
 
-Path::Path(const Path& parent, const Path& relative):
-	_node(parent._node), 
-	_device(parent._device),
-	_name(parent._name),
-	_version(parent._version),
-	_dirs(parent._dirs),
-	_absolute(parent._absolute)
+Path::Path(const Path& rParent, const Path& relative):
+	_node(rParent._node), 
+	_device(rParent._device),
+	_name(rParent._name),
+	_version(rParent._version),
+	_dirs(rParent._dirs),
+	_absolute(rParent._absolute)
 {	
 	resolve(relative);
 }
