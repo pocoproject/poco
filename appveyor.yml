@@ -1,11 +1,305 @@
-version: '{build}'
+version: 1.7.0.{build}-{branch}
+
+cache:
+    - c:\OpenSSL-Win32
+    - c:\OpenSSL-Win64
+    - c:\ProgramData\chocolatey
+    - c:\mysql-5.7.9-win32
+
+# no need to start services until tests are run.
+#services:
+#  - mongodb
+#  - mysql
+  
+os: Windows Server 2012
+
+platform:
+#  - x86
+#  - x64
+
+# to add several configurations to build matrix:
+configuration:
+  - debug
+  - release
+
+
+environment:
+  bundling: bundled
+    
+  matrix:
+    - builder: 120
+      ssl: Win32
+      vc: x86
+      target: x86
+      system: Win32
+      linkmode: shared
+      suffix:
+
+    - builder: 120
+      ssl: Win32
+      vc: x86
+      target: x86
+      system: Win32
+      linkmode: static_md
+      suffix:
+
+    - builder: 120
+      ssl: Win32
+      vc: x86
+      target: x86
+      system: Win32
+      linkmode: static_mt
+      suffix:
+
+    - builder: 120
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
+      linkmode: shared
+      suffix: 64
+      sln: x64
+      
+    - builder: 120
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
+      linkmode: static_md
+      suffix: 64
+      sln: x64
+      
+    - builder: 120
+      ssl: Win64
+      vc: x86_amd64
+      target: x86_64
+      system: x64
+      linkmode: static_mt
+      suffix: 64
+      
+    - builder: 140
+      ssl: Win32
+      vc: x86
+      target: x86
+      system: Win32
+      linkmode: shared
+      suffix:
+
+    - builder: 140
+      ssl: Win32
+      vc: x86
+      target: x86
+      system: Win32
+      linkmode: static_md
+      suffix:
+
+# commented out until openssl for static link be solved      
+#    - builder: 140
+#      ssl: Win32
+#      vc: x86
+#      target: x86
+#      system: Win32
+#      linkmode: static_mt
+#      suffix:
+
+# commented out until VS2015 install be fixed on AppVeyor      
+#    - builder: 140
+#      ssl: Win64
+#      vc: x86_amd64
+#      target: x86_64
+#      system: x64
+#      linkmode: shared
+#      suffix: 64
+#      sln: x64
+      
+#    - builder: 140
+#      ssl: Win64
+#      vc: x86_amd64
+#      target: x86_64
+#      system: x64
+#      linkmode: static_md
+#      suffix: 64
+#      sln: x64
+
+# commented out until openssl for static link be solved      
+#    - builder: 140
+#      ssl: Win64
+#      vc: x86_amd64
+#      target: x86_64
+#      system: x64
+#      linkmode: static_mt
+#      suffix: 64
+#      sln: x64
+      
+#    - builder: cmake
+#      ssl: Win64
+#      vc: amd64
+#      target: x86_64
+      
+#    - builder: cmake
+#      ssl: Win32
+#      vc: amd64_x86
+#      target: x86
+
+matrix:
+  fast_finish: true
+
 
 install:
-  - cinst cmake
+  - systeminfo
+  - c:\cygwin\bin\uname -a
+  - c:\cygwin\bin\cat /proc/cpuinfo
+  - c:\cygwin\bin\cat /proc/meminfo
+  - ps: |
+        if ($env:system -eq "cygwin")
+        {
+          if (!(Test-Path "c:/cygwin/bin/gcc.exe"))
+          {
+             & c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P gcc
+             & c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P g++
+          }
+          if (!(Test-Path "c:/cygwin/bin/gcc.exe"))
+          {
+             & c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P gcc
+             & c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P g++
+          }
+        }
+  - ps: |
+        if ($env:system -eq "cmake")
+        {
+          if (Test-Path "$env:ChocolateyInstall/bin/jom.exe")
+          {
+            echo "using jom from cache"
+          }
+          else
+          {
+            choco install jom
+          }
+        }
+  - ps: |
+        if (Test-Path "c:\OpenSSL-$env:ssl")
+        {
+            echo "using openssl from cache"
+        }
+        else
+        {
+            echo "downloading openssl"
+            Invoke-WebRequest "https://slproweb.com/download/$($env:ssl)OpenSSL-1_0_2d.exe" -OutFile c:\openssl-setup.exe
+            echo "installing openssl"
+            Start-Process -Wait -FilePath c:\openssl-setup.exe -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes"
+        }
+#  MySQL 32 bit is not available by default on AppVeyor
+  - ps: |
+        if ($env:system -eq "Win32")
+        {
+            if (Test-Path "c:\mysql-5.7.9-win32") {
+                echo "using mysql-5.7.9-win32 from cache"
+            }
+            else
+            {
+                echo "downloading mysql-5.7.9-win32"
+                Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile mysql-5.7.9-win32.zip
+                echo "installing mysql-5.7.9-win32"
+                7z x -y mysql-5.7.9-win32.zip -oc:\
+            }
+        }
+#   c:\cygwin\bin\find /cygdrive/c/mysql-5.7.9-win32 "-type" f
+#  chocolatey brokes jom, here's workaround
+#  see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
+  - ps: |
+        if ($env:builder -eq "cmake")
+        {
+          $env:PATH = $env:ChocolateyInstall + "\bin" + ";" + $env:PATH
+          $env:PATH = $env:ChocolateyInstall + "\lib\jom\content" + ";" + $env:PATH
+        }
+
+before_build:
+ 
+# msbuild
+  - ps: |
+      if ($env:builder -eq "120")
+      {
+        & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %vc%
+      }
+      if ($env:builder -eq "140")
+      {
+        & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %vc%
+      }
+  
+# MySQL
+  - ps: |
+      if ($env:system -eq "Win32")
+      {
+          $env:INCLUDE = "C:\mysql-5.7.9-win32\include;" + $env:INCLUDE
+          $env:LIB     = "C:\mysql-5.7.9-win32\lib;" + $env:LIB
+      }
+      if ($env:system -eq "x64")
+      {
+          $env:INCLUDE = "C:\Program Files\MySql\MySQL Server 5.6\include;" + $env:INCLUDE
+          $env:LIB     = "C:\Program Files\MySql\MySQL Server 5.6\lib;" + $env:LIB
+      }
+# OpenSSL  
+  - set INCLUDE=C:\OpenSSL-%ssl%\include;%INCLUDE%
+  - set     LIB=C:\OpenSSL-%ssl%\lib;C:\OpenSSL-%ssl%\lib\VC;C:\OpenSSL-%ssl%\lib\VC\static;%LIB%  
+  - set INCLUDE
+  - set LIB
+
+after_build:
+
+build:
 
 build_script:
-  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
-  - mkdir cmake-build
-  - cd cmake-build
-  - cmake ..
-  - cmake --build .
+  - ps: |
+      if ($env:builder -eq "cmake")
+      {
+         mkdir install
+         & .\build_cmake.cmd %Configuration% "-DCMAKE_INSTALL_PREFIX=%CD%\install"
+      }
+      else
+      {
+         & .\buildwin.cmd %builder% build %linkmode% %Configuration% %system% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+      }
+
+
+before_test:
+
+after_test:
+
+test_script:
+  - ps: |
+      if ($env:builder -eq "cmake")
+      {
+      }
+      if (($env:builder -ne "cmake") -and ($env:linkmode -eq "shared"))
+      {    
+         $env:PATH = $env:CD + "\bin" + $env:suffix + ";" + $env:PATH
+         $env:EXCLUDE_TESTS = "Foundation"
+      }
+# FIXME test runs in loop and job fails by timeout
+#         & .\build\script\runtests2 %suffix%
+ 
+ 
+on_success:
+  - echo success
+
+on_failure:
+  - echo failure
+
+on_finish:
+  - echo finish
+  
+  
+notifications:
+  - provider: Email
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: false
+    
+      
+  - provider: Slack
+    auth_token:
+      secure: xoOlP1UHshqjvh/INwMcNhZ5UHsTVKLGY5maTSjaxDc0fvRwoWIdYvY/CofQEuy2wOIBQK4eLD+tA0xG78ZgqQ==
+    channel: poco
+    on_build_success: false
+    on_build_status_changed: false
+ 

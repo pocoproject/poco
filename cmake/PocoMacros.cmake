@@ -280,3 +280,27 @@ macro(POCO_INSTALL_PDB target_name)
             )
     endif()
 endmacro()
+
+#===============================================================================
+# Macros for simplified installation of package not following the Poco standard as CppUnit
+#
+#  SIMPLE_INSTAL - Install the given target
+#    Usage: SIMPLE_INSTAL(target_name)
+#      INPUT:
+#           target_name             the name of the target. i.e CppUnit
+#    Example: SIMPLE_INSTAL(CppUnit)
+macro(SIMPLE_INSTAL target_name)
+install(
+    DIRECTORY include
+    DESTINATION include
+    COMPONENT Devel
+    PATTERN ".svn" EXCLUDE
+    )
+install(
+    TARGETS "${target_name}" EXPORT "${target_name}Targets"
+    LIBRARY DESTINATION lib${LIB_SUFFIX}
+    ARCHIVE DESTINATION lib${LIB_SUFFIX}
+    RUNTIME DESTINATION bin
+    )
+
+endmacro()
