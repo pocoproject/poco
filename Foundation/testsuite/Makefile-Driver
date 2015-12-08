@@ -51,3 +51,9 @@ include $(POCO_BASE)/build/rules/exec
 ifdef POCO_UNBUNDLED
         SYSLIBS += -lz -lpcre
 endif
+
+COMMONFLAGS += -Wno-unused-variable -Wno-unused-but-set-variable
+
+ifeq ($(LINKMODE),SHARED)
+SHAREDOPT_LINK += -Wl,-rpath,$(BINPATH)
+endif

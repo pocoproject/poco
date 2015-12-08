@@ -207,7 +207,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
 		if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
 		// close all open file descriptors other than stdin, stdout, stderr
-		for (int fd = 3; i < sysconf(_SC_OPEN_MAX); ++fd)
+		for (int fd = 3; fd < sysconf(_SC_OPEN_MAX); ++fd)
 		{
 			close(fd);
 		}

@@ -26,15 +26,10 @@
 namespace Poco {
 
 
-std::string Foundation_API toJSON(char c);
-	/// Utility function for escaping JSON characters.
-
-
 void Foundation_API toJSON(const std::string& value, std::ostream& out, bool wrap = true);
-	/// Formats string value into the supplied output stream by 
+	/// Formats string value into the supplied output stream by
 	/// escaping control characters.
 	/// If wrap is true, the resulting string is enclosed in double quotes
-
 
 std::string Foundation_API toJSON(const std::string& value, bool wrap = true);
 	/// Formats string value by escaping control characters.
