@@ -121,6 +121,9 @@ XSD
 stage/
 releases/
 */testsuite/TestConfiguration/
+Zip/testsuite/testdir/
+Zip/testsuite/test.dat
+Zip/testsuite/testfile*.txt
 
 # openssl binaries #
 ####################
