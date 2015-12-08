@@ -42,7 +42,6 @@ Int64 Database::count(Connection& connection, const std::string& collectionName)
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-
 		if (doc->isType<double>("n")) {
 			return static_cast<Int64>(doc->get<double>("n"));
 		}

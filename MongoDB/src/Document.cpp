@@ -18,6 +18,7 @@
 
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/Binary.h"
+#include "Poco/MongoDB/UUID.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/RegularExpression.h"
@@ -65,7 +66,8 @@ void Document::read(BinaryReader& reader)
 	{
 		Element::Ptr element;
 
-		std::string name = BSONReader(reader).readCString();
+		BSONReader bsonReader(reader);
+		std::string name = bsonReader.readCString();
 
 		switch(type)
 		{
@@ -85,8 +87,25 @@ void Document::read(BinaryReader& reader)
 			element = new ConcreteElement<Array::Ptr>(name, new Array());
 			break;
 		case ElementTraits<Binary::Ptr>::TypeId:
-			element = new ConcreteElement<Binary::Ptr>(name, new Binary());
+		{
+			Poco::Int32 size;
+			reader >> size;
+			unsigned char subtype;
+			reader >> subtype;
+
+			if ( size == UUID::uuidSize && (subtype == UUID::uuidSubtype) )
+			{
+				// BSON UUID (type 0x04)
+				element = new ConcreteElement<UUID::Ptr>(name, new UUID());
+			}
+			else
+			{
+				// Other BSON binary
+				element = new ConcreteElement<Binary::Ptr>(name, new Binary(size, subtype));
+			}
+
 			break;
+		}
 		case ElementTraits<ObjectId::Ptr>::TypeId:
 			element = new ConcreteElement<ObjectId::Ptr>(name, new ObjectId());
 			break;
@@ -166,7 +185,7 @@ std::string Document::toString(int indent) const
 }
 
 
-void Document::write(BinaryWriter& writer)
+void Document::write(BinaryWriter& writer) const
 {
 	if ( _elements.empty() )
 	{
@@ -176,7 +195,7 @@ void Document::write(BinaryWriter& writer)
 	{
 		std::stringstream sstream;
 		Poco::BinaryWriter tempWriter(sstream);
-		for(ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
+		for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
 		{
 			tempWriter << static_cast<unsigned char>((*it)->type());
 			BSONWriter(tempWriter).writeCString((*it)->name());
