@@ -55,10 +55,10 @@ after_build:
 build_script:
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
   - mkdir cmake-build
-  - pushd cmake-build
-  - cmake .. -DENABLE_DATA_MYSQL=OFF -DENABLE_CRYPTO=OFF -DENABLE_NETSSL=OFF -DENABLE_TESTS=ON -DENABLE_REDIS=OFF  
+  - cd cmake-build
+  - cmake .. -G "Visual Studio 12 2013" -DENABLE_DATA_MYSQL=OFF -DENABLE_CRYPTO=OFF -DENABLE_NETSSL=OFF -DENABLE_TESTS=ON -DENABLE_REDIS=OFF  
   - cmake --build . --config %configuration% -- /nologo /v:minimal
-  - popd
+  - cd ..
   
   
 before_test:
