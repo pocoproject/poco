@@ -12,7 +12,7 @@ services:
   - mssql2014  
 
 configuration:
-#  - Debug
+  - Debug
   - Release
 
 install:
@@ -73,7 +73,7 @@ test_script:
 #  - set PATH=%CD%\cmake-build\bin\Release;%PATH%
 #  - set EXCLUDE_TESTS=Crypto,NetSLL_Win,Data/ODBC,Data/MySQL
 #  - build\script\runtests2.cmd
-  - ctest -VV -C %configuration% -E "Data[O,M].*"
+  - ctest -VV -C %configuration% -E "Data*"
 
   
   
