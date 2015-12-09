@@ -66,9 +66,10 @@ before_test:
 after_test:
 
 test_script:
-  - set PATH=%CD%\cmake-build\bin\Release;%PATH%
-  - set EXCLUDE_TESTS=Crypto,NetSLL_Win,Data/ODBC,Data/MySQL
-  - build\script\runtests2.cmd
+#  - set PATH=%CD%\cmake-build\bin\Release;%PATH%
+#  - set EXCLUDE_TESTS=Crypto,NetSLL_Win,Data/ODBC,Data/MySQL
+#  - build\script\runtests2.cmd
+  - ctest -VV -C %configuration%
 
   
   
