@@ -49,10 +49,7 @@ public:
 
 private:
 
-	std::string _host;
-	unsigned    _port;
-	static bool _connected;
-	static Poco::MongoDB::Connection _mongo;
+	static Poco::MongoDB::Connection::Ptr _mongo;
 
 };
 

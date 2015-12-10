@@ -163,6 +163,29 @@ void HTMLFormTest::testReadUrlGET()
 }
 
 
+void HTMLFormTest::testReadUrlGETMultiple()
+{
+	HTTPRequest req("GET", "/form.cgi?field1=value1&field1=value%202&field1=value%3D3&field1=value%264");
+	HTMLForm form(req);
+	assert (form.size() == 4);
+	
+	HTMLForm::ConstIterator it = form.find("field1");
+	assert (it != form.end());
+	assert (it->first == "field1" && it->second == "value1");
+	++it;
+	assert (it != form.end());
+	assert (it->first == "field1" && it->second == "value 2");
+	++it;
+	assert (it != form.end());
+	assert (it->first == "field1" && it->second == "value=3");
+	++it;
+	assert (it != form.end());
+	assert (it->first == "field1" && it->second == "value&4");
+	++it;
+	assert (it == form.end());
+}
+
+
 void HTMLFormTest::testReadUrlPOST()
 {
 	HTTPRequest req("POST", "/form.cgi?field0=value0");
@@ -295,6 +318,21 @@ void HTMLFormTest::testSubmit3()
 }
 
 
+void HTMLFormTest::testSubmit4()
+{
+	HTMLForm form;
+	form.add("field1", "value1");
+	form.add("field1", "value 2");
+	form.add("field1", "value=3");
+	form.add("field1", "value&4");
+	
+	HTTPRequest req("GET", "/form.cgi");
+	form.prepareSubmit(req);
+
+	assert (req.getURI() == "/form.cgi?field1=value1&field1=value%202&field1=value%3D3&field1=value%264");
+}
+
+
 void HTMLFormTest::testFieldLimitUrl()
 {
 	HTTPRequest req("GET", "/form.cgi?field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
@@ -371,6 +409,7 @@ CppUnit::Test* HTMLFormTest::suite()
 	CppUnit_addTest(pSuite, HTMLFormTest, testWriteUrl);
 	CppUnit_addTest(pSuite, HTMLFormTest, testWriteMultipart);
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlGET);
+	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlGETMultiple);
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlPOST);
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlPUT);
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlBOM);
@@ -378,6 +417,7 @@ CppUnit::Test* HTMLFormTest::suite()
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit1);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit2);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit3);
+	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit4);
 	CppUnit_addTest(pSuite, HTMLFormTest, testFieldLimitUrl);
 	CppUnit_addTest(pSuite, HTMLFormTest, testFieldLimitMultipart);
 

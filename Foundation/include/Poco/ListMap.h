@@ -140,19 +140,8 @@ public:
 		/// Returns iterator pointing to the newly inserted value 
 	{
 		Iterator it = find(val.first);
-
-		if (it == _list.end())
-		{
-			_list.push_back(val);
-			it = _list.end();
-			--it;
-		}
-		else
-		{
-			_list.insert(it, 1, val);
-		}
-
-		return it;
+		while (it != _list.end() && isEqual(it->first, val.first)) ++it;
+		return _list.insert(it, val);
 	}
 	
 	void erase(Iterator it)
