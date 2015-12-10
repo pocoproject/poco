@@ -4,8 +4,11 @@ rem $Id$
 rem
 rem A script for running the POCO testsuites.
 rem
-rem usage: runtests2 [64]
+rem usage: runtests2 [64] [component [test]]
 rem
+rem component   : the component under test
+rem test        : the test as part of the component
+
 rem If the environment variable EXCLUDE_TESTS is set, containing
 rem a space-separated list of project names (as found in the
 rem components file), these tests will be skipped.
@@ -15,19 +18,27 @@ setlocal EnableDelayedExpansion
 
 set TESTRUNNER=TestSuite.exe
 set TESTRUNNERARGS=-all
+set TESTCOMPONENTS='findstr /R "." components'
 set BINDIR=bin
 
 if "%1"=="64" (
   set BINDIR=bin64
+  shift
+)
+if not "%1" == "" (
+  set TESTCOMPONENTS="%1"
+  if not "%2" == "" (
+    set TESTRUNNERARGS=%2
+  )
 )
 
 set runs=0
 set failures=0
 set failedTests=
 set status=0
-set excluded=0
 
-for /f %%C in ('findstr /R "." components') do (
+
+for /f %%C in ( %TESTCOMPONENTS% ) do (
   set excluded=0
   for %%X in (%EXCLUDE_TESTS%) do (
     if "%%X"=="%%C" (
