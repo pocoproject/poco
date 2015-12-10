@@ -1,4 +1,6 @@
 trap -p
+trap SIGINT
+trap -p
 set -ev
 export POCO_BASE=`pwd`
 export CPPUNIT_IGNORE="\
