@@ -141,7 +141,7 @@ public:
 	{
 		Iterator it = find(val.first);
 		while (it != _list.end() && isEqual(it->first, val.first)) ++it;
-		return _list.insert(it, 1, val);
+		return _list.insert(it, val);
 	}
 	
 	void erase(Iterator it)
