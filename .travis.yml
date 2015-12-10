@@ -23,7 +23,7 @@ notifications:
   slack: 
     rooms:
       - pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
-      - kampbell:v4ARuptk0ETzwUsKDdV6Gspb#travis
+      - kampbell:v4ARuptk0ETzwUsKDdV6Gspb#poco
 
 env:
   global: TEST_NAME=""
@@ -31,6 +31,7 @@ env:
 before_script:
  - echo ${TEST_NAME}
  - sqlite3 -version
+ - trap -p
 
 matrix:
   include:
