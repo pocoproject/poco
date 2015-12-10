@@ -39,20 +39,23 @@ matrix:
       compiler: gcc
       script:
         - ./configure --everything && make -s -j2
-        - travis_wait 30 ./travis/runtests.sh
+        - trap -p
+        - ./travis/runtests.sh
     
     - env:    TEST_NAME="gcc (make) unbundled"
       compiler: gcc
       script:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - ./configure --everything --unbundled && make -s -j2
-        - travis_wait 30 ./travis/runtests.sh
+        - trap -p
+        - ./travis/runtests.sh
     
     - env:    TEST_NAME="clang (make)"
       compiler: clang
       script:
         - ./configure --everything --config=Linux-clang && make -s -j2
-        - travis_wait 30 ./travis/runtests.sh
+        - trap -p
+        - ./travis/runtests.sh
 
     - env:    TEST_NAME="arm-linux-gnueabi- (make)"
       script:
