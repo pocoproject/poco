@@ -17,6 +17,9 @@
 #include "Poco/Foundation.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Error.h"
+#ifdef POCO_OS_FAMILY_WINDOWS
+#include "Poco/UnWindows.h"
+#endif
 #include <string>
 #include <string.h>
 #include <errno.h>
@@ -26,13 +29,13 @@ namespace Poco {
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
-	DWORD Error::last()
+	Poco::UInt32 Error::last()
 	{
 		return GetLastError();
 	}
 
 
-	std::string Error::getMessage(DWORD errorCode)
+	std::string Error::getMessage(Poco::UInt32 errorCode)
 	{
 		std::string errMsg;
 		DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;

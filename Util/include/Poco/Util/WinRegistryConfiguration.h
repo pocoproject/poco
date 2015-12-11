@@ -23,6 +23,7 @@
 #include "Poco/Util/Util.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/String.h"
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

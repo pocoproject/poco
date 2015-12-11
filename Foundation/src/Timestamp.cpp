@@ -17,6 +17,12 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include "Poco/UnWindows.h"
+#if defined(_WIN32_WCE)
+#include <cmath>
+#endif
+#endif
 #include <algorithm>
 #undef min
 #undef max
@@ -29,11 +35,6 @@
 #else
 #include <sys/time.h>
 #include <sys/times.h>
-#endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "Poco/UnWindows.h"
-#if defined(_WIN32_WCE)
-#include <cmath>
 #endif
 #endif
 
