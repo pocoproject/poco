@@ -23,7 +23,7 @@ services:
 notifications:
   slack: 
     rooms:
-      - pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
+      - pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t#travis
       - kampbell:v4ARuptk0ETzwUsKDdV6Gspb#poco
 
 env:
@@ -32,7 +32,6 @@ env:
 before_script:
  - echo ${TEST_NAME}
  - sqlite3 -version
- - trap -p
 
 matrix:
   include:
@@ -40,14 +39,13 @@ matrix:
       compiler: clang
       os: osx
       script:
-        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make -s -j2
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make install -s -j2
         - ./travis/runtests.sh
 
     - env:    TEST_NAME="Linux gcc (make) bundled"
       compiler: gcc
       script:
         - ./configure --everything && make -s -j2
-        - trap -p
         - ./travis/runtests.sh
     
     - env:    TEST_NAME="Linux gcc (make) unbundled"
@@ -55,14 +53,12 @@ matrix:
       script:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - ./configure --everything --unbundled && make -s -j2
-        - trap -p
         - ./travis/runtests.sh
     
     - env:    TEST_NAME="Linux clang (make)"
       compiler: clang
       script:
         - ./configure --everything --config=Linux-clang && make -s -j2
-        - trap -p
         - ./travis/runtests.sh
 
     - env:    TEST_NAME="Linux arm-linux-gnueabi- (make)"
