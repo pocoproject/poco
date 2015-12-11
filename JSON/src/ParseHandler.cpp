@@ -122,20 +122,20 @@ void ParseHandler::key(const std::string& k)
 }
 
 
-void ParseHandler::setValue(const Var& value)
+void ParseHandler::setValue(const Var& rValue)
 {
 	Var parent = _stack.top();
 
 	if ( parent.type() == typeid(Array::Ptr) )
 	{
 		Array::Ptr arr = parent.extract<Array::Ptr>();
-		arr->add(value);
+		arr->add(rValue);
 	}
 	else if ( parent.type() == typeid(Object::Ptr) )
 	{
 		poco_assert_dbg(!_key.empty());
 		Object::Ptr obj = parent.extract<Object::Ptr>();
-		obj->set(_key, value);
+		obj->set(_key, rValue);
 		_key.clear();
 	}
 }
