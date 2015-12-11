@@ -87,3 +87,8 @@ ifndef OSARCH_64BITS
     OSARCH_64BITS = 0
   endif
 endif
+
+#
+# C++11/14 detection
+#
+include $(POCO_BASE)/build/script/cpp11-gcc

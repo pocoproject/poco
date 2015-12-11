@@ -52,4 +52,43 @@
 #endif
 
 
+//
+// C++11/14 support
+//
+
+// Enable C++11 support for AppleClang 500.x (Clang 3.3)
+#if defined(__clang__) && defined(__apple_build_version__) && (__apple_build_version__ >= 5000275) && !defined(POCO_ENABLE_CPP11) && !defined(POCO_DISABLE_CPP11)
+	#define POCO_ENABLE_CPP11
+#endif
+
+// Enable C++11 support for Clang 3.3
+#if defined(__clang__) && !defined(__apple_build_version__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 3)) && !defined(POCO_ENABLE_CPP11) && !defined(POCO_DISABLE_CPP11)
+	#define POCO_ENABLE_CPP11
+#endif
+
+// Enable C++11 support for GCC 4.8.1
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 8 || (__GNUC_MINOR__ == 8 && __GNUC_PATCHLEVEL__ >= 1)))) && !defined(POCO_ENABLE_CPP11) && !defined(POCO_DISABLE_CPP11)
+	#define POCO_ENABLE_CPP11
+#endif
+
+#if defined(POCO_ENABLE_CPP11)
+
+// Enable C++14 support for AppleClang 503.x (Clang 3.4)
+#if defined(__clang__) && defined(__apple_build_version__) && (__apple_build_version__ >= 5030038) && !defined(POCO_ENABLE_CPP14) && !defined(POCO_DISABLE_CPP14)
+	#define POCO_ENABLE_CPP14
+#endif
+
+// Enable C++14 support for Clang 3.4
+#if defined(__clang__) && !defined(__apple_build_version__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 4)) && !defined(POCO_ENABLE_CPP14) && !defined(POCO_DISABLE_CPP14)
+	#define POCO_ENABLE_CPP14
+#endif
+
+// Enable C++14 support for GCC 4.9.2
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 9 || (__GNUC_MINOR__ == 9 && __GNUC_PATCHLEVEL__ >= 2)))) && !defined(POCO_ENABLE_CPP14) && !defined(POCO_DISABLE_CPP14)
+	#define POCO_ENABLE_CPP14
+#endif
+
+#endif // defined(POCO_ENABLE_CPP11)
+
+
 #endif // Foundation_Platform_POSIX_INCLUDED

@@ -1,0 +1,18 @@
+#! /bin/sh
+#
+# $Id: //poco/1.4/build/script/cpp11-gcc#1 $
+#
+# cpp11-gcc
+#
+# Detect compatible GCC version and add c++11/14 flags
+#
+
+GCCVERSION := $(subst .,,$(shell gcc --version | grep ^gcc | sed 's/^.* //g'))
+
+# C++14 needs GCC 4.9.2
+ifeq ($(shell test $(GCCVERSION) -gt 491 && echo 1), 1)
+	CXXFLAGS += -std=c++14
+# C++11 needs GCC 4.8.1
+else ifeq ($(shell test $(GCCVERSION) -gt 480 && echo 1), 1)
+	CXXFLAGS += -std=c++11
+endif

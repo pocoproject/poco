@@ -23,11 +23,13 @@
 #include "Poco/Foundation.h"
 #include "Poco/Any.h"
 #include <vector>
+#include <type_traits>
 
 
 namespace Poco {
 
 
+#if !defined(POCO_ENABLE_CPP11)
 std::string Foundation_API format(const std::string& fmt, const Any& value);
 	/// This function implements sprintf-style formatting in a typesafe way.
 	/// Various variants of the function are available, supporting a
@@ -127,11 +129,47 @@ void Foundation_API format(std::string& result, const std::string& fmt, const An
 void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
 void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
 void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
+#endif // !defined(POCO_ENABLE_CPP11)
 
+
+void Foundation_API format(std::string& result, const char *fmt, const std::vector<Any>& values);
+	/// Supports a variable number of arguments and is used by
+	/// all other variants of format().
 
 void Foundation_API format(std::string& result, const std::string& fmt, const std::vector<Any>& values);
 	/// Supports a variable number of arguments and is used by
 	/// all other variants of format().
+
+
+#if defined(POCO_ENABLE_CPP11)
+
+
+template <typename T, typename... Args>
+void format(std::string &result, const std::string &fmt, T arg1, Args... args)
+	/// Appends the formatted string to result.
+{
+	std::vector<Any> values;
+	values.push_back(arg1);
+	values.insert(values.end(), { args... });
+	format(result, fmt, values);
+}
+
+
+template <typename FMT, typename T, typename... Args,
+	typename std::enable_if< std::is_const< typename std::remove_reference<FMT>::type >::value, int >::type = 0>
+std::string format(FMT &fmt, T arg1, Args... args)
+	/// Returns the formatted string.
+{
+	std::vector<Any> values;
+	values.push_back(arg1);
+	values.insert(values.end(), { args... });
+	std::string result;
+	format(result, fmt, values);
+	return result;
+}
+
+
+#endif // defined(POCO_ENABLE_CPP11)
 
 
 } // namespace Poco

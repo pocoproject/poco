@@ -76,3 +76,8 @@ SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64 -I$(OPENSSL_DIR)/include
 # System Specific Libraries
 #
 SYSLIBS  = -L$(OPENSSL_DIR)/lib -ldl
+
+#
+# C++11/14 detection
+#
+include $(POCO_BASE)/build/script/cpp11-clang

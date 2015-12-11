@@ -21,6 +21,9 @@
 
 
 #include "Poco/Foundation.h"
+#if defined(POCO_ENABLE_CPP11)
+#include <atomic>
+#else
 #if POCO_OS == POCO_OS_WINDOWS_NT
 	#include "Poco/UnWindows.h"
 #elif POCO_OS == POCO_OS_MAC_OS_X
@@ -35,12 +38,16 @@
 	#endif
 #endif // POCO_OS
 #include "Poco/Mutex.h"
+#endif
 
 
 namespace Poco {
 
 
 class Foundation_API AtomicCounter
+#if defined(POCO_ENABLE_CPP11)
+	: public std::atomic<int>
+#endif
 	/// This class implements a simple counter, which
 	/// provides atomic operations that are safe to
 	/// use in a multithreaded environment.
@@ -82,12 +89,15 @@ public:
 	AtomicCounter& operator = (ValueType value);
 		/// Assigns a value to the counter.
 
+#if !defined(POCO_ENABLE_CPP11)
 	operator ValueType () const;
 		/// Returns the value of the counter.
+#endif
 		
 	ValueType value() const;
 		/// Returns the value of the counter.
 		
+#if !defined(POCO_ENABLE_CPP11)
 	ValueType operator ++ (); // prefix
 		/// Increments the counter and returns the result.
 		
@@ -99,11 +109,13 @@ public:
 		
 	ValueType operator -- (int); // postfix
 		/// Decrements the counter and returns the previous value.
-		
+#endif
+
 	bool operator ! () const;
 		/// Returns true if the counter is zero, false otherwise.
 
 private:
+#if !defined(POCO_ENABLE_CPP11)
 #if POCO_OS == POCO_OS_WINDOWS_NT
 	typedef volatile LONG ImplType;
 #elif POCO_OS == POCO_OS_MAC_OS_X
@@ -119,6 +131,7 @@ private:
 #endif // POCO_OS
 
 	ImplType _counter;
+#endif
 };
 
 
@@ -127,7 +140,24 @@ private:
 //
 
 
-#if POCO_OS == POCO_OS_WINDOWS_NT
+#if defined(POCO_ENABLE_CPP11)
+//
+// C++11
+//
+inline AtomicCounter::ValueType AtomicCounter::value() const
+{
+	return load();
+}
+
+
+inline bool AtomicCounter::operator ! () const
+{
+	return load() == 0;
+	return !*this;
+}
+
+
+#elif POCO_OS == POCO_OS_WINDOWS_NT
 //
 // Windows
 //

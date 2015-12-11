@@ -17,7 +17,9 @@
 #include "Poco/Semaphore.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_CXX11_SEMAPHORE_FINISHED) && defined(POCO_ENABLE_CPP11)
+#include "Semaphore_STD.cpp"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Semaphore_WIN32.cpp"
 #elif defined(POCO_VXWORKS)
 #include "Semaphore_VX.cpp"

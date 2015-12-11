@@ -227,6 +227,7 @@ namespace
 }
 
 
+#if !defined(POCO_ENABLE_CPP11)
 std::string format(const std::string& fmt, const Any& value)
 {
 	std::string result;
@@ -429,6 +430,13 @@ void format(std::string& result, const std::string& fmt, const Any& value1, cons
 	args.push_back(value9);
 	args.push_back(value10);
 	format(result, fmt, args);
+}
+#endif // !defined(POCO_ENABLE_CPP11)
+
+
+void format(std::string& result, const char *fmt, const std::vector<Any>& values)
+{
+	format(result, std::string(fmt), values);
 }
 
 

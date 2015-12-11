@@ -29,11 +29,17 @@
 #include "Poco/Exception.h"
 #include "Poco/Bugcheck.h"
 #include <algorithm>
+#if defined(POCO_ENABLE_CPP11)
+#include <array>
+#endif
 
 namespace Poco {
 
 template<class T, std::size_t N>
 class Array 
+#if defined(POCO_ENABLE_CPP11)
+		: public std::array<T, N>
+#endif
 	/// STL container like C-style array replacement class. 
 	/// 
 	/// This implementation is based on the idea of Nicolai Josuttis.
@@ -42,6 +48,25 @@ class Array
 
 public:
 
+#if defined(POCO_ENABLE_CPP11)
+
+	Array() : std::array<T, N>()
+	{}
+
+	template <typename... X>
+	Array(T t, X... xs) :
+		std::array<T, N>::array{ {t, xs...} }
+	{}
+
+	Array(std::initializer_list<T> l) :
+		std::array<T, N>::array()
+	{
+		std::copy(l.begin(), l.end(), this->begin());
+	}
+
+#endif
+
+#if !defined(POCO_ENABLE_CPP11)
 	typedef T				value_type;
 	typedef T*				iterator;
 	typedef const T*		const_iterator;
@@ -157,9 +182,11 @@ public:
 	{ 
 		return N; 
 	}
+#endif // !defined(POCO_ENABLE_CPP11)
 
 	enum { static_size = N };
 
+#if !defined(POCO_ENABLE_CPP11)
 	void swap (Array<T,N>& y) {
 		std::swap_ranges(begin(),end(),y.begin());
 	}
@@ -174,32 +201,41 @@ public:
 	{ 
 		return elems;
 	}
+#endif // !defined(POCO_ENABLE_CPP11)
 
 	T* c_array(){ 
 		/// Use array as C array (direct read/write access to data)
+#if defined(POCO_ENABLE_CPP11)
+		return this->data();
+#else
 		return elems;
+#endif // !defined(POCO_ENABLE_CPP11)
 	}
 
 	template <typename Other>
 	Array<T,N>& operator= (const Array<Other,N>& rhs)
 		/// Assignment with type conversion 
 	{
-		std::copy(rhs.begin(),rhs.end(), begin());
+		std::copy(rhs.begin(),rhs.end(), this->begin());
 		return *this;
 	}
 
 	void assign (const T& value)
 		/// Assign one value to all elements
 	{
-		std::fill_n(begin(),size(),value);
+		std::fill_n(this->begin(),this->size(),value);
 	}
 
 public:
 
-	T elems[N];	
+#if !defined(POCO_ENABLE_CPP11)
+	T elems[N];
 		/// Fixed-size array of elements of type T, public specifier used to make this class a aggregate.
+#endif // !defined(POCO_ENABLE_CPP11)
 
 };
+
+#if !defined(POCO_ENABLE_CPP11)
 
 // comparisons
 template<class T, std::size_t N>
@@ -244,6 +280,9 @@ inline void swap (Array<T,N>& x, Array<T,N>& y)
 {
 	x.swap(y);
 }
+
+#endif // !defined(POCO_ENABLE_CPP11)
+
 
 }// namespace Poco
 

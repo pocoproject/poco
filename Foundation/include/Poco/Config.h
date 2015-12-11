@@ -30,6 +30,18 @@
 // #define POCO_ENABLE_CPP11
 
 
+// Define to force disable C++11 support
+// #define POCO_DISABLE_CPP11
+
+
+// Define to enable C++14 support
+// #define POCO_ENABLE_CPP14
+
+
+// Define to force disable C++14 support
+// #define POCO_DISABLE_CPP14
+
+
 // Define to disable implicit linking
 // #define POCO_NO_AUTOMATIC_LIBS
 

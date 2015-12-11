@@ -202,7 +202,12 @@ void FormatTest::testAnyInt()
 	char c = 42;
 	std::string s(format("%?i", c));
 	assert (s == "42");
-	
+
+	c = 43;
+	s.clear();
+	format(s, "%?i", c);
+	assert(s == "43");
+
 	bool b = true;
 	s = format("%?i", b);
 	assert (s == "1");

@@ -81,7 +81,11 @@ void FTPStreamFactoryTest::testDownload()
 	uri.setPort(server.port());
 	uri.setPath("/test.txt;type=a");
 	FTPStreamFactory sf;
+#if defined(POCO_ENABLE_CPP11)
+	std::unique_ptr<std::istream> pStr(sf.open(uri));
+#else
 	std::auto_ptr<std::istream> pStr(sf.open(uri));
+#endif
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
@@ -119,7 +123,11 @@ void FTPStreamFactoryTest::testList()
 	uri.setPort(server.port());
 	uri.setPath("/usr/guest/data;type=d");
 	FTPStreamFactory sf;
+#if defined(POCO_ENABLE_CPP11)
+	std::unique_ptr<std::istream> pStr(sf.open(uri));
+#else
 	std::auto_ptr<std::istream> pStr(sf.open(uri));
+#endif
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
@@ -157,7 +165,11 @@ void FTPStreamFactoryTest::testUserInfo()
 	uri.setPath("/test.txt;type=a");
 	uri.setUserInfo("user:secret");
 	FTPStreamFactory sf;
+#if defined(POCO_ENABLE_CPP11)
+	std::unique_ptr<std::istream> pStr(sf.open(uri));
+#else
 	std::auto_ptr<std::istream> pStr(sf.open(uri));
+#endif
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
@@ -196,7 +208,11 @@ void FTPStreamFactoryTest::testPasswordProvider()
 	uri.setPath("/test.txt;type=a");
 	uri.setUserInfo("user");
 	FTPStreamFactory sf;
+#if defined(POCO_ENABLE_CPP11)
+	std::unique_ptr<std::istream> pStr(sf.open(uri));
+#else
 	std::auto_ptr<std::istream> pStr(sf.open(uri));
+#endif
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
@@ -226,7 +242,11 @@ void FTPStreamFactoryTest::testMissingPasswordProvider()
 	try
 	{
 		FTPStreamFactory sf;
+#if defined(POCO_ENABLE_CPP11)
+		std::unique_ptr<std::istream> pStr(sf.open(uri));
+#else
 		std::auto_ptr<std::istream> pStr(sf.open(uri));
+#endif
 		fail("no password provider - must throw");
 	}
 	catch (FTPException&)

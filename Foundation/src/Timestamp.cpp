@@ -27,7 +27,9 @@
 #undef min
 #undef max
 #include <limits>
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_ENABLE_CPP11)
+#include <chrono>
+#elif defined(POCO_OS_FAMILY_UNIX)
 #include <time.h>
 #include <unistd.h>
 #if defined(POCO_VXWORKS)
@@ -208,7 +210,12 @@ Timestamp Timestamp::fromUtcTime(UtcTimeVal val)
 
 void Timestamp::update()
 {
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_ENABLE_CPP11)
+
+	_ts = std::chrono::duration_cast<std::chrono::microseconds>
+		(std::chrono::system_clock::now().time_since_epoch()).count();
+
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 
 	FILETIME ft;
 #if defined(_WIN32_WCE) && defined(POCO_WINCE_TIMESTAMP_HACK)

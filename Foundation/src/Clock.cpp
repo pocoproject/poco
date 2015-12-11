@@ -17,7 +17,9 @@
 #include "Poco/Clock.h"
 #include "Poco/Exception.h"
 #include "Poco/Timestamp.h"
-#if defined(__MACH__)
+#if defined(POCO_ENABLE_CPP11)
+#include <chrono>
+#elif defined(__MACH__)
 #include <mach/mach.h>
 #include <mach/clock.h>
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -86,7 +88,11 @@ void Clock::swap(Clock& timestamp)
 
 void Clock::update()
 {
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_ENABLE_CPP11)
+
+	_clock = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 
 	LARGE_INTEGER perfCounter;
 	LARGE_INTEGER perfFreq;
@@ -138,7 +144,12 @@ void Clock::update()
 
 Clock::ClockDiff Clock::accuracy()
 {
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_ENABLE_CPP11)
+
+	ClockVal acc = static_cast<ClockVal>(std::chrono::duration_cast<std::chrono::duration<double, std::micro>>(std::chrono::steady_clock::duration(1)).count());
+	return acc > 0 ? acc : 1;
+
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 
 	LARGE_INTEGER perfFreq;
 	if (QueryPerformanceFrequency(&perfFreq) && perfFreq.QuadPart > 0)
@@ -193,7 +204,11 @@ Clock::ClockDiff Clock::accuracy()
 	
 bool Clock::monotonic()
 {
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_ENABLE_CPP11)
+
+	return std::chrono::steady_clock::is_steady;
+
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 
 	return true;
 

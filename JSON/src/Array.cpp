@@ -36,6 +36,14 @@ Array::Array(const Array& copy) : _values(copy._values)
 }
 
 
+#ifdef POCO_ENABLE_CPP11
+Array::Array(Array&& other) :
+	_values(std::move(other._values))
+{
+}
+#endif // POCO_ENABLE_CPP11
+
+
 Array::~Array()
 {
 }
@@ -207,6 +215,34 @@ void Array::clear()
 	_values.clear();
 	_pArray = 0;
 }
+
+
+#ifdef POCO_ENABLE_CPP11
+
+
+Array &Array::operator =(const Array &other)
+{
+	if (&other != this)
+	{
+		_values = other._values;
+		_pArray = 0;
+	}
+	return *this;
+}
+
+
+Array &Array::operator = (Array &&other)
+{
+	if (&other != this)
+	{
+		_values = std::move(other._values);
+		_pArray = 0;
+	}
+	return *this;
+}
+
+
+#endif // POCO_ENABLE_CPP11
 
 
 } } // namespace Poco::JSON
