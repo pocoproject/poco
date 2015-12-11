@@ -40,7 +40,7 @@ matrix:
       compiler: clang
       os: osx
       script:
-        - ./configure --everything && make -s -j2
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make -s -j2
         - ./travis/runtests.sh
 
     - env:    TEST_NAME="Linux gcc (make) bundled"
