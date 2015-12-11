@@ -12,8 +12,8 @@ services:
   - mssql2014  
 
 configuration:
-  - Debug
   - Release
+  - Debug
 
 install:
   - systeminfo
