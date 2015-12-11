@@ -19,3 +19,8 @@ WIP
 * std::tuple instead of Tuple: std::tuple doesn't accept partial initialization
 * Semaphore: simulated with mutex and condition variable, but platform specific should be better
 * RWLock: std::shared_timed_mutex has separate read and write unlock, but RWLock uses unlock for both
+* Use <random> for Poco/Random, but it supports 4 different modes that must be mapped
+
+PROBLEMS
+========
+* std::thread doesn`t support priority setting
