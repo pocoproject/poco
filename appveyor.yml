@@ -30,7 +30,7 @@ install:
         else
         {
             echo "downloading openssl"
-            Invoke-WebRequest "https://slproweb.com/download/$($env:ssl)OpenSSL-1_0_2e.exe" -OutFile c:\openssl-setup.exe
+            Invoke-WebRequest "https://slproweb.com/download/$($env:ssl)OpenSSL-$($env:openssl).exe" -OutFile c:\openssl-setup.exe
             echo "installing openssl"
             Start-Process -Wait -FilePath c:\openssl-setup.exe -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes"
         }
@@ -46,6 +46,7 @@ install:
 
 environment:
   bundling: bundled
+  openssl: 1_0_2e
     
   matrix:
     - builder: cmake
