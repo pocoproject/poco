@@ -149,10 +149,10 @@ Array::operator const Poco::Dynamic::Array& () const
 	if (!_pArray)
 	{
 		ValueVec::const_iterator it = _values.begin();
-		ValueVec::const_iterator end = _values.end();
+		ValueVec::const_iterator itEnd = _values.end();
 		_pArray = new Poco::Dynamic::Array;
 		int index = 0;
-		for (; it != end; ++it, ++index)
+		for (; it != itEnd; ++it, ++index)
 		{
 			if (isObject(it))
 			{
