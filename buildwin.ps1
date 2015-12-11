@@ -47,7 +47,7 @@ Param
   [string] $omit,
   
   [Parameter()]
-  [ValidateSet('msbuild', 'devenv')]
+  [ValidateSet('msbuild', 'devenv', 'vcexpress', 'wdexpress')]
   [string] $tool = 'msbuild',
 
   [Parameter()]
@@ -204,6 +204,8 @@ function Process-Input
 function Build-MSBuild([string] $vsProject)
 {
   Write-Host "Build-MSBuild ==> $vsProject"
+  [string]$flags = '/clp:NoSummary /nologo /v:minimal'
+  
   if ($linkmode -eq 'all')
   {
     $linkModeArr = 'shared', 'static_mt', 'static_md'
@@ -217,14 +219,14 @@ function Build-MSBuild([string] $vsProject)
         {
           $projectConfig = "$cfg"
           $projectConfig += "_$mode"
-          Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+          Invoke-Expression "msbuild $vsProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
         }
       }
       else #config
       {
         $projectConfig = "$config"
         $projectConfig += "_$mode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+        Invoke-Expression "msbuild $vsProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
     }
   }
@@ -237,14 +239,14 @@ function Build-MSBuild([string] $vsProject)
       {
         $projectConfig = "$cfg"
         $projectConfig += "_$linkmode"
-        Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+        Invoke-Expression "msbuild $vsProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
     }
     else #config
     {
       $projectConfig = "$config"
       $projectConfig += "_$linkmode"
-      Invoke-Expression "msbuild $vsProject /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+      Invoke-Expression "msbuild $vsProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
     }
   }
 }

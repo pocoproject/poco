@@ -29,6 +29,7 @@ public:
 	void testWriteUrl();
 	void testWriteMultipart();
 	void testReadUrlGET();
+	void testReadUrlGETMultiple();
 	void testReadUrlPOST();
 	void testReadUrlPUT();
 	void testReadUrlBOM();
@@ -36,6 +37,7 @@ public:
 	void testSubmit1();
 	void testSubmit2();
 	void testSubmit3();
+	void testSubmit4();
 	void testFieldLimitUrl();
 	void testFieldLimitMultipart();
 
