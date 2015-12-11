@@ -23,7 +23,7 @@ services:
 notifications:
   slack: 
     rooms:
-      - pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t#travis
+      - pocoproject:4iwY1QpB8fdU2WqpcZ6PpZhz#travis
       - kampbell:v4ARuptk0ETzwUsKDdV6Gspb#poco
 
 env:
@@ -35,7 +35,7 @@ before_script:
 
 matrix:
   include:
-    - env:    TEST_NAME="OSX    clang (make) bundled"
+    - env:    TEST_NAME="OSX   clang (make) bundled"
       compiler: clang
       os: osx
       script:
