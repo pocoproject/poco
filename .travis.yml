@@ -10,10 +10,10 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget --no-check-certificate https://www.cmake.org/files/v3.2/cmake-3.2.3-Linux-x86_64.tar.gz; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then tar -xzvf cmake-3.2.3-Linux-x86_64.tar.gz; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export PATH=$PWD/cmake-3.2.3-Linux-x86_64/bin:$PATH; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev libsqlite3-dev fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y sloccount cppcheck fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev libsqlite3-dev; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y sloccount cppcheck; fi
     
 
 services:
