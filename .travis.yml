@@ -35,21 +35,21 @@ before_script:
 
 matrix:
   include:
-    - env:    TEST_NAME="OSX  : clang (make) bundled"
+    - env:    TEST_NAME="OSX    clang (make) bundled"
       compiler: clang
       os: osx
       script:
         - ./configure --everything && make -s -j2
         - ./travis/runtests.sh
 
-    - env:    TEST_NAME="Linux: gcc (make) bundled"
+    - env:    TEST_NAME="Linux gcc (make) bundled"
       compiler: gcc
       script:
         - ./configure --everything && make -s -j2
         - trap -p
         - ./travis/runtests.sh
     
-    - env:    TEST_NAME="Linux: gcc (make) unbundled"
+    - env:    TEST_NAME="Linux gcc (make) unbundled"
       compiler: gcc
       script:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
@@ -57,18 +57,18 @@ matrix:
         - trap -p
         - ./travis/runtests.sh
     
-    - env:    TEST_NAME="Linux: clang (make)"
+    - env:    TEST_NAME="Linux clang (make)"
       compiler: clang
       script:
         - ./configure --everything --config=Linux-clang && make -s -j2
         - trap -p
         - ./travis/runtests.sh
 
-    - env:    TEST_NAME="Linux: arm-linux-gnueabi- (make)"
+    - env:    TEST_NAME="Linux arm-linux-gnueabi- (make)"
       script:
         - ./configure --omit=Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
-    - env:    TEST_NAME="Linux: gcc (CMake)"
+    - env:    TEST_NAME="Linux gcc (CMake)"
       compiler: gcc
       script:
         # disable tests, gcc-4.6 gets an internal compiler error
@@ -84,18 +84,18 @@ matrix:
         - export CXX="g++-4.8"
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
-    - env:    TEST_NAME="Linux: clang (CMake)"
+    - env:    TEST_NAME="Linux clang (CMake)"
       compiler: clang
       script:
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
-    - env:    TEST_NAME="Linux: arm-linux-gnueabi-g++ (CMake)"
+    - env:    TEST_NAME="Linux arm-linux-gnueabi-g++ (CMake)"
       script:
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
-    - env:    TEST_NAME="Linux: arm-linux-gnueabihf-g++ (CMake)"
+    - env:    TEST_NAME="Linux arm-linux-gnueabihf-g++ (CMake)"
       script:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
