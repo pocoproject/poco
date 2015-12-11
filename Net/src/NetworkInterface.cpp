@@ -26,6 +26,7 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/Format.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
+	#include "Poco/Platform_WIN32_OSVER.h"
 	#if defined(POCO_WIN32_UTF8)
 		#include "Poco/UnicodeConverter.h"
 	#endif
