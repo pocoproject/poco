@@ -174,8 +174,8 @@ void MongoDBTest::testCountCommand()
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
 		std::cout << doc->toString() << std::endl;
-		double count = doc->get<double>("n");
-		assert(count == 1);
+
+		assert(doc->getInteger("n") == 1);
 	}
 	else
 	{
@@ -195,8 +195,7 @@ void MongoDBTest::testDBCountCommand()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		double count = doc->get<double>("n");
-		assert(count == 1);
+		assert(doc->getInteger("n") == 1);
 	}
 	else
 	{
@@ -314,8 +313,7 @@ void MongoDBTest::testConnectionPool()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		double count = doc->get<double>("n");
-		assert(count == 1);
+		assert(doc->getInteger("n") == 1);
 	}
 	else
 	{
