@@ -9,7 +9,7 @@ export CPPUNIT_IGNORE="\
   N7CppUnit10TestCallerI22HTTPSClientSessionTestEE.testProxy \
   N7CppUnit10TestCallerI22HTTPSStreamFactoryTestEE.testProxy \
   N7CppUnit10TestCallerI19MulticastSocketTestEE.testMulticast \
-  N7CppUnit10TestCallerI13NTPClientTestEE.testTimeSync \ 
+  N7CppUnit10TestCallerI13NTPClientTestEE.testTimeSync \
   N7CppUnit10TestCallerI12CompressTestEE.testZip64"
 export EXCLUDE_TESTS="Data/MySQL Data/ODBC MongoDB PDF"
 export PATH=$PATH:.
