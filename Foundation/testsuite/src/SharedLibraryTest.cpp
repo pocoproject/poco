@@ -39,7 +39,6 @@ SharedLibraryTest::~SharedLibraryTest()
 void SharedLibraryTest::testSharedLibrary1()
 {
 	std::string path = "TestLibrary";
-	path.append(SharedLibrary::suffix());
 	SharedLibrary sl;
 	assert (!sl.isLoaded());
 	sl.load(path);
@@ -73,7 +72,6 @@ void SharedLibraryTest::testSharedLibrary1()
 void SharedLibraryTest::testSharedLibrary2()
 {
 	std::string path = "TestLibrary";
-	path.append(SharedLibrary::suffix());
 	SharedLibrary sl(path);
 	assert (sl.getPath() == path);
 	assert (sl.isLoaded());
@@ -89,7 +87,6 @@ void SharedLibraryTest::testSharedLibrary2()
 void SharedLibraryTest::testSharedLibrary3()
 {
 	std::string path = "NonexistentLibrary";
-	path.append(SharedLibrary::suffix());
 	SharedLibrary sl;
 	try
 	{
