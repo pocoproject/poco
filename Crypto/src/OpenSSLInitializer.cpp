@@ -186,7 +186,7 @@ void uninitializeCrypto()
 } } // namespace Poco::Crypto
 
 // needed for OpenSSL static link
-#if defined(_WIN32) && !defined(POCO_DLL) && (POCO_MSVS_VERSION >= 2015)
+#if defined(_WIN32) && !defined(POCO_DLL) && (POCO_MSVS_VERSION >= 2015) && !defined(POCO_EXTERNAL_OPENSSL)
 	FILE * __cdecl __iob_func(void)
 	{
 		static FILE poco_iob[] = { stdin, stdout, stderr };
