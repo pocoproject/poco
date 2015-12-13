@@ -1,11 +1,107 @@
 version: '{build}'
 
+cache:
+    - c:\OpenSSL-Win32
+    - c:\OpenSSL-Win64
+    - c:\ProgramData\chocolatey
+    - c:\mysql-5.7.9-win32
+
+services:
+  - mysql
+  - mongodb
+  - mssql2014  
+
+configuration:
+  - Release
+  - Debug
+
 install:
+  - systeminfo
+  - c:\cygwin\bin\uname -a
+  - c:\cygwin\bin\cat /proc/cpuinfo
+  - c:\cygwin\bin\cat /proc/meminfo
+  - set
   - cinst cmake
+  - ps: |
+        if (Test-Path "c:\OpenSSL-$env:ssl")
+        {
+            echo "using openssl from cache"
+        }
+        else
+        {
+            echo "downloading openssl"
+            Invoke-WebRequest "https://slproweb.com/download/$($env:ssl)OpenSSL-$($env:openssl).exe" -OutFile c:\openssl-setup.exe
+            echo "installing openssl"
+            Start-Process -Wait -FilePath c:\openssl-setup.exe -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes"
+        }
+
+#  chocolatey brokes jom, here's workaround
+#  see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
+  - ps: |
+        if ($env:builder -eq "cmake")
+        {
+          $env:PATH = $env:ChocolateyInstall + "\bin" + ";" + $env:PATH
+          $env:PATH = $env:ChocolateyInstall + "\lib\jom\content" + ";" + $env:PATH
+        }
+
+environment:
+  bundling: bundled
+  openssl: 1_0_2e
+    
+  matrix:
+    - builder: cmake
+      ssl: Win32
+      vc: amd64_x86
+      target: x86
+      
+before_build:
+
+after_build:
 
 build_script:
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
   - mkdir cmake-build
   - cd cmake-build
-  - cmake ..
-  - cmake --build .
+  - cmake .. -G "Visual Studio 12 2013" -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF -DENABLE_TESTS=ON  
+  - cmake --build . --config %configuration% -- /nologo /v:minimal
+  
+  
+before_test:
+
+after_test:
+
+test_script:
+#  - set PATH=%CD%\cmake-build\bin\Release;%PATH%
+#  - set EXCLUDE_TESTS=Crypto,NetSLL_Win,Data/ODBC,Data/MySQL
+#  - build\script\runtests2.cmd
+  - ctest -VV -C %configuration% -E "Data*"
+
+  
+  
+on_success:
+  - echo success
+
+on_failure:
+  - echo failure
+
+on_finish:
+  - echo finish
+  
+  
+notifications:
+  - provider: Email
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: false
+    
+      
+  - provider: Slack
+    auth_token:
+      secure: xoOlP1UHshqjvh/INwMcNhZ5UHsTVKLGY5maTSjaxDc0fvRwoWIdYvY/CofQEuy2wOIBQK4eLD+tA0xG78ZgqQ==
+    channel: poco
+    on_build_success: false
+    on_build_status_changed: false
+  
+  - provider: Slack
+    incoming_webhook: https://hooks.slack.com/services/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
+    

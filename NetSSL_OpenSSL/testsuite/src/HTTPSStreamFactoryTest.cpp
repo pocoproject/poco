@@ -132,7 +132,12 @@ CppUnit::Test* HTTPSStreamFactoryTest::suite()
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testNoRedirect);
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testEmptyPath);
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testRedirect);
+#ifdef FIXME
+	should use a public proxy server
+	http://www.publicproxyservers.com/proxy/list1.html
+	Really working public proxy servers - page 1 of 6.
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testProxy);
+#endif
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testError);
 
 	return pSuite;

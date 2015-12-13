@@ -473,7 +473,12 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunkedKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testInterop);
+#ifdef FIXME
+	should use a public proxy server
+	http://www.publicproxyservers.com/proxy/list1.html
+	Really working public proxy servers - page 1 of 6.
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxy);
+#endif
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testUnknownContentLength);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbort);
