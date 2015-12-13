@@ -386,8 +386,6 @@ if %DEBUG_STATIC_MT%==1 (
       if %1==Foundation (
         echo.
         !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !TEST_APP_PROJECT_FILE!
-        echo.
-        !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !TEST_LIB_PROJECT_FILE!
         if ERRORLEVEL 1 exit /b 1
       )
       echo. && echo.
@@ -405,8 +403,6 @@ if %RELEASE_STATIC_MT%==1 (
       if %1==Foundation (
         echo.
         !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !TEST_APP_PROJECT_FILE!
-        echo.
-        !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !TEST_LIB_PROJECT_FILE!
         if ERRORLEVEL 1 exit /b 1
       )
       echo. && echo.
@@ -424,8 +420,6 @@ if %DEBUG_STATIC_MD%==1 (
       if %1==Foundation (
         echo.
         !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !TEST_APP_PROJECT_FILE!
-        echo.
-        !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !TEST_LIB_PROJECT_FILE!
         if ERRORLEVEL 1 exit /b 1
       )
       echo. && echo.
@@ -443,8 +437,6 @@ if %RELEASE_STATIC_MD%==1 (
       if %1==Foundation (
         echo.
         !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_md %PLATFORMSW% !TEST_APP_PROJECT_FILE!
-        echo.
-        !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_md %PLATFORMSW% !TEST_LIB_PROJECT_FILE!
         if ERRORLEVEL 1 exit /b 1
       )
       echo. && echo.

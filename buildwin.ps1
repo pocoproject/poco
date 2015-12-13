@@ -224,7 +224,7 @@ function Build-MSBuild([string] $vsProject, [string] $vsTestAppProject, [string]
           {
             Invoke-Expression "msbuild $vsTestAppProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
           }
-          if ($vsTestLibraryProject -ne '')
+          if (($vsTestLibraryProject -ne '') -and ($linkModeArr -eq 'shared'))
           {
             Invoke-Expression "msbuild $vsTestLibraryProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
           }
@@ -239,7 +239,7 @@ function Build-MSBuild([string] $vsProject, [string] $vsTestAppProject, [string]
           {
             Invoke-Expression "msbuild $vsTestAppProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
           }
-          if ($vsTestLibraryProject -ne '')
+          if (($vsTestLibraryProject -ne '') -and ($linkModeArr -eq 'shared'))
           {
             Invoke-Expression "msbuild $vsTestLibraryProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
           }
@@ -260,7 +260,7 @@ function Build-MSBuild([string] $vsProject, [string] $vsTestAppProject, [string]
         {
           Invoke-Expression "msbuild $vsTestAppProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
         }
-        if ($vsTestLibraryProject -ne '')
+          if (($vsTestLibraryProject -ne '') -and ($linkmode -eq 'shared'))
         {
           Invoke-Expression "msbuild $vsTestLibraryProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
         }
@@ -275,7 +275,7 @@ function Build-MSBuild([string] $vsProject, [string] $vsTestAppProject, [string]
       {
         Invoke-Expression "msbuild $vsTestAppProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
-      if ($vsTestLibraryProject -ne '')
+          if (($vsTestLibraryProject -ne '') -and ($linkmode -eq 'shared'))
       {
         Invoke-Expression "msbuild $vsTestLibraryProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
       }
