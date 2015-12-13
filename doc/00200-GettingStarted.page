@@ -139,7 +139,7 @@ Depending on where you have installed the OpenSSL libraries,
 you might have to edit the build script (buildwin.cmd), or add the 
 necessary paths to the INCLUDE and LIB environment variables. To disable
 internal automatic linking of supplied binaries, define POCO_EXTERNAL_OPENSSL
-in your build envornment. Alternatively, you can either rename your binaries,
+in your build environment. Alternatively, you can either rename your binaries,
 or edit the %POCO_BASE%\Crypto\include\Poco\Crypto\Crypto.h
 file if the names of the OpenSSL libraries from your build differ from
 the names used thereof (look for "#pragma comment" lines in Crypto.h).
