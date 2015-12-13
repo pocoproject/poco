@@ -100,4 +100,8 @@ notifications:
       secure: xoOlP1UHshqjvh/INwMcNhZ5UHsTVKLGY5maTSjaxDc0fvRwoWIdYvY/CofQEuy2wOIBQK4eLD+tA0xG78ZgqQ==
     channel: poco
     on_build_success: false
-    on_build_status_changed: false  
+    on_build_status_changed: false
+  
+  - provider: Slack
+    incoming_webhook: https://hooks.slack.com/services/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
+    
