@@ -72,10 +72,12 @@ before_build:
           if ($env:platform -eq "Win32")
           {
             & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
+            $env:archsize =
           }
           if ($env:platform -eq "x64")
           {
             & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86_amd64
+            $env:archsize = 64
           }
       }
       if ($env:builder -eq "140")
@@ -115,7 +117,7 @@ before_test:
 after_test:
 
 test_script:
-  - build\script\runtests2.cmd
+  - build\script\runtests2.cmd %archsize%
   
   
 on_success:
