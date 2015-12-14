@@ -61,12 +61,12 @@ before_build:
           if ($env:platform -eq "Win32")
           {
             & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
-            $env:archsize = ""
+            $env:suffix = ""
           }
           if ($env:platform -eq "x64")
           {
             & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86_amd64
-            $env:archsize = 64
+            $env:suffix = 64
           }
       }
       if ($env:builder -eq "140")
@@ -74,10 +74,12 @@ before_build:
           if ($env:platform -eq "Win32")
           {
             & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+            $env:suffix = ""
           }
           if ($env:platform -eq "x64")
           {
             & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
+            $env:suffix = 64
           }
       }
   
@@ -106,8 +108,12 @@ before_test:
 after_test:
 
 test_script:
-  - build\script\runtests2.cmd %archsize%
-  
+#  - build\script\runtests2.cmd %suffix%
+  - ps: |
+      if ($env:$configuration -eq "release")
+      {
+        & .\build\script\runtests2.cmd %suffix%
+      }  
   
 on_success:
   - echo success
