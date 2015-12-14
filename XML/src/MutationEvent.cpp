@@ -30,30 +30,30 @@ const XMLString MutationEvent::DOMAttrModified             = toXMLString("DOMAtt
 const XMLString MutationEvent::DOMCharacterDataModified    = toXMLString("DOMCharacterDataModified");
 
 
-MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type): 
-	Event(pOwnerDocument, type, 0, true, false),
+MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& rType): 
+	Event(pOwnerDocument, rType, 0, true, false),
 	_change(MODIFICATION),
 	_pRelatedNode(0)
 {
 }
 
 
-MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode):
-	Event(pOwnerDocument, type, pTarget, canBubble, cancelable),
+MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& rType, EventTarget* pTarget, bool canBubble, bool isCancelable, Node* pRelatedNode):
+	Event(pOwnerDocument, rType, pTarget, canBubble, isCancelable),
 	_change(MODIFICATION),
-	_pRelatedNode(relatedNode)
+	_pRelatedNode(pRelatedNode)
 {
 }
 
 
-MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode, 
-	                         const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change):
-	Event(pOwnerDocument, type, pTarget, canBubble, cancelable),
-	_prevValue(prevValue),
-	_newValue(newValue),
-	_attrName(attrName),
+MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& rType, EventTarget* pTarget, bool canBubble, bool isCancelable, Node* pRelatedNode, 
+	                         const XMLString& rPrevValue, const XMLString& rNewValue, const XMLString& rAttrName, AttrChangeType change):
+	Event(pOwnerDocument, rType, pTarget, canBubble, isCancelable),
+	_prevValue(rPrevValue),
+	_newValue(rNewValue),
+	_attrName(rAttrName),
 	_change(change),
-	_pRelatedNode(relatedNode)
+	_pRelatedNode(pRelatedNode)
 {
 }
 
@@ -63,14 +63,14 @@ MutationEvent::~MutationEvent()
 }
 
 
-void MutationEvent::initMutationEvent(const XMLString& type, bool canBubble, bool cancelable, Node* relatedNode, 
-	                                  const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change)
+void MutationEvent::initMutationEvent(const XMLString& rType, bool canBubble, bool isCancelable, Node* pRelatedNode, 
+	                                  const XMLString& rPrevValue, const XMLString& rNewValue, const XMLString& rAttrName, AttrChangeType change)
 {
-	initEvent(type, canBubble, cancelable);
-	_pRelatedNode = relatedNode;
-	_prevValue    = prevValue;
-	_newValue     = newValue;
-	_attrName     = attrName;
+	initEvent(rType, canBubble, isCancelable);
+	_pRelatedNode = pRelatedNode;
+	_prevValue    = rPrevValue;
+	_newValue     = rNewValue;
+	_attrName     = rAttrName;
 	_change       = change;
 }
 

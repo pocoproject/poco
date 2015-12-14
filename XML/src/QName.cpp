@@ -43,10 +43,10 @@ QName::QName(const std::string& ns, const std::string& name) :
 }
 
 
-QName::QName(const std::string& ns, const std::string& name, const std::string& prefix) :
+QName::QName(const std::string& ns, const std::string& name, const std::string& rPrefix) :
 	_ns(ns),
 	_name(name),
-	_prefix(prefix)
+	_prefix(rPrefix)
 {
 }
 
