@@ -24,15 +24,6 @@ install:
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
   - set
-  - cinst cmake
-#  chocolatey brokes jom, here's workaround
-#  see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
-  - ps: |
-        if ($env:builder -eq "cmake")
-        {
-          $env:PATH = $env:ChocolateyInstall + "\bin" + ";" + $env:PATH
-          $env:PATH = $env:ChocolateyInstall + "\lib\jom\content" + ";" + $env:PATH
-        }
 #  MySQL 32 bit is not available by default on AppVeyor
   - ps: |
         if ($platform -eq "Win32")
@@ -70,7 +61,7 @@ before_build:
           if ($env:platform -eq "Win32")
           {
             & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
-            $env:archsize =
+            $env:archsize = ""
           }
           if ($env:platform -eq "x64")
           {
