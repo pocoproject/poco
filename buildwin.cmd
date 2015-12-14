@@ -17,7 +17,7 @@ rem Modified by Guenter Obiltschnig.
 rem
 rem Usage:
 rem ------
-rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
+rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL [VERBOSITY [LOGGER] ] ]
 rem VS_VERSION:    90|100|110|120|140
 rem ACTION:        build|rebuild|clean
 rem LINKMODE:      static_mt|static_md|shared|all
@@ -26,6 +26,8 @@ rem PLATFORM:      Win32|x64|WinCE|WEC2013
 rem SAMPLES:       samples|nosamples
 rem TESTS:         tests|notests
 rem TOOL:          devenv|vcexpress|wdexpress|msbuild
+rem VERBOSITY      quiet|minimal|normal|detailed|diagnostic
+rem LOGGER         <logger path> see msbuild /?
 rem
 rem VS_VERSION is required argument. Default is build all.
 
@@ -43,9 +45,10 @@ rem VS_VERSION {90 | 100 | 110 | 120 | 140}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
 set VS_64_BIT_ENV=VC\bin\x86_amd64\vcvarsx86_amd64.bat
+shift /1
 
 rem PLATFORM [Win32|x64|WinCE|WEC2013]
-set PLATFORM=%5
+set PLATFORM=%4
 if "%PLATFORM%"=="" (set PLATFORM=Win32)
 if not "%PLATFORM%"=="Win32" (
 if not "%PLATFORM%"=="x64" (
@@ -101,14 +104,26 @@ if not defined VSINSTALLDIR (
   goto :EOF
 )
 
+rem VERBOSITY      quiet|minimal|normal|detailed
+set VERBOSITY=%8
+if "%VERBOSITY%"=="" (set VERBOSITY=minimal)
+if not "%VERBOSITY%"=="quiet" (
+if not "%VERBOSITY%"=="minimal" (
+if not "%VERBOSITY%"=="normal" (
+if not "%VERBOSITY%"=="detailed" (
+if not "%VERBOSITY%"=="diagnostic" goto usage))))
+
+rem LOGGER         <logger path> see msbuild /?
+set LOGGER=%9
+
 set VCPROJ_EXT=vcproj
 if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs120 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs140 (set VCPROJ_EXT=vcxproj)
 
-if "%8"=="" goto use_devenv
-set BUILD_TOOL=%8
+if "%7"=="" goto use_devenv
+set BUILD_TOOL=%7
 goto use_custom
 :use_devenv
 set BUILD_TOOL=devenv
@@ -123,7 +138,12 @@ if "%BUILD_TOOL%"=="msbuild" (
   set CONFIGSW=/p:Configuration=
   set EXTRASW=/m
   set USEENV=/p:UseEnv=true
-  set BUILD_TOOL_FLAGS=/clp:NoSummary /nologo  /v:minimal  
+
+  set BUILD_TOOL_FLAGS=/clp:NoSummary
+  if not %LOGGER%X==X (
+     set BUILD_TOOL_FLAGS=%BUILD_TOOL_FLAGS% /logger:%LOGGER%
+  )
+  set BUILD_TOOL_FLAGS=%BUILD_TOOL_ARGS% /nologo /v:%VERBOSITY%
 )
 if not "%BUILD_TOOL%"=="msbuild" (
   set ACTIONSW=/
@@ -139,14 +159,14 @@ if "%BUILD_TOOL%"=="msbuild" (
 :msbuildok
 
 rem ACTION [build|rebuild|clean]
-set ACTION=%2
+set ACTION=%1
 if "%ACTION%"=="" (set ACTION=build)
 if not "%ACTION%"=="build" (
 if not "%ACTION%"=="rebuild" (
 if not "%ACTION%"=="clean" goto usage))
 
 rem LINKMODE [static_mt|static_md|shared|all]
-set LINK_MODE=%3
+set LINK_MODE=%2
 if "%LINK_MODE%"=="" (set LINK_MODE=all)
 if not "%LINK_MODE%"=="static_mt" (
 if not "%LINK_MODE%"=="static_md" (
@@ -154,7 +174,7 @@ if not "%LINK_MODE%"=="shared" (
 if not "%LINK_MODE%"=="all" goto usage)))
 
 rem CONFIGURATION [release|debug|both]
-set CONFIGURATION=%4
+set CONFIGURATION=%3
 if "%CONFIGURATION%"=="" (set CONFIGURATION=both)
 if not "%CONFIGURATION%"=="release" (
 if not "%CONFIGURATION%"=="debug" (
@@ -178,11 +198,11 @@ if %VS_VERSION%==vs140 (set EXTRASW=/m /p:VisualStudioVersion=14.0)
 )
 
 rem SAMPLES [samples|nosamples]
-set SAMPLES=%6
+set SAMPLES=%5
 if "%SAMPLES%"=="" (set SAMPLES=samples)
 
 rem TESTS [tests|notests]
-set TESTS=%7
+set TESTS=%6
 if "%TESTS%"=="" (set TESTS=notests)
 
 
@@ -279,6 +299,8 @@ echo #### STARTING VISUAL STUDIO BUILD (%VS_VERSION%, %PLATFORM%)
 echo ####
 echo ########################################################################
 echo.
+echo.
+echo buildwin %VS_VERSION% %ACTION% %LINK_MODE% %CONFIGURATION% %PLATFORM% %SAMPLES% %TESTS% %BUILD_TOOL% %VERBOSITY%
 echo.
 echo The following configurations will be built:
 
@@ -547,7 +569,7 @@ exit /b 1
 :usage
 echo Usage:
 echo ------
-echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
+echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL [VERBOSITY] ]
 echo VS_VERSION:    "90|100|110|120|140"
 echo ACTION:        "build|rebuild|clean"
 echo LINKMODE:      "static_mt|static_md|shared|all"
@@ -556,6 +578,7 @@ echo PLATFORM:      "Win32|x64|WinCE|WEC2013"
 echo SAMPLES:       "samples|nosamples"
 echo TESTS:         "tests|notests"
 echo TOOL:          "devenv|vcexpress|wdexpress|msbuild"
+echo VERBOSITY:     "quiet|minimal|normal|detailed|diagnostic" only for msbuild
 echo.
 echo Default is build all.
 endlocal

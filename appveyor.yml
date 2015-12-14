@@ -60,8 +60,6 @@ environment:
 
     - builder: 120
       linkmode: shared
-      vc32: x86
-      vc64: x86_amd64
 
 
    
@@ -112,7 +110,7 @@ build_script:
   
 before_test:
   - set PATH=%CD%\bin;%PATH%
-  - set EXCLUDE_TESTS=NetSLL_Win,Data/ODBC,Data/MySQL
+  - set EXCLUDE_TESTS=NetSLL_Win,Data/ODBC,Data/MySQL,PDF
 
 after_test:
 
