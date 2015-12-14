@@ -1,4 +1,4 @@
-version: '{build}'
+version: 1.7.0-{branch}.{build}
 
 cache:
     - c:\OpenSSL-Win32
@@ -11,9 +11,14 @@ services:
   - mongodb
   - mssql2014  
 
+platform:
+  - Win32
+  - x64
+  
+      
 configuration:
-  - Release
-  - Debug
+  - release
+  - debug
 
 install:
   - systeminfo
@@ -49,10 +54,15 @@ environment:
   openssl: 1_0_2e
     
   matrix:
-    - builder: cmake
-      ssl: Win32
-      vc: amd64_x86
-      target: x86
+#    - builder: cmake
+#      ssl: Win32
+#      vc: amd64_x86
+#      target: x86
+
+    - builder: msbuild
+      linkmode: shared
+
+     
       
 before_build:
 
@@ -60,21 +70,21 @@ after_build:
 
 build_script:
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
-  - mkdir cmake-build
-  - cd cmake-build
-  - cmake .. -G "Visual Studio 12 2013" -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF -DENABLE_TESTS=ON  
-  - cmake --build . --config %configuration% -- /nologo /v:minimal
-  
+#  - mkdir cmake-build
+#  - cd cmake-build
+#  - cmake .. -G "Visual Studio 12 2013" -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF -DENABLE_TESTS=ON  
+#  - cmake --build . --config %configuration% -- /nologo /v:minimal
+  - buildwin 120 build %linkmode% %configuration% %platform% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" 
   
 before_test:
+  - set PATH=%CD%\bin;%PATH%
+  - set EXCLUDE_TESTS=NetSLL_Win,Data/ODBC,Data/MySQL
 
 after_test:
 
 test_script:
-#  - set PATH=%CD%\cmake-build\bin\Release;%PATH%
-#  - set EXCLUDE_TESTS=Crypto,NetSLL_Win,Data/ODBC,Data/MySQL
-#  - build\script\runtests2.cmd
-  - ctest -VV -C %configuration% -E "Data*"
+  - build\script\runtests2.cmd
+#  - ctest -VV -C %configuration% -E "Data*"
 
   
   
