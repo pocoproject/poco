@@ -27,19 +27,6 @@ install:
   - c:\cygwin\bin\cat /proc/meminfo
   - set
   - cinst cmake
-  - ps: |
-        if (Test-Path "c:\OpenSSL-$env:ssl")
-        {
-            echo "using openssl from cache"
-        }
-        else
-        {
-            echo "downloading openssl"
-            Invoke-WebRequest "https://slproweb.com/download/$($env:ssl)OpenSSL-$($env:openssl).exe" -OutFile c:\openssl-setup.exe
-            echo "installing openssl"
-            Start-Process -Wait -FilePath c:\openssl-setup.exe -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes"
-        }
-
 #  chocolatey brokes jom, here's workaround
 #  see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
   - ps: |
@@ -69,7 +56,7 @@ before_build:
 after_build:
 
 build_script:
-  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
+#  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
 #  - mkdir cmake-build
 #  - cd cmake-build
 #  - cmake .. -G "Visual Studio 12 2013" -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF -DENABLE_TESTS=ON  
