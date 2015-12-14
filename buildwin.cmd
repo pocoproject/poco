@@ -143,7 +143,7 @@ if "%BUILD_TOOL%"=="msbuild" (
   if not %LOGGER%X==X (
      set BUILD_TOOL_FLAGS=%BUILD_TOOL_FLAGS% /logger:%LOGGER%
   )
-  set BUILD_TOOL_FLAGS=%BUILD_TOOL_ARGS% /nologo /v:%VERBOSITY%
+  set BUILD_TOOL_FLAGS=%BUILD_TOOL_FLAGS% /nologo /v:%VERBOSITY%
 )
 if not "%BUILD_TOOL%"=="msbuild" (
   set ACTIONSW=/

@@ -13,7 +13,6 @@ platform:
   - Win32
   - x64
   
-      
 configuration:
   - release
   - debug
@@ -26,7 +25,7 @@ install:
   - set
 #  MySQL 32 bit is not available by default on AppVeyor
   - ps: |
-        if ($platform -eq "Win32")
+        if ($env:platform -eq "Win32")
         {
             if (Test-Path "c:\mysql-5.7.9-win32") {
                 echo "using mysql-5.7.9-win32 from cache"
@@ -44,13 +43,17 @@ environment:
   bundling: bundled
     
   matrix:
-#    - builder: cmake
-#      ssl: Win32
-#      vc: amd64_x86
-#      target: x86
-
     - builder: 120
       linkmode: shared
+
+    - builder: 140
+      linkmode: shared
+
+#    - builder: 120
+#      linkmode: static_md
+
+#    - builder: 120
+#      linkmode: static_mt
 
 
    
@@ -103,14 +106,14 @@ build_script:
   
 before_test:
   - set PATH=%CD%\bin;%PATH%
-  - set EXCLUDE_TESTS=NetSLL_Win,Data/ODBC,Data/MySQL,PDF
+  - set EXCLUDE_TESTS=Data/ODBC,Data/MySQL,PDF
 
 after_test:
 
 test_script:
 #  - build\script\runtests2.cmd %suffix%
   - ps: |
-      if ($env:$configuration -eq "release")
+      if ($env:configuration -eq "release")
       {
         & .\build\script\runtests2.cmd %suffix%
       }  
