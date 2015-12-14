@@ -1,8 +1,6 @@
-version: 1.7.0-{branch}.{build}
+version: 1.7.0-{branch}-{build}
 
 cache:
-    - c:\OpenSSL-Win32
-    - c:\OpenSSL-Win64
     - c:\ProgramData\chocolatey
     - c:\mysql-5.7.9-win32
 
@@ -35,10 +33,24 @@ install:
           $env:PATH = $env:ChocolateyInstall + "\bin" + ";" + $env:PATH
           $env:PATH = $env:ChocolateyInstall + "\lib\jom\content" + ";" + $env:PATH
         }
+#  MySQL 32 bit is not available by default on AppVeyor
+  - ps: |
+        if ($platform -eq "Win32")
+        {
+            if (Test-Path "c:\mysql-5.7.9-win32") {
+                echo "using mysql-5.7.9-win32 from cache"
+            }
+            else
+            {
+                echo "downloading mysql-5.7.9-win32"
+                Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile mysql-5.7.9-win32.zip
+                echo "installing mysql-5.7.9-win32"
+                7z x -y mysql-5.7.9-win32.zip -oc:\
+            }
+        }
 
 environment:
   bundling: bundled
-  openssl: 1_0_2e
     
   matrix:
 #    - builder: cmake
@@ -46,12 +58,35 @@ environment:
 #      vc: amd64_x86
 #      target: x86
 
-    - builder: msbuild
+    - builder: 120
       linkmode: shared
+      vc: x86
 
      
       
 before_build:
+  - ps: |
+      if ($env:builder -eq "120")
+      {
+        & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %vc%
+      }
+      if ($env:builder -eq "140")
+      {
+        & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %vc%
+      }
+  
+# MySQL
+  - ps: |
+      if ($env:platform -eq "Win32")
+      {
+          $env:INCLUDE = "C:\mysql-5.7.9-win32\include;" + $env:INCLUDE
+          $env:LIB     = "C:\mysql-5.7.9-win32\lib;" + $env:LIB
+      }
+      if ($env:platform -eq "x64")
+      {
+          $env:INCLUDE = "C:\Program Files\MySql\MySQL Server 5.6\include;" + $env:INCLUDE
+          $env:LIB     = "C:\Program Files\MySql\MySQL Server 5.6\lib;" + $env:LIB
+      }
 
 after_build:
 
@@ -61,7 +96,7 @@ build_script:
 #  - cd cmake-build
 #  - cmake .. -G "Visual Studio 12 2013" -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF -DENABLE_TESTS=ON  
 #  - cmake --build . --config %configuration% -- /nologo /v:minimal
-  - buildwin 120 build %linkmode% %configuration% %platform% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" 
+  - buildwin %builder% build %linkmode% %configuration% %platform% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" 
   
 before_test:
   - set PATH=%CD%\bin;%PATH%
