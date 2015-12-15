@@ -111,7 +111,7 @@ before_test:
 after_test:
 
 test_script:
-  - set suffix
+  - if %platform%==x64 ( set suffix=64 )
   - if %configuration%==release ( build\script\runtests2.cmd !suffix! )
 #  
 #   Unable to get a correct result with powershell...
