@@ -1,0 +1,2 @@
+powershell -ExecutionPolicy RemoteSigned -File %~dp0..\buildwin.ps1 -vs_version 120 -action rebuild -linkmode all -config both -platform x64 -samples -tests -omit Data;Data/SQLite;Data/ODBC;Data/MySQL;Zip;PageCompiler;PageCompiler/File2Page;PDF;PocoDoc;Progen;MongoDB;CppParser;NetSSL_Win;Redis
+powershell -ExecutionPolicy RemoteSigned -File %~dp0..\buildwin.ps1 -vs_version 120 -action rebuild -linkmode all -config both -platform Win32 -samples -tests -omit Data;Data/ODBC;Data;MySQL;Zip;PageCompiler;PageCompiler/File2Page;PDF;Redis;PocoDoc;Progen

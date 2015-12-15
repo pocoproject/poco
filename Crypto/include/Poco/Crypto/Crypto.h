@@ -60,11 +60,18 @@ enum RSAPaddingMode
 // Crypto_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(Crypto_EXPORTS)
-		#define Crypto_API __declspec(dllexport)
+#if defined(_WIN32)
+	#if defined(POCO_DLL)
+		#if defined(Crypto_EXPORTS)
+			#define Crypto_API __declspec(dllexport)
+		#else
+			#define Crypto_API __declspec(dllimport)
+		#endif
 	#else
-		#define Crypto_API __declspec(dllimport)
+		#if (POCO_MSVS_VERSION >= 2015) // needed for OpenSSL
+			#pragma comment(lib, "legacy_stdio_definitions.lib")
+			#pragma comment(lib, "legacy_stdio_wide_specifiers.lib")
+		#endif
 	#endif
 #endif
 

@@ -4,15 +4,34 @@
 #
 # cpp11-gcc
 #
-# Detect compatible GCC version and add c++11/14 flags
+# Detect compatible GXX version and add c++11/14 flags
 #
 
-GCCVERSION := $(subst .,,$(shell gcc --version | grep ^gcc | sed 's/^.* //g'))
+GXXVERSION := $(shell g++ --version | grep ^g++ | sed 's/^.* //g')
 
-# C++14 needs GCC 4.9.2
-ifeq ($(shell test $(GCCVERSION) -gt 491 && echo 1), 1)
+GXX_MAJOR_VER_GTE_5 := $(shell expr `echo $(GXXVERSION) | cut -f1 -d.` \>= 5)
+GXX_MAJOR_VER_GTE_4 := $(shell expr `echo $(GXXVERSION) | cut -f1 -d.` \>= 4)
+GXX_MINOR_VER_GTE_10 := $(shell expr `echo $(GXXVERSION) | cut -f2 -d.` \>= 10)
+GXX_MINOR_VER_GTE_9 := $(shell expr `echo $(GXXVERSION) | cut -f2 -d.` \>= 9)
+GXX_MINOR_VER_GTE_8 := $(shell expr `echo $(GXXVERSION) | cut -f2 -d.` \>= 8)
+GXX_PATCH_VER_GTE_2 := $(shell expr `echo $(GXXVERSION) | cut -f3 -d.` \>= 2)
+GXX_PATCH_VER_GTE_1 := $(shell expr `echo $(GXXVERSION) | cut -f3 -d.` \>= 1)
+
+ifeq "$(GXX_MAJOR_VER_GTE_5)" "1"
 	CXXFLAGS += -std=c++14
-# C++11 needs GCC 4.8.1
-else ifeq ($(shell test $(GCCVERSION) -gt 480 && echo 1), 1)
-	CXXFLAGS += -std=c++11
+else ifeq "$(GXX_MAJOR_VER_GTE_4)" "1"
+    ifeq "$(GXX_MINOR_VER_GTE_10)" "1"
+	CXXFLAGS += -std=c++14
+    # C++14 needs GXX 4.9.2
+    else ifeq "$(GXX_MINOR_VER_GTE_9)" "1"
+	ifeq "$(GXX_PATCH_VER_GTE_2)" "1"
+        	CXXFLAGS += -std=c++14
+	endif
+    # C++11 needs GXX 4.8.1
+    else ifeq "$(GXX_MINOR_VER_GTE_8)" "1"
+	ifeq "$(GXX_PATCH_VER_GTE_1)" "1"
+        	CXXFLAGS += -std=c++0x
+	endif
+    endif
 endif
+

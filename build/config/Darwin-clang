@@ -25,8 +25,8 @@ endif
 #
 # Tools
 #
-CC      = $(shell xcrun -find clang)
-CXX     = $(shell xcrun -find clang++)
+CC      = clang
+CXX     = clang++
 LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
 RANLIB  = ranlib
@@ -50,10 +50,10 @@ SHAREDLIBLINKEXT = .dylib
 # Compiler and Linker Flags
 #
 CFLAGS          = $(ARCHFLAGS)
-CXXFLAGS        = $(ARCHFLAGS) -std=c++11 -stdlib=libc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
-LINKFLAGS       = $(ARCHFLAGS) -stdlib=libc++
-SHLIBFLAGS      = $(ARCHFLAGS) -stdlib=libc++
-DYLIBFLAGS      = $(ARCHFLAGS) -stdlib=libc++
+CXXFLAGS        = $(ARCHFLAGS) -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
+LINKFLAGS       = $(ARCHFLAGS)
+SHLIBFLAGS      = $(ARCHFLAGS)
+DYLIBFLAGS      = $(ARCHFLAGS)
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  =
