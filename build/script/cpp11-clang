@@ -13,11 +13,11 @@ CLANG_MINOR_VER_GTE_3 := $(shell expr `clang++ -dumpversion | cut -f2 -d.` \>= 3
 CLANG_MINOR_VER_GTE_4 := $(shell expr `clang++ -dumpversion | cut -f2 -d.` \>= 4)
 
 ifeq "$(CLANG_MAJOR_VER_GTE_4)" "1"
-	CXXFLAGS += -std=c++14
+	CXXFLAGS += -std=c++1y
 else ifeq "$(CLANG_MAJOR_VER_GTE_3)" "1"
 	# C++14 needs clang 3.4
     ifeq "$(CLANG_MINOR_VER_GTE_4)" "1"
-        CXXFLAGS += -std=c++14
+        CXXFLAGS += -std=c++1y
 	# C++11 needs clang 3.3
     else ifeq "$(CLANG_MINOR_VER_GTE_3)" "1"
         CXXFLAGS += -std=c++11
