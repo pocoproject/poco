@@ -106,14 +106,17 @@ build_script:
 before_test:
   - set PATH=%CD%\bin;%PATH%
   - set PATH=%CD%\bin64;%PATH%
-  - set EXCLUDE_TESTS=Data/ODBC,Data/MySQL,PDF
+  - set EXCLUDE_TESTS=Data/ODBC Data/MySQL PDF
 
 after_test:
 
 test_script:
+  - set suffix
   - if %configuration%==release ( build\script\runtests2.cmd !suffix! )
 #  
-#    & .\build\script\runtests2.cmd %suffix%
+#   Unable to get a correct result with powershell...
+#   Job last more than one hour
+#
 #  - ps: |
 #      if ($env:configuration -eq "release")
 #      {
