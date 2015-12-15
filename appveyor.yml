@@ -116,7 +116,14 @@ test_script:
   - ps: |
       if ($env:configuration -eq "release")
       {
-        Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -Args "$env:suffix" -RSO "cout" -RSE "cerr"
+        if ($env:platform -eq "Win32")
+        {
+        Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -RSO "cout" -RSE "cerr"
+        }
+        if ($env:platform -eq "x64")
+        {
+        Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -Args "64" -RSO "cout" -RSE "cerr"
+        }
         Get-Content cout; Get-Content cerr
       }
   
