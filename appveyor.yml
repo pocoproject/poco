@@ -118,11 +118,15 @@ test_script:
       {
         if ($env:platform -eq "Win32")
         {
-        Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -RSO "cout" -RSE "cerr"
+          $env:PATH = "$env:CD\bin;" + $env:PATH
+          $process = Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -PassThru -RSO "cout" -RSE "cerr"
+          $process.ExitCode
         }
         if ($env:platform -eq "x64")
         {
-        Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -Args "64" -RSO "cout" -RSE "cerr"
+          $env:PATH = "$env:CD\bin64;" + $env:PATH
+          $process = Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -PassThru -Args "64" -RSO "cout" -RSE "cerr"
+          $process.ExitCode
         }
         Get-Content cout; Get-Content cerr
       }
