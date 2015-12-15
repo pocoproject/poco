@@ -15,4 +15,4 @@ export CPPUNIT_IGNORE="\
 export EXCLUDE_TESTS="Data/MySQL Data/ODBC MongoDB PDF"
 export PATH=$PATH:.
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.
-build/script/runtests.sh %1
+build/script/runtests.sh

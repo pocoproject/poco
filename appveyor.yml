@@ -106,7 +106,7 @@ build_script:
 before_test:
   - set PATH=%CD%\bin;%PATH%
   - set PATH=%CD%\bin64;%PATH%
-  - set EXCLUDE_TESTS=Data/ODBC Data/MySQL PDF
+  - set EXCLUDE_TESTS=Data/ODBC,Data/MySQL,PDF
 
 after_test:
 
