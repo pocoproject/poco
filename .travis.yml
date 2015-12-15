@@ -40,7 +40,7 @@ matrix:
       os: osx
       script:
         - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make install -s -j2
-        - ./travis/runtests.sh
+        - ./travis/runtests.sh 64
 
     - env:    TEST_NAME="Linux gcc (make) bundled"
       compiler: gcc
