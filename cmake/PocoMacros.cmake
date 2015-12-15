@@ -202,10 +202,19 @@ write_basic_package_version_file(
   VERSION ${PROJECT_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
-export(EXPORT "${target_name}Targets"
-  FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
-  NAMESPACE "${PROJECT_NAME}::"
-)
+if ("${CMAKE_VERSION}" VERSION_LESS "3.0.0")
+    if (NOT EXISTS "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake")
+    export(TARGETS "${target_name}" APPEND
+      FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
+      NAMESPACE "${PROJECT_NAME}::"
+    )
+    endif ()
+else ()
+    export(EXPORT "${target_name}Targets"
+      FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
+      NAMESPACE "${PROJECT_NAME}::"
+    )
+endif ()
 configure_file("cmake/Poco${target_name}Config.cmake"
   "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
   @ONLY
