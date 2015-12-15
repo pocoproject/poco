@@ -140,10 +140,10 @@ if "%BUILD_TOOL%"=="msbuild" (
   set USEENV=/p:UseEnv=true
 
   set BUILD_TOOL_FLAGS=/clp:NoSummary
+  set BUILD_TOOL_FLAGS=%BUILD_TOOL_FLAGS% /nologo /v:%VERBOSITY%
   if not %LOGGER%X==X (
      set BUILD_TOOL_FLAGS=%BUILD_TOOL_FLAGS% /logger:%LOGGER%
   )
-  set BUILD_TOOL_FLAGS=%BUILD_TOOL_FLAGS% /nologo /v:%VERBOSITY%
 )
 if not "%BUILD_TOOL%"=="msbuild" (
   set ACTIONSW=/
