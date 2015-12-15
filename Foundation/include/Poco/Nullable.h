@@ -74,9 +74,9 @@ public:
 	{
 	}
 
-	Nullable(const C& value): 
+	Nullable(const C& rValue): 
 		/// Creates a Nullable with the given value.
-		_value(value), 
+		_value(rValue), 
 		_isNull(false)
 	{
 	}
@@ -93,10 +93,10 @@ public:
 	{
 	}
 
-	Nullable& assign(const C& value)
+	Nullable& assign(const C& rValue)
 		/// Assigns a value to the Nullable.
 	{
-		_value  = value;
+		_value  = rValue;
 		_isNull = false;
 		return *this;
 	}
@@ -116,10 +116,10 @@ public:
 		return *this;
 	}
 	
-	Nullable& operator = (const C& value)
+	Nullable& operator = (const C& rValue)
 		/// Assigns a value to the Nullable.
 	{
-		return assign(value);
+		return assign(rValue);
 	}
 
 	Nullable& operator = (const Nullable& other)
@@ -148,10 +148,10 @@ public:
 		return (_isNull && other._isNull) || (_isNull == other._isNull && _value == other._value);
 	}
 
-	bool operator == (const C& value) const
+	bool operator == (const C& rValue) const
 		/// Compares Nullable with value for equality
 	{
-		return (!_isNull && _value == value);
+		return (!_isNull && _value == rValue);
 	}
 
 	bool operator == (const NullType&) const
@@ -160,10 +160,10 @@ public:
 		return _isNull;
 	}
 
-	bool operator != (const C& value) const
+	bool operator != (const C& rValue) const
 		/// Compares Nullable with value for non equality
 	{
-		return !(*this == value);
+		return !(*this == rValue);
 	}
 
 	bool operator != (const Nullable<C>& other) const

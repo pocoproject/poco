@@ -72,7 +72,6 @@ if(NOT MSVC_IDE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
       "Choose the type of build, options are: None Debug Release" FORCE)
   endif()
-  message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -304,6 +303,11 @@ install(
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
 message(STATUS "Installation target path: ${CMAKE_INSTALL_PREFIX}")
+
+message(STATUS "")
+message(STATUS "Generated with config types: ${CMAKE_CONFIGURATION_TYPES}")
+message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")
+message(STATUS "")
 
 message(STATUS "C_FLAGS:  =${CMAKE_C_FLAGS}")
 message(STATUS "CMAKE_C_FLAGS_DEBUG:=${CMAKE_C_FLAGS_DEBUG}")

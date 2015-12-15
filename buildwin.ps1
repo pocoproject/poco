@@ -201,9 +201,9 @@ function Process-Input
 }
 
 
-function Build-MSBuild([string] $vsProject)
+function Build-MSBuild([string] $vsProject, [string] $vsTestAppProject, [string] $vsTestLibraryProject)
 {
-  Write-Host "Build-MSBuild ==> $vsProject"
+  Write-Host "Build-MSBuild ==> $vsProject, $vsTestAppProject, $vsTestLibraryProject"
   [string]$flags = '/clp:NoSummary /nologo /v:minimal'
   
   if ($linkmode -eq 'all')
@@ -220,6 +220,14 @@ function Build-MSBuild([string] $vsProject)
           $projectConfig = "$cfg"
           $projectConfig += "_$mode"
           Invoke-Expression "msbuild $vsProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+          if ($vsTestAppProject -ne '')
+          {
+            Invoke-Expression "msbuild $vsTestAppProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+          }
+          if (($vsTestLibraryProject -ne '') -and ($linkModeArr -eq 'shared'))
+          {
+            Invoke-Expression "msbuild $vsTestLibraryProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+          }
         }
       }
       else #config
@@ -227,6 +235,14 @@ function Build-MSBuild([string] $vsProject)
         $projectConfig = "$config"
         $projectConfig += "_$mode"
         Invoke-Expression "msbuild $vsProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+          if ($vsTestAppProject -ne '')
+          {
+            Invoke-Expression "msbuild $vsTestAppProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+          }
+          if (($vsTestLibraryProject -ne '') -and ($linkModeArr -eq 'shared'))
+          {
+            Invoke-Expression "msbuild $vsTestLibraryProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+          }
       }
     }
   }
@@ -240,6 +256,14 @@ function Build-MSBuild([string] $vsProject)
         $projectConfig = "$cfg"
         $projectConfig += "_$linkmode"
         Invoke-Expression "msbuild $vsProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+        if ($vsTestAppProject -ne '')
+        {
+          Invoke-Expression "msbuild $vsTestAppProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+        }
+          if (($vsTestLibraryProject -ne '') -and ($linkmode -eq 'shared'))
+        {
+          Invoke-Expression "msbuild $vsTestLibraryProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+        }
       }
     }
     else #config
@@ -247,6 +271,14 @@ function Build-MSBuild([string] $vsProject)
       $projectConfig = "$config"
       $projectConfig += "_$linkmode"
       Invoke-Expression "msbuild $vsProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+      if ($vsTestAppProject -ne '')
+      {
+        Invoke-Expression "msbuild $vsTestAppProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+      }
+          if (($vsTestLibraryProject -ne '') -and ($linkmode -eq 'shared'))
+      {
+        Invoke-Expression "msbuild $vsTestLibraryProject $flags /t:$action /p:Configuration=$projectConfig /p:Platform=$platform /p:useenv=true"
+      }
     }
   }
 }
@@ -342,7 +374,7 @@ function Build
     if ($omitArray -NotContains $component)
     {
       $vsProject = "$poco_base\$componentDir\$componentName$($platformName)$($suffix).$($extension)"
-      
+
       if (!(Test-Path -Path $vsProject)) # when VS project name is not same as directory name
       {
         $vsProject = "$poco_base\$componentDir$($platformName)$($suffix).$($extension)"
@@ -354,7 +386,7 @@ function Build
           Return # since Foreach-Object is a function, this is actually loop "continue"
         }
       }
-      
+
       Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
       Write-Host "| Building $vsProject"
       Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -370,13 +402,20 @@ function Build
 
       if ($tests)
       {
-        $vsTestProject = "$poco_base\$componentDir\testsuite\TestSuite$($platformName)$($suffix).$($extension)"
+        $vsTestProject        = "$poco_base\$componentDir\testsuite\TestSuite$($platformName)$($suffix).$($extension)"
+        $vsTestAppProject     = ''
+        $vsTestLibraryProject = ''
+        if ($componentDir -eq "Foundation")
+        {
+          $vsTestAppProject     = "$poco_base\$componentDir\testsuite\TestApp$($platformName)$($suffix).$($extension)"
+          $vsTestLibraryProject = "$poco_base\$componentDir\testsuite\TestLibrary$($platformName)$($suffix).$($extension)"
+        }
         Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         Write-Host "| Building $vsTestProject"
         Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
         if ($tool -eq 'devenv') { Build-Devenv $vsTestProject }
-        elseif ($tool -eq 'msbuild') { Build-MSBuild $vsTestProject }
+        elseif ($tool -eq 'msbuild') { Build-MSBuild $vsTestProject $vsTestAppProject $vsTestLibraryProject}
         else{ Write-Host "Tool not supported: $tool" }
       }
 

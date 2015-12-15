@@ -40,9 +40,6 @@ void ProcessTest::testLaunch()
 {
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
@@ -70,9 +67,6 @@ void ProcessTest::testLaunchRedirectIn()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
@@ -99,9 +93,6 @@ void ProcessTest::testLaunchRedirectOut()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
@@ -130,9 +121,6 @@ void ProcessTest::testLaunchEnv()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
@@ -163,9 +151,6 @@ void ProcessTest::testIsRunning()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
@@ -196,9 +181,6 @@ void ProcessTest::testSignalExitCode()
 #if defined(POCO_OS_FAMILY_UNIX)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 	cmd = "./";
 	cmd += name;

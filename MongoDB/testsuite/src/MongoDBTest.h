@@ -42,6 +42,7 @@ public:
 	void testCursorRequest();
 	void testObjectID();
 	void testCommand();
+	void testUUID();
 	void setUp();
 	void tearDown();
 
