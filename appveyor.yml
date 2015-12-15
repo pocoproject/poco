@@ -112,11 +112,13 @@ after_test:
 
 test_script:
 #  - build\script\runtests2.cmd %suffix%
+#    & .\build\script\runtests2.cmd %suffix%
   - ps: |
       if ($env:configuration -eq "release")
       {
-        & .\build\script\runtests2.cmd %suffix%
-      }  
+        Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -Args "$env:suffix" -RSO "cout" -RSE "cerr"
+        Get-Content cout; Get-Content cerr
+      }
   
 on_success:
   - echo success
@@ -144,4 +146,7 @@ notifications:
   
   - provider: Slack
     incoming_webhook: https://hooks.slack.com/services/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
+    on_build_success: true
+    on_build_failure: true
+    on_build_status_changed: false
     

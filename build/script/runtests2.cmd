@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 rem
 rem $Id$
 rem
