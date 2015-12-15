@@ -40,6 +40,9 @@ install:
 
 environment:
   bundling: bundled
+  logger: "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  samples: samples
+  tests: tests
     
   matrix:
     - builder: 120
@@ -101,7 +104,7 @@ before_build:
 after_build:
 
 build_script:
-  - buildwin %builder% build %linkmode% %configuration% %platform% samples tests msbuild minimal "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" 
+  - buildwin %builder% build %linkmode% %configuration% %platform% %samples% %tests% msbuild minimal %logger%
   
 before_test:
   - set PATH=%CD%\bin;%PATH%
@@ -111,6 +114,7 @@ before_test:
 after_test:
 
 test_script:
+  - set suffix=""
   - if %platform%==x64 ( set suffix=64 )
   - if %configuration%==release ( build\script\runtests2.cmd !suffix! )
 #  
