@@ -1,7 +1,6 @@
 version: 1.7.0-{branch}-{build}
 
 cache:
-    - c:\ProgramData\chocolatey
     - c:\mysql-5.7.9-win32
 
 services:
@@ -106,30 +105,32 @@ build_script:
   
 before_test:
   - set PATH=%CD%\bin;%PATH%
+  - set PATH=%CD%\bin64;%PATH%
   - set EXCLUDE_TESTS=Data/ODBC,Data/MySQL,PDF
 
 after_test:
 
 test_script:
-#  - build\script\runtests2.cmd %suffix%
+  - if %configuration%==release ( build\script\runtests2.cmd !suffix! )
+#  
 #    & .\build\script\runtests2.cmd %suffix%
-  - ps: |
-      if ($env:configuration -eq "release")
-      {
-        if ($env:platform -eq "Win32")
-        {
-          $env:PATH = "$env:CD\bin;" + $env:PATH
-          $process = Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -PassThru -RSO "cout" -RSE "cerr"
-          $process.ExitCode
-        }
-        if ($env:platform -eq "x64")
-        {
-          $env:PATH = "$env:CD\bin64;" + $env:PATH
-          $process = Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -PassThru -Args "64" -RSO "cout" -RSE "cerr"
-          $process.ExitCode
-        }
-        Get-Content cout; Get-Content cerr
-      }
+#  - ps: |
+#      if ($env:configuration -eq "release")
+#      {
+#        if ($env:platform -eq "Win32")
+#        {
+#          $env:PATH = "$env:CD\bin;" + $env:PATH
+#          $process = Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -PassThru -RSO "cout" -RSE "cerr"
+#          $process.ExitCode
+#        }
+#        if ($env:platform -eq "x64")
+#        {
+#          $env:PATH = "$env:CD\bin64;" + $env:PATH
+#          $process = Start-Process -NoNewWindow -Wait -FilePath .\build\script\runtests2.cmd -PassThru -Args "64" -RSO "cout" -RSE "cerr"
+#          $process.ExitCode
+#        }
+#        Get-Content cout; Get-Content cerr
+#      }
   
 on_success:
   - echo success
@@ -153,11 +154,13 @@ notifications:
       secure: xoOlP1UHshqjvh/INwMcNhZ5UHsTVKLGY5maTSjaxDc0fvRwoWIdYvY/CofQEuy2wOIBQK4eLD+tA0xG78ZgqQ==
     channel: poco
     on_build_success: false
-    on_build_status_changed: false
+    on_build_status_changed: true
   
   - provider: Slack
     incoming_webhook: https://hooks.slack.com/services/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
-    on_build_success: true
+    auth_token:
+      secure: Xsss/K3VV9wZI9Ffwvafa67kyohNA437xJ3WA9fVI4w=
+    on_build_success: false
     on_build_failure: true
-    on_build_status_changed: false
+    on_build_status_changed: true
     
