@@ -124,6 +124,11 @@ test_script:
 #  - if %configuration%==release (build\script\runtests2.cmd !suffix!)
 
   - ps: |
+      $runs=0
+      $failures=0
+      $failedTests=''
+      $status=0
+
       $env:POCO_BASE = $env:CD
       $components = @('Foundation', 'XML', 'JSON', 'Util', 'Net', 'Crypto', 'NetSSL_OpenSSL', 'Data', 'MongoDB', 'Redis', 'Zip', 'PageCompiler', 'PageCompiler/File2Page', 'CppParser')
       if ($env:configuration -eq "release")
@@ -134,12 +139,16 @@ test_script:
           foreach ($component in $components) { 
             [string]$path = $component + "\testsuite\bin\TestSuite.exe";
              if (Test-Path -Path $path) {
+                $runs += 1;
                 Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
-                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:linkmode $component; 
+                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:Configuration $env:linkmode $component; 
                 Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
                 $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr"; 
                 Get-Content cout; Get-Content cerr;
-                $process.ExitCode;
+                if ($process.ExitCode -gt 0)
+                {
+                   $failures += 1;$failedTests += $component + ', ';
+                }
              }
            }
         }
@@ -149,15 +158,28 @@ test_script:
           foreach ($component in $components) { 
             [string]$path = $component + "\testsuite\bin64\TestSuite.exe";
              if (Test-Path -Path $path) {
+                $runs += 1;
                 Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
-                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:linkmode $component; 
+                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:Configuration $env:linkmode $component; 
                 Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
                 $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr"; 
                 Get-Content cout; Get-Content cerr;
-                $process.ExitCode;
+                if ($process.ExitCode -gt 0)
+                {
+                   $failures += 1;$failedTests += $component + ', ';
+                }
              }
            }
-         }    
+         }
+         if ($faillures -gt 0)
+         {
+            Write-Host 'Failed: ' $failedTests
+            exit $failures;
+         }
+         else
+         {
+            exit 0;
+         }
       }
 
 #  
