@@ -42,6 +42,7 @@ environment:
   logger: 'C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll'
   samples: samples
   tests: tests
+  verbosity: minimal
     
   matrix:
     - builder: 120
@@ -109,7 +110,7 @@ before_build:
 after_build:
 
 build_script:
-  - buildwin %builder% build %linkmode% %configuration% %platform% %samples% %tests% msbuild minimal %logger%
+  - buildwin %builder% build %linkmode% %configuration% %platform% %samples% %tests% msbuild %verbosity% %logger%
   
 before_test:
   - set PATH=%CD%\bin;%PATH%
@@ -119,8 +120,35 @@ before_test:
 after_test:
 
 test_script:
-  - if %platform%==x64 ( set suffix=64 )
-  - if %configuration%==release (build\script\runtests2.cmd !suffix!)
+#  - if %platform%==x64 ( set suffix=64 )
+#  - if %configuration%==release (build\script\runtests2.cmd !suffix!)
+
+  - ps: |
+      if ($env:configuration -eq "release")
+      {
+        if ($env:platform -eq "Win32")
+        {
+          $env:PATH = "$env:CD\bin;" + $env:PATH
+        }
+        if ($env:platform -eq "x64")
+        {
+          $env:PATH = "$env:CD\bin64;" + $env:PATH
+        }
+        Get-Childitem "." -Recurse | `
+            Where {$_.Extension -eq ".exe" -and `
+                   $_.DirectoryName -match "bin" -and `
+                   $_.DirectoryName -notmatch "bin64" -and `
+                   $_.DirectoryName -notmatch "Data" -and `
+                   $_.DirectoryName -notmatch "PDF" -and `
+                   $_.DirectoryName -notmatch "static" -and `
+                   $_.BaseName -eq "TestSuite" } | `
+            % { `
+                Write-Host -ForegroundColor Yellow $_.FullName; `
+                $process = Start-Process -NoNewWindow -Wait -FilePath $_.FullName -Args "-all" -RSO "cout" -RSE "cerr" ; `
+                Get-Content cout; Get-Content cerr; $process.ExitCode `
+            }
+      }
+
 #  
 #   Unable to get a correct result with powershell...
 #   Job lasts more than one hour
