@@ -134,11 +134,11 @@ test_script:
           foreach ($component in $components) { 
             [string]$path = $component + "\testsuite\bin\TestSuite.exe";
              if (Test-Path -Path $path) {
-                Write-Host -ForegroundColor Yellow '--------------------------------------'; 
-                Write-Host -ForegroundColor Yellow '|' $component;
-                Write-Host -ForegroundColor Yellow '--------------------------------------'; 
+                Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
+                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:linkmode $component; 
+                Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
                 $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr"; 
-                Get-Content cout; Get-Content cerr:
+                Get-Content cout; Get-Content cerr;
                 $process.ExitCode;
              }
            }
@@ -147,13 +147,13 @@ test_script:
         {
           $env:PATH = "$env:CD\bin64;" + $env:PATH
           foreach ($component in $components) { 
-            [string]$path = $component + "\testsuite\bin\TestSuite.exe";
+            [string]$path = $component + "\testsuite\bin64\TestSuite.exe";
              if (Test-Path -Path $path) {
-                Write-Host -ForegroundColor Yellow '--------------------------------------'; 
-                Write-Host -ForegroundColor Yellow '|' $component;
-                Write-Host -ForegroundColor Yellow '--------------------------------------'; 
+                Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
+                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:linkmode $component; 
+                Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
                 $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr"; 
-                Get-Content cout; Get-Content cerr:
+                Get-Content cout; Get-Content cerr;
                 $process.ExitCode;
              }
            }
