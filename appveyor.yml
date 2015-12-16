@@ -125,46 +125,43 @@ test_script:
 
   - ps: |
       $env:POCO_BASE = $env:CD
+      $components = @('Foundation', 'XML', 'JSON', 'Util', 'Net', 'Crypto', 'NetSSL_OpenSSL', 'Data', 'MongoDB', 'Redis', 'Zip', 'PageCompiler', 'PageCompiler/File2Page', 'CppParser')
       if ($env:configuration -eq "release")
       {
         if ($env:platform -eq "Win32")
         {
           $env:PATH = "$env:CD\bin;" + $env:PATH
-          Get-Childitem "." -Recurse | `
-            Where {$_.Extension -eq ".exe" -and `
-                   $_.DirectoryName -match "bin" -and `
-                   $_.DirectoryName -notmatch "bin64" -and `
-                   $_.DirectoryName -notmatch "Data" -and `
-                   $_.DirectoryName -notmatch "PDF" -and `
-                   $_.DirectoryName -notmatch "static" -and `
-                   $_.BaseName -eq "TestSuite" } | `
-              % { `
-                Write-Host -ForegroundColor Yellow $_.FullName; `
-                $process = Start-Process -NoNewWindow -Wait -FilePath $_.FullName -Args "-all"; `
-                $process.ExitCode `
-              }
+          foreach ($component in $components) { 
+            [string]$path = $component + "\testsuite\bin\TestSuite.exe";
+             if (Test-Path -Path $path) {
+                Write-Host -ForegroundColor Yellow '--------------------------------------'; 
+                Write-Host -ForegroundColor Yellow '|' $component;
+                Write-Host -ForegroundColor Yellow '--------------------------------------'; 
+                $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr"; 
+                Get-Content cout; Get-Content cerr:
+                $process.ExitCode;
+             }
+           }
         }
         if ($env:platform -eq "x64")
         {
           $env:PATH = "$env:CD\bin64;" + $env:PATH
-          Get-Childitem "." -Recurse | `
-            Where {$_.Extension -eq ".exe" -and `
-                   $_.DirectoryName -match "bin64" -and `
-                   $_.DirectoryName -notmatch "Data" -and `
-                   $_.DirectoryName -notmatch "PDF" -and `
-                   $_.DirectoryName -notmatch "static" -and `
-                   $_.BaseName -eq "TestSuite" } | `
-              % { `
-                Write-Host -ForegroundColor Yellow $_.FullName; `
-                $process = Start-Process -NoNewWindow -Wait -FilePath $_.FullName -Args "-all"; `
-                $process.ExitCode `
-              }
-        }
-        
+          foreach ($component in $components) { 
+            [string]$path = $component + "\testsuite\bin\TestSuite.exe";
+             if (Test-Path -Path $path) {
+                Write-Host -ForegroundColor Yellow '--------------------------------------'; 
+                Write-Host -ForegroundColor Yellow '|' $component;
+                Write-Host -ForegroundColor Yellow '--------------------------------------'; 
+                $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr"; 
+                Get-Content cout; Get-Content cerr:
+                $process.ExitCode;
+             }
+           }
+         }    
       }
 
 #  
-#   Unable to get a correct result with powershell...
+#	Unable to get a correct result with powershell...
 #   Job lasts more than one hour
 #
 #  - ps: |
@@ -217,4 +214,5 @@ notifications:
     on_build_success: false
     on_build_failure: true
     on_build_status_changed: true
+    
     
