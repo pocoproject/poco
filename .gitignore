@@ -122,7 +122,7 @@ stage/
 releases/
 Zip/testsuite/data*.bin
 Foundation/testsuite/globtest/
-
+TestConfiguration/
 
 # openssl binaries #
 ####################
