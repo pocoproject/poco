@@ -124,17 +124,13 @@ test_script:
 #  - if %configuration%==release (build\script\runtests2.cmd !suffix!)
 
   - ps: |
+      $env:POCO_BASE = $env:CD
       if ($env:configuration -eq "release")
       {
         if ($env:platform -eq "Win32")
         {
           $env:PATH = "$env:CD\bin;" + $env:PATH
-        }
-        if ($env:platform -eq "x64")
-        {
-          $env:PATH = "$env:CD\bin64;" + $env:PATH
-        }
-        Get-Childitem "." -Recurse | `
+          Get-Childitem "." -Recurse | `
             Where {$_.Extension -eq ".exe" -and `
                    $_.DirectoryName -match "bin" -and `
                    $_.DirectoryName -notmatch "bin64" -and `
@@ -142,11 +138,29 @@ test_script:
                    $_.DirectoryName -notmatch "PDF" -and `
                    $_.DirectoryName -notmatch "static" -and `
                    $_.BaseName -eq "TestSuite" } | `
-            % { `
+              % { `
                 Write-Host -ForegroundColor Yellow $_.FullName; `
-                $process = Start-Process -NoNewWindow -Wait -FilePath $_.FullName -Args "-all" -RSO "cout" -RSE "cerr" ; `
-                Get-Content cout; Get-Content cerr; $process.ExitCode `
-            }
+                $process = Start-Process -NoNewWindow -Wait -FilePath $_.FullName -Args "-all"; `
+                $process.ExitCode `
+              }
+        }
+        if ($env:platform -eq "x64")
+        {
+          $env:PATH = "$env:CD\bin64;" + $env:PATH
+          Get-Childitem "." -Recurse | `
+            Where {$_.Extension -eq ".exe" -and `
+                   $_.DirectoryName -match "bin64" -and `
+                   $_.DirectoryName -notmatch "Data" -and `
+                   $_.DirectoryName -notmatch "PDF" -and `
+                   $_.DirectoryName -notmatch "static" -and `
+                   $_.BaseName -eq "TestSuite" } | `
+              % { `
+                Write-Host -ForegroundColor Yellow $_.FullName; `
+                $process = Start-Process -NoNewWindow -Wait -FilePath $_.FullName -Args "-all"; `
+                $process.ExitCode `
+              }
+        }
+        
       }
 
 #  
