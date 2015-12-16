@@ -6,7 +6,6 @@ cache:
 services:
   - mysql
   - mongodb
-  - mssql2014  
 
 platform:
   - Win32
@@ -48,13 +47,19 @@ environment:
     - builder: 120
       linkmode: shared
 
-    - builder: 140
-      linkmode: shared
-
 #    - builder: 120
 #      linkmode: static_md
 
 #    - builder: 120
+#      linkmode: static_mt
+
+    - builder: 140
+      linkmode: shared
+
+#    - builder: 140
+#      linkmode: static_md
+
+#    - builder: 140
 #      linkmode: static_mt
 
 
@@ -114,12 +119,11 @@ before_test:
 after_test:
 
 test_script:
-  - set suffix=""
   - if %platform%==x64 ( set suffix=64 )
-  - if %configuration%==release ( build\script\runtests2.cmd !suffix! )
+  - if %configuration%==release (build\script\runtests2.cmd !suffix!)
 #  
 #   Unable to get a correct result with powershell...
-#   Job last more than one hour
+#   Job lasts more than one hour
 #
 #  - ps: |
 #      if ($env:configuration -eq "release")
