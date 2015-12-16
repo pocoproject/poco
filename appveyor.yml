@@ -109,7 +109,7 @@ build_script:
 before_test:
   - set PATH=%CD%\bin;%PATH%
   - set PATH=%CD%\bin64;%PATH%
-  - set EXCLUDE_TESTS=Data/ODBC,Data/MySQL,PDF
+  - set EXCLUDE_TESTS=Data,Data/ODBC,Data/MySQL,PDF
 
 after_test:
 
@@ -167,6 +167,7 @@ notifications:
     incoming_webhook: https://hooks.slack.com/services/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
     auth_token:
       secure: Xsss/K3VV9wZI9Ffwvafa67kyohNA437xJ3WA9fVI4w=
+    channel: appveyor
     on_build_success: false
     on_build_failure: true
     on_build_status_changed: true
