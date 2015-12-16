@@ -39,8 +39,9 @@ matrix:
       compiler: clang
       os: osx
       script:
-        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make install -j2
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite
         - cat config.*
+        - make install -j2
         - find . -name "*testrunner*"
         - ./travis/runtests.sh
 
