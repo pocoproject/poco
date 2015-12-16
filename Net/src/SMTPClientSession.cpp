@@ -148,6 +148,7 @@ void SMTPClientSession::loginUsingCRAM(const std::string& username, const std::s
 	
 	std::ostringstream challengeResponseBase64;
 	Base64Encoder encoder(challengeResponseBase64);
+	encoder.rdbuf()->setLineLength(0);
 	encoder << challengeResponse;
 	encoder.close();
 	
@@ -164,11 +165,13 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 	
 	std::ostringstream usernameBase64;
 	Base64Encoder usernameEncoder(usernameBase64);
+	usernameEncoder.rdbuf()->setLineLength(0);
 	usernameEncoder << username;
 	usernameEncoder.close();
 	
 	std::ostringstream passwordBase64;
 	Base64Encoder passwordEncoder(passwordBase64);
+	passwordEncoder.rdbuf()->setLineLength(0);
 	passwordEncoder << password;
 	passwordEncoder.close();
 	
@@ -206,16 +209,32 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 	}
 }
 
+
 void SMTPClientSession::loginUsingPlain(const std::string& username, const std::string& password)
 {
 	std::ostringstream credentialsBase64;
 	Base64Encoder credentialsEncoder(credentialsBase64);
+	credentialsEncoder.rdbuf()->setLineLength(0);
 	credentialsEncoder << '\0' << username << '\0' << password;
 	credentialsEncoder.close();
 
 	std::string response;
 	int status = sendCommand("AUTH PLAIN", credentialsBase64.str(), response);
 	if (!isPositiveCompletion(status)) throw SMTPException("Login using PLAIN failed", response, status);
+}
+
+
+void SMTPClientSession::loginUsingXOAUTH2(const std::string& username, const std::string& password)
+{
+	std::ostringstream credentialsBase64;
+	Base64Encoder credentialsEncoder(credentialsBase64);
+	credentialsEncoder.rdbuf()->setLineLength(0);
+	credentialsEncoder << "user=" << username << "\001auth=Bearer " << password << "\001\001";
+	credentialsEncoder.close();
+
+	std::string response;
+	int status = sendCommand("AUTH XOAUTH2", credentialsBase64.str(), response);
+	if (!isPositiveCompletion(status)) throw SMTPException("Login using XOAUTH2 failed", response, status);
 }
 
 
@@ -261,6 +280,14 @@ void SMTPClientSession::login(const std::string& hostname, LoginMethod loginMeth
 			loginUsingPlain(username, password);
 		}
 		else throw SMTPException("The mail service does not support PLAIN authentication", response);
+	}
+	else if (loginMethod == AUTH_XOAUTH2)
+	{
+		if (response.find("XOAUTH2", 0) != std::string::npos)
+		{
+			loginUsingXOAUTH2(username, password);
+		}
+		else throw SMTPException("The mail service does not support XOAUTH2 authentication", response);
 	}
 	else if (loginMethod != AUTH_NONE)
 	{
