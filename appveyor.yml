@@ -40,7 +40,7 @@ install:
 
 environment:
   bundling: bundled
-  logger: "C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  logger: 'C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll'
   samples: samples
   tests: tests
     
