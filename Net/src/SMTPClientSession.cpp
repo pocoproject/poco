@@ -148,6 +148,7 @@ void SMTPClientSession::loginUsingCRAM(const std::string& username, const std::s
 	
 	std::ostringstream challengeResponseBase64;
 	Base64Encoder encoder(challengeResponseBase64);
+	encoder.rdbuf()->setLineLength(0);
 	encoder << challengeResponse;
 	encoder.close();
 	
@@ -164,11 +165,13 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 	
 	std::ostringstream usernameBase64;
 	Base64Encoder usernameEncoder(usernameBase64);
+	usernameEncoder.rdbuf()->setLineLength(0);
 	usernameEncoder << username;
 	usernameEncoder.close();
 	
 	std::ostringstream passwordBase64;
 	Base64Encoder passwordEncoder(passwordBase64);
+	passwordEncoder.rdbuf()->setLineLength(0);
 	passwordEncoder << password;
 	passwordEncoder.close();
 	
@@ -211,6 +214,7 @@ void SMTPClientSession::loginUsingPlain(const std::string& username, const std::
 {
 	std::ostringstream credentialsBase64;
 	Base64Encoder credentialsEncoder(credentialsBase64);
+	credentialsEncoder.rdbuf()->setLineLength(0);
 	credentialsEncoder << '\0' << username << '\0' << password;
 	credentialsEncoder.close();
 
@@ -224,6 +228,7 @@ void SMTPClientSession::loginUsingXOAUTH2(const std::string& username, const std
 {
 	std::ostringstream credentialsBase64;
 	Base64Encoder credentialsEncoder(credentialsBase64);
+	credentialsEncoder.rdbuf()->setLineLength(0);
 	credentialsEncoder << "user=" << username << "\001auth=Bearer " << password << "\001\001";
 	credentialsEncoder.close();
 
