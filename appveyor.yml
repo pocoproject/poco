@@ -127,15 +127,13 @@ after_test:
 
 test_script:
   - ps: |
-      $runs=0;$fails=0;$failedTests='';$status=0
       $env:POCO_BASE = $env:CD
+      $runs=0;$fails=0;$failedTests='';$status=0
+
+      $components = gc components
+      $components
 
       $excludes   = @('Data', 'Data/MySQL', 'Data/ODBC', 'Data/SQLite', 'Redis') 
-      
-      $components = @('Foundation', 'XML', 'JSON', 'Util', 'Net',
-                      'Crypto', 'NetSSL_OpenSSL', 'NetSSL_Win', 
-                      'Data', 'Data/MySQL', 'Data/ODBC', 'Data/SQLite', 'Redis', 'MongoDB', 
-                      'Zip', 'PageCompiler', 'PageCompiler/File2Page', 'CppParser')
 
       if ($env:configuration -eq "release")
       {
