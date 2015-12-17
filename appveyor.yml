@@ -147,7 +147,7 @@ test_script:
           $env:PATH = "$env:CD\bin64;" + $env:PATH;$suffix = 64;
         }
         foreach ($component in $components) { 
-          if (not ($excludes -contains $component))
+          if ($excludes -notcontains $component)
           {
             [string]$path = $component + "\testsuite\bin$suffix\TestSuite.exe";
             if (Test-Path -Path $path) {
