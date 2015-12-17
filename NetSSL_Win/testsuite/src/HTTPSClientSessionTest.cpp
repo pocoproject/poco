@@ -440,9 +440,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunkedKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testInterop);
-#ifdef FIXME
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxy);
-#endif
 	//CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);
 
 	return pSuite;
