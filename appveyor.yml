@@ -108,9 +108,18 @@ before_build:
       }
 
 after_build:
+  - echo -------------------------------------------------------------------------------
   - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -n -H FIXME {} ;
+  - echo.
+  - echo.
+  - echo -------------------------------------------------------------------------------
   - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -n -H TODO {} ;
+  - echo.
+  - echo.
+  - echo -------------------------------------------------------------------------------
   - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -n -H HACK {} ;
+  - echo.
+  - echo.
   
 
 
@@ -126,15 +135,21 @@ before_test:
 after_test:
 
 test_script:
+  - set POCO_BASE=%CD%
   - ps: |
-      $env:POCO_BASE = $env:CD
-      $runs=0;$fails=0;$failedTests='';$status=0
-
-      $components = gc components
-      $components
-
-      $excludes   = @('Data', 'Data/MySQL', 'Data/ODBC', 'Data/SQLite', 'Redis') 
-
+      $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC', 'Data/SQLite', 'Redis', 'PDF') 
+      $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
+      $line='-------------------------------------------------------------------------------------';
+      $components = gc components;
+      Write-Host components;
+      Write-Host -ForegroundColor Yellow $line;
+      $components;
+      Write-Host -ForegroundColor Yellow $line;
+      Write-Host excluded;
+      Write-Host -ForegroundColor Yellow $line;
+      $excluded
+      Write-Host -ForegroundColor Yellow $line;
+ 
       if ($env:configuration -eq "release")
       {
         $suffix = '';
@@ -147,13 +162,13 @@ test_script:
           $env:PATH = "$env:CD\bin64;" + $env:PATH;$suffix = 64;
         }
         foreach ($component in $components) { 
-          if ($excludes -notcontains $component)
+          if ($excluded -notcontains $component)
           {
             [string]$path = $component + "\testsuite\bin$suffix\TestSuite.exe";
             if (Test-Path -Path $path) {
                 $runs += 1;
                 Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
-                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:Configuration $env:linkmode $component; 
+                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:Configuration $env:linkmode '|' $tab $tab $component; 
                 Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
                 $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr"; 
                 Get-Content cout; Get-Content cerr;
