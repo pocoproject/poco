@@ -3,6 +3,10 @@ version: poco-1.7.0@{branch}-{build}
 cache:
     - c:\mysql-5.7.9-win32
 
+hosts:
+  localhost: 127.0.0.1
+  db.server.com: 127.0.0.2
+  
 services:
   - mysql
   - mongodb
@@ -183,13 +187,12 @@ test_script:
         if ($fails -gt 0)
         {
             Write-Host 'Failed: ' $failedTests
-            exit $fails;
-        }
-        else
+            $host.SetShouldExit($fails);
+        } else 
         {
-            exit 0;
-        }
-      }
+ 		   $host.SetShouldExit(0);
+ 		}
+     }
 
 on_success:
   - echo success
