@@ -1,4 +1,4 @@
-version: 1.7.0-{branch}-{build}
+version: poco-1.7.0@{branch}-{build}
 
 cache:
     - c:\mysql-5.7.9-win32
