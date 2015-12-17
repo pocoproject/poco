@@ -171,6 +171,7 @@ test_script:
             [string]$path = $component + "\testsuite\bin$suffix\TestSuite.exe";
             if (Test-Path -Path $path) {
                 $runs += 1;
+                Add-AppveyorTest -Name $component -Outcome  Running
                 Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
                 Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:Configuration $env:linkmode '|' $tab $tab $component; 
                 Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
@@ -178,9 +179,22 @@ test_script:
                 Get-Content cout; Get-Content cerr;
                 if ($process.ExitCode -gt 0)
                 {
-                   $fails += 1;$failedTests += $component + ', ';
+                  $fails += 1;$failedTests += $component + ', ';
+                  Add-AppveyorTest -Name $component -Outcome  Failed
                 }
-            }
+                else
+                {
+                  Add-AppveyorTest -Name $component -Outcome  Passed
+                }
+             }
+             else
+             {
+               Add-AppveyorTest -Name $component -Outcome  NotFound
+             }
+          }
+          else
+          {
+            Add-AppveyorTest -Name $component -Outcome  Skipped
           }
         }
         Write-Host $runs' runs, ' $fails' fails'
