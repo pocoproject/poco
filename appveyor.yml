@@ -142,11 +142,11 @@ test_script:
         $suffix = '';
         if ($env:platform -eq "Win32")
         {
-          $env:PATH = "$env:CD\bin;" + $env:PATH;$suffix = '':
+          $env:PATH = "$env:CD\bin;" + $env:PATH;$suffix = '';
         }
         if ($env:platform -eq "x64")
         {
-          $env:PATH = "$env:CD\bin64;" + $env:PATH;$suffix = 64:
+          $env:PATH = "$env:CD\bin64;" + $env:PATH;$suffix = 64;
         }
         foreach ($component in $components) { 
           if (not ($excludes -contains $component))
