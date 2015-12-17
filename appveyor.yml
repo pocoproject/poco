@@ -108,6 +108,10 @@ before_build:
       }
 
 after_build:
+  - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -n -H FIXME {} ;
+  - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -n -H TODO {} ;
+  - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -n -H HACK {} ;
+  
 
 
 build_script:
@@ -122,44 +126,33 @@ before_test:
 after_test:
 
 test_script:
-#  - if %platform%==x64 ( set suffix=64 )
-#  - if %configuration%==release (build\script\runtests2.cmd !suffix!)
-
   - ps: |
-      $runs=0
-      $fails=0
-      $failedTests=''
-      $status=0
-
+      $runs=0;$fails=0;$failedTests='';$status=0
       $env:POCO_BASE = $env:CD
-      $components = @('Foundation', 'XML', 'JSON', 'Util', 'Net', 'Crypto', 'NetSSL_OpenSSL', 'Data', 'MongoDB', 'Redis', 'Zip', 'PageCompiler', 'PageCompiler/File2Page', 'CppParser')
+
+      $excludes   = @('Data', 'Data/MySQL', 'Data/ODBC', 'Data/SQLite', 'Redis') 
+      
+      $components = @('Foundation', 'XML', 'JSON', 'Util', 'Net',
+                      'Crypto', 'NetSSL_OpenSSL', 'NetSSL_Win', 
+                      'Data', 'Data/MySQL', 'Data/ODBC', 'Data/SQLite', 'Redis', 'MongoDB', 
+                      'Zip', 'PageCompiler', 'PageCompiler/File2Page', 'CppParser')
+
       if ($env:configuration -eq "release")
       {
+        $suffix = '';
         if ($env:platform -eq "Win32")
         {
-          $env:PATH = "$env:CD\bin;" + $env:PATH
-          foreach ($component in $components) { 
-            [string]$path = $component + "\testsuite\bin\TestSuite.exe";
-             if (Test-Path -Path $path) {
-                $runs += 1;
-                Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
-                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:Configuration $env:linkmode $component; 
-                Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
-                $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr"; 
-                Get-Content cout; Get-Content cerr;
-                if ($process.ExitCode -gt 0)
-                {
-                   $fails += 1;$failedTests += $component + ', ';
-                }
-             }
-           }
+          $env:PATH = "$env:CD\bin;" + $env:PATH;$suffix = '':
         }
         if ($env:platform -eq "x64")
         {
-          $env:PATH = "$env:CD\bin64;" + $env:PATH
-          foreach ($component in $components) { 
-            [string]$path = $component + "\testsuite\bin64\TestSuite.exe";
-             if (Test-Path -Path $path) {
+          $env:PATH = "$env:CD\bin64;" + $env:PATH;$suffix = 64:
+        }
+        foreach ($component in $components) { 
+          if (not ($excludes -contains $component))
+          {
+            [string]$path = $component + "\testsuite\bin$suffix\TestSuite.exe";
+            if (Test-Path -Path $path) {
                 $runs += 1;
                 Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
                 Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:Configuration $env:linkmode $component; 
@@ -170,19 +163,19 @@ test_script:
                 {
                    $fails += 1;$failedTests += $component + ', ';
                 }
-             }
-           }
-         }
-         Write-Host $runs' runs, ' $fails' fails'
-         if ($fails -gt 0)
-         {
+            }
+          }
+        }
+        Write-Host $runs' runs, ' $fails' fails'
+        if ($fails -gt 0)
+        {
             Write-Host 'Failed: ' $failedTests
             exit $fails;
-         }
-         else
-         {
+        }
+        else
+        {
             exit 0;
-         }
+        }
       }
 
 on_success:
@@ -193,10 +186,6 @@ on_failure:
 
 on_finish:
   - echo finish
-  - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -i -n -H FIXME {} ;
-  - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -i -n -H TODO {} ;
-  - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -i -n -H HACK {} ;
-  
   
 notifications:
   - provider: Email
