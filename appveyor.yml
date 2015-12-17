@@ -190,11 +190,11 @@ test_script:
             $host.SetShouldExit($fails);
         } else 
         {
- 		   $host.SetShouldExit(0);
- 		}
-     }
+            $host.SetShouldExit(0);
+        }
+      }
 
-on_success:
+on_success:        
   - echo success
 
 on_failure:
