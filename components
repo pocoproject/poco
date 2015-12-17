@@ -11,7 +11,7 @@ NetSSL_Win
 Data
 Data/SQLite
 Data/ODBC
-#Data/MySQL
+Data/MySQL
 Zip
 PageCompiler
 PageCompiler/File2Page
