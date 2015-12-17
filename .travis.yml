@@ -19,6 +19,7 @@ before_install:
 services:
   - mongodb
   - redis-server
+  - mysql
 
 notifications:
   slack: 
