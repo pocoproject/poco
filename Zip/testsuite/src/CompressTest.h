@@ -34,8 +34,7 @@ public:
 	void testSetZipComment();
 
 	static const Poco::UInt64 KB = 1024;
-	static const Poco::UInt64 MB = (1024*KB);
-	static const Poco::UInt64 GB = (1024*MB);
+	static const Poco::UInt64 MB = 1024*KB;
 	void createDataFile(const std::string& path, Poco::UInt64 size);
 	void testZip64();
 
