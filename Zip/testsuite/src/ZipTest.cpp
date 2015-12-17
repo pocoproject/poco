@@ -211,9 +211,9 @@ void ZipTest::verifyDataFile(const std::string& path, Poco::UInt64 size)
 void ZipTest::testDecompressZip64()
 {
 	std::map<std::string, Poco::UInt64> files;
-	files["data1.bin"] = static_cast<Poco::UInt64>(MB)*4096+1;
-	files["data2.bin"] = static_cast<Poco::UInt64>(MB)*16;
-	files["data3.bin"] = static_cast<Poco::UInt64>(MB)*4096-1;
+	files["data1.bin"] = static_cast<Poco::UInt64>(KB)*4096+1;
+	files["data2.bin"] = static_cast<Poco::UInt64>(KB)*16;
+	files["data3.bin"] = static_cast<Poco::UInt64>(KB)*4096-1;
 	
 	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) 
 	{
