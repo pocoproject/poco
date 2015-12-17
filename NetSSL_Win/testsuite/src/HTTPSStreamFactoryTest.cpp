@@ -21,6 +21,7 @@
 #include "Poco/Exception.h"
 #include "Poco/StreamCopier.h"
 #include "HTTPSTestServer.h"
+#include <iostream>
 #include <sstream>
 #include <memory>
 
@@ -84,16 +85,21 @@ void HTTPSStreamFactoryTest::testRedirect()
 
 void HTTPSStreamFactoryTest::testProxy()
 {
-	HTTPSTestServer server;
-	HTTPSStreamFactory factory(
-		Application::instance().config().getString("testsuite.proxy.host"), 
-		Application::instance().config().getInt("testsuite.proxy.port")
-	);
-	URI uri("https://secure.appinf.com/public/poco/NetSSL.txt");
-	std::auto_ptr<std::istream> pStr(factory.open(uri));
-	std::ostringstream ostr;
-	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str().length() > 0);
+	try {
+		HTTPSTestServer server;
+		HTTPSStreamFactory factory(
+			Application::instance().config().getString("testsuite.proxy.host"),
+			Application::instance().config().getInt("testsuite.proxy.port")
+			);
+		URI uri("https://secure.appinf.com/public/poco/NetSSL.txt");
+		std::auto_ptr<std::istream> pStr(factory.open(uri));
+		std::ostringstream ostr;
+		StreamCopier::copyStream(*pStr.get(), ostr);
+		assert(ostr.str().length() > 0);
+	}
+	catch (Poco::Exception e) {
+		std::cout << e.displayText() << std::endl;
+	}
 }
 
 
@@ -132,9 +138,7 @@ CppUnit::Test* HTTPSStreamFactoryTest::suite()
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testNoRedirect);
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testEmptyPath);
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testRedirect);
-#ifdef FIXME
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testProxy);
-#endif
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testError);
 
 	return pSuite;
