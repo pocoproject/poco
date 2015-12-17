@@ -24,12 +24,12 @@ namespace XML {
 const XMLString Entity::NODE_NAME = toXMLString("#entity");
 
 
-Entity::Entity(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName): 
+Entity::Entity(Document* pOwnerDocument, const XMLString& name, const XMLString& rPublicId, const XMLString& rSystemId, const XMLString& rNotationName): 
 	AbstractContainerNode(pOwnerDocument),
 	_name(name),
-	_publicId(publicId),
-	_systemId(systemId),
-	_notationName(notationName)
+	_publicId(rPublicId),
+	_systemId(rSystemId),
+	_notationName(rNotationName)
 {
 }
 

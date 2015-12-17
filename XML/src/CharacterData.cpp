@@ -23,16 +23,16 @@ namespace Poco {
 namespace XML {
 
 
-CharacterData::CharacterData(Document* pOwnerDocument, const XMLString& data): 
+CharacterData::CharacterData(Document* pOwnerDocument, const XMLString& rData): 
 	AbstractNode(pOwnerDocument),
-	_data(data)
+	_data(rData)
 {
 }
 
 
-CharacterData::CharacterData(Document* pOwnerDocument, const CharacterData& data): 
-	AbstractNode(pOwnerDocument, data),
-	_data(data._data)
+CharacterData::CharacterData(Document* pOwnerDocument, const CharacterData& rData): 
+	AbstractNode(pOwnerDocument, rData),
+	_data(rData._data)
 {
 }
 
@@ -42,17 +42,17 @@ CharacterData::~CharacterData()
 }
 
 
-void CharacterData::setData(const XMLString& data)
+void CharacterData::setData(const XMLString& rData)
 {
 	if (events())
 	{
 		XMLString oldData = _data;
-		_data = data;
+		_data = rData;
 		dispatchCharacterDataModified(oldData, _data);
 	}
 	else
 	{
-		_data = data;
+		_data = rData;
 	}
 }
 

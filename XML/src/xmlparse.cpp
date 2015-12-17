@@ -1735,14 +1735,14 @@ XML_GetBuffer(XML_Parser parser, int len)
       bufferLim = newBuf + bufferSize;
 #ifdef XML_CONTEXT_BYTES
       if (bufferPtr) {
-        int keep = (int)(bufferPtr - buffer);
-        if (keep > XML_CONTEXT_BYTES)
-          keep = XML_CONTEXT_BYTES;
-        memcpy(newBuf, &bufferPtr[-keep], bufferEnd - bufferPtr + keep);
+        int keepSize = (int)(bufferPtr - buffer);
+        if (keepSize > XML_CONTEXT_BYTES)
+          keepSize = XML_CONTEXT_BYTES;
+        memcpy(newBuf, &bufferPtr[-keep], bufferEnd - bufferPtr + keepSize);
         FREE(buffer);
         buffer = newBuf;
-        bufferEnd = buffer + (bufferEnd - bufferPtr) + keep;
-        bufferPtr = buffer + keep;
+        bufferEnd = buffer + (bufferEnd - bufferPtr) + keepSize;
+        bufferPtr = buffer + keepSize;
       }
       else {
         bufferEnd = newBuf + (bufferEnd - bufferPtr);
@@ -4434,11 +4434,11 @@ doProlog(XML_Parser parser,
             return XML_ERROR_NO_MEMORY;
           groupConnector = temp;
           if (dtd->scaffIndex) {
-            int *temp = (int *)REALLOC(dtd->scaffIndex,
+            int *tempIndex = (int *)REALLOC(dtd->scaffIndex,
                           groupSize * sizeof(int));
-            if (temp == NULL)
+            if (tempIndex == NULL)
               return XML_ERROR_NO_MEMORY;
-            dtd->scaffIndex = temp;
+            dtd->scaffIndex = tempIndex;
           }
         }
         else {
