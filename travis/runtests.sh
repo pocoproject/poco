@@ -11,7 +11,7 @@ export CPPUNIT_IGNORE="\
   N7CppUnit10TestCallerI19MulticastSocketTestEE.testMulticast \
   N7CppUnit10TestCallerI13NTPClientTestEE.testTimeSync \
   "
-export EXCLUDE_TESTS="Data/MySQL Data/ODBC MongoDB PDF"
+export EXCLUDE_TESTS="Data/MySQL Data/ODBC PDF"
 export PATH=$PATH:.
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.
 build/script/runtests.sh
