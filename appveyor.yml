@@ -25,6 +25,7 @@ install:
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
   - set
+
 #  MySQL 32 bit is not available by default on AppVeyor
   - ps: |
         if ($env:platform -eq "Win32")
@@ -67,6 +68,9 @@ environment:
 #    - builder: 140
 #      linkmode: static_mt
 
+
+matrix:
+  fast_finish: true
 
    
 before_build:
@@ -112,19 +116,29 @@ before_build:
       }
 
 after_build:
-  - echo -------------------------------------------------------------------------------
-  - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -n -H FIXME {} ;
-  - echo.
-  - echo.
-  - echo -------------------------------------------------------------------------------
-  - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -n -H TODO {} ;
-  - echo.
-  - echo.
-  - echo -------------------------------------------------------------------------------
-  - c:\cygwin\bin\find . -type f -name "*.cpp" -exec c:\cygwin\bin\grep -n -H HACK {} ;
-  - echo.
-  - echo.
-  
+  - ps: |
+      $line='-------------------------------------------------------------------------------------';
+      $find='c:\cygwin\bin\find.exe';
+      $arg=". -type f -name '*.cpp' -exec c:\cygwin\bin\grep -n -H $word {} ;";
+
+      Write-Host -ForegroundColor Yellow $line;
+      $word='FIXME'
+      Start-Process -NoNewWindow -Wait -FilePath $find -Args $arg -RSO "cout" -RSE "cerr"; 
+      Get-Content cout; Get-Content cerr;
+      Write-Host;Write-Host;
+
+      Write-Host -ForegroundColor Yellow $line;
+      $word='TODO'
+      Start-Process -NoNewWindow -Wait -FilePath $find -Args $arg -RSO "cout" -RSE "cerr"; 
+      Get-Content cout; Get-Content cerr;
+      Write-Host;Write-Host;
+
+      Write-Host -ForegroundColor Yellow $line;
+      $word='HACK'
+      Start-Process -NoNewWindow -Wait -FilePath $find -Args $arg -RSO "cout" -RSE "cerr"; 
+      Get-Content cout; Get-Content cerr;
+      Write-Host;Write-Host;
+
 
 
 build_script:
@@ -135,13 +149,15 @@ before_test:
   - set PATH=%CD%\bin;%PATH%
   - set PATH=%CD%\bin64;%PATH%
   - set EXCLUDE_TESTS=Data,Data/ODBC,Data/MySQL,PDF
+  - set POCO_BASE=%CD%
 
 after_test:
 
 test_script:
-  - set POCO_BASE=%CD%
   - ps: |
-      $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC', 'Data/SQLite', 'Redis', 'PDF') 
+  
+      $excluded   = @('Data', 'Data/ODBC','Redis', 'PDF') 
+      
       $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
       $line='-------------------------------------------------------------------------------------';
       $components = gc components;
@@ -169,32 +185,32 @@ test_script:
           if ($excluded -notcontains $component)
           {
             [string]$path = $component + "\testsuite\bin$suffix\TestSuite.exe";
+
             if (Test-Path -Path $path) {
                 $runs += 1;
-                Add-AppveyorTest -Name $component -Outcome  Running
-                Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
+                Add-AppveyorTest -Name $component -Outcome  'Running'
+
+                Write-Host -ForegroundColor Yellow $line; 
                 Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:Configuration $env:linkmode '|' $tab $tab $component; 
-                Write-Host -ForegroundColor Yellow '-------------------------------------------------------------------------------------'; 
+                Write-Host -ForegroundColor Yellow $line; 
+
                 $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr"; 
                 Get-Content cout; Get-Content cerr;
+
                 if ($process.ExitCode -gt 0)
                 {
                   $fails += 1;$failedTests += $component + ', ';
-                  Add-AppveyorTest -Name $component -Outcome  Failed
+                  Add-AppveyorTest -Name $component -Outcome  'Failed'
                 }
                 else
                 {
-                  Add-AppveyorTest -Name $component -Outcome  Passed
+                  Add-AppveyorTest -Name $component -Outcome  'Passed'
                 }
-             }
-             else
-             {
-               Add-AppveyorTest -Name $component -Outcome  NotFound
              }
           }
           else
           {
-            Add-AppveyorTest -Name $component -Outcome  Skipped
+            Add-AppveyorTest -Name $component -Outcome  'Skipped'
           }
         }
         Write-Host $runs' runs, ' $fails' fails'
