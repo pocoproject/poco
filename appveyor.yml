@@ -119,26 +119,26 @@ after_build:
   - ps: |
       $line='-------------------------------------------------------------------------------------';
       $find='c:\cygwin\bin\find.exe';
-      $arg=". -type f -name '*.cpp' -exec c:\cygwin\bin\grep -n -H $word {} ;";
-
+      $arg1=". -type f -name '*.cpp' -exec c:\cygwin\bin\grep -n -H ";
+      $arg2=" {} ;"
+      
       Write-Host -ForegroundColor Yellow $line;
       $word='FIXME'
-      Start-Process -NoNewWindow -Wait -FilePath $find -Args $arg -RSO "cout" -RSE "cerr"; 
+      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO "cout" -RSE "cerr"; 
       Get-Content cout; Get-Content cerr;
       Write-Host;Write-Host;
 
       Write-Host -ForegroundColor Yellow $line;
       $word='TODO'
-      Start-Process -NoNewWindow -Wait -FilePath $find -Args $arg -RSO "cout" -RSE "cerr"; 
+      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO "cout" -RSE "cerr"; 
       Get-Content cout; Get-Content cerr;
       Write-Host;Write-Host;
 
       Write-Host -ForegroundColor Yellow $line;
       $word='HACK'
-      Start-Process -NoNewWindow -Wait -FilePath $find -Args $arg -RSO "cout" -RSE "cerr"; 
+      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO "cout" -RSE "cerr"; 
       Get-Content cout; Get-Content cerr;
       Write-Host;Write-Host;
-
 
 
 build_script:
@@ -188,29 +188,33 @@ test_script:
 
             if (Test-Path -Path $path) {
                 $runs += 1;
-                Add-AppveyorTest -Name $component -Outcome  'Running'
+                Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Running'
 
                 Write-Host -ForegroundColor Yellow $line; 
                 Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:Configuration $env:linkmode '|' $tab $tab $component; 
                 Write-Host -ForegroundColor Yellow $line; 
 
-                $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr"; 
+                $started = Get-Date
+                $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr";
+                $ended   = Get-Date
+                $millisec = (stoped -started).milliseconds
+                 
                 Get-Content cout; Get-Content cerr;
 
                 if ($process.ExitCode -gt 0)
                 {
                   $fails += 1;$failedTests += $component + ', ';
-                  Add-AppveyorTest -Name $component -Outcome  'Failed'
+                  Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Failed' -Duration $millisec
                 }
                 else
                 {
-                  Add-AppveyorTest -Name $component -Outcome  'Passed'
+                  Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Passed' -Duration $millisec
                 }
              }
           }
           else
           {
-            Add-AppveyorTest -Name $component -Outcome  'Skipped'
+            Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Skipped'
           }
         }
         Write-Host $runs' runs, ' $fails' fails'
