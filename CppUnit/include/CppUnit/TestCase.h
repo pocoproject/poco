@@ -95,7 +95,7 @@ public:
 	virtual TestResult* run();
 	virtual int countTestCases();
 	const std::string& name() const;
-	std::string toString();
+	virtual std::string toString();
 
 	virtual void setUp();
 	virtual void tearDown();
@@ -167,7 +167,7 @@ protected:
               const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 
-private:
+protected:
 	const std::string _name;
 };
 
