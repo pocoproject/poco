@@ -121,7 +121,8 @@ XSD
 stage/
 releases/
 Zip/testsuite/data*.bin
-
+Foundation/testsuite/globtest/
+TestConfiguration/
 
 # openssl binaries #
 ####################
@@ -134,6 +135,7 @@ openssl/packages/
 !openssl/win32/bin/debug/*.lib
 !openssl/win32/bin/release/*.dll
 !openssl/win32/bin/release/*.lib
+
 !openssl/win64/bin/debug/*.dll
 !openssl/win64/bin/debug/*.lib
 !openssl/win64/bin/release/*.dll
@@ -142,6 +144,8 @@ openssl/packages/
 !openssl/win32/lib/debug/*.lib
 !openssl/win32/lib/debug/*.pdb
 !openssl/win32/lib/release/*.lib
+
 !openssl/win64/lib/debug/*.lib
 !openssl/win64/lib/debug/*.pdb
 !openssl/win64/lib/release/*.lib
+

@@ -25,7 +25,7 @@ if "%1"=="64" (
   shift
 )
 if "%1" =="-d" (
-  set SUFFIX=d
+  set DEBUG=d
   shift
 )
 
@@ -36,7 +36,7 @@ if not "%1" == "" (
   )
 )
 
-set TESTRUNNER=TestSuite%SUFFIX%.exe
+set TESTRUNNER=TestSuite%DEBUG%.exe
 
 set runs=0
 set failures=0
