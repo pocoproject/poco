@@ -1,4 +1,4 @@
-version: poco-1.7.0@{branch}-{build}
+version: poco-1.7.0 {branch}-{build}
 
 cache:
     - c:\mysql-5.7.9-win32
@@ -8,7 +8,7 @@ hosts:
   db.server.com: 127.0.0.2
   
 services:
-  - mysql
+#  - mysql
   - mongodb
 
 platform:
@@ -156,7 +156,7 @@ after_test:
 test_script:
   - ps: |
   
-      $excluded   = @('Data', 'Data/ODBC','Redis', 'PDF') 
+      $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF') 
       
       $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
       $line='-------------------------------------------------------------------------------------';
@@ -197,7 +197,7 @@ test_script:
                 $started = Get-Date
                 $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr";
                 $ended   = Get-Date
-                $millisec = (stoped -started).milliseconds
+                $millisec = ($ended - $started).milliseconds
                  
                 Get-Content cout; Get-Content cerr;
 
