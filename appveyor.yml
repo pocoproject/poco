@@ -162,12 +162,11 @@ build_script:
   - ps: |
       if ($env:builder -eq "msbuild")
       {
-        $logger: 'C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll'
-        $samples: samples
-        $tests: tests
-        $verbosity: minimal
+        $logger='C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll';
+        $samples='samples';$tests='tests';$verbosity='minimal';
     
-        $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "buildwin.cmd" 
+        $process = Start-Process -PassThru -NoNewWindow -Wait 
+        -FilePath "buildwin.cmd" 
         -Args "$env:vsver build $env:linkmode $env:configuration $env:platform $samples $tests msbuild $verbosity $logger"
         -RSO cout -RSE cerr;
         gc cout; gc cerr;
@@ -175,7 +174,7 @@ build_script:
       if ($env:builder -eq "cmake")
       {
         mkdir cmake-build | out-null;cd cmake-build;
-        cmake ../. -G"NMake Makefiles JOM"  -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF
+        cmake ../. -G"NMake Makefiles"  -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF
         cmake --build . --config $env:configuration
       }
    
