@@ -95,7 +95,6 @@ install:
 
    
 before_build:
-  - set %CD%
   - set POCO_BASE=%CD%
   - ps: |
         if ($env:vsver -eq "120")
