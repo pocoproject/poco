@@ -98,33 +98,21 @@ before_build:
   - ps: |
         if ($env:vsver -eq "120")
         {
-          if ($env:platform -eq "Win32")
-          {
-            & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
-            $env:suffix = ""
-          }
-          if ($env:platform -eq "x64")
-          {
-            & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86_amd64
-            $env:suffix = 64
-          }
+          pushd $env:VS120COMNTOOLS
         }
         if ($env:vsver -eq "140")
         {
-          if ($env:platform -eq "Win32")
-          {
-            & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
-            $env:suffix = ""
-          }
-          if ($env:platform -eq "x64")
-          {
-            & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
-            $env:suffix = 64
+          pushd $env:VS140COMNTOOLS
+        }
+        cmd /c "vsvars32.bat&set" |
+        foreach {
+          if ($_ -match "=") {
+            $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
           }
         }
-  - set POCO_BASE=%CD%
+        popd
+        write-host "`nVisual Studio $env:vsver Command Prompt variables set." -ForegroundColor Yellow
   - where cl
-  - cl
   
 # MySQL
   - ps: |
@@ -170,7 +158,7 @@ build_script:
       if ($env:builder -eq "msbuild")
       {
         $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "buildwin.cmd" 
-        -Args "build $env:linkmode $env:configuration $env:platform $env:samples $env:tests msbuild $env:verbosity $env:logger"
+        -Args "$env:vsver build $env:linkmode $env:configuration $env:platform $env:samples $env:tests msbuild $env:verbosity $env:logger"
         -RSO cout -RSE cerr;
         gc cout; gc cerr;
       }
