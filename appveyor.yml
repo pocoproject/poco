@@ -117,7 +117,10 @@ before_build:
         }
         popd
         write-host "`nVisual Studio $env:vsver Command Prompt variables set." -ForegroundColor Yellow
-  
+  - where cl
+  - where mc
+  - where nmake
+    
 # MySQL
   - ps: |
       if ($env:platform -eq "Win32")
