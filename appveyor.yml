@@ -59,12 +59,22 @@ matrix:
   fast_finish: true
 
 install:
+  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
   - systeminfo
   - c:\cygwin\bin\uname -a
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
-  - cinst cmake
-  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
+  - ps: |
+        if (Test-Path "$env:ChocolateyInstall/bin/jom.exe") {
+            echo "using jom from cache"
+        } else {
+            choco install jom
+        }
+        if (Test-Path "$env:ChocolateyInstall/bin/cmake.exe") {
+            echo "using cmake from cache"
+        } else {
+            choco install cmake
+        }
   - where cmake
   - set
 
@@ -92,7 +102,6 @@ install:
 #                7z x -y mysql-5.7.9-win32.zip -oc:\
 #            }
 #        }
-
    
 before_build:
   - ps: |
