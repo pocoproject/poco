@@ -31,8 +31,11 @@ POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
 if (ENABLE_TESTS)
+    #TODO: 
+#	add_subdirectory(testsuite)
+endif ()
+if (ENABLE_SAMPLES)
     #TODO: Looks like the samples use crypto somehow?
     #add_subdirectory(samples)
-    #add_subdirectory(testsuite)
 endif ()
 
