@@ -174,9 +174,10 @@ build_script:
       if ($env:builder -eq "cmake")
       {
         mkdir cmake-build | out-null;cd cmake-build;
-        cmake ../. -G"NMake Makefiles JOM"  -DENABLE_TESTS=ON -DENABLE_NETSSL_OPENSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF;
-        cmake --build . --config $env:configuration -- /nologo;
+        cmake ../. -G"NMake Makefiles JOM"  -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF;
+        jom
       }
+#        cmake --build . --config $env:configuration -- /nologo;
    
 
 
