@@ -19,29 +19,6 @@ configuration:
   - release
   - debug
 
-install:
-  - systeminfo
-  - c:\cygwin\bin\uname -a
-  - c:\cygwin\bin\cat /proc/cpuinfo
-  - c:\cygwin\bin\cat /proc/meminfo
-  - set
-
-#  MySQL 32 bit is not available by default on AppVeyor
-  - ps: |
-        if ($env:platform -eq "Win32")
-        {
-            if (Test-Path "c:\mysql-5.7.9-win32") {
-                echo "using mysql-5.7.9-win32 from cache"
-            }
-            else
-            {
-                echo "downloading mysql-5.7.9-win32"
-                Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile mysql-5.7.9-win32.zip
-                echo "installing mysql-5.7.9-win32"
-                7z x -y mysql-5.7.9-win32.zip -oc:\
-            }
-        }
-
 environment:
   bundling: bundled
   logger: 'C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll'
@@ -78,11 +55,34 @@ environment:
 matrix:
   fast_finish: true
 
+install:
+  - systeminfo
+  - c:\cygwin\bin\uname -a
+  - c:\cygwin\bin\cat /proc/cpuinfo
+  - c:\cygwin\bin\cat /proc/meminfo
+  - set
+
+#  MySQL 32 bit is not available by default on AppVeyor
+  - ps: |
+        if ($env:platform -eq "Win32")
+        {
+            if (Test-Path "c:\mysql-5.7.9-win32") {
+                echo "using mysql-5.7.9-win32 from cache"
+            }
+            else
+            {
+                echo "downloading mysql-5.7.9-win32"
+                Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile mysql-5.7.9-win32.zip
+                echo "installing mysql-5.7.9-win32"
+                7z x -y mysql-5.7.9-win32.zip -oc:\
+            }
+        }
+
    
 before_build:
   - ps: |
-      if ($env:vsver -eq "120")
-      {
+        if ($env:vsver -eq "120")
+        {
           if ($env:platform -eq "Win32")
           {
             & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
@@ -93,9 +93,9 @@ before_build:
             & "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86_amd64
             $env:suffix = 64
           }
-      }
-      if ($env:vsver -eq "140")
-      {
+        }
+        if ($env:vsver -eq "140")
+        {
           if ($env:platform -eq "Win32")
           {
             & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
@@ -106,7 +106,7 @@ before_build:
             & "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
             $env:suffix = 64
           }
-      }
+        }
   
 # MySQL
   - ps: |
@@ -148,7 +148,15 @@ after_build:
 
 
 build_script:
-  - if %builder%==msbuild (buildwin %builder% build %linkmode% %configuration% %platform% %samples% %tests% msbuild %verbosity% %logger%)
+  - ps: |
+      if ($env:builder -eq "msbuild")
+      {
+        $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "buildwin.cmd" 
+        -Args "build $env:linkmode $env:configuration $env:platform $env:samples $env:tests msbuild $env:verbosity $env:logger"
+        -RSO "cout" -RSE "cerr";
+        gc cout; gc cerr;
+      }
+
    
 
 
@@ -206,7 +214,7 @@ test_script:
                 $started = Get-Date
                 $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr";
                 $ended   = Get-Date
-                $millisec = ($ended - $started).ticks
+                $millisec = ($ended - $started).totalmilliseconds
                  
                 gc cout; gc cerr;
 
