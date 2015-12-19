@@ -27,6 +27,9 @@ environment:
   verbosity: minimal
     
   matrix:
+    - builder: cmake
+      vsver: 120
+
     - builder: msbuild
       vsver: 120
       linkmode: shared
@@ -60,7 +63,19 @@ install:
   - c:\cygwin\bin\uname -a
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
+  - cinst cmake
+  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
+  - where cmake
   - set
+
+#  chocolatey brokes jom, here's workaround
+#  see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
+  - ps: |
+        if ($env:builder -eq "cmake")
+        {
+          $env:PATH = $env:ChocolateyInstall + "\bin" + ";" + $env:PATH
+          $env:PATH = $env:ChocolateyInstall + "\lib\jom\content" + ";" + $env:PATH
+        }
 
 #  MySQL 32 bit is not available by default on AppVeyor
   - ps: |
@@ -80,6 +95,8 @@ install:
 
    
 before_build:
+  - set %CD%
+  - set POCO_BASE=%CD%
   - ps: |
         if ($env:vsver -eq "120")
         {
@@ -130,19 +147,19 @@ after_build:
       
       Write-Host -ForegroundColor Yellow $line;
       $word='FIXME'
-      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO "cout" -RSE "cerr"; 
+      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
       Write-Host;Write-Host;
 
       Write-Host -ForegroundColor Yellow $line;
       $word='TODO'
-      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO "cout" -RSE "cerr"; 
+      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
       Write-Host;Write-Host;
 
       Write-Host -ForegroundColor Yellow $line;
       $word='HACK'
-      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO "cout" -RSE "cerr"; 
+      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
       Write-Host;Write-Host;
 
@@ -153,10 +170,15 @@ build_script:
       {
         $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "buildwin.cmd" 
         -Args "build $env:linkmode $env:configuration $env:platform $env:samples $env:tests msbuild $env:verbosity $env:logger"
-        -RSO "cout" -RSE "cerr";
+        -RSO cout -RSE cerr;
         gc cout; gc cerr;
       }
-
+      if ($env:builder -eq "cmake")
+      {
+        mkdir cmake-build | out-null;cd cmake-build;
+        cmake ../. -G"NMake Makefiles JOM"  -DENABLE_TESTS=ON -DENABLE_NETSSL_OPENSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF;
+        cmake --build . --config $enc:configuration -- /nologo;
+      }
    
 
 
@@ -212,7 +234,7 @@ test_script:
                 Write-Host -ForegroundColor Yellow $line; 
 
                 $started = Get-Date
-                $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO "cout" -RSE "cerr";
+                $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO cout -RSE cerr;
                 $ended   = Get-Date
                 $millisec = ($ended - $started).totalmilliseconds
                  
@@ -228,6 +250,10 @@ test_script:
                   Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Passed' -Duration $millisec
                 }
               }
+              else
+              {
+                Write-Host -ForegroundColor Yellow 'using cmake'
+              } 
             }
           }
           else
