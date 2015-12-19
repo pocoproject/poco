@@ -50,22 +50,28 @@ environment:
   verbosity: minimal
     
   matrix:
-    - builder: 120
+    - builder: msbuild
+      vsver: 120
       linkmode: shared
 
-#    - builder: 120
+#    - builder: msbuild
+#      vsver: 120
 #      linkmode: static_md
 
-#    - builder: 120
+#    - builder: msbuild
+#      vsver: 120
 #      linkmode: static_mt
 
-    - builder: 140
+    - builder: msbuild
+      vsver: 140
       linkmode: shared
 
-#    - builder: 140
+#    - builder: msbuild
+#      vsver: 140
 #      linkmode: static_md
 
-#    - builder: 140
+#    - builder: msbuild
+#      vsver: 140
 #      linkmode: static_mt
 
 
@@ -75,7 +81,7 @@ matrix:
    
 before_build:
   - ps: |
-      if ($env:builder -eq "120")
+      if ($env:vsver -eq "120")
       {
           if ($env:platform -eq "Win32")
           {
@@ -88,7 +94,7 @@ before_build:
             $env:suffix = 64
           }
       }
-      if ($env:builder -eq "140")
+      if ($env:vsver -eq "140")
       {
           if ($env:platform -eq "Win32")
           {
@@ -142,7 +148,8 @@ after_build:
 
 
 build_script:
-  - buildwin %builder% build %linkmode% %configuration% %platform% %samples% %tests% msbuild %verbosity% %logger%
+  - if %builder%==msbuild (buildwin %builder% build %linkmode% %configuration% %platform% %samples% %tests% msbuild %verbosity% %logger%)
+   
 
 
 before_test:
@@ -184,14 +191,16 @@ test_script:
         foreach ($component in $components) { 
           if ($excluded -notcontains $component)
           {
-            [string]$path = $component + "\testsuite\bin$suffix\TestSuite.exe";
+            if ($env:msbuild -eq "msbuild")
+            {
+              [string]$path = $component + "\testsuite\bin$suffix\TestSuite.exe";
 
-            if (Test-Path -Path $path) {
+              if (Test-Path -Path $path) {
                 $runs += 1;
                 Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Running'
 
                 Write-Host -ForegroundColor Yellow $line; 
-                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$builder $env:Platform $env:Configuration $env:linkmode '|' $tab $tab $component; 
+                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$vsver $env:Platform $env:Configuration $env:linkmode '|' $tab $tab $component; 
                 Write-Host -ForegroundColor Yellow $line; 
 
                 $started = Get-Date
@@ -210,7 +219,8 @@ test_script:
                 {
                   Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Passed' -Duration $millisec
                 }
-             }
+              }
+            }
           }
           else
           {
