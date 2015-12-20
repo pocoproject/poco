@@ -76,12 +76,12 @@ install:
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
   - ps: |
-        if (Test-Path "$env:ChocolateyInstall/bin/jom.exe") {
+        if (Test-Path "$env:ChocolateyInstall\bin\jom.exe") {
             echo "using jom from cache"
         } else {
             choco install jom
         }
-        if (Test-Path "$env:ChocolateyInstall/bin/cmake.exe") {
+        if (Test-Path "$env:ChocolateyInstall\bin\cmake.exe") {
             echo "using cmake from cache"
         } else {
             choco install cmake
@@ -195,7 +195,7 @@ build_script:
         } catch {
           Write-Warning "Oops: $_"
         }
-        $host.SetShouldExit(0);
+        cd ..
       }
 
 before_test:

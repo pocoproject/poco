@@ -31,11 +31,21 @@ POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
 if (ENABLE_TESTS)
-    #TODO: 
+if (WIN32)
+#   FIXME: 
 #	add_subdirectory(testsuite)
+    message(STATUS "############ FIXME: add_subdirectory(testsuite)")
+else ()
+    add_subdirectory(testsuite)
+endif ()
 endif ()
 if (ENABLE_SAMPLES)
-    #TODO: Looks like the samples use crypto somehow?
-    #add_subdirectory(samples)
+if (WIN32)
+#   FIXME: Looks like the samples use crypto somehow?
+#   add_subdirectory(samples)
+message(STATUS "############ FIXME: add_subdirectory(samples)")
+else ()
+    add_subdirectory(testsuite)
+endif ()
 endif ()
 
