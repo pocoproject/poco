@@ -46,13 +46,13 @@ environment:
       vsver: 120
       linkmode: shared
 
-#    - builder: msbuild
-#      vsver: 120
-#      linkmode: static_md
+    - builder: msbuild
+      vsver: 120
+      linkmode: static_md
 
-#    - builder: msbuild
-#      vsver: 120
-#      linkmode: static_mt
+    - builder: msbuild
+      vsver: 120
+      linkmode: static_mt
 
     - builder: msbuild
       vsver: 140
@@ -117,6 +117,7 @@ install:
 #        }
    
 before_build:
+  - set POCO_BASE=%CD%
   - ps: |
         if ($env:vsver -eq "120")
         {
@@ -185,6 +186,7 @@ build_script:
         -Args "$env:vsver build $env:linkmode $env:configuration $env:platform `
                $samples $tests msbuild $verbosity $logger";
         gc cout; gc cerr;
+        Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
       }
       if ($env:builder -eq "cmake")
       {
@@ -196,11 +198,11 @@ build_script:
         } catch {
           Write-Warning "Oops: $_"
         }
+        Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
         $ErrorActionPreference = 'Stop';
       }
 
 before_test:
-  - set POCO_BASE=%CD%
   - ps: |
       $CPPUNIT_IGNORE='';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
@@ -215,18 +217,9 @@ test_script:
   - ps: |
       if ($env:builder -eq "msbuild")
       {
-        $components = gc components;
-        $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
       }
       if ($env:builder -eq "cmake")
       {
-        $components = gc ..\components;
-        $excluded   = @(
-          'CppUnit', 'CppUnit/WinTestRunner', 'NetSSL_OpenSSL',
-          'Data','Data/ODBC','Data/MySQL',
-          'PageCompiler','PageCompiler/File2Page',
-          'PDF','Redis', 'PocoDoc','ProGen'
-        )
       }
       
       $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
@@ -242,20 +235,24 @@ test_script:
  
       if ($env:configuration -eq "release")
       {
-        $suffix = '';
-        if ($env:platform -eq "Win32")
+        if ($env:msbuild -eq "msbuild")
         {
-          $env:PATH = "$env:CD\bin;" + $env:PATH;$suffix = '';
-        }
-        if ($env:platform -eq "x64")
-        {
-          $env:PATH = "$env:CD\bin64;" + $env:PATH;$suffix = 64;
-        }
-
-        foreach ($component in $components) { 
-          if ($excluded -notcontains $component)
+          $suffix = '';
+          if ($env:platform -eq "Win32")
           {
-            if ($env:msbuild -eq "msbuild")
+            $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
+          }
+          if ($env:platform -eq "x64")
+          {
+            $env:PATH = "$env:POCO_BASE\bin64;" + $env:PATH;$suffix = 64;
+          }
+
+          Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
+          $components = gc components;
+          $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
+          
+          foreach ($component in $components) { 
+            if ($excluded -notcontains $component)
             {
               [string]$path = $component + "\testsuite\bin$suffix\TestSuite.exe";
 
@@ -287,13 +284,31 @@ test_script:
             }
             else
             {
+              Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Skipped'
+            }
+          }
+        }  
+        if ($env:msbuild -eq "cmake")
+        {
+          Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
+          $components = gc ..\components;
+          $excluded   = @(
+            'CppUnit', 'CppUnit/WinTestRunner', 'NetSSL_OpenSSL',
+            'Data','Data/ODBC','Data/MySQL',
+            'PageCompiler','PageCompiler/File2Page',
+            'PDF','Redis', 'PocoDoc','ProGen'
+          );
+          
+          foreach ($component in $components) { 
+            if ($excluded -notcontains $component)
+            {
                Write-Host -ForegroundColor Yellow 'using ctest -VV -R ' $component
                ctest -VV -R $component
-            } 
-          }
-          else
-          {
-            Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Skipped'
+            }
+            else
+            {
+              Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Skipped'
+            }
           }
         }
         Write-Host $runs' runs, ' $fails' fails'
