@@ -43,10 +43,10 @@ void TextTestResult::setup()
 		std::string::const_iterator end = ignored.end();
 		while (it != end)
 		{
-			while (it != end && (std::isspace(*it) || *it == '"')) ++it;
+			while (it != end && (std::isspace(*it) || *it == '"' || *it == '\'')) ++it;
 			std::string test;
-			while (it != end && *it != ',' && *it != '"') test += *it++;
-			if (it != end && (*it == ',' || *it == '"')) ++it;
+			while (it != end && *it != ',' && *it != '"' && *it != '\'') test += *it++;
+			if (it != end && (*it == ',' || *it == '"' || *it == '\'')) ++it;
 			if (!test.empty()) _ignored.insert(test);
 		}
 	}
