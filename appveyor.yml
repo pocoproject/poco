@@ -196,7 +196,7 @@ build_script:
         } catch {
           Write-Warning "Oops: $_"
         }
-        cd ..
+        $ErrorActionPreference = 'Stop';
       }
 
 before_test:
@@ -215,10 +215,12 @@ test_script:
   - ps: |
       if ($env:builder -eq "msbuild")
       {
+        $components = gc components;
         $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
       }
       if ($env:builder -eq "cmake")
       {
+        $components = gc ..\components;
         $excluded   = @(
           'CppUnit', 'CppUnit/WinTestRunner', 'NetSSL_OpenSSL',
           'Data','Data/ODBC','Data/MySQL',
@@ -229,7 +231,6 @@ test_script:
       
       $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
       $line='-------------------------------------------------------------------------------------';
-      $components = gc components;
       Write-Host components;
       Write-Host -ForegroundColor Yellow $line;
       $components;
