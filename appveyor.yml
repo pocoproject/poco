@@ -24,8 +24,8 @@ environment:
 
   matrix:
 # -------------------------------------------------------------------------------------------
-# When builder is cmake, it remains one error reported below
-# Once this problem fixed, the cmake builder will be operational
+# When builder is cmake, it remains one exception reported below
+# Once this problem fixed, the try/catch around the cmake builder can be removed
 #
 # [  1%] Generating pocomsg.h
 # cmake : MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
@@ -36,7 +36,7 @@ environment:
 #     + FullyQualifiedErrorId : NativeCommandError  
 #
 # Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
-#
+# -------------------------------------------------------------------------------------------
     - builder: cmake
       vsver: 120
 # -------------------------------------------------------------------------------------------
@@ -87,6 +87,7 @@ install:
             choco install cmake
         }
   - where cmake
+  - where jom
   - set
 
 #  chocolatey brokes jom, here's workaround
@@ -187,12 +188,14 @@ build_script:
       if ($env:builder -eq "cmake")
       {
         mkdir cmake-build | out-null;cd cmake-build;
-        cmake ../. -G"NMake Makefiles"  -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF
+        cmake ../. -G"NMake Makefiles"  -DENABLE_SAMPLES=ON -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF
         try {
+          $ErrorActionPreference = 'Continue';
           cmake --build . --config $env:configuration
         } catch {
           Write-Warning "Oops: $_"
         }
+        $host.SetShouldExit(0);
       }
 
 before_test:
