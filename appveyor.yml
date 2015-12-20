@@ -201,14 +201,18 @@ build_script:
 
 before_test:
   - set POCO_BASE=%CD%
-  - set CPPUNIT_IGNORE='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync, class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4, class CppUnit::TestCaller<class RawSocketTest>.test
-SendToReceiveFromIPv4, class CppUnit::TestCaller<class ICMPClientTest>.testPing'  
+  - ps: |
+      $CPPUNIT_IGNORE='';
+      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
+      set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
 
 after_test:
 
 test_script:
   - ps: |
-  
       if ($env:builder -eq "msbuild")
       {
         $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
