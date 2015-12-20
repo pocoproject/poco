@@ -217,14 +217,8 @@ after_test:
 
 test_script:
   - ps: |
-      $components = gc $env:poco_base\components;
       $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
       $line='-------------------------------------------------------------------------------------';
-      Write-Host components;
-      Write-Host -ForegroundColor Yellow $line;
-      $components;
-      Write-Host -ForegroundColor Yellow $line;
- 
       if ($env:configuration -eq "release")
       {
         if ($env:builder -eq "msbuild")
@@ -240,6 +234,13 @@ test_script:
           }
 
           Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
+
+          $components = gc $env:poco_base\components;
+          Write-Host components;
+          Write-Host -ForegroundColor Yellow $line;
+          $components;
+          Write-Host -ForegroundColor Yellow $line;
+ 
           $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
           
           Write-Host excluded;
@@ -288,28 +289,11 @@ test_script:
         {
           Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
           pushd cmake-build;
-          $excluded   = @(
-            'CppUnit', 'CppUnit/WinTestRunner', 'NetSSL_OpenSSL',
-            'Data','Data/ODBC','Data/MySQL',
-            'PageCompiler','PageCompiler/File2Page',
-            'PDF','Redis', 'PocoDoc','ProGen'
-          );
-          
-          Write-Host excluded;
           Write-Host -ForegroundColor Yellow $line;
-          $excluded
+          ctest -VV -N
           Write-Host -ForegroundColor Yellow $line;
 
-          foreach ($component in $components) { 
-            if ($excluded -notcontains $component)
-            {
-               Write-Host -ForegroundColor Yellow 'using ctest -VV -R ' $component
-               ctest -VV -R $component
-            }
-            else
-            {
-              Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Skipped'
-            }
+          ctest -VV -E DataODBC
           }
           popd
         }
