@@ -37,8 +37,8 @@ environment:
 #
 # Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
 #
-#    - builder: cmake
-#      vsver: 120
+    - builder: cmake
+      vsver: 120
 # -------------------------------------------------------------------------------------------
 
     - builder: msbuild
@@ -118,11 +118,11 @@ before_build:
   - ps: |
         if ($env:vsver -eq "120")
         {
-          pushd $env:VS120COMNTOOLS
+          pushd $env:VS120COMNTOOLS; $yyyy='2013'
         }
         if ($env:vsver -eq "140")
         {
-          pushd $env:VS140COMNTOOLS
+          pushd $env:VS140COMNTOOLS; $yyyy='2015'
         }
         cmd /c "vsvars32.bat&set" |
         foreach {
@@ -131,10 +131,7 @@ before_build:
           }
         }
         popd
-        write-host "`nVisual Studio $env:vsver Command Prompt variables set." -ForegroundColor Yellow
-  - where cl
-  - where mc
-  - where nmake
+        write-host "`nVisual Studio $yyyy Command Prompt variables set." -ForegroundColor Yellow
     
 # MySQL
   - ps: |
@@ -182,10 +179,9 @@ build_script:
         $logger='C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll';
         $samples='samples';$tests='tests';$verbosity='minimal';
     
-        $process = Start-Process -PassThru -NoNewWindow -Wait 
-        -FilePath "buildwin.cmd" 
-        -Args "$env:vsver build $env:linkmode $env:configuration $env:platform $samples $tests msbuild $verbosity $logger"
-        -RSO cout -RSE cerr;
+        $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "buildwin.cmd" -RSO cout -RSE cerr `
+        -Args "$env:vsver build $env:linkmode $env:configuration $env:platform `
+               $samples $tests msbuild $verbosity $logger";
         gc cout; gc cerr;
       }
       if ($env:builder -eq "cmake")
@@ -198,12 +194,8 @@ build_script:
           Write-Warning "Oops: $_"
         }
       }
-   
-
 
 before_test:
-  - set PATH=%CD%\bin;%PATH%
-  - set PATH=%CD%\bin64;%PATH%
   - set CPPUNIT_IGNORE="class CppUnit::TestCaller<class NTPClientTest>.testTimeSync"
   - set POCO_BASE=%CD%
 
@@ -237,6 +229,7 @@ test_script:
         {
           $env:PATH = "$env:CD\bin64;" + $env:PATH;$suffix = 64;
         }
+
         foreach ($component in $components) { 
           if ($excluded -notcontains $component)
           {
