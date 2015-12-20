@@ -200,15 +200,28 @@ build_script:
       }
 
 before_test:
-  - set CPPUNIT_IGNORE="class CppUnit::TestCaller<class NTPClientTest>.testTimeSync"
   - set POCO_BASE=%CD%
+  - set CPPUNIT_IGNORE='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync, class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4, class CppUnit::TestCaller<class RawSocketTest>.test
+SendToReceiveFromIPv4, class CppUnit::TestCaller<class ICMPClientTest>.testPing'  
 
 after_test:
 
 test_script:
   - ps: |
   
-      $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF') 
+      if ($env:builder -eq "msbuild")
+      {
+        $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
+      }
+      if ($env:builder -eq "cmake")
+      {
+        $excluded   = @(
+          'CppUnit', 'CppUnit/WinTestRunner', 'NetSSL_OpenSSL',
+          'Data','Data/ODBC','Data/MySQL',
+          'PageCompiler','PageCompiler/File2Page',
+          'PDF','Redis', 'PocoDoc','ProGen'
+        )
+      }
       
       $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
       $line='-------------------------------------------------------------------------------------';
@@ -270,6 +283,7 @@ test_script:
             else
             {
                Write-Host -ForegroundColor Yellow 'using ctest -VV -R ' $component
+               ctest -VV -R $component
             } 
           }
           else
