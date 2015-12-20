@@ -1,7 +1,8 @@
 version: poco-1.7.0 {branch}-{build}
 
 cache:
-    - c:\mysql-5.7.9-win32
+#    - c:\mysql-5.7.9-win32
+  - C:\ProgramData\chocolatey
 
 hosts:
   localhost: 127.0.0.1
