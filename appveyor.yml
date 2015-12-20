@@ -266,11 +266,11 @@ test_script:
                   Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Passed' -Duration $millisec
                 }
               }
-              else
-              {
-                Write-Host -ForegroundColor Yellow 'using cmake'
-              } 
             }
+            else
+            {
+               Write-Host -ForegroundColor Yellow 'using ctest -VV -R ' $component
+            } 
           }
           else
           {
