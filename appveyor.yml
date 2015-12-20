@@ -1,7 +1,7 @@
 version: poco-1.7.0 {branch}-{build}
 
 cache:
-#    - c:\mysql-5.7.9-win32
+  - c:\mysql-5.7.9-win32
   - C:\ProgramData\chocolatey
 
 hosts:
@@ -101,20 +101,20 @@ install:
         }
 
 #  MySQL 32 bit is not available by default on AppVeyor
-#  - ps: |
-#        if ($env:platform -eq "Win32")
-#        {
-#            if (Test-Path "c:\mysql-5.7.9-win32") {
-#                echo "using mysql-5.7.9-win32 from cache"
-#            }
-#            else
-#            {
-#                echo "downloading mysql-5.7.9-win32"
-#                Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile mysql-5.7.9-win32.zip
-#                echo "installing mysql-5.7.9-win32"
-#                7z x -y mysql-5.7.9-win32.zip -oc:\
-#            }
-#        }
+  - ps: |
+        if ($env:platform -eq "Win32")
+        {
+            if (Test-Path "c:\mysql-5.7.9-win32") {
+                echo "using mysql-5.7.9-win32 from cache"
+            }
+            else
+            {
+                echo "downloading mysql-5.7.9-win32"
+                Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile mysql-5.7.9-win32.zip
+                echo "installing mysql-5.7.9-win32"
+                7z x -y mysql-5.7.9-win32.zip -oc:\
+            }
+        }
    
 before_build:
   - set POCO_BASE=%CD%
