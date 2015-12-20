@@ -153,7 +153,7 @@ after_build:
   - ps: |
       $line='-------------------------------------------------------------------------------------';
       $find='c:\cygwin\bin\find.exe';
-      $arg1=". -type f -name '*.cpp' -exec c:\cygwin\bin\grep -n -H ";
+      $arg1="$env:POCO_BASE -type f -name '*.cpp' -exec c:\cygwin\bin\grep -n -H ";
       $arg2=" {} ;"
       
       Write-Host -ForegroundColor Yellow $line;
@@ -190,7 +190,7 @@ build_script:
       }
       if ($env:builder -eq "cmake")
       {
-        mkdir cmake-build | out-null;cd cmake-build;
+        mkdir cmake-build | out-null;pushd cmake-build;
         cmake ../. -G"NMake Makefiles"  -DENABLE_SAMPLES=ON -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF
         try {
           $ErrorActionPreference = 'Continue';
@@ -198,6 +198,7 @@ build_script:
         } catch {
           Write-Warning "Oops: $_"
         }
+        popd
         Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
         $ErrorActionPreference = 'Stop';
       }
@@ -210,27 +211,18 @@ before_test:
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
       set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
+      Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE:'  $env:CPPUNIT_IGNORE;
 
 after_test:
 
 test_script:
   - ps: |
-      if ($env:builder -eq "msbuild")
-      {
-      }
-      if ($env:builder -eq "cmake")
-      {
-      }
-      
+      $components = gc $env:poco_base\components;
       $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
       $line='-------------------------------------------------------------------------------------';
       Write-Host components;
       Write-Host -ForegroundColor Yellow $line;
       $components;
-      Write-Host -ForegroundColor Yellow $line;
-      Write-Host excluded;
-      Write-Host -ForegroundColor Yellow $line;
-      $excluded
       Write-Host -ForegroundColor Yellow $line;
  
       if ($env:configuration -eq "release")
@@ -248,8 +240,12 @@ test_script:
           }
 
           Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
-          $components = gc components;
           $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
+          
+          Write-Host excluded;
+          Write-Host -ForegroundColor Yellow $line;
+          $excluded
+          Write-Host -ForegroundColor Yellow $line;
           
           foreach ($component in $components) { 
             if ($excluded -notcontains $component)
@@ -291,7 +287,7 @@ test_script:
         if ($env:msbuild -eq "cmake")
         {
           Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
-          $components = gc ..\components;
+          pushd cmake-build;
           $excluded   = @(
             'CppUnit', 'CppUnit/WinTestRunner', 'NetSSL_OpenSSL',
             'Data','Data/ODBC','Data/MySQL',
@@ -299,6 +295,11 @@ test_script:
             'PDF','Redis', 'PocoDoc','ProGen'
           );
           
+          Write-Host excluded;
+          Write-Host -ForegroundColor Yellow $line;
+          $excluded
+          Write-Host -ForegroundColor Yellow $line;
+
           foreach ($component in $components) { 
             if ($excluded -notcontains $component)
             {
@@ -310,6 +311,7 @@ test_script:
               Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Skipped'
             }
           }
+          popd
         }
         Write-Host $runs' runs, ' $fails' fails'
         if ($fails -gt 0)
