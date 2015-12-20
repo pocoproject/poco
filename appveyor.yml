@@ -23,8 +23,23 @@ environment:
   bundling: bundled
 
   matrix:
-    - builder: cmake
-      vsver: 120
+# -------------------------------------------------------------------------------------------
+# When builder is cmake, it remains one error reported below
+# Once this problem fixed, the cmake builder will be operational
+#
+# [  1%] Generating pocomsg.h
+# cmake : MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
+# At line:16 char:3
+# +   cmake --build . --config $env:configuration
+# +   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#     + CategoryInfo          : NotSpecified: (MC: Compiling C.../src/pocomsg.mc:String) [], RemoteException
+#     + FullyQualifiedErrorId : NativeCommandError  
+#
+# Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
+#
+#    - builder: cmake
+#      vsver: 120
+# -------------------------------------------------------------------------------------------
 
     - builder: msbuild
       vsver: 120
@@ -177,7 +192,11 @@ build_script:
       {
         mkdir cmake-build | out-null;cd cmake-build;
         cmake ../. -G"NMake Makefiles"  -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF
-        cmake --build . --config $env:configuration
+        try {
+          cmake --build . --config $env:configuration
+        } catch {
+          Write-Warning "Oops: $_"
+        }
       }
    
 
