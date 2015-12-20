@@ -182,7 +182,7 @@ build_script:
         $logger='C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll';
         $samples='samples';$tests='tests';$verbosity='minimal';
     
-        $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "buildwin.cmd" -RSO cout -RSE cerr `
+        $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath ".\buildwin.cmd" -RSO cout -RSE cerr `
         -Args "$env:vsver build $env:linkmode $env:configuration $env:platform `
                $samples $tests msbuild $verbosity $logger";
         gc cout; gc cerr;
@@ -227,7 +227,7 @@ test_script:
  
       if ($env:configuration -eq "release")
       {
-        if ($env:msbuild -eq "msbuild")
+        if ($env:build -eq "msbuild")
         {
           $suffix = '';
           if ($env:platform -eq "Win32")
@@ -284,7 +284,7 @@ test_script:
             }
           }
         }  
-        if ($env:msbuild -eq "cmake")
+        if ($env:build -eq "cmake")
         {
           Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
           pushd cmake-build;
