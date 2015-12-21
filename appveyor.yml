@@ -204,8 +204,7 @@ build_script:
         $verbosity='minimal';
     
         $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
-        -Args "$env:vsver build $env:linkmode $env:configuration $env:platform `
-               samples tests msbuild $verbosity $logger";
+        -Args "$env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild $verbosity $logger";
         gc cout; gc cerr;
         Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
       }
