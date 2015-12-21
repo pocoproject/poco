@@ -123,20 +123,20 @@ before_build:
         {
           $vspath= convert-path $env:VS110COMNTOOLS\..\..\VC\bin; $yyyy='2010'
           if($env:platform -eq 'Win32') { $vctool='';}
-          if($env:platform -eq 'x64')   { $vctool='x86_amd64;$vspath+=$vctool }
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
         }
         if ($env:vsver -eq "120")
         {
           $vspath= convert-path $env:VS120COMNTOOLS\..\..\VC\bin;$yyyy='2013'
           if($env:platform -eq 'Win32') { $vctool='';}
-          if($env:platform -eq 'x64')   { $vctool='x86_amd64;$vspath+=$vctool }
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
           
         }
         if ($env:vsver -eq "140")
         {
           $vspath= convert-path $env:VS140COMNTOOLS\..\..\VC\bin; $yyyy='2015'
           if($env:platform -eq 'Win32') { $vctool='';}
-          if($env:platform -eq 'x64')   { $vctool='x86_amd64;$vspath+=$vctool }
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
         }
         pushd $vspath;
         $tool= if($vctool -eq '') {'32'} else {$vctool}
@@ -147,7 +147,7 @@ before_build:
           }
         }
         popd
-        write-host "`nVisual Studio $yyyy Command Prompt variables set." -ForegroundColor Yellow
+        write-host "`nVisual Studio $yyyy $vctool Command Prompt variables set." -ForegroundColor Yellow
         cl
     
 # MySQL
