@@ -23,20 +23,8 @@ configuration:
 environment:
   bundling: bundled
 
+
   matrix:
-# -------------------------------------------------------------------------------------------
-# When builder is cmake, it remains one exception reported below
-# Once this problem fixed, the try/catch around the cmake builder can be removed
-#
-# [  1%] Generating pocomsg.h
-# cmake : MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
-# At line:16 char:3
-# +   cmake --build . --config $env:configuration
-# +   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#     + CategoryInfo          : NotSpecified: (MC: Compiling C.../src/pocomsg.mc:String) [], RemoteException
-#     + FullyQualifiedErrorId : NativeCommandError  
-#
-# Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
 
     - builder: msbuild
       vsver: 120
@@ -62,6 +50,19 @@ environment:
 #      vsver: 140
 #      linkmode: static_mt
 
+# -------------------------------------------------------------------------------------------
+# When builder is cmake, it remains one exception reported below
+# Once this problem fixed, the try/catch around the cmake builder can be removed
+#
+# [  1%] Generating pocomsg.h
+# cmake : MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
+# At line:16 char:3
+# +   cmake --build . --config $env:configuration
+# +   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#     + CategoryInfo          : NotSpecified: (MC: Compiling C.../src/pocomsg.mc:String) [], RemoteException
+#     + FullyQualifiedErrorId : NativeCommandError  
+#
+# Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
 # -------------------------------------------------------------------------------------------
     - builder: cmake
       vsver: 120
