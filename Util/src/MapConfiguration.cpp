@@ -58,7 +58,7 @@ void MapConfiguration::setRaw(const std::string& key, const std::string& value)
 
 void MapConfiguration::enumerate(const std::string& key, Keys& range) const
 {
-	std::set<std::string> keys;
+	std::set<std::string> keySet;
 	std::string prefix = key;
 	if (!prefix.empty()) prefix += '.';
 	std::string::size_type psize = prefix.size();
@@ -67,15 +67,15 @@ void MapConfiguration::enumerate(const std::string& key, Keys& range) const
 		if (it->first.compare(0, psize, prefix) == 0)
 		{
 			std::string subKey;
-			std::string::size_type end = it->first.find('.', psize);
-			if (end == std::string::npos)
+			std::string::size_type pos = it->first.find('.', psize);
+			if (pos == std::string::npos)
 				subKey = it->first.substr(psize);
 			else
-				subKey = it->first.substr(psize, end - psize);
-			if (keys.find(subKey) == keys.end())
+				subKey = it->first.substr(psize, pos - psize);
+			if (keySet.find(subKey) == keySet.end())
 			{
 				range.push_back(subKey);
-				keys.insert(subKey);
+				keySet.insert(subKey);
 			}
 		}
 	}

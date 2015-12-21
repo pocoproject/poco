@@ -260,7 +260,7 @@ void XMLConfiguration::enumerate(const std::string& key, Keys& range) const
 {
 	using Poco::NumberFormatter;
 	
-	std::multiset<std::string> keys;
+	std::multiset<std::string> keySet;
 	const Poco::XML::Node* pNode = findNode(key);
 	if (pNode)
 	{
@@ -270,12 +270,12 @@ void XMLConfiguration::enumerate(const std::string& key, Keys& range) const
 			if (pChild->nodeType() == Poco::XML::Node::ELEMENT_NODE)
 			{
 				const std::string& nodeName = pChild->nodeName();
-				int n = (int) keys.count(nodeName);
+				int n = (int) keySet.count(nodeName);
 				if (n)
 					range.push_back(nodeName + "[" + NumberFormatter::format(n) + "]");
 				else
 					range.push_back(nodeName);
-				keys.insert(nodeName);
+				keySet.insert(nodeName);
 			}
 			pChild = pChild->nextSibling();
 		}

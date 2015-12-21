@@ -30,8 +30,8 @@ namespace Util {
 class TimerNotification: public Poco::Notification
 {
 public:
-	TimerNotification(Poco::TimedNotificationQueue& queue):
-		_queue(queue)
+	TimerNotification(Poco::TimedNotificationQueue& rQueue):
+		_queue(rQueue)
 	{
 	}
 	
@@ -54,8 +54,8 @@ private:
 class StopNotification: public TimerNotification
 {
 public:
-	StopNotification(Poco::TimedNotificationQueue& queue):
-		TimerNotification(queue)
+	StopNotification(Poco::TimedNotificationQueue& rQueue):
+		TimerNotification(rQueue)
 	{
 	}
 	
@@ -74,8 +74,8 @@ public:
 class CancelNotification: public TimerNotification
 {
 public:
-	CancelNotification(Poco::TimedNotificationQueue& queue):
-		TimerNotification(queue)
+	CancelNotification(Poco::TimedNotificationQueue& rQueue):
+		TimerNotification(rQueue)
 	{
 	}
 	
@@ -103,8 +103,8 @@ private:
 class TaskNotification: public TimerNotification
 {
 public:
-	TaskNotification(Poco::TimedNotificationQueue& queue, TimerTask::Ptr pTask):
-		TimerNotification(queue),
+	TaskNotification(Poco::TimedNotificationQueue& rQueue, TimerTask::Ptr pTask):
+		TimerNotification(rQueue),
 		_pTask(pTask)
 	{
 	}
@@ -151,8 +151,8 @@ private:
 class PeriodicTaskNotification: public TaskNotification
 {
 public:
-	PeriodicTaskNotification(Poco::TimedNotificationQueue& queue, TimerTask::Ptr pTask, long interval):
-		TaskNotification(queue, pTask),
+	PeriodicTaskNotification(Poco::TimedNotificationQueue& rQueue, TimerTask::Ptr pTask, long interval):
+		TaskNotification(rQueue, pTask),
 		_interval(interval)
 	{
 	}
@@ -185,8 +185,8 @@ private:
 class FixedRateTaskNotification: public TaskNotification
 {
 public:
-	FixedRateTaskNotification(Poco::TimedNotificationQueue& queue, TimerTask::Ptr pTask, long interval, Poco::Clock clock):
-		TaskNotification(queue, pTask),
+	FixedRateTaskNotification(Poco::TimedNotificationQueue& rQueue, TimerTask::Ptr pTask, long interval, Poco::Clock clock):
+		TaskNotification(rQueue, pTask),
 		_interval(interval),
 		_nextExecution(clock)
 	{

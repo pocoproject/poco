@@ -471,9 +471,9 @@ inline const Poco::Timestamp& Application::startTime() const
 inline Poco::Timespan Application::uptime() const
 {
 	Poco::Timestamp now;
-	Poco::Timespan uptime = now - _startTime;
+	Poco::Timespan ret = now - _startTime;
 
-	return uptime;
+	return ret;
 }
 
 
