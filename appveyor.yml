@@ -172,27 +172,27 @@ after_build:
       $arg2=" {} ;"
       
       $word='FIXME'
-      Write-Host -ForegroundColor Yellow $line;
       Write-Host -ForegroundColor Yellow $word;
       Write-Host -ForegroundColor Yellow $line;
       Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
+      Write-Host -ForegroundColor Yellow $line;
       Write-Host;Write-Host;
 
       $word='TODO'
-      Write-Host -ForegroundColor Yellow $line;
       Write-Host -ForegroundColor Yellow $word;
       Write-Host -ForegroundColor Yellow $line;
       Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
+      Write-Host -ForegroundColor Yellow $line;
       Write-Host;Write-Host;
 
       $word='HACK'
-      Write-Host -ForegroundColor Yellow $line;
       Write-Host -ForegroundColor Yellow $word;
       Write-Host -ForegroundColor Yellow $line;
       Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
+      Write-Host -ForegroundColor Yellow $line;
       Write-Host;Write-Host;
 
 
@@ -200,7 +200,7 @@ build_script:
   - ps: |
       if ($env:builder -eq "msbuild")
       {
-        $logger='C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll';
+        $logger='C:\Program Files (x86)\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll';
         $samples='samples';$tests='tests';$verbosity='minimal';
     
         $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
@@ -242,7 +242,7 @@ test_script:
       $line='-------------------------------------------------------------------------------------';
       if ($env:configuration -eq "release")
       {
-        if ($env:builder -eq "msbuild")
+        if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
         {
           $suffix = '';
           if ($env:platform -eq "Win32")
@@ -270,9 +270,9 @@ test_script:
           Write-Host -ForegroundColor Yellow $line;
           
           foreach ($component in $components) { 
-            if ($excluded -notcontains $component)
-            {
-              [string]$path = $component + "\testsuite\bin$suffix\TestSuite.exe";
+            if ($excluded -notcontains $component) {
+              $path = "$env:poco_base\" + $component + "\testsuite\bin$suffix\TestSuite.exe";
+              Write-Host -ForegroundColor Yellow 'path='$path;
 
               if (Test-Path -Path $path) {
                 $runs += 1;
@@ -289,19 +289,14 @@ test_script:
                  
                 gc cout; gc cerr;
 
-                if ($process.ExitCode -gt 0)
-                {
+                if ($process.ExitCode -gt 0) {
                   $fails += 1;$failedTests += $component + ', ';
                   Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Failed' -Duration $millisec
-                }
-                else
-                {
+                } else {
                   Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Passed' -Duration $millisec
                 }
               }
-            }
-            else
-            {
+            } else {
               Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Skipped'
             }
           }
