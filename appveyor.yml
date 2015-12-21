@@ -293,7 +293,7 @@ test_script:
           ctest -VV -N
           Write-Host -ForegroundColor Yellow $line;
 
-          ctest -VV -E DataODBC
+          ctest -VV -E Data*
           popd
         }
         Write-Host $runs' runs, ' $fails' fails'
