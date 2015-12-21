@@ -3,6 +3,11 @@ language: cpp
 cache:
  - apt
 
+branches:
+  except:
+    - - /*?pp?eyor*/
+
+
 before_install:
   # we need a recent version of CMake
   # - sudo add-apt-repository -y ppa:andykimpe/cmake3
