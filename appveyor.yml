@@ -225,13 +225,21 @@ build_script:
 
 before_test:
   - ps: |
+      $line='-------------------------------------------------------------------------------------';
       $CPPUNIT_IGNORE='';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
       set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
-      Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE=' $env:CPPUNIT_IGNORE;
+      Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE'
+      Write-Host -ForegroundColor Yellow $line;
+      foreach($t in $CPPUNIT_IGNORE.split(",")) { Write-Host -ForegroundColor Yellow $t.trim() }      
+      Write-Host -ForegroundColor Yellow $line;
+      
+#  N7CppUnit10TestCallerI19MulticastSocketTestEE.testMulticast, \
 
 after_test:
 
@@ -271,7 +279,6 @@ test_script:
           foreach ($component in $components) { 
             if ($excluded -notcontains $component) {
               $path = "$env:poco_base\" + $component + "\testsuite\bin$suffix\TestSuite.exe";
-              Write-Host -ForegroundColor Yellow 'path='$path;
 
               if (Test-Path -Path $path) {
                 $runs += 1;
@@ -294,6 +301,8 @@ test_script:
                 } else {
                   Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Passed' -Duration $millisec
                 }
+              } else {
+                 Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome   'NotFound'
               }
             } else {
               Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Skipped'
