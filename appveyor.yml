@@ -37,35 +37,47 @@ environment:
 #     + FullyQualifiedErrorId : NativeCommandError  
 #
 # Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
-# -------------------------------------------------------------------------------------------
-    - builder: cmake
-      vsver: 120
-# -------------------------------------------------------------------------------------------
 
     - builder: msbuild
       vsver: 120
       linkmode: shared
+      vctool: x86
+
+    - builder: msbuild
+      vsver: 120
+      linkmode: shared
+      vctool: x86_amd64
 
     - builder: msbuild
       vsver: 120
       linkmode: static_md
+      vctool: x86
 
     - builder: msbuild
       vsver: 120
       linkmode: static_mt
+      vctool: x86
 
     - builder: msbuild
       vsver: 140
       linkmode: shared
+      vctool: x86
 
 #    - builder: msbuild
 #      vsver: 140
 #      linkmode: static_md
+#      vctool: x86
 
 #    - builder: msbuild
 #      vsver: 140
 #      linkmode: static_mt
+#      vctool: x86
 
+# -------------------------------------------------------------------------------------------
+    - builder: cmake
+      vsver: 120
+      vctool: x86
+# -------------------------------------------------------------------------------------------
 
 matrix:
   fast_finish: true
@@ -119,15 +131,21 @@ install:
 before_build:
   - set POCO_BASE=%CD%
   - ps: |
+        if ($env:vsver -eq "110")
+        {
+          $vspath= convert-path $env:VS110COMNTOOLS\..\..\VC\bin; $yyyy='2010'
+        }
         if ($env:vsver -eq "120")
         {
-          pushd $env:VS120COMNTOOLS; $yyyy='2013'
+          $vspath= convert-path $env:VS120COMNTOOLS\..\..\VC\bin; $yyyy='2013'
         }
         if ($env:vsver -eq "140")
         {
-          pushd $env:VS140COMNTOOLS; $yyyy='2015'
+          $vspath= convert-path $env:VS140COMNTOOLS\..\..\VC\bin; $yyyy='2015'
         }
-        cmd /c "vsvars32.bat&set" |
+        pushd $vspath;
+        $tool= if($env:vctool -eq "x86") {'x32'} else {$env:vctool}
+        cmd /c "vcvars$tool.bat&set" |
         foreach {
           if ($_ -match "=") {
             $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
@@ -135,6 +153,7 @@ before_build:
         }
         popd
         write-host "`nVisual Studio $yyyy Command Prompt variables set." -ForegroundColor Yellow
+        cl
     
 # MySQL
   - ps: |
@@ -156,20 +175,26 @@ after_build:
       $arg1="$env:POCO_BASE -type f -name '*.cpp' -exec c:\cygwin\bin\grep -n -H ";
       $arg2=" {} ;"
       
-      Write-Host -ForegroundColor Yellow $line;
       $word='FIXME'
+      Write-Host -ForegroundColor Yellow $line;
+      Write-Host -ForegroundColor Yellow $word;
+      Write-Host -ForegroundColor Yellow $line;
       Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
       Write-Host;Write-Host;
 
-      Write-Host -ForegroundColor Yellow $line;
       $word='TODO'
+      Write-Host -ForegroundColor Yellow $line;
+      Write-Host -ForegroundColor Yellow $word;
+      Write-Host -ForegroundColor Yellow $line;
       Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
       Write-Host;Write-Host;
 
-      Write-Host -ForegroundColor Yellow $line;
       $word='HACK'
+      Write-Host -ForegroundColor Yellow $line;
+      Write-Host -ForegroundColor Yellow $word;
+      Write-Host -ForegroundColor Yellow $line;
       Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
       Write-Host;Write-Host;
@@ -287,12 +312,12 @@ test_script:
         }  
         if ($env:builder -eq "cmake")
         {
-          Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
           pushd cmake-build;
           Write-Host -ForegroundColor Yellow $line;
-          ctest -VV -N
+          ctest -N
           Write-Host -ForegroundColor Yellow $line;
 
+          Write-Host -ForegroundColor Yellow 'ctest -VV -E Data*'
           ctest -VV -E Data*
           popd
         }
