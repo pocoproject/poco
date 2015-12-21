@@ -134,14 +134,18 @@ before_build:
         if ($env:vsver -eq "110")
         {
           $vspath= convert-path $env:VS110COMNTOOLS\..\..\VC\bin; $yyyy='2010'
+          if($env:vctool -ne "x86") { $vspath+=$env:vctool }
         }
         if ($env:vsver -eq "120")
         {
-          $vspath= convert-path $env:VS120COMNTOOLS\..\..\VC\bin; $yyyy='2013'
+          $vspath= convert-path $env:VS120COMNTOOLS\..\..\VC\bin;$yyyy='2013'
+          if($env:vctool -ne "x86") { $vspath+=$env:vctool }
+          
         }
         if ($env:vsver -eq "140")
         {
           $vspath= convert-path $env:VS140COMNTOOLS\..\..\VC\bin; $yyyy='2015'
+          if($env:vctool -ne "x86") { $vspath+=$env:vctool }
         }
         pushd $vspath;
         $tool= if($env:vctool -eq "x86") {'x32'} else {$env:vctool}
