@@ -148,8 +148,7 @@ before_build:
           }
         }
         popd
-        write-host "`nVisual Studio $yyyy $vctool Command Prompt variables set." -ForegroundColor Yellow
-        cl
+        write-host "`nVisual Studio $yyyy Command Prompt variables set." -ForegroundColor Yellow
     
 # MySQL
   - ps: |
