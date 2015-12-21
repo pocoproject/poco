@@ -200,12 +200,12 @@ build_script:
   - ps: |
       if ($env:builder -eq "msbuild")
       {
-        $logger='C:\Program Files (x86)\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll';
-        $samples='samples';$tests='tests';$verbosity='minimal';
+        $logger='"C:\Program Files (x86)\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"';
+        $verbosity='minimal';
     
         $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
         -Args "$env:vsver build $env:linkmode $env:configuration $env:platform `
-               $samples $tests msbuild $verbosity $logger";
+               samples tests msbuild $verbosity $logger";
         gc cout; gc cerr;
         Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
       }
@@ -232,7 +232,7 @@ before_test:
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
       set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
-      Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE:'  $env:CPPUNIT_IGNORE;
+      Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE=' $env:CPPUNIT_IGNORE;
 
 after_test:
 
