@@ -307,27 +307,22 @@ void HTTPSClientSessionTest::testInterop()
 
 void HTTPSClientSessionTest::testProxy()
 {
-	try {
-		HTTPSTestServer srv;
-		HTTPSClientSession s("secure.appinf.com");
-		s.setProxy(
-			Application::instance().config().getString("testsuite.proxy.host"),
-			Application::instance().config().getInt("testsuite.proxy.port")
-			);
-		HTTPRequest request(HTTPRequest::HTTP_GET, "/public/poco/NetSSL.txt");
-		s.sendRequest(request);
-		X509Certificate cert = s.serverCertificate();
-		HTTPResponse response;
-		std::istream& rs = s.receiveResponse(response);
-		std::ostringstream ostr;
-		StreamCopier::copyStream(rs, ostr);
-		std::string str(ostr.str());
-		assert(str == "This is a test file for NetSSL.\n");
-		assert(cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
-	}
-	catch (Poco::Net::HTTPException e) {
-		std::cout << e.displayText() << std::endl;
-	}
+	HTTPSTestServer srv;
+	HTTPSClientSession s("secure.appinf.com");
+	s.setProxy(
+		Application::instance().config().getString("testsuite.proxy.host"),
+		Application::instance().config().getInt("testsuite.proxy.port")
+		);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/public/poco/NetSSL.txt");
+	s.sendRequest(request);
+	X509Certificate cert = s.serverCertificate();
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	std::string str(ostr.str());
+	assert(str == "This is a test file for NetSSL.\n");
+	assert(cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
 }
 
 
@@ -480,7 +475,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testInterop);
 #ifdef FIXME
-	should use a public proxy server
+	testProxy should use a public proxy server
 	http://www.publicproxyservers.com/proxy/list1.html
 	Really working public proxy servers - page 1 of 6.
 #endif
