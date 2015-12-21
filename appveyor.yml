@@ -41,42 +41,30 @@ environment:
     - builder: msbuild
       vsver: 120
       linkmode: shared
-      vctool: x86
-
-    - builder: msbuild
-      vsver: 120
-      linkmode: shared
-      vctool: x86_amd64
 
     - builder: msbuild
       vsver: 120
       linkmode: static_md
-      vctool: x86
 
     - builder: msbuild
       vsver: 120
       linkmode: static_mt
-      vctool: x86
 
     - builder: msbuild
       vsver: 140
       linkmode: shared
-      vctool: x86
 
 #    - builder: msbuild
 #      vsver: 140
 #      linkmode: static_md
-#      vctool: x86
 
 #    - builder: msbuild
 #      vsver: 140
 #      linkmode: static_mt
-#      vctool: x86
 
 # -------------------------------------------------------------------------------------------
     - builder: cmake
       vsver: 120
-      vctool: x86
 # -------------------------------------------------------------------------------------------
 
 matrix:
