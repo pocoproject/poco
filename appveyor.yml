@@ -36,24 +36,12 @@ environment:
       linkmode: shared
 
     - builder: msbuild
-      vsver: 140
-      linkmode: shared
-
-    - builder: msbuild
       vsver: 120
       linkmode: static_md
-
-#    - builder: msbuild
-#      vsver: 140
-#      linkmode: static_md
 
     - builder: msbuild
       vsver: 120
       linkmode: static_mt
-
-#    - builder: msbuild
-#      vsver: 140
-#      linkmode: static_mt
 
 # -------------------------------------------------------------------------------------------
 # When builder is cmake, it remains one exception reported below
@@ -72,6 +60,18 @@ environment:
     - builder: cmake
       vsver: 120
 # -------------------------------------------------------------------------------------------
+    - builder: msbuild
+      vsver: 140
+      linkmode: shared
+
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: static_md
+
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: static_mt
+
 
 matrix:
   fast_finish: true
@@ -155,8 +155,7 @@ before_build:
         }
         popd
         write-host "`nVisual Studio $yyyy CLI variables set." -ForegroundColor Yellow
-
-    
+  
 # MySQL
   - ps: |
       if ($env:platform -eq "Win32")
