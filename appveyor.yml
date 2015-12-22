@@ -24,8 +24,8 @@ platform:
   - Win32
   
 # -------------------------------------------------------------------------------------------
-# tests are run only in release & shared.
 # building debug configuration doubles the round time and isn't so useful.
+# tests are run only in release & shared.
 # -------------------------------------------------------------------------------------------
 configuration:
   - release
@@ -132,6 +132,7 @@ install:
            } else {
              echo "downloading OpenSSL-Win32"
              Start-FileDownload 'http://slproweb.com/download/Win32OpenSSL-1_0_2e.exe'
+             echo "installing C:\OpenSSL-Win32"
              Start-Process "Win32OpenSSL-1_0_2e.exe" -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
            }
          }
@@ -142,6 +143,7 @@ install:
            } else {
              echo "downloading OpenSSL-Win64"
              Start-FileDownload 'http://slproweb.com/download/Win64OpenSSL-1_0_2e.exe'
+             echo "installing C:\OpenSSL-Win64"
              Start-Process "Win64OpenSSL-1_0_2e.exe" -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
            }
          }
@@ -154,13 +156,13 @@ install:
         if ($env:platform -eq "Win32")
         {
             if (Test-Path "c:\mysql-5.7.9-win32") {
-                echo "using mysql-5.7.9-win32 from cache"
+                echo "using c:\mysql-5.7.9-win32 from cache"
             }
             else
             {
                 echo "downloading mysql-5.7.9-win32"
                 Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile mysql-5.7.9-win32.zip
-                echo "installing mysql-5.7.9-win32"
+                echo "installing c:\mysql-5.7.9-win32"
                 7z x -y mysql-5.7.9-win32.zip -oc:\
             }
         }
@@ -259,7 +261,14 @@ build_script:
       if ($env:builder -eq "cmake")
       {
         mkdir cmake-build | out-null;pushd cmake-build;
-        cmake ../. -G"NMake Makefiles"  -DENABLE_SAMPLES=ON -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF
+        $defs =" -DCMAKE_BUILD_TYPE=$env:configuration";
+        $defs+=" -DENABLE_NETSSL=OFF";
+        $defs+=" -DENABLE_NETSSL_WIN=ON";
+        $defs+=" -DENABLE_DATA_MYSQL=OFF";
+        $defs+=" -DENABLE_REDIS=OFF";
+        $defs+=" -DENABLE_SAMPLES=ON";
+        $defs+=" -DENABLE_TESTS=ON";
+        cmake ../. -G"NMake Makefiles" $defs
         try {
           $ErrorActionPreference = 'Continue';
           cmake --build . --config $env:configuration
@@ -391,15 +400,7 @@ notifications:
     on_build_success: false
     on_build_failure: false
     on_build_status_changed: false
-    
-      
-  - provider: Slack
-    auth_token:
-      secure: xoOlP1UHshqjvh/INwMcNhZ5UHsTVKLGY5maTSjaxDc0fvRwoWIdYvY/CofQEuy2wOIBQK4eLD+tA0xG78ZgqQ==
-    channel: poco
-    on_build_success: false
-    on_build_status_changed: true
-  
+   
   - provider: Slack
     incoming_webhook: https://hooks.slack.com/services/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
     auth_token:
