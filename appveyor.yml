@@ -9,42 +9,47 @@ hosts:
   db.server.com: 127.0.0.2
   
 services:
+# mysql : server: localhost, port: 3306
+# mysql : user  : root, password: Password12!
 #  - mysql
+
+# mongodb config  : C:\mongodb\mongod.cfg
+# mongodb database: C:\mongodb\data\db
   - mongodb
 
 platform:
   - Win32
   - x64
   
+# tests are run only in release & shared.
+# building debug configuration doubles the round time and isn't so useful.
 configuration:
   - release
-  - debug
+#  - debug
 
 environment:
   bundling: bundled
 
-
   matrix:
-
     - builder: msbuild
       vsver: 120
+      linkmode: shared
+
+    - builder: msbuild
+      vsver: 140
       linkmode: shared
 
     - builder: msbuild
       vsver: 120
       linkmode: static_md
 
-    - builder: msbuild
-      vsver: 120
-      linkmode: static_mt
-
-    - builder: msbuild
-      vsver: 140
-      linkmode: shared
-
 #    - builder: msbuild
 #      vsver: 140
 #      linkmode: static_md
+
+    - builder: msbuild
+      vsver: 120
+      linkmode: static_mt
 
 #    - builder: msbuild
 #      vsver: 140
@@ -149,7 +154,8 @@ before_build:
           }
         }
         popd
-        write-host "`nVisual Studio $yyyy Command Prompt variables set." -ForegroundColor Yellow
+        write-host "`nVisual Studio $yyyy CLI variables set." -ForegroundColor Yellow
+
     
 # MySQL
   - ps: |
@@ -239,8 +245,6 @@ before_test:
       foreach($t in $CPPUNIT_IGNORE.split(",")) { Write-Host -ForegroundColor Yellow $t.trim() }      
       Write-Host -ForegroundColor Yellow $line;
       
-#  N7CppUnit10TestCallerI19MulticastSocketTestEE.testMulticast, \
-
 after_test:
 
 test_script:
