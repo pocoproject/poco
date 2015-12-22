@@ -3,7 +3,9 @@ version: poco-1.7.0 {branch}-{build}
 cache:
   - c:\mysql-5.7.9-win32
   - C:\ProgramData\chocolatey
-
+  - C:\OpenSSL-Win32
+  - C:\OpenSSL-Win64
+  
 hosts:
   localhost: 127.0.0.1
   db.server.com: 127.0.0.2
@@ -18,33 +20,25 @@ services:
   - mongodb
 
 platform:
-  - Win32
   - x64
+  - Win32
   
+# -------------------------------------------------------------------------------------------
 # tests are run only in release & shared.
 # building debug configuration doubles the round time and isn't so useful.
+# -------------------------------------------------------------------------------------------
 configuration:
   - release
 #  - debug
+# -------------------------------------------------------------------------------------------
 
 environment:
   bundling: bundled
 
   matrix:
-    - builder: msbuild
-      vsver: 120
-      linkmode: shared
-
-    - builder: msbuild
-      vsver: 120
-      linkmode: static_md
-
-    - builder: msbuild
-      vsver: 120
-      linkmode: static_mt
 
 # -------------------------------------------------------------------------------------------
-# When builder is cmake, it remains one exception reported below
+# When building with cmake, it remains one exception reported below
 # Once this problem fixed, the try/catch around the cmake builder can be removed
 #
 # [  1%] Generating pocomsg.h
@@ -59,7 +53,19 @@ environment:
 # -------------------------------------------------------------------------------------------
     - builder: cmake
       vsver: 120
-# -------------------------------------------------------------------------------------------
+
+    - builder: msbuild
+      vsver: 120
+      linkmode: shared
+
+    - builder: msbuild
+      vsver: 120
+      linkmode: static_md
+
+    - builder: msbuild
+      vsver: 120
+      linkmode: static_mt
+
     - builder: msbuild
       vsver: 140
       linkmode: shared
@@ -98,16 +104,52 @@ install:
         }
   - set
 
+# -------------------------------------------------------------------------------------------
 #  chocolatey brokes jom, here's workaround
 #  see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
+# -------------------------------------------------------------------------------------------
   - ps: |
-        if ($env:builder -eq "cmake")
-        {
-          $env:PATH = $env:ChocolateyInstall + "\bin" + ";" + $env:PATH
-          $env:PATH = $env:ChocolateyInstall + "\lib\jom\content" + ";" + $env:PATH
-        }
+      if ($env:builder -eq "cmake")
+      {
+        $env:PATH = $env:ChocolateyInstall + "\bin" + ";" + $env:PATH
+        $env:PATH = $env:ChocolateyInstall + "\lib\jom\content" + ";" + $env:PATH
+      }
+# -------------------------------------------------------------------------------------------
 
+
+# -------------------------------------------------------------------------------------------
+# OpenSSL-Win32 & OpenSSL-Win64
+# Download & use OpenSSL from  Shining Light Productions for CMake
+# until CMake use implicitly the embedded openssl from the Poco repo. See issue #1093
+# -------------------------------------------------------------------------------------------
+  - ps: |
+       if ($env:builder -eq "cmake")
+       {
+         if ($env:platform -eq "Win32")
+         {
+           if (Test-Path "C:\OpenSSL-Win32") {
+             echo "using C:\OpenSSL-Win32 from cache"
+           } else {
+             echo "downloading OpenSSL-Win32"
+             Start-FileDownload 'http://slproweb.com/download/Win32OpenSSL-1_0_2e.exe'
+             Start-Process "Win32OpenSSL-1_0_2e.exe" -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
+           }
+         }
+         if ($env:platform -eq "x64")
+         {
+           if (Test-Path "C:\OpenSSL-Win64") {
+             echo "using C:\OpenSSL-Win64 from cache"
+           } else {
+             echo "downloading OpenSSL-Win64"
+             Start-FileDownload 'http://slproweb.com/download/Win64OpenSSL-1_0_2e.exe'
+             Start-Process "Win64OpenSSL-1_0_2e.exe" -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
+           }
+         }
+       }
+# -------------------------------------------------------------------------------------------
+   
 #  MySQL 32 bit is not available by default on AppVeyor
+# -------------------------------------------------------------------------------------------
   - ps: |
         if ($env:platform -eq "Win32")
         {
@@ -122,6 +164,7 @@ install:
                 7z x -y mysql-5.7.9-win32.zip -oc:\
             }
         }
+ # -------------------------------------------------------------------------------------------
    
 before_build:
   - set POCO_BASE=%CD%
