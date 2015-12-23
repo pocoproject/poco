@@ -273,10 +273,27 @@ build_script:
       if ($env:builder -eq "cmake")
       {
         mkdir cmake-build | out-null;pushd cmake-build;
-        cmake ../. -G"NMake Makefiles" -DCMAKE_BUILD_TYPE=release -DENABLE_SAMPLES=ON -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF;
+        if ($env:platform -eq "Win32")
+        {
+            $opensslrootdir = 'C:\OpenSSL-Win32'
+        }
+        if ($env:platform -eq "x64")
+        {
+            $opensslrootdir = 'C:\OpenSSL-Win64'
+        }
+        
+        $defs =" `-DCMAKE_BUILD_TYPE=$env:configuration";
+        $defs+=" `-DOPENSSL_ROOT_DIR=$opensslrootdir";
+        $defs+=" `-DENABLE_NETSSL=OFF";
+        $defs+=" `-DENABLE_NETSSL_WIN=ON";
+        $defs+=" `-DENABLE_DATA_MYSQL=OFF";
+        $defs+=" `-DENABLE_REDIS=OFF";
+        $defs+=" `-DENABLE_SAMPLES=ON";
+        $defs+=" `-DENABLE_TESTS=ON";
+        cmake `-G"NMake Makefiles" $defs ..
         try {
           $ErrorActionPreference = 'Continue';
-          cmake --build . --config release
+          cmake `-`-build . `-`-config $env:configuration
         } catch {
           Write-Warning "Oops: $_"
         }
