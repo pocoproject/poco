@@ -72,7 +72,7 @@ environment:
 #
 # In VS2015 runring a x64 build & tests takes twice time and thus makes the build failed since
 # it overpasses 1 hour and free Appveyor account job are limited to 1 hour. Thus VS2015 builds 
-{ are removed until one finds out the reason why time is doubled. See jobs poco-1.7.0 AppVeyorWithCMake-21
+# are removed until one finds out the reason why time is doubled. See jobs poco-1.7.0 AppVeyorWithCMake-21
 #
 # Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: x64       1 hr 
 # -------------------------------------------------------------------------------------------
