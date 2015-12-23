@@ -290,10 +290,12 @@ build_script:
         $defs+=" `-DENABLE_REDIS=OFF";
         $defs+=" `-DENABLE_SAMPLES=ON";
         $defs+=" `-DENABLE_TESTS=ON";
-        cmake `-G"NMake Makefiles" $defs ..
+        Write-Host -ForegroundColor Yellow cmake `-G'"NMake Makefiles"' $defs ..
+        cmake `-G'"NMake Makefiles"' $defs ..
         try {
           $ErrorActionPreference = 'Continue';
-          cmake `-`-build . `-`-config $env:configuration
+          Write-Host -ForegroundColor Yellow cmake `-`-build . 
+          cmake `-`-build . 
         } catch {
           Write-Warning "Oops: $_"
         }
