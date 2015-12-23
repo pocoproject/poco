@@ -7,9 +7,9 @@
 # Detect compatible Clang version and add c++11/14 flags
 #
 
-CLANGMAJOR   := $(shell $(CXX) -x c++ -E /dev/null | grep __clang_major__ | sed -e 's/^.* //g'i)
-CLANGMINOR   := $(shell $(CXX) -x c++ -E /dev/null | grep __clang_minor__ | sed -e 's/^.* //g'i)
-CLANGPATCH   := $(shell $(CXX) -x c++ -E /dev/null | grep __clang_patchlevel__ | sed -e 's/^.* //g'i)
+CLANGMAJOR   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_major__ | sed -e 's/^.* //g')
+CLANGMINOR   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_minor__ | sed -e 's/^.* //g')
+CLANGPATCH   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_patchlevel__ | sed -e 's/^.* //g')
 CLANGVERSION := $(CLANGMAJOR)$(CLANGMINOR)
 
 # C++14 needs Clang 3.4
