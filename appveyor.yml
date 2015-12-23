@@ -273,10 +273,10 @@ build_script:
       if ($env:builder -eq "cmake")
       {
         mkdir cmake-build | out-null;pushd cmake-build;
-        cmake ../. -G"NMake Makefiles" -DCMAKE_BUILD_TYPE=$env:configuration -DENABLE_SAMPLES=ON -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF;
+        cmake ../. -G"NMake Makefiles" -DCMAKE_BUILD_TYPE=release -DENABLE_SAMPLES=ON -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF;
         try {
           $ErrorActionPreference = 'Continue';
-          cmake --build . --config $env:configuration
+          cmake --build . --config release
         } catch {
           Write-Warning "Oops: $_"
         }
