@@ -20,8 +20,8 @@ services:
   - mongodb
 
 platform:
-  - x64
   - Win32
+  - x64
   
 # -------------------------------------------------------------------------------------------
 # building debug configuration doubles the round time and isn't so useful.
@@ -67,13 +67,15 @@ environment:
       linkmode: static_mt
 
 # -------------------------------------------------------------------------------------------
-# VS2013 run a x64 build & tests in around 32 mn
+# VS2013 runs a x64 or Win32 build & tests in around 32 mn
+# Environment: builder=msbuild, vsver=120, linkmode=shared; Platform: Win32    31 min 33 sec
 # Environment: builder=msbuild, vsver=120, linkmode=shared; Platform: x64      33 min 32 sec
 #
-# In VS2015 runring a x64 build & tests takes twice time and thus makes the build failed since
+# In VS2015 running either a x64 or Win32 build & tests takes twice time and thus makes the build failed since
 # it overpasses 1 hour and free Appveyor account job are limited to 1 hour. Thus VS2015 builds 
-# are removed until one finds out the reason why time is doubled. See jobs poco-1.7.0 AppVeyorWithCMake-21
+# are removed until one finds out the reason why build time is doubled.
 #
+# Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: Win32     1 hr
 # Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: x64       1 hr 
 # -------------------------------------------------------------------------------------------
 #    - builder: msbuild
@@ -271,14 +273,7 @@ build_script:
       if ($env:builder -eq "cmake")
       {
         mkdir cmake-build | out-null;pushd cmake-build;
-        $defs =" -DCMAKE_BUILD_TYPE=$env:configuration";
-        $defs+=" -DENABLE_NETSSL=OFF";
-        $defs+=" -DENABLE_NETSSL_WIN=ON";
-        $defs+=" -DENABLE_DATA_MYSQL=OFF";
-        $defs+=" -DENABLE_REDIS=OFF";
-        $defs+=" -DENABLE_SAMPLES=ON";
-        $defs+=" -DENABLE_TESTS=ON";
-        cmake ../. -G"NMake Makefiles" $defs
+        cmake ../. -G"NMake Makefiles" -DCMAKE_BUILD_TYPE=$env:configuration -DENABLE_SAMPLES=ON -DENABLE_TESTS=ON -DENABLE_NETSSL=OFF -DENABLE_NETSSL_WIN=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_REDIS=OFF;
         try {
           $ErrorActionPreference = 'Continue';
           cmake --build . --config $env:configuration
