@@ -13,7 +13,7 @@ CLANGPATCH   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_patchlevel
 CLANGVERSION := $(CLANGMAJOR)$(CLANGMINOR)
 
 # C++14 needs Clang 3.4
-ifeq ($(shell test $(CLANGVERSION) -gt 33 && echo 1), 1)
+ifeq ($(shell test $(CLANGVERSION) -gt 34 && echo 1), 1)
 	CXXFLAGS += -std=c++14
 # C++11 needs Clang 3.1
 else ifeq ($(shell test $(CLANGVERSION) -gt 30 && echo 1), 1)
