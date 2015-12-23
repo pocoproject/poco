@@ -149,3 +149,4 @@ openssl/packages/
 !openssl/win64/lib/debug/*.pdb
 !openssl/win64/lib/release/*.lib
 
+/Debug

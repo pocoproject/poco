@@ -5,6 +5,7 @@
 #
 # ENABLE_{COMPONENT}
 # ENABLE_TESTS
+# ENABLE_SAMPLES
 
 cmake_minimum_required(VERSION 3.0.0)
 
@@ -81,7 +82,10 @@ option(ENABLE_REDIS "Enable Redis" ON)
 option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
 
 option(ENABLE_TESTS
-  "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
+  "Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
+
+option(ENABLE_SAMPLES
+  "Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
 
 option(POCO_STATIC
   "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
@@ -111,9 +115,15 @@ endif(POCO_STATIC)
 if (ENABLE_TESTS)
   include(CTest)
   enable_testing()
-  message(STATUS "Building with unittests & samples")
+  message(STATUS "Building with tests")
 else ()
-  message(STATUS "Building without tests & samples")
+  message(STATUS "Building without tests")
+endif ()
+
+if (ENABLE_SAMPLES)
+  message(STATUS "Building with samples")
+else ()
+  message(STATUS "Building without samples")
 endif ()
 
 if (POCO_UNBUNDLED)

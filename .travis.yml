@@ -3,6 +3,11 @@ language: cpp
 cache:
  - apt
 
+branches:
+  except:
+    - /*?pp?eyor*/
+
+
 before_install:
   # we need a recent version of CMake
   # - sudo add-apt-repository -y ppa:andykimpe/cmake3
@@ -40,9 +45,10 @@ matrix:
       compiler: clang
       os: osx
       script:
-        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make -j2
         - cat config.*
-        - make install -j2
+        - sudo make install
+        - ls -l /usr/local/lib/*Poco*
         - find . -name "*testrunner*"
         - ./travis/runtests.sh
 
@@ -50,6 +56,7 @@ matrix:
       compiler: gcc
       script:
         - ./configure --everything && make -s -j2
+        - sudo make install
         - ./travis/runtests.sh
     
     - env:    TEST_NAME="Linux gcc (make) unbundled"
@@ -57,12 +64,14 @@ matrix:
       script:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - ./configure --everything --unbundled && make -s -j2
+        - sudo make install
         - ./travis/runtests.sh
     
     - env:    TEST_NAME="Linux clang (make)"
       compiler: clang
       script:
         - ./configure --everything --config=Linux-clang && make -s -j2
+        - sudo make install
         - ./travis/runtests.sh
 
     - env:    TEST_NAME="Linux arm-linux-gnueabi- (make)"

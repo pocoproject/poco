@@ -85,21 +85,21 @@ void HTTPSStreamFactoryTest::testRedirect()
 
 void HTTPSStreamFactoryTest::testProxy()
 {
-	try {
-		HTTPSTestServer server;
-		HTTPSStreamFactory factory(
-			Application::instance().config().getString("testsuite.proxy.host"),
-			Application::instance().config().getInt("testsuite.proxy.port")
-			);
-		URI uri("https://secure.appinf.com/public/poco/NetSSL.txt");
-		std::auto_ptr<std::istream> pStr(factory.open(uri));
-		std::ostringstream ostr;
-		StreamCopier::copyStream(*pStr.get(), ostr);
-		assert(ostr.str().length() > 0);
-	}
-	catch (Poco::Exception e) {
-		std::cout << e.displayText() << std::endl;
-	}
+#ifdef FIXME
+	testProxy should use a public proxy server
+	http://www.publicproxyservers.com/proxy/list1.html
+	Really working public proxy servers - page 1 of 6.
+#endif
+	HTTPSTestServer server;
+	HTTPSStreamFactory factory(
+		Application::instance().config().getString("testsuite.proxy.host"),
+		Application::instance().config().getInt("testsuite.proxy.port")
+		);
+	URI uri("https://secure.appinf.com/public/poco/NetSSL.txt");
+	std::auto_ptr<std::istream> pStr(factory.open(uri));
+	std::ostringstream ostr;
+	StreamCopier::copyStream(*pStr.get(), ostr);
+	assert(ostr.str().length() > 0);
 }
 
 
