@@ -37,20 +37,6 @@ environment:
 
   matrix:
 
-# -------------------------------------------------------------------------------------------
-# When building with cmake, it remains one exception reported below
-# Once this problem fixed, the try/catch around the cmake builder can be removed
-#
-# [  1%] Generating pocomsg.h
-# cmake : MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
-# At line:16 char:3
-# +   cmake --build . --config $env:configuration
-# +   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#     + CategoryInfo          : NotSpecified: (MC: Compiling C.../src/pocomsg.mc:String) [], RemoteException
-#     + FullyQualifiedErrorId : NativeCommandError  
-#
-# Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
-# -------------------------------------------------------------------------------------------
     - builder: cmake
       vsver: 120
 
@@ -259,6 +245,22 @@ after_build:
 
 
 build_script:
+# -------------------------------------------------------------------------------------------
+# When building with cmake, it remains one exception reported below
+# Once this problem be fixed, a fix from Microsoft about mc.exe outputing informative 
+# message on stderr: https://connect.microsoft.com/VisualStudio/Feedback/Details/2161572
+# the try/catch around the cmake builder can be removed
+#
+# [  1%] Generating pocomsg.h
+# cmake : MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
+# At line:16 char:3
+# +   cmake --build . --config $env:configuration
+# +   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#     + CategoryInfo          : NotSpecified: (MC: Compiling C.../src/pocomsg.mc:String) [], RemoteException
+#     + FullyQualifiedErrorId : NativeCommandError  
+#
+# Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
+# -------------------------------------------------------------------------------------------
   - ps: |
       if ($env:builder -eq "msbuild")
       {
@@ -390,7 +392,7 @@ test_script:
             }
           }
         }  
-        if ($env:builder -eq "cmake")
+        if ($env:builder -eq "cmake" -and $env:platform -eq "Win32")
         {
           pushd cmake-build;
           Write-Host -ForegroundColor Yellow $line;
