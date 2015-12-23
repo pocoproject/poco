@@ -25,8 +25,7 @@ services:
 notifications:
   slack: 
     rooms:
-      - pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
-      - kampbell:v4ARuptk0ETzwUsKDdV6Gspb#travis
+      - pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t#travis
 
 env:
   global: 
@@ -44,7 +43,8 @@ matrix:
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - ./configure --everything && make -s -j2
+        - ${CXX} -version
+        - ./configure --everything && make -j2
         - travis_wait 30 ./travis/runtests.sh
     
     - env:    TEST_NAME="gcc (make) unbundled"
