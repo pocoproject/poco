@@ -30,8 +30,9 @@ notifications:
 env:
   global: 
     TEST_NAME=""
+    CC="gcc-4.8"
+    CXX="g++-4.8"
     
-
 before_script:
  - echo ${TEST_NAME}
  - sqlite3 -version
@@ -43,9 +44,8 @@ matrix:
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - ${CXX} --version
-        - ./configure --everything && make -j2
-        - travis_wait 30 ./travis/runtests.sh
+        - ./configure --everything && make -s -j2
+        - ./travis/runtests.sh
     
     - env:    TEST_NAME="gcc (make) unbundled"
       compiler: gcc
@@ -54,13 +54,13 @@ matrix:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
         - ./configure --everything --unbundled && make -s -j2
-        - travis_wait 30 ./travis/runtests.sh
+        - ./travis/runtests.sh
     
     - env:    TEST_NAME="clang (make)"
       compiler: clang
       script:
         - ./configure --everything --config=Linux-clang && make -s -j2
-        - travis_wait 30 ./travis/runtests.sh
+        - ./travis/runtests.sh
 
     #FIXME    the -m64 option bring by the Linux config is not supported by arm-linux-gnueabi-g++ which makes this test failing
     #FIXME    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
@@ -73,31 +73,31 @@ matrix:
         # disable tests, gcc-4.6 gets an internal compiler error
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="gcc-4.8 (CMake)"
       compiler: gcc
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="clang (CMake)"
       compiler: clang
       script:
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="arm-linux-gnueabi-g++ (CMake)"
       script:
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="arm-linux-gnueabihf-g++ (CMake)"
       script:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     # TODO osx build
     # TODO run test suite
