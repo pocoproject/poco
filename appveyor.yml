@@ -66,9 +66,19 @@ environment:
       vsver: 120
       linkmode: static_mt
 
-    - builder: msbuild
-      vsver: 140
-      linkmode: shared
+# -------------------------------------------------------------------------------------------
+# VS2013 run a x64 build & tests in around 32 mn
+# Environment: builder=msbuild, vsver=120, linkmode=shared; Platform: x64      33 min 32 sec
+#
+# In VS2015 runring a x64 build & tests takes twice time and thus makes the build failed since
+# it overpasses 1 hour and free Appveyor account job are limited to 1 hour. Thus VS2015 builds 
+{ are removed until one finds out the reason why time is doubled. See jobs poco-1.7.0 AppVeyorWithCMake-21
+#
+# Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: x64       1 hr 
+# -------------------------------------------------------------------------------------------
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: shared
 
 #    - builder: msbuild
 #      vsver: 140
