@@ -22,11 +22,10 @@
 #
 
 
-GNUMAJOR   := $(shell gcc -E -dM - < /dev/null | grep __GNUC__ | sed -e 's/^.* //g'i)
-GNUMINOR   := $(shell gcc -E -dM - < /dev/null | grep __GNUC_MINOR__ | sed -e 's/^.* //g'i)
-GNUPATCH   := $(shell gcc -E -dM - < /dev/null | grep __GNUC_PATCHLEVEL__ | sed -e 's/^.* //g'i)
+GNUMAJOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC__ | sed -e 's/^.* //g'i)
+GNUMINOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC_MINOR__ | sed -e 's/^.* //g'i)
+GNUPATCH   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC_PATCHLEVEL__ | sed -e 's/^.* //g'i)
 GCCVERSION := $(GNUMAJOR)$(GNUMINOR)$(GNUPATCH)
-$(info GCCVERSION=$(GCCVERSION))
 # C++14 needs GCC 4.9.2
 ifeq ($(shell test $(GCCVERSION) -gt 491 && echo 1), 1)
 	CXXFLAGS += -std=c++14
