@@ -236,7 +236,7 @@ after_build:
       $word='FIXME'
       Write-Host -ForegroundColor Yellow $word;
       Write-Host -ForegroundColor Yellow $line;
-      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
+      Start-Process -nnw -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
       Write-Host -ForegroundColor Yellow $line;
       Write-Host;Write-Host;
@@ -244,7 +244,7 @@ after_build:
       $word='TODO'
       Write-Host -ForegroundColor Yellow $word;
       Write-Host -ForegroundColor Yellow $line;
-      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
+      Start-Process -nnw -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
       Write-Host -ForegroundColor Yellow $line;
       Write-Host;Write-Host;
@@ -252,7 +252,7 @@ after_build:
       $word='HACK'
       Write-Host -ForegroundColor Yellow $word;
       Write-Host -ForegroundColor Yellow $line;
-      Start-Process -NoNewWindow -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
+      Start-Process -nnw -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
       gc cout; gc cerr;
       Write-Host -ForegroundColor Yellow $line;
       Write-Host;Write-Host;
@@ -265,7 +265,7 @@ build_script:
         $logger='"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"';
         $verbosity='minimal';
     
-        $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
+        $process = Start-Process -PassThru -nnw -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
         -Args "$env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild $verbosity $logger";
         gc cout; gc cerr;
         Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
@@ -281,17 +281,19 @@ build_script:
         {
             $opensslrootdir = 'C:\OpenSSL-Win64'
         }
-        
-        $defs =" `-DCMAKE_BUILD_TYPE=$env:configuration";
-        $defs+=" `-DOPENSSL_ROOT_DIR=$opensslrootdir";
-        $defs+=" `-DENABLE_NETSSL=OFF";
-        $defs+=" `-DENABLE_NETSSL_WIN=ON";
-        $defs+=" `-DENABLE_DATA_MYSQL=OFF";
-        $defs+=" `-DENABLE_REDIS=OFF";
-        $defs+=" `-DENABLE_SAMPLES=ON";
-        $defs+=" `-DENABLE_TESTS=ON";
-        Write-Host -ForegroundColor Yellow cmake `-G'"NMake Makefiles"' $defs ..
-        cmake `-G'"NMake Makefiles"' $defs ..
+        $defs =' -G"NMake Makefiles"';
+        $defs+=" -DCMAKE_BUILD_TYPE=$env:configuration";
+        $defs+=" -DOPENSSL_ROOT_DIR=$opensslrootdir";
+        $defs+=" -DENABLE_NETSSL=OFF";
+        $defs+=" -DENABLE_NETSSL_WIN=ON";
+        $defs+=" -DENABLE_DATA_MYSQL=OFF";
+        $defs+=" -DENABLE_REDIS=OFF";
+        $defs+=" -DENABLE_SAMPLES=ON";
+        $defs+=" -DENABLE_TESTS=ON";
+        $defs+=" ..";
+        Write-Host -ForegroundColor Yellow cmake $defs
+        $process = Start-Process -PassThru -nnw -Wait -FilePath "cmake" -RSO cout -RSE cerr -Args $defs;
+        gc cout; gc cerr;
         try {
           $ErrorActionPreference = 'Continue';
           Write-Host -ForegroundColor Yellow cmake `-`-build . 
@@ -368,7 +370,7 @@ test_script:
                 Write-Host -ForegroundColor Yellow $line; 
 
                 $started = Get-Date
-                $process = Start-Process -PassThru -NoNewWindow -Wait -FilePath "$path" -Args "-all" -RSO cout -RSE cerr;
+                $process = Start-Process -PassThru -nnw -Wait -FilePath "$path" -Args "-all" -RSO cout -RSE cerr;
                 $ended   = Get-Date
                 $millisec = ($ended - $started).totalmilliseconds
                  
