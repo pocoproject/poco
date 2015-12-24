@@ -37,6 +37,17 @@ before_script:
 
 matrix:
   include:
+    - env:    TEST_NAME="OSX   clang (make) bundled"
+      compiler: clang
+      os: osx
+      script:
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make -s -j2
+        - cat config.*
+        - sudo make install
+        - ls -l /usr/local/lib/*Poco*
+        - find . -name "*testrunner*"
+        - ./travis/runtests.sh
+
     - env:    TEST_NAME="gcc 4.6 (make) bundled"
       compiler: gcc
       script:
