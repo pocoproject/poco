@@ -41,6 +41,7 @@ matrix:
       os: osx
       compiler: clang
       script:
+        - $(CXX) -x c++ /dev/null -dM -E
         - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make -s -j2
         - cat config.*
         - sudo make install
