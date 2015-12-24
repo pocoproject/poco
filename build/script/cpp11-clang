@@ -26,8 +26,8 @@ CLANGVERSION := $(CLANGMAJOR)$(CLANGMINOR)
 # C++14 needs Clang 3.4
 ifeq ($(shell test $(CLANGVERSION) -gt 34 && echo 1), 1)
 	CXXFLAGS += -std=c++14
-# C++11 needs Clang 3.1
-else ifeq ($(shell test $(CLANGVERSION) -gt 30 && echo 1), 1)
+# C++11 needs Clang 3.3
+else ifeq ($(shell test $(CLANGVERSION) -gt 32 && echo 1), 1)
 	CXXFLAGS += -std=c++11
 endif
 
