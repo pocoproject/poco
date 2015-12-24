@@ -30,8 +30,6 @@ notifications:
 env:
   global: 
     TEST_NAME=""
-    CC="gcc-4.8"
-    CXX="g++-4.8"
     
 before_script:
  - echo ${TEST_NAME}
@@ -39,7 +37,15 @@ before_script:
 
 matrix:
   include:
-    - env:    TEST_NAME="gcc (make) bundled"
+    - env:    TEST_NAME="gcc 4.6 (make) bundled"
+      compiler: gcc
+      script:
+        - export CC="gcc"
+        - export CXX="g++"
+        - ./configure --everything && make -s -j2
+        - ./travis/runtests.sh
+    
+    - env:    TEST_NAME="gcc 4.8 (make) bundled"
       compiler: gcc
       script:
         - export CC="gcc-4.8"
@@ -47,7 +53,16 @@ matrix:
         - ./configure --everything && make -s -j2
         - ./travis/runtests.sh
     
-    - env:    TEST_NAME="gcc (make) unbundled"
+    - env:    TEST_NAME="gcc 4.6 (make) unbundled"
+      compiler: gcc
+      script:
+        - export CC="gcc"
+        - export CXX="g++"
+        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
+        - ./configure --everything --unbundled && make -s -j2
+        - ./travis/runtests.sh
+
+    - env:    TEST_NAME="gcc 4.8 (make) unbundled"
       compiler: gcc
       script:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
@@ -56,7 +71,7 @@ matrix:
         - ./configure --everything --unbundled && make -s -j2
         - ./travis/runtests.sh
     
-    - env:    TEST_NAME="clang (make)"
+    - env:    TEST_NAME="clang 3.4 (make)"
       compiler: clang
       script:
         - ./configure --everything --config=Linux-clang && make -s -j2
@@ -67,22 +82,22 @@ matrix:
     #FIXME      script:
     #FIXME        - ./configure --omit=Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
-    - env:    TEST_NAME="gcc (CMake)"
+    - env:    TEST_NAME="gcc 4.6 (CMake)"
       compiler: gcc
       script:
+        - export CC="gcc"
+        - export CXX="g++"
         # disable tests, gcc-4.6 gets an internal compiler error
-        - export CC="gcc-4.8"
-        - export CXX="g++-4.8"
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -s -j2 && cd ..
 
-    - env:    TEST_NAME="gcc-4.8 (CMake)"
+    - env:    TEST_NAME="gcc 4.8 (CMake)"
       compiler: gcc
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
-    - env:    TEST_NAME="clang (CMake)"
+    - env:    TEST_NAME="clang 3.4 (CMake)"
       compiler: clang
       script:
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
@@ -114,6 +129,8 @@ matrix:
     - env:    TEST_NAME="documentation & release"
       compiler: gcc
       script:
+        - export CC="gcc"
+        - export CXX="g++"
         - . env.sh && mkdoc all && mkrel all
 
     # static code analysis with cppcheck (we can add --enable=all later)
