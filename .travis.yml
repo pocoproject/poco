@@ -99,8 +99,7 @@ matrix:
       script:
         - export CC="gcc"
         - export CXX="g++"
-        # disable tests, gcc-4.6 gets an internal compiler error
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -s -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="Linux gcc 4.8 (CMake)"
       compiler: gcc
