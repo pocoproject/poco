@@ -17,17 +17,27 @@
 #	CXXFLAGS += -std=c++11
 #endif
 
-
+ISAPPLE      := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __APPLE__ | sed -e 's/^.* //g')
 CLANGMAJOR   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_major__ | sed -e 's/^.* //g')
 CLANGMINOR   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_minor__ | sed -e 's/^.* //g')
 CLANGPATCH   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_patchlevel__ | sed -e 's/^.* //g')
 CLANGVERSION := $(CLANGMAJOR)$(CLANGMINOR)
 
-# C++14 needs Clang 3.4
-ifeq ($(shell test $(CLANGVERSION) -gt 34 && echo 1), 1)
-	CXXFLAGS += -std=c++14
-# C++11 needs Clang 3.3
-else ifeq ($(shell test $(CLANGVERSION) -gt 32 && echo 1), 1)
-	CXXFLAGS += -std=c++11
+ifeq ($(shell test "$(ISAPPLE)" && echo 1), 1)
+  # C++14 needs Clang 61
+  ifeq ($(shell test $(CLANGVERSION) -ge 61 && echo 1), 1)
+	  CXXFLAGS += -std=c++14
+  # C++11 needs Clang 60
+  else ifeq ($(shell test $(CLANGVERSION) -ge 60 && echo 1), 1)
+	  CXXFLAGS += -std=c++11
+  endif
+else
+  # C++14 needs Clang 3.4
+  ifeq ($(shell test $(CLANGVERSION) -ge 34 && echo 1), 1)
+	  CXXFLAGS += -std=c++14
+  # C++11 needs Clang 3.3
+  else ifeq ($(shell test $(CLANGVERSION) -ge 33 && echo 1), 1)
+	  CXXFLAGS += -std=c++11
+  endif
 endif
 
