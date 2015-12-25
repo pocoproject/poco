@@ -47,7 +47,7 @@ matrix:
         - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make -s -j2
         - cat config.*
         - sudo make install
-        - ls -l /usr/local/lib/*Poco*
+        - ls -l /usr/local/lib/*
         - find . -name "*testrunner*"
         - ./travis/runtests.sh
 
