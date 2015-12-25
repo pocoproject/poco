@@ -610,16 +610,16 @@ void ServerApplication::waitForTerminationRequest()
 }
 
 
-int ServerApplication::run(int argc, char** argv)
+int ServerApplication::run(int argc, char** pArgv)
 {
-	bool runAsDaemon = isDaemon(argc, argv);
+	bool runAsDaemon = isDaemon(argc, pArgv);
 	if (runAsDaemon)
 	{
 		beDaemon();
 	}
 	try
 	{
-		init(argc, argv);
+		init(argc, pArgv);
 		if (runAsDaemon)
 		{
 			int rc = chdir("/");
@@ -668,12 +668,12 @@ int ServerApplication::run(const std::vector<std::string>& args)
 }
 
 
-bool ServerApplication::isDaemon(int argc, char** argv)
+bool ServerApplication::isDaemon(int argc, char** pArgv)
 {
 	std::string option("--daemon");
 	for (int i = 1; i < argc; ++i)
 	{
-		if (option == argv[i])
+		if (option == pArgv[i])
 			return true;
 	}
 	return false;
@@ -708,17 +708,17 @@ void ServerApplication::beDaemon()
 }
 
 
-void ServerApplication::defineOptions(OptionSet& options)
+void ServerApplication::defineOptions(OptionSet& rOptions)
 {
-	Application::defineOptions(options);
+	Application::defineOptions(rOptions);
 
-	options.addOption(
+	rOptions.addOption(
 		Option("daemon", "", "Run application as a daemon.")
 			.required(false)
 			.repeatable(false)
 			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDaemon)));
 
-	options.addOption(
+	rOptions.addOption(
 		Option("pidfile", "", "Write the process ID of the application to given file.")
 			.required(false)
 			.repeatable(false)
@@ -727,13 +727,13 @@ void ServerApplication::defineOptions(OptionSet& options)
 }
 
 
-void ServerApplication::handleDaemon(const std::string& name, const std::string& value)
+void ServerApplication::handleDaemon(const std::string& rName, const std::string& Value)
 {
 	config().setBool("application.runAsDaemon", true);
 }
 
 
-void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
+void ServerApplication::handlePidFile(const std::string& rName, const std::string& value)
 {
 	std::ofstream ostr(value.c_str());
 	if (ostr.good())
