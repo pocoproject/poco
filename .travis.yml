@@ -99,20 +99,22 @@ matrix:
       script:
         - export CC="gcc"
         - export CXX="g++"
-        # disable tests, gcc-4.6 gets an internal compiler error
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -s -j2 && cd ..
+        - ./travis/ignored.sh
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV && cd ..
 
     - env:    TEST_NAME="Linux gcc 4.8 (CMake)"
       compiler: gcc
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
+        - ./travis/ignored.sh
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV && cd ..
 
     - env:    TEST_NAME="clang 3.4 (CMake)"
       compiler: clang
       script:
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
+        - ./travis/ignored.sh
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabi-g++ (CMake)"
       script:
