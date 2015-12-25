@@ -99,6 +99,7 @@ matrix:
       script:
         - export CC="gcc"
         - export CXX="g++"
+        - ./travis/ignored.sh
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV && cd ..
 
     - env:    TEST_NAME="Linux gcc 4.8 (CMake)"
@@ -106,11 +107,13 @@ matrix:
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
+        - ./travis/ignored.sh
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV && cd ..
 
     - env:    TEST_NAME="clang 3.4 (CMake)"
       compiler: clang
       script:
+        - ./travis/ignored.sh
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabi-g++ (CMake)"
