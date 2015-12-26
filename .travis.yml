@@ -34,6 +34,8 @@ env:
 before_script:
  - echo ${TEST_NAME}
  - sqlite3 -version
+ - chmod 755 ./travis/Linux/runtests.sh
+ - chmod 755 ./travis/OSX/runtests.sh
 
 matrix:
   include:
