@@ -1,3 +1,4 @@
+#!/bin/bash
 set -ev
 export POCO_BASE=`pwd`
 export PATH=$PATH:.

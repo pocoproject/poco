@@ -4,3 +4,4 @@
 # been fixed by Travis
 #
 export EXCLUDE_TESTS="Data/MySQL Data/ODBC MongoDB Redis PDF"
+
