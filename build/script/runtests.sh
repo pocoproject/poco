@@ -89,7 +89,12 @@ do
 
 				runs=`expr $runs + 1`
 				sh -c "cd $POCO_BUILD/$comp/testsuite/$BINDIR && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER $TESTRUNNERARGS"
-				if [ $? -ne 0 ] ; then
+				# rc = 141 is in fact 141 - 128 = 13 which corresponds to errno SIGPIPE
+				# caused by the socket connection been closed abruptly on the server side
+				# which make the testrunner failed. So rc=141 is not a failure per se.
+				rc=$?
+				if ([ $rc -ne 0 ] && [ $rc -ne 141 ]) ; then
+					echo "failed="$comp
 					failures=`expr $failures + 1`
 					failedTests="$failedTests $comp"
 					status=1
@@ -108,5 +113,5 @@ do
 	echo "Failed: $test"
 done
 echo ""
-
+echo "status="$status
 exit $status
