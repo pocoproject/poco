@@ -320,12 +320,8 @@ void CoreTest::testBuffer()
 
 void CoreTest::testAtomicCounter()
 {
-#if defined(POCO_ENABLE_CPP11)
 	AtomicCounter ac(0);
-#else
-	AtomicCounter ac;
-#endif
-	
+
 	assert (ac.value() == 0);
 	assert (ac++ == 0);
 	assert (ac-- == 1);
