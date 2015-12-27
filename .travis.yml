@@ -100,7 +100,7 @@ matrix:
       script:
         - export CC="gcc"
         - export CXX="g++"
-        - ./travis/ignored.sh
+        - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
@@ -109,14 +109,14 @@ matrix:
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - ./travis/ignored.sh
+        - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
     - env:    TEST_NAME="clang 3.4 (CMake)"
       compiler: clang
       script:
-        - ./travis/ignored.sh
+        - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
@@ -124,7 +124,7 @@ matrix:
       script:
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
-        - ./travis/ignored.sh
+        - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON ..
         - make -s -j2 && cd ..
@@ -133,7 +133,7 @@ matrix:
       script:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
-        - ./travis/ignored.sh
+        - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. 
         - make -s -j2 && cd ..
