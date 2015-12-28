@@ -182,9 +182,9 @@ MultipartReader::MultipartReader(std::istream& istr):
 }
 
 
-MultipartReader::MultipartReader(std::istream& istr, const std::string& boundary):
+MultipartReader::MultipartReader(std::istream& istr, const std::string& rBoundary):
 	_istr(istr),
-	_boundary(boundary),
+	_boundary(rBoundary),
 	_pMPI(0)
 {
 }

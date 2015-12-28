@@ -33,13 +33,13 @@ namespace Poco {
 namespace Net {
 
 
-HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, HTTPServerSession& session, HTTPServerParams* pParams):
-	_response(response),
+HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& rResponse, HTTPServerSession& session, HTTPServerParams* pParams):
+	_response(rResponse),
 	_session(session),
 	_pStream(0),
 	_pParams(pParams, true)
 {
-	response.attachRequest(this);
+	rResponse.attachRequest(this);
 
 	HTTPHeaderInputStream hs(session);
 	read(hs);
