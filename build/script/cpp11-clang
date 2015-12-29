@@ -7,13 +7,15 @@
 # Detect compatible Clang version and add c++11/14 flags
 #
 
-APPLE_CLANGVERSION := $(subst .,,$(shell clang --version | grep ^Apple | sed 's/^.* //g' | sed 's/(clang\-\(.*\))/\1/g' | sed -e 's/\.\([0-9][0-9]\)/\1/g' -e 's/\.\([0-9]\)/0\1/g' -e 's/^[0-9]\{3,4\}$$/&00/' ))
+CLANGMAJOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __clang_major__ | sed -e 's/^.* //g'i)
+CLANGMINOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __clang_minor__ | sed -e 's/^.* //g'i)
+CLANGPATCH   := $(shell $(CXX) -E -dM - < /dev/null | grep __clang_patchlevel__ | sed -e 's/^.* //g'i)
+CLANGVERSION := $(CLANGMAJOR)$(CLANGMINOR)$(CLANGPATCH)
 
-# C++14 needs AppleClang 503.x
-ifeq ($(shell test $(APPLE_CLANGVERSION) -gt 5030038 && echo 1), 1)
-	CXXFLAGS += -std=c++14
-# C++11 needs AppleClang 500.x
-else ifeq ($(shell test $(APPLE_CLANGVERSION) -gt 5000275 && echo 1), 1)
-	CXXFLAGS += -std=c++11
+# C++14 needs Clang 3.4
+ifeq ($(shell test $(CLANGVERSION) -ge 340 && echo 1), 1)
+	CXXFLAGS += -std=c++1y
+# C++11 needs Clang 3.3
+else ifeq ($(shell test $(CLANGVERSION) -ge 330 && echo 1), 1)
+	CXXFLAGS += -std=c++0x
 endif
-

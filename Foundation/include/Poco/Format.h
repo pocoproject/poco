@@ -23,7 +23,9 @@
 #include "Poco/Foundation.h"
 #include "Poco/Any.h"
 #include <vector>
+#if defined(POCO_ENABLE_CPP11)
 #include <type_traits>
+#endif
 
 
 namespace Poco {

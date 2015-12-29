@@ -26,10 +26,11 @@ GNUMAJOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC__ | sed -e 's/^.
 GNUMINOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC_MINOR__ | sed -e 's/^.* //g'i)
 GNUPATCH   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC_PATCHLEVEL__ | sed -e 's/^.* //g'i)
 GCCVERSION := $(GNUMAJOR)$(GNUMINOR)$(GNUPATCH)
+
 # C++14 needs GCC 4.9.2
-ifeq ($(shell test $(GCCVERSION) -gt 491 && echo 1), 1)
+ifeq ($(shell test $(GCCVERSION) -ge 492 && echo 1), 1)
 	CXXFLAGS += -std=c++14
 # C++11 needs GCC 4.8.1
-else ifeq ($(shell test $(GCCVERSION) -gt 480 && echo 1), 1)
-	CXXFLAGS += -std=c++11
+else ifeq ($(shell test $(GCCVERSION) -ge 481 && echo 1), 1)
+	CXXFLAGS += -std=c++0x
 endif
