@@ -11,10 +11,11 @@ CLANGMAJOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __clang_major__ | sed
 CLANGMINOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __clang_minor__ | sed -e 's/^.* //g'i)
 CLANGPATCH   := $(shell $(CXX) -E -dM - < /dev/null | grep __clang_patchlevel__ | sed -e 's/^.* //g'i)
 CLANGVERSION := $(CLANGMAJOR)$(CLANGMINOR)$(CLANGPATCH)
+
 # C++14 needs Clang 3.4
-ifeq ($(shell test $(CLANGVERSION) -gt 339 && echo 1), 1)
+ifeq ($(shell test $(CLANGVERSION) -ge 340 && echo 1), 1)
 	CXXFLAGS += -std=c++1y
-# C++11 needs Clang 3.4 (3.3 has compile problem in Linux)
-else ifeq ($(shell test $(CLANGVERSION) -gt 339 && echo 1), 1)
+# C++11 needs Clang 3.3
+else ifeq ($(shell test $(CLANGVERSION) -ge 330 && echo 1), 1)
 	CXXFLAGS += -std=c++0x
 endif
