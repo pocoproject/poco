@@ -61,8 +61,8 @@
 	#define POCO_ENABLE_CPP11
 #endif
 
-// Enable C++11 support for Clang 3.4
-#if defined(__clang__) && !defined(__apple_build_version__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 4)) && !defined(POCO_ENABLE_CPP11) && !defined(POCO_DISABLE_CPP11)
+// Enable C++11 support for Clang 3.3
+#if defined(__clang__) && !defined(__apple_build_version__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 3)) && !defined(POCO_ENABLE_CPP11) && !defined(POCO_DISABLE_CPP11)
 	#define POCO_ENABLE_CPP11
 #endif
 
