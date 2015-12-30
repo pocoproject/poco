@@ -257,7 +257,7 @@ std::streamsize HTMLForm::calculateContentLength()
 }
 
 
-void HTMLForm::write(std::ostream& ostr, const std::string& boundary)
+void HTMLForm::write(std::ostream& ostr, const std::string& rBoundary)
 {
 	if (_encoding == ENCODING_URL)
 	{
@@ -265,7 +265,7 @@ void HTMLForm::write(std::ostream& ostr, const std::string& boundary)
 	}
 	else
 	{
-		_boundary = boundary;
+		_boundary = rBoundary;
 		writeMultipart(ostr);
 	}
 }
@@ -355,12 +355,12 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 		{
 			std::string name = params["name"];
 			std::string value;
-			std::istream& istr = reader.stream();
-			int ch = istr.get();
+			std::istream& rIstr = reader.stream();
+			int ch = rIstr.get();
 			while (ch != eof)
 			{
 				value += (char) ch;
-				ch = istr.get();
+				ch = rIstr.get();
 			}
 			add(name, value);
 		}

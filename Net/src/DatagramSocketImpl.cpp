@@ -47,7 +47,7 @@ DatagramSocketImpl::DatagramSocketImpl(SocketAddress::Family family)
 }
 
 	
-DatagramSocketImpl::DatagramSocketImpl(poco_socket_t sockfd): SocketImpl(sockfd)
+DatagramSocketImpl::DatagramSocketImpl(poco_socket_t socketfd): SocketImpl(socketfd)
 {
 }
 
