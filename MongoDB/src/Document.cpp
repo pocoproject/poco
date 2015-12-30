@@ -52,6 +52,28 @@ Element::Ptr Document::get(const std::string& name) const
 	return element;
 }
 
+Int64 Document::getInteger(const std::string& name) const
+{
+	Element::Ptr element = get(name);
+	if ( element.isNull() ) throw NotFoundException(name);
+
+	if ( ElementTraits<double>::TypeId == element->type() )
+	{
+		ConcreteElement<double>* concrete = dynamic_cast<ConcreteElement<double>* >(element.get());
+		if ( concrete != NULL ) return concrete->value();
+	}
+	else if ( ElementTraits<Int32>::TypeId == element->type() )
+	{
+		ConcreteElement<Int32>* concrete = dynamic_cast<ConcreteElement<Int32>* >(element.get());
+		if ( concrete != NULL ) return concrete->value();
+	}
+	else if ( ElementTraits<Int64>::TypeId == element->type() )
+	{
+		ConcreteElement<Int64>* concrete = dynamic_cast<ConcreteElement<Int64>* >(element.get());
+		if ( concrete != NULL ) return concrete->value();
+	}
+	throw BadCastException("Invalid type mismatch!");
+}
 
 void Document::read(BinaryReader& reader)
 {
@@ -184,7 +206,7 @@ void Document::write(BinaryWriter& writer)
 			element->write(tempWriter);
 		}
 		tempWriter.flush();
-		
+
 		Poco::Int32 len = static_cast<Poco::Int32>(5 + sstream.tellp()); /* 5 = sizeof(len) + 0-byte */
 		writer << len;
 		writer.writeRaw(sstream.str());

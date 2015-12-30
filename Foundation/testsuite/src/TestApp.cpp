@@ -49,6 +49,7 @@ int main(int argc, char** argv)
 		}
 		else if (arg == "-raise-int")
 		{
+			std::signal(SIGINT, SIG_DFL);
 			std::raise(SIGINT);
 		}
 	}

@@ -33,12 +33,12 @@ FIFOBufferStreamBuf::FIFOBufferStreamBuf():
 }
 
 
-FIFOBufferStreamBuf::FIFOBufferStreamBuf(FIFOBuffer& fifoBuffer):
-	BufferedBidirectionalStreamBuf(fifoBuffer.size() + 4, std::ios::in | std::ios::out),
+FIFOBufferStreamBuf::FIFOBufferStreamBuf(FIFOBuffer& rFifoBuffer):
+	BufferedBidirectionalStreamBuf(rFifoBuffer.size() + 4, std::ios::in | std::ios::out),
 	_pFIFOBuffer(0),
-	_fifoBuffer(fifoBuffer)
+	_fifoBuffer(rFifoBuffer)
 {
-	fifoBuffer.setNotify(true);
+	rFifoBuffer.setNotify(true);
 }
 
 

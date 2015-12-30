@@ -109,12 +109,12 @@ public:
 		/// not found.
 	{
 		typename Container::const_iterator it = _list.begin();
-		typename Container::const_iterator end = _list.end();
-		for(; it != end; ++it)
+		typename Container::const_iterator itEnd = _list.end();
+		for(; it != itEnd; ++it)
 		{
 			if (isEqual(it->first, key)) return it;
 		}
-		return end;
+		return itEnd;
 	}
 
 	Iterator find(const KeyType& key)
@@ -124,12 +124,12 @@ public:
 		/// not found.
 	{
 		typename Container::iterator it = _list.begin();
-		typename Container::iterator end = _list.end();
-		for(; it != end; ++it)
+		typename Container::iterator itEnd = _list.end();
+		for(; it != itEnd; ++it)
 		{
 			if (isEqual(it->first, key)) return it;
 		}
-		return end;
+		return itEnd;
 	}
 
 	Iterator insert(const ValueType& val)
@@ -140,19 +140,8 @@ public:
 		/// Returns iterator pointing to the newly inserted value 
 	{
 		Iterator it = find(val.first);
-
-		if (it == _list.end())
-		{
-			_list.push_back(val);
-			it = _list.end();
-			--it;
-		}
-		else
-		{
-			_list.insert(it, 1, val);
-		}
-
-		return it;
+		while (it != _list.end() && isEqual(it->first, val.first)) ++it;
+		return _list.insert(it, val);
 	}
 	
 	void erase(Iterator it)
@@ -214,8 +203,8 @@ public:
 		else
 		{
 			ValueType value(key, Mapped());
-			Iterator it = insert(value);
-			return it->second;
+			Iterator itInsert = insert(value);
+			return itInsert->second;
 		}
 	}
 

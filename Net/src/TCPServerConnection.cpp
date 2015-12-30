@@ -27,8 +27,8 @@ namespace Poco {
 namespace Net {
 
 
-TCPServerConnection::TCPServerConnection(const StreamSocket& socket):
-	_socket(socket)
+TCPServerConnection::TCPServerConnection(const StreamSocket& rSocket):
+	_socket(rSocket)
 {
 }
 

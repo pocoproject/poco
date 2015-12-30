@@ -26,11 +26,11 @@ namespace Poco {
 namespace Net {
 
 
-ICMPSocket::ICMPSocket(IPAddress::Family family, int dataSize, int ttl, int timeout): 
-	Socket(new ICMPSocketImpl(family, dataSize, ttl, timeout)),
-	_dataSize(dataSize), 
-	_ttl(ttl),
-	_timeout(timeout)
+ICMPSocket::ICMPSocket(IPAddress::Family family, int dataSizeInBytes, int ttlValue, int socketTimeout): 
+	Socket(new ICMPSocketImpl(family, dataSizeInBytes, ttlValue, socketTimeout)),
+	_dataSize(dataSizeInBytes), 
+	_ttl(ttlValue),
+	_timeout(socketTimeout)
 {
 }
 
@@ -66,15 +66,15 @@ ICMPSocket& ICMPSocket::operator = (const Socket& socket)
 }
 
 
-int ICMPSocket::sendTo(const SocketAddress& address, int flags)
+int ICMPSocket::sendTo(const SocketAddress& rAddress, int flags)
 {
-	return impl()->sendTo(0, 0, address, flags);
+	return impl()->sendTo(0, 0, rAddress, flags);
 }
 
 
-int ICMPSocket::receiveFrom(SocketAddress& address, int flags)
+int ICMPSocket::receiveFrom(SocketAddress& rAddress, int flags)
 {
-	return impl()->receiveFrom(0, 0, address, flags);
+	return impl()->receiveFrom(0, 0, rAddress, flags);
 }
 
 

@@ -86,31 +86,31 @@ IPv4AddressImpl::IPv4AddressImpl()
 }
 
 
-IPv4AddressImpl::IPv4AddressImpl(const void* addr)
+IPv4AddressImpl::IPv4AddressImpl(const void* pAddr)
 {
-	std::memcpy(&_addr, addr, sizeof(_addr));
+	std::memcpy(&_addr, pAddr, sizeof(_addr));
 }
 
 
 IPv4AddressImpl::IPv4AddressImpl(unsigned prefix)
 {
-	UInt32 addr = (prefix == 32) ? 0xffffffff : ~(0xffffffff >> prefix);
-	_addr.s_addr = ByteOrder::toNetwork(addr);
+	UInt32 address = (prefix == 32) ? 0xffffffff : ~(0xffffffff >> prefix);
+	_addr.s_addr = ByteOrder::toNetwork(address);
 }
 
 
-IPv4AddressImpl::IPv4AddressImpl(const IPv4AddressImpl& addr)
+IPv4AddressImpl::IPv4AddressImpl(const IPv4AddressImpl& rAddr)
 {
-	std::memcpy(&_addr, &addr._addr, sizeof(_addr));
+	std::memcpy(&_addr, &rAddr._addr, sizeof(_addr));
 }
 
 
-IPv4AddressImpl& IPv4AddressImpl::operator = (const IPv4AddressImpl& addr)
+IPv4AddressImpl& IPv4AddressImpl::operator = (const IPv4AddressImpl& rAddr)
 {
-    if (this == &addr)
+    if (this == &rAddr)
         return *this;
 
-	std::memcpy(&_addr, &addr._addr, sizeof(_addr));
+	std::memcpy(&_addr, &rAddr._addr, sizeof(_addr));
 	return *this;
 }
 
@@ -199,10 +199,10 @@ bool IPv4AddressImpl::isLinkLocal() const
 
 bool IPv4AddressImpl::isSiteLocal() const
 {
-	UInt32 addr = ntohl(_addr.s_addr);
-	return (addr & 0xFF000000) == 0x0A000000 ||     // 10.0.0.0/24
-		(addr & 0xFFFF0000) == 0xC0A80000 ||        // 192.68.0.0/16
-		(addr >= 0xAC100000 && addr <= 0xAC1FFFFF); // 172.16.0.0 to 172.31.255.255
+	UInt32 address = ntohl(_addr.s_addr);
+	return (address & 0xFF000000) == 0x0A000000 ||     // 10.0.0.0/24
+		(address & 0xFFFF0000) == 0xC0A80000 ||        // 192.68.0.0/16
+		(address >= 0xAC100000 && address <= 0xAC1FFFFF); // 172.16.0.0 to 172.31.255.255
 }
 
 
@@ -250,8 +250,8 @@ bool IPv4AddressImpl::isOrgLocalMC() const
 
 bool IPv4AddressImpl::isGlobalMC() const
 {
-	UInt32 addr = ntohl(_addr.s_addr);
-	return addr >= 0xE0000100 && addr <= 0xEE000000; // 224.0.1.0 to 238.255.255.255
+	UInt32 address = ntohl(_addr.s_addr);
+	return address >= 0xE0000100 && address <= 0xEE000000; // 224.0.1.0 to 238.255.255.255
 }
 
 
@@ -299,26 +299,26 @@ IPAddressImpl* IPv4AddressImpl::clone() const
 }
 
 
-IPv4AddressImpl IPv4AddressImpl::operator & (const IPv4AddressImpl& addr) const
+IPv4AddressImpl IPv4AddressImpl::operator & (const IPv4AddressImpl& rAddr) const
 {
 	IPv4AddressImpl result(&_addr);
-	result._addr.s_addr &= addr._addr.s_addr;
+	result._addr.s_addr &= rAddr._addr.s_addr;
 	return result;
 }
 
 
-IPv4AddressImpl IPv4AddressImpl::operator | (const IPv4AddressImpl& addr) const
+IPv4AddressImpl IPv4AddressImpl::operator | (const IPv4AddressImpl& rAddr) const
 {
 	IPv4AddressImpl result(&_addr);
-	result._addr.s_addr |= addr._addr.s_addr;
+	result._addr.s_addr |= rAddr._addr.s_addr;
 	return result;
 }
 
 
-IPv4AddressImpl IPv4AddressImpl::operator ^ (const IPv4AddressImpl& addr) const
+IPv4AddressImpl IPv4AddressImpl::operator ^ (const IPv4AddressImpl& rAddr) const
 {
 	IPv4AddressImpl result(&_addr);
-	result._addr.s_addr ^= addr._addr.s_addr;
+	result._addr.s_addr ^= rAddr._addr.s_addr;
 	return result;
 }
 
@@ -331,15 +331,15 @@ IPv4AddressImpl result(&_addr);
 }
 
 
-bool IPv4AddressImpl::operator == (const IPv4AddressImpl& addr) const
+bool IPv4AddressImpl::operator == (const IPv4AddressImpl& rAddr) const
 {
-	return 0 == std::memcmp(&addr._addr, &_addr, sizeof(_addr));
+	return 0 == std::memcmp(&rAddr._addr, &_addr, sizeof(_addr));
 }
 
 
-bool IPv4AddressImpl::operator != (const IPv4AddressImpl& addr) const
+bool IPv4AddressImpl::operator != (const IPv4AddressImpl& rAddr) const
 {
-	return !(*this == addr);
+	return !(*this == rAddr);
 }
 
 
@@ -357,31 +357,31 @@ IPv6AddressImpl::IPv6AddressImpl(): _scope(0)
 }
 
 
-IPv6AddressImpl::IPv6AddressImpl(const void* addr): _scope(0)
+IPv6AddressImpl::IPv6AddressImpl(const void* pAddr): _scope(0)
 {
-	std::memcpy(&_addr, addr, sizeof(_addr));
+	std::memcpy(&_addr, pAddr, sizeof(_addr));
 }
 
 
-IPv6AddressImpl::IPv6AddressImpl(const void* addr, Poco::UInt32 scope): _scope(scope)
+IPv6AddressImpl::IPv6AddressImpl(const void* pAddr, Poco::UInt32 scopeIdentifier): _scope(scopeIdentifier)
 {
-	std::memcpy(&_addr, addr, sizeof(_addr));
+	std::memcpy(&_addr, pAddr, sizeof(_addr));
 }
 
 
-IPv6AddressImpl::IPv6AddressImpl(const IPv6AddressImpl& addr): _scope(addr._scope)
+IPv6AddressImpl::IPv6AddressImpl(const IPv6AddressImpl& rAddr): _scope(rAddr._scope)
 {
-	std::memcpy((void*) &_addr, (void*) &addr._addr, sizeof(_addr));
+	std::memcpy((void*) &_addr, (void*) &rAddr._addr, sizeof(_addr));
 }
 
 
-IPv6AddressImpl& IPv6AddressImpl::operator = (const IPv6AddressImpl& addr)
+IPv6AddressImpl& IPv6AddressImpl::operator = (const IPv6AddressImpl& rAddr)
 {
-    if (this == &addr)
+    if (this == &rAddr)
         return *this;
 
-	_scope = addr._scope;
-	std::memcpy(&_addr, &addr._addr, sizeof(_addr));
+	_scope = rAddr._scope;
+	std::memcpy(&_addr, &rAddr._addr, sizeof(_addr));
 	return *this;
 }
 
@@ -516,16 +516,16 @@ unsigned IPv6AddressImpl::prefixLength() const
 #if defined(POCO_OS_FAMILY_UNIX)
 	for (int i = 3; i >= 0; --i)
 	{
-		unsigned addr = ntohl(_addr.s6_addr32[i]);
-		if ((bits = maskBits(addr, 32))) return (bitPos - (32 - bits));
+		unsigned address = ntohl(_addr.s6_addr32[i]);
+		if ((bits = maskBits(address, 32))) return (bitPos - (32 - bits));
 		bitPos -= 32;
 	}
 	return 0;
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	for (int i = 7; i >= 0; --i)
 	{
-		unsigned short addr = ByteOrder::fromNetwork(_addr.s6_addr16[i]);
-		if ((bits = maskBits(addr, 16))) return (bitPos - (16 - bits));
+		unsigned short address = ByteOrder::fromNetwork(_addr.s6_addr16[i]);
+		if ((bits = maskBits(address, 16))) return (bitPos - (16 - bits));
 		bitPos -= 16;
 	}
 	return 0;
@@ -696,77 +696,77 @@ IPAddressImpl* IPv6AddressImpl::clone() const
 }
 
 
-IPv6AddressImpl IPv6AddressImpl::operator & (const IPv6AddressImpl& addr) const
+IPv6AddressImpl IPv6AddressImpl::operator & (const IPv6AddressImpl& rAddr) const
 {
-    if (_scope != addr._scope)
+    if (_scope != rAddr._scope)
         throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match with the source one.");
 
 	IPv6AddressImpl result(*this);
 #ifdef POCO_OS_FAMILY_WINDOWS
-	result._addr.s6_addr16[0] &= addr._addr.s6_addr16[0];
-	result._addr.s6_addr16[1] &= addr._addr.s6_addr16[1];
-	result._addr.s6_addr16[2] &= addr._addr.s6_addr16[2];
-	result._addr.s6_addr16[3] &= addr._addr.s6_addr16[3];
-	result._addr.s6_addr16[4] &= addr._addr.s6_addr16[4];
-	result._addr.s6_addr16[5] &= addr._addr.s6_addr16[5];
-	result._addr.s6_addr16[6] &= addr._addr.s6_addr16[6];
-	result._addr.s6_addr16[7] &= addr._addr.s6_addr16[7];
+	result._addr.s6_addr16[0] &= rAddr._addr.s6_addr16[0];
+	result._addr.s6_addr16[1] &= rAddr._addr.s6_addr16[1];
+	result._addr.s6_addr16[2] &= rAddr._addr.s6_addr16[2];
+	result._addr.s6_addr16[3] &= rAddr._addr.s6_addr16[3];
+	result._addr.s6_addr16[4] &= rAddr._addr.s6_addr16[4];
+	result._addr.s6_addr16[5] &= rAddr._addr.s6_addr16[5];
+	result._addr.s6_addr16[6] &= rAddr._addr.s6_addr16[6];
+	result._addr.s6_addr16[7] &= rAddr._addr.s6_addr16[7];
 #else
-	result._addr.s6_addr32[0] &= addr._addr.s6_addr32[0];
-	result._addr.s6_addr32[1] &= addr._addr.s6_addr32[1];
-	result._addr.s6_addr32[2] &= addr._addr.s6_addr32[2];
-	result._addr.s6_addr32[3] &= addr._addr.s6_addr32[3];
+	result._addr.s6_addr32[0] &= rAddr._addr.s6_addr32[0];
+	result._addr.s6_addr32[1] &= rAddr._addr.s6_addr32[1];
+	result._addr.s6_addr32[2] &= rAddr._addr.s6_addr32[2];
+	result._addr.s6_addr32[3] &= rAddr._addr.s6_addr32[3];
 #endif
 	return result;
 }
 
 
-IPv6AddressImpl IPv6AddressImpl::operator | (const IPv6AddressImpl& addr) const
+IPv6AddressImpl IPv6AddressImpl::operator | (const IPv6AddressImpl& rAddr) const
 {
-    if (_scope != addr._scope) 
+    if (_scope != rAddr._scope) 
         throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match with the source one.");
     
 	IPv6AddressImpl result(*this);
 #ifdef POCO_OS_FAMILY_WINDOWS
-	result._addr.s6_addr16[0] |= addr._addr.s6_addr16[0];
-	result._addr.s6_addr16[1] |= addr._addr.s6_addr16[1];
-	result._addr.s6_addr16[2] |= addr._addr.s6_addr16[2];
-	result._addr.s6_addr16[3] |= addr._addr.s6_addr16[3];
-	result._addr.s6_addr16[4] |= addr._addr.s6_addr16[4];
-	result._addr.s6_addr16[5] |= addr._addr.s6_addr16[5];
-	result._addr.s6_addr16[6] |= addr._addr.s6_addr16[6];
-	result._addr.s6_addr16[7] |= addr._addr.s6_addr16[7];
+	result._addr.s6_addr16[0] |= rAddr._addr.s6_addr16[0];
+	result._addr.s6_addr16[1] |= rAddr._addr.s6_addr16[1];
+	result._addr.s6_addr16[2] |= rAddr._addr.s6_addr16[2];
+	result._addr.s6_addr16[3] |= rAddr._addr.s6_addr16[3];
+	result._addr.s6_addr16[4] |= rAddr._addr.s6_addr16[4];
+	result._addr.s6_addr16[5] |= rAddr._addr.s6_addr16[5];
+	result._addr.s6_addr16[6] |= rAddr._addr.s6_addr16[6];
+	result._addr.s6_addr16[7] |= rAddr._addr.s6_addr16[7];
 #else
-	result._addr.s6_addr32[0] |= addr._addr.s6_addr32[0];
-	result._addr.s6_addr32[1] |= addr._addr.s6_addr32[1];
-	result._addr.s6_addr32[2] |= addr._addr.s6_addr32[2];
-	result._addr.s6_addr32[3] |= addr._addr.s6_addr32[3];
+	result._addr.s6_addr32[0] |= rAddr._addr.s6_addr32[0];
+	result._addr.s6_addr32[1] |= rAddr._addr.s6_addr32[1];
+	result._addr.s6_addr32[2] |= rAddr._addr.s6_addr32[2];
+	result._addr.s6_addr32[3] |= rAddr._addr.s6_addr32[3];
 #endif
 	return result;
 }
 
 
-IPv6AddressImpl IPv6AddressImpl::operator ^ (const IPv6AddressImpl& addr) const
+IPv6AddressImpl IPv6AddressImpl::operator ^ (const IPv6AddressImpl& rAddr) const
 {
-    if (_scope != addr._scope)
+    if (_scope != rAddr._scope)
         throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match  with the source one.");
     
 	IPv6AddressImpl result(*this);
 
 #ifdef POCO_OS_FAMILY_WINDOWS
-	result._addr.s6_addr16[0] ^= addr._addr.s6_addr16[0];
-	result._addr.s6_addr16[1] ^= addr._addr.s6_addr16[1];
-	result._addr.s6_addr16[2] ^= addr._addr.s6_addr16[2];
-	result._addr.s6_addr16[3] ^= addr._addr.s6_addr16[3];
-	result._addr.s6_addr16[4] ^= addr._addr.s6_addr16[4];
-	result._addr.s6_addr16[5] ^= addr._addr.s6_addr16[5];
-	result._addr.s6_addr16[6] ^= addr._addr.s6_addr16[6];
-	result._addr.s6_addr16[7] ^= addr._addr.s6_addr16[7];
+	result._addr.s6_addr16[0] ^= rAddr._addr.s6_addr16[0];
+	result._addr.s6_addr16[1] ^= rAddr._addr.s6_addr16[1];
+	result._addr.s6_addr16[2] ^= rAddr._addr.s6_addr16[2];
+	result._addr.s6_addr16[3] ^= rAddr._addr.s6_addr16[3];
+	result._addr.s6_addr16[4] ^= rAddr._addr.s6_addr16[4];
+	result._addr.s6_addr16[5] ^= rAddr._addr.s6_addr16[5];
+	result._addr.s6_addr16[6] ^= rAddr._addr.s6_addr16[6];
+	result._addr.s6_addr16[7] ^= rAddr._addr.s6_addr16[7];
 #else
-	result._addr.s6_addr32[0] ^= addr._addr.s6_addr32[0];
-	result._addr.s6_addr32[1] ^= addr._addr.s6_addr32[1];
-	result._addr.s6_addr32[2] ^= addr._addr.s6_addr32[2];
-	result._addr.s6_addr32[3] ^= addr._addr.s6_addr32[3];
+	result._addr.s6_addr32[0] ^= rAddr._addr.s6_addr32[0];
+	result._addr.s6_addr32[1] ^= rAddr._addr.s6_addr32[1];
+	result._addr.s6_addr32[2] ^= rAddr._addr.s6_addr32[2];
+	result._addr.s6_addr32[3] ^= rAddr._addr.s6_addr32[3];
 #endif
 	return result;
 }
@@ -794,15 +794,15 @@ IPv6AddressImpl IPv6AddressImpl::operator ~ () const
 }
 
 
-bool IPv6AddressImpl::operator == (const IPv6AddressImpl& addr) const
+bool IPv6AddressImpl::operator == (const IPv6AddressImpl& rAddr) const
 {
-	return _scope == addr._scope && 0 == std::memcmp(&addr._addr, &_addr, sizeof(_addr));
+	return _scope == rAddr._scope && 0 == std::memcmp(&rAddr._addr, &_addr, sizeof(_addr));
 }
 
 
-bool IPv6AddressImpl::operator != (const IPv6AddressImpl& addr) const
+bool IPv6AddressImpl::operator != (const IPv6AddressImpl& rAddr) const
 {
-	return !(*this == addr);
+	return !(*this == rAddr);
 }
 
 

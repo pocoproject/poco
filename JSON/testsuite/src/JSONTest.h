@@ -74,10 +74,11 @@ public:
 	void testInvalidJanssonFiles();
 	void testTemplate();
 	void testItunes();
-	void testUnicode(); 
+	void testUnicode();
 	void testInvalidUnicodeJanssonFiles();
 	void testSmallBuffer();
-
+	void testEscape0();
+	void testEscapeUnicode();
 	void setUp();
 	void tearDown();
 

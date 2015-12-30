@@ -1,7 +1,7 @@
 <AppConfig>
 	<schannel>
 		<server>
-			<certificatePath>any.pfx</certificatePath>
+			<certificatePath>${application.configDir}any.pfx</certificatePath>
 			<verificationMode>none</verificationMode>
 			<useMachineStore>false</useMachineStore>
 			<privateKeyPassphraseHandler>
@@ -34,8 +34,8 @@
 	</schannel>
 	<testsuite>
 		<proxy>
-			<host>proxy.aon.at</host>
-			<port>8080</port>
-		</proxy>
+      <host>freeproxyserver.net</host>
+      <port>80</port>
+    </proxy>
 	</testsuite>
 </AppConfig>

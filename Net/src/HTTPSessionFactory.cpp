@@ -35,9 +35,9 @@ HTTPSessionFactory::HTTPSessionFactory():
 }
 
 
-HTTPSessionFactory::HTTPSessionFactory(const std::string& proxyHost, Poco::UInt16 proxyPort):
-	_proxyHost(proxyHost),
-	_proxyPort(proxyPort)
+HTTPSessionFactory::HTTPSessionFactory(const std::string& rProxyHost, Poco::UInt16 port):
+	_proxyHost(rProxyHost),
+	_proxyPort(port)
 {
 }
 

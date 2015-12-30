@@ -1,12 +1,10 @@
 #
-# $Id: //poco/1.4/build/config/Darwin#6 $
+# $Id
 #
 # Darwin
 #
-# Build settings for Mac OS X 10.6 or newer, using Clang.
-#
-# NOTE: This build configuration will build 64-bit binaries.
-# Use the Darwin32 build configuration to build 32-bit binaries.
+# Build settings for Mac OS X 10.8 or later, clang, 64-bits, with C++11 support.
+# Build settings are compatible with XCode 7 C++ projects.
 # 
 
 include $(POCO_BASE)/build/config/Darwin-clang

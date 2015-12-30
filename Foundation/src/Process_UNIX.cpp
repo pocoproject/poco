@@ -207,9 +207,9 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
 		if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
 		// close all open file descriptors other than stdin, stdout, stderr
-		for (int i = 3; i < sysconf(_SC_OPEN_MAX); ++i)
+		for (int fd = 3; fd < sysconf(_SC_OPEN_MAX); ++fd)
 		{
-			close(i);
+			close(fd);
 		}
 
 		execvp(argv[0], &argv[0]);

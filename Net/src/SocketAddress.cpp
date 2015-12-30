@@ -101,9 +101,9 @@ SocketAddress::SocketAddress(const std::string& hostAddress, const std::string& 
 }
 
 
-SocketAddress::SocketAddress(Family family, const std::string& addr)
+SocketAddress::SocketAddress(Family addressFamily, const std::string& rAddr)
 {
-	init(family, addr);
+	init(addressFamily, rAddr);
 }
 
 
@@ -128,16 +128,16 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 }
 
 
-SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t length)
+SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t addressLength)
 {
-	if (length == sizeof(struct sockaddr_in) && sockAddr->sa_family == AF_INET)
+	if (addressLength == sizeof(struct sockaddr_in) && sockAddr->sa_family == AF_INET)
 		newIPv4(reinterpret_cast<const struct sockaddr_in*>(sockAddr));
 #if defined(POCO_HAVE_IPv6)
-	else if (length == sizeof(struct sockaddr_in6) && sockAddr->sa_family == AF_INET6)
+	else if (addressLength == sizeof(struct sockaddr_in6) && sockAddr->sa_family == AF_INET6)
 		newIPv6(reinterpret_cast<const struct sockaddr_in6*>(sockAddr));
 #endif
 #if defined(POCO_OS_FAMILY_UNIX)
-	else if (length > 0 && length <= sizeof(struct sockaddr_un) && sockAddr->sa_family == AF_UNIX)
+	else if (addressLength > 0 && addressLength <= sizeof(struct sockaddr_un) && sockAddr->sa_family == AF_UNIX)
 		newLocal(reinterpret_cast<const sockaddr_un*>(sockAddr));
 #endif
 	else throw Poco::InvalidArgumentException("Invalid address length or family passed to SocketAddress()");
@@ -281,8 +281,8 @@ void SocketAddress::init(const std::string& hostAndPort)
 {
 	poco_assert (!hostAndPort.empty());
 
-	std::string host;
-	std::string port;
+	std::string socketHost;
+	std::string socketPort;
 	std::string::const_iterator it  = hostAndPort.begin();
 	std::string::const_iterator end = hostAndPort.end();
 	
@@ -296,30 +296,30 @@ void SocketAddress::init(const std::string& hostAndPort)
 	if (*it == '[')
 	{
 		++it;
-		while (it != end && *it != ']') host += *it++;
+		while (it != end && *it != ']') socketHost += *it++;
 		if (it == end) throw InvalidArgumentException("Malformed IPv6 address");
 		++it;
 	}
 	else
 	{
-		while (it != end && *it != ':') host += *it++;
+		while (it != end && *it != ':') socketHost += *it++;
 	}
 	if (it != end && *it == ':')
 	{
 		++it;
-		while (it != end) port += *it++;
+		while (it != end) socketPort += *it++;
 	}
 	else throw InvalidArgumentException("Missing port number");
-	init(host, resolveService(port));
+	init(socketHost, resolveService(socketPort));
 }
 
 
 Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 {
-	unsigned port;
-	if (NumberParser::tryParseUnsigned(service, port) && port <= 0xFFFF)
+	unsigned socketPort;
+	if (NumberParser::tryParseUnsigned(service, socketPort) && socketPort <= 0xFFFF)
 	{
-		return (UInt16) port;
+		return (UInt16) socketPort;
 	}
 	else
 	{
