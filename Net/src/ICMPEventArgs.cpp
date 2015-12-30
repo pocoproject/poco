@@ -32,13 +32,13 @@ namespace Poco {
 namespace Net {
 
 
-ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int repetitions, int dataSize, int ttl):
+ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int operationRepetitions, int dataSizeInBytes, int operationTtl):
 	_address(address), 
 	_sent(0),
-	_dataSize(dataSize), 
-	_ttl(ttl), 
-	_rtt(repetitions, 0), 
-	_errors(repetitions)
+	_dataSize(dataSizeInBytes), 
+	_ttl(operationTtl), 
+	_rtt(operationRepetitions, 0), 
+	_errors(operationRepetitions)
 {
 }
 
@@ -76,11 +76,11 @@ std::string ICMPEventArgs::hostAddress() const
 }
 
 
-void ICMPEventArgs::setRepetitions(int repetitions)
+void ICMPEventArgs::setRepetitions(int operationRepetitions)
 {
 	_rtt.clear();
-	_rtt.resize(repetitions, 0);
-	_errors.assign(repetitions, "");
+	_rtt.resize(operationRepetitions, 0);
+	_errors.assign(operationRepetitions, "");
 }
 
 
@@ -101,13 +101,13 @@ ICMPEventArgs ICMPEventArgs::operator ++ (int)
 
 int ICMPEventArgs::received() const
 {
-	int received = 0;
+	int ret = 0;
 
 	for (int i = 0; i < _rtt.size(); ++i) 
 	{
-		if (_rtt[i]) ++received;
+		if (_rtt[i]) ++ret;
 	}
-	return received;
+	return ret;
 }
 
 

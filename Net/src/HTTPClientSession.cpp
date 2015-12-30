@@ -52,8 +52,8 @@ HTTPClientSession::HTTPClientSession():
 }
 
 
-HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
-	HTTPSession(socket),
+HTTPClientSession::HTTPClientSession(const StreamSocket& rSocket):
+	HTTPSession(rSocket),
 	_port(HTTPSession::HTTP_PORT),
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
