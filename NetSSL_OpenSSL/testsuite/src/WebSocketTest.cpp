@@ -25,6 +25,7 @@
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Thread.h"
+#include <iostream>
 
 
 using Poco::Net::HTTPSClientSession;
@@ -63,7 +64,7 @@ namespace
 					n = ws.receiveFrame(pBuffer.get(), _bufSize, flags);
 					ws.sendFrame(pBuffer.get(), n, flags);
 				}
-				while (n > 0 || (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
+				while (n > 0 && (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
 			}
 			catch (WebSocketException& exc)
 			{
