@@ -27,7 +27,6 @@
 #include "Poco/Thread.h"
 #include <iostream>
 
-
 using Poco::Net::HTTPSClientSession;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
@@ -62,6 +61,8 @@ namespace
 				do
 				{
 					n = ws.receiveFrame(pBuffer.get(), _bufSize, flags);
+					if (n == 0)
+						break;
 					ws.sendFrame(pBuffer.get(), n, flags);
 				}
 				while (n > 0 && (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
@@ -188,7 +189,7 @@ void WebSocketTest::testWebSocketLarge()
 	Poco::Net::SecureServerSocket ss(0);
 	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory(msgSize), ss, new Poco::Net::HTTPServerParams);
 	server.start();
-	
+
 	Poco::Thread::sleep(200);
 	
 	HTTPSClientSession cs("localhost", ss.address().port());
@@ -212,6 +213,8 @@ void WebSocketTest::testWebSocketLarge()
 
 	assert (n == payload.size());
 	assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+
+	server.stop();
 }
 
 
