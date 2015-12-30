@@ -70,7 +70,7 @@ poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL MongoDB Redis Zip PageCompiler PageCompiler/File2Page CppParser PDF
+COMPONENTS = CppUnit Foundation XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL MongoDB Redis Zip PageCompiler PageCompiler/File2Page CppParser PDF
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
@@ -91,11 +91,13 @@ install: libexecs
 		fi ; \
 	done
 ifeq ($(OSNAME), Cygwin)
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*"    -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*"    -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
 endif
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libCppUnit*" -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libCppUnit*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*"    -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*"    -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
 libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec MongoDB-libexec Redis-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec
 tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests MongoDB-tests Redis-tests Zip-tests CppParser-tests PDF-tests
