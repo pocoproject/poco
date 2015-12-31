@@ -12,6 +12,10 @@ CLANGMINOR   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_minor__ | 
 CLANGPATCH   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_patchlevel__ | sed -e 's/^.* //g')
 CLANGVERSION := $(CLANGMAJOR)$(CLANGMINOR)$(CLANGPATCH)
 
+#
+# Clang 3.4 doesn't accept -std=c++14, only -std=c++1y.
+#
+
 # C++14 needs Clang 3.4
 ifeq ($(shell test $(CLANGVERSION) -ge 340 && echo 1), 1)
 	CXXFLAGS += -std=c++1y
