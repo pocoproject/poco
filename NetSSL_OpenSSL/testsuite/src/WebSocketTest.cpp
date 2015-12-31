@@ -65,7 +65,7 @@ namespace
 						break;
 					ws.sendFrame(pBuffer.get(), n, flags);
 				}
-				while (n > 0 && (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
+				while ((flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
 			}
 			catch (WebSocketException& exc)
 			{
