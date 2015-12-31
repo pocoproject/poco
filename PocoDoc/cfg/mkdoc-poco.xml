@@ -13,6 +13,8 @@
 				expat*.h,
 				zconf.h,
 				zlib.h,
+				<!-- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/gthr-default.h -->				
+				gthr-default.h,
 				XMLStreamParser.h
 			</exclude>
 		</files>
