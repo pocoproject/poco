@@ -321,6 +321,8 @@
     <ClInclude Include="src\HTTPSClientSessionTest.h"/>
     <ClInclude Include="src\HTTPSClientTestSuite.h"/>
     <ClInclude Include="src\HTTPSStreamFactoryTest.h"/>
+    <ClInclude Include="src\WebSocketTest.h" />
+    <ClInclude Include="src\WebSocketTestSuite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HTTPSTestServer.cpp"/>
@@ -333,6 +335,8 @@
     <ClCompile Include="src\HTTPSClientSessionTest.cpp"/>
     <ClCompile Include="src\HTTPSClientTestSuite.cpp"/>
     <ClCompile Include="src\HTTPSStreamFactoryTest.cpp"/>
+    <ClCompile Include="src\WebSocketTest.cpp" />
+    <ClCompile Include="src\WebSocketTestSuite.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>
