@@ -10,9 +10,9 @@
 CLANGVERSION   := $(shell $(CXX) -E -dM - < /dev/null | grep __apple_build_version__ | sed -e 's/^.* //g')
 
 # C++14 needs AppleClang 500.x
-ifeq ($(shell test $(CLANGVERSION) -gt 5000274 && echo 1), 1)
+ifeq ($(shell test $(CLANGVERSION) -ge 5000275 && echo 1), 1)
 	CXXFLAGS += -std=c++1y
 # C++11 needs AppleClang 503.x
-else ifeq ($(shell test $(CLANGVERSION) -gt 5030037 && echo 1), 1)
+else ifeq ($(shell test $(CLANGVERSION) -ge 5030038 && echo 1), 1)
 	CXXFLAGS += -std=c++0x
 endif
