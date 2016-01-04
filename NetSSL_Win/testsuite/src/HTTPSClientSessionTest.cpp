@@ -37,6 +37,7 @@
 #include <istream>
 #include <ostream>
 #include <sstream>
+#include <iostream>
 
 
 using namespace Poco::Net;
@@ -313,12 +314,17 @@ void HTTPSClientSessionTest::testInterop()
 
 void HTTPSClientSessionTest::testProxy()
 {
+#ifdef FIXME
+	testProxy should use a public proxy server
+	http://www.publicproxyservers.com/proxy/list1.html
+	Really working public proxy servers - page 1 of 6.
+#endif
 	HTTPSTestServer srv;
 	HTTPSClientSession s("secure.appinf.com");
 	s.setProxy(
-		Application::instance().config().getString("testsuite.proxy.host"), 
+		Application::instance().config().getString("testsuite.proxy.host"),
 		Application::instance().config().getInt("testsuite.proxy.port")
-	);
+		);
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/public/poco/NetSSL.txt");
 	s.sendRequest(request);
 	Poco::Net::X509Certificate cert = s.serverCertificate();
@@ -327,8 +333,8 @@ void HTTPSClientSessionTest::testProxy()
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
-	assert (str == "This is a test file for NetSSL.\n");
-	assert (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
+	assert(str == "This is a test file for NetSSL.\n");
+	assert(cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
 }
 
 

@@ -35,7 +35,7 @@ public:
 
 	static CppUnit::Test* suite();
 
-	static Poco::Path findDataFile(const std::string& afile);
+	static Poco::Path findDataFile(const std::string& directory, const std::string& file);
 
 private:
 };

@@ -15,6 +15,9 @@
 
 
 #include "Poco/DirectoryWatcher.h"
+#ifdef POCO_OS_FAMILY_WINDOWS
+#include "Poco/UnWindows.h"
+#endif
 
 
 #ifndef POCO_NO_INOTIFY
@@ -53,8 +56,8 @@ namespace Poco {
 class DirectoryWatcherStrategy
 {
 public:
-	DirectoryWatcherStrategy(DirectoryWatcher& owner):
-		_owner(owner)
+	DirectoryWatcherStrategy(DirectoryWatcher& ownerWatcher):
+		_owner(ownerWatcher)
 	{
 	}
 
@@ -263,8 +266,8 @@ private:
 class LinuxDirectoryWatcherStrategy: public DirectoryWatcherStrategy
 {
 public:
-	LinuxDirectoryWatcherStrategy(DirectoryWatcher& owner):
-		DirectoryWatcherStrategy(owner),
+	LinuxDirectoryWatcherStrategy(DirectoryWatcher& ownerWatcher):
+		DirectoryWatcherStrategy(ownerWatcher),
 		_fd(-1),
 		_stopped(false)
 	{
@@ -474,8 +477,8 @@ private:
 class PollingDirectoryWatcherStrategy: public DirectoryWatcherStrategy
 {
 public:
-	PollingDirectoryWatcherStrategy(DirectoryWatcher& owner):
-		DirectoryWatcherStrategy(owner)
+	PollingDirectoryWatcherStrategy(DirectoryWatcher& ownerWatcher):
+		DirectoryWatcherStrategy(ownerWatcher)
 	{
 	}
 	
@@ -519,22 +522,22 @@ private:
 
 
 
-DirectoryWatcher::DirectoryWatcher(const std::string& path, int eventMask, int scanInterval,
+DirectoryWatcher::DirectoryWatcher(const std::string& path, int otherEventMask, int otherScanInterval,
 	bool forceScan) :
 	_directory(path),
-	_eventMask(eventMask),
-	_scanInterval(scanInterval),
+	_eventMask(otherEventMask),
+	_scanInterval(otherScanInterval),
 	_forceScan(forceScan)
 {
 	init();
 }
 
 	
-DirectoryWatcher::DirectoryWatcher(const Poco::File& directory, int eventMask, int scanInterval,
+DirectoryWatcher::DirectoryWatcher(const Poco::File& otherDirectory, int otherEventMask, int otherScanInterval,
 	bool forceScan) :
-	_directory(directory),
-	_eventMask(eventMask),
-	_scanInterval(scanInterval),
+	_directory(otherDirectory),
+	_eventMask(otherEventMask),
+	_scanInterval(otherScanInterval),
 	_forceScan(forceScan)
 {
 	init();

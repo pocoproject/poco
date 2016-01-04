@@ -31,8 +31,8 @@ namespace Poco {
 namespace Net {
 
 
-HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
-	TCPServerConnection(socket),
+HTTPServerConnection::HTTPServerConnection(const StreamSocket& rSocket, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
+	TCPServerConnection(rSocket),
 	_pParams(pParams),
 	_pFactory(pFactory),
 	_stopped(false)

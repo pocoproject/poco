@@ -73,7 +73,7 @@ private:
 namespace Redis {
 
 
-class Redis_API PooledConnection
+class PooledConnection
 	/// Helper class for borrowing and returning a connection automatically from a pool.
 {
 public:

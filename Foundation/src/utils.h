@@ -158,8 +158,8 @@ template <typename T>
 class Vector {
  public:
   Vector() : start_(NULL), length_(0) {}
-  Vector(T* data, int length) : start_(data), length_(length) {
-    ASSERT(length == 0 || (length > 0 && data != NULL));
+  Vector(T* data, int size) : start_(data), length_(size) {
+    ASSERT(size == 0 || (size > 0 && data != NULL));
   }
 
   // Returns a vector using the same backing storage as this one,
@@ -201,8 +201,8 @@ class Vector {
 // buffer bounds on all operations in debug mode.
 class StringBuilder {
  public:
-  StringBuilder(char* buffer, int size)
-      : buffer_(buffer, size), position_(0) { }
+  StringBuilder(char* buffer, int length)
+      : buffer_(buffer, length), position_(0) { }
 
   ~StringBuilder() { if (!is_finalized()) Finalize(); }
 

@@ -30,8 +30,8 @@ PartSource::PartSource():
 }
 
 	
-PartSource::PartSource(const std::string& mediaType):
-	_mediaType(mediaType)
+PartSource::PartSource(const std::string& rMediaType):
+	_mediaType(rMediaType)
 {
 }
 

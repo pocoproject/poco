@@ -834,9 +834,9 @@ void XMLWriter::writeIndent() const
 }
 
 
-void XMLWriter::writeIndent(int depth) const
+void XMLWriter::writeIndent(int indent) const
 {
-	for (int i = 0; i < depth; ++i)
+	for (int i = 0; i < indent; ++i)
 		writeMarkup(_indent);
 }
 

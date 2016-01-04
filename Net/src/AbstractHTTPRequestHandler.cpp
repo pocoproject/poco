@@ -43,10 +43,10 @@ AbstractHTTPRequestHandler::~AbstractHTTPRequestHandler()
 }
 
 
-void AbstractHTTPRequestHandler::handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+void AbstractHTTPRequestHandler::handleRequest(HTTPServerRequest& rRequest, HTTPServerResponse& rResponse)
 {
-	_pRequest  = &request;
-	_pResponse = &response;
+	_pRequest  = &rRequest;
+	_pResponse = &rResponse;
 	if (authenticate())
 	{
 		try
@@ -55,14 +55,14 @@ void AbstractHTTPRequestHandler::handleRequest(HTTPServerRequest& request, HTTPS
 		}
 		catch (Poco::Exception& exc)
 		{
-			if (!response.sent())
+			if (!rResponse.sent())
 			{
 				sendErrorResponse(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.displayText());
 			}
 		}
 		catch (std::exception& exc)
 		{
-			if (!response.sent())
+			if (!rResponse.sent())
 			{
 				sendErrorResponse(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.what());
 			}

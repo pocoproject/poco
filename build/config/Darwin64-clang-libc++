@@ -1,14 +1,15 @@
 #
-# $Id: //poco/1.4/build/config/Darwin64-clang#1 $
+# $Id$
 #
-# Darwin64
+# Darwin64-clang-libc++
 #
-# Build settings for Mac OS X 10.5/10.6 (GCC 4.0.1), 64-bits
-# The build settings defined in this file are compatible
-# with XCode 3.1 C++ projects.
-# 
+# Build settings for Mac OS X 10.8 or later, clang, 64-bits, with C++11 support.
+# Build settings are compatible with XCode 7 C++ projects.
+#
+# Note: provided for backwards compatibility.
+#
 
 ARCHFLAGS = -arch x86_64
 POCO_TARGET_OSARCH = x86_64
 
-include $(POCO_BASE)/build/config/Darwin-clang-libc++
+include $(POCO_BASE)/build/config/Darwin-clang

@@ -5,6 +5,7 @@ Data/SQLite
 Data/ODBC
 Data/MySQL
 MongoDB
+Redis
 Zip
 PageCompiler
 PageCompiler/File2Page

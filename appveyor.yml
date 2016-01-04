@@ -1,11 +1,441 @@
-version: '{build}'
+version: poco-1.7.0 {branch}-{build}
+
+cache:
+  - c:\mysql-5.7.9-win32
+  - C:\ProgramData\chocolatey
+  - C:\OpenSSL-Win32
+  - C:\OpenSSL-Win64
+  
+hosts:
+  localhost: 127.0.0.1
+  db.server.com: 127.0.0.2
+  
+services:
+# mysql : server: localhost, port: 3306
+# mysql : user  : root, password: Password12!
+#  - mysql
+
+# mongodb config  : C:\mongodb\mongod.cfg
+# mongodb database: C:\mongodb\data\db
+  - mongodb
+
+platform:
+  - Win32
+  - x64
+  
+# -------------------------------------------------------------------------------------------
+# building debug configuration doubles the round time and isn't so useful.
+# tests are run only in release & shared.
+# -------------------------------------------------------------------------------------------
+configuration:
+  - release
+#  - debug
+# -------------------------------------------------------------------------------------------
+
+environment:
+  bundling: bundled
+
+  matrix:
+
+    - builder: cmake
+      vsver: 120
+
+    - builder: msbuild
+      vsver: 120
+      linkmode: shared
+
+    - builder: msbuild
+      vsver: 120
+      linkmode: static_md
+
+    - builder: msbuild
+      vsver: 120
+      linkmode: static_mt
+
+# -------------------------------------------------------------------------------------------
+# VS2013 runs a x64 or Win32 build & tests in around 32 mn
+# Environment: builder=msbuild, vsver=120, linkmode=shared; Platform: Win32    31 min 33 sec
+# Environment: builder=msbuild, vsver=120, linkmode=shared; Platform: x64      33 min 32 sec
+#
+# In VS2015 running either a x64 or Win32 build & tests takes twice time and thus makes the build failed since
+# it overpasses 1 hour and free Appveyor account job are limited to 1 hour. Thus VS2015 builds 
+# are removed until one finds out the reason why build time is doubled.
+#
+# Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: Win32     1 hr
+# Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: x64       1 hr 
+# -------------------------------------------------------------------------------------------
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: shared
+
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: static_md
+
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: static_mt
+
+
+matrix:
+  fast_finish: true
 
 install:
-  - cinst cmake
+  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
+  - systeminfo
+  - c:\cygwin\bin\uname -a
+  - c:\cygwin\bin\cat /proc/cpuinfo
+  - c:\cygwin\bin\cat /proc/meminfo
+  - ps: |
+        if ($env:builder -eq "cmake")
+        {
+          if (Test-Path "$env:ChocolateyInstall\bin\jom.exe") {
+              echo "using jom from cache"
+          } else {
+              choco install jom
+          }
+          if (Test-Path "$env:ChocolateyInstall\bin\cmake.exe") {
+            echo "using cmake from cache"
+          } else {
+            choco install cmake
+          }
+        }
+  - set
+
+# -------------------------------------------------------------------------------------------
+#  chocolatey brokes jom, here's workaround
+#  see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
+# -------------------------------------------------------------------------------------------
+  - ps: |
+      if ($env:builder -eq "cmake")
+      {
+        $env:PATH = $env:ChocolateyInstall + "\bin" + ";" + $env:PATH
+        $env:PATH = $env:ChocolateyInstall + "\lib\jom\content" + ";" + $env:PATH
+      }
+# -------------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------------
+# OpenSSL-Win32 & OpenSSL-Win64
+# Download & use OpenSSL from  Shining Light Productions for CMake
+# until CMake use implicitly the embedded openssl from the Poco repo. See issue #1093
+# -------------------------------------------------------------------------------------------
+  - ps: |
+       if ($env:builder -eq "cmake")
+       {
+         if ($env:platform -eq "Win32")
+         {
+           if (Test-Path "C:\OpenSSL-Win32") {
+             echo "using C:\OpenSSL-Win32 from cache"
+           } else {
+             echo "downloading OpenSSL-Win32"
+             Start-FileDownload 'http://slproweb.com/download/Win32OpenSSL-1_0_2e.exe'
+             echo "installing C:\OpenSSL-Win32"
+             Start-Process "Win32OpenSSL-1_0_2e.exe" -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
+           }
+         }
+         if ($env:platform -eq "x64")
+         {
+           if (Test-Path "C:\OpenSSL-Win64") {
+             echo "using C:\OpenSSL-Win64 from cache"
+           } else {
+             echo "downloading OpenSSL-Win64"
+             Start-FileDownload 'http://slproweb.com/download/Win64OpenSSL-1_0_2e.exe'
+             echo "installing C:\OpenSSL-Win64"
+             Start-Process "Win64OpenSSL-1_0_2e.exe" -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
+           }
+         }
+       }
+# -------------------------------------------------------------------------------------------
+   
+#  MySQL 32 bit is not available by default on AppVeyor
+# -------------------------------------------------------------------------------------------
+  - ps: |
+        if ($env:platform -eq "Win32")
+        {
+            if (Test-Path "c:\mysql-5.7.9-win32") {
+                echo "using c:\mysql-5.7.9-win32 from cache"
+            }
+            else
+            {
+                echo "downloading mysql-5.7.9-win32"
+                Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile mysql-5.7.9-win32.zip
+                echo "installing c:\mysql-5.7.9-win32"
+                7z x -y mysql-5.7.9-win32.zip -oc:\
+            }
+        }
+ # -------------------------------------------------------------------------------------------
+   
+before_build:
+  - set POCO_BASE=%CD%
+  - ps: |
+        if ($env:vsver -eq "110")
+        {
+          $vspath= convert-path $env:VS110COMNTOOLS\..\..\VC\bin; $yyyy='2010'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+        }
+        if ($env:vsver -eq "120")
+        {
+          $vspath= convert-path $env:VS120COMNTOOLS\..\..\VC\bin;$yyyy='2013'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+          
+        }
+        if ($env:vsver -eq "140")
+        {
+          $vspath= convert-path $env:VS140COMNTOOLS\..\..\VC\bin; $yyyy='2015'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+        }
+        pushd $vspath;
+        $tool= if($vctool -eq '') {'32'} else {$vctool}
+        cmd /c "vcvars$tool.bat&set" |
+        foreach {
+          if ($_ -match "=") {
+            $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
+          }
+        }
+        popd
+        write-host "`nVisual Studio $yyyy CLI variables set." -ForegroundColor Yellow
+  
+# MySQL
+  - ps: |
+      if ($env:platform -eq "Win32")
+      {
+          $env:INCLUDE = "C:\mysql-5.7.9-win32\include;" + $env:INCLUDE
+          $env:LIB     = "C:\mysql-5.7.9-win32\lib;" + $env:LIB
+      }
+      if ($env:platform -eq "x64")
+      {
+          $env:INCLUDE = "C:\Program Files\MySql\MySQL Server 5.6\include;" + $env:INCLUDE
+          $env:LIB     = "C:\Program Files\MySql\MySQL Server 5.6\lib;" + $env:LIB
+      }
+
+after_build:
+  - ps: |
+      $line='-------------------------------------------------------------------------------------';
+      $find='c:\cygwin\bin\find.exe';
+      $arg1="$env:POCO_BASE -type f -name '*.cpp' -exec c:\cygwin\bin\grep -n -H ";
+      $arg2=" {} ;"
+      
+      $word='FIXME'
+      Write-Host -ForegroundColor Yellow $word;
+      Write-Host -ForegroundColor Yellow $line;
+      Start-Process -nnw -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
+      gc cout; gc cerr;
+      Write-Host -ForegroundColor Yellow $line;
+      Write-Host;Write-Host;
+
+      $word='TODO'
+      Write-Host -ForegroundColor Yellow $word;
+      Write-Host -ForegroundColor Yellow $line;
+      Start-Process -nnw -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
+      gc cout; gc cerr;
+      Write-Host -ForegroundColor Yellow $line;
+      Write-Host;Write-Host;
+
+      $word='HACK'
+      Write-Host -ForegroundColor Yellow $word;
+      Write-Host -ForegroundColor Yellow $line;
+      Start-Process -nnw -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr; 
+      gc cout; gc cerr;
+      Write-Host -ForegroundColor Yellow $line;
+      Write-Host;Write-Host;
+
 
 build_script:
-  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
-  - mkdir cmake-build
-  - cd cmake-build
-  - cmake ..
-  - cmake --build .
+# -------------------------------------------------------------------------------------------
+# When building with cmake, it remains one exception reported below
+# Once this problem be fixed, a fix from Microsoft about mc.exe outputing informative 
+# message on stderr: https://connect.microsoft.com/VisualStudio/Feedback/Details/2161572
+# the try/catch around the cmake builder can be removed
+#
+# [  1%] Generating pocomsg.h
+# cmake : MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
+# At line:16 char:3
+# +   cmake --build . --config $env:configuration
+# +   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#     + CategoryInfo          : NotSpecified: (MC: Compiling C.../src/pocomsg.mc:String) [], RemoteException
+#     + FullyQualifiedErrorId : NativeCommandError  
+#
+# Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
+# -------------------------------------------------------------------------------------------
+  - ps: |
+      if ($env:builder -eq "msbuild")
+      {
+        $logger='"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"';
+        $verbosity='minimal';
+    
+        $process = Start-Process -PassThru -nnw -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
+        -Args "$env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild $verbosity $logger";
+        gc cout; gc cerr;
+        Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
+      }
+      if ($env:builder -eq "cmake")
+      {
+        mkdir cmake-build | out-null;pushd cmake-build;
+        if ($env:platform -eq "Win32")
+        {
+            $opensslrootdir = 'C:\OpenSSL-Win32'
+        }
+        if ($env:platform -eq "x64")
+        {
+            $opensslrootdir = 'C:\OpenSSL-Win64'
+        }
+        $defs =' -G"NMake Makefiles"';
+        $defs+=" -DCMAKE_BUILD_TYPE=$env:configuration";
+        $defs+=" -DOPENSSL_ROOT_DIR=$opensslrootdir";
+        $defs+=" -DENABLE_NETSSL=OFF";
+        $defs+=" -DENABLE_NETSSL_WIN=ON";
+        $defs+=" -DENABLE_DATA_MYSQL=OFF";
+        $defs+=" -DENABLE_REDIS=OFF";
+        $defs+=" -DENABLE_SAMPLES=ON";
+        $defs+=" -DENABLE_TESTS=ON";
+        $defs+=" ..";
+        Write-Host -ForegroundColor Yellow cmake $defs
+        $process = Start-Process -PassThru -nnw -Wait -FilePath "cmake" -RSO cout -RSE cerr -Args $defs;
+        gc cout; gc cerr;
+        try {
+          $ErrorActionPreference = 'Continue';
+          Write-Host -ForegroundColor Yellow cmake `-`-build . 
+          cmake `-`-build . 
+        } catch {
+          Write-Warning "Oops: $_"
+        }
+        popd
+        Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
+        $ErrorActionPreference = 'Stop';
+      }
+
+before_test:
+  - ps: |
+      $line='-------------------------------------------------------------------------------------';
+      $CPPUNIT_IGNORE='';
+      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
+      set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
+      Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE'
+      Write-Host -ForegroundColor Yellow $line;
+      foreach($t in $CPPUNIT_IGNORE.split(",")) { Write-Host -ForegroundColor Yellow $t.trim() }      
+      Write-Host -ForegroundColor Yellow $line;
+      
+after_test:
+
+test_script:
+  - ps: |
+      $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
+      $line='-------------------------------------------------------------------------------------';
+      if ($env:configuration -eq "release")
+      {
+        if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
+        {
+          $suffix = '';
+          if ($env:platform -eq "Win32")
+          {
+            $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
+          }
+          if ($env:platform -eq "x64")
+          {
+            $env:PATH = "$env:POCO_BASE\bin64;" + $env:PATH;$suffix = 64;
+          }
+
+          Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
+
+          $components = gc $env:poco_base\components;
+          Write-Host components;
+          Write-Host -ForegroundColor Yellow $line;
+          $components;
+          Write-Host -ForegroundColor Yellow $line;
+ 
+          $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
+          
+          Write-Host excluded;
+          Write-Host -ForegroundColor Yellow $line;
+          $excluded
+          Write-Host -ForegroundColor Yellow $line;
+          
+          foreach ($component in $components) { 
+            if ($excluded -notcontains $component) {
+              $path = "$env:poco_base\" + $component + "\testsuite\bin$suffix\TestSuite.exe";
+
+              if (Test-Path -Path $path) {
+                $runs += 1;
+                Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Running'
+
+                Write-Host -ForegroundColor Yellow $line; 
+                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$vsver $env:Platform $env:Configuration $env:linkmode '|' $tab $tab $component; 
+                Write-Host -ForegroundColor Yellow $line; 
+
+                $started = Get-Date
+                $process = Start-Process -PassThru -nnw -Wait -FilePath "$path" -Args "-all" -RSO cout -RSE cerr;
+                $ended   = Get-Date
+                $millisec = ($ended - $started).totalmilliseconds
+                 
+                gc cout; gc cerr;
+
+                if ($process.ExitCode -gt 0) {
+                  $fails += 1;$failedTests += $component + ', ';
+                  Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Failed' -Duration $millisec
+                } else {
+                  Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Passed' -Duration $millisec
+                }
+              } else {
+                 Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome   'NotFound'
+              }
+            } else {
+              Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Skipped'
+            }
+          }
+        }  
+        if ($env:builder -eq "cmake" -and $env:platform -eq "Win32")
+        {
+          pushd cmake-build;
+          Write-Host -ForegroundColor Yellow $line;
+          ctest -N
+          Write-Host -ForegroundColor Yellow $line;
+
+          Write-Host -ForegroundColor Yellow 'ctest -VV -E Data*'
+          ctest -VV -E Data*
+          popd
+        }
+        Write-Host $runs' runs, ' $fails' fails'
+        if ($fails -gt 0)
+        {
+            Write-Host 'Failed: ' $failedTests
+            $host.SetShouldExit($fails);
+        } else 
+        {
+            $host.SetShouldExit(0);
+        }
+      }
+
+on_success:        
+  - echo success
+
+on_failure:
+  - echo failure
+
+on_finish:
+  - echo finish
+  
+notifications:
+  - provider: Email
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: false
+   
+  - provider: Slack
+    incoming_webhook: https://hooks.slack.com/services/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
+    auth_token:
+      secure: Xsss/K3VV9wZI9Ffwvafa67kyohNA437xJ3WA9fVI4w=
+    channel: appveyor
+    on_build_success: false
+    on_build_failure: true
+    on_build_status_changed: true
+    
+    

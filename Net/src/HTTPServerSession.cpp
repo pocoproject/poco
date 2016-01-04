@@ -21,14 +21,14 @@ namespace Poco {
 namespace Net {
 
 
-HTTPServerSession::HTTPServerSession(const StreamSocket& socket, HTTPServerParams::Ptr pParams):
-	HTTPSession(socket, pParams->getKeepAlive()),
+HTTPServerSession::HTTPServerSession(const StreamSocket& rSocket, HTTPServerParams::Ptr pParams):
+	HTTPSession(rSocket, pParams->getKeepAlive()),
 	_firstRequest(true),
 	_keepAliveTimeout(pParams->getKeepAliveTimeout()),
 	_maxKeepAliveRequests(pParams->getMaxKeepAliveRequests())
 {
 	setTimeout(pParams->getTimeout());
-	this->socket().setReceiveTimeout(pParams->getTimeout());
+	socket().setReceiveTimeout(pParams->getTimeout());
 }
 
 

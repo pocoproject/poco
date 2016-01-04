@@ -23,7 +23,7 @@
 #include "Poco/Poco.h"
 #include "Poco/SharedMemory.h"
 #include "Poco/RefCountedObject.h"
-
+#include "Poco/UnWindows.h"
 
 namespace Poco {
 
