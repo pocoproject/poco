@@ -313,6 +313,8 @@
     <ClInclude Include="src\NetSSLTestSuite.h"/>
     <ClInclude Include="src\TCPServerTest.h"/>
     <ClInclude Include="src\TCPServerTestSuite.h"/>
+    <ClInclude Include="src\WebSocketTest.h" />
+    <ClInclude Include="src\WebSocketTestSuite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Driver.cpp"/>
@@ -325,6 +327,8 @@
     <ClCompile Include="src\NetSSLTestSuite.cpp"/>
     <ClCompile Include="src\TCPServerTest.cpp"/>
     <ClCompile Include="src\TCPServerTestSuite.cpp"/>
+    <ClCompile Include="src\WebSocketTest.cpp" />
+    <ClCompile Include="src\WebSocketTestSuite.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>
