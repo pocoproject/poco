@@ -21,21 +21,21 @@ namespace Poco {
 namespace Crypto {
 
 
-CipherKey::CipherKey(const std::string& name, const std::string& passphrase,  const std::string& salt, int iterationCount,
-	const std::string &digest):
-	_pImpl(new CipherKeyImpl(name, passphrase, salt, iterationCount, digest))
+CipherKey::CipherKey(const std::string& rName, const std::string& passphrase,  const std::string& salt, int iterationCount,
+	const std::string & rDigest):
+	_pImpl(new CipherKeyImpl(rName, passphrase, salt, iterationCount, rDigest))
 {
 }
 
 
-CipherKey::CipherKey(const std::string& name, const ByteVec& key, const ByteVec& iv):
-	_pImpl(new CipherKeyImpl(name, key, iv))
+CipherKey::CipherKey(const std::string& rName, const ByteVec& key, const ByteVec& iv):
+	_pImpl(new CipherKeyImpl(rName, key, iv))
 {
 }
 
 
-CipherKey::CipherKey(const std::string& name):
-	_pImpl(new CipherKeyImpl(name))
+CipherKey::CipherKey(const std::string& rName):
+	_pImpl(new CipherKeyImpl(rName))
 {
 }
 
