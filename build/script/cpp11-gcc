@@ -27,6 +27,10 @@ GNUMINOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC_MINOR__ | sed -e
 GNUPATCH   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC_PATCHLEVEL__ | sed -e 's/^.* //g')
 GCCVERSION := $(GNUMAJOR)$(GNUMINOR)$(GNUPATCH)
 
+
+#
+# GCC 4.8 (or 4.6?) doesn't accept -std=c++11, only -std=c++0x.
+#
 # C++14 needs GCC 4.9.2
 ifeq ($(shell test $(GCCVERSION) -ge 492 && echo 1), 1)
 	CXXFLAGS += -std=c++14
