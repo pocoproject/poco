@@ -44,7 +44,7 @@ StreamSocketImpl::StreamSocketImpl(SocketAddress::Family family)
 }
 
 
-StreamSocketImpl::StreamSocketImpl(poco_socket_t sockfd): SocketImpl(sockfd)
+StreamSocketImpl::StreamSocketImpl(poco_socket_t socketfd): SocketImpl(socketfd)
 {
 }
 

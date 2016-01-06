@@ -29,15 +29,15 @@ HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::UInt16 por
 }
 
 
-HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), socket, pParams),
+HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, const ServerSocket& rSocket, HTTPServerParams::Ptr pParams):
+	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), rSocket, pParams),
 	_pFactory(pFactory)
 {
 }
 
 
-HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams::Ptr pParams):
-	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), threadPool, socket, pParams),
+HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& rSocket, HTTPServerParams::Ptr pParams):
+	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), threadPool, rSocket, pParams),
 	_pFactory(pFactory)
 {
 }

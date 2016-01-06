@@ -423,11 +423,11 @@ std::string AbstractConfiguration::internalExpand(const std::string& value) cons
 }
 
 
-std::string AbstractConfiguration::uncheckedExpand(const std::string& value) const
+std::string AbstractConfiguration::uncheckedExpand(const std::string& rValue) const
 {
 	std::string result;
-	std::string::const_iterator it  = value.begin();
-	std::string::const_iterator end = value.end();
+	std::string::const_iterator it  = rValue.begin();
+	std::string::const_iterator end = rValue.end();
 	while (it != end)
 	{
 		if (*it == '$')

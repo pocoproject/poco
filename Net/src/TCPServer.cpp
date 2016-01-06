@@ -46,9 +46,9 @@ TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 port
 }
 
 
-TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams):
-	_socket(socket),
-	_thread(threadName(socket)),
+TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& rSocket, TCPServerParams::Ptr pParams):
+	_socket(rSocket),
+	_thread(threadName(rSocket)),
 	_stopped(true)
 {
 	Poco::ThreadPool& pool = Poco::ThreadPool::defaultPool();
@@ -61,10 +61,10 @@ TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocke
 }
 
 
-TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams::Ptr pParams):
-	_socket(socket),
+TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& rSocket, TCPServerParams::Ptr pParams):
+	_socket(rSocket),
 	_pDispatcher(new TCPServerDispatcher(pFactory, threadPool, pParams)),
-	_thread(threadName(socket)),
+	_thread(threadName(rSocket)),
 	_stopped(true)
 {
 }
