@@ -5,11 +5,11 @@
 //
 
 
-#ifndef CppUnit_CppUnitException_INCLUDED
-#define CppUnit_CppUnitException_INCLUDED
+#ifndef Poco_CppUnit_CppUnitException_INCLUDED
+#define Poco_CppUnit_CppUnitException_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include <exception>
 #include <string>
 
@@ -17,7 +17,7 @@
 namespace CppUnit {
 
 
-class CppUnit_API CppUnitException: public std::exception
+class Poco_CppUnit_API CppUnitException: public std::exception
 	/// CppUnitException is an exception that serves
 	/// descriptive strings through its what() method
 {
@@ -138,4 +138,4 @@ inline const std::string& CppUnitException::fileName() const
 } // namespace CppUnit
 
 
-#endif // CppUnit_CppUnitException_INCLUDED
+#endif // Poco_CppUnit_CppUnitException_INCLUDED

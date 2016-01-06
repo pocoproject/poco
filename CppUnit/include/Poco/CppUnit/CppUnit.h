@@ -5,8 +5,8 @@
 //
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
-#define CppUnit_CppUnit_INCLUDED
+#ifndef Poco_CppUnit__CppUnitINCLUDED
+#define Poco_CppUnit__CppUnitINCLUDED
 
 
 //
@@ -21,26 +21,26 @@
 
 //
 // The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the CppUnit_EXPORTS
+// from a DLL simpler. All files within this DLL are compiled with the Poco_CppUnitEXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// CppUnit_API functions as being imported from a DLL, wheras this DLL sees symbols
+// Poco_CppUnit_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(CppUnit_EXPORTS)
-		#define CppUnit_API __declspec(dllexport)
+	#if defined(Poco_CppUnit_EXPORTS)
+		#define Poco_CppUnit_API __declspec(dllexport)
 	#else
-		#define CppUnit_API __declspec(dllimport)
+		#define Poco_CppUnit_API __declspec(dllimport)
 	#endif
 #endif
 
 
-#if !defined(CppUnit_API)
+#if !defined(Poco_CppUnit_API)
 	#if defined (__GNUC__) && (__GNUC__ >= 4)
-		#define CppUnit_API __attribute__ ((visibility ("default")))
+		#define Poco_CppUnit_API __attribute__ ((visibility ("default")))
 	#else
-		#define CppUnit_API
+		#define Poco_CppUnit_API
 	#endif
 #endif
 
@@ -57,4 +57,4 @@
 #endif
 
 
-#endif // CppUnit_CppUnit_INCLUDED
+#endif // Poco_CppUnit__CppUnitINCLUDED

@@ -1,4 +1,4 @@
-set(LIBNAME "CppUnit")
+set(LIBNAME "PocoCppUnit")
 
 # Sources
 file(GLOB SRCS_G "src/*.cpp")

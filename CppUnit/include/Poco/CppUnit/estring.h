@@ -5,11 +5,11 @@
 //
 
 
-#ifndef CppUnit_estring_INCLUDED
-#define CppUnit_estring_INCLUDED
+#ifndef Poco_CppUnit_estring_INCLUDED
+#define Poco_CppUnit_estring_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include <string>
 #include <stdio.h>
 
@@ -70,4 +70,4 @@ inline std::string estring(const void* ptr)
 } // namespace CppUnit
 
 
-#endif // CppUnit_estring_INCLUDED
+#endif // Poco_CppUnit_estring_INCLUDED

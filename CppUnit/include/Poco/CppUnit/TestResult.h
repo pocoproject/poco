@@ -5,13 +5,13 @@
 //
 
 
-#ifndef CppUnit_TestResult_INCLUDED
-#define CppUnit_TestResult_INCLUDED
+#ifndef Poco_CppUnit_TestResult_INCLUDED
+#define Poco_CppUnit_TestResult_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/Guards.h"
-#include "CppUnit/TestFailure.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/Guards.h"
+#include "Poco/CppUnit/TestFailure.h"
 #include <vector>
 
 
@@ -41,7 +41,7 @@ class Test;
  *
  * see Test
  */
-class CppUnit_API TestResult
+class Poco_CppUnit_API TestResult
 {
 	REFERENCEOBJECT (TestResult)
 
@@ -228,4 +228,4 @@ inline void TestResult::setSynchronizationObject(SynchronizationObject* syncObje
 } // namespace CppUnit
 
 
-#endif // CppUnit_TestResult_INCLUDED
+#endif // Poco_CppUnit_TestResult_INCLUDED

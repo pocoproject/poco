@@ -5,13 +5,13 @@
 //
 
 
-#ifndef CppUnit_TestSetup_INCLUDED
-#define CppUnit_TestSetup_INCLUDED
+#ifndef Poco_CppUnit_TestSetup_INCLUDED
+#define Poco_CppUnit_TestSetup_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/Guards.h"
-#include "CppUnit/TestDecorator.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/Guards.h"
+#include "Poco/CppUnit/TestDecorator.h"
 
 
 namespace CppUnit {
@@ -21,7 +21,7 @@ class Test;
 class TestResult;
 
 
-class CppUnit_API TestSetup: public TestDecorator
+class Poco_CppUnit_API TestSetup: public TestDecorator
 {
 	REFERENCEOBJECT (TestSetup)
 
@@ -54,4 +54,4 @@ inline void TestSetup::run(TestResult* result)
 } // namespace CppUnit
 
 
-#endif // CppUnit_TestSetup_INCLUDED
+#endif // Poco_CppUnit_TestSetup_INCLUDED

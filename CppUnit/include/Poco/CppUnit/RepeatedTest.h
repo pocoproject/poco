@@ -5,13 +5,13 @@
 //
 
 
-#ifndef CppUnit_RepeatedTest_INCLUDED
-#define CppUnit_RepeatedTest_INCLUDED
+#ifndef Poco_CppUnit_RepeatedTest_INCLUDED
+#define Poco_CppUnit_RepeatedTest_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/Guards.h"
-#include "CppUnit/TestDecorator.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/Guards.h"
+#include "Poco/CppUnit/TestDecorator.h"
 
 
 namespace CppUnit {
@@ -26,7 +26,7 @@ class TestResult;
  * Does not assume ownership of the test it decorates
  *
  */
-class CppUnit_API RepeatedTest: public TestDecorator
+class Poco_CppUnit_API RepeatedTest: public TestDecorator
 {
 	REFERENCEOBJECT (RepeatedTest)
 
@@ -74,4 +74,4 @@ inline void RepeatedTest::run(TestResult *result)
 } // namespace CppUnit
 
 
-#endif // CppUnit_RepeatedTest_INCLUDED
+#endif // Poco_CppUnit_RepeatedTest_INCLUDED

@@ -5,11 +5,11 @@
 //
 
 
-#ifndef CppUnit_TestCaller_INCLUDED
-#define CppUnit_TestCaller_INCLUDED
+#ifndef Poco_CppUnit_TestCaller_INCLUDED
+#define Poco_CppUnit_TestCaller_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include "Guards.h"
 #include "TestCase.h"
 #include <memory>
@@ -96,8 +96,8 @@ private:
 } // namespace CppUnit
 
 
-#define CppUnit_addTest(suite, cls, mth) \
+#define Poco_CppUnit_addTest(suite, cls, mth) \
 	suite->addTest(new CppUnit::TestCaller<cls>(#mth, &cls::mth))
 
 
-#endif // CppUnit_TestCaller_INCLUDED
+#endif // Poco_CppUnit_TestCaller_INCLUDED

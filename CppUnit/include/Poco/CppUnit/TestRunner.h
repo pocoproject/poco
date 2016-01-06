@@ -5,11 +5,11 @@
 //
 
 
-#ifndef CppUnit_TestRunner_INCLUDED
-#define CppUnit_TestRunner_INCLUDED
+#ifndef Poco_CppUnit_TestRunner_INCLUDED
+#define Poco_CppUnit_TestRunner_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include <vector>
 #include <string>
 #include <ostream>
@@ -38,7 +38,7 @@ class Test;
  * TestRunner [-all] [-print] [-wait] ExampleTestCase
  *
  */
-class CppUnit_API TestRunner
+class Poco_CppUnit_API TestRunner
 {
 	typedef std::pair<std::string, Test*> Mapping;
 	typedef std::vector<Mapping> Mappings;
@@ -100,4 +100,4 @@ private:
 #endif
 
 
-#endif // CppUnit_TestRunner_INCLUDED
+#endif // Poco_CppUnit_TestRunner_INCLUDED

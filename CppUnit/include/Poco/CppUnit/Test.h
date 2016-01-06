@@ -5,11 +5,11 @@
 //
 
 
-#ifndef CppUnit_Test_INCLUDED
-#define CppUnit_Test_INCLUDED
+#ifndef Poco_CppUnit_Test_INCLUDED
+#define Poco_CppUnit_Test_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include <string>
 
 
@@ -24,7 +24,7 @@ class TestResult;
  * See TestResult.
  *
  */
-class CppUnit_API Test
+class Poco_CppUnit_API Test
 {
 public:
 	virtual ~Test() = 0;
@@ -62,4 +62,4 @@ inline std::string Test::toString()
 } // namespace CppUnit
 
 
-#endif // CppUnit_Test_INCLUDED
+#endif // Poco_CppUnit_Test_INCLUDED

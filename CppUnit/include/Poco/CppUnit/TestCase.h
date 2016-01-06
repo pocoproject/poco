@@ -5,14 +5,14 @@
 //
 
 
-#ifndef CppUnit_TestCase_INCLUDED
-#define CppUnit_TestCase_INCLUDED
+#ifndef Poco_CppUnit_TestCase_INCLUDED
+#define Poco_CppUnit_TestCase_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/Guards.h"
-#include "CppUnit/Test.h"
-#include "CppUnit/CppUnitException.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/Guards.h"
+#include "Poco/CppUnit/Test.h"
+#include "Poco/CppUnit/CppUnitException.h"
 #include <string>
 #include <typeinfo>
 
@@ -83,7 +83,7 @@ class TestResult;
  * see TestResult, TestSuite and TestCaller
  *
  */
-class CppUnit_API TestCase: public Test
+class Poco_CppUnit_API TestCase: public Test
 {
     REFERENCEOBJECT (TestCase)
 
@@ -254,4 +254,4 @@ inline std::string TestCase::toString()
 } // namespace CppUnit
 
 
-#endif // CppUnit_TestCase_INCLUDED
+#endif // Poco_CppUnit_TestCase_INCLUDED
