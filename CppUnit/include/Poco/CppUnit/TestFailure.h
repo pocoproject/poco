@@ -33,7 +33,7 @@ class Test;
  * see TestSuite
  *
  */
-class Poco_CppUnit_API TestFailure
+class CppUnit_API TestFailure
 {
 	REFERENCEOBJECT (TestFailure)
 

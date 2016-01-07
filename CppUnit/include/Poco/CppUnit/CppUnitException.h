@@ -17,7 +17,7 @@
 namespace CppUnit {
 
 
-class Poco_CppUnit_API CppUnitException: public std::exception
+class CppUnit_API CppUnitException: public std::exception
 	/// CppUnitException is an exception that serves
 	/// descriptive strings through its what() method
 {

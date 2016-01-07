@@ -11,8 +11,8 @@
 
 
 #include "ArrayTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Array.h"
 #include <vector>
 #include <algorithm>

@@ -38,7 +38,7 @@ class Test;
  * TestRunner [-all] [-print] [-wait] ExampleTestCase
  *
  */
-class Poco_CppUnit_API TestRunner
+class CppUnit_API TestRunner
 {
 	typedef std::pair<std::string, Test*> Mapping;
 	typedef std::vector<Mapping> Mappings;

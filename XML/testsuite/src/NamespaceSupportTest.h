@@ -17,7 +17,7 @@
 
 
 #include "Poco/XML/XML.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class NamespaceSupportTest: public CppUnit::TestCase

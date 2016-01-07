@@ -11,8 +11,8 @@
 
 
 #include "TaskTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Task.h"
 #include "Poco/Thread.h"
 #include "Poco/Event.h"

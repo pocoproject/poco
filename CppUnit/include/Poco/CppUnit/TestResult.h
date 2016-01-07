@@ -41,7 +41,7 @@ class Test;
  *
  * see Test
  */
-class Poco_CppUnit_API TestResult
+class CppUnit_API TestResult
 {
 	REFERENCEOBJECT (TestResult)
 

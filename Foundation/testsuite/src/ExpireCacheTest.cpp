@@ -11,8 +11,8 @@
 
 
 #include "ExpireCacheTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/ExpireCache.h"
 #include "Poco/AccessExpireCache.h"

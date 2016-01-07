@@ -11,8 +11,8 @@
 
 
 #include "ODBCPostgreSQLTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "ODBCTest.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"

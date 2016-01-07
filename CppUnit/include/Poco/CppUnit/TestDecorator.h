@@ -26,7 +26,7 @@ class TestResult;
  * Does not assume ownership of the test it decorates
  *
  */
-class Poco_CppUnit_API TestDecorator: public Test
+class CppUnit_API TestDecorator: public Test
 {
 	REFERENCEOBJECT(TestDecorator)
 

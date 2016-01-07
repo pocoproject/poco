@@ -83,7 +83,7 @@ class TestResult;
  * see TestResult, TestSuite and TestCaller
  *
  */
-class Poco_CppUnit_API TestCase: public Test
+class CppUnit_API TestCase: public Test
 {
     REFERENCEOBJECT (TestCase)
 

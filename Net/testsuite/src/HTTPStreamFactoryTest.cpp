@@ -11,8 +11,8 @@
 
 
 #include "HTTPStreamFactoryTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPStreamFactory.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/URI.h"

@@ -11,8 +11,8 @@
 
 
 #include "XMLWriterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/XML/XMLWriter.h"
 #include "Poco/SAX/AttributesImpl.h"
 #include "Poco/Exception.h"

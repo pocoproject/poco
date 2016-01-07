@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/CppUnit/Makefile#1 $
+# $Id: //poco/1.4/PocoCppUnit/Makefile#1 $
 #
 # Makefile for Poco CppUnit
 #

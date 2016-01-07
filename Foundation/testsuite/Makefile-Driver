@@ -44,7 +44,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoFoundation CppUnit
+target_libs    = PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec
 

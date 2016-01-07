@@ -24,7 +24,7 @@ class TestResult;
  * See TestResult.
  *
  */
-class Poco_CppUnit_API Test
+class CppUnit_API Test
 {
 public:
 	virtual ~Test() = 0;

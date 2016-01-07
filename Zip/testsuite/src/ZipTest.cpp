@@ -23,8 +23,8 @@
 #include "Poco/Path.h"
 #include "Poco/Delegate.h"
 #include "Poco/StreamCopier.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #undef min
 #include <algorithm>
 #include <iostream>

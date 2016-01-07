@@ -21,7 +21,7 @@ class Test;
 class TestResult;
 
 
-class Poco_CppUnit_API TestSetup: public TestDecorator
+class CppUnit_API TestSetup: public TestDecorator
 {
 	REFERENCEOBJECT (TestSetup)
 

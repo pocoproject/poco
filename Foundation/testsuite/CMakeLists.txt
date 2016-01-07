@@ -28,7 +28,7 @@ add_executable( ${TESTUNIT} ${TEST_SRCS} )
 add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND ${TESTUNIT} -all)
 set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=.") # The SharedLibaryTest has to look for shared libraries in the working directory
 
-target_link_libraries( ${TESTUNIT} PocoFoundation CppUnit )
+target_link_libraries( ${TESTUNIT} PocoFoundation PocoCppUnit )
 if(UNIX)
     target_link_libraries( ${TESTUNIT} pthread)
 endif(UNIX)

@@ -21,7 +21,7 @@ objects = AbstractConfigurationTest ConfigurationTestSuite \
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoUtil PocoXML PocoJSON PocoFoundation CppUnit
+target_libs    = PocoUtil PocoXML PocoJSON PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec
 

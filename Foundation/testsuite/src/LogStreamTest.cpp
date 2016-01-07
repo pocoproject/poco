@@ -11,8 +11,8 @@
 
 
 #include "LogStreamTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Logger.h"
 #include "Poco/LogStream.h"
 #include "Poco/AutoPtr.h"

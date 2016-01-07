@@ -149,12 +149,12 @@
     </ResourceCompile>
     <Link>
       <ShowProgress>NotSet</ShowProgress>
-      <OutputFile>..\bin\$(Platform)\CppUnitd.dll</OutputFile>
+      <OutputFile>..\bin\$(Platform)\$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>..\bin\$(Platform)\CppUnitd.pdb</ProgramDatabaseFile>
-      <ImportLibrary>..\lib\$(Platform)\CppUnitd.lib</ImportLibrary>
+      <ProgramDatabaseFile>..\bin\$(Platform)\$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>..\lib\$(Platform)\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V300'">
@@ -187,12 +187,12 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\bin\$(Platform)\CppUnit.dll</OutputFile>
+      <OutputFile>..\bin\$(Platform)\$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>
       </ProgramDatabaseFile>
-      <ImportLibrary>..\lib\$(Platform)\CppUnit.lib</ImportLibrary>
+      <ImportLibrary>..\lib\$(Platform)\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V300'">
@@ -214,7 +214,7 @@
       <AssemblerListingLocation>
       </AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>..\lib\$(Platform)\CppUnitmdd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib\$(Platform)\$(TargetName).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <CompileAs>Default</CompileAs>
@@ -225,7 +225,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\$(Platform)\CppUnitmdd.lib</OutputFile>
+      <OutputFile>..\lib\$(Platform)\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V300'">
@@ -258,7 +258,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\$(Platform)\CppUnitmd.lib</OutputFile>
+      <OutputFile>..\lib\$(Platform)\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V300'">
@@ -280,7 +280,7 @@
       <AssemblerListingLocation>
       </AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>..\lib\$(Platform)\CppUnitmtd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib\$(Platform)\$(TargetName).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <CompileAs>Default</CompileAs>
@@ -291,7 +291,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\$(Platform)\CppUnitmtd.lib</OutputFile>
+      <OutputFile>..\lib\$(Platform)\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V300'">
@@ -324,7 +324,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\$(Platform)\CppUnitmt.lib</OutputFile>
+      <OutputFile>..\lib\$(Platform)\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -338,22 +338,22 @@
     <ClCompile Include="src\TextTestResult.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\CppUnit\CppUnit.h" />
-    <ClInclude Include="include\CppUnit\CppUnitException.h" />
-    <ClInclude Include="include\CppUnit\estring.h" />
-    <ClInclude Include="include\CppUnit\Guards.h" />
-    <ClInclude Include="include\CppUnit\Orthodox.h" />
-    <ClInclude Include="include\CppUnit\RepeatedTest.h" />
-    <ClInclude Include="include\CppUnit\Test.h" />
-    <ClInclude Include="include\CppUnit\TestCaller.h" />
-    <ClInclude Include="include\CppUnit\TestCase.h" />
-    <ClInclude Include="include\CppUnit\TestDecorator.h" />
-    <ClInclude Include="include\CppUnit\TestFailure.h" />
-    <ClInclude Include="include\CppUnit\TestResult.h" />
-    <ClInclude Include="include\CppUnit\TestRunner.h" />
-    <ClInclude Include="include\CppUnit\TestSetup.h" />
-    <ClInclude Include="include\CppUnit\TestSuite.h" />
-    <ClInclude Include="include\CppUnit\TextTestResult.h" />
+    <ClInclude Include="include\Poco\CppUnit\$(TargetName).h" />
+    <ClInclude Include="include\Poco\CppUnit\CppUnitException.h" />
+    <ClInclude Include="include\Poco\CppUnit\estring.h" />
+    <ClInclude Include="include\Poco\CppUnit\Guards.h" />
+    <ClInclude Include="include\Poco\CppUnit\Orthodox.h" />
+    <ClInclude Include="include\Poco\CppUnit\RepeatedTest.h" />
+    <ClInclude Include="include\Poco\CppUnit\Test.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestCaller.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestCase.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestDecorator.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestFailure.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestResult.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestRunner.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestSetup.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestSuite.h" />
+    <ClInclude Include="include\Poco\CppUnit\TextTestResult.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -24,23 +24,52 @@
 // from a DLL simpler. All files within this DLL are compiled with the Poco_CppUnitEXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// Poco_CppUnit_API functions as being imported from a DLL, wheras this DLL sees symbols
+// CppUnit_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(Poco_CppUnit_EXPORTS)
-		#define Poco_CppUnit_API __declspec(dllexport)
+	#if defined(CppUnit_EXPORTS)
+		#define CppUnit_API __declspec(dllexport)
 	#else
-		#define Poco_CppUnit_API __declspec(dllimport)
+		#define CppUnit_API __declspec(dllimport)
 	#endif
 #endif
 
 
-#if !defined(Poco_CppUnit_API)
+#if !defined(CppUnit_API)
 	#if defined (__GNUC__) && (__GNUC__ >= 4)
-		#define Poco_CppUnit_API __attribute__ ((visibility ("default")))
+		#define CppUnit_API __attribute__ ((visibility ("default")))
 	#else
-		#define Poco_CppUnit_API
+		#define CppUnit_API
+	#endif
+#endif
+
+//
+// Automatically link Foundation library.
+//
+#if defined(_MSC_VER)
+	#if defined(POCO_DLL)
+		#if defined(_DEBUG)
+			#define POCO_LIB_SUFFIX "d.lib"
+		#else
+			#define POCO_LIB_SUFFIX ".lib"
+		#endif
+	#elif defined(_DLL)
+		#if defined(_DEBUG)
+			#define POCO_LIB_SUFFIX "mdd.lib"
+		#else
+			#define POCO_LIB_SUFFIX "md.lib"
+		#endif
+	#else
+		#if defined(_DEBUG)
+			#define POCO_LIB_SUFFIX "mtd.lib"
+		#else
+			#define POCO_LIB_SUFFIX "mt.lib"
+		#endif
+	#endif
+
+	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(CppUnit_EXPORTS)
+		#pragma comment(lib, "PocoCppUnit" POCO_LIB_SUFFIX)
 	#endif
 #endif
 

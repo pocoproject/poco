@@ -11,8 +11,8 @@
 
 
 #include "PDFTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 PDFTest::PDFTest(const std::string& name): CppUnit::TestCase(name)

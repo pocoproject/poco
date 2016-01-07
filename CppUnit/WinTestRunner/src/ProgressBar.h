@@ -9,7 +9,7 @@
 #define ProgressBar_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include <afxwin.h>
 
 
