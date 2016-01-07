@@ -22,4 +22,4 @@ target_include_directories( "${LIBNAME}"
     )
 target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 
-SIMPLE_INSTALL(${LIBNAME})
+POCO_INSTALL("${LIBNAME}")
