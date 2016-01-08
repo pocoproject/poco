@@ -30,6 +30,8 @@ public:
 	void testLaunchEnv();
 	void testLaunchArgs();
 	void testIsRunning();
+	void testIsRunningAllowsForTermination();
+	void testSignalExitCode();
 
 	void setUp();
 	void tearDown();
