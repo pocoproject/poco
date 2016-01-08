@@ -57,6 +57,7 @@ endif()
 include(PocoMacros)
 
 # Allow enabling and disabling components
+option(ENABLE_CPPUNIT "Enable the CppUnit" ON)
 option(ENABLE_XML "Enable the XML" ON)
 option(ENABLE_JSON "Enable the JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
@@ -138,8 +139,9 @@ include(DefinePlatformSpecifc)
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
 
-if (ENABLE_TESTS)
+if (ENABLE_CPPUNIT)
    add_subdirectory(CppUnit)
+   list(APPEND Poco_COMPONENTS "CppUnit")
 endif ()
 
 add_subdirectory(Foundation)
