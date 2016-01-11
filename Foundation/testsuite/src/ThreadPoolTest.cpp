@@ -25,7 +25,7 @@ using Poco::RunnableAdapter;
 using Poco::Thread;
 
 
-ThreadPoolTest::ThreadPoolTest(const std::string& name): CppUnit::TestCase(name), _event(Event::EVENT_MANUALRESET)
+ThreadPoolTest::ThreadPoolTest(const std::string& rName): CppUnit::TestCase(rName), _event(Event::EVENT_MANUALRESET)
 {
 }
 

@@ -20,7 +20,7 @@
 using Poco::ObjectPool;
 
 
-ObjectPoolTest::ObjectPoolTest(const std::string& name): CppUnit::TestCase(name)
+ObjectPoolTest::ObjectPoolTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

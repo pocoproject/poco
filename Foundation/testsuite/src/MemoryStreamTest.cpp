@@ -22,7 +22,7 @@ using Poco::MemoryInputStream;
 using Poco::MemoryOutputStream;
 
 
-MemoryStreamTest::MemoryStreamTest(const std::string& name): CppUnit::TestCase(name)
+MemoryStreamTest::MemoryStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

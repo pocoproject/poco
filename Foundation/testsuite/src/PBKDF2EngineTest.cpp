@@ -24,7 +24,7 @@ using Poco::SHA1Engine;
 using Poco::DigestEngine;
 
 
-PBKDF2EngineTest::PBKDF2EngineTest(const std::string& name): CppUnit::TestCase(name)
+PBKDF2EngineTest::PBKDF2EngineTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

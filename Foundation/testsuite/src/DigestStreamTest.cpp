@@ -25,7 +25,7 @@ using Poco::DigestEngine;
 using Poco::MD5Engine;
 
 
-DigestStreamTest::DigestStreamTest(const std::string& name): CppUnit::TestCase(name)
+DigestStreamTest::DigestStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

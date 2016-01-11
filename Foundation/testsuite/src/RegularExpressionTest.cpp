@@ -21,7 +21,7 @@ using Poco::RegularExpression;
 using Poco::RegularExpressionException;
 
 
-RegularExpressionTest::RegularExpressionTest(const std::string& name): CppUnit::TestCase(name)
+RegularExpressionTest::RegularExpressionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

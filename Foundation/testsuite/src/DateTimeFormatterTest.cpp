@@ -25,8 +25,8 @@ using Poco::DateTimeFormat;
 using Poco::DateTimeFormatter;
 
 
-DateTimeFormatterTest::DateTimeFormatterTest(const std::string& name)
-	: CppUnit::TestCase(name)
+DateTimeFormatterTest::DateTimeFormatterTest(const std::string& rName)
+	: CppUnit::TestCase(rName)
 {
 	// Linker regresion SF #3288584
 	std::string message;

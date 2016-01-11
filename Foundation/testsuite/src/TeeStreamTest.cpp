@@ -21,7 +21,7 @@ using Poco::TeeInputStream;
 using Poco::TeeOutputStream;
 
 
-TeeStreamTest::TeeStreamTest(const std::string& name): CppUnit::TestCase(name)
+TeeStreamTest::TeeStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

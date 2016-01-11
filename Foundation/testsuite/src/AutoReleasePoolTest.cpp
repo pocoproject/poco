@@ -65,7 +65,7 @@ namespace
 }
 
 
-AutoReleasePoolTest::AutoReleasePoolTest(const std::string& name): CppUnit::TestCase(name)
+AutoReleasePoolTest::AutoReleasePoolTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

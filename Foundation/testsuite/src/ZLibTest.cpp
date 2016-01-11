@@ -30,7 +30,7 @@ using Poco::DeflatingStreamBuf;
 using Poco::StreamCopier;
 
 
-ZLibTest::ZLibTest(const std::string& name): CppUnit::TestCase(name)
+ZLibTest::ZLibTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

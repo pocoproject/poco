@@ -27,7 +27,7 @@ using Poco::NotFoundException;
 using Poco::InvalidAccessException;
 
 
-ClassLoaderTest::ClassLoaderTest(const std::string& name): CppUnit::TestCase(name)
+ClassLoaderTest::ClassLoaderTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

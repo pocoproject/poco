@@ -58,7 +58,7 @@ namespace
 }
 
 
-TaskTest::TaskTest(const std::string& name): CppUnit::TestCase(name)
+TaskTest::TaskTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

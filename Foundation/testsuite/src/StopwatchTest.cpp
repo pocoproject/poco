@@ -23,7 +23,7 @@ using Poco::Timestamp;
 using Poco::Thread;
 
 
-StopwatchTest::StopwatchTest(const std::string& name): CppUnit::TestCase(name)
+StopwatchTest::StopwatchTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

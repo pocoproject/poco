@@ -29,7 +29,7 @@ using Poco::ASCIIEncoding;
 using Poco::StreamCopier;
 
 
-StreamConverterTest::StreamConverterTest(const std::string& name): CppUnit::TestCase(name)
+StreamConverterTest::StreamConverterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
