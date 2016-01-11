@@ -26,7 +26,7 @@ using Poco::PipeInputStream;
 using Poco::PipeOutputStream;
 
 
-ProcessTest::ProcessTest(const std::string& name): CppUnit::TestCase(name)
+ProcessTest::ProcessTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

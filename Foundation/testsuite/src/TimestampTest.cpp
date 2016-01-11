@@ -21,7 +21,7 @@ using Poco::Timestamp;
 using Poco::Thread;
 
 
-TimestampTest::TimestampTest(const std::string& name): CppUnit::TestCase(name)
+TimestampTest::TimestampTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

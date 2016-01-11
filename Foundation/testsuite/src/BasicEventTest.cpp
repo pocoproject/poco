@@ -27,7 +27,7 @@ using namespace Poco;
 #define LARGEINC 100
 
 
-BasicEventTest::BasicEventTest(const std::string& name): CppUnit::TestCase(name)
+BasicEventTest::BasicEventTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -21,7 +21,7 @@
 using Poco::UInt32;
 
 
-RandomTest::RandomTest(const std::string& name): CppUnit::TestCase(name)
+RandomTest::RandomTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

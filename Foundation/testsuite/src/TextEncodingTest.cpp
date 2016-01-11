@@ -26,7 +26,7 @@
 using namespace Poco;
 
 
-TextEncodingTest::TextEncodingTest(const std::string& name): CppUnit::TestCase(name)
+TextEncodingTest::TextEncodingTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

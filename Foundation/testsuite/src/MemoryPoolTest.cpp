@@ -20,7 +20,7 @@
 using Poco::MemoryPool;
 
 
-MemoryPoolTest::MemoryPoolTest(const std::string& name): CppUnit::TestCase(name)
+MemoryPoolTest::MemoryPoolTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

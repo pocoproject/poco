@@ -21,7 +21,7 @@ using Poco::URI;
 using Poco::Path;
 
 
-URITest::URITest(const std::string& name): CppUnit::TestCase(name)
+URITest::URITest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

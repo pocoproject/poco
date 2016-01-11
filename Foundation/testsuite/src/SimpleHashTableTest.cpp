@@ -20,7 +20,7 @@
 using namespace Poco;
 
 
-SimpleHashTableTest::SimpleHashTableTest(const std::string& name): CppUnit::TestCase(name)
+SimpleHashTableTest::SimpleHashTableTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

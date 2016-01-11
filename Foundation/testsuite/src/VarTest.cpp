@@ -58,7 +58,7 @@ private:
 };
 
 
-VarTest::VarTest(const std::string& name): CppUnit::TestCase(name)
+VarTest::VarTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

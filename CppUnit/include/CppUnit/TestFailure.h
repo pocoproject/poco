@@ -52,7 +52,7 @@ protected:
 
 
 // Constructs a TestFailure with the given test and exception.
-inline TestFailure::TestFailure(Test* failedTest, CppUnitException* thrownException): _failedTest(failedTest), _thrownException(thrownException)
+inline TestFailure::TestFailure(Test* pFailedTest, CppUnitException* pThrownException): _failedTest(pFailedTest), _thrownException(pThrownException)
 {
 }
 
