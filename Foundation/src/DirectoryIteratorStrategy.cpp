@@ -24,8 +24,17 @@ namespace Poco {
 // TraverseBase
 //
 TraverseBase::TraverseBase(DepthFunPtr depthDeterminer, UInt16 maxDepth)
-	: _depthDeterminer(depthDeterminer), _maxDepth(maxDepth)
+	: _depthDeterminer(depthDeterminer), 
+	  _maxDepth(maxDepth), 
+	  _pCallback(0)
 {
+}
+
+
+TraverseBase& TraverseBase::setOnError(const AbstractTraverseErrorCallback& cb)
+{
+	_pCallback = cb.clone();
+	return *this;
 }
 
 
@@ -44,6 +53,15 @@ bool TraverseBase::isDirectory(Poco::File& file)
 	catch (...)
 	{
 		return false;
+	}
+}
+
+
+void TraverseBase::invokeOnError(const std::string& path) const
+{
+	if (_pCallback)
+	{
+		_pCallback->invoke(path);
 	}
 }
 
@@ -72,12 +90,20 @@ const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 	bool isDepthLimitReached = isFiniteDepth() && _depthDeterminer(*itStack) >= _maxDepth;
 	if (!isDepthLimitReached && isDirectory(*itStack->top()))
 	{
-		DirectoryIterator child_it(itStack->top().path());
-		// check if directory is empty
-		if (child_it != _itEnd)
+		try
 		{
-			itStack->push(child_it);
-			return child_it->path();
+			DirectoryIterator child_it(itStack->top().path());
+			// check if directory is empty
+			if (child_it != _itEnd)
+			{
+				itStack->push(child_it);
+				return child_it->path();
+			}
+		}
+		catch (...)
+		{
+			// Failed to iterate child dir.
+			invokeOnError(itStack->top()->path());
 		}
 	}
 
@@ -140,14 +166,22 @@ const std::string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 		{
 			std::string dir = _dirsStack.top().front();
 			_dirsStack.top().pop();
-			DirectoryIterator child_it(dir);
-
-			// check if directory is empty
-			if (child_it != _itEnd)
+			try
 			{
-				itStack->push(child_it);
-				_dirsStack.push(std::queue<std::string>());
-				return child_it->path();
+				DirectoryIterator child_it(dir);
+
+				// check if directory is empty
+				if (child_it != _itEnd)
+				{
+					itStack->push(child_it);
+					_dirsStack.push(std::queue<std::string>());
+					return child_it->path();
+				}
+			}
+			catch (...)
+			{
+				// Failed to iterate child dir.
+				invokeOnError(dir);
 			}
 		}
 

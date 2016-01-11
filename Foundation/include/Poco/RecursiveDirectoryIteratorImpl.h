@@ -78,6 +78,13 @@ public:
 	{
 		return _current;
 	}
+
+        RecursiveDirectoryIteratorImpl& setOnError(const AbstractTraverseErrorCallback& cb)
+	{
+		_traverseStrategy.setOnError(cb);
+		return *this;
+	}
+
 	const std::string& next()
 	{
 		if (_isFinished)
