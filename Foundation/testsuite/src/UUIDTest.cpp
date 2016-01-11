@@ -20,7 +20,7 @@
 using Poco::UUID;
 
 
-UUIDTest::UUIDTest(const std::string& name): CppUnit::TestCase(name)
+UUIDTest::UUIDTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

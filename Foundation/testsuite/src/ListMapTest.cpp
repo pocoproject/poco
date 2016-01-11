@@ -21,7 +21,7 @@
 using Poco::ListMap;
 
 
-ListMapTest::ListMapTest(const std::string& name): CppUnit::TestCase(name)
+ListMapTest::ListMapTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

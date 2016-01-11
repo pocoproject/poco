@@ -26,8 +26,8 @@
 using Poco::DirectoryWatcher;
 
 
-DirectoryWatcherTest::DirectoryWatcherTest(const std::string& name): 
-	CppUnit::TestCase(name),
+DirectoryWatcherTest::DirectoryWatcherTest(const std::string& rName): 
+	CppUnit::TestCase(rName),
 	_error(false)
 {
 }

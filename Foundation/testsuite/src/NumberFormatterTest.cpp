@@ -21,7 +21,7 @@ using Poco::Int64;
 using Poco::UInt64;
 
 
-NumberFormatterTest::NumberFormatterTest(const std::string& name): CppUnit::TestCase(name)
+NumberFormatterTest::NumberFormatterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

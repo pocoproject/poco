@@ -20,7 +20,7 @@ using Poco::NullInputStream;
 using Poco::NullOutputStream;
 
 
-NullStreamTest::NullStreamTest(const std::string& name): CppUnit::TestCase(name)
+NullStreamTest::NullStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

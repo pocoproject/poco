@@ -20,7 +20,7 @@ using Poco::SHA1Engine;
 using Poco::DigestEngine;
 
 
-SHA1EngineTest::SHA1EngineTest(const std::string& name): CppUnit::TestCase(name)
+SHA1EngineTest::SHA1EngineTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -25,7 +25,7 @@ using Poco::Timespan;
 using Poco::AssertionViolationException;
 
 
-DateTimeTest::DateTimeTest(const std::string& name): CppUnit::TestCase(name)
+DateTimeTest::DateTimeTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

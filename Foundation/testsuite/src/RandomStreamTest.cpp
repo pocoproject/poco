@@ -21,7 +21,7 @@
 using Poco::RandomInputStream;
 
 
-RandomStreamTest::RandomStreamTest(const std::string& name): CppUnit::TestCase(name)
+RandomStreamTest::RandomStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

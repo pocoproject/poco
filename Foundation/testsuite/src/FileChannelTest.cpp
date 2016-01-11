@@ -48,7 +48,7 @@ using Poco::DirectoryIterator;
 using Poco::InvalidArgumentException;
 
 
-FileChannelTest::FileChannelTest(const std::string& name): CppUnit::TestCase(name)
+FileChannelTest::FileChannelTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

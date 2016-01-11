@@ -23,7 +23,7 @@ using Poco::FIFOBufferStream;
 using Poco::delegate;
 
 
-FIFOBufferStreamTest::FIFOBufferStreamTest(const std::string& name): CppUnit::TestCase(name)
+FIFOBufferStreamTest::FIFOBufferStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

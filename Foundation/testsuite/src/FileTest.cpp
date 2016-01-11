@@ -30,7 +30,7 @@ using Poco::Timestamp;
 using Poco::Thread;
 
 
-FileTest::FileTest(const std::string& name): CppUnit::TestCase(name)
+FileTest::FileTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

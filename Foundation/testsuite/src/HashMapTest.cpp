@@ -21,7 +21,7 @@
 using Poco::HashMap;
 
 
-HashMapTest::HashMapTest(const std::string& name): CppUnit::TestCase(name)
+HashMapTest::HashMapTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -42,7 +42,7 @@ using Poco::decimalSeparator;
 using Poco::thousandSeparator;
 
 
-NumberParserTest::NumberParserTest(const std::string& name): CppUnit::TestCase(name)
+NumberParserTest::NumberParserTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

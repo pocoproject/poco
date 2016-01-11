@@ -19,7 +19,7 @@
 #include "Poco/Exception.h"
 
 
-FileStreamTest::FileStreamTest(const std::string& name): CppUnit::TestCase(name)
+FileStreamTest::FileStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

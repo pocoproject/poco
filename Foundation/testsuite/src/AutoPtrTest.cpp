@@ -67,7 +67,7 @@ namespace
 }
 
 
-AutoPtrTest::AutoPtrTest(const std::string& name): CppUnit::TestCase(name)
+AutoPtrTest::AutoPtrTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

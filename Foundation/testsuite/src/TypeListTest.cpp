@@ -51,7 +51,7 @@ using Poco::UInt32;
 using Poco::Void;
 
 
-TypeListTest::TypeListTest(const std::string& name): CppUnit::TestCase(name)
+TypeListTest::TypeListTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

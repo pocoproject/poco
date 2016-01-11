@@ -24,7 +24,7 @@ using Poco::HexBinaryDecoder;
 using Poco::DataFormatException;
 
 
-HexBinaryTest::HexBinaryTest(const std::string& name): CppUnit::TestCase(name)
+HexBinaryTest::HexBinaryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

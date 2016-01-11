@@ -22,7 +22,7 @@ using Poco::MD5Engine;
 using Poco::DigestEngine;
 
 
-HMACEngineTest::HMACEngineTest(const std::string& name): CppUnit::TestCase(name)
+HMACEngineTest::HMACEngineTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

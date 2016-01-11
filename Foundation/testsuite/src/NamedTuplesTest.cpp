@@ -34,7 +34,7 @@ using Poco::NotFoundException;
 using Poco::InvalidArgumentException;
 
 
-NamedTuplesTest::NamedTuplesTest(const std::string& name): CppUnit::TestCase(name)
+NamedTuplesTest::NamedTuplesTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

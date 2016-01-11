@@ -34,7 +34,7 @@ using Poco::PathSyntaxException;
 using Poco::Environment;
 
 
-PathTest::PathTest(const std::string& name): CppUnit::TestCase(name)
+PathTest::PathTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

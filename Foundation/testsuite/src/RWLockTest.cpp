@@ -121,7 +121,7 @@ private:
 };
 
 
-RWLockTest::RWLockTest(const std::string& name): CppUnit::TestCase(name)
+RWLockTest::RWLockTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

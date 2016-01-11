@@ -23,8 +23,8 @@
 using namespace Poco;
 
 
-DirectoryIteratorsTest::DirectoryIteratorsTest(const std::string& name):
-	CppUnit::TestCase(name)
+DirectoryIteratorsTest::DirectoryIteratorsTest(const std::string& rName):
+	CppUnit::TestCase(rName)
 {
 }
 

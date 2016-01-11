@@ -24,7 +24,7 @@ using Poco::Message;
 using Poco::AutoPtr;
 
 
-LoggerTest::LoggerTest(const std::string& name): CppUnit::TestCase(name)
+LoggerTest::LoggerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

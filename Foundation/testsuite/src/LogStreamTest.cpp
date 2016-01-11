@@ -26,7 +26,7 @@ using Poco::Message;
 using Poco::AutoPtr;
 
 
-LogStreamTest::LogStreamTest(const std::string& name): CppUnit::TestCase(name)
+LogStreamTest::LogStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

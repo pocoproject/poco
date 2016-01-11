@@ -23,7 +23,7 @@ using Poco::Message;
 using Poco::DateTime;
 
 
-PatternFormatterTest::PatternFormatterTest(const std::string& name): CppUnit::TestCase(name)
+PatternFormatterTest::PatternFormatterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

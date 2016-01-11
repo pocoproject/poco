@@ -22,7 +22,7 @@ using Poco::RangeException;
 using Poco::NotFoundException;
 
 
-StringTokenizerTest::StringTokenizerTest(const std::string& name): CppUnit::TestCase(name)
+StringTokenizerTest::StringTokenizerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

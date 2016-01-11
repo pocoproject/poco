@@ -23,7 +23,7 @@ using Poco::UUIDGenerator;
 using Poco::UUID;
 
 
-UUIDGeneratorTest::UUIDGeneratorTest(const std::string& name): CppUnit::TestCase(name)
+UUIDGeneratorTest::UUIDGeneratorTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

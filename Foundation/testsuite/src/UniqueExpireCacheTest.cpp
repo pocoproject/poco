@@ -47,7 +47,7 @@ typedef AccessExpirationDecorator<int> DIntVal;
 #define DURWAIT  300
 
 
-UniqueExpireCacheTest::UniqueExpireCacheTest(const std::string& name): CppUnit::TestCase(name)
+UniqueExpireCacheTest::UniqueExpireCacheTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

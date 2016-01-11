@@ -92,7 +92,7 @@ namespace
 }
 
 
-ActiveMethodTest::ActiveMethodTest(const std::string& name): CppUnit::TestCase(name)
+ActiveMethodTest::ActiveMethodTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

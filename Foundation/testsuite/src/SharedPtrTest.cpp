@@ -26,7 +26,7 @@ namespace
 	class TestObject
 	{
 	public:
-		TestObject(const std::string& data): _data(data)
+		TestObject(const std::string& rData): _data(rData)
 		{
 			++_count;
 		}
@@ -71,7 +71,7 @@ namespace
 }
 
 
-SharedPtrTest::SharedPtrTest(const std::string& name): CppUnit::TestCase(name)
+SharedPtrTest::SharedPtrTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

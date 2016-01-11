@@ -69,7 +69,7 @@ private:
 };
 
 
-SemaphoreTest::SemaphoreTest(const std::string& name): CppUnit::TestCase(name)
+SemaphoreTest::SemaphoreTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

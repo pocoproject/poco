@@ -60,7 +60,7 @@ struct TLTestStruct
 ThreadLocal<int> TLTestRunnable::_count;
 
 
-ThreadLocalTest::ThreadLocalTest(const std::string& name): CppUnit::TestCase(name)
+ThreadLocalTest::ThreadLocalTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

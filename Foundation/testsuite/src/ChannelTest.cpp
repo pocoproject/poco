@@ -47,7 +47,7 @@ public:
 };
 
 
-ChannelTest::ChannelTest(const std::string& name): CppUnit::TestCase(name)
+ChannelTest::ChannelTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

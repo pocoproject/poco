@@ -45,7 +45,7 @@ namespace
 }
 
 
-TimedNotificationQueueTest::TimedNotificationQueueTest(const std::string& name): CppUnit::TestCase(name)
+TimedNotificationQueueTest::TimedNotificationQueueTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

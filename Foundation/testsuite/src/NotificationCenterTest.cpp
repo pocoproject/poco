@@ -31,7 +31,7 @@ class TestNotification: public Notification
 };
 
 
-NotificationCenterTest::NotificationCenterTest(const std::string& name): CppUnit::TestCase(name)
+NotificationCenterTest::NotificationCenterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

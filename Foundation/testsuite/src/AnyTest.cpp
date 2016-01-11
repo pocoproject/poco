@@ -42,7 +42,7 @@ public:
 };
 
 
-AnyTest::AnyTest(const std::string& name): CppUnit::TestCase(name)
+AnyTest::AnyTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -30,7 +30,7 @@ using Poco::Int64;
 using Poco::UInt64;
 
 
-BinaryReaderWriterTest::BinaryReaderWriterTest(const std::string& name): CppUnit::TestCase(name)
+BinaryReaderWriterTest::BinaryReaderWriterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -20,7 +20,7 @@
 using Poco::Timezone;
 
 
-TimezoneTest::TimezoneTest(const std::string& name): CppUnit::TestCase(name)
+TimezoneTest::TimezoneTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -32,10 +32,10 @@ TimezoneTest::~TimezoneTest()
 
 void TimezoneTest::testTimezone()
 {
-	std::string name = Timezone::name();
+	std::string timezoneName = Timezone::name();
 	std::string stdName = Timezone::standardName();
 	std::string dstName = Timezone::dstName();
-	std::cout << "Timezone Names: " << name << ", " << stdName << ", " << dstName << std::endl;
+	std::cout << "Timezone Names: " << timezoneName << ", " << stdName << ", " << dstName << std::endl;
 	int utcOffset = Timezone::utcOffset();
 	std::cout << "UTC Offset: " << utcOffset << std::endl;
 	int dst = Timezone::dst();

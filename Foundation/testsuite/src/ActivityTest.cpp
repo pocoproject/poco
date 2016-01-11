@@ -60,7 +60,7 @@ namespace
 }
  
 
-ActivityTest::ActivityTest(const std::string& name): CppUnit::TestCase(name)
+ActivityTest::ActivityTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

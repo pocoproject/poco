@@ -26,7 +26,7 @@ using namespace Poco;
 #define LARGEINC 100
 
 
-PriorityEventTest::PriorityEventTest(const std::string& name): CppUnit::TestCase(name)
+PriorityEventTest::PriorityEventTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

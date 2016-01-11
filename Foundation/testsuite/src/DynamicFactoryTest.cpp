@@ -46,7 +46,7 @@ namespace
 }
 
 
-DynamicFactoryTest::DynamicFactoryTest(const std::string& name): CppUnit::TestCase(name)
+DynamicFactoryTest::DynamicFactoryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

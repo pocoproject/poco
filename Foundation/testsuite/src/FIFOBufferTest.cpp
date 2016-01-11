@@ -31,8 +31,8 @@ using Poco::delegate;
 using std::memcpy;
 
 
-FIFOBufferTest::FIFOBufferTest(const std::string& name): 
-	CppUnit::TestCase(name),
+FIFOBufferTest::FIFOBufferTest(const std::string& rName): 
+	CppUnit::TestCase(rName),
 	_notToReadable(0),
 	_notToWritable(0),
 	_readableToNot(0),

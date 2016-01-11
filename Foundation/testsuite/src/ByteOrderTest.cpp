@@ -27,7 +27,7 @@ using Poco::UInt64;
 #endif
 
 
-ByteOrderTest::ByteOrderTest(const std::string& name): CppUnit::TestCase(name)
+ByteOrderTest::ByteOrderTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

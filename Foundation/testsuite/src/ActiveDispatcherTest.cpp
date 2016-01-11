@@ -90,7 +90,7 @@ namespace
 }
 
 
-ActiveDispatcherTest::ActiveDispatcherTest(const std::string& name): CppUnit::TestCase(name)
+ActiveDispatcherTest::ActiveDispatcherTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

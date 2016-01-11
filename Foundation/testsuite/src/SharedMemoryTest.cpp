@@ -25,7 +25,7 @@
 using Poco::SharedMemory;
 
 
-SharedMemoryTest::SharedMemoryTest(const std::string& name): CppUnit::TestCase(name)
+SharedMemoryTest::SharedMemoryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

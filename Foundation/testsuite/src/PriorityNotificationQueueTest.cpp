@@ -49,7 +49,7 @@ namespace
 }
 
 
-PriorityNotificationQueueTest::PriorityNotificationQueueTest(const std::string& name): CppUnit::TestCase(name)
+PriorityNotificationQueueTest::PriorityNotificationQueueTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

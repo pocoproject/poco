@@ -46,7 +46,7 @@ namespace
 }
 
 
-URIStreamOpenerTest::URIStreamOpenerTest(const std::string& name): CppUnit::TestCase(name)
+URIStreamOpenerTest::URIStreamOpenerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

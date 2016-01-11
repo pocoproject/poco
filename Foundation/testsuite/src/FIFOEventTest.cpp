@@ -26,7 +26,7 @@ using namespace Poco;
 #define LARGEINC 100
 
 
-FIFOEventTest::FIFOEventTest(const std::string& name): CppUnit::TestCase(name)
+FIFOEventTest::FIFOEventTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

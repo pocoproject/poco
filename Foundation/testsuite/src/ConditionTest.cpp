@@ -92,7 +92,7 @@ namespace
 }
 
 
-ConditionTest::ConditionTest(const std::string& name): CppUnit::TestCase(name)
+ConditionTest::ConditionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -27,7 +27,7 @@ using Poco::UTF32Char;
 using Poco::UTF32String;
 
 
-UnicodeConverterTest::UnicodeConverterTest(const std::string& name): CppUnit::TestCase(name)
+UnicodeConverterTest::UnicodeConverterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
