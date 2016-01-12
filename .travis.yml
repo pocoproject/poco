@@ -5,7 +5,7 @@ cache:
 
 branches:
   except:
-    - /.*?pp?eyor.*/
+    - /.*pp.eyor.*/
 
 
 before_install:
@@ -45,7 +45,7 @@ matrix:
       compiler: clang
       os: osx
       script:
-        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make -j2
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make -s -j2
         - cat config.*
         - sudo make install
         - ls -l /usr/local/lib/*Poco*
@@ -82,7 +82,7 @@ matrix:
       compiler: gcc
       script:
         # disable tests, gcc-4.6 gets an internal compiler error
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="gcc-4.8 (CMake)"
       compiler: gcc
@@ -92,24 +92,24 @@ matrix:
         - sudo apt-get install -qq -y g++-4.8
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="Linux clang (CMake)"
       compiler: clang
       script:
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabi-g++ (CMake)"
       script:
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=OFF .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=OFF .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabihf-g++ (CMake)"
       script:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=OFF .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=OFF .. && make -s -j2 && cd ..
 
     # TODO osx build
     # TODO run test suite
