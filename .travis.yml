@@ -5,7 +5,7 @@ cache:
 
 branches:
   except:
-    - /*?pp?eyor*/
+    - /.*?pp?eyor.*/
 
 
 before_install:
