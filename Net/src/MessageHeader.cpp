@@ -339,7 +339,7 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 
 		// check if there are standar text before the rfc2047 chunk, and if so, copy it.
 		if (pos > 0) {
-			outs += tmp.substr(0, pos - 1);
+			outs += tmp.substr(0, pos);
 		}
 
 		// remove text already copied.
