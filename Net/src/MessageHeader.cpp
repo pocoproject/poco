@@ -346,7 +346,7 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 		tmp = tmp.substr(pos + 2);
 
 		// find the first separator
-		auto pos1 = tmp.find("?");
+		int pos1 = tmp.find("?");
 		if (pos1 == std::string::npos) {
 			// not found.
 			outs += tmp;
@@ -354,7 +354,7 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 		}
 
 		// find the second separator
-		auto pos2 = tmp.find("?", pos1 + 1);
+		int pos2 = tmp.find("?", pos1 + 1);
 		if (pos2 == std::string::npos) {
 			// not found
 			outs += tmp;
@@ -362,7 +362,7 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 		}
 
 		// find the end of the actual rfc2047 chunk
-		auto pos3 = tmp.find("?=", pos2 + 1);
+		int pos3 = tmp.find("?=", pos2 + 1);
 		if (pos3 == std::string::npos) {
 			// not found.
 			outs += tmp;
