@@ -281,15 +281,15 @@ public:
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
 		BucketVecIterator it(_buckets.begin());
-		BucketVecIterator end(_buckets.end());
-		while (it != end && it->empty())
+		BucketVecIterator itEnd(_buckets.end());
+		while (it != itEnd && it->empty())
 		{
 			++it;
 		}
-		if (it == end)
-			return this->end();
+		if (it == itEnd)
+			return end();
 		else
-			return ConstIterator(it, end, it->begin());
+			return ConstIterator(it, itEnd, it->begin());
 	}
 	
 	ConstIterator end() const
@@ -302,15 +302,15 @@ public:
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
 		BucketVecIterator it(_buckets.begin());
-		BucketVecIterator end(_buckets.end());
-		while (it != end && it->empty())
+		BucketVecIterator itEnd(_buckets.end());
+		while (it != itEnd && it->empty())
 		{
 			++it;
 		}
-		if (it == end)
-			return this->end();
+		if (it == itEnd)
+			return end();
 		else
-			return Iterator(it, end, it->begin());
+			return Iterator(it, itEnd, it->begin());
 	}
 	
 	Iterator end()
@@ -400,8 +400,8 @@ public:
 	void clear()
 		/// Erases all elements.
 	{
-		LinearHashTable empty;
-		swap(empty);
+		LinearHashTable emptyTable;
+		swap(emptyTable);
 	}
 	
 	std::size_t size() const

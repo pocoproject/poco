@@ -35,9 +35,9 @@ Time::Time()
 }
 
 
-Time::Time(int hour, int minute, int second)
+Time::Time(int timeHour, int timeMinute, int timeSecond)
 {
-	assign(hour, minute, second);
+	assign(timeHour, timeMinute, timeSecond);
 }
 
 
@@ -52,35 +52,35 @@ Time::~Time()
 }
 
 
-void Time::assign(int hour, int minute, int second)
+void Time::assign(int timeHour, int timeMinute, int timeSecond)
 {
-	if (hour < 0 || hour > 23) 
+	if (timeHour < 0 || timeHour > 23) 
 		throw InvalidArgumentException("Hour must be between 0 and 23.");
 
-	if (minute < 0 || minute > 59) 
+	if (timeMinute < 0 || timeMinute > 59) 
 		throw InvalidArgumentException("Minute must be between 0 and 59.");
 
-	if (second < 0 || second > 59) 
+	if (timeSecond < 0 || timeSecond > 59) 
 		throw InvalidArgumentException("Second must be between 0 and 59.");
 
-	_hour = hour;
-	_minute = minute;
-	_second = second;
+	_hour = timeHour;
+	_minute = timeMinute;
+	_second = timeSecond;
 }
 
 
 bool Time::operator < (const Time& time) const
 {
-	int hour = time.hour();
+	int timeHour = time.hour();
 
-	if (_hour < hour) return true;
-	else if (_hour > hour) return false;
+	if (_hour < timeHour) return true;
+	else if (_hour > timeHour) return false;
 	else // hours equal
 	{
-		int minute = time.minute();
-		if (_minute < minute) return true;
+		int timeMinute = time.minute();
+		if (_minute < timeMinute) return true;
 		else 
-		if (_minute > minute) return false;
+		if (_minute > timeMinute) return false;
 		else // minutes equal
 		if (_second < time.second()) return true;
 	}
