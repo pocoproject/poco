@@ -94,6 +94,7 @@ class NetSSL_API SSLManager
 	///            <requireTLSv1>true|false</requireTLSv1>
 	///            <requireTLSv1_1>true|false</requireTLSv1_1>
 	///            <requireTLSv1_2>true|false</requireTLSv1_2>
+	///            <disableProtocols>sslv2,sslv3,tlsv1,tlsv1_1,tlsv1_2</disableProtocols>
 	///          </server|client>
 	///          <fips>false</fips>
 	///       </openSSL>
@@ -137,6 +138,8 @@ class NetSSL_API SSLManager
 	///    - requireTLSv1 (boolean): Require a TLSv1 connection.
 	///    - requireTLSv1_1 (boolean): Require a TLSv1.1 connection.
 	///    - requireTLSv1_2 (boolean): Require a TLSv1.2 connection.
+	///    - disableProtocols (string): A comma-separated list of protocols that should be
+	///      disabled. Valid protocol names are sslv2, sslv3, tlsv1, tlsv1_1, tlsv1_2.
 	///    - fips: Enable or disable OpenSSL FIPS mode. Only supported if the OpenSSL version 
 	///      that this library is built against supports FIPS mode.
 {
@@ -320,6 +323,7 @@ private:
 	static const std::string CFG_REQUIRE_TLSV1;
 	static const std::string CFG_REQUIRE_TLSV1_1;
 	static const std::string CFG_REQUIRE_TLSV1_2;
+	static const std::string CFG_DISABLE_PROTOCOLS;
 
 #ifdef OPENSSL_FIPS
 	static const std::string CFG_FIPS_MODE;

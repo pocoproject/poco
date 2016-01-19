@@ -317,6 +317,41 @@ void Context::disableStatelessSessionResumption()
 }
 
 
+void Context::disableProtocols(int protocols)
+{
+	if (protocols & PROTO_SSLV2)
+	{
+#if defined(SSL_OP_NO_SSLv2)
+		SSL_CTX_set_options(_pSSLContext, SSL_OP_NO_SSLv2);
+#endif
+	}
+	if (protocols & PROTO_SSLV3)
+	{
+#if defined(SSL_OP_NO_SSLv3)
+		SSL_CTX_set_options(_pSSLContext, SSL_OP_NO_SSLv3);
+#endif
+	}
+	if (protocols & PROTO_TLSV1)
+	{
+#if defined(SSL_OP_NO_TLSv1)
+		SSL_CTX_set_options(_pSSLContext, SSL_OP_NO_TLSv1);
+#endif
+	}
+	if (protocols & PROTO_TLSV1_1)
+	{
+#if defined(SSL_OP_NO_TLSv1_1)
+		SSL_CTX_set_options(_pSSLContext, SSL_OP_NO_TLSv1_1);
+#endif
+	}
+	if (protocols & PROTO_TLSV1_2)
+	{
+#if defined(SSL_OP_NO_TLSv1_2)
+		SSL_CTX_set_options(_pSSLContext, SSL_OP_NO_TLSv1_2);
+#endif
+	}
+}
+
+
 void Context::createSSLContext()
 {
 	if (SSLManager::isFIPSEnabled())

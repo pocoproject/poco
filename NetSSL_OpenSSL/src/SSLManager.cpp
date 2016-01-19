@@ -23,6 +23,7 @@
 #include "Poco/Net/SSLException.h"
 #include "Poco/SingletonHolder.h"
 #include "Poco/Delegate.h"
+#include "Poco/StringTokenizer.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
 
@@ -57,6 +58,7 @@ const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
 const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
+const std::string SSLManager::CFG_DISABLE_PROTOCOLS("disableProtocols");
 #ifdef OPENSSL_FIPS
 const std::string SSLManager::CFG_FIPS_MODE("openSSL.fips");
 const bool        SSLManager::VAL_FIPS_MODE(false);
@@ -300,6 +302,26 @@ void SSLManager::initDefaultContext(bool server)
 		_ptrDefaultClientContext = new Context(usage, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
 	}
 	
+	std::string disabledProtocolsList = config.getString(prefix + CFG_DISABLE_PROTOCOLS, "");
+	Poco::StringTokenizer dpTok(disabledProtocolsList, ";,", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+	int disabledProtocols = 0;
+	for (Poco::StringTokenizer::Iterator it = dpTok.begin(); it != dpTok.end(); ++it)
+	{
+		if (*it == "sslv2")
+			disabledProtocols |= Context::PROTO_SSLV2;
+		else if (*it == "sslv3")
+			disabledProtocols |= Context::PROTO_SSLV3;
+		else if (*it == "tlsv1")
+			disabledProtocols |= Context::PROTO_TLSV1;
+		else if (*it == "tlsv1_1")
+			disabledProtocols |= Context::PROTO_TLSV1_1;
+		else if (*it == "tlsv1_2")
+			disabledProtocols |= Context::PROTO_TLSV1_2;
+	}
+	if (server)
+		_ptrDefaultServerContext->disableProtocols(disabledProtocols);
+	else
+		_ptrDefaultClientContext->disableProtocols(disabledProtocols);
 		
 	bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 	if (server)

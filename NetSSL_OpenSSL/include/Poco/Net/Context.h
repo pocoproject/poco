@@ -95,6 +95,15 @@ public:
 			///
 			/// Client: Same as VERIFY_RELAXED.	
 	};
+	
+	enum Protocols
+	{
+		PROTO_SSLV2   = 0x01,
+		PROTO_SSLV3   = 0x02,
+		PROTO_TLSV1   = 0x04,
+		PROTO_TLSV1_1 = 0x08,
+		PROTO_TLSV1_2 = 0x10
+	};
 
 	Context(
 		Usage usage,
@@ -265,6 +274,14 @@ public:
 		/// session resumption.
 		///
 		/// The feature can be disabled by calling this method.
+		
+	void disableProtocols(int protocols);
+		/// Disables the given protocols.
+		///
+		/// The protocols to be disabled are specified by OR-ing 
+		/// values from the Protocols enumeration, e.g.:
+		///
+		///   context.disableProtocols(PROTO_SSLV2 | PROTO_SSLV3)
 
 private:
 	void createSSLContext();
