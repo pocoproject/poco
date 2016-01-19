@@ -334,6 +334,12 @@ public:
 		/// values from the Protocols enumeration, e.g.:
 		///
 		///   context.disableProtocols(PROTO_SSLV2 | PROTO_SSLV3);
+		
+	void preferServerCiphers();
+		/// When choosing a cipher, use the server's preferences instead of the client 
+		/// preferences. When not called, the SSL server will always follow the clients 
+		/// preferences. When called, the SSL/TLS server will choose following its own 
+		/// preferences.
 
 private:
 	void init(const Params& params);

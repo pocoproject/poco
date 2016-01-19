@@ -77,6 +77,7 @@ class NetSSL_API SSLManager
 	///            <verificationDepth>1..9</verificationDepth>
 	///            <loadDefaultCAFile>true|false</loadDefaultCAFile>
 	///            <cipherList>ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH</cipherList>
+	///            <preferServerCiphers>true|false</preferServerCiphers>
 	///            <privateKeyPassphraseHandler>
 	///                <name>KeyFileHandler</name>
 	///                <options>
@@ -118,6 +119,10 @@ class NetSSL_API SSLManager
 	///    - loadDefaultCAFile (boolean): Specifies whether the builtin CA certificates from OpenSSL are used.
 	///    - cipherList (string): Specifies the supported ciphers in OpenSSL notation
 	///      (e.g. "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH").
+	///    - preferServerCiphers (bool): When choosing a cipher, use the server's preferences instead of the 
+	///      client preferences. When not called, the SSL server will always follow the clients 
+	///      preferences. When called, the SSL/TLS server will choose following its own 
+	///      preferences.
 	///    - privateKeyPassphraseHandler.name (string): The name of the class (subclass of PrivateKeyPassphraseHandler)
 	///      used for obtaining the passphrase for accessing the private key.
 	///    - privateKeyPassphraseHandler.options.password (string): The password to be used by KeyFileHandler.
@@ -317,6 +322,7 @@ private:
 	static const std::string CFG_CIPHER_LIST;
 	static const std::string CFG_CYPHER_LIST; // for backwards compatibility
 	static const std::string VAL_CIPHER_LIST;
+	static const std::string CFG_PREFER_SERVER_CIPHERS;
 	static const std::string CFG_DELEGATE_HANDLER;
 	static const std::string VAL_DELEGATE_HANDLER;
 	static const std::string CFG_CERTIFICATE_HANDLER;
