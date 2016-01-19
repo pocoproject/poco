@@ -44,6 +44,7 @@ const bool        SSLManager::VAL_ENABLE_DEFAULT_CA(true);
 const std::string SSLManager::CFG_CIPHER_LIST("cipherList");
 const std::string SSLManager::CFG_CYPHER_LIST("cypherList");
 const std::string SSLManager::VAL_CIPHER_LIST("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+const std::string SSLManager::CFG_PREFER_SERVER_CIPHERS("preferServerCiphers");
 const std::string SSLManager::CFG_DELEGATE_HANDLER("privateKeyPassphraseHandler.name");
 const std::string SSLManager::VAL_DELEGATE_HANDLER("KeyConsoleHandler");
 const std::string SSLManager::CFG_CERTIFICATE_HANDLER("invalidCertificateHandler.name");
@@ -355,6 +356,15 @@ void SSLManager::initDefaultContext(bool server)
 		_ptrDefaultServerContext->enableExtendedCertificateVerification(extendedVerification);
 	else
 		_ptrDefaultClientContext->enableExtendedCertificateVerification(extendedVerification);
+
+	bool preferServerCiphers = config.getBool(prefix + CFG_PREFER_SERVER_CIPHERS, false);
+	if (preferServerCiphers)
+	{
+		if (server)
+			_ptrDefaultServerContext->preferServerCiphers();
+		else
+			_ptrDefaultClientContext->preferServerCiphers();
+	}
 }
 
 

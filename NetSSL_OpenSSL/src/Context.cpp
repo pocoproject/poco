@@ -349,6 +349,14 @@ void Context::disableProtocols(int protocols)
 }
 
 
+void Context::preferServerCiphers()
+{
+#if defined(SSL_OP_CIPHER_SERVER_PREFERENCE)
+	SSL_CTX_set_options(_pSSLContext, SSL_OP_CIPHER_SERVER_PREFERENCE);
+#endif
+}
+
+
 void Context::createSSLContext()
 {
 	if (SSLManager::isFIPSEnabled())
