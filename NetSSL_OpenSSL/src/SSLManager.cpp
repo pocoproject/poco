@@ -59,6 +59,8 @@ const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
 const std::string SSLManager::CFG_DISABLE_PROTOCOLS("disableProtocols");
+const std::string SSLManager::CFG_DH_PARAMS_FILE("dhParamsFile");
+const std::string SSLManager::CFG_ECDH_CURVE("ecdhCurve");
 #ifdef OPENSSL_FIPS
 const std::string SSLManager::CFG_FIPS_MODE("openSSL.fips");
 const bool        SSLManager::VAL_FIPS_MODE(false);
@@ -251,30 +253,35 @@ void SSLManager::initDefaultContext(bool server)
 
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
 
+	Context::Params params;
 	// mandatory options
-	std::string privKeyFile = config.getString(prefix + CFG_PRIV_KEY_FILE, "");
-	std::string certFile = config.getString(prefix + CFG_CERTIFICATE_FILE, privKeyFile);	
-	std::string caLocation = config.getString(prefix + CFG_CA_LOCATION, "");
+	params.privateKeyFile = config.getString(prefix + CFG_PRIV_KEY_FILE, "");
+	params.certificateFile = config.getString(prefix + CFG_CERTIFICATE_FILE, params.privateKeyFile);	
+	params.caLocation = config.getString(prefix + CFG_CA_LOCATION, "");
 
-	if (server && certFile.empty() && privKeyFile.empty())
+	if (server && params.certificateFile.empty() && params.privateKeyFile.empty())
 		throw SSLException("Configuration error: no certificate file has been specified");
 
 	// optional options for which we have defaults defined
-	Context::VerificationMode verMode = VAL_VER_MODE;
+	params.verificationMode = VAL_VER_MODE;
 	if (config.hasProperty(prefix + CFG_VER_MODE))
 	{
 		// either: none, relaxed, strict, once
 		std::string mode = config.getString(prefix + CFG_VER_MODE);
-		verMode = Utility::convertVerificationMode(mode);
+		params.verificationMode = Utility::convertVerificationMode(mode);
 	}
 
-	int verDepth = config.getInt(prefix + CFG_VER_DEPTH, VAL_VER_DEPTH);
-	bool loadDefCA = config.getBool(prefix + CFG_ENABLE_DEFAULT_CA, VAL_ENABLE_DEFAULT_CA);
-	std::string cipherList = config.getString(prefix + CFG_CIPHER_LIST, VAL_CIPHER_LIST);
-	cipherList = config.getString(prefix + CFG_CYPHER_LIST, cipherList); // for backwards compatibility
+	params.verificationDepth = config.getInt(prefix + CFG_VER_DEPTH, VAL_VER_DEPTH);
+	params.loadDefaultCAs = config.getBool(prefix + CFG_ENABLE_DEFAULT_CA, VAL_ENABLE_DEFAULT_CA);
+	params.cipherList = config.getString(prefix + CFG_CIPHER_LIST, VAL_CIPHER_LIST);
+	params.cipherList = config.getString(prefix + CFG_CYPHER_LIST, params.cipherList); // for backwards compatibility
 	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
 	bool requireTLSv1_1 = config.getBool(prefix + CFG_REQUIRE_TLSV1_1, false);
 	bool requireTLSv1_2 = config.getBool(prefix + CFG_REQUIRE_TLSV1_2, false);
+
+	params.dhParamsFile = config.getString(prefix + CFG_DH_PARAMS_FILE, "");
+	params.ecdhCurve    = config.getString(prefix + CFG_ECDH_CURVE, "");
+
 	Context::Usage usage;
 	
 	if (server)
@@ -287,7 +294,7 @@ void SSLManager::initDefaultContext(bool server)
 			usage = Context::TLSV1_SERVER_USE;
 		else
 			usage = Context::SERVER_USE;
-		_ptrDefaultServerContext = new Context(usage, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
+		_ptrDefaultServerContext = new Context(usage, params);
 	}
 	else
 	{
@@ -299,7 +306,7 @@ void SSLManager::initDefaultContext(bool server)
 			usage = Context::TLSV1_CLIENT_USE;
 		else
 			usage = Context::CLIENT_USE;
-		_ptrDefaultClientContext = new Context(usage, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
+		_ptrDefaultClientContext = new Context(usage, params);
 	}
 	
 	std::string disabledProtocolsList = config.getString(prefix + CFG_DISABLE_PROTOCOLS, "");
