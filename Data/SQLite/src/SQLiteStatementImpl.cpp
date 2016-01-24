@@ -197,7 +197,11 @@ void SQLiteStatementImpl::bindImpl()
 			if (boundRowCount != (*_bindBegin)->numOfRowsHandled())
 				throw BindingException("Size mismatch in Bindings. All Bindings MUST have the same size");
 
-			(*_bindBegin)->bind(pos);
+			std::size_t namedBindPos = 0;
+			if (!(*_bindBegin)->name().empty())
+				namedBindPos = (std::size_t)sqlite3_bind_parameter_index(_pStmt, (*_bindBegin)->name().c_str());
+
+			(*_bindBegin)->bind((namedBindPos != 0) ? namedBindPos : pos);
 			pos += (*_bindBegin)->numOfColumnsHandled();
 		}
 
