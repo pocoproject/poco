@@ -47,6 +47,14 @@ public:
 		/// Creates the HTTPServerRequestImpl, using the
 		/// given HTTPServerSession.
 
+	HTTPServerRequestImpl(HTTPServerResponseImpl& response, HTTPServerSession& session, HTTPServerParams* pParams, const std::string& headersStr);
+		/// Creates the HTTPServerRequestImpl, using the
+		/// given HTTPServerSession and headers.
+
+	HTTPServerRequestImpl(HTTPServerResponseImpl& response, HTTPServerSession& session, HTTPServerParams* pParams, std::istream& headers);
+		/// Creates the HTTPServerRequestImpl, using the
+		/// given HTTPServerSession and headers.
+
 	~HTTPServerRequestImpl();
 		/// Destroys the HTTPServerRequestImpl.
 		
@@ -92,6 +100,8 @@ private:
 	Poco::AutoPtr<HTTPServerParams> _pParams;
 	SocketAddress                   _clientAddress;
 	SocketAddress                   _serverAddress;
+
+	void initialize(std::istream& headers);
 };
 
 
