@@ -18,9 +18,12 @@ find_path(ODBC_INCLUDE_DIRECTORIES
 	HINTS
 	/usr/include
 	/usr/include/odbc
+	/usr/include/iodbc
 	/usr/local/include
 	/usr/local/include/odbc
+	/usr/local/include/iodbc
 	/usr/local/odbc/include
+	/usr/local/iodbc/include
 	"C:/Program Files/ODBC/include"
 	"C:/Program Files/Microsoft SDKs/Windows/v7.0/include" 
 	"C:/Program Files/Microsoft SDKs/Windows/v6.0a/include" 
@@ -29,13 +32,16 @@ find_path(ODBC_INCLUDE_DIRECTORIES
 )
 
 find_library(ODBC_LIBRARIES 
-	NAMES iodbc odbc odbcinst odbc32
+	NAMES iodbc odbc iodbcinst odbcinst odbc32
 	HINTS
 	/usr/lib
 	/usr/lib/odbc
+	/usr/lib/iodbc
 	/usr/local/lib
 	/usr/local/lib/odbc
+	/usr/local/lib/iodbc
 	/usr/local/odbc/lib
+	/usr/local/iodbc/lib
 	"C:/Program Files/ODBC/lib"
 	"C:/ODBC/lib/debug"
 	"C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib"
