@@ -60,9 +60,9 @@ Option::Option(const Option& option):
 }
 
 
-Option::Option(const std::string& fullName, const std::string& shortName):
-	_shortName(shortName),
-	_fullName(fullName),
+Option::Option(const std::string& rFullName, const std::string& rShortName):
+	_shortName(rShortName),
+	_fullName(rFullName),
 	_required(false),
 	_repeatable(false),
 	_argRequired(false),
@@ -73,11 +73,11 @@ Option::Option(const std::string& fullName, const std::string& shortName):
 }
 
 
-Option::Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required):
-	_shortName(shortName),
-	_fullName(fullName),
-	_description(description),
-	_required(required),
+Option::Option(const std::string& rFullName, const std::string& rShortName, const std::string& rDescription, bool isRequired):
+	_shortName(rShortName),
+	_fullName(rFullName),
+	_description(rDescription),
+	_required(isRequired),
 	_repeatable(false),
 	_argRequired(false),
 	_pValidator(0),
@@ -87,11 +87,11 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 }
 
 
-Option::Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required, const std::string& argName, bool argRequired):
-	_shortName(shortName),
-	_fullName(fullName),
-	_description(description),
-	_required(required),
+Option::Option(const std::string& rFullName, const std::string& rShortName, const std::string& rDescription, bool isRequired, const std::string& argName, bool argRequired):
+	_shortName(rShortName),
+	_fullName(rFullName),
+	_description(rDescription),
+	_required(isRequired),
 	_repeatable(false),
 	_argName(argName),
 	_argRequired(argRequired),
@@ -173,10 +173,10 @@ Option& Option::repeatable(bool flag)
 }
 
 	
-Option& Option::argument(const std::string& name, bool required)
+Option& Option::argument(const std::string& name, bool isRequired)
 {
 	_argName     = name;
-	_argRequired = required;
+	_argRequired = isRequired;
 	return *this;
 }
 
@@ -189,9 +189,9 @@ Option& Option::noArgument()
 }
 
 
-Option& Option::group(const std::string& group)
+Option& Option::group(const std::string& rGroup)
 {
-	_group = group;
+	_group = rGroup;
 	return *this;
 }
 

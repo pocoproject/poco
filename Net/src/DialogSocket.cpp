@@ -32,8 +32,8 @@ DialogSocket::DialogSocket():
 }
 
 
-DialogSocket::DialogSocket(const SocketAddress& address): 
-	StreamSocket(address),
+DialogSocket::DialogSocket(const SocketAddress& rAddress): 
+	StreamSocket(rAddress),
 	_pBuffer(0),
 	_pNext(0),
 	_pEnd(0)

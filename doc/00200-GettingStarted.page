@@ -122,7 +122,7 @@ in the %POCO_BASE%\openssl directory. Visual Studio solutions for
 libraries depending on OpenSSL will look for headers in the 
 %POCO_BASE%\openssl\include directory. During the build of the Crypto 
 library, the pre-built OpenSSL binaries will be copied into
-%POCO_BASE%\bin and \lib directories through a VS Pre-Build Event.
+%POCO_BASE%\bin[64] and \lib[64] directories through a VS Pre-Build Event.
 To build your own version of OpenSSL, run 
 
     %POCO_BASE%\openssl\buildall.cmd
@@ -137,8 +137,10 @@ Productions that comes with a Windows installer
 (http://www.slproweb.com/products/Win32OpenSSL.html). 
 Depending on where you have installed the OpenSSL libraries, 
 you might have to edit the build script (buildwin.cmd), or add the 
-necessary paths to the INCLUDE and LIB environment variables. You might
-also have to edit the %POCO_BASE%\Crypto\include\Poco\Crypto\Crypto.h
+necessary paths to the INCLUDE and LIB environment variables. To disable
+internal automatic linking of supplied binaries, define POCO_EXTERNAL_OPENSSL
+in your build environment. Alternatively, you can either rename your binaries,
+or edit the %POCO_BASE%\Crypto\include\Poco\Crypto\Crypto.h
 file if the names of the OpenSSL libraries from your build differ from
 the names used thereof (look for "#pragma comment" lines in Crypto.h).
 

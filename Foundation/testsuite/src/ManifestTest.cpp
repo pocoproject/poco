@@ -32,7 +32,7 @@ class MfTestObject: public MfTestBase
 };
 
 
-ManifestTest::ManifestTest(const std::string& name): CppUnit::TestCase(name)
+ManifestTest::ManifestTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

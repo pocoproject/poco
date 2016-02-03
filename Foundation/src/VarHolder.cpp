@@ -16,7 +16,7 @@
 
 #include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Dynamic/Var.h"
-#include "Poco/JSONString.h"
+#include "Poco/UTF8String.h"
 
 
 namespace Poco {
@@ -38,31 +38,28 @@ namespace Impl {
 
 void escape(std::string& target, const std::string& source)
 {
-	std::string::const_iterator it(source.begin());
-	std::string::const_iterator end(source.end());
-	for (; it != end; ++it)
-	{
-		target.append(Poco::toJSON(*it));
-	}
+	target = UTF8::escape(source.begin(), source.end());
 }
 
 
 bool isJSONString(const Var& any)
 {
-	return any.type() == typeid(std::string) || 
-		any.type() == typeid(char) || 
-		any.type() == typeid(char*) || 
-		any.type() == typeid(Poco::DateTime) || 
-		any.type() == typeid(Poco::LocalDateTime) || 
+	return any.type() == typeid(std::string) ||
+		any.type() == typeid(char) ||
+		any.type() == typeid(char*) ||
+		any.type() == typeid(Poco::DateTime) ||
+		any.type() == typeid(Poco::LocalDateTime) ||
 		any.type() == typeid(Poco::Timestamp);
 }
 
 
 void appendJSONString(std::string& val, const Var& any)
 {
-	val += '"';
-	escape(val, any.convert<std::string>());
-	val += '"';
+	std::string json(val);
+	val.append(1, '"');
+	escape(json, any.convert<std::string>());
+	val.append(json);
+	val.append(1, '"');
 }
 
 
@@ -74,14 +71,14 @@ void appendJSONKey(std::string& val, const Var& any)
 
 void appendJSONValue(std::string& val, const Var& any)
 {
-	if (any.isEmpty()) 
+	if (any.isEmpty())
 	{
 		val.append("null");
 	}
-	else 
+	else
 	{
 		bool isStr = isJSONString(any);
-		if (isStr) 
+		if (isStr)
 		{
 			appendJSONString(val, any.convert<std::string>());
 		}

@@ -209,14 +209,63 @@ ifndef POCO_BASE
 $(warning WARNING: POCO_BASE is not defined. Assuming current directory.)
 export POCO_BASE=$(shell pwd)
 endif
+#$(info POCO_BASE  = $(POCO_BASE))
 
 ifndef POCO_PREFIX
 export POCO_PREFIX=/usr/local
 endif
+#$(info POCO_PREFIX=$(POCO_PREFIX))
 
 ifndef POCO_BUILD
 export POCO_BUILD=$(POCO_BASE)
 endif
+#$(info POCO_BUILD = $(POCO_BUILD))
+
+#
+# Determine OS
+#
+POCO_HOST_OSNAME = $(shell uname)
+ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
+POCO_HOST_OSNAME = Cygwin
+endif
+
+ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
+POCO_HOST_OSNAME = MinGW
+endif
+#$(info POCO_HOST_OSNAME= $(POCO_HOST_OSNAME))
+
+POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
+#$(info POCO_HOST_OSARCH= $(POCO_HOST_OSARCH))
+
+#
+# If POCO_CONFIG is not set, use the OS name as configuration name
+#
+ifndef POCO_CONFIG
+POCO_CONFIG = $(POCO_HOST_OSNAME)
+endif
+#$(info POCO_CONFIG   = $(POCO_CONFIG))
+
+#
+# Include System Specific Settings
+#
+include $(POCO_BASE)/build/config/$(POCO_CONFIG)
+
+#
+# Determine operating system
+#
+ifndef POCO_TARGET_OSNAME
+OSNAME   := $(POCO_HOST_OSNAME)
+else
+OSNAME   := $(POCO_TARGET_OSNAME)
+endif
+#$(info OSNAME     = $(OSNAME))
+
+ifndef POCO_TARGET_OSARCH
+OSARCH   := $(POCO_HOST_OSARCH)
+else
+OSARCH   := $(POCO_TARGET_OSARCH)
+endif
+#$(info OSARCH     = $(OSARCH))
 
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
@@ -249,8 +298,12 @@ install: libexecs
 			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -f {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
-	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+ifeq ($(OSNAME), Cygwin)
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
+endif
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
 ENDOFSCRIPT
 
@@ -380,7 +433,7 @@ cat >${target}/build_vs100.cmd <<'ENDOFSCRIPT'
 @echo off
 if defined VS100COMNTOOLS (
 call "%VS100COMNTOOLS%\vsvars32.bat")
-buildwin 100 build shared both Win32 samples
+buildwin 100 build shared both Win32 samples devenv
 ENDOFSCRIPT
 
 
@@ -391,7 +444,7 @@ cat >${target}/build_vs110.cmd <<'ENDOFSCRIPT'
 @echo off
 if defined VS110COMNTOOLS (
 call "%VS110COMNTOOLS%\vsvars32.bat")
-buildwin 110 build shared both Win32 samples
+buildwin 110 build shared both Win32 samples devenv
 ENDOFSCRIPT
 
 
@@ -402,7 +455,17 @@ cat >${target}/build_vs120.cmd <<'ENDOFSCRIPT'
 @echo off
 if defined VS120COMNTOOLS (
 call "%VS120COMNTOOLS%\vsvars32.bat")
-buildwin 120 build shared both Win32 samples
+buildwin 120 build shared both Win32 samples devenv
+ENDOFSCRIPT
+
+#
+# Create Visual Studio 14 build script
+#
+cat >${target}/build_vs140.cmd <<'ENDOFSCRIPT'
+@echo off
+if defined VS140COMNTOOLS (
+call "%VS140COMNTOOLS%\vsvars32.bat")
+buildwin 140 build shared both Win32 samples devenv
 ENDOFSCRIPT
 
 
@@ -455,10 +518,11 @@ ENDOFSCRIPT
 # Fix line endings
 #
 if [ "$lineEndConv" != "" ] ; then
-	$lineEndConv ${target}/build_vs71.cmd
-	$lineEndConv ${target}/build_vs80.cmd
 	$lineEndConv ${target}/build_vs90.cmd
 	$lineEndConv ${target}/build_vs100.cmd
+	$lineEndConv ${target}/build_vs110.cmd
+	$lineEndConv ${target}/build_vs120.cmd
+	$lineEndConv ${target}/build_vs140.cmd
 	$lineEndConv ${target}/build_CE_vs90.cmd
 	$lineEndConv ${target}/build_vcexpress2008.cmd
 	$lineEndConv ${target}/build_vcexpress2010.cmd

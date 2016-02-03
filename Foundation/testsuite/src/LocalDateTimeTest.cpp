@@ -36,7 +36,7 @@ using std::strftime;
 #endif
 
 
-LocalDateTimeTest::LocalDateTimeTest(const std::string& name): CppUnit::TestCase(name)
+LocalDateTimeTest::LocalDateTimeTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -51,7 +51,7 @@ namespace
 }
 
 
-NamedEventTest::NamedEventTest(const std::string& name): CppUnit::TestCase(name)
+NamedEventTest::NamedEventTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

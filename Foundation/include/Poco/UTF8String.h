@@ -54,10 +54,24 @@ struct Foundation_API UTF8
 	static std::string& toUpperInPlace(std::string& str);
 	static std::string toLower(const std::string& str);
 	static std::string& toLowerInPlace(std::string& str);
-	
+
 	static void removeBOM(std::string& str);
 		/// Remove the UTF-8 Byte Order Mark sequence (0xEF, 0xBB, 0xBF)
 		/// from the beginning of the string, if it's there.
+
+	static std::string escape(const std::string& s);
+		/// Escapes a string. Special characters like tab, backslash, ... are
+		/// escaped. Unicode characters are escaped to \uxxxx.
+
+	static std::string escape(const std::string::const_iterator& begin, const std::string::const_iterator& end);
+		/// Escapes a string. Special characters like tab, backslash, ... are
+		/// escaped. Unicode characters are escaped to \uxxxx.
+
+	static std::string unescape(const std::string& s);
+		/// Creates an UTF8 string from a string that contains escaped characters.
+
+	static std::string unescape(const std::string::const_iterator& begin, const std::string::const_iterator& end);
+		/// Creates an UTF8 string from a string that contains escaped characters.
 };
 
 

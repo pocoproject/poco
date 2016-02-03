@@ -34,7 +34,7 @@ using Poco::PathSyntaxException;
 using Poco::Environment;
 
 
-PathTest::PathTest(const std::string& name): CppUnit::TestCase(name)
+PathTest::PathTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -1511,15 +1511,15 @@ void PathTest::testForDirectory()
 void PathTest::testExpand()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
-	std::string s = Path::expand("~/.bashrc");
-	assert (s == Path::expand("$HOME/.bashrc"));
-	assert (s == Environment::get("HOME") + "/.bashrc" || 
-	        s == Environment::get("HOME") + "//.bashrc");
+	std::string s = Path::expand("~/.profile");
+	assert (s == Path::expand("$HOME/.profile"));
+	assert (s == Environment::get("HOME") + "/.profile" || 
+	        s == Environment::get("HOME") + "//.profile");
 	Path p(s);
-	s = Path::expand("$HOME/.bashrc");
-	assert (s == Path::expand("~/.bashrc"));
-	s = Path::expand("${HOME}/.bashrc");
-	assert (s == Path::expand("~/.bashrc"));
+	s = Path::expand("$HOME/.profile");
+	assert (s == Path::expand("~/.profile"));
+	s = Path::expand("${HOME}/.profile");
+	assert (s == Path::expand("~/.profile"));
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	std::string s = Path::expand("%TMP%\\foo");
 	assert (s == Environment::get("TMP") + "\\foo");

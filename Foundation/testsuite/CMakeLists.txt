@@ -45,15 +45,17 @@ else()
 add_executable( TestApp src/TestApp.cpp )
 endif()
 # The test is run in the runtime directory. So the TestApp is built there too because it is used by the tests
+set_target_properties( TestApp PROPERTIES DEBUG_POSTFIX "") # don't use DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 set_target_properties( TestApp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
-target_link_libraries( TestApp PocoFoundation )
+target_link_libraries( TestApp PocoFoundation)
 
 if(NOT POCO_STATIC)
 # TestLibrary
 add_library( TestLibrary SHARED src/TestLibrary.cpp src/TestPlugin.cpp src/TestPlugin.h )
-set_target_properties( TestLibrary PROPERTIES PREFIX "" DEBUG_POSTFIX "") # The test requires the library named TestLibrary. By default it is prefixed with lib.
-# The test is run in the runtime directory. So the TestLibrary is built there too because it is used by the tests
+# The test requires the library named TestLibrary. By default it is prefixed with lib.
+set_target_properties( TestLibrary PROPERTIES PREFIX "" DEBUG_POSTFIX "") # don't use DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 set_target_properties( TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
-target_link_libraries( TestLibrary PocoFoundation )
+target_link_libraries( TestLibrary PocoFoundation)
+
 endif()
 

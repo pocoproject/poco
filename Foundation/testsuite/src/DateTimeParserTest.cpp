@@ -27,7 +27,7 @@ using Poco::Timestamp;
 using Poco::SyntaxException;
 
 
-DateTimeParserTest::DateTimeParserTest(const std::string& name): CppUnit::TestCase(name)
+DateTimeParserTest::DateTimeParserTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

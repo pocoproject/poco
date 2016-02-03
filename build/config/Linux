@@ -39,14 +39,20 @@ SHAREDLIBLINKEXT = .so
 # Compiler and Linker Flags
 #
 CFLAGS          = 
-CFLAGS32        =
-CFLAGS64        =
+CFLAGS32        = 
+CFLAGS64        = 
 CXXFLAGS        = -Wall -Wno-sign-compare
-CXXFLAGS32      =
-CXXFLAGS64      =
+CXXFLAGS32      = 
+CXXFLAGS64      = 
+SHLIBFLAGS      = 
+SHLIBFLAGS32    = 
+SHLIBFLAGS64    = 
+LIBFLAGS        = 
+LIBFLAGS32      =
+LIBFLAGS64      =
 LINKFLAGS       =
-LINKFLAGS32     =
-LINKFLAGS64     =
+LINKFLAGS32     = 
+LINKFLAGS64     = 
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  = -static
@@ -63,9 +69,21 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -DPOCO_HAVE_FD_EPOLL
+SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -DPOCO_HAVE_FD_EPOLL -DPOCO_HAVE_ADDRINFO -DPOCO_HAVE_LIBRESOLV
 
 #
 # System Specific Libraries
 #
 SYSLIBS  = -lpthread -ldl -lrt
+
+#
+# Auto-detect architecture if not specified
+#
+ifndef OSARCH_64BITS
+  LBITS := $(shell getconf LONG_BIT)
+  ifeq ($(LBITS),64)
+    OSARCH_64BITS = 1
+  else
+    OSARCH_64BITS = 0
+  endif
+endif

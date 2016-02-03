@@ -19,6 +19,7 @@
 #include "Poco/FileStream.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include <iostream>
 #include <fstream>
 #undef min
 #include <algorithm>
@@ -40,7 +41,7 @@ CompressTest::~CompressTest()
 void CompressTest::testSingleFile()
 {
 	std::ofstream out("appinf.zip", std::ios::binary);
-	Poco::Path theFile(ZipTest::getTestFile("test.zip"));
+	Poco::Path theFile(ZipTest::getTestFile("data", "test.zip"));
 	Compress c(out, true);
 	c.addFile(theFile, theFile.getFileName());
 	ZipArchive a(c.close());
@@ -75,14 +76,14 @@ void CompressTest::testManipulator()
 {
 	{
 		std::ofstream out("appinf.zip", std::ios::binary);
-		Poco::Path theFile(ZipTest::getTestFile("test.zip"));
+		Poco::Path theFile(ZipTest::getTestFile("data", "test.zip"));
 		Compress c(out, true);
 		c.addFile(theFile, theFile.getFileName());
 		ZipArchive a(c.close());
 	}
 	ZipManipulator zm("appinf.zip", true);
 	zm.renameFile("test.zip", "renamedtest.zip");
-	zm.addFile("doc/othertest.zip", ZipTest::getTestFile("test.zip"));
+	zm.addFile("doc/othertest.zip", ZipTest::getTestFile("data", "test.zip"));
 	ZipArchive archive=zm.commit();
 	assert (archive.findHeader("doc/othertest.zip") != archive.headerEnd());
 }
@@ -92,14 +93,14 @@ void CompressTest::testManipulatorDel()
 {
 	{
 		std::ofstream out("appinf.zip", std::ios::binary);
-		Poco::Path theFile(ZipTest::getTestFile("test.zip"));
+		Poco::Path theFile(ZipTest::getTestFile("data", "test.zip"));
 		Compress c(out, true);
 		c.addFile(theFile, theFile.getFileName());
 		ZipArchive a(c.close());
 	}
 	ZipManipulator zm("appinf.zip", true);
 	zm.deleteFile("test.zip");
-	zm.addFile("doc/data.zip", ZipTest::getTestFile("data.zip"));
+	zm.addFile("doc/data.zip", ZipTest::getTestFile("data", "data.zip"));
 	ZipArchive archive=zm.commit();
 	assert (archive.findHeader("test.zip") == archive.headerEnd());
 	assert (archive.findHeader("doc/data.zip") != archive.headerEnd());
@@ -110,13 +111,13 @@ void CompressTest::testManipulatorReplace()
 {
 	{
 		std::ofstream out("appinf.zip", std::ios::binary);
-		Poco::Path theFile(ZipTest::getTestFile("test.zip"));
+		Poco::Path theFile(ZipTest::getTestFile("data", "test.zip"));
 		Compress c(out, true);
 		c.addFile(theFile, theFile.getFileName());
 		ZipArchive a(c.close());
 	}
 	ZipManipulator zm("appinf.zip", true);
-	zm.replaceFile("test.zip", ZipTest::getTestFile("doc.zip"));
+	zm.replaceFile("test.zip", ZipTest::getTestFile("data", "doc.zip"));
 	
 	ZipArchive archive=zm.commit();
 	assert (archive.findHeader("test.zip") != archive.headerEnd());
@@ -128,7 +129,7 @@ void CompressTest::testSetZipComment()
 {
 	std::string comment("Testing...123...");
 	std::ofstream out("comment.zip", std::ios::binary);
-	Poco::Path theFile(ZipTest::getTestFile("test.zip"));
+	Poco::Path theFile(ZipTest::getTestFile("data", "test.zip"));
 	Compress c(out, true);
 	c.addFile(theFile, theFile.getFileName());
 	c.setZipComment(comment);
@@ -158,13 +159,15 @@ void CompressTest::createDataFile(const std::string& path, Poco::UInt64 size)
 
 void CompressTest::testZip64()
 {
+	std::cout << std::endl;
 	std::map<std::string, Poco::UInt64> files;
-	files["data1.bin"] = static_cast<Poco::UInt64>(MB)*4096+1;
-	files["data2.bin"] = static_cast<Poco::UInt64>(MB)*16;
-	files["data3.bin"] = static_cast<Poco::UInt64>(MB)*4096-1;
+	files["data1.bin"] = static_cast<Poco::UInt64>(KB)*4096+1;
+	files["data2.bin"] = static_cast<Poco::UInt64>(KB)*16;
+	files["data3.bin"] = static_cast<Poco::UInt64>(KB)*4096-1;
 	
 	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) 
 	{
+		std::cout << '\t' << "createDataFile(" << it->first << ", " << it->second << ");" << std::endl;
 		createDataFile(it->first, it->second);
 	}
 	std::ofstream out("zip64.zip", std::ios::binary | std::ios::trunc);
@@ -172,6 +175,7 @@ void CompressTest::testZip64()
 	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) 
 	{
 		const std::string& path = it->first;
+		std::cout << '\t' << "addFile(" << path <<  ");" << std::endl;
 		c.addFile(path, path, ZipCommon::CM_STORE);
 	}
 	ZipArchive a(c.close());

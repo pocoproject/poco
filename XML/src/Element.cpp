@@ -27,9 +27,9 @@ namespace Poco {
 namespace XML {
 
 
-Element::Element(Document* pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname):
+Element::Element(Document* pOwnerDocument, const XMLString& rNamespaceURI, const XMLString& rLocalName, const XMLString& qname):
 	AbstractContainerNode(pOwnerDocument),
-	_name(pOwnerDocument->namePool().insert(qname, namespaceURI, localName)),
+	_name(pOwnerDocument->namePool().insert(qname, rNamespaceURI, rLocalName)),
 	_pFirstAttr(0)
 {
 }
@@ -180,9 +180,9 @@ NodeList* Element::getElementsByTagName(const XMLString& name) const
 }
 
 
-NodeList* Element::getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const
+NodeList* Element::getElementsByTagNameNS(const XMLString& rNamespaceURI, const XMLString& rLocalName) const
 {
-	return new ElementsByTagNameListNS(this, namespaceURI, localName);
+	return new ElementsByTagNameListNS(this, rNamespaceURI, rLocalName);
 }
 
 
@@ -228,9 +228,9 @@ unsigned short Element::nodeType() const
 }
 
 
-const XMLString& Element::getAttributeNS(const XMLString& namespaceURI, const XMLString& localName) const
+const XMLString& Element::getAttributeNS(const XMLString& rNamespaceURI, const XMLString& rLocalName) const
 {
-	Attr* pAttr = getAttributeNodeNS(namespaceURI, localName);
+	Attr* pAttr = getAttributeNodeNS(rNamespaceURI, rLocalName);
 	if (pAttr)
 		return pAttr->getValue();
 	else
@@ -238,16 +238,16 @@ const XMLString& Element::getAttributeNS(const XMLString& namespaceURI, const XM
 }
 
 
-void Element::setAttributeNS(const XMLString& namespaceURI, const XMLString& qualifiedName, const XMLString& value)
+void Element::setAttributeNS(const XMLString& rNamespaceURI, const XMLString& qualifiedName, const XMLString& value)
 {
-	Attr* pAttr = getAttributeNodeNS(namespaceURI, qualifiedName);
+	Attr* pAttr = getAttributeNodeNS(rNamespaceURI, qualifiedName);
 	if (pAttr)
 	{
 		pAttr->setValue(value);
 	}
 	else
 	{
-		pAttr = _pOwner->createAttributeNS(namespaceURI, qualifiedName);
+		pAttr = _pOwner->createAttributeNS(rNamespaceURI, qualifiedName);
 		pAttr->setValue(value);
 		setAttributeNodeNS(pAttr);
 		pAttr->release();
@@ -255,17 +255,17 @@ void Element::setAttributeNS(const XMLString& namespaceURI, const XMLString& qua
 }
 
 
-void Element::removeAttributeNS(const XMLString& namespaceURI, const XMLString& localName)
+void Element::removeAttributeNS(const XMLString& rNamespaceURI, const XMLString& rLocalName)
 {
-	Attr* pAttr = getAttributeNodeNS(namespaceURI, localName);
+	Attr* pAttr = getAttributeNodeNS(rNamespaceURI, rLocalName);
 	if (pAttr) removeAttributeNode(pAttr);
 }
 
 
-Attr* Element::getAttributeNodeNS(const XMLString& namespaceURI, const XMLString& localName) const
+Attr* Element::getAttributeNodeNS(const XMLString& rNamespaceURI, const XMLString& rLocalName) const
 {
 	Attr* pAttr = _pFirstAttr;
-	while (pAttr && (pAttr->_name.namespaceURI() != namespaceURI || pAttr->_name.localName() != localName)) pAttr = static_cast<Attr*>(pAttr->_pNext);
+	while (pAttr && (pAttr->_name.namespaceURI() != rNamespaceURI || pAttr->_name.localName() != rLocalName)) pAttr = static_cast<Attr*>(pAttr->_pNext);
 	return pAttr;
 }
 
@@ -304,9 +304,9 @@ bool Element::hasAttribute(const XMLString& name) const
 }
 
 
-bool Element::hasAttributeNS(const XMLString& namespaceURI, const XMLString& localName) const
+bool Element::hasAttributeNS(const XMLString& rNamespaceURI, const XMLString& rLocalName) const
 {
-	return getAttributeNodeNS(namespaceURI, localName) != 0;
+	return getAttributeNodeNS(rNamespaceURI, rLocalName) != 0;
 }
 
 
@@ -356,10 +356,10 @@ Element* Element::getChildElement(const XMLString& name) const
 }
 
 
-Element* Element::getChildElementNS(const XMLString& namespaceURI, const XMLString& localName) const
+Element* Element::getChildElementNS(const XMLString& rNamespaceURI, const XMLString& rLocalName) const
 {
 	Node* pNode = firstChild();
-	while (pNode && !(pNode->nodeType() == Node::ELEMENT_NODE && pNode->namespaceURI() == namespaceURI && pNode->localName() == localName))
+	while (pNode && !(pNode->nodeType() == Node::ELEMENT_NODE && pNode->namespaceURI() == rNamespaceURI && pNode->localName() == rLocalName))
 		pNode = pNode->nextSibling();
 	return static_cast<Element*>(pNode);
 }

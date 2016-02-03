@@ -16,6 +16,7 @@
 #include "Poco/Process.h"
 #include "Poco/Pipe.h"
 #include "Poco/PipeStream.h"
+#include "Poco/Thread.h"
 #include <csignal>
 
 
@@ -26,7 +27,7 @@ using Poco::PipeInputStream;
 using Poco::PipeOutputStream;
 
 
-ProcessTest::ProcessTest(const std::string& name): CppUnit::TestCase(name)
+ProcessTest::ProcessTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -40,9 +41,6 @@ void ProcessTest::testLaunch()
 {
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
@@ -70,9 +68,6 @@ void ProcessTest::testLaunchRedirectIn()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
@@ -99,9 +94,6 @@ void ProcessTest::testLaunchRedirectOut()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
@@ -130,9 +122,6 @@ void ProcessTest::testLaunchEnv()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
@@ -163,9 +152,6 @@ void ProcessTest::testIsRunning()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
@@ -191,14 +177,32 @@ void ProcessTest::testIsRunning()
 }
 
 
+void ProcessTest::testIsRunningAllowsForTermination()
+{
+#if !defined(_WIN32_WCE)
+	std::string name("TestApp");
+	std::string cmd;
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd = "./";
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	std::vector<std::string> args;
+	ProcessHandle ph = Process::launch(cmd, args, 0, 0, 0);
+	while (Process::isRunning(ph))
+		Poco::Thread::sleep(100);
+#endif // !defined(_WIN32_WCE)
+}
+
+
 void ProcessTest::testSignalExitCode()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
-	name += "d";
-#endif
 
 	cmd = "./";
 	cmd += name;
@@ -231,6 +235,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectOut);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchEnv);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunning);
+	CppUnit_addTest(pSuite, ProcessTest, testIsRunningAllowsForTermination);
 	CppUnit_addTest(pSuite, ProcessTest, testSignalExitCode);
 
 	return pSuite;

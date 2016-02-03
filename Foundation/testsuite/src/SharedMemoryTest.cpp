@@ -17,12 +17,15 @@
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include "Poco/Exception.h"
+#include "Poco/Environment.h"
+#include <sstream>
+#include <iostream>
 
 
 using Poco::SharedMemory;
 
 
-SharedMemoryTest::SharedMemoryTest(const std::string& name): CppUnit::TestCase(name)
+SharedMemoryTest::SharedMemoryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -43,7 +46,7 @@ void SharedMemoryTest::testCreate()
 
 void SharedMemoryTest::testCreateFromFile()
 {
-	Poco::Path p = findDataFile("testdata.txt");
+	Poco::Path p = findDataFile("data", "testdata.txt");
 	Poco::File f(p);
 	assert (f.exists() && f.isFile());
 	SharedMemory mem(f, SharedMemory::AM_READ);
@@ -54,24 +57,28 @@ void SharedMemoryTest::testCreateFromFile()
 }
 
 
-Poco::Path SharedMemoryTest::findDataFile(const std::string& afile)
+Poco::Path SharedMemoryTest::findDataFile(const std::string& directory, const std::string& file)
 {
-	Poco::Path root;
-	root.makeAbsolute();
-	Poco::Path result;
-	while (!Poco::Path::find(root.toString(), "data", result))
+	std::ostringstream ostr;
+	ostr << directory << '/' << file;
+	std::string validDir(ostr.str());
+	Poco::Path pathPattern(validDir);
+	if (Poco::File(pathPattern).exists())
 	{
-		root.makeParent();
-		if (root.toString().empty() || root.toString() == "/" || root.toString() == "\\")
-			throw Poco::FileNotFoundException("Didn't find data subdir");
+		return pathPattern;
 	}
-	result.makeDirectory();
-	result.setFileName(afile);
-	Poco::File aFile(result.toString());
-	if (!aFile.exists() || (aFile.exists() && !aFile.isFile()))
-		throw Poco::FileNotFoundException("Didn't find file " + afile);
-	
-	return result;
+
+	ostr.str("");
+	ostr << "/Foundation/testsuite/" << directory << '/' << file;
+	validDir = Poco::Environment::get("POCO_BASE") + ostr.str();
+	pathPattern = validDir;
+
+	if (!Poco::File(pathPattern).exists())
+	{
+		std::cout << "Can't find " << validDir << std::endl;
+		throw Poco::NotFoundException("cannot locate directory containing valid Zip test files");
+	}
+	return pathPattern;
 }
 
 

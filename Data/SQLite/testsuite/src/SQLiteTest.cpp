@@ -3446,6 +3446,37 @@ void SQLiteTest::tearDown()
 {
 }
 
+void SQLiteTest::testIncrementVacuum()
+{
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+
+	tmp << "PRAGMA auto_vacuum = 2", now;
+	int pragma_mode = 0;
+
+	tmp << "PRAGMA auto_vacuum", into(pragma_mode), now;
+	assert (pragma_mode==2);
+
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Image BLOB)", now;
+	CLOB img("0123456789", 10);	
+	int count = 0;
+
+	for (int index = 0; index < 5000; ++index)
+		tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :img)", use(lastName), use(firstName), use(address), use(img), now;
+
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 5000);
+
+	// delete record
+	Statement stmt0(tmp << "DELETE FROM PERSON");
+	assert (5000 == stmt0.execute());
+
+	tmp << "PRAGMA incremental_vacuum(1024);", now;
+}
 
 CppUnit::Test* SQLiteTest::suite()
 {
@@ -3538,6 +3569,9 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);
 	CppUnit_addTest(pSuite, SQLiteTest, testFTS3);
 	CppUnit_addTest(pSuite, SQLiteTest, testJSONRowFormatter);
-
+//
+//	To be fixed by dimanikulin
+//	CppUnit_addTest(pSuite, SQLiteTest, testIncrementVacuum);
+//
 	return pSuite;
 }

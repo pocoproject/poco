@@ -62,7 +62,7 @@ namespace
 }
 
 
-MutexTest::MutexTest(const std::string& name): CppUnit::TestCase(name)
+MutexTest::MutexTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

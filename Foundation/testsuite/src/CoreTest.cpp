@@ -112,7 +112,7 @@ struct Large
 #define ENABLE_BUGCHECK_TEST 0
 
 
-CoreTest::CoreTest(const std::string& name): CppUnit::TestCase(name)
+CoreTest::CoreTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -40,7 +40,7 @@ class AbstractMetaObject
 	/// factory for its class.
 {
 public:
-	AbstractMetaObject(const char* name): _name(name)
+	AbstractMetaObject(const char* pName): _name(pName)
 	{
 	}
 

@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <functional>
 
-ArrayTest::ArrayTest(const std::string& name): CppUnit::TestCase(name)
+ArrayTest::ArrayTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

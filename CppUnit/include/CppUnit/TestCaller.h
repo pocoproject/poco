@@ -56,12 +56,20 @@ class TestCaller: public TestCase
 	typedef void (Fixture::*TestMethod)();
 
 public:
-	TestCaller(const std::string& name, TestMethod test): 
-		TestCase(name), 
+	TestCaller(const std::string& rName, TestMethod test):
+		TestCase(rName),
 		_test(test),
-		_fixture(new Fixture(name))
+		_fixture(new Fixture(rName))
 	{
 	}
+	
+	// Returns the name of the test case instance
+	virtual std::string toString()
+	{
+		const std::type_info& thisClass = typeid(*this); 
+		return std::string(thisClass.name()) + "." + name(); 
+	}
+
 
 protected:
 	void runTest()

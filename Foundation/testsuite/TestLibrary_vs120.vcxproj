@@ -70,10 +70,10 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>PocoFoundationd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>bin\TestLibraryd.dll</OutputFile>
+      <OutputFile>%(OutputFile)</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>bin\TestLibraryd.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>bin\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <ImportLibrary>
       </ImportLibrary>

@@ -20,7 +20,7 @@ CXX     = g++
 LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = $(CXX) -shared -o $@ -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
+SHLIB   = $(CXX) -shared -o $@ 
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   =
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
@@ -33,8 +33,12 @@ MKDIR   = mkdir -p
 # Extension for Shared Libraries
 #
 LIBPREFIX        = cyg
-SHAREDLIBEXT     = .$(target_version).dll
+SHAREDLIBEXT     = -$(target_version).dll
 SHAREDLIBLINKEXT = .dll
+
+IMPPREFIX        = lib
+IMPLIBEXT        = -$(target_version).dll.a
+IMPLIBLINKEXT    = .dll.a
 
 #
 # Compiler and Linker Flags
@@ -42,9 +46,12 @@ SHAREDLIBLINKEXT = .dll
 CFLAGS          = 
 CFLAGS32        =
 CFLAGS64        = 
-CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -Wa,-mbig-obj
-CXXFLAGS32      =
-CXXFLAGS64      = 
+CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING
+CXXFLAGS32      = -Wa,-mbig-obj
+CXXFLAGS64      = -Wa,-mbig-obj
+SHLIBFLAGS      = -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
+SHLIBFLAGS32    = 
+SHLIBFLAGS64    = 
 LINKFLAGS       =
 LINKFLAGS32     =
 LINKFLAGS64     = 

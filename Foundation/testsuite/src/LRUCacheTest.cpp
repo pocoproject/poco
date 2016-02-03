@@ -22,7 +22,7 @@
 using namespace Poco;
 
 
-LRUCacheTest::LRUCacheTest(const std::string& name): CppUnit::TestCase(name)
+LRUCacheTest::LRUCacheTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -46,7 +46,7 @@ using Poco::Int32;
 using Poco::UInt32;
 
 
-TuplesTest::TuplesTest(const std::string& name): CppUnit::TestCase(name)
+TuplesTest::TuplesTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

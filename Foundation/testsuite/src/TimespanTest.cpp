@@ -19,7 +19,7 @@
 using Poco::Timespan;
 
 
-TimespanTest::TimespanTest(const std::string& name): CppUnit::TestCase(name)
+TimespanTest::TimespanTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

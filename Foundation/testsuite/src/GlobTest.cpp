@@ -24,7 +24,7 @@ using Poco::File;
 using Poco::Path;
 
 
-GlobTest::GlobTest(const std::string& name): CppUnit::TestCase(name)
+GlobTest::GlobTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

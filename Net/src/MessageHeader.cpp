@@ -18,7 +18,12 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
+#include "Poco/TextConverter.h"
+#include "Poco/StringTokenizer.h"
+#include "Poco/Base64Decoder.h"
+#include "Poco/UTF8Encoding.h"
 
+#include <sstream>
 
 namespace Poco {
 namespace Net {
@@ -98,7 +103,7 @@ void MessageHeader::read(std::istream& istr)
 				throw MessageException("Folded field value too long/no CRLF found");
 		}
 		Poco::trimRightInPlace(value);
-		add(name, value);
+		add(name, decodeWord(value));
 		++fields;
 	}
 	istr.putback(ch);
@@ -251,6 +256,128 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 	if (mustQuote) result += '"';
 	result.append(value);
 	if (mustQuote) result += '"';
+}
+
+void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset_to) {
+	std::string tempout;
+	StringTokenizer tokens(ins, "?");
+
+
+	std::string charset = toUpper(tokens[0]);
+	std::string encoding = toUpper(tokens[1]);
+	std::string text = tokens[2];
+
+	std::istringstream istr(text);
+
+	if (encoding == "B") {
+		// Base64 encoding.
+		Base64Decoder decoder(istr);
+		for (char c; decoder.get(c); tempout += c) {}
+	}
+	else 	if (encoding == "Q") {
+		// Quoted encoding.				
+		for (char c; istr.get(c);) {
+			if (c == '_') {
+				//RFC 2047  _ is a space.
+				tempout += " ";
+				continue;
+			}
+
+			// FIXME: check that we have enought chars-
+			if (c == '=') {
+				// The next two chars are hex representation of the complete byte.
+				std::string hex;
+				for (int i = 0; i < 2; i++) {
+					istr.get(c);
+					hex += c;
+				}
+				hex = toUpper(hex);
+				tempout += (char)(int)strtol(hex.c_str(), 0, 16);
+				continue;
+			}
+			tempout += c;
+		}
+	}
+	else {
+		// Wrong encoding
+		outs = ins;
+		return;
+	}
+
+	// convert to the right charset.
+	if (charset != charset_to) {
+		try {
+			TextEncoding& enc = TextEncoding::byName(charset);
+			TextEncoding& dec = TextEncoding::byName(charset_to);
+			TextConverter converter(enc, dec);
+			converter.convert(tempout, outs);
+		}
+		catch (...) {
+			// FIXME: Unsuported encoding...
+			outs = tempout;
+		}
+	}
+	else {
+		// Not conversion necesary.
+		outs = tempout;
+	}
+}
+
+
+std::string MessageHeader::decodeWord(const std::string& text, const std::string& charset)
+{
+	std::string outs, tmp = text;
+	do {
+		std::string tmp2;
+		// find the begining of the next rfc2047 chunk 
+		size_t pos = tmp.find("=?");
+		if (pos == std::string::npos) {
+			// No more found, return
+			outs += tmp;
+			break;
+		}
+
+		// check if there are standar text before the rfc2047 chunk, and if so, copy it.
+		if (pos > 0) {
+			outs += tmp.substr(0, pos);
+		}
+
+		// remove text already copied.
+		tmp = tmp.substr(pos + 2);
+
+		// find the first separator
+		size_t pos1 = tmp.find("?");
+		if (pos1 == std::string::npos) {
+			// not found.
+			outs += tmp;
+			break;
+		}
+
+		// find the second separator
+		size_t pos2 = tmp.find("?", pos1 + 1);
+		if (pos2 == std::string::npos) {
+			// not found
+			outs += tmp;
+			break;
+		}
+
+		// find the end of the actual rfc2047 chunk
+		size_t pos3 = tmp.find("?=", pos2 + 1);
+		if (pos3 == std::string::npos) {
+			// not found.
+			outs += tmp;
+			break;
+
+		}
+		// At this place, there are a valid rfc2047 chunk, so decode and copy the result.
+		decodeRFC2047(tmp.substr(0, pos3), tmp2, charset);
+		outs += tmp2;
+
+		// Jump at the rest of the string and repeat the whole process.
+		tmp = tmp.substr(pos3 + 2);
+	} while (true);
+
+	return outs;
 }
 
 

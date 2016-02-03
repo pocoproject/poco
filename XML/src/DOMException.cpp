@@ -43,9 +43,9 @@ const std::string DOMException::MESSAGES[_NUMBER_OF_MESSAGES] =
 };
 
 
-DOMException::DOMException(unsigned short code):
-	XMLException(message(code)),
-	_code(code)
+DOMException::DOMException(unsigned short exceptionCode):
+	XMLException(message(exceptionCode)),
+	_code(exceptionCode)
 {
 }
 

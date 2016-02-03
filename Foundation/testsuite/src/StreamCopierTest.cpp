@@ -20,7 +20,7 @@
 using Poco::StreamCopier;
 
 
-StreamCopierTest::StreamCopierTest(const std::string& name): CppUnit::TestCase(name)
+StreamCopierTest::StreamCopierTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

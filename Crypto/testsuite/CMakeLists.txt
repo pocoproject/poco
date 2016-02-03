@@ -18,7 +18,7 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
 
 add_executable( ${TESTUNIT} ${TEST_SRCS} )
 add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
-target_link_libraries( ${TESTUNIT} PocoCrypto PocoNetSSL PocoXML PocoUtil PocoFoundation CppUnit )
+target_link_libraries( ${TESTUNIT} PocoCrypto PocoXML PocoUtil PocoFoundation CppUnit )
 if(UNIX)
     target_link_libraries( ${TESTUNIT} pthread)
 endif(UNIX)
