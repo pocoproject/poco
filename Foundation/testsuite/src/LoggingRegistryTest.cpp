@@ -27,7 +27,7 @@ using Poco::PatternFormatter;
 using Poco::AutoPtr;
 
 
-LoggingRegistryTest::LoggingRegistryTest(const std::string& name): CppUnit::TestCase(name)
+LoggingRegistryTest::LoggingRegistryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

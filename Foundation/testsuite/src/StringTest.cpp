@@ -64,7 +64,7 @@ using Poco::Stopwatch;
 using Poco::RangeException;
 
 
-StringTest::StringTest(const std::string& name): CppUnit::TestCase(name)
+StringTest::StringTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

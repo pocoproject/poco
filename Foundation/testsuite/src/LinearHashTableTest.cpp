@@ -28,7 +28,7 @@ using Poco::Stopwatch;
 using Poco::NumberFormatter;
 
 
-LinearHashTableTest::LinearHashTableTest(const std::string& name): CppUnit::TestCase(name)
+LinearHashTableTest::LinearHashTableTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

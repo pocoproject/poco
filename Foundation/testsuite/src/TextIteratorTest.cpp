@@ -25,7 +25,7 @@ using Poco::UTF8Encoding;
 using Poco::UTF16Encoding;
 
 
-TextIteratorTest::TextIteratorTest(const std::string& name): CppUnit::TestCase(name)
+TextIteratorTest::TextIteratorTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
