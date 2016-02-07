@@ -1,0 +1,2 @@
+export EXCLUDE_TESTS="Data/MySQL Data/ODBC PDF"
+

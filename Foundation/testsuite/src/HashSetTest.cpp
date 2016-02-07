@@ -21,7 +21,7 @@ using Poco::Hash;
 using Poco::HashSet;
 
 
-HashSetTest::HashSetTest(const std::string& name): CppUnit::TestCase(name)
+HashSetTest::HashSetTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

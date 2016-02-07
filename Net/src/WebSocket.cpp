@@ -211,7 +211,7 @@ WebSocketImpl* WebSocket::completeHandshake(HTTPClientSession& cs, HTTPResponse&
 		throw WebSocketException("No Upgrade: websocket header in handshake response", WS_ERR_NO_HANDSHAKE);
 	std::string accept = response.get("Sec-WebSocket-Accept", "");
 	if (accept != computeAccept(key))
-		throw WebSocketException("Invalid or missing Sec-WebSocket-Accept header in handshake response", WS_ERR_NO_HANDSHAKE);
+		throw WebSocketException("Invalid or missing Sec-WebSocket-Accept header in handshake response", WS_ERR_HANDSHAKE_ACCEPT);
 	return new WebSocketImpl(static_cast<StreamSocketImpl*>(cs.detachSocket().impl()), true);
 }
 

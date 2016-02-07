@@ -19,7 +19,7 @@
 using Poco::UTF8;
 
 
-UTF8StringTest::UTF8StringTest(const std::string& name): CppUnit::TestCase(name)
+UTF8StringTest::UTF8StringTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

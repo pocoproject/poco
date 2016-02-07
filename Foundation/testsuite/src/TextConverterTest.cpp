@@ -27,7 +27,7 @@
 using namespace Poco;
 
 
-TextConverterTest::TextConverterTest(const std::string& name): CppUnit::TestCase(name)
+TextConverterTest::TextConverterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

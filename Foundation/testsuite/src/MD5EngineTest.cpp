@@ -20,7 +20,7 @@ using Poco::MD5Engine;
 using Poco::DigestEngine;
 
 
-MD5EngineTest::MD5EngineTest(const std::string& name): CppUnit::TestCase(name)
+MD5EngineTest::MD5EngineTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

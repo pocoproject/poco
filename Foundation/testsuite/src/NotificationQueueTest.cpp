@@ -49,7 +49,7 @@ namespace
 }
 
 
-NotificationQueueTest::NotificationQueueTest(const std::string& name): CppUnit::TestCase(name)
+NotificationQueueTest::NotificationQueueTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

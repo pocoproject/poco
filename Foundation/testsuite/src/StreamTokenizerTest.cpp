@@ -105,7 +105,7 @@ public:
 };
 
 
-StreamTokenizerTest::StreamTokenizerTest(const std::string& name): CppUnit::TestCase(name)
+StreamTokenizerTest::StreamTokenizerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

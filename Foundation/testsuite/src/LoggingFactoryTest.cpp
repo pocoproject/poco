@@ -61,7 +61,7 @@ namespace
 }
 
 
-LoggingFactoryTest::LoggingFactoryTest(const std::string& name): CppUnit::TestCase(name)
+LoggingFactoryTest::LoggingFactoryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
