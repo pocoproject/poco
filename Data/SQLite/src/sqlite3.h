@@ -111,9 +111,9 @@ extern "C" {
 ** [sqlite3_libversion_number()], [sqlite3_sourceid()],
 ** [sqlite_version()] and [sqlite_source_id()].
 */
-#define SQLITE_VERSION        "3.9.2"
-#define SQLITE_VERSION_NUMBER 3009002
-#define SQLITE_SOURCE_ID      "2015-11-02 18:31:45 bda77dda9697c463c3d0704014d51627fceee328"
+#define SQLITE_VERSION        "3.10.2"
+#define SQLITE_VERSION_NUMBER 3010002
+#define SQLITE_SOURCE_ID      "2016-01-20 15:27:19 17efb4209f97fb4971656086b138599a91a75ff9"
 
 /*
 ** CAPI3REF: Run-Time Library Version Numbers
@@ -478,6 +478,7 @@ SQLITE_API int SQLITE_STDCALL sqlite3_exec(
 #define SQLITE_IOERR_GETTEMPPATH       (SQLITE_IOERR | (25<<8))
 #define SQLITE_IOERR_CONVPATH          (SQLITE_IOERR | (26<<8))
 #define SQLITE_IOERR_VNODE             (SQLITE_IOERR | (27<<8))
+#define SQLITE_IOERR_AUTH              (SQLITE_IOERR | (28<<8))
 #define SQLITE_LOCKED_SHAREDCACHE      (SQLITE_LOCKED |  (1<<8))
 #define SQLITE_BUSY_RECOVERY           (SQLITE_BUSY   |  (1<<8))
 #define SQLITE_BUSY_SNAPSHOT           (SQLITE_BUSY   |  (2<<8))
@@ -793,8 +794,13 @@ struct sqlite3_io_methods {
 ** <li>[[SQLITE_FCNTL_FILE_POINTER]]
 ** The [SQLITE_FCNTL_FILE_POINTER] opcode is used to obtain a pointer
 ** to the [sqlite3_file] object associated with a particular database
-** connection.  See the [sqlite3_file_control()] documentation for
-** additional information.
+** connection.  See also [SQLITE_FCNTL_JOURNAL_POINTER].
+**
+** <li>[[SQLITE_FCNTL_JOURNAL_POINTER]]
+** The [SQLITE_FCNTL_JOURNAL_POINTER] opcode is used to obtain a pointer
+** to the [sqlite3_file] object associated with the journal file (either
+** the [rollback journal] or the [write-ahead log]) for a particular database
+** connection.  See also [SQLITE_FCNTL_FILE_POINTER].
 **
 ** <li>[[SQLITE_FCNTL_SYNC_OMITTED]]
 ** No longer in use.
@@ -880,6 +886,15 @@ struct sqlite3_io_methods {
 ** do anything.  Callers should initialize the char* variable to a NULL
 ** pointer in case this file-control is not implemented.  This file-control
 ** is intended for diagnostic use only.
+**
+** <li>[[SQLITE_FCNTL_VFS_POINTER]]
+** ^The [SQLITE_FCNTL_VFS_POINTER] opcode finds a pointer to the top-level
+** [VFSes] currently in use.  ^(The argument X in
+** sqlite3_file_control(db,SQLITE_FCNTL_VFS_POINTER,X) must be
+** of type "[sqlite3_vfs] **".  This opcodes will set *X
+** to a pointer to the top-level VFS.)^
+** ^When there are multiple VFS shims in the stack, this opcode finds the
+** upper-most shim only.
 **
 ** <li>[[SQLITE_FCNTL_PRAGMA]]
 ** ^Whenever a [PRAGMA] statement is parsed, an [SQLITE_FCNTL_PRAGMA] 
@@ -999,6 +1014,8 @@ struct sqlite3_io_methods {
 #define SQLITE_FCNTL_WAL_BLOCK              24
 #define SQLITE_FCNTL_ZIPVFS                 25
 #define SQLITE_FCNTL_RBU                    26
+#define SQLITE_FCNTL_VFS_POINTER            27
+#define SQLITE_FCNTL_JOURNAL_POINTER        28
 
 /* deprecated names */
 #define SQLITE_GET_LOCKPROXYFILE      SQLITE_FCNTL_GET_LOCKPROXYFILE
@@ -1598,29 +1615,34 @@ struct sqlite3_mem_methods {
 ** </dd>
 **
 ** [[SQLITE_CONFIG_PAGECACHE]] <dt>SQLITE_CONFIG_PAGECACHE</dt>
-** <dd> ^The SQLITE_CONFIG_PAGECACHE option specifies a static memory buffer
+** <dd> ^The SQLITE_CONFIG_PAGECACHE option specifies a memory pool
 ** that SQLite can use for the database page cache with the default page
 ** cache implementation.  
-** This configuration should not be used if an application-define page
-** cache implementation is loaded using the [SQLITE_CONFIG_PCACHE2]
-** configuration option.
+** This configuration option is a no-op if an application-define page
+** cache implementation is loaded using the [SQLITE_CONFIG_PCACHE2].
 ** ^There are three arguments to SQLITE_CONFIG_PAGECACHE: A pointer to
-** 8-byte aligned
-** memory, the size of each page buffer (sz), and the number of pages (N).
+** 8-byte aligned memory (pMem), the size of each page cache line (sz),
+** and the number of cache lines (N).
 ** The sz argument should be the size of the largest database page
 ** (a power of two between 512 and 65536) plus some extra bytes for each
 ** page header.  ^The number of extra bytes needed by the page header
-** can be determined using the [SQLITE_CONFIG_PCACHE_HDRSZ] option 
-** to [sqlite3_config()].
+** can be determined using [SQLITE_CONFIG_PCACHE_HDRSZ].
 ** ^It is harmless, apart from the wasted memory,
-** for the sz parameter to be larger than necessary.  The first
-** argument should pointer to an 8-byte aligned block of memory that
-** is at least sz*N bytes of memory, otherwise subsequent behavior is
-** undefined.
-** ^SQLite will use the memory provided by the first argument to satisfy its
-** memory needs for the first N pages that it adds to cache.  ^If additional
-** page cache memory is needed beyond what is provided by this option, then
-** SQLite goes to [sqlite3_malloc()] for the additional storage space.</dd>
+** for the sz parameter to be larger than necessary.  The pMem
+** argument must be either a NULL pointer or a pointer to an 8-byte
+** aligned block of memory of at least sz*N bytes, otherwise
+** subsequent behavior is undefined.
+** ^When pMem is not NULL, SQLite will strive to use the memory provided
+** to satisfy page cache needs, falling back to [sqlite3_malloc()] if
+** a page cache line is larger than sz bytes or if all of the pMem buffer
+** is exhausted.
+** ^If pMem is NULL and N is non-zero, then each database connection
+** does an initial bulk allocation for page cache memory
+** from [sqlite3_malloc()] sufficient for N cache lines if N is positive or
+** of -1024*N bytes if N is negative, . ^If additional
+** page cache memory is needed beyond what is provided by the initial
+** allocation, then SQLite goes to [sqlite3_malloc()] separately for each
+** additional cache line. </dd>
 **
 ** [[SQLITE_CONFIG_HEAP]] <dt>SQLITE_CONFIG_HEAP</dt>
 ** <dd> ^The SQLITE_CONFIG_HEAP option specifies a static memory buffer 
@@ -4389,8 +4411,8 @@ SQLITE_API unsigned int SQLITE_STDCALL sqlite3_value_subtype(sqlite3_value*);
 ** previously obtained from [sqlite3_value_dup()].  ^If V is a NULL pointer
 ** then sqlite3_value_free(V) is a harmless no-op.
 */
-SQLITE_API SQLITE_EXPERIMENTAL sqlite3_value *SQLITE_STDCALL sqlite3_value_dup(const sqlite3_value*);
-SQLITE_API SQLITE_EXPERIMENTAL void SQLITE_STDCALL sqlite3_value_free(sqlite3_value*);
+SQLITE_API sqlite3_value *SQLITE_STDCALL sqlite3_value_dup(const sqlite3_value*);
+SQLITE_API void SQLITE_STDCALL sqlite3_value_free(sqlite3_value*);
 
 /*
 ** CAPI3REF: Obtain Aggregate Function Context
@@ -5609,6 +5631,17 @@ struct sqlite3_module {
 ** ^Information about the ORDER BY clause is stored in aOrderBy[].
 ** ^Each term of aOrderBy records a column of the ORDER BY clause.
 **
+** The colUsed field indicates which columns of the virtual table may be
+** required by the current scan. Virtual table columns are numbered from
+** zero in the order in which they appear within the CREATE TABLE statement
+** passed to sqlite3_declare_vtab(). For the first 63 columns (columns 0-62),
+** the corresponding bit is set within the colUsed mask if the column may be
+** required by SQLite. If the table has at least 64 columns and any column
+** to the right of the first 63 is required, then bit 63 of colUsed is also
+** set. In other words, column iCol may be required if the expression
+** (colUsed & ((sqlite3_uint64)1 << (iCol>=63 ? 63 : iCol))) evaluates to 
+** non-zero.
+**
 ** The [xBestIndex] method must fill aConstraintUsage[] with information
 ** about what parameters to pass to xFilter.  ^If argvIndex>0 then
 ** the right-hand side of the corresponding aConstraint[] is evaluated
@@ -5688,6 +5721,8 @@ struct sqlite3_index_info {
   sqlite3_int64 estimatedRows;    /* Estimated number of rows returned */
   /* Fields below are only available in SQLite 3.9.0 and later */
   int idxFlags;              /* Mask of SQLITE_INDEX_SCAN_* flags */
+  /* Fields below are only available in SQLite 3.10.0 and later */
+  sqlite3_uint64 colUsed;    /* Input: Mask of columns used by statement */
 };
 
 /*
@@ -5703,12 +5738,15 @@ struct sqlite3_index_info {
 ** an operator that is part of a constraint term in the wHERE clause of
 ** a query that uses a [virtual table].
 */
-#define SQLITE_INDEX_CONSTRAINT_EQ    2
-#define SQLITE_INDEX_CONSTRAINT_GT    4
-#define SQLITE_INDEX_CONSTRAINT_LE    8
-#define SQLITE_INDEX_CONSTRAINT_LT    16
-#define SQLITE_INDEX_CONSTRAINT_GE    32
-#define SQLITE_INDEX_CONSTRAINT_MATCH 64
+#define SQLITE_INDEX_CONSTRAINT_EQ      2
+#define SQLITE_INDEX_CONSTRAINT_GT      4
+#define SQLITE_INDEX_CONSTRAINT_LE      8
+#define SQLITE_INDEX_CONSTRAINT_LT     16
+#define SQLITE_INDEX_CONSTRAINT_GE     32
+#define SQLITE_INDEX_CONSTRAINT_MATCH  64
+#define SQLITE_INDEX_CONSTRAINT_LIKE   65
+#define SQLITE_INDEX_CONSTRAINT_GLOB   66
+#define SQLITE_INDEX_CONSTRAINT_REGEXP 67
 
 /*
 ** CAPI3REF: Register A Virtual Table Implementation
@@ -6572,7 +6610,8 @@ SQLITE_API int SQLITE_STDCALL sqlite3_status64(
 ** The value written into the *pCurrent parameter is undefined.</dd>)^
 **
 ** [[SQLITE_STATUS_PARSER_STACK]] ^(<dt>SQLITE_STATUS_PARSER_STACK</dt>
-** <dd>This parameter records the deepest parser stack.  It is only
+** <dd>The *pHighwater parameter records the deepest parser stack. 
+** The *pCurrent value is undefined.  The *pHighwater value is only
 ** meaningful if SQLite is compiled with [YYTRACKMAXSTACKDEPTH].</dd>)^
 ** </dl>
 **
@@ -7358,17 +7397,42 @@ SQLITE_API int SQLITE_STDCALL sqlite3_strnicmp(const char *, const char *, int);
 /*
 ** CAPI3REF: String Globbing
 *
-** ^The [sqlite3_strglob(P,X)] interface returns zero if string X matches
-** the glob pattern P, and it returns non-zero if string X does not match
-** the glob pattern P.  ^The definition of glob pattern matching used in
+** ^The [sqlite3_strglob(P,X)] interface returns zero if and only if
+** string X matches the [GLOB] pattern P.
+** ^The definition of [GLOB] pattern matching used in
 ** [sqlite3_strglob(P,X)] is the same as for the "X GLOB P" operator in the
-** SQL dialect used by SQLite.  ^The sqlite3_strglob(P,X) function is case
-** sensitive.
+** SQL dialect understood by SQLite.  ^The [sqlite3_strglob(P,X)] function
+** is case sensitive.
 **
 ** Note that this routine returns zero on a match and non-zero if the strings
 ** do not match, the same as [sqlite3_stricmp()] and [sqlite3_strnicmp()].
+**
+** See also: [sqlite3_strlike()].
 */
 SQLITE_API int SQLITE_STDCALL sqlite3_strglob(const char *zGlob, const char *zStr);
+
+/*
+** CAPI3REF: String LIKE Matching
+*
+** ^The [sqlite3_strlike(P,X,E)] interface returns zero if and only if
+** string X matches the [LIKE] pattern P with escape character E.
+** ^The definition of [LIKE] pattern matching used in
+** [sqlite3_strlike(P,X,E)] is the same as for the "X LIKE P ESCAPE E"
+** operator in the SQL dialect understood by SQLite.  ^For "X LIKE P" without
+** the ESCAPE clause, set the E parameter of [sqlite3_strlike(P,X,E)] to 0.
+** ^As with the LIKE operator, the [sqlite3_strlike(P,X,E)] function is case
+** insensitive - equivalent upper and lower case ASCII characters match
+** one another.
+**
+** ^The [sqlite3_strlike(P,X,E)] function matches Unicode characters, though
+** only ASCII characters are case folded.
+**
+** Note that this routine returns zero on a match and non-zero if the strings
+** do not match, the same as [sqlite3_stricmp()] and [sqlite3_strnicmp()].
+**
+** See also: [sqlite3_strglob()].
+*/
+SQLITE_API int SQLITE_STDCALL sqlite3_strlike(const char *zGlob, const char *zStr, unsigned int cEsc);
 
 /*
 ** CAPI3REF: Error Logging Interface
@@ -7790,6 +7854,129 @@ SQLITE_API int SQLITE_STDCALL sqlite3_stmt_scanstatus(
 */
 SQLITE_API void SQLITE_STDCALL sqlite3_stmt_scanstatus_reset(sqlite3_stmt*);
 
+/*
+** CAPI3REF: Flush caches to disk mid-transaction
+**
+** ^If a write-transaction is open on [database connection] D when the
+** [sqlite3_db_cacheflush(D)] interface invoked, any dirty
+** pages in the pager-cache that are not currently in use are written out 
+** to disk. A dirty page may be in use if a database cursor created by an
+** active SQL statement is reading from it, or if it is page 1 of a database
+** file (page 1 is always "in use").  ^The [sqlite3_db_cacheflush(D)]
+** interface flushes caches for all schemas - "main", "temp", and
+** any [attached] databases.
+**
+** ^If this function needs to obtain extra database locks before dirty pages 
+** can be flushed to disk, it does so. ^If those locks cannot be obtained 
+** immediately and there is a busy-handler callback configured, it is invoked
+** in the usual manner. ^If the required lock still cannot be obtained, then
+** the database is skipped and an attempt made to flush any dirty pages
+** belonging to the next (if any) database. ^If any databases are skipped
+** because locks cannot be obtained, but no other error occurs, this
+** function returns SQLITE_BUSY.
+**
+** ^If any other error occurs while flushing dirty pages to disk (for
+** example an IO error or out-of-memory condition), then processing is
+** abandoned and an SQLite [error code] is returned to the caller immediately.
+**
+** ^Otherwise, if no error occurs, [sqlite3_db_cacheflush()] returns SQLITE_OK.
+**
+** ^This function does not set the database handle error code or message
+** returned by the [sqlite3_errcode()] and [sqlite3_errmsg()] functions.
+*/
+SQLITE_API int SQLITE_STDCALL sqlite3_db_cacheflush(sqlite3*);
+
+/*
+** CAPI3REF: Database Snapshot
+** KEYWORDS: {snapshot}
+** EXPERIMENTAL
+**
+** An instance of the snapshot object records the state of a [WAL mode]
+** database for some specific point in history.
+**
+** In [WAL mode], multiple [database connections] that are open on the
+** same database file can each be reading a different historical version
+** of the database file.  When a [database connection] begins a read
+** transaction, that connection sees an unchanging copy of the database
+** as it existed for the point in time when the transaction first started.
+** Subsequent changes to the database from other connections are not seen
+** by the reader until a new read transaction is started.
+**
+** The sqlite3_snapshot object records state information about an historical
+** version of the database file so that it is possible to later open a new read
+** transaction that sees that historical version of the database rather than
+** the most recent version.
+**
+** The constructor for this object is [sqlite3_snapshot_get()].  The
+** [sqlite3_snapshot_open()] method causes a fresh read transaction to refer
+** to an historical snapshot (if possible).  The destructor for 
+** sqlite3_snapshot objects is [sqlite3_snapshot_free()].
+*/
+typedef struct sqlite3_snapshot sqlite3_snapshot;
+
+/*
+** CAPI3REF: Record A Database Snapshot
+** EXPERIMENTAL
+**
+** ^The [sqlite3_snapshot_get(D,S,P)] interface attempts to make a
+** new [sqlite3_snapshot] object that records the current state of
+** schema S in database connection D.  ^On success, the
+** [sqlite3_snapshot_get(D,S,P)] interface writes a pointer to the newly
+** created [sqlite3_snapshot] object into *P and returns SQLITE_OK.
+** ^If schema S of [database connection] D is not a [WAL mode] database
+** that is in a read transaction, then [sqlite3_snapshot_get(D,S,P)]
+** leaves the *P value unchanged and returns an appropriate [error code].
+**
+** The [sqlite3_snapshot] object returned from a successful call to
+** [sqlite3_snapshot_get()] must be freed using [sqlite3_snapshot_free()]
+** to avoid a memory leak.
+**
+** The [sqlite3_snapshot_get()] interface is only available when the
+** SQLITE_ENABLE_SNAPSHOT compile-time option is used.
+*/
+SQLITE_API SQLITE_EXPERIMENTAL int SQLITE_STDCALL sqlite3_snapshot_get(
+  sqlite3 *db,
+  const char *zSchema,
+  sqlite3_snapshot **ppSnapshot
+);
+
+/*
+** CAPI3REF: Start a read transaction on an historical snapshot
+** EXPERIMENTAL
+**
+** ^The [sqlite3_snapshot_open(D,S,P)] interface attempts to move the
+** read transaction that is currently open on schema S of
+** [database connection] D so that it refers to historical [snapshot] P.
+** ^The [sqlite3_snapshot_open()] interface returns SQLITE_OK on success
+** or an appropriate [error code] if it fails.
+**
+** ^In order to succeed, a call to [sqlite3_snapshot_open(D,S,P)] must be
+** the first operation, apart from other sqlite3_snapshot_open() calls,
+** following the [BEGIN] that starts a new read transaction.
+** ^A [snapshot] will fail to open if it has been overwritten by a 
+** [checkpoint].  
+**
+** The [sqlite3_snapshot_open()] interface is only available when the
+** SQLITE_ENABLE_SNAPSHOT compile-time option is used.
+*/
+SQLITE_API SQLITE_EXPERIMENTAL int SQLITE_STDCALL sqlite3_snapshot_open(
+  sqlite3 *db,
+  const char *zSchema,
+  sqlite3_snapshot *pSnapshot
+);
+
+/*
+** CAPI3REF: Destroy a snapshot
+** EXPERIMENTAL
+**
+** ^The [sqlite3_snapshot_free(P)] interface destroys [sqlite3_snapshot] P.
+** The application must eventually free every [sqlite3_snapshot] object
+** using this routine to avoid a memory leak.
+**
+** The [sqlite3_snapshot_free()] interface is only available when the
+** SQLITE_ENABLE_SNAPSHOT compile-time option is used.
+*/
+SQLITE_API SQLITE_EXPERIMENTAL void SQLITE_STDCALL sqlite3_snapshot_free(sqlite3_snapshot*);
 
 /*
 ** Undo the hack that converts floating point types to integer for
