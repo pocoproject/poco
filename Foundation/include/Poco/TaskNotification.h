@@ -102,7 +102,7 @@ private:
 
 class Foundation_API TaskProgressNotification: public TaskNotification
 	/// This notification is posted by the TaskManager for
-	/// every task that has failed with an exception.
+	/// a task when its progress changes.
 {
 public:
 	TaskProgressNotification(Task* pTask, float progress);
