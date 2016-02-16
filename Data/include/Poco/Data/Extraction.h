@@ -49,9 +49,9 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(T& result, const Position& pos = Position(0)):
+	Extraction(T& rResult, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default(), 
 		_extracted(false)
 		/// Creates an Extraction object at specified position.
@@ -59,9 +59,9 @@ public:
 	{
 	}
 
-	Extraction(T& result, const T& def, const Position& pos = Position(0)): 
+	Extraction(T& rResult, const T& def, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default(def), 
 		_extracted(false)
 		/// Creates an Extraction object at specified position.
@@ -139,18 +139,18 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::vector<T>& result, const Position& pos = Position(0)): 
+	Extraction(std::vector<T>& rResult, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default()
 
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::vector<T>& result, const T& def, const Position& pos = Position(0)): 
+	Extraction(std::vector<T>& rResult, const T& def, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default(def)
 	{
 		_rResult.clear();
@@ -230,17 +230,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::vector<bool>& result, const Position& pos = Position(0)): 
+	Extraction(std::vector<bool>& rResult, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::vector<bool>& result, const bool& def, const Position& pos = Position(0)): 
+	Extraction(std::vector<bool>& rResult, const bool& def, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default(def)
 	{
 		_rResult.clear();
@@ -322,17 +322,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::list<T>& result, const Position& pos = Position(0)): 
+	Extraction(std::list<T>& rResult, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::list<T>& result, const T& def, const Position& pos = Position(0)): 
+	Extraction(std::list<T>& rResult, const T& def, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default(def)
 	{
 		_rResult.clear();
@@ -412,17 +412,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::deque<T>& result, const Position& pos = Position(0)): 
+	Extraction(std::deque<T>& rResult, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::deque<T>& result, const T& def, const Position& pos = Position(0)): 
+	Extraction(std::deque<T>& rResult, const T& def, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default(def)
 	{
 		_rResult.clear();
@@ -511,8 +511,8 @@ public:
 	typedef SharedPtr<Type>        Ptr;
 
 
-	InternalExtraction(C& result, Column<C>* pColumn, const Position& pos = Position(0)): 
-		Extraction<C>(result, ValType(), pos), 
+	InternalExtraction(C& rResult, Column<C>* pColumn, const Position& pos = Position(0)): 
+		Extraction<C>(rResult, ValType(), pos), 
 		_pColumn(pColumn)
 		/// Creates InternalExtraction.
 	{
@@ -572,17 +572,17 @@ public:
 	typedef SharedPtr<Type>            Ptr;
 	typedef typename ValType::iterator Iterator;
 
-	Extraction(std::set<T>& result, const Position& pos = Position(0)): 
+	Extraction(std::set<T>& rResult, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::set<T>& result, const T& def, const Position& pos = Position(0)): 
+	Extraction(std::set<T>& rResult, const T& def, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default(def)
 	{
 		_rResult.clear();
@@ -636,17 +636,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::multiset<T>& result, const Position& pos = Position(0)): 
+	Extraction(std::multiset<T>& rResult, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::multiset<T>& result, const T& def, const Position& pos = Position(0)): 
+	Extraction(std::multiset<T>& rResult, const T& def, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default(def)
 	{
 		_rResult.clear();
@@ -700,17 +700,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::map<K, V>& result, const Position& pos = Position(0)): 
+	Extraction(std::map<K, V>& rResult, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::map<K, V>& result, const V& def, const Position& pos = Position(0)): 
+	Extraction(std::map<K, V>& rResult, const V& def, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default(def)
 	{
 		_rResult.clear();
@@ -764,17 +764,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::multimap<K, V>& result, const Position& pos = Position(0)): 
+	Extraction(std::multimap<K, V>& rResult, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::multimap<K, V>& result, const V& def, const Position& pos = Position(0)): 
+	Extraction(std::multimap<K, V>& rResult, const V& def, const Position& pos = Position(0)): 
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+		_rResult(rResult), 
 		_default(def)
 	{
 		_rResult.clear();

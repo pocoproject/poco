@@ -26,17 +26,17 @@ MetaColumn::MetaColumn()
 }
 
 
-MetaColumn::MetaColumn(std::size_t position,
-	const std::string& name,
-	ColumnDataType type,
-	std::size_t length,
-	std::size_t precision,
+MetaColumn::MetaColumn(std::size_t columnPosition,
+	const std::string& rName,
+	ColumnDataType columnType,
+	std::size_t columnLength,
+	std::size_t columnPrecision,
 	bool nullable): 
-	_name(name),
-	_length(length),
-	_precision(precision),
-	_position(position),
-	_type(type),
+	_name(rName),
+	_length(columnLength),
+	_precision(columnPrecision),
+	_position(columnPosition),
+	_type(columnType),
 	_nullable(nullable)
 {
 }

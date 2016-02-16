@@ -22,11 +22,11 @@ namespace Data {
 
 
 AbstractExtraction::AbstractExtraction(Poco::UInt32 limit,
-	Poco::UInt32 position,
+	Poco::UInt32 extractionPosition,
 	bool bulk): 
 	_pExtractor(0), 
 	_limit(limit),
-	_position(position),
+	_position(extractionPosition),
 	_bulk(bulk),
 	_emptyStringIsNull(false),
 	_forceEmptyString(false)

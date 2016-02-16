@@ -154,27 +154,27 @@ inline bool MetaColumn::isNullable() const
 }
 
 
-inline void MetaColumn::setName(const std::string& name)
+inline void MetaColumn::setName(const std::string& rName)
 {
-	_name = name;
+	_name = rName;
 }
 
 
-inline void MetaColumn::setLength(std::size_t length)
+inline void MetaColumn::setLength(std::size_t columnLength)
 {
-	_length = length;
+	_length = columnLength;
 }
 
 
-inline void MetaColumn::setPrecision(std::size_t precision)
+inline void MetaColumn::setPrecision(std::size_t columnPrecision)
 {
-	_precision = precision;
+	_precision = columnPrecision;
 }
 
 
-inline void MetaColumn::setType(ColumnDataType type)
+inline void MetaColumn::setType(ColumnDataType columnType)
 {
-	_type = type;
+	_type = columnType;
 }
 
 

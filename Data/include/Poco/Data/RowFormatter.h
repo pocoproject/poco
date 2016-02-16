@@ -184,15 +184,15 @@ inline void RowFormatter::setTotalRowCount(int count)
 }
 
 
-inline void RowFormatter::setPrefix(const std::string& prefix)
+inline void RowFormatter::setPrefix(const std::string& rPrefix)
 {
-	_prefix = prefix;
+	_prefix = rPrefix;
 }
 
 
-inline void RowFormatter::setPostfix(const std::string& postfix)
+inline void RowFormatter::setPostfix(const std::string& rPostfix)
 {
-	_postfix = postfix;
+	_postfix = rPostfix;
 }
 
 

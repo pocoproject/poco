@@ -147,10 +147,10 @@ public:
 		/// Registers the Binding vector with the Statement.
 
 	template <typename C>
-	Statement& addBinding(C& bindingCont, bool reset)
+	Statement& addBinding(C& bindingCont, bool doReset)
 		/// Registers binding container with the Statement.
 	{
-		if (reset) _pImpl->resetBinding();
+		if (doReset) _pImpl->resetBinding();
 		typename C::iterator itAB = bindingCont.begin();
 		typename C::iterator itABEnd = bindingCont.end();
 		for (; itAB != itABEnd; ++itAB) addBind(*itAB);
@@ -169,10 +169,10 @@ public:
 		/// Registers the vector of extraction vectors with the Statement.
 
 	template <typename C>
-	Statement& addExtraction(C& val, bool reset)
+	Statement& addExtraction(C& val, bool doReset)
 		/// Registers extraction container with the Statement.
 	{
-		if (reset) _pImpl->resetExtraction();
+		if (doReset) _pImpl->resetExtraction();
 		typename C::iterator itAE = val.begin();
 		typename C::iterator itAEEnd = val.end();
 		for (; itAE != itAEEnd; ++itAE) addExtract(*itAE);
@@ -680,9 +680,9 @@ inline const MetaColumn& Statement::metaColumn(const std::string& name) const
 }
 
 
-inline void Statement::setStorage(const std::string& storage)
+inline void Statement::setStorage(const std::string& rStorage)
 {
-	_pImpl->setStorage(storage);
+	_pImpl->setStorage(rStorage);
 }
 
 
