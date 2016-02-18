@@ -114,10 +114,10 @@ void TCPServer::run()
 {
 	while (!_stopped)
 	{
-		Poco::Timespan timeout(250000);
-		if (_socket.poll(timeout, Socket::SELECT_READ))
+		try
 		{
-			try
+			const Poco::Timespan timeout(250000);
+			if (_socket.poll(timeout, Socket::SELECT_READ))
 			{
 				StreamSocket ss = _socket.acceptConnection();
 				// enable nodelay per default: OSX really needs that
@@ -129,18 +129,18 @@ void TCPServer::run()
 				}
 				_pDispatcher->enqueue(ss);
 			}
-			catch (Poco::Exception& exc)
-			{
-				ErrorHandler::handle(exc);
-			}
-			catch (std::exception& exc)
-			{
-				ErrorHandler::handle(exc);
-			}
-			catch (...)
-			{
-				ErrorHandler::handle();
-			}
+		}
+		catch (Poco::Exception& exc)
+		{
+			ErrorHandler::handle(exc);
+		}
+		catch (std::exception& exc)
+		{
+			ErrorHandler::handle(exc);
+		}
+		catch (...)
+		{
+			ErrorHandler::handle();
 		}
 	}
 }
