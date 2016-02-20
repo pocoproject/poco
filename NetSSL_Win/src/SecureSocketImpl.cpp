@@ -13,6 +13,7 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+#define NetSSL_Win_API __declspec(dllexport)
 
 #include "Poco/Net/SecureSocketImpl.h"
 #include "Poco/Net/SSLException.h"
@@ -702,7 +703,7 @@ void SecureSocketImpl::connectSSL(bool completeHandshake)
 
 	if (_peerHostName.empty())
 	{
-		_peerHostName = _pSocket->address().host().toString();
+		_peerHostName = _pSocket->peerAddress().host().toString();
 	}
 
 	initClientContext();
@@ -1522,7 +1523,7 @@ void SecureSocketImpl::stateIllegal()
 
 void SecureSocketImpl::stateConnected()
 {
-	_peerHostName = _pSocket->address().host().toString();
+	_peerHostName = _pSocket->peerAddress().host().toString();
 	initClientContext();
 	performInitialClientHandshake();
 }
