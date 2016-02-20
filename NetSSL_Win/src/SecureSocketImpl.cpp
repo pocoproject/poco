@@ -13,7 +13,6 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-#define NetSSL_Win_API __declspec(dllexport)
 
 #include "Poco/Net/SecureSocketImpl.h"
 #include "Poco/Net/SSLException.h"
