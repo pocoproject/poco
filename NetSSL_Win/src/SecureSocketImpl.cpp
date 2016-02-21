@@ -702,7 +702,7 @@ void SecureSocketImpl::connectSSL(bool completeHandshake)
 
 	if (_peerHostName.empty())
 	{
-		_peerHostName = _pSocket->address().host().toString();
+		_peerHostName = _pSocket->peerAddress().host().toString();
 	}
 
 	initClientContext();
@@ -1522,7 +1522,7 @@ void SecureSocketImpl::stateIllegal()
 
 void SecureSocketImpl::stateConnected()
 {
-	_peerHostName = _pSocket->address().host().toString();
+	_peerHostName = _pSocket->peerAddress().host().toString();
 	initClientContext();
 	performInitialClientHandshake();
 }
