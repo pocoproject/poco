@@ -18,6 +18,7 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/OptionException.h"
+#include "Poco/FileStream.h"
 #include "Poco/Exception.h"
 #if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
@@ -690,7 +691,7 @@ void ServerApplication::beDaemon()
 		exit(0);
 	
 	setsid();
-	umask(0);
+	umask(027);
 	
 	// attach stdin, stdout, stderr to /dev/null
 	// instead of just closing them. This avoids
@@ -719,6 +720,13 @@ void ServerApplication::defineOptions(OptionSet& rOptions)
 			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDaemon)));
 
 	rOptions.addOption(
+		Option("umask", "", "Set the daemon's umask (octal, e.g. 027).")
+			.required(false)
+			.repeatable(false)
+			.argument("mask")
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleUMask)));
+
+	rOptions.addOption(
 		Option("pidfile", "", "Write the process ID of the application to given file.")
 			.required(false)
 			.repeatable(false)
@@ -727,20 +735,35 @@ void ServerApplication::defineOptions(OptionSet& rOptions)
 }
 
 
-void ServerApplication::handleDaemon(const std::string& rName, const std::string& Value)
+void ServerApplication::handleDaemon(const std::string& rName, const std::string&)
 {
 	config().setBool("application.runAsDaemon", true);
 }
 
 
-void ServerApplication::handlePidFile(const std::string& rName, const std::string& value)
+void ServerApplication::handleUMask(const std::string& rName, const std::string& rValue)
 {
-	std::ofstream ostr(value.c_str());
+	int mask = 0;
+	for (std::string::const_iterator it = rValue.begin(); it != rValue.end(); ++it)
+	{
+		mask *= 8;
+		if (*it >= '0' && *it <= '7') 
+			mask += *it - '0';
+		else
+			throw Poco::InvalidArgumentException("umask contains non-octal characters", rValue);
+	}
+	umask(mask);
+}
+
+
+void ServerApplication::handlePidFile(const std::string& rName, const std::string& rValue)
+{
+	Poco::FileOutputStream ostr(rValue);
 	if (ostr.good())
 		ostr << Poco::Process::id() << std::endl;
 	else
-		throw Poco::CreateFileException("Cannot write PID to file", value);
-	Poco::TemporaryFile::registerForDeletion(value);
+		throw Poco::CreateFileException("Cannot write PID to file", rValue);
+	Poco::TemporaryFile::registerForDeletion(rValue);
 }
 
 
