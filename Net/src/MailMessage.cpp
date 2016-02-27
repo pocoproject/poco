@@ -98,9 +98,9 @@ namespace
 				std::string contentDisp = header.get(MailMessage::HEADER_CONTENT_DISPOSITION, "");
 				std::string filename;
 				if (!contentDisp.empty())
-					filename = getFileNameFromContentDisposition(contentDisp);
+					filename = getParamFromHeader(contentDisp, "filename");
 				if (filename.empty()) 
-					filename = getNameFromContentType(contentType);
+					filename = getParamFromHeader(contentType, "name");
 				PartSource* pPS = _pMsg->createPartStore(tmp, contentType, filename);
 				poco_check_ptr (pPS);
 				NameValueCollection::ConstIterator it = header.begin();
@@ -121,27 +121,12 @@ namespace
 		}
 		
 	private:
-		std::string getFileNameFromContentDisposition(const std::string& str)
+		std::string getParamFromHeader(const std::string& header, const std::string& param)
 		{
-			StringTokenizer st(str, ";=", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+			StringTokenizer st(header, ";=", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 			StringTokenizer::Iterator it = st.begin();
 			StringTokenizer::Iterator end = st.end();
-			for (; it != end; ++it) { if (*it == "filename") break; }
-			if (it != end)
-			{
-				++it;
-				if (it == end) return "";
-				return *it;
-			}
-			return "";
-		}
-
-		std::string getNameFromContentType(const std::string& str)
-		{
-			StringTokenizer st(str, ";=", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-			StringTokenizer::Iterator it = st.begin();
-			StringTokenizer::Iterator end = st.end();
-			for (; it != end; ++it) { if (*it == "name") break; }
+			for (; it != end; ++it) { if (*it == param) break; }
 			if (it != end)
 			{
 				++it;
