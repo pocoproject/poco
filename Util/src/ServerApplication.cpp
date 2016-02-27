@@ -18,6 +18,7 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/OptionException.h"
+#include "Poco/FileStream.h"
 #include "Poco/Exception.h"
 #if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
@@ -668,7 +669,7 @@ void ServerApplication::beDaemon()
 		exit(0);
 	
 	setsid();
-	umask(0);
+	umask(027);
 	
 	// attach stdin, stdout, stderr to /dev/null
 	// instead of just closing them. This avoids
@@ -697,6 +698,13 @@ void ServerApplication::defineOptions(OptionSet& options)
 			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDaemon)));
 
 	options.addOption(
+		Option("umask", "", "Set the daemon's umask (octal, e.g. 027).")
+			.required(false)
+			.repeatable(false)
+			.argument("mask")
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleUMask)));
+
+	options.addOption(
 		Option("pidfile", "", "Write the process ID of the application to given file.")
 			.required(false)
 			.repeatable(false)
@@ -711,9 +719,24 @@ void ServerApplication::handleDaemon(const std::string& name, const std::string&
 }
 
 
+void ServerApplication::handleUMask(const std::string& name, const std::string& value)
+{
+	int mask = 0;
+	for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+	{
+		mask *= 8;
+		if (*it >= '0' && *it <= '7') 
+			mask += *it - '0';
+		else
+			throw Poco::InvalidArgumentException("umask contains non-octal characters", value);
+	}
+	umask(mask);
+}
+
+
 void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
 {
-	std::ofstream ostr(value.c_str());
+	Poco::FileOutputStream ostr(value);
 	if (ostr.good())
 		ostr << Poco::Process::id() << std::endl;
 	else
