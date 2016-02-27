@@ -53,6 +53,11 @@ MulticastSocket::MulticastSocket()
 }
 
 
+MulticastSocket::MulticastSocket(Unbound unbound): DatagramSocket(unbound)
+{
+}
+
+
 MulticastSocket::MulticastSocket(SocketAddress::Family family): DatagramSocket(family)
 {
 #if defined(POCO_OS_FAMILY_UNIX)
