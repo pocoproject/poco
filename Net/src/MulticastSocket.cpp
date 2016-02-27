@@ -53,6 +53,11 @@ MulticastSocket::MulticastSocket()
 }
 
 
+MulticastSocket::MulticastSocket(Unbound unbound): DatagramSocket(unbound)
+{
+}
+
+
 MulticastSocket::MulticastSocket(IPAddress::Family family): DatagramSocket(family)
 {
 }

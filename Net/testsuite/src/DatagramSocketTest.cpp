@@ -78,6 +78,21 @@ void DatagramSocketTest::testSendToReceiveFrom()
 }
 
 
+void DatagramSocketTest::testUnbound()
+{
+	UDPEchoServer echoServer;
+	DatagramSocket ss(DatagramSocket::SOCKET_CREATE_UNBOUND);
+	char buffer[256];
+	ss.connect(SocketAddress("localhost", echoServer.port()));
+	int n = ss.sendBytes("hello", 5);
+	assert (n == 5);
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assert (n == 5);
+	assert (std::string(buffer, n) == "hello");
+	ss.close();
+}
+
+
 void DatagramSocketTest::testBroadcast()
 {
 	UDPEchoServer echoServer;
@@ -136,6 +151,7 @@ CppUnit::Test* DatagramSocketTest::suite()
 
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEcho);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testSendToReceiveFrom);
+	CppUnit_addTest(pSuite, DatagramSocketTest, testUnbound);
 #if (POCO_OS != POCO_OS_FREE_BSD) // works only with local net bcast and very randomly
 	CppUnit_addTest(pSuite, DatagramSocketTest, testBroadcast);
 #endif
