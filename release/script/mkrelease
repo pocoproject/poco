@@ -409,6 +409,17 @@ ENDOFSCRIPT
 
 
 #
+# Create Visual Studio 14 build script
+#
+cat >${target}/build_vs140.cmd <<'ENDOFSCRIPT'
+@echo off
+if defined VS140COMNTOOLS (
+call "%VS140COMNTOOLS%\vsvars32.bat")
+buildwin 140 build shared both Win32 samples
+ENDOFSCRIPT
+
+
+#
 # Create Visual Studio 9 WinCE build script
 #
 cat >${target}/build_CE_vs90.cmd <<'ENDOFSCRIPT'
