@@ -94,18 +94,25 @@ namespace
 						cte = MailMessage::ENCODING_BASE64;
 				}
 
+				std::string contentType = header.get(MailMessage::HEADER_CONTENT_TYPE, "");
+				std::string contentDisp = header.get(MailMessage::HEADER_CONTENT_DISPOSITION, "");
+				std::string filename;
+				if (!contentDisp.empty())
+					filename = getFileNameFromContentDisposition(contentDisp);
+				if (filename.empty()) 
+					filename = getNameFromContentType(contentType);
+				PartSource* pPS = _pMsg->createPartStore(tmp, contentType, filename);
+				poco_check_ptr (pPS);
 				NameValueCollection::ConstIterator it = header.begin();
 				NameValueCollection::ConstIterator end = header.end();
-				PartSource* pPS = _pMsg->createPartStore(tmp, 
-					header[MailMessage::HEADER_CONTENT_TYPE], 
-					getFileNameFromDisp(it->second));
-				poco_check_ptr (pPS);
 				for (; it != end; ++it)
 				{
 					if (MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
 					{
-						if (it->second == "inline") _pMsg->addContent(pPS, cte);
-						else _pMsg->addAttachment("", pPS, cte);
+						if (it->second == "inline") 
+							_pMsg->addContent(pPS, cte);
+						else 
+							_pMsg->addAttachment("", pPS, cte);
 					}
 					
 					pPS->headers().set(it->first, it->second);
@@ -114,12 +121,27 @@ namespace
 		}
 		
 	private:
-		std::string getFileNameFromDisp(const std::string& str)
+		std::string getFileNameFromContentDisposition(const std::string& str)
 		{
 			StringTokenizer st(str, ";=", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 			StringTokenizer::Iterator it = st.begin();
 			StringTokenizer::Iterator end = st.end();
 			for (; it != end; ++it) { if (*it == "filename") break; }
+			if (it != end)
+			{
+				++it;
+				if (it == end) return "";
+				return *it;
+			}
+			return "";
+		}
+
+		std::string getNameFromContentType(const std::string& str)
+		{
+			StringTokenizer st(str, ";=", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+			StringTokenizer::Iterator it = st.begin();
+			StringTokenizer::Iterator end = st.end();
+			for (; it != end; ++it) { if (*it == "name") break; }
 			if (it != end)
 			{
 				++it;
