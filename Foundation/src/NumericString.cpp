@@ -140,6 +140,19 @@ void floatToStr(char* buffer, int bufferSize, float value, int lowDec, int highD
 }
 
 
+void floatToFixedStr(char* buffer, int bufferSize, float value, int precision)
+{
+	using namespace double_conversion;
+
+	StringBuilder builder(buffer, bufferSize);
+	int flags = DoubleToStringConverter::UNIQUE_ZERO |
+		DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
+	DoubleToStringConverter dc(flags, POCO_FLT_INF, POCO_FLT_NAN, POCO_FLT_EXP, -std::numeric_limits<float>::digits10, std::numeric_limits<float>::digits10, 0, 0);
+	dc.ToFixed(value, precision, &builder);
+	builder.Finalize();
+}
+
+
 std::string& floatToStr(std::string& str, float value, int precision, int width, char thSep, char decSep)
 {
 	if (!decSep) decSep = '.';
@@ -147,6 +160,24 @@ std::string& floatToStr(std::string& str, float value, int precision, int width,
 
 	char buffer[POCO_MAX_FLT_STRING_LEN];
 	floatToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
+	str = buffer;
+	
+	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
+		replaceInPlace(str, '.', decSep);
+
+	if (thSep) insertThousandSep(str, thSep, decSep);
+	if (precision > 0 || width) pad(str, precision, width, ' ', decSep ? decSep : '.');
+	return str;
+}
+
+
+std::string& floatToFixedStr(std::string& str, float value, int precision, int width, char thSep, char decSep)
+{
+	if (!decSep) decSep = '.';
+	if (precision == 0) value = std::floor(value);
+
+	char buffer[POCO_MAX_FLT_STRING_LEN];
+	floatToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
 	str = buffer;
 	
 	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
@@ -171,6 +202,19 @@ void doubleToStr(char* buffer, int bufferSize, double value, int lowDec, int hig
 }
 
 
+void doubleToFixedStr(char* buffer, int bufferSize, double value, int precision)
+{
+	using namespace double_conversion;
+
+	StringBuilder builder(buffer, bufferSize);
+	int flags = DoubleToStringConverter::UNIQUE_ZERO |
+		DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
+	DoubleToStringConverter dc(flags, POCO_FLT_INF, POCO_FLT_NAN, POCO_FLT_EXP, -std::numeric_limits<double>::digits10, std::numeric_limits<double>::digits10, 0, 0);
+	dc.ToFixed(value, precision, &builder);
+	builder.Finalize();
+}
+
+
 std::string& doubleToStr(std::string& str, double value, int precision, int width, char thSep, char decSep)
 {
 	if (!decSep) decSep = '.';
@@ -178,6 +222,26 @@ std::string& doubleToStr(std::string& str, double value, int precision, int widt
 
 	char buffer[POCO_MAX_FLT_STRING_LEN];
 	doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
+		
+	str = buffer;
+	
+	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
+		replaceInPlace(str, '.', decSep);
+
+	if (thSep) insertThousandSep(str, thSep, decSep);
+	if (precision > 0 || width) pad(str, precision, width, ' ', decSep ? decSep : '.');
+	return str;
+}
+
+
+std::string& doubleToFixedStr(std::string& str, double value, int precision, int width, char thSep, char decSep)
+{
+	if (!decSep) decSep = '.';
+	if (precision == 0) value = std::floor(value);
+
+	char buffer[POCO_MAX_FLT_STRING_LEN];
+	doubleToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
+		
 	str = buffer;
 	
 	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
