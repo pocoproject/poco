@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|x64">
@@ -32,7 +32,7 @@
     <RootNamespace>TestSuite</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
@@ -63,27 +63,27 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
-  <ImportGroup Label="ExtensionSettings"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">TestSuited</TargetName>
@@ -129,17 +129,18 @@
       <AdditionalIncludeDirectories>..\include;..\..\..\CppUnit\include;..\..\..\CppUnit\WinTestRunner\include;..\..\..\Foundation\include;..\..\..\Data\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>CppUnitd.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -167,10 +168,11 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>CppUnit.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -189,17 +191,18 @@
       <AdditionalIncludeDirectories>..\include;..\..\..\CppUnit\include;..\..\..\CppUnit\WinTestRunner\include;..\..\..\Foundation\include;..\..\..\Data\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0600;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>CppUnitmtd.lib;iphlpapi.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -227,10 +230,11 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>CppUnitmt.lib;iphlpapi.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -249,17 +253,18 @@
       <AdditionalIncludeDirectories>..\include;..\..\..\CppUnit\include;..\..\..\CppUnit\WinTestRunner\include;..\..\..\Foundation\include;..\..\..\Data\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0600;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>CppUnitmdd.lib;iphlpapi.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -287,10 +292,11 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>CppUnitmd.lib;iphlpapi.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -304,30 +310,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\ODBCAccessTest.h"/>
-    <ClInclude Include="src\ODBCDB2Test.h"/>
-    <ClInclude Include="src\ODBCMySQLTest.h"/>
-    <ClInclude Include="src\ODBCOracleTest.h"/>
-    <ClInclude Include="src\ODBCPostgreSQLTest.h"/>
-    <ClInclude Include="src\ODBCSQLiteTest.h"/>
-    <ClInclude Include="src\ODBCSQLServerTest.h"/>
-    <ClInclude Include="src\ODBCTest.h"/>
-    <ClInclude Include="src\ODBCTestSuite.h"/>
-    <ClInclude Include="src\SQLExecutor.h"/>
+    <ClInclude Include="src\ODBCAccessTest.h" />
+    <ClInclude Include="src\ODBCDB2Test.h" />
+    <ClInclude Include="src\ODBCMySQLTest.h" />
+    <ClInclude Include="src\ODBCOracleTest.h" />
+    <ClInclude Include="src\ODBCPostgreSQLTest.h" />
+    <ClInclude Include="src\ODBCSQLiteTest.h" />
+    <ClInclude Include="src\ODBCSQLServerTest.h" />
+    <ClInclude Include="src\ODBCTest.h" />
+    <ClInclude Include="src\ODBCTestSuite.h" />
+    <ClInclude Include="src\SQLExecutor.h" />
+    <ClInclude Include="src\ODBCSybaseTest.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Driver.cpp"/>
-    <ClCompile Include="src\ODBCAccessTest.cpp"/>
-    <ClCompile Include="src\ODBCDB2Test.cpp"/>
-    <ClCompile Include="src\ODBCMySQLTest.cpp"/>
-    <ClCompile Include="src\ODBCOracleTest.cpp"/>
-    <ClCompile Include="src\ODBCPostgreSQLTest.cpp"/>
-    <ClCompile Include="src\ODBCSQLiteTest.cpp"/>
-    <ClCompile Include="src\ODBCSQLServerTest.cpp"/>
-    <ClCompile Include="src\ODBCTest.cpp"/>
-    <ClCompile Include="src\ODBCTestSuite.cpp"/>
-    <ClCompile Include="src\SQLExecutor.cpp"/>
+    <ClCompile Include="src\Driver.cpp" />
+    <ClCompile Include="src\ODBCAccessTest.cpp" />
+    <ClCompile Include="src\ODBCDB2Test.cpp" />
+    <ClCompile Include="src\ODBCMySQLTest.cpp" />
+    <ClCompile Include="src\ODBCOracleTest.cpp" />
+    <ClCompile Include="src\ODBCPostgreSQLTest.cpp" />
+    <ClCompile Include="src\ODBCSQLiteTest.cpp" />
+    <ClCompile Include="src\ODBCSQLServerTest.cpp" />
+    <ClCompile Include="src\ODBCTest.cpp" />
+    <ClCompile Include="src\ODBCTestSuite.cpp" />
+    <ClCompile Include="src\SQLExecutor.cpp" />
+    <ClCompile Include="src\ODBCSybaseTest.cpp" />
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
-  <ImportGroup Label="ExtensionTargets"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

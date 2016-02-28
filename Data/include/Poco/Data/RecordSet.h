@@ -191,6 +191,10 @@ public:
 		/// Rows are lazy-created and cached.
 
 	template <class T>
+	const T& value(std::size_t col) const;
+		/// Returns the reference to data value at [col] location.
+
+	template <class T>
 	const T& value(std::size_t col, std::size_t dataRow, bool useFilter = true) const
 		/// Returns the reference to data value at [col, row] location.
 	{
@@ -315,16 +319,16 @@ public:
 		/// Returns true if there is at least one row in the RecordSet,
 		/// false otherwise.
 
-	Poco::Dynamic::Var value(const std::string& name);
+	Poco::Dynamic::Var value(const std::string& name) const;
 		/// Returns the value in the named column of the current row.
 
-	Poco::Dynamic::Var value(std::size_t index);
+	Poco::Dynamic::Var value(std::size_t index) const;
 		/// Returns the value in the given column of the current row.
 
-	Poco::Dynamic::Var operator [] (const std::string& name);
+	Poco::Dynamic::Var operator [] (const std::string& name) const;
 		/// Returns the value in the named column of the current row.
 
-	Poco::Dynamic::Var operator [] (std::size_t index);
+	Poco::Dynamic::Var operator [] (std::size_t index) const;
 		/// Returns the value in the named column of the current row.
 
 	MetaColumn::ColumnDataType columnType(std::size_t pos) const;
@@ -352,6 +356,9 @@ public:
 
 	bool isNull(const std::string& name) const;
 		/// Returns true if column value of the current row is null.
+
+	bool isNull(std::size_t& colNo) const;
+	/// Returns true if column value of the current row is null.
 
 	std::ostream& copyNames(std::ostream& os) const;
 		/// Copies the column names to the target output stream.
@@ -457,6 +464,8 @@ private:
 		}
 	}
 
+	size_t storageRowCount() const;
+
 	bool isAllowed(std::size_t row) const;
 		/// Returns true if the specified row is allowed by the
 		/// currently active filter.
@@ -530,27 +539,33 @@ inline Statement& RecordSet::operator = (const Statement& stmt)
 }
 
 
-inline Poco::Dynamic::Var RecordSet::value(const std::string& name)
+inline Poco::Dynamic::Var RecordSet::value(const std::string& name)  const
 {
 	return value(name, _currentRow);
 }
 
 
-inline Poco::Dynamic::Var RecordSet::value(std::size_t index)
+inline Poco::Dynamic::Var RecordSet::value(std::size_t index) const
 {
 	return value(index, _currentRow);
 }
 
 
-inline Poco::Dynamic::Var RecordSet::operator [] (const std::string& name)
+inline Poco::Dynamic::Var RecordSet::operator [] (const std::string& name)  const
 {
 	return value(name, _currentRow);
 }
 
 
-inline Poco::Dynamic::Var RecordSet::operator [] (std::size_t index)
+inline Poco::Dynamic::Var RecordSet::operator [] (std::size_t index) const
 {
 	return value(index, _currentRow);
+}
+
+template <class T>
+inline const T& RecordSet::value(std::size_t col) const
+{
+	return value<T>(col, _currentRow);
 }
 
 
@@ -602,6 +617,11 @@ inline bool RecordSet::isNull(const std::string& name) const
 }
 
 
+inline bool RecordSet::isNull(std::size_t& colNo) const
+{
+    return isNull(colNo, _currentRow);
+}
+
 inline RecordSet::ConstIterator& RecordSet::begin() const
 {
 	return *_pBegin;
@@ -637,6 +657,11 @@ inline void RecordSet::formatNames() const
 	(*_pBegin)->formatNames();
 }
 
+
+inline size_t RecordSet::storageRowCount() const
+{
+	return impl()->rowsExtracted();
+}
 
 /* TODO
 namespace Keywords {

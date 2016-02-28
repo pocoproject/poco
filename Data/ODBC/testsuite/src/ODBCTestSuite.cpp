@@ -12,6 +12,7 @@
 
 #include "ODBCTestSuite.h"
 #include "ODBCDB2Test.h"
+#include "ODBCSybaseTest.h"
 #include "ODBCMySQLTest.h"
 #include "ODBCOracleTest.h"
 #include "ODBCPostgreSQLTest.h"
@@ -44,6 +45,7 @@ CppUnit::Test* ODBCTestSuite::suite()
 	addTest(pSuite, ODBCPostgreSQLTest::suite());
 	addTest(pSuite, ODBCSQLiteTest::suite());
 	addTest(pSuite, ODBCSQLServerTest::suite());
+	addTest(pSuite, SybaseODBC::suite());
 	addTest(pSuite, ODBCDB2Test::suite());
 // MS Access driver does not support connection status detection
 // disabled for the time being

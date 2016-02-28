@@ -39,6 +39,43 @@ namespace Poco {
 namespace Data {
 
 
+	template <typename CollTp, typename ElemTp = typename CollTp::value_type>
+	struct DefaultInitializer
+	{
+		static void appendElem(CollTp& coll, const ElemTp& defVal)
+		{
+			coll.push_back(defVal);
+		}
+	};
+
+	template <typename CollTp>
+	struct DefaultInitializer<CollTp, CLOB>
+	{
+		static void appendElem(CollTp& coll, const CLOB& defVal)
+		{
+			CLOB v(defVal.rawContent(), defVal.size());
+			coll.push_back(v);
+		}
+	};
+
+	template <typename CollTp>
+	struct DefaultInitializer<CollTp, BLOB>
+	{
+		static void appendElem(CollTp& coll, const BLOB& defVal)
+		{
+			BLOB v(defVal.rawContent(), defVal.size());
+			coll.push_back(v);
+		}
+	};
+
+	template <typename CollTp>
+	inline void appendElem(CollTp& coll, const typename CollTp::value_type& defVal)
+	{
+		DefaultInitializer<CollTp, typename CollTp::value_type>::appendElem(coll, defVal);
+	}
+
+
+
 template <class T>
 class Extraction: public AbstractExtraction
 	/// Concrete Data Type specific extraction of values from a query result set.
@@ -190,7 +227,7 @@ public:
 	std::size_t extract(std::size_t pos)
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
-		_rResult.push_back(_default);
+		appendElem(_rResult, _default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
@@ -372,7 +409,7 @@ public:
 	std::size_t extract(std::size_t pos)
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
-		_rResult.push_back(_default);
+		appendElem(_rResult, _default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
@@ -462,7 +499,7 @@ public:
 	std::size_t extract(std::size_t pos)
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
-		_rResult.push_back(_default);
+		appendElem(_rResult, _default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;

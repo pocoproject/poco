@@ -904,6 +904,11 @@ void DataTest::testRow()
 	assert (row[3] == 3);
 	assert (row[4] == 4);
 
+	const Row& cr = row;
+	assert(cr["field0"] == 0);
+	assert(cr[0] == 0);
+	assert(cr.get(0) == 0);
+
 	try
 	{
 		int i; i = row[5].convert<int>(); // to silence gcc
