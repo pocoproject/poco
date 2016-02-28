@@ -39,6 +39,9 @@ public:
 	EnvironmentHandle();
 		/// Creates the EnvironmentHandle.
 
+	explicit EnvironmentHandle(const SQLHENV* henv);
+	/// Creates the EnvironmentHandle which doesn't own the handle
+
 	~EnvironmentHandle();
 		/// Destroys the EnvironmentHandle.
 
@@ -52,8 +55,7 @@ private:
 	operator SQLHENV& ();
 		/// Conversion operator into reference to native type.
 
-	SQLHENV& handle();
-		/// Returns reference to handle.
+	void init();
 
 	EnvironmentHandle(const EnvironmentHandle&);
 	const EnvironmentHandle& operator=(const EnvironmentHandle&);
@@ -79,12 +81,6 @@ inline const SQLHENV& EnvironmentHandle::handle() const
 
 
 inline EnvironmentHandle::operator SQLHENV& ()
-{
-	return handle();
-}
-
-
-inline SQLHENV& EnvironmentHandle::handle()
 {
 	return _henv;
 }

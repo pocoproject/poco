@@ -23,9 +23,10 @@ namespace Data {
 namespace ODBC {
 
 
-ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position) : 
+	ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position, NumericConversion numericConversion) :
 	MetaColumn(position),
-	_rStmt(rStmt)
+	_rStmt(rStmt),
+	_numericConversion(numericConversion)
 {
 	init();
 }
@@ -92,6 +93,7 @@ void ODBCMetaColumn::init()
 	case SQL_WCHAR:
 	case SQL_WVARCHAR:
 	case SQL_WLONGVARCHAR:
+	case -350:	// IBM DB2 CLOB, which long unicode string
 		setType(MetaColumn::FDT_WSTRING); break;
 	
 	case SQL_TINYINT:
@@ -112,12 +114,46 @@ void ODBCMetaColumn::init()
 	
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
-		if (0 == _columnDesc.decimalDigits)
-			setType(MetaColumn::FDT_INT32);
-		else
-			setType(MetaColumn::FDT_DOUBLE);
-		
-		break;
+	{
+		bool toString = false;
+		switch (_numericConversion)
+		{
+		case NC_BEST_FIT:
+		case NC_BEST_FIT_DBL_LIMIT:
+			if (0 == _columnDesc.decimalDigits)
+			{
+				if (_columnDesc.size <= 9)
+					setType(MetaColumn::FDT_INT32);
+				else if (_columnDesc.size <= 18)
+					setType(MetaColumn::FDT_INT64);
+				else if (_numericConversion != NC_BEST_FIT_DBL_LIMIT)
+					toString = true;
+				else
+					setType(MetaColumn::FDT_DOUBLE);
+			} 
+			else
+			{
+				// we can't have more than 16 digits in double, but we may be asked to
+				if (_columnDesc.size > 16 && _numericConversion != NC_BEST_FIT_DBL_LIMIT) 
+					toString = true;
+				else
+					setType(MetaColumn::FDT_DOUBLE);
+			}
+			break;
+		case NC_FORCE_STRING:
+			toString = true;
+		}
+		if (toString)
+		{
+			setLength(_columnDesc.size + 4);
+#if defined(UNICODE)
+			setType(MetaColumn::FDT_WSTRING);
+#else
+			setType(MetaColumn::FDT_STRING);
+#endif
+		}
+	}
+	break;
 	
 	case SQL_REAL:
 		setType(MetaColumn::FDT_FLOAT); break;
@@ -126,8 +162,12 @@ void ODBCMetaColumn::init()
 	case SQL_VARBINARY:
 	case SQL_LONGVARBINARY:
 	case -98:// IBM DB2 non-standard type
+	case -370: // IBM DB2 XML, documentation advises to bind it as BLOB, not CLOB
 		setType(MetaColumn::FDT_BLOB); break;
-	
+
+	case -99: // IBM DB2 CLOB
+		setType(MetaColumn::FDT_CLOB); break;
+
 	case SQL_TYPE_DATE:
 		setType(MetaColumn::FDT_DATE); break;
 	

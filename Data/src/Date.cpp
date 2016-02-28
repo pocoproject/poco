@@ -37,9 +37,9 @@ Date::Date()
 }
 
 
-Date::Date(int year, int month, int day)
+Date::Date(int dateYear, int dateMonth, int dateDay)
 {
-	assign(year, month, day);
+	assign(dateYear, dateMonth, dateDay);
 }
 
 
@@ -54,36 +54,36 @@ Date::~Date()
 }
 
 
-void Date::assign(int year, int month, int day)
+void Date::assign(int dateYear, int dateMonth, int dateDay)
 {
-	if (year < 0 || year > 9999)
+	if (dateYear < 0 || dateYear > 9999)
 		throw InvalidArgumentException("Year must be between 0 and 9999");
 
-	if (month < 1 || month > 12)
+	if (dateMonth < 1 || dateMonth > 12)
 		throw InvalidArgumentException("Month must be between 1 and 12");
 
-	if (day < 1 || day > DateTime::daysOfMonth(year, month))
+	if (dateDay < 1 || dateDay > DateTime::daysOfMonth(dateYear, dateMonth))
 		throw InvalidArgumentException("Month must be between 1 and " + 
-			NumberFormatter::format(DateTime::daysOfMonth(year, month)));
+			NumberFormatter::format(DateTime::daysOfMonth(dateYear, dateMonth)));
 
-	_year = year;
-	_month = month;
-	_day = day;
+	_year = dateYear;
+	_month = dateMonth;
+	_day = dateDay;
 }
 
 
 bool Date::operator < (const Date& date) const
 {
-	int year = date.year();
+	int dateYear = date.year();
 
-	if (_year < year) return true;
-	else if (_year > year) return false;
+	if (_year < dateYear) return true;
+	else if (_year > dateYear) return false;
 	else // years equal
 	{
-		int month = date.month();
-		if (_month < month) return true;
+		int dateMonth = date.month();
+		if (_month < dateMonth) return true;
 		else 
-		if (_month > month) return false;
+		if (_month > dateMonth) return false;
 		else // months equal
 		if (_day < date.day()) return true;
 	}

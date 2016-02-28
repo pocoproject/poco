@@ -21,7 +21,7 @@ namespace Poco {
 namespace Data {
 
 
-Position::Position(Poco::UInt32 value): _value(value)
+Position::Position(Poco::UInt32 positionValue): _value(positionValue)
 {
 }
 

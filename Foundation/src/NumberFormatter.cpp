@@ -340,6 +340,21 @@ void NumberFormatter::append(std::string& str, float value)
 }
 
 
+void NumberFormatter::append(std::string& str, float value, int precision)
+{
+	char buffer[NF_MAX_FLT_STRING_LEN];
+	floatToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
+	str.append(buffer);
+}
+
+
+void NumberFormatter::append(std::string& str, float value, int width, int precision)
+{
+	std::string result;
+	str.append(floatToFixedStr(result, value, precision, width));
+}
+
+
 void NumberFormatter::append(std::string& str, double value)
 {
 	char buffer[NF_MAX_FLT_STRING_LEN];
@@ -350,15 +365,16 @@ void NumberFormatter::append(std::string& str, double value)
 
 void NumberFormatter::append(std::string& str, double value, int precision)
 {
-	std::string result;
-	str.append(doubleToStr(result, value, precision));
+	char buffer[NF_MAX_FLT_STRING_LEN];
+	doubleToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
+	str.append(buffer);
 }
 
 
 void NumberFormatter::append(std::string& str, double value, int width, int precision)
 {
 	std::string result;
-	str.append(doubleToStr(result, value, precision, width));
+	str.append(doubleToFixedStr(result, value, precision, width));
 }
 
 

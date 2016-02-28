@@ -270,7 +270,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	{
 		rc = SSL_write(_pSSL, buffer, length);
 	}
-	while (rc <= 0 && _pSocket->lastError() == POCO_EINTR);
+	while (mustRetry(rc));
 	if (rc <= 0) 
 	{
 		rc = handleError(rc);
@@ -298,7 +298,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	{
 		rc = SSL_read(_pSSL, buffer, length);
 	}
-	while (rc <= 0 && _pSocket->lastError() == POCO_EINTR);
+	while (mustRetry(rc));
 	if (rc <= 0) 
 	{
 		return handleError(rc);
@@ -325,7 +325,7 @@ int SecureSocketImpl::completeHandshake()
 	{
 		rc = SSL_do_handshake(_pSSL);
 	}
-	while (rc <= 0 && _pSocket->lastError() == POCO_EINTR);
+	while (mustRetry(rc));
 	if (rc <= 0) 
 	{
 		return handleError(rc);
@@ -390,6 +390,42 @@ X509* SecureSocketImpl::peerCertificate() const
 }
 
 
+bool SecureSocketImpl::mustRetry(int rc)
+{
+	if (rc <= 0)
+	{
+		int sslError = SSL_get_error(_pSSL, rc);
+		int socketError = _pSocket->lastError();
+		switch (sslError)
+		{
+		case SSL_ERROR_WANT_READ:
+			if (_pSocket->getBlocking())
+			{
+				if (_pSocket->poll(_pSocket->getReceiveTimeout(), Poco::Net::Socket::SELECT_READ))
+					return true;
+				else
+					throw Poco::TimeoutException();
+			}
+			break;
+		case SSL_ERROR_WANT_WRITE:
+			if (_pSocket->getBlocking())
+			{
+				if (_pSocket->poll(_pSocket->getSendTimeout(), Poco::Net::Socket::SELECT_WRITE))
+					return true;
+				else
+					throw Poco::TimeoutException();
+			}
+			break;
+		case SSL_ERROR_SYSCALL:
+			return socketError == POCO_EAGAIN || socketError == POCO_EINTR;
+		default:
+			return socketError == POCO_EINTR;
+		}
+	}
+	return false;
+}
+
+
 int SecureSocketImpl::handleError(int rc)
 {
 	if (rc > 0) return rc;
@@ -402,13 +438,6 @@ int SecureSocketImpl::handleError(int rc)
 	case SSL_ERROR_ZERO_RETURN:
 		return 0;
 	case SSL_ERROR_WANT_READ:
-		if (_pSocket->getBlocking() && error != 0)
-		{
-			if (error == POCO_EAGAIN)
-				throw TimeoutException(error);
-			else
-				SocketImpl::error(error);
-		}
 		return SecureStreamSocket::ERR_SSL_WANT_READ;
 	case SSL_ERROR_WANT_WRITE:
 		return SecureStreamSocket::ERR_SSL_WANT_WRITE;
@@ -421,11 +450,7 @@ int SecureSocketImpl::handleError(int rc)
 	case SSL_ERROR_SYSCALL:
 		if (error != 0)
 		{
-			if (_pSocket->getBlocking() && error == POCO_EAGAIN)
-				throw TimeoutException(error);
-			else
-				SocketImpl::error(error);
-			return rc;
+			SocketImpl::error(error);
 		}
 		// fallthrough
 	default:

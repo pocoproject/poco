@@ -43,7 +43,7 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
-	if (!Utility::isError(rc = SQLDrivers(henv, 
+	if (!Utility::isError(rc = Poco::Data::ODBC::SQLDrivers(henv,
 		SQL_FETCH_FIRST,
 		desc,
 		length,
@@ -59,7 +59,7 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 			std::memset(desc, 0, length);
 			std::memset(attr, 0, length);
 			len2 = length;
-		}while (!Utility::isError(rc = SQLDrivers(henv, 
+		}while (!Utility::isError(rc = Poco::Data::ODBC::SQLDrivers(henv,
 			SQL_FETCH_NEXT,
 			desc,
 			length,
