@@ -50,10 +50,6 @@ public:
 		/// in release 2.0. Previously, the constructor created
 		/// an unbound IPv4 multicast socket.
 
-	//@ deprecated		
-	explicit MulticastSocket(Unbound unbound);
-		/// Creates an unconnected, unbound multicast datagram socket.
-
 	explicit MulticastSocket(SocketAddress::Family family);
 		/// Creates an unconnected datagram socket.
 		///

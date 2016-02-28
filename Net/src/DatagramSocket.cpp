@@ -31,11 +31,6 @@ DatagramSocket::DatagramSocket(): Socket(new DatagramSocketImpl)
 }
 
 
-DatagramSocket::DatagramSocket(Unbound): Socket(new DatagramSocketImpl)
-{
-}
-
-
 DatagramSocket::DatagramSocket(SocketAddress::Family family): Socket(new DatagramSocketImpl(family))
 {
 }
