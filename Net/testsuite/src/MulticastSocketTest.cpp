@@ -50,7 +50,7 @@ MulticastSocketTest::~MulticastSocketTest()
 void MulticastSocketTest::testMulticast()
 {
 	MulticastEchoServer echoServer;
-	MulticastSocket ms;
+	MulticastSocket ms(SocketAddress::IPv4);
 	int n = ms.sendTo("hello", 5, echoServer.group());
 	assert (n == 5);
 	char buffer[256];

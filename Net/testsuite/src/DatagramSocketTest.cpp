@@ -64,7 +64,7 @@ void DatagramSocketTest::testEcho()
 void DatagramSocketTest::testSendToReceiveFrom()
 {
 	UDPEchoServer echoServer(SocketAddress("localhost", 0));
-	DatagramSocket ss;
+	DatagramSocket ss(SocketAddress::IPv4);
 	int n = ss.sendTo("hello", 5, SocketAddress("localhost", echoServer.port()));
 	assert (n == 5);
 	char buffer[256];
@@ -81,7 +81,7 @@ void DatagramSocketTest::testSendToReceiveFrom()
 void DatagramSocketTest::testUnbound()
 {
 	UDPEchoServer echoServer;
-	DatagramSocket ss(DatagramSocket::SOCKET_CREATE_UNBOUND);
+	DatagramSocket ss;
 	char buffer[256];
 	ss.connect(SocketAddress("localhost", echoServer.port()));
 	int n = ss.sendBytes("hello", 5);

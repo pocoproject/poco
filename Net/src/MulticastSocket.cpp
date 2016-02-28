@@ -53,7 +53,7 @@ MulticastSocket::MulticastSocket()
 }
 
 
-MulticastSocket::MulticastSocket(Unbound unbound): DatagramSocket(unbound)
+MulticastSocket::MulticastSocket(Unbound unbound): DatagramSocket()
 {
 }
 

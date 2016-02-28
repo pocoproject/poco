@@ -41,8 +41,16 @@ class Net_API MulticastSocket: public DatagramSocket
 {
 public:
 	MulticastSocket();
-		/// Creates the multicast socket.
-		
+		/// Creates an unconnected, unbound multicast socket.
+		///
+		/// Before the multicast socket can be used, bind(),
+		/// bind6() or connect() must be called.
+		///
+		/// Notice: The behavior of this constructor has changed
+		/// in release 2.0. Previously, the constructor created
+		/// an unbound IPv4 multicast socket.
+
+	//@ deprecated		
 	explicit MulticastSocket(Unbound unbound);
 		/// Creates an unconnected, unbound multicast datagram socket.
 
