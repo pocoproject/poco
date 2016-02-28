@@ -208,6 +208,15 @@ public:
 		/// Formats a float value in decimal floating-point notation,
 		/// according to std::printf's %g format with a precision of 8 fractional digits.
 
+	static std::string format(float value, int precision);
+		/// Formats a double value in decimal floating-point notation,
+		/// according to std::printf's %f format with the given precision.
+
+	static std::string format(float value, int width, int precision);
+		/// Formats a double value in decimal floating-point notation,
+		/// right justified in a field of the specified width,
+		/// with the number of fractional digits given in precision.
+
 	static std::string format(double value);
 		/// Formats a double value in decimal floating-point notation,
 		/// according to std::printf's %g format with a precision of 16 fractional digits.
@@ -367,6 +376,15 @@ public:
 	static void append(std::string& str, float value);
 		/// Formats a float value in decimal floating-point notation,
 		/// according to std::printf's %g format with a precision of 8 fractional digits.
+
+	static void append(std::string& str, float value, int precision);
+		/// Formats a double value in decimal floating-point notation,
+		/// according to std::printf's %f format with the given precision.
+
+	static void append(std::string& str, float value, int width, int precision);
+		/// Formats a double value in decimal floating-point notation,
+		/// right justified in a field of the specified width,
+		/// with the number of fractional digits given in precision.
 
 	static void append(std::string& str, double value);
 		/// Formats a double value in decimal floating-point notation,
@@ -642,32 +660,48 @@ inline std::string NumberFormatter::formatHex(UInt64 value, int width, bool pref
 
 inline std::string NumberFormatter::format(float value)
 {
+	char buffer[POCO_MAX_FLT_STRING_LEN];
+	floatToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
+	return std::string(buffer);
+}
+
+
+inline std::string NumberFormatter::format(float value, int precision)
+{
+	char buffer[POCO_MAX_FLT_STRING_LEN];
+	floatToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
+	return std::string(buffer);
+}
+
+
+inline std::string NumberFormatter::format(float value, int width, int precision)
+{
 	std::string result;
-	floatToStr(result, value);
+	floatToFixedStr(result, value, precision, width);
 	return result;
 }
 
 
 inline std::string NumberFormatter::format(double value)
 {
-	std::string result;
-	doubleToStr(result, value);
-	return result;
+	char buffer[POCO_MAX_FLT_STRING_LEN];
+	doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
+	return std::string(buffer);
 }
 
 
 inline std::string NumberFormatter::format(double value, int precision)
 {
-	std::string result;
-	doubleToStr(result, value, precision);
-	return result;
+	char buffer[POCO_MAX_FLT_STRING_LEN];
+	doubleToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
+	return std::string(buffer);
 }
 
 
 inline std::string NumberFormatter::format(double value, int width, int precision)
 {
 	std::string result;
-	doubleToStr(result, value, precision, width);
+	doubleToFixedStr(result, value, precision, width);
 	return result;
 }
 
