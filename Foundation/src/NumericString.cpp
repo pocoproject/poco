@@ -70,9 +70,46 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	if (frac != precision)
 	{
 		if (frac < precision)
+		{
 			str.append(precision - frac, '0');
-		else if ((frac > precision) && (decSepPos != std::string::npos)) 
+		}
+		else if ((frac > precision) && (decSepPos != std::string::npos))
+		{
+			int pos = decSepPos + 1 + precision;
+			if (str[pos] >= '5') // we must round up
+			{
+				char carry = 0;
+				if(str[--pos] == '9')
+				{
+					str[pos] = '0';
+					carry = 1;
+				}
+				else
+				{
+					++str[pos];
+					carry = 0;
+				}
+				while (--pos >= 0)
+				{
+					if(str[pos] == decSep) continue;
+					if(carry)
+					{
+						if((str[pos] + carry) <= '9')
+						{
+							++str[pos];
+							carry = 0;
+						}
+						else
+						{
+							str[pos] = '0';
+							carry = 1;
+						}
+					}
+				}
+				if (carry) str.insert(str.begin(), 1, '1');
+			}
 			str = str.substr(0, decSepPos + 1 + precision);
+		}
 	}
 
 	if (eStr.get()) str += *eStr;
