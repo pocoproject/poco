@@ -704,8 +704,8 @@ void StringTest::testNumericStringPadding()
 	assert (doubleToStr(str, 12.45, 2, 5) == "12.45");
 	assert (doubleToStr(str, 12.45, 1, 4) == "12.5");
 	assert (doubleToStr(str, 12.45, 2, 6) == " 12.45");
-	assert (floatToStr(str, 12.455f, 3, 7) == " 12.455");
-	assert (floatToStr(str, 12.455f, 2, 6) == " 12.46");
+	assert (doubleToStr(str, 12.455, 3, 7) == " 12.455");
+	assert (doubleToStr(str, 12.455, 2, 6) == " 12.46");
 }
 
 void StringTest::testStringToFloatError()
