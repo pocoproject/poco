@@ -1225,7 +1225,7 @@ void DataTest::testDateAndTime()
 	assert (dt.second() == t.second());
 	
 	Date d1(2007, 6, 15);
-	d1.assign(d.year() - 1, d.month(), d.day());
+	d1.assign(d.year() - 1, d.month(), (d.month() == 2 && d.day() == 29) ? 28 : d.day());
 	assert (d1 < d); assert (d1 != d);
 
 	d1.assign(d.year() - 1, 12, d.day());
@@ -1237,7 +1237,7 @@ void DataTest::testDateAndTime()
 		assert (d1 < d); assert (d1 != d);
 	}
 
-	d1.assign(d.year() + 1, d.month(), d.day());
+	d1.assign(d.year() + 1, d.month(), (d.month() == 2 && d.day() == 29) ? 28 : d.day());
 	assert (d1 > d); assert (d1 != d);
 	
 	d1.assign(d.year() + 1, 1, d.day());
