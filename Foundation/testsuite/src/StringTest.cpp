@@ -697,6 +697,7 @@ void StringTest::testNumericStringPadding()
 	assert (floatToStr(str, 12.45f, 2, 6) == " 12.45");
 	assert (floatToStr(str, 12.455f, 3, 7) == " 12.455");
 	assert (floatToStr(str, 12.455f, 2, 6) == " 12.46");
+	assert (floatToStr(str, 1.23556E-16f, 2, 6) == "1.24e-16");
 
 	assert (doubleToStr(str, 0.999, 2, 4) == "1.00");
 	assert (doubleToStr(str, 0.945, 2, 4) == "0.95");
@@ -705,7 +706,8 @@ void StringTest::testNumericStringPadding()
 	assert (doubleToStr(str, 12.45, 1, 4) == "12.5");
 	assert (doubleToStr(str, 12.45, 2, 6) == " 12.45");
 	assert (doubleToStr(str, 12.455, 3, 7) == " 12.455");
-	assert (doubleToStr(str, 12.455, 2, 6) == " 12.46");
+	assert (doubleToStr(str, 12.455, 2, 6) == " 12.46");	
+	assert (doubleToStr(str, 1.23556E-16, 2, 6) == "1.24e-16");
 }
 
 void StringTest::testStringToFloatError()
