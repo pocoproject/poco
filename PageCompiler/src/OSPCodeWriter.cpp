@@ -54,6 +54,11 @@ void OSPCodeWriter::writeHandlerMembers(std::ostream& ostr)
 		ostr << "\t\treturn _pContext;\n";
 		ostr << "\t}\n";
 		ostr << "\n";
+		ostr << "\tPoco::OSP::BundleContext::Ptr c() const\n";
+		ostr << "\t{\n";
+		ostr << "\t\treturn _pContext;\n";
+		ostr << "\t}\n";
+		ostr << "\n";
 		ostr << "private:\n";
 		ostr << "\tPoco::OSP::BundleContext::Ptr _pContext;\n";
 	}
