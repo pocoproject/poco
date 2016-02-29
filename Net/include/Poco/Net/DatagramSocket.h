@@ -33,16 +33,8 @@ class Net_API DatagramSocket: public Socket
 	/// UDP stream socket.
 {
 public:
-	enum Unbound
-	{
-		SOCKET_CREATE_UNBOUND
-	};
-	
 	DatagramSocket();
 		/// Creates an unconnected IPv4 datagram socket.
-
-	explicit DatagramSocket(Unbound unbound);
-		/// Creates an unconnected, unbound datagram socket.
 
 	explicit DatagramSocket(IPAddress::Family family);
 		/// Creates an unconnected datagram socket.

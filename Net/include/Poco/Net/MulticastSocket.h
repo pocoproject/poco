@@ -43,9 +43,6 @@ public:
 	MulticastSocket();
 		/// Creates the multicast socket.
 		
-	explicit MulticastSocket(Unbound unbound);
-		/// Creates an unconnected, unbound multicast datagram socket.
-
 	explicit MulticastSocket(IPAddress::Family family);
 		/// Creates an unconnected datagram socket.
 		///
