@@ -1,6 +1,61 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.7.0
+
+!!Summary of Changes
+
+  - fixed GH #1160: Poco::Net::NetException 
+    "SSL Exception: error:1409F07F:SSL routines:ssl3_write_pending:bad write retry"
+  - fixed GH #1152: Wrong TaskProgressNotification description
+  - fixed GH #1141: Poco::StringTokenizer::TOK_TRIM changes behavior between 1.4 and 1.6
+  - fixed GH #1137: Missing 'longint' type in SQLite
+  - fixed GH #1135: Different package on github and official web site 
+  - fixed GH #1030: tvOS / WatchOS bitcode enabled for simulators
+  - fixed GH #1114: World-write permissions on files created by daemon
+  - fixed GH #1087: prevent line breaks in base64-encoded creds
+  - fixed GH #1026: Fixes for producing the poco-1.6.2 release on a Cygwin x86 platform
+  - fixed GH #1022: Abbreviation in setThreadName can happen even if thread name is not too long
+  - fixed GH #1002: ActiveDispatcher saves reference to event context after event was 
+    performed until it gets new event
+  - fixed GH #973: overwrite existing files on windows when moving files
+  - fixed GH #969: Poco::File::renameTo() behaviour differs on windows and linux
+  - fixed GH #967: Missing data types in SQLite
+  - fixed GH #966: Possible crash when processing a corrupted Zip file
+  - fixed GH #958: Bug while reading X509Certificate subjectName
+  - fixed GH #937: Missing build_vs140.cmd 
+  - fixed GH #933: Change in JSON::Object::set(key,value) behavior in 1.6.1
+  - fixed GH #931: make strToInt() more strict in what it accepts
+  - fixed GH #921: `BasicUnbufferedStreamBuf` needs to be marked for import/export
+  - fixed GH #848: MailMessage::_encoding is not set when retrieving plain/text message 
+  - fixed GH #767: Inconsistency in getPath & getPathAndQuery returns
+  - fixed GH #724: Poco 1.6.0 is not compiled with openssl 1.0.0
+  - fixed GH #713: Improved support for producing Canonical XML in XMLWriter
+  - fixed GH #696: bug in parsing name of attachment poco c++ 1.6.0
+  - fixed GH #335: Compress with nonseekable
+  - upgraded bundled SQLite to 3.11.0
+  - added Poco::Crypto::X509Certificate::equals() to compare two certificates
+  - support for detecting Win8/Win10 in Poco::Environment
+  - Poco::Net::HTTPServerRequestImpl: fixed an issue with DELETE in persistent connections
+  - NetSSL: added Context::preferServerCiphers()
+  - NetSSL: added support for ECDH, new Context constructor
+  - NetSSL: add support for disabling certain protocols
+  - SMTPClientSession: added support for XOAUTH2 authentication
+  - Poco::Data::SessionPool: re-added customizeSession() method from 1.4.x releases
+  - improved SSLManager to automatically set-up a reasonable client Context if
+    none is configured
+  - add brew OpenSSL search paths to Darwin configs
+  - add HTTP/1.1 version to HTTPRequest for client WebSocket, as this is required for 
+    most servers
+  - remove GCC_DIAG_OFF as this caused more issues than it solved
+  - respect POCO_NO_FORK_EXEC in ServerApplication (tvOS)
+  - tvOS and WatchOS support
+  - fix: need an implementation of available() for WebSocketImpl
+  - HTTPSessionInstantiator: respect global proxy config
+  - added constant for HTTP PATCH method to Poco::Net::HTTPRequest
+  - NumberParser::parseHex[64](): allow 0x/0X prefix
+
+
 !!!Release 1.6.1
 
 !!Summary of Changes
