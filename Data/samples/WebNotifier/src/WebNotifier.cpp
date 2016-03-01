@@ -37,7 +37,9 @@
 #include "Poco/Data/RowFormatter.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/SQLite/Notifier.h"
+#include "Poco/Data/SQLite/Connector.h"
 #include <iostream>
+
 
 using Poco::delegate;
 using Poco::Timespan;
@@ -368,6 +370,9 @@ void doShell(DBEventHandler& dbEventHandler)
 
 int main(int argc, char** argv)
 {
+	// register SQLite connector
+	Poco::Data::SQLite::Connector::registerConnector();
+
 	// HTTPServer instance
 	RequestHandlerFactory* pFactory = new RequestHandlerFactory;
 	HTTPServer srv(pFactory, 9980);
