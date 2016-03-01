@@ -32,6 +32,15 @@ MapConfiguration::~MapConfiguration()
 }
 
 
+void MapConfiguration::copyTo(AbstractConfiguration& config)
+{
+	for (iterator it = _map.begin(); it != _map.end(); ++it)
+	{
+		config.setString(it->first, it->second);
+	}
+}
+
+
 void MapConfiguration::clear()
 {
 	_map.clear();

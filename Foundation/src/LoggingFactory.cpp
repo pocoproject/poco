@@ -22,6 +22,7 @@
 #include "Poco/FormattingChannel.h"
 #include "Poco/SplitterChannel.h"
 #include "Poco/NullChannel.h"
+#include "Poco/EventChannel.h"
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_SYSLOGCHANNEL)
 #include "Poco/SyslogChannel.h"
 #endif
@@ -103,6 +104,7 @@ void LoggingFactory::registerBuiltins()
 	_channelFactory.registerClass("SplitterChannel", new Instantiator<SplitterChannel, Channel>);
 #endif
 	_channelFactory.registerClass("NullChannel", new Instantiator<NullChannel, Channel>);
+	_channelFactory.registerClass("EventChannel", new Instantiator<EventChannel, Channel>);
 
 #if defined(POCO_OS_FAMILY_UNIX)
 #ifndef POCO_NO_SYSLOGCHANNEL
