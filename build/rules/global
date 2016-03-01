@@ -34,7 +34,7 @@ ifndef PROJECT_BASE
 PROJECT_BASE = $(POCO_BASE)
 endif
 export PROJECT_BASE
-ifdef  POCO_VERBOSE
+ifdef POCO_VERBOSE
 $(info PROJECT_BASE  	= $(PROJECT_BASE))
 endif
 
@@ -45,7 +45,7 @@ ifndef POCO_BUILD
 POCO_BUILD = $(PROJECT_BASE)
 endif
 export POCO_BUILD
-ifdef  POCO_VERBOSE
+ifdef POCO_VERBOSE
 $(info POCO_BUILD    	= $(POCO_BUILD))
 endif
 
@@ -80,12 +80,12 @@ endif
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
 POCO_HOST_OSNAME = MinGW
 endif
-ifdef  POCO_VERBOSE
+ifdef POCO_VERBOSE
 $(info POCO_HOST_OSNAME= $(POCO_HOST_OSNAME))
 endif
 
 POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
-ifdef  POCO_VERBOSE
+ifdef POCO_VERBOSE
 $(info POCO_HOST_OSARCH= $(POCO_HOST_OSARCH))
 endif
 

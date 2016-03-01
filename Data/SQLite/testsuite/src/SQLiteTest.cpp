@@ -23,6 +23,7 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/Notifier.h"
+#include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Nullable.h"
@@ -241,11 +242,13 @@ int SQLiteTest::_deleteCounter;
 
 SQLiteTest::SQLiteTest(const std::string& name): CppUnit::TestCase(name)
 {
+	Poco::Data::SQLite::Connector::registerConnector();
 }
 
 
 SQLiteTest::~SQLiteTest()
 {
+	Poco::Data::SQLite::Connector::unregisterConnector();
 }
 
 
