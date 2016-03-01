@@ -34,7 +34,7 @@ ifndef PROJECT_BASE
 PROJECT_BASE = $(POCO_BASE)
 endif
 export PROJECT_BASE
-ifdef VERBOSE
+ifdef POCO_VERBOSE
 $(info PROJECT_BASE  	= $(PROJECT_BASE))
 endif
 
@@ -45,7 +45,7 @@ ifndef POCO_BUILD
 POCO_BUILD = $(PROJECT_BASE)
 endif
 export POCO_BUILD
-ifdef VERBOSE
+ifdef POCO_VERBOSE
 $(info POCO_BUILD    	= $(POCO_BUILD))
 endif
 
@@ -80,12 +80,12 @@ endif
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
 POCO_HOST_OSNAME = MinGW
 endif
-ifdef VERBOSE
+ifdef POCO_VERBOSE
 $(info POCO_HOST_OSNAME= $(POCO_HOST_OSNAME))
 endif
 
 POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
-ifdef VERBOSE
+ifdef POCO_VERBOSE
 $(info POCO_HOST_OSARCH= $(POCO_HOST_OSARCH))
 endif
 
@@ -123,7 +123,7 @@ endif
 ifndef POCO_CONFIG
 POCO_CONFIG = $(POCO_HOST_OSNAME)
 endif
-ifdef VERBOSE
+ifdef POCO_VERBOSE
 $(info POCO_CONFIG   	= $(POCO_CONFIG))
 endif
 
@@ -140,7 +140,7 @@ OSNAME   := $(POCO_HOST_OSNAME)
 else
 OSNAME   := $(POCO_TARGET_OSNAME)
 endif
-ifdef VERBOSE
+ifdef POCO_VERBOSE
 $(info OSNAME   	= $(OSNAME))
 endif
 
@@ -149,7 +149,7 @@ OSARCH   := $(subst /,-,$(shell uname -m | tr ' ' _))
 else
 OSARCH   := $(POCO_TARGET_OSARCH)
 endif
-ifdef VERBOSE
+ifdef POCO_VERBOSE
 $(info OSARCH   	= $(OSARCH))
 endif
 
