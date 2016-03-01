@@ -45,7 +45,6 @@ Poco::Data::ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
 ODBCAccessTest::ODBCAccessTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-	Poco::Data::ODBC::Connector::registerConnector();
 }
 
 
@@ -185,7 +184,6 @@ bool ODBCAccessTest::init(const std::string& driver, const std::string& dsn)
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn)) return false;
 
-	Poco::Data::ODBC::Connector::registerConnector();
 	try
 	{
 		_pSession = new Session(Poco::Data::ODBC::Connector::KEY, _dbConnString);

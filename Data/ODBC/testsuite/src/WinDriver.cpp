@@ -14,12 +14,15 @@
 
 #include "WinTestRunner/WinTestRunner.h"
 #include "ODBCTestSuite.h"
+#include "Poco/Data/ODBC/Connector.h"
 
 
 class TestDriver: public CppUnit::WinTestRunnerApp
 {
 	void TestMain()
 	{
+		Poco::Data::ODBC::Connector::registerConnector();
+
 		CppUnit::WinTestRunner runner;
 		runner.addTest(ODBCTestSuite::suite());
 		runner.run();

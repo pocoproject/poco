@@ -19,15 +19,12 @@
 #include "Poco/Data/SessionFactory.h"
 
 
-const ODBCConnectorRegistrator pocoODBCConnectorRegistrator;
-
-
 namespace Poco {
 namespace Data {
 namespace ODBC {
 
 
-const std::string Connector::KEY(POCO_DATA_ODBC_CONNECTOR_NAME);
+const std::string Connector::KEY("ODBC");
 
 
 Connector::Connector()
@@ -55,7 +52,7 @@ void Connector::registerConnector()
 
 void Connector::unregisterConnector()
 {
-	Poco::Data::SessionFactory::instance().remove(POCO_DATA_ODBC_CONNECTOR_NAME);
+	Poco::Data::SessionFactory::instance().remove(KEY);
 }
 
 
