@@ -5,12 +5,12 @@ XML
 JSON
 Util
 Net
-Crypto
-NetSSL_OpenSSL
+#Crypto
+#NetSSL_OpenSSL
 Data
-Data/SQLite
-Data/ODBC
-Data/MySQL
+#Data/SQLite
+#Data/ODBC
+#Data/MySQL
 Data/PostgreSQL
 Zip
 PageCompiler
