@@ -1,8 +1,13 @@
 set(LIBNAME "XML")
 set(POCO_LIBNAME "Poco${LIBNAME}")
 
+# Expat CPP sources to be excluded from globbed SRCS_G
+# They are added back on the list if POCO_UNBUNDLED is not set
+set(EXPAT_CPP "${CMAKE_CURRENT_SOURCE_DIR}/src/xmlparse.cpp")
+
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
+list(REMOVE_ITEM SRCS_G ${EXPAT_CPP})
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 
 # Headers
