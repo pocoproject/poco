@@ -98,9 +98,18 @@ void PostgreSQLTest::dbInfo(Session& session)
 
 void PostgreSQLTest::testConnectNoDB()
 {
-	std::string dbConnString = "host=" POSTGRESQL_HOST
+	std::string dbConnString = 
+		"host=" POSTGRESQL_HOST
 		" user=" POSTGRESQL_USER
-		" password=" POSTGRESQL_PWD;
+		" password=";
+	if (Environment::has("APPVEYOR"))
+	{
+		dbConnString += POSTGRESQL_PWD_ON_APPVEYOR;
+	}
+	else
+	{
+		dbConnString += POSTGRESQL_PWD;
+	}
 	
 	try
 	{
