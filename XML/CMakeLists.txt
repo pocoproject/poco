@@ -17,11 +17,11 @@ if (POCO_UNBUNDLED)
     include_directories(${EXPAT_INCLUDE_DIRS})
 else()
     POCO_SOURCES( SRCS expat
-    src/xmlparse.cpp
-    src/xmlrole.c
-    src/xmltok.c
-    src/xmltok_impl.c
-    src/xmltok_ns.c
+    src/expat/xmlparse.cpp
+    src/expat/xmlrole.c
+    src/expat/xmltok.c
+    src/expat/xmltok_impl.c
+    src/expat/xmltok_ns.c
     )
 endif (POCO_UNBUNDLED)
 
