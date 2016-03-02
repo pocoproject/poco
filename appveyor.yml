@@ -334,8 +334,8 @@ before_test:
  # -------------------------------------------------------------------------------------------
  # PostgreSQL
   - set PATH=C:\Program Files\PostgreSQL\9.4\bin\;%PATH%
-  - set PASSFILE=%POCO_BASE%\Data\PostgreSQL\pgpass-Win32.conf
-#  - cmd -c "%POCO_BASE%\Data\PostgreSQL\changepwd-Win32.bat"
+  - set PASSFILE=%POCO_BASE%\Data\PostgreSQL\pgpass-x64.conf
+  - %POCO_BASE%\Data\PostgreSQL\changepwd-x64.bat"
 # -------------------------------------------------------------------------------------------
  
   - ps: |

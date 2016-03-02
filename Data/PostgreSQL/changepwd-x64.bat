@@ -18,7 +18,6 @@ rem Run psql
 
 
 rem pause
-
 rem PGPASSFILE 
 rem chmod 0600 ~/.pgpass
 rem %APPDATA%\postgresql\pgpass.conf
