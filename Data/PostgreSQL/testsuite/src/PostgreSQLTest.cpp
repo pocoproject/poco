@@ -1022,7 +1022,9 @@ CppUnit::Test* PostgreSQLTest::suite()
 {
 	PostgreSQL::Connector::registerConnector();
 
-	_dbConnString =	"host=" POSTGRESQL_HOST	" user=" POSTGRESQL_USER " password=" ;
+	_dbConnString += "host=" POSTGRESQL_HOST;
+	_dbConnString += " user=" POSTGRESQL_USER;
+	_dbConnString += " password=";
 	if (Environment::has("APPVEYOR"))
 	{
 		_dbConnString += POSTGRESQL_PWD_ON_APPVEYOR;
@@ -1031,7 +1033,8 @@ CppUnit::Test* PostgreSQLTest::suite()
 	{
 		_dbConnString += POSTGRESQL_PWD;
 	}
-	_dbConnString += " dbname=" POSTGRESQL_DB " port=" POSTGRESQL_PORT;
+	_dbConnString += " dbname=" POSTGRESQL_DB;
+	_dbConnString += " port="POSTGRESQL_PORT;
 
 	try
 	{
