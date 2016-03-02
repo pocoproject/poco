@@ -32,6 +32,7 @@
 
 #include "CppUnit/TestCase.h"
 #include "SQLExecutor.h"
+#include "Poco/ByteOrder.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
@@ -47,13 +48,6 @@
 #include "Poco/Data/Transaction.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
 
-#ifdef _WIN32
-#include <Winsock2.h>
-#else
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#endif 
-
 #include <iostream>
 #include <limits>
 
@@ -64,6 +58,7 @@ using Poco::Data::PostgreSQL::PostgreSQLException;
 using Poco::Data::PostgreSQL::ConnectionException;
 using Poco::Data::PostgreSQL::StatementException;
 using Poco::format;
+using Poco::ByteOrder;
 using Poco::Tuple;
 using Poco::DateTime;
 using Poco::Any;
@@ -344,7 +339,7 @@ void SQLExecutor::barebonePostgreSQLTest(const char* host, const char* user, con
 	PQclear(pResult);
 
 	std::string str[3] = { "111", "222", "333" };
-	int fourth = htonl((Poco::UInt32) 4);
+	int fourth = ByteOrder::toNetwork((Poco::UInt32) 4);
 	float fifth = 1.5;
 
 	const char *paramValues[5] = { 0 };
@@ -468,7 +463,7 @@ void SQLExecutor::barebonePostgreSQLTest(const char* host, const char* user, con
  * we'd better coerce to the local byte order.
 */
 
-	fourth = ntohl(*((Poco::UInt32 *) pSelectResult[ 3 ]));
+	fourth = ByteOrder::fromNetwork(*((Poco::UInt32 *) pSelectResult[ 3 ]));
 	fifth = *((float *) pSelectResult[ 4 ]);
 
 	assert (0 == std::strncmp("111", pSelectResult[0], 3));
