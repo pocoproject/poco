@@ -24,7 +24,7 @@ objects = AbstractContainerNode AbstractNode Attr AttrMap Attributes \
 	TreeWalker WhitespaceFilter XMLException XMLFilter XMLFilterImpl XMLReader \
 	XMLString XMLWriter XMLStreamParser XMLStreamParserException ValueTraits
 
-expat_objects = xmlparse xmlrole xmltok
+expat_objects = expat/xmlparse expat/xmlrole expat/xmltok
 
 ifdef POCO_UNBUNDLED
 	SYSLIBS += -lexpat
