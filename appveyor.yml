@@ -331,11 +331,9 @@ build_script:
       }
 
 before_test:
- # -------------------------------------------------------------------------------------------
- # PostgreSQL
+# -------------------------------------------------------------------------------------------
+# PostgreSQL
   - set PATH=C:\Program Files\PostgreSQL\9.4\bin\;%PATH%
-  - set PASSFILE=%POCO_BASE%\Data\PostgreSQL\pgpass-x64.conf
-  - '%POCO_BASE%\Data\PostgreSQL\changepwd-x64.bat'
 # -------------------------------------------------------------------------------------------
  
   - ps: |
