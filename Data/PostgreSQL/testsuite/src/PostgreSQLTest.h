@@ -150,7 +150,7 @@ private:
 	static std::string _dbConnString;
 	static Poco::SharedPtr<Poco::Data::Session> _pSession;
 	static Poco::SharedPtr<SQLExecutor> _pExecutor;
-	static const bool bindValues[8];
+	bool bindValues[8];
 };
 
 

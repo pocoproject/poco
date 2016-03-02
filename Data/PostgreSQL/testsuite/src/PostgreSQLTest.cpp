@@ -45,6 +45,7 @@
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
 #include "Poco/Nullable.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Environment.h"
 #include <iostream>
 
 using namespace Poco::Data;
@@ -58,10 +59,11 @@ using Poco::Int32;
 using Poco::Nullable;
 using Poco::Tuple;
 using Poco::NamedTuple;
+using Poco::Environment;
 
 Poco::SharedPtr<Poco::Data::Session> PostgreSQLTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = 0;
-
+std::string PostgreSQLTest::_dbConnString;
 //
 // Parameters for barebone-test
 #define POSTGRESQL_USER "postgres"
@@ -69,18 +71,11 @@ Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = 0;
 #define POSTGRESQL_HOST "localhost"
 #define POSTGRESQL_PORT "5432"
 #define POSTGRESQL_DB   "postgres"
-
-//
-// Connection string
-std::string PostgreSQLTest::_dbConnString = "host=" POSTGRESQL_HOST
-	" user=" POSTGRESQL_USER
-	" password=" POSTGRESQL_PWD
-	" dbname=" POSTGRESQL_DB
-	" port=" POSTGRESQL_PORT;
+#define POSTGRESQL_PWD_ON_APPVEYOR  "Password12!"
 
 
-PostgreSQLTest::PostgreSQLTest(const std::string& name): 
-	CppUnit::TestCase(name)
+PostgreSQLTest::PostgreSQLTest(const std::string& name) :
+CppUnit::TestCase(name)
 {
 	PostgreSQL::Connector::registerConnector();
 }
@@ -1027,6 +1022,17 @@ CppUnit::Test* PostgreSQLTest::suite()
 {
 	PostgreSQL::Connector::registerConnector();
 
+	_dbConnString =	"host=" POSTGRESQL_HOST	" user=" POSTGRESQL_USER " password=" ;
+	if (Environment::has("APPVEYOR"))
+	{
+		_dbConnString += POSTGRESQL_PWD_ON_APPVEYOR;
+	}
+	else
+	{
+		_dbConnString += POSTGRESQL_PWD;
+	}
+	_dbConnString += " dbname=" POSTGRESQL_DB " port=" POSTGRESQL_PORT;
+
 	try
 	{
 		_pSession = new Session(PostgreSQL::Connector::KEY, _dbConnString);
@@ -1034,7 +1040,6 @@ CppUnit::Test* PostgreSQLTest::suite()
 	catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
-		return 0;
 	}
 
 	std::cout << "*** Connected to [" << "PostgreSQL" << "] test database." << std::endl;
