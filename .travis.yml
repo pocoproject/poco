@@ -21,7 +21,11 @@ before_install:
 services:
   - mongodb
   - redis-server
-  - postgresql: "9.3"
+  - postgresql
+
+addons:
+  postgresql: "9.3"
+
 
 notifications:
   slack: 
