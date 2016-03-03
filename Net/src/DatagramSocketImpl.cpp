@@ -27,7 +27,6 @@ namespace Net {
 
 DatagramSocketImpl::DatagramSocketImpl()
 {
-	init(AF_INET);
 }
 
 

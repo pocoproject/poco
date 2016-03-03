@@ -22,8 +22,8 @@ namespace Poco {
 namespace Data {
 
 
-SessionImpl::SessionImpl(const std::string& connectionString, std::size_t timeout): 
-	_connectionString(connectionString),
+SessionImpl::SessionImpl(const std::string& rConnectionString, std::size_t timeout): 
+	_connectionString(rConnectionString),
 	_loginTimeout(timeout)
 {
 }
@@ -41,13 +41,13 @@ void SessionImpl::reconnect()
 }
 
 
-void SessionImpl::setConnectionString(const std::string& connectionString)
+void SessionImpl::setConnectionString(const std::string& rConnectionString)
 {
 	if (isConnected())
 		throw Poco::InvalidAccessException("Can not change connection string on connected session."
 			" Close the session first.");
 
-	_connectionString = connectionString;
+	_connectionString = rConnectionString;
 }
 
 

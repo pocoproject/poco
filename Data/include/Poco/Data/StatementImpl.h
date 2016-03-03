@@ -44,6 +44,8 @@ namespace Poco {
 namespace Data {
 
 
+class RecordSet;
+
 class Data_API StatementImpl
 	/// StatementImpl interface that subclasses must implement to define database dependent query execution.
 	///
@@ -157,7 +159,13 @@ public:
 	std::size_t dataSetCount() const;
 		/// Returns the number of data sets associated with the statement.
 		
+	std::size_t currentDataSet() const;
+		/// Returns the current data set.
+
 protected:
+	virtual void insertHint();
+	/// Hints the implementation that it is an insert statement
+
 	virtual std::size_t columnsReturned() const = 0;
 		/// Returns number of columns returned by query. 
 
@@ -169,7 +177,7 @@ protected:
 		/// some ODBC drivers when this function is called after a select statement
 		/// execution).
 
-	virtual const MetaColumn& metaColumn(std::size_t pos) const = 0;
+	virtual const MetaColumn& metaColumn(std::size_t pos, size_t dataSet) const = 0;
 		/// Returns column meta data.
 
 	const MetaColumn& metaColumn(const std::string& name) const;
@@ -252,6 +260,9 @@ protected:
 		/// - std::vector
 		/// - std::list
 
+	void makeExtractors(std::size_t count, const Position& position);
+		/// Create extractors for the specified dataset
+
 	SessionImpl& session();
 		/// Returns session associated with this statement.
 
@@ -284,9 +295,6 @@ protected:
 		/// When connector-specific behavior is desired, it should be overriden 
 		/// by the statement implementation.
 
-	std::size_t currentDataSet() const;
-		/// Returns the current data set.
-
 	std::size_t activateNextDataSet();
 		/// Returns the next data set index, or throws NoDataException if the last 
 		/// data set was reached.
@@ -295,10 +303,14 @@ protected:
 		/// Returns the previous data set index, or throws NoDataException if the last 
 		/// data set was reached.
 
+	void firstDataSet();
+	/// Activate first data set
+
 	bool hasMoreDataSets() const;
 		/// Returns true if there are data sets not activated yet.
 
 private:
+
 	void compile();
 		/// Compiles the statement.
 
@@ -319,26 +331,26 @@ private:
 		/// Resets extraction so it can be reused again.
 
 	template <class C>
-	SharedPtr<InternalExtraction<C> > createExtract(const MetaColumn& mc)
+	SharedPtr<InternalExtraction<C> > createExtract(const MetaColumn& mc, size_t position)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
-		return new InternalExtraction<C>(*pData, pCol, Poco::UInt32(currentDataSet()));
+		return new InternalExtraction<C>(*pData, pCol, Poco::UInt32(position));
 	}
 
 	template <class C>
-	SharedPtr<InternalBulkExtraction<C> > createBulkExtract(const MetaColumn& mc)
+    SharedPtr<InternalBulkExtraction<C> > createBulkExtract(const MetaColumn& mc, size_t position)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
 		return new InternalBulkExtraction<C>(*pData,
 			pCol,
 			static_cast<Poco::UInt32>(getExtractionLimit()),
-			Position(static_cast<Poco::UInt32>(currentDataSet())));
+			Position(static_cast<Poco::UInt32>(position)));
 	}
 
 	template <class T>
-	void addInternalExtract(const MetaColumn& mc)
+	void addInternalExtract(const MetaColumn& mc, size_t position)
 		/// Creates and adds the internal extraction.
 		///
 		/// The decision about internal extraction container is done 
@@ -370,23 +382,23 @@ private:
 		if (0 == icompare(DEQUE, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::deque<T> >(mc));
+				addExtract(createExtract<std::deque<T> >(mc, position));
 			else
-				addExtract(createBulkExtract<std::deque<T> >(mc));
+				addExtract(createBulkExtract<std::deque<T> >(mc, position));
 		}
 		else if (0 == icompare(VECTOR, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::vector<T> >(mc));
+				addExtract(createExtract<std::vector<T> >(mc, position));
 			else
-				addExtract(createBulkExtract<std::vector<T> >(mc));
+				addExtract(createBulkExtract<std::vector<T> >(mc, position));
 		}
 		else if (0 == icompare(LIST, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::list<T> >(mc));
+				addExtract(createExtract<std::list<T> >(mc, position));
 			else
-				addExtract(createBulkExtract<std::list<T> >(mc));
+				addExtract(createBulkExtract<std::list<T> >(mc, position));
 		}
 	}
 
@@ -427,7 +439,7 @@ private:
 	void formatSQL(std::vector<Any>& arguments);
 		/// Formats the SQL string by filling in placeholders with values from supplied vector.
 
-	void assignSubTotal(bool reset);
+	void assignSubTotal(bool reset, size_t firstDs);
 
 	StatementImpl(const StatementImpl& stmt);
 	StatementImpl& operator = (const StatementImpl& stmt);
@@ -444,11 +456,13 @@ private:
 	AbstractBindingVec       _bindings;
 	AbstractExtractionVecVec _extractors;
 	std::size_t              _curDataSet;
+	std::size_t              _pendingDSNo;
 	BulkType                 _bulkBinding;
 	BulkType                 _bulkExtraction;
 	CountVec                 _subTotalRowCount;
 
 	friend class Statement; 
+	friend class RecordSet;
 };
 
 
@@ -624,6 +638,13 @@ inline bool StatementImpl::isBulkSupported() const
 inline bool StatementImpl::hasMoreDataSets() const
 {
 	return currentDataSet() + 1 < dataSetCount();
+}
+
+
+inline void StatementImpl::firstDataSet()
+{
+	_curDataSet = 0;
+	_pendingDSNo = 0;
 }
 
 

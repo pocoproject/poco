@@ -241,7 +241,7 @@ void NetworkInterfaceImpl::setPhyParams()
 #if !defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_VXWORKS)
 	struct ifreq ifr;
 	std::strncpy(ifr.ifr_name, _name.c_str(), IFNAMSIZ);
-	DatagramSocket ds;
+	DatagramSocket ds(SocketAddress::IPv4);
 
 	ds.impl()->ioctl(SIOCGIFFLAGS, &ifr);
 	setFlags(ifr.ifr_flags);

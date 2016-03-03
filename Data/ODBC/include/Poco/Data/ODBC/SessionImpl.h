@@ -45,6 +45,7 @@ class ODBC_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 {
 public:
 	static const std::size_t ODBC_MAX_FIELD_SIZE = 1024u;
+	static const char* const NUMERIC_CONVERSION_PROPERTY;
 
 	enum TransactionCapability
 	{
@@ -167,9 +168,23 @@ public:
 	Poco::Any dataTypeInfo(const std::string& rName="");
 		/// Returns the data types information.
 
+	ODBCMetaColumn::NumericConversion numericConversion() const;
+	/// Tells if NUMERIC values to be always
+	/// converted to string
+
+	void setNumericConversion(ODBCMetaColumn::NumericConversion value);
+	/// Sets flag to tell if NUMERIC values are always returned as 
+	/// string
+
 private:
 	void setDataTypeInfo(const std::string& rName, const Poco::Any& rValue);
 		/// No-op. Throws InvalidAccessException.
+
+	void setNumericConversion(const std::string&, const Poco::Any& rValue);
+
+	Poco::Any numericConversion(const std::string& nm);
+
+	void init();
 
 	static const int FUNCTIONS = SQL_API_ODBC3_ALL_FUNCTIONS_SIZE;
 
@@ -184,6 +199,7 @@ private:
 	Poco::Any              _maxFieldSize;
 	bool                   _autoBind;
 	bool                   _autoExtract;
+	ODBCMetaColumn::NumericConversion _numericConversion;
 	TypeInfo               _dataTypes;
 	char                   _canTransact;
 	bool                   _inTransaction;
@@ -283,6 +299,30 @@ inline Poco::Any SessionImpl::getQueryTimeout(const std::string&)
 inline int SessionImpl::queryTimeout() const
 {
 	return _queryTimeout;
+}
+
+
+inline ODBCMetaColumn::NumericConversion SessionImpl::numericConversion() const
+{
+	return _numericConversion;
+}
+
+
+inline Poco::Any SessionImpl::numericConversion(const std::string&)
+{
+	return numericConversion();
+}
+
+
+inline void SessionImpl::setNumericConversion(ODBCMetaColumn::NumericConversion value)
+{
+	_numericConversion = value;
+}
+
+
+inline void SessionImpl::setNumericConversion(const std::string&, const Poco::Any& rValue)
+{
+	setNumericConversion( Poco::AnyCast<ODBCMetaColumn::NumericConversion>(rValue) );
 }
 
 

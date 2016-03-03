@@ -686,6 +686,30 @@ void StringTest::testStringToDouble()
 }
 
 
+void StringTest::testNumericStringPadding()
+{
+	std::string str;
+	assert (floatToStr(str, 0.999f, 2, 4) == "1.00");
+	assert (floatToStr(str, 0.945f, 2, 4) == "0.95");
+	assert (floatToStr(str, 0.944f, 2, 4) == "0.94");
+	assert (floatToStr(str, 12.45f, 2, 5) == "12.45");
+	assert (floatToStr(str, 12.45f, 1, 4) == "12.5");
+	assert (floatToStr(str, 12.45f, 2, 6) == " 12.45");
+	assert (floatToStr(str, 12.455f, 3, 7) == " 12.455");
+	assert (floatToStr(str, 12.455f, 2, 6) == " 12.46");
+	assert (floatToStr(str, 1.23556E-16f, 2, 6) == "1.24e-16");
+
+	assert (doubleToStr(str, 0.999, 2, 4) == "1.00");
+	assert (doubleToStr(str, 0.945, 2, 4) == "0.95");
+	assert (doubleToStr(str, 0.944, 2, 4) == "0.94");
+	assert (doubleToStr(str, 12.45, 2, 5) == "12.45");
+	assert (doubleToStr(str, 12.45, 1, 4) == "12.5");
+	assert (doubleToStr(str, 12.45, 2, 6) == " 12.45");
+	assert (doubleToStr(str, 12.455, 3, 7) == " 12.455");
+	assert (doubleToStr(str, 12.455, 2, 6) == " 12.46");	
+	assert (doubleToStr(str, 1.23556E-16, 2, 6) == "1.24e-16");
+}
+
 void StringTest::testStringToFloatError()
 {
 	char ds = decimalSeparator();
@@ -930,7 +954,6 @@ void StringTest::testIntToString()
 	assert (result == "11110000111100001111000011110000");
 #if defined(POCO_HAVE_INT64)
 	assert (uIntToStr(0xFFFFFFFFFFFFFFFF, 2, result));
-	std::cout << 0xFFFFFFFFFFFFFFFF << std::endl;
 	assert (result == "1111111111111111111111111111111111111111111111111111111111111111");
 	assert (uIntToStr(0xFF00000FF00000FF, 2, result));
 	assert (result == "1111111100000000000000000000111111110000000000000000000011111111");
@@ -1167,6 +1190,7 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testStringToInt);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloat);
 	CppUnit_addTest(pSuite, StringTest, testStringToDouble);
+	CppUnit_addTest(pSuite, StringTest, testNumericStringPadding);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloatError);
 	CppUnit_addTest(pSuite, StringTest, testNumericLocale);
 	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);

@@ -50,7 +50,7 @@ protected:
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert or update.
 
-	const MetaColumn& metaColumn(std::size_t pos) const;
+	const MetaColumn& metaColumn(std::size_t pos, std::size_t rsPos) const;
 		/// Returns column meta data.
 
 	bool hasNext();

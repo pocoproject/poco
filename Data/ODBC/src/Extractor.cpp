@@ -352,18 +352,37 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 
 
 template<>
-bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos, 
-	Poco::Data::CLOB& val, 
+bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
+	Poco::Data::CLOB& val,
+	SQLSMALLINT cType)
+{
+	return extractManualLOBImpl(pos, val, cType);
+}
+
+
+template<>
+bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos,
+	Poco::Data::BLOB& val,
+	SQLSMALLINT cType)
+{
+	return extractManualLOBImpl(pos, val, cType);
+}
+
+
+template<typename T>
+bool Extractor::extractManualLOBImpl(std::size_t pos, 
+	Poco::Data::LOB<T>& val, 
 	SQLSMALLINT cType)
 {
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
-	std::size_t fetchedSize = 0;
+	const int bufSize = CHUNK_SIZE;
+	std::size_t fetchedSize = bufSize;
 	std::size_t totalSize = 0;
 
 	SQLLEN len;
-	const int bufSize = CHUNK_SIZE;
-	Poco::Buffer<char> apChar(bufSize);
-	char* pChar = apChar.begin();
+	
+	Poco::Buffer<T> apChar(bufSize);
+	T* pChar = apChar.begin();
 	SQLRETURN rc = 0;
 	
 	val.clear();
@@ -371,7 +390,9 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 
 	do
 	{
-		std::memset(pChar, 0, bufSize);
+		// clear out the latest data in the buffer
+		if (fetchedSize > 0)
+			std::memset(pChar, 0, fetchedSize);
 		len = 0;
 		rc = SQLGetData(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
@@ -394,7 +415,7 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 		if (SQL_NO_DATA == rc || !len)
 			break;
 
-		fetchedSize = len > CHUNK_SIZE ? CHUNK_SIZE : len;
+		fetchedSize = len > bufSize ? bufSize : len;
 		totalSize += fetchedSize;
 		if (totalSize <= maxSize) 
 			val.appendRaw(pChar, fetchedSize);
