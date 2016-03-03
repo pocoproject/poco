@@ -150,6 +150,11 @@ private:
 	static std::string _dbConnString;
 	static Poco::SharedPtr<Poco::Data::Session> _pSession;
 	static Poco::SharedPtr<SQLExecutor> _pExecutor;
+	static std::string getHost();
+	static std::string getPort();
+	static std::string getBase();
+	static std::string getUser();
+	static std::string getPassword();
 	bool bindValues[8];
 };
 

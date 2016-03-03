@@ -172,7 +172,7 @@ SQLExecutor::~SQLExecutor()
 {
 }
 
-void SQLExecutor::oidPostgreSQLTest(const char* host, const char* user, const char* pwd, const char* db, const char* port, const char* tableCreateString, const Oid anOIDArray[])
+void SQLExecutor::oidPostgreSQLTest(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db, const std::string& port, const char* tableCreateString, const Oid anOIDArray[])
 {
 	std::string connectionString;
 	

@@ -59,7 +59,7 @@ public:
 	SQLExecutor(const std::string& name, Poco::Data::Session* _pSession);
 	~SQLExecutor();
 
-	void oidPostgreSQLTest(const char* host, const char* user, const char* pwd, const char* db, const char* port, const char* tableCreateString, const Oid anOIDArray[]);
+	void oidPostgreSQLTest(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db, const std::string& port, const char* tableCreateString, const Oid anOIDArray[]);
 		/// This function verifies the PostgreSQL Column type OIDs are consistent between releases
 	
 	void barebonePostgreSQLTest(const char* host, const char* user, const char* pwd, const char* db, const char* port, const char* tableCreateString);

@@ -66,13 +66,29 @@ Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = 0;
 std::string PostgreSQLTest::_dbConnString;
 //
 // Parameters for barebone-test
-#define POSTGRESQL_USER "postgres"
-#define POSTGRESQL_PWD  "postgres"
-#define POSTGRESQL_HOST "localhost"
-#define POSTGRESQL_PORT "5432"
-#define POSTGRESQL_DB   "postgres"
-#define POSTGRESQL_PWD_ON_APPVEYOR  "Password12!"
-
+//
+std::string PostgreSQLTest::getHost() {
+	return "localhost";
+}
+std::string PostgreSQLTest::getPort() {
+	return "5432";
+}
+std::string PostgreSQLTest::getBase(){
+	return "postgres";
+}
+std::string PostgreSQLTest::getUser(){
+	return "postgres";
+}
+std::string PostgreSQLTest::getPassword(){
+	if (Environment::has("APPVEYOR"))
+	{
+		return "Password12!";
+	}
+	else
+	{
+		return "postgres";
+	}
+}
 
 PostgreSQLTest::PostgreSQLTest(const std::string& name) :
 CppUnit::TestCase(name)
@@ -98,18 +114,10 @@ void PostgreSQLTest::dbInfo(Session& session)
 
 void PostgreSQLTest::testConnectNoDB()
 {
-	std::string dbConnString = 
-		"host=" POSTGRESQL_HOST
-		" user=" POSTGRESQL_USER
-		" password=";
-	if (Environment::has("APPVEYOR"))
-	{
-		dbConnString += POSTGRESQL_PWD_ON_APPVEYOR;
-	}
-	else
-	{
-		dbConnString += POSTGRESQL_PWD;
-	}
+	std::string dbConnString;
+	dbConnString +=  "host=" + getHost();
+	dbConnString += " user=" + getUser();
+	dbConnString +=	" password=" + getPassword();
 	
 	try
 	{
@@ -279,7 +287,7 @@ void PostgreSQLTest::testPostgreSQLOIDs()
 		142
 	};
 	
-	 _pExecutor->oidPostgreSQLTest(POSTGRESQL_HOST, POSTGRESQL_USER, POSTGRESQL_PWD, POSTGRESQL_DB, POSTGRESQL_PORT, tableCreateString.c_str(), OIDArray);
+	 _pExecutor->oidPostgreSQLTest(getHost(), getUser(), getPassword(), getBase(), getPort(), tableCreateString.c_str(), OIDArray);
 
 }
 
@@ -1031,19 +1039,11 @@ CppUnit::Test* PostgreSQLTest::suite()
 {
 	PostgreSQL::Connector::registerConnector();
 
-	_dbConnString += "host=" POSTGRESQL_HOST;
-	_dbConnString += " user=" POSTGRESQL_USER;
-	_dbConnString += " password=";
-	if (Environment::has("APPVEYOR"))
-	{
-		_dbConnString += POSTGRESQL_PWD_ON_APPVEYOR;
-	}
-	else
-	{
-		_dbConnString += POSTGRESQL_PWD;
-	}
-	_dbConnString += " dbname=" POSTGRESQL_DB;
-	_dbConnString += " port="POSTGRESQL_PORT;
+	_dbConnString += "host=" + getHost();
+	_dbConnString += " user=" + getUser();
+	_dbConnString += " password=" + getPassword();
+	_dbConnString += " dbname=" + getBase();
+	_dbConnString += " port=" + getPort();
 
 	try
 	{
