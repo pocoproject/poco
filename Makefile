@@ -20,7 +20,48 @@ ifndef POCO_BUILD
 export POCO_BUILD=$(POCO_BASE)
 endif
 
-LIBPREFIX ?= lib
+#
+# Determine OS
+#
+POCO_HOST_OSNAME = $(shell uname)
+ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
+POCO_HOST_OSNAME = Cygwin
+endif
+
+ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
+POCO_HOST_OSNAME = MinGW
+endif
+POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
+
+#
+# If POCO_CONFIG is not set, use the OS name as configuration name
+#
+ifndef POCO_CONFIG
+POCO_CONFIG = $(POCO_HOST_OSNAME)
+endif
+#$(info POCO_CONFIG   = $(POCO_CONFIG))
+
+#
+# Include System Specific Settings
+#
+include $(POCO_BASE)/build/config/$(POCO_CONFIG)
+
+#
+# Determine operating system
+#
+ifndef POCO_TARGET_OSNAME
+OSNAME   := $(POCO_HOST_OSNAME)
+else
+OSNAME   := $(POCO_TARGET_OSNAME)
+endif
+#$(info OSNAME     = $(OSNAME))
+
+ifndef POCO_TARGET_OSARCH
+OSARCH   := $(POCO_HOST_OSARCH)
+else
+OSARCH   := $(POCO_TARGET_OSARCH)
+endif
+#$(info OSARCH     = $(OSARCH))
 
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
@@ -29,7 +70,7 @@ poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Zip PageCompiler PageCompiler/File2Page CppParser PDF
+COMPONENTS = CppUnit Foundation XML JSON Util Net Crypto NetSSL_OpenSSL Data  Data/PostgreSQL Data/SQLite Data/ODBC Data/MySQL MongoDB Zip PageCompiler PageCompiler/File2Page CppParser PDF
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
@@ -41,7 +82,7 @@ install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
 	mkdir -p $(INSTALLDIR)/lib
 	mkdir -p $(INSTALLDIR)/bin
-	for comp in $(COMPONENTS) ; do \
+	for comp in $(filter-out $(foreach f,$(OMIT),$f%),$(COMPONENTS)) ; do \
 		if [ -d "$(POCO_BASE)/$$comp/include" ] ; then \
 			cp -Rf $(POCO_BASE)/$$comp/include/* $(INSTALLDIR)/include/ ; \
 		fi ; \
@@ -49,13 +90,19 @@ install: libexecs
 			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -f {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-	find $(POCO_BUILD)/lib -name "$(LIBPREFIX)Poco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
-	find $(POCO_BUILD)/lib -name "$(LIBPREFIX)Poco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+ifeq ($(OSNAME), Cygwin)
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*"    -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*"    -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
+endif
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libCppUnit*" -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libCppUnit*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*"    -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*"    -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
-libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Data/PostgreSQL-libexec MongoDB-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec
-tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Data/PostgreSQL-tests MongoDB-tests Zip-tests CppParser-tests PDF-tests
+libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/PostgreSQL-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec MongoDB-libexecZip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec
+tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/PostgreSQL-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests MongoDB-testsZip-tests CppParser-tests PDF-tests
 samples  =  Foundation-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples MongoDB-samples Zip-samples PageCompiler-samples PDF-samples
-cleans   =  Foundation-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean Data-clean Data/SQLite-clean Data/ODBC-clean Data/MySQL-clean Data/PostgreSQL-clean MongoDB-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean PDF-clean
+cleans   =  Foundation-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean Data-clean Data/PostgreSQL-clean Data/SQLite-clean Data/ODBC-clean Data/MySQL-clean MongoDB-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean PDF-clean
 
 .PHONY: $(libexecs)
 .PHONY: $(tests)
@@ -179,6 +226,16 @@ Data-clean:
 	$(MAKE) -C $(POCO_BASE)/Data/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Data/samples clean
 
+Data/PostgreSQL-libexec:  Foundation-libexec Data-libexec
+	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL
+
+Data/PostgreSQL-tests: Data/PostgreSQL-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL/testsuite
+
+Data/PostgreSQL-clean:
+	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL clean
+	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL/testsuite clean
+
 Data/SQLite-libexec:  Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite
 
@@ -209,16 +266,6 @@ Data/MySQL-clean:
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL clean
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite clean
 
-Data/PostgreSQL-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL
-
-Data/PostgreSQL-tests: Data/PostgreSQL-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL/testsuite
-
-Data/PostgreSQL-clean:
-	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL clean
-	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL/testsuite clean
-
 MongoDB-libexec:  Foundation-libexec Net-libexec
 	$(MAKE) -C $(POCO_BASE)/MongoDB
 
@@ -232,6 +279,21 @@ MongoDB-clean:
 	$(MAKE) -C $(POCO_BASE)/MongoDB clean
 	$(MAKE) -C $(POCO_BASE)/MongoDB/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/MongoDB/samples clean
+
+Redis-libexec:  Foundation-libexec Net-libexec
+	$(MAKE) -C $(POCO_BASE)/Redis
+
+Redis-tests: Redis-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/Redis/testsuite
+
+#No samples yet ... uncomment this when added, and add Redis-samples to samples above
+#Redis-samples: Redis-libexec 
+#	$(MAKE) -C $(POCO_BASE)/Redis/samples
+
+Redis-clean:
+	$(MAKE) -C $(POCO_BASE)/Redis clean
+	$(MAKE) -C $(POCO_BASE)/Redis/testsuite clean
+#	$(MAKE) -C $(POCO_BASE)/Redis/samples clean
 
 Zip-libexec:  Foundation-libexec Net-libexec Util-libexec XML-libexec
 	$(MAKE) -C $(POCO_BASE)/Zip

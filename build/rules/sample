@@ -78,10 +78,10 @@ LINKFLAGS  += $(COMMONFLAGS) $(SYSFLAGS)
 #
 # Compose object file path
 #
-OBJPATH_RELEASE_STATIC = $(OBJPATH)/release_static$(OSARCH_POSTFIX)
-OBJPATH_DEBUG_STATIC   = $(OBJPATH)/debug_static$(OSARCH_POSTFIX)
-OBJPATH_RELEASE_SHARED = $(OBJPATH)/release_shared$(OSARCH_POSTFIX)
-OBJPATH_DEBUG_SHARED   = $(OBJPATH)/debug_shared$(OSARCH_POSTFIX)
+OBJPATH_RELEASE_STATIC = $(OBJPATH)/release_static
+OBJPATH_DEBUG_STATIC   = $(OBJPATH)/debug_static
+OBJPATH_RELEASE_SHARED = $(OBJPATH)/release_shared
+OBJPATH_DEBUG_SHARED   = $(OBJPATH)/debug_shared
 
 #
 # Build Include directory List
