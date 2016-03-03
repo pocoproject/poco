@@ -96,6 +96,8 @@ void ActiveDispatcher::run()
 		ActiveRunnableBase::Ptr pRunnable = pMethodNf->runnable();
 		pRunnable->duplicate(); // run will release
 		pRunnable->run();
+		pRunnable = 0;
+		pNf = 0;
 		pNf = _queue.waitDequeueNotification();
 	}
 }

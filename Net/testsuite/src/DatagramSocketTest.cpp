@@ -64,7 +64,7 @@ void DatagramSocketTest::testEcho()
 void DatagramSocketTest::testSendToReceiveFrom()
 {
 	UDPEchoServer echoServer(SocketAddress("localhost", 0));
-	DatagramSocket ss;
+	DatagramSocket ss(SocketAddress::IPv4);
 	int n = ss.sendTo("hello", 5, SocketAddress("localhost", echoServer.port()));
 	assert (n == 5);
 	char buffer[256];
@@ -72,6 +72,21 @@ void DatagramSocketTest::testSendToReceiveFrom()
 	n = ss.receiveFrom(buffer, sizeof(buffer), sa);
 	assert (sa.host() == echoServer.address().host());
 	assert (sa.port() == echoServer.port());
+	assert (n == 5);
+	assert (std::string(buffer, n) == "hello");
+	ss.close();
+}
+
+
+void DatagramSocketTest::testUnbound()
+{
+	UDPEchoServer echoServer;
+	DatagramSocket ss;
+	char buffer[256];
+	ss.connect(SocketAddress("localhost", echoServer.port()));
+	int n = ss.sendBytes("hello", 5);
+	assert (n == 5);
+	n = ss.receiveBytes(buffer, sizeof(buffer));
 	assert (n == 5);
 	assert (std::string(buffer, n) == "hello");
 	ss.close();
@@ -136,6 +151,7 @@ CppUnit::Test* DatagramSocketTest::suite()
 
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEcho);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testSendToReceiveFrom);
+	CppUnit_addTest(pSuite, DatagramSocketTest, testUnbound);
 #if (POCO_OS != POCO_OS_FREE_BSD) // works only with local net bcast and very randomly
 	CppUnit_addTest(pSuite, DatagramSocketTest, testBroadcast);
 #endif

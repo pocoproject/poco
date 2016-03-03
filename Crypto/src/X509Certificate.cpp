@@ -284,4 +284,12 @@ bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 }
 
 
+bool X509Certificate::equals(const X509Certificate& otherCertificate) const
+{
+	X509* pCert = const_cast<X509*>(_pCert);
+	X509* pOtherCert = const_cast<X509*>(otherCertificate.certificate());
+	return X509_cmp(pCert, pOtherCert) == 0;
+}
+
+
 } } // namespace Poco::Crypto

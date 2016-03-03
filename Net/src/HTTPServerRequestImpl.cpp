@@ -56,7 +56,7 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& rResponse, 
 #else
 		_pStream = new HTTPFixedLengthInputStream(session, getContentLength());
 #endif
-	else if (getMethod() == HTTPRequest::HTTP_GET || getMethod() == HTTPRequest::HTTP_HEAD)
+	else if (getMethod() == HTTPRequest::HTTP_GET || getMethod() == HTTPRequest::HTTP_HEAD || getMethod() == HTTPRequest::HTTP_DELETE)
 		_pStream = new HTTPFixedLengthInputStream(session, 0);
 	else
 		_pStream = new HTTPInputStream(session);

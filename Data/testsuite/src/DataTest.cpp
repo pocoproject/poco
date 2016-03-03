@@ -904,6 +904,11 @@ void DataTest::testRow()
 	assert (row[3] == 3);
 	assert (row[4] == 4);
 
+	const Row& cr = row;
+	assert(cr["field0"] == 0);
+	assert(cr[0] == 0);
+	assert(cr.get(0) == 0);
+
 	try
 	{
 		int i; i = row[5].convert<int>(); // to silence gcc
@@ -1260,7 +1265,7 @@ void DataTest::testDateAndTime()
 	assert (dt.second() == t.second());
 	
 	Date d1(2007, 6, 15);
-	d1.assign(d.year() - 1, d.month(), d.day());
+	d1.assign(d.year() - 1, d.month(), (d.month() == 2 && d.day() == 29) ? 28 : d.day());
 	assert (d1 < d); assert (d1 != d);
 
 	d1.assign(d.year() - 1, 12, d.day());
@@ -1272,7 +1277,7 @@ void DataTest::testDateAndTime()
 		assert (d1 < d); assert (d1 != d);
 	}
 
-	d1.assign(d.year() + 1, d.month(), d.day());
+	d1.assign(d.year() + 1, d.month(), (d.month() == 2 && d.day() == 29) ? 28 : d.day());
 	assert (d1 > d); assert (d1 != d);
 	
 	d1.assign(d.year() + 1, 1, d.day());
