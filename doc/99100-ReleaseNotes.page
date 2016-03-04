@@ -7,6 +7,7 @@ AAAIntroduction
 
   - POSSIBLE BREAKING CHANGE: removed automatic registration of Data connectors due to
     issues with static initialization order.
+  - fixed GH #1171: Poco::Data::RecordSet: rowCount not reset after execute
   - fixed GH #1160: Poco::Net::NetException 
     "SSL Exception: error:1409F07F:SSL routines:ssl3_write_pending:bad write retry"
   - fixed GH #1152: Wrong TaskProgressNotification description
