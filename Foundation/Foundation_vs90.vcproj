@@ -3093,6 +3093,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\EventChannel.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\EventLogChannel.cpp"
 					>
 				</File>
@@ -3498,6 +3502,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\ConsoleChannel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\EventChannel.h"
 					>
 				</File>
 				<File

@@ -322,6 +322,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Error.cpp" />
+    <ClCompile Include="src\EventChannel.cpp" />
     <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\FIFOBufferStream.cpp" />
     <ClCompile Include="src\Format.cpp" />
@@ -1050,6 +1051,7 @@
     <ClInclude Include="include\Poco\Environment_WIN32.h" />
     <ClInclude Include="include\Poco\Environment_WIN32U.h" />
     <ClInclude Include="include\Poco\Error.h" />
+    <ClInclude Include="include\Poco\EventChannel.h" />
     <ClInclude Include="include\Poco\Exception.h" />
     <ClInclude Include="include\Poco\FIFOBuffer.h" />
     <ClInclude Include="include\Poco\FIFOBufferStream.h" />
