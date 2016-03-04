@@ -1,7 +1,7 @@
 //
 // Driver.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/Driver.cpp#2 $
+// $Id: //poco/1.7/Data/ODBC/testsuite/src/Driver.cpp#3 $
 //
 // Console-based test driver for Poco SQLite.
 //
@@ -25,6 +25,6 @@ int main(int ac, char **av)
 	for (int i = 0; i < ac; ++i)
 		args.push_back(std::string(av[i]));
 	CppUnit::TestRunner runner;
-	runner.addTest(#testCase, testCase::suite());
+	runner.addTest("ODBCTestSuite", ODBCTestSuite::suite());
 	return runner.run(args) ? 0 : 1;
 }
