@@ -5,6 +5,8 @@ AAAIntroduction
 
 !!Summary of Changes
 
+  - POSSIBLE BREAKING CHANGE: removed automatic registration of Data connectors due to
+    issues with static initialization order.
   - fixed GH #1160: Poco::Net::NetException 
     "SSL Exception: error:1409F07F:SSL routines:ssl3_write_pending:bad write retry"
   - fixed GH #1152: Wrong TaskProgressNotification description
@@ -54,6 +56,13 @@ AAAIntroduction
   - HTTPSessionInstantiator: respect global proxy config
   - added constant for HTTP PATCH method to Poco::Net::HTTPRequest
   - NumberParser::parseHex[64](): allow 0x/0X prefix
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - Removed automatic registration of Data connectors due to issues with static 
+    initialization order. Data connectors used in an application must be explicitly
+    registered with a call to registerConnector() before it can be used, e.g.: 
+    Poco::Data::SQLite::Connector::registerConnector()
 
 
 !!!Release 1.6.1

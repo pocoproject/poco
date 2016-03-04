@@ -1,8 +1,10 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.7.0 (2016-03-xx)
+Release 1.7.0 (2016-03-07)
 ==========================
 
+- POSSIBLE BREAKING CHANGE: removed automatic registration of Data connectors due to
+  issues with static initialization order.
 - fixed GH #1160: Poco::Net::NetException 
   "SSL Exception: error:1409F07F:SSL routines:ssl3_write_pending:bad write retry"
 - fixed GH #1152: Wrong TaskProgressNotification description
