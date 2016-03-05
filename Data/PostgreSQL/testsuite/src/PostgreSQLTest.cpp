@@ -1045,6 +1045,12 @@ CppUnit::Test* PostgreSQLTest::suite()
 {
 	PostgreSQL::Connector::registerConnector();
 
+	_dbConnString += "host=" + getHost();
+	_dbConnString += " user=" + getUser();
+	_dbConnString += " password=" + getPassword();
+	_dbConnString += " dbname=" + getBase();
+	_dbConnString += " port=" + getPort();
+
 	try
 	{
 		_pSession = new Session(PostgreSQL::Connector::KEY, _dbConnString);
