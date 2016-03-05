@@ -13,7 +13,9 @@ ENDIF (PGSQL_INCLUDE_DIR)
 
 FIND_PATH(PGSQL_INCLUDE_DIR libpq-fe.h
   $ENV{ProgramFiles}/PostgreSQL/*/include
+  $ENV{ProgramFiles}/PostgreSQL/*/*/include
   $ENV{SystemDrive}/PostgreSQL/*/include
+  $ENV{SystemDrive}/PostgreSQL/*/*/include
   /usr/local/pgsql/include
   /usr/local/postgresql/include
   /usr/local/include/pgsql
@@ -30,7 +32,9 @@ SET(PGSQL_NAMES pq libpq)
 SET(PGSQL_SEARCH_LIB_PATHS
   ${PGSQL_SEARCH_LIB_PATHS}
   $ENV{ProgramFiles}/PostgreSQL/*/lib
+  $ENV{ProgramFiles}/PostgreSQL/*/*/lib
   $ENV{SystemDrive}/PostgreSQL/*/lib
+  $ENV{SystemDrive}/PostgreSQL/*/*/lib
   /usr/local/pgsql/lib
   /usr/local/lib
   /usr/lib
