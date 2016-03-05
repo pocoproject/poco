@@ -103,7 +103,7 @@
     <OutDir>bin\</OutDir>
     <IntDir>obj\TestSuite\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <ExecutablePath>C:\Progra~2\PostgreSQL\9.5\bin;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
     <OutDir>bin\</OutDir>
