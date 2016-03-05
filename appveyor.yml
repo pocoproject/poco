@@ -1,4 +1,4 @@
-version: '{build}'
+version: poco-{branch}-{build}
 
 install:
   - cinst cmake
