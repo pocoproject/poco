@@ -115,27 +115,37 @@ void TCPServer::run()
 	while (!_stopped)
 	{
 		Poco::Timespan timeout(250000);
-		if (_socket.poll(timeout, Socket::SELECT_READ))
+		try
 		{
-			try
+			if (_socket.poll(timeout, Socket::SELECT_READ))
 			{
-				StreamSocket ss = _socket.acceptConnection();
-				// enabe nodelay per default: OSX really needs that
-				ss.setNoDelay(true);
-				_pDispatcher->enqueue(ss);
+				try
+				{
+					StreamSocket ss = _socket.acceptConnection();
+					// enabe nodelay per default: OSX really needs that
+					ss.setNoDelay(true);
+					_pDispatcher->enqueue(ss);
+				}
+				catch (Poco::Exception& exc)
+				{
+					ErrorHandler::handle(exc);
+				}
+				catch (std::exception& exc)
+				{
+					ErrorHandler::handle(exc);
+				}
+				catch (...)
+				{
+					ErrorHandler::handle();
+				}
 			}
-			catch (Poco::Exception& exc)
-			{
-				ErrorHandler::handle(exc);
-			}
-			catch (std::exception& exc)
-			{
-				ErrorHandler::handle(exc);
-			}
-			catch (...)
-			{
-				ErrorHandler::handle();
-			}
+		}
+		catch (Poco::Exception& exc)
+		{
+			ErrorHandler::handle(exc);
+			// possibly a resource issue since poll() failed;
+			// give some time to recover before trying again
+			Poco::Thread::sleep(50); 
 		}
 	}
 }
@@ -145,6 +155,7 @@ int TCPServer::currentThreads() const
 {
 	return _pDispatcher->currentThreads();
 }
+
 
 int TCPServer::maxThreads() const
 {
