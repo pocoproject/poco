@@ -123,9 +123,9 @@ void TCPServer::run()
 				{
 					StreamSocket ss = _socket.acceptConnection();
 					// enable nodelay per default: OSX really needs that
-	#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX)
 					if (ss.address().family() != AddressFamily::UNIX_LOCAL)
-	#endif
+#endif
 					{
 						ss.setNoDelay(true);
 					}
