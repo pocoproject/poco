@@ -180,6 +180,33 @@ void FileTest::testFileAttributes1()
 	catch (Exception&)
 	{
 	}
+
+	try
+	{
+		f.totalSpace();
+		failmsg("file does not exist - must throw exception");
+	}
+	catch (Exception&)
+	{
+	}
+
+	try
+	{
+		f.usableSpace();
+		failmsg("file does not exist - must throw exception");
+	}
+	catch (Exception&)
+	{
+	}
+
+	try
+	{
+		f.freeSpace();
+		failmsg("file does not exist - must throw exception");
+	}
+	catch (Exception&)
+	{
+	}
 }
 
 
@@ -314,6 +341,15 @@ void FileTest::testSize()
 	assert (f.getSize() > 0);
 	f.setSize(0);
 	assert (f.getSize() == 0);
+}
+
+
+void FileTest::testSpace()
+{
+	File f(Path::home());
+	assert(f.totalSpace() > 0);
+	assert(f.usableSpace() > 0);
+	assert(f.freeSpace() > 0);
 }
 
 
@@ -525,6 +561,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testCompare);
 	CppUnit_addTest(pSuite, FileTest, testSwap);
 	CppUnit_addTest(pSuite, FileTest, testSize);
+	CppUnit_addTest(pSuite, FileTest, testSpace);
 	CppUnit_addTest(pSuite, FileTest, testDirectory);
 	CppUnit_addTest(pSuite, FileTest, testCopy);
 	CppUnit_addTest(pSuite, FileTest, testMove);

@@ -59,6 +59,9 @@ protected:
 	void removeImpl();
 	bool createFileImpl();
 	bool createDirectoryImpl();
+	FileSizeImpl totalSpaceImpl() const;
+	FileSizeImpl usableSpaceImpl() const;
+	FileSizeImpl freeSpaceImpl() const;
 	static void handleLastError(const std::string& path);
 	
 private:
