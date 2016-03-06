@@ -11,13 +11,15 @@ ifndef POCO_BASE
 $(warning WARNING: POCO_BASE is not defined. Assuming current directory.)
 export POCO_BASE=$(shell pwd)
 endif
-
-ifndef POCO_PREFIX
-export POCO_PREFIX=/usr/local
+ifdef POCO_VERBOSE
+$(info POCO_BASE           = $(POCO_BASE))
 endif
 
 ifndef POCO_BUILD
 export POCO_BUILD=$(POCO_BASE)
+endif
+ifdef POCO_VERBOSE
+$(info POCO_BUILD          = $(POCO_BUILD))
 endif
 
 #
@@ -39,7 +41,9 @@ POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
 ifndef POCO_CONFIG
 POCO_CONFIG = $(POCO_HOST_OSNAME)
 endif
-#$(info POCO_CONFIG   = $(POCO_CONFIG))
+ifdef POCO_VERBOSE
+$(info POCO_CONFIG         = $(POCO_CONFIG))
+endif
 
 #
 # Include System Specific Settings
@@ -54,14 +58,18 @@ OSNAME   := $(POCO_HOST_OSNAME)
 else
 OSNAME   := $(POCO_TARGET_OSNAME)
 endif
-#$(info OSNAME     = $(OSNAME))
+ifdef POCO_VERBOSE
+$(info OSNAME              = $(OSNAME))
+endif
 
 ifndef POCO_TARGET_OSARCH
 OSARCH   := $(POCO_HOST_OSARCH)
 else
 OSARCH   := $(POCO_TARGET_OSARCH)
 endif
-#$(info OSARCH     = $(OSARCH))
+ifdef POCO_VERBOSE
+$(info OSARCH              = $(OSARCH))
+endif
 
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
@@ -76,7 +84,7 @@ cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
 
 CppUnit-clean:
-	\$(MAKE) -C \$(POCO_BASE)/CppUnit clean
+	$(MAKE) -C $(POCO_BASE)/CppUnit clean
 
 install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
