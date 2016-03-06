@@ -33,6 +33,7 @@
 #include "PostgreSQLTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Environment.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
@@ -58,25 +59,41 @@ using Poco::Int32;
 using Poco::Nullable;
 using Poco::Tuple;
 using Poco::NamedTuple;
+using Poco::Environment;
 
 Poco::SharedPtr<Poco::Data::Session> PostgreSQLTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = 0;
 
 //
-// Parameters for barebone-test
-#define POSTGRESQL_USER "postgres"
-#define POSTGRESQL_PWD  "postgres"
-#define POSTGRESQL_HOST "localhost"
-#define POSTGRESQL_PORT "5432"
-#define POSTGRESQL_DB   "postgres"
+// Connection string
+std::string PostgreSQLTest::_dbConnString;
 
 //
-// Connection string
-std::string PostgreSQLTest::_dbConnString = "host=" POSTGRESQL_HOST
-	" user=" POSTGRESQL_USER
-	" password=" POSTGRESQL_PWD
-	" dbname=" POSTGRESQL_DB
-	" port=" POSTGRESQL_PORT;
+// Parameters for barebone-test
+//
+std::string PostgreSQLTest::getHost() {
+	return "localhost";
+}
+std::string PostgreSQLTest::getPort() {
+	return "5432";
+}
+std::string PostgreSQLTest::getBase(){
+	return "postgres";
+}
+std::string PostgreSQLTest::getUser(){
+	return "postgres";
+}
+std::string PostgreSQLTest::getPassword(){
+	if (Environment::has("APPVEYOR"))
+	{
+		return "Password12!";
+	}
+	else
+	{
+		return "postgres";
+	}
+}
+
 
 
 PostgreSQLTest::PostgreSQLTest(const std::string& name): 
@@ -103,9 +120,10 @@ void PostgreSQLTest::dbInfo(Session& session)
 
 void PostgreSQLTest::testConnectNoDB()
 {
-	std::string dbConnString = "host=" POSTGRESQL_HOST
-		" user=" POSTGRESQL_USER
-		" password=" POSTGRESQL_PWD;
+	std::string dbConnString;
+	dbConnString +=  "host=" + getHost();
+	dbConnString += " user=" + getUser();
+	dbConnString +=	" password=" + getPassword();
 	
 	try
 	{
@@ -275,7 +293,7 @@ void PostgreSQLTest::testPostgreSQLOIDs()
 		142
 	};
 	
-	 _pExecutor->oidPostgreSQLTest(POSTGRESQL_HOST, POSTGRESQL_USER, POSTGRESQL_PWD, POSTGRESQL_DB, POSTGRESQL_PORT, tableCreateString.c_str(), OIDArray);
+	 _pExecutor->oidPostgreSQLTest(getHost(), getUser(), getPassword(), getBase(), getPort(), tableCreateString.c_str(), OIDArray);
 
 }
 
@@ -1026,6 +1044,12 @@ void PostgreSQLTest::tearDown()
 CppUnit::Test* PostgreSQLTest::suite()
 {
 	PostgreSQL::Connector::registerConnector();
+
+	_dbConnString += "host=" + getHost();
+	_dbConnString += " user=" + getUser();
+	_dbConnString += " password=" + getPassword();
+	_dbConnString += " dbname=" + getBase();
+	_dbConnString += " port=" + getPort();
 
 	try
 	{
