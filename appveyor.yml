@@ -364,12 +364,12 @@ test_script:
           if ($env:platform -eq "Win32")
           {
             $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
-            $excluded   = @('Data/MySQL', 'Data/ODBC','Data/PostgreSQL', 'Redis', 'PDF')
+            $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Data/PostgreSQL', 'Redis', 'PDF')
           }
           if ($env:platform -eq "x64")
           {
             $env:PATH = "$env:POCO_BASE\bin64;" + $env:PATH;$suffix = 64;
-            $excluded   = @('Data/MySQL', 'Data/ODBC','Redis', 'PDF')
+            $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
           }
 
           Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
