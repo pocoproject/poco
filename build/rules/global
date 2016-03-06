@@ -238,6 +238,12 @@ ifndef LIBPREFIX
 LIBPREFIX = lib
 endif
 
+ifeq ($(POCO_HOST_OSNAME),Darwin)
+SET_LD_LIBRARY_PATH = DYLD_LIBRARY_PATH=$(LIBPATH)
+else
+SET_LD_LIBRARY_PATH = LD_LIBRARY_PATH=$(LIBPATH)
+endif
+
 #
 # Build component list
 #
