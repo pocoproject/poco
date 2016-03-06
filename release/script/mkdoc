@@ -86,8 +86,8 @@ mkdir -p $tools
 mkrelease -o $tools $version CppParser PocoDoc
 
 cd $tools
-./configure --no-tests --no-samples
-make -s -j8
+./configure --no-tests --no-samples --no-prefix
+make -s -j8 
 
 if [ $osname = "CYGWIN" ] ; then
     find $tools -type f -name "*.$libversion.dll" > $TMP/dlls
