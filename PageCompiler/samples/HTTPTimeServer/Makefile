@@ -31,4 +31,4 @@ endif
 # Rule for runnning PageCompiler
 src/%.cpp: src/%.cpsp
 	@echo "** Compiling Page" $<
-	$(PAGECOMPILER) $<
+	$(SET_LD_LIBRARY_PATH) $(PAGECOMPILER) $<
