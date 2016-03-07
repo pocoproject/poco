@@ -125,7 +125,7 @@ if (ANDROID)
 endif(ANDROID)
 
 # IBM XLC for AIX
-if ((${CMAKE_CXX_COMPILER_ID} MATCHES "XL") and (${CMAKE_SYSTEM} MATCHES "AIX"))
+if ((${CMAKE_CXX_COMPILER_ID} MATCHES "XL") AND (${CMAKE_SYSTEM} MATCHES "AIX"))
   set(WARNINGS_FLAGS "-qsuppress=1540-0198 -qsuppress=1540-1628 -qsuppress=1540-0095 -qsuppress=1500-030")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -qlanglvl=extended0x -qlanglvl=noconstexpr -qlanglvl=newexcp ${WARNINGS_FLAGS}")
 endif()
