@@ -12,6 +12,7 @@
 
 #include "CppUnit/TestCase.h"
 #include "SQLExecutor.h"
+#include "Poco/NumberParser.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
@@ -39,6 +40,7 @@ using Poco::Data::MySQL::StatementException;
 using Poco::format;
 using Poco::Tuple;
 using Poco::DateTime;
+using Poco::NumberParser;
 using Poco::Any;
 using Poco::AnyCast;
 using Poco::NotFoundException;
@@ -157,7 +159,7 @@ void SQLExecutor::bareboneMySQLTest(const std::string& host, const std::string& 
 	MYSQL* hsession = mysql_init(0);
 	assert (hsession != 0);
 
-	MYSQL* tmp = mysql_real_connect(hsession, host.c_str(), user.c_str(), pwd.c_str(), db.c_str(), stoi(port), 0, 0);
+	MYSQL* tmp = mysql_real_connect(hsession, host.c_str(), user.c_str(), pwd.c_str(), db.c_str(), NumberParser::parse(port), 0, 0);
 	assert(tmp == hsession);
 	
 	MYSQL_STMT* hstmt = mysql_stmt_init(hsession);
