@@ -42,7 +42,7 @@ before_script:
  - sqlite3 -version
  - chmod 755 ./travis/Linux/runtests.sh
  - chmod 755 ./travis/OSX/runtests.sh
- - mysql -u root -e 'create database pocotestdb;'
+ - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql -u root -e 'create database pocotestdb;'; fi
 
 matrix:
   include:
