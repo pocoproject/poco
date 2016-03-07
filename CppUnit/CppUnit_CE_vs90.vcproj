@@ -626,67 +626,67 @@
 			Filter="*.h"
 			>
 			<File
-				RelativePath=".\include\CppUnit\CppUnit.h"
+				RelativePath=".\include\Poco\CppUnit\$(TargetName).h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\CppUnitException.h"
+				RelativePath=".\include\Poco\CppUnit\CppUnitException.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\estring.h"
+				RelativePath=".\include\Poco\CppUnit\estring.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\Guards.h"
+				RelativePath=".\include\Poco\CppUnit\Guards.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\Orthodox.h"
+				RelativePath=".\include\Poco\CppUnit\Orthodox.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\RepeatedTest.h"
+				RelativePath=".\include\Poco\CppUnit\RepeatedTest.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\Test.h"
+				RelativePath=".\include\Poco\CppUnit\Test.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestCaller.h"
+				RelativePath=".\include\Poco\CppUnit\TestCaller.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestCase.h"
+				RelativePath=".\include\Poco\CppUnit\TestCase.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestDecorator.h"
+				RelativePath=".\include\Poco\CppUnit\TestDecorator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestFailure.h"
+				RelativePath=".\include\Poco\CppUnit\TestFailure.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestResult.h"
+				RelativePath=".\include\Poco\CppUnit\TestResult.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestRunner.h"
+				RelativePath=".\include\Poco\CppUnit\TestRunner.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestSetup.h"
+				RelativePath=".\include\Poco\CppUnit\TestSetup.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestSuite.h"
+				RelativePath=".\include\Poco\CppUnit\TestSuite.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TextTestResult.h"
+				RelativePath=".\include\Poco\CppUnit\TextTestResult.h"
 				>
 			</File>
 		</Filter>

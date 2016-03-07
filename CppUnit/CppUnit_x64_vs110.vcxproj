@@ -106,12 +106,12 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">obj64\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">..\lib64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">obj64\$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">CppUnit64d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">CppUnitmdd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">CppUnitmtd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">CppUnit64</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">CppUnit64md</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">CppUnit64mt</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">$(ProjectName)64d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">$(ProjectName)mdd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">$(ProjectName)mtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">$(ProjectName)64</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">$(ProjectName)64md</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">$(ProjectName)64mt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
     <Midl>
@@ -119,7 +119,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>.\lib64\CppUnit.tlb</TypeLibraryName>
+      <TypeLibraryName>.\lib64\$(TargetName).tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -154,12 +154,12 @@
     </ResourceCompile>
     <Link>
       <ShowProgress>NotSet</ShowProgress>
-      <OutputFile>..\bin64\CppUnit64d.dll</OutputFile>
+      <OutputFile>..\bin64\$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>..\bin64\CppUnit64d.pdb</ProgramDatabaseFile>
-      <ImportLibrary>..\lib64\CppUnitd.lib</ImportLibrary>
+      <ProgramDatabaseFile>..\bin64\$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>..\lib64\$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -169,7 +169,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>.\lib64\CppUnit.tlb</TypeLibraryName>
+      <TypeLibraryName>.\lib64\$(TargetName).tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -202,12 +202,12 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\bin64\CppUnit64.dll</OutputFile>
+      <OutputFile>..\bin64\$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>
       </ProgramDatabaseFile>
-      <ImportLibrary>..\lib64\CppUnit.lib</ImportLibrary>
+      <ImportLibrary>..\lib64\$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -217,7 +217,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>.\lib64\CppUnit.tlb</TypeLibraryName>
+      <TypeLibraryName>.\lib64\$(TargetName).tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -239,7 +239,7 @@
       <AssemblerListingLocation>
       </AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>..\lib64\CppUnitmdd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib64\$(TargetName).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -251,7 +251,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib64\CppUnitmdd.lib</OutputFile>
+      <OutputFile>..\lib64\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
@@ -260,7 +260,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>.\lib64\CppUnit.tlb</TypeLibraryName>
+      <TypeLibraryName>.\lib64\$(TargetName).tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -293,7 +293,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib64\CppUnitmd.lib</OutputFile>
+      <OutputFile>..\lib64\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
@@ -302,7 +302,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>.\lib64\CppUnit.tlb</TypeLibraryName>
+      <TypeLibraryName>.\lib64\$(TargetName).tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -324,7 +324,7 @@
       <AssemblerListingLocation>
       </AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>..\lib64\CppUnitmtd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib64\$(TargetName).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -336,7 +336,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib64\CppUnitmtd.lib</OutputFile>
+      <OutputFile>..\lib64\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
@@ -345,7 +345,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>.\lib64\CppUnit.tlb</TypeLibraryName>
+      <TypeLibraryName>.\lib64\$(TargetName).tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -378,7 +378,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib64\CppUnitmt.lib</OutputFile>
+      <OutputFile>..\lib64\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -392,22 +392,22 @@
     <ClCompile Include="src\TextTestResult.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\CppUnit\CppUnit.h" />
-    <ClInclude Include="include\CppUnit\CppUnitException.h" />
-    <ClInclude Include="include\CppUnit\estring.h" />
-    <ClInclude Include="include\CppUnit\Guards.h" />
-    <ClInclude Include="include\CppUnit\Orthodox.h" />
-    <ClInclude Include="include\CppUnit\RepeatedTest.h" />
-    <ClInclude Include="include\CppUnit\Test.h" />
-    <ClInclude Include="include\CppUnit\TestCaller.h" />
-    <ClInclude Include="include\CppUnit\TestCase.h" />
-    <ClInclude Include="include\CppUnit\TestDecorator.h" />
-    <ClInclude Include="include\CppUnit\TestFailure.h" />
-    <ClInclude Include="include\CppUnit\TestResult.h" />
-    <ClInclude Include="include\CppUnit\TestRunner.h" />
-    <ClInclude Include="include\CppUnit\TestSetup.h" />
-    <ClInclude Include="include\CppUnit\TestSuite.h" />
-    <ClInclude Include="include\CppUnit\TextTestResult.h" />
+    <ClInclude Include="include\Poco\CppUnit\$(TargetName).h" />
+    <ClInclude Include="include\Poco\CppUnit\CppUnitException.h" />
+    <ClInclude Include="include\Poco\CppUnit\estring.h" />
+    <ClInclude Include="include\Poco\CppUnit\Guards.h" />
+    <ClInclude Include="include\Poco\CppUnit\Orthodox.h" />
+    <ClInclude Include="include\Poco\CppUnit\RepeatedTest.h" />
+    <ClInclude Include="include\Poco\CppUnit\Test.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestCaller.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestCase.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestDecorator.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestFailure.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestResult.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestRunner.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestSetup.h" />
+    <ClInclude Include="include\Poco\CppUnit\TestSuite.h" />
+    <ClInclude Include="include\Poco\CppUnit\TextTestResult.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

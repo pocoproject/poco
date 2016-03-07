@@ -17,7 +17,7 @@
 
 
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/Util/TimerTask.h"
 #include "Poco/Event.h"
 

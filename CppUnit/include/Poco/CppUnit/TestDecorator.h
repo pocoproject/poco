@@ -5,13 +5,13 @@
 //
 
 
-#ifndef CppUnit_TestDecorator_INCLUDED
-#define CppUnit_TestDecorator_INCLUDED
+#ifndef Poco_CppUnit_TestDecorator_INCLUDED
+#define Poco_CppUnit_TestDecorator_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/Guards.h"
-#include "CppUnit/Test.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/Guards.h"
+#include "Poco/CppUnit/Test.h"
 
 
 namespace CppUnit {
@@ -49,4 +49,4 @@ protected:
 } // namespace CppUnit
 
 
-#endif // CppUnit_TestDecorator_INCLUDED
+#endif // Poco_CppUnit_TestDecorator_INCLUDED

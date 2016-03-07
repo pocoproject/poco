@@ -5,13 +5,13 @@
 //
 
 
-#ifndef CppUnit_RepeatedTest_INCLUDED
-#define CppUnit_RepeatedTest_INCLUDED
+#ifndef Poco_CppUnit_RepeatedTest_INCLUDED
+#define Poco_CppUnit_RepeatedTest_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/Guards.h"
-#include "CppUnit/TestDecorator.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/Guards.h"
+#include "Poco/CppUnit/TestDecorator.h"
 
 
 namespace CppUnit {
@@ -74,4 +74,4 @@ inline void RepeatedTest::run(TestResult *result)
 } // namespace CppUnit
 
 
-#endif // CppUnit_RepeatedTest_INCLUDED
+#endif // Poco_CppUnit_RepeatedTest_INCLUDED

@@ -11,8 +11,8 @@
 
 
 #include "POP3ClientSessionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "DialogServer.h"
 #include "Poco/Net/POP3ClientSession.h"
 #include "Poco/Net/MailMessage.h"

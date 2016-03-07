@@ -10,7 +10,7 @@
 //
 
 
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "SQLExecutor.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"

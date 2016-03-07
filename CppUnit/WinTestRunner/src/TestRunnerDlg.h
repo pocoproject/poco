@@ -9,8 +9,8 @@
 #define TestRunnerDlg_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/CppUnitException.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnitException.h"
 #include "ActiveTest.h"
 #include <vector>
 #include "../res/Resource.h"

@@ -11,8 +11,8 @@
 
 
 #include "MD5EngineTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/MD5Engine.h"
 
 

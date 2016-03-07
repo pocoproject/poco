@@ -5,13 +5,13 @@
 //
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
-#define CppUnit_TestSuite_INCLUDED
+#ifndef Poco_CppUnit_TestSuite_INCLUDED
+#define Poco_CppUnit_TestSuite_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/Guards.h"
-#include "CppUnit/Test.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/Guards.h"
+#include "Poco/CppUnit/Test.h"
 #include <vector>
 #include <string>
 
@@ -95,4 +95,4 @@ inline const std::vector<Test*> TestSuite::tests() const
 } // namespace CppUnit
 
 
-#endif // CppUnit_TestSuite_INCLUDED
+#endif // Poco_CppUnit_TestSuite_INCLUDED

@@ -16,7 +16,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class UniqueExpireCacheTest: public CppUnit::TestCase

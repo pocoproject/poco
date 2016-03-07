@@ -42,7 +42,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\lib\CppUnit.tlb"
+				TypeLibraryName=".\lib\$(TargetName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -84,13 +84,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				ShowProgress="0"
-				OutputFile="..\bin\CppUnitd.dll"
+				OutputFile="..\bin\$(TargetName).dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\bin\CppUnitd.pdb"
-				ImportLibrary="..\lib\CppUnitd.lib"
+				ProgramDatabaseFile="..\bin\$(TargetName).pdb"
+				ImportLibrary="..\lib\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -142,7 +142,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\lib\CppUnit.tlb"
+				TypeLibraryName=".\lib\$(TargetName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -182,12 +182,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\bin\CppUnit.dll"
+				OutputFile="..\bin\$(TargetName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
 				ProgramDatabaseFile=""
-				ImportLibrary="..\lib\CppUnit.lib"
+				ImportLibrary="..\lib\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -239,7 +239,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\lib\CppUnit.tlb"
+				TypeLibraryName=".\lib\$(TargetName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -259,7 +259,7 @@
 				PrecompiledHeaderFile=""
 				AssemblerListingLocation=""
 				ObjectFile="$(IntDir)/"
-				ProgramDataBaseFileName="..\lib\CppUnitmdd.pdb"
+				ProgramDataBaseFileName="..\lib\$(TargetName).pdb"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				Detect64BitPortabilityProblems="false"
@@ -280,7 +280,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\CppUnitmdd.lib"
+				OutputFile="..\lib\$(TargetName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -325,7 +325,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\lib\CppUnit.tlb"
+				TypeLibraryName=".\lib\$(TargetName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -365,7 +365,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\CppUnitmd.lib"
+				OutputFile="..\lib\$(TargetName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -410,7 +410,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\lib\CppUnit.tlb"
+				TypeLibraryName=".\lib\$(TargetName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -430,7 +430,7 @@
 				PrecompiledHeaderFile=""
 				AssemblerListingLocation=""
 				ObjectFile="$(IntDir)/"
-				ProgramDataBaseFileName="..\lib\CppUnitmtd.pdb"
+				ProgramDataBaseFileName="..\lib\$(TargetName).pdb"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				Detect64BitPortabilityProblems="false"
@@ -451,7 +451,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\CppUnitmtd.lib"
+				OutputFile="..\lib\$(TargetName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -496,7 +496,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\lib\CppUnit.tlb"
+				TypeLibraryName=".\lib\$(TargetName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -536,7 +536,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\CppUnitmt.lib"
+				OutputFile="..\lib\$(TargetName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -600,67 +600,67 @@
 			Filter="*.h"
 			>
 			<File
-				RelativePath=".\include\CppUnit\CppUnit.h"
+				RelativePath=".\include\Poco\CppUnit\$(TargetName).h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\CppUnitException.h"
+				RelativePath=".\include\Poco\CppUnit\CppUnitException.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\estring.h"
+				RelativePath=".\include\Poco\CppUnit\estring.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\Guards.h"
+				RelativePath=".\include\Poco\CppUnit\Guards.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\Orthodox.h"
+				RelativePath=".\include\Poco\CppUnit\Orthodox.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\RepeatedTest.h"
+				RelativePath=".\include\Poco\CppUnit\RepeatedTest.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\Test.h"
+				RelativePath=".\include\Poco\CppUnit\Test.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestCaller.h"
+				RelativePath=".\include\Poco\CppUnit\TestCaller.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestCase.h"
+				RelativePath=".\include\Poco\CppUnit\TestCase.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestDecorator.h"
+				RelativePath=".\include\Poco\CppUnit\TestDecorator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestFailure.h"
+				RelativePath=".\include\Poco\CppUnit\TestFailure.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestResult.h"
+				RelativePath=".\include\Poco\CppUnit\TestResult.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestRunner.h"
+				RelativePath=".\include\Poco\CppUnit\TestRunner.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestSetup.h"
+				RelativePath=".\include\Poco\CppUnit\TestSetup.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TestSuite.h"
+				RelativePath=".\include\Poco\CppUnit\TestSuite.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\CppUnit\TextTestResult.h"
+				RelativePath=".\include\Poco\CppUnit\TextTestResult.h"
 				>
 			</File>
 		</Filter>

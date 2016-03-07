@@ -5,11 +5,11 @@
 //
 
 
-#ifndef CppUnit_TestCaller_INCLUDED
-#define CppUnit_TestCaller_INCLUDED
+#ifndef Poco_CppUnit_TestCaller_INCLUDED
+#define Poco_CppUnit_TestCaller_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include "Guards.h"
 #include "TestCase.h"
 #include <memory>
@@ -56,10 +56,10 @@ class TestCaller: public TestCase
 	typedef void (Fixture::*TestMethod)();
 
 public:
-	TestCaller(const std::string& rName, TestMethod test):
-		TestCase(rName),
+	TestCaller(const std::string& name, TestMethod test): 
+		TestCase(name), 
 		_test(test),
-		_fixture(new Fixture(rName))
+		_fixture(new Fixture(name))
 	{
 	}
 	
@@ -100,4 +100,4 @@ private:
 	suite->addTest(new CppUnit::TestCaller<cls>(#mth, &cls::mth))
 
 
-#endif // CppUnit_TestCaller_INCLUDED
+#endif // Poco_CppUnit_TestCaller_INCLUDED

@@ -5,11 +5,11 @@
 //
 
 
-#ifndef CppUnit_CppUnitException_INCLUDED
-#define CppUnit_CppUnitException_INCLUDED
+#ifndef Poco_CppUnit_CppUnitException_INCLUDED
+#define Poco_CppUnit_CppUnitException_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include <exception>
 #include <string>
 
@@ -68,17 +68,17 @@ inline CppUnitException::CppUnitException(const CppUnitException& other): except
 }
 
 
-inline CppUnitException::CppUnitException (const std::string& message, long exceptionLineNumber, const std::string& rFileName): _message(message), _lineNumber(exceptionLineNumber), _data1lineNumber(CPPUNIT_UNKNOWNLINENUMBER), _data2lineNumber(CPPUNIT_UNKNOWNLINENUMBER), _fileName(rFileName)
+inline CppUnitException::CppUnitException (const std::string& message, long lineNumber, const std::string& fileName): _message(message), _lineNumber(lineNumber), _data1lineNumber(CPPUNIT_UNKNOWNLINENUMBER), _data2lineNumber(CPPUNIT_UNKNOWNLINENUMBER), _fileName(fileName)
 {
 }
 
 
-inline CppUnitException::CppUnitException (const std::string& message, long exceptionLineNumber, long data1lineNumber, const std::string& rFileName): _message(message), _lineNumber(exceptionLineNumber), _data1lineNumber(data1lineNumber), _data2lineNumber(CPPUNIT_UNKNOWNLINENUMBER), _fileName(rFileName)
+inline CppUnitException::CppUnitException (const std::string& message, long lineNumber, long data1lineNumber, const std::string& fileName): _message(message), _lineNumber(lineNumber), _data1lineNumber(data1lineNumber), _data2lineNumber(CPPUNIT_UNKNOWNLINENUMBER), _fileName(fileName)
 {
 }
 
 
-inline CppUnitException::CppUnitException (const std::string& message, long exceptionLineNumber, long data1lineNumber, long data2lineNumber, const std::string& rFileName): _message(message), _lineNumber(exceptionLineNumber), _data1lineNumber(data1lineNumber), _data2lineNumber(data2lineNumber), _fileName(rFileName)
+inline CppUnitException::CppUnitException (const std::string& message, long lineNumber, long data1lineNumber, long data2lineNumber, const std::string& fileName): _message(message), _lineNumber(lineNumber), _data1lineNumber(data1lineNumber), _data2lineNumber(data2lineNumber), _fileName(fileName)
 {
 }
 
@@ -138,4 +138,4 @@ inline const std::string& CppUnitException::fileName() const
 } // namespace CppUnit
 
 
-#endif // CppUnit_CppUnitException_INCLUDED
+#endif // Poco_CppUnit_CppUnitException_INCLUDED

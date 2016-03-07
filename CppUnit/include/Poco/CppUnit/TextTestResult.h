@@ -5,12 +5,12 @@
 //
 
 
-#ifndef CppUnit_TextTestResult_INCLUDED
-#define CppUnit_TextTestResult_INCLUDED
+#ifndef Poco_CppUnit_TextTestResult_INCLUDED
+#define Poco_CppUnit_TextTestResult_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/TestResult.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/TestResult.h"
 #include <set>
 #include <ostream>
 
@@ -53,4 +53,4 @@ inline std::ostream& operator<< (std::ostream& stream, TextTestResult& result)
 } // namespace CppUnit
 
 
-#endif // CppUnit_TextTestResult_INCLUDED
+#endif // Poco_CppUnit_TextTestResult_INCLUDED

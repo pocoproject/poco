@@ -11,8 +11,8 @@
 
 
 #include "NamePoolTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/XML/NamePool.h"
 #include "Poco/XML/Name.h"
 #include "Poco/DOM/AutoPtr.h"

@@ -5,11 +5,11 @@
 //
 
 
-#ifndef CppUnit_TestRunner_INCLUDED
-#define CppUnit_TestRunner_INCLUDED
+#ifndef Poco_CppUnit_TestRunner_INCLUDED
+#define Poco_CppUnit_TestRunner_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include <vector>
 #include <string>
 #include <ostream>
@@ -100,4 +100,4 @@ private:
 #endif
 
 
-#endif // CppUnit_TestRunner_INCLUDED
+#endif // Poco_CppUnit_TestRunner_INCLUDED

@@ -17,7 +17,7 @@ objects = AttributesImplTest ChildNodesTest DOMTestSuite DocumentTest \
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoXML PocoFoundation CppUnit
+target_libs    = PocoXML PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec
 

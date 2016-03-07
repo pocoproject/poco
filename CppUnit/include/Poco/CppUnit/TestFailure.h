@@ -5,13 +5,13 @@
 //
 
 
-#ifndef CppUnit_TestFailure_INCLUDED
-#define CppUnit_TestFailure_INCLUDED
+#ifndef Poco_CppUnit_TestFailure_INCLUDED
+#define Poco_CppUnit_TestFailure_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/CppUnitException.h"
-#include "CppUnit/Guards.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnitException.h"
+#include "Poco/CppUnit/Guards.h"
 
 
 namespace CppUnit {
@@ -52,7 +52,7 @@ protected:
 
 
 // Constructs a TestFailure with the given test and exception.
-inline TestFailure::TestFailure(Test* pFailedTest, CppUnitException* pThrownException): _failedTest(pFailedTest), _thrownException(pThrownException)
+inline TestFailure::TestFailure(Test* failedTest, CppUnitException* thrownException): _failedTest(failedTest), _thrownException(thrownException)
 {
 }
 
@@ -81,6 +81,6 @@ inline CppUnitException* TestFailure::thrownException()
 } // namespace CppUnit
 
 
-#endif // CppUnit_TestFailure_INCLUDED
+#endif // Poco_CppUnit_TestFailure_INCLUDED
 
 

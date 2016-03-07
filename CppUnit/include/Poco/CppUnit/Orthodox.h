@@ -5,12 +5,12 @@
 //
 
 
-#ifndef CppUnit_Orthodox_INCLUDED
-#define CppUnit_Orthodox_INCLUDED
+#ifndef Poco_CppUnit_Orthodox_INCLUDED
+#define Poco_CppUnit_Orthodox_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 namespace CppUnit {
@@ -102,4 +102,4 @@ ClassUnderTest Orthodox<ClassUnderTest>::call(ClassUnderTest object)
 } // namespace CppUnit
 
 
-#endif // CppUnit_Orthodox_INCLUDED
+#endif // Poco_CppUnit_Orthodox_INCLUDED

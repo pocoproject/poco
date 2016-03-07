@@ -13,7 +13,7 @@
 #include "ActiveTest.h"
 #include "GUITestResult.h"
 #include "ProgressBar.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "TestRunnerDlg.h"
 
 
