@@ -151,7 +151,7 @@ private:
 	static std::string getPort();
 	static std::string getBase();
 	static std::string getUser();
-	static std::string getPassword();
+	static std::string getPass();
 
 	static std::string _dbConnString;
 	static Poco::SharedPtr<Poco::Data::Session> _pSession;
