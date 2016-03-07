@@ -25,6 +25,22 @@
 #include <cmath>
 
 
+#if defined(POCO_OS_AIX)
+
+
+namespace std {
+
+
+using ::isinf;
+using ::isnan;
+
+
+} // namespace std
+
+
+#endif
+
+
 namespace Poco {
 
 
