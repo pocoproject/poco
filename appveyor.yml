@@ -10,19 +10,19 @@ hosts:
   localhost: 127.0.0.1
   db.server.com: 127.0.0.2
 
+services:
 # mysql : server: localhost, port: 3306
 # mysql : user  : root, password: Password12!
-#  - mysql
+  - mysql
 
 # mongodb config  : C:\mongodb\mongod.cfg
 # mongodb database: C:\mongodb\data\db
+  - mongodb
 
 # Server name: localhost
 # Server port: 5432
 # postgres account password: Password12!
-services:
   - postgresql94
-  - mongodb
 
   
 platform:
