@@ -45,7 +45,7 @@
 #endif
 
 //
-// Automatically link Foundation library.
+// Automatically link CppUnit library.
 //
 #if defined(_MSC_VER)
 	#if defined(POCO_DLL)
