@@ -331,9 +331,15 @@ build_script:
 
 before_test:
 # -------------------------------------------------------------------------------------------
+# MySQL
+   - ps: |
+         $env:MYSQL_PWD="Password12!"
+         $cmd = 'mysql -e "create database pocotestdb;" --user=root';
+         iex "& $cmd"
+
+# -------------------------------------------------------------------------------------------
 # PostgreSQL
   - set PATH=C:\Program Files\PostgreSQL\9.4\bin\;%PATH%
-# -------------------------------------------------------------------------------------------
  
   - ps: |
       $line='-------------------------------------------------------------------------------------';
@@ -352,6 +358,7 @@ before_test:
       
 after_test:
 
+
 test_script:
   - ps: |
       $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
@@ -364,12 +371,12 @@ test_script:
           if ($env:platform -eq "Win32")
           {
             $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
-            $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Data/PostgreSQL', 'Redis', 'PDF')
+            $excluded   = @('Data', 'Data/ODBC','Data/PostgreSQL', 'Redis', 'PDF')
           }
           if ($env:platform -eq "x64")
           {
             $env:PATH = "$env:POCO_BASE\bin64;" + $env:PATH;$suffix = 64;
-            $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
+            $excluded   = @('Data', 'Data/ODBC','Redis', 'PDF')
           }
 
           Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;

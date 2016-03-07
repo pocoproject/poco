@@ -27,10 +27,6 @@
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 
-#ifdef _WIN32
-#include <Winsock2.h>
-#endif 
-
 #include <mysql.h>
 #include <iostream>
 #include <limits>
@@ -155,13 +151,13 @@ SQLExecutor::~SQLExecutor()
 }
 
 
-void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const char* pwd, const char* db, int port, const char* tableCreateString)
+void SQLExecutor::bareboneMySQLTest(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db, const std::string& port, const char* tableCreateString)
 {
 	int rc;
 	MYSQL* hsession = mysql_init(0);
 	assert (hsession != 0);
 
-	MYSQL* tmp = mysql_real_connect(hsession, host, user, pwd, db, port, 0, 0);
+	MYSQL* tmp = mysql_real_connect(hsession, host.c_str(), user.c_str(), pwd.c_str(), db.c_str(), stoi(port), 0, 0);
 	assert(tmp == hsession);
 	
 	MYSQL_STMT* hstmt = mysql_stmt_init(hsession);

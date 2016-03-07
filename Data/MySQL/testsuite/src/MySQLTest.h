@@ -128,6 +128,11 @@ private:
 
 	static void dbInfo(Poco::Data::Session& session);
 
+	static std::string getHost();
+	static std::string getPort();
+	static std::string getUser();
+	static std::string getPass();
+	static std::string getBase();
 	static std::string _dbConnString;
 	static Poco::SharedPtr<Poco::Data::Session> _pSession;
 	static Poco::SharedPtr<SQLExecutor> _pExecutor;

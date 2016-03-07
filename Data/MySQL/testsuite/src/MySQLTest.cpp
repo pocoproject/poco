@@ -13,6 +13,7 @@
 #include "MySQLTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Environment.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
@@ -33,6 +34,7 @@ using Poco::Data::MySQL::ConnectionException;
 using Poco::Data::MySQL::Utility;
 using Poco::Data::MySQL::StatementException;
 using Poco::format;
+using Poco::Environment;
 using Poco::NotFoundException;
 using Poco::Int32;
 using Poco::Nullable;
@@ -44,21 +46,37 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 
 //
 // Parameters for barebone-test
-#define MYSQL_USER "root"
-#define MYSQL_PWD  "poco"
-#define MYSQL_HOST "localhost"
-#define MYSQL_PORT 3306
-#define MYSQL_DB   "pocotestdb"
+
+std::string MySQLTest::getHost()
+{
+	return "localhost";
+}
+std::string MySQLTest::getPort()
+{
+	return "3306";
+}
+std::string MySQLTest::getUser()
+{
+	return "root";
+}
+std::string MySQLTest::getPass()
+{
+	if (Environment::has("APPVEYOR"))
+		return "Password12!";
+	else
+		return "poco";
+}
+std::string MySQLTest::getBase()
+{
+	return "pocotestdb";
+}
+
+std::string MySQLTest::_dbConnString;
+
+
 
 //
 // Connection string
-std::string MySQLTest::_dbConnString = "host=" MYSQL_HOST
-	";user=" MYSQL_USER
-	";password=" MYSQL_PWD
-	";db=" MYSQL_DB
-	";compress=true"
-	";auto-reconnect=true"
-	";secure-auth=true";
 
 
 MySQLTest::MySQLTest(const std::string& name):
@@ -84,17 +102,18 @@ void MySQLTest::dbInfo(Session& session)
 
 void MySQLTest::connectNoDB()
 {
-	std::string dbConnString = "host=" MYSQL_HOST
-		";user=" MYSQL_USER
-		";password=" MYSQL_PWD
-		";compress=true;auto-reconnect=true";
+	std::string dbConnString;
+	dbConnString =  "host=" + getHost();
+	dbConnString +=	";user="  + getUser();
+	dbConnString += ";password="  + getPass();
+	dbConnString += ";compress=true;auto-reconnect=true";
 
 	try
 	{
 		Session session(MySQL::Connector::KEY, dbConnString);
 		std::cout << "Connected to [" << "MySQL" << "] without database." << std::endl;
 		dbInfo(session);
-		session << "CREATE DATABASE IF NOT EXISTS " MYSQL_DB ";", now;
+		session << "CREATE DATABASE IF NOT EXISTS " + getBase() + ";", now;
 		std::cout << "Disconnecting ..." << std::endl;
 		session.close();
 		std::cout << "Disconnected." << std::endl;
@@ -117,7 +136,7 @@ void MySQLTest::testBareboneMySQL()
 		"Fourth INTEGER,"
 		"Fifth FLOAT)";
 
-	_pExecutor->bareboneMySQLTest(MYSQL_HOST, MYSQL_USER, MYSQL_PWD, MYSQL_DB, MYSQL_PORT, tableCreateString.c_str());
+	_pExecutor->bareboneMySQLTest(getHost(), getUser(), getPass(), getBase(), getPort(), tableCreateString.c_str());
 }
 
 
@@ -836,6 +855,14 @@ void MySQLTest::tearDown()
 CppUnit::Test* MySQLTest::suite()
 {
 	MySQL::Connector::registerConnector();
+
+	_dbConnString = "host=" + getHost();
+	_dbConnString += ";user=" + getUser();
+	_dbConnString += ";password=" + getPass();
+	_dbConnString += ";db=" + getBase();
+	_dbConnString += ";compress=true";
+	_dbConnString += ";auto-reconnect=true";
+	_dbConnString += ";secure-auth=true";
 
 	try
 	{
