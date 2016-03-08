@@ -75,37 +75,61 @@ private:
 //
 inline bool FPEnvironmentImpl::isInfiniteImpl(float value)
 {
+#if POCO_OS == POCO_OS_AIX
+	return ::isinf(value) != 0;
+#else
 	return std::isinf(value) != 0;
+#endif
 }
 
 
 inline bool FPEnvironmentImpl::isInfiniteImpl(double value)
 {
+#if POCO_OS == POCO_OS_AIX
+	return ::isinf(value) != 0;
+#else
 	return std::isinf(value) != 0;
+#endif
 }
 
 
 inline bool FPEnvironmentImpl::isInfiniteImpl(long double value)
 {
+#if POCO_OS == POCO_OS_AIX
+	return ::isinf((double) value) != 0;
+#else
 	return std::isinf((double) value) != 0;
+#endif
 }
 
 
 inline bool FPEnvironmentImpl::isNaNImpl(float value)
 {
+#if POCO_OS == POCO_OS_AIX
+	return ::isnan(value) != 0;
+#else
 	return std::isnan(value) != 0;
+#endif
 }
 
 
 inline bool FPEnvironmentImpl::isNaNImpl(double value)
 {
+#if POCO_OS == POCO_OS_AIX
+	return ::isnan(value) != 0;
+#else
 	return std::isnan(value) != 0;
+#endif
 }
 
 
 inline bool FPEnvironmentImpl::isNaNImpl(long double value)
 {
+#if POCO_OS == POCO_OS_AIX
+	return ::isnan((double) value) != 0;
+#else
 	return std::isnan((double) value) != 0;
+#endif
 }
 
 
