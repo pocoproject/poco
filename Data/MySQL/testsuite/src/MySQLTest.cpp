@@ -63,6 +63,8 @@ std::string MySQLTest::getPass()
 {
 	if (Environment::has("APPVEYOR"))
 		return "Password12!";
+	else if (Environment::has("TRAVIS"))
+		return "";
 	else
 		return "poco";
 }

@@ -9,7 +9,6 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-
 #include "CppUnit/TestCase.h"
 #include "SQLExecutor.h"
 #include "Poco/NumberParser.h"

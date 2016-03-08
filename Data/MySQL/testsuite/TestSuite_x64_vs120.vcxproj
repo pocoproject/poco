@@ -312,7 +312,13 @@
     <ClCompile Include="src\Driver.cpp" />
     <ClCompile Include="src\MySQLTest.cpp" />
     <ClCompile Include="src\MySQLTestSuite.cpp" />
-    <ClCompile Include="src\SQLExecutor.cpp" />
+    <ClCompile Include="src\SQLExecutor.cpp">
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">false</PreprocessToFile>
+      <PreprocessKeepComments Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">false</PreprocessKeepComments>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="obj64\TestSuite\release_shared\SQLExecutor.i" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
