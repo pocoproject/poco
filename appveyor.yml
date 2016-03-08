@@ -26,8 +26,8 @@ services:
 
   
 platform:
-  - x64
   - Win32
+  - x64
   
 # -------------------------------------------------------------------------------------------
 # building debug configuration doubles the round time and isn't so useful.
@@ -157,7 +157,7 @@ install:
   - ps: |
       if ($env:platform -eq "Win32")
       {
-          if (Test-Path "c:\mysql-5.7.9-win32" -and false) {
+          if (Test-Path "c:\mysql-5.7.9-win32" -and False) {
               echo "using c:\mysql-5.7.9-win32 from cache"
           }
           else
