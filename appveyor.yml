@@ -157,7 +157,7 @@ install:
   - ps: |
       if ($env:platform -eq "Win32")
       {
-          if (Test-Path "Z:\mysql-5.7.9-win32") {
+          if (Test-Path "c:\mysql-5.7.9-win32") {
               echo "using c:\mysql-5.7.9-win32 from cache"
           }
           else
