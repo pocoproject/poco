@@ -588,11 +588,6 @@
     <ClInclude Include="src\SimpleHashTableTest.h"/>
     <ClInclude Include="src\VarTest.h"/>
   </ItemGroup>
-<<<<<<< HEAD
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>
-=======
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
->>>>>>> develop
 </Project>
