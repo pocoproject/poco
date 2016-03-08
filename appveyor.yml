@@ -189,7 +189,9 @@ install:
       Stop-Service postgresql-x64-9.4
       Set-Service -Name postgresql-x64-9.4 -StartupType Manual
 
-      Write-Host "PostgreSQL 9.4 installed" -ForegroundColor Green# -------------------------------------------------------------------------------------------
+      Write-Host "PostgreSQL 9.4 installed" -ForegroundColor Green
+
+# -------------------------------------------------------------------------------------------
 
    
 before_build:
