@@ -32,7 +32,7 @@
 //
 
 
-#include "CppUnit/TestRunner.h"
+#include "Poco/CppUnit/TestRunner.h"
 #include "PostgreSQLTestSuite.h"
 
 
