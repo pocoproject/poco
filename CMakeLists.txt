@@ -171,6 +171,8 @@ add_subdirectory(Net)
 list(APPEND Poco_COMPONENTS "Net")
 endif()
 
+# Pthreads/threads support
+find_package(Threads REQUIRED)
 
 #NetSSL
 
