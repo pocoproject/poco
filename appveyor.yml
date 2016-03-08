@@ -157,13 +157,13 @@ install:
   - ps: |
       if ($env:platform -eq "Win32")
       {
-          if (Test-Path "c:\mysql-5.7.9-win32") {
+          if (Test-Path "c:\mysql-5.7.9-win32" -and false) {
               echo "using c:\mysql-5.7.9-win32 from cache"
           }
           else
           {
               echo "downloading mysql-5.7.9-win32"
-              Invoke-WebRequest "http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.9-win32.zip" -OutFile mysql-5.7.9-win32.zip
+              Invoke-WebRequest "http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.11-win32.zip" -OutFile mysql-5.7.9-win32.zip
               echo "installing c:\mysql-5.7.9-win32"
               7z x -y mysql-5.7.9-win32.zip -oc:\
           }
