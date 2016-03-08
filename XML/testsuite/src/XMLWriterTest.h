@@ -54,12 +54,15 @@ public:
 	void testQNamespaces();
 	void testQNamespacesNested();
 	void testNamespaces();
+	void testNamespacesCanonical();
+	void testAttributeNamespaces();
+	void testAttributeNamespacesCanonical();
 	void testNamespacesNested();
+	void testNamespacesNestedCanonical();
 	void testExplicitNamespaces();
 	void testWellformed();
 	void testWellformedNested();
 	void testWellformedNamespace();
-	void testAttributeNamespaces();
 	void testEmpty();
 
 	void setUp();

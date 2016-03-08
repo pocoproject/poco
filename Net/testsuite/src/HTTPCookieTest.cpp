@@ -115,7 +115,7 @@ void HTTPCookieTest::testExpiryFuture()
 	//1 year from now
 	future.assign(future.year() + 1,
 		future.month(),
-		future.day(),
+		(future.month() == 2 && future.day() == 29) ? 28 : future.day(),
 		future.hour(),
 		future.minute(),
 		future.second(),
@@ -131,7 +131,7 @@ void HTTPCookieTest::testExpiryPast()
 	// 1 year ago
 	past.assign(past.year() - 1,
 		past.month(),
-		past.day(),
+		(past.month() == 2 && past.day() == 29) ? 28 : past.day(),
 		past.hour(),
 		past.minute(),
 		past.second(),

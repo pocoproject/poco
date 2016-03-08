@@ -33,6 +33,7 @@ public:
 	void testCompare();
 	void testSwap();
 	void testSize();
+	void testSpace();
 	void testDirectory();
 	void testCopy();
 	void testMove();

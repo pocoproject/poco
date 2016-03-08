@@ -31,6 +31,7 @@ using Poco::TextConverter;
 using Poco::InvalidArgumentException;
 using Poco::NotImplementedException;
 
+#ifdef POCO_ODBC_UNICODE
 
 namespace Poco {
 namespace Data {
@@ -775,3 +776,4 @@ SQLRETURN SQLDrivers(SQLHENV henv,
 
 
 } } } // namespace Poco::Data::ODBC
+#endif

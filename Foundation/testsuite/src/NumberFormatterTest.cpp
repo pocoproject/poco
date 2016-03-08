@@ -16,6 +16,7 @@
 #include "Poco/NumberFormatter.h"
 #include <sstream>
 
+
 using Poco::NumberFormatter;
 using Poco::Int64;
 using Poco::UInt64;
@@ -208,11 +209,13 @@ void NumberFormatterTest::testFormatFloat()
 	assert(NumberFormatter::format(12.25, 4) == "12.2500");
 	assert(NumberFormatter::format(12.25, 8, 4) == " 12.2500");
 
+	assert (NumberFormatter::format(12.45f, 2) == "12.45");
+
 	assert(NumberFormatter::format(-12.25) == "-12.25");
 	assert(NumberFormatter::format(-12.25, 4) == "-12.2500");
 	assert(NumberFormatter::format(-12.25, 10, 4) == "  -12.2500");
 	assert(NumberFormatter::format(-12.25, 10, 2) == "    -12.25");
-
+	assert(NumberFormatter::format(-12.25, 10, 1) == "     -12.3");
 
 	assert (NumberFormatter::format(50.0, 3) == "50.000");
 	assert (NumberFormatter::format(50.0f, 3) == "50.000");
@@ -220,8 +223,9 @@ void NumberFormatterTest::testFormatFloat()
 	assert (NumberFormatter::format(50.123f, 3) == "50.123");
 	assert (NumberFormatter::format(50.123, 0) == "50");
 	assert (NumberFormatter::format(50.123f, 0) == "50");
-	assert (NumberFormatter::format(50.546, 0) == "50");
-	assert (NumberFormatter::format(50.546f, 0) == "50");
+	assert (NumberFormatter::format(50.546, 0) == "51");
+	assert (NumberFormatter::format(50.546f, 0) == "51");
+	assert (NumberFormatter::format(50.546f, 2) == "50.55");
 }
 
 
@@ -258,7 +262,7 @@ void NumberFormatterTest::testAppend()
 	assert (s == "123.4");
 	s.erase();
 	NumberFormatter::append(s, 123.4567, 2);
-	assert (s == "123.45");
+	assert (s == "123.46");
 	s.erase();
 	NumberFormatter::append(s, 123.4567, 10, 5);
 	assert (s == " 123.45670");
@@ -269,7 +273,7 @@ void NumberFormatterTest::testAppend()
 	NumberFormatter::append(s, static_cast<double>(1234567), 2);
 	assert (s == "1234567.00");
 	s.erase();
-	NumberFormatter::append(s, 1234567, 10, 1);
+	NumberFormatter::append(s, 1234567.0, 10, 1);
 	assert (s == " 1234567.0");
 }
 

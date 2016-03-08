@@ -472,6 +472,21 @@ void XMLWriterTest::testNamespaces()
 	assert (xml == "<ns1:r xmlns:ns1=\"urn:ns\">data</ns1:r>");
 }
 
+
+void XMLWriterTest::testNamespacesCanonical()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::CANONICAL_XML);
+	writer.startDocument();
+	writer.startElement("urn:ns", "r", "");
+	writer.characters("data");
+	writer.endElement("urn:ns", "r", "");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<r xmlns=\"urn:ns\">data</r>");
+}
+
+
 void XMLWriterTest::testAttributeNamespaces()
 {
 	std::ostringstream str;
@@ -489,6 +504,23 @@ void XMLWriterTest::testAttributeNamespaces()
 }
 
 
+void XMLWriterTest::testAttributeNamespacesCanonical()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::CANONICAL_XML);
+	Poco::XML::AttributesImpl attrs;
+	attrs.addAttribute("urn:other", "myattr", "", "", "attrValue");
+	attrs.addAttribute("urn:ns", "myattr2", "", "", "attrValue2");
+	writer.startDocument();
+	writer.startElement("urn:ns", "r", "", attrs);
+	writer.characters("data");
+	writer.endElement("urn:ns", "r", "");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<r xmlns=\"urn:ns\" xmlns:ns1=\"urn:other\" myattr2=\"attrValue2\" ns1:myattr=\"attrValue\">data</r>");
+}
+
+
 void XMLWriterTest::testNamespacesNested()
 {
 	std::ostringstream str;
@@ -503,6 +535,25 @@ void XMLWriterTest::testNamespacesNested()
 	writer.endDocument();
 	std::string xml = str.str();
 	assert (xml == "<ns1:r xmlns:ns1=\"urn:ns1\"><ns1:e/><ns2:f xmlns:ns2=\"urn:ns2\"/></ns1:r>");
+}
+
+
+void XMLWriterTest::testNamespacesNestedCanonical()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::CANONICAL_XML);
+	writer.startDocument();
+	writer.startElement("urn:ns1", "r", "");
+	writer.startElement("urn:ns1", "e", "");
+	writer.endElement("urn:ns1", "e", "");
+	Poco::XML::AttributesImpl attrs;
+	attrs.addAttribute("urn:ns1", "myattr", "myattr", "", "attrValue");
+	writer.startElement("urn:ns2", "f", "", attrs);
+	writer.endElement("urn:ns2", "f", "");
+	writer.endElement("urn:ns1", "r", "");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<r xmlns=\"urn:ns1\"><e></e><ns1:f xmlns:ns1=\"urn:ns2\" myattr=\"attrValue\"></ns1:f></r>");
 }
 
 
@@ -639,8 +690,11 @@ CppUnit::Test* XMLWriterTest::suite()
 	CppUnit_addTest(pSuite, XMLWriterTest, testQNamespaces);
 	CppUnit_addTest(pSuite, XMLWriterTest, testQNamespacesNested);
 	CppUnit_addTest(pSuite, XMLWriterTest, testNamespaces);
+	CppUnit_addTest(pSuite, XMLWriterTest, testNamespacesCanonical);
 	CppUnit_addTest(pSuite, XMLWriterTest, testAttributeNamespaces);
+	CppUnit_addTest(pSuite, XMLWriterTest, testAttributeNamespacesCanonical);
 	CppUnit_addTest(pSuite, XMLWriterTest, testNamespacesNested);
+	CppUnit_addTest(pSuite, XMLWriterTest, testNamespacesNestedCanonical);
 	CppUnit_addTest(pSuite, XMLWriterTest, testExplicitNamespaces);
 	CppUnit_addTest(pSuite, XMLWriterTest, testWellformed);
 	CppUnit_addTest(pSuite, XMLWriterTest, testWellformedNested);

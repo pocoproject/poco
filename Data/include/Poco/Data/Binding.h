@@ -59,9 +59,9 @@ public:
 	typedef SharedPtr<Type>    Ptr;
 
 	explicit Binding(T& val,
-		const std::string& name = "", 
+		const std::string& rName = "", 
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction),
+		AbstractBinding(rName, direction),
 		_val(val), 
 		_bound(false)
 		/// Creates the Binding using the passed reference as bound value.
@@ -129,9 +129,9 @@ public:
 	typedef SharedPtr<Type>      Ptr;
 
 	explicit CopyBinding(T& val,
-		const std::string& name = "", 
+		const std::string& rName = "", 
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction),
+		AbstractBinding(rName, direction),
 		_pVal(new T(val)),
 		_bound(false)
 		/// Creates the Binding using the passed reference as bound value.
@@ -192,9 +192,9 @@ public:
 	typedef SharedPtr<Type>      Ptr;
 
 	explicit Binding(const char* pVal, 
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_val(pVal ? pVal : throw NullPointerException() ),
 		_bound(false)
 		/// Creates the Binding by copying the passed string.
@@ -254,9 +254,9 @@ public:
 	typedef SharedPtr<Type>          Ptr;
 
 	explicit CopyBinding(const char* pVal, 
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_val(pVal ? pVal : throw NullPointerException() ),
 		_bound(false)
 		/// Creates the Binding by copying the passed string.
@@ -315,9 +315,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit Binding(std::vector<T>& val, 
-		const std::string& name = "", 
+		const std::string& rName = "", 
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction),
+		AbstractBinding(rName, direction),
 		_val(val), 
 		_begin(), 
 		_end()
@@ -382,9 +382,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit CopyBinding(std::vector<T>& val, 
-		const std::string& name = "", 
+		const std::string& rName = "", 
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction),
+		AbstractBinding(rName, direction),
 		_pVal(new std::vector<T>(val)),
 		_begin(), 
 		_end()
@@ -459,9 +459,9 @@ public:
 	typedef ValType::const_iterator      Iterator;
 
 	explicit Binding(const std::vector<bool>& val, 
-		const std::string& name = "", 
+		const std::string& rName = "", 
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_val(val), 
 		_deq(_val.begin(), _val.end()),
 		_begin(), 
@@ -541,9 +541,9 @@ public:
 	typedef ValType::const_iterator          Iterator;
 
 	explicit CopyBinding(const std::vector<bool>& val, 
-		const std::string& name = "", 
+		const std::string& rName = "", 
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_deq(val.begin(), val.end()),
 		_begin(), 
 		_end()
@@ -610,9 +610,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit Binding(std::list<T>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_val(val), 
 		_begin(), 
 		_end()
@@ -675,9 +675,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit CopyBinding(ValType& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_pVal(new std::list<T>(val)),
 		_begin(), 
 		_end()
@@ -740,9 +740,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit Binding(std::deque<T>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_val(val), 
 		_begin(), 
 		_end()
@@ -805,9 +805,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit CopyBinding(std::deque<T>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_pVal(new std::deque<T>(val)),
 		_begin(), 
 		_end()
@@ -870,9 +870,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit Binding(std::set<T>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_val(val), 
 		_begin(), 
 		_end()
@@ -935,9 +935,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit CopyBinding(std::set<T>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_pVal(new std::set<T>(val)),
 		_begin(), 
 		_end()
@@ -1000,9 +1000,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit Binding(std::multiset<T>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_val(val), 
 		_begin(), 
 		_end()
@@ -1065,9 +1065,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit CopyBinding(std::multiset<T>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_pVal(new std::multiset<T>(val)),
 		_begin(), 
 		_end()
@@ -1130,9 +1130,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit Binding(std::map<K, V>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_val(val), 
 		_begin(), 
 		_end()
@@ -1195,9 +1195,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit CopyBinding(std::map<K, V>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_pVal(new std::map<K, V>(val)),
 		_begin(), 
 		_end()
@@ -1260,9 +1260,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit Binding(std::multimap<K, V>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_val(val), 
 		_begin(), 
 		_end()
@@ -1325,9 +1325,9 @@ public:
 	typedef typename ValType::const_iterator Iterator;
 
 	explicit CopyBinding(std::multimap<K, V>& val,
-		const std::string& name = "",
+		const std::string& rName = "",
 		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
+		AbstractBinding(rName, direction), 
 		_pVal(new std::multimap<K, V>(val)),
 		_begin(), 
 		_end()
@@ -1400,6 +1400,13 @@ inline AbstractBinding::Ptr use(const NullData& t, const std::string& name = "")
 {
 	return new Binding<NullData>(const_cast<NullData&>(t), name, AbstractBinding::PD_IN);
 }
+
+inline AbstractBinding::Ptr use(const NullValue& t, const std::string& name = "")
+/// NullData overload.
+{
+	return use(NullValue::nullCode<void>(), name);
+}
+
 
 
 template <typename T> 

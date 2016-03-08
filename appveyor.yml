@@ -1,4 +1,4 @@
-version: poco-1.7.0 {branch}-{build}
+version: build {branch}-{build}
 
 cache:
   - c:\mysql-5.7.9-win32
@@ -9,19 +9,25 @@ cache:
 hosts:
   localhost: 127.0.0.1
   db.server.com: 127.0.0.2
-  
-services:
+
 # mysql : server: localhost, port: 3306
 # mysql : user  : root, password: Password12!
 #  - mysql
 
 # mongodb config  : C:\mongodb\mongod.cfg
 # mongodb database: C:\mongodb\data\db
+
+# Server name: localhost
+# Server port: 5432
+# postgres account password: Password12!
+services:
+  - postgresql94
   - mongodb
 
+  
 platform:
-  - Win32
   - x64
+  - Win32
   
 # -------------------------------------------------------------------------------------------
 # building debug configuration doubles the round time and isn't so useful.
@@ -36,9 +42,6 @@ environment:
   bundling: bundled
 
   matrix:
-
-    - builder: cmake
-      vsver: 120
 
     - builder: msbuild
       vsver: 120
@@ -76,13 +79,15 @@ environment:
 #      vsver: 140
 #      linkmode: static_mt
 
+    - builder: cmake
+      vsver: 120
 
 matrix:
   fast_finish: true
 
 install:
+  - set POCO_BASE=%CD%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
-  - systeminfo
   - c:\cygwin\bin\uname -a
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
@@ -146,8 +151,7 @@ install:
            }
          }
        }
-# -------------------------------------------------------------------------------------------
-   
+# -------------------------------------------------------------------------------------------  
 #  MySQL 32 bit is not available by default on AppVeyor
 # -------------------------------------------------------------------------------------------
   - ps: |
@@ -165,9 +169,9 @@ install:
             }
         }
  # -------------------------------------------------------------------------------------------
+ 
    
 before_build:
-  - set POCO_BASE=%CD%
   - ps: |
         if ($env:vsver -eq "110")
         {
@@ -199,7 +203,9 @@ before_build:
         popd
         write-host "`nVisual Studio $yyyy CLI variables set." -ForegroundColor Yellow
   
+# -------------------------------------------------------------------------------------------  
 # MySQL
+# -------------------------------------------------------------------------------------------  
   - ps: |
       if ($env:platform -eq "Win32")
       {
@@ -210,6 +216,21 @@ before_build:
       {
           $env:INCLUDE = "C:\Program Files\MySql\MySQL Server 5.6\include;" + $env:INCLUDE
           $env:LIB     = "C:\Program Files\MySql\MySQL Server 5.6\lib;" + $env:LIB
+      }
+
+# -------------------------------------------------------------------------------------------  
+# PostgreSQL
+# -------------------------------------------------------------------------------------------  
+  - ps: |
+      if ($env:platform -eq "Win32")
+      {
+          $env:INCLUDE = "C:\Program Files (x86)\PostgreSQL\9.4\include;" + $env:INCLUDE
+          $env:LIB     = "C:\Program Files (x86)\PostgreSQL\9.4\lib;" + $env:LIB
+      }
+      if ($env:platform -eq "x64")
+      {
+          $env:INCLUDE = "C:\Program Files\PostgreSQL\9.4\include;" + $env:INCLUDE
+          $env:LIB     = "C:\Program Files\PostgreSQL\9.4\lib;" + $env:LIB
       }
 
 after_build:
@@ -309,6 +330,11 @@ build_script:
       }
 
 before_test:
+# -------------------------------------------------------------------------------------------
+# PostgreSQL
+  - set PATH=C:\Program Files\PostgreSQL\9.4\bin\;%PATH%
+# -------------------------------------------------------------------------------------------
+ 
   - ps: |
       $line='-------------------------------------------------------------------------------------';
       $CPPUNIT_IGNORE='';
@@ -338,10 +364,12 @@ test_script:
           if ($env:platform -eq "Win32")
           {
             $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
+            $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Data/PostgreSQL', 'Redis', 'PDF')
           }
           if ($env:platform -eq "x64")
           {
             $env:PATH = "$env:POCO_BASE\bin64;" + $env:PATH;$suffix = 64;
+            $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
           }
 
           Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
@@ -352,7 +380,6 @@ test_script:
           $components;
           Write-Host -ForegroundColor Yellow $line;
  
-          $excluded   = @('Data', 'Data/MySQL', 'Data/ODBC','Redis', 'PDF')
           
           Write-Host excluded;
           Write-Host -ForegroundColor Yellow $line;

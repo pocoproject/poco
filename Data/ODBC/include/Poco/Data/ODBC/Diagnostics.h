@@ -59,12 +59,12 @@ public:
 	typedef std::vector<DiagnosticFields> FieldVec;
 	typedef typename FieldVec::const_iterator Iterator;
 
-	explicit Diagnostics(const H& handle): _handle(handle)
+	explicit Diagnostics(const H& handle)
 		/// Creates and initializes the Diagnostics.
 	{
 		std::memset(_connectionName, 0, sizeof(_connectionName));
 		std::memset(_serverName, 0, sizeof(_serverName));
-		diagnostics();
+		diagnostics(handle);
 	}
 
 	~Diagnostics()
@@ -138,7 +138,7 @@ public:
 		return _fields.end();
 	}
 
-	const Diagnostics& diagnostics()
+	const Diagnostics& diagnostics(const H& handle)
 	{
 		DiagnosticFields df;
 		SQLSMALLINT count = 1;
@@ -149,7 +149,7 @@ public:
 		reset();
 
 		while (!Utility::isError(SQLGetDiagRec(handleType, 
-			_handle, 
+			handle, 
 			count, 
 			df._sqlState, 
 			&df._nativeError, 
@@ -163,7 +163,7 @@ public:
 				// (they fail if connection has not been established yet
 				//  or return empty string if not applicable for the context)
 				if (Utility::isError(SQLGetDiagField(handleType, 
-					_handle, 
+					handle, 
 					count, 
 					SQL_DIAG_CONNECTION_NAME, 
 					_connectionName, 
@@ -182,7 +182,7 @@ public:
 				}
 				
 				if (Utility::isError(SQLGetDiagField(handleType, 
-					_handle, 
+					handle, 
 					count, 
 					SQL_DIAG_SERVER_NAME, 
 					_serverName, 
@@ -223,9 +223,6 @@ private:
 
 	/// Diagnostics container
 	FieldVec _fields;
-
-	/// Context handle
-	const H& _handle;
 };
 
 

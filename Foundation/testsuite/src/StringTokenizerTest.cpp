@@ -326,6 +326,13 @@ void StringTokenizerTest::testStringTokenizer()
 		assert (st.find("2") == 1);
 		assert (st.find("3") == 2);
 	}
+	
+	{
+		Poco::StringTokenizer st(" 2- ","-", Poco::StringTokenizer::TOK_TRIM);
+		assert (st.count() == 2);
+		assert (st[0] == "2");
+		assert (st[1] == "");
+	}
 }
 
 

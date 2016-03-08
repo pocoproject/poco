@@ -25,6 +25,11 @@ before_install:
 services:
   - mongodb
   - redis-server
+  - postgresql
+
+addons:
+  postgresql: "9.3"
+
 
 notifications:
   slack: 
@@ -50,7 +55,7 @@ matrix:
         - export CC="clang"
         - export CXX="clang++"
         - clang++ -x c++ /dev/null -dM -E
-        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make -s -j2
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL && make -s -j2
         - sudo make install
         - ./travis/OSX/runtests.sh
 
@@ -145,7 +150,7 @@ matrix:
     # TODO osx build
     # TODO run test suite
     #  script:
-    #    - ./configure && make -s -j2
+    #    - ./configure && make -s -i -j2
     #    - sudo ifconfig -a
     #    - sudo ifconfig venet0 multicast
     #    - sudo ifconfig -a

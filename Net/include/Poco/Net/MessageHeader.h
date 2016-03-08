@@ -147,6 +147,11 @@ public:
 		/// appended to result, enclosed in double-quotes.
 		/// Otherwise, the value is appended to result as-is.
 		
+	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset = "UTF-8");
+	static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
+	        /// Decode RFC2047 string.
+
+		
 private:
 	enum Limits
 		/// Limits for basic sanity checks when reading a header

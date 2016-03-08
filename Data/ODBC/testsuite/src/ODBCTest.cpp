@@ -22,6 +22,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -41,6 +42,7 @@ using Poco::Data::ODBC::ODBCException;
 using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::StatementDiagnostics;
+using Poco::Data::Statement;
 using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
@@ -1029,7 +1031,7 @@ void ODBCTest::testNull()
 		recreateNullsTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->nulls();
+		_pExecutor->nulls(emptyStringIsSpace());
 		i += 2;
 	}
 }
@@ -1127,6 +1129,20 @@ void ODBCTest::testMultipleResults()
 	}
 }
 
+void ODBCTest::testMultipleResultsNoProj()
+{
+	if (! &session()) fail("Test not available.");
+	session().setFeature("autoBind", true); // DB2 fails without that
+	for (int autoE = 0; autoE < 2; ++autoE)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoExtract", autoE != 0);
+		_pExecutor->multipleResultsNoProj("SELECT * FROM " + ExecUtil::person() + " WHERE Age = ?; "
+		  "SELECT Age FROM " + ExecUtil::person() + " WHERE FirstName = ?; "
+		  "SELECT * FROM " + ExecUtil::person() + " WHERE Age = ? OR Age = ? ORDER BY Age;");
+	}
+}
+
 
 void ODBCTest::testSQLChannel()
 {
@@ -1219,6 +1235,46 @@ void ODBCTest::testNullable()
 	}
 }
 
+void ODBCTest::testNumeric()
+{
+	if (!_pSession) fail("Test not available.");
+
+	recreateNumericTable();
+	std::vector<std::string> vals;
+	vals.push_back("12345678");
+	vals.push_back("123456789012.123");
+	vals.push_back("123456789012345678");
+	vals.push_back("1234567890.12345678");
+	vals.push_back("1234567890123456789012");
+
+	const std::string sqlStr = std::string("INSERT INTO ") + ExecUtil::numeric_tbl() +
+		"(id, num8, num16_3, num18, num18_8, num22) VALUES (1, " + str2NumExpr(vals[0],8,0) + " , " + str2NumExpr(vals[1],16,3) + ", " + str2NumExpr(vals[2], 18,0)  
+		+ " , " + str2NumExpr(vals[3], 18, 8) + " , " + str2NumExpr(vals[4], 22, 0) + ")";
+	
+	session() << sqlStr, now;
+
+	for (int i = 0; i < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i + 1));
+		_pExecutor->numericTypes(vals);
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testInsertStatReuse()
+{
+	for (int i = 0; i < 8; i += 2)
+	{
+		recreatePersonTable();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i + 1));
+
+		_pExecutor->insertStatReuse();
+	}
+}
+
 
 void ODBCTest::testUnicode()
 {
@@ -1256,6 +1312,28 @@ void ODBCTest::testReconnect()
 }
 
 
+void ODBCTest::testSyntaxError()
+{
+	try {
+		session() << "select fro oops", now;
+		fail("Expected syntax error exception");
+	}
+	catch (const StatementException&)
+	{
+	}
+
+	try {
+		Statement stat(session());
+		stat << "select fro oops";
+		stat.execute();
+		fail("Expected syntax error exception");
+	}
+	catch (const StatementException&)
+	{
+	}
+}
+
+
 bool ODBCTest::canConnect(const std::string& driver,
 	std::string& dsn,
 	std::string& uid,
@@ -1274,7 +1352,7 @@ bool ODBCTest::canConnect(const std::string& driver,
 		}
 	}
 
-	if (_drivers.end() == itDrv) 
+	if ((_drivers.end() == itDrv) && (driver.length() != 0) && (driver[0] != '/')) 
 	{
 		dsn = "";
 		uid = "";
