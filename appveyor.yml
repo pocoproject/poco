@@ -5,6 +5,7 @@ cache:
   - C:\ProgramData\chocolatey
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
+  - C:\Program Files (x86)\PostgreSQL
   
 hosts:
   localhost: 127.0.0.1
@@ -157,74 +158,75 @@ install:
   - ps: |
       if ($env:platform -eq "Win32")
       {
-          if (Test-Path "c:\mysql-5.7.9-win32") {
-              echo "using c:\mysql-5.7.9-win32 from cache"
-          }
-          else
-          {
-              echo "downloading mysql-5.7.9-win32"
-              Invoke-WebRequest "http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.11-win32.zip" -OutFile mysql-5.7.9-win32.zip
-              echo "installing c:\mysql-5.7.9-win32"
-              7z x -y mysql-5.7.9-win32.zip -oc:\
-          }
-      }
+        if (Test-Path "c:\mysql-5.7.9-win32") {
+          echo "using c:\mysql-5.7.9-win32 from cache"
+        }
+        else
+        {
+          echo "downloading mysql-5.7.9-win32"
+            Invoke-WebRequest "http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.11-win32.zip" -OutFile mysql-5.7.9-win32.zip
+            echo "installing c:\mysql-5.7.9-win32"
+            7z x -y mysql-5.7.9-win32.zip -oc:\
+         }
+       }
 # -------------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------------  
 #  PostgreSQL 32 bit is not available by default on AppVeyor
-# http://www.enterprisedb.com/products-services-training/pgdownload#windows
+#  http://www.enterprisedb.com/products-services-training/pgdownload#windows
 # -------------------------------------------------------------------------------------------
   - ps: |
-      Write-Host "Installing PostgreSQL 9.4..." -ForegroundColor Cyan
+      if ($env:platform -eq "Win32")
+      {
+        Write-Host "Installing PostgreSQL 9.4..." -ForegroundColor Cyan
 
-      Write-Host "Downloading..."
-      $exePath = "$($env:USERPROFILE)\postgresql-9.4.5-1-windows.exe"
-      (New-Object Net.WebClient).DownloadFile('http://get.enterprisedb.com/postgresql/postgresql-9.4.5-1-windows.exe', $exePath)
+        Write-Host "Downloading..."
+        $exePath = "$($env:USERPROFILE)\postgresql-9.4.5-1-windows.exe"
+        (New-Object Net.WebClient).DownloadFile('http://get.enterprisedb.com/postgresql/postgresql-9.4.5-1-windows.exe', $exePath)
 
-      Write-Host "Installing..."
-      cmd /c start /wait $exePath --mode unattended --superpassword Password12!
-      del $exePath
+        Write-Host "Installing..."
+        cmd /c start /wait $exePath --mode unattended --superpassword Password12!
+        del $exePath
 
-      Write-Host "Setting up services..."
-      Stop-Service postgresql-9.4
-      Set-Service -Name postgresql-9.4 -StartupType Manual
+        Write-Host "Setting up services..."
+        Stop-Service postgresql-9.4
+        Set-Service -Name postgresql-9.4 -StartupType Manual
 
-      Write-Host "PostgreSQL 9.4 installed" -ForegroundColor Green
-
+        Write-Host "PostgreSQL 9.4 installed" -ForegroundColor Green
+      }
 # -------------------------------------------------------------------------------------------
 
    
 before_build:
   - ps: |
-        if ($env:vsver -eq "110")
-        {
-          $vspath= convert-path $env:VS110COMNTOOLS\..\..\VC\bin; $yyyy='2010'
-          if($env:platform -eq 'Win32') { $vctool='';}
-          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+      if ($env:vsver -eq "110")
+      {
+        $vspath= convert-path $env:VS110COMNTOOLS\..\..\VC\bin; $yyyy='2010'
+        if($env:platform -eq 'Win32') { $vctool='';}
+        if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+      }
+      if ($env:vsver -eq "120")
+      {
+        $vspath= convert-path $env:VS120COMNTOOLS\..\..\VC\bin;$yyyy='2013'
+        if($env:platform -eq 'Win32') { $vctool='';}
+        if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }    
+      }
+      if ($env:vsver -eq "140")
+      {
+        $vspath= convert-path $env:VS140COMNTOOLS\..\..\VC\bin; $yyyy='2015'
+        if($env:platform -eq 'Win32') { $vctool='';}
+        if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+      }
+      pushd $vspath;
+      $tool= if($vctool -eq '') {'32'} else {$vctool}
+      cmd /c "vcvars$tool.bat&set" |
+      foreach {
+        if ($_ -match "=") {
+          $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
         }
-        if ($env:vsver -eq "120")
-        {
-          $vspath= convert-path $env:VS120COMNTOOLS\..\..\VC\bin;$yyyy='2013'
-          if($env:platform -eq 'Win32') { $vctool='';}
-          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
-          
-        }
-        if ($env:vsver -eq "140")
-        {
-          $vspath= convert-path $env:VS140COMNTOOLS\..\..\VC\bin; $yyyy='2015'
-          if($env:platform -eq 'Win32') { $vctool='';}
-          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
-        }
-        pushd $vspath;
-        $tool= if($vctool -eq '') {'32'} else {$vctool}
-        cmd /c "vcvars$tool.bat&set" |
-        foreach {
-          if ($_ -match "=") {
-            $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
-          }
-        }
-        popd
-        write-host "`nVisual Studio $yyyy CLI variables set." -ForegroundColor Yellow
+      }
+      popd
+      write-host "`nVisual Studio $yyyy CLI variables set." -ForegroundColor Yellow
   
 # -------------------------------------------------------------------------------------------  
 # MySQL
@@ -234,13 +236,13 @@ before_build:
       {
           $env:INCLUDE = "C:\mysql-5.7.9-win32\include;" + $env:INCLUDE
           $env:LIB     = "C:\mysql-5.7.9-win32\lib;" + $env:LIB
-          $env:PATH = "C:\mysql-5.7.9-win32\bin;" + $env:PATH
+          $env:PATH    = "C:\mysql-5.7.9-win32\bin;" + $env:PATH
       }
       if ($env:platform -eq "x64")
       {
           $env:INCLUDE = "C:\Program Files\MySql\MySQL Server 5.6\include;" + $env:INCLUDE
           $env:LIB     = "C:\Program Files\MySql\MySQL Server 5.6\lib;" + $env:LIB
-          $env:PATH = "C:\Program Files\MySql\MySQL Server 5.6\bin;" + $env:PATH
+          $env:PATH    = "C:\Program Files\MySql\MySQL Server 5.6\bin;" + $env:PATH
       }
       $env:MYSQL_PWD="Password12!"
       $cmd = 'mysql -e "create database pocotestdb;" --user=root';
@@ -255,11 +257,13 @@ before_build:
       {
           $env:INCLUDE = "C:\Program Files (x86)\PostgreSQL\9.4\include;" + $env:INCLUDE
           $env:LIB     = "C:\Program Files (x86)\PostgreSQL\9.4\lib;" + $env:LIB
+          $env:PATH    = "C:\Program Files (x86)\PostgreSQL\9.4\lib;" + $env:PATH
       }
       if ($env:platform -eq "x64")
       {
           $env:INCLUDE = "C:\Program Files\PostgreSQL\9.4\include;" + $env:INCLUDE
           $env:LIB     = "C:\Program Files\PostgreSQL\9.4\lib;" + $env:LIB
+          $env:PATH    = "C:\Program Files\PostgreSQL\9.4\lib;" + $env:PATH
       }
 
 after_build:
@@ -359,12 +363,7 @@ build_script:
       }
 
 before_test:
-# -------------------------------------------------------------------------------------------
-# PostgreSQL
-  - set PATH=C:\Program Files\PostgreSQL\9.4\bin\;%PATH%
-
- 
-  - ps: |
+- ps: |
       $line='-------------------------------------------------------------------------------------';
       $CPPUNIT_IGNORE='';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
@@ -394,7 +393,7 @@ test_script:
           if ($env:platform -eq "Win32")
           {
             $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
-            $excluded   = @('Data', 'Data/ODBC','Data/PostgreSQL', 'Redis', 'PDF')
+            $excluded   = @('Data', 'Data/ODBC', 'Data/MySQL', 'Data/PostgreSQL', 'Redis', 'PDF')
           }
           if ($env:platform -eq "x64")
           {
