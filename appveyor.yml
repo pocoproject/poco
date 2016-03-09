@@ -183,7 +183,7 @@ install:
       if ($env:platform -eq "Win32")
       {
         if (Test-Path $env:POSTGRES32) {
-          echo "using $env:POSTRGES32 from cache"
+          echo "using $env:POSTGRES32 from cache"
         }
         else
         {
@@ -249,7 +249,7 @@ before_build:
           $to   = $env:MYSQL32 + "\bin\libmysql.dll"
           copy $from $to
         }
-        & C:\cygwin\ibin\ls -lR %MYSQL32%
+        & C:\cygwin\bin\ls -lR %MYSQL32%
       }
       if ($env:platform -eq "x64")
       {
