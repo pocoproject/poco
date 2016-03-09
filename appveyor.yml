@@ -168,9 +168,9 @@ install:
         else
         {
           echo "downloading mysql-5.7.9-win32"
-            Invoke-WebRequest "http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.11-win32.zip" -OutFile mysql-5.7.9-win32.zip
-            echo "installing c:\mysql-5.7.9-win32"
-            7z x -y mysql-5.7.9-win32.zip -oc:\
+           Invoke-WebRequest "http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.11-win32.zip" -OutFile mysql-5.7.9-win32.zip
+           echo "installing c:\mysql-5.7.9-win32"
+           7z x -y mysql-5.7.9-win32.zip -oc:\
          }
        }
 # -------------------------------------------------------------------------------------------
@@ -182,21 +182,27 @@ install:
   - ps: |
       if ($env:platform -eq "Win32")
       {
-        Write-Host "Installing PostgreSQL 9.4..." -ForegroundColor Cyan
+        if (Test-Path "C:\Program Files (x86)\PostgreSQL\9.4") {
+          echo "using C:\Program Files (x86)\PostgreSQL\9.4 from cache"
+        }
+        else
+        {
+          Write-Host "Installing PostgreSQL 9.4..." -ForegroundColor Cyan
 
-        Write-Host "Downloading..."
-        $exePath = "$($env:USERPROFILE)\postgresql-9.4.5-1-windows.exe"
-        (New-Object Net.WebClient).DownloadFile('http://get.enterprisedb.com/postgresql/postgresql-9.4.5-1-windows.exe', $exePath)
+          Write-Host "Downloading..."
+          $exePath = "$($env:USERPROFILE)\postgresql-9.4.5-1-windows.exe"
+          (New-Object Net.WebClient).DownloadFile('http://get.enterprisedb.com/postgresql/postgresql-9.4.5-1-windows.exe', $exePath)
 
-        Write-Host "Installing..."
-        cmd /c start /wait $exePath --mode unattended --superpassword Password12!
-        del $exePath
+          Write-Host "Installing..."
+          cmd /c start /wait $exePath --mode unattended --superpassword Password12!
+          del $exePath
 
-        Write-Host "Setting up services..."
-        Stop-Service postgresql-9.4
-        Set-Service -Name postgresql-9.4 -StartupType Manual
+          Write-Host "Setting up services..."
+          Stop-Service postgresql-9.4
+          Set-Service -Name postgresql-9.4 -StartupType Manual
 
-        Write-Host "PostgreSQL 9.4 installed" -ForegroundColor Green
+          Write-Host "PostgreSQL 9.4 installed" -ForegroundColor Green
+        }
       }
 # -------------------------------------------------------------------------------------------
 
@@ -403,7 +409,7 @@ test_script:
           if ($env:platform -eq "Win32")
           {
             $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
-            $excluded   = @('Data', 'Data/ODBC', 'Data/PostgreSQL', 'Redis', 'PDF')
+            $excluded   = @('Data', 'Data/ODBC', 'Data/MySQL', 'Redis', 'PDF')
           }
           if ($env:platform -eq "x64")
           {
