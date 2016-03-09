@@ -41,6 +41,10 @@ configuration:
 
 environment:
   bundling: bundled
+  mysql32:    C:\mysql-5.7.9-win32
+  mysql64:    C:\Program Files\MySql\MySQL Server 5.6
+  postgres32: C:\Program Files (x86)\PostgreSQL\9.4
+  postgres64: C:\Program Files\PostgreSQL\9.4
 
   matrix:
 
@@ -237,13 +241,18 @@ before_build:
           $env:INCLUDE = "C:\mysql-5.7.9-win32\include;" + $env:INCLUDE
           $env:LIB     = "C:\mysql-5.7.9-win32\lib;" + $env:LIB
           $env:PATH    = "C:\mysql-5.7.9-win32\bin;" + $env:PATH
-          copy C:\mysql-5.7.11-win32\lib\libmysql.dll C:\mysql-5.7.11-win32\bin\libmysql.dll
+          if (Test-Path "C:\mysql-5.7.11-win32\lib\libmysql.dll") {
+          	copy C:\mysql-5.7.11-win32\lib\libmysql.dll C:\mysql-5.7.11-win32\bin\libmysql.dll
+          }
       }
       if ($env:platform -eq "x64")
       {
           $env:INCLUDE = "C:\Program Files\MySql\MySQL Server 5.6\include;" + $env:INCLUDE
           $env:LIB     = "C:\Program Files\MySql\MySQL Server 5.6\lib;" + $env:LIB
           $env:PATH    = "C:\Program Files\MySql\MySQL Server 5.6\bin;" + $env:PATH
+          if (Test-Path "C:\Program Files\MySql\MySQL Server 5.6\lib\libmysql.dlll") {
+             copy C:\Program Files\MySql\MySQL Server 5.6\lib\libmysql.dll C:\Program Files\MySql\MySQL Server 5.6\bin\libmysql.dll
+          }
       }
       $env:MYSQL_PWD="Password12!"
       $cmd = 'mysql -e "create database pocotestdb;" --user=root';
