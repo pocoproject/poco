@@ -237,6 +237,7 @@ before_build:
           $env:INCLUDE = "C:\mysql-5.7.9-win32\include;" + $env:INCLUDE
           $env:LIB     = "C:\mysql-5.7.9-win32\lib;" + $env:LIB
           $env:PATH    = "C:\mysql-5.7.9-win32\bin;" + $env:PATH
+          copy C:\mysql-5.7.11-win32\lib\libmysql.dll C:\mysql-5.7.11-win32\bin\libmysql.dll
       }
       if ($env:platform -eq "x64")
       {
@@ -257,13 +258,13 @@ before_build:
       {
           $env:INCLUDE = "C:\Program Files (x86)\PostgreSQL\9.4\include;" + $env:INCLUDE
           $env:LIB     = "C:\Program Files (x86)\PostgreSQL\9.4\lib;" + $env:LIB
-          $env:PATH    = "C:\Program Files (x86)\PostgreSQL\9.4\lib;" + $env:PATH
+          $env:PATH    = "C:\Program Files (x86)\PostgreSQL\9.4\bin;" + $env:PATH
       }
       if ($env:platform -eq "x64")
       {
           $env:INCLUDE = "C:\Program Files\PostgreSQL\9.4\include;" + $env:INCLUDE
           $env:LIB     = "C:\Program Files\PostgreSQL\9.4\lib;" + $env:LIB
-          $env:PATH    = "C:\Program Files\PostgreSQL\9.4\lib;" + $env:PATH
+          $env:PATH    = "C:\Program Files\PostgreSQL\9.4\bin;" + $env:PATH
       }
 
 after_build:
@@ -393,7 +394,7 @@ test_script:
           if ($env:platform -eq "Win32")
           {
             $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
-            $excluded   = @('Data', 'Data/ODBC', 'Data/MySQL', 'Data/PostgreSQL', 'Redis', 'PDF')
+            $excluded   = @('Data', 'Data/ODBC', 'Data/PostgreSQL', 'Redis', 'PDF')
           }
           if ($env:platform -eq "x64")
           {
