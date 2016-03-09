@@ -245,7 +245,9 @@ before_build:
         $env:LIB     = $env:MYSQL32 + "\lib;" + $env:LIB
         $env:PATH    = $env:MYSQL32 + "\bin;" + $env:PATH
         if (Test-Path ($env:MYSQL32 + "\lib\libmysql.dll")) {
-          copy $env:MYSQL32 + "\lib\libmysql.dll" $env:MYSQL32 + "\bin\libmysql.dll"
+          $from = $env:MYSQL32 + "\lib\libmysql.dll";
+          $to   = $env:MYSQL32 + "\bin\libmysql.dll"
+          copy $from $to
         }
         & C:\cygwin\ibin\ls -lR %MYSQL32%
       }
@@ -255,7 +257,9 @@ before_build:
         $env:LIB     = $env:MYSQL64 + "\lib;" + $env:LIB
         $env:PATH    = $env:MYSQL64 + "\bin;" + $env:PATH
         if (Test-Path ($env:MYSQL64 + "\lib\libmysql.dll")) {
-          copy i$env:MYSQL64 + "\lib\libmysql.dll $env:MYSQL64 + "\bin\libmysql.dll
+          $from = $env:MYSQL64 + "\lib\libmysql.dll";
+          $to   = $env:MYSQL64 + "\bin\libmysql.dll"
+          copy $from $to
         }
         & C:\cygwin\bin\ls -lR %MYSQL64%
       }
