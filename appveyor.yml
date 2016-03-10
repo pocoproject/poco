@@ -5,7 +5,8 @@ cache:
   - C:\ProgramData\chocolatey
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
-  - C:\Program Files (x86)\PostgreSQL
+  - C:\Program Files (x86)\PostgreSQL\9.4
+  - C:\Program Files\PostgreSQL\9.4
   
 hosts:
   localhost: 127.0.0.1
@@ -249,7 +250,7 @@ before_build:
           $to   = $env:MYSQL32 + "\bin\libmysql.dll"
           copy $from $to
         }
-        & C:\cygwin\bin\ls -lR %MYSQL32%
+        & C:\cygwin\bin\ls -lR $env:MYSQL32
       }
       if ($env:platform -eq "x64")
       {
@@ -261,7 +262,7 @@ before_build:
           $to   = $env:MYSQL64 + "\bin\libmysql.dll"
           copy $from $to
         }
-        & C:\cygwin\bin\ls -lR %MYSQL64%
+        & C:\cygwin\bin\ls -lR $env:MYSQL64
       }
       $env:MYSQL_PWD="Password12!"
       $cmd = 'mysql -e "create database pocotestdb;" --user=root';
