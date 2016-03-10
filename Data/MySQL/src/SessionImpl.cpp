@@ -55,7 +55,6 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginT
 	addProperty("insertId", &SessionImpl::setInsertId, &SessionImpl::getInsertId);
 	setProperty("handle", static_cast<MYSQL*>(_handle));
 	open();
-	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 }
 
 
