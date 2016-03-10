@@ -19,6 +19,6 @@ objects = PostgreSQLTestSuite Driver PostgreSQLTest SQLExecutor
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoDataPostgreSQL PocoData PocoFoundation CppUnit
+target_libs    = PocoDataPostgreSQL PocoData PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec
