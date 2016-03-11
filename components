@@ -11,7 +11,6 @@ NetSSL_Win
 Data
 Data/SQLite
 Data/ODBC
-Data/MySQL
 Data/PostgreSQL
 Zip
 PageCompiler
@@ -22,3 +21,4 @@ MongoDB
 Redis
 PocoDoc
 ProGen
+Data/MySQL

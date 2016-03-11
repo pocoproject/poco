@@ -83,7 +83,7 @@ std::string PostgreSQLTest::getBase(){
 std::string PostgreSQLTest::getUser(){
 	return "postgres";
 }
-std::string PostgreSQLTest::getPassword(){
+std::string PostgreSQLTest::getPass(){
 	if (Environment::has("APPVEYOR"))
 	{
 		return "Password12!";
@@ -123,7 +123,7 @@ void PostgreSQLTest::testConnectNoDB()
 	std::string dbConnString;
 	dbConnString +=  "host=" + getHost();
 	dbConnString += " user=" + getUser();
-	dbConnString +=	" password=" + getPassword();
+	dbConnString +=	" password=" + getPass();
 	
 	try
 	{
@@ -293,7 +293,7 @@ void PostgreSQLTest::testPostgreSQLOIDs()
 		142
 	};
 	
-	 _pExecutor->oidPostgreSQLTest(getHost(), getUser(), getPassword(), getBase(), getPort(), tableCreateString.c_str(), OIDArray);
+	 _pExecutor->oidPostgreSQLTest(getHost(), getUser(), getPass(), getBase(), getPort(), tableCreateString.c_str(), OIDArray);
 
 }
 
@@ -1047,7 +1047,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 
 	_dbConnString += "host=" + getHost();
 	_dbConnString += " user=" + getUser();
-	_dbConnString += " password=" + getPassword();
+	_dbConnString += " password=" + getPass();
 	_dbConnString += " dbname=" + getBase();
 	_dbConnString += " port=" + getPort();
 

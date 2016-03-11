@@ -9,9 +9,9 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-
 #include "Poco/CppUnit/TestCase.h"
 #include "SQLExecutor.h"
+#include "Poco/NumberParser.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
@@ -27,10 +27,6 @@
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 
-#ifdef _WIN32
-#include <Winsock2.h>
-#endif 
-
 #include <mysql.h>
 #include <iostream>
 #include <limits>
@@ -43,6 +39,7 @@ using Poco::Data::MySQL::StatementException;
 using Poco::format;
 using Poco::Tuple;
 using Poco::DateTime;
+using Poco::NumberParser;
 using Poco::Any;
 using Poco::AnyCast;
 using Poco::NotFoundException;
@@ -155,13 +152,13 @@ SQLExecutor::~SQLExecutor()
 }
 
 
-void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const char* pwd, const char* db, int port, const char* tableCreateString)
+void SQLExecutor::bareboneMySQLTest(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db, const std::string& port, const char* tableCreateString)
 {
 	int rc;
 	MYSQL* hsession = mysql_init(0);
 	assert (hsession != 0);
 
-	MYSQL* tmp = mysql_real_connect(hsession, host, user, pwd, db, port, 0, 0);
+	MYSQL* tmp = mysql_real_connect(hsession, host.c_str(), user.c_str(), pwd.c_str(), db.c_str(), NumberParser::parse(port), 0, 0);
 	assert(tmp == hsession);
 	
 	MYSQL_STMT* hstmt = mysql_stmt_init(hsession);

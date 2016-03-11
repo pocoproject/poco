@@ -26,6 +26,7 @@ services:
   - mongodb
   - redis-server
   - postgresql
+  - mysql
 
 addons:
   postgresql: "9.3"
@@ -45,6 +46,7 @@ before_script:
  - sqlite3 -version
  - chmod 755 ./travis/Linux/runtests.sh
  - chmod 755 ./travis/OSX/runtests.sh
+ - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql -u root -e 'create database pocotestdb;'; fi
 
 matrix:
   include:
