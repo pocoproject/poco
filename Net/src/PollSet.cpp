@@ -16,6 +16,7 @@
 #include "Poco/Net/SocketImpl.h"
 #include "Poco/Mutex.h"
 #include <set>
+#include <cstring>
 
 
 #if defined(POCO_HAVE_FD_EPOLL)

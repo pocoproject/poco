@@ -125,13 +125,10 @@ target_compile_definitions(Foundation
 		$<$<NOT:$<BOOL:${DISABLE_CPP14}>>:POCO_ENABLE_CPP14>
 		$<$<BOOL:${DISABLE_CPP11}>:POCO_DISABLE_CPP11>
 		$<$<NOT:$<BOOL:${DISABLE_CPP11}>>:POCO_ENABLE_CPP11>
-)
-target_compile_features(Foundation
-	PUBLIC
-		$<$<NOT:$<BOOL:${DISABLE_CPP11}>>:cxx_defaulted_move_initializers>
-)
+		)
+
 if(NOT DISABLE_CPP14 AND CMAKE_VERSION VERSION_GREATER "3.8")
-	target_compile_features(Foundation PUBLIC cxx_std_14)
+	set_property(TARGET Foundation PROPERTY CXX_STANDARD 14)
 endif()
 
 if(NOT BUILD_SHARED_LIBS)

@@ -8,8 +8,7 @@ include $(POCO_BASE)/build/rules/global
 
 # see https://github.com/pocoproject/poco/issues/3073
 GLOBAL_SYSLIBS := $(SYSLIBS)
-SYSLIBS = -lssl -lcrypto
-SYSLIBS += $(GLOBAL_SYSLIBS)
+SYSLIBS += -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB)
 
 objects = Cipher CipherFactory CipherImpl CipherKey CipherKeyImpl \
 	CryptoException CryptoStream CryptoTransform \

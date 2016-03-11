@@ -1,0 +1,125 @@
+import java.util.regex.Pattern
+
+def OPENSSL_VERSION = "1.1.1t"
+
+def agents = [
+  deb9_64bit:    [ label: 'native-deb9-64' ],
+  freebsd13_64:  [ label: 'freebsd64-13', injectGHKey: true ], 
+  freebsd12_64:  [ label: 'freebsd64-12', injectGHKey: true, ], 
+  macos:         [ label: 'macos' ], 
+  win32:         [ label: 'windows-build-pool' ], 
+  win64:         [ label: 'windows-build-pool' ]
+
+]
+
+def builds = [
+  'linux64-deb9':               [ agent: agents.deb9_64bit, openssl: 'deb9_64bit', toolchain: "none" ],
+  'linux-x86_64-static-musl':   [ agent: agents.deb9_64bit, openssl: "static-x86_64-musl", toolchain: 'static-musl-x86_64-linux-musl' ],
+  'linux-x86-static-musl':      [ agent: agents.deb9_64bit, openssl: "static-i386-musl", toolchain: 'static-musl-i386-linux-musl' ],
+  'linux-aarch64-static-musl':  [ agent: agents.deb9_64bit, openssl: "static-aarch64-musl", toolchain: 'static-musl-aarch64-linux-musl' ],
+  'freebsd12_64':   [ agent: agents.freebsd12_64, openssl: 'freebsd12_64bit', toolchain: "none" ],
+  'freebsd13_64':   [ agent: agents.freebsd13_64, openssl: 'freebsd13_64bit', toolchain: "none"],
+  'macosx':         [ agent: agents.macos, openssl: 'macos', toolchain: "none" ],
+  'windows32':      [ agent: agents.win32, winPlatform:'x86', openssl: 'win32', toolchain: "none" ],
+  'windows64':      [ agent: agents.win64, winPlatform:'x64', openssl: 'win64', toolchain: "none" ],
+]
+
+def createBuildStages(builds) {
+  builds.collectEntries { name, definition ->
+    [ "${name}": createBuildStage(name, definition) ]
+  }
+}
+
+def createBuildStage(name, definition) {
+  return {
+    stage(name) {
+
+      node(definition.agent.label) {
+        ws("workspace/" + generateWorkspaceName("${env.APPLICATION_NAME}-${env.BRANCH_NAME}-${name}")) {
+          checkout scm
+          withEnv([
+            "PLATFORM=${definition.platform ?: name}",
+            "TOOLCHAIN_NAME=${definition.toolchain ?: name}",
+          ]) {
+            if (definition.agent.injectGHKey) {
+              withCredentials([[
+                $class: 'SSHUserPrivateKeyBinding',
+                credentialsId: 'jenkins-ssh-key',
+                keyFileVariable: 'ID_RSA_FILE',
+              ]]) {
+                sh "rm -f ~/.ssh/id_rsa; cp \\${ID_RSA_FILE} ~/.ssh/id_rsa"
+              }  
+            
+            }
+            
+            withAwsCredentials('jenkins-native-builds') {
+              sh """
+                      aws s3 cp --no-progress s3://ookla-native-toolchains/openssl-${OPENSSL_VERSION}-${definition.openssl}.tar.gz openssl.tgz
+                      tar xzf openssl.tgz
+                      rm openssl.tgz
+                    """
+              if(definition.toolchain != 'none') {
+                sh """
+                      aws s3 cp --no-progress s3://ookla-native-toolchains/${definition.toolchain}.tgz toolchain.tgz
+                      tar xzf toolchain.tgz -C /home/jenkins/toolchains
+                      rm toolchain.tgz
+                    """
+              }
+
+              ['Debug', 'Release'].each { buildType ->
+                dir("cmake_build_${buildType}") {
+                  deleteDir()
+                }
+                dir("cmake_install_${buildType}") {
+                  deleteDir()
+                }
+              }
+
+              if (isUnix()) {
+                sh 'PATH=$PATH:/opt/cmake-3.11.4/bin exec ./jenkins.sh'
+              } else {
+                msvcBat "set PLATFORM=${definition.platform ?: name} & sh ./jenkins.sh", [winPlatform: definition.winPlatform]
+              }
+
+              def version = env.BRANCH_NAME
+              def m = Pattern.compile("${APPLICATION_NAME}-(\\d+.\\d+.\\d+)").matcher(env.BRANCH_NAME)
+              if (m.matches()) {
+                version = m.getAt(0)[1]
+              }
+              m = null
+
+              ['Debug', 'Release'].each { buildType ->
+                sh "rm -f cmake_install_${buildType}.zip"
+                zip zipFile:"cmake_install_${buildType}.zip", dir:"cmake_install_${buildType}"
+                s3Upload(
+                  bucket:'ookla-native-artifacts',
+                  path:"${APPLICATION_NAME}/${env.BRANCH_NAME}/${APPLICATION_NAME}-${version}-${PLATFORM}-${buildType}.zip",
+                  file:"cmake_install_${buildType}.zip")
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+pipeline {
+  agent none
+  environment {
+    APPLICATION_NAME = "poco"
+    BUILD_TIMESTAMP = "${timeStamp}"
+    OPENSSL_VERSION = "${OPENSSL_VERSION}"
+  }
+  stages {
+    stage('Build All') {
+      steps {
+        script {
+          throttle(['fargate']) {
+            parallel createBuildStages(builds)
+          }
+        }
+      }
+    }
+  }
+}
