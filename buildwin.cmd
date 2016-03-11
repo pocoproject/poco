@@ -28,7 +28,7 @@ rem
 rem VS_VERSION is required argument. Default is build all.
 
 rem Change OPENSSL_DIR to match your setup
-set OPENSSL_DIR=C:\OpenSSL
+set OPENSSL_DIR=C:\OpenSSL-Win32
 set OPENSSL_INCLUDE=%OPENSSL_DIR%\include
 set OPENSSL_LIB=%OPENSSL_DIR%\lib;%OPENSSL_DIR%\lib\VC
 set INCLUDE=%INCLUDE%;%OPENSSL_INCLUDE%
