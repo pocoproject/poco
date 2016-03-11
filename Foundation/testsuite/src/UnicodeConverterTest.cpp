@@ -20,13 +20,6 @@
 #include "Poco/UTFString.h"
 
 
-using Poco::UnicodeConverter;
-using Poco::UTF16Char;
-using Poco::UTF16String;
-using Poco::UTF32Char;
-using Poco::UTF32String;
-
-
 UnicodeConverterTest::UnicodeConverterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
@@ -39,14 +32,13 @@ UnicodeConverterTest::~UnicodeConverterTest()
 
 void UnicodeConverterTest::testUTF16()
 {
-	
-	runTests<UTF16String>();
+	runTests<Poco::UTF16String>();
 }
 
 
 void UnicodeConverterTest::testUTF32()
 {
-	runTests<UTF32String>();
+	runTests<Poco::UTF32String>();
 }
 
 
