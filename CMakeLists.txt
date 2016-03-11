@@ -139,6 +139,9 @@ include(DefinePlatformSpecifc)
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
 
+# Pthreads/threads support
+find_package(Threads REQUIRED)
+
 if (ENABLE_TESTS)
    add_subdirectory(CppUnit)
 endif ()
@@ -168,9 +171,6 @@ if(ENABLE_NET)
 add_subdirectory(Net)
 list(APPEND Poco_COMPONENTS "Net")
 endif()
-
-# Pthreads/threads support
-find_package(Threads REQUIRED)
 
 #NetSSL
 
