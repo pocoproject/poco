@@ -45,6 +45,8 @@ before_script:
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql -u root -e 'create database pocotestdb;'; fi
 
 matrix:
+  fast_finish: true
+
   include:
     - env:    TEST_NAME="OSX   clang (make) bundled"
       os: osx
@@ -53,25 +55,21 @@ matrix:
         - export CC="clang"
         - export CXX="clang++"
         - clang++ -x c++ /dev/null -dM -E
-        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL && make -s -j2
-        - sudo make install
-        - ./travis/OSX/runtests.sh
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL && make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
     - env:    TEST_NAME="Linux gcc 4.6 (make) bundled"
       compiler: gcc
       script:
         - export CC="gcc"
         - export CXX="g++"
-        - ./configure --everything && make -s -j2
-        - ./travis/Linux/runtests.sh
+        - ./configure --everything && make -s -j2 install && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux gcc 4.8 (make) bundled"
       compiler: gcc
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - ./configure --everything && make -s -j2
-        - ./travis/Linux/runtests.sh
+        - ./configure --everything && make -s -j2 install && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux gcc 4.6 (make) unbundled"
       compiler: gcc
@@ -79,8 +77,7 @@ matrix:
         - export CC="gcc"
         - export CXX="g++"
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
-        - ./configure --everything --unbundled && make -s -j2
-        - ./travis/Linux/runtests.sh
+        - ./configure --everything --unbundled && make -s -j2 install && ./travis/Linux/runtests.sh
 
     - env:    TEST_NAME="Linux gcc 4.8 (make) unbundled"
       compiler: gcc
@@ -88,19 +85,17 @@ matrix:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - ./configure --everything --unbundled && make -s -j2
-        - ./travis/Linux/runtests.sh
+        - ./configure --everything --unbundled && make -s -j2 install && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux clang 3.4 (make)"
       compiler: clang
       script:
-        - ./configure --everything --config=Linux-clang && make -s -j2
-        - ./travis/Linux/runtests.sh
+        - ./configure --everything --config=Linux-clang && make -s -j2 install && - ./travis/Linux/runtests.sh
 
     #FIXME    the -m64 option bring by the Linux config is not supported by arm-linux-gnueabi-g++ which makes this test failing
-    #FIXME    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
-    #FIXME      script:
-    #FIXME        - ./configure --omit=Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
+    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
+      script:
+        - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2 install CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
     - env:    TEST_NAME="Linux gcc 4.6 (CMake)"
       compiler: gcc
@@ -134,7 +129,7 @@ matrix:
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON ..
-        - make -s -j2 && cd ..
+        - make -s -j2 install && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabihf-g++ (CMake)"
       script:
@@ -143,17 +138,8 @@ matrix:
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. 
-        - make -s -j2 && cd ..
+        - make -s -j2 install && cd ..
 
-    # TODO osx build
-    # TODO run test suite
-    #  script:
-    #    - ./configure && make -s -i -j2
-    #    - sudo ifconfig -a
-    #    - sudo ifconfig venet0 multicast
-    #    - sudo ifconfig -a
-    #    - export POCO_BASE=`pwd`
-    #    - sudo -E build/script/runtests.sh
 
     # QA jobs for code analytics and metrics
     # build documentation and release
