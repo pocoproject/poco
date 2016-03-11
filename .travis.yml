@@ -131,6 +131,7 @@ matrix:
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabi-g++ (CMake)"
+      compiler: gcc
       script:
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
@@ -140,6 +141,7 @@ matrix:
         - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabihf-g++ (CMake)"
+      compiler: gcc
       script:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
