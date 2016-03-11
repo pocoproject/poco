@@ -32,6 +32,9 @@
 #include <iostream>
 #include <limits>
 
+#ifdef max
+#undef max
+#endif
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
