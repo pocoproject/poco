@@ -1,9 +1,9 @@
 language: cpp
 
 cache:
-  - apt
   directories:
     - cmake-3.2.3-Linux-x86_64
+    - apt
 
 branches:
   except:
