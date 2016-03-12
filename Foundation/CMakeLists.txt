@@ -111,14 +111,14 @@ endif(ANDROID)
 # TODO: Why is this here?
 add_definitions( -DPCRE_STATIC)
 
-# For SetAffinity
+# For POSIX threads on Unix
 if(UNIX AND NOT APPLE)
+	# We still need pthreads on Unix
+	set(SYSLIBS ${SYSLIBS} ${CMAKE_THREAD_LIBS_INIT})
 	INCLUDE (CheckFunctionExists)
 	INCLUDE (CheckCXXSourceCompiles)
 	INCLUDE (CheckLibraryExists)
 	CHECK_LIBRARY_EXISTS(pthread pthread_setaffinity_np "pthread.h" HAVE_PTHREAD_SETAFFINITY_NP)
-	#set(CMAKE_EXTRA_INCLUDE_FILES pthread.h)
-	#CHECK_FUNCTION_EXISTS(pthread_setaffinity_np HAVE_PTHREAD_SETAFFINITY_NP)
 	if(NOT HAVE_PTHREAD_SETAFFINITY_NP)
 		message(STATUS "Platform has not PTHREAD_SETAFFINITY_NP")
 	else(HAVE_PTHREAD_SETAFFINITY_NP)
