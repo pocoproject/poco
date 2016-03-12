@@ -1,5 +1,13 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.7.1 (2016-03-14)
+==========================
+
+- fixed GH #1187: Data/MySQL: Seeing frequent "MySQL server has gone away" errors
+- fixed GH #1184: Attempting to connect via a proxy throws a DNS error "Host not found"
+- fixed GH #1180: Possible deadlock when TaskManager::count() is called in onFinished
+
+
 Release 1.7.0 (2016-03-07)
 ==========================
 
