@@ -240,6 +240,8 @@ before_build:
   
 # -------------------------------------------------------------------------------------------  
 # MySQL
+#        & C:\cygwin\bin\ls -lR $env:MYSQL32
+#        & C:\cygwin\bin\ls -lR $env:MYSQL64
 # -------------------------------------------------------------------------------------------  
   - ps: |
       if ($env:platform -eq "Win32")
@@ -252,7 +254,6 @@ before_build:
           $to   = $env:MYSQL32 + "\bin\libmysql.dll"
           copy $from $to
         }
-        & C:\cygwin\bin\ls -lR $env:MYSQL32
       }
       if ($env:platform -eq "x64")
       {
@@ -264,12 +265,11 @@ before_build:
           $to   = $env:MYSQL64 + "\bin\libmysql.dll"
           copy $from $to
         }
-        & C:\cygwin\bin\ls -lR $env:MYSQL64
       }
       $env:MYSQL_PWD="Password12!"
       $cmd = 'mysql -e "create database pocotestdb;" --user=root';
       iex "& $cmd"
- # -------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------------  
 # PostgreSQL
@@ -287,6 +287,7 @@ before_build:
           $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
           $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
       }
+# -------------------------------------------------------------------------------------------
 
 after_build:
   - ps: |
