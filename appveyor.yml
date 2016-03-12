@@ -97,19 +97,19 @@ install:
   - c:\cygwin\bin\cat /proc/cpuinfo
   - c:\cygwin\bin\cat /proc/meminfo
   - ps: |
-        if ($env:builder -eq "cmake")
-        {
-          if (Test-Path "$env:ChocolateyInstall\bin\jom.exe") {
-              echo "using jom from cache"
-          } else {
-              choco install jom
-          }
-          if (Test-Path "$env:ChocolateyInstall\bin\cmake.exe") {
-            echo "using cmake from cache"
-          } else {
-            choco install cmake
-          }
+      if ($env:builder -eq "cmake")
+      {
+        if (Test-Path "$env:ChocolateyInstall\bin\jom.exe") {
+            echo "using jom from cache"
+        } else {
+            choco install jom
         }
+        if (Test-Path "$env:ChocolateyInstall\bin\cmake.exe") {
+          echo "using cmake from cache"
+        } else {
+          choco install cmake
+        }
+      }
   - set
 
 # -------------------------------------------------------------------------------------------
@@ -206,34 +206,37 @@ install:
    
 before_build:
   - ps: |
-      if ($env:vsver -eq "110")
+      if ($env:builder -eq "cmake")
       {
-        $vspath= convert-path $env:VS110COMNTOOLS\..\..\VC\bin; $yyyy='2010'
-        if($env:platform -eq 'Win32') { $vctool='';}
-        if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
-      }
-      if ($env:vsver -eq "120")
-      {
-        $vspath= convert-path $env:VS120COMNTOOLS\..\..\VC\bin;$yyyy='2013'
-        if($env:platform -eq 'Win32') { $vctool='';}
-        if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }    
-      }
-      if ($env:vsver -eq "140")
-      {
-        $vspath= convert-path $env:VS140COMNTOOLS\..\..\VC\bin; $yyyy='2015'
-        if($env:platform -eq 'Win32') { $vctool='';}
-        if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
-      }
-      pushd $vspath;
-      $tool= if($vctool -eq '') {'32'} else {$vctool}
-      cmd /c "vcvars$tool.bat&set" |
-      foreach {
-        if ($_ -match "=") {
-          $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
+        if ($env:vsver -eq "110")
+        {
+          $vspath= convert-path $env:VS110COMNTOOLS\..\..\VC\bin; $yyyy='2010'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
         }
+        if ($env:vsver -eq "120")
+        {
+          $vspath= convert-path $env:VS120COMNTOOLS\..\..\VC\bin;$yyyy='2013'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }    
+        }
+        if ($env:vsver -eq "140")
+        {
+          $vspath= convert-path $env:VS140COMNTOOLS\..\..\VC\bin; $yyyy='2015'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+        }
+        pushd $vspath;
+        $tool= if($vctool -eq '') {'32'} else {$vctool}
+        cmd /c "vcvars$tool.bat&set" |
+        foreach {
+          if ($_ -match "=") {
+            $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
+          }
+        }
+        popd
+        write-host "`nVisual Studio $yyyy CLI variables set." -ForegroundColor Yellow
       }
-      popd
-      write-host "`nVisual Studio $yyyy CLI variables set." -ForegroundColor Yellow
   
 # -------------------------------------------------------------------------------------------  
 # MySQL
@@ -412,12 +415,12 @@ test_script:
           if ($env:platform -eq "Win32")
           {
             $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
-            $excluded   = @('Data', 'Data/ODBC', 'Data/MySQL', 'Redis', 'PDF')
+            $excluded   = @('Data', 'Data/ODBC', 'Redis', 'PDF')
           }
           if ($env:platform -eq "x64")
           {
             $env:PATH = "$env:POCO_BASE\bin64;" + $env:PATH;$suffix = 64;
-            $excluded   = @('Data', 'Data/ODBC','Redis', 'PDF')
+            $excluded   = @('Data', 'Data/ODBC', 'Redis', 'PDF')
           }
 
           Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
