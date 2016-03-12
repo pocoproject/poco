@@ -6,7 +6,6 @@ cache:
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
   - C:\Program Files (x86)\PostgreSQL\9.4
-  - C:\Program Files\PostgreSQL\9.4
   
 hosts:
   localhost: 127.0.0.1
