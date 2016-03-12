@@ -79,7 +79,8 @@ all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
 
-COMPONENTS =  CppUnit Foundation XML JSON Util Net Crypto NetSSL_OpenSSL Data  Data/ODBC Data/SQLiteData/MySQL
+COMPONENTS =  CppUnit Foundation XML JSON Util Net Crypto NetSSL_OpenSSL
+COMPONENTS += Data Data/ODBC Data/SQLite Data/MySQL
 ifneq ($(OSNAME), Cygwin)
 COMPONENTS += Data/PostgreSQL 
 endif
@@ -112,7 +113,7 @@ endif
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec 
-libexecs += Data-libexec  Data/ODBC-libexec Data/SQLite-libexecData/MySQL-libexec
+libexecs += Data-libexec  Data/ODBC-libexec Data/SQLite-libexec Data/MySQL-libexec
 ifneq ($(OSNAME), Cygwin)
 libexecs += Data/PostgreSQL-libexec
 endif
@@ -120,7 +121,7 @@ libexecs += MongoDB-libexec Redis-libexec Zip-libexec PageCompiler-libexec PageC
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests
-tests    += Data-tests Data/ODBC-tests  Data/SQLite-testsData/MySQL-tests
+tests    += Data-tests Data/ODBC-tests  Data/SQLite-tests Data/MySQL-tests
 ifneq ($(OSNAME), Cygwin)
 tests	 += Data/PostgreSQL-tests
 endif
@@ -133,7 +134,7 @@ samples  += MongoDB-samples Zip-samples PageCompiler-samples PDF-samples
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 cleans   =  Foundation-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean 
-cleans   += Data-clean Data/ODBC-clean Data/SQLite-cleanData/MySQL-clean
+cleans   += Data-clean Data/ODBC-clean Data/SQLite-clean Data/MySQL-clean
 ifneq ($(OSNAME), Cygwin)
 cleans	 += Data/PostgreSQL-clean
 endif
