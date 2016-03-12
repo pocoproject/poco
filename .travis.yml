@@ -63,7 +63,7 @@ matrix:
         - export CC="clang"
         - export CXX="clang++"
         - clang++ -x c++ /dev/null -dM -E
-        - ./configure --everything --omit=Data/ODBC,Data/SQLite,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install
         - ./travis/OSX/runtests.sh
 
     - env:    TEST_NAME="Linux gcc 4.6 (make) bundled"
