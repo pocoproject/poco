@@ -54,7 +54,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="CppUnit.lib ${configuration.linker.dependencies}"
+		AdditionalDependencies="PocoCppUnit.lib ${configuration.linker.dependencies}"
 		OutputFile="bin64\${project.target}.exe"
 		LinkIncremental="1"
 		AdditionalLibraryDirectories="${project.pocobase}\lib64"

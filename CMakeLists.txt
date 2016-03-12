@@ -57,6 +57,7 @@ endif()
 include(PocoMacros)
 
 # Allow enabling and disabling components
+option(ENABLE_CPPUNIT "Enable the CppUnit" ON)
 option(ENABLE_XML "Enable the XML" ON)
 option(ENABLE_JSON "Enable the JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
@@ -144,6 +145,7 @@ find_package(Threads REQUIRED)
 
 if (ENABLE_TESTS)
    add_subdirectory(CppUnit)
+   list(APPEND Poco_COMPONENTS "CppUnit")
 endif ()
 
 add_subdirectory(Foundation)

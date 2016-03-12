@@ -11,8 +11,8 @@
 
 
 #include "DocumentTypeTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DOM/DocumentType.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Notation.h"

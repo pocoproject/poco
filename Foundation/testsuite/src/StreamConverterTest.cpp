@@ -11,8 +11,8 @@
 
 
 #include "StreamConverterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/StreamConverter.h"
 #include "Poco/ASCIIEncoding.h"
 #include "Poco/Latin1Encoding.h"

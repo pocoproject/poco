@@ -17,7 +17,7 @@
 
 
 #include "Poco/JSON/JSON.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Query.h"

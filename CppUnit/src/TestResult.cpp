@@ -5,7 +5,7 @@
 //
 
 
-#include "CppUnit/TestResult.h"
+#include "Poco/CppUnit/TestResult.h"
 
 
 namespace CppUnit {

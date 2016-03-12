@@ -55,7 +55,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="CppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res ${configuration.linker.dependencies}"
+		AdditionalDependencies="PocoCppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res ${configuration.linker.dependencies}"
 		OutputFile="bin64\static_md\${project.target}.exe"
 		LinkIncremental="1"
 		AdditionalLibraryDirectories="${project.pocobase}\lib64"

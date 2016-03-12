@@ -11,8 +11,8 @@
 
 
 #include "RandomStreamTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/RandomStream.h"
 #include <vector>
 #include <cmath>

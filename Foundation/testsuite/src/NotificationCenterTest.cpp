@@ -11,8 +11,8 @@
 
 
 #include "NotificationCenterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/NotificationCenter.h"
 #include "Poco/Observer.h"
 #include "Poco/NObserver.h"

@@ -39,7 +39,7 @@
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/Session.h"
 #include "Poco/SharedPtr.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "SQLExecutor.h"
 
 

@@ -27,8 +27,8 @@
 #include "Poco/UUIDGenerator.h"
 
 #include "MongoDBTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 using namespace Poco::MongoDB;
 
