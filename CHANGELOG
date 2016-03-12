@@ -6,6 +6,9 @@ Release 1.7.1 (2016-03-14)
 - fixed GH #1187: Data/MySQL: Seeing frequent "MySQL server has gone away" errors
 - fixed GH #1184: Attempting to connect via a proxy throws a DNS error "Host not found"
 - fixed GH #1180: Possible deadlock when TaskManager::count() is called in onFinished
+- NetSSL_OpenSSL: use TLS_*_method() instead of deprecated SSLv23_*_method() 
+  if OpenSSL version is >= 1.1; initialize default/fallback client context to support 
+  all TLS protocols, not just TLSv1
 
 
 Release 1.7.0 (2016-03-07)
