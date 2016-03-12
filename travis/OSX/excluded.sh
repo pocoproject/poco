@@ -3,5 +3,5 @@
 # should be restored later on when the OSX environment would have
 # been fixed by Travis
 #
-export EXCLUDE_TESTS="Data/MySQL Data/ODBC MongoDB Redis PDF"
+export EXCLUDE_TESTS="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF"
 
