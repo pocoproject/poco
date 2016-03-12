@@ -368,10 +368,18 @@ void Context::createSSLContext()
 		switch (_usage)
 		{
 		case CLIENT_USE:
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+			_pSSLContext = SSL_CTX_new(TLS_client_method());
+#else
 			_pSSLContext = SSL_CTX_new(SSLv23_client_method());
+#endif
 			break;
 		case SERVER_USE:
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+			_pSSLContext = SSL_CTX_new(TLS_server_method());
+#else
 			_pSSLContext = SSL_CTX_new(SSLv23_server_method());
+#endif
 			break;
 #if defined(SSL_OP_NO_TLSv1) && !defined(OPENSSL_NO_TLS1)
 		case TLSV1_CLIENT_USE:
