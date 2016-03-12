@@ -27,10 +27,14 @@
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 
+#include <my_global.h>
 #include <mysql.h>
 #include <iostream>
 #include <limits>
 
+#ifdef max
+#undef max
+#endif
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
