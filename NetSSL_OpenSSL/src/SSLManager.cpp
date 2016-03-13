@@ -148,7 +148,8 @@ Context::Ptr SSLManager::defaultClientContext()
 		catch (Poco::IllegalStateException&)
 		{
 			_ptrClientCertificateHandler = new RejectCertificateHandler(false);
-			_ptrDefaultClientContext = new Context(Context::TLSV1_CLIENT_USE, "", Context::VERIFY_RELAXED, 9, true);
+			_ptrDefaultClientContext = new Context(Context::CLIENT_USE, "", Context::VERIFY_RELAXED, 9, true);
+			_ptrDefaultClientContext->disableProtocols(Context::PROTO_SSLV2 | Context::PROTO_SSLV3);
 		}
 	}
 		
