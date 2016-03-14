@@ -67,10 +67,8 @@ private:
 	AsyncReader(const AsyncReader&);
 	AsyncReader& operator = (const AsyncReader&);
 
-
-	Activity<AsyncReader> _activity;
-
 	Client& _client;
+	Activity<AsyncReader> _activity;
 };
 
 

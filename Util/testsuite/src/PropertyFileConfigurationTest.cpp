@@ -11,8 +11,8 @@
 
 
 #include "PropertyFileConfigurationTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"

@@ -376,8 +376,15 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 
 bool SecureSocketImpl::isLocalHost(const std::string& hostName)
 {
-	SocketAddress addr(hostName, 0);
-	return addr.host().isLoopback();
+	try
+	{
+		SocketAddress addr(hostName, 0);
+		return addr.host().isLoopback();
+	}
+	catch (Poco::Exception&)
+	{
+		return false;
+	}
 }
 
 

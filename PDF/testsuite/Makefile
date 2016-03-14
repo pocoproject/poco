@@ -12,6 +12,6 @@ objects = PDFTestSuite Driver PDFTest
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoPDF PocoFoundation CppUnit
+target_libs    = PocoPDF PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec

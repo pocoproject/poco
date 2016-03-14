@@ -11,8 +11,8 @@
 
 
 #include "FTPStreamFactoryTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "DialogServer.h"
 #include "Poco/Net/FTPStreamFactory.h"
 #include "Poco/Net/DialogSocket.h"

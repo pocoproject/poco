@@ -12,6 +12,8 @@
 #
 LINKMODE ?= SHARED
 
+OMIT    = Data/PostgreSQL
+
 #
 # Define Tools
 #

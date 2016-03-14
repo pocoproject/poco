@@ -54,7 +54,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="CppUnitmt.lib iphlpapi.lib winmm.lib ${configuration.linker.dependencies}"
+		AdditionalDependencies="PocoCppUnitmt.lib iphlpapi.lib winmm.lib ${configuration.linker.dependencies}"
 		OutputFile="bin\static_mt\${project.target}.exe"
 		LinkIncremental="1"
 		AdditionalLibraryDirectories="${project.pocobase}\lib"

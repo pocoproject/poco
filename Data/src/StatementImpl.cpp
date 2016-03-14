@@ -125,9 +125,9 @@ void StatementImpl::assignSubTotal(bool doReset, size_t firstDs)
 			if (_extractors[counter].size())
 			{
 				if (doReset)
-					*it += CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
-				else
 					*it = CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
+				else
+					*it += CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
 			}
 		}
 	}

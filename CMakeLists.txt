@@ -66,6 +66,7 @@ endif()
 include(PocoMacros)
 
 # Allow enabling and disabling components
+option(ENABLE_CPPUNIT "Enable the CppUnit" ON)
 option(ENABLE_XML "Enable the XML" ON)
 option(ENABLE_JSON "Enable the JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
@@ -78,6 +79,7 @@ option(ENABLE_CRYPTO "Enable Crypto" ON)
 option(ENABLE_DATA "Enable Data" ON)
 option(ENABLE_DATA_SQLITE "Enable Data SQlite" ON)
 option(ENABLE_DATA_MYSQL "Enable Data MySQL" ON)
+option(ENABLE_DATA_POSTGRESQL "Enable Data PosgreSQL" ON)
 option(ENABLE_DATA_ODBC "Enable Data ODBC" ON)
 option(ENABLE_SEVENZIP "Enable SevenZip" OFF)
 option(ENABLE_ZIP "Enable Zip" ON)
@@ -161,8 +163,12 @@ include(DefinePlatformSpecifc)
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
 
+# Pthreads/threads support
+find_package(Threads REQUIRED)
+
 if (ENABLE_TESTS)
    add_subdirectory(CppUnit)
+   list(APPEND Poco_COMPONENTS "CppUnit")
 endif ()
 
 add_subdirectory(Foundation)
@@ -190,7 +196,6 @@ if(ENABLE_NET)
 add_subdirectory(Net)
 list(APPEND Poco_COMPONENTS "Net")
 endif()
-
 
 #NetSSL
 if(WIN32 AND ENABLE_NETSSL_WIN)

@@ -11,8 +11,8 @@
 
 
 #include "OAuth20CredentialsTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/OAuth20Credentials.h"
 #include "Poco/Net/NetException.h"

@@ -9,8 +9,8 @@
 #define GuiTestResult_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/TestResult.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/TestResult.h"
 #include <afxmt.h>
 
 

@@ -10,7 +10,7 @@ set_target_properties( "${POCO_EXENAME}"
     OUTPUT_NAME f2cpsp
     )
 
-target_link_libraries( "${POCO_EXENAME}" Net Util XML JSON Foundation)
+target_link_libraries( "${POCO_EXENAME}" ${CMAKE_THREAD_LIBS_INIT} Net Util XML JSON Foundation)
 
 install(
     TARGETS "${POCO_EXENAME}" EXPORT "${POCO_EXENAME}Targets"

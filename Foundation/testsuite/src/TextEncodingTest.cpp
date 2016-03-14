@@ -11,8 +11,8 @@
 
 
 #include "TextEncodingTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/TextEncoding.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/Latin2Encoding.h"

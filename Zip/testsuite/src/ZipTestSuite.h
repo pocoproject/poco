@@ -16,7 +16,7 @@
 #define ZipTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class ZipTestSuite

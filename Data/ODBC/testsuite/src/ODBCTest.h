@@ -17,7 +17,7 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/SharedPtr.h"

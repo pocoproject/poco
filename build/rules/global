@@ -25,7 +25,7 @@ endif
 #
 # Include some optional make configuration
 #
-sinclude $(POCO_BASE)/config.make
+sinclude $(POCO_BASE)/config.build
 
 #
 # Check for PROJECT_BASE
@@ -34,6 +34,9 @@ ifndef PROJECT_BASE
 PROJECT_BASE = $(POCO_BASE)
 endif
 export PROJECT_BASE
+ifdef POCO_VERBOSE
+$(info PROJECT_BASE        = $(PROJECT_BASE))
+endif
 
 #
 # Check for POCO_BUILD
@@ -42,6 +45,9 @@ ifndef POCO_BUILD
 POCO_BUILD = $(PROJECT_BASE)
 endif
 export POCO_BUILD
+ifdef POCO_VERBOSE
+$(info POCO_BUILD          = $(POCO_BUILD))
+endif
 
 #
 # POCO_BASE/POCO_BUILD/cwd sanity checks
@@ -77,7 +83,14 @@ endif
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
 POCO_HOST_OSNAME = MinGW
 endif
+ifdef POCO_VERBOSE
+$(info POCO_HOST_OSNAME    = $(POCO_HOST_OSNAME))
+endif
+
 POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
+ifdef POCO_VERBOSE
+$(info POCO_HOST_OSARCH    = $(POCO_HOST_OSARCH))
+endif
 
 #
 # Begin Sun platforms
@@ -113,6 +126,9 @@ endif
 ifndef POCO_CONFIG
 POCO_CONFIG = $(POCO_HOST_OSNAME)
 endif
+ifdef POCO_VERBOSE
+$(info POCO_CONFIG         = $(POCO_CONFIG))
+endif
 
 #
 # Include System Specific Settings
@@ -127,11 +143,19 @@ OSNAME   := $(POCO_HOST_OSNAME)
 else
 OSNAME   := $(POCO_TARGET_OSNAME)
 endif
+ifdef POCO_VERBOSE
+$(info OSNAME              = $(OSNAME))
+endif
+
 ifndef POCO_TARGET_OSARCH
 OSARCH   := $(subst /,-,$(shell uname -m | tr ' ' _))
 else
 OSARCH   := $(POCO_TARGET_OSARCH)
 endif
+ifdef POCO_VERBOSE
+$(info OSARCH              = $(OSARCH))
+endif
+
 HOSTNAME := $(shell hostname)
 
 #
@@ -200,6 +224,9 @@ POCO_LIB_INSTALLDIR = $(POCO_PREFIX)/lib
 else
 POCO_LIB_INSTALLDIR = $(LIBPATH)
 endif
+ifdef POCO_VERBOSE
+$(info POCO_LIB_INSTALLDIR = $(POCO_LIB_INSTALLDIR))
+endif
 
 ifeq ($(POCO_BASE),$(PROJECT_BASE))
 POCO_LIBRARY =
@@ -209,6 +236,17 @@ endif
 
 ifndef LIBPREFIX
 LIBPREFIX = lib
+endif
+
+ifeq ($(LIBPATH),$(POCO_BASE)/$(LIBDIR))
+LD_LIBRARY_PATH = $(LIBPATH)
+else
+LD_LIBRARY_PATH = $(LIBPATH):$(POCO_BASE)/$(LIBDIR)
+endif
+ifeq ($(POCO_HOST_OSNAME),Darwin)
+SET_LD_LIBRARY_PATH = DYLD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
+else
+SET_LD_LIBRARY_PATH = LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
 endif
 
 #

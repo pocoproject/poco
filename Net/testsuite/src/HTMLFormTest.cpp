@@ -11,8 +11,8 @@
 
 
 #include "HTMLFormTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/PartSource.h"
 #include "Poco/Net/StringPartSource.h"
