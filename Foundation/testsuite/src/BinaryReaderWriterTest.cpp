@@ -11,8 +11,8 @@
 
 
 #include "BinaryReaderWriterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/Buffer.h"

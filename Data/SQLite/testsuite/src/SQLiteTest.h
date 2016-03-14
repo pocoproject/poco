@@ -17,7 +17,7 @@
 
 
 #include "Poco/Data/SQLite/SQLite.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 namespace Poco {

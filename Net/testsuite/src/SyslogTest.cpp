@@ -11,8 +11,8 @@
 
 
 #include "SyslogTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/RemoteSyslogChannel.h"
 #include "Poco/Net/RemoteSyslogListener.h"
 #include "Poco/Net/DNS.h"

@@ -5,8 +5,8 @@
 //
 
 
-#include "CppUnit/TestSuite.h"
-#include "CppUnit/TestResult.h"
+#include "Poco/CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestResult.h"
 
 
 namespace CppUnit {

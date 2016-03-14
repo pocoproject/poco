@@ -15,7 +15,7 @@
 #define StringTokenizerTest_INCLUDED
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 class StringTokenizerTest: public CppUnit::TestCase
 {

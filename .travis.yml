@@ -1,7 +1,11 @@
 language: cpp
 
 cache:
- - apt
+  - apt
+
+branches:
+  except:
+    - /.*pp.eyor.*/
 
 before_install:
   # we need a recent version of CMake
@@ -21,6 +25,12 @@ before_install:
 services:
   - mongodb
   - redis-server
+  - postgresql
+  - mysql
+
+addons:
+  postgresql: "9.3"
+
 
 notifications:
   slack: 
@@ -33,11 +43,16 @@ env:
     
 before_script:
  - echo ${TEST_NAME}
- - sqlite3 -version
  - chmod 755 ./travis/Linux/runtests.sh
  - chmod 755 ./travis/OSX/runtests.sh
+ - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql -u root -e 'create database pocotestdb;'; fi
+ - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql --version; fi
+ - if [ "$TRAVIS_OS_NAME" == "linux" ]; then postgres --version; fi
+ - sqlite3 -version
 
 matrix:
+  fast_finish: true
+
   include:
     - env:    TEST_NAME="OSX   clang (make) bundled"
       os: osx
@@ -46,8 +61,7 @@ matrix:
         - export CC="clang"
         - export CXX="clang++"
         - clang++ -x c++ /dev/null -dM -E
-        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite && make -s -j2
-        - sudo make install
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install
         - ./travis/OSX/runtests.sh
 
     - env:    TEST_NAME="Linux gcc 4.6 (make) bundled"
@@ -55,7 +69,7 @@ matrix:
       script:
         - export CC="gcc"
         - export CXX="g++"
-        - ./configure --everything && make -s -j2
+        - ./configure --everything && make -s -j2 
         - ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux gcc 4.8 (make) bundled"
@@ -90,10 +104,10 @@ matrix:
         - ./configure --everything --config=Linux-clang && make -s -j2
         - ./travis/Linux/runtests.sh
 
-    #FIXME    the -m64 option bring by the Linux config is not supported by arm-linux-gnueabi-g++ which makes this test failing
-    #FIXME    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
-    #FIXME      script:
-    #FIXME        - ./configure --omit=Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
+    - env:    TEST_NAME="Linux arm-linux-gnueabi- (make)"
+      compiler: gcc
+      script:
+        - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
     - env:    TEST_NAME="Linux gcc 4.6 (CMake)"
       compiler: gcc
@@ -103,7 +117,7 @@ matrix:
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
-
+ 
     - env:    TEST_NAME="Linux gcc 4.8 (CMake)"
       compiler: gcc
       script:
@@ -113,7 +127,7 @@ matrix:
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
-    - env:    TEST_NAME="clang 3.4 (CMake)"
+    - env:    TEST_NAME="Linux clang 3.4 (CMake)"
       compiler: clang
       script:
         - source ./travis/ignored.sh
@@ -121,32 +135,25 @@ matrix:
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabi-g++ (CMake)"
+      compiler: gcc
       script:
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON ..
-        - make -s -j2 && cd ..
+        - mkdir cmake-build 
+        - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabihf-g++ (CMake)"
+      compiler: gcc
       script:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. 
-        - make -s -j2 && cd ..
+        - mkdir cmake-build
+        - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
-    # TODO osx build
-    # TODO run test suite
-    #  script:
-    #    - ./configure && make -s -j2
-    #    - sudo ifconfig -a
-    #    - sudo ifconfig venet0 multicast
-    #    - sudo ifconfig -a
-    #    - export POCO_BASE=`pwd`
-    #    - sudo -E build/script/runtests.sh
 
     # QA jobs for code analytics and metrics
     # build documentation and release

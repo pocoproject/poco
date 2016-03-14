@@ -91,7 +91,7 @@ mkdir -p $tools
 mkrelease -o $tools $version CppParser PocoDoc
 
 cd $tools
-./configure --no-tests --no-samples
+./configure --no-tests --no-samples --no-prefix
 make -s -j8
 
 if [ $osname = "Cygwin" ] ; then

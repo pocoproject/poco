@@ -17,7 +17,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/KeyValueArgs.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class LRUCacheTest: public CppUnit::TestCase

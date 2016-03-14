@@ -2,11 +2,11 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{d780d541-ae9b-4dc6-9c70-cc0e5498be41}</UniqueIdentifier>
+      <UniqueIdentifier>{3ba95f7b-09c7-4a66-a9ca-2461302b501d}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Include Files">
-      <UniqueIdentifier>{102c5e2b-3268-48b6-a3da-c96949868573}</UniqueIdentifier>
+      <UniqueIdentifier>{85cbc74b-c127-4eff-9446-cb848da51b89}</UniqueIdentifier>
       <Extensions>*.h</Extensions>
     </Filter>
   </ItemGroup>
@@ -37,52 +37,52 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\CppUnit\CppUnit.h">
+    <ClInclude Include="include\Poco\CppUnit\$(TargetName).h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\CppUnitException.h">
+    <ClInclude Include="include\Poco\CppUnit\CppUnitException.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\estring.h">
+    <ClInclude Include="include\Poco\CppUnit\estring.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\Guards.h">
+    <ClInclude Include="include\Poco\CppUnit\Guards.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\Orthodox.h">
+    <ClInclude Include="include\Poco\CppUnit\Orthodox.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\RepeatedTest.h">
+    <ClInclude Include="include\Poco\CppUnit\RepeatedTest.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\Test.h">
+    <ClInclude Include="include\Poco\CppUnit\Test.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\TestCaller.h">
+    <ClInclude Include="include\Poco\CppUnit\TestCaller.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\TestCase.h">
+    <ClInclude Include="include\Poco\CppUnit\TestCase.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\TestDecorator.h">
+    <ClInclude Include="include\Poco\CppUnit\TestDecorator.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\TestFailure.h">
+    <ClInclude Include="include\Poco\CppUnit\TestFailure.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\TestResult.h">
+    <ClInclude Include="include\Poco\CppUnit\TestResult.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\TestRunner.h">
+    <ClInclude Include="include\Poco\CppUnit\TestRunner.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\TestSetup.h">
+    <ClInclude Include="include\Poco\CppUnit\TestSetup.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\TestSuite.h">
+    <ClInclude Include="include\Poco\CppUnit\TestSuite.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CppUnit\TextTestResult.h">
+    <ClInclude Include="include\Poco\CppUnit\TextTestResult.h">
       <Filter>Include Files</Filter>
     </ClInclude>
   </ItemGroup>

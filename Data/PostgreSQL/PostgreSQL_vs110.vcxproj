@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|Win32">
@@ -32,7 +32,7 @@
     <RootNamespace>PostgreSQL</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
@@ -63,27 +63,27 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings"/>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoDataPostgreSQLd</TargetName>
@@ -97,7 +97,6 @@
     <OutDir>..\..\bin\</OutDir>
     <IntDir>obj\PostgreSQL\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
     <OutDir>..\..\bin\</OutDir>
@@ -133,7 +132,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -165,9 +164,9 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat />
+      <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
@@ -196,7 +195,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\..\lib\PocoDataPostgreSQLmtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -221,9 +220,9 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat />
+      <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
@@ -243,7 +242,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\..\lib\PocoDataPostgreSQLmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -268,10 +267,10 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader />
+      <PrecompiledHeader/>
       <ProgramDataBaseFileName>..\..\lib\PocoDataPostgreSQLmd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat />
+      <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
@@ -280,30 +279,30 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Binder.cpp" />
-    <ClCompile Include="src\Connector.cpp" />
-    <ClCompile Include="src\Extractor.cpp" />
-    <ClCompile Include="src\PostgreSQLException.cpp" />
-    <ClCompile Include="src\PostgreSQLStatementImpl.cpp" />
-    <ClCompile Include="src\PostgreSQLTypes.cpp" />
-    <ClCompile Include="src\SessionHandle.cpp" />
-    <ClCompile Include="src\SessionImpl.cpp" />
-    <ClCompile Include="src\StatementExecutor.cpp" />
-    <ClCompile Include="src\Utility.cpp" />
+    <ClCompile Include="src\Binder.cpp"/>
+    <ClCompile Include="src\Connector.cpp"/>
+    <ClCompile Include="src\Extractor.cpp"/>
+    <ClCompile Include="src\PostgreSQLException.cpp"/>
+    <ClCompile Include="src\PostgreSQLStatementImpl.cpp"/>
+    <ClCompile Include="src\PostgreSQLTypes.cpp"/>
+    <ClCompile Include="src\SessionHandle.cpp"/>
+    <ClCompile Include="src\SessionImpl.cpp"/>
+    <ClCompile Include="src\StatementExecutor.cpp"/>
+    <ClCompile Include="src\Utility.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Poco\Data\PostgreSQL\Binder.h" />
-    <ClInclude Include="include\Poco\Data\PostgreSQL\Connector.h" />
-    <ClInclude Include="include\Poco\Data\PostgreSQL\Extractor.h" />
-    <ClInclude Include="include\Poco\Data\PostgreSQL\PostgreSQL.h" />
-    <ClInclude Include="include\Poco\Data\PostgreSQL\PostgreSQLException.h" />
-    <ClInclude Include="include\Poco\Data\PostgreSQL\PostgreSQLStatementImpl.h" />
-    <ClInclude Include="include\Poco\Data\PostgreSQL\PostgreSQLTypes.h" />
-    <ClInclude Include="include\Poco\Data\PostgreSQL\SessionHandle.h" />
-    <ClInclude Include="include\Poco\Data\PostgreSQL\SessionImpl.h" />
-    <ClInclude Include="include\Poco\Data\PostgreSQL\StatementExecutor.h" />
-    <ClInclude Include="include\Poco\Data\PostgreSQL\Utility.h" />
+    <ClInclude Include="include\Poco\Data\PostgreSQL\Binder.h"/>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\Connector.h"/>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\Extractor.h"/>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\PostgreSQL.h"/>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\PostgreSQLException.h"/>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\PostgreSQLStatementImpl.h"/>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\PostgreSQLTypes.h"/>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\SessionHandle.h"/>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\SessionImpl.h"/>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\StatementExecutor.h"/>
+    <ClInclude Include="include\Poco\Data\PostgreSQL\Utility.h"/>
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <ImportGroup Label="ExtensionTargets"/>
 </Project>

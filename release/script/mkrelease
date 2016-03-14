@@ -209,17 +209,16 @@ ifndef POCO_BASE
 $(warning WARNING: POCO_BASE is not defined. Assuming current directory.)
 export POCO_BASE=$(shell pwd)
 endif
-#$(info POCO_BASE  = $(POCO_BASE))
-
-ifndef POCO_PREFIX
-export POCO_PREFIX=/usr/local
+ifdef POCO_VERBOSE
+$(info POCO_BASE           = $(POCO_BASE))
 endif
-#$(info POCO_PREFIX=$(POCO_PREFIX))
 
 ifndef POCO_BUILD
 export POCO_BUILD=$(POCO_BASE)
 endif
-#$(info POCO_BUILD = $(POCO_BUILD))
+ifdef POCO_VERBOSE
+$(info POCO_BUILD          = $(POCO_BUILD))
+endif
 
 #
 # Determine OS
@@ -232,10 +231,14 @@ endif
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
 POCO_HOST_OSNAME = MinGW
 endif
-#$(info POCO_HOST_OSNAME= $(POCO_HOST_OSNAME))
+ifdef POCO_VERBOSE
+$(info POCO_HOST_OSNAME    = $(POCO_HOST_OSNAME))
+endif
 
 POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
-#$(info POCO_HOST_OSARCH= $(POCO_HOST_OSARCH))
+ifdef POCO_VERBOSE
+$(info POCO_HOST_OSARCH    = $(POCO_HOST_OSARCH))
+endif
 
 #
 # If POCO_CONFIG is not set, use the OS name as configuration name
@@ -243,7 +246,9 @@ POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
 ifndef POCO_CONFIG
 POCO_CONFIG = $(POCO_HOST_OSNAME)
 endif
-#$(info POCO_CONFIG   = $(POCO_CONFIG))
+ifdef POCO_VERBOSE
+$(info POCO_CONFIG         = $(POCO_CONFIG))
+endif
 
 #
 # Include System Specific Settings
@@ -258,14 +263,18 @@ OSNAME   := $(POCO_HOST_OSNAME)
 else
 OSNAME   := $(POCO_TARGET_OSNAME)
 endif
-#$(info OSNAME     = $(OSNAME))
+ifdef POCO_VERBOSE
+$(info OSNAME              = $(OSNAME))
+endif
 
 ifndef POCO_TARGET_OSARCH
 OSARCH   := $(POCO_HOST_OSARCH)
 else
 OSARCH   := $(POCO_TARGET_OSARCH)
 endif
-#$(info OSARCH     = $(OSARCH))
+ifdef POCO_VERBOSE
+$(info OSARCH              = $(OSARCH))
+endif
 
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
@@ -284,7 +293,7 @@ cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
 
 CppUnit-clean:
-	\$(MAKE) -C \$(POCO_BASE)/CppUnit clean
+	$(MAKE) -C $(POCO_BASE)/CppUnit clean
 
 install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco

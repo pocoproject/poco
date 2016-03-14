@@ -20,6 +20,6 @@ objects = CryptoTestSuite Driver \
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoCrypto PocoFoundation CppUnit
+target_libs    = PocoCrypto PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec

@@ -39,7 +39,7 @@
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/Session.h"
 #include "Poco/SharedPtr.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "SQLExecutor.h"
 
 
@@ -146,6 +146,12 @@ private:
 	void recreateNullableStringTable();
 
 	static void dbInfo(Poco::Data::Session& session);
+
+	static std::string getHost();
+	static std::string getPort();
+	static std::string getBase();
+	static std::string getUser();
+	static std::string getPass();
 
 	static std::string _dbConnString;
 	static Poco::SharedPtr<Poco::Data::Session> _pSession;

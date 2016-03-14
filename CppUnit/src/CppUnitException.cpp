@@ -5,7 +5,7 @@
 //
 
 
-#include "CppUnit/CppUnitException.h"
+#include "Poco/CppUnit/CppUnitException.h"
 
 
 namespace CppUnit {

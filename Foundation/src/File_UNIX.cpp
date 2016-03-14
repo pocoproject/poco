@@ -20,6 +20,12 @@
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
+#if defined(POCO_OS_FAMILY_BSD)
+#include <sys/param.h>
+#include <sys/mount.h>
+#else
+#include <sys/statfs.h>
+#endif
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
@@ -405,6 +411,42 @@ bool FileImpl::createDirectoryImpl()
 	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) 
 		handleLastErrorImpl(_path);
 	return true;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct statfs stats;
+	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_blocks * (FileSizeImpl)stats.f_bsize;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct statfs stats;
+	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_bavail * (FileSizeImpl)stats.f_bsize;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct statfs stats;
+	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_bfree * (FileSizeImpl)stats.f_bsize;
 }
 
 

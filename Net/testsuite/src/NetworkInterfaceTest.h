@@ -22,7 +22,7 @@
 #ifdef POCO_NET_HAS_INTERFACE
 
 
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class NetworkInterfaceTest: public CppUnit::TestCase
