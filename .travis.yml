@@ -1,7 +1,7 @@
 language: cpp
 
 cache:
- - apt
+  - apt
 
 branches:
   except:
@@ -43,12 +43,12 @@ env:
     
 before_script:
  - echo ${TEST_NAME}
- - sqlite3 -version
  - chmod 755 ./travis/Linux/runtests.sh
  - chmod 755 ./travis/OSX/runtests.sh
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql -u root -e 'create database pocotestdb;'; fi
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql --version; fi
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then postgres --version; fi
+ - sqlite3 -version
 
 matrix:
   fast_finish: true
@@ -61,7 +61,7 @@ matrix:
         - export CC="clang"
         - export CXX="clang++"
         - clang++ -x c++ /dev/null -dM -E
-        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/SQLite,Data/PostgreSQL && make -s -j2 && sudo make install
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install
         - ./travis/OSX/runtests.sh
 
     - env:    TEST_NAME="Linux gcc 4.6 (make) bundled"
