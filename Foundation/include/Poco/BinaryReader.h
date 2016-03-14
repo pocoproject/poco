@@ -23,6 +23,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Buffer.h"
 #include "Poco/MemoryStream.h"
+#include "Poco/ByteOrder.h"
 #include <vector>
 #include <istream>
 
@@ -151,6 +152,32 @@ public:
 		/// Returns the number of available bytes in the stream.
 
 private:
+	template<typename T>
+	BinaryReader& read(T& value, bool flipBytes)
+	{
+		_istr.read((char*) &value, sizeof(value));
+		if (flipBytes) value = ByteOrder::flipBytes(value);
+		return *this;
+	}
+
+	template<typename T>
+	void read7BitEncoded(T& value)
+	{
+		char c;
+		value = 0;
+		int s = 0;
+		do
+		{
+			c = 0;
+			_istr.read(&c, 1);
+			T x = (c & 0x7F);
+			x <<= s;
+			value += x;
+			s += 7;
+		}
+		while (c & 0x80);
+	}
+
 	std::istream&  _istr;
 	bool           _flipBytes; 
 	TextConverter* _pTextConverter;
