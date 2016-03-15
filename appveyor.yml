@@ -103,8 +103,8 @@ matrix:
   fast_finish: true
 
 install:
-  - c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P openssl
-  - c:\cygwin64\setup-x86_64.exe -B -q -n -N -d -l c:\cygwin64 -R c:\cygwin64 -s http://mirror.csclub.uwaterloo.ca/cygwin  -P openssl
+#  - c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P openssl
+#  - c:\cygwin64\setup-x86_64.exe -B -q -n -N -d -l c:\cygwin64 -R c:\cygwin64 -s http://mirror.csclub.uwaterloo.ca/cygwin  -P openssl
   
   - set POCO_BASE=%CD%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
@@ -158,7 +158,7 @@ install:
 # until CMake use implicitly the embedded openssl from the Poco repo. See issue #1093
 # -------------------------------------------------------------------------------------------
   - ps: |
-       if (($env:builder -eq "cmake") -or ($env:builder -eq "cygwin"))
+       if ($env:builder -eq "cmake")
        {
          if ($env:platform -eq "Win32")
          {
@@ -372,7 +372,7 @@ build_script:
 # Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
 # -------------------------------------------------------------------------------------------
   - ps: |
-      if ($env:builder -eq "cygwin")
+      if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
       {
         $cmd = 'sh configure --everything'
         iex "& $cmd"
