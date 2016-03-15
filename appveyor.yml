@@ -6,7 +6,17 @@ cache:
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
   - C:\Program Files (x86)\PostgreSQL\9.4
-  
+
+
+branches:
+  except:
+    - /.*ravis.*/
+
+
+skip_commits:
+  message: /Merge pull request.*/
+
+
 hosts:
   localhost: 127.0.0.1
   db.server.com: 127.0.0.2
