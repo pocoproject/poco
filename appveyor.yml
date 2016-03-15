@@ -173,7 +173,7 @@ install:
 #  MySQL 32 bit is not available by default on AppVeyor
 # -------------------------------------------------------------------------------------------
   - ps: |
-      if ($env:platform -eq "Win32")
+      if (($env:platform -eq "Win32") -and !($env:builder -eq "cygwin"))
       {
         if (Test-Path $env:MYSQL32) {
           echo "using $env:MYSQL32 from cache"
@@ -193,7 +193,7 @@ install:
 #  http://www.enterprisedb.com/products-services-training/pgdownload#windows
 # -------------------------------------------------------------------------------------------
   - ps: |
-      if ($env:platform -eq "Win32")
+      if (($env:platform -eq "Win32") -and !($env:builder -eq "cygwin"))
       {
         if (Test-Path $env:POSTGRES32) {
           echo "using $env:POSTGRES32 from cache"
@@ -257,26 +257,29 @@ before_build:
 #        & C:\cygwin\bin\ls -lR $env:MYSQL64
 # -------------------------------------------------------------------------------------------  
   - ps: |
-      if ($env:platform -eq "Win32")
+      if (!($env:builder -eq "cygwin"))
       {
-        $env:INCLUDE = $env:MYSQL32 + "\include;" + $env:INCLUDE
-        $env:LIB     = $env:MYSQL32 + "\lib;" + $env:LIB
-        $env:PATH    = $env:MYSQL32 + "\bin;" + $env:PATH
-        if (Test-Path ($env:MYSQL32 + "\lib\libmysql.dll")) {
-          $from = $env:MYSQL32 + "\lib\libmysql.dll";
-          $to   = $env:MYSQL32 + "\bin\libmysql.dll"
-          copy $from $to
+        if ($env:platform -eq "Win32")
+        {
+          $env:INCLUDE = $env:MYSQL32 + "\include;" + $env:INCLUDE
+          $env:LIB     = $env:MYSQL32 + "\lib;" + $env:LIB
+          $env:PATH    = $env:MYSQL32 + "\bin;" + $env:PATH
+          if (Test-Path ($env:MYSQL32 + "\lib\libmysql.dll")) {
+            $from = $env:MYSQL32 + "\lib\libmysql.dll";
+            $to   = $env:MYSQL32 + "\bin\libmysql.dll"
+            copy $from $to
+          }
         }
-      }
-      if ($env:platform -eq "x64")
-      {
-        $env:INCLUDE = $env:MYSQL64 + "\include;" + $env:INCLUDE
-        $env:LIB     = $env:MYSQL64 + "\lib;" + $env:LIB
-        $env:PATH    = $env:MYSQL64 + "\bin;" + $env:PATH
-        if (Test-Path ($env:MYSQL64 + "\lib\libmysql.dll")) {
-          $from = $env:MYSQL64 + "\lib\libmysql.dll";
-          $to   = $env:MYSQL64 + "\bin\libmysql.dll"
-          copy $from $to
+        if ($env:platform -eq "x64")
+        {
+          $env:INCLUDE = $env:MYSQL64 + "\include;" + $env:INCLUDE
+          $env:LIB     = $env:MYSQL64 + "\lib;" + $env:LIB
+          $env:PATH    = $env:MYSQL64 + "\bin;" + $env:PATH
+          if (Test-Path ($env:MYSQL64 + "\lib\libmysql.dll")) {
+            $from = $env:MYSQL64 + "\lib\libmysql.dll";
+            $to   = $env:MYSQL64 + "\bin\libmysql.dll"
+            copy $from $to
+          }
         }
       }
       $env:MYSQL_PWD="Password12!"
@@ -288,17 +291,20 @@ before_build:
 # PostgreSQL
 # -------------------------------------------------------------------------------------------  
   - ps: |
-      if ($env:platform -eq "Win32")
+      if (!($env:builder -eq "cygwin"))
       {
-          $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
-          $env:LIB     = $env:POSTGRES32 + "\lib;" + $env:LIB
-          $env:PATH    = $env:POSTGRES32 + "\bin;" + $env:PATH
-      }
-      if ($env:platform -eq "x64")
-      {
-          $env:INCLUDE = $env:POSTGRES64 + "\include;" + $env:INCLUDE
-          $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
-          $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
+        if ($env:platform -eq "Win32")
+        {
+            $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
+            $env:LIB     = $env:POSTGRES32 + "\lib;" + $env:LIB
+            $env:PATH    = $env:POSTGRES32 + "\bin;" + $env:PATH
+        }
+        if ($env:platform -eq "x64")
+        {
+            $env:INCLUDE = $env:POSTGRES64 + "\include;" + $env:INCLUDE
+            $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
+            $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
+        }
       }
 # -------------------------------------------------------------------------------------------
 
@@ -354,7 +360,7 @@ build_script:
   - ps: |
       if ($env:builder -eq "cygwin")
       {
-        $cmd = 'configure --everything'
+        $cmd = 'sh configure --everything'
         iex "& $cmd"
         $cmd = 'make -s -j4'
         iex "& $cmd"
