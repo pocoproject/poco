@@ -103,6 +103,9 @@ matrix:
   fast_finish: true
 
 install:
+  - c:\cygwin\setup-x86.exe -B -q -n -N -d -l c:\cygwin -R c:\cygwin -s http://mirror.csclub.uwaterloo.ca/cygwin  -P openssl
+  - c:\cygwin64\setup-x86_64.exe -B -q -n -N -d -l c:\cygwin64 -R c:\cygwin64 -s http://mirror.csclub.uwaterloo.ca/cygwin  -P openssl
+  
   - set POCO_BASE=%CD%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
   - ps: |
