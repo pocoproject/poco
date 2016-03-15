@@ -48,6 +48,8 @@ environment:
 
   matrix:
 
+    - builder: cygwin
+      
     - builder: msbuild
       vsver: 120
       linkmode: shared
@@ -92,10 +94,11 @@ matrix:
 
 install:
   - set POCO_BASE=%CD%
+  - set PATH=c:\cygwin\bin;%PATH%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
-  - c:\cygwin\bin\uname -a
-  - c:\cygwin\bin\cat /proc/cpuinfo
-  - c:\cygwin\bin\cat /proc/meminfo
+  - uname -a
+  - cat /proc/cpuinfo
+  - cat /proc/meminfo
   - ps: |
       if ($env:builder -eq "cmake")
       {
@@ -339,6 +342,11 @@ build_script:
 # Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
 # -------------------------------------------------------------------------------------------
   - ps: |
+      if ($env:builder -eq "cygwin")
+      {
+        & configure --everything
+        & make -s -j4
+      }
       if ($env:builder -eq "msbuild")
       {
         $logger='"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"';
