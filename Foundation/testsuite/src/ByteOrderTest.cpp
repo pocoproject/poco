@@ -67,6 +67,46 @@ void ByteOrderTest::testByteOrderFlip()
 		flip = ByteOrder::flipBytes(flip);
 		assert (flip == norm);
 	}
+	{
+		unsigned char  c     = 0x00;
+		float          norm  = 0;
+		unsigned char* normP = reinterpret_cast<unsigned char*>(&norm);
+		for (unsigned i = 0; i < sizeof(float); i++)
+		{
+			normP[i] |= c;
+			c += 0x11;
+		}
+
+		float          flip  = ByteOrder::flipBytes(norm);
+		unsigned char* flipP = reinterpret_cast<unsigned char*>(&flip);
+		for (unsigned i = 0; i < sizeof(float); i++)
+		{
+			assert(normP[i] == flipP[sizeof(float) - 1 - i]);
+		}
+
+		flip = ByteOrder::flipBytes(flip);
+		assert (flip == norm);
+	}
+	{
+		unsigned char  c     = 0x00;
+		double         norm  = 0;
+		unsigned char* normP = reinterpret_cast<unsigned char*>(&norm);
+		for (unsigned i = 0; i < sizeof(double); i++)
+		{
+			normP[i] |= c;
+			c += 0x11;
+		}
+
+		double         flip  = ByteOrder::flipBytes(norm);
+		unsigned char* flipP = reinterpret_cast<unsigned char*>(&flip);
+		for (unsigned i = 0; i < sizeof(double); i++)
+		{
+			assert(normP[i] == flipP[sizeof(double) - 1 - i]);
+		}
+
+		flip = ByteOrder::flipBytes(flip);
+		assert (flip == norm);
+	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = (Int64(0x8899AABB) << 32) + 0xCCDDEEFF;
