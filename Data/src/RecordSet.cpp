@@ -70,6 +70,7 @@ RecordSet::RecordSet(const RecordSet& other):
 	_pFilter(other._pFilter),
 	_totalRowCount(other._totalRowCount)
 {
+	if(_pFilter) _pFilter->duplicate();
 }
 
 
@@ -79,7 +80,7 @@ RecordSet::~RecordSet()
 	{
 		delete _pBegin;
 		delete _pEnd;
-		if(_pFilter) _pFilter->release();
+		if (_pFilter) _pFilter->release();
 
 		RowMap::iterator it = _rowMap.begin();
 		RowMap::iterator end = _rowMap.end();
@@ -89,6 +90,22 @@ RecordSet::~RecordSet()
 	{
 		poco_unexpected();
 	}
+}
+
+
+void RecordSet::reset(const Statement& stmt)
+{
+	delete _pBegin;
+	_pBegin = 0;
+	delete _pEnd;
+	_pEnd = 0;
+	_currentRow = 0;
+	_totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
+
+	Statement::operator = (stmt);
+
+	_pBegin = new RowIterator(this, 0 == rowsExtracted());
+	_pEnd = new RowIterator(this, true);
 }
 
 
