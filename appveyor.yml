@@ -374,10 +374,9 @@ build_script:
   - ps: |
       if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
       {
-        $cmd = 'sh configure --everything'
-        iex "& $cmd"
-        $cmd = 'make -s -j4'
-        iex "& $cmd"
+        $cmd = 'sh -c "ls -l /usr/include/openssl/"';iex "& $cmd"
+        $cmd = 'sh configure --everything';iex "& $cmd"
+        $cmd = 'make -s -j4';iex "& $cmd"
       }
       if ($env:builder -eq "msbuild")
       {
