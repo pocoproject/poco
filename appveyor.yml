@@ -103,7 +103,7 @@ matrix:
   fast_finish: true
 
 install:
-  - c:\cygwin\setup-x86.exe -B -q -n -N -d -l C:/cygwin/var/cache/setup -R c:\cygwin -s http://cygwin.mirror.constant.com  -P openssl
+  - C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel
 #- c:\cygwin64\setup-x86_64.exe -B -q -n -N -d -l C:/cygwin64/var/cache/setup -R c:\cygwin64 -s http://cygwin.mirror.constant.com  -P openssl
   
   - set POCO_BASE=%CD%
