@@ -19,7 +19,7 @@ if [ "$1" = "" ] ; then
 	exit 1
 fi
 
-comps="Foundation XML JSON Util Net"
+comps="CppUnit CppUnit/WinTestRunner Foundation XML JSON Util Net"
 internal=0
 specfile=""
 version=""
@@ -129,43 +129,6 @@ if [ $internal = 1 ] ; then
 	cp ${POCO_BASE}/build/script/waitfortest ${target}/build/script
 fi
 
-
-#
-# CppUnit
-#
-mkdir -p ${target}/CppUnit
-mkdir -p ${target}/CppUnit/doc
-mkdir -p ${target}/CppUnit/include/CppUnit
-mkdir -p ${target}/CppUnit/src
-mkdir -p ${target}/CppUnit/WinTestRunner
-mkdir -p ${target}/CppUnit/WinTestRunner/include/WinTestRunner
-mkdir -p ${target}/CppUnit/WinTestRunner/src
-mkdir -p ${target}/CppUnit/WinTestRunner/res
-
-cp ${POCO_BASE}/CppUnit/doc/* ${target}/CppUnit/doc >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/include/CppUnit/* ${target}/CppUnit/include/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/src/* ${target}/CppUnit/src >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.sln ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vcproj ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vcxproj ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vcxproj.filters ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vcxproj.user ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/Makefile ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vmsbuild ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vxbuild ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.progen ${target}/CppUnit >/dev/null 2>&1
-
-cp ${POCO_BASE}/CppUnit/WinTestRunner/include/WinTestRunner/* ${target}/CppUnit/WinTestRunner/include/WinTestRunner >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/src/* ${target}/CppUnit/WinTestRunner/src >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/res/WinTestRunner.rc ${target}/CppUnit/WinTestRunner/res >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/res/Resource.h ${target}/CppUnit/WinTestRunner/res >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcproj ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.filters ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.user ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.progen ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
-
-
 #
 # Copy components
 #
@@ -178,8 +141,6 @@ done
 #
 # Create components file
 #
-echo "CppUnit" >${target}/components
-echo "CppUnit/WinTestRunner" >>${target}/components
 for comp in $comps ;
 do
 	echo $comp >>${target}/components
@@ -289,12 +250,6 @@ echo "COMPONENTS = $comps" >>${target}/Makefile
 
 cat >>${target}/Makefile <<'ENDOFSCRIPT'
 
-cppunit:
-	$(MAKE) -C $(POCO_BASE)/CppUnit 
-
-CppUnit-clean:
-	$(MAKE) -C $(POCO_BASE)/CppUnit clean
-
 install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
 	mkdir -p $(INSTALLDIR)/lib
@@ -322,13 +277,15 @@ samples=""
 cleans=""
 for comp in $comps ;
 do
-	libexecs="$libexecs ${comp}-libexec"
-	cleans="$cleans ${comp}-clean"
-	if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
-		tests="$tests ${comp}-tests"
-	fi
-	if [ -d "${POCO_BASE}/${comp}/samples" ] ; then
-		samples="$samples ${comp}-samples"
+	if [ -f "${POCO_BASE}/${comp}/Makefile" ] ; then
+		libexecs="$libexecs ${comp}-libexec"
+		cleans="$cleans ${comp}-clean"
+		if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
+			tests="$tests ${comp}-tests"
+		fi
+		if [ -d "${POCO_BASE}/${comp}/samples" ] ; then
+			samples="$samples ${comp}-samples"
+		fi
 	fi
 done
 
@@ -349,10 +306,11 @@ echo 'cleans: $(filter-out $(foreach f,$(OMIT),$f%),$(cleans))' >>${target}/Make
 
 for comp in $comps ;
 do
-	if [ "`grep -c POCO_LICENSING "${POCO_BASE}/${comp}/Makefile"`" != 0 ] ; then
-		dependencies=$licensingDep
-	else
-		dependencies=""
+	dependencies=""
+	if [ -f "${POCO_BASE}/${comp}/Makefile" ] ; then
+		if [ "`grep -c POCO_LICENSING "${POCO_BASE}/${comp}/Makefile"`" != 0 ] ; then
+			dependencies=$licensingDep
+		fi
 	fi
 	if [ -f "${POCO_BASE}/${comp}/dependencies" ] ; then
 		for dep in `cat "${POCO_BASE}/${comp}/dependencies"` ;
@@ -414,7 +372,7 @@ done
 
 cat >>${target}/Makefile <<ENDOFSCRIPT
 
-clean: cleans CppUnit-clean
+clean: cleans
 
 distclean:
 	rm -rf \$(POCO_BUILD)/lib
