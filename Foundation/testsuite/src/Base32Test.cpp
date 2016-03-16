@@ -11,8 +11,8 @@
 
 
 #include "Base32Test.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Base32Encoder.h"
 #include "Poco/Base32Decoder.h"
 #include "Poco/Exception.h"

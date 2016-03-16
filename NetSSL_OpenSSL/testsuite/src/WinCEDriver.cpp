@@ -12,7 +12,7 @@
 //
 
 
-#include "CppUnit/TestRunner.h"
+#include "Poco/CppUnit/TestRunner.h"
 #include "NetSSLTestSuite.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Net/HTTPStreamFactory.h"

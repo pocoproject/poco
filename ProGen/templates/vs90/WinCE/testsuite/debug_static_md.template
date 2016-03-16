@@ -53,7 +53,7 @@
 	<Tool
 		Name="VCLinkerTool"
 		AdditionalOptions="/FORCE:MULTIPLE ${configuration.linker.additionalOptions}"
-		AdditionalDependencies="CppUnitmdd.lib iphlpapi.lib ${configuration.linker.dependencies}"
+		AdditionalDependencies="PocoCppUnitmdd.lib iphlpapi.lib ${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\static_md\${project.target}d.exe"
 		LinkIncremental="2"
 		AdditionalLibraryDirectories="${project.pocobase}\lib\$(PlatformName)"

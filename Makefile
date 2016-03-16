@@ -79,11 +79,8 @@ all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
 
-COMPONENTS =  CppUnit Foundation XML JSON Util Net Crypto NetSSL_OpenSSL 
-COMPONENTS += Data Data/SQLite Data/ODBC Data/MySQL
-ifneq ($(OSNAME), Cygwin)
-COMPONENTS += Data/PostgreSQL 
-endif
+COMPONENTS =  CppUnit Foundation XML JSON Util Net Crypto NetSSL_OpenSSL
+COMPONENTS += Data Data/ODBC Data/SQLite Data/MySQL Data/PostgreSQL
 COMPONENTS += MongoDB Redis Zip PageCompiler PageCompiler/File2Page CppParser PDF
 
 cppunit:
@@ -108,25 +105,17 @@ ifeq ($(OSNAME), Cygwin)
 	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*"    -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
 	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*"    -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
 endif
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libCppUnit*" -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libCppUnit*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*"    -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
 	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*"    -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec 
-libexecs += Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec
-ifneq ($(OSNAME), Cygwin)
-libexecs += Data/PostgreSQL-libexec
-endif
+libexecs += Data-libexec  Data/ODBC-libexec Data/SQLite-libexec Data/MySQL-libexec Data/PostgreSQL-libexec
 libexecs += MongoDB-libexec Redis-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests
-tests    += Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests
-ifneq ($(OSNAME), Cygwin)
-tests	 += Data/PostgreSQL-tests
-endif
+tests    += Data-tests Data/ODBC-tests  Data/SQLite-tests Data/MySQL-tests Data/PostgreSQL-tests
 tests	 += MongoDB-tests Redis-tests Zip-tests CppParser-tests PDF-tests
 
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -136,10 +125,7 @@ samples  += MongoDB-samples Zip-samples PageCompiler-samples PDF-samples
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 cleans   =  Foundation-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean 
-cleans   += Data-clean Data/SQLite-clean Data/ODBC-clean Data/MySQL-clean
-ifneq ($(OSNAME), Cygwin)
-cleans	 += Data/PostgreSQL-clean
-endif
+cleans   += Data-clean Data/ODBC-clean Data/SQLite-clean Data/MySQL-clean Data/PostgreSQL-clean
 cleans	 += MongoDB-clean Redis-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean PDF-clean
 
 # -------------------------------------------------------------------------------------------------------------------------------------

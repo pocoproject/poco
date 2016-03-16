@@ -9,8 +9,8 @@
 #define ActiveTest_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
-#include "CppUnit/TestDecorator.h"
+#include "Poco/CppUnit/CppUnit.h"
+#include "Poco/CppUnit/TestDecorator.h"
 #include <afxmt.h>
 
 

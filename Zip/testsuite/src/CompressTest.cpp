@@ -17,8 +17,8 @@
 #include "Poco/Zip/ZipManipulator.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include <iostream>
 #include <fstream>
 #undef min

@@ -7,7 +7,7 @@
 
 #include "WinTestRunner/WinTestRunner.h"
 #include "TestRunnerDlg.h"
-#include "CppUnit/TestRunner.h"
+#include "Poco/CppUnit/TestRunner.h"
 #include <fstream>
 
 

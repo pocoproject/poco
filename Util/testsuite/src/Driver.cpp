@@ -12,7 +12,7 @@
 //
 
 
-#include "CppUnit/TestRunner.h"
+#include "Poco/CppUnit/TestRunner.h"
 #include "UtilTestSuite.h"
 
 

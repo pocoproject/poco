@@ -11,8 +11,8 @@
 
 
 #include "URIStreamOpenerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/URIStreamOpener.h"
 #include "Poco/URIStreamFactory.h"
 #include "Poco/URI.h"

@@ -12,6 +12,6 @@ objects = Driver MongoDBTest MongoDBTestSuite
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoMongoDB PocoFoundation PocoNet CppUnit
+target_libs    = PocoMongoDB PocoFoundation PocoNet PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec

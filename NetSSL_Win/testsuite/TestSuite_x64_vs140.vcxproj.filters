@@ -2,55 +2,64 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="HTTPS">
-      <UniqueIdentifier>{d3b9d276-2d80-46b4-ba79-594dcae6e5f2}</UniqueIdentifier>
+      <UniqueIdentifier>{df74e993-995f-4021-a784-d92f6064e458}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPS\Header Files">
-      <UniqueIdentifier>{e05ff7c0-2d7a-4c1d-a3ec-384c94d244a8}</UniqueIdentifier>
+      <UniqueIdentifier>{f9cfbc16-b00a-42af-b867-76e439956fe5}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPS\Source Files">
-      <UniqueIdentifier>{a26feb44-8984-4d9c-84e1-79da4c0a0f6d}</UniqueIdentifier>
+      <UniqueIdentifier>{72d869e3-41f3-4d15-b077-222390a00ce7}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{426172b0-140d-4f95-933c-5f094e663046}</UniqueIdentifier>
+      <UniqueIdentifier>{b3732c0d-f9df-4267-95ae-16ad93defae5}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{84f0e7e6-0584-4942-970f-16458df9e51f}</UniqueIdentifier>
+      <UniqueIdentifier>{95300a20-1e3a-49ca-a355-695474cce90a}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{f2eb70ad-ded8-4a3b-a55c-c8b0eba44aab}</UniqueIdentifier>
+      <UniqueIdentifier>{72ab8b69-13e8-4de5-8ff0-6725bf889e02}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{c34ba3db-a785-4057-8dd6-9fbe0d2d8556}</UniqueIdentifier>
+      <UniqueIdentifier>{d7eacb6b-7dd3-402f-87da-dbc18d18300c}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{fbef26eb-bd88-42e0-9f5c-d2a7b0f9fd45}</UniqueIdentifier>
+      <UniqueIdentifier>{dc5b49bb-a2fe-42d3-8243-8d370b74df9a}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer">
-      <UniqueIdentifier>{3b9680e8-df0e-4049-ae7a-3c68a00cabd7}</UniqueIdentifier>
+      <UniqueIdentifier>{f80496d8-5e08-4567-97c8-086450b06889}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer\Header Files">
-      <UniqueIdentifier>{fdd9c816-9621-4075-9003-5d9eb21846f8}</UniqueIdentifier>
+      <UniqueIdentifier>{3ad23fee-0b61-4265-996a-d646305ddca8}</UniqueIdentifier>
     </Filter>
     <Filter Include="TCPServer\Source Files">
-      <UniqueIdentifier>{860c9d2d-10b1-4437-a418-6f1ce65e6fb5}</UniqueIdentifier>
+      <UniqueIdentifier>{028da373-403d-4b44-8970-c1ec7966fa36}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSServer">
-      <UniqueIdentifier>{4d7ad8a4-f19f-4d61-a87f-7370dc4b59c0}</UniqueIdentifier>
+      <UniqueIdentifier>{1d1537c7-69ad-40c3-b8a9-5b0f2c817e6d}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSServer\Header Files">
-      <UniqueIdentifier>{b819af7f-b9ee-4dc5-b48b-85873b979dc7}</UniqueIdentifier>
+      <UniqueIdentifier>{3a194810-0367-4a29-8198-e2f91977413f}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSServer\Source Files">
-      <UniqueIdentifier>{c966a1e5-f3e2-482b-a12a-07fa212e3f92}</UniqueIdentifier>
+      <UniqueIdentifier>{c81f6182-08d9-4093-bb98-ef20b0166dfe}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient">
-      <UniqueIdentifier>{787a872e-d519-444e-aa48-9d546708308c}</UniqueIdentifier>
+      <UniqueIdentifier>{2f3bc8f1-57af-4039-9f2e-9839a2f13395}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Header Files">
-      <UniqueIdentifier>{d0965b44-681d-463a-b1a4-51f47331a4ec}</UniqueIdentifier>
+      <UniqueIdentifier>{e7ac4670-ad50-4dd7-bd60-6153d0ccab8c}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Source Files">
-      <UniqueIdentifier>{3ad1139c-1164-44cc-914e-75d2efa46369}</UniqueIdentifier>
+      <UniqueIdentifier>{975033d3-bace-4895-89fb-4adb4a0a428a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket">
+      <UniqueIdentifier>{fda5618e-9d85-463d-a8d3-907f367d080c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket\Header Files">
+      <UniqueIdentifier>{914feb69-9536-494e-b993-1351af35530a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket\Source Files">
+      <UniqueIdentifier>{66316bc5-88a8-4db6-97af-9077523fd851}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +89,12 @@
     </ClInclude>
     <ClInclude Include="src\HTTPSStreamFactoryTest.h">
       <Filter>HTTPSClient\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WebSocketTest.h">
+      <Filter>WebSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WebSocketTestSuite.h">
+      <Filter>WebSocket\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +127,12 @@
     </ClCompile>
     <ClCompile Include="src\HTTPSStreamFactoryTest.cpp">
       <Filter>HTTPSClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketTest.cpp">
+      <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketTestSuite.cpp">
+      <Filter>WebSocket\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

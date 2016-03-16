@@ -22,7 +22,7 @@
 #endif
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include <vector>
 #include <afxwin.h>
 

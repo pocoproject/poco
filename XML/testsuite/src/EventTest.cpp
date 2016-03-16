@@ -11,8 +11,8 @@
 
 
 #include "EventTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DOM/Event.h"
 #include "Poco/DOM/MutationEvent.h"
 #include "Poco/DOM/EventListener.h"
