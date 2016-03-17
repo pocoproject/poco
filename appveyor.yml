@@ -37,8 +37,8 @@ services:
 
   
 platform:
-  - Win32
   - x64
+  - Win32
   
 # -------------------------------------------------------------------------------------------
 # building debug configuration doubles the round time and isn't so useful.
@@ -103,8 +103,8 @@ matrix:
   fast_finish: true
 
 install:
-  - C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel
-#- c:\cygwin64\setup-x86_64.exe -B -q -n -N -d -l C:/cygwin64/var/cache/setup -R c:\cygwin64 -s http://cygwin.mirror.constant.com  -P openssl
+#  - C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel
+  - c:\cygwin64\setup-x86_64.exe -B -q -n -N -d -l C:/cygwin64/var/cache/setup -R c:\cygwin64 -s http://cygwin.mirror.constant.com  -P openssl-devel
   
   - set POCO_BASE=%CD%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
@@ -114,14 +114,13 @@ install:
         if ($env:platform -eq "Win32")
         {
           $env:PATH = "c:\cygwin\bin;" + $env:PATH
-        }
+         }
         if ($env:platform -eq "x64")
         {
           $env:PATH = "c:\cygwin64\bin;" + $env:PATH
         }
       }
-  - c:\cygwin\bin\uname -a
-#  - c:\cygwin64\bin\uname -a
+  - uname -a
   - cat /proc/cpuinfo
   - cat /proc/meminfo
   - ps: |
