@@ -103,7 +103,7 @@ matrix:
   fast_finish: true
 
 install:
-  - C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3
+  - C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P mysqlclient-devel -P libsqlite3-devel 
 #  - C:\cygwin64\setup-x86_64.exe -B -q -n -N -d -l C:/cygwin64/var/cache/setup -R c:\cygwin64 -s http://cygwin.mirror.constant.com  -P openssl-devel
   
   - set POCO_BASE=%CD%
@@ -451,8 +451,8 @@ test_script:
       {
         if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
         {
-          $cmd = '/usr/sbin/cygserver &';iex "& $cmd"
-          $cmd = 'sh travis/Linux/runtests.sh';iex "& $cmd"
+          $cmd = '/usr/sbin/cygserver "&"';iex "& $cmd"
+          $cmd = 'sh appveyor/Cygwin/runtests.sh';iex "& $cmd"
         }
         if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
         {
