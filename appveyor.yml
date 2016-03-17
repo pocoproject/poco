@@ -114,7 +114,7 @@ install:
         if ($env:platform -eq "Win32")
         {
           $env:PATH = "C:\cygwin\bin;" + $env:PATH
-          $cmd = 'C:\cygwin\bin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel';
+          $cmd = 'C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel';
           iex "& $cmd"
         }
         if ($env:platform -eq "x64")
