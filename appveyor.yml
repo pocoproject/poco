@@ -452,7 +452,7 @@ test_script:
         if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
         {
           $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"
-          $cmd = 'sh appveyor/Cygwin/runtests.sh';iex "& $cmd"
+          $cmd = 'C:\cygwin\usr\bin\sh.exe appveyor/Cygwin/runtests.sh';iex "& $cmd"
         }
         if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
         {
