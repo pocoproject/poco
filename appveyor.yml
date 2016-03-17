@@ -103,7 +103,7 @@ matrix:
   fast_finish: true
 
 install:
-#  - C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel
+  - C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel
 #  - C:\cygwin64\setup-x86_64.exe -B -q -n -N -d -l C:/cygwin64/var/cache/setup -R c:\cygwin64 -s http://cygwin.mirror.constant.com  -P openssl-devel
   
   - set POCO_BASE=%CD%
@@ -114,8 +114,6 @@ install:
         if ($env:platform -eq "Win32")
         {
           $env:PATH = "C:\cygwin\bin;" + $env:PATH
-          $cmd = 'C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel';
-          iex "& $cmd"
         }
         if ($env:platform -eq "x64")
         {
