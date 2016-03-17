@@ -315,6 +315,9 @@ public:
 		/// Returns true if there is at least one row in the RecordSet,
 		/// false otherwise.
 
+	using Statement::reset;
+		/// Don't hide base class method.
+
 	void reset(const Statement& stmt);
 		/// Resets the RecordSet and assigns a new statement.
 		/// Should be called after the given statement has been reset,
@@ -471,7 +474,6 @@ private:
 	void filter(RowFilter* pFilter);
 		/// Sets the filter for the RecordSet.
 
-	
 	const RowFilter* getFilter() const;
 		/// Returns the filter associated with the RecordSet.
 
@@ -490,6 +492,7 @@ private:
 ///
 /// inlines
 ///
+
 
 inline Data_API std::ostream& operator << (std::ostream &os, const RecordSet& rs)
 {
