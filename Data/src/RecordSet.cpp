@@ -175,6 +175,7 @@ Poco::Dynamic::Var RecordSet::value(const std::string& name, std::size_t dataRow
 	case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(name, dataRow, useFilter);
 	default:
 		throw UnknownTypeException("Data type not supported.");
+	}
 }
 
 
