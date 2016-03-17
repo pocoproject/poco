@@ -70,7 +70,7 @@ RecordSet::RecordSet(const RecordSet& other):
 	_pFilter(other._pFilter),
 	_totalRowCount(other._totalRowCount)
 {
-	if(_pFilter) _pFilter->duplicate();
+	if (_pFilter) _pFilter->duplicate();
 }
 
 
@@ -101,6 +101,11 @@ void RecordSet::reset(const Statement& stmt)
 	_pEnd = 0;
 	_currentRow = 0;
 	_totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
+	
+	RowMap::iterator it = _rowMap.begin();
+	RowMap::iterator end = _rowMap.end();
+	for (; it != end; ++it) delete it->second;
+	_rowMap.clear();
 
 	Statement::operator = (stmt);
 
@@ -118,26 +123,26 @@ Poco::Dynamic::Var RecordSet::value(std::size_t col, std::size_t dataRow, bool u
 
 	switch (columnType(col))
 	{
-		case MetaColumn::FDT_BOOL:      return value<bool>(col, dataRow, useFilter);
-		case MetaColumn::FDT_INT8:      return value<Int8>(col, dataRow, useFilter);
-		case MetaColumn::FDT_UINT8:     return value<UInt8>(col, dataRow, useFilter);
-		case MetaColumn::FDT_INT16:     return value<Int16>(col, dataRow, useFilter);
-		case MetaColumn::FDT_UINT16:    return value<UInt16>(col, dataRow, useFilter);
-		case MetaColumn::FDT_INT32:     return value<Int32>(col, dataRow, useFilter);
-		case MetaColumn::FDT_UINT32:    return value<UInt32>(col, dataRow, useFilter);
-		case MetaColumn::FDT_INT64:     return value<Int64>(col, dataRow, useFilter);
-		case MetaColumn::FDT_UINT64:    return value<UInt64>(col, dataRow, useFilter);
-		case MetaColumn::FDT_FLOAT:     return value<float>(col, dataRow, useFilter);
-		case MetaColumn::FDT_DOUBLE:    return value<double>(col, dataRow, useFilter);
-		case MetaColumn::FDT_STRING:    return value<std::string>(col, dataRow, useFilter);
-		case MetaColumn::FDT_WSTRING:   return value<UTF16String>(col, dataRow, useFilter);
-		case MetaColumn::FDT_BLOB:      return value<BLOB>(col, dataRow, useFilter);
-		case MetaColumn::FDT_CLOB:      return value<CLOB>(col, dataRow, useFilter);
-		case MetaColumn::FDT_DATE:      return value<Date>(col, dataRow, useFilter);
-		case MetaColumn::FDT_TIME:      return value<Time>(col, dataRow, useFilter);
-		case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(col, dataRow);
-		default:
-			throw UnknownTypeException("Data type not supported.");
+	case MetaColumn::FDT_BOOL:      return value<bool>(col, dataRow, useFilter);
+	case MetaColumn::FDT_INT8:      return value<Int8>(col, dataRow, useFilter);
+	case MetaColumn::FDT_UINT8:     return value<UInt8>(col, dataRow, useFilter);
+	case MetaColumn::FDT_INT16:     return value<Int16>(col, dataRow, useFilter);
+	case MetaColumn::FDT_UINT16:    return value<UInt16>(col, dataRow, useFilter);
+	case MetaColumn::FDT_INT32:     return value<Int32>(col, dataRow, useFilter);
+	case MetaColumn::FDT_UINT32:    return value<UInt32>(col, dataRow, useFilter);
+	case MetaColumn::FDT_INT64:     return value<Int64>(col, dataRow, useFilter);
+	case MetaColumn::FDT_UINT64:    return value<UInt64>(col, dataRow, useFilter);
+	case MetaColumn::FDT_FLOAT:     return value<float>(col, dataRow, useFilter);
+	case MetaColumn::FDT_DOUBLE:    return value<double>(col, dataRow, useFilter);
+	case MetaColumn::FDT_STRING:    return value<std::string>(col, dataRow, useFilter);
+	case MetaColumn::FDT_WSTRING:   return value<UTF16String>(col, dataRow, useFilter);
+	case MetaColumn::FDT_BLOB:      return value<BLOB>(col, dataRow, useFilter);
+	case MetaColumn::FDT_CLOB:      return value<CLOB>(col, dataRow, useFilter);
+	case MetaColumn::FDT_DATE:      return value<Date>(col, dataRow, useFilter);
+	case MetaColumn::FDT_TIME:      return value<Time>(col, dataRow, useFilter);
+	case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(col, dataRow);
+	default:
+		throw UnknownTypeException("Data type not supported.");
 	}
 }
 
@@ -151,26 +156,25 @@ Poco::Dynamic::Var RecordSet::value(const std::string& name, std::size_t dataRow
 
 	switch (columnType(name))
 	{
-		case MetaColumn::FDT_BOOL:      return value<bool>(name, dataRow, useFilter);
-		case MetaColumn::FDT_INT8:      return value<Int8>(name, dataRow, useFilter);
-		case MetaColumn::FDT_UINT8:     return value<UInt8>(name, dataRow, useFilter);
-		case MetaColumn::FDT_INT16:     return value<Int16>(name, dataRow, useFilter);
-		case MetaColumn::FDT_UINT16:    return value<UInt16>(name, dataRow, useFilter);
-		case MetaColumn::FDT_INT32:	    return value<Int32>(name, dataRow, useFilter);
-		case MetaColumn::FDT_UINT32:    return value<UInt32>(name, dataRow, useFilter);
-		case MetaColumn::FDT_INT64:     return value<Int64>(name, dataRow, useFilter);
-		case MetaColumn::FDT_UINT64:    return value<UInt64>(name, dataRow, useFilter);
-		case MetaColumn::FDT_FLOAT:     return value<float>(name, dataRow, useFilter);
-		case MetaColumn::FDT_DOUBLE:    return value<double>(name, dataRow, useFilter);
-		case MetaColumn::FDT_STRING:    return value<std::string>(name, dataRow, useFilter);
-		case MetaColumn::FDT_WSTRING:   return value<UTF16String>(name, dataRow, useFilter);
-		case MetaColumn::FDT_BLOB:      return value<BLOB>(name, dataRow, useFilter);
-		case MetaColumn::FDT_DATE:      return value<Date>(name, dataRow, useFilter);
-		case MetaColumn::FDT_TIME:      return value<Time>(name, dataRow, useFilter);
-		case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(name, dataRow, useFilter);
-		default:
-			throw UnknownTypeException("Data type not supported.");
-	}
+	case MetaColumn::FDT_BOOL:      return value<bool>(name, dataRow, useFilter);
+	case MetaColumn::FDT_INT8:      return value<Int8>(name, dataRow, useFilter);
+	case MetaColumn::FDT_UINT8:     return value<UInt8>(name, dataRow, useFilter);
+	case MetaColumn::FDT_INT16:     return value<Int16>(name, dataRow, useFilter);
+	case MetaColumn::FDT_UINT16:    return value<UInt16>(name, dataRow, useFilter);
+	case MetaColumn::FDT_INT32:	    return value<Int32>(name, dataRow, useFilter);
+	case MetaColumn::FDT_UINT32:    return value<UInt32>(name, dataRow, useFilter);
+	case MetaColumn::FDT_INT64:     return value<Int64>(name, dataRow, useFilter);
+	case MetaColumn::FDT_UINT64:    return value<UInt64>(name, dataRow, useFilter);
+	case MetaColumn::FDT_FLOAT:     return value<float>(name, dataRow, useFilter);
+	case MetaColumn::FDT_DOUBLE:    return value<double>(name, dataRow, useFilter);
+	case MetaColumn::FDT_STRING:    return value<std::string>(name, dataRow, useFilter);
+	case MetaColumn::FDT_WSTRING:   return value<UTF16String>(name, dataRow, useFilter);
+	case MetaColumn::FDT_BLOB:      return value<BLOB>(name, dataRow, useFilter);
+	case MetaColumn::FDT_DATE:      return value<Date>(name, dataRow, useFilter);
+	case MetaColumn::FDT_TIME:      return value<Time>(name, dataRow, useFilter);
+	case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(name, dataRow, useFilter);
+	default:
+		throw UnknownTypeException("Data type not supported.");
 }
 
 
@@ -396,7 +400,7 @@ void RecordSet::filter(RowFilter* pFilter)
 {
 	if (_pFilter) _pFilter->release();
 	_pFilter = pFilter;
-	if(_pFilter) _pFilter->duplicate();
+	if (_pFilter) _pFilter->duplicate();
 }
 
 
