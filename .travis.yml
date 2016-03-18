@@ -5,7 +5,7 @@ cache:
 
 branches:
   except:
-    - /.*:iApp:iVeyor.*/
+    - /.*pp.eyor.*/
 
 before_install:
   # we need a recent version of CMake
