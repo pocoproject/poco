@@ -374,8 +374,8 @@ build_script:
   - ps: |
       if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
       {
-        $cmd = 'C:\cygwin\bin\sh.exe -c "ls -l /usr/include/openssl/"';iex "& $cmd"
-        $cmd = 'C:\cygwin\bin\sh.exe configure --everything';iex "& $cmd"
+        $cmd = 'C:\cygwin\bin\bash.exe -c "ls -l /usr/include/openssl/"';iex "& $cmd"
+        $cmd = 'C:\cygwin\bin\bash.exe configure --everything';iex "& $cmd"
         $cmd = 'make -s -j4';iex "& $cmd"
       }
       if ($env:builder -eq "msbuild")
@@ -452,7 +452,7 @@ test_script:
         if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
         {
           $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"
-          $cmd = 'C:\cygwin\bin\sh.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd"
+          $cmd = 'C:\cygwin\bin\bash.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd"
         }
         if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
         {
