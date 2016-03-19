@@ -4,8 +4,8 @@ POCO C++ Libraries
 Build Status
 ------------
 
-- Travis: [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.7.1)](https://travis-ci.org/pocoproject/poco)
-- AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.7.1?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.7.1)
+- Travis: [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.7.2)](https://travis-ci.org/pocoproject/poco)
+- AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.7.2?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.7.2)
 
 
 ![alt text][logo]
@@ -21,7 +21,7 @@ POrtable COmponents C++ Libraries are:
 - Open Source, licensed under the [Boost Software License](https://spdx.org/licenses/BSL-1.0).
 
 ----
-To start using POCO, see the [Guided Tour](http://pocoproject.org/docs-1.5.3/00100-GuidedTour.html) and [Getting Started](http://pocoproject.org/docs-1.5.3/00200-GettingStarted.html) documents.
+To start using POCO, see the [Guided Tour](http://pocoproject.org/docs-1.7.1/00100-GuidedTour.html) and [Getting Started](http://pocoproject.org/docs-1.7.1/00200-GettingStarted.html) documents.
 
 ----
 POCO has an active user and contributing community, please visit our [web site](http://pocoproject.org), [forum](http://pocoproject.org/forum) and [blog](http://pocoproject.org/blog). 
