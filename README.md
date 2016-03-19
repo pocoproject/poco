@@ -21,7 +21,7 @@ POrtable COmponents C++ Libraries are:
 - Open Source, licensed under the [Boost Software License](https://spdx.org/licenses/BSL-1.0).
 
 ----
-To start using POCO, see the [Guided Tour](http://pocoproject.org/docs-1.5.3/00100-GuidedTour.html) and [Getting Started](http://pocoproject.org/docs-1.5.3/00200-GettingStarted.html) documents.
+To start using POCO, see the [Guided Tour](http://pocoproject.org/docs/00100-GuidedTour.html) and [Getting Started](http://pocoproject.org/docs/00200-GettingStarted.html) documents.
 
 ----
 POCO has an active user and contributing community, please visit our [web site](http://pocoproject.org), [forum](http://pocoproject.org/forum) and [blog](http://pocoproject.org/blog). 
