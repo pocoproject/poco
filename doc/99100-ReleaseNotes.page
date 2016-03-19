@@ -1,6 +1,17 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.7.2
+
+!!Summary of Changes
+
+  - fixed GH #1197: Upgrade bundled expat to 2.1.1
+    Expat 2.1.1 fixes a CVE: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-1283
+  - fixed GH #1204: getdtablesize has been removed on Android 21
+  - fixed GH #1203: Poco::Data::RecordSet should be reusable
+  - fixed GH #1198: Upgrade bundled SQLite to 3.11.1
+
+
 !!!Release 1.7.1
 
 !!Summary of Changes
