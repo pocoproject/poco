@@ -377,7 +377,7 @@ build_script:
       if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
       {
         $cmd = 'bash.exe configure --everything';iex "& $cmd"
-        $cmd = 'make.exe -s -j4';iex "& $cmd"
+        $cmd = 'make.exe -s';iex "& $cmd"
       }
       if ($env:builder -eq "msbuild")
       {
