@@ -319,6 +319,16 @@ public:
 		/// Returns true if there is at least one row in the RecordSet,
 		/// false otherwise.
 
+	using Statement::reset;
+		/// Don't hide base class method.
+
+	void reset(const Statement& stmt);
+		/// Resets the RecordSet and assigns a new statement.
+		/// Should be called after the given statement has been reset,
+		/// assigned a new SQL statement, and executed.
+		///
+		/// Does not remove the associated RowFilter or RowFormatter.
+
 	Poco::Dynamic::Var value(const std::string& name) const;
 		/// Returns the value in the named column of the current row.
 
@@ -473,7 +483,6 @@ private:
 	void filter(RowFilter* pFilter);
 		/// Sets the filter for the RecordSet.
 
-	
 	const RowFilter* getFilter() const;
 		/// Returns the filter associated with the RecordSet.
 
@@ -492,6 +501,7 @@ private:
 ///
 /// inlines
 ///
+
 
 inline Data_API std::ostream& operator << (std::ostream &os, const RecordSet& rs)
 {
@@ -534,8 +544,8 @@ inline std::size_t RecordSet::columnCount() const
 
 inline Statement& RecordSet::operator = (const Statement& stmt)
 {
-	_currentRow = 0;
-	return Statement::operator = (stmt);
+	reset(stmt);
+	return *this;
 }
 
 
@@ -663,36 +673,6 @@ inline size_t RecordSet::storageRowCount() const
 	return impl()->rowsExtracted();
 }
 
-/* TODO
-namespace Keywords {
-
-
-inline const std::string& select(const std::string& str)
-{
-	return str;
-}
-
-
-inline const RecordSet& from(const RecordSet& rs)
-{
-	return rs;
-}
-
-
-inline RecordSet from(const Statement& stmt)
-{
-	return RecordSet(stmt);
-}
-
-
-inline const std::string& where(const std::string& str)
-{
-	return str;
-}
-
-
-} // namespace Keywords
-*/
 
 } } // namespace Poco::Data
 
