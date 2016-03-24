@@ -20,16 +20,16 @@
 namespace Poco {
 namespace Redis {
 
-RedisEventArgs::RedisEventArgs(RedisType::Ptr message) :
-	_message(message),
+RedisEventArgs::RedisEventArgs(RedisType::Ptr pMessage) :
+	_message(pMessage),
 	_exception(0),
 	_stop(false)
 {
 }
 
-RedisEventArgs::RedisEventArgs(Exception* exception) :
+RedisEventArgs::RedisEventArgs(Exception* pException) :
 	_message(),
-	_exception(exception ? exception->clone() : 0),
+	_exception(pException ? pException->clone() : 0),
 	_stop(false)
 {
 }
