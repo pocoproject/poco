@@ -233,6 +233,21 @@ void LoggerTest::testFormatAny()
 
 	root.error("%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 	assert(pChannel->getLastMessage().getText() == "12345678910");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+	assert(pChannel->getLastMessage().getText() == "1234567891011");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+	assert(pChannel->getLastMessage().getText() == "123456789101112");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+	assert(pChannel->getLastMessage().getText() == "12345678910111213");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
+	assert(pChannel->getLastMessage().getText() == "1234567891011121314");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+	assert(pChannel->getLastMessage().getText() == "123456789101112131415");
 }
 
 
