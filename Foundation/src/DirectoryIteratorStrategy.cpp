@@ -82,6 +82,7 @@ const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 				itStack->push(child_it);
 				return child_it->path();
 			}
+		}
 		catch (...)
 		{
 		}
