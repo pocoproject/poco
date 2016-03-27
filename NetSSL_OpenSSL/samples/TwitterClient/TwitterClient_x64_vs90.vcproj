@@ -31,7 +31,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include;..\..\..\openssl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -104,7 +104,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include;..\..\..\openssl\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -171,7 +171,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include;..\..\..\openssl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -196,7 +196,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib Crypt32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin64\static_mt\TwitterClientd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -244,7 +244,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include;..\..\..\openssl\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -267,7 +267,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib Crypt32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin64\static_mt\TwitterClient.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -311,7 +311,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include;..\..\..\openssl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -336,7 +336,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib Crypt32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin64\static_md\TwitterClientd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -384,7 +384,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\JSON\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include;..\..\..\openssl\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -407,7 +407,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib winmm.lib Crypt32.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin64\static_md\TwitterClient.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib64"

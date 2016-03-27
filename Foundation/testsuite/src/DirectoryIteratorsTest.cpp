@@ -11,8 +11,8 @@
 
 
 #include "DirectoryIteratorsTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DirectoryIterator.h"
 #include "Poco/SortedDirectoryIterator.h"
 #include "Poco/RecursiveDirectoryIterator.h"
@@ -23,8 +23,8 @@
 using namespace Poco;
 
 
-DirectoryIteratorsTest::DirectoryIteratorsTest(const std::string& name):
-	CppUnit::TestCase(name)
+DirectoryIteratorsTest::DirectoryIteratorsTest(const std::string& rName):
+	CppUnit::TestCase(rName)
 {
 }
 

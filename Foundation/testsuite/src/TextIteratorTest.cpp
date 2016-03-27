@@ -11,8 +11,8 @@
 
 
 #include "TextIteratorTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/TextIterator.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/UTF8Encoding.h"
@@ -25,7 +25,7 @@ using Poco::UTF8Encoding;
 using Poco::UTF16Encoding;
 
 
-TextIteratorTest::TextIteratorTest(const std::string& name): CppUnit::TestCase(name)
+TextIteratorTest::TextIteratorTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

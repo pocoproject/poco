@@ -11,8 +11,8 @@
 
 
 #include "HexBinaryTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/HexBinaryEncoder.h"
 #include "Poco/HexBinaryDecoder.h"
 #include "Poco/Exception.h"
@@ -24,7 +24,7 @@ using Poco::HexBinaryDecoder;
 using Poco::DataFormatException;
 
 
-HexBinaryTest::HexBinaryTest(const std::string& name): CppUnit::TestCase(name)
+HexBinaryTest::HexBinaryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

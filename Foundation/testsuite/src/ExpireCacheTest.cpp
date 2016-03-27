@@ -11,8 +11,8 @@
 
 
 #include "ExpireCacheTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/ExpireCache.h"
 #include "Poco/AccessExpireCache.h"
@@ -28,7 +28,7 @@ using namespace Poco;
 #define DURWAIT  300
 
 
-ExpireCacheTest::ExpireCacheTest(const std::string& name): CppUnit::TestCase(name)
+ExpireCacheTest::ExpireCacheTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -17,7 +17,7 @@
 
 
 #include "Poco/JSON/JSON.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Query.h"
@@ -74,10 +74,11 @@ public:
 	void testInvalidJanssonFiles();
 	void testTemplate();
 	void testItunes();
-	void testUnicode(); 
+	void testUnicode();
 	void testInvalidUnicodeJanssonFiles();
 	void testSmallBuffer();
-
+	void testEscape0();
+	void testEscapeUnicode();
 	void setUp();
 	void tearDown();
 

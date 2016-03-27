@@ -36,9 +36,9 @@ MultipartWriter::MultipartWriter(std::ostream& ostr):
 }
 
 
-MultipartWriter::MultipartWriter(std::ostream& ostr, const std::string& boundary):
+MultipartWriter::MultipartWriter(std::ostream& ostr, const std::string& rBoundary):
 	_ostr(ostr),
-	_boundary(boundary),
+	_boundary(rBoundary),
 	_firstPart(true)
 {
 	if (_boundary.empty())

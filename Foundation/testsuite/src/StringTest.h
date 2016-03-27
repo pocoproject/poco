@@ -17,7 +17,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/NumericString.h"
 #include "Poco/MemoryStream.h"
 
@@ -48,6 +48,7 @@ public:
 	void testStringToInt();
 	void testStringToFloat();
 	void testStringToDouble();
+	void testNumericStringPadding();
 	void testStringToFloatError();
 	void testNumericLocale();
 	void benchmarkStrToFloat();

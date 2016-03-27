@@ -77,6 +77,7 @@ class NetSSL_API SSLManager
 	///            <verificationDepth>1..9</verificationDepth>
 	///            <loadDefaultCAFile>true|false</loadDefaultCAFile>
 	///            <cipherList>ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH</cipherList>
+	///            <preferServerCiphers>true|false</preferServerCiphers>
 	///            <privateKeyPassphraseHandler>
 	///                <name>KeyFileHandler</name>
 	///                <options>
@@ -94,6 +95,9 @@ class NetSSL_API SSLManager
 	///            <requireTLSv1>true|false</requireTLSv1>
 	///            <requireTLSv1_1>true|false</requireTLSv1_1>
 	///            <requireTLSv1_2>true|false</requireTLSv1_2>
+	///            <disableProtocols>sslv2,sslv3,tlsv1,tlsv1_1,tlsv1_2</disableProtocols>
+	///            <dhParamsFile>dh.pem</dhParamsFile>
+	///            <ecdhCurve>prime256v1</ecdhCurve>
 	///          </server|client>
 	///          <fips>false</fips>
 	///       </openSSL>
@@ -115,6 +119,10 @@ class NetSSL_API SSLManager
 	///    - loadDefaultCAFile (boolean): Specifies whether the builtin CA certificates from OpenSSL are used.
 	///    - cipherList (string): Specifies the supported ciphers in OpenSSL notation
 	///      (e.g. "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH").
+	///    - preferServerCiphers (bool): When choosing a cipher, use the server's preferences instead of the 
+	///      client preferences. When not called, the SSL server will always follow the clients 
+	///      preferences. When called, the SSL/TLS server will choose following its own 
+	///      preferences.
 	///    - privateKeyPassphraseHandler.name (string): The name of the class (subclass of PrivateKeyPassphraseHandler)
 	///      used for obtaining the passphrase for accessing the private key.
 	///    - privateKeyPassphraseHandler.options.password (string): The password to be used by KeyFileHandler.
@@ -137,6 +145,12 @@ class NetSSL_API SSLManager
 	///    - requireTLSv1 (boolean): Require a TLSv1 connection.
 	///    - requireTLSv1_1 (boolean): Require a TLSv1.1 connection.
 	///    - requireTLSv1_2 (boolean): Require a TLSv1.2 connection.
+	///    - disableProtocols (string): A comma-separated list of protocols that should be
+	///      disabled. Valid protocol names are sslv2, sslv3, tlsv1, tlsv1_1, tlsv1_2.
+	///    - dhParamsFile (string): Specifies a file containing Diffie-Hellman parameters.
+	///      If not specified or empty, the default parameters are used.
+	///    - ecdhCurve (string): Specifies the name of the curve to use for ECDH, based
+	///      on the curve names specified in RFC 4492. Defaults to "prime256v1".
 	///    - fips: Enable or disable OpenSSL FIPS mode. Only supported if the OpenSSL version 
 	///      that this library is built against supports FIPS mode.
 {
@@ -308,6 +322,7 @@ private:
 	static const std::string CFG_CIPHER_LIST;
 	static const std::string CFG_CYPHER_LIST; // for backwards compatibility
 	static const std::string VAL_CIPHER_LIST;
+	static const std::string CFG_PREFER_SERVER_CIPHERS;
 	static const std::string CFG_DELEGATE_HANDLER;
 	static const std::string VAL_DELEGATE_HANDLER;
 	static const std::string CFG_CERTIFICATE_HANDLER;
@@ -320,6 +335,9 @@ private:
 	static const std::string CFG_REQUIRE_TLSV1;
 	static const std::string CFG_REQUIRE_TLSV1_1;
 	static const std::string CFG_REQUIRE_TLSV1_2;
+	static const std::string CFG_DISABLE_PROTOCOLS;
+	static const std::string CFG_DH_PARAMS_FILE;
+	static const std::string CFG_ECDH_CURVE;
 
 #ifdef OPENSSL_FIPS
 	static const std::string CFG_FIPS_MODE;

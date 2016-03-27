@@ -11,8 +11,8 @@
 
 
 #include "LoggerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Logger.h"
 #include "Poco/AutoPtr.h"
 #include "TestChannel.h"
@@ -24,7 +24,7 @@ using Poco::Message;
 using Poco::AutoPtr;
 
 
-LoggerTest::LoggerTest(const std::string& name): CppUnit::TestCase(name)
+LoggerTest::LoggerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

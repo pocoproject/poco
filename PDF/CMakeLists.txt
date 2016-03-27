@@ -136,7 +136,9 @@ POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
 if (ENABLE_TESTS)
-    add_subdirectory(samples)
     add_subdirectory(testsuite)
+endif ()
+if (ENABLE_SAMPLES)
+    add_subdirectory(samples)
 endif ()
 

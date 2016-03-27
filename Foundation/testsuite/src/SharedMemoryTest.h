@@ -18,7 +18,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Path.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class SharedMemoryTest: public CppUnit::TestCase
@@ -35,7 +35,7 @@ public:
 
 	static CppUnit::Test* suite();
 
-	static Poco::Path findDataFile(const std::string& afile);
+	static Poco::Path findDataFile(const std::string& directory, const std::string& file);
 
 private:
 };

@@ -33,6 +33,13 @@ Binary::Binary(Poco::Int32 size, unsigned char subtype) : _buffer(size), _subtyp
 }
 
 
+Binary::Binary(const UUID& uuid) : _buffer(128 / 8), _subtype(0x04)
+{
+    unsigned char szUUID[16];
+    uuid.copyTo((char*) szUUID);
+    _buffer.assign(szUUID, 16);
+}
+
 Binary::~Binary()
 {
 }
@@ -47,5 +54,15 @@ std::string Binary::toString(int indent) const
 	return oss.str();
 }
 
+UUID Binary::uuid() const
+{
+	if ( _subtype == 0x04 && _buffer.size() == 16 )
+	{
+		UUID uuid;
+		uuid.copyFrom((const char*) _buffer.begin());
+		return uuid;
+	}
+	throw BadCastException("Invalid subtype");
+}
 
 } } // namespace Poco::MongoDB

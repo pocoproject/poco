@@ -11,8 +11,8 @@
 
 
 #include "ZLibTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/InflatingStream.h"
 #include "Poco/DeflatingStream.h"
 #include "Poco/MemoryStream.h"
@@ -30,7 +30,7 @@ using Poco::DeflatingStreamBuf;
 using Poco::StreamCopier;
 
 
-ZLibTest::ZLibTest(const std::string& name): CppUnit::TestCase(name)
+ZLibTest::ZLibTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

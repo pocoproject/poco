@@ -11,8 +11,8 @@
 
 
 #include "FileChannelTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/FileChannel.h"
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
@@ -48,7 +48,7 @@ using Poco::DirectoryIterator;
 using Poco::InvalidArgumentException;
 
 
-FileChannelTest::FileChannelTest(const std::string& name): CppUnit::TestCase(name)
+FileChannelTest::FileChannelTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

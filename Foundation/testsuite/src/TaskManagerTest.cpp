@@ -11,8 +11,8 @@
 
 
 #include "TaskManagerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/TaskManager.h"
 #include "Poco/Task.h"
@@ -234,7 +234,7 @@ namespace
 }
 
 
-TaskManagerTest::TaskManagerTest(const std::string& name): CppUnit::TestCase(name)
+TaskManagerTest::TaskManagerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

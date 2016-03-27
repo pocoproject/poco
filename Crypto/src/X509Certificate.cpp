@@ -20,6 +20,10 @@
 #include "Poco/DateTimeParser.h"
 #include <sstream>
 #include <openssl/pem.h>
+#ifdef _WIN32
+// fix for WIN32 header conflict
+#undef X509_NAME 
+#endif
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
@@ -277,6 +281,14 @@ bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 	int rc = X509_verify(pCert, pIssuerPublicKey);
 	EVP_PKEY_free(pIssuerPublicKey);
 	return rc == 1;
+}
+
+
+bool X509Certificate::equals(const X509Certificate& otherCertificate) const
+{
+	X509* pCert = const_cast<X509*>(_pCert);
+	X509* pOtherCert = const_cast<X509*>(otherCertificate.certificate());
+	return X509_cmp(pCert, pOtherCert) == 0;
 }
 
 

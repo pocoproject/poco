@@ -11,8 +11,8 @@
 
 
 #include "TypeListTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Tuple.h"
 #include "Poco/TypeList.h"
 #include "Poco/Void.h"
@@ -51,7 +51,7 @@ using Poco::UInt32;
 using Poco::Void;
 
 
-TypeListTest::TypeListTest(const std::string& name): CppUnit::TestCase(name)
+TypeListTest::TypeListTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

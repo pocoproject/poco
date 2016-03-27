@@ -330,6 +330,42 @@ bool FileImpl::createDirectoryImpl()
 }
 
 
+FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct statfs stats;
+	if (statfs(_path.c_str(), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_blocks * (FileSizeImpl)stats.f_bsize;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct statfs stats;
+	if (statfs(_path.c_str(), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_bavail * (FileSizeImpl)stats.f_bsize;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct statfs stats;
+	if (statfs(_path.c_str(), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_bfree * (FileSizeImpl)stats.f_bsize;
+}
+
+
 void FileImpl::handleLastErrorImpl(const std::string& path)
 {
 	switch (errno)

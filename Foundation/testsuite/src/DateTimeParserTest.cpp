@@ -11,8 +11,8 @@
 
 
 #include "DateTimeParserTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTime.h"
@@ -27,7 +27,7 @@ using Poco::Timestamp;
 using Poco::SyntaxException;
 
 
-DateTimeParserTest::DateTimeParserTest(const std::string& name): CppUnit::TestCase(name)
+DateTimeParserTest::DateTimeParserTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -11,8 +11,8 @@
 
 
 #include "CryptoTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/CipherKey.h"
@@ -304,6 +304,11 @@ void CryptoTest::testCertificate()
 	
 	// fails with recent OpenSSL versions:
 	// assert (cert.issuedBy(cert));
+	
+	std::istringstream otherCertStream(APPINF_PEM);
+	X509Certificate otherCert(otherCertStream);
+	
+	assert (cert.equals(otherCert));
 }
 
 

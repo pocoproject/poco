@@ -11,8 +11,8 @@
 
 
 #include "StreamTokenizerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/StreamTokenizer.h"
 #include "Poco/Token.h"
 #include "Poco/Ascii.h"
@@ -105,7 +105,7 @@ public:
 };
 
 
-StreamTokenizerTest::StreamTokenizerTest(const std::string& name): CppUnit::TestCase(name)
+StreamTokenizerTest::StreamTokenizerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -9,13 +9,13 @@
 #
 # Target names
 #
-EXEC_RELEASE_STATIC = $(BINPATH)/static/$(target)$(OSARCH_POSTFIX)$(BINEXT)
-EXEC_DEBUG_STATIC   = $(BINPATH)/static/$(target)d$(OSARCH_POSTFIX)$(BINEXT)
-EXEC_RELEASE_SHARED = $(BINPATH)/$(target)$(OSARCH_POSTFIX)$(BINEXT)
-EXEC_DEBUG_SHARED   = $(BINPATH)/$(target)d$(OSARCH_POSTFIX)$(BINEXT)
+EXEC_RELEASE_STATIC = $(BINPATH)/static/$(target)$(BINEXT)
+EXEC_DEBUG_STATIC   = $(BINPATH)/static/$(target)d$(BINEXT)
+EXEC_RELEASE_SHARED = $(BINPATH)/$(target)$(BINEXT)
+EXEC_DEBUG_SHARED   = $(BINPATH)/$(target)d$(BINEXT)
 
-TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d$(OSARCH_POSTFIX))
-TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
+TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d)
+TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l))
 
 #
 # Include the compile rules

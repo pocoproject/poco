@@ -11,8 +11,8 @@
 
 
 #include "NumberParserTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/Types.h"
 #include "Poco/Format.h"
@@ -42,7 +42,7 @@ using Poco::decimalSeparator;
 using Poco::thousandSeparator;
 
 
-NumberParserTest::NumberParserTest(const std::string& name): CppUnit::TestCase(name)
+NumberParserTest::NumberParserTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

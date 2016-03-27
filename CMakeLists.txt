@@ -5,6 +5,7 @@
 #
 # ENABLE_{COMPONENT}
 # ENABLE_TESTS
+# ENABLE_SAMPLES
 
 cmake_minimum_required(VERSION 3.0.0)
 
@@ -46,7 +47,6 @@ if(NOT MSVC_IDE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
       "Choose the type of build, options are: None Debug Release" FORCE)
   endif()
-  message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -57,6 +57,7 @@ endif()
 include(PocoMacros)
 
 # Allow enabling and disabling components
+option(ENABLE_CPPUNIT "Enable the CppUnit" ON)
 option(ENABLE_XML "Enable the XML" ON)
 option(ENABLE_JSON "Enable the JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
@@ -69,6 +70,7 @@ option(ENABLE_CRYPTO "Enable Crypto" ON)
 option(ENABLE_DATA "Enable Data" ON)
 option(ENABLE_DATA_SQLITE "Enable Data SQlite" ON)
 option(ENABLE_DATA_MYSQL "Enable Data MySQL" ON)
+option(ENABLE_DATA_POSTGRESQL "Enable Data PosgreSQL" ON)
 option(ENABLE_DATA_ODBC "Enable Data ODBC" ON)
 option(ENABLE_SEVENZIP "Enable SevenZip" OFF)
 option(ENABLE_ZIP "Enable Zip" ON)
@@ -77,11 +79,15 @@ option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
 option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
+option(ENABLE_REDIS "Enable Redis" ON)
 
 option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
 
 option(ENABLE_TESTS
-  "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
+  "Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
+
+option(ENABLE_SAMPLES
+  "Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
 
 option(POCO_STATIC
   "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
@@ -111,9 +117,15 @@ endif(POCO_STATIC)
 if (ENABLE_TESTS)
   include(CTest)
   enable_testing()
-  message(STATUS "Building with unittests & samples")
+  message(STATUS "Building with tests")
 else ()
-  message(STATUS "Building without tests & samples")
+  message(STATUS "Building without tests")
+endif ()
+
+if (ENABLE_SAMPLES)
+  message(STATUS "Building with samples")
+else ()
+  message(STATUS "Building without samples")
 endif ()
 
 if (POCO_UNBUNDLED)
@@ -128,8 +140,12 @@ include(DefinePlatformSpecifc)
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
 
+# Pthreads/threads support
+find_package(Threads REQUIRED)
+
 if (ENABLE_TESTS)
    add_subdirectory(CppUnit)
+   list(APPEND Poco_COMPONENTS "CppUnit")
 endif ()
 
 add_subdirectory(Foundation)
@@ -157,7 +173,6 @@ if(ENABLE_NET)
 add_subdirectory(Net)
 list(APPEND Poco_COMPONENTS "Net")
 endif()
-
 
 #NetSSL
 
@@ -191,6 +206,10 @@ endif()
 if(ENABLE_ZIP)
 add_subdirectory(Zip)
 list(APPEND Poco_COMPONENTS "Zip")
+endif()
+if(ENABLE_REDIS)
+add_subdirectory(Redis)
+list(APPEND Poco_COMPONENTS "Redis")
 endif()
 
 find_package(APR)
@@ -273,6 +292,11 @@ install(
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
 message(STATUS "Installation target path: ${CMAKE_INSTALL_PREFIX}")
+
+message(STATUS "")
+message(STATUS "Generated with config types: ${CMAKE_CONFIGURATION_TYPES}")
+message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")
+message(STATUS "")
 
 message(STATUS "C_FLAGS:  =${CMAKE_C_FLAGS}")
 message(STATUS "CMAKE_C_FLAGS_DEBUG:=${CMAKE_C_FLAGS_DEBUG}")

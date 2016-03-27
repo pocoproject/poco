@@ -48,8 +48,10 @@ int MySQLStatementImpl::affectedRowCount() const
 }
 
 	
-const MetaColumn& MySQLStatementImpl::metaColumn(std::size_t pos) const
+const MetaColumn& MySQLStatementImpl::metaColumn(std::size_t pos, std::size_t dataSet) const
 {
+	// mysql doesn't support multiple result sets
+	poco_assert_dbg(dataSet == 0);
 	return _metadata.metaColumn(pos);
 }
 

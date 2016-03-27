@@ -12,8 +12,8 @@
 
 
 #include "DigestStreamTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DigestStream.h"
 #include "Poco/MD5Engine.h"
 #include <sstream>
@@ -25,7 +25,7 @@ using Poco::DigestEngine;
 using Poco::MD5Engine;
 
 
-DigestStreamTest::DigestStreamTest(const std::string& name): CppUnit::TestCase(name)
+DigestStreamTest::DigestStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

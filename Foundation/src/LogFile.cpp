@@ -31,7 +31,7 @@
 namespace Poco {
 
 
-LogFile::LogFile(const std::string& path): LogFileImpl(path)
+LogFile::LogFile(const std::string& rPath): LogFileImpl(rPath)
 {
 }
 

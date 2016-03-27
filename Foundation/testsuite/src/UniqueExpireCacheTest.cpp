@@ -11,8 +11,8 @@
 
 
 #include "UniqueExpireCacheTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/UniqueExpireCache.h"
 #include "Poco/UniqueAccessExpireCache.h"
@@ -47,7 +47,7 @@ typedef AccessExpirationDecorator<int> DIntVal;
 #define DURWAIT  300
 
 
-UniqueExpireCacheTest::UniqueExpireCacheTest(const std::string& name): CppUnit::TestCase(name)
+UniqueExpireCacheTest::UniqueExpireCacheTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

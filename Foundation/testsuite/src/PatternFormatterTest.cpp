@@ -11,8 +11,8 @@
 
 
 #include "PatternFormatterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/PatternFormatter.h"
 #include "Poco/Message.h"
 #include "Poco/DateTime.h"
@@ -23,7 +23,7 @@ using Poco::Message;
 using Poco::DateTime;
 
 
-PatternFormatterTest::PatternFormatterTest(const std::string& name): CppUnit::TestCase(name)
+PatternFormatterTest::PatternFormatterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

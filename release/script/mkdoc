@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 #
 # $Id: //poco/1.4/release/script/mkdoc#2 $
 #
@@ -17,6 +17,18 @@
 if [ "$POCO_BASE" = "" ] ; then
   echo "Error: POCO_BASE not set."
   exit 1
+fi
+
+osname=`uname -s | tr ' ' '_'`
+osarch=`uname -m | tr ' ' '_'`
+
+if [ ${osname:0:6} = "CYGWIN" ] ; then
+	osname="Cygwin"
+fi
+
+if [ $osname = "Darwin" ] ; then
+	archpath=`dirname stage/tools/PocoDoc/bin/Darwin/*/PocoDoc`
+	osarch=`basename $archpath`
 fi
 
 spec=""
@@ -59,6 +71,14 @@ if [ "$version" = "" ] ; then
 fi
 release=$version$tag
 
+if [ ! -f libversion ] ; then
+  echo "Error: No libversion file found."
+  exit 2
+fi
+if [ "$libversion" = "" ] ; then
+	read libversion <$POCO_BASE/libversion
+fi
+
 #
 # Build release
 #
@@ -71,18 +91,22 @@ mkdir -p $tools
 mkrelease -o $tools $version CppParser PocoDoc
 
 cd $tools
-./configure --no-tests --no-samples
+./configure --no-tests --no-samples --no-prefix
 make -s -j8
+
+if [ $osname = "Cygwin" ] ; then
+    find $tools -type f -name "cyg*$libversion.dll" > $TMP/dlls
+    rebase -O -T $TMP/dlls
+    rm $TMP/dlls
+fi
 
 cd $POCO_BASE
 
-osname=`uname -s | tr ' ' '_'`
-osarch=`uname -m | tr ' ' '_'`
-
-if [ $osname = "Darwin" ] ; then
-	archpath=`dirname stage/tools/PocoDoc/bin/Darwin/*/PocoDoc`
-	osarch=`basename $archpath`
+if [ $osname = "Cygwin" ] ; then
+#   Poco dlls must be on PATH for Cygwin
+    export PATH=$tools/lib/$osname/$osarch:$PATH
 fi
+
 
 export PATH=$tools/PocoDoc/bin/$osname/$osarch:$PATH
 echo PATH=$PATH

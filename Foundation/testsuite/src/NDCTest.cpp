@@ -11,8 +11,8 @@
 
 
 #include "NDCTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/NestedDiagnosticContext.h"
 #include <iostream>
 
@@ -20,7 +20,7 @@
 using Poco::NDC;
 
 
-NDCTest::NDCTest(const std::string& name): CppUnit::TestCase(name)
+NDCTest::NDCTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

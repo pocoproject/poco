@@ -44,17 +44,17 @@ File::File()
 }
 
 
-File::File(const std::string& path): FileImpl(path)
+File::File(const std::string& rPath): FileImpl(rPath)
 {
 }
 
 
-File::File(const char* path): FileImpl(std::string(path))
+File::File(const char* pPath): FileImpl(std::string(pPath))
 {
 }
 
 
-File::File(const Path& path): FileImpl(path.toString())
+File::File(const Path& rPath): FileImpl(rPath.toString())
 {
 }
 
@@ -76,24 +76,24 @@ File& File::operator = (const File& file)
 }
 
 
-File& File::operator = (const std::string& path)
+File& File::operator = (const std::string& rPath)
 {
-	setPathImpl(path);
+	setPathImpl(rPath);
 	return *this;
 }
 
 
-File& File::operator = (const char* path)
+File& File::operator = (const char* pPath)
 {
-	poco_check_ptr (path);
-	setPathImpl(path);
+	poco_check_ptr (pPath);
+	setPathImpl(pPath);
 	return *this;
 }
 
 
-File& File::operator = (const Path& path)
+File& File::operator = (const Path& rPath)
 {
-	setPathImpl(path.toString());
+	setPathImpl(rPath.toString());
 	return *this;
 }
 
@@ -211,11 +211,11 @@ File& File::setExecutable(bool flag)
 }
 
 	
-void File::copyTo(const std::string& path) const
+void File::copyTo(const std::string& rPath) const
 {
 	Path src(getPathImpl());
-	Path dest(path);
-	File destFile(path);
+	Path dest(rPath);
+	File destFile(rPath);
 	if ((destFile.exists() && destFile.isDirectory()) || dest.isDirectory())
 	{
 		dest.makeDirectory();
@@ -228,9 +228,9 @@ void File::copyTo(const std::string& path) const
 }
 
 
-void File::copyDirectory(const std::string& path) const
+void File::copyDirectory(const std::string& rPath) const
 {
-	File target(path);
+	File target(rPath);
 	target.createDirectories();
 
 	Path src(getPathImpl());
@@ -239,23 +239,23 @@ void File::copyDirectory(const std::string& path) const
 	DirectoryIterator end;
 	for (; it != end; ++it)
 	{
-		it->copyTo(path);
+		it->copyTo(rPath);
 	}
 }
 
 
-void File::moveTo(const std::string& path)
+void File::moveTo(const std::string& rPath)
 {
-	copyTo(path);
+	copyTo(rPath);
 	remove(true);
-	setPathImpl(path);
+	setPathImpl(rPath);
 }
 
 	
-void File::renameTo(const std::string& path)
+void File::renameTo(const std::string& rPath)
 {
-	renameToImpl(path);
-	setPathImpl(path);
+	renameToImpl(rPath);
+	setPathImpl(rPath);
 }
 
 	
@@ -313,6 +313,24 @@ void File::list(std::vector<std::string>& files) const
 		files.push_back(it.name());
 		++it;
 	}
+}
+
+
+File::FileSize File::totalSpace() const
+{
+	return totalSpaceImpl();
+}
+
+
+File::FileSize File::usableSpace() const
+{
+	return usableSpaceImpl();
+}
+
+
+File::FileSize File::freeSpace() const
+{
+	return freeSpaceImpl();
 }
 
 

@@ -62,8 +62,8 @@ public:
 		typedef typename std::map<K, T>::const_iterator MapConstIterator;
 
 		MapConstIterator it = val.begin();
-		MapConstIterator end = val.end();
-		for (; it != end; ++it) _data.insert(ValueType(it->first, Var(it->second)));
+		MapConstIterator itEnd = val.end();
+		for (; it != itEnd; ++it) _data.insert(ValueType(it->first, Var(it->second)));
 	}
 
 	virtual ~Struct()
@@ -190,7 +190,7 @@ public:
 	std::string toString()
 	{
 		std::string str;
-		Var(*this).convert<std::string>(str);
+		Var(*this).template convert<std::string>(str);
 		return str;
 	}
 

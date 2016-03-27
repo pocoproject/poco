@@ -216,8 +216,8 @@ private:
 		if (indent > 0) out << std::endl;
 		
 		typename C::const_iterator it = container.begin();
-		typename C::const_iterator end = container.end();
-		for (; it != end;)
+		typename C::const_iterator itEnd = container.end();
+		for (; it != itEnd;)
 		{
 			for(unsigned int i = 0; i < indent; i++) out << ' ';
 
@@ -320,7 +320,11 @@ inline const Dynamic::Var& Object::getValue(ValueMap::const_iterator& it) const
 
 inline const Dynamic::Var& Object::getValue(KeyPtrList::const_iterator& it) const
 {
-	return _values.at(**it);
+	ValueMap::const_iterator itv = _values.find(**it);
+	if (itv != _values.end())
+		return itv->second;
+	else
+		throw Poco::NotFoundException();
 }
 
 
@@ -388,9 +392,9 @@ public:
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& rValue) const
 	{
-		value = !_val.isNull() && _val->size() > 0;
+		rValue = !_val.isNull() && _val->size() > 0;
 	}
 
 	void convert(float&) const
@@ -530,9 +534,9 @@ public:
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& rValue) const
 	{
-		value = _val.size() > 0;
+		rValue = _val.size() > 0;
 	}
 
 	void convert(float&) const

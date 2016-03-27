@@ -37,10 +37,10 @@ Statement::Statement(StatementImpl::Ptr pImpl):
 }
 
 
-Statement::Statement(Session& session):
+Statement::Statement(Session& rSession):
 	_async(false)
 {
-	reset(session);
+	reset(rSession);
 }
 
 
@@ -81,15 +81,15 @@ void Statement::swap(Statement& other)
 }
 
 
-Statement& Statement::reset(Session& session)
+Statement& Statement::reset(Session& rSession)
 {
-	Statement stmt(session.createStatementImpl());
+	Statement stmt(rSession.createStatementImpl());
 	swap(stmt);
 	return *this;
 }
 
 
-std::size_t Statement::execute(bool reset)
+std::size_t Statement::execute(bool doReset)
 {
 	Mutex::ScopedLock lock(_mutex);
 	bool isDone = done();
@@ -104,7 +104,7 @@ std::size_t Statement::execute(bool reset)
 		if (!isAsync())
 		{
 			if (isDone) _pImpl->reset();
-			return _pImpl->execute(reset);
+			return _pImpl->execute(doReset);
 		}
 		else
 		{
@@ -116,22 +116,22 @@ std::size_t Statement::execute(bool reset)
 }
 
 
-const Statement::Result& Statement::executeAsync(bool reset)
+const Statement::Result& Statement::executeAsync(bool doReset)
 {
 	Mutex::ScopedLock lock(_mutex);
 	if (initialized() || paused() || done())
-		return doAsyncExec(reset);
+		return doAsyncExec(doReset);
 	else
 		throw InvalidAccessException("Statement still executing.");
 }
 
 
-const Statement::Result& Statement::doAsyncExec(bool reset)
+const Statement::Result& Statement::doAsyncExec(bool doReset)
 {
 	if (done()) _pImpl->reset();
 	if (!_pAsyncExec)
 		_pAsyncExec = new AsyncExecMethod(_pImpl, &StatementImpl::execute);
-	_pResult = new Result((*_pAsyncExec)(reset));
+	_pResult = new Result((*_pAsyncExec)(doReset));
 	return *_pResult;
 }
 

@@ -197,7 +197,11 @@ void SQLiteStatementImpl::bindImpl()
 			if (boundRowCount != (*_bindBegin)->numOfRowsHandled())
 				throw BindingException("Size mismatch in Bindings. All Bindings MUST have the same size");
 
-			(*_bindBegin)->bind(pos);
+			std::size_t namedBindPos = 0;
+			if (!(*_bindBegin)->name().empty())
+				namedBindPos = (std::size_t)sqlite3_bind_parameter_index(_pStmt, (*_bindBegin)->name().c_str());
+
+			(*_bindBegin)->bind((namedBindPos != 0) ? namedBindPos : pos);
 			pos += (*_bindBegin)->numOfColumnsHandled();
 		}
 
@@ -273,7 +277,15 @@ std::size_t SQLiteStatementImpl::next()
 		}
 		_stepCalled = false;
 		if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
-		_affectedRowCount += (*extracts.begin())->numOfRowsHandled();
+
+		if (extracts.size())
+			_affectedRowCount += (*extracts.begin())->numOfRowsHandled();
+		else
+		{
+			_stepCalled = true;
+			_nextResponse = SQLITE_DONE;
+		}		
+
 	}
 	else if (SQLITE_DONE == _nextResponse)
 	{
@@ -294,11 +306,10 @@ std::size_t SQLiteStatementImpl::columnsReturned() const
 }
 
 
-const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
+const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos, std::size_t dataSet) const
 {
-	std::size_t curDataSet = currentDataSet();
-	poco_assert (pos >= 0 && pos <= _columns[curDataSet].size());
-	return _columns[curDataSet][pos];
+	poco_assert (pos >= 0 && pos <= _columns[dataSet].size());
+	return _columns[dataSet][pos];
 }
 
 

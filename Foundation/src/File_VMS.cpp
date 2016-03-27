@@ -350,6 +350,36 @@ bool FileImpl::createDirectoryImpl()
 }
 
 
+FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	// TODO: implement
+	
+	return -1;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	// TODO: implement
+	
+	return -1;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	// TODO: implement
+	
+	return -1;
+}
+
+
 void FileImpl::handleLastErrorImpl(const std::string& path)
 {
 	switch (errno)

@@ -11,8 +11,8 @@
 
 
 #include "TextConverterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/TextConverter.h"
 #include "Poco/ASCIIEncoding.h"
 #include "Poco/Latin1Encoding.h"
@@ -27,7 +27,7 @@
 using namespace Poco;
 
 
-TextConverterTest::TextConverterTest(const std::string& name): CppUnit::TestCase(name)
+TextConverterTest::TextConverterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -18,8 +18,8 @@
 Param
 (
   [Parameter()]
-  [ValidateSet(90, 100, 110, 120)]
-  [int] $vs_version = 110,
+  [ValidateSet(90, 100, 110, 120, 140)]
+  [int] $vs_version = 120,
 
   [Parameter()]
   [ValidateSet('release', 'debug', 'both')]
@@ -63,7 +63,7 @@ $PERL_PACKAGE_FILE = "strawberry-perl-$PERL_VERSION-32bit-portable.zip"
 $PERL_DOWNLOAD_URL = "http://strawberryperl.com/download/5.20.1.1/$PERL_PACKAGE_FILE"
 
 # OpenSSL configuration section
-$OPENSSL_VERSION         = "1.0.2a"
+$OPENSSL_VERSION         = "1.0.2e"
 $OPENSSL_DIRECTORY       = Join-Path $PACKAGES_DIRECTORY "openssl-$OPENSSL_VERSION"
 $OPENSSL_CLEAN_DIRECTORY = Join-Path $PACKAGES_DIRECTORY "openssl-$OPENSSL_VERSION.clean"
 $OPENSSL_PACKAGE_FILE    = "openssl-$OPENSSL_VERSION.tar.gz"
@@ -95,7 +95,8 @@ function Load-DevelopmentTools {
     
     if ($vs_version -eq 0)
     {
-      if     ($Env:VS120COMNTOOLS -ne '') { $script:vs_version = 120 }
+      if     ($Env:VS140COMNTOOLS -ne '') { $script:vs_version = 140 }
+      elseif ($Env:VS120COMNTOOLS -ne '') { $script:vs_version = 120 }
       elseif ($Env:VS110COMNTOOLS -ne '') { $script:vs_version = 110 }
       elseif ($Env:VS100COMNTOOLS -ne '') { $script:vs_version = 100 }
       elseif ($Env:VS90COMNTOOLS  -ne '') { $script:vs_version = 90 }

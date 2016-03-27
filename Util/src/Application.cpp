@@ -78,7 +78,7 @@ Application::Application():
 }
 
 
-Application::Application(int argc, char* argv[]):
+Application::Application(int argc, char* pArgv[]):
 	_pConfig(new LayeredConfiguration),
 	_initialized(false),
 	_unixOptions(true),
@@ -87,7 +87,7 @@ Application::Application(int argc, char* argv[]):
 	_loadedConfigs(0)
 {
 	setup();
-	init(argc, argv);
+	init(argc, pArgv);
 }
 
 
@@ -131,9 +131,9 @@ void Application::addSubsystem(Subsystem* pSubsystem)
 }
 
 
-void Application::init(int argc, char* argv[])
+void Application::init(int argc, char* pArgv[])
 {
-	setArgs(argc, argv);
+	setArgs(argc, pArgv);
 	init();
 }
 
@@ -363,15 +363,15 @@ int Application::main(const ArgVec& args)
 }
 
 
-void Application::setArgs(int argc, char* argv[])
+void Application::setArgs(int argc, char* pArgv[])
 {
-	_command = argv[0];
+	_command = pArgv[0];
 	_pConfig->setInt("application.argc", argc);
 	_unprocessedArgs.reserve(argc);
 	std::string argvKey = "application.argv[";
 	for (int i = 0; i < argc; ++i)
 	{
-		std::string arg(argv[i]);
+		std::string arg(pArgv[i]);
 		_pConfig->setString(argvKey + NumberFormatter::format(i) + "]", arg);
 		_unprocessedArgs.push_back(arg);
 	}
@@ -403,13 +403,13 @@ void Application::processOptions()
 	ArgVec::iterator it = _unprocessedArgs.begin();
 	while (it != _unprocessedArgs.end() && !_stopOptionsProcessing)
 	{
-		std::string name;
+		std::string argName;
 		std::string value;
-		if (processor.process(*it, name, value))
+		if (processor.process(*it, argName, value))
 		{
-			if (!name.empty()) // "--" option to end options processing or deferred argument
+			if (!argName.empty()) // "--" option to end options processing or deferred argument
 			{
-				handleOption(name, value);
+				handleOption(argName, value);
 			}
 			it = _unprocessedArgs.erase(it);
 		}
@@ -536,18 +536,18 @@ bool Application::findAppConfigFile(const Path& basePath, const std::string& app
 }
 
 
-void Application::defineOptions(OptionSet& options)
+void Application::defineOptions(OptionSet& rOptions)
 {
 	for (SubsystemVec::iterator it = _subsystems.begin(); it != _subsystems.end(); ++it)
 	{
-		(*it)->defineOptions(options);
+		(*it)->defineOptions(rOptions);
 	}
 }
 
 
-void Application::handleOption(const std::string& name, const std::string& value)
+void Application::handleOption(const std::string& rName, const std::string& value)
 {
-	const Option& option = _options.getOption(name);
+	const Option& option = _options.getOption(rName);
 	if (option.validator())
 	{
 		option.validator()->validate(option, value);
@@ -560,14 +560,14 @@ void Application::handleOption(const std::string& name, const std::string& value
 	}
 	if (option.callback())
 	{
-		option.callback()->invoke(name, value);
+		option.callback()->invoke(rName, value);
 	}
 }
 
 
-void Application::setLogger(Logger& logger)
+void Application::setLogger(Logger& rLogger)
 {
-	_pLogger = &logger;
+	_pLogger = &rLogger;
 }
 
 

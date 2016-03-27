@@ -19,7 +19,7 @@ if [ "$1" = "" ] ; then
 	exit 1
 fi
 
-comps="Foundation XML JSON Util Net"
+comps="CppUnit CppUnit/WinTestRunner Foundation XML JSON Util Net"
 internal=0
 specfile=""
 version=""
@@ -129,43 +129,6 @@ if [ $internal = 1 ] ; then
 	cp ${POCO_BASE}/build/script/waitfortest ${target}/build/script
 fi
 
-
-#
-# CppUnit
-#
-mkdir -p ${target}/CppUnit
-mkdir -p ${target}/CppUnit/doc
-mkdir -p ${target}/CppUnit/include/CppUnit
-mkdir -p ${target}/CppUnit/src
-mkdir -p ${target}/CppUnit/WinTestRunner
-mkdir -p ${target}/CppUnit/WinTestRunner/include/WinTestRunner
-mkdir -p ${target}/CppUnit/WinTestRunner/src
-mkdir -p ${target}/CppUnit/WinTestRunner/res
-
-cp ${POCO_BASE}/CppUnit/doc/* ${target}/CppUnit/doc >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/include/CppUnit/* ${target}/CppUnit/include/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/src/* ${target}/CppUnit/src >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.sln ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vcproj ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vcxproj ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vcxproj.filters ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vcxproj.user ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/Makefile ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vmsbuild ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vxbuild ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.progen ${target}/CppUnit >/dev/null 2>&1
-
-cp ${POCO_BASE}/CppUnit/WinTestRunner/include/WinTestRunner/* ${target}/CppUnit/WinTestRunner/include/WinTestRunner >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/src/* ${target}/CppUnit/WinTestRunner/src >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/res/WinTestRunner.rc ${target}/CppUnit/WinTestRunner/res >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/res/Resource.h ${target}/CppUnit/WinTestRunner/res >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcproj ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.filters ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.user ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/WinTestRunner/*.progen ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
-
-
 #
 # Copy components
 #
@@ -178,8 +141,6 @@ done
 #
 # Create components file
 #
-echo "CppUnit" >${target}/components
-echo "CppUnit/WinTestRunner" >>${target}/components
 for comp in $comps ;
 do
 	echo $comp >>${target}/components
@@ -209,13 +170,71 @@ ifndef POCO_BASE
 $(warning WARNING: POCO_BASE is not defined. Assuming current directory.)
 export POCO_BASE=$(shell pwd)
 endif
-
-ifndef POCO_PREFIX
-export POCO_PREFIX=/usr/local
+ifdef POCO_VERBOSE
+$(info POCO_BASE           = $(POCO_BASE))
 endif
 
 ifndef POCO_BUILD
 export POCO_BUILD=$(POCO_BASE)
+endif
+ifdef POCO_VERBOSE
+$(info POCO_BUILD          = $(POCO_BUILD))
+endif
+
+#
+# Determine OS
+#
+POCO_HOST_OSNAME = $(shell uname)
+ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
+POCO_HOST_OSNAME = Cygwin
+endif
+
+ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
+POCO_HOST_OSNAME = MinGW
+endif
+ifdef POCO_VERBOSE
+$(info POCO_HOST_OSNAME    = $(POCO_HOST_OSNAME))
+endif
+
+POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
+ifdef POCO_VERBOSE
+$(info POCO_HOST_OSARCH    = $(POCO_HOST_OSARCH))
+endif
+
+#
+# If POCO_CONFIG is not set, use the OS name as configuration name
+#
+ifndef POCO_CONFIG
+POCO_CONFIG = $(POCO_HOST_OSNAME)
+endif
+ifdef POCO_VERBOSE
+$(info POCO_CONFIG         = $(POCO_CONFIG))
+endif
+
+#
+# Include System Specific Settings
+#
+include $(POCO_BASE)/build/config/$(POCO_CONFIG)
+
+#
+# Determine operating system
+#
+ifndef POCO_TARGET_OSNAME
+OSNAME   := $(POCO_HOST_OSNAME)
+else
+OSNAME   := $(POCO_TARGET_OSNAME)
+endif
+ifdef POCO_VERBOSE
+$(info OSNAME              = $(OSNAME))
+endif
+
+ifndef POCO_TARGET_OSARCH
+OSARCH   := $(POCO_HOST_OSARCH)
+else
+OSARCH   := $(POCO_TARGET_OSARCH)
+endif
+ifdef POCO_VERBOSE
+$(info OSARCH              = $(OSARCH))
 endif
 
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
@@ -231,12 +250,6 @@ echo "COMPONENTS = $comps" >>${target}/Makefile
 
 cat >>${target}/Makefile <<'ENDOFSCRIPT'
 
-cppunit:
-	$(MAKE) -C $(POCO_BASE)/CppUnit 
-
-CppUnit-clean:
-	\$(MAKE) -C \$(POCO_BASE)/CppUnit clean
-
 install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
 	mkdir -p $(INSTALLDIR)/lib
@@ -249,8 +262,12 @@ install: libexecs
 			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -f {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
-	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+ifeq ($(OSNAME), Cygwin)
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
+endif
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
 ENDOFSCRIPT
 
@@ -260,13 +277,15 @@ samples=""
 cleans=""
 for comp in $comps ;
 do
-	libexecs="$libexecs ${comp}-libexec"
-	cleans="$cleans ${comp}-clean"
-	if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
-		tests="$tests ${comp}-tests"
-	fi
-	if [ -d "${POCO_BASE}/${comp}/samples" ] ; then
-		samples="$samples ${comp}-samples"
+	if [ -f "${POCO_BASE}/${comp}/Makefile" ] ; then
+		libexecs="$libexecs ${comp}-libexec"
+		cleans="$cleans ${comp}-clean"
+		if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
+			tests="$tests ${comp}-tests"
+		fi
+		if [ -d "${POCO_BASE}/${comp}/samples" ] ; then
+			samples="$samples ${comp}-samples"
+		fi
 	fi
 done
 
@@ -287,10 +306,11 @@ echo 'cleans: $(filter-out $(foreach f,$(OMIT),$f%),$(cleans))' >>${target}/Make
 
 for comp in $comps ;
 do
-	if [ "`grep -c POCO_LICENSING "${POCO_BASE}/${comp}/Makefile"`" != 0 ] ; then
-		dependencies=$licensingDep
-	else
-		dependencies=""
+	dependencies=""
+	if [ -f "${POCO_BASE}/${comp}/Makefile" ] ; then
+		if [ "`grep -c POCO_LICENSING "${POCO_BASE}/${comp}/Makefile"`" != 0 ] ; then
+			dependencies=$licensingDep
+		fi
 	fi
 	if [ -f "${POCO_BASE}/${comp}/dependencies" ] ; then
 		for dep in `cat "${POCO_BASE}/${comp}/dependencies"` ;
@@ -352,7 +372,7 @@ done
 
 cat >>${target}/Makefile <<ENDOFSCRIPT
 
-clean: cleans CppUnit-clean
+clean: cleans
 
 distclean:
 	rm -rf \$(POCO_BUILD)/lib
@@ -380,7 +400,7 @@ cat >${target}/build_vs100.cmd <<'ENDOFSCRIPT'
 @echo off
 if defined VS100COMNTOOLS (
 call "%VS100COMNTOOLS%\vsvars32.bat")
-buildwin 100 build shared both Win32 samples
+buildwin 100 build shared both Win32 samples devenv
 ENDOFSCRIPT
 
 
@@ -391,7 +411,7 @@ cat >${target}/build_vs110.cmd <<'ENDOFSCRIPT'
 @echo off
 if defined VS110COMNTOOLS (
 call "%VS110COMNTOOLS%\vsvars32.bat")
-buildwin 110 build shared both Win32 samples
+buildwin 110 build shared both Win32 samples devenv
 ENDOFSCRIPT
 
 
@@ -402,7 +422,17 @@ cat >${target}/build_vs120.cmd <<'ENDOFSCRIPT'
 @echo off
 if defined VS120COMNTOOLS (
 call "%VS120COMNTOOLS%\vsvars32.bat")
-buildwin 120 build shared both Win32 samples
+buildwin 120 build shared both Win32 samples devenv
+ENDOFSCRIPT
+
+#
+# Create Visual Studio 14 build script
+#
+cat >${target}/build_vs140.cmd <<'ENDOFSCRIPT'
+@echo off
+if defined VS140COMNTOOLS (
+call "%VS140COMNTOOLS%\vsvars32.bat")
+buildwin 140 build shared both Win32 samples devenv
 ENDOFSCRIPT
 
 
@@ -455,10 +485,11 @@ ENDOFSCRIPT
 # Fix line endings
 #
 if [ "$lineEndConv" != "" ] ; then
-	$lineEndConv ${target}/build_vs71.cmd
-	$lineEndConv ${target}/build_vs80.cmd
 	$lineEndConv ${target}/build_vs90.cmd
 	$lineEndConv ${target}/build_vs100.cmd
+	$lineEndConv ${target}/build_vs110.cmd
+	$lineEndConv ${target}/build_vs120.cmd
+	$lineEndConv ${target}/build_vs140.cmd
 	$lineEndConv ${target}/build_CE_vs90.cmd
 	$lineEndConv ${target}/build_vcexpress2008.cmd
 	$lineEndConv ${target}/build_vcexpress2010.cmd

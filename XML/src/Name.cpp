@@ -30,24 +30,24 @@ Name::Name()
 }
 
 
-Name::Name(const XMLString& qname):
-	_qname(qname)
+Name::Name(const XMLString& rQname):
+	_qname(rQname)
 {
 }
 
 
-Name::Name(const XMLString& qname, const XMLString& namespaceURI):
-	_qname(qname),
-	_namespaceURI(namespaceURI),
-	_localName(localName(qname))
+Name::Name(const XMLString& rQname, const XMLString& rNamespaceURI):
+	_qname(rQname),
+	_namespaceURI(rNamespaceURI),
+	_localName(localName(rQname))
 {
 }
 
 
-Name::Name(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName):
-	_qname(qname),
-	_namespaceURI(namespaceURI),
-	_localName(localName)
+Name::Name(const XMLString& rQname, const XMLString& rNamespaceURI, const XMLString& rLocalName):
+	_qname(rQname),
+	_namespaceURI(rNamespaceURI),
+	_localName(rLocalName)
 {
 }
 
@@ -85,27 +85,27 @@ void Name::swap(Name& name)
 }
 
 
-void Name::assign(const XMLString& qname)
+void Name::assign(const XMLString& rQname)
 {
-	_qname        = qname;
+	_qname        = rQname;
 	_namespaceURI.clear();
 	_localName.clear();
 }
 
 
-void Name::assign(const XMLString& qname, const XMLString& namespaceURI)
+void Name::assign(const XMLString& rQname, const XMLString& rNamespaceURI)
 {
-	_qname        = qname;
-	_namespaceURI = namespaceURI;
-	_localName    = localName(qname);
+	_qname        = rQname;
+	_namespaceURI = rNamespaceURI;
+	_localName    = localName(rQname);
 }
 
 
-void Name::assign(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName)
+void Name::assign(const XMLString& rQname, const XMLString& rNamespaceURI, const XMLString& rLocalName)
 {
-	_qname        = qname;
-	_namespaceURI = namespaceURI;
-	_localName    = localName;
+	_qname        = rQname;
+	_namespaceURI = rNamespaceURI;
+	_localName    = rLocalName;
 }
 
 
@@ -115,15 +115,15 @@ bool Name::equals(const Name& name) const
 }
 
 
-bool Name::equals(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName) const
+bool Name::equals(const XMLString& rQname, const XMLString& rNamespaceURI, const XMLString& rLocalName) const
 {
-	return _namespaceURI == namespaceURI && _localName == localName && _qname == qname;
+	return _namespaceURI == rNamespaceURI && _localName == rLocalName && _qname == rQname;
 }
 
 
-bool Name::equalsWeakly(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName) const
+bool Name::equalsWeakly(const XMLString& rQname, const XMLString& rNamespaceURI, const XMLString& rLocalName) const
 {
-	return (_qname == qname && !qname.empty()) || (_namespaceURI == namespaceURI && _localName == localName && !_localName.empty());
+	return (_qname == rQname && !rQname.empty()) || (_namespaceURI == rNamespaceURI && _localName == rLocalName && !_localName.empty());
 }
 
 
@@ -133,37 +133,37 @@ XMLString Name::prefix() const
 }
 
 
-void Name::split(const XMLString& qname, XMLString& prefix, XMLString& localName)
+void Name::split(const XMLString& rQname, XMLString& prefix, XMLString& rLocalName)
 {
-	XMLString::size_type pos = qname.find(':');
+	XMLString::size_type pos = rQname.find(':');
 	if (pos != XMLString::npos)
 	{
-		prefix.assign(qname, 0, pos);
-		localName.assign(qname, pos + 1, qname.size() - pos - 1);
+		prefix.assign(rQname, 0, pos);
+		rLocalName.assign(rQname, pos + 1, rQname.size() - pos - 1);
 	}
 	else
 	{
 		prefix.clear();
-		localName.assign(qname);
+		rLocalName.assign(rQname);
 	}
 }
 
 
-XMLString Name::localName(const XMLString& qname)
+XMLString Name::localName(const XMLString& rQname)
 {
-	XMLString::size_type pos = qname.find(':');
+	XMLString::size_type pos = rQname.find(':');
 	if (pos != XMLString::npos) 
-		return XMLString(qname, pos + 1, qname.size() - pos - 1);
+		return XMLString(rQname, pos + 1, rQname.size() - pos - 1);
 	else
-		return qname;
+		return rQname;
 }
 
 
-XMLString Name::prefix(const XMLString& qname)
+XMLString Name::prefix(const XMLString& rQname)
 {
-	XMLString::size_type pos = qname.find(':');
+	XMLString::size_type pos = rQname.find(':');
 	if (pos != XMLString::npos)
-		return XMLString(qname, 0, pos);
+		return XMLString(rQname, 0, pos);
 	else
 		return EMPTY_NAME;
 }

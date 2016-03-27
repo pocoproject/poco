@@ -78,20 +78,28 @@ std::string EnvironmentImpl::osNameImpl()
 
 std::string EnvironmentImpl::osDisplayNameImpl()
 {
-	OSVERSIONINFO vi;
+	OSVERSIONINFOEX vi;	// OSVERSIONINFOEX is supported starting at Windows 2000 
 	vi.dwOSVersionInfoSize = sizeof(vi);
-	if (GetVersionEx(&vi) == 0) throw SystemException("Cannot get OS version information");
-	switch(vi.dwMajorVersion)
+	if (GetVersionEx((OSVERSIONINFO*) &vi) == 0) throw SystemException("Cannot get OS version information");
+	switch (vi.dwMajorVersion)
 	{
+	case 10:
+		switch (vi.dwMinorVersion)
+		{
+		case 0:
+			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 10" : "Windows Server 2016";
+		}
 	case 6:
 		switch (vi.dwMinorVersion)
 		{
 		case 0:
-			return "Windows Vista/Server 2008";
+			return vi.wProductType == VER_NT_WORKSTATION ? "Windows Vista" : "Windows Server 2008";
 		case 1:
-			return "Windows 7/Server 2008 R2";
+			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 7" : "Windows Server 2008 R2";
 		case 2:
-			return "Windows 8/Server 2012";
+			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 8" : "Windows Server 2012";
+		case 3:
+			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 8.1" : "Windows Server 2012 R2";
 		default:
 			return "Unknown";
 		}
@@ -104,18 +112,6 @@ std::string EnvironmentImpl::osDisplayNameImpl()
 			return "Windows XP";
 		case 2:
 			return "Windows Server 2003/Windows Server 2003 R2";
-		default:
-			return "Unknown";
-		}
-	case 4:
-		switch (vi.dwMinorVersion)
-		{
-		case 0:
-			return "Windows 95/Windows NT 4.0";
-		case 10:
-			return "Windows 98";
-		case 90:
-			return "Windows ME";
 		default:
 			return "Unknown";
 		}

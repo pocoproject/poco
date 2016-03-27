@@ -94,7 +94,20 @@ Poco::Dynamic::Var& Row::get(std::size_t col)
 }
 
 
-std::size_t Row::getPosition(const std::string& name)
+const Poco::Dynamic::Var& Row::get(std::size_t col) const
+{
+	try
+	{
+		return _values.at(col);
+	}
+	catch (std::out_of_range& re)
+	{
+		throw RangeException(re.what());
+	}
+}
+
+
+std::size_t Row::getPosition(const std::string& name) const
 {
 	if (!_pNames)
 		throw NullPointerException();

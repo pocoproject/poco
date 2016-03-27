@@ -300,9 +300,9 @@ public:
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& rValue) const
 	{
-		value = !_val.isNull() && _val->size() > 0;
+		rValue = !_val.isNull() && _val->size() > 0;
 	}
 
 	void convert(float&) const
@@ -439,9 +439,9 @@ public:
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& rValue) const
 	{
-		value = _val.size() > 0;
+		rValue = _val.size() > 0;
 	}
 
 	void convert(float&) const

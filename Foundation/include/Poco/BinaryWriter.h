@@ -23,6 +23,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Buffer.h"
 #include "Poco/MemoryStream.h"
+#include "Poco/ByteOrder.h"
 #include <vector>
 #include <ostream>
 
@@ -57,10 +58,10 @@ public:
 		LITTLE_ENDIAN_BYTE_ORDER = 3  /// little-endian byte-order
 	};
 	
-	BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
+	BinaryWriter(std::ostream& ostr, StreamByteOrder order = NATIVE_BYTE_ORDER);
 		/// Creates the BinaryWriter.
 
-	BinaryWriter(std::ostream& ostr, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
+	BinaryWriter(std::ostream& ostr, TextEncoding& encoding, StreamByteOrder order = NATIVE_BYTE_ORDER);
 		/// Creates the BinaryWriter using the given TextEncoding.
 		///
 		/// Strings will be converted from the currently set global encoding
@@ -160,6 +161,36 @@ public:
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
 
 private:
+	template<typename T>
+	BinaryWriter& write(T value, bool flipBytes)
+	{
+		if (flipBytes)
+		{
+			T fValue = ByteOrder::flipBytes(value);
+			_ostr.write((const char*) &fValue, sizeof(fValue));
+		}
+		else
+		{
+			_ostr.write((const char*) &value, sizeof(value));
+		}
+		return *this;
+	}
+
+	template<typename T>
+	void write7BitEncoded(T value)
+	{
+		do
+		{
+			unsigned char c = (unsigned char) (value & 0x7F);
+			value >>= 7;
+			if (value) c |= 0x80;
+			_ostr.write((const char*) &c, 1);
+		}
+		while (value);
+	}
+
+	BinaryWriter& write(const char* value, std::size_t length);
+
 	std::ostream&  _ostr;
 	bool           _flipBytes;
 	TextConverter* _pTextConverter;
@@ -171,17 +202,17 @@ class BasicMemoryBinaryWriter: public BinaryWriter
 	/// A convenient wrapper for using Buffer and MemoryStream with BinarWriter.
 {
 public:
-	BasicMemoryBinaryWriter(Buffer<T>& data, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER): 
-		BinaryWriter(_ostr, byteOrder),
-		_data(data),
-		_ostr(data.begin(), data.capacity())
+	BasicMemoryBinaryWriter(Buffer<T>& dataBuffer, StreamByteOrder order = NATIVE_BYTE_ORDER): 
+		BinaryWriter(_ostr, order),
+		_data(dataBuffer),
+		_ostr(dataBuffer.begin(), dataBuffer.capacity())
 	{
 	}
 
-	BasicMemoryBinaryWriter(Buffer<T>& data, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER): 
-		BinaryWriter(_ostr, encoding, byteOrder),
-		_data(data),
-		_ostr(data.begin(), data.capacity())
+	BasicMemoryBinaryWriter(Buffer<T>& dataBuffer, TextEncoding& encoding, StreamByteOrder order = NATIVE_BYTE_ORDER): 
+		BinaryWriter(_ostr, encoding, order),
+		_data(dataBuffer),
+		_ostr(dataBuffer.begin(), dataBuffer.capacity())
 	{
 	}
 

@@ -17,7 +17,7 @@
 
 
 #include "Poco/Data/SQLite/SQLite.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 namespace Poco {
@@ -136,6 +136,8 @@ public:
 	void testFTS3();
 
 	void testJSONRowFormatter();
+
+	void testIncrementVacuum();
 
 	void setUp();
 	void tearDown();

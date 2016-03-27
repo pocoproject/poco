@@ -5,7 +5,7 @@
 //
 
 
-#include "CppUnit/TestDecorator.h"
+#include "Poco/CppUnit/TestDecorator.h"
 
 
 namespace CppUnit {

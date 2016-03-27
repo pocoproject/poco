@@ -11,8 +11,8 @@
 
 
 #include "PartialStreamTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Zip/PartialStream.h"
 #include <sstream>
 
@@ -20,7 +20,7 @@
 using namespace Poco::Zip;
 
 
-PartialStreamTest::PartialStreamTest(const std::string& name): CppUnit::TestCase(name)
+PartialStreamTest::PartialStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

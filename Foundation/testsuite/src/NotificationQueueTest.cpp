@@ -11,8 +11,8 @@
 
 
 #include "NotificationQueueTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/NotificationQueue.h"
 #include "Poco/Notification.h"
 #include "Poco/Thread.h"
@@ -49,7 +49,7 @@ namespace
 }
 
 
-NotificationQueueTest::NotificationQueueTest(const std::string& name): CppUnit::TestCase(name)
+NotificationQueueTest::NotificationQueueTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

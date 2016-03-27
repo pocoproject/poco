@@ -140,17 +140,17 @@ void LayeredConfiguration::setRaw(const std::string& key, const std::string& val
 
 void LayeredConfiguration::enumerate(const std::string& key, Keys& range) const
 {
-	std::set<std::string> keys;
+	std::set<std::string> keySet;
 	for (ConfigList::const_iterator itc = _configs.begin(); itc != _configs.end(); ++itc)
 	{
 		Keys partRange;
 		itc->pConfig->enumerate(key, partRange);
 		for (Keys::const_iterator itr = partRange.begin(); itr != partRange.end(); ++itr)
 		{
-			if (keys.find(*itr) == keys.end())
+			if (keySet.find(*itr) == keySet.end())
 			{
 				range.push_back(*itr);
-				keys.insert(*itr);
+				keySet.insert(*itr);
 			}
 		}
 	}

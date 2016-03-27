@@ -23,6 +23,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Buffer.h"
 #include "Poco/MemoryStream.h"
+#include "Poco/ByteOrder.h"
 #include <vector>
 #include <istream>
 
@@ -151,6 +152,32 @@ public:
 		/// Returns the number of available bytes in the stream.
 
 private:
+	template<typename T>
+	BinaryReader& read(T& value, bool flipBytes)
+	{
+		_istr.read((char*) &value, sizeof(value));
+		if (flipBytes) value = ByteOrder::flipBytes(value);
+		return *this;
+	}
+
+	template<typename T>
+	void read7BitEncoded(T& value)
+	{
+		char c;
+		value = 0;
+		int s = 0;
+		do
+		{
+			c = 0;
+			_istr.read(&c, 1);
+			T x = (c & 0x7F);
+			x <<= s;
+			value += x;
+			s += 7;
+		}
+		while (c & 0x80);
+	}
+
 	std::istream&  _istr;
 	bool           _flipBytes; 
 	TextConverter* _pTextConverter;
@@ -162,17 +189,17 @@ class BasicMemoryBinaryReader : public BinaryReader
 	/// A convenient wrapper for using Buffer and MemoryStream with BinaryReader.
 {
 public:
-	BasicMemoryBinaryReader(const Buffer<T>& data, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
-		BinaryReader(_istr, byteOrder),
-		_data(data),
-		_istr(data.begin(), data.capacity())
+	BasicMemoryBinaryReader(const Buffer<T>& dataBuffer, StreamByteOrder order = NATIVE_BYTE_ORDER):
+		BinaryReader(_istr, order),
+		_data(dataBuffer),
+		_istr(dataBuffer.begin(), dataBuffer.capacity())
 	{
 	}
 
-	BasicMemoryBinaryReader(const Buffer<T>& data, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER):
-		BinaryReader(_istr, encoding, byteOrder),
-		_data(data),
-		_istr(data.begin(), data.capacity())
+	BasicMemoryBinaryReader(const Buffer<T>& dataBuffer, TextEncoding& encoding, StreamByteOrder order = NATIVE_BYTE_ORDER):
+		BinaryReader(_istr, encoding, order),
+		_data(dataBuffer),
+		_istr(dataBuffer.begin(), dataBuffer.capacity())
 	{
 	}
 

@@ -42,11 +42,12 @@ class Foundation_API Path
 public:
 	enum Style
 	{
-		PATH_UNIX,    /// Unix-style path
-		PATH_WINDOWS, /// Windows-style path
-		PATH_VMS,     /// VMS-style path
-		PATH_NATIVE,  /// The current platform's native style
-		PATH_GUESS    /// Guess the style by examining the path
+		PATH_UNIX,            /// Unix-style path
+		PATH_URI = PATH_UNIX, /// URI-style path, same as Unix-style
+		PATH_WINDOWS,         /// Windows-style path
+		PATH_VMS,             /// VMS-style path
+		PATH_NATIVE,          /// The current platform's native style
+		PATH_GUESS            /// Guess the style by examining the path
 	};
 	
 	typedef std::vector<std::string> StringVec;

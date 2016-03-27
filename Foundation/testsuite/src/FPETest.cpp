@@ -11,15 +11,15 @@
 
 
 #include "FPETest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/FPEnvironment.h"
 
 
 using Poco::FPE;
 
 
-FPETest::FPETest(const std::string& name): CppUnit::TestCase(name)
+FPETest::FPETest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

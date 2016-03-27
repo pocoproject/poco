@@ -11,8 +11,8 @@
 
 
 #include "LogStreamTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Logger.h"
 #include "Poco/LogStream.h"
 #include "Poco/AutoPtr.h"
@@ -26,7 +26,7 @@ using Poco::Message;
 using Poco::AutoPtr;
 
 
-LogStreamTest::LogStreamTest(const std::string& name): CppUnit::TestCase(name)
+LogStreamTest::LogStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

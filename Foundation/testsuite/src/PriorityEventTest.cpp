@@ -12,8 +12,8 @@
 
 #include "PriorityEventTest.h"
 #include "DummyDelegate.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/PriorityDelegate.h"
 #include "Poco/PriorityExpire.h"
 #include "Poco/Thread.h"
@@ -26,7 +26,7 @@ using namespace Poco;
 #define LARGEINC 100
 
 
-PriorityEventTest::PriorityEventTest(const std::string& name): CppUnit::TestCase(name)
+PriorityEventTest::PriorityEventTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

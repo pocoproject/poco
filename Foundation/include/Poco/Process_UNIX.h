@@ -21,6 +21,9 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Event.h"
+#include "Poco/Mutex.h"
+#include "Poco/Optional.h"
 #include "Poco/RefCountedObject.h"
 #include <unistd.h>
 #include <vector>
@@ -41,9 +44,13 @@ public:
 	
 	pid_t id() const;
 	int wait() const;
+	int wait(int options) const;
 	
 private:
-	pid_t _pid;
+	const pid_t _pid;
+	mutable FastMutex _mutex;
+	mutable Event _event;
+	mutable Optional<int> _status;
 };
 
 

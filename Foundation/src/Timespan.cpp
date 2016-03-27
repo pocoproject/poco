@@ -40,14 +40,14 @@ Timespan::Timespan(TimeDiff microSeconds):
 }
 
 
-Timespan::Timespan(long seconds, long microSeconds):
-	_span(TimeDiff(seconds)*SECONDS + microSeconds)
+Timespan::Timespan(long otherSeconds, long otherMicroSeconds):
+	_span(TimeDiff(otherSeconds)*SECONDS + otherMicroSeconds)
 {
 }
 
 	
-Timespan::Timespan(int days, int hours, int minutes, int seconds, int microSeconds):
-	_span(TimeDiff(microSeconds) + TimeDiff(seconds)*SECONDS + TimeDiff(minutes)*MINUTES + TimeDiff(hours)*HOURS + TimeDiff(days)*DAYS)
+Timespan::Timespan(int otherDays, int otherHours, int otherMinutes, int otherSeconds, int otherMicroSeconds):
+	_span(TimeDiff(otherMicroSeconds) + TimeDiff(otherSeconds)*SECONDS + TimeDiff(otherMinutes)*MINUTES + TimeDiff(otherHours)*HOURS + TimeDiff(otherDays)*DAYS)
 {
 }
 
@@ -77,16 +77,16 @@ Timespan& Timespan::operator = (TimeDiff microSeconds)
 }
 
 
-Timespan& Timespan::assign(int days, int hours, int minutes, int seconds, int microSeconds)
+Timespan& Timespan::assign(int otherDays, int otherHours, int otherMinutes, int otherSeconds, int otherMicroSeconds)
 {
-	_span = TimeDiff(microSeconds) + TimeDiff(seconds)*SECONDS + TimeDiff(minutes)*MINUTES + TimeDiff(hours)*HOURS + TimeDiff(days)*DAYS;
+	_span = TimeDiff(otherMicroSeconds) + TimeDiff(otherSeconds)*SECONDS + TimeDiff(otherMinutes)*MINUTES + TimeDiff(otherHours)*HOURS + TimeDiff(otherDays)*DAYS;
 	return *this;
 }
 
 
-Timespan& Timespan::assign(long seconds, long microSeconds)
+Timespan& Timespan::assign(long otherSeconds, long otherMicroSeconds)
 {
-	_span = TimeDiff(seconds)*SECONDS + TimeDiff(microSeconds);
+	_span = TimeDiff(otherSeconds)*SECONDS + TimeDiff(otherMicroSeconds);
 	return *this;
 }
 
