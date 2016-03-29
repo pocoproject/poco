@@ -84,17 +84,17 @@ environment:
 # Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: Win32     1 hr
 # Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: x64       1 hr 
 # -------------------------------------------------------------------------------------------
-#    - builder: msbuild
-#      vsver: 140
-#      linkmode: shared
+    - builder: msbuild
+      vsver: 140
+      linkmode: shared
 
-#    - builder: msbuild
-#      vsver: 140
-#      linkmode: static_md
+    - builder: msbuild
+      vsver: 140
+      linkmode: static_md
 
-#    - builder: msbuild
-#      vsver: 140
-#      linkmode: static_mt
+    - builder: msbuild
+      vsver: 140
+      linkmode: static_mt
 
     - builder: cmake
       vsver: 120
@@ -372,7 +372,7 @@ build_script:
 # Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
 # -------------------------------------------------------------------------------------------
   - ps: |
-      if ($env:builder -eq "cygwin")
+      if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
       {
         $cmd = 'bash.exe configure --everything';iex "& $cmd"
         $cmd = 'make.exe -s';iex "& $cmd"
@@ -448,7 +448,7 @@ test_script:
       $line='-------------------------------------------------------------------------------------';
       if ($env:configuration -eq "release")
       {
-        if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
+        if ($env:builder -eq "cygwin")
         {
           if ($env:platform -eq "Win32")
           {
