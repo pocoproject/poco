@@ -169,6 +169,7 @@
 // #define POCO_LOG_DEBUG
 
 // Uncomment to disable the use of bundled OpenSSL binaries
+// (Windows only)
 // #define POCO_EXTERNAL_OPENSSL
 
 #endif // Foundation_Config_INCLUDED
