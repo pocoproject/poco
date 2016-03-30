@@ -58,8 +58,6 @@ environment:
 
   matrix:
 
-    - builder: cygwin
-      
     - builder: msbuild
       vsver: 120
       linkmode: shared
@@ -72,18 +70,6 @@ environment:
       vsver: 120
       linkmode: static_mt
 
-# -------------------------------------------------------------------------------------------
-# VS2013 runs a x64 or Win32 build & tests in around 32 mn
-# Environment: builder=msbuild, vsver=120, linkmode=shared; Platform: Win32    31 min 33 sec
-# Environment: builder=msbuild, vsver=120, linkmode=shared; Platform: x64      33 min 32 sec
-#
-# In VS2015 running either a x64 or Win32 build & tests takes twice time and thus makes the build failed since
-# it overpasses 1 hour and free Appveyor account job are limited to 1 hour. Thus VS2015 builds 
-# are removed until one finds out the reason why build time is doubled.
-#
-# Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: Win32     1 hr
-# Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: x64       1 hr 
-# -------------------------------------------------------------------------------------------
     - builder: msbuild
       vsver: 140
       linkmode: shared
@@ -98,6 +84,12 @@ environment:
 
     - builder: cmake
       vsver: 120
+
+    - builder: cmake
+      vsver: 140
+
+    - builder: cygwin
+      
 
 matrix:
   fast_finish: true
@@ -390,6 +382,7 @@ build_script:
         gc cout; gc cerr;
         Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
       }
+      
       if ($env:builder -eq "cmake")
       {
         mkdir cmake-build | out-null;pushd cmake-build;
@@ -426,6 +419,7 @@ build_script:
         $ErrorActionPreference = 'Stop';
       }
 
+
 before_test:
 - ps: |
       $line='-------------------------------------------------------------------------------------';
@@ -441,6 +435,7 @@ before_test:
       Write-Host -ForegroundColor Yellow $line;
       foreach($t in $CPPUNIT_IGNORE.split(",")) { Write-Host -ForegroundColor Yellow $t.trim() }      
       Write-Host -ForegroundColor Yellow $line;
+      
       
 after_test:
 
