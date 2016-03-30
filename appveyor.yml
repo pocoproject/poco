@@ -519,7 +519,7 @@ test_script:
             }
           }
         }  
-        if ($env:builder -eq "cmake" -and $env:platform -eq "Win32")
+        if ($env:builder -eq "cmake")
         {
           pushd cmake-build;
           Write-Host -ForegroundColor Yellow $line;
