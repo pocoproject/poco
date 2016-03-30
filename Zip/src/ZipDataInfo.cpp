@@ -47,7 +47,7 @@ ZipDataInfo::ZipDataInfo(std::istream& in, bool assumeHeaderRead):
 	else
 	{
 		in.read(_rawInfo, ZipCommon::HEADER_SIZE);
-		if ((! in) || (in.gcount() != ZipCommon::HEADER_SIZE))
+		if ((!in) || (in.gcount() != ZipCommon::HEADER_SIZE))
 			return;
 	}
 	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
@@ -87,7 +87,7 @@ ZipDataInfo64::ZipDataInfo64(std::istream& in, bool assumeHeaderRead):
 	else
 	{
 		in.read(_rawInfo, ZipCommon::HEADER_SIZE);
-		if ((! in) || (in.gcount() != ZipCommon::HEADER_SIZE))
+		if ((!in) || (in.gcount() != ZipCommon::HEADER_SIZE))
 			return;
 	}
 	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
