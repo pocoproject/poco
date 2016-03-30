@@ -71,17 +71,17 @@ protected:
 		Application::initialize(self);
 	}
 	
-	void defineOptions(OptionSet& options)
+	void defineOptions(OptionSet& rOptions)
 	{
-		Application::defineOptions(options);
+		Application::defineOptions(rOptions);
 
-		options.addOption(
+		rOptions.addOption(
 			Option("help", "h", "Display help information on command line arguments.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHelp)));
 
-		options.addOption(
+		rOptions.addOption(
 			Option("define", "D", 
 				"Define a configuration property. A configuration property "
 				"defined with this option can be referenced in the input "
@@ -91,109 +91,109 @@ protected:
 				.argument("<name>=<value>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleDefine)));
 				
-		options.addOption(
+		rOptions.addOption(
 			Option("config-file", "f", "Load configuration data from the given file.")
 				.required(false)
 				.repeatable(true)
 				.argument("<file>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleConfig)));
 
-		options.addOption(
+		rOptions.addOption(
 			Option("output-dir", "o", "Write output files to directory <dir>.")
 				.required(false)
 				.repeatable(false)
 				.argument("<dir>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleOutputDir)));
 
-		options.addOption(
+		rOptions.addOption(
 			Option("header-output-dir", "H", "Write header file to directory <dir>.")
 				.required(false)
 				.repeatable(false)
 				.argument("<dir>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHeaderOutputDir)));
 
-		options.addOption(
+		rOptions.addOption(
 			Option("header-prefix", "P", "Prepend the given <prefix> to the header file name in the generated #include directive.")
 				.required(false)
 				.repeatable(false)
 				.argument("<prefix>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHeaderPrefix)));
 
-		options.addOption(
+		rOptions.addOption(
 			Option("base-file-name", "b", "Use <name> instead of the class name for the output file name.")
 				.required(false)
 				.repeatable(false)
 				.argument("<name>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleBase)));
 
-		options.addOption(
+		rOptions.addOption(
 			Option("osp", "O", "Add factory class definition and implementation for use with the Open Service Platform.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleOSP)));
 
-		options.addOption(
+		rOptions.addOption(
 			Option("apache", "A", "Add factory class definition and implementation, and shared library manifest for use with ApacheConnector.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleApache)));
 
-		options.addOption(
+		rOptions.addOption(
 			Option("noline", "N", "Do not include #line directives in generated code.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleNoLine)));
 	}
 	
-	void handleHelp(const std::string& name, const std::string& value)
+	void handleHelp(const std::string& rName, const std::string& value)
 	{
 		_helpRequested = true;
 		stopOptionsProcessing();
 	}
 	
-	void handleDefine(const std::string& name, const std::string& value)
+	void handleDefine(const std::string& rName, const std::string& value)
 	{
 		defineProperty(value);
 	}
 	
-	void handleConfig(const std::string& name, const std::string& value)
+	void handleConfig(const std::string& rName, const std::string& value)
 	{
 		loadConfiguration(value);
 	}
 
-	void handleOutputDir(const std::string& name, const std::string& value)
+	void handleOutputDir(const std::string& rName, const std::string& value)
 	{
 		_outputDir = value;
 	}
 
-	void handleHeaderOutputDir(const std::string& name, const std::string& value)
+	void handleHeaderOutputDir(const std::string& rName, const std::string& value)
 	{
 		_headerOutputDir = value;
 	}
 
-	void handleHeaderPrefix(const std::string& name, const std::string& value)
+	void handleHeaderPrefix(const std::string& rName, const std::string& value)
 	{
 		_headerPrefix = value;
 		if (!_headerPrefix.empty() && _headerPrefix[_headerPrefix.size() - 1] != '/')
 			_headerPrefix += '/';
 	}
 
-	void handleBase(const std::string& name, const std::string& value)
+	void handleBase(const std::string& rName, const std::string& value)
 	{
 		_base = value;
 	}
 
-	void handleOSP(const std::string& name, const std::string& value)
+	void handleOSP(const std::string& rName, const std::string& value)
 	{
 		_generateOSPCode = true;	
 	}
 
-	void handleApache(const std::string& name, const std::string& value)
+	void handleApache(const std::string& rName, const std::string& value)
 	{
 		_generateApacheCode = true;
 	}
 	
-	void handleNoLine(const std::string& name, const std::string& value)
+	void handleNoLine(const std::string& rName, const std::string& value)
 	{
 		_emitLineDirectives = false;
 	}
@@ -223,16 +223,16 @@ protected:
 	
 	void defineProperty(const std::string& def)
 	{
-		std::string name;
+		std::string configName;
 		std::string value;
 		std::string::size_type pos = def.find('=');
 		if (pos != std::string::npos)
 		{
-			name.assign(def, 0, pos);
+			configName.assign(def, 0, pos);
 			value.assign(def, pos + 1, def.length() - pos);
 		}
-		else name = def;
-		config().setString(name, value);
+		else configName = def;
+		config().setString(configName, value);
 	}
 
 	int main(const std::vector<std::string>& args)
