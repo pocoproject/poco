@@ -1,7 +1,7 @@
 version: build {branch}-{build}
 
 cache:
-  - c:\mysql-5.7.9-win32
+  - c:\mysql-5.7.11-win32
   - C:\ProgramData\chocolatey
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
@@ -51,7 +51,7 @@ configuration:
 
 environment:
   bundling: bundled
-  MYSQL32:    C:\mysql-5.7.9-win32
+  MYSQL32:    C:\mysql-5.7.11-win32
   MYSQL64:    C:\Program Files\MySql\MySQL Server 5.6
   POSTGRES32: C:\Program Files (x86)\PostgreSQL\9.4
   POSTGRES64: C:\Program Files\PostgreSQL\9.4
@@ -192,9 +192,9 @@ install:
         else
         {
           echo "downloading $env:MYSQL32"
-          Invoke-WebRequest "http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.11-win32.zip" -OutFile mysql-5.7.9-win32.zip
+          Invoke-WebRequest "http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.11-win32.zip" -OutFile mysql-5.7.11-win32.zip
           echo "installing $env:MYSQL32"
-          7z x -y mysql-5.7.9-win32.zip -oc:\
+          7z x -y mysql-5.7.11-win32.zip -oc:\
         }
       }
 # -------------------------------------------------------------------------------------------
@@ -322,7 +322,7 @@ before_build:
 after_build:
   - ps: |
       $line='-------------------------------------------------------------------------------------';
-      $find='find.exe';
+      $find='C:\Cygwin\bin\find.exe';
       $arg1="$env:POCO_BASE -type f -name '*.cpp' -exec grep -n -H ";
       $arg2=" {} ;"
       
@@ -378,7 +378,7 @@ build_script:
         $verbosity='minimal';
     
         $process = Start-Process -PassThru -nnw -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
-        -Args "$env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild $verbosity $logger";
+        -EA Stop -Args "$env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild $verbosity $logger";
         gc cout; gc cerr;
         Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
       }
