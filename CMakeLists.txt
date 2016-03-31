@@ -42,6 +42,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Setup C/C++ compiler options
 #################################################################################
 
+include(cmake/CXX11.cmake)
+check_for_cxx11_compiler(CXX11_COMPILER)
+
+# If a C++11 compiler is available, then set the appropriate flags
+if(CXX11_COMPILER)
+    enable_cxx11()
+    add_definitions(-DPOCO_ENABLE_CPP11)
+endif()
+
 if(NOT MSVC_IDE)
   if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
@@ -61,7 +70,7 @@ option(ENABLE_CPPUNIT "Enable the CppUnit" ON)
 option(ENABLE_XML "Enable the XML" ON)
 option(ENABLE_JSON "Enable the JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
-option(ENABLE_PDF "Enable PDF" OFF)
+option(ENABLE_PDF "Enable PDF" ON)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
 option(ENABLE_NETSSL "Enable NetSSL" ON)
@@ -75,7 +84,7 @@ option(ENABLE_DATA_ODBC "Enable Data ODBC" ON)
 option(ENABLE_SEVENZIP "Enable SevenZip" OFF)
 option(ENABLE_ZIP "Enable Zip" ON)
 option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
-option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
+option(ENABLE_CPPPARSER "Enable C++ parser" ON)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
 option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
@@ -135,6 +144,20 @@ else ()
   message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
 endif ()
 
+# Set local include path
+include_directories( 
+    CppUnit/include CppUnit/WinTestRunner/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include Data/MySQL/include Data/SQLite/include Data/ODBC/include Zip/include Crypto/include Web/include JSON/include MongoDB/include PDF/include SevenZip/include
+    
+    CppParser/include
+    CodeGeneration/include
+    XSD/Parser/include
+    XSD/Types/include
+    RemotingNG/include
+    RemotingNG/SOAP/include
+    RemotingNG/TCP/include
+    RemotingNG/JSONRPC/include
+    )
+
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
@@ -175,8 +198,6 @@ list(APPEND Poco_COMPONENTS "Net")
 endif()
 
 #NetSSL
-
-
 if(WIN32 AND ENABLE_NETSSL_WIN)
     add_subdirectory(NetSSL_Win)
     list(APPEND Poco_COMPONENTS "NetSSL_Win")
@@ -241,6 +262,18 @@ if(ENABLE_PAGECOMPILER_FILE2PAGE)
 add_subdirectory(PageCompiler/File2Page)
 list(APPEND Poco_COMPONENTS "File2Page")
 endif()
+
+IF (REMOTING)
+    add_subdirectory(CodeGeneration)
+    add_subdirectory(XSD/Parser)
+    add_subdirectory(XSD/Types)
+    add_subdirectory(XSD/CodeGen)
+    add_subdirectory(RemotingNG)
+    add_subdirectory(RemotingNG/SOAP)
+    add_subdirectory(RemotingNG/TCP)
+    add_subdirectory(RemotingNG/JSONRPC)
+    add_subdirectory(RemotingNG/RemoteGen)
+ENDIF (REMOTING)
 
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ

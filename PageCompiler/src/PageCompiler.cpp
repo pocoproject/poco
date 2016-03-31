@@ -285,7 +285,7 @@ protected:
 			p.setBaseName(clazz);
 		}
 
-		std::auto_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
+		std::unique_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
 
 		if (!_outputDir.empty())
 		{

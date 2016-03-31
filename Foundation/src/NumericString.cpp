@@ -59,7 +59,7 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	std::string::size_type frac = str.length() - decSepPos - 1;
 
 	std::string::size_type ePos = str.find_first_of("eE");
-	std::auto_ptr<std::string> eStr;
+	std::unique_ptr<std::string> eStr;
 	if (ePos != std::string::npos)
 	{
 		eStr.reset(new std::string(str.substr(ePos, std::string::npos)));

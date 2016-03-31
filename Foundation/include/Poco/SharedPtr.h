@@ -25,6 +25,13 @@
 #include "Poco/AtomicCounter.h"
 #include <algorithm>
 
+#ifndef POCO_PTR_CHECKING
+	#ifdef _DEBUG
+		#define POCO_PTR_CHECKING 0
+	#else
+		#define POCO_PTR_CHECKING 1
+	#endif
+#endif
 
 namespace Poco {
 
@@ -33,7 +40,7 @@ class ReferenceCounter
 	/// Simple ReferenceCounter object, does not delete itself when count reaches 0.
 {
 public:
-	ReferenceCounter(): _cnt(1)
+	ReferenceCounter() : _cnt(1)
 	{
 	}
 
@@ -141,6 +148,12 @@ public:
 		_pCounter->duplicate();
 	}
 
+	SharedPtr(SharedPtr&& ptr)  : _pCounter(std::move(ptr._pCounter)), _ptr(std::move(ptr._ptr))
+	{
+		ptr._ptr = nullptr;
+		ptr._pCounter = nullptr;
+	}
+
 	~SharedPtr()
 	{
 		try
@@ -194,6 +207,12 @@ public:
 		return assign(ptr);
 	}
 
+	SharedPtr& operator = (SharedPtr&& ptr) 
+	{
+		swap(ptr);
+		return *this;
+	}
+
 	template <class Other, class OtherRP>
 	SharedPtr& operator = (const SharedPtr<Other, RC, OtherRP>& ptr)
 	{
@@ -233,24 +252,40 @@ public:
 		return SharedPtr<Other, RC, RP>(_pCounter, pOther);
 	}
 
-	C* operator -> ()
+	inline C* operator -> ()
 	{
+#if POCO_PTR_CHECKING
 		return deref();
+#else
+		return _ptr;
+#endif
 	}
 
-	const C* operator -> () const
+	inline const C* operator -> () const
 	{
+#if POCO_PTR_CHECKING
 		return deref();
+#else
+		return _ptr;
+#endif
 	}
 
-	C& operator * ()
+	inline C& operator * ()
 	{
+#if POCO_PTR_CHECKING
 		return *deref();
+#else
+		return *_ptr;
+#endif
 	}
 
-	const C& operator * () const
+	inline const C& operator * () const
 	{
+#if POCO_PTR_CHECKING
 		return *deref();
+#else
+		return *_ptr;
+#endif
 	}
 
 	C* get()
@@ -389,15 +424,17 @@ private:
 
 	void release()
 	{
-		poco_assert_dbg (_pCounter);
-		int i = _pCounter->release();
-		if (i == 0)
+		if (_pCounter)
 		{
-			RP::release(_ptr);
-			_ptr = 0;
+			int i = _pCounter->release();
+			if (i == 0)
+			{
+				RP::release(_ptr);
+				_ptr = 0;
 
-			delete _pCounter;
-			_pCounter = 0;
+				delete _pCounter;
+				_pCounter = 0;
+			}
 		}
 	}
 

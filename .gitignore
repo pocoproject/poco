@@ -116,6 +116,9 @@ cmake-build/
 # Temporary files #
 ###################
 *.bak
+
+# Remoting #
+############
 CodeGeneration
 RemotingNG
 XSD

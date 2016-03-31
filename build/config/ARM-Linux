@@ -47,7 +47,7 @@ SHAREDLIBLINKEXT = .so
 CFLAGS          = -Isrc
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        =
+CXXFLAGS        = -std=c++0x
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS       =

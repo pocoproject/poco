@@ -51,7 +51,7 @@ namespace
 			try
 			{
 				WebSocket ws(request, response);
-				std::auto_ptr<char> pBuffer(new char[_bufSize]);
+				std::unique_ptr<char> pBuffer(new char[_bufSize]);
 				int flags;
 				int n;
 				do

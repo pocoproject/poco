@@ -39,11 +39,11 @@ SHAREDLIBLINKEXT = .so
 # Compiler and Linker Flags
 #
 CFLAGS          = 
-CFLAGS32        = 
-CFLAGS64        = 
-CXXFLAGS        = -Wall -Wno-sign-compare
-CXXFLAGS32      = 
-CXXFLAGS64      = 
+CFLAGS32        = -m32
+CFLAGS64        = -m64
+CXXFLAGS        = -Wall -Wno-sign-compare -std=c++11
+CXXFLAGS32      = -m32
+CXXFLAGS64      = -m64
 SHLIBFLAGS      = 
 SHLIBFLAGS32    = 
 SHLIBFLAGS64    = 

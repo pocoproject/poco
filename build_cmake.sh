@@ -9,13 +9,13 @@ mkdir cmake-build
 cd cmake-build
 
 cmake ../. -DCMAKE_BUILD_TYPE=Debug $1 $2 $3 $4 $5
-make -j3
+make -j8
 make install
 
 rm -rf CMakeCache.txt
 
-cmake ../. -DCMAKE_BUILD_TYPE=Release $1 $2 $3 $4 $5
-make -j3
+cmake ../. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS=1 $1 $2 $3 $4 $5
+make -j8
 make install
 
 

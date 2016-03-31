@@ -25,6 +25,14 @@
 #include <algorithm>
 
 
+#ifndef POCO_PTR_CHECKING
+	#ifdef _DEBUG
+		#define POCO_PTR_CHECKING 0
+	#else
+		#define POCO_PTR_CHECKING 1
+	#endif
+#endif
+
 namespace Poco {
 
 
@@ -79,6 +87,11 @@ public:
 	AutoPtr(const AutoPtr& ptr): _ptr(ptr._ptr)
 	{
 		if (_ptr) _ptr->duplicate();
+	}
+
+	AutoPtr(AutoPtr&& ptr) : _ptr(std::move(ptr._ptr))
+	{
+		ptr._ptr = nullptr;
 	}
 
 	template <class Other> 
@@ -152,7 +165,13 @@ public:
 		return assign<Other>(ptr);
 	}
 
-	void swap(AutoPtr& ptr)
+	AutoPtr& operator = (AutoPtr&& ptr)
+	{
+		swap(ptr);
+		return *this;
+	}
+
+	inline void swap(AutoPtr& ptr)
 	{
 		std::swap(_ptr, ptr._ptr);
 	}
@@ -182,160 +201,176 @@ public:
 		return AutoPtr<Other>(pOther, true);
 	}
 
-	C* operator -> ()
+	inline C* operator -> ()
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return _ptr;
 		else
 			throw NullPointerException();
+#else
+		return _ptr;
+#endif
 	}
 
-	const C* operator -> () const
+	inline const C* operator -> () const
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return _ptr;
 		else
 			throw NullPointerException();
+#else
+		return _ptr;
+#endif
 	}
 
-	C& operator * ()
+	inline C& operator * ()
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return *_ptr;
 		else
 			throw NullPointerException();
+#else
+		return *_ptr;
+#endif
 	}
 
-	const C& operator * () const
+	inline const C& operator * () const
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return *_ptr;
 		else
 			throw NullPointerException();
+#else
+		return *_ptr;
+#endif
 	}
 
-	C* get()
+	inline C* get()
 	{
 		return _ptr;
 	}
 
-	const C* get() const
+	inline const C* get() const
 	{
 		return _ptr;
 	}
 
-	operator C* ()
+	inline operator C* ()
 	{
 		return _ptr;
 	}
 	
-	operator const C* () const
+	inline operator const C* () const
 	{
 		return _ptr;
 	}
 	
-	bool operator ! () const
+	inline bool operator ! () const
 	{
 		return _ptr == 0;
 	}
 
-	bool isNull() const
+	inline bool isNull() const
 	{
 		return _ptr == 0;
 	}
 	
-	C* duplicate()
+	inline C* duplicate()
 	{
 		if (_ptr) _ptr->duplicate();
 		return _ptr;
 	}
 
-	bool operator == (const AutoPtr& ptr) const
+	inline bool operator == (const AutoPtr& ptr) const
 	{
 		return _ptr == ptr._ptr;
 	}
 
-	bool operator == (const C* ptr) const
+	inline bool operator == (const C* ptr) const
 	{
 		return _ptr == ptr;
 	}
 
-	bool operator == (C* ptr) const
+	inline bool operator == (C* ptr) const
 	{
 		return _ptr == ptr;
 	}
 
-	bool operator != (const AutoPtr& ptr) const
+	inline bool operator != (const AutoPtr& ptr) const
 	{
 		return _ptr != ptr._ptr;
 	}
 
-	bool operator != (const C* ptr) const
+	inline bool operator != (const C* ptr) const
 	{
 		return _ptr != ptr;
 	}
 
-	bool operator != (C* ptr) const
+	inline bool operator != (C* ptr) const
 	{
 		return _ptr != ptr;
 	}
 
-	bool operator < (const AutoPtr& ptr) const
+	inline bool operator < (const AutoPtr& ptr) const
 	{
 		return _ptr < ptr._ptr;
 	}
 
-	bool operator < (const C* ptr) const
+	inline bool operator < (const C* ptr) const
 	{
 		return _ptr < ptr;
 	}
 
-	bool operator < (C* ptr) const
+	inline bool operator < (C* ptr) const
 	{
 		return _ptr < ptr;
 	}
 
-	bool operator <= (const AutoPtr& ptr) const
+	inline bool operator <= (const AutoPtr& ptr) const
 	{
 		return _ptr <= ptr._ptr;
 	}
 
-	bool operator <= (const C* ptr) const
+	inline bool operator <= (const C* ptr) const
 	{
 		return _ptr <= ptr;
 	}
 
-	bool operator <= (C* ptr) const
+	inline bool operator <= (C* ptr) const
 	{
 		return _ptr <= ptr;
 	}
 
-	bool operator > (const AutoPtr& ptr) const
+	inline bool operator > (const AutoPtr& ptr) const
 	{
 		return _ptr > ptr._ptr;
 	}
 
-	bool operator > (const C* ptr) const
+	inline bool operator > (const C* ptr) const
 	{
 		return _ptr > ptr;
 	}
 
-	bool operator > (C* ptr) const
+	inline bool operator > (C* ptr) const
 	{
 		return _ptr > ptr;
 	}
 
-	bool operator >= (const AutoPtr& ptr) const
+	inline bool operator >= (const AutoPtr& ptr) const
 	{
 		return _ptr >= ptr._ptr;
 	}
 
-	bool operator >= (const C* ptr) const
+	inline bool operator >= (const C* ptr) const
 	{
 		return _ptr >= ptr;
 	}
 
-	bool operator >= (C* ptr) const
+	inline bool operator >= (C* ptr) const
 	{
 		return _ptr >= ptr;
 	}
