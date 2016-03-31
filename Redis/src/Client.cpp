@@ -123,14 +123,14 @@ void Client::disconnect()
 	_socket.close();
 }
 
-void Client::writeCommand(const Array& command, bool flush)
+void Client::writeCommand(const Array& command, bool doFlush)
 {
 	poco_assert(_output);
 
 	std::string commandStr = command.toString();
 
 	_output->write(commandStr.c_str(), commandStr.length());
-	if ( flush ) _output->flush();
+	if ( doFlush ) _output->flush();
 }
 
 RedisType::Ptr Client::readReply()

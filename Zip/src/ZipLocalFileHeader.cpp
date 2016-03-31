@@ -31,7 +31,7 @@ const char ZipLocalFileHeader::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b',
 
 
 ZipLocalFileHeader::ZipLocalFileHeader(const Poco::Path& fileName, 
-    const Poco::DateTime& lastModifiedAt,
+    const Poco::DateTime& lastModified,
     ZipCommon::CompressionMethod cm, 
     ZipCommon::CompressionLevel cl,
     bool forceZip64):
@@ -62,7 +62,7 @@ ZipLocalFileHeader::ZipLocalFileHeader(const Poco::Path& fileName,
     setHostSystem(hs);
     setEncryption(false);
     setExtraFieldSize(0);
-    setLastModifiedAt(lastModifiedAt);
+    setLastModifiedAt(lastModified);
     init(fileName, cm, cl);
 }
 
@@ -197,12 +197,12 @@ bool ZipLocalFileHeader::searchCRCAndSizesAfterData() const
 }
 
 
-void ZipLocalFileHeader::setFileName(const std::string& fileName, bool isDirectory)
+void ZipLocalFileHeader::setFileName(const std::string& fileName, bool directory)
 {
     poco_assert (!fileName.empty());
     Poco::Path aPath(fileName);
 
-    if (isDirectory)
+    if (directory)
     {
         aPath.makeDirectory();
         setCRC(0);
@@ -218,7 +218,7 @@ void ZipLocalFileHeader::setFileName(const std::string& fileName, bool isDirecto
     _fileName = aPath.toString(Poco::Path::PATH_UNIX);
     if (_fileName[0] == '/')
         _fileName = _fileName.substr(1);
-    if (isDirectory)
+    if (directory)
     {
         poco_assert_dbg (_fileName[_fileName.size()-1] == '/');
     }
