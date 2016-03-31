@@ -62,9 +62,9 @@ public:
 	{
 	}
 
-	Optional(const C& value): 
+	Optional(const C& rValue):
 		/// Creates a Optional with the given value.
-		_value(value), 
+		_value(rValue),
 		_isSpecified(true)
 	{
 	}
@@ -81,10 +81,10 @@ public:
 	{
 	}
 
-	Optional& assign(const C& value)
+	Optional& assign(const C& rValue)
 		/// Assigns a value to the Optional.
 	{
-		_value  = value;
+		_value  = rValue;
 		_isSpecified = true;
 		return *this;
 	}
@@ -97,9 +97,9 @@ public:
 		return *this;
 	}
 	
-	Optional& operator = (const C& value)
+	Optional& operator = (const C& rValue)
 	{
-		return assign(value);
+		return assign(rValue);
 	}
 
 	Optional& operator = (const Optional& other)

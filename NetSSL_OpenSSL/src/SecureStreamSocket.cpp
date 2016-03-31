@@ -47,50 +47,50 @@ SecureStreamSocket::SecureStreamSocket(Context::Ptr pContext, Session::Ptr pSess
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& rAddress): 
 	StreamSocket(new SecureStreamSocketImpl(SSLManager::instance().defaultClientContext()))
 {
-	connect(address);
+	connect(rAddress);
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& rAddress, const std::string& hostName): 
 	StreamSocket(new SecureStreamSocketImpl(SSLManager::instance().defaultClientContext()))
 {
 	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
-	connect(address);
+	connect(rAddress);
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& rAddress, Context::Ptr pContext): 
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
-	connect(address);
+	connect(rAddress);
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext, Session::Ptr pSession): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& rAddress, Context::Ptr pContext, Session::Ptr pSession): 
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 	useSession(pSession);
-	connect(address);
+	connect(rAddress);
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& rAddress, const std::string& hostName, Context::Ptr pContext): 
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
-	connect(address);
+	connect(rAddress);
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext, Session::Ptr pSession): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& rAddress, const std::string& hostName, Context::Ptr pContext, Session::Ptr pSession): 
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
 	useSession(pSession);
-	connect(address);
+	connect(rAddress);
 }
 
 
