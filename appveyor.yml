@@ -1,7 +1,7 @@
 version: build {branch}-{build}
 
 cache:
-  - c:\mysql-5.7.11-win32
+  - C:\mysql-5.7.11-win32
   - C:\ProgramData\chocolatey
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
@@ -58,38 +58,38 @@ environment:
 
   matrix:
 
-    - builder: msbuild
-      vsver: 120
-      linkmode: shared
-
-    - builder: msbuild
-      vsver: 120
-      linkmode: static_md
-
-    - builder: msbuild
-      vsver: 120
-      linkmode: static_mt
-
-    - builder: msbuild
-      vsver: 140
-      linkmode: shared
-
-    - builder: msbuild
-      vsver: 140
-      linkmode: static_md
-
-    - builder: msbuild
-      vsver: 140
-      linkmode: static_mt
-
-    - builder: cmake
-      vsver: 120
-
-    - builder: cmake
-      vsver: 140
-
     - builder: cygwin
       
+    - builder: msbuild
+      vsver: 120
+      linkmode: shared
+
+    - builder: msbuild
+      vsver: 120
+      linkmode: static_md
+
+    - builder: msbuild
+      vsver: 120
+      linkmode: static_mt
+
+    - builder: msbuild
+      vsver: 140
+      linkmode: shared
+
+    - builder: msbuild
+      vsver: 140
+      linkmode: static_md
+
+    - builder: msbuild
+      vsver: 140
+      linkmode: static_mt
+
+    - builder: cmake
+      vsver: 120
+
+    - builder: cmake
+      vsver: 140
+
 
 matrix:
   fast_finish: true
