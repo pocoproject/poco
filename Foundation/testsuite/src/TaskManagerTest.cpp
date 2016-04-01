@@ -209,7 +209,7 @@ namespace
 	class CustomTaskObserver
 	{
 	public:
-		CustomTaskObserver(const C& custom): _custom(custom)
+		CustomTaskObserver(const C& rCustom): _custom(rCustom)
 		{
 		}
 		
