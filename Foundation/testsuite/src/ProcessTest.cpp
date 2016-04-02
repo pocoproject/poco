@@ -39,18 +39,18 @@ ProcessTest::~ProcessTest()
 
 void ProcessTest::testLaunch()
 {
-	std::string name("TestApp");
+	std::string testName("TestApp");
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
-	cmd += name;
+	cmd += testName;
 #elif defined(_WIN32_WCE)
 	cmd = "\\";
-	cmd += name;
+	cmd += testName;
 	cmd += ".EXE";
 #else
-	cmd = name;
+	cmd = testName;
 #endif
 
 	std::vector<std::string> args;
@@ -66,14 +66,14 @@ void ProcessTest::testLaunch()
 void ProcessTest::testLaunchRedirectIn()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string testName("TestApp");
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
-	cmd += name;
+	cmd += testName;
 #else
-	cmd = name;
+	cmd = testName;
 #endif
 
 	std::vector<std::string> args;
@@ -92,14 +92,14 @@ void ProcessTest::testLaunchRedirectIn()
 void ProcessTest::testLaunchRedirectOut()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string testName("TestApp");
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
-	cmd += name;
+	cmd += testName;
 #else
-	cmd = name;
+	cmd = testName;
 #endif
 
 	std::vector<std::string> args;
@@ -120,14 +120,14 @@ void ProcessTest::testLaunchRedirectOut()
 void ProcessTest::testLaunchEnv()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string testName("TestApp");
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
-	cmd += name;
+	cmd += testName;
 #else
-	cmd = name;
+	cmd = testName;
 #endif
 
 	std::vector<std::string> args;
@@ -150,14 +150,14 @@ void ProcessTest::testLaunchEnv()
 void ProcessTest::testIsRunning()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string testName("TestApp");
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
-	cmd += name;
+	cmd += testName;
 #else
-	cmd = name;
+	cmd = testName;
 #endif
 
 	std::vector<std::string> args;
@@ -180,14 +180,14 @@ void ProcessTest::testIsRunning()
 void ProcessTest::testIsRunningAllowsForTermination()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string testName("TestApp");
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
-	cmd += name;
+	cmd += testName;
 #else
-	cmd = name;
+	cmd = testName;
 #endif
 
 	std::vector<std::string> args;
@@ -201,11 +201,11 @@ void ProcessTest::testIsRunningAllowsForTermination()
 void ProcessTest::testSignalExitCode()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
-	std::string name("TestApp");
+	std::string testName("TestApp");
 	std::string cmd;
 
 	cmd = "./";
-	cmd += name;
+	cmd += testName;
 
 	std::vector<std::string> args;
 	args.push_back("-raise-int");
