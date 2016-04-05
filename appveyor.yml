@@ -368,9 +368,6 @@ build_script:
 #
 # Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
 # -------------------------------------------------------------------------------------------
-  - if "%builder%"=="cygwin" (
-    bash.exe configure --everything & make.exe -s) 
-
   - ps: |
       if ($env:builder -eq "cygwin")
       {
