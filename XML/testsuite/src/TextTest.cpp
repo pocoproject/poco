@@ -28,7 +28,7 @@ using Poco::XML::AutoPtr;
 using Poco::XML::XMLString;
 
 
-TextTest::TextTest(const std::string& name): CppUnit::TestCase(name)
+TextTest::TextTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
