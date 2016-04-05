@@ -375,10 +375,10 @@ build_script:
       if ($env:builder -eq "cygwin")
       {
       	$LastExitCode=0;
-      	$cmd='bash.exe configure --everything';$cmd;
+      	$cmd='bash.exe configure --everything';iex "& $cmd"
       	Write-Host -ForegroundColor Yellow $cmd ' LastExitCode=' $lastExitCode;
        	$LastExitCode=0;
-      	$cmd='make.exe -s';
+      	$cmd='make.exe -s';iex "& $cmd"
       	Write-Host -ForegroundColor Yellow $cmd ' LastExitCode=' $lastExitCode;
       }
       if ($env:builder -eq "msbuild")
