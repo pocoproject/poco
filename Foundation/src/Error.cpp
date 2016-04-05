@@ -69,9 +69,6 @@ namespace Poco {
 		   without -D_GNU_SOURCE is needed, otherwise the GNU version is
 		   preferred.
 		*/
-		/* The GNU version of strerror_r is non-portable and not
-		   available on the musl C library.
-		 */
 #if (defined __GLIBC__ || defined __UCLIBC__) && defined _GNU_SOURCE && !POCO_ANDROID
 		char errmsg[256] = "";
 		return std::string(strerror_r(errorCode, errmsg, 256));
