@@ -33,7 +33,7 @@ using Poco::XML::AutoPtr;
 using Poco::XML::XMLString;
 
 
-ElementTest::ElementTest(const std::string& name): CppUnit::TestCase(name)
+ElementTest::ElementTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
