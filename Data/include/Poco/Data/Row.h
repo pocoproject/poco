@@ -218,10 +218,6 @@ public:
 private:
 	void init(const SortMapPtr& pSortMap, const RowFormatter::Ptr& pFormatter);
 
-	void checkEmpty(std::size_t pos, const Poco::Dynamic::Var& val);
-		/// Check if row contains only empty values and throws IllegalStateException
-		/// if that is the case.
-
 	ValueVec& values();
 		/// Returns the reference to values vector.
 
