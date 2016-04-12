@@ -64,25 +64,25 @@ environment:
       vsver: 120
       linkmode: shared
 
-    - builder: msbuild
-      vsver: 120
-      linkmode: static_md
+#    - builder: msbuild
+#      vsver: 120
+#      linkmode: static_md
 
-    - builder: msbuild
-      vsver: 120
-      linkmode: static_mt
+#    - builder: msbuild
+#      vsver: 120
+#      linkmode: static_mt
 
     - builder: msbuild
       vsver: 140
       linkmode: shared
 
-    - builder: msbuild
-      vsver: 140
-      linkmode: static_md
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: static_md
 
-    - builder: msbuild
-      vsver: 140
-      linkmode: static_mt
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: static_mt
 
     - builder: cmake
       vsver: 120
@@ -368,10 +368,20 @@ build_script:
 #
 # Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
 # -------------------------------------------------------------------------------------------
-  - if "%builder%"=="cygwin" (
-    bash.exe configure --everything & make.exe -s) 
-
   - ps: |
+      if ($env:builder -eq "cygwin")
+      {
+          $LastExitCode=0;
+          $cmd='bash.exe configure --everything';iex "& $cmd"
+          if ($LastExitCode -ne 0) {
+            throw "$cmd failed with exit code $LastExitCode."
+          }
+          $LastExitCode=0;
+          $cmd='make.exe -s';iex "& $cmd"
+          if ($LastExitCode -ne 0) {
+            throw "$cmd failed with exit code $LastExitCode."
+          }
+      }
       if ($env:builder -eq "msbuild")
       {
         $logger='"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"';
@@ -448,6 +458,7 @@ test_script:
       {
         if ($env:builder -eq "cygwin")
         {
+            $LastExitCode=0;
           if ($env:platform -eq "Win32")
           {
             $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"
@@ -456,8 +467,9 @@ test_script:
           {
             $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';iex "& $cmd"
           }
-          $cmd = 'bash.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd"
-        }
+          $cmd = 'bash.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd";
+            Write-Host -ForegroundColor Yellow $cmd ': LastExitCode=' $lastExitCode;
+          }
         if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
         {
           $suffix = '';
