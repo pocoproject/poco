@@ -188,12 +188,12 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 
 bool ZipLocalFileHeader::searchCRCAndSizesAfterData() const
 {
-    if (getCompressionMethod() == ZipCommon::CM_DEFLATE)
-    {
-        // check bit 3
-        return ((ZipUtil::get16BitValue(_rawHeader, GENERAL_PURPOSE_POS) & 0x0008) != 0);
-    }
-    return false;
+	if (getCompressionMethod() == ZipCommon::CM_STORE || getCompressionMethod() == ZipCommon::CM_DEFLATE)
+	{
+		// check bit 3
+		return ((ZipUtil::get16BitValue(_rawHeader, GENERAL_PURPOSE_POS) & 0x0008) != 0);
+	}
+	return false;
 }
 
 
