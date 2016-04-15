@@ -107,14 +107,66 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
+static bool argNeedsEscaping(const std::string& arg)
+{
+	bool containsQuotableChar = arg.npos != arg.find_first_of(" \t\n\v\"");
+	// Assume args that start and end with quotes are already quoted and do not require further quoting.
+	// There is probably code out there written before launch() escaped the arguments that does its own
+	// escaping of arguments. This ensures we do not interfere with those arguments.
+	bool isAlreadyQuoted = arg.size() > 1 && '\"' == arg[0] && '\"' == arg[arg.size() - 1];
+	return containsQuotableChar && !isAlreadyQuoted;
+}
+
+
+// Based on code from https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
+static std::string escapeArg(const std::string& arg)
+{
+	if (argNeedsEscaping(arg))
+	{
+		std::string quotedArg("\"");
+		for (auto it = arg.begin(); ; ++it)
+		{
+			unsigned backslashCount = 0;
+			while (it != arg.end() && '\\' == *it)
+			{
+				++it;
+				++backslashCount;
+			}
+
+			if (it == arg.end())
+			{
+				quotedArg.append(2 * backslashCount, '\\');
+				break;
+			}
+			else if ('"' == *it)
+			{
+				quotedArg.append(2 * backslashCount + 1, '\\');
+				quotedArg.push_back('"');
+			}
+			else
+			{
+				quotedArg.append(backslashCount, '\\');
+				quotedArg.push_back(*it);
+			}
+		}
+		quotedArg.push_back('"');
+		return quotedArg;
+	}
+	else
+	{
+		return arg;
+	}
+}
+
+
 ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
 	std::string commandLine = command;
 	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it)
 	{
 		commandLine.append(" ");
-		commandLine.append(*it);
-	}		
+		commandLine.append(escapeArg(*it));
+	}
 
 	STARTUPINFOA startupInfo;
 	GetStartupInfoA(&startupInfo); // take defaults from current process
