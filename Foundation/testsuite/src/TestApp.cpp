@@ -46,6 +46,18 @@ int main(int argc, char** argv)
 			}
 			else return 1;
 		}
+		else if (arg == "-raise-int")
+		{
+			std::signal(SIGINT, SIG_DFL);
+			std::raise(SIGINT);
+		}
+		else if (arg == "-echo-args")
+		{
+			for (int i = 2; i < argc; ++i)
+			{
+				std::cout << argv[i] << std::endl;
+			}
+		}
 	}
 	return argc - 1;
 }
