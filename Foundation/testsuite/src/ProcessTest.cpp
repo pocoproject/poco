@@ -149,16 +149,9 @@ void ProcessTest::testLaunchEnv()
 
 void ProcessTest::testLaunchArgs()
 {
-#if !defined(_WIN32_WCE)
+#if defined (_WIN32) && !defined(_WIN32_WCE)
 	std::string name("TestApp");
-	std::string cmd;
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
-	cmd += name;
-#else
-	cmd = name;
-#endif
+	std::string cmd = name;
 
 	std::vector<std::string> args;
 	args.push_back("-echo-args");
