@@ -40,6 +40,7 @@ ProcessHandleImpl::~ProcessHandleImpl()
 	closeHandle();
 }
 
+
 void ProcessHandleImpl::closeHandle()
 {
 	if (_hProcess)
@@ -48,6 +49,7 @@ void ProcessHandleImpl::closeHandle()
 		_hProcess = NULL;
 	}
 }
+
 
 UInt32 ProcessHandleImpl::id() const
 {
@@ -298,7 +300,8 @@ void ProcessImpl::killImpl(PIDImpl pid)
 			throw SystemException("cannot kill process");
 		}
 		CloseHandle(hProc);
-	} else
+	} 
+	else
 	{
 		switch (GetLastError())
 		{

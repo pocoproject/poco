@@ -39,6 +39,7 @@ ProcessHandleImpl::~ProcessHandleImpl()
 	closeHandle();
 }
 
+
 void ProcessHandleImpl::closeHandle()
 {
 	if (_hProcess)
@@ -47,6 +48,7 @@ void ProcessHandleImpl::closeHandle()
 		_hProcess = NULL;
 	}
 }
+
 
 UInt32 ProcessHandleImpl::id() const
 {
