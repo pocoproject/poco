@@ -40,6 +40,7 @@ ProcessHandleImpl::~ProcessHandleImpl()
 	closeHandle();
 }
 
+
 void ProcessHandleImpl::closeHandle()
 {
 	if (_hProcess)
@@ -48,6 +49,7 @@ void ProcessHandleImpl::closeHandle()
 		_hProcess = NULL;
 	}
 }
+
 
 UInt32 ProcessHandleImpl::id() const
 {
@@ -100,7 +102,8 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 		time.LowPart = ftUser.dwLowDateTime;
 		time.HighPart = ftUser.dwHighDateTime;
 		userTime = long(time.QuadPart / 10000000L);
-	} else
+	} 
+	else
 	{
 		userTime = kernelTime = -1;
 	}
@@ -137,11 +140,13 @@ static std::string escapeArg(const std::string& arg)
 			{
 				quotedArg.append(2 * backslashCount, '\\');
 				break;
-			} else if ('"' == *it)
+			} 
+			else if ('"' == *it)
 			{
 				quotedArg.append(2 * backslashCount + 1, '\\');
 				quotedArg.push_back('"');
-			} else
+			} 
+			else
 			{
 				quotedArg.append(backslashCount, '\\');
 				quotedArg.push_back(*it);
@@ -149,7 +154,8 @@ static std::string escapeArg(const std::string& arg)
 		}
 		quotedArg.push_back('"');
 		return quotedArg;
-	} else
+	} 
+	else
 	{
 		return arg;
 	}
@@ -185,11 +191,13 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		DuplicateHandle(hProc, inPipe->readHandle(), hProc, &startupInfo.hStdInput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
 		inPipe->close(Pipe::CLOSE_READ);
-	} else if (GetStdHandle(STD_INPUT_HANDLE))
+	} 
+	else if (GetStdHandle(STD_INPUT_HANDLE))
 	{
 		DuplicateHandle(hProc, GetStdHandle(STD_INPUT_HANDLE), hProc, &startupInfo.hStdInput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} else
+	} 
+	else
 	{
 		startupInfo.hStdInput = 0;
 	}
@@ -198,11 +206,13 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	{
 		DuplicateHandle(hProc, outPipe->writeHandle(), hProc, &startupInfo.hStdOutput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} else if (GetStdHandle(STD_OUTPUT_HANDLE))
+	} 
+	else if (GetStdHandle(STD_OUTPUT_HANDLE))
 	{
 		DuplicateHandle(hProc, GetStdHandle(STD_OUTPUT_HANDLE), hProc, &startupInfo.hStdOutput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} else
+	} 
+	else
 	{
 		startupInfo.hStdOutput = 0;
 	}
@@ -210,11 +220,13 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	{
 		DuplicateHandle(hProc, errPipe->writeHandle(), hProc, &startupInfo.hStdError, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} else if (GetStdHandle(STD_ERROR_HANDLE))
+	} 
+	else if (GetStdHandle(STD_ERROR_HANDLE))
 	{
 		DuplicateHandle(hProc, GetStdHandle(STD_ERROR_HANDLE), hProc, &startupInfo.hStdError, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} else
+	} 
+	else
 	{
 		startupInfo.hStdError = 0;
 	}
@@ -259,7 +271,8 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	{
 		CloseHandle(processInfo.hThread);
 		return new ProcessHandleImpl(processInfo.hProcess, processInfo.dwProcessId);
-	} else throw SystemException("Cannot launch process", command);
+	} 
+	else throw SystemException("Cannot launch process", command);
 }
 
 
@@ -287,16 +300,17 @@ void ProcessImpl::killImpl(PIDImpl pid)
 			throw SystemException("cannot kill process");
 		}
 		CloseHandle(hProc);
-	} else
+	} 
+	else
 	{
 		switch (GetLastError())
 		{
 		case ERROR_ACCESS_DENIED:
-		throw NoPermissionException("cannot kill process");
+			throw NoPermissionException("cannot kill process");
 		case ERROR_INVALID_PARAMETER:
-		throw NotFoundException("cannot kill process");
+			throw NotFoundException("cannot kill process");
 		default:
-		throw SystemException("cannot kill process");
+			throw SystemException("cannot kill process");
 		}
 	}
 }
