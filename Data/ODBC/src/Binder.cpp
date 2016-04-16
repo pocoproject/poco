@@ -445,7 +445,10 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 		colSize = (SQLINTEGER) p.columnSize();
 		decDigits = (SQLSMALLINT) p.decimalDigits();
 		return;
-	} catch (StatementException&) { }
+	} 
+	catch (StatementException&)
+	{ 
+	}
 
 	try
 	{
@@ -453,7 +456,10 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 		colSize = (SQLINTEGER) c.length();
 		decDigits = (SQLSMALLINT) c.precision();
 		return;
-	} catch (StatementException&) { }
+	} 
+	catch (StatementException&) 
+	{ 
+	}
 
 	// no success, set to zero and hope for the best
 	// (most drivers do not require these most of the times anyway)

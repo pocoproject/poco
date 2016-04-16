@@ -111,8 +111,8 @@ std::size_t Statement::execute(bool reset)
 			doAsyncExec();
 			return 0;
 		}
-	} else
-		throw InvalidAccessException("Statement still executing.");
+	} 
+	else throw InvalidAccessException("Statement still executing.");
 }
 
 

@@ -88,7 +88,8 @@ public:
 		try
 		{
 			return _nulls.at(row);
-		}catch (std::out_of_range& ex)
+		}
+		catch (std::out_of_range& ex)
 		{ 
 			throw RangeException(ex.what()); 
 		}
