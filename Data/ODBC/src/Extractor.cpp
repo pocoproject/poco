@@ -1313,13 +1313,13 @@ bool Extractor::isNull(std::size_t col, std::size_t row)
 		try
 		{
 			return isNullLengthIndicator(_lengths.at(col));
-		} catch (std::out_of_range& ex)
+		} 
+		catch (std::out_of_range& ex)
 		{
 			throw RangeException(ex.what()); 
 		}
 	}
-	else
-		return SQL_NULL_DATA == _pPreparator->actualDataSize(col, row);
+	else return SQL_NULL_DATA == _pPreparator->actualDataSize(col, row);
 }
 
 

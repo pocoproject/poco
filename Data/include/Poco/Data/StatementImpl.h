@@ -557,7 +557,8 @@ inline bool StatementImpl::isNull(std::size_t col, std::size_t row) const
 	try 
 	{
 		return extractions().at(col)->isNull(row);
-	}catch (std::out_of_range& ex)
+	}
+	catch (std::out_of_range& ex)
 	{ 
 		throw RangeException(ex.what()); 
 	}

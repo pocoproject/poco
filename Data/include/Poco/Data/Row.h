@@ -130,7 +130,8 @@ public:
 		try
 		{
 			_values.at(pos) = val;
-		}catch (std::out_of_range&)
+		}
+		catch (std::out_of_range&)
 		{
 			throw RangeException("Invalid column number.");
 		}
