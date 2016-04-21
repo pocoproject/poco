@@ -18,6 +18,7 @@
 #include <string>
 #include <iostream>
 #include <cstdlib>
+#include <signal.h>
 
 
 int main(int argc, char** argv)
@@ -48,8 +49,8 @@ int main(int argc, char** argv)
 		}
 		else if (arg == "-raise-int")
 		{
-			std::signal(SIGINT, SIG_DFL);
-			std::raise(SIGINT);
+			signal(SIGINT, SIG_DFL);
+			raise(SIGINT);
 		}
 		else if (arg == "-echo-args")
 		{
