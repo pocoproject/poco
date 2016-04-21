@@ -140,6 +140,11 @@ public:
 		/// Returns iterator pointing to the newly inserted value 
 	{
 		Iterator it = find(val.first);
+		
+		while (it != _list.end() && isEqual(it->first, val.first))
+		{
+			++it;
+		}
 
 		if (it == _list.end())
 		{

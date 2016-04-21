@@ -72,6 +72,41 @@ void ListMapTest::testInsert()
 }
 
 
+void ListMapTest::testInsertOrder()
+{
+	const int N = 1000;
+
+	typedef ListMap<std::string, int> StrToIntMap;
+	StrToIntMap lm;
+
+	lm.insert(StrToIntMap::ValueType("foo", 42));
+	lm.insert(StrToIntMap::ValueType("bar", 43));
+	
+	StrToIntMap::Iterator it = lm.begin();
+	assert (it != lm.end() && it->first == "foo" && it->second == 42);
+	
+	++it;
+	assert (it != lm.end() && it->first == "bar" && it->second == 43);
+	
+	++it;
+	assert (it == lm.end());
+
+	lm.insert(StrToIntMap::ValueType("foo", 44));
+
+ 	it = lm.begin();
+	assert (it != lm.end() && it->first == "foo" && it->second == 42);
+	
+	++it;
+	assert (it != lm.end() && it->first == "foo" && it->second == 44);
+
+	++it;
+	assert (it != lm.end() && it->first == "bar" && it->second == 43);
+	
+	++it;
+	assert (it == lm.end());	 
+}
+
+
 void ListMapTest::testErase()
 {
 	const int N = 1000;
@@ -239,6 +274,7 @@ CppUnit::Test* ListMapTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ListMapTest");
 
 	CppUnit_addTest(pSuite, ListMapTest, testInsert);
+	CppUnit_addTest(pSuite, ListMapTest, testInsertOrder);
 	CppUnit_addTest(pSuite, ListMapTest, testErase);
 	CppUnit_addTest(pSuite, ListMapTest, testIterator);
 	CppUnit_addTest(pSuite, ListMapTest, testConstIterator);

@@ -27,6 +27,7 @@ public:
 	~ListMapTest();
 
 	void testInsert();
+	void testInsertOrder();
 	void testErase();
 	void testIterator();
 	void testConstIterator();
