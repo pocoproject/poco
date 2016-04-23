@@ -62,10 +62,14 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 		if (any.type() == typeid(char)) formatString(value, out);
 		else out << value;
 	}
-	else
+	else if (any.isString() || any.isDateTime() || any.isDate() || any.isTime())
 	{
 		std::string value = any.convert<std::string>();
 		formatString(value, out);
+	}
+	else
+	{
+		out << any.convert<std::string>();
 	}
 }
 
