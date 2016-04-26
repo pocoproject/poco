@@ -3,7 +3,15 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.7.3 (2016-05-xx)
 ==========================
 
-- TODO
+- fixed GH #993: Invalid zip format when opening a docx in word
+- fixed GH #1235: Poco::Net::HTTPClientSession::sendRequest() should also handle HTTP_PATCH
+- fixed GH #1236: Remove Poco::Data::Row::checkEmpty() as it prevents Row from being used 
+  with all NULL rows
+- fixed GH #1239: Poco::Zip::Compress with non-seekable stream fails for CM_STORE
+- fixed GH #1242: Poco::Data::RowFormatter generate exception if the first column of first 
+  row is null
+- fixed GH #1253: ListMap does not maintain insertion order if key already exists
+- Upgraded bundled SQLite to 3.12.2
 
 
 Release 1.7.2 (2016-03-21)
@@ -13,7 +21,7 @@ Release 1.7.2 (2016-03-21)
   Expat 2.1.1 fixes a CVE: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-1283
 - fixed GH #1204: getdtablesize has been removed on Android 21
 - fixed GH #1203: Poco::Data::RecordSet should be reusable
-- fixed GH #1198: Upgrade bundled SQLite to 3.11.1
+- fixed GH #1198: Upgrade bundled SQLite to 3.12.1
 
 
 Release 1.7.1 (2016-03-14)
