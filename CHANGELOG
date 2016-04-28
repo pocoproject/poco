@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.7.3 (2016-05-xx)
+Release 1.7.3 (2016-05-02)
 ==========================
 
 - fixed GH #993: Invalid zip format when opening a docx in word
