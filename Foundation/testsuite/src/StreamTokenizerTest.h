@@ -33,6 +33,8 @@ public:
 	void testTokenizer5();
 	void testTokenizer6();
 	void testTokenizer7();
+	void testTokenizer8();
+	void testTokenizer9();
 
 	void setUp();
 	void tearDown();
