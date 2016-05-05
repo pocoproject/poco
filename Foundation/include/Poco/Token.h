@@ -106,18 +106,18 @@ public:
 		/// Returns a char representation of the token.
 
 	bool is(Class tokenClass) const;
-	/// Returns true iff the token has the given class.
+		/// Returns true iff the token has the given class.
 
 	void ignore(bool ignored);
-	/// If ignored is true, the token will be marked
-	/// as ignorable, which means that next() will
-	/// not return it.
-	/// If ignored is false, the token will be marked
-	/// as acceptable, which means that next() will
-	/// return it.
+		/// If ignored is true, the token will be marked
+		/// as ignorable, which means that next() will
+		/// not return it.
+		/// If ignored is false, the token will be marked
+		/// as acceptable, which means that next() will
+		/// return it.
 
 	bool ignored() const;
-	/// return if the token is ignored or not
+		/// return if the token is ignored or not
 
 protected:
 	std::string _value;
