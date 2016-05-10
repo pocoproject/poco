@@ -55,12 +55,14 @@ Path::Path(bool absolutePath): _absolute(absolutePath)
 
 Path::Path(const std::string& path)
 {
+	poco_assert( std::char_traits<char>::length(path.data()) == path.size() );
 	assign(path);
 }
 
 
 Path::Path(const std::string& path, Style style)
 {
+	poco_assert( std::char_traits<char>::length(path.data()) == path.size() );
 	assign(path, style);
 }
 
@@ -98,6 +100,7 @@ Path::Path(const Path& rParent, const std::string& fileName):
 	_dirs(rParent._dirs),
 	_absolute(rParent._absolute)
 {	
+	poco_assert( std::char_traits<char>::length(fileName.data()) == fileName.size() );
 	makeDirectory();
 	_name = fileName;
 }
@@ -141,6 +144,7 @@ Path& Path::operator = (const Path& path)
 	
 Path& Path::operator = (const std::string& path)
 {
+	poco_assert( std::char_traits<char>::length(path.data()) == path.size() );
 	return assign(path);
 }
 
@@ -257,6 +261,8 @@ std::string Path::toString(Style style) const
 
 bool Path::tryParse(const std::string& path)
 {
+	poco_assert( std::char_traits<char>::length(path.data()) == path.size() );
+
 	try
 	{
 		Path p;
@@ -273,6 +279,8 @@ bool Path::tryParse(const std::string& path)
 
 bool Path::tryParse(const std::string& path, Style style)
 {
+	poco_assert( std::char_traits<char>::length(path.data()) == path.size() );
+
 	try
 	{
 		Path p;
@@ -289,6 +297,8 @@ bool Path::tryParse(const std::string& path, Style style)
 
 Path& Path::parseDirectory(const std::string& path)
 {
+	poco_assert( std::char_traits<char>::length(path.data()) == path.size() );
+
 	assign(path);
 	return makeDirectory();
 }
@@ -296,6 +306,8 @@ Path& Path::parseDirectory(const std::string& path)
 
 Path& Path::parseDirectory(const std::string& path, Style style)
 {
+	poco_assert( std::char_traits<char>::length(path.data()) == path.size() );
+
 	assign(path, style);
 	return makeDirectory();
 }
@@ -436,6 +448,8 @@ Path& Path::resolve(const Path& path)
 
 Path& Path::setNode(const std::string& node)
 {
+	poco_assert( std::char_traits<char>::length(node.data()) == node.size() );
+
 	_node     = node;
 	_absolute = _absolute || !node.empty();
 	return *this;
@@ -444,6 +458,8 @@ Path& Path::setNode(const std::string& node)
 	
 Path& Path::setDevice(const std::string& device)
 {
+	poco_assert( std::char_traits<char>::length(device.data()) == device.size() );
+
 	_device   = device;
 	_absolute = _absolute || !device.empty();
 	return *this;
@@ -474,6 +490,8 @@ const std::string& Path::operator [] (int n) const
 	
 Path& Path::pushDirectory(const std::string& dir)
 {
+	poco_assert( std::char_traits<char>::length(dir.data()) == dir.size() );
+
 	if (!dir.empty() && dir != ".")
 	{
 #if defined(POCO_OS_FAMILY_VMS)
@@ -521,6 +539,8 @@ Path& Path::popFrontDirectory()
 	
 Path& Path::setFileName(const std::string& name)
 {
+	poco_assert( std::char_traits<char>::length(name.data()) == name.size() );
+
 	_name = name;
 	return *this;
 }
@@ -528,6 +548,8 @@ Path& Path::setFileName(const std::string& name)
 
 Path& Path::setBaseName(const std::string& name)
 {
+	poco_assert( std::char_traits<char>::length(name.data()) == name.size() );
+
 	std::string ext = getExtension();
 	_name = name;
 	if (!ext.empty())
@@ -551,6 +573,8 @@ std::string Path::getBaseName() const
 
 Path& Path::setExtension(const std::string& extension)
 {
+	poco_assert( std::char_traits<char>::length(extension.data()) == extension.size() );
+
 	_name = getBaseName();
 	if (!extension.empty())
 	{
@@ -658,6 +682,7 @@ std::string Path::null()
 	
 std::string Path::expand(const std::string& path)
 {
+	poco_assert( std::char_traits<char>::length(path.data()) == path.size() );
 	return PathImpl::expandImpl(path);
 }
 
@@ -670,6 +695,8 @@ void Path::listRoots(std::vector<std::string>& roots)
 
 bool Path::find(StringVec::const_iterator it, StringVec::const_iterator end, const std::string& name, Path& path)
 {
+	poco_assert( std::char_traits<char>::length(name.data()) == name.size() );
+
 	while (it != end)
 	{
 #if defined(WIN32)
