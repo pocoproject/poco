@@ -27,7 +27,7 @@ using Poco::NotImplementedException;
 using Poco::NotFoundException;
 
 
-XMLConfigurationTest::XMLConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
+XMLConfigurationTest::XMLConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName)
 {
 }
 
