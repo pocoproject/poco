@@ -35,7 +35,7 @@ using Poco::DynamicStruct;
 using Poco::DateTime;
 using Poco::DateTimeFormatter;
 
-JSONTest::JSONTest(const std::string& name): CppUnit::TestCase("JSON")
+JSONTest::JSONTest(const std::string& rName): CppUnit::TestCase("JSON")
 {
 
 }
