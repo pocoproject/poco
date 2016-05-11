@@ -52,7 +52,7 @@ public:
 	~ICMPClient();
 		/// Destroys the ICMP client.
 
-	int ping(SocketAddress& address, int repeat = 1) const;
+	int ping(const SocketAddress& address, int repeat = 1) const;
 		/// Pings the specified address [repeat] times.
 		/// Notifications are posted for events.
 		/// 
@@ -64,7 +64,7 @@ public:
 		/// 
 		/// Returns the number of valid replies.
 
-	static int ping(SocketAddress& address, SocketAddress::Family family, int repeat = 1);
+	static int ping(const SocketAddress& address, SocketAddress::Family family, int repeat = 1);
 		/// Pings the specified address [repeat] times.
 		/// Notifications are not posted for events.
 		/// 
