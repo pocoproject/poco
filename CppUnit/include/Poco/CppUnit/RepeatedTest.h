@@ -12,13 +12,13 @@
 #include "Poco/CppUnit/CppUnit.h"
 #include "Poco/CppUnit/Guards.h"
 #include "Poco/CppUnit/TestDecorator.h"
+#include "CppUnit/TestResult.h"
 
 
 namespace CppUnit {
 
 
 class Test;
-class TestResult;
 
 
 /*
