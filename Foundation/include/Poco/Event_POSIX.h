@@ -51,6 +51,7 @@ private:
 	volatile bool   _state;
 	pthread_mutex_t _mutex;
 	pthread_cond_t  _cond;
+	bool _monotonic;
 };
 
 

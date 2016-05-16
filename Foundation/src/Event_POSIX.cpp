@@ -37,8 +37,18 @@ EventImpl::EventImpl(EventTypeImpl type): _auto(type == EVENT_AUTORESET_IMPL), _
 #endif
 	if (pthread_mutex_init(&_mutex, NULL))
 		throw SystemException("cannot create event (mutex)");
-	if (pthread_cond_init(&_cond, NULL))
-		throw SystemException("cannot create event (condition)");
+
+	int condrc = 0;
+	pthread_condattr_t attr;
+	if (pthread_condattr_init(&attr) == 0) {
+		_monotonic = pthread_condattr_setclock(&attr, CLOCK_MONOTONIC) == 0;
+		condrc = pthread_cond_init(&_cond, &attr);
+	} else {
+		condrc = pthread_cond_init(&_cond, NULL);
+	}
+	if (condrc != 0) {
+		throw Poco::SystemException("cannot create event (condition)");
+	}
 }
 
 
@@ -87,10 +97,16 @@ bool EventImpl::waitImpl(long milliseconds)
 		abstime.tv_sec++;
 	}
 #else
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	abstime.tv_sec  = tv.tv_sec + milliseconds / 1000;
-	abstime.tv_nsec = tv.tv_usec*1000 + (milliseconds % 1000)*1000000;
+	if (_monotonic) {
+		clock_gettime(CLOCK_MONOTONIC, &abstime);
+		abstime.tv_sec  += milliseconds / 1000;
+		abstime.tv_nsec += (milliseconds % 1000)*1000000;
+	} else {
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		abstime.tv_sec  = tv.tv_sec + milliseconds / 1000;
+		abstime.tv_nsec = tv.tv_usec*1000 + (milliseconds % 1000)*1000000;
+	}
 	if (abstime.tv_nsec >= 1000000000)
 	{
 		abstime.tv_nsec -= 1000000000;
