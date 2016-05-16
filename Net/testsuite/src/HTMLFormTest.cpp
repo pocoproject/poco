@@ -75,7 +75,7 @@ namespace
 }
 
 
-HTMLFormTest::HTMLFormTest(const std::string& name): CppUnit::TestCase(name)
+HTMLFormTest::HTMLFormTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

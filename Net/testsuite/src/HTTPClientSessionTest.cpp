@@ -30,7 +30,7 @@ using Poco::Net::HTTPMessage;
 using Poco::StreamCopier;
 
 
-HTTPClientSessionTest::HTTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
+HTTPClientSessionTest::HTTPClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

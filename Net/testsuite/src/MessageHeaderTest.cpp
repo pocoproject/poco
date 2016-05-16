@@ -23,7 +23,7 @@ using Poco::Net::NameValueCollection;
 using Poco::Net::MessageException;
 
 
-MessageHeaderTest::MessageHeaderTest(const std::string& name): CppUnit::TestCase(name)
+MessageHeaderTest::MessageHeaderTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

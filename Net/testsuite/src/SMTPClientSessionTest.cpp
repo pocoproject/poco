@@ -26,7 +26,7 @@ using Poco::Net::MailRecipient;
 using Poco::Net::SMTPException;
 
 
-SMTPClientSessionTest::SMTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
+SMTPClientSessionTest::SMTPClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
