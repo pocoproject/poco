@@ -1451,7 +1451,10 @@ void PathTest::testRobustness()
 	{
 		int len = r.next(1024);
 		std::string s;
-		for (int j = 0; j < len; ++j) s += r.nextChar();
+		while(s.size() < len) {
+			char c = r.nextChar();
+			if( c!= 0 ) s += c;
+		}
 		try
 		{
 			Path p(s, Path::PATH_WINDOWS);
