@@ -238,6 +238,8 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir, const 
 		getColumnOrParameterSize(pos, size);
 		CharT* pChar = (CharT*)std::calloc(size, 1);
 		pVal = (SQLPOINTER)pChar;
+		if (isInOutBound(dir))
+			std::wcscpy(pChar,val.c_str());
 		_outParams.insert(ParamMap::value_type(pVal, size));
 		_utf16Strings.insert(UTF16StringMap::value_type(pChar, const_cast<UTF16String*>(&val)));
 	}

@@ -45,6 +45,7 @@ public:
 	void testStoredFunction();
 	void testCursorStoredFunction();
 	void testStoredProcedureAny();
+	void testStoredProcedureAnyString();
 	void testStoredProcedureDynamicAny();
 	void testAutoTransaction();
 
