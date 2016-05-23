@@ -224,6 +224,9 @@ public:
 	Timestamp::UtcTimeVal utcTime() const;
 		/// Returns the UTC equivalent for the local date and time.
 
+    inline operator DateTime() const {return _dateTime;}
+		/// Converts LocalDateTime into DateTime
+        
 	bool operator == (const LocalDateTime& dateTime) const;	
 	bool operator != (const LocalDateTime& dateTime) const;	
 	bool operator <  (const LocalDateTime& dateTime) const;	
@@ -236,7 +239,7 @@ public:
 	Timespan       operator -  (const LocalDateTime& dateTime) const;
 	LocalDateTime& operator += (const Timespan& span);
 	LocalDateTime& operator -= (const Timespan& span);
-
+    
 protected:
 	LocalDateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff diff, int tzd);
 		
