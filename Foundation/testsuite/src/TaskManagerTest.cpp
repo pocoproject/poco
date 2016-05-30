@@ -246,6 +246,47 @@ namespace
 	private:
 		C _custom;
 	};
+
+	class SimpleTaskQueue
+	{
+	public:
+		SimpleTaskQueue(TaskManager& tm): _tm(tm)
+		{
+			_tm.addObserver(Observer<SimpleTaskQueue, TaskFinishedNotification>(*this, &SimpleTaskQueue::taskFinished));
+		}
+
+		void enqueue(Task* pTask)
+		{
+			_tasks.push_back(pTask);
+		}
+
+		void startQueue()
+		{
+			if (_tm.count() == 0 && _tasks.size())
+			{
+				Task* pTask = _tasks.back();
+				// not thread-safe
+				_tasks.pop_back();
+				_tm.start(pTask);
+			}
+		}
+
+		void taskFinished(TaskFinishedNotification* pNf)
+		{
+			if (_tasks.size())
+			{
+				Task* pTask = _tasks.back();
+				// not thread-safe
+				_tasks.pop_back();
+				_tm.startSync(pTask);
+			}
+			pNf->release();
+		}
+
+	private:
+		std::vector<Task*> _tasks;
+		TaskManager& _tm;
+	};
 }
 
 
@@ -469,12 +510,47 @@ void TaskManagerTest::testTaskInclusion()
 
 	tm.start(pTask);
 	// wait for the included task to be started
-	while (pTask->progress()<0.5)
+	while (pTask->progress() < 0.5)
 	{
 		Thread::sleep(100);
 	}
 	Thread::sleep(100);
-	assert (tm.count()==2);
+	assert (tm.count() == 2);
+
+	tm.cancelAll();
+	while (tm.count() > 0) Thread::sleep(100);
+	assert (tm.count() == 0);
+}
+
+
+void TaskManagerTest::testTaskQueue()
+{
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
+	SimpleTaskQueue tq(tm);
+
+	Task* pT1 = new SimpleTask;
+	Task* pT2 = new SimpleTask;
+	Task* pT3 = new SimpleTask;
+	tq.enqueue(pT1);
+	tq.enqueue(pT2);
+	tq.startQueue();
+
+	assert (tm.count() == 1);
+	Thread::sleep(500);
+	assert (pT1->state() == Task::TASK_RUNNING);
+	assert (pT2->state() == Task::TASK_IDLE);
+
+	tq.enqueue(pT3);
+	pT1->cancel();
+	Thread::sleep(500);
+	assert (tm.count() == 1);
+	assert (pT2->state() == Task::TASK_RUNNING);
+	assert (pT3->state() == Task::TASK_IDLE);
+
+	pT2->cancel();
+	Thread::sleep(500);
+	assert (tm.count() == 1);
+	assert (pT3->state() == Task::TASK_RUNNING);
 
 	tm.cancelAll();
 	while (tm.count() > 0) Thread::sleep(100);

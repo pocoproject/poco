@@ -158,17 +158,21 @@ void TaskManager::taskCancelled(Task* pTask)
 
 void TaskManager::taskFinished(Task* pTask)
 {
-	_nc.postNotification(new TaskFinishedNotification(pTask));
+	TaskPtr currentTask;
+	ScopedLockWithUnlock<FastMutex> lock(_mutex);
 	
-	FastMutex::ScopedLock lock(_mutex);
 	for (TaskList::iterator it = _taskList.begin(); it != _taskList.end(); ++it)
 	{
 		if (*it == pTask)
 		{
+			currentTask = *it;
 			_taskList.erase(it);
 			break;
 		}
 	}
+	lock.unlock();
+
+	_nc.postNotification(new TaskFinishedNotification(pTask));
 }
 
 
