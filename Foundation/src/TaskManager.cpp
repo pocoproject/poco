@@ -64,6 +64,30 @@ void TaskManager::start(Task* pTask, int cpu)
 }
 
 
+void TaskManager::startSync(Task* pTask)
+{
+	TaskPtr pAutoTask(pTask); // take ownership immediately
+	ScopedLockWithUnlock<FastMutex> lock(_mutex);
+
+	pAutoTask->setOwner(this);
+	pAutoTask->setState(Task::TASK_STARTING);
+	_taskList.push_back(pAutoTask);
+	lock.unlock();
+	try
+	{
+		pAutoTask->runTask();
+	}
+	catch (...)
+	{
+		// Make sure that we don't act like we own the task since
+		// we never started it.  If we leave the task on our task
+		// list, the size of the list is incorrect.
+		_taskList.pop_back();
+		throw;
+	}
+}
+
+
 void TaskManager::cancelAll()
 {
 	FastMutex::ScopedLock lock(_mutex);

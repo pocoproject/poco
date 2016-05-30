@@ -98,6 +98,21 @@ namespace
 		}
 	};
 	
+	class IncludingTask: public Task
+	{
+	public:
+		IncludingTask(): Task("IncludingTask")
+		{
+		}
+
+		void runTask()
+		{
+			setProgress(0.5);
+			getOwner()->startSync(new SimpleTask);
+			setProgress(1.0);
+		}
+	};
+
 	class TaskObserver
 	{
 	public:
@@ -439,6 +454,28 @@ void TaskManagerTest::testMultiTasks()
 	TaskManager::TaskList list = tm.taskList();
 	assert (list.size() == 3);
 	
+	tm.cancelAll();
+	while (tm.count() > 0) Thread::sleep(100);
+	assert (tm.count() == 0);
+}
+
+
+void TaskManagerTest::testTaskInclusion()
+{
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
+	IncludingTask* pTask = new IncludingTask;
+
+	pTask->duplicate();
+
+	tm.start(pTask);
+	// wait for the included task to be started
+	while (pTask->progress()<0.5)
+	{
+		Thread::sleep(100);
+	}
+	Thread::sleep(100);
+	assert (tm.count()==2);
+
 	tm.cancelAll();
 	while (tm.count() > 0) Thread::sleep(100);
 	assert (tm.count() == 0);
