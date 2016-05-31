@@ -440,6 +440,7 @@ before_test:
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
       set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
       Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE'
       Write-Host -ForegroundColor Yellow $line;
