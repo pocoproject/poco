@@ -79,6 +79,8 @@ void TaskManager::startSync(Task* pTask)
 	}
 	catch (...)
 	{
+		FastMutex::ScopedLock miniLock(_mutex);
+
 		// Make sure that we don't act like we own the task since
 		// we never started it.  If we leave the task on our task
 		// list, the size of the list is incorrect.
