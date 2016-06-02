@@ -19,7 +19,7 @@
 using Poco::XML::NamespaceSupport;
 
 
-NamespaceSupportTest::NamespaceSupportTest(const std::string& name): CppUnit::TestCase(name)
+NamespaceSupportTest::NamespaceSupportTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

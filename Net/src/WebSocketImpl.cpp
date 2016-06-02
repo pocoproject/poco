@@ -133,7 +133,8 @@ int WebSocketImpl::receiveHeader(char mask[4], bool& useMask)
 		Poco::UInt64 l;
 		reader >> l;
 		payloadLength = static_cast<int>(l);
-	} else if (lengthByte == 126)
+	} 
+	else if (lengthByte == 126)
 	{
 		n = receiveNBytes(header + 2, 2);
 		if (n <= 0)

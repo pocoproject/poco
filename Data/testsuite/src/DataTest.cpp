@@ -961,18 +961,6 @@ void DataTest::testRow()
 		fail ("must fail");
 	}catch (NotFoundException&) {}
 
-	try
-	{
-		row4.set("field1", Var());
-		row4.addSortField(1);
-		row4.removeSortField(0);
-		fail ("must fail - field 1 is empty");
-	}
-	catch (IllegalStateException&)
-	{
-		row4.removeSortField(1);
-	}
-
 	row4.set("field0", 0);
 	row4.set("field1", 1);
 	row4.set("field2", 2);

@@ -30,6 +30,7 @@ public:
 	void testLaunchRedirectIn();
 	void testLaunchRedirectOut();
 	void testLaunchEnv();
+	void testLaunchArgs();
 	void testIsRunning();
 	void testIsRunningAllowsForTermination();
 	void testSignalExitCode();

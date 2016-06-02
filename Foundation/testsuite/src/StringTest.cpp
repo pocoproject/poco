@@ -47,6 +47,8 @@ using Poco::replaceInPlace;
 using Poco::remove;
 using Poco::removeInPlace;
 using Poco::cat;
+using Poco::startsWith;
+using Poco::endsWith;
 using Poco::strToInt;
 using Poco::strToFloat;
 using Poco::strToDouble;
@@ -80,8 +82,8 @@ void StringTest::testTrimLeft()
 		std::string s = "abc";
 		assert (trimLeft(s) == "abc");
 	}
-		std::string s = " abc ";
-		assert (trimLeft(s) == "abc ");
+		std::string s2 = " abc ";
+		assert (trimLeft(s2) == "abc ");
 	{
 	std::string s = "  ab c ";
 	assert (trimLeft(s) == "ab c ");
@@ -432,6 +434,55 @@ void StringTest::testCat()
 	assert (cat(std::string(","), vec.begin(), vec.end()) == "one,two");
 	vec.push_back(s3);
 	assert (cat(std::string(","), vec.begin(), vec.end()) == "one,two,three");
+}
+
+
+void StringTest::testStartsWith()
+{
+	std::string s1("o");
+
+	assert (startsWith(s1, std::string("o")));
+	assert (startsWith(s1, std::string("")));
+
+	assert (!startsWith(s1, std::string("O")));
+	assert (!startsWith(s1, std::string("1")));
+
+	std::string s2("");
+
+	assert (startsWith(s2, std::string("")));
+
+	assert (!startsWith(s2, std::string("o")));
+
+	std::string s3("oO");
+
+	assert (startsWith(s3, std::string("o")));
+
+	assert (!startsWith(s3, std::string(" o")));
+}
+
+
+void StringTest::testEndsWith()
+{
+	std::string s1("o");
+
+	assert (endsWith(s1, std::string("o")));
+	assert (endsWith(s1, std::string("")));
+
+	assert (!endsWith(s1, std::string("O")));
+	assert (!endsWith(s1, std::string("1")));
+
+
+	std::string s2("");
+
+	assert (endsWith(s2, std::string("")));
+
+	assert (!endsWith(s2, std::string("o")));
+
+	std::string s3("Oo");
+
+	assert (endsWith(s3, std::string("o")));
+
+	assert (!endsWith(s3, std::string("o ")));	
 }
 
 
@@ -1187,6 +1238,8 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testReplace);
 	CppUnit_addTest(pSuite, StringTest, testReplaceInPlace);
 	CppUnit_addTest(pSuite, StringTest, testCat);
+	CppUnit_addTest(pSuite, StringTest, testStartsWith);
+	CppUnit_addTest(pSuite, StringTest, testEndsWith);
 	CppUnit_addTest(pSuite, StringTest, testStringToInt);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloat);
 	CppUnit_addTest(pSuite, StringTest, testStringToDouble);

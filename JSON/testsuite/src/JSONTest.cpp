@@ -23,6 +23,8 @@
 #include "Poco/TextConverter.h"
 #include "Poco/Nullable.h"
 #include "Poco/Dynamic/Struct.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormatter.h"
 #include <set>
 #include <iostream>
 
@@ -30,9 +32,10 @@
 using namespace Poco::JSON;
 using namespace Poco::Dynamic;
 using Poco::DynamicStruct;
+using Poco::DateTime;
+using Poco::DateTimeFormatter;
 
-
-JSONTest::JSONTest(const std::string& name): CppUnit::TestCase("JSON")
+JSONTest::JSONTest(const std::string& rName): CppUnit::TestCase("JSON")
 {
 
 }
@@ -897,6 +900,12 @@ void JSONTest::testStringElement()
 	Poco::Dynamic::Array da = *array;
 	assert (da.size() == 1);
 	assert (da[0] == "value");
+
+	std::stringstream s;
+	json = "[ \"\\u0017\" ]";
+	Var v = Parser().parse(json);
+	Stringifier::condense(v, s);
+	assert(s.str() == "[\"\\u0017\"]");
 }
 
 
@@ -1245,6 +1254,27 @@ void JSONTest::testPrintHandler()
 
 void JSONTest::testStringify()
 {
+	std::ostringstream os;
+	Var i = 123;
+	Stringifier::stringify(i, os);
+	assert(os.str() == "123");
+
+	os.str("");
+	Var f = 123.456;
+	Stringifier::stringify(f, os);
+	assert(os.str() == "123.456");
+
+	os.str("");
+	Var s = "abcdef";
+	Stringifier::stringify(s, os);
+	assert(os.str() == "\"abcdef\"");
+
+	os.str("");
+	DateTime dt;
+	Var d = dt;
+	Stringifier::stringify(d, os);
+	assert(os.str() == std::string("\"" + DateTimeFormatter::format(dt, Poco::DateTimeFormat::ISO8601_FORMAT) + "\""));
+
 	std::string str1 = "\r";
 	std::string str2 = "\n";
 	Poco::JSON::Object obj1, obj2;

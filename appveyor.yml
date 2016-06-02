@@ -1,7 +1,7 @@
 version: build {branch}-{build}
 
 cache:
-  - c:\mysql-5.7.9-win32
+  - C:\mysql-5.7.11-win32
   - C:\ProgramData\chocolatey
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
@@ -51,7 +51,7 @@ configuration:
 
 environment:
   bundling: bundled
-  MYSQL32:    C:\mysql-5.7.9-win32
+  MYSQL32:    C:\mysql-5.7.11-win32
   MYSQL64:    C:\Program Files\MySql\MySQL Server 5.6
   POSTGRES32: C:\Program Files (x86)\PostgreSQL\9.4
   POSTGRES64: C:\Program Files\PostgreSQL\9.4
@@ -64,29 +64,17 @@ environment:
       vsver: 120
       linkmode: shared
 
-    - builder: msbuild
-      vsver: 120
-      linkmode: static_md
-
-    - builder: msbuild
-      vsver: 120
-      linkmode: static_mt
-
-# -------------------------------------------------------------------------------------------
-# VS2013 runs a x64 or Win32 build & tests in around 32 mn
-# Environment: builder=msbuild, vsver=120, linkmode=shared; Platform: Win32    31 min 33 sec
-# Environment: builder=msbuild, vsver=120, linkmode=shared; Platform: x64      33 min 32 sec
-#
-# In VS2015 running either a x64 or Win32 build & tests takes twice time and thus makes the build failed since
-# it overpasses 1 hour and free Appveyor account job are limited to 1 hour. Thus VS2015 builds 
-# are removed until one finds out the reason why build time is doubled.
-#
-# Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: Win32     1 hr
-# Environment: builder=msbuild, vsver=140, linkmode=shared; Platform: x64       1 hr 
-# -------------------------------------------------------------------------------------------
 #    - builder: msbuild
-#      vsver: 140
-#      linkmode: shared
+#      vsver: 120
+#      linkmode: static_md
+
+#    - builder: msbuild
+#      vsver: 120
+#      linkmode: static_mt
+
+    - builder: msbuild
+      vsver: 140
+      linkmode: shared
 
 #    - builder: msbuild
 #      vsver: 140
@@ -99,14 +87,21 @@ environment:
     - builder: cmake
       vsver: 120
 
+    - builder: cmake
+      vsver: 140
+
+
 matrix:
   fast_finish: true
 
 install:
-  - C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel 
-#
-# C:Cygwin64 is not yet available on Build Worker image.
-#  - C:\cygwin64\setup-x86_64.exe -B -q -n -N -d -l C:/cygwin64/var/cache/setup -R c:\cygwin64 -s http://cygwin.mirror.constant.com  -P openssl-devel
+  - if "%builder%"=="cygwin" (
+    if "%platform%"=="Win32" (
+    C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel -P libcrypt-devel))
+    
+  - if "%builder%"=="cygwin" (
+    if "%platform%"=="x64" (   
+    C:\cygwin64\setup-x86_64.exe -qnNdO -R C:/cygwin64 -s http://cygwin.mirror.constant.com -l C:/cygwin64/var/cache/setup -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel  -P libcrypt-devel))
   
   - set POCO_BASE=%CD%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
@@ -197,9 +192,9 @@ install:
         else
         {
           echo "downloading $env:MYSQL32"
-          Invoke-WebRequest "http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.11-win32.zip" -OutFile mysql-5.7.9-win32.zip
+          Invoke-WebRequest "http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.11-win32.zip" -OutFile mysql-5.7.11-win32.zip
           echo "installing $env:MYSQL32"
-          7z x -y mysql-5.7.9-win32.zip -oc:\
+          7z x -y mysql-5.7.11-win32.zip -oc:\
         }
       }
 # -------------------------------------------------------------------------------------------
@@ -327,8 +322,8 @@ before_build:
 after_build:
   - ps: |
       $line='-------------------------------------------------------------------------------------';
-      $find='c:\cygwin\bin\find.exe';
-      $arg1="$env:POCO_BASE -type f -name '*.cpp' -exec c:\cygwin\bin\grep -n -H ";
+      $find='C:\Cygwin\bin\find.exe';
+      $arg1="$env:POCO_BASE -type f -name '*.cpp' -exec grep -n -H ";
       $arg2=" {} ;"
       
       $word='FIXME'
@@ -374,10 +369,18 @@ build_script:
 # Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
 # -------------------------------------------------------------------------------------------
   - ps: |
-      if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
+      if ($env:builder -eq "cygwin")
       {
-        $cmd = 'bash.exe configure --everything';iex "& $cmd"
-        $cmd = 'make.exe -s';iex "& $cmd"
+          $LastExitCode=0;
+          $cmd='bash.exe configure --everything';iex "& $cmd"
+          if ($LastExitCode -ne 0) {
+            throw "$cmd failed with exit code $LastExitCode."
+          }
+          $LastExitCode=0;
+          $cmd='make.exe -s';iex "& $cmd"
+          if ($LastExitCode -ne 0) {
+            throw "$cmd failed with exit code $LastExitCode."
+          }
       }
       if ($env:builder -eq "msbuild")
       {
@@ -385,10 +388,11 @@ build_script:
         $verbosity='minimal';
     
         $process = Start-Process -PassThru -nnw -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
-        -Args "$env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild $verbosity $logger";
+        -EA Stop -Args "$env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild $verbosity $logger";
         gc cout; gc cerr;
         Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
       }
+      
       if ($env:builder -eq "cmake")
       {
         mkdir cmake-build | out-null;pushd cmake-build;
@@ -425,6 +429,7 @@ build_script:
         $ErrorActionPreference = 'Stop';
       }
 
+
 before_test:
 - ps: |
       $line='-------------------------------------------------------------------------------------';
@@ -441,6 +446,7 @@ before_test:
       foreach($t in $CPPUNIT_IGNORE.split(",")) { Write-Host -ForegroundColor Yellow $t.trim() }      
       Write-Host -ForegroundColor Yellow $line;
       
+      
 after_test:
 
 
@@ -450,11 +456,20 @@ test_script:
       $line='-------------------------------------------------------------------------------------';
       if ($env:configuration -eq "release")
       {
-        if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
+        if ($env:builder -eq "cygwin")
         {
-          $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"
-          $cmd = 'bash.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd"
-        }
+            $LastExitCode=0;
+          if ($env:platform -eq "Win32")
+          {
+            $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"
+          }
+          if ($env:platform -eq "x64")
+          {
+            $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';iex "& $cmd"
+          }
+          $cmd = 'bash.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd";
+            Write-Host -ForegroundColor Yellow $cmd ': LastExitCode=' $lastExitCode;
+          }
         if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
         {
           $suffix = '';
@@ -516,7 +531,7 @@ test_script:
             }
           }
         }  
-        if ($env:builder -eq "cmake" -and $env:platform -eq "Win32")
+        if ($env:builder -eq "cmake")
         {
           pushd cmake-build;
           Write-Host -ForegroundColor Yellow $line;

@@ -24,7 +24,7 @@ using Poco::Util::OptionSet;
 using Poco::Util::HelpFormatter;
 
 
-HelpFormatterTest::HelpFormatterTest(const std::string& name): CppUnit::TestCase(name)
+HelpFormatterTest::HelpFormatterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

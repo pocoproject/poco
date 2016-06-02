@@ -2511,13 +2511,13 @@ void VarTest::testEmpty()
 
 	try
 	{
-		int i = da;
+		int j = da;
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 
 	try
 	{
-		int i = da.extract<int>();
+		int j = da.extract<int>();
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 }

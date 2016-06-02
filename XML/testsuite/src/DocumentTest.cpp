@@ -31,7 +31,7 @@ using Poco::XML::XMLString;
 using Poco::XML::DOMException;
 
 
-DocumentTest::DocumentTest(const std::string& name): CppUnit::TestCase(name)
+DocumentTest::DocumentTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

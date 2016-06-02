@@ -402,7 +402,10 @@ void SessionImpl::close()
 	try
 	{
 		commit();
-	}catch (ConnectionException&) { }
+	}
+	catch (ConnectionException&) 
+	{
+	}
 
 	SQLDisconnect(_db);
 }

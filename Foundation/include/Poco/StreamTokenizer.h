@@ -78,13 +78,7 @@ public:
 		/// You must not delete the token returned by next().
 
 private:
-	struct TokenInfo
-	{
-		Token* pToken;
-		bool   ignore;
-	};
-	
-	typedef std::vector<TokenInfo> TokenVec;
+	typedef std::vector<Token*> TokenVec;
 	
 	TokenVec      _tokens;
 	std::istream* _pIstr;

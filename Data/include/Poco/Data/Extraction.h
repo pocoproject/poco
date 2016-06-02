@@ -170,7 +170,7 @@ class Extraction<std::vector<T> >: public AbstractExtraction
 	/// Vector Data Type specialization for extraction of values from a query result set.
 {
 public:
-	
+
 	typedef std::vector<T>      ValType;
 	typedef SharedPtr<ValType>  ValPtr;
 	typedef Extraction<ValType> Type;

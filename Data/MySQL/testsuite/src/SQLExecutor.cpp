@@ -9,6 +9,10 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+#include <iostream>
+#include <limits>
+
+
 #include "Poco/CppUnit/TestCase.h"
 #include "SQLExecutor.h"
 #include "Poco/NumberParser.h"
@@ -27,10 +31,12 @@
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 
+#if POCO_MSVS_VERSION == 2015
+#define HAVE_STRUCT_TIMESPEC
+#endif
+
 #include <my_global.h>
 #include <mysql.h>
-#include <iostream>
-#include <limits>
 
 #ifdef max
 #undef max
