@@ -75,7 +75,7 @@ void TaskManager::startSync(Task* pTask)
 	lock.unlock();
 	try
 	{
-		pAutoTask->runTask();
+		pAutoTask->run();
 	}
 	catch (...)
 	{
