@@ -334,14 +334,14 @@ public:
 		{
 			if (_entries[i])
 			{
-				UInt32 size = (UInt32)_entries[i]->size();
-				poco_assert_dbg(size != 0);
-				if (size > maxEntriesPerHash)
-					maxEntriesPerHash = size;
+				UInt32 entrySize = (UInt32)_entries[i]->size();
+				poco_assert_dbg(entrySize != 0);
+				if (entrySize > maxEntriesPerHash)
+					maxEntriesPerHash = entrySize;
 				if (details)
-					detailedEntriesPerHash.push_back(size);
+					detailedEntriesPerHash.push_back(entrySize);
 	#ifdef _DEBUG
-				totalSize += size;
+				totalSize += entrySize;
 	#endif
 			}
 			else

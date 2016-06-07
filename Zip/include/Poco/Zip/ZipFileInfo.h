@@ -78,10 +78,10 @@ public:
 
 	const std::string& getFileComment() const;
 
-	void getVersionMadeBy(int& major, int& minor);
+	void getVersionMadeBy(int& major, int& minor) const;
 		/// The ZIP version used to create the file
 
-	void getRequiredVersion(int& major, int& minor);
+	void getRequiredVersion(int& major, int& minor) const;
 		/// The minimum version required to extract the data
 
 	ZipCommon::HostSystem getHostSystem() const;
@@ -343,14 +343,14 @@ inline Poco::UInt16 ZipFileInfo::getFileCommentLength() const
 }
 
 
-inline void ZipFileInfo::getVersionMadeBy(int& major, int& minor)
+inline void ZipFileInfo::getVersionMadeBy(int& major, int& minor) const
 {
 	major = (_rawInfo[VERSIONMADEBY_POS]/10);
 	minor = (_rawInfo[VERSIONMADEBY_POS]%10);
 }
 
 
-inline void ZipFileInfo::getRequiredVersion(int& major, int& minor)
+inline void ZipFileInfo::getRequiredVersion(int& major, int& minor) const
 {
 	major = (_rawInfo[VERSION_NEEDED_POS]/10);
 	minor = (_rawInfo[VERSION_NEEDED_POS]%10);

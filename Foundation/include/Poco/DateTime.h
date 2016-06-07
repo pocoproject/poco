@@ -208,51 +208,51 @@ public:
 		/// Returns the date and time expressed in UTC-based
 		/// time. UTC base time is midnight, October 15, 1582.
 		/// Resolution is 100 nanoseconds.
-		
-	bool operator == (const DateTime& dateTime) const;	
-	bool operator != (const DateTime& dateTime) const;	
-	bool operator <  (const DateTime& dateTime) const;	
-	bool operator <= (const DateTime& dateTime) const;	
-	bool operator >  (const DateTime& dateTime) const;	
-	bool operator >= (const DateTime& dateTime) const;	
+
+	bool operator == (const DateTime& dateTime) const;
+	bool operator != (const DateTime& dateTime) const;
+	bool operator <  (const DateTime& dateTime) const;
+	bool operator <= (const DateTime& dateTime) const;
+	bool operator >  (const DateTime& dateTime) const;
+	bool operator >= (const DateTime& dateTime) const;
 
 	DateTime  operator +  (const Timespan& span) const;
 	DateTime  operator -  (const Timespan& span) const;
 	Timespan  operator -  (const DateTime& dateTime) const;
 	DateTime& operator += (const Timespan& span);
 	DateTime& operator -= (const Timespan& span);
-	
+
 	void makeUTC(int tzd);
 		/// Converts a local time into UTC, by applying the given time zone differential.
-		
+
 	void makeLocal(int tzd);
 		/// Converts a UTC time into a local time, by applying the given time zone differential.
-	
+
 	static bool isLeapYear(int year);
 		/// Returns true if the given year is a leap year;
 		/// false otherwise.
-		
+
 	static int daysOfMonth(int year, int month);
 		/// Returns the number of days in the given month
 		/// and year. Month is from 1 to 12.
-		
+
 	static bool isValid(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
 		/// Checks if the given date and time is valid
 		/// (all arguments are within a proper range).
 		///
 		/// Returns true if all arguments are valid, false otherwise.
-		
-protected:	
+
+protected:
 	static double toJulianDay(Timestamp::UtcTimeVal utcTime);
 		/// Computes the Julian day for an UTC time.
 	
 	static double toJulianDay(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
 		/// Computes the Julian day for a Gregorian calendar date and time.
 		/// See <http://vsg.cape.com/~pbaum/date/jdimp.htm>, section 2.3.1 for the algorithm.
-	
+
 	static Timestamp::UtcTimeVal toUtcTime(double julianDay);
 		/// Computes the UTC time for a Julian day.
-		
+
 	void computeGregorian(double julianDay);
 		/// Computes the Gregorian date for the given Julian day.
 		/// See <http://vsg.cape.com/~pbaum/date/injdimp.htm>, section 3.3.1 for the algorithm.
@@ -369,13 +369,13 @@ inline bool DateTime::operator == (const DateTime& dateTime) const
 }
 
 
-inline bool DateTime::operator != (const DateTime& dateTime) const	
+inline bool DateTime::operator != (const DateTime& dateTime) const
 {
 	return _utcTime != dateTime._utcTime;
 }
 
 
-inline bool DateTime::operator <  (const DateTime& dateTime) const	
+inline bool DateTime::operator < (const DateTime& dateTime) const
 {
 	return _utcTime < dateTime._utcTime;
 }
@@ -387,13 +387,13 @@ inline bool DateTime::operator <= (const DateTime& dateTime) const
 }
 
 
-inline bool DateTime::operator >  (const DateTime& dateTime) const
+inline bool DateTime::operator > (const DateTime& dateTime) const
 {
 	return _utcTime > dateTime._utcTime;
 }
 
 
-inline bool DateTime::operator >= (const DateTime& dateTime) const	
+inline bool DateTime::operator >= (const DateTime& dateTime) const
 {
 	return _utcTime >= dateTime._utcTime;
 }

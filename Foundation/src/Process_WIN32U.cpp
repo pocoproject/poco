@@ -28,7 +28,7 @@ namespace Poco {
 //
 // ProcessHandleImpl
 //
-ProcessHandleImpl::ProcessHandleImpl(HANDLE hProcess, UInt32 pid):
+ProcessHandleImpl::ProcessHandleImpl(HANDLE hProcess, UInt32 pid) :
 	_hProcess(hProcess),
 	_pid(pid)
 {
@@ -40,6 +40,7 @@ ProcessHandleImpl::~ProcessHandleImpl()
 	closeHandle();
 }
 
+
 void ProcessHandleImpl::closeHandle()
 {
 	if (_hProcess)
@@ -48,6 +49,7 @@ void ProcessHandleImpl::closeHandle()
 		_hProcess = NULL;
 	}
 }
+
 
 UInt32 ProcessHandleImpl::id() const
 {
@@ -80,7 +82,7 @@ int ProcessHandleImpl::wait() const
 //
 ProcessImpl::PIDImpl ProcessImpl::idImpl()
 {
-	return GetCurrentProcessId(); 
+	return GetCurrentProcessId();
 }
 
 
@@ -94,16 +96,68 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 	if (GetProcessTimes(GetCurrentProcess(), &ftCreation, &ftExit, &ftKernel, &ftUser) != 0)
 	{
 		ULARGE_INTEGER time;
-		time.LowPart  = ftKernel.dwLowDateTime;
+		time.LowPart = ftKernel.dwLowDateTime;
 		time.HighPart = ftKernel.dwHighDateTime;
-		kernelTime    = long(time.QuadPart/10000000L);
-		time.LowPart  = ftUser.dwLowDateTime;
+		kernelTime = long(time.QuadPart / 10000000L);
+		time.LowPart = ftUser.dwLowDateTime;
 		time.HighPart = ftUser.dwHighDateTime;
-		userTime      = long(time.QuadPart/10000000L);
-	}
+		userTime = long(time.QuadPart / 10000000L);
+	} 
 	else
 	{
 		userTime = kernelTime = -1;
+	}
+}
+
+
+static bool argNeedsEscaping(const std::string& arg)
+{
+	bool containsQuotableChar = std::string::npos != arg.find_first_of(" \t\n\v\"");
+	// Assume args that start and end with quotes are already quoted and do not require further quoting.
+	// There is probably code out there written before launch() escaped the arguments that does its own
+	// escaping of arguments. This ensures we do not interfere with those arguments.
+	bool isAlreadyQuoted = arg.size() > 1 && '\"' == arg[0] && '\"' == arg[arg.size() - 1];
+	return containsQuotableChar && !isAlreadyQuoted;
+}
+
+
+// Based on code from https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
+static std::string escapeArg(const std::string& arg)
+{
+	if (argNeedsEscaping(arg))
+	{
+		std::string quotedArg("\"");
+		for (std::string::const_iterator it = arg.begin(); ; ++it)
+		{
+			unsigned backslashCount = 0;
+			while (it != arg.end() && '\\' == *it)
+			{
+				++it;
+				++backslashCount;
+			}
+
+			if (it == arg.end())
+			{
+				quotedArg.append(2 * backslashCount, '\\');
+				break;
+			} 
+			else if ('"' == *it)
+			{
+				quotedArg.append(2 * backslashCount + 1, '\\');
+				quotedArg.push_back('"');
+			} 
+			else
+			{
+				quotedArg.append(backslashCount, '\\');
+				quotedArg.push_back(*it);
+			}
+		}
+		quotedArg.push_back('"');
+		return quotedArg;
+	} 
+	else
+	{
+		return arg;
 	}
 }
 
@@ -114,19 +168,19 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it)
 	{
 		commandLine.append(" ");
-		commandLine.append(*it);
-	}		
+		commandLine.append(escapeArg(*it));
+	}
 
 	std::wstring ucommandLine;
 	UnicodeConverter::toUTF16(commandLine, ucommandLine);
 
 	STARTUPINFOW startupInfo;
 	GetStartupInfoW(&startupInfo); // take defaults from current process
-	startupInfo.cb          = sizeof(STARTUPINFOW);
-	startupInfo.lpReserved  = NULL;
-	startupInfo.lpDesktop   = NULL;
-	startupInfo.lpTitle     = NULL;
-	startupInfo.dwFlags     = STARTF_FORCEOFFFEEDBACK;
+	startupInfo.cb = sizeof(STARTUPINFOW);
+	startupInfo.lpReserved = NULL;
+	startupInfo.lpDesktop = NULL;
+	startupInfo.lpTitle = NULL;
+	startupInfo.dwFlags = STARTF_FORCEOFFFEEDBACK;
 	startupInfo.cbReserved2 = 0;
 	startupInfo.lpReserved2 = NULL;
 
@@ -137,13 +191,13 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		DuplicateHandle(hProc, inPipe->readHandle(), hProc, &startupInfo.hStdInput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
 		inPipe->close(Pipe::CLOSE_READ);
-	}
+	} 
 	else if (GetStdHandle(STD_INPUT_HANDLE))
 	{
 		DuplicateHandle(hProc, GetStdHandle(STD_INPUT_HANDLE), hProc, &startupInfo.hStdInput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	}
-	else 
+	} 
+	else
 	{
 		startupInfo.hStdInput = 0;
 	}
@@ -152,13 +206,13 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	{
 		DuplicateHandle(hProc, outPipe->writeHandle(), hProc, &startupInfo.hStdOutput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	}
+	} 
 	else if (GetStdHandle(STD_OUTPUT_HANDLE))
 	{
 		DuplicateHandle(hProc, GetStdHandle(STD_OUTPUT_HANDLE), hProc, &startupInfo.hStdOutput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	}
-	else 
+	} 
+	else
 	{
 		startupInfo.hStdOutput = 0;
 	}
@@ -166,12 +220,12 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	{
 		DuplicateHandle(hProc, errPipe->writeHandle(), hProc, &startupInfo.hStdError, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	}
+	} 
 	else if (GetStdHandle(STD_ERROR_HANDLE))
 	{
 		DuplicateHandle(hProc, GetStdHandle(STD_ERROR_HANDLE), hProc, &startupInfo.hStdError, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	}
+	} 
 	else
 	{
 		startupInfo.hStdError = 0;
@@ -195,19 +249,19 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		envChars = getEnvironmentVariablesBuffer(env);
 		pEnv = &envChars[0];
 	}
-		
+
 	PROCESS_INFORMATION processInfo;
 	DWORD creationFlags = GetConsoleWindow() ? 0 : CREATE_NO_WINDOW;
 	BOOL rc = CreateProcessW(
 		NULL, // applicationName
-		const_cast<wchar_t*>(ucommandLine.c_str()), 
+		const_cast<wchar_t*>(ucommandLine.c_str()),
 		NULL, // processAttributes
 		NULL, // threadAttributes
 		mustInheritHandles,
 		creationFlags,
-		(LPVOID) pEnv, 
+		(LPVOID)pEnv,
 		workingDirectory,
-		&startupInfo, 
+		&startupInfo,
 		&processInfo
 	);
 	if (startupInfo.hStdInput) CloseHandle(startupInfo.hStdInput);
@@ -217,7 +271,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	{
 		CloseHandle(processInfo.hThread);
 		return new ProcessHandleImpl(processInfo.hProcess, processInfo.dwProcessId);
-	}
+	} 
 	else throw SystemException("Cannot launch process", command);
 }
 
@@ -246,14 +300,14 @@ void ProcessImpl::killImpl(PIDImpl pid)
 			throw SystemException("cannot kill process");
 		}
 		CloseHandle(hProc);
-	}
+	} 
 	else
 	{
 		switch (GetLastError())
 		{
 		case ERROR_ACCESS_DENIED:
 			throw NoPermissionException("cannot kill process");
-		case ERROR_INVALID_PARAMETER: 
+		case ERROR_INVALID_PARAMETER:
 			throw NotFoundException("cannot kill process");
 		default:
 			throw SystemException("cannot kill process");
@@ -262,7 +316,7 @@ void ProcessImpl::killImpl(PIDImpl pid)
 }
 
 
-bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle) 
+bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 {
 	bool result = true;
 	DWORD exitCode;
@@ -272,7 +326,7 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 }
 
 
-bool ProcessImpl::isRunningImpl(PIDImpl pid) 
+bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
 	HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	bool result = true;

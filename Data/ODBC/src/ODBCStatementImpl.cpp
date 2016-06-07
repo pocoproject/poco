@@ -105,7 +105,10 @@ void ODBCStatementImpl::compileImpl()
 	{
 		Poco::Any dti = session().getProperty("dataTypeInfo");
 		pDT = AnyCast<TypeInfo*>(dti);
-	}catch (NotSupportedException&) { }
+	}
+	catch (NotSupportedException&) 
+	{
+	}
 
 	const std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 	const ODBCMetaColumn::NumericConversion numericConversion = dynamic_cast<SessionImpl&>(session()).numericConversion();
@@ -126,7 +129,8 @@ void ODBCStatementImpl::makeInternalExtractors()
 		try
 		{
 			fillColumns(currentDataSet());
-		} catch (DataFormatException&)
+		} 
+		catch (DataFormatException&)
 		{
 			if (isStoredProcedure()) return;
 			throw;

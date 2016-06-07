@@ -168,28 +168,28 @@ class ObjectPool
 	///   - If the object is not valid, it is destroyed immediately.
 {
 public:
-	ObjectPool(std::size_t capacity, std::size_t peakCapacity):
+	ObjectPool(std::size_t objectCapacity, std::size_t peakObjectCapacity):
 		/// Creates a new ObjectPool with the given capacity
 		/// and peak capacity.
 		///
 		/// The PoolableObjectFactory must have a public default constructor.
-		_capacity(capacity),
-		_peakCapacity(peakCapacity),
+		_capacity(objectCapacity),
+		_peakCapacity(peakObjectCapacity),
 		_size(0)
 	{
-		poco_assert (capacity <= peakCapacity);
+		poco_assert (objectCapacity <= peakObjectCapacity);
 	}
 	
-	ObjectPool(const F& factory, std::size_t capacity, std::size_t peakCapacity):
+	ObjectPool(const F& factory, std::size_t objectCapacity, std::size_t peakObjectCapacity):
 		/// Creates a new ObjectPool with the given PoolableObjectFactory,
 		/// capacity and peak capacity. The PoolableObjectFactory must have
 		/// a public copy constructor.
 		_factory(factory),
-		_capacity(capacity),
-		_peakCapacity(peakCapacity),
+		_capacity(objectCapacity),
+		_peakCapacity(peakObjectCapacity),
 		_size(0)
 	{
-		poco_assert (capacity <= peakCapacity);
+		poco_assert (objectCapacity <= peakObjectCapacity);
 	}
 	
 	~ObjectPool()
