@@ -24,7 +24,7 @@ namespace MongoDB {
 
 ObjectId::ObjectId()
 {
-	memset(_id, 0, sizeof(_id));
+	std::memset(_id, 0, sizeof(_id));
 }
 
 ObjectId::ObjectId(const std::string& id)
@@ -40,7 +40,7 @@ ObjectId::ObjectId(const std::string& id)
 
 ObjectId::ObjectId(const ObjectId& copy)
 {
-	memcpy(_id, copy._id, sizeof(_id));
+	std::memcpy(_id, copy._id, sizeof(_id));
 }
 
 ObjectId::~ObjectId()
