@@ -22,7 +22,7 @@ using Poco::Net::MultipartWriter;
 using Poco::Net::MessageHeader;
 
 
-MultipartWriterTest::MultipartWriterTest(const std::string& name): CppUnit::TestCase(name)
+MultipartWriterTest::MultipartWriterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

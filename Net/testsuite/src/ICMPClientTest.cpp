@@ -34,8 +34,8 @@ using Poco::Delegate;
 using Poco::AutoPtr;
 
 
-ICMPClientTest::ICMPClientTest(const std::string& name): 
-	CppUnit::TestCase(name),
+ICMPClientTest::ICMPClientTest(const std::string& rName): 
+	CppUnit::TestCase(rName),
 	_icmpClient(IPAddress::IPv4)
 {
 }

@@ -19,7 +19,7 @@
 using Poco::Net::MediaType;
 
 
-MediaTypeTest::MediaTypeTest(const std::string& name): CppUnit::TestCase(name)
+MediaTypeTest::MediaTypeTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
