@@ -26,7 +26,7 @@ using Poco::Util::MapConfiguration;
 using Poco::AutoPtr;
 
 
-ConfigurationMapperTest::ConfigurationMapperTest(const std::string& name): AbstractConfigurationTest(name)
+ConfigurationMapperTest::ConfigurationMapperTest(const std::string& rName): AbstractConfigurationTest(rName)
 {
 }
 

@@ -32,7 +32,7 @@ using Poco::Int64;
 using Poco::UInt64;
 
 
-AbstractConfigurationTest::AbstractConfigurationTest(const std::string& name): CppUnit::TestCase(name)
+AbstractConfigurationTest::AbstractConfigurationTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

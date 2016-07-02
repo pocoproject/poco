@@ -22,7 +22,7 @@
 namespace Poco {
 
 
-Token::Token(bool ignore) : _ignored(ignore)
+Token::Token(bool isIgnore) : _ignored(isIgnore)
 {
 }
 
@@ -94,9 +94,9 @@ char Token::asChar() const
 }
 
 
-void Token::ignore(bool ignored)
+void Token::ignore(bool isIgnored)
 {
-	_ignored = ignored;
+	_ignored = isIgnored;
 }
 
 bool Token::ignored() const

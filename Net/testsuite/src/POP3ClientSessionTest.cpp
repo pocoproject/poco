@@ -25,7 +25,7 @@ using Poco::Net::MailMessage;
 using Poco::Net::POP3Exception;
 
 
-POP3ClientSessionTest::POP3ClientSessionTest(const std::string& name): CppUnit::TestCase(name)
+POP3ClientSessionTest::POP3ClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
