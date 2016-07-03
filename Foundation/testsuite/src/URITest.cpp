@@ -437,6 +437,13 @@ void URITest::testParse()
 	assert (uri.getFragment().empty());
 	assert (uri.isRelative());
 	
+	uri = "ws://www.appinf.com/ws";
+	assert (uri.getScheme() == "ws");
+	assert (uri.getPort() == 80);
+
+	uri = "wss://www.appinf.com/ws";
+	assert (uri.getScheme() == "wss");
+	assert (uri.getPort() == 443);
 }
 
 
