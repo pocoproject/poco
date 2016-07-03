@@ -31,8 +31,10 @@
 
 #include "ascii.h"
 #include "Poco/XML/expat.h"
-#if defined(_WIN32_WCE)
+#if defined(_WIN32) || defined(_WIN32_WCE)
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
 #endif
 
 #ifdef XML_UNICODE
