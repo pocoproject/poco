@@ -5,7 +5,7 @@ AAAIntroduction
 
 !!Summary of Changes
 
-  - TODO
+  - fixed GH #1307: Upgrade bundled expat to 2.2.0
 
 
 !!!Release 1.7.3

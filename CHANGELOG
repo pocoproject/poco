@@ -3,7 +3,7 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.7.4 (2016-08-XX)
 ==========================
 
-- TODO
+- fixed GH #1307: Upgrade bundled expat to 2.2.0
 
 
 Release 1.7.3 (2016-05-02)
