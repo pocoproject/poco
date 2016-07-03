@@ -9,7 +9,7 @@
 //
 // Version information for the POCO C++ Libraries.
 //
-// Copyright (c) 2004-2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2016, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -37,7 +37,7 @@
 //      Ax: alpha releases
 //      Bx: beta releases
 //
-#define POCO_VERSION 0x01070300
+#define POCO_VERSION 0x01070400
 
 
 #endif // Foundation_Version_INCLUDED
