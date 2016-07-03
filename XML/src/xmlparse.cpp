@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <limits.h>                     /* UINT_MAX */
 
-#ifdef WIN32
+#ifdef _WIN32
 #define getpid GetCurrentProcessId
 #else
 #include <sys/time.h>                   /* gettimeofday() */
