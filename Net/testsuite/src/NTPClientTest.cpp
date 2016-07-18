@@ -34,8 +34,8 @@ using Poco::Delegate;
 using Poco::AutoPtr;
 
 
-NTPClientTest::NTPClientTest(const std::string& name): 
-	CppUnit::TestCase(name),
+NTPClientTest::NTPClientTest(const std::string& rName): 
+	CppUnit::TestCase(rName),
 	_ntpClient(IPAddress::IPv4)
 {
 }

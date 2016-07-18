@@ -136,8 +136,8 @@ namespace
 			checkWritableObserverCount(1);
 			_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, WritableNotification>(*this, &ClientServiceHandler::onWritable));
 			checkWritableObserverCount(0);
-			std::string data(1024, 'x');
-			_socket.sendBytes(data.data(), (int) data.length());
+			std::string dataString(1024, 'x');
+			_socket.sendBytes(dataString.data(), (int) dataString.length());
 			_socket.shutdownSend();
 		}
 		
@@ -253,13 +253,13 @@ namespace
 	class FailConnector: public SocketConnector<ClientServiceHandler>
 	{
 	public:
-		FailConnector(SocketAddress& address, SocketReactor& reactor):
-			SocketConnector<ClientServiceHandler>(address, reactor),
+		FailConnector(SocketAddress& address, SocketReactor& rReactor):
+			SocketConnector<ClientServiceHandler>(address, rReactor),
 			_failed(false),
 			_shutdown(false)
 		{
-			reactor.addEventHandler(socket(), Observer<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
-			reactor.addEventHandler(socket(), Observer<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
+			rReactor.addEventHandler(socket(), Observer<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
+			rReactor.addEventHandler(socket(), Observer<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
 		}
 		
 		void onShutdown(ShutdownNotification* pNf)
@@ -298,7 +298,7 @@ namespace
 }
 
 
-SocketReactorTest::SocketReactorTest(const std::string& name): CppUnit::TestCase(name)
+SocketReactorTest::SocketReactorTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

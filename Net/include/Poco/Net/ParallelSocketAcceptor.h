@@ -57,9 +57,9 @@ class ParallelSocketAcceptor
 public:
 	typedef Poco::Net::ParallelSocketReactor<SR> ParallelReactor;
 
-	explicit ParallelSocketAcceptor(ServerSocket& socket,
+	explicit ParallelSocketAcceptor(ServerSocket& rSocket,
 		unsigned threads = Poco::Environment::processorCount()):
-		_socket(socket),
+		_socket(rSocket),
 		_pReactor(0),
 		_threads(threads),
 		_next(0)
@@ -69,11 +69,11 @@ public:
 		init();
 	}
 
-	ParallelSocketAcceptor(ServerSocket& socket,
-		SocketReactor& reactor,
+	ParallelSocketAcceptor(ServerSocket& rSocket,
+		SocketReactor& rReactor,
 		unsigned threads = Poco::Environment::processorCount()):
-		_socket(socket),
-		_pReactor(&reactor),
+		_socket(rSocket),
+		_pReactor(&rReactor),
 		_threads(threads),
 		_next(0)
 		/// Creates a ParallelSocketAcceptor using the given ServerSocket, sets the 
@@ -104,19 +104,19 @@ public:
 		}
 	}
 
-	void setReactor(SocketReactor& reactor)
+	void setReactor(SocketReactor& rReactor)
 		/// Sets the reactor for this acceptor.
 	{
-		_pReactor = &reactor;
+		_pReactor = &rReactor;
 		if (!_pReactor->hasEventHandler(_socket, 
 			Poco::Observer<ParallelSocketAcceptor,
 			ReadableNotification>(*this, &ParallelSocketAcceptor::onAccept)))
 		{
-			registerAcceptor(reactor);
+			registerAcceptor(rReactor);
 		}
 	}
 	
-	virtual void registerAcceptor(SocketReactor& reactor)
+	virtual void registerAcceptor(SocketReactor& rReactor)
 		/// Registers the ParallelSocketAcceptor with a SocketReactor.
 		///
 		/// A subclass can override this function to e.g.
@@ -128,7 +128,7 @@ public:
 		if (_pReactor)
 			throw Poco::InvalidAccessException("Acceptor already registered.");
 
-		_pReactor = &reactor;
+		_pReactor = &rReactor;
 		_pReactor->addEventHandler(_socket,
 			Poco::Observer<ParallelSocketAcceptor,
 			ReadableNotification>(*this, &ParallelSocketAcceptor::onAccept));
@@ -161,15 +161,15 @@ public:
 	}
 
 protected:
-	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
+	virtual ServiceHandler* createServiceHandler(StreamSocket& rSocket)
 		/// Create and initialize a new ServiceHandler instance.
 		///
 		/// Subclasses can override this method.
 	{
-		std::size_t next = _next++;
+		std::size_t nextReactor = _next++;
 		if (_next == _reactors.size()) _next = 0;
-		_reactors[next]->wakeUp();
-		return new ServiceHandler(socket, *_reactors[next]);
+		_reactors[nextReactor]->wakeUp();
+		return new ServiceHandler(rSocket, *_reactors[nextReactor]);
 	}
 
 	SocketReactor* reactor()

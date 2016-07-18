@@ -35,7 +35,7 @@ using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 
 
-SocketStreamTest::SocketStreamTest(const std::string& name): CppUnit::TestCase(name)
+SocketStreamTest::SocketStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

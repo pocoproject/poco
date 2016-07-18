@@ -65,7 +65,7 @@ namespace
 }
 
 
-TCPServerTest::TCPServerTest(const std::string& name): CppUnit::TestCase(name)
+TCPServerTest::TCPServerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
