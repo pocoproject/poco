@@ -73,7 +73,7 @@ RELEASEOPT_LINK =
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500 -D__BSD_VISIBLE
+SYSFLAGS = -D__BSD_VISIBLE=1 -D__MISC_VISIBLE=1
 
 #
 # System Specific Libraries
