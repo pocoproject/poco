@@ -1,12 +1,14 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.7.4 (2016-08-XX)
+Release 1.7.4 (2016-07-20)
 ==========================
 
 - fixed GH #1300: Session constructor hangs
 - fixed GH #1303: HTTPSClientSession::sendRequest() fails if server has wildcard cert
 - fixed GH #1304: URI doesn't know "ws:/" or "wss://" schemes
 - fixed GH #1307: Upgrade bundled expat to 2.2.0
+- fixed GH #1313: XML library compilation error
+- fixed GH #1316: Empty SocketReactor never sleeps
 - Upgraded bundled SQLite to 3.13.0
 
 
