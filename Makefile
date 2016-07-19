@@ -80,7 +80,7 @@ all: libexecs tests samples
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
 
 COMPONENTS =  CppUnit Foundation XML JSON Util Net Crypto NetSSL_OpenSSL
-COMPONENTS += Data Data/ODBC Data/SQLite Data/MySQL Data/PostgreSQL
+COMPONENTS += FSM Data Data/ODBC Data/SQLite Data/MySQL Data/PostgreSQL
 COMPONENTS += MongoDB Redis Zip PageCompiler PageCompiler/File2Page CppParser PDF
 
 cppunit:
@@ -110,7 +110,7 @@ endif
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec 
-libexecs += Data-libexec  Data/ODBC-libexec Data/SQLite-libexec Data/MySQL-libexec Data/PostgreSQL-libexec
+libexecs += FSM-libexec Data-libexec  Data/ODBC-libexec Data/SQLite-libexec Data/MySQL-libexec Data/PostgreSQL-libexec
 libexecs += MongoDB-libexec Redis-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec
 
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -120,11 +120,11 @@ tests	 += MongoDB-tests Redis-tests Zip-tests CppParser-tests PDF-tests
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 samples  =  Foundation-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples 
-samples  += Data-samples
+samples  += FSM-samples Data-samples
 samples  += MongoDB-samples Zip-samples PageCompiler-samples PDF-samples
 
 # -------------------------------------------------------------------------------------------------------------------------------------
-cleans   =  Foundation-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean 
+cleans   =  Foundation-clean XML-clean JSON-clean FSM-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean 
 cleans   += Data-clean Data/ODBC-clean Data/SQLite-clean Data/MySQL-clean Data/PostgreSQL-clean
 cleans	 += MongoDB-clean Redis-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean PDF-clean
 
@@ -180,6 +180,20 @@ JSON-clean:
 	$(MAKE) -C $(POCO_BASE)/JSON clean
 	$(MAKE) -C $(POCO_BASE)/JSON/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/JSON/samples clean
+
+FSM-libexec:  Foundation-libexec Util-libexec
+	$(MAKE) -C $(POCO_BASE)/FSM
+
+FSM-tests: FSM-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/FSM/testsuite
+	
+FSM-samples: FSM-libexec 
+	$(MAKE) -C $(POCO_BASE)/FSM/samples
+
+FSM-clean:
+	$(MAKE) -C $(POCO_BASE)/FSM clean
+	$(MAKE) -C $(POCO_BASE)/FSM/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/FSM/samples clean
 
 Util-libexec:  Foundation-libexec XML-libexec JSON-libexec
 	$(MAKE) -C $(POCO_BASE)/Util
