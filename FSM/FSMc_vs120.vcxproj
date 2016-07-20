@@ -86,6 +86,7 @@
     <ClCompile Include="src\VariableForCpp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Poco\FSM\statemap.h" />
     <ClInclude Include="src\cpp\ActionForCpp.h" />
     <ClInclude Include="src\cpp\ArgumentForCpp.h" />
     <ClInclude Include="src\cpp\BinaryOperationForCpp.h" />
