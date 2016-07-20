@@ -148,5 +148,38 @@
     <ClInclude Include="src\model\Variable.h">
       <Filter>model</Filter>
     </ClInclude>
+    <ClInclude Include="src\parser\Character.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Comment.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Identifier.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\IndentStream.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Keyword.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Number.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Operator.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Parser.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\String.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Token.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Tokenizer.h">
+      <Filter>parser</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

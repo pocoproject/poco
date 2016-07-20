@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|Win32">
       <Configuration>debug_shared</Configuration>
@@ -111,6 +111,17 @@
     <ClInclude Include="src\model\Transition.h" />
     <ClInclude Include="src\model\UnaryOperation.h" />
     <ClInclude Include="src\model\Variable.h" />
+    <ClInclude Include="src\parser\Character.h" />
+    <ClInclude Include="src\parser\Comment.h" />
+    <ClInclude Include="src\parser\Identifier.h" />
+    <ClInclude Include="src\parser\IndentStream.h" />
+    <ClInclude Include="src\parser\Keyword.h" />
+    <ClInclude Include="src\parser\Number.h" />
+    <ClInclude Include="src\parser\Operator.h" />
+    <ClInclude Include="src\parser\Parser.h" />
+    <ClInclude Include="src\parser\String.h" />
+    <ClInclude Include="src\parser\Token.h" />
+    <ClInclude Include="src\parser\Tokenizer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>FSMc</ProjectName>
@@ -122,32 +133,32 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
