@@ -86,6 +86,26 @@
     <ClCompile Include="src\VariableForCpp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\cpp\ActionForCpp.h" />
+    <ClInclude Include="src\cpp\ArgumentForCpp.h" />
+    <ClInclude Include="src\cpp\BinaryOperationForCpp.h" />
+    <ClInclude Include="src\cpp\CompilableForCpp.h" />
+    <ClInclude Include="src\cpp\ElementForCpp.h" />
+    <ClInclude Include="src\cpp\EntryForCpp.h" />
+    <ClInclude Include="src\cpp\ExitForCpp.h" />
+    <ClInclude Include="src\cpp\ExpressionForCpp.h" />
+    <ClInclude Include="src\cpp\FactoryForCpp.h" />
+    <ClInclude Include="src\cpp\FSMForCpp.h" />
+    <ClInclude Include="src\cpp\FunctionForCpp.h" />
+    <ClInclude Include="src\cpp\GuardForCpp.h" />
+    <ClInclude Include="src\cpp\LiteralForCpp.h" />
+    <ClInclude Include="src\cpp\MapForCpp.h" />
+    <ClInclude Include="src\cpp\ParameterForCpp.h" />
+    <ClInclude Include="src\cpp\ReferenceForCpp.h" />
+    <ClInclude Include="src\cpp\StateForCpp.h" />
+    <ClInclude Include="src\cpp\TransitionForCpp.h" />
+    <ClInclude Include="src\cpp\UnaryOperationForCpp.h" />
+    <ClInclude Include="src\cpp\VariableForCpp.h" />
     <ClInclude Include="src\model\Action.h" />
     <ClInclude Include="src\model\Actions.h" />
     <ClInclude Include="src\model\Argument.h" />
@@ -111,6 +131,17 @@
     <ClInclude Include="src\model\Transition.h" />
     <ClInclude Include="src\model\UnaryOperation.h" />
     <ClInclude Include="src\model\Variable.h" />
+    <ClInclude Include="src\parser\Character.h" />
+    <ClInclude Include="src\parser\Comment.h" />
+    <ClInclude Include="src\parser\Identifier.h" />
+    <ClInclude Include="src\parser\IndentStream.h" />
+    <ClInclude Include="src\parser\Keyword.h" />
+    <ClInclude Include="src\parser\Number.h" />
+    <ClInclude Include="src\parser\Operator.h" />
+    <ClInclude Include="src\parser\Parser.h" />
+    <ClInclude Include="src\parser\String.h" />
+    <ClInclude Include="src\parser\Token.h" />
+    <ClInclude Include="src\parser\Tokenizer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>FSMc</ProjectName>

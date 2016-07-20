@@ -148,5 +148,98 @@
     <ClInclude Include="src\model\Variable.h">
       <Filter>model</Filter>
     </ClInclude>
+    <ClInclude Include="src\parser\Character.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Comment.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Identifier.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\IndentStream.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Keyword.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Number.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Operator.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Parser.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\String.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Token.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Tokenizer.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ActionForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ArgumentForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\BinaryOperationForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\CompilableForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ElementForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\EntryForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ExitForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ExpressionForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\FactoryForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\FSMForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\FunctionForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\GuardForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\LiteralForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\MapForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ParameterForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ReferenceForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\StateForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\TransitionForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\UnaryOperationForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\VariableForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
