@@ -11,6 +11,10 @@ namespace FSM
 {
 namespace MODEL
 {
+	Expression::Expression() : _operation(NULL), _guard(NULL) {
+	}
+	Expression::~Expression() {
+	}
 
 }
 }
