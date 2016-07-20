@@ -1,3 +1,8 @@
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+
 #include "parser/IndentStream.h"
 
 std::ostream& tab(std::ostream& stream)

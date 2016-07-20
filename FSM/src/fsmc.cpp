@@ -1,3 +1,8 @@
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+
 #include <sstream>
 #include <fstream>
 #include <iostream>

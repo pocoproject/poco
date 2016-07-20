@@ -1,9 +1,7 @@
-/*
- * String.cpp
- *
- *  Created on: 3 août 2014
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include "Poco/Ascii.h"
 #include "Poco/StreamTokenizer.h"

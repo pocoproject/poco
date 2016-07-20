@@ -1,9 +1,7 @@
-/*
- * ElementForCpp.h
- *
- *  Created on: 2 févr. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef ELEMENTFORCPP_H_
 #define ELEMENTFORCPP_H_

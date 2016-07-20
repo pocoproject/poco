@@ -1,9 +1,8 @@
-/*
- * Parser.cpp
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+
 #include <iostream>
 #include <sstream>
 #include <cassert>

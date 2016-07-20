@@ -1,9 +1,9 @@
-/*
- * Transition.cpp
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// CodeWriter.cpp
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include <algorithm>
 using std::max;

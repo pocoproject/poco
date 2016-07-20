@@ -1,9 +1,7 @@
-/*
- * Dumper.cpp
- *
- *  Created on: 8 févr. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include "model/Dumper.h"
 

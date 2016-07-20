@@ -1,9 +1,7 @@
-/*
- * Print.cpp
- *
- *  Created on: 22 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include <algorithm>
 using std::max;
