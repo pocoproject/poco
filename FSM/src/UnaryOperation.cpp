@@ -19,7 +19,7 @@ const string UnaryOperation::display() const
     {
         switch (_operator)
         {
-        case Operator::not:
+        case not:
             _asstring += '!';
         }
         _asstring += _operand->display();

@@ -20,7 +20,7 @@ const string UnaryOperationForCpp::display(const string& prefix) const
     string value;
     switch (_operator)
     {
-    case Poco::FSM::MODEL::Operator::not:
+    case Poco::FSM::MODEL::not:
         value += "!";
         break;
     default:

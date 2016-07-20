@@ -14,8 +14,10 @@
 #include "cpp/TransitionForCpp.h"
 #include "parser/IndentStream.h"
 #include "model/FSM.h"
+#include "model/Action.h"
 
 using namespace std;
+using namespace Poco::FSM::MODEL;
 
 namespace Poco
 {
@@ -35,9 +37,10 @@ void StateForCpp::generateForwarDeclaration(ostream& inc, bool debug) const
 }
 void StateForCpp::generateVirtualTransitions(ostream& inc, bool debug) const
 {
-    for (const auto& transition : _transitions)
-    {
-        TransitionForCpp* tfc = dynamic_cast<TransitionForCpp*>(transition);
+	List<TransitionPtr>::const_iterator transition;
+	for (transition = transitions().begin(); transition != transitions().end(); ++transition)
+	{
+        TransitionForCpp* tfc = dynamic_cast<TransitionForCpp*>(*transition);
         if (tfc)
             tfc->generateVirtualTransitions(inc, debug);
     }
@@ -60,9 +63,10 @@ void StateForCpp::generateDefinition(ostream& inc, bool debug) const
     }
     inc << endl;
 
-    for (auto transition : _transitions)
+	List<TransitionPtr>::const_iterator transition;
+	for (transition = transitions().begin(); transition != transitions().end(); ++transition)
     {
-        TransitionForCpp* tfc = dynamic_cast<TransitionForCpp*>(transition);
+        TransitionForCpp* tfc = dynamic_cast<TransitionForCpp*>(*transition);
         if (tfc)
             tfc->generateDefinition(inc, debug);
     }
@@ -85,10 +89,11 @@ void StateForCpp::generateCode(ostream& cpp, bool debug) const
     {
         cpp << "void " << statename() << "::Entry" << "(" << map()->fsm()->context() << "& context) {" << endl;
         cpp << "    " << map()->fsm()->klass() << "& ctxt = context.getOwner();" << endl;
-        for (const auto& action : entry()->actions())
-            if (action)
+		List<ActionPtr>::const_iterator action;
+		for (action = entry()->actions().begin(); action != entry()->actions().end(); ++action)
+			if (*action)
             {
-                ActionForCpp* afc = static_cast<ActionForCpp*>(action);
+                ActionForCpp* afc = static_cast<ActionForCpp*>(*action);
                 cpp << tab << "ctxt." << afc->display() << endl << back;
             }
         cpp << "}" << endl;
@@ -97,17 +102,19 @@ void StateForCpp::generateCode(ostream& cpp, bool debug) const
     {
         cpp << "void " << statename() << "::Exit" << "(" << map()->fsm()->context() << "& context) {" << endl;
         cpp << "    " << map()->fsm()->klass() << "& ctxt = context.getOwner();" << endl;
-        for (const auto& action : exit()->actions())
-            if (action)
+		List<ActionPtr>::const_iterator action;
+		for (action = exit()->actions().begin(); action != exit()->actions().end(); ++action)
+            if (*action)
             {
-                ActionForCpp* afc = static_cast<ActionForCpp*>(action);
+                ActionForCpp* afc = static_cast<ActionForCpp*>(*action);
                 cpp << tab << "ctxt." << afc->display() << endl << back;
             }
         cpp << "}" << endl;
     }
-    for (const auto& transition : _transitions)
-    {
-        TransitionForCpp* tfc = dynamic_cast<TransitionForCpp*>(transition);
+	List<TransitionPtr>::const_iterator transition;
+	for (transition = _transitions.begin(); transition !=_transitions.end(); ++transition)
+	{
+        TransitionForCpp* tfc = dynamic_cast<TransitionForCpp*>(*transition);
         if (tfc)
             tfc->generateCode(cpp, debug);
     }

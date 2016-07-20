@@ -22,7 +22,8 @@ namespace FSM
 {
 namespace MODEL
 {
-Transition::Transition(const string& name, int lineno) : Element(name, lineno)
+Transition::Transition(const string& name, int lineno) : 
+	Element(name, lineno), _begstate(NULL)
 {
 }
 Transition::~Transition()
@@ -35,9 +36,10 @@ bool parameterEqual(const Parameter* left, const Parameter* right)
 }
 bool Transition::hasParameter(const string& name) const
 {
-    for (const auto& parameter : _parameters)
+	List<ParameterPtr>::const_iterator parameter;
+	for (parameter =_parameters.begin(); parameter != _parameters.end(); ++parameter)
     {
-        if (parameter->Element::name() == name)
+        if ((*parameter)->Element::name() == name)
             return true;
     }
     return false;
@@ -46,7 +48,7 @@ string Transition::declaration(const Parameter* added) const
 {
     string declaration(name());
     declaration += '(';
-    if (added != nullptr)
+    if (added != NULL)
     {
         declaration += added->type();
         declaration += ' ';
@@ -72,7 +74,7 @@ string Transition::call(const char* c) const
 {
     string embed(name());
     embed += '(';
-    if (c != nullptr)
+    if (c != NULL)
     {
         embed += c;
         if (!parameters().empty())
@@ -125,9 +127,10 @@ const string Transition::display() const
         string parameters;
         if (!_parameters.empty())
             parameters += '(';
-        for (auto parameter : _parameters)
+		List<ParameterPtr>::const_iterator parameter;
+		for (parameter =_parameters.begin(); parameter != _parameters.end(); ++parameter)
         {
-            parameters += parameter->display();
+            parameters += (*parameter)->display();
         }
         if (!_parameters.empty())
             parameters += ')';
@@ -143,10 +146,11 @@ const string Transition::display() const
 }
 void Transition::print(Print& print) const
 {
-    for (auto  guard : guards())
+    List<GuardPtr>::const_iterator guard;
+	for (guard = guards().begin(); guard != guards().end(); ++guard)
     {
         const TransitionPtr transitionptr = const_cast<TransitionPtr>(this);
-        const GuardPtr guardptr = guard;
+        const GuardPtr guardptr = *guard;
         print(transitionptr, guardptr);
     }
 }

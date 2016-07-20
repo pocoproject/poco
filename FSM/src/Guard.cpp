@@ -19,12 +19,24 @@ namespace FSM
 {
 namespace MODEL
 {
+Guard::Guard(const string& name, int lineno) : 
+	Element(name, lineno),
+	_transition(NULL),
+	_condition(NULL),
+	_endstate(NULL),
+	_pushState(NULL),
+	_popArgs(NULL)
+{
+}
+Guard::~Guard() {
+}
+
 const string Guard::display() const
 {
     if (oneline.empty())
     {
         string guards;
-        if (_condition != nullptr)
+        if (_condition != NULL)
         {
             guards += '[';
             guards += _condition->display();
@@ -42,9 +54,10 @@ const string Guard::display() const
 
         string actions;
         actions += '{';
-        for (auto action : _actions)
-        {
-            actions += action->display();
+		List<ActionPtr>::const_iterator action;
+		for (action = _actions.begin(); action != _actions.end(); ++action)
+		{
+            actions += (*action)->display();
         }
         actions += '}';
 

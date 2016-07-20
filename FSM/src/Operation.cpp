@@ -22,7 +22,7 @@ Operation:: ~Operation()
 }
 void Operation::setNoContextuel()
 {
-    if (_operator == Operator::equal || _operator == Operator::notequal)
+    if (_operator == equal || _operator == notequal)
     {
         _contextuel = false;
     }

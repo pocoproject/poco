@@ -13,7 +13,7 @@
 namespace Poco {
 	namespace FSM {
 		namespace MODEL {
-			enum class Operator {
+			enum Operator {
 				none,
 				and,
 				or,
@@ -24,9 +24,9 @@ namespace Poco {
 			};
 			class Operation : public virtual Expression {
 			protected:
-				bool _contextuel = true;
+				Operation() : _contextuel(true) {}
 
-			protected:
+				bool _contextuel;
 				Operator		_operator;
 
 			public:

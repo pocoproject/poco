@@ -8,7 +8,7 @@
 
 include $(POCO_BASE)/build/rules/global
 INCLUDE 	+= -Isrc 
-CXXFLAGS 	+= -std=c++11 -fno-operator-names
+CXXFLAGS 	+= -fno-operator-names
 
 objects = \
 Action \

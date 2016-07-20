@@ -37,9 +37,10 @@ void Print::operator()(const TransitionPtr transition, const GuardPtr guard)
     string parameters;
     if (!transition->parameters().empty())
         parameters += '(';
-    for (auto parameter : transition->parameters())
+	List<ParameterPtr>::const_iterator parameter;
+	for (parameter = transition->parameters().begin(); parameter != transition->parameters().end(); ++parameter)
     {
-        parameters += parameter->display();
+        parameters += (*parameter)->display();
     }
     if (!transition->parameters().empty())
         parameters += ')';

@@ -120,16 +120,16 @@ namespace Poco {
 				string		_doc;
 				string		_attrs;
 
-				FSMPtr			fsm = nullptr;
-				StatePtr		state= nullptr;
-				GuardPtr		guard= nullptr;
-				MapPtr			map= nullptr;
-				ActionPtr		action= nullptr;
-				TransitionPtr	transition= nullptr;
-				ParameterPtr	parameter= nullptr;
+				FSMPtr			fsm;
+				StatePtr		state;
+				GuardPtr		guard;
+				MapPtr			map;
+				ActionPtr		action;
+				TransitionPtr	transition;
+				ParameterPtr	parameter;
 				List<ParameterPtr> parameters;
-				EntryPtr		entry = nullptr;
-				ExitPtr			exit = nullptr;
+				EntryPtr		entry;
+				ExitPtr			exit;
 
 				Logger&					_logger;
 				stack<ExpressionPtr>	_stack;

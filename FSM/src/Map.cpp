@@ -14,6 +14,11 @@ namespace FSM
 {
 namespace MODEL
 {
+Map::Map(const string& name, int lineno) : 
+	Element(name, lineno), _fsm(NULL), _defaultState(NULL) {
+}
+Map::~Map() {
+}
 void Map::add(TransitionPtr transition)
 {
     if (transition->name() != "Default")
@@ -28,7 +33,7 @@ void Map::add(StatePtr state)
 
 StatePtr Map::lookfor(const string& state) const
 {
-    StatePtr result = nullptr;
+    StatePtr result = NULL;
     try
     {
         result = _states.at(state);
@@ -40,9 +45,10 @@ StatePtr Map::lookfor(const string& state) const
 }
 void Map::print(Print& print) const
 {
-    for (const auto& state : states())
+	map<string, StatePtr>::const_iterator state;
+	for (state = states().begin(); state != states().end(); ++state)
     {
-        state.second->print(print);
+        state->second->print(print);
     }
 }
 const string Map::display() const

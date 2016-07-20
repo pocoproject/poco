@@ -27,9 +27,10 @@ void Entry::print(Print& print) const
 {
     string line;
     line += "Entry\t{";
+	List<ActionPtr>::const_iterator ci;
 
-    for (const auto& action : actions())
-        line += action->display();
+	for (ci = actions().begin(); ci !=actions().end(); ++ci)
+		line += (*ci)->display();
 
     line += '}';
     print(line);

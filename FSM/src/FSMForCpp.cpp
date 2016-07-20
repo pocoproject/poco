@@ -30,14 +30,16 @@ namespace CPP
 {
 void FSMForCpp::openNamespaces(IndentStream& os) const
 {
-    for (const auto& package : packages())
-        if (!package.empty())
-            os << "namespace " << package << " {" << endl << tab;
+	List<string>::const_iterator package;
+	for (package = packages().begin(); package != packages().end(); ++package)
+        if (!package->empty())
+            os << "namespace " << *package << " {" << endl << tab;
 }
 void FSMForCpp::closeNamespaces(IndentStream& os) const
 {
-    for (const auto& package : packages())
-        if (!package.empty())
+	List<string>::const_iterator package;
+	for (package = packages().begin(); package != packages().end(); ++package)
+		if (!package->empty())
             os << back << '}' << endl;
 }
 void FSMForCpp::generate(const Path& out, bool debug) const
@@ -47,9 +49,10 @@ void FSMForCpp::generate(const Path& out, bool debug) const
         FileOutputStream incfos(incPath.toString());
         IndentStream inc(incfos);
         string define;
-        for (const auto& ns : packages())
+		List<string>::const_iterator ns;
+		for (ns = packages().begin(); ns != packages().end(); ++ns)
         {
-            define += ns;
+            define += *ns;
             define += "_";
         }
         define += fsmfile();
@@ -60,9 +63,10 @@ void FSMForCpp::generate(const Path& out, bool debug) const
 
         openNamespaces(inc);
 
-        for (auto map : _maps)
+		List<MapPtr>::const_iterator map;
+		for (map = _maps.begin(); map != _maps.end(); ++map)
         {
-            dynamic_cast<MapForCpp*>(map)->generateInclude(inc, debug);
+            dynamic_cast<MapForCpp*>(*map)->generateInclude(inc, debug);
         }
         closeNamespaces(inc);
         inc << "#endif" << endl;
@@ -72,9 +76,10 @@ void FSMForCpp::generate(const Path& out, bool debug) const
         FileOutputStream cppfos(cppPath.toString());
         IndentStream cpp(cppfos);
 
-        for (const auto& include : includes())
-            if (!include.empty())
-                cpp << "#include \"" << include << "\"" << endl;
+		List<string>::const_iterator include;
+		for (include = includes().begin(); include != includes().end(); ++include)
+            if (!include->empty())
+                cpp << "#include \"" << *include << "\"" << endl;
 
         if (!header().empty())
             cpp << "#include \"" << header() << "\"" << endl;
@@ -84,9 +89,10 @@ void FSMForCpp::generate(const Path& out, bool debug) const
         cpp << "using namespace statemap;" << endl;
 
         openNamespaces(cpp);
-        for (const auto& map : _maps)
-        {
-            dynamic_cast<MapForCpp*>(map)->generateCode(cpp, debug);
+		List<MapPtr>::const_iterator map;
+		for (map = _maps.begin(); map != _maps.end(); ++map)
+		{
+			dynamic_cast<MapForCpp*>(*map)->generateCode(cpp, debug);
         }
         closeNamespaces(cpp);
     }

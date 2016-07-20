@@ -29,10 +29,8 @@ namespace Poco {
 
 			class FSM  : public Compilable {
 			public:
-				FSM(PARSER::Parser* parser) : Compilable(), _parser(parser) {
-				}
-				virtual ~FSM() {
-				}
+				FSM(PARSER::Parser* parser);
+				virtual ~FSM();
 
 
 				void    setcontext()					{ _context = _fsmClass + "<" + _klass + ">"; }
@@ -74,7 +72,7 @@ namespace Poco {
 				virtual bool updated(const Path& out) = 0;
 
 			protected:
-				Parser*		_parser = nullptr;
+				Parser*		_parser;
 
 				// The state map's initial state.
 				string _startState;
@@ -122,7 +120,7 @@ namespace Poco {
 
 				string _return;
 
-				bool _updated = false;
+				bool _updated;
 
 			};
 
