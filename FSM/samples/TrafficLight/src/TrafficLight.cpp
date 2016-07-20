@@ -39,6 +39,14 @@ class TrafficLight : public Application {
 	/// option (/help on Windows, --help on Unix) for
 	/// the available command line options.
 	///
+  public:
+  	TrafficLight() :
+		KeepGoing(1),
+		YellowTimer(2),    // Yellow lights last 2 seconds.
+		NSGreenTimer(8),    // North-south green lasts 8 seconds.
+		EWGreenTimer(5),    // East-west green lasts 5 seconds.
+		help(false) { }
+
   protected:
 	void initialize(Application& self) {
 		loadConfiguration(); // load default configuration files, if present
@@ -83,12 +91,12 @@ class TrafficLight : public Application {
 		return Application::EXIT_OK;
 	}
   private:
-	int KeepGoing = 1;
+	int KeepGoing;
 
-	int YellowTimer = 2;    // Yellow lights last 2 seconds.
-	int NSGreenTimer = 8;    // North-south green lasts 8 seconds.
-	int EWGreenTimer = 5;    // East-west green lasts 5 seconds.
-	bool help = false;
+	int YellowTimer;
+	int NSGreenTimer;
+	int EWGreenTimer;
+	bool help;
 };
 
 POCO_APP_MAIN(TrafficLight)

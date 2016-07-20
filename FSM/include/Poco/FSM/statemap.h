@@ -81,9 +81,9 @@ inline char* copyString(const char *s) {
 }
 #else
 inline char* copyString(const char *s) {
-	char *retval = nullptr;
+	char *retval = NULL;
 
-	if (s != nullptr) {
+	if (s != NULL) {
 		retval = new char[MAX_NAME_LEN + 1];
 		retval[MAX_NAME_LEN] = '\0';
 		(void) std::strncpy(retval, s, MAX_NAME_LEN);
@@ -188,8 +188,8 @@ class TransitionUndefinedException :
 	// Default constructor.
 	TransitionUndefinedException()
 		: SmcException("no such transition in current state"),
-		  _state(nullptr),
-		  _transition(nullptr) {
+		  _state(NULL),
+		  _transition(NULL) {
 	};
 
 	// Construct an exception using the specified state
@@ -210,14 +210,14 @@ class TransitionUndefinedException :
 	};
 
 	virtual ~TransitionUndefinedException() throw() {
-		if (_state != nullptr) {
+		if (_state != NULL) {
 			delete[] _state;
-			_state = nullptr;
+			_state = NULL;
 		}
 
-		if (_transition != nullptr) {
+		if (_transition != NULL) {
 			delete[] _transition;
-			_transition = nullptr;
+			_transition = NULL;
 		}
 	};
 
@@ -225,14 +225,14 @@ class TransitionUndefinedException :
 	operator=(const TransitionUndefinedException& ex) {
 		// Don't do self assignment.
 		if (this != &ex) {
-			if (_state != nullptr) {
+			if (_state != NULL) {
 				delete[] _state;
-				_state = nullptr;
+				_state = NULL;
 			}
 
-			if (_transition != nullptr) {
+			if (_transition != NULL) {
 				delete[] _transition;
-				_transition = nullptr;
+				_transition = NULL;
 			}
 
 			_state = copyString(ex._state);
@@ -242,12 +242,12 @@ class TransitionUndefinedException :
 		return (*this);
 	};
 
-	// Returns the state. May be nullptr.
+	// Returns the state. May be NULL.
 	const char* getState() const {
 		return(_state);
 	};
 
-	// Returns the transition. May be nullptr.
+	// Returns the transition. May be NULL.
 	const char* getTransition() const {
 		return (_transition);
 	};
@@ -340,14 +340,15 @@ public:
 		return (_stateId);
 	}
 
-protected:
-	  State() = delete;
-	  State(const State&) = delete;
+private:
+	  State() { }
+	  State(const State&) { }
 
+protected:
 	State(const char *name, int stateId)
-		: _name(nullptr),
+		: _name(NULL),
 		  _stateId(stateId) {
-		if (name != nullptr) {
+		if (name != NULL) {
 			_name = copyString(name);
 		} else {
 			_name = copyString("NAME NOT SET");
@@ -356,9 +357,9 @@ protected:
 
 	virtual ~State() {
 #ifndef SMC_FIXED_STACK
-		if (_name != nullptr) {
+		if (_name != NULL) {
 			delete[] _name;
-			_name = nullptr;
+			_name = NULL;
 		}
 #endif
 	};
@@ -372,7 +373,7 @@ protected:
   private:
 };
 
-enum class Event {
+enum Event {
 	Enter,
 	Leave,
 	Switch,
@@ -397,8 +398,8 @@ class FSMContext {
 		};
 
 		~StateEntry() {
-			_state = nullptr;
-			_next = nullptr;
+			_state = NULL;
+			_next = NULL;
 		};
 
 		State* getState() {
@@ -424,17 +425,17 @@ class FSMContext {
 
 	virtual ~FSMContext() {
 #ifdef SMC_FIXED_STACK
-		_transition = nullptr;
+		_transition = NULL;
 #else // ! SMC_FIXED_STACK
 		StateEntry *state;
 
-		if (_transition != nullptr) {
+		if (_transition != NULL) {
 			delete[] _transition;
-			_transition = nullptr;
+			_transition = NULL;
 		}
 
 		// But we did allocate the state stack.
-		while (_state_stack != nullptr) {
+		while (_state_stack != NULL) {
 			state = _state_stack;
 			_state_stack = _state_stack->_next;
 			delete state;
@@ -472,7 +473,7 @@ class FSMContext {
 	// Is this state machine already inside a transition?
 	// Yes if state is null.
 	bool isInTransition() const {
-		return(_state == nullptr ? true : false);
+		return(_state == NULL ? true : false);
 	};
 
 	// Returns the current transition's name.
@@ -485,15 +486,15 @@ class FSMContext {
 	// is turned on.
 	void setTransition(const char *transition) {
 #ifndef SMC_FIXED_STACK
-		if (_transition != nullptr) {
+		if (_transition != NULL) {
 			delete[] _transition;
-			_transition = nullptr;
+			_transition = NULL;
 		}
 #endif // ! SMC_FIXED_STACK
 
 		_transition = copyString(transition);
 		if (getDebugFlag() && transition)
-			_notify(Event::Transition, transition);
+			_notify(Transition, transition);
 
 		return;
 	};
@@ -501,11 +502,11 @@ class FSMContext {
 	// Clears the current state.
 	void clearState() {
 		_previous_state = _state;
-		_state = nullptr;
+		_state = NULL;
 	};
 
 	// Returns the state which a transition left.
-	// May be nullptr.
+	// May be NULL.
 	State* getPreviousState() {
 		return (_previous_state);
 	}
@@ -516,9 +517,9 @@ class FSMContext {
 		// no actions, so set _previous_state to _state in
 		// that situation. We know clearState() was not
 		// called when _state is not null.
-		if (_state != nullptr) {
+		if (_state != NULL) {
 			if (_debug_flag) {
-				_notify(Event::Leave, _state);
+				_notify(Leave, _state);
 			}
 			_previous_state = _state;
 		}
@@ -526,7 +527,7 @@ class FSMContext {
 		_state = const_cast<State *>(&state);
 
 		if (_debug_flag) {
-			_notify(Event::Switch, _previous_state, _state);
+			_notify(Switch, _previous_state, _state);
 		}
 	};
 
@@ -555,7 +556,7 @@ class FSMContext {
 
 		// Do the push only if there is a state to be pushed
 		// on the stack.
-		if (_state != nullptr) {
+		if (_state != NULL) {
 			_state_stack[_state_stack_depth] = _state;
 			++_state_stack_depth;
 		}
@@ -564,7 +565,7 @@ class FSMContext {
 		_state = const_cast<State *>(&state);
 
 		if (_debug_flag == true) {
-			_notify(Event::PUSH_STATE, _state);
+			_notify(PUSH_STATE, _state);
 		}
 	};
 
@@ -585,7 +586,7 @@ class FSMContext {
 		_state = _state_stack[_state_stack_depth];
 
 		if (_debug_flag == true) {
-			_notify(Event::POP, _state);
+			_notify(POP, _state);
 		}
 	};
 
@@ -597,7 +598,7 @@ class FSMContext {
 	// Returns true if the state stack is empty and false
 	// otherwise.
 	bool isStateStackEmpty() const {
-		return (_state_stack == nullptr);
+		return (_state_stack == NULL);
 	}
 
 	// Returns the state stack's depth.
@@ -606,7 +607,7 @@ class FSMContext {
 		int retval;
 
 		for (state_ptr = _state_stack, retval = 0;
-				state_ptr != nullptr;
+				state_ptr != NULL;
 				state_ptr = state_ptr->getNext(), ++retval)
 			;
 
@@ -620,7 +621,7 @@ class FSMContext {
 
 		// Do the push only if there is a state to be pushed
 		// on the stack.
-		if (_state != nullptr) {
+		if (_state != NULL) {
 			new_entry = new StateEntry(_state, _state_stack);
 			_state_stack = new_entry;
 		}
@@ -629,7 +630,7 @@ class FSMContext {
 		_state = const_cast<State *>(&state);
 
 		if (_debug_flag == true) {
-			_notify(Event::Push, _state);
+			_notify(Push, _state);
 		}
 	};
 
@@ -640,9 +641,9 @@ class FSMContext {
 
 		// Popping when there was no previous push is an error.
 #ifdef SMC_NO_EXCEPTIONS
-		poco_assert(_state_stack != nullptr);
+		poco_assert(_state_stack != NULL);
 #else
-		if (_state_stack == nullptr) {
+		if (_state_stack == NULL) {
 			throw PopOnEmptyStateStackException();
 		}
 #endif // SMC_NO_EXCEPTIONS
@@ -654,7 +655,7 @@ class FSMContext {
 		delete entry;
 
 		if (_debug_flag == true) {
-			_notify(Event::Pop, _state);
+			_notify(Pop, _state);
 		}
 	};
 
@@ -662,26 +663,28 @@ class FSMContext {
 	void emptyStateStack() {
 		StateEntry *state_ptr,  *next_ptr;
 
-		for (state_ptr = _state_stack; state_ptr != nullptr; state_ptr = next_ptr) {
+		for (state_ptr = _state_stack; state_ptr != NULL; state_ptr = next_ptr) {
 			next_ptr = state_ptr->getNext();
 			delete state_ptr;
 		}
-		_state_stack = nullptr;
+		_state_stack = NULL;
 	};
 #endif
 
+  private:
+	  FSMContext(const FSMContext&);
+
   protected:
-	  FSMContext(const FSMContext&) = delete;
 	// Default constructor.
 	FSMContext(Notifier& notifier, const State& state)
 		: _state(const_cast<State *>(&state)),
-		  _previous_state(nullptr),
+		  _previous_state(NULL),
 #ifdef SMC_FIXED_STACK
 		  _state_stack_depth(0),
 #else
-		  _state_stack(nullptr),
+		  _state_stack(NULL),
 #endif
-		  _transition(nullptr),
+		  _transition(NULL),
 		  _debug_flag(false),
 		  _notify(notifier)
 	{};
