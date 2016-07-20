@@ -128,12 +128,12 @@ install:
         } else {
             choco install jom
         }
+      }
 #        if (Test-Path "$env:ChocolateyInstall\bin\cmake.exe") {
 #          echo "using cmake from cache"
 #        } else {
 #          choco install cmake
 #        }
-      }
   - set
 
 # -------------------------------------------------------------------------------------------
