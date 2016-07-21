@@ -3,6 +3,7 @@
 // and Contributors.
 //
 
+#include <stdexcept>
 #include "model/Map.h"
 #include "model/Transition.h"
 
@@ -36,7 +37,7 @@ StatePtr Map::lookfor(const string& state) const
     {
         result = _states.at(state);
     }
-    catch (std::out_of_range oor)
+    catch (std::out_of_range& oor)
     {
     }
     return result;
