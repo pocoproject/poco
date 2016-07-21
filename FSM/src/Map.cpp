@@ -36,7 +36,7 @@ StatePtr Map::lookfor(const string& state) const
     {
         result = _states.at(state);
     }
-    catch (const std::out_of_range&)
+    catch (std::out_of_range oor)
     {
     }
     return result;
