@@ -39,7 +39,7 @@ using Poco::TimerCallback;
 #include "stoplight_sm.h"
 
 namespace cpp_ex4 {
-	class Stoplight : protected StoplightContext<Stoplight> {
+	class Stoplight : public StoplightContext<Stoplight> {
 		// Member data.
 	public:
 		static int YellowTimer;
