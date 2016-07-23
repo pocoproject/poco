@@ -34,7 +34,7 @@
   <ItemGroup>
     <ClInclude Include="src\stoplight.h" />
     <ClInclude Include="src\stoplightdefs.h" />
-    <ClInclude Include="src\stoplight_sm.h" />
+    <ClInclude Include="src\Stoplight_sm.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>TrafficLight</ProjectName>
