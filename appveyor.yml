@@ -145,6 +145,9 @@ install:
       {
         $env:PATH = $env:ChocolateyInstall + "\bin;" + $env:PATH
         $env:PATH = $env:ChocolateyInstall + "\lib\jom\content;" + $env:PATH
+        $env:PATH = "C:\Program Files (x86)\cmake\bin;" + $env:PATH
+        $env:PATH = "C:\Program Files (x86)\ctest\bin;" + $env:PATH
+        
       }
 # -------------------------------------------------------------------------------------------
 
