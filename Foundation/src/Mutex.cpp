@@ -17,7 +17,7 @@
 #include "Poco/Mutex.h"
 
 
-#if defined(POCO_ENABLE_CPP11)
+#if defined(POCO_ENABLE_CPP11) && (POCO_OS != POCO_OS_CYGWIN)
 #include "Mutex_STD.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
