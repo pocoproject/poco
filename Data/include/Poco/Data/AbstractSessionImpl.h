@@ -52,8 +52,8 @@ public:
 	typedef Poco::Any (C::*PropertyGetter)(const std::string&);
 		/// The getter method for a property.
 
-	AbstractSessionImpl(const std::string& connectionString,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT): SessionImpl(connectionString, timeout),
+	AbstractSessionImpl(const std::string& rConnectionString,
+		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT): SessionImpl(rConnectionString, timeout),
 			_storage(std::string("deque")),
 			_bulk(false),
 			_emptyStringIsNull(false),

@@ -11,8 +11,8 @@
 
 
 #include "IPAddressTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Net/NetException.h"
 
@@ -21,7 +21,7 @@ using Poco::Net::IPAddress;
 using Poco::Net::InvalidAddressException;
 
 
-IPAddressTest::IPAddressTest(const std::string& name): CppUnit::TestCase(name)
+IPAddressTest::IPAddressTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

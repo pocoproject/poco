@@ -11,8 +11,8 @@
 
 
 #include "UUIDTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/UUID.h"
 #include "Poco/Exception.h"
 
@@ -20,7 +20,7 @@
 using Poco::UUID;
 
 
-UUIDTest::UUIDTest(const std::string& name): CppUnit::TestCase(name)
+UUIDTest::UUIDTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -11,8 +11,8 @@
 
 
 #include "LRUCacheTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/LRUCache.h"
 #include "Poco/Bugcheck.h"
@@ -22,7 +22,7 @@
 using namespace Poco;
 
 
-LRUCacheTest::LRUCacheTest(const std::string& name): CppUnit::TestCase(name)
+LRUCacheTest::LRUCacheTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

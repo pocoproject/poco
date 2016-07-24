@@ -72,12 +72,19 @@ const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 	bool isDepthLimitReached = isFiniteDepth() && _depthDeterminer(*itStack) >= _maxDepth;
 	if (!isDepthLimitReached && isDirectory(*itStack->top()))
 	{
-		DirectoryIterator child_it(itStack->top().path());
-		// check if directory is empty
-		if (child_it != _itEnd)
+		// check the dir is iterable
+		try
 		{
-			itStack->push(child_it);
-			return child_it->path();
+			DirectoryIterator child_it(itStack->top().path());
+			// check if directory is empty
+			if (child_it != _itEnd)
+			{
+				itStack->push(child_it);
+				return child_it->path();
+			}
+		}
+		catch (...)
+		{
 		}
 	}
 
@@ -140,7 +147,17 @@ const std::string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 		{
 			std::string dir = _dirsStack.top().front();
 			_dirsStack.top().pop();
-			DirectoryIterator child_it(dir);
+			DirectoryIterator child_it;
+			
+			// check the dir is iterable
+			try
+			{
+				child_it = dir;
+			}
+			catch (...)
+			{
+				continue;
+			}
 
 			// check if directory is empty
 			if (child_it != _itEnd)

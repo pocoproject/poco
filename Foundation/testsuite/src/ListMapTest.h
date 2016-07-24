@@ -17,7 +17,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class ListMapTest: public CppUnit::TestCase
@@ -27,6 +27,7 @@ public:
 	~ListMapTest();
 
 	void testInsert();
+	void testInsertOrder();
 	void testErase();
 	void testIterator();
 	void testConstIterator();

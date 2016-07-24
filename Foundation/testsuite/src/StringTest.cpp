@@ -11,8 +11,8 @@
 
 
 #include "StringTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/String.h"
 #include "Poco/JSONString.h"
 #include "Poco/Format.h"
@@ -47,6 +47,8 @@ using Poco::replaceInPlace;
 using Poco::remove;
 using Poco::removeInPlace;
 using Poco::cat;
+using Poco::startsWith;
+using Poco::endsWith;
 using Poco::strToInt;
 using Poco::strToFloat;
 using Poco::strToDouble;
@@ -64,7 +66,7 @@ using Poco::Stopwatch;
 using Poco::RangeException;
 
 
-StringTest::StringTest(const std::string& name): CppUnit::TestCase(name)
+StringTest::StringTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -80,8 +82,8 @@ void StringTest::testTrimLeft()
 		std::string s = "abc";
 		assert (trimLeft(s) == "abc");
 	}
-		std::string s = " abc ";
-		assert (trimLeft(s) == "abc ");
+		std::string s2 = " abc ";
+		assert (trimLeft(s2) == "abc ");
 	{
 	std::string s = "  ab c ";
 	assert (trimLeft(s) == "ab c ");
@@ -435,6 +437,55 @@ void StringTest::testCat()
 }
 
 
+void StringTest::testStartsWith()
+{
+	std::string s1("o");
+
+	assert (startsWith(s1, std::string("o")));
+	assert (startsWith(s1, std::string("")));
+
+	assert (!startsWith(s1, std::string("O")));
+	assert (!startsWith(s1, std::string("1")));
+
+	std::string s2("");
+
+	assert (startsWith(s2, std::string("")));
+
+	assert (!startsWith(s2, std::string("o")));
+
+	std::string s3("oO");
+
+	assert (startsWith(s3, std::string("o")));
+
+	assert (!startsWith(s3, std::string(" o")));
+}
+
+
+void StringTest::testEndsWith()
+{
+	std::string s1("o");
+
+	assert (endsWith(s1, std::string("o")));
+	assert (endsWith(s1, std::string("")));
+
+	assert (!endsWith(s1, std::string("O")));
+	assert (!endsWith(s1, std::string("1")));
+
+
+	std::string s2("");
+
+	assert (endsWith(s2, std::string("")));
+
+	assert (!endsWith(s2, std::string("o")));
+
+	std::string s3("Oo");
+
+	assert (endsWith(s3, std::string("o")));
+
+	assert (!endsWith(s3, std::string("o ")));	
+}
+
+
 void StringTest::testStringToInt()
 {
 //gcc on Mac emits warnings that cannot be suppressed
@@ -686,6 +737,30 @@ void StringTest::testStringToDouble()
 }
 
 
+void StringTest::testNumericStringPadding()
+{
+	std::string str;
+	assert (floatToStr(str, 0.999f, 2, 4) == "1.00");
+	assert (floatToStr(str, 0.945f, 2, 4) == "0.95");
+	assert (floatToStr(str, 0.944f, 2, 4) == "0.94");
+	assert (floatToStr(str, 12.45f, 2, 5) == "12.45");
+	assert (floatToStr(str, 12.45f, 1, 4) == "12.5");
+	assert (floatToStr(str, 12.45f, 2, 6) == " 12.45");
+	assert (floatToStr(str, 12.455f, 3, 7) == " 12.455");
+	assert (floatToStr(str, 12.455f, 2, 6) == " 12.46");
+	assert (floatToStr(str, 1.23556E-16f, 2, 6) == "1.24e-16");
+
+	assert (doubleToStr(str, 0.999, 2, 4) == "1.00");
+	assert (doubleToStr(str, 0.945, 2, 4) == "0.95");
+	assert (doubleToStr(str, 0.944, 2, 4) == "0.94");
+	assert (doubleToStr(str, 12.45, 2, 5) == "12.45");
+	assert (doubleToStr(str, 12.45, 1, 4) == "12.5");
+	assert (doubleToStr(str, 12.45, 2, 6) == " 12.45");
+	assert (doubleToStr(str, 12.455, 3, 7) == " 12.455");
+	assert (doubleToStr(str, 12.455, 2, 6) == " 12.46");	
+	assert (doubleToStr(str, 1.23556E-16, 2, 6) == "1.24e-16");
+}
+
 void StringTest::testStringToFloatError()
 {
 	char ds = decimalSeparator();
@@ -930,7 +1005,6 @@ void StringTest::testIntToString()
 	assert (result == "11110000111100001111000011110000");
 #if defined(POCO_HAVE_INT64)
 	assert (uIntToStr(0xFFFFFFFFFFFFFFFF, 2, result));
-	std::cout << 0xFFFFFFFFFFFFFFFF << std::endl;
 	assert (result == "1111111111111111111111111111111111111111111111111111111111111111");
 	assert (uIntToStr(0xFF00000FF00000FF, 2, result));
 	assert (result == "1111111100000000000000000000111111110000000000000000000011111111");
@@ -1164,9 +1238,12 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testReplace);
 	CppUnit_addTest(pSuite, StringTest, testReplaceInPlace);
 	CppUnit_addTest(pSuite, StringTest, testCat);
+	CppUnit_addTest(pSuite, StringTest, testStartsWith);
+	CppUnit_addTest(pSuite, StringTest, testEndsWith);
 	CppUnit_addTest(pSuite, StringTest, testStringToInt);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloat);
 	CppUnit_addTest(pSuite, StringTest, testStringToDouble);
+	CppUnit_addTest(pSuite, StringTest, testNumericStringPadding);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloatError);
 	CppUnit_addTest(pSuite, StringTest, testNumericLocale);
 	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);

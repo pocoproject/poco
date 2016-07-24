@@ -17,7 +17,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class StreamTokenizerTest: public CppUnit::TestCase
@@ -33,6 +33,8 @@ public:
 	void testTokenizer5();
 	void testTokenizer6();
 	void testTokenizer7();
+	void testTokenizer8();
+	void testTokenizer9();
 
 	void setUp();
 	void tearDown();

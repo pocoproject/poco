@@ -73,6 +73,9 @@ public:
 			///   - do not write an XML declaration
 			///   - do not use special empty element syntax
 			///   - set the New Line character to NEWLINE_LF
+			///   - write namespace declarations and attributes 
+			///     in canonical order
+			///   - use default namespace as much as possible
 
 		WRITE_XML_DECLARATION   = 0x02, 
 			/// Write an XML declaration.
@@ -279,8 +282,10 @@ public:
 
 protected:
 	typedef std::map<XMLString, XMLString> AttributeMap;
+	typedef std::map<XMLString, std::pair<XMLString, XMLString> > CanonicalAttributeMap;
 
 	void writeStartElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes);
+	void writeCanonicalStartElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes);
 	void writeEndElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname);
 	void writeMarkup(const std::string& str) const;
 	void writeXML(const XMLString& str) const;
@@ -291,10 +296,14 @@ protected:
 	void writeName(const XMLString& prefix, const XMLString& localName);
 	void writeXMLDeclaration();
 	void closeStartTag();
+	void declareNamespaces(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes);
 	void declareAttributeNamespaces(const Attributes& attributes);
 	void addNamespaceAttributes(AttributeMap& attributeMap);
+	void addNamespaceAttributes(CanonicalAttributeMap& attributeMap);
 	void addAttributes(AttributeMap& attributeMap, const Attributes& attributes, const XMLString& elementNamespaceURI);
+	void addAttributes(CanonicalAttributeMap& attributeMap, const Attributes& attributes, const XMLString& elementNamespaceURI);
 	void writeAttributes(const AttributeMap& attributeMap);
+	void writeAttributes(const CanonicalAttributeMap& attributeMap);
 	void prettyPrint() const;
 	static std::string nameToString(const XMLString& localName, const XMLString& qname);
 

@@ -11,8 +11,8 @@
 
 
 #include "POP3ClientSessionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "DialogServer.h"
 #include "Poco/Net/POP3ClientSession.h"
 #include "Poco/Net/MailMessage.h"
@@ -25,7 +25,7 @@ using Poco::Net::MailMessage;
 using Poco::Net::POP3Exception;
 
 
-POP3ClientSessionTest::POP3ClientSessionTest(const std::string& name): CppUnit::TestCase(name)
+POP3ClientSessionTest::POP3ClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

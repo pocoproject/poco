@@ -11,8 +11,8 @@
 #include <iostream>
 
 #include "StringTokenizerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Exception.h"
 
@@ -22,7 +22,7 @@ using Poco::RangeException;
 using Poco::NotFoundException;
 
 
-StringTokenizerTest::StringTokenizerTest(const std::string& name): CppUnit::TestCase(name)
+StringTokenizerTest::StringTokenizerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -325,6 +325,13 @@ void StringTokenizerTest::testStringTokenizer()
 		assert (st.find("1") == 0);
 		assert (st.find("2") == 1);
 		assert (st.find("3") == 2);
+	}
+	
+	{
+		Poco::StringTokenizer st(" 2- ","-", Poco::StringTokenizer::TOK_TRIM);
+		assert (st.count() == 2);
+		assert (st[0] == "2");
+		assert (st[1] == "");
 	}
 }
 

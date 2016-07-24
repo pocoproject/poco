@@ -22,8 +22,8 @@
 	</schannel>
 	<testsuite>
 		<proxy>
-			<host>proxy.aon.at</host>
-			<port>8080</port>
+			<host>freeproxyserver.net</host>
+			<port>80</port>
 		</proxy>
 	</testsuite>
 </AppConfig>

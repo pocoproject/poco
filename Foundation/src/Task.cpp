@@ -95,9 +95,12 @@ void Task::setProgress(float taskProgress)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	_progress = taskProgress;
-	if (_pOwner)
-		_pOwner->taskProgress(this, _progress);
+	if (_progress != taskProgress)
+	{
+		_progress = taskProgress;
+		if (_pOwner)
+			_pOwner->taskProgress(this, _progress);
+	}
 }
 
 

@@ -29,7 +29,7 @@ endif
 
 objects = ODBCTestSuite Driver \
 	ODBCDB2Test ODBCMySQLTest ODBCOracleTest ODBCPostgreSQLTest \
-	ODBCSQLiteTest ODBCSQLServerTest ODBCTest SQLExecutor
+	ODBCSQLiteTest ODBCSQLServerTest ODBCTest SQLExecutor ODBCSybaseTest
 
 ifeq ($(POCO_CONFIG),MinGW)
 	objects += ODBCAccessTest
@@ -37,6 +37,6 @@ endif
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoDataODBC PocoData PocoFoundation CppUnit
+target_libs    = PocoDataODBC PocoData PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec

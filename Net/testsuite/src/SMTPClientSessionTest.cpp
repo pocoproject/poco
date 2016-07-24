@@ -11,8 +11,8 @@
 
 
 #include "SMTPClientSessionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "DialogServer.h"
 #include "Poco/Net/SMTPClientSession.h"
 #include "Poco/Net/MailMessage.h"
@@ -26,7 +26,7 @@ using Poco::Net::MailRecipient;
 using Poco::Net::SMTPException;
 
 
-SMTPClientSessionTest::SMTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
+SMTPClientSessionTest::SMTPClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

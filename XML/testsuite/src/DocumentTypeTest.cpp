@@ -11,8 +11,8 @@
 
 
 #include "DocumentTypeTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DOM/DocumentType.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Notation.h"
@@ -31,7 +31,7 @@ using Poco::XML::NamedNodeMap;
 using Poco::XML::AutoPtr;
 
 
-DocumentTypeTest::DocumentTypeTest(const std::string& name): CppUnit::TestCase(name)
+DocumentTypeTest::DocumentTypeTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

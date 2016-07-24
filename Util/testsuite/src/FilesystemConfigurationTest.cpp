@@ -11,8 +11,8 @@
 
 
 #include "FilesystemConfigurationTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/FilesystemConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/File.h"
@@ -24,7 +24,7 @@ using Poco::Util::AbstractConfiguration;
 using Poco::AutoPtr;
 
 
-FilesystemConfigurationTest::FilesystemConfigurationTest(const std::string& name): AbstractConfigurationTest(name),
+FilesystemConfigurationTest::FilesystemConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName),
 	_path("TestConfiguration")
 {
 }

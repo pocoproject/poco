@@ -65,11 +65,14 @@ Session SessionFactory::create(const std::string& key,
 	const std::string& connectionString,
 	std::size_t timeout)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
-	Connectors::iterator it = _connectors.find(key);
-	poco_assert (_connectors.end() != it);
-
-	return Session(it->second.ptrSI->createSession(connectionString, timeout));
+	Poco::SharedPtr<Connector> ptrSI;
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		Connectors::iterator it = _connectors.find(key);
+		if (_connectors.end() == it) throw Poco::NotFoundException(key);
+		ptrSI = it->second.ptrSI;
+	}
+	return Session(ptrSI->createSession(connectionString, timeout));
 }
 
 

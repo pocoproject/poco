@@ -19,8 +19,8 @@
 #include "Poco/Redis/Command.h"
 #include "Poco/Redis/PoolableConnectionFactory.h"
 
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 using namespace Poco::Redis;
 

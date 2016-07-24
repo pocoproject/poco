@@ -11,8 +11,8 @@
 
 
 #include "FormatTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Any.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
@@ -24,7 +24,7 @@ using Poco::Int64;
 using Poco::UInt64;
 
 
-FormatTest::FormatTest(const std::string& name): CppUnit::TestCase(name)
+FormatTest::FormatTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

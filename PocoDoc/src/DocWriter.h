@@ -1,7 +1,7 @@
 //
 // DocWriter.h
 //
-// $Id: //poco/1.4/PocoDoc/src/DocWriter.h#2 $
+// $Id: //poco/1.7/PocoDoc/src/DocWriter.h#2 $
 //
 // Definition of the DocWriter class.
 //

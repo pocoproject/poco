@@ -11,8 +11,8 @@
 
 
 #include "ChannelTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/SplitterChannel.h"
 #include "Poco/AsyncChannel.h"
 #include "Poco/AutoPtr.h"
@@ -47,7 +47,7 @@ public:
 };
 
 
-ChannelTest::ChannelTest(const std::string& name): CppUnit::TestCase(name)
+ChannelTest::ChannelTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

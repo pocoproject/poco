@@ -8,7 +8,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-COMMONFLAGS += -DXML_NS -DXML_DTD -DHAVE_EXPAT_CONFIG_H
+COMMONFLAGS += -DXML_NS -DXML_DTD -DHAVE_EXPAT_CONFIG_H -DEXPAT_POCO
 
 objects = AbstractContainerNode AbstractNode Attr AttrMap Attributes \
 	AttributesImpl CDATASection CharacterData ChildNodesList Comment \

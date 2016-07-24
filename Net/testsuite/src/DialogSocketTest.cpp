@@ -11,8 +11,8 @@
 
 
 #include "DialogSocketTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "EchoServer.h"
 #include "Poco/Net/DialogSocket.h"
 #include "Poco/Net/SocketAddress.h"
@@ -23,7 +23,7 @@ using Poco::Net::DialogSocket;
 using Poco::Net::SocketAddress;
 
 
-DialogSocketTest::DialogSocketTest(const std::string& name): CppUnit::TestCase(name)
+DialogSocketTest::DialogSocketTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

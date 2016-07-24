@@ -36,6 +36,9 @@ public:
 	MapConfiguration();
 		/// Creates an empty MapConfiguration.
 
+	void copyTo(AbstractConfiguration& config);
+		/// Copies all configuration properties to the given configuration.
+
 	void clear();
 		/// Clears the configuration.
 

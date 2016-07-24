@@ -24,11 +24,11 @@ namespace Poco {
 namespace XML {
 
 
-DocumentType::DocumentType(Document* pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId): 
+DocumentType::DocumentType(Document* pOwner, const XMLString& rName, const XMLString& rPublicId, const XMLString& rSystemId): 
 	AbstractContainerNode(pOwner),
-	_name(name),
-	_publicId(publicId),
-	_systemId(systemId)
+	_name(rName),
+	_publicId(rPublicId),
+	_systemId(rSystemId)
 {
 }
 

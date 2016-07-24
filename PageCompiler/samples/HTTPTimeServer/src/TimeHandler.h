@@ -1,10 +1,3 @@
-//
-// TimeHandler.h
-//
-// This file has been generated from TimeHandler.cpsp on 2010-01-28 08:49:54.
-//
-
-
 #ifndef TimeHandler_INCLUDED
 #define TimeHandler_INCLUDED
 

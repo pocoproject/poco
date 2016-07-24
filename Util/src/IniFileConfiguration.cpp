@@ -100,7 +100,7 @@ void IniFileConfiguration::setRaw(const std::string& key, const std::string& val
 
 void IniFileConfiguration::enumerate(const std::string& key, Keys& range) const
 {
-	std::set<std::string> keys;
+	std::set<std::string> keySet;
 	std::string prefix = key;
 	if (!prefix.empty()) prefix += '.';
 	std::string::size_type psize = prefix.size();
@@ -114,10 +114,10 @@ void IniFileConfiguration::enumerate(const std::string& key, Keys& range) const
 				subKey = it->first.substr(psize);
 			else
 				subKey = it->first.substr(psize, end - psize);
-			if (keys.find(subKey) == keys.end())
+			if (keySet.find(subKey) == keySet.end())
 			{
 				range.push_back(subKey);
-				keys.insert(subKey);
+				keySet.insert(subKey);
 			}
 		}
 	}

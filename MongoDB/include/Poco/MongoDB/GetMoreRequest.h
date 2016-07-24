@@ -58,7 +58,6 @@ protected:
 	void buildRequest(BinaryWriter& writer);
 
 private:
-	Int32 _flags;
 	std::string _fullCollectionName;
 	Int32 _numberToReturn;
 	Int64 _cursorID;

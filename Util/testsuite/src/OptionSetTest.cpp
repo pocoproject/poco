@@ -11,8 +11,8 @@
 
 
 #include "OptionSetTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionException.h"
@@ -22,7 +22,7 @@ using Poco::Util::OptionSet;
 using Poco::Util::Option;
 
 
-OptionSetTest::OptionSetTest(const std::string& name): CppUnit::TestCase(name)
+OptionSetTest::OptionSetTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

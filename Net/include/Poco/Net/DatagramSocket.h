@@ -34,7 +34,14 @@ class Net_API DatagramSocket: public Socket
 {
 public:
 	DatagramSocket();
-		/// Creates an unconnected IPv4 datagram socket.
+		/// Creates an unconnected, unbound datagram socket.
+		///
+		/// Before the datagram socket can be used, bind(),
+		/// bind6() or connect() must be called.
+		///
+		/// Notice: The behavior of this constructor has changed
+		/// in release 2.0. Previously, the constructor created
+		/// an unbound IPv4 datagram socket.
 
 	explicit DatagramSocket(SocketAddress::Family family);
 		/// Creates an unconnected datagram socket.

@@ -196,7 +196,21 @@ protected:
 	static bool isLocalHost(const std::string& hostName);
 		/// Returns true iff the given host name is the local host 
 		/// (either "localhost" or "127.0.0.1").
-		
+
+	bool mustRetry(int rc);
+		/// Returns true if the last operation should be retried,
+		/// otherwise false.
+		///
+		/// In case of an SSL_ERROR_WANT_READ error, and if the socket is 
+		/// blocking, waits for the underlying socket to become readable.
+		///
+		/// In case of an SSL_ERROR_WANT_WRITE error, and if the socket is
+		/// blocking, waits for the underlying socket to become writable.
+		///
+		/// Can also throw a Poco::TimeoutException if the socket does
+		/// not become readable or writable within the sockets
+		/// receive or send timeout.
+
 	int handleError(int rc);
 		/// Handles an SSL error by throwing an appropriate exception.
 

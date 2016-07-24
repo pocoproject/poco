@@ -154,12 +154,10 @@ public:
 		///    - the request's persistent connection state is left unchanged
 		///    - the content transfer encoding is set to chunked
 
-
 	std::streamsize calculateContentLength();
 		/// Calculate the content length for the form.
 		/// May be UNKNOWN_CONTENT_LENGTH if not possible
 		/// to calculate
-
 
 	void write(std::ostream& ostr, const std::string& boundary);
 		/// Writes the form data to the given output stream,

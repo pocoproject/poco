@@ -21,13 +21,13 @@ namespace Poco {
 namespace Data {
 
 
-AbstractBinding::AbstractBinding(const std::string& name, 
+AbstractBinding::AbstractBinding(const std::string& rName, 
 	Direction direction, 
-	Poco::UInt32 bulkSize): 
+	Poco::UInt32 bindingBulkSize): 
 	_pBinder(0),
-	_name(name),
+	_name(rName),
 	_direction(direction),
-	_bulkSize(bulkSize)
+	_bulkSize(bindingBulkSize)
 {
 }
 

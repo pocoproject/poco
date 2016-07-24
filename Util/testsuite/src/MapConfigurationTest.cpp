@@ -11,8 +11,8 @@
 
 
 #include "MapConfigurationTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/AutoPtr.h"
 
@@ -22,7 +22,7 @@ using Poco::Util::MapConfiguration;
 using Poco::AutoPtr;
 
 
-MapConfigurationTest::MapConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
+MapConfigurationTest::MapConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName)
 {
 }
 

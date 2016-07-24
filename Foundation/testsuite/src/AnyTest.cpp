@@ -11,8 +11,8 @@
 
 
 #include "AnyTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/Any.h"
 #include "Poco/Bugcheck.h"
@@ -42,7 +42,7 @@ public:
 };
 
 
-AnyTest::AnyTest(const std::string& name): CppUnit::TestCase(name)
+AnyTest::AnyTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

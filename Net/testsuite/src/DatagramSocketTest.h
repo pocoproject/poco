@@ -17,7 +17,7 @@
 
 
 #include "Poco/Net/Net.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class DatagramSocketTest: public CppUnit::TestCase
@@ -28,6 +28,7 @@ public:
 
 	void testEcho();
 	void testSendToReceiveFrom();
+	void testUnbound();
 	void testBroadcast();
 
 	void setUp();

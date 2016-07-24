@@ -11,8 +11,8 @@
 
 
 #include "HashSetTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/HashSet.h"
 #include <set>
 
@@ -21,7 +21,7 @@ using Poco::Hash;
 using Poco::HashSet;
 
 
-HashSetTest::HashSetTest(const std::string& name): CppUnit::TestCase(name)
+HashSetTest::HashSetTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -11,8 +11,8 @@
 
 
 #include "SocketTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "EchoServer.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
@@ -41,7 +41,7 @@ using Poco::FIFOBuffer;
 using Poco::delegate;
 
 
-SocketTest::SocketTest(const std::string& name): CppUnit::TestCase(name)
+SocketTest::SocketTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -11,8 +11,8 @@
 
 
 #include "NTPClientTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/NTPClient.h"
 #include "Poco/Net/NTPEventArgs.h"
 #include "Poco/Net/SocketAddress.h"
@@ -34,8 +34,8 @@ using Poco::Delegate;
 using Poco::AutoPtr;
 
 
-NTPClientTest::NTPClientTest(const std::string& name): 
-	CppUnit::TestCase(name),
+NTPClientTest::NTPClientTest(const std::string& rName): 
+	CppUnit::TestCase(rName),
 	_ntpClient(IPAddress::IPv4)
 {
 }

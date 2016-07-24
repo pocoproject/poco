@@ -18,6 +18,7 @@
 #ifndef Redis_RedisStream_INCLUDED
 #define Redis_RedisStream_INCLUDED
 
+#include "Poco/Redis/Redis.h"
 #include "Poco/BufferedStreamBuf.h"
 #include "Poco/Net/StreamSocket.h"
 
@@ -77,7 +78,7 @@ protected:
 };
 
 
-class RedisOutputStream: public RedisIOS, public std::ostream
+class Redis_API RedisOutputStream: public RedisIOS, public std::ostream
 	/// An output stream for writing to a Redis server.
 {
 public:
@@ -91,7 +92,7 @@ public:
 };
 
 
-class RedisInputStream: public RedisIOS, public std::istream
+class Redis_API RedisInputStream: public RedisIOS, public std::istream
 	/// An input stream for reading from a Redis server.
 {
 public:

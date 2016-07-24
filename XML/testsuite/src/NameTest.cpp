@@ -11,15 +11,15 @@
 
 
 #include "NameTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/XML/Name.h"
 
 
 using Poco::XML::Name;
 
 
-NameTest::NameTest(const std::string& name): CppUnit::TestCase(name)
+NameTest::NameTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -81,18 +81,18 @@ void NameTest::testPrefix()
 void NameTest::testName()
 {
 	std::string qname = "name";
-	Name name(qname);
-	assert (name.qname() == "name");
-	assert (name.prefix().empty());
-	assert (name.namespaceURI().empty());
-	assert (name.localName().empty());
+	Name xmlName(qname);
+	assert (xmlName.qname() == "name");
+	assert (xmlName.prefix().empty());
+	assert (xmlName.namespaceURI().empty());
+	assert (xmlName.localName().empty());
 
 	qname.clear();
-	name.assign(qname, "http://www.appinf.com/", "local");
-	assert (name.qname().empty());
-	assert (name.prefix().empty());
-	assert (name.namespaceURI() == "http://www.appinf.com/");
-	assert (name.localName() == "local");
+	xmlName.assign(qname, "http://www.appinf.com/", "local");
+	assert (xmlName.qname().empty());
+	assert (xmlName.prefix().empty());
+	assert (xmlName.namespaceURI() == "http://www.appinf.com/");
+	assert (xmlName.localName() == "local");
 
 	Name name2("pre:local", "http://www.appinf.com/");
 	assert (name2.qname() == "pre:local");

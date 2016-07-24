@@ -19,7 +19,7 @@
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Connection.h"
 
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class MongoDBTest: public CppUnit::TestCase
@@ -42,6 +42,7 @@ public:
 	void testCursorRequest();
 	void testObjectID();
 	void testCommand();
+	void testUUID();
 	void setUp();
 	void tearDown();
 

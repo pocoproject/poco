@@ -11,8 +11,8 @@
 
 
 #include "TimerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Thread.h"
 #include "Poco/Stopwatch.h"
 
@@ -23,7 +23,7 @@ using Poco::Thread;
 using Poco::Stopwatch;
 
 
-TimerTest::TimerTest(const std::string& name): CppUnit::TestCase(name)
+TimerTest::TimerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

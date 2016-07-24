@@ -17,7 +17,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class ProcessTest: public CppUnit::TestCase
@@ -30,7 +30,9 @@ public:
 	void testLaunchRedirectIn();
 	void testLaunchRedirectOut();
 	void testLaunchEnv();
+	void testLaunchArgs();
 	void testIsRunning();
+	void testIsRunningAllowsForTermination();
 	void testSignalExitCode();
 
 	void setUp();

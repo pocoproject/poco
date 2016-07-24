@@ -28,17 +28,17 @@ StringPartSource::StringPartSource(const std::string& str):
 }
 
 
-StringPartSource::StringPartSource(const std::string& str, const std::string& mediaType):
-	PartSource(mediaType),
+StringPartSource::StringPartSource(const std::string& str, const std::string& rMediaType):
+	PartSource(rMediaType),
 	_istr(str)
 {
 }
 
 
-StringPartSource::StringPartSource(const std::string& str, const std::string& mediaType, const std::string& filename):
-	PartSource(mediaType),
+StringPartSource::StringPartSource(const std::string& str, const std::string& rMediaType, const std::string& rFilename):
+	PartSource(rMediaType),
 	_istr(str),
-	_filename(filename)
+	_filename(rFilename)
 {
 }
 

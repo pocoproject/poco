@@ -20,7 +20,7 @@ set_target_properties( "${LIBNAME}"
     PROPERTIES
     VERSION "1" SOVERSION "1"
     DEFINE_SYMBOL WinTestRunner_EXPORTS)
-target_link_libraries( "${LIBNAME}" CppUnit )
+target_link_libraries( "${LIBNAME}" PocoCppUnit )
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

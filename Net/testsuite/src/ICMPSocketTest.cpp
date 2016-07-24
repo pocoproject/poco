@@ -11,8 +11,8 @@
 
 
 #include "ICMPSocketTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "UDPEchoServer.h"
 #include "Poco/Net/ICMPSocket.h"
 #include "Poco/Net/SocketAddress.h"
@@ -31,7 +31,7 @@ using Poco::TimeoutException;
 using Poco::Net::ICMPException;
 
 
-ICMPSocketTest::ICMPSocketTest(const std::string& name): CppUnit::TestCase(name)
+ICMPSocketTest::ICMPSocketTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -51,4 +51,9 @@
       <Filter>_Driver\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="obj64\TestSuite\release_shared\SQLExecutor.i">
+      <Filter>MySQL\Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

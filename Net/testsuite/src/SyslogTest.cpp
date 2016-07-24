@@ -11,8 +11,8 @@
 
 
 #include "SyslogTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/RemoteSyslogChannel.h"
 #include "Poco/Net/RemoteSyslogListener.h"
 #include "Poco/Net/DNS.h"
@@ -112,7 +112,7 @@ void CachingChannel::getMessages(std::vector<Poco::Message>& msg, int offset, in
 }
 
 
-SyslogTest::SyslogTest(const std::string& name): CppUnit::TestCase(name)
+SyslogTest::SyslogTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

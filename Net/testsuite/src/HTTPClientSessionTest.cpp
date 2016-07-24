@@ -11,8 +11,8 @@
 
 
 #include "HTTPClientSessionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
@@ -30,7 +30,7 @@ using Poco::Net::HTTPMessage;
 using Poco::StreamCopier;
 
 
-HTTPClientSessionTest::HTTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
+HTTPClientSessionTest::HTTPClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -24,8 +24,8 @@ namespace XML {
 const XMLString Comment::NODE_NAME = toXMLString("#comment");
 
 
-Comment::Comment(Document* pOwnerDocument, const XMLString& data): 
-	CharacterData(pOwnerDocument, data)
+Comment::Comment(Document* pOwnerDocument, const XMLString& rData): 
+	CharacterData(pOwnerDocument, rData)
 {
 }
 

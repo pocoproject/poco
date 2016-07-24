@@ -57,6 +57,9 @@
     <ClInclude Include="src\ODBCTestSuite.h">
       <Filter>_Suite\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ODBCSybaseTest.h">
+      <Filter>ODBC</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ODBCAccessTest.cpp">
@@ -91,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="src\Driver.cpp">
       <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCSybaseTest.cpp">
+      <Filter>ODBC</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
