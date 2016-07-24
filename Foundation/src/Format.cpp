@@ -227,14 +227,13 @@ namespace
 }
 
 
-#if !defined(POCO_ENABLE_CPP11)
-std::string format(const std::string& fmt, const Any& value)
-{
+std::string format(const std::string& fmt, const Any& value) {
 	std::string result;
 	format(result, fmt, value);
 	return result;
 }
 
+#if !defined(POCO_ENABLE_CPP11)
 
 std::string format(const std::string& fmt, const Any& value1, const Any& value2)
 {
@@ -471,17 +470,7 @@ void format(std::string& result, const std::string& fmt, const Any& value1, cons
 	args.push_back(value10);
 	format(result, fmt, args);
 }
-#endif // !defined(POCO_ENABLE_CPP11)
-
-
-void format(std::string& result, const char *fmt, const std::vector<Any>& values)
-{
-	format(result, std::string(fmt), values);
-}
-
-
-void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10, const Any& value11)
-{
+void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10, const Any& value11) {
 	std::vector<Any> args;
 	args.push_back(value1);
 	args.push_back(value2);
@@ -498,8 +487,7 @@ void format(std::string& result, const std::string& fmt, const Any& value1, cons
 }
 
 
-void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10, const Any& value11, const Any& value12)
-{
+void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10, const Any& value11, const Any& value12) {
 	std::vector<Any> args;
 	args.push_back(value1);
 	args.push_back(value2);
@@ -517,8 +505,7 @@ void format(std::string& result, const std::string& fmt, const Any& value1, cons
 }
 
 
-void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10, const Any& value11, const Any& value12, const Any& value13)
-{
+void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10, const Any& value11, const Any& value12, const Any& value13) {
 	std::vector<Any> args;
 	args.push_back(value1);
 	args.push_back(value2);
@@ -537,8 +524,7 @@ void format(std::string& result, const std::string& fmt, const Any& value1, cons
 }
 
 
-void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10, const Any& value11, const Any& value12, const Any& value13, const Any& value14)
-{
+void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10, const Any& value11, const Any& value12, const Any& value13, const Any& value14) {
 	std::vector<Any> args;
 	args.push_back(value1);
 	args.push_back(value2);
@@ -558,8 +544,7 @@ void format(std::string& result, const std::string& fmt, const Any& value1, cons
 }
 
 
-void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10, const Any& value11, const Any& value12, const Any& value13, const Any& value14, const Any& value15)
-{
+void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10, const Any& value11, const Any& value12, const Any& value13, const Any& value14, const Any& value15) {
 	std::vector<Any> args;
 	args.push_back(value1);
 	args.push_back(value2);
@@ -577,6 +562,15 @@ void format(std::string& result, const std::string& fmt, const Any& value1, cons
 	args.push_back(value14);
 	args.push_back(value15);
 	format(result, fmt, args);
+}
+
+
+#endif // !defined(POCO_ENABLE_CPP11)
+
+
+void format(std::string& result, const char *fmt, const std::vector<Any>& values)
+{
+	format(result, std::string(fmt), values);
 }
 
 

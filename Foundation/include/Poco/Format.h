@@ -31,8 +31,9 @@
 namespace Poco {
 
 
-#if !defined(POCO_ENABLE_CPP11)
 std::string Foundation_API format(const std::string& fmt, const Any& value);
+
+#if !defined(POCO_ENABLE_CPP11)
 	/// This function implements sprintf-style formatting in a typesafe way.
 	/// Various variants of the function are available, supporting a
 	/// different number of arguments (up to six).
@@ -150,8 +151,8 @@ void Foundation_API format(std::string& result, const char *fmt, const std::vect
 	/// all other variants of format().
 
 void Foundation_API format(std::string& result, const std::string& fmt, const std::vector<Any>& values);
-	/// Supports a variable number of arguments and is used by
-	/// all other variants of format().
+/// Supports a variable number of arguments and is used by
+/// all other variants of format().
 
 
 #if defined(POCO_ENABLE_CPP11)
