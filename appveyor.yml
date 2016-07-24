@@ -57,8 +57,6 @@ environment:
   POSTGRES64: C:\Program Files\PostgreSQL\9.4
 
   matrix:
-
-    - builder: cygwin
       
     - builder: msbuild
       vsver: 120
@@ -90,6 +88,7 @@ environment:
     - builder: cmake
       vsver: 140
 
+    - builder: cygwin
 
 matrix:
   fast_finish: true
