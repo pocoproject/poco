@@ -1,9 +1,7 @@
-/*
- * BinaryOperation.cpp
- *
- *  Created on: 20 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include "model/BinaryOperation.h"
 
@@ -20,19 +18,19 @@ const string BinaryOperation::display() const
         _asstring += _left->display();
         switch (_operator)
         {
-        case Operator::equal:
+        case equal:
             _asstring += "==";
             break;
-        case Operator::notequal:
+        case notequal:
             _asstring += "!=";
             break;
-        case Operator::and:
+        case and:
             _asstring += "&&";
             break;
-        case Operator::or:
+        case or:
             _asstring += "||";
             break;
-        case Operator::xor:
+        case xor:
             _asstring += '^';
             break;
         default:

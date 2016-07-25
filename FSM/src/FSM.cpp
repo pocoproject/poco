@@ -1,9 +1,7 @@
-/*
- * FSM.cpp
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include "Poco/Format.h"
 using Poco::format;
@@ -19,6 +17,10 @@ namespace FSM
 {
 namespace MODEL
 {
+FSM::FSM(PARSER::Parser* parser) : Compilable(), _parser(parser), _updated(false) {
+}
+FSM::~FSM() {
+}
 void FSM::add(MapPtr map)
 {
     _maps.push_back(map);
@@ -51,10 +53,11 @@ void FSM::print(Print& print) const
     print(format("%s\t%s", string(Keyword::asString(Keyword::HEADER)), header()));
     print(format("%s\t%s", string(Keyword::asString(Keyword::PACKAGE)), packages()[0]));
 
-    for (const auto& map : maps())
+	List<MapPtr>::const_iterator map;
+	for (map = maps().begin(); map != maps().end(); ++map)
     {
-        print(format("%s\t%s", string(Keyword::asString(Keyword::MAP)), map->Element::name()));
-        map->print(print);
+        print(format("%s\t%s", string(Keyword::asString(Keyword::MAP)), (*map)->Element::name()));
+        (*map)->print(print);
     }
 }
 }

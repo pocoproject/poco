@@ -1,3 +1,8 @@
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -46,10 +51,10 @@ using Poco::FSM::MODEL::Print;
 
 const static string NL = "\n";
 
-class FFSMompiler: public Application
+class FSMCompiler: public Application
 {
 public:
-    FFSMompiler()
+    FSMCompiler() : help(false), verbose(false), debug(false)
     {
 
     }
@@ -77,26 +82,26 @@ protected:
             Option("help", "h",	"display help information on command line arguments")
             .required(false)
             .repeatable(false)
-            .callback(OptionCallback<FFSMompiler>(this, &FFSMompiler::handleHelp)));
+            .callback(OptionCallback<FSMCompiler>(this, &FSMCompiler::handleHelp)));
 
         options.addOption(
             Option("out", "o", "the out directory where to generate the c++ code, defaulted to the fsm file directory")
             .required(false)
             .repeatable(false)
             .argument("file")
-            .callback(OptionCallback<FFSMompiler>(this, &FFSMompiler::handleOutdir)));
+            .callback(OptionCallback<FSMCompiler>(this, &FSMCompiler::handleOutdir)));
 
         options.addOption(
             Option("verbose", "v", "output the parsed FSM file on the console")
             .required(false)
             .repeatable(false)
-            .callback(OptionCallback<FFSMompiler>(this, &FFSMompiler::handleVerbose)));
+            .callback(OptionCallback<FSMCompiler>(this, &FSMCompiler::handleVerbose)));
 
         options.addOption(
             Option("debug", "d", "generate debug log")
             .required(false)
             .repeatable(false)
-            .callback(OptionCallback<FFSMompiler>(this, &FFSMompiler::handleDebug)));
+            .callback(OptionCallback<FSMCompiler>(this, &FSMCompiler::handleDebug)));
 
     }
 
@@ -181,11 +186,11 @@ protected:
     }
 
 private:
-    bool	help = false;
-    bool	verbose = false;
-    bool	debug = false;
+    bool	help;
+    bool	verbose;
+    bool	debug;
     Path	out;
     Path	smPath;
     File	smFile;
 };
-POCO_APP_MAIN(FFSMompiler)
+POCO_APP_MAIN(FSMCompiler)

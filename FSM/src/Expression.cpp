@@ -1,9 +1,7 @@
-/*
- * Expression.cpp
- *
- *  Created on: 21 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include "model/Expression.h"
 
@@ -13,6 +11,10 @@ namespace FSM
 {
 namespace MODEL
 {
+	Expression::Expression() : _operation(NULL), _guard(NULL) {
+	}
+	Expression::~Expression() {
+	}
 
 }
 }

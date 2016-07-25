@@ -8,7 +8,7 @@
 
 include $(POCO_BASE)/build/rules/global
 INCLUDE 	+= -I$(POCO_BASE)/FSM/include 
-CXXFLAGS 	+= -std=c++11 -fno-operator-names
+CXXFLAGS 	+= -fno-operator-names
 
 # Cygwin Poco*.dll should be on PATH
 ifeq ($(OSNAME), Cygwin)

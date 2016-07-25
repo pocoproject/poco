@@ -1,9 +1,7 @@
-/*
- * UnaryOperationForCpp.cpp
- *
- *  Created on: 24 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include "cpp/UnaryOperationForCpp.h"
 
@@ -20,7 +18,7 @@ const string UnaryOperationForCpp::display(const string& prefix) const
     string value;
     switch (_operator)
     {
-    case Poco::FSM::MODEL::Operator::not:
+    case Poco::FSM::MODEL::not:
         value += "!";
         break;
     default:

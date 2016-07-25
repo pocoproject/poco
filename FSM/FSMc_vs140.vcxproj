@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|Win32">
       <Configuration>debug_shared</Configuration>
@@ -86,27 +86,6 @@
     <ClCompile Include="src\VariableForCpp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Poco\FSM\statemap.h" />
-    <ClInclude Include="src\cpp\ActionForCpp.h" />
-    <ClInclude Include="src\cpp\ArgumentForCpp.h" />
-    <ClInclude Include="src\cpp\BinaryOperationForCpp.h" />
-    <ClInclude Include="src\cpp\CompilableForCpp.h" />
-    <ClInclude Include="src\cpp\ElementForCpp.h" />
-    <ClInclude Include="src\cpp\EntryForCpp.h" />
-    <ClInclude Include="src\cpp\ExitForCpp.h" />
-    <ClInclude Include="src\cpp\ExpressionForCpp.h" />
-    <ClInclude Include="src\cpp\FactoryForCpp.h" />
-    <ClInclude Include="src\cpp\FSMForCpp.h" />
-    <ClInclude Include="src\cpp\FunctionForCpp.h" />
-    <ClInclude Include="src\cpp\GuardForCpp.h" />
-    <ClInclude Include="src\cpp\LiteralForCpp.h" />
-    <ClInclude Include="src\cpp\MapForCpp.h" />
-    <ClInclude Include="src\cpp\ParameterForCpp.h" />
-    <ClInclude Include="src\cpp\ReferenceForCpp.h" />
-    <ClInclude Include="src\cpp\StateForCpp.h" />
-    <ClInclude Include="src\cpp\TransitionForCpp.h" />
-    <ClInclude Include="src\cpp\UnaryOperationForCpp.h" />
-    <ClInclude Include="src\cpp\VariableForCpp.h" />
     <ClInclude Include="src\model\Action.h" />
     <ClInclude Include="src\model\Actions.h" />
     <ClInclude Include="src\model\Argument.h" />
@@ -154,32 +133,32 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />

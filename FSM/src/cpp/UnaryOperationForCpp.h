@@ -1,9 +1,7 @@
-/*
- * UnaryOperationForCpp.h
- *
- *  Created on: 24 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef UNARYOPERATIONFORCPP_H_
 #define UNARYOPERATIONFORCPP_H_

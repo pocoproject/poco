@@ -1,9 +1,7 @@
-/*
- * Transition.h
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef POCO_FSM_MODEL_TRANSITION_H_
 #define POCO_FSM_MODEL_TRANSITION_H_
@@ -20,15 +18,7 @@ namespace Poco {
 		namespace MODEL {
 
 			class Transition : public Element {
-			protected:
-				StatePtr			_begstate = nullptr;
-				List<ParameterPtr>	_parameters;
-				List<GuardPtr>		_guards;
-				mutable string		_signature;
-
 			public:
-				Transition() = delete;
-				Transition(const Transition&) = delete;
 				Transition(const string& name, int lineno = 0);
 				virtual ~Transition();
 
@@ -46,13 +36,24 @@ namespace Poco {
 				void add(GuardPtr guard)			{ _guards.push_back(guard); guard->transition() = this; }
 
 
-				string declaration(const Parameter* added = nullptr) const;
+				string declaration(const Parameter* added = 0) const;
 				string call(const char* embed) const;
 
 				const string& signature() const;
 				static string signature(const string& name, const List<ParameterPtr>& parameters);
 
 				bool hasParameter(const string& name) const;
+
+			protected:
+				StatePtr			_begstate;
+				List<ParameterPtr>	_parameters;
+				List<GuardPtr>		_guards;
+				mutable string		_signature;
+
+			private:
+				Transition() {}
+				Transition(const Transition&) {}
+
 			};
 
 		}

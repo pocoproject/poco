@@ -1,9 +1,7 @@
-/*
- * FSM.h
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef POCO_FSM_MODEL_FSM_H_
 #define POCO_FSM_MODEL_FSM_H_
@@ -29,10 +27,8 @@ namespace Poco {
 
 			class FSM  : public Compilable {
 			public:
-				FSM(PARSER::Parser* parser) : Compilable(), _parser(parser) {
-				}
-				virtual ~FSM() {
-				}
+				FSM(PARSER::Parser* parser);
+				virtual ~FSM();
 
 
 				void    setcontext()					{ _context = _fsmClass + "<" + _klass + ">"; }
@@ -74,7 +70,7 @@ namespace Poco {
 				virtual bool updated(const Path& out) = 0;
 
 			protected:
-				Parser*		_parser = nullptr;
+				Parser*		_parser;
 
 				// The state map's initial state.
 				string _startState;
@@ -122,7 +118,7 @@ namespace Poco {
 
 				string _return;
 
-				bool _updated = false;
+				bool _updated;
 
 			};
 

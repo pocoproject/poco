@@ -1,9 +1,7 @@
-/*
- * ArgumentForCpp.h
- *
- *  Created on: 21 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef ARGUMENTFORCPP_H_
 #define ARGUMENTFORCPP_H_

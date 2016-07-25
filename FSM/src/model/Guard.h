@@ -1,9 +1,7 @@
-/*
- * Guard.h
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef POCO_FSM_MODEL_GUARD_H_
 #define POCO_FSM_MODEL_GUARD_H_
@@ -48,19 +46,17 @@ namespace Poco {
 
 			class Guard : public Element {
 			private:
-				TransitionPtr	_transition = nullptr;
-				ExpressionPtr	_condition = nullptr;
+				TransitionPtr	_transition;
+				ExpressionPtr	_condition;
 				TransType		_transType;
-				StatePtr		_endstate = nullptr;
-				StatePtr		_pushState = nullptr;
-				StatePtr		_popArgs = nullptr;
+				StatePtr		_endstate;
+				StatePtr		_pushState;
+				StatePtr		_popArgs;
 				List<ActionPtr>	_actions;
 
 			public:
-				Guard(const string& name, int lineno = 0) : Element(name, lineno) {
-				}
-				virtual ~Guard() {
-				}
+				Guard(const string& name, int lineno = 0);
+				virtual ~Guard();
 
 				TransitionPtr&					transition()	{ return _transition; }
 				ExpressionPtr&					condition()		{ return _condition;  }

@@ -1,9 +1,7 @@
-/*
- * MapForCpp.cpp
- *
- *  Created on: 19 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include <iostream>
 #include "parser/IndentStream.h"
@@ -48,9 +46,10 @@ void MapForCpp::generateInclude(ostream& inc, bool debug) const
         inc << comment << endl;
         inc << "class " << name() << ";" << endl;
 
-        for (const auto& state : states())
-        {
-            dynamic_cast<StateForCpp*>(state.second)->generateForwarDeclaration(inc, debug);
+		map<string, StatePtr>::const_iterator state;
+		for (state = states().begin(); state != states().end(); ++state)
+		{
+            dynamic_cast<StateForCpp*>(state->second)->generateForwarDeclaration(inc, debug);
         }
 
         inc << "class " << defaultStateName() << ";" << endl;
@@ -77,16 +76,17 @@ void MapForCpp::generateInclude(ostream& inc, bool debug) const
 #if 0
         for (const auto& state : states())
         {
-            StateForCpp* sfc = dynamic_cast<StateForCpp*>(state.second);
+            StateForCpp* sfc = dynamic_cast<StateForCpp*>(state->second);
             sfc->generateVirtualTransitions(inc);
         }
 #else
-        for (const auto& transition : transitions())
-            if (transition.second)
+		map<string, TransitionPtr>::const_iterator transition;
+		for (transition = transitions().begin(); transition != transitions().end(); ++transition)
+            if (transition->second)
             {
                 Parameter context("context");
                 context.type() = fsm()->context() + '&';
-                TransitionForCpp* tfc = static_cast<TransitionForCpp*>(transition.second);
+                TransitionForCpp* tfc = static_cast<TransitionForCpp*>(transition->second);
                 inc << "virtual void " << tfc->declaration(&context) << ";" << endl;
             }
 
@@ -111,9 +111,10 @@ void MapForCpp::generateInclude(ostream& inc, bool debug) const
         comment = "// FSM map states class.";
         comment.resize(LL, '-');
         inc << comment << endl;
-        for (const auto& state : states())
-        {
-            StateForCpp* sfc = dynamic_cast<StateForCpp*>(state.second);
+		map<string, StatePtr>::const_iterator state;
+		for (state = states().begin(); state != states().end(); ++state)
+		{
+            StateForCpp* sfc = dynamic_cast<StateForCpp*>(state->second);
             sfc->generateDefinition(inc, debug);
         }
     }
@@ -126,9 +127,10 @@ void MapForCpp::generateInclude(ostream& inc, bool debug) const
         inc << "class " << name() << " {" << endl;
         inc << "public:" << endl << tab;
         inc << name() << "();" << endl;
-        for (const auto& state : states())
-        {
-            const StatePtr sp = state.second;
+		map<string, StatePtr>::const_iterator state;
+		for (state = states().begin(); state != states().end(); ++state)
+		{
+            const StatePtr sp = state->second;
             inc << name() + '_' + sp->name() << ' ' << sp->name() << ";" << endl;
         }
         inc << back << "};" << endl;
@@ -171,17 +173,18 @@ void MapForCpp::generateInclude(ostream& inc, bool debug) const
         inc << endl;
 
         inc << fsm()->klass() << "State& getState() const {" << endl;
-        inc << "    if (_state == nullptr) {" << endl;
+        inc << "    if (_state == NULL) {" << endl;
         inc << "        throw statemap::StateUndefinedException();" << endl;
         inc << "    }" << endl;
         inc << "     return (dynamic_cast<" << fsm()->klass() << "State&>(*_state));" << endl;
         inc << "};" << endl;
         inc << endl;
 
-        for (const auto& transition : transitions())
-            if (transition.second)
+		map<string, TransitionPtr>::const_iterator transition;
+		for (transition = transitions().begin(); transition != transitions().end(); ++transition)
+            if (transition->second)
             {
-                TransitionForCpp* tfc = static_cast<TransitionForCpp*>(transition.second);
+                TransitionForCpp* tfc = static_cast<TransitionForCpp*>(transition->second);
                 if (fsm()->returnt().empty())
                     inc << "void ";
                 else
@@ -190,7 +193,7 @@ void MapForCpp::generateInclude(ostream& inc, bool debug) const
                 inc << tfc->declaration() << " {" << endl;
                 inc << "    setTransition(\"" << tfc->Transition::name() << "\");" << endl;
                 inc << "    getState()." << tfc->call("*this") << ";" << endl;
-                inc << "    setTransition(nullptr);" << endl;
+                inc << "    setTransition(NULL);" << endl;
                 inc << "};" << endl;
             }
         inc << back;
@@ -204,9 +207,10 @@ void MapForCpp::generateCode(ostream& cpp, bool debug) const
     cpp << "// FSM Map constructor." << endl;
     cpp << name() << "::" << name() << "() :" << endl << tab;
     int no = 0;
-    for (const auto& state : states())
-    {
-        StateForCpp* sfc = dynamic_cast<StateForCpp*>(state.second);
+	map<string, StatePtr>::const_iterator state;
+	for (state = states().begin(); state != states().end(); ++state)
+	{
+        StateForCpp* sfc = dynamic_cast<StateForCpp*>(state->second);
         sfc->generateDeclaration(cpp, no++);
         if (no < states().size())
             cpp << ",";
@@ -218,12 +222,13 @@ void MapForCpp::generateCode(ostream& cpp, bool debug) const
     comment = "// Class state ";
     comment.resize(LL, '-');
     cpp << comment << endl;
-    for (const auto& transition : transitions())
-        if (transition.second)
+	map<string, TransitionPtr>::const_iterator transition;
+	for (transition = transitions().begin(); transition != transitions().end(); ++transition)
+		if (transition->second)
         {
             Parameter context("context");
             context.type() = fsm()->context() + '&';
-            TransitionForCpp* tfc = static_cast<TransitionForCpp*>(transition.second);
+            TransitionForCpp* tfc = static_cast<TransitionForCpp*>(transition->second);
             if (fsm()->returnt().empty())
                 cpp << "void ";
             else
@@ -240,9 +245,9 @@ void MapForCpp::generateCode(ostream& cpp, bool debug) const
     cpp << "}" << endl;
 
 
-    for (const auto& state : states())
-    {
-        StateForCpp* sfc = dynamic_cast<StateForCpp*>(state.second);
+	for (state = states().begin(); state != states().end(); ++state)
+	{
+        StateForCpp* sfc = dynamic_cast<StateForCpp*>(state->second);
         sfc->generateCode(cpp, debug);
     }
 }

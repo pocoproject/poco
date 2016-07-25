@@ -10,9 +10,6 @@
     <Filter Include="cpp">
       <UniqueIdentifier>{a8451f20-ad5b-42c6-8137-7d9f5f4dc222}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FSM">
-      <UniqueIdentifier>{8ee51b34-f230-48c0-ba7b-d98efc842617}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\parser\BNF.txt">
@@ -183,69 +180,6 @@
     </ClInclude>
     <ClInclude Include="src\parser\Tokenizer.h">
       <Filter>parser</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\ActionForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\ArgumentForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\BinaryOperationForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\CompilableForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\ElementForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\EntryForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\ExitForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\ExpressionForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\FactoryForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\FSMForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\FunctionForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\GuardForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\LiteralForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\MapForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\ParameterForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\ReferenceForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\StateForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\TransitionForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\UnaryOperationForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="src\cpp\VariableForCpp.h">
-      <Filter>cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Poco\FSM\statemap.h">
-      <Filter>FSM</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

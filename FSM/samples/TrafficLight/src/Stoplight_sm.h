@@ -1,6 +1,8 @@
 #ifndef cpp_ex4_Stoplight_sm_H
 #define cpp_ex4_Stoplight_sm_H
 #include "Poco/FSM/statemap.h"
+
+
 namespace cpp_ex4 {
 	// Forward declarations.--------------------------
 	class StopMap;
@@ -110,7 +112,7 @@ namespace cpp_ex4 {
 		};
 		
 		StoplightState& getState() const {
-		    if (_state == nullptr) {
+		    if (_state == NULL) {
 		        throw statemap::StateUndefinedException();
 		    }
 		     return (dynamic_cast<StoplightState&>(*_state));
@@ -119,7 +121,7 @@ namespace cpp_ex4 {
 		void Timeout() {
 		    setTransition("Timeout");
 		    getState().Timeout(*this);
-		    setTransition(nullptr);
+		    setTransition(NULL);
 		};
 	};
 }
