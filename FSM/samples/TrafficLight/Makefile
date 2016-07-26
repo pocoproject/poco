@@ -16,7 +16,7 @@ ifeq ($(OSNAME), Cygwin)
 endif
 
 # Where to find the Finite State Machine Compiler executable
-FSMc   = $(POCO_BUILD)/FSM/bin/$(OSNAME)/$(OSARCH)/FSMc
+FSMc   = $(POCO_BUILD)/FSM/bin/$(OSNAME)/$(OSARCH)/fsmc
 
 objects = stoplight Stoplight_sm TrafficLight
 
@@ -31,6 +31,6 @@ ifdef POCO_UNBUNDLED
 endif
 
 # Rule for runnning Finite State Machine Compiler
-src/%.cpp: src/%.sm
+src/Stoplight_sm.cpp: src/TrafficLight.sm
 	@echo "** Compiling FSM " $<
 	$(SET_LD_LIBRARY_PATH) $(FSMc) $<
