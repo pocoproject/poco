@@ -142,7 +142,7 @@ protected:
         {
             if (args.size() == 0)
             {
-                logger.error("Missing <fsm>.sm file");
+                logger.error("Missing FSM file");
                 return Application::EXIT_NOINPUT;
             }
             smPath = args[0];
@@ -151,7 +151,8 @@ protected:
                 logger.error("file %s is not a file", smPath.toString());
                 return Application::EXIT_USAGE;
             }
-            if (smPath.getExtension() != "sm")
+			string extension = smPath.getExtension();
+            if (!(extension == "sm" || extension == "smt") || extension == "smx"))
             {
                 logger.error("file %s is not a FSM file", smPath.toString());
                 return Application::EXIT_USAGE;
