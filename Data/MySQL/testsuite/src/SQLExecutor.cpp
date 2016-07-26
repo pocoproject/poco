@@ -35,6 +35,12 @@
 #define HAVE_STRUCT_TIMESPEC
 #endif
 
+#if (POCO_OS == POCO_OS_CYGWIN)
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+#endif
+
 #include <my_global.h>
 #include <mysql.h>
 
