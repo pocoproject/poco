@@ -152,7 +152,7 @@ protected:
                 return Application::EXIT_USAGE;
             }
 			string extension = smPath.getExtension();
-            if (!(extension == "sm" || extension == "smt") || extension == "smx"))
+            if (!(extension == "sm" || extension == "smt" || extension == "smx"))
             {
                 logger.error("file %s is not a FSM file", smPath.toString());
                 return Application::EXIT_USAGE;
