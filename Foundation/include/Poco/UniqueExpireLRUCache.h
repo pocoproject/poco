@@ -49,7 +49,7 @@ class UniqueExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollectio
 	/// method to values that do not have a getExpiration function.
 {
 public:
-	UniqueExpireLRUCache(long cacheSize = 1024): 
+	UniqueExpireLRUCache(std::size_t cacheSize = 1024): 
 		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>(StrategyCollection<TKey, TValue>())
 	{
 		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));
