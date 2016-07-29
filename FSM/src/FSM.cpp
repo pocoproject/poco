@@ -51,7 +51,8 @@ void FSM::print(Print& print) const
 //				print(format("%s\t%s", string(Keyword::asString(Keyword::DECLARE)), declare()));
 //				print(format("%s\t%s", string(Keyword::asString(Keyword::ACCESS)), access()));
     print(format("%s\t%s", string(Keyword::asString(Keyword::HEADER)), header()));
-    print(format("%s\t%s", string(Keyword::asString(Keyword::PACKAGE)), packages()[0]));
+    if (packages().size())
+		print(format("%s\t%s", string(Keyword::asString(Keyword::PACKAGE)), packages()[0]));
 
 	List<MapPtr>::const_iterator map;
 	for (map = maps().begin(); map != maps().end(); ++map)
