@@ -147,8 +147,8 @@ void MapForCpp::generateInclude(ostream& inc, bool debug) const
         inc << "public:" << endl << tab;
 
         inc << "explicit " << endl;
-        inc << fsm()->fsmclass() << "(statemap::Notifier& notifier) : FSMContext(notifier, " << startStateName() << ") {};" << endl;
-        inc << fsm()->fsmclass() << "(statemap::Notifier& notifier, const statemap::State& state) : FSMContext(notifier, state) {};" << endl;
+        inc << fsm()->fsmclass() << "(statemap::Notifier* notifier = NULL) : FSMContext(" << startStateName() << ", notifier) {};" << endl;
+        inc << fsm()->fsmclass() << "(const statemap::State& state, statemap::Notifier* notifier = NULL) : FSMContext(state, notifier) {};" << endl;
         inc << endl;
 
         inc << "void setStartState(const statemap::State& state) {" << endl;

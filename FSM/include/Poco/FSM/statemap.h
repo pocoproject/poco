@@ -493,8 +493,8 @@ class FSMContext {
 #endif // ! SMC_FIXED_STACK
 
 		_transition = copyString(transition);
-		if (getDebugFlag() && transition)
-			_notify(Transition, transition);
+		if (getDebugFlag() && transition && _notify)
+			(*_notify)(Transition, transition);
 
 		return;
 	};
@@ -518,16 +518,16 @@ class FSMContext {
 		// that situation. We know clearState() was not
 		// called when _state is not null.
 		if (_state != NULL) {
-			if (_debug_flag) {
-				_notify(Leave, _state);
+			if (_debug_flag && _notify) {
+				(*_notify)(Leave, _state);
 			}
 			_previous_state = _state;
 		}
 
 		_state = const_cast<State *>(&state);
 
-		if (_debug_flag) {
-			_notify(Switch, _previous_state, _state);
+		if (_debug_flag && _notify) {
+			(*_notify)(Switch, _previous_state, _state);
 		}
 	};
 
@@ -564,8 +564,8 @@ class FSMContext {
 		_previous_state = _state;
 		_state = const_cast<State *>(&state);
 
-		if (_debug_flag == true) {
-			_notify(PUSH_STATE, _state);
+		if (_debug_flag == true && _notify) {
+			(*_notify)(PUSH_STATE, _state);
 		}
 	};
 
@@ -585,8 +585,8 @@ class FSMContext {
 		--_state_stack_depth;
 		_state = _state_stack[_state_stack_depth];
 
-		if (_debug_flag == true) {
-			_notify(POP, _state);
+		if (_debug_flag == true && _notify) {
+			(*_notify)(POP, _state);
 		}
 	};
 
@@ -629,8 +629,8 @@ class FSMContext {
 		_previous_state = _state;
 		_state = const_cast<State *>(&state);
 
-		if (_debug_flag == true) {
-			_notify(Push, _state);
+		if (_debug_flag == true && _notify) {
+			(*_notify)(Push, _state);
 		}
 	};
 
@@ -654,8 +654,8 @@ class FSMContext {
 		_state_stack = _state_stack->getNext();
 		delete entry;
 
-		if (_debug_flag == true) {
-			_notify(Pop, _state);
+		if (_debug_flag == true && _notify) {
+			(*_notify)(Pop, _state);
 		}
 	};
 
@@ -676,7 +676,7 @@ class FSMContext {
 
   protected:
 	// Default constructor.
-	FSMContext(Notifier& notifier, const State& state)
+	FSMContext(const State& state, Notifier* notifier = NULL)
 		: _state(const_cast<State *>(&state)),
 		  _previous_state(NULL),
 #ifdef SMC_FIXED_STACK
@@ -709,7 +709,7 @@ class FSMContext {
 
   private:
 	bool _debug_flag;
-	Notifier&	_notify;
+	Notifier*	_notify;
 };
 }
 #endif
