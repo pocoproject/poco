@@ -257,8 +257,10 @@ const Poco::Token* Parser::parseFile(const Poco::Token* next, const Path& out)
                 next = parseAccess(next);
                 break;
             case Keyword::MAP:		// %map
-                if (fsm->fsmfile().empty())
-                    fsm->fsmfile() = fsm->klass() + "_sm";
+				if (fsm->fsmclass().empty())
+					fsm->fsmclass() = fsm->klass() + "Context";
+				if (fsm->fsmfile().empty())
+					fsm->fsmfile() = fsm->klass() + "_sm";
                 fsm->setcontext();
 
                 if (fsm->updated(out))
@@ -616,23 +618,29 @@ const Poco::Token* Parser::parseGuard(const Poco::Token* next)
 const Poco::Token* Parser::parseTerminal(const Poco::Token* next, ReferencePtr& reference)
 {
     poco_assert(isIdentifier(next));
-    if (isIdentifier(next))
-    {
-        const Poco::Token* identifier = next; // true/false not supported
-        next = nextToken();
-        if (isOperator(next, Operator::OPENPARENT))
-        {
-            FunctionPtr function = factory.newFunction(identifier->tokenString());
-            next = parseArguments(next, function->arguments());
-            reference = factory.newReference(function);
-        }
-        else
-        {
-            VariablePtr variable = factory.newVariable(identifier->tokenString());
-            reference = factory.newReference(variable);
-        }
-        reference->guard() = guard;
-    }
+    for(;;) {
+		if (isIdentifier(next))
+		{
+		    const Poco::Token* identifier = next; // true/false not supported
+		    next = nextToken();
+		    if (isOperator(next, Operator::OPENPARENT))
+		    {
+		        FunctionPtr function = factory.newFunction(identifier->tokenString());
+		        next = parseArguments(next, function->arguments());
+		        reference = factory.newReference(function);
+		    }
+			else
+			{
+			    VariablePtr variable = factory.newVariable(identifier->tokenString());
+			    reference = factory.newReference(variable);
+			}
+		    reference->guard() = guard;
+		}
+		if (isOperator(next, Operator::PERIOD)) {
+			next = nextToken();
+		} else
+			break;
+	}
     return next;
 }
 void Parser::reduce()
@@ -843,7 +851,7 @@ const Poco::Token* Parser::parseParameter(const Poco::Token* next)
             if (isOperator(next, Operator::CLOSPARENT) || isOperator(next, Operator::COMMA))
                 break;
             string token = next->tokenString();
-            if (token == "const")
+            if (token == "const" || token == "unsigned" || token == "long")
                 token += ' ';
             type += token;
         }
@@ -911,7 +919,9 @@ const Poco::Token* Parser::parseArguments(const Poco::Token* next, List<Argument
 }
 const Poco::Token* Parser::parseArgument(const Poco::Token* next, List<ArgumentPtr>& arguments)
 {
-    poco_assert(isIdentifier(next) || isNumber(next) || isString(next) || isCharacter(next));
+	string msg = next->asString() + ':';
+	poco_assert_msg(isIdentifier(next) || isNumber(next) || isString(next) || isCharacter(next) ||
+					 isOperator(next, Operator::STAR) || isOperator(next, Operator::BITAND), msg.c_str());
     string code;
     int count = 0;
     for (;;)
@@ -924,8 +934,9 @@ const Poco::Token* Parser::parseArgument(const Poco::Token* next, List<ArgumentP
         }
         if (isOperator(next, Operator::OPENPARENT))
             count += 1;
-        code += next->tokenString();
-        next = nextToken();
+		code += next->tokenString();
+		code += ' ';
+		next = nextToken();
     }
     ArgumentPtr argument = factory.newArgument(code);
     arguments.push_back(argument);
