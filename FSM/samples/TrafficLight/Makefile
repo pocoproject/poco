@@ -7,8 +7,8 @@
 #
 
 include $(POCO_BASE)/build/rules/global
-INCLUDE 	+= -I$(POCO_BASE)/FSM/include 
-CXXFLAGS 	+= -fno-operator-names
+INCLUDE 		+= -I$(POCO_BASE)/FSM/include 
+CXXFLAGS 		+= -fno-operator-names
 
 # Cygwin Poco*.dll should be on PATH
 ifeq ($(OSNAME), Cygwin)
@@ -22,12 +22,12 @@ objects = stoplight Stoplight_sm TrafficLight
 
 target         = TrafficLight
 target_version = 1
-target_libs    = PocoUtil PocoJSON PocoNet PocoXML PocoFoundation
+target_libs    = PocoUtil PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
 
 ifdef POCO_UNBUNDLED
-    SYSLIBS += -lz -lpcre -lexpat
+    SYSLIBS 	+= -lz -lpcre -lexpat
 endif
 
 # Rule for runnning Finite State Machine Compiler
