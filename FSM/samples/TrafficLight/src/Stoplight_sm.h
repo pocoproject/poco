@@ -1,7 +1,6 @@
 #ifndef cpp_ex4_Stoplight_sm_H
 #define cpp_ex4_Stoplight_sm_H
 #include "Poco/FSM/statemap.h"
-
 namespace cpp_ex4 {
 	// Forward declarations.--------------------------
 	class StopMap;
@@ -90,8 +89,8 @@ namespace cpp_ex4 {
 	class StoplightContext : public statemap::FSMContext, public StopMap {
 	public:
 		explicit 
-		StoplightContext(statemap::Notifier& notifier) : FSMContext(notifier, StopMap::NorthSouthGreen) {};
-		StoplightContext(statemap::Notifier& notifier, const statemap::State& state) : FSMContext(notifier, state) {};
+		StoplightContext(statemap::Notifier* notifier = NULL) : FSMContext(StopMap::NorthSouthGreen, notifier) {};
+		StoplightContext(const statemap::State& state, statemap::Notifier* notifier = NULL) : FSMContext(state, notifier) {};
 		
 		void setStartState(const statemap::State& state) {
 			setState(state);

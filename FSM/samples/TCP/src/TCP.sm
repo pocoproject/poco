@@ -98,9 +98,9 @@ Exit
 	// the ESTABLISHED state while the server socket goes back to
 	// LISTEN.
 	ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort() &&
-	   segment.getAcknowledgeNumber() == ctxt.getSequenceNumber()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort() &&
+	   segment.getAcknowledgeNumber() == getSequenceNumber()]
 											ESTABLISHED				{ accepted();deleteSegment(segment); }
 	Close									FIN_WAIT_1				{ doSend(TcpSegment::FIN, NULL, 0, 0, NULL); }
 	AckTimeout								CLOSED					{ doSend(TcpSegment::RST, NULL, 0, 0, NULL);closeSocket(); }
@@ -116,9 +116,9 @@ Exit
 	// When a TCP service accepts a new connection, it creates
 	// a new client to handle this connection.
 	SYN_ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort() &&
-	   segment.getAcknowledgeNumber() == ctxt.getSequenceNumber()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort() &&
+	   segment.getAcknowledgeNumber() == getSequenceNumber()]
 											ESTABLISHED				{ setFarAddress(segment);sendSynAckAck(segment);openSuccess();deleteSegment(segment); }
 
 	Close									CLOSED					{ closeSocket();closed(""); }
@@ -128,13 +128,13 @@ Exit
 ESTABLISHED
 {
 	FIN(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort()]
 											CLOSE_WAIT				{ doSend(TcpSegment::ACK, NULL, 0, 0, &segment);halfClosed();deleteSegment(segment); }
 
 	PSH(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort()]
 											nil						{ doSend(TcpSegment::ACK, NULL, 0, 0, &segment);receive(segment);deleteSegment(segment); }
 
 	Transmit(data: const char*, offset: int, size: int)
@@ -161,9 +161,9 @@ Exit
 }
 {
 	ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort() &&
-	   segment.getAcknowledgeNumber() == ctxt.getSequenceNumber()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort() &&
+	   segment.getAcknowledgeNumber() == getSequenceNumber()]
 		ESTABLISHED
 		{
 			transmitted();
@@ -171,9 +171,9 @@ Exit
 		}
 
 	PSH_ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort() &&
-	   segment.getAcknowledgeNumber() == ctxt.getSequenceNumber()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort() &&
+	   segment.getAcknowledgeNumber() == getSequenceNumber()]
 		ESTABLISHED
 		{
 			doSend(TcpSegment::ACK, NULL, 0, 0, &segment);
@@ -186,8 +186,8 @@ Exit
 	// data at exactly the same time as we sent it. Send an ack
 	// but don't go anywhere.
 	PSH(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort()]
 		nil
 		{
 			doSend(TcpSegment::ACK, NULL, 0, 0, &segment);
@@ -196,8 +196,8 @@ Exit
 		}
 
 	FIN(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort()]
 		CLOSE_WAIT
 		{
 			doSend(TcpSegment::ACK, NULL, 0, 0, &segment);
@@ -239,9 +239,9 @@ Exit
 }
 {
 	ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort() &&
-	   segment.getAcknowledgeNumber() == ctxt.getSequenceNumber()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort() &&
+	   segment.getAcknowledgeNumber() == getSequenceNumber()]
 		CLOSED
 		{
 			doSend(TcpSegment::FIN, NULL, 0, 0, &segment);
@@ -269,17 +269,17 @@ Exit
 }
 {
 	ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort() &&
-	   segment.getAcknowledgeNumber() == ctxt.getSequenceNumber()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort() &&
+	   segment.getAcknowledgeNumber() == getSequenceNumber()]
 		FIN_WAIT_2
 		{
 			deleteSegment(segment);
 		}
 
 	FIN(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort()]
 		CLOSING
 		{
 			doSend(TcpSegment::ACK, NULL, 0, 0, &segment);
@@ -287,9 +287,9 @@ Exit
 		}
 
 	FIN_ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort() &&
-	   segment.getAcknowledgeNumber() == ctxt.getSequenceNumber()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort() &&
+	   segment.getAcknowledgeNumber() == getSequenceNumber()]
 		TIME_WAIT
 		{
 			doSend(TcpSegment::ACK, NULL, 0, 0, &segment);
@@ -315,8 +315,8 @@ Exit
 }
 {
 	FIN(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort()]
 		TIME_WAIT
 		{
 			doSend(TcpSegment::ACK, NULL, 0, 0, &segment);
@@ -348,9 +348,9 @@ Exit
 }
 {
 	ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort() &&
-	   segment.getAcknowledgeNumber() == ctxt.getSequenceNumber()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort() &&
+	   segment.getAcknowledgeNumber() == getSequenceNumber()]
 		TIME_WAIT
 		{
 			deleteSegment(segment);
@@ -382,9 +382,9 @@ Exit
 }
 {
 	FIN_ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() == ctxt.getFarAddress() &&
-	   segment.getSrcPort() == ctxt.getFarPort() &&
-	   segment.getAcknowledgeNumber() == ctxt.getSequenceNumber()]
+	  [segment.getSrcAddress() == getFarAddress() &&
+	   segment.getSrcPort() == getFarPort() &&
+	   segment.getAcknowledgeNumber() == getSequenceNumber()]
 		CLOSED
 		{
 			closeSocket();
@@ -405,7 +405,7 @@ Exit
 			deleteSegment(segment);
 		}
 }
-
+ 
 Default
 {
 	PassiveOpen(port : unsigned short)
@@ -430,8 +430,8 @@ Default
 	// segment is to reset the unknown client but remain in
 	// the current state for a segment from the real client.
 	FIN(segment: const TcpSegment&)
-	  [segment.getSrcAddress() != ctxt.getFarAddress() ||
-	   segment.getSrcPort() != ctxt.getFarPort()]
+	  [segment.getSrcAddress() != getFarAddress() ||
+	   segment.getSrcPort() != getFarPort()]
 		nil
 		{
 			doSend(TcpSegment::RST, NULL, 0, 0, &segment);
@@ -440,8 +440,8 @@ Default
 		}
 
 	SYN(segment: const TcpSegment&)
-	  [segment.getSrcAddress() != ctxt.getFarAddress() ||
-	   segment.getSrcPort() != ctxt.getFarPort()]
+	  [segment.getSrcAddress() != getFarAddress() ||
+	   segment.getSrcPort() != getFarPort()]
 		nil
 		{
 			doSend(TcpSegment::RST, NULL, 0, 0, &segment);
@@ -450,8 +450,8 @@ Default
 		}
 
 	PSH(segment: const TcpSegment&)
-	  [segment.getSrcAddress() != ctxt.getFarAddress() ||
-	   segment.getSrcPort() != ctxt.getFarPort()]
+	  [segment.getSrcAddress() != getFarAddress() ||
+	   segment.getSrcPort() != getFarPort()]
 		nil
 		{
 			doSend(TcpSegment::RST, NULL, 0, 0, &segment);
@@ -460,8 +460,8 @@ Default
 		}
 
 	ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() != ctxt.getFarAddress() ||
-	   segment.getSrcPort() != ctxt.getFarPort()]
+	  [segment.getSrcAddress() != getFarAddress() ||
+	   segment.getSrcPort() != getFarPort()]
 		nil
 		{
 			doSend(TcpSegment::RST, NULL, 0, 0, &segment);
@@ -470,8 +470,8 @@ Default
 		}
 
 	URG(segment: const TcpSegment&)
-	  [segment.getSrcAddress() != ctxt.getFarAddress() ||
-	   segment.getSrcPort() != ctxt.getFarPort()]
+	  [segment.getSrcAddress() != getFarAddress() ||
+	   segment.getSrcPort() != getFarPort()]
 		nil
 		{
 			doSend(TcpSegment::RST, NULL, 0, 0, &segment);
@@ -480,8 +480,8 @@ Default
 		}
 
 	FIN_ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() != ctxt.getFarAddress() ||
-	   segment.getSrcPort() != ctxt.getFarPort()]
+	  [segment.getSrcAddress() != getFarAddress() ||
+	   segment.getSrcPort() != getFarPort()]
 		nil
 		{
 			doSend(TcpSegment::RST, NULL, 0, 0, &segment);
@@ -490,8 +490,8 @@ Default
 		}
 
 	SYN_ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() != ctxt.getFarAddress() ||
-	   segment.getSrcPort() != ctxt.getFarPort()]
+	  [segment.getSrcAddress() != getFarAddress() ||
+	   segment.getSrcPort() != getFarPort()]
 		nil
 		{
 			doSend(TcpSegment::RST, NULL, 0, 0, &segment);
@@ -500,8 +500,8 @@ Default
 		}
 
 	PSH_ACK(segment: const TcpSegment&)
-	  [segment.getSrcAddress() != ctxt.getFarAddress() ||
-	   segment.getSrcPort() != ctxt.getFarPort()]
+	  [segment.getSrcAddress() != getFarAddress() ||
+	   segment.getSrcPort() != getFarPort()]
 		nil
 		{
 			doSend(TcpSegment::RST, NULL, 0, 0, &segment);
@@ -510,8 +510,8 @@ Default
 		}
 
 	UNDEF(segment: const TcpSegment&)
-	  [segment.getSrcAddress() != ctxt.getFarAddress() ||
-	   segment.getSrcPort() != ctxt.getFarPort()]
+	  [segment.getSrcAddress() != getFarAddress() ||
+	   segment.getSrcPort() != getFarPort()]
 		nil
 		{
 			doSend(TcpSegment::RST, NULL, 0, 0, &segment);

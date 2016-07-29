@@ -72,7 +72,7 @@ public:
 static Print print;
 
  Stoplight::Stoplight(Directions direction, int NSGreenTimer, int EWGreenTimer)	:
-	StoplightContext(print),
+	StoplightContext(&print),
 	callback(*this, &Stoplight::onTimer) {
 
 #define FSM_DEBUG
