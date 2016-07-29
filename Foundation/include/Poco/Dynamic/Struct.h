@@ -211,7 +211,8 @@ public:
     return it->second;
   }
   
-  inline Var getVar(const K& key, const Var& defaultValue) const
+  template<typename DefT = Var>
+  inline Var getVar(const K& key, const DefT& defaultValue) const
 		/// Returns the var value of the element with the given name.
 		/// or defaultValue if none is found.
   {
@@ -222,7 +223,7 @@ public:
     }
     return it->second;
   }
-
+  
 	std::string toString()
 	{
 		std::string str;
