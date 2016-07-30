@@ -230,10 +230,6 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 		{
 			request.setChunkedTransferEncoding(true);
 		}
-		if (!request.getChunkedTransferEncoding())
-		{
-			request.setContentLength(calculateContentLength());
-		}
 	}
 	else
 	{
