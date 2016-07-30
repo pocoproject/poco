@@ -224,7 +224,7 @@ public:
     return it->second;
   }
   
-	std::string toString()
+	std::string toString() const
 	{
 		std::string str;
 		Var(*this).template convert<std::string>(str);
