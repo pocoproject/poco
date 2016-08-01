@@ -245,7 +245,11 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 
 std::streamsize HTMLForm::calculateContentLength()
 {
-	if (_boundary.empty())
+	if (_encoding == ENCODING_URL)
+	{
+		return 0;
+	}
+	else if (_boundary.empty())
 		throw HTMLFormException("Form must be prepared");
 
 	HTMLFormCountingOutputStream c;
