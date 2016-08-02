@@ -108,7 +108,18 @@ protected:
 		DirectoryIterator end;
 		while (it != end)
 		{
-			entries[it.path().getFileName()] = ItemInfo(*it);
+			// DirectoryWatcher should not stop watching if it fails to get the info
+			// of a file, it should just ignore it.
+			try
+			{
+				entries[it.path().getFileName()] = ItemInfo(*it);
+			}
+			catch (Poco::FileNotFoundException&)
+			{
+				// The file is missing, remove it from the entries so it is treated as
+				// deleted.
+				entries.erase(it.path().getFileName());
+			}
 			++it;
 		}
 	}
