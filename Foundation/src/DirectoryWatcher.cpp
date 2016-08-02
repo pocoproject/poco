@@ -114,13 +114,11 @@ protected:
 			{
 				entries[it.path().getFileName()] = ItemInfo(*it);
 			}
-			catch(const Poco::FileNotFoundException& fnfe)
+			catch (Poco::FileNotFoundException&)
 			{
 				// The file is missing, remove it from the entries so it is treated as
 				// deleted.
 				entries.erase(it.path().getFileName());
-
-				poco_unexpected();
 			}
 			++it;
 		}
