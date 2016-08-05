@@ -16,6 +16,7 @@
 
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/Struct.h"
+#include "Poco/NumberParser.h"
 #include <algorithm>
 #include <cctype>
 #include <vector>
@@ -404,7 +405,8 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 		case '"':
 			return parseJSONString(val, pos);
 		default:
-			return parseString(val, pos);
+			//return parseString(val, pos);
+			return parseVar(val, pos);
 		}
 	}
 	std::string empty;
@@ -481,6 +483,99 @@ std::string Var::parseString(const std::string& val, std::string::size_type& pos
 		{
 			result += val[pos++];
 		}
+		return result;
+	}
+}
+
+
+Var Var::parseVar(const std::string& val, std::string::size_type& pos)
+{
+	if (val[pos] == '"')
+	{
+		return parseJSONString(val, pos);
+	}
+	else
+	{
+    bool withNumeric = false;
+    bool withNonNumeric = false;
+    bool withDot = false;
+		std::string result;
+		while (pos < val.size() 
+			&& !Poco::Ascii::isSpace(val[pos]) 
+			&& val[pos] != ','
+			&& val[pos] != ']'
+			&& val[pos] != '}')
+		{
+      if(withDot)
+      {
+        if(val[pos] == '.')
+        {
+          withNonNumeric = true;
+        }
+      }
+      if(val[pos] == '.')
+      {
+        withDot = true;
+      }
+      else if((val[pos] > 47 && val[pos] < 58) || val[pos] == 45 || val[pos] == 43)
+      {
+        withNumeric = true;
+      }
+      else
+      {
+        withNonNumeric = true;
+      }
+      
+			result += val[pos++];
+		}
+    if(result == "true")
+      return(true);
+    else if(result == "false")
+      return(false);
+    else if(!withNonNumeric && withNumeric)
+    {
+      if(withDot)
+      {
+        {
+          double dblResult;
+          if(Poco::NumberParser::tryParseFloat(result, dblResult))
+          {
+            return(dblResult);
+          }
+        }
+      }
+      else
+      {
+        {
+          Int32 intResult;
+          if(Poco::NumberParser::tryParse(result, intResult))
+          {
+            return(intResult);
+          }
+        }
+        {
+          Int64 intResult;
+          if(Poco::NumberParser::tryParse64(result, intResult))
+          {
+            return(intResult);
+          }
+        }
+        {
+          UInt32 intResult;
+          if(Poco::NumberParser::tryParseUnsigned(result, intResult))
+          {
+            return(intResult);
+          }
+        }
+        {
+          UInt64 intResult;
+          if(Poco::NumberParser::tryParseUnsigned64(result, intResult))
+          {
+            return(intResult);
+          }
+        }
+      }
+    }
 		return result;
 	}
 }
