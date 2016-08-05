@@ -11,8 +11,8 @@
 
 
 #include "SocketAddressTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
 
@@ -26,7 +26,7 @@ using Poco::Net::NoAddressFoundException;
 using Poco::InvalidArgumentException;
 
 
-SocketAddressTest::SocketAddressTest(const std::string& name): CppUnit::TestCase(name)
+SocketAddressTest::SocketAddressTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -61,7 +61,7 @@ void SocketAddressTest::testSocketAddress()
 
 	try
 	{
-		SocketAddress sa3("192.168.1.100", "f00bar");
+		SocketAddress sa4("192.168.1.100", "f00bar");
 		fail("bad service name - must throw");
 	}
 	catch (ServiceNotFoundException&)

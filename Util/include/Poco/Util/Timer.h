@@ -40,7 +40,7 @@ class Util_API Timer: protected Poco::Runnable
 	/// sequentially. Therefore, tasks should complete their work as quickly
 	/// as possible, otherwise subsequent tasks may be delayed.
 	///
-	/// Timer is save for multithreaded use - multiple threads can schedule
+	/// Timer is safe for multithreaded use - multiple threads can schedule
 	/// new tasks simultaneously.
 	///
 	/// Acknowledgement: The interface of this class has been inspired by

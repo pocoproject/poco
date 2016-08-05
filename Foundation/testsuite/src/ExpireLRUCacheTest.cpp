@@ -11,8 +11,8 @@
 
 
 #include "ExpireLRUCacheTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/ExpireLRUCache.h"
 #include "Poco/AccessExpireLRUCache.h"
@@ -28,7 +28,7 @@ using namespace Poco;
 #define DURWAIT  300
 
 
-ExpireLRUCacheTest::ExpireLRUCacheTest(const std::string& name): CppUnit::TestCase(name)
+ExpireLRUCacheTest::ExpireLRUCacheTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

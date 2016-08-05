@@ -11,8 +11,8 @@
 
 
 #include "MemoryStreamTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Buffer.h"
 #include "Poco/MemoryStream.h"
 #include <sstream>
@@ -22,7 +22,7 @@ using Poco::MemoryInputStream;
 using Poco::MemoryOutputStream;
 
 
-MemoryStreamTest::MemoryStreamTest(const std::string& name): CppUnit::TestCase(name)
+MemoryStreamTest::MemoryStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

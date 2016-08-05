@@ -74,9 +74,9 @@ inline const NTPPacket &NTPEventArgs::packet()
 }
 
 
-inline void NTPEventArgs::setPacket(NTPPacket &packet)
+inline void NTPEventArgs::setPacket(NTPPacket &rPacket)
 {
-	_packet = packet;
+	_packet = rPacket;
 }
 
 

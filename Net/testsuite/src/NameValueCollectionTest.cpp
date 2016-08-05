@@ -11,8 +11,8 @@
 
 
 #include "NameValueCollectionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Exception.h"
 
@@ -21,7 +21,7 @@ using Poco::Net::NameValueCollection;
 using Poco::NotFoundException;
 
 
-NameValueCollectionTest::NameValueCollectionTest(const std::string& name): CppUnit::TestCase(name)
+NameValueCollectionTest::NameValueCollectionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

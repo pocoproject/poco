@@ -41,9 +41,15 @@ ZipDataInfo::ZipDataInfo(std::istream& in, bool assumeHeaderRead):
 	_valid(false)
 {
 	if (assumeHeaderRead)
+	{
 		std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
+	}
 	else
+	{
 		in.read(_rawInfo, ZipCommon::HEADER_SIZE);
+		if ((!in) || (in.gcount() != ZipCommon::HEADER_SIZE))
+			return;
+	}
 	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
 	// now copy the rest of the header
 	in.read(_rawInfo+ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
@@ -75,9 +81,15 @@ ZipDataInfo64::ZipDataInfo64(std::istream& in, bool assumeHeaderRead):
 	_valid(false)
 {
 	if (assumeHeaderRead)
+	{
 		std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
+	}
 	else
+	{
 		in.read(_rawInfo, ZipCommon::HEADER_SIZE);
+		if ((!in) || (in.gcount() != ZipCommon::HEADER_SIZE))
+			return;
+	}
 	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
 	// now copy the rest of the header
 	in.read(_rawInfo+ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);

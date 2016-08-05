@@ -11,8 +11,8 @@
 
 
 #include "LocalDateTimeTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/LocalDateTime.h"
 #include "Poco/DateTime.h"
 #include "Poco/Timestamp.h"
@@ -36,7 +36,7 @@ using std::strftime;
 #endif
 
 
-LocalDateTimeTest::LocalDateTimeTest(const std::string& name): CppUnit::TestCase(name)
+LocalDateTimeTest::LocalDateTimeTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

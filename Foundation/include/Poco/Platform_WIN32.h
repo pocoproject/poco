@@ -57,6 +57,9 @@
 #elif (_MSC_VER >= 1800) && (_MSC_VER < 1900) // Visual Studio 2013, MSVC++ 12.0
 	#define POCO_MSVS_VERSION 2013
 	#define POCO_MSVC_VERSION 120
+#elif (_MSC_VER >= 1900) && (_MSC_VER < 2000) // Visual Studio 2015, MSVC++ 14.0
+	#define POCO_MSVS_VERSION 2015
+	#define POCO_MSVC_VERSION 140
 #endif
 
 
@@ -90,8 +93,8 @@
 // C++11/14 support
 //
 
-// Enable C++11 support for VS 2013 and newer
-#if defined(_MSC_VER) && (_MSC_VER >= 1800) && !defined(POCO_ENABLE_CPP11) && !defined(POCO_DISABLE_CPP11)
+// Enable C++11 support for VS 2014 and newer
+#if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(POCO_ENABLE_CPP11)
 	#define POCO_ENABLE_CPP11
 #endif
 

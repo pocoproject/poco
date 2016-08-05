@@ -54,9 +54,9 @@ public:
 		/// A key-value pair, used as event argument.
 	{
 	public:
-		KeyValue(const std::string& key, std::string& value):
-			_key(key),
-			_value(value)
+		KeyValue(const std::string& rKey, std::string& rValue):
+			_key(rKey),
+			_value(rValue)
 		{
 		}
 		

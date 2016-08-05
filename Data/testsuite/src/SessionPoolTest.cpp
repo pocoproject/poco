@@ -11,8 +11,8 @@
 
 
 #include "SessionPoolTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Data/SessionPoolContainer.h"
 #include "Poco/Thread.h"

@@ -39,8 +39,8 @@ class WorkNotification: public Notification
 public:
 	typedef AutoPtr<WorkNotification> Ptr;
 	
-	WorkNotification(int data):
-		_data(data)
+	WorkNotification(int workData):
+		_data(workData)
 	{
 	}
 	

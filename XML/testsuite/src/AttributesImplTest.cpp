@@ -11,15 +11,15 @@
 
 
 #include "AttributesImplTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/SAX/AttributesImpl.h"
 
 
 using Poco::XML::AttributesImpl;
 
 
-AttributesImplTest::AttributesImplTest(const std::string& name): CppUnit::TestCase(name)
+AttributesImplTest::AttributesImplTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

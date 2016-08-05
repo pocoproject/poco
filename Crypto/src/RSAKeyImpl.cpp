@@ -87,10 +87,10 @@ RSAKeyImpl::RSAKeyImpl(
 			RSA* pubKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, 0, 0);
 			if (!pubKey)
 			{
-				int rc = BIO_reset(bio);
+				int ret = BIO_reset(bio);
 				// BIO_reset() normally returns 1 for success and 0 or -1 for failure. 
 				// File BIOs are an exception, they return 0 for success and -1 for failure.
-				if (rc != 0) throw Poco::FileException("Failed to load public key", publicKeyFile);
+				if (ret != 0) throw Poco::FileException("Failed to load public key", publicKeyFile);
 				pubKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, 0, 0);
 			}
 			BIO_free(bio);
@@ -287,8 +287,8 @@ void RSAKeyImpl::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyS
 			throw Poco::WriteFileException("Failed to write public key to stream");
 		}
 		char* pData;
-		long size = BIO_get_mem_data(bio, &pData);
-		pPublicKeyStream->write(pData, static_cast<std::streamsize>(size));
+		long keySize = BIO_get_mem_data(bio, &pData);
+		pPublicKeyStream->write(pData, static_cast<std::streamsize>(keySize));
 		BIO_free(bio);
 	}
 
@@ -309,8 +309,8 @@ void RSAKeyImpl::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyS
 			throw Poco::FileException("Failed to write private key to stream");
 		}
 		char* pData;
-		long size = BIO_get_mem_data(bio, &pData);
-		pPrivateKeyStream->write(pData, static_cast<std::streamsize>(size));
+		long keySize = BIO_get_mem_data(bio, &pData);
+		pPrivateKeyStream->write(pData, static_cast<std::streamsize>(keySize));
 		BIO_free(bio);
 	}
 }

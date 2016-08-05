@@ -30,21 +30,35 @@ namespace ODBC {
 Preparator::Preparator(const StatementHandle& rStmt, 
 	const std::string& statement, 
 	std::size_t maxFieldSize,
-	DataExtraction dataExtraction): 
+	DataExtraction dataExtraction,
+	ODBCMetaColumn::NumericConversion numericConversion,
+	bool isPostgres) :
 	_rStmt(rStmt),
 	_maxFieldSize(maxFieldSize),
-	_dataExtraction(dataExtraction)
+	_dataExtraction(dataExtraction),
+	_numericConversion(numericConversion)
 {
 	SQLCHAR* pStr = (SQLCHAR*) statement.c_str();
 	if (Utility::isError(Poco::Data::ODBC::SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
 		throw StatementException(_rStmt);
+	// PostgreSQL error swallowing workaround:
+	// Postgres may execute a statement with sintax error fine,
+	// but would return error once num of columns requested!
+	if (isPostgres)
+	{
+		SQLSMALLINT t = 0;
+		SQLRETURN r = SQLNumResultCols(rStmt, &t);
+		if (r != SQL_NO_DATA && Utility::isError(r))
+			throw StatementException(rStmt, "Failed to get number of columns");
+	}
 }
 
 
 Preparator::Preparator(const Preparator& other): 
 	_rStmt(other._rStmt),
 	_maxFieldSize(other._maxFieldSize),
-	_dataExtraction(other._dataExtraction)
+	_dataExtraction(other._dataExtraction),
+	_numericConversion(other._numericConversion)
 {
 	resize();
 }
@@ -155,7 +169,7 @@ std::size_t Preparator::maxDataSize(std::size_t pos) const
 
 	try 
 	{
-		ODBCMetaColumn mc(_rStmt, pos);
+		ODBCMetaColumn mc(_rStmt, pos, _numericConversion);
 		sz = mc.length();
 
 		// accommodate for terminating zero (non-bulk only!)

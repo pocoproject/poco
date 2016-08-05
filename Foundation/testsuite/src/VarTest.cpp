@@ -11,8 +11,8 @@
 
 
 #include "VarTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Bugcheck.h"
@@ -58,7 +58,7 @@ private:
 };
 
 
-VarTest::VarTest(const std::string& name): CppUnit::TestCase(name)
+VarTest::VarTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -2511,13 +2511,13 @@ void VarTest::testEmpty()
 
 	try
 	{
-		int i = da;
+		int j = da;
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 
 	try
 	{
-		int i = da.extract<int>();
+		int j = da.extract<int>();
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 }

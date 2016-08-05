@@ -11,8 +11,8 @@
 
 
 #include "PropertyFileConfigurationTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
@@ -26,7 +26,7 @@ using Poco::AutoPtr;
 using Poco::NotFoundException;
 
 
-PropertyFileConfigurationTest::PropertyFileConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
+PropertyFileConfigurationTest::PropertyFileConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName)
 {
 }
 

@@ -139,7 +139,6 @@ inline bool VarIterator::operator != (const VarIterator& other) const
 
 namespace std
 {
-	using std::swap;
 	template<>
 	inline void swap<Poco::Dynamic::VarIterator>(Poco::Dynamic::VarIterator& s1, 
 		Poco::Dynamic::VarIterator& s2)

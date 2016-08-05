@@ -59,7 +59,7 @@ public:
 	}
 
 	template <typename T>
-	Pair(const K& first, const T& second): _data(std::make_pair(first, second))
+	Pair(const K& rFirst, const T& rSecond): _data(std::make_pair(rFirst, rSecond))
 		/// Creates pair from two values.
 	{
 	}
@@ -98,7 +98,7 @@ public:
 	std::string toString()
 	{
 		std::string str;
-		Var(*this).convert<std::string>(str);
+		Var(*this).template convert<std::string>(str);
 		return str;
 	}
 

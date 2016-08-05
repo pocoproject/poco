@@ -699,13 +699,13 @@ unsigned short URI::getWellKnownPort() const
 		return 22;
 	else if (_scheme == "telnet")
 		return 23;
-	else if (_scheme == "http")
+	else if (_scheme == "http" || _scheme == "ws")
 		return 80;
 	else if (_scheme == "nntp")
 		return 119;
 	else if (_scheme == "ldap")
 		return 389;
-	else if (_scheme == "https")
+	else if (_scheme == "https" || _scheme == "wss")
 		return 443;
 	else if (_scheme == "rtsp")
 		return 554;

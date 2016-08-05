@@ -11,8 +11,8 @@
 
 
 #include "RandomTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Random.h"
 #include <vector>
 #include <cmath>
@@ -21,7 +21,7 @@
 using Poco::UInt32;
 
 
-RandomTest::RandomTest(const std::string& name): CppUnit::TestCase(name)
+RandomTest::RandomTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

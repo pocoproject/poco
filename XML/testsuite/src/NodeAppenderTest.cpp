@@ -11,8 +11,8 @@
 
 
 #include "NodeAppenderTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DOM/NodeAppender.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Document.h"
@@ -28,7 +28,7 @@ using Poco::XML::AutoPtr;
 using Poco::XML::XMLString;
 
 
-NodeAppenderTest::NodeAppenderTest(const std::string& name): CppUnit::TestCase(name)
+NodeAppenderTest::NodeAppenderTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

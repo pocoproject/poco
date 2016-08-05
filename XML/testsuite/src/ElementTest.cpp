@@ -11,8 +11,8 @@
 
 
 #include "ElementTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Attr.h"
@@ -33,7 +33,7 @@ using Poco::XML::AutoPtr;
 using Poco::XML::XMLString;
 
 
-ElementTest::ElementTest(const std::string& name): CppUnit::TestCase(name)
+ElementTest::ElementTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

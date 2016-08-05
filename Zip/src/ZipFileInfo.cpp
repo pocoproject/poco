@@ -125,7 +125,9 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 				if(size >= 8 && getOffsetFromHeader() == ZipCommon::ZIP64_MAGIC) {
 					setOffset(ZipUtil::get64BitValue(ptr, 0)); size -= 8; ptr += 8;
 				}
-			} else {
+			} 
+			else 
+			{
 				ptr += size;
 			}
 		}

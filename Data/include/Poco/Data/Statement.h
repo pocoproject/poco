@@ -147,10 +147,10 @@ public:
 		/// Registers the Binding vector with the Statement.
 
 	template <typename C>
-	Statement& addBinding(C& bindingCont, bool reset)
+	Statement& addBinding(C& bindingCont, bool doReset)
 		/// Registers binding container with the Statement.
 	{
-		if (reset) _pImpl->resetBinding();
+		if (doReset) _pImpl->resetBinding();
 		typename C::iterator itAB = bindingCont.begin();
 		typename C::iterator itABEnd = bindingCont.end();
 		for (; itAB != itABEnd; ++itAB) addBind(*itAB);
@@ -169,10 +169,10 @@ public:
 		/// Registers the vector of extraction vectors with the Statement.
 
 	template <typename C>
-	Statement& addExtraction(C& val, bool reset)
+	Statement& addExtraction(C& val, bool doReset)
 		/// Registers extraction container with the Statement.
 	{
-		if (reset) _pImpl->resetExtraction();
+		if (doReset) _pImpl->resetExtraction();
 		typename C::iterator itAE = val.begin();
 		typename C::iterator itAEEnd = val.end();
 		for (; itAE != itAEEnd; ++itAE) addExtract(*itAE);
@@ -365,10 +365,18 @@ public:
 		/// Returns false if the current data set index points to the last
 		/// data set. Otherwise, it returns true.
 
+	std::size_t firstDataSet();
+	/// Activates the first data set
+
+	std::size_t currentDataSet() const;
+	/// Returns the current data set.
+
 	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Sets the row formatter for this statement.
 		/// Statement takes the ownership of the formatter.
 
+	void insertHint();
+		/// Tells the statement that it is an sinsert one
 protected:
 	typedef StatementImpl::Ptr ImplPtr;
 
@@ -670,7 +678,7 @@ inline const AbstractExtractionVec& Statement::extractions() const
 
 inline const MetaColumn& Statement::metaColumn(std::size_t pos) const
 {
-	return _pImpl->metaColumn(pos);
+	return _pImpl->metaColumn(pos, _pImpl->currentDataSet());
 }
 
 
@@ -680,9 +688,9 @@ inline const MetaColumn& Statement::metaColumn(const std::string& name) const
 }
 
 
-inline void Statement::setStorage(const std::string& storage)
+inline void Statement::setStorage(const std::string& rStorage)
 {
-	_pImpl->setStorage(storage);
+	_pImpl->setStorage(rStorage);
 }
 
 
@@ -770,6 +778,19 @@ inline bool Statement::isBulkExtraction() const
 }
 
 
+inline std::size_t Statement::firstDataSet()
+{
+	_pImpl->firstDataSet();
+	return 0;
+}
+
+
+inline std::size_t Statement::currentDataSet() const
+{
+	return _pImpl->currentDataSet();
+}
+
+
 inline bool Statement::isAsync() const
 {
 	return _async;
@@ -788,6 +809,11 @@ inline const RowFormatter::Ptr& Statement::getRowFormatter()
 	return _pRowFormatter;
 }
 
+
+inline void Statement::insertHint()
+{
+	_pImpl->insertHint();
+}
 
 inline void swap(Statement& s1, Statement& s2)
 {

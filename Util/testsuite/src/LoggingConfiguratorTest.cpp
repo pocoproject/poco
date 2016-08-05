@@ -11,8 +11,8 @@
 
 
 #include "LoggingConfiguratorTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/LoggingConfigurator.h"
 #include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/LoggingRegistry.h"
@@ -44,7 +44,7 @@ using Poco::Message;
 using Poco::AutoPtr;
 
 
-LoggingConfiguratorTest::LoggingConfiguratorTest(const std::string& name): CppUnit::TestCase(name)
+LoggingConfiguratorTest::LoggingConfiguratorTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

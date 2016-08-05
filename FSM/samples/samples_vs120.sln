@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TrafficLight", "TrafficLight\TrafficLight_vs120.vcxproj", "{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|Win32 = debug_shared|Win32
+		debug_static_md|Win32 = debug_static_md|Win32
+		debug_static_mt|Win32 = debug_static_mt|Win32
+		release_shared|Win32 = release_shared|Win32
+		release_static_md|Win32 = release_static_md|Win32
+		release_static_mt|Win32 = release_static_mt|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.debug_static_md|Win32.ActiveCfg = debug_static_md|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.debug_static_md|Win32.Build.0 = debug_static_md|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.debug_static_mt|Win32.ActiveCfg = debug_static_mt|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.debug_static_mt|Win32.Build.0 = debug_static_mt|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.release_shared|Win32.Build.0 = release_shared|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.release_static_md|Win32.ActiveCfg = release_static_md|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.release_static_md|Win32.Build.0 = release_static_md|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.release_static_mt|Win32.ActiveCfg = release_static_mt|Win32
+		{A89F0F92-17FD-4F64-B95D-CBEE7349DB2C}.release_static_mt|Win32.Build.0 = release_static_mt|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

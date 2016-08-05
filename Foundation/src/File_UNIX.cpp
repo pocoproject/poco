@@ -20,12 +20,25 @@
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
+#if defined(POCO_OS_FAMILY_BSD)
+#include <sys/param.h>
+#include <sys/mount.h>
+#else
+#include <sys/statfs.h>
+#endif
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <utime.h>
 #include <cstring>
+
+namespace{
+// Convert timespec structures (seconds and remaining nano secs) to TimeVal (microseconds)
+Poco::Timestamp::TimeVal timespec2Microsecs(const struct timespec &ts) {
+	return ts.tv_sec * 1000000L + ts.tv_nsec / 1000L;
+}
+} // namespace
 
 
 namespace Poco {
@@ -195,15 +208,29 @@ bool FileImpl::isHiddenImpl() const
 Timestamp FileImpl::createdImpl() const
 {
 	poco_assert (!_path.empty());
-
+// first, platforms with birthtime attributes
 #if defined(__APPLE__) && defined(st_birthtime) && !defined(POCO_NO_STAT64) // st_birthtime is available only on 10.5
+	// a macro st_birthtime makes sure there is a st_birthtimespec (nano sec precision)
 	struct stat64 st;
 	if (stat64(_path.c_str(), &st) == 0)
-		return Timestamp::fromEpochTime(st.st_birthtime);
+		return Timestamp(timespec2Microsecs(st.st_birthtimespec);
+#elif defined(__FreeBSD__) && defined(st_birthtime)
+	// a macro st_birthtime makes sure there is a st_birthtimespec (nano sec precision)
+	struct stat st;
+	if (stat(_path.c_str(), &st) == 0)
+		return Timestamp(timespec2Microsecs(st.st_birthtimespec));
 #elif defined(__FreeBSD__)
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_birthtime);
+// then platforms with POSIX 2008-09 compatibility (nanosec precision)
+// (linux 2.6 and later)
+#elif (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L) \
+	|| (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 700)
+	struct stat st;
+	if (stat(_path.c_str(), &st) == 0)
+		return Timestamp(timespec2Microsecs(st.st_ctim));
+// finally try just stat with status change with precision to the second.
 #else
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
@@ -220,8 +247,17 @@ Timestamp FileImpl::getLastModifiedImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (stat(_path.c_str(), &st) == 0) {
+#if (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L) \
+	|| (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 700) \
+	|| defined(_BSD_SOURCE) || defined(_SVID_SOURCE)
+		return Timestamp(timespec2Microsecs(st.st_mtim));
+#elif defined(__APPLE__)
+		return Timestamp(timespec2Microsecs(st.st_mtimespec));
+#else
 		return Timestamp::fromEpochTime(st.st_mtime);
+#endif
+	}
 	else
 		handleLastErrorImpl(_path);
 	return 0;
@@ -232,10 +268,11 @@ void FileImpl::setLastModifiedImpl(const Timestamp& ts)
 {
 	poco_assert (!_path.empty());
 
-	struct utimbuf tb;
-	tb.actime  = ts.epochTime();
-	tb.modtime = ts.epochTime();
-	if (utime(_path.c_str(), &tb) != 0)
+	struct timeval tb[2];
+	tb[0].tv_sec  = ts.epochMicroseconds() / 1000000;
+	tb[0].tv_usec  = ts.epochMicroseconds() % 1000000;
+	tb[1] = tb[0];
+	if (utimes(_path.c_str(), tb) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -405,6 +442,42 @@ bool FileImpl::createDirectoryImpl()
 	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) 
 		handleLastErrorImpl(_path);
 	return true;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct statfs stats;
+	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_blocks * (FileSizeImpl)stats.f_bsize;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct statfs stats;
+	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_bavail * (FileSizeImpl)stats.f_bsize;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct statfs stats;
+	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_bfree * (FileSizeImpl)stats.f_bsize;
 }
 
 

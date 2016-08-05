@@ -11,8 +11,8 @@
 
 
 #include "ActivityTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Activity.h"
 #include "Poco/Thread.h"
 
@@ -60,7 +60,7 @@ namespace
 }
  
 
-ActivityTest::ActivityTest(const std::string& name): CppUnit::TestCase(name)
+ActivityTest::ActivityTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -19,7 +19,7 @@
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/Client.h"
 
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class RedisTest: public CppUnit::TestCase

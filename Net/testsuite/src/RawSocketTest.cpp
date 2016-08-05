@@ -11,8 +11,8 @@
 
 
 #include "RawSocketTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/RawSocket.h"
 #include "Poco/Net/RawSocketImpl.h"
 #include "Poco/Net/SocketAddress.h"
@@ -33,7 +33,7 @@ using Poco::InvalidArgumentException;
 using Poco::IOException;
 
 
-RawSocketTest::RawSocketTest(const std::string& name): CppUnit::TestCase(name)
+RawSocketTest::RawSocketTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

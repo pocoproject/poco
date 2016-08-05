@@ -11,8 +11,8 @@
 
 
 #include "HTTPCredentialsTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPBasicCredentials.h"
@@ -32,7 +32,7 @@ using Poco::Net::HTTPCredentials;
 using Poco::Net::NotAuthenticatedException;
 
 
-HTTPCredentialsTest::HTTPCredentialsTest(const std::string& name): CppUnit::TestCase(name)
+HTTPCredentialsTest::HTTPCredentialsTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

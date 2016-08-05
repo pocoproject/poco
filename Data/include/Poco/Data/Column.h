@@ -393,16 +393,16 @@ public:
 		if (row <= (std::size_t) (_pData->size() / 2))
 		{
 			Iterator it = _pData->begin();
-			Iterator end = _pData->end();
-			for (int i = 0; it != end; ++it, ++i)
+			Iterator itEnd = _pData->end();
+			for (int i = 0; it != itEnd; ++it, ++i)
 				if (i == row) return *it;
 		}
 		else
 		{
 			row = _pData->size() - row;
 			RIterator it = _pData->rbegin();
-			RIterator end = _pData->rend();
-			for (int i = 1; it != end; ++it, ++i)
+			RIterator itEnd = _pData->rend();
+			for (int i = 1; it != itEnd; ++it, ++i)
 				if (i == row) return *it;
 		}
 

@@ -5,8 +5,8 @@
 //
 
 
-#include "CppUnit/TestFailure.h"
-#include "CppUnit/Test.h"
+#include "Poco/CppUnit/TestFailure.h"
+#include "Poco/CppUnit/Test.h"
 
 
 namespace CppUnit {

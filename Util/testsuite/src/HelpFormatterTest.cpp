@@ -11,8 +11,8 @@
 
 
 #include "HelpFormatterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/HelpFormatter.h"
@@ -24,7 +24,7 @@ using Poco::Util::OptionSet;
 using Poco::Util::HelpFormatter;
 
 
-HelpFormatterTest::HelpFormatterTest(const std::string& name): CppUnit::TestCase(name)
+HelpFormatterTest::HelpFormatterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

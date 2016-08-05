@@ -11,8 +11,8 @@
 
 
 #include "ICMPClientTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/ICMPSocket.h"
 #include "Poco/Net/ICMPClient.h"
 #include "Poco/Net/ICMPEventArgs.h"
@@ -34,8 +34,8 @@ using Poco::Delegate;
 using Poco::AutoPtr;
 
 
-ICMPClientTest::ICMPClientTest(const std::string& name): 
-	CppUnit::TestCase(name),
+ICMPClientTest::ICMPClientTest(const std::string& rName): 
+	CppUnit::TestCase(rName),
 	_icmpClient(IPAddress::IPv4)
 {
 }

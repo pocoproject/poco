@@ -348,21 +348,21 @@ Node* AbstractContainerNode::getNodeByPathNS(const XMLString& path, const NSMap&
 			XMLString name;
 			while (it != path.end() && *it != '/' && *it != '@' && *it != '[') name += *it++;
 			if (it != path.end() && *it == '/') ++it;
-			XMLString namespaceURI;
-			XMLString localName;
+			XMLString namespaceURIString;
+			XMLString localNameString;
 			bool nameOK = true;
 			if (name.empty())
 			{
-				namespaceURI += '*';
-				localName += '*';
+				namespaceURIString += '*';
+				localNameString += '*';
 			}
 			else
 			{
-				nameOK = nsMap.processName(name, namespaceURI, localName, false);
+				nameOK = nsMap.processName(name, namespaceURIString, localNameString, false);
 			}
 			if (nameOK)
 			{
-				AutoPtr<ElementsByTagNameListNS> pList = new ElementsByTagNameListNS(this, namespaceURI, localName);
+				AutoPtr<ElementsByTagNameListNS> pList = new ElementsByTagNameListNS(this, namespaceURIString, localNameString);
 				unsigned long length = pList->length();
 				for (unsigned long i = 0; i < length; i++)
 				{

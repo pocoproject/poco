@@ -38,9 +38,9 @@ ServerSocket::ServerSocket(const Socket& socket): Socket(socket)
 }
 
 
-ServerSocket::ServerSocket(const SocketAddress& address, int backlog): Socket(new ServerSocketImpl)
+ServerSocket::ServerSocket(const SocketAddress& rAddress, int backlog): Socket(new ServerSocketImpl)
 {
-	impl()->bind(address, true);
+	impl()->bind(rAddress, true);
 	impl()->listen(backlog);
 }
 
@@ -48,8 +48,8 @@ ServerSocket::ServerSocket(const SocketAddress& address, int backlog): Socket(ne
 ServerSocket::ServerSocket(Poco::UInt16 port, int backlog): Socket(new ServerSocketImpl)
 {
 	IPAddress wildcardAddr;
-	SocketAddress address(wildcardAddr, port);
-	impl()->bind(address, true);
+	SocketAddress socketAddress(wildcardAddr, port);
+	impl()->bind(socketAddress, true);
 	impl()->listen(backlog);
 }
 
@@ -74,23 +74,23 @@ ServerSocket& ServerSocket::operator = (const Socket& socket)
 }
 
 
-void ServerSocket::bind(const SocketAddress& address, bool reuseAddress)
+void ServerSocket::bind(const SocketAddress& rAddress, bool reuseAddress)
 {
-	impl()->bind(address, reuseAddress);
+	impl()->bind(rAddress, reuseAddress);
 }
 
 
 void ServerSocket::bind(Poco::UInt16 port, bool reuseAddress)
 {
 	IPAddress wildcardAddr;
-	SocketAddress address(wildcardAddr, port);
-	impl()->bind(address, reuseAddress);
+	SocketAddress socketAddress(wildcardAddr, port);
+	impl()->bind(socketAddress, reuseAddress);
 }
 
 
-void ServerSocket::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+void ServerSocket::bind6(const SocketAddress& rAddress, bool reuseAddress, bool ipV6Only)
 {
-	impl()->bind6(address, reuseAddress, ipV6Only);
+	impl()->bind6(rAddress, reuseAddress, ipV6Only);
 }
 
 
@@ -98,8 +98,8 @@ void ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool ipV6Only)
 {
 #if defined(POCO_HAVE_IPv6)
 	IPAddress wildcardAddr(IPAddress::IPv6);
-	SocketAddress address(wildcardAddr, port);
-	impl()->bind6(address, reuseAddress, ipV6Only);
+	SocketAddress socketAddress(wildcardAddr, port);
+	impl()->bind6(socketAddress, reuseAddress, ipV6Only);
 #else
 	throw Poco::NotImplementedException("No IPv6 support available");
 #endif // POCO_HAVE_IPv6

@@ -11,8 +11,8 @@
 
 
 #include "NotificationQueueTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/NotificationQueue.h"
 #include "Poco/Notification.h"
 #include "Poco/Thread.h"
@@ -32,7 +32,7 @@ namespace
 	class QTestNotification: public Notification
 	{
 	public:
-		QTestNotification(const std::string& data): _data(data)
+		QTestNotification(const std::string& rData): _data(rData)
 		{
 		}
 		~QTestNotification()
@@ -49,7 +49,7 @@ namespace
 }
 
 
-NotificationQueueTest::NotificationQueueTest(const std::string& name): CppUnit::TestCase(name)
+NotificationQueueTest::NotificationQueueTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

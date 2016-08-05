@@ -12,6 +12,8 @@
 #
 LINKMODE ?= SHARED
 
+OMIT    = Data/PostgreSQL
+
 #
 # Define Tools
 #
@@ -71,9 +73,28 @@ RELEASEOPT_LINK =
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500 -D__BSD_VISIBLE
+
+SYSFLAGS = -D_XOPEN_SOURCE=500 -D__BSD_VISIBLE=1 -D__MISC_VISIBLE=1
 
 #
 # System Specific Libraries
 #
 SYSLIBS  = 
+
+#
+# Auto-detect architecture if not specified
+#
+ifndef OSARCH_64BITS
+  LBITS := $(shell getconf LONG_BIT)
+  ifeq ($(LBITS),64)
+    OSARCH_64BITS = 1
+  else
+    OSARCH_64BITS = 0
+  endif
+endif
+
+#
+# C++11/14 detection
+#
+include $(POCO_BASE)/build/script/cpp11-gcc
+

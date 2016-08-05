@@ -17,8 +17,8 @@
 #include "Poco/Zip/ZipManipulator.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include <iostream>
 #include <fstream>
 #undef min
@@ -28,7 +28,7 @@
 using namespace Poco::Zip;
 
 
-CompressTest::CompressTest(const std::string& name): CppUnit::TestCase(name)
+CompressTest::CompressTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -159,6 +159,7 @@ void CompressTest::createDataFile(const std::string& path, Poco::UInt64 size)
 
 void CompressTest::testZip64()
 {
+	std::cout << std::endl;
 	std::map<std::string, Poco::UInt64> files;
 	files["data1.bin"] = static_cast<Poco::UInt64>(KB)*4096+1;
 	files["data2.bin"] = static_cast<Poco::UInt64>(KB)*16;
@@ -166,6 +167,7 @@ void CompressTest::testZip64()
 	
 	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) 
 	{
+		std::cout << '\t' << "createDataFile(" << it->first << ", " << it->second << ");" << std::endl;
 		createDataFile(it->first, it->second);
 	}
 	std::ofstream out("zip64.zip", std::ios::binary | std::ios::trunc);
@@ -173,6 +175,7 @@ void CompressTest::testZip64()
 	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) 
 	{
 		const std::string& path = it->first;
+		std::cout << '\t' << "addFile(" << path <<  ");" << std::endl;
 		c.addFile(path, path, ZipCommon::CM_STORE);
 	}
 	ZipArchive a(c.close());

@@ -9,7 +9,7 @@
 include $(POCO_BASE)/build/rules/global
 
 # Cygwin Poco*.dll should be on PATH
-ifeq ($(OSNAME), CYGWIN)
+ifeq ($(OSNAME), Cygwin)
     PATH       :=$(LIBPATH):$(PATH)
 endif
 
@@ -31,4 +31,4 @@ endif
 # Rule for runnning PageCompiler
 src/%.cpp: src/%.cpsp
 	@echo "** Compiling Page" $<
-	$(PAGECOMPILER) $<
+	$(SET_LD_LIBRARY_PATH) $(PAGECOMPILER) $<

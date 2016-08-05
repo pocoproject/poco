@@ -17,7 +17,7 @@
 
 
 #include "Poco/Net/Net.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class POP3ClientSessionTest: public CppUnit::TestCase

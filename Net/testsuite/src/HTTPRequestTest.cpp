@@ -11,8 +11,8 @@
 
 
 #include "HTTPRequestTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/NetException.h"
 #include <sstream>
@@ -24,7 +24,7 @@ using Poco::Net::MessageException;
 using Poco::Net::NameValueCollection;
 
 
-HTTPRequestTest::HTTPRequestTest(const std::string& name): CppUnit::TestCase(name)
+HTTPRequestTest::HTTPRequestTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

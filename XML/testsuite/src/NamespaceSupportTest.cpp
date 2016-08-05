@@ -11,15 +11,15 @@
 
 
 #include "NamespaceSupportTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/SAX/NamespaceSupport.h"
 
 
 using Poco::XML::NamespaceSupport;
 
 
-NamespaceSupportTest::NamespaceSupportTest(const std::string& name): CppUnit::TestCase(name)
+NamespaceSupportTest::NamespaceSupportTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

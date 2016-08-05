@@ -115,11 +115,12 @@ void TaskManager::taskStarted(Task* pTask)
 
 void TaskManager::taskProgress(Task* pTask, float progress)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	ScopedLockWithUnlock<FastMutex> lock(_mutex);
 
 	if (_lastProgressNotification.isElapsed(MIN_PROGRESS_NOTIFICATION_INTERVAL))
 	{
 		_lastProgressNotification.update();
+		lock.unlock();
 		_nc.postNotification(new TaskProgressNotification(pTask, progress));
 	}
 }

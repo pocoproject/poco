@@ -11,15 +11,15 @@
 
 
 #include "UTF8StringTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/UTF8String.h"
 
 
 using Poco::UTF8;
 
 
-UTF8StringTest::UTF8StringTest(const std::string& name): CppUnit::TestCase(name)
+UTF8StringTest::UTF8StringTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

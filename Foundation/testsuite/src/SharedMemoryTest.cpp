@@ -11,8 +11,8 @@
 
 
 #include "SharedMemoryTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/SharedMemory.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
@@ -25,7 +25,7 @@
 using Poco::SharedMemory;
 
 
-SharedMemoryTest::SharedMemoryTest(const std::string& name): CppUnit::TestCase(name)
+SharedMemoryTest::SharedMemoryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

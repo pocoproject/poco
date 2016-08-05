@@ -97,6 +97,7 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("TINYINT", MetaColumn::FDT_INT8));
 		_types.insert(TypeMap::value_type("SMALLINT", MetaColumn::FDT_INT16));
 		_types.insert(TypeMap::value_type("BIGINT", MetaColumn::FDT_INT64));
+		_types.insert(TypeMap::value_type("LONGINT", MetaColumn::FDT_INT64));
 		_types.insert(TypeMap::value_type("COUNTER", MetaColumn::FDT_UINT64));
 		_types.insert(TypeMap::value_type("AUTOINCREMENT", MetaColumn::FDT_UINT64));
 		_types.insert(TypeMap::value_type("REAL", MetaColumn::FDT_DOUBLE));
@@ -168,7 +169,9 @@ void Utility::throwException(int rc, const std::string& addErrMsg)
 		throw ExecutionAbortedException(std::string("Callback routine requested an abort"), addErrMsg);
 	case SQLITE_BUSY:
 	case SQLITE_BUSY_RECOVERY:
+#if defined(SQLITE_BUSY_SNAPSHOT)
 	case SQLITE_BUSY_SNAPSHOT:
+#endif
 		throw DBLockedException(std::string("The database file is locked"), addErrMsg);
 	case SQLITE_LOCKED:
 		throw TableLockedException(std::string("A table in the database is locked"), addErrMsg);

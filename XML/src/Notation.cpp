@@ -21,11 +21,11 @@ namespace Poco {
 namespace XML {
 
 
-Notation::Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId): 
+Notation::Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& rPublicId, const XMLString& rSystemId): 
 	AbstractNode(pOwnerDocument),
 	_name(name),
-	_publicId(publicId),
-	_systemId(systemId)
+	_publicId(rPublicId),
+	_systemId(rSystemId)
 {
 }
 

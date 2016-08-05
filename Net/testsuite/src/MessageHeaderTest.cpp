@@ -11,8 +11,8 @@
 
 
 #include "MessageHeaderTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
 #include <sstream>
@@ -23,7 +23,7 @@ using Poco::Net::NameValueCollection;
 using Poco::Net::MessageException;
 
 
-MessageHeaderTest::MessageHeaderTest(const std::string& name): CppUnit::TestCase(name)
+MessageHeaderTest::MessageHeaderTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -362,6 +362,23 @@ void MessageHeaderTest::testFieldLimit()
 }
 
 
+void MessageHeaderTest::testDecodeWord()
+{
+	std::string coded("this is pure ASCII");
+	std::string decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
+	assert(decoded == coded);
+
+	coded = "(=?ISO-8859-1?Q?a?= =?ISO-8859-1?Q?b?=)";
+	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
+	assert(decoded == "(a b)");
+
+	coded = "Hello =?UTF-8?B?RnJhbmNpcw==?=, good bye";
+	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
+	assert(decoded == "Hello Francis, good bye");
+}
+
+
+
 void MessageHeaderTest::setUp()
 {
 }
@@ -392,6 +409,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitElements);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParameters);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimit);
-
+        CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
+        
 	return pSuite;
 }

@@ -11,8 +11,8 @@
 
 
 #include "URITest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/URI.h"
 #include "Poco/Path.h"
 
@@ -21,7 +21,7 @@ using Poco::URI;
 using Poco::Path;
 
 
-URITest::URITest(const std::string& name): CppUnit::TestCase(name)
+URITest::URITest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -437,6 +437,13 @@ void URITest::testParse()
 	assert (uri.getFragment().empty());
 	assert (uri.isRelative());
 	
+	uri = "ws://www.appinf.com/ws";
+	assert (uri.getScheme() == "ws");
+	assert (uri.getPort() == 80);
+
+	uri = "wss://www.appinf.com/ws";
+	assert (uri.getScheme() == "wss");
+	assert (uri.getPort() == 443);
 }
 
 

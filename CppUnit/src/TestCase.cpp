@@ -7,9 +7,9 @@
 
 #include <stdexcept>
 #include <math.h>
-#include "CppUnit/TestCase.h"
-#include "CppUnit/TestResult.h"
-#include "CppUnit/estring.h"
+#include "Poco/CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestResult.h"
+#include "Poco/CppUnit/estring.h"
 #include <typeinfo>
 #include <iostream>
 

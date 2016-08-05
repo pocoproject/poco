@@ -16,8 +16,8 @@
 #ifdef POCO_NET_HAS_INTERFACE
 
 
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "MulticastEchoServer.h"
 #include "Poco/Net/MulticastSocket.h"
 #include "Poco/Net/SocketAddress.h"
@@ -37,7 +37,7 @@ using Poco::InvalidArgumentException;
 using Poco::IOException;
 
 
-MulticastSocketTest::MulticastSocketTest(const std::string& name): CppUnit::TestCase(name)
+MulticastSocketTest::MulticastSocketTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -50,7 +50,7 @@ MulticastSocketTest::~MulticastSocketTest()
 void MulticastSocketTest::testMulticast()
 {
 	MulticastEchoServer echoServer;
-	MulticastSocket ms;
+	MulticastSocket ms(SocketAddress::IPv4);
 	int n = ms.sendTo("hello", 5, echoServer.group());
 	assert (n == 5);
 	char buffer[256];

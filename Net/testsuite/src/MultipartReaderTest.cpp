@@ -11,8 +11,8 @@
 
 
 #include "MultipartReaderTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/MultipartReader.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
@@ -24,7 +24,7 @@ using Poco::Net::MessageHeader;
 using Poco::Net::MultipartException;
 
 
-MultipartReaderTest::MultipartReaderTest(const std::string& name): CppUnit::TestCase(name)
+MultipartReaderTest::MultipartReaderTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

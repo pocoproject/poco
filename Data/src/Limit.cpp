@@ -21,10 +21,10 @@ namespace Poco {
 namespace Data {
 
 
-Limit::Limit(SizeT value, bool hardLimit, bool isLowerLimit) :
-	_value(value),
+Limit::Limit(SizeT limitValue, bool hardLimit, bool lowerLimit) :
+	_value(limitValue),
 	_hardLimit(hardLimit),
-	_isLowerLimit(isLowerLimit)
+	_isLowerLimit(lowerLimit)
 {
 }
 

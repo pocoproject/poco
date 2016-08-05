@@ -11,8 +11,8 @@
 
 
 #include "DataTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/LOB.h"
@@ -904,6 +904,11 @@ void DataTest::testRow()
 	assert (row[3] == 3);
 	assert (row[4] == 4);
 
+	const Row& cr = row;
+	assert(cr["field0"] == 0);
+	assert(cr[0] == 0);
+	assert(cr.get(0) == 0);
+
 	try
 	{
 		int i; i = row[5].convert<int>(); // to silence gcc
@@ -955,18 +960,6 @@ void DataTest::testRow()
 		row4.set("badfieldname", 0);
 		fail ("must fail");
 	}catch (NotFoundException&) {}
-
-	try
-	{
-		row4.set("field1", Var());
-		row4.addSortField(1);
-		row4.removeSortField(0);
-		fail ("must fail - field 1 is empty");
-	}
-	catch (IllegalStateException&)
-	{
-		row4.removeSortField(1);
-	}
 
 	row4.set("field0", 0);
 	row4.set("field1", 1);
@@ -1260,7 +1253,7 @@ void DataTest::testDateAndTime()
 	assert (dt.second() == t.second());
 	
 	Date d1(2007, 6, 15);
-	d1.assign(d.year() - 1, d.month(), d.day());
+	d1.assign(d.year() - 1, d.month(), (d.month() == 2 && d.day() == 29) ? 28 : d.day());
 	assert (d1 < d); assert (d1 != d);
 
 	d1.assign(d.year() - 1, 12, d.day());
@@ -1272,7 +1265,7 @@ void DataTest::testDateAndTime()
 		assert (d1 < d); assert (d1 != d);
 	}
 
-	d1.assign(d.year() + 1, d.month(), d.day());
+	d1.assign(d.year() + 1, d.month(), (d.month() == 2 && d.day() == 29) ? 28 : d.day());
 	assert (d1 > d); assert (d1 != d);
 	
 	d1.assign(d.year() + 1, 1, d.day());

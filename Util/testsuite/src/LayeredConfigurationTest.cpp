@@ -11,8 +11,8 @@
 
 
 #include "LayeredConfigurationTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/LayeredConfiguration.h"
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/AutoPtr.h"
@@ -28,7 +28,7 @@ using Poco::NotFoundException;
 using Poco::RuntimeException;
 
 
-LayeredConfigurationTest::LayeredConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
+LayeredConfigurationTest::LayeredConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName)
 {
 }
 

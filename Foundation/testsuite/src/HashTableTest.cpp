@@ -11,8 +11,8 @@
 
 
 #include "HashTableTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/HashTable.h"
 #include "Poco/NumberFormatter.h"
 
@@ -20,7 +20,7 @@
 using namespace Poco;
 
 
-HashTableTest::HashTableTest(const std::string& name): CppUnit::TestCase(name)
+HashTableTest::HashTableTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

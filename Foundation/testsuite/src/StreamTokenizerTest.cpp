@@ -11,8 +11,8 @@
 
 
 #include "StreamTokenizerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/StreamTokenizer.h"
 #include "Poco/Token.h"
 #include "Poco/Ascii.h"
@@ -105,7 +105,7 @@ public:
 };
 
 
-StreamTokenizerTest::StreamTokenizerTest(const std::string& name): CppUnit::TestCase(name)
+StreamTokenizerTest::StreamTokenizerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -251,19 +251,79 @@ void StreamTokenizerTest::testTokenizer7()
 	tokenizer.addToken(new WhitespaceToken());
 	tokenizer.addToken(new IdentifierToken());
 	tokenizer.addToken(new IntLiteralToken());
-	
+
 	const Token* next = tokenizer.next();
-	assert (next->tokenClass() == Token::IDENTIFIER_TOKEN);
-	assert (next->tokenString() == "foo");
+	assert(next->tokenClass() == Token::IDENTIFIER_TOKEN);
+	assert(next->tokenString() == "foo");
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
-	assert (next->asInteger() == 123);
+	assert(next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
+	assert(next->asInteger() == 123);
 
 	next = tokenizer.next();
-	assert (next->tokenClass() == Token::EOF_TOKEN);
+	assert(next->tokenClass() == Token::EOF_TOKEN);
 }
 
+
+void StreamTokenizerTest::testTokenizer8()
+{
+	std::string data = "  foo 123   ";
+	std::istringstream istr(data);
+	StreamTokenizer tokenizer(istr);
+	Token* whitespace = new WhitespaceToken();
+	tokenizer.addToken(whitespace);
+	tokenizer.addToken(new IdentifierToken());
+	tokenizer.addToken(new IntLiteralToken());
+
+	const Token* next = tokenizer.next();
+	assert(next->tokenClass() == Token::IDENTIFIER_TOKEN);
+	assert(next->tokenString() == "foo");
+
+	whitespace->ignore(false);
+	next = tokenizer.next();
+	assert(next->tokenClass() == Token::WHITESPACE_TOKEN);
+	assert(next->asString() == " ");
+
+	next = tokenizer.next();
+	assert(next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
+	assert(next->asInteger() == 123);
+
+	next = tokenizer.next();
+	assert(next->tokenClass() == Token::WHITESPACE_TOKEN);
+	assert(next->asString() == "   ");
+
+	next = tokenizer.next();
+	assert(next->tokenClass() == Token::EOF_TOKEN);
+}
+
+
+void StreamTokenizerTest::testTokenizer9()
+{
+	std::string data = "  foo 123   ";
+	std::istringstream istr(data);
+	StreamTokenizer tokenizer(istr);
+	Token* whitespace = new WhitespaceToken();
+	tokenizer.addToken(whitespace);
+	tokenizer.addToken(new IdentifierToken());
+	tokenizer.addToken(new IntLiteralToken());
+
+	const Token* next = tokenizer.next();
+	assert(next->tokenClass() == Token::IDENTIFIER_TOKEN);
+	assert(next->tokenString() == "foo");
+
+	whitespace->ignore(false);
+	next = tokenizer.next();
+	assert(next->tokenClass() == Token::WHITESPACE_TOKEN);
+	assert(next->asString() == " ");
+
+	next = tokenizer.next();
+	assert(next->tokenClass() == Token::INTEGER_LITERAL_TOKEN);
+	assert(next->asInteger() == 123);
+
+	whitespace->ignore(true);
+	next = tokenizer.next();
+	assert(next->tokenClass() == Token::EOF_TOKEN);
+}
 
 void StreamTokenizerTest::setUp()
 {
@@ -286,6 +346,8 @@ CppUnit::Test* StreamTokenizerTest::suite()
 	CppUnit_addTest(pSuite, StreamTokenizerTest, testTokenizer5);
 	CppUnit_addTest(pSuite, StreamTokenizerTest, testTokenizer6);
 	CppUnit_addTest(pSuite, StreamTokenizerTest, testTokenizer7);
+	CppUnit_addTest(pSuite, StreamTokenizerTest, testTokenizer8);
+	CppUnit_addTest(pSuite, StreamTokenizerTest, testTokenizer9);
 
 	return pSuite;
 }

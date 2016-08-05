@@ -17,7 +17,7 @@
 
 
 #include "Poco/Data/Data.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class SessionPoolTest: public CppUnit::TestCase

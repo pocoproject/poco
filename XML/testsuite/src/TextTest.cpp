@@ -11,8 +11,8 @@
 
 
 #include "TextTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DOM/Text.h"
 #include "Poco/DOM/CDATASection.h"
 #include "Poco/DOM/Element.h"
@@ -28,7 +28,7 @@ using Poco::XML::AutoPtr;
 using Poco::XML::XMLString;
 
 
-TextTest::TextTest(const std::string& name): CppUnit::TestCase(name)
+TextTest::TextTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

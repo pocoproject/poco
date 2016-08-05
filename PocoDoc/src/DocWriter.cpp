@@ -1,7 +1,7 @@
 //
 // DocWriter.cpp
 //
-// $Id: //poco/1.4/PocoDoc/src/DocWriter.cpp#4 $
+// $Id: //poco/1.7/PocoDoc/src/DocWriter.cpp#3 $
 //
 // Copyright (c) 2005-2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -2192,6 +2192,7 @@ void DocWriter::writePage(Page& page)
 	writeCopyright(ostr);
 	endContent(ostr);
 	endBody(ostr);
+	ostr << "<script>CollapsibleLists.apply(true)</script>" << std::endl;
 	writeFooter(ostr);
 }
 
@@ -2229,8 +2230,8 @@ void DocWriter::scanTOC(const std::string& text, TOC& toc)
 
 void DocWriter::writeTOC(std::ostream& ostr, const TOC& toc)
 {
-	ostr << "<h2>" << tr("TOC") << "</h2>" << std::endl;
 	ostr << "<div class=\"toc\">" << std::endl;
+	ostr << "<ul class=\"collapsibleList\"><li>" << tr("TOC") << std::endl;
 	int lastLevel = 0;
 	for (TOC::const_iterator it = toc.begin(); it != toc.end(); ++it)
 	{
@@ -2257,7 +2258,7 @@ void DocWriter::writeTOC(std::ostream& ostr, const TOC& toc)
 	{
 		ostr << "</li></ul>" << std::endl;
 	}
-	ostr << "</li></ul></div>" << std::endl;
+	ostr << "</li></ul></li></ul></div>" << std::endl;
 }
 
 

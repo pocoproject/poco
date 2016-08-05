@@ -15,8 +15,8 @@
 #include "Poco/NumberParser.h"
 
 
-OSPCodeWriter::OSPCodeWriter(const Page& page, const std::string& clazz):
-	CodeWriter(page, clazz)
+OSPCodeWriter::OSPCodeWriter(const Page& rPage, const std::string& rClazz):
+	CodeWriter(rPage, rClazz)
 {
 }
 
@@ -50,6 +50,11 @@ void OSPCodeWriter::writeHandlerMembers(std::ostream& ostr)
 		ostr << "\n";
 		ostr << "protected:\n";
 		ostr << "\tPoco::OSP::BundleContext::Ptr context() const\n";
+		ostr << "\t{\n";
+		ostr << "\t\treturn _pContext;\n";
+		ostr << "\t}\n";
+		ostr << "\n";
+		ostr << "\tPoco::OSP::BundleContext::Ptr c() const\n";
 		ostr << "\t{\n";
 		ostr << "\t\treturn _pContext;\n";
 		ostr << "\t}\n";

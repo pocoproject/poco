@@ -11,8 +11,8 @@
 
 
 #include "TuplesTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Tuple.h"
 #include "Poco/Void.h"
 #include <algorithm>
@@ -46,7 +46,7 @@ using Poco::Int32;
 using Poco::UInt32;
 
 
-TuplesTest::TuplesTest(const std::string& name): CppUnit::TestCase(name)
+TuplesTest::TuplesTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

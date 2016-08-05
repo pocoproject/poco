@@ -11,8 +11,8 @@
 
 
 #include "StreamCopierTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
 
@@ -20,7 +20,7 @@
 using Poco::StreamCopier;
 
 
-StreamCopierTest::StreamCopierTest(const std::string& name): CppUnit::TestCase(name)
+StreamCopierTest::StreamCopierTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

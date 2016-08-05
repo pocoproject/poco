@@ -41,6 +41,7 @@ public:
 	void testStoredProcedureAny();
 	void testStoredProcedureDynamicAny();
 	void testStoredFunction();
+	void testXMLColumn();
 
 	static CppUnit::Test* suite();
 
@@ -61,6 +62,7 @@ private:
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateMiscTable();
 	void recreateLogTable();
+	void recreateNumericTable();
 
 	static ODBCTest::SessionPtr  _pSession;
 	static ODBCTest::ExecPtr     _pExecutor;

@@ -11,8 +11,8 @@
 
 
 #include "FTPClientSessionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "DialogServer.h"
 #include "Poco/Net/FTPClientSession.h"
 #include "Poco/Net/DialogSocket.h"
@@ -63,7 +63,7 @@ namespace
 };
 
 
-FTPClientSessionTest::FTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
+FTPClientSessionTest::FTPClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

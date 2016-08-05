@@ -4,7 +4,7 @@ rem $Id$
 rem
 rem A script for running the POCO testsuites.
 rem
-rem usage: runtests2 [64] [component [test]]
+rem usage: runtests2 [64] [-d ] [component [test]]
 rem
 rem component   : the component under test
 rem test        : the test as part of the component
@@ -16,7 +16,6 @@ rem
 
 setlocal EnableDelayedExpansion
 
-set TESTRUNNER=TestSuite.exe
 set TESTRUNNERARGS=-all
 set TESTCOMPONENTS='findstr /R "." components'
 set BINDIR=bin
@@ -25,12 +24,19 @@ if "%1"=="64" (
   set BINDIR=bin64
   shift
 )
+if "%1" =="-d" (
+  set DEBUG=d
+  shift
+)
+
 if not "%1" == "" (
   set TESTCOMPONENTS="%1"
   if not "%2" == "" (
     set TESTRUNNERARGS=%2
   )
 )
+
+set TESTRUNNER=TestSuite%DEBUG%.exe
 
 set runs=0
 set failures=0

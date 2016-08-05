@@ -11,8 +11,8 @@
 
 
 #include "DNSTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/DNS.h"
 #include "Poco/Net/HostEntry.h"
 #include "Poco/Net/NetException.h"
@@ -27,7 +27,7 @@ using Poco::Net::ServiceNotFoundException;
 using Poco::Net::NoAddressFoundException;
 
 
-DNSTest::DNSTest(const std::string& name): CppUnit::TestCase(name)
+DNSTest::DNSTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -52,7 +52,7 @@ void DNSTest::testHostByName()
 	
 	try
 	{
-		HostEntry he1 = DNS::hostByName("nohost.appinf.com");
+		HostEntry he2 = DNS::hostByName("nohost.appinf.com");
 		fail("host not found - must throw");
 	}
 	catch (HostNotFoundException&)
