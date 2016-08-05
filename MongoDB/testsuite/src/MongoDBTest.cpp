@@ -20,7 +20,9 @@
 #include "Poco/MongoDB/PoolableConnectionFactory.h"
 #include "Poco/MongoDB/Database.h"
 #include "Poco/MongoDB/Cursor.h"
+#include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/ObjectId.h"
+#include "Poco/MongoDB/UUID.h"
 
 #include "Poco/Net/NetException.h"
 
@@ -34,6 +36,7 @@ using namespace Poco::MongoDB;
 bool MongoDBTest::_connected = false;
 Poco::MongoDB::Connection MongoDBTest::_mongo;
 
+static Poco::UUID uuid("0489c502-e127-4312-b629-3870c9dddc07");
 
 MongoDBTest::MongoDBTest(const std::string& name): 
 	CppUnit::TestCase("MongoDB"),
@@ -96,12 +99,15 @@ void MongoDBTest::testInsertRequest()
 
 	player->add("start", 1993);
 	player->add("active", false);
+	player->add("hits", 200);
 
 	Poco::DateTime now;
 	std::cout << now.day() << " " << now.hour() << ":" << now.minute() << ":" << now.second() << std::endl;
 	player->add("lastupdated", now.timestamp());
 
 	player->add("unknown", NullValue());
+
+    player->add("an_uuid", UUID::Ptr(new UUID(uuid)));
 
 	Poco::MongoDB::InsertRequest request("team.players");
 	request.documents().push_back(player);
@@ -141,6 +147,10 @@ void MongoDBTest::testQueryRequest()
 			assert(doc->isType<NullValue>("unknown"));
 			bool active = doc->get<bool>("active");
 			assert(!active);
+
+			assert(doc->isType<UUID::Ptr>("an_uuid"));
+			UUID::Ptr dbUuid = doc->get<UUID::Ptr>("an_uuid");
+			assert(dbUuid->uuid() == uuid);
 
 			std::string id = doc->get("_id")->toString();
 			std::cout << id << std::endl;
@@ -201,6 +211,72 @@ void MongoDBTest::testDBQueryRequest()
 	}
 }
 
+void MongoDBTest::testDBAggregateCommand()
+{
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
+	Poco::MongoDB::Document::Ptr match(new Poco::MongoDB::Document());
+	Poco::MongoDB::Document::Ptr group(new Poco::MongoDB::Document());
+	Poco::MongoDB::Array::Ptr pipeline(new Poco::MongoDB::Array());
+
+	match->addNewDocument("$match")
+		.addNewDocument("hits").add("$gt", 0);
+	group->addNewDocument("$group")
+		.add("_id", "$lastname")
+		.addNewDocument("total_hits").add("$sum", "$hits");
+
+	pipeline->add("0", match);
+	pipeline->add("1", group);
+
+	Database db("team");
+	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = db.createCommand();
+	request->selector()
+		.add("aggregate", "players")
+		.add("pipeline", pipeline);
+
+	std::cout << request->selector().toString() << std::endl;
+
+	Poco::MongoDB::ResponseMessage response;
+	_mongo.sendRequest(*request, response);
+
+	std::string err = db.getLastError(_mongo);
+	assert(err.empty());
+
+	if (! response.hasDocuments())
+	{
+		fail("No document returned");
+	}
+	else {
+		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
+		std::cout << doc->toString() << std::endl;
+/*
+Should be:
+{
+    "result" : [ 
+        {
+            "_id" : "Braem",
+            "total_hits" : 200
+        }
+    ],
+    "ok" : 1.0000000000000000
+}
+*/
+
+		double ok = doc->get<double>("ok");
+		assert(ok > 0);
+		Poco::MongoDB::Array::Ptr results = doc->get<Poco::MongoDB::Array::Ptr>("result");
+		assert(!results->empty());
+		assert(results->size() == 1);
+		Poco::MongoDB::Document::Ptr r1 = results->get<Poco::MongoDB::Document::Ptr>(0);
+		assert(r1->get<std::string>("_id") == "Braem");
+		assert(r1->get<Poco::Int32>("total_hits") == 200);
+	}
+
+}
 
 void MongoDBTest::testCountCommand()
 {
@@ -221,7 +297,16 @@ void MongoDBTest::testCountCommand()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		double count = doc->get<double>("n");
+        Poco::Int64 count = -1;
+        if (doc->isType<double>("n")) {
+            count = static_cast<Poco::Int64>(doc->get<double>("n"));
+        }
+        else if (doc->isType<Poco::Int32>("n")) {
+            count = doc->get<Poco::Int32>("n");
+        }
+        else if (doc->isType<Poco::Int64>("n")) {
+            count = doc->get<Poco::Int64>("n");
+        }
 		assert(count == 1);
 	}
 	else
@@ -248,7 +333,16 @@ void MongoDBTest::testDBCountCommand()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		double count = doc->get<double>("n");
+		Poco::Int64 count = -1;
+        if (doc->isType<double>("n")) {
+            count = static_cast<Poco::Int64>(doc->get<double>("n"));
+        }
+        else if (doc->isType<Poco::Int32>("n")) {
+            count = doc->get<Poco::Int32>("n");
+        }
+        else if (doc->isType<Poco::Int64>("n")) {
+            count = doc->get<Poco::Int64>("n");
+        }
 		assert(count == 1);
 	}
 	else
@@ -267,7 +361,7 @@ void MongoDBTest::testDBCount2Command()
 	}
 
 	Poco::MongoDB::Database db("team");
-	double count = db.count(_mongo, "players");
+	int count = db.count(_mongo, "players");
 	assert(count == 1);
 }
 
@@ -390,7 +484,16 @@ void MongoDBTest::testConnectionPool()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		double count = doc->get<double>("n");
+        Poco::Int64 count = -1;
+        if (doc->isType<double>("n")) {
+            count = static_cast<Poco::Int64>(doc->get<double>("n"));
+        }
+        else if (doc->isType<Poco::Int32>("n")) {
+            count = doc->get<Poco::Int32>("n");
+        }
+        else if (doc->isType<Poco::Int64>("n")) {
+            count = doc->get<Poco::Int64>("n");
+        }
 		assert(count == 1);
 	}
 	else
@@ -415,6 +518,7 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testInsertRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testQueryRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testDBQueryRequest);
+	CppUnit_addTest(pSuite, MongoDBTest, testDBAggregateCommand);
 	CppUnit_addTest(pSuite, MongoDBTest, testCountCommand);
 	CppUnit_addTest(pSuite, MongoDBTest, testDBCountCommand);
 	CppUnit_addTest(pSuite, MongoDBTest, testDBCount2Command);

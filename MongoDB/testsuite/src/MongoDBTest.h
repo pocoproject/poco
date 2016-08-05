@@ -33,6 +33,7 @@ public:
 	void testInsertRequest();
 	void testQueryRequest();
 	void testDBQueryRequest();
+	void testDBAggregateCommand();
 	void testCountCommand();
 	void testDBCountCommand();
 	void testDBCount2Command();
