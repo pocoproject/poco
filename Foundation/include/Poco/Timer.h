@@ -92,6 +92,14 @@ public:
 		///
 		/// The timer thread is taken from the global default thread pool.
 
+	void start(const AbstractTimerCallback& method, int prio, int policy);
+		/// Starts the timer in a thread with the given OS specific priority.
+		/// Create the TimerCallback as follows:
+		///     TimerCallback<MyClass> callback(*this, &MyClass::onTimer);
+		///     timer.start(callback);
+		///
+		/// The timer thread is taken from the global default thread pool.
+
 	void start(const AbstractTimerCallback& method, ThreadPool& threadPool);
 		/// Starts the timer.
 		/// Create the TimerCallback as follows:
@@ -104,6 +112,12 @@ public:
 		///     TimerCallback<MyClass> callback(*this, &MyClass::onTimer);
 		///     timer.start(callback);
 		
+	void start(const AbstractTimerCallback& method, int prio, int policy, ThreadPool& threadPool);
+		/// Starts the timer in a thread with the given OS specific priolity.
+		/// Create the TimerCallback as follows:
+		///     TimerCallback<MyClass> callback(*this, &MyClass::onTimer);
+		///     timer.start(callback);
+
 	void stop();
 		/// Stops the timer. If the callback method is currently running
 		/// it will be allowed to finish first.

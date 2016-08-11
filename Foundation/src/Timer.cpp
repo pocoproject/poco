@@ -58,6 +58,12 @@ void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority
 }
 
 
+void Timer::start(const AbstractTimerCallback& method, int prio, int policy)
+{
+	start(method, prio, policy, ThreadPool::defaultPool());
+}
+
+
 void Timer::start(const AbstractTimerCallback& method, ThreadPool& threadPool)
 {
 	start(method, Thread::PRIO_NORMAL, threadPool);
@@ -82,6 +88,34 @@ void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority
 	try
 	{
 		threadPool.startWithPriority(priority, *this);
+	}
+	catch (...)
+	{
+		delete _pCallback;
+		_pCallback = 0;
+		throw;
+	}
+}
+
+
+void Timer::start(const AbstractTimerCallback& method, int prio, int policy, ThreadPool& threadPool)
+{
+	Clock nextInvocation;
+	nextInvocation += static_cast<Clock::ClockVal>(_startInterval)*1000;
+
+	FastMutex::ScopedLock lock(_mutex);
+
+	if (_pCallback)
+	{
+		throw Poco::IllegalStateException("Timer already running");
+	}
+
+	_nextInvocation = nextInvocation;
+	_pCallback = method.clone();
+	_wakeUp.reset();
+	try
+	{
+		threadPool.startWithOSPriority(prio, policy, *this);
 	}
 	catch (...)
 	{
