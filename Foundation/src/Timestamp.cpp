@@ -226,7 +226,7 @@ void Timestamp::update()
 	ts.QuadPart -= epoch.QuadPart;
 	_ts = ts.QuadPart/10;
 
-#elif defined(POCO_VXWORKS)
+#elif (defined(_POSIX_TIMERS) && defined(CLOCK_REALTIME)) || defined(POCO_VXWORKS) || defined(__QNX__)
 
 	struct timespec ts;
 	if (clock_gettime(CLOCK_REALTIME, &ts))
