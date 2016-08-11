@@ -36,7 +36,7 @@ using Poco::InvalidArgumentException;
 using Poco::IOException;
 
 
-DatagramSocketTest::DatagramSocketTest(const std::string& name): CppUnit::TestCase(name)
+DatagramSocketTest::DatagramSocketTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

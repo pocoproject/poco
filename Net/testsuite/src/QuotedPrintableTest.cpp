@@ -22,7 +22,7 @@ using Poco::Net::QuotedPrintableEncoder;
 using Poco::Net::QuotedPrintableDecoder;
 
 
-QuotedPrintableTest::QuotedPrintableTest(const std::string& name): CppUnit::TestCase(name)
+QuotedPrintableTest::QuotedPrintableTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
