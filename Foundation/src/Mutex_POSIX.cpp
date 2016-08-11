@@ -98,6 +98,16 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 {
 #if defined(POCO_HAVE_MUTEX_TIMEOUT)
 	struct timespec abstime;
+#if defined(_POSIX_TIMERS) && defined(CLOCK_REALTIME)
+	clock_gettime(CLOCK_REALTIME, &abstime);
+	abstime.tv_sec  += milliseconds / 1000;
+	abstime.tv_nsec += (milliseconds % 1000)*1000000;
+	if (abstime.tv_nsec >= 1000000000)
+	{
+		abstime.tv_nsec -= 1000000000;
+		abstime.tv_sec++;
+	}
+#else
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	abstime.tv_sec  = tv.tv_sec + milliseconds / 1000;
@@ -107,6 +117,7 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 		abstime.tv_nsec -= 1000000000;
 		abstime.tv_sec++;
 	}
+#endif
 	int rc = pthread_mutex_timedlock(&_mutex, &abstime);
 	if (rc == 0)
 		return true;
