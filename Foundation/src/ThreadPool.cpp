@@ -39,6 +39,8 @@ public:
 	void start(int cpu = -1);
 	void start(Thread::Priority priority, Runnable& target, int cpu = -1);
 	void start(Thread::Priority priority, Runnable& target, const std::string& name, int cpu = -1);
+	void start(int prio, int policy, Runnable& target, int cpu = -1);
+	void start(int prio, int policy, Runnable& target, const std::string& name, int cpu = -1);
 	bool idle();
 	int idleTime();
 	void join();
@@ -135,6 +137,51 @@ void PooledThread::start(Thread::Priority priority, Runnable& target, const std:
 	_pTarget = &target;
 	_targetReady.set();
 	if (cpu >= 0) 
+	{
+		_thread.setAffinity(static_cast<unsigned>(cpu));
+	}
+}
+
+
+void PooledThread::start(int prio, int policy, Runnable& target, int cpu)
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	poco_assert (_pTarget == 0);
+
+	_pTarget = &target;
+	_thread.setOSPriority(prio, policy);
+	_targetReady.set();
+	if (cpu >= 0)
+	{
+		_thread.setAffinity(static_cast<unsigned>(cpu));
+	}
+}
+
+
+void PooledThread::start(int prio, int policy, Runnable& target, const std::string& name, int cpu)
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	std::string fullName(name);
+	if (name.empty())
+	{
+		fullName = _name;
+	}
+	else
+	{
+		fullName.append(" (");
+		fullName.append(_name);
+		fullName.append(")");
+	}
+	_thread.setName(fullName);
+	_thread.setOSPriority(prio, policy);
+
+	poco_assert (_pTarget == 0);
+
+	_pTarget = &target;
+	_targetReady.set();
+	if (cpu >= 0)
 	{
 		_thread.setAffinity(static_cast<unsigned>(cpu));
 	}
@@ -431,6 +478,15 @@ void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, 
 	getThread()->start(priority, target, rName, affinity(cpu));
 }
 
+void ThreadPool::startWithOSPriority(int prio, int policy, Runnable& target, int cpu)
+{
+	getThread()->start(prio, policy, target, affinity(cpu));
+}
+
+void ThreadPool::startWithOSPriority(int prio, int policy, Runnable& target, const std::string& rName, int cpu)
+{
+	getThread()->start(prio, policy, target, rName, affinity(cpu));
+}
 
 void ThreadPool::stopAll()
 {

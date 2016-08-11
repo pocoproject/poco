@@ -137,6 +137,19 @@ public:
 		/// Throws a NoThreadAvailableException if no more
 		/// threads are available.
 
+	void startWithOSPriority(int prio, int policy, Runnable& target, int cpu = -1);
+		/// Obtains a thread, adjusts the thread's priority using an operating system specific
+		/// priority value, and starts the target on specified cpu.
+		/// Throws a NoThreadAvailableException if no more
+		/// threads are available.
+
+	void startWithOSPriority(int prio, int policy, Runnable& target, const std::string& name, int cpu = -1);
+		/// Obtains a thread, adjusts the thread's priority using an operating system specific
+		/// priority value, and starts the target on specified cpu.
+		/// Assigns the given name to the thread.
+		/// Throws a NoThreadAvailableException if no more
+		/// threads are available.
+
 	void stopAll();
 		/// Stops all running threads and waits for their completion.
 		///
