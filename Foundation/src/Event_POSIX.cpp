@@ -19,6 +19,7 @@
 #include <timers.h>
 #include <cstring>
 #else
+#include <time.h>
 #include <sys/time.h>
 #endif
 
@@ -35,10 +36,37 @@ EventImpl::EventImpl(EventTypeImpl type): _auto(type == EVENT_AUTORESET_IMPL), _
 	// if the mutex has never been used.
 	std::memset(&_mutex, 0, sizeof(_mutex));
 #endif
+
 	if (pthread_mutex_init(&_mutex, NULL))
 		throw SystemException("cannot create event (mutex)");
-	if (pthread_cond_init(&_cond, NULL))
+
+#if defined(__linux__) || defined(__QNX__)
+	pthread_condattr_t attr;
+	if (pthread_condattr_init(&attr))
+	{
+		pthread_mutex_destroy(&_mutex);
+		throw SystemException("cannot create event (condition attribute)");
+	}
+	if (pthread_condattr_setclock(&attr, CLOCK_MONOTONIC))
+    {
+		pthread_condattr_destroy(&attr);
+		pthread_mutex_destroy(&_mutex);
+		throw SystemException("cannot create event (condition attribute clock)");
+    }
+	if (pthread_cond_init(&_cond, &attr))
+	{
+		pthread_condattr_destroy(&attr);
+		pthread_mutex_destroy(&_mutex);
 		throw SystemException("cannot create event (condition)");
+	}
+	pthread_condattr_destroy(&attr);
+#else
+	if (pthread_cond_init(&_cond, NULL))
+	{
+		pthread_mutex_destroy(&_mutex);
+		throw SystemException("cannot create event (condition)");
+	}
+#endif
 }
 
 
@@ -77,7 +105,16 @@ bool EventImpl::waitImpl(long milliseconds)
 	delta.tv_sec  = milliseconds / 1000;
 	delta.tv_nsec = (milliseconds % 1000)*1000000;
 	pthread_get_expiration_np(&delta, &abstime);
-#elif defined(POCO_VXWORKS)
+#elif defined(__linux__) || defined(__QNX__)
+	clock_gettime(CLOCK_MONOTONIC, &abstime);
+	abstime.tv_sec  += milliseconds / 1000;
+	abstime.tv_nsec += (milliseconds % 1000)*1000000;
+	if (abstime.tv_nsec >= 1000000000)
+	{
+		abstime.tv_nsec -= 1000000000;
+		abstime.tv_sec++;
+	}
+#elif (defined(_POSIX_TIMERS) && defined(CLOCK_REALTIME)) || defined(POCO_VXWORKS)
 	clock_gettime(CLOCK_REALTIME, &abstime);
 	abstime.tv_sec  += milliseconds / 1000;
 	abstime.tv_nsec += (milliseconds % 1000)*1000000;
