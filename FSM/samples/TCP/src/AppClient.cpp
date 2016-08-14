@@ -243,7 +243,7 @@ void AppClient::receive(const char *data,
     string[size] = '\0';
 
     cout << "Received data from "
-         << inet_ntoa(address.sin_addr)
+         << inet_ntop(address.sin_addr)
          << ":"
          << ntohs(address.sin_port)
          << ": \""

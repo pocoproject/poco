@@ -1,9 +1,7 @@
-/*
- * State.h
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef POCO_FSM_MODEL_STATE_H_
 #define POCO_FSM_MODEL_STATE_H_
@@ -23,10 +21,9 @@ namespace Poco {
 
 			class State : public Element {
 			public:
-				State(const string& name, int lineno = 0) : Element(name, lineno) {
-				}
-				virtual ~State() {
-				}
+				State(const string& name, int lineno = 0) ;
+				virtual ~State();
+
 				MapPtr&			map()								{ return _map; }
 				EntryPtr&		entry()								{ return _entry; }
 				ExitPtr&		exit()								{ return _exit; }
@@ -42,11 +39,11 @@ namespace Poco {
 				void print(Print& print) const;
 
 			protected:
-				MapPtr				_map = nullptr;
+				MapPtr				_map;
 				string				_className;
 				string				_instanceName;
-				EntryPtr			_entry = nullptr;
-				ExitPtr				_exit = nullptr;
+				EntryPtr			_entry;
+				ExitPtr				_exit;
 				List<TransitionPtr>	_transitions;
 
 			private:

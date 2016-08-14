@@ -230,7 +230,7 @@ class TcpConnection :
     char *_errorMessage;
 
 #ifndef CRTP
-    TcpConnectionContext _fsm;
+    TcpConnectionContext<TcpConnection> _fsm;
 #endif
 };
 

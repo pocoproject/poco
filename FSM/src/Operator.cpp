@@ -1,9 +1,7 @@
-/*
- * Operator.cpp
- *
- *  Created on: 3 août 2014
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include "Poco/Ascii.h"
 
@@ -25,56 +23,56 @@ namespace PARSER
 {
 Operator::Operator()
 {
-    _opMap["["] = OP::OPENBRACKET;
-    _opMap["]"] = OP::CLOSBRACKET;
-    _opMap["("] = OP::OPENPARENT;
-    _opMap[")"] = OP::CLOSPARENT;
-    _opMap["{"] = OP::OPENBRACE;
-    _opMap["}"] = OP::CLOSBRACE;
-    _opMap["<"] = OP::LT;
-    _opMap["<="] = OP::LE;
-    _opMap["<<"] = OP::SHL;
-    _opMap["<<="] = OP::SHL_ASSIGN;
-    _opMap[">"] = OP::GT;
-    _opMap[">="] = OP::GE;
-    _opMap[">>"] = OP::SHR;
-    _opMap[">>="] = OP::SHR_ASSIGN;
-    _opMap["="] = OP::ASSIGN;
-    _opMap["=="] = OP::EQ;
-    _opMap["!"] = OP::NOT;
-    _opMap["!="] = OP::NE;
-    _opMap["&"] = OP::BITAND;
-    _opMap["&="] = OP::BITAND_ASSIGN;
-    _opMap["&&"] = OP::AND;
-    _opMap["|"] = OP::BITOR;
-    _opMap["|="] = OP::BITOR_ASSIGN;
-    _opMap["||"] = OP::OR;
-    _opMap["^"] = OP::XOR;
-    _opMap["^="] = OP::XOR_ASSIGN;
-    _opMap["~"] = OP::COMPL;
-    _opMap["*"] = OP::STAR;
-    _opMap["*="] = OP::STAR_ASSIGN;
-    _opMap["/"] = OP::SLASH;
-    _opMap["/="] = OP::SLASH_ASSIGN;
-    _opMap["+"] = OP::PLUS;
-    _opMap["+="] = OP::PLUS_ASSIGN;
-    _opMap["++"] = OP::INCR;
-    _opMap["-"] = OP::MINUS;
-    _opMap["-="] = OP::MINUS_ASSIGN;
-    _opMap["--"] = OP::DECR;
-    _opMap["->"] = OP::ARROW;
-    _opMap["%"] = OP::MOD;
-    _opMap["%="] = OP::MOD_ASSIGN;
-    _opMap[","] = OP::COMMA;
-    _opMap["."] = OP::PERIOD;
-    _opMap["..."] = OP::ELLIPSIS;
-    _opMap[":"] = OP::COLON;
-    _opMap["::"] = OP::DBL_COLON;
-    _opMap[";"] = OP::SEMICOLON;
-    _opMap["?"] = OP::QUESTION;
-    _opMap["%{"] = OP::OPENCODE;
-    _opMap["%}"] = OP::CLOSCODE;
-    _opMap["%%"] = OP::FSM;
+    _opMap["["] = OPENBRACKET;
+    _opMap["]"] = CLOSBRACKET;
+    _opMap["("] = OPENPARENT;
+    _opMap[")"] = CLOSPARENT;
+    _opMap["{"] = OPENBRACE;
+    _opMap["}"] = CLOSBRACE;
+    _opMap["<"] = LT;
+    _opMap["<="] = LE;
+    _opMap["<<"] = SHL;
+    _opMap["<<="] = SHL_ASSIGN;
+    _opMap[">"] = GT;
+    _opMap[">="] = GE;
+    _opMap[">>"] = SHR;
+    _opMap[">>="] = SHR_ASSIGN;
+    _opMap["="] = ASSIGN;
+    _opMap["=="] = EQ;
+    _opMap["!"] = NOT;
+    _opMap["!="] = NE;
+    _opMap["&"] = BITAND;
+    _opMap["&="] = BITAND_ASSIGN;
+    _opMap["&&"] = AND;
+    _opMap["|"] = BITOR;
+    _opMap["|="] = BITOR_ASSIGN;
+    _opMap["||"] = OR;
+    _opMap["^"] = XOR;
+    _opMap["^="] = XOR_ASSIGN;
+    _opMap["~"] = COMPL;
+    _opMap["*"] = STAR;
+    _opMap["*="] = STAR_ASSIGN;
+    _opMap["/"] = SLASH;
+    _opMap["/="] = SLASH_ASSIGN;
+    _opMap["+"] = PLUS;
+    _opMap["+="] = PLUS_ASSIGN;
+    _opMap["++"] = INCR;
+    _opMap["-"] = MINUS;
+    _opMap["-="] = MINUS_ASSIGN;
+    _opMap["--"] = DECR;
+    _opMap["->"] = ARROW;
+    _opMap["%"] = MOD;
+    _opMap["%="] = MOD_ASSIGN;
+    _opMap[","] = COMMA;
+    _opMap["."] = PERIOD;
+    _opMap["..."] = ELLIPSIS;
+    _opMap[":"] = COLON;
+    _opMap["::"] = DBL_COLON;
+    _opMap[";"] = SEMICOLON;
+    _opMap["?"] = QUESTION;
+    _opMap["%{"] = OPENCODE;
+    _opMap["%}"] = CLOSCODE;
+    _opMap["%%"] = FSM;
 }
 
 

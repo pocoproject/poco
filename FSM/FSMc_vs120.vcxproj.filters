@@ -10,6 +10,9 @@
     <Filter Include="cpp">
       <UniqueIdentifier>{a8451f20-ad5b-42c6-8137-7d9f5f4dc222}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FSM">
+      <UniqueIdentifier>{8ee51b34-f230-48c0-ba7b-d98efc842617}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\parser\BNF.txt">
@@ -71,5 +74,178 @@
     <ClCompile Include="src\UnaryOperationForCpp.cpp" />
     <ClCompile Include="src\Variable.cpp" />
     <ClCompile Include="src\VariableForCpp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\model\Action.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Actions.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Argument.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\BinaryOperation.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Compilable.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Dumper.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Element.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Entry.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Exit.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Expression.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Factory.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\FSM.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Function.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Guard.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Literal.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Map.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Operation.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Parameter.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Print.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Reference.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\SMC.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\State.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Transition.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\UnaryOperation.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\Variable.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Character.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Comment.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Identifier.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\IndentStream.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Keyword.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Number.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Operator.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Parser.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\String.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Token.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser\Tokenizer.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ActionForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ArgumentForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\BinaryOperationForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\CompilableForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ElementForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\EntryForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ExitForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ExpressionForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\FactoryForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\FSMForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\FunctionForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\GuardForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\LiteralForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\MapForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ParameterForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\ReferenceForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\StateForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\TransitionForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\UnaryOperationForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cpp\VariableForCpp.h">
+      <Filter>cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\FSM\statemap.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

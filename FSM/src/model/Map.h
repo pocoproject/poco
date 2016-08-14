@@ -1,9 +1,7 @@
-/*
- * Map.h
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef POCO_FSM_MODEL_MAP_H_
 #define POCO_FSM_MODEL_MAP_H_
@@ -22,10 +20,8 @@ namespace Poco {
 
 			class Map : public Element {
 			public:
-				Map(const string& name, int lineno = 0) : Element(name, lineno) {
-				}
-				virtual ~Map() {
-				}
+				Map(const string& name, int lineno = 0);
+				virtual ~Map();
 
 				StatePtr&		defaultState()			{ return _defaultState; }
 				const StatePtr	defaultState() const	{ return _defaultState; }
@@ -43,8 +39,8 @@ namespace Poco {
 				void print(Print& print) const;
 
 			protected:
-				FSMPtr _fsm = nullptr;
-				StatePtr _defaultState = nullptr;
+				FSMPtr _fsm;
+				StatePtr _defaultState;
 				map<string, StatePtr> _states;
 				map<string, TransitionPtr> _transitions;
 

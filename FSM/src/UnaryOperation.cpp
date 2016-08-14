@@ -1,9 +1,7 @@
-/*
- * UnaryOperation.cpp
- *
- *  Created on: 20 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include "model/UnaryOperation.h"
 
@@ -19,7 +17,7 @@ const string UnaryOperation::display() const
     {
         switch (_operator)
         {
-        case Operator::not:
+        case not:
             _asstring += '!';
         }
         _asstring += _operand->display();

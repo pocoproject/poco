@@ -49,12 +49,12 @@ int Stoplight::EWGreenTimer;
 
 const char* literal(const statemap::Event & event) {
 	switch (event) {
-		case statemap::Event::Enter:		return "Enter     ";
-		case statemap::Event::Leave:		return "Leave     ";
-		case statemap::Event::Switch:		return "Switch    ";
-		case statemap::Event::Transition:	return "Transition";
-		case statemap::Event::Push:			return "Push      ";
-		case statemap::Event::Pop:			return "Pop       ";
+		case statemap::Enter:		return "Enter     ";
+		case statemap::Leave:		return "Leave     ";
+		case statemap::Switch:		return "Switch    ";
+		case statemap::Transition:	return "Transition";
+		case statemap::Push:		return "Push      ";
+		case statemap::Pop:			return "Pop       ";
 	}
 }
 class Print : public statemap::Notifier {
@@ -72,7 +72,7 @@ public:
 static Print print;
 
  Stoplight::Stoplight(Directions direction, int NSGreenTimer, int EWGreenTimer)	:
-	StoplightContext(print),
+	StoplightContext(&print),
 	callback(*this, &Stoplight::onTimer) {
 
 #define FSM_DEBUG

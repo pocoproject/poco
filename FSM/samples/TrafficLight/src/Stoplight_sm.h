@@ -89,8 +89,8 @@ namespace cpp_ex4 {
 	class StoplightContext : public statemap::FSMContext, public StopMap {
 	public:
 		explicit 
-		StoplightContext(statemap::Notifier& notifier) : FSMContext(notifier, StopMap::NorthSouthGreen) {};
-		StoplightContext(statemap::Notifier& notifier, const statemap::State& state) : FSMContext(notifier, state) {};
+		StoplightContext(statemap::Notifier* notifier = NULL) : FSMContext(StopMap::NorthSouthGreen, notifier) {};
+		StoplightContext(const statemap::State& state, statemap::Notifier* notifier = NULL) : FSMContext(state, notifier) {};
 		
 		void setStartState(const statemap::State& state) {
 			setState(state);
@@ -110,7 +110,7 @@ namespace cpp_ex4 {
 		};
 		
 		StoplightState& getState() const {
-		    if (_state == nullptr) {
+		    if (_state == NULL) {
 		        throw statemap::StateUndefinedException();
 		    }
 		     return (dynamic_cast<StoplightState&>(*_state));
@@ -119,7 +119,7 @@ namespace cpp_ex4 {
 		void Timeout() {
 		    setTransition("Timeout");
 		    getState().Timeout(*this);
-		    setTransition(nullptr);
+		    setTransition(NULL);
 		};
 	};
 }

@@ -1,9 +1,7 @@
-/*
- * Print.cpp
- *
- *  Created on: 22 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include <algorithm>
 using std::max;
@@ -37,9 +35,10 @@ void Print::operator()(const TransitionPtr transition, const GuardPtr guard)
     string parameters;
     if (!transition->parameters().empty())
         parameters += '(';
-    for (auto parameter : transition->parameters())
+	List<ParameterPtr>::const_iterator parameter;
+	for (parameter = transition->parameters().begin(); parameter != transition->parameters().end(); ++parameter)
     {
-        parameters += parameter->display();
+        parameters += (*parameter)->display();
     }
     if (!transition->parameters().empty())
         parameters += ')';

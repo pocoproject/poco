@@ -1,9 +1,7 @@
-/*
- * Token.h
- *
- *  Created on: 3 août 2014
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef POCO_FSM_PARSER_TOKEN_H_
 #define POCO_FSM_PARSER_TOKEN_H_

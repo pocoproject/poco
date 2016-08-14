@@ -1,9 +1,7 @@
-/*
- * Parser.h
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef POCO_FSM_PARSER_H_
 #define POCO_FSM_PARSER_H_
@@ -120,16 +118,16 @@ namespace Poco {
 				string		_doc;
 				string		_attrs;
 
-				FSMPtr			fsm = nullptr;
-				StatePtr		state= nullptr;
-				GuardPtr		guard= nullptr;
-				MapPtr			map= nullptr;
-				ActionPtr		action= nullptr;
-				TransitionPtr	transition= nullptr;
-				ParameterPtr	parameter= nullptr;
+				FSMPtr			fsm;
+				StatePtr		state;
+				GuardPtr		guard;
+				MapPtr			map;
+				ActionPtr		action;
+				TransitionPtr	transition;
+				ParameterPtr	parameter;
 				List<ParameterPtr> parameters;
-				EntryPtr		entry = nullptr;
-				ExitPtr			exit = nullptr;
+				EntryPtr		entry;
+				ExitPtr			exit;
 
 				Logger&					_logger;
 				stack<ExpressionPtr>	_stack;

@@ -1,9 +1,7 @@
-/*
- * Operation.h
- *
- *  Created on: 20 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef POCO_FSM_MODEL_OPERATION_H_
 #define POCO_FSM_MODEL_OPERATION_H_
@@ -13,7 +11,7 @@
 namespace Poco {
 	namespace FSM {
 		namespace MODEL {
-			enum class Operator {
+			enum Operator {
 				none,
 				and,
 				or,
@@ -24,9 +22,9 @@ namespace Poco {
 			};
 			class Operation : public virtual Expression {
 			protected:
-				bool _contextuel = true;
+				Operation() : _contextuel(true) {}
 
-			protected:
+				bool _contextuel;
 				Operator		_operator;
 
 			public:

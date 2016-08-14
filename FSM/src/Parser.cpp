@@ -1,9 +1,8 @@
-/*
- * Parser.cpp
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -101,7 +100,16 @@ Parser::Parser(Logger& logger, const File& file, istream& istr) :
     _logger(logger),
     _istr(istr),
     _tokenizer(_istr),
-    _file(file)
+    _file(file),
+	fsm (NULL),
+	state(NULL),
+	guard(NULL),
+	map(NULL),
+	action(NULL),
+	transition(NULL),
+	parameter(NULL),
+	entry (NULL),
+	exit (NULL)
 {
 }
 Parser:: ~Parser()
@@ -249,14 +257,16 @@ const Poco::Token* Parser::parseFile(const Poco::Token* next, const Path& out)
                 next = parseAccess(next);
                 break;
             case Keyword::MAP:		// %map
-                if (fsm->fsmfile().empty())
-                    fsm->fsmfile() = fsm->klass() + "_sm";
+				if (fsm->fsmclass().empty())
+					fsm->fsmclass() = fsm->klass() + "Context";
+				if (fsm->fsmfile().empty())
+					fsm->fsmfile() = fsm->klass() + "_sm";
                 fsm->setcontext();
 
                 if (fsm->updated(out))
                 {
                     fsm->updated() = true;
-                    return nullptr;
+                    return NULL;
                 }
 
                 next = parseMap(next);
@@ -485,7 +495,7 @@ const Poco::Token* Parser::parseMap(const Poco::Token* next)
         fsm->add(map);
         next = nextToken();
         next = parseStates(next);
-        if (map->defaultState() == nullptr)
+        if (map->defaultState() == NULL)
             map->defaultState() = factory.newState("Default");
     }
     return next;
@@ -511,7 +521,7 @@ const Poco::Token* Parser::parseState(const Poco::Token* next)
 {
     poco_assert(isIdentifier(next));
     state = map->lookfor(next->tokenString());
-    if (state == nullptr)
+    if (state == NULL)
     {
         state = factory.newState(next->tokenString());
         map->add(state);
@@ -528,7 +538,7 @@ const Poco::Token* Parser::parseState(const Poco::Token* next)
 }
 const Poco::Token* Parser::parseEntry(const Poco::Token* next)
 {
-    entry = nullptr;
+    entry = NULL;
     if (isOperator(next, Operator::OPENBRACE))
         return next;
     poco_assert(next->tokenString() == "Entry");
@@ -539,8 +549,8 @@ const Poco::Token* Parser::parseEntry(const Poco::Token* next)
 }
 const Poco::Token* Parser::parseExit(const Poco::Token* next)
 {
-    exit = nullptr;
-    if (isOperator(next, Operator::OPENBRACE))
+	exit = NULL;
+	if (isOperator(next, Operator::OPENBRACE))
         return next;
     poco_assert(next->tokenString() == "Exit");
     exit = factory.newExit("Exit");
@@ -565,16 +575,18 @@ const Poco::Token* Parser::parseTransition(const Poco::Token* next)
     next = nextToken();
     next = parseParameters(next);
     transition = state->get(name, parameters);
-    if (transition == nullptr)
+    if (transition == NULL)
     {
         transition = factory.newTransition(name);
-        for (auto parameter : parameters)
-            if (parameter != nullptr)
-                transition->add(parameter);
+		List<ParameterPtr>::const_iterator parameter;
+
+        for (parameter = parameters.begin(); parameter != parameters.end(); ++parameter)
+            if (*parameter != NULL)
+                transition->add(*parameter);
         state->add(transition);
         map->add(transition);
     }
-    guard = nullptr;
+    guard = NULL;
     next = parseGuard(next);
     transition->add(guard);
     next = parseNext(next);
@@ -606,23 +618,29 @@ const Poco::Token* Parser::parseGuard(const Poco::Token* next)
 const Poco::Token* Parser::parseTerminal(const Poco::Token* next, ReferencePtr& reference)
 {
     poco_assert(isIdentifier(next));
-    if (isIdentifier(next))
-    {
-        const Poco::Token* identifier = next; // true/false not supported
-        next = nextToken();
-        if (isOperator(next, Operator::OPENPARENT))
-        {
-            FunctionPtr function = factory.newFunction(identifier->tokenString());
-            next = parseArguments(next, function->arguments());
-            reference = factory.newReference(function);
-        }
-        else
-        {
-            VariablePtr variable = factory.newVariable(identifier->tokenString());
-            reference = factory.newReference(variable);
-        }
-        reference->guard() = guard;
-    }
+    for(;;) {
+		if (isIdentifier(next))
+		{
+		    const Poco::Token* identifier = next; // true/false not supported
+		    next = nextToken();
+		    if (isOperator(next, Operator::OPENPARENT))
+		    {
+		        FunctionPtr function = factory.newFunction(identifier->tokenString());
+		        next = parseArguments(next, function->arguments());
+		        reference = factory.newReference(function);
+		    }
+			else
+			{
+			    VariablePtr variable = factory.newVariable(identifier->tokenString());
+			    reference = factory.newReference(variable);
+			}
+		    reference->guard() = guard;
+		}
+		if (isOperator(next, Operator::PERIOD)) {
+			next = nextToken();
+		} else
+			break;
+	}
     return next;
 }
 void Parser::reduce()
@@ -637,7 +655,7 @@ void Parser::reduce()
     _stack.pop();
     poco_check_ptr(right);
     top = _stack.top();
-    if (top == nullptr)
+    if (top == NULL)
     {
         _stack.pop();
         _stack.push(right);
@@ -654,7 +672,7 @@ void Parser::reduce()
         binop->right() = right;
         right->operation() = binop;
         if (_stack.size() > 1)
-            if (_stack.top() == nullptr)
+            if (_stack.top() == NULL)
                 _stack.pop();
 
         _stack.push(binop);
@@ -678,7 +696,7 @@ const Poco::Token* Parser::parseExpression(const Poco::Token* next, ExpressionPt
             if (_stack.size() > 0)
             {
                 ExpressionPtr top = _stack.top();
-                if (top != nullptr)
+                if (top != NULL)
                 {
                     //
                     // TODO: to be improved using true operator's precedence.
@@ -709,7 +727,7 @@ const Poco::Token* Parser::parseExpression(const Poco::Token* next, ExpressionPt
                         expression = monop;
                         _stack.pop();
                     }
-                    else if (binop && (binop->op() == FSM::MODEL::Operator::equal || binop->op() == FSM::MODEL::Operator::notequal))
+                    else if (binop && (binop->op() == FSM::MODEL::equal || binop->op() == FSM::MODEL::notequal))
                     {
                         _stack.pop();
                         binop->right() = reference;
@@ -725,7 +743,7 @@ const Poco::Token* Parser::parseExpression(const Poco::Token* next, ExpressionPt
         }
         else if (isOperator(next, Operator::OPENPARENT))
         {
-            _stack.push(nullptr);
+            _stack.push(NULL);
             next = nextToken();
         }
         else if (isOperator(next, Operator::CLOSPARENT))
@@ -743,23 +761,23 @@ const Poco::Token* Parser::parseExpression(const Poco::Token* next, ExpressionPt
             case Operator::OR:
             case Operator::XOR:
             {
-                FSM::MODEL::Operator op = FSM::MODEL::Operator::none;
+                FSM::MODEL::Operator op = FSM::MODEL::none;
                 switch (next->asInteger())
                 {
                 case Operator::NE:
-                    op = FSM::MODEL::Operator::notequal;
+                    op = FSM::MODEL::notequal;
                     break;
                 case Operator::EQ:
-                    op = FSM::MODEL::Operator::equal;
+                    op = FSM::MODEL::equal;
                     break;
                 case Operator::AND:
-                    op = FSM::MODEL::Operator::and;
+                    op = FSM::MODEL::and;
                     break;
                 case Operator::OR:
-                    op = FSM::MODEL::Operator::or;
+                    op = FSM::MODEL::or;
                     break;
                 case Operator::XOR:
-                    op = FSM::MODEL::Operator::xor;
+                    op = FSM::MODEL::xor;
                     break;
                 default:
                     poco_assert(false);
@@ -771,7 +789,7 @@ const Poco::Token* Parser::parseExpression(const Poco::Token* next, ExpressionPt
             break;
             case Operator::NOT:
             {
-                UnaryOperation* not = factory.newUnaryOperation(FSM::MODEL::Operator::not);
+                UnaryOperation* not = factory.newUnaryOperation(FSM::MODEL::not);
                 _stack.push(not);
                 next = nextToken();
             }
@@ -793,7 +811,7 @@ const Poco::Token* Parser::parseNext(const Poco::Token* next)
     poco_assert(isIdentifier(next));
 
     StatePtr endstate = map->lookfor(next->tokenString());
-    if (endstate == nullptr && next->tokenString() != "nil")
+    if (endstate == NULL && next->tokenString() != "nil")
     {
         endstate = factory.newState(next->tokenString());
         map->add(endstate);
@@ -833,7 +851,7 @@ const Poco::Token* Parser::parseParameter(const Poco::Token* next)
             if (isOperator(next, Operator::CLOSPARENT) || isOperator(next, Operator::COMMA))
                 break;
             string token = next->tokenString();
-            if (token == "const")
+            if (token == "const" || token == "unsigned" || token == "long")
                 token += ' ';
             type += token;
         }
@@ -866,7 +884,7 @@ const Poco::Token* Parser::parseActions(const Poco::Token* next, List<ActionPtr>
     {
         if (isOperator(next, Operator::CLOSBRACE))
             break;
-        action = nullptr;
+        action = NULL;
         next = parseAction(next);
         actions.push_back(action);
     }
@@ -901,7 +919,9 @@ const Poco::Token* Parser::parseArguments(const Poco::Token* next, List<Argument
 }
 const Poco::Token* Parser::parseArgument(const Poco::Token* next, List<ArgumentPtr>& arguments)
 {
-    poco_assert(isIdentifier(next) || isNumber(next) || isString(next) || isCharacter(next));
+	string msg = next->asString() + ':';
+	poco_assert_msg(isIdentifier(next) || isNumber(next) || isString(next) || isCharacter(next) ||
+					 isOperator(next, Operator::STAR) || isOperator(next, Operator::BITAND), msg.c_str());
     string code;
     int count = 0;
     for (;;)
@@ -914,8 +934,9 @@ const Poco::Token* Parser::parseArgument(const Poco::Token* next, List<ArgumentP
         }
         if (isOperator(next, Operator::OPENPARENT))
             count += 1;
-        code += next->tokenString();
-        next = nextToken();
+		code += next->tokenString();
+		code += ' ';
+		next = nextToken();
     }
     ArgumentPtr argument = factory.newArgument(code);
     arguments.push_back(argument);

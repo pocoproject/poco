@@ -1,9 +1,8 @@
-/*
- * State.cpp
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+
 #include <stdexcept>
 #include "Poco/Format.h"
 using Poco::format;
@@ -20,9 +19,15 @@ namespace FSM
 {
 namespace MODEL
 {
+State::State(const string& name, int lineno) : 
+	Element(name, lineno),
+	_map(NULL), _entry(NULL), _exit(NULL) {
+}
+State::~State() {
+}
 TransitionPtr State::get(const string& name, const List<ParameterPtr>& parameters) const
 {
-    TransitionPtr transition = nullptr;
+    TransitionPtr transition = NULL;
     string signature = Transition::signature(name, parameters);
     try
     {
@@ -48,9 +53,10 @@ void State::print(Print& print) const
     if (exit())
         exit()->print(print);
     print("{");
-    for (const auto& transition : transitions())
+	List<TransitionPtr>::const_iterator transition;
+	for (transition = transitions().begin(); transition != transitions().end(); ++transition)
     {
-        transition->print(print);
+        (*transition)->print(print);
     }
     print("}");
 }

@@ -1,9 +1,14 @@
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+
 #include "parser/IndentStream.h"
 
 std::ostream& tab(std::ostream& stream)
 {
     IndentStream* pIndentStream = dynamic_cast<IndentStream*>(&stream);
-    if (pIndentStream != nullptr)
+    if (pIndentStream != NULL)
     {
         pIndentStream->ib.tab();
     }
@@ -13,7 +18,7 @@ std::ostream& tab(std::ostream& stream)
 std::ostream& back(std::ostream& stream)
 {
     IndentStream* pIndentStream = dynamic_cast<IndentStream*>(&stream);
-    if (pIndentStream != nullptr)
+    if (pIndentStream != NULL)
     {
         pIndentStream->ib.back();
     }

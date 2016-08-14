@@ -1,9 +1,7 @@
-/*
- * ParameterForCpp.h
- *
- *  Created on: 19 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef  POCO_FSM_CPP_PARAMETER_H_
 #define  POCO_FSM_CPP_PARAMETER_H_

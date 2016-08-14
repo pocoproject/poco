@@ -1,9 +1,7 @@
-/*
- * BinaryOperationForCpp.cpp
- *
- *  Created on: 24 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #include "cpp/BinaryOperationForCpp.h"
 
@@ -21,19 +19,19 @@ const string BinaryOperationForCpp::display(const string& prefix) const
     value += dynamic_cast<ExpressionForCpp*>(left())->display(prefix);
     switch (_operator)
     {
-    case Poco::FSM::MODEL::Operator::equal:
+    case Poco::FSM::MODEL::equal:
         value += "==";
         break;
-    case Poco::FSM::MODEL::Operator::notequal:
+    case Poco::FSM::MODEL::notequal:
         value += "!=";
         break;
-    case Poco::FSM::MODEL::Operator::and:
+    case Poco::FSM::MODEL::and:
         value += "&&";
         break;
-    case Poco::FSM::MODEL::Operator::or:
+    case Poco::FSM::MODEL::or:
         value += "||";
         break;
-    case Poco::FSM::MODEL::Operator::xor:
+    case Poco::FSM::MODEL::xor:
         value += '^';
         break;
     default:

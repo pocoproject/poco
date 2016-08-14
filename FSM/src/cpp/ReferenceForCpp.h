@@ -1,9 +1,7 @@
-/*
- * ReferenceForCpp.h
- *
- *  Created on: 24 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef REFERENCEFOCCPP_H_
 #define REFERENCEFOCCPP_H_

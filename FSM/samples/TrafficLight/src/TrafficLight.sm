@@ -28,12 +28,13 @@
 //  This state machine implements a US traffic light.
 //
 %}
-%start StopMap::NorthSouthGreen
-%class Stoplight
-%fsmclass StoplightContext
-%include "stoplightdefs.h"
-%header stoplight.h
-%package cpp_ex4
+
+%start 		StopMap::NorthSouthGreen
+%class 		Stoplight
+%fsmclass 	StoplightContext
+%include 	"stoplightdefs.h"
+%header 	stoplight.h
+%package 	cpp_ex4
 
 %map StopMap
 %%

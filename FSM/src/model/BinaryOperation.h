@@ -1,9 +1,7 @@
-/*
- * BinaryOperation.h
- *
- *  Created on: 20 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef POCO_FSM_MODEL_BINARY_OPERATION_H_
 #define POCO_FSM_MODEL_BINARY_OPERATION_H_

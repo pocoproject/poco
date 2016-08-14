@@ -1,9 +1,8 @@
-/*
- * TransitionForCpp.cpp
- *
- *  Created on: 19 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+
 #include <iostream>
 #include <algorithm>
 #include "cpp/TransitionForCpp.h"
@@ -16,6 +15,7 @@
 #include "cpp/ExpressionForCpp.h"
 #include "parser/IndentStream.h"
 #include "model/Parameter.h"
+#include "model/Action.h"
 
 using Poco::FSM::MODEL::Parameter;
 using namespace std;
@@ -93,29 +93,31 @@ void TransitionForCpp::generateCode(ostream& cpp, bool debug) const
     cpp << endl;
 
 
-    for (auto guard : _guards)
+	List<GuardPtr>::const_iterator guard;
+	for (guard = guards().begin(); guard != guards().end(); ++guard)
     {
-        if (guard != nullptr)
+        if ((*guard) != NULL)
         {
-            if (guard->endstate() == nullptr)
+            if ((*guard)->endstate() == NULL)
             {
-                for (auto action : guard->actions())
-                    if (action != nullptr)
+				List<MODEL::ActionPtr>::const_iterator action;
+				for (action = (*guard)->actions().begin(); action != (*guard)->actions().end(); ++action)
+                    if (*action != NULL)
                     {
-                        ActionForCpp* afc = static_cast<ActionForCpp*>(action);
-                        cpp << "ctxt." << action->display() << endl;
+                        ActionForCpp* afc = static_cast<ActionForCpp*>(*action);
+                        cpp << "ctxt." << (*action)->display() << endl;
                     }
                 continue;
             }
 
-            if (guard->condition())
+            if ((*guard)->condition())
             {
-                ExpressionForCpp* efc = dynamic_cast<ExpressionForCpp*>(guard->condition());
+                ExpressionForCpp* efc = dynamic_cast<ExpressionForCpp*>((*guard)->condition());
                 cpp << "if (" << efc->display("ctxt.") << ") {" << endl << tab;
             }
             cpp << "(context.getState()).Exit(context);" << endl;
 
-            if (guard->actions().size() > 0)
+            if ((*guard)->actions().size() > 0)
             {
                 if (RAPP)
                 {
@@ -127,25 +129,26 @@ void TransitionForCpp::generateCode(ostream& cpp, bool debug) const
                 }
             }
 
-            cpp << "context.setState(context." << guard->endstate()->name() << ");" << endl;
+            cpp << "context.setState(context." << (*guard)->endstate()->name() << ");" << endl;
             if (!RAPP)
             {
                 cpp << "(context.getState()).Entry(context);" << endl;
             }
 
-            for (auto action : guard->actions())
-                if (action != nullptr)
+			List<MODEL::ActionPtr>::const_iterator action;
+			for (action = (*guard)->actions().begin(); action != (*guard)->actions().end(); ++action)
+                if (*action != NULL)
                 {
-                    ActionForCpp* afc = static_cast<ActionForCpp*>(action);
-                    cpp << "ctxt." << action->display() << endl;
+                    ActionForCpp* afc = static_cast<ActionForCpp*>(*action);
+                    cpp << "ctxt." << (*action)->display() << endl;
                 }
 
-            if (guard->actions().size() > 0)
+            if ((*guard)->actions().size() > 0)
             {
                 if (RAPP)
                 {
                     cpp << back << "} catch (...) {" << endl << tab;
-                    cpp << "context.setState(context." << guard->endstate()->name() << ");" << endl;
+                    cpp << "context.setState(context." << (*guard)->endstate()->name() << ");" << endl;
                     cpp << "throw;" << endl << back;
                     cpp << "}" << endl;
                 }
@@ -154,7 +157,7 @@ void TransitionForCpp::generateCode(ostream& cpp, bool debug) const
             {
                 cpp << "(context.getState()).Entry(context);" << endl;
             }
-            if (guard->condition())
+            if ((*guard)->condition())
                 cpp << back << "} else " << endl;
         }
     }

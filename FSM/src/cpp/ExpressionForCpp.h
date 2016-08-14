@@ -1,9 +1,7 @@
-/*
- * ExpressionForCpp.h
- *
- *  Created on: 24 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef EXPRESSIONFORCPP_H_
 #define EXPRESSIONFORCPP_H_

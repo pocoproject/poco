@@ -1,20 +1,23 @@
-/*
- * fSMC.h
- *
- *  Created on: 16 janv. 2016
- *      Author: FrancisANDRE
- */
+//
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 
 #ifndef POCO_FSM_MODEL_SMC_H_
 #define POCO_FSM_MODEL_SMC_H_
 
+#include <cstddef>
 #include <string>
 #include <vector>
 using std::string;
 using std::vector;
 
-template<typename T>
-using List = vector<T>;
+#ifdef POCO_ENABLE_CPP11 
+	template<typename T>
+	using List = vector<T>;
+#else
+	#define List vector
+#endif
 
 namespace Poco {
 	namespace FSM {

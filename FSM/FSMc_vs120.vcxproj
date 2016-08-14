@@ -85,6 +85,65 @@
     <ClCompile Include="src\Variable.cpp" />
     <ClCompile Include="src\VariableForCpp.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\FSM\statemap.h" />
+    <ClInclude Include="src\cpp\ActionForCpp.h" />
+    <ClInclude Include="src\cpp\ArgumentForCpp.h" />
+    <ClInclude Include="src\cpp\BinaryOperationForCpp.h" />
+    <ClInclude Include="src\cpp\CompilableForCpp.h" />
+    <ClInclude Include="src\cpp\ElementForCpp.h" />
+    <ClInclude Include="src\cpp\EntryForCpp.h" />
+    <ClInclude Include="src\cpp\ExitForCpp.h" />
+    <ClInclude Include="src\cpp\ExpressionForCpp.h" />
+    <ClInclude Include="src\cpp\FactoryForCpp.h" />
+    <ClInclude Include="src\cpp\FSMForCpp.h" />
+    <ClInclude Include="src\cpp\FunctionForCpp.h" />
+    <ClInclude Include="src\cpp\GuardForCpp.h" />
+    <ClInclude Include="src\cpp\LiteralForCpp.h" />
+    <ClInclude Include="src\cpp\MapForCpp.h" />
+    <ClInclude Include="src\cpp\ParameterForCpp.h" />
+    <ClInclude Include="src\cpp\ReferenceForCpp.h" />
+    <ClInclude Include="src\cpp\StateForCpp.h" />
+    <ClInclude Include="src\cpp\TransitionForCpp.h" />
+    <ClInclude Include="src\cpp\UnaryOperationForCpp.h" />
+    <ClInclude Include="src\cpp\VariableForCpp.h" />
+    <ClInclude Include="src\model\Action.h" />
+    <ClInclude Include="src\model\Actions.h" />
+    <ClInclude Include="src\model\Argument.h" />
+    <ClInclude Include="src\model\BinaryOperation.h" />
+    <ClInclude Include="src\model\Compilable.h" />
+    <ClInclude Include="src\model\Dumper.h" />
+    <ClInclude Include="src\model\Element.h" />
+    <ClInclude Include="src\model\Entry.h" />
+    <ClInclude Include="src\model\Exit.h" />
+    <ClInclude Include="src\model\Expression.h" />
+    <ClInclude Include="src\model\Factory.h" />
+    <ClInclude Include="src\model\FSM.h" />
+    <ClInclude Include="src\model\Function.h" />
+    <ClInclude Include="src\model\Guard.h" />
+    <ClInclude Include="src\model\Literal.h" />
+    <ClInclude Include="src\model\Map.h" />
+    <ClInclude Include="src\model\Operation.h" />
+    <ClInclude Include="src\model\Parameter.h" />
+    <ClInclude Include="src\model\Print.h" />
+    <ClInclude Include="src\model\Reference.h" />
+    <ClInclude Include="src\model\SMC.h" />
+    <ClInclude Include="src\model\State.h" />
+    <ClInclude Include="src\model\Transition.h" />
+    <ClInclude Include="src\model\UnaryOperation.h" />
+    <ClInclude Include="src\model\Variable.h" />
+    <ClInclude Include="src\parser\Character.h" />
+    <ClInclude Include="src\parser\Comment.h" />
+    <ClInclude Include="src\parser\Identifier.h" />
+    <ClInclude Include="src\parser\IndentStream.h" />
+    <ClInclude Include="src\parser\Keyword.h" />
+    <ClInclude Include="src\parser\Number.h" />
+    <ClInclude Include="src\parser\Operator.h" />
+    <ClInclude Include="src\parser\Parser.h" />
+    <ClInclude Include="src\parser\String.h" />
+    <ClInclude Include="src\parser\Token.h" />
+    <ClInclude Include="src\parser\Tokenizer.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>FSMc</ProjectName>
     <ProjectGuid>{E12E5C71-79A4-495A-848F-F1710111E610}</ProjectGuid>
