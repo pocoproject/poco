@@ -80,7 +80,7 @@ all: libexecs tests samples
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
 
 COMPONENTS =  CppUnit Foundation XML JSON Util Net Crypto NetSSL_OpenSSL
-COMPONENTS += FSM Data Data/ODBC Data/SQLite Data/MySQL Data/PostgreSQL
+COMPONENTS += Data Data/ODBC Data/SQLite Data/MySQL Data/PostgreSQL
 COMPONENTS += MongoDB Redis Zip PageCompiler PageCompiler/File2Page CppParser PDF
 
 cppunit:
@@ -110,7 +110,7 @@ endif
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec 
-libexecs += FSM-libexec Data-libexec  Data/ODBC-libexec Data/SQLite-libexec Data/MySQL-libexec Data/PostgreSQL-libexec
+libexecs += Data-libexec  Data/ODBC-libexec Data/SQLite-libexec Data/MySQL-libexec Data/PostgreSQL-libexec
 libexecs += MongoDB-libexec Redis-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec
 
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ tests	 += MongoDB-tests Redis-tests Zip-tests CppParser-tests PDF-tests
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 samples  =  Foundation-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples 
-samples  += FSM-samples Data-samples
+samples  += Data-samples
 samples  += MongoDB-samples Zip-samples PageCompiler-samples PDF-samples
 
 # -------------------------------------------------------------------------------------------------------------------------------------
