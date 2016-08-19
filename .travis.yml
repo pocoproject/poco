@@ -101,7 +101,7 @@ matrix:
     - env:    TEST_NAME="Linux arm-linux-gnueabi- (make)"
       compiler: gcc
       script:
-        - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  BUILD_CC=gcc CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
+        - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
     - env:    TEST_NAME="Linux gcc 4.6 (CMake)"
       compiler: gcc
