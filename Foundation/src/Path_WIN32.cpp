@@ -129,6 +129,7 @@ std::string PathImpl::tempHomeImpl()
 	return tempImpl();
 }
 
+
 std::string PathImpl::tempImpl()
 {
 	char buffer[MAX_PATH];
@@ -165,6 +166,7 @@ std::string PathImpl::configImpl()
 		result.append("\\");
 	return result;
 }
+
 
 std::string PathImpl::nullImpl()
 {

@@ -36,5 +36,7 @@ ifeq ($(shell test $(GCCVERSION) -ge 492 && echo 1), 1)
 	CXXFLAGS += -std=c++14
 # C++11 needs GCC 4.8.1
 else ifeq ($(shell test $(GCCVERSION) -ge 481 && echo 1), 1)
-	CXXFLAGS += -std=c++0x
+	CXXFLAGS += -std=c++11
+else
+	CXXFLAGS += -std=c++03
 endif

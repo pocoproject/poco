@@ -139,6 +139,7 @@ std::string PathImpl::tempHomeImpl()
 	return tempImpl();
 }
 
+
 std::string PathImpl::tempImpl()
 {
 	Buffer<wchar_t> buffer(MAX_PATH_LEN);
@@ -177,6 +178,7 @@ std::string PathImpl::configImpl()
 	return result;
 }
 
+
 std::string PathImpl::nullImpl()
 {
 	return "NUL:";
@@ -203,10 +205,11 @@ std::string PathImpl::expandImpl(const std::string& path)
 void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 {
 	roots.clear();
-	wchar_t buffer[128];
-	DWORD n = GetLogicalDriveStringsW(sizeof(buffer)/sizeof(wchar_t) - 1, buffer);
+	const int bufferSize = 128;
+	wchar_t buffer[bufferSize];
+	DWORD n = GetLogicalDriveStringsW(bufferSize - 1, buffer);
 	wchar_t* it  = buffer;
-	wchar_t* end = buffer + (n > sizeof(buffer) ? sizeof(buffer) : n);
+	wchar_t* end = buffer + (n > bufferSize ? bufferSize : n);
 	while (it < end)
 	{
 		std::wstring udev;
