@@ -4,8 +4,8 @@ POCO C++ Libraries
 Build Status
 ------------
 
-- Travis: [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.7.4)](https://travis-ci.org/pocoproject/poco)
-- AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.7.4?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.7.4)
+- Travis: [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.7.5)](https://travis-ci.org/pocoproject/poco)
+- AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.7.5?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.7.5)
 
 
 ![alt text][logo]
