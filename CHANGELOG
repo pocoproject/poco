@@ -4,11 +4,13 @@ Release 1.7.5 (2016-08-29)
 ==========================
 
 - fixed GH #1252: Unable to compile Poco::Data for Windows Compact Embedded 2013
+- fixed GH #1344: Poco::Event::wait(timeout) should use CLOCK_MONOTONIC on Linux
 - fixed GH #1355: [JSON::Object] After copy-ctor, JSON::Object::_keys still points to 
   keys in map of copied object 
 - GH #1361: Shell expansion rules say that tilde must be replaced with $HOME before 
   calling getpwuid
 - Poco::SingletonHolder: added reset() method
+- prefer clock_getttime() over gettimeofday() if available
 - Upgraded bundled SQLite to 3.14.1
 
 
