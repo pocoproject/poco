@@ -67,7 +67,7 @@ public:
 	typedef ValueMap::iterator                  Iterator;
 	typedef ValueMap::const_iterator            ConstIterator;
 
-	Object(bool preserveInsertionOrder = false);
+	explicit Object(bool preserveInsertionOrder = false);
 		/// Default constructor. If preserveInsertionOrder, object
 		/// will preserve the items insertion order. Otherwise, items
 		/// will be sorted by keys.

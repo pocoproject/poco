@@ -38,15 +38,15 @@ public:
 		/// This is just a "shortcut" to stringify(any, out) with name indicating the function effect.
 
 	static void stringify(const Dynamic::Var& any, bool preserveInsertionOrder, std::ostream& out, unsigned int indent = 0);
-		/// Writes a String representation of the value to the output stream while preserving the insertion order.
+		/// Writes a string representation of the value to the output stream while optionally preserving the insertion order.
 		/// When indent is 0, the generated string will be created as small as possible (condensed).
-		/// When preserveInsertionOrder is true, the original string object members order will be preserved.
+		/// When preserveInsertionOrder is true, the original order of object members will be preserved.
 		/// This is a "shortcut" to stringify(any, out, indent, -1, preserveInsertionOrder).
 
 	static void stringify(const Dynamic::Var& any, std::ostream& out, unsigned int indent = 0, int step = -1, bool preserveInsertionOrder = false);
-		/// Writes a String representation of the value to the output stream.
-		/// When indent is 0, the String will be created as small as possible.
-		/// When preserveInsertionOrder is true, the original string object members order will be preserved;
+		/// Writes a string representation of the value to the output stream.
+		/// When indent is 0, the string will be created as small as possible.
+		/// When preserveInsertionOrder is true, the original order of object members will be preserved;
 		/// otherwise, object members are sorted by their names.
 
 	static void formatString(const std::string& value, std::ostream& out);
