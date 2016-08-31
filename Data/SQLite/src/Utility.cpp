@@ -125,6 +125,12 @@ Utility::Utility()
 }
 
 
+void Utility::addType(const std::string &sql_type, MetaColumn::ColumnDataType poco_type)
+{
+	_types.insert(TypeMap::value_type(sql_type, poco_type));
+}
+
+
 std::string Utility::lastError(sqlite3* pDB)
 {
 	return std::string(sqlite3_errmsg(pDB));
