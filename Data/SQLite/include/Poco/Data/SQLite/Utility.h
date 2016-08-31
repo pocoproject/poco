@@ -56,6 +56,12 @@ public:
 	static const int OPERATION_DELETE;
 	static const int OPERATION_UPDATE;
 
+	static void addType(const std::string &sql_type, MetaColumn::ColumnDataType poco_type);
+		/// Adds or replaces a mapping for \p sql_type to a Poco type
+		/// 
+		/// \p sql_type 
+		/// a case-insensitive desription ofthe column type
+
 	static sqlite3* dbHandle(const Session& session);
 		/// Returns native DB handle.
 

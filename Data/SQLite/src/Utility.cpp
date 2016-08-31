@@ -125,6 +125,12 @@ Utility::Utility()
 }
 
 
+void Utility::addType(const std::string &sql_type, MetaColumn::ColumnDataType poco_type)
+{
+	_types.insert(TypeMap::value_type(sql_type, poco_type));
+}
+
+
 std::string Utility::lastError(sqlite3* pDB)
 {
 	return std::string(sqlite3_errmsg(pDB));
@@ -147,9 +153,12 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 	sqliteType = sqliteType.substr(0, sqliteType.find_first_of(" ("));
 
 	TypeMap::const_iterator it = _types.find(Poco::trimInPlace(sqliteType));
-	if (_types.end() == it)	throw Poco::NotFoundException();
-
-	return it->second;
+	if (_types.end() == it)	{
+		return MetaColumn::FDT_BLOB;
+	}
+	else {
+		return it->second;
+  }
 }
 
 
