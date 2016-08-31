@@ -147,9 +147,12 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 	sqliteType = sqliteType.substr(0, sqliteType.find_first_of(" ("));
 
 	TypeMap::const_iterator it = _types.find(Poco::trimInPlace(sqliteType));
-	if (_types.end() == it)	throw Poco::NotFoundException();
-
-	return it->second;
+	if (_types.end() == it)	{
+		return MetaColumn::FDT_BLOB;
+	}
+	else {
+		return it->second;
+  }
 }
 
 
