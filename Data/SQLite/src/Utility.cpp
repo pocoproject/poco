@@ -63,6 +63,11 @@ Poco::Mutex Utility::_mutex;
 
 Utility::Utility()
 {
+	initializeDefaultTypes();
+}
+
+void Utility::initializeDefaultTypes()
+{
 	if (_types.empty())
 	{
 		_types.insert(TypeMap::value_type("", MetaColumn::FDT_STRING));
@@ -122,6 +127,21 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("DATETIME", MetaColumn::FDT_TIMESTAMP));
 		_types.insert(TypeMap::value_type("TIMESTAMP", MetaColumn::FDT_TIMESTAMP));
 	}
+}
+
+
+void Utility::addColumnType(std::string sqliteType, MetaColumn::ColumnDataType pocoType)
+{
+	// Check for errors in the mapping
+	if (MetaColumn::FDT_UNKNOWN == pocoType)
+		throw Poco::Data::NotSupportedException("Cannot map to unknown poco type.");
+
+	// Initialize default types
+	initializeDefaultTypes();
+
+	// Add type to internal map
+	Poco::toUpperInPlace(sqliteType);
+	_types[sqliteType] = pocoType;
 }
 
 
