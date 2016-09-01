@@ -32,10 +32,19 @@ Object::Object(bool preserveInsertionOrder): _preserveInsOrder(preserveInsertion
 
 
 Object::Object(const Object& copy) : _values(copy._values),
-	_keys(copy._keys),
 	_preserveInsOrder(copy._preserveInsOrder),
 	_pStruct(0)
 {
+	if (_preserveInsOrder)
+	{
+		// need to update pointers in _keys to point to copied _values
+		for (KeyPtrList::const_iterator it = copy._keys.begin(); it != copy._keys.end(); ++it)
+		{
+			ValueMap::const_iterator itv = _values.find(**it);
+			poco_assert (itv != _values.end());
+			_keys.push_back(&itv->first);
+		}
+	}
 }
 
 
