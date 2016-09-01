@@ -66,6 +66,7 @@ Utility::Utility()
 	initializeDefaultTypes();
 }
 
+
 void Utility::initializeDefaultTypes()
 {
 	if (_types.empty())
@@ -167,12 +168,10 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 	sqliteType = sqliteType.substr(0, sqliteType.find_first_of(" ("));
 
 	TypeMap::const_iterator it = _types.find(Poco::trimInPlace(sqliteType));
-	if (_types.end() == it)	{
+	if (_types.end() == it)	
 		return MetaColumn::FDT_BLOB;
-	}
-	else {
+	else
 		return it->second;
-  }
 }
 
 
