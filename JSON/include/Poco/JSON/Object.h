@@ -303,6 +303,19 @@ inline std::size_t Object::size() const
 inline void Object::remove(const std::string& key)
 {
 	_values.erase(key);
+	if (_preserveInsOrder)
+	{
+		KeyPtrList::iterator it = _keys.begin();
+		KeyPtrList::iterator end = _keys.end();
+		for (; it != end; ++it)
+		{
+			if (key == **it)
+			{
+				_keys.erase(it);
+				break;
+			}
+		}
+	}
 }
 
 
