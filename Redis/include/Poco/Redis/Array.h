@@ -9,69 +9,74 @@
 //
 // Definition of the Array class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #ifndef Redis_Array_INCLUDED
 #define Redis_Array_INCLUDED
 
-#include <vector>
-#include <sstream>
 
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/Type.h"
 #include "Poco/Redis/Exception.h"
+#include <vector>
+#include <sstream>
+
 
 namespace Poco {
 namespace Redis {
 
+
 class Redis_API Array
 	/// Represents a Redis Array. An Array can contain Integers, Strings,
-	/// Bulk Strings, Errors and other arrays. It can also contain a Null
+	/// Bulk Strings, Errors and other Arrays. It can also contain a Null
 	/// value.
 {
 public:
-
 	typedef std::vector<RedisType::Ptr>::const_iterator const_iterator;
 
 	Array();
-		/// Default constructor. As long as there are no elements added,
+		/// Creates an Array. As long as there are no elements added,
 		/// the array will contain a Null value.
 
 	Array(const Array& copy);
-		/// Copy constructor.
+		/// Creates an Array by copying another one.
 
 	virtual ~Array();
-		/// Destructor.
+		/// Destroys the Array.
 
 	template<typename T>
 	Array& operator<<(const T& arg)
 		/// Adds the argument to the array.
+		///
 		/// Note: a std::string will be added as a BulkString because this
 		/// is commonly used for representing strings in Redis. If you
-		/// really need a simple string, use addSimpleString.
+		/// really need a simple string, use addSimpleString().
 	{
 		return add(arg);
 	}
 
 	Array& operator<<(const char* s);
-		/// Special implementation for const char*
+		/// Special implementation for const char*.
+		///
 		/// Note: the specialization creates a BulkString. If you need
-		/// a simple string, call addSimpleString.
+		/// a simple string, call addSimpleString().
 
 	Array& operator<<(const std::vector<std::string>& strings);
-		/// Special implementation for a vector with strings
+		/// Special implementation for a vector with strings.
 		/// All strings will be added as a BulkString.
 
 	Array& add();
-		/// Adds an Null BulkString
+		/// Adds an Null BulkString.
 
 	template<typename T>
 	Array& add(const T& arg)
 		/// Adds an element to the array.
+		///
 		/// Note: the specialization for std::string will add a BulkString!
 		/// If you really need a simple string, call addSimpleString.
 	{
@@ -80,38 +85,41 @@ public:
 	}
 
 	Array& add(const char* s);
-		/// Special implementation for const char*
+		/// Special implementation for const char*.
+		///
 		/// Note: the specialization creates a BulkString. If you need
 		/// a simple string, call addSimpleString.
 
 	Array& add(const std::vector<std::string>& strings);
-		/// Special implementation for a vector with strings
+		/// Special implementation for a vector with strings.
 		/// All strings will be added as a BulkString.
 
 	Array& addRedisType(RedisType::Ptr value);
 		/// Adds a Redis element.
 
 	Array& addSimpleString(const std::string& value);
-		/// Adds a simple string (can't contain newline characters!)
+		/// Adds a simple string (can't contain newline characters!).
 
 	const_iterator begin() const;
-		/// Returns an iterator to the start of the array. Note:
-		/// this can throw a NullValueException when this is a Null array.
+		/// Returns an iterator to the start of the array. 
+		///
+		/// Note: this can throw a NullValueException when this is a Null array.
 
 	void clear();
 		/// Removes all elements from the array.
 
 	const_iterator end() const;
-		/// Returns an iterator to the end of the array. Note:
-		/// this can throw a NullValueException when this is a Null array.
+		/// Returns an iterator to the end of the array. 
+		///
+		/// Note: this can throw a NullValueException when this is a Null array.
 
 	template<typename T>
 	T get(size_t pos) const
 		/// Returns the element on the given position and tries to convert
-		/// to the template type. A BadCastException will be thrown when the
-		/// the conversion fails. An InvalidArgumentException will be thrown
+		/// to the template type. A Poco::BadCastException will be thrown when the
+		/// the conversion fails. An Poco::InvalidArgumentException will be thrown
 		/// when the index is out of range. When the array is a Null array
-		/// a NullValueException is thrown.
+		/// a Poco::NullValueException is thrown.
 	{
 		if ( _elements.isNull() ) throw NullValueException();
 
@@ -127,8 +135,8 @@ public:
 	}
 
 	int getType(size_t pos) const;
-		/// Returns the type of the element. This can throw a NullValueException
-		/// when this array is a Null array. An InvalidArgumentException will
+		/// Returns the type of the element. This can throw a Poco::NullValueException
+		/// when this array is a Null array. An Poco::InvalidArgumentException will
 		/// be thrown when the index is out of range.
 
 	bool isNull() const;
@@ -143,16 +151,22 @@ public:
 		/// Redis Protocol specification.
 
 	size_t size() const;
-		/// Returns the size of the array. Note:
-		/// this can throw a NullValueException when this is a Null array.
+		/// Returns the size of the array. 
+		///
+		/// Note: this can throw a NullValueException when this is a Null array.
 
 private:
-
-	Nullable<std::vector<RedisType::Ptr> > _elements;
-
 	void checkNull();
 		/// Checks for null array and sets a new vector if true.
+
+	Nullable<std::vector<RedisType::Ptr> > _elements;
 };
+
+
+//
+// inlines
+//
+
 
 inline Array& Array::operator<<(const char* s)
 {
@@ -160,16 +174,19 @@ inline Array& Array::operator<<(const char* s)
 	return add(value);
 }
 
+
 inline Array& Array::operator<<(const std::vector<std::string>& strings)
 {
 	return add(strings);
 }
+
 
 inline Array& Array::add()
 {
 	BulkString value;
 	return add(value);
 }
+
 
 template<>
 inline Array& Array::add(const std::string& arg)
@@ -178,11 +195,13 @@ inline Array& Array::add(const std::string& arg)
 	return add(value);
 }
 
+
 inline Array& Array::add(const char* s)
 {
 	BulkString value(s);
 	return add(value);
 }
+
 
 inline Array& Array::add(const std::vector<std::string>& strings)
 {
@@ -193,21 +212,25 @@ inline Array& Array::add(const std::vector<std::string>& strings)
 	return *this;
 }
 
+
 inline Array& Array::addSimpleString(const std::string& value)
 {
 	return addRedisType(new Type<std::string>(value));
 }
+
 
 inline Array::const_iterator Array::begin() const
 {
 	return _elements.value().begin();
 }
 
+
 inline void Array::checkNull()
 {
 	std::vector<RedisType::Ptr> v;
 	if ( _elements.isNull() ) _elements.assign(v);
 }
+
 
 inline void Array::clear()
 {
@@ -217,15 +240,18 @@ inline void Array::clear()
 	}
 }
 
+
 inline Array::const_iterator Array::end() const
 {
 	return _elements.value().end();
 }
 
+
 inline bool Array::isNull() const
 {
 	return _elements.isNull();
 }
+
 
 inline void Array::makeNull()
 {
@@ -233,6 +259,7 @@ inline void Array::makeNull()
 
 	_elements.clear();
 }
+
 
 inline size_t Array::size() const
 {
@@ -291,6 +318,7 @@ struct RedisTypeTraits<Array>
 };
 
 
-}}
+} } // namespace Poco::Redis
+
 
 #endif // Redis_Array_INCLUDED

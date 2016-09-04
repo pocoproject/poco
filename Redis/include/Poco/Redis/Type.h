@@ -9,23 +9,25 @@
 //
 // Definition of the Type class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2016, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #ifndef Redis_Type_INCLUDED
 #define Redis_Type_INCLUDED
+
 
 #include "Poco/LineEndingConverter.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Nullable.h"
-
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/RedisStream.h"
+
 
 namespace Poco {
 namespace Redis {
@@ -36,22 +38,22 @@ class Redis_API RedisType
 	/// element with different types in Array.
 {
 public:
-
-	enum Types {
-		REDIS_INTEGER, // Redis Integer
-		REDIS_SIMPLE_STRING, // Redis Simple String
-		REDIS_BULK_STRING, // Redis Bulkstring
-		REDIS_ARRAY, // Redis Array
-		REDIS_ERROR // Redis Error
+	enum Types 
+	{
+		REDIS_INTEGER,       /// Redis Integer
+		REDIS_SIMPLE_STRING, /// Redis Simple String
+		REDIS_BULK_STRING,   /// Redis Bulkstring
+		REDIS_ARRAY,         /// Redis Array
+		REDIS_ERROR          /// Redis Error
 	};
 
 	typedef SharedPtr<RedisType> Ptr;
 
 	RedisType();
-		/// Constructor
+		/// Creates the RedisType.
 
 	virtual ~RedisType();
-		/// Destructor
+		/// Destroys the RedisType.
 
 	bool isArray() const;
 		/// Returns true when the value is a Redis array.
@@ -63,7 +65,7 @@ public:
 		/// Returns true when the value is a Redis error.
 
 	bool isInteger() const;
-		/// Returns true when the value is a Redis integer (64 bit integer)
+		/// Returns true when the value is a Redis integer (64 bit integer).
 
 	bool isSimpleString() const;
 		/// Returns true when the value is a simple string.
@@ -78,41 +80,50 @@ public:
 		/// Converts the value to a RESP (REdis Serialization Protocol) string.
 
 	static RedisType::Ptr createRedisType(char marker);
-		/// Create a Redis type based on the marker :
-		/// + : a simple string (std::string)
-		/// - : an error (Error)
-		/// $ : a bulk string (BulkString)
-		/// * : an array (Array)
-		/// : : a signed 64 bit integer (Int64)
-
-private:
-
+		/// Create a Redis type based on the marker:
+		///
+		///     - '+': a simple string (std::string)
+		///     - '-': an error (Error)
+		///     - '$': a bulk string (BulkString)
+		///     - '*': an array (Array)
+		///     - ':': a signed 64 bit integer (Int64)
 };
+
+
+//
+// inlines
+//
+
 
 inline bool RedisType::isArray() const
 {
 	return type() == REDIS_ARRAY;
 }
 
+
 inline bool RedisType::isBulkString() const
 {
 	return type() == REDIS_BULK_STRING;
 }
+
 
 inline bool RedisType::isError() const
 {
 	return type() == REDIS_ERROR;
 }
 
+
 inline bool RedisType::isInteger() const
 {
 	return type() == REDIS_INTEGER;
 }
 
+
 inline bool RedisType::isSimpleString() const
 {
 	return type() == REDIS_SIMPLE_STRING;
 }
+
 
 template<typename T>
 struct RedisTypeTraits
@@ -123,7 +134,10 @@ struct RedisTypeTraits
 template<>
 struct RedisTypeTraits<Int64>
 {
-	enum { TypeId = RedisType::REDIS_INTEGER };
+	enum 
+	{
+		TypeId = RedisType::REDIS_INTEGER 
+	};
 
 	static const char marker = ':';
 
@@ -137,14 +151,16 @@ struct RedisTypeTraits<Int64>
 		std::string number = input.getline();
 		value = NumberParser::parse64(number);
 	}
-
 };
 
 
 template<>
 struct RedisTypeTraits<std::string>
 {
-	enum { TypeId = RedisType::REDIS_SIMPLE_STRING };
+	enum 
+	{ 
+		TypeId = RedisType::REDIS_SIMPLE_STRING 
+	};
 
 	static const char marker = '+';
 
@@ -168,7 +184,10 @@ typedef Nullable<std::string> BulkString;
 template<>
 struct RedisTypeTraits<BulkString>
 {
-	enum { TypeId = RedisType::REDIS_BULK_STRING };
+	enum 
+	{ 
+		TypeId = RedisType::REDIS_BULK_STRING 
+	};
 
 	static const char marker = '$';
 
@@ -210,29 +229,28 @@ struct RedisTypeTraits<BulkString>
 
 
 template<typename T>
-class Type : public RedisType
+class Type: public RedisType
 	/// Template class for all Redis types. This class will use
 	/// RedisTypeTraits structure for calling the type specific code.
 {
 public:
-
 	Type()
-		/// Constructor
+		/// Creates the Type.
 	{
 	}
 
 	Type(const T& t) : _value(t)
-		/// Constructor
+		/// Creates the Type from another one.
 	{
 	}
 
 	Type(const Type& copy) : _value(copy._value)
-		/// Copy Constructor
+		/// Creates the Type by copying another one.
 	{
 	}
 
 	virtual ~Type()
-		/// Destructor
+		/// Destroys the Type.
 	{
 	}
 
@@ -267,10 +285,11 @@ public:
 	}
 
 private:
-
 	T _value;
 };
 
-}} // Namespace Poco/Redis
+
+} } // namespace Poco/Redis
+
 
 #endif // Redis_Type_INCLUDED
