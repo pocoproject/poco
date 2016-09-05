@@ -24,7 +24,7 @@ using Poco::Util::OptionSet;
 using Poco::Util::OptionProcessor;
 
 
-OptionProcessorTest::OptionProcessorTest(const std::string& rName): CppUnit::TestCase(rName)
+OptionProcessorTest::OptionProcessorTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -81,58 +81,58 @@ void OptionProcessorTest::testUnix()
 		.repeatable(false));
 
 	OptionProcessor p1(set);
-	std::string optionName;
+	std::string name;
 	std::string value;
 	
-	assert (p1.process("-I/usr/include", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("-I/usr/include", name, value));
+	assert (name == "include-dir");
 	assert (value == "/usr/include");
 
-	assert (p1.process("--include:/usr/local/include", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("--include:/usr/local/include", name, value));
+	assert (name == "include-dir");
 	assert (value == "/usr/local/include");
 	
-	assert (p1.process("-I", optionName, value));
-	assert (optionName.empty());
+	assert (p1.process("-I", name, value));
+	assert (name.empty());
 	assert (value.empty());
-	assert (p1.process("/usr/include", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("/usr/include", name, value));
+	assert (name == "include-dir");
 	assert (value == "/usr/include");
 
-	assert (p1.process("-I", optionName, value));
-	assert (optionName.empty());
+	assert (p1.process("-I", name, value));
+	assert (name.empty());
 	assert (value.empty());
-	assert (p1.process("-L", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("-L", name, value));
+	assert (name == "include-dir");
 	assert (value == "-L");
 
-	assert (p1.process("--lib=/usr/local/lib", optionName, value));
-	assert (optionName == "library-dir");
+	assert (p1.process("--lib=/usr/local/lib", name, value));
+	assert (name == "library-dir");
 	assert (value == "/usr/local/lib");
 	
-	assert (p1.process("-ofile", optionName, value));
-	assert (optionName == "output");
+	assert (p1.process("-ofile", name, value));
+	assert (name == "output");
 	assert (value == "file");
 	
-	assert (!p1.process("src/file.cpp", optionName, value));
-	assert (!p1.process("/src/file.cpp", optionName, value));
+	assert (!p1.process("src/file.cpp", name, value));
+	assert (!p1.process("/src/file.cpp", name, value));
 	
 	try
 	{
-		p1.process("--output:file", optionName, value);
+		p1.process("--output:file", name, value);
 		fail("duplicate - must throw");
 	}
 	catch (Poco::Util::DuplicateOptionException&)
 	{
 	}
 	
-	assert (p1.process("-g", optionName, value));
-	assert (optionName == "debug");
+	assert (p1.process("-g", name, value));
+	assert (name == "debug");
 	assert (value == "");
 	
 	try
 	{
-		p1.process("--optimize", optionName, value);
+		p1.process("--optimize", name, value);
 		fail("incompatible - must throw");
 	}
 	catch (Poco::Util::IncompatibleOptionsException&)
@@ -141,7 +141,7 @@ void OptionProcessorTest::testUnix()
 	
 	try
 	{
-		p1.process("-x", optionName, value);
+		p1.process("-x", name, value);
 		fail("unknown option - must throw");
 	}
 	catch (Poco::Util::UnknownOptionException&)
@@ -150,7 +150,7 @@ void OptionProcessorTest::testUnix()
 
 	try
 	{
-		p1.process("--in", optionName, value);
+		p1.process("--in", name, value);
 		fail("ambiguous option - must throw");
 	}
 	catch (Poco::Util::AmbiguousOptionException&)
@@ -207,51 +207,51 @@ void OptionProcessorTest::testDefault()
 
 	OptionProcessor p1(set);
 	p1.setUnixStyle(false);
-	std::string optionName;
+	std::string name;
 	std::string value;
 	
-	assert (p1.process("/Inc:/usr/include", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("/Inc:/usr/include", name, value));
+	assert (name == "include-dir");
 	assert (value == "/usr/include");
 
-	assert (p1.process("/include:/usr/local/include", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("/include:/usr/local/include", name, value));
+	assert (name == "include-dir");
 	assert (value == "/usr/local/include");
 
-	assert (p1.process("/Inc", optionName, value));
-	assert (optionName.empty());
+	assert (p1.process("/Inc", name, value));
+	assert (name.empty());
 	assert (value.empty());
-	assert (p1.process("/usr/include", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("/usr/include", name, value));
+	assert (name == "include-dir");
 	assert (value == "/usr/include");
 
-	assert (p1.process("/lib=/usr/local/lib", optionName, value));
-	assert (optionName == "library-dir");
+	assert (p1.process("/lib=/usr/local/lib", name, value));
+	assert (name == "library-dir");
 	assert (value == "/usr/local/lib");
 	
-	assert (p1.process("/out:file", optionName, value));
-	assert (optionName == "output");
+	assert (p1.process("/out:file", name, value));
+	assert (name == "output");
 	assert (value == "file");
 	
-	assert (!p1.process("src/file.cpp", optionName, value));
-	assert (!p1.process("\\src\\file.cpp", optionName, value));
+	assert (!p1.process("src/file.cpp", name, value));
+	assert (!p1.process("\\src\\file.cpp", name, value));
 	
 	try
 	{
-		p1.process("/output:file", optionName, value);
+		p1.process("/output:file", name, value);
 		fail("duplicate - must throw");
 	}
 	catch (Poco::Util::DuplicateOptionException&)
 	{
 	}
 	
-	assert (p1.process("/debug", optionName, value));
-	assert (optionName == "debug");
+	assert (p1.process("/debug", name, value));
+	assert (name == "debug");
 	assert (value == "");
 	
 	try
 	{
-		p1.process("/OPT", optionName, value);
+		p1.process("/OPT", name, value);
 		fail("incompatible - must throw");
 	}
 	catch (Poco::Util::IncompatibleOptionsException&)
@@ -260,7 +260,7 @@ void OptionProcessorTest::testDefault()
 	
 	try
 	{
-		p1.process("/x", optionName, value);
+		p1.process("/x", name, value);
 		fail("unknown option - must throw");
 	}
 	catch (Poco::Util::UnknownOptionException&)
@@ -269,7 +269,7 @@ void OptionProcessorTest::testDefault()
 
 	try
 	{
-		p1.process("/in", optionName, value);
+		p1.process("/in", name, value);
 		fail("ambiguous option - must throw");
 	}
 	catch (Poco::Util::AmbiguousOptionException&)
@@ -287,7 +287,7 @@ void OptionProcessorTest::testRequired()
 			.repeatable(true));
 
 	OptionProcessor p1(set);
-	std::string optionName;
+	std::string name;
 	std::string value;
 	
 	try
@@ -299,7 +299,7 @@ void OptionProcessorTest::testRequired()
 	{
 	}
 	
-	assert (p1.process("-o", optionName, value));
+	assert (p1.process("-o", name, value));
 	p1.checkRequired();
 }
 
@@ -321,37 +321,37 @@ void OptionProcessorTest::testArgs()
 		.argument("level", false));
 
 	OptionProcessor p1(set);
-	std::string optionName;
+	std::string name;
 	std::string value;
 	
-	assert (p1.process("-I/usr/include", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("-I/usr/include", name, value));
+	assert (name == "include-dir");
 	assert (value == "/usr/include");
 
-	assert (p1.process("--include:/usr/local/include", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("--include:/usr/local/include", name, value));
+	assert (name == "include-dir");
 	assert (value == "/usr/local/include");
 	
-	assert (p1.process("-I", optionName, value));
-	assert (optionName.empty());
+	assert (p1.process("-I", name, value));
+	assert (name.empty());
 	assert (value.empty());
-	assert (p1.process("/usr/include", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("/usr/include", name, value));
+	assert (name == "include-dir");
 	assert (value == "/usr/include");
 
-	assert (p1.process("-I", optionName, value));
-	assert (optionName.empty());
+	assert (p1.process("-I", name, value));
+	assert (name.empty());
 	assert (value.empty());
-	assert (p1.process("-L", optionName, value));
-	assert (optionName == "include-dir");
+	assert (p1.process("-L", name, value));
+	assert (name == "include-dir");
 	assert (value == "-L");
 
-	assert (p1.process("-O", optionName, value));
-	assert (optionName == "optimize");
+	assert (p1.process("-O", name, value));
+	assert (name == "optimize");
 	assert (value.empty());
 	
-	assert (p1.process("-O2", optionName, value));
-	assert (optionName == "optimize");
+	assert (p1.process("-O2", name, value));
+	assert (name == "optimize");
 	assert (value == "2");
 }
 

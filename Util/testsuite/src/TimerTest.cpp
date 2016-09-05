@@ -24,7 +24,7 @@ using Poco::Timestamp;
 using Poco::Clock;
 
 
-TimerTest::TimerTest(const std::string& rName): CppUnit::TestCase(rName)
+TimerTest::TimerTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
