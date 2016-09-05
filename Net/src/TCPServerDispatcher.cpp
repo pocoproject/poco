@@ -33,8 +33,8 @@ namespace Net {
 class TCPConnectionNotification: public Notification
 {
 public:
-	TCPConnectionNotification(const StreamSocket& rSocket):
-		_socket(rSocket)
+	TCPConnectionNotification(const StreamSocket& socket):
+		_socket(socket)
 	{
 	}
 	

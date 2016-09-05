@@ -32,9 +32,9 @@ SocketNotification::~SocketNotification()
 }
 
 	
-void SocketNotification::setSocket(const Socket& rSocket)
+void SocketNotification::setSocket(const Socket& socket)
 {
-	_socket = rSocket;
+	_socket = socket;
 }
 
 
