@@ -216,8 +216,8 @@ private:
 		if (indent > 0) out << std::endl;
 		
 		typename C::const_iterator it = container.begin();
-		typename C::const_iterator itEnd = container.end();
-		for (; it != itEnd;)
+		typename C::const_iterator end = container.end();
+		for (; it != end;)
 		{
 			for(unsigned int i = 0; i < indent; i++) out << ' ';
 
@@ -405,9 +405,9 @@ public:
 		throw BadCastException();
 	}
 
-	void convert(bool& rValue) const
+	void convert(bool& value) const
 	{
-		rValue = !_val.isNull() && _val->size() > 0;
+		value = !_val.isNull() && _val->size() > 0;
 	}
 
 	void convert(float&) const
@@ -547,9 +547,9 @@ public:
 		throw BadCastException();
 	}
 
-	void convert(bool& rValue) const
+	void convert(bool& value) const
 	{
-		rValue = _val.size() > 0;
+		value = _val.size() > 0;
 	}
 
 	void convert(float&) const
