@@ -712,14 +712,14 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 	bool defaultNameSpaceUsed = false;
 	XMLString defaultNamespaceURI = _namespaces.getURI(XMLString());
 	XMLString local;
-	XMLString prefixString;
+	XMLString prefix;
 	XMLString elementNamespaceURI = namespaceURI;
-	Name::split(qname, prefixString, local);
+	Name::split(qname, prefix, local);
 	if (elementNamespaceURI.empty())
-		elementNamespaceURI = _namespaces.getURI(prefixString);
+		elementNamespaceURI = _namespaces.getURI(prefix);
 	if (!elementNamespaceURI.empty())
 	{
-		usedNamespaces[prefixString].insert(elementNamespaceURI);
+		usedNamespaces[prefix].insert(elementNamespaceURI);
 		if (!defaultNamespaceURI.empty() && elementNamespaceURI == defaultNamespaceURI)
 			defaultNameSpaceUsed = true;
 	}
@@ -733,7 +733,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 		XMLString attributeLocal;
 		Name::split(attributeQName, attributePrefix, attributeLocal);
 		if (attributeNamespaceURI.empty())
-			attributeNamespaceURI = _namespaces.getURI(prefixString);
+			attributeNamespaceURI = _namespaces.getURI(prefix);
 		if (!attributeNamespaceURI.empty())
 		{
 			usedNamespaces[attributePrefix].insert(attributeNamespaceURI);
