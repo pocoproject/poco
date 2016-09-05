@@ -14,8 +14,8 @@
 #include "Page.h"
 
 
-ApacheCodeWriter::ApacheCodeWriter(const Page& rPage, const std::string& rClazz):
-	CodeWriter(rPage, rClazz)
+ApacheCodeWriter::ApacheCodeWriter(const Page& page, const std::string& clazz):
+	CodeWriter(page, clazz)
 {
 }
 
