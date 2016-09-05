@@ -103,8 +103,8 @@ void RecordSet::reset(const Statement& stmt)
 	_totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
 	
 	RowMap::iterator it = _rowMap.begin();
-	RowMap::iterator itEnd = _rowMap.end();
-	for (; it != itEnd; ++it) delete it->second;
+	RowMap::iterator end = _rowMap.end();
+	for (; it != end; ++it) delete it->second;
 	_rowMap.clear();
 
 	Statement::operator = (stmt);
