@@ -46,27 +46,27 @@ SocketImpl* SecureServerSocketImpl::acceptConnection(SocketAddress& clientAddr)
 }
 
 
-void SecureServerSocketImpl::connect(const SocketAddress& rAddress)
+void SecureServerSocketImpl::connect(const SocketAddress& address)
 {
 	throw Poco::InvalidAccessException("Cannot connect() a SecureServerSocket");
 }
 
 
-void SecureServerSocketImpl::connect(const SocketAddress& rAddress, const Poco::Timespan& timeout)
-{
-	throw Poco::InvalidAccessException("Cannot connect() a SecureServerSocket");
-}
-	
-
-void SecureServerSocketImpl::connectNB(const SocketAddress& rAddress)
+void SecureServerSocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout)
 {
 	throw Poco::InvalidAccessException("Cannot connect() a SecureServerSocket");
 }
 	
 
-void SecureServerSocketImpl::bind(const SocketAddress& rAddress, bool reuseAddress)
+void SecureServerSocketImpl::connectNB(const SocketAddress& address)
 {
-	_impl.bind(rAddress, reuseAddress);
+	throw Poco::InvalidAccessException("Cannot connect() a SecureServerSocket");
+}
+	
+
+void SecureServerSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
+{
+	_impl.bind(address, reuseAddress);
 	reset(_impl.sockfd());
 }
 
@@ -97,13 +97,13 @@ int SecureServerSocketImpl::receiveBytes(void* buffer, int length, int flags)
 }
 
 
-int SecureServerSocketImpl::sendTo(const void* buffer, int length, const SocketAddress& rAddress, int flags)
+int SecureServerSocketImpl::sendTo(const void* buffer, int length, const SocketAddress& address, int flags)
 {
 	throw Poco::InvalidAccessException("Cannot sendTo() on a SecureServerSocket");
 }
 
 
-int SecureServerSocketImpl::receiveFrom(void* buffer, int length, SocketAddress& rAddress, int flags)
+int SecureServerSocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, int flags)
 {
 	throw Poco::InvalidAccessException("Cannot receiveFrom() on a SecureServerSocket");
 }

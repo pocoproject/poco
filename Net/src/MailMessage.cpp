@@ -214,9 +214,9 @@ void MailMessage::addRecipient(const MailRecipient& recipient)
 }
 
 
-void MailMessage::setRecipients(const Recipients& rRecipients)
+void MailMessage::setRecipients(const Recipients& recipients)
 {
-	_recipients.assign(rRecipients.begin(), rRecipients.end());
+	_recipients.assign(recipients.begin(), recipients.end());
 }
 
 
@@ -326,12 +326,12 @@ void MailMessage::addAttachment(const std::string& name, PartSource* pSource, Co
 }
 
 
-void MailMessage::read(std::istream& istr, PartHandler& rHandler)
+void MailMessage::read(std::istream& istr, PartHandler& handler)
 {
 	readHeader(istr);
 	if (isMultipart())
 	{
-		readMultipart(istr, rHandler);
+		readMultipart(istr, handler);
 	}
 	else
 	{
