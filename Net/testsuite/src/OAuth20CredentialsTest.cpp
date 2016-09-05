@@ -23,7 +23,7 @@ using Poco::Net::OAuth20Credentials;
 using Poco::Net::NotAuthenticatedException;
 
 
-OAuth20CredentialsTest::OAuth20CredentialsTest(const std::string& rName): CppUnit::TestCase(rName)
+OAuth20CredentialsTest::OAuth20CredentialsTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

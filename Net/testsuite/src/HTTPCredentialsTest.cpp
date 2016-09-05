@@ -32,7 +32,7 @@ using Poco::Net::HTTPCredentials;
 using Poco::Net::NotAuthenticatedException;
 
 
-HTTPCredentialsTest::HTTPCredentialsTest(const std::string& rName): CppUnit::TestCase(rName)
+HTTPCredentialsTest::HTTPCredentialsTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

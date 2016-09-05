@@ -24,7 +24,7 @@ using Poco::Net::MessageException;
 using Poco::Net::NameValueCollection;
 
 
-HTTPRequestTest::HTTPRequestTest(const std::string& rName): CppUnit::TestCase(rName)
+HTTPRequestTest::HTTPRequestTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

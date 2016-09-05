@@ -101,7 +101,7 @@ namespace
 }
 
 
-WebSocketTest::WebSocketTest(const std::string& rName): CppUnit::TestCase(rName)
+WebSocketTest::WebSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

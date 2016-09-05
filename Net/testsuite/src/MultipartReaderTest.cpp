@@ -24,7 +24,7 @@ using Poco::Net::MessageHeader;
 using Poco::Net::MultipartException;
 
 
-MultipartReaderTest::MultipartReaderTest(const std::string& rName): CppUnit::TestCase(rName)
+MultipartReaderTest::MultipartReaderTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

@@ -29,7 +29,7 @@ using Poco::Net::IPAddress;
 using Poco::NotFoundException;
 
 
-NetworkInterfaceTest::NetworkInterfaceTest(const std::string& rName): CppUnit::TestCase(rName)
+NetworkInterfaceTest::NetworkInterfaceTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
