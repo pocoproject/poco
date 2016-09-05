@@ -201,15 +201,13 @@ protected:
 	
 	void loadEntries()
 	{
-		_entries.reserve(_db.db.NumFiles);
-		for (Poco::UInt32 i = 0; i < _db.db.NumFiles; i++)
+		_entries.reserve(_db.NumFiles);
+		for (Poco::UInt32 i = 0; i < _db.NumFiles; i++)
 		{
-			const CSzFileItem *f = _db.db.Files + i;
-			
-			ArchiveEntry::EntryType type = f->IsDir ? ArchiveEntry::ENTRY_DIRECTORY : ArchiveEntry::ENTRY_FILE;
-			Poco::UInt32 attributes = f->AttribDefined ? f->Attrib : 0;
-			Poco::UInt64 size = f->Size;
-			
+			ArchiveEntry::EntryType type = SzArEx_IsDir(&_db, i) ? ArchiveEntry::ENTRY_DIRECTORY : ArchiveEntry::ENTRY_FILE;
+			Poco::UInt32 attributes = SzBitWithVals_Check(&_db.Attribs, i) ? _db.Attribs.Vals[i] : 0;
+			Poco::UInt64 size = SzArEx_GetFileSize(&_db, i);
+
 			std::vector<Poco::UInt16> utf16Path;
 			std::size_t utf16PathLen = SzArEx_GetFileNameUtf16(&_db, i, 0);
 			utf16Path.resize(utf16PathLen, 0);
@@ -222,10 +220,10 @@ protected:
 			converter.convert(&utf16Path[0], (int) utf16PathLen*sizeof(Poco::UInt16), utf8Path);
 						
 			Poco::Timestamp lastModified(0);
-			if (f->MTimeDefined)
+			if (SzBitWithVals_Check(&_db.MTime, i))
 			{
 				Poco::Timestamp::TimeVal tv(0);
-				tv = (static_cast<Poco::UInt64>(f->MTime.High) << 32) + f->MTime.Low;
+				tv  = (static_cast<Poco::UInt64>(_db.MTime.Vals[i].High) << 32) + _db.MTime.Vals[i].Low;
 				tv -= (static_cast<Poco::Int64>(0x019DB1DE) << 32) + 0xD53E8000;
 				tv /= 10;
 				lastModified = tv;

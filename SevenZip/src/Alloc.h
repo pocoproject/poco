@@ -1,14 +1,12 @@
 /* Alloc.h -- Memory allocation functions
-2009-02-07 : Igor Pavlov : Public domain */
+2015-02-21 : Igor Pavlov : Public domain */
 
 #ifndef __COMMON_ALLOC_H
 #define __COMMON_ALLOC_H
 
-#include <stddef.h>
+#include "7zTypes.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 void *MyAlloc(size_t size);
 void MyFree(void *address);
@@ -31,8 +29,9 @@ void BigFree(void *address);
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+extern ISzAlloc g_Alloc;
+extern ISzAlloc g_BigAlloc;
+
+EXTERN_C_END
 
 #endif

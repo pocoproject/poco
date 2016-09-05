@@ -36,7 +36,88 @@
     <ClInclude Include="include\Poco\SevenZip\ArchiveEntry.h">
       <Filter>Archive\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\SevenZip\SevenZip.h">
+      <Filter>SevenZip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bcj2.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bra.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Compiler.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CpuArch.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Delta.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LzFind.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LzFindMt.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LzHash.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Lzma2Dec.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Lzma2Enc.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Lzma86.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LzmaDec.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LzmaEnc.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LzmaLib.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MtCoder.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Ppmd.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Ppmd7.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Precomp.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RotateDefs.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sha256.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sort.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Threads.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Xz.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XzCrc64.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XzEnc.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\7z.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\7zAlloc.h">
       <Filter>LZMA SDK\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\7zBuf.h">
@@ -48,32 +129,32 @@
     <ClInclude Include="src\7zFile.h">
       <Filter>LZMA SDK\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\7zTypes.h">
+      <Filter>LZMA SDK\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\7zVersion.h">
       <Filter>LZMA SDK\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bcj2.h">
+    <ClInclude Include="src\Aes.h">
       <Filter>LZMA SDK\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bra.h">
+    <ClInclude Include="src\Alloc.h">
       <Filter>LZMA SDK\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\CpuArch.h">
+    <ClInclude Include="src\Ppmd8.h">
       <Filter>LZMA SDK\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Lzma2Dec.h">
+    <ClInclude Include="src\Sha1.h">
       <Filter>LZMA SDK\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LzmaDec.h">
+    <ClInclude Include="src\Blake2.h">
       <Filter>LZMA SDK\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Ppmd.h">
+    <ClInclude Include="src\BwtSort.h">
       <Filter>LZMA SDK\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Ppmd7.h">
+    <ClInclude Include="src\HuffEnc.h">
       <Filter>LZMA SDK\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Poco\SevenZip\SevenZip.h">
-      <Filter>SevenZip\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +165,9 @@
       <Filter>Archive\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\7zAlloc.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\7zArcIn.c">
       <Filter>LZMA SDK\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\7zBuf.c">
@@ -104,13 +188,22 @@
     <ClCompile Include="src\7zFile.c">
       <Filter>LZMA SDK\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\7zIn.c">
-      <Filter>LZMA SDK\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\7zStream.c">
       <Filter>LZMA SDK\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Aes.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AesOpt.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Alloc.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Bcj2.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bcj2Enc.c">
       <Filter>LZMA SDK\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Bra.c">
@@ -119,19 +212,100 @@
     <ClCompile Include="src\Bra86.c">
       <Filter>LZMA SDK\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BraIA64.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\CpuArch.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Delta.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LzFind.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LzFindMt.c">
       <Filter>LZMA SDK\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Lzma2Dec.c">
       <Filter>LZMA SDK\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Lzma2Enc.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lzma86Dec.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lzma86Enc.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\LzmaDec.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LzmaEnc.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LzmaLib.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MtCoder.c">
       <Filter>LZMA SDK\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Ppmd7.c">
       <Filter>LZMA SDK\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Ppmd7Dec.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ppmd7Enc.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sha256.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sort.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Threads.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Xz.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XzCrc64.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XzCrc64Opt.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XzDec.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XzEnc.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XzIn.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Blake2s.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ppmd8.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ppmd8Dec.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ppmd8Enc.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sha1.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BwtSort.c">
+      <Filter>LZMA SDK\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HuffEnc.c">
       <Filter>LZMA SDK\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
