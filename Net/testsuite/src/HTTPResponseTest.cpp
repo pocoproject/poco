@@ -25,7 +25,7 @@ using Poco::Net::HTTPCookie;
 using Poco::Net::MessageException;
 
 
-HTTPResponseTest::HTTPResponseTest(const std::string& rName): CppUnit::TestCase(rName)
+HTTPResponseTest::HTTPResponseTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

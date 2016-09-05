@@ -27,7 +27,7 @@ using Poco::Net::ServiceNotFoundException;
 using Poco::Net::NoAddressFoundException;
 
 
-DNSTest::DNSTest(const std::string& rName): CppUnit::TestCase(rName)
+DNSTest::DNSTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -52,7 +52,7 @@ void DNSTest::testHostByName()
 	
 	try
 	{
-		HostEntry he2 = DNS::hostByName("nohost.appinf.com");
+		HostEntry he1 = DNS::hostByName("nohost.appinf.com");
 		fail("host not found - must throw");
 	}
 	catch (HostNotFoundException&)

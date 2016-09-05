@@ -30,7 +30,7 @@ using Poco::URI;
 using Poco::StreamCopier;
 
 
-HTTPStreamFactoryTest::HTTPStreamFactoryTest(const std::string& rName): CppUnit::TestCase(rName)
+HTTPStreamFactoryTest::HTTPStreamFactoryTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
