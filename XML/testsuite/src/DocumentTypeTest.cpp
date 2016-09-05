@@ -31,7 +31,7 @@ using Poco::XML::NamedNodeMap;
 using Poco::XML::AutoPtr;
 
 
-DocumentTypeTest::DocumentTypeTest(const std::string& rName): CppUnit::TestCase(rName)
+DocumentTypeTest::DocumentTypeTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
