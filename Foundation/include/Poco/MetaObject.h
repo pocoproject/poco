@@ -132,7 +132,7 @@ class MetaObject: public AbstractMetaObject<B>
 	/// factory for its class.
 {
 public:
-	MetaObject(const char* pName): AbstractMetaObject<B>(pName)
+	MetaObject(const char* name): AbstractMetaObject<B>(name)
 	{
 	}
 
@@ -164,7 +164,7 @@ class MetaSingleton: public AbstractMetaObject<B>
 	/// the single instance of its class. 
 { 
 public: 
-	MetaSingleton(const char* pName): AbstractMetaObject<B>(pName)
+	MetaSingleton(const char* name): AbstractMetaObject<B>(name) 
 	{
 	}
 	
