@@ -173,7 +173,7 @@ protected:
 
 
 // Constructs a test case
-inline TestCase::TestCase(const std::string& rName): _name (rName)
+inline TestCase::TestCase(const std::string& name): _name (name)
 {
 }
 

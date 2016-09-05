@@ -28,7 +28,7 @@
 using namespace Poco::Zip;
 
 
-CompressTest::CompressTest(const std::string& rName): CppUnit::TestCase(rName)
+CompressTest::CompressTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
