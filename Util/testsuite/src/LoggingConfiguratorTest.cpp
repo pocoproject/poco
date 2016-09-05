@@ -44,7 +44,7 @@ using Poco::Message;
 using Poco::AutoPtr;
 
 
-LoggingConfiguratorTest::LoggingConfiguratorTest(const std::string& rName): CppUnit::TestCase(rName)
+LoggingConfiguratorTest::LoggingConfiguratorTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

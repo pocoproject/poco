@@ -27,7 +27,7 @@ using Poco::NotImplementedException;
 using Poco::NotFoundException;
 
 
-IniFileConfigurationTest::IniFileConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName)
+IniFileConfigurationTest::IniFileConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 
