@@ -422,8 +422,8 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	{
 		char buf[1024];
 		int rc = strerror_r(errno, buf, sizeof(buf));
-		poco_assert (rc == 0);
 		::close(epollfd);
+		poco_assert (rc == 0);
 		error(std::string("Can't insert socket to epoll queue: ") + buf);
 	}
 
