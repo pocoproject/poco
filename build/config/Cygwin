@@ -12,7 +12,7 @@
 #
 LINKMODE ?= SHARED
 
-OMIT    = Data/PostgreSQL
+OMIT    += Data/PostgreSQL
 
 #
 # Define Tools
@@ -48,7 +48,7 @@ IMPLIBLINKEXT    = .dll.a
 CFLAGS          = 
 CFLAGS32        =
 CFLAGS64        = 
-CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING
+CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING 
 CXXFLAGS32      = -Wa,-mbig-obj
 CXXFLAGS64      = -Wa,-mbig-obj
 SHLIBFLAGS      = -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
@@ -73,8 +73,7 @@ RELEASEOPT_LINK =
 #
 # System Specific Flags
 #
-
-SYSFLAGS = -D_XOPEN_SOURCE=500 -D__BSD_VISIBLE=1 -D__MISC_VISIBLE=1
+SYSFLAGS = -D_XOPEN_SOURCE=500
 
 #
 # System Specific Libraries

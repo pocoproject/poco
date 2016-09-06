@@ -67,7 +67,7 @@ public:
 	typedef ValueMap::iterator                  Iterator;
 	typedef ValueMap::const_iterator            ConstIterator;
 
-	Object(bool preserveInsertionOrder = false);
+	explicit Object(bool preserveInsertionOrder = false);
 		/// Default constructor. If preserveInsertionOrder, object
 		/// will preserve the items insertion order. Otherwise, items
 		/// will be sorted by keys.
@@ -318,6 +318,19 @@ inline std::size_t Object::size() const
 inline void Object::remove(const std::string& key)
 {
 	_values.erase(key);
+	if (_preserveInsOrder)
+	{
+		KeyPtrList::iterator it = _keys.begin();
+		KeyPtrList::iterator end = _keys.end();
+		for (; it != end; ++it)
+		{
+			if (key == **it)
+			{
+				_keys.erase(it);
+				break;
+			}
+		}
+	}
 }
 
 

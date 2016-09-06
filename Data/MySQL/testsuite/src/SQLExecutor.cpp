@@ -36,9 +36,9 @@
 #endif
 
 #if (POCO_OS == POCO_OS_CYGWIN)
-#ifdef _XOPEN_SOURCE
-#undef _XOPEN_SOURCE
-#endif
+typedef unsigned short  ushort;         /* System V compatibility */
+typedef unsigned int    uint;           /* System V compatibility */
+typedef unsigned long   ulong;          /* System V compatibility */
 #endif
 
 #include <my_global.h>
