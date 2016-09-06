@@ -148,7 +148,8 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		if (epollfd < 0)
 		{
 			char buf[1024];
-			strerror_r(errno, buf, sizeof(buf));
+			int rc = strerror_r(errno, buf, sizeof(buf));
+			poco_assert (rc == 0);
 			SocketImpl::error(std::string("Can't create epoll queue: ") + buf);
 		}
 
@@ -160,8 +161,9 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, e) < 0)
 				{
 					char buf[1024];
-					strerror_r(errno, buf, sizeof(buf));
+					int rc = strerror_r(errno, buf, sizeof(buf));
 					::close(epollfd);
+					poco_assert (rc == 0);
 					SocketImpl::error(std::string("Can't insert socket to epoll queue: ") + buf);
 				}
 			}
