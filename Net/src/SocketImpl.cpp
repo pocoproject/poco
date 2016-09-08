@@ -403,8 +403,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	if (epollfd < 0)
 	{
 		char buf[1024];
-		int rc = strerror_r(errno, buf, sizeof(buf));
-		poco_assert (rc == 0);
+		(void) strerror_r(errno, buf, sizeof(buf));
 		error(std::string("Can't create epoll queue: ") + buf);
 	}
 
@@ -421,9 +420,8 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &evin) < 0)
 	{
 		char buf[1024];
-		int rc = strerror_r(errno, buf, sizeof(buf));
+		(void) strerror_r(errno, buf, sizeof(buf));
 		::close(epollfd);
-		poco_assert (rc == 0);
 		error(std::string("Can't insert socket to epoll queue: ") + buf);
 	}
 
