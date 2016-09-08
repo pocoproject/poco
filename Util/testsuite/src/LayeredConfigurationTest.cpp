@@ -28,7 +28,7 @@ using Poco::NotFoundException;
 using Poco::RuntimeException;
 
 
-LayeredConfigurationTest::LayeredConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName)
+LayeredConfigurationTest::LayeredConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 

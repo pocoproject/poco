@@ -46,7 +46,7 @@ namespace
 }
 
 
-FTPStreamFactoryTest::FTPStreamFactoryTest(const std::string& rName): CppUnit::TestCase(rName)
+FTPStreamFactoryTest::FTPStreamFactoryTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

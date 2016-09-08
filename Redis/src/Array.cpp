@@ -9,13 +9,15 @@
 //
 // Implementation of the Array class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #include "Poco/Redis/Array.h"
+
 
 namespace Poco {
 namespace Redis {
@@ -26,7 +28,8 @@ Array::Array()
 }
 
 
-Array::Array(const Array& copy) : _elements(copy._elements)
+Array::Array(const Array& copy): 
+	_elements(copy._elements)
 {
 }
 
@@ -48,9 +51,9 @@ Array& Array::addRedisType(RedisType::Ptr value)
 
 int Array::getType(size_t pos) const
 {
-	if ( _elements.isNull() ) throw NullValueException();
+	if (_elements.isNull()) throw NullValueException();
 
-	if ( pos >= _elements.value().size() ) throw InvalidArgumentException();
+	if (pos >= _elements.value().size()) throw InvalidArgumentException();
 
 	RedisType::Ptr element = _elements.value().at(pos);
 	return element->type();
@@ -62,4 +65,5 @@ std::string Array::toString() const
 	return RedisTypeTraits<Array>::toString(*this);
 }
 
-} }
+
+} } // namespace Poco::Redis

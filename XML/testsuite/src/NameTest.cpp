@@ -19,7 +19,7 @@
 using Poco::XML::Name;
 
 
-NameTest::NameTest(const std::string& rName): CppUnit::TestCase(rName)
+NameTest::NameTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -81,18 +81,18 @@ void NameTest::testPrefix()
 void NameTest::testName()
 {
 	std::string qname = "name";
-	Name xmlName(qname);
-	assert (xmlName.qname() == "name");
-	assert (xmlName.prefix().empty());
-	assert (xmlName.namespaceURI().empty());
-	assert (xmlName.localName().empty());
+	Name name(qname);
+	assert (name.qname() == "name");
+	assert (name.prefix().empty());
+	assert (name.namespaceURI().empty());
+	assert (name.localName().empty());
 
 	qname.clear();
-	xmlName.assign(qname, "http://www.appinf.com/", "local");
-	assert (xmlName.qname().empty());
-	assert (xmlName.prefix().empty());
-	assert (xmlName.namespaceURI() == "http://www.appinf.com/");
-	assert (xmlName.localName() == "local");
+	name.assign(qname, "http://www.appinf.com/", "local");
+	assert (name.qname().empty());
+	assert (name.prefix().empty());
+	assert (name.namespaceURI() == "http://www.appinf.com/");
+	assert (name.localName() == "local");
 
 	Name name2("pre:local", "http://www.appinf.com/");
 	assert (name2.qname() == "pre:local");

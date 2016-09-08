@@ -12,7 +12,7 @@
 #
 LINKMODE ?= SHARED
 
-OMIT    = Data/PostgreSQL
+OMIT    += Data/PostgreSQL
 
 #
 # Define Tools
@@ -73,7 +73,7 @@ RELEASEOPT_LINK =
 #
 # System Specific Flags
 #
-SYSFLAGS = -D__BSD_VISIBLE=1 -D__MISC_VISIBLE=1
+SYSFLAGS = -D_XOPEN_SOURCE=500
 
 #
 # System Specific Libraries

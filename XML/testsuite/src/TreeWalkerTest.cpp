@@ -57,7 +57,7 @@ namespace
 }
 
 
-TreeWalkerTest::TreeWalkerTest(const std::string& rName): CppUnit::TestCase(rName)
+TreeWalkerTest::TreeWalkerTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

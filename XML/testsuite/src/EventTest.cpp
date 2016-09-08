@@ -133,7 +133,7 @@ private:
 XMLString TestEventListener::_log;
 
 
-EventTest::EventTest(const std::string& rName): CppUnit::TestCase(rName)
+EventTest::EventTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

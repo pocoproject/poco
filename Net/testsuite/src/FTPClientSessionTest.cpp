@@ -63,7 +63,7 @@ namespace
 };
 
 
-FTPClientSessionTest::FTPClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
+FTPClientSessionTest::FTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

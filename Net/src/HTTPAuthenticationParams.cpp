@@ -137,15 +137,15 @@ void HTTPAuthenticationParams::fromResponse(const HTTPResponse& response, const 
 	bool found = false;
 	while (!found && it != response.end() && icompare(it->first, header) == 0)
 	{
-		const std::string& rHeader = it->second;
-		if (icompare(rHeader, 0, 6, "Basic ") == 0) 
+		const std::string& header = it->second;
+		if (icompare(header, 0, 6, "Basic ") == 0) 
 		{
-			parse(rHeader.begin() + 6, rHeader.end());
+			parse(header.begin() + 6, header.end());
 			found = true;
 		} 
-		else if (icompare(rHeader, 0, 7, "Digest ") == 0)
+		else if (icompare(header, 0, 7, "Digest ") == 0)
 		{
-			parse(rHeader.begin() + 7, rHeader.end());
+			parse(header.begin() + 7, header.end());
 			found = true;
 		} 
 		++it;

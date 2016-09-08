@@ -29,7 +29,7 @@ using Poco::Net::HTMLForm;
 using Poco::URI;
 
 
-OAuth10CredentialsTest::OAuth10CredentialsTest(const std::string& rName): CppUnit::TestCase(rName)
+OAuth10CredentialsTest::OAuth10CredentialsTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

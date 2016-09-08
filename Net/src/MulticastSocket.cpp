@@ -62,7 +62,7 @@ MulticastSocket::MulticastSocket(SocketAddress::Family family): DatagramSocket(f
 }
 
 
-MulticastSocket::MulticastSocket(const SocketAddress& rAddress, bool reuseAddress): DatagramSocket(rAddress, reuseAddress)
+MulticastSocket::MulticastSocket(const SocketAddress& address, bool reuseAddress): DatagramSocket(address, reuseAddress)
 {
 }
 
