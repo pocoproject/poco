@@ -150,9 +150,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		epollfd = epoll_create(epollSize);
 		if (epollfd < 0)
 		{
-			char buf[1024];
-			(void) strerror_r(errno, buf, sizeof(buf));
-			SocketImpl::error(std::string("Can't create epoll queue: ") + buf);
+			SocketImpl::error("Can't create epoll queue");
 		}
 
 		for (struct epoll_event* e = eventsIn; e != eventLast; ++e)
@@ -162,10 +160,8 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 			{
 				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, e) < 0)
 				{
-					char buf[1024];
-					(void) strerror_r(errno, buf, sizeof(buf));
 					::close(epollfd);
-					SocketImpl::error(std::string("Can't insert socket to epoll queue: ") + buf);
+					SocketImpl::error("Can't insert socket to epoll queue");
 				}
 			}
 		}
