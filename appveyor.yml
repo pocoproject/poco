@@ -384,7 +384,7 @@ build_script:
       }
       if ($env:builder -eq "msbuild")
       {
-        $logger='"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"';
+        $logger='"C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"';
         $verbosity='minimal';
     
         $process = Start-Process -PassThru -nnw -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
