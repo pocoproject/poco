@@ -1,7 +1,7 @@
 # Contributing
 
 ---
-## Bug Reports and Feature requests
+## Bug Reports and Feature Requests
 ---
 If you think you've found a bug or would like to see a feature in one of the [upcoming releases](https://github.com/pocoproject/poco/milestones), file an [issue](https://github.com/pocoproject/poco/issues). Please make sure that your explanations are clear and coherent; do the homework of understanding the problem and searching for existing solutions before posting.
 
