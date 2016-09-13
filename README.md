@@ -6,6 +6,7 @@ Build Status
 
 - Travis: [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.7.6)](https://travis-ci.org/pocoproject/poco)
 - AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.7.6?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.7.6)
+- [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
 
 
 ![alt text][logo]
@@ -24,8 +25,10 @@ POrtable COmponents C++ Libraries are:
 To start using POCO, see the [Guided Tour](http://pocoproject.org/docs/00100-GuidedTour.html) and [Getting Started](http://pocoproject.org/docs/00200-GettingStarted.html) documents.
 
 ----
-POCO has an active user and contributing community, please visit our [web site](http://pocoproject.org), [forum](http://pocoproject.org/forum) and [blog](http://pocoproject.org/blog). 
-Answers to POCO-related questions can also be found on [Stack Overflow](http://stackoverflow.com/questions/tagged/poco-libraries).
+POCO has an active user and contributing community, please visit our [web site](https://pocoproject.org), [forum](http://pocoproject.org/forum) and [blog](https://pocoproject.org/blog). 
+Answers to POCO-related questions can also be found on [Stack Overflow](https://stackoverflow.com/questions/tagged/poco-libraries).
+
+Please see [CONTRIBUTING](CONTRIBUTING.md) for submitting contributions, bugs reports, feature requests or security issues.
 
 ----
 In regards to Boost, in spite of some functional overlapping,
