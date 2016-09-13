@@ -28,7 +28,7 @@ To start using POCO, see the [Guided Tour](http://pocoproject.org/docs/00100-Gui
 POCO has an active user and contributing community, please visit our [web site](http://pocoproject.org), [forum](http://pocoproject.org/forum) and [blog](http://pocoproject.org/blog). 
 Answers to POCO-related questions can also be found on [Stack Overflow](http://stackoverflow.com/questions/tagged/poco-libraries).
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for submitting bugs, feature requests or security issues.
+Please see [CONTRIBUTING](CONTRIBUTING.md) for submitting contributions, bugs reports, feature requests or security issues.
 
 ----
 In regards to Boost, in spite of some functional overlapping,
