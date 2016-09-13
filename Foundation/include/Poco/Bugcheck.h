@@ -27,6 +27,20 @@
 #endif
 
 
+#ifndef CLANG_ANALYZER_NORETURN
+#ifdef __clang_analyzer__
+#if __has_feature(attribute_analyzer_noreturn)
+#define CLANG_ANALYZER_NORETURN __attribute__((analyzer_noreturn))
+#endif
+#endif
+#endif
+
+#ifndef CLANG_ANALYZER_NORETURN
+#define CLANG_ANALYZER_NORETURN
+#endif
+
+
+
 namespace Poco {
 
 
@@ -40,23 +54,23 @@ class Foundation_API Bugcheck
 	/// automatically provide useful context information.
 {
 public:
-	static void assertion(const char* cond, const char* file, int line, const char* text = 0);
+	static void assertion(const char* cond, const char* file, int line, const char* text = 0) CLANG_ANALYZER_NORETURN;
 		/// An assertion failed. Break into the debugger, if
 		/// possible, then throw an AssertionViolationException.
 
-	static void nullPointer(const char* ptr, const char* file, int line);
+	static void nullPointer(const char* ptr, const char* file, int line) CLANG_ANALYZER_NORETURN;
 		/// An null pointer was encountered. Break into the debugger, if
 		/// possible, then throw an NullPointerException.
 
-	static void bugcheck(const char* file, int line);
+	static void bugcheck(const char* file, int line) CLANG_ANALYZER_NORETURN;
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	static void bugcheck(const char* msg, const char* file, int line);
+	static void bugcheck(const char* msg, const char* file, int line) CLANG_ANALYZER_NORETURN;
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	static void unexpected(const char* file, int line);
+	static void unexpected(const char* file, int line) CLANG_ANALYZER_NORETURN;
 		/// An exception was caught in a destructor. Break into debugger,
 		/// if possible and report exception. Must only be called from
 		/// within a catch () block as it rethrows the exception to
