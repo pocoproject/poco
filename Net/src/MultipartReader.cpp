@@ -88,13 +88,13 @@ int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 				{
 					if (ch == '\r')
 					{
-						ch = buf.sbumpc(); // '\n'
+						buf.sbumpc(); // '\n'
 					}
 					return 0;					
 				}
 				else if (ch == '-' && buf.sgetc() == '-')
 				{
-					ch = buf.sbumpc(); // '-'
+					buf.sbumpc(); // '-'
 					_lastPart = true;
 					return 0;
 				}
@@ -268,7 +268,7 @@ void MultipartReader::guessBoundary()
 			ch = _istr.peek();
 		}
 		if (ch == '\r' || ch == '\n')
-			ch = _istr.get();
+			_istr.get();
 		if (_istr.peek() == '\n')
 			_istr.get();
 	}
@@ -281,7 +281,7 @@ void MultipartReader::parseHeader(MessageHeader& messageHeader)
 	messageHeader.clear();
 	messageHeader.read(_istr);
 	int ch = _istr.get();
-	if (ch == '\r' && _istr.peek() == '\n') ch = _istr.get();
+	if (ch == '\r' && _istr.peek() == '\n') _istr.get();
 }
 
 

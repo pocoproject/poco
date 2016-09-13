@@ -105,18 +105,21 @@ namespace
 				poco_check_ptr (pPS);
 				NameValueCollection::ConstIterator it = header.begin();
 				NameValueCollection::ConstIterator end = header.end();
+				bool added = false;
 				for (; it != end; ++it)
 				{
-					if (MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
+					if (!added && MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
 					{
 						if (it->second == "inline") 
 							_pMsg->addContent(pPS, cte);
 						else 
 							_pMsg->addAttachment("", pPS, cte);
+						added = true;
 					}
 					
 					pPS->headers().set(it->first, it->second);
 				}
+				if (!added) delete pPS;
 			}
 		}
 		
