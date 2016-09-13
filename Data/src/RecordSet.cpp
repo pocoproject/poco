@@ -253,8 +253,7 @@ bool RecordSet::moveFirst()
 			return true;
 		}
 
-		std::size_t currentRow = _currentRow;
-		currentRow = 0;
+		std::size_t currentRow = 0;
 		while (!isAllowed(currentRow))
 		{
 			if (currentRow >= subTotalRowCount() - 1) return false;
@@ -300,8 +299,7 @@ bool RecordSet::moveLast()
 {
 	if (subTotalRowCount() > 0)
 	{
-		std::size_t currentRow = _currentRow;
-		currentRow = subTotalRowCount() - 1;
+		std::size_t currentRow = subTotalRowCount() - 1;
 		if (!isFiltered())
 		{
 			_currentRow = currentRow;
