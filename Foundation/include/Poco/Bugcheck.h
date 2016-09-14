@@ -22,23 +22,10 @@
 
 #include "Poco/Foundation.h"
 #include <string>
+#include <cstdlib>
 #if defined(_DEBUG)
 #	include <iostream>
 #endif
-
-
-#ifndef CLANG_ANALYZER_NORETURN
-#ifdef __clang_analyzer__
-#if __has_feature(attribute_analyzer_noreturn)
-#define CLANG_ANALYZER_NORETURN __attribute__((analyzer_noreturn))
-#endif
-#endif
-#endif
-
-#ifndef CLANG_ANALYZER_NORETURN
-#define CLANG_ANALYZER_NORETURN
-#endif
-
 
 
 namespace Poco {
@@ -54,23 +41,23 @@ class Foundation_API Bugcheck
 	/// automatically provide useful context information.
 {
 public:
-	static void assertion(const char* cond, const char* file, int line, const char* text = 0) CLANG_ANALYZER_NORETURN;
+	static void assertion(const char* cond, const char* file, int line, const char* text = 0);
 		/// An assertion failed. Break into the debugger, if
 		/// possible, then throw an AssertionViolationException.
 
-	static void nullPointer(const char* ptr, const char* file, int line) CLANG_ANALYZER_NORETURN;
+	static void nullPointer(const char* ptr, const char* file, int line);
 		/// An null pointer was encountered. Break into the debugger, if
 		/// possible, then throw an NullPointerException.
 
-	static void bugcheck(const char* file, int line) CLANG_ANALYZER_NORETURN;
+	static void bugcheck(const char* file, int line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	static void bugcheck(const char* msg, const char* file, int line) CLANG_ANALYZER_NORETURN;
+	static void bugcheck(const char* msg, const char* file, int line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	static void unexpected(const char* file, int line) CLANG_ANALYZER_NORETURN;
+	static void unexpected(const char* file, int line);
 		/// An exception was caught in a destructor. Break into debugger,
 		/// if possible and report exception. Must only be called from
 		/// within a catch () block as it rethrows the exception to
@@ -95,6 +82,28 @@ protected:
 //
 // useful macros (these automatically supply line number and file name)
 //
+#if defined(__KLOCWORK__) || defined(__clang_analyzer__)
+
+
+// Short-circuit these macros when under static analysis.
+// Ideally, static analysis tools should understand and reason correctly about
+// noreturn methods such as Bugcheck::bugcheck(). In practice, they don't.
+// Help them by turning these macros into std::abort() as described here:
+// https://developer.klocwork.com/documentation/en/insight/10-1/tuning-cc-analysis#Usingthe__KLOCWORK__macro
+
+#include <cstdlib> // for abort
+#define poco_assert_dbg(cond)           do { if (!(cond)) std::abort(); } while (0)
+#define poco_assert_msg_dbg(cond, text) do { if (!(cond)) std::abort(); } while (0)
+#define poco_assert(cond)               do { if (!(cond)) std::abort(); } while (0)
+#define poco_assert_msg(cond, text)     do { if (!(cond)) std::abort(); } while (0)
+#define poco_check_ptr(ptr)             do { if (!(ptr)) std::abort(); } while (0)
+#define poco_bugcheck()                 do { std::abort(); } while (0)
+#define poco_bugcheck_msg(msg)          do { std::abort(); } while (0)
+
+
+#else // defined(__KLOCWORK__) || defined(__clang_analyzer__)
+
+
 #if defined(_DEBUG)
 	#define poco_assert_dbg(cond) \
 		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) 0
@@ -125,6 +134,9 @@ protected:
 
 #define poco_bugcheck_msg(msg) \
 	Poco::Bugcheck::bugcheck(msg, __FILE__, __LINE__)
+
+
+#endif // defined(__KLOCWORK__) || defined(__clang_analyzer__)
 
 
 #define poco_unexpected() \
