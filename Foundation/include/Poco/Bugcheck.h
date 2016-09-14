@@ -81,6 +81,25 @@ protected:
 //
 // useful macros (these automatically supply line number and file name)
 //
+#if defined(__KLOCWORK__) || defined(__clang_analyzer__)
+
+// Short-circuit these macros when under static analysis.
+// Ideally, static analysis tools should understand and reason correctly about
+// noreturn methods such as Bugcheck::bugcheck. In practice, they don't.
+// Help them by turning these macros into 'abort' as described here:
+// https://developer.klocwork.com/documentation/en/insight/10-1/tuning-cc-analysis#Usingthe__KLOCWORK__macro
+
+#include <cstdlib> // for abort
+#define poco_assert_dbg(cond)           do { if (!(cond)) abort(); } while (0)
+#define poco_assert_msg_dbg(cond, text) do { if (!(cond)) abort(); } while (0)
+#define poco_assert(cond)               do { if (!(cond)) abort(); } while (0)
+#define poco_assert_msg(cond, text)     do { if (!(cond)) abort(); } while (0)
+#define poco_check_ptr(ptr)             do { if (!(ptr)) abort(); } while (0)
+#define poco_bugcheck()                 do { abort(); } while (0)
+#define poco_bugcheck_msg(msg)          do { abort(); } while (0)
+
+#else // defined(__KLOCWORK__) || defined(__clang_analyzer__)
+
 #if defined(_DEBUG)
 	#define poco_assert_dbg(cond) \
 		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) 0
@@ -112,6 +131,7 @@ protected:
 #define poco_bugcheck_msg(msg) \
 	Poco::Bugcheck::bugcheck(msg, __FILE__, __LINE__)
 
+#endif // defined(__KLOCWORK__) || defined(__clang_analyzer__)
 
 #define poco_unexpected() \
 	Poco::Bugcheck::unexpected(__FILE__, __LINE__);
