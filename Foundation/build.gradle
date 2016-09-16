@@ -1,0 +1,91 @@
+apply plugin: 'c'
+apply plugin: 'cpp'
+
+model {
+    buildTypes {
+        debug
+        release
+    }
+
+    platforms {
+        x86 {
+            architecture "x86"
+        }
+        x64 {
+            architecture "x86_64"
+        }
+        itanium {
+            architecture "ia-64"
+        }
+    }
+
+    flavors {
+        minimal
+        unbundled
+    }
+
+    components {
+		Foundation(NativeLibrarySpec) {
+			sources {
+			   c {
+					source {
+						srcDir "src"
+						include "**/*.c"
+					}
+					exportedHeaders {
+						srcDir "include"
+					}
+				}
+				cpp {
+					source {
+						srcDir "src"
+						include "**/*.cpp"
+						exclude "*_UNIX*.cpp"
+						exclude "*_VMS*.cpp"
+						exclude "*_VX*.cpp"
+						exclude "*Android*.cpp"
+						exclude "*POSIX*.cpp"
+						exclude "*WIN32*.cpp"
+						exclude "*WIN32U*.cpp"
+						exclude "*WINCE*.cpp"
+						exclude "*DEC*.cpp"
+						exclude "*SUN*.cpp"
+						exclude "*HPUX*.cpp"
+						exclude "EventLogChannel.cpp"
+						exclude "SyslogChannel.cpp"
+						exclude "OpcomChannel.cpp"
+					}
+					 exportedHeaders {
+						srcDir "include"
+					}
+			   }
+			}
+			binaries.all {
+				cppCompiler.define "Foundation_EXPORTS"
+				cppCompiler.define "_USRDLL"
+				cppCompiler.define "WIN32"
+				cppCompiler.define "_WIN32"
+				cppCompiler.define "_WINDLL"
+				cppCompiler.define "_MBCS"
+				
+				if (buildTypes == buildTypes.debug) {
+					cppCompiler.define "_DEBUG"
+				}
+				
+				if (toolChain in VisualCpp) {
+					cppCompiler.args "/EHsc"
+					linker.args "/DEBUG"
+				}
+				
+				if (flavor == flavors.unbundled) {
+					cppCompiler.define "PPPPPOCO_UNBUNDLED"
+				}
+			}
+		}
+ 	}
+}
+
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.0'
+}
