@@ -41,17 +41,17 @@ HTTPSClientSession::HTTPSClientSession():
 }
 
 
-HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& rSocket):
-	HTTPClientSession(rSocket),
-	_pContext(rSocket.context())
+HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket):
+	HTTPClientSession(socket),
+	_pContext(socket.context())
 {
 	setPort(HTTPS_PORT);
 }
 
 
-HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& rSocket, Session::Ptr pSession):
-	HTTPClientSession(rSocket),
-	_pContext(rSocket.context()),
+HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket, Session::Ptr pSession):
+	HTTPClientSession(socket),
+	_pContext(socket.context()),
 	_pSession(pSession)
 {
 	setPort(HTTPS_PORT);
@@ -64,8 +64,6 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-	SecureStreamSocket sss(socket());
-	sss.setPeerHostName(host);
 }
 
 
@@ -90,8 +88,6 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-	SecureStreamSocket sss(socket());
-	sss.setPeerHostName(host);
 }
 
 
@@ -102,8 +98,6 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-	SecureStreamSocket sss(socket());
-	sss.setPeerHostName(host);
 }
 
 
@@ -148,6 +142,10 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 	if (getProxyHost().empty() || bypassProxy())
 	{
 		SecureStreamSocket sss(socket());
+		if (sss.getPeerHostName().empty()) 
+		{
+			sss.setPeerHostName(getHost());
+		}
 		if (_pContext->sessionCacheEnabled())
 		{
 			sss.useSession(_pSession);

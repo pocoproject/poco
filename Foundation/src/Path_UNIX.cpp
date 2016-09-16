@@ -204,7 +204,19 @@ std::string PathImpl::expandImpl(const std::string& path)
 		++it;
 		if (it != end && *it == '/')
 		{
-			result += homeImpl(); ++it;
+			const char* homeEnv = getenv("HOME");
+			if (homeEnv)
+			{
+				result += homeEnv;
+				std::string::size_type resultSize = result.size();
+				if (resultSize > 0 && result[resultSize - 1] != '/')
+					result.append("/");
+			}
+			else
+			{
+				result += homeImpl();
+			}
+			++it;
 		}
 		else result += '~';
 	}

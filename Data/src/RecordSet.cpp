@@ -103,8 +103,8 @@ void RecordSet::reset(const Statement& stmt)
 	_totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
 	
 	RowMap::iterator it = _rowMap.begin();
-	RowMap::iterator itEnd = _rowMap.end();
-	for (; it != itEnd; ++it) delete it->second;
+	RowMap::iterator end = _rowMap.end();
+	for (; it != end; ++it) delete it->second;
 	_rowMap.clear();
 
 	Statement::operator = (stmt);
@@ -256,8 +256,7 @@ bool RecordSet::moveFirst()
 			return true;
 		}
 
-		std::size_t currentRow = _currentRow;
-		currentRow = 0;
+		std::size_t currentRow = 0;
 		while (!isAllowed(currentRow))
 		{
 			if (currentRow >= rc - 1) return false;
@@ -303,8 +302,7 @@ bool RecordSet::moveLast()
 {
 	if (storageRowCount() > 0)
 	{
-		std::size_t currentRow = _currentRow;
-		currentRow = storageRowCount() - 1;
+		std::size_t currentRow = subTotalRowCount() - 1;
 		if (!isFiltered())
 		{
 			_currentRow = currentRow;

@@ -9,7 +9,7 @@
 //
 // Definition of the AsyncReader class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -25,6 +25,7 @@
 #include "Poco/Redis/RedisEventArgs.h"
 #include "Poco/Activity.h"
 
+
 namespace Poco {
 namespace Redis {
 
@@ -37,17 +38,17 @@ class Redis_API AsyncReader
 	/// reading all replies.
 {
 public:
-
 	BasicEvent<RedisEventArgs> redisResponse;
-		/// Event that is called when a message is received
+		/// Event that is fired when a message is received.
+
 	BasicEvent<RedisEventArgs> redisException;
-		/// Event that is called when an error occurred.
+		/// Event that is fired when an error occurred.
 
 	AsyncReader(Client& client);
-		/// Constructor.
+		/// Creates the AsyncReader using the given Client.
 
 	virtual ~AsyncReader();
-		/// Destructor
+		/// Destroys the AsyncReader.
 
 	bool isStopped();
 		/// Returns true if the activity is not running, false when it is.
@@ -59,11 +60,9 @@ public:
 		/// Stops the read activity.
 
 protected:
-
 	void runActivity();
 
 private:
-
 	AsyncReader(const AsyncReader&);
 	AsyncReader& operator = (const AsyncReader&);
 
@@ -72,15 +71,22 @@ private:
 };
 
 
+//
+// inlines
+//
+
+
 inline bool AsyncReader::isStopped()
 {
 	return _activity.isStopped();
 }
 
+
 inline void AsyncReader::start()
 {
 	_activity.start();
 }
+
 
 inline void AsyncReader::stop()
 {
@@ -89,5 +95,6 @@ inline void AsyncReader::stop()
 
 
 } } // namespace Poco::Redis
+
 
 #endif //Redis_AsyncReader_INCLUDED

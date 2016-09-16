@@ -26,7 +26,7 @@ using Poco::AutoPtr;
 using Poco::NotFoundException;
 
 
-PropertyFileConfigurationTest::PropertyFileConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName)
+PropertyFileConfigurationTest::PropertyFileConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 

@@ -33,7 +33,7 @@ using Poco::InvalidArgumentException;
 using Poco::IOException;
 
 
-RawSocketTest::RawSocketTest(const std::string& rName): CppUnit::TestCase(rName)
+RawSocketTest::RawSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

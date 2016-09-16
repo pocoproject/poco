@@ -21,7 +21,7 @@ using Poco::Net::IPAddress;
 using Poco::Net::InvalidAddressException;
 
 
-IPAddressTest::IPAddressTest(const std::string& rName): CppUnit::TestCase(rName)
+IPAddressTest::IPAddressTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

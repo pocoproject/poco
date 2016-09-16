@@ -31,7 +31,7 @@ using Poco::TimeoutException;
 using Poco::Net::ICMPException;
 
 
-ICMPSocketTest::ICMPSocketTest(const std::string& rName): CppUnit::TestCase(rName)
+ICMPSocketTest::ICMPSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

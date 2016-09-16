@@ -155,8 +155,8 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 		if(hdr.hasExtraField())	 // Update sizes in header extension.
 			hdr.setZip64Data();
 		_out.seekp(hdr.getStartPos(), std::ios_base::beg);
-		std::string headerString = hdr.createHeader();
-		_out.write(headerString.c_str(), static_cast<std::streamsize>(headerString.size()));
+		std::string header = hdr.createHeader();
+		_out.write(header.c_str(), static_cast<std::streamsize>(header.size()));
 		_out.seekp(0, std::ios_base::end);
 	}
 
@@ -273,8 +273,8 @@ void Compress::addRecursive(const Poco::Path& entry, ZipCommon::CompressionMetho
 	{
 		Poco::Path realFile(entry, *it);
 		Poco::Path renamedFile(aName, *it);
-		Poco::File file(realFile);
-		if (file.isDirectory())
+		Poco::File aFile(realFile);
+		if (aFile.isDirectory())
 		{
 			realFile.makeDirectory();
 			renamedFile.makeDirectory();

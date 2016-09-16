@@ -63,6 +63,12 @@ Poco::Mutex Utility::_mutex;
 
 Utility::Utility()
 {
+	initializeDefaultTypes();
+}
+
+
+void Utility::initializeDefaultTypes()
+{
 	if (_types.empty())
 	{
 		_types.insert(TypeMap::value_type("", MetaColumn::FDT_STRING));
@@ -125,6 +131,21 @@ Utility::Utility()
 }
 
 
+void Utility::addColumnType(std::string sqliteType, MetaColumn::ColumnDataType pocoType)
+{
+	// Check for errors in the mapping
+	if (MetaColumn::FDT_UNKNOWN == pocoType)
+		throw Poco::Data::NotSupportedException("Cannot map to unknown poco type.");
+
+	// Initialize default types
+	initializeDefaultTypes();
+
+	// Add type to internal map
+	Poco::toUpperInPlace(sqliteType);
+	_types[sqliteType] = pocoType;
+}
+
+
 std::string Utility::lastError(sqlite3* pDB)
 {
 	return std::string(sqlite3_errmsg(pDB));
@@ -147,9 +168,10 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 	sqliteType = sqliteType.substr(0, sqliteType.find_first_of(" ("));
 
 	TypeMap::const_iterator it = _types.find(Poco::trimInPlace(sqliteType));
-	if (_types.end() == it)	throw Poco::NotFoundException();
-
-	return it->second;
+	if (_types.end() == it)	
+		return MetaColumn::FDT_BLOB;
+	else
+		return it->second;
 }
 
 

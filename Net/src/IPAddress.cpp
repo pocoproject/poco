@@ -60,39 +60,39 @@ IPAddress::IPAddress()
 }
 
 
-IPAddress::IPAddress(const IPAddress& rAddr)
+IPAddress::IPAddress(const IPAddress& addr)
 {
-	if (rAddr.family() == IPv4)
-		newIPv4(rAddr.addr());
+	if (addr.family() == IPv4)
+		newIPv4(addr.addr());
 #if defined(POCO_HAVE_IPv6)
 	else
-		newIPv6(rAddr.addr(), rAddr.scope());
+		newIPv6(addr.addr(), addr.scope());
 #endif
 }
 
 
-IPAddress::IPAddress(Family addressFamily)
+IPAddress::IPAddress(Family family)
 {
-	if (addressFamily == IPv4)
+	if (family == IPv4)
 		newIPv4();
 #if defined(POCO_HAVE_IPv6)
-	else if (addressFamily == IPv6)
+	else if (family == IPv6)
 		newIPv6();
 #endif
 	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 
 
-IPAddress::IPAddress(const std::string& rAddr)
+IPAddress::IPAddress(const std::string& addr)
 {
 	IPv4AddressImpl empty4 = IPv4AddressImpl();
-	if (rAddr.empty() || trim(rAddr) == "0.0.0.0")
+	if (addr.empty() || trim(addr) == "0.0.0.0")
 	{
 		newIPv4(empty4.addr());
 		return;
 	}
 
-	IPv4AddressImpl addr4(IPv4AddressImpl::parse(rAddr));
+	IPv4AddressImpl addr4(IPv4AddressImpl::parse(addr));
 	if (addr4 != empty4)
 	{
 		newIPv4(addr4.addr());
@@ -101,13 +101,13 @@ IPAddress::IPAddress(const std::string& rAddr)
 
 #if defined(POCO_HAVE_IPv6)
 	IPv6AddressImpl empty6 = IPv6AddressImpl();
-	if (rAddr.empty() || trim(rAddr) == "::")
+	if (addr.empty() || trim(addr) == "::")
 	{
 		newIPv6(empty6.addr());
 		return;
 	}
 
-	IPv6AddressImpl addr6(IPv6AddressImpl::parse(rAddr));
+	IPv6AddressImpl addr6(IPv6AddressImpl::parse(addr));
 	if (addr6 != IPv6AddressImpl())
 	{
 		newIPv6(addr6.addr(), addr6.scope());
@@ -115,22 +115,22 @@ IPAddress::IPAddress(const std::string& rAddr)
 	}
 #endif
 
-	throw InvalidAddressException(rAddr);
+	throw InvalidAddressException(addr);
 }
 
 
-IPAddress::IPAddress(const std::string& rAddr, Family addressFamily)
+IPAddress::IPAddress(const std::string& addr, Family family)
 {
-	if (addressFamily == IPv4)
+	if (family == IPv4)
 	{
-		IPv4AddressImpl addr4(IPv4AddressImpl::parse(rAddr));
+		IPv4AddressImpl addr4(IPv4AddressImpl::parse(addr));
 		newIPv4(addr4.addr());
 		return;
 	}
 #if defined(POCO_HAVE_IPv6)
-	else if (addressFamily == IPv6)
+	else if (family == IPv6)
 	{
-		IPv6AddressImpl addr6(IPv6AddressImpl::parse(rAddr));
+		IPv6AddressImpl addr6(IPv6AddressImpl::parse(addr));
 		newIPv6(addr6.addr(), addr6.scope());
 		return;
 	}
@@ -139,36 +139,36 @@ IPAddress::IPAddress(const std::string& rAddr, Family addressFamily)
 }
 
 
-IPAddress::IPAddress(const void* pAddr, poco_socklen_t addressLength)
+IPAddress::IPAddress(const void* addr, poco_socklen_t length)
 #ifndef POCO_HAVE_ALIGNMENT
 	: _pImpl(0)
 #endif
 {
-	if (addressLength == sizeof(struct in_addr))
-		newIPv4(pAddr);
+	if (length == sizeof(struct in_addr))
+		newIPv4(addr);
 #if defined(POCO_HAVE_IPv6)
-	else if (addressLength == sizeof(struct in6_addr))
-		newIPv6(pAddr);
+	else if (length == sizeof(struct in6_addr))
+		newIPv6(addr);
 #endif
 	else throw Poco::InvalidArgumentException("Invalid address length passed to IPAddress()");
 }
 
 
-IPAddress::IPAddress(const void* pAddr, poco_socklen_t addressLength, Poco::UInt32 scopeIdentifier)
+IPAddress::IPAddress(const void* addr, poco_socklen_t length, Poco::UInt32 scope)
 {
-	if (addressLength == sizeof(struct in_addr))
-		newIPv4(pAddr);
+	if (length == sizeof(struct in_addr))
+		newIPv4(addr);
 #if defined(POCO_HAVE_IPv6)
-	else if (addressLength == sizeof(struct in6_addr))
-		newIPv6(pAddr, scopeIdentifier);
+	else if (length == sizeof(struct in6_addr))
+		newIPv6(addr, scope);
 #endif
 	else throw Poco::InvalidArgumentException("Invalid address length passed to IPAddress()");
 }
 
 
-IPAddress::IPAddress(unsigned prefix, Family addressFamily)
+IPAddress::IPAddress(unsigned prefix, Family family)
 {
-	if (addressFamily == IPv4)
+	if (family == IPv4)
 	{
 		if (prefix <= 32)
 			newIPv4(prefix);
@@ -176,7 +176,7 @@ IPAddress::IPAddress(unsigned prefix, Family addressFamily)
 			throw Poco::InvalidArgumentException("Invalid prefix length passed to IPAddress()");
 	}
 #if defined(POCO_HAVE_IPv6)
-	else if (addressFamily == IPv6)
+	else if (family == IPv6)
 	{
 		if (prefix <= 128)
 			newIPv6(prefix);
@@ -209,11 +209,11 @@ IPAddress::IPAddress(const SOCKET_ADDRESS& socket_address)
 
 IPAddress::IPAddress(const struct sockaddr& sockaddr)
 {
-	unsigned short addressFamily = sockaddr.sa_family;
-	if (addressFamily == AF_INET)
+	unsigned short family = sockaddr.sa_family;
+	if (family == AF_INET)
 		newIPv4(&reinterpret_cast<const struct sockaddr_in*>(&sockaddr)->sin_addr);
 #if defined(POCO_HAVE_IPv6)
-	else if (addressFamily == AF_INET6)
+	else if (family == AF_INET6)
 		newIPv6(&reinterpret_cast<const struct sockaddr_in6*>(&sockaddr)->sin6_addr,
 			reinterpret_cast<const struct sockaddr_in6*>(&sockaddr)->sin6_scope_id);
 #endif
@@ -227,16 +227,16 @@ IPAddress::~IPAddress()
 }
 
 
-IPAddress& IPAddress::operator = (const IPAddress& rAddr)
+IPAddress& IPAddress::operator = (const IPAddress& addr)
 {
-	if (&rAddr != this)
+	if (&addr != this)
 	{
 		destruct();
-		if (rAddr.family() == IPAddress::IPv4)
-			newIPv4(rAddr.addr());
+		if (addr.family() == IPAddress::IPv4)
+			newIPv4(addr.addr());
 #if defined(POCO_HAVE_IPv6)
-		else if (rAddr.family() == IPAddress::IPv6)
-			newIPv6(rAddr.addr(), rAddr.scope());
+		else if (addr.family() == IPAddress::IPv6)
+			newIPv6(addr.addr(), addr.scope());
 #endif
 		else 
 			throw Poco::InvalidArgumentException("Invalid or unsupported address family");
@@ -553,16 +553,16 @@ bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 }
 
 
-void IPAddress::mask(const IPAddress& rMask)
+void IPAddress::mask(const IPAddress& mask)
 {
 	IPAddress null;
-	pImpl()->mask(rMask.pImpl(), null.pImpl());
+	pImpl()->mask(mask.pImpl(), null.pImpl());
 }
 
 
-void IPAddress::mask(const IPAddress& rMask, const IPAddress& set)
+void IPAddress::mask(const IPAddress& mask, const IPAddress& set)
 {
-	pImpl()->mask(rMask.pImpl(), set.pImpl());
+	pImpl()->mask(mask.pImpl(), set.pImpl());
 }
 
 

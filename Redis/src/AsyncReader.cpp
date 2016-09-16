@@ -9,19 +9,22 @@
 //
 // Implementation of the AsyncReader class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #include "Poco/Redis/AsyncReader.h"
+
 
 namespace Poco {
 namespace Redis {
 
 
-AsyncReader::AsyncReader(Client& client) : _client(client),
+AsyncReader::AsyncReader(Client& client): 
+	_client(client),
 	_activity(this, &AsyncReader::runActivity)
 {
 }
@@ -35,7 +38,7 @@ AsyncReader::~AsyncReader()
 
 void AsyncReader::runActivity()
 {
-	while(!_activity.isStopped())
+	while (!_activity.isStopped())
 	{
 		try
 		{
@@ -46,7 +49,7 @@ void AsyncReader::runActivity()
 
 			if ( args.isStopped() ) stop();
 		}
-		catch(Exception& e)
+		catch (Exception& e)
 		{
 			RedisEventArgs args(&e);
 			redisException.notify(this, args);
@@ -57,4 +60,4 @@ void AsyncReader::runActivity()
 }
 
 
-} } // Poco::Redis
+} } // namespace Poco::Redis

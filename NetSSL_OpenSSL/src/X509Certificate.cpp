@@ -111,11 +111,11 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 						// compare by IP
 						const HostEntry& heData = DNS::resolve(*it);
 						const HostEntry::AddressList& addr = heData.addresses();
-						HostEntry::AddressList::const_iterator itAddr = addr.begin();
+						HostEntry::AddressList::const_iterator it = addr.begin();
 						HostEntry::AddressList::const_iterator itEnd = addr.end();
-						for (; itAddr != itEnd && !ok; ++itAddr)
+						for (; it != itEnd && !ok; ++it)
 						{
-							ok = (*itAddr == ip);
+							ok = (*it == ip);
 						}
 					}
 					else

@@ -35,7 +35,7 @@ using Poco::Net::NameValueCollection;
 using Poco::Net::HTTPCookie;
 
 
-HTTPCookieTest::HTTPCookieTest(const std::string& rName): CppUnit::TestCase(rName)
+HTTPCookieTest::HTTPCookieTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

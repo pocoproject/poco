@@ -41,7 +41,7 @@ using Poco::FIFOBuffer;
 using Poco::delegate;
 
 
-SocketTest::SocketTest(const std::string& rName): CppUnit::TestCase(rName)
+SocketTest::SocketTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

@@ -230,6 +230,10 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 		{
 			request.setChunkedTransferEncoding(true);
 		}
+		if (!request.getChunkedTransferEncoding())
+ 		{
+ 			request.setContentLength(calculateContentLength());
+ 		}
 	}
 	else
 	{
@@ -245,7 +249,7 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 
 std::streamsize HTMLForm::calculateContentLength()
 {
-	if (_boundary.empty())
+	if (_encoding == ENCODING_MULTIPART && _boundary.empty())
 		throw HTMLFormException("Form must be prepared");
 
 	HTMLFormCountingOutputStream c;
@@ -257,7 +261,7 @@ std::streamsize HTMLForm::calculateContentLength()
 }
 
 
-void HTMLForm::write(std::ostream& ostr, const std::string& rBoundary)
+void HTMLForm::write(std::ostream& ostr, const std::string& boundary)
 {
 	if (_encoding == ENCODING_URL)
 	{
@@ -265,7 +269,7 @@ void HTMLForm::write(std::ostream& ostr, const std::string& rBoundary)
 	}
 	else
 	{
-		_boundary = rBoundary;
+		_boundary = boundary;
 		writeMultipart(ostr);
 	}
 }
@@ -355,12 +359,12 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 		{
 			std::string name = params["name"];
 			std::string value;
-			std::istream& rIstr = reader.stream();
-			int ch = rIstr.get();
+			std::istream& istr = reader.stream();
+			int ch = istr.get();
 			while (ch != eof)
 			{
 				value += (char) ch;
-				ch = rIstr.get();
+				ch = istr.get();
 			}
 			add(name, value);
 		}
@@ -385,7 +389,7 @@ void HTMLForm::writeUrl(std::ostream& ostr)
 
 void HTMLForm::writeMultipart(std::ostream& ostr)
 {
-	HTMLFormCountingOutputStream *costr(dynamic_cast<HTMLFormCountingOutputStream*>(&ostr));
+	HTMLFormCountingOutputStream* pCountingOutputStream(dynamic_cast<HTMLFormCountingOutputStream*>(&ostr));
 
 	MultipartWriter writer(ostr, _boundary);
 	for (NameValueCollection::ConstIterator it = begin(); it != end(); ++it)
@@ -414,17 +418,19 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 		header.set("Content-Disposition", disp);
 		header.set("Content-Type", ita->pSource->mediaType());
 		writer.nextPart(header);
-		if (costr)
+		if (pCountingOutputStream)
 		{
 			// count only, don't move stream position
 			std::streamsize partlen = ita->pSource->getContentLength();
 			if (partlen != PartSource::UNKNOWN_CONTENT_LENGTH)
-				costr->addChars(static_cast<int>(partlen));
+				pCountingOutputStream->addChars(static_cast<int>(partlen));
 			else
-				costr->setValid(false);
+				pCountingOutputStream->setValid(false);
 		}
 		else
+		{
 			StreamCopier::copyStream(ita->pSource->stream(), ostr);
+		}
 	}
 	writer.close();
 	_boundary = writer.boundary();

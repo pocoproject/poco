@@ -38,8 +38,8 @@ HTTPSession::HTTPSession():
 }
 
 
-HTTPSession::HTTPSession(const StreamSocket& rSocket):
-	_socket(rSocket),
+HTTPSession::HTTPSession(const StreamSocket& socket):
+	_socket(socket),
 	_pBuffer(0),
 	_pCurrent(0),
 	_pEnd(0),
@@ -50,8 +50,8 @@ HTTPSession::HTTPSession(const StreamSocket& rSocket):
 }
 
 
-HTTPSession::HTTPSession(const StreamSocket& rSocket, bool keepAlive):
-	_socket(rSocket),
+HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
+	_socket(socket),
 	_pBuffer(0),
 	_pCurrent(0),
 	_pEnd(0),
@@ -226,9 +226,9 @@ StreamSocket HTTPSession::detachSocket()
 }
 
 
-void HTTPSession::attachSocket(const StreamSocket& rSocket)
+void HTTPSession::attachSocket(const StreamSocket& socket)
 {
-	_socket = rSocket;
+	_socket = socket;
 }
 
 
