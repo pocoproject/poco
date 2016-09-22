@@ -1,84 +1,99 @@
-apply plugin: 'c'
-apply plugin: 'cpp'
+plugins {
+	id 'c'
+	id 'cpp'
+	id 'windows-resources'
+	id 'visual-studio'
+}
 
 model {
     buildTypes {
         debug
-        release
+//        release
     }
 
     platforms {
-        x86 {
-            architecture "x86"
+        Win32 {
+            architecture 'x86'
         }
         x64 {
-            architecture "x86_64"
-        }
-        itanium {
-            architecture "ia-64"
+            architecture 'x86_64'
         }
     }
 
     flavors {
-        minimal
+ //       minimal
         unbundled
     }
 
     components {
 		Foundation(NativeLibrarySpec) {
 			sources {
-			   c {
+			   rc {
 					source {
-						srcDir "src"
-						include "**/*.c"
+						srcDir 'src'
+						include '**/*.res'
 					}
 					exportedHeaders {
-						srcDir "include"
+						srcDir 'include'
+					}
+				}
+				c {
+					source {
+						srcDir 'src'
+						include '**/*.c'
+					}
+					exportedHeaders {
+						srcDir 'include'
 					}
 				}
 				cpp {
 					source {
-						srcDir "src"
-						include "**/*.cpp"
-						exclude "*_UNIX*.cpp"
-						exclude "*_VMS*.cpp"
-						exclude "*_VX*.cpp"
-						exclude "*Android*.cpp"
-						exclude "*POSIX*.cpp"
-						exclude "*WIN32*.cpp"
-						exclude "*WIN32U*.cpp"
-						exclude "*WINCE*.cpp"
-						exclude "*DEC*.cpp"
-						exclude "*SUN*.cpp"
-						exclude "*HPUX*.cpp"
-						exclude "EventLogChannel.cpp"
-						exclude "SyslogChannel.cpp"
-						exclude "OpcomChannel.cpp"
+						srcDir 'src'
+						include '**/*.cpp'
+						exclude '*_UNIX*.cpp'
+						exclude '*_VMS*.cpp'
+						exclude '*_VX*.cpp'
+						exclude '*Android*.cpp'
+						exclude '*POSIX*.cpp'
+						exclude '*WIN32*.cpp'
+						exclude '*WIN32U*.cpp'
+						exclude '*WINCE*.cpp'
+						exclude '*DEC*.cpp'
+						exclude '*SUN*.cpp'
+						exclude '*HPUX*.cpp'
+						exclude '*DUMMY*.cpp'
+						exclude '*C99*.cpp'
+						exclude '*STD*.cpp'
+						exclude 'SyslogChannel.cpp'
+						exclude 'OpcomChannel.cpp'
 					}
 					 exportedHeaders {
-						srcDir "include"
+						srcDir 'include'
 					}
 			   }
 			}
 			binaries.all {
-				cppCompiler.define "Foundation_EXPORTS"
-				cppCompiler.define "_USRDLL"
-				cppCompiler.define "WIN32"
-				cppCompiler.define "_WIN32"
-				cppCompiler.define "_WINDLL"
-				cppCompiler.define "_MBCS"
+				cppCompiler.define 'Foundation_EXPORTS'
+				cppCompiler.define '_USRDLL'
+				cppCompiler.define 'WIN32'
+				cppCompiler.define '_WIN32'
+				cppCompiler.define '_WINDLL'
+				cppCompiler.define '_WINDOWS'
+				cppCompiler.define '_MBCS'
 				
 				if (buildTypes == buildTypes.debug) {
-					cppCompiler.define "_DEBUG"
+					cppCompiler.define '_DEBUG'
 				}
 				
 				if (toolChain in VisualCpp) {
-					cppCompiler.args "/EHsc"
-					linker.args "/DEBUG"
+					cppCompiler.args '/EHsc'
+					linker.args '/DEBUG'
+					linker.args 'ws2_32.lib'
+					linker.args 'iphlpapi.lib'
+					linker.args 'Advapi32.lib'
 				}
-				
 				if (flavor == flavors.unbundled) {
-					cppCompiler.define "PPPPPOCO_UNBUNDLED"
+					cppCompiler.define 'PPPPPOCO_UNBUNDLED'
 				}
 			}
 		}
