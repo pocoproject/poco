@@ -117,15 +117,21 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 		throw Poco::DataFormatException("bad ZIP file header", "invalid compression method");
 	parseDateTime();
 	Poco::UInt16 len = getFileNameLength();
-	Poco::Buffer<char> buf(len);
-	inp.read(buf.begin(), len);
-	_fileName = std::string(buf.begin(), len);
+	if (len > 0)
+	{
+		Poco::Buffer<char> buf(len);
+		inp.read(buf.begin(), len);
+		_fileName = std::string(buf.begin(), len);
+	}
 	if (hasExtraField())
 	{
 		len = getExtraFieldLength();
-		Poco::Buffer<char> xtra(len);
-		inp.read(xtra.begin(), len);
-		_extraField = std::string(xtra.begin(), len);
+		if (len > 0)
+		{
+			Poco::Buffer<char> xtra(len);
+			inp.read(xtra.begin(), len);
+			_extraField = std::string(xtra.begin(), len);
+		}
 	}
 	if (!searchCRCAndSizesAfterData())
 	{
