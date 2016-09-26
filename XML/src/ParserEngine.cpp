@@ -450,18 +450,26 @@ void ParserEngine::init()
 	if (dynamic_cast<NoNamespacePrefixesStrategy*>(_pNamespaceStrategy))
 	{
 		_parser = XML_ParserCreateNS(_encodingSpecified ? _encoding.c_str() : 0, '\t');
-		XML_SetNamespaceDeclHandler(_parser, handleStartNamespaceDecl, handleEndNamespaceDecl);
+		if (_parser)
+		{
+			XML_SetNamespaceDeclHandler(_parser, handleStartNamespaceDecl, handleEndNamespaceDecl);
+		}
 	}
 	else if (dynamic_cast<NamespacePrefixesStrategy*>(_pNamespaceStrategy))
 	{
 		_parser = XML_ParserCreateNS(_encodingSpecified ? _encoding.c_str() : 0, '\t');
-		XML_SetReturnNSTriplet(_parser, 1);
-		XML_SetNamespaceDeclHandler(_parser, handleStartNamespaceDecl, handleEndNamespaceDecl);
+		if (_parser)
+		{
+			XML_SetReturnNSTriplet(_parser, 1);
+			XML_SetNamespaceDeclHandler(_parser, handleStartNamespaceDecl, handleEndNamespaceDecl);
+		}
 	}
 	else
 	{
 		_parser = XML_ParserCreate(_encodingSpecified ? _encoding.c_str() : 0);
 	}
+
+	if (!_parser) throw XMLException("Cannot create Expat parser");
 
 	XML_SetUserData(_parser, this);
 	XML_SetElementHandler(_parser, handleStartElement, handleEndElement);
@@ -720,6 +728,8 @@ int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* con
 	if (pInputSource)
 	{
 		XML_Parser extParser = XML_ExternalEntityParserCreate(pThis->_parser, context, 0);
+		if (!extParser) throw XMLException("Cannot create external entity parser");
+
 		try
 		{
 			pThis->parseExternal(extParser, pInputSource);
