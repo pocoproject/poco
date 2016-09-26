@@ -404,7 +404,13 @@ S translateInPlace(S& str, const typename S::value_type* from, const typename S:
 	poco_check_ptr (from);
 	poco_check_ptr (to);
 	str = translate(str, S(from), S(to));
+#if defined(__SUNPRO_CC)
+   // Fix around the RVO bug in SunStudio 12.4
+   S ret(str);
+   return ret;
+#else
 	return str;
+#endif
 }
 
 
