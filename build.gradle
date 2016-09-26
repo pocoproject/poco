@@ -1,0 +1,195 @@
+plugins {
+	id 'c'
+	id 'cpp'
+	id 'windows-resources'
+	id 'windows-messages'
+	id 'visual-studio'
+}
+
+/*
+class BinaryCollectorPlugin extends RuleSource {
+	@Mutate
+	public void createCollectBinariesTask(ModelMap<Task> tasks, @Path("binaries") ModelMap<NativeBinarySpec> binaries) {
+        tasks.create('collectBinaries', Copy) { task ->
+            binaries.each { binary ->
+                task.dependsOn binary.buildTask
+                
+                String buildType = binary.buildType.name
+ 				destinationDir = project.rootProject.rootDir
+
+               if (binary instanceof NativeExecutableBinarySpec) {
+                    addBinary(task, binary.file, buildType, 'bin')
+                } else if (binary instanceof SharedLibraryBinarySpec) {
+                    addBinary(task, binary.sharedLibraryFile, buildType, 'bin')
+				} else if (binary instanceof StaticLibraryBinarySpec) {
+                    addBinary(task, binary.staticLibraryFile, buildType, 'lib')
+				}
+            }
+        }
+    }
+    
+    private void addBinary(Copy task, File binaryFile, String buildType, String destinationDirectory) {
+        task.from(binaryFile) {
+            into destinationDirectory
+			System.err.println("Adding binary $binaryFile to $destinationDirectory");
+           
+            if (buildType == 'debug') {
+                rename { originalName ->
+                    int lastPeriod = originalName.lastIndexOf('.')
+                    
+                    if (lastPeriod < 0)
+                        return "Poco" + originalName
+                    else {
+                        String fileName = originalName.substring(0, lastPeriod)
+                        String extension = originalName.substring(lastPeriod + 1)
+                        
+                        return "Poco" + "${fileName}d.$extension"
+                    }
+                }
+            }
+        }
+    }
+}
+apply plugin: BinaryCollectorPlugin
+
+*/
+
+//tasks.build.dependsOn collectBinaries
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '3.1'
+}
+
+allprojects {
+    task hello << { task -> println "I'm $task.project.name" }
+
+	apply plugin:  'c'
+	apply plugin:  'cpp'
+	apply plugin:  'visual-studio'
+	
+
+	model {
+/*
+	   all {
+			binaries.withType(NativeBinarySpec).afterEach { binary ->
+				def headers = binary.libs.collect { it.includeRoots }
+			}
+		}
+*/
+		buildTypes {
+			debug
+//	        release
+		}
+
+		platforms {
+			Win32 {
+				architecture 'x86'
+			}
+			x64 {
+				architecture 'x86_64'
+			}
+		}
+
+		flavors {
+	 //       minimal
+			unbundled
+		}
+		
+		binaries {
+			all {
+				if (buildTypes == buildTypes.debug) {
+					cCompiler.define '_DEBUG'
+					cCompiler.args '/Zi'
+					cppCompiler.define '_DEBUG'
+					cppCompiler.args '/Zi'
+					if (toolChain in VisualCpp) {
+						linker.args '/DEBUG'
+					}
+				}
+			
+				if (toolChain in VisualCpp) {
+					cCompiler.args '/Zc:wchar_t'
+					cCompiler.args '/Zc:inline'
+					cCompiler.args '/Zc:forScope'
+					cCompiler.args '/GR'
+					cCompiler.args '/GF'
+					cCompiler.args '/EHsc'
+					cCompiler.define 'WIN32'
+					cCompiler.define '_WIN32'
+					cCompiler.define '_WINDOWS'
+					cCompiler.define '_MBCS'
+
+					cppCompiler.args '/Zc:wchar_t'
+					cppCompiler.args '/Zc:inline'
+					cppCompiler.args '/Zc:forScope'
+					cppCompiler.args '/GR'
+					cppCompiler.args '/GF'
+					cppCompiler.args '/EHsc'
+					cppCompiler.define 'WIN32'
+					cppCompiler.define '_WIN32'
+					cppCompiler.define '_WINDOWS'
+					cppCompiler.define '_MBCS'
+				
+					linker.args 'ws2_32.lib'
+					linker.args 'iphlpapi.lib'
+					
+					linker.args 'kernel32.lib'
+					linker.args 'user32.lib'
+					linker.args 'gdi32.lib'
+					linker.args 'comdlg32.lib'
+					linker.args 'advapi32.lib'
+					linker.args 'shell32.lib'
+					linker.args 'ole32.lib'
+					linker.args 'oleaut32.lib'
+					linker.args 'uuid.lib'
+				
+				}
+				if (flavor == flavors.unbundled) {
+					cppCompiler.define 'PPPPPOCO_UNBUNDLED'
+				}
+			}
+			withType(SharedLibraryBinarySpec) {
+				if (toolChain in VisualCpp) {
+					cCompiler.define '_USRDLL'
+					cCompiler.define '_WINDLL'
+					cppCompiler.define '_USRDLL'
+					cppCompiler.define '_WINDLL'
+					if (buildTypes == buildTypes.debug) {
+						cCompiler.args "/MDd"
+						cppCompiler.args "/MDd"
+					} else {
+						cCompiler.args "/MD"
+						cppCompiler.args "/MD"
+					}
+				}
+			}
+			withType(StaticLibraryBinarySpec) {
+				if (toolChain in VisualCpp) {
+					cCompiler.define 'POCO_STATIC'
+					cppCompiler.define 'POCO_STATIC'
+					if (buildTypes == buildTypes.debug) {
+						cCompiler.args "/MDd"
+						cppCompiler.args "/MDd"
+					} else {
+						cCompiler.args "/MD"
+						cppCompiler.args "/MD"
+					}
+				}
+			}
+		}
+	}
+}
+
+subprojects {
+    hello << {println "- I depend on water"}
+	apply plugin:  'windows-resources'
+	apply plugin:	  'windows-messages'
+}
+
+gradle.afterProject {project, projectState ->
+    if (projectState.failure) {
+        println "Evaluation of $project FAILED"
+    } else {
+        println "Evaluation of $project succeeded"
+    }
+}

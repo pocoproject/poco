@@ -1,157 +1,76 @@
-plugins {
-	id 'c'
-	id 'cpp'
-	id 'windows-resources'
-	id 'windows-messages'
-	id 'visual-studio'
-}
-class BinaryCollectorPlugin extends RuleSource {
-	@Mutate
-	public void createCollectBinariesTask(ModelMap<Task> tasks, @Path("binaries") ModelMap<NativeBinarySpec> binaries) {
-        tasks.create('collectBinaries', Copy) { task ->
-            binaries.each { binary ->
-                task.dependsOn binary.buildTask
-                
-                String buildType = binary.buildType.name
- 				destinationDir = project.rootDir
-				println("destination dir:" + destinationDir)
-				
-                if (binary instanceof NativeExecutableBinarySpec) {
-                    addBinary(task, binary.file, buildType, 'bin')
-                } else if (binary instanceof SharedLibraryBinarySpec) {
-                    addBinary(task, binary.sharedLibraryFile, buildType, 'bin')
-				} else if (binary instanceof StaticLibraryBinarySpec) {
-                    addBinary(task, binary.staticLibraryFile, buildType, 'lib')
-				}
-            }
-        }
-    }
-    
-    private void addBinary(Copy task, File binaryFile, String buildType, String destinationDirectory) {
-        task.from(binaryFile) {
-            into destinationDirectory
-            
-            if (buildType == 'debug') {
-                rename { originalName ->
-                    int lastPeriod = originalName.lastIndexOf('.')
-                    
-                    if (lastPeriod < 0)
-                        return "Poco" + originalName
-                    else {
-                        String fileName = originalName.substring(0, lastPeriod)
-                        String extension = originalName.substring(lastPeriod + 1)
-                        
-                        return "Poco" + "${fileName}d.$extension"
-                    }
-                }
-            }
-        }
-    }
-}
-apply plugin: BinaryCollectorPlugin
-
-model {
-
-
-    buildTypes {
-        debug
-//        release
-    }
-
-    platforms {
-        Win32 {
-            architecture 'x86'
-        }
-        x64 {
-            architecture 'x86_64'
-        }
-    }
-
-    flavors {
- //       minimal
-        unbundled
-    }
-
-    components {
-		
-		Foundation(NativeLibrarySpec) {
-			sources {
-			   mc {
-					source {
-						srcDir 'src'
-						include '**/*.mc'
+project(":Foundation") {
+	model {
+		components {
+			PocoFoundation(NativeLibrarySpec) {
+				sources {
+					mc {
+						source {
+							srcDir 'src'
+							include '**/*.mc'
+						}
 					}
-					exportedHeaders {
-						srcDir 'src'
+					rc {
+						source {
+							srcDir 'src'
+							include '**/*.rc'
+						}
 					}
-				}
-				c {
-					source {
-						srcDir 'src'
-						include '**/*.c'
+					c {
+						source {
+							srcDir 'src'
+							include '**/*.c'
+						}
 					}
-					exportedHeaders {
-						srcDir 'include'
-					}
-				}
-				cpp {
-					source {
-						srcDir 'src'
-						include '**/*.cpp'
-						exclude '*_UNIX*.cpp'
-						exclude '*_VMS*.cpp'
-						exclude '*_VX*.cpp'
-						exclude '*Android*.cpp'
-						exclude '*POSIX*.cpp'
-						exclude '*WIN32*.cpp'
-						exclude '*WIN32U*.cpp'
-						exclude '*WINCE*.cpp'
-						exclude '*DEC*.cpp'
-						exclude '*SUN*.cpp'
-						exclude '*HPUX*.cpp'
-						exclude '*DUMMY*.cpp'
-						exclude '*C99*.cpp'
-						exclude '*STD*.cpp'
-						exclude 'SyslogChannel.cpp'
-						exclude 'OpcomChannel.cpp'
-					}
-					exportedHeaders {
-						srcDir 'include'
-					}
-				}
-			}
-			binaries {
-				all {
-					cppCompiler.define 'Foundation_EXPORTS'
-					cppCompiler.define '_USRDLL'
-					cppCompiler.define 'WIN32'
-					cppCompiler.define '_WIN32'
-					cppCompiler.define '_WINDLL'
-					cppCompiler.define '_WINDOWS'
-					cppCompiler.define '_MBCS'
-				
-					if (buildTypes == buildTypes.debug) {
-						cppCompiler.define '_DEBUG'
-						linker.args '/DEBUG'
-					}
-				
-					if (toolChain in VisualCpp) {
-						cppCompiler.args '/EHsc'
-						linker.args 'ws2_32.lib'
-						linker.args 'iphlpapi.lib'
-						linker.args 'Advapi32.lib'
-					}
-					if (flavor == flavors.unbundled) {
-						cppCompiler.define 'PPPPPOCO_UNBUNDLED'
+	//ByteOrder
+	//String
+	//SignalHandler
+					cpp {
+						source {
+							srcDir 'src'
+							include '**/*.cpp'
+							exclude 'Environment_*.cpp'
+							exclude 'FPEnvironment_*.cpp'
+							exclude 'Timezone_*.cpp'
+							exclude 'DirectoryIterator_*.cpp'
+							exclude 'File_*.cpp'
+							exclude 'FileStream_*.cpp'
+							exclude 'Path_*.cpp'
+							exclude 'LogFile_*.cpp'
+							exclude 'NamedEvent_*.cpp'
+							exclude 'NamedMutex_*.cpp'
+							exclude 'PipeImpl_*.cpp'
+							exclude 'Process_*.cpp'
+							exclude 'SharedMemory_*.cpp'
+							exclude 'SharedLibrary_*.cpp'
+							exclude 'Event_*.cpp'
+							exclude 'Mutex_*.cpp'
+							exclude 'RWLock_*.cpp'
+							exclude 'Semaphore_*.cpp'
+							exclude 'Thread_*.cpp'
+	//						if (toolChain in VisualCpp) {
+								exclude 'SyslogChannel.cpp'
+								exclude 'OpcomChannel.cpp'
+								exclude 'AndroidLogChannel.cpp'
+	//						}
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
 					}
 				}
 			}
 		}
- 	}
+		binaries {
+			all {
+			}
+			withType(SharedLibraryBinarySpec) {
+				if (toolChain in VisualCpp) {
+					cCompiler.define "Foundation_EXPORTS"
+					cppCompiler.define "Foundation_EXPORTS"
+				}
+			}
+		}
+	}
 }
-
 //tasks.build.dependsOn collectBinaries
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.1'
-}

@@ -1,0 +1,40 @@
+project(":JSON") {
+	model {
+		components {
+			PocoJSON(NativeLibrarySpec) {
+				sources {
+					c {
+						source {
+							srcDir 'src'
+							include '**/*.c'
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
+					}
+					cpp {
+						source {
+							srcDir 'src'
+							include '**/*.cpp'
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
+					}
+				}
+			}
+		}
+		binaries {
+			withType(SharedLibraryBinarySpec) {
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				if (toolChain in VisualCpp) {
+					 cppCompiler.define "JSON_EXPORTS"
+				}
+			}
+			withType(StaticLibraryBinarySpec) {
+				 lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+			}
+		}
+	}
+}
+

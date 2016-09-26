@@ -1,0 +1,50 @@
+project(":Util") {
+	dependencies {
+//	   compile files(project(':Foundation').binaries['PocoFoundation'].staticLibraryFile)
+	}
+	model {
+		components {
+			PocoUtil(NativeLibrarySpec) {
+				sources {
+					c {
+						source {
+							srcDir 'src'
+							include '**/*.c'
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
+					}
+					cpp {
+						source {
+							srcDir 'src'
+							include '**/*.cpp'
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
+					}
+				}
+			}
+		}
+		binaries {
+			all {
+				 cppCompiler.args '/IC:/Git/poco-gradle/XML/include'
+				 cppCompiler.args '/IC:/Git/poco-gradle/JSON/include'
+			}
+			withType(SharedLibraryBinarySpec) {
+				 lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				 lib project: ':XML', library: 'PocoXML', linkage: 'shared'
+				 lib project: ':JSON', library: 'PocoJSON', linkage: 'shared'
+				if (toolChain in VisualCpp) {
+					 cppCompiler.define "Util_EXPORTS"
+				}
+			}
+			withType(StaticLibraryBinarySpec) {
+				 lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+				 lib project: ':XML', library: 'PocoXML', linkage: 'static'
+				 lib project: ':JSON', library: 'PocoJSON', linkage: 'static'
+			 }
+		}
+	}
+}
