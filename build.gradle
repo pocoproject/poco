@@ -64,7 +64,8 @@ allprojects {
 	apply plugin:  'c'
 	apply plugin:  'cpp'
 	apply plugin:  'visual-studio'
-	
+
+	buildDir = new File("gradle")	
 
 	model {
 /*
