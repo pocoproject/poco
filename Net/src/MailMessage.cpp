@@ -194,6 +194,7 @@ const std::string MailMessage::CTE_BASE64("base64");
 
 
 MailMessage::MailMessage(PartStoreFactory* pStoreFactory): 
+	_encoding(),
 	_pStoreFactory(pStoreFactory)
 {
 	Poco::Timestamp now;
