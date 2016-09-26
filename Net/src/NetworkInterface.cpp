@@ -226,7 +226,8 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name,
 	_pointToPoint(false),
 	_up(false),
 	_running(false),
-	_mtu(0)
+	_mtu(0),
+	_type(NetworkInterface::NI_TYPE_OTHER)
 {
 	_addressList.push_back(AddressTuple(address, subnetMask, broadcastAddress));
 	setPhyParams();
