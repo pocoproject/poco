@@ -1,0 +1,33 @@
+project(":Data") {
+	model {
+		components {
+			PocoData(NativeLibrarySpec) {
+				sources {
+					cpp {
+						source {
+							srcDir 'src'
+							include '**/*.cpp'
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
+					}
+				}
+			}
+		}
+		binaries {
+			all {
+			}
+			withType(SharedLibraryBinarySpec) {
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				if (toolChain in VisualCpp) {
+					 cppCompiler.define "Data_EXPORTS"
+				}
+			}
+			withType(StaticLibraryBinarySpec) {
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+			}
+		}
+	}
+}
+

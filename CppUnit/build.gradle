@@ -1,0 +1,29 @@
+project(":CppUnit") {
+	model {
+		components {
+			PocoCppUnit(NativeLibrarySpec) {
+				sources {
+					cpp {
+						source {
+							srcDir 'src'
+							include '**/*.cpp'
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
+					}
+				}
+			}
+		}
+		binaries {
+			withType(SharedLibraryBinarySpec) {
+				if (toolChain in VisualCpp) {
+					 cppCompiler.define "CppUnit_EXPORTS"
+				}
+			}
+			withType(StaticLibraryBinarySpec) {
+			}
+		}
+	}
+}
+

@@ -1,0 +1,37 @@
+project(":PageCompiler") {
+	model {
+		components {
+			PocoPageCompiler(NativeLibrarySpec) {
+				sources {
+					cpp {
+						source {
+							srcDir 'src'
+							include '**/*.cpp'
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
+					}
+				}
+			}
+		}
+		binaries {
+			all {
+			}
+			withType(SharedLibraryBinarySpec) {
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':Net', library: 'PocoNet', linkage: 'shared'
+				lib project: ':Util', library: 'PocoUtil', linkage: 'shared'
+				if (toolChain in VisualCpp) {
+					 cppCompiler.define "PageCompiler_EXPORTS"
+				}
+			}
+			withType(StaticLibraryBinarySpec) {
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+				lib project: ':Net', library: 'PocoNet', linkage: 'static'
+				lib project: ':Util', library: 'PocoUtil', linkage: 'static'
+			}
+		}
+	}
+}
+

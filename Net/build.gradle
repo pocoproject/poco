@@ -1,0 +1,35 @@
+project(":Net") {
+	model {
+		components {
+			PocoNet(NativeLibrarySpec) {
+				sources {
+					cpp {
+						source {
+							srcDir 'src'
+							include '**/*.cpp'
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
+					}
+				}
+			}
+		}
+		binaries {
+			all {
+				linker.args "ws2_32.lib"
+				linker.args "iphlpapi.lib"
+			}
+			withType(SharedLibraryBinarySpec) {
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				if (toolChain in VisualCpp) {
+					 cppCompiler.define "Net_EXPORTS"
+				}
+			}
+			withType(StaticLibraryBinarySpec) {
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+			}
+		}
+	}
+}
+

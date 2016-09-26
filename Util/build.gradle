@@ -29,8 +29,6 @@ project(":Util") {
 		}
 		binaries {
 			all {
-				 cppCompiler.args '/IC:/Git/poco-gradle/XML/include'
-				 cppCompiler.args '/IC:/Git/poco-gradle/JSON/include'
 			}
 			withType(SharedLibraryBinarySpec) {
 				 lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
