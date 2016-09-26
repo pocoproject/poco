@@ -182,7 +182,6 @@ public:
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(rResult), 
 		_default()
-
 	{
 		_rResult.clear();
 	}
