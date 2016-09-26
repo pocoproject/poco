@@ -73,6 +73,8 @@ private:
 	MemoryPool(const MemoryPool&);
 	MemoryPool& operator = (const MemoryPool&);
 	
+	void clear();
+	
 	enum
 	{
 		BLOCK_RESERVE = 128
