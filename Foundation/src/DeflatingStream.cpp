@@ -27,13 +27,20 @@ DeflatingStreamBuf::DeflatingStreamBuf(std::istream& istr, StreamType type, int 
 	_pOstr(0),
 	_eof(false)
 {
+	_zstr.next_in   = 0;
+	_zstr.avail_in  = 0;
+	_zstr.total_in  = 0;
+	_zstr.next_out  = 0;
+	_zstr.avail_out = 0;
+	_zstr.total_out = 0;
+	_zstr.msg       = 0;
+	_zstr.state     = 0;
 	_zstr.zalloc    = Z_NULL;
 	_zstr.zfree     = Z_NULL;
 	_zstr.opaque    = Z_NULL;
-	_zstr.next_in   = 0;
-	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
-	_zstr.avail_out = 0;
+	_zstr.data_type = 0;
+	_zstr.adler     = 0;
+	_zstr.reserved  = 0;
 
 	_buffer = new char[DEFLATE_BUFFER_SIZE];
 
