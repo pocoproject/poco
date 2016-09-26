@@ -33,7 +33,7 @@ cmake_*
 
 # gradle #
 .gradle
-build/
+gradle/
 
 # Packages #
 ############
