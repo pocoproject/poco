@@ -62,6 +62,10 @@ project(":Foundation") {
 		}
 		binaries {
 			all {
+				if (toolChain in VisualCpp) {
+					linker.args 'ws2_32.lib'
+					linker.args 'iphlpapi.lib'
+				}
 			}
 			withType(SharedLibraryBinarySpec) {
 				if (toolChain in VisualCpp) {

@@ -61,8 +61,6 @@ task wrapper(type: Wrapper) {
 }
 
 allprojects {
-    task hello << { task -> println "I'm $task.project.name" }
-
 	apply plugin:  'c'
 	apply plugin:  'cpp'
 	apply plugin:  'visual-studio'
@@ -130,9 +128,6 @@ allprojects {
 					cppCompiler.define '_WINDOWS'
 					cppCompiler.define '_MBCS'
 				
-					linker.args 'ws2_32.lib'
-					linker.args 'iphlpapi.lib'
-					
 					linker.args 'kernel32.lib'
 					linker.args 'user32.lib'
 					linker.args 'gdi32.lib'
@@ -181,9 +176,8 @@ allprojects {
 }
 
 subprojects {
-    hello << {println "- I depend on water"}
-	apply plugin:  'windows-resources'
-	apply plugin:	  'windows-messages'
+ 	apply plugin:	'windows-resources'
+	apply plugin:	'windows-messages'
 }
 
 gradle.afterProject {project, projectState ->
