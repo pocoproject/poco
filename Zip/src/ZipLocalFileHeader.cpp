@@ -131,10 +131,13 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
     poco_assert (ZipUtil::get16BitValue(_rawHeader, COMPR_METHOD_POS) < ZipCommon::CM_UNUSED);
     parseDateTime();
     Poco::UInt16 len = getFileNameLength();
-    Poco::Buffer<char> buf(len);
-    inp.read(buf.begin(), len);
-    _fileName = std::string(buf.begin(), len);
-
+    if (len > 0)
+    {
+    	Poco::Buffer<char> buf(len);
+    	inp.read(buf.begin(), len);
+    	_fileName = std::string(buf.begin(), len);
+	}
+	
     if (!searchCRCAndSizesAfterData())
     {
         _crc32 = getCRCFromHeader();
@@ -145,33 +148,41 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
     if (hasExtraField())
     {
         len = getExtraFieldLength();
-        Poco::Buffer<char> xtra(len);
-        inp.read(xtra.begin(), len);
-        _extraField = std::string(xtra.begin(), len);
-        char* ptr = xtra.begin();
-        while (ptr <= xtra.begin() + len - 4) 
+        if (len > 0)
         {
-            Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0); ptr +=2;
-            Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0); ptr += 2;
-            if (id == ZipCommon::ZIP64_EXTRA_ID) 
-            {
-                poco_assert(size >= 8);
-                if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
-                {
-                    setUncompressedSize(ZipUtil::get64BitValue(ptr, 0)); size -= 8; ptr += 8;
-                }
-                if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
-                {
-                    setCompressedSize(ZipUtil::get64BitValue(ptr, 0)); size -= 8; ptr += 8;
-                }
-            } 
-            else 
-            {
-                ptr += size;
-            }
+			Poco::Buffer<char> xtra(len);
+			inp.read(xtra.begin(), len);
+			_extraField = std::string(xtra.begin(), len);
+			char* ptr = xtra.begin();
+			while (ptr <= xtra.begin() + len - 4) 
+			{
+				Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0); 
+				ptr += 2;
+				Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0); 
+				ptr += 2;
+				if (id == ZipCommon::ZIP64_EXTRA_ID) 
+				{
+					poco_assert(size >= 8);
+					if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
+					{
+						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0)); 
+						size -= 8; 
+						ptr += 8;
+					}
+					if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
+					{
+						setCompressedSize(ZipUtil::get64BitValue(ptr, 0)); 
+						size -= 8; 
+						ptr += 8;
+					}
+				} 
+				else 
+				{
+					ptr += size;
+				}
+			}
         }
     }
-
 }
 
 
