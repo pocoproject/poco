@@ -3,6 +3,15 @@ project(":PDF") {
 		components {
 			PocoPDF(NativeLibrarySpec) {
 				sources {
+					c {
+						source {
+							srcDir 'src'
+							include '**/*.c'
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
+					}
 					cpp {
 						source {
 							srcDir 'src'

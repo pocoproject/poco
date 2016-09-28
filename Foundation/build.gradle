@@ -1,5 +1,6 @@
 project(":Foundation") {
 	model {
+		def os = org.gradle.internal.os.OperatingSystem.current()
 		components {
 			PocoFoundation(NativeLibrarySpec) {
 				sources {
@@ -20,14 +21,17 @@ project(":Foundation") {
 							srcDir 'src'
 							include '**/*.c'
 						}
+						exportedHeaders {
+							srcDir 'include'
+						}
 					}
-	//ByteOrder
-	//String
-	//SignalHandler
 					cpp {
 						source {
 							srcDir 'src'
 							include '**/*.cpp'
+							exclude 'ByteOrder.cpp'
+							exclude 'String.cpp'
+							exclude 'SignalHandler.cpp'
 							exclude 'Environment_*.cpp'
 							exclude 'FPEnvironment_*.cpp'
 							exclude 'Timezone_*.cpp'
@@ -47,11 +51,11 @@ project(":Foundation") {
 							exclude 'RWLock_*.cpp'
 							exclude 'Semaphore_*.cpp'
 							exclude 'Thread_*.cpp'
-	//						if (toolChain in VisualCpp) {
+							if (os.isWindows()) {
 								exclude 'SyslogChannel.cpp'
 								exclude 'OpcomChannel.cpp'
 								exclude 'AndroidLogChannel.cpp'
-	//						}
+							}
 						}
 						exportedHeaders {
 							srcDir 'include'

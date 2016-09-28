@@ -1,6 +1,7 @@
 plugins {
 	id 'c'
 	id 'cpp'
+	id 'cppunit-test-suite'
 	id 'windows-resources'
 	id 'windows-messages'
 	id 'visual-studio'
@@ -60,12 +61,15 @@ task wrapper(type: Wrapper) {
 	gradleVersion = '3.1'
 }
 
+
 allprojects {
 	apply plugin:  'c'
 	apply plugin:  'cpp'
 	apply plugin:  'visual-studio'
+	apply plugin:  'cppunit-test-suite'
 
 	buildDir = new File("gradle")	
+	
 
 	model {
 /*
@@ -80,11 +84,22 @@ allprojects {
 //	        release
 		}
 
+		
 		platforms {
-			Win32 {
+			win32 {
+				operatingSystem "windows"
 				architecture 'x86'
 			}
-			x64 {
+			win64 {
+				operatingSystem "windows"
+				architecture 'x86_64'
+			}
+			linux32 {
+				operatingSystem "linux"
+				architecture 'x86'
+			}
+			linux64 {
+				operatingSystem "linux"
 				architecture 'x86_64'
 			}
 		}
@@ -98,15 +113,18 @@ allprojects {
 			all {
 				if (buildTypes == buildTypes.debug) {
 					cCompiler.define '_DEBUG'
-					cCompiler.args '/Zi'
 					cppCompiler.define '_DEBUG'
-					cppCompiler.args '/Zi'
-					if (toolChain in VisualCpp) {
-						linker.args '/DEBUG'
-					}
+				} else {
+					cCompiler.define 'NDEBUG'
+					cppCompiler.define 'NDEBUG'
 				}
 			
 				if (toolChain in VisualCpp) {
+					if (buildTypes == buildTypes.debug) {
+						cCompiler.args '/Zi'
+						cppCompiler.args '/Zi'
+						linker.args '/DEBUG'
+					}
 					cCompiler.args '/Zc:wchar_t'
 					cCompiler.args '/Zc:inline'
 					cCompiler.args '/Zc:forScope'
@@ -143,6 +161,13 @@ allprojects {
 				if (flavor == flavors.unbundled) {
 					cppCompiler.define 'PPPPPOCO_UNBUNDLED'
 				}
+				if (buildTypes == buildTypes.debug) {
+					cCompiler.args "/MDd"
+					cppCompiler.args "/MDd"
+				} else {
+					cCompiler.args "/MD"
+					cppCompiler.args "/MD"
+				}
 			}
 			withType(SharedLibraryBinarySpec) {
 				if (toolChain in VisualCpp) {
@@ -150,26 +175,17 @@ allprojects {
 					cCompiler.define '_WINDLL'
 					cppCompiler.define '_USRDLL'
 					cppCompiler.define '_WINDLL'
-					if (buildTypes == buildTypes.debug) {
-						cCompiler.args "/MDd"
-						cppCompiler.args "/MDd"
-					} else {
-						cCompiler.args "/MD"
-						cppCompiler.args "/MD"
-					}
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
 				if (toolChain in VisualCpp) {
 					cCompiler.define 'POCO_STATIC'
 					cppCompiler.define 'POCO_STATIC'
-					if (buildTypes == buildTypes.debug) {
-						cCompiler.args "/MDd"
-						cppCompiler.args "/MDd"
-					} else {
-						cCompiler.args "/MD"
-						cppCompiler.args "/MD"
-					}
+				}
+			}
+			withType(NativeExecutableSpec) {
+				if (toolChain in VisualCpp) {
+					
 				}
 			}
 		}
