@@ -56,7 +56,7 @@ public:
 	virtual ~ObjectId();
 		/// Destructor
 
-	Timestamp timestamp() const;
+	Poco::Timestamp timestamp() const;
 		/// Returns the timestamp which is stored in the first four bytes of the id
 
 	std::string toString(const std::string& fmt = "%02x") const;
@@ -81,7 +81,7 @@ private:
 };
 
 
-inline Timestamp ObjectId::timestamp() const
+inline Poco::Timestamp ObjectId::timestamp() const
 {
 	int time;
 	char* T = (char *) &time;
@@ -89,7 +89,7 @@ inline Timestamp ObjectId::timestamp() const
 	T[1] = _id[2];
 	T[2] = _id[1];
 	T[3] = _id[0];
-	return Timestamp::fromEpochTime((time_t) time);
+	return Poco::Timestamp::fromEpochTime((time_t) time);
 }
 
 inline int ObjectId::fromHex(char c)

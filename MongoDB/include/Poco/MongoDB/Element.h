@@ -291,7 +291,7 @@ inline void BSONWriter::write<NullValue>(NullValue& from)
 {
 }
 
-struct SpecialTimestamp {
+struct Timestamp {
 	Poco::Timestamp ts;
 	Poco::Int32 inc;
 };
@@ -299,11 +299,11 @@ struct SpecialTimestamp {
 // BSON Timestamp
 // spec: int64
 template<>
-struct ElementTraits<SpecialTimestamp>
+struct ElementTraits<Timestamp>
 {
 	enum { TypeId = 0x11 };
 
-	static std::string toString(const SpecialTimestamp& value, int indent = 0)
+	static std::string toString(const Timestamp& value, int indent = 0)
 	{
 		std::string result;
 		result.append(1, '"');
@@ -317,18 +317,18 @@ struct ElementTraits<SpecialTimestamp>
 
 
 template<>
-inline void BSONReader::read<SpecialTimestamp>(SpecialTimestamp& to)
+inline void BSONReader::read<Timestamp>(Timestamp& to)
 {
 	Poco::Int64 value;
 	_reader >> value;
 	to.inc = value & 0xffffffff;
 	value >>= 32;
-	to.ts = Timestamp::fromEpochTime(static_cast<std::time_t>(value));
+	to.ts = Poco::Timestamp::fromEpochTime(static_cast<std::time_t>(value));
 }
 
 
 template<>
-inline void BSONWriter::write<SpecialTimestamp>(SpecialTimestamp& from)
+inline void BSONWriter::write<Timestamp>(Timestamp& from)
 {
 	Poco::Int64 value = from.ts.epochMicroseconds() / 1000;
 	value <<= 32;
