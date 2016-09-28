@@ -291,10 +291,13 @@ inline void BSONWriter::write<NullValue>(NullValue& from)
 {
 }
 
-struct BSONTimestamp {
+
+struct BSONTimestamp 
+{
 	Poco::Timestamp ts;
 	Poco::Int32 inc;
 };
+
 
 // BSON Timestamp
 // spec: int64
