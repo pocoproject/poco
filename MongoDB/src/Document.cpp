@@ -96,8 +96,8 @@ void Document::read(BinaryReader& reader)
 		case ElementTraits<Poco::Timestamp>::TypeId:
 			element = new ConcreteElement<Poco::Timestamp>(name, Poco::Timestamp());
 			break;
-		case ElementTraits<SpecialTimestamp>::TypeId:
-			element = new ConcreteElement<SpecialTimestamp>(name, SpecialTimestamp());
+		case ElementTraits<BSONTimestamp>::TypeId:
+			element = new ConcreteElement<BSONTimestamp>(name, BSONTimestamp());
 			break;
 		case ElementTraits<NullValue>::TypeId:
 			element = new ConcreteElement<NullValue>(name, NullValue(0));
