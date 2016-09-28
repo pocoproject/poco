@@ -96,6 +96,9 @@ void Document::read(BinaryReader& reader)
 		case ElementTraits<Poco::Timestamp>::TypeId:
 			element = new ConcreteElement<Poco::Timestamp>(name, Poco::Timestamp());
 			break;
+		case ElementTraits<SpecialTimestamp>::TypeId:
+			element = new ConcreteElement<SpecialTimestamp>(name, SpecialTimestamp());
+			break;
 		case ElementTraits<NullValue>::TypeId:
 			element = new ConcreteElement<NullValue>(name, NullValue(0));
 			break;
@@ -111,7 +114,7 @@ void Document::read(BinaryReader& reader)
 		default:
 			{
 				std::stringstream ss;
-				ss << "Element " << name << " contains an unsupported type " << std::hex << (int) type;
+				ss << "Element " << name << " contains an unsupported type 0x" << std::hex << (int) type;
 				throw Poco::NotImplementedException(ss.str());
 			}
 		//TODO: x0F -> JavaScript code with scope
