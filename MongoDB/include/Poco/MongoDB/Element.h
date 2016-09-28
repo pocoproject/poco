@@ -247,6 +247,54 @@ inline void BSONWriter::write<NullValue>(NullValue& from)
 }
 
 
+struct BSONTimestamp 
+{
+	Poco::Timestamp ts;
+	Poco::Int32 inc;
+};
+
+
+// BSON Timestamp
+// spec: int64
+template<>
+struct ElementTraits<BSONTimestamp>
+{
+	enum { TypeId = 0x11 };
+
+	static std::string toString(const BSONTimestamp& value, int indent = 0)
+	{
+		std::string result;
+		result.append(1, '"');
+		result.append(DateTimeFormatter::format(value.ts, "%Y-%m-%dT%H:%M:%s%z"));
+		result.append(1, ' ');
+		result.append(NumberFormatter::format(value.inc));
+		result.append(1, '"');
+		return result;
+	}
+};
+
+
+template<>
+inline void BSONReader::read<BSONTimestamp>(BSONTimestamp& to)
+{
+	Poco::Int64 value;
+	_reader >> value;
+	to.inc = value & 0xffffffff;
+	value >>= 32;
+	to.ts = Timestamp::fromEpochTime(static_cast<std::time_t>(value));
+}
+
+
+template<>
+inline void BSONWriter::write<BSONTimestamp>(BSONTimestamp& from)
+{
+	Poco::Int64 value = from.ts.epochMicroseconds() / 1000;
+	value <<= 32;
+	value += from.inc;
+	_writer << value;
+}
+
+
 // BSON 64-bit integer
 // spec: int64
 template<>
