@@ -185,4 +185,5 @@ POCO_IMPLEMENT_EXCEPTION(URISyntaxException, SyntaxException, "Bad URI syntax")
 POCO_IMPLEMENT_EXCEPTION(ApplicationException, Exception, "Application exception")
 POCO_IMPLEMENT_EXCEPTION(BadCastException, RuntimeException, "Bad cast exception")
 
+
 } // namespace Poco
