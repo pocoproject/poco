@@ -65,22 +65,15 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 		{
 			return openURI(scheme, uri);
 		}
-		else
+		else if (scheme.length() <= 1) // could be Windows path
 		{
 			Path path;
 			if (path.tryParse(pathOrURI, Path::PATH_GUESS))
+			{
 				return openFile(path);
-			else 
-				throw UnknownURISchemeException(pathOrURI);
+			}
 		}
-	}
-	catch (UnknownURISchemeException&)
-	{
-		throw;
-	}
-	catch (TooManyURIRedirectsException&)
-	{
-		throw;
+		throw UnknownURISchemeException(pathOrURI);
 	}
 	catch (URISyntaxException&)
 	{
@@ -105,24 +98,32 @@ std::istream* URIStreamOpener::open(const std::string& basePathOrURI, const std:
 		if (it != _map.end())
 		{
 			uri.resolve(pathOrURI);
+			scheme = uri.getScheme();
 			return openURI(scheme, uri);
 		}
+		else if (scheme.length() <= 1) // could be Windows path
+		{
+			Path base;
+			Path path;
+			if (base.tryParse(basePathOrURI, Path::PATH_GUESS) && path.tryParse(pathOrURI, Path::PATH_GUESS))
+			{
+				base.resolve(path);
+				return openFile(base);
+			}
+		}
+		throw UnknownURISchemeException(basePathOrURI);
 	}
-	catch (UnknownURISchemeException&)
+	catch (URISyntaxException&)
 	{
-		throw;
-	} 
-	catch (TooManyURIRedirectsException&)
-	{
-		throw;
-	} 
-	catch (Exception&)
-	{
+		Path base;
+		Path path;
+		if (base.tryParse(basePathOrURI, Path::PATH_GUESS) && path.tryParse(pathOrURI, Path::PATH_GUESS))
+		{
+			base.resolve(path);
+			return openFile(base);
+		}
+		else throw;
 	}
-	Path base(basePathOrURI, Path::PATH_GUESS);
-	Path path(pathOrURI, Path::PATH_GUESS);
-	base.resolve(path);
-	return openFile(base);
 }
 
 	
