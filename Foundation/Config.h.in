@@ -29,11 +29,11 @@
 
 
 // Define to enable C++11 support
-// #define POCO_ENABLE_CPP11
+#cmakedefine POCO_ENABLE_CPP11
 
 
 // Define to disable implicit linking
-// #define POCO_NO_AUTOMATIC_LIBS
+#cmakedefine POCO_NO_AUTOMATIC_LIBS
 
 
 // Define to disable automatic initialization
@@ -41,23 +41,23 @@
 // initialization framework-wide (e.g. Net
 // on Windows, all Data back-ends, etc).
 //
-// #define POCO_NO_AUTOMATIC_LIB_INIT
+#cmakedefine POCO_NO_AUTOMATIC_LIB_INIT
 
 
 // Define to disable FPEnvironment support
-// #define POCO_NO_FPENVIRONMENT
+#cmakedefine POCO_NO_FPENVIRONMENT
 
 
 // Define if std::wstring is not available
-// #define POCO_NO_WSTRING
+#cmakedefine POCO_NO_WSTRING
 
 
 // Define to disable shared memory
-// #define POCO_NO_SHAREDMEMORY
+#cmakedefine POCO_NO_SHAREDMEMORY
 
 
 // Define if no <locale> header is available (such as on WinCE)
-// #define POCO_NO_LOCALE
+#cmakedefine POCO_NO_LOCALE
 
 
 // Define to desired default thread stack size
@@ -67,16 +67,19 @@
 #endif
 
 
+#cmakedefine POCO_OVERRIDE_THREAD_PRIORITIES
+#ifdef POCO_OVERRIDE_THREAD_PRIORITIES
 // Define to override system-provided
 // minimum thread priority value on POSIX
 // platforms (returned by Poco::Thread::getMinOSPriority()).
-// #define POCO_THREAD_PRIORITY_MIN 0
+#define POCO_THREAD_PRIORITY_MIN @POCO_THREAD_PRIORITY_MIN@
 
 
 // Define to override system-provided
 // maximum thread priority value on POSIX
 // platforms (returned by Poco::Thread::getMaxOSPriority()).
-// #define POCO_THREAD_PRIORITY_MAX 31
+#define POCO_THREAD_PRIORITY_MAX @POCO_THREAD_PRIORITY_MAX@
+#endif
 
 
 // Define to disable small object optimization. If not
@@ -109,7 +112,7 @@
 
 // Define to disable compilation of DirectoryWatcher
 // on platforms with no inotify.
-// #define POCO_NO_INOTIFY
+#cmakedefine POCO_NO_INOTIFY
 
 
 // Following are options to remove certain features
@@ -122,45 +125,45 @@
 // No automatic registration of FileChannel in
 // LoggingFactory - avoids FileChannel and friends
 // being linked to executable.
-// #define POCO_NO_FILECHANNEL
+#cmakedefine POCO_NO_FILECHANNEL
 
 
 // No automatic registration of SplitterChannel in
 // LoggingFactory - avoids SplitterChannel being
 // linked to executable.
-// #define POCO_NO_SPLITTERCHANNEL
+#cmakedefine POCO_NO_SPLITTERCHANNEL
 
 
 // No automatic registration of SyslogChannel in
 // LoggingFactory - avoids SyslogChannel being
 // linked to executable on Unix/Linux systems.
-// #define POCO_NO_SYSLOGCHANNEL
+#cmakedefine POCO_NO_SYSLOGCHANNEL
 
 
 // Define to enable MSVC secure warnings
-// #define POCO_MSVC_SECURE_WARNINGS
+#cmakedefine POCO_MSVC_SECURE_WARNINGS
 
 
 // No support for INI file configurations in
 // Poco::Util::Application.
-// #define POCO_UTIL_NO_INIFILECONFIGURATION
+#cmakedefine POCO_UTIL_NO_INIFILECONFIGURATION
 
 
 // No support for JSON configuration in
 // Poco::Util::Application. Avoids linking of JSON
 // library and saves a few 100 Kbytes.
-// #define POCO_UTIL_NO_JSONCONFIGURATION
+#cmakedefine POCO_UTIL_NO_JSONCONFIGURATION
 
 
 // No support for XML configuration in
 // Poco::Util::Application. Avoids linking of XML
 // library and saves a few 100 Kbytes.
-// #define POCO_UTIL_NO_XMLCONFIGURATION
+#cmakedefine POCO_UTIL_NO_XMLCONFIGURATION
 
 
 // No IPv6 support
 // Define to disable IPv6
-// #define POCO_NET_NO_IPv6
+#cmakedefine POCO_NET_NO_IPv6
 
 
 // Windows CE has no locale support
@@ -171,10 +174,10 @@
 // Enable the poco_debug_* and poco_trace_* macros
 // even if the _DEBUG variable is not set.
 // This allows the use of these macros in a release version.
-// #define POCO_LOG_DEBUG
+#cmakedefine POCO_LOG_DEBUG
 
 // Uncomment to disable the use of bundled OpenSSL binaries
 // (Windows only)
-// #define POCO_EXTERNAL_OPENSSL
+#cmakedefine POCO_EXTERNAL_OPENSSL
 
 #endif // Foundation_Config_INCLUDED
