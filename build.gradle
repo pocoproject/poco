@@ -1,6 +1,7 @@
 plugins {
 	id 'c'
 	id 'cpp'
+	id 'cunit-test-suite'
 	id 'cppunit-test-suite'
 	id 'windows-resources'
 	id 'windows-messages'
@@ -66,10 +67,28 @@ allprojects {
 	apply plugin:  'c'
 	apply plugin:  'cpp'
 	apply plugin:  'visual-studio'
+	apply plugin:  'cunit-test-suite'
 	apply plugin:  'cppunit-test-suite'
 
 	buildDir = new File("gradle")	
 	
+   def addCompilerFlag = { NativeBinarySpec binary, String flag ->
+        if (binary.hasProperty("cppCompiler")) {
+            binary.cppCompiler.args flag
+        }
+        if (binary.hasProperty("cCompiler")) {
+            binary.cCompiler.args flag
+        }
+    }
+    
+    def addCompilerDefine = { NativeBinarySpec binary, String define, String value ->
+        if (binary.hasProperty("cppCompiler")) {
+            binary.cppCompiler.define define, value
+        }
+        if (binary.hasProperty("cCompiler")) {
+            binary.cCompiler.define define, value
+        }
+    }
 
 	model {
 /*
@@ -111,6 +130,9 @@ allprojects {
 		
 		binaries {
 			all {
+				if (flavor == flavors.unbundled) {
+					cppCompiler.define 'PPPPPOCO_UNBUNDLED'
+				}
 				if (buildTypes == buildTypes.debug) {
 					cCompiler.define '_DEBUG'
 					cppCompiler.define '_DEBUG'
@@ -157,16 +179,14 @@ allprojects {
 					linker.args 'oleaut32.lib'
 					linker.args 'uuid.lib'
 				
-				}
-				if (flavor == flavors.unbundled) {
-					cppCompiler.define 'PPPPPOCO_UNBUNDLED'
-				}
-				if (buildTypes == buildTypes.debug) {
-					cCompiler.args "/MDd"
-					cppCompiler.args "/MDd"
-				} else {
-					cCompiler.args "/MD"
-					cppCompiler.args "/MD"
+					if (buildTypes == buildTypes.debug) {
+						cCompiler.args "/MDd"
+						cppCompiler.args "/MDd"
+					} else {
+						cCompiler.args "/MD"
+						cppCompiler.args "/MD"
+					}
+					linker.args '/SUBSYSTEM:CONSOLE'
 				}
 			}
 			withType(SharedLibraryBinarySpec) {

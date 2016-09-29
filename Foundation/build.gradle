@@ -64,6 +64,11 @@ project(":Foundation") {
 				}
 			}
 		}
+		testSuites {
+			PocoFoundationTest(CUnitTestSuiteSpec) {
+				testing $.components.PocoFoundation
+			}
+		}
 		binaries {
 			all {
 				if (toolChain in VisualCpp) {

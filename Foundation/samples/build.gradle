@@ -1,0 +1,38 @@
+project(":Foundation:samples") {
+	model {
+		components {
+			ActiveMethod(NativeExecutableSpec) {
+				sources {
+					cpp.source { srcDir 'ActiveMethod/src' include '**/*.cpp' }
+					cpp.lib project: ':Foundation', library: 'PocoFoundation'				
+				}
+			}
+			Activity(NativeExecutableSpec) {
+				sources {
+					cpp.source { srcDir 'ActiveMethod/src' include '**/*.cpp' }
+					cpp.lib project: ':Foundation', library: 'PocoFoundation'				
+				}
+			}
+			base64decode(NativeExecutableSpec) {
+				sources {
+					cpp.source { srcDir 'base64decode/src' include '**/*.cpp' }
+					cpp.lib project: ':Foundation', library: 'PocoFoundation'				
+				}
+			}
+		}
+		binaries {
+			all {
+			}
+			withType(SharedLibraryBinarySpec) {
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+			}
+			withType(StaticLibraryBinarySpec) {
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+			}
+			withType(NativeExecutableSpec) {
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+			}
+		}
+	}
+}
+
