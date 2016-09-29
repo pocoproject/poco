@@ -175,8 +175,8 @@ int ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 				Poco::Int32 size = static_cast<Poco::Int32>(nfo.getFullHeaderSize());
 				_expectedCrc32 = nfo.getCRC32();
 				const char* rawHeader = nfo.getRawHeader();
-				for (Poco::Int32 i = size-1; i >= 0; --i)
-					_pIstr->putback(rawHeader[i]);
+				_pIstr->seekg(-size, std::ios::cur);
+				if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
 				if (!crcValid())
 					throw ZipException("CRC failure");
 			}

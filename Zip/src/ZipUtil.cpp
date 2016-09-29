@@ -117,31 +117,23 @@ void ZipUtil::sync(std::istream& in)
 			{
 				if (std::memcmp(ZipLocalFileHeader::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0)
 				{
-					in.putback(ZipLocalFileHeader::HEADER[3]);
-					in.putback(ZipLocalFileHeader::HEADER[2]);
-					in.putback(ZipLocalFileHeader::HEADER[1]);
-					in.putback(ZipLocalFileHeader::HEADER[0]);
+					in.seekg(-4, std::ios::cur);
+					if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
 				}
 				else if (std::memcmp(ZipArchiveInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0)
 				{
-					in.putback(ZipArchiveInfo::HEADER[3]);
-					in.putback(ZipArchiveInfo::HEADER[2]);
-					in.putback(ZipArchiveInfo::HEADER[1]);
-					in.putback(ZipArchiveInfo::HEADER[0]);
+					in.seekg(-4, std::ios::cur);
+					if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
 				}
 				else if (std::memcmp(ZipFileInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0)
 				{
-					in.putback(ZipFileInfo::HEADER[3]);
-					in.putback(ZipFileInfo::HEADER[2]);
-					in.putback(ZipFileInfo::HEADER[1]);
-					in.putback(ZipFileInfo::HEADER[0]);
+					in.seekg(-4, std::ios::cur);
+					if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
 				}
 				else
 				{
-					in.putback(ZipDataInfo::HEADER[3]);
-					in.putback(ZipDataInfo::HEADER[2]);
-					in.putback(ZipDataInfo::HEADER[1]);
-					in.putback(ZipDataInfo::HEADER[0]);
+					in.seekg(-4, std::ios::cur);
+					if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
 				}
 				return;
 			}
@@ -149,6 +141,7 @@ void ZipUtil::sync(std::istream& in)
 			{
 				// we have read 2 bytes, should only be one: putback the last char
 				in.putback(temp[tempPos - 1]);
+				if (!in.good()) throw Poco::IOException("Failed to putback on input stream");
 				--tempPos;
 			}
 		}
