@@ -53,7 +53,7 @@ Option::Option(const Option& option):
 	_binding(option._binding),
 	_pValidator(option._pValidator),
 	_pCallback(option._pCallback),
-	_pConfig(option._pConfig)
+	_pConfig(option._pConfig),
 	_hidden(option._hidden)
 {
 	if (_pValidator) _pValidator->duplicate();
