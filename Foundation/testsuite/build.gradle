@@ -1,0 +1,50 @@
+project(":Foundation:testsuite") {
+	model {
+		components {
+			PocoFoundationTestsuite(NativeExecutableSpec) {
+				sources {
+					cpp {
+						source {
+							srcDir 'src'
+							include '**/*.cpp'
+							exclude 'WinDriver.cpp'
+							exclude '*_WINCE.cpp'
+							exclude 'TestApp*.cpp'
+						}
+						exportedHeaders {
+							srcDir 'include'
+						}
+						lib project: ':CppUnit', library: 'PocoCppUnit'
+						lib project: ':Foundation', library: 'PocoFoundation'
+					}
+				}
+			}
+		}
+/*
+		testSuites {
+			PocoFoundationTestsuite(CppUnitTestSuiteSpec) {
+				testing $.components.PocoFoundationTestsuite
+			}
+		}
+*/
+		binaries {
+			withType(NativeExecutableSpec) {
+				lib project: ':CppUnit', library: 'PocoCppUnit', linkage: 'shared'
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+			}
+		    withType(CppUnitTestSuiteBinarySpec) {
+				lib project: ':CppUnit', library: 'PocoCppUnit', linkage: 'shared'
+				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+			}
+		}
+
+/*
+		testSuites {
+			PocoFoundationTestsuite(CppUnitTestSuiteBinarySpec) {
+				testing components.pocoFoundationTestsuite
+			}
+        }
+*/
+	}
+}
+
