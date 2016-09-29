@@ -660,9 +660,9 @@ void URI::decode(const std::string& str, std::string& decodedStr, bool plusAsSpa
 		if (inQuery && plusAsSpace && c == '+') c = ' ';
 		else if (c == '%')
 		{
-			if (it == end) throw SyntaxException("URI encoding: no hex digit following percent sign", str);
+			if (it == end) throw URISyntaxException("URI encoding: no hex digit following percent sign", str);
 			char hi = *it++;
-			if (it == end) throw SyntaxException("URI encoding: two hex digits must follow percent sign", str);
+			if (it == end) throw URISyntaxException("URI encoding: two hex digits must follow percent sign", str);
 			char lo = *it++;
 			if (hi >= '0' && hi <= '9')
 				c = hi - '0';
@@ -670,7 +670,7 @@ void URI::decode(const std::string& str, std::string& decodedStr, bool plusAsSpa
 				c = hi - 'A' + 10;
 			else if (hi >= 'a' && hi <= 'f')
 				c = hi - 'a' + 10;
-			else throw SyntaxException("URI encoding: not a hex digit");
+			else throw URISyntaxException("URI encoding: not a hex digit");
 			c *= 16;
 			if (lo >= '0' && lo <= '9')
 				c += lo - '0';
@@ -678,7 +678,7 @@ void URI::decode(const std::string& str, std::string& decodedStr, bool plusAsSpa
 				c += lo - 'A' + 10;
 			else if (lo >= 'a' && lo <= 'f')
 				c += lo - 'a' + 10;
-			else throw SyntaxException("URI encoding: not a hex digit");
+			else throw URISyntaxException("URI encoding: not a hex digit");
 		}
 		decodedStr += c;
 	}
@@ -732,7 +732,7 @@ void URI::parse(const std::string& uri)
 		if (it != end && *it == ':')
 		{
 			++it;
-			if (it == end) throw SyntaxException("URI scheme must be followed by authority or path", uri);
+			if (it == end) throw URISyntaxException("URI scheme must be followed by authority or path", uri);
 			setScheme(scheme);
 			if (*it == '/')
 			{
@@ -786,7 +786,7 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 		// IPv6 address
 		++it;
 		while (it != end && *it != ']') host += *it++;
-		if (it == end) throw SyntaxException("unterminated IPv6 address");
+		if (it == end) throw URISyntaxException("unterminated IPv6 address");
 		++it;
 	}
 	else
@@ -804,7 +804,7 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 			if (NumberParser::tryParse(port, nport) && nport > 0 && nport < 65536)
 				_port = (unsigned short) nport;
 			else
-				throw SyntaxException("bad or invalid port number", port);
+				throw URISyntaxException("bad or invalid port number", port);
 		}
 		else _port = getWellKnownPort();
 	}
