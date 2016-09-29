@@ -62,13 +62,34 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 		std::string scheme(uri.getScheme());
 		FactoryMap::const_iterator it = _map.find(scheme);
 		if (it != _map.end())
+		{
 			return openURI(scheme, uri);
+		}
+		else
+		{
+			Path path;
+			if (path.tryParse(pathOrURI, Path::PATH_GUESS))
+				return openFile(path);
+			else 
+				throw UnknownURISchemeException(pathOrURI);
+		}
 	}
-	catch (Exception&)
+	catch (UnknownURISchemeException&)
 	{
+		throw;
 	}
-	Path path(pathOrURI, Path::PATH_GUESS);
-	return openFile(path);
+	catch (TooManyURIRedirectsException&)
+	{
+		throw;
+	}
+	catch (URISyntaxException&)
+	{
+		Path path;
+		if (path.tryParse(pathOrURI, Path::PATH_GUESS))
+			return openFile(path);
+		else 
+			throw;
+	}
 }
 
 
@@ -87,6 +108,14 @@ std::istream* URIStreamOpener::open(const std::string& basePathOrURI, const std:
 			return openURI(scheme, uri);
 		}
 	}
+	catch (UnknownURISchemeException&)
+	{
+		throw;
+	} 
+	catch (TooManyURIRedirectsException&)
+	{
+		throw;
+	} 
 	catch (Exception&)
 	{
 	}
@@ -176,7 +205,7 @@ std::istream* URIStreamOpener::openURI(const std::string& scheme, const URI& uri
 			++redirects;
 		}
 	}
-	throw IOException("Too many redirects while opening URI", uri.toString());
+	throw TooManyURIRedirectsException(uri.toString());
 }
 
 
