@@ -67,6 +67,8 @@
 #endif
 
 
+#cmakedefine POCO_OVERRIDE_THREAD_PRIORITIES
+#ifdef POCO_OVERRIDE_THREAD_PRIORITIES
 // Define to override system-provided
 // minimum thread priority value on POSIX
 // platforms (returned by Poco::Thread::getMinOSPriority()).
@@ -77,6 +79,7 @@
 // maximum thread priority value on POSIX
 // platforms (returned by Poco::Thread::getMaxOSPriority()).
 #define POCO_THREAD_PRIORITY_MAX @POCO_THREAD_PRIORITY_MAX@
+#endif
 
 
 // Define to disable small object optimization. If not

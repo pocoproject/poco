@@ -105,20 +105,21 @@ option(POCO_NO_AUTOMATIC_LIBS
 option(POCO_NO_SHAREDMEMORY
   "Set to OFF|ON (default is OFF) to control shared memory" OFF)
 
+option(POCO_OVERRIDE_THREAD_PRIORITIES
+  "Set to OFF|ON (default is OFF) to control overriding thread priorities on POSIX platforms" OFF)
 set(POCO_THREAD_PRIORITY_MIN 0 CACHE STRING
   "")
-
 set(POCO_THREAD_PRIORITY_MAX 31 CACHE STRING
   "")
 
 option(POCO_NO_WSTRING
-  "" OFF)
+  "Set OFF|ON (default is OFF) to control use of wstring" OFF)
 
 option(POCO_NO_LOCALE
-  "" OFF)
+  "Set OFF|ON (default is OFF) to control use of <locale> header" OFF)
 
 option(POCO_NO_INOTIFY
-  "" OFF)
+  "Set OFF|ON (default is OFF) to control" OFF)
 
 # Following are options to remove certain features
 # to reduce library/executable size for smaller
