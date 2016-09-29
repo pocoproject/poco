@@ -95,6 +95,75 @@ option(POCO_STATIC
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
 
+# Config.h switches
+option(POCO_ENABLE_CPP11
+  "Set to OFF|ON (default is OFF) to control C++11 support" OFF)
+
+option(POCO_NO_AUTOMATIC_LIBS
+  "Set to OFF|ON (default is OFF) to control implicit linking" OFF)
+
+option(POCO_NO_SHAREDMEMORY
+  "Set to OFF|ON (default is OFF) to control shared memory" OFF)
+
+set(POCO_THREAD_PRIORITY_MIN 0 CACHE STRING
+  "")
+
+set(POCO_THREAD_PRIORITY_MAX 31 CACHE STRING
+  "")
+
+option(POCO_NO_WSTRING
+  "" OFF)
+
+option(POCO_NO_LOCALE
+  "" OFF)
+
+option(POCO_NO_INOTIFY
+  "" OFF)
+
+# Following are options to remove certain features
+# to reduce library/executable size for smaller
+# embedded platforms. By enabling these options,
+# the size of a statically executable can be
+# reduced by a few 100 Kbytes.
+option(POCO_NO_FILECHANNEL
+  "Set OFF|ON (default is OFF) to control automatic registration of FIleChannel in LoggingFactory" OFF)
+option(POCO_NO_SPLITTERCHANNEL
+  "Set OFF|ON (default is OFF) to control automatic registration of SplitterChannel in LoggingFactory" OFF)
+option(POCO_NO_SYSLOGCHANNEL
+  "Set OFF|ON (default is OFF) to control automatic registration of SyslogChannel in LoggingFactory" OFF)
+
+if(MSVC)
+    option(POCO_MSVC_SECURE_WARNINGS
+      "Set OFF|ON (default is OFF) to control MSVC secure warnings" OFF)
+endif()
+
+option(POCO_UTIL_NO_INIFILECONFIGURATION
+  "Set OFF|ON (default is OFF) to control support for INI file configurations in Poco::Util::Application" OFF)
+
+option(POCO_UTIL_NO_JSONCONFIGURATION
+  "Set OFF|ON (default is OFF) to control support for JSON configuration in Poco::Util::Application" OFF)
+
+option(POCO_UTIL_NO_XMLCONFIGURATION
+  "Set OFF|ON (default is OFF) to control support for XML configuration in Poco::Util::Application" OFF)
+
+option(POCO_NET_NO_IPv6
+  "Set OFF|ON (default is OFF) to control support for IPv6" OFF)
+
+option(POCO_LOG_DEBUG
+  "Set OFF|ON (default is OFF) to control poco_debug_* and poco_trace_* macros even if the _DEBUG var is not set" OFF)
+
+if(WIN32)
+    option(POCO_EXTERNAL_OPENSSL
+      "Set OFF|ON (default is OFF) to control use of bundled OpenSSL binaries" OFF)
+endif()
+
+# populate configure_file Config.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/Foundation/Config.h.in ${CMAKE_BINARY_DIR}/Poco/Config.h )
+include_directories( ${CMAKE_BINARY_DIR} )
+install(FILES ${CMAKE_BINARY_DIR}/Poco/Config.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/Poco/)
+
+mark_as_advanced(POCO_ENABLE_CPP11 POCO_NO_AUTOMATIC_LIBS POCO_NO_WSTRING POCO_NO_SHAREDMEMORY POCO_NO_LOCALE POCO_THREAD_PRIORITY_MIN POCO_THREAD_PRIORITY_MAX POCO_NO_INOTIFY POCO_NO_FILECHANNEL POCO_NO_SPLITTERCHANNEL POCO_NO_SYSLOGCHANNEL POCO_MSVC_SECURE_WARNINGS POCO_UTIL_NO_INIFILECONFIGURATION POCO_UTIL_NO_JSONCONFIGURATION POCO_UTIL_NO_XMLCONFIGURATION POCO_NET_NO_IPv6 POCO_LOG_DEBUG POCO_EXTERNAL_OPENSSL)
+
 if(MSVC)
     option(POCO_MT
       "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
