@@ -118,13 +118,17 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
     if (!assumeHeaderRead)
     {
         inp.read(_rawHeader, ZipCommon::HEADER_SIZE);
+		if (inp.gcount() != ZipCommon::HEADER_SIZE)
+			throw Poco::IOException("Failed to read local file header");
+		if (std::memcmp(_rawHeader, HEADER, ZipCommon::HEADER_SIZE) != 0)
+			throw Poco::DataFormatException("Bad local file header");
     }
     else
     {
         std::memcpy(_rawHeader, HEADER, ZipCommon::HEADER_SIZE);
     }
-    poco_assert (std::memcmp(_rawHeader, HEADER, ZipCommon::HEADER_SIZE) == 0);
-    // read the rest of the header
+
+        // read the rest of the header
     inp.read(_rawHeader + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
     poco_assert (_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED);
     poco_assert (getMajorVersionNumber() <= 4); // Allow for Zip64 version 4.5
