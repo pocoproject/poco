@@ -76,6 +76,7 @@
 					cCompiler.define "Foundation_EXPORTS"
 					cppCompiler.define "Foundation_EXPORTS"
 				}
+				out {}
 			}
 		}
 	}
