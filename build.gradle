@@ -62,6 +62,15 @@ task wrapper(type: Wrapper) {
 	gradleVersion = '3.1'
 }
 
+repositories {
+	mavenCentral()
+}
+
+/*
+dependencies {
+	testCompile group: 'org.jvnet.hudson.plugins', name: 'cppunit', version: '1.10'
+}
+*/
 
 allprojects {
 	apply plugin:  'c'
@@ -69,6 +78,7 @@ allprojects {
 	apply plugin:  'visual-studio'
 	apply plugin:  'cunit-test-suite'
 	apply plugin:  'cppunit-test-suite'
+
 
 	buildDir = new File("gradle")	
 	
@@ -127,7 +137,7 @@ allprojects {
 	 //       minimal
 			unbundled
 		}
-		
+
 		binaries {
 			all {
 				if (flavor == flavors.unbundled) {
@@ -190,6 +200,7 @@ allprojects {
 				}
 			}
 			withType(SharedLibraryBinarySpec) {
+//				targetPlatform "win32"
 				if (toolChain in VisualCpp) {
 					cCompiler.define '_USRDLL'
 					cCompiler.define '_WINDLL'
@@ -198,12 +209,14 @@ allprojects {
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
+//				targetPlatform "win32"
 				if (toolChain in VisualCpp) {
 					cCompiler.define 'POCO_STATIC'
 					cppCompiler.define 'POCO_STATIC'
 				}
 			}
 			withType(NativeExecutableSpec) {
+//				targetPlatform "win32"
 				if (toolChain in VisualCpp) {
 					
 				}
