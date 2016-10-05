@@ -1,0 +1,37 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bonjour", "Bonjour_CE_vs90.vcproj", "{D9257FF3-3A9A-41F6-B60E-D077EFF94186}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|Digi JumpStart (ARMV4I) = debug_shared|Digi JumpStart (ARMV4I)
+		release_shared|Digi JumpStart (ARMV4I) = release_shared|Digi JumpStart (ARMV4I)
+		debug_static_mt|Digi JumpStart (ARMV4I) = debug_static_mt|Digi JumpStart (ARMV4I)
+		release_static_mt|Digi JumpStart (ARMV4I) = release_static_mt|Digi JumpStart (ARMV4I)
+		debug_static_md|Digi JumpStart (ARMV4I) = debug_static_md|Digi JumpStart (ARMV4I)
+		release_static_md|Digi JumpStart (ARMV4I) = release_static_md|Digi JumpStart (ARMV4I)
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_shared|Digi JumpStart (ARMV4I).ActiveCfg = debug_shared|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_shared|Digi JumpStart (ARMV4I).Build.0 = debug_shared|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_shared|Digi JumpStart (ARMV4I).Deploy.0 = debug_shared|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_shared|Digi JumpStart (ARMV4I).ActiveCfg = release_shared|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_shared|Digi JumpStart (ARMV4I).Build.0 = release_shared|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_shared|Digi JumpStart (ARMV4I).Deploy.0 = release_shared|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_mt|Digi JumpStart (ARMV4I).ActiveCfg = debug_static_mt|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_mt|Digi JumpStart (ARMV4I).Build.0 = debug_static_mt|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_mt|Digi JumpStart (ARMV4I).Deploy.0 = debug_static_mt|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_mt|Digi JumpStart (ARMV4I).ActiveCfg = release_static_mt|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_mt|Digi JumpStart (ARMV4I).Build.0 = release_static_mt|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_mt|Digi JumpStart (ARMV4I).Deploy.0 = release_static_mt|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_md|Digi JumpStart (ARMV4I).ActiveCfg = debug_static_md|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_md|Digi JumpStart (ARMV4I).Build.0 = debug_static_md|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_md|Digi JumpStart (ARMV4I).Deploy.0 = debug_static_md|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_md|Digi JumpStart (ARMV4I).ActiveCfg = release_static_md|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_md|Digi JumpStart (ARMV4I).Build.0 = release_static_md|Digi JumpStart (ARMV4I)
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_md|Digi JumpStart (ARMV4I).Deploy.0 = release_static_md|Digi JumpStart (ARMV4I)
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

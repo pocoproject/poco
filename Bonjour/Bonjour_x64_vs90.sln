@@ -1,0 +1,37 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bonjour", "Bonjour_x64_vs90.vcproj", "{D9257FF3-3A9A-41F6-B60E-D077EFF94186}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|x64 = debug_shared|x64
+		release_shared|x64 = release_shared|x64
+		debug_static_mt|x64 = debug_static_mt|x64
+		release_static_mt|x64 = release_static_mt|x64
+		debug_static_md|x64 = debug_static_md|x64
+		release_static_md|x64 = release_static_md|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_shared|x64.Build.0 = debug_shared|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_shared|x64.Deploy.0 = debug_shared|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_shared|x64.ActiveCfg = release_shared|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_shared|x64.Build.0 = release_shared|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_shared|x64.Deploy.0 = release_shared|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_mt|x64.ActiveCfg = debug_static_mt|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_mt|x64.Build.0 = debug_static_mt|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_mt|x64.Deploy.0 = debug_static_mt|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_mt|x64.ActiveCfg = release_static_mt|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_mt|x64.Build.0 = release_static_mt|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_mt|x64.Deploy.0 = release_static_mt|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_md|x64.ActiveCfg = debug_static_md|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_md|x64.Build.0 = debug_static_md|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.debug_static_md|x64.Deploy.0 = debug_static_md|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_md|x64.ActiveCfg = release_static_md|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_md|x64.Build.0 = release_static_md|x64
+		{D9257FF3-3A9A-41F6-B60E-D077EFF94186}.release_static_md|x64.Deploy.0 = release_static_md|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

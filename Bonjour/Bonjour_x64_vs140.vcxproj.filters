@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Implementation">
+      <UniqueIdentifier>{e03a222f-16e7-48db-b432-04c37f37ed96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Implementation\Header Files">
+      <UniqueIdentifier>{72ccc966-4768-424e-ad15-7a87c746e4a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Implementation\Source Files">
+      <UniqueIdentifier>{ba6ba226-2ec9-4409-9428-7c75a93517f4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\DNSSD\Bonjour\Bonjour.h">
+      <Filter>Implementation\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\DNSSD\Bonjour\BonjourBrowserImpl.h">
+      <Filter>Implementation\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\DNSSD\Bonjour\BonjourResponderImpl.h">
+      <Filter>Implementation\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\DNSSD\Bonjour\EventLoop.h">
+      <Filter>Implementation\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\BonjourBrowserImpl.cpp">
+      <Filter>Implementation\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BonjourResponderImpl.cpp">
+      <Filter>Implementation\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EventLoop.cpp">
+      <Filter>Implementation\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

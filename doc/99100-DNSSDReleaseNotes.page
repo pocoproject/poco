@@ -1,0 +1,171 @@
+DNS-SD Release Notes
+DNS-SD
+
+!!!Release 2016.2
+
+!!Summary of Changes
+
+  - No changes since previous release.
+
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - None at this time.
+
+
+!!!Release 2016.1
+
+!!Summary of Changes
+
+  - No changes since previous release.
+
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - None at this time.
+
+
+!!!Release 2015.2
+
+!!Summary of Changes
+
+  - No changes since previous release.
+
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - None at this time.
+
+
+!!!Release 2015.1
+
+!!Summary of Changes
+
+  - Minor changes for compatibility with C++11.
+
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - None at this time.
+
+
+!!!Release 2014.1
+
+!!Summary of Changes
+
+  - Minor changes for compatibility with C++11.
+
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - None at this time.
+
+
+!!!Release 2013.2
+
+!!Summary of Changes
+
+  - No changes since previous release.
+
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - None at this time.
+
+
+!!!Release 2013.1
+
+!!Summary of Changes
+
+  - No changes since previous release.
+
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - None at this time.
+
+
+!!!Release 2012.1
+
+!!Summary of Changes
+
+  - No changes since previous release.
+
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - None at this time.
+
+
+!!!Release 2011.2
+
+!!Summary of Changes
+
+  - No changes since previous release.
+
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - None at this time.
+
+
+!!!Release 2011.1p1
+
+!!Summary of Changes
+
+  - Fixed a build error of the DNSSD/Avahi library on 64-bit Linux.
+  
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - None at this time.
+
+
+!!!Release 2011.1
+
+!!Summary of Changes
+
+  - This is the first release of the DNS-SD library.
+  
+!!Known Issues
+
+  - None at this time.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - The DNS-SD library replaces the previously available Zeroconf library.
+    Note that the DNS-SD library provides programming interfaces that are
+    different from those provided by the old Zeroconf library. Those parts
+    of an application interfacing with the Zeroconf library must be rewritten
+    to use the new DNS-SD library. However, this usually affects only a
+    very small part of an application and should not be much of an effort.
