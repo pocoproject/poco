@@ -170,7 +170,7 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 		destruct();
 		if (socketAddress.family() == IPv4)
 			newIPv4(reinterpret_cast<const sockaddr_in*>(socketAddress.addr()));
-#if defined(POCO_HAVE_IPv6)			
+#if defined(POCO_HAVE_IPv6)
 		else if (socketAddress.family() == IPv6)
 			newIPv6(reinterpret_cast<const sockaddr_in6*>(socketAddress.addr()));
 #endif
@@ -252,7 +252,7 @@ void SocketAddress::init(const std::string& hostAddress, Poco::UInt16 portNumber
 		{
 #if defined(POCO_HAVE_IPv6)
 			// if we get both IPv4 and IPv6 addresses, prefer IPv4
-			std::sort(addresses.begin(), addresses.end(), AFLT());
+			std::stable_sort(addresses.begin(), addresses.end(), AFLT());
 #endif
 			init(addresses[0], portNumber);
 		}
@@ -285,7 +285,7 @@ void SocketAddress::init(const std::string& hostAndPort)
 	std::string port;
 	std::string::const_iterator it  = hostAndPort.begin();
 	std::string::const_iterator end = hostAndPort.end();
-	
+
 #if defined(POCO_OS_FAMILY_UNIX)
 	if (*it == '/')
 	{
