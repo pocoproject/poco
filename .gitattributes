@@ -31,3 +31,8 @@
 *.png binary
 *.jpg binary
 *.gif binary
+
+# Linguist overrides
+.cpp linguist-language=C++
+.h linguist-language=C++
+

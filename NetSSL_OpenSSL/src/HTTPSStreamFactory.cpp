@@ -132,7 +132,8 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 					resolvedURI.setUserInfo(username + ":" + password);
 					authorize = false;
 				}
-				delete pSession; pSession = 0;
+				delete pSession; 
+				pSession = 0;
 				++redirects;
 				retry = true;
 			}

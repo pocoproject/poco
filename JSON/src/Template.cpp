@@ -350,14 +350,16 @@ private:
 
 
 Template::Template(const Path& templatePath)
-	: _parts(NULL)
+	: _parts(0)
+	, _currentPart(0)
 	, _templatePath(templatePath)
 {
 }
 
 
 Template::Template()
-	: _parts(NULL)
+	: _parts(0)
+	, _currentPart(0)
 {
 }
 
