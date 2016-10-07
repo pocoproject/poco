@@ -134,6 +134,12 @@ public:
 		/// Loads the XML document containing the configuration data
 		/// from the given InputSource.
 
+	void load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize);
+		/// Loads the XML document containing the configuration data
+		/// from the given InputSource. Uses the give namePoolSize (which 
+		/// should be a suitable prime like 251, 509, 1021, 4093) for the
+		/// internal DOM Document's name pool.
+
 	void load(std::istream& istr);
 		/// Loads the XML document containing the configuration data
 		/// from the given stream.
