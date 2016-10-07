@@ -111,12 +111,14 @@ public:
 	
 	void onSocketReadable(const AutoPtr<ReadableNotification>& pNf)
 	{
-		// some socket implementations (windows) report available 
-		// bytes on client disconnect, so we  double-check here
-		if (_socket.available())
+		int len = _socket.receiveBytes(_fifoIn);
+		if (len > 0)
 		{
-			int len = _socket.receiveBytes(_fifoIn);
 			_fifoIn.drain(_fifoOut.write(_fifoIn.buffer(), _fifoIn.used()));
+		}
+		else
+		{
+			delete this;
 		}
 	}
 	
