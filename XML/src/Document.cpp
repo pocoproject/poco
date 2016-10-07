@@ -57,6 +57,15 @@ Document::Document(NamePool* pNamePool):
 }
 
 
+Document::Document(unsigned long namePoolSize): 
+	AbstractContainerNode(0),
+	_pDocumentType(0),
+	_pNamePool(new NamePool(namePoolSize)),
+	_eventSuspendLevel(0)
+{
+}
+
+
 Document::Document(DocumentType* pDocumentType, NamePool* pNamePool): 
 	AbstractContainerNode(0),
 	_pDocumentType(pDocumentType),
@@ -71,6 +80,20 @@ Document::Document(DocumentType* pDocumentType, NamePool* pNamePool):
 	{
 		_pNamePool = new NamePool;
 	}
+	if (_pDocumentType)
+	{
+		_pDocumentType->duplicate();
+		_pDocumentType->setOwnerDocument(this);
+	}
+}
+
+
+Document::Document(DocumentType* pDocumentType, unsigned long namePoolSize): 
+	AbstractContainerNode(0),
+	_pDocumentType(pDocumentType),
+	_pNamePool(new NamePool(namePoolSize)),
+	_eventSuspendLevel(0)
+{
 	if (_pDocumentType)
 	{
 		_pDocumentType->duplicate();
