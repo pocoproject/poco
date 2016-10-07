@@ -25,6 +25,11 @@
 #include "Poco/XML/Name.h"
 
 
+#ifndef POCO_XML_NAMEPOOL_DEFAULT_SIZE
+#define POCO_XML_NAMEPOOL_DEFAULT_SIZE 509
+#endif
+
+
 namespace Poco {
 namespace XML {
 
@@ -37,7 +42,7 @@ class XML_API NamePool
 	/// local name and a qualified name.
 {
 public:
-	NamePool(unsigned long size = 251);
+	NamePool(unsigned long size = POCO_XML_NAMEPOOL_DEFAULT_SIZE);
 		/// Creates a name pool with room for up to size strings.
 	
 	const Name& insert(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName);	
