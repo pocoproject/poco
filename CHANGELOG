@@ -1,9 +1,30 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.7.6 (2016-09-xx)
+Release 1.7.6 (2016-10-10)
 ==========================
 
-- TODO
+- fixed GH #1298: ZipFileInfo: Assertion violation when reading ods files
+- fixed GH #1315: Redefine Poco assertions for static analysis 
+- fixed GH #1397: Fix issues reported by static source code analysis
+- fixed GH #1403: Android compile with poco-1.7.5 no 'pthread_condattr_setclock' error 
+- fixed GH #1416: Assertion violation when unzipping
+- fixed GH #1418: Poco::Delegate assignment operator fails to compile for some specializations
+- fixed GH #1422: Can't build poco 1.7.4 or 1.7.5 on centos5 32 bit
+- fixed GH #1429: exception thrown in MongoDB when using replicaset
+- fixed GH #1431: Poco/FIFOBuffer.h copy issue
+- fixed GH #1445: Use stable_sort to preserve order of IP addresses from DNS
+- Poco::XML::NamePool: increased default size from 251 to 509. Default size can now
+  be changed by defining the POCO_XML_NAMEPOOL_DEFAULT_SIZE macro accordingly.
+- Enchancements: Poco::XML::Document and Poco::XML::DOMParser have new constructors
+  taking a NamePool size. Poco::Util::XMLConfiguration::load() also has a new overload
+  for that purpose.
+- Improved error handling in the Zip library (getting rid of some poco_assert macros
+  and did proper error handling instead).
+- Added Poco::URISyntaxException (subclass of Poco::SyntaxException), which is now
+  thrown by Poco::URI.
+- Improved error handling in Poco::URIStreamOpener::open().
+- Poco::Data::MySQL: Handle connection lost/server gone error when starting a transaction
+  and retry.
 
 
 Release 1.7.5 (2016-08-29)
