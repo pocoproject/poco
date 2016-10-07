@@ -45,7 +45,11 @@ public:
 		/// If a NamePool is given, it becomes the Document's NamePool.
 		
 	explicit DOMParser(unsigned long namePoolSize);
-		/// Creates a new DOMParser, using the given name pool size.
+		/// Creates a new DOMParser, using the given NamePool size.
+		///
+		/// The given namePoolSize should be a suitable prime number, 
+		/// e.g. 251, 509, 1021 or 4093, depending on the expected
+		/// size of the document.
 
 	~DOMParser();
 		/// Destroys the DOMParser.
