@@ -111,20 +111,38 @@ public:
 	
 	void onSocketReadable(const AutoPtr<ReadableNotification>& pNf)
 	{
-		int len = _socket.receiveBytes(_fifoIn);
-		if (len > 0)
+		try
 		{
-			_fifoIn.drain(_fifoOut.write(_fifoIn.buffer(), _fifoIn.used()));
+			int len = _socket.receiveBytes(_fifoIn);
+			if (len > 0)
+			{
+				_fifoIn.drain(_fifoOut.write(_fifoIn.buffer(), _fifoIn.used()));
+			}
+			else
+			{
+				delete this;
+			}
 		}
-		else
+		catch (Poco::Exception& exc)
 		{
+			Application& app = Application::instance();
+			app.logger().log(exc);
 			delete this;
 		}
 	}
 	
 	void onSocketWritable(const AutoPtr<WritableNotification>& pNf)
 	{
-		_socket.sendBytes(_fifoOut);
+		try
+		{
+			_socket.sendBytes(_fifoOut);
+		}
+		catch (Poco::Exception& exc)
+		{
+			Application& app = Application::instance();
+			app.logger().log(exc);
+			delete this;
+		}
 	}
 
 	void onSocketShutdown(const AutoPtr<ShutdownNotification>& pNf)
