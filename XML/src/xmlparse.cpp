@@ -742,7 +742,7 @@ generate_hash_secret_salt(XML_Parser parser)
   if (sizeof(unsigned long) == 4) {
     return entropy * 2147483647;
   } else {
-    return entropy * (unsigned long)2305843009213693951;
+    return entropy * 2305843009213693951ULL;
   }
 }
 
