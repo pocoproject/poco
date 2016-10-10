@@ -9,7 +9,7 @@
 //
 // Feature configuration for the POCO libraries.
 //
-// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -90,7 +90,9 @@
 // !!! for std::aligned_storage.                           !!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // 
+#ifndef POCO_ENABLE_SOO
 #define POCO_NO_SOO
+#endif
 
 
 // Small object size in bytes. When assigned to Any or Var,
@@ -163,9 +165,16 @@
 	#define POCO_NO_LOCALE
 #endif
 
+
 // Enable the poco_debug_* and poco_trace_* macros
 // even if the _DEBUG variable is not set.
 // This allows the use of these macros in a release version.
 // #define POCO_LOG_DEBUG
+
+
+// Define to prevent changing the suffix for shared libraries
+// to "d.so", "d.dll", etc. for _DEBUG builds in Poco::SharedLibrary.
+// #define POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX
+
 
 #endif // Foundation_Config_INCLUDED

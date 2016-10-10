@@ -102,25 +102,25 @@ const std::string& SharedLibraryImpl::getPathImpl() const
 std::string SharedLibraryImpl::suffixImpl()
 {
 #if defined(__APPLE__)
-	#if defined(_DEBUG)
+	#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 		return "d.dylib";
 	#else
 		return ".dylib";
 	#endif
 #elif defined(hpux) || defined(_hpux)
-	#if defined(_DEBUG)
+	#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 		return "d.sl";
 	#else
 		return ".sl";
 	#endif
 #elif defined(__CYGWIN__)
-	#if defined(_DEBUG)
+	#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 		return "d.dll";
 	#else
 		return ".dll";
 	#endif
 #else
-	#if defined(_DEBUG)
+	#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 		return "d.so";
 	#else
 		return ".so";
