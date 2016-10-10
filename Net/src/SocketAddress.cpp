@@ -250,7 +250,7 @@ void SocketAddress::init(const std::string& hostAddress, Poco::UInt16 portNumber
 		HostEntry::AddressList addresses = he.addresses();
 		if (addresses.size() > 0)
 		{
-#if defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6) && defined(POCO_SOCKETADDRESS_PREFER_IPv4)
 			// if we get both IPv4 and IPv6 addresses, prefer IPv4
 			std::stable_sort(addresses.begin(), addresses.end(), AFLT());
 #endif
