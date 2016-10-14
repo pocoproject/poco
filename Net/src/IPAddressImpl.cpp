@@ -107,8 +107,8 @@ IPv4AddressImpl::IPv4AddressImpl(const IPv4AddressImpl& addr)
 
 IPv4AddressImpl& IPv4AddressImpl::operator = (const IPv4AddressImpl& addr)
 {
-    if (this == &addr)
-        return *this;
+	if (this == &addr)
+		return *this;
 
 	std::memcpy(&_addr, &addr._addr, sizeof(_addr));
 	return *this;
@@ -377,8 +377,8 @@ IPv6AddressImpl::IPv6AddressImpl(const IPv6AddressImpl& addr): _scope(addr._scop
 
 IPv6AddressImpl& IPv6AddressImpl::operator = (const IPv6AddressImpl& addr)
 {
-    if (this == &addr)
-        return *this;
+	if (this == &addr)
+		return *this;
 
 	_scope = addr._scope;
 	std::memcpy(&_addr, &addr._addr, sizeof(_addr));
@@ -696,8 +696,8 @@ IPAddressImpl* IPv6AddressImpl::clone() const
 
 IPv6AddressImpl IPv6AddressImpl::operator & (const IPv6AddressImpl& addr) const
 {
-    if (_scope != addr._scope)
-        throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match with the source one.");
+	if (_scope != addr._scope)
+		throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match with the source one.");
 
 	IPv6AddressImpl result(*this);
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -721,8 +721,8 @@ IPv6AddressImpl IPv6AddressImpl::operator & (const IPv6AddressImpl& addr) const
 
 IPv6AddressImpl IPv6AddressImpl::operator | (const IPv6AddressImpl& addr) const
 {
-    if (_scope != addr._scope) 
-        throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match with the source one.");
+	if (_scope != addr._scope) 
+		throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match with the source one.");
     
 	IPv6AddressImpl result(*this);
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -746,8 +746,8 @@ IPv6AddressImpl IPv6AddressImpl::operator | (const IPv6AddressImpl& addr) const
 
 IPv6AddressImpl IPv6AddressImpl::operator ^ (const IPv6AddressImpl& addr) const
 {
-    if (_scope != addr._scope)
-        throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match  with the source one.");
+	if (_scope != addr._scope)
+		throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match  with the source one.");
     
 	IPv6AddressImpl result(*this);
 
