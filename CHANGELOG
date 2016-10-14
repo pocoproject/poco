@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.7.6 (2016-10-10)
+Release 1.7.6 (2016-10-17)
 ==========================
 
 - fixed GH #1298: ZipFileInfo: Assertion violation when reading ods files
