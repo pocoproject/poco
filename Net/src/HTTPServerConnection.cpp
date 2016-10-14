@@ -78,7 +78,11 @@ void HTTPServerConnection::run()
 					response.set("Server", server);
 				try
 				{
+#if __cplusplus < 201103L
 					std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
+#else
+					std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
+#endif
 					if (pHandler.get())
 					{
 						if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)
