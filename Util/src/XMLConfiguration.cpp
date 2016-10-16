@@ -39,12 +39,14 @@ namespace Util {
 XMLConfiguration::XMLConfiguration():
 	_delim('.')
 {
+	loadEmpty("config");
 }
 
 
 XMLConfiguration::XMLConfiguration(char delim):
 	_delim(delim)
 {
+	loadEmpty("config");
 }
 
 

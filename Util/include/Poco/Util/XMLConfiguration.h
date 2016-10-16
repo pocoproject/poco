@@ -83,11 +83,11 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 {
 public:
 	XMLConfiguration();
-		/// Creates an empty XMLConfiguration.
+		/// Creates an empty XMLConfiguration with a "config" root element.
 
 	XMLConfiguration(char delim);
-		/// Creates an empty XMLConfiguration, using the given
-		/// delimiter char instead of the default '.'.
+		/// Creates an empty XMLConfiguration with a "config" root element,
+		/// using the given delimiter char instead of the default '.'.
 
 	XMLConfiguration(Poco::XML::InputSource* pInputSource);
 		/// Creates an XMLConfiguration and loads the XML document from
