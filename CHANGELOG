@@ -25,6 +25,9 @@ Release 1.7.6 (2016-10-17)
 - Improved error handling in Poco::URIStreamOpener::open().
 - Poco::Data::MySQL: Handle connection lost/server gone error when starting a transaction
   and retry.
+- XMLConfiguration default (and single-argument delimiter) constructor now loads an empty 
+  XML document with "config" root element to make the configuration usable without an 
+  additional call to load() or loadEmpty().
 
 
 Release 1.7.5 (2016-08-29)
