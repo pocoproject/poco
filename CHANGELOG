@@ -13,6 +13,8 @@ Release 1.7.6 (2016-10-17)
 - fixed GH #1429: exception thrown in MongoDB when using replicaset
 - fixed GH #1431: Poco/FIFOBuffer.h copy issue
 - fixed GH #1445: Use stable_sort to preserve order of IP addresses from DNS
+- fixed GH #1456: better handle leap seconds in Poco::DateTime and Poco::LocalDateTime
+- fixed GH #1458: Probably invalid epoll_create() usage inside Poco/Socket.cpp
 - Poco::XML::NamePool: increased default size from 251 to 509. Default size can now
   be changed by defining the POCO_XML_NAMEPOOL_DEFAULT_SIZE macro accordingly.
 - Enchancements: Poco::XML::Document and Poco::XML::DOMParser have new constructors
