@@ -144,6 +144,8 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		}
 
 		epollSize = eventLast - eventsIn;
+		if (epollSize == 0) return 0;
+		
 		epollfd = epoll_create(1);
 		if (epollfd < 0)
 		{
