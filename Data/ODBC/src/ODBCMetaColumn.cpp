@@ -113,12 +113,18 @@ void ODBCMetaColumn::init()
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
 		if (0 == _columnDesc.decimalDigits)
-			setType(MetaColumn::FDT_INT32);
+		{
+			if (_columnDesc.size > 9)
+				setType(MetaColumn::FDT_INT64);
+			else
+				setType(MetaColumn::FDT_INT32);
+		}
 		else
+		{
 			setType(MetaColumn::FDT_DOUBLE);
-		
+		}
 		break;
-	
+
 	case SQL_REAL:
 		setType(MetaColumn::FDT_FLOAT); break;
 	
