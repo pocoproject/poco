@@ -222,23 +222,22 @@ allprojects {
 				}
 			}
 			withType(SharedLibraryBinarySpec) {
-//				targetPlatform "win32"
 				if (toolChain in VisualCpp) {
-					cCompiler.define '_USRDLL'
-					cCompiler.define '_WINDLL'
+					cCompiler.define   '_USRDLL'
+					cCompiler.define   '_WINDLL'
 					cppCompiler.define '_USRDLL'
 					cppCompiler.define '_WINDLL'
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
-//				targetPlatform "win32"
 				if (toolChain in VisualCpp) {
-					cCompiler.define 'POCO_STATIC'
+					cCompiler.define   '_LIB'
+					cppCompiler.define '_LIB'
+					cCompiler.define   'POCO_STATIC'
 					cppCompiler.define 'POCO_STATIC'
 				}
 			}
 			withType(NativeExecutableSpec) {
-//				targetPlatform "win32"
 				if (toolChain in VisualCpp) {
 					
 				}
