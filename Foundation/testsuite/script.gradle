@@ -1,7 +1,6 @@
 	model {
 		components {
-/*
-			TestApp(SharedLibraryBinarySpec) {
+			TestApp(NativeLibrarySpec) {
 				sources {
 					cpp {
 						source {
@@ -13,7 +12,19 @@
 					}
 				}
 			}
-*/
+			TestLib(NativeLibrarySpec) {
+				sources {
+					cpp {
+						source {
+							srcDir 'src'
+							include 'TestLibrary.cpp'
+							include 'TestPlugin.cpp'
+						}
+						lib project: ':CppUnit', library: 'PocoCppUnit'
+						lib project: ':Foundation', library: 'PocoFoundation'
+					}
+				}
+			}
 			FoundationTestRunner(NativeLibrarySpec) {
 				sources {
 					cpp {
@@ -23,6 +34,10 @@
 							exclude 'WinDriver.cpp'
 							exclude '*_WINCE.cpp'
 							exclude 'TestApp*.cpp'
+							exclude 'Driver.cpp'
+						}
+						exportedHeaders {
+							srcDir 'src'
 						}
 						lib project: ':CppUnit', library: 'PocoCppUnit'
 						lib project: ':Foundation', library: 'PocoFoundation'
@@ -32,7 +47,7 @@
 		}
 		testSuites {
 			FoundationTestSuite(CppUnitTestSuiteSpec) {
-				testing $.components.FoundationTestRunner
+				testing $.components.FoundationTestRunner 
 			}
 		}
 		binaries {
@@ -47,26 +62,8 @@
 		}
 
 	}
+	tasks.withType(RunTestExecutable) {
+		args "-print"
+	}
 
-task testrunner(type:Exec) {
-  workingDir '../tomcat/bin'
 
-  //on windows:
-  commandLine 'cmd', '/c', 'stop.bat'
-
-  //on linux
-  commandLine './stop.sh'
-
-  //store the output instead of printing to the console:
-  standardOutput = new ByteArrayOutputStream()
-
-  //extension method stopTomcat.output() can be used to obtain the output:
-  ext.output = {
-    return standardOutput.toString()
-  }
-}
-
-task hello(type: Exec) {
-  executable "cmd.exe"
-  args "echo",  "'hello from your shell'"
-}

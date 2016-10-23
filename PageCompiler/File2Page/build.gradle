@@ -1,7 +1,7 @@
-project(":PageCompiler") {
+project(":PageCompiler:File2Page") {
 	model {
 		components {
-			PocoPageCompiler(NativeExecutableSpec) {
+			PocoFile2page(NativeExecutableSpec) {
 				sources {
 					cpp {
 						source {

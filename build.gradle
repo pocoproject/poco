@@ -82,7 +82,7 @@ allprojects {
 
 	buildDir = new File("gradle")	
 	
-   def addCompilerFlag = { NativeBinarySpec binary, String flag ->
+	def addCompilerFlag = { NativeBinarySpec binary, String flag ->
         if (binary.hasProperty("cppCompiler")) {
             binary.cppCompiler.args flag
         }
@@ -101,6 +101,28 @@ allprojects {
     }
 
 	model {
+    repositories {
+        libs(PrebuiltLibraries) {
+			def opensslDir = "$rootDir/openssl"
+            crypto {
+				headers.srcDir "$opensslDir/include"
+
+                binaries.withType(StaticLibraryBinary) {
+					def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
+                    staticLibraryFile = file("$opensslDir/win32/bin/release/$libName")
+				}
+			}
+            ssl {
+				headers.srcDir "$opensslDir/include"
+
+                binaries.withType(StaticLibraryBinary) {
+					def libName = targetPlatform.operatingSystem.windows ? 'ssleay32MD.lib' : 'libssl.a'
+                    staticLibraryFile = file("$opensslDir/win32/bin/release/$libName")
+                }
+            }
+        }
+    }
+
 /*
 	   all {
 			binaries.withType(NativeBinarySpec).afterEach { binary ->
@@ -230,10 +252,3 @@ subprojects {
 	apply plugin:	'windows-messages'
 }
 
-gradle.afterProject {project, projectState ->
-    if (projectState.failure) {
-        println "Evaluation of $project FAILED"
-    } else {
-        println "Evaluation of $project succeeded"
-    }
-}

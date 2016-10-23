@@ -1,24 +1,15 @@
-project(":PDF") {
+project(":PocoDoc") {
 	model {
 		components {
-			PocoPDF(NativeLibrarySpec) {
+			PocoPocoDoc(NativeLibrarySpec) {
 				sources {
-					c {
-						source {
-							srcDir 'src'
-							include '**/*.c'
-						}
-						exportedHeaders {
-							srcDirs 'include', 'include/Poco/PDF'
-						}
-					}
 					cpp {
 						source {
 							srcDir 'src'
 							include '**/*.cpp'
 						}
 						exportedHeaders {
-							srcDirs 'include', 'include/Poco/PDF'
+							srcDir 'include'
 						}
 					}
 				}
@@ -28,13 +19,15 @@ project(":PDF") {
 			all {
 			}
 			withType(SharedLibraryBinarySpec) {
+				lib project: ':CppParser', library: 'PocoCppParser', linkage: 'shared'
 				lib project: ':Util', library: 'PocoUtil', linkage: 'shared'
 				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
 				if (toolChain in VisualCpp) {
-					 cppCompiler.define "PDF_EXPORTS"
+					 cppCompiler.define "PocoDoc_EXPORTS"
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
+				lib project: ':CppParser', library: 'PocoCppParser', linkage: 'static'
 				lib project: ':Util', library: 'PocoUtil', linkage: 'static'
 				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
 			}

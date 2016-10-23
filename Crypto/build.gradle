@@ -11,6 +11,8 @@ project(":Crypto") {
 						exportedHeaders {
 							srcDir 'include'
 						}
+						lib library: 'ssl', linkage: 'static'
+						lib library: 'crypto', linkage: 'static'
 					}
 				}
 			}
