@@ -33,8 +33,8 @@ namespace Net {
 class TCPConnectionNotification: public Notification
 {
 public:
-	TCPConnectionNotification(const StreamSocket& rSocket):
-		_socket(rSocket)
+	TCPConnectionNotification(const StreamSocket& socket):
+		_socket(socket)
 	{
 	}
 	
@@ -110,7 +110,11 @@ void TCPServerDispatcher::run()
 			TCPConnectionNotification* pCNf = dynamic_cast<TCPConnectionNotification*>(pNf.get());
 			if (pCNf)
 			{
+#if __cplusplus < 201103L
 				std::auto_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
+#else
+				std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
+#endif
 				poco_check_ptr(pConnection.get());
 				beginConnection();
 				pConnection->start();

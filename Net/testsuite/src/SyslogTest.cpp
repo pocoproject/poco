@@ -112,7 +112,7 @@ void CachingChannel::getMessages(std::vector<Poco::Message>& msg, int offset, in
 }
 
 
-SyslogTest::SyslogTest(const std::string& rName): CppUnit::TestCase(rName)
+SyslogTest::SyslogTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

@@ -41,8 +41,8 @@ Context::Params::Params():
 }
 
 
-Context::Context(Usage contextUsage, const Params& params):
-	_usage(contextUsage),
+Context::Context(Usage usage, const Params& params):
+	_usage(usage),
 	_mode(params.verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true)
@@ -52,16 +52,16 @@ Context::Context(Usage contextUsage, const Params& params):
 
 
 Context::Context(
-	Usage contextUsage,
+	Usage usage,
 	const std::string& privateKeyFile, 
 	const std::string& certificateFile,
 	const std::string& caLocation, 
-	VerificationMode mode,
+	VerificationMode verificationMode,
 	int verificationDepth,
 	bool loadDefaultCAs,
 	const std::string& cipherList):
-	_usage(contextUsage),
-	_mode(mode),
+	_usage(usage),
+	_mode(verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true)
 {
@@ -69,7 +69,7 @@ Context::Context(
 	params.privateKeyFile = privateKeyFile;
 	params.certificateFile = certificateFile;
 	params.caLocation = caLocation;
-	params.verificationMode = mode;
+	params.verificationMode = verificationMode;
 	params.verificationDepth = verificationDepth;
 	params.loadDefaultCAs = loadDefaultCAs;
 	params.cipherList = cipherList;
@@ -78,20 +78,20 @@ Context::Context(
 
 
 Context::Context(
-	Usage contextUsage,
+	Usage usage,
 	const std::string& caLocation, 
-	VerificationMode mode,
+	VerificationMode verificationMode,
 	int verificationDepth,
 	bool loadDefaultCAs,
 	const std::string& cipherList):
-	_usage(contextUsage),
-	_mode(mode),
+	_usage(usage),
+	_mode(verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true)
 {
 	Params params;
 	params.caLocation = caLocation;
-	params.verificationMode = mode;
+	params.verificationMode = verificationMode;
 	params.verificationDepth = verificationDepth;
 	params.loadDefaultCAs = loadDefaultCAs;
 	params.cipherList = cipherList;

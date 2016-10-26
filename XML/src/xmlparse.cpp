@@ -7,12 +7,19 @@
 #include <assert.h>
 #include <limits.h>                     /* UINT_MAX */
 
-#ifdef _WIN32
-#define getpid GetCurrentProcessId
+#define EXPAT_POCO 1
+
+#if defined(EXPAT_POCO)
+#include "Poco/Process.h"
+#include "Poco/Timestamp.h"
+#define platform_getpid Poco::Process::id
+#elif defined(_WIN32)
+#define platform_getpid GetCurrentProcessId
 #else
 #include <sys/time.h>                   /* gettimeofday() */
 #include <sys/types.h>                  /* getpid() */
 #include <unistd.h>                     /* getpid() */
+#define platform_getpid getpid
 #endif
 
 #define XML_BUILDING_EXPAT 1
@@ -703,9 +710,11 @@ static const XML_Char implicitContext[] = {
 };
 
 static unsigned long
-gather_time_entropy(void)
+platform_gather_time_entropy(void)
 {
-#ifdef WIN32
+#if defined(EXPAT_POCO)
+  return static_cast<unsigned long>(Poco::Timestamp().utcTime());
+#elif defined(_WIN32)
   FILETIME ft;
   GetSystemTimeAsFileTime(&ft); /* never fails */
   return ft.dwHighDateTime ^ ft.dwLowDateTime;
@@ -727,14 +736,14 @@ generate_hash_secret_salt(XML_Parser parser)
   /* Process ID is 0 bits entropy if attacker has local access
    * XML_Parser address is few bits of entropy if attacker has local access */
   const unsigned long entropy =
-      gather_time_entropy() ^ getpid() ^ (unsigned long)parser;
+      platform_gather_time_entropy() ^ platform_getpid() ^ (unsigned long)parser;
 
   /* Factors are 2^31-1 and 2^61-1 (Mersenne primes M31 and M61) */
-  if (sizeof(unsigned long) == 4) {
-    return entropy * 2147483647;
-  } else {
-    return entropy * (unsigned long)2305843009213693951;
-  }
+#ifdef POCO_LONG_IS_64_BIT
+  return entropy * 2305843009213693951ULL;
+#else
+  return entropy * 2147483647;
+#endif
 }
 
 static XML_Bool  /* only valid for root parser */

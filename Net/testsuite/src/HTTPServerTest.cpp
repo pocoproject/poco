@@ -128,7 +128,7 @@ namespace
 }
 
 
-HTTPServerTest::HTTPServerTest(const std::string& rName): CppUnit::TestCase(rName)
+HTTPServerTest::HTTPServerTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

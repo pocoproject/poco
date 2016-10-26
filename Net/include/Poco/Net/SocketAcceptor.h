@@ -69,16 +69,16 @@ class SocketAcceptor
 	/// if special steps are necessary to create a ServiceHandler object.
 {
 public:
-	explicit SocketAcceptor(ServerSocket& rSocket):
-		_socket(rSocket),
+	explicit SocketAcceptor(ServerSocket& socket):
+		_socket(socket),
 		_pReactor(0)
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 	{
 	}
 
-	SocketAcceptor(ServerSocket& rSocket, SocketReactor& rReactor):
-		_socket(rSocket),
-		_pReactor(&rReactor)
+	SocketAcceptor(ServerSocket& socket, SocketReactor& reactor):
+		_socket(socket),
+		_pReactor(&reactor)
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 		/// The SocketAcceptor registers itself with the given SocketReactor.
 	{
@@ -103,18 +103,18 @@ public:
 		}
 	}
 
-	void setReactor(SocketReactor& rReactor)
+	void setReactor(SocketReactor& reactor)
 		/// Sets the reactor for this acceptor.
 	{
-		_pReactor = &rReactor;
+		_pReactor = &reactor;
 		if (!_pReactor->hasEventHandler(_socket, Poco::Observer<SocketAcceptor,
 			ReadableNotification>(*this, &SocketAcceptor::onAccept)))
 		{
-			registerAcceptor(rReactor);
+			registerAcceptor(reactor);
 		}
 	}
 
-	virtual void registerAcceptor(SocketReactor& rReactor)
+	virtual void registerAcceptor(SocketReactor& reactor)
 		/// Registers the SocketAcceptor with a SocketReactor.
 		///
 		/// A subclass can override this function to e.g.
@@ -128,7 +128,7 @@ public:
 		if (_pReactor)
 			throw Poco::InvalidAccessException("Acceptor already registered.");
 
-		_pReactor = &rReactor;
+		_pReactor = &reactor;
 		_pReactor->addEventHandler(_socket, Poco::Observer<SocketAcceptor, ReadableNotification>(*this, &SocketAcceptor::onAccept));
 	}
 	
@@ -158,12 +158,12 @@ public:
 	}
 	
 protected:
-	virtual ServiceHandler* createServiceHandler(StreamSocket& rSocket)
+	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
 		/// Create and initialize a new ServiceHandler instance.
 		///
 		/// Subclasses can override this method.
 	{
-		return new ServiceHandler(rSocket, *_pReactor);
+		return new ServiceHandler(socket, *_pReactor);
 	}
 
 	SocketReactor* reactor()

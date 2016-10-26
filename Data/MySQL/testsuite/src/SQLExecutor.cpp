@@ -35,6 +35,12 @@
 #define HAVE_STRUCT_TIMESPEC
 #endif
 
+#if (POCO_OS == POCO_OS_CYGWIN)
+typedef unsigned short  ushort;         /* System V compatibility */
+typedef unsigned int    uint;           /* System V compatibility */
+typedef unsigned long   ulong;          /* System V compatibility */
+#endif
+
 #include <my_global.h>
 #include <mysql.h>
 

@@ -31,31 +31,33 @@ Poco::DateTime ZipUtil::parseDateTime(const char* pVal, const Poco::UInt32 timeP
 {
 	Poco::UInt16 time = ZipUtil::get16BitValue(pVal, timePos);
 	Poco::UInt16 date = ZipUtil::get16BitValue(pVal, datePos);
-	//TIME: second 0-4, minute 5-10, hour 11-15, second resolution is 2!
-	int sec = 2*(time & 0x001fu);         // 0000 0000 0001 1111
-	int min = ((time & 0x07e0u) >> 5);  // 0000 0111 1110 0000
-	int hour= ((time & 0xf800u) >> 11); // 1111 1000 0000 0000
+	// TIME: second 0-4, minute 5-10, hour 11-15, second resolution is 2!
+	int sec  = 2*(time & 0x001fu);           // 0000 0000 0001 1111
+	int min  = ((time & 0x07e0u) >> 5);      // 0000 0111 1110 0000
+	int hour = ((time & 0xf800u) >> 11);     // 1111 1000 0000 0000
 
-	//DATE: day 0-4, month 5-8, year (starting with 1980): 9-16
-	int day = (date & 0x001fu);        // 0000 0000 0001 1111
-	int mon = ((date & 0x01e0u) >> 5); // 0000 0001 1110 0000
-	int year= 1980+((date & 0xfe00u) >> 9); // 1111 1110 0000 0000
-	return Poco::DateTime(year, mon, day, hour, min, sec);
+	// DATE: day 0-4, month 5-8, year (starting with 1980): 9-16
+	int day  = (date & 0x001fu);             // 0000 0000 0001 1111
+	int mon  = ((date & 0x01e0u) >> 5);      // 0000 0001 1110 0000
+	int year = 1980+((date & 0xfe00u) >> 9); // 1111 1110 0000 0000
+	
+	if (Poco::DateTime::isValid(year, mon, day, hour, min, sec))
+		return Poco::DateTime(year, mon, day, hour, min, sec);
+	else
+		return Poco::DateTime(1970, 01, 01);
 }
 
 
 void ZipUtil::setDateTime(const Poco::DateTime& dt, char* pVal, const Poco::UInt32 timePos, const Poco::UInt32 datePos)
 {
-	//TIME: second 0-4, minute 5-10, hour 11-15
+	// TIME: second 0-4, minute 5-10, hour 11-15
 	Poco::UInt16 time = static_cast<Poco::UInt16>((dt.second()/2) + (dt.minute()<<5) + (dt.hour()<<11));
-	//DATE: day 0-4, month 5-8, year (starting with 1980): 9-16
+	// DATE: day 0-4, month 5-8, year (starting with 1980): 9-16
 	int year = dt.year() - 1980;
-	if (year<0)
-		year = 0;
+	if (year < 0) year = 0;
 	Poco::UInt16 date = static_cast<Poco::UInt16>(dt.day() + (dt.month()<<5) + (year<<9));
 	ZipUtil::set16BitValue(time, pVal, timePos);
 	ZipUtil::set16BitValue(date, pVal, datePos);
-
 }
 
 
@@ -117,31 +119,23 @@ void ZipUtil::sync(std::istream& in)
 			{
 				if (std::memcmp(ZipLocalFileHeader::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0)
 				{
-					in.putback(ZipLocalFileHeader::HEADER[3]);
-					in.putback(ZipLocalFileHeader::HEADER[2]);
-					in.putback(ZipLocalFileHeader::HEADER[1]);
-					in.putback(ZipLocalFileHeader::HEADER[0]);
+					in.seekg(-4, std::ios::cur);
+					if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
 				}
 				else if (std::memcmp(ZipArchiveInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0)
 				{
-					in.putback(ZipArchiveInfo::HEADER[3]);
-					in.putback(ZipArchiveInfo::HEADER[2]);
-					in.putback(ZipArchiveInfo::HEADER[1]);
-					in.putback(ZipArchiveInfo::HEADER[0]);
+					in.seekg(-4, std::ios::cur);
+					if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
 				}
 				else if (std::memcmp(ZipFileInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0)
 				{
-					in.putback(ZipFileInfo::HEADER[3]);
-					in.putback(ZipFileInfo::HEADER[2]);
-					in.putback(ZipFileInfo::HEADER[1]);
-					in.putback(ZipFileInfo::HEADER[0]);
+					in.seekg(-4, std::ios::cur);
+					if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
 				}
 				else
 				{
-					in.putback(ZipDataInfo::HEADER[3]);
-					in.putback(ZipDataInfo::HEADER[2]);
-					in.putback(ZipDataInfo::HEADER[1]);
-					in.putback(ZipDataInfo::HEADER[0]);
+					in.seekg(-4, std::ios::cur);
+					if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
 				}
 				return;
 			}
@@ -149,6 +143,7 @@ void ZipUtil::sync(std::istream& in)
 			{
 				// we have read 2 bytes, should only be one: putback the last char
 				in.putback(temp[tempPos - 1]);
+				if (!in.good()) throw Poco::IOException("Failed to putback on input stream");
 				--tempPos;
 			}
 		}

@@ -45,10 +45,10 @@ SimpleFileChannelTest::~SimpleFileChannelTest()
 
 void SimpleFileChannelTest::testRotate()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<SimpleFileChannel> pChannel = new SimpleFileChannel(fileName);
+		AutoPtr<SimpleFileChannel> pChannel = new SimpleFileChannel(name);
 		pChannel->setProperty(SimpleFileChannel::PROP_ROTATION, "2 K");
 		pChannel->open();
 		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
@@ -56,18 +56,18 @@ void SimpleFileChannelTest::testRotate()
 		{
 			pChannel->log(msg);
 		}
-		File f(fileName);
+		File f(name);
 		assert (f.exists());
-		f = fileName + ".0";
+		f = name + ".0";
 		assert (f.exists());
 		assert (f.getSize() >= 2048);
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
@@ -94,11 +94,11 @@ void SimpleFileChannelTest::remove(const std::string& baseName)
 		}
 		++it;
 	}
-	for (std::vector<std::string>::iterator itFiles = files.begin(); itFiles != files.end(); ++itFiles)
+	for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it)
 	{
 		try
 		{
-			File f(*itFiles);
+			File f(*it);
 			f.remove();
 		}
 		catch (...)
@@ -110,10 +110,10 @@ void SimpleFileChannelTest::remove(const std::string& baseName)
 
 std::string SimpleFileChannelTest::filename() const
 {
-	std::string ret = "log_";
-	ret.append(DateTimeFormatter::format(Timestamp(), "%Y%m%d%H%M%S"));
-	ret.append(".log");
-	return ret;
+	std::string name = "log_";
+	name.append(DateTimeFormatter::format(Timestamp(), "%Y%m%d%H%M%S"));
+	name.append(".log");
+	return name;
 }
 
 

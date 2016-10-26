@@ -34,7 +34,7 @@ using Poco::InvalidAccessException;
 using Poco::NotFoundException;
 
 
-SystemConfigurationTest::SystemConfigurationTest(const std::string& rName): CppUnit::TestCase(rName)
+SystemConfigurationTest::SystemConfigurationTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

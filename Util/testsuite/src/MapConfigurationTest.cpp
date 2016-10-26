@@ -22,7 +22,7 @@ using Poco::Util::MapConfiguration;
 using Poco::AutoPtr;
 
 
-MapConfigurationTest::MapConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName)
+MapConfigurationTest::MapConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 

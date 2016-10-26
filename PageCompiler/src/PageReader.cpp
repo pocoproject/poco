@@ -267,7 +267,7 @@ void PageReader::nextToken(std::istream& istr, std::string& token)
 		if (ch == '<' && istr.peek() == '%')
 		{
 			token += "<%";
-			ch = istr.get();
+			istr.get();
 			ch = istr.peek();
 			switch (ch)
 			{
@@ -300,7 +300,7 @@ void PageReader::nextToken(std::istream& istr, std::string& token)
 		else if (ch == '%' && istr.peek() == '>')
 		{
 			token += "%>";
-			ch = istr.get();
+			istr.get();
 		}
 		else token += (char) ch;
 	}

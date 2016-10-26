@@ -3,7 +3,7 @@
 #
 # Yocto
 #
-# Make settings for Linux/GCC ARM
+# Make settings for Yocto Linux/GCC ARM
 #
 #
 
@@ -11,7 +11,7 @@
 # General Settings
 #
 LINKMODE           ?= SHARED
-TOOL               ?= arm-linux
+TOOL               ?= arm-poky-linux-gnueabi
 POCO_TARGET_OSNAME  = Linux
 POCO_TARGET_OSARCH ?= armv7l
 
