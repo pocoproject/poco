@@ -73,11 +73,16 @@ dependencies {
 */
 
 allprojects {
-	apply plugin:  'c'
-	apply plugin:  'cpp'
-	apply plugin:  'visual-studio'
-	apply plugin:  'cunit-test-suite'
-	apply plugin:  'cppunit-test-suite'
+}
+
+subprojects {
+	apply plugin:	'c'
+	apply plugin:	'cpp'
+	apply plugin:	'visual-studio'
+	apply plugin:	'cunit-test-suite'
+	apply plugin:	'cppunit-test-suite'
+ 	apply plugin:	'windows-resources'
+	apply plugin:	'windows-messages'
 
 
 	buildDir = new File("gradle")	
@@ -101,27 +106,27 @@ allprojects {
     }
 
 	model {
-    repositories {
-        libs(PrebuiltLibraries) {
-			def opensslDir = "$rootDir/openssl"
-            crypto {
-				headers.srcDir "$opensslDir/include"
+	    repositories {
+	        libs(PrebuiltLibraries) {
+				def opensslDir = "$rootDir/openssl"
+	            crypto {
+					headers.srcDir "$opensslDir/include"
 
-                binaries.withType(StaticLibraryBinary) {
-					def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
-                    staticLibraryFile = file("$opensslDir/win32/bin/release/$libName")
+	                binaries.withType(StaticLibraryBinary) {
+						def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
+	                    staticLibraryFile = file("$opensslDir/win32/bin/release/$libName")
+					}
 				}
-			}
-            ssl {
-				headers.srcDir "$opensslDir/include"
+	            ssl {
+					headers.srcDir "$opensslDir/include"
 
-                binaries.withType(StaticLibraryBinary) {
-					def libName = targetPlatform.operatingSystem.windows ? 'ssleay32MD.lib' : 'libssl.a'
-                    staticLibraryFile = file("$opensslDir/win32/bin/release/$libName")
-                }
-            }
-        }
-    }
+	                binaries.withType(StaticLibraryBinary) {
+						def libName = targetPlatform.operatingSystem.windows ? 'ssleay32MD.lib' : 'libssl.a'
+	                    staticLibraryFile = file("$opensslDir/win32/bin/release/$libName")
+   	             }
+ 	           }
+ 	       }
+ 	   }
 
 /*
 	   all {
@@ -130,11 +135,6 @@ allprojects {
 			}
 		}
 */
-		buildTypes {
-			debug
-//	        release
-		}
-
 		
 		platforms {
 			win32 {
@@ -159,6 +159,11 @@ allprojects {
 	 //       minimal
 			unbundled
 		}
+
+    	buildTypes {
+    	    debug
+    	    release
+	   	}
 
 		binaries {
 			all {
@@ -243,11 +248,16 @@ allprojects {
 				}
 			}
 		}
-	}
-}
-
-subprojects {
- 	apply plugin:	'windows-resources'
-	apply plugin:	'windows-messages'
+    	components {
+			withType(NativeLibrarySpec) {
+				if (buildType == buildTypes.debug) {
+     				baseName "Poco${project.name}d"
+				}
+				if (buildType == buildTypes.release) {
+     				baseName "Poco${project.name}"
+				}
+			}
+		}
+    }
 }
 

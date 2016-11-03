@@ -1,7 +1,7 @@
 project(":CppUnit") {
 	model {
 		components {
-			PocoCppUnit(NativeLibrarySpec) {
+			CppUnit(NativeLibrarySpec) {
 				sources {
 					cpp {
 						source {

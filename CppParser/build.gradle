@@ -1,7 +1,8 @@
 project(":CppParser") {
 	model {
 		components {
-			PocoCppParser(NativeLibrarySpec) {
+			CppParser(NativeLibrarySpec) {
+				baseName 'PocoCppParser'
 				sources {
 					cpp {
 						source {
@@ -19,13 +20,13 @@ project(":CppParser") {
 			all {
 			}
 			withType(SharedLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				if (toolChain in VisualCpp) {
 					 cppCompiler.define "CppParser_EXPORTS"
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 project(":Crypto") {
 	model {
 		components {
-			PocoCrypto(NativeLibrarySpec) {
+			Crypto(NativeLibrarySpec) {
 				sources {
 					cpp {
 						source {
@@ -23,13 +23,13 @@ project(":Crypto") {
 				linker.args "iphlpapi.lib"
 			}
 			withType(SharedLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				if (toolChain in VisualCpp) {
 					 cppCompiler.define "Crypto_EXPORTS"
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}

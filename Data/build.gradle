@@ -1,7 +1,7 @@
 project(":Data") {
 	model {
 		components {
-			PocoData(NativeLibrarySpec) {
+			Data(NativeLibrarySpec) {
 				sources {
 					cpp {
 						source {
@@ -19,13 +19,13 @@ project(":Data") {
 			all {
 			}
 			withType(SharedLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				if (toolChain in VisualCpp) {
 					 cppCompiler.define "Data_EXPORTS"
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}

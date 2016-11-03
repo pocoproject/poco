@@ -1,7 +1,7 @@
 project(":PocoDoc") {
 	model {
 		components {
-			PocoPocoDoc(NativeLibrarySpec) {
+			PocoDoc(NativeLibrarySpec) {
 				sources {
 					cpp {
 						source {
@@ -19,17 +19,17 @@ project(":PocoDoc") {
 			all {
 			}
 			withType(SharedLibraryBinarySpec) {
-				lib project: ':CppParser', library: 'PocoCppParser', linkage: 'shared'
-				lib project: ':Util', library: 'PocoUtil', linkage: 'shared'
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':CppParser', library: 'CppParser', linkage: 'shared'
+				lib project: ':Util', library: 'Util', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				if (toolChain in VisualCpp) {
-					 cppCompiler.define "PocoDoc_EXPORTS"
+					 cppCompiler.define "Doc_EXPORTS"
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
-				lib project: ':CppParser', library: 'PocoCppParser', linkage: 'static'
-				lib project: ':Util', library: 'PocoUtil', linkage: 'static'
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+				lib project: ':CppParser', library: 'CppParser', linkage: 'static'
+				lib project: ':Util', library: 'Util', linkage: 'static'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}

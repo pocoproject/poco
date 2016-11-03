@@ -1,7 +1,7 @@
 project(":Net") {
 	model {
 		components {
-			PocoNet(NativeLibrarySpec) {
+			Net(NativeLibrarySpec) {
 				sources {
 					cpp {
 						source {
@@ -21,13 +21,13 @@ project(":Net") {
 				linker.args "iphlpapi.lib"
 			}
 			withType(SharedLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				if (toolChain in VisualCpp) {
 					 cppCompiler.define "Net_EXPORTS"
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}

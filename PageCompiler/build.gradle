@@ -1,7 +1,7 @@
 project(":PageCompiler") {
 	model {
 		components {
-			PocoPageCompiler(NativeExecutableSpec) {
+			PageCompiler(NativeExecutableSpec) {
 				sources {
 					cpp {
 						source {
@@ -11,15 +11,15 @@ project(":PageCompiler") {
 						exportedHeaders {
 							srcDir 'include'
 						}
-						lib project: ':Net', library: 'PocoNet'
-						lib project: ':Util', library: 'PocoUtil'
-						lib project: ':Foundation', library: 'PocoFoundation'
+						lib project: ':Net', library: 'Net'
+						lib project: ':Util', library: 'Util'
+						lib project: ':Foundation', library: 'Foundation'
 					}
 				}
 				binaries.withType(NativeExecutableSpec) {
-					lib project: ':Net', library: 'PocoNet', linkage: 'shared'
-					lib project: ':Util', library: 'PocoUtil', linkage: 'shared'
-					lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+					lib project: ':Net', library: 'Net', linkage: 'shared'
+					lib project: ':Util', library: 'Util', linkage: 'shared'
+					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				}
 			}
 		}

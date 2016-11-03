@@ -7,8 +7,8 @@
 							srcDir 'src'
 							include 'TestApp.cpp'
 						}
-						lib project: ':CppUnit', library: 'PocoCppUnit'
-						lib project: ':Foundation', library: 'PocoFoundation'
+						lib project: ':CppUnit', library: 'CppUnit'
+						lib project: ':Foundation', library: 'Foundation'
 					}
 				}
 			}
@@ -20,8 +20,8 @@
 							include 'TestLibrary.cpp'
 							include 'TestPlugin.cpp'
 						}
-						lib project: ':CppUnit', library: 'PocoCppUnit'
-						lib project: ':Foundation', library: 'PocoFoundation'
+						lib project: ':CppUnit', library: 'CppUnit'
+						lib project: ':Foundation', library: 'Foundation'
 					}
 				}
 			}
@@ -39,8 +39,8 @@
 						exportedHeaders {
 							srcDir 'src'
 						}
-						lib project: ':CppUnit', library: 'PocoCppUnit'
-						lib project: ':Foundation', library: 'PocoFoundation'
+						lib project: ':CppUnit', library: 'CppUnit'
+						lib project: ':Foundation', library: 'Foundation'
 					}
 				}
 			}
@@ -52,12 +52,12 @@
 		}
 		binaries {
 			withType(NativeExecutableSpec) {
-				lib project: ':CppUnit', library: 'PocoCppUnit', linkage: 'shared'
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			}
 		    withType(CppUnitTestSuiteBinarySpec) {
-				lib project: ':CppUnit', library: 'PocoCppUnit', linkage: 'shared'
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			}
 		}
 

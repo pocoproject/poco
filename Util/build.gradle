@@ -1,10 +1,10 @@
 project(":Util") {
 	dependencies {
-//	   compile files(project(':Foundation').binaries['PocoFoundation'].staticLibraryFile)
+//	   compile files(project(':Foundation').binaries['Foundation'].staticLibraryFile)
 	}
 	model {
 		components {
-			PocoUtil(NativeLibrarySpec) {
+			Util(NativeLibrarySpec) {
 				sources {
 					c {
 						source {
@@ -31,17 +31,17 @@ project(":Util") {
 			all {
 			}
 			withType(SharedLibraryBinarySpec) {
-				 lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
-				 lib project: ':XML', library: 'PocoXML', linkage: 'shared'
-				 lib project: ':JSON', library: 'PocoJSON', linkage: 'shared'
+				 lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+				 lib project: ':XML', library: 'XML', linkage: 'shared'
+				 lib project: ':JSON', library: 'JSON', linkage: 'shared'
 				if (toolChain in VisualCpp) {
 					 cppCompiler.define "Util_EXPORTS"
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
-				 lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
-				 lib project: ':XML', library: 'PocoXML', linkage: 'static'
-				 lib project: ':JSON', library: 'PocoJSON', linkage: 'static'
+				 lib project: ':Foundation', library: 'Foundation', linkage: 'static'
+				 lib project: ':XML', library: 'XML', linkage: 'static'
+				 lib project: ':JSON', library: 'JSON', linkage: 'static'
 			 }
 		}
 	}

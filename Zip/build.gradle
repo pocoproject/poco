@@ -1,7 +1,7 @@
 project(":Zip") {
 	model {
 		components {
-			PocoZip(NativeLibrarySpec) {
+			Zip(NativeLibrarySpec) {
 				sources {
 					cpp {
 						source {
@@ -19,13 +19,13 @@ project(":Zip") {
 			all {
 			}
 			withType(SharedLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				if (toolChain in VisualCpp) {
 					 cppCompiler.define "Zip_EXPORTS"
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}

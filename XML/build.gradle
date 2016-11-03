@@ -1,7 +1,7 @@
 project(":XML") {
 	model {
 		components {
-			PocoXML(NativeLibrarySpec) {
+			XML(NativeLibrarySpec) {
 				sources {
 					c {
 						source {
@@ -39,14 +39,14 @@ project(":XML") {
 				 }
 			}
 			withType(SharedLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				if (toolChain in VisualCpp) {
 					 cCompiler.define "XML_EXPORTS"
 					 cppCompiler.define "XML_EXPORTS"
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
-				 lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+				 lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}
