@@ -76,7 +76,7 @@ public:
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 	
-	virtual void bind(const SocketAddress& address, bool reuseAddress = false);
+	virtual void bind(const SocketAddress& address, bool reuseAddress = false, bool reusePort = false);
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -85,8 +85,10 @@ public:
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
+        /// If reusePort is true, set the SO_REUSEPORT
+        /// socket option.
 
-	virtual void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
+	virtual void bind6(const SocketAddress& address, bool reuseAddress = false, bool reusePort = false, bool ipV6Only = false);
 		/// Bind a local IPv6 address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -95,6 +97,8 @@ public:
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
+        /// if reusePort is true, sets the SO_REUSEPORT
+        /// socket option.
 		///
 		/// The given address must be an IPv6 address. The
 		/// IPPROTO_IPV6/IPV6_V6ONLY option is set on the socket
