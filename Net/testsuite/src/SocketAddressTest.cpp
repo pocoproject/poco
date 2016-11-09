@@ -130,7 +130,7 @@ void SocketAddressTest::testSocketAddress()
 	try
 	{
 		SocketAddress sa12(SocketAddress::IPv6, "www6.pocoproject.org", 80);
-		assert (sa12.host().toString() == "[2001:4801:7819:74:be76:4eff:fe10:6b73]");
+		assert (sa12.host().toString() == "2001:4801:7819:74:be76:4eff:fe10:6b73");
 	}
 	catch (AddressFamilyMismatchException&)
 	{
