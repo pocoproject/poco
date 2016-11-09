@@ -183,7 +183,7 @@ if(WIN32 AND ENABLE_NETSSL_WIN)
 endif(WIN32 AND ENABLE_NETSSL_WIN)
 
 if(ENABLE_NETSSL OR ENABLE_CRYPTO)
-    find_package(OpenSSL)
+    find_package(OpenSSL REQUIRED)
     if(OPENSSL_FOUND)
         include_directories("${OPENSSL_INCLUDE_DIR}")
         if(ENABLE_NETSSL)
@@ -316,4 +316,3 @@ message(STATUS "CMAKE_CXX_FLAGS_RELWITHDEBINFO:=${CMAKE_CXX_FLAGS_RELWITHDEBINFO
 foreach(component ${Poco_COMPONENTS})
 message(STATUS "Building: ${component}")
 endforeach()
-
