@@ -274,6 +274,7 @@ void WebSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool 
 	throw Poco::InvalidAccessException("Cannot bind6() a WebSocketImpl");
 }
 
+
 void WebSocketImpl::listen(int backlog)
 {
 	throw Poco::InvalidAccessException("Cannot listen() on a WebSocketImpl");

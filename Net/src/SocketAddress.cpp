@@ -77,6 +77,12 @@ SocketAddress::SocketAddress()
 }
 
 
+SocketAddress::SocketAddress(Family fam)
+{
+		init(IPAddress(fam), 0);
+}
+
+
 SocketAddress::SocketAddress(const IPAddress& hostAddress, Poco::UInt16 portNumber)
 {
 	init(hostAddress, portNumber);
@@ -89,9 +95,21 @@ SocketAddress::SocketAddress(Poco::UInt16 portNumber)
 }
 
 
+SocketAddress::SocketAddress(Family fam, Poco::UInt16 portNumber)
+{
+	init(IPAddress(fam), portNumber);
+}
+
+
 SocketAddress::SocketAddress(const std::string& hostAddress, Poco::UInt16 portNumber)
 {
 	init(hostAddress, portNumber);
+}
+
+
+SocketAddress::SocketAddress(Family fam, const std::string& hostAddress, Poco::UInt16 portNumber)
+{
+	init(fam, hostAddress, portNumber);
 }
 
 
@@ -101,9 +119,15 @@ SocketAddress::SocketAddress(const std::string& hostAddress, const std::string& 
 }
 
 
-SocketAddress::SocketAddress(Family family, const std::string& addr)
+SocketAddress::SocketAddress(Family fam, const std::string& hostAddress, const std::string& portNumber)
 {
-	init(family, addr);
+	init(fam, hostAddress, resolveService(portNumber));
+}
+
+
+SocketAddress::SocketAddress(Family fam, const std::string& addr)
+{
+	init(fam, addr);
 }
 
 
@@ -261,6 +285,35 @@ void SocketAddress::init(const std::string& hostAddress, Poco::UInt16 portNumber
 }
 
 
+void SocketAddress::init(Family fam, const std::string& hostAddress, Poco::UInt16 portNumber)
+{
+	IPAddress ip;
+	if (IPAddress::tryParse(hostAddress, ip))
+	{
+		if (ip.family() != fam) throw AddressFamilyMismatchException(hostAddress);
+		init(ip, portNumber);
+	}
+	else
+	{
+		HostEntry he = DNS::hostByName(hostAddress);
+		HostEntry::AddressList addresses = he.addresses();
+		if (addresses.size() > 0)
+		{
+			for (HostEntry::AddressList::const_iterator it = addresses.begin(); it != addresses.end(); ++it)
+			{
+				if (it->family() == fam)
+				{
+					init(*it, portNumber);
+					return;
+				}
+			}
+			throw AddressFamilyMismatchException(hostAddress);
+		}
+		else throw HostNotFoundException("No address found for host", hostAddress);
+	}
+}
+
+
 void SocketAddress::init(Family fam, const std::string& address)
 {
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -271,8 +324,29 @@ void SocketAddress::init(Family fam, const std::string& address)
 	else
 #endif
 	{
-		init(address);
-		if (fam != family()) throw Poco::InvalidArgumentException("address does not fit family");
+		std::string host;
+		std::string port;
+		std::string::const_iterator it  = address.begin();
+		std::string::const_iterator end = address.end();
+
+		if (*it == '[')
+		{
+			++it;
+			while (it != end && *it != ']') host += *it++;
+			if (it == end) throw InvalidArgumentException("Malformed IPv6 address");
+			++it;
+		}
+		else
+		{
+			while (it != end && *it != ':') host += *it++;
+		}
+		if (it != end && *it == ':')
+		{
+			++it;
+			while (it != end) port += *it++;
+		}
+		else throw InvalidArgumentException("Missing port number");
+		init(fam, host, resolveService(port));
 	}
 }
 

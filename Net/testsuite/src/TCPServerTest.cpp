@@ -84,7 +84,7 @@ void TCPServerTest::testOneConnection()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", srv.socket().address().port());
+	SocketAddress sa("127.0.0.1", srv.socket().address().port());
 	StreamSocket ss1(sa);
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
@@ -111,7 +111,7 @@ void TCPServerTest::testTwoConnections()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", srv.socket().address().port());
+	SocketAddress sa("127.0.0.1", srv.socket().address().port());
 	StreamSocket ss1(sa);
 	StreamSocket ss2(sa);
 	std::string data("hello, world");
@@ -159,7 +159,7 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	StreamSocket ss1(sa);
 	StreamSocket ss2(sa);
 	StreamSocket ss3(sa);
