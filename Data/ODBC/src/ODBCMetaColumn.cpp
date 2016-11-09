@@ -88,6 +88,9 @@ void ODBCMetaColumn::init()
 	case SQL_CHAR:
 	case SQL_VARCHAR:
 	case SQL_LONGVARCHAR:
+#ifdef SQL_GUID
+	case SQL_GUID:
+#endif
 		setType(MetaColumn::FDT_STRING); break;
 
 	case SQL_WCHAR:
