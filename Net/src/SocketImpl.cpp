@@ -191,15 +191,20 @@ void SocketImpl::connectNB(const SocketAddress& address)
 
 void SocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 {
+    bind(address, reuseAddress, true);
+}
+
+
+void SocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
 	if (_sockfd == POCO_INVALID_SOCKET)
 	{
 		init(address.af());
 	}
 	if (reuseAddress)
-	{
 		setReuseAddress(true);
+    if (reusePort)
 		setReusePort(true);
-	}
 #if defined(POCO_VXWORKS)
 	int rc = ::bind(_sockfd, (sockaddr*) address.addr(), address.length());
 #else
@@ -210,6 +215,12 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 
 
 void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+    bind6(address, reuseAddress, true, ipV6Only);
+}
+
+
+void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
 {
 #if defined(POCO_HAVE_IPv6)
 	if (address.family() != SocketAddress::IPv6)
@@ -225,10 +236,9 @@ void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV
 	if (ipV6Only) throw Poco::NotImplementedException("IPV6_V6ONLY not defined.");
 #endif
 	if (reuseAddress)
-	{
 		setReuseAddress(true);
+    if (reusePort)
 		setReusePort(true);
-	}
 	int rc = ::bind(_sockfd, address.addr(), address.length());
 	if (rc != 0) error(address.toString());
 #else
