@@ -257,11 +257,22 @@ void WebSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 }
 
 
+void WebSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	throw Poco::InvalidAccessException("Cannot bind() a WebSocketImpl");
+}
+
+
 void WebSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
 {
 	throw Poco::InvalidAccessException("Cannot bind6() a WebSocketImpl");
 }
 
+
+void WebSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
+{
+	throw Poco::InvalidAccessException("Cannot bind6() a WebSocketImpl");
+}
 
 void WebSocketImpl::listen(int backlog)
 {
