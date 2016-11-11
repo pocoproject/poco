@@ -31,11 +31,11 @@ namespace Net {
 
 
 //
-// TCPConnectionFilter
+// TCPServerConnectionFilter
 //
 
 
-TCPConnectionFilter::~TCPConnectionFilter()
+TCPServerConnectionFilter::~TCPServerConnectionFilter()
 {
 }
 
@@ -138,7 +138,7 @@ void TCPServer::run()
 				{
 					StreamSocket ss = _socket.acceptConnection();
 					
-					if (!_pConnectionFilter || _pConnectionFilter->accept(ss.peerAddress()))
+					if (!_pConnectionFilter || _pConnectionFilter->accept(ss))
 					{
 						// enable nodelay per default: OSX really needs that
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -217,7 +217,7 @@ int TCPServer::refusedConnections() const
 }
 
 
-void TCPServer::setConnectionFilter(const TCPConnectionFilter::Ptr& pConnectionFilter)
+void TCPServer::setConnectionFilter(const TCPServerConnectionFilter::Ptr& pConnectionFilter)
 {
 	poco_assert (_stopped);
 

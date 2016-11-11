@@ -24,7 +24,7 @@
 
 
 using Poco::Net::TCPServer;
-using Poco::Net::TCPConnectionFilter;
+using Poco::Net::TCPServerConnectionFilter;
 using Poco::Net::TCPServerConnection;
 using Poco::Net::TCPServerConnectionFactory;
 using Poco::Net::TCPServerConnectionFactoryImpl;
@@ -64,10 +64,10 @@ namespace
 		}
 	};
 	
-	class RejectFilter: public TCPConnectionFilter
+	class RejectFilter: public TCPServerConnectionFilter
 	{
 	public:
-		bool accept(const SocketAddress&)
+		bool accept(const StreamSocket&)
 		{
 			return false;
 		}
