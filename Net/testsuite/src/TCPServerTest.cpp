@@ -24,6 +24,7 @@
 
 
 using Poco::Net::TCPServer;
+using Poco::Net::TCPConnectionFilter;
 using Poco::Net::TCPServerConnection;
 using Poco::Net::TCPServerConnectionFactory;
 using Poco::Net::TCPServerConnectionFactoryImpl;
@@ -60,6 +61,15 @@ namespace
 			{
 				std::cerr << "EchoConnection: " << exc.displayText() << std::endl;
 			}
+		}
+	};
+	
+	class RejectFilter: public TCPConnectionFilter
+	{
+	public:
+		bool accept(const SocketAddress&)
+		{
+			return false;
 		}
 	};
 }
@@ -233,7 +243,9 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.currentConnections() == 0);
 }
 
-void TCPServerTest::testThreadCapacity(){
+
+void TCPServerTest::testThreadCapacity()
+{
 	ServerSocket svs(0);
 	TCPServerParams* pParams = new TCPServerParams;
 	pParams->setMaxThreads(64);
@@ -242,6 +254,29 @@ void TCPServerTest::testThreadCapacity(){
 	assert (srv.maxThreads() >= 64);
 }
 
+
+void TCPServerTest::testFilter()
+{
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>());
+	srv.setConnectionFilter(new RejectFilter);
+	srv.start();
+	assert (srv.currentConnections() == 0);
+	assert (srv.currentThreads() == 0);
+	assert (srv.queuedConnections() == 0);
+	assert (srv.totalConnections() == 0);
+	
+	SocketAddress sa("127.0.0.1", srv.socket().address().port());
+	StreamSocket ss(sa);
+
+	char buffer[256];
+	int n = ss.receiveBytes(buffer, sizeof(buffer));
+
+	assert (n == 0);
+	assert (srv.currentConnections() == 0);
+	assert (srv.currentThreads() == 0);
+	assert (srv.queuedConnections() == 0);
+	assert (srv.totalConnections() == 0);
+}
 
 
 void TCPServerTest::setUp()
@@ -262,6 +297,7 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testTwoConnections);
 	CppUnit_addTest(pSuite, TCPServerTest, testMultiConnections);
 	CppUnit_addTest(pSuite, TCPServerTest, testThreadCapacity);
+	CppUnit_addTest(pSuite, TCPServerTest, testFilter);
 
 	return pSuite;
 }

@@ -24,6 +24,8 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/TCPServerConnectionFactory.h"
 #include "Poco/Net/TCPServerParams.h"
+#include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
 #include "Poco/ThreadPool.h"
@@ -34,6 +36,26 @@ namespace Net {
 
 
 class TCPServerDispatcher;
+
+
+class Net_API TCPConnectionFilter: public Poco::RefCountedObject
+	/// A TCPConnectionFilter can be used to reject incoming connections
+	/// before a thread is started to handle them.
+	///
+	/// An example use case is white-list or black-list IP address filtering.
+	///
+	/// Subclasses must override the accept() method.
+{
+public:
+	typedef Poco::AutoPtr<TCPConnectionFilter> Ptr;
+	
+	virtual bool accept(const Poco::Net::SocketAddress& clientAddress) = 0;
+		/// Returns true if a connection from the given clientAddress should
+		/// be accepted, otherwise false.
+
+protected:
+	virtual ~TCPConnectionFilter();
+};
 
 
 class Net_API TCPServer: public Poco::Runnable
@@ -165,6 +187,19 @@ public:
 
 	Poco::UInt16 port() const;
 		/// Returns the port the server socket listens on.
+		
+	void setConnectionFilter(const TCPConnectionFilter::Ptr& pFilter);
+		/// Sets a TCPConnectionFilter. Can also be used to remove
+		/// a filter by passing a null pointer.
+		///
+		/// To avoid a potential race condition, the filter must
+		/// be set before the TCPServer is started. Trying to set
+		/// the filter after start() has been called will trigger
+		/// an assertion.
+		
+	TCPConnectionFilter::Ptr getConnectionFilter() const;
+		/// Returns the TCPConnectionFilter set with setConnectionFilter(), 
+		/// or null pointer if no filter has been set.
 
 protected:
 	void run();
@@ -181,13 +216,17 @@ private:
 	TCPServer(const TCPServer&);
 	TCPServer& operator = (const TCPServer&);
 	
-	ServerSocket         _socket;
-	TCPServerDispatcher* _pDispatcher;
-	Poco::Thread         _thread;
-	bool                 _stopped;
+	ServerSocket             _socket;
+	TCPServerDispatcher*     _pDispatcher;
+	TCPConnectionFilter::Ptr _pConnectionFilter;
+	Poco::Thread             _thread;
+	bool                     _stopped;
 };
 
 
+//
+// inlines
+//
 inline const ServerSocket& TCPServer::socket() const
 {
 	return _socket;
@@ -197,6 +236,12 @@ inline const ServerSocket& TCPServer::socket() const
 inline Poco::UInt16 TCPServer::port() const
 {
 	return _socket.address().port();
+}
+
+
+inline TCPConnectionFilter::Ptr TCPServer::getConnectionFilter() const
+{
+	return _pConnectionFilter;
 }
 
 
