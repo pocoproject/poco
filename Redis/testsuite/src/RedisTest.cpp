@@ -31,7 +31,7 @@ Poco::Redis::Client RedisTest::_redis;
 
 RedisTest::RedisTest(const std::string& name):
 	CppUnit::TestCase("Redis"),
-	_host("localhost"),
+	_host("127.0.0.1"),
 	_port(6379)
 {
 	if (!_connected)

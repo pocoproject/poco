@@ -287,7 +287,7 @@ void MongoDBTest::testBuildInfo()
 
 void MongoDBTest::testConnectionPool()
 {
-	Poco::Net::SocketAddress sa("localhost", 27017);
+	Poco::Net::SocketAddress sa("127.0.0.1", 27017);
 	Poco::PoolableObjectFactory<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> factory(sa);
 	Poco::ObjectPool<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> pool(factory, 10, 15);
 
@@ -394,8 +394,8 @@ CppUnit::Test* MongoDBTest::suite()
 {
 	try
 	{
-		_mongo = new Poco::MongoDB::Connection("localhost", 27017);
-		std::cout << "Connected to [localhost:27017]" << std::endl;
+		_mongo = new Poco::MongoDB::Connection("127.0.0.1", 27017);
+		std::cout << "Connected to [127.0.0.1:27017]" << std::endl;
 	}
 	catch (Poco::Net::ConnectionRefusedException& e)
 	{
