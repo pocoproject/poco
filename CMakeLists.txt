@@ -173,6 +173,7 @@ if(WIN32 AND ENABLE_NETSSL_WIN)
     list(APPEND Poco_COMPONENTS "NetSSL_Win")
 endif(WIN32 AND ENABLE_NETSSL_WIN)
 
+hunter_add_package(OpenSSL)
 find_package(OpenSSL)
 if(OPENSSL_FOUND)
     include_directories("${OPENSSL_INCLUDE_DIR}")
