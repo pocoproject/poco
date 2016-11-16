@@ -260,18 +260,12 @@ public:
 			if (_pool.size() < _capacity)
 			{
 				_pool.push_back(pObject);
-			}
-			else
-			{
-				_factory.destroyObject(pObject);
-				_size--;
-				_availableCondition.signal();
+				return;
 			}
 		}
-		else
-		{
-			_factory.destroyObject(pObject);
-		}
+		_factory.destroyObject(pObject);
+		_size--;
+		_availableCondition.signal();
 	}
 
 	std::size_t capacity() const
