@@ -92,7 +92,7 @@ public:
 		///
 		/// The timer thread is taken from the global default thread pool.
 
-	void start(const AbstractTimerCallback& method, int prio, int policy);
+	void start(const AbstractTimerCallback& method, int prio, int policy = Thread::POLICY_DEFAULT);
 		/// Starts the timer in a thread with the given OS specific priority.
 		/// Create the TimerCallback as follows:
 		///     TimerCallback<MyClass> callback(*this, &MyClass::onTimer);
