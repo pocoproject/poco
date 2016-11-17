@@ -54,7 +54,7 @@ public:
 		/// Creates the Timer, using a timer thread with
 		/// the given priority.
 	
-	explicit Timer(int prio, int policy);
+	explicit Timer(int prio, int policy = Poco::Thread::POLICY_DEFAULT);
 		/// Creates the Timer, using a timer thread with
 		/// the given OS specific priority.
 
