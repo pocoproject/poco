@@ -5,7 +5,7 @@
 //
 // Definition of the RedisTest class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -18,7 +18,6 @@
 
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/Client.h"
-
 #include "Poco/CppUnit/TestCase.h"
 
 

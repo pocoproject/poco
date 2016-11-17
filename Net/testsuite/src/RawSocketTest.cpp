@@ -33,7 +33,7 @@ using Poco::InvalidArgumentException;
 using Poco::IOException;
 
 
-RawSocketTest::RawSocketTest(const std::string& rName): CppUnit::TestCase(rName)
+RawSocketTest::RawSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -45,7 +45,7 @@ RawSocketTest::~RawSocketTest()
 
 void RawSocketTest::testEchoIPv4()
 {
-	SocketAddress sa("localhost", 0);
+	SocketAddress sa("127.0.0.1", 0);
 	RawSocket rs(IPAddress::IPv4);
 	rs.connect(sa);
 
@@ -70,7 +70,7 @@ void RawSocketTest::testSendToReceiveFromIPv4()
 {
 	RawSocket rs(IPAddress::IPv4);
 	
-	int n = rs.sendTo("hello", 5, SocketAddress("localhost", 0));
+	int n = rs.sendTo("hello", 5, SocketAddress("127.0.0.1", 0));
 	assert (n == 5);
 
 	char buffer[256] = "";

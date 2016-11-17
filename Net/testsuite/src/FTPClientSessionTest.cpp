@@ -63,7 +63,7 @@ namespace
 };
 
 
-FTPClientSessionTest::FTPClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
+FTPClientSessionTest::FTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -94,7 +94,7 @@ void FTPClientSessionTest::testLogin1()
 {
 	DialogServer server;
 	server.addResponse("220 localhost FTP ready");
-	FTPClientSession session("localhost", server.port());
+	FTPClientSession session("127.0.0.1", server.port());
 	assert (session.isOpen());
 	assert (!session.isLoggedIn());
 	login(server, session);
@@ -125,7 +125,7 @@ void FTPClientSessionTest::testLogin2()
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
 	Poco::UInt16 serverPort = server.port();
-	FTPClientSession session("localhost", serverPort, "user", "password");
+	FTPClientSession session("127.0.0.1", serverPort, "user", "password");
 	assert (session.isOpen());
 	assert (session.isLoggedIn());
 	server.addResponse("221 Good Bye");
@@ -139,7 +139,7 @@ void FTPClientSessionTest::testLogin2()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	session.open("localhost", serverPort, "user", "password");
+	session.open("127.0.0.1", serverPort, "user", "password");
 	assert (session.isOpen());
 	assert (session.isLoggedIn());
 	server.addResponse("221 Good Bye");
@@ -159,7 +159,7 @@ void FTPClientSessionTest::testLogin3()
 	FTPClientSession session;
 	assert (!session.isOpen());
 	assert (!session.isLoggedIn());
-	session.open("localhost", server.port(), "user", "password");
+	session.open("127.0.0.1", server.port(), "user", "password");
 	server.addResponse("221 Good Bye");
 	session.close();
 	assert (!session.isOpen());
@@ -172,7 +172,7 @@ void FTPClientSessionTest::testLoginFailed1()
 {
 	DialogServer server;
 	server.addResponse("421 localhost FTP not ready");
-	FTPClientSession session("localhost", server.port());
+	FTPClientSession session("127.0.0.1", server.port());
 	try
 	{
 		session.login("user", "password");
@@ -192,7 +192,7 @@ void FTPClientSessionTest::testLoginFailed2()
 	server.addResponse("220 localhost FTP ready");
 	server.addResponse("331 Password required");
 	server.addResponse("530 Login incorrect");
-	FTPClientSession session("localhost", server.port());
+	FTPClientSession session("127.0.0.1", server.port());
 	try
 	{
 		session.login("user", "password");
@@ -213,7 +213,7 @@ void FTPClientSessionTest::testCommands()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	FTPClientSession session("localhost", server.port());
+	FTPClientSession session("127.0.0.1", server.port());
 	session.login("user", "password");
 	std::string cmd = server.popCommand();
 	assert (cmd == "USER user");
@@ -342,7 +342,7 @@ void FTPClientSessionTest::testDownloadPORT()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	FTPClientSession session("localhost", server.port());
+	FTPClientSession session("127.0.0.1", server.port());
 	session.setPassive(false);
 	session.login("user", "password");
 	server.clearCommands();
@@ -373,7 +373,7 @@ void FTPClientSessionTest::testDownloadPORT()
 	cmd = server.popCommandWait();
 	assert (cmd == "RETR test.txt");
 
-	SocketAddress sa("localhost", (Poco::UInt16) port);
+	SocketAddress sa("127.0.0.1", (Poco::UInt16) port);
 	DialogSocket dataSock;
 	dataSock.connect(sa);
 
@@ -397,7 +397,7 @@ void FTPClientSessionTest::testDownloadEPRT()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	FTPClientSession session("localhost", server.port());
+	FTPClientSession session("127.0.0.1", server.port());
 	session.setPassive(false);
 	session.login("user", "password");
 	server.clearCommands();
@@ -421,7 +421,7 @@ void FTPClientSessionTest::testDownloadEPRT()
 	cmd = server.popCommandWait();
 	assert (cmd == "RETR test.txt");
 	
-	SocketAddress sa("localhost", (Poco::UInt16) port);
+	SocketAddress sa("127.0.0.1", (Poco::UInt16) port);
 	DialogSocket dataSock;
 	dataSock.connect(sa);
 
@@ -445,7 +445,7 @@ void FTPClientSessionTest::testDownloadPASV()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	FTPClientSession session("localhost", server.port());
+	FTPClientSession session("127.0.0.1", server.port());
 	session.login("user", "password");
 	server.clearCommands();
 
@@ -478,7 +478,7 @@ void FTPClientSessionTest::testDownloadEPSV()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	FTPClientSession session("localhost", server.port());
+	FTPClientSession session("127.0.0.1", server.port());
 	session.login("user", "password");
 	server.clearCommands();
 
@@ -513,7 +513,7 @@ void FTPClientSessionTest::testUpload()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	FTPClientSession session("localhost", server.port());
+	FTPClientSession session("127.0.0.1", server.port());
 	session.login("user", "password");
 	server.clearCommands();
 
@@ -546,7 +546,7 @@ void FTPClientSessionTest::testList()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	FTPClientSession session("localhost", server.port());
+	FTPClientSession session("127.0.0.1", server.port());
 	session.login("user", "password");
 	server.clearCommands();
 

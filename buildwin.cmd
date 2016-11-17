@@ -1,4 +1,5 @@
 @echo off
+setlocal enableextensions
 setlocal enabledelayedexpansion
 
 rem
@@ -17,7 +18,7 @@ rem Modified by Guenter Obiltschnig.
 rem
 rem Usage:
 rem ------
-rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL [VERBOSITY [LOGGER] ] ]
+rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY [LOGGER] ] ] 
 rem VS_VERSION:    90|100|110|120|140
 rem ACTION:        build|rebuild|clean
 rem LINKMODE:      static_mt|static_md|shared|all
@@ -26,17 +27,11 @@ rem PLATFORM:      Win32|x64|WinCE|WEC2013
 rem SAMPLES:       samples|nosamples
 rem TESTS:         tests|notests
 rem TOOL:          devenv|vcexpress|wdexpress|msbuild
+rem ENV:           env|noenv (active only with msbuild, defaulted to env)
 rem VERBOSITY      quiet|minimal|normal|detailed|diagnostic
 rem LOGGER         <logger path> see msbuild /?
 rem
 rem VS_VERSION is required argument. Default is build all.
-
-rem Change MYSQL_DIR to match your setup
-set MYSQL_DIR=C:\PROGRA~1\MySQL\MYSQLS~1.5
-set MYSQL_INCLUDE=%MYSQL_DIR%\include
-set MYSQL_LIB=%MYSQL_DIR%\lib
-set INCLUDE=%INCLUDE%;%MYSQL_INCLUDE%
-set LIB=%LIB%;%MYSQL_LIB%
 
 set POCO_BASE=%CD%
 set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
@@ -45,15 +40,51 @@ rem VS_VERSION {90 | 100 | 110 | 120 | 140}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
 set VS_64_BIT_ENV=VC\bin\x86_amd64\vcvarsx86_amd64.bat
+
 shift /1
+rem ACTION [build|rebuild|clean]
+set ACTION=%1
+if "%ACTION%"=="" (set ACTION=build)
+if not "%ACTION%"=="build" (
+if not "%ACTION%"=="rebuild" (
+if not "%ACTION%"=="clean" goto usage))
+
+shift /1
+rem LINKMODE [static_mt|static_md|shared|all]
+set LINK_MODE=%1
+if "%LINK_MODE%"=="" (set LINK_MODE=all)
+if not "%LINK_MODE%"=="static_mt" (
+if not "%LINK_MODE%"=="static_md" (
+if not "%LINK_MODE%"=="shared" (
+if not "%LINK_MODE%"=="all" goto usage)))
+
+rem CONFIGURATION [release|debug|both]
+set CONFIGURATION=%2
+if "%CONFIGURATION%"=="" (set CONFIGURATION=both)
+if not "%CONFIGURATION%"=="release" (
+if not "%CONFIGURATION%"=="debug" (
+if not "%CONFIGURATION%"=="both" goto usage))
 
 rem PLATFORM [Win32|x64|WinCE|WEC2013]
-set PLATFORM=%4
+set PLATFORM=%3
 if "%PLATFORM%"=="" (set PLATFORM=Win32)
 if not "%PLATFORM%"=="Win32" (
 if not "%PLATFORM%"=="x64" (
 if not "%PLATFORM%"=="WinCE" (
 if not "%PLATFORM%"=="WEC2013" goto usage)))
+
+if "%PLATFORM%"=="Win32" (set PLATFORM_SUFFIX=) else (
+if "%PLATFORM%"=="x64" (set PLATFORM_SUFFIX=_x64) else (
+if "%PLATFORM%"=="WinCE" (set PLATFORM_SUFFIX=_CE) else (
+if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013))))
+
+rem SAMPLES [samples|nosamples]
+set SAMPLES=%4
+if "%SAMPLES%"=="" (set SAMPLES=samples)
+
+rem TESTS [tests|notests]
+set TESTS=%5
+if "%TESTS%"=="" (set TESTS=notests)
 
 if not defined VCINSTALLDIR (
   if %VS_VERSION%==vs90 (
@@ -104,6 +135,19 @@ if not defined VSINSTALLDIR (
   goto :EOF
 )
 
+set VCPROJ_EXT=vcproj
+if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
+if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
+if %VS_VERSION%==vs120 (set VCPROJ_EXT=vcxproj)
+if %VS_VERSION%==vs140 (set VCPROJ_EXT=vcxproj)
+
+
+rem ENV      	env|noenv
+set USEENV=%7
+if "%USEENV%"=="" (set USEENV=env)
+if not "%USEENV%"=="env" (
+if not "%USEENV%"=="noenv"  goto usage)
+
 rem VERBOSITY      quiet|minimal|normal|detailed
 set VERBOSITY=%8
 if "%VERBOSITY%"=="" (set VERBOSITY=minimal)
@@ -113,17 +157,8 @@ if not "%VERBOSITY%"=="normal" (
 if not "%VERBOSITY%"=="detailed" (
 if not "%VERBOSITY%"=="diagnostic" goto usage))))
 
-rem LOGGER         <logger path> see msbuild /?
-set LOGGER=%9
-
-set VCPROJ_EXT=vcproj
-if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
-if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
-if %VS_VERSION%==vs120 (set VCPROJ_EXT=vcxproj)
-if %VS_VERSION%==vs140 (set VCPROJ_EXT=vcxproj)
-
-if "%7"=="" goto use_devenv
-set BUILD_TOOL=%7
+if "%6"=="" goto use_devenv
+set BUILD_TOOL=%6
 goto use_custom
 :use_devenv
 set BUILD_TOOL=devenv
@@ -132,22 +167,32 @@ if "%VS_VERSION%"=="vs110" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs120" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs140" (set BUILD_TOOL=msbuild)
 :use_custom
-if not "%BUILD_TOOL%"=="msbuild" (set USEENV=/useenv)
 if "%BUILD_TOOL%"=="msbuild" (
   set ACTIONSW=/t:
   set CONFIGSW=/p:Configuration=
   set EXTRASW=/m
   set USEENV=/p:UseEnv=true
+  if "%USEENV%"=="noenv" set USEENV=/p:UseEnv=false
 
   set BUILD_TOOL_FLAGS=/clp:NoSummary
   set BUILD_TOOL_FLAGS=!BUILD_TOOL_FLAGS! /nologo /v:%VERBOSITY%
-  if not %LOGGER%X==X (
-     set BUILD_TOOL_FLAGS=!BUILD_TOOL_FLAGS! /logger:%LOGGER%
-  )
 )
 if not "%BUILD_TOOL%"=="msbuild" (
+  set USEENV=/useenv
   set ACTIONSW=/
 )
+
+
+rem LOGGER         <logger path> see msbuild /?
+set LOGGER=%9
+if not "%LOGGER%"=="" (
+  if "%BUILD_TOOL%"=="msbuild" (
+    if not %LOGGER%X==X (
+       set BUILD_TOOL_FLAGS=!BUILD_TOOL_FLAGS! /logger:%LOGGER%
+    )
+  )
+)
+
 if "%VS_VERSION%"=="vs100" (goto msbuildok)
 if "%VS_VERSION%"=="vs110" (goto msbuildok)
 if "%VS_VERSION%"=="vs120" (goto msbuildok)
@@ -158,32 +203,6 @@ if "%BUILD_TOOL%"=="msbuild" (
 )
 :msbuildok
 
-rem ACTION [build|rebuild|clean]
-set ACTION=%1
-if "%ACTION%"=="" (set ACTION=build)
-if not "%ACTION%"=="build" (
-if not "%ACTION%"=="rebuild" (
-if not "%ACTION%"=="clean" goto usage))
-
-rem LINKMODE [static_mt|static_md|shared|all]
-set LINK_MODE=%2
-if "%LINK_MODE%"=="" (set LINK_MODE=all)
-if not "%LINK_MODE%"=="static_mt" (
-if not "%LINK_MODE%"=="static_md" (
-if not "%LINK_MODE%"=="shared" (
-if not "%LINK_MODE%"=="all" goto usage)))
-
-rem CONFIGURATION [release|debug|both]
-set CONFIGURATION=%3
-if "%CONFIGURATION%"=="" (set CONFIGURATION=both)
-if not "%CONFIGURATION%"=="release" (
-if not "%CONFIGURATION%"=="debug" (
-if not "%CONFIGURATION%"=="both" goto usage))
-
-if "%PLATFORM%"=="Win32" (set PLATFORM_SUFFIX=) else (
-if "%PLATFORM%"=="x64" (set PLATFORM_SUFFIX=_x64) else (
-if "%PLATFORM%"=="WinCE" (set PLATFORM_SUFFIX=_CE) else (
-if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013))))
 
 if "%PLATFORM%"=="WEC2013" (
 if "%WEC2013_PLATFORM%"=="" (
@@ -196,14 +215,6 @@ if %VS_VERSION%==vs110 (set EXTRASW=/m /p:VisualStudioVersion=11.0)
 if %VS_VERSION%==vs120 (set EXTRASW=/m /p:VisualStudioVersion=12.0)
 if %VS_VERSION%==vs140 (set EXTRASW=/m /p:VisualStudioVersion=14.0)
 )
-
-rem SAMPLES [samples|nosamples]
-set SAMPLES=%5
-if "%SAMPLES%"=="" (set SAMPLES=samples)
-
-rem TESTS [tests|notests]
-set TESTS=%6
-if "%TESTS%"=="" (set TESTS=notests)
 
 
 set DEBUG_SHARED=0
@@ -569,7 +580,7 @@ exit /b 1
 :usage
 echo Usage:
 echo ------
-echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL [VERBOSITY] ]
+echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] {ENV] [VERBOSITY]
 echo VS_VERSION:    "90|100|110|120|140"
 echo ACTION:        "build|rebuild|clean"
 echo LINKMODE:      "static_mt|static_md|shared|all"
@@ -578,6 +589,7 @@ echo PLATFORM:      "Win32|x64|WinCE|WEC2013"
 echo SAMPLES:       "samples|nosamples"
 echo TESTS:         "tests|notests"
 echo TOOL:          "devenv|vcexpress|wdexpress|msbuild"
+echo ENV:           "env|noenv" (active only with msbuild, defaulted to env)
 echo VERBOSITY:     "quiet|minimal|normal|detailed|diagnostic" only for msbuild
 echo.
 echo Default is build all.

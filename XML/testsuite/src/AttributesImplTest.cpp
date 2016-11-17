@@ -19,7 +19,7 @@
 using Poco::XML::AttributesImpl;
 
 
-AttributesImplTest::AttributesImplTest(const std::string& rName): CppUnit::TestCase(rName)
+AttributesImplTest::AttributesImplTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

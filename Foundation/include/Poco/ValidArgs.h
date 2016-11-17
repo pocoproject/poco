@@ -30,8 +30,8 @@ template <class TKey>
 class ValidArgs
 {
 public:
-	ValidArgs(const TKey& rKey):
-		_key(rKey), 
+	ValidArgs(const TKey& key):
+		_key(key), 
 		_isValid(true)
 	{
 	}

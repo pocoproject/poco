@@ -73,9 +73,9 @@ NTPPacket::NTPPacket() :
 }
 
 
-NTPPacket::NTPPacket(Poco::UInt8 *pPacket)
+NTPPacket::NTPPacket(Poco::UInt8 *packet)
 {
-	setPacket(pPacket);
+	setPacket(packet);
 }
 
 
@@ -84,9 +84,9 @@ NTPPacket::~NTPPacket()
 }
 
 
-void NTPPacket::packet(Poco::UInt8 *pPacket) const
+void NTPPacket::packet(Poco::UInt8 *packet) const
 {
-	NTPPacketData *p = (NTPPacketData*)pPacket;
+	NTPPacketData *p = (NTPPacketData*)packet;
 
 	p->li = _leapIndicator;
 	p->vn = _version;
@@ -104,9 +104,9 @@ void NTPPacket::packet(Poco::UInt8 *pPacket) const
 }
 
 
-void NTPPacket::setPacket(Poco::UInt8 *pPacket)
+void NTPPacket::setPacket(Poco::UInt8 *packet)
 {
-	NTPPacketData *p = (NTPPacketData*)pPacket;
+	NTPPacketData *p = (NTPPacketData*)packet;
 
 	_leapIndicator = p->li;
 	_version = p->vn;

@@ -59,7 +59,7 @@ public:
 	}
 
 	template <typename T>
-	Pair(const K& rFirst, const T& rSecond): _data(std::make_pair(rFirst, rSecond))
+	Pair(const K& first, const T& second): _data(std::make_pair(first, second))
 		/// Creates pair from two values.
 	{
 	}

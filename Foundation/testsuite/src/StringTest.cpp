@@ -82,8 +82,8 @@ void StringTest::testTrimLeft()
 		std::string s = "abc";
 		assert (trimLeft(s) == "abc");
 	}
-		std::string s2 = " abc ";
-		assert (trimLeft(s2) == "abc ");
+		std::string s = " abc ";
+		assert (trimLeft(s) == "abc ");
 	{
 	std::string s = "  ab c ";
 	assert (trimLeft(s) == "ab c ");

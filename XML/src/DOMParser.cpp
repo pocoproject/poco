@@ -39,6 +39,15 @@ DOMParser::DOMParser(NamePool* pNamePool):
 }
 
 
+DOMParser::DOMParser(unsigned long namePoolSize):
+	_pNamePool(new NamePool(namePoolSize)),
+	_filterWhitespace(false)
+{
+	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
+	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
+}
+
+
 DOMParser::~DOMParser()
 {
 	if (_pNamePool) _pNamePool->release();

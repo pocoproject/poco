@@ -739,11 +739,11 @@ generate_hash_secret_salt(XML_Parser parser)
       platform_gather_time_entropy() ^ platform_getpid() ^ (unsigned long)parser;
 
   /* Factors are 2^31-1 and 2^61-1 (Mersenne primes M31 and M61) */
-  if (sizeof(unsigned long) == 4) {
-    return entropy * 2147483647;
-  } else {
-    return entropy * (unsigned long)2305843009213693951;
-  }
+#ifdef POCO_LONG_IS_64_BIT
+  return entropy * 2305843009213693951ULL;
+#else
+  return entropy * 2147483647;
+#endif
 }
 
 static XML_Bool  /* only valid for root parser */

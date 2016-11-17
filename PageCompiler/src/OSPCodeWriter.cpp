@@ -15,8 +15,8 @@
 #include "Poco/NumberParser.h"
 
 
-OSPCodeWriter::OSPCodeWriter(const Page& rPage, const std::string& rClazz):
-	CodeWriter(rPage, rClazz)
+OSPCodeWriter::OSPCodeWriter(const Page& page, const std::string& clazz):
+	CodeWriter(page, clazz)
 {
 }
 

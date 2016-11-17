@@ -36,9 +36,9 @@ DatagramSocket::DatagramSocket(SocketAddress::Family family): Socket(new Datagra
 }
 
 
-DatagramSocket::DatagramSocket(const SocketAddress& rAddress, bool reuseAddress): Socket(new DatagramSocketImpl(rAddress.family()))
+DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress): Socket(new DatagramSocketImpl(address.family()))
 {
-	bind(rAddress, reuseAddress);
+	bind(address, reuseAddress);
 }
 
 
@@ -71,15 +71,21 @@ DatagramSocket& DatagramSocket::operator = (const Socket& socket)
 }
 
 
-void DatagramSocket::connect(const SocketAddress& rAddress)
+void DatagramSocket::connect(const SocketAddress& address)
 {
-	impl()->connect(rAddress);
+	impl()->connect(address);
 }
 
 
-void DatagramSocket::bind(const SocketAddress& rAddress, bool reuseAddress)
+void DatagramSocket::bind(const SocketAddress& address, bool reuseAddress)
 {
-	impl()->bind(rAddress, reuseAddress);
+	impl()->bind(address, reuseAddress);
+}
+
+
+void DatagramSocket::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	impl()->bind(address, reuseAddress, reusePort);
 }
 
 
@@ -95,15 +101,15 @@ int DatagramSocket::receiveBytes(void* buffer, int length, int flags)
 }
 
 
-int DatagramSocket::sendTo(const void* buffer, int length, const SocketAddress& rAddress, int flags)
+int DatagramSocket::sendTo(const void* buffer, int length, const SocketAddress& address, int flags)
 {
-	return impl()->sendTo(buffer, length, rAddress, flags);
+	return impl()->sendTo(buffer, length, address, flags);
 }
 
 
-int DatagramSocket::receiveFrom(void* buffer, int length, SocketAddress& rAddress, int flags)
+int DatagramSocket::receiveFrom(void* buffer, int length, SocketAddress& address, int flags)
 {
-	return impl()->receiveFrom(buffer, length, rAddress, flags);
+	return impl()->receiveFrom(buffer, length, address, flags);
 }
 
 

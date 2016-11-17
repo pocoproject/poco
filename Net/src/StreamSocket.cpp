@@ -35,9 +35,9 @@ StreamSocket::StreamSocket(): Socket(new StreamSocketImpl)
 }
 
 
-StreamSocket::StreamSocket(const SocketAddress& rAddress): Socket(new StreamSocketImpl(rAddress.family()))
+StreamSocket::StreamSocket(const SocketAddress& address): Socket(new StreamSocketImpl(address.family()))
 {
-	connect(rAddress);
+	connect(address);
 }
 
 
@@ -75,21 +75,21 @@ StreamSocket& StreamSocket::operator = (const Socket& socket)
 }
 
 
-void StreamSocket::connect(const SocketAddress& rAddress)
+void StreamSocket::connect(const SocketAddress& address)
 {
-	impl()->connect(rAddress);
+	impl()->connect(address);
 }
 
 
-void StreamSocket::connect(const SocketAddress& rAddress, const Poco::Timespan& timeout)
+void StreamSocket::connect(const SocketAddress& address, const Poco::Timespan& timeout)
 {
-	impl()->connect(rAddress, timeout);
+	impl()->connect(address, timeout);
 }
 
 
-void StreamSocket::connectNB(const SocketAddress& rAddress)
+void StreamSocket::connectNB(const SocketAddress& address)
 {
-	impl()->connectNB(rAddress);
+	impl()->connectNB(address);
 }
 
 

@@ -119,9 +119,9 @@ private:
 };
 
 
-inline void PrintHandler::setIndent(unsigned newIndent)
+inline void PrintHandler::setIndent(unsigned indent)
 {
-	_indent = newIndent;
+	_indent = indent;
 }
 
 

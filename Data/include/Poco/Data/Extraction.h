@@ -90,7 +90,8 @@ public:
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(rResult), 
 		_default(), 
-		_extracted(false)
+		_extracted(false),
+		_null(false)
 		/// Creates an Extraction object at specified position.
 		/// Uses an empty object T as default value.
 	{
@@ -100,7 +101,8 @@ public:
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(rResult), 
 		_default(def), 
-		_extracted(false)
+		_extracted(false),
+		_null(false)
 		/// Creates an Extraction object at specified position.
 		/// Uses the provided def object as default value.
 	{
@@ -180,7 +182,6 @@ public:
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(rResult), 
 		_default()
-
 	{
 		_rResult.clear();
 	}

@@ -60,10 +60,10 @@ FileChannelTest::~FileChannelTest()
 
 void FileChannelTest::testRotateBySize()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_ROTATION, "2 K");
 		pChannel->open();
 		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
@@ -71,28 +71,28 @@ void FileChannelTest::testRotateBySize()
 		{
 			pChannel->log(msg);
 		}
-		File f(fileName + ".0");
+		File f(name + ".0");
 		assert (f.exists());
-		f = fileName + ".1";
+		f = name + ".1";
 		assert (f.exists());
-		f = fileName + ".2";
+		f = name + ".2";
 		assert (!f.exists());
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::testRotateByAge()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_ROTATION, "2 seconds");
 		pChannel->open();
 		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
@@ -101,26 +101,26 @@ void FileChannelTest::testRotateByAge()
 			pChannel->log(msg);
 			Thread::sleep(300);
 		}
-		File f(fileName + ".0");
+		File f(name + ".0");
 		assert (f.exists());
-		f = fileName + ".1";
+		f = name + ".1";
 		assert (f.exists());
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::testRotateAtTimeDayUTC()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_TIMES, "utc");
 		pChannel->setProperty(FileChannel::PROP_ROTATION, rotation<DateTime>(DAY_HOUR_MIN));
 		pChannel->open();
@@ -132,24 +132,24 @@ void FileChannelTest::testRotateAtTimeDayUTC()
 			Thread::sleep(1000);
 		}
 		pChannel->log(msg);
-		File f(fileName + ".0");
+		File f(name + ".0");
 		assert (f.exists());
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::testRotateAtTimeDayLocal()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_TIMES, "local");
 		pChannel->setProperty(FileChannel::PROP_ROTATION, rotation<LocalDateTime>(DAY_HOUR_MIN));
 		pChannel->open();
@@ -161,24 +161,24 @@ void FileChannelTest::testRotateAtTimeDayLocal()
 			Thread::sleep(1000);
 		}
 		pChannel->log(msg);
-		File f(fileName + ".0");
+		File f(name + ".0");
 		assert (f.exists());
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::testRotateAtTimeHourUTC()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_TIMES, "utc");
 		pChannel->setProperty(FileChannel::PROP_ROTATION, rotation<DateTime>(HOUR_MIN));
 		pChannel->open();
@@ -190,24 +190,24 @@ void FileChannelTest::testRotateAtTimeHourUTC()
 			Thread::sleep(1000);
 		}
 		pChannel->log(msg);
-		File f(fileName + ".0");
+		File f(name + ".0");
 		assert (f.exists());
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::testRotateAtTimeHourLocal()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_TIMES, "local");
 		pChannel->setProperty(FileChannel::PROP_ROTATION, rotation<LocalDateTime>(HOUR_MIN));
 		pChannel->open();
@@ -219,24 +219,24 @@ void FileChannelTest::testRotateAtTimeHourLocal()
 			Thread::sleep(1000);
 		}
 		pChannel->log(msg);
-		File f(fileName + ".0");
+		File f(name + ".0");
 		assert (f.exists());
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::testRotateAtTimeMinUTC()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_TIMES, "utc");
 		pChannel->setProperty(FileChannel::PROP_ROTATION, rotation<DateTime>(MIN));
 		pChannel->open();
@@ -248,24 +248,24 @@ void FileChannelTest::testRotateAtTimeMinUTC()
 			Thread::sleep(1000);
 		}
 		pChannel->log(msg);
-		File f(fileName + ".0");
+		File f(name + ".0");
 		assert (f.exists());
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::testRotateAtTimeMinLocal()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_TIMES, "local");
 		pChannel->setProperty(FileChannel::PROP_ROTATION, rotation<LocalDateTime>(MIN));
 		pChannel->open();
@@ -277,24 +277,24 @@ void FileChannelTest::testRotateAtTimeMinLocal()
 			Thread::sleep(1000);
 		}
 		pChannel->log(msg);
-		File f(fileName + ".0");
+		File f(name + ".0");
 		assert (f.exists());
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::testArchive()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_ROTATION, "2 K");
 		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
 		pChannel->open();
@@ -303,24 +303,24 @@ void FileChannelTest::testArchive()
 		{
 			pChannel->log(msg);
 		}
-		File f(fileName + ".0");
+		File f(name + ".0");
 		assert (f.exists());
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::testCompress()
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 K");
 		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
 		pChannel->setProperty(FileChannel::PROP_COMPRESS, "true");
@@ -331,26 +331,26 @@ void FileChannelTest::testCompress()
 			pChannel->log(msg);
 		}
 		Thread::sleep(3000); // allow time for background compression
-		File f0(fileName + ".0.gz");
+		File f0(name + ".0.gz");
 		assert (f0.exists());
-		File f1(fileName + ".1.gz");
+		File f1(name + ".1.gz");
 		assert (f1.exists());
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::purgeAge(const std::string& pa)
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 K");
 		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
 		pChannel->setProperty(FileChannel::PROP_PURGEAGE, pa);
@@ -360,11 +360,11 @@ void FileChannelTest::purgeAge(const std::string& pa)
 		{
 			pChannel->log(msg);
 		}
-		File f0(fileName + ".0");
+		File f0(name + ".0");
 		assert(f0.exists());
-		File f1(fileName + ".1");
+		File f1(name + ".1");
 		assert(f1.exists());
-		File f2(fileName + ".2");
+		File f2(name + ".2");
 		assert(f2.exists());
 		
 		Thread::sleep(5000);
@@ -377,20 +377,20 @@ void FileChannelTest::purgeAge(const std::string& pa)
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::noPurgeAge(const std::string& npa)
 {
-	std::string fileName = filename();
+	std::string name = filename();
 
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 K");
 		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
 		pChannel->setProperty(FileChannel::PROP_PURGEAGE, npa);
@@ -400,11 +400,11 @@ void FileChannelTest::noPurgeAge(const std::string& npa)
 		{
 			pChannel->log(msg);
 		}
-		File f0(fileName + ".0");
+		File f0(name + ".0");
 		assert(f0.exists());
-		File f1(fileName + ".1");
+		File f1(name + ".1");
 		assert(f1.exists());
-		File f2(fileName + ".2");
+		File f2(name + ".2");
 		assert(f2.exists());
 
 		Thread::sleep(5000);
@@ -417,10 +417,10 @@ void FileChannelTest::noPurgeAge(const std::string& npa)
 	}
 	catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
@@ -442,10 +442,10 @@ void FileChannelTest::testPurgeAge()
 
 void FileChannelTest::purgeCount(const std::string& pc)
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 K");
 		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
 		pChannel->setProperty(FileChannel::PROP_PURGECOUNT, pc);
@@ -456,27 +456,27 @@ void FileChannelTest::purgeCount(const std::string& pc)
 			pChannel->log(msg);
 			Thread::sleep(50);
 		}
-		File f0(fileName + ".0");
+		File f0(name + ".0");
 		assert(f0.exists());
-		File f1(fileName + ".1");
+		File f1(name + ".1");
 		assert(f1.exists());
-		File f2(fileName + ".2");
+		File f2(name + ".2");
 		assert(!f2.exists());
 	} catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
 void FileChannelTest::noPurgeCount(const std::string& npc)
 {
-	std::string fileName = filename();
+	std::string name = filename();
 	try
 	{
-		AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 K");
 		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
 		pChannel->setProperty(FileChannel::PROP_PURGECOUNT, npc);
@@ -487,18 +487,18 @@ void FileChannelTest::noPurgeCount(const std::string& npc)
 			pChannel->log(msg);
 			Thread::sleep(50);
 		}
-		File f0(fileName + ".0");
+		File f0(name + ".0");
 		assert(f0.exists());
-		File f1(fileName + ".1");
+		File f1(name + ".1");
 		assert(f1.exists());
-		File f2(fileName + ".2");
+		File f2(name + ".2");
 		assert(f2.exists());
 	} catch (...)
 	{
-		remove(fileName);
+		remove(name);
 		throw;
 	}
-	remove(fileName);
+	remove(name);
 }
 
 
@@ -520,8 +520,8 @@ void FileChannelTest::testPurgeCount()
 
 void FileChannelTest::testWrongPurgeOption()
 {
-	std::string fileName = filename();
-	AutoPtr<FileChannel> pChannel = new FileChannel(fileName);
+	std::string name = filename();
+	AutoPtr<FileChannel> pChannel = new FileChannel(name);
 	pChannel->setProperty(FileChannel::PROP_PURGEAGE, "5 seconds");
 
 	try
@@ -542,7 +542,7 @@ void FileChannelTest::testWrongPurgeOption()
 		assert(pChannel->getProperty(FileChannel::PROP_PURGEAGE) == "5 seconds");
 	}
 
-	remove(fileName);
+	remove(name);
 }
 
 
@@ -569,11 +569,11 @@ void FileChannelTest::remove(const std::string& baseName)
 		}
 		++it;
 	}
-	for (std::vector<std::string>::iterator itFiles = files.begin(); itFiles != files.end(); ++itFiles)
+	for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it)
 	{
 		try
 		{
-			File f(*itFiles);
+			File f(*it);
 			f.remove();
 		} catch (...)
 		{
@@ -584,10 +584,10 @@ void FileChannelTest::remove(const std::string& baseName)
 
 std::string FileChannelTest::filename() const
 {
-	std::string ret = "log_";
-	ret.append(DateTimeFormatter::format(Timestamp(), "%Y%m%d%H%M%S"));
-	ret.append(".log");
-	return ret;
+	std::string name = "log_";
+	name.append(DateTimeFormatter::format(Timestamp(), "%Y%m%d%H%M%S"));
+	name.append(".log");
+	return name;
 }
 
 
@@ -595,7 +595,7 @@ template <class DT>
 std::string FileChannelTest::rotation(TimeRotation rtype) const
 {
 	DT now;
-	std::string ret;
+	std::string rotation;
 
 	int day  = now.dayOfWeek();
 	int min  = now.minute();
@@ -615,20 +615,20 @@ std::string FileChannelTest::rotation(TimeRotation rtype) const
 	switch (rtype)
 	{
 	case DAY_HOUR_MIN: // day,hh:m,
-		ret = DateTimeFormat::WEEKDAY_NAMES[day];
-		ret += ',' + NumberFormatter::format0(hour, 2) + ':' + NumberFormatter::format0(min, 2);
+		rotation = DateTimeFormat::WEEKDAY_NAMES[day];
+		rotation += ',' + NumberFormatter::format0(hour, 2) + ':' + NumberFormatter::format0(min, 2);
 		break;
 	case HOUR_MIN: // hh:mm
-		ret = NumberFormatter::format0(hour, 2) + ':' + NumberFormatter::format0(min, 2);
+		rotation = NumberFormatter::format0(hour, 2) + ':' + NumberFormatter::format0(min, 2);
 		break;
 	case MIN: // mm
-		ret = ':' + NumberFormatter::format0(min, 2);
+		rotation = ':' + NumberFormatter::format0(min, 2);
 		break;
 	default:
-		ret = "";
+		rotation = "";
 		break;
 	}
-	return ret;
+	return rotation;
 }
 
 
