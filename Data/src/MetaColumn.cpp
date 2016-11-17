@@ -21,7 +21,12 @@ namespace Poco {
 namespace Data {
 
 
-MetaColumn::MetaColumn()
+MetaColumn::MetaColumn():
+	_length(),
+	_precision(),
+	_position(),
+	_type(),
+	_nullable()
 {
 }
 

@@ -23,10 +23,11 @@ using Poco::Net::InvalidAddressException;
 using Poco::Net::HostNotFoundException;
 using Poco::Net::ServiceNotFoundException;
 using Poco::Net::NoAddressFoundException;
+using Poco::Net::AddressFamilyMismatchException;
 using Poco::InvalidArgumentException;
 
 
-SocketAddressTest::SocketAddressTest(const std::string& rName): CppUnit::TestCase(rName)
+SocketAddressTest::SocketAddressTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -61,17 +62,17 @@ void SocketAddressTest::testSocketAddress()
 
 	try
 	{
-		SocketAddress sa4("192.168.1.100", "f00bar");
+		SocketAddress sa3("192.168.1.100", "f00bar");
 		fail("bad service name - must throw");
 	}
 	catch (ServiceNotFoundException&)
 	{
 	}
 
-	SocketAddress sa4("www.appinf.com", 80);
+	SocketAddress sa4("pocoproject.org", 80);
 	assert (sa4.host().toString() == "162.209.7.4");
 	assert (sa4.port() == 80);
-
+	
 	try
 	{
 		SocketAddress sa5("192.168.2.260", 80);
@@ -118,6 +119,24 @@ void SocketAddressTest::testSocketAddress()
 	catch (InvalidArgumentException&)
 	{
 	}
+	
+	SocketAddress sa10("www6.pocoproject.org", 80);
+	assert (sa10.host().toString() == "162.209.7.4" || sa10.host().toString() == "[2001:4801:7819:74:be76:4eff:fe10:6b73]");
+	
+	SocketAddress sa11(SocketAddress::IPv4, "www6.pocoproject.org", 80);
+	assert (sa11.host().toString() == "162.209.7.4");
+
+#ifdef POCO_HAVE_IPv6
+	try
+	{
+		SocketAddress sa12(SocketAddress::IPv6, "www6.pocoproject.org", 80);
+		assert (sa12.host().toString() == "2001:4801:7819:74:be76:4eff:fe10:6b73");
+	}
+	catch (AddressFamilyMismatchException&)
+	{
+		// may happen if no IPv6 address is configured on the system
+	}
+#endif
 }
 
 

@@ -28,7 +28,7 @@ namespace
 	class QTestNotification: public Notification
 	{
 	public:
-		QTestNotification(const std::string& rData): _data(rData)
+		QTestNotification(const std::string& data): _data(data)
 		{
 		}
 		~QTestNotification()

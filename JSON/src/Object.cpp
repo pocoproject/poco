@@ -113,8 +113,8 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 const std::string& Object::getKey(KeyPtrList::const_iterator& iter) const
 {
 	ValueMap::const_iterator it = _values.begin();
-	ValueMap::const_iterator itEnd = _values.end();
-	for (; it != itEnd; ++it)
+	ValueMap::const_iterator end = _values.end();
+	for (; it != end; ++it)
 	{
 		if (it->first == **iter) return it->first;
 	}
@@ -130,8 +130,8 @@ void Object::set(const std::string& key, const Dynamic::Var& value)
 	if (_preserveInsOrder)
 	{
 		KeyPtrList::iterator it = _keys.begin();
-		KeyPtrList::iterator itEnd = _keys.end();
-		for (; it != itEnd; ++it)
+		KeyPtrList::iterator end = _keys.end();
+		for (; it != end; ++it)
 		{
 			if (key == **it) return;
 		}
@@ -173,9 +173,9 @@ Object::operator const Poco::DynamicStruct& () const
 	if (!_pStruct)
 	{
 		ValueMap::const_iterator it = _values.begin();
-		ValueMap::const_iterator itEnd = _values.end();
+		ValueMap::const_iterator end = _values.end();
 		_pStruct = new Poco::DynamicStruct;
-		for (; it != itEnd; ++it)
+		for (; it != end; ++it)
 		{
 			if (isObject(it))
 			{

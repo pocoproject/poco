@@ -9,27 +9,30 @@
 //
 // Definition of the RedisStream class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #ifndef Redis_RedisStream_INCLUDED
 #define Redis_RedisStream_INCLUDED
+
 
 #include "Poco/Redis/Redis.h"
 #include "Poco/BufferedStreamBuf.h"
 #include "Poco/Net/StreamSocket.h"
-
 #include <istream>
 #include <ostream>
+
 
 namespace Poco {
 namespace Redis {
 
-class RedisStreamBuf : public BufferedStreamBuf
-	/// BufferedStreamBuf for Redis
+
+class RedisStreamBuf: public BufferedStreamBuf
+	/// BufferedStreamBuf for Redis.
 {
 public:
 	RedisStreamBuf(Net::StreamSocket& redis);
@@ -43,11 +46,9 @@ public:
 
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
-
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-
 	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
@@ -55,6 +56,7 @@ private:
 
 	Net::StreamSocket& _redis;
 };
+
 
 class RedisIOS: public virtual std::ios
 {
@@ -103,11 +105,12 @@ public:
 		/// Destroys the RedisInputStream.
 
 	std::string getline();
-		/// Redis uses /r/n as delimiter. This getline version removes
-		/// the /r from the result.
+		/// Redis uses \r\n as delimiter. This getline version removes
+		/// the \r from the result.
 };
 
 
-}} // Poco::Redis
+} } // namespace Poco::Redis
+
 
 #endif // Redis_RedisStream_INCLUDED

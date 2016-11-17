@@ -63,52 +63,52 @@ protected:
 		// add your own reinitialization code here
 	}
 	
-	void defineOptions(OptionSet& rOptions)
+	void defineOptions(OptionSet& options)
 	{
-		Application::defineOptions(rOptions);
+		Application::defineOptions(options);
 
-		rOptions.addOption(
+		options.addOption(
 			Option("help", "h", "Display help information on command line arguments.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleHelp)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("contentType", "t", "Specify a content type.")
 				.required(false)
 				.repeatable(false)
 				.argument("MIME-Type")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleContentType)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("contentLanguage", "l", "Specify a content language.")
 				.required(false)
 				.repeatable(false)
 				.argument("language")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleContentLang)));
 								
-		rOptions.addOption(
+		options.addOption(
 			Option("class", "c", "Specify the handler class name.")
 				.required(false)
 				.repeatable(false)
 				.argument("class-name")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleClassName)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("namespace", "n", "Specify the handler class namespace name.")
 				.required(false)
 				.repeatable(false)
 				.argument("namespace-name")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleNamespace)));
 	
-		rOptions.addOption(
+		options.addOption(
 			Option("output", "o", "Specify the output file name.")
 				.required(false)
 				.repeatable(false)
 				.argument("path")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleOutput)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("path", "p", "Specify the server path of the file.")
 				.required(false)
 				.repeatable(false)
@@ -116,39 +116,39 @@ protected:
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handlePath)));
 	}
 	
-	void handleHelp(const std::string& rName, const std::string& value)
+	void handleHelp(const std::string& name, const std::string& value)
 	{
 		_helpRequested = true;
 		displayHelp();
 		stopOptionsProcessing();
 	}
 	
-	void handleContentType(const std::string& rName, const std::string& value)
+	void handleContentType(const std::string& name, const std::string& value)
 	{
 		_contentType = value;
 	}
 
-	void handleContentLang(const std::string& rName, const std::string& value)
+	void handleContentLang(const std::string& name, const std::string& value)
 	{
 		_contentLang = value;
 	}
 	
-	void handleClassName(const std::string& rName, const std::string& value)
+	void handleClassName(const std::string& name, const std::string& value)
 	{
 		_clazz = value;
 	}
 
-	void handleNamespace(const std::string& rName, const std::string& value)
+	void handleNamespace(const std::string& name, const std::string& value)
 	{
 		_namespace = value;
 	}
 				
-	void handleOutput(const std::string& rName, const std::string& value)
+	void handleOutput(const std::string& name, const std::string& value)
 	{
 		_output = value;
 	}
 
-	void handlePath(const std::string& rName, const std::string& value)
+	void handlePath(const std::string& name, const std::string& value)
 	{
 		_path = value;
 	}

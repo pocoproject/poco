@@ -37,7 +37,7 @@ using Poco::InvalidArgumentException;
 using Poco::IOException;
 
 
-MulticastSocketTest::MulticastSocketTest(const std::string& rName): CppUnit::TestCase(rName)
+MulticastSocketTest::MulticastSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

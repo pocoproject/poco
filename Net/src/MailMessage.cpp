@@ -105,18 +105,21 @@ namespace
 				poco_check_ptr (pPS);
 				NameValueCollection::ConstIterator it = header.begin();
 				NameValueCollection::ConstIterator end = header.end();
+				bool added = false;
 				for (; it != end; ++it)
 				{
-					if (MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
+					if (!added && MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
 					{
 						if (it->second == "inline") 
 							_pMsg->addContent(pPS, cte);
 						else 
 							_pMsg->addAttachment("", pPS, cte);
+						added = true;
 					}
 					
 					pPS->headers().set(it->first, it->second);
 				}
+				if (!added) delete pPS;
 			}
 		}
 		
@@ -191,6 +194,7 @@ const std::string MailMessage::CTE_BASE64("base64");
 
 
 MailMessage::MailMessage(PartStoreFactory* pStoreFactory): 
+	_encoding(),
 	_pStoreFactory(pStoreFactory)
 {
 	Poco::Timestamp now;
@@ -214,9 +218,9 @@ void MailMessage::addRecipient(const MailRecipient& recipient)
 }
 
 
-void MailMessage::setRecipients(const Recipients& rRecipients)
+void MailMessage::setRecipients(const Recipients& recipients)
 {
-	_recipients.assign(rRecipients.begin(), rRecipients.end());
+	_recipients.assign(recipients.begin(), recipients.end());
 }
 
 
@@ -326,12 +330,12 @@ void MailMessage::addAttachment(const std::string& name, PartSource* pSource, Co
 }
 
 
-void MailMessage::read(std::istream& istr, PartHandler& rHandler)
+void MailMessage::read(std::istream& istr, PartHandler& handler)
 {
 	readHeader(istr);
 	if (isMultipart())
 	{
-		readMultipart(istr, rHandler);
+		readMultipart(istr, handler);
 	}
 	else
 	{

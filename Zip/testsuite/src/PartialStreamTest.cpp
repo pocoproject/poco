@@ -20,7 +20,7 @@
 using namespace Poco::Zip;
 
 
-PartialStreamTest::PartialStreamTest(const std::string& rName): CppUnit::TestCase(rName)
+PartialStreamTest::PartialStreamTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

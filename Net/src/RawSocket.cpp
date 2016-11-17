@@ -38,10 +38,10 @@ RawSocket::RawSocket(SocketAddress::Family family, int proto):
 }
 
 
-RawSocket::RawSocket(const SocketAddress& rAddress, bool reuseAddress): 
-	Socket(new RawSocketImpl(rAddress.family()))
+RawSocket::RawSocket(const SocketAddress& address, bool reuseAddress): 
+	Socket(new RawSocketImpl(address.family()))
 {
-	bind(rAddress, reuseAddress);
+	bind(address, reuseAddress);
 }
 
 
@@ -74,15 +74,21 @@ RawSocket& RawSocket::operator = (const Socket& socket)
 }
 
 
-void RawSocket::connect(const SocketAddress& rAddress)
+void RawSocket::connect(const SocketAddress& address)
 {
-	impl()->connect(rAddress);
+	impl()->connect(address);
 }
 
 
-void RawSocket::bind(const SocketAddress& rAddress, bool reuseAddress)
+void RawSocket::bind(const SocketAddress& address, bool reuseAddress)
 {
-	impl()->bind(rAddress, reuseAddress);
+	impl()->bind(address, reuseAddress);
+}
+
+
+void RawSocket::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	impl()->bind(address, reuseAddress, reusePort);
 }
 
 
@@ -98,15 +104,15 @@ int RawSocket::receiveBytes(void* buffer, int length, int flags)
 }
 
 
-int RawSocket::sendTo(const void* buffer, int length, const SocketAddress& rAddress, int flags)
+int RawSocket::sendTo(const void* buffer, int length, const SocketAddress& address, int flags)
 {
-	return impl()->sendTo(buffer, length, rAddress, flags);
+	return impl()->sendTo(buffer, length, address, flags);
 }
 
 
-int RawSocket::receiveFrom(void* buffer, int length, SocketAddress& rAddress, int flags)
+int RawSocket::receiveFrom(void* buffer, int length, SocketAddress& address, int flags)
 {
-	return impl()->receiveFrom(buffer, length, rAddress, flags);
+	return impl()->receiveFrom(buffer, length, address, flags);
 }
 
 

@@ -43,7 +43,7 @@ void ConsoleCertificateHandler::onInvalidCertificate(const void*, VerificationEr
 	std::cout << "The certificate yielded the error: " << errorCert.errorMessage() << "\n\n";
 	std::cout << "The error occurred in the certificate chain at position " << errorCert.errorDepth() << "\n";
 	std::cout << "Accept the certificate (y,n)? ";
-	char c;
+	char c = 0;
 	std::cin >> c;
 	if (c == 'y' || c == 'Y')
 		errorCert.setIgnoreError(true);

@@ -26,7 +26,7 @@ using Poco::Net::MailRecipient;
 using Poco::Net::SMTPException;
 
 
-SMTPClientSessionTest::SMTPClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
+SMTPClientSessionTest::SMTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -42,7 +42,7 @@ void SMTPClientSessionTest::testLoginEHLO()
 	server.addResponse("220 localhost SMTP ready");
 	server.addResponse("250 Hello localhost");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 	std::string cmd = server.popCommand();
 	assert (cmd == "EHLO localhost");
@@ -59,7 +59,7 @@ void SMTPClientSessionTest::testLoginHELO()
 	server.addResponse("500 EHLO not understood");
 	server.addResponse("250 Hello localhost");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 	std::string cmd = server.popCommand();
 	assert (cmd == "EHLO localhost");
@@ -76,7 +76,7 @@ void SMTPClientSessionTest::testLoginFailed()
 	DialogServer server;
 	server.addResponse("500 No SMTP service here");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	try
 	{
 		session.login("localhost");
@@ -99,7 +99,7 @@ void SMTPClientSessionTest::testSend()
 	server.addResponse("354 Send data");
 	server.addResponse("250 OK");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 
 	MailMessage message;
@@ -153,7 +153,7 @@ void SMTPClientSessionTest::testSendMultiRecipient()
 	server.addResponse("250 OK");
 	server.addResponse("250 OK");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 
 	MailMessage message;
@@ -218,7 +218,7 @@ void SMTPClientSessionTest::testMultiSeparateRecipient()
 	server.addResponse("250 OK");
 	server.addResponse("250 OK");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 
 	MailMessage message;
@@ -285,7 +285,7 @@ void SMTPClientSessionTest::testSendFailed()
 	server.addResponse("354 Send data");
 	server.addResponse("500 Error");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 
 	MailMessage message;

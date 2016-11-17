@@ -35,19 +35,35 @@ MemoryPool::MemoryPool(std::size_t blockLength, int preAlloc, int maxAlloc):
 	if (maxAlloc > 0 && maxAlloc < r)
 		r = maxAlloc;
 	_blocks.reserve(r);
-	for (int i = 0; i < preAlloc; ++i)
+	
+	try
 	{
-		_blocks.push_back(new char[_blockSize]);
+		for (int i = 0; i < preAlloc; ++i)
+		{
+			_blocks.push_back(new char[_blockSize]);
+		}
+	}
+	catch (...)
+	{
+		clear();
+		throw;
 	}
 }
 
 	
 MemoryPool::~MemoryPool()
 {
+	clear();
+}
+
+
+void MemoryPool::clear()
+{
 	for (BlockVec::iterator it = _blocks.begin(); it != _blocks.end(); ++it)
 	{
 		delete [] *it;
 	}
+	_blocks.clear();
 }
 
 
@@ -77,7 +93,14 @@ void MemoryPool::release(void* ptr)
 {
 	FastMutex::ScopedLock lock(_mutex);
 	
-	_blocks.push_back(reinterpret_cast<char*>(ptr));
+	try
+	{
+		_blocks.push_back(reinterpret_cast<char*>(ptr));
+	}
+	catch (...)
+	{
+		delete [] reinterpret_cast<char*>(ptr);
+	}
 }
 
 

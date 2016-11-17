@@ -69,6 +69,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	{
 		_pIstr->seekg(_start, std::ios_base::beg);
 		_reposition = false;
+		if (!_pIstr->good()) return -1;
 	}
 
 	if (!_prefix.empty())
@@ -145,11 +146,9 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 				{
 					if (c-1 == byte3)
 					{
-						// a match, pushback
-						_pIstr->putback(c);
-						_pIstr->putback(byte3);
-						_pIstr->putback(ZipLocalFileHeader::HEADER[1]);
-						_pIstr->putback(ZipLocalFileHeader::HEADER[0]);
+						// a match, seek back 
+						_pIstr->seekg(-4, std::ios::cur);
+						if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
 						_eofDetected = true;
 						return tempPos;
 					}

@@ -80,13 +80,13 @@ public:
 		_socket.connectNB(address);
 	}
 
-	SocketConnector(SocketAddress& address, SocketReactor& rReactor):
+	SocketConnector(SocketAddress& address, SocketReactor& reactor):
 		_pReactor(0)
 		/// Creates an acceptor, using the given ServerSocket.
 		/// The SocketConnector registers itself with the given SocketReactor.
 	{
 		_socket.connectNB(address);
-		registerConnector(rReactor);
+		registerConnector(reactor);
 	}
 
 	virtual ~SocketConnector()
@@ -102,7 +102,7 @@ public:
 		}
 	}
 	
-	virtual void registerConnector(SocketReactor& rReactor)
+	virtual void registerConnector(SocketReactor& reactor)
 		/// Registers the SocketConnector with a SocketReactor.
 		///
 		/// A subclass can override this and, for example, also register
@@ -110,7 +110,7 @@ public:
 		///
 		/// The overriding method must call the baseclass implementation first.
 	{
-		_pReactor = &rReactor;
+		_pReactor = &reactor;
 		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
 		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
 		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));

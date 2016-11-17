@@ -53,6 +53,7 @@ POCO_DECLARE_EXCEPTION(Net_API, NTPException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, HTMLFormException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, WebSocketException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, UnsupportedFamilyException, NetException)
+POCO_DECLARE_EXCEPTION(Net_API, AddressFamilyMismatchException, NetException)
 
 
 } } // namespace Poco::Net

@@ -89,7 +89,7 @@ void DynamicFactoryTest::testDynamicFactory()
 	
 	try
 	{
-		std::auto_ptr<B> pB(dynamic_cast<B*>(dynFactory.createInstance("B")));
+		std::auto_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
 		fail("unregistered - must throw");
 	}
 	catch (Poco::NotFoundException&)

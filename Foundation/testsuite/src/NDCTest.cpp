@@ -50,13 +50,13 @@ void NDCTest::testNDC()
 
 void NDCTest::testNDCScope()
 {
-	Poco::NDCScope item1("item1", __LINE__, __FILE__);
+	poco_ndc("item1");
 	assert (NDC::current().depth() == 1);
 	{
-		Poco::NDCScope item2("item2", __LINE__, __FILE__);
+		poco_ndc("item2");
 		assert (NDC::current().depth() == 2);
 		{
-			Poco::NDCScope item3("item3", __LINE__, __FILE__);
+			poco_ndc("item3");
 			assert (NDC::current().depth() == 3);
 			NDC::current().dump(std::cout);
 		}

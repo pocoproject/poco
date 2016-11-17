@@ -111,7 +111,7 @@ const ZipLocalFileHeader& ZipManipulator::getForChange(const std::string& zipPat
 {
 	ZipArchive::FileHeaders::const_iterator it = _in->findHeader(zipPath);
 	if (it == _in->headerEnd())
-		throw ZipManipulationException("entry not found: " + zipPath);
+		throw ZipManipulationException("Entry not found: " + zipPath);
 
 	if (_changes.find(zipPath) != _changes.end())
 		throw ZipManipulationException("A change request exists already for entry " + zipPath);

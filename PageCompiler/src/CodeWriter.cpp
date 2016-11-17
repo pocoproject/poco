@@ -21,9 +21,9 @@ using Poco::Path;
 using Poco::StringTokenizer;
 
 
-CodeWriter::CodeWriter(const Page& rPage, const std::string& rClazz):
-	_page(rPage),
-	_class(rClazz)
+CodeWriter::CodeWriter(const Page& page, const std::string& clazz):
+	_page(page),
+	_class(clazz)
 {
 }
 

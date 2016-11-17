@@ -30,7 +30,7 @@ using Poco::Net::HTTPMessage;
 using Poco::StreamCopier;
 
 
-HTTPClientSessionTest::HTTPClientSessionTest(const std::string& rName): CppUnit::TestCase(rName)
+HTTPClientSessionTest::HTTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -43,7 +43,7 @@ HTTPClientSessionTest::~HTTPClientSessionTest()
 void HTTPClientSessionTest::testGetSmall()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -59,7 +59,7 @@ void HTTPClientSessionTest::testGetSmall()
 void HTTPClientSessionTest::testGetLarge()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -75,7 +75,7 @@ void HTTPClientSessionTest::testGetLarge()
 void HTTPClientSessionTest::testHead()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/large");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -90,7 +90,7 @@ void HTTPClientSessionTest::testHead()
 void HTTPClientSessionTest::testPostSmallIdentity()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body("this is a random request body\r\n0\r\n");
 	request.setContentLength((int) body.length());
@@ -107,7 +107,7 @@ void HTTPClientSessionTest::testPostSmallIdentity()
 void HTTPClientSessionTest::testPostLargeIdentity()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body(8000, 'x');
 	body.append("\r\n0\r\n");
@@ -125,7 +125,7 @@ void HTTPClientSessionTest::testPostLargeIdentity()
 void HTTPClientSessionTest::testPostSmallChunked()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body("this is a random request body");
 	request.setChunkedTransferEncoding(true);
@@ -143,7 +143,7 @@ void HTTPClientSessionTest::testPostSmallChunked()
 void HTTPClientSessionTest::testPostLargeChunked()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body(16000, 'x');
 	request.setChunkedTransferEncoding(true);
@@ -163,7 +163,7 @@ void HTTPClientSessionTest::testPostLargeChunked()
 void HTTPClientSessionTest::testPostSmallClose()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body("this is a random request body");
 	s.sendRequest(request) << body;
@@ -180,7 +180,7 @@ void HTTPClientSessionTest::testPostSmallClose()
 void HTTPClientSessionTest::testPostLargeClose()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body(8000, 'x');
 	s.sendRequest(request) << body;
@@ -197,7 +197,7 @@ void HTTPClientSessionTest::testPostLargeClose()
 void HTTPClientSessionTest::testKeepAlive()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	s.setKeepAlive(true);
 	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/keepAlive", HTTPMessage::HTTP_1_1);
 	s.sendRequest(request);
@@ -246,7 +246,7 @@ void HTTPClientSessionTest::testProxy()
 {
 	HTTPTestServer srv;
 	HTTPClientSession s("www.somehost.com");
-	s.setProxy("localhost", srv.port());
+	s.setProxy("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -263,7 +263,7 @@ void HTTPClientSessionTest::testProxyAuth()
 {
 	HTTPTestServer srv;
 	HTTPClientSession s("www.somehost.com");
-	s.setProxy("localhost", srv.port());
+	s.setProxy("127.0.0.1", srv.port());
 	s.setProxyCredentials("user", "pass");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
 	s.sendRequest(request);
@@ -286,7 +286,7 @@ void HTTPClientSessionTest::testBypassProxy()
 	proxyConfig.port = 80;
 	proxyConfig.nonProxyHosts = "localhost|127\\.0\\.0\\.1";
 	
-	HTTPClientSession s1("localhost", 80);
+	HTTPClientSession s1("127.0.0.1", 80);
 	s1.setProxyConfig(proxyConfig);
 	assert (s1.bypassProxy());
 	
@@ -303,7 +303,7 @@ void HTTPClientSessionTest::testBypassProxy()
 void HTTPClientSessionTest::testExpectContinue()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/expect");
 	std::string body("this is a random request body\r\n0\r\n");
 	request.setContentLength((int) body.length());
@@ -324,7 +324,7 @@ void HTTPClientSessionTest::testExpectContinue()
 void HTTPClientSessionTest::testExpectContinueFail()
 {
 	HTTPTestServer srv;
-	HTTPClientSession s("localhost", srv.port());
+	HTTPClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/fail");
 	std::string body("this is a random request body\r\n0\r\n");
 	request.setContentLength((int) body.length());

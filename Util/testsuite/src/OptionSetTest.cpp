@@ -22,7 +22,7 @@ using Poco::Util::OptionSet;
 using Poco::Util::Option;
 
 
-OptionSetTest::OptionSetTest(const std::string& rName): CppUnit::TestCase(rName)
+OptionSetTest::OptionSetTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

@@ -66,8 +66,8 @@ int SocketStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 //
 
 
-SocketIOS::SocketIOS(const Socket& rSocket):
-	_buf(rSocket)
+SocketIOS::SocketIOS(const Socket& socket):
+	_buf(socket)
 {
 	poco_ios_init(&_buf);
 }
@@ -109,8 +109,8 @@ StreamSocket SocketIOS::socket() const
 //
 
 
-SocketOutputStream::SocketOutputStream(const Socket& rSocket):
-	SocketIOS(rSocket),
+SocketOutputStream::SocketOutputStream(const Socket& socket):
+	SocketIOS(socket),
 	std::ostream(&_buf)
 {
 }
@@ -126,8 +126,8 @@ SocketOutputStream::~SocketOutputStream()
 //
 
 
-SocketInputStream::SocketInputStream(const Socket& rSocket):
-	SocketIOS(rSocket),
+SocketInputStream::SocketInputStream(const Socket& socket):
+	SocketIOS(socket),
 	std::istream(&_buf)
 {
 }
@@ -143,8 +143,8 @@ SocketInputStream::~SocketInputStream()
 //
 
 
-SocketStream::SocketStream(const Socket& rSocket):
-	SocketIOS(rSocket),
+SocketStream::SocketStream(const Socket& socket):
+	SocketIOS(socket),
 	std::iostream(&_buf)
 {
 }

@@ -51,8 +51,8 @@ namespace Poco {
 namespace Net {
 
 
-SMTPClientSession::SMTPClientSession(const StreamSocket& rSocket):
-	_socket(rSocket),
+SMTPClientSession::SMTPClientSession(const StreamSocket& socket):
+	_socket(socket),
 	_isOpen(false)
 {
 }
@@ -346,8 +346,8 @@ void SMTPClientSession::sendCommands(const MailMessage& message, const Recipient
 		for (Recipients::const_iterator it = pRecipients->begin(); it != pRecipients->end(); ++it)
 		{
 			recipient << '<' << *it << '>';
-			int commandStatus = sendCommand("RCPT TO:", recipient.str(), response);
-			if (!isPositiveCompletion(commandStatus)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, commandStatus);
+			int status = sendCommand("RCPT TO:", recipient.str(), response);
+			if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
 			recipient.str("");
 		}
 	}
@@ -356,8 +356,8 @@ void SMTPClientSession::sendCommands(const MailMessage& message, const Recipient
 		for (MailMessage::Recipients::const_iterator it = message.recipients().begin(); it != message.recipients().end(); ++it)
 		{
 			recipient << '<' << it->getAddress() << '>';
-			int commandStatus = sendCommand("RCPT TO:", recipient.str(), response);
-			if (!isPositiveCompletion(commandStatus)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, commandStatus);
+			int status = sendCommand("RCPT TO:", recipient.str(), response);
+			if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
 			recipient.str("");
 		}
 	}
@@ -393,8 +393,8 @@ void SMTPClientSession::sendAddresses(const std::string& from, const Recipients&
 	{
 
 		recipient << '<' << *it << '>';
-		int commandStatus = sendCommand("RCPT TO:", recipient.str(), response);
-		if (!isPositiveCompletion(commandStatus)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, commandStatus);
+		int status = sendCommand("RCPT TO:", recipient.str(), response);
+		if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
 		recipient.str("");
 	}
 }
