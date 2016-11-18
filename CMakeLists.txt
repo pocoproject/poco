@@ -143,7 +143,7 @@ set(Poco_COMPONENTS "")
 # Pthreads/threads support
 find_package(Threads REQUIRED)
 
-if (ENABLE_TESTS)
+if (ENABLE_TESTS OR ENABLE_CPPUNIT)
    add_subdirectory(CppUnit)
    list(APPEND Poco_COMPONENTS "CppUnit")
 endif ()
