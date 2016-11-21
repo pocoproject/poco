@@ -113,10 +113,10 @@ void Message::init()
 #if !defined(POCO_VXWORKS)
 	_pid = Process::id();
 #endif
+	_tid = Thread::currentTid();
 	Thread* pThread = Thread::current();
 	if (pThread)
 	{
-		_tid    = pThread->id();
 		_thread = pThread->name();
 	}
 }
