@@ -143,7 +143,7 @@ protected:
 };
 
 
-class Foundation_API InflatingOutputStream: public InflatingIOS, public std::ostream
+class Foundation_API InflatingOutputStream: public std::ostream, public InflatingIOS
 	/// This stream decompresses all data passing through it
 	/// using zlib's inflate algorithm.
 	///
