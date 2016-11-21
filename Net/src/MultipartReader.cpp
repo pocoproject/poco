@@ -38,7 +38,7 @@ MultipartStreamBuf::MultipartStreamBuf(std::istream& istr, const std::string& bo
 	_boundary(boundary),
 	_lastPart(false)
 {
-	poco_assert (!boundary.empty() && boundary.length() < STREAM_BUFFER_SIZE - 6);
+	poco_assert (boundary.length() < STREAM_BUFFER_SIZE - 6);
 }
 
 
