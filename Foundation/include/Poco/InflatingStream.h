@@ -173,7 +173,7 @@ public:
 };
 
 
-class Foundation_API InflatingInputStream: public InflatingIOS, public std::istream
+class Foundation_API InflatingInputStream: public std::istream, public InflatingIOS
 	/// This stream decompresses all data passing through it
 	/// using zlib's inflate algorithm.
 	/// Example:
