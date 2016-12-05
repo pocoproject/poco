@@ -259,8 +259,14 @@ public:
 			_factory.deactivateObject(pObject);
 			if (_pool.size() < _capacity)
 			{
-				_pool.push_back(pObject);
-				return;
+				try
+				{
+					_pool.push_back(pObject);
+					return;
+				}
+				catch (...)
+				{
+				}
 			}
 		}
 		_factory.destroyObject(pObject);
