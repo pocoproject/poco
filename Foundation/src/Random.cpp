@@ -151,6 +151,8 @@ namespace Poco {
 
 
 Random::Random(int stateSize)
+	: _fptr(NULL)
+	, _rptr(NULL)
 {
 	poco_assert (BREAK_0 <= stateSize && stateSize <= BREAK_4);
 
