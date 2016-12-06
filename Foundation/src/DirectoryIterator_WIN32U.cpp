@@ -28,7 +28,7 @@
 namespace Poco {
 
 
-DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVALID_HANDLE_VALUE), _rc(1)
+DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVALID_HANDLE_VALUE), _fd({0}), _rc(1)
 {
 	Path p(path);
 	p.makeDirectory();
