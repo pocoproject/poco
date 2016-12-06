@@ -309,9 +309,11 @@ void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severi
 	if (hasDate)
 		logEntry.setTime(date.timestamp());
 	int lval(0);
-	Poco::NumberParser::tryParse(procId, lval);
-	logEntry.setPid(lval);
-	message.swap(logEntry);
+	if (Poco::NumberParser::tryParse(procId, lval))
+	{
+		logEntry.setPid(lval);
+		message.swap(logEntry);
+	}
 }
 
 
