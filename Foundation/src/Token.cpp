@@ -167,7 +167,7 @@ bool WhitespaceToken::start(char c, std::istream& istr)
 void WhitespaceToken::finish(std::istream& istr)
 {
 	int c = istr.peek();
-	while (Ascii::isSpace(c))
+	while (c != EOF && Ascii::isSpace(c))
 	{
 		istr.get();
 		_value += (char) c;
