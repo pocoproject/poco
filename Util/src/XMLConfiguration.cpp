@@ -308,10 +308,13 @@ void XMLConfiguration::removeRaw(const std::string& key)
 		else if (pNode->nodeType() == Poco::XML::Node::ATTRIBUTE_NODE)
 		{
 			Poco::XML::Attr* pAttr = dynamic_cast<Poco::XML::Attr*>(pNode);
-			Poco::XML::Element* pOwner = pAttr->ownerElement();
-			if (pOwner)
+			if (pAttr)
 			{
-				pOwner->removeAttributeNode(pAttr);
+				Poco::XML::Element* pOwner = pAttr->ownerElement();
+				if (pOwner)
+				{
+					pOwner->removeAttributeNode(pAttr);
+				}
 			}
 		}
 	}
