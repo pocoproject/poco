@@ -205,11 +205,10 @@ std::string PathImpl::expandImpl(const std::string& path)
 void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 {
 	roots.clear();
-	const int bufferSize = 128;
-	wchar_t buffer[bufferSize];
-	DWORD n = GetLogicalDriveStringsW(bufferSize - 1, buffer);
+	wchar_t buffer[128];
+	DWORD n = GetLogicalDriveStringsW(_countof(buffer) - 1, buffer);
 	wchar_t* it  = buffer;
-	wchar_t* end = buffer + (n > bufferSize ? bufferSize : n);
+	wchar_t* end = buffer + (n > _countof(buffer) ? _countof(buffer) : n);
 	while (it < end)
 	{
 		std::wstring udev;
