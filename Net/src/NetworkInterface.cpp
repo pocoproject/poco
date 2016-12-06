@@ -49,12 +49,16 @@ std::ostream& operator << (std::ostream& os, const Poco::Net::NetworkInterface::
 {
 	std::ios state(0);
 	state.copyfmt(os);
+	std::ios::fmtflags prevFlags(os.flags());
+	char prevFill = os.fill();
 	for (unsigned i = 0; i < mac.size(); ++i)
 	{
 		if (i > 0) os << Poco::Net::NetworkInterface::MAC_SEPARATOR;
 		os << std::hex << std::setw(2) << std::setfill('0') << (unsigned) mac[i];
 	}
 	os.copyfmt(state);
+	os.flags(prevFlags);
+	os.fill(prevFill);
 	return os;
 }
 
