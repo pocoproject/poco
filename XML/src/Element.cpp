@@ -137,7 +137,7 @@ Attr* Element::removeAttributeNode(Attr* oldAttr)
 	if (oldAttr != _pFirstAttr)
 	{
 		Attr* pCur = _pFirstAttr;
-		while (pCur->_pNext != oldAttr) pCur = static_cast<Attr*>(pCur->_pNext);
+		while (pCur && pCur->_pNext != oldAttr) pCur = static_cast<Attr*>(pCur->_pNext);
 		if (pCur)
 		{
 			pCur->_pNext = static_cast<Attr*>(pCur->_pNext->_pNext);
