@@ -24,7 +24,17 @@
 #if POCO_OS == POCO_OS_WINDOWS_NT
 	#include "Poco/UnWindows.h"
 #elif POCO_OS == POCO_OS_MAC_OS_X
+<<<<<<< HEAD
 	#include <libkern/OSAtomic.h>
+=======
+	#if __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_12 || __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0 || __TV_OS_VERSION_MAX_ALLOWED >= __TVOS_10_0 || __WATCH_OS_VERSION_MAX_ALLOWED >= __WATCHOS_3_0
+		#ifndef POCO_HAVE_STD_ATOMICS
+			#define POCO_HAVE_STD_ATOMICS
+		#endif
+	#else
+		#include <libkern/OSAtomic.h>
+	#endif
+>>>>>>> c8aa273... more fixes related to GH #1453
 #elif ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2) || __GNUC__ > 4) && (defined(__x86_64__) || defined(__i386__))
 	#if !defined(POCO_HAVE_GCC_ATOMICS) && !defined(POCO_NO_GCC_ATOMICS)
 		#define POCO_HAVE_GCC_ATOMICS
