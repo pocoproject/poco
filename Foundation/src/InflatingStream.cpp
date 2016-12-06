@@ -309,15 +309,15 @@ InflatingStreamBuf* InflatingIOS::rdbuf()
 
 
 InflatingOutputStream::InflatingOutputStream(std::ostream& ostr, InflatingStreamBuf::StreamType type):
-	InflatingIOS(ostr, type),
-	std::ostream(&_buf)
+	std::ostream(&_buf),
+	InflatingIOS(ostr, type)
 {
 }
 
 
 InflatingOutputStream::InflatingOutputStream(std::ostream& ostr, int windowBits):
-	InflatingIOS(ostr, windowBits),
-	std::ostream(&_buf)
+	std::ostream(&_buf),
+	InflatingIOS(ostr, windowBits)
 {
 }
 
@@ -334,15 +334,15 @@ int InflatingOutputStream::close()
 
 
 InflatingInputStream::InflatingInputStream(std::istream& istr, InflatingStreamBuf::StreamType type):
-	InflatingIOS(istr, type),
-	std::istream(&_buf)
+	std::istream(&_buf),
+	InflatingIOS(istr, type)
 {
 }
 
 
 InflatingInputStream::InflatingInputStream(std::istream& istr, int windowBits):
-	InflatingIOS(istr, windowBits),
-	std::istream(&_buf)
+	std::istream(&_buf),
+	InflatingIOS(istr, windowBits)
 {
 }
 
