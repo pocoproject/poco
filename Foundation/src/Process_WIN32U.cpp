@@ -333,6 +333,7 @@ bool ProcessImpl::isRunningImpl(PIDImpl pid)
 	DWORD exitCode;
 	BOOL rc = GetExitCodeProcess(hProc, &exitCode);
 	if (!rc || exitCode != STILL_ACTIVE) result = false;
+    if (hProc) CloseHandle(hProc);
 	return result;
 }
 
