@@ -65,9 +65,9 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	if (_chunk == 0)
 	{
 		int ch = _session.get();
-		while (Poco::Ascii::isSpace(ch)) ch = _session.get();
+		while (ch != eof && Poco::Ascii::isSpace(ch)) ch = _session.get();
 		std::string chunkLen;
-		while (Poco::Ascii::isHexDigit(ch)) { chunkLen += (char) ch; ch = _session.get(); }
+		while (ch != eof && Poco::Ascii::isHexDigit(ch)) { chunkLen += (char) ch; ch = _session.get(); }
 		while (ch != eof && ch != '\n') ch = _session.get();
 		unsigned chunk;
 		if (NumberParser::tryParseHex(chunkLen, chunk))
