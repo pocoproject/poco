@@ -1174,9 +1174,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			ifIt->second.impl().setMTU(pAddress->Mtu);
 			ifIt->second.impl().setUp(pAddress->OperStatus == IfOperStatusUp);
 #if (_WIN32_WINNT >= 0x0600) // Vista and newer only
-			if ((osvi.dwMajorVersion >= 6) &&
-				(osvi.dwMinorVersion >= 0) &&
-				(osvi.dwBuildNumber >= 0))
+			if (osvi.dwMajorVersion >= 6)
 			{
 				ifIt->second.impl().setRunning(pAddress->ReceiveLinkSpeed > 0 || pAddress->TransmitLinkSpeed > 0);
 			}
