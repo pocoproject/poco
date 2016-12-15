@@ -58,7 +58,8 @@ void Net_API uninitializeNetwork()
 		{
 			Poco::Net::initializeNetwork();
 		}
-
+#pragma warning(push)
+#pragma warning(disable:4702)
 		~NetworkInitializer()
 			/// Calls Poco::Net::uninitializeNetwork();
 		{
@@ -71,6 +72,7 @@ void Net_API uninitializeNetwork()
 				poco_unexpected();
 			}
 		}
+#pragma warning(pop)
 	};
 
 	const NetworkInitializer pocoNetworkInitializer;
