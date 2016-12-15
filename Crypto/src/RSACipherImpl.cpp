@@ -32,12 +32,13 @@ namespace
 	{
 		unsigned long err;
 		std::string msg;
-		
-		while ((err = ERR_get_error()))
+		err = ERR_get_error();
+		while (err)
 		{
 			if (!msg.empty())
 				msg.append("; ");
 			msg.append(ERR_error_string(err, 0));
+            err = ERR_get_error();
 		}
 
 		throw Poco::IOException(msg);
