@@ -527,6 +527,8 @@ float Strtof(Vector<const char> buffer, int exponent) {
          (f1 == f2 && f2 != f3 && f3 == f4) ||
          (f1 == f2 && f2 == f3 && f3 != f4));
 
+  // fix warning "C4189: 'f2' : local variable is initialized but not referenced"
+  (void)f2;
   // guess and next are the two possible canditates (in the same way that
   // double_guess was the lower candidate for a double-precision guess).
   float guess = f1;
