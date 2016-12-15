@@ -244,7 +244,7 @@ void HelpFormatter::formatText(std::ostream& ostr, const std::string& text, int 
 		}
 		else 
 		{
-			if (word.length() == maxWordLen)
+			if (word.length() == (size_t)maxWordLen)
 			{
 				clearWord(ostr, pos, word, indent);
 			}
