@@ -475,6 +475,9 @@ parserInit(XML_Parser parser, const XML_Char *encodingName);
    ? 0 \
    : ((*((pool)->ptr)++ = c), 1))
 
+#pragma warning(push)
+#pragma warning(disable:4510)
+#pragma warning(disable:4610)
 struct XML_ParserStruct {
   /* The first member must be userData so that the XML_GetUserData
      macro works. */
@@ -577,6 +580,7 @@ struct XML_ParserStruct {
 #endif
   unsigned long m_hash_secret_salt;
 };
+#pragma warning(pop)
 
 #define MALLOC(s) (parser->m_mem.malloc_fcn((s)))
 #define REALLOC(p,s) (parser->m_mem.realloc_fcn((p),(s)))
