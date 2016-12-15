@@ -71,7 +71,7 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 		str = str.substr(0, str.length() - eStr->length());
 	}
 
-	if (frac != precision)
+	if (frac != (std::string::size_type)precision)
 	{
 		if (frac < precision)
 		{
