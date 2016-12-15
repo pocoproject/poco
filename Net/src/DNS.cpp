@@ -85,7 +85,8 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 	throw NetException(); // to silence compiler
 }
 
-
+#pragma warning(push)
+#pragma warning(disable:4702)
 HostEntry DNS::hostByAddress(const IPAddress& address, unsigned 
 #ifdef POCO_HAVE_ADDRINFO
 							 hintFlags
@@ -139,7 +140,7 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 	error(err, address.toString()); // will throw an appropriate exception
 	throw NetException(); // to silence compiler
 }
-
+#pragma warning(pop)
 
 HostEntry DNS::resolve(const std::string& address)
 {
