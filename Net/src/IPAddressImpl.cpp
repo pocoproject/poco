@@ -525,7 +525,8 @@ unsigned IPv6AddressImpl::prefixLength() const
 	for (int i = 7; i >= 0; --i)
 	{
 		unsigned short addr = ByteOrder::fromNetwork(_addr.s6_addr16[i]);
-		if ((bits = maskBits(addr, 16))) return (bitPos - (16 - bits));
+		bits = maskBits(addr, 16);
+		if (bits) return (bitPos - (16 - bits));
 		bitPos -= 16;
 	}
 	return 0;
