@@ -407,7 +407,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case ERROR_CANNOT_MAKE:
 		throw CreateFileException(path);
 	case ERROR_DIR_NOT_EMPTY:
-		throw FileException("directory not empty", path);
+		throw DirectoryNotEmptyException(path);
 	case ERROR_WRITE_FAULT:
 		throw WriteFileException(path);
 	case ERROR_READ_FAULT:

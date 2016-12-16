@@ -49,7 +49,7 @@ void SocketStreamTest::testStreamEcho()
 {
 	EchoServer echoServer;
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	SocketStream str(ss);
 	str << "hello";
 	assert (str.good());
@@ -72,7 +72,7 @@ void SocketStreamTest::testLargeStreamEcho()
 	const int msgSize = 64000;
 	EchoServer echoServer;
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	SocketStream str(ss);
 	ss.setSendBufferSize(msgSize);
 	ss.setReceiveBufferSize(msgSize);
@@ -100,7 +100,7 @@ void SocketStreamTest::testEOF()
 	{
 		EchoServer echoServer;
 
-		ss.connect(SocketAddress("localhost", echoServer.port()));
+		ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 		str << "hello";
 		assert (str.good());
 		str.flush();

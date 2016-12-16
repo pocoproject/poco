@@ -86,6 +86,12 @@ void RawSocket::bind(const SocketAddress& address, bool reuseAddress)
 }
 
 
+void RawSocket::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	impl()->bind(address, reuseAddress, reusePort);
+}
+
+
 int RawSocket::sendBytes(const void* buffer, int length, int flags)
 {
 	return impl()->sendBytes(buffer, length, flags);

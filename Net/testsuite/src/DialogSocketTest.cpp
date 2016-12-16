@@ -37,7 +37,7 @@ void DialogSocketTest::testDialogSocket()
 {
 	EchoServer echoServer;
 	DialogSocket ds;
-	ds.connect(SocketAddress("localhost", echoServer.port()));
+	ds.connect(SocketAddress("127.0.0.1", echoServer.port()));
 
 	ds.sendMessage("Hello, world!");
 	std::string str;

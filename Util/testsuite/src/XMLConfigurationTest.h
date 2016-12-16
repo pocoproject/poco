@@ -30,6 +30,9 @@ public:
 	void testSave();
 	void testLoadAppendSave();
 	void testOtherDelimiter();
+	void testSaveEmpty();
+	void testFromScratch();
+	void testLoadEmpty();
 
 	void setUp();
 	void tearDown();

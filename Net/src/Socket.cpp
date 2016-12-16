@@ -144,7 +144,9 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		}
 
 		epollSize = eventLast - eventsIn;
-		epollfd = epoll_create(epollSize);
+		if (epollSize == 0) return 0;
+		
+		epollfd = epoll_create(1);
 		if (epollfd < 0)
 		{
 			SocketImpl::error("Can't create epoll queue");

@@ -58,18 +58,37 @@ public:
 	SocketAddress();
 		/// Creates a wildcard (all zero) IPv4 SocketAddress.
 
+	explicit SocketAddress(Family family);
+		/// Creates a SocketAddress with unspecified (wildcard) IP address 
+		/// of the given family.
+
 	SocketAddress(const IPAddress& hostAddress, Poco::UInt16 portNumber);
 		/// Creates a SocketAddress from an IP address and given port number.
 
-	SocketAddress(Poco::UInt16 port);
+	explicit SocketAddress(Poco::UInt16 port);
 		/// Creates a SocketAddress with unspecified (wildcard) IP address 
 		/// and given port number.
+
+	SocketAddress(Family family, Poco::UInt16 port);
+		/// Creates a SocketAddress with unspecified (wildcard) IP address 
+		/// of the given family, and given port number.
 
 	SocketAddress(const std::string& hostAddress, Poco::UInt16 portNumber);
 		/// Creates a SocketAddress from an IP address and given port number.
 		///
 		/// The IP address must either be a domain name, or it must
 		/// be in dotted decimal (IPv4) or hex string (IPv6) format.
+
+	SocketAddress(Family family, const std::string& hostAddress, Poco::UInt16 portNumber);
+		/// Creates a SocketAddress from an IP address and given port number.
+		///
+		/// The IP address must either be a domain name, or it must
+		/// be in dotted decimal (IPv4) or hex string (IPv6) format.
+		///
+		/// If a domain name is given in hostAddress, it is resolved and the address
+		/// matching the given family is used. If no address matching the given family
+		/// is found, or the IP address given in hostAddress does not match the given
+		/// family, an AddressFamilyMismatchException is thrown.
 
 	SocketAddress(const std::string& hostAddress, const std::string& portNumber);
 		/// Creates a SocketAddress from an IP address and the
@@ -80,6 +99,21 @@ public:
 		///
 		/// The given port must either be a decimal port number, or
 		/// a service name.
+
+	SocketAddress(Family family, const std::string& hostAddress, const std::string& portNumber);
+		/// Creates a SocketAddress from an IP address and the
+		/// service name or port number.
+		///
+		/// The IP address must either be a domain name, or it must
+		/// be in dotted decimal (IPv4) or hex string (IPv6) format.
+		///
+		/// The given port must either be a decimal port number, or
+		/// a service name.
+		///
+		/// If a domain name is given in hostAddress, it is resolved and the address
+		/// matching the given family is used. If no address matching the given family
+		/// is found, or the IP address given in hostAddress does not match the given
+		/// family, an AddressFamilyMismatchException is thrown.
 
 	explicit SocketAddress(const std::string& hostAndPort);
 		/// Creates a SocketAddress from an IP address or host name and the
@@ -156,6 +190,7 @@ public:
 protected:
 	void init(const IPAddress& hostAddress, Poco::UInt16 portNumber);
 	void init(const std::string& hostAddress, Poco::UInt16 portNumber);
+	void init(Family family, const std::string& hostAddress, Poco::UInt16 portNumber);
 	void init(Family family, const std::string& address);
 	void init(const std::string& hostAndPort);
 	Poco::UInt16 resolveService(const std::string& service);
