@@ -189,7 +189,7 @@ public:
 	{
 	}
 
-	TimerCallback(const TimerCallback& callback): _pObject(callback._pObject), _method(callback._method)
+	TimerCallback(const TimerCallback& callback):AbstractTimerCallback(), _pObject(callback._pObject), _method(callback._method)
 	{
 	}
 
