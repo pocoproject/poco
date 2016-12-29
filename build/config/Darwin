@@ -9,4 +9,4 @@
 # Use the Darwin32 build configuration to build 32-bit binaries.
 # 
 
-include $(POCO_BASE)/build/config/Darwin-clang
+include $(POCO_BASE)/build/config/Darwin-clang-libc++

@@ -18,7 +18,7 @@ LINKMODE ?= SHARED
 
 POCO_TARGET_OSARCH ?= x86_64
 POCO_HOST_OSARCH   := $(POCO_TARGET_OSARCH)
-ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH)
+ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH) 
 
 OPENSSL_DIR        ?= /usr/local/opt/openssl/
 
@@ -79,4 +79,4 @@ SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64 -I$(OPENSSL_DIR)/include
 #
 # System Specific Libraries
 #
-SYSLIBS  = -L$(OPENSSL_DIR)/lib -ldl
+SYSLIBS  = -L$(OPENSSL_DIR)/lib -ldl 

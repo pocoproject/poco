@@ -29,8 +29,8 @@ endif
 #
 # Tools
 #
-CC      = clang
-CXX     = clang++
+CC      = $(shell xcrun -find clang)
+CXX     = $(shell xcrun -find clang++)
 LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
 RANLIB  = ranlib
