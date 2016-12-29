@@ -25,7 +25,7 @@
 #include "Poco/ActiveMethod.h"
 #include "Poco/Void.h"
 #include "Poco/FileStream.h"
-#include <iostream>
+
 
 namespace Poco {
 
@@ -65,9 +65,8 @@ protected:
 			ostr.close();
 			istr.close();
 		}
-		catch (Poco::Exception& exc)
+		catch (Poco::Exception&)
 		{
-			std::cerr << "***************** Error: " << exc.displayText() << std::endl;
 			// deflating failed - remove gz file and leave uncompressed log file
 			ostr.close();
 			Poco::File gzf(gzPath);
