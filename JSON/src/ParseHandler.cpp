@@ -133,7 +133,6 @@ void ParseHandler::setValue(const Var& value)
 	}
 	else if ( parent.type() == typeid(Object::Ptr) )
 	{
-		poco_assert_dbg(!_key.empty());
 		Object::Ptr obj = parent.extract<Object::Ptr>();
 		obj->set(_key, value);
 		_key.clear();
