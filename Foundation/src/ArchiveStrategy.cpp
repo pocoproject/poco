@@ -25,7 +25,7 @@
 #include "Poco/ActiveMethod.h"
 #include "Poco/Void.h"
 #include "Poco/FileStream.h"
-
+#include <iostream>
 
 namespace Poco {
 
@@ -47,28 +47,36 @@ public:
 	{
 	}
 	
-	ActiveMethod<Void, std::string, ArchiveCompressor, ActiveStarter<ActiveDispatcher> > compress;
+	ActiveMethod<void, std::string, ArchiveCompressor, ActiveStarter<ActiveDispatcher> > compress;
 
 protected:
-	Void compressImpl(const std::string& path)
+	void compressImpl(const std::string& path)
 	{
 		std::string gzPath(path);
 		gzPath.append(".gz");
-		FileInputStream istr(path, std::ios::binary | std::ios::in);
-		if (!istr.good()) throw OpenFileException(path);
-		FileOutputStream ostr(gzPath, std::ios::binary | std::ios::out);
-		if (ostr.good())
+		FileInputStream istr(path);
+		FileOutputStream ostr(gzPath);
+		try
 		{
 			DeflatingOutputStream deflater(ostr, DeflatingStreamBuf::STREAM_GZIP);
 			StreamCopier::copyStream(istr, deflater);
+			if (!deflater.good() || !ostr.good()) throw WriteFileException(gzPath);
 			deflater.close();
 			ostr.close();
 			istr.close();
-			File f(path);
-			f.remove();
 		}
-		else throw CreateFileException(gzPath);
-		return Void();
+		catch (Poco::Exception& exc)
+		{
+			std::cerr << "***************** Error: " << exc.displayText() << std::endl;
+			// deflating failed - remove gz file and leave uncompressed log file
+			ostr.close();
+			Poco::File gzf(gzPath);
+			gzf.remove();
+			return;
+		}
+		File f(path);
+		f.remove();
+		return;
 	}
 };
 
