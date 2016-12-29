@@ -46,6 +46,7 @@ public:
 #endif
 	void testStringProperty();
 	void testEmptyObject();
+	void testEmptyPropertyName();
 	void testComplexObject();
 	void testDoubleProperty();
 	void testDouble2Property();
