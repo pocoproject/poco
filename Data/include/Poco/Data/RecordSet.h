@@ -26,10 +26,12 @@
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RowIterator.h"
+#include "Poco/Data/RowFilter.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/String.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
+#include "Poco/AutoPtr.h"
 #include <ostream>
 #include <limits>
 
@@ -98,7 +100,6 @@ public:
 		_currentRow(0),
 		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 		_pEnd(new RowIterator(this, true)),
-		_pFilter(0),
 		_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
 		/// Creates the RecordSet.
 	{
@@ -480,17 +481,17 @@ private:
 		/// Returns true if the specified row is allowed by the
 		/// currently active filter.
 
-	void filter(RowFilter* pFilter);
+	void filter(const Poco::AutoPtr<RowFilter>& pFilter);
 		/// Sets the filter for the RecordSet.
 
-	const RowFilter* getFilter() const;
+	const Poco::AutoPtr<RowFilter>& getFilter() const;
 		/// Returns the filter associated with the RecordSet.
 
 	std::size_t  _currentRow;
 	RowIterator* _pBegin;
 	RowIterator* _pEnd;
 	RowMap       _rowMap;
-	RowFilter*   _pFilter;
+	Poco::AutoPtr<RowFilter> _pFilter;
 	std::size_t  _totalRowCount;
 
 	friend class RowIterator;
@@ -656,7 +657,7 @@ inline RecordSet::Iterator RecordSet::end()
 }
 
 
-inline const RowFilter* RecordSet::getFilter() const
+inline const Poco::AutoPtr<RowFilter>& RecordSet::getFilter() const
 {
 	return _pFilter;
 }
