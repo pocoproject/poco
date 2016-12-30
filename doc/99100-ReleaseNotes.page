@@ -24,6 +24,7 @@ AAAIntroduction
   - fixed GH #1515: Detection of closed websocket connection
   - fixed GH #1521: bug in JSON ParseHandler.cpp (empty keys should be valid) 
   - fixed GH #1526: iOS app rejected, IPv6 not working 
+  - fixed GH #1532: RecordSet and RowFilter: bad use of reference counter
 
 
 !!!Release 1.7.6
