@@ -31,9 +31,18 @@
 // availability of non-standard pthread_cond_timedwait_monotonic().
 //
 #ifndef POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT
-#if (defined(__linux__) || defined(__QNX__)) && !(defined(__ANDROID__) && defined(HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC))
-#define POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT 1
+	#if (defined(__linux__) || defined(__QNX__)) && !(defined(__ANDROID__) && defined(HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC))
+		#define POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT 1
+	#endif
 #endif
+
+
+#ifndef POCO_HAVE_CLOCK_GETTIME
+	#if (defined(_POSIX_TIMERS) && defined(CLOCK_REALTIME)) || defined(POCO_VXWORKS) || defined(__QNX__)
+		#ifndef __APPLE__ // See GitHub issue #1453 - not available before Mac OS 10.12/iOS 10
+			#define POCO_HAVE_CLOCK_GETTIME
+		#endif
+	#endif
 #endif
 
 
@@ -127,7 +136,7 @@ bool SemaphoreImpl::waitImpl(long milliseconds)
 		abstime.tv_nsec -= 1000000000;
 		abstime.tv_sec++;
 	}
-#elif (defined(_POSIX_TIMERS) && defined(CLOCK_REALTIME)) || defined(POCO_VXWORKS)
+#elif defined(POCO_HAVE_CLOCK_GETTIME)
 	clock_gettime(CLOCK_REALTIME, &abstime);
 	abstime.tv_sec  += milliseconds / 1000;
 	abstime.tv_nsec += (milliseconds % 1000)*1000000;

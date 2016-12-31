@@ -119,6 +119,13 @@ namespace
 					
 					pPS->headers().set(it->first, it->second);
 				}
+
+				if (contentDisp.empty())
+				{
+					_pMsg->addContent(pPS, cte);
+					added = true;
+				}
+
 				if (!added) delete pPS;
 			}
 		}

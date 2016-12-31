@@ -1,6 +1,32 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.7.7
+
+!!Summary of Changes
+
+  - fixed GH #865: FileChannel compress fails leaving empty .gz files 
+  - fixed GH #990: Potential race condition in Poco::File on Windows 
+  - fixed GH #1157: Fixing a bug in the NetSSL_Win module (Host name verification failed error)
+  - fixed GH #1351: Fix for android include pthread.h from /usr/include
+  - fixed GH #1436: ODBC Bug: Unicode text(NVARCHAT) read from DB is truncated to half
+  - fixed GH #1453: _clock_gettime Symbol not found on Mac 10.11
+  - fixed GH #1460: POCO does not build with OpenSSL 1.1
+  - fixed GH #1461: Poco::Data::SQLite::SQLiteStatementImpl::next() error 
+  - fixed GH #1462: AbstractConfiguration::getUInt does not parse hex numbers
+  - fixed GH #1464: ODBCMetaColumn::init() always maps integer NUMERIC/DECIMAL to Int32
+  - fixed GH #1465: Assertion violation in DateTime.cpp using ZipArchive 
+  - fixed GH #1472: HTTP(S)StreamFactory should send a User-Agent header.
+  - fixed GH #1476: Fixed error with Poco::UTF8Encoding::isLegal()
+  - fixed GH #1484: ODBC: fix uninitialized variable
+  - fixed GH #1486: Support ODBC GUID data type as string
+  - fixed GH #1488: Poco::ObjectPool shrinks if returned object is not valid
+  - fixed GH #1515: Detection of closed websocket connection
+  - fixed GH #1521: bug in JSON ParseHandler.cpp (empty keys should be valid) 
+  - fixed GH #1526: iOS app rejected, IPv6 not working 
+  - fixed GH #1532: RecordSet and RowFilter: bad use of reference counter
+
+
 !!!Release 1.7.6
 
 !!Summary of Changes

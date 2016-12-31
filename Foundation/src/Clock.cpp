@@ -34,6 +34,15 @@
 #include <limits>
 
 
+#ifndef POCO_HAVE_CLOCK_GETTIME
+	#if (defined(_POSIX_TIMERS) && defined(CLOCK_REALTIME)) || defined(POCO_VXWORKS) || defined(__QNX__)
+		#ifndef __APPLE__ // See GitHub issue #1453 - not available before Mac OS 10.12/iOS 10
+			#define POCO_HAVE_CLOCK_GETTIME
+		#endif
+	#endif
+#endif
+
+
 namespace Poco {
 
 
@@ -120,7 +129,7 @@ void Clock::update()
 #endif
 	_clock = ClockVal(ts.tv_sec)*resolution() + ts.tv_nsec/1000;
 
-#elif (defined(_POSIX_TIMERS) && defined(_POSIX_MONOTONIC_CLOCK)) || defined(__QNX__)
+#elif defined(POCO_HAVE_CLOCK_GETTIME)
 
 	struct timespec ts;
 	if (clock_gettime(CLOCK_MONOTONIC, &ts))

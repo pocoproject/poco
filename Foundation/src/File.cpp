@@ -34,6 +34,7 @@
 #else
 #include "File_VMS.cpp"
 #endif
+#include "Poco/Thread.h"
 
 
 namespace Poco {
@@ -269,8 +270,37 @@ void File::remove(bool recursive)
 		{
 			it->remove(true);
 		}
+
+		// Note: On Windows, removing a directory may not succeed at first 
+		// try because deleting files is not a synchronous operation. Files
+		// are merely marked as deleted, and actually removed at a later time.
+		//
+		// An alternate strategy would be moving files to a different directory
+		// first (on the same drive, but outside the deleted tree), and marking
+		// them as hidden, before deleting them, but this could lead to other issues.
+		// So we simply retry after some time until we succeed, or give up.
+
+		int retry = 8;
+		long sleep = 10;
+		while (retry > 0)
+		{ 
+			try
+			{
+				removeImpl();
+				retry = 0;
+			}
+			catch (DirectoryNotEmptyException&)
+			{
+				if (--retry == 0) throw;
+				Poco::Thread::sleep(sleep);
+				sleep *= 2;
+			}
+		}
 	}
-	removeImpl();
+	else
+	{
+		removeImpl();
+	}
 }
 
 

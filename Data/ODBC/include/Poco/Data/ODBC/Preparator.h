@@ -627,7 +627,7 @@ private:
 			(SQLUSMALLINT) pos + 1, 
 			valueType, 
 			(SQLPOINTER) pCache, 
-			(SQLINTEGER) size, 
+			(SQLINTEGER) size*sizeof(T), 
 			&_lengths[pos])))
 		{
 			throw StatementException(_rStmt, "SQLBindCol()");
@@ -1033,7 +1033,7 @@ inline void Preparator::prepare(std::size_t pos, const std::list<std::string>& v
 
 inline void Preparator::prepare(std::size_t pos, const UTF16String&)
 {
-	prepareVariableLen<UTF16String::value_type>(pos, SQL_C_WCHAR, maxDataSize(pos), DT_CHAR);
+	prepareVariableLen<UTF16String::value_type>(pos, SQL_C_WCHAR, maxDataSize(pos), DT_WCHAR);
 }
 
 
