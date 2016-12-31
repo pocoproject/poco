@@ -13,7 +13,7 @@ project(Poco)
 file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
 
 # Read the version information from the VERSION file
-file (STRINGS "${PROJECT_SOURCE_DIR}/VERSION" PACKAGE_VERSION )
+file(STRINGS "${PROJECT_SOURCE_DIR}/VERSION" PACKAGE_VERSION)
 message(STATUS "Poco package version: ${PACKAGE_VERSION}")
 string(REGEX REPLACE "([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" CPACK_PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION})
 string(REGEX REPLACE "[0-9]+\\.([0-9])+\\.[0-9]+.*" "\\1" CPACK_PACKAGE_VERSION_MINOR ${PACKAGE_VERSION})
@@ -49,8 +49,8 @@ if(NOT MSVC_IDE)
   message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")
 endif()
 
-if (CMAKE_BUILD_TYPE STREQUAL "")
-    set( CMAKE_BUILD_TYPE "RelWithDebInfo" )
+if(CMAKE_BUILD_TYPE STREQUAL "")
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
 # Include some common macros to simpilfy the Poco CMake files
@@ -99,38 +99,38 @@ endif()
 
 # Uncomment from next two lines to force static or dynamic library, default is autodetection
 if(POCO_STATIC)
-    set( LIB_MODE_DEFINITIONS -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)
-    set( LIB_MODE STATIC )
+    set(LIB_MODE_DEFINITIONS -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)
+    set(LIB_MODE STATIC)
     message(STATUS "Building static libraries")
 else(POCO_STATIC)
-    set( LIB_MODE SHARED )
-    set( LIB_MODE_DEFINITIONS -DPOCO_NO_AUTOMATIC_LIBS)
+    set(LIB_MODE SHARED)
+    set(LIB_MODE_DEFINITIONS -DPOCO_NO_AUTOMATIC_LIBS)
     message(STATUS "Building dynamic libraries")
 endif(POCO_STATIC)
 
-if (ENABLE_TESTS)
+if(ENABLE_TESTS)
   include(CTest)
   enable_testing()
   message(STATUS "Building with unittests & samples")
-else ()
+else()
   message(STATUS "Building without tests & samples")
-endif ()
+endif()
 
-if (POCO_UNBUNDLED)
-  add_definitions( -DPOCO_UNBUNDLED)
+if(POCO_UNBUNDLED)
+  add_definitions(-DPOCO_UNBUNDLED)
   message(STATUS "Build with using external sqlite, libz, pcre, expat ...")
-else ()
+else()
   message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
-endif ()
+endif()
 
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
 
-if (ENABLE_TESTS)
+if(ENABLE_TESTS)
    add_subdirectory(CppUnit)
-endif ()
+endif()
 
 add_subdirectory(Foundation)
 if(ENABLE_XML)
