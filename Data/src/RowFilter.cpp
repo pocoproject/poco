@@ -20,6 +20,7 @@
 #include "Poco/Exception.h"
 #include <functional>
 
+
 namespace Poco {
 namespace Data {
 
@@ -53,8 +54,6 @@ void RowFilter::init()
 	_comparisons.insert(Comparisons::value_type("<>", VALUE_NOT_EQUAL));
 	_comparisons.insert(Comparisons::value_type("!=", VALUE_NOT_EQUAL));
 	_comparisons.insert(Comparisons::value_type("IS NULL", VALUE_IS_NULL));
-
-	duplicate();
 }
 
 
@@ -62,7 +61,6 @@ RowFilter::~RowFilter()
 {
 	try
 	{
-		release();
 		if (_pRecordSet) _pRecordSet->filter(0);
 		if (_pParent.get()) _pParent->removeFilter(this);
 	}
@@ -201,6 +199,7 @@ void RowFilter::doCompare(Poco::Dynamic::Var& ret,
 	}
 }
 
+
 RecordSet& RowFilter::recordSet() const
 {
 	if (!_pRecordSet)
@@ -211,6 +210,12 @@ RecordSet& RowFilter::recordSet() const
 	}
 	poco_check_ptr (_pRecordSet);
 	return *_pRecordSet; 
+}
+
+
+void RowFilter::rewindRecordSet()
+{
+	if (_pRecordSet) _pRecordSet->moveFirst();
 }
 
 
