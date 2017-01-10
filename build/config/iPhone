@@ -34,7 +34,7 @@ TOOL_PREFIX            ?= $(shell xcode-select -print-path)/Platforms/$(IPHONE_S
 ifneq ($(POCO_TARGET_OSARCH),arm64)
 THUMB = -mthumb
 endif
-OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) $(THUMB) -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN)
+OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) $(THUMB) -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN) -fembed-bitcode
 
 #
 # Tools
