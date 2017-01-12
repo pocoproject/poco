@@ -86,9 +86,6 @@ public:
 		
 	HTTPServerSession& session();
 		/// Returns the underlying HTTPServerSession.
-
-protected:
-	static const std::string EXPECT;
 	
 private:
 	HTTPServerResponseImpl&         _response;
