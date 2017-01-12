@@ -252,4 +252,11 @@ void HTTPSession::attachSessionData(const Poco::Any& data)
 }
 
 
+void HTTPSession::drainBuffer(Poco::Buffer<char>& buffer)
+{
+	buffer.assign(_pCurrent, static_cast<std::size_t>(_pEnd - _pCurrent));
+	_pCurrent = _pEnd;
+}
+
+
 } } // namespace Poco::Net
