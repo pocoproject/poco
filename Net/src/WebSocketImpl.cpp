@@ -17,6 +17,7 @@
 #include "Poco/Net/WebSocketImpl.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/WebSocket.h"
+#include "Poco/Net/HTTPSession.h"
 #include "Poco/Buffer.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/BinaryReader.h"
@@ -29,14 +30,17 @@ namespace Poco {
 namespace Net {
 
 
-WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, bool mustMaskPayload):
+WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& session, bool mustMaskPayload):
 	StreamSocketImpl(pStreamSocketImpl->sockfd()),
 	_pStreamSocketImpl(pStreamSocketImpl),
+	_buffer(0),
+	_bufferOffset(0),
 	_frameFlags(0),
 	_mustMaskPayload(mustMaskPayload)
 {
 	poco_check_ptr(pStreamSocketImpl);
 	_pStreamSocketImpl->duplicate();
+	session.drainBuffer(_buffer);
 }
 
 
@@ -192,12 +196,12 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 
 int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 {
-	int received = _pStreamSocketImpl->receiveBytes(reinterpret_cast<char*>(buffer), bytes);
+	int received = receiveSomeBytes(reinterpret_cast<char*>(buffer), bytes);
 	if (received > 0)
 	{
 		while (received < bytes)
 		{
-			int n = _pStreamSocketImpl->receiveBytes(reinterpret_cast<char*>(buffer) + received, bytes - received);
+			int n = receiveSomeBytes(reinterpret_cast<char*>(buffer) + received, bytes - received);
 			if (n > 0)
 				received += n;
 			else
@@ -205,6 +209,23 @@ int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 		}
 	}
 	return received;
+}
+
+
+int WebSocketImpl::receiveSomeBytes(char* buffer, int bytes)
+{
+	int n = _buffer.size() - _bufferOffset;
+	if (n > 0)
+	{
+		if (bytes < n) n = bytes;
+		std::memcpy(buffer, _buffer.begin() + _bufferOffset, n);
+		_bufferOffset += n;
+		return n;
+	}
+	else
+	{
+		return _pStreamSocketImpl->receiveBytes(buffer, bytes);
+	}
 }
 
 

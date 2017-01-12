@@ -25,6 +25,7 @@
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include "Poco/Any.h"
+#include "Poco/Buffer.h"
 #include <ios>
 
 
@@ -100,6 +101,14 @@ public:
 
 	StreamSocket& socket();
 		/// Returns a reference to the underlying socket.
+		
+	void drainBuffer(Poco::Buffer<char>& buffer);
+		/// Copies all bytes remaining in the internal buffer to the
+		/// given Poco::Buffer, resizing it as necessary.
+		///
+		/// This is usually used together with detachSocket() to
+		/// obtain any data already read from the socket, but not
+		/// yet processed.
 
 protected:
 	HTTPSession();
