@@ -2109,7 +2109,7 @@ private:
 
 #if __cplusplus >= 201103L
 
-template<size_t N>
+template<std::size_t N>
 struct TupleBind
 /// Helper for specialization of type handler for std::tuple
 {
@@ -2130,7 +2130,7 @@ struct TupleBind
 };
 
 
-template<size_t N>
+template<std::size_t N>
 struct TupleSize
 /// Helper for specialization of type handler for std::tuple
 {
@@ -2150,7 +2150,7 @@ struct TupleSize
 };
 
 
-template<size_t N>
+template<std::size_t N>
 struct TupleExtract
 /// Helper for specialization of type handler for std::tuple
 {
@@ -2171,7 +2171,7 @@ struct TupleExtract
 };
 
 
-template<size_t N>
+template<std::size_t N>
 struct TuplePrepare
 /// Helper for specialization of type handler for std::tuple
 {
