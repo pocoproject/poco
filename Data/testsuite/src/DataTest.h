@@ -48,7 +48,7 @@ public:
 	void testExternalBindingAndExtraction();
 
 #if __cplusplus >= 201103L
-    void testStdTuple();
+	void testStdTuple();
 #endif
 
 	void setUp();
