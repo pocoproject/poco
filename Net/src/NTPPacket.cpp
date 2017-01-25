@@ -23,7 +23,12 @@
 namespace Poco {
 namespace Net {
 
-#pragma pack(push,1)
+
+#if !defined(POCO_COMPILER_SUN)
+#pragma pack(push, 1)
+#else
+#pragma pack(1)
+#endif
 typedef struct _NTPPacketData {
 	Poco::Int8 mode:3;
 	Poco::Int8 vn:3;
@@ -39,7 +44,11 @@ typedef struct _NTPPacketData {
 	Poco::Int64 vts;
 	Poco::Int64 tts;
 } NTPPacketData;
+#if !defined(POCO_COMPILER_SUN)
 #pragma pack(pop)
+#else
+#pragma pack()
+#endif
 
 
 NTPPacket::NTPPacket() :
