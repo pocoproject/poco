@@ -1,5 +1,5 @@
 /* zconf.h -- configuration of the zlib compression library
- * Copyright (C) 1995-2016 Jean-loup Gailly, Mark Adler
+ * Copyright (C) 1995-2013 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -251,11 +251,6 @@
 #  endif
 #  undef z_longlong
 #endif
-     
-/* Some Mac compilers merge all .h files incorrectly: */
-#if defined(__MWERKS__)||defined(applec)||defined(THINK_C)||defined(__SC__)
-#  define NO_DUMMY_DECL
-#endif
 
 /* Maximum value for memLevel in deflateInit2 */
 #ifndef MAX_MEM_LEVEL
@@ -444,10 +439,12 @@ typedef uLong FAR uLongf;
 #  define Z_HAVE_STDARG_H
 #endif
 
+#ifndef _WIN32_WCE
 #ifdef STDC
 #  ifndef Z_SOLO
 #    include <sys/types.h>      /* for off_t */
 #  endif
+#endif
 #endif
 
 #if defined(STDC) || defined(Z_HAVE_STDARG_H)
