@@ -31,6 +31,10 @@
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 
+#if __cplusplus >= 201103L
+#include <tuple>
+#endif
+
 #if POCO_MSVS_VERSION == 2015
 #define HAVE_STRUCT_TIMESPEC
 #endif
@@ -1475,6 +1479,58 @@ void SQLExecutor::tupleVector()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assert (ret == v);
 }
+
+#if __cplusplus >= 201103L
+
+void SQLExecutor::stdTuples()
+{
+	typedef std::tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
+	std::string funct = "stdTuples()";
+	TupleType t = std::make_tuple(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
+
+	try { *_pSession << "INSERT INTO Tuples VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", use(t), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	TupleType ret = std::make_tuple(-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-23,-24,-25,-26,-27,-28,-29);
+	assert (ret != t);
+	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (ret == t);
+}
+
+
+void SQLExecutor::stdTupleVector()
+{
+	typedef std::tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
+	std::string funct = "stdTupleVector()";
+	TupleType t = std::make_tuple(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
+	auto t10 = std::make_tuple(10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29);
+	TupleType t100 = std::make_tuple(100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119);
+	std::vector<TupleType> v;
+	v.push_back(t);
+	v.push_back(t10);
+	v.push_back(t100);
+
+	try { *_pSession << "INSERT INTO Tuples VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", use(v), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Tuples", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (v.size() == (std::size_t) count);
+
+	std::vector<TupleType> ret;
+	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (ret == v);
+}
+
+#endif //__cplusplus >= 201103L
 
 
 void SQLExecutor::internalExtraction()
