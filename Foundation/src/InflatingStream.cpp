@@ -69,7 +69,13 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits):
 	_zstr.avail_in  = 0;
 	_zstr.next_out  = 0;
 	_zstr.avail_out = 0;
-
+	_zstr.total_in  = 0;
+	_zstr.total_out = 0;
+	_zstr.msg       = 0;
+	_zstr.state     = 0;
+	_zstr.adler     = 0;
+	_zstr.data_type = Z_BINARY;
+	_zstr.reserved = 0;
 	_buffer = new char[INFLATE_BUFFER_SIZE];
 
 	int rc = inflateInit2(&_zstr, windowBits);
@@ -95,7 +101,13 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	_zstr.avail_in  = 0;
 	_zstr.next_out  = 0;
 	_zstr.avail_out = 0;
-
+	_zstr.total_in  = 0;
+	_zstr.total_out = 0;
+	_zstr.msg       = 0;
+	_zstr.state     = 0;
+	_zstr.adler     = 0;
+	_zstr.data_type = Z_BINARY;
+	_zstr.reserved = 0;
 	_buffer = new char[INFLATE_BUFFER_SIZE];
 
 	int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
@@ -121,7 +133,13 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits):
 	_zstr.avail_in  = 0;
 	_zstr.next_out  = 0;
 	_zstr.avail_out = 0;
-
+	_zstr.total_in  = 0;
+	_zstr.total_out = 0;
+	_zstr.msg       = 0;
+	_zstr.state     = 0;
+	_zstr.adler     = 0;
+	_zstr.data_type = Z_BINARY;
+	_zstr.reserved = 0;
 	_buffer = new char[INFLATE_BUFFER_SIZE];
 
 	int rc = inflateInit2(&_zstr, windowBits);
