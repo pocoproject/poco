@@ -66,13 +66,13 @@ namespace Poco {
 		   without -D_GNU_SOURCE is needed, otherwise the GNU version is
 		   preferred.
 		*/
-#if defined _GNU_SOURCE && !POCO_ANDROID
-		char errmsg[256] = "";
-		return std::string(strerror_r(errorCode, errmsg, 256));
-#elif (_XOPEN_SOURCE >= 600) || POCO_ANDROID
+#if (_XOPEN_SOURCE >= 600) || POCO_ANDROID
 		char errmsg[256] = "";
 		strerror_r(errorCode, errmsg, 256);
 		return errmsg;
+#elif defined _GNU_SOURCE
+		char errmsg[256] = "";
+		return std::string(strerror_r(errorCode, errmsg, 256));
 #else
 		return std::string(strerror(errorCode));
 #endif
