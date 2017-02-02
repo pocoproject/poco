@@ -20,6 +20,9 @@
 #include "Poco/NamedEvent.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Pipe.h"
+#include "Poco/File.h"
+#include "Poco/Path.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
@@ -164,7 +167,7 @@ static std::string escapeArg(const std::string& arg)
 
 ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
-	std::string commandLine = command;
+	std::string commandLine = escapeArg(command);
 	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it)
 	{
 		commandLine.append(" ");
@@ -173,6 +176,19 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 	std::wstring ucommandLine;
 	UnicodeConverter::toUTF16(commandLine, ucommandLine);
+
+	const wchar_t* applicationName = 0;
+	std::wstring uapplicationName;
+	if (command.size() > MAX_PATH)
+	{
+		Poco::Path p(command);
+		if (p.isAbsolute())
+		{
+			UnicodeConverter::toUTF16(command, uapplicationName);
+			if (p.getExtension().empty()) uapplicationName += L".EXE";
+			applicationName = uapplicationName.c_str();
+		}
+	}
 
 	STARTUPINFOW startupInfo;
 	GetStartupInfoW(&startupInfo); // take defaults from current process
@@ -253,7 +269,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	PROCESS_INFORMATION processInfo;
 	DWORD creationFlags = GetConsoleWindow() ? 0 : CREATE_NO_WINDOW;
 	BOOL rc = CreateProcessW(
-		NULL, // applicationName
+		applicationName,
 		const_cast<wchar_t*>(ucommandLine.c_str()),
 		NULL, // processAttributes
 		NULL, // threadAttributes

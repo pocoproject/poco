@@ -524,6 +524,30 @@ void FileTest::testRename()
 }
 
 
+void FileTest::testLongPath()
+{
+#if defined(_WIN32) && defined(POCO_WIN32_UTF8) && !defined(_WIN32_WCE)
+	Poco::Path p("longpathtest");
+	p.makeAbsolute();
+	std::string longpath(p.toString());
+	while (longpath.size() < MAX_PATH*4)
+	{
+		longpath.append("\\");
+		longpath.append(64, 'x');
+	}
+
+	Poco::File d(longpath);
+	d.createDirectories();
+
+	assert (d.exists());
+	assert (d.isDirectory());
+
+	Poco::File f(p.toString());
+	f.remove(true);	
+#endif
+}
+
+
 void FileTest::setUp()
 {
 	File f("testfile.dat");
@@ -568,6 +592,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testCopyDirectory);
 	CppUnit_addTest(pSuite, FileTest, testRename);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
+	CppUnit_addTest(pSuite, FileTest, testLongPath);
 
 	return pSuite;
 }
