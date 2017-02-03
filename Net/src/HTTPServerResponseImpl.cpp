@@ -48,14 +48,18 @@ namespace Net {
 HTTPServerResponseImpl::HTTPServerResponseImpl(HTTPServerSession& session):
 	_session(session),
 	_pRequest(0),
-	_pStream(0)
+	_pStream(0),
+	_pHeaderStream(0)
 {
 }
 
 
 HTTPServerResponseImpl::~HTTPServerResponseImpl()
 {
-	delete _pStream;
+	if (_pHeaderStream && _pHeaderStream != _pStream)
+		delete _pHeaderStream;
+	if (_pStream)
+		delete _pStream;
 }
 
 
@@ -104,6 +108,42 @@ std::ostream& HTTPServerResponseImpl::send()
 		write(*_pStream);
 	}
 	return *_pStream;
+}
+
+
+std::pair<std::ostream *, std::ostream *> HTTPServerResponseImpl::beginSend()
+{
+	poco_assert (!_pStream);
+	poco_assert (!_pHeaderStream);
+
+	// NOTE Code is not exception safe.
+
+	if ((_pRequest && _pRequest->getMethod() == HTTPRequest::HTTP_HEAD) ||
+		getStatus() < 200 ||
+		getStatus() == HTTPResponse::HTTP_NO_CONTENT ||
+		getStatus() == HTTPResponse::HTTP_NOT_MODIFIED)
+	{
+		throw Exception("HTTPServerResponse::beginSend is invalid for HEAD request");
+	}
+	else if (getChunkedTransferEncoding())
+	{
+		_pHeaderStream = new HTTPHeaderOutputStream(_session);
+		beginWrite(*_pHeaderStream);
+		_pStream = new HTTPChunkedOutputStream(_session);
+	}
+	else if (hasContentLength())
+	{
+		throw Exception("HTTPServerResponse::beginSend is invalid for response with Content-Length header");
+	}
+	else
+	{
+		_pStream = new HTTPOutputStream(_session);
+		_pHeaderStream = _pStream;
+		setKeepAlive(false);
+		beginWrite(*_pStream);
+	}
+
+	return std::make_pair(_pHeaderStream, _pStream);
 }
 
 

@@ -184,6 +184,10 @@ public:
 		/// Writes the HTTP response to the given
 		/// output stream.
 
+	void beginWrite(std::ostream& ostr) const;
+		/// Writes the HTTP response to the given
+		/// output stream, but do not finish with \r\n delimiter.
+
 	void read(std::istream& istr);
 		/// Reads the HTTP response from the
 		/// given input stream.
