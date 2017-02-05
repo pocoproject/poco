@@ -47,6 +47,10 @@ public:
 	void testDateAndTime();
 	void testExternalBindingAndExtraction();
 
+#if __cplusplus >= 201103L
+	void testStdTuple();
+#endif
+
 	void setUp();
 	void tearDown();
 

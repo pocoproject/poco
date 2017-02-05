@@ -23,10 +23,14 @@
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Buffer.h"
 #include "Poco/Random.h"
+#include "Poco/Buffer.h"
 
 
 namespace Poco {
 namespace Net {
+
+
+class HTTPSession;
 
 
 class Net_API WebSocketImpl: public StreamSocketImpl
@@ -34,8 +38,8 @@ class Net_API WebSocketImpl: public StreamSocketImpl
 	/// to the WebSocket protocol described in RFC 6455.
 {
 public:
-	WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, bool mustMaskPayload);
-		/// Creates a StreamSocketImpl using the given native socket.
+	WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& session, bool mustMaskPayload);
+		/// Creates a WebSocketImpl.
 	
 	// StreamSocketImpl
 	virtual int sendBytes(const void* buffer, int length, int flags);
@@ -88,12 +92,15 @@ protected:
 	int receivePayload(char *buffer, int payloadLength, char mask[4], bool useMask);
 
 	int receiveNBytes(void* buffer, int bytes);
+	int receiveSomeBytes(char* buffer, int bytes);
 	virtual ~WebSocketImpl();
 
 private:
 	WebSocketImpl();
 	
 	StreamSocketImpl* _pStreamSocketImpl;
+	Poco::Buffer<char> _buffer;
+	int _bufferOffset;
 	int _frameFlags;
 	bool _mustMaskPayload;
 	Poco::Random _rnd;

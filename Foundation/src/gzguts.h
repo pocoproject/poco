@@ -1,5 +1,5 @@
 /* gzguts.h -- zlib internal header definitions for gz* operations
- * Copyright (C) 2004, 2005, 2010, 2011, 2012, 2013, 2016 Mark Adler
+ * Copyright (C) 2004, 2005, 2010, 2011, 2012, 2013 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -35,10 +35,11 @@
 #  include <stddef.h>
 #endif
 
+#ifndef _WIN32_WCE
 #if defined(__TURBOC__) || defined(_MSC_VER) || defined(_WIN32)
 #  include <io.h>
 #endif
-
+#endif
 #if defined(_WIN32) || defined(__CYGWIN__)
 #  define WIDECHAR
 #endif
