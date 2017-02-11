@@ -157,6 +157,7 @@ int Latin2Encoding::convert(int ch, unsigned char* bytes, int length) const
 	case 0x016f: if (bytes && length >= 1) *bytes = 0xf9; return 1;
 	case 0x0171: if (bytes && length >= 1) *bytes = 0xfb; return 1;
 	case 0x0163: if (bytes && length >= 1) *bytes = 0xfe; return 1;
+	case 0x02d9: if (bytes && length >= 1) *bytes = 0xff; return 1;
 	default: return 0;
 	}
 }
