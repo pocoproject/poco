@@ -94,7 +94,7 @@ void Preparator::freeMemory() const
 				break;
 
 			case DT_WCHAR:
-				deleteCachedArray<UTF16String>(it->first);
+				deleteCachedArray<UTF16String::value_type>(it->first);
 				break;
 
 			case DT_UCHAR:
