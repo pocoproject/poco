@@ -23,7 +23,6 @@
 #include "Poco/Zip/Zip.h"
 #include "Poco/BufferedStreamBuf.h"
 #include <istream>
-#include <ostream>
 
 
 namespace Poco {
@@ -37,12 +36,6 @@ public:
 	AutoDetectStreamBuf(std::istream& in, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start);
 		/// Creates the AutoDetectStream. 
 		
-
-	AutoDetectStreamBuf(std::ostream& out);
-		/// Creates the AutoDetectStream. 
-		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
-		/// to position start
-
 	~AutoDetectStreamBuf();
 		/// Destroys the AutoDetectStream.
 
@@ -58,7 +51,6 @@ private:
 	};
 
 	std::istream*   _pIstr;
-	std::ostream*   _pOstr;
 	bool            _eofDetected;
 	int             _matchCnt;
 	std::string     _prefix;
@@ -79,10 +71,6 @@ public:
 	AutoDetectIOS(std::istream& istr, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start);
 		/// Creates the basic stream and connects it
 		/// to the given input stream.
-
-	AutoDetectIOS(std::ostream& ostr);
-		/// Creates the basic stream and connects it
-		/// to the given output stream.
 
 	~AutoDetectIOS();
 		/// Destroys the stream.

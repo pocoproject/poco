@@ -30,28 +30,12 @@ namespace Zip {
 AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&in),
-	_pOstr(0),
 	_eofDetected(false),
 	_matchCnt(0),
 	_prefix(pre),
 	_postfix(post),
 	_reposition(reposition),
 	_start(start),
-	_length(0)
-{
-}
-
-
-AutoDetectStreamBuf::AutoDetectStreamBuf(std::ostream& out):
-	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
-	_pIstr(0),
-	_pOstr(&out),
-	_eofDetected(false),
-	_matchCnt(0),
-	_prefix(),
-	_postfix(),
-	_reposition(false),
-	_start(0u),
 	_length(0)
 {
 }
@@ -173,12 +157,6 @@ int AutoDetectStreamBuf::writeToDevice(const char* buffer, std::streamsize lengt
 
 AutoDetectIOS::AutoDetectIOS(std::istream& istr, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start):
 	_buf(istr, pre, post, reposition, start)
-{
-	poco_ios_init(&_buf);
-}
-
-
-AutoDetectIOS::AutoDetectIOS(std::ostream& ostr): _buf(ostr)
 {
 	poco_ios_init(&_buf);
 }
