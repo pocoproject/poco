@@ -348,6 +348,7 @@ static BignumDtoaMode DtoaToBignumDtoaMode(
     case DoubleToStringConverter::PRECISION: return BIGNUM_DTOA_PRECISION;
     default:
       UNREACHABLE();
+	  return BIGNUM_DTOA_SHORTEST;
   }
 }
 
