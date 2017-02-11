@@ -85,6 +85,10 @@ void IPAddressTest::testStringConv6()
 	IPAddress ia6(32, IPAddress::IPv6);
 	assert (ia6.family() == IPAddress::IPv6);
 	assert (ia6.toString() == "ffff:ffff::");
+
+	IPAddress ia7("::");
+	assert (ia7.family() == IPAddress::IPv6);
+	assert (ia7.toString() == "::");
 #endif
 }
 
