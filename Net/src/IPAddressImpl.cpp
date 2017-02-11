@@ -432,13 +432,16 @@ std::string IPv6AddressImpl::toString() const
 		else
 			result.append("::ffff:");
 		const UInt8* bytes = reinterpret_cast<const UInt8*>(&_addr);
-		NumberFormatter::append(result, bytes[12]);
-		result.append(".");
-		NumberFormatter::append(result, bytes[13]);
-		result.append(".");
-		NumberFormatter::append(result, bytes[14]);
-		result.append(".");
-		NumberFormatter::append(result, bytes[15]);
+		if (bytes[12] != 0) // only 0.0.0.0 can start with zero
+		{
+			NumberFormatter::append(result, bytes[12]);
+			result.append(".");
+			NumberFormatter::append(result, bytes[13]);
+			result.append(".");
+			NumberFormatter::append(result, bytes[14]);
+			result.append(".");
+			NumberFormatter::append(result, bytes[15]);
+		}
 		return result;
 	}
 	else
