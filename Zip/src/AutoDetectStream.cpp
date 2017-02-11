@@ -36,7 +36,8 @@ AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, const std::string& pr
 	_prefix(pre),
 	_postfix(post),
 	_reposition(reposition),
-	_start(start)
+	_start(start),
+	_length(0)
 {
 }
 
@@ -50,7 +51,8 @@ AutoDetectStreamBuf::AutoDetectStreamBuf(std::ostream& out):
 	_prefix(),
 	_postfix(),
 	_reposition(false),
-	_start(0u)
+	_start(0u),
+	_length(0)
 {
 }
 
@@ -63,7 +65,7 @@ AutoDetectStreamBuf::~AutoDetectStreamBuf()
 int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	poco_assert_dbg(length >= 8);
-	if (_pIstr == 0 ||length == 0) return -1;
+	if (_pIstr == 0 || length == 0) return -1;
 
 	if (_reposition)
 	{
@@ -74,109 +76,98 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 
 	if (!_prefix.empty())
 	{
-		std::streamsize tmp = (_prefix.size() > length)? length: static_cast<std::streamsize>(_prefix.size());
-		std::memcpy(buffer, _prefix.c_str(), tmp);
-		_prefix = _prefix.substr(tmp);
-		return tmp;
+		std::streamsize n = (_prefix.size() > length) ? length : static_cast<std::streamsize>(_prefix.size());
+		std::memcpy(buffer, _prefix.c_str(), n);
+		_prefix.erase(0, n);
+		return n;
 	}
 
 	if (_eofDetected)
 	{
 		if (!_postfix.empty())
 		{
-			std::streamsize tmp = (_postfix.size() > length)? length: static_cast<std::streamsize>(_postfix.size());
-			std::memcpy(buffer, _postfix.c_str(), tmp);
-			_postfix = _postfix.substr(tmp);
-			return tmp;
+			std::streamsize n = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
+			std::memcpy(buffer, _postfix.c_str(), n);
+			_postfix.erase(0, n);
+			return n;
 		}
-		else
-			return -1;
+		else return -1;
 	}
 
-	if (!_pIstr->good())
-		return -1;
+	if (!_pIstr->good()) return -1;
 
-	char byte3('\x00');
-	std::streamsize tempPos = 0;
+	std::streamsize offset = 0;
 	static std::istream::int_type eof = std::istream::traits_type::eof();
-	while (_pIstr->good() && !_pIstr->eof() && (tempPos+4) < length)
+	while (_pIstr->good() && !_pIstr->eof() && (offset + 4) < length)
 	{ 
 		std::istream::int_type c = _pIstr->get();
 		if (c != eof)
 		{
-			// all zip headers start with the same 2byte prefix
-			if (_matchCnt<2)
+			if (_matchCnt < 3)
 			{
-				if (c == ZipLocalFileHeader::HEADER[_matchCnt])
+				if (c == ZipDataInfo::HEADER[_matchCnt])
+				{
 					++_matchCnt;
+				}
 				else
 				{
-					// matchcnt was either 0 or 1 the headers have all unique chars -> safe to set to 0
-					if (_matchCnt == 1)
+					for (int i = 0; i < _matchCnt; i++)
 					{
-						buffer[tempPos++] = ZipLocalFileHeader::HEADER[0];
+						buffer[offset++] = ZipDataInfo::HEADER[i];
 					}
 					_matchCnt = 0;
-
-					buffer[tempPos++] = static_cast<char>(c);
+					buffer[offset++] = static_cast<char>(c);
 				}
 			}
-			else
+			else if (_matchCnt == 3)
 			{
-				//the upper 2 bytes differ: the lower one must be in range 1,3,5,7, the upper must be one larger: 2,4,6,8
-				if (_matchCnt == 2)
+				if (ZipDataInfo::HEADER[3] == c)
 				{
-					if (ZipLocalFileHeader::HEADER[2] == c || 
-						ZipArchiveInfo::HEADER[2] == c || 
-						ZipFileInfo::HEADER[2] == c || 
-						ZipDataInfo::HEADER[2] == c)
+					ZipDataInfo dataInfo(*_pIstr, true);
+					if (!_pIstr->good()) throw Poco::IOException("Failed to read data descriptor");
+
+					if (dataInfo.getCompressedSize() == _length + offset)
 					{
-						byte3 = static_cast<char>(c);;
-						_matchCnt++; 
+						_pIstr->seekg(-static_cast<int>(dataInfo.getFullHeaderSize()), std::ios::cur);
+						if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
+
+						_eofDetected = true;
+						_length += offset;
+						return offset;
 					}
 					else
 					{
-						buffer[tempPos++] = ZipLocalFileHeader::HEADER[0];
-						buffer[tempPos++] = ZipLocalFileHeader::HEADER[1];
-						buffer[tempPos++] = static_cast<char>(c);
+						_pIstr->seekg(-static_cast<int>(dataInfo.getFullHeaderSize() - 4), std::ios::cur);
+						if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
+
+						buffer[offset++] = ZipDataInfo::HEADER[0];
+						buffer[offset++] = ZipDataInfo::HEADER[1];
+						buffer[offset++] = ZipDataInfo::HEADER[2];
+						buffer[offset++] = ZipDataInfo::HEADER[3];
 						_matchCnt = 0;
 					}
 				}
-				else if (_matchCnt == 3)
+				else
 				{
-					if (c-1 == byte3)
-					{
-						// a match, seek back first, try pushback as fallback
-						_pIstr->seekg(-4, std::ios::cur);
-						if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
-						_eofDetected = true;
-						return tempPos;
-					}
-					else
-					{
-						buffer[tempPos++] = ZipLocalFileHeader::HEADER[0];
-						buffer[tempPos++] = ZipLocalFileHeader::HEADER[1];
-						buffer[tempPos++] = byte3;
-						buffer[tempPos++] = c;
-						_matchCnt = 0; //the headers have all unique chars -> safe to set to 0
-					}
+					buffer[offset++] = ZipDataInfo::HEADER[0];
+					buffer[offset++] = ZipDataInfo::HEADER[1];
+					buffer[offset++] = ZipDataInfo::HEADER[2];
+					buffer[offset++] = c;
+					_matchCnt = 0; 
 				}
 			}
 		}
 	}
 
-	return tempPos;
+	_length += offset;
+	return offset;
 
 }
 
 
 int AutoDetectStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
-	if (_pOstr == 0 || length == 0) return -1;
-	_pOstr->write(buffer, length);
-	if (_pOstr->good())
-		return length;
-	throw Poco::IOException("Failed to write to output stream");
+	return -1; // not supported
 }
 
 
@@ -212,18 +203,6 @@ AutoDetectInputStream::AutoDetectInputStream(std::istream& istr, const std::stri
 
 
 AutoDetectInputStream::~AutoDetectInputStream()
-{
-}
-
-
-AutoDetectOutputStream::AutoDetectOutputStream(std::ostream& ostr):
-	AutoDetectIOS(ostr), 
-	std::ostream(&_buf)
-{
-}
-
-
-AutoDetectOutputStream::~AutoDetectOutputStream()
 {
 }
 

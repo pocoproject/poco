@@ -57,14 +57,15 @@ private:
 		STREAM_BUFFER_SIZE  = 1024
 	};
 
-	std::istream*  _pIstr;
-	std::ostream*  _pOstr;
-	bool           _eofDetected;
-	int            _matchCnt;
-	std::string    _prefix;
-	std::string    _postfix;
-	bool           _reposition;
-	Poco::UInt32   _start;
+	std::istream*   _pIstr;
+	std::ostream*   _pOstr;
+	bool            _eofDetected;
+	int             _matchCnt;
+	std::string     _prefix;
+	std::string     _postfix;
+	bool            _reposition;
+	Poco::UInt32    _start;
+	std::streamsize _length;
 };
 
 
@@ -107,22 +108,6 @@ public:
 
 	~AutoDetectInputStream();
 		/// Destroys the AutoDetectInputStream.
-};
-
-
-class Zip_API AutoDetectOutputStream: public AutoDetectIOS, public std::ostream
-	/// This stream copies all characters written to it
-	/// to one or multiple output streams.
-{
-public:
-	AutoDetectOutputStream(std::ostream& ostr);
-		/// Creates the AutoDetectOutputStream and connects it
-		/// to the given input stream. Bytes written are guaranteed to be in the range [start, end-1]
-		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
-		/// to position start
-
-	~AutoDetectOutputStream();
-		/// Destroys the AutoDetectOutputStream.
 };
 
 
