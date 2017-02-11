@@ -40,7 +40,7 @@ public:
 	// Implementation note: the following definitions must be kept
 	// in sync with those from ucp.h (PCRE).
 	enum CharacterCategory
-		/// Unicode 5.0 character categories.
+		/// Unicode character categories.
 	{
 		UCP_OTHER,
 		UCP_LETTER,
@@ -52,7 +52,7 @@ public:
 	};
 
 	enum CharacterType
-		/// Unicode 5.0 character types.
+		/// Unicode character types.
 	{
 		UCP_CONTROL,
 		UCP_FORMAT,
@@ -87,7 +87,7 @@ public:
 	};
 	
 	enum Script
-		/// Unicode 5.0 scripts.
+		/// Unicode 7.0 script identifiers.
 	{
 		UCP_ARABIC,
 		UCP_ARMENIAN,
@@ -150,11 +150,13 @@ public:
 		UCP_TIFINAGH,
 		UCP_UGARITIC,
 		UCP_YI,
+		// Unicode 5.0
 		UCP_BALINESE,
 		UCP_CUNEIFORM,
 		UCP_NKO,
 		UCP_PHAGS_PA,
 		UCP_PHOENICIAN,
+		// Unicode 5.1
 		UCP_CARIAN,
 		UCP_CHAM,
 		UCP_KAYAH_LI,
@@ -165,7 +167,59 @@ public:
 		UCP_REJANG,
 		UCP_SAURASHTRA,
 		UCP_SUNDANESE,
-		UCP_VAI
+		UCP_VAI,
+		// Unicode 5.2
+		UCP_AVESTAN,
+		UCP_BAMUM,
+		UCP_EGYPTIAN_HIEROGLYPHS,
+		UCP_IMPERIAL_ARAMAIC,
+		UCP_INSCRIPTIONAL_PAHLAVI,
+		UCP_INSCRIPTIONAL_PARTHIAN,
+		UCP_JAVANESE,
+		UCP_KAITHI,
+		UCP_LISU,
+		UCP_MEETEI_MAYEK,
+		UCP_OLD_SOUTH_ARABIAN,
+		UCP_OLD_TURKIC,
+		UCP_SAMARITAN,
+		UCP_TAI_THAM,
+		UCP_TAI_VIET,
+		// Unicode 6.0
+		UCP_BATAK,
+		UCP_BRAHMI,
+		UCP_MANDAIC,
+		// Unicode 6.1
+		UCP_CHAKMA,
+		UCP_MEROITIC_CURSIVE,
+		UCP_MEROITIC_HIEROGLYPHS,
+		UCP_MIAO,
+		UCP_SHARADA,
+		UCP_SORA_SOMPENG,
+		UCP_TAKRI,
+		// Unicode 7.0
+		UCP_BASSA_VAH,
+		UCP_CAUCASIAN_ALBANIAN,
+		UCP_DUPLOYAN,
+		UCP_ELBASAN,
+		UCP_GRANTHA,
+		UCP_KHOJKI,
+		UCP_KHUDAWADI,
+		UCP_LINEAR_A,
+		UCP_MAHAJANI,
+		UCP_MANICHAEAN,
+		UCP_MENDE_KIKAKUI,
+		UCP_MODI,
+		UCP_MRO,
+		UCP_NABATAEAN,
+		UCP_OLD_NORTH_ARABIAN,
+		UCP_OLD_PERMIC,
+		UCP_PAHAWH_HMONG,
+		UCP_PALMYRENE,
+		UCP_PSALTER_PAHLAVI,
+		UCP_PAU_CIN_HAU,
+		UCP_SIDDHAM,
+		UCP_TIRHUTA,
+		UCP_WARANG_CITI
 	};
 	
 	enum
