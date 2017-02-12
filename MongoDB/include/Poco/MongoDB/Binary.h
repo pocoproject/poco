@@ -26,6 +26,7 @@
 #include "Poco/Buffer.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/MemoryStream.h"
+#include "Poco/UUID.h"
 #include <sstream>
 
 
@@ -45,6 +46,15 @@ public:
 	Binary(Poco::Int32 size, unsigned char subtype);
 		/// Constructor
 
+	Binary(const UUID& uuid);
+		/// Constructor for setting a UUID in a binary element
+		
+	Binary(const std::string& data, unsigned char subtype = 0);
+		/// Constructor for getting binary data from a string.
+		
+	Binary(const void* data, Poco::Int32 size, unsigned char subtype = 0);
+		/// Constructor for getting binary data from a buffer.		
+
 	virtual ~Binary();
 		/// Destructor
 
@@ -59,6 +69,13 @@ public:
 
 	std::string toString(int indent = 0) const;
 		/// Returns the binary encoded in Base64
+		
+	std::string toRawString() const;
+		/// Returns the raw content as a string.
+
+	UUID uuid() const;
+		/// Returns the UUID when the binary subtype is 0x04.
+		/// Otherwise BadCastException will be thrown
 
 private:
 	Buffer<unsigned char> _buffer;
@@ -81,6 +98,12 @@ inline void Binary::subtype(unsigned char type)
 inline Buffer<unsigned char>& Binary::buffer()
 {
 	return _buffer;
+}
+
+
+inline std::string Binary::toRawString() const
+{
+	return std::string(reinterpret_cast<const char*>(_buffer.begin()), _buffer.size());
 }
 
 

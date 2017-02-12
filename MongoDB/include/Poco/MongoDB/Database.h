@@ -44,8 +44,18 @@ public:
 
 	virtual ~Database();
 		/// Destructor
+		
+	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_MONGODB_CR);
+		/// Authenticates against the database using the given connection,
+		/// username and password, as well as authentication method.
+		///
+		/// "MONGODB-CR" (default prior to MongoDB 3.0) and 
+		/// "SCRAM-SHA-1" (default starting in 3.0) are the only supported 
+		/// authentication methods.
+		///
+		/// Returns true if authentication was successful, otherwise false.
 
-	double count(Connection& connection, const std::string& collectionName) const;
+	Int64 count(Connection& connection, const std::string& collectionName) const;
 		/// Sends a count request for the given collection to MongoDB. When
 		/// the command fails, -1 is returned.
 
@@ -88,6 +98,16 @@ public:
 		/// Sends the getLastError command to the database and returns the err element
 		/// from the error document. When err is null, an empty string is returned.
 
+	static const std::string AUTH_MONGODB_CR;
+		/// Default authentication mechanism prior to MongoDB 3.0.
+		
+	static const std::string AUTH_SCRAM_SHA1;
+		/// Default authentication mechanism for MongoDB 3.0.
+
+protected:
+	bool authCR(Connection& connection, const std::string& username, const std::string& password);
+	bool authSCRAM(Connection& connection, const std::string& username, const std::string& password);
+
 private:
 	std::string _dbname;
 };
@@ -127,6 +147,7 @@ Database::createUpdateRequest(const std::string& collectionName) const
 {
 	return new Poco::MongoDB::UpdateRequest(_dbname + '.' + collectionName);
 }
+
 
 } } // namespace Poco::MongoDB
 

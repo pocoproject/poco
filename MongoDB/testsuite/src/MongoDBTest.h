@@ -41,6 +41,8 @@ public:
 	void testConnectionPool();
 	void testCursorRequest();
 	void testObjectID();
+	void testCommand();
+	void testUUID();
 	void setUp();
 	void tearDown();
 
@@ -48,10 +50,7 @@ public:
 
 private:
 
-	std::string _host;
-	unsigned    _port;
-	static bool _connected;
-	static Poco::MongoDB::Connection _mongo;
+	static Poco::MongoDB::Connection::Ptr _mongo;
 
 };
 
