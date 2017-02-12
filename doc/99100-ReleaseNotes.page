@@ -21,10 +21,15 @@ AAAIntroduction
   - fixed GH #1573: Poco::File::createDirectories() should not throw Poco::FileExistsException
   - fixed GH #1580: Unable to unzip zip file created using non-seeking stream
   - fixed GH #1581: Cannot find 'pcre.h' when using POCO_UNBUNDLED, a non-system PCRE, and CMake
+  - fixed GH #1588: Poco::Net::HTTPChunkedStreamBuf::readFromDevice(): restrict maximum 
+    size of chunk length 
+  - fixed GH #1589: Poco::Net::HTMLForm: restrict maximum field and value length
+  - fixed GH #1590: Poco::Net::DialogSocket: restrict maximum line length
+  - fixed GH #1591: Poco::Net::MultipartReader: restrict maximum boundary string length
   - fixed GH #1534: Upgraded bundled zlib to 1.2.11
   - fixed GH #1558: Upgraded bundled SQLite to 3.16.2
   - fixed GH #1586: Upgraded bundled PCRE to 8.40
-  - fixed GH #1538: Upgraded bundled double-conversion to v1.1.5
+  - fixed GH #1538: Upgraded bundled double-conversion to 1.1.5
 
 
 !!!Release 1.7.7
