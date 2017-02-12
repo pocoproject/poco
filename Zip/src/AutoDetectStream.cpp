@@ -61,7 +61,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	if (!_prefix.empty())
 	{
 		std::streamsize n = (_prefix.size() > length) ? length : static_cast<std::streamsize>(_prefix.size());
-		std::memcpy(buffer, _prefix.c_str(), n);
+		std::memcpy(buffer, _prefix.data(), n);
 		_prefix.erase(0, n);
 		return n;
 	}
@@ -71,7 +71,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (!_postfix.empty())
 		{
 			std::streamsize n = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
-			std::memcpy(buffer, _postfix.c_str(), n);
+			std::memcpy(buffer, _postfix.data(), n);
 			_postfix.erase(0, n);
 			return n;
 		}
@@ -117,6 +117,14 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 
 						_eofDetected = true;
 						_length += offset;
+						
+						if (offset == 0 && !_postfix.empty())
+						{
+							offset = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
+							std::memcpy(buffer, _postfix.data(), offset);
+							_postfix.erase(0, offset);
+						}
+						
 						return offset;
 					}
 					else
