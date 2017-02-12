@@ -30,7 +30,8 @@ namespace Zip {
 
 
 class Zip_API AutoDetectStreamBuf: public Poco::BufferedStreamBuf
-	/// A AutoDetectStreamBuf is a class that limits one view on an inputstream to a selected view range
+	/// AutoDetectStreamBuf automatically detects the end of a stream using the 
+	/// Data Descriptor signature.
 {
 public:
 	AutoDetectStreamBuf(std::istream& in, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start);
@@ -83,15 +84,12 @@ protected:
 
 
 class Zip_API AutoDetectInputStream: public AutoDetectIOS, public std::istream
-	/// This stream copies all characters read through it
-	/// to one or multiple output streams.
+	/// AutoDetectInputStream automatically detects the end of a stream using the 
+	/// Data Descriptor signature.
 {
 public:
 	AutoDetectInputStream(std::istream& istr, const std::string& prefix = std::string(), const std::string& postfix = std::string(), bool reposition = false, Poco::UInt32 start = 0);
-		/// Creates the AutoDetectInputStream and connects it
-		/// to the given input stream. Bytes read are guaranteed to be in the range [start, end-1]
-		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
-		/// to position start
+		/// Creates the AutoDetectInputStream and connects it to the underlying stream.
 
 	~AutoDetectInputStream();
 		/// Destroys the AutoDetectInputStream.
