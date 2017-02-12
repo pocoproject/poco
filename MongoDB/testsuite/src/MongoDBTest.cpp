@@ -221,6 +221,10 @@ void MongoDBTest::testDeleteRequest()
 void MongoDBTest::testCursorRequest()
 {
 	Poco::MongoDB::Database db("team");
+	
+	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> deleteRequest = db.createDeleteRequest("numbers");
+	_mongo->sendRequest(*deleteRequest);
+
 	Poco::SharedPtr<Poco::MongoDB::InsertRequest> insertRequest = db.createInsertRequest("numbers");
 	for(int i = 0; i < 10000; ++i)
 	{

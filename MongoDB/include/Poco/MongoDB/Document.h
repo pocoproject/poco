@@ -68,7 +68,7 @@ public:
 	template<typename T>
 	Document& add(const std::string& name, T value)
 		/// Creates an element with the given name and value and
-		// adds it to the document.
+		/// adds it to the document.
 		/// The active document is returned to allow chaining of the add methods.
 	{
 		return addElement(new ConcreteElement<T>(name, value));
@@ -76,7 +76,7 @@ public:
 
 	Document& add(const std::string& name, const char* value)
 		/// Creates an element with the given name and value and
-		// adds it to the document.
+		/// adds it to the document.
 		/// The active document is returned to allow chaining of the add methods.
 	{
 		return addElement(new ConcreteElement<std::string>(name, std::string(value)));
