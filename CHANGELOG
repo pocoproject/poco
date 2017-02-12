@@ -1,9 +1,28 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.7.8 (2016-02-XX)
+Release 1.7.8 (2016-02-13)
 ==========================
 
-- TODO
+- fixed GH #1212: Lost WebSocket Frames after Client Websocket Handshake is complete
+- fixed GH #1501: Alpine 3.4 trouble with Foundation/src/Error.cpp
+- fixed GH #1523: Long path names under Windows
+- fixed GH #1536: Building with OS X 10.12 SDK and 10.7 deployment target without libc++ fails
+- fixed GH #1537: Need to add multiple cflags parameters to configure
+- fixed GH #1539: Allow overriding POCO_TARGET_OSARCH for iPhoneSimulator
+- fixed GH #1546: Enable bitcode for iPhone build config
+- fixed GH #1549: Latin2Encoding and 0xFF
+- fixed GH #1551: Unable to use Poco on macOS 10.12
+- fixed GH #1566: Poco/Zip issue with some CM_DEFLATE archives
+- fixed GH #1567: Poco/ZIP issue with uncompressed archives
+- fixed GH #1570: IPv6AddressImpl::toString() returns wrong output for IPv6 address "::"
+- fixed GH #1571: ODBC Preparator memory leak
+- fixed GH #1573: Poco::File::createDirectories() should not throw Poco::FileExistsException
+- fixed GH #1580: Unable to unzip zip file created using non-seeking stream
+- fixed GH #1581: Cannot find 'pcre.h' when using POCO_UNBUNDLED, a non-system PCRE, and CMake
+- fixed GH #1534: Upgraded bundled zlib to 1.2.11
+- fixed GH #1558: Upgraded bundled SQLite to 3.16.2
+- fixed GH #1586: Upgraded bundled PCRE to 8.40
+- fixed GH #1538: Upgraded bundled double-conversion to v1.1.5
 
 
 Release 1.7.7 (2016-12-31)
