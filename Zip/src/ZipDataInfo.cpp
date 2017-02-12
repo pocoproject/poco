@@ -64,7 +64,6 @@ ZipDataInfo::~ZipDataInfo()
 }
 
 
-
 const char ZipDataInfo64::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x07', '\x08'};
 
 

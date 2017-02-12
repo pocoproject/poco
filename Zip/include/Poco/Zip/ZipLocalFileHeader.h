@@ -280,6 +280,7 @@ inline void ZipLocalFileHeader::setRequiredVersion(int major, int minor)
 	_rawHeader[VERSION_POS] = static_cast<char>(static_cast<unsigned char>(major)*10+static_cast<unsigned char>(minor));
 }
 
+
 inline Poco::UInt16 ZipLocalFileHeader::getFileNameLength() const
 {
 	return ZipUtil::get16BitValue(_rawHeader, FILE_LENGTH_POS);
