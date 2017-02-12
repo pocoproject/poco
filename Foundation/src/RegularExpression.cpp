@@ -49,14 +49,14 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 	if (study)
 		_extra = pcre_study(reinterpret_cast<pcre*>(_pcre), 0, &error);
 
-	pcre_fullinfo(_pcre, _extra, PCRE_INFO_NAMECOUNT, &nmcount);
-	pcre_fullinfo(_pcre, _extra, PCRE_INFO_NAMEENTRYSIZE, &nmentrysz);
-	pcre_fullinfo(_pcre, _extra, PCRE_INFO_NAMETABLE, &nmtbl);
+	pcre_fullinfo(reinterpret_cast<const pcre*>(_pcre), reinterpret_cast<const pcre_extra*>(_extra), PCRE_INFO_NAMECOUNT, &nmcount);
+	pcre_fullinfo(reinterpret_cast<const pcre*>(_pcre), reinterpret_cast<const pcre_extra*>(_extra), PCRE_INFO_NAMEENTRYSIZE, &nmentrysz);
+	pcre_fullinfo(reinterpret_cast<const pcre*>(_pcre), reinterpret_cast<const pcre_extra*>(_extra), PCRE_INFO_NAMETABLE, &nmtbl);
 
 	for (int i = 0; i < nmcount; i++)
 	{
 		unsigned char* group = nmtbl + 2 + (nmentrysz * i);
-		int n = pcre_get_stringnumber(_pcre, (char*) group);
+		int n = pcre_get_stringnumber(reinterpret_cast<const pcre*>(_pcre), (char*) group);
 		_groups[n] = std::string((char*) group);
 	}
 }
