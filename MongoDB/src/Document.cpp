@@ -7,8 +7,6 @@
 // Package: MongoDB
 // Module:  Document
 //
-// Implementation of the Document class.
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -44,7 +42,7 @@ Element::Ptr Document::get(const std::string& name) const
 	Element::Ptr element;
 
 	ElementSet::const_iterator it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
-	if ( it != _elements.end() )
+	if (it != _elements.end())
 	{
 		return *it;
 	}
@@ -52,28 +50,30 @@ Element::Ptr Document::get(const std::string& name) const
 	return element;
 }
 
+
 Int64 Document::getInteger(const std::string& name) const
 {
 	Element::Ptr element = get(name);
-	if ( element.isNull() ) throw NotFoundException(name);
+	if (element.isNull()) throw Poco::NotFoundException(name);
 
-	if ( ElementTraits<double>::TypeId == element->type() )
+	if (ElementTraits<double>::TypeId == element->type())
 	{
-		ConcreteElement<double>* concrete = dynamic_cast<ConcreteElement<double>* >(element.get());
-		if ( concrete != NULL ) return concrete->value();
+		ConcreteElement<double>* concrete = dynamic_cast<ConcreteElement<double>*>(element.get());
+		if (concrete) return concrete->value();
 	}
-	else if ( ElementTraits<Int32>::TypeId == element->type() )
+	else if (ElementTraits<Int32>::TypeId == element->type())
 	{
-		ConcreteElement<Int32>* concrete = dynamic_cast<ConcreteElement<Int32>* >(element.get());
-		if ( concrete != NULL ) return concrete->value();
+		ConcreteElement<Int32>* concrete = dynamic_cast<ConcreteElement<Int32>*>(element.get());
+		if (concrete) return concrete->value();
 	}
-	else if ( ElementTraits<Int64>::TypeId == element->type() )
+	else if (ElementTraits<Int64>::TypeId == element->type())
 	{
-		ConcreteElement<Int64>* concrete = dynamic_cast<ConcreteElement<Int64>* >(element.get());
-		if ( concrete != NULL ) return concrete->value();
+		ConcreteElement<Int64>* concrete = dynamic_cast<ConcreteElement<Int64>*>(element.get());
+		if (concrete) return concrete->value();
 	}
-	throw BadCastException("Invalid type mismatch!");
+	throw Poco::BadCastException("Invalid type mismatch!");
 }
+
 
 void Document::read(BinaryReader& reader)
 {
@@ -83,13 +83,13 @@ void Document::read(BinaryReader& reader)
 	unsigned char type;
 	reader >> type;
 
-	while( type != '\0' )
+	while (type != '\0')
 	{
 		Element::Ptr element;
-
+		
 		std::string name = BSONReader(reader).readCString();
 
-		switch(type)
+		switch (type)
 		{
 		case ElementTraits<double>::TypeId:
 			element = new ConcreteElement<double>(name, 0);
@@ -101,16 +101,16 @@ void Document::read(BinaryReader& reader)
 			element = new ConcreteElement<std::string>(name, "");
 			break;
 		case ElementTraits<Document::Ptr>::TypeId:
-			element = new ConcreteElement<Document::Ptr>(name, new Document());
+			element = new ConcreteElement<Document::Ptr>(name, new Document);
 			break;
 		case ElementTraits<Array::Ptr>::TypeId:
-			element = new ConcreteElement<Array::Ptr>(name, new Array());
+			element = new ConcreteElement<Array::Ptr>(name, new Array);
 			break;
 		case ElementTraits<Binary::Ptr>::TypeId:
-			element = new ConcreteElement<Binary::Ptr>(name, new Binary());
+			element = new ConcreteElement<Binary::Ptr>(name, new Binary);
 			break;
 		case ElementTraits<ObjectId::Ptr>::TypeId:
-			element = new ConcreteElement<ObjectId::Ptr>(name, new ObjectId());
+			element = new ConcreteElement<ObjectId::Ptr>(name, new ObjectId);
 			break;
 		case ElementTraits<bool>::TypeId:
 			element = new ConcreteElement<bool>(name, false);
@@ -158,31 +158,31 @@ std::string Document::toString(int indent) const
 
 	oss << '{';
 
-	if ( indent > 0 ) oss << std::endl;
+	if (indent > 0) oss << std::endl;
 
 
-	for(ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+	for (ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
 	{
-		if ( it != _elements.begin() )
+		if (it != _elements.begin())
 		{
 			oss << ',';
-			if ( indent > 0 ) oss << std::endl;
+			if (indent > 0) oss << std::endl;
 		}
 
-		for(int i = 0; i < indent; ++i) oss << ' ';
+		for (int i = 0; i < indent; ++i) oss << ' ';
 
 		oss << '"' << (*it)->name() << '"';
-		oss << (( indent > 0 ) ? " : " : ":");
+		oss << (indent > 0  ? " : " : ":");
 
 		oss << (*it)->toString(indent > 0 ? indent + 2 : 0);
 	}
 
-	if ( indent > 0 )
+	if (indent > 0)
 	{
 		oss << std::endl;
-		if ( indent >= 2 ) indent -= 2;
+		if (indent >= 2) indent -= 2;
 
-		for(int i = 0; i < indent; ++i) oss << ' ';
+		for (int i = 0; i < indent; ++i) oss << ' ';
 	}
 
 	oss << '}';
@@ -193,7 +193,7 @@ std::string Document::toString(int indent) const
 
 void Document::write(BinaryWriter& writer)
 {
-	if ( _elements.empty() )
+	if (_elements.empty())
 	{
 		writer << 5;
 	}
@@ -201,7 +201,7 @@ void Document::write(BinaryWriter& writer)
 	{
 		std::stringstream sstream;
 		Poco::BinaryWriter tempWriter(sstream);
-		for(ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
+		for (ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
 		{
 			tempWriter << static_cast<unsigned char>((*it)->type());
 			BSONWriter(tempWriter).writeCString((*it)->name());
@@ -209,7 +209,7 @@ void Document::write(BinaryWriter& writer)
 			element->write(tempWriter);
 		}
 		tempWriter.flush();
-
+		
 		Poco::Int32 len = static_cast<Poco::Int32>(5 + sstream.tellp()); /* 5 = sizeof(len) + 0-byte */
 		writer << len;
 		writer.writeRaw(sstream.str());

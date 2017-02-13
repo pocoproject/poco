@@ -39,13 +39,13 @@ class MongoDB_API Database
 	/// the database.
 {
 public:
-	Database(const std::string& db);
-		/// Constructor
+	explicit Database(const std::string& name);
+		/// Creates a Database for the database with the given name.
 
 	virtual ~Database();
-		/// Destructor
-
-	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_MONGODB_CR);
+		/// Destroys the Database.
+		
+	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA1);
 		/// Authenticates against the database using the given connection,
 		/// username and password, as well as authentication method.
 		///
@@ -54,31 +54,37 @@ public:
 		/// authentication methods.
 		///
 		/// Returns true if authentication was successful, otherwise false.
+		///
+		/// May throw a Poco::ProtocolException if authentication fails for a reason other than
+		/// invalid credentials.
 
 	Int64 count(Connection& connection, const std::string& collectionName) const;
-		/// Sends a count request for the given collection to MongoDB. When
-		/// the command fails, -1 is returned.
+		/// Sends a count request for the given collection to MongoDB. 
+		///
+		/// If the command fails, -1 is returned.
 
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCommand() const;
 		/// Creates a QueryRequest for a command.
 
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCountRequest(const std::string& collectionName) const;
-		/// Creates a QueryRequest to count the given collection. The collectionname must not contain
-		/// the database name!
+		/// Creates a QueryRequest to count the given collection. 
+		/// The collectionname must not contain the database name.
 
 	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> createDeleteRequest(const std::string& collectionName) const;
 		/// Creates a DeleteRequest to delete documents in the given collection.
-		/// The collectionname must not contain the database name!
+		/// The collectionname must not contain the database name.
 
 	Poco::SharedPtr<Poco::MongoDB::InsertRequest> createInsertRequest(const std::string& collectionName) const;
 		/// Creates an InsertRequest to insert new documents in the given collection.
-		/// The collectionname must not contain the database name!
+		/// The collectionname must not contain the database name.
 
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName) const;
-		/// Creates a QueryRequest. The collectionname must not contain the database name!
+		/// Creates a QueryRequest. 
+		/// The collectionname must not contain the database name.
 
 	Poco::SharedPtr<Poco::MongoDB::UpdateRequest> createUpdateRequest(const std::string& collectionName) const;
-		/// Creates an UpdateRequest. The collectionname must not contain the database name!
+		/// Creates an UpdateRequest. 
+		/// The collectionname must not contain the database name.
 
 	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection,
 		const std::string& collection,
@@ -92,7 +98,7 @@ public:
 		/// For more info look at the ensureIndex information on the MongoDB website.
 
 	Document::Ptr getLastErrorDoc(Connection& connection) const;
-		/// Sends the getLastError command to the database and returns the document
+		/// Sends the getLastError command to the database and returns the error document.
 
 	std::string getLastError(Connection& connection) const;
 		/// Sends the getLastError command to the database and returns the err element
@@ -113,6 +119,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCommand() const
 {
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> cmd = createQueryRequest("$cmd");

@@ -7,8 +7,6 @@
 // Package: MongoDB
 // Module:  Database
 //
-// Implementation of the Database class.
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -158,19 +156,11 @@ bool Database::authCR(Connection& connection, const std::string& username, const
 	if (response.documents().size() > 0)
 	{
 		Document::Ptr pDoc = response.documents()[0];
-		try
-		{
-			double ok = pDoc->get<double>("ok");   
-			if (ok != 1) return false;
-			nonce = pDoc->get<std::string>("nonce", "");
-			if (nonce.empty()) return false;
-		}
-		catch (Poco::NotFoundException&)
-		{
-			return false;
-		}
+		if (pDoc->get<double>("ok") != 1) return false;
+		nonce = pDoc->get<std::string>("nonce", "");
+		if (nonce.empty()) throw Poco::ProtocolException("no nonce received");
 	}
-	else return false;
+	else throw Poco::ProtocolException("empty response for getnonce");
 
 	std::string credsDigest = hashCredentials(username, password);
 
@@ -191,15 +181,9 @@ bool Database::authCR(Connection& connection, const std::string& username, const
 	if (response.documents().size() > 0)
 	{
 		Document::Ptr pDoc = response.documents()[0];
-		try
-		{
-			return pDoc->get<double>("ok") == 1;
-		}
-		catch (Poco::NotFoundException&)
-		{
-		}
+		return pDoc->get<double>("ok") == 1;
 	}
-	return false;
+	else throw Poco::ProtocolException("empty response for authenticate");
 }
 
 
@@ -224,22 +208,15 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 	if (response.documents().size() > 0)
 	{
 		Document::Ptr pDoc = response.documents()[0];
-		try
+		if (pDoc->get<double>("ok") == 1)
 		{
-			if (pDoc->get<double>("ok") == 1)
-			{
-				Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
-				serverFirstMsg = pPayload->toRawString();
-				conversationId = pDoc->get<Int32>("conversationId");
-			}
-			else return false;
+			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
+			serverFirstMsg = pPayload->toRawString();
+			conversationId = pDoc->get<Int32>("conversationId");
 		}
-		catch (Poco::NotFoundException&)
-		{
-			return false;
-		}
+		else return false;
 	}
-	else return false;
+	else throw Poco::ProtocolException("empty response for saslStart");
 	
 	std::map<std::string, std::string> kvm = parseKeyValueList(serverFirstMsg);
 	const std::string serverNonce = kvm["r"];
@@ -287,21 +264,14 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 	if (response.documents().size() > 0)
 	{
 		Document::Ptr pDoc = response.documents()[0];
-		try
+		if (pDoc->get<double>("ok") == 1)
 		{
-			if (pDoc->get<double>("ok") == 1)
-			{
-				Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
-				serverSecondMsg.assign(reinterpret_cast<const char*>(pPayload->buffer().begin()), pPayload->buffer().size());
-			}
-			else return false;
+			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
+			serverSecondMsg.assign(reinterpret_cast<const char*>(pPayload->buffer().begin()), pPayload->buffer().size());
 		}
-		catch (Poco::NotFoundException&)
-		{
-			return false;
-		}
+		else return false;
 	}
-	else return false;
+	else throw Poco::ProtocolException("empty response for saslContinue");
 
 	Poco::HMACEngine<Poco::SHA1Engine> hmacSKey(saltedPassword);
 	hmacSKey.update(std::string("Server Key"));
@@ -314,7 +284,8 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 	kvm = parseKeyValueList(serverSecondMsg);
 	std::string serverSignatureReceived = kvm["v"];
 	
-	if (serverSignature != serverSignatureReceived) return false;
+	if (serverSignature != serverSignatureReceived) 	
+		throw Poco::ProtocolException("server signature verification failed");
 	
 	pCommand = createCommand();
 	pCommand->selector()
@@ -328,8 +299,7 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 		Document::Ptr pDoc = response.documents()[0];
 		return pDoc->get<double>("ok") == 1;
 	}
-
-	return false;
+	else throw Poco::ProtocolException("empty response for saslContinue");
 }
 
 
@@ -340,7 +310,7 @@ Int64 Database::count(Connection& connection, const std::string& collectionName)
 	Poco::MongoDB::ResponseMessage response;
 	connection.sendRequest(*countRequest, response);
 
-	if ( response.documents().size() > 0 )
+	if (response.documents().size() > 0)
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
 		return doc->getInteger("n");
@@ -357,22 +327,22 @@ Poco::MongoDB::Document::Ptr Database::ensureIndex(Connection& connection, const
 	index->add("name", indexName);
 	index->add("key", keys);
 
-	if ( version > 0 )
+	if (version > 0)
 	{
 		index->add("version", version);
 	}
 
-	if ( unique )
+	if (unique)
 	{
 		index->add("unique", true);
 	}
 
-	if ( background )
+	if (background)
 	{
 		index->add("background", true);
 	}
 
-	if ( ttl > 0 )
+	if (ttl > 0)
 	{
 		index->add("expireAfterSeconds", ttl);
 	}
@@ -396,7 +366,7 @@ Document::Ptr Database::getLastErrorDoc(Connection& connection) const
 	Poco::MongoDB::ResponseMessage response;
 	connection.sendRequest(*request, response);
 
-	if ( response.documents().size() > 0 )
+	if (response.documents().size() > 0)
 	{
 		errorDoc = response.documents()[0];
 	}
@@ -408,7 +378,7 @@ Document::Ptr Database::getLastErrorDoc(Connection& connection) const
 std::string Database::getLastError(Connection& connection) const
 {
 	Document::Ptr errorDoc = getLastErrorDoc(connection);
-	if ( !errorDoc.isNull() && errorDoc->isType<std::string>("err") )
+	if (!errorDoc.isNull() && errorDoc->isType<std::string>("err"))
 	{
 		return errorDoc->get<std::string>("err");
 	}
