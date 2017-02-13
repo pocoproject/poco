@@ -15,6 +15,7 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 /*
 Copyright (c) 2005 JSON.org
 
@@ -39,6 +40,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+
 #ifndef JSON_JSONParser_INCLUDED
 #define JSON_JSONParser_INCLUDED
 
@@ -58,22 +60,34 @@ namespace JSON {
 
 
 class JSON_API Parser
-	/// A RFC 4627 compatible class for parsing JSON strings or streams.
+	/// A parser for reading RFC 4627 compliant JSON from strings or streams.
 	/// 
-	/// See http://www.ietf.org/rfc/rfc4627.txt for specification.
-	/// 
-	/// Usage example:
+	/// Simple usage example:
 	/// 
 	///    std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ] }";
 	///    Parser parser;
 	///    Var result = parser.parse(json);
-	///    // ... use result
+	///    // ... use result (see next example)
 	///    parser.reset();
 	///    std::ostringstream ostr;
 	///    PrintHandler::Ptr pHandler = new PrintHandler(ostr);
 	///    parser.setHandler(pHandler);
 	///    parser.parse(json); // ostr.str() == json
+	/// ----
+	///
+	/// The result of parsing a valid JSON document will be either an Object
+	/// or an Array. Therefore the result of parse() is a Poco::Dynamic::Var
+	/// containing a Poco::SharedPtr to an Object or Array instance.
+	///
+	/// Example:
 	/// 
+	///    std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ] }";
+	///    Parser parser;
+	///    Var result = parser.parse(json);
+	///    Object::Ptr object = result.extract<Object::Ptr>();
+	///    std::string name = object.getValue<std::string>("name");
+	///    Array::Ptr children = object.getArray("children");
+	/// ----
 {
 public:
 	typedef std::char_traits<char> CharTraits;
@@ -201,7 +215,7 @@ public:
 	static const int         JSON_UNLIMITED_DEPTH = -1;
 
 	Parser(const Handler::Ptr& pHandler = new ParseHandler, std::size_t bufSize = JSON_PARSE_BUFFER_SIZE);
-		/// Creates JSON Parser.
+		/// Creates JSON Parser, using the given Handler and buffer size.
 
 	virtual ~Parser();
 		/// Destroys JSON Parser.
@@ -210,17 +224,21 @@ public:
 		/// Resets the parser.
 
 	void setAllowComments(bool comments);
-		/// Allow comments. By default, comments are not allowed.
+		/// Allow or disallow comments. By default, comments are not allowed.
 
 	bool getAllowComments() const;
 		/// Returns true if comments are allowed, false otherwise.
+		///
 		/// By default, comments are not allowed.
 		
 	void setAllowNullByte(bool nullByte);
-		/// Allow null byte in strings. By default, null byte is allowed.
+		/// Allow or disallow null byte in strings. 
+		///
+		/// By default, null byte is allowed.
 
 	bool getAllowNullByte() const;
 		/// Returns true if null byte is allowed, false otherwise.
+		///
 		/// By default, null bytes are allowed.
 
 	void setDepth(std::size_t depth);
@@ -230,16 +248,16 @@ public:
 		/// Returns the allowed JSON depth.
 
 	Dynamic::Var parse(const std::string& json);
-		/// Parses a string.
+		/// Parses JSON from a string.
 
 	Dynamic::Var parse(std::istream& in);
-		/// Parses a JSON from the input stream.
+		/// Parses JSON from an input stream.
 
 	void setHandler(const Handler::Ptr& pHandler);
-		/// Set the handler.
+		/// Set the Handler.
 
 	const Handler::Ptr& getHandler();
-		/// Returns the handler.
+		/// Returns the Handler.
 
 	Dynamic::Var asVar() const;
 		/// Returns the result of parsing;
@@ -261,23 +279,14 @@ private:
 		/// Returns false if there is underflow or if the modes mismatch.
 
 	void growBuffer();
-
 	void clearBuffer();
-
 	void parseBufferPushBackChar(char c);
-
 	void parseBufferPopBackChar();
-
 	void addCharToParseBuffer(CharIntType nextChar, int nextClass);
-
 	void addEscapedCharToParseBuffer(CharIntType nextChar);
-
 	CharIntType decodeUnicodeChar();
-
 	void assertNotStringNullBool();
-
 	void assertNonContainer();
-
 	void parseBuffer();
 
 	template <typename IT>
@@ -315,7 +324,7 @@ private:
 		unsigned char ch = static_cast<unsigned char>(CharTraits::to_char_type(nextChar));
 
 		// Determine the character's class.
-		if ((!_allowNullByte && ch == 0)) return false;
+		if (!_allowNullByte && ch == 0) return false;
 		if (ch >= 0x80)
 		{
 			nextClass = C_ETC;
@@ -327,7 +336,7 @@ private:
 
 			char buffer[4];
 			buffer[0] = nextChar;
-			for(int i = 1; i < count; ++i)
+			for (int i = 1; i < count; ++i)
 			{
 				int c = 0;
 				if (!source.nextChar(c)) throw Poco::JSON::JSONException("Invalid UTF8 sequence found");
@@ -339,7 +348,7 @@ private:
 				throw Poco::JSON::JSONException("No legal UTF8 found");
 			}
 
-			for(int i = 0; i < count; ++i)
+			for (int i = 0; i < count; ++i)
 			{
 				parseBufferPushBackChar(buffer[i]);
 			}
@@ -366,7 +375,7 @@ private:
 			{
 			// Unicode character 
 			case UC:
-				if(!decodeUnicodeChar()) return false;
+				if (!decodeUnicodeChar()) return false;
 				// check if we need to read a second UTF-16 char
 				if (_utf16HighSurrogate) _state = D1;
 				else _state = ST;
@@ -449,7 +458,7 @@ private:
 				{
 				case MODE_ARRAY:
 					case MODE_OBJECT:
-						switch(_state)
+						switch (_state)
 						{
 						case VA:
 						case AR:
@@ -591,8 +600,10 @@ private:
 	}
 
 	bool done();
-
 	static CharIntType utf8CheckFirst(char byte);
+	bool isHighSurrogate(unsigned uc);
+	bool isLowSurrogate(unsigned uc);
+	unsigned decodeSurrogatePair(unsigned hi, unsigned lo);
 
 	static const int _asciiClass[128];
 		/// This array maps the 128 ASCII characters into character classes.
@@ -601,10 +612,6 @@ private:
 
 	static const int _stateTransitionTable[NR_STATES][NR_CLASSES];
 	static const int xx = -1;
-
-	bool isHighSurrogate(unsigned uc);
-	bool isLowSurrogate(unsigned uc);
-	unsigned decodeSurrogatePair(unsigned hi, unsigned lo);
 
 	Handler::Ptr   _pHandler;
 	signed char    _state;
@@ -623,6 +630,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline void Parser::setAllowComments(bool comments)
 {
 	_allowComments = comments;
@@ -735,7 +745,7 @@ inline unsigned Parser::decodeSurrogatePair(unsigned hi, unsigned lo)
 }
 
 
-}} // namespace Poco::JSON
+} } // namespace Poco::JSON
 
 
 #endif // JSON_JSONParser_INCLUDED
