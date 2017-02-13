@@ -237,7 +237,6 @@ void MongoDBTest::testCursorRequest()
 	_mongo->sendRequest(*insertRequest);
 
 	Poco::Int64 count = db.count(*_mongo, "numbers");
-
 	assert(count == 10000);
 
 	Poco::MongoDB::Cursor cursor("team", "numbers");
