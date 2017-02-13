@@ -156,7 +156,7 @@ bool Database::authCR(Connection& connection, const std::string& username, const
 	if (response.documents().size() > 0)
 	{
 		Document::Ptr pDoc = response.documents()[0];
-		if (pDoc->get<double>("ok") != 1) return false;
+		if (pDoc->getInteger("ok") != 1) return false;
 		nonce = pDoc->get<std::string>("nonce", "");
 		if (nonce.empty()) throw Poco::ProtocolException("no nonce received");
 	}
@@ -181,7 +181,7 @@ bool Database::authCR(Connection& connection, const std::string& username, const
 	if (response.documents().size() > 0)
 	{
 		Document::Ptr pDoc = response.documents()[0];
-		return pDoc->get<double>("ok") == 1;
+		return pDoc->getInteger("ok") == 1;
 	}
 	else throw Poco::ProtocolException("empty response for authenticate");
 }
@@ -208,7 +208,7 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 	if (response.documents().size() > 0)
 	{
 		Document::Ptr pDoc = response.documents()[0];
-		if (pDoc->get<double>("ok") == 1)
+		if (pDoc->getInteger("ok") == 1)
 		{
 			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
 			serverFirstMsg = pPayload->toRawString();
@@ -264,7 +264,7 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 	if (response.documents().size() > 0)
 	{
 		Document::Ptr pDoc = response.documents()[0];
-		if (pDoc->get<double>("ok") == 1)
+		if (pDoc->getInteger("ok") == 1)
 		{
 			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
 			serverSecondMsg.assign(reinterpret_cast<const char*>(pPayload->buffer().begin()), pPayload->buffer().size());
@@ -297,7 +297,7 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 	if (response.documents().size() > 0)
 	{
 		Document::Ptr pDoc = response.documents()[0];
-		return pDoc->get<double>("ok") == 1;
+		return pDoc->getInteger("ok") == 1;
 	}
 	else throw Poco::ProtocolException("empty response for saslContinue");
 }
