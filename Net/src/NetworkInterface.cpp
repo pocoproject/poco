@@ -23,6 +23,8 @@
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/StringTokenizer.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Format.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -35,6 +37,7 @@
 	#include <ipifcons.h>
 #endif
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 
@@ -1560,26 +1563,37 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setMACAddress(sdl->sll_addr, sdl->sll_halen);
 	impl.setType(fromNative(sdl->sll_hatype));
 #else
-	// TODO: fix for non-Ethernet interfaces
-	std::string ifpath("/sys/class/net/");
-	ifpath += iface->ifa_name;
-	ifpath += "/address";
-	int fd = open(ifpath.c_str(), O_RDONLY);
-	if (fd >= 0)
+	std::string ifPath("/sys/class/net/");
+	ifPath += iface->ifa_name;
+
+	std::string addrPath(ifPath);
+	addrPath += "/address";
+	
+	std::ifstream addrStream(addrPath.c_str());
+	if (addrStream.good())
 	{
-		char buffer[18];
-		int n = read(fd, buffer, 17);
-		close(fd);
-		if (n == 17)
+		std::string addr;
+		std::getline(addrStream, addr);
+		Poco::StringTokenizer tok(addr, ":");
+		std::vector<unsigned char> mac;
+		for (Poco::StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
 		{
-			unsigned char mac[6];
-			buffer[n] = 0;
-			if (std::sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]) == 6)
-			{
-				impl.setMACAddress(mac, 6);
-			}
+			mac.push_back(static_cast<unsigned char>(Poco::NumberParser::parseHex(*it)));
 		}
-	}	
+		impl.setMACAddress(&mac[0], mac.size());
+		addrStream.close();
+	}
+	
+	std::string typePath(ifPath);
+	typePath += "/type";
+	std::ifstream typeStream(typePath.c_str());
+	if (typeStream.good())
+	{
+		int type;
+		typeStream >> type;
+		impl.setType(fromNative(type));
+		typeStream.close();
+	}
 #endif // POCO_NO_LINUX_IF_PACKET_H
 }
 
