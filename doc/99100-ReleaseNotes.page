@@ -30,6 +30,15 @@ AAAIntroduction
   - fixed GH #1558: Upgraded bundled SQLite to 3.16.2
   - fixed GH #1586: Upgraded bundled PCRE to 8.40
   - fixed GH #1538: Upgraded bundled double-conversion to 1.1.5
+  - MongoDB: added support for authentication using "MONGODB-CR" and "SCRAM-SHA-1"
+    authentication schemes.
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - MongoDB: additional documentation and fixes for style and consistency and minor
+    API improvements (e.g., Poco::MongoDB::Binary)
+    Note: some flag enumeration values have been renamed for better consistency
+    and readability; existing code using these will have to be updated.
 
 
 !!!Release 1.7.7
