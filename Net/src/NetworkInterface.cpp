@@ -1516,7 +1516,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #include <ifaddrs.h>
 #endif
 #include <net/if.h>
+#ifndef POCO_NO_LINUX_IF_PACKET_H
 #include <linux/if_packet.h>
+#endif
 #include <net/if_arp.h>
 #include <iostream>
 
@@ -1548,14 +1550,37 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
-	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
 	impl.setName(iface->ifa_name);
 	impl.setDisplayName(iface->ifa_name);
 	impl.setAdapterName(iface->ifa_name);
 	impl.setPhyParams();
 
+#ifndef POCO_NO_LINUX_IF_PACKET_H
+	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
 	impl.setMACAddress(sdl->sll_addr, sdl->sll_halen);
 	impl.setType(fromNative(sdl->sll_hatype));
+#else
+	// TODO: fix for non-Ethernet interfaces
+	std::string ifpath("/sys/class/net/");
+	ifpath += iface->ifa_name;
+	ifpath += "/address";
+	int fd = open(ifpath.c_str(), O_RDONLY);
+	if (fd >= 0)
+	{
+		char buffer[18];
+		int n = read(fd, buffer, 17);
+		close(fd);
+		if (n == 17)
+		{
+			unsigned char mac[6];
+			buffer[n] = 0;
+			if (std::sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]) == 6)
+			{
+				impl.setMACAddress(mac, 6);
+			}
+		}
+	}	
+#endif // POCO_NO_LINUX_IF_PACKET_H
 }
 
 #endif
@@ -1588,6 +1613,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			unsigned family = iface->ifa_addr->sa_family;
 			switch (family)
 			{
+#ifndef POCO_NO_LINUX_IF_PACKET_H
 			case AF_PACKET:
 			{
 				struct sockaddr_ll* sll = (struct sockaddr_ll*)iface->ifa_addr;
@@ -1600,6 +1626,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 
 				break;
 			}
+#endif // POCO_NO_LINUX_IF_PACKET_H
 			case AF_INET:
 				ifIndex = if_nametoindex(iface->ifa_name);
 				ifIt = result.find(ifIndex);
