@@ -29,18 +29,18 @@ namespace Poco {
 namespace MongoDB {
 
 
-class MongoDB_API RequestMessage : public Message
-	/// Base class for a request
+class MongoDB_API RequestMessage: public Message
+	/// Base class for a request sent to the MongoDB server.
 {
 public:
-	RequestMessage(MessageHeader::OpCode opcode);
-		/// Constructor
+	explicit RequestMessage(MessageHeader::OpCode opcode);
+		/// Creates a RequestMessage using the given opcode.
 
 	virtual ~RequestMessage();
-		/// Destructor
+		/// Destroys the RequestMessage.
 
 	void send(std::ostream& ostr);
-		/// Sends the request to stream
+		/// Writes the request to stream.
 
 protected:
 	virtual void buildRequest(BinaryWriter& ss) = 0;
@@ -50,4 +50,4 @@ protected:
 } } // namespace Poco::MongoDB
 
 
-#endif //MongoDB_RequestMessage_INCLUDED
+#endif // MongoDB_RequestMessage_INCLUDED

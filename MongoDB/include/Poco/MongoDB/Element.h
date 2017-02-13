@@ -42,19 +42,19 @@ namespace MongoDB {
 
 
 class MongoDB_API Element
-	/// Represents an element of a Document or an Array
+	/// Represents an Element of a Document or an Array.
 {
 public:
 	typedef Poco::SharedPtr<Element> Ptr;
 
-	Element(const std::string& name);
-		/// Constructor
+	explicit Element(const std::string& name);
+		/// Creates the Element with the given name.
 
 	virtual ~Element();
 		/// Destructor
 
-	std::string name() const;
-		/// Returns the name of the element
+	const std::string& name() const;
+		/// Returns the name of the element.
 
 	virtual std::string toString(int indent = 0) const = 0;
 		/// Returns a string representation of the element.
@@ -71,7 +71,10 @@ private:
 };
 
 
-inline std::string Element::name() const
+//
+// inlines
+//
+inline const std::string& Element::name() const
 {
 	return _name;
 }
@@ -114,7 +117,7 @@ struct ElementTraits<std::string>
 
 		oss << '"';
 
-		for(std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+		for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
 		{
 			switch (*it)
 			{
@@ -350,10 +353,12 @@ struct ElementTraits<Int64>
 
 
 template<typename T>
-class ConcreteElement : public Element
+class ConcreteElement: public Element
 {
 public:
-	ConcreteElement(const std::string& name, const T& init) : Element(name), _value(init)
+	ConcreteElement(const std::string& name, const T& init):
+		Element(name), 
+		_value(init)
 	{
 	}
 
@@ -397,4 +402,4 @@ private:
 } } // namespace Poco::MongoDB
 
 
-#endif //  MongoDB_Element_INCLUDED
+#endif // MongoDB_Element_INCLUDED

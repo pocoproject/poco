@@ -7,8 +7,6 @@
 // Package: MongoDB
 // Module:  Binary
 //
-// Implementation of the Binary class.
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -76,9 +74,10 @@ std::string Binary::toString(int indent) const
 	return oss.str();
 }
 
+
 UUID Binary::uuid() const
 {
-	if ( _subtype == 0x04 && _buffer.size() == 16 )
+	if (_subtype == 0x04 && _buffer.size() == 16)
 	{
 		UUID uuid;
 		uuid.copyFrom((const char*) _buffer.begin());
@@ -86,5 +85,6 @@ UUID Binary::uuid() const
 	}
 	throw BadCastException("Invalid subtype");
 }
+
 
 } } // namespace Poco::MongoDB
