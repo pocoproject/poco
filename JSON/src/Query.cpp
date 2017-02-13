@@ -104,7 +104,7 @@ Var Query::find(const std::string& path) const
 {
 	Var result = _source;
 	StringTokenizer tokenizer(path, ".");
-	for(StringTokenizer::Iterator token = tokenizer.begin(); token != tokenizer.end(); token++)
+	for (StringTokenizer::Iterator token = tokenizer.begin(); token != tokenizer.end(); token++)
 	{
 		if (!result.isEmpty())
 		{
@@ -113,7 +113,7 @@ Var Query::find(const std::string& path) const
 			int firstOffset = -1;
 			int offset = 0;
 			RegularExpression regex("\\[([0-9]+)\\]");
-			while(regex.match(*token, offset, matches) > 0)
+			while (regex.match(*token, offset, matches) > 0)
 			{
 				if (firstOffset == -1)
 				{
@@ -149,7 +149,7 @@ Var Query::find(const std::string& path) const
 
 			if (!result.isEmpty() && !indexes.empty())
 			{
-				for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end(); ++it)
+				for (std::vector<int>::iterator it = indexes.begin(); it != indexes.end(); ++it)
 				{
 					if (result.type() == typeid(Array::Ptr))
 					{
@@ -171,4 +171,4 @@ Var Query::find(const std::string& path) const
 }
 
 
-} } // Namespace Poco::JSON
+} } // namespace Poco::JSON
