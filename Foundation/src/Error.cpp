@@ -29,6 +29,8 @@ namespace Poco {
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
+
+
 	Poco::UInt32 Error::last()
 	{
 		return GetLastError();
@@ -52,34 +54,67 @@ namespace Poco {
 		return errMsg;
 	}
 
+
 #else
+
+	
 	int Error::last()
 	{
 		return errno;
 	}
 
 
+	class StrErrorHelper
+		/// This little hack magically handles all variants
+		/// of strerror_r() (POSIX and GLIBC) and strerror().
+	{
+	public:
+		explicit StrErrorHelper(int err)
+		{
+			_buffer[0] = 0;
+
+#if (_XOPEN_SOURCE >= 600) || POCO_ANDROID || __APPLE__
+			setMessage(strerror_r(err, _buffer, sizeof(_buffer)));
+#elif _GNU_SOURCE
+			setMessage(strerror_r(err, _buffer, sizeof(_buffer)));
+#else
+			setMessage(strerror(err));
+#endif
+		}
+		
+		~StrErrorHelper()
+		{
+		}
+		
+		const std::string& message() const
+		{
+			return _message;
+		}
+		
+	protected:
+		void setMessage(int rc)
+			/// Handles POSIX variant
+		{
+			_message = _buffer;
+		}
+		
+		void setMessage(const char* msg)
+			/// Handles GLIBC variant
+		{
+			_message = msg;
+		}
+		
+	private:
+		char _buffer[256];
+		std::string _message;
+	};
+
 	std::string Error::getMessage(int errorCode)
 	{
-		/* Reentrant version of `strerror'.
-		   There are 2 flavors of `strerror_r', GNU which returns the string
-		   and may or may not use the supplied temporary buffer and POSIX one
-		   which fills the string into the buffer.
-		   To use the POSIX version, -D_XOPEN_SOURCE=600 or -D_POSIX_C_SOURCE=200112L
-		   without -D_GNU_SOURCE is needed, otherwise the GNU version is
-		   preferred.
-		*/
-#if (defined __GLIBC__ || defined __UCLIBC__) && defined _GNU_SOURCE && !POCO_ANDROID
-		char errmsg[256] = "";
-		return std::string(strerror_r(errorCode, errmsg, 256));
-#elif (_XOPEN_SOURCE >= 600) || POCO_ANDROID
-		char errmsg[256] = "";
-		strerror_r(errorCode, errmsg, 256);
-		return errmsg;
-#else
-		return std::string(strerror(errorCode));
-#endif
+		StrErrorHelper helper(errorCode);
+		return helper.message();
 	}
+
 
 #endif
 
