@@ -66,7 +66,7 @@ namespace Poco {
 		   without -D_GNU_SOURCE is needed, otherwise the GNU version is
 		   preferred.
 		*/
-#if _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600 || POCO_ANDROID
+#if _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600 || POCO_ANDROID || __APPLE__
 		char errmsg[256] = "";
 		int rc = strerror_r(errorCode, errmsg, 256);
 		return rc == 0 ? std::string(errmsg) : std::string();
