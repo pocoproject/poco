@@ -41,12 +41,13 @@
 #include <iostream>
 #include <iomanip>
 
+
 using Poco::NumberFormatter;
 using Poco::FastMutex;
 using Poco::format;
 
 
-std::ostream& operator<<(std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac)
+std::ostream& operator << (std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac)
 {
 	std::ios state(0);
 	state.copyfmt(os);
@@ -884,7 +885,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 		const List& ipList = it->second.addressList();
 		List::const_iterator ipIt = ipList.begin();
 		List::const_iterator ipEnd = ipList.end();
-		for (int counter = 0; ipIt != ipEnd; ++ipIt, ++counter)
+		for (; ipIt != ipEnd; ++ipIt)
 		{
 			IPAddress addr = ipIt->get<NetworkInterface::IP_ADDRESS>();
 			IPAddress mask = ipIt->get<NetworkInterface::SUBNET_MASK>();
@@ -1360,6 +1361,7 @@ namespace Net {
 
 namespace {
 
+
 NetworkInterface::Type fromNative(u_char nativeType)
 {
 	switch (nativeType)
@@ -1380,6 +1382,7 @@ NetworkInterface::Type fromNative(u_char nativeType)
 	}
 }
 
+
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
 	struct sockaddr_dl* sdl = (struct sockaddr_dl*) iface->ifa_addr;
@@ -1391,6 +1394,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setMACAddress(LLADDR(sdl), sdl->sdl_alen);
 	impl.setType(fromNative(sdl->sdl_type));
 }
+
 
 } // namespace
 
@@ -1531,6 +1535,7 @@ namespace Net {
 
 namespace {
 
+
 static NetworkInterface::Type fromNative(unsigned arphrd)
 {
 	switch (arphrd)
@@ -1598,6 +1603,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 }
 
 #endif
+
 
 }
 
