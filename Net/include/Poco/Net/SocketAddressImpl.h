@@ -67,7 +67,7 @@ public:
 	poco_socklen_t length() const;
 	const struct sockaddr* addr() const;
 	int af() const;
-	Family family() const;
+	IPAddress::Family family() const;
 	std::string toString() const;
 
 private:
