@@ -91,8 +91,8 @@ void HTTPCookieTest::testCookie()
 
 void HTTPCookieTest::testEscape()
 {
-	std::string escaped = HTTPCookie::escape("this is a test!");
-	assert (escaped == "this%20is%20a%20test!");
+	std::string escaped = HTTPCookie::escape("this is a test.");
+	assert (escaped == "this%20is%20a%20test.");
 
 	escaped = HTTPCookie::escape("\n\t@,;\"'");
 	assert (escaped == "%0A%09@%2C%3B%22%27");
