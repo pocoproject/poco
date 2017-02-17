@@ -106,7 +106,7 @@ void ZipUtil::sync(std::istream& in)
 	while (in.good() && !in.eof())
 	{ 
 		// all zip headers start withe same 2byte prefix
-		if(std::memcmp(ZipLocalFileHeader::HEADER, &temp[tempPos - PREFIX], PREFIX) == 0)
+		if (std::memcmp(ZipLocalFileHeader::HEADER, &temp[tempPos - PREFIX], PREFIX) == 0)
 		{
 			// we have a possible header!
 			// read the next 2 bytes

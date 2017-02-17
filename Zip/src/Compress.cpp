@@ -101,7 +101,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	ZipLocalFileHeader hdr(h);
 	hdr.setFileName(fn, h.isDirectory());
 	hdr.setStartPos(localHeaderOffset);
-	if(hdr.needsZip64())
+	if (hdr.needsZip64())
 		hdr.setZip64Data();
 	//bypass zipoutputstream
 	//write the header directly
@@ -113,7 +113,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	{
 		Poco::Buffer<char> buffer(COMPRESS_CHUNK_SIZE);
 		Poco::UInt64 remaining = totalSize;
-		while(remaining > 0)
+		while (remaining > 0)
 		{
 			if (remaining > COMPRESS_CHUNK_SIZE)
 			{
@@ -153,7 +153,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	} 
 	else 
 	{
-		if(hdr.hasExtraField())	 // Update sizes in header extension.
+		if (hdr.hasExtraField())	 // Update sizes in header extension.
 			hdr.setZip64Data();
 		_out.seekp(hdr.getStartPos(), std::ios_base::beg);
 		std::string header = hdr.createHeader();
@@ -319,7 +319,7 @@ ZipArchive Compress::close()
 	
 	Poco::UInt64 numEntries64 = _infos.size();
 	needZip64 = needZip64  || _offset >= ZipCommon::ZIP64_MAGIC;
-	if(needZip64) 
+	if (needZip64) 
 	{
 		ZipArchiveInfo64 central;
 		central.setCentralDirectorySize(centralDirSize64);
