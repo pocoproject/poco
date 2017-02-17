@@ -23,6 +23,8 @@
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/StringTokenizer.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Format.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -36,6 +38,7 @@
 	#include <ipifcons.h>
 #endif
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 
@@ -796,8 +799,10 @@ bool NetworkInterface::isUp() const
 
 NetworkInterface NetworkInterface::forName(const std::string& name, bool requireIPv6)
 {
-	if (requireIPv6) return forName(name, IPv6_ONLY);
-	else return forName(name, IPv4_OR_IPv6);
+	if (requireIPv6) 
+		return forName(name, IPv6_ONLY);
+	else 
+		return forName(name, IPv4_OR_IPv6);
 }
 
 
@@ -1513,7 +1518,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #include <ifaddrs.h>
 #endif
 #include <net/if.h>
+#ifndef POCO_NO_LINUX_IF_PACKET_H
 #include <linux/if_packet.h>
+#endif
 #include <net/if_arp.h>
 #include <iostream>
 
@@ -1546,14 +1553,48 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
-	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
 	impl.setName(iface->ifa_name);
 	impl.setDisplayName(iface->ifa_name);
 	impl.setAdapterName(iface->ifa_name);
 	impl.setPhyParams();
 
+#ifndef POCO_NO_LINUX_IF_PACKET_H
+	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
 	impl.setMACAddress(sdl->sll_addr, sdl->sll_halen);
 	impl.setType(fromNative(sdl->sll_hatype));
+#else
+	std::string ifPath("/sys/class/net/");
+	ifPath += iface->ifa_name;
+
+	std::string addrPath(ifPath);
+	addrPath += "/address";
+	
+	std::ifstream addrStream(addrPath.c_str());
+	if (addrStream.good())
+	{
+		std::string addr;
+		std::getline(addrStream, addr);
+		Poco::StringTokenizer tok(addr, ":");
+		std::vector<unsigned char> mac;
+		for (Poco::StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
+		{
+			mac.push_back(static_cast<unsigned char>(Poco::NumberParser::parseHex(*it)));
+		}
+		impl.setMACAddress(&mac[0], mac.size());
+		addrStream.close();
+	}
+	
+	std::string typePath(ifPath);
+	typePath += "/type";
+	std::ifstream typeStream(typePath.c_str());
+	if (typeStream.good())
+	{
+		int type;
+		typeStream >> type;
+		impl.setType(fromNative(type));
+		typeStream.close();
+	}
+#endif // POCO_NO_LINUX_IF_PACKET_H
 }
 
 #endif
@@ -1587,6 +1628,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			unsigned family = iface->ifa_addr->sa_family;
 			switch (family)
 			{
+#ifndef POCO_NO_LINUX_IF_PACKET_H
 			case AF_PACKET:
 			{
 				struct sockaddr_ll* sll = (struct sockaddr_ll*)iface->ifa_addr;
@@ -1599,6 +1641,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 
 				break;
 			}
+#endif // POCO_NO_LINUX_IF_PACKET_H
 			case AF_INET:
 				ifIndex = if_nametoindex(iface->ifa_name);
 				ifIt = result.find(ifIndex);
