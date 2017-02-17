@@ -1,9 +1,10 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.7.8 (2016-02-15)
+Release 1.7.8 (2017-02-21)
 ==========================
 
 - fixed GH #1212: Lost WebSocket Frames after Client Websocket Handshake is complete
+- fixed GH #1260: URI encoding
 - fixed GH #1501: Alpine 3.4 trouble with Foundation/src/Error.cpp
 - fixed GH #1523: Long path names under Windows
 - fixed GH #1536: Building with OS X 10.12 SDK and 10.7 deployment target without libc++ fails
