@@ -60,15 +60,6 @@ namespace
 		return kvm;
 	}
 
-	std::string hashCredentials(const std::string& username, const std::string& password)
-	{
-		Poco::MD5Engine md5;
-		md5.update(username);
-		md5.update(std::string(":mongo:"));
-		md5.update(password);
-		return Poco::DigestEngine::digestToHex(md5.digest());
-	}
-
 	std::string decodeBase64(const std::string& base64)
 	{
 		Poco::MemoryInputStream istr(base64.data(), base64.size());
@@ -104,7 +95,16 @@ namespace
 	{
 		return encodeBase64(digestToBinaryString(engine));
 	}
-	
+
+	std::string hashCredentials(const std::string& username, const std::string& password)
+	{
+		Poco::MD5Engine md5;
+		md5.update(username);
+		md5.update(std::string(":mongo:"));
+		md5.update(password);
+		return digestToHexString(md5);
+	}
+
 	std::string createNonce()
 	{
 		Poco::MD5Engine md5;
@@ -267,7 +267,7 @@ bool Database::authSCRAM(Connection& connection, const std::string& username, co
 		if (pDoc->getInteger("ok") == 1)
 		{
 			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
-			serverSecondMsg.assign(reinterpret_cast<const char*>(pPayload->buffer().begin()), pPayload->buffer().size());
+			serverSecondMsg = pPayload->toRawString();
 		}
 		else return false;
 	}
