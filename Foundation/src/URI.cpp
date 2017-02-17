@@ -25,10 +25,11 @@
 namespace Poco {
 
 
-const std::string URI::RESERVED_PATH     = "?#";
-const std::string URI::RESERVED_QUERY    = "?#/";
-const std::string URI::RESERVED_FRAGMENT = "";
-const std::string URI::ILLEGAL           = "%<>{}|\\\"^`";
+const std::string URI::RESERVED_PATH        = "?#";
+const std::string URI::RESERVED_QUERY       = "?#/:;+@";
+const std::string URI::RESERVED_QUERY_PARAM = "?#/:;+@&=";
+const std::string URI::RESERVED_FRAGMENT    = "";
+const std::string URI::ILLEGAL              = "%<>{}|\\\"^`!*'()$,[]";
 
 
 URI::URI():
@@ -333,12 +334,10 @@ void URI::setQuery(const std::string& query)
 
 void URI::addQueryParameter(const std::string& param, const std::string& val)
 {
-	std::string reserved(RESERVED_QUERY);
-	reserved += "=&";
 	if (!_query.empty()) _query += '&';
-	encode(param, reserved, _query);
+	encode(param, RESERVED_QUERY_PARAM, _query);
 	_query += '=';
-	encode(val, reserved, _query);
+	encode(val, RESERVED_QUERY_PARAM, _query);
 }
 
 
