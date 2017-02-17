@@ -114,7 +114,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	{
 		Poco::Buffer<char> buffer(COMPRESS_CHUNK_SIZE);
 		Poco::UInt32 remaining = totalSize;
-		while(remaining > 0)
+		while (remaining > 0)
 		{
 			if (remaining > COMPRESS_CHUNK_SIZE)
 			{
