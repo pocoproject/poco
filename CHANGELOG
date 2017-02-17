@@ -25,6 +25,8 @@ Release 1.7.8 (2017-02-21)
 - fixed GH #1589: Poco::Net::HTMLForm: restrict maximum field and value length
 - fixed GH #1590: Poco::Net::DialogSocket: restrict maximum line length
 - fixed GH #1591: Poco::Net::MultipartReader: restrict maximum boundary string length
+- fixed GH #1597: adding empty file to zip leads to archive that can't be unzipped by windows
+- fixed GH #1599: readFromDevice() in AutoDetectStream.cpp in Poco Zip cannot detect signature
 - fixed GH #1534: Upgraded bundled zlib to 1.2.11
 - fixed GH #1558: Upgraded bundled SQLite to 3.16.2
 - fixed GH #1586: Upgraded bundled PCRE to 8.40
