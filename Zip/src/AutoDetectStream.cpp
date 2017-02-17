@@ -99,8 +99,15 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 					{
 						buffer[offset++] = ZipDataInfo::HEADER[i];
 					}
-					_matchCnt = 0;
-					buffer[offset++] = static_cast<char>(c);
+					if (c == ZipDataInfo::HEADER[0])
+					{
+						_matchCnt = 1;
+					}
+					else
+					{
+						_matchCnt = 0;
+						buffer[offset++] = static_cast<char>(c);
+					}
 				}
 			}
 			else if (_matchCnt == 3)
