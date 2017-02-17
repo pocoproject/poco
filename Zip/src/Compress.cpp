@@ -56,9 +56,14 @@ void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, 
 	{
 		std::string ext = Poco::toLower(fileName.getExtension());
 		if (_storeExtensions.find(ext) != _storeExtensions.end())
+		{
 			cm = ZipCommon::CM_STORE;
+			cl = ZipCommon::CL_NORMAL;
+		}
 		else
+		{
 			cm = ZipCommon::CM_DEFLATE;
+		}
 	}
 
 	std::string fn = ZipUtil::validZipEntryFileName(fileName);
@@ -68,12 +73,27 @@ void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, 
 	if (!in.good())
 		throw ZipException("Invalid input stream");
 
+	// Check if stream is empty.
+	// In this case, we have to set compression to STORE, otherwise
+	// extraction will fail with various tools.
+	const int eof = std::char_traits<char>::eof();
+	int firstChar = in.get();
+	if (firstChar == eof)
+	{
+		cm = ZipCommon::CM_STORE;
+		cl = ZipCommon::CL_NORMAL;
+	}
+
 	std::streamoff localHeaderOffset = _offset;
 	ZipLocalFileHeader hdr(fileName, lastModifiedAt, cm, cl);
 	hdr.setStartPos(localHeaderOffset);
 
 	ZipOutputStream zipOut(_out, hdr, _seekableOut);
-	Poco::StreamCopier::copyStream(in, zipOut);
+	if (firstChar != eof)
+	{
+		zipOut.put(static_cast<char>(firstChar));
+		Poco::StreamCopier::copyStream(in, zipOut);
+	}
 	zipOut.close();
 	hdr.setStartPos(localHeaderOffset); // reset again now that compressed Size is known
 	_offset = hdr.getEndPos();
