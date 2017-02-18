@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/SQLite/src/Binder.cpp#5 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Binder
 //

@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/src/Binder.cpp#4 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Binder
 //

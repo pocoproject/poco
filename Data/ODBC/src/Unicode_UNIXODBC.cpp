@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/src/Unicode_UNIXODBC.cpp#3 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Unicode_UNIX
 //

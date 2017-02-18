@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/SQLite/src/Connector.cpp#2 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Connector
 //
