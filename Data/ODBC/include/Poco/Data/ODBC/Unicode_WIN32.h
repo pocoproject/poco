@@ -5,7 +5,7 @@
 //
 // Library: Data/ODBC
 // Package: ODBC
-// Module:  Unicode_WIN32
+// Module:  Unicode
 //
 // Definition of Unicode_WIN32.
 //

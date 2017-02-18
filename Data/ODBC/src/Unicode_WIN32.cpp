@@ -5,7 +5,7 @@
 //
 // Library: Data/ODBC
 // Package: ODBC
-// Module:  Unicode_WIN32
+// Module:  Unicode
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

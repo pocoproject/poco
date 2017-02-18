@@ -5,7 +5,7 @@
 //
 // Library: Data/ODBC
 // Package: ODBC
-// Module:  Unicode_UNIX
+// Module:  Unicode
 //
 // Definition of Unicode_UNIX.
 //
