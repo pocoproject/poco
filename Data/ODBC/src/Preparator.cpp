@@ -3,8 +3,8 @@
 //
 // $Id: //poco/Main/Data/ODBC/src/Preparator.cpp#5 $
 //
-// Library: Data
-// Package: DataCore
+// Library: Data/ODBC
+// Package: ODBC
 // Module:  Preparator
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

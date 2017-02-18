@@ -3,8 +3,8 @@
 //
 // $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Preparator.h#5 $
 //
-// Library: Data
-// Package: DataCore
+// Library: Data/ODBC
+// Package: ODBC
 // Module:  Preparator
 //
 // Definition of the Preparator class.
