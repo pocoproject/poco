@@ -29,16 +29,17 @@ namespace MongoDB {
 
 
 class MongoDB_API BSONWriter
-	/// Class for writing BSON to a Poco::BinaryWriter.
+	/// Class for writing BSON using a Poco::BinaryWriter.
 {
 public:
-	BSONWriter(const Poco::BinaryWriter& writer) : _writer(writer)
-		/// Constructor
+	BSONWriter(const Poco::BinaryWriter& writer): 
+		_writer(writer)
+		/// Creates the BSONWriter.
 	{
 	}
 
 	virtual ~BSONWriter()
-		/// Destructor
+		/// Destroys the BSONWriter.
 	{
 	}
 
@@ -52,13 +53,16 @@ public:
 
 	void writeCString(const std::string& value);
 		/// Writes a cstring to the writer. A cstring is a string
-		/// terminated with 0x00
+		/// terminated a null character.
 
 private:
 	Poco::BinaryWriter _writer;
 };
 
 
+//
+// inlines
+//
 inline void BSONWriter::writeCString(const std::string& value)
 {
 	_writer.writeRaw(value);
@@ -69,4 +73,4 @@ inline void BSONWriter::writeCString(const std::string& value)
 } } // namespace Poco::MongoDB
 
 
-#endif //  MongoDB_BSONWriter_INCLUDED
+#endif // MongoDB_BSONWriter_INCLUDED

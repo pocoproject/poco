@@ -92,7 +92,7 @@ Object::Ptr Object::getObject(const std::string& key) const
 void Object::getNames(std::vector<std::string>& names) const
 {
 	names.clear();
-	for(ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
+	for (ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
 	{
 		names.push_back(it->first);
 	}
@@ -103,7 +103,7 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 {
 	if (step < 0) step = indent;
 
-	if(!_preserveInsOrder)
+	if (!_preserveInsOrder)
 		doStringify(_values, out, indent, step);
 	else
 		doStringify(_keys, out, indent, step);

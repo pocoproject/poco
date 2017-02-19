@@ -88,7 +88,7 @@ void PrintHandler::startObject()
 
 void PrintHandler::endObject()
 {
-	if( _tab.length() >= indent())
+	if (_tab.length() >= indent())
 		_tab.erase(_tab.length() - indent());
 
 	_out << endLine() << _tab << '}';
@@ -205,7 +205,7 @@ void PrintHandler::comma()
 void PrintHandler::arrayValue()
 {
 	if (!_objStart) comma();
-	if (array())
+	if (array()) 
 	{
 		_out << _tab;
 	}

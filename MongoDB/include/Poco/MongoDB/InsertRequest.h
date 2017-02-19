@@ -29,26 +29,34 @@ namespace Poco {
 namespace MongoDB {
 
 
-class MongoDB_API InsertRequest : public RequestMessage
-	/// Class for creating an OP_INSERT client request. This request is used
-	/// to insert one or more documents to the database.
+class MongoDB_API InsertRequest: public RequestMessage
+	/// A request for inserting one or more documents to the database
+	/// (OP_INSERT).
 {
 public:
-	typedef enum
+	enum Flags
 	{
-		INSERT_NONE = 0,
+		INSERT_DEFAULT = 0,
+			/// If specified, perform a normal insert operation.
+		
 		INSERT_CONTINUE_ON_ERROR = 1
-	} Flags;
+			/// If set, the database will not stop processing a bulk insert if one 
+			/// fails (e.g. due to duplicate IDs). This makes bulk insert behave similarly 
+			/// to a series of single inserts, except lastError will be set if any insert 
+			/// fails, not just the last one. If multiple errors occur, only the most 
+			/// recent will be reported.
+	};
 
-	InsertRequest(const std::string& collectionName, Flags flags = INSERT_NONE );
-		/// Constructor.
+	InsertRequest(const std::string& collectionName, Flags flags = INSERT_DEFAULT);
+		/// Creates an InsertRequest.
+		///
 		/// The full collection name is the concatenation of the database 
 		/// name with the collection name, using a "." for the concatenation. For example, 
 		/// for the database "foo" and the collection "bar", the full collection name is 
 		/// "foo.bar".
 
 	virtual ~InsertRequest();
-		/// Destructor
+		/// Destroys the InsertRequest.
 
 	Document& addNewDocument();
 		/// Adds a new document for insertion. A reference to the empty document is
@@ -56,20 +64,21 @@ public:
 		/// on destruction.
 
 	Document::Vector& documents();
-		/// Returns the documents to insert into the database
+		/// Returns the documents to insert into the database.
 
 protected:
-
 	void buildRequest(BinaryWriter& writer);
 
 private:
-
 	Int32 _flags;
 	std::string _fullCollectionName;
 	Document::Vector _documents;
 };
 
 
+//
+// inlines
+//
 inline Document& InsertRequest::addNewDocument()
 {
 	Document::Ptr doc = new Document();
@@ -87,4 +96,4 @@ inline Document::Vector& InsertRequest::documents()
 } } // namespace Poco::MongoDB
 
 
-#endif //MongoDB_InsertRequest_INCLUDED
+#endif // MongoDB_InsertRequest_INCLUDED

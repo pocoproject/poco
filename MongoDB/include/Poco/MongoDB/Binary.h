@@ -35,38 +35,49 @@ namespace MongoDB {
 
 
 class MongoDB_API Binary
-	/// Implements BSON Binary. It's a wrapper around a Poco::Buffer<unsigned char>.
+	/// Implements BSON Binary.
+	///
+	/// A Binary stores its data in a Poco::Buffer<unsigned char>.
 {
 public:
 	typedef SharedPtr<Binary> Ptr;
 
 	Binary();
-		/// Constructor
+		/// Creates an empty Binary with subtype 0.
 
 	Binary(Poco::Int32 size, unsigned char subtype);
-		/// Constructor
+		/// Creates a Binary with a buffer of the given size and the given subtype.
 
 	Binary(const UUID& uuid);
-		/// Constructor for setting a UUID in a binary element
+		/// Creates a Binary containing an UUID.
+		
+	Binary(const std::string& data, unsigned char subtype = 0);
+		/// Creates a Binary with the contents of the given string and the given subtype.
+		
+	Binary(const void* data, Poco::Int32 size, unsigned char subtype = 0);
+		/// Creates a Binary with the contents of the given buffer and the given subtype.		
 
 	virtual ~Binary();
-		/// Destructor
+		/// Destroys the Binary.
 
 	Buffer<unsigned char>& buffer();
-		/// Returns a reference to the buffer
+		/// Returns a reference to the internal buffer
 
 	unsigned char subtype() const;
-		/// Returns the subtype
+		/// Returns the subtype.
 
 	void subtype(unsigned char type);
-		/// Sets the subtype
+		/// Sets the subtype.
 
 	std::string toString(int indent = 0) const;
-		/// Returns the binary encoded in Base64
+		/// Returns the contents of the Binary as Base64-encoded string.
+		
+	std::string toRawString() const;
+		/// Returns the raw content of the Binary as a string.
 
 	UUID uuid() const;
 		/// Returns the UUID when the binary subtype is 0x04.
-		/// Otherwise BadCastException will be thrown
+		/// Otherwise, throws a Poco::BadCastException.
 
 private:
 	Buffer<unsigned char> _buffer;
@@ -74,6 +85,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline unsigned char Binary::subtype() const
 {
 	return _subtype;
@@ -89,6 +103,12 @@ inline void Binary::subtype(unsigned char type)
 inline Buffer<unsigned char>& Binary::buffer()
 {
 	return _buffer;
+}
+
+
+inline std::string Binary::toRawString() const
+{
+	return std::string(reinterpret_cast<const char*>(_buffer.begin()), _buffer.size());
 }
 
 
@@ -117,7 +137,7 @@ inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 	unsigned char subtype;
 	_reader >> subtype;
 	to->subtype(subtype);
-
+	
 	_reader.readRaw((char*) to->buffer().begin(), size);
 }
 

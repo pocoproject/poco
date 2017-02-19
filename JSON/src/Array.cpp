@@ -48,7 +48,7 @@ Var Array::get(unsigned int index) const
 	{
 		value = _values.at(index);
 	}
-	catch(std::out_of_range&)
+	catch (std::out_of_range&)
 	{
 		//Ignore, we return an empty value
 	}
@@ -61,7 +61,7 @@ Array::Ptr Array::getArray(unsigned int index) const
 	Array::Ptr result;
 
 	Var value = get(index);
-	if ( value.type() == typeid(Array::Ptr) )
+	if (value.type() == typeid(Array::Ptr))
 	{
 		result = value.extract<Array::Ptr>();
 	}
@@ -74,7 +74,7 @@ Object::Ptr Array::getObject(unsigned int index) const
 	Object::Ptr result;
 
 	Var value = get(index);
-	if ( value.type() == typeid(Object::Ptr) )
+	if (value.type() == typeid(Object::Ptr))
 	{
 		result = value.extract<Object::Ptr>();
 	}
@@ -84,7 +84,7 @@ Object::Ptr Array::getObject(unsigned int index) const
 
 bool Array::isNull(unsigned int index) const
 {
-	if ( index < _values.size() )
+	if (index < _values.size())
 	{
 		Dynamic::Var value = _values[index];
 		return value.isEmpty();
@@ -122,11 +122,11 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 
 	for (ValueVec::const_iterator it = _values.begin(); it != _values.end();)
 	{
-		for(int i = 0; i < indent; i++) out << ' ';
+		for (int i = 0; i < indent; i++) out << ' ';
 
 		Stringifier::stringify(*it, out, indent + step, step);
 
-		if ( ++it != _values.end() )
+		if (++it != _values.end())
 		{
 			out << ",";
 			if (step > 0) out << '\n';

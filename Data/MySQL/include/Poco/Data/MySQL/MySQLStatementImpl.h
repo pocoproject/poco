@@ -3,7 +3,7 @@
 //
 // $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/MySQLStatementImpl.h#1 $
 //
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  MySQLstatementImpl
 //

@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Handle.h#2 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Handle
 //

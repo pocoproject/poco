@@ -7,8 +7,6 @@
 // Package: MongoDB
 // Module:  MessageHeader
 //
-// Implementation of the MessageHeader class.
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -18,15 +16,17 @@
 
 #include "Poco/MongoDB/Message.h"
 #include "Poco/Exception.h"
-#include "Poco/Net/SocketStream.h"
-#include "Poco/StreamCopier.h"
 
 
 namespace Poco {
 namespace MongoDB {
 
 
-MessageHeader::MessageHeader(OpCode opCode) : _messageLength(0), _requestID(0), _responseTo(0), _opCode(opCode)
+MessageHeader::MessageHeader(OpCode opCode): 
+	_messageLength(0), 
+	_requestID(0), 
+	_responseTo(0), 
+	_opCode(opCode)
 {
 }
 

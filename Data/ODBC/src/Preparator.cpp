@@ -3,8 +3,8 @@
 //
 // $Id: //poco/Main/Data/ODBC/src/Preparator.cpp#5 $
 //
-// Library: Data
-// Package: DataCore
+// Library: Data/ODBC
+// Package: ODBC
 // Module:  Preparator
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -94,7 +94,7 @@ void Preparator::freeMemory() const
 				break;
 
 			case DT_WCHAR:
-				deleteCachedArray<UTF16String>(it->first);
+				deleteCachedArray<UTF16String::value_type>(it->first);
 				break;
 
 			case DT_UCHAR:

@@ -160,7 +160,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, e) < 0)
 				{
 					::close(epollfd);
-					SocketImpl::error("Can't insert socket to epoll queue: ");
+					SocketImpl::error("Can't insert socket to epoll queue");
 				}
 			}
 		}

@@ -80,4 +80,4 @@ void Stringifier::formatString(const std::string& value, std::ostream& out)
 }
 
 
-} }  // Namespace Poco::JSON
+} }  // namespace Poco::JSON

@@ -33,60 +33,80 @@ namespace MongoDB {
 
 class MongoDB_API Connection
 	/// Represents a connection to a MongoDB server
+	/// using the MongoDB wire protocol.
+	/// 
+	/// See https://docs.mongodb.com/manual/reference/mongodb-wire-protocol/
+	/// for more information on the wire protocol.
 {
 public:
 	typedef Poco::SharedPtr<Connection> Ptr;
 
 	Connection();
-		/// Default constructor. Use this when you want to
-		/// connect later on.
+		/// Creates an unconnected Connection.
+		///
+		/// Use this when you want to connect later on.
 
 	Connection(const std::string& hostAndPort);
-		/// Constructor which connects to the given MongoDB host/port.
+		/// Creates a Connection connected to the given MongoDB instance at host:port.
+		///
 		/// The host and port must be separated with a colon.
 
 	Connection(const std::string& host, int port);
-		/// Constructor which connects to the given MongoDB host/port.
+		/// Creates a Connection connected to the given MongoDB instance at host and port.
 
-	Connection(const Net::SocketAddress& addrs);
-		/// Constructor which connects to the given MongoDB host/port.
+	Connection(const Poco::Net::SocketAddress& addrs);
+		/// Creates a Connection connected to the given MongoDB instance at the given address.
+
+	Connection(const Poco::Net::StreamSocket& socket);
+		/// Creates a Connection connected to the given MongoDB instance using the given socket,
+		/// which must already be connected.
 
 	virtual ~Connection();
-		/// Destructor
+		/// Destroys the Connection.
 
-	Net::SocketAddress address() const;
-		/// Returns the address of the MongoDB connection
+	Poco::Net::SocketAddress address() const;
+		/// Returns the address of the MongoDB server.
 
 	void connect(const std::string& hostAndPort);
-		/// Connects to the given MongoDB server. The host and port must be separated
-		/// with a colon.
+		/// Connects to the given MongoDB server. 
+		///
+		/// The host and port must be separated with a colon.
 
 	void connect(const std::string& host, int port);
 		/// Connects to the given MongoDB server.
 
-	void connect(const Net::SocketAddress& addrs);
+	void connect(const Poco::Net::SocketAddress& addrs);
 		/// Connects to the given MongoDB server.
+		
+	void connect(const Poco::Net::StreamSocket& socket);
+		/// Connects using an already connected socket.
 
 	void disconnect();
-		/// Disconnects from the MongoDB server
+		/// Disconnects from the MongoDB server.
 
 	void sendRequest(RequestMessage& request);
-		/// Sends a request to the MongoDB server
-		/// Only use this when the request hasn't a response.
+		/// Sends a request to the MongoDB server.
+		/// 
+		/// Used for one-way requests without a response.
 
 	void sendRequest(RequestMessage& request, ResponseMessage& response);
 		/// Sends a request to the MongoDB server and receives the response.
-		/// Use this when a response is expected: only a query or getmore
+		/// 
+		/// Use this when a response is expected: only a "query" or "getmore"
 		/// request will return a response.
 
-private:
-	Net::SocketAddress _address;
-	Net::StreamSocket _socket;
+protected:
 	void connect();
-		/// Connects to the MongoDB server
+
+private:
+	Poco::Net::SocketAddress _address;
+	Poco::Net::StreamSocket _socket;
 };
 
 
+//
+// inlines
+//
 inline Net::SocketAddress Connection::address() const
 {
 	return _address;
@@ -96,4 +116,4 @@ inline Net::SocketAddress Connection::address() const
 } } // namespace Poco::MongoDB
 
 
-#endif //MongoDB_Connection_INCLUDED
+#endif // MongoDB_Connection_INCLUDED
