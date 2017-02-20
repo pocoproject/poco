@@ -136,7 +136,6 @@ function Set-Environment
     $Command = "$($vsdir)..\..\VC\vcvarsall.bat"
   }
   $tempFile = [IO.Path]::GetTempFileName()
-  Write-Host "Command: $Command $CommandArg"
   cmd /c " `"$Command`" $CommandArg && set > `"$tempFile`" "
   Get-Content $tempFile | Foreach-Object {
     if($_ -match "^(.*?)=(.*)$")
