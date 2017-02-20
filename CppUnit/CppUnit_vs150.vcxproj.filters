@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{a8d27618-a198-4717-8c54-06f871c9bcae}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Include Files">
+      <UniqueIdentifier>{e1764315-6342-498e-b2ad-51da33cc65ed}</UniqueIdentifier>
+      <Extensions>*.h</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CppUnitException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestCase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestDecorator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestFailure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestResult.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestRunner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestSuite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextTestResult.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\CppUnit\CppUnitException.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\estring.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\Guards.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\Orthodox.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\RepeatedTest.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\Test.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\TestCaller.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\TestCase.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\TestDecorator.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\TestFailure.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\TestResult.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\TestRunner.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\TestSetup.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\TestSuite.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\TextTestResult.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
