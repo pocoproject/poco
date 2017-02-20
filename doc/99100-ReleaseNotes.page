@@ -15,6 +15,7 @@ AAAIntroduction
   - fixed GH #1546: Enable bitcode for iPhone build config
   - fixed GH #1549: Latin2Encoding and 0xFF
   - fixed GH #1551: Unable to use Poco on macOS 10.12
+  - fixed GH #1552: IPv6 & operator throws an exception when scope = 0
   - fixed GH #1566: Poco/Zip issue with some CM_DEFLATE archives
   - fixed GH #1567: Poco/ZIP issue with uncompressed archives
   - fixed GH #1570: IPv6AddressImpl::toString() returns wrong output for IPv6 address "::"
