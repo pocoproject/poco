@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/TypeInfo.h#1 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  TypeInfo
 //

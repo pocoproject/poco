@@ -7,8 +7,6 @@
 // Package: MongoDB
 // Module:  Cursor
 //
-// Implementation of the Cursor class.
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -25,14 +23,14 @@ namespace Poco {
 namespace MongoDB {
 
 
-Cursor::Cursor(const std::string& db, const std::string& collection, QueryRequest::Flags flags)
-	: _query(db + '.' + collection, flags)
+Cursor::Cursor(const std::string& db, const std::string& collection, QueryRequest::Flags flags):
+	_query(db + '.' + collection, flags)
 {
 }
 
 
-Cursor::Cursor(const std::string& fullCollectionName, QueryRequest::Flags flags)
-	: _query(fullCollectionName, flags)
+Cursor::Cursor(const std::string& fullCollectionName, QueryRequest::Flags flags):
+	_query(fullCollectionName, flags)
 {
 }
 
@@ -42,7 +40,6 @@ Cursor::~Cursor()
 	try
 	{
 		poco_assert_dbg(!_response.cursorID());
-
 	}
 	catch (...)
 	{
@@ -52,7 +49,7 @@ Cursor::~Cursor()
 
 ResponseMessage& Cursor::next(Connection& connection)
 {
-	if ( _response.cursorID() == 0 )
+	if (_response.cursorID() == 0)
 	{
 		connection.sendRequest(_query, _response);
 	}
@@ -69,7 +66,7 @@ ResponseMessage& Cursor::next(Connection& connection)
 
 void Cursor::kill(Connection& connection)
 {
-	if ( _response.cursorID() != 0 )
+	if (_response.cursorID() != 0)
 	{
 		KillCursorsRequest killRequest;
 		killRequest.cursors().push_back(_response.cursorID());

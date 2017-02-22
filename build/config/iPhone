@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/iPhone#4 $
+# $Id: //poco/1.4/build/config/iPhone#2 $
 #
 # iPhone
 #
@@ -23,22 +23,23 @@ LINKMODE ?= STATIC
 # Otherwise use the version found. 
 
 IPHONE_SDK             ?= iPhoneOS
-IPHONE_SDK_ROOT         = $(shell xcode-select -print-path)/Platforms/$(IPHONE_SDK).platform/Developer/SDKs
+IPHONE_SDK_ROOT        ?= $(shell xcode-select -print-path)/Platforms/$(IPHONE_SDK).platform/Developer/SDKs
 IPHONE_SDK_ROOT_DIR     = $(IPHONE_SDK_ROOT)/$(IPHONE_SDK)
 IPHONE_SDK_BASE         = $(shell ls -d $(IPHONE_SDK_ROOT_DIR)$(IPHONE_SDK_VERSION)*.sdk | tail -1)
 IPHONE_SDK_VERSION_MIN ?= $(patsubst %.sdk,%,$(patsubst $(IPHONE_SDK_ROOT_DIR)%,%,$(IPHONE_SDK_BASE)))
 
 POCO_TARGET_OSNAME     ?= $(IPHONE_SDK)
-POCO_TARGET_OSARCH     ?= armv6
+POCO_TARGET_OSARCH     ?= arm64
 TOOL_PREFIX            ?= $(shell xcode-select -print-path)/Platforms/$(IPHONE_SDK).platform/Developer/usr/bin
-OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) -mthumb -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN) -fembed-bitcode
+ifneq ($(POCO_TARGET_OSARCH),arm64)
+THUMB = -mthumb
+endif
+OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) $(THUMB) -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN) -fembed-bitcode
 
 #
 # Tools
 #
-# If GCC_VER is defined then use it.
-# Otherwise select the latest version
-#
+
 CC		= $(shell xcrun -find clang)
 CXX		= $(shell xcrun -find clang++)
 
@@ -67,10 +68,10 @@ SHAREDLIBLINKEXT = .dylib
 CFLAGS          = $(OSFLAGS)
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = $(OSFLAGS) -Wall -Wno-sign-compare 
+CXXFLAGS        = $(OSFLAGS) -std=gnu++11 -stdlib=libc++ -Wall -Wno-sign-compare 
 CXXFLAGS32      =
 CXXFLAGS64      = 
-LINKFLAGS       = $(OSFLAGS)
+LINKFLAGS       = $(OSFLAGS) -stdlib=libc++
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =
@@ -89,7 +90,7 @@ RELEASEOPT_LINK =
 #
 # System Specific Flags
 #
-SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_STAT64 -DPOCO_NO_SHAREDLIBS
+SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_SOCKETADDRESS_DONT_PREFER_IPV4 -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_STAT64 -DPOCO_NO_SHAREDLIBS -DPOCO_NO_NET_IFTYPES
 
 #
 # System Specific Libraries

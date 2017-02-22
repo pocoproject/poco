@@ -63,7 +63,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 		std::string crc(4, ' ');
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, start);
+			_ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, start, fileEntry.needsZip64());
 		}
 		else
 		{
@@ -75,7 +75,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 	{
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, start);
+			_ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, start, fileEntry.needsZip64());
 		}
 		else
 		{
@@ -223,6 +223,13 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 		_pHeader->setCRC(_crc32.checksum());
 		_pHeader->setUncompressedSize(_bytesWritten);
 		_pHeader->setCompressedSize(_ptrOHelper->bytesWritten());
+		if (_bytesWritten == 0) 
+		{
+			poco_assert (_ptrOHelper->bytesWritten() == 0);
+			// Empty files must use CM_STORE, otherwise unzipping will fail
+			_pHeader->setCompressionMethod(ZipCommon::CM_STORE);
+			_pHeader->setCompressionLevel(ZipCommon::CL_NORMAL);
+		}
 		_pHeader->setStartPos(_pHeader->getStartPos()); // This resets EndPos now that compressed Size is known
 
 		if (_pHeader->searchCRCAndSizesAfterData())

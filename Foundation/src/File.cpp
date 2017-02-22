@@ -328,7 +328,13 @@ void File::createDirectories()
 			File f(p);
 			f.createDirectories();
 		}
-		createDirectoryImpl();
+		try
+		{
+			createDirectoryImpl();
+		}
+		catch (FileExistsException&)
+		{
+		}
 	}
 }
 

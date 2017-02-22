@@ -33,11 +33,11 @@ namespace MongoDB {
 
 
 class MongoDB_API Message
-	/// Base class for all messages send or retrieved from MongoDB server
+	/// Base class for all messages send or retrieved from MongoDB server.
 {
 public:
-	Message(MessageHeader::OpCode opcode);
-		/// Constructor
+	explicit Message(MessageHeader::OpCode opcode);
+		/// Creates a Message using the given OpCode.
 	
 	virtual ~Message();
 		/// Destructor
@@ -53,6 +53,9 @@ protected:
 };
 
 
+//
+// inlines
+//
 inline MessageHeader& Message::header()
 {
 	return _header;
@@ -69,4 +72,4 @@ inline void Message::messageLength(Poco::Int32 length)
 } } // namespace Poco::MongoDB
 
 
-#endif //MongoDB_Message_INCLUDED
+#endif // MongoDB_Message_INCLUDED

@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/SQLite/src/SQLiteStatementImpl.cpp#8 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SQLiteStatementImpl
 //

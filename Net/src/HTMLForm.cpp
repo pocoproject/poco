@@ -73,6 +73,7 @@ private:
 
 HTMLForm::HTMLForm():
 	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH),
 	_encoding(ENCODING_URL)
 {
 }
@@ -80,27 +81,31 @@ HTMLForm::HTMLForm():
 	
 HTMLForm::HTMLForm(const std::string& encoding):
 	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH),
 	_encoding(encoding)
 {
 }
 
 
 HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler):
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH)
 {
 	load(request, requestBody, handler);
 }
 
 
 HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody):
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH)
 {
 	load(request, requestBody);
 }
 
 
 HTMLForm::HTMLForm(const HTTPRequest& request):
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH)
 {
 	load(request);
 }
@@ -300,7 +305,10 @@ void HTMLForm::readUrl(std::istream& istr)
 		while (ch != eof && ch != '=' && ch != '&')
 		{
 			if (ch == '+') ch = ' ';
-			name += (char) ch;
+			if (name.size() < MAX_NAME_LENGTH)
+				name += (char) ch;
+			else
+				throw HTMLFormException("Field name too long");
 			ch = istr.get();
 		}
 		if (ch == '=')
@@ -309,7 +317,10 @@ void HTMLForm::readUrl(std::istream& istr)
 			while (ch != eof && ch != '&')
 			{
 				if (ch == '+') ch = ' ';
-				value += (char) ch;
+				if (value.size() < _valueLengthLimit)
+					value += (char) ch;
+				else
+					throw HTMLFormException("Field value too long");
 				ch = istr.get();
 			}
 		}
@@ -363,7 +374,10 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 			int ch = istr.get();
 			while (ch != eof)
 			{
-				value += (char) ch;
+				if (value.size() < _valueLengthLimit)
+					value += (char) ch;
+				else
+					throw HTMLFormException("Field value too long");
 				ch = istr.get();
 			}
 			add(name, value);
@@ -442,6 +456,14 @@ void HTMLForm::setFieldLimit(int limit)
 	poco_assert (limit >= 0);
 	
 	_fieldLimit = limit;
+}
+
+
+void HTMLForm::setValueLengthLimit(int limit)
+{
+	poco_assert (limit >= 0);
+	
+	_valueLengthLimit = limit;
 }
 
 

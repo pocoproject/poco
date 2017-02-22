@@ -256,6 +256,8 @@ class Double {
     return (significand & kSignificandMask) |
         (biased_exponent << kPhysicalSignificandSize);
   }
+
+  DISALLOW_COPY_AND_ASSIGN(Double);
 };
 
 class Single {
@@ -391,6 +393,8 @@ class Single {
   static const uint32_t kNaN = 0x7FC00000;
 
   const uint32_t d32_;
+
+  DISALLOW_COPY_AND_ASSIGN(Single);
 };
 
 }  // namespace double_conversion

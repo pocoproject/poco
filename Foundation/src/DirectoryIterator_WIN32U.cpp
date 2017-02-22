@@ -35,7 +35,7 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVAL
 	std::string findPath = p.toString();
 	findPath.append("*");
 	std::wstring uFindPath;
-	UnicodeConverter::toUTF16(findPath, uFindPath);
+	FileImpl::convertPath(findPath, uFindPath);
 
 	_fh = FindFirstFileW(uFindPath.c_str(), &_fd);
 	if (_fh == INVALID_HANDLE_VALUE)

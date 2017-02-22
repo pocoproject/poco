@@ -8,11 +8,10 @@
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
-#include <iostream>
+
 
 #include "Poco/DateTime.h"
 #include "Poco/ObjectPool.h"
-
 #include "Poco/MongoDB/InsertRequest.h"
 #include "Poco/MongoDB/QueryRequest.h"
 #include "Poco/MongoDB/DeleteRequest.h"
@@ -22,15 +21,16 @@
 #include "Poco/MongoDB/Cursor.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/Binary.h"
-
 #include "Poco/Net/NetException.h"
 #include "Poco/UUIDGenerator.h"
-
-#include "MongoDBTest.h"
 #include "Poco/CppUnit/TestCaller.h"
 #include "Poco/CppUnit/TestSuite.h"
+#include "MongoDBTest.h"
+#include <iostream>
+
 
 using namespace Poco::MongoDB;
+
 
 Poco::MongoDB::Connection::Ptr MongoDBTest::_mongo;
 
@@ -79,6 +79,7 @@ void MongoDBTest::testInsertRequest()
 	_mongo->sendRequest(request);
 }
 
+
 void MongoDBTest::testQueryRequest()
 {
 	Poco::MongoDB::QueryRequest request("team.players");
@@ -119,6 +120,7 @@ void MongoDBTest::testQueryRequest()
 		fail("No document returned");
 	}
 }
+
 
 void MongoDBTest::testDBQueryRequest()
 {
@@ -221,6 +223,10 @@ void MongoDBTest::testDeleteRequest()
 void MongoDBTest::testCursorRequest()
 {
 	Poco::MongoDB::Database db("team");
+	
+	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> deleteRequest = db.createDeleteRequest("numbers");
+	_mongo->sendRequest(*deleteRequest);
+
 	Poco::SharedPtr<Poco::MongoDB::InsertRequest> insertRequest = db.createInsertRequest("numbers");
 	for(int i = 0; i < 10000; ++i)
 	{
@@ -340,6 +346,7 @@ void MongoDBTest::testCommand() {
 		fail(lastError->toString(2));
 	}
 }
+
 
 void MongoDBTest::testUUID()
 {

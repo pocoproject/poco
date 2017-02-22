@@ -184,11 +184,19 @@ public:
 		/// Specify 0 for unlimited (not recommended).
 		///
 		/// The default limit is 100.
+		
+	void setValueLengthLimit(int limit);
+		/// Sets the maximum size for form field values
+		/// stored as strings.
+		
+	int getValueLengthLimit() const;
+		/// Returns the maximum size for form field values
+		/// stored as strings.
 
 	static const std::string ENCODING_URL;       /// "application/x-www-form-urlencoded"
 	static const std::string ENCODING_MULTIPART; /// "multipart/form-data"
-
 	static const int         UNKNOWN_CONTENT_LENGTH;
+	
 protected:
 	void readUrl(std::istream& istr);
 	void readMultipart(std::istream& istr, PartHandler& handler);
@@ -201,7 +209,9 @@ private:
 
 	enum Limits
 	{
-		DFL_FIELD_LIMIT = 100
+		DFL_FIELD_LIMIT = 100,
+		MAX_NAME_LENGTH  = 1024,
+		DFL_MAX_VALUE_LENGTH = 256*1024
 	};
 
 	struct Part
@@ -213,6 +223,7 @@ private:
 	typedef std::vector<Part> PartVec;
 	
 	int         _fieldLimit;
+	int         _valueLengthLimit;
 	std::string _encoding;
 	std::string _boundary;
 	PartVec     _parts;
@@ -237,6 +248,12 @@ inline const std::string& HTMLForm::boundary() const
 inline int HTMLForm::getFieldLimit() const
 {
 	return _fieldLimit;
+}
+
+
+inline int HTMLForm::getValueLengthLimit() const
+{
+	return _valueLengthLimit;
 }
 
 

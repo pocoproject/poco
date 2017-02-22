@@ -83,7 +83,7 @@ ZipLocalFileHeader::ZipLocalFileHeader(std::istream& inp, bool assumeHeaderRead,
         {
             char header[ZipCommon::HEADER_SIZE]={'\x00', '\x00', '\x00', '\x00'};
             inp.read(header, ZipCommon::HEADER_SIZE);
-            if (std::memcmp(header, ZipDataInfo64::HEADER, sizeof(header)) == 0) 
+            if (_forceZip64) 
             {
                 ZipDataInfo64 nfo(inp, true);
                 setCRC(nfo.getCRC32());
@@ -166,6 +166,7 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 				ptr += 2;
 				if (id == ZipCommon::ZIP64_EXTRA_ID) 
 				{
+					_forceZip64 = true;
 					poco_assert(size >= 8);
 					if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
 					{

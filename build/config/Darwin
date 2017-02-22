@@ -1,10 +1,11 @@
 #
-# $Id
+# $Id$
 #
 # Darwin
 #
-# Build settings for Mac OS X 10.8 or later, clang, 64-bits, with C++11 support.
-# Build settings are compatible with XCode 7 C++ projects.
+# Build settings for Mac OS X 10.9 (clang++, libc++, x86_64)
+# The build settings defined in this file are compatible
+# with XCode C++ projects.
 # 
 
-include $(POCO_BASE)/build/config/Darwin-clang
+include $(POCO_BASE)/build/config/Darwin-clang-libc++

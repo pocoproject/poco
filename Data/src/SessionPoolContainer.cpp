@@ -4,7 +4,7 @@
 // $Id: //poco/Main/Data/src/SessionPoolContainer.cpp#3 $
 //
 // Library: Data
-// Package: SessionPoolContainering
+// Package: SessionPooling
 // Module:  SessionPoolContainer
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

@@ -64,7 +64,7 @@ FileImpl::FileImpl(const std::string& path): _path(path)
 	{
 		_path.resize(n - 1);
 	}
-	UnicodeConverter::toUTF16(_path, _upath);
+	convertPath(_path, _upath);
 }
 
 
@@ -88,7 +88,7 @@ void FileImpl::setPathImpl(const std::string& path)
 	{
 		_path.resize(n - 1);
 	}
-	UnicodeConverter::toUTF16(_path, _upath);
+	convertPath(_path, _upath);
 }
 
 
@@ -284,7 +284,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 	poco_assert (!_path.empty());
 
 	std::wstring upath;
-	UnicodeConverter::toUTF16(path, upath);
+	convertPath(path, upath);
 	if (CopyFileW(_upath.c_str(), upath.c_str(), FALSE) == 0)
 		handleLastErrorImpl(_path);
 }
@@ -295,7 +295,7 @@ void FileImpl::renameToImpl(const std::string& path)
 	poco_assert (!_path.empty());
 
 	std::wstring upath;
-	UnicodeConverter::toUTF16(path, upath);
+	convertPath(path, upath);
 	if (MoveFileW(_upath.c_str(), upath.c_str()) == 0)
 		handleLastErrorImpl(_path);
 }
@@ -428,5 +428,10 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	}
 }
 
+
+void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
+{
+	UnicodeConverter::toUTF16(utf8Path, utf16Path);
+}
 
 } // namespace Poco
