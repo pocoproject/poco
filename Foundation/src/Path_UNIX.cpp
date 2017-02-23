@@ -81,15 +81,23 @@ std::string PathImpl::configHomeImpl()
 {
 #if defined(POCO_VXWORKS)
 	return PathImpl::homeImpl();
-#else
+#elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
 	std::string::size_type n = path.size();
 	if (n > 0 && path[n - 1] == '/') 
-#if POCO_OS == POCO_OS_MAC_OS_X
-	  path.append("Library/Preferences/");
+		path.append("Library/Preferences/");
+	return path;
 #else
-	  path.append(".config/");
-#endif
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_CONFIG_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_CONFIG_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".config/");
 
 	return path;
 #endif
@@ -100,15 +108,23 @@ std::string PathImpl::dataHomeImpl()
 {
 #if defined(POCO_VXWORKS)
 	return PathImpl::homeImpl();
-#else
+#elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
 	std::string::size_type n = path.size();
 	if (n > 0 && path[n - 1] == '/') 
-#if POCO_OS == POCO_OS_MAC_OS_X
-	  path.append("Library/Application Support/");
+		path.append("Library/Application Support/");
+	return path;
 #else
-	  path.append(".local/share/");
-#endif
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_DATA_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_DATA_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".local/share/");
 
 	return path;
 #endif
@@ -119,34 +135,23 @@ std::string PathImpl::cacheHomeImpl()
 {
 #if defined(POCO_VXWORKS)
 	return PathImpl::tempImpl();
-#else
+#elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
 	std::string::size_type n = path.size();
 	if (n > 0 && path[n - 1] == '/') 
-#if POCO_OS == POCO_OS_MAC_OS_X
-	  path.append("Library/Caches/");
-#else
-	  path.append(".cache/");
-#endif
-
+		path.append("Library/Caches/");
 	return path;
-#endif
-}
-
-
-std::string PathImpl::tempHomeImpl()
-{
-#if defined(POCO_VXWORKS)
-	return PathImpl::tempImpl();
 #else
-	std::string path = PathImpl::homeImpl();
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_CACHE_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_CACHE_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
 	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] == '/') 
-#if POCO_OS == POCO_OS_MAC_OS_X
-	  path.append("Library/Caches/");
-#else
-	  path.append(".local/tmp/");
-#endif
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".cache/");
 
 	return path;
 #endif
