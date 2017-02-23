@@ -164,7 +164,9 @@ void Application::init()
 	_pConfig->setString("application.name", appPath.getFileName());
 	_pConfig->setString("application.baseName", appPath.getBaseName());
 	_pConfig->setString("application.dir", appPath.parent().toString());
-	_pConfig->setString("application.configDir", appPath.parent().toString());
+	_pConfig->setString("application.configDir", Path::configHome() + appPath.getBaseName() + Path::separator());
+	_pConfig->setString("application.cacheDir", Path::cacheHome() + appPath.getBaseName() + Path::separator());
+	_pConfig->setString("application.dataDir", Path::dataHome() + appPath.getBaseName() + Path::separator());
 	processOptions();
 }
 

@@ -288,7 +288,25 @@ public:
 		
 	static std::string home();
 		/// Returns the user's home directory.
+
+	static std::string configHome();
+		/// Returns the user's config directory.
+		///
+		/// On Unix systems, this is the '~/.config/'. On Windows systems,
+		/// this is '%APPDATA%'.
 		
+	static std::string dataHome();
+		/// Returns the user's data directory.
+		///
+		/// On Unix systems, this is the '~/.local/share/'. On Windows systems,
+		/// this is '%APPDATA%'.
+		
+	static std::string cacheHome();
+		/// Returns the user's cache directory.
+		///
+		/// On Unix systems, this is the '~/.cache/'. On Windows systems,
+		/// this is '%APPDATA%'.
+
 	static std::string temp();
 		/// Returns the temporary directory.
 		

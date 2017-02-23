@@ -74,6 +74,87 @@ std::string PathImpl::homeImpl()
 }
 
 
+std::string PathImpl::configHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::homeImpl();
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') 
+		path.append("Library/Preferences/");
+	return path;
+#else
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_CONFIG_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_CONFIG_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".config/");
+
+	return path;
+#endif
+}
+
+
+std::string PathImpl::dataHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::homeImpl();
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') 
+		path.append("Library/Application Support/");
+	return path;
+#else
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_DATA_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_DATA_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".local/share/");
+
+	return path;
+#endif
+}
+
+
+std::string PathImpl::cacheHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::tempImpl();
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') 
+		path.append("Library/Caches/");
+	return path;
+#else
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_CACHE_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_CACHE_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".cache/");
+
+	return path;
+#endif
+}
+
+
 std::string PathImpl::tempImpl()
 {
 	std::string path;

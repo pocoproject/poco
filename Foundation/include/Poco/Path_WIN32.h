@@ -30,6 +30,9 @@ class Foundation_API PathImpl
 public:
 	static std::string currentImpl();
 	static std::string homeImpl();
+	static std::string configHomeImpl();
+	static std::string dataHomeImpl();
+	static std::string cacheHomeImpl();
 	static std::string tempImpl();
 	static std::string nullImpl();
 	static std::string systemImpl();

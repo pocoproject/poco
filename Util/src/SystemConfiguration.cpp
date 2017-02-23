@@ -41,6 +41,9 @@ const std::string SystemConfiguration::NODENAME       = "system.nodeName";
 const std::string SystemConfiguration::NODEID         = "system.nodeId";
 const std::string SystemConfiguration::CURRENTDIR     = "system.currentDir";
 const std::string SystemConfiguration::HOMEDIR        = "system.homeDir";
+const std::string SystemConfiguration::CONFIGHOMEDIR  = "system.configHomeDir";
+const std::string SystemConfiguration::CACHEHOMEDIR   = "system.cacheHomeDir";
+const std::string SystemConfiguration::DATAHOMEDIR    = "system.dataHomeDir";
 const std::string SystemConfiguration::TEMPDIR        = "system.tempDir";
 const std::string SystemConfiguration::DATETIME       = "system.dateTime";
 #if !defined(POCO_VXWORKS)
@@ -106,6 +109,18 @@ bool SystemConfiguration::getRaw(const std::string& key, std::string& value) con
 	{
 		value = Path::home();
 	}
+	else if (key == CONFIGHOMEDIR)
+	{
+		value = Path::configHome();
+	}
+	else if (key == CACHEHOMEDIR)
+	{
+		value = Path::cacheHome();
+	}
+	else if (key == DATAHOMEDIR)
+	{
+		value = Path::dataHome();
+	}
 	else if (key == TEMPDIR)
 	{
 		value = Path::temp();
@@ -151,6 +166,9 @@ void SystemConfiguration::enumerate(const std::string& key, Keys& range) const
 		range.push_back("nodeId");
 		range.push_back("currentDir");
 		range.push_back("homeDir");
+		range.push_back("configHomeDir");
+		range.push_back("cacheHomeDir");
+		range.push_back("dataHomeDir");
 		range.push_back("tempDir");
 		range.push_back("dateTime");
 #if !defined(POCO_VXWORKS)

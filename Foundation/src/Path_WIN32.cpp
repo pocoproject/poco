@@ -74,6 +74,54 @@ std::string PathImpl::homeImpl()
 }
 
 
+std::string PathImpl::configHomeImpl()
+{
+	std::string result;
+
+	// if APPDATA environment variable not exist, return home directory instead
+	try
+	{
+		result = EnvironmentImpl::getImpl("APPDATA");
+	}
+	catch (NotFoundException&)
+	{
+		result = homeImpl();
+	}
+
+	std::string::size_type n = result.size();
+	if (n > 0 && result[n - 1] != '\\')
+		result.append("\\");
+	return result;
+}
+
+
+std::string PathImpl::dataHomeImpl()
+{
+	std::string result;
+
+	// if LOCALAPPDATA environment variable not exist, return config home instead
+	try
+	{
+		result = EnvironmentImpl::getImpl("LOCALAPPDATA");
+	}
+	catch (NotFoundException&)
+	{
+		result = configHomeImpl();
+	}
+
+	std::string::size_type n = result.size();
+	if (n > 0 && result[n - 1] != '\\')
+		result.append("\\");
+	return result;
+}
+
+
+std::string PathImpl::cacheHomeImpl()
+{
+	return tempImpl();
+}
+
+
 std::string PathImpl::tempImpl()
 {
 	char buffer[MAX_PATH];

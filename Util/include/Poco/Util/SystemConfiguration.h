@@ -39,6 +39,9 @@ class Util_API SystemConfiguration: public AbstractConfiguration
 	///     of the first Ethernet adapter found on the system.
 	///   - system.currentDir: the current working directory
 	///   - system.homeDir: the user's home directory
+	///   - system.configHomeDir: the base directory relative to which user specific configuration files should be stored
+	///   - system.cacheHomeDir: the base directory relative to which user specific non-essential data files should be stored
+	///   - system.dataHomeDir: the base directory relative to which user specific data files should be stored
 	///   - system.tempDir: the system's temporary directory
 	///   - system.dateTime: the current UTC date and time, formatted in ISO 8601 format.
 	///   - system.pid: the current process ID.
@@ -74,6 +77,9 @@ private:
 	static const std::string NODEID;
 	static const std::string CURRENTDIR;
 	static const std::string HOMEDIR;
+	static const std::string CONFIGHOMEDIR;
+	static const std::string CACHEHOMEDIR;
+	static const std::string DATAHOMEDIR;
 	static const std::string TEMPDIR;
 	static const std::string DATETIME;
 #if !defined(POCO_VXWORKS)

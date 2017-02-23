@@ -569,6 +569,16 @@ std::string Path::home()
 }
 
 
+std::string Path::cacheHome()
+{
+#if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
+	return PathImpl::cacheHomeImpl();
+#else
+	return PathImpl::homeImpl();
+#endif
+}
+
+
 std::string Path::temp()
 {
 	return PathImpl::tempImpl();

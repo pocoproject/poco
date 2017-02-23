@@ -49,10 +49,12 @@ std::string PathImpl::cacheHomeImpl()
   return homeImpl();
 }
 
+
 std::string PathImpl::tempHomeImpl()
 {
   return tempImpl();
 }
+
 
 std::string PathImpl::configImpl()
 {
