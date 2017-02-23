@@ -99,7 +99,6 @@ void SystemConfigurationTest::testKeys()
 	assert (std::find(keys.begin(), keys.end(), "configHomeDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "cacheHomeDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "dataHomeDir") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "tempHomeDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "tempDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "configDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "dateTime") != keys.end());

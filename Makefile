@@ -124,7 +124,7 @@ samples  += Data-samples
 samples  += MongoDB-samples Zip-samples PageCompiler-samples PDF-samples
 
 # -------------------------------------------------------------------------------------------------------------------------------------
-cleans   =  Foundation-clean XML-clean JSON-clean FSM-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean 
+cleans   =  Foundation-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean 
 cleans   += Data-clean Data/ODBC-clean Data/SQLite-clean Data/MySQL-clean Data/PostgreSQL-clean
 cleans	 += MongoDB-clean Redis-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean PDF-clean
 
@@ -180,20 +180,6 @@ JSON-clean:
 	$(MAKE) -C $(POCO_BASE)/JSON clean
 	$(MAKE) -C $(POCO_BASE)/JSON/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/JSON/samples clean
-
-FSM-libexec:  Foundation-libexec Util-libexec
-	$(MAKE) -C $(POCO_BASE)/FSM
-
-FSM-tests: FSM-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/FSM/testsuite
-	
-FSM-samples: FSM-libexec 
-	$(MAKE) -C $(POCO_BASE)/FSM/samples
-
-FSM-clean:
-	$(MAKE) -C $(POCO_BASE)/FSM clean
-	$(MAKE) -C $(POCO_BASE)/FSM/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/FSM/samples clean
 
 Util-libexec:  Foundation-libexec XML-libexec JSON-libexec
 	$(MAKE) -C $(POCO_BASE)/Util
