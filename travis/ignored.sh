@@ -6,5 +6,6 @@ export CPPUNIT_IGNORE="\
   N7CppUnit10TestCallerI22HTTPSClientSessionTestEE.testProxy, \
   N7CppUnit10TestCallerI22HTTPSStreamFactoryTestEE.testProxy, \
   N7CppUnit10TestCallerI19MulticastSocketTestEE.testMulticast, \
+  N7CppUnit10TestCallerI22HTTPSClientSessionTestEE.testCachedSession, \
   N7CppUnit10TestCallerI13NTPClientTestEE.testTimeSync"
 
