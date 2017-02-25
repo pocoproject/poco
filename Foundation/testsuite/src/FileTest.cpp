@@ -8,8 +8,6 @@
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
-#include <iostream>
-using namespace std;
 
 #include "FileTest.h"
 #include "Poco/CppUnit/TestCaller.h"
