@@ -8,7 +8,8 @@
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
-
+#include <iostream>
+using namespace std;
 
 #include "FileTest.h"
 #include "Poco/CppUnit/TestCaller.h"
@@ -529,7 +530,9 @@ void FileTest::testLongPath()
 #if defined(_WIN32) && defined(POCO_WIN32_UTF8) && !defined(_WIN32_WCE)
 	Poco::Path p("longpathtest");
 	p.makeAbsolute();
-	std::string longpath(p.toString());
+	std::string longpath("\\\\?\\");
+	longpath += p.toString();
+
 	while (longpath.size() < MAX_PATH*4)
 	{
 		longpath.append("\\");
