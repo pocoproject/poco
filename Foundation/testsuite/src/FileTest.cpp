@@ -528,8 +528,7 @@ void FileTest::testLongPath()
 #if defined(_WIN32) && defined(POCO_WIN32_UTF8) && !defined(_WIN32_WCE)
 	Poco::Path p("longpathtest");
 	p.makeAbsolute();
-	std::string prefix("\\\\?\\");
-	std::string longpath = prefix + p.toString();
+	std::string longpath(p.toString());
 
 	while (longpath.size() < MAX_PATH*4)
 	{
