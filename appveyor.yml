@@ -119,9 +119,9 @@ install:
   - if "%configuration%"=="release" (
       if "%builder%"=="cygwin" (
         if "%platform%"=="Win32" (
-          C:\cygwin\usr\sbin\cygserver.exe &
+          bash.exe -c 'C:/cygwin/usr/sbin/cygserver.exe' &
         ) else (
-          C:\cygwin64\usr\sbin\cygserver.exe &
+          bash.exe -c 'C:/cygwin64/usr/sbin/cygserver.exe' &
         )
       )
     )
