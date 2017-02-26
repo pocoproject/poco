@@ -119,9 +119,9 @@ install:
   - if "%configuration%"=="release" (
       if "%builder%"=="cygwin" (
         if "%platform%"=="Win32" (
-          C:\Cygwin\bin\bash.exe --norc -c 'C:/cygwin/usr/sbin/cygserver.exe' &
+          C:\Cygwin\bin\bash.exe --norc -c 'C:/cygwin/usr/sbin/cygserver.exe' ^&
         ) else (
-          C:\Cygwin64\bin\bash.exe --norc -c 'C:/cygwin64/usr/sbin/cygserver.exe' &
+          C:\Cygwin64\bin\bash.exe --norc -c 'C:/cygwin64/usr/sbin/cygserver.exe' ^&
         )
       )
     )
