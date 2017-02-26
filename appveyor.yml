@@ -105,15 +105,6 @@ install:
   
   - set POCO_BASE=%CD%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
-  
-  - if "%builder%"=="cygwin" (
-    if "%platform%"=="Win32" (
-    set PATH=C:\cygwin\bin;%PATH% ))
-    
-  - if "%builder%"=="cygwin" (
-    if "%platform%"=="x64" (   
-    set PATH=C:\cygwin64\bin;%PATH% ))
-
   - uname -a
   - cat /proc/cpuinfo
   - cat /proc/meminfo
