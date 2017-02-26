@@ -108,7 +108,14 @@ install:
   - uname -a
   - cat /proc/cpuinfo
   - cat /proc/meminfo
-
+  - if "%builder%"=="cygwin" (
+      if "%platform%"=="Win32" (
+        PATH='/cygdrive/C/cygwin/bin;$PATH 
+      ) else (
+         PATH='/cygdrive/C/cygwin64/bin;$PATH 
+      )
+    )
+    
   - ps: |
       if ($env:builder -eq "cmake")
       {
