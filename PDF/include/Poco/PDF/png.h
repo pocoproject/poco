@@ -911,7 +911,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* The sCAL chunk describes the actual physical dimensions of the
     * subject matter of the graphic.  The chunk contains a unit specification
     * a byte value, and two ASCII strings representing floating-point
-    * values.  The values are width and height corresponsing to one pixel
+    * values.  The values are width and height corresponding to one pixel
     * in the image.  This external representation is converted to double
     * here.  Data values are valid if (valid & PNG_INFO_sCAL) is non-zero.
     */

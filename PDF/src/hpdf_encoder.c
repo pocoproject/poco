@@ -2573,7 +2573,7 @@ HPDF_CMapEncoder_InitAttr  (HPDF_Encoder  encoder)
 
     for (i = 0; i <= 255; i++) {
         for (j = 0; j <= 255; j++) {
-            /* undefined charactors are replaced to square */
+            /* undefined characters are replaced to square */
             encoder_attr->unicode_map[i][j] = 0x25A1;
         }
     }

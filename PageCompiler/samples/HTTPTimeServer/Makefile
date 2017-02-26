@@ -28,7 +28,7 @@ ifdef POCO_UNBUNDLED
     SYSLIBS += -lz -lpcre -lexpat
 endif
 
-# Rule for runnning PageCompiler
+# Rule for running PageCompiler
 src/%.cpp: src/%.cpsp
 	@echo "** Compiling Page" $<
 	$(SET_LD_LIBRARY_PATH) $(PAGECOMPILER) $<
