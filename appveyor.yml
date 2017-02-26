@@ -368,7 +368,7 @@ build_script:
       if ($env:builder -eq "cygwin")
       {
           $LastExitCode=0;
-          $cmd='bash.exe configure --everything';iex "& $cmd"
+          $cmd='bash.exe configure --config=Cygwin --everything';iex "& $cmd"
           if ($LastExitCode -ne 0) {
             throw "$cmd failed with exit code $LastExitCode."
           }
@@ -457,7 +457,7 @@ test_script:
           C:\cygwin64\usr\sbin\cygserver.exe &
         )
       )
-      ./appveyor/Cygwin/runtests.sh
+      bash.exe -c 'appveyor/Cygwin/runtests.sh'
     )
     
   - ps: |
