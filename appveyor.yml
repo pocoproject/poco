@@ -115,23 +115,7 @@ install:
         set PATH=C:\cygwin64\bin;"%PATH%"
       )
     )
-    
-  - if "%configuration%"=="release" (
-      if "%builder%"=="cygwin" (
-        if "%platform%"=="Win32" (
-          C:\Cygwin\bin\bash.exe --norc -c 'C:/cygwin/usr/sbin/cygserver.exe' ^&
-        ) else (
-          C:\Cygwin64\bin\bash.exe --norc -c 'C:/cygwin64/usr/sbin/cygserver.exe' ^&
-        )
-      )
-    )
-    
-  - if "%configuration%"=="release" (
-      if "%builder%"=="cygwin" (
-        C:\Cygwin\bin\bash.exe --norc -c 'appveyor/Cygwin/runtests.sh'
-      )
-    )
-    
+       
   - ps: |
       if ($env:builder -eq "cmake")
       {
@@ -465,14 +449,19 @@ after_test:
 
 
 test_script:
+#  - if "%configuration%"=="release" (
+#      if "%builder%"=="cygwin" (
+#        if "%platform%"=="Win32" (
+#          C:\Cygwin\bin\bash.exe --norc -c 'C:/cygwin/usr/sbin/cygserver.exe' ^&
+#        ) else (
+#          C:\Cygwin64\bin\bash.exe --norc -c 'C:/cygwin64/usr/sbin/cygserver.exe' ^&
+#        )
+#      )
+#    )
+    
   - if "%configuration%"=="release" (
       if "%builder%"=="cygwin" (
-        if "%platform%"=="Win32" (
-          C:\cygwin\usr\sbin\cygserver.exe &
-        ) else (
-          C:\cygwin64\usr\sbin\cygserver.exe &
-        )
-        bash.exe -c 'appveyor/Cygwin/runtests.sh'
+        C:\Cygwin\bin\bash.exe --norc -c 'appveyor/Cygwin/runtests.sh'
       )
     )
     
