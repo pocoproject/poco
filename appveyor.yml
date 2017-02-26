@@ -105,21 +105,19 @@ install:
   
   - set POCO_BASE=%CD%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
-  - ps: |
-      if ($env:builder -eq "cygwin")
-      {
-        if ($env:platform -eq "Win32")
-        {
-          $env:PATH = "C:\cygwin\bin;" + $env:PATH
-        }
-        if ($env:platform -eq "x64")
-        {
-          $env:PATH = "c:\cygwin64\bin;" + $env:PATH
-        }
-      }
+  
+  - if "%builder%"=="cygwin" (
+    if "%platform%"=="Win32" (
+    set PATH=C:\cygwin\bin;%PATH% ))
+    
+  - if "%builder%"=="cygwin" (
+    if "%platform%"=="x64" (   
+    set PATH=C:\cygwin64\bin;%PATH% ))
+
   - uname -a
   - cat /proc/cpuinfo
   - cat /proc/meminfo
+
   - ps: |
       if ($env:builder -eq "cmake")
       {
@@ -453,25 +451,22 @@ after_test:
 
 
 test_script:
+  - if "%configuration%"=="release" (
+      if "%builder%"=="cygwin" (
+        if "%platform%"=="Win32" (
+          C:\cygwin\usr\sbin\cygserver.exe &
+        ) else (
+          C:\cygwin64\usr\sbin\cygserver.exe &
+        )
+      )
+      ./appveyor/Cygwin/runtests.sh
+    )
+    
   - ps: |
       $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
       $line='-------------------------------------------------------------------------------------';
       if ($env:configuration -eq "release")
       {
-        if ($env:builder -eq "cygwin")
-        {
-            $LastExitCode=0;
-          if ($env:platform -eq "Win32")
-          {
-            $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"
-          }
-          if ($env:platform -eq "x64")
-          {
-            $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';iex "& $cmd"
-          }
-          $cmd = 'bash.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd";
-            Write-Host -ForegroundColor Yellow $cmd ': LastExitCode=' $lastExitCode;
-          }
         if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
         {
           $suffix = '';
