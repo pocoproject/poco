@@ -123,6 +123,11 @@ install:
         ) else (
           C:\cygwin64\usr\sbin\cygserver.exe &
         )
+      )
+    )
+    
+  - if "%configuration%"=="release" (
+      if "%builder%"=="cygwin" (
         bash.exe -c 'appveyor/Cygwin/runtests.sh'
       )
     )
