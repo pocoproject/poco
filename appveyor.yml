@@ -110,9 +110,9 @@ install:
   - cat /proc/meminfo
   - if "%builder%"=="cygwin" (
       if "%platform%"=="Win32" (
-        PATH='/cygdrive/C/cygwin/bin;$PATH 
+        set PATH='C:\cygwin\bin';%PATH% 
       ) else (
-         PATH='/cygdrive/C/cygwin64/bin;$PATH 
+        set PATH='C:\cygwin64\bin';%PATH% 
       )
     )
     
