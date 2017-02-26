@@ -119,16 +119,16 @@ install:
   - if "%configuration%"=="release" (
       if "%builder%"=="cygwin" (
         if "%platform%"=="Win32" (
-          bash.exe -c 'C:/cygwin/usr/sbin/cygserver.exe' &
+          C:\Cygwin\bin\bash.exe --norc -c 'C:/cygwin/usr/sbin/cygserver.exe' &
         ) else (
-          bash.exe -c 'C:/cygwin64/usr/sbin/cygserver.exe' &
+          C:\Cygwin64\bin\bash.exe --norc -c 'C:/cygwin64/usr/sbin/cygserver.exe' &
         )
       )
     )
     
   - if "%configuration%"=="release" (
       if "%builder%"=="cygwin" (
-        bash.exe -c 'appveyor/Cygwin/runtests.sh'
+        C:\Cygwin\bin\bash.exe --norc -c 'appveyor/Cygwin/runtests.sh'
       )
     )
     
