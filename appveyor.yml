@@ -116,6 +116,17 @@ install:
       )
     )
     
+  - if "%configuration%"=="release" (
+      if "%builder%"=="cygwin" (
+        if "%platform%"=="Win32" (
+          C:\cygwin\usr\sbin\cygserver.exe &
+        ) else (
+          C:\cygwin64\usr\sbin\cygserver.exe &
+        )
+        bash.exe -c 'appveyor/Cygwin/runtests.sh'
+      )
+    )
+    
   - ps: |
       if ($env:builder -eq "cmake")
       {
@@ -456,8 +467,8 @@ test_script:
         ) else (
           C:\cygwin64\usr\sbin\cygserver.exe &
         )
+        bash.exe -c 'appveyor/Cygwin/runtests.sh'
       )
-      bash.exe -c 'appveyor/Cygwin/runtests.sh'
     )
     
   - ps: |
