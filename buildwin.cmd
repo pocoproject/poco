@@ -18,7 +18,7 @@ rem Modified by Guenter Obiltschnig.
 rem
 rem Usage:
 rem ------
-rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY [LOGGER] ] ] 
+rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY [LOGGER] ] 
 rem VS_VERSION:    90|100|110|120|140|150
 rem ACTION:        build|rebuild|clean
 rem LINKMODE:      static_mt|static_md|shared|all
@@ -44,6 +44,31 @@ if %VS_VERSION%==vs150 (
 ) else (
   set VS_VARSALL=..\..\VC\vcvarsall.bat
 )
+
+shift /1
+rem ACTION [build|rebuild|clean]
+set ACTION=%1
+if "%ACTION%"=="" (set ACTION=build)
+if not "%ACTION%"=="build" (
+if not "%ACTION%"=="rebuild" (
+if not "%ACTION%"=="clean" goto usage))
+
+shift /1
+rem LINKMODE [static_mt|static_md|shared|all]
+set LINK_MODE=%1
+if "%LINK_MODE%"=="" (set LINK_MODE=all)
+if not "%LINK_MODE%"=="static_mt" (
+if not "%LINK_MODE%"=="static_md" (
+if not "%LINK_MODE%"=="shared" (
+if not "%LINK_MODE%"=="all" goto usage)))
+
+rem CONFIGURATION [release|debug|both]
+set CONFIGURATION=%2
+if "%CONFIGURATION%"=="" (set CONFIGURATION=both)
+if not "%CONFIGURATION%"=="release" (
+if not "%CONFIGURATION%"=="debug" (
+if not "%CONFIGURATION%"=="both" goto usage))
+
 rem PLATFORM [Win32|x64|WinCE|WEC2013]
 set PLATFORM=%3
 if "%PLATFORM%"=="" (set PLATFORM=Win32)
@@ -102,6 +127,7 @@ if not defined VCINSTALLDIR (
             )
           ) else (
             if %VS_VERSION%==vs150 (
+                echo "%VS150COMNTOOLS%%VS_VARSALL%" amd64
               if %PLATFORM%==x64 (
                 call "%VS150COMNTOOLS%%VS_VARSALL%" amd64
               ) else (
@@ -571,7 +597,7 @@ exit /b 1
 :usage
 echo Usage:
 echo ------
-echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] {ENV] [VERBOSITY]
+echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY]
 echo VS_VERSION:    "90|100|110|120|140|150"
 echo ACTION:        "build|rebuild|clean"
 echo LINKMODE:      "static_mt|static_md|shared|all"
