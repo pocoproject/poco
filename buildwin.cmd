@@ -127,7 +127,6 @@ if not defined VCINSTALLDIR (
             )
           ) else (
             if %VS_VERSION%==vs150 (
-                echo "%VS150COMNTOOLS%%VS_VARSALL%" amd64
               if %PLATFORM%==x64 (
                 call "%VS150COMNTOOLS%%VS_VARSALL%" amd64
               ) else (
