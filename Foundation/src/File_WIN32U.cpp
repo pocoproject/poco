@@ -442,7 +442,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 {
 	UnicodeConverter::toUTF16(utf8Path, utf16Path);
-	if (utf16Path.size() > MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
+	if (utf16Path.size() >= MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
 	{
 		if (utf16Path[0] == '\\' || utf16Path[1] == ':')
 		{
