@@ -104,16 +104,16 @@ public:
 		/// Returns the path.
 	
 	bool exists() const;
-		/// Returns true iff the file exists.
+		/// Returns true if the file exists.
 		
 	bool canRead() const;
-		/// Returns true iff the file is readable.
+		/// Returns true if the file is readable.
 		
 	bool canWrite() const;
-		/// Returns true iff the file is writeable.
+		/// Returns true if the file is writeable.
 
 	bool canExecute() const;
-		/// Returns true iff the file is executable.
+		/// Returns true if the file is executable.
 		///
 		/// On Windows and OpenVMS, the file must have
 		/// the extension ".EXE" to be executable.
@@ -121,16 +121,16 @@ public:
 		/// bit must be set.
 
 	bool isFile() const;
-		/// Returns true iff the file is a regular file.
+		/// Returns true if the file is a regular file.
 		
 	bool isLink() const;
-		/// Returns true iff the file is a symbolic link.
+		/// Returns true if the file is a symbolic link.
 		
 	bool isDirectory() const;
-		/// Returns true iff the file is a directory.
+		/// Returns true if the file is a directory.
 		
 	bool isDevice() const;
-		/// Returns true iff the file is a device.
+		/// Returns true if the file is a device.
 
 	bool isHidden() const;
 		/// Returns true if the file is hidden.
