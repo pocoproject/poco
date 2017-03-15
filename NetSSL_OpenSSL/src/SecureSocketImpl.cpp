@@ -229,10 +229,15 @@ void SecureSocketImpl::shutdown()
 			// OpenSSL and/or browser versions, and things
 			// seem to work better now.
 			int rc = SSL_shutdown(_pSSL);
+#if FIXME
+			#1605: try to do a proper SSL_shutdown()
+			This fix for the issue above breaks the 
+			HTTPSClientSessionTest::testCachedSession() Unit test
 			if (rc == 0 && _pSocket->getBlocking())
 			{
 				rc = SSL_shutdown(_pSSL);
 			}
+#endif
 			if (rc < 0) handleError(rc);
 			if (_pSocket->getBlocking())
 			{
