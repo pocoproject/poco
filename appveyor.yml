@@ -105,21 +105,17 @@ install:
   
   - set POCO_BASE=%CD%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
-  - ps: |
-      if ($env:builder -eq "cygwin")
-      {
-        if ($env:platform -eq "Win32")
-        {
-          $env:PATH = "C:\cygwin\bin;" + $env:PATH
-        }
-        if ($env:platform -eq "x64")
-        {
-          $env:PATH = "c:\cygwin64\bin;" + $env:PATH
-        }
-      }
   - uname -a
   - cat /proc/cpuinfo
   - cat /proc/meminfo
+  - if "%builder%"=="cygwin" (
+      if "%platform%"=="Win32" (
+        set PATH=C:\cygwin\bin;"%PATH%"
+      ) else (
+        set PATH=C:\cygwin64\bin;"%PATH%"
+      )
+    )
+       
   - ps: |
       if ($env:builder -eq "cmake")
       {
@@ -372,7 +368,7 @@ build_script:
       if ($env:builder -eq "cygwin")
       {
           $LastExitCode=0;
-          $cmd='bash.exe configure --everything';iex "& $cmd"
+          $cmd='bash.exe configure --config=Cygwin --everything';iex "& $cmd"
           if ($LastExitCode -ne 0) {
             throw "$cmd failed with exit code $LastExitCode."
           }
@@ -441,6 +437,7 @@ before_test:
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testCachedSession';
       set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
       Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE'
       Write-Host -ForegroundColor Yellow $line;
@@ -452,25 +449,27 @@ after_test:
 
 
 test_script:
+#  - if "%configuration%"=="release" (
+#      if "%builder%"=="cygwin" (
+#        if "%platform%"=="Win32" (
+#          C:\Cygwin\bin\bash.exe --norc -c 'C:/cygwin/usr/sbin/cygserver.exe' ^&
+#        ) else (
+#          C:\Cygwin64\bin\bash.exe --norc -c 'C:/cygwin64/usr/sbin/cygserver.exe' ^&
+#        )
+#      )
+#    )
+    
+  - if "%configuration%"=="release" (
+      if "%builder%"=="cygwin" (
+        C:\Cygwin\bin\bash.exe --norc -c 'appveyor/Cygwin/runtests.sh'
+      )
+    )
+    
   - ps: |
       $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
       $line='-------------------------------------------------------------------------------------';
       if ($env:configuration -eq "release")
       {
-        if ($env:builder -eq "cygwin")
-        {
-            $LastExitCode=0;
-          if ($env:platform -eq "Win32")
-          {
-            $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"
-          }
-          if ($env:platform -eq "x64")
-          {
-            $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';iex "& $cmd"
-          }
-          $cmd = 'bash.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd";
-            Write-Host -ForegroundColor Yellow $cmd ': LastExitCode=' $lastExitCode;
-          }
         if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
         {
           $suffix = '';
