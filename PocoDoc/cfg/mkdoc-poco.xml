@@ -13,7 +13,22 @@
 				expat*.h,
 				zconf.h,
 				zlib.h,
-				XMLStreamParser.h
+				XMLStreamParser.h,
+				Units.h,
+				AbstractBinder.h,
+				Alignment.h,
+				QName.h,
+				CppUnitException.h,
+				RepeatedTest.h,
+				Test.h,
+				TestCase.h,
+				TestDecorator.h,
+				TestFailure.h,
+				TestResult.h,
+				TestRunner.h,
+				TestSetup.h,
+				TestSuite.h,
+				TextTestResult.h
 			</exclude>
 		</files>
 		<pages>
