@@ -83,6 +83,7 @@ SOURCES="
 	RandomTest.cpp
 	RegularExpressionTest.cpp
 	SHA1EngineTest.cpp
+	SHA2EngineTest.cpp
 	SemaphoreTest.cpp
 	SharedLibraryTest.cpp
 	SharedLibraryTestSuite.cpp
