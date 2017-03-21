@@ -465,6 +465,9 @@
     <ClCompile Include="src\SHA1Engine.cpp">
       <Filter>Crypt\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SHA2Engine.cpp">
+      <Filter>Crypt\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Manifest.cpp">
       <Filter>SharedLibrary\Source Files</Filter>
     </ClCompile>
@@ -1359,6 +1362,9 @@
       <Filter>Crypt\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\SHA1Engine.h">
+      <Filter>Crypt\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\SHA2Engine.h">
       <Filter>Crypt\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\ClassLibrary.h">
