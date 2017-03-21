@@ -10,6 +10,9 @@
 // Secure Hash Standard SHA-2 algorithm
 // (FIPS 180-4, see http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf)
 //
+// Based on the implementation of mbed TLS (Apache 2.0)
+// http://www.apache.org/licenses/LICENSE-2.0
+//
 
 #ifndef Foundation_SHA2Engine_INCLUDED
 #define Foundation_SHA2Engine_INCLUDED
