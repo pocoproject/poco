@@ -408,6 +408,7 @@ void SHA2Engine::reset()
 
 const DigestEngine::Digest& SHA2Engine::digest()
 {
+	_digest.clear();
 	if (_context == NULL) return _digest;
 	HASHCONTEXT* pContext = (HASHCONTEXT*)_context;
 	size_t last, padn;
