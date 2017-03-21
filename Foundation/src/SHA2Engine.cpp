@@ -13,16 +13,14 @@
 // Based on the implementation of mbed TLS (Apache 2.0)
 // http://www.apache.org/licenses/LICENSE-2.0
 //
+// Copyright (c) 2017, Applied Informatics Software Engineering GmbH
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
 
 #include "Poco/SHA2Engine.h"
-#include <cstring>
-#include <cstdint>
-
-#ifdef POCO_ARCH_LITTLE_ENDIAN
-	#define SHA2_BYTE_REVERSE(x, y) byteReverse(x, y)
-#else
-	#define SHA2_BYTE_REVERSE(x, y)
-#endif
+#include <string.h>
 
 namespace Poco {
 
@@ -247,7 +245,7 @@ SHA2Engine::~SHA2Engine()
 void _sha256_process(HASHCONTEXT* pContext, const unsigned char data[64])
 {
 	unsigned int i;
-	uint32_t temp1, temp2, temp3[8], W[64];
+	Poco::UInt32 temp1, temp2, temp3[8], W[64];
 	for (i = 0; i < 8; i++) temp3[i] = pContext->state.state32[i];
 	for (i = 0; i < 16; i++) { GET_UINT32(W[i], data, 4 * i); }
 	for (i = 0; i < 16; i += 8)
@@ -278,7 +276,7 @@ void _sha256_process(HASHCONTEXT* pContext, const unsigned char data[64])
 void _sha512_process(HASHCONTEXT* pContext, const unsigned char data[128])
 {
 	int i;
-	uint64_t temp1, temp2, temp3[8], W[80];
+	Poco::UInt64 temp1, temp2, temp3[8], W[80];
 	for (i = 0; i < 16; i++) { GET_UINT64(W[i], data, i << 3); }
 	for (; i < 80; i++) { W[i] = S641(W[i - 2]) + W[i - 7] + S640(W[i - 15]) + W[i - 16]; }
 	for (i = 0; i < 8; i++) temp3[i] = pContext->state.state64[i];

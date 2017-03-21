@@ -7,6 +7,11 @@
 //
 // test vectors from FIPS 180-1
 //
+// Copyright (c) 2017, Applied Informatics Software Engineering GmbH
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
 
 #include "SHA2EngineTest.h"
 #include "Poco/CppUnit/TestCaller.h"

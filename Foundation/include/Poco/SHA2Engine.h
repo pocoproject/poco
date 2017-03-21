@@ -13,6 +13,11 @@
 // Based on the implementation of mbed TLS (Apache 2.0)
 // http://www.apache.org/licenses/LICENSE-2.0
 //
+// Copyright (c) 2017, Applied Informatics Software Engineering GmbH
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
 
 #ifndef Foundation_SHA2Engine_INCLUDED
 #define Foundation_SHA2Engine_INCLUDED

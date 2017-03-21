@@ -5,6 +5,11 @@
 //
 // Definition of the SHA2EngineTest class.
 //
+// Copyright (c) 2017, Applied Informatics Software Engineering GmbH
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
 
 #ifndef SHA2EngineTest_INCLUDED
 #define SHA2EngineTest_INCLUDED
