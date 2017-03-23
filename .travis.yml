@@ -154,8 +154,8 @@ matrix:
     - env:    TEST_NAME="Linux documentation & release"
       compiler: gcc
       script:
-        - export CC="gcc"
-        - export CXX="g++"
+        - export CC="gcc-4.8"
+        - export CXX="g++-4.8"
         - . env.sh && mkdoc all && mkrel all
 
     # static code analysis with cppcheck (we can add --enable=all later)
