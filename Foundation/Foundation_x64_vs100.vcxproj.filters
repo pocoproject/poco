@@ -477,6 +477,9 @@
     <ClCompile Include="src\SHA1Engine.cpp">
       <Filter>Crypt\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SHA2Engine.cpp">
+      <Filter>Crypt\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Manifest.cpp">
       <Filter>SharedLibrary\Source Files</Filter>
     </ClCompile>

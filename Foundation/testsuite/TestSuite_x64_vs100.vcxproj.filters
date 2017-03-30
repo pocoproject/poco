@@ -330,6 +330,9 @@
     <ClCompile Include="src\SHA1EngineTest.cpp">
       <Filter>Crypt\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SHA2EngineTest.cpp">
+      <Filter>Crypt\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\NotificationCenterTest.cpp">
       <Filter>Notifications\Source Files</Filter>
     </ClCompile>
@@ -750,6 +753,9 @@
       <Filter>Crypt\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\SHA1EngineTest.h">
+      <Filter>Crypt\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SHA2EngineTest.h">
       <Filter>Crypt\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\NotificationCenterTest.h">
