@@ -360,6 +360,8 @@
     <ClCompile Include="src\RandomTest.cpp"/>
     <ClCompile Include="src\SHA1EngineTest.cpp"/>
     <ClCompile Include="src\SHA2EngineTest.cpp"/>
+    <ClCompile Include="src\SHA3EngineTest.cpp"/>
+    <ClCompile Include="src\BLAKE2EngineTest.cpp"/>
     <ClCompile Include="src\NotificationCenterTest.cpp"/>
     <ClCompile Include="src\NotificationQueueTest.cpp"/>
     <ClCompile Include="src\NotificationsTestSuite.cpp"/>
@@ -503,6 +505,8 @@
     <ClInclude Include="src\RandomTest.h"/>
     <ClInclude Include="src\SHA1EngineTest.h"/>
     <ClInclude Include="src\SHA2EngineTest.h"/>
+    <ClInclude Include="src\SHA3EngineTest.h"/>
+    <ClInclude Include="src\BLAKE2EngineTest.h"/>
     <ClInclude Include="src\NotificationCenterTest.h"/>
     <ClInclude Include="src\NotificationQueueTest.h"/>
     <ClInclude Include="src\NotificationsTestSuite.h"/>
