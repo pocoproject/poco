@@ -164,6 +164,7 @@ public:
 	void setBlocking(bool flag);
 		/// Sets the socket in blocking mode if flag is true,
 		/// disables blocking mode if flag is false.
+	bool poll(const Poco::Timespan& timeout, int mode);
 
 	bool getBlocking() const;
 		/// Returns the blocking mode of the socket.
@@ -176,6 +177,8 @@ public:
 		///
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
+	
+	int peekBytes(void* buffer, int length, int flags);
 
 	int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it

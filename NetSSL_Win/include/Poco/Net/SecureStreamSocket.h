@@ -158,6 +158,8 @@ public:
 	const std::string& getPeerHostName() const;
 		/// Returns the peer's host name used for certificate validation.
 
+	bool poll(const Poco::Timespan& timeout, int mode) const;
+
 	static SecureStreamSocket attach(const StreamSocket& streamSocket);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.

@@ -198,6 +198,8 @@ public:
 		/// The flags parameter can be used to pass system-defined flags
 		/// for send() like MSG_OOB.
 
+	int peekBytes(void* buffer, int length, int flags = 0) const;
+
 	int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.

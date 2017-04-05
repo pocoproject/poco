@@ -18,6 +18,7 @@
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Exception.h"
 
+#include "poco_debug.h"
 
 using Poco::InvalidArgumentException;
 
@@ -144,6 +145,12 @@ void SecureStreamSocket::setPeerHostName(const std::string& hostName)
 const std::string& SecureStreamSocket::getPeerHostName() const
 {
 	return static_cast<SecureStreamSocketImpl*>(impl())->getPeerHostName();
+}
+
+
+bool SecureStreamSocket::poll(const Poco::Timespan& timeout, int mode) const;
+{
+	return static_cast<SecureStreamSocketImpl*>(impl())->poll(timeout, mode);
 }
 
 

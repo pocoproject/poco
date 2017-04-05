@@ -404,5 +404,9 @@ void Socket::error()
 	SocketImpl::error();
 }
 
+bool Socket::poll(const Poco::Timespan& timeout, int mode) const
+{
+    return _pImpl->poll(timeout, mode);
+}
 
 } } // namespace Poco::Net

@@ -164,8 +164,8 @@ public:
 		/// This function is deprecated and may be removed in the future releases,
 		/// please use PollSet class instead.
 
-	bool poll(const Poco::Timespan& timeout, int mode) const;
-		/// Determines the status of the socket, using a
+	virtual bool poll(const Poco::Timespan& timeout, int mode) const;
+		/// Determines the status of the socket, using a 
 		/// call to poll() or select().
 		///
 		/// The mode argument is constructed by combining the values
@@ -492,14 +492,6 @@ inline bool Socket::isNull() const
 inline void Socket::close()
 {
 	if (_pImpl) _pImpl->close();
-}
-
-
-inline bool Socket::poll(const Poco::Timespan& timeout, int mode) const
-{
-	POCO_CHECK_NEW_STATE_ON_MOVE;
-
-	return _pImpl->poll(timeout, mode);
 }
 
 
