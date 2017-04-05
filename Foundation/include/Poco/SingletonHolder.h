@@ -54,8 +54,11 @@ public:
 		/// hold by the SingletonHolder. The first call
 		/// to get will create the singleton.
 	{
-		FastMutex::ScopedLock lock(_m);
-		if (!_pS) _pS = new S;
+		if (!_ps)
+		{
+			FastMutex::ScopedLock lock(_m);
+			if (!_pS) _pS = new S;
+		}
 		return _pS;
 	}
 	
