@@ -13,6 +13,7 @@
 
 
 #include "Poco/Net/SecureSocketImpl.h"
+#include "Poco/Net/SocketImpl.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/X509Certificate.h"
@@ -248,6 +249,11 @@ void SecureSocketImpl::close()
 }
 
 
+bool SecureSocketImpl::poll(const Poco::Timespan& timeout, int mode)
+{
+	return _pSocket->poll(timeout, mode);
+}
+
 int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	poco_assert (_pSocket->initialized());
@@ -278,6 +284,12 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 }
 
 
+int SecureSocketImpl::peekBytes(void* buffer, int length, int flags)
+{
+	return receiveBytes(buffer, length, flags | MSG_PEEK);
+}
+
+
 int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 {
 	poco_assert (_pSocket->initialized());
@@ -294,7 +306,12 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	}
 	do
 	{
-		rc = SSL_read(_pSSL, buffer, length);
+		if (flags & MSG_PEEK) {
+			rc = SSL_peek(_pSSL, buffer, length);
+		}
+		else {
+			rc = SSL_read(_pSSL, buffer, length);
+		}
 	}
 	while (mustRetry(rc));
 	if (rc <= 0)
