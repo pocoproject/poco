@@ -92,6 +92,8 @@ SOURCES="
 	Runnable.cpp
 	SHA1Engine.cpp
 	SHA2Engine.cpp
+	SHA3Engine.cpp
+	BLAKE2Engine.cpp
 	Semaphore.cpp
 	SharedLibrary.cpp
 	SimpleFileChannel.cpp

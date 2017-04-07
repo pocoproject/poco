@@ -1765,6 +1765,10 @@
 					RelativePath=".\src\SHA1Engine.cpp"/>
 				<File
 					RelativePath=".\src\SHA2Engine.cpp"/>
+				<File
+					RelativePath=".\src\SHA3Engine.cpp"/>
+				<File
+					RelativePath=".\src\BLAKE2Engine.cpp"/>
 			</Filter>
 			<Filter
 				Name="Header Files">
@@ -1788,6 +1792,10 @@
 					RelativePath=".\include\Poco\SHA1Engine.h"/>
 				<File
 					RelativePath=".\include\Poco\SHA2Engine.h"/>
+				<File
+					RelativePath=".\include\Poco\SHA3Engine.h"/>
+				<File
+					RelativePath=".\include\Poco\BLAKE2Engine.h"/>
 			</Filter>
 		</Filter>
 		<Filter
