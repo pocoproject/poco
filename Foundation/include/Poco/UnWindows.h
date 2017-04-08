@@ -88,7 +88,9 @@
 
 
 #include <windows.h>
-
+#include <Winsock2.h>
+#include <Iphlpapi.h>
+#include <ws2tcpip.h>
 
 #if !defined(POCO_NO_UNWINDOWS)
 // A list of annoying macros to #undef.
