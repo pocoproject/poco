@@ -27,7 +27,6 @@ LogFileImpl::LogFileImpl(const std::string& path):
 	_str(_path, std::ios::app),
 	_size((UInt64) _str.tellp())
 {
-	if(!_str.good()) throw OpenFileException(_path);
 	if (_size == 0)
 		_creationDate = File(path).getLastModified();
 	else
