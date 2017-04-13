@@ -166,7 +166,11 @@
 #elif defined(__PPC) || defined(__POWERPC__) || defined(__powerpc) || defined(__PPC__) || \
       defined(__powerpc__) || defined(__ppc__) || defined(__ppc) || defined(_ARCH_PPC) || defined(_M_PPC)
 	#define POCO_ARCH POCO_ARCH_PPC
-	#define POCO_ARCH_BIG_ENDIAN 1
+	#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+		#define POCO_ARCH_LITTLE_ENDIAN 1
+	#else
+		#define POCO_ARCH_BIG_ENDIAN 1
+	#endif
 #elif defined(_POWER) || defined(_ARCH_PWR) || defined(_ARCH_PWR2) || defined(_ARCH_PWR3) || \
       defined(_ARCH_PWR4) || defined(__THW_RS6000)
 	#define POCO_ARCH POCO_ARCH_POWER
