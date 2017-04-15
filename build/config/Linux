@@ -15,8 +15,8 @@ LINKMODE ?= SHARED
 #
 # Define Tools
 #
-CC      = ${CROSS_COMPILE}gcc
-CXX     = ${CROSS_COMPILE}g++
+CC      ?= ${CROSS_COMPILE}gcc
+CXX     ?= ${CROSS_COMPILE}g++
 LINK    = $(CXX)
 LIB     = ${CROSS_COMPILE}ar -cr
 RANLIB  = ${CROSS_COMPILE}ranlib
