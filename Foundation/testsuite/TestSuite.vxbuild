@@ -84,6 +84,8 @@ SOURCES="
 	RegularExpressionTest.cpp
 	SHA1EngineTest.cpp
 	SHA2EngineTest.cpp
+	SHA3EngineTest.cpp
+	BLAKE2EngineTest.cpp
 	SemaphoreTest.cpp
 	SharedLibraryTest.cpp
 	SharedLibraryTestSuite.cpp
