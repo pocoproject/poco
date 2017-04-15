@@ -61,21 +61,21 @@ matrix:
         - export CC="clang"
         - export CXX="clang++"
         - clang++ -x c++ /dev/null -dM -E
-        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -j2 && sudo make install && ./travis/OSX/runtests.sh
+        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
     - env:    TEST_NAME="Linux gcc 4.6 (make) bundled"
       compiler: gcc
       script:
         - export CC="gcc"
         - export CXX="g++"
-        - ./configure --everything && make -j2 && ./travis/Linux/runtests.sh
+        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux gcc 4.8 (make) bundled"
       compiler: gcc
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - ./configure --everything && make -j2 && ./travis/Linux/runtests.sh
+        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux gcc 4.6 (make) unbundled"
       compiler: gcc
@@ -83,7 +83,7 @@ matrix:
         - export CC="gcc"
         - export CXX="g++"
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
-        - ./configure --everything --unbundled && make -j2 && ./travis/Linux/runtests.sh
+        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
 
     - env:    TEST_NAME="Linux gcc 4.8 (make) unbundled"
       compiler: gcc
@@ -91,17 +91,17 @@ matrix:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - ./configure --everything --unbundled && make -j2 && ./travis/Linux/runtests.sh
+        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux clang 3.4 (make)"
       compiler: clang
       script:
-        - ./configure --everything --config=Linux-clang && make -j2 && ./travis/Linux/runtests.sh
+        - ./configure --everything --config=Linux-clang && make -s -j2 && ./travis/Linux/runtests.sh
 
     - env:    TEST_NAME="Linux arm-linux-gnueabi- (make)"
       compiler: gcc
       script:
-        - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
+        - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
     - env:    TEST_NAME="Linux gcc 4.6 (CMake)"
       compiler: gcc
@@ -110,7 +110,7 @@ matrix:
         - export CXX="g++"
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && ctest -VV -E Data && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
  
     - env:    TEST_NAME="Linux gcc 4.8 (CMake)"
       compiler: gcc
@@ -119,14 +119,14 @@ matrix:
         - export CXX="g++-4.8"
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && ctest -VV -E Data && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
     - env:    TEST_NAME="Linux clang 3.4 (CMake)"
       compiler: clang
       script:
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && ctest -VV -E Data && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabi-g++ (CMake)"
       compiler: gcc
@@ -136,7 +136,7 @@ matrix:
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build 
-        - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="Linux arm-linux-gnueabihf-g++ (CMake)"
       compiler: gcc
@@ -146,7 +146,7 @@ matrix:
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build
-        - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
 
     # QA jobs for code analytics and metrics
