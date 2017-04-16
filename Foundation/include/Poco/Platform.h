@@ -229,6 +229,7 @@
 	#define POCO_COMPILER_CLANG
 #elif defined (__GNUC__)
 	#define POCO_COMPILER_GCC
+	#include "Poco/Compiler_GCC.h"
 #elif defined (__MINGW32__) || defined (__MINGW64__)
 	#define POCO_COMPILER_MINGW
 #elif defined (__INTEL_COMPILER) || defined(__ICC) || defined(__ECC) || defined(__ICL)
