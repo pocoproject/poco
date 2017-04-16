@@ -60,6 +60,7 @@ matrix:
       script:
         - export CC="clang"
         - export CXX="clang++"
+        - $CXX --version
         - clang++ -x c++ /dev/null -dM -E
         - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
@@ -68,6 +69,7 @@ matrix:
       script:
         - export CC="gcc"
         - export CXX="g++"
+        - $CXX --version
         - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux gcc 4.8 (make) bundled"
@@ -75,6 +77,7 @@ matrix:
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
+        - $CXX --version
         - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux gcc 4.6 (make) unbundled"
@@ -82,6 +85,7 @@ matrix:
       script:
         - export CC="gcc"
         - export CXX="g++"
+        - $CXX --version
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
 
@@ -91,6 +95,7 @@ matrix:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
+        - $CXX --version
         - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux clang 3.4 (make)"
@@ -108,6 +113,7 @@ matrix:
       script:
         - export CC="gcc"
         - export CXX="g++"
+        - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
@@ -117,6 +123,7 @@ matrix:
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
+        - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
@@ -133,6 +140,7 @@ matrix:
       script:
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
+        - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build 
@@ -143,6 +151,7 @@ matrix:
       script:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
+        - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build
@@ -156,6 +165,7 @@ matrix:
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
+        - $CXX --version
         - . env.sh && mkdoc all && mkrel all
 
     # static code analysis with cppcheck (we can add --enable=all later)
