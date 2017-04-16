@@ -64,7 +64,7 @@ matrix:
         - clang++ -x c++ /dev/null -dM -E
         - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
-    - env:    TEST_NAME="Linux clang (make) unbundled"
+    - env:    TEST_NAME="Linux clang (make) bundled"
       compiler: clang
       script:
         - sudo apt-get install -qq -y clang
@@ -72,7 +72,7 @@ matrix:
         - export CXX="clang++"
         - $CXX --version
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
-        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+        - ./configure --everything  && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux clang (make) unbundled"
       compiler: clang
@@ -81,21 +81,13 @@ matrix:
         - export CC="clang"
         - export CXX="clang++"
         - $CXX --version
-        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
+        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="Linux gcc 4.6 (make) bundled"
       compiler: gcc
       script:
         - export CC="gcc"
         - export CXX="g++"
-        - $CXX --version
-        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="Linux gcc 4.8 (make) bundled"
-      compiler: gcc
-      script:
-        - export CC="gcc-4.8"
-        - export CXX="g++-4.8"
         - $CXX --version
         - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
     
@@ -108,6 +100,14 @@ matrix:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
 
+    - env:    TEST_NAME="Linux gcc 4.8 (make) bundled"
+      compiler: gcc
+      script:
+        - export CC="gcc-4.8"
+        - export CXX="g++-4.8"
+        - $CXX --version
+        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
+    
     - env:    TEST_NAME="Linux gcc 4.8 (make) unbundled"
       compiler: gcc
       script:
