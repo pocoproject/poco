@@ -1,6 +1,13 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.7.8p1
+
+!!Summary of Changes
+
+  - fixed GH #1655: CipherImpl memory leak with OpenSSL 1.1
+
+
 !!!Release 1.7.8
 
 !!Summary of Changes
