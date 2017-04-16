@@ -162,7 +162,16 @@
 	#endif
 #elif defined(__hppa) || defined(__hppa__)
 	#define POCO_ARCH POCO_ARCH_HPPA
-	#define POCO_ARCH_BIG_ENDIAN 1
+	#if defined(POCO_OS_FAMILY_WINDOWS)
+		// Is this OK? Supports windows only little endian??
+		#define POCO_ARCH_LITTLE_ENDIAN 1
+	#elif defined(__MIPSEB__) || defined(_MIPSEB) || defined(__MIPSEB)
+		#define POCO_ARCH_BIG_ENDIAN 1
+	#elif defined(__MIPSEL__) || defined(_MIPSEL) || defined(__MIPSEL)
+		#define POCO_ARCH_LITTLE_ENDIAN 1
+	#else
+		#error "MIPS but neither MIPSEL nor MIPSEB?"
+	#endif
 #elif defined(__PPC) || defined(__POWERPC__) || defined(__powerpc) || defined(__PPC__) || \
       defined(__powerpc__) || defined(__ppc__) || defined(__ppc) || defined(_ARCH_PPC) || defined(_M_PPC)
 	#define POCO_ARCH POCO_ARCH_PPC
