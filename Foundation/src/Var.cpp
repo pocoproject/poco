@@ -60,6 +60,23 @@ Var::Var(const Var& other)
 #endif
 
 
+#if __cplusplus >= 201103L
+Var::Var(Var&& val) noexcept
+	: _pHolder(std::move(val._pHolder))
+{
+	val._pHolder = nullptr;
+}
+
+
+Var& Var::operator = (Var&& other) noexcept
+{
+	_pHolder = std::move(other._pHolder);
+	other._pHolder = nullptr;
+	return *this;
+}
+#endif
+
+
 Var::~Var()
 {
 	destruct();
