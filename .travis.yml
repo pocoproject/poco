@@ -28,6 +28,9 @@ services:
   - postgresql
   - mysql
 
+dist: trusty
+sudo: required
+  
 addons:
   postgresql: "9.3"
 
@@ -74,14 +77,14 @@ matrix:
         - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
         - ./configure --everything  && make -s -j2 && ./travis/Linux/runtests.sh
     
-    #- env:    TEST_NAME="clang (make) unbundled"
-    #  compiler: clang
-    #  script:
-    #    - sudo apt-get install -qq -y clang
-    #    - export CC="clang"
-    #    - export CXX="clang++"
-    #    - $CXX --version
-    #    - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+    - env:    TEST_NAME="clang (make) unbundled"
+      compiler: clang
+      script:
+        - sudo apt-get install -qq -y clang
+        - export CC="clang"
+        - export CXX="clang++"
+        - $CXX --version
+        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="gcc 4.6 (make) bundled"
       compiler: gcc
@@ -91,14 +94,14 @@ matrix:
         - $CXX --version
         - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
     
-    #- env:    TEST_NAME="gcc 4.6 (make) unbundled"
-    #  compiler: gcc
-    #  script:
-    #    - export CC="gcc"
-    #    - export CXX="g++"
-    #    - $CXX --version
-    #    - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
-    #    - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+    - env:    TEST_NAME="gcc 4.6 (make) unbundled"
+      compiler: gcc
+      script:
+        - export CC="gcc"
+        - export CXX="g++"
+        - $CXX --version
+        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
+        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
 
     - env:    TEST_NAME="gcc 4.8 (make) bundled"
       compiler: gcc
@@ -108,14 +111,14 @@ matrix:
         - $CXX --version
         - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
     
-    #- env:    TEST_NAME="gcc 4.8 (make) unbundled"
-    #  compiler: gcc
-    #  script:
-    #    - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
-    #    - export CC="gcc-4.8"
-    #    - export CXX="g++-4.8"
-    #    - $CXX --version
-    #    - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+    - env:    TEST_NAME="gcc 4.8 (make) unbundled"
+      compiler: gcc
+      script:
+        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
+        - export CC="gcc-4.8"
+        - export CXX="g++-4.8"
+        - $CXX --version
+        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="arm-linux-gnueabi- (make)"
       compiler: gcc
