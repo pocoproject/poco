@@ -137,7 +137,7 @@ public:
 	void setRow(Poco::Int64 row);
 		/// Sets the row number.
 
-	std::string getTable() const;
+	const std::string& getTable() const;
 		/// Returns the table name.
 
 	const Poco::Dynamic::Var& getValue() const;
@@ -183,7 +183,7 @@ inline Poco::Int64 Notifier::getRow() const
 }
 
 
-inline std::string Notifier::getTable() const
+inline const std::string& Notifier::getTable() const
 {
 	return _table;
 }
