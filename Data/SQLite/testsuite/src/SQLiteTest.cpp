@@ -2886,7 +2886,7 @@ void SQLiteTest::testNotifier()
 	assert (_updateCounter == 3);
 	assert (notifier.getRow() == 3);
 
-    assert (notifier.getTable() == "Person");
+	assert (notifier.getTable() == "Person");
 
 	notifier.setRow(0);
 	// SQLite optimizes DELETE so here we must have

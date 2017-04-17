@@ -158,7 +158,7 @@ private:
 	const Session&     _session;
 	Poco::Dynamic::Var _value;
 	Poco::Int64        _row;
-    std::string        _table;
+	std::string        _table;
 	EnabledEventType   _enabledEvents;
 	Poco::Mutex        _mutex;
 };
@@ -184,7 +184,7 @@ inline Poco::Int64 Notifier::getRow() const
 
 inline std::string Notifier::getTable() const
 {
-    return _table;
+	return _table;
 }
 
 
