@@ -634,6 +634,21 @@ void MailMessageTest::testEncodeWord()
 	                   " =?ISO-8859-1?q?d=2E?=");
 }
 
+void MailMessageTest::testDecodeWord()
+{
+	std::string coded("this is pure ASCII");
+	std::string decoded = MailMessage::decodeWord(coded, "ISO-8859-1");
+	assert(decoded == coded);
+
+	coded = "(=?ISO-8859-1?Q?a?= =?ISO-8859-1?Q?b?=)";
+	decoded = MailMessage::decodeWord(coded, "ISO-8859-1");	
+	assert(decoded == "(a b)");	
+
+	coded = "Hello =?UTF-8?B?RnJhbmNpcw==?=, good bye";
+	decoded = MailMessage::decodeWord(coded, "ISO-8859-1");
+	assert(decoded == "Hello Francis, good bye");
+}
+
 
 void MailMessageTest::setUp()
 {
@@ -662,6 +677,7 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPartStore);
 	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWord);
+	CppUnit_addTest(pSuite, MailMessageTest, testDecodeWord);
 
 	return pSuite;
 }
