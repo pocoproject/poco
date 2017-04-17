@@ -27,7 +27,6 @@ namespace SQLite {
 Notifier::Notifier(const Session& session, EnabledEventType enabled):
 	_session(session),
 	_row(),
-	_table(),
 	_enabledEvents()
 {
 	if (enabled & SQLITE_NOTIFY_UPDATE)   enableUpdate();

@@ -172,6 +172,7 @@ inline bool Notifier::operator == (const Notifier& other) const
 {
 	return _value == other._value &&
 		_row == other._row &&
+		_table == other._table &&
 		Utility::dbHandle(_session) == Utility::dbHandle(other._session);
 }
 
