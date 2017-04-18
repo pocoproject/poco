@@ -119,7 +119,7 @@ namespace
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		EVP_CIPHER_CTX_cleanup(_pContext);
-		EVP_CIPHER_free(_pContext);
+		EVP_CIPHER_CTX_free(_pContext);
 #else
 		EVP_CIPHER_CTX_cleanup(&_context);
 #endif
