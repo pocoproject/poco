@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.7.8p1 (2017-04-16)
+Release 1.7.8p2 (2017-04-18)
 ============================
 
 - fixed GH #1655: CipherImpl memory leak with OpenSSL 1.1
