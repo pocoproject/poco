@@ -79,16 +79,25 @@ void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority
 	_nextInvocation = nextInvocation;
 	_pCallback = method.clone();
 	_wakeUp.reset();
-	try
-	{
-		threadPool.startWithPriority(priority, *this);
-	}
-	catch (...)
-	{
-		delete _pCallback;
-		_pCallback = 0;
-		throw;
-	}
+    do
+    {
+    	try
+    	{
+    		threadPool.startWithPriority(priority, *this);
+    	}
+        catch(NoThreadAvailableException&)
+        {
+            threadPool.addCapacity(16);
+            continue;
+        }
+    	catch (...)
+    	{
+    		delete _pCallback;
+    		_pCallback = 0;
+    		throw;
+    	}
+        break;
+    }while(1);
 }
 
 
