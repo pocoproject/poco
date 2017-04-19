@@ -121,6 +121,19 @@ void HTTPClientSession::setPort(Poco::UInt16 port)
 		throw IllegalStateException("Cannot set the port number for an already connected session");
 }
 
+void HTTPClientSession::setRemoteIp(const std::string& remoteIp) 
+{
+    if (!connected())
+    {
+        IPAddress ip;
+        if (!Net::IPAddress::tryParse(remoteIp, ip)) {
+        	throw InvalidAddressException(remoteIp);
+    	}
+        _remoteIp = remoteIp;
+    }
+    else
+        throw IllegalStateException("Cannot set the remote ip for an already connected session");
+}
 
 void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port)
 {
@@ -338,7 +351,13 @@ void HTTPClientSession::reconnect()
 {
 	if (_proxyConfig.host.empty() || bypassProxy())
 	{
-		SocketAddress addr(_host, _port);
+	
+		std::string remoteIp = _remoteIp;
+		if (remoteIp.empty()) {
+			remoteIp = _host;
+		}
+
+		SocketAddress addr(remoteIp, _port);
 		connect(addr);
 	}
 	else
@@ -391,8 +410,14 @@ StreamSocket HTTPClientSession::proxyConnect()
 	ProxyConfig emptyProxyConfig;
 	HTTPClientSession proxySession(getProxyHost(), getProxyPort(), emptyProxyConfig);
 	proxySession.setTimeout(getTimeout());
-	std::string targetAddress(_host);
-	targetAddress.append(":");
+
+	std::string remoteIp = _remoteIp;
+	if (remoteIp.empty()) {
+		remoteIp = _host;
+	}
+
+	std::string targetAddress(remoteIp);
+    	targetAddress.append(":");
 	NumberFormatter::append(targetAddress, _port);
 	HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress, HTTPMessage::HTTP_1_1);
 	HTTPResponse proxyResponse;

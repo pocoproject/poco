@@ -125,6 +125,15 @@ public:
 	Poco::UInt16 getPort() const;
 		/// Returns the port number of the target HTTP server.
 
+	void setRemoteIp(const std::string& remoteIp);
+		/// Sets the remote ip of the target HTTP server.
+		///
+		/// The ip must not be changed once there is an
+		/// open connection to the server.
+
+	const std::string& getRemoteIp() const;
+		/// Returns the remote ip of the target HTTP server.
+
 	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
 		/// Sets the proxy host name and port number.
 		
@@ -283,6 +292,7 @@ protected:
 		/// to the HTTPClientSession.
 
 private:
+	std::string     _remoteIp;
 	std::string     _host;
 	Poco::UInt16    _port;
 	ProxyConfig     _proxyConfig;
@@ -311,6 +321,10 @@ inline const std::string& HTTPClientSession::getHost() const
 	return _host;
 }
 
+inline const std::string& HTTPClientSession::getRemoteIp() const 
+{
+    return _remoteIp;
+}
 
 inline Poco::UInt16 HTTPClientSession::getPort() const
 {
