@@ -137,6 +137,9 @@ public:
 	void setRow(Poco::Int64 row);
 		/// Sets the row number.
 
+	const std::string& getTable() const;
+		/// Returns the table name.
+
 	const Poco::Dynamic::Var& getValue() const;
 		/// Returns the value.
 
@@ -155,6 +158,7 @@ private:
 	const Session&     _session;
 	Poco::Dynamic::Var _value;
 	Poco::Int64        _row;
+	std::string        _table;
 	EnabledEventType   _enabledEvents;
 	Poco::Mutex        _mutex;
 };
@@ -168,6 +172,7 @@ inline bool Notifier::operator == (const Notifier& other) const
 {
 	return _value == other._value &&
 		_row == other._row &&
+		_table == other._table &&
 		Utility::dbHandle(_session) == Utility::dbHandle(other._session);
 }
 
@@ -175,6 +180,12 @@ inline bool Notifier::operator == (const Notifier& other) const
 inline Poco::Int64 Notifier::getRow() const
 {
 	return _row;
+}
+
+
+inline const std::string& Notifier::getTable() const
+{
+	return _table;
 }
 
 

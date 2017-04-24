@@ -163,16 +163,19 @@ void Notifier::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, c
 	if (opCode == Utility::OPERATION_INSERT)
 	{
 		pV->_row = row;
+		pV->_table = pTable;
 		pV->insert.notify(pV);
 	}
 	else if (opCode == Utility::OPERATION_UPDATE)
 	{
 		pV->_row = row;
+		pV->_table = pTable;
 		pV->update.notify(pV);
 	}
 	else if (opCode == Utility::OPERATION_DELETE)
 	{
 		pV->_row = row;
+		pV->_table = pTable;
 		pV->erase.notify(pV);
 	}
 }
