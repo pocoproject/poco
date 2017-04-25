@@ -67,6 +67,7 @@ public:
 	void testJSONDeserializePrimitives();
 	void testJSONDeserializeArray();
 	void testJSONDeserializeStruct();
+	void testJSONRoundtripStruct(); 
 	void testJSONDeserializeComplex();
 	void testDate();
 	void testEmpty();
