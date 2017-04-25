@@ -98,10 +98,10 @@ release_static_md/
 debug_static_md/
 release_static_mt/
 debug_static_mt/
-bin/*
-bin64/*
-lib/*
-lib64/*
+bin/
+bin64/
+lib/
+lib64/
 pocomsg.h
 */testsuite/bin/*
 Util/testsuite/TestConfiguration/

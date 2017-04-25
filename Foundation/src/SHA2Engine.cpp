@@ -229,8 +229,8 @@ do {                                              \
 #endif
 
 SHA2Engine::SHA2Engine(ALGORITHM algorithm)
-	: _algorithm(algorithm)
-	, _context(NULL)
+	: _context(NULL),
+	_algorithm(algorithm)
 {
 	_digest.reserve(digestLength());
 	reset();

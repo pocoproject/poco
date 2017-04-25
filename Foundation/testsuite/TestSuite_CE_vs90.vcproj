@@ -670,6 +670,10 @@
 					RelativePath=".\src\SHA1EngineTest.cpp"/>
 				<File
 					RelativePath=".\src\SHA2EngineTest.cpp"/>
+				<File
+					RelativePath=".\src\SHA3EngineTest.cpp"/>
+				<File
+					RelativePath=".\src\BLAKE2EngineTest.cpp"/>
 			</Filter>
 			<Filter
 				Name="Header Files">
@@ -693,6 +697,10 @@
 					RelativePath=".\src\SHA1EngineTest.h"/>
 				<File
 					RelativePath=".\src\SHA2EngineTest.h"/>
+				<File
+					RelativePath=".\src\SHA3EngineTest.h"/>
+				<File
+					RelativePath=".\src\BLAKE2EngineTest.h"/>
 			</Filter>
 		</Filter>
 		<Filter

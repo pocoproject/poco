@@ -397,6 +397,8 @@
     <ClCompile Include="src\SemaphoreTest.cpp"/>
     <ClCompile Include="src\SHA1EngineTest.cpp"/>
     <ClCompile Include="src\SHA2EngineTest.cpp"/>
+    <ClCompile Include="src\SHA3EngineTest.cpp"/>
+    <ClCompile Include="src\BLAKE2EngineTest.cpp"/>
     <ClCompile Include="src\SharedLibraryTest.cpp"/>
     <ClCompile Include="src\SharedLibraryTestSuite.cpp"/>
     <ClCompile Include="src\SharedMemoryTest.cpp"/>
@@ -539,6 +541,8 @@
     <ClInclude Include="src\SemaphoreTest.h"/>
     <ClInclude Include="src\SHA1EngineTest.h"/>
     <ClInclude Include="src\SHA2EngineTest.h"/>
+    <ClInclude Include="src\SHA3EngineTest.h"/>
+    <ClInclude Include="src\BLAKE2EngineTest.h"/>
     <ClInclude Include="src\SharedLibraryTest.h"/>
     <ClInclude Include="src\SharedLibraryTestSuite.h"/>
     <ClInclude Include="src\SharedMemoryTest.h"/>
