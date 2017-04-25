@@ -20,7 +20,6 @@
 #include "Poco/Dynamic/Pair.h"
 #include <map>
 #include <utility>
-#include <iostream>
 
 
 
