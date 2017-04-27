@@ -417,9 +417,10 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 				int separators = 0;
 				int separator = 0;
 				int index = 0;
-
-				for (auto ch : str)
+				size_t size = str.size();
+				for (size_t i = 0; i < size ; ++i)
 				{
+					int ch = str[i];
 					if ((ch == '-' || ch == '+') && index == 0)
 					{
 						if (ch == '-')
