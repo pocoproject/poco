@@ -23,7 +23,6 @@
 #include "Poco/Zip/Zip.h"
 #include "Poco/BufferedStreamBuf.h"
 #include <istream>
-#include <ostream>
 
 
 namespace Poco {
@@ -31,24 +30,18 @@ namespace Zip {
 
 
 class Zip_API AutoDetectStreamBuf: public Poco::BufferedStreamBuf
-	/// A AutoDetectStreamBuf is a class that limits one view on an inputstream to a selected view range
+	/// AutoDetectStreamBuf automatically detects the end of a stream using the 
+	/// Data Descriptor signature.
 {
 public:
-	AutoDetectStreamBuf(std::istream& in, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start);
+	AutoDetectStreamBuf(std::istream& in, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start, bool needsZip64);
 		/// Creates the AutoDetectStream. 
-		
-
-	AutoDetectStreamBuf(std::ostream& out);
-		/// Creates the AutoDetectStream. 
-		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
-		/// to position start
 
 	~AutoDetectStreamBuf();
 		/// Destroys the AutoDetectStream.
 
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
-
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
@@ -57,14 +50,15 @@ private:
 		STREAM_BUFFER_SIZE  = 1024
 	};
 
-	std::istream*  _pIstr;
-	std::ostream*  _pOstr;
-	bool           _eofDetected;
-	int            _matchCnt;
-	std::string    _prefix;
-	std::string    _postfix;
-	bool           _reposition;
-	Poco::UInt32   _start;
+	std::istream*   _pIstr;
+	bool            _eofDetected;
+	int             _matchCnt;
+	std::string     _prefix;
+	std::string     _postfix;
+	bool            _reposition;
+	Poco::UInt32    _start;
+	bool            _needsZip64;
+	Poco::UInt64    _length;
 };
 
 
@@ -75,13 +69,9 @@ class Zip_API AutoDetectIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	AutoDetectIOS(std::istream& istr, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start);
+	AutoDetectIOS(std::istream& istr, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start, bool needsZip64);
 		/// Creates the basic stream and connects it
 		/// to the given input stream.
-
-	AutoDetectIOS(std::ostream& ostr);
-		/// Creates the basic stream and connects it
-		/// to the given output stream.
 
 	~AutoDetectIOS();
 		/// Destroys the stream.
@@ -95,34 +85,15 @@ protected:
 
 
 class Zip_API AutoDetectInputStream: public AutoDetectIOS, public std::istream
-	/// This stream copies all characters read through it
-	/// to one or multiple output streams.
+	/// AutoDetectInputStream automatically detects the end of a stream using the 
+	/// Data Descriptor signature.
 {
 public:
-	AutoDetectInputStream(std::istream& istr, const std::string& prefix = std::string(), const std::string& postfix = std::string(), bool reposition = false, Poco::UInt32 start = 0);
-		/// Creates the AutoDetectInputStream and connects it
-		/// to the given input stream. Bytes read are guaranteed to be in the range [start, end-1]
-		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
-		/// to position start
+	AutoDetectInputStream(std::istream& istr, const std::string& prefix = std::string(), const std::string& postfix = std::string(), bool reposition = false, Poco::UInt32 start = 0, bool needsZip64 = false);
+		/// Creates the AutoDetectInputStream and connects it to the underlying stream.
 
 	~AutoDetectInputStream();
 		/// Destroys the AutoDetectInputStream.
-};
-
-
-class Zip_API AutoDetectOutputStream: public AutoDetectIOS, public std::ostream
-	/// This stream copies all characters written to it
-	/// to one or multiple output streams.
-{
-public:
-	AutoDetectOutputStream(std::ostream& ostr);
-		/// Creates the AutoDetectOutputStream and connects it
-		/// to the given input stream. Bytes written are guaranteed to be in the range [start, end-1]
-		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
-		/// to position start
-
-	~AutoDetectOutputStream();
-		/// Destroys the AutoDetectOutputStream.
 };
 
 

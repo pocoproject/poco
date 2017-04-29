@@ -29,9 +29,6 @@
 #include "Poco/Event.h"
 #include "Poco/Exception.h"
 #include "Poco/Buffer.h"
-#if defined(POCO_WIN32_UTF8)
-	#include "Poco/UnicodeConverter.h"
-#endif
 #if POCO_OS == POCO_OS_LINUX
 	#include <sys/inotify.h>
 	#include <sys/select.h>
@@ -108,7 +105,18 @@ protected:
 		DirectoryIterator end;
 		while (it != end)
 		{
-			entries[it.path().getFileName()] = ItemInfo(*it);
+			// DirectoryWatcher should not stop watching if it fails to get the info
+			// of a file, it should just ignore it.
+			try
+			{
+				entries[it.path().getFileName()] = ItemInfo(*it);
+			}
+			catch (Poco::FileNotFoundException&)
+			{
+				// The file is missing, remove it from the entries so it is treated as
+				// deleted.
+				entries.erase(it.path().getFileName());
+			}
 			++it;
 		}
 	}
@@ -189,7 +197,7 @@ public:
 		std::string path(owner().directory().path());
 #if defined(POCO_WIN32_UTF8)
 		std::wstring upath;
-		Poco::UnicodeConverter::toUTF16(path.c_str(), upath);
+		FileImpl::convertPath(path.c_str(), upath);
 		HANDLE hChange = FindFirstChangeNotificationW(upath.c_str(), FALSE, filter);
 #else
 		HANDLE hChange = FindFirstChangeNotificationA(path.c_str(), FALSE, filter);

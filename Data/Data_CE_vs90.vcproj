@@ -45,7 +45,7 @@
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
 				InterworkCalls="false"
-				AdditionalOptions=""/>
+				AdditionalOptions="/bigobj"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -125,7 +125,7 @@
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
 				InterworkCalls="false"
-				AdditionalOptions=""/>
+				AdditionalOptions="/bigobj"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -205,7 +205,7 @@
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
 				InterworkCalls="false"
-				AdditionalOptions=""/>
+				AdditionalOptions="/bigobj"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -271,7 +271,7 @@
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
 				InterworkCalls="false"
-				AdditionalOptions=""/>
+				AdditionalOptions="/bigobj"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -336,7 +336,7 @@
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
 				InterworkCalls="false"
-				AdditionalOptions=""/>
+				AdditionalOptions="/bigobj"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool
@@ -402,7 +402,7 @@
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
 				InterworkCalls="false"
-				AdditionalOptions=""/>
+				AdditionalOptions="/bigobj"/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"/>
 			<Tool

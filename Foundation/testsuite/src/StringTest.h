@@ -44,6 +44,8 @@ public:
 	void testReplace();
 	void testReplaceInPlace();
 	void testCat();
+	void testStartsWith();
+	void testEndsWith();
 
 	void testStringToInt();
 	void testStringToFloat();

@@ -7,8 +7,6 @@
 // Package: MongoDB
 // Module:  Connection
 //
-// Implementation of the Connection class.
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -18,33 +16,47 @@
 
 #include "Poco/Net/SocketStream.h"
 #include "Poco/MongoDB/Connection.h"
-#include <iostream>
 
 
 namespace Poco {
 namespace MongoDB {
 
 
-Connection::Connection() : _address(), _socket()
+Connection::Connection():
+	_address(),
+	_socket()
 {
 }
 
 
-Connection::Connection(const std::string& hostAndPort) : _address(hostAndPort), _socket()
+Connection::Connection(const std::string& hostAndPort):
+	_address(hostAndPort),
+	_socket()
 {
 	connect();
 }
 
 
-Connection::Connection(const std::string& host, int port) : _address(host, port), _socket()
+Connection::Connection(const std::string& host, int port):
+	_address(host, port),
+	_socket()
 {
 	connect();
 }
 
 
-Connection::Connection(const Net::SocketAddress& addrs) : _address(addrs), _socket()
+Connection::Connection(const Poco::Net::SocketAddress& addrs):
+	_address(addrs),
+	_socket()
 {
 	connect();
+}
+
+
+Connection::Connection(const Poco::Net::StreamSocket& socket):
+	_address(socket.peerAddress()),
+	_socket(socket)
+{
 }
 
 
@@ -52,7 +64,7 @@ Connection::~Connection()
 {
 	try
 	{
-		_socket.close();
+		disconnect();
 	}
 	catch (...)
 	{
@@ -68,22 +80,29 @@ void Connection::connect()
 
 void Connection::connect(const std::string& hostAndPort)
 {
-	_address = Net::SocketAddress(hostAndPort);
+	_address = Poco::Net::SocketAddress(hostAndPort);
 	connect();
 }
 
 
 void Connection::connect(const std::string& host, int port)
 {
-	_address = Net::SocketAddress(host, port);
+	_address = Poco::Net::SocketAddress(host, port);
 	connect();
 }
 
 
-void Connection::connect(const Net::SocketAddress& addrs)
+void Connection::connect(const Poco::Net::SocketAddress& addrs)
 {
 	_address = addrs;
 	connect();
+}
+
+
+void Connection::connect(const Poco::Net::StreamSocket& socket)
+{
+	_address = socket.peerAddress();
+	_socket = socket;
 }
 
 
@@ -95,7 +114,7 @@ void Connection::disconnect()
 
 void Connection::sendRequest(RequestMessage& request)
 {
-	Net::SocketOutputStream sos(_socket);
+	Poco::Net::SocketOutputStream sos(_socket);
 	request.send(sos);
 }
 
@@ -104,8 +123,9 @@ void Connection::sendRequest(RequestMessage& request, ResponseMessage& response)
 {
 	sendRequest(request);
 
-	Net::SocketInputStream sis(_socket);
+	Poco::Net::SocketInputStream sis(_socket);
 	response.read(sis);
 }
+
 
 } } // Poco::MongoDB

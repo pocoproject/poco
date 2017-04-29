@@ -215,7 +215,12 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		std::string name = pNext->tokenString();
 		pNext = next();
 		expectOperator(pNext, OperatorToken::OP_OPENBRACE, "{");
-		NameSpace* pNS = dynamic_cast<NameSpace*>(currentNameSpace()->lookup(name));
+		
+		std::string fullName = currentNameSpace()->fullName();
+		if (!fullName.empty()) fullName += "::";
+		fullName += name;
+		
+		NameSpace* pNS = dynamic_cast<NameSpace*>(currentNameSpace()->lookup(fullName));
 		bool undefined = (pNS == 0);
 		if (undefined) pNS = new NameSpace(name, currentNameSpace());
 		pushNameSpace(pNS, -1, undefined);

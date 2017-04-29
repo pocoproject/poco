@@ -52,8 +52,8 @@ HTTPClientSession::HTTPClientSession():
 }
 
 
-HTTPClientSession::HTTPClientSession(const StreamSocket& rSocket):
-	HTTPSession(rSocket),
+HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
+	HTTPSession(socket),
 	_port(HTTPSession::HTTP_PORT),
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
@@ -220,6 +220,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		}
 		_reconnect = keepAlive;
 		_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
+		const std::string& method = request.getMethod();
 		if (request.getChunkedTransferEncoding())
 		{
 			HTTPHeaderOutputStream hos(*this);
@@ -237,7 +238,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 #endif
 			request.write(*_pRequestStream);
 		}
-		else if ((request.getMethod() != HTTPRequest::HTTP_PUT && request.getMethod() != HTTPRequest::HTTP_POST) || request.has(HTTPRequest::UPGRADE))
+		else if ((method != HTTPRequest::HTTP_PUT && method != HTTPRequest::HTTP_POST && method != HTTPRequest::HTTP_PATCH) || request.has(HTTPRequest::UPGRADE))
 		{
 			Poco::CountingOutputStream cs;
 			request.write(cs);

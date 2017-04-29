@@ -13,8 +13,19 @@
 				expat*.h,
 				zconf.h,
 				zlib.h,
-				XMLStreamParser.h
-				${PocoBuild}/Util/include/Poco/Util/Units.h
+				XMLStreamParser.h,
+				Units.h,
+				CppUnitException.h,
+				RepeatedTest.h,
+				Test.h,
+				TestCase.h,
+				TestDecorator.h,
+				TestFailure.h,
+				TestResult.h,
+				TestRunner.h,
+				TestSetup.h,
+				TestSuite.h,
+				TextTestResult.h
 			</exclude>
 		</files>
 		<pages>
@@ -35,10 +46,12 @@
 				${Includes},
 				-I/usr/local/mysql/include,
 				-I/usr/include/mysql,
+				-I/usr/include/postgresql,
 				-D_DEBUG,
 				-E,
 				-C,
 				-DPOCO_NO_GCC_API_ATTRIBUTE
+				-DPOCO_NO_WINDOWS_H
 			</options>
 			<path></path>
 			<usePipe>true</usePipe>

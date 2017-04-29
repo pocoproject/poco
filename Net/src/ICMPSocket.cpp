@@ -26,11 +26,8 @@ namespace Poco {
 namespace Net {
 
 
-ICMPSocket::ICMPSocket(IPAddress::Family family, int dataSizeInBytes, int ttlValue, int socketTimeout): 
-	Socket(new ICMPSocketImpl(family, dataSizeInBytes, ttlValue, socketTimeout)),
-	_dataSize(dataSizeInBytes), 
-	_ttl(ttlValue),
-	_timeout(socketTimeout)
+ICMPSocket::ICMPSocket(IPAddress::Family family, int dataSize, int ttl, int timeout): 
+	Socket(new ICMPSocketImpl(family, dataSize, ttl, timeout))
 {
 }
 
@@ -66,15 +63,33 @@ ICMPSocket& ICMPSocket::operator = (const Socket& socket)
 }
 
 
-int ICMPSocket::sendTo(const SocketAddress& rAddress, int flags)
+int ICMPSocket::sendTo(const SocketAddress& address, int flags)
 {
-	return impl()->sendTo(0, 0, rAddress, flags);
+	return impl()->sendTo(0, 0, address, flags);
 }
 
 
-int ICMPSocket::receiveFrom(SocketAddress& rAddress, int flags)
+int ICMPSocket::receiveFrom(SocketAddress& address, int flags)
 {
-	return impl()->receiveFrom(0, 0, rAddress, flags);
+	return impl()->receiveFrom(0, 0, address, flags);
+}
+
+
+int ICMPSocket::dataSize() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->dataSize();
+}
+
+
+int ICMPSocket::ttl() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->ttl();
+}
+
+
+int ICMPSocket::timeout() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->timeout();
 }
 
 

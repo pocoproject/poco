@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/src/SessionImpl.cpp#3 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  SessionImpl
 //
@@ -402,7 +402,10 @@ void SessionImpl::close()
 	try
 	{
 		commit();
-	}catch (ConnectionException&) { }
+	}
+	catch (ConnectionException&) 
+	{
+	}
 
 	SQLDisconnect(_db);
 }

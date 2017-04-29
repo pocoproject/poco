@@ -30,15 +30,17 @@ namespace JSON {
 
 
 class JSON_API Stringifier
-	/// Helper class for creating a String from a JSON object or array
+	/// Helper class for creating a string from a JSON object or array.
 {
 public:
 	static void condense(const Dynamic::Var& any, std::ostream& out);
 		/// Writes a condensed string representation of the value to the output stream while preserving the insertion order.
+		///
 		/// This is just a "shortcut" to stringify(any, out) with name indicating the function effect.
 
 	static void stringify(const Dynamic::Var& any, std::ostream& out, unsigned int indent = 0, int step = -1);
 		/// Writes a string representation of the value to the output stream.
+		///
 		/// When indent is 0, the string will be created as small as possible.
 		/// When preserveInsertionOrder is true, the original string object members order will be preserved;
 		/// otherwise, object members are sorted by their names.
@@ -53,7 +55,8 @@ inline void Stringifier::condense(const Dynamic::Var& any, std::ostream& out)
 	stringify(any, out, 0, -1);
 }
 
-}} // namespace Poco::JSON
+
+} } // namespace Poco::JSON
 
 
 #endif // JSON_JSONStringifier_INCLUDED

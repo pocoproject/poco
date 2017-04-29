@@ -3,9 +3,9 @@
 //
 // $Id: //poco/Main/Data/ODBC/src/Unicode_WIN32.cpp#3 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
-// Module:  Unicode_WIN32
+// Module:  Unicode
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

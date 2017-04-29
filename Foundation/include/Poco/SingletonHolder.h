@@ -59,6 +59,14 @@ public:
 		return _pS;
 	}
 	
+	void reset()
+		/// Deletes the singleton object.
+	{
+		FastMutex::ScopedLock lock(_m);
+		delete _pS;
+		_pS = 0;
+	}
+	
 private:
 	S* _pS;
 	FastMutex _m;

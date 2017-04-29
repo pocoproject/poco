@@ -83,11 +83,11 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 {
 public:
 	XMLConfiguration();
-		/// Creates an empty XMLConfiguration.
+		/// Creates an empty XMLConfiguration with a "config" root element.
 
 	XMLConfiguration(char delim);
-		/// Creates an empty XMLConfiguration, using the given
-		/// delimiter char instead of the default '.'.
+		/// Creates an empty XMLConfiguration with a "config" root element,
+		/// using the given delimiter char instead of the default '.'.
 
 	XMLConfiguration(Poco::XML::InputSource* pInputSource);
 		/// Creates an XMLConfiguration and loads the XML document from
@@ -133,6 +133,12 @@ public:
 	void load(Poco::XML::InputSource* pInputSource);
 		/// Loads the XML document containing the configuration data
 		/// from the given InputSource.
+
+	void load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize);
+		/// Loads the XML document containing the configuration data
+		/// from the given InputSource. Uses the give namePoolSize (which 
+		/// should be a suitable prime like 251, 509, 1021, 4093) for the
+		/// internal DOM Document's name pool.
 
 	void load(std::istream& istr);
 		/// Loads the XML document containing the configuration data

@@ -38,6 +38,10 @@
 #include <iomanip>
 #include <set>
 
+#if __cplusplus >= 201103L
+#include <tuple>
+#endif
+
 
 using namespace Poco::Data::Keywords;
 
@@ -952,7 +956,7 @@ void DataTest::testRow()
 	row3.append("field4", 4);
 
 	assert (row3 == row);
-	assert (!(row < row3 | row3 < row));
+	assert (!(row < row3 || row3 < row));
 
 	Row row4(row3.names());
 	try
@@ -960,18 +964,6 @@ void DataTest::testRow()
 		row4.set("badfieldname", 0);
 		fail ("must fail");
 	}catch (NotFoundException&) {}
-
-	try
-	{
-		row4.set("field1", Var());
-		row4.addSortField(1);
-		row4.removeSortField(0);
-		fail ("must fail - field 1 is empty");
-	}
-	catch (IllegalStateException&)
-	{
-		row4.removeSortField(1);
-	}
 
 	row4.set("field0", 0);
 	row4.set("field1", 1);
@@ -1412,6 +1404,22 @@ void DataTest::testExternalBindingAndExtraction()
 }
 
 
+#if __cplusplus >= 201103L
+
+void DataTest::testStdTuple()
+{
+	using Row = std::tuple<std::string, std::string, int>;
+
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	Row person = std::make_tuple(std::string("Scott"), std::string("Washington, DC"), 42);
+	sess << "INSERT INTO Person(name, address, age) VALUES (?, ?, ?)", use(person), now;
+	std::vector<Row> rows;
+	sess << "SELECT name, address, age FROM Person", into(rows) , now;
+}
+
+#endif // __cplusplus >= 201103L
+
+
 void DataTest::setUp()
 {
 }
@@ -1443,6 +1451,10 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testJSONRowFormatter);
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
+#if __cplusplus >= 201103L
+	CppUnit_addTest(pSuite, DataTest, testStdTuple);
+#endif
+
 
 	return pSuite;
 }

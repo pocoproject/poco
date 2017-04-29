@@ -339,7 +339,7 @@ private:
 	}
 
 	template <class C>
-    SharedPtr<InternalBulkExtraction<C> > createBulkExtract(const MetaColumn& mc, size_t position)
+	SharedPtr<InternalBulkExtraction<C> > createBulkExtract(const MetaColumn& mc, size_t position)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -366,18 +366,18 @@ private:
 	
 		switch (_storage)
 		{
-		case STORAGE_DEQUE_IMPL:  
+		case STORAGE_DEQUE_IMPL:
 			storage = DEQUE; break;
-		case STORAGE_VECTOR_IMPL: 
+		case STORAGE_VECTOR_IMPL:
 			storage = VECTOR; break;
-		case STORAGE_LIST_IMPL:   
+		case STORAGE_LIST_IMPL:
 			storage = LIST; break;
 		case STORAGE_UNKNOWN_IMPL:
 			storage = AnyCast<std::string>(session().getProperty("storage")); 
 			break;
 		}
 
-		if (storage.empty()) storage = DEQUE;
+		if (storage.empty()) storage = VECTOR;
 
 		if (0 == icompare(DEQUE, storage))
 		{
@@ -557,7 +557,8 @@ inline bool StatementImpl::isNull(std::size_t col, std::size_t row) const
 	try 
 	{
 		return extractions().at(col)->isNull(row);
-	}catch (std::out_of_range& ex)
+	}
+	catch (std::out_of_range& ex)
 	{ 
 		throw RangeException(ex.what()); 
 	}

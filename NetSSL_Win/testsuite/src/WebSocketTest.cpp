@@ -57,9 +57,11 @@ namespace
 				do
 				{
 					n = ws.receiveFrame(pBuffer.get(), _bufSize, flags);
+					if (n == 0)
+						break;
 					ws.sendFrame(pBuffer.get(), n, flags);
 				}
-				while (n > 0 || (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
+				while ((flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
 			}
 			catch (WebSocketException& exc)
 			{
@@ -119,7 +121,7 @@ void WebSocketTest::testWebSocket()
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPSClientSession cs("localhost", ss.address().port());
+	HTTPSClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
@@ -186,7 +188,7 @@ void WebSocketTest::testWebSocketLarge()
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPSClientSession cs("localhost", ss.address().port());
+	HTTPSClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);

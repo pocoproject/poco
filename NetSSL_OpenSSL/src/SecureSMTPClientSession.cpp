@@ -24,8 +24,8 @@ namespace Poco {
 namespace Net {
 
 
-SecureSMTPClientSession::SecureSMTPClientSession(const StreamSocket& rSocket):
-	SMTPClientSession(rSocket)
+SecureSMTPClientSession::SecureSMTPClientSession(const StreamSocket& socket):
+	SMTPClientSession(socket)
 {
 }
 

@@ -15,6 +15,7 @@
 
 
 #include "Poco/Net/DialogSocket.h"
+#include "Poco/Exception.h"
 #include "Poco/Ascii.h"
 #include <cstring>
 
@@ -32,8 +33,8 @@ DialogSocket::DialogSocket():
 }
 
 
-DialogSocket::DialogSocket(const SocketAddress& rAddress): 
-	StreamSocket(rAddress),
+DialogSocket::DialogSocket(const SocketAddress& address): 
+	StreamSocket(address),
 	_pBuffer(0),
 	_pNext(0),
 	_pEnd(0)
@@ -149,20 +150,20 @@ void DialogSocket::sendMessage(const std::string& message, const std::string& ar
 bool DialogSocket::receiveMessage(std::string& message)
 {
 	message.clear();
-	return receiveLine(message);
+	return receiveLine(message, MAX_LINE_LENGTH);
 }
 
 
 int DialogSocket::receiveStatusMessage(std::string& message)
 {
 	message.clear();
-	int status = receiveStatusLine(message);
+	int status = receiveStatusLine(message, MAX_LINE_LENGTH);
 	if (status < 0)
 	{
 		while (status <= 0)
 		{
 			message += '\n';
-			status = receiveStatusLine(message);
+			status = receiveStatusLine(message, MAX_LINE_LENGTH);
 		}
 	}
 	return status;
@@ -236,14 +237,17 @@ void DialogSocket::allocBuffer()
 }
 
 
-bool DialogSocket::receiveLine(std::string& line)
+bool DialogSocket::receiveLine(std::string& line, std::size_t lineLengthLimit)
 {
 	// An old wisdom goes: be strict in what you emit
 	// and generous in what you accept.
 	int ch = get();
 	while (ch != EOF_CHAR && ch != '\r' && ch != '\n')
 	{
-		line += (char) ch;
+		if (lineLengthLimit == 0 || line.size() < lineLengthLimit)
+			line += (char) ch;
+		else
+			throw Poco::IOException("Line too long");
 		ch = get();
 	}
 	if (ch == '\r' && peek() == '\n')
@@ -254,7 +258,7 @@ bool DialogSocket::receiveLine(std::string& line)
 }
 
 
-int DialogSocket::receiveStatusLine(std::string& line)
+int DialogSocket::receiveStatusLine(std::string& line, std::size_t lineLengthLimit)
 {
 	int status = 0;
 	int ch = get();
@@ -274,7 +278,7 @@ int DialogSocket::receiveStatusLine(std::string& line)
 			status = -status;
 	}
 	else status = 0;
-	if (ch != EOF_CHAR) receiveLine(line);
+	if (ch != EOF_CHAR) receiveLine(line, lineLengthLimit);
 	return status;
 }
 

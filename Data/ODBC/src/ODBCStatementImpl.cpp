@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/src/ODBCStatementImpl.cpp#8 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCStatementImpl
 //
@@ -105,7 +105,10 @@ void ODBCStatementImpl::compileImpl()
 	{
 		Poco::Any dti = session().getProperty("dataTypeInfo");
 		pDT = AnyCast<TypeInfo*>(dti);
-	}catch (NotSupportedException&) { }
+	}
+	catch (NotSupportedException&) 
+	{
+	}
 
 	const std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 	const ODBCMetaColumn::NumericConversion numericConversion = dynamic_cast<SessionImpl&>(session()).numericConversion();
@@ -126,7 +129,8 @@ void ODBCStatementImpl::makeInternalExtractors()
 		try
 		{
 			fillColumns(currentDataSet());
-		} catch (DataFormatException&)
+		} 
+		catch (DataFormatException&)
 		{
 			if (isStoredProcedure()) return;
 			throw;
@@ -495,7 +499,7 @@ int ODBCStatementImpl::affectedRowCount() const
 {
 	if (0 == _affectedRowCount)
 	{
-		SQLLEN rows;
+		SQLLEN rows = 0;
 		if (!Utility::isError(SQLRowCount(_stmt, &rows)))
 			_affectedRowCount = static_cast<std::size_t>(rows);
 	}

@@ -147,8 +147,8 @@ odbcinclude=""
 unbundled=""
 static=""
 shared=""
-omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL MongoDB PDF CppParser PageCompiler"
-omitTypical="Data/ODBC Data/MySQL MongoDB PDF CppParser"
+omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL MongoDB Redis PDF CppParser PageCompiler"
+omitTypical="Data/ODBC Data/MySQL MongoDB Redis PDF CppParser"
 omit=$omitTypical
 # parse arguments
 while [ $# -ge 1 ]; do
@@ -181,7 +181,7 @@ while [ $# -ge 1 ]; do
 		odbcinclude="`echo ${1} | awk '{print substr($0,16)}'`" ;;
 
 	--cflags=*)
-		flags="`echo ${1} | awk '{print substr($0,10)}'`" ;;
+		flags="$flags `echo ${1} | awk '{print substr($0,10)}'`" ;;
 
 	--no-samples)
 		samples="" ;;

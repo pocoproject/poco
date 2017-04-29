@@ -23,6 +23,8 @@
 #include "Poco/TextConverter.h"
 #include "Poco/Nullable.h"
 #include "Poco/Dynamic/Struct.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormatter.h"
 #include <set>
 #include <iostream>
 
@@ -30,7 +32,8 @@
 using namespace Poco::JSON;
 using namespace Poco::Dynamic;
 using Poco::DynamicStruct;
-
+using Poco::DateTime;
+using Poco::DateTimeFormatter;
 
 JSONTest::JSONTest(const std::string& name): CppUnit::TestCase("JSON")
 {
@@ -371,6 +374,37 @@ void JSONTest::testEmptyObject()
 
 	const DynamicStruct& rds = *object;
 	assert (rds.size() == 0);
+}
+
+
+void JSONTest::testEmptyPropertyName()
+{
+	std::string json = "{\"\": 42}";
+	Parser parser;
+	Var result;
+
+	try
+	{
+		result = parser.parse(json);
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	assert(object->size() == 1);
+
+	DynamicStruct ds = *object;
+	assert (ds.size() == 1);
+
+	const DynamicStruct& rds = *object;
+	assert (rds.size() == 1);
+	
+	assert (ds[""] == 42);
 }
 
 
@@ -897,6 +931,12 @@ void JSONTest::testStringElement()
 	Poco::Dynamic::Array da = *array;
 	assert (da.size() == 1);
 	assert (da[0] == "value");
+
+	std::stringstream s;
+	json = "[ \"\\u0017\" ]";
+	Var v = Parser().parse(json);
+	Stringifier::condense(v, s);
+	assert(s.str() == "[\"\\u0017\"]");
 }
 
 
@@ -1245,6 +1285,27 @@ void JSONTest::testPrintHandler()
 
 void JSONTest::testStringify()
 {
+	std::ostringstream os;
+	Var i = 123;
+	Stringifier::stringify(i, os);
+	assert(os.str() == "123");
+
+	os.str("");
+	Var f = 123.456;
+	Stringifier::stringify(f, os);
+	assert(os.str() == "123.456");
+
+	os.str("");
+	Var s = "abcdef";
+	Stringifier::stringify(s, os);
+	assert(os.str() == "\"abcdef\"");
+
+	os.str("");
+	DateTime dt;
+	Var d = dt;
+	Stringifier::stringify(d, os);
+	assert(os.str() == std::string("\"" + DateTimeFormatter::format(dt, Poco::DateTimeFormat::ISO8601_FORMAT) + "\""));
+
 	std::string str1 = "\r";
 	std::string str2 = "\n";
 	Poco::JSON::Object obj1, obj2;
@@ -1859,6 +1920,7 @@ CppUnit::Test* JSONTest::suite()
 #endif
 	CppUnit_addTest(pSuite, JSONTest, testStringProperty);
 	CppUnit_addTest(pSuite, JSONTest, testEmptyObject);
+	CppUnit_addTest(pSuite, JSONTest, testEmptyPropertyName);
 	CppUnit_addTest(pSuite, JSONTest, testComplexObject);
 	CppUnit_addTest(pSuite, JSONTest, testDoubleProperty);
 	CppUnit_addTest(pSuite, JSONTest, testDouble2Property);

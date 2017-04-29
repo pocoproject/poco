@@ -389,7 +389,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case ENOSPC:
 		throw FileException("no space left on device", path);
 	case ENOTEMPTY:
-		throw FileException("directory not empty", path);
+		throw DirectoryNotEmptyException(path);
 	case ENAMETOOLONG:
 		throw PathSyntaxException(path);
 	case ENFILE:

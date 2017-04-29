@@ -22,8 +22,8 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/UTF8Encoding.h"
-
 #include <sstream>
+
 
 namespace Poco {
 namespace Net {
@@ -258,10 +258,11 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 	if (mustQuote) result += '"';
 }
 
-void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset_to) {
+
+void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset_to) 
+{
 	std::string tempout;
 	StringTokenizer tokens(ins, "?");
-
 
 	std::string charset = toUpper(tokens[0]);
 	std::string encoding = toUpper(tokens[1]);
@@ -269,25 +270,31 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 
 	std::istringstream istr(text);
 
-	if (encoding == "B") {
+	if (encoding == "B") 
+	{
 		// Base64 encoding.
 		Base64Decoder decoder(istr);
 		for (char c; decoder.get(c); tempout += c) {}
 	}
-	else 	if (encoding == "Q") {
+	else if (encoding == "Q") 
+	{
 		// Quoted encoding.				
-		for (char c; istr.get(c);) {
-			if (c == '_') {
+		for (char c; istr.get(c);) 
+		{
+			if (c == '_') 
+			{
 				//RFC 2047  _ is a space.
 				tempout += " ";
 				continue;
 			}
 
 			// FIXME: check that we have enought chars-
-			if (c == '=') {
+			if (c == '=') 
+			{
 				// The next two chars are hex representation of the complete byte.
 				std::string hex;
-				for (int i = 0; i < 2; i++) {
+				for (int i = 0; i < 2; i++) 
+				{
 					istr.get(c);
 					hex += c;
 				}
@@ -298,26 +305,31 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 			tempout += c;
 		}
 	}
-	else {
+	else 
+	{
 		// Wrong encoding
 		outs = ins;
 		return;
 	}
 
 	// convert to the right charset.
-	if (charset != charset_to) {
-		try {
+	if (charset != charset_to) 
+	{
+		try 
+		{
 			TextEncoding& enc = TextEncoding::byName(charset);
 			TextEncoding& dec = TextEncoding::byName(charset_to);
 			TextConverter converter(enc, dec);
 			converter.convert(tempout, outs);
 		}
-		catch (...) {
+		catch (...) 
+		{
 			// FIXME: Unsuported encoding...
 			outs = tempout;
 		}
 	}
-	else {
+	else 
+	{
 		// Not conversion necesary.
 		outs = tempout;
 	}

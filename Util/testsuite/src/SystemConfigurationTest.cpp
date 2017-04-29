@@ -84,9 +84,9 @@ void SystemConfigurationTest::testKeys()
 
 	pConf->keys("system", keys);
 #if defined(POCO_VXWORKS)
-	assert (keys.size() == 15);
+	assert (keys.size() == 14);
 #else
-	assert (keys.size() == 16);
+	assert (keys.size() == 15);
 #endif
 
 	assert (std::find(keys.begin(), keys.end(), "osName") != keys.end());
@@ -99,7 +99,6 @@ void SystemConfigurationTest::testKeys()
 	assert (std::find(keys.begin(), keys.end(), "configHomeDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "cacheHomeDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "dataHomeDir") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "tempHomeDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "tempDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "configDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "dateTime") != keys.end());

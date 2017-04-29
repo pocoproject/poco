@@ -90,7 +90,8 @@ public:
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(rResult), 
 		_default(), 
-		_extracted(false)
+		_extracted(false),
+		_null(false)
 		/// Creates an Extraction object at specified position.
 		/// Uses an empty object T as default value.
 	{
@@ -100,7 +101,8 @@ public:
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(rResult), 
 		_default(def), 
-		_extracted(false)
+		_extracted(false),
+		_null(false)
 		/// Creates an Extraction object at specified position.
 		/// Uses the provided def object as default value.
 	{
@@ -170,7 +172,7 @@ class Extraction<std::vector<T> >: public AbstractExtraction
 	/// Vector Data Type specialization for extraction of values from a query result set.
 {
 public:
-	
+
 	typedef std::vector<T>      ValType;
 	typedef SharedPtr<ValType>  ValPtr;
 	typedef Extraction<ValType> Type;
@@ -180,7 +182,6 @@ public:
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(rResult), 
 		_default()
-
 	{
 		_rResult.clear();
 	}

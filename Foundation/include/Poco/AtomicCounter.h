@@ -24,7 +24,15 @@
 #if POCO_OS == POCO_OS_WINDOWS_NT
 	#include "Poco/UnWindows.h"
 #elif POCO_OS == POCO_OS_MAC_OS_X
-	#include <libkern/OSAtomic.h>
+	#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200 || __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000 || __TV_OS_VERSION_MAX_ALLOWED >= 100000 || __WATCH_OS_VERSION_MAX_ALLOWED >= 30000
+		#ifndef POCO_HAVE_STD_ATOMICS
+			#if __cplusplus >= 201103L
+				#define POCO_HAVE_STD_ATOMICS
+			#endif
+		#endif
+	#else
+		#include <libkern/OSAtomic.h>
+	#endif
 #elif ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2) || __GNUC__ > 4) && (defined(__x86_64__) || defined(__i386__))
 	#if !defined(POCO_HAVE_GCC_ATOMICS) && !defined(POCO_NO_GCC_ATOMICS)
 		#define POCO_HAVE_GCC_ATOMICS
@@ -35,6 +43,9 @@
 	#endif
 #endif // POCO_OS
 #include "Poco/Mutex.h"
+#ifdef POCO_HAVE_STD_ATOMICS
+#include <atomic>
+#endif
 
 
 namespace Poco {
@@ -104,7 +115,9 @@ public:
 		/// Returns true if the counter is zero, false otherwise.
 
 private:
-#if POCO_OS == POCO_OS_WINDOWS_NT
+#if defined(POCO_HAVE_STD_ATOMICS)
+	typedef std::atomic<int> ImplType;
+#elif POCO_OS == POCO_OS_WINDOWS_NT
 	typedef volatile LONG ImplType;
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	typedef int32_t ImplType;
@@ -127,7 +140,53 @@ private:
 //
 
 
-#if POCO_OS == POCO_OS_WINDOWS_NT
+#if defined(POCO_HAVE_STD_ATOMICS)
+//
+// C++11 atomics
+//
+inline AtomicCounter::operator AtomicCounter::ValueType () const
+{
+	return _counter.load();
+}
+
+	
+inline AtomicCounter::ValueType AtomicCounter::value() const
+{
+	return _counter.load();
+}
+
+
+inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
+{
+	return ++_counter;
+}
+
+	
+inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
+{
+	return _counter++;
+}
+
+
+inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
+{
+	return --_counter;
+}
+
+	
+inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
+{
+	return _counter--;
+}
+
+	
+inline bool AtomicCounter::operator ! () const
+{
+	return _counter.load() == 0;
+}
+
+
+#elif POCO_OS == POCO_OS_WINDOWS_NT
 //
 // Windows
 //

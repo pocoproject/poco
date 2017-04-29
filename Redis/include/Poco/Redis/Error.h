@@ -9,54 +9,64 @@
 //
 // Definition of the Error class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #ifndef Redis_Error_INCLUDED
 #define Redis_Error_INCLUDED
 
+
 #include "Poco/Redis/Type.h"
+
 
 namespace Poco {
 namespace Redis {
 
+
 class Redis_API Error
-	/// Represent a Redis error
+	/// Represent a Redis error.
 {
 public:
-
 	Error();
-		/// Constructor
+		/// Creates an empty Error.
 
 	Error(const std::string& message);
-		/// Constructor
+		/// Creates an Error with the given message.
 
 	virtual ~Error();
-		/// Destructor
+		/// Destroys the Error.
 
-	std::string  getMessage() const;
-		/// Returns the error message
+	const std::string& getMessage() const;
+		/// Returns the error message.
 
 	void setMessage(const std::string& message);
-		/// Sets the error message
+		/// Sets the error message.
 
 private:
-
 	std::string _message;
 };
 
-inline std::string Error::getMessage() const
+
+//
+// inlines
+//
+
+
+inline const std::string& Error::getMessage() const
 {
 	return _message;
 }
+
 
 inline void Error::setMessage(const std::string& message)
 {
 	_message = message;
 }
+
 
 template<>
 struct RedisTypeTraits<Error>
@@ -76,6 +86,8 @@ struct RedisTypeTraits<Error>
 	}
 };
 
-}} // Namespace Poco::Redis
+
+} } // namespace Poco::Redis
+
 
 #endif // Redis_Error_INCLUDED

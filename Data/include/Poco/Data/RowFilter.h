@@ -21,7 +21,6 @@
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/Data/RecordSet.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Tuple.h"
 #include "Poco/String.h"
@@ -34,6 +33,9 @@
 
 namespace Poco {
 namespace Data {
+
+
+class RecordSet;
 
 
 class Data_API RowFilter: public RefCountedObject
@@ -93,7 +95,7 @@ public:
 	void add(const std::string& name, Comparison comparison, const T& value, LogicOperator op = OP_OR)
 		/// Adds value to the filter.
 	{
-		if (_pRecordSet) _pRecordSet->moveFirst();
+		rewindRecordSet();
 		_comparisonMap.insert(ComparisonMap::value_type(toUpper(name),
 			ComparisonEntry(value, comparison, op)));
 	}
@@ -164,6 +166,8 @@ private:
 	RecordSet& recordSet() const;
 
 	Comparison getComparison(const std::string& comp) const;
+	
+	void rewindRecordSet();
 
 	Comparisons        _comparisons;
 	ComparisonMap      _comparisonMap;

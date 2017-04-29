@@ -533,6 +533,26 @@ void MySQLTest::testTupleVector()
 	_pExecutor->tupleVector();
 }
 
+#if __cplusplus >= 201103L
+
+void MySQLTest::testStdTuple()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateTuplesTable();
+	_pExecutor->stdTuples();
+}
+
+
+void MySQLTest::testStdTupleVector()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateTuplesTable();
+	_pExecutor->stdTupleVector();
+}
+
+#endif // __cplusplus >= 201103L
 
 void MySQLTest::testInternalExtraction()
 {
@@ -934,6 +954,10 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testDouble);
 	CppUnit_addTest(pSuite, MySQLTest, testTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
+#if __cplusplus >= 201103L
+	CppUnit_addTest(pSuite, MySQLTest, testStdTuple);
+	CppUnit_addTest(pSuite, MySQLTest, testStdTupleVector);
+#endif
 	CppUnit_addTest(pSuite, MySQLTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, MySQLTest, testNull);
 	CppUnit_addTest(pSuite, MySQLTest, testNullableInt);

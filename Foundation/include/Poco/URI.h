@@ -342,6 +342,7 @@ protected:
 
 	static const std::string RESERVED_PATH;
 	static const std::string RESERVED_QUERY;
+	static const std::string RESERVED_QUERY_PARAM;
 	static const std::string RESERVED_FRAGMENT;
 	static const std::string ILLEGAL;
 	
