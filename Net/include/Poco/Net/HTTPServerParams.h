@@ -97,7 +97,6 @@ public:
 		/// during a persistent connection, or 0 if
 		/// unlimited connections are allowed.
 
-protected:
 	virtual ~HTTPServerParams();
 		/// Destroys the HTTPServerParams.
 
