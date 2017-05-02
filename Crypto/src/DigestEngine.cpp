@@ -48,7 +48,7 @@ std::size_t DigestEngine::digestLength() const
 
 void DigestEngine::reset()
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#if 0 && OPENSSL_VERSION_NUMBER >= 0x10100000L
 	EVP_MD_CTX_free(_pContext);
 	_pContext = EVP_MD_CTX_create();
 #else

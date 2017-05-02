@@ -96,6 +96,12 @@ Options:
   --library-path=<path>
     Add search path for library files.
 
+  --crypto-lib=<path>
+    Specify the name of the crypto library.
+
+  --ssl-lib=<path>
+    Specify the name of the SSL library.
+
   --odbc-lib=<path>
     Specify the directory where ODBC library is located.
 
@@ -140,6 +146,8 @@ noprefix=0
 flags=""
 includepath=""
 librarypath=""
+cryptolib=""
+ssl_lib=""
 odbclib=""
 odbcinclude=""
 unbundled=""
@@ -172,8 +180,14 @@ while [ $# -ge 1 ]; do
 	--library-path=*)
 		librarypath="`echo ${1} | awk '{print substr($0,16)}' | tr ',;' '  '`" ;;
 
-	--odbc-lib=*)
-		odbclib="`echo ${1} | awk '{print substr($0,12)}'`" ;;
+    --crypto-lib=*)
+        cryptolib="`echo ${1} | awk '{print substr($0,14)}'`" ;;
+
+    --ssl-lib=*)
+        ssl_lib="`echo ${1} | awk '{print substr($0,11)}'`" ;;
+
+    --odbc-lib=*)
+        odbclib="`echo ${1} | awk '{print substr($0,12)}'`" ;;
 
 	--odbc-include=*)
 		odbcinclude="`echo ${1} | awk '{print substr($0,16)}'`" ;;
@@ -309,6 +323,12 @@ fi
 if [ -n "$librarypath" ] ; then
 	echo "POCO_ADD_LIBRARY = $librarypath" >>$build/config.make
 fi
+if [ -n "$cryptolib" ] ; then
+        echo "POCO_CRYPTO_LIB = $cryptolib" >>$build/config.make
+fi
+if [ -n "$ssl_lib" ] ; then
+        echo "POCO_SSL_LIB = $ssl_lib" >>$build/config.make
+fi
 if [ -n "$odbclib" ] ; then
         echo "POCO_ODBC_LIB = $odbclib" >>$build/config.make
 fi
@@ -360,5 +380,11 @@ cat <<__EOF__ >>$build/config.build
 TESTS = $tests
 SAMPLES = $samples
 __EOF__
+if [ -n "$cryptolib" ] ; then
+        echo "POCO_CRYPTO_LIB = $cryptolib" >>$build/config.build
+fi
+if [ -n "$ssl_lib" ] ; then
+        echo "POCO_SSL_LIB = $ssl_lib" >>$build/config.build
+fi
 
 echo "Configured for $config"

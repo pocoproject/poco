@@ -245,6 +245,12 @@ SET_LD_LIBRARY_PATH = LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
 endif
 
 #
+# Determine crypto libraries
+#
+POCO_SSL_LIB ?= ssl
+POCO_CRYPTO_LIB ?= crypto
+
+#
 # Build component list
 #
 COMPONENTS := $(shell cat $(POCO_BASE)/components)
