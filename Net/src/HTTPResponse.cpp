@@ -214,9 +214,15 @@ void HTTPResponse::getCookies(std::vector<HTTPCookie>& cookies) const
 
 void HTTPResponse::write(std::ostream& ostr) const
 {
+	beginWrite(ostr);
+	ostr << "\r\n";
+}
+
+
+void HTTPResponse::beginWrite(std::ostream& ostr) const
+{
 	ostr << getVersion() << " " << static_cast<int>(_status) << " " << _reason << "\r\n";
 	HTTPMessage::write(ostr);
-	ostr << "\r\n";
 }
 
 
