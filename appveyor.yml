@@ -52,7 +52,7 @@ configuration:
 environment:
   bundling: bundled
   MYSQL32:    C:\mysql-5.7.17-win32
-  MYSQL64:    C:\Program Files\MySql\MySQL Server 5.6
+  MYSQL64:    C:\Program Files\MySql\MySQL Server 5.7
   POSTGRES32: C:\Program Files (x86)\PostgreSQL\9.4
   POSTGRES64: C:\Program Files\PostgreSQL\9.4
 
