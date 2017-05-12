@@ -19,7 +19,20 @@ libraries are required.
 
     $ git clone https://github.com/pocoproject/poco-dnssd.git DNSSD
 
-On Windows, build the included Visual C++ solution. On Linux/OS X, build with POCO_BASE environment variable set to the root of
+On Linux, build with cmake like below.
+
+    $ git apply DNSSD/CMakeLists.diff
+    $ sudo ./build_cmake.sh
+
+On Windows or OS X, build with cmake like below.
+
+    $ git apply DNSSD/CMakeLists.diff
+    $ mkdir build
+    $ cd build
+    $ cmake ..
+    $ make -j
+    
+For build without using cmake on Windows, build the included Visual C++ solution. On Linux/OS X, build with POCO_BASE environment variable set to the root of
 the POCO source tree.
 
     $ export POCO_BASE=`pwd`
