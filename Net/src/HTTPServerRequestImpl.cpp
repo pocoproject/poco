@@ -110,4 +110,10 @@ StreamSocket HTTPServerRequestImpl::detachSocket()
 }
 
 
+int HTTPServerRequestImpl::readBytes(char* buffer, std::streamsize length)
+{
+	return _session.read(buffer, length);
+}
+
+
 } } // namespace Poco::Net
