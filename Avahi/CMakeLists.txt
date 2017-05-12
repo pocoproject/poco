@@ -20,7 +20,7 @@ set_target_properties( "${LIBNAME}"
     DEFINE_SYMBOL Avahi_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" Foundation Net DNSSD ${Avahi_LIBRARIES})
+target_link_libraries( "${LIBNAME}" Foundation Net DNSSD ${AVAHI_LIBRARIES})
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

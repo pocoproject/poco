@@ -1,11 +1,14 @@
 # ITNOA
 
+set(DNSSD_IMPLEMENTATION_LIBRARY "")
+
 macro(ADD_AVAHI)
 	find_package(Avahi REQUIRED)
 	if(AVAHI_FOUND)
 		include_directories("${AVAHI_INCLUDE_DIR}")
 		message(STATUS "Avahi Support Enabled")
 		add_subdirectory( Avahi )
+		set(DNSSD_IMPLEMENTATION_LIBRARY "DNSSDAvahi")
 	else()
 		message(ERROR "Avahi does not found, please make install it")
 	endif()
@@ -17,6 +20,7 @@ macro(ADD_BONJOUR)
 		include_directories("${BONJOUR_INCLUDE_DIR}")
 		message(STATUS "Bonjour Support Enabled")
 		add_subdirectory( Bonjour )
+		set(DNSSD_IMPLEMENTATION_LIBRARY "DNSSDBonjour")
 	else()
 		message(ERROR "Bonjour does not found, please make install sdk")
 	endif()
