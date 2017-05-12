@@ -30,7 +30,7 @@ On Windows or OS X, build with cmake like below.
     $ mkdir build
     $ cd build
     $ cmake ..
-    $ make -j
+    $ make -j8
     
 For build without using cmake on Windows, build the included Visual C++ solution. On Linux/OS X, build with POCO_BASE environment variable set to the root of
 the POCO source tree.
