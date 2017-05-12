@@ -89,6 +89,10 @@ public:
 	StreamSocket detachSocket();
 		/// Returns the underlying socket after detaching
 		/// it from the server session.
+		
+	int readBytes(char* buffer, std::streamsize length);
+		/// Reads data from the HTTP session into the provided
+		/// buffer.
 
 	HTTPServerSession& session();
 		/// Returns the underlying HTTPServerSession.
