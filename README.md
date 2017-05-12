@@ -13,8 +13,7 @@ The [Apple Bonjour SDK](https://developer.apple.com/bonjour/) is needed on Windo
 Getting Started
 ---------------
 
-Clone into the root of an existing POCO source tree. The POCO Foundation and Net 
-libraries are required.
+Clone into the root of an existing POCO source tree.
 
 
     $ git clone https://github.com/pocoproject/poco-dnssd.git DNSSD
