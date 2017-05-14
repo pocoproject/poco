@@ -18,6 +18,7 @@
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/Tuple.h"
+#include "Poco/UTFString.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -41,6 +42,7 @@ using Poco::Any;
 using Poco::AnyCast;
 using Poco::DynamicAny;
 using Poco::DateTime;
+using Poco::UTF16String;
 
 
 // uncomment to force FreeTDS on Windows
@@ -326,8 +328,8 @@ void ODBCSQLServerTest::testStoredProcedure()
 			"END;"
 			, now;
 
-		std::wstring inParam = L"123";
-		std::wstring outParam;
+		UTF16String inParam = L"123";
+		UTF16String outParam;
 		try {
 			session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
 		}

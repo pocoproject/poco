@@ -493,7 +493,7 @@ void Binder::synchronize()
 		UTF16StringMap::iterator it = _utf16Strings.begin();
 		UTF16StringMap::iterator end = _utf16Strings.end();
 		for (; it != end; ++it)
-			it->second->assign(it->first, std::wcslen(it->first));
+			it->second->assign(it->first, UTF16CharTraits::length((UTF16CharTraits::char_type*)it->first));
 	}
 
 	if (_nullCbMap.size())
