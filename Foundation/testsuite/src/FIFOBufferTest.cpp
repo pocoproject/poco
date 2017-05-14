@@ -523,6 +523,25 @@ void FIFOBufferTest::testChar()
 	assert(f[7] == '9');
 	assert(f[8] == '0');
 	assert(f[9] == '1');
+	
+	//make sure _begin is NOT 0, and _used is not equal to _begin
+	f.drain(2);
+	f.copy(&e[0], 2);
+
+	assert (10 == f.size());
+	assert (10 == f.used());
+	assert (0 == f.available());
+
+	assert(f[0] == '4');
+	assert(f[1] == '5');
+	assert(f[2] == '6');
+	assert(f[3] == '7');
+	assert(f[4] == '8');
+	assert(f[5] == '9');
+	assert(f[6] == '0');
+	assert(f[7] == '1');
+	assert(f[8] == '1');
+	assert(f[9] == '2');
 
 	f.readable -= delegate(this, &FIFOBufferTest::onReadable);
 	f.writable -= delegate(this, &FIFOBufferTest::onReadable);
