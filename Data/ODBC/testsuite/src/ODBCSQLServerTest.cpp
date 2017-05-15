@@ -328,7 +328,8 @@ void ODBCSQLServerTest::testStoredProcedure()
 			"END;"
 			, now;
 
-		UTF16String inParam = L"123";
+		UTF16String::value_type cs[] = { L'1', L'2', L'3', L'\0' };
+		UTF16String inParam(cs);
 		UTF16String outParam;
 		try {
 			session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
