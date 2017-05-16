@@ -25,6 +25,14 @@
 #include <algorithm>
 
 
+#ifndef POCO_PTR_CHECKING
+	#ifdef _DEBUG
+		#define POCO_PTR_CHECKING 0
+	#else
+		#define POCO_PTR_CHECKING 1
+	#endif
+#endif
+
 namespace Poco {
 
 
@@ -182,36 +190,52 @@ public:
 		return AutoPtr<Other>(pOther, true);
 	}
 
-	C* operator -> ()
+	inline C* operator -> ()
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return _ptr;
 		else
 			throw NullPointerException();
+#else
+		return _ptr;
+#endif
 	}
 
-	const C* operator -> () const
+	inline const C* operator -> () const
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return _ptr;
 		else
 			throw NullPointerException();
+#else
+		return _ptr;
+#endif
 	}
 
-	C& operator * ()
+	inline C& operator * ()
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return *_ptr;
 		else
 			throw NullPointerException();
+#else
+		return *_ptr;
+#endif
 	}
 
-	const C& operator * () const
+	inline const C& operator * () const
 	{
+#if POCO_PTR_CHECKING
 		if (_ptr)
 			return *_ptr;
 		else
 			throw NullPointerException();
+#else
+		return *_ptr;
+#endif
 	}
 
 	C* get()

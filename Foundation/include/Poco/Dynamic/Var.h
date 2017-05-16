@@ -99,6 +99,22 @@ public:
 	}
 #endif
 
+#if __cplusplus >= 201103L
+	Var(Var&& val)
+		/// Creates the Var from the given rvalue.
+		: _pHolder(std::move(val._pHolder))
+	{
+	    val._pHolder = nullptr;
+	}
+
+	Var& operator = (Var&& other)
+	{
+		_pHolder = std::move(other._pHolder);
+		other._pHolder = nullptr;
+		return *this;
+	}
+#endif
+
 	Var(const char* pVal);
 		// Convenience constructor for const char* which gets mapped to a std::string internally, i.e. pVal is deep-copied.
 
