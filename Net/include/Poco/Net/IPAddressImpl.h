@@ -33,7 +33,7 @@ namespace Net {
 namespace Impl {
 
 
-class IPAddressImpl
+class Net_API IPAddressImpl
 #ifndef POCO_HAVE_ALIGNMENT
 	: public Poco::RefCountedObject
 #endif
@@ -80,7 +80,7 @@ private:
 // IPv4AddressImpl
 //
 
-class IPv4AddressImpl: public IPAddressImpl
+class Net_API IPv4AddressImpl: public IPAddressImpl
 {
 public:
 	IPv4AddressImpl();
@@ -131,7 +131,7 @@ private:
 // IPv6AddressImpl
 //
 
-class IPv6AddressImpl: public IPAddressImpl
+class Net_API IPv6AddressImpl: public IPAddressImpl
 {
 public:
 	IPv6AddressImpl();
