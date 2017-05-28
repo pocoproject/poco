@@ -4,4 +4,4 @@ set(LOCAL_SRCS "")
 aux_source_directory(src LOCAL_SRCS)
 
 add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoNetSSLWin PocoCrypto PocoUtil PocoNet PocoXML PocoFoundation )
+target_link_libraries( ${SAMPLE_NAME} PocoNetSSLWin PocoUtil PocoNet PocoXML PocoFoundation )
