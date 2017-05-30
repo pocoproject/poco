@@ -252,26 +252,26 @@ inline AtomicCounter::ValueType AtomicCounter::value() const
 
 inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
 {
-	return OSAtomicIncrement32(&_counter);
+	return OSAtomicAdd32(1, &_counter);
 }
 
 	
 inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
 {
-	ValueType result = OSAtomicIncrement32(&_counter);
+	ValueType result = OSAtomicAdd32(1, &_counter);
 	return --result;
 }
 
 
 inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
 {
-	return OSAtomicDecrement32(&_counter);
+	return OSAtomicAdd32(-1, &_counter);
 }
 
 	
 inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 {
-	ValueType result = OSAtomicDecrement32(&_counter);
+	ValueType result = OSAtomicAdd32(-1, &_counter);
 	return ++result;
 }
 
