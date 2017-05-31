@@ -33,7 +33,7 @@ using Poco::Thread;
 namespace Poco {
 namespace Crypto {
 
-
+Poco::FastMutex OpenSSLInitializer::_synchronizationMutex;
 Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
 Poco::AtomicCounter OpenSSLInitializer::_rc;
 bool OpenSSLInitializer::_disableSSLInitialization = false;
@@ -59,6 +59,7 @@ OpenSSLInitializer::~OpenSSLInitializer()
 
 void OpenSSLInitializer::initialize()
 {
+	_synchronizationMutex.lock();
 	if (++_rc == 1)
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x0907000L
@@ -99,11 +100,13 @@ void OpenSSLInitializer::initialize()
 		    CRYPTO_set_dynlock_destroy_callback(&OpenSSLInitializer::dynlockDestroy);
         }
 	}
+	_synchronizationMutex.unlock();
 }
 
 
 void OpenSSLInitializer::uninitialize()
 {
+	_synchronizationMutex.lock();
 	if (--_rc == 0)
 	{
         if(_mutexes != NULL) {
@@ -127,6 +130,7 @@ void OpenSSLInitializer::uninitialize()
     		CONF_modules_free();
         }
 	}
+	_synchronizationMutex.unlock();
 }
 
 
