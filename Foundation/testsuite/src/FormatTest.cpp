@@ -412,6 +412,9 @@ void FormatTest::testString()
 
 	s = format("'%s%%''%s%%'", foo, foo);
 	assertTrue (s == "'foo%''foo%'");
+
+	s = format("%s", foo.c_str());
+	assert (s == "foo");
 }
 
 
