@@ -41,7 +41,7 @@
 			${PocoBuild}/*/doc/images
 		</resources>
 		<compiler>
-			<exec>g++</exec>
+			<exec>${CXX}</exec>
 			<options>
 				${Includes},
 				-I/usr/local/mysql/include,
