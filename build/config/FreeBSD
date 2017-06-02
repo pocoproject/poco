@@ -20,7 +20,7 @@ CXX     = g++
 LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
+SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) $(LDFLAGS) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
 STRIP   = strip
@@ -38,13 +38,13 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
+CFLAGS         +=
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        =
+CXXFLAGS       +=
 CXXFLAGS32      =
 CXXFLAGS64      =
-LINKFLAGS       =
+LINKFLAGS       = $(LDFLAGS)
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =
@@ -56,14 +56,14 @@ SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
-RELEASEOPT_CC   = -O2 -DNDEBUG
-RELEASEOPT_CXX  = -O2 -DNDEBUG
-RELEASEOPT_LINK = -O2
+RELEASEOPT_CC   = -DNDEBUG
+RELEASEOPT_CXX  = -DNDEBUG
+RELEASEOPT_LINK =
 
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_REENTRANT -D_THREAD_SAFE 
+SYSFLAGS = -D_REENTRANT -D_THREAD_SAFE $(CPPFLAGS)
 
 #
 # System Specific Libraries
