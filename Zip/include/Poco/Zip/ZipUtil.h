@@ -51,7 +51,7 @@ public:
 
 	static void setDateTime(const Poco::DateTime& dt, char* pVal, const Poco::UInt32 timePos, const Poco::UInt32 datePos);
 
-	static std::string fakeZLibInitString(ZipCommon::CompressionLevel cl);
+	static std::string fakeZlibInitString(ZipCommon::CompressionLevel cl);
 
 	static void sync(std::istream& in);
 		/// Searches the next valid header in the input stream, stops right before it
