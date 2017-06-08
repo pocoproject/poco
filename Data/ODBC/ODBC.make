@@ -10,9 +10,21 @@ ifndef POCO_ODBC_INCLUDE
 POCO_ODBC_INCLUDE = /usr/include
 endif
 
+LIB_OSARCH=$(OSARCH)
+# on any i?86 architecture, the directory is named i386-linux-gnu
+ifeq ($(OSARCH),i486)
+LIB_OSARCH=i386
+endif
+ifeq ($(OSARCH),i586)
+LIB_OSARCH=i386
+endif
+ifeq ($(OSARCH),i686)
+LIB_OSARCH=i386
+endif
+
 ifndef POCO_ODBC_LIB
-ifeq (0, $(shell test -d /usr/lib/$(OSARCH)-linux-gnu; echo $$?))
-POCO_ODBC_LIB = /usr/lib/$(OSARCH)-linux-gnu
+ifeq (0, $(shell test -d /usr/lib/$(LIB_OSARCH)-linux-gnu; echo $$?))
+POCO_ODBC_LIB = /usr/lib/$(LIB_OSARCH)-linux-gnu
 else ifeq (0, $(shell test -d /usr/lib64; echo $$?))
 POCO_ODBC_LIB = /usr/lib64
 else 
@@ -64,4 +76,5 @@ COMMONFLAGS += -Wno-deprecated-declarations
 else
 $(error No ODBC library found. Please install unixODBC or iODBC or specify POCO_ODBC_LIB or set the correct libodbc library path by using --odbc-lib as option to 'configure' script and try again)
 endif
+
 
