@@ -104,6 +104,9 @@ void StatementExecutor::execute()
 
 	if (mysql_stmt_execute(_pHandle) != 0)
 		throw StatementException("mysql_stmt_execute error", _pHandle, _query);
+		
+	if (mysql_stmt_store_result(_pHandle) != 0)
+		throw StatementException("mysql_stmt_store_result", _pHandle, _query);
 
 	_state = STMT_EXECUTED;
 
