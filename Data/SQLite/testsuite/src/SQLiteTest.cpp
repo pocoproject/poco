@@ -2078,7 +2078,15 @@ void SQLiteTest::testNulls()
 	ses << "CREATE TABLE NullTest (i INTEGER, r REAL, v VARCHAR)", now;
 
 	ses << "INSERT INTO NullTest VALUES(:i, :r, :v)", use(null), use(null), use(null), now;
-	
+
+	int cnt = 0;
+	ses << "SELECT count(*) FROM NullTest", into(cnt), now;
+	assert (cnt == 1);
+
+	std::string none;
+	ses << "SELECT v FROM NullTest WHERE v = 'abc'", into(none), now;
+	assert (none.empty());
+
 	RecordSet rs(ses, "SELECT i, r, v, null as e FROM NullTest");
 	rs.moveFirst();
 	assert (rs.isNull("i"));
