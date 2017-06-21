@@ -700,6 +700,7 @@ static const XML_Char implicitContext[] = {
 };
 
 
+#if !defined(EXPAT_POCO)
 #if defined(HAVE_GETRANDOM) || defined(HAVE_SYSCALL_GETRANDOM)
 # include <errno.h>
 
@@ -773,7 +774,6 @@ writeRandomBytes_RtlGenRandom(void * target, size_t count) {
 #endif /* _WIN32 */
 
 
-#if !defined(EXPAT_POCO)
 static unsigned long
 gather_time_entropy(void)
 {
