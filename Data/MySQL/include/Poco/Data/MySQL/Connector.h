@@ -62,7 +62,7 @@ public:
 	static void unregisterConnector();
 		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
 
-	static Poco::Mutex _mutex;
+	static Poco::FastMutex _mutex;
 };
 
 

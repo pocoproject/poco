@@ -30,7 +30,7 @@ namespace MySQL {
 
 
 std::string Connector::KEY(POCO_DATA_MYSQL_CONNECTOR_NAME);
-Poco::Mutex Connector::_mutex;
+Poco::FastMutex Connector::_mutex;
 
 
 Connector::Connector()
@@ -53,7 +53,7 @@ Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::strin
 {
 	static bool initDone = false;
 	{
-		Poco::Mutex::ScopedLock l(_mutex);
+		Poco::FastMutex::ScopedLock l(_mutex);
 		if (!initDone)
 		{
 			if (mysql_library_init(0, 0, 0) != 0)
