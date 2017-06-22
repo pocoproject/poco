@@ -1,6 +1,12 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.7.8p3
+
+  - fixed GH #1760: Upgrade bundled expat to 2.2.1 which fixes some vulnerabilities:
+    http://seclists.org/oss-sec/2017/q2/499
+
+
 !!!Release 1.7.8p2
 
 !!Summary of Changes
