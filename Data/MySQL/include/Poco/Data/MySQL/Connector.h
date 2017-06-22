@@ -22,6 +22,7 @@
 
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/Connector.h"
+#include "Poco/Mutex.h"
 
 
 // Note: to avoid static (de)initialization problems,
@@ -60,6 +61,8 @@ public:
 
 	static void unregisterConnector();
 		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
+
+	static Poco::Mutex _mutex;
 };
 
 

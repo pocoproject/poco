@@ -49,16 +49,22 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 
 std::string MySQLTest::getHost()
 {
-	return "localhost";
+	return "127.0.0.1"; //localhost";
 }
+
+
 std::string MySQLTest::getPort()
 {
 	return "3306";
 }
+
+
 std::string MySQLTest::getUser()
 {
 	return "root";
 }
+
+
 std::string MySQLTest::getPass()
 {
 	if (Environment::has("APPVEYOR"))
@@ -68,18 +74,20 @@ std::string MySQLTest::getPass()
 	else
 		return "poco";
 }
+
+
 std::string MySQLTest::getBase()
 {
 	return "pocotestdb";
 }
 
-std::string MySQLTest::_dbConnString;
 
+std::string MySQLTest::_dbConnString;
 
 
 //
 // Connection string
-
+//
 
 MySQLTest::MySQLTest(const std::string& name):
 	CppUnit::TestCase(name)
