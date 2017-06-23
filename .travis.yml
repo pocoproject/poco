@@ -28,6 +28,9 @@ services:
   - postgresql
   - mysql
 
+dist: trusty
+sudo: required
+  
 addons:
   postgresql: "9.3"
 
@@ -54,95 +57,118 @@ matrix:
   fast_finish: true
 
   include:
-    - env:    TEST_NAME="OSX   clang (make) bundled"
+    - env:    TEST_NAME="clang (make) bundled"
       os: osx
       compiler: clang
       script:
         - export CC="clang"
         - export CXX="clang++"
+        - $CXX --version
         - clang++ -x c++ /dev/null -dM -E
         - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
-    - env:    TEST_NAME="Linux gcc 4.6 (make) bundled"
-      compiler: gcc
-      script:
-        - export CC="gcc"
-        - export CXX="g++"
-        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="Linux gcc 4.8 (make) bundled"
-      compiler: gcc
-      script:
-        - export CC="gcc-4.8"
-        - export CXX="g++-4.8"
-        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="Linux gcc 4.6 (make) unbundled"
-      compiler: gcc
-      script:
-        - export CC="gcc"
-        - export CXX="g++"
-        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
-        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
-
-    - env:    TEST_NAME="Linux gcc 4.8 (make) unbundled"
-      compiler: gcc
-      script:
-        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
-        - export CC="gcc-4.8"
-        - export CXX="g++-4.8"
-        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="Linux clang 3.4 (make)"
+    - env:    TEST_NAME="clang (make) bundled"
       compiler: clang
       script:
-        - ./configure --everything --config=Linux-clang && make -s -j2 && ./travis/Linux/runtests.sh
+        - sudo apt-get install -qq -y clang
+        - export CC="clang"
+        - export CXX="clang++"
+        - $CXX --version
+        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
+        - ./configure --everything  && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    - env:    TEST_NAME="clang (make) unbundled"
+      compiler: clang
+      script:
+        - sudo apt-get install -qq -y clang
+        - export CC="clang"
+        - export CXX="clang++"
+        - $CXX --version
+        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    - env:    TEST_NAME="gcc 4.6 (make) bundled"
+      compiler: gcc
+      script:
+        - export CC="gcc"
+        - export CXX="g++"
+        - $CXX --version
+        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    - env:    TEST_NAME="gcc 4.6 (make) unbundled"
+      compiler: gcc
+      script:
+        - export CC="gcc"
+        - export CXX="g++"
+        - $CXX --version
+        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
+        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
 
-    - env:    TEST_NAME="Linux arm-linux-gnueabi- (make)"
+    - env:    TEST_NAME="gcc 4.8 (make) bundled"
+      compiler: gcc
+      script:
+        - export CC="gcc-4.8"
+        - export CXX="g++-4.8"
+        - $CXX --version
+        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    - env:    TEST_NAME="gcc 4.8 (make) unbundled"
+      compiler: gcc
+      script:
+        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
+        - export CC="gcc-4.8"
+        - export CXX="g++-4.8"
+        - $CXX --version
+        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
       compiler: gcc
       script:
         - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
-    - env:    TEST_NAME="Linux gcc 4.6 (CMake)"
+    - env:    TEST_NAME="gcc 4.6 (CMake)"
       compiler: gcc
       script:
         - export CC="gcc"
         - export CXX="g++"
+        - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
  
-    - env:    TEST_NAME="Linux gcc 4.8 (CMake)"
+    - env:    TEST_NAME="gcc 4.8 (CMake)"
       compiler: gcc
       script:
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
+        - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
-    - env:    TEST_NAME="Linux clang 3.4 (CMake)"
+    - env:    TEST_NAME="clang 3.4 (CMake)"
       compiler: clang
       script:
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
-    - env:    TEST_NAME="Linux arm-linux-gnueabi-g++ (CMake)"
+    - env:    TEST_NAME="arm-linux-gnueabi-g++ (CMake)"
       compiler: gcc
       script:
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
+        - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build 
         - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
-    - env:    TEST_NAME="Linux arm-linux-gnueabihf-g++ (CMake)"
+    - env:    TEST_NAME="arm-linux-gnueabihf-g++ (CMake)"
       compiler: gcc
       script:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
+        - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build
@@ -151,11 +177,12 @@ matrix:
 
     # QA jobs for code analytics and metrics
     # build documentation and release
-    - env:    TEST_NAME="Linux documentation & release"
+    - env:    TEST_NAME="documentation & release"
       compiler: gcc
       script:
-        - export CC="gcc"
-        - export CXX="g++"
+        - export CC="gcc-4.8"
+        - export CXX="g++-4.8"
+        - $CXX --version
         - . env.sh && mkdoc all && mkrel all
 
     # static code analysis with cppcheck (we can add --enable=all later)

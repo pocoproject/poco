@@ -15,14 +15,22 @@ LINKMODE ?= SHARED
 #
 # Define Tools
 #
-CC      = ${CROSS_COMPILE}gcc
-CXX     = ${CROSS_COMPILE}g++
+ifeq ($(origin CROSS_COMPILE), undefined)
+	CC	?=gcc
+	CXX	?=g++
+	LIB     = ar -cr
+	RANLIB  = ranlib
+	STRIP   = strip
+else
+	CC      = ${CROSS_COMPILE}gcc
+	CXX     = ${CROSS_COMPILE}g++
+	LIB     = ${CROSS_COMPILE}ar -cr
+	RANLIB  = ${CROSS_COMPILE}ranlib
+	STRIP   = ${CROSS_COMPILE}strip
+endif
 LINK    = $(CXX)
-LIB     = ${CROSS_COMPILE}ar -cr
-RANLIB  = ${CROSS_COMPILE}ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-STRIP   = ${CROSS_COMPILE}strip
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
 SHELL   = sh
 RM      = rm -rf
