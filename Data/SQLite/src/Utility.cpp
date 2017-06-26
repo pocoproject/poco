@@ -92,7 +92,7 @@ void Utility::initializeDefaultTypes()
 		_types.insert(TypeMap::value_type("UINTEGER32", MetaColumn::FDT_UINT32));
 		_types.insert(TypeMap::value_type("INT", MetaColumn::FDT_INT32));
 		_types.insert(TypeMap::value_type("INT32", MetaColumn::FDT_INT32));
-		_types.insert(TypeMap::value_type("INTEGER", MetaColumn::FDT_INT32));
+		_types.insert(TypeMap::value_type("INTEGER", MetaColumn::FDT_INT64));
 		_types.insert(TypeMap::value_type("INTEGER32", MetaColumn::FDT_INT32));
 		_types.insert(TypeMap::value_type("UINT64", MetaColumn::FDT_UINT64));
 		_types.insert(TypeMap::value_type("ULONG", MetaColumn::FDT_INT64));
