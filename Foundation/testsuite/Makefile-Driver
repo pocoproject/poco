@@ -54,8 +54,9 @@ endif
 
 COMMONFLAGS += -Wno-unused-variable
 
-ifneq (,$(findstring g++,$(CXX)))
+ifeq ('g++',$(findstring 'g++','$(CXX)'))
 COMMONFLAGS += -Wno-unused-but-set-variable
+#$(error $(findstring g++,$(CXX)))
 endif
 
 ifeq ($(LINKMODE),SHARED)
