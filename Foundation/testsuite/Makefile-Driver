@@ -52,7 +52,11 @@ ifdef POCO_UNBUNDLED
         SYSLIBS += -lz -lpcre
 endif
 
-COMMONFLAGS += -Wno-unused-variable -Wno-unused-but-set-variable
+COMMONFLAGS += -Wno-unused-variable
+
+ifneq (, $(findstring($(CXX), $(filter $(CC),g++ gcc))))
+COMMONFLAGS += -Wno-unused-but-set-variable
+endif
 
 ifeq ($(LINKMODE),SHARED)
 SHAREDOPT_LINK += -Wl,-rpath,$(BINPATH)
