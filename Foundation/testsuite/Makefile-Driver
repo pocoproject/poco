@@ -54,7 +54,7 @@ endif
 
 COMMONFLAGS += -Wno-unused-variable
 
-ifneq (, $(findstring($(CXX), $(filter $(CC),g++ gcc))))
+ifneq (,$(findstring g++,$(CXX)))
 COMMONFLAGS += -Wno-unused-but-set-variable
 endif
 
