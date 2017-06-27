@@ -29,7 +29,7 @@ services:
   - mysql
 
 dist: trusty
-sudo: required
+sudo: enabled
   
 addons:
   postgresql: "9.3"
