@@ -47,7 +47,8 @@ env:
     TEST_NAME=""
     
 before_script:
- - echo ${TEST_NAME}
+ - sleep 15
+ - mongo mydb_test --eval 'db.addUser("travis", "test");'- echo ${TEST_NAME}
  - chmod 755 ./travis/Linux/runtests.sh
  - chmod 755 ./travis/OSX/runtests.sh
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql -u root -e 'create database pocotestdb;'; fi
