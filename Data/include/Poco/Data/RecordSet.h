@@ -469,9 +469,12 @@ private:
 		}
 		else 
 		{
-			throw Poco::BadCastException(Poco::format("Type cast failed!\nColumn: %z\nTarget type:\t%s",  
+			throw Poco::BadCastException(Poco::format("Type cast failed!\nColumn: %z\nTarget type:\t%s"
+				"\nTarget container type:\t%s\nSource container type:\t%s",
 				pos,
-				std::string(typeid(T).name())));
+				std::string(typeid(T).name()),
+				std::string(typeid(ExtractionVecPtr).name()),
+				std::string(typeid(rExtractions[pos].get()).name())));
 		}
 	}
 
