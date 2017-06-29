@@ -24,7 +24,7 @@ before_install:
   # if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq && sudo apt-get install -qq -y clang; fi
 
 services:
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mongodb
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mongodb; fi
   - redis-server
   - postgresql
   - mysql
