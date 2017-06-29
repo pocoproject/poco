@@ -32,7 +32,6 @@
 #include "Poco/Data/Time.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/BulkExtraction.h"
@@ -1750,73 +1749,6 @@ void SQLExecutor::prepare()
 	assert (count == 0);
 }
 
-void SQLExecutor::numericTypes(const std::vector<std::string>& vals)
-{
-	std::string funct = "numericTypes()";
-	try {
-
-		session().setProperty(Poco::Data::ODBC::SessionImpl::NUMERIC_CONVERSION_PROPERTY, Poco::Data::ODBC::ODBCMetaColumn::NC_BEST_FIT);
-
-		{
-			Statement stat(session());
-			stat << "SELECT * FROM " << ExecUtil::numeric_tbl(), now;
-			RecordSet rs(stat);
-
-			assert(vals.size() + 1 == rs.columnCount());
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(0));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(1));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(2));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT64 == rs.columnType(3));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_STRING == rs.columnType(4));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_STRING == rs.columnType(5));
-			for (size_t i = 0; i < vals.size(); ++i)
-			{
-				std::string v = rs.value(i + 1).convert<std::string>();
-				assert(vals[i] == v);
-			}
-		}
-
-		session().setProperty(Poco::Data::ODBC::SessionImpl::NUMERIC_CONVERSION_PROPERTY, Poco::Data::ODBC::ODBCMetaColumn::NC_FORCE_STRING);
-		{
-			Statement stat(session());
-			stat << "SELECT * FROM " << ExecUtil::numeric_tbl(), now;
-			RecordSet rs(stat);
-
-			assert(vals.size() + 1 == rs.columnCount());
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(0));
-			for (size_t i = 0; i < vals.size(); ++i)
-			{
-				assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_STRING == rs.columnType(i + 1));
-				std::string v = rs.value<std::string>(i + 1);
-				assert(vals[i] == v);
-			}
-		}
-
-		session().setProperty(Poco::Data::ODBC::SessionImpl::NUMERIC_CONVERSION_PROPERTY, Poco::Data::ODBC::ODBCMetaColumn::NC_BEST_FIT_DBL_LIMIT);
-		{
-			Statement stat(session());
-			stat << "SELECT * FROM " << ExecUtil::numeric_tbl(), now;
-			RecordSet rs(stat);
-
-			assert(vals.size() + 1 == rs.columnCount());
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(0));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(1));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(2));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT64 == rs.columnType(3));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(4)); //conversion would be done with precision loss
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(5)); //conversion would be done with precision loss
-			for (size_t i = 0; i < vals.size(); ++i)
-			{
-				std::string v = rs.value(i + 1).convert<std::string>();
-				if (i < 3) // we've lost precision, so can't compare values
-					assert(vals[i] == v);
-			}
-		}
-
-	}
-	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
-	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
-}
 
 void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 {
@@ -2800,128 +2732,6 @@ void SQLExecutor::tupleVector()
 }
 
 
-void SQLExecutor::internalExtraction()
-{
-	std::string funct = "internalExtraction()";
-	std::vector<Tuple<int, double, std::string> > v;
-	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
-	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
-	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
-	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
-
-	try { session() << "INSERT INTO " << ExecUtil::vectors() << " VALUES (?,?,?)", use(v), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	try 
-	{ 
-		Statement stmt = (session() << "SELECT * FROM " << ExecUtil::vectors() , now);
-		RecordSet rset(stmt);
-
-		assert (3 == rset.columnCount());
-		assert (4 == rset.rowCount());
-
-		int curVal = 3;
-		do
-		{
-			assert (rset["str0"] == curVal);
-			++curVal;
-		} while (rset.moveNext());
-
-		rset.moveFirst();
-		assert (rset["str0"] == "3");
-		rset.moveLast();
-		assert(rset["str0"] == "6");
-
-		RecordSet rset2(rset);
-		assert (3 == rset2.columnCount());
-		assert (4 == rset2.rowCount());
-
-		int i = rset.value<int>(0,0);
-		assert (1 == i);
-
-		std::string s = rset.value(0,0).convert<std::string>();
-		assert ("1" == s);
-
-		int a = rset.value<int>(0,2);
-		assert (3 == a);
-
-		try
-		{
-			double d = rset.value<double>(1,1);
-			assert (2.5 == d);
-		}
-		catch (BadCastException&)
-		{
-			float f = rset.value<float>(1,1);
-			assert (2.5 == f);
-		}
-
-		try
-		{
-			s = rset.value<std::string>(2, 2);
-		}
-		catch (BadCastException&)
-		{
-			UTF16String us = rset.value<Poco::UTF16String>(2, 2);
-			Poco::UnicodeConverter::convert(us, s);
-		}
-		assert("5" == s);
-
-		i = rset.value("str0", 2);
-		assert (5 == i);
-		
-		const Column<std::deque<int> >& col = rset.column<std::deque<int> >(0);
-		Column<std::deque<int> >::Iterator it = col.begin();
-		Column<std::deque<int> >::Iterator end = col.end();
-		for (int i = 1; it != end; ++it, ++i)
-			assert (*it == i);
-
-		rset = (session() << "SELECT COUNT(*) AS cnt FROM " << ExecUtil::vectors(), now);
-
-		//various results for COUNT(*) are received from different drivers
-		try
-		{
-			//this is what most drivers will return
-			int i = rset.value<int>(0,0);
-			assert (4 == i);
-		}
-		catch(BadCastException&)
-		{
-			try
-			{
-				//this is for Oracle
-				double i = rset.value<double>(0,0);
-				assert (4 == int(i));
-			}
-			catch(BadCastException&)
-			{
-				//this is for PostgreSQL
-				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
-				assert (4 == big);
-			}
-		}
-
-		s = rset.value("cnt", 0).convert<std::string>();
-		assert ("4" == s);
-
-		try { rset.column<std::deque<int> >(100); fail ("must fail"); }
-		catch (RangeException&) { }
-
-		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
-		catch (BadCastException&) {	}
-		
-		stmt = (session() << "DELETE FROM " << ExecUtil::vectors(), now);
-		rset = stmt;
-
-		try { rset.column<std::deque<int> >(0); fail ("must fail"); }
-		catch (RangeException&) { }
-	}
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-}
-
-
 void SQLExecutor::filter(const std::string& query, const std::string& intFldName)
 {
 	std::string funct = "filter()";
@@ -3001,7 +2811,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 }
 
-
+/*
 void SQLExecutor::internalBulkExtraction()
 {
 	std::string funct = "internalBulkExtraction()";
@@ -3124,7 +2934,7 @@ void SQLExecutor::internalBulkExtractionUTF16()
 	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
 	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
 }
-
+*/
 
 void SQLExecutor::internalStorageType()
 {

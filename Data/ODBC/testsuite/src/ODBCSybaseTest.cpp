@@ -153,17 +153,6 @@ void SybaseODBC::recreateNullableTable()
 }
 
 
-void SybaseODBC::recreateNumericTable()
-{
-	dropObject("TABLE", ExecUtil::numeric_tbl());
-	try {
-		session() << "CREATE TABLE " << ExecUtil::numeric_tbl() <<
-			" (id integer, num8 NUMERIC(8), num16_3 NUMERIC(16,3), num18 NUMERIC(18), num18_8 NUMERIC(18,8), num22 NUMERIC(22))", now;
-	}
-	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateNumericTable()"); }
-	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateNumericTable()"); }
-}
-
 void SybaseODBC::recreatePersonTable()
 {
 	doPersonTable();
@@ -665,7 +654,6 @@ CppUnit::Test* SybaseODBC::suite()
 		CppUnit_addTest(pSuite, SybaseODBC, testTransactor);
 		CppUnit_addTest(pSuite, SybaseODBC, testNullable);
 		CppUnit_addTest(pSuite, SybaseODBC, testReconnect);
-		CppUnit_addTest(pSuite, SybaseODBC, testNumeric);
 		CppUnit_addTest(pSuite, SybaseODBC, testInsertStatReuse);
 
 		_pExecutor = 0;

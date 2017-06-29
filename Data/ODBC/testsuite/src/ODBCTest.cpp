@@ -960,7 +960,7 @@ void ODBCTest::testInternalExtraction()
 		recreateVectorsTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->internalExtraction();
+		_pExecutor->internalExtraction(0);
 		i += 2;
 	}
 }
@@ -989,9 +989,9 @@ void ODBCTest::testInternalBulkExtraction()
 	_pSession->setFeature("autoBind", true);
 	_pSession->setFeature("autoExtract", true);
 #ifdef POCO_ODBC_UNICODE
-	_pExecutor->internalBulkExtractionUTF16();
+	_pExecutor->internalBulkExtractionUTF16(0);
 #else
-	_pExecutor->internalBulkExtraction();
+	_pExecutor->internalBulkExtraction(0);
 #endif
 }
 
@@ -1235,33 +1235,6 @@ void ODBCTest::testNullable()
 	}
 }
 
-void ODBCTest::testNumeric()
-{
-	if (!_pSession) fail("Test not available.");
-
-	recreateNumericTable();
-	std::vector<std::string> vals;
-	vals.push_back("12345678");
-	vals.push_back("123456789012.123");
-	vals.push_back("123456789012345678");
-	vals.push_back("1234567890.12345678");
-	vals.push_back("1234567890123456789012");
-
-	const std::string sqlStr = std::string("INSERT INTO ") + ExecUtil::numeric_tbl() +
-		"(id, num8, num16_3, num18, num18_8, num22) VALUES (1, " + str2NumExpr(vals[0],8,0) + " , " + str2NumExpr(vals[1],16,3) + ", " + str2NumExpr(vals[2], 18,0)  
-		+ " , " + str2NumExpr(vals[3], 18, 8) + " , " + str2NumExpr(vals[4], 22, 0) + ")";
-	
-	session() << sqlStr, now;
-
-	for (int i = 0; i < 8;)
-	{
-		_pSession->setFeature("autoBind", bindValue(i));
-		_pSession->setFeature("autoExtract", bindValue(i + 1));
-		_pExecutor->numericTypes(vals);
-		i += 2;
-	}
-}
-
 
 void ODBCTest::testInsertStatReuse()
 {
@@ -1413,7 +1386,7 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	
 	try
 	{
-		std::cout << "Conecting to [" << dbConnString << ']' << std::endl;
+		std::cout << "Connecting to [" << dbConnString << ']' << std::endl;
 		return new Session(Poco::Data::ODBC::Connector::KEY, dbConnString, 5);
 	}catch (ConnectionFailedException& ex)
 	{

@@ -47,7 +47,7 @@ public:
 	typedef SharedPtr<Type>         Ptr;
 
 	BulkExtraction(C& rResult, Poco::UInt32 limit, const Position& pos = Position(0)): 
-		AbstractExtraction(limit, pos.value(), true),
+		AbstractExtraction(typeid(C).name(), limit, pos.value(), true),
 		_rResult(rResult), 
 		_default()
 	{
@@ -56,7 +56,7 @@ public:
 	}
 
 	BulkExtraction(C& rResult, const CValType& def, Poco::UInt32 limit, const Position& pos = Position(0)): 
-		AbstractExtraction(limit, pos.value(), true),
+		AbstractExtraction(typeid(C).name(), limit, pos.value(), true),
 		_rResult(rResult), 
 		_default(def)
 	{

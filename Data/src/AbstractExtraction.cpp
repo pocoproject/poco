@@ -21,9 +21,10 @@ namespace Poco {
 namespace Data {
 
 
-AbstractExtraction::AbstractExtraction(Poco::UInt32 limit,
+AbstractExtraction::AbstractExtraction(const std::string& type, Poco::UInt32 limit,
 	Poco::UInt32 extractionPosition,
-	bool bulk): 
+	bool bulk):
+	_type(type),
 	_pExtractor(0), 
 	_limit(limit),
 	_position(extractionPosition),

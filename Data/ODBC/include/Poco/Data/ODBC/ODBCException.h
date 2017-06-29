@@ -57,7 +57,7 @@ public:
 		/// Creates HandleException
 	{
 		extendedMessage(_error.toString());
-	}							
+	}
 
 	HandleException(const H& handle, const std::string& msg, const std::string& arg): 
 		ODBCException(msg, arg), 

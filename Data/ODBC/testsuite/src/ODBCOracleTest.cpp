@@ -43,7 +43,7 @@ using Poco::DynamicAny;
 using Poco::DateTime;
 
 
-#define ORACLE_ODBC_DRIVER "Oracle in XE"
+#define ORACLE_ODBC_DRIVER "Oracle in OraClient12Home1_32bit"//XE"
 #define ORACLE_DSN "PocoDataOracleTest"
 #define ORACLE_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define ORACLE_PORT "1521"
@@ -166,6 +166,40 @@ void ODBCOracleTest::testBarebone()
 		MULTI_INSERT,
 		MULTI_SELECT);
 
+}
+
+
+void ODBCOracleTest::testInternalExtraction()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateVectorsTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+#ifdef POCO_64_BIT
+		_pExecutor->internalExtraction<double>(0.);
+#else
+		_pExecutor->internalExtraction(0);
+#endif
+		i += 2;
+	}
+}
+
+
+void ODBCOracleTest::testInternalBulkExtraction()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonTable();
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+#ifdef POCO_ODBC_UNICODE
+	_pExecutor->internalBulkExtractionUTF16<double>(0);
+#else
+	_pExecutor->internalBulkExtraction<double>(0);
+#endif
 }
 
 
