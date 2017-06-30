@@ -88,6 +88,11 @@ struct ExecUtil
 		return mangleTable("Strings");
 	}
 
+	static std::string ints()
+	{
+		return mangleTable("Ints");
+	}
+
 	static std::string tuples()
 	{
 		return mangleTable("Tuples");

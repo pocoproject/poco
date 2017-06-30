@@ -617,18 +617,18 @@ void ODBCOracleTest::testAutoTransaction()
 	recreateIntsTable();
 
 	session().setFeature("autoCommit", true);
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (1)", now;
-	localSession << "SELECT count(*) FROM " << ExecUtil::person() , into(count), now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (1)", now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints() , into(count), now;
 	assert (1 == count);
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (2)", now;
-	localSession << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (2)", now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (2 == count);
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (3)", now;
-	localSession << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (3)", now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (3 == count);
 
-	session() << "DELETE FROM " << ExecUtil::strings(), now;
-	localSession << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	session() << "DELETE FROM " << ExecUtil::ints(), now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (0 == count);
 
 	session().setFeature("autoCommit", false);
@@ -636,26 +636,26 @@ void ODBCOracleTest::testAutoTransaction()
 	try
 	{
 		AutoTransaction at(session());
-		session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (1)", now;
-		session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (2)", now;
+		session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (1)", now;
+		session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (2)", now;
 		session() << "BAD QUERY", now;
 	} catch (Poco::Exception&) {}
 
-	session() << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	session() << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (0 == count);
 
 	AutoTransaction at(session());
 
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (1)", now;
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (2)", now;
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (3)", now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (1)", now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (2)", now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (3)", now;
 
-	localSession << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (0 == count);
 
 	at.commit();
 
-	localSession << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (3 == count);
 
 	session().setFeature("autoCommit", ac);
@@ -745,8 +745,8 @@ void ODBCOracleTest::recreatePersonDateTable()
 
 void ODBCOracleTest::recreateIntsTable()
 {
-	dropObject("TABLE", ExecUtil::strings());
-	try { *_pSession << "CREATE TABLE " << ExecUtil::strings() <<" (str INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::ints());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::ints() <<" (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }

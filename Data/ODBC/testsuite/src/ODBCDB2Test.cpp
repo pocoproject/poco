@@ -626,8 +626,8 @@ void ODBCDB2Test::recreatePersonDateTimeTable()
 
 void ODBCDB2Test::recreateIntsTable()
 {
-	dropObject("TABLE", ExecUtil::strings());
-	try { session() << "CREATE TABLE " << ExecUtil::strings() << " (str INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::ints());
+	try { session() << "CREATE TABLE " << ExecUtil::ints() << " (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }
