@@ -188,21 +188,6 @@ void ODBCOracleTest::testInternalExtraction()
 }
 
 
-void ODBCOracleTest::testInternalBulkExtraction()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	recreatePersonTable();
-	_pSession->setFeature("autoBind", true);
-	_pSession->setFeature("autoExtract", true);
-#ifdef POCO_ODBC_UNICODE
-	_pExecutor->internalBulkExtractionUTF16<double>(0);
-#else
-	_pExecutor->internalBulkExtraction<double>(0);
-#endif
-}
-
-
 void ODBCOracleTest::testBLOB()
 {
 	const std::size_t maxFldSize = 1000000;

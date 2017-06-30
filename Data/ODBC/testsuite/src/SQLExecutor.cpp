@@ -2811,7 +2811,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 }
 
-/*
+
 void SQLExecutor::internalBulkExtraction()
 {
 	std::string funct = "internalBulkExtraction()";
@@ -2934,7 +2934,7 @@ void SQLExecutor::internalBulkExtractionUTF16()
 	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
 	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
 }
-*/
+
 
 void SQLExecutor::internalStorageType()
 {

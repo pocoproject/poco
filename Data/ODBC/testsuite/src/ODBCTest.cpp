@@ -989,9 +989,9 @@ void ODBCTest::testInternalBulkExtraction()
 	_pSession->setFeature("autoBind", true);
 	_pSession->setFeature("autoExtract", true);
 #ifdef POCO_ODBC_UNICODE
-	_pExecutor->internalBulkExtractionUTF16(0);
+	_pExecutor->internalBulkExtractionUTF16();
 #else
-	_pExecutor->internalBulkExtraction(0);
+	_pExecutor->internalBulkExtraction();
 #endif
 }
 
