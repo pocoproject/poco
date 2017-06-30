@@ -514,7 +514,7 @@ private:
 	bool extractImpl(std::size_t pos, T& val)
 		/// Utility function for extraction of Any and DynamicAny.
 	{
-		ODBCMetaColumn column(_rStmt, pos, _pPreparator->numericConversion());
+		ODBCMetaColumn column(_rStmt, pos);
 
 		switch (column.type())
 		{
@@ -720,7 +720,7 @@ inline bool Extractor::isNullLengthIndicator(SQLLEN val) const
 
 inline SQLINTEGER Extractor::columnSize(std::size_t pos) const
 {
-	std::size_t size = ODBCMetaColumn(_rStmt, pos, _pPreparator->numericConversion()).length();
+	std::size_t size = ODBCMetaColumn(_rStmt, pos).length();
 	std::size_t maxSize = _pPreparator->maxDataSize(pos);
 	if (size > maxSize) size = maxSize;
 	return (SQLINTEGER) size;
