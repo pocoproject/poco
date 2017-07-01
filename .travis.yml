@@ -47,8 +47,8 @@ env:
     TEST_NAME=""
     
 before_script:
- - sleep 15
- - mongo mydb_test --eval 'db.createUser("travis", "test");'
+ # sleep 15
+ # mongo mydb_test --eval 'db.createUser("travis", "test");'
  - echo ${TEST_NAME}
  - chmod 755 ./travis/Linux/runtests.sh
  - chmod 755 ./travis/OSX/runtests.sh
