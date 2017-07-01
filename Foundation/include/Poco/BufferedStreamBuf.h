@@ -72,7 +72,7 @@ public:
 			Allocator::deallocate(_pBuffer, _bufsize);
 		} catch (...)
 		{
-			// Do nothing
+			poco_unexpected();
 		}
 	}
 
