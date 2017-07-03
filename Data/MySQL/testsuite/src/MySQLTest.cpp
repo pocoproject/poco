@@ -49,16 +49,22 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 
 std::string MySQLTest::getHost()
 {
-	return "localhost";
+	return "127.0.0.1"; //do not change to "localhost"!
 }
+
+
 std::string MySQLTest::getPort()
 {
 	return "3306";
 }
+
+
 std::string MySQLTest::getUser()
 {
 	return "root";
 }
+
+
 std::string MySQLTest::getPass()
 {
 	if (Environment::has("APPVEYOR"))
@@ -68,18 +74,20 @@ std::string MySQLTest::getPass()
 	else
 		return "poco";
 }
+
+
 std::string MySQLTest::getBase()
 {
 	return "pocotestdb";
 }
 
-std::string MySQLTest::_dbConnString;
 
+std::string MySQLTest::_dbConnString;
 
 
 //
 // Connection string
-
+//
 
 MySQLTest::MySQLTest(const std::string& name):
 	CppUnit::TestCase(name)
@@ -533,6 +541,26 @@ void MySQLTest::testTupleVector()
 	_pExecutor->tupleVector();
 }
 
+#if __cplusplus >= 201103L
+
+void MySQLTest::testStdTuple()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateTuplesTable();
+	_pExecutor->stdTuples();
+}
+
+
+void MySQLTest::testStdTupleVector()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateTuplesTable();
+	_pExecutor->stdTupleVector();
+}
+
+#endif // __cplusplus >= 201103L
 
 void MySQLTest::testInternalExtraction()
 {
@@ -765,8 +793,8 @@ void MySQLTest::recreatePersonTimeTable()
 
 void MySQLTest::recreateIntsTable()
 {
-	dropTable("Strings");
-	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	dropTable("Ints");
+	try { *_pSession << "CREATE TABLE Ints (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -934,6 +962,10 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testDouble);
 	CppUnit_addTest(pSuite, MySQLTest, testTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
+#if __cplusplus >= 201103L
+	CppUnit_addTest(pSuite, MySQLTest, testStdTuple);
+	CppUnit_addTest(pSuite, MySQLTest, testStdTupleVector);
+#endif
 	CppUnit_addTest(pSuite, MySQLTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, MySQLTest, testNull);
 	CppUnit_addTest(pSuite, MySQLTest, testNullableInt);

@@ -87,10 +87,10 @@ RSAKeyImpl::RSAKeyImpl(
 			RSA* pubKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, 0, 0);
 			if (!pubKey)
 			{
-				int ret = BIO_reset(bio);
+				int rc = BIO_reset(bio);
 				// BIO_reset() normally returns 1 for success and 0 or -1 for failure. 
 				// File BIOs are an exception, they return 0 for success and -1 for failure.
-				if (ret != 0) throw Poco::FileException("Failed to load public key", publicKeyFile);
+				if (rc != 0) throw Poco::FileException("Failed to load public key", publicKeyFile);
 				pubKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, 0, 0);
 			}
 			BIO_free(bio);
@@ -207,19 +207,43 @@ int RSAKeyImpl::size() const
 
 RSAKeyImpl::ByteVec RSAKeyImpl::modulus() const
 {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	const BIGNUM* n = 0;
+	const BIGNUM* e = 0;
+	const BIGNUM* d = 0;
+	RSA_get0_key(_pRSA, &n, &e, &d);
+	return convertToByteVec(n);
+#else
 	return convertToByteVec(_pRSA->n);
+#endif
 }
 
 
 RSAKeyImpl::ByteVec RSAKeyImpl::encryptionExponent() const
 {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	const BIGNUM* n = 0;
+	const BIGNUM* e = 0;
+	const BIGNUM* d = 0;
+	RSA_get0_key(_pRSA, &n, &e, &d);
+	return convertToByteVec(e);
+#else
 	return convertToByteVec(_pRSA->e);
+#endif
 }
 
 
 RSAKeyImpl::ByteVec RSAKeyImpl::decryptionExponent() const
 {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	const BIGNUM* n = 0;
+	const BIGNUM* e = 0;
+	const BIGNUM* d = 0;
+	RSA_get0_key(_pRSA, &n, &e, &d);
+	return convertToByteVec(d);
+#else
 	return convertToByteVec(_pRSA->d);
+#endif
 }
 
 
@@ -287,8 +311,8 @@ void RSAKeyImpl::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyS
 			throw Poco::WriteFileException("Failed to write public key to stream");
 		}
 		char* pData;
-		long keySize = BIO_get_mem_data(bio, &pData);
-		pPublicKeyStream->write(pData, static_cast<std::streamsize>(keySize));
+		long size = BIO_get_mem_data(bio, &pData);
+		pPublicKeyStream->write(pData, static_cast<std::streamsize>(size));
 		BIO_free(bio);
 	}
 
@@ -309,8 +333,8 @@ void RSAKeyImpl::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyS
 			throw Poco::FileException("Failed to write private key to stream");
 		}
 		char* pData;
-		long keySize = BIO_get_mem_data(bio, &pData);
-		pPrivateKeyStream->write(pData, static_cast<std::streamsize>(keySize));
+		long size = BIO_get_mem_data(bio, &pData);
+		pPrivateKeyStream->write(pData, static_cast<std::streamsize>(size));
 		BIO_free(bio);
 	}
 }

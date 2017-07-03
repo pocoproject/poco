@@ -112,25 +112,25 @@ std::string SharedLibraryImpl::prefixImpl()
 std::string SharedLibraryImpl::suffixImpl()
 {
 #if POCO_OS == POCO_OS_MAC_OS_X
-	#if defined(_DEBUG)
+	#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 		return "d.dylib";
 	#else
 		return ".dylib";
 	#endif
 #elif POCO_OS == POCO_OS_HPUX
-	#if defined(_DEBUG)
+	#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 		return "d.sl";
 	#else
 		return ".sl";
 	#endif
 #elif POCO_OS == POCO_OS_CYGWIN
-	#if defined(_DEBUG)
+	#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 		return "d.dll";
 	#else
 		return ".dll";
 	#endif
 #else
-	#if defined(_DEBUG)
+	#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 		return "d.so";
 	#else
 		return ".so";

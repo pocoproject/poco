@@ -18,6 +18,7 @@
 
 
 // +++ double conversion +++
+#define double_conversion poco_double_conversion	// don't collide with standalone double_conversion library
 #define UNREACHABLE poco_bugcheck
 #define UNIMPLEMENTED poco_bugcheck
 #include "diy-fp.cc"
@@ -59,11 +60,7 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	std::string::size_type frac = str.length() - decSepPos - 1;
 
 	std::string::size_type ePos = str.find_first_of("eE");
-#if defined(POCO_ENABLE_CPP11)
 	std::unique_ptr<std::string> eStr;
-#else
-	std::auto_ptr<std::string> eStr;
-#endif
 	if (ePos != std::string::npos)
 	{
 		eStr.reset(new std::string(str.substr(ePos, std::string::npos)));

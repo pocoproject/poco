@@ -134,12 +134,6 @@ std::string PathImpl::cacheHomeImpl()
 }
 
 
-std::string PathImpl::tempHomeImpl()
-{
-	return tempImpl();
-}
-
-
 std::string PathImpl::tempImpl()
 {
 	Buffer<wchar_t> buffer(MAX_PATH_LEN);

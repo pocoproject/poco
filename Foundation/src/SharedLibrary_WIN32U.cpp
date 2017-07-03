@@ -106,7 +106,7 @@ std::string SharedLibraryImpl::prefixImpl()
 
 std::string SharedLibraryImpl::suffixImpl()
 {
-#if defined(_DEBUG)
+#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 	return "d.dll";
 #else
 	return ".dll";

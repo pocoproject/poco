@@ -32,7 +32,6 @@
 #include "Poco/Data/Time.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/BulkExtraction.h"
@@ -1518,7 +1517,7 @@ void SQLExecutor::insertSingleBulk()
 {
 	std::string funct = "insertSingleBulk()";
 	int x = 0;
-	Statement stmt((session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(x)));
+	Statement stmt((session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (?)", use(x)));
 
 	for (x = 0; x < 100; ++x)
 	{
@@ -1526,12 +1525,12 @@ void SQLExecutor::insertSingleBulk()
 		assert (1 == i);
 	}
 	int count = 0;
-	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::strings(), into(count), now; }
+	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::ints(), into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == 100);
 
-	try { session() << "SELECT SUM(str) FROM " << ExecUtil::strings(), into(count), now; }
+	try { session() << "SELECT SUM(str) FROM " << ExecUtil::ints(), into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == ((0+99)*100/2));
@@ -1592,16 +1591,16 @@ void SQLExecutor::insertSingleBulkVec()
 	for (int x = 0; x < 100; ++x)
 		data.push_back(x);
 
-	Statement stmt((session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(data)));
+	Statement stmt((session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (?)", use(data)));
 	stmt.execute();
 
 	int count = 0;
-	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::strings(), into(count), now; }
+	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::ints(), into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	assert (count == 100);
-	try { session() << "SELECT SUM(str) FROM " << ExecUtil::strings(), into(count), now; }
+	try { session() << "SELECT SUM(str) FROM " << ExecUtil::ints(), into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == ((0+99)*100/2));
@@ -1617,12 +1616,12 @@ void SQLExecutor::limits()
 		data.push_back(x);
 	}
 
-	try { session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(data), now; }
+	try { session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (?)", use(data), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	std::vector<int> retData;
-	try { session() << "SELECT * FROM " << ExecUtil::strings(), into(retData), limit(50), now; }
+	try { session() << "SELECT * FROM " << ExecUtil::ints(), into(retData), limit(50), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (retData.size() == 50);
@@ -1642,12 +1641,12 @@ void SQLExecutor::limitZero()
 		data.push_back(x);
 	}
 
-	try { session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(data), now; }
+	try { session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (?)", use(data), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	std::vector<int> retData;
-	try { session() << "SELECT * FROM " << ExecUtil::strings(), into(retData), limit(0), now; }// stupid test, but at least we shouldn't crash
+	try { session() << "SELECT * FROM " << ExecUtil::ints(), into(retData), limit(0), now; }// stupid test, but at least we shouldn't crash
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (retData.size() == 0);
@@ -1663,12 +1662,12 @@ void SQLExecutor::limitOnce()
 		data.push_back(x);
 	}
 
-	try { session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(data), now; }
+	try { session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (?)", use(data), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	std::vector<int> retData;
-	Statement stmt = (session() << "SELECT * FROM " << ExecUtil::strings(), into(retData), limit(50), now);
+	Statement stmt = (session() << "SELECT * FROM " << ExecUtil::ints(), into(retData), limit(50), now);
 	assert (!stmt.done());
 	assert (retData.size() == 50);
 	stmt.execute();
@@ -1696,14 +1695,14 @@ void SQLExecutor::limitPrepare()
 
 	try 
 	{ 
-		Statement stmt = (session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(data)); 
+		Statement stmt = (session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (?)", use(data)); 
 		assert (100 == stmt.execute());
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	std::vector<int> retData;
-	Statement stmt = (session() << "SELECT * FROM " << ExecUtil::strings(), into(retData), limit(50));
+	Statement stmt = (session() << "SELECT * FROM " << ExecUtil::ints(), into(retData), limit(50));
 	assert (retData.size() == 0);
 	assert (!stmt.done());
 
@@ -1739,84 +1738,17 @@ void SQLExecutor::prepare()
 	}
 
 	{
-		Statement stmt((session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(data)));
+		Statement stmt((session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (?)", use(data)));
 	}
 
 	// stmt should not have been executed when destroyed
 	int count = 100;
-	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::strings(), into(count), now; }
+	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::ints(), into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == 0);
 }
 
-void SQLExecutor::numericTypes(const std::vector<std::string>& vals)
-{
-	std::string funct = "numericTypes()";
-	try {
-
-		session().setProperty(Poco::Data::ODBC::SessionImpl::NUMERIC_CONVERSION_PROPERTY, Poco::Data::ODBC::ODBCMetaColumn::NC_BEST_FIT);
-
-		{
-			Statement stat(session());
-			stat << "SELECT * FROM " << ExecUtil::numeric_tbl(), now;
-			RecordSet rs(stat);
-
-			assert(vals.size() + 1 == rs.columnCount());
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(0));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(1));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(2));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT64 == rs.columnType(3));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_STRING == rs.columnType(4));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_STRING == rs.columnType(5));
-			for (size_t i = 0; i < vals.size(); ++i)
-			{
-				std::string v = rs.value(i + 1).convert<std::string>();
-				assert(vals[i] == v);
-			}
-		}
-
-		session().setProperty(Poco::Data::ODBC::SessionImpl::NUMERIC_CONVERSION_PROPERTY, Poco::Data::ODBC::ODBCMetaColumn::NC_FORCE_STRING);
-		{
-			Statement stat(session());
-			stat << "SELECT * FROM " << ExecUtil::numeric_tbl(), now;
-			RecordSet rs(stat);
-
-			assert(vals.size() + 1 == rs.columnCount());
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(0));
-			for (size_t i = 0; i < vals.size(); ++i)
-			{
-				assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_STRING == rs.columnType(i + 1));
-				std::string v = rs.value<std::string>(i + 1);
-				assert(vals[i] == v);
-			}
-		}
-
-		session().setProperty(Poco::Data::ODBC::SessionImpl::NUMERIC_CONVERSION_PROPERTY, Poco::Data::ODBC::ODBCMetaColumn::NC_BEST_FIT_DBL_LIMIT);
-		{
-			Statement stat(session());
-			stat << "SELECT * FROM " << ExecUtil::numeric_tbl(), now;
-			RecordSet rs(stat);
-
-			assert(vals.size() + 1 == rs.columnCount());
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(0));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT32 == rs.columnType(1));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(2));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_INT64 == rs.columnType(3));
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(4)); //conversion would be done with precision loss
-			assert(Poco::Data::ODBC::ODBCMetaColumn::FDT_DOUBLE == rs.columnType(5)); //conversion would be done with precision loss
-			for (size_t i = 0; i < vals.size(); ++i)
-			{
-				std::string v = rs.value(i + 1).convert<std::string>();
-				if (i < 3) // we've lost precision, so can't compare values
-					assert(vals[i] == v);
-			}
-		}
-
-	}
-	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
-	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
-}
 
 void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 {
@@ -2800,128 +2732,6 @@ void SQLExecutor::tupleVector()
 }
 
 
-void SQLExecutor::internalExtraction()
-{
-	std::string funct = "internalExtraction()";
-	std::vector<Tuple<int, double, std::string> > v;
-	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
-	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
-	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
-	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
-
-	try { session() << "INSERT INTO " << ExecUtil::vectors() << " VALUES (?,?,?)", use(v), now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	try 
-	{ 
-		Statement stmt = (session() << "SELECT * FROM " << ExecUtil::vectors() , now);
-		RecordSet rset(stmt);
-
-		assert (3 == rset.columnCount());
-		assert (4 == rset.rowCount());
-
-		int curVal = 3;
-		do
-		{
-			assert (rset["str0"] == curVal);
-			++curVal;
-		} while (rset.moveNext());
-
-		rset.moveFirst();
-		assert (rset["str0"] == "3");
-		rset.moveLast();
-		assert(rset["str0"] == "6");
-
-		RecordSet rset2(rset);
-		assert (3 == rset2.columnCount());
-		assert (4 == rset2.rowCount());
-
-		int i = rset.value<int>(0,0);
-		assert (1 == i);
-
-		std::string s = rset.value(0,0).convert<std::string>();
-		assert ("1" == s);
-
-		int a = rset.value<int>(0,2);
-		assert (3 == a);
-
-		try
-		{
-			double d = rset.value<double>(1,1);
-			assert (2.5 == d);
-		}
-		catch (BadCastException&)
-		{
-			float f = rset.value<float>(1,1);
-			assert (2.5 == f);
-		}
-
-		try
-		{
-			s = rset.value<std::string>(2, 2);
-		}
-		catch (BadCastException&)
-		{
-			UTF16String us = rset.value<Poco::UTF16String>(2, 2);
-			Poco::UnicodeConverter::convert(us, s);
-		}
-		assert("5" == s);
-
-		i = rset.value("str0", 2);
-		assert (5 == i);
-		
-		const Column<std::deque<int> >& col = rset.column<std::deque<int> >(0);
-		Column<std::deque<int> >::Iterator it = col.begin();
-		Column<std::deque<int> >::Iterator end = col.end();
-		for (int i = 1; it != end; ++it, ++i)
-			assert (*it == i);
-
-		rset = (session() << "SELECT COUNT(*) AS cnt FROM " << ExecUtil::vectors(), now);
-
-		//various results for COUNT(*) are received from different drivers
-		try
-		{
-			//this is what most drivers will return
-			int i = rset.value<int>(0,0);
-			assert (4 == i);
-		}
-		catch(BadCastException&)
-		{
-			try
-			{
-				//this is for Oracle
-				double i = rset.value<double>(0,0);
-				assert (4 == int(i));
-			}
-			catch(BadCastException&)
-			{
-				//this is for PostgreSQL
-				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
-				assert (4 == big);
-			}
-		}
-
-		s = rset.value("cnt", 0).convert<std::string>();
-		assert ("4" == s);
-
-		try { rset.column<std::deque<int> >(100); fail ("must fail"); }
-		catch (RangeException&) { }
-
-		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
-		catch (BadCastException&) {	}
-		
-		stmt = (session() << "DELETE FROM " << ExecUtil::vectors(), now);
-		rset = stmt;
-
-		try { rset.column<std::deque<int> >(0); fail ("must fail"); }
-		catch (RangeException&) { }
-	}
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-}
-
-
 void SQLExecutor::filter(const std::string& query, const std::string& intFldName)
 {
 	std::string funct = "filter()";
@@ -3455,12 +3265,12 @@ void SQLExecutor::asynchronous(int rowCount)
 	if (!_connInitSql.empty()) tmp << _connInitSql, now;
 
 	std::vector<int> data(rowCount);
-	Statement stmt = (tmp << "INSERT INTO " << ExecUtil::strings() << " VALUES(?)", use(data));
+	Statement stmt = (tmp << "INSERT INTO " << ExecUtil::ints() << " VALUES(?)", use(data));
 	Statement::Result result = stmt.executeAsync();
 	assert (!stmt.isAsync());
 	result.wait();
 	
-	Statement stmt1 = (tmp << "SELECT * FROM " << ExecUtil::strings(), into(data), async, now);
+	Statement stmt1 = (tmp << "SELECT * FROM " << ExecUtil::ints(), into(data), async, now);
 	assert (stmt1.isAsync());
 	assert (stmt1.wait() == rowCount);
 
@@ -3478,7 +3288,7 @@ void SQLExecutor::asynchronous(int rowCount)
 	}
 	// ---
 
-	stmt = tmp << "SELECT * FROM " << ExecUtil::strings(), into(data), async, now;
+	stmt = tmp << "SELECT * FROM " << ExecUtil::ints(), into(data), async, now;
 	assert (stmt.isAsync());
 	stmt.wait();
 	assert (stmt.execute() == 0);
@@ -3502,7 +3312,7 @@ void SQLExecutor::asynchronous(int rowCount)
 	assert (!stmt.isAsync());
 	assert (stmt.execute() == rowCount);
 
-	stmt = tmp << "SELECT * FROM " << ExecUtil::strings(), into(data), sync, now;
+	stmt = tmp << "SELECT * FROM " << ExecUtil::ints(), into(data), sync, now;
 	assert (!stmt.isAsync());
 	assert (stmt.wait() == 0);
 	assert (stmt.execute() == rowCount);
@@ -3514,7 +3324,7 @@ void SQLExecutor::asynchronous(int rowCount)
 	assert (0 == rowCount % 10);
 	int step = (int) (rowCount/10);
 	data.clear();
-	Statement stmt2 = (tmp << "SELECT * FROM " << ExecUtil::strings(), into(data), async, limit(step));
+	Statement stmt2 = (tmp << "SELECT * FROM " << ExecUtil::ints(), into(data), async, limit(step));
 	assert (data.size() == 0);
 	assert (!stmt2.done());
 	std::size_t rows = 0;
@@ -3529,7 +3339,7 @@ void SQLExecutor::asynchronous(int rowCount)
 	assert (stmt2.done());
 	assert (rowCount == data.size());
 
-	stmt2 = tmp << "SELECT * FROM " << ExecUtil::strings(), reset;
+	stmt2 = tmp << "SELECT * FROM " << ExecUtil::ints(), reset;
 	assert (!stmt2.isAsync());
 	assert ("deque" == stmt2.getStorage());
 	assert (stmt2.execute() == rowCount);

@@ -17,6 +17,7 @@
 #include "Poco/Net/WebSocketImpl.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/WebSocket.h"
+#include "Poco/Net/HTTPSession.h"
 #include "Poco/Buffer.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/BinaryReader.h"
@@ -29,14 +30,17 @@ namespace Poco {
 namespace Net {
 
 
-WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, bool isMustMaskPayload):
+WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& session, bool mustMaskPayload):
 	StreamSocketImpl(pStreamSocketImpl->sockfd()),
 	_pStreamSocketImpl(pStreamSocketImpl),
+	_buffer(0),
+	_bufferOffset(0),
 	_frameFlags(0),
-	_mustMaskPayload(isMustMaskPayload)
+	_mustMaskPayload(mustMaskPayload)
 {
 	poco_check_ptr(pStreamSocketImpl);
 	_pStreamSocketImpl->duplicate();
+	session.drainBuffer(_buffer);
 }
 
 
@@ -211,12 +215,12 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int)
 
 int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 {
-	int received = _pStreamSocketImpl->receiveBytes(reinterpret_cast<char*>(buffer), bytes);
+	int received = receiveSomeBytes(reinterpret_cast<char*>(buffer), bytes);
 	if (received > 0)
 	{
 		while (received < bytes)
 		{
-			int n = _pStreamSocketImpl->receiveBytes(reinterpret_cast<char*>(buffer) + received, bytes - received);
+			int n = receiveSomeBytes(reinterpret_cast<char*>(buffer) + received, bytes - received);
 			if (n > 0)
 				received += n;
 			else
@@ -227,37 +231,66 @@ int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 }
 
 
+int WebSocketImpl::receiveSomeBytes(char* buffer, int bytes)
+{
+	int n = _buffer.size() - _bufferOffset;
+	if (n > 0)
+	{
+		if (bytes < n) n = bytes;
+		std::memcpy(buffer, _buffer.begin() + _bufferOffset, n);
+		_bufferOffset += n;
+		return n;
+	}
+	else
+	{
+		return _pStreamSocketImpl->receiveBytes(buffer, bytes);
+	}
+}
+
+
 SocketImpl* WebSocketImpl::acceptConnection(SocketAddress& clientAddr)
 {
 	throw Poco::InvalidAccessException("Cannot acceptConnection() on a WebSocketImpl");
 }
 
 
-void WebSocketImpl::connect(const SocketAddress& rAddress)
+void WebSocketImpl::connect(const SocketAddress& address)
 {
 	throw Poco::InvalidAccessException("Cannot connect() a WebSocketImpl");
 }
 
 
-void WebSocketImpl::connect(const SocketAddress& rAddress, const Poco::Timespan& timeout)
+void WebSocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout)
 {
 	throw Poco::InvalidAccessException("Cannot connect() a WebSocketImpl");
 }
 
 
-void WebSocketImpl::connectNB(const SocketAddress& rAddress)
+void WebSocketImpl::connectNB(const SocketAddress& address)
 {
 	throw Poco::InvalidAccessException("Cannot connectNB() a WebSocketImpl");
 }
 
 
-void WebSocketImpl::bind(const SocketAddress& rAddress, bool reuseAddress)
+void WebSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 {
 	throw Poco::InvalidAccessException("Cannot bind() a WebSocketImpl");
 }
 
 
-void WebSocketImpl::bind6(const SocketAddress& rAddress, bool reuseAddress, bool ipV6Only)
+void WebSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	throw Poco::InvalidAccessException("Cannot bind() a WebSocketImpl");
+}
+
+
+void WebSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	throw Poco::InvalidAccessException("Cannot bind6() a WebSocketImpl");
+}
+
+
+void WebSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
 {
 	throw Poco::InvalidAccessException("Cannot bind6() a WebSocketImpl");
 }
@@ -294,13 +327,13 @@ void WebSocketImpl::shutdown()
 }
 
 
-int WebSocketImpl::sendTo(const void* buffer, int length, const SocketAddress& rAddress, int flags)
+int WebSocketImpl::sendTo(const void* buffer, int length, const SocketAddress& address, int flags)
 {
 	throw Poco::InvalidAccessException("Cannot sendTo() on a WebSocketImpl");
 }
 
 
-int WebSocketImpl::receiveFrom(void* buffer, int length, SocketAddress& rAddress, int flags)
+int WebSocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, int flags)
 {
 	throw Poco::InvalidAccessException("Cannot receiveFrom() on a WebSocketImpl");
 }

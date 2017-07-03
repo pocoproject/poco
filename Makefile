@@ -243,7 +243,7 @@ Data-libexec:  Foundation-libexec
 Data-tests: Data-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/testsuite
 	
-Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec
+Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec Net-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/samples
 
 Data-clean:

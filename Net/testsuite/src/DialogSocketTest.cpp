@@ -23,7 +23,7 @@ using Poco::Net::DialogSocket;
 using Poco::Net::SocketAddress;
 
 
-DialogSocketTest::DialogSocketTest(const std::string& rName): CppUnit::TestCase(rName)
+DialogSocketTest::DialogSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -37,7 +37,7 @@ void DialogSocketTest::testDialogSocket()
 {
 	EchoServer echoServer;
 	DialogSocket ds;
-	ds.connect(SocketAddress("localhost", echoServer.port()));
+	ds.connect(SocketAddress("127.0.0.1", echoServer.port()));
 
 	ds.sendMessage("Hello, world!");
 	std::string str;

@@ -32,31 +32,37 @@ HTTPSession::HTTPSession():
 	_pCurrent(0),
 	_pEnd(0),
 	_keepAlive(false),
-	_timeout(HTTP_DEFAULT_TIMEOUT),
+	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
+	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
+	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
 	_pException(0)
 {
 }
 
 
-HTTPSession::HTTPSession(const StreamSocket& rSocket):
-	_socket(rSocket),
+HTTPSession::HTTPSession(const StreamSocket& socket):
+	_socket(socket),
 	_pBuffer(0),
 	_pCurrent(0),
 	_pEnd(0),
 	_keepAlive(false),
-	_timeout(HTTP_DEFAULT_TIMEOUT),
+	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
+	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
+	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
 	_pException(0)
 {
 }
 
 
-HTTPSession::HTTPSession(const StreamSocket& rSocket, bool keepAlive):
-	_socket(rSocket),
+HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
+	_socket(socket),
 	_pBuffer(0),
 	_pCurrent(0),
 	_pEnd(0),
 	_keepAlive(keepAlive),
-	_timeout(HTTP_DEFAULT_TIMEOUT),
+	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
+	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
+	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
 	_pException(0)
 {
 }
@@ -91,7 +97,14 @@ void HTTPSession::setKeepAlive(bool keepAlive)
 
 void HTTPSession::setTimeout(const Poco::Timespan& timeout)
 {
-	_timeout = timeout;
+	setTimeout(timeout, timeout, timeout);
+}
+
+void HTTPSession::setTimeout(const Poco::Timespan& connectionTimeout, const Poco::Timespan& sendTimeout, const Poco::Timespan& receiveTimeout)
+{
+	 _connectionTimeout = connectionTimeout;
+	 _sendTimeout = sendTimeout;
+	 _receiveTimeout = receiveTimeout;
 }
 
 
@@ -181,8 +194,9 @@ bool HTTPSession::connected() const
 
 void HTTPSession::connect(const SocketAddress& address)
 {
-	_socket.connect(address, _timeout);
-	_socket.setReceiveTimeout(_timeout);
+	_socket.connect(address, _connectionTimeout);
+	_socket.setReceiveTimeout(_receiveTimeout);
+	_socket.setSendTimeout(_sendTimeout);
 	_socket.setNoDelay(true);
 	// There may be leftover data from a previous (failed) request in the buffer,
 	// so we clear it.
@@ -226,15 +240,22 @@ StreamSocket HTTPSession::detachSocket()
 }
 
 
-void HTTPSession::attachSocket(const StreamSocket& rSocket)
+void HTTPSession::attachSocket(const StreamSocket& socket)
 {
-	_socket = rSocket;
+	_socket = socket;
 }
 
 
 void HTTPSession::attachSessionData(const Poco::Any& data)
 {
 	_data = data;
+}
+
+
+void HTTPSession::drainBuffer(Poco::Buffer<char>& buffer)
+{
+	buffer.assign(_pCurrent, static_cast<std::size_t>(_pEnd - _pCurrent));
+	_pCurrent = _pEnd;
 }
 
 

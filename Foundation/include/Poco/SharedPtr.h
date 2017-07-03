@@ -24,86 +24,16 @@
 #include "Poco/Exception.h"
 #include "Poco/AtomicCounter.h"
 #include <algorithm>
-#if defined(POCO_ENABLE_CPP11)
 #include <memory>
-#endif
 
 
 namespace Poco {
 
 
-#if !defined(POCO_ENABLE_CPP11)
-
-
-class ReferenceCounter
-	/// Simple ReferenceCounter object, does not delete itself when count reaches 0.
-{
-public:
-	ReferenceCounter(): _cnt(1)
-	{
-	}
-
-	void duplicate()
-	{
-		++_cnt;
-	}
-
-	int release()
-	{
-		return --_cnt;
-	}
-	
-	int referenceCount() const
-	{
-		return _cnt.value();
-	}
-
-private:
-	AtomicCounter _cnt;
-};
-
 
 template <class C>
-class ReleasePolicy
-	/// The default release policy for SharedPtr, which
-	/// simply uses the delete operator to delete an object.
-{
-public:
-	static void release(C* pObj)
-		/// Delete the object.
-		/// Note that pObj can be 0.
-	{
-		delete pObj;
-	}
-};
-
-
-template <class C>
-class ReleaseArrayPolicy
-	/// The release policy for SharedPtr holding arrays.
-{
-public:
-	static void release(C* pObj)
-		/// Delete the object.
-		/// Note that pObj can be 0.
-	{
-		delete [] pObj;
-	}
-};
-
-
-#endif
-
-
-template <class C 
-#if !defined(POCO_ENABLE_CPP11)
-	, class RC = ReferenceCounter, class RP = ReleasePolicy<C> 
-#endif
-		>
 class SharedPtr
-#if defined(POCO_ENABLE_CPP11)
 	: public std::shared_ptr<C>
-#endif
 	/// SharedPtr is a "smart" pointer for classes implementing
 	/// reference counting based garbage collection.
 	/// SharedPtr is thus similar to AutoPtr. Unlike the
@@ -132,59 +62,27 @@ class SharedPtr
 {
 public:
 	SharedPtr()
-#if defined(POCO_ENABLE_CPP11)
 		: std::shared_ptr<C>()
-#else
-		: _pCounter(new RC), _ptr(0)
-#endif
 	{
 	}
 
 	SharedPtr(C* ptr)
-#if defined(POCO_ENABLE_CPP11)
 		: std::shared_ptr<C>(ptr)
-#else
-	try:
-		_pCounter(new RC), 
-		_ptr(ptr)
-#endif
 	{
 	}
-#if !defined(POCO_ENABLE_CPP11)
-	catch (...)
-	{
-		RP::release(ptr);
-	}
-#endif
 
-#if defined(POCO_ENABLE_CPP11)
 	template <class Other>
 	SharedPtr(const SharedPtr<Other>& ptr)
 		: std::shared_ptr<C>(ptr)
 	{
 
 	}
-#else
-	template <class Other, class OtherRP>
-	SharedPtr(const SharedPtr<Other, RC, OtherRP>& ptr): _pCounter(ptr._pCounter), _ptr(const_cast<Other*>(ptr.get()))
-	{
-		_pCounter->duplicate();
-	}
-#endif
 
 	SharedPtr(const SharedPtr& ptr)
-#if defined(POCO_ENABLE_CPP11)
 		: std::shared_ptr<C>(ptr)
-#else
-		: _pCounter(ptr._pCounter), _ptr(ptr._ptr)
-#endif
 	{
-#if !defined(POCO_ENABLE_CPP11)
-		_pCounter->duplicate();
-#endif
 	}
 
-#if defined(POCO_ENABLE_CPP11)
 	SharedPtr(const std::shared_ptr<C>& ptr)
 		: std::shared_ptr<C>(ptr)
 	{
@@ -194,33 +92,7 @@ public:
 		: std::shared_ptr<C>(ptr)
 	{
 	}
-#endif
 
-#if !defined(POCO_ENABLE_CPP11)
-	~SharedPtr()
-	{
-		try
-		{
-			release();
-		}
-		catch (...)
-		{
-			poco_unexpected();
-		}
-	}
-#endif
-
-#if !defined(POCO_ENABLE_CPP11)
-	C* get()
-	{
-		return _ptr;
-	}
-
-	const C* get() const
-	{
-		return _ptr;
-	}
-#endif
 
 	SharedPtr& assign(C* ptr)
 	{
@@ -242,7 +114,6 @@ public:
 		return *this;
 	}
 	
-#if defined(POCO_ENABLE_CPP11)
 	template <class Other>
 	SharedPtr& assign(const SharedPtr<Other>& ptr)
 	{
@@ -253,18 +124,6 @@ public:
 		}
 		return *this;
 	}
-#else
-	template <class Other, class OtherRP>
-	SharedPtr& assign(const SharedPtr<Other, RC, OtherRP>& ptr)
-	{
-		if (ptr.get() != _ptr)
-		{
-			SharedPtr tmp(ptr);
-			swap(tmp);
-		}
-		return *this;
-	}
-#endif
 
 	SharedPtr& operator = (C* ptr)
 	{
@@ -276,7 +135,6 @@ public:
 		return assign(ptr);
 	}
 
-#if defined(POCO_ENABLE_CPP11)
 	SharedPtr& operator = (SharedPtr&& ptr)
 	{
 		std::shared_ptr<C>::operator=(ptr);
@@ -288,23 +146,8 @@ public:
 	{
 		return assign<Other>(ptr);
 	}
-#else
-	template <class Other, class OtherRP>
-	SharedPtr& operator = (const SharedPtr<Other, RC, OtherRP>& ptr)
-	{
-		return assign<Other>(ptr);
-	}
-#endif
 
-#if !defined(POCO_ENABLE_CPP11)
-	void swap(SharedPtr& ptr)
-	{
-		std::swap(_ptr, ptr._ptr);
-		std::swap(_pCounter, ptr._pCounter);
-	}
-#endif
 
-#if defined(POCO_ENABLE_CPP11)
 	template <class Other>
 	SharedPtr<Other> cast() const
 		/// Casts the SharedPtr via a dynamic cast to the given type.
@@ -317,24 +160,7 @@ public:
 		std::shared_ptr<Other> pOther = std::dynamic_pointer_cast<Other>(*this);
 		return pOther;
 	}
-#else
-	template <class Other>
-	SharedPtr<Other, RC, RP> cast() const
-		/// Casts the SharedPtr via a dynamic cast to the given type.
-		/// Returns an SharedPtr containing NULL if the cast fails.
-		/// Example: (assume class Sub: public Super)
-		///    SharedPtr<Super> super(new Sub());
-		///    SharedPtr<Sub> sub = super.cast<Sub>();
-		///    poco_assert (sub.get());
-	{
-		Other* pOther = dynamic_cast<Other*>(_ptr);
-		if (pOther)
-			return SharedPtr<Other, RC, RP>(_pCounter, pOther);
-		return SharedPtr<Other, RC, RP>();
-	}
-#endif
 
-#if defined(POCO_ENABLE_CPP11)
 	template <class Other>
 	SharedPtr<Other> unsafeCast() const
 		/// Casts the SharedPtr via a static cast to the given type.
@@ -346,19 +172,6 @@ public:
 		std::shared_ptr<Other> pOther = std::static_pointer_cast<Other>(*this);
 		return pOther;
 	}
-#else
-	template <class Other> 
-	SharedPtr<Other, RC, RP> unsafeCast() const
-		/// Casts the SharedPtr via a static cast to the given type.
-		/// Example: (assume class Sub: public Super)
-		///    SharedPtr<Super> super(new Sub());
-		///    SharedPtr<Sub> sub = super.unsafeCast<Sub>();
-		///    poco_assert (sub.get());
-	{
-		Other* pOther = static_cast<Other*>(_ptr);
-		return SharedPtr<Other, RC, RP>(_pCounter, pOther);
-	}
-#endif
 
 	C* operator -> ()
 	{
@@ -390,21 +203,6 @@ public:
 		return this->get();
 	}
 
-#if !defined(POCO_ENABLE_CPP11)
-/*
-	bool operator ! () const
-	{
-		return _ptr == 0;
-	}
-*/	
-#endif
-
-#if !defined(POCO_ENABLE_CPP11)
-	operator bool () const
-	{
-		return _ptr != 0;
-	}
-#endif
 
 	bool isNull() const
 	{
@@ -503,15 +301,11 @@ public:
 	
 	int referenceCount() const
 	{
-#if defined(POCO_ENABLE_CPP11)
 		return this->use_count();
-#else
-		return _pCounter->referenceCount();
-#endif
 	}
 
-private:
-	C* deref()
+protected:
+	C* deref() const
 	{
 		if (!this->operator bool())
 			throw NullPointerException();
@@ -527,46 +321,8 @@ private:
 		return this->get();
 	}
 	
-#if !defined(POCO_ENABLE_CPP11)
-	void release()
-	{
-		poco_assert_dbg (_pCounter);
-		int i = _pCounter->release();
-		if (i == 0)
-		{
-			RP::release(_ptr);
-			_ptr = 0;
 
-			delete _pCounter;
-			_pCounter = 0;
-		}
-	}
-
-	SharedPtr(RC* pCounter, C* ptr): _pCounter(pCounter), _ptr(ptr)
-		/// for cast operation
-	{
-		poco_assert_dbg (_pCounter);
-		_pCounter->duplicate();
-	}
-#endif
-
-private:
-#if !defined(POCO_ENABLE_CPP11)
-	RC* _pCounter;
-	C*  _ptr;
-
-	template <class OtherC, class OtherRC, class OtherRP> friend class SharedPtr;
-#endif
 };
-
-
-#if !defined(POCO_ENABLE_CPP11)
-template <class C, class RC, class RP>
-inline void swap(SharedPtr<C, RC, RP>& p1, SharedPtr<C, RC, RP>& p2)
-{
-	p1.swap(p2);
-}
-#endif
 
 
 } // namespace Poco

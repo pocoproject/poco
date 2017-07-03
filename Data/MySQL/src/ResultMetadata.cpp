@@ -3,7 +3,7 @@
 //
 // $Id: //poco/1.4/Data/MySQL/src/ResultMetadata.cpp#1 $
 //
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  ResultMetadata
 //

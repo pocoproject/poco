@@ -168,28 +168,28 @@ class ObjectPool
 	///   - If the object is not valid, it is destroyed immediately.
 {
 public:
-	ObjectPool(std::size_t objectCapacity, std::size_t peakObjectCapacity):
+	ObjectPool(std::size_t capacity, std::size_t peakCapacity):
 		/// Creates a new ObjectPool with the given capacity
 		/// and peak capacity.
 		///
 		/// The PoolableObjectFactory must have a public default constructor.
-		_capacity(objectCapacity),
-		_peakCapacity(peakObjectCapacity),
+		_capacity(capacity),
+		_peakCapacity(peakCapacity),
 		_size(0)
 	{
-		poco_assert (objectCapacity <= peakObjectCapacity);
+		poco_assert (capacity <= peakCapacity);
 	}
 	
-	ObjectPool(const F& factory, std::size_t objectCapacity, std::size_t peakObjectCapacity):
+	ObjectPool(const F& factory, std::size_t capacity, std::size_t peakCapacity):
 		/// Creates a new ObjectPool with the given PoolableObjectFactory,
 		/// capacity and peak capacity. The PoolableObjectFactory must have
 		/// a public copy constructor.
 		_factory(factory),
-		_capacity(objectCapacity),
-		_peakCapacity(peakObjectCapacity),
+		_capacity(capacity),
+		_peakCapacity(peakCapacity),
 		_size(0)
 	{
-		poco_assert (objectCapacity <= peakObjectCapacity);
+		poco_assert (capacity <= peakCapacity);
 	}
 	
 	~ObjectPool()
@@ -259,19 +259,19 @@ public:
 			_factory.deactivateObject(pObject);
 			if (_pool.size() < _capacity)
 			{
-				_pool.push_back(pObject);
-			}
-			else
-			{
-				_factory.destroyObject(pObject);
-				_size--;
-				_availableCondition.signal();
+				try
+				{
+					_pool.push_back(pObject);
+					return;
+				}
+				catch (...)
+				{
+				}
 			}
 		}
-		else
-		{
-			_factory.destroyObject(pObject);
-		}
+		_factory.destroyObject(pObject);
+		_size--;
+		_availableCondition.signal();
 	}
 
 	std::size_t capacity() const

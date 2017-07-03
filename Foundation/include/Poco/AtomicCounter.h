@@ -21,24 +21,8 @@
 
 
 #include "Poco/Foundation.h"
-#if defined(POCO_ENABLE_CPP11)
 #include <atomic>
-#else
-#if POCO_OS == POCO_OS_WINDOWS_NT
-	#include "Poco/UnWindows.h"
-#elif POCO_OS == POCO_OS_MAC_OS_X
-	#include <libkern/OSAtomic.h>
-#elif ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2) || __GNUC__ > 4) && (defined(__x86_64__) || defined(__i386__))
-	#if !defined(POCO_HAVE_GCC_ATOMICS) && !defined(POCO_NO_GCC_ATOMICS)
-		#define POCO_HAVE_GCC_ATOMICS
-	#endif
-#elif ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3) || __GNUC__ > 4)
-	#if !defined(POCO_HAVE_GCC_ATOMICS) && !defined(POCO_NO_GCC_ATOMICS)
-		#define POCO_HAVE_GCC_ATOMICS
-	#endif
-#endif // POCO_OS
 #include "Poco/Mutex.h"
-#endif
 
 
 namespace Poco {
@@ -89,49 +73,12 @@ public:
 	AtomicCounter& operator = (ValueType value);
 		/// Assigns a value to the counter.
 
-#if !defined(POCO_ENABLE_CPP11)
-	operator ValueType () const;
-		/// Returns the value of the counter.
-#endif
-		
 	ValueType value() const;
 		/// Returns the value of the counter.
 		
-#if !defined(POCO_ENABLE_CPP11)
-	ValueType operator ++ (); // prefix
-		/// Increments the counter and returns the result.
-		
-	ValueType operator ++ (int); // postfix
-		/// Increments the counter and returns the previous value.
-		
-	ValueType operator -- (); // prefix
-		/// Decrements the counter and returns the result.
-		
-	ValueType operator -- (int); // postfix
-		/// Decrements the counter and returns the previous value.
-#endif
-
 	bool operator ! () const;
 		/// Returns true if the counter is zero, false otherwise.
 
-private:
-#if !defined(POCO_ENABLE_CPP11)
-#if POCO_OS == POCO_OS_WINDOWS_NT
-	typedef volatile LONG ImplType;
-#elif POCO_OS == POCO_OS_MAC_OS_X
-	typedef int32_t ImplType;
-#elif defined(POCO_HAVE_GCC_ATOMICS)
-	typedef int ImplType;
-#else // generic implementation based on FastMutex
-	struct ImplType
-	{
-		mutable FastMutex mutex;
-		volatile int      value;
-	};
-#endif // POCO_OS
-
-	ImplType _counter;
-#endif
 };
 
 
@@ -140,7 +87,6 @@ private:
 //
 
 
-#if defined(POCO_ENABLE_CPP11)
 //
 // C++11
 //
@@ -154,232 +100,6 @@ inline bool AtomicCounter::operator ! () const
 {
 	return load() == 0;
 	return !*this;
-}
-
-
-#elif POCO_OS == POCO_OS_WINDOWS_NT
-//
-// Windows
-//
-inline AtomicCounter::operator AtomicCounter::ValueType () const
-{
-	return _counter;
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::value() const
-{
-	return _counter;
-}
-
-
-inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
-{
-	return InterlockedIncrement(&_counter);
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
-{
-	ValueType result = InterlockedIncrement(&_counter);
-	return --result;
-}
-
-
-inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
-{
-	return InterlockedDecrement(&_counter);
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
-{
-	ValueType result = InterlockedDecrement(&_counter);
-	return ++result;
-}
-
-	
-inline bool AtomicCounter::operator ! () const
-{
-	return _counter == 0;
-}
-
-
-#elif POCO_OS == POCO_OS_MAC_OS_X
-//
-// Mac OS X
-//
-inline AtomicCounter::operator AtomicCounter::ValueType () const
-{
-	return _counter;
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::value() const
-{
-	return _counter;
-}
-
-
-inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
-{
-	return OSAtomicIncrement32(&_counter);
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
-{
-	ValueType result = OSAtomicIncrement32(&_counter);
-	return --result;
-}
-
-
-inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
-{
-	return OSAtomicDecrement32(&_counter);
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
-{
-	ValueType result = OSAtomicDecrement32(&_counter);
-	return ++result;
-}
-
-	
-inline bool AtomicCounter::operator ! () const
-{
-	return _counter == 0;
-}
-
-#elif defined(POCO_HAVE_GCC_ATOMICS)
-//
-// GCC 4.1+ atomic builtins.
-//
-inline AtomicCounter::operator AtomicCounter::ValueType () const
-{
-	return _counter;
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::value() const
-{
-	return _counter;
-}
-
-
-inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
-{
-	return __sync_add_and_fetch(&_counter, 1);
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
-{
-	return __sync_fetch_and_add(&_counter, 1);
-}
-
-
-inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
-{
-	return __sync_sub_and_fetch(&_counter, 1);
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
-{
-	return __sync_fetch_and_sub(&_counter, 1);
-}
-
-	
-inline bool AtomicCounter::operator ! () const
-{
-	return _counter == 0;
-}
-
-
-#else
-//
-// Generic implementation based on FastMutex
-//
-inline AtomicCounter::operator AtomicCounter::ValueType () const
-{
-	ValueType result;
-	{
-		FastMutex::ScopedLock lock(_counter.mutex);
-		result = _counter.value;
-	}
-	return result;
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::value() const
-{
-	ValueType result;
-	{
-		FastMutex::ScopedLock lock(_counter.mutex);
-		result = _counter.value;
-	}
-	return result;
-}
-
-
-inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
-{
-	ValueType result;
-	{
-		FastMutex::ScopedLock lock(_counter.mutex);
-		result = ++_counter.value;
-	}
-	return result;
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
-{
-	ValueType result;
-	{
-		FastMutex::ScopedLock lock(_counter.mutex);
-		result = _counter.value++;
-	}
-	return result;
-}
-
-
-inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
-{
-	ValueType result;
-	{
-		FastMutex::ScopedLock lock(_counter.mutex);
-		result = --_counter.value;
-	}
-	return result;
-}
-
-	
-inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
-{
-	ValueType result;
-	{
-		FastMutex::ScopedLock lock(_counter.mutex);
-		result = _counter.value--;
-	}
-	return result;
-}
-
-	
-inline bool AtomicCounter::operator ! () const
-{
-	bool result;
-	{
-		FastMutex::ScopedLock lock(_counter.mutex);
-		result = _counter.value == 0;
-	}
-	return result;
-}
-
-
-#endif // POCO_OS
 
 
 } // namespace Poco

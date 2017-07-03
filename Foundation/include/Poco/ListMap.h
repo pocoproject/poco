@@ -109,12 +109,12 @@ public:
 		/// not found.
 	{
 		typename Container::const_iterator it = _list.begin();
-		typename Container::const_iterator itEnd = _list.end();
-		for(; it != itEnd; ++it)
+		typename Container::const_iterator end = _list.end();
+		for(; it != end; ++it)
 		{
 			if (isEqual(it->first, key)) return it;
 		}
-		return itEnd;
+		return end;
 	}
 
 	Iterator find(const KeyType& key)
@@ -124,12 +124,12 @@ public:
 		/// not found.
 	{
 		typename Container::iterator it = _list.begin();
-		typename Container::iterator itEnd = _list.end();
-		for(; it != itEnd; ++it)
+		typename Container::iterator end = _list.end();
+		for(; it != end; ++it)
 		{
 			if (isEqual(it->first, key)) return it;
 		}
-		return itEnd;
+		return end;
 	}
 
 	Iterator insert(const ValueType& val)
@@ -203,8 +203,8 @@ public:
 		else
 		{
 			ValueType value(key, Mapped());
-			Iterator itInsert = insert(value);
-			return itInsert->second;
+			Iterator it = insert(value);
+			return it->second;
 		}
 	}
 

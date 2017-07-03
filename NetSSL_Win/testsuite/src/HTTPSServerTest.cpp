@@ -134,7 +134,7 @@ void HTTPSServerTest::testIdentityRequest()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPSClientSession cs("localhost", svs.address().port());
+	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
 	request.setContentLength((int) body.length());
@@ -157,7 +157,7 @@ void HTTPSServerTest::testChunkedRequest()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPSClientSession cs("localhost", svs.address().port());
+	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
 	request.setContentType("text/plain");
@@ -181,7 +181,7 @@ void HTTPSServerTest::testIdentityRequestKeepAlive()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPSClientSession cs("localhost", svs.address().port());
+	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
@@ -216,7 +216,7 @@ void HTTPSServerTest::testChunkedRequestKeepAlive()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPSClientSession cs("localhost", svs.address().port());
+	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
@@ -251,7 +251,7 @@ void HTTPSServerTest::test100Continue()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPSClientSession cs("localhost", svs.address().port());
+	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
 	request.setContentLength((int) body.length());
@@ -275,7 +275,7 @@ void HTTPSServerTest::testRedirect()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPSClientSession cs("localhost", svs.address().port());
+	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/redirect");
 	cs.sendRequest(request);
 	HTTPResponse response;
@@ -295,7 +295,7 @@ void HTTPSServerTest::testAuth()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPSClientSession cs("localhost", svs.address().port());
+	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/auth");
 	cs.sendRequest(request);
 	HTTPResponse response;
@@ -315,7 +315,7 @@ void HTTPSServerTest::testNotImpl()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPSClientSession cs("localhost", svs.address().port());
+	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/notImpl");
 	cs.sendRequest(request);
 	HTTPResponse response;

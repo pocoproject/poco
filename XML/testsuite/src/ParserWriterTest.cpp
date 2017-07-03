@@ -32,7 +32,7 @@ using Poco::XML::AutoPtr;
 using Poco::XML::InputSource;
 
 
-ParserWriterTest::ParserWriterTest(const std::string& rName): CppUnit::TestCase(rName)
+ParserWriterTest::ParserWriterTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

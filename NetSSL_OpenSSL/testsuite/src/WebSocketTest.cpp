@@ -125,7 +125,7 @@ void WebSocketTest::testWebSocket()
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPSClientSession cs("localhost", ss.address().port());
+	HTTPSClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
@@ -192,7 +192,7 @@ void WebSocketTest::testWebSocketLarge()
 
 	Poco::Thread::sleep(200);
 	
-	HTTPSClientSession cs("localhost", ss.address().port());
+	HTTPSClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);

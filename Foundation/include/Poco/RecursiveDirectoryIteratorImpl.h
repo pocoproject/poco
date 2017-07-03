@@ -42,8 +42,8 @@ public:
 		D_INFINITE = 0 /// Special value for infinite traverse depth.
 	};
 
-	RecursiveDirectoryIteratorImpl(const std::string& path, UInt16 maxTraversalDepth = D_INFINITE)
-		: _maxDepth(maxTraversalDepth), _traverseStrategy(std::ptr_fun(depthFun), _maxDepth), _isFinished(false), _rc(1)
+	RecursiveDirectoryIteratorImpl(const std::string& path, UInt16 maxDepth = D_INFINITE)
+		: _maxDepth(maxDepth), _traverseStrategy(std::ptr_fun(depthFun), _maxDepth), _isFinished(false), _rc(1)
 	{
 		_itStack.push(DirectoryIterator(path));
 		_current = _itStack.top()->path();

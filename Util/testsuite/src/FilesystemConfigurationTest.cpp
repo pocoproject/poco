@@ -24,7 +24,7 @@ using Poco::Util::AbstractConfiguration;
 using Poco::AutoPtr;
 
 
-FilesystemConfigurationTest::FilesystemConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName),
+FilesystemConfigurationTest::FilesystemConfigurationTest(const std::string& name): AbstractConfigurationTest(name),
 	_path("TestConfiguration")
 {
 }

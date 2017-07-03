@@ -21,7 +21,7 @@ using Poco::Net::NameValueCollection;
 using Poco::NotFoundException;
 
 
-NameValueCollectionTest::NameValueCollectionTest(const std::string& rName): CppUnit::TestCase(rName)
+NameValueCollectionTest::NameValueCollectionTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

@@ -35,9 +35,9 @@ class Object;
 
 
 class JSON_API Array
-	/// Represents a JSON array. JSON array provides a representation
+	/// Represents a JSON array. Array provides a representation
 	/// based on shared pointers and optimized for performance. It is possible to 
-	/// convert object to Poco::Dynamic::Array. Conversion requires copying and therefore
+	/// convert Array to Poco::Dynamic::Array. Conversion requires copying and therefore
 	/// has performance penalty; the benefit is in improved syntax, eg:
 	/// 
 	///    // use pointers to avoid copying
@@ -57,7 +57,7 @@ class JSON_API Array
 	///    i = da[0]["test"];     // i == 0
 	///    i = da[1]["test1"][1]; // i == 2
 	///    i = da[1]["test2"];    // i == 4
-	/// 
+	/// ----
 {
 public:
 	typedef std::vector<Dynamic::Var>                 ValueVec;
@@ -66,10 +66,10 @@ public:
 	typedef SharedPtr<Array> Ptr;
 
 	Array();
-		/// Default constructor
+		/// Creates an empty Array.
 
 	Array(const Array& copy);
-		/// Copy Constructor
+		/// Creates an Array by copying another one.
 
 #ifdef POCO_ENABLE_CPP11
 	Array(Array&& other);
@@ -77,21 +77,21 @@ public:
 #endif // POCO_ENABLE_CPP11
 
 	virtual ~Array();
-		/// Destructor
+		/// Destroys the Array.
 
 	ValueVec::const_iterator begin() const;
-		/// Returns iterator
+		/// Returns the begin iterator for values.
 
 	ValueVec::const_iterator end() const;
-		/// Returns iterator
+		/// Returns the end iterator for values.
 
 	Dynamic::Var get(unsigned int index) const;
-		/// Retrieves an element. Will return an empty value
-		/// when the element doesn't exist.
+		/// Retrieves the element at the given index. 
+		/// Will return an empty value when the element doesn't exist.
 
 	Array::Ptr getArray(unsigned int index) const;
 		/// Retrieves an array. When the element is not
-		/// an array or doesn't exist, an empty SharedPtr is returned.
+		/// an Array or doesn't exist, an empty SharedPtr is returned.
 
 	template<typename T>
 	T getElement(unsigned int index) const
@@ -109,30 +109,30 @@ public:
 		/// Retrieves an object. When the element is not
 		/// an object or doesn't exist, an empty SharedPtr is returned.
 
-	std::size_t  size() const;
-		/// Returns the size of the array
+	std::size_t size() const;
+		/// Returns the size of the array.
 
 	bool isArray(unsigned int index) const;
-		/// Returns true when the element is an array
+		/// Returns true when the element is an array.
 
 	bool isArray(const Dynamic::Var& value) const;
-		/// Returns true when the element is an array
+		/// Returns true when the element is an array.
 
 	bool isArray(ConstIterator& value) const;
-		/// Returns true when the element is an array
+		/// Returns true when the element is an array.
 
 	bool isNull(unsigned int index) const;
 		/// Returns true when the element is null or
 		/// when the element doesn't exist.
 
 	bool isObject(unsigned int index) const;
-		/// Returns true when the element is an object
+		/// Returns true when the element is an object.
 
 	bool isObject(const Dynamic::Var& value) const;
-		/// Returns true when the element is an object
+		/// Returns true when the element is an object.
 
 	bool isObject(ConstIterator& value) const;
-		/// Returns true when the element is an object
+		/// Returns true when the element is an object.
 
 	template<typename T>
 	T optElement(unsigned int index, const T& def) const
@@ -142,13 +142,13 @@ public:
 		/// value will be returned
 	{
 		T value = def;
-		if ( index < _values.size() )
+		if (index < _values.size())
 		{
 			try
 			{
 				value = _values[index].convert<T>();
 			}
-			catch(...)
+			catch (...)
 			{
 				// Default value is returned.
 			}
@@ -195,6 +195,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline Array::ValueVec::const_iterator Array::begin() const
 {
 	return _values.begin();
@@ -251,7 +254,8 @@ inline void Array::remove(unsigned int index)
 	_values.erase(_values.begin() + index);
 }
 
-}} // Namespace Poco::JSON
+
+} } // namespace Poco::JSON
 
 
 namespace Poco {
@@ -315,9 +319,9 @@ public:
 		throw BadCastException();
 	}
 
-	void convert(bool& rValue) const
+	void convert(bool& value) const
 	{
-		rValue = !_val.isNull() && _val->size() > 0;
+		value = !_val.isNull() && _val->size() > 0;
 	}
 
 	void convert(float&) const
@@ -454,9 +458,9 @@ public:
 		throw BadCastException();
 	}
 
-	void convert(bool& rValue) const
+	void convert(bool& value) const
 	{
-		rValue = _val.size() > 0;
+		value = _val.size() > 0;
 	}
 
 	void convert(float&) const
@@ -536,7 +540,7 @@ private:
 };
 
 
-}} // namespace Poco::JSON
+} } // namespace Poco::Dynamic
 
 
 #endif // JSON_Array_INCLUDED

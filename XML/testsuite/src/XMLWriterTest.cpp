@@ -23,7 +23,7 @@ using Poco::XML::XMLWriter;
 using Poco::XML::AttributesImpl;
 
 
-XMLWriterTest::XMLWriterTest(const std::string& rName): CppUnit::TestCase(rName)
+XMLWriterTest::XMLWriterTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

@@ -627,7 +627,7 @@ template <class S>
 bool startsWith(const S& str, const S& prefix)
 	/// Tests whether the string starts with the given prefix.
 {
-	return equal(prefix.begin(), prefix.end(), str.begin());
+	return str.size() >= prefix.size() && equal(prefix.begin(), prefix.end(), str.begin());
 }
 
 
@@ -635,7 +635,7 @@ template <class S>
 bool endsWith(const S& str, const S& suffix)
 	/// Tests whether the string ends with the given suffix.
 {
-	return equal(suffix.rbegin(), suffix.rend(), str.rbegin());
+	return str.size() >= suffix.size() && equal(suffix.rbegin(), suffix.rend(), str.rbegin());
 }
 
 

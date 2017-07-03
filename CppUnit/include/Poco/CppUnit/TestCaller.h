@@ -56,10 +56,10 @@ class TestCaller: public TestCase
 	typedef void (Fixture::*TestMethod)();
 
 public:
-	TestCaller(const std::string& rName, TestMethod test): 
-		TestCase(rName), 
+	TestCaller(const std::string& name, TestMethod test): 
+		TestCase(name), 
 		_test(test),
-		_fixture(new Fixture(rName))
+		_fixture(new Fixture(name))
 	{
 	}
 	
@@ -89,7 +89,11 @@ protected:
 
 private:
 	TestMethod             _test;
+#if __cplusplus < 201103L
 	std::auto_ptr<Fixture> _fixture;
+#else
+	std::unique_ptr<Fixture> _fixture;
+#endif
 };
 
 

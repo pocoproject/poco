@@ -41,17 +41,17 @@ HTTPSClientSession::HTTPSClientSession():
 }
 
 
-HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& rSocket):
-	HTTPClientSession(rSocket),
-	_pContext(rSocket.context())
+HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket):
+	HTTPClientSession(socket),
+	_pContext(socket.context())
 {
 	setPort(HTTPS_PORT);
 }
 
 
-HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& rSocket, Session::Ptr pSession):
-	HTTPClientSession(rSocket),
-	_pContext(rSocket.context()),
+HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket, Session::Ptr pSession):
+	HTTPClientSession(socket),
+	_pContext(socket.context()),
 	_pSession(pSession)
 {
 	setPort(HTTPS_PORT);

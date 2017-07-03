@@ -34,8 +34,8 @@ using Poco::Delegate;
 using Poco::AutoPtr;
 
 
-ICMPClientTest::ICMPClientTest(const std::string& rName): 
-	CppUnit::TestCase(rName),
+ICMPClientTest::ICMPClientTest(const std::string& name): 
+	CppUnit::TestCase(name),
 	_icmpClient(IPAddress::IPv4)
 {
 }
@@ -48,9 +48,9 @@ ICMPClientTest::~ICMPClientTest()
 
 void ICMPClientTest::testPing()
 {
-	assert(ICMPClient::pingIPv4("localhost") > 0);
+	assert(ICMPClient::pingIPv4("127.0.0.1") > 0);
 
-	assert(_icmpClient.ping("localhost") > 0);
+	assert(_icmpClient.ping("127.0.0.1") > 0);
 	assert(_icmpClient.ping("www.appinf.com", 4) > 0);
 
 	// warning: may fail depending on the existence of the addresses at test site

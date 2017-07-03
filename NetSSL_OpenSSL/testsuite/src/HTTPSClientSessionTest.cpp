@@ -93,7 +93,7 @@ HTTPSClientSessionTest::~HTTPSClientSessionTest()
 void HTTPSClientSessionTest::testGetSmall()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -109,7 +109,7 @@ void HTTPSClientSessionTest::testGetSmall()
 void HTTPSClientSessionTest::testGetLarge()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -125,7 +125,7 @@ void HTTPSClientSessionTest::testGetLarge()
 void HTTPSClientSessionTest::testHead()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/large");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -140,7 +140,7 @@ void HTTPSClientSessionTest::testHead()
 void HTTPSClientSessionTest::testPostSmallIdentity()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body("this is a random request body\r\n0\r\n");
 	request.setContentLength((int) body.length());
@@ -157,7 +157,7 @@ void HTTPSClientSessionTest::testPostSmallIdentity()
 void HTTPSClientSessionTest::testPostLargeIdentity()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body(8000, 'x');
 	body.append("\r\n0\r\n");
@@ -175,7 +175,7 @@ void HTTPSClientSessionTest::testPostLargeIdentity()
 void HTTPSClientSessionTest::testPostSmallChunked()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body("this is a random request body");
 	request.setChunkedTransferEncoding(true);
@@ -193,7 +193,7 @@ void HTTPSClientSessionTest::testPostSmallChunked()
 void HTTPSClientSessionTest::testPostLargeChunked()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body(16000, 'x');
 	request.setChunkedTransferEncoding(true);
@@ -215,7 +215,7 @@ void HTTPSClientSessionTest::testPostLargeChunkedKeepAlive()
 	srv.start();
 	try
 	{
-		HTTPSClientSession s("localhost", srv.port());
+		HTTPSClientSession s("127.0.0.1", srv.port());
 		s.setKeepAlive(true);
 		for (int i = 0; i < 10; ++i)
 		{
@@ -244,7 +244,7 @@ void HTTPSClientSessionTest::testPostLargeChunkedKeepAlive()
 void HTTPSClientSessionTest::testKeepAlive()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	s.setKeepAlive(true);
 	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/keepAlive", HTTPMessage::HTTP_1_1);
 	s.sendRequest(request);
@@ -359,7 +359,7 @@ void HTTPSClientSessionTest::testCachedSession()
 		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
 	pClientContext->enableSessionCache(true);
 
-	HTTPSClientSession s1("localhost", srv.port(), pClientContext);
+	HTTPSClientSession s1("127.0.0.1", srv.port(), pClientContext);
 	HTTPRequest request1(HTTPRequest::HTTP_GET, "/small");
 	s1.sendRequest(request1);
 	Session::Ptr pSession1 = s1.sslSession();
@@ -371,7 +371,7 @@ void HTTPSClientSessionTest::testCachedSession()
 	StreamCopier::copyStream(rs1, ostr1);
 	assert (ostr1.str() == HTTPSTestServer::SMALL_BODY);
 
-	HTTPSClientSession s2("localhost", srv.port(), pClientContext, pSession1);
+	HTTPSClientSession s2("127.0.0.1", srv.port(), pClientContext, pSession1);
 	HTTPRequest request2(HTTPRequest::HTTP_GET, "/small");
 	s2.sendRequest(request2);
 	Session::Ptr pSession2 = s2.sslSession();
@@ -419,7 +419,7 @@ void HTTPSClientSessionTest::testCachedSession()
 void HTTPSClientSessionTest::testUnknownContentLength()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/nolength");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -435,7 +435,7 @@ void HTTPSClientSessionTest::testUnknownContentLength()
 void HTTPSClientSessionTest::testServerAbort()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/nolength/connection/abort");
 	s.sendRequest(request);
 	HTTPResponse response;

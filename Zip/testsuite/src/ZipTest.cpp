@@ -35,7 +35,7 @@
 using namespace Poco::Zip;
 
 
-ZipTest::ZipTest(const std::string& rName): CppUnit::TestCase(rName)
+ZipTest::ZipTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
