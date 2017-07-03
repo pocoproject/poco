@@ -16,6 +16,7 @@
 
 #include "Poco/InflatingStream.h"
 #include "Poco/Exception.h"
+#include <cstring>
 
 
 namespace Poco {
@@ -28,13 +29,20 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	_eof(false),
 	_check(type != STREAM_ZIP)
 {
+	_zstr.next_in   = 0;
+	_zstr.avail_in  = 0;
+	_zstr.total_in  = 0;
+	_zstr.next_out  = 0;
+	_zstr.avail_out = 0;
+	_zstr.total_out = 0;
+	_zstr.msg       = 0;
+	_zstr.state     = 0;
 	_zstr.zalloc    = Z_NULL;
 	_zstr.zfree     = Z_NULL;
 	_zstr.opaque    = Z_NULL;
-	_zstr.next_in   = 0;
-	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
-	_zstr.avail_out = 0;
+	_zstr.data_type = 0;
+	_zstr.adler     = 0;
+	_zstr.reserved  = 0;
 
 	_buffer = new char[INFLATE_BUFFER_SIZE];
 
@@ -301,15 +309,15 @@ InflatingStreamBuf* InflatingIOS::rdbuf()
 
 
 InflatingOutputStream::InflatingOutputStream(std::ostream& ostr, InflatingStreamBuf::StreamType type):
-	InflatingIOS(ostr, type),
-	std::ostream(&_buf)
+	std::ostream(&_buf),
+	InflatingIOS(ostr, type)
 {
 }
 
 
 InflatingOutputStream::InflatingOutputStream(std::ostream& ostr, int windowBits):
-	InflatingIOS(ostr, windowBits),
-	std::ostream(&_buf)
+	std::ostream(&_buf),
+	InflatingIOS(ostr, windowBits)
 {
 }
 
@@ -326,15 +334,15 @@ int InflatingOutputStream::close()
 
 
 InflatingInputStream::InflatingInputStream(std::istream& istr, InflatingStreamBuf::StreamType type):
-	InflatingIOS(istr, type),
-	std::istream(&_buf)
+	std::istream(&_buf),
+	InflatingIOS(istr, type)
 {
 }
 
 
 InflatingInputStream::InflatingInputStream(std::istream& istr, int windowBits):
-	InflatingIOS(istr, windowBits),
-	std::istream(&_buf)
+	std::istream(&_buf),
+	InflatingIOS(istr, windowBits)
 {
 }
 

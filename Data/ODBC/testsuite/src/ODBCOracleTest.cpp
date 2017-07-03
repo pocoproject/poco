@@ -43,7 +43,7 @@ using Poco::DynamicAny;
 using Poco::DateTime;
 
 
-#define ORACLE_ODBC_DRIVER "Oracle in XE"
+#define ORACLE_ODBC_DRIVER "Oracle in OraClient12Home1_32bit"//XE"
 #define ORACLE_DSN "PocoDataOracleTest"
 #define ORACLE_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define ORACLE_PORT "1521"
@@ -166,6 +166,25 @@ void ODBCOracleTest::testBarebone()
 		MULTI_INSERT,
 		MULTI_SELECT);
 
+}
+
+
+void ODBCOracleTest::testInternalExtraction()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateVectorsTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+#ifdef POCO_64_BIT
+		_pExecutor->internalExtraction<double>(0.);
+#else
+		_pExecutor->internalExtraction(0);
+#endif
+		i += 2;
+	}
 }
 
 
@@ -598,18 +617,18 @@ void ODBCOracleTest::testAutoTransaction()
 	recreateIntsTable();
 
 	session().setFeature("autoCommit", true);
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (1)", now;
-	localSession << "SELECT count(*) FROM " << ExecUtil::person() , into(count), now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (1)", now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints() , into(count), now;
 	assert (1 == count);
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (2)", now;
-	localSession << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (2)", now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (2 == count);
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (3)", now;
-	localSession << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (3)", now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (3 == count);
 
-	session() << "DELETE FROM " << ExecUtil::strings(), now;
-	localSession << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	session() << "DELETE FROM " << ExecUtil::ints(), now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (0 == count);
 
 	session().setFeature("autoCommit", false);
@@ -617,26 +636,26 @@ void ODBCOracleTest::testAutoTransaction()
 	try
 	{
 		AutoTransaction at(session());
-		session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (1)", now;
-		session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (2)", now;
+		session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (1)", now;
+		session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (2)", now;
 		session() << "BAD QUERY", now;
 	} catch (Poco::Exception&) {}
 
-	session() << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	session() << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (0 == count);
 
 	AutoTransaction at(session());
 
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (1)", now;
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (2)", now;
-	session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (3)", now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (1)", now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (2)", now;
+	session() << "INSERT INTO " << ExecUtil::ints() << " VALUES (3)", now;
 
-	localSession << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (0 == count);
 
 	at.commit();
 
-	localSession << "SELECT count(*) FROM " << ExecUtil::strings(), into(count), now;
+	localSession << "SELECT count(*) FROM " << ExecUtil::ints(), into(count), now;
 	assert (3 == count);
 
 	session().setFeature("autoCommit", ac);
@@ -726,8 +745,8 @@ void ODBCOracleTest::recreatePersonDateTable()
 
 void ODBCOracleTest::recreateIntsTable()
 {
-	dropObject("TABLE", ExecUtil::strings());
-	try { *_pSession << "CREATE TABLE " << ExecUtil::strings() <<" (str INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::ints());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::ints() <<" (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }

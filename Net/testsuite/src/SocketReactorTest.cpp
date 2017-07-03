@@ -136,8 +136,8 @@ namespace
 			checkWritableObserverCount(1);
 			_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, WritableNotification>(*this, &ClientServiceHandler::onWritable));
 			checkWritableObserverCount(0);
-			std::string dataString(1024, 'x');
-			_socket.sendBytes(dataString.data(), (int) dataString.length());
+			std::string data(1024, 'x');
+			_socket.sendBytes(data.data(), (int) data.length());
 			_socket.shutdownSend();
 		}
 		
@@ -253,13 +253,13 @@ namespace
 	class FailConnector: public SocketConnector<ClientServiceHandler>
 	{
 	public:
-		FailConnector(SocketAddress& address, SocketReactor& rReactor):
-			SocketConnector<ClientServiceHandler>(address, rReactor),
+		FailConnector(SocketAddress& address, SocketReactor& reactor):
+			SocketConnector<ClientServiceHandler>(address, reactor),
 			_failed(false),
 			_shutdown(false)
 		{
-			rReactor.addEventHandler(socket(), Observer<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
-			rReactor.addEventHandler(socket(), Observer<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
+			reactor.addEventHandler(socket(), Observer<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
+			reactor.addEventHandler(socket(), Observer<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
 		}
 		
 		void onShutdown(ShutdownNotification* pNf)
@@ -298,7 +298,7 @@ namespace
 }
 
 
-SocketReactorTest::SocketReactorTest(const std::string& rName): CppUnit::TestCase(rName)
+SocketReactorTest::SocketReactorTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -314,7 +314,7 @@ void SocketReactorTest::testSocketReactor()
 	ServerSocket ss(ssa);
 	SocketReactor reactor;
 	SocketAcceptor<EchoServiceHandler> acceptor(ss, reactor);
-	SocketAddress sa("localhost", ss.address().port());
+	SocketAddress sa("127.0.0.1", ss.address().port());
 	SocketConnector<ClientServiceHandler> connector(sa, reactor);
 	ClientServiceHandler::setOnce(true);
 	ClientServiceHandler::resetData();
@@ -334,7 +334,7 @@ void SocketReactorTest::testSetSocketReactor()
 	SocketReactor reactor;
 	SocketAcceptor<EchoServiceHandler> acceptor(ss);
 	acceptor.setReactor(reactor);
-	SocketAddress sa("localhost", ss.address().port());
+	SocketAddress sa("127.0.0.1", ss.address().port());
 	SocketConnector<ClientServiceHandler> connector(sa, reactor);
 	ClientServiceHandler::setOnce(true);
 	ClientServiceHandler::resetData();
@@ -353,7 +353,7 @@ void SocketReactorTest::testParallelSocketReactor()
 	ServerSocket ss(ssa);
 	SocketReactor reactor;
 	ParallelSocketAcceptor<EchoServiceHandler, SocketReactor> acceptor(ss, reactor);
-	SocketAddress sa("localhost", ss.address().port());
+	SocketAddress sa("127.0.0.1", ss.address().port());
 	SocketConnector<ClientServiceHandler> connector1(sa, reactor);
 	SocketConnector<ClientServiceHandler> connector2(sa, reactor);
 	SocketConnector<ClientServiceHandler> connector3(sa, reactor);
@@ -390,7 +390,7 @@ void SocketReactorTest::testSocketConnectorTimeout()
 	SocketAddress ssa;
 	ServerSocket ss(ssa);
 	SocketReactor reactor;
-	SocketAddress sa("localhost", ss.address().port());
+	SocketAddress sa("127.0.0.1", ss.address().port());
 	SocketConnector<ClientServiceHandler> connector(sa, reactor);
 	reactor.run();
 	assert (ClientServiceHandler::timeout());

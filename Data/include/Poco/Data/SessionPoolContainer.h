@@ -4,7 +4,7 @@
 // $Id: //poco/Main/Data/include/Poco/Data/SessionPoolContainer.h#4 $
 //
 // Library: Data
-// Package: SessionPoolContainering
+// Package: SessionPooling
 // Module:  SessionPoolContainer
 //
 // Definition of the SessionPoolContainer class.

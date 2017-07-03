@@ -58,7 +58,7 @@ public:
 
 	typedef std::vector<HashEntry*> HashTableVector;
 
-	SimpleHashTable(UInt32 tableCapacity = 251): _entries(tableCapacity, 0), _size(0), _capacity(tableCapacity)
+	SimpleHashTable(UInt32 capacity = 251): _entries(capacity, 0), _size(0), _capacity(capacity)
 		/// Creates the SimpleHashTable.
 	{
 	}
@@ -366,11 +366,11 @@ public:
 			if (_entries[i])
 			{
 				maxEntriesPerHash = 1;
-				UInt32 entrySize = 1;
+				UInt32 size = 1;
 				if (details)
-					detailedEntriesPerHash.push_back(entrySize);
+					detailedEntriesPerHash.push_back(size);
 	#ifdef _DEBUG
-				totalSize += entrySize;
+				totalSize += size;
 	#endif
 			}
 			else

@@ -28,31 +28,31 @@ namespace Poco {
 namespace MongoDB {
 
 
-class MongoDB_API GetMoreRequest : public RequestMessage
-	/// Class for creating an OP_GETMORE client request. This request is used
-	/// to query the database for more documents in a collection after
-	/// a query request is send.
+class MongoDB_API GetMoreRequest: public RequestMessage
+	/// A GetMoreRequest is used to query the database for more documents in a collection 
+	/// after a query request is send (OP_GETMORE).
 {
 public:
 	GetMoreRequest(const std::string& collectionName, Int64 cursorID);
-		/// Constructor. The full collection name is the concatenation of the database 
+		/// Creates a GetMoreRequest for the give collection and cursor. 
+		///
+		/// The full collection name is the concatenation of the database 
 		/// name with the collection name, using a "." for the concatenation. For example, 
 		/// for the database "foo" and the collection "bar", the full collection name is 
 		/// "foo.bar". The cursorID has been returned by the response on the query request.
 		/// By default the numberToReturn is set to 100.
 
-
 	virtual ~GetMoreRequest();
-		/// Destructor
+		/// Destroys the GetMoreRequest.
 
 	Int32 getNumberToReturn() const;
-		/// Returns the limit of returned documents
+		/// Returns the limit of returned documents.
 
 	void setNumberToReturn(Int32 n);
-		/// Sets the limit of returned documents
+		/// Sets the limit of returned documents.
 
 	Int64 cursorID() const;
-		/// Returns the cursor id
+		/// Returns the cursor ID.
 
 protected:
 	void buildRequest(BinaryWriter& writer);
@@ -88,4 +88,4 @@ inline Int64 GetMoreRequest::cursorID() const
 } } // namespace Poco::MongoDB
 
 
-#endif //MongoDB_GetMoreRequest_INCLUDED
+#endif // MongoDB_GetMoreRequest_INCLUDED

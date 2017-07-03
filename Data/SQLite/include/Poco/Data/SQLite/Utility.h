@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/Utility.h#2 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Utility
 //
@@ -55,6 +55,14 @@ public:
 	static const int OPERATION_INSERT;
 	static const int OPERATION_DELETE;
 	static const int OPERATION_UPDATE;
+
+	static void addColumnType(std::string sqliteType, MetaColumn::ColumnDataType pocoType);
+		/// Adds or replaces the mapping for SQLite column type sqliteType 
+		/// to a Poco type pocoType.
+		/// 
+		/// sqliteType is a case-insensitive desription of the column type with
+		/// any value pocoType value but MetaColumn::FDT_UNKNOWN. 
+		/// A Poco::Data::NotSupportedException is thrown if pocoType is invalid.
 
 	static sqlite3* dbHandle(const Session& session);
 		/// Returns native DB handle.
@@ -189,6 +197,8 @@ private:
 
 	Utility(const Utility&);
 	Utility& operator = (const Utility&);
+
+	static void initializeDefaultTypes();
 
 	static void* eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam);
 	static void* eventHookRegister(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam);

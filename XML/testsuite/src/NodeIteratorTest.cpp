@@ -46,7 +46,7 @@ namespace
 }
 
 
-NodeIteratorTest::NodeIteratorTest(const std::string& rName): CppUnit::TestCase(rName)
+NodeIteratorTest::NodeIteratorTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

@@ -28,7 +28,7 @@ using Poco::Util::InvalidArgumentException;
 using Poco::AutoPtr;
 
 
-ValidatorTest::ValidatorTest(const std::string& rName): CppUnit::TestCase(rName)
+ValidatorTest::ValidatorTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

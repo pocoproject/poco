@@ -30,6 +30,21 @@ namespace Poco {
 namespace Net {
 
 
+//
+// TCPServerConnectionFilter
+//
+
+
+TCPServerConnectionFilter::~TCPServerConnectionFilter()
+{
+}
+
+
+//
+// TCPServer
+//
+
+
 TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 portNumber, TCPServerParams::Ptr pParams):
 	_socket(ServerSocket(portNumber)),
 	_thread(threadName(_socket)),
@@ -46,9 +61,9 @@ TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 port
 }
 
 
-TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& rSocket, TCPServerParams::Ptr pParams):
-	_socket(rSocket),
-	_thread(threadName(rSocket)),
+TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams):
+	_socket(socket),
+	_thread(threadName(socket)),
 	_stopped(true)
 {
 	Poco::ThreadPool& pool = Poco::ThreadPool::defaultPool();
@@ -61,10 +76,10 @@ TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocke
 }
 
 
-TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& rSocket, TCPServerParams::Ptr pParams):
-	_socket(rSocket),
+TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams::Ptr pParams):
+	_socket(socket),
 	_pDispatcher(new TCPServerDispatcher(pFactory, threadPool, pParams)),
-	_thread(threadName(rSocket)),
+	_thread(threadName(socket)),
 	_stopped(true)
 {
 }
@@ -122,14 +137,18 @@ void TCPServer::run()
 				try
 				{
 					StreamSocket ss = _socket.acceptConnection();
-					// enable nodelay per default: OSX really needs that
-#if defined(POCO_OS_FAMILY_UNIX)
-					if (ss.address().family() != AddressFamily::UNIX_LOCAL)
-#endif
+					
+					if (!_pConnectionFilter || _pConnectionFilter->accept(ss))
 					{
-						ss.setNoDelay(true);
+						// enable nodelay per default: OSX really needs that
+#if defined(POCO_OS_FAMILY_UNIX)
+						if (ss.address().family() != AddressFamily::UNIX_LOCAL)
+#endif
+						{
+							ss.setNoDelay(true);
+						}
+						_pDispatcher->enqueue(ss);
 					}
-					_pDispatcher->enqueue(ss);
 				}
 				catch (Poco::Exception& exc)
 				{
@@ -160,6 +179,7 @@ int TCPServer::currentThreads() const
 {
 	return _pDispatcher->currentThreads();
 }
+
 
 int TCPServer::maxThreads() const
 {
@@ -194,6 +214,14 @@ int TCPServer::queuedConnections() const
 int TCPServer::refusedConnections() const
 {
 	return _pDispatcher->refusedConnections();
+}
+
+
+void TCPServer::setConnectionFilter(const TCPServerConnectionFilter::Ptr& pConnectionFilter)
+{
+	poco_assert (_stopped);
+
+	_pConnectionFilter = pConnectionFilter;
 }
 
 

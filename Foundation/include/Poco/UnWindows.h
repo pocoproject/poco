@@ -80,15 +80,14 @@
 #endif
 #endif
 
+#if !defined(POCO_NO_WINDOWS_H)
+#include <windows.h>
+#endif
 
 // To prevent Platform_WIN32.h to modify version defines,
 // uncomment this, otherwise versions will be automatically
 // discovered in Platform_WIN32.h.
 // #define POCO_FORCE_MIN_WINDOWS_OS_SUPPORT
-
-
-#include <windows.h>
-
 
 #if !defined(POCO_NO_UNWINDOWS)
 // A list of annoying macros to #undef.

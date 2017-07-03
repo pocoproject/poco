@@ -825,6 +825,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\SHA1Engine.cpp"/>
+    <ClCompile Include="src\SHA2Engine.cpp"/>
+    <ClCompile Include="src\SHA3Engine.cpp"/>
+    <ClCompile Include="src\BLAKE2Engine.cpp"/>
     <ClCompile Include="src\SharedLibrary.cpp"/>
     <ClCompile Include="src\SharedLibrary_HPUX.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
@@ -1232,6 +1235,9 @@
     <ClInclude Include="include\Poco\Semaphore_POSIX.h"/>
     <ClInclude Include="include\Poco\Semaphore_WIN32.h"/>
     <ClInclude Include="include\Poco\SHA1Engine.h"/>
+    <ClInclude Include="include\Poco\SHA2Engine.h"/>
+    <ClInclude Include="include\Poco\SHA3Engine.h"/>
+    <ClInclude Include="include\Poco\BLAKE2Engine.h"/>
     <ClInclude Include="include\Poco\SharedLibrary.h"/>
     <ClInclude Include="include\Poco\SharedLibrary_HPUX.h"/>
     <ClInclude Include="include\Poco\SharedLibrary_UNIX.h"/>

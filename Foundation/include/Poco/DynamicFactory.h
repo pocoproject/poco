@@ -89,11 +89,7 @@ public:
 
 		FastMutex::ScopedLock lock(_mutex);
 
-#if defined(POCO_ENABLE_CPP11)
 		std::unique_ptr<AbstractFactory> ptr(pAbstractFactory);
-#else
-		std::auto_ptr<AbstractFactory> ptr(pAbstractFactory);
-#endif
 		typename FactoryMap::iterator it = _map.find(className);
 		if (it == _map.end())
 			_map[className] = ptr.release();

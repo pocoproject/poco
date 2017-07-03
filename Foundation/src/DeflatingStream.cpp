@@ -27,13 +27,20 @@ DeflatingStreamBuf::DeflatingStreamBuf(std::istream& istr, StreamType type, int 
 	_pOstr(0),
 	_eof(false)
 {
+	_zstr.next_in   = 0;
+	_zstr.avail_in  = 0;
+	_zstr.total_in  = 0;
+	_zstr.next_out  = 0;
+	_zstr.avail_out = 0;
+	_zstr.total_out = 0;
+	_zstr.msg       = 0;
+	_zstr.state     = 0;
 	_zstr.zalloc    = Z_NULL;
 	_zstr.zfree     = Z_NULL;
 	_zstr.opaque    = Z_NULL;
-	_zstr.next_in   = 0;
-	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
-	_zstr.avail_out = 0;
+	_zstr.data_type = 0;
+	_zstr.adler     = 0;
+	_zstr.reserved  = 0;
 
 	_buffer = new char[DEFLATE_BUFFER_SIZE];
 
@@ -327,15 +334,15 @@ DeflatingStreamBuf* DeflatingIOS::rdbuf()
 
 
 DeflatingOutputStream::DeflatingOutputStream(std::ostream& ostr, DeflatingStreamBuf::StreamType type, int level):
-	DeflatingIOS(ostr, type, level),
-	std::ostream(&_buf)
+	std::ostream(&_buf),
+	DeflatingIOS(ostr, type, level)
 {
 }
 
 
 DeflatingOutputStream::DeflatingOutputStream(std::ostream& ostr, int windowBits, int level):
-	DeflatingIOS(ostr, windowBits, level),
-	std::ostream(&_buf)
+	std::ostream(&_buf),
+	DeflatingIOS(ostr, windowBits, level)
 {
 }
 
@@ -358,15 +365,15 @@ int DeflatingOutputStream::sync()
 
 
 DeflatingInputStream::DeflatingInputStream(std::istream& istr, DeflatingStreamBuf::StreamType type, int level):
-	DeflatingIOS(istr, type, level),
-	std::istream(&_buf)
+	std::istream(&_buf),
+	DeflatingIOS(istr, type, level)
 {
 }
 
 
 DeflatingInputStream::DeflatingInputStream(std::istream& istr, int windowBits, int level):
-	DeflatingIOS(istr, windowBits, level),
-	std::istream(&_buf)
+	std::istream(&_buf),
+	DeflatingIOS(istr, windowBits, level)
 {
 }
 

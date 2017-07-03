@@ -234,7 +234,7 @@ std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length
 		break;
 
 	case TIME_EXCEEDED_TYPE:
-		if (code >= TIME_TO_LIVE || code < TIME_EXCEEDED_UNKNOWN)
+		if (code >= TIME_TO_LIVE && code < TIME_EXCEEDED_UNKNOWN)
 			err << TIME_EXCEEDED_CODE[code];
 		else
 			err << TIME_EXCEEDED_CODE[TIME_EXCEEDED_UNKNOWN];

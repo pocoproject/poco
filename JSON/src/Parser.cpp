@@ -34,7 +34,8 @@ namespace JSON {
 static const unsigned char UTF8_LEAD_BITS[4] = { 0x00, 0xC0, 0xE0, 0xF0 };
 
 
-const int Parser::_asciiClass[] = {
+const int Parser::_asciiClass[] = 
+{
     xx,      xx,      xx,      xx,      xx,      xx,      xx,      xx,
     xx,      C_WHITE, C_WHITE, xx,      xx,      C_WHITE, xx,      xx,
     xx,      xx,      xx,      xx,      xx,      xx,      xx,      xx,
@@ -57,7 +58,8 @@ const int Parser::_asciiClass[] = {
 };
 
 
-const int Parser::_stateTransitionTable[NR_STATES][NR_CLASSES] = {
+const int Parser::_stateTransitionTable[NR_STATES][NR_CLASSES] = 
+{
 /*
                  white                                      1-9                                   ABCDF  etc
              space |  {  }  [  ]  :  ,  "  \  /  +  -  .  0  |  a  b  c  d  e  f  l  n  r  s  t  u  |  E  |  * */
@@ -100,7 +102,7 @@ const int Parser::_stateTransitionTable[NR_STATES][NR_CLASSES] = {
 };
 
 
-Parser::Parser(const Handler::Ptr& pHandler, std::size_t bufSize) :
+Parser::Parser(const Handler::Ptr& pHandler, std::size_t bufSize):
 	_pHandler(pHandler),
 	_state(GO),
 	_beforeCommentState(0),
@@ -149,7 +151,7 @@ Dynamic::Var Parser::parse(const std::string& json)
 	Source<std::string::const_iterator> source(it, end);
 
 	int c = 0;
-	while(source.nextChar(c))
+	while (source.nextChar(c))
 	{
 		if (0 == parseChar(c, source))
 			throw SyntaxException("JSON syntax error");
@@ -169,7 +171,7 @@ Dynamic::Var Parser::parse(std::istream& in)
 	Source<std::istreambuf_iterator<char> > source(it, end);
 
 	int c = 0;
-	while(source.nextChar(c))
+	while (source.nextChar(c))
 	{
 		if (0 == parseChar(c, source)) throw JSONException("JSON syntax error");
 	}
@@ -237,7 +239,7 @@ void Parser::addEscapedCharToParseBuffer(CharIntType nextChar)
 	// remove the backslash
 	parseBufferPopBackChar();
 
-	switch(nextChar)
+	switch (nextChar)
 	{
 	case 'b':
 		parseBufferPushBackChar('\b');
@@ -313,7 +315,7 @@ Parser::CharIntType Parser::decodeUnicodeChar()
 		uc |= x << i;
 	}
 
-	if ( !_allowNullByte && uc == 0 ) return 0; 
+	if (!_allowNullByte && uc == 0) return 0; 
 
 	// clear UTF-16 char from buffer
 	_parseBuffer.resize(_parseBuffer.size() - 6);
@@ -379,7 +381,7 @@ void Parser::parseBuffer()
 		{
 			assertNonContainer();
 
-			switch(type)
+			switch (type)
 			{
 			case JSON_T_TRUE:
 				{
@@ -399,7 +401,7 @@ void Parser::parseBuffer()
 			case JSON_T_FLOAT:
 				{ 
 					// Float can't end with a dot
-					if (_parseBuffer[_parseBuffer.size() - 1] == '.' ) throw SyntaxException("JSON syntax error");
+					if (_parseBuffer[_parseBuffer.size() - 1] == '.') throw SyntaxException("JSON syntax error");
 
 					double float_value = NumberParser::parseFloat(std::string(_parseBuffer.begin(), _parseBuffer.size()));
 					_pHandler->value(float_value);
@@ -415,7 +417,7 @@ void Parser::parseBuffer()
 						Int64 value = NumberParser::parse64(numStr);
 						// if number is 32-bit, then handle as such
 						if (value > std::numeric_limits<int>::max()
-						 || value < std::numeric_limits<int>::min() )
+						 || value < std::numeric_limits<int>::min())
 						{
 							_pHandler->value(value);
 						}
@@ -425,11 +427,11 @@ void Parser::parseBuffer()
 						}
 					}
 					// try to handle error as unsigned in case of overflow
-					catch ( const SyntaxException& )
+					catch (const SyntaxException&)
 					{
 						UInt64 value = NumberParser::parseUnsigned64(numStr);
 						// if number is 32-bit, then handle as such
-						if ( value > std::numeric_limits<unsigned>::max() )
+						if (value > std::numeric_limits<unsigned>::max())
 						{
 							_pHandler->value(value);
 						}
@@ -445,7 +447,7 @@ void Parser::parseBuffer()
 						_pHandler->value(value);
 					}
 					// try to handle error as unsigned in case of overflow
-					catch ( const SyntaxException& )
+					catch (const SyntaxException&)
 					{
 						unsigned value = NumberParser::parseUnsigned(numStr);
 						_pHandler->value(value);
@@ -465,11 +467,12 @@ void Parser::parseBuffer()
 	clearBuffer();
 }
 
+
 int Parser::utf8CheckFirst(char byte)
 {
 	unsigned char u = (unsigned char) byte;
 
-	if(u < 0x80)
+	if (u < 0x80)
 		return 1;
 
 	if (0x80 <= u && u <= 0xBF) 
@@ -478,22 +481,22 @@ int Parser::utf8CheckFirst(char byte)
 		// sequence, i.e. a "continuation byte"
 		return 0;
 	}
-	else if(u == 0xC0 || u == 0xC1) 
+	else if (u == 0xC0 || u == 0xC1) 
 	{
 		// overlong encoding of an ASCII byte
 		return 0;
 	}
-	else if(0xC2 <= u && u <= 0xDF) 
+	else if (0xC2 <= u && u <= 0xDF) 
 	{
 		// 2-byte sequence
 		return 2;
 	}
-	else if(0xE0 <= u && u <= 0xEF) 
+	else if (0xE0 <= u && u <= 0xEF) 
 	{
 		// 3-byte sequence
 		return 3;
 	}
-	else if(0xF0 <= u && u <= 0xF4) 
+	else if (0xF0 <= u && u <= 0xF4) 
 	{
 		// 4-byte sequence
 		return 4;
@@ -505,5 +508,6 @@ int Parser::utf8CheckFirst(char byte)
 		return 0;
 	}
 }
+
 
 } } // namespace Poco::JSON

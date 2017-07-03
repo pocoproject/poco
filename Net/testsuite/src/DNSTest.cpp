@@ -27,7 +27,7 @@ using Poco::Net::ServiceNotFoundException;
 using Poco::Net::NoAddressFoundException;
 
 
-DNSTest::DNSTest(const std::string& rName): CppUnit::TestCase(rName)
+DNSTest::DNSTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -39,20 +39,20 @@ DNSTest::~DNSTest()
 
 void DNSTest::testHostByName()
 {
-	HostEntry he1 = DNS::hostByName("aliastest.appinf.com");
+	HostEntry he1 = DNS::hostByName("aliastest.pocoproject.org");
 	// different systems report different canonical names, unfortunately.
-	assert (he1.name() == "dnstest.appinf.com" || he1.name() == "aliastest.appinf.com");
+	assert (he1.name() == "dnstest.pocoproject.org" || he1.name() == "aliastest.pocoproject.org");
 #if !defined(POCO_HAVE_ADDRINFO)
 	// getaddrinfo() does not report any aliases
 	assert (!he1.aliases().empty());
-	assert (he1.aliases()[0] == "aliastest.appinf.com");
+	assert (he1.aliases()[0] == "aliastest.pocoproject.org");
 #endif
 	assert (he1.addresses().size() >= 1);
 	assert (he1.addresses()[0].toString() == "1.2.3.4");
 	
 	try
 	{
-		HostEntry he2 = DNS::hostByName("nohost.appinf.com");
+		HostEntry he1 = DNS::hostByName("nohost.pocoproject.org");
 		fail("host not found - must throw");
 	}
 	catch (HostNotFoundException&)

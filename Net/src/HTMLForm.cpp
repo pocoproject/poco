@@ -73,6 +73,7 @@ private:
 
 HTMLForm::HTMLForm():
 	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH),
 	_encoding(ENCODING_URL)
 {
 }
@@ -80,27 +81,31 @@ HTMLForm::HTMLForm():
 	
 HTMLForm::HTMLForm(const std::string& encoding):
 	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH),
 	_encoding(encoding)
 {
 }
 
 
 HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler):
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH)
 {
 	load(request, requestBody, handler);
 }
 
 
 HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody):
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH)
 {
 	load(request, requestBody);
 }
 
 
 HTMLForm::HTMLForm(const HTTPRequest& request):
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH)
 {
 	load(request);
 }
@@ -261,7 +266,7 @@ std::streamsize HTMLForm::calculateContentLength()
 }
 
 
-void HTMLForm::write(std::ostream& ostr, const std::string& rBoundary)
+void HTMLForm::write(std::ostream& ostr, const std::string& boundary)
 {
 	if (_encoding == ENCODING_URL)
 	{
@@ -269,7 +274,7 @@ void HTMLForm::write(std::ostream& ostr, const std::string& rBoundary)
 	}
 	else
 	{
-		_boundary = rBoundary;
+		_boundary = boundary;
 		writeMultipart(ostr);
 	}
 }
@@ -300,7 +305,10 @@ void HTMLForm::readUrl(std::istream& istr)
 		while (ch != eof && ch != '=' && ch != '&')
 		{
 			if (ch == '+') ch = ' ';
-			name += (char) ch;
+			if (name.size() < MAX_NAME_LENGTH)
+				name += (char) ch;
+			else
+				throw HTMLFormException("Field name too long");
 			ch = istr.get();
 		}
 		if (ch == '=')
@@ -309,7 +317,10 @@ void HTMLForm::readUrl(std::istream& istr)
 			while (ch != eof && ch != '&')
 			{
 				if (ch == '+') ch = ' ';
-				value += (char) ch;
+				if (value.size() < _valueLengthLimit)
+					value += (char) ch;
+				else
+					throw HTMLFormException("Field value too long");
 				ch = istr.get();
 			}
 		}
@@ -359,12 +370,15 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 		{
 			std::string name = params["name"];
 			std::string value;
-			std::istream& rIstr = reader.stream();
-			int ch = rIstr.get();
+			std::istream& istr = reader.stream();
+			int ch = istr.get();
 			while (ch != eof)
 			{
-				value += (char) ch;
-				ch = rIstr.get();
+				if (value.size() < _valueLengthLimit)
+					value += (char) ch;
+				else
+					throw HTMLFormException("Field value too long");
+				ch = istr.get();
 			}
 			add(name, value);
 		}
@@ -442,6 +456,14 @@ void HTMLForm::setFieldLimit(int limit)
 	poco_assert (limit >= 0);
 	
 	_fieldLimit = limit;
+}
+
+
+void HTMLForm::setValueLengthLimit(int limit)
+{
+	poco_assert (limit >= 0);
+	
+	_valueLengthLimit = limit;
 }
 
 

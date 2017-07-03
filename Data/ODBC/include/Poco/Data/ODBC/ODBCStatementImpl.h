@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCStatementImpl.h#5 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCStatementImpl
 //
@@ -160,7 +160,6 @@ private:
 	bool                  _prepared;
 	mutable std::size_t   _affectedRowCount;
 	bool                  _canCompile;
-	ODBCMetaColumn::NumericConversion _numericConversion;
 	bool                  _isPostgres;
 	bool                  _insertHint;
 };

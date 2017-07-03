@@ -62,17 +62,25 @@ class XML_API Document: public AbstractContainerNode, public DocumentEvent
 public:
 	typedef Poco::AutoReleasePool<DOMObject> AutoReleasePool;
 
-	Document(NamePool* pNamePool = 0);
+	explicit Document(NamePool* pNamePool = 0);
 		/// Creates a new document. If pNamePool == 0, the document
 		/// creates its own name pool, otherwise it uses the given name pool.
 		/// Sharing a name pool makes sense for documents containing instances
 		/// of the same schema, thus reducing memory usage.
+		
+	explicit Document(unsigned long namePoolSize);
+		/// Creates a new document using a name pool with the given size, which
+		/// should be a prime number (e.g., 251, 509, 1021, 4093).
 
 	Document(DocumentType* pDocumentType, NamePool* pNamePool = 0);
 		/// Creates a new document. If pNamePool == 0, the document
 		/// creates its own name pool, otherwise it uses the given name pool.
 		/// Sharing a name pool makes sense for documents containing instances
 		/// of the same schema, thus reducing memory usage.
+
+	Document(DocumentType* pDocumentType, unsigned long namePoolSize);
+		/// Creates a new document using a name pool with the given size, which
+		/// should be a prime number (e.g., 251, 509, 1021, 4093).
 
 	NamePool& namePool();
 		/// Returns a pointer to the documents Name Pool.

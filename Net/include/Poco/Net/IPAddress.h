@@ -489,12 +489,12 @@ inline void IPAddress::newIPv6(const void* hostAddr)
 }
 
 
-inline void IPAddress::newIPv6(const void* hostAddr, Poco::UInt32 scopeIdentifier)
+inline void IPAddress::newIPv6(const void* hostAddr, Poco::UInt32 scope)
 {
 #ifdef POCO_HAVE_ALIGNMENT
-	new (storage()) Poco::Net::Impl::IPv6AddressImpl(hostAddr, scopeIdentifier);
+	new (storage()) Poco::Net::Impl::IPv6AddressImpl(hostAddr, scope);
 #else
-	_pImpl = new Poco::Net::Impl::IPv6AddressImpl(hostAddr, scopeIdentifier);
+	_pImpl = new Poco::Net::Impl::IPv6AddressImpl(hostAddr, scope);
 #endif
 }
 

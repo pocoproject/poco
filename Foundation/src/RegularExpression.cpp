@@ -24,6 +24,7 @@
 #include "pcre.h"
 #endif
 
+
 namespace Poco {
 
 
@@ -46,26 +47,25 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 		throw RegularExpressionException(msg.str());
 	}
 	if (study)
-		_extra = pcre_study(_pcre, 0, &error);
+		_extra = pcre_study(reinterpret_cast<pcre*>(_pcre), 0, &error);
 
-	pcre_fullinfo(_pcre, _extra, PCRE_INFO_NAMECOUNT, &nmcount);
-	pcre_fullinfo(_pcre, _extra, PCRE_INFO_NAMEENTRYSIZE, &nmentrysz);
-	pcre_fullinfo(_pcre, _extra, PCRE_INFO_NAMETABLE, &nmtbl);
+	pcre_fullinfo(reinterpret_cast<const pcre*>(_pcre), reinterpret_cast<const pcre_extra*>(_extra), PCRE_INFO_NAMECOUNT, &nmcount);
+	pcre_fullinfo(reinterpret_cast<const pcre*>(_pcre), reinterpret_cast<const pcre_extra*>(_extra), PCRE_INFO_NAMEENTRYSIZE, &nmentrysz);
+	pcre_fullinfo(reinterpret_cast<const pcre*>(_pcre), reinterpret_cast<const pcre_extra*>(_extra), PCRE_INFO_NAMETABLE, &nmtbl);
 
 	for (int i = 0; i < nmcount; i++)
 	{
 		unsigned char* group = nmtbl + 2 + (nmentrysz * i);
-		int n = pcre_get_stringnumber(_pcre, (char*) group);
+		int n = pcre_get_stringnumber(reinterpret_cast<const pcre*>(_pcre), (char*) group);
 		_groups[n] = std::string((char*) group);
 	}
-
 }
 
 
 RegularExpression::~RegularExpression()
 {
-	if (_pcre)  pcre_free(_pcre);
-	if (_extra) pcre_free(_extra);
+	if (_pcre)  pcre_free(reinterpret_cast<pcre*>(_pcre));
+	if (_extra) pcre_free(reinterpret_cast<struct pcre_extra*>(_extra));
 }
 
 
@@ -74,7 +74,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 	poco_assert (offset <= subject.length());
 
 	int ovec[OVEC_SIZE];
-	int rc = pcre_exec(_pcre, _extra, subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
+	int rc = pcre_exec(reinterpret_cast<pcre*>(_pcre), reinterpret_cast<struct pcre_extra*>(_extra), subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
 	if (rc == PCRE_ERROR_NOMATCH)
 	{
 		mtch.offset = std::string::npos;
@@ -108,7 +108,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 	matches.clear();
 
 	int ovec[OVEC_SIZE];
-	int rc = pcre_exec(_pcre, _extra, subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
+	int rc = pcre_exec(reinterpret_cast<pcre*>(_pcre), reinterpret_cast<struct pcre_extra*>(_extra), subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
 	if (rc == PCRE_ERROR_NOMATCH)
 	{
 		return 0;
@@ -230,7 +230,7 @@ std::string::size_type RegularExpression::substOne(std::string& subject, std::st
 	if (offset >= subject.length()) return std::string::npos;
 
 	int ovec[OVEC_SIZE];
-	int rc = pcre_exec(_pcre, _extra, subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
+	int rc = pcre_exec(reinterpret_cast<pcre*>(_pcre), reinterpret_cast<struct pcre_extra*>(_extra), subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
 	if (rc == PCRE_ERROR_NOMATCH)
 	{
 		return std::string::npos;

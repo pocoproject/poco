@@ -24,7 +24,6 @@
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "Poco/Zip/ZipFileInfo.h"
 #include "Poco/Zip/ZipArchiveInfo.h"
-
 #include <istream>
 #include <map>
 

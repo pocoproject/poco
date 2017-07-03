@@ -3,9 +3,9 @@
 //
 // $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Unicode_UNIXODBC.h#4 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
-// Module:  Unicode_UNIX
+// Module:  Unicode
 //
 // Definition of Unicode_UNIX.
 //

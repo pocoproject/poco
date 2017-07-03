@@ -29,39 +29,42 @@ namespace Poco {
 namespace MongoDB {
 
 
-class UpdateRequest : public RequestMessage
-	/// Class for creating an OP_UPDATE client request. This request is used
-	/// to update a document.
+class UpdateRequest: public RequestMessage
+	/// This request is used to update a document in a database
+	/// using the OP_UPDATE client request. 
 {
 public:
-	typedef enum
+	enum Flags
 	{
-		UPDATE_NOFLAGS = 0,
-		// If set, the database will insert the supplied object into the
-		// collection if no matching document is found.
+		UPDATE_DEFAULT = 0,
+			/// If set, the database will insert the supplied object into the
+			/// collection if no matching document is found.
+			
 		UPDATE_UPSERT = 1,
-		// if set, the database will update all matching objects in the collection.
-		// Otherwise only updates first matching doc.
-		UPDATE_MULTIUPDATE = 2
-	} Flags;
+			/// If set, the database will update all matching objects in the collection.
+			/// Otherwise only updates first matching doc.
 
-	UpdateRequest(const std::string& collectionName, Flags flags = UPDATE_NOFLAGS);
-		/// Constructor.
+		UPDATE_MULTIUPDATE = 2
+			/// If set to, updates multiple documents that meet the query criteria.
+			/// Otherwise only updates one document.
+	};
+
+	UpdateRequest(const std::string& collectionName, Flags flags = UPDATE_DEFAULT);
+		/// Creates the UpdateRequest.
+		///
 		/// The full collection name is the concatenation of the database 
 		/// name with the collection name, using a "." for the concatenation. For example, 
 		/// for the database "foo" and the collection "bar", the full collection name is 
 		/// "foo.bar".
 
 	virtual ~UpdateRequest();
-		/// Destructor
-		
+		/// Destroys the UpdateRequest.
 
 	Document& selector();
-		/// Returns the selector document
-		
+		/// Returns the selector document.
 
 	Document& update();
-		/// The document to update
+		/// Returns the document to update.
 
 	Flags flags() const;
 		/// Returns the flags
@@ -72,7 +75,6 @@ public:
 protected:
 	void buildRequest(BinaryWriter& writer);
 
-
 private:
 	Flags       _flags;
 	std::string _fullCollectionName;
@@ -81,20 +83,26 @@ private:
 };
 
 
+//
+// inlines
+//
 inline UpdateRequest::Flags UpdateRequest::flags() const
 {
 	return _flags;
 }
+
 
 inline void UpdateRequest::flags(UpdateRequest::Flags flags)
 {
 	_flags = flags;
 }
 
+
 inline Document& UpdateRequest::selector()
 {
 	return _selector;
 }
+
 
 inline Document& UpdateRequest::update()
 {
@@ -105,4 +113,4 @@ inline Document& UpdateRequest::update()
 } } // namespace Poco::MongoDB
 
 
-#endif //MongoDB_UpdateRequest_INCLUDED
+#endif // MongoDB_UpdateRequest_INCLUDED

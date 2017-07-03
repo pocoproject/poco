@@ -25,6 +25,7 @@
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include "Poco/Any.h"
+#include "Poco/Buffer.h"
 #include <ios>
 
 
@@ -55,7 +56,10 @@ public:
 
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for the HTTP session.
-		
+
+	void setTimeout(const Poco::Timespan& connectionTimeout, const Poco::Timespan& sendTimeout, const Poco::Timespan& receiveTimeout);
+		/// Sets different timeouts for the HTTP session.
+
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout for the HTTP session.
 
@@ -100,6 +104,14 @@ public:
 
 	StreamSocket& socket();
 		/// Returns a reference to the underlying socket.
+		
+	void drainBuffer(Poco::Buffer<char>& buffer);
+		/// Copies all bytes remaining in the internal buffer to the
+		/// given Poco::Buffer, resizing it as necessary.
+		///
+		/// This is usually used together with detachSocket() to
+		/// obtain any data already read from the socket, but not
+		/// yet processed.
 
 protected:
 	HTTPSession();
@@ -171,7 +183,8 @@ protected:
 private:
 	enum
 	{
-		HTTP_DEFAULT_TIMEOUT = 60000000
+		HTTP_DEFAULT_TIMEOUT = 60000000,
+		HTTP_DEFAULT_CONNECTION_TIMEOUT = 30000000
 	};
 	
 	HTTPSession(const HTTPSession&);
@@ -182,7 +195,9 @@ private:
 	char*            _pCurrent;
 	char*            _pEnd;
 	bool             _keepAlive;
-	Poco::Timespan   _timeout;
+	Poco::Timespan   _connectionTimeout;
+	Poco::Timespan   _receiveTimeout;
+	Poco::Timespan   _sendTimeout;
 	Poco::Exception* _pException;
 	Poco::Any        _data;
 	
@@ -204,7 +219,7 @@ inline bool HTTPSession::getKeepAlive() const
 
 inline Poco::Timespan HTTPSession::getTimeout() const
 {
-	return _timeout;
+	return _receiveTimeout;
 }
 
 

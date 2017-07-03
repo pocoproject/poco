@@ -17,6 +17,7 @@
 #include "Poco/Zip/SkipCallback.h"
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "Poco/Zip/ZipUtil.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
@@ -39,6 +40,7 @@ bool SkipCallback::handleZipEntry(std::istream& zipStream, const ZipLocalFileHea
 		zipStream.seekg(hdr.getCompressedSize(), std::ios_base::cur);
 	else
 		ZipUtil::sync(zipStream);
+	if (!zipStream.good()) throw Poco::IOException("Failed to seek on input stream");
 	return true;
 }
 

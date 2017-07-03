@@ -38,8 +38,8 @@ FilePartSource::FilePartSource(const std::string& path):
 }
 
 
-FilePartSource::FilePartSource(const std::string& path, const std::string& rMediaType):
-	PartSource(rMediaType),
+FilePartSource::FilePartSource(const std::string& path, const std::string& mediaType):
+	PartSource(mediaType),
 	_path(path),
 	_istr(path)
 {
@@ -50,10 +50,10 @@ FilePartSource::FilePartSource(const std::string& path, const std::string& rMedi
 }
 
 
-FilePartSource::FilePartSource(const std::string& path, const std::string& rFilename, const std::string& rMediaType):
-	PartSource(rMediaType),
+FilePartSource::FilePartSource(const std::string& path, const std::string& filename, const std::string& mediaType):
+	PartSource(mediaType),
 	_path(path),
-	_filename(rFilename),
+	_filename(filename),
 	_istr(path)
 {
 	Path p(path);

@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCException.h#4 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCException
 //
@@ -57,7 +57,7 @@ public:
 		/// Creates HandleException
 	{
 		extendedMessage(_error.toString());
-	}							
+	}
 
 	HandleException(const H& handle, const std::string& msg, const std::string& arg): 
 		ODBCException(msg, arg), 

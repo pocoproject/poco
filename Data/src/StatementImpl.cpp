@@ -318,8 +318,8 @@ void StatementImpl::setStorage(const std::string& storage)
 
 void StatementImpl::makeExtractors(std::size_t count)
 {
-  // type cast is needed when size_t is 64 bit
-	makeExtractors(count, static_cast<Position::PositionType>(currentDataSet()));
+	// type cast is needed when size_t is 64 bit
+	makeExtractors(count, static_cast<Position::Type>(currentDataSet()));
 }
 
 void StatementImpl::makeExtractors(std::size_t count, const Position& position)

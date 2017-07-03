@@ -67,7 +67,8 @@ Arguments:
   code            pointer to start of group (the bracket)
   startcode       pointer to start of the whole pattern's code
   options         the compiling options
-  int             RECURSE depth
+  recurses        chain of recurse_check to catch mutual recursion
+  countptr        pointer to call count (to catch over complexity)
 
 Returns:   the minimum length
            -1 if \C in UTF-8 mode or (*ACCEPT) was encountered
@@ -77,14 +78,18 @@ Returns:   the minimum length
 
 static int
 find_minlength(const REAL_PCRE *re, const pcre_uchar *code,
-  const pcre_uchar *startcode, int options, int recurse_depth)
+  const pcre_uchar *startcode, int options, recurse_check *recurses,
+  int *countptr)
 {
 int length = -1;
 /* PCRE_UTF16 has the same value as PCRE_UTF8. */
 BOOL utf = (options & PCRE_UTF8) != 0;
 BOOL had_recurse = FALSE;
+recurse_check this_recurse;
 register int branchlength = 0;
 register pcre_uchar *cc = (pcre_uchar *)code + 1 + LINK_SIZE;
+
+if ((*countptr)++ > 1000) return -1;   /* too complex */
 
 if (*code == OP_CBRA || *code == OP_SCBRA ||
     *code == OP_CBRAPOS || *code == OP_SCBRAPOS) cc += IMM2_SIZE;
@@ -127,7 +132,7 @@ for (;;)
     case OP_SBRAPOS:
     case OP_ONCE:
     case OP_ONCE_NC:
-    d = find_minlength(re, cc, startcode, options, recurse_depth);
+    d = find_minlength(re, cc, startcode, options, recurses, countptr);
     if (d < 0) return d;
     branchlength += d;
     do cc += GET(cc, 1); while (*cc == OP_ALT);
@@ -390,7 +395,7 @@ for (;;)
         ce = cs = (pcre_uchar *)PRIV(find_bracket)(startcode, utf, GET2(slot, 0));
         if (cs == NULL) return -2;
         do ce += GET(ce, 1); while (*ce == OP_ALT);
-        if (cc > cs && cc < ce)
+        if (cc > cs && cc < ce)     /* Simple recursion */
           {
           d = 0;
           had_recurse = TRUE;
@@ -398,8 +403,23 @@ for (;;)
           }
         else
           {
-          int dd = find_minlength(re, cs, startcode, options, recurse_depth);
-          if (dd < d) d = dd;
+          recurse_check *r = recurses;
+          for (r = recurses; r != NULL; r = r->prev) if (r->group == cs) break;
+          if (r != NULL)           /* Mutual recursion */
+            {
+            d = 0;
+            had_recurse = TRUE;
+            break;
+            }
+          else
+            {
+            int dd;
+            this_recurse.prev = recurses;
+            this_recurse.group = cs;
+            dd = find_minlength(re, cs, startcode, options, &this_recurse,
+              countptr);
+            if (dd < d) d = dd;
+            }
           }
         slot += re->name_entry_size;
         }
@@ -415,14 +435,27 @@ for (;;)
       ce = cs = (pcre_uchar *)PRIV(find_bracket)(startcode, utf, GET2(cc, 1));
       if (cs == NULL) return -2;
       do ce += GET(ce, 1); while (*ce == OP_ALT);
-      if (cc > cs && cc < ce)
+      if (cc > cs && cc < ce)    /* Simple recursion */
         {
         d = 0;
         had_recurse = TRUE;
         }
       else
         {
-        d = find_minlength(re, cs, startcode, options, recurse_depth);
+        recurse_check *r = recurses;
+        for (r = recurses; r != NULL; r = r->prev) if (r->group == cs) break;
+        if (r != NULL)           /* Mutual recursion */
+          {
+          d = 0;
+          had_recurse = TRUE;
+          }
+        else
+          {
+          this_recurse.prev = recurses;
+          this_recurse.group = cs;
+          d = find_minlength(re, cs, startcode, options, &this_recurse,
+            countptr);
+          }
         }
       }
     else d = 0;
@@ -471,12 +504,21 @@ for (;;)
     case OP_RECURSE:
     cs = ce = (pcre_uchar *)startcode + GET(cc, 1);
     do ce += GET(ce, 1); while (*ce == OP_ALT);
-    if ((cc > cs && cc < ce) || recurse_depth > 10)
+    if (cc > cs && cc < ce)    /* Simple recursion */
       had_recurse = TRUE;
     else
       {
-      branchlength += find_minlength(re, cs, startcode, options,
-        recurse_depth + 1);
+      recurse_check *r = recurses;
+      for (r = recurses; r != NULL; r = r->prev) if (r->group == cs) break;
+      if (r != NULL)           /* Mutual recursion */
+        had_recurse = TRUE;
+      else
+        {
+        this_recurse.prev = recurses;
+        this_recurse.group = cs;
+        branchlength += find_minlength(re, cs, startcode, options,
+          &this_recurse, countptr);
+        }
       }
     cc += 1 + LINK_SIZE;
     break;
@@ -860,7 +902,6 @@ do
       case OP_NOTUPTOI:
       case OP_NOT_HSPACE:
       case OP_NOT_VSPACE:
-      case OP_PROP:
       case OP_PRUNE:
       case OP_PRUNE_ARG:
       case OP_RECURSE:
@@ -877,6 +918,31 @@ do
       case OP_THEN:
       case OP_THEN_ARG:
       return SSB_FAIL;
+
+      /* A "real" property test implies no starting bits, but the fake property
+      PT_CLIST identifies a list of characters. These lists are short, as they
+      are used for characters with more than one "other case", so there is no
+      point in recognizing them for OP_NOTPROP. */
+
+      case OP_PROP:
+      if (tcode[1] != PT_CLIST) return SSB_FAIL;
+        {
+        const pcre_uint32 *p = PRIV(ucd_caseless_sets) + tcode[2];
+        while ((c = *p++) < NOTACHAR)
+          {
+#if defined SUPPORT_UTF && defined COMPILE_PCRE8
+          if (utf)
+            {
+            pcre_uchar buff[6];
+            (void)PRIV(ord2utf)(c, buff);
+            c = buff[0];
+            }
+#endif
+          if (c > 0xff) SET_BIT(0xff); else SET_BIT(c);
+          }
+        }
+      try_next = FALSE;
+      break;
 
       /* We can ignore word boundary tests. */
 
@@ -1103,24 +1169,17 @@ do
       try_next = FALSE;
       break;
 
-      /* The cbit_space table has vertical tab as whitespace; we have to
-      ensure it is set as not whitespace. Luckily, the code value is the same
-      (0x0b) in ASCII and EBCDIC, so we can just adjust the appropriate bit. */
+      /* The cbit_space table has vertical tab as whitespace; we no longer
+      have to play fancy tricks because Perl added VT to its whitespace at
+      release 5.18. PCRE added it at release 8.34. */
 
       case OP_NOT_WHITESPACE:
       set_nottype_bits(start_bits, cbit_space, table_limit, cd);
-      start_bits[1] |= 0x08;
       try_next = FALSE;
       break;
 
-      /* The cbit_space table has vertical tab as whitespace; we have to not
-      set it from the table. Luckily, the code value is the same (0x0b) in
-      ASCII and EBCDIC, so we can just adjust the appropriate bit. */
-
       case OP_WHITESPACE:
-      c = start_bits[1];    /* Save in case it was already set */
       set_type_bits(start_bits, cbit_space, table_limit, cd);
-      start_bits[1] = (start_bits[1] & ~0x08) | c;
       try_next = FALSE;
       break;
 
@@ -1309,7 +1368,7 @@ do
             for (c = 0; c < 16; c++) start_bits[c] |= map[c];
             for (c = 128; c < 256; c++)
               {
-              if ((map[c/8] && (1 << (c&7))) != 0)
+              if ((map[c/8] & (1 << (c&7))) != 0)
                 {
                 int d = (c >> 6) | 0xc0;            /* Set bit for this starter */
                 start_bits[d/8] |= (1 << (d&7));    /* and then skip on to the */
@@ -1397,6 +1456,7 @@ pcre32_study(const pcre32 *external_re, int options, const char **errorptr)
 #endif
 {
 int min;
+int count = 0;
 BOOL bits_set = FALSE;
 pcre_uint8 start_bits[32];
 PUBL(extra) *extra = NULL;
@@ -1483,7 +1543,7 @@ if ((re->options & PCRE_ANCHORED) == 0 &&
 
 /* Find the minimum length of subject string. */
 
-switch(min = find_minlength(re, code, code, re->options, 0))
+switch(min = find_minlength(re, code, code, re->options, NULL, &count))
   {
   case -2: *errorptr = "internal error: missing capturing bracket"; return NULL;
   case -3: *errorptr = "internal error: opcode not recognized"; return NULL;
