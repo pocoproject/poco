@@ -29,8 +29,8 @@ RowFilter::RowFilter(RecordSet* pRecordSet): _pRecordSet(pRecordSet), _not(false
 {
 	poco_check_ptr(pRecordSet);
 	init();
-	duplicate();
-	_pRecordSet->filter(this);
+	Ptr pThis(this, true);
+	_pRecordSet->filter(pThis);
 }
 
 
@@ -40,8 +40,8 @@ RowFilter::RowFilter(Ptr pParent, LogicOperator op): _pRecordSet(0),
 {
 	poco_check_ptr(_pParent.get());
 	init();
-	duplicate();
-	_pParent->addFilter(this, op);
+	Ptr pThis(this, true);
+	_pParent->addFilter(pThis, op);
 }
 
 
@@ -64,9 +64,12 @@ RowFilter::~RowFilter()
 	try
 	{
 		if (_pRecordSet) _pRecordSet->filter(0);
-		if (_pParent && _pParent->has(this))
-			_pParent->removeFilter(this);
-		release();
+		if (_pParent)
+		{
+			Ptr pThis(this, true);
+			if(_pParent->has(pThis))
+				_pParent->removeFilter(pThis);
+		}
 	}
 	catch (...)
 	{
