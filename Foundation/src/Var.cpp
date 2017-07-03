@@ -414,7 +414,7 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 
 Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 {
-	poco_assert_dbg (val[pos] == '{');
+	poco_assert_dbg (pos < val.size() && val[pos] == '{');
 	++pos;
 	skipWhiteSpace(val, pos);
 	DynamicStruct aStruct;
@@ -443,7 +443,7 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 
 Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 {
-	poco_assert_dbg (val[pos] == '[');
+	poco_assert_dbg (pos < val.size() && val[pos] == '[');
 	++pos;
 	skipWhiteSpace(val, pos);
 	std::vector<Var> result;
@@ -466,6 +466,7 @@ Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 
 std::string Var::parseString(const std::string& val, std::string::size_type& pos)
 {
+	poco_assert_dbg (pos < val.size());
 	if (val[pos] == '"')
 	{
 		return parseJSONString(val, pos);
@@ -488,7 +489,7 @@ std::string Var::parseString(const std::string& val, std::string::size_type& pos
 
 std::string Var::parseJSONString(const std::string& val, std::string::size_type& pos)
 {
-	poco_assert_dbg (val[pos] == '"');
+	poco_assert_dbg (pos < val.size() && val[pos] == '"');
 	++pos;
 	std::string result;
 	bool done = false;
@@ -545,7 +546,8 @@ std::string Var::parseJSONString(const std::string& val, std::string::size_type&
 
 void Var::skipWhiteSpace(const std::string& val, std::string::size_type& pos)
 {
-	while (std::isspace(val[pos]))
+	poco_assert_dbg (pos < val.size());
+	while (std::isspace(val[pos]) && pos < val.size())
 		++pos;
 }
 
