@@ -404,7 +404,63 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 		case '"':
 			return parseJSONString(val, pos);
 		default:
-			return parseString(val, pos);
+			{
+				std::string str = parseString(val, pos);
+				if (str == "false")
+					return false;
+
+				if (str == "true")
+					return true;
+
+				bool isNumber = false;
+				bool isSigned = false;
+				int separators = 0;
+				int separator = 0;
+				int index = 0;
+				size_t size = str.size();
+				for (size_t i = 0; i < size ; ++i)
+				{
+					int ch = str[i];
+					if ((ch == '-' || ch == '+') && index == 0)
+					{
+						if (ch == '-')
+							isSigned = true;
+					}
+					else if (Ascii::isDigit(ch))
+					{
+						isNumber |= true;
+					}
+					else if (ch == '.' || ch == ',')
+					{
+						separator = ch;
+						++separators;
+						if (separators > 1)
+							return str;
+					}
+					else
+						return str;
+
+					++index;
+				}
+
+				if (separator && isNumber)
+				{
+					const double number = NumberParser::parseFloat(str, separator);
+					return Var(number);
+				}
+				else if (separator == 0 && isNumber && isSigned)
+				{
+					const Poco::Int64 number = NumberParser::parse64(str);
+					return number;
+				}
+				else if (separator == 0 && isNumber && !isSigned)
+				{
+					const Poco::UInt64 number = NumberParser::parseUnsigned64(str);
+					return number;
+				}
+
+				return str;
+			}
 		}
 	}
 	std::string empty;
