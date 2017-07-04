@@ -210,7 +210,7 @@ void Compress::addFile(const Poco::Path& file, const Poco::Path& fileName, ZipCo
 	Poco::FileInputStream in(file.toString());
 	if (fileName.depth() > 1)
 	{
-		Poco::File aParent(file.parent());
+		Poco::File aParent(file.depth() > 1 ? file.parent() : ".");
 		addDirectory(fileName.parent(), aParent.getLastModified());
 	}
 	addFile(in, aFile.getLastModified(), fileName, cm, cl);
