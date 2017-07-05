@@ -64,55 +64,14 @@ namespace Poco {
 	}
 
 
-	class StrErrorHelper
-		/// This little hack magically handles all variants
-		/// of strerror_r() (POSIX and GLIBC) and strerror().
-	{
-	public:
-		explicit StrErrorHelper(int err)
-		{
-			_buffer[0] = 0;
-
-#if (_XOPEN_SOURCE >= 600) || POCO_ANDROID || __APPLE__
-			setMessage(strerror_r(err, _buffer, sizeof(_buffer)));
-#elif _GNU_SOURCE
-			setMessage(strerror_r(err, _buffer, sizeof(_buffer)));
-#else
-			setMessage(strerror(err));
-#endif
-		}
-		
-		~StrErrorHelper()
-		{
-		}
-		
-		const std::string& message() const
-		{
-			return _message;
-		}
-		
-	protected:
-		void setMessage(int rc)
-			/// Handles POSIX variant
-		{
-			_message = _buffer;
-		}
-		
-		void setMessage(const char* msg)
-			/// Handles GLIBC variant
-		{
-			_message = msg;
-		}
-		
-	private:
-		char _buffer[256];
-		std::string _message;
-	};
-
 	std::string Error::getMessage(int errorCode)
 	{
-		StrErrorHelper helper(errorCode);
-		return helper.message();
+#if defined _GNU_SOURCE || (_XOPEN_SOURCE >= 600) || POCO_ANDROID || __APPLE__
+		char errmsg[256] = "";
+		return std::string(strerror_result(strerror_r(errorCode, errmsg, sizeof(errmsg)), errmsg));
+#else
+		return std::string(strerror(errorCode));
+#endif
 	}
 
 
