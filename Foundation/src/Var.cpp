@@ -415,7 +415,7 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 				bool isNumber = false;
 				bool isSigned = false;
 				int separators = 0;
-				int separator = 0;
+				int frac = 0;
 				int index = 0;
 				size_t size = str.size();
 				for (size_t i = 0; i < size ; ++i)
@@ -432,7 +432,7 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 					}
 					else if (ch == '.' || ch == ',')
 					{
-						separator = ch;
+						frac = ch;
 						++separators;
 						if (separators > 1)
 							return str;
@@ -443,17 +443,17 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 					++index;
 				}
 
-				if (separator && isNumber)
+				if (frac && isNumber)
 				{
-					const double number = NumberParser::parseFloat(str, separator);
+					const double number = NumberParser::parseFloat(str, frac);
 					return Var(number);
 				}
-				else if (separator == 0 && isNumber && isSigned)
+				else if (frac == 0 && isNumber && isSigned)
 				{
 					const Poco::Int64 number = NumberParser::parse64(str);
 					return number;
 				}
-				else if (separator == 0 && isNumber && !isSigned)
+				else if (frac == 0 && isNumber && !isSigned)
 				{
 					const Poco::UInt64 number = NumberParser::parseUnsigned64(str);
 					return number;
