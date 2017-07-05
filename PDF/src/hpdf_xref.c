@@ -142,7 +142,7 @@ HPDF_Xref_Add  (HPDF_Xref  xref,
     }
 
     /* in the following, we have to dispose the object when an error is
-     * occured.
+     * occurred.
      */
 
     entry = (HPDF_XrefEntry)HPDF_GetMem (xref->mmgr,

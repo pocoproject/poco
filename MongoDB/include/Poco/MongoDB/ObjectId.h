@@ -49,7 +49,7 @@ public:
 	explicit ObjectId(const std::string& id);
 		/// Creates an ObjectId from a string. 
 		///
-		/// The string must contain a hexidecimal representation
+		/// The string must contain a hexadecimal representation
 		/// of an object ID. This means a string of 24 characters.
 
 	ObjectId(const ObjectId& copy);

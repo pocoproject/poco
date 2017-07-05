@@ -375,7 +375,7 @@ Release 1.5.3 (2014-06-30)
 - Add extern "C" around <net/if.h> on HPUX platform.
 - added runtests.sh
 - fixed CPPUNIT_IGNORE parsing
-- fixed Glob from start path, for platforms not alowing transverse from root (Android)
+- fixed Glob from start path, for platforms not allowing transverse from root (Android)
 - added NTPClient (Rangel Reale)
 - added PowerShell build script
 - added SmartOS build support
@@ -1238,7 +1238,7 @@ Release 1.4.0 (2010-12-14)
 - Added Poco::Nullable class template.
 - Added Poco::NullMutex, a no-op mutex to be used as template argument for template classes
   taking a mutex policy argument.
-- Poco::XML::XMLWriter: fixed a namespace handling issue that occured with startPrefixMapping() and endPrefixMapping()
+- Poco::XML::XMLWriter: fixed a namespace handling issue that occurred with startPrefixMapping() and endPrefixMapping()
 - Poco::Net::Context now allows for loading certificates and private keys from Poco::Crypto::X509Certificate objects 
   and Poco::Crypto::RSAKey objects.
 - Poco::Crypto::RSAKey no longer uses temporary files for stream operations. Memory buffers are used instead.
@@ -1455,7 +1455,7 @@ Release 1.3.6 (2009-11-24)
 - fixed SF# 2828401: Deadlock in SocketReactor/NotificationCenter (also fixes patch# 1956490)
   NotificationCenter now uses a std::vector internally instead of a std::list, and the mutex is
   no longer held while notifications are sent to observers.
-- fixed SF# 2835206: File_WIN32 not checking aganist INVALID_HANDLE_VALUE
+- fixed SF# 2835206: File_WIN32 not checking against INVALID_HANDLE_VALUE
 - fixed SF# 2841812: Posix ThreadImpl::sleepImpl throws exceptions on EINTR
 - fixed SF# 2839579: simple DoS for SSL TCPServer, HTTPS server
   No SSL handshake is performed during accept() - the handshake is delayed until
@@ -2052,7 +2052,7 @@ Release 1.2.5 (2006-10-23)
 - XML now compiles with -DXML_UNICODE_WCHAR_T (SF# 1575174)
 - fixed SF# 1572757: HTML forms can have more than one key/value pair with the same name
 - got rid of the dynamic casts in Events, Events/Cache: simpler/faster Delegate < operator, 
-  prevents some rare dynamic casts error from occuring when using StrategyCollection with Caches
+  prevents some rare dynamic casts error from occurring when using StrategyCollection with Caches
 - improvements to Logger and LoggingConfigurator:
   * added Logger::unsafeGet()
   * added Logger::setProperty(loggerName, propertyName, value)
@@ -2313,7 +2313,7 @@ Release 1.0b1 (2006-01-09)
 Release 1.0a1 (2006-01-03) [internal]
 =====================================
 
-- mediaType is used consistently to refer to a MIME media type (some occurences of contentType and mimeType have been replaced)
+- mediaType is used consistently to refer to a MIME media type (some occurrences of contentType and mimeType have been replaced)
 - moved MediaType::quote() to MessageHeader and made it public
 - added MultipartWriter::stream()
 - Renamed AttachmentSource to PartSource and AttachmentHandler to PartHandler
@@ -2427,7 +2427,7 @@ Relesae 0.95.1 (2005-10-15) [internal]
 - Socket classes use Timespan::useconds() to fill struct timeval
 - added DatagramSocket, MulticastSocket and NetworkInterface classes
 - added socket classes and related basic stuff
-- added additonal constructor/assign to Timespan- added BasicBufferedBidirectionalStreamBuf
+- added additional constructor/assign to Timespan- added BasicBufferedBidirectionalStreamBuf
 - fixed a potential MT issue in Base64Decoder
 - code beautifying in [Un]BufferedStreamBuf
 - more improvements to ClassLoader
