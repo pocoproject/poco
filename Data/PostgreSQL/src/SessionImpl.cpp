@@ -199,7 +199,7 @@ SessionImpl::begin()
 void
 SessionImpl::commit()
 {
-	// Not an error to issue a COMMIT without a preceeding BEGIN
+	// Not an error to issue a COMMIT without a preceding BEGIN
 	_sessionHandle.commit();
 }
 
@@ -207,7 +207,7 @@ SessionImpl::commit()
 void
 SessionImpl::rollback()
 {
-	// Not an error to issue a ROLLBACK without a preceeding BEGIN
+	// Not an error to issue a ROLLBACK without a preceding BEGIN
 	_sessionHandle.rollback();
 }
 

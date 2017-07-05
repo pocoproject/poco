@@ -194,7 +194,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 
 void PartialStreamBuf::close()
 {
-	// DONT write data from _buffer!
+	// DON'T write data from _buffer!
 }
 
 
