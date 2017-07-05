@@ -62,15 +62,14 @@ private:
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateMiscTable();
 	void recreateLogTable();
-	void recreateNumericTable();
 
-	static ODBCTest::SessionPtr  _pSession;
-	static ODBCTest::ExecPtr     _pExecutor;
-	static std::string _driver;
-	static std::string _dsn;
-	static std::string _uid;
-	static std::string _pwd;
-	static std::string _connectString;
+	static ODBCTest::SessionPtr _pSession;
+	static ODBCTest::ExecPtr    _pExecutor;
+	static std::string          _driver;
+	static std::string          _dsn;
+	static std::string          _uid;
+	static std::string          _pwd;
+	static std::string          _connectString;
 };
 
 

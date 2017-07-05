@@ -21,7 +21,7 @@ using Poco::Net::IPAddress;
 using Poco::Net::InvalidAddressException;
 
 
-IPAddressTest::IPAddressTest(const std::string& rName): CppUnit::TestCase(rName)
+IPAddressTest::IPAddressTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -85,6 +85,10 @@ void IPAddressTest::testStringConv6()
 	IPAddress ia6(32, IPAddress::IPv6);
 	assert (ia6.family() == IPAddress::IPv6);
 	assert (ia6.toString() == "ffff:ffff::");
+
+	IPAddress ia7("::");
+	assert (ia7.family() == IPAddress::IPv6);
+	assert (ia7.toString() == "::");
 #endif
 }
 

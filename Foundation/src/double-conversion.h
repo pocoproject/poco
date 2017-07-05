@@ -502,7 +502,7 @@ class StringToDoubleConverter {
   // in the 'processed_characters_count'. Trailing junk is never included.
   double StringToDouble(const char* buffer,
                         int length,
-                        int* processed_characters_count) {
+                        int* processed_characters_count) const {
     return StringToIeee(buffer, length, processed_characters_count, true);
   }
 
@@ -511,7 +511,7 @@ class StringToDoubleConverter {
   // due to potential double-rounding.
   float StringToFloat(const char* buffer,
                       int length,
-                      int* processed_characters_count) {
+                      int* processed_characters_count) const {
     return static_cast<float>(StringToIeee(buffer, length,
                                            processed_characters_count, false));
   }
@@ -526,7 +526,7 @@ class StringToDoubleConverter {
   double StringToIeee(const char* buffer,
                       int length,
                       int* processed_characters_count,
-                      bool read_as_double);
+                      bool read_as_double) const;
 
   DISALLOW_IMPLICIT_CONSTRUCTORS(StringToDoubleConverter);
 };

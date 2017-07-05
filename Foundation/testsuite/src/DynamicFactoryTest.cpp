@@ -94,11 +94,7 @@ void DynamicFactoryTest::testDynamicFactory()
 	
 	try
 	{
-#if defined(POCO_ENABLE_CPP11)
 		std::unique_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
-#else
-		std::auto_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
-#endif
 		fail("unregistered - must throw");
 	}
 	catch (Poco::NotFoundException&)

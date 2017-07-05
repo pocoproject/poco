@@ -27,7 +27,7 @@ using Poco::NotImplementedException;
 using Poco::NotFoundException;
 
 
-XMLConfigurationTest::XMLConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName)
+XMLConfigurationTest::XMLConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 
@@ -272,6 +272,36 @@ AbstractConfiguration* XMLConfigurationTest::allocConfiguration() const
 }
 
 
+void XMLConfigurationTest::testSaveEmpty()
+{
+	Poco::AutoPtr<XMLConfiguration> pConfig = new XMLConfiguration;
+	std::ostringstream ostr;
+	pConfig->save(ostr);
+	assert (ostr.str() == "<config/>\n");
+}
+
+
+void XMLConfigurationTest::testFromScratch()
+{
+	Poco::AutoPtr<XMLConfiguration> pConfig = new XMLConfiguration;
+	pConfig->setString("foo", "bar");
+	std::ostringstream ostr;
+	pConfig->save(ostr);
+	assert (ostr.str() == "<config>\n\t<foo>bar</foo>\n</config>\n");
+}
+
+
+void XMLConfigurationTest::testLoadEmpty()
+{
+	Poco::AutoPtr<XMLConfiguration> pConfig = new XMLConfiguration;
+	pConfig->loadEmpty("AppConfig");
+	pConfig->setString("foo", "bar");
+	std::ostringstream ostr;
+	pConfig->save(ostr);
+	assert (ostr.str() == "<AppConfig>\n\t<foo>bar</foo>\n</AppConfig>\n");
+}
+
+
 void XMLConfigurationTest::setUp()
 {
 }
@@ -291,6 +321,9 @@ CppUnit::Test* XMLConfigurationTest::suite()
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testSave);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoadAppendSave);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testOtherDelimiter);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testSaveEmpty);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testFromScratch);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoadEmpty);
 
 	return pSuite;
 }

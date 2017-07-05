@@ -48,18 +48,18 @@ SecureServerSocket::SecureServerSocket(const Socket& socket):
 }
 
 
-SecureServerSocket::SecureServerSocket(const SocketAddress& rAddress, int backlog): 
+SecureServerSocket::SecureServerSocket(const SocketAddress& address, int backlog): 
 	ServerSocket(new SecureServerSocketImpl(SSLManager::instance().defaultServerContext()), true)
 {
-	impl()->bind(rAddress, true);
+	impl()->bind(address, true);
 	impl()->listen(backlog);
 }
 
 
-SecureServerSocket::SecureServerSocket(const SocketAddress& rAddress, int backlog, Context::Ptr pContext): 
+SecureServerSocket::SecureServerSocket(const SocketAddress& address, int backlog, Context::Ptr pContext): 
 	ServerSocket(new SecureServerSocketImpl(pContext), true)
 {
-	impl()->bind(rAddress, true);
+	impl()->bind(address, true);
 	impl()->listen(backlog);
 }
 
@@ -68,8 +68,8 @@ SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog):
 	ServerSocket(new SecureServerSocketImpl(SSLManager::instance().defaultServerContext()), true)
 {
 	IPAddress wildcardAddr;
-	SocketAddress socketAddress(wildcardAddr, port);
-	impl()->bind(socketAddress, true);
+	SocketAddress address(wildcardAddr, port);
+	impl()->bind(address, true);
 	impl()->listen(backlog);
 }
 
@@ -77,8 +77,8 @@ SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog, Context::
 	ServerSocket(new SecureServerSocketImpl(pContext), true)
 {
 	IPAddress wildcardAddr;
-	SocketAddress socketAddress(wildcardAddr, port);
-	impl()->bind(socketAddress, true);
+	SocketAddress address(wildcardAddr, port);
+	impl()->bind(address, true);
 	impl()->listen(backlog);
 }
 

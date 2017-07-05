@@ -41,8 +41,8 @@ Context::Params::Params():
 }
 
 
-Context::Context(Usage contextUsage, const Params& params):
-	_usage(contextUsage),
+Context::Context(Usage usage, const Params& params):
+	_usage(usage),
 	_mode(params.verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true)
@@ -52,16 +52,16 @@ Context::Context(Usage contextUsage, const Params& params):
 
 
 Context::Context(
-	Usage contextUsage,
+	Usage usage,
 	const std::string& privateKeyFile, 
 	const std::string& certificateFile,
 	const std::string& caLocation, 
-	VerificationMode mode,
+	VerificationMode verificationMode,
 	int verificationDepth,
 	bool loadDefaultCAs,
 	const std::string& cipherList):
-	_usage(contextUsage),
-	_mode(mode),
+	_usage(usage),
+	_mode(verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true)
 {
@@ -69,7 +69,7 @@ Context::Context(
 	params.privateKeyFile = privateKeyFile;
 	params.certificateFile = certificateFile;
 	params.caLocation = caLocation;
-	params.verificationMode = mode;
+	params.verificationMode = verificationMode;
 	params.verificationDepth = verificationDepth;
 	params.loadDefaultCAs = loadDefaultCAs;
 	params.cipherList = cipherList;
@@ -78,20 +78,20 @@ Context::Context(
 
 
 Context::Context(
-	Usage contextUsage,
+	Usage usage,
 	const std::string& caLocation, 
-	VerificationMode mode,
+	VerificationMode verificationMode,
 	int verificationDepth,
 	bool loadDefaultCAs,
 	const std::string& cipherList):
-	_usage(contextUsage),
-	_mode(mode),
+	_usage(usage),
+	_mode(verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true)
 {
 	Params params;
 	params.caLocation = caLocation;
-	params.verificationMode = mode;
+	params.verificationMode = verificationMode;
 	params.verificationDepth = verificationDepth;
 	params.loadDefaultCAs = loadDefaultCAs;
 	params.cipherList = cipherList;
@@ -494,6 +494,17 @@ void Context::initDH(const std::string& dhParamsFile)
 			std::string msg = Utility::getLastError();
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+		BIGNUM* p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
+		BIGNUM* g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
+		DH_set0_pqg(dh, p, 0, g);
+		DH_set_length(dh, 160);
+		if (!p || !g)
+		{
+			DH_free(dh);
+			throw SSLContextException("Error creating Diffie-Hellman parameters");
+		}
+#else
 		dh->p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 		dh->g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 		dh->length = 160;
@@ -502,6 +513,7 @@ void Context::initDH(const std::string& dhParamsFile)
 			DH_free(dh);
 			throw SSLContextException("Error creating Diffie-Hellman parameters");
 		}
+#endif
 	}
 	SSL_CTX_set_tmp_dh(_pSSLContext, dh);
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);

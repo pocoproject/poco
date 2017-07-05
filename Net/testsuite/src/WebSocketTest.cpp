@@ -25,6 +25,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Thread.h"
+#include "Poco/Buffer.h"
 
 
 using Poco::Net::HTTPClientSession;
@@ -51,19 +52,13 @@ namespace
 			try
 			{
 				WebSocket ws(request, response);
-#if defined(POCO_ENABLE_CPP11)
-				std::unique_ptr<char> pBuffer(new char[_bufSize]);
-#else
-				std::auto_ptr<char> pBuffer(new char[_bufSize]);
-#endif
+				Poco::Buffer<char> buffer(_bufSize);
 				int flags;
 				int n;
 				do
 				{
-					n = ws.receiveFrame(pBuffer.get(), _bufSize, flags);
-					if (n == 0)
-						break;
-					ws.sendFrame(pBuffer.get(), n, flags);
+					n = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
+					ws.sendFrame(buffer.begin(), n, flags);
 				}
 				while ((flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
 			}
@@ -107,7 +102,7 @@ namespace
 }
 
 
-WebSocketTest::WebSocketTest(const std::string& rName): CppUnit::TestCase(rName)
+WebSocketTest::WebSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -125,7 +120,7 @@ void WebSocketTest::testWebSocket()
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPClientSession cs("localhost", ss.address().port());
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
@@ -206,7 +201,7 @@ void WebSocketTest::testWebSocketLarge()
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPClientSession cs("localhost", ss.address().port());
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
@@ -238,7 +233,7 @@ void WebSocketTest::testOneLargeFrame(int msgSize)
 
 	Poco::Thread::sleep(200);
 
-	HTTPClientSession cs("localhost", ss.address().port());
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);

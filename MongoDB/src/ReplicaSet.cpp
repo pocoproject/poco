@@ -7,8 +7,6 @@
 // Package: MongoDB
 // Module:  ReplicaSet
 //
-// Implementation of the ReplicaSet class.
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -20,11 +18,13 @@
 #include "Poco/MongoDB/QueryRequest.h"
 #include "Poco/MongoDB/ResponseMessage.h"
 
+
 namespace Poco {
 namespace MongoDB {
 
 
-ReplicaSet::ReplicaSet(const std::vector<Net::SocketAddress> &addresses) : _addresses(addresses)
+ReplicaSet::ReplicaSet(const std::vector<Net::SocketAddress> &addresses): 
+	_addresses(addresses)
 {
 }
 
@@ -38,10 +38,10 @@ Connection::Ptr ReplicaSet::findMaster()
 {
 	Connection::Ptr master;
 
-	for(std::vector<Net::SocketAddress>::iterator it = _addresses.begin(); it != _addresses.end(); ++it)
+	for (std::vector<Net::SocketAddress>::iterator it = _addresses.begin(); it != _addresses.end(); ++it)
 	{
 		master = isMaster(*it);
-		if ( ! master.isNull() )
+		if (!master.isNull())
 		{
 			break;
 		}
@@ -66,25 +66,25 @@ Connection::Ptr ReplicaSet::isMaster(const Net::SocketAddress& address)
 		ResponseMessage response;
 		conn->sendRequest(request, response);
 
-		if ( response.documents().size() > 0 )
+		if (response.documents().size() > 0)
 		{
 			Document::Ptr doc = response.documents()[0];
-			if ( doc->get<bool>("ismaster") )
+			if (doc->get<bool>("ismaster"))
 			{
 				return conn;
 			}
-			else if ( doc->exists("primary") )
+			else if (doc->exists("primary"))
 			{
 				return isMaster(Net::SocketAddress(doc->get<std::string>("primary")));
 			}
 		}
 	}
-	catch(...)
+	catch (...)
 	{
-		conn = NULL;
+		conn = 0;
 	}
 	
-	return NULL; 
+	return 0; 
 }
 
 

@@ -53,14 +53,14 @@ namespace
 		{
 			_disp.push_back(header["Content-Disposition"]);
 			_type.push_back(header["Content-Type"]);
-			std::string dataString;
+			std::string data;
 			int ch = stream.get();
 			while (ch > 0)
 			{
-				dataString += (char) ch;
+				data += (char) ch;
 				ch = stream.get();
 			}
-			_data.push_back(dataString);
+			_data.push_back(data);
 		}
 		
 		const std::vector<std::string>& data() const
@@ -86,7 +86,7 @@ namespace
 }
 
 
-MailMessageTest::MailMessageTest(const std::string& rName): CppUnit::TestCase(rName)
+MailMessageTest::MailMessageTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

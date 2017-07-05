@@ -15,6 +15,7 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #ifndef JSON_JSONQuery_INCLUDED
 #define JSON_JSONQuery_INCLUDED
 
@@ -33,44 +34,56 @@ class JSON_API Query
 {
 public:
 	Query(const Dynamic::Var& source);
-		/// Creates the Query; source must be JSON Object, Array, Object::Ptr,
+		/// Creates a Query/
+		///
+		/// Source must be JSON Object, Array, Object::Ptr,
 		/// Array::Ptr or empty Var. Any other type will trigger throwing of 
 		/// InvalidArgumentException.
+		///
 		/// Creating Query holding Ptr will typically result in faster
 		/// performance.
 
 	virtual ~Query();
-		/// Destructor
+		/// Destroys the Query.
 
 	Object::Ptr findObject(const std::string& path) const;
-		/// Search for an object. When the object can't be found, a zero Ptr
-		/// is returned; otherwise, a shared pointer to internally held object
+		/// Search for an object. 
+		///
+		/// When the object can't be found, a zero Ptr is returned; 
+		/// otherwise, a shared pointer to internally held object
 		/// is returned.
 		/// If object (as opposed to a pointer to object) is held
 		/// internally, a shared pointer to new (heap-allocated) Object is
 		/// returned; this may be expensive operation.
 
 	Object& findObject(const std::string& path, Object& obj) const;
-		/// Search for an object. If object is found, it is assigned to the
+		/// Search for an object. 
+		///
+		/// If object is found, it is assigned to the
 		/// Object through the reference passed in. When the object can't be 
 		/// found, the provided Object is emptied and returned.
 
 	Array::Ptr findArray(const std::string& path) const;
-		/// Search for an array. When the array can't be found, a zero Ptr
-		/// is returned; otherwise, a shared pointer to internally held array
+		/// Search for an array. 
+		///
+		/// When the array can't be found, a zero Ptr is returned; 
+		/// otherwise, a shared pointer to internally held array
 		/// is returned.
 		/// If array (as opposed to a pointer to array) is held
 		/// internally, a shared pointer to new (heap-allocated) Object is
 		/// returned; this may be expensive operation.
 
 	Array& findArray(const std::string& path, Array& obj) const;
-		/// Search for an array. If array is found, it is assigned to the
+		/// Search for an array. 
+		///
+		/// If array is found, it is assigned to the
 		/// Object through the reference passed in. When the array can't be 
 		/// found, the provided Object is emptied and returned.
 
 	Dynamic::Var find(const std::string& path) const;
-		/// Searches a value
-		/// For example: "person.children[0].name" will return the
+		/// Searches a value.
+		///
+		/// Example: "person.children[0].name" will return the
 		/// the name of the first child. When the value can't be found
 		/// an empty value is returned.
 
@@ -82,13 +95,15 @@ public:
 	{
 		T result = def;
 		Dynamic::Var value = find(path);
-		if ( ! value.isEmpty() )
+		if (!value.isEmpty())
 		{
 			try
 			{
 				result = value.convert<T>();
 			}
-			catch(...) { }
+			catch (...) 
+			{ 
+			}
 		}
 		return result;
 	}
@@ -106,7 +121,7 @@ private:
 };
 
 
-}} // namespace Poco::JSON
+} } // namespace Poco::JSON
 
 
 #endif // JSON_JSONQuery_INCLUDED

@@ -91,6 +91,11 @@ public:
 	void tuples();
 	void tupleVector();
 
+#if __cplusplus >= 201103L
+	void stdTuples();
+	void stdTupleVector();
+#endif
+
 	void internalExtraction();
 	void doNull();
 

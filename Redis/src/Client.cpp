@@ -9,37 +9,55 @@
 //
 // Implementation of the Client class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #include "Poco/Redis/Client.h"
 #include "Poco/Redis/Exception.h"
+
 
 namespace Poco {
 namespace Redis {
 
 
-Client::Client() : _address(), _socket(), _input(0), _output(0)
+Client::Client(): 
+	_address(), 
+	_socket(), 
+	_input(0), 
+	_output(0)
 {
 }
 
 
-Client::Client(const std::string& hostAndPort) : _address(hostAndPort), _socket(), _input(0), _output(0)
+Client::Client(const std::string& hostAndPort):
+	_address(hostAndPort), 
+	_socket(), 
+	_input(0), 
+	_output(0)
 {
 	connect();
 }
 
 
-Client::Client(const std::string& host, int port) : _address(host, port), _socket(), _input(0), _output(0)
+Client::Client(const std::string& host, int port): 
+	_address(host, port), 
+	_socket(), 
+	_input(0), 
+	_output(0)
 {
 	connect();
 }
 
 
-Client::Client(const Net::SocketAddress& addrs) : _address(addrs), _socket(), _input(0), _output(0)
+Client::Client(const Net::SocketAddress& addrs): 
+	_address(addrs), 
+	_socket(), 
+	_input(0), 
+	_output(0)
 {
 	connect();
 }
@@ -62,6 +80,7 @@ void Client::connect()
 	_output = new RedisOutputStream(_socket);
 }
 
+
 void Client::connect(const std::string& hostAndPort)
 {
 	_address = Net::SocketAddress(hostAndPort);
@@ -82,6 +101,7 @@ void Client::connect(const Net::SocketAddress& addrs)
 	connect();
 }
 
+
 void Client::connect(const Timespan& timeout)
 {
 	poco_assert(! _input);
@@ -91,6 +111,7 @@ void Client::connect(const Timespan& timeout)
 	_input = new RedisInputStream(_socket);
 	_output = new RedisOutputStream(_socket);
 }
+
 
 void Client::connect(const std::string& hostAndPort, const Timespan& timeout)
 {
@@ -112,6 +133,7 @@ void Client::connect(const Net::SocketAddress& addrs, const Timespan& timeout)
 	connect(timeout);
 }
 
+
 void Client::disconnect()
 {
 	delete _input;
@@ -123,6 +145,7 @@ void Client::disconnect()
 	_socket.close();
 }
 
+
 void Client::writeCommand(const Array& command, bool doFlush)
 {
 	poco_assert(_output);
@@ -130,8 +153,9 @@ void Client::writeCommand(const Array& command, bool doFlush)
 	std::string commandStr = command.toString();
 
 	_output->write(commandStr.c_str(), commandStr.length());
-	if ( doFlush ) _output->flush();
+	if (doFlush) _output->flush();
 }
+
 
 RedisType::Ptr Client::readReply()
 {
@@ -139,7 +163,7 @@ RedisType::Ptr Client::readReply()
 
 	int c = _input->get();
 	RedisType::Ptr result = RedisType::createRedisType(c);
-	if ( result.isNull() )
+	if (result.isNull())
 	{
 		throw RedisException("Invalid Redis type returned");
 	}
@@ -149,23 +173,25 @@ RedisType::Ptr Client::readReply()
 	return result;
 }
 
+
 RedisType::Ptr Client::sendCommand(const Array& command)
 {
 	writeCommand(command, true);
 	return readReply();
 }
 
+
 Array Client::sendCommands(const std::vector<Array>& commands)
 {
 	Array results;
 
-	for(std::vector<Array>::const_iterator it = commands.begin(); it != commands.end(); ++it)
+	for (std::vector<Array>::const_iterator it = commands.begin(); it != commands.end(); ++it)
 	{
 		writeCommand(*it, false);
 	}
 	_output->flush();
 
-	for(int i = 0; i < commands.size(); ++i)
+	for (int i = 0; i < commands.size(); ++i)
 	{
 		results.addRedisType(readReply());
 	}
@@ -173,4 +199,5 @@ Array Client::sendCommands(const std::vector<Array>& commands)
 	return results;
 }
 
-} } // Poco::Redis
+
+} } // namespace Poco::Redis

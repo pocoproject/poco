@@ -45,6 +45,7 @@ private:
 	std::string _path;
 	mutable Poco::FileOutputStream _str;
 	Timestamp _creationDate;
+	UInt64 _size;
 };
 
 

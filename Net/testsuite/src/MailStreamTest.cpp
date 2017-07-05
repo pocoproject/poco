@@ -23,7 +23,7 @@ using Poco::Net::MailOutputStream;
 using Poco::StreamCopier;
 
 
-MailStreamTest::MailStreamTest(const std::string& rName): CppUnit::TestCase(rName)
+MailStreamTest::MailStreamTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

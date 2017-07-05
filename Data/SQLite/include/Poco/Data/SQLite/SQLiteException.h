@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/SQLiteException.h#2 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SQLiteException
 //

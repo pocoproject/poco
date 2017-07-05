@@ -178,10 +178,13 @@ POCO_IMPLEMENT_EXCEPTION(CreateFileException, FileException, "Cannot create file
 POCO_IMPLEMENT_EXCEPTION(OpenFileException, FileException, "Cannot open file")
 POCO_IMPLEMENT_EXCEPTION(WriteFileException, FileException, "Cannot write file")
 POCO_IMPLEMENT_EXCEPTION(ReadFileException, FileException, "Cannot read file")
+POCO_IMPLEMENT_EXCEPTION(DirectoryNotEmptyException, FileException, "Directory not empty")
 POCO_IMPLEMENT_EXCEPTION(UnknownURISchemeException, RuntimeException, "Unknown URI scheme")
-
+POCO_IMPLEMENT_EXCEPTION(TooManyURIRedirectsException, RuntimeException, "Too many URI redirects")
+POCO_IMPLEMENT_EXCEPTION(URISyntaxException, SyntaxException, "Bad URI syntax")
 
 POCO_IMPLEMENT_EXCEPTION(ApplicationException, Exception, "Application exception")
 POCO_IMPLEMENT_EXCEPTION(BadCastException, RuntimeException, "Bad cast exception")
+
 
 } // namespace Poco

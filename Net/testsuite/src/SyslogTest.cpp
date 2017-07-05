@@ -112,7 +112,7 @@ void CachingChannel::getMessages(std::vector<Poco::Message>& msg, int offset, in
 }
 
 
-SyslogTest::SyslogTest(const std::string& rName): CppUnit::TestCase(rName)
+SyslogTest::SyslogTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -125,7 +125,7 @@ SyslogTest::~SyslogTest()
 void SyslogTest::testListener()
 {
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "localhost:51400");
+	channel->setProperty("loghost", "127.0.0.1:51400");
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
@@ -150,7 +150,7 @@ void SyslogTest::testListener()
 void SyslogTest::testChannelOpenClose()
 {
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "localhost:51400");
+	channel->setProperty("loghost", "127.0.0.1:51400");
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
@@ -189,7 +189,7 @@ void SyslogTest::testChannelOpenClose()
 void SyslogTest::testOldBSD()
 {
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "localhost:51400");
+	channel->setProperty("loghost", "127.0.0.1:51400");
 	channel->setProperty("format", "bsd");
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);

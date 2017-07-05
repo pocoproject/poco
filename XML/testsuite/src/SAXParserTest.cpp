@@ -64,7 +64,7 @@ public:
 };
 
 
-SAXParserTest::SAXParserTest(const std::string& rName): CppUnit::TestCase(rName)
+SAXParserTest::SAXParserTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
