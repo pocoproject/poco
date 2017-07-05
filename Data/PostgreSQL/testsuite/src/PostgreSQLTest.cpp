@@ -952,8 +952,8 @@ void PostgreSQLTest::recreatePersonTimeTable()
 
 void PostgreSQLTest::recreateIntsTable()
 {
-	dropTable("Ints");
-	try { *_pSession << "CREATE TABLE " << ExecUtil::ints() << " (str INTEGER)", now; }
+	dropTable("Strings");
+	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateIntsTable()"); }
 }
