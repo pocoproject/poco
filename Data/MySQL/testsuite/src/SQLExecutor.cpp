@@ -1429,6 +1429,33 @@ void SQLExecutor::blobStmt()
 	poco_assert (res == blob);
 }
 
+void SQLExecutor::longText()
+{
+	std::string funct = "longText()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	std::string info("0123456789");
+
+	Poco::Data::CLOB img("0123456789", 10);
+	int count = 0;
+	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(info), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	std::string res;
+	poco_assert (res.size() == 0);
+	Statement stmt = (*_pSession << "SELECT Info FROM Person", into(res));
+	try { stmt.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (res == info);
+}
 
 void SQLExecutor::tuples()
 {

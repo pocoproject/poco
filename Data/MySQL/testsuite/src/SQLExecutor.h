@@ -82,6 +82,7 @@ public:
 
 	void blob(unsigned int bigSize = ~0);
 	void blobStmt();
+	void longText();
 	void dateTime();
 	void date();
 	void time();

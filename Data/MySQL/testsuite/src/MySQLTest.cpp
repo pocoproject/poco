@@ -497,6 +497,14 @@ void MySQLTest::testBLOBStmt()
 }
 
 
+void MySQLTest::testLongText()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonLongTextTable();
+	_pExecutor->longText();
+}
+
 void MySQLTest::testUnsignedInts()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -763,6 +771,13 @@ void MySQLTest::recreatePersonBLOBTable()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
 
+void MySQLTest::recreatePersonLongTextTable()
+{
+	dropTable("Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Info LONGTEXT)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonBLOBTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonBLOBTable()"); }
+}
 
 void MySQLTest::recreatePersonDateTimeTable()
 {
@@ -957,6 +972,7 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testDateTime);
 	//CppUnit_addTest(pSuite, MySQLTest, testBLOB);
 	CppUnit_addTest(pSuite, MySQLTest, testBLOBStmt);
+	CppUnit_addTest(pSuite, MySQLTest, testLongText);
 	CppUnit_addTest(pSuite, MySQLTest, testUnsignedInts);
 	CppUnit_addTest(pSuite, MySQLTest, testFloat);
 	CppUnit_addTest(pSuite, MySQLTest, testDouble);
