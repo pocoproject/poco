@@ -184,10 +184,10 @@ void MessageHeader::splitParameters(const std::string& s, std::string& value, Na
 {
 	value.clear();
 	parameters.clear();
-	std::string::const_iterator it  = s.begin();
+	std::string::const_iterator it = s.begin();
 	std::string::const_iterator end = s.end();
 	while (it != end && Poco::Ascii::isSpace(*it)) ++it;
-	while (it != end && *it != ';') value += *it++;
+	while (it != end && *it != ';' && *it != ',') value += *it++;
 	Poco::trimRightInPlace(value);
 	if (it != end) ++it;
 	splitParameters(it, end, parameters);
@@ -216,6 +216,20 @@ void MessageHeader::splitParameters(const std::string::const_iterator& begin, co
 			{
 				++it;
 				while (it != end && *it != '"')
+				{
+					if (*it == '\\')
+					{
+						++it;
+						if (it != end) pvalue += *it++;
+					}
+					else pvalue += *it++;
+				}
+				if (it != end) ++it;
+			}
+			else if (*it == '\'')
+			{
+				++it;
+				while (it != end && *it != '\'')
 				{
 					if (*it == '\\')
 					{
