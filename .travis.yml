@@ -91,11 +91,12 @@ matrix:
         - $CXX --version
         - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
-    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
-      compiler: gcc
-      script:
-        - arm-linux-gnueabi-g++ --version -x c++ /dev/null -dM -E
-        - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
+    #- env:    TEST_NAME="arm-linux-gnueabi-g++ (make)"
+    #  compiler: gcc
+    #  script:
+    #    - arm-linux-gnueabi-g++ --version
+    #    - arm-linux-gnueabi-g++ -x c++ /dev/null -dM -E
+    #    - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
     - env:    TEST_NAME="gcc 5.4.1 (CMake)"
       compiler: gcc
@@ -106,7 +107,7 @@ matrix:
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
  
 
-    # env:    TEST_NAME="clang (CMake)"
+    #- env:    TEST_NAME="clang (CMake)"
     #  compiler: clang
     #  script:
     #    - source ./travis/ignored.sh
