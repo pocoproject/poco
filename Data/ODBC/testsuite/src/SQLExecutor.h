@@ -564,9 +564,9 @@ public:
 
 	template <typename IntType =
 #ifdef POCO_64_BIT
-		Poco::Int64 IntType
+		Poco::Int64
 #else
-		Poco::Int32 IntType
+		Poco::Int32
 #endif
 	>
 	void internalExtraction(IntType)
