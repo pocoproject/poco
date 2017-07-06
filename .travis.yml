@@ -77,7 +77,7 @@ matrix:
         - export CC="clang"
         - export CXX="clang++"
         - $CXX --version
-        - ./configure --config==Linux-clang --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+        - ./configure --config=Linux-clang --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
     - env:    TEST_NAME="gcc 5.4.1 (make) bundled"
       compiler: gcc
