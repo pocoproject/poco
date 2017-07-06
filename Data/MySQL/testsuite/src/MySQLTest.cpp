@@ -116,7 +116,7 @@ void MySQLTest::connectNoDB()
 	dbConnString =  "host=" + getHost();
 	dbConnString +=	";user="  + getUser();
 	dbConnString += ";password="  + getPass();
-	dbConnString += ";compress=true;auto-reconnect=true";
+	dbConnString += ";compress=true;auto-reconnect=true;protocol=tcp";
 
 	try
 	{
@@ -208,7 +208,7 @@ void MySQLTest::testInsertSingleBulk()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->insertSingleBulk();
 }
 
@@ -217,7 +217,7 @@ void MySQLTest::testInsertSingleBulkVec()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->insertSingleBulkVec();
 }
 
@@ -226,7 +226,7 @@ void MySQLTest::testLimit()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limits();
 }
 
@@ -235,7 +235,7 @@ void MySQLTest::testLimitZero()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limitZero();
 }
 
@@ -244,7 +244,7 @@ void MySQLTest::testLimitOnce()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limitOnce();
 }
 
@@ -253,7 +253,7 @@ void MySQLTest::testLimitPrepare()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limitPrepare();
 }
 
@@ -263,7 +263,7 @@ void MySQLTest::testPrepare()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->prepare();
 }
 
@@ -908,6 +908,7 @@ CppUnit::Test* MySQLTest::suite()
 	_dbConnString += ";compress=true";
 	_dbConnString += ";auto-reconnect=true";
 	_dbConnString += ";secure-auth=true";
+	_dbConnString += ";protocol=tcp";
 
 	try
 	{
