@@ -60,13 +60,12 @@ matrix:
         - export CC="clang"
         - export CXX="clang++"
         - $CXX --version
-        - clang++ -x c++ /dev/null -dM -E
+        - $CXX -x c++ /dev/null -dM -E
         - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
     - env:    TEST_NAME="clang 3.5.0 (make) bundled"
       compiler: clang
       script:
-        - sudo apt-get install -qq -y clang
         - export CC="clang"
         - export CXX="clang++"
         - $CXX --version
@@ -95,6 +94,7 @@ matrix:
     - env:    TEST_NAME="arm-linux-gnueabi- (make)"
       compiler: gcc
       script:
+        - arm-linux-gnueabi-g++ --version -x c++ /dev/null -dM -E
         - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
     - env:    TEST_NAME="gcc 5.4.1 (CMake)"
