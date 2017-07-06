@@ -12,6 +12,7 @@ docker run -p 3306:3306 --name poco-test-mysql -e MYSQL_ROOT_PASSWORD=poco -e MY
 echo "poco-test-mysql container up and running, sleeping $MYSQL_DB_START_WAIT seconds waiting for db to start ..."
 sleep $MYSQL_DB_START_WAIT
 
+echo "running tests ..."
 ./bin/Linux/x86_64/testrunner -all
 
 echo "stopping poco-test-mysql docker container"

@@ -25,6 +25,7 @@
 #include "Poco/Data/RecordSet.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/String.h"
+#include "Poco/Tuple.h"
 #include "Poco/Exception.h"
 #include <iostream>
 
@@ -573,9 +574,14 @@ public:
 	{
 		using Poco::Data::RecordSet;
 		using Poco::Data::Column;
+		using Poco::Data::Statement;
 		using Poco::UTF16String;
+		using Poco::Tuple;
 		using Poco::BadCastException;
 		using Poco::RangeException;
+		using Poco::Data::ODBC::ConnectionException;
+		using Poco::Data::ODBC::StatementException;
+		using namespace Poco::Data::Keywords;
 
 		std::string funct = "internalExtraction()";
 		std::vector<Poco::Tuple<int, double, std::string> > v;
@@ -653,8 +659,8 @@ public:
 			assert (5 == i);
 
 			const Column<std::deque<IntType> >& col = rset.column<std::deque<IntType> >(0);
-			Column<std::deque<IntType> >::Iterator it = col.begin();
-			Column<std::deque<IntType> >::Iterator end = col.end();
+			typename Column<std::deque<IntType> >::Iterator it = col.begin();
+			typename Column<std::deque<IntType> >::Iterator end = col.end();
 			for (int i = 1; it != end; ++it, ++i)
 				assert (*it == i);
 

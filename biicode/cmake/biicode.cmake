@@ -16,10 +16,14 @@ option(POCO_STATIC
 if(POCO_STATIC)
     target_compile_definitions(${BII_BLOCK_TARGET} INTERFACE  -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)
     set( LIB_MODE STATIC )
-    message(STATUS "Building static libraries")
+    if(POCO_VERBOSE_MESSAGES)
+        message(STATUS "Building static libraries")
+    endif()
 else(POCO_STATIC)
     set( LIB_MODE SHARED )
-    message(STATUS "Building dynamic libraries")
+    if(POCO_VERBOSE_MESSAGES)
+        message(STATUS "Building dynamic libraries")
+    endif()
 endif(POCO_STATIC)
 
 # OS Detection

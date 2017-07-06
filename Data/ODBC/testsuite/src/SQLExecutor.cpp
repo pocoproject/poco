@@ -14,7 +14,6 @@
 #include "SQLExecutor.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
-#include "Poco/Tuple.h"
 #include "Poco/Nullable.h"
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
