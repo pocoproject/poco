@@ -564,9 +564,9 @@ public:
 
 	template <typename IntType =
 #ifdef POCO_64_BIT
-		Poco::Int64 IntType
+		Poco::Int64
 #else
-		Poco::Int32 IntType
+		Poco::Int32
 #endif
 	>
 	void internalExtraction(IntType)
@@ -578,11 +578,11 @@ public:
 		using Poco::RangeException;
 
 		std::string funct = "internalExtraction()";
-		std::vector<Tuple<int, double, std::string> > v;
-		v.push_back(Tuple<int, double, std::string>(1, 1.5, "3"));
-		v.push_back(Tuple<int, double, std::string>(2, 2.5, "4"));
-		v.push_back(Tuple<int, double, std::string>(3, 3.5, "5"));
-		v.push_back(Tuple<int, double, std::string>(4, 4.5, "6"));
+		std::vector<Poco::Tuple<int, double, std::string> > v;
+		v.push_back(Poco::Tuple<int, double, std::string>(1, 1.5, "3"));
+		v.push_back(Poco::Tuple<int, double, std::string>(2, 2.5, "4"));
+		v.push_back(Poco::Tuple<int, double, std::string>(3, 3.5, "5"));
+		v.push_back(Poco::Tuple<int, double, std::string>(4, 4.5, "6"));
 
 		try { session() << "INSERT INTO " << ExecUtil::vectors() << " VALUES (?,?,?)", use(v), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
