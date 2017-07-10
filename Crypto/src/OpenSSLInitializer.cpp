@@ -35,7 +35,7 @@ namespace Crypto {
 
 Poco::FastMutex OpenSSLInitializer::_mutex;
 Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
-Poco::AtomicCounter OpenSSLInitializer::_rc;
+int OpenSSLInitializer::_rc(0);
 bool OpenSSLInitializer::_disableSSLInitialization = false;
 
 OpenSSLInitializer::OpenSSLInitializer()
