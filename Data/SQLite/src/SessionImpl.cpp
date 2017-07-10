@@ -207,12 +207,14 @@ void SessionImpl::close()
 {
 	if (_pDB) {
 		int result = 0;
+		int times = 50;
 		do {
 			result = sqlite3_close(_pDB);
 			if (result == SQLITE_BUSY) {
 				Poco::Thread::sleep(100);
 			}
-		} while (SQLITE_BUSY == result);
+			--times;
+		} while (SQLITE_BUSY == result && times > 0);
 		_pDB = 0;
 	}
 
