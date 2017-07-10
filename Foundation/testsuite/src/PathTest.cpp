@@ -373,6 +373,18 @@ void PathTest::testParseUnix5()
 	assert (p.toString(Path::PATH_UNIX) == "/c:/windows/system32/");	
 }
 
+void PathTest::testExpandUnix()
+{
+	std::string pathWithOutVar = "/usr/share/O1\\$\\$/folder";
+	std::string pathWithVar = "${PWD}/folder";
+	Path p;
+	std::string s = p.expand(pathWithOutVar);
+	assert (s == "/usr/share/O1$$/folder");
+	s = p.expand(pathWithVar);
+	Path tmpPath = Path::current();
+	tmpPath.append("folder");
+	assert (s == tmpPath.toString());
+}
 
 void PathTest::testParseWindows1()
 {
@@ -1641,6 +1653,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testParseUnix3);
 	CppUnit_addTest(pSuite, PathTest, testParseUnix4);
 	CppUnit_addTest(pSuite, PathTest, testParseUnix5);
+	CppUnit_addTest(pSuite, PathTest, testExpandUnix);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows1);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows2);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows3);
