@@ -2020,7 +2020,7 @@ void SQLiteTest::testInternalExtraction()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Vectors", now;
-	tmp << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+	tmp << "CREATE TABLE Vectors (int0 INTEGER32, flt0 REAL, str0 VARCHAR)", now;
 
 	std::vector<Tuple<int, double, std::string> > v;
 	v.push_back(Tuple<int, double, std::string>(1, 1.5, "3"));
@@ -2086,7 +2086,7 @@ void SQLiteTest::testAny()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Anys", now;
-	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+	tmp << "CREATE TABLE Anys (int0 INTEGER32, flt0 REAL, str0 VARCHAR)", now;
 
 	Any i = Int32(42);
 	Any f = double(42.5);
