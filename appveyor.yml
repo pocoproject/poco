@@ -36,6 +36,10 @@ services:
   - postgresql94
 
   
+image:
+  - Visual Studio 2017
+
+  
 platform:
   - Win32
   - x64
@@ -59,18 +63,6 @@ environment:
   matrix:
       
     - builder: msbuild
-      vsver: 120
-      linkmode: shared
-
-#    - builder: msbuild
-#      vsver: 120
-#      linkmode: static_md
-
-#    - builder: msbuild
-#      vsver: 120
-#      linkmode: static_mt
-
-    - builder: msbuild
       vsver: 140
       linkmode: shared
 
@@ -82,8 +74,20 @@ environment:
 #      vsver: 140
 #      linkmode: static_mt
 
-    - builder: cmake
-      vsver: 120
+#    - builder: msbuild
+#      vsver: 150
+#      linkmode: shared
+
+#    - builder: msbuild
+#      vsver: 150
+#      linkmode: static_md
+
+#    - builder: msbuild
+#      vsver: 150
+#      linkmode: static_mt
+
+#    - builder: cmake
+#      vsver: 120
 
     - builder: cmake
       vsver: 140
@@ -249,6 +253,14 @@ before_build:
         if ($env:vsver -eq "140")
         {
           $vspath= convert-path $env:VS140COMNTOOLS\..\..\VC\bin; $yyyy='2015'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+        }
+        if ($env:vsver -eq "150")
+        {
+          Install-Module VSSetup -Scope CurrentUser
+          Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64
+          $vspath= convert-path $env:VS150COMNTOOLS\..\..\VC\bin; $yyyy='2017'
           if($env:platform -eq 'Win32') { $vctool='';}
           if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
         }
