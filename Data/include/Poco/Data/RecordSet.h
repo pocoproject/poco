@@ -323,7 +323,7 @@ public:
 	using Statement::reset;
 		/// Don't hide base class method.
 
-	void reset(const Statement& stmt);
+	RecordSet& reset(const Statement& stmt);
 		/// Resets the RecordSet and assigns a new statement.
 		/// Should be called after the given statement has been reset,
 		/// assigned a new SQL statement, and executed.
