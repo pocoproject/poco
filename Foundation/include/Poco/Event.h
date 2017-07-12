@@ -24,7 +24,13 @@
 #include "Poco/Exception.h"
 
 
-#if defined(POCO_ENABLE_CPP11)
+// C++ doesn't have native event, better to use native ones for now
+// (current implementation is simulated using std::mutex and std::condition_variable)
+
+//#define POCO_CXX11_EVENT_FINISHED
+
+
+#if defined(POCO_CXX11_EVENT_FINISHED) && defined(POCO_ENABLE_CPP11)
 #include "Poco/Event_STD.h"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Event_WIN32.h"

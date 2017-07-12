@@ -21,6 +21,17 @@
 #include "Poco/Format.h"
 
 
+#if defined(POCO_ENABLE_CPP11)
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include "Thread_STD_WIN32.cpp"
+#elif defined(POCO_VXWORKS)
+#include "Thread_STD_VX.cpp"
+#else
+#include "Thread_STD_POSIX.cpp"
+#endif
+#endif
+
+
 namespace Poco {
 
 
@@ -40,70 +51,6 @@ ThreadImpl::~ThreadImpl()
 	{
 		_pData->thread->detach();
 	}
-}
-
-
-void ThreadImpl::setPriorityImpl(int prio)
-{
-	if (prio != _pData->prio)
-	{
-		_pData->prio = prio;
-		_pData->policy = 0;
-		// not supported
-	}
-}
-
-
-void ThreadImpl::setOSPriorityImpl(int prio, int policy)
-{
-	if (prio != _pData->osPrio || policy != _pData->policy)
-	{
-		//_pData->prio   = reverseMapPrio(prio, policy);
-		_pData->osPrio = prio;
-		_pData->policy = policy;
-		// not supported
-	}
-}
-
-
-int ThreadImpl::getMinOSPriorityImpl(int policy)
-{
-#if defined(POCO_THREAD_PRIORITY_MIN)
-	return POCO_THREAD_PRIORITY_MIN;
-#else
-	return 0;
-#endif
-}
-
-
-int ThreadImpl::getMaxOSPriorityImpl(int policy)
-{
-#if defined(POCO_THREAD_PRIORITY_MAX)
-	return POCO_THREAD_PRIORITY_MAX;
-#else
-	return 0;
-#endif
-}
-
-
-void ThreadImpl::setStackSizeImpl(int size)
-{
-	_pData->stackSize = size;
-	// not supported
-}
-
-
-void ThreadImpl::setAffinityImpl(int cpu)
-{
-	// not supported
-}
-
-
-int ThreadImpl::getAffinityImpl() const
-{
-	int cpuSet = -1;
-	return cpuSet;
-	// not supported
 }
 
 

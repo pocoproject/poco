@@ -116,6 +116,8 @@ public:
 		_ptr(other._ptr),
 		_ownMem(other._ownMem)
 	{
+		other._capacity = 0;
+		other._used = 0;
 		other._ownMem = false;
 		other._ptr = nullptr;
 	}
@@ -130,6 +132,8 @@ public:
 			_ptr = other._ptr;
 			_ownMem = other._ownMem;
 
+			other._capacity = 0;
+			other._used = 0;
 			other._ownMem = false;
 			other._ptr = nullptr;
 		}
