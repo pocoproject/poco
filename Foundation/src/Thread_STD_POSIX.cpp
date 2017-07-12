@@ -147,10 +147,10 @@ void ThreadImpl::setAffinityImpl(int cpu)
 	CPU_ZERO(&cpuset);
 	CPU_SET(cpu, &cpuset);
 #ifdef HAVE_THREE_PARAM_SCHED_SETAFFINITY
-	if (pthread_setaffinity_np(_pData->thread, sizeof(cpuset), &cpuset) != 0)
+	if (pthread_setaffinity_np(_pData->thread->native_handle(), sizeof(cpuset), &cpuset) != 0)
 		throw SystemException("Failed to set affinity");
 #else
-	if (pthread_setaffinity_np(_pData->thread, &cpuset) != 0)
+	if (pthread_setaffinity_np(_pData->thread->native_handle(), &cpuset) != 0)
 		throw SystemException("Failed to set affinity");
 #endif
 #endif
@@ -161,7 +161,7 @@ void ThreadImpl::setAffinityImpl(int cpu)
 	thread_affinity_policy policy;
 	policy.affinity_tag = cpu;
 
-	ret = thread_policy_set(pthread_mach_thread_np(_pData->thread),
+	ret = thread_policy_set(pthread_mach_thread_np(_pData->thread->native_handle()),
 		THREAD_AFFINITY_POLICY,
 		(thread_policy_t)&policy,
 		THREAD_AFFINITY_POLICY_COUNT);
@@ -183,10 +183,10 @@ int ThreadImpl::getAffinityImpl() const
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
 #ifdef HAVE_THREE_PARAM_SCHED_SETAFFINITY
-	if (pthread_getaffinity_np(_pData->thread, sizeof(cpuset), &cpuset) != 0)
+	if (pthread_getaffinity_np(_pData->thread->native_handle(), sizeof(cpuset), &cpuset) != 0)
 		throw SystemException("Failed to get affinity", errno);
 #else
-	if (pthread_getaffinity_np(_pData->thread, &cpuset) != 0)
+	if (pthread_getaffinity_np(_pData->thread->native_handle(), &cpuset) != 0)
 		throw SystemException("Failed to get affinity", errno);
 #endif
 	int cpuCount = Environment::processorCount();
@@ -206,7 +206,7 @@ int ThreadImpl::getAffinityImpl() const
 	thread_affinity_policy policy;
 	mach_msg_type_number_t count = THREAD_AFFINITY_POLICY_COUNT;
 	boolean_t get_default = false;
-	ret = thread_policy_get(pthread_mach_thread_np(_pData->thread),
+	ret = thread_policy_get(pthread_mach_thread_np(_pData->thread->native_handle()),
 		THREAD_AFFINITY_POLICY,
 		(thread_policy_t)&policy,
 		&count,
