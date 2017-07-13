@@ -36,8 +36,8 @@ services:
   - postgresql94
 
   
-image:
-  - Visual Studio 2017
+#image:
+#  - Visual Studio 2017
 
   
 platform:
