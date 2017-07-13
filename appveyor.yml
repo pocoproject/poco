@@ -36,8 +36,8 @@ services:
   - postgresql94
 
   
-#image:
-#  - Visual Studio 2017
+image:
+  - Visual Studio 2017
 
   
 platform:
@@ -54,12 +54,15 @@ configuration:
 # -------------------------------------------------------------------------------------------
 
 environment:
-  bundling: bundled
-  MYSQL32:    C:\mysql-5.7.17-win32
-  MYSQL64:    C:\Program Files\MySql\MySQL Server 5.7
-  POSTGRES32: C:\Program Files (x86)\PostgreSQL\9.4
-  POSTGRES64: C:\Program Files\PostgreSQL\9.4
-
+  bundling:     bundled
+  MYSQL32:      C:\mysql-5.7.17-win32
+  MYSQL64:      C:\Program Files\MySql\MySQL Server 5.7
+  POSTGRES32:   C:\Program Files (x86)\PostgreSQL\9.4
+  POSTGRES64:   C:\Program Files\PostgreSQL\9.4
+  OPENSSLURL:   https://slproweb.com/download
+  OPENSSL32EXE: Win32OpenSSL-1_1_0f.exe
+  OPENSSL64EXE: Win64OpenSSL-1_1_0f.exe
+  
   matrix:
       
     - builder: msbuild
@@ -169,9 +172,9 @@ install:
              echo "using C:\OpenSSL-Win32 from cache"
            } else {
              echo "downloading OpenSSL-Win32"
-             Start-FileDownload 'http://slproweb.com/download/Win32OpenSSL-1_0_2e.exe'
+             Start-FileDownload $env:OPENSSLURL + "/" + $env:OPENSSL32EXE
              echo "installing C:\OpenSSL-Win32"
-             Start-Process "Win32OpenSSL-1_0_2e.exe" -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
+             Start-Process $env:OPENSSL32EXE -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
            }
          }
          if ($env:platform -eq "x64")
@@ -180,9 +183,9 @@ install:
              echo "using C:\OpenSSL-Win64 from cache"
            } else {
              echo "downloading OpenSSL-Win64"
-             Start-FileDownload 'http://slproweb.com/download/Win64OpenSSL-1_0_2e.exe'
+             Start-FileDownload $env:OPENSSLURL + "/" + $env:OPENSSL64EXE
              echo "installing C:\OpenSSL-Win64"
-             Start-Process "Win64OpenSSL-1_0_2e.exe" -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
+             Start-Process $env:OPENSSL64EXE -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
            }
          }
        }
