@@ -62,9 +62,16 @@ environment:
   OPENSSLURL:   https://slproweb.com/download
   OPENSSL32EXE: Win32OpenSSL-1_1_0f.exe
   OPENSSL64EXE: Win64OpenSSL-1_1_0f.exe
+  OPENSSL32:    C:\OpenSSL-Win32
+  OPENSSL64:    C:\OpenSSL-Win64
   
   matrix:
-      
+    - builder: cmake
+      vsver: 140
+
+    - builder: cygwin
+
+     
     - builder: msbuild
       vsver: 140
       linkmode: shared
@@ -92,22 +99,17 @@ environment:
 #    - builder: cmake
 #      vsver: 120
 
-    - builder: cmake
-      vsver: 140
-
-    - builder: cygwin
-
 matrix:
   fast_finish: true
 
 install:
   - if "%builder%"=="cygwin" (
     if "%platform%"=="Win32" (
-    C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P libpcre-devel -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel -P libcrypt-devel))
+    C:\cygwin\setup-x86.exe      -qnNdO -R C:/cygwin   -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup   -P libpq-devel -P libpcre-devel -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel -P libcrypt-devel))
     
   - if "%builder%"=="cygwin" (
     if "%platform%"=="x64" (   
-    C:\cygwin64\setup-x86_64.exe -qnNdO -R C:/cygwin64 -s http://cygwin.mirror.constant.com -l C:/cygwin64/var/cache/setup -P libpcre-devel -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel  -P libcrypt-devel))
+    C:\cygwin64\setup-x86_64.exe -qnNdO -R C:/cygwin64 -s http://cygwin.mirror.constant.com -l C:/cygwin64/var/cache/setup -P libpq-devel -P libpcre-devel -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel  -P libcrypt-devel))
   
   - set POCO_BASE=%CD%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
@@ -168,25 +170,23 @@ install:
        {
          if ($env:platform -eq "Win32")
          {
-           if (Test-Path "C:\OpenSSL-Win32") {
-             echo "using C:\OpenSSL-Win32 from cache"
-           } else {
-             echo "downloading OpenSSL-Win32"
-             Start-FileDownload $env:OPENSSLURL + "/" + $env:OPENSSL32EXE
-             echo "installing C:\OpenSSL-Win32"
-             Start-Process $env:OPENSSL32EXE -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
-           }
+             $openssl     = $env:OPENSSL32
+             $opensslexe  = $env:OPENSSL32EXE
          }
          if ($env:platform -eq "x64")
          {
-           if (Test-Path "C:\OpenSSL-Win64") {
-             echo "using C:\OpenSSL-Win64 from cache"
-           } else {
-             echo "downloading OpenSSL-Win64"
-             Start-FileDownload $env:OPENSSLURL + "/" + $env:OPENSSL64EXE
-             echo "installing C:\OpenSSL-Win64"
-             Start-Process $env:OPENSSL64EXE -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
-           }
+             $openssl     = $env:OPENSSL64
+             $opensslexe  = $env:OPENSSL64EXE
+         }
+         $opensslurl  = $env:OPENSSLURL + "/" + $opensslexe
+         
+         if (Test-Path $openssl) {
+           echo "using " + $openssl + " from cache"
+         } else {
+           echo "downloading " + $openssl
+           Start-FileDownload $opensslurl
+           echo "installing " + $openssl
+           Start-Process $opensslexe -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
          }
        }
 # -------------------------------------------------------------------------------------------  
