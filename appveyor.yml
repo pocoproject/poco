@@ -245,7 +245,9 @@ install:
 # -------------------------------------------------------------------------------------------
   - ps: |
       Install-Module VSSetup -Scope CurrentUser
-      Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64
+      $vs150comntools = Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
+      set-item -force -path "ENV:VS150COMNTOOLS"  -value "$($v[1])
+      Write-Host "`nVS150COMNTOOLS=$vs150comntools" -ForegroundColor Yellow
 
 # -------------------------------------------------------------------------------------------
   
