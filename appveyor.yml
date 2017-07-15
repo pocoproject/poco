@@ -66,12 +66,10 @@ environment:
   OPENSSL64:    C:\OpenSSL-Win64
   
   matrix:
-    - builder: cmake
-      vsver: 140
+    - builder: msbuild
+      vsver: 150
+      linkmode: shared
 
-    - builder: cygwin
-
-     
     - builder: msbuild
       vsver: 140
       linkmode: shared
@@ -99,6 +97,12 @@ environment:
 #    - builder: cmake
 #      vsver: 120
 
+    - builder: cmake
+      vsver: 140
+
+    - builder: cygwin
+
+     
 matrix:
   fast_finish: true
 
@@ -236,7 +240,15 @@ install:
       }
 # -------------------------------------------------------------------------------------------
 
-   
+# -------------------------------------------------------------------------------------------
+# VS2017 setup. VS2017 does not provide VS150COMNTOOLS. See
+# -------------------------------------------------------------------------------------------
+  - ps: |
+      Install-Module VSSetup -Scope CurrentUser
+      Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64
+
+# -------------------------------------------------------------------------------------------
+  
 before_build:
   - ps: |
       if ($env:builder -eq "cmake")
@@ -261,8 +273,6 @@ before_build:
         }
         if ($env:vsver -eq "150")
         {
-          Install-Module VSSetup -Scope CurrentUser
-          Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64
           $vspath= convert-path $env:VS150COMNTOOLS\..\..\VC\bin; $yyyy='2017'
           if($env:platform -eq 'Win32') { $vctool='';}
           if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
