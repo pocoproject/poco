@@ -242,9 +242,9 @@ install:
 
 # -------------------------------------------------------------------------------------------
 # VS2017 setup. VS2017 does not provide VS150COMNTOOLS. See
+#      Install-Module VSSetup -Scope CurrentUser
 # -------------------------------------------------------------------------------------------
   - ps: |
-      Install-Module VSSetup -Scope CurrentUser
       $vs150comntools = Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
       set-item -force -path "ENV:VS150COMNTOOLS"  -value "vs150comntools"
       Write-Host "`nVS150COMNTOOLS=$vs150comntools" -ForegroundColor Yellow
