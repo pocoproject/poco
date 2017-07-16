@@ -241,10 +241,11 @@ install:
 # -------------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------------
-# VS2017 setup. VS2017 does not provide VS150COMNTOOLS. See
-#      Install-Module VSSetup -Scope CurrentUser
+# VS2017 setup. VS2017 does not provide VS150COMNTOOLS. 
+# See https://blogs.msdn.microsoft.com/vcblog/2017/03/06/finding-the-visual-c-compiler-tools-in-visual-studio-2017/
 # -------------------------------------------------------------------------------------------
   - ps: |
+      Install-Module VSSetup -Scope CurrentUser -Force
       $vs150comntools = Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
       set-item -force -path "ENV:VS150COMNTOOLS"  -value "vs150comntools"
       Write-Host "`nVS150COMNTOOLS=$vs150comntools" -ForegroundColor Yellow
