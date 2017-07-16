@@ -115,8 +115,8 @@ install:
       Install-Module VSSetup -Scope CurrentUser -Force
       
       $installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
-      $vs150comntools = $installationPath.split("="); 
-      set-item -force -path "ENV:VS150COMNTOOLS"  -value "$vs150comntools[1]\Common7\Tools\"
+      $vs150comntools = $installationPath.psobject.properties | % {$_.Value}; 
+      set-item -force -path "ENV:VS150COMNTOOLS"  -value "$vs150comntools\Common7\Tools\"
       Write-Host "`nVS150COMNTOOLS=$vs150comntools" -ForegroundColor Yellow
 
 # -------------------------------------------------------------------------------------------
