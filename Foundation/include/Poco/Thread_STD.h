@@ -121,8 +121,10 @@ private:
 			thread(),
 			prio(PRIO_NORMAL_IMPL),
 			policy(0),
+			task(0),
 			done(Event::EVENT_MANUALRESET),
 			stackSize(POCO_THREAD_STACK_SIZE),
+			cpu(-1),
 			started(false),
 			joined(false)
 		{
@@ -134,8 +136,10 @@ private:
 		int           prio;
 		int           osPrio;
 		int           policy;
+		int           task;
 		Event         done;
 		std::size_t   stackSize;
+		int			  cpu;
 		bool          started;
 		bool          joined;
 	};

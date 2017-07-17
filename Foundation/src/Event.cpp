@@ -17,7 +17,7 @@
 #include "Poco/Event.h"
 
 
-#if defined(POCO_ENABLE_CPP11)
+#if defined(POCO_CXX11_EVENT_FINISHED) && defined(POCO_ENABLE_CPP11)
 #include "Event_STD.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Event_WIN32.cpp"
