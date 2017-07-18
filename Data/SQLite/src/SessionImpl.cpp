@@ -214,21 +214,24 @@ void SessionImpl::close()
 			result = sqlite3_close(_pDB);
 			if (result == SQLITE_BUSY) 
 			{
-				sqlite3_stmt *pStmt = NULL;
-				do 
-				{
-					pStmt = sqlite3_next_stmt(_pDB, NULL);
-					if (pStmt && sqlite3_stmt_busy(pStmt)) 
-					{
-						sqlite3_finalize(pStmt);
-					}
-				}
-				while (pStmt != NULL);
-				Poco::Thread::sleep(100);
 				--times;
 			}			
 		} 
 		while (SQLITE_BUSY == result && times > 0);
+		if (SQLITE_BUSY == result && times == 0) 
+		{
+			sqlite3_stmt *pStmt = NULL;
+			do 
+			{
+				pStmt = sqlite3_next_stmt(_pDB, NULL);
+				if (pStmt && sqlite3_stmt_busy(pStmt)) 
+				{
+					sqlite3_finalize(pStmt);
+				}
+			}
+			while (pStmt != NULL);
+			sqlite3_close(_pDB);		
+		}
 		_pDB = 0;
 	}
 
