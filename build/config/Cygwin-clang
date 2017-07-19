@@ -12,13 +12,11 @@
 #
 LINKMODE ?= SHARED
 
-OMIT    += Data/PostgreSQL
-
 #
 # Define Tools
 #
-CC      = gcc
-CXX     = g++
+CC      = clang$(CLANG_VERSION)
+CXX     = clang++$(CLANG_VERSION)
 LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
@@ -48,9 +46,9 @@ IMPLIBLINKEXT    = .dll.a
 CFLAGS          = 
 CFLAGS32        =
 CFLAGS64        = 
-CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING 
-CXXFLAGS32      = -Wa,-mbig-obj
-CXXFLAGS64      = -Wa,-mbig-obj
+CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING
+CXXFLAGS32      = 
+CXXFLAGS64      = 
 SHLIBFLAGS      = -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
 SHLIBFLAGS32    = 
 SHLIBFLAGS64    = 
@@ -73,7 +71,7 @@ RELEASEOPT_LINK =
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500
+SYSFLAGS = -D_XOPEN_SOURCE=500 -D__BSD_VISIBLE
 
 #
 # System Specific Libraries
@@ -81,19 +79,6 @@ SYSFLAGS = -D_XOPEN_SOURCE=500
 SYSLIBS  = 
 
 #
-# Auto-detect architecture if not specified
-#
-ifndef OSARCH_64BITS
-  LBITS := $(shell getconf LONG_BIT)
-  ifeq ($(LBITS),64)
-    OSARCH_64BITS = 1
-  else
-    OSARCH_64BITS = 0
-  endif
-endif
-
-#
 # C++11/14 detection
 #
-include $(POCO_BASE)/build/script/cpp11-gcc
-
+include $(POCO_BASE)/build/script/cpp11-clang
