@@ -576,7 +576,7 @@ test_script:
           Write-Host -ForegroundColor Yellow $line;
 
           Write-Host -ForegroundColor Yellow 'ctest -VV -E Data*'
-          ctest -VV -E Data*
+          ctest -VV -E Data* -E Crypto*
           popd
         }
         Write-Host $runs' runs, ' $fails' fails'
