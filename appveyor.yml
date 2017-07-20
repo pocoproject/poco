@@ -69,10 +69,6 @@ environment:
   
   matrix:
     - builder: msbuild
-      vsver: 150
-      linkmode: shared
-
-    - builder: msbuild
       vsver: 140
       linkmode: shared
 
@@ -84,9 +80,9 @@ environment:
 #      vsver: 140
 #      linkmode: static_mt
 
-#    - builder: msbuild
-#      vsver: 150
-#      linkmode: shared
+    - builder: msbuild
+      vsver: 150
+      linkmode: shared
 
 #    - builder: msbuild
 #      vsver: 150
@@ -104,6 +100,7 @@ environment:
 
     - builder: cygwin
 
+
      
 matrix:
   fast_finish: true
@@ -114,12 +111,11 @@ install:
 # See https://blogs.msdn.microsoft.com/vcblog/2017/03/06/finding-the-visual-c-compiler-tools-in-visual-studio-2017/
 # -------------------------------------------------------------------------------------------
   - ps: |
-      Install-Module VSSetup -Scope CurrentUser -Force
-      
+      Install-Module VSSetup -Scope CurrentUser -Force  
       $installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
       $vs150comntools = $installationPath.psobject.properties.Value; 
       set-item -force -path "ENV:VS150COMNTOOLS"  -value "$vs150comntools\Common7\Tools\"
-      Write-Host "`nVS150COMNTOOLS=$vs150comntools" -ForegroundColor Yellow
+      Write-Host "`nVS150COMNTOOLS=$env:VS150COMNTOOLS" -ForegroundColor Yellow
 
 # -------------------------------------------------------------------------------------------
   - if "%builder%"=="cygwin" (
@@ -161,7 +157,6 @@ install:
 #        } else {
 #          choco install cmake
 #        }
-  - set
 
 # -------------------------------------------------------------------------------------------
 #  chocolatey brokes jom, here's workaround
@@ -200,11 +195,11 @@ install:
          $opensslurl  = $env:OPENSSLURL + "/" + $opensslexe
          
          if (Test-Path $openssl) {
-           echo "using " + $openssl + " from cache"
+           Write-Host "using $openssl from cache" -ForegroundColor Yellow
          } else {
-           echo "downloading " + $openssl
+           Write-Host "downloading $openssl" -ForegroundColor Cyan
            Start-FileDownload $opensslurl
-           echo "installing " + $openssl
+           Write-Host "installing  $openssl" -ForegroundColor Green
            Start-Process $opensslexe -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
          }
        }
@@ -212,15 +207,15 @@ install:
 #  MySQL 32 bit is not available by default on AppVeyor
 # -------------------------------------------------------------------------------------------
   - ps: |
-      if (($env:platform -eq "Win32") -and !($env:builder -eq "cygwin"))
+      if ($env:platform -eq "Win32")
       {
         if (Test-Path $env:MYSQL32) {
-          echo "using $env:MYSQL32 from cache"
+          Write-Host "using $env:MYSQL32 from cache" -ForegroundColor Yellow
         }
         else
         {
           Write-Host "downloading $env:MYSQL32" -ForegroundColor Cyan
-          Invoke-WebRequest "$env:MYSQL32URL" -OutFile MYSQL32ZIP
+          Invoke-WebRequest $env:MYSQL32URL -OutFile $env:MYSQL32ZIP
           Write-Host "installing $env:MYSQL32" -ForegroundColor Green
           7z x -y $env:MYSQL32ZIP -oc:\
         }
@@ -235,7 +230,7 @@ install:
       if ($env:platform -eq "Win32")
       {
         if (Test-Path $env:POSTGRES32) {
-          echo "using $env:POSTGRES32 from cache"
+          Write-Host "using $env:POSTGRES32 from cache" -ForegroundColor Yellow
         }
         else
         {
@@ -249,7 +244,6 @@ install:
           Write-Host "Setting up services..."
           Stop-Service postgresql-9.4
           Set-Service -Name postgresql-9.4 -StartupType Manual
-
           Write-Host "$env:POSTGRES32 installed" -ForegroundColor Green
         }
       }
@@ -257,6 +251,7 @@ install:
 
   
 before_build:
+  - set
   - ps: |
       if ($env:builder -eq "cmake")
       {
@@ -302,8 +297,6 @@ before_build:
 #        & C:\cygwin\bin\ls -lR $env:MYSQL64
 # -------------------------------------------------------------------------------------------  
   - ps: |
-      if (!($env:builder -eq "cygwin"))
-      {
         if ($env:platform -eq "Win32")
         {
           $env:INCLUDE = $env:MYSQL32 + "\include;" + $env:INCLUDE
@@ -329,15 +322,12 @@ before_build:
         $env:MYSQL_PWD="Password12!"
         $cmd = 'mysql -e "create database pocotestdb;" --user=root';
         iex "& $cmd"
-      }
 # -------------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------------  
 # PostgreSQL
 # -------------------------------------------------------------------------------------------  
   - ps: |
-      if (!($env:builder -eq "cygwin"))
-      {
         if ($env:platform -eq "Win32")
         {
             $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
@@ -350,7 +340,6 @@ before_build:
             $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
             $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
         }
-      }
 # -------------------------------------------------------------------------------------------
 
 after_build:
@@ -405,7 +394,7 @@ build_script:
 # Don't build Cygwin64 with std=c++14 until this issue be fixed https://gcc.gnu.org/bugzilla/show_bug.cgi?id=77441
 # -------------------------------------------------------------------------------------------
   - ps: |
-      if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
+      if ($env:builder -eq "cygwin")
       {
           $LastExitCode=0;
           $cmd='bash.exe configure --everything';iex "& $cmd"
@@ -434,15 +423,15 @@ build_script:
         mkdir cmake-build | out-null;pushd cmake-build;
         if ($env:platform -eq "Win32")
         {
-            $opensslrootdir = 'C:\OpenSSL-Win32'
+            $openssl = $env:OPENSSL32
         }
         if ($env:platform -eq "x64")
         {
-            $opensslrootdir = 'C:\OpenSSL-Win64'
+            $openssl = $env:OPENSSL64
         }
         $defs =' -G"NMake Makefiles"';
         $defs+=" -DCMAKE_BUILD_TYPE=$env:configuration";
-        $defs+=" -DOPENSSL_ROOT_DIR=$opensslrootdir";
+        $defs+=" -DOPENSSL_ROOT_DIR=$openssl";
         $defs+=" -DENABLE_NETSSL=OFF";
         $defs+=" -DENABLE_NETSSL_WIN=ON";
         $defs+=" -DENABLE_DATA_MYSQL=OFF";
@@ -493,7 +482,7 @@ test_script:
       $line='-------------------------------------------------------------------------------------';
       if ($env:configuration -eq "release")
       {
-        if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
+        if ($env:builder -eq "cygwin")
         {
           $LastExitCode=0;
           if ($env:platform -eq "Win32")
