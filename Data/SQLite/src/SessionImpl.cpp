@@ -223,10 +223,18 @@ bool SessionImpl::isConnected()
 
 void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
-	int tout = 1000 * timeout;
-	int rc = sqlite3_busy_timeout(_pDB, tout);
-	if (rc != 0) Utility::throwException(rc);
-	_timeout = tout;
+	if(timeout >= 0 && (timeout <= INT_MAX/1000))
+	{
+		int tout = 1000 * timeout;
+		int rc = sqlite3_busy_timeout(_pDB, tout);
+		if (rc != 0) Utility::throwException(rc);
+		_timeout = tout;
+	}
+	else
+	{
+		throw RangeException
+				("Occurred integer overflow because of timeout value.");
+	}
 }
 
 
