@@ -16,8 +16,8 @@ LINKMODE ?= SHARED
 # Define Tools
 #
 ifeq ($(origin CROSS_COMPILE), undefined)
-	CC	?=gcc
-	CXX	?=g++
+	CC	    ?=gcc
+	CXX	    ?=g++
 	LIB     = ar -cr
 	RANLIB  = ranlib
 	STRIP   = strip
@@ -63,7 +63,7 @@ LINKFLAGS32     =
 LINKFLAGS64     = 
 STATICOPT_CC    =
 STATICOPT_CXX   =
-STATICOPT_LINK  = -static
+STATICOPT_LINK  = 
 SHAREDOPT_CC    = -fPIC
 SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
@@ -82,7 +82,7 @@ SYSFLAGS = -D_XOPEN_SOURCE=600 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=6
 #
 # System Specific Libraries
 #
-SYSLIBS  = -lpthread -ldl -lrt
+SYSLIBS  = -lrt -lpthread -ldl
 
 #
 # Auto-detect architecture if not specified
@@ -95,3 +95,8 @@ ifndef OSARCH_64BITS
     OSARCH_64BITS = 0
   endif
 endif
+
+#
+# C++11/14 detection
+#
+include $(POCO_BASE)/build/script/cpp11-gcc

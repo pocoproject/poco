@@ -1,7 +1,7 @@
 version: build {branch}-{build}
 
 cache:
-  - C:\mysql-5.7.17-win32
+  - C:\mysql-5.7.18-win32
   - C:\ProgramData\chocolatey
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
@@ -36,6 +36,10 @@ services:
   - postgresql94
 
   
+image:
+  - Visual Studio 2017
+
+  
 platform:
   - Win32
   - x64
@@ -50,58 +54,77 @@ configuration:
 # -------------------------------------------------------------------------------------------
 
 environment:
-  bundling: bundled
-  MYSQL32:    C:\mysql-5.7.17-win32
-  MYSQL64:    C:\Program Files\MySql\MySQL Server 5.7
-  POSTGRES32: C:\Program Files (x86)\PostgreSQL\9.4
-  POSTGRES64: C:\Program Files\PostgreSQL\9.4
-
+  bundling:     bundled
+  MYSQL32URL:   http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.18-win32.zip
+  MYSQL32ZIP:   mysql-5.7.18-win32.zip
+  MYSQL32:      C:\mysql-5.7.18-win32
+  MYSQL64:      C:\Program Files\MySql\MySQL Server 5.7
+  POSTGRES32:   C:\Program Files (x86)\PostgreSQL\9.4
+  POSTGRES64:   C:\Program Files\PostgreSQL\9.4
+  OPENSSLURL:   https://slproweb.com/download
+  OPENSSL32EXE: Win32OpenSSL-1_1_0f.exe
+  OPENSSL64EXE: Win64OpenSSL-1_1_0f.exe
+  OPENSSL32:    C:\OpenSSL-Win32
+  OPENSSL64:    C:\OpenSSL-Win64
+  
   matrix:
+    - builder: msbuild
+      vsver: 140
+      linkmode: shared
+
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: static_md
+
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: static_mt
+
+    - builder: msbuild
+      vsver: 150
+      linkmode: shared
+
+#    - builder: msbuild
+#      vsver: 150
+#      linkmode: static_md
+
+#    - builder: msbuild
+#      vsver: 150
+#      linkmode: static_mt
+
+#    - builder: cmake
+#      vsver: 120
+
+    - builder: cmake
+      vsver: 140
 
     - builder: cygwin
-      
-    - builder: msbuild
-      vsver: 120
-      linkmode: shared
-
-#    - builder: msbuild
-#      vsver: 120
-#      linkmode: static_md
-
-#    - builder: msbuild
-#      vsver: 120
-#      linkmode: static_mt
-
-    - builder: msbuild
-      vsver: 140
-      linkmode: shared
-
-#    - builder: msbuild
-#      vsver: 140
-#      linkmode: static_md
-
-#    - builder: msbuild
-#      vsver: 140
-#      linkmode: static_mt
-
-    - builder: cmake
-      vsver: 120
-
-    - builder: cmake
-      vsver: 140
 
 
+     
 matrix:
   fast_finish: true
 
 install:
+# -------------------------------------------------------------------------------------------
+# VS2017 setup. VS2017 does not provide VS150COMNTOOLS. 
+# See https://blogs.msdn.microsoft.com/vcblog/2017/03/06/finding-the-visual-c-compiler-tools-in-visual-studio-2017/
+# -------------------------------------------------------------------------------------------
+  - ps: |
+      Install-Module VSSetup -Scope CurrentUser -Force  
+      $installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
+      $vs150comntools = $installationPath.psobject.properties.Value; 
+      set-item -force -path "ENV:VS150COMNTOOLS"  -value "$vs150comntools\Common7\Tools\"
+      Write-Host "`nVS150COMNTOOLS=$env:VS150COMNTOOLS" -ForegroundColor Yellow
+
+# -------------------------------------------------------------------------------------------
   - if "%builder%"=="cygwin" (
     if "%platform%"=="Win32" (
-    C:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P libpcre-devel -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel -P libcrypt-devel))
+    C:\cygwin\setup-x86.exe      -qnNdO -R C:/cygwin   -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup   -P libpq-devel -P libpcre-devel -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel -P libcrypt-devel))
     
   - if "%builder%"=="cygwin" (
     if "%platform%"=="x64" (   
-    C:\cygwin64\setup-x86_64.exe -qnNdO -R C:/cygwin64 -s http://cygwin.mirror.constant.com -l C:/cygwin64/var/cache/setup -P libpcre-devel -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel  -P libcrypt-devel))
+    C:\cygwin64\setup-x86_64.exe -qnNdO -R C:/cygwin64 -s http://cygwin.mirror.constant.com -l C:/cygwin64/var/cache/setup -P libpq-devel -P libpcre-devel -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel  -P libcrypt-devel))
   
   - set POCO_BASE=%CD%
   - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
@@ -134,7 +157,6 @@ install:
 #        } else {
 #          choco install cmake
 #        }
-  - set
 
 # -------------------------------------------------------------------------------------------
 #  chocolatey brokes jom, here's workaround
@@ -145,6 +167,9 @@ install:
       {
         $env:PATH = $env:ChocolateyInstall + "\bin;" + $env:PATH
         $env:PATH = $env:ChocolateyInstall + "\lib\jom\content;" + $env:PATH
+        $env:PATH = "C:\Program Files (x86)\cmake\bin;" + $env:PATH
+        $env:PATH = "C:\Program Files (x86)\ctest\bin;" + $env:PATH
+        
       }
 # -------------------------------------------------------------------------------------------
 
@@ -159,42 +184,40 @@ install:
        {
          if ($env:platform -eq "Win32")
          {
-           if (Test-Path "C:\OpenSSL-Win32") {
-             echo "using C:\OpenSSL-Win32 from cache"
-           } else {
-             echo "downloading OpenSSL-Win32"
-             Start-FileDownload 'http://slproweb.com/download/Win32OpenSSL-1_0_2e.exe'
-             echo "installing C:\OpenSSL-Win32"
-             Start-Process "Win32OpenSSL-1_0_2e.exe" -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
-           }
+             $openssl     = $env:OPENSSL32
+             $opensslexe  = $env:OPENSSL32EXE
          }
          if ($env:platform -eq "x64")
          {
-           if (Test-Path "C:\OpenSSL-Win64") {
-             echo "using C:\OpenSSL-Win64 from cache"
-           } else {
-             echo "downloading OpenSSL-Win64"
-             Start-FileDownload 'http://slproweb.com/download/Win64OpenSSL-1_0_2e.exe'
-             echo "installing C:\OpenSSL-Win64"
-             Start-Process "Win64OpenSSL-1_0_2e.exe" -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
-           }
+             $openssl     = $env:OPENSSL64
+             $opensslexe  = $env:OPENSSL64EXE
+         }
+         $opensslurl  = $env:OPENSSLURL + "/" + $opensslexe
+         
+         if (Test-Path $openssl) {
+           Write-Host "using $openssl from cache" -ForegroundColor Yellow
+         } else {
+           Write-Host "downloading $openssl" -ForegroundColor Cyan
+           Start-FileDownload $opensslurl
+           Write-Host "installing  $openssl" -ForegroundColor Green
+           Start-Process $opensslexe -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
          }
        }
 # -------------------------------------------------------------------------------------------  
 #  MySQL 32 bit is not available by default on AppVeyor
 # -------------------------------------------------------------------------------------------
   - ps: |
-      if (($env:platform -eq "Win32") -and !($env:builder -eq "cygwin"))
+      if ($env:platform -eq "Win32")
       {
         if (Test-Path $env:MYSQL32) {
-          echo "using $env:MYSQL32 from cache"
+          Write-Host "using $env:MYSQL32 from cache" -ForegroundColor Yellow
         }
         else
         {
-          echo "downloading $env:MYSQL32"
-          Invoke-WebRequest "http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.17-win32.zip" -OutFile mysql-5.7.17-win32.zip
-          echo "installing $env:MYSQL32"
-          7z x -y mysql-5.7.17-win32.zip -oc:\
+          Write-Host "downloading $env:MYSQL32" -ForegroundColor Cyan
+          Invoke-WebRequest $env:MYSQL32URL -OutFile $env:MYSQL32ZIP
+          Write-Host "installing $env:MYSQL32" -ForegroundColor Green
+          7z x -y $env:MYSQL32ZIP -oc:\
         }
       }
 # -------------------------------------------------------------------------------------------
@@ -204,10 +227,10 @@ install:
 #  http://www.enterprisedb.com/products-services-training/pgdownload#windows
 # -------------------------------------------------------------------------------------------
   - ps: |
-      if (($env:platform -eq "Win32") -and !($env:builder -eq "cygwin"))
+      if ($env:platform -eq "Win32")
       {
         if (Test-Path $env:POSTGRES32) {
-          echo "using $env:POSTGRES32 from cache"
+          Write-Host "using $env:POSTGRES32 from cache" -ForegroundColor Yellow
         }
         else
         {
@@ -221,14 +244,14 @@ install:
           Write-Host "Setting up services..."
           Stop-Service postgresql-9.4
           Set-Service -Name postgresql-9.4 -StartupType Manual
-
           Write-Host "$env:POSTGRES32 installed" -ForegroundColor Green
         }
       }
 # -------------------------------------------------------------------------------------------
 
-   
+  
 before_build:
+  - set
   - ps: |
       if ($env:builder -eq "cmake")
       {
@@ -250,6 +273,12 @@ before_build:
           if($env:platform -eq 'Win32') { $vctool='';}
           if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
         }
+        if ($env:vsver -eq "150")
+        {
+          $vspath= convert-path $env:VS150COMNTOOLS\..\..\VC\bin; $yyyy='2017'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+        }
         pushd $vspath;
         $tool= if($vctool -eq '') {'32'} else {$vctool}
         cmd /c "vcvars$tool.bat&set" |
@@ -268,8 +297,6 @@ before_build:
 #        & C:\cygwin\bin\ls -lR $env:MYSQL64
 # -------------------------------------------------------------------------------------------  
   - ps: |
-      if (!($env:builder -eq "cygwin"))
-      {
         if ($env:platform -eq "Win32")
         {
           $env:INCLUDE = $env:MYSQL32 + "\include;" + $env:INCLUDE
@@ -295,15 +322,12 @@ before_build:
         $env:MYSQL_PWD="Password12!"
         $cmd = 'mysql -e "create database pocotestdb;" --user=root';
         iex "& $cmd"
-      }
 # -------------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------------  
 # PostgreSQL
 # -------------------------------------------------------------------------------------------  
   - ps: |
-      if (!($env:builder -eq "cygwin"))
-      {
         if ($env:platform -eq "Win32")
         {
             $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
@@ -316,7 +340,6 @@ before_build:
             $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
             $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
         }
-      }
 # -------------------------------------------------------------------------------------------
 
 after_build:
@@ -368,6 +391,8 @@ build_script:
 #
 # Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
 # -------------------------------------------------------------------------------------------
+# Don't build Cygwin64 with std=c++14 until this issue be fixed https://gcc.gnu.org/bugzilla/show_bug.cgi?id=77441
+# -------------------------------------------------------------------------------------------
   - ps: |
       if ($env:builder -eq "cygwin")
       {
@@ -398,15 +423,15 @@ build_script:
         mkdir cmake-build | out-null;pushd cmake-build;
         if ($env:platform -eq "Win32")
         {
-            $opensslrootdir = 'C:\OpenSSL-Win32'
+            $openssl = $env:OPENSSL32
         }
         if ($env:platform -eq "x64")
         {
-            $opensslrootdir = 'C:\OpenSSL-Win64'
+            $openssl = $env:OPENSSL64
         }
         $defs =' -G"NMake Makefiles"';
         $defs+=" -DCMAKE_BUILD_TYPE=$env:configuration";
-        $defs+=" -DOPENSSL_ROOT_DIR=$opensslrootdir";
+        $defs+=" -DOPENSSL_ROOT_DIR=$openssl";
         $defs+=" -DENABLE_NETSSL=OFF";
         $defs+=" -DENABLE_NETSSL_WIN=ON";
         $defs+=" -DENABLE_DATA_MYSQL=OFF";
@@ -459,7 +484,7 @@ test_script:
       {
         if ($env:builder -eq "cygwin")
         {
-            $LastExitCode=0;
+          $LastExitCode=0;
           if ($env:platform -eq "Win32")
           {
             $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"
@@ -469,8 +494,8 @@ test_script:
             $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';iex "& $cmd"
           }
           $cmd = 'bash.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd";
-            Write-Host -ForegroundColor Yellow $cmd ': LastExitCode=' $lastExitCode;
-          }
+          Write-Host -ForegroundColor Yellow $cmd ': LastExitCode=' $lastExitCode;
+        }
         if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
         {
           $suffix = '';
@@ -540,7 +565,7 @@ test_script:
           Write-Host -ForegroundColor Yellow $line;
 
           Write-Host -ForegroundColor Yellow 'ctest -VV -E Data*'
-          ctest -VV -E Data*
+          ctest -VV -E Data* -E Crypto*
           popd
         }
         Write-Host $runs' runs, ' $fails' fails'
