@@ -30,6 +30,7 @@
 #include "sqlite3.h"
 #endif
 #include <cstdlib>
+#include <limits>
 
 
 #ifndef SQLITE_OPEN_URI
@@ -223,7 +224,7 @@ bool SessionImpl::isConnected()
 
 void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
-	if(timeout >= 0 && (timeout <= INT_MAX/1000))
+	if(timeout <= std::numeric_limits<int>::max()/1000)
 	{
 		int tout = 1000 * timeout;
 		int rc = sqlite3_busy_timeout(_pDB, tout);
