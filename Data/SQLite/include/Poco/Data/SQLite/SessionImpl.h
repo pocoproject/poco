@@ -75,6 +75,7 @@ public:
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
+		/// Throws RangeException if the timeout value is overflow.
 
 	std::size_t getConnectionTimeout();
 		/// Returns the session connection timeout value.

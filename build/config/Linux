@@ -16,8 +16,8 @@ LINKMODE ?= SHARED
 # Define Tools
 #
 ifeq ($(origin CROSS_COMPILE), undefined)
-	CC	?=gcc
-	CXX	?=g++
+	CC	    ?=gcc
+	CXX	    ?=g++
 	LIB     = ar -cr
 	RANLIB  = ranlib
 	STRIP   = strip
