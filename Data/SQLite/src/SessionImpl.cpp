@@ -206,9 +206,16 @@ void SessionImpl::open(const std::string& connect)
 
 void SessionImpl::close()
 {
-	if (_pDB)
-	{
-		sqlite3_close(_pDB);
+	if (_pDB) {
+		int result = 0;
+		int times = 50;
+		do {
+			result = sqlite3_close(_pDB);
+			if (result == SQLITE_BUSY) {
+				Poco::Thread::sleep(100);
+			}
+			--times;
+		} while (SQLITE_BUSY == result && times > 0);
 		_pDB = 0;
 	}
 
