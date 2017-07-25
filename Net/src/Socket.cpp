@@ -80,8 +80,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 
 	int epollfd = -1;
 	{
-		struct epoll_event eventsIn[epollSize];
-		memset(eventsIn, 0, sizeof(eventsIn));
+		struct epoll_event eventsIn[epollSize] = { 0 };		
 		struct epoll_event* eventLast = eventsIn;
 		for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
 		{
@@ -166,8 +165,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		}
 	}
 
-	struct epoll_event eventsOut[epollSize];
-	memset(eventsOut, 0, sizeof(eventsOut));
+	struct epoll_event eventsOut[epollSize] = { 0 };	
 
 	Poco::Timespan remainingTime(timeout);
 	int rc;
