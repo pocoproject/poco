@@ -102,6 +102,9 @@ public:
 
 	HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig);
 		/// Creates a HTTPClientSession using the given host, port and proxy configuration.
+			
+	HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig);
+		/// Creates a HTTPClientSession using the given socket and proxy configuration.
 
 	virtual ~HTTPClientSession();
 		/// Destroys the HTTPClientSession and closes

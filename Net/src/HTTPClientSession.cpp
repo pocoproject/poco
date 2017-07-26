@@ -60,8 +60,9 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false)	
 {
+	setKeepAlive(true);
 }
 
 
@@ -103,7 +104,19 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port,
 {
 }
 
-
+HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig):
+	HTTPSession(socket),
+	_port(HTTPSession::HTTP_PORT),
+	_proxyConfig(proxyConfig),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
+	_reconnect(false),
+	_mustReconnect(false),
+	_expectResponseBody(false),
+	_responseReceived(false)
+{
+	setKeepAlive(true);
+}
+	
 HTTPClientSession::~HTTPClientSession()
 {
 }
