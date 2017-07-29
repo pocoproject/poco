@@ -38,27 +38,27 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
-CFLAGS32        =
-CFLAGS64        =
-CXXFLAGS        = -Wall -Wno-sign-compare
-CXXFLAGS32      =
-CXXFLAGS64      =
-LINKFLAGS       =
-LINKFLAGS32     =
-LINKFLAGS64     =
-STATICOPT_CC    =
-STATICOPT_CXX   =
-STATICOPT_LINK  = -static
-SHAREDOPT_CC    = -fPIC
-SHAREDOPT_CXX   = -fPIC
-SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
-DEBUGOPT_CC     = -g -D_DEBUG
-DEBUGOPT_CXX    = -g -D_DEBUG
-DEBUGOPT_LINK   = -g
-RELEASEOPT_CC   = -O2 -DNDEBUG
-RELEASEOPT_CXX  = -O2 -DNDEBUG
-RELEASEOPT_LINK = -O2
+CFLAGS          += 
+CFLAGS32        +=
+CFLAGS64        +=
+CXXFLAGS        += -Wall -Wno-sign-compare
+CXXFLAGS32      +=
+CXXFLAGS64      +=
+LINKFLAGS       +=
+LINKFLAGS32     +=
+LINKFLAGS64     +=
+STATICOPT_CC    +=
+STATICOPT_CXX   +=
+STATICOPT_LINK  += -static
+SHAREDOPT_CC    += -fPIC
+SHAREDOPT_CXX   += -fPIC
+SHAREDOPT_LINK  += -Wl,-rpath,$(LIBPATH)
+DEBUGOPT_CC     += -g -D_DEBUG
+DEBUGOPT_CXX    += -g -D_DEBUG
+DEBUGOPT_LINK   += -g
+RELEASEOPT_CC   += -O2 -DNDEBUG
+RELEASEOPT_CXX  += -O2 -DNDEBUG
+RELEASEOPT_LINK += -O2
 
 #
 # System Specific Flags
@@ -68,7 +68,7 @@ SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=6
 #
 # System Specific Libraries
 #
-SYSLIBS  = -lpthread -ldl -lrt
+SYSLIBS  += -lpthread -ldl -lrt
 
 #
 # C++11/14 detection
