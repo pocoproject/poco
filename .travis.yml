@@ -17,6 +17,10 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update  -qq; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y gcc-5 g++-5; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo bash -c "cat >> /etc/apt/sources.list" < build/script/clang.apt; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key|sudo apt-key add -; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update  -qq; fi
+
 
 services:
   - mongodb
@@ -71,6 +75,16 @@ matrix:
     #    - export CXX="clang++"
     #    - $CXX --version
     #    - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
+
+    - env:    TEST_NAME="clang 3.7.0 (make) bundled"
+      compiler: clang
+      script:
+        - sudo apt-get install -qq -y clang-3.7 lldb-3.7 libc++-dev libc++abi-dev
+        - export CLANG_VERSTION="-3.7"
+        - export CC="clang-3.7"
+        - export CXX="clang++-3.7"
+        - $CXX --version
+        - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
     
     #- env:    TEST_NAME="clang 3.5.0 (make) unbundled"
     #  ======================================= compiler error on generating debug info for auto return
