@@ -93,7 +93,7 @@ matrix:
         - export CLANG_VERSTION="-3.8"
         - export CC="clang-3.8"
         - export CXX="clang++-3.8"
-        - export CXXFLAGS=-stdlib=libstdc++
+        - export CXXFLAGS="-stdlib=libstdc++ -ftemplate-backtrace-limit=0"
         - $CXX --version
         - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
     
@@ -104,7 +104,7 @@ matrix:
         - export CLANG_VERSTION="-3.9"
         - export CC="clang-3.9"
         - export CXX="clang++-3.9"
-        - export CXXFLAGS=-stdlib=libstdc++
+        - export CXXFLAGS="-stdlib=libstdc++ -ftemplate-backtrace-limit=0"
         - $CXX --version
         - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
     
