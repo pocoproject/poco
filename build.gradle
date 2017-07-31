@@ -34,6 +34,7 @@ File prefixByPoco(File binaryFile) {
 	return new File(parent, "Poco" + name);
 }
 allprojects {
+	buildDir = new File("gradle")	
 }
 subprojects {
 	apply plugin:	'c'
@@ -44,8 +45,6 @@ subprojects {
  	apply plugin:	'windows-resources'
 	apply plugin:	'windows-messages'
 
-
-	buildDir = new File("gradle")	
 	
 		model {
 			buildTypes {
