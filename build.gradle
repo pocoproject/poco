@@ -8,59 +8,8 @@ plugins {
 	id 'visual-studio'
 }
 
-/*
-class BinaryCollectorPlugin extends RuleSource {
-	@Mutate
-	public void createCollectBinariesTask(ModelMap<Task> tasks, @Path("binaries") ModelMap<NativeBinarySpec> binaries) {
-        tasks.create('collectBinaries', Copy) { task ->
-            binaries.each { binary ->
-                task.dependsOn binary.buildTask
-                
-                String buildType = binary.buildType.name
- 				destinationDir = project.rootProject.rootDir
-
-               if (binary instanceof NativeExecutableBinarySpec) {
-                    addBinary(task, binary.file, buildType, 'bin')
-                } else if (binary instanceof SharedLibraryBinarySpec) {
-                    addBinary(task, binary.sharedLibraryFile, buildType, 'bin')
-				} else if (binary instanceof StaticLibraryBinarySpec) {
-                    addBinary(task, binary.staticLibraryFile, buildType, 'lib')
-				}
-            }
-        }
-    }
-    
-    private void addBinary(Copy task, File binaryFile, String buildType, String destinationDirectory) {
-        task.from(binaryFile) {
-            into destinationDirectory
-			System.err.println("Adding binary $binaryFile to $destinationDirectory");
-           
-            if (buildType == 'debug') {
-                rename { originalName ->
-                    int lastPeriod = originalName.lastIndexOf('.')
-                    
-                    if (lastPeriod < 0)
-                        return "Poco" + originalName
-                    else {
-                        String fileName = originalName.substring(0, lastPeriod)
-                        String extension = originalName.substring(lastPeriod + 1)
-                        
-                        return "Poco" + "${fileName}d.$extension"
-                    }
-                }
-            }
-        }
-    }
-}
-apply plugin: BinaryCollectorPlugin
-
-*/
 
 //tasks.build.dependsOn collectBinaries
-
-task wrapper(type: Wrapper) {
-	gradleVersion = '3.1'
-}
 
 repositories {
 	mavenCentral()
@@ -72,9 +21,20 @@ dependencies {
 }
 */
 
-allprojects {
+File appendDebugSuffix(File binaryFile) {
+	String name = binaryFile.getName()
+	File parent = binaryFile.getParentFile()
+	int extensionSeparatorIndex = name.lastIndexOf('.')
+	return new File(parent, name.substring(0, extensionSeparatorIndex) + "d" + name.substring(extensionSeparatorIndex))
 }
 
+File prefixByPoco(File binaryFile) {
+	String name = binaryFile.getName()
+	File parent = binaryFile.getParentFile()
+	return new File(parent, "Poco" + name);
+}
+allprojects {
+}
 subprojects {
 	apply plugin:	'c'
 	apply plugin:	'cpp'
@@ -87,25 +47,47 @@ subprojects {
 
 	buildDir = new File("gradle")	
 	
-	def addCompilerFlag = { NativeBinarySpec binary, String flag ->
-        if (binary.hasProperty("cppCompiler")) {
-            binary.cppCompiler.args flag
-        }
-        if (binary.hasProperty("cCompiler")) {
-            binary.cCompiler.args flag
-        }
-    }
-    
-    def addCompilerDefine = { NativeBinarySpec binary, String define, String value ->
-        if (binary.hasProperty("cppCompiler")) {
-            binary.cppCompiler.define define, value
-        }
-        if (binary.hasProperty("cCompiler")) {
-            binary.cCompiler.define define, value
-        }
-    }
-
-	model {
+		model {
+			buildTypes {
+				release
+				debug
+			}
+			components {
+				withType(NativeComponentSpec) {
+					binaries.withType(NativeBinarySpec) {
+						if (buildType == buildTypes.debug) {
+							if (it instanceof SharedLibraryBinarySpec) {
+								sharedLibraryFile = prefixByPoco(appendDebugSuffix(sharedLibraryFile))
+								sharedLibraryLinkFile = prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile))
+							} else
+							if (it instanceof StaticLibraryBinarySpec) {
+								staticLibraryFile = prefixByPoco(appendDebugSuffix(staticLibraryFile))
+							} else
+							if (it instanceof NativeExecutableBinarySpec) {
+								// executable.file = ...
+							} else {
+								throw new GradleException("Unknown native library binary")
+							}
+						} else
+						if (buildType == buildTypes.release) {
+							if (it instanceof SharedLibraryBinarySpec) {
+								sharedLibraryFile = prefixByPoco(sharedLibraryFile)
+								sharedLibraryLinkFile = prefixByPoco(sharedLibraryLinkFile)
+							} else
+							if (it instanceof StaticLibraryBinarySpec) {
+								staticLibraryFile = prefixByPoco(staticLibraryFile)
+							} else
+							if (it instanceof NativeExecutableBinarySpec) {
+								// executable.file = ...
+							} else {
+								throw new GradleException("Unknown native library binary")
+							} 
+						} else {
+							throw new GradleException("Unknown buildType")
+						}
+					}
+				}
+			}
 	    repositories {
 	        libs(PrebuiltLibraries) {
 				def opensslDir = "$rootDir/openssl"
@@ -160,30 +142,29 @@ subprojects {
 			unbundled
 		}
 
-    	buildTypes {
-    	    debug
-    	    release
-	   	}
-
 		binaries {
 			all {
 				if (flavor == flavors.unbundled) {
 					cppCompiler.define 'PPPPPOCO_UNBUNDLED'
 				}
-				if (buildTypes == buildTypes.debug) {
+				if (buildType == buildTypes.debug) {
 					cCompiler.define '_DEBUG'
 					cppCompiler.define '_DEBUG'
-				} else {
+				} else 
+				if (buildType == buildTypes.release) {
 					cCompiler.define 'NDEBUG'
 					cppCompiler.define 'NDEBUG'
+				} else {
+					throw new GradleException("Unknown buildTypes" + buildTypes)
 				}
 			
 				if (toolChain in VisualCpp) {
-					if (buildTypes == buildTypes.debug) {
+					if (buildType == buildTypes.debug) {
 						cCompiler.args '/Zi'
 						cppCompiler.args '/Zi'
 						linker.args '/DEBUG'
 					}
+					cCompiler.args '/FS'
 					cCompiler.args '/Zc:wchar_t'
 					cCompiler.args '/Zc:inline'
 					cCompiler.args '/Zc:forScope'
@@ -195,6 +176,7 @@ subprojects {
 					cCompiler.define '_WINDOWS'
 					cCompiler.define '_MBCS'
 
+					cppCompiler.args '/FS'
 					cppCompiler.args '/Zc:wchar_t'
 					cppCompiler.args '/Zc:inline'
 					cppCompiler.args '/Zc:forScope'
@@ -216,12 +198,15 @@ subprojects {
 					linker.args 'oleaut32.lib'
 					linker.args 'uuid.lib'
 				
-					if (buildTypes == buildTypes.debug) {
+					if (buildType == buildTypes.debug) {
 						cCompiler.args "/MDd"
 						cppCompiler.args "/MDd"
-					} else {
+					} else 
+					if (buildType == buildTypes.release) {
 						cCompiler.args "/MD"
 						cppCompiler.args "/MD"
+					} else {
+						throw new GradleException("Unknown buildTypes" + buildTypes)
 					}
 					linker.args '/SUBSYSTEM:CONSOLE'
 				}
@@ -248,16 +233,71 @@ subprojects {
 				}
 			}
 		}
-    	components {
-			withType(NativeLibrarySpec) {
-				if (buildType == buildTypes.debug) {
-     				baseName "Poco${project.name}d"
-				}
-				if (buildType == buildTypes.release) {
-     				baseName "Poco${project.name}"
-				}
-			}
-		}
     }
 }
 
+/*
+	def addCompilerFlag = { NativeBinarySpec binary, String flag ->
+        if (binary.hasProperty("cppCompiler")) {
+            binary.cppCompiler.args flag
+        }
+        if (binary.hasProperty("cCompiler")) {
+            binary.cCompiler.args flag
+        }
+    }
+    
+    def addCompilerDefine = { NativeBinarySpec binary, String define, String value ->
+        if (binary.hasProperty("cppCompiler")) {
+            binary.cppCompiler.define define, value
+        }
+        if (binary.hasProperty("cCompiler")) {
+            binary.cCompiler.define define, value
+        }
+    }
+
+class BinaryCollectorPlugin extends RuleSource {
+	@Mutate
+	public void createCollectBinariesTask(ModelMap<Task> tasks, @Path("binaries") ModelMap<NativeBinarySpec> binaries) {
+        tasks.create('collectBinaries', Copy) { task ->
+            binaries.each { binary ->
+                task.dependsOn binary.buildTask
+                
+                String buildType = binary.buildType.name
+ 				destinationDir = project.rootProject.rootDir
+
+               if (binary instanceof NativeExecutableBinarySpec) {
+                    addBinary(task, binary.file, buildType, 'bin')
+                } else if (binary instanceof SharedLibraryBinarySpec) {
+                    addBinary(task, binary.sharedLibraryFile, buildType, 'bin')
+				} else if (binary instanceof StaticLibraryBinarySpec) {
+                    addBinary(task, binary.staticLibraryFile, buildType, 'lib')
+				}
+            }
+        }
+    }
+    
+    private void addBinary(Copy task, File binaryFile, String buildType, String destinationDirectory) {
+        task.from(binaryFile) {
+            into destinationDirectory
+			System.err.println("Adding binary $binaryFile to $destinationDirectory");
+           
+            if (buildType == 'debug') {
+                rename { originalName ->
+                    int lastPeriod = originalName.lastIndexOf('.')
+                    
+                    if (lastPeriod < 0)
+                        return "Poco" + originalName
+                    else {
+                        String fileName = originalName.substring(0, lastPeriod)
+                        String extension = originalName.substring(lastPeriod + 1)
+                        
+                        return "Poco" + "${fileName}d.$extension"
+                    }
+                }
+            }
+        }
+    }
+}
+apply plugin: BinaryCollectorPlugin
+
+*/
