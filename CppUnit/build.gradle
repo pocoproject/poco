@@ -1,29 +1,28 @@
-project(":CppUnit") {
-	model {
-		components {
-			CppUnit(NativeLibrarySpec) {
-				sources {
-					cpp {
-						source {
-							srcDir 'src'
-							include '**/*.cpp'
-						}
-						exportedHeaders {
-							srcDir 'include'
-						}
+model {
+	components {
+		CppUnit(NativeLibrarySpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+					}
+					exportedHeaders {
+						srcDir 'include'
 					}
 				}
 			}
 		}
-		binaries {
-			withType(SharedLibraryBinarySpec) {
-				if (toolChain in VisualCpp) {
-					 cppCompiler.define "CppUnit_EXPORTS"
-				}
+	}
+	binaries {
+		withType(SharedLibraryBinarySpec) {
+			if (toolChain in VisualCpp) {
+				 cppCompiler.define "CppUnit_EXPORTS"
 			}
-			withType(StaticLibraryBinarySpec) {
-			}
+		}
+		withType(StaticLibraryBinarySpec) {
 		}
 	}
 }
+
 

@@ -2,7 +2,6 @@ project(":CppParser") {
 	model {
 		components {
 			CppParser(NativeLibrarySpec) {
-				baseName 'PocoCppParser'
 				sources {
 					cpp {
 						source {

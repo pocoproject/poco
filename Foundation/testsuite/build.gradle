@@ -1,3 +1,69 @@
-project(":Foundation:testsuite") {
-	apply from:'script.gradle'
+model {
+	components {
+		TestApp(NativeLibrarySpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include 'TestApp.cpp'
+					}
+					lib project: ':CppUnit', library: 'CppUnit'
+					lib project: ':Foundation', library: 'Foundation'
+				}
+			}
+		}
+		TestLib(NativeLibrarySpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include 'TestLibrary.cpp'
+						include 'TestPlugin.cpp'
+					}
+					lib project: ':CppUnit', library: 'CppUnit'
+					lib project: ':Foundation', library: 'Foundation'
+				}
+			}
+		}
+		FoundationTestRunner(NativeLibrarySpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+						exclude 'WinDriver.cpp'
+						exclude '*_WINCE.cpp'
+						exclude 'TestApp*.cpp'
+						exclude 'Driver.cpp'
+					}
+					exportedHeaders {
+						srcDir 'src'
+					}
+					lib project: ':CppUnit', library: 'CppUnit'
+					lib project: ':Foundation', library: 'Foundation'
+				}
+			}
+		}
+	}
+	testSuites {
+		FoundationTestSuite(CppUnitTestSuiteSpec) {
+			testing $.components.FoundationTestRunner 
+		}
+	}
+	binaries {
+		withType(NativeExecutableSpec) {
+			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+		}
+		withType(CppUnitTestSuiteBinarySpec) {
+			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+		}
+	}
+
 }
+tasks.withType(RunTestExecutable) {
+	args "-print"
+}
+
+
