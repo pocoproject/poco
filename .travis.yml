@@ -129,16 +129,16 @@ matrix:
     #    - $CXX --version
     #    - ./configure --config=Linux-clang --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
-    - env:    TEST_NAME="gcc 5.4.1 (make) bundled"
+    - env:    TEST_NAME="gcc 5.4 (make) bundled"
       compiler: gcc
       script:
         - sudo apt-get install -qq -y gcc-5 g++-5; fi
-        - export CC="gcc-5"
-        - export CXX="g++-5"
+        - export CC="gcc-5.4"
+        - export CXX="g++-5.4"
         - $CXX --version
         - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
     
-    #- env:    TEST_NAME="gcc 5.4.1 (make) unbundled"
+    #- env:    TEST_NAME="gcc 5.4 (make) unbundled"
     #  ======================================= unit tests fail ures due to unbundled pcre
     # There was 1 error: 
     #  1: N7CppUnit10TestCallerI21RegularExpressionTestEE.testSubst2
@@ -163,6 +163,9 @@ matrix:
     #  =======================================
     #  compiler: gcc
     #  script:
+    #    - sudo apt-get install -qq -y gcc-5 g++-5; fi
+    #    - export CC="gcc-5.4"
+    #    - export CXX="g++-5.4"
     #    - $CXX --version
     #    - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
@@ -173,9 +176,11 @@ matrix:
     #    - arm-linux-gnueabi-g++ -x c++ /dev/null -dM -E
     #    - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
-    - env:    TEST_NAME="gcc 5.4.1 (CMake)"
+    - env:    TEST_NAME="gcc 5.4 (CMake)"
       compiler: gcc
       script:
+        - export CC="gcc-5.4"
+        - export CXX="g++-5.4"
         - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
