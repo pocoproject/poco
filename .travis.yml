@@ -14,9 +14,6 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y sloccount cppcheck; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update  -qq; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y gcc-5 g++-5; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo bash -c "cat >> /etc/apt/sources.list" < build/script/clang.apt; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key|sudo apt-key add -; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update  -qq; fi
@@ -135,11 +132,14 @@ matrix:
     - env:    TEST_NAME="gcc 5.4.1 (make) bundled"
       compiler: gcc
       script:
+        - sudo apt-get install -qq -y gcc-5 g++-5; fi
+        - export CC="gcc-5"
+        - export CXX="g++-5"
         - $CXX --version
         - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
     
     #- env:    TEST_NAME="gcc 5.4.1 (make) unbundled"
-    #  ======================================= unit tests failures due to unbundled pcre
+    #  ======================================= unit tests fail ures due to unbundled pcre
     # There was 1 error: 
     #  1: N7CppUnit10TestCallerI21RegularExpressionTestEE.testSubst2
     #     "St9bad_alloc: std::bad_alloc"
