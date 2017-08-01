@@ -13,6 +13,8 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y libpq-dev unixodbc-dev libmysqlclient-dev libsqlite3-dev; fi 
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y sloccount cppcheck; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y gcc-5 g++-5; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo bash -c "cat >> /etc/apt/sources.list" < build/script/clang.apt; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key|sudo apt-key add -; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update  -qq; fi
@@ -131,7 +133,6 @@ matrix:
     - env:    TEST_NAME="gcc 5.4 (make) bundled"
       compiler: gcc
       script:
-        - sudo apt-get install -qq -y gcc-5 g++-5
         - export CC="gcc-5"
         - export CXX="g++-5"
         - $CXX --version
