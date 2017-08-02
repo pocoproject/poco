@@ -62,6 +62,66 @@ matrix:
   fast_finish: true
 
   include:
+    - env:    TEST_NAME="gcc 4.9 (make) bundled"
+      compiler: gcc
+      script:
+        - sudo apt-get install -qq -y gcc-4.9 g++-4.9
+        - export CC="gcc-4.9"
+        - export CXX="g++-4.9"
+        - $CXX --version
+        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    - env:    TEST_NAME="gcc 5.4 (make) bundled"
+      compiler: gcc
+      script:
+        - export CC="gcc-5"
+        - export CXX="g++-5"
+        - $CXX --version
+        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    #- env:    TEST_NAME="gcc 5.4 (make) unbundled"
+    #  ======================================= unit tests fail ures due to unbundled pcre
+    # There was 1 error: 
+    #  1: N7CppUnit10TestCallerI21RegularExpressionTestEE.testSubst2
+    #     "St9bad_alloc: std::bad_alloc"
+    #     in "<unknown>", line -1
+    # 
+    # There were 4 failures: 
+    #  1: N7CppUnit10TestCallerI21RegularExpressionTestEE.testMatch4
+    #     "re.match("123 456", 0, matches) == 3"
+    #     in "src/RegularExpressionTest.cpp", line 103
+    #  2: N7CppUnit10TestCallerI21RegularExpressionTestEE.testMatch6
+    #     "expr.match("abcde", 0, 0)"
+    #     in "src/RegularExpressionTest.cpp", line 136
+    #  3: N7CppUnit10TestCallerI21RegularExpressionTestEE.testSplit2
+    #     "re.split("123 456", 0, strings) == 3"
+    #     in "src/RegularExpressionTest.cpp", line 184
+    #  4: N7CppUnit10TestCallerI21RegularExpressionTestEE.testGroup
+    #     "re.match("abcd 1234", 0, matches) == 3"
+    #     in "src/RegularExpressionTest.cpp", line 271
+    # 
+    # failed=Foundation
+    #  =======================================
+    #  compiler: gcc
+    #  script:
+    #    - sudo apt-get install -qq -y gcc-5 g++-5
+    #    - export CC="gcc-5"
+    #    - export CXX="g++-5"
+    #    - $CXX --version
+    #    - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    - env:    TEST_NAME="gcc 4.9 (CMake)"
+      compiler: gcc
+      script:
+        - sudo apt-get install -qq -y gcc-4.9 g++-4.9
+        - export CC="gcc-4.9"
+        - export CXX="g++-4.9"
+        - $CXX --version
+        - source ./travis/ignored.sh
+        - export POCO_BASE=`pwd`
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
+ 
+
     - env:    TEST_NAME="clang (make) bundled"
       os: osx
       compiler: clang
@@ -155,54 +215,6 @@ matrix:
     #    - $CXX --version
     #    - ./configure --config=Linux-clang --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
-    - env:    TEST_NAME="gcc 4.9 (make) bundled"
-      compiler: gcc
-      script:
-        - sudo apt-get install -qq -y gcc-4.9 g++-4.9
-        - export CC="gcc-4.9"
-        - export CXX="g++-4.9"
-        - $CXX --version
-        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="gcc 5.4 (make) bundled"
-      compiler: gcc
-      script:
-        - export CC="gcc-5"
-        - export CXX="g++-5"
-        - $CXX --version
-        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    #- env:    TEST_NAME="gcc 5.4 (make) unbundled"
-    #  ======================================= unit tests fail ures due to unbundled pcre
-    # There was 1 error: 
-    #  1: N7CppUnit10TestCallerI21RegularExpressionTestEE.testSubst2
-    #     "St9bad_alloc: std::bad_alloc"
-    #     in "<unknown>", line -1
-    # 
-    # There were 4 failures: 
-    #  1: N7CppUnit10TestCallerI21RegularExpressionTestEE.testMatch4
-    #     "re.match("123 456", 0, matches) == 3"
-    #     in "src/RegularExpressionTest.cpp", line 103
-    #  2: N7CppUnit10TestCallerI21RegularExpressionTestEE.testMatch6
-    #     "expr.match("abcde", 0, 0)"
-    #     in "src/RegularExpressionTest.cpp", line 136
-    #  3: N7CppUnit10TestCallerI21RegularExpressionTestEE.testSplit2
-    #     "re.split("123 456", 0, strings) == 3"
-    #     in "src/RegularExpressionTest.cpp", line 184
-    #  4: N7CppUnit10TestCallerI21RegularExpressionTestEE.testGroup
-    #     "re.match("abcd 1234", 0, matches) == 3"
-    #     in "src/RegularExpressionTest.cpp", line 271
-    # 
-    # failed=Foundation
-    #  =======================================
-    #  compiler: gcc
-    #  script:
-    #    - sudo apt-get install -qq -y gcc-5 g++-5
-    #    - export CC="gcc-5"
-    #    - export CXX="g++-5"
-    #    - $CXX --version
-    #    - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
-    
     #- env:    TEST_NAME="arm-linux-gnueabi-g++ (make)"
     #  compiler: gcc
     #  script:
@@ -210,17 +222,6 @@ matrix:
     #    - arm-linux-gnueabi-g++ --version
     #    - arm-linux-gnueabi-g++ -x c++ /dev/null -dM -E
     #    - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
-
-    - env:    TEST_NAME="gcc 5.4 (CMake)"
-      compiler: gcc
-      script:
-        - export CC="gcc-5"
-        - export CXX="g++-5"
-        - $CXX --version
-        - source ./travis/ignored.sh
-        - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
- 
 
     #- env:    TEST_NAME="clang (CMake)"
     #  compiler: clang
