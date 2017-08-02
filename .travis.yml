@@ -36,10 +36,15 @@ addons:
 
 
 notifications:
-  slack: 
-    rooms:
-      - pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t#travis
-
+    email:
+      on_success: never # default: change
+      on_failure: always # default: always
+    slack: 
+      rooms:
+        - pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t#travis
+      on_success: never # default: change
+      on_failure: always # default: always
+ 
 env:
   global: 
     TEST_NAME=""
