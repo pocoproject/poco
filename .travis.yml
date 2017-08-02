@@ -162,6 +162,15 @@ matrix:
     #    - $CXX --version
     #    - ./configure --config=Linux-clang --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
+    - env:    TEST_NAME="gcc 4.9 (make) bundled"
+      compiler: gcc
+      script:
+        - sudo apt-get install -qq -y gcc-4.9 g++-4.9
+        - export CC="gcc-4.9"
+        - export CXX="g++-4.9"
+        - $CXX --version
+        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
+    
     - env:    TEST_NAME="gcc 5.4 (make) bundled"
       compiler: gcc
       script:
