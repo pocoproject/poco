@@ -1,0 +1,62 @@
+model {
+	components {
+		DataSQLite(NativeLibrarySpec) {
+			sources {
+				c {
+					source {
+						srcDir 'src'
+						include '**/*.c'
+					}
+					exportedHeaders {
+						srcDir 'include'
+					}
+				}
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+					}
+					exportedHeaders {
+						srcDir 'include'
+					}
+				}
+			}
+		}
+	}
+	binaries {
+		all {
+			if (toolChain in VisualCpp) {
+				cCompiler.define	"SQLITE_THREADSAFE=1"
+				cCompiler.define	"SQLITE_ENABLE_FTS3"
+				cCompiler.define	"SQLITE_ENABLE_FTS3_PARENTHESIS"
+				cCompiler.define	"SQLITE_OMIT_UTF16"
+				cCompiler.define	"SQLITE_OMIT_PROGRESS_CALLBACK"
+				cCompiler.define	"SQLITE_OMIT_COMPLETE"
+				cCompiler.define	"SQLITE_OMIT_TCL_VARIABLE"
+				cCompiler.define	"SQLITE_OMIT_DEPRECATED"
+				
+				cppCompiler.define	"SQLITE_THREADSAFE=1"
+				cppCompiler.define	"SQLITE_ENABLE_FTS3"
+				cppCompiler.define	"SQLITE_ENABLE_FTS3_PARENTHESIS"
+				cppCompiler.define	"SQLITE_OMIT_UTF16"
+				cppCompiler.define	"SQLITE_OMIT_PROGRESS_CALLBACK"
+				cppCompiler.define	"SQLITE_OMIT_COMPLETE"
+				cppCompiler.define	"SQLITE_OMIT_TCL_VARIABLE"
+				cppCompiler.define	"SQLITE_OMIT_DEPRECATED"
+			}
+		}
+		withType(SharedLibraryBinarySpec) {
+			lib project: ':Data', library: 'Data', linkage: 'shared'
+			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+			if (toolChain in VisualCpp) {
+				cppCompiler.define	"SQLite_EXPORTS"
+			}
+		}
+		withType(StaticLibraryBinarySpec) {
+			lib project: ':Data', library: 'Data', linkage: 'static'
+			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
+		}
+	}
+}
+
+

@@ -1,11 +1,13 @@
 model {
 	components {
-		CppParser(NativeLibrarySpec) {
+		DataODBC(NativeLibrarySpec) {
 			sources {
 				cpp {
 					source {
 						srcDir 'src'
 						include '**/*.cpp'
+						exclude 'Unicode_WIN32.cpp'
+						exclude 'Unicode_UNIXODBC.cpp'
 					}
 					exportedHeaders {
 						srcDir 'include'
@@ -16,16 +18,24 @@ model {
 	}
 	binaries {
 		all {
+			if (toolChain in VisualCpp) {
+				cppCompiler.define	"THREADSAFE=1"
+			}
 		}
 		withType(SharedLibraryBinarySpec) {
+			lib project: ':Data', library: 'Data', linkage: 'shared'
 			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {
-				 cppCompiler.define "CppParser_EXPORTS"
+				cppCompiler.define	"ODBC_EXPORTS"
+				linker.args 'odbc32.lib'
+				linker.args 'odbccp32.lib'
 			}
 		}
 		withType(StaticLibraryBinarySpec) {
+			lib project: ':Data', library: 'Data', linkage: 'static'
 			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }
+
 

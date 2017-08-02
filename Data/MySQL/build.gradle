@@ -1,0 +1,61 @@
+model {
+	repositories {
+		libs(PrebuiltLibraries) {
+			mysql {
+				headers.srcDir "$mysqlHome/include"
+
+				binaries.withType(StaticLibraryBinary) {
+					if (buildType == buildTypes.debug) {
+						def libName = targetPlatform.operatingSystem.windows ? 'libeay32MDd.lib' : 'libssl.a'
+						staticLibraryFile = file("$mysqlHome/lib/libmysqld.lib")
+					} else
+					if (buildType == buildTypes.release) {
+						def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
+						staticLibraryFile = file("$mysqlHome/lib/libmysql.lib")
+					} else {
+						throw new GradleException("Unknown buildType")
+					}
+				}
+			}
+		}
+	}
+	components {
+		DataMySQL(NativeLibrarySpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+					}
+					exportedHeaders {
+						srcDir 'include'
+					}
+					lib library: 'mysql', linkage: 'static'
+				}
+			}
+		}
+	}
+	binaries {
+		all {
+			if (toolChain in VisualCpp) {
+				cppCompiler.define	"THREADSAFE"
+				cppCompiler.define 	"__LCC__"	
+			}
+		}
+		withType(SharedLibraryBinarySpec) {
+			lib project: ':Data', library: 'Data', linkage: 'shared'
+			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+			if (toolChain in VisualCpp) {
+				cppCompiler.define	"THREADSAFE"
+				cppCompiler.define 	"__LCC__"	
+				cppCompiler.define	"MySQL_EXPORTS"
+			}
+		}
+		withType(StaticLibraryBinarySpec) {
+			lib project: ':Data', library: 'Data', linkage: 'static'
+			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
+		}
+	}
+}
+
+

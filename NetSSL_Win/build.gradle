@@ -1,7 +1,7 @@
 project(":NetSSL_Win") {
 	model {
 		components {
-			PocoNetSSL_Win(NativeLibrarySpec) {
+			NetSSL_Win(NativeLibrarySpec) {
 				sources {
 					cpp {
 						source {
@@ -17,17 +17,26 @@ project(":NetSSL_Win") {
 		}
 		binaries {
 			all {
-				linker.args "ws2_32.lib"
-				linker.args "iphlpapi.lib"
+				if (toolChain in VisualCpp) {
+					linker.args "Crypt32.lib"
+					linker.args 'ws2_32.lib'
+					linker.args 'iphlpapi.lib'
+				}
 			}
 			withType(SharedLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'shared'
+				lib project: ':Crypto', library: 'Crypto', linkage: 'shared'
+				lib project: ':Net', library: 'Net', linkage: 'shared'
+				lib project: ':Util', library: 'Util', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				if (toolChain in VisualCpp) {
 					 cppCompiler.define "NetSSL_Win_EXPORTS"
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'PocoFoundation', linkage: 'static'
+				lib project: ':Crypto', library: 'Crypto', linkage: 'static'
+				lib project: ':Net', library: 'Net', linkage: 'static'
+				lib project: ':Util', library: 'Util', linkage: 'static'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}

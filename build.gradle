@@ -9,8 +9,6 @@ plugins {
 }
 
 
-//tasks.build.dependsOn collectBinaries
-
 repositories {
 	mavenCentral()
 }
@@ -46,77 +44,99 @@ subprojects {
 	apply plugin:	'windows-messages'
 
 	
-		model {
-			buildTypes {
-				release
-				debug
-			}
-			components {
-				withType(NativeComponentSpec) {
-					binaries.withType(NativeBinarySpec) {
+	model {
+		buildTypes {
+			release
+			debug
+		}
+		repositories {
+			libs(PrebuiltLibraries) {
+				crypto {
+					headers.srcDir "$opensslHome/include"
+
+					binaries.withType(StaticLibraryBinary) {
 						if (buildType == buildTypes.debug) {
-							if (it instanceof SharedLibraryBinarySpec) {
-								sharedLibraryFile = prefixByPoco(appendDebugSuffix(sharedLibraryFile))
-								sharedLibraryLinkFile = prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile))
-							} else
-							if (it instanceof StaticLibraryBinarySpec) {
-								staticLibraryFile = prefixByPoco(appendDebugSuffix(staticLibraryFile))
-							} else
-							if (it instanceof NativeExecutableBinarySpec) {
-								// executable.file = ...
-							} else {
-								throw new GradleException("Unknown native library binary")
-							}
+							def libName = targetPlatform.operatingSystem.windows ? 'libeay32MDd.lib' : 'libssl.a'
+							staticLibraryFile = file("$opensslHome/win32/bin/debug/$libName")
 						} else
 						if (buildType == buildTypes.release) {
-							if (it instanceof SharedLibraryBinarySpec) {
-								sharedLibraryFile = prefixByPoco(sharedLibraryFile)
-								sharedLibraryLinkFile = prefixByPoco(sharedLibraryLinkFile)
-							} else
-							if (it instanceof StaticLibraryBinarySpec) {
-								staticLibraryFile = prefixByPoco(staticLibraryFile)
-							} else
-							if (it instanceof NativeExecutableBinarySpec) {
-								// executable.file = ...
-							} else {
-								throw new GradleException("Unknown native library binary")
-							} 
+							def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
+							staticLibraryFile = file("$opensslHome/win32/bin/release/$libName")
 						} else {
-							throw new GradleException("Unknown buildType")
+							throw new GradleException("Unknown buildType" + buildType)
+						}
+					}
+/*
+					binaries.withType(SharedLibraryBinary) {
+						if (buildType == buildTypes.debug) {
+							def libName = targetPlatform.operatingSystem.windows ? 'libeay32MDd.lib' : 'libssl.a'
+							sharedLibraryFile = file("$opensslHome/win32/bin/debug/$libName")
+							sharedLibraryLinkFile = file("$opensslHome/win32/bin/debug/$libName")
+						} else
+						if (buildType == buildTypes.release) {
+							def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
+							staticLibraryFile = file("$opensslHome/win32/bin/release/$libName")
+						} else {
+							throw new GradleException("Unknown buildType" + buildType)
+						}
+					}
+*/
+				}
+				ssl {
+					headers.srcDir "$opensslHome/include"
+
+					binaries.withType(StaticLibraryBinary) {
+						if (buildType == buildTypes.debug) {
+							def libName = targetPlatform.operatingSystem.windows ? 'ssleay32MDd.lib' : 'libssl.a'
+							staticLibraryFile = file("$opensslHome/win32/bin/debug/$libName")
+						} else
+						if (buildType == buildTypes.release) {
+							def libName = targetPlatform.operatingSystem.windows ? 'ssleay32MD.lib' : 'libssl.a'
+							staticLibraryFile = file("$opensslHome/win32/bin/release/$libName")
+						} else {
+							throw new GradleException("Unknown buildType" + buildType)
 						}
 					}
 				}
 			}
-	    repositories {
-	        libs(PrebuiltLibraries) {
-				def opensslDir = "$rootDir/openssl"
-	            crypto {
-					headers.srcDir "$opensslDir/include"
-
-	                binaries.withType(StaticLibraryBinary) {
-						def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
-	                    staticLibraryFile = file("$opensslDir/win32/bin/release/$libName")
+		}
+		components {
+			withType(NativeComponentSpec) {
+				binaries.withType(NativeBinarySpec) {
+					if (buildType == buildTypes.debug) {
+						if (it instanceof SharedLibraryBinarySpec) {
+							sharedLibraryFile = prefixByPoco(appendDebugSuffix(sharedLibraryFile))
+							sharedLibraryLinkFile = prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile))
+						} else
+						if (it instanceof StaticLibraryBinarySpec) {
+							staticLibraryFile = prefixByPoco(appendDebugSuffix(staticLibraryFile))
+						} else
+						if (it instanceof NativeExecutableBinarySpec) {
+							executable.file = appendDebugSuffix(executable.file)
+						} else {
+							throw new GradleException("Unknown native library binary")
+						}
+					} else
+					if (buildType == buildTypes.release) {
+						if (it instanceof SharedLibraryBinarySpec) {
+							sharedLibraryFile = prefixByPoco(sharedLibraryFile)
+							sharedLibraryLinkFile = prefixByPoco(sharedLibraryLinkFile)
+						} else
+						if (it instanceof StaticLibraryBinarySpec) {
+							staticLibraryFile = prefixByPoco(staticLibraryFile)
+						} else
+						if (it instanceof NativeExecutableBinarySpec) {
+							// executable.file = ...
+						} else {
+							throw new GradleException("Unknown native library binary")
+						} 
+					} else {
+						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
-	            ssl {
-					headers.srcDir "$opensslDir/include"
-
-	                binaries.withType(StaticLibraryBinary) {
-						def libName = targetPlatform.operatingSystem.windows ? 'ssleay32MD.lib' : 'libssl.a'
-	                    staticLibraryFile = file("$opensslDir/win32/bin/release/$libName")
-   	             }
- 	           }
- 	       }
- 	   }
-
-/*
-	   all {
-			binaries.withType(NativeBinarySpec).afterEach { binary ->
-				def headers = binary.libs.collect { it.includeRoots }
 			}
 		}
-*/
-		
+
 		platforms {
 			win32 {
 				operatingSystem "windows"
@@ -137,14 +157,15 @@ subprojects {
 		}
 
 		flavors {
-	 //       minimal
-			unbundled
+			bundled
+//			unbundled
 		}
 
 		binaries {
 			all {
-				if (flavor == flavors.unbundled) {
-					cppCompiler.define 'PPPPPOCO_UNBUNDLED'
+				if (flavor != flavors.bundled) {
+					cCompiler.define 'POCO_UNBUNDLED'
+					cppCompiler.define 'POCO_UNBUNDLED'
 				}
 				if (buildType == buildTypes.debug) {
 					cCompiler.define '_DEBUG'
@@ -154,7 +175,7 @@ subprojects {
 					cCompiler.define 'NDEBUG'
 					cppCompiler.define 'NDEBUG'
 				} else {
-					throw new GradleException("Unknown buildTypes" + buildTypes)
+					throw new GradleException("Unknown buildType" + buildType)
 				}
 			
 				if (toolChain in VisualCpp) {
@@ -205,7 +226,7 @@ subprojects {
 						cCompiler.args "/MD"
 						cppCompiler.args "/MD"
 					} else {
-						throw new GradleException("Unknown buildTypes" + buildTypes)
+						throw new GradleException("Unknown buildType" + buildType)
 					}
 					linker.args '/SUBSYSTEM:CONSOLE'
 				}

@@ -1,0 +1,55 @@
+model {
+	repositories {
+		libs(PrebuiltLibraries) {
+			postgres {
+				headers.srcDir "$postgresHome/include"
+
+				binaries.withType(StaticLibraryBinary) {
+					if (buildType == buildTypes.debug) {
+						def libName = targetPlatform.operatingSystem.windows ? 'libeay32MDd.lib' : 'libssl.a'
+						staticLibraryFile = file("$postgresHome/lib/libpq.lib")
+					} else
+					if (buildType == buildTypes.release) {
+						def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
+						staticLibraryFile = file("$postgresHome/lib/libpq.lib")
+					} else {
+						throw new GradleException("Unknown buildType")
+					}
+				}
+			}
+		}
+	}
+	components {
+		DataPostgreSQL(NativeLibrarySpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+					}
+					exportedHeaders {
+						srcDir 'include'
+					}
+					lib library: 'postgres', linkage: 'static'
+				}
+			}
+		}
+	}
+	binaries {
+		all {
+		}
+		withType(SharedLibraryBinarySpec) {
+			lib project: ':Data', library: 'Data', linkage: 'shared'
+			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+			if (toolChain in VisualCpp) {
+				 cppCompiler.define "PostgreSQL_EXPORTS"
+			}
+		}
+		withType(StaticLibraryBinarySpec) {
+			lib project: ':Data', library: 'Data', linkage: 'static'
+			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
+		}
+	}
+}
+
+
