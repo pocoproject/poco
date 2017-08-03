@@ -15,6 +15,7 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #ifndef JSON_JSONTemplate_INCLUDED
 #define JSON_JSONTemplate_INCLUDED
 
@@ -42,7 +43,7 @@ class JSON_API Template
 	/// Template is a template engine which uses JSON as input
 	/// for generating output. There are commands for
 	/// looping over JSON arrays, include other templates,
-	/// conditional output, ...
+	/// conditional output, etc.
 	///
 	/// All text is send to the outputstream. A command is placed
 	/// between 
@@ -91,13 +92,13 @@ public:
 	typedef SharedPtr<Template> Ptr;
 
 	Template();
-		/// Constructor.
+		/// Creates a Template.
 
 	Template(const Path& templatePath);
-		/// Constructor. Creates a template from a file.
+		/// Creates a Template from the file with the given templatePath.
 
 	virtual ~Template();
-		/// Destructor.
+		/// Destroys the Template.
 
 	void parse();
 		/// Parse a template from a file.
@@ -106,7 +107,7 @@ public:
 		/// Parse a template from a string.
 
 	void parse(std::istream& in);
-		/// Parse a template from a input stream.
+		/// Parse a template from an input stream.
 
 	Timestamp parseTime() const;
 		/// Returns the time when the template was parsed.
@@ -130,6 +131,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline void Template::parse(const std::string& source)
 {
 	std::istringstream is(source);
@@ -143,7 +147,7 @@ inline Timestamp Template::parseTime() const
 }
 
 
-}} // namespace Poco::JSON
+} } // namespace Poco::JSON
 
 
 #endif // JSON_JSONTemplate_INCLUDED

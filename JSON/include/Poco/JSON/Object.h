@@ -39,9 +39,9 @@ namespace JSON {
 
 
 class JSON_API Object
-	/// Represents a JSON object. JSON object provides a representation
+	/// Represents a JSON object. Object provides a representation
 	/// based on shared pointers and optimized for performance. It is possible to 
-	/// convert object to DynamicStruct. Conversion requires copying and therefore
+	/// convert Object to DynamicStruct. Conversion requires copying and therefore
 	/// has performance penalty; the benefit is in improved syntax, eg:
 	/// 
 	///    std::string json = "{ \"test\" : { \"property\" : \"value\" } }";
@@ -58,7 +58,7 @@ class JSON_API Object
 	///    // copy/convert to Poco::DynamicStruct
 	///    Poco::DynamicStruct ds = *object;
 	///    val = ds["test"]["property"]; // val holds "value"
-	/// 
+	/// ----
 {
 public:
 	typedef SharedPtr<Object>                   Ptr;
@@ -68,16 +68,19 @@ public:
 	typedef ValueMap::const_iterator            ConstIterator;
 
 	explicit Object(bool preserveInsertionOrder = false);
-		/// Default constructor. If preserveInsertionOrder, object
-		/// will preserve the items insertion order. Otherwise, items
-		/// will be sorted by keys.
+		/// Creates an empty Object.
+		///
+		/// If preserveInsertionOrder, object will preserve the items insertion 
+		/// order. Otherwise, items will be sorted by keys.
 
 	Object(const Object& copy);
-		/// Copy constructor. Struct is not copied to keep the operation as
+		/// Creates an Object by copying another one.
+		///
+		/// Struct is not copied to keep the operation as
 		/// efficient as possible (when needed, it will be generated upon request).
 
 	virtual ~Object();
-		/// Destroys Object.
+		/// Destroys the Object.
 
 	Iterator begin()
 	{
@@ -117,7 +120,7 @@ public:
 	T getValue(const std::string& key) const
 		/// Retrieves the property with the given name and will
 		/// try to convert the value to the given template type.
-		/// The convert<T> method of Dynamic is called
+		/// The convert<T>() method of Var is called
 		/// which can also throw exceptions for invalid values.
 		/// Note: This will not work for an array or an object.
 	{
@@ -129,8 +132,8 @@ public:
 	Poco::Nullable<T> getNullableValue(const std::string& key) const
 		/// Retrieves the property with the given name and will
 		/// try to convert the value to the given template type.
-		/// Returns null if isNull.
-		/// The convert<T> method of Dynamic is called
+		/// 
+		/// The convert<T> method of Var is called
 		/// which can also throw exceptions for invalid values.
 		/// Note: This will not work for an array or an object.
 	{
@@ -142,25 +145,25 @@ public:
 	}
 
 	void getNames(std::vector<std::string>& names) const;
-		/// Returns all property names
+		/// Returns all property names.
 
 	bool has(const std::string& key) const;
-		/// Returns true when the given property exists
+		/// Returns true when the given property exists.
 
 	bool isArray(const std::string& key) const;
-		/// Returns true when the given property contains an array
+		/// Returns true when the given property contains an array.
 
 	bool isArray(ConstIterator& it) const;
-		/// Returns true when the given property contains an array
+		/// Returns true when the given property contains an array.
 
 	bool isNull(const std::string& key) const;
-		/// Returns true when the given property contains a null value
+		/// Returns true when the given property contains a null value.
 
 	bool isObject(const std::string& key) const;
-		/// Returns true when the given property contains an object
+		/// Returns true when the given property contains an object.
 
 	bool isObject(ConstIterator& it) const;
-		/// Returns true when the given property contains an object
+		/// Returns true when the given property contains an object.
 
 	template<typename T>
 	T optValue(const std::string& key, const T& def) const
@@ -170,13 +173,13 @@ public:
 	{
 		T value = def;
 		ValueMap::const_iterator it = _values.find(key);
-		if (it != _values.end() && ! it->second.isEmpty() )
+		if (it != _values.end() && ! it->second.isEmpty())
 		{
 			try
 			{
 				value = it->second.convert<T>();
 			}
-			catch(...)
+			catch (...)
 			{
 				// The default value will be returned
 			}
@@ -185,17 +188,19 @@ public:
 	}
 
 	std::size_t size() const;
-		/// Returns the number of properties
+		/// Returns the number of properties.
 
 	void set(const std::string& key, const Dynamic::Var& value);
-		/// Sets a new value
+		/// Sets a new value.
 
 	void stringify(std::ostream& out, unsigned int indent = 0, int step = -1) const;
-		/// Prints the object to out stream. When indent is 0, the object
-		/// will be printed on a single line without indentation.
+		/// Prints the object to out stream. 
+		///
+		/// When indent is 0, the object will be printed on a single 
+		/// line without indentation.
 
 	void remove(const std::string& key);
-		/// Removes the property with the given key
+		/// Removes the property with the given key.
 
 	static Poco::DynamicStruct makeStruct(const Object::Ptr& obj);
 		/// Utility function for creation of struct.
@@ -204,8 +209,9 @@ public:
 		/// Cast operator to Poco::DynamiStruct.
 
 	void clear();
-		/// Clears the contents of the object. Insertion order 
-		/// preservation property is left intact.
+		/// Clears the contents of the object.
+		///
+		/// Insertion order preservation property is left intact.
 
 private:
 	template <typename C>
@@ -219,7 +225,7 @@ private:
 		typename C::const_iterator end = container.end();
 		for (; it != end;)
 		{
-			for(unsigned int i = 0; i < indent; i++) out << ' ';
+			for (unsigned int i = 0; i < indent; i++) out << ' ';
 
 			Stringifier::stringify(getKey(it), out);
 			out << ((indent > 0) ? " : " : ":");
@@ -233,8 +239,7 @@ private:
 
 		if (indent >= step) indent -= step;
 
-		for (unsigned int i = 0; i < indent; i++)
-			out << ' ';
+		for (unsigned int i = 0; i < indent; i++) out << ' ';
 
 		out << '}';
 	}
@@ -254,6 +259,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline bool Object::has(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
@@ -341,7 +349,7 @@ inline const Dynamic::Var& Object::getValue(KeyPtrList::const_iterator& it) cons
 }
 
 
-}} // Namespace Poco::JSON
+} } // namespace Poco::JSON
 
 
 namespace Poco {
@@ -632,7 +640,7 @@ private:
 };
 
 
-}} // namespace Poco::JSON
+} } // namespace Poco::Dynamic
 
 
 #endif // JSON_Object_INCLUDED

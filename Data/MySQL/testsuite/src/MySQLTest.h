@@ -81,6 +81,7 @@ public:
 	void testDateTime();
 	void testBLOB();
 	void testBLOBStmt();
+	void testLongText();
 
 	void testUnsignedInts();
 	void testFloat();
@@ -88,6 +89,13 @@ public:
 
 	void testTuple();
 	void testTupleVector();
+
+#if __cplusplus >= 201103L
+
+	void testStdTuple();
+	void testStdTupleVector();
+
+#endif
 
 	void testInternalExtraction();
 
@@ -114,6 +122,7 @@ private:
 	void dropTable(const std::string& tableName);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
+	void recreatePersonLongTextTable();
 	void recreatePersonDateTimeTable();
 	void recreatePersonDateTable();
 	void recreatePersonTimeTable();

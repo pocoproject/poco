@@ -409,7 +409,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitElements);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParameters);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimit);
-        CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
         
 	return pSuite;
 }

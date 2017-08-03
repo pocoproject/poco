@@ -84,8 +84,9 @@ protected:
 	static void dynlockDestroy(struct CRYPTO_dynlock_value* lock, const char* file, int line);
 
 private:
+	static Poco::FastMutex _mutex;
 	static Poco::FastMutex* _mutexes;
-	static Poco::AtomicCounter _rc;
+	static int _rc;
     static bool _disableSSLInitialization;
 };
 

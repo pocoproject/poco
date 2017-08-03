@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/src/Connector.cpp#2 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Connector
 //

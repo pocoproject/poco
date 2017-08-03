@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/Utility.h#2 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Utility
 //
@@ -60,7 +60,7 @@ public:
 		/// Adds or replaces the mapping for SQLite column type sqliteType 
 		/// to a Poco type pocoType.
 		/// 
-		/// sqliteType is a case-insensitive desription of the column type with
+		/// sqliteType is a case-insensitive description of the column type with
 		/// any value pocoType value but MetaColumn::FDT_UNKNOWN. 
 		/// A Poco::Data::NotSupportedException is thrown if pocoType is invalid.
 

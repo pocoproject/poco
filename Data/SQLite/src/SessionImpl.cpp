@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/SQLite/src/SessionImpl.cpp#5 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SessionImpl
 //
@@ -30,6 +30,7 @@
 #include "sqlite3.h"
 #endif
 #include <cstdlib>
+#include <limits>
 
 
 #ifndef SQLITE_OPEN_URI
@@ -223,10 +224,18 @@ bool SessionImpl::isConnected()
 
 void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
-	int tout = 1000 * timeout;
-	int rc = sqlite3_busy_timeout(_pDB, tout);
-	if (rc != 0) Utility::throwException(rc);
-	_timeout = tout;
+	if(timeout <= std::numeric_limits<int>::max()/1000)
+	{
+		int tout = 1000 * timeout;
+		int rc = sqlite3_busy_timeout(_pDB, tout);
+		if (rc != 0) Utility::throwException(rc);
+		_timeout = tout;
+	}
+	else
+	{
+		throw RangeException
+				("Occurred integer overflow because of timeout value.");
+	}
 }
 
 

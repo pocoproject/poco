@@ -82,6 +82,7 @@ public:
 
 	void blob(unsigned int bigSize = ~0);
 	void blobStmt();
+	void longText();
 	void dateTime();
 	void date();
 	void time();
@@ -90,6 +91,11 @@ public:
 	void doubles();
 	void tuples();
 	void tupleVector();
+
+#if __cplusplus >= 201103L
+	void stdTuples();
+	void stdTupleVector();
+#endif
 
 	void internalExtraction();
 	void doNull();

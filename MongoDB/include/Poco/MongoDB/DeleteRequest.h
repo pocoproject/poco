@@ -29,51 +29,57 @@ namespace Poco {
 namespace MongoDB {
 
 
-class MongoDB_API DeleteRequest : public RequestMessage
-	/// Class for creating an OP_DELETE client request. This request
-	/// is used to delete one ore more documents from a database.
+class MongoDB_API DeleteRequest: public RequestMessage
+	/// A DeleteRequest is used to delete one ore more documents from a database.
 	///
 	/// Specific flags for this request
-	///  - DELETE_NONE
-	///      No flags
-	///  - DELETE_SINGLE_REMOVE
-	///      Delete only the first document
+	///   - DELETE_DEFAULT: default delete operation
+	///   - DELETE_SINGLE_REMOVE: delete only the first document
 {
 public:
-	typedef enum
+	enum Flags
 	{
-		DELETE_NONE = 0,
-		DELETE_SINGLE_REMOVE = 1
-	} Flags;
+		DELETE_DEFAULT = 0,
+			/// Default
 
-	DeleteRequest(const std::string& collectionName, Flags flags = DELETE_NONE);
-		/// Constructor. The full collection name is the concatenation of the database 
+		DELETE_SINGLE_REMOVE = 1
+			/// Delete only the first document.
+	};
+
+	DeleteRequest(const std::string& collectionName, Flags flags = DELETE_DEFAULT);
+		/// Creates a DeleteRequest for the given collection using the given flags. 
+		///
+		/// The full collection name is the concatenation of the database 
 		/// name with the collection name, using a "." for the concatenation. For example, 
 		/// for the database "foo" and the collection "bar", the full collection name is 
 		/// "foo.bar".
 
 	DeleteRequest(const std::string& collectionName, bool justOne);
-		/// Constructor. The full collection name is the concatenation of the database
+		/// Creates a DeleteRequest for the given collection.
+		/// 
+		/// The full collection name is the concatenation of the database
 		/// name with the collection name, using a "." for the concatenation. For example,
 		/// for the database "foo" and the collection "bar", the full collection name is
-		/// "foo.bar". When justOne is true, only the first matching document will
+		/// "foo.bar". 
+		///
+		/// If justOne is true, only the first matching document will
 		/// be removed (the same as using flag DELETE_SINGLE_REMOVE).
 
 	virtual ~DeleteRequest();
 		/// Destructor
 
 	Flags flags() const;
-		/// Returns flags
+		/// Returns the flags.
 
 	void flags(Flags flag);
-		/// Sets flags
+		/// Sets the flags.
 
 	Document& selector();
-		/// Returns the selector document
+		/// Returns the selector document.
 
 protected:
 	void buildRequest(BinaryWriter& writer);
-		/// Writes the OP_DELETE request to the writer
+		/// Writes the OP_DELETE request to the writer.
 
 private:
 	Flags       _flags;
@@ -82,6 +88,9 @@ private:
 };
 
 
+///
+/// inlines
+///
 inline DeleteRequest::Flags DeleteRequest::flags() const
 {
 	return _flags;
@@ -103,4 +112,4 @@ inline Document& DeleteRequest::selector()
 } } // namespace Poco::MongoDB
 
 
-#endif //MongoDB_DeleteRequest_INCLUDED
+#endif // MongoDB_DeleteRequest_INCLUDED

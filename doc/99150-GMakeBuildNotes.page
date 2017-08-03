@@ -11,7 +11,7 @@ every other Unix platform, as well as Cygwin and MinGW on Windows.
 Why GNU Make? Well, GNU Make is available virtually everywhere
 and it's usually readily available, such as on Linux and Mac OS X. 
 Sure, there are more advanced build systems out there, but the 
-philisophy for POCO is download -- compile -- go. Requiring the user 
+philosophy for POCO is download -- compile -- go. Requiring the user
 to download and install another build tool just for getting 
 POCO to work is unacceptable.
 
@@ -780,37 +780,37 @@ an executable if compiling in 64 bit mode.
 
 !STATICOPT_CC
 
-<*STATICOPT_CC*> specifies additonal flags passed to the C compiler 
+<*STATICOPT_CC*> specifies additional flags passed to the C compiler
 if compiling for static linking.
 
 
 !STATICOPT_CXX
 
-<*STATICOPT_CXX*> specifies additonal flags passed to the C++ compiler if 
+<*STATICOPT_CXX*> specifies additional flags passed to the C++ compiler if
 compiling for static linking.
 
 
 !STATICOPT_LINK
 
-<*STATICOPT_LINK*> specifies additonal flags passed to the linker for 
+<*STATICOPT_LINK*> specifies additional flags passed to the linker for
 static linking.
 
 
 !SHAREDOPT_CC
 
-<*SHAREDOPT_CC*> specifies additonal flags passed to the C compiler 
+<*SHAREDOPT_CC*> specifies additional flags passed to the C compiler
 for dynamic linking.
 
 
 !SHAREDOPT_CXX
 
-<*SHAREDOPT_CXX*> specifies additonal flags passed to the C++ compiler if 
+<*SHAREDOPT_CXX*> specifies additional flags passed to the C++ compiler if
 compiling for dynamic linking.
 
 
 !SHAREDOPT_LINK
 
-<*SHAREDOPT_LINK*> specifies additonal flags passed to the linker for dynamic linking.
+<*SHAREDOPT_LINK*> specifies additional flags passed to the linker for dynamic linking.
 
 
 !DEBUGOPT_CC

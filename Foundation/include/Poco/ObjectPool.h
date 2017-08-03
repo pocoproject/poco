@@ -41,7 +41,7 @@ class PoolableObjectFactory
 	/// a policy class to change the behavior of the ObjectPool when
 	/// creating new objects, returning used objects back to the pool
 	/// and destroying objects, when the pool itself is destroyed or
-	/// shrinked.
+	/// shrunk.
 {
 public:
 	P createObject()
@@ -259,19 +259,19 @@ public:
 			_factory.deactivateObject(pObject);
 			if (_pool.size() < _capacity)
 			{
-				_pool.push_back(pObject);
-			}
-			else
-			{
-				_factory.destroyObject(pObject);
-				_size--;
-				_availableCondition.signal();
+				try
+				{
+					_pool.push_back(pObject);
+					return;
+				}
+				catch (...)
+				{
+				}
 			}
 		}
-		else
-		{
-			_factory.destroyObject(pObject);
-		}
+		_factory.destroyObject(pObject);
+		_size--;
+		_availableCondition.signal();
 	}
 
 	std::size_t capacity() const

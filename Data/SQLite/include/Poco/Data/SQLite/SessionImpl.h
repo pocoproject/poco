@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#2 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SessionImpl
 //
@@ -75,6 +75,7 @@ public:
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
+		/// Throws RangeException if the timeout value is overflow.
 
 	std::size_t getConnectionTimeout();
 		/// Returns the session connection timeout value.

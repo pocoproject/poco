@@ -83,6 +83,9 @@ public:
 	StreamSocket detachSocket();
 		/// Returns the underlying socket after detaching
 		/// it from the server session.
+		
+	HTTPServerSession& session();
+		/// Returns the underlying HTTPServerSession.
 	
 private:
 	HTTPServerResponseImpl&         _response;
@@ -126,6 +129,12 @@ inline const HTTPServerParams& HTTPServerRequestImpl::serverParams() const
 inline HTTPServerResponse& HTTPServerRequestImpl::response() const
 {
 	return _response;
+}
+
+
+inline HTTPServerSession& HTTPServerRequestImpl::session()
+{
+	return _session;
 }
 
 

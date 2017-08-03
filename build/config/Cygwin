@@ -48,7 +48,7 @@ IMPLIBLINKEXT    = .dll.a
 CFLAGS          = 
 CFLAGS32        =
 CFLAGS64        = 
-CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING
+CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING 
 CXXFLAGS32      = -Wa,-mbig-obj
 CXXFLAGS64      = -Wa,-mbig-obj
 SHLIBFLAGS      = -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
@@ -79,3 +79,21 @@ SYSFLAGS = -D_XOPEN_SOURCE=500
 # System Specific Libraries
 #
 SYSLIBS  = 
+
+#
+# Auto-detect architecture if not specified
+#
+ifndef OSARCH_64BITS
+  LBITS := $(shell getconf LONG_BIT)
+  ifeq ($(LBITS),64)
+    OSARCH_64BITS = 1
+  else
+    OSARCH_64BITS = 0
+  endif
+endif
+
+#
+# C++11/14 detection
+#
+include $(POCO_BASE)/build/script/cpp11-gcc
+

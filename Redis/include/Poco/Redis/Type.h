@@ -77,7 +77,7 @@ public:
 		/// Reads the value from the stream.
 
 	virtual std::string toString() const = 0;
-		/// Converts the value to a RESP (REdis Serialization Protocol) string.
+		/// Converts the value to a RESP (Redis Serialization Protocol) string.
 
 	static RedisType::Ptr createRedisType(char marker);
 		/// Create a Redis type based on the marker:

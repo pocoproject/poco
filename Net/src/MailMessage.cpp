@@ -119,6 +119,13 @@ namespace
 					
 					pPS->headers().set(it->first, it->second);
 				}
+
+				if (contentDisp.empty())
+				{
+					_pMsg->addContent(pPS, cte);
+					added = true;
+				}
+
 				if (!added) delete pPS;
 			}
 		}
@@ -194,6 +201,7 @@ const std::string MailMessage::CTE_BASE64("base64");
 
 
 MailMessage::MailMessage(PartStoreFactory* pStoreFactory): 
+	_encoding(),
 	_pStoreFactory(pStoreFactory)
 {
 	Poco::Timestamp now;

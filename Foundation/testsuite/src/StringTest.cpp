@@ -1163,11 +1163,13 @@ void StringTest::testJSONString()
 	assert (toJSON("\\", false) == "\\\\");
 	assert (toJSON("\"", false) == "\\\"");
 	assert (toJSON("/", false) == "\\/");
+	assert (toJSON("\a", false) == "\\a");
 	assert (toJSON("\b", false) == "\\b");
 	assert (toJSON("\f", false) == "\\f");
 	assert (toJSON("\n", false) == "\\n");
 	assert (toJSON("\r", false) == "\\r");
 	assert (toJSON("\t", false) == "\\t");
+	assert (toJSON("\v", false) == "\\v");
 	assert (toJSON("a", false) == "a");
 
 	// ??? on MSVC, the assert macro expansion

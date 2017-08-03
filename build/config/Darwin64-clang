@@ -3,8 +3,7 @@
 #
 # Darwin64-clang
 #
-# Build settings for Mac OS X 10.8 or later, clang, 64-bits, with C++11 support.
-# Build settings are compatible with XCode 7 C++ projects.
+# Build settings for Mac OS X 10.7 (clang, libstdc++, x86_64)
 # 
 
 ARCHFLAGS = -arch x86_64

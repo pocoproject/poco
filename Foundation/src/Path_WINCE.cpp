@@ -56,12 +56,6 @@ std::string PathImpl::cacheHomeImpl()
 }
 
 
-std::string PathImpl::tempHomeImpl()
-{
-  return tempImpl();
-}
-
-
 std::string PathImpl::configImpl()
 {
   return("\\");

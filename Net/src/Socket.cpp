@@ -79,9 +79,10 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	if (epollSize == 0) return 0;
 
 	int epollfd = -1;
-	{
+	{		
 		struct epoll_event eventsIn[epollSize];
-		memset(eventsIn, 0, sizeof(eventsIn));
+		memset(eventsIn, 0, sizeof(epoll_event) * epollSize );
+		
 		struct epoll_event* eventLast = eventsIn;
 		for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
 		{
@@ -144,7 +145,9 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		}
 
 		epollSize = eventLast - eventsIn;
-		epollfd = epoll_create(epollSize);
+		if (epollSize == 0) return 0;
+		
+		epollfd = epoll_create(1);
 		if (epollfd < 0)
 		{
 			SocketImpl::error("Can't create epoll queue");
@@ -158,14 +161,14 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, e) < 0)
 				{
 					::close(epollfd);
-					SocketImpl::error("Can't insert socket to epoll queue: ");
+					SocketImpl::error("Can't insert socket to epoll queue");
 				}
 			}
 		}
 	}
 
 	struct epoll_event eventsOut[epollSize];
-	memset(eventsOut, 0, sizeof(eventsOut));
+	memset(eventsOut, 0, sizeof(epoll_event) * epollSize );	
 
 	Poco::Timespan remainingTime(timeout);
 	int rc;

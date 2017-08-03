@@ -89,7 +89,11 @@ protected:
 
 private:
 	TestMethod             _test;
+#if __cplusplus < 201103L
 	std::auto_ptr<Fixture> _fixture;
+#else
+	std::unique_ptr<Fixture> _fixture;
+#endif
 };
 
 
