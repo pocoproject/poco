@@ -2,7 +2,6 @@ project(":MongoDB") {
 	model {
 		components {
 			MongoDB(NativeLibrarySpec) {
-				baseName 'PocoMongoDB'
 				sources {
 					cpp {
 						source {

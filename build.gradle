@@ -31,8 +31,41 @@ File prefixByPoco(File binaryFile) {
 	File parent = binaryFile.getParentFile()
 	return new File(parent, "Poco" + name);
 }
+File toBin(File sharedFile, Platform platform) {
+	String name = sharedFile.getName()
+	String target
+	if (platform.architecture.name == 'x86') {
+		target = 'bin'
+	} else
+	if (platform.architecture.name == 'x64') {
+		target = 'bin64'
+	} else {
+		throw new GradleException("Unknown architecture: " + platform)
+	}
+	File parent = new File(rootDir, target)
+	return new File(parent, name);
+}
+File toLib(File linkFile, Platform platform) {
+	String name = linkFile.getName()
+	String target
+	if (platform.architecture.name == 'x86') {
+		target = 'bin' // 'lib'
+	} else
+	if (platform.architecture.name == 'x64') {
+		target = 'bin64' // 'lib64'
+	} else {
+		throw new GradleException("Unknown architecture: " + platform)
+	}
+	File parent = new File(rootDir, target )
+	return new File(parent, name);
+}
+File toStatic(File staticFile) {
+	String name = staticFile.getName()
+	File parent = new File(rootDir, "static")
+	return new File(parent, name);
+}
 allprojects {
-	buildDir = new File("gradle")	
+	buildDir = new File("buildgradle")	
 }
 subprojects {
 	apply plugin:	'c'
@@ -105,28 +138,28 @@ subprojects {
 				binaries.withType(NativeBinarySpec) {
 					if (buildType == buildTypes.debug) {
 						if (it instanceof SharedLibraryBinarySpec) {
-							sharedLibraryFile = prefixByPoco(appendDebugSuffix(sharedLibraryFile))
-							sharedLibraryLinkFile = prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile))
+							sharedLibraryFile     = toBin(prefixByPoco(appendDebugSuffix(sharedLibraryFile)), targetPlatform)
+							sharedLibraryLinkFile = toLib(prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile)), targetPlatform)
 						} else
 						if (it instanceof StaticLibraryBinarySpec) {
-							staticLibraryFile = prefixByPoco(appendDebugSuffix(staticLibraryFile))
+							staticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(staticLibraryFile)))
 						} else
 						if (it instanceof NativeExecutableBinarySpec) {
-							executable.file = appendDebugSuffix(executable.file)
+							executable.file = toBin(appendDebugSuffix(executable.file), targetPlatform)
 						} else {
 							throw new GradleException("Unknown native library binary")
 						}
 					} else
 					if (buildType == buildTypes.release) {
 						if (it instanceof SharedLibraryBinarySpec) {
-							sharedLibraryFile = prefixByPoco(sharedLibraryFile)
-							sharedLibraryLinkFile = prefixByPoco(sharedLibraryLinkFile)
+							sharedLibraryFile = toBin(prefixByPoco(sharedLibraryFile), targetPlatform)
+							sharedLibraryLinkFile = toLib(prefixByPoco(sharedLibraryLinkFile), targetPlatform)
 						} else
 						if (it instanceof StaticLibraryBinarySpec) {
-							staticLibraryFile = prefixByPoco(staticLibraryFile)
+							staticLibraryFile = toStatic(prefixByPoco(staticLibraryFile))
 						} else
 						if (it instanceof NativeExecutableBinarySpec) {
-							// executable.file = ...
+							executable.file = toBin(executable.file, targetPlatform)
 						} else {
 							throw new GradleException("Unknown native library binary")
 						} 
@@ -137,6 +170,18 @@ subprojects {
 			}
 		}
 
+		toolChains {
+			visualCpp(VisualCpp) {
+				// Specify the installDir if Visual Studio cannot be located
+				// installDir "C:/Apps/Microsoft Visual Studio 10.0"
+			}
+			gcc(Gcc) {
+				// Uncomment to use a GCC install that is not in the PATH
+				// path "/usr/bin/gcc"
+			}
+			clang(Clang)
+		}
+
 		platforms {
 			win32 {
 				operatingSystem "windows"
@@ -144,7 +189,7 @@ subprojects {
 			}
 			win64 {
 				operatingSystem "windows"
-				architecture 'x86_64'
+				architecture 'x64'
 			}
 			linux32 {
 				operatingSystem "linux"
@@ -152,7 +197,7 @@ subprojects {
 			}
 			linux64 {
 				operatingSystem "linux"
-				architecture 'x86_64'
+				architecture 'x64'
 			}
 		}
 
@@ -163,6 +208,7 @@ subprojects {
 
 		binaries {
 			all {
+				
 				if (flavor != flavors.bundled) {
 					cCompiler.define 'POCO_UNBUNDLED'
 					cppCompiler.define 'POCO_UNBUNDLED'
@@ -179,6 +225,9 @@ subprojects {
 				}
 			
 				if (toolChain in VisualCpp) {
+					if (targetPlatform == platforms.win64) {
+						linker.args '/MACHINE:X64'
+					}
 					if (buildType == buildTypes.debug) {
 						cCompiler.args '/Zi'
 						cppCompiler.args '/Zi'
