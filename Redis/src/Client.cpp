@@ -24,42 +24,83 @@ namespace Poco {
 namespace Redis {
 
 
-Client::Client(): 
-	_address(), 
-	_socket(), 
-	_input(0), 
+Client::Client():
+	_address(),
+	_socket(),
+    _password(""),
+	_input(0),
 	_output(0)
 {
 }
 
 
 Client::Client(const std::string& hostAndPort):
-	_address(hostAndPort), 
-	_socket(), 
-	_input(0), 
+	_address(hostAndPort),
+	_socket(),
+    _password(""),
+	_input(0),
 	_output(0)
 {
 	connect();
 }
 
 
-Client::Client(const std::string& host, int port): 
-	_address(host, port), 
-	_socket(), 
-	_input(0), 
+Client::Client(const std::string& hostAndPort, const std::string& password):
+	_address(hostAndPort),
+	_socket(),
+    _password(password),
+	_input(0),
+	_output(0)
+{
+	connect();
+    sendAuth();
+}
+
+
+Client::Client(const std::string& host, int port):
+	_address(host, port),
+	_socket(),
+    _password(""),
+	_input(0),
+	_output(0)
+{
+	connect();
+    sendAuth();
+}
+
+
+Client::Client(const std::string& host, int port, const std::string& password):
+	_address(host, port),
+	_socket(),
+    _password(password),
+	_input(0),
+	_output(0)
+{
+	connect();
+    sendAuth();
+}
+
+
+Client::Client(const Net::SocketAddress& addrs):
+	_address(addrs),
+	_socket(),
+    _password(""),
+	_input(0),
 	_output(0)
 {
 	connect();
 }
 
 
-Client::Client(const Net::SocketAddress& addrs): 
-	_address(addrs), 
-	_socket(), 
-	_input(0), 
+Client::Client(const Net::SocketAddress& addrs, const std::string& password):
+	_address(addrs),
+	_socket(),
+    _password(password),
+	_input(0),
 	_output(0)
 {
 	connect();
+    sendAuth();
 }
 
 
@@ -67,6 +108,7 @@ Client::~Client()
 {
 	delete _input;
 	delete _output;
+    _socket.close();
 }
 
 
@@ -76,7 +118,7 @@ void Client::connect()
 	poco_assert(! _output);
 
 	_socket.connect(_address);
-	_input = new RedisInputStream(_socket);
+    _input = new RedisInputStream(_socket);
 	_output = new RedisOutputStream(_socket);
 }
 
@@ -131,6 +173,20 @@ void Client::connect(const Net::SocketAddress& addrs, const Timespan& timeout)
 {
 	_address = addrs;
 	connect(timeout);
+}
+
+
+void Client::sendAuth()
+{
+    if(_password.empty()) return;
+
+    Array cmd;
+    cmd << "AUTH" << _password;
+    try {
+        execute<std::string>(cmd);
+    } catch (...) {
+        poco_unexpected();
+    }
 }
 
 

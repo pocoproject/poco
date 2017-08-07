@@ -83,11 +83,21 @@ public:
 		/// Constructor which connects to the given Redis host/port.
 		/// The host and port must be separated with a colon.
 
+    Client(const std::string& hostAndPort, const std::string& password);
+		/// Constructor which connects to the given Redis host/port/password.
+		/// The host and port must be separated with a colon.
+
 	Client(const std::string& host, int port);
 		/// Constructor which connects to the given Redis host/port.
 
+	Client(const std::string& host, int port, const std::string& password);
+		/// Constructor which connects to the given Redis host/port/password.
+
 	Client(const Net::SocketAddress& addrs);
 		/// Constructor which connects to the given Redis host/port.
+
+    Client(const Net::SocketAddress& addrs, const std::string& password);
+		/// Constructor which connects to the given Redis host/port/password.
 
 	virtual ~Client();
 		/// Destroys the Client.
@@ -185,6 +195,9 @@ private:
 	void connect();
 		/// Connects to the Redis server
 
+    void sendAuth();
+        /// Sends password to Redis server
+
 	void connect(const Timespan& timeout);
 		/// Connects to the Redis server and sets a timeout.
 
@@ -196,6 +209,7 @@ private:
 
 	Net::SocketAddress _address;
 	Net::StreamSocket _socket;
+    std::string _password;
 	RedisInputStream* _input;
 	RedisOutputStream* _output;
 };
