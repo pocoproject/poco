@@ -27,9 +27,9 @@ namespace Redis {
 Client::Client():
 	_address(),
 	_socket(),
-    _password(""),
 	_input(0),
-	_output(0)
+	_output(0),
+    _authenticated(false)
 {
 }
 
@@ -37,70 +37,33 @@ Client::Client():
 Client::Client(const std::string& hostAndPort):
 	_address(hostAndPort),
 	_socket(),
-    _password(""),
 	_input(0),
-	_output(0)
+	_output(0),
+    _authenticated(false)
 {
 	connect();
-}
-
-
-Client::Client(const std::string& hostAndPort, const std::string& password):
-	_address(hostAndPort),
-	_socket(),
-    _password(password),
-	_input(0),
-	_output(0)
-{
-	connect();
-    sendAuth();
 }
 
 
 Client::Client(const std::string& host, int port):
 	_address(host, port),
 	_socket(),
-    _password(""),
 	_input(0),
-	_output(0)
+	_output(0),
+    _authenticated(false)
 {
 	connect();
-    sendAuth();
-}
-
-
-Client::Client(const std::string& host, int port, const std::string& password):
-	_address(host, port),
-	_socket(),
-    _password(password),
-	_input(0),
-	_output(0)
-{
-	connect();
-    sendAuth();
 }
 
 
 Client::Client(const Net::SocketAddress& addrs):
 	_address(addrs),
 	_socket(),
-    _password(""),
 	_input(0),
-	_output(0)
+	_output(0),
+    _authenticated(false)
 {
 	connect();
-}
-
-
-Client::Client(const Net::SocketAddress& addrs, const std::string& password):
-	_address(addrs),
-	_socket(),
-    _password(password),
-	_input(0),
-	_output(0)
-{
-	connect();
-    sendAuth();
 }
 
 
@@ -176,17 +139,25 @@ void Client::connect(const Net::SocketAddress& addrs, const Timespan& timeout)
 }
 
 
-void Client::sendAuth()
+bool Client::sendAuth(const std::string& password)
 {
-    if(_password.empty()) return;
+    if(password.empty()) return true;
 
     Array cmd;
-    cmd << "AUTH" << _password;
+    cmd << "AUTH" << password;
+
+    bool ret = true;
+    std::string response;
+
     try {
-        execute<std::string>(cmd);
+        response = execute<std::string>(cmd);
     } catch (...) {
-        poco_unexpected();
+        ret = false;
     }
+
+    _authenticated = (ret && (response == "OK"));
+
+    return _authenticated;
 }
 
 
