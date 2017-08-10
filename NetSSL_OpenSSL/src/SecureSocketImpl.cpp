@@ -251,7 +251,8 @@ void SecureSocketImpl::close()
 
 bool SecureSocketImpl::poll(const Poco::Timespan& timeout, int mode)
 {
-	return _pSocket->poll(timeout, mode);
+    return (((mode & SocketImpl::SELECT_READ) == SocketImpl::SELECT_READ) && SSL_pending(_pSSL) > 0)
+           ||  _pSocket->poll(timeout, mode);
 }
 
 int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
