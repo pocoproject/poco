@@ -78,7 +78,7 @@ const std::string& MultipartWriter::boundary() const
 std::string MultipartWriter::createBoundary()
 {
 	std::string boundary("MIME_boundary_");
-	Random rnd;
+	static Random rnd;
 	NumberFormatter::appendHex(boundary, rnd.next(), 8);
 	NumberFormatter::appendHex(boundary, rnd.next(), 8);
 	return boundary;
