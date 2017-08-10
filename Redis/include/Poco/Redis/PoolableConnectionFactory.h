@@ -58,9 +58,9 @@ public:
 
 	Redis::Client::Ptr createObject()
 	{
-        if (_password.empty()) return new Redis::Client(_address, _password);
-
         Redis::Client::Ptr redis = Redis::Client(_addresses);
+
+        if (_password.empty()) return redis;
 
         if (redis->sendAuth(_password)) return redis;
 
