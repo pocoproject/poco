@@ -213,7 +213,7 @@ first into clause.
 
 !! Handling NULL entries
 A common case with databases are optional data fields that can contain NULL.
-To accomodate for NULL, use the Poco::Nullable template:
+To accommodate for NULL, use the Poco::Nullable template:
 
     std::string firstName("Peter";
     Poco::Nullable<std::string> lastName("Junior");
@@ -231,7 +231,7 @@ If the returned value was null, age.isNull() will return true. Whether empty
 string is null or not is more of a philosophical question (a topic for discussion
 in some other time and place); for the purpose of this document, suffice it to say 
 that different databases handle it differently and Poco::Data provides a way to 
-tweak it to user's needs through folowing <[Session]> features:
+tweak it to user's needs through following <[Session]> features:
 
   *emptyStringIsNull
   *forceEmptyString

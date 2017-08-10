@@ -578,17 +578,6 @@ void ODBCDB2Test::recreateNullableTable()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
 
-void ODBCDB2Test::recreateNumericTable()
-{
-	dropObject("TABLE", ExecUtil::numeric_tbl());
-	try {
-		session() << "CREATE TABLE " << ExecUtil::numeric_tbl() <<
-			" (id integer, num8 NUMERIC(8), num16_3 NUMERIC(16,3), num18 NUMERIC(18), num18_8 NUMERIC(18,8), num22 NUMERIC(22))", now;
-	}
-	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateNumericTable()"); }
-	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateNumericTable()"); }
-}
-
 
 void ODBCDB2Test::recreatePersonTable()
 {
@@ -637,8 +626,8 @@ void ODBCDB2Test::recreatePersonDateTimeTable()
 
 void ODBCDB2Test::recreateIntsTable()
 {
-	dropObject("TABLE", ExecUtil::strings());
-	try { session() << "CREATE TABLE " << ExecUtil::strings() << " (str INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::ints());
+	try { session() << "CREATE TABLE " << ExecUtil::ints() << " (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -835,7 +824,6 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTransactor);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNullable);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testReconnect);
-		CppUnit_addTest(pSuite, ODBCDB2Test, testNumeric);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testXMLColumn);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertStatReuse);
 

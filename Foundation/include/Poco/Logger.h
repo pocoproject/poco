@@ -647,48 +647,35 @@ private:
 #define poco_information_f4(logger, fmt, arg1, arg2, arg3, arg4) \
 	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
 
-#if defined(_DEBUG) || defined(POCO_LOG_DEBUG)
-	#define poco_debug(logger, msg) \
-		if ((logger).debug()) (logger).debug(msg, __FILE__, __LINE__); else (void) 0
+#define poco_debug(logger, msg) \
+	if ((logger).debug()) (logger).debug(msg, __FILE__, __LINE__); else (void) 0
 
-	#define poco_debug_f1(logger, fmt, arg1) \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
+#define poco_debug_f1(logger, fmt, arg1) \
+	if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
 
-	#define poco_debug_f2(logger, fmt, arg1, arg2) \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
+#define poco_debug_f2(logger, fmt, arg1, arg2) \
+	if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
 
-	#define poco_debug_f3(logger, fmt, arg1, arg2, arg3) \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
+#define poco_debug_f3(logger, fmt, arg1, arg2, arg3) \
+	if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
 
-	#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
 
-	#define poco_trace(logger, msg) \
-		if ((logger).trace()) (logger).trace(msg, __FILE__, __LINE__); else (void) 0
+#define poco_trace(logger, msg) \
+	if ((logger).trace()) (logger).trace(msg, __FILE__, __LINE__); else (void) 0
 
-	#define poco_trace_f1(logger, fmt, arg1) \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
+#define poco_trace_f1(logger, fmt, arg1) \
+	if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
 
-	#define poco_trace_f2(logger, fmt, arg1, arg2) \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
+#define poco_trace_f2(logger, fmt, arg1, arg2) \
+	if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
 
-	#define poco_trace_f3(logger, fmt, arg1, arg2, arg3) \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
+#define poco_trace_f3(logger, fmt, arg1, arg2, arg3) \
+	if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
 
-	#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
-#else
-	#define poco_debug(logger, msg)
-	#define poco_debug_f1(logger, fmt, arg1)
-	#define poco_debug_f2(logger, fmt, arg1, arg2)
-	#define poco_debug_f3(logger, fmt, arg1, arg2, arg3)
-	#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4)
-	#define poco_trace(logger, msg)
-	#define poco_trace_f1(logger, fmt, arg1)
-	#define poco_trace_f2(logger, fmt, arg1, arg2)
-	#define poco_trace_f3(logger, fmt, arg1, arg2, arg3)
-	#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4)
-#endif
+#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
 
 
 //

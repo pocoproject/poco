@@ -222,7 +222,7 @@ std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length
 			err << DESTINATION_UNREACHABLE_CODE[DESTINATION_UNREACHABLE_UNKNOWN];
 		break;
 	
-	case SOURCE_QUENCH_TYPE:		
+	case SOURCE_QUENCH_TYPE:
 		err << "Source quench";
 		break;
 	

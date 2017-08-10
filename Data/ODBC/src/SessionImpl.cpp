@@ -29,8 +29,6 @@ namespace Data {
 namespace ODBC {
 
 
-const char* const SessionImpl::NUMERIC_CONVERSION_PROPERTY= "numericConversion";
-
 SessionImpl::SessionImpl(const std::string& connect,
 	std::size_t loginTimeout,
 	std::size_t maxFieldSize,
@@ -41,7 +39,6 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_maxFieldSize(maxFieldSize),
 		_autoBind(autoBind),
 		_autoExtract(autoExtract),
-		_numericConversion(ODBCMetaColumn::NC_BEST_FIT),
 		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
 		_inTransaction(false),
 		_queryTimeout(-1)
@@ -69,9 +66,6 @@ SessionImpl::SessionImpl(const std::string& connect,
 
 void SessionImpl::init()
 {
-	addProperty(NUMERIC_CONVERSION_PROPERTY,
-		&SessionImpl::setNumericConversion,
-		&SessionImpl::numericConversion);
 	setFeature("bulk", true);
 	open();
 	setProperty("handle", _db.handle());

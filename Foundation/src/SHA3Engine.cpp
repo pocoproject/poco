@@ -123,9 +123,8 @@ typedef struct
 	unsigned char delimitedSuffix;
 } HASHCONTEXT;
 
-SHA3Engine::SHA3Engine(ALGORITHM algorithm)
-	: _algorithm(algorithm)
-	, _context(NULL)
+SHA3Engine::SHA3Engine(ALGORITHM algorithm): _context(NULL),
+	_algorithm(algorithm)
 {
 	_digest.reserve(digestLength());
 	reset();

@@ -227,7 +227,15 @@ std::string PathImpl::expandImpl(const std::string& path)
 	}
 	while (it != end)
 	{
-		if (*it == '$')
+		if (*it == '\\')
+		{
+			++it;
+			if (*it == '$')
+			{
+				result += *it++;
+			}
+		}
+		else if (*it == '$')
 		{
 			std::string var;
 			++it;

@@ -30,6 +30,7 @@
 #include "sqlite3.h"
 #endif
 #include <cstdlib>
+#include <limits>
 
 
 #ifndef SQLITE_OPEN_URI
@@ -205,9 +206,33 @@ void SessionImpl::open(const std::string& connect)
 
 void SessionImpl::close()
 {
-	if (_pDB)
+	if (_pDB) 
 	{
-		sqlite3_close(_pDB);
+		int result = 0;
+		int times = 50;
+		do 
+		{
+			result = sqlite3_close(_pDB);
+			if (result == SQLITE_BUSY) 
+			{
+				--times;
+			}			
+		} 
+		while (SQLITE_BUSY == result && times > 0);
+		if (SQLITE_BUSY == result && times == 0) 
+		{
+			sqlite3_stmt *pStmt = NULL;
+			do 
+			{
+				pStmt = sqlite3_next_stmt(_pDB, NULL);
+				if (pStmt && sqlite3_stmt_busy(pStmt)) 
+				{
+					sqlite3_finalize(pStmt);
+				}
+			}
+			while (pStmt != NULL);
+			sqlite3_close(_pDB);		
+		}
 		_pDB = 0;
 	}
 
@@ -223,10 +248,18 @@ bool SessionImpl::isConnected()
 
 void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
-	int tout = 1000 * timeout;
-	int rc = sqlite3_busy_timeout(_pDB, tout);
-	if (rc != 0) Utility::throwException(rc);
-	_timeout = tout;
+	if(timeout <= std::numeric_limits<int>::max()/1000)
+	{
+		int tout = 1000 * timeout;
+		int rc = sqlite3_busy_timeout(_pDB, tout);
+		if (rc != 0) Utility::throwException(rc);
+		_timeout = tout;
+	}
+	else
+	{
+		throw RangeException
+				("Occurred integer overflow because of timeout value.");
+	}
 }
 
 

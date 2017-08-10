@@ -111,7 +111,7 @@ static time_t __wceex_mktime_internal(struct tm *tmbuff, time_t _loctime_offset)
         return (time_t) -1;
     }
 
-    /* Convert calender time to a time_t value. */
+    /* Convert calendar time to a time_t value. */
     tres = 0;
 
     /* Sum total amount of days from the Epoch with respect to leap years. */

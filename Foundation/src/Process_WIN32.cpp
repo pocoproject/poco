@@ -163,7 +163,7 @@ static std::string escapeArg(const std::string& arg)
 
 ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
 {
-	std::string commandLine = command;
+	std::string commandLine = escapeArg(command);
 	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it)
 	{
 		commandLine.append(" ");

@@ -23,11 +23,11 @@ namespace Poco {
 namespace XML {
 
 
-Attr::Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& rNamespaceURI, const XMLString& rLocalName, const XMLString& qname, const XMLString& rValue, bool isSpecified):
+Attr::Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified):
 	AbstractNode(pOwnerDocument),
-	_name(pOwnerDocument->namePool().insert(qname, rNamespaceURI, rLocalName)),
-	_value(rValue),
-	_specified(isSpecified)
+	_name(pOwnerDocument->namePool().insert(qname, namespaceURI, localName)),
+	_value(value),
+	_specified(specified)
 {
 }
 
@@ -46,13 +46,13 @@ Attr::~Attr()
 }
 
 
-void Attr::setValue(const XMLString& rValue)
+void Attr::setValue(const XMLString& value)
 {
 	XMLString oldValue = _value;
-	_value     = rValue;
+	_value     = value;
 	_specified = true;
 	if (_pParent && !_pOwner->eventsSuspended())
-		_pParent->dispatchAttrModified(this, MutationEvent::MODIFICATION, oldValue, rValue);
+		_pParent->dispatchAttrModified(this, MutationEvent::MODIFICATION, oldValue, value);
 }
 
 
@@ -90,9 +90,9 @@ const XMLString& Attr::getNodeValue() const
 }
 
 
-void Attr::setNodeValue(const XMLString& rValue)
+void Attr::setNodeValue(const XMLString& value)
 {
-	setValue(rValue);
+	setValue(value);
 }
 
 

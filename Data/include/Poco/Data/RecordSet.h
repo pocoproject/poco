@@ -323,7 +323,7 @@ public:
 	using Statement::reset;
 		/// Don't hide base class method.
 
-	void reset(const Statement& stmt);
+	RecordSet& reset(const Statement& stmt);
 		/// Resets the RecordSet and assigns a new statement.
 		/// Should be called after the given statement has been reset,
 		/// assigned a new SQL statement, and executed.
@@ -438,7 +438,8 @@ private:
 		if (typeFound)
 			throw NotFoundException(Poco::format("Column name: %s", name));
 		else
-			throw NotFoundException(Poco::format("Column type: %s, name: %s", std::string(typeid(T).name()), name));
+			throw NotFoundException(Poco::format("Column type: %s, Container type: %s, name: %s",
+				std::string(typeid(T).name()), std::string(typeid(ExtractionVecPtr).name()), name));
 	}
 
 	template <class C, class E>
@@ -469,9 +470,13 @@ private:
 		}
 		else 
 		{
-			throw Poco::BadCastException(Poco::format("Type cast failed!\nColumn: %z\nTarget type:\t%s",  
+			throw Poco::BadCastException(Poco::format("RecordSet::columnImpl(%z) type cast failed!\nTarget type:\t%s"
+				"\nTarget container type:\t%s\nSource container type:\t%s\nSource abstraction type:\t%s",
 				pos,
-				std::string(typeid(T).name())));
+				std::string(typeid(T).name()),
+				std::string(typeid(ExtractionVecPtr).name()),
+				rExtractions[pos]->type(),
+				std::string(typeid(rExtractions[pos].get()).name())));
 		}
 	}
 

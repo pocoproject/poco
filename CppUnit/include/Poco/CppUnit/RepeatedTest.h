@@ -45,7 +45,7 @@ private:
 
 
 // Counts the number of test cases that will be run by this test.
-inline RepeatedTest::countTestCases ()
+inline int RepeatedTest::countTestCases ()
 {
 	return TestDecorator::countTestCases() * _timesRepeat;
 }

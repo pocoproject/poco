@@ -49,7 +49,7 @@ public:
 	typedef SharedPtr<AbstractExtractor>  ExtractorPtr;
 	typedef SharedPtr<AbstractPreparator> PreparatorPtr;
 
-	AbstractExtraction(Poco::UInt32 limit = Limit::LIMIT_UNLIMITED,
+	AbstractExtraction(const std::string& type, Poco::UInt32 limit = Limit::LIMIT_UNLIMITED,
 		Poco::UInt32 position = 0, bool bulk = false);
 		/// Creates the AbstractExtraction. A limit value equal to EXTRACT_UNLIMITED (0xffffffffu) 
 		/// means that we extract as much data as possible during one execute.
@@ -153,6 +153,11 @@ public:
 		/// - string is empty 
 		/// - getEmptyStringIsNull() returns true
 
+	const std::string& type() const
+	{
+		return _type;
+	}
+
 private:
 	template <typename S>
 	bool isStringNull(const S& str, bool deflt)
@@ -165,6 +170,7 @@ private:
 		return deflt;
 	}
 
+	std::string _type;
 	ExtractorPtr _pExtractor;
 	Poco::UInt32 _limit;
 	Poco::UInt32 _position;
@@ -176,11 +182,6 @@ private:
 
 typedef std::vector<AbstractExtraction::Ptr> AbstractExtractionVec;
 typedef std::vector<AbstractExtractionVec>   AbstractExtractionVecVec;
-typedef std::deque<AbstractExtraction::Ptr>  AbstractExtractionDeq;
-typedef std::vector<AbstractExtractionDeq>   AbstractExtractionDeqVec;
-typedef std::list<AbstractExtraction::Ptr>   AbstractExtractionLst;
-typedef std::vector<AbstractExtractionLst>   AbstractExtractionLstVec;
-
 
 //
 // inlines

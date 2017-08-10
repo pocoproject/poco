@@ -201,7 +201,7 @@ complete access to an XML
 document, using a tree-style object hierarchy. For this to work, the DOM
 parser provided by POCO has to load the entire document into memory. To
 reduce the memory footprint of the DOM document, the POCO DOM
-implementation uses string pooling, storing frequently occuring strings
+implementation uses string pooling, storing frequently occurring strings
 such as element and attribute names only once. The XML library is based
 on the Expat open source XML parser library (http://www.libexpat.org). 
 Built on top of Expat

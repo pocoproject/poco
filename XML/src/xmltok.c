@@ -6,12 +6,6 @@
 
 #ifdef EXPAT_WIN32
 #include "winconfig.h"
-#elif defined(MACOS_CLASSIC)
-#include "macconfig.h"
-#elif defined(__amigaos__)
-#include "amigaconfig.h"
-#elif defined(__WATCOMC__)
-#include "watcomconfig.h"
 #else
 #ifdef HAVE_EXPAT_CONFIG_H
 #include "expat_config.h"
@@ -369,24 +363,24 @@ utf8_toUtf8(const ENCODING *UNUSED_P(enc),
             const char **fromP, const char *fromLim,
             char **toP, const char *toLim)
 {
-  enum XML_Convert_Result res = XML_CONVERT_COMPLETED;
   char *to;
   const char *from;
-  if (fromLim - *fromP > toLim - *toP) {
-    /* Avoid copying partial characters. */
-    res = XML_CONVERT_OUTPUT_EXHAUSTED;
-    fromLim = *fromP + (toLim - *toP);
-    align_limit_to_full_utf8_characters(*fromP, &fromLim);
-  }
+  const char *fromLimInitial = fromLim;
+
+  /* Avoid copying partial characters. */
+  align_limit_to_full_utf8_characters(*fromP, &fromLim);
+
   for (to = *toP, from = *fromP; (from < fromLim) && (to < toLim); from++, to++)
     *to = *from;
   *fromP = from;
   *toP = to;
 
-  if ((to == toLim) && (from < fromLim))
+  if (fromLim < fromLimInitial)
+    return XML_CONVERT_INPUT_INCOMPLETE;
+  else if ((to == toLim) && (from < fromLim))
     return XML_CONVERT_OUTPUT_EXHAUSTED;
   else
-    return res;
+    return XML_CONVERT_COMPLETED;
 }
 
 static enum XML_Convert_Result PTRCALL
@@ -402,7 +396,7 @@ utf8_toUtf16(const ENCODING *enc,
     case BT_LEAD2:
       if (fromLim - from < 2) {
         res = XML_CONVERT_INPUT_INCOMPLETE;
-        break;
+        goto after;
       }
       *to++ = (unsigned short)(((from[0] & 0x1f) << 6) | (from[1] & 0x3f));
       from += 2;
@@ -410,7 +404,7 @@ utf8_toUtf16(const ENCODING *enc,
     case BT_LEAD3:
       if (fromLim - from < 3) {
         res = XML_CONVERT_INPUT_INCOMPLETE;
-        break;
+        goto after;
       }
       *to++ = (unsigned short)(((from[0] & 0xf) << 12)
                                | ((from[1] & 0x3f) << 6) | (from[2] & 0x3f));
@@ -441,6 +435,8 @@ utf8_toUtf16(const ENCODING *enc,
       break;
     }
   }
+  if (from < fromLim)
+    res = XML_CONVERT_OUTPUT_EXHAUSTED;
 after:
   *fromP = from;
   *toP = to;
@@ -1023,7 +1019,11 @@ streqci(const char *s1, const char *s2)
     if (ASCII_a <= c1 && c1 <= ASCII_z)
       c1 += ASCII_A - ASCII_a;
     if (ASCII_a <= c2 && c2 <= ASCII_z)
-      c2 += ASCII_A - ASCII_a;
+      /* The following line will never get executed.  streqci() is
+       * only called from two places, both of which guarantee to put
+       * upper-case strings into s2.
+       */
+      c2 += ASCII_A - ASCII_a; /* LCOV_EXCL_LINE */
     if (c1 != c2)
       return 0;
     if (!c1)
@@ -1295,7 +1295,7 @@ XmlUtf8Encode(int c, char *buf)
   };
 
   if (c < 0)
-    return 0;
+    return 0; /* LCOV_EXCL_LINE: this case is always eliminated beforehand */
   if (c < min2) {
     buf[0] = (char)(c | UTF8_cval1);
     return 1;
@@ -1318,7 +1318,7 @@ XmlUtf8Encode(int c, char *buf)
     buf[3] = (char)((c & 0x3f) | 0x80);
     return 4;
   }
-  return 0;
+  return 0; /* LCOV_EXCL_LINE: this case too is eliminated before calling */
 }
 
 int FASTCALL
@@ -1468,6 +1468,9 @@ XmlInitUnknownEncoding(void *mem,
     }
     else if (c < 0) {
       if (c < -4)
+        return 0;
+      /* Multi-byte sequences need a converter function */
+      if (!convert)
         return 0;
       e->normal.type[i] = (unsigned char)(BT_LEAD2 - (c + 2));
       e->utf8[i][0] = 0;

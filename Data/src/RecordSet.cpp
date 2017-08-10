@@ -89,7 +89,7 @@ RecordSet::~RecordSet()
 }
 
 
-void RecordSet::reset(const Statement& stmt)
+RecordSet& RecordSet::reset(const Statement& stmt)
 {
 	delete _pBegin;
 	_pBegin = 0;
@@ -107,6 +107,8 @@ void RecordSet::reset(const Statement& stmt)
 
 	_pBegin = new RowIterator(this, 0 == rowsExtracted());
 	_pEnd = new RowIterator(this, true);
+
+	return *this;
 }
 
 
