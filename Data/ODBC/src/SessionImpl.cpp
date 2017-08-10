@@ -406,7 +406,8 @@ void SessionImpl::close()
 	SQLINTEGER nativeErrorCode;
 	SQLSMALLINT sqlErrorMessageLength;
 	unsigned int retryCount = 10;
-	do {
+	do
+	{
 		SQLRETURN rc = SQLDisconnect(_db);
 		if (SQL_SUCCESS != rc && SQL_SUCCESS_WITH_INFO != rc)
 		{
@@ -430,10 +431,11 @@ void SessionImpl::close()
 		{
 			return;
 		}
-	} while(retryCount > 0);
+	}
+	while(retryCount > 0);
 		
-	throw ODBCException(nativeErrorCode);
-			(std::string(reinterpret_cast<const char *>(sqlErrorMessage)), nativeErrorCode);
+	throw ODBCException
+		(std::string(reinterpret_cast<const char *>(sqlErrorMessage)), nativeErrorCode);
 }
 
 
