@@ -99,8 +99,8 @@ environment:
 #    - builder: cmake
 #      vsver: 120
 
-    - builder: cmake
-      vsver: 140
+#    - builder: cmake
+#      vsver: 140
 
     - builder: cygwin
 
@@ -396,7 +396,7 @@ build_script:
 # Don't build Cygwin64 with std=c++14 until this issue be fixed https://gcc.gnu.org/bugzilla/show_bug.cgi?id=77441
 # -------------------------------------------------------------------------------------------
   - ps: |
-      if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
+      if ($env:builder -eq "cygwin")
       {
           $LastExitCode=0;
           $cmd='bash.exe configure --everything';iex "& $cmd"
@@ -484,7 +484,7 @@ test_script:
       $line='-------------------------------------------------------------------------------------';
       if ($env:configuration -eq "release")
       {
-        if (($env:builder -eq "cygwin") -and ($env:platform -eq "Win32"))
+        if ($env:builder -eq "cygwin")
         {
           $LastExitCode=0;
           if ($env:platform -eq "Win32")
