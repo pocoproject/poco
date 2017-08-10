@@ -22,7 +22,7 @@ namespace Poco {
 namespace XML {
 
 
-EventException::EventException(int exceptionCode):
+EventException::EventException(int code):
 	XMLException("Unspecified event type")
 {
 }
