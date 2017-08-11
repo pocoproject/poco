@@ -64,6 +64,8 @@ protected:
 	static bool namesAreEqual(const Node* pNode1, const Node* pNode2, const NSMap* pNSMap);
 	static bool namesAreEqual(const Node* pNode, const XMLString& name, const NSMap* pNSMap);
 
+	static const XMLString WILDCARD;
+
 private:
 	AbstractNode* _pFirstChild;
 
