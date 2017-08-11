@@ -19,9 +19,7 @@
 #include "Poco/FunctionDelegate.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
-#if defined(POCO_ENABLE_CPP11)
 #include "Poco/StdFunctionDelegate.h"
-#endif // defined(POCO_ENABLE_CPP11)
 
 
 using namespace Poco;
@@ -320,7 +318,6 @@ void BasicEventTest::testAsyncNotify()
 	assert (_count == LARGEINC);
 }
 
-#if defined(POCO_ENABLE_CPP11)
 
 void BasicEventTest::testLambda()
 {
@@ -335,8 +332,6 @@ void BasicEventTest::testLambda()
 	Simple -= f;
 	assert(Simple.empty());
 }
-
-#endif // defined(POCO_ENABLE_CPP11)
 
 
 void BasicEventTest::onStaticVoid(const void* pSender)
@@ -458,8 +453,6 @@ CppUnit::Test* BasicEventTest::suite()
 	CppUnit_addTest(pSuite, BasicEventTest, testOverwriteDelegate);
 	CppUnit_addTest(pSuite, BasicEventTest, testAsyncNotify);
 	CppUnit_addTest(pSuite, BasicEventTest, testNullMutex);
-#if defined(POCO_ENABLE_CPP11)
 	CppUnit_addTest(pSuite, BasicEventTest, testLambda);
-#endif // defined(POCO_ENABLE_CPP11)
 	return pSuite;
 }

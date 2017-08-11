@@ -71,10 +71,8 @@ public:
 	Array(const Array& copy);
 		/// Creates an Array by copying another one.
 
-#ifdef POCO_ENABLE_CPP11
 	Array(Array&& other);
 		/// Move constructor
-#endif // POCO_ENABLE_CPP11
 
 	virtual ~Array();
 		/// Destroys the Array.
@@ -177,15 +175,11 @@ public:
 	void clear();
 		/// Clears the contents of the array.
 
-#ifdef POCO_ENABLE_CPP11
-
 	Array &operator =(const Array &other);
 		// Assignment operator
 
 	Array &operator =(Array &&other);
 		// Move operator
-
-#endif  // POCO_ENABLE_CPP11
 
 private:
 	typedef SharedPtr<Poco::Dynamic::Array> ArrayPtr;

@@ -88,7 +88,6 @@ Message::Message(const Message& msg):
 }
 
 
-#ifdef POCO_ENABLE_CPP11
 Message::Message(Message&& msg) :
 	_source(std::move(msg._source)),
 	_text(std::move(msg._text)),
@@ -103,7 +102,6 @@ Message::Message(Message&& msg) :
 	_pMap = msg._pMap;
 	msg._pMap = nullptr;
 }
-#endif // POCO_ENABLE_CPP11
 
 
 Message::Message(const Message& msg, const std::string& text):
@@ -157,7 +155,6 @@ Message& Message::operator = (const Message& msg)
 }
 
 
-#ifdef POCO_ENABLE_CPP11
 Message& Message::operator = (Message&& msg)
 {
 	if (&msg != this)
@@ -177,7 +174,6 @@ Message& Message::operator = (Message&& msg)
 	}
 	return *this;
 }
-#endif // POCO_ENABLE_CPP11
 
 
 void Message::swap(Message& msg)

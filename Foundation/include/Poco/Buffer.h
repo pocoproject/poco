@@ -108,7 +108,6 @@ public:
 		return *this;
 	}
 
-#ifdef POCO_ENABLE_CPP11
 	Buffer(Buffer&& other) :
 		/// Copy constructor.
 		_capacity(other._capacity),
@@ -140,7 +139,6 @@ public:
 
 		return *this;
 	}
-#endif
 
 	~Buffer()
 		/// Destroys the Buffer.

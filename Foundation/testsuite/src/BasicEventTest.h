@@ -46,9 +46,7 @@ public:
 	void testOverwriteDelegate();
 	void testAsyncNotify();
 	void testNullMutex();
-#if defined(POCO_ENABLE_CPP11)
 	void testLambda();
-#endif // defined(POCO_ENABLE_CPP11)
 
 	void setUp();
 	void tearDown();

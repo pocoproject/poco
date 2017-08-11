@@ -32,9 +32,9 @@
 #include "VarTest.h"
 #include "FormatTest.h"
 #include "TuplesTest.h"
-#ifndef POCO_VXWORKS
-#include "NamedTuplesTest.h"
-#endif
+//#ifndef POCO_VXWORKS
+//#include "NamedTuplesTest.h"
+//#endif
 #include "TypeListTest.h"
 #include "ObjectPoolTest.h"
 #include "ListMapTest.h"
@@ -66,7 +66,7 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(FormatTest::suite());
 	pSuite->addTest(TuplesTest::suite());
 #ifndef POCO_VXWORKS
-	pSuite->addTest(NamedTuplesTest::suite());
+	//pSuite->addTest(NamedTuplesTest::suite());
 #endif
 	pSuite->addTest(TypeListTest::suite());
 	pSuite->addTest(ObjectPoolTest::suite());

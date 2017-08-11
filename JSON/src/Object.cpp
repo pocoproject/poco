@@ -48,7 +48,6 @@ Object::Object(const Object& copy) : _values(copy._values),
 }
 
 
-#ifdef POCO_ENABLE_CPP11
 Object::Object(Object&& other) :
 	_values(std::move(other._values)),
 	_keys(std::move(other._keys)),
@@ -56,7 +55,6 @@ Object::Object(Object&& other) :
 	_pStruct(0)
 {
 }
-#endif // POCO_ENABLE_CPP11
 
 
 Object::~Object()
@@ -215,9 +213,6 @@ void Object::clear()
 }
 
 
-#ifdef POCO_ENABLE_CPP11
-
-
 Object &Object::operator =(const Object &other)
 {
 	if (&other != this)
@@ -242,9 +237,6 @@ Object &Object::operator = (Object &&other)
 	}
 	return *this;
 }
-
-
-#endif // POCO_ENABLE_CPP11
 
 
 } } // namespace Poco::JSON
