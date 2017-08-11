@@ -1,28 +1,27 @@
-project(":PageCompiler") {
-	model {
-		components {
-			PageCompiler(NativeExecutableSpec) {
-				sources {
-					cpp {
-						source {
-							srcDir 'src'
-							include '**/*.cpp'
-						}
-						exportedHeaders {
-							srcDir 'include'
-						}
-						lib project: ':Net', library: 'Net'
-						lib project: ':Util', library: 'Util'
-						lib project: ':Foundation', library: 'Foundation'
+model {
+	components {
+		PageCompiler(NativeExecutableSpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
 					}
+					exportedHeaders {
+						srcDir 'include'
+					}
+					lib project: ':Net', library: 'Net'
+					lib project: ':Util', library: 'Util'
+					lib project: ':Foundation', library: 'Foundation'
 				}
-				binaries.withType(NativeExecutableSpec) {
-					lib project: ':Net', library: 'Net', linkage: 'shared'
-					lib project: ':Util', library: 'Util', linkage: 'shared'
-					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
-				}
+			}
+			binaries.withType(NativeExecutableSpec) {
+				lib project: ':Net', library: 'Net', linkage: 'shared'
+				lib project: ':Util', library: 'Util', linkage: 'shared'
+				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			}
 		}
 	}
 }
+
 

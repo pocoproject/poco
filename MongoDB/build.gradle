@@ -1,35 +1,40 @@
-project(":MongoDB") {
-	model {
-		components {
-			MongoDB(NativeLibrarySpec) {
-				sources {
-					cpp {
-						source {
-							srcDir 'src'
-							include '**/*.cpp'
-						}
-						exportedHeaders {
-							srcDir 'include'
-						}
+model {
+	components {
+		MongoDB(NativeLibrarySpec) {
+			sources {
+				rc {
+					source {
+						srcDir '..'
+						include 'DLLVersion.rc'
+					}
+				}
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+					}
+					exportedHeaders {
+						srcDir 'include'
 					}
 				}
 			}
 		}
-		binaries {
-			all {
+	}
+	binaries {
+		all {
+		}
+		withType(SharedLibraryBinarySpec) {
+			lib project: ':Net', library: 'Net', linkage: 'shared'
+			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+			if (toolChain in VisualCpp) {
+				 cppCompiler.define "MongoDB_EXPORTS"
 			}
-			withType(SharedLibraryBinarySpec) {
-				lib project: ':Net', library: 'Net', linkage: 'shared'
-				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
-				if (toolChain in VisualCpp) {
-					 cppCompiler.define "MongoDB_EXPORTS"
-				}
-			}
-			withType(StaticLibraryBinarySpec) {
-				lib project: ':Net', library: 'Net', linkage: 'static'
-				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
-			}
+		}
+		withType(StaticLibraryBinarySpec) {
+			lib project: ':Net', library: 'Net', linkage: 'static'
+			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }
+
 

@@ -208,7 +208,6 @@ subprojects {
 
 		binaries {
 			all {
-				
 				if (flavor != flavors.bundled) {
 					cCompiler.define 'POCO_UNBUNDLED'
 					cppCompiler.define 'POCO_UNBUNDLED'
@@ -305,68 +304,4 @@ subprojects {
     }
 }
 
-/*
-	def addCompilerFlag = { NativeBinarySpec binary, String flag ->
-        if (binary.hasProperty("cppCompiler")) {
-            binary.cppCompiler.args flag
-        }
-        if (binary.hasProperty("cCompiler")) {
-            binary.cCompiler.args flag
-        }
-    }
-    
-    def addCompilerDefine = { NativeBinarySpec binary, String define, String value ->
-        if (binary.hasProperty("cppCompiler")) {
-            binary.cppCompiler.define define, value
-        }
-        if (binary.hasProperty("cCompiler")) {
-            binary.cCompiler.define define, value
-        }
-    }
 
-class BinaryCollectorPlugin extends RuleSource {
-	@Mutate
-	public void createCollectBinariesTask(ModelMap<Task> tasks, @Path("binaries") ModelMap<NativeBinarySpec> binaries) {
-        tasks.create('collectBinaries', Copy) { task ->
-            binaries.each { binary ->
-                task.dependsOn binary.buildTask
-                
-                String buildType = binary.buildType.name
- 				destinationDir = project.rootProject.rootDir
-
-               if (binary instanceof NativeExecutableBinarySpec) {
-                    addBinary(task, binary.file, buildType, 'bin')
-                } else if (binary instanceof SharedLibraryBinarySpec) {
-                    addBinary(task, binary.sharedLibraryFile, buildType, 'bin')
-				} else if (binary instanceof StaticLibraryBinarySpec) {
-                    addBinary(task, binary.staticLibraryFile, buildType, 'lib')
-				}
-            }
-        }
-    }
-    
-    private void addBinary(Copy task, File binaryFile, String buildType, String destinationDirectory) {
-        task.from(binaryFile) {
-            into destinationDirectory
-			System.err.println("Adding binary $binaryFile to $destinationDirectory");
-           
-            if (buildType == 'debug') {
-                rename { originalName ->
-                    int lastPeriod = originalName.lastIndexOf('.')
-                    
-                    if (lastPeriod < 0)
-                        return "Poco" + originalName
-                    else {
-                        String fileName = originalName.substring(0, lastPeriod)
-                        String extension = originalName.substring(lastPeriod + 1)
-                        
-                        return "Poco" + "${fileName}d.$extension"
-                    }
-                }
-            }
-        }
-    }
-}
-apply plugin: BinaryCollectorPlugin
-
-*/

@@ -3,6 +3,12 @@ project(":Net") {
 		components {
 			Net(NativeLibrarySpec) {
 				sources {
+					rc {
+						source {
+							srcDir '..'
+							include 'DLLVersion.rc'
+						}
+					}
 					cpp {
 						source {
 							srcDir 'src'

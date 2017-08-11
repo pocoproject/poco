@@ -2,6 +2,12 @@ model {
 	components {
 		DataSQLite(NativeLibrarySpec) {
 			sources {
+				rc {
+					source {
+						srcDir '../..'
+						include 'DLLVersion.rc'
+					}
+				}
 				c {
 					source {
 						srcDir 'src'

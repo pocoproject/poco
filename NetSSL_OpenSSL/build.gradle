@@ -1,7 +1,13 @@
 model {
 	components {
-		NetSSL_OpenSSL(NativeLibrarySpec) {
+		NetSSL(NativeLibrarySpec) {
 			sources {
+				rc {
+					source {
+						srcDir '..'
+						include 'DLLVersion.rc'
+					}
+				}
 				cpp {
 					source {
 						srcDir 'src'

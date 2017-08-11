@@ -1,48 +1,49 @@
-project(":Util") {
-	dependencies {
-//	   compile files(project(':Foundation').binaries['Foundation'].staticLibraryFile)
+model {
+	components {
+		Util(NativeLibrarySpec) {
+			sources {
+				rc {
+					source {
+						srcDir '..'
+						include 'DLLVersion.rc'
+					}
+				}
+				c {
+					source {
+						srcDir 'src'
+						include '**/*.c'
+					}
+					exportedHeaders {
+						srcDir 'include'
+					}
+				}
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+					}
+					exportedHeaders {
+						srcDir 'include'
+					}
+				}
+			}
+		}
 	}
-	model {
-		components {
-			Util(NativeLibrarySpec) {
-				sources {
-					c {
-						source {
-							srcDir 'src'
-							include '**/*.c'
-						}
-						exportedHeaders {
-							srcDir 'include'
-						}
-					}
-					cpp {
-						source {
-							srcDir 'src'
-							include '**/*.cpp'
-						}
-						exportedHeaders {
-							srcDir 'include'
-						}
-					}
-				}
+	binaries {
+		all {
+		}
+		withType(SharedLibraryBinarySpec) {
+			 lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+			 lib project: ':XML', library: 'XML', linkage: 'shared'
+			 lib project: ':JSON', library: 'JSON', linkage: 'shared'
+			if (toolChain in VisualCpp) {
+				 cppCompiler.define "Util_EXPORTS"
 			}
 		}
-		binaries {
-			all {
-			}
-			withType(SharedLibraryBinarySpec) {
-				 lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
-				 lib project: ':XML', library: 'XML', linkage: 'shared'
-				 lib project: ':JSON', library: 'JSON', linkage: 'shared'
-				if (toolChain in VisualCpp) {
-					 cppCompiler.define "Util_EXPORTS"
-				}
-			}
-			withType(StaticLibraryBinarySpec) {
-				 lib project: ':Foundation', library: 'Foundation', linkage: 'static'
-				 lib project: ':XML', library: 'XML', linkage: 'static'
-				 lib project: ':JSON', library: 'JSON', linkage: 'static'
-			 }
-		}
+		withType(StaticLibraryBinarySpec) {
+			 lib project: ':Foundation', library: 'Foundation', linkage: 'static'
+			 lib project: ':XML', library: 'XML', linkage: 'static'
+			 lib project: ':JSON', library: 'JSON', linkage: 'static'
+		 }
 	}
 }

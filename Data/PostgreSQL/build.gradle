@@ -22,6 +22,12 @@ model {
 	components {
 		DataPostgreSQL(NativeLibrarySpec) {
 			sources {
+				rc {
+					source {
+						srcDir '../..'
+						include 'DLLVersion.rc'
+					}
+				}
 				cpp {
 					source {
 						srcDir 'src'

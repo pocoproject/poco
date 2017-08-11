@@ -11,8 +11,8 @@ model {
 				}
 				rc {
 					source {
-						srcDir 'src'
-						include '**/*.rc'
+						srcDir '..'
+						include 'DLLVersion.rc'
 					}
 				}
 				c {
