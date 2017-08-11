@@ -84,6 +84,7 @@ subprojects {
 		}
 		repositories {
 			libs(PrebuiltLibraries) {
+				def  opensslHome = new File(rootDir, "openssl")
 				crypto {
 					headers.srcDir "$opensslHome/include"
 
