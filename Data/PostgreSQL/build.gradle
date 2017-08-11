@@ -4,17 +4,12 @@ model {
 			postgres {
 				headers.srcDir "$postgresHome/include"
 
+				binaries.withType(SharedLibraryBinary) {
+					sharedLibraryFile 		= file("$postgresHome/lib/libpq.dll")
+					sharedLibraryLinkFile 	= file("$postgresHome/lib/libpq.lib")
+				}
 				binaries.withType(StaticLibraryBinary) {
-					if (buildType == buildTypes.debug) {
-						def libName = targetPlatform.operatingSystem.windows ? 'libeay32MDd.lib' : 'libssl.a'
-						staticLibraryFile = file("$postgresHome/lib/libpq.lib")
-					} else
-					if (buildType == buildTypes.release) {
-						def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
-						staticLibraryFile = file("$postgresHome/lib/libpq.lib")
-					} else {
-						throw new GradleException("Unknown buildType")
-					}
+					staticLibraryFile 		= file("$postgresHome/lib/libpq.lib")
 				}
 			}
 		}
