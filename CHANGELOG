@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.7.8p4 (2017-08-11)
+Release 1.7.9 (2017-08-14)
 ============================
 
 - fixed GH #1813: xmlparse.cpp doesn't compile in WinCE (poco 1.7.8p3)
