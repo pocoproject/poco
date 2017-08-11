@@ -21,10 +21,10 @@ namespace Poco {
 namespace XML {
 
 
-ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, const XMLString& rTarget, const XMLString& rData): 
+ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, const XMLString& target, const XMLString& data): 
 	AbstractNode(pOwnerDocument),
-	_target(rTarget),
-	_data(rData)
+	_target(target),
+	_data(data)
 {
 }
 
@@ -42,9 +42,9 @@ ProcessingInstruction::~ProcessingInstruction()
 }
 
 
-void ProcessingInstruction::setData(const XMLString& rData)
+void ProcessingInstruction::setData(const XMLString& data)
 {
-	_data = rData;
+	_data = data;
 }
 
 
@@ -60,9 +60,9 @@ const XMLString& ProcessingInstruction::getNodeValue() const
 }
 
 
-void ProcessingInstruction::setNodeValue(const XMLString& rData)
+void ProcessingInstruction::setNodeValue(const XMLString& data)
 {
-	setData(rData);
+	setData(data);
 }
 
 
