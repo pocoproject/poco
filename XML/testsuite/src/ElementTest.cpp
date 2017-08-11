@@ -628,6 +628,9 @@ void ElementTest::testNodeByPath()
 			</elemC>
 			<elemC attr1="value2"/>
 		</elem2>
+		<elem2>
+			<elemB attr1="value4"/>
+		</elem2>
 	</root>
 	*/
 
@@ -643,6 +646,8 @@ void ElementTest::testNodeByPath()
 	AutoPtr<Element> pElem23 = pDoc->createElement("elemB");
 	AutoPtr<Element> pElem24 = pDoc->createElement("elemC");
 	AutoPtr<Element> pElem25 = pDoc->createElement("elemC");
+	AutoPtr<Element> pElem3  = pDoc->createElement("elem2");
+	AutoPtr<Element> pElem31 = pDoc->createElement("elemB");
 	
 	pElem21->setAttribute("attr1", "value1");
 	pElem22->setAttribute("attr1", "value2");
@@ -650,6 +655,8 @@ void ElementTest::testNodeByPath()
 	
 	pElem24->setAttribute("attr1", "value1");
 	pElem25->setAttribute("attr1", "value2");
+	
+	pElem31->setAttribute("attr1", "value4");
 	
 	AutoPtr<Element> pElem241 = pDoc->createElement("elemC1");
 	AutoPtr<Element> pElem242 = pDoc->createElement("elemC2");
@@ -664,9 +671,12 @@ void ElementTest::testNodeByPath()
 	pElem2->appendChild(pElem23);
 	pElem2->appendChild(pElem24);
 	pElem2->appendChild(pElem25);
+	
+	pElem3->appendChild(pElem31);
 
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);	
+	pRoot->appendChild(pElem3);
 	
 	pDoc->appendChild(pRoot);
 	
@@ -734,12 +744,18 @@ void ElementTest::testNodeByPath()
 	assert (pNode == pElem23);
 
 	pNode = pDoc->getNodeByPath("//elemB[@attr1='value4']");
+	assert (pNode == pElem31);
+
+	pNode = pDoc->getNodeByPath("//elemB[@attr1='value5']");
 	assert (pNode == 0);
 
 	pNode = pDoc->getNodeByPath("//[@attr1='value1']");
 	assert (pNode == pElem21);
 
 	pNode = pDoc->getNodeByPath("//[@attr1='value2']");
+	assert (pNode == pElem22);
+
+	pNode = pRoot->getNodeByPath("/elem2/*[@attr1='value2']");
 	assert (pNode == pElem22);
 }
 
@@ -762,6 +778,9 @@ void ElementTest::testNodeByPathNS()
 			</ns2:elemC>
 			<ns2:elemC ns2:attr1="value2" xmlns:ns2="urn:ns2"/>
 		</ns1:elem2>
+		<ns1:elem2>
+			<ns2:elemB ns2:attr1="value4" xmlns:ns2="urn:ns2"/>
+		</ns1:elem2>
 	</ns1:root>	
 	*/
 	AutoPtr<Document> pDoc   = new Document;
@@ -776,10 +795,13 @@ void ElementTest::testNodeByPathNS()
 	AutoPtr<Element> pElem23 = pDoc->createElementNS("urn:ns2", "ns2:elemB");
 	AutoPtr<Element> pElem24 = pDoc->createElementNS("urn:ns2", "ns2:elemC");
 	AutoPtr<Element> pElem25 = pDoc->createElementNS("urn:ns2", "ns2:elemC");
+	AutoPtr<Element> pElem3  = pDoc->createElementNS("urn:ns1", "ns1:elem2");
+	AutoPtr<Element> pElem31 = pDoc->createElementNS("urn:ns2", "ns2:elemB");
 	
 	pElem21->setAttributeNS("urn:ns2", "ns2:attr1", "value1");
 	pElem22->setAttributeNS("urn:ns2", "ns2:attr1", "value2");
 	pElem23->setAttributeNS("urn:ns2", "ns2:attr1", "value3");
+	pElem31->setAttributeNS("urn:ns2", "ns2:attr1", "value4");
 	
 	pElem24->setAttributeNS("urn:ns2", "ns2:attr1", "value1");
 	pElem25->setAttributeNS("urn:ns2", "ns2:attr1", "value2");
@@ -797,9 +819,11 @@ void ElementTest::testNodeByPathNS()
 	pElem2->appendChild(pElem23);
 	pElem2->appendChild(pElem24);
 	pElem2->appendChild(pElem25);
+	pElem3->appendChild(pElem31);
 
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);	
+	pRoot->appendChild(pElem3);
 
 	pDoc->appendChild(pRoot);
 	
@@ -874,6 +898,9 @@ void ElementTest::testNodeByPathNS()
 	assert (pNode == pElem23);
 
 	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value4']", nsMap);
+	assert (pNode == pElem31);
+
+	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value5']", nsMap);
 	assert (pNode == 0);
 
 	pNode = pDoc->getNodeByPathNS("//[@NS2:attr1='value1']", nsMap);
@@ -881,6 +908,15 @@ void ElementTest::testNodeByPathNS()
 	
 	pNode = pDoc->getNodeByPathNS("//[@NS2:attr1='value2']", nsMap);
 	assert (pNode == pElem22);
+	
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/*[@NS2:attr1='value2']", nsMap);
+	assert (pNode == pElem22);
+
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:*[@NS2:attr1='value2']", nsMap);
+	assert (pNode == pElem22);
+
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns1:*[@NS2:attr1='value2']", nsMap);
+	assert (pNode == 0);
 }
 
 
