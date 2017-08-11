@@ -401,7 +401,41 @@ void SessionImpl::close()
 	{
 	}
 
-	SQLDisconnect(_db);
+	SQLCHAR sqlState[5+1];
+	SQLCHAR sqlErrorMessage[SQL_MAX_MESSAGE_LENGTH];
+	SQLINTEGER nativeErrorCode;
+	SQLSMALLINT sqlErrorMessageLength;
+	unsigned int retryCount = 10;
+	do
+	{
+		SQLRETURN rc = SQLDisconnect(_db);
+		if (SQL_SUCCESS != rc && SQL_SUCCESS_WITH_INFO != rc)
+		{
+			SQLGetDiagRec(SQL_HANDLE_DBC, _db,
+							1,
+							sqlState,
+							&nativeErrorCode,
+							sqlErrorMessage, SQL_MAX_MESSAGE_LENGTH, &sqlErrorMessageLength);
+			if (std::string(reinterpret_cast<const char *>(sqlState)) == "25000"
+				|| std::string(reinterpret_cast<const char *>(sqlState)) == "25501")
+			{
+				--retryCount;
+				Poco::Thread::sleep(100);
+			}
+			else
+			{
+				break;
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+	while(retryCount > 0);
+		
+	throw ODBCException
+		(std::string(reinterpret_cast<const char *>(sqlErrorMessage)), nativeErrorCode);
 }
 
 
