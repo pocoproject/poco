@@ -8,6 +8,7 @@ Release 1.7.9 (2017-08-14)
 - fixed GH #1834: Visual Studio 2008 cannot find stdint.h
 - fixed GH #1842: Upgrade bundled expat to 2.2.3
 - fixed GH #1843: Use random salt for Poco::XML::NamePool
+- upgraded bundled SQLite to 3.20.0
 
 
 Release 1.7.8p3 (2017-06-22)
