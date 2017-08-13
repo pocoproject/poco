@@ -1,6 +1,6 @@
 model {
 	components {
-		NetSSL_Win(NativeLibrarySpec) {
+		NetSSLWin(NativeLibrarySpec) {
 			sources {
 				rc {
 					source {

@@ -1,7 +1,6 @@
 plugins {
 	id 'c'
 	id 'cpp'
-	id 'cunit-test-suite'
 	id 'cppunit-test-suite'
 	id 'windows-resources'
 	id 'windows-messages'
@@ -31,6 +30,20 @@ File prefixByPoco(File binaryFile) {
 	File parent = binaryFile.getParentFile()
 	return new File(parent, "Poco" + name);
 }
+File toLocalBin(File binaryFile, Platform platform) {
+	String name = binaryFile.getName()
+	File parent = new File("bin")
+	String target
+	if (platform.architecture.name == 'x86') {
+		target = 'bin'
+	} else
+	if (platform.architecture.name == 'x64') {
+		target = 'bin64'
+	} else {
+		throw new GradleException("Unknown architecture: " + platform)
+	}
+	return new File(parent, name);
+}
 File toBin(File sharedFile, Platform platform) {
 	String name = sharedFile.getName()
 	String target
@@ -49,10 +62,10 @@ File toLib(File linkFile, Platform platform) {
 	String name = linkFile.getName()
 	String target
 	if (platform.architecture.name == 'x86') {
-		target = 'bin' // 'lib'
+		target = 'lib'
 	} else
 	if (platform.architecture.name == 'x64') {
-		target = 'bin64' // 'lib64'
+		target = 'lib64'
 	} else {
 		throw new GradleException("Unknown architecture: " + platform)
 	}
@@ -65,13 +78,12 @@ File toStatic(File staticFile) {
 	return new File(parent, name);
 }
 allprojects {
-	buildDir = new File("buildgradle")	
+	buildDir = new File("gradle")	
 }
 subprojects {
 	apply plugin:	'c'
 	apply plugin:	'cpp'
 	apply plugin:	'visual-studio'
-	apply plugin:	'cunit-test-suite'
 	apply plugin:	'cppunit-test-suite'
  	apply plugin:	'windows-resources'
 	apply plugin:	'windows-messages'
@@ -84,6 +96,12 @@ subprojects {
 		}
 		repositories {
 			libs(PrebuiltLibraries) {
+				WS2_32 {
+					headers.srcDir 'C:/Program Files (x86)/Windows Kits/10/Include/10.0.15063.0/um'
+					binaries.withType(StaticLibraryBinary) {
+						staticLibraryFile = file('C:/Program Files (x86)/Windows Kits/10/Lib/10.0.15063.0/um/x86/WS2_32.lib')
+					}
+				}
 				def  opensslHome = new File(rootDir, "openssl")
 				crypto {
 					headers.srcDir "$opensslHome/include"
@@ -136,17 +154,40 @@ subprojects {
 		}
 		components {
 			withType(NativeComponentSpec) {
+				binaries.withType(NativeTestSuiteBinarySpec) {
+					if (buildType == buildTypes.debug) {
+						if (it instanceof NativeExecutableBinarySpec) {
+							executable.file = toLocalBin(appendDebugSuffix(executable.file), targetPlatform)
+						}
+					} else
+					if (buildType == buildTypes.release) {
+						if (it instanceof NativeExecutableBinarySpec) {
+							executable.file = toLocalBin(executable.file, targetPlatform)
+						} 
+					}
+				}
 				binaries.withType(NativeBinarySpec) {
 					if (buildType == buildTypes.debug) {
 						if (it instanceof SharedLibraryBinarySpec) {
 							sharedLibraryFile     = toBin(prefixByPoco(appendDebugSuffix(sharedLibraryFile)), targetPlatform)
 							sharedLibraryLinkFile = toLib(prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile)), targetPlatform)
+						    // WINDOWS ONLY
+    						linker.args "/implib:${sharedLibraryLinkFile}"  // For MSVC only
+							// use the following for MinGW
+    						// linker.args "-Wl,--out-implib,${sharedLibraryLinkFile}"
+							// This next part is simply to ensure the directory is created as the compiler (tested on MSVC only) won't create it
+							def binary = it  // Simply to expose the binary in the `doFirst`
+							tasks.withType(LinkSharedLibrary) {
+								doFirst {
+									binary.sharedLibraryLinkFile.parentFile.mkdirs()
+								}
+							}
 						} else
 						if (it instanceof StaticLibraryBinarySpec) {
 							staticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(staticLibraryFile)))
 						} else
 						if (it instanceof NativeExecutableBinarySpec) {
-							executable.file = toBin(appendDebugSuffix(executable.file), targetPlatform)
+//							executable.file = toBin(appendDebugSuffix(executable.file), targetPlatform)
 						} else {
 							throw new GradleException("Unknown native library binary")
 						}
@@ -155,12 +196,23 @@ subprojects {
 						if (it instanceof SharedLibraryBinarySpec) {
 							sharedLibraryFile = toBin(prefixByPoco(sharedLibraryFile), targetPlatform)
 							sharedLibraryLinkFile = toLib(prefixByPoco(sharedLibraryLinkFile), targetPlatform)
+						    // WINDOWS ONLY
+    						linker.args "/implib:${sharedLibraryLinkFile}"  // For MSVC only
+							// use the following for MinGW
+    						// linker.args "-Wl,--out-implib,${sharedLibraryLinkFile}"
+							// This next part is simply to ensure the directory is created as the compiler (tested on MSVC only) won't create it
+							def binary = it  // Simply to expose the binary in the `doFirst`
+							tasks.withType(LinkSharedLibrary) {
+								doFirst {
+									binary.sharedLibraryLinkFile.parentFile.mkdirs()
+								}
+							}
 						} else
 						if (it instanceof StaticLibraryBinarySpec) {
 							staticLibraryFile = toStatic(prefixByPoco(staticLibraryFile))
 						} else
 						if (it instanceof NativeExecutableBinarySpec) {
-							executable.file = toBin(executable.file, targetPlatform)
+//							executable.file = toBin(executable.file, targetPlatform)
 						} else {
 							throw new GradleException("Unknown native library binary")
 						} 

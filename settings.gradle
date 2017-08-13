@@ -1,6 +1,7 @@
 println 'This is executed during the initialization phase.'
+rootProject.name = 'Poco'
+
 include ':CppUnit'
-//include ':CppUnit/WinTestRunner'
 include ':Foundation'
 include ':XML'
 include ':JSON'
@@ -52,4 +53,3 @@ include ':Util:samples'
 include ':XML:samples'
 include ':Zip:samples'
 
-rootProject.name = 'Poco'

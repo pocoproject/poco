@@ -1,14 +1,58 @@
 model {
 	components {
-		TestApp(NativeLibrarySpec) {
-			sources {
-				cpp {
-					source {
-						srcDir 'src'
-						include 'TestApp.cpp'
+		withType(NativeComponentSpec) {
+			binaries.withType(NativeBinarySpec) {
+				if (buildType == buildTypes.debug) {
+					if (it instanceof SharedLibraryBinarySpec) {
+						sharedLibraryFile     = toLocalBin(prefixByPoco(appendDebugSuffix(sharedLibraryFile)), targetPlatform)
+						sharedLibraryLinkFile = toLocalBin(prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile)), targetPlatform)
+						// WINDOWS ONLY
+						linker.args "/implib:${sharedLibraryLinkFile}"  // For MSVC only
+						// use the following for MinGW
+						// linker.args "-Wl,--out-implib,${sharedLibraryLinkFile}"
+						// This next part is simply to ensure the directory is created as the compiler (tested on MSVC only) won't create it
+						def binary = it  // Simply to expose the binary in the `doFirst`
+						tasks.withType(LinkSharedLibrary) {
+							doFirst {
+								binary.sharedLibraryLinkFile.parentFile.mkdirs()
+							}
+						}
+					} else
+					if (it instanceof StaticLibraryBinarySpec) {
+						staticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(staticLibraryFile)))
+					} else
+					if (it instanceof NativeExecutableBinarySpec) {
+							executable.file = toLocalBin(appendDebugSuffix(executable.file), targetPlatform)
+					} else {
+						throw new GradleException("Unknown native library binary")
 					}
-					lib project: ':CppUnit', library: 'CppUnit'
-					lib project: ':Foundation', library: 'Foundation'
+				} else
+				if (buildType == buildTypes.release) {
+					if (it instanceof SharedLibraryBinarySpec) {
+						sharedLibraryFile = toLocalBin(prefixByPoco(sharedLibraryFile), targetPlatform)
+						sharedLibraryLinkFile = toLocalBin(prefixByPoco(sharedLibraryLinkFile), targetPlatform)
+						// WINDOWS ONLY
+						linker.args "/implib:${sharedLibraryLinkFile}"  // For MSVC only
+						// use the following for MinGW
+						// linker.args "-Wl,--out-implib,${sharedLibraryLinkFile}"
+						// This next part is simply to ensure the directory is created as the compiler (tested on MSVC only) won't create it
+						def binary = it  // Simply to expose the binary in the `doFirst`
+						tasks.withType(LinkSharedLibrary) {
+							doFirst {
+								binary.sharedLibraryLinkFile.parentFile.mkdirs()
+							}
+						}
+					} else
+					if (it instanceof StaticLibraryBinarySpec) {
+						staticLibraryFile = toStatic(prefixByPoco(staticLibraryFile))
+					} else
+					if (it instanceof NativeExecutableBinarySpec) {
+							executable.file = toLocalBin(executable.file, targetPlatform)
+					} else {
+						throw new GradleException("Unknown native library binary")
+					} 
+				} else {
+					throw new GradleException("Unknown buildType" + buildType)
 				}
 			}
 		}
@@ -20,44 +64,46 @@ model {
 						include 'TestLibrary.cpp'
 						include 'TestPlugin.cpp'
 					}
-					lib project: ':CppUnit', library: 'CppUnit'
-					lib project: ':Foundation', library: 'Foundation'
+					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				}
 			}
 		}
-		FoundationTestRunner(NativeLibrarySpec) {
+		TestApp(NativeExecutableSpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include 'TestApp.cpp'
+					}
+					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+					lib library: 'TestLib', linkage: 'shared'
+				}
+			}
+		}
+		TestSuite(NativeExecutableSpec) {
 			sources {
 				cpp {
 					source {
 						srcDir 'src'
 						include '**/*.cpp'
-						exclude 'WinDriver.cpp'
+						exclude 'Win*Driver.cpp'
 						exclude '*_WINCE.cpp'
 						exclude 'TestApp*.cpp'
-						exclude 'Driver.cpp'
 					}
 					exportedHeaders {
 						srcDir 'src'
 					}
-					lib project: ':CppUnit', library: 'CppUnit'
-					lib project: ':Foundation', library: 'Foundation'
+					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				}
 			}
 		}
 	}
 	testSuites {
 		FoundationTestSuite(CppUnitTestSuiteSpec) {
-			testing $.components.FoundationTestRunner 
-		}
-	}
-	binaries {
-		withType(NativeExecutableSpec) {
-			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
-		}
-		withType(CppUnitTestSuiteBinarySpec) {
-			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+			testing $.components.TestSuite 
 		}
 	}
 

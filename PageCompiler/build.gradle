@@ -1,6 +1,6 @@
 model {
 	components {
-		PageCompiler(NativeExecutableSpec) {
+		cpspc(NativeExecutableSpec) {
 			sources {
 				cpp {
 					source {
@@ -10,15 +10,10 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
-					lib project: ':Net', library: 'Net'
-					lib project: ':Util', library: 'Util'
-					lib project: ':Foundation', library: 'Foundation'
+					lib project: ':Net', library: 'Net', linkage: 'shared'
+					lib project: ':Util', library: 'Util', linkage: 'shared'
+					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				}
-			}
-			binaries.withType(NativeExecutableSpec) {
-				lib project: ':Net', library: 'Net', linkage: 'shared'
-				lib project: ':Util', library: 'Util', linkage: 'shared'
-				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			}
 		}
 	}

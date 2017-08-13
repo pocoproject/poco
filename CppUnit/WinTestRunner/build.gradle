@@ -1,7 +1,7 @@
 project(":CppUnit/WinTestRunner") {
 	model {
 		components {
-			PocoWinTestRunner(NativeLibrarySpec) {
+			PocoWinTestRunner(NativeExecutableSpec) {
 				sources {
 					cpp {
 						source {
