@@ -3,56 +3,14 @@ model {
 		withType(NativeComponentSpec) {
 			binaries.withType(NativeBinarySpec) {
 				if (buildType == buildTypes.debug) {
-					if (it instanceof SharedLibraryBinarySpec) {
-						sharedLibraryFile     = toLocalBin(prefixByPoco(appendDebugSuffix(sharedLibraryFile)), targetPlatform)
-						sharedLibraryLinkFile = toLocalBin(prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile)), targetPlatform)
-						// WINDOWS ONLY
-						linker.args "/implib:${sharedLibraryLinkFile}"  // For MSVC only
-						// use the following for MinGW
-						// linker.args "-Wl,--out-implib,${sharedLibraryLinkFile}"
-						// This next part is simply to ensure the directory is created as the compiler (tested on MSVC only) won't create it
-						def binary = it  // Simply to expose the binary in the `doFirst`
-						tasks.withType(LinkSharedLibrary) {
-							doFirst {
-								binary.sharedLibraryLinkFile.parentFile.mkdirs()
-							}
-						}
-					} else
-					if (it instanceof StaticLibraryBinarySpec) {
-						staticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(staticLibraryFile)))
-					} else
 					if (it instanceof NativeExecutableBinarySpec) {
-							executable.file = toLocalBin(appendDebugSuffix(executable.file), targetPlatform)
-					} else {
-						throw new GradleException("Unknown native library binary")
+						executable.file = toLocalBin(appendDebugSuffix(executable.file), targetPlatform)
 					}
 				} else
 				if (buildType == buildTypes.release) {
-					if (it instanceof SharedLibraryBinarySpec) {
-						sharedLibraryFile = toLocalBin(prefixByPoco(sharedLibraryFile), targetPlatform)
-						sharedLibraryLinkFile = toLocalBin(prefixByPoco(sharedLibraryLinkFile), targetPlatform)
-						// WINDOWS ONLY
-						linker.args "/implib:${sharedLibraryLinkFile}"  // For MSVC only
-						// use the following for MinGW
-						// linker.args "-Wl,--out-implib,${sharedLibraryLinkFile}"
-						// This next part is simply to ensure the directory is created as the compiler (tested on MSVC only) won't create it
-						def binary = it  // Simply to expose the binary in the `doFirst`
-						tasks.withType(LinkSharedLibrary) {
-							doFirst {
-								binary.sharedLibraryLinkFile.parentFile.mkdirs()
-							}
-						}
-					} else
-					if (it instanceof StaticLibraryBinarySpec) {
-						staticLibraryFile = toStatic(prefixByPoco(staticLibraryFile))
-					} else
 					if (it instanceof NativeExecutableBinarySpec) {
-							executable.file = toLocalBin(executable.file, targetPlatform)
-					} else {
-						throw new GradleException("Unknown native library binary")
+						executable.file = toLocalBin(executable.file, targetPlatform)
 					} 
-				} else {
-					throw new GradleException("Unknown buildType" + buildType)
 				}
 			}
 		}
