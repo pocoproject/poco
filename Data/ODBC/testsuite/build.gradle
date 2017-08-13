@@ -1,0 +1,54 @@
+model {
+	components {
+		withType(NativeComponentSpec) {
+			binaries.withType(NativeBinarySpec) {
+				if (buildType == buildTypes.debug) {
+					if (it instanceof NativeExecutableBinarySpec) {
+						executable.file = toLocalBin(appendDebugSuffix(executable.file), targetPlatform)
+					}
+				} else
+				if (buildType == buildTypes.release) {
+					if (it instanceof NativeExecutableBinarySpec) {
+						executable.file = toLocalBin(executable.file, targetPlatform)
+					} 
+				}
+			}
+		}
+		TestSuite(NativeExecutableSpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+						exclude 'Win*Driver.cpp'
+					}
+					exportedHeaders {
+						srcDir 'src'
+					}
+					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+					lib project: ':Data:ODBC', library: 'DataODBC', linkage: 'shared'
+					lib project: ':Data', library: 'Data', linkage: 'shared'
+					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+				}
+			}
+		}
+	}
+	testSuites {
+		DataODBCTestSuite(CppUnitTestSuiteSpec) {
+			testing $.components.TestSuite 
+		}
+	}
+	binaries {
+		all {
+			if (toolChain in VisualCpp) {
+				linker.args 'odbc32.lib'
+				linker.args 'odbccp32.lib'
+			}
+		}
+	}
+}
+tasks.withType(RunTestExecutable) {
+	args "-print"
+}
+
+

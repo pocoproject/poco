@@ -1,0 +1,47 @@
+model {
+	components {
+		withType(NativeComponentSpec) {
+			binaries.withType(NativeBinarySpec) {
+				if (buildType == buildTypes.debug) {
+					if (it instanceof NativeExecutableBinarySpec) {
+						executable.file = toLocalBin(appendDebugSuffix(executable.file), targetPlatform)
+					}
+				} else
+				if (buildType == buildTypes.release) {
+					if (it instanceof NativeExecutableBinarySpec) {
+						executable.file = toLocalBin(executable.file, targetPlatform)
+					} 
+				}
+			}
+		}
+		TestSuite(NativeExecutableSpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+						exclude 'Win*Driver.cpp'
+					}
+					exportedHeaders {
+						srcDir 'src'
+					}
+					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+					lib project: ':Crypto', library: 'Crypto', linkage: 'shared'
+					lib library: 'ssl', linkage: 'static'
+					lib library: 'crypto', linkage: 'static'
+					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+				}
+			}
+		}
+	}
+	testSuites {
+		CryptoTestSuite(CppUnitTestSuiteSpec) {
+			testing $.components.TestSuite 
+		}
+	}
+}
+tasks.withType(RunTestExecutable) {
+	args "-print"
+}
+
+
