@@ -370,18 +370,18 @@ void PathTest::testParseUnix5()
 	assert (p[1] == "system32");
 	assert (p.isDirectory());
 	assert (!p.isFile());
-	assert (p.toString(Path::PATH_UNIX) == "/c:/windows/system32/");	
+	assert (p.toString(Path::PATH_UNIX) == "/c:/windows/system32/");
 }
 
 void PathTest::testExpandUnix()
 {
-	std::string pathWithOutVar = "/usr/share/O1\\$\\$/folder";
-	std::string pathWithVar = "${PWD}/folder";
+	std::string pathWithoutVar = "/usr/share/O1\\$\\$/folder";
+	std::string pathWithVar = "${TMPDIR}folder";
 	Path p;
-	std::string s = p.expand(pathWithOutVar);
+	std::string s = p.expand(pathWithoutVar);
 	assert (s == "/usr/share/O1$$/folder");
 	s = p.expand(pathWithVar);
-	Path tmpPath = Path::current();
+	Path tmpPath = Path::temp();
 	tmpPath.append("folder");
 	assert (s == tmpPath.toString());
 }
