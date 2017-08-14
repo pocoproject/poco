@@ -81,12 +81,10 @@ public:
 		if (_ptr) _ptr->duplicate();
 	}
 
-#ifdef POCO_ENABLE_CPP11
 	AutoPtr(AutoPtr&& ptr) : _ptr(std::move(ptr._ptr))
 	{
 		ptr._ptr = nullptr;
 	}
-#endif
 
 	template <class Other> 
 	AutoPtr(const AutoPtr<Other>& ptr): _ptr(const_cast<Other*>(ptr.get()))
@@ -98,7 +96,7 @@ public:
 	{
 		if (_ptr) _ptr->release();
 	}
-	
+
 	AutoPtr& assign(C* ptr)
 	{
 		if (_ptr != ptr)
@@ -119,7 +117,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	AutoPtr& assign(const AutoPtr& ptr)
 	{
 		if (&ptr != this)
@@ -130,7 +128,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	template <class Other> 
 	AutoPtr& assign(const AutoPtr<Other>& ptr)
 	{
@@ -152,26 +150,25 @@ public:
 	{
 		return assign(ptr);
 	}
-	
+
 	template <class Other> 
 	AutoPtr& operator = (const AutoPtr<Other>& ptr)
 	{
 		return assign<Other>(ptr);
 	}
 
-#ifdef POCO_ENABLE_CPP11
 	AutoPtr& operator = (AutoPtr&& ptr)
 	{
 		swap(ptr);
 		return *this;
 	}
-#endif
+
 
 	void swap(AutoPtr& ptr)
 	{
 		std::swap(_ptr, ptr._ptr);
 	}
-	
+
 	template <class Other> 
 	AutoPtr<Other> cast() const
 		/// Casts the AutoPtr via a dynamic cast to the given type.

@@ -80,6 +80,7 @@ public:
 
 	void close();
 		/// Closes the connection
+		/// Throws ODBCException if close was not successful.
 
 	bool isConnected();
 		/// Returns true if session is connected

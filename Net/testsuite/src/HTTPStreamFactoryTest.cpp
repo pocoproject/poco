@@ -46,11 +46,7 @@ void HTTPStreamFactoryTest::testNoRedirect()
 	HTTPStreamFactory factory;
 	URI uri("http://127.0.0.1/large");
 	uri.setPort(server.port());
-#if defined(POCO_ENABLE_CPP11)
 	std::unique_ptr<std::istream> pStr(factory.open(uri));
-#else
-	std::auto_ptr<std::istream> pStr(factory.open(uri));
-#endif
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
 	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
@@ -63,11 +59,7 @@ void HTTPStreamFactoryTest::testEmptyPath()
 	HTTPStreamFactory factory;
 	URI uri("http://127.0.0.1");
 	uri.setPort(server.port());
-#if defined(POCO_ENABLE_CPP11)
 	std::unique_ptr<std::istream> pStr(factory.open(uri));
-#else
-	std::auto_ptr<std::istream> pStr(factory.open(uri));
-#endif
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
 	assert (ostr.str() == HTTPTestServer::SMALL_BODY);
@@ -81,11 +73,7 @@ void HTTPStreamFactoryTest::testRedirect()
 	opener.registerStreamFactory("http", new HTTPStreamFactory);
 	URI uri("http://127.0.0.1/redirect");
 	uri.setPort(server.port());
-#if defined(POCO_ENABLE_CPP11)
 	std::unique_ptr<std::istream> pStr(opener.open(uri));
-#else
-	std::auto_ptr<std::istream> pStr(opener.open(uri));
-#endif
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
 	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
@@ -97,11 +85,7 @@ void HTTPStreamFactoryTest::testProxy()
 	HTTPTestServer server;
 	HTTPStreamFactory factory("127.0.0.1", server.port());
 	URI uri("http://www.somehost.com/large");
-#if defined(POCO_ENABLE_CPP11)
 	std::unique_ptr<std::istream> pStr(factory.open(uri));
-#else
-	std::auto_ptr<std::istream> pStr(factory.open(uri));
-#endif
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
 	assert (ostr.str() == HTTPTestServer::LARGE_BODY);

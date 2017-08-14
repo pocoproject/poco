@@ -49,11 +49,7 @@ int main(int argc, char** argv)
 	try
 	{
 		URI uri(argv[1]);
-#if defined(POCO_ENABLE_CPP11)
 		std::unique_ptr<std::istream> pStr(URIStreamOpener::defaultOpener().open(uri));
-#else
-		std::auto_ptr<std::istream> pStr(URIStreamOpener::defaultOpener().open(uri));
-#endif
 		StreamCopier::copyStream(*pStr.get(), std::cout);
 	}
 	catch (Exception& exc)

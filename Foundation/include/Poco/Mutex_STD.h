@@ -1,5 +1,5 @@
 //
-// Mutex_WIN32.h
+// Mutex_STD.h
 //
 // $Id: //poco/1.4/Foundation/include/Poco/Mutex_STD.h#1 $
 //

@@ -23,11 +23,11 @@ namespace Poco {
 namespace XML {
 
 
-TreeWalker::TreeWalker(Node* pRoot, unsigned long whatToShowFlags, NodeFilter* pFilter):
-	_pRoot(pRoot),
-	_whatToShow(whatToShowFlags),
+TreeWalker::TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter):
+	_pRoot(root),
+	_whatToShow(whatToShow),
 	_pFilter(pFilter),
-	_pCurrent(pRoot)
+	_pCurrent(root)
 {
 }
 
@@ -160,38 +160,38 @@ Node* TreeWalker::nextNode()
 
 int TreeWalker::accept(Node* pNode) const
 {
-	bool ret = false;
+	bool accept = false;
 	switch (pNode->nodeType())
 	{
 	case Node::ELEMENT_NODE: 
-		ret = (_whatToShow & NodeFilter::SHOW_ELEMENT) != 0; break;
+		accept = (_whatToShow & NodeFilter::SHOW_ELEMENT) != 0; break;
 	case Node::ATTRIBUTE_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_ATTRIBUTE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ATTRIBUTE) != 0; break; 
 	case Node::TEXT_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_TEXT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_TEXT) != 0; break; 
 	case Node::CDATA_SECTION_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_CDATA_SECTION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_CDATA_SECTION) != 0; break; 
 	case Node::ENTITY_REFERENCE_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_ENTITY_REFERENCE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ENTITY_REFERENCE) != 0; break; 
 	case Node::ENTITY_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_ENTITY) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ENTITY) != 0; break; 
 	case Node::PROCESSING_INSTRUCTION_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_PROCESSING_INSTRUCTION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_PROCESSING_INSTRUCTION) != 0; break; 
 	case Node::COMMENT_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_COMMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_COMMENT) != 0; break; 
 	case Node::DOCUMENT_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_DOCUMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT) != 0; break; 
 	case Node::DOCUMENT_TYPE_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_DOCUMENT_TYPE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_TYPE) != 0; break; 
 	case Node::DOCUMENT_FRAGMENT_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_DOCUMENT_FRAGMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_FRAGMENT) != 0; break; 
 	case Node::NOTATION_NODE:
-		ret = (_whatToShow & NodeFilter::SHOW_NOTATION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_NOTATION) != 0; break; 
 	}
-	if (ret && _pFilter)
+	if (accept && _pFilter)
 		return _pFilter->acceptNode(pNode);
 	else
-		return ret ? NodeFilter::FILTER_ACCEPT : NodeFilter::FILTER_REJECT;
+		return accept ? NodeFilter::FILTER_ACCEPT : NodeFilter::FILTER_REJECT;
 }
 
 

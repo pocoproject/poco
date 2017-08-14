@@ -22,9 +22,9 @@ namespace Poco {
 namespace XML {
 
 
-Event::Event(Document* pOwnerDocument, const XMLString& rType):
+Event::Event(Document* pOwnerDocument, const XMLString& type):
 	_pOwner(pOwnerDocument),
-	_type(rType),
+	_type(type),
 	_pTarget(0),
 	_pCurrentTarget(0),
 	_currentPhase(CAPTURING_PHASE),
@@ -36,9 +36,9 @@ Event::Event(Document* pOwnerDocument, const XMLString& rType):
 }
 
 
-Event::Event(Document* pOwnerDocument, const XMLString& rType, EventTarget* pTarget, bool canBubble, bool isCancelable):
+Event::Event(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool isCancelable):
 	_pOwner(pOwnerDocument),
-	_type(rType),
+	_type(type),
 	_pTarget(pTarget),
 	_pCurrentTarget(0),
 	_currentPhase(CAPTURING_PHASE),

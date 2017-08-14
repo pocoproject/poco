@@ -22,29 +22,14 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
-
-
-// C++ doesn't have native semaphore, better to use native ones for now
-// (current implementation is simulated using std::mutex and std::condition_variable)
-
-//#define POCO_CXX11_SEMAPHORE_FINISHED
-
-
-#if defined(POCO_CXX11_SEMAPHORE_FINISHED) && defined(POCO_ENABLE_CPP11)
-#include "Poco/Semaphore_STD.h"
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "Poco/Semaphore_WIN32.h"
-#elif defined(POCO_VXWORKS)
-#include "Poco/Semaphore_VX.h"
-#else
-#include "Poco/Semaphore_POSIX.h"
-#endif
+#include <mutex>
+#include <condition_variable>
 
 
 namespace Poco {
 
 
-class Foundation_API Semaphore: private SemaphoreImpl
+class Foundation_API Semaphore
 	/// A Semaphore is a synchronization object with the following 
 	/// characteristics:
 	/// A semaphore has a value that is constrained to be a non-negative
@@ -110,28 +95,23 @@ private:
 	Semaphore();
 	Semaphore(const Semaphore&);
 	Semaphore& operator = (const Semaphore&);
+
+	bool waitImpl(long milliseconds);
+
+	int _count;
+	int _max;
+	std::mutex _mutex;
+	std::condition_variable _cv;
 };
 
 
 //
 // inlines
 //
-inline void Semaphore::set()
-{
-	setImpl();
-}
-
-
-inline void Semaphore::wait()
-{
-	waitImpl();
-}
-
 
 inline void Semaphore::wait(long milliseconds)
 {
-	if (!waitImpl(milliseconds))
-		throw TimeoutException();
+	if (!waitImpl(milliseconds)) throw TimeoutException();
 }
 
 
