@@ -209,18 +209,15 @@ void SessionImpl::close()
 	if (_pDB) 
 	{
 		int result = 0;
-		int times = 50;
+		int times = 10;
 		do 
 		{
 			result = sqlite3_close(_pDB);
-			if (result == SQLITE_BUSY) 
-			{
-				--times;
-			}			
-		} 
-		while (SQLITE_BUSY == result && times > 0);
+		} while (SQLITE_BUSY == result && --times > 0);
+
 		if (SQLITE_BUSY == result && times == 0) 
 		{
+			times = 10;
 			sqlite3_stmt *pStmt = NULL;
 			do 
 			{
@@ -229,9 +226,8 @@ void SessionImpl::close()
 				{
 					sqlite3_finalize(pStmt);
 				}
-			}
-			while (pStmt != NULL);
-			sqlite3_close(_pDB);		
+			} while (pStmt != NULL && --times > 0);
+			sqlite3_close(_pDB);
 		}
 		_pDB = 0;
 	}
