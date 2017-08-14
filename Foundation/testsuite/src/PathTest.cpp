@@ -375,7 +375,6 @@ void PathTest::testParseUnix5()
 
 void PathTest::testExpandUnix()
 {
-
 	std::string pathWithoutVar = "/usr/share/O1\\$\\$/folder";
 	std::string pathWithVar = "${HOME}/folder";
 	Path p;
