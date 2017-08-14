@@ -1404,6 +1404,8 @@ void DataTest::testExternalBindingAndExtraction()
 }
 
 
+#if __cplusplus >= 201103L
+
 void DataTest::testStdTuple()
 {
 	using Row = std::tuple<std::string, std::string, int>;
@@ -1414,6 +1416,8 @@ void DataTest::testStdTuple()
 	std::vector<Row> rows;
 	sess << "SELECT name, address, age FROM Person", into(rows) , now;
 }
+
+#endif // __cplusplus >= 201103L
 
 
 void DataTest::setUp()

@@ -20,7 +20,21 @@
 #include "Poco/ThreadLocal.h"
 #include "Poco/AtomicCounter.h"
 #include <sstream>
+
+
+#if defined(POCO_ENABLE_CPP11)
 #include "Thread_STD.cpp"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(_WIN32_WCE)
+#include "Thread_WINCE.cpp"
+#else
+#include "Thread_WIN32.cpp"
+#endif
+#elif defined(POCO_VXWORKS)
+#include "Thread_VX.cpp"
+#else
+#include "Thread_POSIX.cpp"
+#endif
 
 
 namespace Poco {

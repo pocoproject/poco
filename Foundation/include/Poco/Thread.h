@@ -24,7 +24,21 @@
 #include "Poco/Event.h"
 #include "Poco/Mutex.h"
 #include "Poco/Environment.h"
+
+
+#if defined(POCO_ENABLE_CPP11)
 #include "Poco/Thread_STD.h"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(_WIN32_WCE)
+#include "Poco/Thread_WINCE.h"
+#else
+#include "Poco/Thread_WIN32.h"
+#endif
+#elif defined(POCO_VXWORKS)
+#include "Poco/Thread_VX.h"
+#else
+#include "Poco/Thread_POSIX.h"
+#endif
 
 
 namespace Poco {

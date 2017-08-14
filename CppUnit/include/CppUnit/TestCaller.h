@@ -80,8 +80,12 @@ protected:
 	}
 
 private:
-	TestMethod               _test;
+	TestMethod             _test;
+#if defined(POCO_ENABLE_CPP11)
 	std::unique_ptr<Fixture> _fixture;
+#else
+	std::auto_ptr<Fixture> _fixture;
+#endif
 };
 
 
