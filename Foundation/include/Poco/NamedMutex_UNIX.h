@@ -23,7 +23,7 @@
 #include "Poco/Foundation.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__EMSCRIPTEN__)
 #include <semaphore.h>
 #endif
 
@@ -44,7 +44,7 @@ private:
 	std::string getFileName();
 
 	std::string _name;
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__EMSCRIPTEN__)
 	sem_t* _sem;
 #else
 	int _semid;  // semaphore id
