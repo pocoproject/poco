@@ -376,12 +376,12 @@ void PathTest::testParseUnix5()
 void PathTest::testExpandUnix()
 {
 	std::string pathWithoutVar = "/usr/share/O1\\$\\$/folder";
-	std::string pathWithVar = "${TMPDIR}folder";
+	std::string pathWithVar = "${HOME}/folder";
 	Path p;
 	std::string s = p.expand(pathWithoutVar);
 	assert (s == "/usr/share/O1$$/folder");
 	s = p.expand(pathWithVar);
-	Path tmpPath = Path::temp();
+	Path tmpPath = Path::home();
 	tmpPath.append("folder");
 	assert (s == tmpPath.toString());
 }
