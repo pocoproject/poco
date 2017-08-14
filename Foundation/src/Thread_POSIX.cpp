@@ -54,7 +54,9 @@ public:
 		sigset_t sset;
 		sigemptyset(&sset);
 		sigaddset(&sset, SIGPIPE);
+#if POCO_OS != POCO_OS_EMSCRIPTEN
 		pthread_sigmask(SIG_BLOCK, &sset, 0);
+#endif
 	}
 	~SignalBlocker()
 	{
@@ -451,7 +453,9 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
 	sigaddset(&sset, SIGPIPE);
+#if POCO_OS != POCO_OS_EMSCRIPTEN
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
+#endif
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
