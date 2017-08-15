@@ -375,7 +375,7 @@ void PathTest::testParseUnix5()
 
 void PathTest::testExpandVariableFromPath()
 {
-	#ifdef POCO_OS_FAMILY_WINDOWS
+#ifdef POCO_OS_FAMILY_WINDOWS
 	std::string pathWithoutVar = "\\usr\\share\\O1%%\\folder";
 	std::string pathWithVar = "%HOMEDRIVE%%HOMEPATH%\\folder";
 	std::string correctStringWithoutVar = "\\usr\\share\\O1%%\\folder";
