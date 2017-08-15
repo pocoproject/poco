@@ -24,7 +24,7 @@
 #if defined(POCO_OS_FAMILY_BSD)
 #include <sys/param.h>
 #include <sys/mount.h>
-#elif defined(__SUNPRO_CC)
+#elif (POCO_OS == POCO_OS_SOLARIS)
 #include <sys/statvfs.h>
 #else
 #include <sys/statfs.h>
@@ -35,7 +35,7 @@
 #include <stdio.h>
 #include <cstring>
 
-#if defined(__SUNPRO_CC)
+#if (POCO_OS == POCO_OS_SOLARIS)
 #define STATFSFN statvfs
 #define STATFSSTRUCT statvfs
 #else
