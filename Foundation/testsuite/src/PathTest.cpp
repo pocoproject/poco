@@ -373,17 +373,27 @@ void PathTest::testParseUnix5()
 	assert (p.toString(Path::PATH_UNIX) == "/c:/windows/system32/");
 }
 
-void PathTest::testExpandUnix()
+void PathTest::testExpandVariableFromPath()
 {
+#ifdef POCO_OS_FAMILY_WINDOWS
+	std::string pathWithoutVar = "\\usr\\share\\O1%%\\folder";
+	std::string pathWithVar = "%HOMEDRIVE%%HOMEPATH%\\folder";
+	std::string correctStringWithoutVar = "\\usr\\share\\O1%%\\folder";
+#elif defined(POCO_OS_FAMILY_UNIX)
 	std::string pathWithoutVar = "/usr/share/O1\\$\\$/folder";
 	std::string pathWithVar = "${HOME}/folder";
-	Path p;
+	std::string correctStringWithoutVar = "/usr/share/O1$$/folder";
+#else
+	return;
+#endif
+  
+	Poco::Path p;
 	std::string s = p.expand(pathWithoutVar);
-	assert (s == "/usr/share/O1$$/folder");
+	assert(s == correctStringWithoutVar);
 	s = p.expand(pathWithVar);
-	Path tmpPath = Path::home();
+	Poco::Path tmpPath = Poco::Path::home();
 	tmpPath.append("folder");
-	assert (s == tmpPath.toString());
+	assert(s == tmpPath.toString());
 }
 
 void PathTest::testParseWindows1()
@@ -1653,7 +1663,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testParseUnix3);
 	CppUnit_addTest(pSuite, PathTest, testParseUnix4);
 	CppUnit_addTest(pSuite, PathTest, testParseUnix5);
-	CppUnit_addTest(pSuite, PathTest, testExpandUnix);
+	CppUnit_addTest(pSuite, PathTest, testExpandVariableFromPath);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows1);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows2);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows3);
