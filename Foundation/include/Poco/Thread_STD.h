@@ -33,12 +33,9 @@
 
 
 #ifdef __APPLE__
-#define POCO_THREADIMPL_THREAD_LOCAL __thread
-#elif defined(_MSC_VER) && (_MSC_VER <= 1800)
-// VS2013 and earlier uses __declspec(thread)
-#define POCO_THREADIMPL_THREAD_LOCAL __declspec(thread)
-#else
-#define POCO_THREADIMPL_THREAD_LOCAL thread_local
+#define thread_local __thread
+#elif defined(_MSC_VER)
+#include "Poco/UnWindows.h"
 #endif
 
 namespace Poco {
@@ -112,7 +109,7 @@ private:
 		}
 
 	private:
-		static POCO_THREADIMPL_THREAD_LOCAL ThreadImpl* _pThread;
+		static thread_local ThreadImpl* _pThread;
 	};
 
 	struct ThreadData: public RefCountedObject
