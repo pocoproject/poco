@@ -24,6 +24,8 @@
 #if defined(POCO_OS_FAMILY_BSD)
 #include <sys/param.h>
 #include <sys/mount.h>
+#elif defined(__SUNPRO_CC)
+#include <sys/statvfs.h>
 #else
 #include <sys/statfs.h>
 #endif
@@ -33,13 +35,20 @@
 #include <stdio.h>
 #include <cstring>
 
+#if defined(__SUNPRO_CC)
+#define STATFSFN statvfs
+#define STATFSSTRUCT statvfs
+#else
+#define STATFSFN statfs
+#define STATFSSTRUCT statfs
+#endif
+
 namespace{
 // Convert timespec structures (seconds and remaining nano secs) to TimeVal (microseconds)
 Poco::Timestamp::TimeVal timespec2Microsecs(const struct timespec &ts) {
 	return ts.tv_sec * 1000000L + ts.tv_nsec / 1000L;
 }
 } // namespace
-
 
 namespace Poco {
 
@@ -449,8 +458,8 @@ FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
 {
 	poco_assert(!_path.empty());
 
-	struct statfs stats;
-	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
 		handleLastErrorImpl(_path);
 
 	return (FileSizeImpl)stats.f_blocks * (FileSizeImpl)stats.f_bsize;
@@ -461,8 +470,8 @@ FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
 {
 	poco_assert(!_path.empty());
 
-	struct statfs stats;
-	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
 		handleLastErrorImpl(_path);
 
 	return (FileSizeImpl)stats.f_bavail * (FileSizeImpl)stats.f_bsize;
@@ -473,8 +482,8 @@ FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
 {
 	poco_assert(!_path.empty());
 
-	struct statfs stats;
-	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
 		handleLastErrorImpl(_path);
 
 	return (FileSizeImpl)stats.f_bfree * (FileSizeImpl)stats.f_bsize;
