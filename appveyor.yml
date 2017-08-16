@@ -14,7 +14,7 @@ branches:
 
 
 skip_commits:
-  message: /Merge pull request.*/
+  message: /.*Merge.*/
 
 
 hosts:
@@ -95,8 +95,8 @@ environment:
 #    - builder: cmake
 #      vsver: 120
 
-    - builder: cmake
-      vsver: 140
+#    - builder: cmake
+#      vsver: 140
 
     - builder: cygwin
 
