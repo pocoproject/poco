@@ -4,7 +4,6 @@ plugins {
 	id 'cppunit-test-suite'
 	id 'windows-resources'
 	id 'windows-messages'
-	id 'visual-studio'
 }
 
 
@@ -37,10 +36,10 @@ File toLocalBin(File binaryFile, Platform platform) {
 	if (platform.architecture.name == 'x86') {
 		target = 'bin'
 	} else
-	if (platform.architecture.name == 'x64') {
+	if (platform.architecture.name == 'x86-64') {
 		target = 'bin64'
 	} else {
-		throw new GradleException("Unknown architecture: " + platform)
+		throw new GradleException("Unknown architecture: " + platform.architecture.name)
 	}
 	return new File(parent, name);
 }
@@ -50,10 +49,10 @@ File toBin(File sharedFile, Platform platform) {
 	if (platform.architecture.name == 'x86') {
 		target = 'bin'
 	} else
-	if (platform.architecture.name == 'x64') {
+	if (platform.architecture.name == 'x86-64') {
 		target = 'bin64'
 	} else {
-		throw new GradleException("Unknown architecture: " + platform)
+		throw new GradleException("Unknown architecture: " + platform.architecture.name)
 	}
 	File parent = new File(rootDir, target)
 	return new File(parent, name);
@@ -64,10 +63,10 @@ File toLib(File linkFile, Platform platform) {
 	if (platform.architecture.name == 'x86') {
 		target = 'lib'
 	} else
-	if (platform.architecture.name == 'x64') {
+	if (platform.architecture.name == 'x86-64') {
 		target = 'lib64'
 	} else {
-		throw new GradleException("Unknown architecture: " + platform)
+		throw new GradleException("Unknown architecture: " + platform.architecture.name)
 	}
 	File parent = new File(rootDir, target )
 	return new File(parent, name);
@@ -77,22 +76,106 @@ File toStatic(File staticFile) {
 	File parent = new File(rootDir, "static")
 	return new File(parent, name);
 }
+
+task production {
+}
+production.dependsOn ':CppParser:assemble'
+production.dependsOn ':CppUnit:assemble'
+production.dependsOn ':Foundation:assemble'
+production.dependsOn ':XML:assemble'
+production.dependsOn ':JSON:assemble'
+production.dependsOn ':Util:assemble'
+production.dependsOn ':Net:assemble'
+production.dependsOn ':Crypto:assemble'
+production.dependsOn ':NetSSL_OpenSSL:assemble'
+production.dependsOn ':NetSSL_Win:assemble'
+production.dependsOn ':Data:assemble'
+production.dependsOn ':Data:ODBC:assemble'
+production.dependsOn ':Data:SQLite:assemble'
+production.dependsOn ':Data:MySQL:assemble'
+production.dependsOn ':Data:PostgreSQL:assemble'
+production.dependsOn ':Zip:assemble'
+production.dependsOn ':PageCompiler:assemble'
+production.dependsOn ':PageCompiler:File2Page:assemble'
+production.dependsOn ':PDF:assemble'
+production.dependsOn ':MongoDB:assemble'
+production.dependsOn ':Redis:assemble'
+production.dependsOn ':PocoDoc:assemble'
+production.dependsOn ':ProGen:assemble'
+
+task unittest {
+}
+unittest.dependsOn ':CppParser:testsuite:assemble'
+unittest.dependsOn ':Foundation:testsuite:assemble'
+unittest.dependsOn ':XML:testsuite:assemble'
+unittest.dependsOn ':JSON:testsuite:assemble'
+unittest.dependsOn ':Util:testsuite:assemble'
+unittest.dependsOn ':Net:testsuite:assemble'
+unittest.dependsOn ':Crypto:testsuite:assemble'
+unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
+//unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
+unittest.dependsOn ':Data:testsuite:assemble'
+unittest.dependsOn ':Data:ODBC:testsuite:assemble'
+unittest.dependsOn ':Data:SQLite:testsuite:assemble'
+unittest.dependsOn ':Data:MySQL:testsuite:assemble'
+unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
+unittest.dependsOn ':Zip:testsuite:assemble'
+unittest.dependsOn ':MongoDB:testsuite:assemble'
+unittest.dependsOn ':Redis:testsuite:assemble'
+
 allprojects {
 	buildDir = new File("gradle")	
 }
 subprojects {
 	apply plugin:	'c'
 	apply plugin:	'cpp'
-	apply plugin:	'visual-studio'
 	apply plugin:	'cppunit-test-suite'
  	apply plugin:	'windows-resources'
 	apply plugin:	'windows-messages'
 
 	
+
 	model {
 		buildTypes {
 			release
 			debug
+		}
+
+/*
+		toolChains {
+			visualCpp(VisualCpp) {
+				// Specify the installDir if Visual Studio cannot be located
+				// installDir "C:/Apps/Microsoft Visual Studio 10.0"
+			}
+			gcc(Gcc) {
+				// Uncomment to use a GCC install that is not in the PATH
+				// path "/usr/bin/gcc"
+			}
+			clang(Clang)
+		}
+*/
+		platforms {
+			win32 {
+				operatingSystem "windows"
+				architecture 'x86'
+			}
+			win64 {
+				operatingSystem "windows"
+				architecture 'x64'
+			}
+			linux32 {
+				operatingSystem "linux"
+				architecture 'x86'
+			}
+			linux64 {
+				operatingSystem "linux"
+				architecture 'x64'
+			}
+		}
+
+		flavors {
+			bundled
+//			unbundled
 		}
 		repositories {
 			libs(PrebuiltLibraries) {
@@ -107,44 +190,123 @@ subprojects {
 					headers.srcDir "$opensslHome/include"
 
 					binaries.withType(StaticLibraryBinary) {
+						def libName = "foobar"
 						if (buildType == buildTypes.debug) {
-							def libName = targetPlatform.operatingSystem.windows ? 'libeay32MDd.lib' : 'libssl.a'
-							staticLibraryFile = file("$opensslHome/win32/bin/debug/$libName")
+							if (targetPlatform == 'win32') {
+								libName = 'libeay32MTd.lib'
+								staticLibraryFile = file("$opensslHome/win32/lib/debug/$libName")
+							} else
+							if (targetPlatform == 'win64') {
+								libName = 'libeay64MTd.lib'
+								staticLibraryFile = file("$opensslHome/win64/lib/debug/$libName")
+							}
 						} else
 						if (buildType == buildTypes.release) {
-							def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
-							staticLibraryFile = file("$opensslHome/win32/bin/release/$libName")
+							if (targetPlatform == 'win32') {
+								libName = 'libeay32MT.lib'
+								staticLibraryFile = file("$opensslHome/win32/lib/release/$libName")
+							} else
+							if (targetPlatform == 'win64') {
+								libName = 'libeay64MT.lib'
+								staticLibraryFile = file("$opensslHome/win64/lib/release/$libName")
+							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
 						}
 					}
-/*
 					binaries.withType(SharedLibraryBinary) {
+						def dllName
+						def linkName
 						if (buildType == buildTypes.debug) {
-							def libName = targetPlatform.operatingSystem.windows ? 'libeay32MDd.lib' : 'libssl.a'
-							sharedLibraryFile = file("$opensslHome/win32/bin/debug/$libName")
-							sharedLibraryLinkFile = file("$opensslHome/win32/bin/debug/$libName")
+							if (targetPlatform == 'win32') {
+								dllName = 'libeay32d.dll'
+								linkName = 'libeay32d.lib'
+								sharedLibraryFile     = file("$opensslHome/win32/bin/debug/$dllName")
+								sharedLibraryLinkFile = file("$opensslHome/win32/bin/debug/$linkName")
+							} else
+							if (targetPlatform == 'win64') {
+								dllName = 'libeay64d.dll'
+								linkName = 'libeay64d.lib'
+								sharedLibraryFile     = file("$opensslHome/win64/bin/debug/$dllName")
+								sharedLibraryLinkFile = file("$opensslHome/win64/bin/debug/$linkName")
+							}
 						} else
 						if (buildType == buildTypes.release) {
-							def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
-							staticLibraryFile = file("$opensslHome/win32/bin/release/$libName")
+							if (targetPlatform == 'win32') {
+								dllName = 'libeay32.dll'
+								linkName = 'libeay32.lib'
+								sharedLibraryFile     = file("$opensslHome/win32/bin/release/$dllName")
+								sharedLibraryLinkFile = file("$opensslHome/win32/bin/release/$linkName")
+							} else
+							if (targetPlatform == 'win64') {
+								dllName = 'libeay64.dll'
+								linkName = 'libeay64.lib'
+								sharedLibraryFile     = file("$opensslHome/win64/bin/release/$dllName")
+								sharedLibraryLinkFile = file("$opensslHome/win64/bin/release/$linkName")
+							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
 						}
 					}
-*/
 				}
 				ssl {
 					headers.srcDir "$opensslHome/include"
 
 					binaries.withType(StaticLibraryBinary) {
+						def libName
 						if (buildType == buildTypes.debug) {
-							def libName = targetPlatform.operatingSystem.windows ? 'ssleay32MDd.lib' : 'libssl.a'
-							staticLibraryFile = file("$opensslHome/win32/bin/debug/$libName")
+							if (targetPlatform == 'win32') {
+								libName = 'ssleay32MTd.lib'
+								staticLibraryFile = file("$opensslHome/win32/lib/debug/$libName")
+							} else
+							if (targetPlatform == 'win64') {
+								libName = 'ssleay64MTd.lib'
+								staticLibraryFile = file("$opensslHome/win64/lib/debug/$libName")
+							}
 						} else
 						if (buildType == buildTypes.release) {
-							def libName = targetPlatform.operatingSystem.windows ? 'ssleay32MD.lib' : 'libssl.a'
-							staticLibraryFile = file("$opensslHome/win32/bin/release/$libName")
+							if (targetPlatform == 'win32') {
+								libName = 'ssleay32MT.lib'
+								staticLibraryFile = file("$opensslHome/win32/lib/release/$libName")
+							} else
+							if (targetPlatform == 'win64') {
+								libName = 'ssleay64MT.lib'
+								staticLibraryFile = file("$opensslHome/win64/lib/release/$libName")
+							}
+						} else {
+							throw new GradleException("Unknown buildType" + buildType)
+						}
+					}
+					binaries.withType(SharedLibraryBinary) {
+						def dllName
+						def linkName
+						if (buildType == buildTypes.debug) {
+							if (targetPlatform == 'win32') {
+								dllName = 'ssleay32d.dll'
+								linkName = 'ssleay32d.lib'
+								sharedLibraryFile     = file("$opensslHome/win32/bin/debug/$dllName")
+								sharedLibraryLinkFile = file("$opensslHome/win32/bin/debug/$linkName")
+							} else
+							if (targetPlatform == 'win64') {
+								dllName = 'ssleay64d.dll'
+								linkName = 'ssleay64d.lib'
+								sharedLibraryFile     = file("$opensslHome/win64/bin/debug/$dllName")
+								sharedLibraryLinkFile = file("$opensslHome/win64/bin/debug/$linkName")
+							}
+						} else
+						if (buildType == buildTypes.release) {
+							if (targetPlatform == 'win32') {
+								dllName = 'ssleay32.dll'
+								linkName = 'ssleay32.lib'
+								sharedLibraryFile     = file("$opensslHome/win32/bin/release/$dllName")
+								sharedLibraryLinkFile = file("$opensslHome/win32/bin/release/$linkName")
+							} else
+							if (targetPlatform == 'win64') {
+								dllName = 'ssleay64.dll'
+								linkName = 'ssleay64.lib'
+								sharedLibraryFile     = file("$opensslHome/win64/bin/release/$dllName")
+								sharedLibraryLinkFile = file("$opensslHome/win64/bin/release/$linkName")
+							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
 						}
@@ -153,7 +315,10 @@ subprojects {
 			}
 		}
 		components {
+			
 			withType(NativeComponentSpec) {
+            targetPlatform "win32"
+            targetPlatform "win64"
 				binaries.withType(NativeTestSuiteBinarySpec) {
 					if (buildType == buildTypes.debug) {
 						if (it instanceof NativeExecutableBinarySpec) {
@@ -223,41 +388,6 @@ subprojects {
 			}
 		}
 
-		toolChains {
-			visualCpp(VisualCpp) {
-				// Specify the installDir if Visual Studio cannot be located
-				// installDir "C:/Apps/Microsoft Visual Studio 10.0"
-			}
-			gcc(Gcc) {
-				// Uncomment to use a GCC install that is not in the PATH
-				// path "/usr/bin/gcc"
-			}
-			clang(Clang)
-		}
-
-		platforms {
-			win32 {
-				operatingSystem "windows"
-				architecture 'x86'
-			}
-			win64 {
-				operatingSystem "windows"
-				architecture 'x64'
-			}
-			linux32 {
-				operatingSystem "linux"
-				architecture 'x86'
-			}
-			linux64 {
-				operatingSystem "linux"
-				architecture 'x64'
-			}
-		}
-
-		flavors {
-			bundled
-//			unbundled
-		}
 
 		binaries {
 			all {

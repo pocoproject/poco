@@ -15,8 +15,6 @@ model {
 		}
 	}
 	binaries {
-		all {
-		}
 		withType(SharedLibraryBinarySpec) {
 			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {

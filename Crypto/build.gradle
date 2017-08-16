@@ -16,8 +16,8 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
-					lib library: 'ssl', linkage: 'static'
-					lib library: 'crypto', linkage: 'static'
+					lib library: 'ssl'
+					lib library: 'crypto'
 				}
 			}
 		}

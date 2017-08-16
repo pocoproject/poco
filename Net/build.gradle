@@ -1,41 +1,40 @@
-project(":Net") {
-	model {
-		components {
-			Net(NativeLibrarySpec) {
-				sources {
-					rc {
-						source {
-							srcDir '..'
-							include 'DLLVersion.rc'
-						}
-					}
-					cpp {
-						source {
-							srcDir 'src'
-							include '**/*.cpp'
-						}
-						exportedHeaders {
-							srcDir 'include'
-						}
+model {
+	components {
+		Net(NativeLibrarySpec) {
+			sources {
+				rc {
+					source {
+						srcDir '..'
+						include 'DLLVersion.rc'
 					}
 				}
-			}
-		}
-		binaries {
-			all {
-				linker.args "ws2_32.lib"
-				linker.args "iphlpapi.lib"
-			}
-			withType(SharedLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
-				if (toolChain in VisualCpp) {
-					 cppCompiler.define "Net_EXPORTS"
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+					}
+					exportedHeaders {
+						srcDir 'include'
+					}
 				}
-			}
-			withType(StaticLibraryBinarySpec) {
-				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}
+	binaries {
+		all {
+			linker.args "ws2_32.lib"
+			linker.args "iphlpapi.lib"
+		}
+		withType(SharedLibraryBinarySpec) {
+			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+			if (toolChain in VisualCpp) {
+				 cppCompiler.define "Net_EXPORTS"
+			}
+		}
+		withType(StaticLibraryBinarySpec) {
+			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
+		}
+	}
 }
+
 
