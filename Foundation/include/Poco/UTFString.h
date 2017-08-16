@@ -262,8 +262,13 @@ struct UTF32CharTraits
 };
 
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+typedef wchar_t      UTF16Char;
+typedef std::wstring UTF16String;
+#else
 typedef char16_t       UTF16Char;
 typedef std::u16string UTF16String;
+#endif // POCO_OS_FAMILY_WINDOWS
 typedef char32_t       UTF32Char;
 typedef std::u32string UTF32String;
 

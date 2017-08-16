@@ -48,7 +48,7 @@ bool Timezone::isDst(const Timestamp& timestamp)
 	return tms->tm_isdst > 0;
 }
 
-	
+
 std::string Timezone::name()
 {
 	std::string result;
@@ -65,7 +65,7 @@ std::string Timezone::name()
 	return result;
 }
 
-	
+
 std::string Timezone::standardName()
 {
 	std::string result;
@@ -82,7 +82,7 @@ std::string Timezone::standardName()
 	return result;
 }
 
-	
+
 std::string Timezone::dstName()
 {
 	std::string result;

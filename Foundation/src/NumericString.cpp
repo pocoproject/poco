@@ -76,7 +76,7 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 		}
 		else if ((frac > precision) && (decSepPos != std::string::npos))
 		{
-			int pos = decSepPos + 1 + precision;
+			int pos = static_cast<int>(decSepPos) + 1 + precision;
 			if (str[pos] >= '5') // we must round up
 			{
 				char carry = 0;
