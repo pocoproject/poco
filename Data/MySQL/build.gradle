@@ -2,18 +2,72 @@ model {
 	repositories {
 		libs(PrebuiltLibraries) {
 			mysql {
+				def mysqlHome
+				if (targetPlatform == 'win32') {
+					mysqlHome = $mysql32Home
+				} else
+				if (targetPlatform == 'win64') {
+					mysqlHome = $mysql64Home
+				}
 				headers.srcDir "$mysqlHome/include"
 
 				binaries.withType(StaticLibraryBinary) {
+					def libName = "foobar"
 					if (buildType == buildTypes.debug) {
-						def libName = targetPlatform.operatingSystem.windows ? 'libeay32MDd.lib' : 'libssl.a'
-						staticLibraryFile = file("$mysqlHome/lib/libmysqld.lib")
+						if (targetPlatform == 'win32') {
+							libName = 'libmysqld.lib'
+							staticLibraryFile = file("$mysqlHome/lib/$libName")
+						} else
+						if (targetPlatform == 'win64') {
+							libName = 'libmysqld.lib'
+							staticLibraryFile = file("$mysqlHome/lib/$libName")
+						}
 					} else
 					if (buildType == buildTypes.release) {
-						def libName = targetPlatform.operatingSystem.windows ? 'libeay32MD.lib' : 'libssl.a'
-						staticLibraryFile = file("$mysqlHome/lib/libmysql.lib")
+						if (targetPlatform == 'win32') {
+							libName = 'libmysql.lib'
+							staticLibraryFile = file("$mysqlHome/lib/$libName")
+						} else
+						if (targetPlatform == 'win64') {
+							libName = 'libmysql.lib'
+							staticLibraryFile = file("$mysqlHome/lib/$libName")
+						}
 					} else {
-						throw new GradleException("Unknown buildType")
+						throw new GradleException("Unknown buildType" + buildType)
+					}
+				}
+				binaries.withType(SharedLibraryBinary) {
+					def dllName
+					def linkName
+					if (buildType == buildTypes.debug) {
+						if (targetPlatform == 'win32') {
+							dllName = 'libmysqld.dll'
+							linkName = 'libmysqld.lib'
+							sharedLibraryFile     = file("$mysqlHome/lib/$dllName")
+							sharedLibraryLinkFile = file("$mysqlHome/lib/$linkName")
+						} else
+						if (targetPlatform == 'win64') {
+							dllName = 'libmysqld.dll'
+							linkName = 'libmysqld.lib'
+							sharedLibraryFile     = file("$mysqlHome/lib/$dllName")
+							sharedLibraryLinkFile = file("$mysqlHome/lib/$linkName")
+						}
+					} else
+					if (buildType == buildTypes.release) {
+						if (targetPlatform == 'win32') {
+							dllName = 'libmysql.dll'
+							linkName = 'libmysql.lib'
+							sharedLibraryFile     = file("$mysqlHome/lib/$dllName")
+							sharedLibraryLinkFile = file("$mysqlHome/lib/$linkName")
+						} else
+						if (targetPlatform == 'win64') {
+							dllName = 'libmysql.dll'
+							linkName = 'libmysql.lib'
+							sharedLibraryFile     = file("$mysqlHome/lib/$dllName")
+							sharedLibraryLinkFile = file("$mysqlHome/lib/$linkName")
+						}
+					} else {
+						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
 			}

@@ -26,16 +26,19 @@ model {
 						srcDir 'src'
 					}
 					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
-					lib project: ':Data:MySQL', library: 'mysql', linkage: 'shared'
-					lib project: ':Data:MySQL', library: 'DataMySQL', linkage: 'shared'
-					lib project: ':Data', library: 'Data', linkage: 'shared'
+					lib library: 'crypto', linkage: 'static'
+					lib library: 'ssl', linkage: 'static'
+					lib project: ':Crypto', library: 'Crypto', linkage: 'shared'
+					lib project: ':Net', library: 'Net', linkage: 'shared'
+					lib project: ':Util', library: 'Util', linkage: 'shared'
 					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+					lib library: 'WS2_32', linkage: 'static'
 				}
 			}
 		}
 	}
 	testSuites {
-		DataMySQLTestSuite(CppUnitTestSuiteSpec) {
+		NetSSLTestSuite(CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
 		}
 	}

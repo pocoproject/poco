@@ -1,37 +1,36 @@
-project(":PocoDoc") {
-	model {
-		components {
-			PocoDoc(NativeLibrarySpec) {
-				sources {
-					cpp {
-						source {
-							srcDir 'src'
-							include '**/*.cpp'
-						}
-						exportedHeaders {
-							srcDir 'include'
-						}
+model {
+	components {
+		withType(NativeComponentSpec) {
+			binaries.withType(NativeBinarySpec) {
+				if (buildType == buildTypes.debug) {
+					if (it instanceof NativeExecutableBinarySpec) {
+						executable.file = toLocalBin(appendDebugSuffix(executable.file), targetPlatform)
 					}
+				} else
+				if (buildType == buildTypes.release) {
+					if (it instanceof NativeExecutableBinarySpec) {
+						executable.file = toLocalBin(executable.file, targetPlatform)
+					} 
 				}
 			}
 		}
-		binaries {
-			all {
-			}
-			withType(SharedLibraryBinarySpec) {
-				lib project: ':CppParser', library: 'CppParser', linkage: 'shared'
-				lib project: ':Util', library: 'Util', linkage: 'shared'
-				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
-				if (toolChain in VisualCpp) {
-					 cppCompiler.define "PocoDoc_EXPORTS"
+		PocoDoc(NativeExecutableSpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+					}
+					exportedHeaders {
+						srcDir 'include'
+					}
+					lib project: ':CppParser', library: 'CppParser', linkage: 'shared'
+					lib project: ':Util', library: 'Util', linkage: 'shared'
+					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				}
-			}
-			withType(StaticLibraryBinarySpec) {
-				lib project: ':CppParser', library: 'CppParser', linkage: 'static'
-				lib project: ':Util', library: 'Util', linkage: 'static'
-				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}
 }
+
 

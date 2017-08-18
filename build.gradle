@@ -21,7 +21,14 @@ File appendDebugSuffix(File binaryFile) {
 	String name = binaryFile.getName()
 	File parent = binaryFile.getParentFile()
 	int extensionSeparatorIndex = name.lastIndexOf('.')
-	return new File(parent, name.substring(0, extensionSeparatorIndex) + "d" + name.substring(extensionSeparatorIndex))
+	File file
+	if (extensionSeparatorIndex < 0) {
+		println "name=" + name
+		file = file = new File(parent, name + "d")
+	} else {
+		file = new File(parent, name.substring(0, extensionSeparatorIndex) + "d" + name.substring(extensionSeparatorIndex))
+	}
+	return file;
 }
 
 File prefixByPoco(File binaryFile) {
@@ -77,9 +84,25 @@ File toStatic(File staticFile) {
 	return new File(parent, name);
 }
 
+task pocoDoc(type: Exec) {
+//  environment PATH "$rootDir\bin;$PATH"
+  executable "PocoDoc/bin/PocoDoc.exe"
+  args "/config=PocoDoc/cfg/mkdoc-poco.xml"
+  args "/config=stage/docbuild/PocoDoc.ini"
+}
+pocoDoc.dependsOn ':PocoDoc::assemble'
+
+task zipDoc(type: Zip) {
+   from 'releases/poco-2.0.0-all-doc/'
+   include '*'
+   include '*/*'
+   archiveName 'poco-2.0.0-all-doc.zip'
+   destinationDir(file('releases'))
+}
+zipDoc.dependsOn pocoDoc
+
 task production {
 }
-production.dependsOn ':CppParser:assemble'
 production.dependsOn ':CppUnit:assemble'
 production.dependsOn ':Foundation:assemble'
 production.dependsOn ':XML:assemble'
@@ -100,7 +123,6 @@ production.dependsOn ':PageCompiler:File2Page:assemble'
 production.dependsOn ':PDF:assemble'
 production.dependsOn ':MongoDB:assemble'
 production.dependsOn ':Redis:assemble'
-production.dependsOn ':PocoDoc:assemble'
 production.dependsOn ':ProGen:assemble'
 
 task unittest {
@@ -113,7 +135,7 @@ unittest.dependsOn ':Util:testsuite:assemble'
 unittest.dependsOn ':Net:testsuite:assemble'
 unittest.dependsOn ':Crypto:testsuite:assemble'
 unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
-//unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
+unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
 unittest.dependsOn ':Data:testsuite:assemble'
 unittest.dependsOn ':Data:ODBC:testsuite:assemble'
 unittest.dependsOn ':Data:SQLite:testsuite:assemble'
@@ -315,10 +337,11 @@ subprojects {
 			}
 		}
 		components {
-			
 			withType(NativeComponentSpec) {
             targetPlatform "win32"
             targetPlatform "win64"
+            targetPlatform "linux32"
+            targetPlatform "linux64"
 				binaries.withType(NativeTestSuiteBinarySpec) {
 					if (buildType == buildTypes.debug) {
 						if (it instanceof NativeExecutableBinarySpec) {
@@ -422,6 +445,7 @@ subprojects {
 					cCompiler.args '/GR'
 					cCompiler.args '/GF'
 					cCompiler.args '/EHsc'
+					cCompiler.args '/bigobj'
 					cCompiler.define 'WIN32'
 					cCompiler.define '_WIN32'
 					cCompiler.define '_WINDOWS'
@@ -434,6 +458,7 @@ subprojects {
 					cppCompiler.args '/GR'
 					cppCompiler.args '/GF'
 					cppCompiler.args '/EHsc'
+					cppCompiler.args '/bigobj'
 					cppCompiler.define 'WIN32'
 					cppCompiler.define '_WIN32'
 					cppCompiler.define '_WINDOWS'
