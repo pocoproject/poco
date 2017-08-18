@@ -2,35 +2,28 @@ model {
 	repositories {
 		libs(PrebuiltLibraries) {
 			mysql {
-				def mysqlHome
-				if (targetPlatform == 'win32') {
-					mysqlHome = $mysql32Home
-				} else
-				if (targetPlatform == 'win64') {
-					mysqlHome = $mysql64Home
-				}
-				headers.srcDir "$mysqlHome/include"
-
+				headers.srcDir "$mysql32Home/include"
 				binaries.withType(StaticLibraryBinary) {
 					def libName = "foobar"
 					if (buildType == buildTypes.debug) {
+						libName = 'libmysqld.lib'
 						if (targetPlatform == 'win32') {
-							libName = 'libmysqld.lib'
-							staticLibraryFile = file("$mysqlHome/lib/$libName")
+							staticLibraryFile = file("$mysql32Home/lib/$libName")
 						} else
 						if (targetPlatform == 'win64') {
-							libName = 'libmysqld.lib'
-							staticLibraryFile = file("$mysqlHome/lib/$libName")
+							headers.srcDir "$mysql64Home/include"
+							staticLibraryFile = file("$mysql64Home/lib/$libName")
 						}
 					} else
 					if (buildType == buildTypes.release) {
+						libName = 'libmysql.lib'
 						if (targetPlatform == 'win32') {
-							libName = 'libmysql.lib'
-							staticLibraryFile = file("$mysqlHome/lib/$libName")
+							headers.srcDir "$mysql32Home/include"
+							staticLibraryFile = file("$mysql32Home/lib/$libName")
 						} else
 						if (targetPlatform == 'win64') {
-							libName = 'libmysql.lib'
-							staticLibraryFile = file("$mysqlHome/lib/$libName")
+							headers.srcDir "$mysql64Home/include"
+							staticLibraryFile = file("$mysql64Home/lib/$libName")
 						}
 					} else {
 						throw new GradleException("Unknown buildType" + buildType)
@@ -40,31 +33,31 @@ model {
 					def dllName
 					def linkName
 					if (buildType == buildTypes.debug) {
+						dllName = 'libmysqld.dll'
+						linkName = 'libmysqld.lib'
 						if (targetPlatform == 'win32') {
-							dllName = 'libmysqld.dll'
-							linkName = 'libmysqld.lib'
-							sharedLibraryFile     = file("$mysqlHome/lib/$dllName")
-							sharedLibraryLinkFile = file("$mysqlHome/lib/$linkName")
+							headers.srcDir "$mysql32Home/include"
+							sharedLibraryFile     = file("$mysql32Home/lib/$dllName")
+							sharedLibraryLinkFile = file("$mysql32Home/lib/$linkName")
 						} else
 						if (targetPlatform == 'win64') {
-							dllName = 'libmysqld.dll'
-							linkName = 'libmysqld.lib'
-							sharedLibraryFile     = file("$mysqlHome/lib/$dllName")
-							sharedLibraryLinkFile = file("$mysqlHome/lib/$linkName")
+							headers.srcDir "$mysql64Home/include"
+							sharedLibraryFile     = file("$mysql64Home/lib/$dllName")
+							sharedLibraryLinkFile = file("$mysql64Home/lib/$linkName")
 						}
 					} else
 					if (buildType == buildTypes.release) {
+						dllName = 'libmysql.dll'
+						linkName = 'libmysql.lib'
 						if (targetPlatform == 'win32') {
-							dllName = 'libmysql.dll'
-							linkName = 'libmysql.lib'
-							sharedLibraryFile     = file("$mysqlHome/lib/$dllName")
-							sharedLibraryLinkFile = file("$mysqlHome/lib/$linkName")
+							headers.srcDir "$mysql32Home/include"
+							sharedLibraryFile     = file("$mysql32Home/lib/$dllName")
+							sharedLibraryLinkFile = file("$mysql32Home/lib/$linkName")
 						} else
 						if (targetPlatform == 'win64') {
-							dllName = 'libmysql.dll'
-							linkName = 'libmysql.lib'
-							sharedLibraryFile     = file("$mysqlHome/lib/$dllName")
-							sharedLibraryLinkFile = file("$mysqlHome/lib/$linkName")
+							headers.srcDir "$mysql64Home/include"
+							sharedLibraryFile     = file("$mysql64Home/lib/$dllName")
+							sharedLibraryLinkFile = file("$mysql64Home/lib/$linkName")
 						}
 					} else {
 						throw new GradleException("Unknown buildType" + buildType)
@@ -84,30 +77,24 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
-					lib library: 'mysql', linkage: 'static'
+					lib library: 'mysql'
+					lib project: ':Data', library: 'Data'
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}
 	}
 	binaries {
 		all {
-			if (toolChain in VisualCpp) {
-				cppCompiler.define	"THREADSAFE"
-				cppCompiler.define 	"__LCC__"	
-			}
+			cppCompiler.define	"THREADSAFE"
+			cppCompiler.define 	"__LCC__"	
 		}
 		withType(SharedLibraryBinarySpec) {
-			lib project: ':Data', library: 'Data', linkage: 'shared'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {
-				cppCompiler.define	"THREADSAFE"
-				cppCompiler.define 	"__LCC__"	
 				cppCompiler.define	"MySQL_EXPORTS"
 			}
 		}
 		withType(StaticLibraryBinarySpec) {
-			lib project: ':Data', library: 'Data', linkage: 'static'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }

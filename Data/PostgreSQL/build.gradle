@@ -2,14 +2,32 @@ model {
 	repositories {
 		libs(PrebuiltLibraries) {
 			postgres {
-				headers.srcDir "$postgresHome/include"
-
-				binaries.withType(SharedLibraryBinary) {
-					sharedLibraryFile 		= file("$postgresHome/lib/libpq.dll")
-					sharedLibraryLinkFile 	= file("$postgresHome/lib/libpq.lib")
-				}
 				binaries.withType(StaticLibraryBinary) {
-					staticLibraryFile 		= file("$postgresHome/lib/libpq.lib")
+					def libName = "foobar"
+					if (buildType == buildTypes.debug) {
+						libName = 'libmysqld.lib'
+						if (targetPlatform == 'win32') {
+							headers.srcDir "$postgres32Home/include"
+							staticLibraryFile = file("$postgres32Home/lib/$libName")
+						} else
+						if (targetPlatform == 'win64') {
+							headers.srcDir "$postgres64Home/include"
+							staticLibraryFile = file("$postgres64Home/lib/$libName")
+						}
+					} else
+					if (buildType == buildTypes.release) {
+						libName = 'libmysql.lib'
+						if (targetPlatform == 'win32') {
+							headers.srcDir "$postgres32Home/include"
+							staticLibraryFile = file("$postgres32Home/lib/$libName")
+						} else
+						if (targetPlatform == 'win64') {
+							headers.srcDir "$postgres64Home/include"
+							staticLibraryFile = file("$postgres64Home/lib/$libName")
+						}
+					} else {
+						throw new GradleException("Unknown buildType" + buildType)
+					}
 				}
 			}
 		}
@@ -31,7 +49,9 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
-					lib library: 'postgres', linkage: 'static'
+					lib library: 'postgres'
+					lib project: ':Data', library: 'Data'
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}
@@ -40,15 +60,11 @@ model {
 		all {
 		}
 		withType(SharedLibraryBinarySpec) {
-			lib project: ':Data', library: 'Data', linkage: 'shared'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				 cppCompiler.define "PostgreSQL_EXPORTS"
 			}
 		}
 		withType(StaticLibraryBinarySpec) {
-			lib project: ':Data', library: 'Data', linkage: 'static'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }
