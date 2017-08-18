@@ -28,13 +28,18 @@
 				TestRunner.h,
 				TestSetup.h,
 				TestSuite.h,
-				TextTestResult.h
+				TextTestResult.h,
+				Connector.h,
+				Constants.h,
+				inffast.h
 			</exclude>
 		</files>
 		<pages>
 			${PocoBuild}/doc/*.page,
+<!--
 			${PocoBuild}/*/doc/*.page
 			${PocoBuild}/*/*/doc/*.page
+-->
 		</pages>
 		<resources>
 			${PocoBase}/PocoDoc/resources/css,
@@ -44,20 +49,43 @@
 			${PocoBuild}/*/doc/images
 		</resources>
 		<compiler>
-			<exec>${CXX} ${CXXFLAGS}</exec>
-			<options>
-				${Includes},
-				-I/usr/local/mysql/include,
-				-I/usr/include/mysql,
-				-I/usr/include/postgresql,
-				-D_DEBUG,
-				-E,
-				-C,
-				-DPOCO_NO_GCC_API_ATTRIBUTE
-				-DPOCO_NO_WINDOWS_H
-			</options>
-			<path></path>
-			<usePipe>true</usePipe>
+			<windows>
+				<exec>cl.exe</exec>
+				<options>
+					${Includes},
+					/IC:\mysql-5.6.37-win32\include,
+					/IC:\postgresql-9.6.3-2-win32\pgsql\include,
+					/I${PocoBase}/openssl/include
+					/IC:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include,
+					/IC:\Program Files (x86)\Windows Kits\8.1\Include\shared,
+					/IC:\Program Files (x86)\Windows Kits\8.1\Include\um,
+					/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt,
+					/nologo,
+					/D_DEBUG,
+					/E,
+					/C,
+					/DPOCO_NO_GCC_API_ATTRIBUTE
+					/DPOCO_NO_WINDOWS_H
+				</options>
+				<path>C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\</path>
+				<usePipe>true</usePipe>
+			</windows>
+			<unix>
+				<exec>${CXX} ${CXXFLAGS}</exec>
+				<options>
+					${Includes},
+					-I/usr/local/mysql/include,
+					-I/usr/include/mysql,
+					-I/usr/include/postgresql,
+					-D_DEBUG,
+					-E,
+					-C,
+					-DPOCO_NO_GCC_API_ATTRIBUTE
+					-DPOCO_NO_WINDOWS_H
+				</options>
+				<path></path>
+				<usePipe>true</usePipe>
+			</unix>
 		</compiler>
 		<language>EN</language>
 		<charset>utf-8</charset>
