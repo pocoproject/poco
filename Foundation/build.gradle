@@ -1,7 +1,6 @@
 model {
 	components {
-		def os = org.gradle.internal.os.OperatingSystem.current()
-		Foundation(NativeLibrarySpec) {
+		Foundation(NativeLibrarySpec) { m ->
 			sources {
 				mc {
 					source {
@@ -50,14 +49,41 @@ model {
 						exclude 'RWLock_*.cpp'
 						exclude 'Semaphore_*.cpp'
 						exclude 'Thread_*.cpp'
-						if (os.isWindows()) {
-							exclude 'SyslogChannel.cpp'
-							exclude 'OpcomChannel.cpp'
-							exclude 'AndroidLogChannel.cpp'
-						}
+
+						exclude 'EventLogChannel.cpp'
+						exclude 'UnWindows.cpp'
+						exclude 'WindowsConsoleChannel.cpp'
+						exclude 'OpcomChannel.cpp'
+						exclude 'AndroidLogChannel.cpp'
+						exclude 'SyslogChannel.cpp'
+
 					}
 					exportedHeaders {
 						srcDir 'include'
+					}
+				}
+			}
+			binaries.all {
+				sources {
+					if (targetPlatform.operatingSystem.windows) {
+						platformWindows(CppSourceSet) {
+							lib m.sources.cpp
+							source {
+								srcDir 'src'
+								include 'EventLogChannel.cpp'
+								include 'UnWindows.cpp'
+								include 'WindowsConsoleChannel.cpp'
+							}
+						}
+					} else if (targetPlatform.operatingSystem.macOsX) {
+						platformNix(CppSourceSet) {
+							lib m.sources.cpp
+							source {
+								srcDir 'src'
+								include 'SignalHandler.cpp'
+								include 'SyslogChannel.cpp'
+							}
+						}
 					}
 				}
 			}

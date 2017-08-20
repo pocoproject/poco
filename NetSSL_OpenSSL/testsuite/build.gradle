@@ -33,6 +33,10 @@ model {
 					lib project: ':NetSSL_OpenSSL', library: 'NetSSL', linkage: 'shared'
 					lib project: ':Util', library: 'Util', linkage: 'shared'
 					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+				}
+			}
+			binaries.all {
+				if (targetPlatform.operatingSystem.windows) {
 					lib library: 'WS2_32', linkage: 'static'
 				}
 			}

@@ -1,3 +1,4 @@
+def os = org.gradle.internal.os.OperatingSystem.current()
 println 'This is executed during the initialization phase.'
 rootProject.name = 'Poco'
 
@@ -11,10 +12,12 @@ include ':Net'
 //include ':NetSSL_OpenSSL'
 //include ':NetSSL_Win'
 include ':Data'
-include ':Data:ODBC'
-include ':Data:SQLite'
-include ':Data:MySQL'
-include ':Data:PostgreSQL'
+if (os.windows) {
+	include ':Data:ODBC'
+	include ':Data:SQLite'
+	include ':Data:MySQL'
+	include ':Data:PostgreSQL'
+}
 include ':Zip'
 include ':PageCompiler'
 include ':PageCompiler:File2Page'
@@ -34,17 +37,21 @@ include ':Net:testsuite'
 //include ':NetSSL_OpenSSL:testsuite'
 //include ':NetSSL_Win:testsuite'
 include ':Data:testsuite'
-include ':Data:ODBC:testsuite'
-include ':Data:SQLite:testsuite'
-include ':Data:MySQL:testsuite'
-include ':Data:PostgreSQL:testsuite'
+if (os.windows) {
+	include ':Data:ODBC:testsuite'
+	include ':Data:SQLite:testsuite'
+	include ':Data:MySQL:testsuite'
+	include ':Data:PostgreSQL:testsuite'
+}
 include ':MongoDB:testsuite'
 include ':Redis:testsuite'
 include ':CppParser:testsuite'
 include ':Zip:testsuite'
 
 include ':Foundation:samples'
-include ':Data:samples'
+if (os.windows) {
+	include ':Data:samples'
+}
 include ':JSON:samples'
 include ':MongoDB:samples'
 include ':Net:samples'

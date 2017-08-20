@@ -21,20 +21,21 @@ File appendDebugSuffix(File binaryFile) {
 	String name = binaryFile.getName()
 	File parent = binaryFile.getParentFile()
 	int extensionSeparatorIndex = name.lastIndexOf('.')
-	File file
-	if (extensionSeparatorIndex < 0) {
-		println "name=" + name
-		file = file = new File(parent, name + "d")
-	} else {
-		file = new File(parent, name.substring(0, extensionSeparatorIndex) + "d" + name.substring(extensionSeparatorIndex))
+	if (extensionSeparatorIndex == -1) {
+		return new File(parent, name + "d")
 	}
-	return file;
+	return new File(parent, name.substring(0, extensionSeparatorIndex) + "d" + name.substring(extensionSeparatorIndex))
 }
 
 File prefixByPoco(File binaryFile) {
 	String name = binaryFile.getName()
+	String prefix = ''
+	if (name.startsWith('lib')) {
+		prefix = 'lib'
+		name = name.substring(3)
+	}
 	File parent = binaryFile.getParentFile()
-	return new File(parent, "Poco" + name);
+	return new File(parent, prefix + "Poco" + name);
 }
 File toLocalBin(File binaryFile, Platform platform) {
 	String name = binaryFile.getName()
@@ -65,6 +66,11 @@ File toBin(File sharedFile, Platform platform) {
 	return new File(parent, name);
 }
 File toLib(File linkFile, Platform platform) {
+	// On macOS, it creates a dylib file which is the shared and import library
+	if (platform.operatingSystem.macOsX) {
+		return toBin(linkFile, platform)
+	}
+
 	String name = linkFile.getName()
 	String target
 	if (platform.architecture.name == 'x86') {
@@ -101,6 +107,7 @@ task zipDoc(type: Zip) {
 }
 zipDoc.dependsOn pocoDoc
 
+def os = org.gradle.internal.os.OperatingSystem.current()
 task production {
 }
 production.dependsOn ':CppUnit:assemble'
@@ -113,10 +120,12 @@ production.dependsOn ':Crypto:assemble'
 production.dependsOn ':NetSSL_OpenSSL:assemble'
 production.dependsOn ':NetSSL_Win:assemble'
 production.dependsOn ':Data:assemble'
-production.dependsOn ':Data:ODBC:assemble'
-production.dependsOn ':Data:SQLite:assemble'
-production.dependsOn ':Data:MySQL:assemble'
-production.dependsOn ':Data:PostgreSQL:assemble'
+if (os.windows) {
+	production.dependsOn ':Data:ODBC:assemble'
+	production.dependsOn ':Data:SQLite:assemble'
+	production.dependsOn ':Data:MySQL:assemble'
+	production.dependsOn ':Data:PostgreSQL:assemble'
+}
 production.dependsOn ':Zip:assemble'
 production.dependsOn ':PageCompiler:assemble'
 production.dependsOn ':PageCompiler:File2Page:assemble'
@@ -137,10 +146,12 @@ unittest.dependsOn ':Crypto:testsuite:assemble'
 unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
 unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
 unittest.dependsOn ':Data:testsuite:assemble'
-unittest.dependsOn ':Data:ODBC:testsuite:assemble'
-unittest.dependsOn ':Data:SQLite:testsuite:assemble'
-unittest.dependsOn ':Data:MySQL:testsuite:assemble'
-unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
+if (os.windows) {
+	unittest.dependsOn ':Data:ODBC:testsuite:assemble'
+	unittest.dependsOn ':Data:SQLite:testsuite:assemble'
+	unittest.dependsOn ':Data:MySQL:testsuite:assemble'
+	unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
+}
 unittest.dependsOn ':Zip:testsuite:assemble'
 unittest.dependsOn ':MongoDB:testsuite:assemble'
 unittest.dependsOn ':Redis:testsuite:assemble'
@@ -193,6 +204,10 @@ subprojects {
 				operatingSystem "linux"
 				architecture 'x64'
 			}
+			macos {
+				operatingSystem "macosx"
+				architecture 'x64'
+			}
 		}
 
 		flavors {
@@ -204,10 +219,13 @@ subprojects {
 				WS2_32 {
 					headers.srcDir 'C:/Program Files (x86)/Windows Kits/10/Include/10.0.15063.0/um'
 					binaries.withType(StaticLibraryBinary) {
-						staticLibraryFile = file('C:/Program Files (x86)/Windows Kits/10/Lib/10.0.15063.0/um/x86/WS2_32.lib')
+						if (targetPlatform.operatingSystem.windows) {
+							staticLibraryFile = file('C:/Program Files (x86)/Windows Kits/10/Lib/10.0.15063.0/um/x86/WS2_32.lib')
+						}
 					}
 				}
-				def  opensslHome = new File(rootDir, "openssl")
+				def opensslHome = new File(rootDir, "openssl")
+				def opensslBrewHome = new File('/usr/local/opt/openssl')
 				crypto {
 					headers.srcDir "$opensslHome/include"
 
@@ -217,20 +235,24 @@ subprojects {
 							if (targetPlatform == 'win32') {
 								libName = 'libeay32MTd.lib'
 								staticLibraryFile = file("$opensslHome/win32/lib/debug/$libName")
-							} else
-							if (targetPlatform == 'win64') {
+							} else if (targetPlatform == 'win64') {
 								libName = 'libeay64MTd.lib'
 								staticLibraryFile = file("$opensslHome/win64/lib/debug/$libName")
+							} else if (targetPlatform.operatingSystem.macOsX) {
+								libName = 'libcrypto.a'
+								staticLibraryFile = file("$opensslBrewHome/lib/$libName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
 							if (targetPlatform == 'win32') {
 								libName = 'libeay32MT.lib'
 								staticLibraryFile = file("$opensslHome/win32/lib/release/$libName")
-							} else
-							if (targetPlatform == 'win64') {
+							} else if (targetPlatform == 'win64') {
 								libName = 'libeay64MT.lib'
 								staticLibraryFile = file("$opensslHome/win64/lib/release/$libName")
+							} else if (targetPlatform.operatingSystem.macOsX) {
+								libName = 'libcrypto.a'
+								staticLibraryFile = file("$opensslBrewHome/lib/$libName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -243,28 +265,36 @@ subprojects {
 							if (targetPlatform == 'win32') {
 								dllName = 'libeay32d.dll'
 								linkName = 'libeay32d.lib'
-								sharedLibraryFile     = file("$opensslHome/win32/bin/debug/$dllName")
+								sharedLibraryFile	 = file("$opensslHome/win32/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win32/bin/debug/$linkName")
-							} else
-							if (targetPlatform == 'win64') {
+							} else if (targetPlatform == 'win64') {
 								dllName = 'libeay64d.dll'
 								linkName = 'libeay64d.lib'
-								sharedLibraryFile     = file("$opensslHome/win64/bin/debug/$dllName")
+								sharedLibraryFile	 = file("$opensslHome/win64/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win64/bin/debug/$linkName")
+							} else if (targetPlatform.operatingSystem.macOsX) {
+								dllName = 'libcrypto.dylib'
+								linkName = 'libcrypto.dylib'
+								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
+								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
 							if (targetPlatform == 'win32') {
 								dllName = 'libeay32.dll'
 								linkName = 'libeay32.lib'
-								sharedLibraryFile     = file("$opensslHome/win32/bin/release/$dllName")
+								sharedLibraryFile	 = file("$opensslHome/win32/bin/release/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win32/bin/release/$linkName")
-							} else
-							if (targetPlatform == 'win64') {
+							} else if (targetPlatform == 'win64') {
 								dllName = 'libeay64.dll'
 								linkName = 'libeay64.lib'
-								sharedLibraryFile     = file("$opensslHome/win64/bin/release/$dllName")
+								sharedLibraryFile	 = file("$opensslHome/win64/bin/release/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win64/bin/release/$linkName")
+							} else if (targetPlatform.operatingSystem.macOsX) {
+								dllName = 'libcrypto.dylib'
+								linkName = 'libcrypto.dylib'
+								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
+								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -280,20 +310,24 @@ subprojects {
 							if (targetPlatform == 'win32') {
 								libName = 'ssleay32MTd.lib'
 								staticLibraryFile = file("$opensslHome/win32/lib/debug/$libName")
-							} else
-							if (targetPlatform == 'win64') {
+							} else if (targetPlatform == 'win64') {
 								libName = 'ssleay64MTd.lib'
 								staticLibraryFile = file("$opensslHome/win64/lib/debug/$libName")
+							} else if (targetPlatform.operatingSystem.macOsX) {
+								libName = 'libssl.a'
+								staticLibraryFile = file("$opensslBrewHome/lib/$libName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
 							if (targetPlatform == 'win32') {
 								libName = 'ssleay32MT.lib'
 								staticLibraryFile = file("$opensslHome/win32/lib/release/$libName")
-							} else
-							if (targetPlatform == 'win64') {
+							} else if (targetPlatform == 'win64') {
 								libName = 'ssleay64MT.lib'
 								staticLibraryFile = file("$opensslHome/win64/lib/release/$libName")
+							} else if (targetPlatform.operatingSystem.macOsX) {
+								libName = 'libssl.a'
+								staticLibraryFile = file("$opensslBrewHome/lib/$libName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -306,28 +340,35 @@ subprojects {
 							if (targetPlatform == 'win32') {
 								dllName = 'ssleay32d.dll'
 								linkName = 'ssleay32d.lib'
-								sharedLibraryFile     = file("$opensslHome/win32/bin/debug/$dllName")
+								sharedLibraryFile	 = file("$opensslHome/win32/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win32/bin/debug/$linkName")
-							} else
-							if (targetPlatform == 'win64') {
+							} else if (targetPlatform == 'win64') {
 								dllName = 'ssleay64d.dll'
 								linkName = 'ssleay64d.lib'
-								sharedLibraryFile     = file("$opensslHome/win64/bin/debug/$dllName")
+								sharedLibraryFile	 = file("$opensslHome/win64/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win64/bin/debug/$linkName")
+							} else if (targetPlatform.operatingSystem.macOsX) {
+								dllName = 'libssl.dylib'
+								linkName = 'libssl.dylib'
+								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
+								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							}
-						} else
-						if (buildType == buildTypes.release) {
+						} else if (buildType == buildTypes.release) {
 							if (targetPlatform == 'win32') {
 								dllName = 'ssleay32.dll'
 								linkName = 'ssleay32.lib'
-								sharedLibraryFile     = file("$opensslHome/win32/bin/release/$dllName")
+								sharedLibraryFile	 = file("$opensslHome/win32/bin/release/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win32/bin/release/$linkName")
-							} else
-							if (targetPlatform == 'win64') {
+							} else if (targetPlatform == 'win64') {
 								dllName = 'ssleay64.dll'
 								linkName = 'ssleay64.lib'
-								sharedLibraryFile     = file("$opensslHome/win64/bin/release/$dllName")
+								sharedLibraryFile	 = file("$opensslHome/win64/bin/release/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win64/bin/release/$linkName")
+							} else if (targetPlatform.operatingSystem.macOsX) {
+								dllName = 'libssl.dylib'
+								linkName = 'libssl.dylib'
+								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
+								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -338,10 +379,11 @@ subprojects {
 		}
 		components {
 			withType(NativeComponentSpec) {
-            targetPlatform "win32"
-            targetPlatform "win64"
-            targetPlatform "linux32"
-            targetPlatform "linux64"
+			targetPlatform "win32"
+			targetPlatform "win64"
+			targetPlatform "linux32"
+			targetPlatform "linux64"
+			targetPlatform "macos"
 				binaries.withType(NativeTestSuiteBinarySpec) {
 					if (buildType == buildTypes.debug) {
 						if (it instanceof NativeExecutableBinarySpec) {
@@ -355,19 +397,26 @@ subprojects {
 					}
 				}
 				binaries.withType(NativeBinarySpec) {
+
+					if (toolChain in Clang) {
+						cppCompiler.args "-std=c++11"
+					}
 					if (buildType == buildTypes.debug) {
 						if (it instanceof SharedLibraryBinarySpec) {
-							sharedLibraryFile     = toBin(prefixByPoco(appendDebugSuffix(sharedLibraryFile)), targetPlatform)
+							sharedLibraryFile	 = toBin(prefixByPoco(appendDebugSuffix(sharedLibraryFile)), targetPlatform)
 							sharedLibraryLinkFile = toLib(prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile)), targetPlatform)
-						    // WINDOWS ONLY
-    						linker.args "/implib:${sharedLibraryLinkFile}"  // For MSVC only
-							// use the following for MinGW
-    						// linker.args "-Wl,--out-implib,${sharedLibraryLinkFile}"
-							// This next part is simply to ensure the directory is created as the compiler (tested on MSVC only) won't create it
-							def binary = it  // Simply to expose the binary in the `doFirst`
-							tasks.withType(LinkSharedLibrary) {
-								doFirst {
-									binary.sharedLibraryLinkFile.parentFile.mkdirs()
+
+							if (targetPlatform.operatingSystem.windows) {
+								// WINDOWS ONLY
+								linker.args "/implib:${sharedLibraryLinkFile}"  // For MSVC only
+								// use the following for MinGW
+								// linker.args "-Wl,--out-implib,${sharedLibraryLinkFile}"
+								// This next part is simply to ensure the directory is created as the compiler (tested on MSVC only) won't create it
+								def binary = it  // Simply to expose the binary in the `doFirst`
+								tasks.withType(LinkSharedLibrary) {
+									doFirst {
+										binary.sharedLibraryLinkFile.parentFile.mkdirs()
+									}
 								}
 							}
 						} else
@@ -384,15 +433,18 @@ subprojects {
 						if (it instanceof SharedLibraryBinarySpec) {
 							sharedLibraryFile = toBin(prefixByPoco(sharedLibraryFile), targetPlatform)
 							sharedLibraryLinkFile = toLib(prefixByPoco(sharedLibraryLinkFile), targetPlatform)
-						    // WINDOWS ONLY
-    						linker.args "/implib:${sharedLibraryLinkFile}"  // For MSVC only
-							// use the following for MinGW
-    						// linker.args "-Wl,--out-implib,${sharedLibraryLinkFile}"
-							// This next part is simply to ensure the directory is created as the compiler (tested on MSVC only) won't create it
-							def binary = it  // Simply to expose the binary in the `doFirst`
-							tasks.withType(LinkSharedLibrary) {
-								doFirst {
-									binary.sharedLibraryLinkFile.parentFile.mkdirs()
+
+							if (targetPlatform.operatingSystem.windows) {
+								// WINDOWS ONLY
+								linker.args "/implib:${sharedLibraryLinkFile}"  // For MSVC only
+								// use the following for MinGW
+								// linker.args "-Wl,--out-implib,${sharedLibraryLinkFile}"
+								// This next part is simply to ensure the directory is created as the compiler (tested on MSVC only) won't create it
+								def binary = it  // Simply to expose the binary in the `doFirst`
+								tasks.withType(LinkSharedLibrary) {
+									doFirst {
+										binary.sharedLibraryLinkFile.parentFile.mkdirs()
+									}
 								}
 							}
 						} else
@@ -509,7 +561,7 @@ subprojects {
 				}
 			}
 		}
-    }
+	}
 }
 
 
