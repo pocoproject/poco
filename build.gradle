@@ -101,6 +101,7 @@ task zipDoc(type: Zip) {
 }
 zipDoc.dependsOn pocoDoc
 
+def os = org.gradle.internal.os.OperatingSystem.current()
 task production {
 }
 production.dependsOn ':CppUnit:assemble'
@@ -113,10 +114,12 @@ production.dependsOn ':Crypto:assemble'
 production.dependsOn ':NetSSL_OpenSSL:assemble'
 production.dependsOn ':NetSSL_Win:assemble'
 production.dependsOn ':Data:assemble'
-production.dependsOn ':Data:ODBC:assemble'
-production.dependsOn ':Data:SQLite:assemble'
-production.dependsOn ':Data:MySQL:assemble'
-production.dependsOn ':Data:PostgreSQL:assemble'
+if (os.windows) {
+	production.dependsOn ':Data:ODBC:assemble'
+	production.dependsOn ':Data:SQLite:assemble'
+	production.dependsOn ':Data:MySQL:assemble'
+	production.dependsOn ':Data:PostgreSQL:assemble'
+}
 production.dependsOn ':Zip:assemble'
 production.dependsOn ':PageCompiler:assemble'
 production.dependsOn ':PageCompiler:File2Page:assemble'
@@ -137,10 +140,12 @@ unittest.dependsOn ':Crypto:testsuite:assemble'
 unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
 unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
 unittest.dependsOn ':Data:testsuite:assemble'
-unittest.dependsOn ':Data:ODBC:testsuite:assemble'
-unittest.dependsOn ':Data:SQLite:testsuite:assemble'
-unittest.dependsOn ':Data:MySQL:testsuite:assemble'
-unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
+if (os.windows) {
+	unittest.dependsOn ':Data:ODBC:testsuite:assemble'
+	unittest.dependsOn ':Data:SQLite:testsuite:assemble'
+	unittest.dependsOn ':Data:MySQL:testsuite:assemble'
+	unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
+}
 unittest.dependsOn ':Zip:testsuite:assemble'
 unittest.dependsOn ':MongoDB:testsuite:assemble'
 unittest.dependsOn ':Redis:testsuite:assemble'
