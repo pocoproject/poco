@@ -222,7 +222,7 @@ Timestamp FileImpl::createdImpl() const
 	// a macro st_birthtime makes sure there is a st_birthtimespec (nano sec precision)
 	struct stat64 st;
 	if (stat64(_path.c_str(), &st) == 0)
-		return Timestamp(timespec2Microsecs(st.st_birthtimespec);
+		return Timestamp(timespec2Microsecs(st.st_birthtimespec));
 #elif defined(__FreeBSD__) && defined(st_birthtime)
 	// a macro st_birthtime makes sure there is a st_birthtimespec (nano sec precision)
 	struct stat st;
