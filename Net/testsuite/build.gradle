@@ -39,8 +39,10 @@ model {
 	}
 	binaries {
 		all {
-			linker.args "ws2_32.lib"
-			linker.args "iphlpapi.lib"
+			if (targetPlatform.operatingSystem.windows) {
+				linker.args "ws2_32.lib"
+				linker.args "iphlpapi.lib"
+			}
 		}
 	}
 }

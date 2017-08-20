@@ -1,20 +1,24 @@
 model {
 	components {
 		NetSSLWin(NativeLibrarySpec) {
-			sources {
-				rc {
-					source {
-						srcDir '..'
-						include 'DLLVersion.rc'
-					}
-				}
-				cpp {
-					source {
-						srcDir 'src'
-						include '**/*.cpp'
-					}
-					exportedHeaders {
-						srcDir 'include'
+			binaries.all {
+				if (targetPlatform.operatingSystem.windows) {
+					sources {
+						rc(WindowsResourceSet) {
+							source {
+								srcDir '..'
+								include 'DLLVersion.rc'
+							}
+						}
+						cpp(CppSourceSet) {
+							source {
+								srcDir 'src'
+								include '**/*.cpp'
+							}
+							exportedHeaders {
+								srcDir 'include'
+							}
+						}
 					}
 				}
 			}

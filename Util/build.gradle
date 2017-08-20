@@ -1,6 +1,6 @@
 model {
 	components {
-		Util(NativeLibrarySpec) {
+		Util(NativeLibrarySpec) { m ->
 			sources {
 				rc {
 					source {
@@ -21,9 +21,23 @@ model {
 					source {
 						srcDir 'src'
 						include '**/*.cpp'
+						exclude '**/Win*.cpp'
 					}
 					exportedHeaders {
 						srcDir 'include'
+					}
+				}
+			}
+			binaries.all {
+				if (targetPlatform.operatingSystem.windows) {
+					sources {
+						platformWindows(CppSourceSet) {
+							lib m.sources.cpp
+							source {
+								srcDir 'src'
+								include '**/Win*.cpp'
+							}
+						}
 					}
 				}
 			}

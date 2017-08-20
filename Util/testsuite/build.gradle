@@ -14,13 +14,14 @@ model {
 				}
 			}
 		}
-		TestSuite(NativeExecutableSpec) {
+		TestSuite(NativeExecutableSpec) { m ->
 			sources {
 				cpp {
 					source {
 						srcDir 'src'
 						include '**/*.cpp'
 						exclude 'Win*Driver.cpp'
+						exclude 'Win*.cpp'
 					}
 					exportedHeaders {
 						srcDir 'src'
@@ -30,6 +31,17 @@ model {
 					lib project: ':XML', library: 'XML', linkage: 'shared'
 					lib project: ':Util', library: 'Util', linkage: 'shared'
 					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+				}
+			}
+			binaries.all {
+				if (targetPlatform.operatingSystem.windows) {
+					sources {
+						platformWindows(CppSourceSet) {
+							lib m.sources.cpp
+							source.srcDir 'src'
+							source.include 'Win*.cpp'
+						}
+					}
 				}
 			}
 		}
