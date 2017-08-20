@@ -20,6 +20,7 @@
 #include "Poco/Token.h"
 #include "Poco/UTF8Encoding.h"
 #include "Poco/String.h"
+#include "Poco/StreamCopier.h"
 #undef min
 #undef max
 #include <limits>
@@ -31,9 +32,108 @@ namespace Poco {
 namespace JSON {
 
 
-#ifdef SOME_JSON_PARSER
+#ifdef PD_JSON_PARSER
 
-//TODO
+
+ParserImpl::ParserImpl(const Handler::Ptr& pHandler, std::size_t bufSize):
+	_pHandler(pHandler),
+	_depth(JSON_UNLIMITED_DEPTH),
+	_decimalPoint('.'),
+	_allowNullByte(true),
+	_allowComments(false)
+{
+	poco_assert_dbg(_pHandler);
+}
+
+
+ParserImpl::~ParserImpl()
+{
+}
+
+
+Dynamic::Var ParserImpl::parseImpl(const std::string& json)
+{
+	json_open_buffer(&_json, json.data(), json.size());
+	if (json_get_error(&_json)) throw JSONException(json_get_error(&_json));
+	handle();
+	json_close(&_json);
+	return asVarImpl();
+}
+
+
+Dynamic::Var ParserImpl::parseImpl(std::istream& in)
+{
+	std::ostringstream os;
+	StreamCopier::copyStream(in, os);
+	json_open_buffer(&_json, os.str().data(), os.str().size());
+	handle();
+	json_close(&_json);
+	return asVarImpl();
+}
+
+
+void ParserImpl::handleArray()
+{
+	while (json_peek(&_json) != JSON_ARRAY_END && !json_get_error(&_json))
+		handle();
+
+	json_next(&_json);
+}
+
+
+void ParserImpl::handleObject()
+{
+	while (json_peek(&_json) != JSON_OBJECT_END && !json_get_error(&_json))
+	{
+		json_next(&_json);
+		_pHandler->key(std::string(json_get_string(&_json, NULL)));
+		handle();
+	}
+	json_next(&_json);
+}
+
+
+void ParserImpl::handle()
+{
+	enum json_type type = json_next(&_json);
+	switch (type)
+	{
+		case JSON_DONE:
+			return;
+		case JSON_NULL:
+			_pHandler->null();
+			break;
+		case JSON_TRUE:
+			_pHandler->value(true);
+			break;
+		case JSON_FALSE:
+			_pHandler->value(false);
+			break;
+		case JSON_NUMBER:
+			_pHandler->value(NumberParser::parseFloat(json_get_string(&_json, NULL)));
+			break;
+		case JSON_STRING:
+			_pHandler->value(std::string(json_get_string(&_json, NULL)));
+			break;
+		case JSON_ARRAY:
+			_pHandler->startArray();
+			handleArray();
+			break;
+		case JSON_OBJECT:
+			_pHandler->startObject();
+			handleObject();
+			break;
+		case JSON_OBJECT_END:
+			_pHandler->endObject();
+			return;
+		case JSON_ARRAY_END:
+			_pHandler->endArray();
+			return;
+		case JSON_ERROR:
+			throw JSONException(json_get_error(&_json));
+	}
+}
+
 
 #elif defined(JSON_ORG_PARSER)
 
