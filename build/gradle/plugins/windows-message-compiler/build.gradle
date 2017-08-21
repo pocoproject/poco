@@ -1,0 +1,18 @@
+group = 'org.pocoproject'
+version = '1.0.0'
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.7
+
+dependencies {
+    compile gradleApi()
+	compile 'com.google.collections:google-collections:1.0'
+    testCompile 'junit:junit:4.12'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}

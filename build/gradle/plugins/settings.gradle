@@ -1,0 +1,2 @@
+include ':cppunit-test-suite'
+include 'windows-message-compiler'
