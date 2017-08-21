@@ -173,9 +173,10 @@ void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractOb
 			_handlers[socket] = pNotifier;
 		}
 		else pNotifier = it->second;
-	}
-	if (!pNotifier->hasObserver(observer))
-		pNotifier->addObserver(this, observer);
+
+		if (!pNotifier->hasObserver(observer))
+			pNotifier->addObserver(this, observer);
+	}	
 }
 
 
@@ -212,12 +213,12 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 				_handlers.erase(it);
 			}
 		}
-	}
-	if (pNotifier && pNotifier->hasObserver(observer))
-	{
-		pNotifier->removeObserver(this, observer);
-	}
 
+		if (pNotifier && pNotifier->hasObserver(observer))
+		{
+			pNotifier->removeObserver(this, observer);
+		}
+	}
 }
 
 
