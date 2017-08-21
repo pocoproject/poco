@@ -1,5 +1,4 @@
 def os = org.gradle.internal.os.OperatingSystem.current()
-println 'This is executed during the initialization phase.'
 rootProject.name = 'Poco'
 
 include ':CppUnit'
@@ -10,7 +9,9 @@ include ':Util'
 include ':Net'
 include ':Crypto'
 include ':NetSSL_OpenSSL'
-include ':NetSSL_Win'
+if (os.windows) {
+	include ':NetSSL_Win'
+}
 include ':Data'
 if (os.windows) {
 	include ':Data:ODBC'
@@ -35,7 +36,9 @@ include ':Util:testsuite'
 include ':Net:testsuite'
 include ':Crypto:testsuite'
 include ':NetSSL_OpenSSL:testsuite'
-include ':NetSSL_Win:testsuite'
+if (os.windows) {
+	include ':NetSSL_Win:testsuite'
+}
 include ':Data:testsuite'
 if (os.windows) {
 	include ':Data:ODBC:testsuite'
