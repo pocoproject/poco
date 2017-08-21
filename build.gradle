@@ -1,16 +1,22 @@
+/*
+ * buildscript {
+    repositories {
+        mavenLocal()
+    }
+    dependencies {
+        classpath group: 'org.pocoproject', name: 'cppunit-test-suite', version:'1.0.0'
+        classpath group: 'org.pocoproject', name: 'windows-message-compiler', version:'1.0.0'
+    }
+}
+
 plugins {
 	id 'c'
 	id 'cpp'
 	id 'cppunit-test-suite'
 	id 'windows-resources'
-	id 'windows-messages'
+	id 'windows-message-compiler'
 }
-
-
-repositories {
-	mavenCentral()
-}
-
+*/
 /*
 dependencies {
 	testCompile group: 'org.jvnet.hudson.plugins', name: 'cppunit', version: '1.10'
@@ -108,6 +114,7 @@ task zipDoc(type: Zip) {
 zipDoc.dependsOn pocoDoc
 
 def os = org.gradle.internal.os.OperatingSystem.current()
+
 task production {
 }
 production.dependsOn ':CppUnit:assemble'
@@ -118,7 +125,9 @@ production.dependsOn ':Util:assemble'
 production.dependsOn ':Net:assemble'
 production.dependsOn ':Crypto:assemble'
 production.dependsOn ':NetSSL_OpenSSL:assemble'
-production.dependsOn ':NetSSL_Win:assemble'
+if (os.windows) {
+	production.dependsOn ':NetSSL_Win:assemble'
+}
 production.dependsOn ':Data:assemble'
 if (os.windows) {
 	production.dependsOn ':Data:ODBC:assemble'
@@ -144,7 +153,9 @@ unittest.dependsOn ':Util:testsuite:assemble'
 unittest.dependsOn ':Net:testsuite:assemble'
 unittest.dependsOn ':Crypto:testsuite:assemble'
 unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
-unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
+if (os.windows) {
+	unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
+}
 unittest.dependsOn ':Data:testsuite:assemble'
 if (os.windows) {
 	unittest.dependsOn ':Data:ODBC:testsuite:assemble'
@@ -155,6 +166,22 @@ if (os.windows) {
 unittest.dependsOn ':Zip:testsuite:assemble'
 unittest.dependsOn ':MongoDB:testsuite:assemble'
 unittest.dependsOn ':Redis:testsuite:assemble'
+
+task samples {	
+}
+samples.dependsOn ':Foundation:samples:assemble'
+if (os.windows) {
+	samples.dependsOn ':Data:samples:assemble'
+}
+samples.dependsOn ':JSON:samples:assemble'
+samples.dependsOn ':MongoDB:samples:assemble'
+samples.dependsOn ':Net:samples:assemble'
+samples.dependsOn ':PageCompiler:samples:assemble'
+samples.dependsOn ':PDF:samples:assemble'
+samples.dependsOn ':Util:samples:assemble'
+samples.dependsOn ':XML:samples:assemble'
+samples.dependsOn ':Zip:samples:assemble'
+
 
 allprojects {
 	buildDir = new File("gradle")	
@@ -564,4 +591,20 @@ subprojects {
 	}
 }
 
+/*
+if (os.windows) {
+task Candle(type: Exec) {
+//%VIXTOOLSET%\bin\Candle.exe -arch x86 -dVSYEAR=%VSYEAR% -dVERSION=%POCO_VERSION% -dPOCO=%POCO_BASE% -dPlatform=x86 -out "%VSYEAR%/Poco %POCO_VERSION% (x86).wixobj" -ext %VIXTOOLSET%\bin\WixUIExtension.dll Poco-%POCO_VERSION%.wxs
+}
+task Light(type: Exec) {
+//%VIXTOOLSET%\bin\Light.exe  -out "%VSYEAR%/Poco %POCO_VERSION% (x86).msi" -cultures:null -ext %VIXTOOLSET%\bin\WixUIExtension.dll "%VSYEAR%/Poco %POCO_VERSION% (x86).wixobj"
+}
+task WiX(type: Exec) {
+}
+Light.dependsOn Candle
+WiX.dependsOn Light
 
+task NuGet(type: Exec){
+}
+}
+*/
