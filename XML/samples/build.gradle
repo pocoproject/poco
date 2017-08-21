@@ -1,45 +1,46 @@
 model {
 	components {
-		pkill(NativeExecutableSpec) {
+		data(NativeExecutableSpec) {
 			sources {
-				cpp.source { srcDir 'pkill/src' include '**/*.cpp' }
-				cpp.lib project: ':Util', library: 'Util'				
-				cpp.lib project: ':Foundation', library: 'Foundation'				
+				cpp.source { srcDir 'data/src' include '**/*.cpp' }
+				cpp.lib project: ':XML', library: 'XML', linkage: 'shared'				
+				cpp.lib project: ':Foundation', library: 'Foundation', linkage: 'shared'				
 			}
 		}
-		SampleApp(NativeExecutableSpec) {
+		DOMParser(NativeExecutableSpec) {
 			sources {
-				cpp.source { srcDir 'SampleApp/src' include '**/*.cpp' }
-				cpp.lib project: ':Util', library: 'Util'				
-				cpp.lib project: ':Foundation', library: 'Foundation'				
+				cpp.source { srcDir 'DOMParser/src' include '**/*.cpp' }
+				cpp.lib project: ':XML', library: 'XML', linkage: 'shared'				
+				cpp.lib project: ':Foundation', library: 'Foundation', linkage: 'shared'				
 			}
 		}
-		SampleServer(NativeExecutableSpec) {
+		DOMWriter(NativeExecutableSpec) {
 			sources {
-				cpp.source { srcDir 'SampleServer/src' include '**/*.cpp' }
-				cpp.lib project: ':Util', library: 'Util'				
-				cpp.lib project: ':Foundation', library: 'Foundation'				
+				cpp.source { srcDir 'DOMWriter/src' include '**/*.cpp' }
+				cpp.lib project: ':XML', library: 'XML', linkage: 'shared'				
+				cpp.lib project: ':Foundation', library: 'Foundation', linkage: 'shared'				
 			}
 		}
-		Units(NativeExecutableSpec) {
+		PrettyPrint(NativeExecutableSpec) {
 			sources {
-				cpp.source { srcDir 'Units/src' include '**/*.cpp' }
-				cpp.lib project: ':Util', library: 'Util'				
-				cpp.lib project: ':Foundation', library: 'Foundation'				
+				cpp.source { srcDir 'PrettyPrint/src' include '**/*.cpp' }
+				cpp.lib project: ':XML', library: 'XML', linkage: 'shared'				
+				cpp.lib project: ':Foundation', library: 'Foundation', linkage: 'shared'				
 			}
 		}
-	}
-	binaries {
-		all {
-		}
-		withType(SharedLibraryBinarySpec) {
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
-		}
-		withType(StaticLibraryBinarySpec) {
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
-		}
-		withType(NativeExecutableSpec) {
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
+//		RoundTrip(NativeExecutableSpec) {
+//			sources {
+//				cpp.source { srcDir 'RoundTrip/src' include '**/*.cpp' }
+//				cpp.lib project: ':XML', library: 'XML', linkage: 'shared'				
+//				cpp.lib project: ':Foundation', library: 'Foundation', linkage: 'shared'				
+//			}
+//		}
+		SAXParser(NativeExecutableSpec) {
+			sources {
+				cpp.source { srcDir 'SAXParser/src' include '**/*.cpp' }
+				cpp.lib project: ':XML', library: 'XML', linkage: 'shared'				
+				cpp.lib project: ':Foundation', library: 'Foundation', linkage: 'shared'				
+			}
 		}
 	}
 }
