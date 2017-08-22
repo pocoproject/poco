@@ -31,15 +31,15 @@
 				TextTestResult.h,
 				Connector.h,
 				Constants.h,
-				inffast.h
+				inffast.h,
+				${PocoBuild}/PDF/include/*.h,
+				${PocoBuild}/CppParser/include/*.h
 			</exclude>
 		</files>
 		<pages>
 			${PocoBuild}/doc/*.page,
-<!--
 			${PocoBuild}/*/doc/*.page
 			${PocoBuild}/*/*/doc/*.page
--->
 		</pages>
 		<resources>
 			${PocoBase}/PocoDoc/resources/css,
@@ -53,13 +53,11 @@
 				<exec>cl.exe</exec>
 				<options>
 					${Includes},
-					/IC:\mysql-5.6.37-win32\include,
-					/IC:\postgresql-9.6.3-2-win32\pgsql\include,
 					/I${PocoBase}/openssl/include
-					/IC:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include,
-					/IC:\Program Files (x86)\Windows Kits\8.1\Include\shared,
-					/IC:\Program Files (x86)\Windows Kits\8.1\Include\um,
-					/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt,
+					/I${VC}/include,
+					/I${WDK}/shared
+					/I${WDK}/um
+					/I${WDK}/ucrt
 					/nologo,
 					/D_DEBUG,
 					/E,
@@ -67,7 +65,7 @@
 					/DPOCO_NO_GCC_API_ATTRIBUTE
 					/DPOCO_NO_WINDOWS_H
 				</options>
-				<path>C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\</path>
+				<path>${VC}/bin</path>
 				<usePipe>true</usePipe>
 			</windows>
 			<unix>
