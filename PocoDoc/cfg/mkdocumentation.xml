@@ -41,12 +41,18 @@
 			${PocoBuild}/*/doc/images
 		</resources>
 		<compiler>
-			<exec>${CXX} ${CXXFLAGS}</exec>
+			<exec>C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\cl.exe</exec>
 			<options>
 				${Includes},
 				-I/usr/local/mysql/include,
 				-I/usr/include/mysql,
 				-I/usr/include/postgresql,
+				/I${PocoBase}/openssl/include
+				/IC:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include,
+				/IC:\Program Files (x86)\Windows Kits\8.1\Include\shared,
+				/IC:\Program Files (x86)\Windows Kits\8.1\Include\um,
+				/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt,
+				/nologo,
 				-D_DEBUG,
 				-E,
 				-C,
@@ -108,7 +114,7 @@
 		<loggers>
 			<root>
 				<channel>c1</channel>
-				<level>warning</level>
+				<level>information</level>
 			</root>
 		</loggers>
 		<channels>
