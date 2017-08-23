@@ -42,7 +42,6 @@ ParserImpl::ParserImpl(const Handler::Ptr& pHandler, std::size_t bufSize):
 	_allowNullByte(true),
 	_allowComments(false)
 {
-	poco_assert_dbg(_pHandler);
 }
 
 
@@ -51,12 +50,43 @@ ParserImpl::~ParserImpl()
 }
 
 
+void ParserImpl::handle(const std::string& json)
+{
+	try
+	{
+		json_open_buffer(&_json, json.data(), json.size());
+		checkError();
+		//////////////////////////////////
+		// Underlying parser is capable of parsing multiple consecutive JSONs;
+		// we do not currently support this feature; to force error on
+		// excessive characters past valid JSON end, this MUST be called
+		// AFTER opening the buffer - otherwise it is overwritten by
+		// json_open*() call, which calls internal init()
+		json_set_streaming(&_json, false);
+		/////////////////////////////////
+		handle(); checkError();
+		if (JSON_DONE != json_next(&_json))
+			throw JSONException("Excess characters found after JSON end.");
+		json_close(&_json);
+	}
+	catch (std::exception&)
+	{
+		json_close(&_json);
+		throw;
+	}
+}
+
+
 Dynamic::Var ParserImpl::parseImpl(const std::string& json)
 {
-	json_open_buffer(&_json, json.data(), json.size());
-	if (json_get_error(&_json)) throw JSONException(json_get_error(&_json));
-	handle();
-	json_close(&_json);
+	if (_allowComments)
+	{
+		std::string str = json;
+		stripComments(str);
+		handle(str);
+	}
+	else handle(json);
+
 	return asVarImpl();
 }
 
@@ -65,31 +95,71 @@ Dynamic::Var ParserImpl::parseImpl(std::istream& in)
 {
 	std::ostringstream os;
 	StreamCopier::copyStream(in, os);
-	json_open_buffer(&_json, os.str().data(), os.str().size());
-	handle();
-	json_close(&_json);
-	return asVarImpl();
+	return parseImpl(os.str());
+}
+
+
+void ParserImpl::stripComments(std::string& json)
+{
+	if (_allowComments)
+	{
+		bool inString = false;
+		bool inComment = false;
+		char prevChar = 0;
+		std::string::iterator it = json.begin();
+		for (; it != json.end();)
+		{
+			if (*it == '"' && !inString) inString = true;
+			else inString = false;
+			if (!inString)
+			{
+				if (*it == '/' && it + 1 != json.end() && *(it + 1) == '*')
+					inComment = true;
+			}
+			if (inComment)
+			{
+				char c = *it;
+				it = json.erase(it);
+				if (prevChar == '*' && c == '/')
+				{
+					inComment = false;
+					prevChar = 0;
+				}
+				else prevChar = c;
+			}
+			else ++it;
+		}
+	}
 }
 
 
 void ParserImpl::handleArray()
 {
-	while (json_peek(&_json) != JSON_ARRAY_END && !json_get_error(&_json))
+	json_type tok = json_peek(&_json);
+	while (tok != JSON_ARRAY_END && checkError())
+	{
 		handle();
+		tok = json_peek(&_json);
+	}
 
-	json_next(&_json);
+	if (tok == JSON_ARRAY_END) handle();
+	else throw JSONException("JSON array end not found");
 }
 
 
 void ParserImpl::handleObject()
 {
-	while (json_peek(&_json) != JSON_OBJECT_END && !json_get_error(&_json))
+	json_type tok = json_peek(&_json);
+	while (tok != JSON_OBJECT_END && checkError())
 	{
 		json_next(&_json);
-		_pHandler->key(std::string(json_get_string(&_json, NULL)));
+		if (_pHandler) _pHandler->key(std::string(json_get_string(&_json, NULL)));
 		handle();
+		tok = json_peek(&_json);
 	}
-	json_next(&_json);
+
+	if (tok == JSON_OBJECT_END) handle();
+	else throw JSONException("JSON object end not found");
 }
 
 
@@ -104,30 +174,47 @@ void ParserImpl::handle()
 			_pHandler->null();
 			break;
 		case JSON_TRUE:
-			_pHandler->value(true);
+			if (_pHandler) _pHandler->value(true);
 			break;
 		case JSON_FALSE:
-			_pHandler->value(false);
+			if (_pHandler) _pHandler->value(false);
 			break;
 		case JSON_NUMBER:
-			_pHandler->value(NumberParser::parseFloat(json_get_string(&_json, NULL)));
+		{
+			if (_pHandler)
+			{
+				std::string str(json_get_string(&_json, NULL));
+				if (str.find(_decimalPoint) != str.npos || str.find('e') != str.npos || str.find('E') != str.npos)
+				{
+					_pHandler->value(NumberParser::parseFloat(str));
+				}
+				else
+				{
+					Poco::Int64 val;
+					if (NumberParser::tryParse64(str, val))
+						_pHandler->value(val);
+					else
+						_pHandler->value(NumberParser::parseUnsigned64(str));
+				}
+			}
 			break;
+		}
 		case JSON_STRING:
-			_pHandler->value(std::string(json_get_string(&_json, NULL)));
-			break;
-		case JSON_ARRAY:
-			_pHandler->startArray();
-			handleArray();
+			if (_pHandler) _pHandler->value(std::string(json_get_string(&_json, NULL)));
 			break;
 		case JSON_OBJECT:
-			_pHandler->startObject();
+			if (_pHandler) _pHandler->startObject();
 			handleObject();
 			break;
 		case JSON_OBJECT_END:
-			_pHandler->endObject();
+			if (_pHandler) _pHandler->endObject();
 			return;
+		case JSON_ARRAY:
+			if (_pHandler) _pHandler->startArray();
+			handleArray();
+			break;
 		case JSON_ARRAY_END:
-			_pHandler->endArray();
+			if (_pHandler) _pHandler->endArray();
 			return;
 		case JSON_ERROR:
 			throw JSONException(json_get_error(&_json));

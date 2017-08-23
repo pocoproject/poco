@@ -47,7 +47,6 @@ void ParseHandler::reset()
 void ParseHandler::startObject()
 {
 	Object::Ptr newObj = new Object(_preserveObjectOrder);
-
 	if (_stack.empty()) // The first object
 	{
 		_result = newObj;

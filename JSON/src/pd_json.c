@@ -322,7 +322,7 @@ int read_escaped(json_stream *json)
 static int
 char_needs_escaping(int c)
 {
-    if (c < 0x20 || c == 0x22 || c == 0x5c) {
+    if ((c >= 0) && (c < 0x20 || c == 0x22 || c == 0x5c)) {
         return 1;
     }
 
@@ -349,7 +349,7 @@ read_string(json_stream *json)
                 return JSON_ERROR;
         } else {
             if (char_needs_escaping(c)) {
-                json_error(json, "%s", "unescaped control character in string");
+                json_error(json, "%s:%u", "unescaped control character in string", (unsigned)c);
                 return JSON_ERROR;
             }
 
@@ -528,11 +528,9 @@ enum json_type json_next(json_stream *json)
                 c = json->source.get(&json->source);
             }
         } while (json_isspace(c));
-
         if (!json->streaming && c != EOF) {
             return JSON_ERROR;
         }
-
         return JSON_DONE;
     }
     int c = next(json);

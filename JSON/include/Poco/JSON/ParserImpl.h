@@ -107,6 +107,9 @@ private:
 	void handleArray();
 	void handleObject();
 	void handle();
+	void handle(const std::string& json);
+	void stripComments(std::string& json);
+	bool checkError();
 
 	json_stream  _json;
 	Handler::Ptr _pHandler;
@@ -123,7 +126,10 @@ private:
 
 inline void ParserImpl::resetImpl()
 {
-	json_reset(&_json);
+	// currently, json stream is opened and closed on every parse request
+	// (perhaps there is some optimization room?)
+	//json_reset(&_json);
+	if (_pHandler) _pHandler->reset();
 }
 
 
@@ -166,6 +172,14 @@ inline std::size_t ParserImpl::getDepthImpl() const
 inline void ParserImpl::setHandlerImpl(const Handler::Ptr& pHandler)
 {
 	_pHandler = pHandler;
+}
+
+
+inline bool ParserImpl::checkError()
+{
+	const char* err = json_get_error(&_json);
+	if (err) throw Poco::JSON::JSONException(err);
+	return true;
 }
 
 
