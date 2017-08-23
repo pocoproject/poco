@@ -2,12 +2,13 @@ model {
 	components {
 		Foundation(NativeLibrarySpec) { m ->
 			sources {
-				mc {
-					source {
-						srcDir 'src'
-						include '**/*.mc'
-					}
-				}
+//
+//				mc {
+//					source {
+//						srcDir 'src'
+//						include '**/*.mc'
+//					}
+//				}
 				rc {
 					source {
 						srcDir '..'
