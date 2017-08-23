@@ -1,25 +1,15 @@
-/*
- * buildscript {
-    repositories {
-        mavenLocal()
-    }
-    dependencies {
-        classpath group: 'org.pocoproject', name: 'cppunit-test-suite', version:'1.0.0'
-        classpath group: 'org.pocoproject', name: 'windows-message-compiler', version:'1.0.0'
-    }
+buildscript {
 }
 
-plugins {
-	id 'c'
-	id 'cpp'
-	id 'cppunit-test-suite'
-	id 'windows-resources'
-	id 'windows-message-compiler'
+/*
+dependencies {
+	testCompile group: 'org.jvnet.hudson.plugins', name: 'cppunit', version: '1.10'
 }
 */
 /*
 dependencies {
-	testCompile group: 'org.jvnet.hudson.plugins', name: 'cppunit', version: '1.10'
+	classpath group: 'org.pocoproject', name: 'cppunit-test-suite', version:'1.0.0'
+	classpath group: 'org.pocoproject', name: 'windows-message-compiler', version:'1.0.0'
 }
 */
 
@@ -45,7 +35,6 @@ File prefixByPoco(File binaryFile) {
 }
 File toLocalBin(File binaryFile, Platform platform) {
 	String name = binaryFile.getName()
-	File parent = new File("bin")
 	String target
 	if (platform.architecture.name == 'x86') {
 		target = 'bin'
@@ -55,6 +44,7 @@ File toLocalBin(File binaryFile, Platform platform) {
 	} else {
 		throw new GradleException("Unknown architecture: " + platform.architecture.name)
 	}
+	File parent = new File(target)
 	return new File(parent, name);
 }
 File toBin(File sharedFile, Platform platform) {
@@ -95,14 +85,29 @@ File toStatic(File staticFile) {
 	File parent = new File(rootDir, "static")
 	return new File(parent, name);
 }
+apply plugin: 'base' 
 
+task PocoDocIni {
+    def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
+    file.createNewFile()
+    file.text = """
+PocoBuild=$rootDir
+PocoBase=$rootDir
+PocoDoc.output=releases/poco-2.0.0-all-doc
+PocoDoc.version=2.0.0-all
+Includes=-IC:/postgresql-9.6.3-2-win32/pgsql/include,-IC:/mysql-5.6.37-win32/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include
+VC=C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC
+WDK=C:/Program Files (x86)/Windows Kits/10/Include/10.0.15063.0
+"""
+}
 task pocoDoc(type: Exec) {
 //  environment PATH "$rootDir\bin;$PATH"
   executable "PocoDoc/bin/PocoDoc.exe"
-  args "/config=PocoDoc/cfg/mkdoc-poco.xml"
-  args "/config=stage/docbuild/PocoDoc.ini"
+  args "/config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+  args "/config=$rootDir/PocoDoc/PocoDoc.ini"
 }
 pocoDoc.dependsOn ':PocoDoc::assemble'
+pocoDoc.dependsOn PocoDocIni
 
 task zipDoc(type: Zip) {
    from 'releases/poco-2.0.0-all-doc/'
@@ -112,6 +117,15 @@ task zipDoc(type: Zip) {
    destinationDir(file('releases'))
 }
 zipDoc.dependsOn pocoDoc
+
+clean.doFirst {
+	file('bin').delete() 
+	file('bin64').delete() 
+	file('lib').delete() 
+	file('lib64').delete() 
+	file('static').delete() 
+	file('static64').delete() 
+}
 
 def os = org.gradle.internal.os.OperatingSystem.current()
 
@@ -192,7 +206,7 @@ subprojects {
 	apply plugin:	'cppunit-test-suite'
  	apply plugin:	'windows-resources'
 	apply plugin:	'windows-messages'
-
+	
 	
 
 	model {
@@ -406,11 +420,12 @@ subprojects {
 		}
 		components {
 			withType(NativeComponentSpec) {
-			targetPlatform "win32"
-			targetPlatform "win64"
-			targetPlatform "linux32"
-			targetPlatform "linux64"
-			targetPlatform "macos"
+				targetPlatform "win32"
+				targetPlatform "win64"
+				targetPlatform "linux32"
+				targetPlatform "linux64"
+				targetPlatform "macos"
+
 				binaries.withType(NativeTestSuiteBinarySpec) {
 					if (buildType == buildTypes.debug) {
 						if (it instanceof NativeExecutableBinarySpec) {
