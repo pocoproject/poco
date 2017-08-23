@@ -58,6 +58,10 @@ File toLocalBin(File binaryFile, Platform platform) {
 	return new File(parent, name);
 }
 File toBin(File sharedFile, Platform platform) {
+	if (platform.operatingSystem.linux) {
+		return toLib(sharedFile, platform)
+	}
+
 	String name = sharedFile.getName()
 	String target
 	if (platform.architecture.name == 'x86') {
@@ -408,7 +412,7 @@ subprojects {
 			withType(NativeComponentSpec) {
 			targetPlatform "win32"
 			targetPlatform "win64"
-			targetPlatform "linux32"
+			//targetPlatform "linux32"
 			targetPlatform "linux64"
 			targetPlatform "macos"
 				binaries.withType(NativeTestSuiteBinarySpec) {
@@ -508,6 +512,17 @@ subprojects {
 					throw new GradleException("Unknown buildType" + buildType)
 				}
 			
+//				if (toolChain in Gcc) {
+					cppCompiler.define "_XOPEN_SOURCE=600"
+					cppCompiler.define "_REENTRANT"
+					cppCompiler.define "_THREAD_SAFE"
+					cppCompiler.define "_FILE_OFFSET_BITS=64"
+					cppCompiler.define "_LARGEFILE64_SOURCE"
+					cppCompiler.define "POCO_HAVE_FD_EPOLL"
+					cppCompiler.define "POCO_HAVE_ADDRINFO"
+					cppCompiler.define "POCO_HAVE_LIBRESOLV"
+					cppCompiler.args "-std=c++11"
+//				}
 				if (toolChain in VisualCpp) {
 					if (targetPlatform == platforms.win64) {
 						linker.args '/MACHINE:X64'
