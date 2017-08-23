@@ -58,7 +58,7 @@ public:
 
 	Redis::Client::Ptr createObject()
 	{
-        Redis::Client::Ptr redis = Redis::Client(_addresses);
+        Redis::Client::Ptr redis = new Redis::Client(_address);
 
         if (_password.empty()) return redis;
 
@@ -112,7 +112,10 @@ public:
 	{
 		try
 		{
-			_pool.returnObject(_client);
+            if (_client)
+            {
+                _pool.returnObject(_client);
+            }
 		}
 		catch (...)
 		{
