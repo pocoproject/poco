@@ -889,6 +889,10 @@ inline unsigned ParserImpl::decodeSurrogatePair(unsigned hi, unsigned lo)
 }
 
 
+#else
+
+#error "No JSON parser defined."
+
 #endif // JSON_ORG_PARSER
 
 

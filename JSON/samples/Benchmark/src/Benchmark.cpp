@@ -50,8 +50,12 @@ int main(int argc, char** argv)
 			return 1; 
 		}
 	}
-
-	std::cout << "JSON Benchmark" << std::endl;
+#ifdef PD_JSON_PARSER
+	std::string parser = "pdparser";
+#elif defined(JSON_ORG_PARSER)
+	std::string parser = "json.org parser";
+#endif
+	std::cout << "JSON Benchmark (" << parser << ')' << std::endl;
 	std::cout << "==============" << std::endl;
 
 	std::string jsonStr = ostr.str();
@@ -99,7 +103,7 @@ int main(int argc, char** argv)
 
 		//Serialize to string
 		Poco::JSON::Object::Ptr obj;
-		if ( result.type() == typeid(Poco::JSON::Object::Ptr) )
+		if (result.type() == typeid(Poco::JSON::Object::Ptr))
 			obj = result.extract<Poco::JSON::Object::Ptr>();
 
 		std::ostringstream out;

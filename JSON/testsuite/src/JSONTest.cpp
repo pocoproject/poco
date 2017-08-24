@@ -1632,7 +1632,7 @@ void JSONTest::testValidJanssonFiles()
 			if ( inputFile.exists() )
 			{
 				Poco::FileInputStream fis(filePath.toString());
-				std::cout << filePath.toString() << std::endl;
+				std::cout << filePath.toString() << " ... ";
 
 				Parser parser;
 				Var result;
@@ -1678,7 +1678,7 @@ void JSONTest::testInvalidJanssonFiles()
 			if ( inputFile.exists() )
 			{
 				Poco::FileInputStream fis(filePath.toString());
-				std::cout << filePath.toString() << std::endl;
+				std::cout << filePath.toString() << " ... ";
 
 				Parser parser;
 				parser.setAllowNullByte(false);
@@ -1694,6 +1694,7 @@ void JSONTest::testInvalidJanssonFiles()
 				}
 				catch(JSONException&)
 				{
+					std::cout << "Ok!" << std::endl;
 					continue;
 				}
 				catch(Poco::SyntaxException&)

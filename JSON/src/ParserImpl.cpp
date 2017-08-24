@@ -52,6 +52,9 @@ ParserImpl::~ParserImpl()
 
 void ParserImpl::handle(const std::string& json)
 {
+	if (!_allowNullByte && json.find("\\u0000") != json.npos)
+		throw JSONException("Null bytes in strings not allowed.");
+
 	try
 	{
 		json_open_buffer(&_json, json.data(), json.size());
