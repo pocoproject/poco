@@ -7,21 +7,21 @@ model {
 					def libName = "foobar"
 					if (buildType == buildTypes.debug) {
 						libName = 'libmysqld.lib'
-						if (targetPlatform == 'win32') {
+						if (targetPlatform.name == 'win32') {
 							staticLibraryFile = file("$mysql32Home/lib/$libName")
 						} else
-						if (targetPlatform == 'win64') {
+						if (targetPlatform.name == 'win64') {
 							headers.srcDir "$mysql64Home/include"
 							staticLibraryFile = file("$mysql64Home/lib/$libName")
 						}
 					} else
 					if (buildType == buildTypes.release) {
 						libName = 'libmysql.lib'
-						if (targetPlatform == 'win32') {
+						if (targetPlatform.name == 'win32') {
 							headers.srcDir "$mysql32Home/include"
 							staticLibraryFile = file("$mysql32Home/lib/$libName")
 						} else
-						if (targetPlatform == 'win64') {
+						if (targetPlatform.name == 'win64') {
 							headers.srcDir "$mysql64Home/include"
 							staticLibraryFile = file("$mysql64Home/lib/$libName")
 						}
@@ -35,12 +35,12 @@ model {
 					if (buildType == buildTypes.debug) {
 						dllName = 'libmysqld.dll'
 						linkName = 'libmysqld.lib'
-						if (targetPlatform == 'win32') {
+						if (targetPlatform.name == 'win32') {
 							headers.srcDir "$mysql32Home/include"
 							sharedLibraryFile     = file("$mysql32Home/lib/$dllName")
 							sharedLibraryLinkFile = file("$mysql32Home/lib/$linkName")
 						} else
-						if (targetPlatform == 'win64') {
+						if (targetPlatform.name == 'win64') {
 							headers.srcDir "$mysql64Home/include"
 							sharedLibraryFile     = file("$mysql64Home/lib/$dllName")
 							sharedLibraryLinkFile = file("$mysql64Home/lib/$linkName")
@@ -49,12 +49,12 @@ model {
 					if (buildType == buildTypes.release) {
 						dllName = 'libmysql.dll'
 						linkName = 'libmysql.lib'
-						if (targetPlatform == 'win32') {
+						if (targetPlatform.name == 'win32') {
 							headers.srcDir "$mysql32Home/include"
 							sharedLibraryFile     = file("$mysql32Home/lib/$dllName")
 							sharedLibraryLinkFile = file("$mysql32Home/lib/$linkName")
 						} else
-						if (targetPlatform == 'win64') {
+						if (targetPlatform.name == 'win64') {
 							headers.srcDir "$mysql64Home/include"
 							sharedLibraryFile     = file("$mysql64Home/lib/$dllName")
 							sharedLibraryLinkFile = file("$mysql64Home/lib/$linkName")

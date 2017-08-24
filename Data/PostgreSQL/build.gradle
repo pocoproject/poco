@@ -5,25 +5,59 @@ model {
 				binaries.withType(StaticLibraryBinary) {
 					def libName = "foobar"
 					if (buildType == buildTypes.debug) {
-						libName = 'libmysqld.lib'
-						if (targetPlatform == 'win32') {
+						libName = 'libpq.lib'
+						if (targetPlatform.name == 'win32') {
 							headers.srcDir "$postgres32Home/include"
 							staticLibraryFile = file("$postgres32Home/lib/$libName")
 						} else
-						if (targetPlatform == 'win64') {
+						if (targetPlatform.name == 'win64') {
 							headers.srcDir "$postgres64Home/include"
 							staticLibraryFile = file("$postgres64Home/lib/$libName")
 						}
 					} else
 					if (buildType == buildTypes.release) {
 						libName = 'libmysql.lib'
-						if (targetPlatform == 'win32') {
+						if (targetPlatform.name == 'win32') {
 							headers.srcDir "$postgres32Home/include"
 							staticLibraryFile = file("$postgres32Home/lib/$libName")
 						} else
-						if (targetPlatform == 'win64') {
+						if (targetPlatform.name == 'win64') {
 							headers.srcDir "$postgres64Home/include"
 							staticLibraryFile = file("$postgres64Home/lib/$libName")
+						}
+					} else {
+						throw new GradleException("Unknown buildType" + buildType)
+					}
+				}
+				binaries.withType(SharedLibraryBinary) {
+					def dllName
+					def linkName
+					if (buildType == buildTypes.debug) {
+						dllName = 'libpq.dll'
+						linkName = 'libpq.lib'
+						if (targetPlatform.name == 'win32') {
+							headers.srcDir "$mysql32Home/include"
+							sharedLibraryFile     = file("$postgres32Home/lib/$dllName")
+							sharedLibraryLinkFile = file("$postgres32Home/lib/$linkName")
+						} else
+						if (targetPlatform.name == 'win64') {
+							headers.srcDir "$mysql64Home/include"
+							sharedLibraryFile     = file("$postgres64Home/lib/$dllName")
+							sharedLibraryLinkFile = file("$postgres64Home/lib/$linkName")
+						}
+					} else
+					if (buildType == buildTypes.release) {
+						dllName = 'libpq.dll'
+						linkName = 'libpq.lib'
+						if (targetPlatform.name == 'win32') {
+							headers.srcDir "$mysql32Home/include"
+							sharedLibraryFile     = file("$postgres32Home/lib/$dllName")
+							sharedLibraryLinkFile = file("$postgres32Home/lib/$linkName")
+						} else
+						if (targetPlatform.name == 'win64') {
+							headers.srcDir "$mysql64Home/include"
+							sharedLibraryFile     = file("$postgres64Home/lib/$dllName")
+							sharedLibraryLinkFile = file("$postgres64Home/lib/$linkName")
 						}
 					} else {
 						throw new GradleException("Unknown buildType" + buildType)

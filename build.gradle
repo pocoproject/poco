@@ -1,3 +1,5 @@
+import org.pocoproject.nativeplatform.test.SharedLibraryTestSuiteBinarySpec
+
 buildscript {
 }
 
@@ -200,9 +202,6 @@ samples.dependsOn ':Util:samples:assemble'
 samples.dependsOn ':XML:samples:assemble'
 samples.dependsOn ':Zip:samples:assemble'
 
-tasks.withType(RunTestExecutable) {
-	args "-print"
-}
 
 allprojects {
 	buildDir = new File("gradle")	
@@ -280,10 +279,10 @@ subprojects {
 					binaries.withType(StaticLibraryBinary) {
 						def libName = "foobar"
 						if (buildType == buildTypes.debug) {
-							if (targetPlatform == 'win32') {
+							if (targetPlatform.name == 'win32') {
 								libName = 'libeay32MTd.lib'
 								staticLibraryFile = file("$opensslHome/win32/lib/debug/$libName")
-							} else if (targetPlatform == 'win64') {
+							} else if (targetPlatform.name == 'win64') {
 								libName = 'libeay64MTd.lib'
 								staticLibraryFile = file("$opensslHome/win64/lib/debug/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
@@ -292,10 +291,10 @@ subprojects {
 							}
 						} else
 						if (buildType == buildTypes.release) {
-							if (targetPlatform == 'win32') {
+							if (targetPlatform.name == 'win32') {
 								libName = 'libeay32MT.lib'
 								staticLibraryFile = file("$opensslHome/win32/lib/release/$libName")
-							} else if (targetPlatform == 'win64') {
+							} else if (targetPlatform.name == 'win64') {
 								libName = 'libeay64MT.lib'
 								staticLibraryFile = file("$opensslHome/win64/lib/release/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
@@ -310,14 +309,14 @@ subprojects {
 						def dllName
 						def linkName
 						if (buildType == buildTypes.debug) {
-							if (targetPlatform == 'win32') {
-								dllName = 'libeay32d.dll'
-								linkName = 'libeay32d.lib'
+							if (targetPlatform.name == 'win32') {
+								dllName = 'libeay32MDd.dll'
+								linkName = 'libeay32MDd.lib'
 								sharedLibraryFile	 = file("$opensslHome/win32/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win32/bin/debug/$linkName")
-							} else if (targetPlatform == 'win64') {
-								dllName = 'libeay64d.dll'
-								linkName = 'libeay64d.lib'
+							} else if (targetPlatform.name == 'win64') {
+								dllName = 'libeay64MDd.dll'
+								linkName = 'libeay64MDd.lib'
 								sharedLibraryFile	 = file("$opensslHome/win64/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win64/bin/debug/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
@@ -328,14 +327,14 @@ subprojects {
 							}
 						} else
 						if (buildType == buildTypes.release) {
-							if (targetPlatform == 'win32') {
-								dllName = 'libeay32.dll'
-								linkName = 'libeay32.lib'
+							if (targetPlatform.name == 'win32') {
+								dllName = 'libeay32MD.dll'
+								linkName = 'libeay32MD.lib'
 								sharedLibraryFile	 = file("$opensslHome/win32/bin/release/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win32/bin/release/$linkName")
-							} else if (targetPlatform == 'win64') {
-								dllName = 'libeay64.dll'
-								linkName = 'libeay64.lib'
+							} else if (targetPlatform.name == 'win64') {
+								dllName = 'libeay64MD.dll'
+								linkName = 'libeay64MD.lib'
 								sharedLibraryFile	 = file("$opensslHome/win64/bin/release/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win64/bin/release/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
@@ -355,10 +354,10 @@ subprojects {
 					binaries.withType(StaticLibraryBinary) {
 						def libName
 						if (buildType == buildTypes.debug) {
-							if (targetPlatform == 'win32') {
+							if (targetPlatform.name == 'win32') {
 								libName = 'ssleay32MTd.lib'
 								staticLibraryFile = file("$opensslHome/win32/lib/debug/$libName")
-							} else if (targetPlatform == 'win64') {
+							} else if (targetPlatform.name == 'win64') {
 								libName = 'ssleay64MTd.lib'
 								staticLibraryFile = file("$opensslHome/win64/lib/debug/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
@@ -367,10 +366,10 @@ subprojects {
 							}
 						} else
 						if (buildType == buildTypes.release) {
-							if (targetPlatform == 'win32') {
+							if (targetPlatform.name == 'win32') {
 								libName = 'ssleay32MT.lib'
 								staticLibraryFile = file("$opensslHome/win32/lib/release/$libName")
-							} else if (targetPlatform == 'win64') {
+							} else if (targetPlatform.name == 'win64') {
 								libName = 'ssleay64MT.lib'
 								staticLibraryFile = file("$opensslHome/win64/lib/release/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
@@ -385,14 +384,14 @@ subprojects {
 						def dllName
 						def linkName
 						if (buildType == buildTypes.debug) {
-							if (targetPlatform == 'win32') {
-								dllName = 'ssleay32d.dll'
-								linkName = 'ssleay32d.lib'
+							if (targetPlatform.name == 'win32') {
+								dllName = 'ssleay32MDd.dll'
+								linkName = 'ssleay32MDd.lib'
 								sharedLibraryFile	 = file("$opensslHome/win32/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win32/bin/debug/$linkName")
-							} else if (targetPlatform == 'win64') {
-								dllName = 'ssleay64d.dll'
-								linkName = 'ssleay64d.lib'
+							} else if (targetPlatform.name == 'win64') {
+								dllName = 'ssleay64MDd.dll'
+								linkName = 'ssleay64MDd.lib'
 								sharedLibraryFile	 = file("$opensslHome/win64/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win64/bin/debug/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
@@ -402,14 +401,14 @@ subprojects {
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							}
 						} else if (buildType == buildTypes.release) {
-							if (targetPlatform == 'win32') {
-								dllName = 'ssleay32.dll'
-								linkName = 'ssleay32.lib'
+							if (targetPlatform.name == 'win32') {
+								dllName = 'ssleay32MD.dll'
+								linkName = 'ssleay32MD.lib'
 								sharedLibraryFile	 = file("$opensslHome/win32/bin/release/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win32/bin/release/$linkName")
-							} else if (targetPlatform == 'win64') {
-								dllName = 'ssleay64.dll'
-								linkName = 'ssleay64.lib'
+							} else if (targetPlatform.name == 'win64') {
+								dllName = 'ssleay64MD.dll'
+								linkName = 'ssleay64MD.lib'
 								sharedLibraryFile	 = file("$opensslHome/win64/bin/release/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win64/bin/release/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
@@ -443,7 +442,13 @@ subprojects {
 						if (it instanceof NativeExecutableBinarySpec) {
 							executable.file = toLocalBin(executable.file, targetPlatform)
 						} 
+						if (it instanceof SharedLibraryTestSuiteBinarySpec) {
+							println "it.name=----------------------------------------" + it.name
+						}
 					}
+				}
+				binaries.withType(SharedLibraryTestSuiteBinarySpec) {
+					println "====================================================================="
 				}
 				binaries.withType(NativeBinarySpec) {
 
@@ -451,6 +456,9 @@ subprojects {
 						cppCompiler.args "-std=c++11"
 					}
 					if (buildType == buildTypes.debug) {
+						if (it instanceof SharedLibraryTestSuiteBinarySpec) {
+							println "ffffffffffffffffffffffffffffffffffoooooooooooooooooooooooooo"
+						}
 						if (it instanceof SharedLibraryBinarySpec) {
 							sharedLibraryFile	 = toBin(prefixByPoco(appendDebugSuffix(sharedLibraryFile)), targetPlatform)
 							sharedLibraryLinkFile = toLib(prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile)), targetPlatform)
@@ -630,25 +638,42 @@ task Candle(type: Exec) {
 	String target = 'x86'
 	String VSYEAR = 'VS2017'
 	String VERSION = '1.7.8.4'
-	executable "${VIXTOOLSET}/bin/Candle.exe "
+	executable "${VIXTOOLSET}/bin/Candle.exe"
 	workingDir "..\\distro\\Windows\\WiX"
 //	args "-arch ${target}"
 	args "-dVSYEAR=${VSYEAR}"
 	args "-dVERSION=${VERSION}"
 	args "-dPOCO=${rootDir}"
 	args "-dPlatform=${target}"
-	args "-ext \"${VIXTOOLSET}/bin/WixUIExtension.dll\""
-//	args "-out \"\"${VSYEAR}\\Poco-$VERSION-${target}.wixobj\"\""
+//	args "-ext \"${VIXTOOLSET}/bin/WixUIExtension.dll\""
+	args "-out ${VSYEAR}\\Poco-$VERSION-${target}.wixobj"
 	args "Poco-${VERSION}.wxs"
 
 //$VIXTOOLSET\bin\Candle.exe -arch $target -dVSYEAR=$VSYEAR -dVERSION=$VERSION -dPOCO=$rootDir -dPlatform=$target -out "$VSYEAR/Poco $VERSION ($target).wixobj" -ext $VIXTOOLSET\bin\WixUIExtension.dll Poco-$VERSION.wxs
 }
+Candle.doLast() {
+	println "commandLine=" + commandLine 
+}
 task Light(type: Exec) {
+	String target = 'x86'
+	String VSYEAR = 'VS2017'
+	String VERSION = '1.7.8.4'
+	executable "${VIXTOOLSET}/bin/Light.exe"
+	workingDir "..\\distro\\Windows\\WiX"
+	args "-v"
+	args "-cultures:null"
+	args "-ext \"${VIXTOOLSET}\\bin\\WixUIExtension.dll\""
+	args "-out ${VSYEAR}\\Poco-$VERSION-${target}.msi"
+	args "Poco-${VERSION}.wixobj"
 //$VIXTOOLSET\bin\Light.exe  -out "$VSYEAR/Poco $VERSION ($target).msi" -cultures:null -ext $VIXTOOLSET\bin\WixUIExtension.dll "$VSYEAR/Poco $VERSION ($target).wixobj"
+	println "commandLine=" + commandLine
+}
+Light.doLast() {
+	println "commandLine=" + commandLine 
 }
 task WiX(type: Exec) {
 }
-Light.dependsOn Candle
+//Light.dependsOn Candle
 WiX.dependsOn Light
 
 task NuGet(type: Exec){

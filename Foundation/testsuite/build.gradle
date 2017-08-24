@@ -42,13 +42,13 @@ model {
 				}
 			}
 		}
-		TestSuite(NativeExecutableSpec) {
+		TestSuite(NativeLibrarySpec) {
 			sources {
 				cpp {
 					source {
 						srcDir 'src'
 						include '**/*.cpp'
-						exclude 'Win*Driver.cpp'
+						exclude '*Driver.cpp'
 						exclude '*_WINCE.cpp'
 						exclude 'TestApp*.cpp'
 					}
@@ -65,6 +65,11 @@ model {
 		FoundationTestSuite(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
 		}
+	}
+    binaries {                                               
+        withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
+ 			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+        }
 	}
 
 }

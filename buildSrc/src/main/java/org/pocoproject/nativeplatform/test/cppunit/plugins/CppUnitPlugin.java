@@ -64,7 +64,7 @@ public class CppUnitPlugin implements Plugin<Project> {
     static class Rules extends RuleSource {
 
         @ComponentType
-        void registerSharedLibraryTestSuiteBinaryType(TypeBuilder<SharedLibraryTestSuiteBinarySpec> builder) {
+        void registerSharedLibraryTestSuiteBinarySpecType(TypeBuilder<SharedLibraryTestSuiteBinarySpec> builder) {
             builder.defaultImplementation(DefaultSharedLibraryTestSuiteBinarySpec.class);
             builder.internalView(SharedLibraryBinarySpecInternal.class);
         }
