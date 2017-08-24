@@ -1,6 +1,8 @@
+import org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec
+
 model {
 	components {
-		TestSuite(NativeExecutableSpec) {
+		TestSuite(NativeLibrarySpec) {
 			sources {
 				cpp {
 					source {
@@ -19,13 +21,15 @@ model {
 		}
 	}
 	testSuites {
-		CppParserTestSuite(CppUnitTestSuiteSpec) {
+		CppParserTestSuite(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
 		}
 	}
-}
-tasks.withType(RunTestExecutable) {
-	args "-print"
+    binaries {
+        withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
+ 			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+        }
+	}
 }
 
 

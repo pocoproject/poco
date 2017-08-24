@@ -200,6 +200,9 @@ samples.dependsOn ':Util:samples:assemble'
 samples.dependsOn ':XML:samples:assemble'
 samples.dependsOn ':Zip:samples:assemble'
 
+tasks.withType(RunTestExecutable) {
+	args "-print"
+}
 
 allprojects {
 	buildDir = new File("gradle")	
@@ -621,13 +624,27 @@ subprojects {
 	}
 }
 
-/*
+
 if (os.windows) {
 task Candle(type: Exec) {
-//%VIXTOOLSET%\bin\Candle.exe -arch x86 -dVSYEAR=%VSYEAR% -dVERSION=%POCO_VERSION% -dPOCO=%POCO_BASE% -dPlatform=x86 -out "%VSYEAR%/Poco %POCO_VERSION% (x86).wixobj" -ext %VIXTOOLSET%\bin\WixUIExtension.dll Poco-%POCO_VERSION%.wxs
+	String target = 'x86'
+	String VSYEAR = 'VS2017'
+	String VERSION = '1.7.8.4'
+	executable "${VIXTOOLSET}/bin/Candle.exe "
+	workingDir "..\\distro\\Windows\\WiX"
+//	args "-arch ${target}"
+	args "-dVSYEAR=${VSYEAR}"
+	args "-dVERSION=${VERSION}"
+	args "-dPOCO=${rootDir}"
+	args "-dPlatform=${target}"
+	args "-ext \"${VIXTOOLSET}/bin/WixUIExtension.dll\""
+//	args "-out \"\"${VSYEAR}\\Poco-$VERSION-${target}.wixobj\"\""
+	args "Poco-${VERSION}.wxs"
+
+//$VIXTOOLSET\bin\Candle.exe -arch $target -dVSYEAR=$VSYEAR -dVERSION=$VERSION -dPOCO=$rootDir -dPlatform=$target -out "$VSYEAR/Poco $VERSION ($target).wixobj" -ext $VIXTOOLSET\bin\WixUIExtension.dll Poco-$VERSION.wxs
 }
 task Light(type: Exec) {
-//%VIXTOOLSET%\bin\Light.exe  -out "%VSYEAR%/Poco %POCO_VERSION% (x86).msi" -cultures:null -ext %VIXTOOLSET%\bin\WixUIExtension.dll "%VSYEAR%/Poco %POCO_VERSION% (x86).wixobj"
+//$VIXTOOLSET\bin\Light.exe  -out "$VSYEAR/Poco $VERSION ($target).msi" -cultures:null -ext $VIXTOOLSET\bin\WixUIExtension.dll "$VSYEAR/Poco $VERSION ($target).wixobj"
 }
 task WiX(type: Exec) {
 }
@@ -637,4 +654,4 @@ WiX.dependsOn Light
 task NuGet(type: Exec){
 }
 }
-*/
+
