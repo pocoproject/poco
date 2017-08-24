@@ -39,38 +39,18 @@ public:
 	{
 	}
 
-    PoolableObjectFactory(Net::SocketAddress& address, const std::string& password):
-        _address(address),
-        _password(password)
-	{
-	}
-
 	PoolableObjectFactory(const std::string& address):
         _address(address)
 	{
 	}
 
-    PoolableObjectFactory(const std::string& address, const std::string& password):
-        _address(address),
-        _password(password)
-	{
-	}
-
 	Redis::Client::Ptr createObject()
 	{
-        Redis::Client::Ptr redis = new Redis::Client(_address);
-
-        if (_password.empty()) return redis;
-
-        if (redis->sendAuth(_password)) return redis;
-
-        return NULL;
+        return new Redis::Client(_address);
 	}
 
 	bool validateObject(Redis::Client::Ptr pObject)
 	{
-		if (_password.empty()) return true;
-
         return pObject->isAuthenticated();
 	}
 
@@ -88,7 +68,6 @@ public:
 
 private:
 	Net::SocketAddress _address;
-    std::string _password;
 };
 
 
