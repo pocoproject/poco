@@ -220,7 +220,11 @@ void ParserImpl::handle()
 			if (_pHandler) _pHandler->endArray();
 			return;
 		case JSON_ERROR:
-			throw JSONException(json_get_error(&_json));
+		{
+			const char* pErr = json_get_error(&_json);
+			std::string err(pErr ? pErr : "JSON parser error.");
+			throw JSONException(err);
+		}
 	}
 }
 

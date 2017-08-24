@@ -361,10 +361,16 @@ read_string(json_stream *json)
 }
 
 static int
+is_digit(int c)
+{
+    return c >= -1 && c <= 255 && isdigit(c);
+}
+
+static int
 read_digits(json_stream *json)
 {
     unsigned nread = 0;
-    while (isdigit(json->source.peek(&json->source))) {
+    while (is_digit(json->source.peek(&json->source))) {
         if (pushchar(json, json->source.get(&json->source)) != 0)
             return -1;
 
@@ -385,14 +391,14 @@ read_number(json_stream *json, int c)
         return JSON_ERROR;
     if (c == '-') {
         c = json->source.get(&json->source);
-        if (isdigit(c)) {
+        if (is_digit(c)) {
             return read_number(json, c);
         } else {
             json_error(json, "unexpected byte, '%c'", c);
         }
     } else if (strchr("123456789", c) != NULL) {
         c = json->source.peek(&json->source);
-        if (isdigit(c)) {
+        if (is_digit(c)) {
             if (read_digits(json) != 0)
                 return JSON_ERROR;
         }
@@ -425,7 +431,7 @@ read_number(json_stream *json, int c)
                 return JSON_ERROR;
             if (read_digits(json) != 0)
                 return JSON_ERROR;
-        } else if (isdigit(c)) {
+        } else if (is_digit(c)) {
             if (read_digits(json) != 0)
                 return JSON_ERROR;
         } else {

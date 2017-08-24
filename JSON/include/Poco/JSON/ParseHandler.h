@@ -162,9 +162,7 @@ inline void ParseHandler::value(bool b)
 inline void ParseHandler::null()
 {
 	Poco::Dynamic::Var empty;
-	//std::cout << "empty 1" << std::endl;
 	setValue(empty);
-	//std::cout << "empty 2" << std::endl;
 }
 
 
