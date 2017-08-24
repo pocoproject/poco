@@ -51,7 +51,7 @@ public:
 
 	bool validateObject(Redis::Client::Ptr pObject)
 	{
-        return pObject->isAuthenticated();
+        return true;
 	}
 
 	void activateObject(Redis::Client::Ptr pObject)
