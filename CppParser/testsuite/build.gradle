@@ -8,6 +8,7 @@ model {
 					source {
 						srcDir 'src'
 						include '**/*.cpp'
+						exclude 'Driver.cpp'
 						exclude 'Win*Driver.cpp'
 					}
 					exportedHeaders {
@@ -25,11 +26,14 @@ model {
 			testing $.components.TestSuite 
 		}
 	}
-    binaries {
-        withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
+    binaries {                                               
+        withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
         }
 	}
+}
+tasks.withType(RunTestExecutable) {
+	args "-all"
 }
 
 
