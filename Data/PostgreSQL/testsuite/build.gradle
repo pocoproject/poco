@@ -1,3 +1,5 @@
+import org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec
+
 model {
 	components {
 		withType(NativeComponentSpec) {
@@ -35,7 +37,7 @@ model {
 		}
 	}
 	testSuites {
-		DataPostgresTestSuite(CppUnitTestSuiteSpec) {
+		DataPostgresTestSuite(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
 		}
 	}
