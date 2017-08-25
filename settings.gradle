@@ -37,16 +37,16 @@ include ':Net:testsuite'
 include ':Crypto:testsuite'
 include ':NetSSL_OpenSSL:testsuite'
 if (os.windows) {
-	include ':NetSSL_Win:testsuite'
+//	include ':NetSSL_Win:testsuite'
 }
 include ':Data:testsuite'
 if (os.windows) {
 	include ':Data:ODBC:testsuite'
 	include ':Data:SQLite:testsuite'
-	include ':Data:MySQL:testsuite'
-	include ':Data:PostgreSQL:testsuite'
+//	include ':Data:MySQL:testsuite'
+//	include ':Data:PostgreSQL:testsuite'
 }
-include ':MongoDB:testsuite'
+//include ':MongoDB:testsuite'
 include ':Redis:testsuite'
 include ':CppParser:testsuite'
 include ':Zip:testsuite'

@@ -22,7 +22,7 @@ model {
 					source {
 						srcDir 'src'
 						include '**/*.cpp'
-						exclude 'Win*Driver.cpp'
+						exclude '*Driver.cpp'
 					}
 					exportedHeaders {
 						srcDir 'src'
@@ -38,6 +38,11 @@ model {
 		ZipTestSuite(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
 		}
+	}
+    binaries {                                               
+        withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
+ 			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+        }
 	}
 }
 tasks.withType(RunTestExecutable) {

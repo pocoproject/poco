@@ -50,6 +50,12 @@ File toLocalBin(File binaryFile, Platform platform) {
 	return new File(parent, name);
 }
 File toBin(File sharedFile, Platform platform) {
+	File parent = sharedFile.parentFile
+	if (parent.canonicalPath.contains("testsuite"))
+		return sharedFile;
+	if (parent.canonicalPath.contains("sample"))
+		return sharedFile;
+		
 	if (platform.operatingSystem.linux) {
 		return toLib(sharedFile, platform)
 	}
@@ -64,10 +70,16 @@ File toBin(File sharedFile, Platform platform) {
 	} else {
 		throw new GradleException("Unknown architecture: " + platform.architecture.name)
 	}
-	File parent = new File(rootDir, target)
-	return new File(parent, name);
+	File newParent = new File(rootDir, target)
+	return new File(newParent, name);
 }
 File toLib(File linkFile, Platform platform) {
+	File parent = linkFile.parentFile
+	if (parent.canonicalPath.contains("testsuite"))
+		return linkFile;
+	if (parent.canonicalPath.contains("sample"))
+		return linkFile;
+		
 	// On macOS, it creates a dylib file which is the shared and import library
 	if (platform.operatingSystem.macOsX) {
 		return toBin(linkFile, platform)
@@ -83,8 +95,8 @@ File toLib(File linkFile, Platform platform) {
 	} else {
 		throw new GradleException("Unknown architecture: " + platform.architecture.name)
 	}
-	File parent = new File(rootDir, target )
-	return new File(parent, name);
+	File newParent = new File(rootDir, target )
+	return new File(newParent, name);
 }
 File toStatic(File staticFile) {
 	String name = staticFile.getName()
@@ -101,9 +113,9 @@ PocoBuild=$rootDir
 PocoBase=$rootDir
 PocoDoc.output=releases/poco-2.0.0-all-doc
 PocoDoc.version=2.0.0-all
-Includes=-IC:/postgresql-9.6.3-2-win32/pgsql/include,-IC:/mysql-5.6.37-win32/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include
-VC=C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC
-WDK=C:/Program Files (x86)/Windows Kits/10/Include/10.0.15063.0
+Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include
+VC=${VCHome}
+WDK=${WDKHome}
 """
 }
 task pocoDoc(type: Exec) {
@@ -125,12 +137,12 @@ task zipDoc(type: Zip) {
 zipDoc.dependsOn pocoDoc
 
 clean.doFirst {
-	file('bin').delete() 
-	file('bin64').delete() 
-	file('lib').delete() 
-	file('lib64').delete() 
-	file('static').delete() 
-	file('static64').delete() 
+	file($projectDir, 'bin').delete()
+	file($projectDir, 'bin64').delete() 
+	file($projectDir, 'lib').delete() 
+	file($projectDir, 'lib64').delete() 
+	file($projectDir, 'static').delete() 
+	file($projectDir, 'static64').delete() 
 }
 
 def os = org.gradle.internal.os.OperatingSystem.current()
@@ -204,7 +216,7 @@ samples.dependsOn ':Zip:samples:assemble'
 
 
 allprojects {
-	buildDir = new File("gradle")	
+	buildDir = new File("root")	
 }
 subprojects {
 	apply plugin:	'c'
@@ -213,6 +225,7 @@ subprojects {
  	apply plugin:	'windows-resources'
 	apply plugin:	'windows-messages'
 	
+	buildDir = new File("gradle")	
 	
 
 	model {
@@ -427,7 +440,7 @@ subprojects {
 		components {
 			withType(NativeComponentSpec) {
 				targetPlatform "win32"
-				targetPlatform "win64"
+//				targetPlatform "win64"
 				targetPlatform "linux32"
 				targetPlatform "linux64"
 				targetPlatform "macos"
@@ -443,12 +456,12 @@ subprojects {
 							executable.file = toLocalBin(executable.file, targetPlatform)
 						} 
 						if (it instanceof SharedLibraryTestSuiteBinarySpec) {
-							println "it.name=----------------------------------------" + it.name
+							println "----------------------------------------" + it.name
 						}
 					}
 				}
 				binaries.withType(SharedLibraryTestSuiteBinarySpec) {
-					println "====================================================================="
+					println "======================================binaries.withType(SharedLibraryTestSuiteBinarySpec)"
 				}
 				binaries.withType(NativeBinarySpec) {
 
@@ -457,7 +470,7 @@ subprojects {
 					}
 					if (buildType == buildTypes.debug) {
 						if (it instanceof SharedLibraryTestSuiteBinarySpec) {
-							println "ffffffffffffffffffffffffffffffffffoooooooooooooooooooooooooo"
+							println "===================================it instanceof SharedLibraryTestSuiteBinarySpec"
 						}
 						if (it instanceof SharedLibraryBinarySpec) {
 							sharedLibraryFile	 = toBin(prefixByPoco(appendDebugSuffix(sharedLibraryFile)), targetPlatform)
@@ -637,43 +650,36 @@ if (os.windows) {
 task Candle(type: Exec) {
 	String target = 'x86'
 	String VSYEAR = 'VS2017'
-	String VERSION = '1.7.8.4'
+	String VERSION = '2.0.0'
 	executable "${VIXTOOLSET}/bin/Candle.exe"
-	workingDir "..\\distro\\Windows\\WiX"
-//	args "-arch ${target}"
+	workingDir "../distro/Windows/WiX"
+	args "-arch", "${target}"
 	args "-dVSYEAR=${VSYEAR}"
 	args "-dVERSION=${VERSION}"
 	args "-dPOCO=${rootDir}"
 	args "-dPlatform=${target}"
-//	args "-ext \"${VIXTOOLSET}/bin/WixUIExtension.dll\""
-	args "-out ${VSYEAR}\\Poco-$VERSION-${target}.wixobj"
+	args "-ext", "${VIXTOOLSET}/bin/WixUIExtension.dll"
+	args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 	args "Poco-${VERSION}.wxs"
 
 //$VIXTOOLSET\bin\Candle.exe -arch $target -dVSYEAR=$VSYEAR -dVERSION=$VERSION -dPOCO=$rootDir -dPlatform=$target -out "$VSYEAR/Poco $VERSION ($target).wixobj" -ext $VIXTOOLSET\bin\WixUIExtension.dll Poco-$VERSION.wxs
 }
-Candle.doLast() {
-	println "commandLine=" + commandLine 
-}
 task Light(type: Exec) {
 	String target = 'x86'
 	String VSYEAR = 'VS2017'
-	String VERSION = '1.7.8.4'
+	String VERSION = '2.0.0'
 	executable "${VIXTOOLSET}/bin/Light.exe"
-	workingDir "..\\distro\\Windows\\WiX"
-	args "-v"
+	workingDir "../distro/Windows/WiX"
 	args "-cultures:null"
-	args "-ext \"${VIXTOOLSET}\\bin\\WixUIExtension.dll\""
-	args "-out ${VSYEAR}\\Poco-$VERSION-${target}.msi"
-	args "Poco-${VERSION}.wixobj"
+	args "-ext", "${VIXTOOLSET}/bin/WixUIExtension.dll"
+	args "-out"
+	args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
+	args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 //$VIXTOOLSET\bin\Light.exe  -out "$VSYEAR/Poco $VERSION ($target).msi" -cultures:null -ext $VIXTOOLSET\bin\WixUIExtension.dll "$VSYEAR/Poco $VERSION ($target).wixobj"
-	println "commandLine=" + commandLine
-}
-Light.doLast() {
-	println "commandLine=" + commandLine 
 }
 task WiX(type: Exec) {
 }
-//Light.dependsOn Candle
+Light.dependsOn Candle
 WiX.dependsOn Light
 
 task NuGet(type: Exec){

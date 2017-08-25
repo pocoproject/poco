@@ -16,20 +16,20 @@ model {
 				}
 			}
 		}
-		TestSuite(NativeExecutableSpec) {
+		TestSuite(NativeLibrarySpec) {
 			sources {
 				cpp {
 					source {
 						srcDir 'src'
 						include '**/*.cpp'
-						exclude 'Win*Driver.cpp'
+						exclude '*Driver.cpp'
 					}
 					exportedHeaders {
 						srcDir 'src'
 					}
 					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
-					lib library: 'crypto', linkage: 'static'
-					lib library: 'ssl', linkage: 'static'
+					lib library: 'crypto'
+					lib library: 'ssl'
 					lib project: ':Crypto', library: 'Crypto', linkage: 'shared'
 					lib project: ':Net', library: 'Net', linkage: 'shared'
 					lib project: ':Util', library: 'Util', linkage: 'shared'
@@ -43,6 +43,14 @@ model {
 		NetSSLTestSuite(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
 		}
+	}
+    binaries {                                               
+		all {
+			cppCompiler.args "-Isrc"
+		}
+		withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
+ 			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+        }
 	}
 }
 tasks.withType(RunTestExecutable) {

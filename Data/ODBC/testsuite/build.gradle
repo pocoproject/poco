@@ -16,13 +16,13 @@ model {
 				}
 			}
 		}
-		TestSuite(NativeExecutableSpec) {
+		TestSuite(NativeLibrarySpec) {
 			sources {
 				cpp {
 					source {
 						srcDir 'src'
 						include '**/*.cpp'
-						exclude 'Win*Driver.cpp'
+						exclude '*Driver.cpp'
 					}
 					exportedHeaders {
 						srcDir 'src'
@@ -36,7 +36,7 @@ model {
 		}
 	}
 	testSuites {
-		DataODBCTestSuite(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
+		ODBCTestSuite(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
 		}
 	}
@@ -47,6 +47,9 @@ model {
 				linker.args 'odbccp32.lib'
 			}
 		}
+        withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
+ 			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+        }
 	}
 }
 tasks.withType(RunTestExecutable) {

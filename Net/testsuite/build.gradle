@@ -16,13 +16,13 @@ model {
 				}
 			}
 		}
-		TestSuite(NativeExecutableSpec) {
+		TestSuite(NativeLibrarySpec) {
 			sources {
 				cpp {
 					source {
 						srcDir 'src'
 						include '**/*.cpp'
-						exclude 'Win*Driver.cpp'
+						exclude '*Driver.cpp'
 					}
 					exportedHeaders {
 						srcDir 'src'
@@ -46,6 +46,9 @@ model {
 				linker.args "iphlpapi.lib"
 			}
 		}
+        withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
+ 			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+        }
 	}
 }
 tasks.withType(RunTestExecutable) {
