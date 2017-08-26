@@ -25,18 +25,10 @@
 #include "Poco/ScopedLock.h"
 
 
-#if (POCO_OS != POCO_OS_CYGWIN)
-#include "Poco/Mutex_STD.h"
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Poco/Mutex_WINCE.h"
-#else
-#include "Poco/Mutex_WIN32.h"
-#endif
-#elif defined(POCO_VXWORKS)
-#include "Poco/Mutex_VX.h"
-#else
+#if (POCO_OS == POCO_OS_CYGWIN)
 #include "Poco/Mutex_POSIX.h"
+#else
+#include "Poco/Mutex_STD.h"
 #endif
 
 
