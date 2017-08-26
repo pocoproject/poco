@@ -136,6 +136,7 @@ task zipDoc(type: Zip) {
 }
 zipDoc.dependsOn pocoDoc
 
+/*
 clean.doFirst {
 	file($projectDir, 'bin').delete()
 	file($projectDir, 'bin64').delete() 
@@ -144,6 +145,7 @@ clean.doFirst {
 	file($projectDir, 'static').delete() 
 	file($projectDir, 'static64').delete() 
 }
+*/
 
 def os = org.gradle.internal.os.OperatingSystem.current()
 
@@ -286,6 +288,7 @@ subprojects {
 				}
 				def opensslHome = new File(rootDir, "openssl")
 				def opensslBrewHome = new File('/usr/local/opt/openssl')
+				def opensslLinuxHome = new File('/usr/lib/x86_64-linux-gnu')
 				crypto {
 					headers.srcDir "$opensslHome/include"
 
@@ -301,6 +304,9 @@ subprojects {
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								libName = 'libcrypto.a'
 								staticLibraryFile = file("$opensslBrewHome/lib/$libName")
+							} else if (targetPlatform.operatingSystem.linux) {
+								libName = 'libcrypto.a'
+								staticLibraryFile = file("$opensslLinuxHome/$libName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
@@ -313,6 +319,9 @@ subprojects {
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								libName = 'libcrypto.a'
 								staticLibraryFile = file("$opensslBrewHome/lib/$libName")
+							} else if (targetPlatform.operatingSystem.linux) {
+								libName = 'libcrypto.a'
+								staticLibraryFile = file("$opensslLinuxHome/$libName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -337,6 +346,11 @@ subprojects {
 								linkName = 'libcrypto.dylib'
 								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
+							} else if (targetPlatform.operatingSystem.linux) {
+								dllName = 'libhcrypto.so.4.1.0'
+								linkName = 'libhcrypto.so.4.1.0'
+								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
+								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
@@ -355,6 +369,11 @@ subprojects {
 								linkName = 'libcrypto.dylib'
 								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
+							} else if (targetPlatform.operatingSystem.linux) {
+								dllName = 'libhcrypto.so.4.1.0'
+								linkName = 'libhcrypto.so.4.1.0'
+								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
+								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -376,6 +395,9 @@ subprojects {
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								libName = 'libssl.a'
 								staticLibraryFile = file("$opensslBrewHome/lib/$libName")
+							} else if (targetPlatform.operatingSystem.linux) {
+								libName = 'libssl.a'
+								staticLibraryFile = file("$opensslLinuxHome/$libName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
@@ -388,6 +410,9 @@ subprojects {
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								libName = 'libssl.a'
 								staticLibraryFile = file("$opensslBrewHome/lib/$libName")
+							} else if (targetPlatform.operatingSystem.linux) {
+								libName = 'libssl.a'
+								staticLibraryFile = file("$opensslLinuxHome/$libName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -412,6 +437,11 @@ subprojects {
 								linkName = 'libssl.dylib'
 								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
+							} else if (targetPlatform.operatingSystem.linux) {
+								dllName = 'libssl3.so'
+								linkName = 'libssl3.so'
+								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
+								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
 						} else if (buildType == buildTypes.release) {
 							if (targetPlatform.name == 'win32') {
@@ -429,6 +459,11 @@ subprojects {
 								linkName = 'libssl.dylib'
 								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
+							} else if (targetPlatform.operatingSystem.linux) {
+								dllName = 'libssl3.so'
+								linkName = 'libssl3.so'
+								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
+								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -441,7 +476,7 @@ subprojects {
 			withType(NativeComponentSpec) {
 				targetPlatform "win32"
 //				targetPlatform "win64"
-				targetPlatform "linux32"
+//				targetPlatform "linux32"
 				targetPlatform "linux64"
 				targetPlatform "macos"
 
@@ -561,6 +596,11 @@ subprojects {
 					cppCompiler.define "POCO_HAVE_ADDRINFO"
 					cppCompiler.define "POCO_HAVE_LIBRESOLV"
 					cppCompiler.args "-std=c++11"
+					cppCompiler.args "-fPIC"
+
+					linker.args "-lrt"
+					linker.args "-ldl"
+					linker.args "-lpthread"
 				}
 				if (toolChain in VisualCpp) {
 					if (targetPlatform == platforms.win64) {
@@ -627,6 +667,9 @@ subprojects {
 					cppCompiler.define '_USRDLL'
 					cppCompiler.define '_WINDLL'
 				}
+				if (toolChain in Gcc) {
+					linker.args "-Wl,-rpath,$rootDir/lib64"
+				}
 			}
 			withType(StaticLibraryBinarySpec) {
 				if (toolChain in VisualCpp) {
@@ -635,10 +678,13 @@ subprojects {
 					cCompiler.define   'POCO_STATIC'
 					cppCompiler.define 'POCO_STATIC'
 				}
+				if (toolChain in Gcc) {
+				}
 			}
 			withType(NativeExecutableSpec) {
 				if (toolChain in VisualCpp) {
-					
+				}
+				if (toolChain in Gcc) {
 				}
 			}
 		}

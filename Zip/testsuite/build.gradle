@@ -16,7 +16,7 @@ model {
 				}
 			}
 		}
-		TestSuite(NativeExecutableSpec) {
+		TestSuite(NativeLibrarySpec) {
 			sources {
 				cpp {
 					source {

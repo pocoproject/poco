@@ -76,7 +76,8 @@ model {
 								include 'WindowsConsoleChannel.cpp'
 							}
 						}
-					} else if (targetPlatform.operatingSystem.macOsX) {
+					} else
+                     if (targetPlatform.operatingSystem.macOsX || targetPlatform.operatingSystem.linux) {
 						platformNix(CppSourceSet) {
 							lib m.sources.cpp
 							source {
