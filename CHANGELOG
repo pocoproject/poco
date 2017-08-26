@@ -1,5 +1,27 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.7.8p4 (2017-08-11)
+============================
+
+- fixed GH #1813: xmlparse.cpp doesn't compile in WinCE (poco 1.7.8p3)
+- fixed GH #1834: Visual Studio 2008 cannot find stdint.h
+- fixed GH #1842: Upgrade bundled expat to 2.2.3
+- fixed GH #1843: Use random salt for Poco::XML::NamePool
+
+
+Release 1.7.8p3 (2017-06-22)
+============================
+
+- fixed GH #1760: Upgrade bundled expat to 2.2.1 which fixes some vulnerabilities:
+  http://seclists.org/oss-sec/2017/q2/499
+
+
+Release 1.7.8p2 (2017-04-18)
+============================
+
+- fixed GH #1655: CipherImpl memory leak with OpenSSL 1.1
+
+
 Release 1.7.8 (2017-02-21)
 ==========================
 

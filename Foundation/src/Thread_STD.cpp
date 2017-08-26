@@ -36,7 +36,7 @@ namespace Poco {
 
 
 ThreadImpl::CurrentThreadHolder ThreadImpl::_currentThreadHolder;
-POCO_THREADIMPL_THREAD_LOCAL ThreadImpl* ThreadImpl::CurrentThreadHolder::_pThread;
+thread_local ThreadImpl* ThreadImpl::CurrentThreadHolder::_pThread;
 
 
 ThreadImpl::ThreadImpl():
