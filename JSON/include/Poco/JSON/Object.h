@@ -79,8 +79,10 @@ public:
 		/// Struct is not copied to keep the operation as
 		/// efficient as possible (when needed, it will be generated upon request).
 
+#ifdef POCO_ENABLE_CPP11
 	Object(Object&& other);
-		/// Move constructor
+	/// Move constructor
+#endif // POCO_ENABLE_CPP11
 
 	virtual ~Object();
 		/// Destroys the Object.
@@ -216,11 +218,15 @@ public:
 		///
 		/// Insertion order preservation property is left intact.
 
+#ifdef POCO_ENABLE_CPP11
+
 	Object &operator =(const Object &other);
 		// Assignment operator
 
 	Object &operator =(Object &&other);
 		// Move operator
+
+#endif // POCO_ENABLE_CPP11
 
 private:
 	template <typename C>

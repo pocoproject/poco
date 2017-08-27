@@ -23,7 +23,12 @@
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include "Poco/ScopedLock.h"
+
+#if (POCO_OS == POCO_OS_CYGWIN)
+#include "Poco/Mutex_POSIX.h"
+#else
 #include "Poco/Mutex_STD.h"
+#endif
 
 
 namespace Poco {

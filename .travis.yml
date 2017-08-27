@@ -122,7 +122,7 @@ matrix:
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
  
 
-    - env:    TEST_NAME="clang (make) bundled"
+    - env:    TEST_NAME="clang 7.3(make) bundled"
       os: osx
       compiler: clang
       script:

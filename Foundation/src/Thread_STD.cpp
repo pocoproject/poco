@@ -19,12 +19,16 @@
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Format.h"
+
+
+#if defined(POCO_ENABLE_CPP11)
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Thread_STD_WIN32.cpp"
 #elif defined(POCO_VXWORKS)
 #include "Thread_STD_VX.cpp"
 #else
 #include "Thread_STD_POSIX.cpp"
+#endif
 #endif
 
 
@@ -35,7 +39,8 @@ ThreadImpl::CurrentThreadHolder ThreadImpl::_currentThreadHolder;
 thread_local ThreadImpl* ThreadImpl::CurrentThreadHolder::_pThread;
 
 
-ThreadImpl::ThreadImpl(): _pData(new ThreadData)
+ThreadImpl::ThreadImpl():
+	_pData(new ThreadData)
 {
 }
 

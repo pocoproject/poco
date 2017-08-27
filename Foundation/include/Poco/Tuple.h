@@ -26,7 +26,7 @@
 
 
 #include "Poco/Foundation.h"
-#if defined(POCO_CXX11_TUPLE_FINISHED)
+#if defined(POCO_CXX11_TUPLE_FINISHED) && defined(POCO_ENABLE_CPP11)
 #include <tuple>
 #endif
 #include "Poco/TypeList.h"
@@ -35,7 +35,7 @@
 namespace Poco {
 
 
-#if defined(POCO_CXX11_TUPLE_FINISHED)
+#if defined(POCO_CXX11_TUPLE_FINISHED) && defined(POCO_ENABLE_CPP11)
 
 template<class ...Types>
 class Tuple : public std::tuple<Types...>
@@ -88,7 +88,7 @@ public:
 	}
 
 	template <int N>
-	typename std::tuple_element<N, std::tuple<Types...>>::type& get()
+	typename std::tuple_element<N, std::tuple<Types...>>::type &get()
 	{
 		return std::get<N>(*this);
 	}

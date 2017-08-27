@@ -20,21 +20,21 @@
 #include <pthread.h>
 #include <signal.h>
 #if defined(__sun) && defined(__SVR4)
-	#if !defined(__EXTENSIONS__)
-		#define __EXTENSIONS__
-	#endif
+#	if !defined(__EXTENSIONS__)
+#		define __EXTENSIONS__
+#	endif
 #endif
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
-	#include <time.h>
-	#include <unistd.h>
+#	include <time.h>
+#	include <unistd.h>
 #endif
 #if POCO_OS == POCO_OS_MAC_OS_X
-	#include <mach/mach.h>
-	#include <mach/task.h>
-	#include <mach/thread_policy.h>
+#   include <mach/mach.h>
+#   include <mach/task.h>
+#   include <mach/thread_policy.h>
 #endif
 #if POCO_OS == POCO_OS_LINUX
-	#include <sys/syscall.h>
+#include <sys/syscall.h>
 #endif
 #include <cstring>
 
