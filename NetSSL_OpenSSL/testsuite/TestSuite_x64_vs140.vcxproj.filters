@@ -61,6 +61,15 @@
     <Filter Include="FTPSClient\Header Files">
       <UniqueIdentifier>{c12db3ef-a857-4f57-8e49-3292aca89151}</UniqueIdentifier>
     </Filter>
+    <Filter Include="WebSocket">
+      <UniqueIdentifier>{aaafad05-402a-4cd2-aa7d-da3a2e09c9f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket\Header Files">
+      <UniqueIdentifier>{676caae1-cfac-49dc-a53d-5b710a37b39e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebSocket\Source Files">
+      <UniqueIdentifier>{3b14eae2-2b25-4f69-b6e5-64bf3f8770bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HTTPSTestServer.h">
@@ -98,6 +107,12 @@
     </ClInclude>
     <ClInclude Include="src\DialogServer.h">
       <Filter>FTPSClient</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WebSocketTest.h">
+      <Filter>WebSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WebSocketTestSuite.h">
+      <Filter>WebSocket\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +154,12 @@
     </ClCompile>
     <ClCompile Include="src\DialogServer.cpp">
       <Filter>FTPSClient</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketTest.cpp">
+      <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketTestSuite.cpp">
+      <Filter>WebSocket\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
