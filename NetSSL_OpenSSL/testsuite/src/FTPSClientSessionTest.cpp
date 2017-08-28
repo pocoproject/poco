@@ -11,8 +11,8 @@
 
 
 #include "FTPSClientSessionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "DialogServer.h"
 #include "Poco/Net/FTPSClientSession.h"
 #include "Poco/Net/DialogSocket.h"
