@@ -15,7 +15,11 @@
 
 
 #include "Poco/Mutex.h"
+#if (POCO_OS == POCO_OS_CYGWIN)
+#include "Mutex_POSIX.cpp"
+#else
 #include "Mutex_STD.cpp"
+#endif
 
 
 namespace Poco {
