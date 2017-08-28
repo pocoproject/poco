@@ -141,8 +141,6 @@ void Client::connect(const Net::SocketAddress& addrs, const Timespan& timeout)
 
 bool Client::sendAuth(const std::string& password)
 {
-    if(password.empty()) return true;
-
     Array cmd;
     cmd << "AUTH" << password;
 
