@@ -338,17 +338,11 @@ public:
 	{
 		Mutex::ScopedLock lock(_mutex);
 
-		if (length > available())
+		if (length > _buffer.size() - _used - _begin)
 			throw Poco::InvalidAccessException("Cannot extend buffer.");
 		
 		if (!isWritable())
 			throw Poco::InvalidAccessException("Buffer not writable.");
-
-		if (_buffer.size() - (_begin + _used) < length)
-		{
-			std::memmove(_buffer.begin(), begin(), _used * sizeof(T));
-			_begin = 0;
-		}
 
 		std::size_t usedBefore = _used;
 		_used += length;
