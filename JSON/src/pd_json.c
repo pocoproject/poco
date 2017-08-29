@@ -478,7 +478,7 @@ read_string(json_stream *json)
 static int
 is_digit(int c)
 {
-    return c >= -1 && c <= 255 && isdigit(c);
+    return c >= 48 /*0*/ && c <= 57 /*9*/;
 }
 
 static int
