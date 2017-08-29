@@ -186,7 +186,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;c:\SALVA\VS2005\libs\OpenSSL64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;..\..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0600;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -202,9 +202,9 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CppUnitmtd.lib;iphlpapi.lib;winmm.lib;libeay32mtd.lib;ssleay32mtd.lib;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PocoCppUnitmtd.lib;iphlpapi.lib;winmm.lib;libeay32mtd.lib;ssleay32mtd.lib;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\static_mt\TestSuited.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\lib64;c:\SALVA\VS2005\libs\OpenSSL64\lib_2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\lib64;..\..\openssl\win32\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>bin64\static_mt\TestSuited.pdb</ProgramDatabaseFile>
@@ -219,7 +219,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;c:\SALVA\VS2005\libs\OpenSSL64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\Net\include;..\..\Crypto\include;..\..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x0600;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -235,7 +235,7 @@
     <Link>
       <AdditionalDependencies>CppUnitmt.lib;iphlpapi.lib;winmm.lib;libeay32mt.lib;ssleay32mt.lib;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\static_mt\TestSuite.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\lib64;c:\SALVA\VS2005\libs\OpenSSL64\lib_2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\lib64;..\..\openssl\win64\lib\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
