@@ -31,9 +31,9 @@ namespace Net {
 
 
 FTPClientSession::FTPClientSession():
-	_port(0),
 	_pControlSocket(0),
 	_pDataStream(0),
+	_port(0),		
 	_passiveMode(true),
 	_fileType(TYPE_BINARY),
 	_supports1738(true),
@@ -45,10 +45,10 @@ FTPClientSession::FTPClientSession():
 
 	
 FTPClientSession::FTPClientSession(const StreamSocket& socket):
-	_host(socket.address().host().toString()),
-	_port(socket.address().port()),
 	_pControlSocket(new DialogSocket(socket)),
 	_pDataStream(0),
+	_host(socket.address().host().toString()),
+	_port(socket.address().port()),
 	_passiveMode(true),
 	_fileType(TYPE_BINARY),
 	_supports1738(true),
@@ -64,10 +64,10 @@ FTPClientSession::FTPClientSession(const std::string& host,
 	Poco::UInt16 port,
 	const std::string& username,
 	const std::string& password):
-	_host(host),
-	_port(port),
 	_pControlSocket(new DialogSocket(SocketAddress(host, port))),
 	_pDataStream(0),
+	_host(host),
+	_port(port),		
 	_passiveMode(true),
 	_fileType(TYPE_BINARY),
 	_supports1738(true),

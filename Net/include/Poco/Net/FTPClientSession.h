@@ -348,15 +348,15 @@ protected:
 
 private:
 	FTPClientSession(const FTPClientSession&);
-
-	bool	   _passiveMode = true;
-	bool	   _supports1738 = true;
-	bool	   _serverReady = false;
-	Poco::Timespan _timeout = DEFAULT_TIMEOUT;
+	
 	std::string    _host;
 	Poco::UInt16   _port = 0;
-	bool	   _isLoggedIn = false;
+	bool	   _passiveMode = true;
 	FileType       _fileType = TYPE_BINARY;
+	bool	   _supports1738 = true;
+	bool	   _serverReady = false;
+	bool	   _isLoggedIn = false;
+	Poco::Timespan _timeout = DEFAULT_TIMEOUT;
 };
 
 
