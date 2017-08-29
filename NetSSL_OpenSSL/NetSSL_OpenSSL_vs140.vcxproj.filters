@@ -129,6 +129,9 @@
     <ClInclude Include="include\Poco\Net\FTPSClientSession.h">
       <Filter>FTPSClient</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\FTPSStreamFactory.h">
+      <Filter>FTPSClient</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AcceptCertificateHandler.cpp">
@@ -213,6 +216,9 @@
       <Filter>Mail\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\FTPSClientSession.cpp">
+      <Filter>FTPSClient</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPSStreamFactory.cpp">
       <Filter>FTPSClient</Filter>
     </ClCompile>
   </ItemGroup>
