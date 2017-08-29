@@ -329,6 +329,118 @@ char_needs_escaping(int c)
     return 0;
 }
 
+static int
+utf8_seq_length(char byte)
+{
+    unsigned char u = (unsigned char) byte;
+    if (u < 0x80) return 1;
+
+    if (0x80 <= u && u <= 0xBF)
+    {
+        // second, third or fourth byte of a multi-byte
+        // sequence, i.e. a "continuation byte"
+        return 0;
+    }
+    else if (u == 0xC0 || u == 0xC1)
+    {
+        // overlong encoding of an ASCII byte
+        return 0;
+    }
+    else if (0xC2 <= u && u <= 0xDF)
+    {
+        // 2-byte sequence
+        return 2;
+    }
+    else if (0xE0 <= u && u <= 0xEF)
+    {
+        // 3-byte sequence
+        return 3;
+    }
+    else if (0xF0 <= u && u <= 0xF4)
+    {
+        // 4-byte sequence
+        return 4;
+    }
+    else
+    {
+        // u >= 0xF5
+        // Restricted (start of 4-, 5- or 6-byte sequence) or invalid UTF-8
+        return 0;
+    }
+}
+
+static int
+is_legal_utf8(const unsigned char *bytes, int length)
+{
+    if (0 == bytes || 0 == length) return 0;
+
+    unsigned char a;
+    const unsigned char* srcptr = bytes + length;
+    switch (length)
+    {
+    default:
+        return 0;
+        // Everything else falls through when true.
+    case 4:
+        if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return 0;
+    case 3:
+        if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return 0;
+    case 2:
+        a = (*--srcptr);
+        switch (*bytes)
+        {
+        case 0xE0:
+            if (a < 0xA0 || a > 0xBF) return 0;
+            break;
+        case 0xED:
+            if (a < 0x80 || a > 0x9F) return 0;
+            break;
+        case 0xF0:
+            if (a < 0x90 || a > 0xBF) return 0;
+            break;
+        case 0xF4:
+            if (a < 0x80 || a > 0x8F) return 0;
+            break;
+        default:
+            if (a < 0x80 || a > 0xBF) return 0;
+        }
+    case 1:
+        if (*bytes >= 0x80 && *bytes < 0xC2) return 0;
+    }
+    return *bytes <= 0xF4;
+}
+
+static int
+read_utf8(json_stream* json, int next_char)
+{
+    int count = utf8_seq_length(next_char);
+    if (!count)
+    {
+        json_error(json, "%s", "Bad character.");
+        return -1;
+    }
+
+    char buffer[4];
+    buffer[0] = next_char;
+    for (int i = 1; i < count; ++i)
+    {
+        buffer[i] = json->source.get(&json->source);;
+    }
+
+    if (!is_legal_utf8((unsigned char*) buffer, count))
+    {
+        json_error(json, "%s", "No legal UTF8 found");
+        return -1;
+    }
+
+    for (int i = 0; i < count; ++i)
+    {
+        if (pushchar(json, buffer[i]) != 0)
+            return -1;
+    }
+    return 0;
+}
+
 static enum json_type
 read_string(json_stream *json)
 {
@@ -346,6 +458,9 @@ read_string(json_stream *json)
                 return JSON_ERROR;
         } else if (c == '\\') {
             if (read_escaped(json) != 0)
+                return JSON_ERROR;
+        } else if ((unsigned) c >= 0x80) {
+            if (read_utf8(json, c) != 0)
                 return JSON_ERROR;
         } else {
             if (char_needs_escaping(c)) {

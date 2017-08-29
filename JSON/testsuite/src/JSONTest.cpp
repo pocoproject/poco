@@ -1672,6 +1672,47 @@ void JSONTest::testInvalidJanssonFiles()
 	{
 		Poco::Path filePath(*it, "input");
 
+		if (filePath.isFile())
+		{
+			Poco::File inputFile(filePath);
+			if (inputFile.exists())
+			{
+				Poco::FileInputStream fis(filePath.toString());
+				std::cout << filePath.toString() << " ... ";
+
+				Parser parser;
+				parser.setAllowNullByte(false);
+				Var result;
+
+				try
+				{
+					parser.parse(fis);
+					result = parser.asVar();
+					// We shouldn't get here.
+					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl;
+					fail(result.convert<std::string>());
+				}
+				catch(Poco::Exception& /*ex*/)
+				{
+					std::cout << /*" (" << ex.displayText() << ") " <<*/ "Ok!" << std::endl;
+				}
+			}
+		}
+	}
+}
+
+
+void JSONTest::testInvalidUnicodeJanssonFiles()
+{
+	Poco::Path pathPattern(getTestFilesPath("invalid-unicode"));
+
+	std::set<std::string> paths;
+	Poco::Glob::glob(pathPattern, paths);
+
+	for(std::set<std::string>::iterator it = paths.begin(); it != paths.end(); ++it)
+	{
+		Poco::Path filePath(*it, "input");
+
 		if ( filePath.isFile() )
 		{
 			Poco::File inputFile(filePath);
@@ -1692,62 +1733,13 @@ void JSONTest::testInvalidJanssonFiles()
 					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl;
 					fail(result.convert<std::string>());
 				}
-				catch(JSONException&)
+				catch(Poco::Exception& /*ex*/)
 				{
-					std::cout << "Ok!" << std::endl;
-					continue;
+					std::cout << /*" (" << ex.displayText() << ") " <<*/ "Ok!" << std::endl;
 				}
-				catch(Poco::SyntaxException&)
-				{ }
 			}
 		}
 	}
-}
-
-
-void JSONTest::testInvalidUnicodeJanssonFiles()
-{
-#if 0
-	Poco::Path pathPattern(getTestFilesPath("invalid-unicode"));
-
-	std::set<std::string> paths;
-	Poco::Glob::glob(pathPattern, paths);
-
-	for(std::set<std::string>::iterator it = paths.begin(); it != paths.end(); ++it)
-	{
-		Poco::Path filePath(*it, "input");
-
-		if ( filePath.isFile() )
-		{
-			Poco::File inputFile(filePath);
-			if ( inputFile.exists() )
-			{
-				Poco::FileInputStream fis(filePath.toString());
-				std::cout << filePath.toString() << std::endl;
-
-				Parser parser;
-				parser.setAllowNullByte(false);
-				Var result;
-
-				try
-				{
-					parser.parse(fis);
-					result = parser.asVar();
-					// We shouldn't get here.
-					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl;
-					fail(result.convert<std::string>());
-				}
-				catch(JSONException&)
-				{
-					std::cout << "Ok!" << std::endl;
-					continue;
-				}
-				catch(Poco::SyntaxException&)
-				{ }
-			}
-		}
-	}
-#endif
 }
 
 
@@ -1792,7 +1784,7 @@ void JSONTest::testUnicode()
 	converter.convert(text, original);
 
 	assert(test.convert<std::string>() == original);
-#if 0
+
 	parser.reset();
 	std::ostringstream os;
 	os << '[' << (char) 0x92 << ']';
@@ -1805,13 +1797,13 @@ void JSONTest::testUnicode()
 
 	parser.reset();
 	os.str("");
-	os << '[' << (char)0xC2 << (char)0x92 << ']';
+	os << "[\"" << (char)0xC2 << (char)0x92 << "\"]";
 	result = parser.parse(os.str());
 	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	parser.reset();
 	os.str("");
-	os << '[' << (char)0xAC << ']';
+	os << "[\"" << (char)0xAC << "\"]";
 	try
 	{
 		parser.parse(os.str());
@@ -1821,13 +1813,13 @@ void JSONTest::testUnicode()
 
 	parser.reset();
 	os.str("");
-	os << '[' << (char)0xE2 << (char)0x82 << (char)0xAC << ']';
+	os << "[\"" << (char)0xE2 << (char)0x82 << (char)0xAC << "\"]";
 	result = parser.parse(os.str());
 	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	parser.reset();
 	os.str("");
-	os << '[' << (char)0xA2 << ']';
+	os << "[\"" << (char)0xA2 << "\"]";
 	try
 	{
 		parser.parse(os.str());
@@ -1837,10 +1829,9 @@ void JSONTest::testUnicode()
 
 	parser.reset();
 	os.str("");
-	os << '[' << (char)0xF0 << (char)0xA4 << (char)0xAD << (char)0xAD << ']';
+	os << "[\"" << (char)0xF0 << (char)0xA4 << (char)0xAD << (char)0xAD << "\"]";
 	result = parser.parse(os.str());
 	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
-#endif
 }
 
 
