@@ -285,6 +285,7 @@
     <ClInclude Include="include\Poco\Net\ConsoleCertificateHandler.h" />
     <ClInclude Include="include\Poco\Net\Context.h" />
     <ClInclude Include="include\Poco\Net\FTPSClientSession.h" />
+    <ClInclude Include="include\Poco\Net\FTPSStreamFactory.h" />
     <ClInclude Include="include\Poco\Net\HTTPSClientSession.h" />
     <ClInclude Include="include\Poco\Net\HTTPSSessionInstantiator.h" />
     <ClInclude Include="include\Poco\Net\HTTPSStreamFactory.h" />
@@ -316,6 +317,7 @@
     <ClCompile Include="src\ConsoleCertificateHandler.cpp" />
     <ClCompile Include="src\Context.cpp" />
     <ClCompile Include="src\FTPSClientSession.cpp" />
+    <ClCompile Include="src\FTPSStreamFactory.cpp" />
     <ClCompile Include="src\HTTPSClientSession.cpp" />
     <ClCompile Include="src\HTTPSSessionInstantiator.cpp" />
     <ClCompile Include="src\HTTPSStreamFactory.cpp" />
