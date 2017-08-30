@@ -20,23 +20,17 @@ project(":PDF") {
 						exportedHeaders {
 							srcDirs 'include', 'include/Poco/PDF'
 						}
+						lib project: ':Util', library: 'Util'
+						lib project: ':Foundation', library: 'Foundation'
 					}
 				}
 			}
 		}
 		binaries {
-			all {
-			}
 			withType(SharedLibraryBinarySpec) {
-				lib project: ':Util', library: 'Util', linkage: 'shared'
-				lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				if (toolChain in VisualCpp) {
 					 cppCompiler.define "PDF_EXPORTS"
 				}
-			}
-			withType(StaticLibraryBinarySpec) {
-				lib project: ':Util', library: 'Util', linkage: 'static'
-				lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 			}
 		}
 	}

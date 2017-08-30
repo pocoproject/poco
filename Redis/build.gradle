@@ -16,6 +16,8 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
+					lib project: ':Net', library: 'Net'
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}
@@ -24,15 +26,9 @@ model {
 		all {
 		}
 		withType(SharedLibraryBinarySpec) {
-			lib project: ':Net', library: 'Net', linkage: 'shared'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				 cppCompiler.define "Redis_EXPORTS"
 			}
-		}
-		withType(StaticLibraryBinarySpec) {
-			lib project: ':Net', library: 'Net', linkage: 'static'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }

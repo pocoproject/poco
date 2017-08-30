@@ -25,19 +25,16 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}
 	}
 	binaries {
 		withType(SharedLibraryBinarySpec) {
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				 cppCompiler.define "JSON_EXPORTS"
 			}
-		}
-		withType(StaticLibraryBinarySpec) {
-			 lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }

@@ -18,6 +18,7 @@ model {
 					}
 					lib library: 'ssl'
 					lib library: 'crypto'
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}
@@ -34,13 +35,9 @@ model {
 			}
 		}
 		withType(SharedLibraryBinarySpec) {
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				 cppCompiler.define "Crypto_EXPORTS"
 			}
-		}
-		withType(StaticLibraryBinarySpec) {
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }

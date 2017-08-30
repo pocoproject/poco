@@ -16,6 +16,7 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
+					lib project: ':Foundation', library: 'Foundation'
 				}
 				cpp {
 					source {
@@ -25,6 +26,7 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}
@@ -42,14 +44,12 @@ model {
 			cppCompiler.define "HAVE_EXPAT_CONFIG_H"
 		}
 		withType(SharedLibraryBinarySpec) {
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				 cCompiler.define "XML_EXPORTS"
 				 cppCompiler.define "XML_EXPORTS"
 			}
 		}
 		withType(StaticLibraryBinarySpec) {
-			 lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }

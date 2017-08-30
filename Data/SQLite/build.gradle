@@ -16,6 +16,8 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
+					lib project: ':Data', library: 'Data'
+					lib project: ':Foundation', library: 'Foundation'
 				}
 				cpp {
 					source {
@@ -25,6 +27,8 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
+					lib project: ':Data', library: 'Data'
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}
@@ -52,15 +56,11 @@ model {
 			}
 		}
 		withType(SharedLibraryBinarySpec) {
-			lib project: ':Data', library: 'Data', linkage: 'shared'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				cppCompiler.define	"SQLite_EXPORTS"
 			}
 		}
 		withType(StaticLibraryBinarySpec) {
-			lib project: ':Data', library: 'Data', linkage: 'static'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }

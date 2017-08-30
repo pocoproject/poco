@@ -34,14 +34,11 @@ import org.gradle.model.ModelMap;
 import org.gradle.model.Mutate;
 import org.gradle.model.Path;
 import org.gradle.model.RuleSource;
-import org.gradle.nativeplatform.internal.SharedLibraryBinarySpecInternal;
 import org.gradle.nativeplatform.test.plugins.NativeBinariesTestPlugin;
 import org.gradle.platform.base.ComponentBinaries;
 import org.gradle.platform.base.ComponentType;
 import org.gradle.platform.base.TypeBuilder;
 import org.gradle.testing.base.TestSuiteContainer;
-import org.pocoproject.nativeplatform.test.DefaultSharedLibraryTestSuiteBinarySpec;
-import org.pocoproject.nativeplatform.test.SharedLibraryTestSuiteBinarySpec;
 import org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec;
 import org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec;
 import org.pocoproject.nativeplatform.test.cppunit.internal.DefaultCppUnitTestSuiteBinary;
@@ -63,11 +60,6 @@ public class CppUnitPlugin implements Plugin<Project> {
     @SuppressWarnings("UnusedDeclaration")
     static class Rules extends RuleSource {
 
-        @ComponentType
-        void registerSharedLibraryTestSuiteBinarySpecType(TypeBuilder<SharedLibraryTestSuiteBinarySpec> builder) {
-            builder.defaultImplementation(DefaultSharedLibraryTestSuiteBinarySpec.class);
-            builder.internalView(SharedLibraryBinarySpecInternal.class);
-        }
 
         private static final String CPPUNIT_LAUNCHER_SOURCE_SET = "cppUnitLauncher";
 

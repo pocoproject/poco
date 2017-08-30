@@ -26,6 +26,9 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
+					lib project: ':Foundation', library: 'Foundation'
+					lib project: ':XML', library: 'XML'
+					lib project: ':JSON', library: 'JSON'
 				}
 			}
 			binaries.all {
@@ -37,6 +40,9 @@ model {
 								srcDir 'src'
 								include '**/Win*.cpp'
 							}
+							lib project: ':Foundation', library: 'Foundation'
+							lib project: ':XML', library: 'XML'
+							lib project: ':JSON', library: 'JSON'
 						}
 					}
 				}
@@ -44,20 +50,10 @@ model {
 		}
 	}
 	binaries {
-		all {
-		}
 		withType(SharedLibraryBinarySpec) {
-			 lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
-			 lib project: ':XML', library: 'XML', linkage: 'shared'
-			 lib project: ':JSON', library: 'JSON', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				 cppCompiler.define "Util_EXPORTS"
 			}
 		}
-		withType(StaticLibraryBinarySpec) {
-			 lib project: ':Foundation', library: 'Foundation', linkage: 'static'
-			 lib project: ':XML', library: 'XML', linkage: 'static'
-			 lib project: ':JSON', library: 'JSON', linkage: 'static'
-		 }
 	}
 }

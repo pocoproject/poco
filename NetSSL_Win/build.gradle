@@ -18,6 +18,10 @@ model {
 							exportedHeaders {
 								srcDir 'include'
 							}
+							lib project: ':Crypto', library: 'Crypto'
+							lib project: ':Net', library: 'Net'
+							lib project: ':Util', library: 'Util'
+							lib project: ':Foundation', library: 'Foundation'
 						}
 					}
 				}
@@ -33,19 +37,9 @@ model {
 			}
 		}
 		withType(SharedLibraryBinarySpec) {
-			lib project: ':Crypto', library: 'Crypto', linkage: 'shared'
-			lib project: ':Net', library: 'Net', linkage: 'shared'
-			lib project: ':Util', library: 'Util', linkage: 'shared'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				 cppCompiler.define "NetSSL_Win_EXPORTS"
 			}
-		}
-		withType(StaticLibraryBinarySpec) {
-			lib project: ':Crypto', library: 'Crypto', linkage: 'static'
-			lib project: ':Net', library: 'Net', linkage: 'static'
-			lib project: ':Util', library: 'Util', linkage: 'static'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }

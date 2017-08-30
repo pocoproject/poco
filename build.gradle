@@ -25,6 +25,25 @@ File appendDebugSuffix(File binaryFile) {
 	return new File(parent, name.substring(0, extensionSeparatorIndex) + "d" + name.substring(extensionSeparatorIndex))
 }
 
+File appendStaticSuffix(File binaryFile) {
+	String name = binaryFile.getName()
+	File parent = binaryFile.getParentFile()
+	int extensionSeparatorIndex = name.lastIndexOf('.')
+	if (extensionSeparatorIndex == -1) {
+		return new File(parent, name + "MT")
+	}
+	return new File(parent, name.substring(0, extensionSeparatorIndex) + "MT" + name.substring(extensionSeparatorIndex))
+}
+File appendSemiStaticSuffix(File binaryFile) {
+	String name = binaryFile.getName()
+	File parent = binaryFile.getParentFile()
+	int extensionSeparatorIndex = name.lastIndexOf('.')
+	if (extensionSeparatorIndex == -1) {
+		return new File(parent, name + "MD")
+	}
+	return new File(parent, name.substring(0, extensionSeparatorIndex) + "MD" + name.substring(extensionSeparatorIndex))
+}
+
 File prefixByPoco(File binaryFile) {
 	String name = binaryFile.getName()
 	String prefix = ''
@@ -98,9 +117,18 @@ File toLib(File linkFile, Platform platform) {
 	File newParent = new File(rootDir, target )
 	return new File(newParent, name);
 }
-File toStatic(File staticFile) {
+File toStatic(File staticFile, Platform platform) {
 	String name = staticFile.getName()
-	File parent = new File(rootDir, "static")
+	String target
+	if (platform.architecture.name == 'x86') {
+		target = 'lib'
+	} else
+	if (platform.architecture.name == 'x86-64') {
+		target = 'lib64'
+	} else {
+		throw new GradleException("Unknown architecture: " + platform.architecture.name)
+	}
+	File parent = new File(rootDir, target)
 	return new File(parent, name);
 }
 apply plugin: 'base' 
@@ -186,19 +214,19 @@ unittest.dependsOn ':JSON:testsuite:assemble'
 unittest.dependsOn ':Util:testsuite:assemble'
 unittest.dependsOn ':Net:testsuite:assemble'
 unittest.dependsOn ':Crypto:testsuite:assemble'
-unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
+//unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
 if (os.windows) {
-	unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
+//	unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
 }
 unittest.dependsOn ':Data:testsuite:assemble'
 if (os.windows) {
-	unittest.dependsOn ':Data:ODBC:testsuite:assemble'
-	unittest.dependsOn ':Data:SQLite:testsuite:assemble'
-	unittest.dependsOn ':Data:MySQL:testsuite:assemble'
-	unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
+//	unittest.dependsOn ':Data:ODBC:testsuite:assemble'
+//	unittest.dependsOn ':Data:SQLite:testsuite:assemble'
+//	unittest.dependsOn ':Data:MySQL:testsuite:assemble'
+//	unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
 }
 unittest.dependsOn ':Zip:testsuite:assemble'
-unittest.dependsOn ':MongoDB:testsuite:assemble'
+//unittest.dependsOn ':MongoDB:testsuite:assemble'
 unittest.dependsOn ':Redis:testsuite:assemble'
 
 task samples {	
@@ -526,10 +554,13 @@ subprojects {
 							}
 						} else
 						if (it instanceof StaticLibraryBinarySpec) {
-							staticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(staticLibraryFile)))
+							staticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendStaticSuffix(staticLibraryFile))), targetPlatform)
+						} else
+						if (it instanceof SemiStaticLibraryBinarySpec) {
+							semiStaticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendSemiStaticSuffix(semiStaticLibraryFile))), targetPlatform)
 						} else
 						if (it instanceof NativeExecutableBinarySpec) {
-//							executable.file = toBin(appendDebugSuffix(executable.file), targetPlatform)
+							executable.file = toBin(appendDebugSuffix(executable.file), targetPlatform)
 						} else {
 							throw new GradleException("Unknown native library binary")
 						}
@@ -554,10 +585,13 @@ subprojects {
 							}
 						} else
 						if (it instanceof StaticLibraryBinarySpec) {
-							staticLibraryFile = toStatic(prefixByPoco(staticLibraryFile))
+							staticLibraryFile = toStatic(prefixByPoco(appendStaticSuffix(staticLibraryFile)), targetPlatform)
+						} else
+						if (it instanceof SemiStaticLibraryBinarySpec) {
+							semiStaticLibraryFile = toStatic(prefixByPoco(appendSemiStaticSuffix(semiStaticLibraryFile)), targetPlatform)
 						} else
 						if (it instanceof NativeExecutableBinarySpec) {
-//							executable.file = toBin(executable.file, targetPlatform)
+							executable.file = toBin(executable.file, targetPlatform)
 						} else {
 							throw new GradleException("Unknown native library binary")
 						} 
@@ -605,6 +639,8 @@ subprojects {
 				if (toolChain in VisualCpp) {
 					if (targetPlatform == platforms.win64) {
 						linker.args '/MACHINE:X64'
+					} else {
+						linker.args '/MACHINE:X86'
 					}
 					if (buildType == buildTypes.debug) {
 						cCompiler.args '/Zi'
@@ -636,17 +672,35 @@ subprojects {
 					cppCompiler.define '_WIN32'
 					cppCompiler.define '_WINDOWS'
 					cppCompiler.define '_MBCS'
-				
+					
 					linker.args 'kernel32.lib'
 					linker.args 'user32.lib'
 					linker.args 'gdi32.lib'
+					linker.args 'winspool.lib'
 					linker.args 'comdlg32.lib'
 					linker.args 'advapi32.lib'
 					linker.args 'shell32.lib'
 					linker.args 'ole32.lib'
 					linker.args 'oleaut32.lib'
 					linker.args 'uuid.lib'
-				
+					
+					linker.args '/NXCOMPAT' 
+					linker.args '/OPT:REF' 
+					linker.args '/SAFESEH' 
+					linker.args '/INCREMENTAL:NO' 
+//					linker.args '/MANIFEST' 
+//					linker.args '/MANIFESTUAC:"level='asInvoker' uiAccess='false'"' 
+					linker.args '/OPT:ICF' 
+					linker.args '/NOLOGO' 
+					linker.args '/SUBSYSTEM:CONSOLE'
+				}
+			}
+			withType(SharedLibraryBinarySpec) {
+				if (toolChain in VisualCpp) {
+					cCompiler.define   '_USRDLL'
+					cCompiler.define   '_WINDLL'
+					cppCompiler.define '_USRDLL'
+					cppCompiler.define '_WINDLL'
 					if (buildType == buildTypes.debug) {
 						cCompiler.args "/MDd"
 						cppCompiler.args "/MDd"
@@ -657,15 +711,6 @@ subprojects {
 					} else {
 						throw new GradleException("Unknown buildType" + buildType)
 					}
-					linker.args '/SUBSYSTEM:CONSOLE'
-				}
-			}
-			withType(SharedLibraryBinarySpec) {
-				if (toolChain in VisualCpp) {
-					cCompiler.define   '_USRDLL'
-					cCompiler.define   '_WINDLL'
-					cppCompiler.define '_USRDLL'
-					cppCompiler.define '_WINDLL'
 				}
 				if (toolChain in Gcc) {
 					linker.args "-Wl,-rpath,$rootDir/lib64"
@@ -674,20 +719,64 @@ subprojects {
 			withType(StaticLibraryBinarySpec) {
 				if (toolChain in VisualCpp) {
 					cCompiler.define   '_LIB'
-					cppCompiler.define '_LIB'
 					cCompiler.define   'POCO_STATIC'
+					cppCompiler.define '_LIB'
 					cppCompiler.define 'POCO_STATIC'
+					if (buildType == buildTypes.debug) {
+						cCompiler.args "/MTd"
+						cppCompiler.args "/MTd"
+					} else 
+					if (buildType == buildTypes.release) {
+						cCompiler.args "/MT"
+						cppCompiler.args "/MT"
+					} else {
+						throw new GradleException("Unknown buildType" + buildType)
+					}
 				}
 				if (toolChain in Gcc) {
 				}
 			}
-			withType(NativeExecutableSpec) {
+			withType(SemiStaticLibraryBinarySpec) {
 				if (toolChain in VisualCpp) {
+					cCompiler.define   '_LIB'
+					cCompiler.define   'POCO_STATIC'
+					cppCompiler.define '_LIB'
+					cppCompiler.define 'POCO_STATIC'
+					if (buildType == buildTypes.debug) {
+						cCompiler.args "/MDd"
+						cppCompiler.args "/MDd"
+					} else 
+					if (buildType == buildTypes.release) {
+						cCompiler.args "/MD"
+						cppCompiler.args "/MD"
+					} else {
+						throw new GradleException("Unknown buildType" + buildType)
+					}
+				}
+				if (toolChain in Gcc) {
+				}
+			}
+			withType(NativeExecutableBinarySpec) {
+				if (toolChain in VisualCpp) {
+					if (buildType == buildTypes.debug) {
+						cCompiler.args "/MDd"
+						cppCompiler.args "/MDd"
+					} else 
+					if (buildType == buildTypes.release) {
+						cCompiler.args "/MD"
+						cppCompiler.args "/MD"
+					} else {
+						throw new GradleException("Unknown buildType" + buildType)
+					}
 				}
 				if (toolChain in Gcc) {
 				}
 			}
 		}
+	}
+	tasks.withType(RunTestExecutable) {
+//		String test ="-print"
+		args test
 	}
 }
 

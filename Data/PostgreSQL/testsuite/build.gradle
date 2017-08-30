@@ -44,11 +44,20 @@ model {
     binaries {
         withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+			if (toolChain in VisualCpp) {
+				if (buildType == buildTypes.debug) {
+					cCompiler.args "/MDd"
+					cppCompiler.args "/MDd"
+				} else 
+				if (buildType == buildTypes.release) {
+					cCompiler.args "/MD"
+					cppCompiler.args "/MD"
+				} else {
+					throw new GradleException("Unknown buildType" + buildType)
+				}
+			}
+			if (toolChain in Gcc) {
+			}
         }
 	}
 }
-tasks.withType(RunTestExecutable) {
-	args "-print"
-}
-
-

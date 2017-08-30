@@ -27,14 +27,16 @@ model {
 					exportedHeaders {
 						srcDir 'src'
 					}
-					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+					lib project: ':CppUnit', library: 'CppUnit'
 					lib library: 'crypto'
 					lib library: 'ssl'
-					lib project: ':Crypto', library: 'Crypto', linkage: 'shared'
-					lib project: ':Net', library: 'Net', linkage: 'shared'
-					lib project: ':NetSSL_OpenSSL', library: 'NetSSL', linkage: 'shared'
-					lib project: ':Util', library: 'Util', linkage: 'shared'
-					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+					lib project: ':Crypto', library: 'Crypto'
+					lib project: ':Net', library: 'Net'
+					lib project: ':NetSSL_OpenSSL', library: 'NetSSL'
+					lib project: ':Util', library: 'Util'
+					lib project: ':JSON', library: 'JSON'
+					lib project: ':XML', library: 'XML'
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 			binaries.all {
@@ -52,11 +54,20 @@ model {
     binaries {                                               
         withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+			if (toolChain in VisualCpp) {
+				if (buildType == buildTypes.debug) {
+					cCompiler.args "/MDd"
+					cppCompiler.args "/MDd"
+				} else 
+				if (buildType == buildTypes.release) {
+					cCompiler.args "/MD"
+					cppCompiler.args "/MD"
+				} else {
+					throw new GradleException("Unknown buildType" + buildType)
+				}
+			}
+			if (toolChain in Gcc) {
+			}
         }
 	}
 }
-tasks.withType(RunTestExecutable) {
-	args "-print"
-}
-
-

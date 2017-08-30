@@ -18,6 +18,8 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
+					lib project: ':Data', library: 'Data'
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}
@@ -29,8 +31,6 @@ model {
 			}
 		}
 		withType(SharedLibraryBinarySpec) {
-			lib project: ':Data', library: 'Data', linkage: 'shared'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				cppCompiler.define	"ODBC_EXPORTS"
 				linker.args 'odbc32.lib'
@@ -38,8 +38,6 @@ model {
 			}
 		}
 		withType(StaticLibraryBinarySpec) {
-			lib project: ':Data', library: 'Data', linkage: 'static'
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }
