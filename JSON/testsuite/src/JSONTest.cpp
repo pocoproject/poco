@@ -711,6 +711,18 @@ void JSONTest::testObjectArray()
 	assert (ds["test"]["test1"][1] == 2);
 	assert (ds["test"]["test1"][2] == 3);
 	assert (ds["test"]["test2"] == 4);
+
+	object->set("test3", "another top level value");
+	ds = std::move(*object);
+	assert (ds.size() == 2);
+	assert (ds["test"].isStruct());
+	assert (ds["test"]["test1"].isArray());
+	assert (ds["test"]["test1"].size() == 3);
+	assert (ds["test"]["test1"][0] == 1);
+	assert (ds["test"]["test1"][1] == 2);
+	assert (ds["test"]["test1"][2] == 3);
+	assert (ds["test"]["test2"] == 4);
+	assert (ds["test3"] == "another top level value");
 }
 
 
@@ -1029,10 +1041,17 @@ void JSONTest::testSetArrayElement()
 	Var result = parser.parse(json);
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 
+	Poco::Dynamic::Array dynArray = *array;
+	assert(dynArray.size() == 0);
+
 	// array[0] = 7
 	array->set(0, 7);
 	assert(array->size() == 1);
 	assert(array->getElement<int>(0) == 7);
+
+	dynArray = *array;
+	assert(dynArray.size() == 1);
+	assert(dynArray[0] == 7);
 
 	// array[2] = "foo"
 	array->set(2, std::string("foo"));
@@ -1041,12 +1060,27 @@ void JSONTest::testSetArrayElement()
 	assert(array->isNull(1));
 	assert(array->getElement<std::string>(2) == "foo");
 
+	dynArray = *array;
+	assert(dynArray.size() == 3);
+	assert(dynArray[0] == 7);
+	assert(dynArray[1].isEmpty());
+	assert(dynArray[2] == "foo");
+
 	// array[1] = 13
 	array->set(1, 13);
 	assert(array->size() == 3);
 	assert(array->getElement<int>(0) == 7);
 	assert(array->getElement<int>(1) == 13);
 	assert(array->getElement<std::string>(2) == "foo");
+
+	dynArray = std::move(*array);
+	assert(dynArray.size() == 3);
+	assert(dynArray[0] == 7);
+	assert(dynArray[1] == 13);
+	assert(dynArray[2] == "foo");
+
+	dynArray.clear();
+	assert(dynArray.size() == 0);
 }
 
 

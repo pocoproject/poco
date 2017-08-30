@@ -85,6 +85,12 @@ public:
 	virtual ~Object();
 		/// Destroys the Object.
 
+	Object &operator =(const Object &other);
+		// Assignment operator
+
+	Object &operator =(Object &&other);
+		// Move asignment operator
+
 	Iterator begin()
 	{
 		return _values.begin();
@@ -216,13 +222,9 @@ public:
 		///
 		/// Insertion order preservation property is left intact.
 
-	Object &operator =(const Object &other);
-		// Assignment operator
-
-	Object &operator =(Object &&other);
-		// Move operator
-
 private:
+	void resetDynStruct() const;
+
 	template <typename C>
 	void doStringify(const C& container, std::ostream& out, unsigned int indent, unsigned int step) const
 	{
@@ -265,6 +267,7 @@ private:
 	KeyPtrList        _keys;
 	bool              _preserveInsOrder;
 	mutable StructPtr _pStruct;
+	mutable bool      _modified;
 };
 
 
@@ -335,6 +338,7 @@ inline void Object::remove(const std::string& key)
 			}
 		}
 	}
+	_modified = true;
 }
 
 

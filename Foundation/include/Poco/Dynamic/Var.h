@@ -479,7 +479,13 @@ public:
 	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
 
+	//@ deprecated
 	void empty();
+		/// Empties Var.
+		/// This function is deprecated and will be removed.
+		/// Please use clear().
+
+	void clear();
 		/// Empties Var.
 
 	bool isEmpty() const;
