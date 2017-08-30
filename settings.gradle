@@ -37,7 +37,7 @@ include ':Net:testsuite'
 include ':Crypto:testsuite'
 include ':NetSSL_OpenSSL:testsuite'
 if (os.windows) {
-//	include ':NetSSL_Win:testsuite'
+	include ':NetSSL_Win:testsuite'
 }
 include ':Data:testsuite'
 if (os.windows) {

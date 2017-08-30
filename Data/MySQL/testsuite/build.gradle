@@ -31,6 +31,9 @@ model {
 					lib project: ':Data:MySQL', library: 'mysql', linkage: 'shared'
 					lib project: ':Data:MySQL', library: 'DataMySQL', linkage: 'shared'
 					lib project: ':Data', library: 'Data', linkage: 'shared'
+					lib project: ':Util', library: 'Util'
+					lib project: ':JSON', library: 'JSON'
+					lib project: ':XML', library: 'XML'
 					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				}
 			}
