@@ -437,7 +437,7 @@ public:
 		/// Logical AND operator operator overload for Var.
 
 	bool isArray() const;
-		/// Returns true if Var is not empty.
+		/// Returns true if Var is an array.
 
 	bool isVector() const;
 		/// Returns true if Var represents a vector.

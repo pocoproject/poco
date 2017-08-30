@@ -365,11 +365,6 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
-	{
-		return false;
-	}
-
 	bool isInteger() const
 	{
 		return false;
@@ -502,11 +497,6 @@ public:
 	const JSON::Array& value() const
 	{
 		return _val;
-	}
-
-	bool isArray() const
-	{
-		return false;
 	}
 
 	bool isInteger() const

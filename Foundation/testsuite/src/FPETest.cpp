@@ -29,6 +29,10 @@ FPETest::~FPETest()
 }
 
 
+#ifdef POCO_OS_FAMILY_WINDOWS
+#pragma warning(push)
+#pragma warning(disable : 4723) // potential divide by 0
+#endif
 void FPETest::testClassify()
 {
 	{
@@ -36,7 +40,7 @@ void FPETest::testClassify()
 		float b = 0.0f;
 		float nan = a/b;
 		float inf = 1.0f/b;
-		
+
 		assert (FPE::isNaN(nan));
 		assert (!FPE::isNaN(a));
 		assert (FPE::isInfinite(inf));
@@ -47,13 +51,16 @@ void FPETest::testClassify()
 		double b = 0;
 		double nan = a/b;
 		double inf = 1.0/b;
-		
+
 		assert (FPE::isNaN(nan));
 		assert (!FPE::isNaN(a));
 		assert (FPE::isInfinite(inf));
 		assert (!FPE::isInfinite(a));
 	}
 }
+#ifdef POCO_OS_FAMILY_WINDOWS
+#pragma warning(pop)
+#endif
 
 
 #if defined(__HP_aCC)

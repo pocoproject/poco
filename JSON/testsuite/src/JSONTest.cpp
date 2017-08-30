@@ -629,7 +629,7 @@ void JSONTest::testObjectProperty()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assert (false);
 	}
 
 	assert(result.type() == typeid(Object::Ptr));
@@ -639,17 +639,39 @@ void JSONTest::testObjectProperty()
 	assert (!object->isArray("test"));
 
 	Var test = object->get("test");
-	assert(test.type() == typeid(Object::Ptr));
+	assert (test.type() == typeid(Object::Ptr));
 	Object::Ptr subObject = test.extract<Object::Ptr>();
 
 	test = subObject->get("property");
-	assert(test.isString());
+	assert (test.isString());
 	std::string value = test.convert<std::string>();
-	assert(value.compare("value") == 0);
+	assert (value.compare("value") == 0);
 
 	DynamicStruct ds = *object;
 	assert (ds["test"].isStruct());
 	assert (ds["test"]["property"] == "value");
+
+	// make sure that Object is recognized as such
+	{
+		Object obj;
+		Object inner;
+		inner.set("some_number", 5);
+		inner.set("some_string", "xyz");
+		std::string key = "new_object";
+		obj.set(key, inner);
+		assert(obj.isObject(key));
+	}
+
+	// make sure that Object pointer is recognized as Object
+	{
+		Object obj;
+		Poco::JSON::Object::Ptr inner = new Poco::JSON::Object;
+		inner->set("some_number", 5);
+		inner->set("some_string", "xyz");
+		std::string key = "new_object";
+		obj.set(key, inner);
+		assert(obj.isObject(key));
+	}
 }
 
 
@@ -708,6 +730,7 @@ void JSONTest::testArrayOfObjects()
 		assert(false);
 	}
 
+	assert(result.isArray());
 	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
 	Poco::JSON::Array::Ptr arr = result.extract<Poco::JSON::Array::Ptr>();
 	Object::Ptr object = arr->getObject(0);

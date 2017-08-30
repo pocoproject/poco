@@ -92,7 +92,6 @@ void containerToJSON(C& cont, std::string& val)
 	}
 	for (; it != itEnd; ++it)
 	{
-		
 		val.append(", ");
 		appendJSONValue(val, *it);
 	}
