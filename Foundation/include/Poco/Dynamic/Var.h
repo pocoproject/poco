@@ -437,7 +437,7 @@ public:
 		/// Logical AND operator operator overload for Var.
 
 	bool isArray() const;
-		/// Returns true if Var is not empty.
+		/// Returns true if Var is an array.
 
 	bool isVector() const;
 		/// Returns true if Var represents a vector.
@@ -479,7 +479,13 @@ public:
 	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
 
+	//@ deprecated
 	void empty();
+		/// Empties Var.
+		/// This function is deprecated and will be removed.
+		/// Please use clear().
+
+	void clear();
 		/// Empties Var.
 
 	bool isEmpty() const;

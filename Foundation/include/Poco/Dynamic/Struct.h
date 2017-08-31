@@ -171,6 +171,12 @@ public:
 		return _data.empty();
 	}
 
+	inline void clear()
+		/// Clears the Struct contents
+	{
+		_data.clear();
+	}
+
 	SizeType size() const
 		/// Returns the number of members the Struct contains
 	{
