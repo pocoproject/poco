@@ -54,6 +54,27 @@ File prefixByPoco(File binaryFile) {
 	File parent = binaryFile.getParentFile()
 	return new File(parent, prefix + "Poco" + name);
 }
+File suffixByArch(File binaryFile, Platform platform) {
+	if (platform.operatingSystem.windows) {
+		return binaryFile;
+	}
+	String name = binaryFile.getName()
+	String suffix = ''
+	if (platform.architecture.name == 'x86') {
+		suffix = ''
+	} else
+	if (platform.architecture.name == 'x86-64') {
+		suffix = '64'
+	} else {
+		throw new GradleException("Unknown architecture: " + platform.architecture.name)
+	}
+	int extensionSeparatorIndex = name.lastIndexOf('.')
+	if (extensionSeparatorIndex == -1) {
+		return new File(parent, name + suffix)
+	}
+	File parent = binaryFile.getParentFile()
+	return new File(parent, name.substring(0, extensionSeparatorIndex) + suffix + name.substring(extensionSeparatorIndex));
+}
 File toLocalBin(File binaryFile, Platform platform) {
 	String name = binaryFile.getName()
 	String target
@@ -509,7 +530,7 @@ subprojects {
 		components {
 			withType(NativeComponentSpec) {
 				targetPlatform "win32"
-//				targetPlatform "win64"
+				targetPlatform "win64"
 //				targetPlatform "linux32"
 				targetPlatform "linux64"
 				targetPlatform "macos"
@@ -542,8 +563,8 @@ subprojects {
 							println "===================================it instanceof SharedLibraryTestSuiteBinarySpec"
 						}
 						if (it instanceof SharedLibraryBinarySpec) {
-							sharedLibraryFile	 = toBin(prefixByPoco(appendDebugSuffix(sharedLibraryFile)), targetPlatform)
-							sharedLibraryLinkFile = toLib(prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile)), targetPlatform)
+							sharedLibraryFile	 = toBin(prefixByPoco(appendDebugSuffix(suffixByArch(sharedLibraryFile, targetPlatform))), targetPlatform)
+							sharedLibraryLinkFile = toLib(prefixByPoco(appendDebugSuffix(suffixByArch(sharedLibraryLinkFile, targetPlatform))), targetPlatform)
 
 							if (targetPlatform.operatingSystem.windows) {
 								// WINDOWS ONLY
@@ -560,10 +581,10 @@ subprojects {
 							}
 						} else
 						if (it instanceof StaticLibraryBinarySpec) {
-							staticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendStaticSuffix(staticLibraryFile))), targetPlatform)
+							staticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendStaticSuffix(suffixByArch(staticLibraryFile, targetPlatform)))), targetPlatform)
 						} else
 						if (it instanceof SemiStaticLibraryBinarySpec) {
-							semiStaticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendSemiStaticSuffix(semiStaticLibraryFile))), targetPlatform)
+							semiStaticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendSemiStaticSuffix(suffixByArch(semiStaticLibraryFile, targetPlatform)))), targetPlatform)
 						} else
 						if (it instanceof NativeExecutableBinarySpec) {
 							executable.file = toBin(appendDebugSuffix(executable.file), targetPlatform)
@@ -574,7 +595,7 @@ subprojects {
 					if (buildType == buildTypes.release) {
 						if (it instanceof SharedLibraryBinarySpec) {
 							sharedLibraryFile = toBin(prefixByPoco(sharedLibraryFile), targetPlatform)
-							sharedLibraryLinkFile = toLib(prefixByPoco(sharedLibraryLinkFile), targetPlatform)
+							sharedLibraryLinkFile = toLib(prefixByPoco(suffixByArch(sharedLibraryLinkFile, targetPlatform)), targetPlatform)
 
 							if (targetPlatform.operatingSystem.windows) {
 								// WINDOWS ONLY
@@ -591,10 +612,22 @@ subprojects {
 							}
 						} else
 						if (it instanceof StaticLibraryBinarySpec) {
-							staticLibraryFile = toStatic(prefixByPoco(appendStaticSuffix(staticLibraryFile)), targetPlatform)
+							staticLibraryFile = toStatic(prefixByPoco(appendStaticSuffix(suffixByArch(staticLibraryFile, targetPlatform))), targetPlatform)
+							def binary = it
+							tasks.withType(CreateStaticLibrary) {
+								doFirst {
+									binary.staticLibraryFile.parentFile.mkdirs()
+								}
+							}
 						} else
 						if (it instanceof SemiStaticLibraryBinarySpec) {
-							semiStaticLibraryFile = toStatic(prefixByPoco(appendSemiStaticSuffix(semiStaticLibraryFile)), targetPlatform)
+							semiStaticLibraryFile = toStatic(prefixByPoco(appendSemiStaticSuffix(suffixByArch(semiStaticLibraryFile, targetPlatform))), targetPlatform)
+							def binary = it
+							tasks.withType(CreateSemiStaticLibrary) {
+								doFirst {
+									binary.semiStaticLibraryFile.parentFile.mkdirs()
+								}
+							}
 						} else
 						if (it instanceof NativeExecutableBinarySpec) {
 							executable.file = toBin(executable.file, targetPlatform)
@@ -694,7 +727,6 @@ subprojects {
 					
 					linker.args '/NXCOMPAT' 
 					linker.args '/OPT:REF' 
-					linker.args '/SAFESEH' 
 					linker.args '/INCREMENTAL:NO' 
 //					linker.args '/MANIFEST' 
 //					linker.args '/MANIFESTUAC:"level='asInvoker' uiAccess='false'"' 
