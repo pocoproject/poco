@@ -159,107 +159,7 @@ File toPDB(File binaryFile) {
 	return new File(parent, name.substring(0, extensionSeparatorIndex) + ".pdb")
 }
 apply plugin: 'base' 
-
-task PocoDocIni {
-    def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
-    file.createNewFile()
-    file.text = """
-PocoBuild=$rootDir
-PocoBase=$rootDir
-PocoDoc.output=releases/poco-2.0.0-all-doc
-PocoDoc.version=2.0.0-all
-Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
-VC=${VCHome}
-WDK=${WDKHome}
-"""
-}
-task pocoDoc(type: Exec) {
-//  environment PATH "$rootDir\bin;$PATH"
-  executable "PocoDoc/bin/PocoDoc.exe"
-  args "/config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
-  args "/config=$rootDir/PocoDoc/PocoDoc.ini"
-}
-pocoDoc.dependsOn ':PocoDoc::assemble'
-pocoDoc.dependsOn PocoDocIni
-
-task zipDoc(type: Zip) {
-   from 'releases/poco-2.0.0-all-doc/'
-   include '*'
-   include '*/*'
-   archiveName 'poco-2.0.0-all-doc.zip'
-   destinationDir(file('releases'))
-}
-zipDoc.dependsOn pocoDoc
-
-
 def os = org.gradle.internal.os.OperatingSystem.current()
-
-task production {
-}
-production.dependsOn ':CppUnit:assemble'
-production.dependsOn ':Foundation:assemble'
-production.dependsOn ':XML:assemble'
-production.dependsOn ':JSON:assemble'
-production.dependsOn ':Util:assemble'
-production.dependsOn ':Net:assemble'
-production.dependsOn ':Crypto:assemble'
-production.dependsOn ':NetSSL_OpenSSL:assemble'
-if (os.windows) {
-	production.dependsOn ':NetSSL_Win:assemble'
-}
-production.dependsOn ':Data:assemble'
-if (os.windows) {
-	production.dependsOn ':Data:ODBC:assemble'
-	production.dependsOn ':Data:SQLite:assemble'
-	production.dependsOn ':Data:MySQL:assemble'
-	production.dependsOn ':Data:PostgreSQL:assemble'
-}
-production.dependsOn ':Zip:assemble'
-production.dependsOn ':PageCompiler:assemble'
-production.dependsOn ':PageCompiler:File2Page:assemble'
-production.dependsOn ':PDF:assemble'
-production.dependsOn ':MongoDB:assemble'
-production.dependsOn ':Redis:assemble'
-production.dependsOn ':ProGen:assemble'
-
-task unittest {
-}
-unittest.dependsOn ':CppParser:testsuite:assemble'
-unittest.dependsOn ':Foundation:testsuite:assemble'
-unittest.dependsOn ':XML:testsuite:assemble'
-unittest.dependsOn ':JSON:testsuite:assemble'
-unittest.dependsOn ':Util:testsuite:assemble'
-unittest.dependsOn ':Net:testsuite:assemble'
-unittest.dependsOn ':Crypto:testsuite:assemble'
-unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
-if (os.windows) {
-	unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
-}
-unittest.dependsOn ':Data:testsuite:assemble'
-if (os.windows) {
-	unittest.dependsOn ':Data:ODBC:testsuite:assemble'
-	unittest.dependsOn ':Data:SQLite:testsuite:assemble'
-//	unittest.dependsOn ':Data:MySQL:testsuite:assemble'
-//	unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
-}
-unittest.dependsOn ':Zip:testsuite:assemble'
-//unittest.dependsOn ':MongoDB:testsuite:assemble'
-unittest.dependsOn ':Redis:testsuite:assemble'
-
-task samples {	
-}
-samples.dependsOn ':Foundation:samples:assemble'
-if (os.windows) {
-	samples.dependsOn ':Data:samples:assemble'
-}
-samples.dependsOn ':JSON:samples:assemble'
-samples.dependsOn ':MongoDB:samples:assemble'
-samples.dependsOn ':Net:samples:assemble'
-samples.dependsOn ':PageCompiler:samples:assemble'
-samples.dependsOn ':PDF:samples:assemble'
-samples.dependsOn ':Util:samples:assemble'
-samples.dependsOn ':XML:samples:assemble'
-samples.dependsOn ':Zip:samples:assemble'
 
 
 allprojects {
@@ -753,7 +653,7 @@ subprojects {
 					}
 				}
 				if (toolChain in Gcc) {
-					linker.args "-Wl,-rpath,$rootDir/lib64"
+					linker.args "-Wl,-rpath,$rootDir/lib64"   //FIXME
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
@@ -764,6 +664,7 @@ subprojects {
 					cppCompiler.define 'POCO_STATIC'
 					if (buildType == buildTypes.debug) {
 						cCompiler.args "/MTd"
+						cCompiler.args "/Fd" + toStatic(toPDB(staticLibraryFile), targetPlatform)
 						cppCompiler.args "/MTd"
 						cppCompiler.args "/Fd" + toStatic(toPDB(staticLibraryFile), targetPlatform)
 					} else 
@@ -785,6 +686,7 @@ subprojects {
 					cppCompiler.define 'POCO_STATIC'
 					if (buildType == buildTypes.debug) {
 						cCompiler.args "/MDd"
+						cCompiler.args "/Fd" + toStatic(toPDB(semiStaticLibraryFile), targetPlatform)
 						cppCompiler.args "/MDd"
 						cppCompiler.args "/Fd" + toStatic(toPDB(semiStaticLibraryFile), targetPlatform)
 					} else 
@@ -820,45 +722,153 @@ subprojects {
 		args test
 	}
 }
+task PocoDocIni {
+    def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
+    file.createNewFile()
+    file.text = """
+PocoBuild=$rootDir
+PocoBase=$rootDir
+PocoDoc.output=releases/poco-2.0.0-all-doc
+PocoDoc.version=2.0.0-all
+Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
+VC=${VCHome}
+WDK=${WDKHome}
+"""
+}
+task pocoDoc(type: Exec) {
+	if (os.windows) {
+		environment "Path", "$rootDir\\bin;$Path"
+	} 
+	if (os.linux) {
+		environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
+	}
+	if (os.macOsX) {
+		//FIXME environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
+	}
+	executable "PocoDoc/bin/PocoDoc.exe"
+	args "/config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+	args "/config=$rootDir/PocoDoc/PocoDoc.ini"
+}
+pocoDoc.dependsOn ':PocoDoc::assemble'
+pocoDoc.dependsOn PocoDocIni
+
+task zipDoc(type: Zip) {
+   from 'releases/poco-2.0.0-all-doc/'
+   include '*'
+   include '*/*'
+   archiveName 'poco-2.0.0-all-doc.zip'
+   destinationDir(file('releases'))
+}
+zipDoc.dependsOn pocoDoc
+
+
 
 
 if (os.windows) {
-task Candle(type: Exec) {
-	String target = 'x86'
-	String VSYEAR = 'VS2017'
-	String VERSION = '2.0.0'
-	executable "${VIXTOOLSET}/bin/Candle.exe"
-	workingDir "../distro/Windows/WiX"
-	args "-arch", "${target}"
-	args "-dVSYEAR=${VSYEAR}"
-	args "-dVERSION=${VERSION}"
-	args "-dPOCO=${rootDir}"
-	args "-dPlatform=${target}"
-	args "-ext", "${VIXTOOLSET}/bin/WixUIExtension.dll"
-	args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
-	args "Poco-${VERSION}.wxs"
+	task Candle(type: Exec) {
+		String target = 'x86'
+		String VSYEAR = 'VS2017'
+		String VERSION = '2.0.0'
+		executable "${VIXTOOLSET}/bin/Candle.exe"
+		workingDir "../distro/Windows/WiX"
+		args "-arch", "${target}"
+		args "-dVSYEAR=${VSYEAR}"
+		args "-dVERSION=${VERSION}"
+		args "-dPOCO=${rootDir}"
+		args "-dPlatform=${target}"
+		args "-ext", "${VIXTOOLSET}/bin/WixUIExtension.dll"
+		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
+		args "Poco-${VERSION}.wxs"
 
-//$VIXTOOLSET\bin\Candle.exe -arch $target -dVSYEAR=$VSYEAR -dVERSION=$VERSION -dPOCO=$rootDir -dPlatform=$target -out "$VSYEAR/Poco $VERSION ($target).wixobj" -ext $VIXTOOLSET\bin\WixUIExtension.dll Poco-$VERSION.wxs
-}
-task Light(type: Exec) {
-	String target = 'x86'
-	String VSYEAR = 'VS2017'
-	String VERSION = '2.0.0'
-	executable "${VIXTOOLSET}/bin/Light.exe"
-	workingDir "../distro/Windows/WiX"
-	args "-cultures:null"
-	args "-ext", "${VIXTOOLSET}/bin/WixUIExtension.dll"
-	args "-out"
-	args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
-	args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
-//$VIXTOOLSET\bin\Light.exe  -out "$VSYEAR/Poco $VERSION ($target).msi" -cultures:null -ext $VIXTOOLSET\bin\WixUIExtension.dll "$VSYEAR/Poco $VERSION ($target).wixobj"
-}
-task WiX(type: Exec) {
-}
-Light.dependsOn Candle
-WiX.dependsOn Light
+	//$VIXTOOLSET\bin\Candle.exe -arch $target -dVSYEAR=$VSYEAR -dVERSION=$VERSION -dPOCO=$rootDir -dPlatform=$target -out "$VSYEAR/Poco $VERSION ($target).wixobj" -ext $VIXTOOLSET\bin\WixUIExtension.dll Poco-$VERSION.wxs
+	}
+	task Light(type: Exec) {
+		String target = 'x86'
+		String VSYEAR = 'VS2017'
+		String VERSION = '2.0.0'
+		executable "${VIXTOOLSET}/bin/Light.exe"
+		workingDir "../distro/Windows/WiX"
+		args "-cultures:null"
+		args "-ext", "${VIXTOOLSET}/bin/WixUIExtension.dll"
+		args "-out"
+		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
+		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
+	//$VIXTOOLSET\bin\Light.exe  -out "$VSYEAR/Poco $VERSION ($target).msi" -cultures:null -ext $VIXTOOLSET\bin\WixUIExtension.dll "$VSYEAR/Poco $VERSION ($target).wixobj"
+	}
+	task WiX(type: Exec) {
+	}
+	Light.dependsOn Candle
+	WiX.dependsOn Light
 
-task NuGet(type: Exec){
+	task NuGet(type: Exec){
+	}
 }
+
+task production {
 }
+production.dependsOn ':CppUnit:assemble'
+production.dependsOn ':Foundation:assemble'
+production.dependsOn ':XML:assemble'
+production.dependsOn ':JSON:assemble'
+production.dependsOn ':Util:assemble'
+production.dependsOn ':Net:assemble'
+production.dependsOn ':Crypto:assemble'
+production.dependsOn ':NetSSL_OpenSSL:assemble'
+if (os.windows) {
+	production.dependsOn ':NetSSL_Win:assemble'
+}
+production.dependsOn ':Data:assemble'
+if (os.windows) {
+	production.dependsOn ':Data:ODBC:assemble'
+	production.dependsOn ':Data:SQLite:assemble'
+	production.dependsOn ':Data:MySQL:assemble'
+	production.dependsOn ':Data:PostgreSQL:assemble'
+}
+production.dependsOn ':Zip:assemble'
+production.dependsOn ':PageCompiler:assemble'
+production.dependsOn ':PageCompiler:File2Page:assemble'
+production.dependsOn ':PDF:assemble'
+production.dependsOn ':MongoDB:assemble'
+production.dependsOn ':Redis:assemble'
+production.dependsOn ':ProGen:assemble'
+
+task unittest {
+}
+unittest.dependsOn ':CppParser:testsuite:assemble'
+unittest.dependsOn ':Foundation:testsuite:assemble'
+unittest.dependsOn ':XML:testsuite:assemble'
+unittest.dependsOn ':JSON:testsuite:assemble'
+unittest.dependsOn ':Util:testsuite:assemble'
+unittest.dependsOn ':Net:testsuite:assemble'
+unittest.dependsOn ':Crypto:testsuite:assemble'
+unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
+if (os.windows) {
+	unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
+}
+unittest.dependsOn ':Data:testsuite:assemble'
+if (os.windows) {
+	unittest.dependsOn ':Data:ODBC:testsuite:assemble'
+	unittest.dependsOn ':Data:SQLite:testsuite:assemble'
+//	unittest.dependsOn ':Data:MySQL:testsuite:assemble'
+//	unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
+}
+unittest.dependsOn ':Zip:testsuite:assemble'
+//unittest.dependsOn ':MongoDB:testsuite:assemble'
+unittest.dependsOn ':Redis:testsuite:assemble'
+
+task samples {	
+}
+samples.dependsOn ':Foundation:samples:assemble'
+if (os.windows) {
+	samples.dependsOn ':Data:samples:assemble'
+}
+samples.dependsOn ':JSON:samples:assemble'
+samples.dependsOn ':MongoDB:samples:assemble'
+samples.dependsOn ':Net:samples:assemble'
+samples.dependsOn ':PageCompiler:samples:assemble'
+samples.dependsOn ':PDF:samples:assemble'
+samples.dependsOn ':Util:samples:assemble'
+samples.dependsOn ':XML:samples:assemble'
+samples.dependsOn ':Zip:samples:assemble'
+
 
