@@ -147,7 +147,7 @@ PocoBuild=$rootDir
 PocoBase=$rootDir
 PocoDoc.output=releases/poco-2.0.0-all-doc
 PocoDoc.version=2.0.0-all
-Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include
+Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
 VC=${VCHome}
 WDK=${WDKHome}
 """
@@ -210,14 +210,14 @@ unittest.dependsOn ':JSON:testsuite:assemble'
 unittest.dependsOn ':Util:testsuite:assemble'
 unittest.dependsOn ':Net:testsuite:assemble'
 unittest.dependsOn ':Crypto:testsuite:assemble'
-//unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
+unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
 if (os.windows) {
-//	unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
+	unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
 }
 unittest.dependsOn ':Data:testsuite:assemble'
 if (os.windows) {
-//	unittest.dependsOn ':Data:ODBC:testsuite:assemble'
-//	unittest.dependsOn ':Data:SQLite:testsuite:assemble'
+	unittest.dependsOn ':Data:ODBC:testsuite:assemble'
+	unittest.dependsOn ':Data:SQLite:testsuite:assemble'
 //	unittest.dependsOn ':Data:MySQL:testsuite:assemble'
 //	unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
 }
