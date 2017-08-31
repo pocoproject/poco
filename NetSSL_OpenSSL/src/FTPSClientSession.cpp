@@ -1,3 +1,19 @@
+//
+// FTPSClientSession.cpp
+//
+// $Id: //poco/1.4/Net/src/FTPSClientSession.cpp#1 $
+//
+// Library: Net
+// Package: FTP
+// Module:  FTPSClientSession
+//
+// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
 #include "Poco/Net/FTPSClientSession.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureStreamSocketImpl.h"
