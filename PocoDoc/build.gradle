@@ -34,7 +34,6 @@ model {
 	binaries {
 		withType(NativeExecutableSpec) {
 			if (toolChain in VisualCpp) {
-				linker.args "/LIBPATH:$rootDir/lib"
 			}
 			if (toolChain in Gcc) {
 			}

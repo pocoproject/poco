@@ -13,9 +13,9 @@ model {
 					exportedHeaders {
 						srcDir 'src'
 					}
-					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
-					lib project: ':CppParser', library: 'CppParser', linkage: 'shared'
-					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
+					lib project: ':CppUnit', library: 'CppUnit'
+					lib project: ':CppParser', library: 'CppParser'
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}

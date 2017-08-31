@@ -131,6 +131,12 @@ File toStatic(File staticFile, Platform platform) {
 	File parent = new File(rootDir, target)
 	return new File(parent, name);
 }
+File toPDB(File binaryFile) {
+	String name = binaryFile.getName()
+	File parent = binaryFile.getParentFile()
+	int extensionSeparatorIndex = name.lastIndexOf('.')
+	return new File(parent, name.substring(0, extensionSeparatorIndex) + ".pdb")
+}
 apply plugin: 'base' 
 
 task PocoDocIni {
@@ -164,16 +170,6 @@ task zipDoc(type: Zip) {
 }
 zipDoc.dependsOn pocoDoc
 
-/*
-clean.doFirst {
-	file($projectDir, 'bin').delete()
-	file($projectDir, 'bin64').delete() 
-	file($projectDir, 'lib').delete() 
-	file($projectDir, 'lib64').delete() 
-	file($projectDir, 'static').delete() 
-	file($projectDir, 'static64').delete() 
-}
-*/
 
 def os = org.gradle.internal.os.OperatingSystem.current()
 
@@ -247,6 +243,16 @@ samples.dependsOn ':Zip:samples:assemble'
 
 allprojects {
 	buildDir = new File("root")	
+/*
+	clean.doFirst {
+		file($projectDir, 'bin').delete()
+		file($projectDir, 'bin64').delete() 
+		file($projectDir, 'lib').delete() 
+		file($projectDir, 'lib64').delete() 
+		file($projectDir, 'static').delete() 
+		file($projectDir, 'static64').delete() 
+	}
+*/
 }
 subprojects {
 	apply plugin:	'c'
@@ -647,6 +653,7 @@ subprojects {
 						cppCompiler.args '/Zi'
 						linker.args '/DEBUG'
 					}
+					cCompiler.args '/RTC1'
 					cCompiler.args '/FS'
 					cCompiler.args '/Zc:wchar_t'
 					cCompiler.args '/Zc:inline'
@@ -660,6 +667,7 @@ subprojects {
 					cCompiler.define '_WINDOWS'
 					cCompiler.define '_MBCS'
 
+					cppCompiler.args '/RTC1'
 					cppCompiler.args '/FS'
 					cppCompiler.args '/Zc:wchar_t'
 					cppCompiler.args '/Zc:inline'
@@ -725,6 +733,7 @@ subprojects {
 					if (buildType == buildTypes.debug) {
 						cCompiler.args "/MTd"
 						cppCompiler.args "/MTd"
+						cppCompiler.args "/Fd" + toStatic(toPDB(staticLibraryFile), targetPlatform)
 					} else 
 					if (buildType == buildTypes.release) {
 						cCompiler.args "/MT"
@@ -745,6 +754,7 @@ subprojects {
 					if (buildType == buildTypes.debug) {
 						cCompiler.args "/MDd"
 						cppCompiler.args "/MDd"
+						cppCompiler.args "/Fd" + toStatic(toPDB(semiStaticLibraryFile), targetPlatform)
 					} else 
 					if (buildType == buildTypes.release) {
 						cCompiler.args "/MD"
@@ -775,7 +785,6 @@ subprojects {
 		}
 	}
 	tasks.withType(RunTestExecutable) {
-//		String test ="-print"
 		args test
 	}
 }
