@@ -197,6 +197,23 @@ void LayeredConfigurationTest::testRemove()
 }
 
 
+void LayeredConfigurationTest::testFind()
+{
+	AutoPtr<LayeredConfiguration> pLC = new LayeredConfiguration;
+	AutoPtr<AbstractConfiguration> pMC1 = new MapConfiguration;
+	AutoPtr<AbstractConfiguration> pMC2 = new MapConfiguration;
+	
+	pLC->add(pMC1, 0);
+	pLC->add(pMC2, "label", -1);
+	
+	AutoPtr<AbstractConfiguration> pFound = pLC->find("label");
+	assert (pFound == pMC2);
+	
+	pFound = pLC->find("notfound");
+	assert (pFound.isNull());
+}
+
+
 AbstractConfiguration* LayeredConfigurationTest::allocConfiguration() const
 {
 	LayeredConfiguration* pLC = new LayeredConfiguration;
@@ -230,6 +247,7 @@ CppUnit::Test* LayeredConfigurationTest::suite()
 	CppUnit_addTest(pSuite, LayeredConfigurationTest, testTwoLayers);
 	CppUnit_addTest(pSuite, LayeredConfigurationTest, testThreeLayers);
 	CppUnit_addTest(pSuite, LayeredConfigurationTest, testRemove);
+	CppUnit_addTest(pSuite, LayeredConfigurationTest, testFind);
 
 	return pSuite;
 }
