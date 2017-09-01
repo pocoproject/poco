@@ -49,11 +49,19 @@ class Util_API LayeredConfiguration: public AbstractConfiguration
 	/// If no priority is specified, a priority of 0 is assumed.
 {
 public:
+	typedef Poco::AutoPtr<AbstractConfiguration> ConfigPtr;
+
 	LayeredConfiguration();
 		/// Creates the LayeredConfiguration.
 		
 	void add(AbstractConfiguration* pConfig);
 		/// Adds a read-only configuration to the back of the LayeredConfiguration.
+		/// The LayeredConfiguration does not take ownership of the given
+		/// configuration. In other words, the configuration's reference
+		/// count is incremented.
+
+	void add(AbstractConfiguration* pConfig, const std::string& label);
+		/// Adds a read-only configuration with the given label to the back of the LayeredConfiguration.
 		/// The LayeredConfiguration does not take ownership of the given
 		/// configuration. In other words, the configuration's reference
 		/// count is incremented.
@@ -64,8 +72,20 @@ public:
 		/// of the given configuration (and the configuration's reference
 		/// count remains unchanged).
 
+	void add(AbstractConfiguration* pConfig, const std::string& label, bool shared);
+		/// Adds a read-only configuration with the given label to the back of the LayeredConfiguration.
+		/// If shared is false, the LayeredConfiguration takes ownership
+		/// of the given configuration (and the configuration's reference
+		/// count remains unchanged).
+
 	void add(AbstractConfiguration* pConfig, int priority);
 		/// Adds a read-only configuration to the LayeredConfiguration.
+		/// The LayeredConfiguration does not take ownership of the given
+		/// configuration. In other words, the configuration's reference
+		/// count is incremented.
+
+	void add(AbstractConfiguration* pConfig, const std::string& label, int priority);
+		/// Adds a read-only configuration with the given label to the LayeredConfiguration.
 		/// The LayeredConfiguration does not take ownership of the given
 		/// configuration. In other words, the configuration's reference
 		/// count is incremented.
@@ -76,8 +96,20 @@ public:
 		/// of the given configuration (and the configuration's reference
 		/// count remains unchanged).
 
+	void add(AbstractConfiguration* pConfig, const std::string& label, int priority, bool shared);
+		/// Adds a read-only configuration with the given label the LayeredConfiguration.
+		/// If shared is false, the LayeredConfiguration takes ownership
+		/// of the given configuration (and the configuration's reference
+		/// count remains unchanged).
+
 	void add(AbstractConfiguration* pConfig, int priority, bool writeable, bool shared);
 		/// Adds a configuration to the LayeredConfiguration.
+		/// If shared is false, the LayeredConfiguration takes ownership
+		/// of the given configuration (and the configuration's reference
+		/// count remains unchanged).
+
+	void add(AbstractConfiguration* pConfig, const std::string& label, int priority, bool writeable, bool shared);
+		/// Adds a configuration with the given label to the LayeredConfiguration.
 		/// If shared is false, the LayeredConfiguration takes ownership
 		/// of the given configuration (and the configuration's reference
 		/// count remains unchanged).
@@ -93,6 +125,11 @@ public:
 		/// If shared is false, the LayeredConfiguration takes ownership
 		/// of the given configuration (and the configuration's reference
 		/// count remains unchanged).
+		
+	ConfigPtr find(const std::string& label) const;
+		/// Finds and returns the configuration with the given label.
+		///
+		/// Returns null if no such configuration can be found.
 
 	//@ deprecated
 	void addFront(AbstractConfiguration* pConfig);
@@ -113,14 +150,13 @@ public:
 		/// Does nothing if the given configuration is not part of the
 		/// LayeredConfiguration.
 		
-protected:
-	typedef Poco::AutoPtr<AbstractConfiguration> ConfigPtr;
-	
+protected:	
 	struct ConfigItem
 	{
-		ConfigPtr pConfig;
-		int       priority;
-		bool      writeable;
+		ConfigPtr   pConfig;
+		int         priority;
+		bool        writeable;
+		std::string label;
 	};
 
 	bool getRaw(const std::string& key, std::string& value) const;

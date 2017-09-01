@@ -31,6 +31,7 @@ public:
 	void testTwoLayers();
 	void testThreeLayers();
 	void testRemove();
+	void testFind();
 
 	void setUp();
 	void tearDown();
