@@ -8,7 +8,8 @@ AAAIntroduction
   - fixed GH #1834: Visual Studio 2008 cannot find stdint.h
   - fixed GH #1842: Upgrade bundled expat to 2.2.3
   - fixed GH #1843: Use random salt for Poco::XML::NamePool
-  - upgraded bundled SQLite to 3.20.0
+  - fixed GH #1865: AbstractEvent::hasDelegates() is not thread-safe
+  - upgraded bundled SQLite to 3.20.1
 
 
 !!!Release 1.7.8p3
