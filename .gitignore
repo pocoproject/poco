@@ -105,6 +105,7 @@ lib64/
 pocomsg.h
 */testsuite/bin/*
 Util/testsuite/TestConfiguration/
+.vs/
 
 # Eclipse generated files #
 ######################
