@@ -194,13 +194,13 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 		throw NotFoundException(key(name));
 	if (size > 0)
 	{
-		Poco::Buffer<char> Buffer(size + 1);
-		RegQueryValueExA(_hKey, name.c_str(), NULL, NULL, (BYTE*) Buffer.begin(), &size);
+		Poco::Buffer<char> buffer(size + 1);
+		RegQueryValueExA(_hKey, name.c_str(), NULL, NULL, (BYTE*) buffer.begin(), &size);
 		buffer[size] = 0;
 		char temp;
 		DWORD expSize = ExpandEnvironmentStringsA(buffer, &temp, 1);
 		Poco::Buffer<char> expBuffer(expSize);
-		ExpandEnvironmentStringsA(Buffer.begin(), expBuffer.begin(), expSize);
+		ExpandEnvironmentStringsA(buffer.begin(), expBuffer.begin(), expSize);
 		std::string result(expBuffer.begin());
 		return result;
 	}
