@@ -30,12 +30,12 @@ namespace Poco {
 
 struct UTF16CharTraits
 {
-	typedef std::fpos<mbstate_t> u16streampos;
-	typedef UInt16               char_type;
-	typedef int                  int_type;
-	typedef std::streamoff       off_type;
-	typedef u16streampos         pos_type;
-	typedef mbstate_t            state_type;
+	typedef std::fpos<std::mbstate_t> u16streampos;
+	typedef UInt16                    char_type;
+	typedef int                       int_type;
+	typedef std::streamoff            off_type;
+	typedef u16streampos              pos_type;
+	typedef std::mbstate_t            state_type;
 
 	static void assign(char_type& c1, const char_type& c2)
 	{
@@ -147,12 +147,12 @@ struct UTF16CharTraits
 
 struct UTF32CharTraits
 {
-	typedef std::fpos<mbstate_t> u32streampos;
-	typedef UInt32               char_type;
-	typedef int                  int_type;
-	typedef std::streamoff       off_type;
-	typedef u32streampos         pos_type;
-	typedef mbstate_t            state_type;
+	typedef std::fpos<std::mbstate_t> u32streampos;
+	typedef UInt32                    char_type;
+	typedef int                       int_type;
+	typedef std::streamoff            off_type;
+	typedef u32streampos              pos_type;
+	typedef std::mbstate_t            state_type;
 
 	static void assign(char_type& c1, const char_type& c2)
 	{
