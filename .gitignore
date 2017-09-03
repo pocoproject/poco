@@ -31,9 +31,15 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 cmake_*
 
-# gradle #
+# Gradle #
 .gradle
 gradle/
+
+# NuGet #
+.nupkg
+
+# WiX #
+.msi
 
 # Packages #
 ############
