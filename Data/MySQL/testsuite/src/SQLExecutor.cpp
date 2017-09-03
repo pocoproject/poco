@@ -45,12 +45,7 @@ typedef unsigned int    uint;           /* System V compatibility */
 typedef unsigned long   ulong;          /* System V compatibility */
 #endif
 
-#include <my_global.h>
 #include <mysql.h>
-
-#ifdef max
-#undef max
-#endif
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
