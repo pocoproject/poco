@@ -6425,7 +6425,7 @@ switch(type)
   if (common->mode == JIT_PARTIAL_HARD_COMPILE)
     {
     jump[0] = CMP(SLJIT_LESS, STR_PTR, 0, STR_END, 0);
-    /* Since we successfully read a char above, partial matching must occure. */
+    /* Since we successfully read a char above, partial matching must occur. */
     check_partial(common, TRUE);
     JUMPHERE(jump[0]);
     }

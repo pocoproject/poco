@@ -29,8 +29,6 @@ namespace Data {
 namespace ODBC {
 
 
-const char* const SessionImpl::NUMERIC_CONVERSION_PROPERTY= "numericConversion";
-
 SessionImpl::SessionImpl(const std::string& connect,
 	std::size_t loginTimeout,
 	std::size_t maxFieldSize,
@@ -41,7 +39,6 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_maxFieldSize(maxFieldSize),
 		_autoBind(autoBind),
 		_autoExtract(autoExtract),
-		_numericConversion(ODBCMetaColumn::NC_BEST_FIT),
 		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
 		_inTransaction(false),
 		_queryTimeout(-1)
@@ -69,9 +66,6 @@ SessionImpl::SessionImpl(const std::string& connect,
 
 void SessionImpl::init()
 {
-	addProperty(NUMERIC_CONVERSION_PROPERTY,
-		&SessionImpl::setNumericConversion,
-		&SessionImpl::numericConversion);
 	setFeature("bulk", true);
 	open();
 	setProperty("handle", _db.handle());
@@ -407,7 +401,41 @@ void SessionImpl::close()
 	{
 	}
 
-	SQLDisconnect(_db);
+	SQLCHAR sqlState[5+1];
+	SQLCHAR sqlErrorMessage[SQL_MAX_MESSAGE_LENGTH];
+	SQLINTEGER nativeErrorCode;
+	SQLSMALLINT sqlErrorMessageLength;
+	unsigned int retryCount = 10;
+	do
+	{
+		SQLRETURN rc = SQLDisconnect(_db);
+		if (SQL_SUCCESS != rc && SQL_SUCCESS_WITH_INFO != rc)
+		{
+			SQLGetDiagRec(SQL_HANDLE_DBC, _db,
+							1,
+							sqlState,
+							&nativeErrorCode,
+							sqlErrorMessage, SQL_MAX_MESSAGE_LENGTH, &sqlErrorMessageLength);
+			if (std::string(reinterpret_cast<const char *>(sqlState)) == "25000"
+				|| std::string(reinterpret_cast<const char *>(sqlState)) == "25501")
+			{
+				--retryCount;
+				Poco::Thread::sleep(100);
+			}
+			else
+			{
+				break;
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+	while(retryCount > 0);
+		
+	throw ODBCException
+		(std::string(reinterpret_cast<const char *>(sqlErrorMessage)), nativeErrorCode);
 }
 
 

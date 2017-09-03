@@ -74,6 +74,7 @@ private:
 
 	NamePoolItem* _pItems;
 	unsigned long _size;
+	unsigned long _salt;
 	int           _rc;
 };
 

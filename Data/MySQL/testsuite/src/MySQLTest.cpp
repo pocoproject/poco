@@ -49,16 +49,22 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 
 std::string MySQLTest::getHost()
 {
-	return "localhost";
+	return "127.0.0.1"; //do not change to "localhost"!
 }
+
+
 std::string MySQLTest::getPort()
 {
 	return "3306";
 }
+
+
 std::string MySQLTest::getUser()
 {
 	return "root";
 }
+
+
 std::string MySQLTest::getPass()
 {
 	if (Environment::has("APPVEYOR"))
@@ -68,18 +74,20 @@ std::string MySQLTest::getPass()
 	else
 		return "poco";
 }
+
+
 std::string MySQLTest::getBase()
 {
 	return "pocotestdb";
 }
 
-std::string MySQLTest::_dbConnString;
 
+std::string MySQLTest::_dbConnString;
 
 
 //
 // Connection string
-
+//
 
 MySQLTest::MySQLTest(const std::string& name):
 	CppUnit::TestCase(name)
@@ -108,7 +116,7 @@ void MySQLTest::connectNoDB()
 	dbConnString =  "host=" + getHost();
 	dbConnString +=	";user="  + getUser();
 	dbConnString += ";password="  + getPass();
-	dbConnString += ";compress=true;auto-reconnect=true";
+	dbConnString += ";compress=true;auto-reconnect=true;protocol=tcp";
 
 	try
 	{
@@ -200,7 +208,7 @@ void MySQLTest::testInsertSingleBulk()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->insertSingleBulk();
 }
 
@@ -209,7 +217,7 @@ void MySQLTest::testInsertSingleBulkVec()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->insertSingleBulkVec();
 }
 
@@ -218,7 +226,7 @@ void MySQLTest::testLimit()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limits();
 }
 
@@ -227,7 +235,7 @@ void MySQLTest::testLimitZero()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limitZero();
 }
 
@@ -236,7 +244,7 @@ void MySQLTest::testLimitOnce()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limitOnce();
 }
 
@@ -245,7 +253,7 @@ void MySQLTest::testLimitPrepare()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limitPrepare();
 }
 
@@ -255,7 +263,7 @@ void MySQLTest::testPrepare()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->prepare();
 }
 
@@ -488,6 +496,14 @@ void MySQLTest::testBLOBStmt()
 	_pExecutor->blobStmt();
 }
 
+
+void MySQLTest::testLongText()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonLongTextTable();
+	_pExecutor->longText();
+}
 
 void MySQLTest::testUnsignedInts()
 {
@@ -755,6 +771,13 @@ void MySQLTest::recreatePersonBLOBTable()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
 
+void MySQLTest::recreatePersonLongTextTable()
+{
+	dropTable("Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Info LONGTEXT)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonBLOBTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonBLOBTable()"); }
+}
 
 void MySQLTest::recreatePersonDateTimeTable()
 {
@@ -785,8 +808,8 @@ void MySQLTest::recreatePersonTimeTable()
 
 void MySQLTest::recreateIntsTable()
 {
-	dropTable("Strings");
-	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	dropTable("Ints");
+	try { *_pSession << "CREATE TABLE Ints (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -885,6 +908,7 @@ CppUnit::Test* MySQLTest::suite()
 	_dbConnString += ";compress=true";
 	_dbConnString += ";auto-reconnect=true";
 	_dbConnString += ";secure-auth=true";
+	_dbConnString += ";protocol=tcp";
 
 	try
 	{
@@ -949,6 +973,7 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testDateTime);
 	//CppUnit_addTest(pSuite, MySQLTest, testBLOB);
 	CppUnit_addTest(pSuite, MySQLTest, testBLOBStmt);
+	CppUnit_addTest(pSuite, MySQLTest, testLongText);
 	CppUnit_addTest(pSuite, MySQLTest, testUnsignedInts);
 	CppUnit_addTest(pSuite, MySQLTest, testFloat);
 	CppUnit_addTest(pSuite, MySQLTest, testDouble);

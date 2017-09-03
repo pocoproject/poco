@@ -102,7 +102,6 @@ public:
 		const std::string& statement, 
 		std::size_t maxFieldSize,
 		DataExtraction dataExtraction,
-		ODBCMetaColumn::NumericConversion numericConversion ,
 		bool isPostgres
 		);
 		/// Creates the Preparator.
@@ -419,9 +418,6 @@ public:
 	DataExtraction getDataExtraction() const;
 		/// Returns data extraction mode.
 
-	ODBCMetaColumn::NumericConversion numericConversion() const;
-		/// Tells if numeric values are always converted to string
-
 private:
 	typedef std::vector<Poco::Any> ValueVec;
 	typedef std::vector<SQLLEN>    LengthVec;
@@ -435,7 +431,7 @@ private:
 	void prepareImpl(std::size_t pos, const C* pVal = 0)
 		/// Utility function to prepare Any and DynamicAny.
 	{
-		ODBCMetaColumn col(_rStmt, pos, _numericConversion);
+		ODBCMetaColumn col(_rStmt, pos);
 
 		switch (col.type())
 		{
@@ -687,7 +683,6 @@ private:
 	mutable IndexMap        _varLengthArrays;
 	std::size_t             _maxFieldSize;
 	DataExtraction          _dataExtraction;
-	ODBCMetaColumn::NumericConversion _numericConversion;
 };
 
 
@@ -1271,12 +1266,6 @@ inline Poco::Any& Preparator::operator [] (std::size_t pos)
 inline Poco::Any& Preparator::at(std::size_t pos)
 {
 	return _values.at(pos);
-}
-
-
-inline ODBCMetaColumn::NumericConversion Preparator::numericConversion() const
-{
-	return _numericConversion;
 }
 
 

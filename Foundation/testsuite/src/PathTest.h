@@ -31,6 +31,7 @@ public:
 	void testParseUnix3();
 	void testParseUnix4();
 	void testParseUnix5();
+	void testExpandVariableFromPath();
 	void testParseWindows1();
 	void testParseWindows2();
 	void testParseWindows3();

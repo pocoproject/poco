@@ -29,7 +29,7 @@
 
 
 // Define to enable C++11 support
-// #define POCO_ENABLE_CPP11
+#define POCO_ENABLE_CPP11
 
 
 // Define to disable implicit linking

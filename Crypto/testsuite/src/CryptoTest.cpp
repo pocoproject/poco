@@ -292,6 +292,8 @@ void CryptoTest::testCertificate()
 	std::string stateOrProvince(cert.subjectName(X509Certificate::NID_STATE_OR_PROVINCE));
 	std::string organizationName(cert.subjectName(X509Certificate::NID_ORGANIZATION_NAME));
 	std::string organizationUnitName(cert.subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME));
+	std::string emailAddress(cert.subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS));
+	std::string serialNumber(cert.subjectName(X509Certificate::NID_SERIAL_NUMBER));
 	
 	assert (subjectName == "/CN=appinf.com/O=Applied Informatics Software Engineering GmbH/OU=Development/ST=Carinthia/C=AT/L=St. Jakob im Rosental/emailAddress=guenter.obiltschnig@appinf.com");
 	assert (issuerName == subjectName);
@@ -301,6 +303,8 @@ void CryptoTest::testCertificate()
 	assert (stateOrProvince == "Carinthia");
 	assert (organizationName == "Applied Informatics Software Engineering GmbH");
 	assert (organizationUnitName == "Development");
+	assert (emailAddress == "guenter.obiltschnig@appinf.com");
+	assert (serialNumber == "");
 	
 	// fails with recent OpenSSL versions:
 	// assert (cert.issuedBy(cert));

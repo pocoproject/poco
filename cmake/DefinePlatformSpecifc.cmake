@@ -90,8 +90,11 @@ else (CYGWIN)
 	      set(SYSLIBS  m socket)
 		elseif(${CMAKE_SYSTEM} MATCHES "AIX")
 		  add_definitions(-D__IBMCPP_TR1__)
+		elseif(${CMAKE_SYSTEM} MATCHES "SunOS")
+         add_definitions(-m64)
+	      set(SYSLIBS  pthread dl rt)
 		else ()
-	      add_definitions( -D_XOPEN_SOURCE=500 -DPOCO_HAVE_FD_EPOLL)
+	      add_definitions(-D_XOPEN_SOURCE=500 -DPOCO_HAVE_FD_EPOLL)
 	      set(SYSLIBS  pthread dl rt)
 		endif ()
 	  endif (APPLE)
@@ -100,7 +103,7 @@ endif (CYGWIN)
 
 if (CMAKE_SYSTEM MATCHES "SunOS")
   # Standard 'must be' defines
-  add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
+  add_definitions( -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -m64 )
   set(SYSLIBS  pthread socket xnet nsl resolv rt dl)
 endif(CMAKE_SYSTEM MATCHES "SunOS")
 
@@ -108,11 +111,6 @@ if (CMAKE_COMPILER_IS_MINGW)
   add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
   add_definitions(-D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE)
 endif (CMAKE_COMPILER_IS_MINGW)
-
-# SunPro C++
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-  add_definitions( -D_BSD_SOURCE -library=stlport4)
-endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 
 # iOS
 if (IOS)

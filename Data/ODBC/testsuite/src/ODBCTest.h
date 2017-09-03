@@ -154,7 +154,6 @@ public:
 	virtual void testUnicode();
 
 	virtual void testReconnect();
-	virtual void testNumeric();
 	virtual void testSyntaxError();
 	virtual void testInsertStatReuse();
 

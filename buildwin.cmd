@@ -18,7 +18,7 @@ rem Modified by Guenter Obiltschnig.
 rem
 rem Usage:
 rem ------
-rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY [LOGGER] ] ] 
+rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY [LOGGER] ] 
 rem VS_VERSION:    90|100|110|120|140|150
 rem ACTION:        build|rebuild|clean
 rem LINKMODE:      static_mt|static_md|shared|all
@@ -40,10 +40,38 @@ rem VS_VERSION {90 | 100 | 110 | 120 | 140 | 150}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
 if %VS_VERSION%==vs150 (
+  if "%VS150COMNTOOLS%"=="" (
+    set VS150COMNTOOLS=C:\Program Files ^(x86^)\Microsoft Visual Studio\2017\Community\Common7\Tools\
+  )
   set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
 ) else (
   set VS_VARSALL=..\..\VC\vcvarsall.bat
 )
+
+shift /1
+rem ACTION [build|rebuild|clean]
+set ACTION=%1
+if "%ACTION%"=="" (set ACTION=build)
+if not "%ACTION%"=="build" (
+if not "%ACTION%"=="rebuild" (
+if not "%ACTION%"=="clean" goto usage))
+
+shift /1
+rem LINKMODE [static_mt|static_md|shared|all]
+set LINK_MODE=%1
+if "%LINK_MODE%"=="" (set LINK_MODE=all)
+if not "%LINK_MODE%"=="static_mt" (
+if not "%LINK_MODE%"=="static_md" (
+if not "%LINK_MODE%"=="shared" (
+if not "%LINK_MODE%"=="all" goto usage)))
+
+rem CONFIGURATION [release|debug|both]
+set CONFIGURATION=%2
+if "%CONFIGURATION%"=="" (set CONFIGURATION=both)
+if not "%CONFIGURATION%"=="release" (
+if not "%CONFIGURATION%"=="debug" (
+if not "%CONFIGURATION%"=="both" goto usage))
+
 rem PLATFORM [Win32|x64|WinCE|WEC2013]
 set PLATFORM=%3
 if "%PLATFORM%"=="" (set PLATFORM=Win32)
@@ -68,42 +96,42 @@ if "%TESTS%"=="" (set TESTS=notests)
 if not defined VCINSTALLDIR (
   if %VS_VERSION%==vs90 (
     if %PLATFORM%==x64 (
-      call "%VS90COMNTOOLS%%VS_VARSALL%" amd64
+      call "%VS90COMNTOOLS%%VS_VARSALL%" x86_amd64
     ) else (
       call "%VS90COMNTOOLS%%VS_VARSALL%" x86
     )
   ) else (
     if %VS_VERSION%==vs100 (
       if %PLATFORM%==x64 (
-        call "%VS100COMNTOOLS%%VS_VARSALL%" amd64
+        call "%VS100COMNTOOLS%%VS_VARSALL%" x86_amd64
       ) else (
         call "%VS100COMNTOOLS%%VS_VARSALL%" x86
       )
     ) else (
       if %VS_VERSION%==vs110 (
         if %PLATFORM%==x64 (
-          call "%VS110COMNTOOLS%%VS_VARSALL%" amd64
+          call "%VS110COMNTOOLS%%VS_VARSALL%" x86_amd64
         ) else (
           call "%VS110COMNTOOLS%%VS_VARSALL%" x86
         ) 
       ) else (
         if %VS_VERSION%==vs120 (
           if %PLATFORM%==x64 (
-            call "%VS120COMNTOOLS%%VS_VARSALL%" amd64
+            call "%VS120COMNTOOLS%%VS_VARSALL%" x86_amd64
           ) else (
             call "%VS120COMNTOOLS%%VS_VARSALL%" x86
           )     
         ) else (
           if %VS_VERSION%==vs140 (
             if %PLATFORM%==x64 (
-              call "%VS140COMNTOOLS%%VS_VARSALL%" amd64
+              call "%VS140COMNTOOLS%%VS_VARSALL%" x86_amd64
             ) else (
               call "%VS140COMNTOOLS%%VS_VARSALL%" x86
             )
           ) else (
             if %VS_VERSION%==vs150 (
               if %PLATFORM%==x64 (
-                call "%VS150COMNTOOLS%%VS_VARSALL%" amd64
+                call "%VS150COMNTOOLS%%VS_VARSALL%" x86_amd64
               ) else (
                 call "%VS150COMNTOOLS%%VS_VARSALL%" x86
               )
@@ -571,7 +599,7 @@ exit /b 1
 :usage
 echo Usage:
 echo ------
-echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] {ENV] [VERBOSITY]
+echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY]
 echo VS_VERSION:    "90|100|110|120|140|150"
 echo ACTION:        "build|rebuild|clean"
 echo LINKMODE:      "static_mt|static_md|shared|all"

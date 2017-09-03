@@ -36,6 +36,8 @@ public:
 
 	void testBareboneODBC();
 
+	void testInternalExtraction();
+
 	void testBLOB();
 
 	void testMultipleResults();

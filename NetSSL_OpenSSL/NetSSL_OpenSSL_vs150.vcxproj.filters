@@ -37,6 +37,9 @@
     <Filter Include="Mail\Source Files">
       <UniqueIdentifier>{411ae688-a196-41e1-ad15-df5f35c0af97}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FTPSClientSession">
+      <UniqueIdentifier>{b7576a8c-16d7-441a-a69c-39734bf72731}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Net\AcceptCertificateHandler.h">
@@ -123,6 +126,12 @@
     <ClInclude Include="include\Poco\Net\SecureSMTPClientSession.h">
       <Filter>Mail\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\FTPSStreamFactory.h">
+      <Filter>FTPSClientSession</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\FTPSClientSession.h">
+      <Filter>FTPSClientSession</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AcceptCertificateHandler.cpp">
@@ -205,6 +214,12 @@
     </ClCompile>
     <ClCompile Include="src\SecureSMTPClientSession.cpp">
       <Filter>Mail\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPSClientSession.cpp">
+      <Filter>FTPSClientSession</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPSStreamFactory.cpp">
+      <Filter>FTPSClientSession</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

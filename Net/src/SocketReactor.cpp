@@ -20,7 +20,9 @@
 #include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
-
+#ifdef max
+#undef max
+#endif
 
 using Poco::FastMutex;
 using Poco::Exception;
@@ -104,7 +106,9 @@ void SocketReactor::run()
 			if (nSockets == 0)
 			{
 				onIdle();
-				Thread::trySleep(_timeout.totalMilliseconds());
+				Timespan::TimeDiff ms = _timeout.totalMilliseconds();
+				poco_assert_dbg(ms <= std::numeric_limits<long>::max());
+				Thread::trySleep(static_cast<long>(ms));
 			}
 			else if (Socket::select(readable, writable, except, _timeout))
 			{
@@ -173,9 +177,10 @@ void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractOb
 			_handlers[socket] = pNotifier;
 		}
 		else pNotifier = it->second;
-	}
-	if (!pNotifier->hasObserver(observer))
-		pNotifier->addObserver(this, observer);
+
+		if (!pNotifier->hasObserver(observer))
+			pNotifier->addObserver(this, observer);
+	}	
 }
 
 
@@ -212,12 +217,12 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 				_handlers.erase(it);
 			}
 		}
-	}
-	if (pNotifier && pNotifier->hasObserver(observer))
-	{
-		pNotifier->removeObserver(this, observer);
-	}
 
+		if (pNotifier && pNotifier->hasObserver(observer))
+		{
+			pNotifier->removeObserver(this, observer);
+		}
+	}
 }
 
 

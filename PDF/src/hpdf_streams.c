@@ -132,7 +132,7 @@ HPDF_Stream_Read  (HPDF_Stream  stream,
  *  s : Pointer to a buffer to copy read data.
  *  size : buffer-size of s.
  *
- *  Read from stream until the buffer is exhausted or line-feed charactor is
+ *  Read from stream until the buffer is exhausted or line-feed character is
  *  read.
  *
  */

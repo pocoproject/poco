@@ -19,7 +19,7 @@
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include <algorithm>
-#include <ctime>
+#include <time.h>
 #if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 #include "wce_time.h"
 #endif

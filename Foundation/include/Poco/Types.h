@@ -208,6 +208,11 @@ namespace Poco {
 #endif
 
 
+#if defined(POCO_PTR_IS_64_BIT) && (POCO_PTR_IS_64_BIT == 1)
+	#define POCO_64_BIT
+#endif
+
+
 } // namespace Poco
 
 
