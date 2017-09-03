@@ -769,6 +769,7 @@ if (os.windows) {
 
 	def Candle(VSYEAR, VERSION, target) {
 		return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
+			dependsOn 		assemble
 			executable "${WiX}/bin/Candle.exe"
 			workingDir "distrib/Windows/WiX"
 			args "-arch", "${target}"
@@ -798,7 +799,6 @@ if (os.windows) {
 		}
 	}
 	task msi() {
-		dependsOn 		assemble
 		dependsOn 		Light('VS2015', version, 'x86')
 		dependsOn 		Light('VS2015', version, 'x64')
 	}
