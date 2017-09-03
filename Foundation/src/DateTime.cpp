@@ -17,6 +17,7 @@
 #include "Poco/DateTime.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
+#include "Poco/Format.h"
 #include <algorithm>
 #include <cmath>
 
@@ -70,7 +71,19 @@ DateTime::DateTime(int otherYear, int otherMonth, int otherDay, int otherHour, i
 	}
 	else
 	{
-		throw Poco::InvalidArgumentException("DataTime is invalid");
+		throw Poco::InvalidArgumentException(Poco::format("Your Date time is %d-%d-%dT%d:%d:%d:%d:%d\n"
+                                                                  "Date time must be values of below.\n"
+                                                                  "Year must be betweent 0 and 9999\n"
+                                                                  "Month must be betweent 1 and 12\n"
+                                                                  "Day must be betweent  1 and %d\n"
+                                                                  "Hour must be betweent 0 and 23\n"
+                                                                  "Minute must be betweent 0 and 59\n"
+                                                                  "Second must be betweent 0 and 59\n"
+                                                                  "Millisecond must be betweent 0 and 999\n"
+                                                                  "Microseconds must be betweent 0 and 999",
+                                                                  _year, _month, _day, _hour, _minute,
+                                                                  _second, _millisecond, _microsecond,
+                                                                  daysOfMonth(_year, _month)));
 	}
 }
 
@@ -159,9 +172,21 @@ DateTime& DateTime::assign(int otherYear, int otherMonth, int otherDay, int othe
 	}
 	else
 	{
-		throw Poco::InvalidArgumentException("DataTime is invalid");
+		throw Poco::InvalidArgumentException(Poco::format("Your Date time is %d-%d-%dT%d:%d:%d:%d:%d\n"
+                                                                  "Date time must be values of below.\n"
+                                                                  "Year must be betweent 0 and 9999\n"
+                                                                  "Month must be betweent 1 and 12\n"
+                                                                  "Day must be betweent  1 and %d\n"
+                                                                  "Hour must be betweent 0 and 23\n"
+                                                                  "Minute must be betweent 0 and 59\n"
+                                                                  "Second must be betweent 0 and 59\n"
+                                                                  "Millisecond must be betweent 0 and 999\n"
+                                                                  "Microseconds must be betweent 0 and 999",
+                                                                  otherYear, otherMonth, otherDay, otherHour, otherMinute,
+                                                                  otherSecond, otherMillisecond, otherMicrosecond,
+                                                                  daysOfMonth(otherYear, otherMonth)));
 	}
-	
+
 	return *this;
 }
 
