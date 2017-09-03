@@ -55,9 +55,6 @@ File prefixByPoco(File binaryFile) {
 	return new File(parent, prefix + "Poco" + name);
 }
 File suffixByArch(File binaryFile, Platform platform) {
-	if (platform.operatingSystem.windows) {
-		return binaryFile;
-	}
 	String name = binaryFile.getName()
 	String suffix = ''
 	if (platform.architecture.name == 'x86') {
@@ -160,6 +157,7 @@ File toPDB(File binaryFile) {
 }
 apply plugin: 'base' 
 def os = org.gradle.internal.os.OperatingSystem.current()
+def String version = file("VERSION").text.replaceAll("[\n\r]", "")
 
 
 allprojects {
@@ -464,7 +462,7 @@ subprojects {
 						}
 						if (it instanceof SharedLibraryBinarySpec) {
 							sharedLibraryFile	 = toBin(prefixByPoco(appendDebugSuffix(suffixByArch(sharedLibraryFile, targetPlatform))), targetPlatform)
-							sharedLibraryLinkFile = toLib(prefixByPoco(appendDebugSuffix(suffixByArch(sharedLibraryLinkFile, targetPlatform))), targetPlatform)
+							sharedLibraryLinkFile = toLib(prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile)), targetPlatform)
 
 							if (targetPlatform.operatingSystem.windows) {
 								// WINDOWS ONLY
@@ -481,10 +479,10 @@ subprojects {
 							}
 						} else
 						if (it instanceof StaticLibraryBinarySpec) {
-							staticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendStaticSuffix(suffixByArch(staticLibraryFile, targetPlatform)))), targetPlatform)
+							staticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendStaticSuffix(staticLibraryFile))), targetPlatform)
 						} else
 						if (it instanceof SemiStaticLibraryBinarySpec) {
-							semiStaticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendSemiStaticSuffix(suffixByArch(semiStaticLibraryFile, targetPlatform)))), targetPlatform)
+							semiStaticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendSemiStaticSuffix(semiStaticLibraryFile))), targetPlatform)
 						} else
 						if (it instanceof NativeExecutableBinarySpec) {
 							executable.file = toBin(appendDebugSuffix(executable.file), targetPlatform)
@@ -494,8 +492,8 @@ subprojects {
 					} else
 					if (buildType == buildTypes.release) {
 						if (it instanceof SharedLibraryBinarySpec) {
-							sharedLibraryFile = toBin(prefixByPoco(sharedLibraryFile), targetPlatform)
-							sharedLibraryLinkFile = toLib(prefixByPoco(suffixByArch(sharedLibraryLinkFile, targetPlatform)), targetPlatform)
+							sharedLibraryFile = toBin(prefixByPoco(suffixByArch(sharedLibraryFile, targetPlatform)), targetPlatform)
+							sharedLibraryLinkFile = toLib(prefixByPoco(sharedLibraryLinkFile), targetPlatform)
 
 							if (targetPlatform.operatingSystem.windows) {
 								// WINDOWS ONLY
@@ -512,7 +510,7 @@ subprojects {
 							}
 						} else
 						if (it instanceof StaticLibraryBinarySpec) {
-							staticLibraryFile = toStatic(prefixByPoco(appendStaticSuffix(suffixByArch(staticLibraryFile, targetPlatform))), targetPlatform)
+							staticLibraryFile = toStatic(prefixByPoco(appendStaticSuffix(staticLibraryFile)), targetPlatform)
 							def binary = it
 							tasks.withType(CreateStaticLibrary) {
 								doFirst {
@@ -521,7 +519,7 @@ subprojects {
 							}
 						} else
 						if (it instanceof SemiStaticLibraryBinarySpec) {
-							semiStaticLibraryFile = toStatic(prefixByPoco(appendSemiStaticSuffix(suffixByArch(semiStaticLibraryFile, targetPlatform))), targetPlatform)
+							semiStaticLibraryFile = toStatic(prefixByPoco(appendSemiStaticSuffix(semiStaticLibraryFile)), targetPlatform)
 							def binary = it
 							tasks.withType(CreateSemiStaticLibrary) {
 								doFirst {
@@ -728,8 +726,8 @@ task PocoDocIni {
     file.text = """
 PocoBuild=$rootDir
 PocoBase=$rootDir
-PocoDoc.output=releases/poco-2.0.0-all-doc
-PocoDoc.version=2.0.0-all
+PocoDoc.output=releases/poco-${version}-all-doc
+PocoDoc.version=${version}-all
 Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
 VC=${VCHome}
 WDK=${WDKHome}
@@ -738,71 +736,87 @@ WDK=${WDKHome}
 task pocoDoc(type: Exec) {
 	if (os.windows) {
 		environment "Path", "$rootDir\\bin;$Path"
+		executable "PocoDoc/bin/PocoDoc.exe"
 	} 
 	if (os.linux) {
 		environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
+		executable "PocoDoc/bin/PocoDoc"
 	}
 	if (os.macOsX) {
 		//FIXME environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
 	}
-	executable "PocoDoc/bin/PocoDoc.exe"
 	args "/config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
 	args "/config=$rootDir/PocoDoc/PocoDoc.ini"
+//	dependsOn ':PocoDoc::assemble'
+//	dependsOn PocoDocIni
+	outputs.files(new File("releases/$version-all-doc/index.html"))
 }
-pocoDoc.dependsOn ':PocoDoc::assemble'
-pocoDoc.dependsOn PocoDocIni
 
 task zipDoc(type: Zip) {
-   from 'releases/poco-2.0.0-all-doc/'
-   include '*'
-   include '*/*'
-   archiveName 'poco-2.0.0-all-doc.zip'
-   destinationDir(file('releases'))
+	from "releases/poco-${version}-all-doc/"
+	include '*'
+	include '*/*'
+	archiveName "poco-${version}-all-doc.zip"
+	destinationDir(file('releases'))
+//	dependsOn pocoDoc
 }
-zipDoc.dependsOn pocoDoc
 
 
 
 
 if (os.windows) {
-	task Candle(type: Exec) {
-		String target = 'x86'
-		String VSYEAR = 'VS2017'
-		String VERSION = '2.0.0'
-		executable "${VIXTOOLSET}/bin/Candle.exe"
-		workingDir "../distro/Windows/WiX"
-		args "-arch", "${target}"
-		args "-dVSYEAR=${VSYEAR}"
-		args "-dVERSION=${VERSION}"
-		args "-dPOCO=${rootDir}"
-		args "-dPlatform=${target}"
-		args "-ext", "${VIXTOOLSET}/bin/WixUIExtension.dll"
-		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
-		args "Poco-${VERSION}.wxs"
-
-	//$VIXTOOLSET\bin\Candle.exe -arch $target -dVSYEAR=$VSYEAR -dVERSION=$VERSION -dPOCO=$rootDir -dPlatform=$target -out "$VSYEAR/Poco $VERSION ($target).wixobj" -ext $VIXTOOLSET\bin\WixUIExtension.dll Poco-$VERSION.wxs
-	}
-	task Light(type: Exec) {
-		String target = 'x86'
-		String VSYEAR = 'VS2017'
-		String VERSION = '2.0.0'
-		executable "${VIXTOOLSET}/bin/Light.exe"
-		workingDir "../distro/Windows/WiX"
-		args "-cultures:null"
-		args "-ext", "${VIXTOOLSET}/bin/WixUIExtension.dll"
-		args "-out"
-		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
-		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
-	//$VIXTOOLSET\bin\Light.exe  -out "$VSYEAR/Poco $VERSION ($target).msi" -cultures:null -ext $VIXTOOLSET\bin\WixUIExtension.dll "$VSYEAR/Poco $VERSION ($target).wixobj"
-	}
-	task WiX(type: Exec) {
-	}
-	Light.dependsOn Candle
-	WiX.dependsOn Light
-
-	task NuGet(type: Exec){
-	}
 }
+
+	def Candle(VSYEAR, VERSION, target) {
+		return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
+			executable "${WiX}/bin/Candle.exe"
+			workingDir "distrib/Windows/WiX"
+			args "-arch", "${target}"
+			args "-dVSYEAR=${VSYEAR}"
+			args "-dVERSION=${VERSION}"
+			args "-dPOCO=${rootDir}"
+			args "-dPlatform=${target}"
+			args "-ext", "${WiX}/bin/WixUIExtension.dll"
+			args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
+			args "Poco-${VERSION}.wxs"
+			inputs.files(new File(workingDir, "Poco-${VERSION}.wxs"))
+			outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
+		}
+	}
+	def Light(VSYEAR, VERSION, target) {
+		return tasks.create("Light-${VSYEAR}-${VERSION}-${target}", Exec) {
+			dependsOn Candle(VSYEAR, VERSION, target)
+			executable "${WiX}/bin/Light.exe"
+			workingDir "distrib/Windows/WiX"
+			args "-cultures:null"
+			args "-ext", "${WiX}/bin/WixUIExtension.dll"
+			args "-out"
+			args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
+			args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
+			inputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
+			outputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"))
+		}
+	}
+	task msi() {
+		dependsOn 		assemble
+		dependsOn 		Light('VS2015', version, 'x86')
+		dependsOn 		Light('VS2015', version, 'x64')
+	}
+
+
+	task NuGet(type: Exec) {
+		executable "${NuGet}/NuGet.exe"
+		workingDir "distrib/Windows/NuGet"
+		args "pack"
+		args "-BasePath", "$rootDir"
+		args "-Version", version
+		args "-Symbols"
+		args "-NonInteractive"
+		args "Pocoproject.Poco.vs140.nuspec"
+		inputs.files(new File(workingDir, "Pocoproject.Poco.vs140.nuspec"))
+		outputs.files(new File(workingDir,"Pocoproject.Poco.vs140.${version}.nupkg"))
+		dependsOn 		assemble
+	}
 
 task production {
 }
