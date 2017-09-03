@@ -36,10 +36,10 @@ cmake_*
 gradle/
 
 # NuGet #
-.nupkg
+*.nupkg
 
 # WiX #
-.msi
+*.msi
 
 # Packages #
 ############
