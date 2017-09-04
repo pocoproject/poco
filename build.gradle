@@ -1,4 +1,4 @@
-import org.pocoproject.nativeplatform.test.SharedLibraryTestSuiteBinarySpec
+import org.pocoproject.nativeplatform.test.TestSharedLibraryBinarySpec
 
 buildscript {
 }
@@ -452,13 +452,13 @@ subprojects {
 						if (it instanceof NativeExecutableBinarySpec) {
 							executable.file = toLocalBin(executable.file, targetPlatform)
 						} 
-						if (it instanceof SharedLibraryTestSuiteBinarySpec) {
+						if (it instanceof TestSharedLibraryBinarySpec) {
 							println "----------------------------------------" + it.name
 						}
 					}
 				}
-				binaries.withType(SharedLibraryTestSuiteBinarySpec) {
-					println "======================================binaries.withType(SharedLibraryTestSuiteBinarySpec)"
+				binaries.withType(TestSharedLibraryBinarySpec) {
+					println "======================================binaries.withType(TestSharedLibraryBinarySpec)"
 				}
 				binaries.withType(NativeBinarySpec) {
 
@@ -466,8 +466,8 @@ subprojects {
 						cppCompiler.args "-std=c++11"
 					}
 					if (buildType == buildTypes.debug) {
-						if (it instanceof SharedLibraryTestSuiteBinarySpec) {
-							println "===================================it instanceof SharedLibraryTestSuiteBinarySpec"
+						if (it instanceof TestSharedLibraryBinarySpec) {
+							println "===================================it instanceof TestSharedLibraryBinarySpec"
 						}
 						if (it instanceof SharedLibraryBinarySpec) {
 							sharedLibraryFile	 = toBin(prefixByPoco(appendDebugSuffix(suffixByArch(sharedLibraryFile, targetPlatform))), targetPlatform)
