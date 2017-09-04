@@ -106,6 +106,7 @@ public:
 		///   * second is from 0 to 59.
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
+		/// Throws an InvalidArgumentException if an argument date is out of range.
 
 	DateTime(double julianDay);
 		/// Creates a DateTime for the given Julian day.
@@ -140,6 +141,7 @@ public:
 		///   * second is from 0 to 59.
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
+		/// Throws an InvalidArgumentException if an argument date is out of range.
 
 	void swap(DateTime& dateTime);
 		/// Swaps the DateTime with another one.

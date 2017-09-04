@@ -16,6 +16,8 @@
 
 #include "Poco/DateTime.h"
 #include "Poco/Timespan.h"
+#include "Poco/Exception.h"
+#include "Poco/Format.h"
 #include <algorithm>
 #include <cmath>
 
@@ -63,18 +65,27 @@ DateTime::DateTime(int otherYear, int otherMonth, int otherDay, int otherHour, i
 	_millisecond(otherMillisecond),
 	_microsecond(otherMicrosecond)
 {
-	poco_assert (_year >= 0 && _year <= 9999);
-	poco_assert (_month >= 1 && _month <= 12);
-	poco_assert (_day >= 1 && _day <= daysOfMonth(_year, _month));
-	poco_assert (_hour >= 0 && _hour <= 23);
-	poco_assert (_minute >= 0 && _minute <= 59);
-	poco_assert (_second >= 0 && _second <= 59);
-	poco_assert (_millisecond >= 0 && _millisecond <= 999);
-	poco_assert (_microsecond >= 0 && _microsecond <= 999);
-	
-	_utcTime = toUtcTime(toJulianDay(_year, _month, _day)) + 10*(_hour*Timespan::HOURS + _minute*Timespan::MINUTES + _second*Timespan::SECONDS + _millisecond*Timespan::MILLISECONDS + _microsecond);
+	if(isValid(_year, _month, _day, _hour, _minute, _second, _millisecond, _microsecond))
+	{
+		_utcTime = toUtcTime(toJulianDay(_year, _month, _day)) + 10*(_hour*Timespan::HOURS + _minute*Timespan::MINUTES + _second*Timespan::SECONDS + _millisecond*Timespan::MILLISECONDS + _microsecond);
+	}
+	else
+	{
+		throw Poco::InvalidArgumentException(Poco::format("Your Date time is %d-%d-%dT%d:%d:%d:%d:%d\n"
+                                                                  "Date time must be values of below.\n"
+                                                                  "Year must be betweent 0 and 9999\n"
+                                                                  "Month must be betweent 1 and 12\n"
+                                                                  "Day must be betweent  1 and %d\n"
+                                                                  "Hour must be betweent 0 and 23\n"
+                                                                  "Minute must be betweent 0 and 59\n"
+                                                                  "Second must be betweent 0 and 59\n"
+                                                                  "Millisecond must be betweent 0 and 999\n"
+                                                                  "Microseconds must be betweent 0 and 999",
+                                                                  _year, _month, _day, _hour, _minute,
+                                                                  _second, _millisecond, _microsecond,
+                                                                  daysOfMonth(_year, _month)));
+	}
 }
-
 
 DateTime::DateTime(double otherJulianDay):
 	_utcTime(toUtcTime(otherJulianDay))
@@ -147,25 +158,35 @@ DateTime& DateTime::operator = (double otherJulianDay)
 
 DateTime& DateTime::assign(int otherYear, int otherMonth, int otherDay, int otherHour, int otherMinute, int otherSecond, int otherMillisecond, int otherMicrosecond)
 {
-	poco_assert (otherYear >= 0 && otherYear <= 9999);
-	poco_assert (otherMonth >= 1 && otherMonth <= 12);
-	poco_assert (otherDay >= 1 && otherDay <= daysOfMonth(otherYear, otherMonth));
-	poco_assert (otherHour >= 0 && otherHour <= 23);
-	poco_assert (otherMinute >= 0 && otherMinute <= 59);
-	poco_assert (otherSecond >= 0 && otherSecond <= 59);
-	poco_assert (otherMillisecond >= 0 && otherMillisecond <= 999);
-	poco_assert (otherMicrosecond >= 0 && otherMicrosecond <= 999);
+	if(isValid(otherYear, otherMonth, otherDay, otherHour, otherMinute, otherSecond, otherMillisecond, otherMicrosecond))
+	{
+		_utcTime     = toUtcTime(toJulianDay(otherYear, otherMonth, otherDay)) + 10*(otherHour*Timespan::HOURS + otherMinute*Timespan::MINUTES + otherSecond*Timespan::SECONDS + otherMillisecond*Timespan::MILLISECONDS + otherMicrosecond);
+		_year        = otherYear;
+		_month       = otherMonth;
+		_day         = otherDay;
+		_hour        = otherHour;
+		_minute      = otherMinute;
+		_second      = otherSecond;
+		_millisecond = otherMillisecond;
+		_microsecond = otherMicrosecond;
+	}
+	else
+	{
+		throw Poco::InvalidArgumentException(Poco::format("Your Date time is %d-%d-%dT%d:%d:%d:%d:%d\n"
+                                                                  "Date time must be values of below.\n"
+                                                                  "Year must be betweent 0 and 9999\n"
+                                                                  "Month must be betweent 1 and 12\n"
+                                                                  "Day must be betweent  1 and %d\n"
+                                                                  "Hour must be betweent 0 and 23\n"
+                                                                  "Minute must be betweent 0 and 59\n"
+                                                                  "Second must be betweent 0 and 59\n"
+                                                                  "Millisecond must be betweent 0 and 999\n"
+                                                                  "Microseconds must be betweent 0 and 999",
+                                                                  otherYear, otherMonth, otherDay, otherHour, otherMinute,
+                                                                  otherSecond, otherMillisecond, otherMicrosecond,
+                                                                  daysOfMonth(otherYear, otherMonth)));
+	}
 
-	_utcTime     = toUtcTime(toJulianDay(otherYear, otherMonth, otherDay)) + 10*(otherHour*Timespan::HOURS + otherMinute*Timespan::MINUTES + otherSecond*Timespan::SECONDS + otherMillisecond*Timespan::MILLISECONDS + otherMicrosecond);
-	_year        = otherYear;
-	_month       = otherMonth;
-	_day         = otherDay;
-	_hour        = otherHour;
-	_minute      = otherMinute;
-	_second      = otherSecond;
-	_millisecond = otherMillisecond;
-	_microsecond = otherMicrosecond;
-	
 	return *this;
 }
 
