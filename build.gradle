@@ -748,16 +748,16 @@ task pocoDoc(type: Exec) {
 		executable "PocoDoc/bin/PocoDoc.exe"
 	} 
 	if (os.linux) {
-		environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
-		executable "PocoDoc/bin/PocoDoc"
+		environment "LD_LIBRARY_PATH", "$rootDir/lib64:$LD_LIBRARY_PATH"
+		executable "PocoDoc/bin64/PocoDoc"
 	}
 	if (os.macOsX) {
 		//FIXME environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
 	}
 	args "/config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
 	args "/config=$rootDir/PocoDoc/PocoDoc.ini"
-//	dependsOn ':PocoDoc::assemble'
-//	dependsOn PocoDocIni
+	dependsOn ':PocoDoc::assemble'
+	dependsOn PocoDocIni
 	outputs.files(new File("releases/$version-all-doc/index.html"))
 }
 
