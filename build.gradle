@@ -15,6 +15,11 @@ dependencies {
 }
 */
 
+apply plugin: 'base' 
+
+def os = org.gradle.internal.os.OperatingSystem.current()
+def String version = file("VERSION").text.replaceAll("[\n\r]", "")
+
 File appendDebugSuffix(File binaryFile) {
 	String name = binaryFile.getName()
 	File parent = binaryFile.getParentFile()
@@ -24,15 +29,19 @@ File appendDebugSuffix(File binaryFile) {
 	}
 	return new File(parent, name.substring(0, extensionSeparatorIndex) + "d" + name.substring(extensionSeparatorIndex))
 }
-
+ 
 File appendStaticSuffix(File binaryFile) {
-	String name = binaryFile.getName()
-	File parent = binaryFile.getParentFile()
-	int extensionSeparatorIndex = name.lastIndexOf('.')
-	if (extensionSeparatorIndex == -1) {
-		return new File(parent, name + "MT")
-	}
-	return new File(parent, name.substring(0, extensionSeparatorIndex) + "MT" + name.substring(extensionSeparatorIndex))
+    def os = org.gradle.internal.os.OperatingSystem.current()
+	if (!os.windows) {
+		return binaryFile
+    }
+    String name = binaryFile.getName()
+    File parent = binaryFile.getParentFile()
+    int extensionSeparatorIndex = name.lastIndexOf('.')
+    if (extensionSeparatorIndex == -1) {
+    	return new File(parent, name + "MT")
+    }
+    return new File(parent, name.substring(0, extensionSeparatorIndex) + "MT" + name.substring(extensionSeparatorIndex))
 }
 File appendSemiStaticSuffix(File binaryFile) {
 	String name = binaryFile.getName()
@@ -55,6 +64,9 @@ File prefixByPoco(File binaryFile) {
 	return new File(parent, prefix + "Poco" + name);
 }
 File suffixByArch(File binaryFile, Platform platform) {
+	if (!platform.operatingSystem.windows) {
+		return binaryFile
+	}
 	String name = binaryFile.getName()
 	String suffix = ''
 	if (platform.architecture.name == 'x86') {
@@ -155,13 +167,10 @@ File toPDB(File binaryFile) {
 	int extensionSeparatorIndex = name.lastIndexOf('.')
 	return new File(parent, name.substring(0, extensionSeparatorIndex) + ".pdb")
 }
-apply plugin: 'base' 
-def os = org.gradle.internal.os.OperatingSystem.current()
-def String version = file("VERSION").text.replaceAll("[\n\r]", "")
 
 
 allprojects {
-	buildDir = new File("root")	
+	buildDir = new File("root")	            // DO NOT REMOVE
 /*
 	clean.doFirst {
 		file($projectDir, 'bin').delete()
