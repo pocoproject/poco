@@ -1,7 +1,7 @@
 //
 // OSPCodeWriter.h
 //
-// $Id: //poco/1.4/PageCompiler/src/OSPCodeWriter.h#1 $
+// $Id: //poco/1.7/PageCompiler/src/OSPCodeWriter.h#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
