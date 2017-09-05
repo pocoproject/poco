@@ -5,7 +5,7 @@
 #
 # Usage:
 # ------
-# build.ps1 [-vs_version 120 | 110 | 100 | 90]
+# build.ps1 [-vs_version 150 | 140]
 #           [-config     release | debug | both]
 #           [-platform   Win32 | x64]
 #           [-library    shared | static]
@@ -18,8 +18,8 @@
 Param
 (
   [Parameter()]
-  [ValidateSet(90, 100, 110, 120, 140)]
-  [int] $vs_version = 120,
+  [ValidateSet(140, 150)]
+  [int] $vs_version = 140,
 
   [Parameter()]
   [ValidateSet('release', 'debug', 'both')]
@@ -63,7 +63,7 @@ $PERL_PACKAGE_FILE = "strawberry-perl-$PERL_VERSION-32bit-portable.zip"
 $PERL_DOWNLOAD_URL = "http://strawberryperl.com/download/5.20.1.1/$PERL_PACKAGE_FILE"
 
 # OpenSSL configuration section
-$OPENSSL_VERSION         = "1.0.2e"
+$OPENSSL_VERSION         = "1.0.2l"
 $OPENSSL_DIRECTORY       = Join-Path $PACKAGES_DIRECTORY "openssl-$OPENSSL_VERSION"
 $OPENSSL_CLEAN_DIRECTORY = Join-Path $PACKAGES_DIRECTORY "openssl-$OPENSSL_VERSION.clean"
 $OPENSSL_PACKAGE_FILE    = "openssl-$OPENSSL_VERSION.tar.gz"
@@ -95,7 +95,8 @@ function Load-DevelopmentTools {
     
     if ($vs_version -eq 0)
     {
-      if     ($Env:VS140COMNTOOLS -ne '') { $script:vs_version = 140 }
+      if     ($Env:VS150COMNTOOLS -ne '') { $script:vs_version = 150 }
+      elseif ($Env:VS140COMNTOOLS -ne '') { $script:vs_version = 140 }
       elseif ($Env:VS120COMNTOOLS -ne '') { $script:vs_version = 120 }
       elseif ($Env:VS110COMNTOOLS -ne '') { $script:vs_version = 110 }
       elseif ($Env:VS100COMNTOOLS -ne '') { $script:vs_version = 100 }
@@ -278,19 +279,19 @@ function Compile-OpenSSL {
     if ($winplatform -eq "win64") {
         Replace-String "util\pl\VC-32.pl" "`$ssl=	`"ssleay32`"" `
                                           "`$ssl=	`"ssleay$b$l$d`""
-        
+
         Replace-String "util\pl\VC-32.pl" "`$crypto=`"libeay32`"" `
                                           "`$crypto=`"libeay$b$l$d`""
-        
+
         Replace-String "util\pl\VC-32.pl" "`$crypto=`"libeayfips32`"" `
                                           "`$crypto=`"libeayfips$b$l$d`""
-        
+
         Replace-String "ms\do_win64a.bat" "perl util\mkdef.pl 32 libeay > ms\libeay32.def" `
                                           "perl util\mkdef.pl $b libeay > ms\libeay$b$l$d.def"
-        
+
         Replace-String "ms\do_win64a.bat" "perl util\mkdef.pl 32 ssleay > ms\ssleay32.def" `
                                           "perl util\mkdef.pl $b ssleay > ms\ssleay$b$l$d.def"
-        
+
         cmd /c ms\do_win64a
 
         Replace-String "ms\libeay$b$l$d.def" "LIBEAY32" "LIBEAY$b$l$d"
