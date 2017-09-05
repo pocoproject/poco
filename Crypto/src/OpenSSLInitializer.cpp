@@ -65,7 +65,8 @@ void OpenSSLInitializer::initialize()
 #if OPENSSL_VERSION_NUMBER >= 0x0907000L
 		OPENSSL_config(NULL);
 #endif
-		if(! _disableSSLInitialization) {
+		if(! _disableSSLInitialization)
+		{
 			SSL_library_init();
 			SSL_load_error_strings();
 			OpenSSL_add_all_algorithms();
@@ -75,8 +76,9 @@ void OpenSSLInitializer::initialize()
 		RandomInputStream rnd;
 		rnd.read(seed, sizeof(seed));
 		RAND_seed(seed, SEEDSIZE);
-		
-		if(CRYPTO_get_locking_callback() == NULL) {
+
+		if(CRYPTO_get_locking_callback() == NULL)
+		{
 			int nMutexes = CRYPTO_num_locks();
 			_mutexes = new Poco::FastMutex[nMutexes];
 			CRYPTO_set_locking_callback(&OpenSSLInitializer::lock);
@@ -108,7 +110,8 @@ void OpenSSLInitializer::uninitialize()
 	FastMutex::ScopedLock lock(_mutex);
 	if (--_rc == 0)
 	{
-		if(_mutexes != NULL) {
+		if(_mutexes != NULL)
+		{
 			CRYPTO_set_dynlock_create_callback(0);
 			CRYPTO_set_dynlock_lock_callback(0);
 			CRYPTO_set_dynlock_destroy_callback(0);
@@ -123,7 +126,9 @@ void OpenSSLInitializer::uninitialize()
 #endif
 			delete [] _mutexes;
 		}
-		if(! _disableSSLInitialization) {
+
+		if(! _disableSSLInitialization)
+		{
 			EVP_cleanup();
 			ERR_free_strings();
 			CONF_modules_free();
@@ -141,6 +146,8 @@ void OpenSSLInitializer::lock(int mode, int n, const char* file, int line)
 }
 
 
+#ifndef POCO_OS_FAMILY_WINDOWS
+
 unsigned long OpenSSLInitializer::id()
 {
 	// Note: we use an old-style C cast here because
@@ -148,6 +155,8 @@ unsigned long OpenSSLInitializer::id()
 	// work uniformly across all platforms.
 	return (unsigned long) Poco::Thread::currentTid();
 }
+
+#endif
 
 
 struct CRYPTO_dynlock_value* OpenSSLInitializer::dynlockCreate(const char* file, int line)
