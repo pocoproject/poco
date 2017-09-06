@@ -31,14 +31,10 @@ namespace Poco {
 namespace Crypto {
 
 
-Cipher::Cipher()
-{
-}
+Cipher::Cipher() = default;
 
 
-Cipher::~Cipher()
-{
-}
+Cipher::~Cipher() = default;
 
 
 std::string Cipher::encryptString(const std::string& str, Encoding encoding)

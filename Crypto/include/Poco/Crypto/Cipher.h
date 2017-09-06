@@ -99,7 +99,10 @@ public:
 		ENC_BINHEX_NO_LF = 0x82  /// BinHex-encoded output, no linefeeds
 		
 	};
-
+	
+	Cipher(Cipher&&) = delete;
+		/// Expreesively says that Cipher doesn't copy or move.
+		
 	virtual ~Cipher();
 		/// Destroys the Cipher.
 
@@ -128,9 +131,6 @@ protected:
 	Cipher();
 		/// Creates a new Cipher object.
 
-private:
-	Cipher(const Cipher&);
-	Cipher& operator = (const Cipher&);
 };
 
 

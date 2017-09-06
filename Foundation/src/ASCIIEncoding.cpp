@@ -49,14 +49,10 @@ const TextEncoding::CharacterMap ASCIIEncoding::_charMap =
 };
 
 
-ASCIIEncoding::ASCIIEncoding()
-{
-}
+ASCIIEncoding::ASCIIEncoding() = default;
 
 
-ASCIIEncoding::~ASCIIEncoding()
-{
-}
+ASCIIEncoding::~ASCIIEncoding() = default;
 
 
 const char* ASCIIEncoding::canonicalName() const
