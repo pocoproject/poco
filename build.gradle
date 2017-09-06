@@ -1,5 +1,3 @@
-import org.pocoproject.nativeplatform.test.TestSharedLibraryBinarySpec
-
 buildscript {
 }
 
@@ -170,7 +168,7 @@ File toPDB(File binaryFile) {
 
 
 allprojects {
-	buildDir = new File("root")	            // DO NOT REMOVE
+	buildDir = new File("root")	            // DO NOT REMOVE OR CHANGE to 'build'
 /*
 	clean.doFirst {
 		file($projectDir, 'bin').delete()
@@ -309,8 +307,8 @@ subprojects {
 								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-								dllName = 'libhcrypto.so.4.1.0'
-								linkName = 'libhcrypto.so.4.1.0'
+								dllName = 'libcrypto.so'
+								linkName = 'libcrypto.a'
 								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
 								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
@@ -332,8 +330,8 @@ subprojects {
 								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-								dllName = 'libhcrypto.so.4.1.0'
-								linkName = 'libhcrypto.so.4.1.0'
+								dllName = 'libcrypto.so'
+								linkName = 'libcrypto.a'
 								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
 								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
@@ -400,8 +398,8 @@ subprojects {
 								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-								dllName = 'libssl3.so'
-								linkName = 'libssl3.so'
+								dllName = 'libssl.so'
+								linkName = 'libssl.a'
 								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
 								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
@@ -422,8 +420,8 @@ subprojects {
 								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-								dllName = 'libssl3.so'
-								linkName = 'libssl3.so'
+								dllName = 'libssl.so'
+								linkName = 'libssl.a'
 								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
 								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
@@ -452,13 +450,7 @@ subprojects {
 						if (it instanceof NativeExecutableBinarySpec) {
 							executable.file = toLocalBin(executable.file, targetPlatform)
 						} 
-						if (it instanceof TestSharedLibraryBinarySpec) {
-							println "----------------------------------------" + it.name
-						}
 					}
-				}
-				binaries.withType(TestSharedLibraryBinarySpec) {
-					println "======================================binaries.withType(TestSharedLibraryBinarySpec)"
 				}
 				binaries.withType(NativeBinarySpec) {
 
@@ -466,9 +458,6 @@ subprojects {
 						cppCompiler.args "-std=c++11"
 					}
 					if (buildType == buildTypes.debug) {
-						if (it instanceof TestSharedLibraryBinarySpec) {
-							println "===================================it instanceof TestSharedLibraryBinarySpec"
-						}
 						if (it instanceof SharedLibraryBinarySpec) {
 							sharedLibraryFile	 = toBin(prefixByPoco(appendDebugSuffix(suffixByArch(sharedLibraryFile, targetPlatform))), targetPlatform)
 							sharedLibraryLinkFile = toLib(prefixByPoco(appendDebugSuffix(sharedLibraryLinkFile)), targetPlatform)
@@ -729,6 +718,34 @@ subprojects {
 		args test
 	}
 }
+
+task production {
+	dependsOn ':CppUnit:assemble'
+	dependsOn ':Foundation:assemble'
+	dependsOn ':XML:assemble'
+	dependsOn ':JSON:assemble'
+	dependsOn ':Util:assemble'
+	dependsOn ':Net:assemble'
+	dependsOn ':Crypto:assemble'
+	dependsOn ':NetSSL_OpenSSL:assemble'
+	if (os.windows) {
+		dependsOn ':NetSSL_Win:assemble'
+	}
+	dependsOn ':Data:assemble'
+	if (os.windows) {
+		dependsOn ':Data:ODBC:assemble'
+		dependsOn ':Data:SQLite:assemble'
+		dependsOn ':Data:MySQL:assemble'
+		dependsOn ':Data:PostgreSQL:assemble'
+	}
+	dependsOn ':Zip:assemble'
+	dependsOn ':PageCompiler:assemble'
+	dependsOn ':PageCompiler:File2Page:assemble'
+	dependsOn ':PDF:assemble'
+	dependsOn ':MongoDB:assemble'
+	dependsOn ':Redis:assemble'
+}
+
 task PocoDocIni {
     def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
     file.createNewFile()
@@ -737,27 +754,39 @@ PocoBuild=$rootDir
 PocoBase=$rootDir
 PocoDoc.output=releases/poco-${version}-all-doc
 PocoDoc.version=${version}-all
+"""
+	if (os.windows) {
+		file.text += """
 Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
 VC=${VCHome}
 WDK=${WDKHome}
 """
+	} else {
+	}
 }
 task pocoDoc(type: Exec) {
 	if (os.windows) {
 		environment "Path", "$rootDir\\bin;$Path"
 		executable "PocoDoc/bin/PocoDoc.exe"
+		args "/config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+		args "/config=$rootDir/PocoDoc/PocoDoc.ini"
 	} 
 	if (os.linux) {
 		environment "LD_LIBRARY_PATH", "$rootDir/lib64:$LD_LIBRARY_PATH"
 		executable "PocoDoc/bin64/PocoDoc"
+		args "-config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
 	if (os.macOsX) {
 		//FIXME environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
+		args "-config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
-	args "/config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
-	args "/config=$rootDir/PocoDoc/PocoDoc.ini"
 	dependsOn ':PocoDoc::assemble'
 	dependsOn PocoDocIni
+//	inputs.files(tasks.getByPath(':production').outputs.files)
+	inputs.files(new File(executable))
+	inputs.files(new File("$rootDir/PocoDoc/cfg/mkdoc-poco.xml"))
 	outputs.files(new File("releases/$version-all-doc/index.html"))
 }
 
@@ -767,6 +796,8 @@ task zipDoc(type: Zip) {
 	include '*/*'
 	archiveName "poco-${version}-all-doc.zip"
 	destinationDir(file('releases'))
+	inputs.files(new File("releases/$version-all-doc/index.html"))
+	outputs.files(new File("releases/poco-${version}-all-doc.zip"))
 //	dependsOn pocoDoc
 }
 
@@ -778,8 +809,9 @@ if (os.windows) {
 
 	def Candle(VSYEAR, VERSION, target) {
 		return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
-			dependsOn 		assemble
-			executable "${WiX}/bin/Candle.exe"
+			dependsOn ':production'
+			dependsOn ':pocoDoc'
+			executable "${WiXHome}/bin/Candle.exe"
 			workingDir "distrib/Windows/WiX"
 			args "-arch", "${target}"
 			args "-dVSYEAR=${VSYEAR}"
@@ -790,13 +822,14 @@ if (os.windows) {
 			args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 			args "Poco-${VERSION}.wxs"
 			inputs.files(new File(workingDir, "Poco-${VERSION}.wxs"))
+			inputs.files(tasks.getByPath(':production').outputs.files)
 			outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
 		}
 	}
 	def Light(VSYEAR, VERSION, target) {
 		return tasks.create("Light-${VSYEAR}-${VERSION}-${target}", Exec) {
 			dependsOn Candle(VSYEAR, VERSION, target)
-			executable "${WiX}/bin/Light.exe"
+			executable "${WiXHome}/bin/Light.exe"
 			workingDir "distrib/Windows/WiX"
 			args "-cultures:null"
 			args "-ext", "${WiX}/bin/WixUIExtension.dll"
@@ -807,14 +840,14 @@ if (os.windows) {
 			outputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"))
 		}
 	}
-	task msi() {
+	task WiX() {
 		dependsOn 		Light('VS2015', version, 'x86')
 		dependsOn 		Light('VS2015', version, 'x64')
 	}
 
 
 	task NuGet(type: Exec) {
-		executable "${NuGet}/NuGet.exe"
+		executable "${NuGetHome}/NuGet.exe"
 		workingDir "distrib/Windows/NuGet"
 		args "pack"
 		args "-BasePath", "$rootDir"
@@ -823,37 +856,15 @@ if (os.windows) {
 		args "-NonInteractive"
 		args "Pocoproject.Poco.vs140.nuspec"
 		inputs.files(new File(workingDir, "Pocoproject.Poco.vs140.nuspec"))
+		inputs.files(tasks.getByPath(':production').outputs.files)
 		outputs.files(new File(workingDir,"Pocoproject.Poco.vs140.${version}.nupkg"))
-		dependsOn 		assemble
+		dependsOn ':production'
 	}
 
-task production {
+task distrib() {
+	dependsOn NuGet
+	dependsOn WiX
 }
-production.dependsOn ':CppUnit:assemble'
-production.dependsOn ':Foundation:assemble'
-production.dependsOn ':XML:assemble'
-production.dependsOn ':JSON:assemble'
-production.dependsOn ':Util:assemble'
-production.dependsOn ':Net:assemble'
-production.dependsOn ':Crypto:assemble'
-production.dependsOn ':NetSSL_OpenSSL:assemble'
-if (os.windows) {
-	production.dependsOn ':NetSSL_Win:assemble'
-}
-production.dependsOn ':Data:assemble'
-if (os.windows) {
-	production.dependsOn ':Data:ODBC:assemble'
-	production.dependsOn ':Data:SQLite:assemble'
-	production.dependsOn ':Data:MySQL:assemble'
-	production.dependsOn ':Data:PostgreSQL:assemble'
-}
-production.dependsOn ':Zip:assemble'
-production.dependsOn ':PageCompiler:assemble'
-production.dependsOn ':PageCompiler:File2Page:assemble'
-production.dependsOn ':PDF:assemble'
-production.dependsOn ':MongoDB:assemble'
-production.dependsOn ':Redis:assemble'
-production.dependsOn ':ProGen:assemble'
 
 task unittest {
 }
