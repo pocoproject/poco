@@ -1,7 +1,7 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/PageCompiler.cpp#4 $
+// $Id: //poco/1.7/PageCompiler/src/PageCompiler.cpp#5 $
 //
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
@@ -206,7 +206,7 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Server Page Compiler.\n"
-			"Copyright (c) 2008-2016 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2008-2017 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program compiles web pages containing embedded C++ code "
 			"into a C++ class that can be used with the HTTP server "

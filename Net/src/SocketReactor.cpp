@@ -20,7 +20,9 @@
 #include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
-
+#ifdef max
+#undef max
+#endif
 
 using Poco::FastMutex;
 using Poco::Exception;
@@ -104,7 +106,9 @@ void SocketReactor::run()
 			if (nSockets == 0)
 			{
 				onIdle();
-				Thread::trySleep(_timeout.totalMilliseconds());
+				Timespan::TimeDiff ms = _timeout.totalMilliseconds();
+				poco_assert_dbg(ms <= std::numeric_limits<long>::max());
+				Thread::trySleep(static_cast<long>(ms));
 			}
 			else if (Socket::select(readable, writable, except, _timeout))
 			{

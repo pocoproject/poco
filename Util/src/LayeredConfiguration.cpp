@@ -43,9 +43,21 @@ void LayeredConfiguration::add(AbstractConfiguration* pConfig)
 }
 
 
+void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label)
+{
+	add(pConfig, label, highest(), false, true);
+}
+
+
 void LayeredConfiguration::add(AbstractConfiguration* pConfig, bool shared)
 {
 	add(pConfig, highest(), false, shared);
+}
+
+
+void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, bool shared)
+{
+	add(pConfig, label, highest(), false, shared);
 }
 
 
@@ -55,9 +67,21 @@ void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority)
 }
 
 
+void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, int priority)
+{
+	add(pConfig, label, priority, false, true);
+}
+
+
 void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, bool shared)
 {
 	add(pConfig, priority, false, shared);
+}
+
+
+void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, int priority, bool shared)
+{
+	add(pConfig, label, priority, false, shared);
 }
 
 
@@ -87,10 +111,17 @@ void LayeredConfiguration::addWriteable(AbstractConfiguration* pConfig, int prio
 
 void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, bool writeable, bool shared)
 {
+	add(pConfig, std::string(), priority, writeable, shared);
+}
+
+
+void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, int priority, bool writeable, bool shared)
+{
 	ConfigItem item;
 	item.pConfig   = ConfigPtr(pConfig, shared);
 	item.priority  = priority;
 	item.writeable = writeable;
+	item.label     = label;
 	
 	ConfigList::iterator it = _configs.begin();
 	while (it != _configs.end() && it->priority < priority)
@@ -110,6 +141,19 @@ void LayeredConfiguration::removeConfiguration(AbstractConfiguration* pConfig)
 			break;
 		}
 	}
+}
+
+
+LayeredConfiguration::ConfigPtr LayeredConfiguration::find(const std::string& label) const
+{
+	for (ConfigList::const_iterator it = _configs.begin(); it != _configs.end(); ++it)
+	{
+		if (it->label == label)
+		{
+			return it->pConfig;
+		}
+	}
+	return 0;
 }
 
 
