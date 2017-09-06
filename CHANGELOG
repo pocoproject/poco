@@ -1509,7 +1509,7 @@ Release 1.3.6 (2009-11-24)
 - fixed a documentation bug (wrong sample code) in Process::launch() documentation
 - added --header-output-dir option to PageCompiler
 - fixed SF# 2849144: Zip::Decompress notifications error
-- SAXParser has a new feature: "http://www.appinf.com/features/enable-partial-reads".
+- SAXParser has a new feature: http://www.appinf.com/features/enable-partial-reads.
   See ParserEngine::setEnablePartialReads() for a description of what this does.
 - fixed SF# 2876179: MySQL Signed/Unsigned value bug
 - fixed SF# 2877970: possible bug in timer task
