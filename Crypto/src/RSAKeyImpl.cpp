@@ -31,8 +31,7 @@ namespace Poco {
 namespace Crypto {
 
 
-RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
-	_pRSA(0)
+RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert): _pRSA(0)
 {
 	const X509* pCert = cert.certificate();
 	EVP_PKEY* pKey = X509_get_pubkey(const_cast<X509*>(pCert));
@@ -41,8 +40,7 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 }
 
 
-RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent):
-	_pRSA(0)
+RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent): _pRSA(0)
 {
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L
 	_pRSA = RSA_new();
@@ -68,11 +66,9 @@ RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent):
 }
 
 
-RSAKeyImpl::RSAKeyImpl(
-		const std::string& publicKeyFile, 
+RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile, 
 		const std::string& privateKeyFile, 
-		const std::string& privateKeyPassphrase):
-	_pRSA(0)
+		const std::string& privateKeyPassphrase): _pRSA(0)
 {
 	poco_assert_dbg(_pRSA == 0);
 	
@@ -135,8 +131,9 @@ RSAKeyImpl::RSAKeyImpl(
 }
 
 
-RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase):
-	_pRSA(0)
+RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream,
+	std::istream* pPrivateKeyStream,
+	const std::string& privateKeyPassphrase): _pRSA(0)
 {
 	poco_assert_dbg(_pRSA == 0);
 	
@@ -193,8 +190,7 @@ RSAKeyImpl::~RSAKeyImpl()
 
 void RSAKeyImpl::freeRSA()
 {
-	if (_pRSA)
-		RSA_free(_pRSA);
+	if (_pRSA) RSA_free(_pRSA);
 	_pRSA = 0;
 }
 
@@ -247,7 +243,9 @@ RSAKeyImpl::ByteVec RSAKeyImpl::decryptionExponent() const
 }
 
 
-void RSAKeyImpl::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
+void RSAKeyImpl::save(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
+	const std::string& privateKeyPassphrase)
 {
 	if (!publicKeyFile.empty())
 	{
@@ -299,7 +297,9 @@ void RSAKeyImpl::save(const std::string& publicKeyFile, const std::string& priva
 }
 
 
-void RSAKeyImpl::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream, const std::string& privateKeyPassphrase)
+void RSAKeyImpl::save(std::ostream* pPublicKeyStream,
+	std::ostream* pPrivateKeyStream,
+	const std::string& privateKeyPassphrase)
 {
 	if (pPublicKeyStream)
 	{
