@@ -89,6 +89,8 @@ public:
 	void unsignedInts();
 	void floats();
 	void doubles();
+	void any();
+	void dynamicAny();
 	void tuples();
 	void tupleVector();
 
