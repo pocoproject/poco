@@ -24,12 +24,8 @@
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Path.h"
-//#include "Poco/DateTime.h"
-//#include "Poco/SharedPtr.h"
-//#include <set>
 #include <istream>
 #include <openssl/pkcs12.h>
-//#include <openssl/ssl.h>
 
 
 namespace Poco {
