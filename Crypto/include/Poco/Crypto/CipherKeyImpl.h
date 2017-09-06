@@ -121,9 +121,9 @@ private:
 private:
 	const EVP_CIPHER*  _pCipher;
 	const EVP_MD*      _pDigest;
-	std::string	       _name;
-	ByteVec		       _key;
-	ByteVec		       _iv;
+	std::string        _name;
+	ByteVec            _key;
+	ByteVec            _iv;
 	OpenSSLInitializer _openSSLInitializer;
 };
 

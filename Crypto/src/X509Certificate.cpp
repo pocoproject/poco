@@ -35,7 +35,7 @@ namespace Crypto {
 
 X509Certificate::X509Certificate(std::istream& istr):
 	_pCert(0)
-{	
+{
 	load(istr);
 }
 
@@ -211,24 +211,24 @@ std::string X509Certificate::commonName() const
 std::string X509Certificate::issuerName(NID nid) const
 {
 	if (X509_NAME* issuer = X509_get_issuer_name(_pCert))
-    {
+	{
 		char buffer[NAME_BUFFER_SIZE];
 		if (X509_NAME_get_text_by_NID(issuer, nid, buffer, sizeof(buffer)) >= 0)
 			return std::string(buffer);
-    }
-    return std::string();
+	}
+	return std::string();
 }
 
 
 std::string X509Certificate::subjectName(NID nid) const
 {
 	if (X509_NAME* subj = X509_get_subject_name(_pCert))
-    {
+	{
 		char buffer[NAME_BUFFER_SIZE];
 		if (X509_NAME_get_text_by_NID(subj, nid, buffer, sizeof(buffer)) >= 0)
 			return std::string(buffer);
-    }
-    return std::string();
+	}
+	return std::string();
 }
 
 
@@ -236,16 +236,16 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 {
 	domainNames.clear(); 
 	if (STACK_OF(GENERAL_NAME)* names = static_cast<STACK_OF(GENERAL_NAME)*>(X509_get_ext_d2i(_pCert, NID_subject_alt_name, 0, 0)))
-    {
+	{
 		for (int i = 0; i < sk_GENERAL_NAME_num(names); ++i)
-        {
+		{
 			const GENERAL_NAME* name = sk_GENERAL_NAME_value(names, i);
 			if (name->type == GEN_DNS)
 			{
 				const char* data = reinterpret_cast<char*>(ASN1_STRING_data(name->d.ia5));
 				std::size_t len = ASN1_STRING_length(name->d.ia5);
 				domainNames.insert(std::string(data, len));
-            }
+			}
 		}
 		GENERAL_NAMES_free(names);
 	}
