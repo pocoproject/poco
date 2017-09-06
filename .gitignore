@@ -40,6 +40,8 @@ gradle/
 
 # WiX #
 *.msi
+*.wixobj
+*.wixpdb
 
 # Packages #
 ############
