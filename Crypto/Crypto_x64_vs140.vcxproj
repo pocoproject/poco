@@ -306,9 +306,14 @@ xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*</Command>
     <ClInclude Include="include\Poco\Crypto\CipherKey.h" />
     <ClInclude Include="include\Poco\Crypto\CipherKeyImpl.h" />
     <ClInclude Include="include\Poco\Crypto\Crypto.h" />
+    <ClInclude Include="include\Poco\Crypto\CryptoException.h" />
     <ClInclude Include="include\Poco\Crypto\CryptoStream.h" />
     <ClInclude Include="include\Poco\Crypto\CryptoTransform.h" />
     <ClInclude Include="include\Poco\Crypto\DigestEngine.h" />
+    <ClInclude Include="include\Poco\Crypto\ECCipherImpl.h" />
+    <ClInclude Include="include\Poco\Crypto\ECDigestEngine.h" />
+    <ClInclude Include="include\Poco\Crypto\ECKey.h" />
+    <ClInclude Include="include\Poco\Crypto\ECKeyImpl.h" />
     <ClInclude Include="include\Poco\Crypto\OpenSSLInitializer.h" />
     <ClInclude Include="include\Poco\Crypto\PKCS12Container.h" />
     <ClInclude Include="include\Poco\Crypto\RSACipherImpl.h" />
@@ -323,9 +328,12 @@ xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*</Command>
     <ClCompile Include="src\CipherImpl.cpp" />
     <ClCompile Include="src\CipherKey.cpp" />
     <ClCompile Include="src\CipherKeyImpl.cpp" />
+    <ClCompile Include="src\CryptoException.cpp" />
     <ClCompile Include="src\CryptoStream.cpp" />
     <ClCompile Include="src\CryptoTransform.cpp" />
     <ClCompile Include="src\DigestEngine.cpp" />
+    <ClCompile Include="src\ECKey.cpp" />
+    <ClCompile Include="src\ECKeyImpl.cpp" />
     <ClCompile Include="src\OpenSSLInitializer.cpp" />
     <ClCompile Include="src\PKCS12Container.cpp" />
     <ClCompile Include="src\RSACipherImpl.cpp" />

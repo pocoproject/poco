@@ -92,14 +92,9 @@ void RSAKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStrea
 }
 
 
-namespace
-{
-	static const std::string RSA("rsa");
-}
-
-
 const std::string& RSAKey::name() const
 {
+	static const std::string RSA("rsa");
 	return RSA;
 }
 

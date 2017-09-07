@@ -129,11 +129,10 @@ namespace
 	}
 
 
-	std::streamsize RSAEncryptImpl::transform(
-		const unsigned char* input,
-		std::streamsize		 inputLength,
-		unsigned char*		 output,
-		std::streamsize		 outputLength)
+	std::streamsize RSAEncryptImpl::transform(const unsigned char* input,
+		std::streamsize inputLength,
+		unsigned char* output,
+		std::streamsize outputLength)
 	{
 		// always fill up the buffer before writing!
 		std::streamsize maxSize = static_cast<std::streamsize>(maxDataSize());
@@ -160,9 +159,7 @@ namespace
 			}
 			else
 			{
-				if (missing > inputLength)
-					missing = inputLength;
-
+				if (missing > inputLength) missing = inputLength;
 				std::memcpy(_pBuf + _pos, input, static_cast<std::size_t>(missing));
 				input += missing;
 				_pos += missing;
@@ -195,14 +192,12 @@ namespace
 		
 		std::size_t blockSize() const;
 
-		std::streamsize transform(
-			const unsigned char* input,
-			std::streamsize		 inputLength,
-			unsigned char*		 output,
-			std::streamsize		 outputLength);
+		std::streamsize transform(const unsigned char* input,
+			std::streamsize inputLength,
+			unsigned char* output,
+			std::streamsize outputLength);
 		
-		std::streamsize finalize(
-			unsigned char*	output,
+		std::streamsize finalize(unsigned char*	output,
 			std::streamsize length);
 
 	private:

@@ -76,7 +76,7 @@ const DigestEngine::Digest& RSADigestEngine::signature()
 		if (sigLen < _signature.size())
 			_signature.resize(sigLen);
 	}
-    return _signature;
+	return _signature;
 }
 
 	

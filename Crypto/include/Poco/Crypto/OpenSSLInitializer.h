@@ -21,6 +21,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/CryptoException.h"
 #include "Poco/Mutex.h"
 #include "Poco/AtomicCounter.h"
 #include <openssl/crypto.h>
