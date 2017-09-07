@@ -50,7 +50,6 @@ File appendSemiStaticSuffix(File binaryFile) {
 	}
 	return new File(parent, name.substring(0, extensionSeparatorIndex) + "MD" + name.substring(extensionSeparatorIndex))
 }
-
 File prefixByPoco(File binaryFile) {
 	String name = binaryFile.getName()
 	String prefix = ''
@@ -171,12 +170,10 @@ allprojects {
 	buildDir = new File("root")	            // DO NOT REMOVE OR CHANGE to 'build'
 /*
 	clean.doFirst {
-		file($projectDir, 'bin').delete()
-		file($projectDir, 'bin64').delete() 
-		file($projectDir, 'lib').delete() 
-		file($projectDir, 'lib64').delete() 
-		file($projectDir, 'static').delete() 
-		file($projectDir, 'static64').delete() 
+		file(projectDir, 'bin').delete()
+		file(projectDir, 'bin64').delete() 
+		file(projectDir, 'lib').delete() 
+		file(projectDir, 'lib64').delete() 
 	}
 */
 }
@@ -436,7 +433,7 @@ subprojects {
 			withType(NativeComponentSpec) {
 				targetPlatform "win32"
 				targetPlatform "win64"
-//				targetPlatform "linux32"
+				targetPlatform "linux32"
 				targetPlatform "linux64"
 				targetPlatform "macos"
 
@@ -719,33 +716,6 @@ subprojects {
 	}
 }
 
-task production {
-	dependsOn ':CppUnit:assemble'
-	dependsOn ':Foundation:assemble'
-	dependsOn ':XML:assemble'
-	dependsOn ':JSON:assemble'
-	dependsOn ':Util:assemble'
-	dependsOn ':Net:assemble'
-	dependsOn ':Crypto:assemble'
-	dependsOn ':NetSSL_OpenSSL:assemble'
-	if (os.windows) {
-		dependsOn ':NetSSL_Win:assemble'
-	}
-	dependsOn ':Data:assemble'
-	if (os.windows) {
-		dependsOn ':Data:ODBC:assemble'
-		dependsOn ':Data:SQLite:assemble'
-		dependsOn ':Data:MySQL:assemble'
-		dependsOn ':Data:PostgreSQL:assemble'
-	}
-	dependsOn ':Zip:assemble'
-	dependsOn ':PageCompiler:assemble'
-	dependsOn ':PageCompiler:File2Page:assemble'
-	dependsOn ':PDF:assemble'
-	dependsOn ':MongoDB:assemble'
-	dependsOn ':Redis:assemble'
-}
-
 task PocoDocIni {
     def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
     file.createNewFile()
@@ -786,10 +756,10 @@ task pocoDoc(type: Exec) {
 	dependsOn PocoDocIni
 //	inputs.files(tasks.getByPath(':production').outputs.files)
 	inputs.files(new File(executable))
+	inputs.files(fileTree("doc").filter { it.isFile() })
 	inputs.files(new File("$rootDir/PocoDoc/cfg/mkdoc-poco.xml"))
 	outputs.files(new File("releases/$version-all-doc/index.html"))
 }
-
 task zipDoc(type: Zip) {
 	from "releases/poco-${version}-all-doc/"
 	include '*'
@@ -801,15 +771,12 @@ task zipDoc(type: Zip) {
 //	dependsOn pocoDoc
 }
 
-
-
-
 if (os.windows) {
 }
 
 	def Candle(VSYEAR, VERSION, target) {
 		return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
-			dependsOn ':production'
+//			dependsOn ':poco'
 			dependsOn ':pocoDoc'
 			executable "${WiXHome}/bin/Candle.exe"
 			workingDir "distrib/Windows/WiX"
@@ -818,11 +785,11 @@ if (os.windows) {
 			args "-dVERSION=${VERSION}"
 			args "-dPOCO=${rootDir}"
 			args "-dPlatform=${target}"
-			args "-ext", "${WiX}/bin/WixUIExtension.dll"
+			args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
 			args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 			args "Poco-${VERSION}.wxs"
 			inputs.files(new File(workingDir, "Poco-${VERSION}.wxs"))
-			inputs.files(tasks.getByPath(':production').outputs.files)
+//			inputs.files(tasks.getByPath(':poco').outputs.files)
 			outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
 		}
 	}
@@ -832,7 +799,7 @@ if (os.windows) {
 			executable "${WiXHome}/bin/Light.exe"
 			workingDir "distrib/Windows/WiX"
 			args "-cultures:null"
-			args "-ext", "${WiX}/bin/WixUIExtension.dll"
+			args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
 			args "-out"
 			args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
 			args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
@@ -840,13 +807,13 @@ if (os.windows) {
 			outputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"))
 		}
 	}
-	task WiX() {
+	task wix() {
 		dependsOn 		Light('VS2015', version, 'x86')
 		dependsOn 		Light('VS2015', version, 'x64')
 	}
 
 
-	task NuGet(type: Exec) {
+	task nuget(type: Exec) {
 		executable "${NuGetHome}/NuGet.exe"
 		workingDir "distrib/Windows/NuGet"
 		args "pack"
@@ -856,53 +823,57 @@ if (os.windows) {
 		args "-NonInteractive"
 		args "Pocoproject.Poco.vs140.nuspec"
 		inputs.files(new File(workingDir, "Pocoproject.Poco.vs140.nuspec"))
-		inputs.files(tasks.getByPath(':production').outputs.files)
+//		inputs.files(tasks.getByPath(':poco').outputs.files)
 		outputs.files(new File(workingDir,"Pocoproject.Poco.vs140.${version}.nupkg"))
-		dependsOn ':production'
 	}
 
 task distrib() {
-	dependsOn NuGet
-	dependsOn WiX
+	if (os.windows) {
+		dependsOn nuget
+		dependsOn wix
+	}
 }
+	def get() {
+		def foo = subprojects.tasks.findAll { it.name.contains('poco') }
+		return foo
+	}
+task includes() {
+	doLast {
+		TaskContainer tc;
+//		Task t = tasks.getByPath(':poco');
+//		TaskDependency td = t.taskDependencies;
+//		td.values.each { task -> println task }
+		def ts = subprojects.tasks //.matching { task -> task.name.contains("poco") }
+//		println ts.each { it.matching { task -> task.name.contains("poco") } }
+		def foo = get()
+		println foo
+/*
+		def compileTasks = tasks.withType(CppCompile).matching { Task task -> 
+				String path = task.path;
+				String name = task.name;
+				name.contains("Shared") && name.contains("Release") && name.contains("Win32") && !path.contains("test") && !path.contains("sample")
+		}
+		println compileTasks
+*/
+	}
+}
+/*
+    tasks { t ->
+        $.components.main.binaries.each { binary ->
+            def stripTask = binary.tasks.taskName("strip")
+            t.create(stripTask) {
+                dependsOn binary.tasks.link
+                doFirst {
+                    if (binary.toolChain in Gcc) {
+                        ["strip", binary.tasks.link.outputFile].execute().waitForOrKill(1000)
+                    }
+                }
+            }
+            binary.tasks.build.dependsOn stripTask
+        }
+    }
+*/
 
-task unittest {
-}
-unittest.dependsOn ':CppParser:testsuite:assemble'
-unittest.dependsOn ':Foundation:testsuite:assemble'
-unittest.dependsOn ':XML:testsuite:assemble'
-unittest.dependsOn ':JSON:testsuite:assemble'
-unittest.dependsOn ':Util:testsuite:assemble'
-unittest.dependsOn ':Net:testsuite:assemble'
-unittest.dependsOn ':Crypto:testsuite:assemble'
-unittest.dependsOn ':NetSSL_OpenSSL:testsuite:assemble'
-if (os.windows) {
-	unittest.dependsOn ':NetSSL_Win:testsuite:assemble'
-}
-unittest.dependsOn ':Data:testsuite:assemble'
-if (os.windows) {
-	unittest.dependsOn ':Data:ODBC:testsuite:assemble'
-	unittest.dependsOn ':Data:SQLite:testsuite:assemble'
-//	unittest.dependsOn ':Data:MySQL:testsuite:assemble'
-//	unittest.dependsOn ':Data:PostgreSQL:testsuite:assemble'
-}
-unittest.dependsOn ':Zip:testsuite:assemble'
-//unittest.dependsOn ':MongoDB:testsuite:assemble'
-unittest.dependsOn ':Redis:testsuite:assemble'
 
-task samples {	
-}
-samples.dependsOn ':Foundation:samples:assemble'
-if (os.windows) {
-	samples.dependsOn ':Data:samples:assemble'
-}
-samples.dependsOn ':JSON:samples:assemble'
-samples.dependsOn ':MongoDB:samples:assemble'
-samples.dependsOn ':Net:samples:assemble'
-samples.dependsOn ':PageCompiler:samples:assemble'
-samples.dependsOn ':PDF:samples:assemble'
-samples.dependsOn ':Util:samples:assemble'
-samples.dependsOn ':XML:samples:assemble'
-samples.dependsOn ':Zip:samples:assemble'
 
 
