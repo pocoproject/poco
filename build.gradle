@@ -305,7 +305,7 @@ subprojects {
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
 								dllName = 'libcrypto.so'
-								linkName = 'libcrypto.a'
+								linkName = 'libcrypto.so'
 								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
 								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
@@ -328,7 +328,7 @@ subprojects {
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
 								dllName = 'libcrypto.so'
-								linkName = 'libcrypto.a'
+								linkName = 'libcrypto.so'
 								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
 								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
@@ -396,7 +396,7 @@ subprojects {
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
 								dllName = 'libssl.so'
-								linkName = 'libssl.a'
+								linkName = 'libssl.so'
 								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
 								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
@@ -418,7 +418,7 @@ subprojects {
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
 								dllName = 'libssl.so'
-								linkName = 'libssl.a'
+								linkName = 'libssl.so'
 								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
 								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
@@ -433,7 +433,7 @@ subprojects {
 			withType(NativeComponentSpec) {
 				targetPlatform "win32"
 				targetPlatform "win64"
-				targetPlatform "linux32"
+//				targetPlatform "linux32"
 				targetPlatform "linux64"
 				targetPlatform "macos"
 
