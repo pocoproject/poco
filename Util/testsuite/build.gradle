@@ -82,4 +82,5 @@ model {
         }
 	}
 }
+task testsuite { dependsOn "assemble" }
 

@@ -2,6 +2,8 @@
 	<PocoDoc>
 		<files>
 			<include>
+<!--
+-->
 				${PocoBuild}/*/include/Poco/*.h
 				${PocoBuild}/*/include/Poco/*/*.h
 				${PocoBuild}/*/include/Poco/*/*/*.h
@@ -18,6 +20,7 @@
 				QName.h,
 				CppUnitException.h,
 				RepeatedTest.h,
+<!--
 				Test.h,
 				TestCase.h,
 				TestDecorator.h,
@@ -27,7 +30,7 @@
 				TestSetup.h,
 				TestSuite.h,
 				TextTestResult.h,
-				Connector.h,
+-->
 				Constants.h,
 				inffast.h,
 				${PocoBuild}/PDF/include/*.h,

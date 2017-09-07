@@ -43,5 +43,6 @@ model {
 		}
 	}
 }
+task samples { dependsOn "assemble" }
 
 

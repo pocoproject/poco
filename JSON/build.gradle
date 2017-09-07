@@ -38,4 +38,5 @@ model {
 		}
 	}
 }
+task poco { dependsOn "assemble" }
 

@@ -45,6 +45,11 @@ model {
 		}
 	}
     binaries {
+		all {
+			cppCompiler.define	"THREADSAFE"
+			cppCompiler.define 	"__LCC__"	
+			cppCompiler.define 	"WINVER=0x0600"
+		}
         withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
 			if (toolChain in VisualCpp) {
@@ -64,4 +69,5 @@ model {
         }
 	}
 }
+task testsuite { dependsOn "assemble" }
 

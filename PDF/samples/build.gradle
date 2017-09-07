@@ -7,6 +7,13 @@ model {
 				cpp.lib project: ':Foundation', library: 'Foundation'				
 			}
 		}
+		Text(NativeExecutableSpec) {
+			sources {
+				cpp.source { srcDir 'Image/src' include '**/*.cpp' }
+				cpp.lib project: ':PDF', library: 'PDF'				
+				cpp.lib project: ':Foundation', library: 'Foundation'				
+			}
+		}
 	}
 	binaries {
 		all {
@@ -22,5 +29,6 @@ model {
 		}
 	}
 }
+task samples { dependsOn "assemble" }
 
 

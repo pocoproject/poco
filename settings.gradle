@@ -43,8 +43,8 @@ include ':Data:testsuite'
 if (os.windows) {
 	include ':Data:ODBC:testsuite'
 	include ':Data:SQLite:testsuite'
-//	include ':Data:MySQL:testsuite'
-//	include ':Data:PostgreSQL:testsuite'
+	include ':Data:MySQL:testsuite'
+	include ':Data:PostgreSQL:testsuite'
 }
 //include ':MongoDB:testsuite'
 include ':Redis:testsuite'
@@ -55,6 +55,10 @@ include ':Foundation:samples'
 if (os.windows) {
 	include ':Data:samples'
 }
+include ':NetSSL_OpenSSL:samples'
+if (os.windows) {
+	include ':NetSSL_Win:samples'
+}
 include ':JSON:samples'
 include ':MongoDB:samples'
 include ':Net:samples'
@@ -62,5 +66,6 @@ include ':PageCompiler:samples'
 include ':PDF:samples'
 include ':Util:samples'
 include ':XML:samples'
+include ':SevenZip:samples'
 include ':Zip:samples'
 

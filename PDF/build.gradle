@@ -35,4 +35,5 @@ project(":PDF") {
 		}
 	}
 }
+task poco { dependsOn "assemble" }
 

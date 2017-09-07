@@ -88,6 +88,7 @@ model {
 		all {
 			cppCompiler.define	"THREADSAFE"
 			cppCompiler.define 	"__LCC__"	
+			cppCompiler.define 	"WINVER=0x0600"
 		}
 		withType(SharedLibraryBinarySpec) {
 			if (toolChain in VisualCpp) {
@@ -98,5 +99,6 @@ model {
 		}
 	}
 }
+task poco { dependsOn "assemble" }
 
 
