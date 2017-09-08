@@ -148,7 +148,9 @@
 // A macro expanding to a compiler-specific clause to
 // mark a class or function as deprecated.
 //
-#ifdef _GNUC_
+#if defined(POCO_NO_DEPRECATED)
+#define POCO_DEPRECATED
+#elif defined(_GNUC_)
 #define POCO_DEPRECATED __attribute__((deprecated))
 #elif defined(__clang__)
 #define POCO_DEPRECATED __attribute__((deprecated))

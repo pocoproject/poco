@@ -35,10 +35,10 @@
 
 
 // Define to disable automatic initialization
-// Defining this will disable ALL automatic 
+// Defining this will disable ALL automatic
 // initialization framework-wide (e.g. Net
 // on Windows, all Data back-ends, etc).
-// 
+//
 // #define POCO_NO_AUTOMATIC_LIB_INIT
 
 
@@ -77,19 +77,19 @@
 // #define POCO_THREAD_PRIORITY_MAX 31
 
 
-// Define to disable small object optimization. If not 
+// Define to disable small object optimization. If not
 // defined, Any and Dynamic::Var (and similar optimization
-// candidates) will be auto-allocated on the stack in 
+// candidates) will be auto-allocated on the stack in
 // cases when value holder fits into POCO_SMALL_OBJECT_SIZE
 // (see below).
-// 
+//
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // !!! NOTE: Any/Dynamic::Var SOO will NOT work reliably   !!!
 // !!! without C++11 (std::aligned_storage in particular). !!!
 // !!! Only comment this out if your compiler has support  !!!
 // !!! for std::aligned_storage.                           !!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// 
+//
 #ifndef POCO_ENABLE_SOO
 #define POCO_NO_SOO
 #endif
@@ -117,7 +117,7 @@
 
 
 // No automatic registration of FileChannel in
-// LoggingFactory - avoids FileChannel and friends 
+// LoggingFactory - avoids FileChannel and friends
 // being linked to executable.
 // #define POCO_NO_FILECHANNEL
 
@@ -143,13 +143,13 @@
 // #define POCO_UTIL_NO_INIFILECONFIGURATION
 
 
-// No support for JSON configuration in 
+// No support for JSON configuration in
 // Poco::Util::Application. Avoids linking of JSON
 // library and saves a few 100 Kbytes.
 // #define POCO_UTIL_NO_JSONCONFIGURATION
 
 
-// No support for XML configuration in 
+// No support for XML configuration in
 // Poco::Util::Application. Avoids linking of XML
 // library and saves a few 100 Kbytes.
 // #define POCO_UTIL_NO_XMLCONFIGURATION
@@ -175,6 +175,10 @@
 // Define to prevent changing the suffix for shared libraries
 // to "d.so", "d.dll", etc. for _DEBUG builds in Poco::SharedLibrary.
 // #define POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX
+
+
+// Disarm POCO_DEPRECATED macro.
+// #define POCO_NO_DEPRECATED
 
 
 #endif // Foundation_Config_INCLUDED
