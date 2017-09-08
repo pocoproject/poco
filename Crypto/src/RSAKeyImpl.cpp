@@ -51,7 +51,7 @@ RSAKeyImpl::RSAKeyImpl(const PKCS12Container& cont):
 	KeyPairImpl("ec", KT_EC_IMPL),
 	_pRSA(0)
 {
-	EVPPKey<EC_KEY> key = cont.getKey<EC_KEY>();
+	EVPPKey key = cont.getKey();
 	_pRSA = EVP_PKEY_get1_RSA(key);
 }
 

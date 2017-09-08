@@ -4,7 +4,7 @@
 // $Id: //poco/1.4/Crypto/src/KeyPair.cpp#2 $
 //
 // Library: Crypto
-// Package: RSA
+// Package: CryptoCore
 // Module:  KeyPair
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

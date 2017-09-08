@@ -4,7 +4,7 @@
 // $Id: //poco/1.4/Crypto/include/Poco/Crypto/EVPPKey.h#3 $
 //
 // Library: Crypto
-// Package: EC
+// Package: CryptoCore
 // Module:  EVPPKey
 //
 // Definition of the EVPPKey class.
@@ -21,105 +21,94 @@
 
 
 #include "Poco/Crypto/Crypto.h"
-#include <openssl/objects.h>
+#include "Poco/Crypto/CryptoException.h"
 #include <openssl/ec.h>
+#include <openssl/rsa.h>
+#include <openssl/evp.h>
 
 
 namespace Poco {
 namespace Crypto {
 
 
-template<typename K>
 class EVPPKey
-	/// Utility class for conversion between EVP and native keys.
+	/// Utility class for conversion of native keys to EVP.
 {
 public:
 	EVPPKey() = delete;
 
-	explicit EVPPKey(EVP_PKEY* pEVPPKey):
-		_ownKey(true),
-		_pEVPPKey(pEVPPKey),
-		_ownEVP(false)
-	{
-		getKey(&_pKey);
-	}
+	explicit EVPPKey(EVP_PKEY* pEVPPKey);
+		/// Constructs EVPPKey from EVP_PKEY pointer.
+		/// The content behind the supplied pointer is internally duplicated.
 
-	explicit EVPPKey(K* pKey):
-		_pKey(pKey),
-		_ownKey(false),
-		_pEVPPKey(EVP_PKEY_new()),
-		_ownEVP(true)
+	template<typename K>
+	explicit EVPPKey(K* pKey): _pEVPPKey(EVP_PKEY_new())
+		/// Constructs EVPPKey from a "native" key pointer
+		/// Currently, only RSA and EC keys are supported.
 	{
-		
 		if (!_pEVPPKey) throw OpenSSLException();
-		setKey(_pKey);
+		setKey(pKey);
 	}
 
-	~EVPPKey()
-	{
-		if (_ownEVP && _pEVPPKey)
-			EVP_PKEY_free(_pEVPPKey);
-		if (_ownKey && _pKey) freeKey(&_pKey);
-	}
+	EVPPKey(const EVPPKey& other);
+		/// Copy constructor.
 
-	operator K*()
-	{
-		return _pKey;
-	}
+	EVPPKey(EVPPKey&& other);
+		/// Move constructor.
 
-	operator EVP_PKEY*()
-	{
-		return _pEVPPKey;
-	}
+	EVPPKey& operator=(const EVPPKey& other);
+		/// Assignment operator.
+
+	EVPPKey& operator=(EVPPKey&& other);
+		/// Assignment move operator.
+
+	~EVPPKey();
+		/// Destroys the EVPPKey.
+
+	operator const EVP_PKEY*() const;
+		/// Returns const pointer to the EVP_PKEY structure.
+
+	operator EVP_PKEY*();
+		/// Returns pointer to the EVP_PKEY structure.
 
 private:
-	void setKey(EC_KEY* pKey)
-	{
-		if (!EVP_PKEY_set1_EC_KEY(_pEVPPKey, pKey))
-			throw OpenSSLException();
-	}
+	void duplicate(EVP_PKEY* pEVPPKey);
+	void setKey(EC_KEY* pKey);
+	void setKey(RSA* pKey);
 
-	void setKey(RSA* pKey)
-	{
-		if (!EVP_PKEY_set1_RSA(_pEVPPKey, pKey))
-			throw OpenSSLException();
-	}
-	
-	void getKey(EC_KEY** pKey)
-	{
-		*pKey = EVP_PKEY_get1_EC_KEY(_pEVPPKey);
-		if (!*pKey) throw OpenSSLException();
-	}
-
-	void getKey(RSA** pKey)
-	{
-		*pKey = EVP_PKEY_get1_RSA(_pEVPPKey);
-		if (!*pKey) throw OpenSSLException();
-	}
-
-	void freeKey(RSA** pKey)
-	{
-		if (_ownKey && pKey && *pKey)
-		{
-			RSA_free(*pKey);
-			*pKey = 0;
-		}
-	}
-
-	void freeKey(EC_KEY** pKey)
-	{
-		if (_ownKey && pKey && *pKey)
-		{
-			EC_KEY_free(*pKey);
-			*pKey = 0;
-		}
-	}
-
-	K*        _pKey = nullptr;
-	bool      _ownKey = false;
 	EVP_PKEY* _pEVPPKey = nullptr;
-	bool      _ownEVP = false;
 };
+
+//
+// inlines
+//
+
+inline EVPPKey::operator const EVP_PKEY*() const
+	/// Returns const pointer to the EVP_PKEY structure.
+{
+	return _pEVPPKey;
+}
+
+
+inline EVPPKey::operator EVP_PKEY*()
+	/// Returns pointer to the EVP_PKEY structure.
+{
+	return _pEVPPKey;
+}
+
+
+inline void EVPPKey::setKey(EC_KEY* pKey)
+{
+	if (!EVP_PKEY_set1_EC_KEY(_pEVPPKey, pKey))
+		throw OpenSSLException();
+}
+
+
+inline void EVPPKey::setKey(RSA* pKey)
+{
+	if (!EVP_PKEY_set1_RSA(_pEVPPKey, pKey))
+		throw OpenSSLException();
+}
 
 
 } } // namespace Poco::Crypto

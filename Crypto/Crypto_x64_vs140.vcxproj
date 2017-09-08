@@ -337,6 +337,7 @@ xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*</Command>
     <ClCompile Include="src\DigestEngine.cpp" />
     <ClCompile Include="src\ECKey.cpp" />
     <ClCompile Include="src\ECKeyImpl.cpp" />
+    <ClCompile Include="src\EVPPKey.cpp" />
     <ClCompile Include="src\KeyPair.cpp" />
     <ClCompile Include="src\OpenSSLInitializer.cpp" />
     <ClCompile Include="src\PKCS12Container.cpp" />

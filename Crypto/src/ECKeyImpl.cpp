@@ -56,7 +56,7 @@ ECKeyImpl::ECKeyImpl(const PKCS12Container& cont):
 	KeyPairImpl("ec", KT_EC_IMPL),
 	_pEC(0)
 {
-	EVPPKey<EC_KEY> key = cont.getKey<EC_KEY>();
+	EVPPKey key = cont.getKey();
 	_pEC = EVP_PKEY_get1_EC_KEY(key);
 }
 
@@ -231,7 +231,7 @@ void ECKeyImpl::save(const std::string& publicKeyFile,
 		{
 			if (BIO_write_filename(bio, const_cast<char*>(publicKeyFile.c_str())))
 			{
-				EVPPKey<EC_KEY> pKey(_pEC);
+				EVPPKey pKey(_pEC);
 				if (!PEM_write_bio_PUBKEY(bio, pKey))
 				{
 					throw Poco::WriteFileException("Failed to write public key to file", publicKeyFile);
@@ -255,7 +255,7 @@ void ECKeyImpl::save(const std::string& publicKeyFile,
 		{
 			if (BIO_write_filename(bio, const_cast<char*>(privateKeyFile.c_str())))
 			{
-				EVPPKey<EC_KEY> pKey(_pEC);
+				EVPPKey pKey(_pEC);
 				int rc = 0;
 				if (privateKeyPassphrase.empty())
 				{
@@ -290,7 +290,7 @@ void ECKeyImpl::save(std::ostream* pPublicKeyStream,
 	{
 		BIO* bio = BIO_new(BIO_s_mem());
 		if (!bio) throw Poco::IOException("Cannot create BIO for writing public key");
-		EVPPKey<EC_KEY> pKey(_pEC);
+		EVPPKey pKey(_pEC);
 		if (!PEM_write_bio_PUBKEY(bio, pKey))
 		{
 			BIO_free(bio);
@@ -306,7 +306,7 @@ void ECKeyImpl::save(std::ostream* pPublicKeyStream,
 	{
 		BIO* bio = BIO_new(BIO_s_mem());
 		if (!bio) throw Poco::IOException("Cannot create BIO for writing public key");
-		EVPPKey<EC_KEY> pKey(_pEC);
+		EVPPKey pKey(_pEC);
 		int rc = 0;
 		if (privateKeyPassphrase.empty())
 			rc = PEM_write_bio_PrivateKey(bio, pKey, 0, 0, 0, 0, 0);

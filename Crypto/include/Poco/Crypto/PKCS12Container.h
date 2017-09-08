@@ -57,10 +57,9 @@ public:
 	~PKCS12Container();
 		/// Destroys the PKCS12Container.
 
-	template <typename K>
-	EVPPKey<K> getKey() const
+	EVPPKey getKey() const
 	{
-		return EVPPKey<K>(_pKey);
+		return EVPPKey(_pKey);
 	}
 
 	bool hasX509Certificate() const;

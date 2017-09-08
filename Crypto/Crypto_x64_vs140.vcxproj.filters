@@ -188,6 +188,9 @@
     <ClCompile Include="src\KeyPair.cpp">
       <Filter>CryptoCore\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\EVPPKey.cpp">
+      <Filter>CryptoCore\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc" />

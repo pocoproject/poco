@@ -4,7 +4,7 @@
 // $Id: //poco/1.4/Crypto/include/Poco/Crypto/KeyPairImpl.h#3 $
 //
 // Library: Crypto
-// Package: RSA
+// Package: CryptoCore
 // Module:  KeyPairImpl
 //
 // Definition of the KeyPairImpl class.
