@@ -309,7 +309,7 @@ void PageReader::nextToken(std::istream& istr, std::string& token)
 
 void PageReader::handleAttribute(const std::string& name, const std::string& value)
 {
-	if (name == "include.page")
+	if (name == "include.page" || name == "include.file")
 	{
 		include(value);
 	}
@@ -341,14 +341,14 @@ void PageReader::include(const std::string& path)
 	Poco::Path currentPath(_path);
 	Poco::Path includePath(path);
 	currentPath.resolve(includePath);
-	
+
 	_page.handler() << "\t// begin include " << currentPath.toString() << "\n";
-	
+
 	Poco::FileInputStream includeStream(currentPath.toString());
 	PageReader includeReader(*this, currentPath.toString());
 	includeReader.emitLineDirectives(_emitLineDirectives);
 	includeReader.parse(includeStream);
-	
+
 	_page.handler() << "\t// end include " << currentPath.toString() << "\n";
 }
 
