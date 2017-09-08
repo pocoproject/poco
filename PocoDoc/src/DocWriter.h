@@ -191,7 +191,10 @@ protected:
 	static Poco::Logger& logger();
 	
 	static const std::string RFC_URI;
-	
+	static const std::string nbsp;
+	static const std::string copy;
+	static const std::string mdash;
+
 private:	
 	bool _prettifyCode;
 	bool _noFrames;
