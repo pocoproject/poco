@@ -23,6 +23,7 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Path.h"
 #include <istream>
 #include <openssl/pkcs12.h>
@@ -56,9 +57,10 @@ public:
 	~PKCS12Container();
 		/// Destroys the PKCS12Container.
 
-	const EVP_PKEY* getPrivateKey() const
+	template <typename K>
+	EVPPKey<K> getKey() const
 	{
-		return _pKey;
+		return EVPPKey<K>(_pKey);
 	}
 
 	bool hasX509Certificate() const;

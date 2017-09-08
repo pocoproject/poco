@@ -23,74 +23,46 @@ namespace Crypto {
 
 
 ECKey::ECKey(const X509Certificate& cert):
-	_pImpl(new ECKeyImpl(cert))
+	KeyPair(new ECKeyImpl(cert)),
+	_pImpl(KeyPair::impl().cast<ECKeyImpl>())
 {
 }
 
 
-ECKey::ECKey(int eccGroup): _pImpl(0)
-{
-	_pImpl = new ECKeyImpl(eccGroup);
-}
-
-
-ECKey::ECKey(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase):
-	_pImpl(new ECKeyImpl(publicKeyFile, privateKeyFile, privateKeyPassphrase))
+ECKey::ECKey(const PKCS12Container& cont):
+	KeyPair(new ECKeyImpl(cont)),
+	_pImpl(KeyPair::impl().cast<ECKeyImpl>())
 {
 }
 
 
-ECKey::ECKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase):
-	_pImpl(new ECKeyImpl(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase))
+ECKey::ECKey(const std::string& eccGroup):
+	KeyPair(new ECKeyImpl(OBJ_txt2nid(eccGroup.c_str()))),
+	_pImpl(KeyPair::impl().cast<ECKeyImpl>())
+{
+}
+
+
+ECKey::ECKey(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
+	const std::string& privateKeyPassphrase):
+		KeyPair(new ECKeyImpl(publicKeyFile, privateKeyFile, privateKeyPassphrase)),
+		_pImpl(KeyPair::impl().cast<ECKeyImpl>())
+{
+}
+
+
+ECKey::ECKey(std::istream* pPublicKeyStream,
+	std::istream* pPrivateKeyStream,
+	const std::string& privateKeyPassphrase):
+		KeyPair(new ECKeyImpl(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase)),
+		_pImpl(KeyPair::impl().cast<ECKeyImpl>())
 {
 }
 
 
 ECKey::~ECKey()
 {
-}
-
-
-int ECKey::size() const
-{
-	return _pImpl->size();
-}
-
-/*
-ECKeyImpl::ByteVec ECKey::modulus() const
-{
-	return _pImpl->modulus();
-}
-
-
-ECKeyImpl::ByteVec ECKey::encryptionExponent() const
-{
-	return _pImpl->encryptionExponent();
-}
-
-
-ECKeyImpl::ByteVec ECKey::decryptionExponent() const
-{
-	return _pImpl->decryptionExponent();
-}
-*/
-
-void ECKey::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
-{
-	_pImpl->save(publicKeyFile, privateKeyFile, privateKeyPassphrase);
-}
-
-
-void ECKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream, const std::string& privateKeyPassphrase)
-{
-	_pImpl->save(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase);
-}
-
-
-const std::string& ECKey::name() const
-{
-	static const std::string EC("ec");
-	return EC;
 }
 
 

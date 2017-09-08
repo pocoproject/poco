@@ -21,6 +21,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/KeyPair.h"
 #include "Poco/Crypto/ECKeyImpl.h"
 
 
@@ -29,9 +30,10 @@ namespace Crypto {
 
 
 class X509Certificate;
+class PKCS12Container;
 
 
-class Crypto_API ECKey
+class Crypto_API ECKey : public KeyPair
 	/// This class stores an EC key pair, consisting
 	/// of private and public key. Storage of the private
 	/// key is optional.
@@ -41,14 +43,17 @@ class Crypto_API ECKey
 	/// or computing secure digital signatures.
 {
 public:
-	explicit ECKey(const X509Certificate& cert);
+	ECKey(const X509Certificate& cert);
 		/// Extracts the EC public key from the given certificate.
 
-	ECKey(int eccGroup);
+	ECKey(const PKCS12Container& cert);
+		/// Extracts the EC private key from the given certificate.
+
+	ECKey(const std::string& eccGroup);
 		/// Creates the ECKey. Creates a new public/private keypair using the given parameters.
 		/// Can be used to sign data and verify signatures.
 
-	ECKey(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
+	ECKey(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase = "");
 		/// Creates the ECKey, by reading public and private key from the given files and
 		/// using the given passphrase for the private key.
 		///
@@ -69,35 +74,8 @@ public:
 	~ECKey();
 		/// Destroys the ECKey.
 
-	int size() const;
-		/// Returns the EC modulus size.
-/*
-	ECKeyImpl::ByteVec modulus() const;
-		/// Returns the EC modulus.
-
-	ECKeyImpl::ByteVec encryptionExponent() const;
-		/// Returns the EC encryption exponent.
-
-	ECKeyImpl::ByteVec decryptionExponent() const;
-		/// Returns the EC decryption exponent.
-		*/
-	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
-		/// Exports the public and private keys to the given files. 
-		///
-		/// If an empty filename is specified, the corresponding key
-		/// is not exported.
-
-	void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
-		/// Exports the public and private key to the given streams.
-		///
-		/// If a null pointer is passed for a stream, the corresponding
-		/// key is not exported.
-
 	ECKeyImpl::Ptr impl() const;
 		/// Returns the impl object.
-
-	const std::string& name() const;
-		/// Returns "rsa"
 	
 private:
 	ECKeyImpl::Ptr _pImpl;

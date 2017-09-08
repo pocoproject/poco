@@ -15,7 +15,7 @@
 
 
 #include "Poco/Crypto/DigestEngine.h"
-#include "Poco/Exception.h"
+#include "Poco/Crypto/CryptoException.h"
 
 
 namespace Poco {
@@ -27,7 +27,7 @@ DigestEngine::DigestEngine(const std::string& name):
 	_pContext(EVP_MD_CTX_create())
 {
 	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
-	if (!md) throw Poco::NotFoundException(_name);
+	if (!md) throw OpenSSLException(_name);
 	EVP_DigestInit_ex(_pContext, md, NULL);	
 }
 

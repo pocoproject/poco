@@ -21,6 +21,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/KeyPairImpl.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
@@ -30,29 +31,27 @@
 #include <openssl/objects.h>
 #include <openssl/ec.h>
 
-/*
-struct bignum_st;
-struct rsa_st;
-typedef struct bignum_st BIGNUM;
-typedef struct rsa_st EC;
-*/
 
 namespace Poco {
 namespace Crypto {
 
 
 class X509Certificate;
+class PKCS12Container;
 
 
-class ECKeyImpl: public Poco::RefCountedObject
+class ECKeyImpl: public KeyPairImpl
 	/// class ECKeyImpl
 {
 public:
 	typedef Poco::AutoPtr<ECKeyImpl> Ptr;
 	typedef std::vector<unsigned char> ByteVec;
 
-	explicit ECKeyImpl(const X509Certificate& cert);
+	ECKeyImpl(const X509Certificate& cert);
 		/// Extracts the EC public key from the given certificate.
+
+	ECKeyImpl(const PKCS12Container& cert);
+		/// Extracts the EC private key from the given certificate.
 
 	ECKeyImpl(int eccGroup);
 		/// Creates the ECKey of the specified group. Creates a new public/private keypair using the given parameters.
@@ -99,18 +98,6 @@ public:
 		/// key is not exported.
 
 private:
-	class EVPPKey
-	{
-	public:
-		EVPPKey() = delete;
-		EVPPKey(EC_KEY* pEC);
-		~EVPPKey();
-		operator EVP_PKEY*();
-
-	private:
-		EC_KEY*   _pEC = nullptr;
-		EVP_PKEY* _pKey = nullptr;
-	};
 
 	static int passCB(char* buf, int size, int, void* pass);
 	bool loadKey(const std::string& keyFile, const std::string& pass = "");
@@ -119,10 +106,8 @@ private:
 
 	static ByteVec convertToByteVec(const BIGNUM* bn);
 
-private:
 	EC_KEY* _pEC;
 	int _eccGroup = -1;
-	OpenSSLInitializer _openSSLInitializer;
 };
 
 

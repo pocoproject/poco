@@ -16,6 +16,7 @@
 
 #include "Poco/Crypto/RSAKeyImpl.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/PKCS12Container.h"
 #include "Poco/FileStream.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
@@ -31,16 +32,32 @@ namespace Poco {
 namespace Crypto {
 
 
-RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert): _pRSA(0)
+RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert): KeyPairImpl("rsa", KT_RSA_IMPL),
+	_pRSA(0)
 {
 	const X509* pCert = cert.certificate();
 	EVP_PKEY* pKey = X509_get_pubkey(const_cast<X509*>(pCert));
-	_pRSA = EVP_PKEY_get1_RSA(pKey);
-	EVP_PKEY_free(pKey);
+	if (pKey)
+	{
+		_pRSA = EVP_PKEY_get1_RSA(pKey);
+		EVP_PKEY_free(pKey);
+	}
+	else
+		throw OpenSSLException("RSAKeyImpl(const X509Certificate&)");
 }
 
 
-RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent): _pRSA(0)
+RSAKeyImpl::RSAKeyImpl(const PKCS12Container& cont):
+	KeyPairImpl("ec", KT_EC_IMPL),
+	_pRSA(0)
+{
+	EVPPKey<EC_KEY> key = cont.getKey<EC_KEY>();
+	_pRSA = EVP_PKEY_get1_RSA(key);
+}
+
+
+RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent): KeyPairImpl("rsa", KT_RSA_IMPL),
+	_pRSA(0)
 {
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L
 	_pRSA = RSA_new();
@@ -67,8 +84,9 @@ RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent): _pRSA(0)
 
 
 RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile, 
-		const std::string& privateKeyFile, 
-		const std::string& privateKeyPassphrase): _pRSA(0)
+	const std::string& privateKeyFile, 
+	const std::string& privateKeyPassphrase): KeyPairImpl("rsa", KT_RSA_IMPL),
+		_pRSA(0)
 {
 	poco_assert_dbg(_pRSA == 0);
 	
@@ -133,7 +151,8 @@ RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile,
 
 RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream,
 	std::istream* pPrivateKeyStream,
-	const std::string& privateKeyPassphrase): _pRSA(0)
+	const std::string& privateKeyPassphrase): KeyPairImpl("rsa", KT_RSA_IMPL),
+		_pRSA(0)
 {
 	poco_assert_dbg(_pRSA == 0);
 	

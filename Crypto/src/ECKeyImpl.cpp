@@ -16,6 +16,8 @@
 
 #include "Poco/Crypto/ECKeyImpl.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/PKCS12Container.h"
+#include "Poco/Crypto/EVPPKey.h"
 #include "Poco/FileStream.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
@@ -31,28 +33,9 @@ namespace Poco {
 namespace Crypto {
 
 
-ECKeyImpl::EVPPKey::EVPPKey(EC_KEY* pEC) : _pEC(pEC)
-{
-	_pKey = EVP_PKEY_new();
-	if (_pKey)
-	{
-		if (!EVP_PKEY_set1_EC_KEY(_pKey, _pEC))
-			throw OpenSSLException();
-	}
-}
-
-ECKeyImpl::EVPPKey::~EVPPKey()
-{
-	if (_pKey) EVP_PKEY_free(_pKey);
-}
-
-ECKeyImpl::EVPPKey::operator EVP_PKEY*()
-{
-	return _pKey;
-}
-
-
-ECKeyImpl::ECKeyImpl(const X509Certificate& cert): _pEC(0)
+ECKeyImpl::ECKeyImpl(const X509Certificate& cert):
+	KeyPairImpl("ec", KT_EC_IMPL),
+	_pEC(0)
 {
 	const X509* pCert = cert.certificate();
 	if (pCert)
@@ -65,11 +48,22 @@ ECKeyImpl::ECKeyImpl(const X509Certificate& cert): _pEC(0)
 			return;
 		}
 	}
-	throw OpenSSLException("ECKeyImpl::ECKeyImpl(const X509Certificate&)");
+	throw OpenSSLException("ECKeyImpl(const X509Certificate&)");
 }
 
 
-ECKeyImpl::ECKeyImpl(int eccGroup): _eccGroup(eccGroup),
+ECKeyImpl::ECKeyImpl(const PKCS12Container& cont):
+	KeyPairImpl("ec", KT_EC_IMPL),
+	_pEC(0)
+{
+	EVPPKey<EC_KEY> key = cont.getKey<EC_KEY>();
+	_pEC = EVP_PKEY_get1_EC_KEY(key);
+}
+
+
+ECKeyImpl::ECKeyImpl(int eccGroup):
+	KeyPairImpl("ec", KT_EC_IMPL),
+	_eccGroup(eccGroup),
 	_pEC(EC_KEY_new_by_curve_name(eccGroup))
 {
 	if (!(EC_KEY_generate_key(_pEC)))
@@ -79,7 +73,9 @@ ECKeyImpl::ECKeyImpl(int eccGroup): _eccGroup(eccGroup),
 
 ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile, 
 		const std::string& privateKeyFile, 
-		const std::string& privateKeyPassphrase): _pEC(0)
+		const std::string& privateKeyPassphrase):
+		KeyPairImpl("ec", KT_EC_IMPL),
+		_pEC(0)
 {
 	if (loadKey(privateKeyFile, privateKeyPassphrase))
 		return; // private key is enough
@@ -91,7 +87,9 @@ ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile,
 
 ECKeyImpl::ECKeyImpl(std::istream* pPublicKeyStream,
 	std::istream* pPrivateKeyStream,
-	const std::string& privateKeyPassphrase): _pEC(0)
+	const std::string& privateKeyPassphrase):
+		KeyPairImpl("ec", KT_EC_IMPL),
+		_pEC(0)
 {
 	if (loadKey(pPrivateKeyStream, privateKeyPassphrase))
 		return; // private key is enough
@@ -233,7 +231,7 @@ void ECKeyImpl::save(const std::string& publicKeyFile,
 		{
 			if (BIO_write_filename(bio, const_cast<char*>(publicKeyFile.c_str())))
 			{
-				EVPPKey pKey(_pEC);
+				EVPPKey<EC_KEY> pKey(_pEC);
 				if (!PEM_write_bio_PUBKEY(bio, pKey))
 				{
 					throw Poco::WriteFileException("Failed to write public key to file", publicKeyFile);
@@ -257,7 +255,7 @@ void ECKeyImpl::save(const std::string& publicKeyFile,
 		{
 			if (BIO_write_filename(bio, const_cast<char*>(privateKeyFile.c_str())))
 			{
-				EVPPKey pKey(_pEC);
+				EVPPKey<EC_KEY> pKey(_pEC);
 				int rc = 0;
 				if (privateKeyPassphrase.empty())
 				{
@@ -292,7 +290,7 @@ void ECKeyImpl::save(std::ostream* pPublicKeyStream,
 	{
 		BIO* bio = BIO_new(BIO_s_mem());
 		if (!bio) throw Poco::IOException("Cannot create BIO for writing public key");
-		EVPPKey pKey(_pEC);
+		EVPPKey<EC_KEY> pKey(_pEC);
 		if (!PEM_write_bio_PUBKEY(bio, pKey))
 		{
 			BIO_free(bio);
@@ -308,7 +306,7 @@ void ECKeyImpl::save(std::ostream* pPublicKeyStream,
 	{
 		BIO* bio = BIO_new(BIO_s_mem());
 		if (!bio) throw Poco::IOException("Cannot create BIO for writing public key");
-		EVPPKey pKey(_pEC);
+		EVPPKey<EC_KEY> pKey(_pEC);
 		int rc = 0;
 		if (privateKeyPassphrase.empty())
 			rc = PEM_write_bio_PrivateKey(bio, pKey, 0, 0, 0, 0, 0);
