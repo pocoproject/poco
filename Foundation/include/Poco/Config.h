@@ -187,4 +187,8 @@
 // #define POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX
 
 
+// Disarm POCO_DEPRECATED macro.
+// #define POCO_NO_DEPRECATED
+
+
 #endif // Foundation_Config_INCLUDED
