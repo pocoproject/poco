@@ -1,8 +1,6 @@
 //
 // RotateStrategy.cpp
 //
-// $Id: //poco/1.4/Foundation/src/RotateStrategy.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  FileChannel

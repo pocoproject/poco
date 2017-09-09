@@ -1,8 +1,6 @@
 //
 // RecordSet.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RecordSet.h#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RecordSet

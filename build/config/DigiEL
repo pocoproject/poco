@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/DigiEL#4 $
-#
 # DigiEL
 #
 # Make settings for Digi Embedded Linux 4 (gcc 4.0.3, uclibc 0.9.28)

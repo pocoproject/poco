@@ -1,8 +1,6 @@
 //
 // StreamSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/StreamSocket.h#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  StreamSocket

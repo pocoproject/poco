@@ -1,8 +1,6 @@
 //
 // NamedEvent_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NamedEvent_UNIX.cpp#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedEvent

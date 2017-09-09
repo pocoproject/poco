@@ -1,8 +1,6 @@
 //
 // File.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/File.h#3 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File

@@ -1,8 +1,6 @@
 //
 // ODBCStatementImpl.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCStatementImpl.h#5 $
-//
 // Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCStatementImpl

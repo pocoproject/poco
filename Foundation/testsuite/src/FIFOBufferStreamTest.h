@@ -1,8 +1,6 @@
 //
 // FIFOBufferStreamTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FIFOBufferStreamTest.h#1 $
-//
 // Definition of the FIFOBufferStreamTest class.
 //
 // Copyright (c) 2009, Applied Informatics Software Engineering GmbH.

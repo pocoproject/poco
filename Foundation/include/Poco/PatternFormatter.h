@@ -1,8 +1,6 @@
 //
 // PatternFormatter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/PatternFormatter.h#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  PatternFormatter

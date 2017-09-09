@@ -1,8 +1,6 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/Binder.cpp#4 $
-//
 // Library: Data/ODBC
 // Package: ODBC
 // Module:  Binder

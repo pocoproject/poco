@@ -1,8 +1,6 @@
 //
 // ODBCStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/ODBCStatementImpl.cpp#8 $
-//
 // Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCStatementImpl

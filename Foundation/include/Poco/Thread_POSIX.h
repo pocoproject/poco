@@ -1,8 +1,6 @@
 //
 // Thread_POSIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread_POSIX.h#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread

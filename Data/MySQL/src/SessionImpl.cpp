@@ -1,8 +1,6 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/SessionImpl.cpp#1 $
-//
 // Library: Data/MySQL
 // Package: MySQL
 // Module:  SessionImpl

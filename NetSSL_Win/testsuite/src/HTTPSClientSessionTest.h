@@ -1,8 +1,6 @@
 //
 // HTTPSClientSessionTest.h
 //
-// $Id: //poco/1.4/NetSSL_Win/testsuite/src/HTTPSClientSessionTest.h#1 $
-//
 // Definition of the HTTPSClientSessionTest class.
 //
 // Copyright (c) 2006-2014, Applied Informatics Software Engineering GmbH.

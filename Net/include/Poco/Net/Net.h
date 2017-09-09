@@ -1,8 +1,6 @@
 //
 // Net.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/Net.h#2 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  Net

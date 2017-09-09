@@ -2610,7 +2610,3 @@ The release does not contain all features planned for the later 1.0 release
 (the NET library is missing, for example), but is already quite usable.
 Please refer to the README file for more information and instructions for
 building the libraries.
-
-
---
-$Id: //poco/1.4/dist/CHANGELOG#59 $

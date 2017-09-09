@@ -1,8 +1,6 @@
 //
 // RowFilter.cpp
 //
-// $Id: //poco/Main/Data/src/RowFilter.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RowFilter

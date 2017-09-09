@@ -1,8 +1,6 @@
 //
 // SharedLibrary_VMS.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SharedLibrary_VMS.h#2 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary

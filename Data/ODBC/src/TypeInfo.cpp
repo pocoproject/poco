@@ -1,8 +1,6 @@
 //
 // TypeInfo.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/TypeInfo.cpp#1 $
-//
 // Library: Data/ODBC
 // Package: ODBC
 // Module:  TypeInfo

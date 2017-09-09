@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/iPhone-clang-libc++#2 $
-#
 # iPhone-clang-libc++
 #
 # Build settings for iPhone OS, using Apple's iPhone SDK

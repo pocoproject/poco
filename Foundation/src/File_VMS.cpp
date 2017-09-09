@@ -1,8 +1,6 @@
 //
 // File_VMS.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_VMS.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File

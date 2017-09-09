@@ -1,8 +1,6 @@
 //
 // Path_WIN32U.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path_WIN32U.cpp#2 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  Path

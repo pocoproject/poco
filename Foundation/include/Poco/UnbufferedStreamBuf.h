@@ -1,8 +1,6 @@
 //
 // UnufferedStreamBuf.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UnbufferedStreamBuf.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  StreamBuf

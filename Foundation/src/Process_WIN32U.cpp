@@ -1,8 +1,6 @@
 //
 // Process_WIN32U.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_WIN32U.cpp#4 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process

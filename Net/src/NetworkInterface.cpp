@@ -1,8 +1,6 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#9 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  NetworkInterface

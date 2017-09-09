@@ -1,8 +1,6 @@
 //
 // FIFOEventTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FIFOEventTest.h#1 $
-//
 // Definition of the FIFOEventTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // Text.cpp
 //
-// $Id: //poco/Main/PDF/samples/Text/src/Text.cpp#1 $
-//
 // This sample demonstrates the Data library.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.

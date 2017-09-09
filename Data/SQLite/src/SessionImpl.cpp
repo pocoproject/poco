@@ -1,8 +1,6 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/SessionImpl.cpp#5 $
-//
 // Library: Data/SQLite
 // Package: SQLite
 // Module:  SessionImpl

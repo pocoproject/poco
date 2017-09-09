@@ -1,8 +1,6 @@
 //
 // dict.cpp
 //
-// $Id: //poco/1.4/Net/samples/dict/src/dict.cpp#1 $
-//
 // This sample demonstrates the StreamSocket and SocketStream classes.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

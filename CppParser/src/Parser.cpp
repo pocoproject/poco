@@ -1,8 +1,6 @@
 //
 // Parser.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Parser.cpp#2 $
-//
 // Library: CppParser
 // Package: CppParser
 // Module:  Parser

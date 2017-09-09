@@ -1,8 +1,6 @@
 //
 // HTTPStreamFactory.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPStreamFactory.h#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPStreamFactory

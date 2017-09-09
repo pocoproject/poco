@@ -1,8 +1,6 @@
 //
 // DateTime.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DateTime.cpp#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  DateTime

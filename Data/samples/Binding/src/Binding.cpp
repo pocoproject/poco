@@ -1,8 +1,6 @@
 //
 // Binding.cpp
 //
-// $Id: //poco/Main/Data/samples/Binding/src/Binding.cpp#2 $
-//
 // This sample demonstrates the Data library.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

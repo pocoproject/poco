@@ -1,8 +1,6 @@
 //
 // ZipDataInfo.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipDataInfo.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipDataInfo

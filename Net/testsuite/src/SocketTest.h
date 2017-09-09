@@ -1,8 +1,6 @@
 //
 // SocketTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/SocketTest.h#1 $
-//
 // Definition of the SocketTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

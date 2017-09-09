@@ -1,8 +1,6 @@
 //
 // Optional.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Optional.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Optional

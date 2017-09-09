@@ -1,8 +1,6 @@
 //
 // WebSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocket.cpp#8 $
-//
 // Library: Net
 // Package: WebSocket
 // Module:  WebSocket

@@ -1,8 +1,6 @@
 //
 // UniqueExpireLRUCache.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UniqueExpireLRUCache.h#1 $
-//
 // Library: Foundation
 // Package: Cache
 // Module:  UniqueExpireLRUCache

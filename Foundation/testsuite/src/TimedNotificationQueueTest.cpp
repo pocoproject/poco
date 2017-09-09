@@ -1,8 +1,6 @@
 //
 // TimedNotificationQueueTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TimedNotificationQueueTest.cpp#1 $
-//
 // Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

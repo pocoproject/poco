@@ -1,8 +1,6 @@
 //
 // TestFailure.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestFailure.cpp#1 $
-//
 
 
 #include "CppUnit/TestFailure.h"

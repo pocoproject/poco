@@ -9,7 +9,7 @@ a large number of useful utility classes, such various stream buffer and stream
 classes, URI handling, and many more.
 The XML library contains an XML parser with SAX2 and DOM interfaces,
 as well as an XMLWriter.
-The Util library contains classes for working with configuration files and 
+The Util library contains classes for working with configuration files and
 command line arguments, as well as various utility classes.
 The Net library contains network classes (sockets, HTTP client/server, etc.).
 All libraries come with a test suite and a number of sample programs.
@@ -88,47 +88,47 @@ The following libraries require third-party software (header files and
 libraries) being installed to build properly:
 
 - NetSSL_OpenSSL and Crypt require OpenSSL.
-- Data/ODBC requires ODBC 
+- Data/ODBC requires ODBC
   (Microsoft ODBC on Windows, unixODBC or iODBC on Unix/Linux)
 - Data/MySQL requires the MySQL client.
 
-Most Unix/Linux systems already have OpenSSL preinstalled. If your system 
-does not have OpenSSL, please get it from http://www.openssl.org or 
-another source. You do not have to build OpenSSL yourself - a binary 
+Most Unix/Linux systems already have OpenSSL preinstalled. If your system
+does not have OpenSSL, please get it from http://www.openssl.org or
+another source. You do not have to build OpenSSL yourself - a binary
 distribution is fine (e.g., apt-get install openssl libssl-dev).
 
-The easiest way to install OpenSSL on Windows is to use a binary 
-(prebuild) release, for example the one from Shining Light 
+The easiest way to install OpenSSL on Windows is to use a binary
+(prebuild) release, for example the one from Shining Light
 Productions that comes with a Windows installer
-(http://www.slproweb.com/products/Win32OpenSSL.html). 
-Depending on where you have installed the OpenSSL libraries, 
-you might have to edit the build script (buildwin.cmd), or add the 
+(http://www.slproweb.com/products/Win32OpenSSL.html).
+Depending on where you have installed the OpenSSL libraries,
+you might have to edit the build script (buildwin.cmd), or add the
 necessary paths to the INCLUDE and LIB environment variables.
 
-The Data library requires ODBC support on your system if you want 
-to build the ODBC connector (which is the default). On Windows 
-platforms, ODBC should be readily available if you have the 
-Windows SDK. On Unix/Linux platforms, you can use iODBC 
-(preinstalled on Mac OS X) or unixODBC. For the MySQL connector, 
+The Data library requires ODBC support on your system if you want
+to build the ODBC connector (which is the default). On Windows
+platforms, ODBC should be readily available if you have the
+Windows SDK. On Unix/Linux platforms, you can use iODBC
+(preinstalled on Mac OS X) or unixODBC. For the MySQL connector,
 the MySQL client libraries and header files are required.
 
-The Data/ODBC and Data/MySQL Makefiles will search for the ODBC 
-and MySQL headers and libraries in various places. Nevertheless, 
-the Makefiles may not be able to find the headers and libraries. 
-In this case, please edit the Makefile in Data/ODBC and/or Data/MySQL 
+The Data/ODBC and Data/MySQL Makefiles will search for the ODBC
+and MySQL headers and libraries in various places. Nevertheless,
+the Makefiles may not be able to find the headers and libraries.
+In this case, please edit the Makefile in Data/ODBC and/or Data/MySQL
 accordingly.
 
 
 BUILDING ON WINDOWS
 ===================
 
-Microsoft Visual Studio 7.1 (2003), 8.0 (2005), 9.0 (2008) or 10.0 (2010) is required to 
-build the POCO C++ Libraries on Windows platforms. Solution and project files for all 
+Microsoft Visual Studio 7.1 (2003), 8.0 (2005), 9.0 (2008) or 10.0 (2010) is required to
+build the POCO C++ Libraries on Windows platforms. Solution and project files for all
 versions are included. For Visual Studio 2008 and 2010, 64-bit (x64) builds are
 supported as well.
 You can either build from within Visual Studio (Build->Batch Build->Select All;Rebuild)
 or from the command line. To build from the command line, start the
-Visual Studio .NET 2003 (or 2005/2008/2010) Command Prompt and cd to the directory where you 
+Visual Studio .NET 2003 (or 2005/2008/2010) Command Prompt and cd to the directory where you
 have extracted the POCO C++ Libraries sources. Then, simply start the buildwin.cmd script
 and pass as argument the version of visual studio (71, 80, 90 or 100). You can customize
 what is being built by buildwin.cmd by passing appropriate command line arguments to
@@ -142,7 +142,7 @@ to other libraries. Since the build script does not know where to find the neces
 header files and import libraries, you have to either add the header file paths to
 the INCLUDE environment variable and the library path to the LIB environment variable,
 or you'll have to edit the buildwin.cmd script, where these environment variables can
-be set as well. 
+be set as well.
 
 In order to run the test suite and the samples, the top-most bin directory containing
 the shared libraries must be in the PATH environment variable.
@@ -165,10 +165,10 @@ BUILDING ON UNIX/LINUX/MAC OS X
 ===============================
 
 For building on Unix platforms, the POCO C++ Libraries come with their own
-build system. The build system is based on GNU Make 3.80 (or newer), with the help 
-from a few shell scripts. If you do not have GNU Make 3.80 (or later) installed on 
-your machine, you will need to download it from 
-http://directory.fsf.org/devel/build/make.html>, 
+build system. The build system is based on GNU Make 3.80 (or newer), with the help
+from a few shell scripts. If you do not have GNU Make 3.80 (or later) installed on
+your machine, you will need to download it from
+http://directory.fsf.org/devel/build/make.html>,
 build and install it prior to building the POCO C++ Libraries.
 
 You can check the version of GNU Make installed on your system with
@@ -216,7 +216,7 @@ To build on Mac OS X 10.3 with GCC 3, do the following:
 
 IMPORTANT: Make sure that the path to the build directory does not
 contain symbolic links. Furthermore, on Mac OS X (or other systems
-with case insensitive filesystems), make sure that the characters in 
+with case insensitive filesystems), make sure that the characters in
 the path have the correct case. Otherwise you'll get an error saying
 "Current working directory not under $PROJECT_BASE.".
 
@@ -288,7 +288,3 @@ MORE INFORMATION
 
 For more information, see the POCO C++ Libraries website
 at <http://pocoproject.org>.
-
-
---
-$Id: //poco/1.4/dist/README#4 $

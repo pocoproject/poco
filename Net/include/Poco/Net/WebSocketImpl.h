@@ -1,8 +1,6 @@
 //
 // WebSocketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocketImpl.h#5 $
-//
 // Library: Net
 // Package: WebSocket
 // Module:  WebSocketImpl

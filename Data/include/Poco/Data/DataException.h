@@ -1,8 +1,6 @@
 //
 // DataException.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/DataException.h#8 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  DataException

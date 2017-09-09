@@ -1,7 +1,5 @@
 #! /bin/bash
 #
-# $Id: //poco/1.4/release/script/mkrelease#8 $
-#
 # mkrelease
 #
 # Create a release for distribution.

@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/PDF/testsuite/Makefile#7 $
-#
 # Makefile for Poco PDF testsuite
 #
 

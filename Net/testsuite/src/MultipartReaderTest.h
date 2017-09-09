@@ -1,8 +1,6 @@
 //
 // MultipartReaderTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/MultipartReaderTest.h#1 $
-//
 // Definition of the MultipartReaderTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
