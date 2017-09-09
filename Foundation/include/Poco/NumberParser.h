@@ -1,8 +1,6 @@
 //
 // NumberParser.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NumberParser.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  NumberParser

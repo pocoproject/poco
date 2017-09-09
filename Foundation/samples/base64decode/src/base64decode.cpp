@@ -1,8 +1,6 @@
 //
 // base64decode.cpp
 //
-// $Id: //poco/1.4/Foundation/samples/base64decode/src/base64decode.cpp#1 $
-//
 // This sample demonstrates the Base64Decoder and StreamCopier classes.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

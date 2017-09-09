@@ -1,8 +1,6 @@
 //
 // TestRunnerDlg.h
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/TestRunnerDlg.h#1 $
-//
 
 
 #ifndef TestRunnerDlg_INCLUDED

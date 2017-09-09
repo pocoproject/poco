@@ -1,8 +1,6 @@
 //
 // RowIterator.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RowIterator.h#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RowIterator

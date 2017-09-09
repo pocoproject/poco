@@ -1,8 +1,6 @@
 //
 // DigestEngineTest.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/DigestEngineTest.cpp#1 $
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

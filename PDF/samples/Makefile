@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/PDF/samples/Makefile#1 $
-#
 # Makefile for Poco PDF Samples
 #
 

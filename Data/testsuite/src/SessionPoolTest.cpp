@@ -1,8 +1,6 @@
 //
 // SessionPoolTest.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/SessionPoolTest.cpp#3 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

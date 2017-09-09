@@ -1,8 +1,6 @@
 //
 // NotificationsTestSuite.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NotificationsTestSuite.h#1 $
-//
 // Definition of the NotificationsTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

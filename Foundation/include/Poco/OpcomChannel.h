@@ -1,8 +1,6 @@
 //
 // OpcomChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/OpcomChannel.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  OpcomChannel

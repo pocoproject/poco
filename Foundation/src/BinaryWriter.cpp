@@ -1,8 +1,6 @@
 //
 // BinaryWriter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/BinaryWriter.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  BinaryReaderWriter

@@ -1,8 +1,6 @@
 //
 // Process.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process.cpp#4 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process

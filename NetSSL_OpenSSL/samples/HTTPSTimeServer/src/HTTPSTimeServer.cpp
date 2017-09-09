@@ -1,8 +1,6 @@
 //
 // TimeServer.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#2 $
-//
 // This sample demonstrates the HTTPServer and related classes.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

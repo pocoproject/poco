@@ -1,8 +1,6 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.4/Net/src/Socket.cpp#3 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  Socket

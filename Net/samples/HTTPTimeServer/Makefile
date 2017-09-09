@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Net/samples/HTTPTimeServer/Makefile#1 $
-#
 # Makefile for Poco HTTPTimeServer
 #
 

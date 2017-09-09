@@ -1,8 +1,6 @@
 //
 // Condition.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Condition.cpp#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Condition

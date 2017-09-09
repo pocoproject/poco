@@ -1,8 +1,6 @@
 //
 // RepeatedTest.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/RepeatedTest.h#1 $
-//
 
 
 #ifndef Poco_CppUnit_RepeatedTest_INCLUDED

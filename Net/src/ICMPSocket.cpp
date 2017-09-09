@@ -1,8 +1,6 @@
 //
 // ICMPSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPSocket.cpp#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPSocket

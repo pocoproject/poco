@@ -1,8 +1,6 @@
 //
 // PostgreSQLStatementImpl.cpp
 //
-// $Id: //poco/1.4/Data/PostgreSQL/src/PostgreSQLStatementImpl.cpp#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  PostgreSQLStatementImpl

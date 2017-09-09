@@ -1,8 +1,6 @@
 //
 // RWLock_WINCE.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/RWLock_WINCE.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  RWLock

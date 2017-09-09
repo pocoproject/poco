@@ -1,8 +1,6 @@
 //
 // hmacmd5.cpp
 //
-// $Id: //poco/1.4/Foundation/samples/hmacmd5/src/hmacmd5.cpp#1 $
-//
 // This sample demonstrates the HMACEngine class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

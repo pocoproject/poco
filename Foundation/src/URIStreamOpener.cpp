@@ -1,8 +1,6 @@
 //
 // URIStreamOpener.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URIStreamOpener.cpp#1 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URIStreamOpener

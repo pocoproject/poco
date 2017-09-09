@@ -1,8 +1,6 @@
 //
 // StatementExecutor.cpp
 //
-// $Id: //poco/1.3/Data/PostgreSQL/src/StatementExecutor.cpp#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  StatementExecutor

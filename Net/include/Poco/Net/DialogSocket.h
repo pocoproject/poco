@@ -1,8 +1,6 @@
 //
 // DialogSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/DialogSocket.h#2 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  DialogSocket

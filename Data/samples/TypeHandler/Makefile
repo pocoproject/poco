@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/samples/TypeHandler/Makefile#1 $
-#
 # Makefile for Poco Data TypeHandler sample
 #
 

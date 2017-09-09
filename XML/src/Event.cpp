@@ -1,8 +1,6 @@
 //
 // Event.cpp
 //
-// $Id: //poco/1.4/XML/src/Event.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMEvents

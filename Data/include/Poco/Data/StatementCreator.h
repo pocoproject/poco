@@ -1,8 +1,6 @@
 //
 // StatementCreator.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/StatementCreator.h#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  StatementCreator

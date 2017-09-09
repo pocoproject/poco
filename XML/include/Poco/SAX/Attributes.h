@@ -1,8 +1,6 @@
 //
 // Attributes.h
 //
-// $Id: //poco/1.4/XML/include/Poco/SAX/Attributes.h#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  SAX

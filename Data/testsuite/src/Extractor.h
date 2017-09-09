@@ -1,8 +1,6 @@
 //
 // Extractor.h
 //
-// $Id: //poco/Main/Data/testsuite/src/Extractor.h#5 $
-//
 // Definition of the Extractor class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

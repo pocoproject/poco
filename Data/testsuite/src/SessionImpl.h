@@ -1,8 +1,6 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/Main/Data/testsuite/src/SessionImpl.h#2 $
-//
 // Definition of the SessionImpl class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

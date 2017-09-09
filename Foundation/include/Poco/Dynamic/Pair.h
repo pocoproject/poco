@@ -1,8 +1,6 @@
 //
 // Pair.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Dynamic/Pair.h#9 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  Pair

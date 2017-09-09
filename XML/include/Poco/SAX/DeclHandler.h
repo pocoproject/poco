@@ -1,8 +1,6 @@
 //
 // DeclHandler.h
 //
-// $Id: //poco/1.4/XML/include/Poco/SAX/DeclHandler.h#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  SAX

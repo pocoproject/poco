@@ -1,8 +1,6 @@
 //
 // genrsakey.cpp
 //
-// $Id: //poco/1.4/Crypto/samples/genrsakey/src/genrsakey.cpp#1 $
-//
 // This sample demonstrates the XYZ class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.

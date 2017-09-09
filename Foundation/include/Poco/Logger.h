@@ -1,8 +1,6 @@
 //
 // Logger.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Logger.h#5 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Logger

@@ -1,8 +1,6 @@
 //
 // RecordSet.cpp
 //
-// $Id: //poco/Main/Data/src/RecordSet.cpp#2 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RecordSet

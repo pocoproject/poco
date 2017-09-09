@@ -1,8 +1,6 @@
 //
 // ThreadTarget.h
 //
-// $Id: ThreadTarget.h 1327 2010-02-09 13:56:31Z obiltschnig $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ThreadTarget

@@ -1,8 +1,6 @@
 //
 // FTPClientSession.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/FTPClientSession.h#2 $
-//
 // Library: Net
 // Package: FTP
 // Module:  FTPClientSession
