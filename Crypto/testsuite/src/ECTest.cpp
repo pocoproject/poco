@@ -14,10 +14,8 @@
 #include "Poco/CppUnit/TestCaller.h"
 #include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Crypto/ECKey.h"
-#include "Poco/Crypto/ECDigestEngine.h"
-#include "Poco/Crypto/CipherFactory.h"
-#include "Poco/Crypto/Cipher.h"
-#include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/EVPPKey.h"
+#include <openssl/pem.h>
 #include <sstream>
 
 
@@ -83,6 +81,86 @@ ECTest::ECTest(const std::string& name): CppUnit::TestCase(name)
 
 ECTest::~ECTest()
 {
+}
+
+
+void ECTest::testEVPPKey()
+{
+	int eccGroup = OBJ_txt2nid("secp521r1");
+	EC_KEY* pEC = EC_KEY_new_by_curve_name(eccGroup);
+	assert (pEC != nullptr);
+	assert (0 != EC_KEY_generate_key(pEC));
+	EVP_PKEY* pKey = EVP_PKEY_new();
+	assert (pKey != nullptr);
+	assert (0 != EVP_PKEY_set1_EC_KEY(pKey, pEC));
+	EC_KEY_free(pEC);
+
+	BIO* bioPriv1 = BIO_new(BIO_s_mem());
+	BIO* bioPub1 = BIO_new(BIO_s_mem());
+	assert (0 != PEM_write_bio_PrivateKey(bioPriv1, pKey, NULL, NULL, 0, 0, NULL));
+	assert (0 != PEM_write_bio_PUBKEY(bioPub1, pKey));
+	char* pPrivData1;
+	long sizePriv1 = BIO_get_mem_data(bioPriv1, &pPrivData1);
+	char* pPubData1;
+	long sizePub1 = BIO_get_mem_data(bioPub1, &pPubData1);
+
+	// construct EVPPKey from EVP_PKEY*
+	EVPPKey evpPKey(pKey);
+	// EVPPKey makes duplicate, so freeing the original must be ok
+	EVP_PKEY_free(pKey);
+
+	BIO* bioPriv2 = BIO_new(BIO_s_mem());
+	BIO* bioPub2 = BIO_new(BIO_s_mem());
+	assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, NULL, NULL, 0, 0, NULL));
+	assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey));
+	char* pPrivData2;
+	long sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
+	char* pPubData2;
+	long sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
+
+	assert (sizePriv1 && (sizePriv1 == sizePriv2));
+	assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+	assert (sizePub1 && (sizePub1 == sizePub2));
+	assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+
+	BIO_free(bioPub2);
+	BIO_free(bioPriv2);
+
+	// copy
+	EVPPKey evpPKey2(evpPKey);
+	bioPriv2 = BIO_new(BIO_s_mem());
+	bioPub2 = BIO_new(BIO_s_mem());
+	assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, NULL, NULL, 0, 0, NULL));
+	assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey2));
+	sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
+	sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
+
+	assert (sizePriv1 && (sizePriv1 == sizePriv2));
+	assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+	assert (sizePub1 && (sizePub1 == sizePub2));
+	assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+
+	BIO_free(bioPub2);
+	BIO_free(bioPriv2);
+
+	// move
+	EVPPKey evpPKey3(std::move(evpPKey2));
+	bioPriv2 = BIO_new(BIO_s_mem());
+	bioPub2 = BIO_new(BIO_s_mem());
+	assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, NULL, NULL, 0, 0, NULL));
+	assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey3));
+	sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
+	sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
+
+	assert (sizePriv1 && (sizePriv1 == sizePriv2));
+	assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+	assert (sizePub1 && (sizePub1 == sizePub2));
+	assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+
+	BIO_free(bioPub2);
+	BIO_free(bioPriv2);
+	BIO_free(bioPub1);
+	BIO_free(bioPriv1);
 }
 
 
@@ -267,6 +345,7 @@ CppUnit::Test* ECTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ECTest");
 
+	CppUnit_addTest(pSuite, ECTest, testEVPPKey);
 	CppUnit_addTest(pSuite, ECTest, testECNewKeys);
 	CppUnit_addTest(pSuite, ECTest, testECNewKeysNoPassphrase);
 	CppUnit_addTest(pSuite, ECTest, testECSign);

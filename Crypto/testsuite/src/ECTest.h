@@ -26,6 +26,7 @@ public:
 	ECTest(const std::string& name);
 	~ECTest();
 
+	void testEVPPKey();
 	void testECNewKeys();
 	void testECNewKeysNoPassphrase();
 	void testECSign();

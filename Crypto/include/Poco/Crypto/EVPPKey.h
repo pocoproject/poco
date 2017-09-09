@@ -31,8 +31,9 @@ namespace Poco {
 namespace Crypto {
 
 
-class EVPPKey
+class Crypto_API EVPPKey
 	/// Utility class for conversion of native keys to EVP.
+	/// Currently, only RSA and EC keys are supported.
 {
 public:
 	EVPPKey() = delete;
@@ -43,8 +44,7 @@ public:
 
 	template<typename K>
 	explicit EVPPKey(K* pKey): _pEVPPKey(EVP_PKEY_new())
-		/// Constructs EVPPKey from a "native" key pointer
-		/// Currently, only RSA and EC keys are supported.
+		/// Constructs EVPPKey from a "native" key pointer.
 	{
 		if (!_pEVPPKey) throw OpenSSLException();
 		setKey(pKey);

@@ -57,38 +57,47 @@ EVPPKey& EVPPKey::operator=(EVPPKey&& other)
 
 EVPPKey::~EVPPKey()
 {
-	if (!_pEVPPKey) poco_unexpected();
-	EVP_PKEY_free(_pEVPPKey);
+	if (_pEVPPKey) EVP_PKEY_free(_pEVPPKey);
 }
 
 
 void EVPPKey::duplicate(EVP_PKEY* pEVPPKey)
 {
-	if (!pEVPPKey) throw NullPointerException("EVPPKey:duplicate()");
-	EVP_PKEY* pDupKey = EVP_PKEY_new();
+	if (!pEVPPKey) throw NullPointerException("EVPPKey::duplicate(): "
+		"provided key pointer is null.");
+
+	_pEVPPKey = EVP_PKEY_new();
+	if (!_pEVPPKey) throw NullPointerException("EVPPKey::duplicate(): "
+		"EVP_PKEY_new() returned null.");
+
 	switch (pEVPPKey->type)
 	{
 		case EVP_PKEY_RSA:
 		{
 			RSA* pRSA = EVP_PKEY_get1_RSA(pEVPPKey);
-			EVP_PKEY_set1_RSA(pDupKey, pRSA);
-			RSA_free(pRSA);
+			if (pRSA)
+			{
+				EVP_PKEY_set1_RSA(_pEVPPKey, pRSA);
+				RSA_free(pRSA);
+			}
+			else throw OpenSSLException();
 			break;
 		}
 		case EVP_PKEY_EC:
 		{
 			EC_KEY* pEC = EVP_PKEY_get1_EC_KEY(pEVPPKey);
-			EVP_PKEY_set1_EC_KEY(pDupKey, pEC);
-			EC_KEY_free(pEC);
+			if (pEC)
+			{
+				EVP_PKEY_set1_EC_KEY(_pEVPPKey, pEC);
+				EC_KEY_free(pEC);
+			}
+			else throw OpenSSLException();
 			break;
 		}
 		default:
-			EVP_PKEY_free(pDupKey);
 			throw NotImplementedException("EVPPKey:duplicate(); Key type: " +
 				NumberFormatter::format(pEVPPKey->type));
 	}
-	poco_assert_dbg(pDupKey);
-	_pEVPPKey = pDupKey;
 }
 
 
