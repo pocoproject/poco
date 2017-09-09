@@ -10,7 +10,9 @@ include $(POCO_BASE)/build/rules/global
 
 SYSLIBS += -lssl -lcrypto
 
-objects = Cipher CipherFactory CipherImpl CipherKey CipherKeyImpl CryptoStream CryptoTransform \
+objects = Cipher CipherFactory CipherImpl CipherKey CipherKeyImpl \
+	CryptoException CryptoStream CryptoTransform \
+	ECKey ECKeyImpl EVPPKey KeyPair KeyPairImpl \
 	RSACipherImpl RSAKey RSAKeyImpl RSADigestEngine DigestEngine \
 	X509Certificate OpenSSLInitializer
 

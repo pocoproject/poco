@@ -47,9 +47,10 @@ public:
 
 	KeyPairImpl() = delete;
 
-	KeyPairImpl(const std::string& name, Type type) : _name(name), _type(type) {}
+	KeyPairImpl(const std::string& name, Type type);
+		/// Create KeyPairImpl with specified type and name.
 
-	virtual ~KeyPairImpl() { }
+	virtual ~KeyPairImpl();
 		/// Destroys the KeyPairImpl.
 
 	virtual int size() const = 0;

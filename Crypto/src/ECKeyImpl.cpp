@@ -63,8 +63,8 @@ ECKeyImpl::ECKeyImpl(const PKCS12Container& cont):
 
 ECKeyImpl::ECKeyImpl(int eccGroup):
 	KeyPairImpl("ec", KT_EC_IMPL),
-	_eccGroup(eccGroup),
-	_pEC(EC_KEY_new_by_curve_name(eccGroup))
+	_pEC(EC_KEY_new_by_curve_name(eccGroup)),
+	_eccGroup(eccGroup)
 {
 	if (!(EC_KEY_generate_key(_pEC)))
 		throw OpenSSLException("ECKeyImpl::ECKeyImpl(int)");

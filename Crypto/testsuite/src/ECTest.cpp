@@ -17,6 +17,7 @@
 #include "Poco/Crypto/EVPPKey.h"
 #include <openssl/pem.h>
 #include <sstream>
+#include <cstring>
 
 
 using namespace Poco::Crypto;
