@@ -31,16 +31,16 @@
 namespace Poco {
 
 
-template <class TArgs, class TStrategy, class TDelegate, class TMutex = FastMutex> 
+template <class TArgs, class TStrategy, class TDelegate, class TMutex = FastMutex>
 class AbstractEvent
-	/// An AbstractEvent is the base class of all events. 
+	/// An AbstractEvent is the base class of all events.
 	/// It works similar to the way C# handles notifications (aka events in C#).
 	///
 	/// Events can be used to send information to a set of delegates
 	/// which are registered with the event. The type of the data is specified with
-	/// the template parameter TArgs. The TStrategy parameter must be a subclass 
+	/// the template parameter TArgs. The TStrategy parameter must be a subclass
 	/// of NotificationStrategy. The parameter TDelegate can either be a subclass of AbstractDelegate
-	/// or of AbstractPriorityDelegate. 
+	/// or of AbstractPriorityDelegate.
 	///
 	/// Note that AbstractEvent should never be used directly. One ought to use
 	/// one of its subclasses which set the TStrategy and TDelegate template parameters
@@ -67,7 +67,7 @@ class AbstractEvent
 	///     {
 	///     public:
 	///         Poco::BasicEvent<int> dataChanged;
-	///         
+	///
 	///         MyData();
 	///         ...
 	///         void setData(int i);
@@ -92,7 +92,7 @@ class AbstractEvent
 	///         dataChanged(this, this->_data);
 	///     }
 	///
-	/// Note that operator (), notify() and notifyAsync() do not catch exceptions, i.e. in case a  
+	/// Note that operator (), notify() and notifyAsync() do not catch exceptions, i.e. in case a
 	/// delegate throws an exception, notifying is immediately aborted and the exception is propagated
 	/// back to the caller.
 	///
@@ -121,11 +121,11 @@ class AbstractEvent
 	///     {
 	///     protected:
 	///         MyData _data;
-	///         
+	///
 	///         void onDataChanged(void* pSender, int& data);
 	///         ...
 	///     };
-	///         
+	///
 	///     MyController::MyController()
 	///     {
 	///         _data.dataChanged += delegate(this, &MyController::onDataChanged);
@@ -154,17 +154,17 @@ public:
 	typedef TDelegate* DelegateHandle;
 	typedef TArgs Args;
 
-	AbstractEvent(): 
+	AbstractEvent():
 		_executeAsync(this, &AbstractEvent::executeAsyncImpl),
 		_enabled(true)
 	{
 	}
 
-	AbstractEvent(const TStrategy& strat): 
+	AbstractEvent(const TStrategy& strat):
 		_executeAsync(this, &AbstractEvent::executeAsyncImpl),
 		_strategy(strat),
 		_enabled(true)
-	{	
+	{
 	}
 
 	virtual ~AbstractEvent()
@@ -172,14 +172,14 @@ public:
 	}
 
 	void operator += (const TDelegate& aDelegate)
-		/// Adds a delegate to the event. 
+		/// Adds a delegate to the event.
 		///
 		/// Exact behavior is determined by the TStrategy.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
 		_strategy.add(aDelegate);
 	}
-	
+
 	void operator -= (const TDelegate& aDelegate)
 		/// Removes a delegate from the event.
 		///
@@ -188,9 +188,9 @@ public:
 		typename TMutex::ScopedLock lock(_mutex);
 		_strategy.remove(aDelegate);
 	}
-	
+
 	DelegateHandle add(const TDelegate& aDelegate)
-		/// Adds a delegate to the event. 
+		/// Adds a delegate to the event.
 		///
 		/// Exact behavior is determined by the TStrategy.
 		///
@@ -200,7 +200,7 @@ public:
 		typename TMutex::ScopedLock lock(_mutex);
 		return _strategy.add(aDelegate);
 	}
-	
+
 	void remove(DelegateHandle delegateHandle)
 		/// Removes a delegate from the event using a DelegateHandle
 		/// returned by add().
@@ -210,13 +210,13 @@ public:
 		typename TMutex::ScopedLock lock(_mutex);
 		_strategy.remove(delegateHandle);
 	}
-		
+
 	void operator () (const void* pSender, TArgs& args)
 		/// Shortcut for notify(pSender, args);
 	{
 		notify(pSender, args);
 	}
-	
+
 	void operator () (TArgs& args)
 		/// Shortcut for notify(args).
 	{
@@ -224,21 +224,21 @@ public:
 	}
 
 	void notify(const void* pSender, TArgs& args)
-		/// Sends a notification to all registered delegates. The order is 
+		/// Sends a notification to all registered delegates. The order is
 		/// determined by the TStrategy. This method is blocking. While executing,
 		/// the list of delegates may be modified. These changes don't
 		/// influence the current active notifications but are activated with
 		/// the next notify. If a delegate is removed during a notify(), the
 		/// delegate will no longer be invoked (unless it has already been
-		/// invoked prior to removal). If one of the delegates throws an exception, 
+		/// invoked prior to removal). If one of the delegates throws an exception,
 		/// the notify method is immediately aborted and the exception is propagated
 		/// to the caller.
 	{
 		Poco::ScopedLockWithUnlock<TMutex> lock(_mutex);
-		
+
 		if (!_enabled) return;
-		
-		// thread-safeness: 
+
+		// thread-safeness:
 		// copy should be faster and safer than blocking until
 		// execution ends
 		TStrategy strategy(_strategy);
@@ -247,11 +247,11 @@ public:
 	}
 
 	bool hasDelegates() const {
-		return !(_strategy.empty());
+		return !empty();
 	}
 
 	ActiveResult<TArgs> notifyAsync(const void* pSender, const TArgs& args)
-		/// Sends a notification to all registered delegates. The order is 
+		/// Sends a notification to all registered delegates. The order is
 		/// determined by the TStrategy. This method is not blocking and will
 		/// immediately return. The delegates are invoked in a seperate thread.
 		/// Call activeResult.wait() to wait until the notification has ended.
@@ -259,26 +259,26 @@ public:
 		/// influence the current active notifications but are activated with
 		/// the next notify. If a delegate is removed during a notify(), the
 		/// delegate will no longer be invoked (unless it has already been
-		/// invoked prior to removal). If one of the delegates throws an exception, 
+		/// invoked prior to removal). If one of the delegates throws an exception,
 		/// the execution is aborted and the exception is propagated to the caller.
 	{
 		NotifyAsyncParams params(pSender, args);
 		{
 			typename TMutex::ScopedLock lock(_mutex);
 
-			// thread-safeness: 
+			// thread-safeness:
 			// copy should be faster and safer than blocking until
 			// execution ends
 			// make a copy of the strategy here to guarantee that
 			// between notifyAsync and the execution of the method no changes can occur
-				
+
 			params.ptrStrat = SharedPtr<TStrategy>(new TStrategy(_strategy));
 			params.enabled  = _enabled;
 		}
 		ActiveResult<TArgs> result = _executeAsync(params);
 		return result;
 	}
-	
+
 	void enable()
 		/// Enables the event.
 	{
@@ -306,7 +306,7 @@ public:
 		typename TMutex::ScopedLock lock(_mutex);
 		_strategy.clear();
 	}
-	
+
 	bool empty() const
 		/// Checks if any delegates are registered at the delegate.
 	{
@@ -321,7 +321,7 @@ protected:
 		const void* pSender;
 		TArgs       args;
 		bool        enabled;
-		
+
 		NotifyAsyncParams(const void* pSend, const TArgs& a):ptrStrat(), pSender(pSend), args(a), enabled(true)
 			/// Default constructor reduces the need for TArgs to have an empty constructor, only copy constructor is needed.
 		{
@@ -354,23 +354,23 @@ private:
 };
 
 
-template <class TStrategy, class TDelegate, class TMutex> 
+template <class TStrategy, class TDelegate, class TMutex>
 class AbstractEvent<void, TStrategy, TDelegate, TMutex>
 {
 public:
 	typedef TDelegate* DelegateHandle;
 
-	AbstractEvent(): 
+	AbstractEvent():
 		_executeAsync(this, &AbstractEvent::executeAsyncImpl),
 		_enabled(true)
 	{
 	}
 
-	AbstractEvent(const TStrategy& strat): 
+	AbstractEvent(const TStrategy& strat):
 		_executeAsync(this, &AbstractEvent::executeAsyncImpl),
 		_strategy(strat),
 		_enabled(true)
-	{	
+	{
 	}
 
 	virtual ~AbstractEvent()
@@ -378,14 +378,14 @@ public:
 	}
 
 	void operator += (const TDelegate& aDelegate)
-		/// Adds a delegate to the event. 
+		/// Adds a delegate to the event.
 		///
 		/// Exact behavior is determined by the TStrategy.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
 		_strategy.add(aDelegate);
 	}
-	
+
 	void operator -= (const TDelegate& aDelegate)
 		/// Removes a delegate from the event.
 		///
@@ -396,7 +396,7 @@ public:
 	}
 
 	DelegateHandle add(const TDelegate& aDelegate)
-		/// Adds a delegate to the event. 
+		/// Adds a delegate to the event.
 		///
 		/// Exact behavior is determined by the TStrategy.
 		///
@@ -406,7 +406,7 @@ public:
 		typename TMutex::ScopedLock lock(_mutex);
 		return _strategy.add(aDelegate);
 	}
-	
+
 	void remove(DelegateHandle delegateHandle)
 		/// Removes a delegate from the event using a DelegateHandle
 		/// returned by add().
@@ -416,13 +416,13 @@ public:
 		typename TMutex::ScopedLock lock(_mutex);
 		_strategy.remove(delegateHandle);
 	}
-	
+
 	void operator () (const void* pSender)
 		/// Shortcut for notify(pSender, args);
 	{
 		notify(pSender);
 	}
-	
+
 	void operator () ()
 		/// Shortcut for notify(args).
 	{
@@ -430,21 +430,21 @@ public:
 	}
 
 	void notify(const void* pSender)
-		/// Sends a notification to all registered delegates. The order is 
+		/// Sends a notification to all registered delegates. The order is
 		/// determined by the TStrategy. This method is blocking. While executing,
 		/// the list of delegates may be modified. These changes don't
 		/// influence the current active notifications but are activated with
 		/// the next notify. If a delegate is removed during a notify(), the
 		/// delegate will no longer be invoked (unless it has already been
-		/// invoked prior to removal). If one of the delegates throws an exception, 
+		/// invoked prior to removal). If one of the delegates throws an exception,
 		/// the notify method is immediately aborted and the exception is propagated
 		/// to the caller.
 	{
 		Poco::ScopedLockWithUnlock<TMutex> lock(_mutex);
-		
+
 		if (!_enabled) return;
-		
-		// thread-safeness: 
+
+		// thread-safeness:
 		// copy should be faster and safer than blocking until
 		// execution ends
 		TStrategy strategy(_strategy);
@@ -453,7 +453,7 @@ public:
 	}
 
 	ActiveResult<void> notifyAsync(const void* pSender)
-		/// Sends a notification to all registered delegates. The order is 
+		/// Sends a notification to all registered delegates. The order is
 		/// determined by the TStrategy. This method is not blocking and will
 		/// immediately return. The delegates are invoked in a seperate thread.
 		/// Call activeResult.wait() to wait until the notification has ended.
@@ -461,26 +461,26 @@ public:
 		/// influence the current active notifications but are activated with
 		/// the next notify. If a delegate is removed during a notify(), the
 		/// delegate will no longer be invoked (unless it has already been
-		/// invoked prior to removal). If one of the delegates throws an exception, 
+		/// invoked prior to removal). If one of the delegates throws an exception,
 		/// the execution is aborted and the exception is propagated to the caller.
 	{
 		NotifyAsyncParams params(pSender);
 		{
 			typename TMutex::ScopedLock lock(_mutex);
 
-			// thread-safeness: 
+			// thread-safeness:
 			// copy should be faster and safer than blocking until
 			// execution ends
 			// make a copy of the strategy here to guarantee that
 			// between notifyAsync and the execution of the method no changes can occur
-				
+
 			params.ptrStrat = SharedPtr<TStrategy>(new TStrategy(_strategy));
 			params.enabled  = _enabled;
 		}
 		ActiveResult<void> result = _executeAsync(params);
 		return result;
 	}
-	
+
 	void enable()
 		/// Enables the event.
 	{
@@ -508,7 +508,7 @@ public:
 		typename TMutex::ScopedLock lock(_mutex);
 		_strategy.clear();
 	}
-	
+
 	bool empty() const
 		/// Checks if any delegates are registered at the delegate.
 	{
@@ -522,7 +522,7 @@ protected:
 		SharedPtr<TStrategy> ptrStrat;
 		const void* pSender;
 		bool        enabled;
-		
+
 		NotifyAsyncParams(const void* pSend):ptrStrat(), pSender(pSend), enabled(true)
 			/// Default constructor reduces the need for TArgs to have an empty constructor, only copy constructor is needed.
 		{

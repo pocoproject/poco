@@ -108,7 +108,7 @@ const std::string& SharedLibraryImpl::getPathImpl() const
 
 std::string SharedLibraryImpl::suffixImpl()
 {
-#if defined(_DEBUG)
+#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 	return "d.exe";
 #else
 	return ".exe";

@@ -1,7 +1,7 @@
 //
 // PageReader.h
 //
-// $Id: //poco/1.4/PageCompiler/src/PageReader.h#1 $
+// $Id: //poco/1.7/PageCompiler/src/PageReader.h#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.

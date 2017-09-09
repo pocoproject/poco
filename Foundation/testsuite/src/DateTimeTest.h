@@ -42,6 +42,7 @@ public:
 	void testDayOfWeek();
 	void testIncrementDecrement();
 	void testUTC();
+	void testLeapSeconds();
 
 	void setUp();
 	void tearDown();

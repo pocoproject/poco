@@ -103,29 +103,39 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 	if (!assumeHeaderRead)
 	{
 		inp.read(_rawHeader, ZipCommon::HEADER_SIZE);
+		if (inp.gcount() != ZipCommon::HEADER_SIZE)
+			throw Poco::IOException("Failed to read local file header");
+		if (std::memcmp(_rawHeader, HEADER, ZipCommon::HEADER_SIZE) != 0)
+			throw Poco::DataFormatException("Bad local file header");
 	}
 	else
 	{
 		std::memcpy(_rawHeader, HEADER, ZipCommon::HEADER_SIZE);
 	}
-	poco_assert (std::memcmp(_rawHeader, HEADER, ZipCommon::HEADER_SIZE) == 0);
+
 	// read the rest of the header
 	inp.read(_rawHeader + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
 	if (!(_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED))
-		throw Poco::DataFormatException("bad ZIP file header", "invalid version");
+		throw Poco::DataFormatException("Bad local file header", "invalid version");
 	if (ZipUtil::get16BitValue(_rawHeader, COMPR_METHOD_POS) >= ZipCommon::CM_UNUSED)
-		throw Poco::DataFormatException("bad ZIP file header", "invalid compression method");
+		throw Poco::DataFormatException("Bad local file header", "invalid compression method");
 	parseDateTime();
 	Poco::UInt16 len = getFileNameLength();
-	Poco::Buffer<char> buf(len);
-	inp.read(buf.begin(), len);
-	_fileName = std::string(buf.begin(), len);
+	if (len > 0)
+	{
+		Poco::Buffer<char> buf(len);
+		inp.read(buf.begin(), len);
+		_fileName = std::string(buf.begin(), len);
+	}
 	if (hasExtraField())
 	{
 		len = getExtraFieldLength();
-		Poco::Buffer<char> xtra(len);
-		inp.read(xtra.begin(), len);
-		_extraField = std::string(xtra.begin(), len);
+		if (len > 0)
+		{
+			Poco::Buffer<char> xtra(len);
+			inp.read(xtra.begin(), len);
+			_extraField = std::string(xtra.begin(), len);
+		}
 	}
 	if (!searchCRCAndSizesAfterData())
 	{

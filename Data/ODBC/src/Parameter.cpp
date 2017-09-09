@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/src/Parameter.cpp#5 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Parameter
 //

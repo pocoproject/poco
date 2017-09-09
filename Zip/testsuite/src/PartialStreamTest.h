@@ -30,6 +30,7 @@ public:
 	void testWriting();
 	void testWritingZero();
 	void testWritingOne();
+	void testAutoDetect();
 
 	void setUp();
 	void tearDown();

@@ -23,6 +23,7 @@ namespace Poco {
 namespace Net {
 namespace Impl {
 
+
 //
 // SocketAddressImpl
 //

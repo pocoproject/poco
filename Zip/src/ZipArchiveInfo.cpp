@@ -58,12 +58,16 @@ void ZipArchiveInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	if (!assumeHeaderRead)
 	{
 		inp.read(_rawInfo, ZipCommon::HEADER_SIZE);
+		if (inp.gcount() != ZipCommon::HEADER_SIZE)
+			throw Poco::IOException("Failed to read archive info header");
+		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
+			throw Poco::DataFormatException("Bad archive info header");
 	}
 	else
 	{
 		std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
 	}
-	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
+		
 	// read the rest of the header
 	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
 	Poco::UInt16 len = getZipCommentSize();

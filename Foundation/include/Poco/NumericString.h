@@ -31,6 +31,7 @@
 #endif
 #include <limits>
 #include <cmath>
+#include <cctype>
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
@@ -82,11 +83,11 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	/// Converts zero-terminated character array to integer number;
 	/// Thousand separators are recognized for base10 and current locale;
 	/// it is silently skipped but not verified for correct positioning.
-	/// Function returns true if succesful. If parsing was unsuccesful,
+	/// Function returns true if successful. If parsing was unsuccessful,
 	/// the return value is false with the result value undetermined.
 {
 	if (!pStr) return false;
-	while (isspace(*pStr)) ++pStr;
+	while (std::isspace(*pStr)) ++pStr;
 	if (*pStr == '\0') return false;
 	short sign = 1;
 	if ((base == 10) && (*pStr == '-'))
@@ -539,7 +540,7 @@ Foundation_API bool strToFloat(const std::string&, float& result, char decSep = 
 	/// If decimal separator and/or thousand separator are different from defaults, they should be
 	/// supplied to ensure proper conversion.
 	/// 
-	/// Returns true if succesful, false otherwise.
+	/// Returns true if successful, false otherwise.
 
 
 Foundation_API double strToDouble(const char* str);
@@ -552,7 +553,7 @@ Foundation_API bool strToDouble(const std::string& str, double& result, char dec
 	/// If decimal separator and/or thousand separator are different from defaults, they should be
 	/// supplied to ensure proper conversion.
 	/// 
-	/// Returns true if succesful, false otherwise.
+	/// Returns true if successful, false otherwise.
 
 
 } // namespace Poco

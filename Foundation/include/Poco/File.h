@@ -50,6 +50,19 @@ class Path;
 
 class Foundation_API File: private FileImpl
 	/// The File class provides methods for working with a file.
+	///
+	/// Regarding paths passed to the various methods, note that 
+	/// platform-specific limitations regarding maximum length
+	/// of the entire path and its components apply.
+	///
+	/// On Windows, if compiled with UTF-8 support (POCO_WIN32_UTF8) 
+	/// the implementation tries to work around the rather low
+	/// 260 characters MAX_PATH limit by adding the "\\?\" prefix if
+	/// a path is absolute and exceeds MAX_PATH characters in length.
+	/// Note that various limitations regarding usage of the "\\?\" 
+	/// prefix apply in that case, e.g. the path must
+	/// not contain relative components ("." and "..") and must not 
+	/// use the forward slash ("/") as directory separator.
 {
 public:
 	typedef FileSizeImpl FileSize;

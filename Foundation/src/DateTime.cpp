@@ -68,7 +68,7 @@ DateTime::DateTime(int year, int month, int day, int hour, int minute, int secon
 	poco_assert (day >= 1 && day <= daysOfMonth(year, month));
 	poco_assert (hour >= 0 && hour <= 23);
 	poco_assert (minute >= 0 && minute <= 59);
-	poco_assert (second >= 0 && second <= 59);
+	poco_assert (second >= 0 && second <= 60); // allow leap seconds
 	poco_assert (millisecond >= 0 && millisecond <= 999);
 	poco_assert (microsecond >= 0 && microsecond <= 999);
 	
@@ -152,7 +152,7 @@ DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, i
 	poco_assert (day >= 1 && day <= daysOfMonth(year, month));
 	poco_assert (hour >= 0 && hour <= 23);
 	poco_assert (minute >= 0 && minute <= 59);
-	poco_assert (second >= 0 && second <= 59);
+	poco_assert (second >= 0 && second <= 60); // allow leap seconds
 	poco_assert (millisecond >= 0 && millisecond <= 999);
 	poco_assert (microsecond >= 0 && microsecond <= 999);
 
@@ -221,7 +221,7 @@ bool DateTime::isValid(int year, int month, int day, int hour, int minute, int s
 		(day >= 1 && day <= daysOfMonth(year, month)) &&
 		(hour >= 0 && hour <= 23) &&
 		(minute >= 0 && minute <= 59) &&
-		(second >= 0 && second <= 59) &&
+		(second >= 0 && second <= 60) &&
 		(millisecond >= 0 && millisecond <= 999) &&
 		(microsecond >= 0 && microsecond <= 999);
 }

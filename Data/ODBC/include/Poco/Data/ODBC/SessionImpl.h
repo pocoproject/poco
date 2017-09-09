@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/SessionImpl.h#4 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  SessionImpl
 //

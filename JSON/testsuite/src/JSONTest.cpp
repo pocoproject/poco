@@ -369,6 +369,37 @@ void JSONTest::testEmptyObject()
 }
 
 
+void JSONTest::testEmptyPropertyName()
+{
+	std::string json = "{\"\": 42}";
+	Parser parser;
+	Var result;
+
+	try
+	{
+		result = parser.parse(json);
+	}
+	catch(JSONException& jsone)
+	{
+		std::cout << jsone.message() << std::endl;
+		assert(false);
+	}
+
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	assert(object->size() == 1);
+
+	DynamicStruct ds = *object;
+	assert (ds.size() == 1);
+
+	const DynamicStruct& rds = *object;
+	assert (rds.size() == 1);
+	
+	assert (ds[""] == 42);
+}
+
+
 void JSONTest::testComplexObject()
 {
 	std::string json = 
@@ -1822,6 +1853,7 @@ CppUnit::Test* JSONTest::suite()
 #endif
 	CppUnit_addTest(pSuite, JSONTest, testStringProperty);
 	CppUnit_addTest(pSuite, JSONTest, testEmptyObject);
+	CppUnit_addTest(pSuite, JSONTest, testEmptyPropertyName);
 	CppUnit_addTest(pSuite, JSONTest, testComplexObject);
 	CppUnit_addTest(pSuite, JSONTest, testDoubleProperty);
 	CppUnit_addTest(pSuite, JSONTest, testDouble2Property);

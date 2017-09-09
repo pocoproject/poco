@@ -27,6 +27,7 @@
 #include "Poco/RefCountedObject.h"
 #endif
 
+
 namespace Poco {
 namespace Net {
 namespace Impl {
@@ -59,20 +60,15 @@ class Net_API IPv4SocketAddressImpl: public SocketAddressImpl
 {
 public:
 	IPv4SocketAddressImpl();
-
 	IPv4SocketAddressImpl(const struct sockaddr_in* addr);
-
 	IPv4SocketAddressImpl(const void* addr, UInt16 port);
-
 	IPAddress host() const;
-
 	UInt16 port() const;
-
 	poco_socklen_t length() const;
-
 	const struct sockaddr* addr() const;
-
 	int af() const;
+	IPAddress::Family family() const;
+	std::string toString() const;
 
 private:
 	struct sockaddr_in _addr;
@@ -120,19 +116,12 @@ class Net_API IPv6SocketAddressImpl: public SocketAddressImpl
 {
 public:
 	IPv6SocketAddressImpl(const struct sockaddr_in6* addr);
-
 	IPv6SocketAddressImpl(const void* addr, UInt16 port);
-
 	IPv6SocketAddressImpl(const void* addr, UInt16 port, UInt32 scope);
-
 	IPAddress host() const;
-
 	UInt16 port() const;
-
 	poco_socklen_t length() const;
-
 	const struct sockaddr* addr() const;
-
 	int af() const;
 
 private:

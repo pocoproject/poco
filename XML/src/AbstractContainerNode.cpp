@@ -29,6 +29,9 @@ namespace Poco {
 namespace XML {
 
 
+const XMLString AbstractContainerNode::WILDCARD(toXMLString("*"));
+
+
 AbstractContainerNode::AbstractContainerNode(Document* pOwnerDocument): 
 	AbstractNode(pOwnerDocument),
 	_pFirstChild(0)
@@ -320,7 +323,7 @@ Node* AbstractContainerNode::getNodeByPath(const XMLString& path) const
 			XMLString name;
 			while (it != path.end() && *it != '/' && *it != '@' && *it != '[') name += *it++;
 			if (it != path.end() && *it == '/') ++it;
-			if (name.empty()) name += '*';
+			if (name.empty()) name = WILDCARD;
 			AutoPtr<ElementsByTagNameList> pList = new ElementsByTagNameList(this, name);
 			unsigned long length = pList->length();
 			for (unsigned long i = 0; i < length; i++)
@@ -353,8 +356,8 @@ Node* AbstractContainerNode::getNodeByPathNS(const XMLString& path, const NSMap&
 			bool nameOK = true;
 			if (name.empty())
 			{
-				namespaceURI += '*';
-				localName += '*';
+				namespaceURI = WILDCARD;
+				localName = WILDCARD;
 			}
 			else
 			{
@@ -421,10 +424,11 @@ const Node* AbstractContainerNode::findNode(XMLString::const_iterator& it, const
 #ifdef XML_UNICODE_WCHAR_T
 				std::string idx;
 				Poco::UnicodeConverter::convert(index, idx);
-				return findNode(it, end, findElement(Poco::NumberParser::parse(idx), pNode, pNSMap), pNSMap);
+				int i = Poco::NumberParser::parse(idx);	
 #else
-				return findNode(it, end, findElement(Poco::NumberParser::parse(index), pNode, pNSMap), pNSMap);
+				int i = Poco::NumberParser::parse(index);
 #endif
+				return findNode(it, end, findElement(i, pNode, pNSMap), pNSMap);
 			}
 		}
 		else
@@ -432,7 +436,17 @@ const Node* AbstractContainerNode::findNode(XMLString::const_iterator& it, const
 			while (it != end && *it == '/') ++it;
 			XMLString key;
 			while (it != end && *it != '/' && *it != '[') key += *it++;
-			return findNode(it, end, findElement(key, pNode, pNSMap), pNSMap);
+
+			XMLString::const_iterator itStart(it);
+			const Node* pFound = 0;
+			const Node* pElem = findElement(key, pNode->firstChild(), pNSMap);
+			while (!pFound && pElem)
+			{
+				pFound = findNode(it, end, pElem, pNSMap);
+				if (!pFound) pElem = findElement(key, pElem->nextSibling(), pNSMap);
+				it = itStart;
+			}
+			return pFound;
 		}
 	}
 	else return pNode;
@@ -441,12 +455,11 @@ const Node* AbstractContainerNode::findNode(XMLString::const_iterator& it, const
 
 const Node* AbstractContainerNode::findElement(const XMLString& name, const Node* pNode, const NSMap* pNSMap)
 {
-	Node* pChild = pNode->firstChild();
-	while (pChild)
+	while (pNode)
 	{
-		if (pChild->nodeType() == Node::ELEMENT_NODE && namesAreEqual(pChild, name, pNSMap))
-			return pChild;
-		pChild = pChild->nextSibling();
+		if (pNode->nodeType() == Node::ELEMENT_NODE && namesAreEqual(pNode, name, pNSMap))
+			return pNode;
+		pNode = pNode->nextSibling();
 	}
 	return 0;
 }
@@ -542,15 +555,19 @@ bool AbstractContainerNode::namesAreEqual(const Node* pNode, const XMLString& na
 	{
 		XMLString namespaceURI;
 		XMLString localName;
-		if (pNSMap->processName(name, namespaceURI, localName, false))
+		if (name == WILDCARD)
 		{
-			return pNode->namespaceURI() == namespaceURI && pNode->localName() == localName;
+			return true;
+		}
+		else if (pNSMap->processName(name, namespaceURI, localName, false))
+		{
+			return (pNode->namespaceURI() == namespaceURI || namespaceURI == WILDCARD) && (pNode->localName() == localName || localName == WILDCARD);
 		}
 		else return false;
 	}
 	else
 	{
-		return pNode->nodeName() == name;
+		return pNode->nodeName() == name || name == WILDCARD;
 	}
 }
 

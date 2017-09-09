@@ -944,7 +944,7 @@ void DataTest::testRow()
 	row3.append("field4", 4);
 
 	assert (row3 == row);
-	assert (!(row < row3 | row3 < row));
+	assert (!(row < row3 || row3 < row));
 
 	Row row4(row3.names());
 	try

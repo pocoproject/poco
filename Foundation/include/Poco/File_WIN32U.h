@@ -60,6 +60,7 @@ protected:
 	bool createFileImpl();
 	bool createDirectoryImpl();
 	static void handleLastErrorImpl(const std::string& path);
+	static void convertPath(const std::string& utf8Path, std::wstring& utf16Path);
 	
 private:
 	std::string  _path;
@@ -68,6 +69,8 @@ private:
 	friend class FileHandle;
 	friend class DirectoryIteratorImpl;
 	friend class WindowsDirectoryWatcherStrategy;
+	friend class FileStreamBuf;
+	friend class LogFileImpl;
 };
 
 

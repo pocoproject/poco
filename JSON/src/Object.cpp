@@ -32,10 +32,19 @@ Object::Object(bool preserveInsertionOrder): _preserveInsOrder(preserveInsertion
 
 
 Object::Object(const Object& copy) : _values(copy._values),
-	_keys(copy._keys),
 	_preserveInsOrder(copy._preserveInsOrder),
 	_pStruct(0)
 {
+	if (_preserveInsOrder)
+	{
+		// need to update pointers in _keys to point to copied _values
+		for (KeyPtrList::const_iterator it = copy._keys.begin(); it != copy._keys.end(); ++it)
+		{
+			ValueMap::const_iterator itv = _values.find(**it);
+			poco_assert (itv != _values.end());
+			_keys.push_back(&itv->first);
+		}
+	}
 }
 
 
@@ -83,7 +92,7 @@ Object::Ptr Object::getObject(const std::string& key) const
 void Object::getNames(std::vector<std::string>& names) const
 {
 	names.clear();
-	for(ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
+	for (ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
 	{
 		names.push_back(it->first);
 	}
@@ -94,7 +103,7 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 {
 	if (step < 0) step = indent;
 
-	if(!_preserveInsOrder)
+	if (!_preserveInsOrder)
 		doStringify(_values, out, indent, step);
 	else
 		doStringify(_keys, out, indent, step);

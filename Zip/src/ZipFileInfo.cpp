@@ -85,12 +85,16 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	if (!assumeHeaderRead)
 	{
 		inp.read(_rawInfo, ZipCommon::HEADER_SIZE);
+		if (inp.gcount() != ZipCommon::HEADER_SIZE)
+			throw Poco::IOException("Failed to read file info header");
+		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
+			throw Poco::DataFormatException("Bad file info header");
 	}
 	else
 	{
 		std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
 	}
-	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
+
 	// read the rest of the header
 	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
 	_crc32 = getCRCFromHeader();
@@ -98,15 +102,21 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	_uncompressedSize = getUncompressedSizeFromHeader();
 	parseDateTime();
 	Poco::UInt16 len = getFileNameLength();
-	Poco::Buffer<char> buf(len);
-	inp.read(buf.begin(), len);
-	_fileName = std::string(buf.begin(), len);
+	if (len > 0)
+	{
+		Poco::Buffer<char> buf(len);
+		inp.read(buf.begin(), len);
+		_fileName = std::string(buf.begin(), len);
+	}
 	if (hasExtraField())
 	{
 		len = getExtraFieldLength();
-		Poco::Buffer<char> xtra(len);
-		inp.read(xtra.begin(), len);
-		_extraField = std::string(xtra.begin(), len);
+		if (len > 0)
+		{
+			Poco::Buffer<char> xtra(len);
+			inp.read(xtra.begin(), len);
+			_extraField = std::string(xtra.begin(), len);
+		}
 	}
 	len = getFileCommentLength();
 	if (len > 0)

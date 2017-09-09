@@ -44,7 +44,7 @@ public:
 	SocketAddress(const IPAddress& hostAddress, Poco::UInt16 portNumber);
 		/// Creates a SocketAddress from an IP address and given port number.
 
-	SocketAddress(Poco::UInt16 port);
+	explicit SocketAddress(Poco::UInt16 port);
 		/// Creates a SocketAddress with unspecified (wildcard) IP address 
 		/// and given port number.
 

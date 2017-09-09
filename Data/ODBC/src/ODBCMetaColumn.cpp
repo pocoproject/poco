@@ -3,7 +3,7 @@
 //
 // $Id: //poco/Main/Data/ODBC/src/ODBCMetaColumn.cpp#5 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCMetaColumn
 //
@@ -87,6 +87,9 @@ void ODBCMetaColumn::init()
 	case SQL_CHAR:
 	case SQL_VARCHAR:
 	case SQL_LONGVARCHAR:
+#ifdef SQL_GUID
+	case SQL_GUID:
+#endif
 		setType(MetaColumn::FDT_STRING); break;
 
 	case SQL_WCHAR:
@@ -113,12 +116,18 @@ void ODBCMetaColumn::init()
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
 		if (0 == _columnDesc.decimalDigits)
-			setType(MetaColumn::FDT_INT32);
+		{
+			if (_columnDesc.size > 9)
+				setType(MetaColumn::FDT_INT64);
+			else
+				setType(MetaColumn::FDT_INT32);
+		}
 		else
+		{
 			setType(MetaColumn::FDT_DOUBLE);
-		
+		}
 		break;
-	
+
 	case SQL_REAL:
 		setType(MetaColumn::FDT_FLOAT); break;
 	

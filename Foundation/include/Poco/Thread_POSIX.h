@@ -119,6 +119,7 @@ private:
 		ThreadData():
 			thread(0),
 			prio(PRIO_NORMAL_IMPL),
+			osPrio(),
 			policy(SCHED_OTHER),
 			done(false),
 			stackSize(POCO_THREAD_STACK_SIZE),

@@ -7,8 +7,6 @@
 // Package: MongoDB
 // Module:  GetMoreRequest
 //
-// Implementation of the GetMoreRequest class.
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -24,8 +22,8 @@ namespace Poco {
 namespace MongoDB {
 
 
-GetMoreRequest::GetMoreRequest(const std::string& collectionName, Int64 cursorID) 
-	: RequestMessage(MessageHeader::GetMore), 
+GetMoreRequest::GetMoreRequest(const std::string& collectionName, Int64 cursorID):
+	RequestMessage(MessageHeader::OP_GET_MORE), 
 	_fullCollectionName(collectionName),
 	_numberToReturn(100),
 	_cursorID(cursorID)

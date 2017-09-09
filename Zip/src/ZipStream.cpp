@@ -174,9 +174,8 @@ int ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 				// now push back the header to the stream, so that the ZipLocalFileHeader can read it
 				Poco::Int32 size = static_cast<Poco::Int32>(nfo.getFullHeaderSize());
 				_expectedCrc32 = nfo.getCRC32();
-				const char* rawHeader = nfo.getRawHeader();
-				for (Poco::Int32 i = size-1; i >= 0; --i)
-					_pIstr->putback(rawHeader[i]);
+				_pIstr->seekg(-size, std::ios::cur);
+				if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
 				if (!crcValid())
 					throw ZipException("CRC failure");
 			}
@@ -220,6 +219,13 @@ void ZipStreamBuf::close()
 		_pHeader->setCRC(_crc32.checksum());
 		_pHeader->setUncompressedSize(_bytesWritten);
 		_pHeader->setCompressedSize(_ptrOHelper->bytesWritten());
+		if (_bytesWritten == 0) 
+		{
+			poco_assert (_ptrOHelper->bytesWritten() == 0);
+			// Empty files must use CM_STORE, otherwise unzipping will fail
+			_pHeader->setCompressionMethod(ZipCommon::CM_STORE);
+			_pHeader->setCompressionLevel(ZipCommon::CL_NORMAL);
+		}
 		_pHeader->setStartPos(_pHeader->getStartPos()); // This resets EndPos now that compressed Size is known
 
 		if (_pHeader->searchCRCAndSizesAfterData())

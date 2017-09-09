@@ -190,6 +190,8 @@ private:
 	Poco::UInt32   _crc32;
 	Poco::UInt32   _compressedSize;
 	Poco::UInt32   _uncompressedSize;
+	
+	friend class ZipStreamBuf;
 };
 
 

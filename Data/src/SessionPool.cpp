@@ -82,7 +82,7 @@ Session SessionPool::get()
 			_idleSessions.push_front(pHolder);
 			++_nSessions;
 		}
-		else throw SessionPoolExhaustedException(_connector, _connectionString);
+		else throw SessionPoolExhaustedException(_connector);
 	}
 
 	PooledSessionHolderPtr pHolder(_idleSessions.front());

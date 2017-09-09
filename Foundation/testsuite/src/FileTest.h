@@ -39,6 +39,7 @@ public:
 	void testCopyDirectory();
 	void testRename();
 	void testRootDir();
+	void testLongPath();
 	
 	void setUp();
 	void tearDown();
