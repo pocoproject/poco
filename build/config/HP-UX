@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/HP-UX#2 $
-#
 # HP-UX
 #
 # Make settings for HP-UX 11.11/aCC 03.30 (and later)

@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Data/ODBC/testsuite/Makefile#4 $
-#
 # Makefile for Poco SQLite testsuite
 #
 # For Unicode support, add following to COMMONFLAGS:

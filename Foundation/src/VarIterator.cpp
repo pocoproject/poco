@@ -1,8 +1,6 @@
 //
 // VarIterator.cpp
 //
-// $Id: //poco/Main/Data/src/VarIterator.cpp#1 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  VarIterator

@@ -1,8 +1,6 @@
 //
 // Path_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path_UNIX.cpp#3 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  Path

@@ -1,8 +1,6 @@
 //
 // PostgreSQLTestSuite.h
 //
-// $Id: //poco/1.5/Data/PostgreSQL/testsuite/src/PostgreSQLTestSuite.h#1 $
-//
 // Definition of the PostgreSQLTestSuite class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

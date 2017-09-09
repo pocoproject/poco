@@ -1,8 +1,6 @@
 //
 // Error.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Error.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Error

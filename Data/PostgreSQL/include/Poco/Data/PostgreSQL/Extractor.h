@@ -1,8 +1,6 @@
 //
 // Extractor.h
 //
-// $Id: //poco/1.5/Data/PostgreSQL/include/Poco/Data/PostgreSQL/Extractor.h#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  Extractor

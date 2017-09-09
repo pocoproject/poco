@@ -1,8 +1,6 @@
 //
 // GUITestResult.cpp
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/GUITestResult.cpp#1 $
-//
 
 
 #include "TestRunnerDlg.h"

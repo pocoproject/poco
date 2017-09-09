@@ -1,8 +1,6 @@
 //
 // ODBCTest.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCTest.cpp#5 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

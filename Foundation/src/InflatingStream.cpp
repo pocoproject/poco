@@ -1,8 +1,6 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/InflatingStream.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  ZLibStream

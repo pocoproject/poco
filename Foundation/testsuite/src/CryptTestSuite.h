@@ -1,8 +1,6 @@
 //
 // CryptTestSuite.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/CryptTestSuite.h#1 $
-//
 // Definition of the CryptTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // MutationEvent.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/MutationEvent.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMEvents

@@ -1,8 +1,6 @@
 //
 // TypeHandler.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/TypeHandler.h#13 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  TypeHandler

@@ -1,8 +1,6 @@
 //
 // WebSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocket.h#4 $
-//
 // Library: Net
 // Package: WebSocket
 // Module:  WebSocket

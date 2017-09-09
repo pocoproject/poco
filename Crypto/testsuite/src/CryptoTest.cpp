@@ -1,8 +1,6 @@
 //
 // CryptoTest.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTest.cpp#2 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

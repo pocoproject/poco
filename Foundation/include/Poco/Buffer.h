@@ -1,8 +1,6 @@
 //
 // Buffer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Buffer.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Buffer

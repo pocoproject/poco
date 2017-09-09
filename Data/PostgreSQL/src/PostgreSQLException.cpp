@@ -1,8 +1,6 @@
 //
 // PostgreSQLException.cpp
 //
-// $Id: //poco/1.5/Data/PostgreSQL/src/PostgreSQLException.cpp#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  PostgreSQLException

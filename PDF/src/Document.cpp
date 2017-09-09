@@ -1,8 +1,6 @@
 //
 // Document.cpp
 //
-// $Id: //poco/Main/PDF/src/Document.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Document

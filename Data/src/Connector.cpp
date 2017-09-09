@@ -1,8 +1,6 @@
 //
 // Connector.cpp
 //
-// $Id: //poco/Main/Data/src/Connector.cpp#2 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Connector

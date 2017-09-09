@@ -1,8 +1,6 @@
 //
 // DocWriter.h
 //
-// $Id: //poco/1.7/PocoDoc/src/DocWriter.h#2 $
-//
 // Definition of the DocWriter class.
 //
 // Copyright (c) 2005-2007, Applied Informatics Software Engineering GmbH.

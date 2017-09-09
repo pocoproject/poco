@@ -1,8 +1,6 @@
 //
 // Base64Test.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/Base64Test.h#1 $
-//
 // Definition of the Base64Test class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

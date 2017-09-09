@@ -1,8 +1,6 @@
 //
 // SocketAddressImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketAddressImpl.h#2 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  SocketAddressImpl

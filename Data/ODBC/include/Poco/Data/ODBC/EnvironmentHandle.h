@@ -1,8 +1,6 @@
 //
 // EnvironmentHandle.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/EnvironmentHandle.h#3 $
-//
 // Library: Data/ODBC
 // Package: ODBC
 // Module:  EnvironmentHandle

@@ -1,8 +1,6 @@
 //
 // Path.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path.cpp#5 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  Path

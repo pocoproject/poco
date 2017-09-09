@@ -1,8 +1,6 @@
 //
 // NTPPacket.cpp
 //
-// $Id: //poco/1.4/Net/src/NTPPacket.cpp#2 $
-//
 // Library: Net
 // Package: NTP
 // Module:  NTPPacket

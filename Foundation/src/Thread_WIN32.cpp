@@ -1,8 +1,6 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/src/Thread_WIN32.cpp#4 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread

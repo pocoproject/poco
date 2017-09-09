@@ -1,8 +1,6 @@
 //
 // Environment_VMS.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Environment_VMS.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Environment

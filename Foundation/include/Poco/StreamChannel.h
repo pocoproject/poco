@@ -1,8 +1,6 @@
 //
 // StreamChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/StreamChannel.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  StreamChannel

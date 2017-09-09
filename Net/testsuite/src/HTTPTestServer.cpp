@@ -1,8 +1,6 @@
 //
 // HTTPTestServer.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPTestServer.cpp#4 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/testsuite/Makefile#7 $
-#
 # Makefile for Poco Data testsuite
 #
 

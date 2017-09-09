@@ -1,8 +1,6 @@
 //
 // SHA3EngineTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SHA3EngineTest.cpp#1 $
-//
 // Code of the SHA3EngineTest class.
 //
 // test vectors from FIPS 180-1
