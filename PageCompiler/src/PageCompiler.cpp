@@ -1,8 +1,6 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.7/PageCompiler/src/PageCompiler.cpp#5 $
-//
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

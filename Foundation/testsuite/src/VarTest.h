@@ -1,8 +1,6 @@
 //
 // VarTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/VarTest.h#2 $
-//
 // Tests for Any types
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // LinearHashTable.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/LinearHashTable.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  LinearHashTable

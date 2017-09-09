@@ -1,8 +1,6 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/Context.cpp#2 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  Context

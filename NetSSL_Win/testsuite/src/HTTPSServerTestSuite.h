@@ -1,8 +1,6 @@
 //
 // HTTPSServerTestSuite.h
 //
-// $Id: //poco/1.4/NetSSL_Win/testsuite/src/HTTPSServerTestSuite.h#1 $
-//
 // Definition of the HTTPSServerTestSuite class.
 //
 // Copyright (c) 2006-2014, Applied Informatics Software Engineering GmbH.

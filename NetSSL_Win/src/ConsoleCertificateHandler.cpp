@@ -1,8 +1,6 @@
 //
 // ConsoleCertificateHandler.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/src/ConsoleCertificateHandler.cpp#1 $
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  ConsoleCertificateHandler

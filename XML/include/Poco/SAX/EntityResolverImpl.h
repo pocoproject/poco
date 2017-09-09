@@ -1,8 +1,6 @@
 //
 // EntityResolverImpl.h
 //
-// $Id: //poco/1.4/XML/include/Poco/SAX/EntityResolverImpl.h#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  SAX

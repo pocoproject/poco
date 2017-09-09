@@ -1,8 +1,6 @@
 //
 // ConfigurationMapper.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/ConfigurationMapper.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  ConfigurationMapper

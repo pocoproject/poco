@@ -1,8 +1,6 @@
 //
 // WebSocketServer.cpp
 //
-// $Id: //poco/1.4/Net/samples/WebSocketServer/src/WebSocketServer.cpp#1 $
-//
 // This sample demonstrates the WebSocket class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.

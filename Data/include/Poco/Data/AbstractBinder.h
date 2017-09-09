@@ -1,8 +1,6 @@
 //
 // AbstractBinder.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractBinder.h#12 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AbstractBinder

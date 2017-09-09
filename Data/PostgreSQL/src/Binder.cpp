@@ -1,8 +1,6 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/1.5/Data/PostgreSQL/src/Binder.cpp#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  Binder

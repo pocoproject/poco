@@ -1,8 +1,6 @@
 //
 // PostgreSQLTypes.h
 //
-// $Id: //poco/1.4/Data/PostgreSQL/include/Poco/Data/PostgreSQL/SessionHandle.h#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module: PostgreSQLTypes

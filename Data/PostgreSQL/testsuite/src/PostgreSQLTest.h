@@ -1,8 +1,6 @@
 //
 // PostgreSQLTest.h
 //
-// $Id: //poco/1.5/Data/PostgreSQL/testsuite/src/PostgreSQLTest.h#1 $
-//
 // Definition of the PostgreSQLTest class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

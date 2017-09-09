@@ -1,8 +1,6 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/Main/Data/PostgreSQL/src/Utility.cpp#5 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  Utility

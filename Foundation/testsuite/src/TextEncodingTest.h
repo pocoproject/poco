@@ -1,8 +1,6 @@
 //
 // TextEncodingTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TextEncodingTest.h#1 $
-//
 // Definition of the TextEncodingTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // MapConfigurationTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/MapConfigurationTest.h#1 $
-//
 // Definition of the MapConfigurationTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

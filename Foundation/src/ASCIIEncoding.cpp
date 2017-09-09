@@ -1,8 +1,6 @@
 //
 // ASCIIEncoding.cpp
 //
-// $Id: //poco/1.4/Foundation/src/ASCIIEncoding.cpp#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  ASCIIEncoding

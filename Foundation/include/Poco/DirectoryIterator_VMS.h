@@ -1,8 +1,6 @@
 //
 // DirectoryIterator_VMS.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DirectoryIterator_VMS.h#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryIterator

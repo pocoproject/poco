@@ -1,8 +1,6 @@
 //
 // RandomStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/RandomStream.cpp#1 $
-//
 // Library: Foundation
 // Package: Crypt
 // Module:  RandomStream

@@ -1,8 +1,6 @@
 //
 // SessionPoolContainer.cpp
 //
-// $Id: //poco/Main/Data/src/SessionPoolContainer.cpp#3 $
-//
 // Library: Data
 // Package: SessionPooling
 // Module:  SessionPoolContainer

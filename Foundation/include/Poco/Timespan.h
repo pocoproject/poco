@@ -1,8 +1,6 @@
 //
 // Timespan.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Timespan.h#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timespan

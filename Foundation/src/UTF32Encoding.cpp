@@ -1,8 +1,6 @@
 //
 // UTF32Encoding.cpp
 //
-// $Id: //poco/1.4/Foundation/src/UTF32Encoding.cpp#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  UTF32Encoding

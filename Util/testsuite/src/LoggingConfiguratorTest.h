@@ -1,8 +1,6 @@
 //
 // LoggingConfiguratorTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/LoggingConfiguratorTest.h#1 $
-//
 // Definition of the LoggingConfiguratorTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

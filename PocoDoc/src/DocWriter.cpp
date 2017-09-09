@@ -1,8 +1,6 @@
 //
 // DocWriter.cpp
 //
-// $Id: //poco/1.7/PocoDoc/src/DocWriter.cpp#3 $
-//
 // Copyright (c) 2005-2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
