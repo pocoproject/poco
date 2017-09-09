@@ -1,8 +1,6 @@
 //
 // SessionFactory.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SessionFactory.h#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  SessionFactory

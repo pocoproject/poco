@@ -1,8 +1,6 @@
 //
 // Compress.cpp
 //
-// $Id: //poco/1.4/Zip/src/Compress.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:	Compress

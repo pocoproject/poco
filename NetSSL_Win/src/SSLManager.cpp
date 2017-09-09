@@ -1,8 +1,6 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.7/NetSSL_Win/src/SSLManager.cpp#2 $
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  SSLManager

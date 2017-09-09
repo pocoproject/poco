@@ -1,8 +1,6 @@
 //
 // NetException.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/NetException.h#4 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  NetException

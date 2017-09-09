@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/rules/exec#1 $
-#
 # exec
 #
 # Rule definitions for building executables

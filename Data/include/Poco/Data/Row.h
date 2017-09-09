@@ -1,8 +1,6 @@
 //
 // Row.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Row.h#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Row

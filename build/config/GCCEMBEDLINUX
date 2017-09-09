@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/GCCEMBEDLINUX#2 $
-#
 # ARM-Linux
 #
 # Make settings for Cross compiling in to unknown, ARM-based embedded Linux

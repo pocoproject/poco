@@ -1,8 +1,6 @@
 //
 // NamedTuplesTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NamedTuplesTest.h#1 $
-//
 // Definition of the NamedTuplesTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

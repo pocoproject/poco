@@ -1,8 +1,6 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_UNIX.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File

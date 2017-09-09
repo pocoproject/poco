@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/projname#1 $
-#
 # projname
 #
 # Usage: projname PROJECT_BASE

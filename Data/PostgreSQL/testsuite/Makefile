@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.5/Data/PostgreSQL/testsuite/Makefile#1 $
-#
 # Makefile for Poco PostgreSQL testsuite
 #
 

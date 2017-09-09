@@ -1,8 +1,6 @@
 //
 // Bugcheck.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Bugcheck.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Bugcheck

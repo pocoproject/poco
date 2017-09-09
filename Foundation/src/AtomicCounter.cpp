@@ -1,8 +1,6 @@
 //
 // AtomicCounter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/AtomicCounter.cpp#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  AtomicCounter

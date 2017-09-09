@@ -1,8 +1,6 @@
 //
 // Preparator.h
 //
-// $Id: //poco/Main/Data/testsuite/src/Preparator.h#3 $
-//
 // Definition of the Preparator class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

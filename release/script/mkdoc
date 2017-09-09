@@ -1,7 +1,5 @@
 #!/bin/bash
 #
-# $Id: //poco/1.4/release/script/mkdoc#2 $
-#
 # mkdoc
 #
 # Create reference documentation for a POCO release.

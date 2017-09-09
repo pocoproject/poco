@@ -1,8 +1,6 @@
 //
 // HTTPFixedLengthStream.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPFixedLengthStream.cpp#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPFixedLengthStream

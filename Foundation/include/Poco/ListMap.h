@@ -1,8 +1,6 @@
 //
 // ListMap.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ListMap.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  ListMap

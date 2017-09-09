@@ -1,8 +1,6 @@
 //
 // SHA2EngineTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SHA2EngineTest.h#1 $
-//
 // Definition of the SHA2EngineTest class.
 //
 // Copyright (c) 2017, Applied Informatics Software Engineering GmbH

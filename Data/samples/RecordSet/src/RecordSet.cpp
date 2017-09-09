@@ -1,8 +1,6 @@
 //
 // RecordSet.cpp
 //
-// $Id: //poco/Main/Data/samples/RecordSet/src/RecordSet.cpp#2 $
-//
 // This sample demonstrates the Data library.
 //
 /// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/samples/Makefile#2 $
-#
 # Makefile for Poco Data Samples
 #
 

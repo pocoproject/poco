@@ -1,8 +1,6 @@
 //
 // AutoTransaction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AutoTransaction.h#2 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AutoTransaction

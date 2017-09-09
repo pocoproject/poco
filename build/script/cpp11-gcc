@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/cpp11-gcc#1 $
-#
 # cpp11-gcc
 #
 # Detect compatible GCC version and add c++11/14 flags

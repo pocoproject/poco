@@ -1,8 +1,6 @@
 //
 // IniFileConfigurationTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/IniFileConfigurationTest.h#1 $
-//
 // Definition of the IniFileConfigurationTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

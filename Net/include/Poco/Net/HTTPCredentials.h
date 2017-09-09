@@ -1,8 +1,6 @@
 //
 // HTTPCredentials.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPCredentials.h#4 $
-//
 // Library: Net
 // Package: HTTP
 // Module:	HTTPCredentials

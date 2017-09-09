@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Data/MySQL/testsuite/Makefile#1 $
-#
 # Makefile for Poco MySQL testsuite
 #
 

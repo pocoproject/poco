@@ -1,8 +1,6 @@
 //
 // SQLExecutor.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/SQLExecutor.cpp#14 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

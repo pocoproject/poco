@@ -1,8 +1,6 @@
 //
 // HTTPSTestServer.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/testsuite/src/HTTPSTestServer.cpp#1 $
-//
 // Copyright (c) 2006-2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

@@ -1,8 +1,6 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URI.cpp#5 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URI

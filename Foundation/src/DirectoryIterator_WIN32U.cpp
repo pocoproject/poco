@@ -1,8 +1,6 @@
 //
 // DirectoryIterator_WIN32U.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryIterator_WIN32U.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryIterator

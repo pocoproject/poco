@@ -1,8 +1,6 @@
 //
 // AbstractConfigurationTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/AbstractConfigurationTest.h#1 $
-//
 // Definition of the AbstractConfigurationTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

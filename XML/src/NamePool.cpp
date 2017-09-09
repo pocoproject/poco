@@ -1,8 +1,6 @@
 //
 // NamePool.cpp
 //
-// $Id: //poco/1.4/XML/src/NamePool.cpp#1 $
-//
 // Library: XML
 // Package: XML
 // Module:  NamePool

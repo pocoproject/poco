@@ -1,8 +1,6 @@
 //
 // ODBCTest.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCTest.h#4 $
-//
 // Definition of the ODBCTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

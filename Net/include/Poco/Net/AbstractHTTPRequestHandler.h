@@ -1,8 +1,6 @@
 //
 // AbstractHTTPRequestHandler.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/AbstractHTTPRequestHandler.h#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  AbstractHTTPRequestHandler

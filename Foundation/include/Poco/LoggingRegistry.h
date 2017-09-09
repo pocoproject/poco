@@ -1,8 +1,6 @@
 //
 // LoggingRegistry.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/LoggingRegistry.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  LoggingRegistry

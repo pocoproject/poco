@@ -1,8 +1,6 @@
 //
 // Thread_STD.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread_STD.h#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread
@@ -37,6 +35,7 @@
 #elif defined(_MSC_VER)
 #include "Poco/UnWindows.h"
 #endif
+
 
 namespace Poco {
 
@@ -148,7 +147,7 @@ private:
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	SignalHandler::JumpBufferVec _jumpBufferVec;
 	friend class SignalHandler;
-#endif	
+#endif
 };
 
 
