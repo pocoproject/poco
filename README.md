@@ -6,6 +6,8 @@ Build Status
 
 - Travis: [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.8.0)](https://travis-ci.org/pocoproject/poco)
 - AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.8.0?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.8.0)
+- [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
+
 
 ![alt text][logo]
 
@@ -34,6 +36,7 @@ POCO is best thought of as a Boost complement (rather than replacement).
 Side-by-side use of Boost and POCO is a very common occurrence.
 
 When contributing to POCO, please adhere to our [guidelines](https://github.com/pocoproject/poco/blob/develop/CONTRIBUTING.md).
+
 
 All text file line endings in the repository must be Unix-style (LF).
 This includes Visual Studio project and solution files (.sln, .vcproj, .vcxproj, .vcxproj.filters).
