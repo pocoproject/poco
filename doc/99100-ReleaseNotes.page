@@ -13,6 +13,12 @@ AAAIntroduction
   - Poco::Util::LayeredConfiguration: added support for labelling configurations and
     finding them by their label
   - upgraded bundled SQLite to 3.20.1
+  - PageCompiler: support <%@ include file="<path>" %> syntax for includes, in addition
+    to <%@ include page="<path>" %>
+  - PageCompiler: optimize generated request handler code by removing useless
+    statements, e.g. writing empty strings.
+  - added POCO_DEPRECATED macro which will be used in the future to deprecate
+    classes and methods.
 
 
 !!!Release 1.7.8p3
