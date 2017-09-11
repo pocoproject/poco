@@ -19,6 +19,10 @@ Release 1.7.9 (2017-09-11)
   statements, e.g. writing empty strings.
 - added POCO_DEPRECATED macro which will be used in the future to deprecate
   classes and methods.
+- Poco::NamedMutex and Poco::NamedEvent (System V Semaphores implementation): files are
+  now opened with O_RDONLY | O_CREAT instead of O_WRONLY | O_CREAT, allowing sharing
+  between different users. Furthermore, ftok() is called with 'p' as project ID
+  argument.
 
 
 Release 1.7.8p3 (2017-06-22)
