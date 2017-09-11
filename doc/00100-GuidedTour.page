@@ -16,7 +16,7 @@ development. Of course, POCO is also ready for enterprise-level
 challenges.
 
 <%
-<img src="images/poco.png" width="320" height="255" alt="POCO Libraries" border="0">
+<img src="images/poco.png" width="320" height="255" alt="POCO Libraries" border="0"/>
 %>
 
 POCO consists of four core libraries, and a number of add-on libraries.
