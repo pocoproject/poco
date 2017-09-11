@@ -58,12 +58,12 @@ NamedMutexImpl::NamedMutexImpl(const std::string& name):
 	if ((long) _sem == (long) SEM_FAILED) 
 		throw SystemException(Poco::format("cannot create named mutex %s (sem_open() failed, errno=%d)", fileName, errno), _name);
 #else
-	int fd = open(fileName.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	int fd = open(fileName.c_str(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd != -1)
 		close(fd);
 	else 
 		throw SystemException(Poco::format("cannot create named mutex %s (lockfile)", fileName), _name);
-	key_t key = ftok(fileName.c_str(), 0);
+	key_t key = ftok(fileName.c_str(), 'p');
 	if (key == -1)
 		throw SystemException(Poco::format("cannot create named mutex %s (ftok() failed, errno=%d)", fileName, errno), _name);
 	_semid = semget(key, 1, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH | IPC_CREAT | IPC_EXCL);
