@@ -1,8 +1,6 @@
 //
 // StdFunctionDelegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/StdFunctionDelegate.h#4 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  StdFunctionDelegate

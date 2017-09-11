@@ -1,8 +1,6 @@
 //
 // BLAKE2EngineTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/BLAKE2EngineTest.h#1 $
-//
 // Definition of the BLAKE2EngineTest class.
 //
 // Copyright (c) 2017, Applied Informatics Software Engineering GmbH

@@ -1,8 +1,6 @@
 //
 // NullChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NullChannel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  NullChannel

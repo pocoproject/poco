@@ -1,8 +1,6 @@
 //
 // AbstractExtractor.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractExtractor.h#9 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AbstractExtractor

@@ -1,8 +1,6 @@
 //
 // RSADigestEngine.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSADigestEngine.cpp#1 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSADigestEngine

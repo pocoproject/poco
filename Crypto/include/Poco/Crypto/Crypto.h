@@ -1,8 +1,6 @@
 //
 // Crypto.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/Crypto.h#3 $
-//
 // Library: Crypto
 // Package: CryptoCore
 // Module:  Crypto

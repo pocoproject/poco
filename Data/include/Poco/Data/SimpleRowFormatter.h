@@ -1,8 +1,6 @@
 //
 // RowFormatter.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SimpleRowFormatter.h#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  SimpleRowFormatter

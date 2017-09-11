@@ -1,8 +1,6 @@
 //
 // Session.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Session.h#9 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Session

@@ -1,8 +1,6 @@
 //
 // DigestEngine.cpp
 //
-// $Id: //poco/1.4/Crypto/src/DigestEngine.cpp#1 $
-//
 // Library: Crypto
 // Package: Digest
 // Module:  DigestEngine

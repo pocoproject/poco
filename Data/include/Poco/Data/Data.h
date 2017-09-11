@@ -1,8 +1,6 @@
 //
 // Data.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Data.h#4 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Data

@@ -1,8 +1,6 @@
 //
 // Var.cpp
 //
-// $Id: //poco/svn/Foundation/src/Var.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Var

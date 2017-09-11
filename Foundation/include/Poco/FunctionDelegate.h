@@ -1,8 +1,6 @@
 //
 // FunctionDelegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FunctionDelegate.h#4 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  FunctionDelegate

@@ -1,8 +1,6 @@
 //
 // TCPServerDispatcher.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/TCPServerDispatcher.h#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServerDispatcher

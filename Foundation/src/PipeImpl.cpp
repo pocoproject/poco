@@ -1,8 +1,6 @@
 //
 // PipeImpl.cpp
 //
-// $Id: //poco/1.4/Foundation/src/PipeImpl.cpp#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  PipeImpl

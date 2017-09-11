@@ -1,7 +1,5 @@
 #! /bin/bash
 #
-# $Id: //poco/1.4/build/script/makedepend.clang#1 $
-#
 # makedepend.clang
 #
 # Create dependency file, Clang version

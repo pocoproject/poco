@@ -1,8 +1,6 @@
 //
 // BLAKE2EngineTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/BLAKE2EngineTest.cpp#1 $
-//
 // Code of the BLAKE2EngineTest class.
 //
 // test vectors from RFC 7693

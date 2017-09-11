@@ -1,8 +1,6 @@
 //
 // Utility.h
 //
-// $Id: //poco/Main/Data/PostgreSQL/include/Poco/Data/PostgreSQL/Utility.h#2 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  Utility

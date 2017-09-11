@@ -1,8 +1,6 @@
 //
 // DigestEngine.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/DigestEngine.h#1 $
-//
 // Library: Crypto
 // Package: Digest
 // Module:  DigestEngine

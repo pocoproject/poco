@@ -1,8 +1,6 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.4/Net/src/HTMLForm.cpp#4 $
-//
 // Library: Net
 // Package: HTML
 // Module:  HTMLForm

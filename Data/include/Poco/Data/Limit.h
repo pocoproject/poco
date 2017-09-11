@@ -1,8 +1,6 @@
 //
 // Limit.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Limit.h#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Limit

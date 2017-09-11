@@ -1,8 +1,6 @@
 //
 // FTPSStreamFactory.cpp
 //
-// $Id: //poco/1.4/Net/src/FTPSStreamFactory.cpp#1 $
-//
 // Library: Net
 // Package: FTP
 // Module:  FTPSStreamFactory

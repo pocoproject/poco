@@ -1,8 +1,6 @@
 //
 // RWLock_Android.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/RWLock_Android.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  RWLock

@@ -1,8 +1,6 @@
 //
 // RWLock_POSIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/RWLock_POSIX.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  RWLock

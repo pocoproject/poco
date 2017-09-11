@@ -1,8 +1,6 @@
 //
 // DynamicAnyHolder.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/DynamicAnyHolder.h#3 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  VarHolder

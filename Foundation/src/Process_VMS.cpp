@@ -1,8 +1,6 @@
 //
 // Process_VMS.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_VMS.cpp#3 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process

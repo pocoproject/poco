@@ -1,8 +1,6 @@
 //
 // CppToken.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/CppToken.h#2 $
-//
 // Library: CppParser
 // Package: CppParser
 // Module:  CppToken

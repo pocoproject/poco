@@ -1,8 +1,6 @@
 //
 // OpenSSLInitializer.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/OpenSSLInitializer.h#1 $
-//
 // Library: Crypto
 // Package: CryptoCore
 // Module:  OpenSSLInitializer

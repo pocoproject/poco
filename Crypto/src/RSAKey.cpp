@@ -1,8 +1,6 @@
 //
 // RSAKey.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSAKey.cpp#2 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSAKey

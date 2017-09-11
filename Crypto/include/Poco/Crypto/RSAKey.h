@@ -1,8 +1,6 @@
 //
 // RSAKey.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSAKey.h#2 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSAKey

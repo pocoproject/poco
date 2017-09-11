@@ -1,8 +1,6 @@
 //
 // Array.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Array.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Array

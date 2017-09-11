@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/template/TestSuite.make#3 $
-#
 # Makefile for Poco NetSSL testsuite
 #
 

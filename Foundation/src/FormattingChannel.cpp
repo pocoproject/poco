@@ -1,8 +1,6 @@
 //
 // FormattingChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FormattingChannel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Formatter
