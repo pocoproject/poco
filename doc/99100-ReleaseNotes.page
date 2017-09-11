@@ -3,6 +3,8 @@ AAAIntroduction
 
 !!!Release 1.7.9
 
+!!Summary of Changes
+
   - fixed GH #1813: xmlparse.cpp doesn't compile in WinCE (poco 1.7.8p3)
   - fixed GH #1826: XPath query error
   - fixed GH #1834: Visual Studio 2008 cannot find stdint.h
@@ -13,8 +15,8 @@ AAAIntroduction
   - Poco::Util::LayeredConfiguration: added support for labelling configurations and
     finding them by their label
   - upgraded bundled SQLite to 3.20.1
-  - PageCompiler: support <%@ include file="<path>" %> syntax for includes, in addition
-    to <%@ include page="<path>" %>
+  - PageCompiler: support <[@ include file="<path>"]> syntax for includes, in addition
+    to <[@ include page="<path>"]>
   - PageCompiler: optimize generated request handler code by removing useless
     statements, e.g. writing empty strings.
   - added POCO_DEPRECATED macro which will be used in the future to deprecate
@@ -26,6 +28,8 @@ AAAIntroduction
 
 
 !!!Release 1.7.8p3
+
+!!Summary of Changes
 
   - fixed GH #1760: Upgrade bundled expat to 2.2.1 which fixes some vulnerabilities:
     http://seclists.org/oss-sec/2017/q2/499
