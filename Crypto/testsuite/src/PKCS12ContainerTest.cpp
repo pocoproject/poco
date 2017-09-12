@@ -52,9 +52,8 @@ void PKCS12ContainerTest::testFullPKCS12()
 		std::string file = getTestFilesPath("full");
 		full(PKCS12Container(Poco::Path(file), "crypto"));
 
-		/* TODO: error:0D06B08E:asn1 encoding routines:ASN1_D2I_READ_BIO:not enough data
 		std::ifstream ifs(file);
-		full(PKCS12Container(ifs, "crypto"));*/
+		full(PKCS12Container(ifs, "crypto"));
 	}
 	catch (Poco::Exception& ex)
 	{
@@ -66,9 +65,7 @@ void PKCS12ContainerTest::testFullPKCS12()
 
 void PKCS12ContainerTest::full(const PKCS12Container& pkcs12)
 {
-	//PKCS12Container pkcs12(Poco::Path(getTestFilesPath("full")), "crypto");
-
-	assert ( "vally" == pkcs12.getFriendlyName());
+	assert ("vally" == pkcs12.getFriendlyName());
 
 	assert (pkcs12.hasKey());
 	assert (pkcs12.hasX509Certificate());
@@ -130,9 +127,8 @@ void PKCS12ContainerTest::testCertsOnlyPKCS12()
 		std::string file = getTestFilesPath("certs-only");
 		certsOnly(PKCS12Container(Poco::Path(file), "crypto"));
 
-		/* TODO: error:0D06B08E:asn1 encoding routines:ASN1_D2I_READ_BIO:not enough data
 		std::ifstream ifs(file);
-		certsOnly(PKCS12Container(ifs, "crypto"));*/
+		certsOnly(PKCS12Container(ifs, "crypto"));
 	}
 	catch (Poco::Exception& ex)
 	{
@@ -148,6 +144,8 @@ void PKCS12ContainerTest::certsOnly(const PKCS12Container& pkcs12)
 	assert (!pkcs12.hasX509Certificate());
 
 	PKCS12Container::CAList caList = pkcs12.getCACerts();
+
+	assert (5 == caList.size());
 
 	assert (caList[0].subjectName() == "/C=US/O=Let's Encrypt/CN=Let's Encrypt Authority X3");
 	assert (caList[0].issuerName() == "/C=US/O=Internet Security Research Group/CN=ISRG Root X1");

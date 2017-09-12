@@ -90,23 +90,26 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 {
 	if (pPKCS12)
 	{
-		X509* pCert = nullptr;
-		STACK_OF(X509)* pCA = nullptr;
+		X509* pCert = 0;
+		STACK_OF(X509)* pCA = 0;
 		if (PKCS12_parse(pPKCS12, password.c_str(), &_pKey, &pCert, &pCA))
 		{
 			if (pCert)
 			{
-				STACK_OF(PKCS12_SAFEBAG)* pBags = nullptr;
+				STACK_OF(PKCS12_SAFEBAG)* pBags = 0;
 				_pX509Cert.reset(new X509Certificate(pCert, true));
 				PKCS12_SAFEBAG* pBag = PKCS12_add_cert(&pBags, pCert);
-				char* pBuffer = PKCS12_get_friendlyname(pBag);
-				if (pBuffer)
+				if (pBag)
 				{
-					_pkcsFriendlyname = pBuffer;
-					CRYPTO_free(pBuffer);
+					char*pBuffer = PKCS12_get_friendlyname(pBag);
+					if(pBuffer)
+					{
+						_pkcsFriendlyname = pBuffer;
+						CRYPTO_free(pBuffer);
+					}else _pkcsFriendlyname.clear();
+					if(pBags) sk_PKCS12_SAFEBAG_pop_free(pBags, PKCS12_SAFEBAG_free);
 				}
-				else _pkcsFriendlyname.clear();
-				if (pBags) sk_PKCS12_SAFEBAG_pop_free(pBags, PKCS12_SAFEBAG_free);
+				else throw OpenSSLException();
 			}
 			else _pX509Cert.reset();
 
