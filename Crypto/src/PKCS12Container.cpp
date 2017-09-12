@@ -96,12 +96,17 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 		{
 			if (pCert)
 			{
-				STACK_OF(PKCS12_SAFEBAG)* bags = nullptr;
+				STACK_OF(PKCS12_SAFEBAG)* pBags = nullptr;
 				_pX509Cert.reset(new X509Certificate(pCert, true));
-				PKCS12_SAFEBAG* bag = PKCS12_add_cert(&bags, pCert);
-				char* buffer = PKCS12_get_friendlyname(bag);
-				if (buffer) _pkcsFriendlyname = buffer;
+				PKCS12_SAFEBAG* pBag = PKCS12_add_cert(&pBags, pCert);
+				char* pBuffer = PKCS12_get_friendlyname(pBag);
+				if (pBuffer)
+				{
+					_pkcsFriendlyname = pBuffer;
+					CRYPTO_free(pBuffer);
+				}
 				else _pkcsFriendlyname.clear();
+				if (pBags) sk_PKCS12_SAFEBAG_pop_free(pBags, PKCS12_SAFEBAG_free);
 			}
 			else _pX509Cert.reset();
 
