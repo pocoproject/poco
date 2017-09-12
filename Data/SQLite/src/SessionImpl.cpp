@@ -22,7 +22,7 @@
 #include "Poco/String.h"
 #include "Poco/Mutex.h"
 #include "Poco/Data/DataException.h"
-#if defined(POCO_UNBUNDLED)
+#if defined(POCO_UNBUNDLED_SQLITE)
 #include <sqlite3.h>
 #else
 #include "sqlite3.h"

@@ -11,7 +11,9 @@ POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
-if (POCO_UNBUNDLED)
+option(POCO_UNBUNDLED_ZLIB
+  "Set to OFF|ON (default is OFF) to control linking dependencies as external" ${POCO_UNBUNDLED})
+if (POCO_UNBUNDLED_ZLIB)
     find_package(ZLIB REQUIRED)
     set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
     include_directories(${ZLIB_INCLUDE_DIRS})
@@ -30,7 +32,7 @@ else()
         src/trees.c
         src/zutil.c
     )
-endif (POCO_UNBUNDLED)
+endif (POCO_UNBUNDLED_ZLIB)
 
 # TODO: Currently only bundled is supported, in future this should also be possible
 # with an unbundled version of hpdf

@@ -21,7 +21,7 @@
 #include "Poco/Exception.h"
 #include "Poco/InflatingStream.h"
 #include "Poco/DeflatingStream.h"
-#if defined(POCO_UNBUNDLED)
+#if defined(POCO_UNBUNDLED_ZLIB)
 #include <zlib.h>
 #else
 #include "Poco/zlib.h"

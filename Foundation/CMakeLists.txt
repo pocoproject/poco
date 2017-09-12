@@ -37,10 +37,15 @@ POCO_MESSAGES( SRCS Logging src/pocomsg.mc)
 
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
-if (POCO_UNBUNDLED)
+option(POCO_UNBUNDLED_PCRE
+  "Set to OFF|ON (default is OFF) to control linking pcre as external" ${POCO_UNBUNDLED})
+
+if (POCO_UNBUNDLED_PCRE)
 	find_package(PCRE REQUIRED)
 	set(SYSLIBS ${SYSLIBS} ${PCRE_LIBRARIES})
 	include_directories(${PCRE_INCLUDE_DIRS})
+
+	add_definitions(-DPOCO_UNBUNDLED_PCRE)
 
 	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
 	POCO_SOURCES( SRCS RegExp
@@ -48,9 +53,6 @@ if (POCO_UNBUNDLED)
 		src/pcre_tables.c
 	)
 
-	find_package(ZLIB REQUIRED)
-	set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
-	include_directories(${ZLIB_INCLUDE_DIRS})
 else()
 	# pcre
 	POCO_SOURCES( SRCS pcre
@@ -76,6 +78,18 @@ else()
 		src/pcre_valid_utf8.c
 		src/pcre_xclass.c
 	)
+endif (POCO_UNBUNDLED_PCRE)
+
+option(POCO_UNBUNDLED_ZLIB
+  "Set to OFF|ON (default is OFF) to control linking zlib as external" ${POCO_UNBUNDLED})
+
+if (POCO_UNBUNDLED_ZLIB)
+	find_package(ZLIB REQUIRED)
+	set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
+	include_directories(${ZLIB_INCLUDE_DIRS})
+
+	add_definitions(-DPOCO_UNBUNDLED_ZLIB)
+else()
 
 	# zlib
 	POCO_HEADERS( SRCS zlib
@@ -95,7 +109,7 @@ else()
 		src/trees.c
 		src/zutil.c
 	)
-endif (POCO_UNBUNDLED)
+endif (POCO_UNBUNDLED_ZLIB)
 
 if(WIN32)
 	set(SYSLIBS ${SYSLIBS} iphlpapi)
