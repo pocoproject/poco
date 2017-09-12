@@ -43,6 +43,9 @@ class Crypto_API ECKey : public KeyPair
 	/// or computing secure digital signatures.
 {
 public:
+	ECKey(const EVPPKey& key);
+		/// Constructs ECKeyImpl by extracting the EC key.
+
 	ECKey(const X509Certificate& cert);
 		/// Extracts the EC public key from the given certificate.
 

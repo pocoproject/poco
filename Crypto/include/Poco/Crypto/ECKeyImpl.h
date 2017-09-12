@@ -21,6 +21,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/KeyPairImpl.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/RefCountedObject.h"
@@ -41,17 +42,20 @@ class PKCS12Container;
 
 
 class ECKeyImpl: public KeyPairImpl
-	/// class ECKeyImpl
+	/// Elliptic Curve key clas implementation.
 {
 public:
 	typedef Poco::AutoPtr<ECKeyImpl> Ptr;
 	typedef std::vector<unsigned char> ByteVec;
 
+	ECKeyImpl(const EVPPKey& key);
+		/// Constructs ECKeyImpl by extracting the EC key.
+
 	ECKeyImpl(const X509Certificate& cert);
-		/// Extracts the EC public key from the given certificate.
+		/// Constructs ECKeyImpl by extracting the EC public key from the given certificate.
 
 	ECKeyImpl(const PKCS12Container& cert);
-		/// Extracts the EC private key from the given certificate.
+		/// Constructs ECKeyImpl by extracting the EC private key from the given certificate.
 
 	ECKeyImpl(int eccGroup);
 		/// Creates the ECKey of the specified group. Creates a new public/private keypair using the given parameters.

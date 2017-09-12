@@ -294,4 +294,19 @@ bool X509Certificate::equals(const X509Certificate& otherCertificate) const
 }
 
 
+void X509Certificate::print(std::ostream& out) const
+{
+	out << "subjectName: " << subjectName() << std::endl;
+	out << "issuerName: " << issuerName() << std::endl;
+	out << "commonName: " << commonName() << std::endl;
+	out << "country: " << subjectName(X509Certificate::NID_COUNTRY) << std::endl;
+	out << "localityName: " << subjectName(X509Certificate::NID_LOCALITY_NAME) << std::endl;
+	out << "stateOrProvince: " << subjectName(X509Certificate::NID_STATE_OR_PROVINCE) << std::endl;
+	out << "organizationName: " << subjectName(X509Certificate::NID_ORGANIZATION_NAME) << std::endl;
+	out << "organizationUnitName: " << subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME) << std::endl;
+	out << "emailAddress: " << subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS) << std::endl;
+	out << "serialNumber: " << subjectName(X509Certificate::NID_SERIAL_NUMBER) << std::endl;
+}
+
+
 } } // namespace Poco::Crypto

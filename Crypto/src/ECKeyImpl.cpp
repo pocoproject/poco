@@ -17,7 +17,6 @@
 #include "Poco/Crypto/ECKeyImpl.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/PKCS12Container.h"
-#include "Poco/Crypto/EVPPKey.h"
 #include "Poco/FileStream.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
@@ -31,6 +30,14 @@
 
 namespace Poco {
 namespace Crypto {
+
+
+ECKeyImpl::ECKeyImpl(const EVPPKey& key):
+	KeyPairImpl("ec", KT_EC_IMPL),
+	_pEC(EVP_PKEY_get1_EC_KEY(const_cast<EVP_PKEY*>((const EVP_PKEY*)key)))
+{
+	if (!_pEC) throw OpenSSLException();
+}
 
 
 ECKeyImpl::ECKeyImpl(const X509Certificate& cert):
@@ -54,10 +61,9 @@ ECKeyImpl::ECKeyImpl(const X509Certificate& cert):
 
 ECKeyImpl::ECKeyImpl(const PKCS12Container& cont):
 	KeyPairImpl("ec", KT_EC_IMPL),
-	_pEC(0)
+	_pEC(EVP_PKEY_get1_EC_KEY(cont.getKey()))
 {
-	EVPPKey key = cont.getKey();
-	_pEC = EVP_PKEY_get1_EC_KEY(key);
+	if (!_pEC) throw OpenSSLException();
 }
 
 

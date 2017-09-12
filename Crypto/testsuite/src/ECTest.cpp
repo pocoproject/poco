@@ -89,10 +89,10 @@ void ECTest::testEVPPKey()
 {
 	int eccGroup = OBJ_txt2nid("secp521r1");
 	EC_KEY* pEC = EC_KEY_new_by_curve_name(eccGroup);
-	assert (pEC != nullptr);
+	assert (pEC != 0);
 	assert (0 != EC_KEY_generate_key(pEC));
 	EVP_PKEY* pKey = EVP_PKEY_new();
-	assert (pKey != nullptr);
+	assert (pKey != 0);
 	assert (0 != EVP_PKEY_set1_EC_KEY(pKey, pEC));
 	EC_KEY_free(pEC);
 

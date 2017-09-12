@@ -13,6 +13,7 @@
 #include "RSATest.h"
 #include "ECTest.h"
 #include "DigestEngineTest.h"
+#include "PKCS12ContainerTest.h"
 
 
 CppUnit::Test* CryptoTestSuite::suite()
@@ -23,6 +24,6 @@ CppUnit::Test* CryptoTestSuite::suite()
 	pSuite->addTest(RSATest::suite());
 	pSuite->addTest(ECTest::suite());
 	pSuite->addTest(DigestEngineTest::suite());
-
+	pSuite->addTest(PKCS12ContainerTest::suite());
 	return pSuite;
 }

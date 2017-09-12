@@ -22,6 +22,13 @@ namespace Poco {
 namespace Crypto {
 
 
+ECKey::ECKey(const EVPPKey& key):
+	KeyPair(new ECKeyImpl(key)),
+	_pImpl(KeyPair::impl().cast<ECKeyImpl>())
+{
+}
+
+
 ECKey::ECKey(const X509Certificate& cert):
 	KeyPair(new ECKeyImpl(cert)),
 	_pImpl(KeyPair::impl().cast<ECKeyImpl>())

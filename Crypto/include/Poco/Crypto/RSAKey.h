@@ -55,7 +55,10 @@ public:
 		EXP_LARGE
 	};
 
-	explicit RSAKey(const X509Certificate& cert);
+	RSAKey(const EVPPKey& key);
+		/// Constructs ECKeyImpl by extracting the EC key.
+
+	RSAKey(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
 
 	RSAKey(const PKCS12Container& cert);

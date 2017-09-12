@@ -57,10 +57,11 @@ public:
 	~PKCS12Container();
 		/// Destroys the PKCS12Container.
 
-	EVPPKey getKey() const
-	{
-		return EVPPKey(_pKey);
-	}
+	bool hasKey() const;
+		/// Returns true if container contains the key.
+
+	EVPPKey getKey() const;
+		/// Return key as openssl EVP_PKEY wrapper object.
 
 	bool hasX509Certificate() const;
 		/// Returns true if container has X509 certificate.
@@ -81,7 +82,7 @@ private:
 	typedef std::unique_ptr<X509Certificate> CertPtr;
 
 	OpenSSLInitializer _openSSLInitializer;
-	EVP_PKEY*          _pKey = nullptr;
+	EVP_PKEY*          _pKey = 0;
 	CertPtr            _pX509Cert;
 	CAList             _caCertList;
 	std::string        _pkcsFriendlyname;
@@ -115,6 +116,18 @@ inline const std::string& PKCS12Container::getFriendlyName() const
 inline const PKCS12Container::CAList& PKCS12Container::getCACerts() const
 {
 	return _caCertList;
+}
+
+
+inline bool PKCS12Container::hasKey() const
+{
+	return _pKey != 0;
+}
+
+
+inline EVPPKey PKCS12Container::getKey() const
+{
+	return EVPPKey(_pKey);
 }
 
 

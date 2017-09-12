@@ -30,7 +30,16 @@ namespace Poco {
 namespace Crypto {
 
 
-RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert): KeyPairImpl("rsa", KT_RSA_IMPL),
+RSAKeyImpl::RSAKeyImpl(const EVPPKey& key):
+	KeyPairImpl("rsa", KT_EC_IMPL),
+	_pRSA(EVP_PKEY_get1_RSA(const_cast<EVP_PKEY*>((const EVP_PKEY*)key)))
+{
+	if (!_pRSA) throw OpenSSLException();
+}
+
+
+RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
+	KeyPairImpl("rsa", KT_RSA_IMPL),
 	_pRSA(0)
 {
 	const X509* pCert = cert.certificate();

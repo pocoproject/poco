@@ -20,6 +20,13 @@ namespace Poco {
 namespace Crypto {
 
 
+RSAKey::RSAKey(const EVPPKey& key):
+	KeyPair(new RSAKeyImpl(key)),
+	_pImpl(KeyPair::impl().cast<RSAKeyImpl>())
+{
+}
+
+
 RSAKey::RSAKey(const X509Certificate& cert):
 	KeyPair(new RSAKeyImpl(cert)),
 	_pImpl(KeyPair::impl().cast<RSAKeyImpl>())

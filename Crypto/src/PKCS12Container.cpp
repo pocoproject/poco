@@ -29,14 +29,15 @@ PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password
 {
 	std::ostringstream ostr;
 	Poco::StreamCopier::copyStream(istr, ostr);
-	std::string cont = ostr.str();
+	const std::string& cont = ostr.str();
 
-	BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(cont.data()), static_cast<int>(cont.size()));
+	BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(cont.c_str()), static_cast<int>(cont.size()));
 	if (pBIO)
 	{
-		PKCS12* pkcs12 = d2i_PKCS12_bio(pBIO, NULL);
+		PKCS12* pPKCS12 = d2i_PKCS12_bio(pBIO, NULL);
 		BIO_free(pBIO);
-		load(pkcs12, password);
+		if (!pPKCS12) throw OpenSSLException();
+		load(pPKCS12, password);
 	}
 	else
 	{
@@ -53,6 +54,7 @@ PKCS12Container::PKCS12Container(const Poco::Path& path, const std::string& pass
 	{
 		PKCS12* pPKCS12 = d2i_PKCS12_fp(pFile, NULL);
 		fclose (pFile);
+		if (!pPKCS12) throw OpenSSLException();
 		load(pPKCS12, password);
 	}
 	else
@@ -90,45 +92,46 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 	{
 		X509* pCert = nullptr;
 		STACK_OF(X509)* pCA = nullptr;
-		STACK_OF(PKCS12_SAFEBAG)* bags = nullptr;
 		if (PKCS12_parse(pPKCS12, password.c_str(), &_pKey, &pCert, &pCA))
 		{
-			if (pCert && _pKey)
+			if (pCert)
 			{
+				STACK_OF(PKCS12_SAFEBAG)* bags = nullptr;
 				_pX509Cert.reset(new X509Certificate(pCert));
 				PKCS12_SAFEBAG* bag = PKCS12_add_cert(&bags, pCert);
 				char* buffer = PKCS12_get_friendlyname(bag);
 				if (buffer) _pkcsFriendlyname = buffer;
 				else _pkcsFriendlyname.clear();
-				_caCertList.clear();
-				if (pCA)
-				{
-					int certCount = sk_X509_num(pCA);
-					for (int i = 0; i < certCount; ++i)
-					{
-						_caCertList.push_back(X509Certificate(sk_X509_value(pCA, i)));
-					}
-				}
 			}
-			else
+			else _pX509Cert.reset();
+
+			_caCertList.clear();
+			if (pCA)
 			{
-				_pX509Cert.reset();
+				int certCount = sk_X509_num(pCA);
+				for (int i = 0; i < certCount; ++i)
+				{
+					_caCertList.push_back(X509Certificate(sk_X509_value(pCA, i)));
+				}
 			}
 		}
 		else
 		{
-			unsigned long e = ERR_get_error();
-			char buf[128] = { 0 };
-			char* pErr = ERR_error_string(e, buf);
-			std::string err = "PKCS12Container PKCS12_parse error: ";
-			if (pErr) err.append(pErr);
-			else err.append(NumberFormatter::format(e));
-
-			throw RuntimeException(err);
+			throw OpenSSLException();
 		}
 		PKCS12_free(pPKCS12);
-		sk_X509_pop_free(pCA, X509_free);
-		X509_free(pCert);
+		// ??? TODO:
+		// crashing here, not sure if these should be freed
+		// ************************
+		// sk_X509_pop_free(pCA, X509_free);
+		// X509_free(pCert);
+		// *************************
+		// there's an example on SO with these calls, however: 
+		// https://github.com/openssl/openssl/blob/master/demos/pkcs12/pkread.c
+		// and 
+		// https://opensource.apple.com/source/OpenSSL/OpenSSL-46/openssl/doc/openssl.txt (3.1 Parsing with PKCS12_parse().)
+		//
+		// !!! check with valgrind
 	}
 	else
 	{
