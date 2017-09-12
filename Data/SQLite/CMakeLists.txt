@@ -9,7 +9,10 @@ POCO_SOURCES_AUTO( SQLITE_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SQLITE_SRCS ${HDRS_G})
 
-if (POCO_UNBUNDLED)
+option(POCO_UNBUNDLED_SQLITE
+  "Set to OFF|ON (default is OFF) to control linking sqlite as external" ${POCO_UNBUNDLED})
+
+if (POCO_UNBUNDLED_SQLITE)
     find_package(SQLite3)
     set(DATASQLITELIBS ${SQLITE3_LIBRARIES})
     include_directories("${SQLITE3_INCLUDE_DIRS}")
