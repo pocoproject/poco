@@ -1,3 +1,4 @@
+
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO(SRCS ${SRCS_G})
@@ -34,16 +35,17 @@ POCO_MESSAGES(SRCS Logging src/pocomsg.mc)
 
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
-if(POCO_UNBUNDLED)
+option(POCO_UNBUNDLED_PCRE
+  "Set to OFF|ON (default is OFF) to control linking pcre as external" ${POCO_UNBUNDLED})
+
+if (POCO_UNBUNDLED_PCRE)
 	find_package(PCRE2 REQUIRED)
-	find_package(ZLIB REQUIRED)
 
 	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
 	POCO_SOURCES(SRCS RegExp
 		src/pcre2_ucd.c
 		src/pcre2_tables.c
 	)
-
 else()
 	# pcre2
 	POCO_SOURCES(SRCS pcre2
@@ -75,6 +77,14 @@ else()
 		src/pcre2_valid_utf.c
 		src/pcre2_xclass.c
 	)
+endif()
+
+option(POCO_UNBUNDLED_ZLIB
+  "Set to OFF|ON (default is OFF) to control linking zlib as external" ${POCO_UNBUNDLED})
+
+if (POCO_UNBUNDLED_ZLIB)
+	find_package(ZLIB REQUIRED)
+else()
 
 	# zlib
 	POCO_HEADERS(SRCS zlib
@@ -94,8 +104,7 @@ else()
 		src/trees.c
 		src/zutil.c
 	)
-endif(POCO_UNBUNDLED)
-
+endif()
 
 add_library(Foundation ${SRCS})
 add_library(Poco::Foundation ALIAS Foundation)

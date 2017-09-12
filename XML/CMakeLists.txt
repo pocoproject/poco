@@ -1,3 +1,4 @@
+
 # Expat CPP sources to be excluded from globbed SRCS_G
 # They are added back on the list if POCO_UNBUNDLED is not set
 set(EXPAT_CPP "${CMAKE_CURRENT_SOURCE_DIR}/src/xmlparse.cpp")
@@ -19,7 +20,11 @@ endif()
 
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
-if(POCO_UNBUNDLED)
+
+option(POCO_UNBUNDLED_EXPAT
+  "Set to OFF|ON (default is OFF) to control linking expat as external" ${POCO_UNBUNDLED})
+
+if (POCO_UNBUNDLED_EXPAT)
 	find_package(EXPAT REQUIRED)
 else()
 	POCO_SOURCES(SRCS expat
@@ -29,7 +34,7 @@ else()
 		src/xmltok_impl.c
 		src/xmltok_ns.c
 	)
-endif(POCO_UNBUNDLED)
+endif()
 
 add_library(XML ${SRCS})
 
