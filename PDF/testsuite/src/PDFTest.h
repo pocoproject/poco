@@ -1,8 +1,6 @@
 //
 // PDFTest.h
 //
-// $Id: //poco/Main/PDF/testsuite/src/PDFTest.h#6 $
-//
 // Definition of the PDFTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

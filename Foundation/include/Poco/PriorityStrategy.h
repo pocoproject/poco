@@ -1,8 +1,6 @@
 //
 // PriorityStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/PriorityStrategy.h#2 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  PrioritytStrategy

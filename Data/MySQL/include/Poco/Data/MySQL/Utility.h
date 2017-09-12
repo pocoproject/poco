@@ -1,8 +1,6 @@
 //
 // Utility.h
 //
-// $Id: //poco/Main/Data/MySQL/include/Poco/Data/MySQL/Utility.h#2 $
-//
 // Library: Data/MySQL
 // Package: MySQL
 // Module:  Utility

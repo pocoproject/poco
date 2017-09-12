@@ -1,8 +1,6 @@
 //
 // Destination.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/Destination.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Destination

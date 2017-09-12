@@ -1,8 +1,6 @@
 //
 // NamedEventTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NamedEventTest.h#1 $
-//
 // Definition of the NamedEventTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

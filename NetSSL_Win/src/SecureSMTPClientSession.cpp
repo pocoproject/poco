@@ -1,8 +1,6 @@
 //
 // SecureSMTPClientSession.h
 //
-// $Id: //poco/1.4/NetSSL_Win/src/SecureSMTPClientSession.cpp#1 $
-//
 // Library: NetSSL_Win
 // Package: Mail
 // Module:  SecureSMTPClientSession

@@ -1,8 +1,6 @@
 //
 // URI.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/URI.h#1 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URI

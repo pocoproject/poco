@@ -1,8 +1,6 @@
 //
 // TextAnnotation.cpp
 //
-// $Id: //poco/Main/PDF/src/TextAnnotation.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  TextAnnotation

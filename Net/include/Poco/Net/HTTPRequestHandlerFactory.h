@@ -1,8 +1,6 @@
 //
 // HTTPRequestHandlerFactory.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPRequestHandlerFactory.h#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPRequestHandlerFactory

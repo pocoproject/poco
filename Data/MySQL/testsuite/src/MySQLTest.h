@@ -1,8 +1,6 @@
 //
 // ODBCMySQLTest.h
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/ODBCMySQLTest.h#1 $
-//
 // Definition of the MySQLTest class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -87,6 +85,9 @@ public:
 	void testFloat();
 	void testDouble();
 
+	void testAny();
+	void testDynamicAny();
+
 	void testTuple();
 	void testTupleVector();
 
@@ -134,6 +135,7 @@ private:
 	void recreateVectorsTable();
 	void recreateNullableIntTable();
 	void recreateNullableStringTable();
+	void recreateAnyTable();
 
 	static void dbInfo(Poco::Data::Session& session);
 

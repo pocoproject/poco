@@ -1,8 +1,6 @@
 //
 // ODBCException.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/ODBCException.cpp#2 $
-//
 // Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCException

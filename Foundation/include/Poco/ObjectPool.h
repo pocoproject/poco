@@ -1,8 +1,6 @@
 //
 // ObjectPool.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ObjectPool.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  ObjectPool

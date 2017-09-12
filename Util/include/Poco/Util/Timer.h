@@ -1,8 +1,6 @@
 //
 // Timer.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/Timer.h#2 $
-//
 // Library: Util
 // Package: Timer
 // Module:  Timer

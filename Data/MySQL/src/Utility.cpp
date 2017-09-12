@@ -1,8 +1,6 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/Main/Data/MySQL/src/Utility.cpp#5 $
-//
 // Library: Data/MySQL
 // Package: MySQL
 // Module:  Utility

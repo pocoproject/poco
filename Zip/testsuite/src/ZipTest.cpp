@@ -1,8 +1,6 @@
 //
 // ZipTest.cpp
 //
-// $Id: //poco/1.4/Zip/testsuite/src/ZipTest.cpp#1 $
-//
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

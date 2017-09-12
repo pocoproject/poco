@@ -1,8 +1,6 @@
 //
 // NotificationCenterTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NotificationCenterTest.h#1 $
-//
 // Definition of the NotificationCenterTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

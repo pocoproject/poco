@@ -1,8 +1,6 @@
 //
 // LOBStream.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/LOBStream.h#3 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  LOBStream

@@ -1,8 +1,6 @@
 //
 // ifconfig.cpp
 //
-// $Id: //poco/1.4/Net/samples/download/src/ifconfig.cpp#1 $
-//
 // This sample demonstrates the (display only) ifconfig-like capabilities 
 // of the NetworkInterface class (on platforms where it is supported).
 //

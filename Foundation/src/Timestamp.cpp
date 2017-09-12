@@ -1,8 +1,6 @@
 //
 // Timestamp.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timestamp.cpp#2 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timestamp

@@ -1,8 +1,6 @@
 //
 // JSONRowFormatter.cpp
 //
-// $Id: //poco/Main/Data/src/JSONRowFormatter.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  JSONRowFormatter

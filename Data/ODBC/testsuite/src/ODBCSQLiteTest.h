@@ -1,8 +1,6 @@
 //
 // ODBCSQLiteTest.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCSQLiteTest.h#4 $
-//
 // Definition of the ODBCSQLiteTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

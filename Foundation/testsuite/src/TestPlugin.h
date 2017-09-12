@@ -1,8 +1,6 @@
 //
 // TestPlugin.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TestPlugin.h#1 $
-//
 // Definition of the TestPlugin class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

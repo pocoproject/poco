@@ -1,8 +1,6 @@
 //
 // Mutex_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Mutex_POSIX.cpp#4 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex

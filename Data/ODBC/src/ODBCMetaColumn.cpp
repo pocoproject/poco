@@ -1,8 +1,6 @@
 //
 // ODBCMetaColumn.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/ODBCMetaColumn.cpp#5 $
-//
 // Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCMetaColumn

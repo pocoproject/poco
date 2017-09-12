@@ -1,8 +1,6 @@
 //
 // TimerTask.cpp
 //
-// $Id: //poco/1.4/Util/src/TimerTask.cpp#1 $
-//
 // Library: Util
 // Package: Timer
 // Module:  TimerTask

@@ -1,8 +1,6 @@
 //
 // ManifestTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ManifestTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

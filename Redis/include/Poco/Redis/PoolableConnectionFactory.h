@@ -35,23 +35,23 @@ class PoolableObjectFactory<Redis::Client, Redis::Client::Ptr>
 {
 public:
 	PoolableObjectFactory(Net::SocketAddress& address):
-		_address(address)
+        _address(address)
 	{
 	}
 
 	PoolableObjectFactory(const std::string& address):
-		_address(address)
+        _address(address)
 	{
 	}
 
 	Redis::Client::Ptr createObject()
 	{
-		return new Redis::Client(_address);
+        return new Redis::Client(_address);
 	}
 
 	bool validateObject(Redis::Client::Ptr pObject)
 	{
-		return true;
+        return true;
 	}
 
 	void activateObject(Redis::Client::Ptr pObject)
@@ -91,7 +91,10 @@ public:
 	{
 		try
 		{
-			_pool.returnObject(_client);
+            if (_client)
+            {
+                _pool.returnObject(_client);
+            }
 		}
 		catch (...)
 		{

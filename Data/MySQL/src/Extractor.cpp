@@ -1,8 +1,6 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/Extractor.cpp#1 $
-//
 // Library: Data/MySQL
 // Package: MySQL
 // Module:  Extractor
@@ -18,6 +16,7 @@
 
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
+#include "Poco/Dynamic/Var.h"
 
 namespace Poco {
 namespace Data {
@@ -240,13 +239,13 @@ bool Extractor::extract(std::size_t pos, Time& val)
 
 bool Extractor::extract(std::size_t pos, Any& val)
 {
-	return false;
+	return extractToDynamic<Any>(pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Dynamic::Var& val)
 {
-	return false;
+	return extractToDynamic<Dynamic::Var>(pos, val);
 }
 
 

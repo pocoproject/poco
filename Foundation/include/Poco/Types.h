@@ -1,8 +1,6 @@
 //
 // Types.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Types.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Types

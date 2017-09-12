@@ -1,8 +1,6 @@
 //
 // TestStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/TestStatementImpl.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

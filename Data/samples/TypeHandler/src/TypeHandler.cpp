@@ -1,8 +1,6 @@
 //
 // Binding.cpp
 //
-// $Id: //poco/Main/Data/samples/TypeHandler/src/TypeHandler.cpp#3 $
-//
 // This sample demonstrates the Data library.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

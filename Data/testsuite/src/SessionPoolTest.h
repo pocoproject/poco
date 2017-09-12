@@ -1,8 +1,6 @@
 //
 // SessionPoolTest.h
 //
-// $Id: //poco/Main/Data/testsuite/src/SessionPoolTest.h#1 $
-//
 // Definition of the SessionPoolTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

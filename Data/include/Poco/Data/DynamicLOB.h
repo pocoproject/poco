@@ -1,8 +1,6 @@
 //
 // DynamicLOB.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/DynamicLOB.h#12 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  DynamicLOB
