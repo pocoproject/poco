@@ -11,9 +11,6 @@ deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty-4.0 main
 deb http://llvm.org/apt/trusty/     llvm-toolchain-trusty-5.0 main
 deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty-5.0 main
 
-# Also add the following for the appropriate libstdc++
-deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main
-
 # LLVMAPT
 
 # wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key|sudo apt-key add -
