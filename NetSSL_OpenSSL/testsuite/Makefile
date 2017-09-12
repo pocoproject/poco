@@ -16,7 +16,8 @@ endif
 objects = NetSSLTestSuite Driver \
 	HTTPSClientSessionTest HTTPSClientTestSuite HTTPSServerTest HTTPSServerTestSuite \
 	HTTPSStreamFactoryTest HTTPSTestServer TCPServerTest TCPServerTestSuite \
-	WebSocketTest WebSocketTestSuite FTPSClientSessionTest FTPSClientTestSuite DialogServer
+	WebSocketTest WebSocketTestSuite FTPSClientSessionTest FTPSClientTestSuite DialogServer \
+	X509CertificateTest X509CertificateTestSuite
 
 target         = testrunner
 target_version = 1
