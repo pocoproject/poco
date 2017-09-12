@@ -23,6 +23,7 @@
 #include "Poco/Environment.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
+#include <iostream>
 #include <sstream>
 #include <fstream>
 

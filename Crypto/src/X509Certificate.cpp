@@ -107,17 +107,17 @@ X509Certificate::~X509Certificate()
 void X509Certificate::load(std::istream& istr)
 {
 	poco_assert (!_pCert);
-		
+
 	std::stringstream certStream;
 	Poco::StreamCopier::copyStream(istr, certStream);
 	std::string cert = certStream.str();
-		
+
 	BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(cert.data()), static_cast<int>(cert.size()));
 	if (!pBIO) throw Poco::IOException("Cannot create BIO for reading certificate");
 	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
 	BIO_free(pBIO);
-	
-	if (!_pCert) throw Poco::IOException("Faild to load certificate from stream");
+
+	if (!_pCert) throw Poco::IOException("Failed to load certificate from stream");
 
 	init();
 }
@@ -134,10 +134,10 @@ void X509Certificate::load(const std::string& path)
 		BIO_free(pBIO);
 		throw Poco::OpenFileException("Cannot open certificate file for reading", path);
 	}
-	
+
 	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
 	BIO_free(pBIO);
-	
+
 	if (!_pCert) throw Poco::ReadFileException("Faild to load certificate from", path);
 
 	init();

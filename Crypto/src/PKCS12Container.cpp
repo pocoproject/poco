@@ -97,7 +97,7 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 			if (pCert)
 			{
 				STACK_OF(PKCS12_SAFEBAG)* bags = nullptr;
-				_pX509Cert.reset(new X509Certificate(pCert));
+				_pX509Cert.reset(new X509Certificate(pCert, true));
 				PKCS12_SAFEBAG* bag = PKCS12_add_cert(&bags, pCert);
 				char* buffer = PKCS12_get_friendlyname(bag);
 				if (buffer) _pkcsFriendlyname = buffer;
@@ -111,7 +111,7 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 				int certCount = sk_X509_num(pCA);
 				for (int i = 0; i < certCount; ++i)
 				{
-					_caCertList.push_back(X509Certificate(sk_X509_value(pCA, i)));
+					_caCertList.push_back(X509Certificate(sk_X509_value(pCA, i), true));
 				}
 			}
 		}
@@ -120,18 +120,8 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 			throw OpenSSLException();
 		}
 		PKCS12_free(pPKCS12);
-		// ??? TODO:
-		// crashing here, not sure if these should be freed
-		// ************************
-		// sk_X509_pop_free(pCA, X509_free);
-		// X509_free(pCert);
-		// *************************
-		// there's an example on SO with these calls, however: 
-		// https://github.com/openssl/openssl/blob/master/demos/pkcs12/pkread.c
-		// and 
-		// https://opensource.apple.com/source/OpenSSL/OpenSSL-46/openssl/doc/openssl.txt (3.1 Parsing with PKCS12_parse().)
-		//
-		// !!! check with valgrind
+		sk_X509_pop_free(pCA, X509_free);
+		X509_free(pCert);
 	}
 	else
 	{

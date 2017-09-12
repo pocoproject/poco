@@ -10,7 +10,7 @@ SYSLIBS += -lssl -lcrypto
 
 objects = Cipher CipherFactory CipherImpl CipherKey CipherKeyImpl \
 	CryptoException CryptoStream CryptoTransform \
-	ECKey ECKeyImpl EVPPKey KeyPair KeyPairImpl \
+	ECKey ECKeyImpl EVPPKey KeyPair KeyPairImpl PKCS12Container \
 	RSACipherImpl RSAKey RSAKeyImpl RSADigestEngine DigestEngine \
 	X509Certificate OpenSSLInitializer
 
