@@ -1,7 +1,6 @@
 //
 // EVPPKey.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/EVPPKey.h#3 $
 //
 // Library: Crypto
 // Package: CryptoCore

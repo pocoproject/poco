@@ -1,7 +1,6 @@
 //
 // CryptoException.h
 //
-// $Id$
 //
 // Library: Crypto
 // Package: Crypto

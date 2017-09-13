@@ -1,7 +1,6 @@
 //
 // CryptoException.cpp
 //
-// $Id$
 //
 // Library: Crypto
 // Package: Crypto

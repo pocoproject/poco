@@ -1,7 +1,6 @@
 //
 // ECKeyImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/ECKeyImpl.h#3 $
 //
 // Library: Crypto
 // Package: EC

@@ -1,7 +1,6 @@
 //
 // PKCS12Container.cpp
 //
-// $Id: //poco/1.4/Crypto/src/PKCS12Container.cpp#1 $
 //
 // Library: Crypto
 // Package: Certificate

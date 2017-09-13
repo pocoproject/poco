@@ -1,7 +1,6 @@
 //
 // EVPPKey.cpp
 //
-// $Id: //poco/1.4/Crypto/src/EVPPKey.cpp#2 $
 //
 // Library: Crypto
 // Package: CryptoCore

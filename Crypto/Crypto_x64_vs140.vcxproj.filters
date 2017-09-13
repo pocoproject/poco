@@ -194,6 +194,9 @@
     <ClCompile Include="src\KeyPairImpl.cpp">
       <Filter>CryptoCore\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ECCipherImpl.cpp">
+      <Filter>EC\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc" />

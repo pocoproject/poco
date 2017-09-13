@@ -1,7 +1,6 @@
 //
 // ECTest.h
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/ECTest.h#1 $
 //
 // Definition of the ECTest class.
 //

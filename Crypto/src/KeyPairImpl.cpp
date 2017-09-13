@@ -1,7 +1,6 @@
 //
 // KeyPairImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/KeyPairImpl.cpp#2 $
 //
 // Library: Crypto
 // Package: CryptoCore

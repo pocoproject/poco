@@ -1,7 +1,6 @@
 //
 // KeyPair.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/KeyPair.h#2 $
 //
 // Library: Crypto
 // Package: CryptoCore
