@@ -310,8 +310,7 @@ xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*</Command>
     <ClInclude Include="include\Poco\Crypto\CryptoStream.h" />
     <ClInclude Include="include\Poco\Crypto\CryptoTransform.h" />
     <ClInclude Include="include\Poco\Crypto\DigestEngine.h" />
-    <ClInclude Include="include\Poco\Crypto\ECCipherImpl.h" />
-    <ClInclude Include="include\Poco\Crypto\ECDigestEngine.h" />
+    <ClInclude Include="include\Poco\Crypto\ECDSADigestEngine.h" />
     <ClInclude Include="include\Poco\Crypto\ECKey.h" />
     <ClInclude Include="include\Poco\Crypto\ECKeyImpl.h" />
     <ClInclude Include="include\Poco\Crypto\EVPPKey.h" />
@@ -335,7 +334,7 @@ xcopy /y ..\openssl\win64\bin\release\*64MD.lib ..\lib64\*</Command>
     <ClCompile Include="src\CryptoStream.cpp" />
     <ClCompile Include="src\CryptoTransform.cpp" />
     <ClCompile Include="src\DigestEngine.cpp" />
-    <ClCompile Include="src\ECCipherImpl.cpp" />
+    <ClCompile Include="src\ECDSADigestEngine.cpp" />
     <ClCompile Include="src\ECKey.cpp" />
     <ClCompile Include="src\ECKeyImpl.cpp" />
     <ClCompile Include="src\EVPPKey.cpp" />
