@@ -2,8 +2,8 @@
 
 # sudo bash -c "cat >> /etc/apt/sources.list" << LLVMAPT
 # LLVM
-deb http://llvm.org/apt/trusty/     llvm-toolchain-trusty main
-deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty main
+# deb http://llvm.org/apt/trusty/     llvm-toolchain-trusty main
+# deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty main
 # 4.0 
 deb http://llvm.org/apt/trusty/     llvm-toolchain-trusty-4.0 main
 deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty-4.0 main
