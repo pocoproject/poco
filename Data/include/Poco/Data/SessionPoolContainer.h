@@ -1,8 +1,6 @@
 //
 // SessionPoolContainer.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SessionPoolContainer.h#4 $
-//
 // Library: Data
 // Package: SessionPooling
 // Module:  SessionPoolContainer

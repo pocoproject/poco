@@ -1,8 +1,6 @@
 //
 // Application.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/Application.h#4 $
-//
 // Library: Util
 // Package: Application
 // Module:  Application

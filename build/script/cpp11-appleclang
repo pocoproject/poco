@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/cpp11-appleclang#1 $
-#
 # cpp11-appleclang
 #
 # Detect compatible AppleClang version and add c++11/14 flags

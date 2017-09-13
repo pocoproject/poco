@@ -1,8 +1,6 @@
 //
 // LOB.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/LOB.h#12 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  LOB

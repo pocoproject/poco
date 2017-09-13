@@ -1,8 +1,6 @@
 //
 // Process_UNIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Process_UNIX.h#3 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process

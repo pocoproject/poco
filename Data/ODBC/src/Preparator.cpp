@@ -1,8 +1,6 @@
 //
 // Preparator.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/Preparator.cpp#5 $
-//
 // Library: Data/ODBC
 // Package: ODBC
 // Module:  Preparator

@@ -1,8 +1,6 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/1.5/Data/PostgreSQL/include/Poco/Data/PostgreSQL/SessionImpl.h#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  SessionImpl

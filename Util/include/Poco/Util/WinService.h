@@ -1,8 +1,6 @@
 //
 // WinService.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/WinService.h#2 $
-//
 // Library: Util
 // Package: Windows
 // Module:  WinService

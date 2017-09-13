@@ -1,8 +1,6 @@
 //
 // HTTPSServerTest.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.h#1 $
-//
 // Definition of the HTTPSServerTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

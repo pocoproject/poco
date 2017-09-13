@@ -1,8 +1,6 @@
 //
 // SQLiteTest.h
 //
-// $Id: //poco/Main/Data/SQLite/testsuite/src/SQLiteTest.h#4 $
-//
 // Definition of the SQLiteTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

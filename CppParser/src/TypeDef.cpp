@@ -1,8 +1,6 @@
 //
 // TypeDef.cpp
 //
-// $Id: //poco/1.4/CppParser/src/TypeDef.cpp#1 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  TypeDef

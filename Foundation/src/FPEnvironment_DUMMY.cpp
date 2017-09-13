@@ -1,8 +1,6 @@
 //
 // FPEnvironment_C99.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FPEnvironment_DUMMY.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FPEnvironment

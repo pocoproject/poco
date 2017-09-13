@@ -1,8 +1,6 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Exception.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Exception

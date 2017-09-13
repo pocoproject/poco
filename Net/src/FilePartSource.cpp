@@ -1,8 +1,6 @@
 //
 // FilePartSource.cpp
 //
-// $Id: //poco/1.4/Net/src/FilePartSource.cpp#1 $
-//
 // Library: Net
 // Package: Messages
 // Module:  FilePartSource

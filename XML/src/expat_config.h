@@ -1,8 +1,6 @@
 //
 // expat_config.h
 //
-// $Id: //poco/1.4/XML/src/expat_config.h#2 $
-//
 // Poco XML specific configuration for expat.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

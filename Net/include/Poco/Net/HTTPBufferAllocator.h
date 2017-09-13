@@ -1,8 +1,6 @@
 //
 // HTTPBufferAllocator.h
 //
-// $Id: //poco/Main/template/class.h#4 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPBufferAllocator

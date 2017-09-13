@@ -1,8 +1,6 @@
 //
 // PostgreSQLTestSuite.cpp
 //
-// $Id: //poco/1.5/Data/PostgreSQL/testsuite/src/PostgreSQLTestSuite.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

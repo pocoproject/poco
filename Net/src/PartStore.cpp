@@ -1,8 +1,6 @@
 //
 // PartStore.cpp
 //
-// $Id: //poco/1.4/Net/src/PartStore.cpp#1 $
-//
 // Library: Net
 // Package: Messages
 // Module:  PartStore

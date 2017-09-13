@@ -1,8 +1,6 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSACipherImpl.cpp#3 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSACipherImpl

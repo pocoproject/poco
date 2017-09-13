@@ -1,8 +1,6 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/1.5/Data/PostgreSQL/testsuite/src/WinDriver.cpp#1 $
-//
 // Windows test driver for Poco PostgreSQL.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

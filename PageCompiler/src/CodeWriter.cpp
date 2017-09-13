@@ -1,8 +1,6 @@
 //
 // CodeWriter.cpp
 //
-// $Id: //poco/1.7/PageCompiler/src/CodeWriter.cpp#4 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

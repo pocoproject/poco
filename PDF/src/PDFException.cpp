@@ -1,8 +1,6 @@
 //
 // PDFException.cpp
 //
-// $Id: //poco/Main/PDF/src/PDFException.cpp#8 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  PDFException

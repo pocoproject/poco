@@ -1,8 +1,6 @@
 //
 // SQLExecutor.cpp
 //
-// $Id: //poco/1.4/Data/PostgreSQL/testsuite/src/SQLExecutor.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

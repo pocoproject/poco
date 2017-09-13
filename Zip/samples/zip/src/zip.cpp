@@ -1,8 +1,6 @@
 //
 // zip.cpp
 //
-// $Id: //poco/1.4/Zip/samples/zip/src/zip.cpp#1 $
-//
 // This sample demonstrates the Compress class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.

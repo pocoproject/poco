@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.5/Data/PostgreSQL/Makefile#1 $
-#
 # Makefile for Poco PostgreSQL
 #
 

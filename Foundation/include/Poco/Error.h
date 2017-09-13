@@ -1,8 +1,6 @@
 //
 // Error.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Error.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Error

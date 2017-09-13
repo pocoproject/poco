@@ -1,8 +1,6 @@
 //
 // ThreadTarget.cpp
 //
-// $Id: ThreadTarget.cpp 762 2008-09-16 19:04:32Z obiltschnig $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ThreadTarget

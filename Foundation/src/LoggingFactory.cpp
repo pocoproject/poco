@@ -1,8 +1,6 @@
 //
 // LoggingFactory.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LoggingFactory.cpp#3 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  LoggingFactory

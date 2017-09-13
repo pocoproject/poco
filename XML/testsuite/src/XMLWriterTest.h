@@ -1,8 +1,6 @@
 //
 // XMLWriterTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/XMLWriterTest.h#2 $
-//
 // Definition of the XMLWriterTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

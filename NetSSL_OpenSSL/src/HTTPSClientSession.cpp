@@ -1,8 +1,6 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#4 $
-//
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
 // Module:  HTTPSClientSession

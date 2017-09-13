@@ -1,8 +1,6 @@
 //
 // HTTPMessage.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPMessage.h#3 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPMessage

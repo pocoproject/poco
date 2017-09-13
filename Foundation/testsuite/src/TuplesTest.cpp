@@ -1,8 +1,6 @@
 //
 // TuplesTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TuplesTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

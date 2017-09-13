@@ -1,8 +1,6 @@
 //
 // Extraction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Extraction.h#9 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Extraction

@@ -1,8 +1,6 @@
 //
 // Timezone_WINCE.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timezone_WINCE.cpp#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timezone

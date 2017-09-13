@@ -1,8 +1,6 @@
 //
 // Ascii.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Ascii.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Ascii
