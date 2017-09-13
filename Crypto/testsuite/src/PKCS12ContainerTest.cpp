@@ -43,7 +43,7 @@ void PKCS12ContainerTest::testFullPKCS12()
 	try
 	{
 		std::string file = getTestFilesPath("full");
-		full(PKCS12Container(Poco::Path(file), "crypto"));
+		full(PKCS12Container(file, "crypto"));
 
 		std::ifstream ifs(file, std::ios::binary);
 		full(PKCS12Container(ifs, "crypto"));
@@ -118,6 +118,7 @@ void PKCS12ContainerTest::testCertsOnlyPKCS12()
 	try
 	{
 		std::string file = getTestFilesPath("certs-only");
+		certsOnly(PKCS12Container(file, "crypto"));
 
 		std::ifstream ifs(file, std::ios::binary);
 		certsOnly(PKCS12Container(ifs, "crypto"));

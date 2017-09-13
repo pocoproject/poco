@@ -42,9 +42,6 @@ public:
 	explicit PKCS12Container(std::istream& istr, const std::string& password = "");
 		/// Creates the PKCS12Container object from a stream.
 
-	explicit PKCS12Container(const Poco::Path& path, const std::string& password = "");
-		/// Creates the PKCS12Container object from a file.
-
 	explicit PKCS12Container(const std::string& str, const std::string& password = "");
 		/// Creates the PKCS12Container object from a string.
 

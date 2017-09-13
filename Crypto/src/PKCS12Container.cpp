@@ -46,9 +46,9 @@ PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password
 }
 
 
-PKCS12Container::PKCS12Container(const Poco::Path& path, const std::string& password)
+PKCS12Container::PKCS12Container(const std::string& path, const std::string& password)
 {
-	FILE* pFile = fopen(path.toString().c_str(), "rb");
+	FILE* pFile = fopen(path.c_str(), "rb");
 	if (pFile)
 	{
 		PKCS12* pPKCS12 = d2i_PKCS12_fp(pFile, NULL);
@@ -58,13 +58,8 @@ PKCS12Container::PKCS12Container(const Poco::Path& path, const std::string& pass
 	}
 	else
 	{
-		throw Poco::OpenFileException("PKCS12Container: " + path.toString());
+		throw Poco::OpenFileException("PKCS12Container: " + path);
 	}
-}
-
-
-PKCS12Container::PKCS12Container(const std::string& str, const std::string& password)
-{
 }
 
 
