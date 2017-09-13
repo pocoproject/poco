@@ -21,6 +21,18 @@ namespace Poco {
 namespace Crypto {
 
 
+EVPPKey::EVPPKey(const std::string& ecCurveName)
+{
+	newECKey(ecCurveName.c_str());
+}
+
+
+EVPPKey::EVPPKey(const char* ecCurveName)
+{
+	newECKey(ecCurveName);
+}
+
+
 EVPPKey::EVPPKey(EVP_PKEY* pEVPPKey)
 {
 	duplicate(pEVPPKey);
@@ -97,6 +109,22 @@ void EVPPKey::duplicate(EVP_PKEY* pEVPPKey)
 			throw NotImplementedException("EVPPKey:duplicate(); Key type: " +
 				NumberFormatter::format(pEVPPKey->type));
 	}
+}
+
+
+void EVPPKey::newECKey(const char* ecCurveName)
+{
+	int curveID = OBJ_txt2nid(ecCurveName);
+	EC_KEY* pEC = EC_KEY_new_by_curve_name(curveID);
+	if (!pEC) goto err;
+	if (!EC_KEY_generate_key(pEC)) goto err;
+	_pEVPPKey = EVP_PKEY_new();
+	if (!_pEVPPKey) goto err;
+	if (!EVP_PKEY_set1_EC_KEY(_pEVPPKey, pEC)) goto err;
+	EC_KEY_free(pEC);
+	return;
+err:
+	throw OpenSSLException();
 }
 
 

@@ -28,7 +28,7 @@ public:
 	void testEVPPKey();
 	void testECNewKeys();
 	void testECNewKeysNoPassphrase();
-	void testECSign();
+	void testECDSASign();
 	void testECSignSha256();
 	void testECSignManipulated();
 	void testECCipher();

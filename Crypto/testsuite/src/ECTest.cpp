@@ -14,6 +14,7 @@
 #include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Crypto/ECKey.h"
 #include "Poco/Crypto/EVPPKey.h"
+#include "Poco/Crypto/ECDSADigestEngine.h"
 #include <openssl/pem.h>
 #include <sstream>
 #include <cstring>
@@ -86,28 +87,21 @@ ECTest::~ECTest()
 
 void ECTest::testEVPPKey()
 {
-	int eccGroup = OBJ_txt2nid("secp521r1");
-	EC_KEY* pEC = EC_KEY_new_by_curve_name(eccGroup);
-	assert (pEC != 0);
-	assert (0 != EC_KEY_generate_key(pEC));
-	EVP_PKEY* pKey = EVP_PKEY_new();
-	assert (pKey != 0);
-	assert (0 != EVP_PKEY_set1_EC_KEY(pKey, pEC));
-	EC_KEY_free(pEC);
+	EVPPKey* pKey = new EVPPKey("secp521r1");
 
 	BIO* bioPriv1 = BIO_new(BIO_s_mem());
 	BIO* bioPub1 = BIO_new(BIO_s_mem());
-	assert (0 != PEM_write_bio_PrivateKey(bioPriv1, pKey, NULL, NULL, 0, 0, NULL));
-	assert (0 != PEM_write_bio_PUBKEY(bioPub1, pKey));
+	assert (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, NULL, NULL, 0, 0, NULL));
+	assert (0 != PEM_write_bio_PUBKEY(bioPub1, *pKey));
 	char* pPrivData1;
 	long sizePriv1 = BIO_get_mem_data(bioPriv1, &pPrivData1);
 	char* pPubData1;
 	long sizePub1 = BIO_get_mem_data(bioPub1, &pPubData1);
 
 	// construct EVPPKey from EVP_PKEY*
-	EVPPKey evpPKey(pKey);
+	EVPPKey evpPKey(pKey->operator EVP_PKEY*());
 	// EVPPKey makes duplicate, so freeing the original must be ok
-	EVP_PKEY_free(pKey);
+	delete pKey;
 
 	BIO* bioPriv2 = BIO_new(BIO_s_mem());
 	BIO* bioPub2 = BIO_new(BIO_s_mem());
@@ -210,11 +204,11 @@ void ECTest::testECNewKeysNoPassphrase()
 }
 
 
-void ECTest::testECSign()
-{/*
+void ECTest::testECDSASign()
+{
 	std::string msg("Test this sign message");
-	ECKey key(ECKey::KL_2048, ECKey::EXP_LARGE);
-	ECDigestEngine eng(key);
+	ECKey key("secp521r1");
+	ECDSADigestEngine eng(key, "SHA256");
 	eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
 	const Poco::DigestEngine::Digest& sig = eng.signature();
 	std::string hexDig = Poco::DigestEngine::digestToHex(sig);
@@ -225,10 +219,10 @@ void ECTest::testECSign()
 	std::string pubKey = strPub.str();
 	std::istringstream iPub(pubKey);
 	ECKey keyPub(&iPub);
-	ECDigestEngine eng2(keyPub);
+	ECDSADigestEngine eng2(keyPub, "SHA256");
 	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
 	assert (eng2.verify(sig));
-*/}
+}
 
 
 void ECTest::testECSignSha256()
@@ -348,7 +342,7 @@ CppUnit::Test* ECTest::suite()
 	CppUnit_addTest(pSuite, ECTest, testEVPPKey);
 	CppUnit_addTest(pSuite, ECTest, testECNewKeys);
 	CppUnit_addTest(pSuite, ECTest, testECNewKeysNoPassphrase);
-	CppUnit_addTest(pSuite, ECTest, testECSign);
+	CppUnit_addTest(pSuite, ECTest, testECDSASign);
 	CppUnit_addTest(pSuite, ECTest, testECSignSha256);
 	CppUnit_addTest(pSuite, ECTest, testECSignManipulated);
 	CppUnit_addTest(pSuite, ECTest, testECCipher);

@@ -37,6 +37,18 @@ class Crypto_API EVPPKey
 public:
 	EVPPKey() = delete;
 
+	explicit EVPPKey(const std::string& ecCurveName);
+		/// Constructs EVPPKey from ECC curve name.
+		///
+		/// Only EC keys can be wrapped by an EVPPKey
+		/// created using this constructor.
+
+	explicit EVPPKey(const char* ecCurveName);
+		/// Constructs EVPPKey from ECC curve name.
+		///
+		/// Only EC keys can be wrapped by an EVPPKey
+		/// created using this constructor.
+
 	explicit EVPPKey(EVP_PKEY* pEVPPKey);
 		/// Constructs EVPPKey from EVP_PKEY pointer.
 		/// The content behind the supplied pointer is internally duplicated.
@@ -71,6 +83,8 @@ public:
 		/// Returns pointer to the EVP_PKEY structure.
 
 private:
+	void newECKey(const char* group);
+
 	void duplicate(EVP_PKEY* pEVPPKey);
 	void setKey(EC_KEY* pKey);
 	void setKey(RSA* pKey);
