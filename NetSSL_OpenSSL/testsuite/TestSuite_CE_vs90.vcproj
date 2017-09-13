@@ -568,6 +568,23 @@
 					RelativePath=".\src\WebSocketTestSuite.h"/>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="X509Certificate">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\src\X509CertificateTest.h"/>
+				<File
+					RelativePath=".\src\X509CertificateTestSuite.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\X509CertificateTest.cpp"/>
+				<File
+					RelativePath=".\src\X509CertificateTestSuite.cpp"/>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals/>
 </VisualStudioProject>
