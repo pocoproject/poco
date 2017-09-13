@@ -132,66 +132,6 @@ matrix:
         - $CXX -x c++ /dev/null -dM -E
         - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
-    - env:    TEST_NAME="clang 3.4 (make) bundled"
-      compiler: clang
-      script:
-        - sudo apt-get install -qq -y clang-3.4 lldb-3.4 libc++-dev libc++abi-dev
-        - export CLANG_VERSTION="-3.4"
-        - export CC="clang-3.4"
-        - export CXX="clang++-3.4"
-        - $CXX --version
-        - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="clang 3.5 (make) bundled"
-      compiler: clang
-      script:
-        - sudo apt-get install -qq -y clang-3.5 lldb-3.5 libc++-dev libc++abi-dev
-        - export CLANG_VERSTION="-3.5"
-        - export CC="clang-3.5"
-        - export CXX="clang++-3.5"
-        - $CXX --version
-        - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="clang 3.6 (make) bundled"
-      compiler: clang
-      script:
-        - sudo apt-get install -qq -y clang-3.6 lldb-3.6 libc++-dev libc++abi-dev
-        - export CLANG_VERSTION="-3.6"
-        - export CC="clang-3.6"
-        - export CXX="clang++-3.6"
-        - $CXX --version
-        - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="clang 3.7 (make) bundled"
-      compiler: clang
-      script:
-        - sudo apt-get install -qq -y clang-3.7 lldb-3.7 libc++-dev libc++abi-dev
-        - export CLANG_VERSTION="-3.7"
-        - export CC="clang-3.7"
-        - export CXX="clang++-3.7"
-        - $CXX --version
-        - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="clang 3.8 (make) bundled"
-      compiler: clang
-      script:
-        - sudo apt-get install -qq -y clang-3.8 lldb-3.8 libc++-dev libc++abi-dev
-        - export CLANG_VERSTION="-3.8"
-        - export CC="clang-3.8"
-        - export CXX="clang++-3.8"
-        - $CXX --version
-        - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="clang 3.9 (make) bundled"
-      compiler: clang
-      script:
-        - sudo apt-get install -qq -y clang-3.9 lldb-3.9 libc++-dev libc++abi-dev
-        - export CLANG_VERSTION="-3.9"
-        - export CC="clang-3.9"
-        - export CXX="clang++-3.9"
-        - $CXX --version
-        - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
-    
     - env:    TEST_NAME="clang 4.0 (make) bundled"
       compiler: clang
       script:
@@ -199,6 +139,16 @@ matrix:
         - export CLANG_VERSTION="-4.0"
         - export CC="clang-4.0"
         - export CXX="clang++-4.0"
+        - $CXX --version
+        - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    - env:    TEST_NAME="clang 5.0 (make) bundled"
+      compiler: clang
+      script:
+        - sudo apt-get install -qq -y clang-5.0 lldb-5.0 libc++-dev libc++abi-dev
+        - export CLANG_VERSTION="-5.0"
+        - export CC="clang-5.0"
+        - export CXX="clang++-5.0"
         - $CXX --version
         - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
     
