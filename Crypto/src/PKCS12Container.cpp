@@ -31,26 +31,26 @@ PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password
 	Poco::StreamCopier::copyStream(istr, ostr);
 	const std::string& cont = ostr.str();
 
-	BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(cont.c_str()), static_cast<int>(cont.size()));
+	BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(cont.data()), static_cast<int>(cont.size()));
 	if (pBIO)
 	{
-		PKCS12* pPKCS12 = d2i_PKCS12_bio(pBIO, NULL);
+		PKCS12* pPKCS12 = 0;
+		d2i_PKCS12_bio(pBIO, &pPKCS12);
 		BIO_free(pBIO);
 		if (!pPKCS12) throw OpenSSLException();
 		load(pPKCS12, password);
 	}
 	else
 	{
-		throw NullPointerException("PKCS12Container BIO memory buffer");
+		throw OpenSSLException();
 	}
 }
 
 
 PKCS12Container::PKCS12Container(const Poco::Path& path, const std::string& password)
 {
-	FILE* pFile = nullptr;
-
-	if ((pFile = fopen(path.toString().c_str(), "rb")))
+	FILE* pFile = fopen(path.toString().c_str(), "rb");
+	if (pFile)
 	{
 		PKCS12* pPKCS12 = d2i_PKCS12_fp(pFile, NULL);
 		fclose (pFile);
@@ -59,7 +59,7 @@ PKCS12Container::PKCS12Container(const Poco::Path& path, const std::string& pass
 	}
 	else
 	{
-		throw NullPointerException("PKCS12Container file:" + path.toString());
+		throw Poco::OpenFileException("PKCS12Container: " + path.toString());
 	}
 }
 

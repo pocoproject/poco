@@ -8,13 +8,6 @@
 //
 
 
-#include "Poco/Platform.h"
-// this should not be necessary (although is seems to do no harm)
-// somehow, code in this file (and only this file) causes "no OPENSSL_Applink"
-// see https://www.openssl.org/docs/faq.html#PROG2
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_EXTERNAL_OPENSSL)
-#include "openssl/applink.c"
-#endif
 #include "PKCS12ContainerTest.h"
 #include "Poco/CppUnit/TestCaller.h"
 #include "Poco/CppUnit/TestSuite.h"
@@ -52,7 +45,7 @@ void PKCS12ContainerTest::testFullPKCS12()
 		std::string file = getTestFilesPath("full");
 		full(PKCS12Container(Poco::Path(file), "crypto"));
 
-		std::ifstream ifs(file);
+		std::ifstream ifs(file, std::ios::binary);
 		full(PKCS12Container(ifs, "crypto"));
 	}
 	catch (Poco::Exception& ex)
@@ -125,9 +118,8 @@ void PKCS12ContainerTest::testCertsOnlyPKCS12()
 	try
 	{
 		std::string file = getTestFilesPath("certs-only");
-		certsOnly(PKCS12Container(Poco::Path(file), "crypto"));
 
-		std::ifstream ifs(file);
+		std::ifstream ifs(file, std::ios::binary);
 		certsOnly(PKCS12Container(ifs, "crypto"));
 	}
 	catch (Poco::Exception& ex)
