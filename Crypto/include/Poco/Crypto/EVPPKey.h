@@ -76,6 +76,9 @@ public:
 	~EVPPKey();
 		/// Destroys the EVPPKey.
 
+	int type() const;
+		/// Retuns the EVPPKey type NID.
+
 	operator const EVP_PKEY*() const;
 		/// Returns const pointer to the EVP_PKEY structure.
 
@@ -95,6 +98,14 @@ private:
 //
 // inlines
 //
+
+inline int EVPPKey::type() const
+{
+	if (!_pEVPPKey) return NID_undef;
+
+	return EVP_PKEY_type(_pEVPPKey->type);
+}
+
 
 inline EVPPKey::operator const EVP_PKEY*() const
 	/// Returns const pointer to the EVP_PKEY structure.

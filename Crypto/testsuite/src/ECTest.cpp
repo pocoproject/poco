@@ -88,6 +88,8 @@ ECTest::~ECTest()
 void ECTest::testEVPPKey()
 {
 	EVPPKey* pKey = new EVPPKey("secp521r1");
+	assert (pKey);
+	assert (pKey->type() == EVP_PKEY_EC);
 
 	BIO* bioPriv1 = BIO_new(BIO_s_mem());
 	BIO* bioPub1 = BIO_new(BIO_s_mem());
@@ -100,6 +102,7 @@ void ECTest::testEVPPKey()
 
 	// construct EVPPKey from EVP_PKEY*
 	EVPPKey evpPKey(pKey->operator EVP_PKEY*());
+	assert (evpPKey.type() == EVP_PKEY_EC);
 	// EVPPKey makes duplicate, so freeing the original must be ok
 	delete pKey;
 
@@ -122,6 +125,7 @@ void ECTest::testEVPPKey()
 
 	// copy
 	EVPPKey evpPKey2(evpPKey);
+	assert (evpPKey2.type() == EVP_PKEY_EC);
 	bioPriv2 = BIO_new(BIO_s_mem());
 	bioPub2 = BIO_new(BIO_s_mem());
 	assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, NULL, NULL, 0, 0, NULL));
@@ -139,6 +143,7 @@ void ECTest::testEVPPKey()
 
 	// move
 	EVPPKey evpPKey3(std::move(evpPKey2));
+	assert (evpPKey3.type() == EVP_PKEY_EC);
 	bioPriv2 = BIO_new(BIO_s_mem());
 	bioPub2 = BIO_new(BIO_s_mem());
 	assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, NULL, NULL, 0, 0, NULL));
@@ -204,9 +209,38 @@ void ECTest::testECNewKeysNoPassphrase()
 }
 
 
-void ECTest::testECDSASign()
+void ECTest::testECDSASignSha256()
+{
+	try
+	{
+		std::string msg("Test this sign message");
+		ECKey key("secp521r1");
+		ECDSADigestEngine eng(key, "SHA256");
+		eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
+		const Poco::DigestEngine::Digest& sig = eng.signature();
+
+		// verify
+		std::ostringstream strPub;
+		key.save(&strPub);
+		std::string pubKey = strPub.str();
+		std::istringstream iPub(pubKey);
+		ECKey keyPub(&iPub);
+		ECDSADigestEngine eng2(keyPub, "SHA256");
+		eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
+		assert(eng2.verify(sig));
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
+}
+
+
+void ECTest::testECDSASignManipulated()
 {
 	std::string msg("Test this sign message");
+	std::string msgManip("Test that sign message");
 	ECKey key("secp521r1");
 	ECDSADigestEngine eng(key, "SHA256");
 	eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
@@ -220,52 +254,9 @@ void ECTest::testECDSASign()
 	std::istringstream iPub(pubKey);
 	ECKey keyPub(&iPub);
 	ECDSADigestEngine eng2(keyPub, "SHA256");
-	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	assert (eng2.verify(sig));
-}
-
-
-void ECTest::testECSignSha256()
-{/*
-	std::string msg("Test this sign message");
-	ECKey key(ECKey::KL_2048, ECKey::EXP_LARGE);
-	ECDigestEngine eng(key, "SHA256");
-	eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	const Poco::DigestEngine::Digest& sig = eng.signature();
-	std::string hexDig = Poco::DigestEngine::digestToHex(sig);
-
-	// verify
-	std::ostringstream strPub;
-	key.save(&strPub);
-	std::string pubKey = strPub.str();
-	std::istringstream iPub(pubKey);
-	ECKey keyPub(&iPub);
-	ECDigestEngine eng2(keyPub, "SHA256");
-	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	assert (eng2.verify(sig));
-*/}
-
-
-void ECTest::testECSignManipulated()
-{/*
-	std::string msg("Test this sign message");
-	std::string msgManip("Test that sign message");
-	ECKey key(ECKey::KL_2048, ECKey::EXP_LARGE);
-	ECDigestEngine eng(key);
-	eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	const Poco::DigestEngine::Digest& sig = eng.signature();
-	std::string hexDig = Poco::DigestEngine::digestToHex(sig);
-
-	// verify
-	std::ostringstream strPub;
-	key.save(&strPub);
-	std::string pubKey = strPub.str();
-	std::istringstream iPub(pubKey);
-	ECKey keyPub(&iPub);
-	ECDigestEngine eng2(keyPub);
 	eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
 	assert (!eng2.verify(sig));
-*/}
+}
 
 
 void ECTest::testECCipher()
@@ -342,9 +333,8 @@ CppUnit::Test* ECTest::suite()
 	CppUnit_addTest(pSuite, ECTest, testEVPPKey);
 	CppUnit_addTest(pSuite, ECTest, testECNewKeys);
 	CppUnit_addTest(pSuite, ECTest, testECNewKeysNoPassphrase);
-	CppUnit_addTest(pSuite, ECTest, testECDSASign);
-	CppUnit_addTest(pSuite, ECTest, testECSignSha256);
-	CppUnit_addTest(pSuite, ECTest, testECSignManipulated);
+	CppUnit_addTest(pSuite, ECTest, testECDSASignSha256);
+	CppUnit_addTest(pSuite, ECTest, testECDSASignManipulated);
 	CppUnit_addTest(pSuite, ECTest, testECCipher);
 	CppUnit_addTest(pSuite, ECTest, testECCipherLarge);
 	CppUnit_addTest(pSuite, ECTest, testECCertificate);

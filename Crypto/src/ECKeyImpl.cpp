@@ -19,8 +19,6 @@
 #include "Poco/FileStream.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
-#include <openssl/pem.h>
-#include <openssl/rsa.h>
 #include <openssl/evp.h>
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L
 #include <openssl/bn.h>
@@ -35,7 +33,7 @@ ECKeyImpl::ECKeyImpl(const EVPPKey& key):
 	KeyPairImpl("ec", KT_EC_IMPL),
 	_pEC(EVP_PKEY_get1_EC_KEY(const_cast<EVP_PKEY*>((const EVP_PKEY*)key)))
 {
-	if (!_pEC) throw OpenSSLException();
+	if (!_pEC) throw OpenSSLException("ECKeyImpl(const EVPPKey&)");
 }
 
 
@@ -66,41 +64,42 @@ ECKeyImpl::ECKeyImpl(const PKCS12Container& cont):
 }
 
 
-ECKeyImpl::ECKeyImpl(int eccGroup):
+ECKeyImpl::ECKeyImpl(int curve):
 	KeyPairImpl("ec", KT_EC_IMPL),
-	_pEC(EC_KEY_new_by_curve_name(eccGroup)),
-	_eccGroup(eccGroup)
+	_pEC(EC_KEY_new_by_curve_name(curve))
 {
-	if (!(EC_KEY_generate_key(_pEC)))
-		throw OpenSSLException("ECKeyImpl::ECKeyImpl(int)");
+	if (!EC_KEY_generate_key(_pEC))
+		throw OpenSSLException("ECKeyImpl(int)");
 }
 
 
 ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile, 
-		const std::string& privateKeyFile, 
-		const std::string& privateKeyPassphrase):
-		KeyPairImpl("ec", KT_EC_IMPL),
-		_pEC(0)
+	const std::string& privateKeyFile, 
+	const std::string& privateKeyPassphrase): KeyPairImpl("ec", KT_EC_IMPL), _pEC(0)
 {
-	if (loadKey(privateKeyFile, privateKeyPassphrase))
+	if (loadKey(PEM_read_PrivateKey, privateKeyFile, privateKeyPassphrase))
 		return; // private key is enough
 
-	// no private key, this is public key only
-	loadKey(publicKeyFile);
+	// no private key, this must be public key only, otherwise throw
+	if (!loadKey(PEM_read_PUBKEY, publicKeyFile))
+	{
+		throw OpenSSLException("ECKeyImpl(const string&, const string&, const string&");
+	}
 }
 
 
 ECKeyImpl::ECKeyImpl(std::istream* pPublicKeyStream,
 	std::istream* pPrivateKeyStream,
-	const std::string& privateKeyPassphrase):
-		KeyPairImpl("ec", KT_EC_IMPL),
-		_pEC(0)
+	const std::string& privateKeyPassphrase): KeyPairImpl("ec", KT_EC_IMPL), _pEC(0)
 {
-	if (loadKey(pPrivateKeyStream, privateKeyPassphrase))
+	if (loadKey(PEM_read_bio_PrivateKey, pPrivateKeyStream, privateKeyPassphrase))
 		return; // private key is enough
 
-	// no private key, this is public key only
-	loadKey(pPublicKeyStream);
+	// no private key, this must be public key only, otherwise throw
+	if (!loadKey(PEM_read_bio_PUBKEY, pPublicKeyStream))
+	{
+		throw OpenSSLException("ECKeyImpl(istream*, istream*, const string&");
+	}
 }
 
 
@@ -112,8 +111,11 @@ ECKeyImpl::~ECKeyImpl()
 
 void ECKeyImpl::freeEC()
 {
-	if (_pEC) EC_KEY_free(_pEC);
-	_pEC = 0;
+	if (_pEC)
+	{
+		EC_KEY_free(_pEC);
+		_pEC = 0;
+	}
 }
 
 
@@ -126,7 +128,7 @@ int ECKeyImpl::passCB(char* buf, int size, int, void* pass)
 }
 
 
-bool ECKeyImpl::loadKey(const std::string& keyFile, const std::string& pass)
+bool ECKeyImpl::loadKey(PEM_read_Key_fn func, const std::string& keyFile, const std::string& pass)
 {
 	if (!keyFile.empty())
 	{
@@ -136,7 +138,7 @@ bool ECKeyImpl::loadKey(const std::string& keyFile, const std::string& pass)
 			FILE* pFile = fopen(keyFile.c_str(), "r");
 			if (pFile)
 			{
-				PEM_read_PrivateKey(pFile, &pKey, passCB, pass.empty() ? (void*)0 : (void*)pass.c_str());
+				func(pFile, &pKey, passCB, pass.empty() ? (void*)0 : (void*)pass.c_str());
 				_pEC = EVP_PKEY_get1_EC_KEY(pKey);
 				EVP_PKEY_free(pKey);
 				if (!_pEC) goto error;
@@ -157,7 +159,7 @@ error:
 }
 
 
-bool ECKeyImpl::loadKey(std::istream* pIstr, const std::string& pass)
+bool ECKeyImpl::loadKey(PEM_read_bio_Key_fn func, std::istream* pIstr, const std::string& pass)
 {
 	if (pIstr)
 	{
@@ -170,12 +172,15 @@ bool ECKeyImpl::loadKey(std::istream* pIstr, const std::string& pass)
 			EVP_PKEY* pKey = EVP_PKEY_new();
 			if (pKey)
 			{
-				PEM_read_bio_PrivateKey(pBIO, &pKey, passCB, pass.empty() ? (void*)0 : (void*)pass.c_str());
-				_pEC = EVP_PKEY_get1_EC_KEY(pKey);
-				EVP_PKEY_free(pKey);
-				BIO_free(pBIO);
-				if (!_pEC) goto error;
-				return true;
+				if (func(pBIO, &pKey, passCB, pass.empty() ? (void*)0 : (void*)pass.c_str()))
+				{
+					_pEC = EVP_PKEY_get1_EC_KEY(pKey);
+					EVP_PKEY_free(pKey);
+					BIO_free(pBIO);
+					if (!_pEC) goto error;
+					return true;
+				}
+				goto error;
 			}
 			else
 			{
@@ -196,7 +201,7 @@ int ECKeyImpl::size() const
 {
 	int sz = -1;
 	EVP_PKEY* pKey = EVP_PKEY_new();
-	if (pKey && EVP_PKEY_assign_EC_KEY(pKey, _pEC))
+	if (pKey && EVP_PKEY_set1_EC_KEY(pKey, _pEC))
 	{
 		sz = EVP_PKEY_bits(pKey);
 		EVP_PKEY_free(pKey);

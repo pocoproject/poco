@@ -64,8 +64,11 @@ const DigestEngine::Digest& ECDSADigestEngine::signature()
 		digest();
 		_signature.resize(_key.size());
 		unsigned sigLen = static_cast<unsigned>(_signature.size());
-		if (!ECDSA_do_sign(&_digest[0], static_cast<unsigned>(_digest.size()), _key.impl()->getECKey()))
+		if (!ECDSA_sign(0, &_digest[0], static_cast<unsigned>(_digest.size()),
+			&_signature[0], &sigLen, _key.impl()->getECKey()))
+		{
 			throw OpenSSLException();
+		}
 		if (sigLen < _signature.size()) _signature.resize(sigLen);
 	}
 	return _signature;
@@ -75,10 +78,16 @@ const DigestEngine::Digest& ECDSADigestEngine::signature()
 bool ECDSADigestEngine::verify(const DigestEngine::Digest& sig)
 {
 	digest();
-	return 0 != ECDSA_do_verify(&_digest[0],
-		static_cast<unsigned>(_digest.size()),
-		reinterpret_cast<const ECDSA_SIG*>(&sig[0]),
-		_key.impl()->getECKey());
+	EC_KEY* pKey = _key.impl()->getECKey();
+	if (pKey)
+	{
+		int ret = ECDSA_verify(0, &_digest[0], static_cast<unsigned>(_digest.size()),
+			&sig[0], static_cast<unsigned>(sig.size()),
+			pKey);
+		if (1 == ret) return true;
+		else if (0 == ret) return false;
+	}
+	throw OpenSSLException();
 }
 
 
