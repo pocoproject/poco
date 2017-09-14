@@ -16,6 +16,7 @@
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/ECDSADigestEngine.h"
 #include <openssl/pem.h>
+#include <iostream>
 #include <sstream>
 #include <cstring>
 
@@ -87,125 +88,149 @@ ECTest::~ECTest()
 
 void ECTest::testEVPPKey()
 {
-	EVPPKey* pKey = new EVPPKey("secp521r1");
-	assert (pKey);
-	assert (pKey->type() == EVP_PKEY_EC);
+	try
+	{
+		EVPPKey* pKey = new EVPPKey("secp521r1");
+		assert (pKey);
+		assert (pKey->type() == EVP_PKEY_EC);
 
-	BIO* bioPriv1 = BIO_new(BIO_s_mem());
-	BIO* bioPub1 = BIO_new(BIO_s_mem());
-	assert (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, NULL, NULL, 0, 0, NULL));
-	assert (0 != PEM_write_bio_PUBKEY(bioPub1, *pKey));
-	char* pPrivData1;
-	long sizePriv1 = BIO_get_mem_data(bioPriv1, &pPrivData1);
-	char* pPubData1;
-	long sizePub1 = BIO_get_mem_data(bioPub1, &pPubData1);
+		BIO* bioPriv1 = BIO_new(BIO_s_mem());
+		BIO* bioPub1 = BIO_new(BIO_s_mem());
+		assert (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, NULL, NULL, 0, 0, NULL));
+		assert (0 != PEM_write_bio_PUBKEY(bioPub1, *pKey));
+		char* pPrivData1;
+		long sizePriv1 = BIO_get_mem_data(bioPriv1, &pPrivData1);
+		char* pPubData1;
+		long sizePub1 = BIO_get_mem_data(bioPub1, &pPubData1);
 
-	// construct EVPPKey from EVP_PKEY*
-	EVPPKey evpPKey(pKey->operator EVP_PKEY*());
-	assert (evpPKey.type() == EVP_PKEY_EC);
-	// EVPPKey makes duplicate, so freeing the original must be ok
-	delete pKey;
+		// construct EVPPKey from EVP_PKEY*
+		EVPPKey evpPKey(pKey->operator EVP_PKEY*());
+		assert (evpPKey.type() == EVP_PKEY_EC);
+		// EVPPKey makes duplicate, so freeing the original must be ok
+		delete pKey;
 
-	BIO* bioPriv2 = BIO_new(BIO_s_mem());
-	BIO* bioPub2 = BIO_new(BIO_s_mem());
-	assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, NULL, NULL, 0, 0, NULL));
-	assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey));
-	char* pPrivData2;
-	long sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
-	char* pPubData2;
-	long sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
+		BIO* bioPriv2 = BIO_new(BIO_s_mem());
+		BIO* bioPub2 = BIO_new(BIO_s_mem());
+		assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, NULL, NULL, 0, 0, NULL));
+		assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey));
+		char* pPrivData2;
+		long sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
+		char* pPubData2;
+		long sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
 
-	assert (sizePriv1 && (sizePriv1 == sizePriv2));
-	assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
-	assert (sizePub1 && (sizePub1 == sizePub2));
-	assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+		assert (sizePriv1 && (sizePriv1 == sizePriv2));
+		assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+		assert (sizePub1 && (sizePub1 == sizePub2));
+		assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
-	BIO_free(bioPub2);
-	BIO_free(bioPriv2);
+		BIO_free(bioPub2);
+		BIO_free(bioPriv2);
 
-	// copy
-	EVPPKey evpPKey2(evpPKey);
-	assert (evpPKey2.type() == EVP_PKEY_EC);
-	bioPriv2 = BIO_new(BIO_s_mem());
-	bioPub2 = BIO_new(BIO_s_mem());
-	assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, NULL, NULL, 0, 0, NULL));
-	assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey2));
-	sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
-	sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
+		// copy
+		EVPPKey evpPKey2(evpPKey);
+		assert (evpPKey2.type() == EVP_PKEY_EC);
+		bioPriv2 = BIO_new(BIO_s_mem());
+		bioPub2 = BIO_new(BIO_s_mem());
+		assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, NULL, NULL, 0, 0, NULL));
+		assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey2));
+		sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
+		sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
 
-	assert (sizePriv1 && (sizePriv1 == sizePriv2));
-	assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
-	assert (sizePub1 && (sizePub1 == sizePub2));
-	assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+		assert (sizePriv1 && (sizePriv1 == sizePriv2));
+		assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+		assert (sizePub1 && (sizePub1 == sizePub2));
+		assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
-	BIO_free(bioPub2);
-	BIO_free(bioPriv2);
+		BIO_free(bioPub2);
+		BIO_free(bioPriv2);
 
-	// move
-	EVPPKey evpPKey3(std::move(evpPKey2));
-	assert (evpPKey3.type() == EVP_PKEY_EC);
-	bioPriv2 = BIO_new(BIO_s_mem());
-	bioPub2 = BIO_new(BIO_s_mem());
-	assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, NULL, NULL, 0, 0, NULL));
-	assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey3));
-	sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
-	sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
+		// move
+		EVPPKey evpPKey3(std::move(evpPKey2));
+		assert (evpPKey3.type() == EVP_PKEY_EC);
+		bioPriv2 = BIO_new(BIO_s_mem());
+		bioPub2 = BIO_new(BIO_s_mem());
+		assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, NULL, NULL, 0, 0, NULL));
+		assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey3));
+		sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
+		sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
 
-	assert (sizePriv1 && (sizePriv1 == sizePriv2));
-	assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
-	assert (sizePub1 && (sizePub1 == sizePub2));
-	assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+		assert (sizePriv1 && (sizePriv1 == sizePriv2));
+		assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+		assert (sizePub1 && (sizePub1 == sizePub2));
+		assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
-	BIO_free(bioPub2);
-	BIO_free(bioPriv2);
-	BIO_free(bioPub1);
-	BIO_free(bioPriv1);
+		BIO_free(bioPub2);
+		BIO_free(bioPriv2);
+		BIO_free(bioPub1);
+		BIO_free(bioPriv1);
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
 }
 
 
 void ECTest::testECNewKeys()
 {
-	ECKey key("secp521r1");
-	std::ostringstream strPub;
-	std::ostringstream strPriv;
-	key.save(&strPub, &strPriv, "testpwd");
-	std::string pubKey = strPub.str();
-	std::string privKey = strPriv.str();
+	try
+	{
+		ECKey key("secp521r1");
+		std::ostringstream strPub;
+		std::ostringstream strPriv;
+		key.save(&strPub, &strPriv, "testpwd");
+		std::string pubKey = strPub.str();
+		std::string privKey = strPriv.str();
 
-	// now do the round trip
-	std::istringstream iPub(pubKey);
-	std::istringstream iPriv(privKey);
-	ECKey key2(&iPub, &iPriv, "testpwd");
+		// now do the round trip
+		std::istringstream iPub(pubKey);
+		std::istringstream iPriv(privKey);
+		ECKey key2(&iPub, &iPriv, "testpwd");
 
-	std::istringstream iPriv2(privKey);
-	ECKey key3(0, &iPriv2,  "testpwd");
-	std::ostringstream strPub3;
-	key3.save(&strPub3);
-	std::string pubFromPrivate = strPub3.str();
-	assert (pubFromPrivate == pubKey);
+		std::istringstream iPriv2(privKey);
+		ECKey key3(0, &iPriv2,  "testpwd");
+		std::ostringstream strPub3;
+		key3.save(&strPub3);
+		std::string pubFromPrivate = strPub3.str();
+		assert (pubFromPrivate == pubKey);
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
 }
 
 
 void ECTest::testECNewKeysNoPassphrase()
 {
-	ECKey key("secp521r1");
-	std::ostringstream strPub;
-	std::ostringstream strPriv;
-	key.save(&strPub, &strPriv);
-	std::string pubKey = strPub.str();
-	std::string privKey = strPriv.str();
+	try
+	{
+		ECKey key("secp521r1");
+		std::ostringstream strPub;
+		std::ostringstream strPriv;
+		key.save(&strPub, &strPriv);
+		std::string pubKey = strPub.str();
+		std::string privKey = strPriv.str();
 
-	// now do the round trip
-	std::istringstream iPub(pubKey);
-	std::istringstream iPriv(privKey);
-	ECKey key2(&iPub, &iPriv);
+		// now do the round trip
+		std::istringstream iPub(pubKey);
+		std::istringstream iPriv(privKey);
+		ECKey key2(&iPub, &iPriv);
 
-	std::istringstream iPriv2(privKey);
-	ECKey key3(0, &iPriv2);
-	std::ostringstream strPub3;
-	key3.save(&strPub3);
-	std::string pubFromPrivate = strPub3.str();
-	assert (pubFromPrivate == pubKey);
+		std::istringstream iPriv2(privKey);
+		ECKey key3(0, &iPriv2);
+		std::ostringstream strPub3;
+		key3.save(&strPub3);
+		std::string pubFromPrivate = strPub3.str();
+		assert (pubFromPrivate == pubKey);
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
 }
 
 
@@ -239,23 +264,31 @@ void ECTest::testECDSASignSha256()
 
 void ECTest::testECDSASignManipulated()
 {
-	std::string msg("Test this sign message");
-	std::string msgManip("Test that sign message");
-	ECKey key("secp521r1");
-	ECDSADigestEngine eng(key, "SHA256");
-	eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	const Poco::DigestEngine::Digest& sig = eng.signature();
-	std::string hexDig = Poco::DigestEngine::digestToHex(sig);
+	try
+	{
+		std::string msg("Test this sign message");
+		std::string msgManip("Test that sign message");
+		ECKey key("secp521r1");
+		ECDSADigestEngine eng(key, "SHA256");
+		eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
+		const Poco::DigestEngine::Digest& sig = eng.signature();
+		std::string hexDig = Poco::DigestEngine::digestToHex(sig);
 
-	// verify
-	std::ostringstream strPub;
-	key.save(&strPub);
-	std::string pubKey = strPub.str();
-	std::istringstream iPub(pubKey);
-	ECKey keyPub(&iPub);
-	ECDSADigestEngine eng2(keyPub, "SHA256");
-	eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
-	assert (!eng2.verify(sig));
+		// verify
+		std::ostringstream strPub;
+		key.save(&strPub);
+		std::string pubKey = strPub.str();
+		std::istringstream iPub(pubKey);
+		ECKey keyPub(&iPub);
+		ECDSADigestEngine eng2(keyPub, "SHA256");
+		eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
+		assert (!eng2.verify(sig));
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
 }
 
 
