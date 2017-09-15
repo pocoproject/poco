@@ -141,6 +141,7 @@ install:
         {
           $env:PATH = "c:\cygwin64\bin;" + $env:PATH
         }
+        g++ --version
       }
   - uname -a
   - cat /proc/cpuinfo
