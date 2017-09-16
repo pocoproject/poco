@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/Makefile#4 $
-#
 # Makefile for Poco Foundation
 #
 
@@ -23,7 +21,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	NullStream NumberFormatter NumberParser NumericString AbstractObserver \
 	Path PatternFormatter Process PurgeStrategy RWLock Random RandomStream \
 	DirectoryIteratorStrategy RegularExpression RefCountedObject Runnable RotateStrategy \
-	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \
+	SHA1Engine SHA2Engine SHA3Engine BLAKE2Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel SortedDirectoryIterator Stopwatch StreamChannel \
 	StreamConverter StreamCopier StreamTokenizer String StringTokenizer SynchronizedObject \
 	Task TaskManager TaskNotification TeeStream Hash HashStatistic \
@@ -46,6 +44,7 @@ pcre_utf8_objects = pcre_ucd pcre_tables
 
 ifdef POCO_UNBUNDLED
 	SYSLIBS += -lpcre -lz
+	objects += $(pcre_utf8_objects)
 else
 	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects)
 endif

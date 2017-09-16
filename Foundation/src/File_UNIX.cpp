@@ -1,8 +1,6 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_UNIX.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -24,6 +22,8 @@
 #if defined(POCO_OS_FAMILY_BSD)
 #include <sys/param.h>
 #include <sys/mount.h>
+#elif (POCO_OS == POCO_OS_SOLARIS)
+#include <sys/statvfs.h>
 #else
 #include <sys/statfs.h>
 #endif
@@ -33,13 +33,20 @@
 #include <stdio.h>
 #include <cstring>
 
+#if (POCO_OS == POCO_OS_SOLARIS)
+#define STATFSFN statvfs
+#define STATFSSTRUCT statvfs
+#else
+#define STATFSFN statfs
+#define STATFSSTRUCT statfs
+#endif
+
 namespace{
 // Convert timespec structures (seconds and remaining nano secs) to TimeVal (microseconds)
 Poco::Timestamp::TimeVal timespec2Microsecs(const struct timespec &ts) {
 	return ts.tv_sec * 1000000L + ts.tv_nsec / 1000L;
 }
 } // namespace
-
 
 namespace Poco {
 
@@ -213,7 +220,7 @@ Timestamp FileImpl::createdImpl() const
 	// a macro st_birthtime makes sure there is a st_birthtimespec (nano sec precision)
 	struct stat64 st;
 	if (stat64(_path.c_str(), &st) == 0)
-		return Timestamp(timespec2Microsecs(st.st_birthtimespec);
+		return Timestamp(timespec2Microsecs(st.st_birthtimespec));
 #elif defined(__FreeBSD__) && defined(st_birthtime)
 	// a macro st_birthtime makes sure there is a st_birthtimespec (nano sec precision)
 	struct stat st;
@@ -449,8 +456,8 @@ FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
 {
 	poco_assert(!_path.empty());
 
-	struct statfs stats;
-	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
 		handleLastErrorImpl(_path);
 
 	return (FileSizeImpl)stats.f_blocks * (FileSizeImpl)stats.f_bsize;
@@ -461,8 +468,8 @@ FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
 {
 	poco_assert(!_path.empty());
 
-	struct statfs stats;
-	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
 		handleLastErrorImpl(_path);
 
 	return (FileSizeImpl)stats.f_bavail * (FileSizeImpl)stats.f_bsize;
@@ -473,8 +480,8 @@ FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
 {
 	poco_assert(!_path.empty());
 
-	struct statfs stats;
-	if (statfs(const_cast<char*>(_path.c_str()), &stats) != 0)
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
 		handleLastErrorImpl(_path);
 
 	return (FileSizeImpl)stats.f_bfree * (FileSizeImpl)stats.f_bsize;
@@ -507,7 +514,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 		throw FileException("disk quota exceeded", path, errno);
 #if !defined(_AIX)
 	case ENOTEMPTY:
-		throw FileException("directory not empty", path, errno);
+		throw DirectoryNotEmptyException(path, errno);
 #endif
 	case ENAMETOOLONG:
 		throw PathSyntaxException(path, errno);

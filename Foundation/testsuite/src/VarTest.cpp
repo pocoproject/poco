@@ -1,8 +1,6 @@
 //
 // VarTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/VarTest.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -2203,11 +2201,11 @@ void VarTest::testJSONDeserializeString()
 	char cc = b2.convert<char>();
 	assert (cc == 'c');
 
-	tst = "{ \"a\" : 1, \"b\" : 2 \n}";
+	tst = "{ \"a\" : \"1\", \"b\" : \"2\" \n}";
 	a = Var::parse(tst);
 	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 
-	tst = "{ \"a\" : 1, \"b\" : 2\n}";
+	tst = "{ \"a\" : \"1\", \"b\" : \"2\"\n}";
 	a = Var::parse(tst);
 	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 }
@@ -2373,15 +2371,43 @@ void VarTest::testJSONDeserializeStruct()
 
 	std::string sStr = Var::toString(aStr);
 	Var a = Var::parse(sStr);
-	assert (aStr["i8"] == i8);
-	assert (aStr["u16"] == u16);
-	assert (aStr["i32"] == i32);
-	assert (aStr["u64"] == u64);
-	assert (aStr["b"] == b);
-	assert (aStr["f"] == f);
-	assert (aStr["d"] == d);
-	assert (aStr["s"] == s);
-	assert (aStr["c"] == c);
+	assert (a["i8"] == i8);
+	assert (a["u16"] == u16);
+	assert (a["i32"] == i32);
+	assert (a["u64"] == u64);
+	assert (a["b"] == b);
+	assert (a["f"] == f);
+	assert (a["d"] == d);
+	assert (a["s"] == s);
+	assert (a["c"] == c);
+}
+
+
+void VarTest::testJSONRoundtripStruct()
+{
+	Poco::Int64 i64(-1234567890);
+	Poco::UInt64 u64(1234567890);
+	u64 *= u64;
+	bool b = false;
+	double d = 3.1415;
+	std::string s("test string");
+	DynamicStruct aStr;
+	aStr["i64"] = i64;
+	aStr["u64"] = u64;
+	aStr["b"] = b;
+	aStr["d"] = d;
+	aStr["s"] = s;
+
+	std::string sStr = Var::toString(aStr);
+	Var a = Var::parse(sStr);
+	assert (a["i64"].isInteger());
+	assert (!a["u64"].isSigned());
+	assert (a["b"].isBoolean());
+	assert (a["d"].isNumeric());
+	assert (a["s"].isString());
+
+	std::string serialized = Var::toString(a);
+	assert (sStr == serialized);
 }
 
 
@@ -2642,6 +2668,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeArray);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeStruct);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeComplex);
+	CppUnit_addTest(pSuite, VarTest, testJSONRoundtripStruct);
 	CppUnit_addTest(pSuite, VarTest, testDate);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);

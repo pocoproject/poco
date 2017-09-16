@@ -1,8 +1,6 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/ServerApplication.h#3 $
-//
 // Library: Util
 // Package: Application
 // Module:  ServerApplication
@@ -163,7 +161,7 @@ public:
 		
 protected:
 	int run();
-	void waitForTerminationRequest();
+	virtual void waitForTerminationRequest();
 #if !defined(_WIN32_WCE)
 	void defineOptions(OptionSet& options);
 #endif
@@ -187,7 +185,7 @@ private:
 	void handlePidFile(const std::string& name, const std::string& value);
 	bool isDaemon(int argc, char** argv);
 	void beDaemon();
-#if defined(POCO_ANDROID) || defined(__NACL__)
+#if defined(POCO_ANDROID) || defined(__NACL__) || defined(__EMSCRIPTEN__)
 	static Poco::Event _terminate;
 #endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)

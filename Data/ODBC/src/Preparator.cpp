@@ -1,10 +1,8 @@
 //
 // Preparator.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/Preparator.cpp#5 $
-//
-// Library: Data
-// Package: DataCore
+// Library: Data/ODBC
+// Package: ODBC
 // Module:  Preparator
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -31,12 +29,10 @@ Preparator::Preparator(const StatementHandle& rStmt,
 	const std::string& statement, 
 	std::size_t maxFieldSize,
 	DataExtraction dataExtraction,
-	ODBCMetaColumn::NumericConversion numericConversion,
 	bool isPostgres) :
 	_rStmt(rStmt),
 	_maxFieldSize(maxFieldSize),
-	_dataExtraction(dataExtraction),
-	_numericConversion(numericConversion)
+	_dataExtraction(dataExtraction)
 {
 	SQLCHAR* pStr = (SQLCHAR*) statement.c_str();
 	if (Utility::isError(Poco::Data::ODBC::SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
@@ -57,8 +53,7 @@ Preparator::Preparator(const StatementHandle& rStmt,
 Preparator::Preparator(const Preparator& other): 
 	_rStmt(other._rStmt),
 	_maxFieldSize(other._maxFieldSize),
-	_dataExtraction(other._dataExtraction),
-	_numericConversion(other._numericConversion)
+	_dataExtraction(other._dataExtraction)
 {
 	resize();
 }
@@ -94,7 +89,7 @@ void Preparator::freeMemory() const
 				break;
 
 			case DT_WCHAR:
-				deleteCachedArray<UTF16String>(it->first);
+				deleteCachedArray<UTF16String::value_type>(it->first);
 				break;
 
 			case DT_UCHAR:
@@ -169,7 +164,7 @@ std::size_t Preparator::maxDataSize(std::size_t pos) const
 
 	try 
 	{
-		ODBCMetaColumn mc(_rStmt, pos, _numericConversion);
+		ODBCMetaColumn mc(_rStmt, pos);
 		sz = mc.length();
 
 		// accommodate for terminating zero (non-bulk only!)

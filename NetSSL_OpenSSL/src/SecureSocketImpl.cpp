@@ -1,8 +1,6 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#11 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureSocketImpl
@@ -219,14 +217,25 @@ void SecureSocketImpl::shutdown()
         bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
         if (!shutdownSent)
         {
-			// A proper clean shutdown would require us to
-			// retry the shutdown if we get a zero return
-			// value, until SSL_shutdown() returns 1.
-			// However, this will lead to problems with
-			// most web browsers, so we just set the shutdown
-			// flag by calling SSL_shutdown() once and be
-			// done with it.
+			// A proper clean shutdown requires us to
+			// call SSL_shutdown() a second time if the
+			// first call returns 0.
+			// Previously, this lead to problems with
+			// most web browsers, so we just called 
+			// SSL_shutdown() once.
+			// It seems that behavior has changed in newer
+			// OpenSSL and/or browser versions, and things
+			// seem to work better now.
 			int rc = SSL_shutdown(_pSSL);
+#if FIXME
+			#1605: try to do a proper SSL_shutdown()
+			This fix for the issue above breaks the 
+			HTTPSClientSessionTest::testCachedSession() Unit test
+			if (rc == 0 && _pSocket->getBlocking())
+			{
+				rc = SSL_shutdown(_pSSL);
+			}
+#endif
 			if (rc < 0) handleError(rc);
 			if (_pSocket->getBlocking())
 			{

@@ -1,8 +1,6 @@
 //
 // Path_WIN32U.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path_WINCE.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  Path
@@ -53,12 +51,6 @@ std::string PathImpl::dataHomeImpl()
 std::string PathImpl::cacheHomeImpl()
 {
   return homeImpl();
-}
-
-
-std::string PathImpl::tempHomeImpl()
-{
-  return tempImpl();
 }
 
 

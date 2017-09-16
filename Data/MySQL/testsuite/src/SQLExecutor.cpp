@@ -1,8 +1,6 @@
 //
 // SQLExecutor.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/SQLExecutor.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -31,6 +29,10 @@
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 
+#if __cplusplus >= 201103L
+#include <tuple>
+#endif
+
 #if POCO_MSVS_VERSION == 2015
 #define HAVE_STRUCT_TIMESPEC
 #endif
@@ -41,12 +43,7 @@ typedef unsigned int    uint;           /* System V compatibility */
 typedef unsigned long   ulong;          /* System V compatibility */
 #endif
 
-#include <my_global.h>
 #include <mysql.h>
-
-#ifdef max
-#undef max
-#endif
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
@@ -58,6 +55,7 @@ using Poco::DateTime;
 using Poco::NumberParser;
 using Poco::Any;
 using Poco::AnyCast;
+using Poco::DynamicAny;
 using Poco::NotFoundException;
 using Poco::InvalidAccessException;
 using Poco::BadCastException;
@@ -170,29 +168,28 @@ SQLExecutor::~SQLExecutor()
 
 void SQLExecutor::bareboneMySQLTest(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db, const std::string& port, const char* tableCreateString)
 {
-	int rc;
 	MYSQL* hsession = mysql_init(0);
-	assert (hsession != 0);
+	poco_assert (hsession != 0);
 
 	MYSQL* tmp = mysql_real_connect(hsession, host.c_str(), user.c_str(), pwd.c_str(), db.c_str(), NumberParser::parse(port), 0, 0);
-	assert(tmp == hsession);
+	poco_assert (tmp == hsession);
 	
 	MYSQL_STMT* hstmt = mysql_stmt_init(hsession);
-	assert(hstmt != 0);
+	poco_assert (hstmt != 0);
 	
 	std::string sql = "DROP TABLE Test";
 	mysql_real_query(hsession, sql.c_str(), static_cast<unsigned long>(sql.length()));
 	
 	sql = tableCreateString;
-	rc = mysql_stmt_prepare(hstmt, sql.c_str(), static_cast<unsigned long>(sql.length())); 
-	assert(rc == 0);
+	int rc = mysql_stmt_prepare(hstmt, sql.c_str(), static_cast<unsigned long>(sql.length())); 
+	poco_assert (rc == 0);
 
 	rc = mysql_stmt_execute(hstmt);
-	assert(rc == 0);
+	poco_assert (rc == 0);
 
 	sql = "INSERT INTO Test VALUES (?,?,?,?,?)";
 	rc = mysql_stmt_prepare(hstmt, sql.c_str(), static_cast<unsigned long>(sql.length())); 
-	assert(rc == 0);
+	poco_assert (rc == 0);
 
 	std::string str[3] = { "111", "222", "333" };
 	int fourth = 4;
@@ -219,14 +216,14 @@ void SQLExecutor::bareboneMySQLTest(const std::string& host, const std::string& 
 	bind_param[4].buffer_type   = MYSQL_TYPE_FLOAT;
 
 	rc = mysql_stmt_bind_param(hstmt, bind_param);
-	assert (rc == 0);
+	poco_assert (rc == 0);
 
 	rc = mysql_stmt_execute(hstmt);
-	assert (rc == 0);
+	poco_assert (rc == 0);
 
 	sql = "SELECT * FROM Test";
 	rc = mysql_stmt_prepare(hstmt, sql.c_str(), static_cast<unsigned long>(sql.length()));
-	assert (rc == 0);
+	poco_assert (rc == 0);
 
 	char chr[3][5] = {{ 0 }};
 	unsigned long lengths[5] = { 0 };
@@ -259,25 +256,25 @@ void SQLExecutor::bareboneMySQLTest(const std::string& host, const std::string& 
 	bind_result[4].length		= &lengths[4];
 
 	rc = mysql_stmt_bind_result(hstmt, bind_result);
-	assert (rc == 0);
+	poco_assert (rc == 0);
 
 	rc = mysql_stmt_execute(hstmt);
-	assert (rc == 0);
+	poco_assert (rc == 0);
 	rc = mysql_stmt_fetch(hstmt);
-	assert (rc == 0);
+	poco_assert (rc == 0);
 
-			assert (0 == std::strncmp("111", chr[0], 3));
-			assert (0 == std::strncmp("222", chr[1], 3));
-			assert (0 == std::strncmp("333", chr[2], 3));
-			assert (4 == fourth);
-			assert (1.5 == fifth);
+			poco_assert (0 == std::strncmp("111", chr[0], 3));
+			poco_assert (0 == std::strncmp("222", chr[1], 3));
+			poco_assert (0 == std::strncmp("333", chr[2], 3));
+			poco_assert (4 == fourth);
+			poco_assert (1.5 == fifth);
 
 	rc = mysql_stmt_close(hstmt);
-	assert(rc == 0);
+	poco_assert (rc == 0);
 
 	sql = "DROP TABLE Test";
 	rc = mysql_real_query(hsession, sql.c_str(), static_cast<unsigned long>(sql.length()));
-	assert(rc == 0);
+	poco_assert (rc == 0);
 
 	mysql_close(hsession);
 }
@@ -307,17 +304,17 @@ void SQLExecutor::simpleAccess()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
-	assert (count == 1);
+	poco_assert (count == 1);
 
 	try { *_pSession << "SELECT LastName FROM Person", into(result), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (lastName == result);
+	poco_assert (lastName == result);
 
 	try { *_pSession << "SELECT Age FROM Person", into(count), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == age);
+	poco_assert (count == age);
 }
 
 
@@ -339,14 +336,14 @@ void SQLExecutor::complexType()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 
 	Person c1;
 	Person c2;
 	try { *_pSession << "SELECT * FROM Person WHERE LastName = 'LN1'", into(c1), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (c1 == p1);
+	poco_assert (c1 == p1);
 }
 
 
@@ -376,7 +373,7 @@ void SQLExecutor::simpleAccessVector()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 
 	std::vector<std::string> lastNamesR;
 	std::vector<std::string> firstNamesR;
@@ -385,10 +382,10 @@ void SQLExecutor::simpleAccessVector()
 	try { *_pSession << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (ages == agesR);
-	assert (lastNames == lastNamesR);
-	assert (firstNames == firstNamesR);
-	assert (addresses == addressesR);
+	poco_assert (ages == agesR);
+	poco_assert (lastNames == lastNamesR);
+	poco_assert (firstNames == firstNamesR);
+	poco_assert (addresses == addressesR);
 }
 
 
@@ -407,13 +404,13 @@ void SQLExecutor::complexTypeVector()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 
 	std::vector<Person> result;
 	try { *_pSession << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (result == people);
+	poco_assert (result == people);
 }
 
 
@@ -432,7 +429,7 @@ void SQLExecutor::insertVector()
 		try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-		assert (count == 0);
+		poco_assert (count == 0);
 
 		try { stmt.execute(); }
 		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
@@ -440,13 +437,13 @@ void SQLExecutor::insertVector()
 		try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-		assert (count == 4);
+		poco_assert (count == 4);
 	}
 	count = 0;
 	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 4);
+	poco_assert (count == 4);
 }
 
 
@@ -475,19 +472,19 @@ void SQLExecutor::insertSingleBulk()
 	for (x = 0; x < 100; ++x)
 	{
 		std::size_t i = stmt.execute();
-		assert (i == 1);
+		poco_assert (i == 1);
 	}
 
 	int count = 0;
 	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 100);
+	poco_assert (count == 100);
 
 	try { *_pSession << "SELECT SUM(str) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == ((0+99)*100/2));
+	poco_assert (count == ((0+99)*100/2));
 }
 
 
@@ -505,12 +502,12 @@ void SQLExecutor::unsignedInts()
 	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	poco_assert (count == 1);
 
 	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (ret == data);
+	poco_assert (ret == data);
 }
 
 
@@ -528,12 +525,12 @@ void SQLExecutor::floats()
 	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	poco_assert (count == 1);
 
 	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (ret == data);
+	poco_assert (ret == data);
 }
 
 
@@ -551,12 +548,134 @@ void SQLExecutor::doubles()
 	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	poco_assert (count == 1);
 
 	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (ret == data);
+	poco_assert (ret == data);
+}
+
+void SQLExecutor::any()
+{
+	std::string funct = "any()";
+	Any i8 = Poco::Int8(42);
+	Any i16 = Poco::Int16(420);
+	Any i32 = Poco::UInt32(42058);
+	Any i64 = Poco::Int64(2205861);
+	Any f = float(42.5);
+	Any d = double(4278.5);
+	Any s = std::string("42");
+	Any date = Date(DateTime());
+	Any t = Time(DateTime());
+	Any dateTime = DateTime(2017, 9, 2, 18, 49, 15);
+	Any e;
+	assert (e.empty());
+
+	try { *_pSession << "INSERT INTO Anys VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)",
+				use(i8), use(i16), use(i32), use(i64), use(f), use(d), use(s), use(s), use(date),
+				use(t), use(dateTime), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Anys", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (count == 1);
+
+	i8 = Poco::Int8(0);
+	i16 = Poco::Int16(0);
+	i32 = Poco::Int32(0);
+	i64 = Poco::Int64(0);
+	f = 0.0f;
+	d = 0.0;
+	s = std::string("");
+	Any s2 = std::string("");
+	Any dateR = Date();
+	Any tR = Time();
+	Any dateTimeR = DateTime(2010, 5, 25);
+	e = 1;
+	assert (!e.empty());
+
+	try { *_pSession << "SELECT * FROM Anys", into(i8), into(i16), into(i32), into(i64),
+				into(f), into(d), into(s), into(s2), into(dateR), into(tR), into(dateTimeR), into(e), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	assert (42 == AnyCast<Poco::Int8>(i8));
+	assert (420 == AnyCast<Poco::Int16>(i16));
+	assert (42058 == AnyCast<Poco::Int32>(i32));
+	assert (2205861 == AnyCast<Poco::Int64>(i64));
+	assert (42.5f == AnyCast<float>(f));
+	assert (4278.5 == AnyCast<double>(d));
+	assert ("42" == AnyCast<std::string>(s));
+	assert ("42" == AnyCast<std::string>(s2));
+	assert (AnyCast<Date>(date) == AnyCast<Date>(dateR));
+	assert (AnyCast<Time>(t) == AnyCast<Time>(tR));
+	assert (AnyCast<DateTime>(dateTimeR) == AnyCast<DateTime>(dateTime));
+	assert (e.empty());
+}
+
+void SQLExecutor::dynamicAny()
+{
+	std::string funct = "dynamicAny()";
+	DynamicAny i8 = Poco::Int8(42);
+	DynamicAny i16 = Poco::Int16(420);
+	DynamicAny i32 = Poco::UInt32(42058);
+	DynamicAny i64 = Poco::Int64(2205861);
+	DynamicAny f = float(42.5);
+	DynamicAny d = double(4278.5);
+	DynamicAny s = std::string("42");
+	DynamicAny date = Date(DateTime());
+	DynamicAny t = Time(DateTime());
+	DynamicAny dateTime = DateTime();
+	DynamicAny e;
+	assert (e.isEmpty());
+
+	try { *_pSession << "INSERT INTO Anys VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)",
+				use(i8), use(i16), use(i32), use(i64), use(f), use(d), use(s), use(s), use(date),
+				use(t), use(dateTime), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Anys", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (count == 1);
+
+	i8 = Poco::Int8(0);
+	i16 = Poco::Int16(0);
+	i32 = Poco::Int32(0);
+	i64 = Poco::Int64(0);
+	f = 0.0f;
+	d = 0.0;
+	s = std::string("");
+	DynamicAny s2 = std::string("");
+	DynamicAny dateR = Date();
+	DynamicAny tR = Time();
+	DynamicAny dateTimeR = DateTime(2017, 9, 2);
+	e = 1;
+	assert (!e.isEmpty());
+
+	try { *_pSession << "SELECT * FROM Anys", into(i8), into(i16), into(i32), into(i64),
+				into(f), into(d), into(s), into(s2), into(dateR), into(tR), into(dateTimeR), into(e), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	assert (42 == i8);
+	assert (420 == i16);
+	assert (42058 == i32);
+	assert (2205861 == i64);
+	assert (42.5f == f);
+	assert (4278.5 == d);
+	assert ("42" == s);
+	assert ("42" == s2);
+	assert (date == dateR);
+	assert (t == tR);
+	assert (dateTimeR == dateTime);
+	assert (e.isEmpty());
 }
 
 
@@ -576,11 +695,11 @@ void SQLExecutor::insertSingleBulkVec()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
-	assert (count == 100);
+	poco_assert (count == 100);
 	try { *_pSession << "SELECT SUM(str) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == ((0+99)*100/2));
+	poco_assert (count == ((0+99)*100/2));
 }
 
 
@@ -601,10 +720,10 @@ void SQLExecutor::limits()
 	try { *_pSession << "SELECT * FROM Strings", into(retData), limit(50), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (retData.size() == 50);
+	poco_assert (retData.size() == 50);
 	for (int x = 0; x < 50; ++x)
 	{
-		assert(data[x] == retData[x]);
+		poco_assert (data[x] == retData[x]);
 	}
 }
 
@@ -626,7 +745,7 @@ void SQLExecutor::limitZero()
 	try { *_pSession << "SELECT * FROM Strings", into(retData), limit(0), now; }// stupid test, but at least we shouldn't crash
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (retData.size() == 0);
+	poco_assert (retData.size() == 0);
 }
 
 
@@ -645,18 +764,18 @@ void SQLExecutor::limitOnce()
 
 	std::vector<int> retData;
 	Statement stmt = (*_pSession << "SELECT * FROM Strings", into(retData), limit(50), now);
-	assert (!stmt.done());
-	assert (retData.size() == 50);
+	poco_assert (!stmt.done());
+	poco_assert (retData.size() == 50);
 	stmt.execute();
-	assert (!stmt.done());
-	assert (retData.size() == 100);
+	poco_assert (!stmt.done());
+	poco_assert (retData.size() == 100);
 	stmt.execute();
-	assert (stmt.done());
-	assert (retData.size() == 101);
+	poco_assert (stmt.done());
+	poco_assert (retData.size() == 101);
 
 	for (int x = 0; x < 101; ++x)
 	{
-		assert(data[x] == retData[x]);
+		poco_assert (data[x] == retData[x]);
 	}
 }
 
@@ -676,26 +795,26 @@ void SQLExecutor::limitPrepare()
 
 	std::vector<int> retData;
 	Statement stmt = (*_pSession << "SELECT * FROM Strings", into(retData), limit(50));
-	assert (retData.size() == 0);
-	assert (!stmt.done());
+	poco_assert (retData.size() == 0);
+	poco_assert (!stmt.done());
 
 	try { stmt.execute(); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (!stmt.done());
-	assert (retData.size() == 50);
+	poco_assert (!stmt.done());
+	poco_assert (retData.size() == 50);
 
 	try { stmt.execute(); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (stmt.done());
-	assert (retData.size() == 100);
+	poco_assert (stmt.done());
+	poco_assert (retData.size() == 100);
 
 	try { stmt.execute(); }// will restart execution!
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (!stmt.done());
-	assert (retData.size() == 150);
+	poco_assert (!stmt.done());
+	poco_assert (retData.size() == 150);
 	for (int x = 0; x < 150; ++x)
 	{
-		assert(data[x%100] == retData[x]);
+		poco_assert (data[x%100] == retData[x]);
 	}
 }
 
@@ -718,7 +837,7 @@ void SQLExecutor::prepare()
 	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 0);
+	poco_assert (count == 0);
 }
 
 
@@ -747,7 +866,7 @@ void SQLExecutor::setSimple()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 
 	std::set<std::string> lastNamesR;
 	std::set<std::string> firstNamesR;
@@ -756,10 +875,10 @@ void SQLExecutor::setSimple()
 	try { *_pSession << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (ages == agesR);
-	assert (lastNames == lastNamesR);
-	assert (firstNames == firstNamesR);
-	assert (addresses == addressesR);
+	poco_assert (ages == agesR);
+	poco_assert (lastNames == lastNamesR);
+	poco_assert (firstNames == firstNamesR);
+	poco_assert (addresses == addressesR);
 }
 
 
@@ -777,13 +896,13 @@ void SQLExecutor::setComplex()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 
 	std::set<Person> result;
 	try { *_pSession << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (result == people);
+	poco_assert (result == people);
 }
 
 
@@ -806,15 +925,15 @@ void SQLExecutor::setComplexUnique()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 5);
+	poco_assert (count == 5);
 
 	std::set<Person> result;
 	try { *_pSession << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (result.size() == 2);
-	assert (*result.begin() == p1);
-	assert (*++result.begin() == p2);
+	poco_assert (result.size() == 2);
+	poco_assert (*result.begin() == p1);
+	poco_assert (*++result.begin() == p2);
 }
 
 void SQLExecutor::multiSetSimple()
@@ -842,7 +961,7 @@ void SQLExecutor::multiSetSimple()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 
 	std::multiset<std::string> lastNamesR;
 	std::multiset<std::string> firstNamesR;
@@ -851,10 +970,10 @@ void SQLExecutor::multiSetSimple()
 	try { *_pSession << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (ages.size() == agesR.size());
-	assert (lastNames.size() == lastNamesR.size());
-	assert (firstNames.size() == firstNamesR.size());
-	assert (addresses.size() == addressesR.size());
+	poco_assert (ages.size() == agesR.size());
+	poco_assert (lastNames.size() == lastNamesR.size());
+	poco_assert (firstNames.size() == firstNamesR.size());
+	poco_assert (addresses.size() == addressesR.size());
 }
 
 
@@ -877,13 +996,13 @@ void SQLExecutor::multiSetComplex()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 5);
+	poco_assert (count == 5);
 
 	std::multiset<Person> result;
 	try { *_pSession << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (result.size() == people.size());
+	poco_assert (result.size() == people.size());
 }
 
 
@@ -903,13 +1022,13 @@ void SQLExecutor::mapComplex()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 
 	std::map<std::string, Person> result;
 	try { *_pSession << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (result == people);
+	poco_assert (result == people);
 }
 
 
@@ -932,13 +1051,13 @@ void SQLExecutor::mapComplexUnique()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 5);
+	poco_assert (count == 5);
 
 	std::map<std::string, Person> result;
 	try { *_pSession << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (result.size() == 2);
+	poco_assert (result.size() == 2);
 }
 
 
@@ -961,13 +1080,13 @@ void SQLExecutor::multiMapComplex()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 5);
+	poco_assert (count == 5);
 
 	std::multimap<std::string, Person> result;
 	try { *_pSession << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (result.size() == people.size());
+	poco_assert (result.size() == people.size());
 }
 
 
@@ -987,12 +1106,12 @@ void SQLExecutor::selectIntoSingle()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 	Person result;
 	try { *_pSession << "SELECT * FROM Person", into(result), limit(1), now; }// will return 1 object into one single result
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (result == p1);
+	poco_assert (result == p1);
 }
 
 
@@ -1013,15 +1132,15 @@ void SQLExecutor::selectIntoSingleStep()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 	Person result;
 	Statement stmt = (*_pSession << "SELECT * FROM Person", into(result), limit(1)); 
 	stmt.execute();
-	assert (result == p1);
-	assert (!stmt.done());
+	poco_assert (result == p1);
+	poco_assert (!stmt.done());
 	stmt.execute();
-	assert (result == p2);
-	assert (stmt.done());
+	poco_assert (result == p2);
+	poco_assert (stmt.done());
 }
 
 
@@ -1041,7 +1160,7 @@ void SQLExecutor::selectIntoSingleFail()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), limit(2, true), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 	Person result;
 	try
 	{
@@ -1071,7 +1190,7 @@ void SQLExecutor::lowerLimitOk()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 	Person result;
 	try
 	{
@@ -1101,15 +1220,15 @@ void SQLExecutor::singleSelect()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 	Person result;
 	Statement stmt = (*_pSession << "SELECT * FROM Person", into(result), limit(1));
 	stmt.execute();
-	assert (result == p1);
-	assert (!stmt.done());
+	poco_assert (result == p1);
+	poco_assert (!stmt.done());
 	stmt.execute();
-	assert (result == p2);
-	assert (stmt.done());
+	poco_assert (result == p2);
+	poco_assert (stmt.done());
 }
 
 
@@ -1129,7 +1248,7 @@ void SQLExecutor::lowerLimitFail()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 	Person result;
 	try
 	{
@@ -1158,14 +1277,14 @@ void SQLExecutor::combinedLimits()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 	std::vector <Person> result;
 	try { *_pSession << "SELECT * FROM Person", into(result), lowerLimit(2), upperLimit(2), now; }// will return 2 objects
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (result.size() == 2);
-	assert (result[0] == p1);
-	assert (result[1] == p2);
+	poco_assert (result.size() == 2);
+	poco_assert (result[0] == p1);
+	poco_assert (result[1] == p2);
 }
 
 
@@ -1186,14 +1305,14 @@ void SQLExecutor::ranges()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 	std::vector <Person> result;
 	try { *_pSession << "SELECT * FROM Person", into(result), range(2, 2), now; }// will return 2 objects
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (result.size() == 2);
-	assert (result[0] == p1);
-	assert (result[1] == p2);
+	poco_assert (result.size() == 2);
+	poco_assert (result[0] == p1);
+	poco_assert (result[1] == p2);
 }
 
 
@@ -1213,7 +1332,7 @@ void SQLExecutor::combinedIllegalLimits()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 	Person result;
 	try
 	{
@@ -1242,7 +1361,7 @@ void SQLExecutor::illegalRange()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 2);
+	poco_assert (count == 2);
 	Person result;
 	try
 	{
@@ -1262,13 +1381,13 @@ void SQLExecutor::emptyDB()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 0);
+	poco_assert (count == 0);
 
 	Person result;
 	Statement stmt = (*_pSession << "SELECT * FROM Person", into(result), limit(1));
 	stmt.execute();
-	assert (result.firstName.empty());
-	assert (stmt.done());
+	poco_assert (result.firstName.empty());
+	poco_assert (stmt.done());
 }
 
 
@@ -1287,14 +1406,14 @@ void SQLExecutor::dateTime()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	poco_assert (count == 1);
 	
 	DateTime bd;
-	assert (bd != birthday);
+	poco_assert (bd != birthday);
 	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (bd == birthday);
+	poco_assert (bd == birthday);
 	
 	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
 }
@@ -1315,14 +1434,14 @@ void SQLExecutor::date()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	poco_assert (count == 1);
 	
 	Date bd;
-	assert (bd != birthday);
+	poco_assert (bd != birthday);
 	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (bd == birthday);
+	poco_assert (bd == birthday);
 	
 	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
 }
@@ -1343,14 +1462,14 @@ void SQLExecutor::time()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	poco_assert (count == 1);
 	
 	Time bd;
-	assert (bd != birthday);
+	poco_assert (bd != birthday);
 	try { *_pSession << "SELECT Birthday FROM Person", into(bd), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (bd == birthday);
+	poco_assert (bd == birthday);
 	
 	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
 }
@@ -1371,20 +1490,20 @@ void SQLExecutor::blob(unsigned int bigSize)
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	poco_assert (count == 1);
 
 	Poco::Data::CLOB res;
-	assert (res.size() == 0);
+	poco_assert (res.size() == 0);
 	try { *_pSession << "SELECT Image FROM Person", into(res), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (res == img);
+	poco_assert (res == img);
 
 	Poco::Data::CLOB big;
 	std::vector<char> v(bigSize, 'x');
 	big.assignRaw(&v[0], (std::size_t) v.size());
 
-	assert (big.size() == (std::size_t) bigSize);
+	poco_assert (big.size() == (std::size_t) bigSize);
 
 	try { *_pSession << "DELETE FROM Person", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
@@ -1397,7 +1516,7 @@ void SQLExecutor::blob(unsigned int bigSize)
 	try { *_pSession << "SELECT Image FROM Person", into(res), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (res == big);
+	poco_assert (res == big);
 }
 
 
@@ -1415,7 +1534,7 @@ void SQLExecutor::blobStmt()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	poco_assert (count == 1);
 
 	Poco::Data::CLOB res;
 	poco_assert (res.size() == 0);
@@ -1426,6 +1545,33 @@ void SQLExecutor::blobStmt()
 	poco_assert (res == blob);
 }
 
+void SQLExecutor::longText()
+{
+	std::string funct = "longText()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	std::string info("0123456789");
+
+	Poco::Data::CLOB img("0123456789", 10);
+	int count = 0;
+	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(info), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	std::string res;
+	poco_assert (res.size() == 0);
+	Statement stmt = (*_pSession << "SELECT Info FROM Person", into(res));
+	try { stmt.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (res == info);
+}
 
 void SQLExecutor::tuples()
 {
@@ -1438,11 +1584,11 @@ void SQLExecutor::tuples()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
 	TupleType ret(-10,-11,-12,-13,-14,-15,-16,-17,-18,-19);
-	assert (ret != t);
+	poco_assert (ret != t);
 	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (ret == t);
+	poco_assert (ret == t);
 }
 
 
@@ -1467,14 +1613,66 @@ void SQLExecutor::tupleVector()
 	try { *_pSession << "SELECT COUNT(*) FROM Tuples", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (v.size() == (std::size_t) count);
+	poco_assert (v.size() == (std::size_t) count);
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> > ret;
 	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (ret == v);
+	poco_assert (ret == v);
 }
+
+#if __cplusplus >= 201103L
+
+void SQLExecutor::stdTuples()
+{
+	typedef std::tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
+	std::string funct = "stdTuples()";
+	TupleType t = std::make_tuple(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
+
+	try { *_pSession << "INSERT INTO Tuples VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", use(t), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	TupleType ret = std::make_tuple(-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-23,-24,-25,-26,-27,-28,-29);
+	poco_assert (ret != t);
+	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (ret == t);
+}
+
+
+void SQLExecutor::stdTupleVector()
+{
+	typedef std::tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
+	std::string funct = "stdTupleVector()";
+	TupleType t = std::make_tuple(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
+	auto t10 = std::make_tuple(10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29);
+	TupleType t100 = std::make_tuple(100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119);
+	std::vector<TupleType> v;
+	v.push_back(t);
+	v.push_back(t10);
+	v.push_back(t100);
+
+	try { *_pSession << "INSERT INTO Tuples VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", use(v), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Tuples", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (v.size() == (std::size_t) count);
+
+	std::vector<TupleType> ret;
+	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (ret == v);
+}
+
+#endif //__cplusplus >= 201103L
 
 
 void SQLExecutor::internalExtraction()
@@ -1495,55 +1693,55 @@ void SQLExecutor::internalExtraction()
 		Statement stmt = (*_pSession << "SELECT * FROM Vectors", now);
 		RecordSet rset(stmt);
 
-		assert (3 == rset.columnCount());
-		assert (4 == rset.rowCount());
+		poco_assert (3 == rset.columnCount());
+		poco_assert (4 == rset.rowCount());
 
 		int curVal = 3;
 		do
 		{
-			assert (rset["str0"] == curVal);
+			poco_assert (rset["str0"] == curVal);
 			++curVal;
 		} while (rset.moveNext());
 
 		rset.moveFirst();
-		assert (rset["str0"] == "3");
+		poco_assert (rset["str0"] == "3");
 		rset.moveLast();
-		assert (rset["str0"] == "6");
+		poco_assert (rset["str0"] == "6");
 
 		RecordSet rset2(rset);
-		assert (3 == rset2.columnCount());
-		assert (4 == rset2.rowCount());
+		poco_assert (3 == rset2.columnCount());
+		poco_assert (4 == rset2.rowCount());
 
 		int i = rset.value<int>(0,0);
-		assert (1 == i);
+		poco_assert (1 == i);
 
 		std::string s = rset.value(0,0);
-		assert ("1" == s);
+		poco_assert ("1" == s);
 
 		int a = rset.value<int>(0,2);
-		assert (3 == a);
+		poco_assert (3 == a);
 
 		try
 		{
 			double d = rset.value<double>(1,1);
-			assert (2.5 == d);
+			poco_assert (2.5 == d);
 		}
 		catch (BadCastException&)
 		{
 			float f = rset.value<float>(1,1);
-			assert (2.5 == f);
+			poco_assert (2.5 == f);
 		}
 
 		s = rset.value<std::string>(2,2);
-		assert ("5" == s);
+		poco_assert ("5" == s);
 		i = rset.value("str0", 2);
-		assert (5 == i);
+		poco_assert (5 == i);
 		
 		const Column<int>& col = rset.column<int>(0);
 		Column<int>::Iterator it = col.begin();
 		Column<int>::Iterator end = col.end();
 		for (int i = 1; it != end; ++it, ++i)
-			assert (*it == i);
+			poco_assert (*it == i);
 
 		rset = (*_pSession << "SELECT COUNT(*) AS cnt FROM Vectors", now);
 
@@ -1552,7 +1750,7 @@ void SQLExecutor::internalExtraction()
 		{
 			//this is what most drivers will return
 			int i = rset.value<int>(0,0);
-			assert (4 == i);
+			poco_assert (4 == i);
 		}
 		catch(BadCastException&)
 		{
@@ -1560,18 +1758,18 @@ void SQLExecutor::internalExtraction()
 			{
 				//this is for Oracle
 				double i = rset.value<double>(0,0);
-				assert (4 == int(i));
+				poco_assert (4 == int(i));
 			}
 			catch(BadCastException&)
 			{
 				//this is for PostgreSQL
 				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
-				assert (4 == big);
+				poco_assert (4 == big);
 			}
 		}
 
 		s = rset.value("cnt", 0).convert<std::string>();
-		assert ("4" == s);
+		poco_assert ("4" == s);
 
 		try { const Column<int>& col1 = rset.column<int>(100); fail ("must fail"); }
 		catch (RangeException&) { }
@@ -1604,7 +1802,7 @@ void SQLExecutor::doNull()
 	try { *_pSession << "SELECT COUNT(*) FROM Vectors", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	poco_assert (count == 1);
 
 	int i0 = 0;
 	Statement stmt1 = (*_pSession << "SELECT i0 FROM Vectors", into(i0, Poco::Data::Position(0), -1));
@@ -1640,11 +1838,11 @@ void SQLExecutor::setTransactionIsolation(Session& session, Poco::UInt32 ti)
 			Transaction t(session, false);
 			t.setIsolation(ti);
 			
-			assert (ti == t.getIsolation());
-			assert (t.isIsolation(ti));
+			poco_assert (ti == t.getIsolation());
+			poco_assert (t.isIsolation(ti));
 			
-			assert (ti == session.getTransactionIsolation());
-			assert (session.isTransactionIsolation(ti));
+			poco_assert (ti == session.getTransactionIsolation());
+			poco_assert (session.isTransactionIsolation(ti));
 		}
 		catch(Poco::Exception& e){ std::cout << funct << ':' << e.displayText() << std::endl;}
 	}
@@ -1700,9 +1898,9 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	bool autoCommit = _pSession->getFeature("autoCommit");
 
 	_pSession->setFeature("autoCommit", true);
-	assert (!_pSession->isTransaction());
+	poco_assert (!_pSession->isTransaction());
 	_pSession->setFeature("autoCommit", false);
-	assert (!_pSession->isTransaction());
+	poco_assert (!_pSession->isTransaction());
 
 	setTransactionIsolation((*_pSession), Session::TRANSACTION_READ_UNCOMMITTED);
 	setTransactionIsolation((*_pSession), Session::TRANSACTION_REPEATABLE_READ);
@@ -1711,51 +1909,51 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	setTransactionIsolation((*_pSession), Session::TRANSACTION_READ_COMMITTED);
 
 	_pSession->begin();
-	assert (_pSession->isTransaction());
+	poco_assert (_pSession->isTransaction());
 	try { (*_pSession) << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (_pSession->isTransaction());
+	poco_assert (_pSession->isTransaction());
 
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assert (0 == locCount);
+	poco_assert (0 == locCount);
 
 	try { (*_pSession) << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (2 == count);
-	assert (_pSession->isTransaction());
+	poco_assert (2 == count);
+	poco_assert (_pSession->isTransaction());
 	_pSession->rollback();
-	assert (!_pSession->isTransaction());
+	poco_assert (!_pSession->isTransaction());
 
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assert (0 == locCount);
+	poco_assert (0 == locCount);
 
 	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (0 == count);
-	assert (!_pSession->isTransaction());
+	poco_assert (0 == count);
+	poco_assert (!_pSession->isTransaction());
 
 	_pSession->begin();
 	try { (*_pSession) << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (_pSession->isTransaction());
+	poco_assert (_pSession->isTransaction());
 
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assert (0 == locCount);
+	poco_assert (0 == locCount);
 
 	_pSession->commit();
-	assert (!_pSession->isTransaction());
+	poco_assert (!_pSession->isTransaction());
 
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assert (2 == locCount);
+	poco_assert (2 == locCount);
 
 	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (2 == count);
+	poco_assert (2 == count);
 
 	_pSession->setFeature("autoCommit", autoCommit);
 }
@@ -1795,37 +1993,37 @@ void SQLExecutor::transaction(const std::string& connect)
 	bool autoCommit = _pSession->getFeature("autoCommit");
 
 	_pSession->setFeature("autoCommit", true);
-	assert (!_pSession->isTransaction());
+	poco_assert (!_pSession->isTransaction());
 	_pSession->setFeature("autoCommit", false);
-	assert (!_pSession->isTransaction());
+	poco_assert (!_pSession->isTransaction());
 	_pSession->setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
 
 	{
 		Transaction trans((*_pSession));
-		assert (trans.isActive());
-		assert (_pSession->isTransaction());
+		poco_assert (trans.isActive());
+		poco_assert (_pSession->isTransaction());
 		
 		try { (*_pSession) << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 		
-		assert (_pSession->isTransaction());
-		assert (trans.isActive());
+		poco_assert (_pSession->isTransaction());
+		poco_assert (trans.isActive());
 
 		try { (*_pSession) << "SELECT COUNT(*) FROM Person", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-		assert (2 == count);
-		assert (_pSession->isTransaction());
-		assert (trans.isActive());
+		poco_assert (2 == count);
+		poco_assert (_pSession->isTransaction());
+		poco_assert (trans.isActive());
 	}
-	assert (!_pSession->isTransaction());
+	poco_assert (!_pSession->isTransaction());
 
 	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (0 == count);
-	assert (!_pSession->isTransaction());
+	poco_assert (0 == count);
+	poco_assert (!_pSession->isTransaction());
 
 	{
 		Transaction trans((*_pSession));
@@ -1834,21 +2032,21 @@ void SQLExecutor::transaction(const std::string& connect)
 		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
 		local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-		assert (0 == locCount);
+		poco_assert (0 == locCount);
 
-		assert (_pSession->isTransaction());
-		assert (trans.isActive());
+		poco_assert (_pSession->isTransaction());
+		poco_assert (trans.isActive());
 		trans.commit();
-		assert (!_pSession->isTransaction());
-		assert (!trans.isActive());
+		poco_assert (!_pSession->isTransaction());
+		poco_assert (!trans.isActive());
 		local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-		assert (2 == locCount);
+		poco_assert (2 == locCount);
 	}
 
 	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (2 == count);
+	poco_assert (2 == count);
 
 	_pSession->begin();
 	try { (*_pSession) << "DELETE FROM Person", now; }
@@ -1856,16 +2054,16 @@ void SQLExecutor::transaction(const std::string& connect)
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assert (2 == locCount);
+	poco_assert (2 == locCount);
 
 	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (0 == count);
+	poco_assert (0 == count);
 	_pSession->commit();
 
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assert (0 == locCount);
+	poco_assert (0 == locCount);
 
 	std::string sql1 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[0], firstNames[0], addresses[0], ages[0]);
 	std::string sql2 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[1], firstNames[1], addresses[1], ages[1]);
@@ -1879,35 +2077,35 @@ void SQLExecutor::transaction(const std::string& connect)
 	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (1 == count);
+	poco_assert (1 == count);
 	trans.execute(sql2, false);
 	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (2 == count);
+	poco_assert (2 == count);
 
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assert (0 == locCount);
+	poco_assert (0 == locCount);
 
 	trans.rollback();
 
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assert (0 == locCount);
+	poco_assert (0 == locCount);
 
 	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (0 == count);
+	poco_assert (0 == count);
 
 	trans.execute(sql);
 	
 	local << "SELECT COUNT(*) FROM Person", into(locCount), now;
-	assert (2 == locCount);
+	poco_assert (2 == locCount);
 
 	try { (*_pSession) << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (2 == count);
+	poco_assert (2 == count);
 
 	_pSession->setFeature("autoCommit", autoCommit);
 }
@@ -1931,24 +2129,24 @@ void SQLExecutor::reconnect()
 	try { (*_pSession) << "SELECT COUNT(*) FROM Person", into(count), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	poco_assert (count == 1);
 
-	assert (_pSession->isConnected());
+	poco_assert (_pSession->isConnected());
 	_pSession->close();
-	assert (!_pSession->isConnected());
+	poco_assert (!_pSession->isConnected());
 	try 
 	{
 		(*_pSession) << "SELECT LastName FROM Person", into(result), now;  
 		fail ("must fail");
 	}
 	catch(NotConnectedException&){ }
-	assert (!_pSession->isConnected());
+	poco_assert (!_pSession->isConnected());
 
 	_pSession->open();
-	assert (_pSession->isConnected());
+	poco_assert (_pSession->isConnected());
 	try { (*_pSession) << "SELECT Age FROM Person", into(count), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == age);
-	assert (_pSession->isConnected());
+	poco_assert (count == age);
+	poco_assert (_pSession->isConnected());
 }

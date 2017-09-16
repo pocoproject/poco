@@ -1,8 +1,6 @@
 //
 // SQLiteTest.cpp
 //
-// $Id: //poco/Main/Data/SQLite/testsuite/src/SQLiteTest.cpp#7 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -85,6 +83,7 @@ using Poco::NotImplementedException;
 using Poco::Data::SQLite::ConstraintViolationException;
 using Poco::Data::SQLite::ParameterCountMismatchException;
 using Poco::Int32;
+using Poco::Int64;
 using Poco::Dynamic::Var;
 using Poco::Data::SQLite::Utility;
 using Poco::delegate;
@@ -1911,12 +1910,115 @@ void SQLiteTest::testDateTime()
 	assert (rt == t);
 }
 
+#if defined(POCO_PTR_IS_64_BIT) && (POCO_PTR_IS_64_BIT == 1)
 
 void SQLiteTest::testInternalExtraction()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Vectors", now;
-	tmp << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+	tmp << "CREATE TABLE Vectors (int0 INTEGER32, flt0 REAL, str0 VARCHAR, int1 INTEGER)", now;
+
+	std::vector<Tuple<int, double, std::string, Int64> > v;
+	v.push_back(Tuple<int, double, std::string, Int64>(1, 1.5, "3", 1));
+	v.push_back(Tuple<int, double, std::string, Int64>(2, 2.5, "4", 2));
+	v.push_back(Tuple<int, double, std::string, Int64>(3, 3.5, "5", 3));
+	v.push_back(Tuple<int, double, std::string, Int64>(4, 4.5, "6", Int64(std::numeric_limits<Int64>::max())));
+
+	tmp << "INSERT INTO Vectors VALUES (?,?,?,?)", use(v), now;
+
+	Statement stmt = (tmp << "SELECT * FROM Vectors", now);
+	RecordSet rset(stmt);
+	assert (4 == rset.columnCount());
+	assert (4 == rset.rowCount());
+
+	RecordSet rset2(rset);
+	assert (4 == rset2.columnCount());
+	assert (4 == rset2.rowCount());
+
+	Int32 a = rset.value<Int32>(0,2);
+	assert (3 == a);
+
+	Int64 x = rset.value<Int64>(3, 2);
+	assert(3 == x);
+
+	x = rset.value<Int64>(3, 3);
+	assert(std::numeric_limits<Int64>::max() == x);
+
+	int c = rset2.value(0);
+	assert (1 == c);
+
+	Int32 b = rset2.value<Int32>("InT0",2);
+	assert (3 == b);
+
+	double d = rset.value<double>(1,0);
+	assert (1.5 == d);
+
+	std::string s = rset.value<std::string>(2,1);
+	assert ("4" == s);
+	
+	typedef std::deque<Int32> IntDeq;
+	
+	const Column<IntDeq>& col = rset.column<IntDeq>(0);
+	assert (col[0] == 1);
+
+	try { rset.column<IntDeq>(100); fail ("must fail"); }
+	catch (RangeException&) { }
+
+	const Column<IntDeq>& col1 = rset.column<IntDeq>(0);
+	assert ("int0" == col1.name());
+	Column<IntDeq>::Iterator it = col1.begin();
+	Column<IntDeq>::Iterator itEnd = col1.end();
+	int counter = 1;
+	for (; it != itEnd; ++it, ++counter)
+		assert (counter == *it);
+
+	rset = (tmp << "SELECT COUNT(*) FROM Vectors", now);
+	s = rset.value<std::string>(0,0);
+	assert ("4" == s);
+	
+	stmt = (tmp << "DELETE FROM Vectors", now);
+	rset = stmt;
+
+	try { rset.column<IntDeq>(0); fail ("must fail"); }
+	catch (RangeException&) { }
+}
+
+
+void SQLiteTest::testAny()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS Anys", now;
+	tmp << "CREATE TABLE Anys (int0 INTEGER32, flt0 REAL, str0 VARCHAR, int1 INTEGER)", now;
+
+	Any i = Int32(42);
+	Any f = double(42.5);
+	Any s = std::string("42");
+	Any i64 = std::numeric_limits<Int64>::max();
+
+	tmp << "INSERT INTO Anys VALUES (?, ?, ?, ?)", use(i), use(f), use(s), use(i64), now;
+
+	int count = 0;
+	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
+	assert (1 == count);
+
+	i = 0;
+	f = 0.0;
+	s = std::string("");
+	i64 = 0;
+	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), into(i64), now;
+	assert (AnyCast<Int32>(i) == 42);
+	assert (AnyCast<double>(f) == 42.5);
+	assert (AnyCast<std::string>(s) == "42");
+	assert (AnyCast<Int64>(i64) == std::numeric_limits<Int64>::max());
+}
+
+#else // !POCO_PTR_IS_64_BIT
+
+void SQLiteTest::testInternalExtraction()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS Vectors", now;
+	tmp << "CREATE TABLE Vectors (int0 INTEGER32, flt0 REAL, str0 VARCHAR)", now;
 
 	std::vector<Tuple<int, double, std::string> > v;
 	v.push_back(Tuple<int, double, std::string>(1, 1.5, "3"));
@@ -1976,6 +2078,34 @@ void SQLiteTest::testInternalExtraction()
 	try { rset.column<IntDeq>(0); fail ("must fail"); }
 	catch (RangeException&) { }
 }
+
+
+void SQLiteTest::testAny()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS Anys", now;
+	tmp << "CREATE TABLE Anys (int0 INTEGER32, flt0 REAL, str0 VARCHAR)", now;
+
+	Any i = Int32(42);
+	Any f = double(42.5);
+	Any s = std::string("42");
+
+	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
+
+	int count = 0;
+	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
+	assert (1 == count);
+
+	i = 0;
+	f = 0.0;
+	s = std::string("");
+	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
+	assert (AnyCast<Int32>(i) == 42);
+	assert (AnyCast<double>(f) == 42.5);
+	assert (AnyCast<std::string>(s) == "42");
+}
+
+#endif // POCO_PTR_IS_64_BIT
 
 
 void SQLiteTest::testPrimaryKeyConstraint()
@@ -2078,7 +2208,15 @@ void SQLiteTest::testNulls()
 	ses << "CREATE TABLE NullTest (i INTEGER, r REAL, v VARCHAR)", now;
 
 	ses << "INSERT INTO NullTest VALUES(:i, :r, :v)", use(null), use(null), use(null), now;
-	
+
+	int cnt = 0;
+	ses << "SELECT count(*) FROM NullTest", into(cnt), now;
+	assert (cnt == 1);
+
+	std::string none;
+	ses << "SELECT v FROM NullTest WHERE v = 'abc'", into(none), now;
+	assert (none.empty());
+
 	RecordSet rs(ses, "SELECT i, r, v, null as e FROM NullTest");
 	rs.moveFirst();
 	assert (rs.isNull("i"));
@@ -2250,32 +2388,6 @@ void SQLiteTest::testAsync()
 	assert (!stmt2.isAsync());
 	assert ("deque" == stmt2.getStorage());
 	assert (stmt2.execute() == rowCount);
-}
-
-
-void SQLiteTest::testAny()
-{
-	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
-	tmp << "DROP TABLE IF EXISTS Anys", now;
-	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
-
-	Any i = Int32(42);
-	Any f = double(42.5);
-	Any s = std::string("42");
-
-	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
-
-	int count = 0;
-	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
-	assert (1 == count);
-
-	i = 0;
-	f = 0.0;
-	s = std::string("");
-	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
-	assert (AnyCast<Int32>(i) == 42);
-	assert (AnyCast<double>(f) == 42.5);
-	assert (AnyCast<std::string>(s) == "42");
 }
 
 
@@ -2885,6 +2997,8 @@ void SQLiteTest::testNotifier()
 	session << "UPDATE PERSON SET Age = 41 WHERE FirstName = 'Homer'", now;
 	assert (_updateCounter == 3);
 	assert (notifier.getRow() == 3);
+
+	assert (notifier.getTable() == "Person");
 
 	notifier.setRow(0);
 	// SQLite optimizes DELETE so here we must have

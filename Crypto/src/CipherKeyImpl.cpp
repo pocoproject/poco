@@ -1,8 +1,6 @@
 //
 // CipherKeyImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/CipherKeyImpl.cpp#1 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherKeyImpl

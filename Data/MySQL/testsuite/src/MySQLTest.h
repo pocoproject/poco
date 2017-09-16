@@ -1,8 +1,6 @@
 //
 // ODBCMySQLTest.h
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/ODBCMySQLTest.h#1 $
-//
 // Definition of the MySQLTest class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -81,13 +79,24 @@ public:
 	void testDateTime();
 	void testBLOB();
 	void testBLOBStmt();
+	void testLongText();
 
 	void testUnsignedInts();
 	void testFloat();
 	void testDouble();
 
+	void testAny();
+	void testDynamicAny();
+
 	void testTuple();
 	void testTupleVector();
+
+#if __cplusplus >= 201103L
+
+	void testStdTuple();
+	void testStdTupleVector();
+
+#endif
 
 	void testInternalExtraction();
 
@@ -114,6 +123,7 @@ private:
 	void dropTable(const std::string& tableName);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
+	void recreatePersonLongTextTable();
 	void recreatePersonDateTimeTable();
 	void recreatePersonDateTable();
 	void recreatePersonTimeTable();
@@ -125,6 +135,7 @@ private:
 	void recreateVectorsTable();
 	void recreateNullableIntTable();
 	void recreateNullableStringTable();
+	void recreateAnyTable();
 
 	static void dbInfo(Poco::Data::Session& session);
 

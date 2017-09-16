@@ -1,8 +1,6 @@
 //
 // TCPServerTest.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/TCPServerTest.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -95,7 +93,7 @@ void TCPServerTest::testOneConnection()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
@@ -123,7 +121,7 @@ void TCPServerTest::testTwoConnections()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	SecureStreamSocket ss2(sa);
 	std::string data("hello, world");
@@ -170,7 +168,7 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	SecureStreamSocket ss2(sa);
 	SecureStreamSocket ss3(sa);
@@ -259,7 +257,7 @@ void TCPServerTest::testReuseSocket()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
@@ -328,7 +326,7 @@ void TCPServerTest::testReuseSession()
 		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
 	pClientContext->enableSessionCache(true);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa, pClientContext);
 	assert (!ss1.sessionWasReused());
 	std::string data("hello, world");

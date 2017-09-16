@@ -1,8 +1,6 @@
 //
 // StringTokenizerTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/StringTokenizerTest.h#2 $
-//
 // Definition of the StringTokenizerTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

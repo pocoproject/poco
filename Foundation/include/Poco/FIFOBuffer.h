@@ -1,8 +1,6 @@
 //
 // FIFOBuffer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FIFOBuffer.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FIFOBuffer
@@ -325,7 +323,7 @@ public:
 		if (!isWritable())
 			throw Poco::InvalidAccessException("Buffer not writable.");
 
-		std::memcpy(&_buffer[_used], ptr, length * sizeof(T));
+		std::memcpy(begin() + _used, ptr, length * sizeof(T));
 		std::size_t usedBefore = _used;
 		_used += length;
 		if (_notify) notify(usedBefore);
@@ -338,17 +336,11 @@ public:
 	{
 		Mutex::ScopedLock lock(_mutex);
 
-		if (length > available())
+		if (length > _buffer.size() - _used - _begin)
 			throw Poco::InvalidAccessException("Cannot extend buffer.");
 		
 		if (!isWritable())
 			throw Poco::InvalidAccessException("Buffer not writable.");
-
-		if (_buffer.size() - (_begin + _used) < length)
-		{
-			std::memmove(_buffer.begin(), begin(), _used * sizeof(T));
-			_begin = 0;
-		}
 
 		std::size_t usedBefore = _used;
 		_used += length;

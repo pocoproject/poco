@@ -1,8 +1,6 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.4/Foundation/samples/URI/src/URI.cpp#1 $
-//
 // This sample demonstrates the URI class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

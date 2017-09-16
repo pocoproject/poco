@@ -1,8 +1,6 @@
 //
 // AbstractBinding.cpp
 //
-// $Id: //poco/Main/Data/src/AbstractBinding.cpp#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AbstractBinding

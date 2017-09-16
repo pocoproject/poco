@@ -1,8 +1,6 @@
 //
 // LinkAnnotation.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/LinkAnnotation.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  LinkAnnotation

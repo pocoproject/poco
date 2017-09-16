@@ -1,8 +1,6 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/1.4/Crypto/src/OpenSSLInitializer.cpp#3 $
-//
 // Library: Crypto
 // Package: CryptoCore
 // Module:  OpenSSLInitializer
@@ -33,9 +31,9 @@ using Poco::Thread;
 namespace Poco {
 namespace Crypto {
 
-
+Poco::FastMutex OpenSSLInitializer::_mutex;
 Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
-Poco::AtomicCounter OpenSSLInitializer::_rc;
+int OpenSSLInitializer::_rc(0);
 bool OpenSSLInitializer::_disableSSLInitialization = false;
 
 OpenSSLInitializer::OpenSSLInitializer()
@@ -59,6 +57,7 @@ OpenSSLInitializer::~OpenSSLInitializer()
 
 void OpenSSLInitializer::initialize()
 {
+	FastMutex::ScopedLock lock(_mutex);
 	if (++_rc == 1)
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x0907000L
@@ -104,6 +103,7 @@ void OpenSSLInitializer::initialize()
 
 void OpenSSLInitializer::uninitialize()
 {
+	FastMutex::ScopedLock lock(_mutex);
 	if (--_rc == 0)
 	{
         if(_mutexes != NULL) {

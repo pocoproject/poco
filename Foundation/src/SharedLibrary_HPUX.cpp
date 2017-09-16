@@ -1,8 +1,6 @@
 //
 // SharedLibrary_HPUX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary_HPUX.cpp#2 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -91,7 +89,7 @@ std::string SharedLibraryImpl::prefixImpl()
 
 std::string SharedLibraryImpl::suffixImpl()
 {
-#if defined(_DEBUG)
+#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 	return "d.sl";
 #else
 	return ".sl";

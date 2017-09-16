@@ -1,8 +1,6 @@
 //
 // Format.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Format.cpp#5 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Format
@@ -46,28 +44,44 @@ namespace
 	}
 
 
-	void parseWidth(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
+	void parseWidth(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
 	{
 		int width = 0;
-		while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+		if (itFmt != endFmt && *itFmt == '*')
 		{
-			width = 10*width + *itFmt - '0';
 			++itFmt;
+			width = AnyCast<int>(*itVal++);
 		}
-		if (width != 0) str.width(width);
+		else
+		{
+			while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+			{
+				width = 10*width + *itFmt - '0';
+				++itFmt;
+			}
+		}
+		if (width > 0) str.width(width);
 	}
 	
 	
-	void parsePrec(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
+	void parsePrec(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
 	{
 		if (itFmt != endFmt && *itFmt == '.')
 		{
 			++itFmt;
 			int prec = 0;
-			while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+			if (itFmt != endFmt && *itFmt == '*')
 			{
-				prec = 10*prec + *itFmt - '0';
 				++itFmt;
+				prec = AnyCast<int>(*itVal++);
+			}
+			else
+			{
+				while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+				{
+					prec = 10*prec + *itFmt - '0';
+					++itFmt;
+				}
 			}
 			if (prec >= 0) str.precision(prec);
 		}
@@ -155,8 +169,8 @@ namespace
 		try
 		{
 			parseFlags(str, itFmt, endFmt);
-			parseWidth(str, itFmt, endFmt);
-			parsePrec(str, itFmt, endFmt);
+			parseWidth(str, itFmt, endFmt, itVal);
+			parsePrec(str, itFmt, endFmt, itVal);
 			char mod = parseMod(itFmt, endFmt);
 			if (itFmt != endFmt)
 			{

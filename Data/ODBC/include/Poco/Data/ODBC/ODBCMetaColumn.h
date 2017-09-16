@@ -1,9 +1,7 @@
 //
 // ODBCMetaColumn.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCMetaColumn.h#3 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCMetaColumn
 //
@@ -40,14 +38,7 @@ class ODBC_API ODBCMetaColumn: public MetaColumn
 {
 public:
 
-	enum NumericConversion
-	{
-		NC_BEST_FIT = 0,
-		NC_FORCE_STRING = 1,
-		NC_BEST_FIT_DBL_LIMIT = 2
-	};
-
-	ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position, NumericConversion numericConversion);
+	ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position);
 		/// Creates the ODBCMetaColumn.
 		
 	~ODBCMetaColumn();
@@ -81,7 +72,6 @@ private:
 	SQLLEN                 _dataLength;
 	const StatementHandle& _rStmt;
 	ColumnDescription      _columnDesc;
-	NumericConversion      _numericConversion;
 };
 
 

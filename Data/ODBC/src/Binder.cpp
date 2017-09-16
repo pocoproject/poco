@@ -1,9 +1,7 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/Binder.cpp#4 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Binder
 //
@@ -44,7 +42,6 @@ Binder::Binder(const StatementHandle& rStmt,
 	std::size_t maxFieldSize,
 	Binder::ParameterBinding dataBinding,
 	TypeInfo* pDataTypes,
-	ODBCMetaColumn::NumericConversion numericConversion,
 	bool insertOnly) :
 	_rStmt(rStmt),
 	_paramBinding(dataBinding),
@@ -54,7 +51,6 @@ Binder::Binder(const StatementHandle& rStmt,
 	_maxCharColLength(1024),
 	_maxWCharColLength(1024),
 	_maxVarBinColSize(1024),
-	_numericConversion(numericConversion),
 	_insertOnly(insertOnly)
 {
 	getProp(*_pTypeInfo, SQL_WVARCHAR, _maxWCharColLength);
@@ -110,6 +106,13 @@ void Binder::freeMemory()
 	{
 		StringMap::iterator itStr = _strings.begin();
 		StringMap::iterator itStrEnd = _strings.end();
+		for (; itStr != itStrEnd; ++itStr) std::free(itStr->first);
+	}
+
+	if (_utf16Strings.size() > 0)
+	{
+		UTF16StringMap::iterator itStr = _utf16Strings.begin();
+		UTF16StringMap::iterator itStrEnd = _utf16Strings.end();
 		for (; itStr != itStrEnd; ++itStr) std::free(itStr->first);
 	}
 
@@ -174,7 +177,6 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir, const 
 	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER) val.size();
 
-	SQLSMALLINT sqType = SQL_LONGVARCHAR;
 	if (isOutBound(dir))
 	{
 		getColumnOrParameterSize(pos, size);
@@ -182,13 +184,11 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir, const 
 		pVal = (SQLPOINTER) pChar;
 		_outParams.insert(ParamMap::value_type(pVal, size));
 		_strings.insert(StringMap::value_type(pChar, const_cast<std::string*>(&val)));
-		if (size < _maxCharColLength) sqType = SQL_VARCHAR;
 	}
 	else if (isInBound(dir))
 	{
 		pVal = (SQLPOINTER) val.c_str();
 		_inParams.insert(ParamMap::value_type(pVal, size));
-		if (size < _maxCharColLength) sqType = SQL_VARCHAR;
 	}
 	else
 		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
@@ -205,6 +205,8 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir, const 
 		*pLenIn = SQL_LEN_DATA_AT_EXEC(size);
 
 	_lengthIndicator.push_back(pLenIn);
+
+	SQLSMALLINT sqType = (size <= _maxCharColLength) ? SQL_VARCHAR : SQL_LONGVARCHAR;
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
@@ -228,11 +230,11 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir, const 
 
 	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER)(val.size() * sizeof(CharT));
-	SQLSMALLINT sqType = (val.size() < _maxWCharColLength) ? SQL_WVARCHAR : SQL_WLONGVARCHAR;
+	
 	if (isOutBound(dir))
 	{
 		getColumnOrParameterSize(pos, size);
-		CharT* pChar = (CharT*)std::calloc(size, 1);
+		CharT* pChar = (CharT*)std::calloc(size, sizeof(CharT));
 		pVal = (SQLPOINTER)pChar;
 		_outParams.insert(ParamMap::value_type(pVal, size));
 		_utf16Strings.insert(UTF16StringMap::value_type(pChar, const_cast<UTF16String*>(&val)));
@@ -260,6 +262,8 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir, const 
 	}
 
 	_lengthIndicator.push_back(pLenIn);
+
+	SQLSMALLINT sqType = (size <= _maxWCharColLength) ? SQL_WVARCHAR : SQL_WLONGVARCHAR;
 
 	if (Utility::isError(SQLBindParameter(_rStmt,
 		(SQLUSMALLINT)pos + 1,
@@ -480,6 +484,14 @@ void Binder::synchronize()
 			it->second->assign(it->first, std::strlen(it->first));
 	}
 
+	if (_utf16Strings.size())
+	{
+		UTF16StringMap::iterator it = _utf16Strings.begin();
+		UTF16StringMap::iterator end = _utf16Strings.end();
+		for (; it != end; ++it)
+			it->second->assign(it->first, UTF16CharTraits::length((UTF16CharTraits::char_type*)it->first));
+	}
+
 	if (_nullCbMap.size())
 	{
 		NullCbMap::iterator it = _nullCbMap.begin();
@@ -508,6 +520,8 @@ void Binder::reset()
 		_timestamps.clear();
 	if (_strings.size() > 0)
 		_strings.clear();
+	if (_utf16Strings.size() > 0)
+		_utf16Strings.clear();
 	if (_dateVecVec.size() > 0)
 		_dateVecVec.clear();
 	if (_timeVecVec.size() > 0)
@@ -566,7 +580,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 		{
 			try
 			{
-				ODBCMetaColumn c(_rStmt, pos, _numericConversion);
+				ODBCMetaColumn c(_rStmt, pos);
 				_parameters[pos] = ParamDescriptor(static_cast<SQLINTEGER>(c.length()), cDataType, static_cast<SQLSMALLINT>(c.precision()));
 			}
 			catch (StatementException&) {}
@@ -587,7 +601,7 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 
 	try
 	{
-		ODBCMetaColumn col(_rStmt, pos, _numericConversion);
+		ODBCMetaColumn col(_rStmt, pos);
 		colSize = col.length();
 	}
 	catch (StatementException&) { }

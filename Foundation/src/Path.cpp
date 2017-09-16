@@ -1,8 +1,6 @@
 //
 // Path.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path.cpp#5 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  Path
@@ -611,16 +609,6 @@ std::string Path::dataHome()
 	return PathImpl::dataHomeImpl();
 #else
 	return PathImpl::homeImpl();
-#endif
-}
-
-	
-std::string Path::tempHome()
-{
-#if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
-	return PathImpl::tempHomeImpl();
-#else
-	return PathImpl::tempImpl();
 #endif
 }
 

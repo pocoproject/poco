@@ -1,10 +1,8 @@
 //
 // Preparator.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Preparator.h#5 $
-//
-// Library: Data
-// Package: DataCore
+// Library: Data/ODBC
+// Package: ODBC
 // Module:  Preparator
 //
 // Definition of the Preparator class.
@@ -102,7 +100,6 @@ public:
 		const std::string& statement, 
 		std::size_t maxFieldSize,
 		DataExtraction dataExtraction,
-		ODBCMetaColumn::NumericConversion numericConversion ,
 		bool isPostgres
 		);
 		/// Creates the Preparator.
@@ -419,9 +416,6 @@ public:
 	DataExtraction getDataExtraction() const;
 		/// Returns data extraction mode.
 
-	ODBCMetaColumn::NumericConversion numericConversion() const;
-		/// Tells if numeric values are always converted to string
-
 private:
 	typedef std::vector<Poco::Any> ValueVec;
 	typedef std::vector<SQLLEN>    LengthVec;
@@ -435,7 +429,7 @@ private:
 	void prepareImpl(std::size_t pos, const C* pVal = 0)
 		/// Utility function to prepare Any and DynamicAny.
 	{
-		ODBCMetaColumn col(_rStmt, pos, _numericConversion);
+		ODBCMetaColumn col(_rStmt, pos);
 
 		switch (col.type())
 		{
@@ -633,7 +627,7 @@ private:
 			(SQLUSMALLINT) pos + 1, 
 			valueType, 
 			(SQLPOINTER) pCache, 
-			(SQLINTEGER) size, 
+			(SQLINTEGER) size*sizeof(T), 
 			&_lengths[pos])))
 		{
 			throw StatementException(_rStmt, "SQLBindCol()");
@@ -687,7 +681,6 @@ private:
 	mutable IndexMap        _varLengthArrays;
 	std::size_t             _maxFieldSize;
 	DataExtraction          _dataExtraction;
-	ODBCMetaColumn::NumericConversion _numericConversion;
 };
 
 
@@ -1040,7 +1033,7 @@ inline void Preparator::prepare(std::size_t pos, const std::list<std::string>& v
 
 inline void Preparator::prepare(std::size_t pos, const UTF16String&)
 {
-	prepareVariableLen<UTF16String::value_type>(pos, SQL_C_WCHAR, maxDataSize(pos), DT_CHAR);
+	prepareVariableLen<UTF16String::value_type>(pos, SQL_C_WCHAR, maxDataSize(pos), DT_WCHAR);
 }
 
 
@@ -1271,12 +1264,6 @@ inline Poco::Any& Preparator::operator [] (std::size_t pos)
 inline Poco::Any& Preparator::at(std::size_t pos)
 {
 	return _values.at(pos);
-}
-
-
-inline ODBCMetaColumn::NumericConversion Preparator::numericConversion() const
-{
-	return _numericConversion;
 }
 
 

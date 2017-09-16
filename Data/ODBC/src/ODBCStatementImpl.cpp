@@ -1,9 +1,7 @@
 //
 // ODBCStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/ODBCStatementImpl.cpp#8 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCStatementImpl
 //
@@ -47,7 +45,6 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_prepared(false),
 	_affectedRowCount(0),
 	_canCompile(true),
-	_numericConversion(rSession.numericConversion()),
 	_isPostgres(false),
 	_insertHint(false)
 {
@@ -111,9 +108,8 @@ void ODBCStatementImpl::compileImpl()
 	}
 
 	const std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
-	const ODBCMetaColumn::NumericConversion numericConversion = dynamic_cast<SessionImpl&>(session()).numericConversion();
 	
-	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT, numericConversion, _insertHint);
+	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT, _insertHint);
 	
 	makeInternalExtractors();
 	doPrepare();
@@ -156,7 +152,7 @@ bool ODBCStatementImpl::addPreparator(bool addAlways)
 
 		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 
-		prep = new Preparator(_stmt, statement, maxFieldSize, ext, _numericConversion, _isPostgres);
+		prep = new Preparator(_stmt, statement, maxFieldSize, ext, _isPostgres);
 	}
 	else
 		prep = new Preparator(*_preparations[0]);
@@ -339,20 +335,24 @@ bool ODBCStatementImpl::hasNext()
 
 		if (!nextRowReady())
 		{
-		// have a loop here, as there could be one or more empty results
-			do {
-				if (hasMoreDataSets()) {
+			// have a loop here, as there could be one or more empty results
+			do
+			{
+				if (hasMoreDataSets())
+				{
 					activateNextDataSet();
 					if (!nextResultSet())
 						return false;
 					addPreparator();
 				}
-				else {
-					if (nextResultSet()) {
+				else
+				{
+					if (nextResultSet())
+					{
 						if (!addPreparator(false)) // skip the result set if it has no columns
 							continue;
 						fillColumns(currentDataSet() + 1);
-						makeExtractors(_preparations.back()->columns(), static_cast<Position::PositionType>(currentDataSet() + 1));
+						makeExtractors(_preparations.back()->columns(), static_cast<Position::Type>(currentDataSet() + 1));
 						activateNextDataSet();
 					}
 					else return false;
@@ -451,8 +451,8 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 	if (Utility::isError(rc))
 	{
 		std::ostringstream os;
-		os << std::endl << "Requested SQL statement: " << toString() << std::endl; 	 
-		os << "Native SQL statement: " << nativeSQL() << std::endl; 	 
+		os << std::endl << "Requested SQL statement: " << toString() << std::endl;
+		os << "Native SQL statement: " << nativeSQL() << std::endl;
 		std::string str(msg); str += os.str();
 		
 		throw StatementException(_stmt, str);
@@ -469,7 +469,7 @@ void ODBCStatementImpl::fillColumns(size_t dataSetPos)
 		_columnPtrs.resize(dataSetPos + 1);
 
 	for (int i = 0; i < colCount; ++i)
-		_columnPtrs[dataSetPos].push_back(new ODBCMetaColumn(_stmt, i, _numericConversion));
+		_columnPtrs[dataSetPos].push_back(new ODBCMetaColumn(_stmt, i));
 }
 
 
@@ -499,7 +499,7 @@ int ODBCStatementImpl::affectedRowCount() const
 {
 	if (0 == _affectedRowCount)
 	{
-		SQLLEN rows;
+		SQLLEN rows = 0;
 		if (!Utility::isError(SQLRowCount(_stmt, &rows)))
 			_affectedRowCount = static_cast<std::size_t>(rows);
 	}

@@ -115,6 +115,12 @@ public:
 	void connect(const Net::SocketAddress& addrs, const Timespan& timeout);
 		/// Connects to the given Redis server.
 
+    bool sendAuth(const std::string& password);
+        /// Sends password to Redis server
+
+    bool isAuthenticated();
+        /// Returns true when the client is authenticated
+
 	void disconnect();
 		/// Disconnects from the Redis server.
 
@@ -198,6 +204,7 @@ private:
 	Net::StreamSocket _socket;
 	RedisInputStream* _input;
 	RedisOutputStream* _output;
+    bool _authenticated;
 };
 
 
@@ -231,6 +238,10 @@ inline void Client::setReceiveTimeout(const Timespan& timeout)
 	_socket.setReceiveTimeout(timeout);
 }
 
+inline bool Client::isAuthenticated()
+{
+    return _authenticated;
+}
 
 } } // namespace Poco::Redis
 

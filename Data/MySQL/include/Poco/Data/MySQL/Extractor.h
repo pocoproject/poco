@@ -1,9 +1,7 @@
 //
 // Extractor.h
 //
-// $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/Extractor.h#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  Extractor
 //
@@ -25,6 +23,8 @@
 #include "Poco/Data/MySQL/ResultMetadata.h"
 #include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 
 
 namespace Poco {
@@ -322,6 +322,18 @@ public:
 private:
 
 	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, bool isUnsigned = false);
+	bool realExtractFixedBlob(std::size_t pos, enum_field_types type, void* buffer, size_t len);
+
+	template<typename T>
+	T extractAny(std::size_t pos, bool& success)
+	{
+		T value;
+		success = extract(pos, value);
+		return value;
+	}
+
+	template<typename T>
+	bool extractToDynamic(std::size_t pos, T& val);
 
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=(const Extractor&);
@@ -331,6 +343,97 @@ private:
 	StatementExecutor& _stmt;
 	ResultMetadata& _metadata;
 };
+
+template<typename T>
+bool Extractor::extractToDynamic(std::size_t pos, T &val)
+{
+	MetaColumn::ColumnDataType columnType = _metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type();
+
+	T resultValue;
+	bool success = false;
+
+	switch (columnType)
+	{
+	case MetaColumn::FDT_BOOL:
+		resultValue = extractAny<bool>(pos, success);
+	break;
+
+	case MetaColumn::FDT_INT8:
+		resultValue = extractAny<Int8>(pos, success);
+	break;
+
+	case MetaColumn::FDT_UINT8:
+		resultValue = extractAny<UInt8>(pos, success);
+	break;
+
+	case MetaColumn::FDT_INT16:
+		resultValue = extractAny<Int16>(pos, success);
+	break;
+
+	case MetaColumn::FDT_UINT16:
+		resultValue = extractAny<UInt16>(pos, success);
+	break;
+
+	case MetaColumn::FDT_INT32:
+		resultValue = extractAny<Int32>(pos, success);
+	break;
+
+	case MetaColumn::FDT_UINT32:
+		resultValue = extractAny<UInt32>(pos, success);
+	break;
+
+	case MetaColumn::FDT_INT64:
+		resultValue = extractAny<Int64>(pos, success);
+	break;
+
+	case MetaColumn::FDT_UINT64:
+		resultValue = extractAny<UInt64>(pos, success);
+	break;
+
+	case MetaColumn::FDT_FLOAT:
+		resultValue = extractAny<float>(pos, success);
+	break;
+
+	case MetaColumn::FDT_DOUBLE:
+		resultValue = extractAny<double>(pos, success);
+	break;
+
+	case MetaColumn::FDT_STRING:
+		resultValue = extractAny<std::string>(pos, success);
+	break;
+
+	case MetaColumn::FDT_WSTRING:
+	return false;
+
+	case MetaColumn::FDT_BLOB:
+		resultValue = extractAny<std::string>(pos, success);
+	break;
+
+	case MetaColumn::FDT_CLOB:
+		resultValue = extractAny<CLOB>(pos, success);
+	break;
+
+	case MetaColumn::FDT_DATE:
+		resultValue = extractAny<Date>(pos, success);
+	break;
+
+	case MetaColumn::FDT_TIME:
+		resultValue = extractAny<Time>(pos, success);
+	break;
+
+	case MetaColumn::FDT_TIMESTAMP:
+		resultValue = extractAny<DateTime>(pos, success);
+	break;
+
+	case MetaColumn::FDT_UNKNOWN:
+	return false;
+	}
+
+	if(success)
+		val.swap(resultValue);
+
+	return success;
+}
 
 } } } // namespace Poco::Data::MySQL
 

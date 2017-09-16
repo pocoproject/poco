@@ -1,9 +1,7 @@
 //
 // Binder.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Binder.h#5 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Binder
 //
@@ -90,7 +88,6 @@ public:
 		std::size_t maxFieldSize,
 		ParameterBinding dataBinding,
 		TypeInfo* pDataTypes,
-		ODBCMetaColumn::NumericConversion numericConversion,
 		bool insertOnly);
 		/// Creates the Binder.
 
@@ -604,7 +601,7 @@ private:
 			_charPtrs.resize(pos + 1, 0);
 
 		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(char));
-		
+
 		std::size_t strSize;
 		std::size_t offset = 0;
 		typename C::const_iterator it = val.begin();
@@ -617,13 +614,13 @@ private:
 			std::memcpy(_charPtrs[pos] + offset, it->c_str(), strSize);
 			offset += size;
 		}
-        	SQLSMALLINT sqlType = (isInBound(dir) && size < _maxCharColLength) ? SQL_VARCHAR : SQL_LONGVARCHAR;
+		SQLSMALLINT sqlType = (isInBound(dir) && size < _maxCharColLength) ? SQL_VARCHAR : SQL_LONGVARCHAR;
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			toODBCDirection(dir), 
 			SQL_C_CHAR, 
-            		sqlType,
+			sqlType,
 			(SQLUINTEGER) size - 1,
 			0,
 			_charPtrs[pos], 
@@ -684,12 +681,12 @@ private:
 			std::memcpy(_utf16CharPtrs[pos] + offset, it->data(), strSize);
 			offset += (size / sizeof(UTF16Char));
 		}
-        	SQLSMALLINT sqlType = (isInBound(dir) && size < _maxWCharColLength) ? SQL_WVARCHAR : SQL_WLONGVARCHAR;
+		SQLSMALLINT sqlType = (isInBound(dir) && size < _maxWCharColLength) ? SQL_WVARCHAR : SQL_WLONGVARCHAR;
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT)pos + 1,
 			toODBCDirection(dir),
 			SQL_C_WCHAR,
-            		sqlType,
+			sqlType,
 			(SQLUINTEGER)size - 1,
 			0,
 			_utf16CharPtrs[pos],
@@ -754,13 +751,13 @@ private:
 			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize * sizeof(CharType));
 			offset += size;
 		}
-        	SQLSMALLINT sqlType = (isInBound(dir) && size <= _maxVarBinColSize) ? SQL_VARBINARY : SQL_LONGVARBINARY;
+		SQLSMALLINT sqlType = (isInBound(dir) && size <= _maxVarBinColSize) ? SQL_VARBINARY : SQL_LONGVARBINARY;
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			SQL_PARAM_INPUT, 
 			SQL_C_BINARY, 
-            		sqlType,
+			sqlType,
 			(SQLUINTEGER) size,
 			0,
 			_charPtrs[pos], 
@@ -1043,7 +1040,6 @@ private:
 	std::size_t      _maxCharColLength;
 	std::size_t      _maxWCharColLength;
 	std::size_t      _maxVarBinColSize;
-	ODBCMetaColumn::NumericConversion _numericConversion;
 	NullCbMap        _nullCbMap;
 	bool             _insertOnly;
 };

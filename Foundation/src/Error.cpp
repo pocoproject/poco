@@ -1,8 +1,6 @@
 //
 // Error.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Error.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Error
@@ -29,6 +27,8 @@ namespace Poco {
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
+
+
 	Poco::UInt32 Error::last()
 	{
 		return GetLastError();
@@ -52,7 +52,10 @@ namespace Poco {
 		return errMsg;
 	}
 
+
 #else
+
+	
 	int Error::last()
 	{
 		return errno;
@@ -61,25 +64,14 @@ namespace Poco {
 
 	std::string Error::getMessage(int errorCode)
 	{
-		/* Reentrant version of `strerror'.
-		   There are 2 flavors of `strerror_r', GNU which returns the string
-		   and may or may not use the supplied temporary buffer and POSIX one
-		   which fills the string into the buffer.
-		   To use the POSIX version, -D_XOPEN_SOURCE=600 or -D_POSIX_C_SOURCE=200112L
-		   without -D_GNU_SOURCE is needed, otherwise the GNU version is
-		   preferred.
-		*/
-#if (defined __GLIBC__ || defined __UCLIBC__) && defined _GNU_SOURCE && !POCO_ANDROID
+#if defined _GNU_SOURCE || (_XOPEN_SOURCE >= 600) || POCO_ANDROID || __APPLE__
 		char errmsg[256] = "";
-		return std::string(strerror_r(errorCode, errmsg, 256));
-#elif (_XOPEN_SOURCE >= 600) || POCO_ANDROID
-		char errmsg[256] = "";
-		strerror_r(errorCode, errmsg, 256);
-		return errmsg;
+		return std::string(strerror_result(strerror_r(errorCode, errmsg, sizeof(errmsg)), errmsg));
 #else
 		return std::string(strerror(errorCode));
 #endif
 	}
+
 
 #endif
 

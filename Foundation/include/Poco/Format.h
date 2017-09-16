@@ -1,8 +1,6 @@
 //
 // Format.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Format.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Format
@@ -82,11 +80,11 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///   * h      argument is short (d, i), unsigned short (o, u, x, X) or float (e, E, f, g, G)
 	///   * ?      argument is any signed or unsigned int, short, long, or 64-bit integer (d, i, o, x, X)
 	///
-	/// The width argument is a nonnegative decimal integer controlling the minimum number of characters printed.
+	/// The width argument is a nonnegative decimal integer or '*' with an additional nonnegative integer value preceding the value to be formated, controlling the minimum number of characters printed.
 	/// If the number of characters in the output value is less than the specified width, blanks or
 	/// leading zeros are added, according to the specified flags (-, +, 0).
 	///
-	/// Precision is a nonnegative decimal integer, preceded by a period (.), which specifies the number of characters 
+	/// Precision is a nonnegative decimal integer or '*' with an additional nonnegative integer value preceding the value to be formated, preceded by a period (.), which specifies the number of characters
 	/// to be printed, the number of decimal places, or the number of significant digits.
 	///
 	/// Throws an InvalidArgumentException if an argument index is out of range.

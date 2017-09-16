@@ -1,8 +1,6 @@
 //
 // NetException.cpp
 //
-// $Id: //poco/1.4/Net/src/NetException.cpp#4 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  NetException
@@ -49,7 +47,8 @@ POCO_IMPLEMENT_EXCEPTION(ICMPException, NetException, "ICMP Exception")
 POCO_IMPLEMENT_EXCEPTION(NTPException, NetException, "NTP Exception")
 POCO_IMPLEMENT_EXCEPTION(HTMLFormException, NetException, "HTML Form Exception")
 POCO_IMPLEMENT_EXCEPTION(WebSocketException, NetException, "WebSocket Exception")
-POCO_IMPLEMENT_EXCEPTION(UnsupportedFamilyException, NetException, "Unknown or unsupported socket family.")
+POCO_IMPLEMENT_EXCEPTION(UnsupportedFamilyException, NetException, "Unknown or unsupported socket family")
+POCO_IMPLEMENT_EXCEPTION(AddressFamilyMismatchException, NetException, "Address family mismatch")
 
 
 } } // namespace Poco::Net

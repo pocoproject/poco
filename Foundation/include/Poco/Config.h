@@ -1,15 +1,13 @@
 //
 // Config.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Config.h#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Foundation
 //
 // Feature configuration for the POCO libraries.
 //
-// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2016, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -29,7 +27,7 @@
 
 
 // Define to enable C++11 support
-// #define POCO_ENABLE_CPP11
+#define POCO_ENABLE_CPP11
 
 
 // Define to disable implicit linking
@@ -93,7 +91,9 @@
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //
 #ifndef POCO_NO_SOO
+#ifndef POCO_ENABLE_SOO
 #define POCO_NO_SOO
+#endif
 #endif
 
 
@@ -168,13 +168,25 @@
 	#define POCO_NO_LOCALE
 #endif
 
+
 // Enable the poco_debug_* and poco_trace_* macros
 // even if the _DEBUG variable is not set.
 // This allows the use of these macros in a release version.
 // #define POCO_LOG_DEBUG
 
+
 // Uncomment to disable the use of bundled OpenSSL binaries
 // (Windows only)
 // #define POCO_EXTERNAL_OPENSSL
+
+
+// Define to prevent changing the suffix for shared libraries
+// to "d.so", "d.dll", etc. for _DEBUG builds in Poco::SharedLibrary.
+// #define POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX
+
+
+// Disarm POCO_DEPRECATED macro.
+// #define POCO_NO_DEPRECATED
+
 
 #endif // Foundation_Config_INCLUDED

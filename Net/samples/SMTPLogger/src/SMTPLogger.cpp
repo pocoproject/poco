@@ -1,8 +1,6 @@
 //
 // Mail.cpp
 //
-// $Id: //poco/svn/Net/samples/SMTPLogger/src/SMTPLogger.cpp#1 $
-//
 // This sample demonstrates the SMTPChannel class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

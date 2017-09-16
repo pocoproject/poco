@@ -8,19 +8,15 @@ branches:
     - /.*pp.eyor.*/
 
 before_install:
-  # we need a recent version of CMake
-  # - sudo add-apt-repository -y ppa:andykimpe/cmake3
-  # linux prereqisite packages
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget --no-check-certificate https://www.cmake.org/files/v3.2/cmake-3.2.3-Linux-x86_64.tar.gz; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then tar -xzvf cmake-3.2.3-Linux-x86_64.tar.gz; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export PATH=$PWD/cmake-3.2.3-Linux-x86_64/bin:$PATH; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev libsqlite3-dev; fi 
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update  -qq; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y libpq-dev unixodbc-dev libmysqlclient-dev libsqlite3-dev; fi 
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y sloccount cppcheck; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y g++-4.8; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update  -qq; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y gcc-5 g++-5; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5; fi
 
 services:
   - mongodb
@@ -28,6 +24,9 @@ services:
   - postgresql
   - mysql
 
+dist: trusty
+sudo: enabled
+  
 addons:
   postgresql: "9.3"
 
@@ -54,95 +53,113 @@ matrix:
   fast_finish: true
 
   include:
-    - env:    TEST_NAME="OSX   clang (make) bundled"
+    - env:    TEST_NAME="clang (make) bundled"
       os: osx
       compiler: clang
       script:
         - export CC="clang"
         - export CXX="clang++"
-        - clang++ -x c++ /dev/null -dM -E
+        - $CXX --version
+        - $CXX -x c++ /dev/null -dM -E
         - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
-    - env:    TEST_NAME="Linux gcc 4.6 (make) bundled"
+    #- env:    TEST_NAME="clang 3.5.0 (make) bundled"
+    #  ======================================= compiler error on generating debug info for auto return
+    #compiler: clang
+    #  script:
+    #    - export CC="clang"
+    #    - export CXX="clang++"
+    #    - $CXX --version
+    #    - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    #- env:    TEST_NAME="clang 3.5.0 (make) unbundled"
+    #  ======================================= compiler error on generating debug info for auto return
+    # error: debug information for auto is not yet supported
+    # error: debug information for auto is not yet supported
+    # ** Creating dependency info for src/Timespan.cpp
+    # make[1]: *** [/home/travis/build/Kampbell/poco/CppUnit/obj/Linux/x86_64/debug_shared/TestRunner.o] Error 1   #  compiler: clang
+    #  ======================================= 
+    #  script:
+    #    - export CC="clang"
+    #    - export CXX="clang++"
+    #    - $CXX --version
+    #    - ./configure --config=Linux-clang --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+    
+    - env:    TEST_NAME="gcc 5.4.1 (make) bundled"
       compiler: gcc
       script:
-        - export CC="gcc"
-        - export CXX="g++"
+        - $CXX --version
         - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
     
-    - env:    TEST_NAME="Linux gcc 4.8 (make) bundled"
-      compiler: gcc
-      script:
-        - export CC="gcc-4.8"
-        - export CXX="g++-4.8"
-        - ./configure --everything && make -s -j2 && ./travis/Linux/runtests.sh
+    #- env:    TEST_NAME="gcc 5.4.1 (make) unbundled"
+    #  ======================================= unit tests failures due to unbundled pcre
+    # There was 1 error: 
+    #  1: N7CppUnit10TestCallerI21RegularExpressionTestEE.testSubst2
+    #     "St9bad_alloc: std::bad_alloc"
+    #     in "<unknown>", line -1
+    # 
+    # There were 4 failures: 
+    #  1: N7CppUnit10TestCallerI21RegularExpressionTestEE.testMatch4
+    #     "re.match("123 456", 0, matches) == 3"
+    #     in "src/RegularExpressionTest.cpp", line 103
+    #  2: N7CppUnit10TestCallerI21RegularExpressionTestEE.testMatch6
+    #     "expr.match("abcde", 0, 0)"
+    #     in "src/RegularExpressionTest.cpp", line 136
+    #  3: N7CppUnit10TestCallerI21RegularExpressionTestEE.testSplit2
+    #     "re.split("123 456", 0, strings) == 3"
+    #     in "src/RegularExpressionTest.cpp", line 184
+    #  4: N7CppUnit10TestCallerI21RegularExpressionTestEE.testGroup
+    #     "re.match("abcd 1234", 0, matches) == 3"
+    #     in "src/RegularExpressionTest.cpp", line 271
+    # 
+    # failed=Foundation
+    #  =======================================
+    #  compiler: gcc
+    #  script:
+    #    - $CXX --version
+    #    - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
-    - env:    TEST_NAME="Linux gcc 4.6 (make) unbundled"
-      compiler: gcc
-      script:
-        - export CC="gcc"
-        - export CXX="g++"
-        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
-        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+    #- env:    TEST_NAME="arm-linux-gnueabi-g++ (make)"
+    #  compiler: gcc
+    #  script:
+    #    - arm-linux-gnueabi-g++ --version
+    #    - arm-linux-gnueabi-g++ -x c++ /dev/null -dM -E
+    #    - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
-    - env:    TEST_NAME="Linux gcc 4.8 (make) unbundled"
+    - env:    TEST_NAME="gcc 5.4.1 (CMake)"
       compiler: gcc
       script:
-        - sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev
-        - export CC="gcc-4.8"
-        - export CXX="g++-4.8"
-        - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    - env:    TEST_NAME="Linux clang 3.4 (make)"
-      compiler: clang
-      script:
-        - ./configure --everything --config=Linux-clang && make -s -j2 && ./travis/Linux/runtests.sh
-
-    - env:    TEST_NAME="Linux arm-linux-gnueabi- (make)"
-      compiler: gcc
-      script:
-        - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
-
-    - env:    TEST_NAME="Linux gcc 4.6 (CMake)"
-      compiler: gcc
-      script:
-        - export CC="gcc"
-        - export CXX="g++"
+        - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
  
-    - env:    TEST_NAME="Linux gcc 4.8 (CMake)"
-      compiler: gcc
-      script:
-        - export CC="gcc-4.8"
-        - export CXX="g++-4.8"
-        - source ./travis/ignored.sh
-        - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
-    - env:    TEST_NAME="Linux clang 3.4 (CMake)"
-      compiler: clang
-      script:
-        - source ./travis/ignored.sh
-        - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
+    #- env:    TEST_NAME="clang (CMake)"
+    #  compiler: clang
+    #  script:
+    #    - source ./travis/ignored.sh
+    #    - export POCO_BASE=`pwd`
+    #    - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
-    - env:    TEST_NAME="Linux arm-linux-gnueabi-g++ (CMake)"
-      compiler: gcc
-      script:
-        - export CC="arm-linux-gnueabi-gcc"
-        - export CXX="arm-linux-gnueabi-g++"
-        - source ./travis/ignored.sh
-        - export POCO_BASE=`pwd`
-        - mkdir cmake-build 
-        - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
+    #- env:    TEST_NAME="arm-linux-gnueabi-g++ (CMake)"
+    #  ======================================= "arm-linux-gnueabi-g++: version 4.7.0: non compliant to c++11
+    #  compiler: gcc
+    #  script:
+    #    - export CC="arm-linux-gnueabi-gcc"
+    #    - export CXX="arm-linux-gnueabi-g++"
+    #    - $CXX --version
+    #    - source ./travis/ignored.sh
+    #    - export POCO_BASE=`pwd`
+    #    - mkdir cmake-build 
+    #    - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
-    - env:    TEST_NAME="Linux arm-linux-gnueabihf-g++ (CMake)"
+    - env:    TEST_NAME="arm-linux-gnueabihf-g++ (CMake)"
       compiler: gcc
       script:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
+        - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build
@@ -151,11 +168,10 @@ matrix:
 
     # QA jobs for code analytics and metrics
     # build documentation and release
-    - env:    TEST_NAME="Linux documentation & release"
+    - env:    TEST_NAME="documentation & release"
       compiler: gcc
       script:
-        - export CC="gcc"
-        - export CXX="g++"
+        - $CXX --version
         - . env.sh && mkdoc all && mkrel all
 
     # static code analysis with cppcheck (we can add --enable=all later)

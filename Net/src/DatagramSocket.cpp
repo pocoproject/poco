@@ -1,8 +1,6 @@
 //
 // DatagramSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/DatagramSocket.cpp#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  DatagramSocket
@@ -80,6 +78,12 @@ void DatagramSocket::connect(const SocketAddress& address)
 void DatagramSocket::bind(const SocketAddress& address, bool reuseAddress)
 {
 	impl()->bind(address, reuseAddress);
+}
+
+
+void DatagramSocket::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	impl()->bind(address, reuseAddress, reusePort);
 }
 
 

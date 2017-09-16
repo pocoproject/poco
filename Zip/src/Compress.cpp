@@ -1,8 +1,6 @@
 //
 // Compress.cpp
 //
-// $Id: //poco/1.4/Zip/src/Compress.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:	Compress
@@ -57,9 +55,14 @@ void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, 
 	{
 		std::string ext = Poco::toLower(fileName.getExtension());
 		if (_storeExtensions.find(ext) != _storeExtensions.end())
+		{
 			cm = ZipCommon::CM_STORE;
+			cl = ZipCommon::CL_NORMAL;
+		}
 		else
+		{
 			cm = ZipCommon::CM_DEFLATE;
+		}
 	}
 
 	std::string fn = ZipUtil::validZipEntryFileName(fileName);
@@ -67,18 +70,33 @@ void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, 
 	if (!in.good())
 		throw ZipException("Invalid input stream");
 
+	// Check if stream is empty.
+	// In this case, we have to set compression to STORE, otherwise
+	// extraction will fail with various tools.
+	const int eof = std::char_traits<char>::eof();
+	int firstChar = in.get();
+	if (firstChar == eof)
+	{
+		cm = ZipCommon::CM_STORE;
+		cl = ZipCommon::CL_NORMAL;
+	}
+
 	std::streamoff localHeaderOffset = _offset;
 	ZipLocalFileHeader hdr(fileName, lastModifiedAt, cm, cl, _forceZip64);
 	hdr.setStartPos(localHeaderOffset);
 
 	ZipOutputStream zipOut(_out, hdr, _seekableOut);
-	Poco::StreamCopier::copyStream(in, zipOut);
+	if (firstChar != eof)
+	{
+		zipOut.put(static_cast<char>(firstChar));
+		Poco::StreamCopier::copyStream(in, zipOut);
+	}
 	Poco::UInt64 extraDataSize;
 	zipOut.close(extraDataSize);
 	_offset = hdr.getEndPos();
 	_offset += extraDataSize;
 	_files.insert(std::make_pair(fileName.toString(Poco::Path::PATH_UNIX), hdr));
-	poco_assert (_out);
+	if (!_out) throw Poco::IOException("Bad output stream");
 	ZipFileInfo nfo(hdr);
 	nfo.setOffset(localHeaderOffset);
 	nfo.setZip64Data();
@@ -89,18 +107,19 @@ void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, 
 
 void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const Poco::Path& fileName)
 {
+	if (!in.good())
+		throw ZipException("Invalid input stream");
+
 	std::string fn = ZipUtil::validZipEntryFileName(fileName);
 	//bypass the header of the input stream and point to the first byte of the data payload
 	in.seekg(h.getDataStartPos(), std::ios_base::beg);
-
-	if (!in.good())
-		throw ZipException("Invalid input stream");
+	if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
 
 	std::streamoff localHeaderOffset = _offset;
 	ZipLocalFileHeader hdr(h);
 	hdr.setFileName(fn, h.isDirectory());
 	hdr.setStartPos(localHeaderOffset);
-	if(hdr.needsZip64())
+	if (hdr.needsZip64())
 		hdr.setZip64Data();
 	//bypass zipoutputstream
 	//write the header directly
@@ -112,7 +131,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	{
 		Poco::Buffer<char> buffer(COMPRESS_CHUNK_SIZE);
 		Poco::UInt64 remaining = totalSize;
-		while(remaining > 0)
+		while (remaining > 0)
 		{
 			if (remaining > COMPRESS_CHUNK_SIZE)
 			{
@@ -152,7 +171,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	} 
 	else 
 	{
-		if(hdr.hasExtraField())	 // Update sizes in header extension.
+		if (hdr.hasExtraField())	 // Update sizes in header extension.
 			hdr.setZip64Data();
 		_out.seekp(hdr.getStartPos(), std::ios_base::beg);
 		std::string header = hdr.createHeader();
@@ -161,7 +180,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	}
 
 	_files.insert(std::make_pair(fileName.toString(Poco::Path::PATH_UNIX), hdr));
-	poco_assert (_out);
+	if (!_out) throw Poco::IOException("Bad output stream");
 	ZipFileInfo nfo(hdr);
 	nfo.setOffset(localHeaderOffset);
 	nfo.setZip64Data();
@@ -229,7 +248,7 @@ void Compress::addDirectory(const Poco::Path& entryName, const Poco::DateTime& l
 	if (hdr.searchCRCAndSizesAfterData())
 		_offset += extraDataSize;
 	_files.insert(std::make_pair(entryName.toString(Poco::Path::PATH_UNIX), hdr));
-	poco_assert (_out);
+	if (!_out) throw Poco::IOException("Bad output stream");
 	ZipFileInfo nfo(hdr);
 	nfo.setOffset(localHeaderOffset);
 	nfo.setZip64Data();
@@ -314,11 +333,11 @@ ZipArchive Compress::close()
 		centralDirSize64 += entrySize;
 		_offset += entrySize;
 	}
-	poco_assert (_out);
+	if (!_out) throw Poco::IOException("Bad output stream");
 	
 	Poco::UInt64 numEntries64 = _infos.size();
 	needZip64 = needZip64  || _offset >= ZipCommon::ZIP64_MAGIC;
-	if(needZip64) 
+	if (needZip64) 
 	{
 		ZipArchiveInfo64 central;
 		central.setCentralDirectorySize(centralDirSize64);

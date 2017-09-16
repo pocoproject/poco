@@ -1,8 +1,6 @@
 //
 // File_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_VX.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -389,7 +387,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case ENOSPC:
 		throw FileException("no space left on device", path);
 	case ENOTEMPTY:
-		throw FileException("directory not empty", path);
+		throw DirectoryNotEmptyException(path);
 	case ENAMETOOLONG:
 		throw PathSyntaxException(path);
 	case ENFILE:

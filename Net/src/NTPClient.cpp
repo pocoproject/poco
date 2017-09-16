@@ -1,8 +1,6 @@
 //
 // NTPClient.cpp
 //
-// $Id: //poco/1.4/Net/src/NTPClient.cpp#1 $
-//
 // Library: Net
 // Package: NTP
 // Module:  NTPClient

@@ -1,8 +1,6 @@
 //
 // RemoteSyslogListener.cpp
 //
-// $Id: //poco/1.4/Net/src/RemoteSyslogListener.cpp#4 $
-//
 // Library: Net
 // Package: Logging
 // Module:  RemoteSyslogListener

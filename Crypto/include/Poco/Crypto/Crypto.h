@@ -1,8 +1,6 @@
 //
 // Crypto.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/Crypto.h#3 $
-//
 // Library: Crypto
 // Package: CryptoCore
 // Module:  Crypto
@@ -57,7 +55,7 @@ enum RSAPaddingMode
 // from a DLL simpler. All files within this DLL are compiled with the Crypto_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// Crypto_API functions as being imported from a DLL, wheras this DLL sees symbols
+// Crypto_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32)

@@ -1,8 +1,6 @@
 //
 // Thread_POSIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread_POSIX.h#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread
@@ -132,6 +130,7 @@ private:
 		ThreadData():
 			thread(0),
 			prio(PRIO_NORMAL_IMPL),
+			osPrio(),
 			policy(SCHED_OTHER),
 			done(Event::EVENT_MANUALRESET),
 			stackSize(POCO_THREAD_STACK_SIZE),

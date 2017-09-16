@@ -1,8 +1,6 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.4/Util/src/Application.cpp#6 $
-//
 // Library: Util
 // Package: Application
 // Module:  Application
@@ -170,7 +168,6 @@ void Application::init()
 	_pConfig->setString("application.dir", appPath.parent().toString());
 	_pConfig->setString("application.configDir", Path::configHome() + appPath.getBaseName() + Path::separator());
 	_pConfig->setString("application.cacheDir", Path::cacheHome() + appPath.getBaseName() + Path::separator());
-	_pConfig->setString("application.tempDir", Path::tempHome() + appPath.getBaseName() + Path::separator());
 	_pConfig->setString("application.dataDir", Path::dataHome() + appPath.getBaseName() + Path::separator());
 	processOptions();
 }

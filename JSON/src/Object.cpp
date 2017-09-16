@@ -92,7 +92,7 @@ Object::Ptr Object::getObject(const std::string& key) const
 void Object::getNames(std::vector<std::string>& names) const
 {
 	names.clear();
-	for(ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
+	for (ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
 	{
 		names.push_back(it->first);
 	}
@@ -103,7 +103,7 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 {
 	if (step < 0) step = indent;
 
-	if(!_preserveInsOrder)
+	if (!_preserveInsOrder)
 		doStringify(_values, out, indent, step);
 	else
 		doStringify(_keys, out, indent, step);
@@ -113,8 +113,8 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 const std::string& Object::getKey(KeyPtrList::const_iterator& iter) const
 {
 	ValueMap::const_iterator it = _values.begin();
-	ValueMap::const_iterator itEnd = _values.end();
-	for (; it != itEnd; ++it)
+	ValueMap::const_iterator end = _values.end();
+	for (; it != end; ++it)
 	{
 		if (it->first == **iter) return it->first;
 	}
@@ -130,8 +130,8 @@ void Object::set(const std::string& key, const Dynamic::Var& value)
 	if (_preserveInsOrder)
 	{
 		KeyPtrList::iterator it = _keys.begin();
-		KeyPtrList::iterator itEnd = _keys.end();
-		for (; it != itEnd; ++it)
+		KeyPtrList::iterator end = _keys.end();
+		for (; it != end; ++it)
 		{
 			if (key == **it) return;
 		}
@@ -173,9 +173,9 @@ Object::operator const Poco::DynamicStruct& () const
 	if (!_pStruct)
 	{
 		ValueMap::const_iterator it = _values.begin();
-		ValueMap::const_iterator itEnd = _values.end();
+		ValueMap::const_iterator end = _values.end();
 		_pStruct = new Poco::DynamicStruct;
-		for (; it != itEnd; ++it)
+		for (; it != end; ++it)
 		{
 			if (isObject(it))
 			{

@@ -1,8 +1,6 @@
 //
 // Process.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process.cpp#4 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process
@@ -47,6 +45,7 @@ namespace
 		return envbuf;
 	}
 	
+#if defined(POCO_OS_FAMILY_VMS)
 	void setEnvironmentVariables(const Poco::Process::Env& env)
 	{
 		for (Poco::Process::Env::const_iterator it = env.begin(); it != env.end(); ++it)
@@ -54,6 +53,7 @@ namespace
 			Poco::Environment::set(it->first, it->second);
 		}
 	}
+#endif
 }
 
 

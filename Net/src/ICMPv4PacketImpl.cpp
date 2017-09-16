@@ -1,8 +1,6 @@
 //
 // ICMPv4PacketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPv4PacketImpl.cpp#2 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPv4PacketImpl
@@ -222,7 +220,7 @@ std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length
 			err << DESTINATION_UNREACHABLE_CODE[DESTINATION_UNREACHABLE_UNKNOWN];
 		break;
 	
-	case SOURCE_QUENCH_TYPE:		
+	case SOURCE_QUENCH_TYPE:
 		err << "Source quench";
 		break;
 	
@@ -234,7 +232,7 @@ std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length
 		break;
 
 	case TIME_EXCEEDED_TYPE:
-		if (code >= TIME_TO_LIVE || code < TIME_EXCEEDED_UNKNOWN)
+		if (code >= TIME_TO_LIVE && code < TIME_EXCEEDED_UNKNOWN)
 			err << TIME_EXCEEDED_CODE[code];
 		else
 			err << TIME_EXCEEDED_CODE[TIME_EXCEEDED_UNKNOWN];

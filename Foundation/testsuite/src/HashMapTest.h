@@ -1,8 +1,6 @@
 //
 // HashMapTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/HashMapTest.h#1 $
-//
 // Definition of the HashMapTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

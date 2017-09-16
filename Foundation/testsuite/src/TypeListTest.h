@@ -1,8 +1,6 @@
 //
 // TypeListTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TypeListTest.h#1 $
-//
 // Definition of the TypeListTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

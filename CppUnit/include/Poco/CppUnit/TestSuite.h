@@ -1,8 +1,6 @@
 //
 // TestSuite.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TestSuite.h#1 $
-//
 
 
 #ifndef Poco_CppUnit_TestSuite_INCLUDED

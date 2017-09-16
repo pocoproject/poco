@@ -15,61 +15,67 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #ifndef MongoDB_Array_INCLUDED
 #define MongoDB_Array_INCLUDED
 
-#include "Poco/NumberFormatter.h"
 
+#include "Poco/NumberFormatter.h"
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Document.h"
+
 
 namespace Poco {
 namespace MongoDB {
 
-class MongoDB_API Array : public Document
-	/// Implements the BSON Array
+
+class MongoDB_API Array: public Document
+	/// This class represents a BSON Array.
 {
 public:
 	typedef SharedPtr<Array> Ptr;
 
 	Array();
-		/// Constructor
+		/// Creates an empty Array.
 
 	virtual ~Array();
-		/// Destructor
+		/// Destroys the Array.
 
 	template<typename T>
 	T get(int pos) const
-		/// Returns the element on the given index and tries to convert
-		/// it to the template type. When the element is not found, a
-		/// NotFoundException will be thrown. When the element can't be
+		/// Returns the element at the given index and tries to convert
+		/// it to the template type. If the element is not found, a
+		/// Poco::NotFoundException will be thrown. If the element cannot be
 		/// converted a BadCastException will be thrown.
 	{
 		return Document::get<T>(Poco::NumberFormatter::format(pos));
 	}
 
 	template<typename T>
-	T get(int pos, const T& def) const
-		/// Returns the element on the given index and tries to convert
-		/// it to the template type. When the element is not found, or
-		/// has the wrong type, the def argument will be returned.
+	T get(int pos, const T& deflt) const
+		/// Returns the element at the given index and tries to convert
+		/// it to the template type. If the element is not found, or
+		/// has the wrong type, the deflt argument will be returned.
 	{
-		return Document::get<T>(Poco::NumberFormatter::format(pos), def);
+		return Document::get<T>(Poco::NumberFormatter::format(pos), deflt);
 	}
 
 	Element::Ptr get(int pos) const;
-		/// Returns the element on the given index.
-		/// An empty element will be returned when the element is not found.
+		/// Returns the element at the given index.
+		/// An empty element will be returned if the element is not found.
 
 	template<typename T>
 	bool isType(int pos) const
-		/// Returns true when the type of the element equals the TypeId of ElementTrait
+		/// Returns true if the type of the element equals the TypeId of ElementTrait,
+		/// otherwise false.
 	{
 		return Document::isType<T>(Poco::NumberFormatter::format(pos));
 	}
 
 	std::string toString(int indent = 0) const;
+		/// Returns a string representation of the Array.
 };
+
 
 // BSON Embedded Array
 // spec: document
@@ -103,4 +109,4 @@ inline void BSONWriter::write<Array::Ptr>(Array::Ptr& from)
 } } // namespace Poco::MongoDB
 
 
-#endif //MongoDB_Array_INCLUDED
+#endif // MongoDB_Array_INCLUDED

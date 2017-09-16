@@ -1,8 +1,6 @@
 //
 // RecordSet.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RecordSet.h#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RecordSet
@@ -26,10 +24,12 @@
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RowIterator.h"
+#include "Poco/Data/RowFilter.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/String.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
+#include "Poco/AutoPtr.h"
 #include <ostream>
 #include <limits>
 
@@ -98,7 +98,6 @@ public:
 		_currentRow(0),
 		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 		_pEnd(new RowIterator(this, true)),
-		_pFilter(0),
 		_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
 		/// Creates the RecordSet.
 	{
@@ -322,7 +321,7 @@ public:
 	using Statement::reset;
 		/// Don't hide base class method.
 
-	void reset(const Statement& stmt);
+	RecordSet& reset(const Statement& stmt);
 		/// Resets the RecordSet and assigns a new statement.
 		/// Should be called after the given statement has been reset,
 		/// assigned a new SQL statement, and executed.
@@ -437,7 +436,8 @@ private:
 		if (typeFound)
 			throw NotFoundException(Poco::format("Column name: %s", name));
 		else
-			throw NotFoundException(Poco::format("Column type: %s, name: %s", std::string(typeid(T).name()), name));
+			throw NotFoundException(Poco::format("Column type: %s, Container type: %s, name: %s",
+				std::string(typeid(T).name()), std::string(typeid(ExtractionVecPtr).name()), name));
 	}
 
 	template <class C, class E>
@@ -468,9 +468,13 @@ private:
 		}
 		else 
 		{
-			throw Poco::BadCastException(Poco::format("Type cast failed!\nColumn: %z\nTarget type:\t%s",  
+			throw Poco::BadCastException(Poco::format("RecordSet::columnImpl(%z) type cast failed!\nTarget type:\t%s"
+				"\nTarget container type:\t%s\nSource container type:\t%s\nSource abstraction type:\t%s",
 				pos,
-				std::string(typeid(T).name())));
+				std::string(typeid(T).name()),
+				std::string(typeid(ExtractionVecPtr).name()),
+				rExtractions[pos]->type(),
+				std::string(typeid(rExtractions[pos].get()).name())));
 		}
 	}
 
@@ -480,17 +484,17 @@ private:
 		/// Returns true if the specified row is allowed by the
 		/// currently active filter.
 
-	void filter(RowFilter* pFilter);
+	void filter(const Poco::AutoPtr<RowFilter>& pFilter);
 		/// Sets the filter for the RecordSet.
 
-	const RowFilter* getFilter() const;
+	const Poco::AutoPtr<RowFilter>& getFilter() const;
 		/// Returns the filter associated with the RecordSet.
 
 	std::size_t  _currentRow;
 	RowIterator* _pBegin;
 	RowIterator* _pEnd;
 	RowMap       _rowMap;
-	RowFilter*   _pFilter;
+	Poco::AutoPtr<RowFilter> _pFilter;
 	std::size_t  _totalRowCount;
 
 	friend class RowIterator;
@@ -656,7 +660,7 @@ inline RecordSet::Iterator RecordSet::end()
 }
 
 
-inline const RowFilter* RecordSet::getFilter() const
+inline const Poco::AutoPtr<RowFilter>& RecordSet::getFilter() const
 {
 	return _pFilter;
 }

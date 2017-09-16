@@ -1,8 +1,6 @@
 //
 // DatagramSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/DatagramSocketTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -51,7 +49,7 @@ void DatagramSocketTest::testEcho()
 	UDPEchoServer echoServer;
 	DatagramSocket ss;
 	char buffer[256];
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	int n = ss.sendBytes("hello", 5);
 	assert (n == 5);
 	n = ss.receiveBytes(buffer, sizeof(buffer));
@@ -63,9 +61,9 @@ void DatagramSocketTest::testEcho()
 
 void DatagramSocketTest::testSendToReceiveFrom()
 {
-	UDPEchoServer echoServer(SocketAddress("localhost", 0));
+	UDPEchoServer echoServer(SocketAddress("127.0.0.1", 0));
 	DatagramSocket ss(SocketAddress::IPv4);
-	int n = ss.sendTo("hello", 5, SocketAddress("localhost", echoServer.port()));
+	int n = ss.sendTo("hello", 5, SocketAddress("127.0.0.1", echoServer.port()));
 	assert (n == 5);
 	char buffer[256];
 	SocketAddress sa;
@@ -83,7 +81,7 @@ void DatagramSocketTest::testUnbound()
 	UDPEchoServer echoServer;
 	DatagramSocket ss;
 	char buffer[256];
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	int n = ss.sendBytes("hello", 5);
 	assert (n == 5);
 	n = ss.receiveBytes(buffer, sizeof(buffer));

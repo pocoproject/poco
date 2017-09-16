@@ -1,8 +1,6 @@
 //
 // ArchiveStrategy.h
 //
-// $Id: //poco/Main/Data/include/Poco/ArchiveStrategy.h#1 $
-//
 // Library: Data
 // Package: Logging
 // Module:  ArchiveStrategy

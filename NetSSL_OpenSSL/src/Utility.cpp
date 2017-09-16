@@ -1,8 +1,6 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/Utility.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  Utility

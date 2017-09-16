@@ -1,8 +1,6 @@
 //
 // SystemConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/SystemConfiguration.h#2 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  SystemConfiguration
@@ -44,7 +42,6 @@ class Util_API SystemConfiguration: public AbstractConfiguration
 	///   - system.configHomeDir: the base directory relative to which user specific configuration files should be stored
 	///   - system.cacheHomeDir: the base directory relative to which user specific non-essential data files should be stored
 	///   - system.dataHomeDir: the base directory relative to which user specific data files should be stored
-	///   - system.tempHomeDir: the base directory relative to which user-specific temporary files and other file objects should be placed
 	///   - system.tempDir: the system's temporary directory
 	///   - system.configDir: the system's configuration directory
 	///   - system.dateTime: the current UTC date and time, formatted in ISO 8601 format.
@@ -84,7 +81,6 @@ private:
 	static const std::string CONFIGHOMEDIR;
 	static const std::string CACHEHOMEDIR;
 	static const std::string DATAHOMEDIR;
-	static const std::string TEMPHOMEDIR;
 	static const std::string TEMPDIR;
 	static const std::string CONFIGDIR;
 	static const std::string DATETIME;

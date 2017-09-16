@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/testsuite/Makefile-Driver#2 $
-#
 # Makefile for Poco Foundation testsuite
 #
 
@@ -23,7 +21,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
 	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
-	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest \
+	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest SHA2EngineTest SHA3EngineTest BLAKE2EngineTest \
 	SemaphoreTest MutexTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
 	SimpleFileChannelTest StopwatchTest \
 	StreamConverterTest StreamCopierTest StreamTokenizerTest \
@@ -52,7 +50,12 @@ ifdef POCO_UNBUNDLED
         SYSLIBS += -lz -lpcre
 endif
 
-COMMONFLAGS += -Wno-unused-variable -Wno-unused-but-set-variable
+COMMONFLAGS += -Wno-unused-variable
+
+ifeq ('g++',$(findstring 'g++','$(CXX)'))
+COMMONFLAGS += -Wno-unused-but-set-variable
+#$(error $(findstring g++,$(CXX)))
+endif
 
 ifeq ($(LINKMODE),SHARED)
 SHAREDOPT_LINK += -Wl,-rpath,$(BINPATH)

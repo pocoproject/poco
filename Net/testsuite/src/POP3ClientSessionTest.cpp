@@ -1,8 +1,6 @@
 //
 // POP3ClientSessionTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/POP3ClientSessionTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -42,7 +40,7 @@ void POP3ClientSessionTest::testLogin()
 	server.addResponse("+OK USER");
 	server.addResponse("+OK PASS");
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	std::string cmd = server.popCommand();
 	assert (cmd == "USER user");
@@ -61,7 +59,7 @@ void POP3ClientSessionTest::testLoginFail()
 	server.addResponse("+OK USER");
 	server.addResponse("-ERR PASS");
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	try
 	{
 		session.login("user", "secret");
@@ -82,7 +80,7 @@ void POP3ClientSessionTest::testMessageCount()
 	server.addResponse("+OK PASS");
 	server.addResponse("+OK 42 12345");
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	int n = session.messageCount();
@@ -107,7 +105,7 @@ void POP3ClientSessionTest::testList()
 		".\r\n"
 	);
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	std::vector<POP3ClientSession::MessageInfo> infos;
@@ -146,7 +144,7 @@ void POP3ClientSessionTest::testRetrieveMessage()
 		".\r\n"
 	);
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	MailMessage message;
@@ -182,7 +180,7 @@ void POP3ClientSessionTest::testRetrieveHeader()
 		"."
 	);
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	MessageHeader header;
@@ -225,7 +223,7 @@ void POP3ClientSessionTest::testRetrieveMessages()
 		"."
 	);
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	MessageHeader header;
@@ -261,7 +259,7 @@ void POP3ClientSessionTest::testDeleteMessage()
 	server.addResponse("+OK PASS");
 	server.addResponse("+OK DELETED");
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	session.deleteMessage(42);

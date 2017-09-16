@@ -1,8 +1,6 @@
 //
 // SQLExecutor.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/SQLExecutor.h#4 $
-//
 // Definition of the SQLExecutor class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -22,8 +20,10 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/String.h"
+#include "Poco/Tuple.h"
 #include "Poco/Exception.h"
 #include <iostream>
 
@@ -75,76 +75,76 @@
 
 struct ExecUtil
 {
-  static std::string mangleTable(const std::string& name);
+	static std::string mangleTable(const std::string& name);
 
-  static std::string person()
-  {
-	return mangleTable("Person");
-  }
-
-  static std::string strings()
-  {
-	return mangleTable("Strings");
-  }
-
-  static std::string tuples()
-  {
-	return mangleTable("Tuples");
-  }
-
-  static std::string vectors()
-  {
-	return mangleTable("Vectors");
-  }
-
-  static std::string anys()
-  {
-	return mangleTable("Anys");
-  }
-
-  static std::string nulltest()
-  {
-	return mangleTable("NullTest");
-  }
-
-  static std::string misctest()
-  {
-	return mangleTable("MiscTest");
-  }
-
-  static std::string nullabletest()
-  {
-	return mangleTable("NullableTest");
-  }
-
-  static std::string pocolog()
-  {
-	return mangleTable("POCO_LOG");
-  }
-
-  static std::string pocolog_a()
-  {
-	return mangleTable("POCO_LOG_A");
-  }
-
-  static std::string stored_func()
-  {
-	return mangleTable("storedFunc");
-  }
-
-  static std::string stored_proc()
-  {
-	return mangleTable("storedProc");
-  }
-
-  static std::string test_tbl()
-  {
-	return mangleTable("Test");
-  }
-
-	static std::string numeric_tbl()
+	static std::string person()
 	{
-		return mangleTable("numer_t");
+		return mangleTable("Person");
+	}
+
+	static std::string strings()
+	{
+		return mangleTable("Strings");
+	}
+
+	static std::string ints()
+	{
+		return mangleTable("Ints");
+	}
+
+	static std::string tuples()
+	{
+		return mangleTable("Tuples");
+	}
+
+	static std::string vectors()
+	{
+		return mangleTable("Vectors");
+	}
+
+	static std::string anys()
+	{
+		return mangleTable("Anys");
+	}
+
+	static std::string nulltest()
+	{
+		return mangleTable("NullTest");
+	}
+
+	static std::string misctest()
+	{
+		return mangleTable("MiscTest");
+	}
+
+	static std::string nullabletest()
+	{
+		return mangleTable("NullableTest");
+	}
+
+	static std::string pocolog()
+	{
+		return mangleTable("POCO_LOG");
+	}
+
+	static std::string pocolog_a()
+	{
+		return mangleTable("POCO_LOG_A");
+	}
+
+	static std::string stored_func()
+	{
+		return mangleTable("storedFunc");
+	}
+
+	static std::string stored_proc()
+	{
+		return mangleTable("storedProc");
+	}
+
+	static std::string test_tbl()
+	{
+		return mangleTable("Test");
 	}
 };
 
@@ -222,7 +222,6 @@ public:
 	void limitPrepare();
 	void limitZero();
 	void prepare();
-	void numericTypes(const std::vector<std::string>& vals);
 	void insertStatReuse();
 
 	template <typename C1, typename C2, typename C3, typename C4, typename C5, typename C6>
@@ -562,13 +561,158 @@ public:
 	void tuples();
 	void tupleVector();
 
-	void internalExtraction();
+	template <typename IntType =
+#ifdef POCO_64_BIT
+		Poco::Int64
+#else
+		Poco::Int32
+#endif
+	>
+	void internalExtraction(IntType)
+	{
+		using Poco::Data::RecordSet;
+		using Poco::Data::Column;
+		using Poco::Data::Statement;
+		using Poco::UTF16String;
+		using Poco::Tuple;
+		using Poco::BadCastException;
+		using Poco::RangeException;
+		using Poco::Data::ODBC::ConnectionException;
+		using Poco::Data::ODBC::StatementException;
+		using namespace Poco::Data::Keywords;
+
+		std::string funct = "internalExtraction()";
+		std::vector<Tuple<int, double, std::string> > v;
+		v.push_back(Tuple<int, double, std::string>(1, 1.5, "3"));
+		v.push_back(Tuple<int, double, std::string>(2, 2.5, "4"));
+		v.push_back(Tuple<int, double, std::string>(3, 3.5, "5"));
+		v.push_back(Tuple<int, double, std::string>(4, 4.5, "6"));
+
+		try { session() << "INSERT INTO " << ExecUtil::vectors() << " VALUES (?,?,?)", use(v), now; }
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+		try
+		{
+			Statement stmt = (session() << "SELECT * FROM " << ExecUtil::vectors() , now);
+			RecordSet rset(stmt);
+
+			assert (3 == rset.columnCount());
+			assert (4 == rset.rowCount());
+
+			int curVal = 3;
+			do
+			{
+				assert (rset["str0"] == curVal);
+				++curVal;
+			} while (rset.moveNext());
+
+			rset.moveFirst();
+			assert (rset["str0"] == "3");
+			rset.moveLast();
+			assert(rset["str0"] == "6");
+
+			RecordSet rset2(rset);
+			assert (3 == rset2.columnCount());
+			assert (4 == rset2.rowCount());
+
+			IntType i;
+			try {
+				i = rset.value<IntType>(0, 0);
+				assert(1 == i);
+			}
+			catch (Poco::BadCastException& ex)
+			{
+				std::cout << ex.displayText() << std::endl;
+			}
+			std::string s = rset.value(0,0).convert<std::string>();
+			assert ("1" == s);
+
+			IntType a = rset.value<IntType>(0,2);
+			assert (3 == a);
+
+			try
+			{
+				double d = rset.value<double>(1,1);
+				assert (2.5 == d);
+			}
+			catch (BadCastException&)
+			{
+				float f = rset.value<float>(1,1);
+				assert (2.5 == f);
+			}
+
+			try
+			{
+				s = rset.value<std::string>(2, 2);
+			}
+			catch (BadCastException&)
+			{
+				UTF16String us = rset.value<Poco::UTF16String>(2, 2);
+				Poco::UnicodeConverter::convert(us, s);
+			}
+			assert("5" == s);
+
+			i = rset.value("str0", 2);
+			assert (5 == i);
+
+			const Column<std::deque<IntType> >& col = rset.column<std::deque<IntType> >(0);
+			typename Column<std::deque<IntType> >::Iterator it = col.begin();
+			typename Column<std::deque<IntType> >::Iterator end = col.end();
+			for (int i = 1; it != end; ++it, ++i)
+				assert (*it == i);
+
+			rset = (session() << "SELECT COUNT(*) AS cnt FROM " << ExecUtil::vectors(), now);
+
+			//various results for COUNT(*) are received from different drivers
+			try
+			{
+				//this is what most drivers will return
+				int i = rset.value<int>(0,0);
+				assert (4 == i);
+			}
+			catch(BadCastException&)
+			{
+				try
+				{
+					//this is for Oracle
+					double i = rset.value<double>(0,0);
+					assert (4 == int(i));
+				}
+				catch(BadCastException&)
+				{
+					//this is for PostgreSQL
+					Poco::Int64 big = rset.value<Poco::Int64>(0,0);
+					assert (4 == big);
+				}
+			}
+
+			s = rset.value("cnt", 0).convert<std::string>();
+			assert ("4" == s);
+
+			try { rset.column<std::deque<IntType> >(100); fail ("must fail"); }
+			catch (RangeException&) { }
+
+			try { rset.value<std::string>(0,0); fail ("must fail"); }
+			catch (BadCastException&) {	}
+
+			stmt = (session() << "DELETE FROM " << ExecUtil::vectors(), now);
+			rset = stmt;
+
+			try { rset.column<std::deque<IntType> >(0); fail ("must fail"); }
+			catch (RangeException&) { }
+		}
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	}
+
 	void filter(const std::string& query = 
-		"SELECT * FROM " + ExecUtil::vectors() + " ORDER BY i0 ASC",
-		const std::string& intFldName = "i0");
+		"SELECT * FROM " + ExecUtil::vectors() + " ORDER BY int0 ASC",
+		const std::string& intFldName = "int0");
 
 	void internalBulkExtraction();
 	void internalBulkExtractionUTF16();
+
 	void internalStorageType();
 	void nulls(bool emptyStrIsSpace = false);
 	void notNulls(const std::string& sqlState = "23502");

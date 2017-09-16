@@ -1,8 +1,6 @@
 //
 // DataTest.h
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.h#6 $
-//
 // Definition of the DataTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -46,6 +44,10 @@ public:
 	void testJSONRowFormatter();
 	void testDateAndTime();
 	void testExternalBindingAndExtraction();
+
+#if __cplusplus >= 201103L
+	void testStdTuple();
+#endif
 
 	void setUp();
 	void tearDown();

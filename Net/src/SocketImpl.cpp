@@ -1,8 +1,6 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketImpl.cpp#6 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  SocketImpl
@@ -191,15 +189,20 @@ void SocketImpl::connectNB(const SocketAddress& address)
 
 void SocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 {
+    bind(address, reuseAddress, true);
+}
+
+
+void SocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
 	if (_sockfd == POCO_INVALID_SOCKET)
 	{
 		init(address.af());
 	}
 	if (reuseAddress)
-	{
 		setReuseAddress(true);
+    if (reusePort)
 		setReusePort(true);
-	}
 #if defined(POCO_VXWORKS)
 	int rc = ::bind(_sockfd, (sockaddr*) address.addr(), address.length());
 #else
@@ -210,6 +213,12 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 
 
 void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+    bind6(address, reuseAddress, true, ipV6Only);
+}
+
+
+void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
 {
 #if defined(POCO_HAVE_IPv6)
 	if (address.family() != SocketAddress::IPv6)
@@ -225,10 +234,9 @@ void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV
 	if (ipV6Only) throw Poco::NotImplementedException("IPV6_V6ONLY not defined.");
 #endif
 	if (reuseAddress)
-	{
 		setReuseAddress(true);
+    if (reusePort)
 		setReusePort(true);
-	}
 	int rc = ::bind(_sockfd, address.addr(), address.length());
 	if (rc != 0) error(address.toString());
 #else
@@ -428,9 +436,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	int epollfd = epoll_create(1);
 	if (epollfd < 0)
 	{
-		char buf[1024];
-		strerror_r(errno, buf, sizeof(buf));
-		error(std::string("Can't create epoll queue: ") + buf);
+		error("Can't create epoll queue");
 	}
 
 	struct epoll_event evin;
@@ -445,10 +451,8 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 
 	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &evin) < 0)
 	{
-		char buf[1024];
-		strerror_r(errno, buf, sizeof(buf));
 		::close(epollfd);
-		error(std::string("Can't insert socket to epoll queue: ") + buf);
+		error("Can't insert socket to epoll queue");
 	}
 
 	Poco::Timespan remainingTime(timeout);

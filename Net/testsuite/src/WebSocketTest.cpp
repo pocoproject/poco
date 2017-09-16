@@ -1,8 +1,6 @@
 //
 // WebSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/WebSocketTest.cpp#3 $
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -25,6 +23,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Thread.h"
+#include "Poco/Buffer.h"
 
 
 using Poco::Net::HTTPClientSession;
@@ -51,13 +50,13 @@ namespace
 			try
 			{
 				WebSocket ws(request, response);
-				std::auto_ptr<char> pBuffer(new char[_bufSize]);
+				Poco::Buffer<char> buffer(_bufSize);
 				int flags;
 				int n;
 				do
 				{
-					n = ws.receiveFrame(pBuffer.get(), _bufSize, flags);
-					ws.sendFrame(pBuffer.get(), n, flags);
+					n = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
+					ws.sendFrame(buffer.begin(), n, flags);
 				}
 				while (n > 0 || (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
 			}
@@ -119,7 +118,7 @@ void WebSocketTest::testWebSocket()
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPClientSession cs("localhost", ss.address().port());
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
@@ -200,7 +199,7 @@ void WebSocketTest::testWebSocketLarge()
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPClientSession cs("localhost", ss.address().port());
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
@@ -232,7 +231,7 @@ void WebSocketTest::testOneLargeFrame(int msgSize)
 
 	Poco::Thread::sleep(200);
 
-	HTTPClientSession cs("localhost", ss.address().port());
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);

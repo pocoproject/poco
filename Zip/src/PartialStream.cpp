@@ -1,8 +1,6 @@
 //
 // PartialStream.cpp
 //
-// $Id: //poco/1.4/Zip/src/PartialStream.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  PartialStream
@@ -69,7 +67,7 @@ int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		_pIstr->clear();
 		_pIstr->seekg(_start, std::ios_base::beg);
 		if (_pIstr->fail())
-			throw Poco::IOException("Failed to reposition in stream");
+			throw Poco::IOException("Failed to seek on input stream");
 	}
 	if (!_prefix.empty())
 	{
@@ -194,7 +192,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 
 void PartialStreamBuf::close()
 {
-	// DONT write data from _buffer!
+	// DON'T write data from _buffer!
 }
 
 

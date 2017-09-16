@@ -1,8 +1,6 @@
 //
 // MemoryPoolTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/MemoryPoolTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

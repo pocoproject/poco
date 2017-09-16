@@ -1,8 +1,6 @@
 //
 // UniqueAccessExpireCache.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UniqueAccessExpireCache.h#1 $
-//
 // Library: Foundation
 // Package: Cache
 // Module:  UniqueAccessExpireCache

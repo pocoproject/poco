@@ -28,14 +28,19 @@ namespace Poco {
 namespace JSON {
 
 
-class JSON_API ParseHandler : public Handler
-	/// Provides a default handler for the JSON parser.
-	/// This handler will build up an object or array based
-	/// on the handlers called by the parser.
+class JSON_API ParseHandler: public Handler
+	/// ParseHandler is the default handler for the JSON Parser.
+	///
+	/// This handler will construct an Object or Array based
+	/// on the handlers called by the Parser.
 {
 public:
 	ParseHandler(bool preserveObjectOrder = false);
 		/// Creates the ParseHandler.
+		///
+		/// If preserveObjectOrder is true, the order of properties
+		/// inside objects is preserved. Otherwise, items
+		/// will be sorted by keys.
 
 	virtual ~ParseHandler();
 		/// Destroys the ParseHandler.
@@ -100,6 +105,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline Dynamic::Var ParseHandler::asVar() const
 {
 	return _result;
@@ -157,11 +165,7 @@ inline void ParseHandler::null()
 }
 
 
-typedef ParseHandler ParseHandler;
-//@ deprecated
-
-
-}} // namespace Poco::JSON
+} } // namespace Poco::JSON
 
 
 #endif // JSON_ParseHandler_INCLUDED

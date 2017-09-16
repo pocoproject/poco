@@ -1,8 +1,6 @@
 //
 // Path.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Path.h#3 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  Path
@@ -303,11 +301,6 @@ public:
 		///
 		/// On Unix systems, this is the '~/.local/share/'. On Windows systems,
 		/// this is '%APPDATA%'.
-		
-	static std::string tempHome();
-		/// Returns the user's temp directory.
-		///
-		/// On Unix systems, this is the '~/.local/temp/'.
 		
 	static std::string cacheHome();
 		/// Returns the user's cache directory.

@@ -1,8 +1,6 @@
 //
 // AbstractConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/AbstractConfiguration.h#2 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  AbstractConfiguration
@@ -54,9 +52,9 @@ public:
 		/// A key-value pair, used as event argument.
 	{
 	public:
-		KeyValue(const std::string& rKey, std::string& rValue):
-			_key(rKey),
-			_value(rValue)
+		KeyValue(const std::string& key, std::string& value):
+			_key(key),
+			_value(value)
 		{
 		}
 		
@@ -346,7 +344,7 @@ protected:
 		/// implementation throws a Poco::NotImplementedException.
 
 	static int parseInt(const std::string& value);
-	static int parseUInt(const std::string& value);
+	static unsigned parseUInt(const std::string& value);
 
 #if defined(POCO_HAVE_INT64)
 

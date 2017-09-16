@@ -1,8 +1,6 @@
 //
 // VarHolder.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/VarHolder.h#3 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  VarHolder
@@ -332,8 +330,8 @@ protected:
 	template <typename F, typename T>
 	void convertToSmallerUnsigned(const F& from, T& to) const
 		/// This function is meant for converting unsigned integral data types,
-		/// from larger to smaller type. Since lower limit is always 0 for unsigned types, 
-		/// only the upper limit is checked, thus saving some cycles compared to the signed 
+		/// from larger to smaller type. Since lower limit is always 0 for unsigned types,
+		/// only the upper limit is checked, thus saving some cycles compared to the signed
 		/// version of the function. If the value to be converted is smaller than
 		/// the maximum value for the target type, the conversion is performed.
 	{
@@ -349,8 +347,8 @@ protected:
 	template <typename F, typename T>
 	void convertSignedToUnsigned(const F& from, T& to) const
 		/// This function is meant for converting signed integral data types to
-		/// unsigned data types. Negative values can not be converted and if one is 
-		/// encountered, RangeException is thrown. 
+		/// unsigned data types. Negative values can not be converted and if one
+		/// is encountered, RangeException is thrown.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
@@ -367,8 +365,8 @@ protected:
 	template <typename F, typename T>
 	void convertSignedFloatToUnsigned(const F& from, T& to) const
 		/// This function is meant for converting floating point data types to
-		/// unsigned integral data types. Negative values can not be converted and if one is 
-		/// encountered, RangeException is thrown. 
+		/// unsigned integral data types. Negative values can not be converted and if one
+		/// is encountered, RangeException is thrown.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
@@ -386,8 +384,8 @@ protected:
 	template <typename F, typename T>
 	void convertUnsignedToSigned(const F& from, T& to) const
 		/// This function is meant for converting unsigned integral data types to
-		/// unsigned data types. Negative values can not be converted and if one is 
-		/// encountered, RangeException is thrown. 
+		/// signed integral data types. Negative values can not be converted and if one
+		/// is encountered, RangeException is thrown.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
@@ -395,7 +393,7 @@ protected:
 		poco_static_assert (!std::numeric_limits<F>::is_signed);
 		poco_static_assert (std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit<F,T>(from); 
+		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
@@ -409,7 +407,7 @@ private:
 			throw RangeException("Value too large.");
 		}
 		else
-		if (static_cast<T>(from) > std::numeric_limits<T>::max()) 
+		if (from > std::numeric_limits<T>::max())
 		{
 			throw RangeException("Value too large.");
 		}

@@ -61,6 +61,15 @@
     <Filter Include="WebSocket\Header Files">
       <UniqueIdentifier>{e94c146d-f540-4b14-bf90-880e6520522d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="X509Certificate">
+      <UniqueIdentifier>{01efc196-f7e7-4700-9e0e-a50df884a114}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="X509Certificate\Header Files">
+      <UniqueIdentifier>{721cad2c-4a3c-47f9-ae35-8abcfd629fe1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="X509Certificate\Source Files">
+      <UniqueIdentifier>{d863807d-abe4-408b-8143-a4dfd71ec1f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HTTPSTestServer.h">
@@ -95,6 +104,12 @@
     </ClInclude>
     <ClInclude Include="src\WebSocketTestSuite.h">
       <Filter>WebSocket\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\X509CertificateTest.h">
+      <Filter>X509Certificate\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\X509CertificateTestSuite.h">
+      <Filter>X509Certificate\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +148,12 @@
     </ClCompile>
     <ClCompile Include="src\WebSocketTestSuite.cpp">
       <Filter>WebSocket\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\X509CertificateTest.cpp">
+      <Filter>X509Certificate\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\X509CertificateTestSuite.cpp">
+      <Filter>X509Certificate\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

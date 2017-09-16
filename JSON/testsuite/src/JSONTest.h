@@ -1,8 +1,6 @@
 //
 // JSONTest.h
 //
-// $Id: //poco/1.4/JSON/testsuite/src/JSONTest.h#1 $
-//
 // Definition of the JSONTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -46,6 +44,7 @@ public:
 #endif
 	void testStringProperty();
 	void testEmptyObject();
+	void testEmptyPropertyName();
 	void testComplexObject();
 	void testDoubleProperty();
 	void testDouble2Property();

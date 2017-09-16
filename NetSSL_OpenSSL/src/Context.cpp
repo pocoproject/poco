@@ -1,8 +1,6 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/Context.cpp#2 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  Context
@@ -494,6 +492,17 @@ void Context::initDH(const std::string& dhParamsFile)
 			std::string msg = Utility::getLastError();
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+		BIGNUM* p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
+		BIGNUM* g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
+		DH_set0_pqg(dh, p, 0, g);
+		DH_set_length(dh, 160);
+		if (!p || !g)
+		{
+			DH_free(dh);
+			throw SSLContextException("Error creating Diffie-Hellman parameters");
+		}
+#else
 		dh->p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 		dh->g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 		dh->length = 160;
@@ -502,6 +511,7 @@ void Context::initDH(const std::string& dhParamsFile)
 			DH_free(dh);
 			throw SSLContextException("Error creating Diffie-Hellman parameters");
 		}
+#endif
 	}
 	SSL_CTX_set_tmp_dh(_pSSLContext, dh);
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);

@@ -1,8 +1,6 @@
 //
 // FIFOBufferStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FIFOBufferStream.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  FIFOBufferStream

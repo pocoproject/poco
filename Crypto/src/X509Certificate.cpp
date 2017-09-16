@@ -1,8 +1,6 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.4/Crypto/src/X509Certificate.cpp#1 $
-//
 // Library: Crypto
 // Package: Certificate
 // Module:  X509Certificate
@@ -63,7 +61,11 @@ X509Certificate::X509Certificate(X509* pCert, bool shared):
 	
 	if (shared)
 	{
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+		X509_up_ref(_pCert);
+#else
 		_pCert->references++;
+#endif
 	}
 
 	init();

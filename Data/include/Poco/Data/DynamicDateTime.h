@@ -1,8 +1,6 @@
 //
 // DynamicDateTime.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/DynamicDateTime.h#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  DynamicDateTime

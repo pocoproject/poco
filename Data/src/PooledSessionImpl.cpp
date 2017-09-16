@@ -1,8 +1,6 @@
 //
 // PooledSessionImpl.cpp
 //
-// $Id: //poco/Main/Data/src/PooledSessionImpl.cpp#3 $
-//
 // Library: Data
 // Package: SessionPooling
 // Module:  PooledSessionImpl

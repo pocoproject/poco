@@ -1,8 +1,6 @@
 //
 // PartialStreamTest.h
 //
-// $Id: //poco/1.4/Zip/testsuite/src/PartialStreamTest.h#1 $
-//
 // Definition of the PartialStreamTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
@@ -30,6 +28,7 @@ public:
 	void testWriting();
 	void testWritingZero();
 	void testWritingOne();
+	void testAutoDetect();
 
 	void setUp();
 	void tearDown();

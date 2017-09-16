@@ -1,9 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/Extractor.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  Extractor
 //
@@ -18,6 +16,7 @@
 
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
+#include "Poco/Dynamic/Var.h"
 
 namespace Poco {
 namespace Data {
@@ -132,6 +131,16 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 	MetaColumn::ColumnDataType columnType = _metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type();
 	if (columnType != Poco::Data::MetaColumn::FDT_STRING && columnType != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a string");
+
+	if (columnType == Poco::Data::MetaColumn::FDT_BLOB && _metadata.length(pos) > 0 && _metadata.rawData(pos) == NULL)
+	{
+		std::vector<char> buffer(_metadata.length(pos), 0);
+		bool ret = realExtractFixedBlob(pos, _metadata.row()[pos].buffer_type, buffer.data(), buffer.size());
+		if (ret)
+			val.assign(buffer.data(), buffer.size());
+			
+		return ret;
+	}
 		
 	val.assign(reinterpret_cast<const char*>(_metadata.rawData(pos)), _metadata.length(pos));
 	return true;
@@ -146,8 +155,19 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
 	return false;
 	
-	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_BLOB)
+	MetaColumn::ColumnDataType columnType = _metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type();
+	if (columnType != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a blob");
+		
+	if (columnType == Poco::Data::MetaColumn::FDT_BLOB && _metadata.length(pos) > 0 && _metadata.rawData(pos) == NULL)
+	{
+		std::vector<unsigned char> buffer(_metadata.length(pos), 0);
+		bool ret = realExtractFixedBlob(pos, _metadata.row()[pos].buffer_type, buffer.data(), buffer.size());
+		if (ret)
+			val.assignRaw(buffer.data(), buffer.size());
+			
+		return ret;
+	}
 	
 	val.assignRaw(_metadata.rawData(pos), _metadata.length(pos));
 	return true;
@@ -162,8 +182,19 @@ bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
 	return false;
 	
-	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_BLOB)
+	MetaColumn::ColumnDataType columnType = _metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type();
+	if (columnType != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a blob");
+	
+	if (columnType == Poco::Data::MetaColumn::FDT_BLOB && _metadata.length(pos) > 0 && _metadata.rawData(pos) == NULL)
+	{
+		std::vector<char> buffer(_metadata.length(pos), 0);
+		bool ret = realExtractFixedBlob(pos, _metadata.row()[pos].buffer_type, buffer.data(), buffer.size());
+		if (ret)
+			val.assignRaw(buffer.data(), buffer.size());
+			
+		return ret;
+	}
 	
 	val.assignRaw(reinterpret_cast<const char*>(_metadata.rawData(pos)), _metadata.length(pos));
 	return true;
@@ -208,13 +239,13 @@ bool Extractor::extract(std::size_t pos, Time& val)
 
 bool Extractor::extract(std::size_t pos, Any& val)
 {
-	return false;
+	return extractToDynamic<Any>(pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Dynamic::Var& val)
 {
-	return false;
+	return extractToDynamic<Dynamic::Var>(pos, val);
 }
 
 
@@ -253,6 +284,21 @@ bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* b
 	return isNull == 0;
 }
 
+bool Extractor::realExtractFixedBlob(std::size_t pos, enum_field_types type, void* buffer, size_t len)
+{
+	MYSQL_BIND bind = {0};
+	my_bool isNull = 0;
+
+	bind.is_null	   = &isNull;
+	bind.buffer_type   = type;
+	bind.buffer	   = buffer;
+	bind.buffer_length = len;
+	
+	if (!_stmt.fetchColumn(pos, &bind))
+		return false;
+
+	return isNull == 0;
+}
 
 //////////////
 // Not implemented

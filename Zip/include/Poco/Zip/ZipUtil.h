@@ -1,8 +1,6 @@
 //
 // ZipUtil.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipUtil.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:	ZipUtil
@@ -31,7 +29,7 @@ namespace Poco {
 namespace Zip {
 
 
-class ZipUtil
+class Zip_API ZipUtil
 	/// A utility class used for parsing header information inside of zip files
 {
 public:

@@ -1,8 +1,6 @@
 //
 // ZipLocalFileHeader.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipLocalFileHeader.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipLocalFileHeader
@@ -83,7 +81,7 @@ ZipLocalFileHeader::ZipLocalFileHeader(std::istream& inp, bool assumeHeaderRead,
         {
             char header[ZipCommon::HEADER_SIZE]={'\x00', '\x00', '\x00', '\x00'};
             inp.read(header, ZipCommon::HEADER_SIZE);
-            if (std::memcmp(header, ZipDataInfo64::HEADER, sizeof(header)) == 0) 
+            if (_forceZip64) 
             {
                 ZipDataInfo64 nfo(inp, true);
                 setCRC(nfo.getCRC32());
@@ -118,23 +116,30 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
     if (!assumeHeaderRead)
     {
         inp.read(_rawHeader, ZipCommon::HEADER_SIZE);
+		if (inp.gcount() != ZipCommon::HEADER_SIZE)
+			throw Poco::IOException("Failed to read local file header");
+		if (std::memcmp(_rawHeader, HEADER, ZipCommon::HEADER_SIZE) != 0)
+			throw Poco::DataFormatException("Bad local file header");
     }
     else
     {
         std::memcpy(_rawHeader, HEADER, ZipCommon::HEADER_SIZE);
     }
-    poco_assert (std::memcmp(_rawHeader, HEADER, ZipCommon::HEADER_SIZE) == 0);
-    // read the rest of the header
+
+        // read the rest of the header
     inp.read(_rawHeader + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
     poco_assert (_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED);
     poco_assert (getMajorVersionNumber() <= 4); // Allow for Zip64 version 4.5
     poco_assert (ZipUtil::get16BitValue(_rawHeader, COMPR_METHOD_POS) < ZipCommon::CM_UNUSED);
     parseDateTime();
     Poco::UInt16 len = getFileNameLength();
-    Poco::Buffer<char> buf(len);
-    inp.read(buf.begin(), len);
-    _fileName = std::string(buf.begin(), len);
-
+    if (len > 0)
+    {
+    	Poco::Buffer<char> buf(len);
+    	inp.read(buf.begin(), len);
+    	_fileName = std::string(buf.begin(), len);
+	}
+	
     if (!searchCRCAndSizesAfterData())
     {
         _crc32 = getCRCFromHeader();
@@ -145,33 +150,42 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
     if (hasExtraField())
     {
         len = getExtraFieldLength();
-        Poco::Buffer<char> xtra(len);
-        inp.read(xtra.begin(), len);
-        _extraField = std::string(xtra.begin(), len);
-        char* ptr = xtra.begin();
-        while (ptr <= xtra.begin() + len - 4) 
+        if (len > 0)
         {
-            Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0); ptr +=2;
-            Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0); ptr += 2;
-            if (id == ZipCommon::ZIP64_EXTRA_ID) 
-            {
-                poco_assert(size >= 8);
-                if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
-                {
-                    setUncompressedSize(ZipUtil::get64BitValue(ptr, 0)); size -= 8; ptr += 8;
-                }
-                if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
-                {
-                    setCompressedSize(ZipUtil::get64BitValue(ptr, 0)); size -= 8; ptr += 8;
-                }
-            } 
-            else 
-            {
-                ptr += size;
-            }
+			Poco::Buffer<char> xtra(len);
+			inp.read(xtra.begin(), len);
+			_extraField = std::string(xtra.begin(), len);
+			char* ptr = xtra.begin();
+			while (ptr <= xtra.begin() + len - 4) 
+			{
+				Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0); 
+				ptr += 2;
+				Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0); 
+				ptr += 2;
+				if (id == ZipCommon::ZIP64_EXTRA_ID) 
+				{
+					_forceZip64 = true;
+					poco_assert(size >= 8);
+					if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
+					{
+						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0)); 
+						size -= 8; 
+						ptr += 8;
+					}
+					if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
+					{
+						setCompressedSize(ZipUtil::get64BitValue(ptr, 0)); 
+						size -= 8; 
+						ptr += 8;
+					}
+				} 
+				else 
+				{
+					ptr += size;
+				}
+			}
         }
     }
-
 }
 
 

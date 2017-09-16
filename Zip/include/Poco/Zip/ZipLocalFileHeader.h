@@ -1,8 +1,6 @@
 //
 // ZipLocalFileHeader.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipLocalFileHeader.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:	ZipLocalFileHeader
@@ -205,6 +203,8 @@ private:
 	Poco::UInt32   _crc32;
 	Poco::UInt64   _compressedSize;
 	Poco::UInt64   _uncompressedSize;
+	
+	friend class ZipStreamBuf;
 };
 
 
@@ -279,6 +279,7 @@ inline void ZipLocalFileHeader::setRequiredVersion(int major, int minor)
 	poco_assert (major < 24);
 	_rawHeader[VERSION_POS] = static_cast<char>(static_cast<unsigned char>(major)*10+static_cast<unsigned char>(minor));
 }
+
 
 inline Poco::UInt16 ZipLocalFileHeader::getFileNameLength() const
 {

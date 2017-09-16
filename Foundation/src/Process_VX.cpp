@@ -1,8 +1,6 @@
 //
 // Process_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_VX.cpp#3 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process

@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/release/script/mkrel#1 $
-#
 # mkrel
 #
 # Create a release for distribution.

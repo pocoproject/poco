@@ -1,8 +1,6 @@
 //
 // SocketReactor.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketReactor.h#1 $
-//
 // Library: Net
 // Package: Reactor
 // Module:  SocketReactor

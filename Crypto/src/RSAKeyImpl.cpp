@@ -1,8 +1,6 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSAKeyImpl.cpp#3 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSAKeyImpl
@@ -207,19 +205,43 @@ int RSAKeyImpl::size() const
 
 RSAKeyImpl::ByteVec RSAKeyImpl::modulus() const
 {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	const BIGNUM* n = 0;
+	const BIGNUM* e = 0;
+	const BIGNUM* d = 0;
+	RSA_get0_key(_pRSA, &n, &e, &d);
+	return convertToByteVec(n);
+#else
 	return convertToByteVec(_pRSA->n);
+#endif
 }
 
 
 RSAKeyImpl::ByteVec RSAKeyImpl::encryptionExponent() const
 {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	const BIGNUM* n = 0;
+	const BIGNUM* e = 0;
+	const BIGNUM* d = 0;
+	RSA_get0_key(_pRSA, &n, &e, &d);
+	return convertToByteVec(e);
+#else
 	return convertToByteVec(_pRSA->e);
+#endif
 }
 
 
 RSAKeyImpl::ByteVec RSAKeyImpl::decryptionExponent() const
 {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	const BIGNUM* n = 0;
+	const BIGNUM* e = 0;
+	const BIGNUM* d = 0;
+	RSA_get0_key(_pRSA, &n, &e, &d);
+	return convertToByteVec(d);
+#else
 	return convertToByteVec(_pRSA->d);
+#endif
 }
 
 

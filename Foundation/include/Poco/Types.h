@@ -1,8 +1,6 @@
 //
 // Types.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Types.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Types
@@ -205,6 +203,11 @@ namespace Poco {
 	typedef signed long long   Int64;
 	typedef unsigned long long UInt64;
 	#define POCO_HAVE_INT64 1
+#endif
+
+
+#if defined(POCO_PTR_IS_64_BIT) && (POCO_PTR_IS_64_BIT == 1)
+	#define POCO_64_BIT
 #endif
 
 

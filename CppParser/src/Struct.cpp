@@ -1,8 +1,6 @@
 //
 // Struct.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Struct.cpp#1 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Struct

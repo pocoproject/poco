@@ -1,8 +1,6 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#3 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  X509Certificate

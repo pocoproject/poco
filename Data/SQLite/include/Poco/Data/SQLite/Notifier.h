@@ -1,9 +1,7 @@
 //
 // Notifier.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/Notifier.h#2 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Notifier
 //
@@ -121,7 +119,7 @@ public:
 	static int sqliteCommitCallbackFn(void* pVal);
 		/// Commit callback event dispatcher. If an exception occurs, it is caught inside this function,
 		/// non-zero value is returned, which causes SQLite engine to turn commit into a rollback.
-		/// Therefore, callers should check for return value - if it is zero, callback completed successfuly
+		/// Therefore, callers should check for return value - if it is zero, callback completed successfully
 		/// and transaction was committed.
 
 	static void sqliteRollbackCallbackFn(void* pVal);
@@ -136,6 +134,9 @@ public:
 
 	void setRow(Poco::Int64 row);
 		/// Sets the row number.
+
+	const std::string& getTable() const;
+		/// Returns the table name.
 
 	const Poco::Dynamic::Var& getValue() const;
 		/// Returns the value.
@@ -155,6 +156,7 @@ private:
 	const Session&     _session;
 	Poco::Dynamic::Var _value;
 	Poco::Int64        _row;
+	std::string        _table;
 	EnabledEventType   _enabledEvents;
 	Poco::Mutex        _mutex;
 };
@@ -168,6 +170,7 @@ inline bool Notifier::operator == (const Notifier& other) const
 {
 	return _value == other._value &&
 		_row == other._row &&
+		_table == other._table &&
 		Utility::dbHandle(_session) == Utility::dbHandle(other._session);
 }
 
@@ -175,6 +178,12 @@ inline bool Notifier::operator == (const Notifier& other) const
 inline Poco::Int64 Notifier::getRow() const
 {
 	return _row;
+}
+
+
+inline const std::string& Notifier::getTable() const
+{
+	return _table;
 }
 
 
