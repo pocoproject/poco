@@ -381,7 +381,7 @@ void XMLStreamParser::popElement()
 }
 
 
-XMLStreamParser::EventType XMLStreamParser::nextImpl(bool isPeek)
+XMLStreamParser::EventType XMLStreamParser::nextImpl(bool peek)
 {
 	EventType e(nextBody());
 
@@ -400,7 +400,7 @@ XMLStreamParser::EventType XMLStreamParser::nextImpl(bool isPeek)
 		// This way, the attribute map will still be valid until we
 		// call next().
 		//
-		if (!isPeek)
+		if (!peek)
 		{
 			if (!_elementState.empty() && _elementState.back().depth == _depth)
 				popElement();
@@ -411,9 +411,9 @@ XMLStreamParser::EventType XMLStreamParser::nextImpl(bool isPeek)
 	}
 	case EV_START_ELEMENT:
 	{
-		if (const ElementEntry* pEntry = getElement())
+		if (const ElementEntry* e = getElement())
 		{
-			switch (pEntry->content)
+			switch (e->content)
 			{
 			case Content::Empty:
 				throw XMLStreamParserException(*this, "element in empty content");
@@ -426,7 +426,7 @@ XMLStreamParser::EventType XMLStreamParser::nextImpl(bool isPeek)
 
 		// If this is a peek, then delay adjusting the depth.
 		//
-		if (!isPeek)
+		if (!peek)
 			_depth++;
 
 		break;
@@ -769,10 +769,10 @@ void XMLCALL XMLStreamParser::handleStartElement(void* v, const XML_Char* name, 
 				{
 					QName qn;
 					splitName(*atts, qn);
-					AttributeMapType::value_type value(qn, AttributeValueType());
-					value.second.value = *(atts + 1);
-					value.second.handled = false;
-					pe->attributeMap.insert(value);
+					AttributeMapType::value_type v(qn, AttributeValueType());
+					v.second.value = *(atts + 1);
+					v.second.handled = false;
+					pe->attributeMap.insert(v);
 				}
 				else
 				{
