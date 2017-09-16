@@ -141,6 +141,9 @@ public:
 	const X509* certificate() const;
 		/// Returns the underlying OpenSSL certificate.
 
+	void print(std::ostream& out) const;
+		/// Prints the certificate information to ostream.
+
 protected:
 	void load(std::istream& stream);
 		/// Loads the certificate from the given stream. The

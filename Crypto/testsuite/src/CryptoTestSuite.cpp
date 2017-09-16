@@ -8,10 +8,17 @@
 //
 
 
+#include "Poco/Platform.h"
+// see https://github.com/openssl/openssl/blob/master/doc/man3/OPENSSL_Applink.pod
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include "openssl/applink.c"
+#endif
 #include "CryptoTestSuite.h"
 #include "CryptoTest.h"
 #include "RSATest.h"
+#include "ECTest.h"
 #include "DigestEngineTest.h"
+#include "PKCS12ContainerTest.h"
 
 
 CppUnit::Test* CryptoTestSuite::suite()
@@ -20,7 +27,8 @@ CppUnit::Test* CryptoTestSuite::suite()
 
 	pSuite->addTest(CryptoTest::suite());
 	pSuite->addTest(RSATest::suite());
+	pSuite->addTest(ECTest::suite());
 	pSuite->addTest(DigestEngineTest::suite());
-
+	pSuite->addTest(PKCS12ContainerTest::suite());
 	return pSuite;
 }
