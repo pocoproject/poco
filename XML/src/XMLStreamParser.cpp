@@ -411,9 +411,9 @@ XMLStreamParser::EventType XMLStreamParser::nextImpl(bool peek)
 	}
 	case EV_START_ELEMENT:
 	{
-		if (const ElementEntry* e = getElement())
+		if (const ElementEntry* pEntry = getElement())
 		{
-			switch (e->content)
+			switch (pEntry->content)
 			{
 			case Content::Empty:
 				throw XMLStreamParserException(*this, "element in empty content");
