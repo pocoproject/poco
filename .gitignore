@@ -89,6 +89,8 @@ Thumbs.db
 *.tlog
 *.lastbuildstate
 *.unsuccessfulbuild
+*.opendb
+.vs/
 release_shared/
 debug_shared/
 release_static/

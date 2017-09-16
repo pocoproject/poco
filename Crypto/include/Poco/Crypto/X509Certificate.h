@@ -44,7 +44,9 @@ public:
 		NID_LOCALITY_NAME = 15,
 		NID_STATE_OR_PROVINCE = 16,
 		NID_ORGANIZATION_NAME = 17,
-		NID_ORGANIZATION_UNIT_NAME = 18	
+		NID_ORGANIZATION_UNIT_NAME = 18,
+		NID_PKCS9_EMAIL_ADDRESS = 48,
+		NID_SERIAL_NUMBER = 105
 	};
 	
 	explicit X509Certificate(std::istream& istr);
@@ -126,7 +128,7 @@ public:
 		/// certificate.
 		///
 		/// Returns true if verification against the issuer certificate
-		/// was successfull, false otherwise.
+		/// was successful, false otherwise.
 
 	bool equals(const X509Certificate& otherCertificate) const;
 		/// Checks whether the certificate is equal to
@@ -138,6 +140,9 @@ public:
 
 	const X509* certificate() const;
 		/// Returns the underlying OpenSSL certificate.
+
+	void print(std::ostream& out) const;
+		/// Prints the certificate information to ostream.
 
 protected:
 	void load(std::istream& stream);

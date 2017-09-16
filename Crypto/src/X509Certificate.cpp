@@ -18,6 +18,10 @@
 #include "Poco/DateTimeParser.h"
 #include <sstream>
 #include <openssl/pem.h>
+#ifdef _WIN32
+// fix for WIN32 header conflict
+#undef X509_NAME 
+#endif
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
@@ -29,7 +33,7 @@ namespace Crypto {
 
 X509Certificate::X509Certificate(std::istream& istr):
 	_pCert(0)
-{	
+{
 	load(istr);
 }
 
@@ -103,17 +107,17 @@ X509Certificate::~X509Certificate()
 void X509Certificate::load(std::istream& istr)
 {
 	poco_assert (!_pCert);
-		
+
 	std::stringstream certStream;
 	Poco::StreamCopier::copyStream(istr, certStream);
 	std::string cert = certStream.str();
-		
+
 	BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(cert.data()), static_cast<int>(cert.size()));
 	if (!pBIO) throw Poco::IOException("Cannot create BIO for reading certificate");
 	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
 	BIO_free(pBIO);
-	
-	if (!_pCert) throw Poco::IOException("Faild to load certificate from stream");
+
+	if (!_pCert) throw Poco::IOException("Failed to load certificate from stream");
 
 	init();
 }
@@ -130,10 +134,10 @@ void X509Certificate::load(const std::string& path)
 		BIO_free(pBIO);
 		throw Poco::OpenFileException("Cannot open certificate file for reading", path);
 	}
-	
+
 	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
 	BIO_free(pBIO);
-	
+
 	if (!_pCert) throw Poco::ReadFileException("Faild to load certificate from", path);
 
 	init();
@@ -205,24 +209,24 @@ std::string X509Certificate::commonName() const
 std::string X509Certificate::issuerName(NID nid) const
 {
 	if (X509_NAME* issuer = X509_get_issuer_name(_pCert))
-    {
+	{
 		char buffer[NAME_BUFFER_SIZE];
 		if (X509_NAME_get_text_by_NID(issuer, nid, buffer, sizeof(buffer)) >= 0)
 			return std::string(buffer);
-    }
-    return std::string();
+	}
+	return std::string();
 }
 
 
 std::string X509Certificate::subjectName(NID nid) const
 {
 	if (X509_NAME* subj = X509_get_subject_name(_pCert))
-    {
+	{
 		char buffer[NAME_BUFFER_SIZE];
 		if (X509_NAME_get_text_by_NID(subj, nid, buffer, sizeof(buffer)) >= 0)
 			return std::string(buffer);
-    }
-    return std::string();
+	}
+	return std::string();
 }
 
 
@@ -230,16 +234,16 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 {
 	domainNames.clear(); 
 	if (STACK_OF(GENERAL_NAME)* names = static_cast<STACK_OF(GENERAL_NAME)*>(X509_get_ext_d2i(_pCert, NID_subject_alt_name, 0, 0)))
-    {
+	{
 		for (int i = 0; i < sk_GENERAL_NAME_num(names); ++i)
-        {
+		{
 			const GENERAL_NAME* name = sk_GENERAL_NAME_value(names, i);
 			if (name->type == GEN_DNS)
 			{
 				const char* data = reinterpret_cast<char*>(ASN1_STRING_data(name->d.ia5));
 				std::size_t len = ASN1_STRING_length(name->d.ia5);
 				domainNames.insert(std::string(data, len));
-            }
+			}
 		}
 		GENERAL_NAMES_free(names);
 	}
@@ -287,6 +291,21 @@ bool X509Certificate::equals(const X509Certificate& otherCertificate) const
 	X509* pCert = const_cast<X509*>(_pCert);
 	X509* pOtherCert = const_cast<X509*>(otherCertificate.certificate());
 	return X509_cmp(pCert, pOtherCert) == 0;
+}
+
+
+void X509Certificate::print(std::ostream& out) const
+{
+	out << "subjectName: " << subjectName() << std::endl;
+	out << "issuerName: " << issuerName() << std::endl;
+	out << "commonName: " << commonName() << std::endl;
+	out << "country: " << subjectName(X509Certificate::NID_COUNTRY) << std::endl;
+	out << "localityName: " << subjectName(X509Certificate::NID_LOCALITY_NAME) << std::endl;
+	out << "stateOrProvince: " << subjectName(X509Certificate::NID_STATE_OR_PROVINCE) << std::endl;
+	out << "organizationName: " << subjectName(X509Certificate::NID_ORGANIZATION_NAME) << std::endl;
+	out << "organizationUnitName: " << subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME) << std::endl;
+	out << "emailAddress: " << subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS) << std::endl;
+	out << "serialNumber: " << subjectName(X509Certificate::NID_SERIAL_NUMBER) << std::endl;
 }
 
 
