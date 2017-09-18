@@ -14,6 +14,8 @@
 
 
 #include "Poco/Crypto/EVPPKey.h"
+#include "Poco/Crypto/ECKey.h"
+#include "Poco/Crypto/RSAKey.h"
 #include "Poco/NumberFormatter.h"
 
 
@@ -130,5 +132,20 @@ err:
 	throw OpenSSLException();
 }
 
+
+void EVPPKey::setKey(ECKey* pKey)
+{
+	poco_check_ptr(pKey);
+	poco_check_ptr(pKey->impl());
+	setKey(pKey->impl()->getECKey());
+}
+
+
+void EVPPKey::setKey(RSAKey* pKey)
+{
+	poco_check_ptr(pKey);
+	poco_check_ptr(pKey->impl());
+	setKey(pKey->impl()->getRSA());
+}
 
 } } // namespace Poco::Crypto

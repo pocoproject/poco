@@ -31,7 +31,7 @@ namespace Crypto {
 POCO_DECLARE_EXCEPTION(Crypto_API, CryptoException, Poco::Exception)
 
 
-class OpenSSLException : public CryptoException
+class Crypto_API OpenSSLException : public CryptoException
 {
 public:
 	OpenSSLException(int code = 0);

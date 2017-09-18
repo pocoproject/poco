@@ -31,7 +31,7 @@ namespace Crypto {
 
 
 RSAKeyImpl::RSAKeyImpl(const EVPPKey& key):
-	KeyPairImpl("rsa", KT_EC_IMPL),
+	KeyPairImpl("rsa", KT_RSA_IMPL),
 	_pRSA(EVP_PKEY_get1_RSA(const_cast<EVP_PKEY*>((const EVP_PKEY*)key)))
 {
 	if (!_pRSA) throw OpenSSLException();

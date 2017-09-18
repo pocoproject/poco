@@ -40,6 +40,9 @@ void ECTest::testEVPPKey()
 	{
 		EVPPKey* pKey = new EVPPKey("secp521r1");
 		assert (pKey != 0);
+		assert (!pKey->isSupported(0));
+		assert (!pKey->isSupported(-1));
+		assert (pKey->isSupported(pKey->type()));
 		assert (pKey->type() == EVP_PKEY_EC);
 
 		BIO* bioPriv1 = BIO_new(BIO_s_mem());

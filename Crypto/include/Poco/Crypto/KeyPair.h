@@ -76,7 +76,7 @@ public:
 		/// Returns key pair type
 	
 private:
-	KeyPairImpl::Ptr   _pImpl;
+	KeyPairImpl::Ptr _pImpl;
 };
 
 
@@ -110,6 +110,12 @@ inline const std::string& KeyPair::name() const
 inline KeyPairImpl::Ptr KeyPair::impl() const
 {
 	return _pImpl;
+}
+
+
+inline KeyPair::Type KeyPair::type() const
+{
+	return (KeyPair::Type)impl()->type();
 }
 
 

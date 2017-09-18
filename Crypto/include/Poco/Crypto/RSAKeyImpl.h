@@ -50,8 +50,6 @@ public:
 	typedef Poco::AutoPtr<RSAKeyImpl> Ptr;
 	typedef std::vector<unsigned char> ByteVec;
 
-	RSAKeyImpl() = delete;
-
 	RSAKeyImpl(const EVPPKey& key);
 		/// Constructs ECKeyImpl by extracting the EC key.
 
@@ -109,6 +107,8 @@ public:
 		/// key is not exported.
 
 private:
+	RSAKeyImpl();
+
 	void freeRSA();
 	static ByteVec convertToByteVec(const BIGNUM* bn);
 
