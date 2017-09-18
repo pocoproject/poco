@@ -19,6 +19,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/KeyPair.h"
 #include "Poco/Crypto/RSAKeyImpl.h"
 
 
@@ -27,9 +28,10 @@ namespace Crypto {
 
 
 class X509Certificate;
+class PKCS12Container;
 
 
-class Crypto_API RSAKey
+class Crypto_API RSAKey : public KeyPair
 	/// This class stores an RSA key pair, consisting
 	/// of private and public key. Storage of the private
 	/// key is optional.
@@ -53,8 +55,14 @@ public:
 		EXP_LARGE
 	};
 
-	explicit RSAKey(const X509Certificate& cert);
+	RSAKey(const EVPPKey& key);
+		/// Constructs ECKeyImpl by extracting the EC key.
+
+	RSAKey(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
+
+	RSAKey(const PKCS12Container& cert);
+		/// Extracts the RSA private key from the given certificate.
 
 	RSAKey(KeyLength keyLength, Exponent exp);
 		/// Creates the RSAKey. Creates a new public/private keypair using the given parameters.
@@ -81,9 +89,6 @@ public:
 	~RSAKey();
 		/// Destroys the RSAKey.
 
-	int size() const;
-		/// Returns the RSA modulus size.
-
 	RSAKeyImpl::ByteVec modulus() const;
 		/// Returns the RSA modulus.
 
@@ -93,23 +98,8 @@ public:
 	RSAKeyImpl::ByteVec decryptionExponent() const;
 		/// Returns the RSA decryption exponent.
 
-	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
-		/// Exports the public and private keys to the given files. 
-		///
-		/// If an empty filename is specified, the corresponding key
-		/// is not exported.
-
-	void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
-		/// Exports the public and private key to the given streams.
-		///
-		/// If a null pointer is passed for a stream, the corresponding
-		/// key is not exported.
-
 	RSAKeyImpl::Ptr impl() const;
 		/// Returns the impl object.
-
-	const std::string& name() const;
-		/// Returns "rsa"
 	
 private:
 	RSAKeyImpl::Ptr _pImpl;

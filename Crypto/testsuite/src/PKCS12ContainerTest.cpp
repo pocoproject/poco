@@ -21,8 +21,7 @@
 #include <fstream>
 
 
-using Poco::Crypto::PKCS12Container;
-using Poco::Crypto::X509Certificate;
+using namespace Poco::Crypto;
 using Poco::Environment;
 using Poco::Path;
 using Poco::File;
@@ -61,6 +60,9 @@ void PKCS12ContainerTest::full(const PKCS12Container& pkcs12)
 	assert ("vally" == pkcs12.getFriendlyName());
 
 	assert (pkcs12.hasKey());
+	EVPPKey pKey = pkcs12.getKey();
+	assert (EVP_PKEY_RSA == pKey.type());
+
 	assert (pkcs12.hasX509Certificate());
 	X509Certificate x509 = pkcs12.getX509Certificate();
 

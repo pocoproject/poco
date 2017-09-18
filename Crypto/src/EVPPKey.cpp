@@ -21,7 +21,7 @@ namespace Poco {
 namespace Crypto {
 
 
-	EVPPKey::EVPPKey(const std::string& ecCurveName): _pEVPPKey(0)
+EVPPKey::EVPPKey(const std::string& ecCurveName): _pEVPPKey(0)
 {
 	newECKey(ecCurveName.c_str());
 }

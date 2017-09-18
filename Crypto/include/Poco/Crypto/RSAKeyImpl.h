@@ -19,6 +19,8 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/EVPPKey.h"
+#include "Poco/Crypto/KeyPairImpl.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
@@ -38,17 +40,26 @@ namespace Crypto {
 
 
 class X509Certificate;
+class PKCS12Container;
 
 
-class RSAKeyImpl: public Poco::RefCountedObject
+class RSAKeyImpl: public KeyPairImpl
 	/// class RSAKeyImpl
 {
 public:
 	typedef Poco::AutoPtr<RSAKeyImpl> Ptr;
 	typedef std::vector<unsigned char> ByteVec;
 
-	explicit RSAKeyImpl(const X509Certificate& cert);
+	RSAKeyImpl() = delete;
+
+	RSAKeyImpl(const EVPPKey& key);
+		/// Constructs ECKeyImpl by extracting the EC key.
+
+	RSAKeyImpl(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
+
+	RSAKeyImpl(const PKCS12Container& cert);
+		/// Extracts the EC private key from the given certificate.
 
 	RSAKeyImpl(int keyLength, unsigned long exponent);
 		/// Creates the RSAKey. Creates a new public/private keypair using the given parameters.
@@ -99,12 +110,9 @@ public:
 
 private:
 	void freeRSA();
-
 	static ByteVec convertToByteVec(const BIGNUM* bn);
 
-private:
 	RSA* _pRSA;
-	OpenSSLInitializer _openSSLInitializer;
 };
 
 
