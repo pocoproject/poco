@@ -30,6 +30,10 @@ namespace Poco {
 namespace Crypto {
 
 
+class ECKey;
+class RSAKey;
+
+
 class Crypto_API EVPPKey
 	/// Utility class for conversion of native keys to EVP.
 	/// Currently, only RSA and EC keys are supported.
@@ -79,16 +83,22 @@ public:
 	int type() const;
 		/// Retuns the EVPPKey type NID.
 
+	bool isSupported(int type) const;
+		/// Returns true if OpenSSL type is supported
+
 	operator const EVP_PKEY*() const;
-		/// Returns const pointer to the EVP_PKEY structure.
+		/// Returns const pointer to the OpenSSL EVP_PKEY structure.
 
 	operator EVP_PKEY*();
-		/// Returns pointer to the EVP_PKEY structure.
+		/// Returns pointer to the OpenSSL EVP_PKEY structure.
 
 private:
 	void newECKey(const char* group);
 
 	void duplicate(EVP_PKEY* pEVPPKey);
+
+	void setKey(ECKey* pKey);
+	void setKey(RSAKey* pKey);
 	void setKey(EC_KEY* pKey);
 	void setKey(RSA* pKey);
 
@@ -104,6 +114,12 @@ inline int EVPPKey::type() const
 	if (!_pEVPPKey) return NID_undef;
 
 	return EVP_PKEY_type(_pEVPPKey->type);
+}
+
+
+inline bool EVPPKey::isSupported(int type) const
+{
+	return type == EVP_PKEY_EC || type == EVP_PKEY_RSA;
 }
 
 
