@@ -26,6 +26,7 @@
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Path.h"
 #include <istream>
+#include <memory>
 #include <openssl/pkcs12.h>
 
 
