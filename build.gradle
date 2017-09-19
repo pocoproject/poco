@@ -735,6 +735,8 @@ WDK=${WDKHome}
 	}
 }
 task pocoDoc(type: Exec) {
+	dependsOn ':PocoDoc::assemble'
+	dependsOn PocoDocIni
 	if (os.windows) {
 		environment "Path", "$rootDir\\bin;$Path"
 		executable "PocoDoc/bin/PocoDoc.exe"
@@ -752,10 +754,8 @@ task pocoDoc(type: Exec) {
 		args "-config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
 		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
-	dependsOn ':PocoDoc::assemble'
-	dependsOn PocoDocIni
 //	inputs.files(tasks.getByPath(':production').outputs.files)
-	inputs.files(new File(executable))
+//	inputs.files(executable)
 	inputs.files(fileTree("doc").filter { it.isFile() })
 	inputs.files(new File("$rootDir/PocoDoc/cfg/mkdoc-poco.xml"))
 	outputs.files(new File("releases/$version-all-doc/index.html"))
@@ -771,67 +771,101 @@ task zipDoc(type: Zip) {
 //	dependsOn pocoDoc
 }
 
-if (os.windows) {
-}
-
-	def Candle(VSYEAR, VERSION, target) {
-		return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
+def candle(VSYEAR, VERSION, target, os) {
+	return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
 //			dependsOn ':poco'
-			dependsOn ':pocoDoc'
-			executable "${WiXHome}/bin/Candle.exe"
-			workingDir "distrib/Windows/WiX"
-			args "-arch", "${target}"
-			args "-dVSYEAR=${VSYEAR}"
-			args "-dVERSION=${VERSION}"
-			args "-dPOCO=${rootDir}"
-			args "-dPlatform=${target}"
-			args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
-			args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
-			args "Poco-${VERSION}.wxs"
-			inputs.files(new File(workingDir, "Poco-${VERSION}.wxs"))
+//		dependsOn ':pocoDoc'
+		executable "${WiXHome}/bin/Candle.exe"
+		workingDir "distrib/Windows/WiX"
+		args "-arch", "${target}"
+		args "-dVSYEAR=${VSYEAR}"
+		args "-dVERSION=${VERSION}"
+		args "-dPOCO=${rootDir}"
+		args "-dPlatform=${target}"
+		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
+		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
+		args "Poco-${VERSION}.wxs"
+		inputs.files(new File(workingDir, "Poco-${VERSION}.wxs"))
 //			inputs.files(tasks.getByPath(':poco').outputs.files)
-			outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
+		outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
+		onlyIf(new Spec<Exec>() {
+			boolean isSatisfiedBy(Exec task) {
+				   return os.windows;
+			}
+		});
+	}
+}
+def light(VSYEAR, VERSION, target, os) {
+	return tasks.create("Light-${VSYEAR}-${VERSION}-${target}", Exec) {
+		dependsOn candle(VSYEAR, VERSION, target, os)
+		executable "${WiXHome}/bin/Light.exe"
+		workingDir "distrib/Windows/WiX"
+		args "-cultures:null"
+		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
+		args "-out"
+		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
+		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
+		inputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
+		outputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"))
+		onlyIf(new Spec<Exec>() {
+			boolean isSatisfiedBy(Exec task) {
+				   return os.windows;
+			}
+		});
+	}
+}
+task wix() {
+	dependsOn 		light('VS2015', version, 'x86', os)
+	dependsOn 		light('VS2015', version, 'x64', os)
+	onlyIf(new Spec<Task>() {
+		boolean isSatisfiedBy(Task task) {
+			   return os.windows;
 		}
-	}
-	def Light(VSYEAR, VERSION, target) {
-		return tasks.create("Light-${VSYEAR}-${VERSION}-${target}", Exec) {
-			dependsOn Candle(VSYEAR, VERSION, target)
-			executable "${WiXHome}/bin/Light.exe"
-			workingDir "distrib/Windows/WiX"
-			args "-cultures:null"
-			args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
-			args "-out"
-			args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
-			args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
-			inputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
-			outputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"))
+	});
+}
+task nuget(type: Exec) {
+	executable "${NuGetHome}/NuGet.exe"
+	workingDir "distrib/Windows/NuGet"
+	args "pack"
+	args "-BasePath", "$rootDir"
+	args "-Version", version
+	args "-Symbols"
+	args "-NonInteractive"
+	args "Pocoproject.Poco.vs140.nuspec"
+	inputs.files(new File(workingDir, "Pocoproject.Poco.vs140.nuspec"))
+//	inputs.files(tasks.getByPath(':poco').outputs.files)
+	outputs.files(new File(workingDir,"Pocoproject.Poco.vs140.${version}.nupkg"))
+	onlyIf(new Spec<Exec>() {
+		boolean isSatisfiedBy(Exec task) {
+			   return os.windows;
 		}
-	}
-	task wix() {
-		dependsOn 		Light('VS2015', version, 'x86')
-		dependsOn 		Light('VS2015', version, 'x64')
-	}
-
-
-	task nuget(type: Exec) {
-		executable "${NuGetHome}/NuGet.exe"
-		workingDir "distrib/Windows/NuGet"
-		args "pack"
-		args "-BasePath", "$rootDir"
-		args "-Version", version
-		args "-Symbols"
-		args "-NonInteractive"
-		args "Pocoproject.Poco.vs140.nuspec"
-		inputs.files(new File(workingDir, "Pocoproject.Poco.vs140.nuspec"))
-//		inputs.files(tasks.getByPath(':poco').outputs.files)
-		outputs.files(new File(workingDir,"Pocoproject.Poco.vs140.${version}.nupkg"))
-	}
+	});
+}
 
 task distrib() {
 	if (os.windows) {
 		dependsOn nuget
 		dependsOn wix
 	}
+}
+task all() {
+doLast {
+        def files =  fileTree("src").filter { it.isFile() }.files.name;
+        println files;
+        println "------------------------------------"
+        println project.tasks.matching { Task task -> !task.name.empty }
+        println "------------------------------------"
+        def c = subprojects.tasks.findAll { it.findByName(":poco") }
+		println c
+
+//        CppCompile task = tasks.getByPath(':compileHelloSharedLibraryHelloCpp');
+//        println task;
+/*
+        FileCollection incs = task.includes;
+        incs.each { dir -> fileTree(dir).files.each { file -> inputs.files(file) }};
+        inputs.files.each { file -> println file.path }
+*/
+}
 }
 	def get() {
 		def foo = subprojects.tasks.findAll { it.name.contains('poco') }
@@ -845,7 +879,7 @@ task includes() {
 //		td.values.each { task -> println task }
 		def ts = subprojects.tasks //.matching { task -> task.name.contains("poco") }
 //		println ts.each { it.matching { task -> task.name.contains("poco") } }
-		def foo = get()
+		def foo = binaries.findAll { it.buildable }
 		println foo
 /*
 		def compileTasks = tasks.withType(CppCompile).matching { Task task -> 
