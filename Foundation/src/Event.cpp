@@ -43,10 +43,8 @@ void Event::set()
 {
 	try
 	{
-		{
-			std::unique_lock<std::mutex> lock(_mutex);
-			_state = true;
-		}
+		std::unique_lock<std::mutex> lock(_mutex);
+		_state = true;
 		if (_autoreset)
 			_cond.notify_one();
 		else
