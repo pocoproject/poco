@@ -15,6 +15,7 @@
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include <iostream>
 #include <sstream>
 
 
