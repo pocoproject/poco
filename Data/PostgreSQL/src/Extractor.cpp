@@ -1,8 +1,6 @@
 //
 // Extractor.cpp
 //
-// $Id: //poco/1.4/Data/PostgreSQL/src/Extractor.cpp#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  Extractor

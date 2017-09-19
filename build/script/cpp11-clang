@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/cpp11-clang#1 $
-#
 # cpp11-clang
 #
 # Detect compatible Clang version and add c++11/14 flags

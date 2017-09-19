@@ -1,8 +1,6 @@
 //
 // OptionCallback.cpp
 //
-// $Id: //poco/1.4/Util/src/OptionCallback.cpp#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  OptionCallback

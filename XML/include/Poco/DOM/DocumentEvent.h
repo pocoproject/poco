@@ -1,8 +1,6 @@
 //
 // DocumentEvent.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/DocumentEvent.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM

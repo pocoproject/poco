@@ -1,8 +1,6 @@
 //
 // DOMParser.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/DOMParser.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMParser

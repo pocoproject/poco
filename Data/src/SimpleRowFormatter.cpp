@@ -1,8 +1,6 @@
 //
 // RowFormatter.cpp
 //
-// $Id: //poco/Main/Data/src/RowFormatter.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RowFormatter

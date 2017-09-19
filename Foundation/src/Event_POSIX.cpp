@@ -1,8 +1,6 @@
 //
 // Event_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Event_POSIX.cpp#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Event

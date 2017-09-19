@@ -1,8 +1,6 @@
 //
 // Struct.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Dynamic/Struct.h#9 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  Struct

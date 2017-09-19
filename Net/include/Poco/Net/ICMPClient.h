@@ -1,8 +1,6 @@
 //
 // ICMPClient.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPClient.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPClient

@@ -1,8 +1,6 @@
 //
 // HTTPServerSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerSession.cpp#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPServerSession

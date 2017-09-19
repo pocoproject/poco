@@ -1,8 +1,6 @@
 //
 // Platform_WIN32_OSVER.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform_WIN32_OSVER.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Platform

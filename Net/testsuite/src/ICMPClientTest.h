@@ -1,8 +1,6 @@
 //
 // ICMPClientTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/ICMPClientTest.h#1 $
-//
 // Definition of the ICMPClientTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

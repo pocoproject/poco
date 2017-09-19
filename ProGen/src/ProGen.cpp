@@ -1,8 +1,6 @@
 //
 // ProGen.cpp
 //
-// $Id: //poco/1.4/ProGen/src/ProGen.cpp#9 $
-//
 // Visual Studio project file generator.
 //
 // Copyright (c) 2010, Applied Informatics Software Engineering GmbH.

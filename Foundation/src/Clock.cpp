@@ -1,8 +1,6 @@
 //
 // Clock.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Clock.cpp#3 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Clock

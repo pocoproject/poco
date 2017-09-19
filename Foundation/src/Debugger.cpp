@@ -1,8 +1,6 @@
 //
 // Debugger.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Debugger.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Debugger

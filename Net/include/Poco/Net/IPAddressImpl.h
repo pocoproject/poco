@@ -1,8 +1,6 @@
 //
 // IPAddressImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/IPAddressImpl.h#2 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  IPAddressImpl

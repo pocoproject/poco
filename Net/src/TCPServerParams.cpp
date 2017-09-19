@@ -1,8 +1,6 @@
 //
 // TCPServerParams.cpp
 //
-// $Id: //poco/1.4/Net/src/TCPServerParams.cpp#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServerParams

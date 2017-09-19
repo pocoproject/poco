@@ -1,8 +1,6 @@
 //
 // RWLock_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/RWLock_VX.cpp#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  RWLock

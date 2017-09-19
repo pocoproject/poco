@@ -1,8 +1,6 @@
 //
 // Driver.cpp
 //
-// $Id: //poco/1.5/Data/PostgreSQL/testsuite/src/Driver.cpp#2 $
-//
 // Console-based test driver for Poco PostgreSQL.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // FIFOEvent.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FIFOEvent.h#2 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  FIFOEvent

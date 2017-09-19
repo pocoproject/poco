@@ -1,8 +1,6 @@
 //
 // Process_WINCE.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Process_WINCE.h#4 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process

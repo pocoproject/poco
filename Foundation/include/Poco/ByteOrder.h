@@ -1,8 +1,6 @@
 //
 // ByteOrder.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ByteOrder.h#5 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  ByteOrder

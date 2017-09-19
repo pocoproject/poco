@@ -1,8 +1,6 @@
 //
 // NTPEventArgs.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/NTPEventArgs.h#1 $
-//
 // Library: Net
 // Package: NTP
 // Module:  NTPEventArgs

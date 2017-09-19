@@ -1,8 +1,6 @@
 //
 // HTTPAuthenticationParams.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPAuthenticationParams.h#2 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPAuthenticationParams

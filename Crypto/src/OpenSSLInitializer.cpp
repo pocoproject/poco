@@ -1,8 +1,6 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/1.4/Crypto/src/OpenSSLInitializer.cpp#3 $
-//
 // Library: Crypto
 // Package: CryptoCore
 // Module:  OpenSSLInitializer

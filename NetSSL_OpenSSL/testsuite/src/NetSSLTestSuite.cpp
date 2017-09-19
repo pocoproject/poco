@@ -1,8 +1,6 @@
 //
 // OpenSSLTestSuite.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/NetSSLTestSuite.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -17,6 +15,7 @@
 #include "HTTPSServerTestSuite.h"
 #include "WebSocketTestSuite.h"
 #include "FTPSClientTestSuite.h"
+#include "X509CertificateTestSuite.h"
 
 
 CppUnit::Test* NetSSLTestSuite::suite()
@@ -29,6 +28,7 @@ CppUnit::Test* NetSSLTestSuite::suite()
 	pSuite->addTest(HTTPSServerTestSuite::suite());
 	pSuite->addTest(WebSocketTestSuite::suite());
 	pSuite->addTest(FTPSClientTestSuite::suite());
+	pSuite->addTest(X509CertificateTestSuite::suite());
 
 	return pSuite;
 }

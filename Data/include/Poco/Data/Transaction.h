@@ -1,8 +1,6 @@
 //
 // Transaction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Transaction.h#2 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Transaction

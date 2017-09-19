@@ -1,8 +1,6 @@
 //
 // WebSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#10 $
-//
 // Library: Net
 // Package: WebSocket
 // Module:  WebSocketImpl

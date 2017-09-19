@@ -1,8 +1,6 @@
 //
 // NumericString.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NumericString.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  NumericString

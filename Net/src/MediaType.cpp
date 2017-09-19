@@ -1,8 +1,6 @@
 //
 // MediaType.cpp
 //
-// $Id: //poco/1.4/Net/src/MediaType.cpp#2 $
-//
 // Library: Net
 // Package: Messages
 // Module:  MediaType

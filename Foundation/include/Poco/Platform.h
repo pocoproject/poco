@@ -1,8 +1,6 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#5 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Platform

@@ -1,8 +1,6 @@
 //
 // AtomicCounter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AtomicCounter.h#4 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  AtomicCounter

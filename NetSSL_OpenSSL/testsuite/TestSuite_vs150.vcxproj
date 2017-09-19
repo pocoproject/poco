@@ -318,6 +318,8 @@
     <ClInclude Include="src\TCPServerTestSuite.h" />
     <ClInclude Include="src\WebSocketTest.h" />
     <ClInclude Include="src\WebSocketTestSuite.h" />
+    <ClInclude Include="src\X509CertificateTest.h"/>
+    <ClInclude Include="src\X509CertificateTestSuite.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DialogServer.cpp" />
@@ -335,6 +337,8 @@
     <ClCompile Include="src\TCPServerTestSuite.cpp" />
     <ClCompile Include="src\WebSocketTest.cpp" />
     <ClCompile Include="src\WebSocketTestSuite.cpp" />
+    <ClCompile Include="src\X509CertificateTest.cpp"/>
+    <ClCompile Include="src\X509CertificateTestSuite.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

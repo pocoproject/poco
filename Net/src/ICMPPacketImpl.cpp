@@ -1,8 +1,6 @@
 //
 // ICMPPacketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPPacketImpl.cpp#2 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPPacketImpl

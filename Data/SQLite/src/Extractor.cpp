@@ -1,8 +1,6 @@
 //
 // Extractor.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/Extractor.cpp#5 $
-//
 // Library: Data/SQLite
 // Package: SQLite
 // Module:  Extractor

@@ -1,8 +1,6 @@
 //
 // TwitterApp.cpp
 //
-// $Id: //poco/1.4/Net/samples/TwitterClient/src/TweetApp.cpp#2 $
-//
 // A very simple command-line Twitter client.
 //
 // Copyright (c) 2009-2013, Applied Informatics Software Engineering GmbH.

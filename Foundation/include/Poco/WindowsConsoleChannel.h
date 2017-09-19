@@ -1,8 +1,6 @@
 //
 // WindowsConsoleChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/WindowsConsoleChannel.h#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  WindowsConsoleChannel

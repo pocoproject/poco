@@ -1,8 +1,6 @@
 
 // Environment_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_UNIX.cpp#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Environment

@@ -1,8 +1,6 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPCookie.cpp#3 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPCookie

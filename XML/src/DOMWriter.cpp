@@ -1,8 +1,6 @@
 //
 // DOMWriter.cpp
 //
-// $Id: //poco/1.4/XML/src/DOMWriter.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMWriter
