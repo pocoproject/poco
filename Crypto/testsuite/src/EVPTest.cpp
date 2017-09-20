@@ -19,6 +19,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 
 using namespace Poco::Crypto;
