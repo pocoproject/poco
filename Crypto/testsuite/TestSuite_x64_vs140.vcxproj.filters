@@ -45,6 +45,9 @@
     <ClInclude Include="src\PKCS12ContainerTest.h">
       <Filter>Crypto\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\EVPTest.h">
+      <Filter>Crypto\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CryptoTest.cpp">
@@ -66,6 +69,9 @@
       <Filter>Crypto\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PKCS12ContainerTest.cpp">
+      <Filter>Crypto\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EVPTest.cpp">
       <Filter>Crypto\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

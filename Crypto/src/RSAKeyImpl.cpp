@@ -96,7 +96,7 @@ RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile,
 		_pRSA(0)
 {
 	poco_assert_dbg(_pRSA == 0);
-	
+
 	_pRSA = RSA_new();
 	if (!publicKeyFile.empty())
 	{
@@ -162,7 +162,7 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream,
 		_pRSA(0)
 {
 	poco_assert_dbg(_pRSA == 0);
-	
+
 	_pRSA = RSA_new();
 	if (pPublicKeyStream)
 	{
