@@ -473,6 +473,8 @@
 				<File
 					RelativePath=".\src\ECTest.h"/>
 				<File
+					RelativePath=".\src\EVPTest.h"/>
+				<File
 					RelativePath=".\src\PKCS12ContainerTest.h"/>
 				<File
 					RelativePath=".\src\RSATest.h"/>
@@ -485,6 +487,8 @@
 					RelativePath=".\src\DigestEngineTest.cpp"/>
 				<File
 					RelativePath=".\src\ECTest.cpp"/>
+				<File
+					RelativePath=".\src\EVPTest.cpp"/>
 				<File
 					RelativePath=".\src\PKCS12ContainerTest.cpp"/>
 				<File

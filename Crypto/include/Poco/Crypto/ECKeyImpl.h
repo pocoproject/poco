@@ -30,7 +30,6 @@
 #include <vector>
 #include <openssl/objects.h>
 #include <openssl/ec.h>
-#include <openssl/pem.h>
 
 
 namespace Poco {
@@ -102,15 +101,7 @@ public:
 		/// key is not exported.
 
 private:
-	typedef EVP_PKEY* (*PEM_read_bio_Key_fn)(BIO*, EVP_PKEY**, pem_password_cb*, void*);
-	typedef EVP_PKEY* (*PEM_read_Key_fn)(FILE*, EVP_PKEY**, pem_password_cb*, void*);
-
-	static int passCB(char* buf, int size, int, void* pass);
-	bool loadKey(PEM_read_Key_fn func, const std::string& keyFile, const std::string& pass = "");
-	bool loadKey(PEM_read_bio_Key_fn func, std::istream* pKeyStream, const std::string& pass = "");
 	void freeEC();
-
-	static ByteVec convertToByteVec(const BIGNUM* bn);
 
 	EC_KEY* _pEC;
 };
@@ -128,6 +119,28 @@ inline EC_KEY* ECKeyImpl::getECKey()
 inline const EC_KEY* ECKeyImpl::getECKey() const
 {
 	return _pEC;
+}
+
+
+inline std::string ECKeyImpl::groupName() const
+{
+	return OBJ_nid2sn(groupId());
+}
+
+
+inline void ECKeyImpl::save(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
+	const std::string& privateKeyPassphrase)
+{
+	EVPPKey(_pEC).save(publicKeyFile, privateKeyFile, privateKeyPassphrase);
+}
+
+
+inline void ECKeyImpl::save(std::ostream* pPublicKeyStream,
+	std::ostream* pPrivateKeyStream,
+	const std::string& privateKeyPassphrase)
+{
+	EVPPKey(_pEC).save(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase);
 }
 
 

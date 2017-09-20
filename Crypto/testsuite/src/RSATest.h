@@ -24,7 +24,6 @@ public:
 	RSATest(const std::string& name);
 	~RSATest();
 
-	void testEVPPKey();
 	void testNewKeys();
 	void testNewKeysNoPassphrase();
 	void testSign();

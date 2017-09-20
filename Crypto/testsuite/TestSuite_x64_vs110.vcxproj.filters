@@ -2,28 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Crypto">
-      <UniqueIdentifier>{3b577deb-1389-4111-b6ba-581f87ce61d1}</UniqueIdentifier>
+      <UniqueIdentifier>{24b608cd-8757-43b8-80c5-4230d7d6c918}</UniqueIdentifier>
     </Filter>
     <Filter Include="Crypto\Header Files">
-      <UniqueIdentifier>{dd4329af-8e38-42e3-a8dc-058e6e3b7460}</UniqueIdentifier>
+      <UniqueIdentifier>{686a133e-be58-400c-b745-937593e26a33}</UniqueIdentifier>
     </Filter>
     <Filter Include="Crypto\Source Files">
-      <UniqueIdentifier>{607b66e2-e1b4-425d-9172-3680a8930e22}</UniqueIdentifier>
+      <UniqueIdentifier>{c2a27d76-2132-42ea-ae74-c9cf4d38307a}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{d285ca5d-4d0f-4b56-a1da-89aecab4972c}</UniqueIdentifier>
+      <UniqueIdentifier>{ea2d8fcb-16cb-4c51-af81-f4ebb9a0ac1d}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{fc178a63-9cd3-4315-97ec-fe42768910b3}</UniqueIdentifier>
+      <UniqueIdentifier>{d3d257de-a55e-4ac0-a3b4-9015f5fb5cd6}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{72733724-3186-4711-b38e-2810a31b532f}</UniqueIdentifier>
+      <UniqueIdentifier>{11e6c108-a5be-4361-9737-a418b3db0443}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{661dd1a9-5ee1-4720-807a-2bd5e09f09b3}</UniqueIdentifier>
+      <UniqueIdentifier>{944b6b75-3951-48e6-81d5-6e596d074efc}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{62b95cb9-a259-4912-8dcd-47cb26d1824b}</UniqueIdentifier>
+      <UniqueIdentifier>{09325e26-328b-4344-af22-d97cb694e7df}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +34,9 @@
       <Filter>Crypto\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ECTest.h">
+      <Filter>Crypto\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EVPTest.h">
       <Filter>Crypto\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\PKCS12ContainerTest.h">
@@ -54,6 +57,9 @@
       <Filter>Crypto\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ECTest.cpp">
+      <Filter>Crypto\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EVPTest.cpp">
       <Filter>Crypto\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PKCS12ContainerTest.cpp">

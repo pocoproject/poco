@@ -25,14 +25,10 @@ public:
 	ECTest(const std::string& name);
 	~ECTest();
 
-	void testEVPPKey();
 	void testECNewKeys();
 	void testECNewKeysNoPassphrase();
 	void testECDSASignSha256();
 	void testECDSASignManipulated();
-	void testECCipher();
-	void testECCipherLarge();
-	void testECCertificate();
 
 	void setUp();
 	void tearDown();
