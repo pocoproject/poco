@@ -18,6 +18,7 @@
 #include "Poco/CppUnit/TestSuite.h"
 #include <sstream>
 #include <fstream>
+#include <iostream>
 
 
 using namespace Poco::Crypto;
